@@ -1,0 +1,463 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4382C3CBF889D674ADFDF59D /* libapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF9D0BC31C34D5144BA0D0D5 /* libapp.a */; };
+		5780ACB51E9800C0552F0866 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0347A81D94E1F319AA2BAF1 /* MetalKit.framework */; };
+		5DCCA1CA3192474BAF3B3B4C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D517C6E003424081DA94D78A /* Assets.xcassets */; };
+		6C17EE0AFDF32894B52E895B /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD03A2F0FBF0033A8F36F44E /* WebKit.framework */; };
+		89A4008092DA3D71FC12EDF8 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E5243767E6FEAD991FA7EC0 /* CoreGraphics.framework */; };
+		9BDB8D0DA6D15893D012EDB2 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B6942D27A00446F4D69606E /* Security.framework */; };
+		A15C43BD14D2FE4687C1E466 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA5C33A0E69E4594A2E34FA9 /* Metal.framework */; };
+		BEB9FBF2C68077D294585B0E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A184FC609325CE261468DE64 /* LaunchScreen.storyboard */; };
+		C32BA3AF59E2DB1DD51B0EF5 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BFB194B243AAAFBEF3C42E1 /* UIKit.framework */; };
+		D3F15819F2B0E5B4A877E959 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = E0D3CF221434DE79715758C3 /* main.mm */; };
+		EE7DBBDB27EC02BD747DCB56 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = BAE935DAF133D2798B4EA76A /* assets */; };
+		F0B894D869AEF309297CD2D6 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB6B046CC401F1E8AB8E99A7 /* QuartzCore.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		080C45C0B0C2EA6486E88F8A /* main.rs */ = {isa = PBXFileReference; path = main.rs; sourceTree = "<group>"; };
+		0C0ED01280F29C7662DFB694 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		3E5243767E6FEAD991FA7EC0 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		3F8B3373DC9098938EA76E72 /* lib.rs */ = {isa = PBXFileReference; path = lib.rs; sourceTree = "<group>"; };
+		63E617F1897395E195245065 /* dreamcaller_iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = dreamcaller_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		83FF327BB34AA2A5576F6DAC /* dreamcaller_iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = dreamcaller_iOS.entitlements; sourceTree = "<group>"; };
+		9B6942D27A00446F4D69606E /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		9BFB194B243AAAFBEF3C42E1 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		A184FC609325CE261468DE64 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		BAE935DAF133D2798B4EA76A /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = SOURCE_ROOT; };
+		BB6B046CC401F1E8AB8E99A7 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		BF9D0BC31C34D5144BA0D0D5 /* libapp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libapp.a; sourceTree = "<group>"; };
+		CD03A2F0FBF0033A8F36F44E /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		D0347A81D94E1F319AA2BAF1 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
+		D517C6E003424081DA94D78A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E0D3CF221434DE79715758C3 /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		EA5C33A0E69E4594A2E34FA9 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		EE91948B7DC83883AC630438 /* bindings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bindings.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		15D40CB4F9F1CA4863D0EC0E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4382C3CBF889D674ADFDF59D /* libapp.a in Frameworks */,
+				89A4008092DA3D71FC12EDF8 /* CoreGraphics.framework in Frameworks */,
+				A15C43BD14D2FE4687C1E466 /* Metal.framework in Frameworks */,
+				5780ACB51E9800C0552F0866 /* MetalKit.framework in Frameworks */,
+				F0B894D869AEF309297CD2D6 /* QuartzCore.framework in Frameworks */,
+				9BDB8D0DA6D15893D012EDB2 /* Security.framework in Frameworks */,
+				C32BA3AF59E2DB1DD51B0EF5 /* UIKit.framework in Frameworks */,
+				6C17EE0AFDF32894B52E895B /* WebKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0940FB47BFEEF5CD1DF67AB1 /* dreamcaller_iOS */ = {
+			isa = PBXGroup;
+			children = (
+				83FF327BB34AA2A5576F6DAC /* dreamcaller_iOS.entitlements */,
+				0C0ED01280F29C7662DFB694 /* Info.plist */,
+			);
+			path = dreamcaller_iOS;
+			sourceTree = "<group>";
+		};
+		0C1D4AB501AA0C5DFB9C6AC7 /* Externals */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Externals;
+			sourceTree = "<group>";
+		};
+		321079238AA2C2AFD620B9A5 /* dreamcaller */ = {
+			isa = PBXGroup;
+			children = (
+				E0D3CF221434DE79715758C3 /* main.mm */,
+				C98C66B2B5303B2C286A824E /* bindings */,
+			);
+			path = dreamcaller;
+			sourceTree = "<group>";
+		};
+		644DD52E6D53BDDC890CCB8B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				63E617F1897395E195245065 /* dreamcaller_iOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C0E89B9C3985B1FBD89BF980 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3E5243767E6FEAD991FA7EC0 /* CoreGraphics.framework */,
+				BF9D0BC31C34D5144BA0D0D5 /* libapp.a */,
+				EA5C33A0E69E4594A2E34FA9 /* Metal.framework */,
+				D0347A81D94E1F319AA2BAF1 /* MetalKit.framework */,
+				BB6B046CC401F1E8AB8E99A7 /* QuartzCore.framework */,
+				9B6942D27A00446F4D69606E /* Security.framework */,
+				9BFB194B243AAAFBEF3C42E1 /* UIKit.framework */,
+				CD03A2F0FBF0033A8F36F44E /* WebKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C105A08B9DD5046D2EEFAE89 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				321079238AA2C2AFD620B9A5 /* dreamcaller */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		C98C66B2B5303B2C286A824E /* bindings */ = {
+			isa = PBXGroup;
+			children = (
+				EE91948B7DC83883AC630438 /* bindings.h */,
+			);
+			path = bindings;
+			sourceTree = "<group>";
+		};
+		CE74D9A3D9BB8BF40D1CAA4E = {
+			isa = PBXGroup;
+			children = (
+				BAE935DAF133D2798B4EA76A /* assets */,
+				D517C6E003424081DA94D78A /* Assets.xcassets */,
+				A184FC609325CE261468DE64 /* LaunchScreen.storyboard */,
+				0940FB47BFEEF5CD1DF67AB1 /* dreamcaller_iOS */,
+				0C1D4AB501AA0C5DFB9C6AC7 /* Externals */,
+				C105A08B9DD5046D2EEFAE89 /* Sources */,
+				F1E81B425B3D8B1851E370D5 /* src */,
+				C0E89B9C3985B1FBD89BF980 /* Frameworks */,
+				644DD52E6D53BDDC890CCB8B /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F1E81B425B3D8B1851E370D5 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				3F8B3373DC9098938EA76E72 /* lib.rs */,
+				080C45C0B0C2EA6486E88F8A /* main.rs */,
+			);
+			name = src;
+			path = ../../src;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6998F9AEBDE88C5BF7EB3CE7 /* dreamcaller_iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 04A2317D45DFB470FB38E537 /* Build configuration list for PBXNativeTarget "dreamcaller_iOS" */;
+			buildPhases = (
+				6494F645FF965E0D7D5FD716 /* Build Rust Code */,
+				DC1DFB8F8AF05129B837F033 /* Sources */,
+				97C4A7355F4D3AA2EB61FFCE /* Resources */,
+				15D40CB4F9F1CA4863D0EC0E /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = dreamcaller_iOS;
+			productName = dreamcaller_iOS;
+			productReference = 63E617F1897395E195245065 /* dreamcaller_iOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		07638710BCEB83A9FCEEB9E7 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 113CD13ABD0369CA040E58A2 /* Build configuration list for PBXProject "dreamcaller" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = CE74D9A3D9BB8BF40D1CAA4E;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6998F9AEBDE88C5BF7EB3CE7 /* dreamcaller_iOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		97C4A7355F4D3AA2EB61FFCE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5DCCA1CA3192474BAF3B3B4C /* Assets.xcassets in Resources */,
+				BEB9FBF2C68077D294585B0E /* LaunchScreen.storyboard in Resources */,
+				EE7DBBDB27EC02BD747DCB56 /* assets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		6494F645FF965E0D7D5FD716 /* Build Rust Code */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build Rust Code";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/Externals/x86_64/${CONFIGURATION}/libapp.a",
+				"$(SRCROOT)/Externals/arm64/${CONFIGURATION}/libapp.a",
+				"$(SRCROOT)/Externals/arm64-sim/${CONFIGURATION}/libapp.a",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "npm run -- tauri ios xcode-script -v --platform ${PLATFORM_DISPLAY_NAME:?} --sdk-root ${SDKROOT:?} --framework-search-paths \"${FRAMEWORK_SEARCH_PATHS:?}\" --header-search-paths \"${HEADER_SEARCH_PATHS:?}\" --gcc-preprocessor-definitions \"${GCC_PREPROCESSOR_DEFINITIONS:-}\" --configuration ${CONFIGURATION:?} ${FORCE_COLOR} ${ARCHS:?}";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DC1DFB8F8AF05129B837F033 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D3F15819F2B0E5B4A877E959 /* main.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		43B6609F1519312EE609A4EF /* release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = release;
+		};
+		6D59E4D365A2CB2F912432D0 /* debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ARCHS = (
+					arm64,
+					"arm64-sim",
+				);
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = dreamcaller_iOS/dreamcaller_iOS.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphoneos*]" = "arm64-sim x86_64";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\".\"",
+				);
+				INFOPLIST_FILE = dreamcaller_iOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				"LIBRARY_SEARCH_PATHS[arch=arm64-sim]" = "$(inherited) $(PROJECT_DIR)/Externals/arm64-sim/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
+				"LIBRARY_SEARCH_PATHS[arch=arm64]" = "$(inherited) $(PROJECT_DIR)/Externals/arm64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
+				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = "$(inherited) $(PROJECT_DIR)/Externals/x86_64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.thedreamcaller;
+				PRODUCT_NAME = dreamcaller;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64  arm64-sim";
+			};
+			name = debug;
+		};
+		75DDD0C65E4AC12DB0D40983 /* release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ARCHS = (
+					arm64,
+					"arm64-sim",
+				);
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = dreamcaller_iOS/dreamcaller_iOS.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_BITCODE = NO;
+				"EXCLUDED_ARCHS[sdk=iphoneos*]" = "arm64-sim x86_64";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\".\"",
+				);
+				INFOPLIST_FILE = dreamcaller_iOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				"LIBRARY_SEARCH_PATHS[arch=arm64-sim]" = "$(inherited) $(PROJECT_DIR)/Externals/arm64-sim/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
+				"LIBRARY_SEARCH_PATHS[arch=arm64]" = "$(inherited) $(PROJECT_DIR)/Externals/arm64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
+				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = "$(inherited) $(PROJECT_DIR)/Externals/x86_64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.thedreamcaller;
+				PRODUCT_NAME = dreamcaller;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64  arm64-sim";
+			};
+			name = release;
+		};
+		D4FCDF5584744AA3047C8359 /* debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		04A2317D45DFB470FB38E537 /* Build configuration list for PBXNativeTarget "dreamcaller_iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6D59E4D365A2CB2F912432D0 /* debug */,
+				75DDD0C65E4AC12DB0D40983 /* release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = debug;
+		};
+		113CD13ABD0369CA040E58A2 /* Build configuration list for PBXProject "dreamcaller" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D4FCDF5584744AA3047C8359 /* debug */,
+				43B6609F1519312EE609A4EF /* release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 07638710BCEB83A9FCEEB9E7 /* Project object */;
+}
