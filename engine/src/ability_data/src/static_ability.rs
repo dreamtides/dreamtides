@@ -17,4 +17,5 @@
 /// A static ability represents something which modifies the rules of the game, either for
 /// this specific card or globally. Static abilities do not 'happen', they're just something
 /// that is always true.
+#[derive(Debug)]
 pub enum StaticAbility {}

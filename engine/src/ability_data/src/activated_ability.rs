@@ -18,6 +18,7 @@ use crate::effect::EffectList;
 
 /// An activated ability is present on a character card and allows the controlling player
 /// to pay some cost in order to achieve an effect. This is written as "> cost: effect".
+#[derive(Debug)]
 pub struct ActivatedAbility {
     /// Cost to activate this ability, paid before it is put on the stack.
     pub cost: Cost,

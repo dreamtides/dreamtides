@@ -15,8 +15,11 @@
  */
 
 /// Describes possible game events which may cause a triggered ability to trigger.
+#[derive(Debug, Clone)]
 pub enum TriggerEvent {
     Materialized,
     Judgment,
     Dissolved,
+    MaterializeAWarrior,
+    PlayACharacter,
 }

@@ -4,5 +4,6 @@ version = "0.0.0"
 edition = "2021"
 
 [dependencies]
-ability_data = { path = "../ability_data" }
 parser = { path = "../parser" }
+
+chumsky = "0.9.3"

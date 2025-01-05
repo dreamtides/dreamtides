@@ -18,9 +18,10 @@ use crate::effect::EffectList;
 use crate::static_ability::StaticAbility;
 use crate::trigger_event::TriggerEvent;
 
-/// An 'ability' represents a paragraph of text present on a card, or in some cases a specific
-/// keyword which maps to specific text defined by the game rules. Abilities on cards are evaluated
+/// An 'ability' represents a paragraph of text present on a card or a specific keyword
+/// which maps to text defined by the game rules. Abilities on cards are evaluated
 /// from top to bottom in order to apply their game effects.
+#[derive(Debug)]
 pub enum Ability {
     /// An event ability happens immediately when an event card is played, and then the event
     /// card is discarded. Character cards cannot have 'event' abilities.
@@ -35,7 +36,8 @@ pub enum Ability {
     /// to pay some cost in order to achieve an effect. This is written as "> cost: effect".
     Activated(ActivatedAbility),
 
-    /// A triggered ability is an effect which happens when some triggering event occurs while its
-    /// card is in play.
+    /// A triggered ability is an effect which happens when some triggering event occurs,
+    /// typically while its card is in play. Indicated in card text by "When", "Whenever",
+    /// or "At".
     Triggered(TriggerEvent, EffectList),
 }

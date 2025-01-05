@@ -5,3 +5,5 @@ edition = "2021"
 
 [dependencies]
 ability_data = { path = "../ability_data" }
+
+chumsky = "0.9.3"

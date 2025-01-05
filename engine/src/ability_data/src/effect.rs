@@ -17,6 +17,7 @@ use crate::condition::Condition;
 
 /// Provides a sequence of effects to apply, as well as modifiers which affect how those
 /// effects are applied.
+#[derive(Default, Debug, Clone)]
 pub struct EffectList {
     /// Sequences of effects to apply in the provided order, usually written as complete sentences
     /// or separated by the words "then" or "and" to indicate order.
@@ -31,10 +32,22 @@ pub struct EffectList {
     pub condition: Option<Condition>,
 }
 
+impl EffectList {
+    /// Creates a new effect list containing a single provided effect.
+    pub fn single(effect: Effect) -> Self {
+        Self {
+            effects: vec![effect],
+            ..Self::default()
+        }
+    }
+}
+
 /// Effects are the primary way in which cards modify the game state. This can be as part of the
 /// resolution of an event card, or via the effect text of a triggered or activated ability on
 /// a character card.
+#[derive(Debug, Clone)]
 pub enum Effect {
     /// Draw N cards.
     DrawCards(u32),
+    ThisCharacterGainsPlus1Spark,
 }

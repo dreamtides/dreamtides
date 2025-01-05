@@ -16,6 +16,7 @@
 
 /// Any action a player must take in order to play a card or activate an ability, such as
 /// paying energy.
+#[derive(Debug)]
 pub enum Cost {
     EnergyCost,
 }
