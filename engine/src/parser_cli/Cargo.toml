@@ -1,0 +1,8 @@
+[package]
+name = "parser_cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ability_types = { path = "../ability_types" }
+parser = { path = "../parser" }

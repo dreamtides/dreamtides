@@ -3,5 +3,21 @@
 version = 4
 
 [[package]]
+name = "ability_types"
+version = "0.1.0"
+
+[[package]]
 name = "main"
 version = "0.0.0"
+
+[[package]]
+name = "parser"
+version = "0.1.0"
+
+[[package]]
+name = "parser_cli"
+version = "0.1.0"
+dependencies = [
+ "ability_types",
+ "parser",
+]
