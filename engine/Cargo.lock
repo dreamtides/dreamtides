@@ -3,8 +3,8 @@
 version = 4
 
 [[package]]
-name = "ability_types"
-version = "0.1.0"
+name = "ability_data"
+version = "0.0.0"
 
 [[package]]
 name = "main"
@@ -13,11 +13,14 @@ version = "0.0.0"
 [[package]]
 name = "parser"
 version = "0.1.0"
+dependencies = [
+ "ability_data",
+]
 
 [[package]]
 name = "parser_cli"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
- "ability_types",
+ "ability_data",
  "parser",
 ]
