@@ -14,6 +14,12 @@ build:
 run *args='':
     npm run tauri dev
 
+android:
+    npm run tauri android dev
+
+ios:
+    npm run tauri ios dev
+
 run-release:
   npm run tauri dev -- --release
 
