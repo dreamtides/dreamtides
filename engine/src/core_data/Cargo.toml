@@ -3,5 +3,10 @@ name = "core_data"
 version = "0.0.0"
 edition = "2021"
 
+[lib]
+test = false
+doctest = false
+bench = false
+
 [dependencies]
 serde = { version = "1", features = ["derive"] }
