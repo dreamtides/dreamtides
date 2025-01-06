@@ -32,6 +32,6 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, extra::Err<Rich<'a
 fn materialize<'a>() -> impl Parser<'a, &'a str, TriggerEvent, extra::Err<Rich<'a, char>>> {
     just("you materialize")
         .ignore_then(determiner_parser::parser())
-        .map(|p| TriggerEvent::Materialize(p))
+        .map(TriggerEvent::Materialize)
         .padded()
 }

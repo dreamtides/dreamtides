@@ -13,10 +13,9 @@
 // limitations under the License.
 
 use ability_data::ability::Ability;
-use ability_data::triggered_ability::TriggeredAbility;
 use chumsky::prelude::*;
 
-use crate::{effect_parser, trigger_event_parser};
+use crate::{activated_ability_parser, triggered_ability_parser};
 
 /// Takes a string containing card rules text and parses it into an [Ability]
 /// data structure.
@@ -25,15 +24,9 @@ pub fn parse(text: &str) -> ParseResult<Ability, Rich<char>> {
 }
 
 fn parser<'a>() -> impl Parser<'a, &'a str, Ability, extra::Err<Rich<'a, char>>> {
-    trigger_keyword()
-        .ignore_then(trigger_event_parser::parser())
-        .then_ignore(just(","))
-        .then(effect_parser::parser())
-        .then_ignore(just("."))
-        .then_ignore(end())
-        .map(|(event, effects)| Ability::Triggered(TriggeredAbility::new(event, effects)))
-}
-
-fn trigger_keyword<'a>() -> impl Parser<'a, &'a str, &'a str, extra::Err<Rich<'a, char>>> {
-    text::keyword("Whenever").or(text::keyword("When"))
+    choice((
+        triggered_ability_parser::parser().map(Ability::Triggered),
+        activated_ability_parser::parser().map(Ability::Activated),
+    ))
+    .then_ignore(end())
 }

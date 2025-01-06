@@ -12,20 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ability_data::predicate::CardPredicate;
+use ability_data::predicate::{CardPredicate, Operator};
 use chumsky::error::Rich;
 use chumsky::prelude::{choice, just};
-use chumsky::{extra, Parser};
+use chumsky::{extra, text, Parser};
 use core_data::character_type::CharacterType;
+use core_data::numerics::Energy;
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, extra::Err<Rich<'a, char>>> {
     choice((
+        character_with_cost(),
+        character_type().map(CardPredicate::CharacterType),
         just("card").to(CardPredicate::Card),
         just("character").to(CardPredicate::Character),
         just("event").to(CardPredicate::Event),
-        character_type().map(|t| CardPredicate::CharacterType(t)),
     ))
     .padded()
+}
+
+fn character_with_cost<'a>() -> impl Parser<'a, &'a str, CardPredicate, extra::Err<Rich<'a, char>>>
+{
+    just("character with cost $").ignore_then(text::int(10)).then_ignore(just(" or less")).map(
+        |s: &str| CardPredicate::CharacterWithCost(Operator::OrLess, Energy(s.parse().unwrap())),
+    )
 }
 
 fn character_type<'a>() -> impl Parser<'a, &'a str, CharacterType, extra::Err<Rich<'a, char>>> {

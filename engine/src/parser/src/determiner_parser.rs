@@ -25,8 +25,8 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Predicate, extra::Err<Rich<'a, c
         just("this event").to(Predicate::This),
         just("that character").to(Predicate::That),
         just("that event").to(Predicate::That),
-        just("another").ignore_then(card_predicate_parser::parser()).map(|p| Predicate::Another(p)),
-        just("an enemy").ignore_then(card_predicate_parser::parser()).map(|p| Predicate::Enemy(p)),
+        just("another").ignore_then(card_predicate_parser::parser()).map(Predicate::Another),
+        just("an enemy").ignore_then(card_predicate_parser::parser()).map(Predicate::Enemy),
     ))
     .padded()
 }

@@ -12,12 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod ability_parser;
+use ability_data::cost::Cost;
+use chumsky::error::Rich;
+use chumsky::prelude::*;
+use chumsky::{extra, Parser};
+use core_data::numerics::Energy;
 
-mod activated_ability_parser;
-mod card_predicate_parser;
-mod cost_parser;
-mod determiner_parser;
-mod effect_parser;
-mod trigger_event_parser;
-mod triggered_ability_parser;
+pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, extra::Err<Rich<'a, char>>> {
+    choice((
+        just("$")
+            .ignore_then(text::int(10))
+            .map(|s: &str| Cost::Energy(Energy(s.parse().unwrap()))),
+        just("Banish ")
+            .ignore_then(text::int(10))
+            .then_ignore(just(" cards from your void"))
+            .map(|s: &str| Cost::BanishCardsFromYourVoid(s.parse().unwrap())),
+    ))
+    .padded()
+}

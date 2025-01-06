@@ -42,24 +42,25 @@ benchmark *args='':
 parser *args='':
   cargo run --manifest-path engine/Cargo.toml --bin "parser_cli" -- "$@"
 
+insta:
+  cd engine && cargo insta review
+
 # Reformats code. Requires nightly because several useful options (e.g. imports_granularity) are
 # nightly-only
-# Manifest path seems to not work?
 fmt: fix-ts-format
-    cd src-tauri && cargo +nightly fmt
+    cd engine && cargo +nightly fmt
 
 check-format:
-    # Manifest path seems to not work?
-    cd src-tauri && cargo +nightly fmt -- --check
+    cd engine && cargo +nightly fmt -- --check
 
 lint-ts:
-  npx eslint src
+  npx eslint client/src
 
 check-ts-format:
-  npx prettier src --check
+  npx prettier client/src --check
 
 fix-ts-format:
-  npx prettier src --write
+  npx prettier client/src --write
 
 check-docs:
     RUSTDOCFLAGS="-D rustdoc::broken-intra-doc-links -D rustdoc::private-intra-doc-links -D rustdoc::bare-urls" cargo doc --manifest-path engine/Cargo.toml --all

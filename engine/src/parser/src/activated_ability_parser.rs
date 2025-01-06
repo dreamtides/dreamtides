@@ -12,12 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod ability_parser;
+use ability_data::activated_ability::ActivatedAbility;
+use chumsky::error::Rich;
+use chumsky::prelude::*;
+use chumsky::{extra, Parser};
 
-mod activated_ability_parser;
-mod card_predicate_parser;
-mod cost_parser;
-mod determiner_parser;
-mod effect_parser;
-mod trigger_event_parser;
-mod triggered_ability_parser;
+use crate::{cost_parser, effect_parser};
+
+pub fn parser<'a>() -> impl Parser<'a, &'a str, ActivatedAbility, extra::Err<Rich<'a, char>>> {
+    just("$activated")
+        .padded()
+        .ignore_then(cost_parser::parser())
+        .then_ignore(just(":").padded())
+        .then(effect_parser::parser())
+        .then_ignore(just(".").padded())
+        .map(|(cost, effect)| ActivatedAbility { cost, effect, options: None })
+}

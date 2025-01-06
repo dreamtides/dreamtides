@@ -53,4 +53,7 @@ pub enum GameEffect {
 
     /// Matching character gains spark.
     GainSpark(Predicate, Spark),
+
+    /// Dissolve matching character.
+    DissolveCharacter(Predicate),
 }

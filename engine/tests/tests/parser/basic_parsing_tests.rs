@@ -52,3 +52,18 @@ fn test_materialize_warrior_gain_spark() {
     "###
     );
 }
+
+#[test]
+fn test_banish_from_void_dissolve_enemy_character() {
+    let result = parse("$activated Banish 3 cards from your void: Dissolve an enemy character with cost $2 or less.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    Activated(ActivatedAbility(
+      cost: BanishCardsFromYourVoid(3),
+      effect: Effect(DissolveCharacter(Enemy(CharacterWithCost(OrLess, Energy(2))))),
+      options: None,
+    ))
+    "###
+    );
+}

@@ -21,16 +21,22 @@ use core_data::numerics::Spark;
 use crate::determiner_parser;
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, Effect, extra::Err<Rich<'a, char>>> {
-    choice((gain_spark(),)).padded()
+    choice((gain_spark(), dissolve_character())).padded()
 }
 
 fn gain_spark<'a>() -> impl Parser<'a, &'a str, Effect, extra::Err<Rich<'a, char>>> {
     determiner_parser::parser()
         .then(
             just("gains +")
-                .ignore_then(text::int(10))
-                .then_ignore(just(" spark"))
+                .ignore_then(text::int(10).padded())
+                .then_ignore(just("spark"))
                 .map(|s: &str| Spark(s.parse().unwrap())),
         )
         .map(|(predicate, spark)| Effect::Effect(GameEffect::GainSpark(predicate, spark)))
+}
+
+fn dissolve_character<'a>() -> impl Parser<'a, &'a str, Effect, extra::Err<Rich<'a, char>>> {
+    just("Dissolve")
+        .ignore_then(determiner_parser::parser())
+        .map(|predicate| Effect::Effect(GameEffect::DissolveCharacter(predicate)))
 }
