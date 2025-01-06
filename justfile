@@ -39,6 +39,9 @@ clippy:
 benchmark *args='':
   cargo criterion --manifest-path src-tauri/Cargo.toml "$@"
 
+parser *args='':
+  cargo run --manifest-path engine/Cargo.toml --bin "parser_cli" -- "$@"
+
 # Reformats code. Requires nightly because several useful options (e.g. imports_granularity) are
 # nightly-only
 # Manifest path seems to not work?
