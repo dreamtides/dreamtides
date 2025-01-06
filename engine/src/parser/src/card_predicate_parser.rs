@@ -33,15 +33,15 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, extra::Err<Rich<'
 fn character_with_cost<'a>() -> impl Parser<'a, &'a str, CardPredicate, extra::Err<Rich<'a, char>>>
 {
     just("character with cost $").ignore_then(text::int(10)).then_ignore(just(" or less")).map(
-        |s: &str| CardPredicate::CharacterWithCost(Operator::OrLess, Energy(s.parse().unwrap())),
+        |s: &str| CardPredicate::CharacterWithCost(Energy(s.parse().unwrap()), Operator::OrLess),
     )
 }
 
 fn character_type<'a>() -> impl Parser<'a, &'a str, CharacterType, extra::Err<Rich<'a, char>>> {
     choice((
-        just("warrior").to(CharacterType::Warrior),
-        just("survivor").to(CharacterType::Survivor),
-        just("spirit animal").to(CharacterType::SpiritAnimal),
+        just("{cardtype: warrior}").to(CharacterType::Warrior),
+        just("{cardtype: survivor}").to(CharacterType::Survivor),
+        just("{cardtype: spirit animal}").to(CharacterType::SpiritAnimal),
     ))
     .padded()
 }

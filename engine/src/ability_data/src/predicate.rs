@@ -58,8 +58,8 @@ pub enum CardPredicate {
     Event,
     CharacterType(CharacterType),
     NotCharacterType(CharacterType),
-    CharacterWithSpark(Operator, Spark),
-    CharacterWithCost(Operator, Energy),
+    CharacterWithSpark(Spark, Operator),
+    CharacterWithCost(Energy, Operator),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

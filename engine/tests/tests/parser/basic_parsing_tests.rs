@@ -41,7 +41,9 @@ fn parse(text: &str) -> Ability {
 
 #[test]
 fn test_materialize_warrior_gain_spark() {
-    let result = parse("Whenever you materialize another warrior, this character gains +1 spark.");
+    let result = parse(
+        "Whenever you materialize another {cardtype: warrior}, this character gains +1 spark.",
+    );
     assert_ron_snapshot!(
         result,
         @r###"
@@ -61,7 +63,7 @@ fn test_banish_from_void_dissolve_enemy_character() {
         @r###"
     Activated(ActivatedAbility(
       cost: BanishCardsFromYourVoid(3),
-      effect: Effect(DissolveCharacter(Enemy(CharacterWithCost(OrLess, Energy(2))))),
+      effect: Effect(DissolveCharacter(Enemy(CharacterWithCost(Energy(2), OrLess)))),
       options: None,
     ))
     "###
