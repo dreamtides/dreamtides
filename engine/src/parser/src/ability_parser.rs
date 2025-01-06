@@ -23,11 +23,11 @@ use core_data::numerics::Spark;
 
 /// Takes a string containing card rules text and parses it into an [Ability]
 /// data structure.
-pub fn parse(text: &str) -> Result<Ability, Vec<Simple<char>>> {
+pub fn parse(text: &str) -> ParseResult<Ability, Rich<char>> {
     parser().parse(text)
 }
 
-fn parser() -> impl Parser<char, Ability, Error = Simple<char>> {
+fn parser<'a>() -> impl Parser<'a, &'a str, Ability, extra::Err<Rich<'a, char>>> {
     trigger_keyword()
         .ignore_then(trigger_event())
         .then_ignore(just(","))
@@ -37,11 +37,11 @@ fn parser() -> impl Parser<char, Ability, Error = Simple<char>> {
         .map(|(event, effects)| Ability::Triggered(TriggeredAbility::new(event, effects)))
 }
 
-fn trigger_keyword() -> impl Parser<char, (), Error = Simple<char>> {
+fn trigger_keyword<'a>() -> impl Parser<'a, &'a str, &'a str, extra::Err<Rich<'a, char>>> {
     text::keyword("Whenever").or(text::keyword("When"))
 }
 
-fn trigger_event() -> impl Parser<char, TriggerEvent, Error = Simple<char>> {
+fn trigger_event<'a>() -> impl Parser<'a, &'a str, TriggerEvent, extra::Err<Rich<'a, char>>> {
     choice((
         just("you materialize another warrior").to(TriggerEvent::Materialize(Predicate::Another(
             CardPredicate::CharacterType(CharacterType::Warrior),
@@ -52,7 +52,7 @@ fn trigger_event() -> impl Parser<char, TriggerEvent, Error = Simple<char>> {
     .padded()
 }
 
-fn effect_list() -> impl Parser<char, Effect, Error = Simple<char>> {
+fn effect_list<'a>() -> impl Parser<'a, &'a str, Effect, extra::Err<Rich<'a, char>>> {
     choice((
         just("this character gains +1 spark")
             .to(Effect::Effect(GameEffect::GainSpark(Predicate::This, Spark(1)))),

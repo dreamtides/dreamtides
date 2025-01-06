@@ -12,4 +12,4 @@ bench = false
 core_data = { path = "../core_data" }
 ability_data = { path = "../ability_data" }
 
-chumsky = "0.9"
+chumsky = "1.0.0-alpha.7"

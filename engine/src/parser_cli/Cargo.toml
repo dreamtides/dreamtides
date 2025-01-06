@@ -12,4 +12,5 @@ bench = false
 [dependencies]
 parser = { path = "../parser" }
 
+ariadne = "0.2"
 ron = "0.8"

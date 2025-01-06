@@ -14,6 +14,7 @@
 
 use std::{env, process};
 
+use ariadne::{Color, Label, Report, ReportKind, Source};
 use parser::ability_parser;
 
 fn main() {
@@ -23,13 +24,28 @@ fn main() {
         process::exit(0)
     }
 
-    match ability_parser::parse(&args[1]) {
-        Ok(result) => {
-            println!(
-                "{}",
-                ron::ser::to_string_pretty(&result, ron::ser::PrettyConfig::default()).unwrap(),
-            );
-        }
-        Err(parse_errs) => parse_errs.into_iter().for_each(|e| println!("Parse error: {}", e)),
+    let (result, errs) = ability_parser::parse(&args[1]).into_output_errors();
+    if let Some(output) = result.as_ref() {
+        println!(
+            "{}",
+            ron::ser::to_string_pretty(
+                output,
+                ron::ser::PrettyConfig::default().struct_names(true)
+            )
+            .unwrap(),
+        );
     }
+
+    errs.into_iter().for_each(|e| {
+        Report::build(ReportKind::Error, (), e.span().start)
+            .with_message(e.to_string())
+            .with_label(
+                Label::new(e.span().into_range())
+                    .with_message(e.reason().to_string())
+                    .with_color(Color::Red),
+            )
+            .finish()
+            .eprint(Source::from(&args[1]))
+            .unwrap()
+    });
 }

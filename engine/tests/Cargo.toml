@@ -7,5 +7,7 @@ edition = "2021"
 ability_data = { path = "../src/ability_data" }
 parser = { path = "../src/parser" }
 
+ariadne = "0.2"
+
 [dev-dependencies]
 insta = { version = "1.42", features = ["ron"] }
