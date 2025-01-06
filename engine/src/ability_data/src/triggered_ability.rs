@@ -14,27 +14,20 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::cost::Cost;
 use crate::effect::Effect;
+use crate::trigger_event::TriggerEvent;
 
-/// An activated ability is present on a character card and allows the
-/// controlling player to pay some cost in order to achieve an effect. This is
-/// written as "> cost: effect".
+/// A triggered ability is an effect which happens when some triggering
+/// event occurs, typically while its card is in play. Indicated in card
+/// text by "When", "Whenever", "At", or by a trigger keyword.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ActivatedAbility {
-    /// Cost to activate this ability, paid before it is put on the stack.
-    pub cost: Cost,
-
-    /// Effect of this ability, applied as it resolves on the stack.
+pub struct TriggeredAbility {
+    pub trigger: TriggerEvent,
     pub effect: Effect,
+}
 
-    /// True if this ability can be activated in response to enemy game actions.
-    pub is_fast: bool,
-
-    /// True if this ability can be used on the turn in which its controlling
-    /// character was played.
-    pub is_immediate: bool,
-
-    /// True if this ability can be used multiple times per turn.
-    pub is_multi: bool,
+impl TriggeredAbility {
+    pub fn new(trigger: TriggerEvent, effect: Effect) -> Self {
+        Self { trigger, effect }
+    }
 }

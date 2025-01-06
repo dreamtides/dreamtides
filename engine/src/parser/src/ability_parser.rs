@@ -13,21 +13,28 @@
 // limitations under the License.
 
 use ability_data::ability::Ability;
-use ability_data::effect::{Effect, EffectList};
+use ability_data::effect::{Effect, GameEffect};
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::trigger_event::TriggerEvent;
+use ability_data::triggered_ability::TriggeredAbility;
 use chumsky::prelude::*;
 use core_data::character_type::CharacterType;
 use core_data::numerics::Spark;
 
-pub fn parser() -> impl Parser<char, Ability, Error = Simple<char>> {
+/// Takes a string containing card rules text and parses it into an [Ability]
+/// data structure.
+pub fn parse(text: &str) -> Result<Ability, Vec<Simple<char>>> {
+    parser().parse(text)
+}
+
+fn parser() -> impl Parser<char, Ability, Error = Simple<char>> {
     trigger_keyword()
         .ignore_then(trigger_event())
         .then_ignore(just(","))
         .then(effect_list())
         .then_ignore(just("."))
         .then_ignore(end())
-        .map(|(event, effects)| Ability::Triggered(event, effects))
+        .map(|(event, effects)| Ability::Triggered(TriggeredAbility::new(event, effects)))
 }
 
 fn trigger_keyword() -> impl Parser<char, (), Error = Simple<char>> {
@@ -45,11 +52,11 @@ fn trigger_event() -> impl Parser<char, TriggerEvent, Error = Simple<char>> {
     .padded()
 }
 
-fn effect_list() -> impl Parser<char, EffectList, Error = Simple<char>> {
+fn effect_list() -> impl Parser<char, Effect, Error = Simple<char>> {
     choice((
         just("this character gains +1 spark")
-            .to(EffectList::single(Effect::GainSpark(Predicate::This, Spark(1)))),
-        just("draw a card").to(EffectList::single(Effect::DrawCards(1))),
+            .to(Effect::Effect(GameEffect::GainSpark(Predicate::This, Spark(1)))),
+        just("draw a card").to(Effect::Effect(GameEffect::DrawCards(1))),
     ))
     .padded()
 }

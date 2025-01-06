@@ -15,9 +15,9 @@
 use serde::{Deserialize, Serialize};
 
 use crate::activated_ability::ActivatedAbility;
-use crate::effect::EffectList;
+use crate::effect::Effect;
 use crate::static_ability::StaticAbility;
-use crate::trigger_event::TriggerEvent;
+use crate::triggered_ability::TriggeredAbility;
 
 /// An 'ability' represents a paragraph of text present on a card or a specific
 /// keyword which maps to text defined by the game rules. Abilities on cards are
@@ -27,7 +27,7 @@ pub enum Ability {
     /// An event ability happens immediately when an event card is played, and
     /// then the event card is discarded. Character cards cannot have
     /// 'event' abilities.
-    Event(EffectList),
+    Event(Effect),
 
     /// A static ability represents something which modifies the rules of the
     /// game, either for this specific card or globally. Static abilities do
@@ -42,5 +42,5 @@ pub enum Ability {
     /// A triggered ability is an effect which happens when some triggering
     /// event occurs, typically while its card is in play. Indicated in card
     /// text by "When", "Whenever", "At", or by a trigger keyword.
-    Triggered(TriggerEvent, EffectList),
+    Triggered(TriggeredAbility),
 }

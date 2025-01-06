@@ -26,7 +26,7 @@ pub enum Predicate {
     This,
 
     /// Card targeted by this effect. This is typically used for applying
-    /// multiple effects to the same target, e.g.  "banish a character you
+    /// multiple effects to the same target, e.g. "banish a character you
     /// control, then materialize it."
     Target,
 

@@ -12,24 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::{env, process};
-
+use ability_data::ability::Ability;
+use insta::assert_ron_snapshot;
 use parser::ability_parser;
 
-fn main() {
-    let args: Vec<_> = env::args().collect();
-    if args.len() != 2 {
-        println!("Usage: parser_cli <expression>");
-        process::exit(0)
+fn parse(text: &str) -> Ability {
+    match ability_parser::parse(text) {
+        Ok(parsed) => parsed,
+        Err(errors) => panic!("Parse error: {:?}", errors),
     }
+}
 
-    match ability_parser::parse(&args[1]) {
-        Ok(result) => {
-            println!(
-                "{}",
-                ron::ser::to_string_pretty(&result, ron::ser::PrettyConfig::default()).unwrap(),
-            );
-        }
-        Err(parse_errs) => parse_errs.into_iter().for_each(|e| println!("Parse error: {}", e)),
-    }
+#[test]
+fn test_materialize_warrior_gain_spark() {
+    let result = parse("Whenever you materialize another warrior, this character gains +1 spark.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    Triggered(TriggeredAbility(
+      trigger: Materialize(Another(CharacterType(Warrior))),
+      effect: Effect(GainSpark(This, Spark(1))),
+    ))
+    "###
+    );
 }

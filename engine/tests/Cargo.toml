@@ -4,7 +4,8 @@ version = "0.0.0"
 edition = "2021"
 
 [dependencies]
+ability_data = { path = "../src/ability_data" }
 parser = { path = "../src/parser" }
 
 [dev-dependencies]
-insta = "1.42"
+insta = { version = "1.42", features = ["ron"] }
