@@ -23,7 +23,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, extra::Err<Rich<'a, char>>
         just("$")
             .ignore_then(text::int(10))
             .map(|s: &str| Cost::Energy(Energy(s.parse().unwrap()))),
-        just("Banish ")
+        just("banish ")
             .ignore_then(text::int(10))
             .then_ignore(just(" cards from your void"))
             .map(|s: &str| Cost::BanishCardsFromYourVoid(s.parse().unwrap())),

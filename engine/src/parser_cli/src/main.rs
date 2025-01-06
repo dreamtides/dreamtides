@@ -24,7 +24,8 @@ fn main() {
         process::exit(0)
     }
 
-    let (result, errs) = ability_parser::parse(&args[1]).into_output_errors();
+    let input = args[1].to_lowercase();
+    let (result, errs) = ability_parser::parse(&input).into_output_errors();
     if let Some(output) = result.as_ref() {
         println!(
             "{}",

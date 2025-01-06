@@ -13,15 +13,16 @@
 // limitations under the License.
 
 use ability_data::effect::{Effect, GameEffect};
+use ability_data::predicate::Predicate;
 use chumsky::error::Rich;
 use chumsky::prelude::*;
 use chumsky::{extra, text, Parser};
 use core_data::numerics::Spark;
 
-use crate::determiner_parser;
+use crate::{card_predicate_parser, determiner_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, Effect, extra::Err<Rich<'a, char>>> {
-    choice((gain_spark(), dissolve_character())).padded()
+    choice((gain_spark_until_next_main_for_each(), gain_spark(), dissolve_character())).padded()
 }
 
 fn gain_spark<'a>() -> impl Parser<'a, &'a str, Effect, extra::Err<Rich<'a, char>>> {
@@ -32,11 +33,28 @@ fn gain_spark<'a>() -> impl Parser<'a, &'a str, Effect, extra::Err<Rich<'a, char
                 .then_ignore(just("spark"))
                 .map(|s: &str| Spark(s.parse().unwrap())),
         )
-        .map(|(predicate, spark)| Effect::Effect(GameEffect::GainSpark(predicate, spark)))
+        .map(|(predicate, spark)| Effect::Effect(GameEffect::GainsSpark(predicate, spark)))
+}
+
+fn gain_spark_until_next_main_for_each<'a>(
+) -> impl Parser<'a, &'a str, Effect, extra::Err<Rich<'a, char>>> {
+    determiner_parser::parser()
+        .then_ignore(just("gains +"))
+        .then(text::int(10).padded())
+        .then_ignore(just("spark until your next main phase for each").padded())
+        .then(card_predicate_parser::parser())
+        .then_ignore(just("you control").padded())
+        .map(|((target, spark), counted)| {
+            Effect::Effect(GameEffect::GainsSparkUntilYourNextMainPhaseForEach(
+                target,
+                Spark(spark.parse().unwrap()),
+                Predicate::Your(counted),
+            ))
+        })
 }
 
 fn dissolve_character<'a>() -> impl Parser<'a, &'a str, Effect, extra::Err<Rich<'a, char>>> {
-    just("Dissolve")
+    just("dissolve")
         .ignore_then(determiner_parser::parser())
         .map(|predicate| Effect::Effect(GameEffect::DissolveCharacter(predicate)))
 }

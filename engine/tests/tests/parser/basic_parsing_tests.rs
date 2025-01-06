@@ -18,7 +18,8 @@ use insta::assert_ron_snapshot;
 use parser::ability_parser;
 
 fn parse(text: &str) -> Ability {
-    let (result, errs) = ability_parser::parse(text).into_output_errors();
+    let input = text.to_lowercase();
+    let (result, errs) = ability_parser::parse(&input).into_output_errors();
 
     if !errs.is_empty() {
         errs.into_iter().for_each(|e| {
@@ -49,7 +50,7 @@ fn test_materialize_warrior_gain_spark() {
         @r###"
     Triggered(TriggeredAbility(
       trigger: Materialize(Another(CharacterType(Warrior))),
-      effect: Effect(GainSpark(This, Spark(1))),
+      effect: Effect(GainsSpark(This, Spark(1))),
     ))
     "###
     );
@@ -67,5 +68,14 @@ fn test_banish_from_void_dissolve_enemy_character() {
       options: None,
     ))
     "###
+    );
+}
+
+#[test]
+fn test_gains_spark_until_main_phase_for_each_warrior() {
+    let result = parse("A character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control.");
+    assert_ron_snapshot!(
+    result,
+    @"Event(Effect(GainsSparkUntilYourNextMainPhaseForEach(Your(Character), Spark(1), Your(CharacterType(Warrior)))))"
     );
 }

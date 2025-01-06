@@ -14,7 +14,7 @@
 
 use ability_data::predicate::Predicate;
 use chumsky::error::Rich;
-use chumsky::prelude::{choice, just};
+use chumsky::prelude::*;
 use chumsky::{extra, Parser};
 
 use crate::card_predicate_parser;
@@ -27,6 +27,11 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Predicate, extra::Err<Rich<'a, c
         just("that event").to(Predicate::That),
         just("another").ignore_then(card_predicate_parser::parser()).map(Predicate::Another),
         just("an enemy").ignore_then(card_predicate_parser::parser()).map(Predicate::Enemy),
+        choice((just("a"), just("an")))
+            .padded()
+            .ignore_then(card_predicate_parser::parser())
+            .then_ignore(just("you control").padded())
+            .map(Predicate::Your),
     ))
     .padded()
 }

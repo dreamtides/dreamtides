@@ -15,10 +15,12 @@
 use ability_data::ability::Ability;
 use chumsky::prelude::*;
 
-use crate::{activated_ability_parser, triggered_ability_parser};
+use crate::{activated_ability_parser, effect_parser, triggered_ability_parser};
 
 /// Takes a string containing card rules text and parses it into an [Ability]
 /// data structure.
+///
+/// The provided text must be all lowercase.
 pub fn parse(text: &str) -> ParseResult<Ability, Rich<char>> {
     parser().parse(text)
 }
@@ -27,6 +29,7 @@ fn parser<'a>() -> impl Parser<'a, &'a str, Ability, extra::Err<Rich<'a, char>>>
     choice((
         triggered_ability_parser::parser().map(Ability::Triggered),
         activated_ability_parser::parser().map(Ability::Activated),
+        effect_parser::parser().then_ignore(just(".")).map(Ability::Event),
     ))
     .then_ignore(end())
 }

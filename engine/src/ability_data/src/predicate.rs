@@ -42,7 +42,7 @@ pub enum Predicate {
     Another(CardPredicate),
 
     /// Any card controlled by the owner matching a predicate.
-    You(CardPredicate),
+    Your(CardPredicate),
 
     /// Any card matching a predicate.
     Any(CardPredicate),

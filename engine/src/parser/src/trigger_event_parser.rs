@@ -24,7 +24,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, extra::Err<Rich<'a
     choice((
         materialize(),
         just("you play a character")
-            .to(TriggerEvent::Play(Predicate::You(CardPredicate::Character))),
+            .to(TriggerEvent::Play(Predicate::Your(CardPredicate::Character))),
     ))
     .padded()
 }

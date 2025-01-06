@@ -48,12 +48,8 @@ pub struct EffectList {
 /// triggered or activated ability on a character card.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum GameEffect {
-    /// Controller draws N cards.
     DrawCards(u32),
-
-    /// Matching character gains spark.
-    GainSpark(Predicate, Spark),
-
-    /// Dissolve matching character.
+    GainsSpark(Predicate, Spark),
+    GainsSparkUntilYourNextMainPhaseForEach(Predicate, Spark, Predicate),
     DissolveCharacter(Predicate),
 }

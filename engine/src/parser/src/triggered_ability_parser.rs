@@ -29,5 +29,5 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, extra::Err<Ric
 }
 
 fn trigger_keyword<'a>() -> impl Parser<'a, &'a str, &'a str, extra::Err<Rich<'a, char>>> {
-    text::keyword("Whenever").or(text::keyword("When"))
+    text::keyword("whenever").or(text::keyword("when"))
 }
