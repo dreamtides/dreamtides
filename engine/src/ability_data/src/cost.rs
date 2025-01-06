@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use serde::{Deserialize, Serialize};
+
 /// Any action a player must take in order to play a card or activate an
 /// ability, such as paying energy.
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Cost {
     EnergyCost,
 }

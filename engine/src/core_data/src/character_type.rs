@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use serde::{Deserialize, Serialize};
+
 /// Represents possible subtypes of 'character' cards.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum CharacterType {
     Warrior,
     Survivor,

@@ -14,12 +14,13 @@
 
 use core_data::character_type::CharacterType;
 use core_data::numerics::{Energy, Spark};
+use serde::{Deserialize, Serialize};
 
 /// Specifies which game object is being effected by a card.
 ///
 /// This is used for both targeting constraints as well as describing the
 /// implicit target of an effect.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Predicate {
     /// Predicate which only matches the owning card.
     This,
@@ -50,7 +51,7 @@ pub enum Predicate {
     AnyOther(CardPredicate),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum CardPredicate {
     Card,
     Character,
@@ -61,7 +62,7 @@ pub enum CardPredicate {
     CharacterWithCost(Operator, Energy),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Operator {
     OrMore,
     Exactly,

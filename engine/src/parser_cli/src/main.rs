@@ -26,7 +26,10 @@ fn main() {
 
     match ability_parser::parser().parse(args[1].clone()) {
         Ok(result) => {
-            println!("{:?}", result);
+            println!(
+                "{}",
+                ron::ser::to_string_pretty(&result, ron::ser::PrettyConfig::default()).unwrap(),
+            );
         }
         Err(parse_errs) => parse_errs.into_iter().for_each(|e| println!("Parse error: {}", e)),
     }

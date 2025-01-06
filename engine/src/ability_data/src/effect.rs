@@ -13,13 +13,14 @@
 // limitations under the License.
 
 use core_data::numerics::Spark;
+use serde::{Deserialize, Serialize};
 
 use crate::condition::Condition;
 use crate::predicate::Predicate;
 
 /// Provides a sequence of effects to apply, as well as modifiers which affect
 /// how those effects are applied.
-#[derive(Default, Debug, Clone)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct EffectList {
     /// Sequences of effects to apply in the provided order, usually written as
     /// complete sentences or separated by the words "then" or "and" to
@@ -45,7 +46,7 @@ impl EffectList {
 /// Effects are the primary way in which cards modify the game state. This can
 /// be as part of the resolution of an event card, or via the effect text of a
 /// triggered or activated ability on a character card.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Effect {
     /// Controller draws N cards.
     DrawCards(u32),

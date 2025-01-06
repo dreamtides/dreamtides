@@ -12,15 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use serde::{Deserialize, Serialize};
+
 /// A resource used to pay for cards & abilities.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Energy(pub u64);
 
 /// Represents the 'power' of characters; the primary way in which players earn
 /// victory points.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Spark(pub u64);
 
 /// Victory points. Enable the player to win the game.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Points(pub u64);

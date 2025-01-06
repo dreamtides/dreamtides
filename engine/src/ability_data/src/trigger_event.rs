@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use serde::{Deserialize, Serialize};
+
 use crate::predicate::Predicate;
 
 /// Describes possible game events which may cause a triggered ability to
 /// trigger.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum TriggerEvent {
     Keyword(TriggerKeyword),
 
@@ -27,7 +29,7 @@ pub enum TriggerEvent {
     Play(Predicate),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum TriggerKeyword {
     Materialized,
     Judgment,

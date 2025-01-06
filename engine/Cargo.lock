@@ -7,6 +7,7 @@ name = "ability_data"
 version = "0.0.0"
 dependencies = [
  "core_data",
+ "serde",
 ]
 
 [[package]]
@@ -26,6 +27,21 @@ name = "allocator-api2"
 version = "0.2.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
+
+[[package]]
+name = "base64"
+version = "0.21.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
+
+[[package]]
+name = "bitflags"
+version = "2.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b048fb63fd8b5923fc5aa7b340d8e156aec7ec02f0c78fa8a6ddc2613f6f71de"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "cc"
@@ -55,6 +71,9 @@ dependencies = [
 [[package]]
 name = "core_data"
 version = "0.0.0"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "hashbrown"
@@ -97,6 +116,7 @@ version = "0.0.0"
 dependencies = [
  "chumsky",
  "parser",
+ "ron",
 ]
 
 [[package]]
@@ -124,6 +144,38 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0e4dccaaaf89514f546c693ddc140f729f958c247918a13380cccc6078391acc"
 dependencies = [
  "proc-macro2",
+]
+
+[[package]]
+name = "ron"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b91f7eff05f748767f183df4320a63d6936e9c6107d97c9e6bdd9784f4289c94"
+dependencies = [
+ "base64",
+ "bitflags",
+ "serde",
+ "serde_derive",
+]
+
+[[package]]
+name = "serde"
+version = "1.0.217"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "02fc4265df13d6fa1d00ecff087228cc0a2b5f3c0e87e258d8b94a156e984c70"
+dependencies = [
+ "serde_derive",
+]
+
+[[package]]
+name = "serde_derive"
+version = "1.0.217"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5a9bf7cf98d04a2b28aead066b7496853d4779c9cc183c440dbac457641e19a0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]

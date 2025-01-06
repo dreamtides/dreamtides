@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use serde::{Deserialize, Serialize};
+
 /// A static ability represents something which modifies the rules of the game,
 /// either for this specific card or globally. Static abilities do not 'happen',
 /// they're just something that is always true.
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum StaticAbility {}
