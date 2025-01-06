@@ -13,23 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-use crate::predicate::Predicate;
 
-/// Describes possible game events which may cause a triggered ability to trigger.
+/// A resource used to pay for cards & abilities.
 #[derive(Debug, Clone)]
-pub enum TriggerEvent {
-    Keyword(TriggerKeyword),
+pub struct Energy(pub u64);
 
-    /// Event when a character matching a predicate is materialized.
-    Materialize(Predicate),
-
-    /// Event when a card matching a predicate is played
-    Play(Predicate),
-}
-
+/// Represents the 'power' of characters; the primary way in which players earn victory points.
 #[derive(Debug, Clone)]
-pub enum TriggerKeyword {
-    Materialized,
-    Judgment,
-    Dissolved,
-}
+pub struct Spark(pub u64);
+
+/// Victory points. Enable the player to win the game.
+#[derive(Debug, Clone)]
+pub struct Points(pub u64);

@@ -13,23 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-use crate::predicate::Predicate;
 
-/// Describes possible game events which may cause a triggered ability to trigger.
-#[derive(Debug, Clone)]
-pub enum TriggerEvent {
-    Keyword(TriggerKeyword),
-
-    /// Event when a character matching a predicate is materialized.
-    Materialize(Predicate),
-
-    /// Event when a card matching a predicate is played
-    Play(Predicate),
-}
-
-#[derive(Debug, Clone)]
-pub enum TriggerKeyword {
-    Materialized,
-    Judgment,
-    Dissolved,
-}
+pub mod character_type;
+pub mod numerics;

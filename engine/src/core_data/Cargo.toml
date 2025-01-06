@@ -1,7 +1,6 @@
 [package]
-name = "ability_data"
+name = "core_data"
 version = "0.0.0"
 edition = "2021"
 
 [dependencies]
-core_data = { path = "../core_data" }

@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+core_data = { path = "../core_data" }
 ability_data = { path = "../ability_data" }
 
 chumsky = "0.9.3"

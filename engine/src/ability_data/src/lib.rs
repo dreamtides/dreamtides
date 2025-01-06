@@ -19,5 +19,6 @@ pub mod activated_ability;
 pub mod condition;
 pub mod cost;
 pub mod effect;
+pub mod predicate;
 pub mod static_ability;
 pub mod trigger_event;

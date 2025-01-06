@@ -16,8 +16,10 @@
 
 use ability_data::ability::Ability;
 use ability_data::effect::{Effect, EffectList};
+use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::trigger_event::TriggerEvent;
 use chumsky::prelude::*;
+use core_data::character_type::CharacterType;
 
 pub fn parser() -> impl Parser<char, Ability, Error = Simple<char>> {
     trigger_keyword()
@@ -35,8 +37,11 @@ fn trigger_keyword() -> impl Parser<char, (), Error = Simple<char>> {
 
 fn trigger_event() -> impl Parser<char, TriggerEvent, Error = Simple<char>> {
     choice((
-        just("you materialize another warrior").to(TriggerEvent::MaterializeAWarrior),
-        just("you play a character").to(TriggerEvent::PlayACharacter),
+        just("you materialize another warrior").to(TriggerEvent::Materialize(
+            Predicate::AnotherYouControl(CardPredicate::CharacterType(CharacterType::Warrior)),
+        )),
+        just("you play a character")
+            .to(TriggerEvent::Play(Predicate::You(CardPredicate::Character))),
     ))
     .padded()
 }
