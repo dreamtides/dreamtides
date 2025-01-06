@@ -12,26 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ability_data::predicate::{CardPredicate, Predicate};
-use ability_data::trigger_event::TriggerEvent;
+use ability_data::predicate::Predicate;
 use chumsky::error::Rich;
 use chumsky::prelude::{choice, just};
 use chumsky::{extra, Parser};
 
-use crate::determiner_parser;
+use crate::card_predicate_parser;
 
-pub fn parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, extra::Err<Rich<'a, char>>> {
+pub fn parser<'a>() -> impl Parser<'a, &'a str, Predicate, extra::Err<Rich<'a, char>>> {
     choice((
-        materialize(),
-        just("you play a character")
-            .to(TriggerEvent::Play(Predicate::You(CardPredicate::Character))),
+        just("this character").to(Predicate::This),
+        just("this event").to(Predicate::This),
+        just("that character").to(Predicate::That),
+        just("that event").to(Predicate::That),
+        just("another").ignore_then(card_predicate_parser::parser()).map(|p| Predicate::Another(p)),
+        just("an enemy").ignore_then(card_predicate_parser::parser()).map(|p| Predicate::Enemy(p)),
     ))
     .padded()
-}
-
-fn materialize<'a>() -> impl Parser<'a, &'a str, TriggerEvent, extra::Err<Rich<'a, char>>> {
-    just("you materialize")
-        .ignore_then(determiner_parser::parser())
-        .map(|p| TriggerEvent::Materialize(p))
-        .padded()
 }

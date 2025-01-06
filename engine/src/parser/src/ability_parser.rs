@@ -13,13 +13,10 @@
 // limitations under the License.
 
 use ability_data::ability::Ability;
-use ability_data::effect::{Effect, GameEffect};
-use ability_data::predicate::Predicate;
 use ability_data::triggered_ability::TriggeredAbility;
 use chumsky::prelude::*;
-use core_data::numerics::Spark;
 
-use crate::trigger_event_parser;
+use crate::{effect_parser, trigger_event_parser};
 
 /// Takes a string containing card rules text and parses it into an [Ability]
 /// data structure.
@@ -31,7 +28,7 @@ fn parser<'a>() -> impl Parser<'a, &'a str, Ability, extra::Err<Rich<'a, char>>>
     trigger_keyword()
         .ignore_then(trigger_event_parser::parser())
         .then_ignore(just(","))
-        .then(effect_list())
+        .then(effect_parser::parser())
         .then_ignore(just("."))
         .then_ignore(end())
         .map(|(event, effects)| Ability::Triggered(TriggeredAbility::new(event, effects)))
@@ -39,13 +36,4 @@ fn parser<'a>() -> impl Parser<'a, &'a str, Ability, extra::Err<Rich<'a, char>>>
 
 fn trigger_keyword<'a>() -> impl Parser<'a, &'a str, &'a str, extra::Err<Rich<'a, char>>> {
     text::keyword("Whenever").or(text::keyword("When"))
-}
-
-fn effect_list<'a>() -> impl Parser<'a, &'a str, Effect, extra::Err<Rich<'a, char>>> {
-    choice((
-        just("this character gains +1 spark")
-            .to(Effect::Effect(GameEffect::GainSpark(Predicate::This, Spark(1)))),
-        just("draw a card").to(Effect::Effect(GameEffect::DrawCards(1))),
-    ))
-    .padded()
 }
