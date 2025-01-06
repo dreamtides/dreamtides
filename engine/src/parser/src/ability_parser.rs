@@ -14,12 +14,12 @@
 
 use ability_data::ability::Ability;
 use ability_data::effect::{Effect, GameEffect};
-use ability_data::predicate::{CardPredicate, Predicate};
-use ability_data::trigger_event::TriggerEvent;
+use ability_data::predicate::Predicate;
 use ability_data::triggered_ability::TriggeredAbility;
 use chumsky::prelude::*;
-use core_data::character_type::CharacterType;
 use core_data::numerics::Spark;
+
+use crate::trigger_event_parser;
 
 /// Takes a string containing card rules text and parses it into an [Ability]
 /// data structure.
@@ -29,7 +29,7 @@ pub fn parse(text: &str) -> ParseResult<Ability, Rich<char>> {
 
 fn parser<'a>() -> impl Parser<'a, &'a str, Ability, extra::Err<Rich<'a, char>>> {
     trigger_keyword()
-        .ignore_then(trigger_event())
+        .ignore_then(trigger_event_parser::parser())
         .then_ignore(just(","))
         .then(effect_list())
         .then_ignore(just("."))
@@ -39,17 +39,6 @@ fn parser<'a>() -> impl Parser<'a, &'a str, Ability, extra::Err<Rich<'a, char>>>
 
 fn trigger_keyword<'a>() -> impl Parser<'a, &'a str, &'a str, extra::Err<Rich<'a, char>>> {
     text::keyword("Whenever").or(text::keyword("When"))
-}
-
-fn trigger_event<'a>() -> impl Parser<'a, &'a str, TriggerEvent, extra::Err<Rich<'a, char>>> {
-    choice((
-        just("you materialize another warrior").to(TriggerEvent::Materialize(Predicate::Another(
-            CardPredicate::CharacterType(CharacterType::Warrior),
-        ))),
-        just("you play a character")
-            .to(TriggerEvent::Play(Predicate::You(CardPredicate::Character))),
-    ))
-    .padded()
 }
 
 fn effect_list<'a>() -> impl Parser<'a, &'a str, Effect, extra::Err<Rich<'a, char>>> {

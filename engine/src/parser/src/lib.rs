@@ -14,3 +14,4 @@
 
 pub mod ability_parser;
 mod card_predicate_parser;
+mod trigger_event_parser;

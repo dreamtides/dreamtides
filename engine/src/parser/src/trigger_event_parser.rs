@@ -12,27 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ability_data::predicate::CardPredicate;
+use ability_data::predicate::{CardPredicate, Predicate};
+use ability_data::trigger_event::TriggerEvent;
 use chumsky::error::Rich;
 use chumsky::prelude::{choice, just};
 use chumsky::{extra, Parser};
-use core_data::character_type::CharacterType;
 
-pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, extra::Err<Rich<'a, char>>> {
+use crate::card_predicate_parser;
+
+pub fn parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, extra::Err<Rich<'a, char>>> {
     choice((
-        just("card").to(CardPredicate::Card),
-        just("character").to(CardPredicate::Character),
-        just("event").to(CardPredicate::Event),
-        character_type().map(|t| CardPredicate::CharacterType(t)),
+        materialize(),
+        just("you play a character")
+            .to(TriggerEvent::Play(Predicate::You(CardPredicate::Character))),
     ))
     .padded()
 }
 
-fn character_type<'a>() -> impl Parser<'a, &'a str, CharacterType, extra::Err<Rich<'a, char>>> {
-    choice((
-        just("warrior").to(CharacterType::Warrior),
-        just("survivor").to(CharacterType::Survivor),
-        just("spirit animal").to(CharacterType::SpiritAnimal),
-    ))
-    .padded()
+fn materialize<'a>() -> impl Parser<'a, &'a str, TriggerEvent, extra::Err<Rich<'a, char>>> {
+    just("you materialize another")
+        .ignore_then(card_predicate_parser::parser())
+        .map(|p| TriggerEvent::Materialize(Predicate::Another(p)))
+        .padded()
 }
