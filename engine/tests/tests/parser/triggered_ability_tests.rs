@@ -17,6 +17,9 @@ fn test_materialize_warrior_gain_spark() {
           target: This,
           gained: Spark(1),
         )),
+        options: Some(TriggeredAbilityOptions(
+          once_per_turn: false,
+        )),
       )),
     ]
     "###
@@ -35,6 +38,7 @@ fn test_keyword_trigger_draw() {
         effect: Effect(DrawCards(
           count: 1,
         )),
+        options: None,
       )),
     ]
     "###);
@@ -53,6 +57,7 @@ fn test_multiple_keyword_trigger() {
         effect: Effect(DrawCards(
           count: 1,
         )),
+        options: None,
       )),
     ]
     "###);
@@ -72,6 +77,7 @@ fn test_three_keyword_trigger() {
         effect: Effect(DrawCards(
           count: 1,
         )),
+        options: None,
       )),
     ]
     "###);
