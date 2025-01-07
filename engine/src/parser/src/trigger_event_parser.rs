@@ -14,24 +14,22 @@
 
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::trigger_event::TriggerEvent;
-use chumsky::error::Rich;
-use chumsky::prelude::{choice, just};
-use chumsky::{extra, Parser};
+use chumsky::prelude::choice;
+use chumsky::Parser;
 
 use crate::determiner_parser;
+use crate::parser_utils::{phrase, ErrorType};
 
-pub fn parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, extra::Err<Rich<'a, char>>> {
+pub fn parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
     choice((
         materialize(),
-        just("you play a character")
+        phrase("you play a character")
             .to(TriggerEvent::Play(Predicate::Your(CardPredicate::Character))),
     ))
-    .padded()
 }
 
-fn materialize<'a>() -> impl Parser<'a, &'a str, TriggerEvent, extra::Err<Rich<'a, char>>> {
-    just("you materialize")
+fn materialize<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
+    phrase("you materialize")
         .ignore_then(determiner_parser::parser())
         .map(TriggerEvent::Materialize)
-        .padded()
 }

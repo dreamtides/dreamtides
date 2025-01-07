@@ -13,25 +13,23 @@
 // limitations under the License.
 
 use ability_data::predicate::Predicate;
-use chumsky::error::Rich;
 use chumsky::prelude::*;
-use chumsky::{extra, Parser};
+use chumsky::Parser;
 
 use crate::card_predicate_parser;
+use crate::parser_utils::{phrase, ErrorType};
 
-pub fn parser<'a>() -> impl Parser<'a, &'a str, Predicate, extra::Err<Rich<'a, char>>> {
+pub fn parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>> {
     choice((
-        just("this character").to(Predicate::This),
-        just("this event").to(Predicate::This),
-        just("that character").to(Predicate::That),
-        just("that event").to(Predicate::That),
-        just("another").ignore_then(card_predicate_parser::parser()).map(Predicate::Another),
-        just("an enemy").ignore_then(card_predicate_parser::parser()).map(Predicate::Enemy),
-        choice((just("a"), just("an")))
-            .padded()
+        phrase("this character").to(Predicate::This),
+        phrase("this event").to(Predicate::This),
+        phrase("that character").to(Predicate::That),
+        phrase("that event").to(Predicate::That),
+        phrase("another").ignore_then(card_predicate_parser::parser()).map(Predicate::Another),
+        phrase("an enemy").ignore_then(card_predicate_parser::parser()).map(Predicate::Enemy),
+        choice((phrase("a"), phrase("an")))
             .ignore_then(card_predicate_parser::parser())
-            .then_ignore(just("you control").padded())
+            .then_ignore(phrase("you control"))
             .map(Predicate::Your),
     ))
-    .padded()
 }

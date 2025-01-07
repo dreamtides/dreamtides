@@ -15,6 +15,7 @@
 use ability_data::ability::Ability;
 use chumsky::prelude::*;
 
+use crate::parser_utils::{phrase, ErrorType};
 use crate::{
     activated_ability_parser, effect_parser, static_ability_parser, triggered_ability_parser,
 };
@@ -27,12 +28,12 @@ pub fn parse(text: &str) -> ParseResult<Ability, Rich<char>> {
     parser().parse(text)
 }
 
-fn parser<'a>() -> impl Parser<'a, &'a str, Ability, extra::Err<Rich<'a, char>>> {
+fn parser<'a>() -> impl Parser<'a, &'a str, Ability, ErrorType<'a>> {
     choice((
         triggered_ability_parser::parser().map(Ability::Triggered),
         activated_ability_parser::parser().map(Ability::Activated),
-        effect_parser::parser().then_ignore(just(".")).map(Ability::Event),
-        static_ability_parser::parser().then_ignore(just(".")).map(Ability::Static),
+        effect_parser::parser().then_ignore(phrase(".")).map(Ability::Event),
+        static_ability_parser::parser().then_ignore(phrase(".")).map(Ability::Static),
     ))
     .then_ignore(end())
 }

@@ -13,21 +13,20 @@
 // limitations under the License.
 
 use ability_data::triggered_ability::TriggeredAbility;
-use chumsky::error::Rich;
-use chumsky::prelude::just;
-use chumsky::{extra, text, Parser};
+use chumsky::{text, Parser};
 
+use crate::parser_utils::{phrase, ErrorType};
 use crate::{effect_parser, trigger_event_parser};
 
-pub fn parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, extra::Err<Rich<'a, char>>> {
+pub fn parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, ErrorType<'a>> {
     trigger_keyword()
         .ignore_then(trigger_event_parser::parser())
-        .then_ignore(just(","))
+        .then_ignore(phrase(","))
         .then(effect_parser::parser())
-        .then_ignore(just("."))
+        .then_ignore(phrase("."))
         .map(|(event, effects)| TriggeredAbility::new(event, effects))
 }
 
-fn trigger_keyword<'a>() -> impl Parser<'a, &'a str, &'a str, extra::Err<Rich<'a, char>>> {
+fn trigger_keyword<'a>() -> impl Parser<'a, &'a str, &'a str, ErrorType<'a>> {
     text::keyword("whenever").or(text::keyword("when"))
 }

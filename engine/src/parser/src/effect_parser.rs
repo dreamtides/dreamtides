@@ -14,36 +14,35 @@
 
 use ability_data::effect::{Effect, GameEffect};
 use ability_data::predicate::Predicate;
-use chumsky::error::Rich;
 use chumsky::prelude::*;
-use chumsky::{extra, text, Parser};
+use chumsky::{text, Parser};
 use core_data::numerics::Spark;
 
+use crate::parser_utils::{phrase, ErrorType};
 use crate::{card_predicate_parser, determiner_parser};
 
-pub fn parser<'a>() -> impl Parser<'a, &'a str, Effect, extra::Err<Rich<'a, char>>> {
-    choice((gain_spark_until_next_main_for_each(), gain_spark(), dissolve_character())).padded()
+pub fn parser<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
+    choice((gain_spark_until_next_main_for_each(), gain_spark(), dissolve_character()))
 }
 
-fn gain_spark<'a>() -> impl Parser<'a, &'a str, Effect, extra::Err<Rich<'a, char>>> {
+fn gain_spark<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
     determiner_parser::parser()
         .then(
-            just("gains +")
-                .ignore_then(text::int(10).padded())
-                .then_ignore(just("spark"))
+            phrase("gains +")
+                .ignore_then(text::int(10))
+                .then_ignore(phrase("spark"))
                 .map(|s: &str| Spark(s.parse().unwrap())),
         )
         .map(|(predicate, spark)| Effect::Effect(GameEffect::GainsSpark(predicate, spark)))
 }
 
-fn gain_spark_until_next_main_for_each<'a>(
-) -> impl Parser<'a, &'a str, Effect, extra::Err<Rich<'a, char>>> {
+fn gain_spark_until_next_main_for_each<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
     determiner_parser::parser()
-        .then_ignore(just("gains +"))
-        .then(text::int(10).padded())
-        .then_ignore(just("spark until your next main phase for each").padded())
+        .then_ignore(phrase("gains +"))
+        .then(text::int(10))
+        .then_ignore(phrase("spark until your next main phase for each"))
         .then(card_predicate_parser::parser())
-        .then_ignore(just("you control").padded())
+        .then_ignore(phrase("you control"))
         .map(|((target, spark), counted)| {
             Effect::Effect(GameEffect::GainsSparkUntilYourNextMainPhaseForEach(
                 target,
@@ -53,8 +52,8 @@ fn gain_spark_until_next_main_for_each<'a>(
         })
 }
 
-fn dissolve_character<'a>() -> impl Parser<'a, &'a str, Effect, extra::Err<Rich<'a, char>>> {
-    just("dissolve")
+fn dissolve_character<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
+    phrase("dissolve")
         .ignore_then(determiner_parser::parser())
         .map(|predicate| Effect::Effect(GameEffect::DissolveCharacter(predicate)))
 }

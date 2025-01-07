@@ -13,18 +13,16 @@
 // limitations under the License.
 
 use ability_data::activated_ability::ActivatedAbility;
-use chumsky::error::Rich;
-use chumsky::prelude::*;
-use chumsky::{extra, Parser};
+use chumsky::Parser;
 
+use crate::parser_utils::{phrase, ErrorType};
 use crate::{cost_parser, effect_parser};
 
-pub fn parser<'a>() -> impl Parser<'a, &'a str, ActivatedAbility, extra::Err<Rich<'a, char>>> {
-    just("$activated")
-        .padded()
+pub fn parser<'a>() -> impl Parser<'a, &'a str, ActivatedAbility, ErrorType<'a>> {
+    phrase("$activated")
         .ignore_then(cost_parser::parser())
-        .then_ignore(just(":").padded())
+        .then_ignore(phrase(":"))
         .then(effect_parser::parser())
-        .then_ignore(just(".").padded())
+        .then_ignore(phrase("."))
         .map(|(cost, effect)| ActivatedAbility { cost, effect, options: None })
 }

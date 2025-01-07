@@ -13,20 +13,20 @@
 // limitations under the License.
 
 use ability_data::cost::Cost;
-use chumsky::error::Rich;
 use chumsky::prelude::*;
-use chumsky::{extra, Parser};
+use chumsky::Parser;
 use core_data::numerics::Energy;
 
-pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, extra::Err<Rich<'a, char>>> {
+use crate::parser_utils::{phrase, ErrorType};
+
+pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
     choice((
-        just("$")
+        phrase("$")
             .ignore_then(text::int(10))
             .map(|s: &str| Cost::Energy(Energy(s.parse().unwrap()))),
-        just("banish ")
+        phrase("banish")
             .ignore_then(text::int(10))
-            .then_ignore(just(" cards from your void"))
+            .then_ignore(phrase("cards from your void"))
             .map(|s: &str| Cost::BanishCardsFromYourVoid(s.parse().unwrap())),
     ))
-    .padded()
 }
