@@ -9,8 +9,12 @@ fn test_multiple_abilities_with_br() {
         result,
         @r###"
     [
-      Event(Effect(DrawCards(1))),
-      Event(Effect(GainEnergy(Energy(2)))),
+      Event(Effect(DrawCards(
+        count: 1,
+      ))),
+      Event(Effect(GainEnergy(
+        gained: Energy(2),
+      ))),
     ]
     "###
     );
@@ -21,7 +25,9 @@ fn test_flavor_text() {
     let result = parse("Draw a card. {flavor: Drawing cards is fun.}");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(DrawCards(1))),
+      Event(Effect(DrawCards(
+        count: 1,
+      ))),
     ]
     "###);
 }
@@ -35,8 +41,12 @@ fn test_multiple_abilities_with_flavor() {
         result,
         @r###"
     [
-      Event(Effect(DrawCards(1))),
-      Event(Effect(DiscardCards(1))),
+      Event(Effect(DrawCards(
+        count: 1,
+      ))),
+      Event(Effect(DiscardCards(
+        count: 1,
+      ))),
     ]
     "###
     );
@@ -47,7 +57,9 @@ fn test_reminder_text() {
     let result = parse("Draw a card. {reminder: You get to look at more cards!}");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(DrawCards(1))),
+      Event(Effect(DrawCards(
+        count: 1,
+      ))),
     ]
     "###);
 }
@@ -61,8 +73,12 @@ fn test_multiple_abilities_with_reminder() {
         result,
         @r###"
     [
-      Event(Effect(DrawCards(1))),
-      Event(Effect(DiscardCards(1))),
+      Event(Effect(DrawCards(
+        count: 1,
+      ))),
+      Event(Effect(DiscardCards(
+        count: 1,
+      ))),
     ]
     "###
     );
@@ -77,8 +93,12 @@ fn test_reminder_and_flavor() {
         result,
         @r###"
     [
-      Event(Effect(DrawCards(1))),
-      Event(Effect(DiscardCards(1))),
+      Event(Effect(DrawCards(
+        count: 1,
+      ))),
+      Event(Effect(DiscardCards(
+        count: 1,
+      ))),
     ]
     "###
     );

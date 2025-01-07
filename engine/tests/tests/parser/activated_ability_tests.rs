@@ -11,7 +11,9 @@ fn test_banish_from_void_dissolve_enemy_character() {
     [
       Activated(ActivatedAbility(
         cost: BanishCardsFromYourVoid(3),
-        effect: Effect(DissolveCharacter(Enemy(CharacterWithCost(Energy(2), OrLess)))),
+        effect: Effect(DissolveCharacter(
+          target: Enemy(CharacterWithCost(Energy(2), OrLess)),
+        )),
         options: None,
       )),
     ]
@@ -28,7 +30,9 @@ fn test_fast_activated_grant_aegis() {
     [
       Activated(ActivatedAbility(
         cost: None,
-        effect: Effect(GainsAegisThisTurn(Another(Character))),
+        effect: Effect(GainsAegisThisTurn(
+          target: Another(Character),
+        )),
         options: Some(ActivatedAbilityOptions(
           is_fast: true,
           is_immediate: false,
@@ -38,4 +42,26 @@ fn test_fast_activated_grant_aegis() {
     ]
     "###
     );
+}
+
+#[test]
+fn test_activated_spark_equal_to_warriors() {
+    let result = parse("$fastActivated $2: Another character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control.");
+    assert_ron_snapshot!(result, @r###"
+  [
+    Activated(ActivatedAbility(
+      cost: Energy(Energy(2)),
+      effect: Effect(TargetGainsSparkUntilYourNextMainPhaseForEach(
+        target: Another(Character),
+        gained: Spark(1),
+        for_each: Your(CharacterType(Warrior)),
+      )),
+      options: Some(ActivatedAbilityOptions(
+        is_fast: true,
+        is_immediate: false,
+        is_multi: false,
+      )),
+    )),
+  ]
+  "###);
 }

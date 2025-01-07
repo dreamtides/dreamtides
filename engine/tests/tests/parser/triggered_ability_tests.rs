@@ -13,7 +13,10 @@ fn test_materialize_warrior_gain_spark() {
     [
       Triggered(TriggeredAbility(
         trigger: Materialize(Another(CharacterType(Warrior))),
-        effect: Effect(GainsSpark(This, Spark(1))),
+        effect: Effect(GainsSpark(
+          target: This,
+          gained: Spark(1),
+        )),
       )),
     ]
     "###
@@ -29,7 +32,9 @@ fn test_keyword_trigger_draw() {
         trigger: Keywords([
           Materialized,
         ]),
-        effect: Effect(DrawCards(1)),
+        effect: Effect(DrawCards(
+          count: 1,
+        )),
       )),
     ]
     "###);
@@ -45,7 +50,9 @@ fn test_multiple_keyword_trigger() {
           Materialized,
           Dissolved,
         ]),
-        effect: Effect(DrawCards(1)),
+        effect: Effect(DrawCards(
+          count: 1,
+        )),
       )),
     ]
     "###);
@@ -62,7 +69,9 @@ fn test_three_keyword_trigger() {
           Judgment,
           Dissolved,
         ]),
-        effect: Effect(DrawCards(1)),
+        effect: Effect(DrawCards(
+          count: 1,
+        )),
       )),
     ]
     "###);
