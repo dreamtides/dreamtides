@@ -40,7 +40,7 @@ fn draw_cards<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
 }
 
 fn gain_spark<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
-    determiner_parser::parser().then(numeric("gains +", Spark, "spark")).map(
+    determiner_parser::target_parser().then(numeric("gains +", Spark, "spark")).map(
         |(predicate, spark)| {
             Effect::Effect(GameEffect::GainsSpark { target: predicate, gained: spark })
         },
@@ -53,7 +53,7 @@ fn gain_energy<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
 }
 
 fn gain_spark_until_next_main_for_each<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
-    determiner_parser::parser()
+    determiner_parser::target_parser()
         .then(numeric("gains +", Spark, "spark until your next main phase for each"))
         .then(card_predicate_parser::parser())
         .then_ignore(phrase("you control"))
@@ -68,7 +68,7 @@ fn gain_spark_until_next_main_for_each<'a>() -> impl Parser<'a, &'a str, Effect,
 
 fn dissolve_character<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
     phrase("dissolve")
-        .ignore_then(determiner_parser::parser())
+        .ignore_then(determiner_parser::target_parser())
         .map(|predicate| Effect::Effect(GameEffect::DissolveCharacter { target: predicate }))
 }
 
@@ -79,7 +79,7 @@ fn discard_cards<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
 }
 
 fn gains_aegis_this_turn<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
-    determiner_parser::parser()
+    determiner_parser::target_parser()
         .then_ignore(phrase("gains {kw: aegis} this turn"))
         .map(|target| Effect::Effect(GameEffect::GainsAegisThisTurn { target }))
 }

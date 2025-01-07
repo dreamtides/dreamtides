@@ -17,9 +17,7 @@ fn test_materialize_warrior_gain_spark() {
           target: This,
           gained: Spark(1),
         )),
-        options: Some(TriggeredAbilityOptions(
-          once_per_turn: false,
-        )),
+        options: None,
       )),
     ]
     "###
@@ -81,4 +79,26 @@ fn test_three_keyword_trigger() {
       )),
     ]
     "###);
+}
+
+#[test]
+fn test_once_per_turn() {
+    let result =
+        parse("Once per turn, when you materialize a character with cost $2 or less, draw a card.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Materialize(Your(CharacterWithCost(Energy(2), OrLess))),
+        effect: Effect(DrawCards(
+          count: 1,
+        )),
+        options: Some(TriggeredAbilityOptions(
+          once_per_turn: true,
+        )),
+      )),
+    ]
+    "###
+    );
 }

@@ -33,15 +33,17 @@ fn keyword_trigger_parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, Er
 }
 
 fn standard_trigger_parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, ErrorType<'a>> {
-    choice((phrase("whenever"), phrase("when")))
-        .ignore_then(trigger_event_parser::event_parser())
+    phrase("once per turn,")
+        .or_not()
+        .then_ignore(choice((phrase("whenever"), phrase("when"))))
+        .then(trigger_event_parser::event_parser())
         .then_ignore(phrase(","))
         .then(effect_parser::parser())
         .then_ignore(phrase("."))
-        .map(|(trigger, effect)| TriggeredAbility {
+        .map(|((once_per_turn, trigger), effect)| TriggeredAbility {
             trigger,
             effect,
-            options: Some(TriggeredAbilityOptions::default()),
+            options: once_per_turn.map(|_| TriggeredAbilityOptions { once_per_turn: true }),
         })
         .boxed()
 }

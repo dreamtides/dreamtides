@@ -19,7 +19,9 @@ use chumsky::Parser;
 use crate::card_predicate_parser;
 use crate::parser_utils::{phrase, ErrorType};
 
-pub fn parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>> {
+/// Parser for expressions describing the target selected for an effect, for
+/// example in "Dissolve an enemy character".
+pub fn target_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>> {
     choice((
         phrase("this character").to(Predicate::This),
         phrase("this event").to(Predicate::This),
@@ -36,4 +38,14 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>> {
             .map(Predicate::Your),
     ))
     .boxed()
+}
+
+/// Parser for expressions where the controller has already been described as
+/// the acting party, for example in "Whenever you materialize <predicate>".
+pub fn your_action<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>> {
+    choice((
+        phrase("another").ignore_then(card_predicate_parser::parser()).map(Predicate::Another),
+        phrase("an").ignore_then(card_predicate_parser::parser()).map(Predicate::Your),
+        phrase("a").ignore_then(card_predicate_parser::parser()).map(Predicate::Your),
+    ))
 }

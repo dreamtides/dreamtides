@@ -46,7 +46,7 @@ pub fn keyword_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<
 
 fn materialize<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
     phrase("you materialize")
-        .ignore_then(determiner_parser::parser())
+        .ignore_then(determiner_parser::your_action())
         .map(TriggerEvent::Materialize)
         .boxed()
 }
