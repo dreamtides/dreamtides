@@ -16,7 +16,7 @@ use ability_data::effect::{Effect, GameEffect};
 use ability_data::predicate::Predicate;
 use chumsky::prelude::*;
 use chumsky::Parser;
-use core_data::numerics::Spark;
+use core_data::numerics::{Energy, Spark};
 
 use crate::parser_utils::{count, numeric, phrase, ErrorType};
 use crate::{card_predicate_parser, determiner_parser};
@@ -27,6 +27,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
         gain_spark_until_next_main_for_each(),
         gain_spark(),
         dissolve_character(),
+        gain_energy(),
     ))
 }
 
@@ -54,6 +55,10 @@ fn gain_spark_until_next_main_for_each<'a>() -> impl Parser<'a, &'a str, Effect,
                 Predicate::Your(counted),
             ))
         })
+}
+
+fn gain_energy<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
+    numeric("gain $", Energy, "").map(|energy| Effect::Effect(GameEffect::GainEnergy(energy)))
 }
 
 fn dissolve_character<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {

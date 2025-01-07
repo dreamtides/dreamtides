@@ -20,20 +20,21 @@ use crate::{
     activated_ability_parser, effect_parser, static_ability_parser, triggered_ability_parser,
 };
 
-/// Takes a string containing card rules text and parses it into an [Ability]
-/// data structure.
+/// Takes a string containing card rules text and parses it into a
+/// Vec<[Ability]> data structure.
 ///
 /// The provided text must be all lowercase.
-pub fn parse(text: &str) -> ParseResult<Ability, Rich<char>> {
+pub fn parse(text: &str) -> ParseResult<Vec<Ability>, Rich<char>> {
     parser().parse(text)
 }
 
-fn parser<'a>() -> impl Parser<'a, &'a str, Ability, ErrorType<'a>> {
-    choice((
+fn parser<'a>() -> impl Parser<'a, &'a str, Vec<Ability>, ErrorType<'a>> {
+    let single_ability = choice((
         triggered_ability_parser::parser().map(Ability::Triggered),
         activated_ability_parser::parser().map(Ability::Activated),
         effect_parser::parser().then_ignore(phrase(".")).map(Ability::Event),
         static_ability_parser::parser().then_ignore(phrase(".")).map(Ability::Static),
-    ))
-    .then_ignore(end())
+    ));
+
+    single_ability.separated_by(just("$br")).at_least(1).collect().then_ignore(end())
 }

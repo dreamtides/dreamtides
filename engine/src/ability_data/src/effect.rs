@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use core_data::numerics::Spark;
+use core_data::numerics::{Energy, Spark};
 use serde::{Deserialize, Serialize};
 
 use crate::condition::Condition;
@@ -52,4 +52,5 @@ pub enum GameEffect {
     GainsSpark(Predicate, Spark),
     GainsSparkUntilYourNextMainPhaseForEach(Predicate, Spark, Predicate),
     DissolveCharacter(Predicate),
+    GainEnergy(Energy),
 }
