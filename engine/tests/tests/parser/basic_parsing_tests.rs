@@ -173,3 +173,29 @@ fn test_multiple_abilities_with_br() {
     "###
     );
 }
+
+#[test]
+fn test_flavor_text() {
+    let result = parse("Draw a card. {flavor: Drawing cards is fun.}");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(DrawCards(1))),
+    ]
+    "###);
+}
+
+#[test]
+fn test_multiple_abilities_with_flavor() {
+    let result = parse(
+        "Draw a card.$brDiscard a card. {flavor: The cycle of drawing and discarding continues.}",
+    );
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Event(Effect(DrawCards(1))),
+      Event(Effect(DiscardCards(1))),
+    ]
+    "###
+    );
+}

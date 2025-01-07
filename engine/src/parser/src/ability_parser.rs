@@ -29,6 +29,9 @@ pub fn parse(text: &str) -> ParseResult<Vec<Ability>, Rich<char>> {
 }
 
 fn parser<'a>() -> impl Parser<'a, &'a str, Vec<Ability>, ErrorType<'a>> {
+    // Parser for flavor text that we'll ignore
+    let flavor_text = just("{flavor:").then(none_of("}").repeated()).then(just("}")).padded();
+
     let single_ability = choice((
         triggered_ability_parser::parser().map(Ability::Triggered),
         activated_ability_parser::parser().map(Ability::Activated),
@@ -36,5 +39,10 @@ fn parser<'a>() -> impl Parser<'a, &'a str, Vec<Ability>, ErrorType<'a>> {
         static_ability_parser::parser().then_ignore(phrase(".")).map(Ability::Static),
     ));
 
-    single_ability.separated_by(just("$br")).at_least(1).collect().then_ignore(end())
+    single_ability
+        .separated_by(phrase("$br"))
+        .at_least(1)
+        .collect()
+        .then_ignore(flavor_text.or_not())
+        .then_ignore(end())
 }
