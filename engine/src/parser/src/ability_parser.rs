@@ -32,15 +32,19 @@ fn parser<'a>() -> impl Parser<'a, &'a str, Vec<Ability>, ErrorType<'a>> {
     // Parser for flavor text that we'll ignore
     let flavor_text = just("{flavor:").then(none_of("}").repeated()).then(just("}")).padded();
 
+    // Parser for reminder text that we'll ignore
+    let reminder_text = just("{reminder:").then(none_of("}").repeated()).then(just("}")).padded();
+
     let single_ability = choice((
         triggered_ability_parser::parser().map(Ability::Triggered),
         activated_ability_parser::parser().map(Ability::Activated),
         effect_parser::parser().then_ignore(phrase(".")).map(Ability::Event),
         static_ability_parser::parser().then_ignore(phrase(".")).map(Ability::Static),
-    ));
+    ))
+    .then_ignore(reminder_text.or_not());
 
     single_ability
-        .separated_by(phrase("$br"))
+        .separated_by(just("$br"))
         .at_least(1)
         .collect()
         .then_ignore(flavor_text.or_not())
