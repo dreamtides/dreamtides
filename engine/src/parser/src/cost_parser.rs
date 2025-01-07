@@ -24,6 +24,6 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
         phrase("$")
             .ignore_then(text::int(10))
             .map(|s: &str| Cost::Energy(Energy(s.parse().unwrap()))),
-        numeric("banish", count, "cards from your void").map(|n| Cost::BanishCardsFromYourVoid(n)),
+        numeric("banish", count, "cards from your void").map(Cost::BanishCardsFromYourVoid),
     ))
 }

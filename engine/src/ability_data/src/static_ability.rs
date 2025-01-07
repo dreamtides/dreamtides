@@ -23,4 +23,5 @@ use crate::predicate::CardPredicate;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum StaticAbility {
     EnemyAddedCostToPlay(CardPredicate, Energy),
+    OncePerTurnPlayFromVoid(CardPredicate),
 }

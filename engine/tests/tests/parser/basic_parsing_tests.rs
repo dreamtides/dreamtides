@@ -99,3 +99,10 @@ fn test_keyword_trigger_draw() {
     ))
     "###);
 }
+
+#[test]
+fn test_once_per_turn_play_2_or_less_from_void() {
+    let result =
+        parse("Once per turn, you may play a character with cost $2 or less from your void.");
+    assert_ron_snapshot!(result, @"Static(OncePerTurnPlayFromVoid(CharacterWithCost(Energy(2), OrLess)))");
+}

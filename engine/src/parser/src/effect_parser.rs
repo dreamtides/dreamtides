@@ -32,10 +32,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
 
 fn draw_cards<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
     phrase("draw")
-        .ignore_then(choice((
-            phrase("a card").to(1),
-            numeric("", count, "cards"),
-        )))
+        .ignore_then(choice((phrase("a card").to(1), numeric("", count, "cards"))))
         .map(|count| Effect::Effect(GameEffect::DrawCards(count)))
 }
 
