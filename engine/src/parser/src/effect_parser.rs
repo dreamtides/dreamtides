@@ -15,6 +15,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
         gain_energy(),
         gain_spark_until_next_main_for_each(),
         gain_spark(),
+        gains_aegis_this_turn(),
     ))
 }
 
@@ -58,4 +59,10 @@ fn discard_cards<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
     phrase("discard")
         .ignore_then(choice((phrase("a card").to(1), numeric("", count, "cards"))))
         .map(|count| Effect::Effect(GameEffect::DiscardCards(count)))
+}
+
+fn gains_aegis_this_turn<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
+    determiner_parser::parser()
+        .then_ignore(phrase("gains {kw: aegis} this turn"))
+        .map(|target| Effect::Effect(GameEffect::GainsAegisThisTurn(target)))
 }

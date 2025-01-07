@@ -38,6 +38,7 @@ pub enum GameEffect {
     DissolveCharacter(Predicate),
     DrawCards(u64),
     GainEnergy(Energy),
+    GainsAegisThisTurn(Predicate),
     GainsSpark(Predicate, Spark),
     GainsSparkUntilYourNextMainPhaseForEach(Predicate, Spark, Predicate),
 }

@@ -121,3 +121,24 @@ fn test_once_per_turn_play_2_or_less_from_void() {
     ]
     "###);
 }
+
+#[test]
+fn test_fast_activated_grant_aegis() {
+    let result = parse("$fastActivated: Another character you control gains {kw: aegis} this turn. {reminder: (it cannot be affected by the enemy)} {flavor: She stands where others would fall.}");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Activated(ActivatedAbility(
+        cost: None,
+        effect: Effect(GainsAegisThisTurn(Another(Character))),
+        options: Some(ActivatedAbilityOptions(
+          is_fast: true,
+          is_immediate: false,
+          is_multi: false,
+        )),
+      )),
+    ]
+    "###
+    );
+}

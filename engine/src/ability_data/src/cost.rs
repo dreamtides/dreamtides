@@ -5,6 +5,9 @@ use serde::{Deserialize, Serialize};
 /// ability, such as paying energy.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Cost {
+    /// No cost required
+    None,
+
     Energy(Energy),
 
     /// Banish N cards from your void.
