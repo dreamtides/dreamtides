@@ -15,7 +15,7 @@
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
 use chumsky::prelude::choice;
-use chumsky::Parser;
+use chumsky::{IterParser, Parser};
 
 use crate::determiner_parser;
 use crate::parser_utils::{phrase, ErrorType};
@@ -29,11 +29,17 @@ pub fn event_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a
 }
 
 pub fn keyword_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
-    choice((
-        phrase("$materialized").to(TriggerEvent::Keyword(TriggerKeyword::Materialized)),
-        phrase("$judgment").to(TriggerEvent::Keyword(TriggerKeyword::Judgment)),
-        phrase("$dissolved").to(TriggerEvent::Keyword(TriggerKeyword::Dissolved)),
-    ))
+    let single_keyword = choice((
+        phrase("$materialized").to(TriggerKeyword::Materialized),
+        phrase("$judgment").to(TriggerKeyword::Judgment),
+        phrase("$dissolved").to(TriggerKeyword::Dissolved),
+    ));
+
+    single_keyword
+        .separated_by(phrase(","))
+        .at_least(1)
+        .collect::<Vec<_>>()
+        .map(TriggerEvent::Keywords)
 }
 
 fn materialize<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {

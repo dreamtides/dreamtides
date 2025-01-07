@@ -20,7 +20,8 @@ use crate::predicate::Predicate;
 /// trigger.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum TriggerEvent {
-    Keyword(TriggerKeyword),
+    /// One or more trigger keywords
+    Keywords(Vec<TriggerKeyword>),
 
     /// Event when a character matching a predicate is materialized.
     Materialize(Predicate),
