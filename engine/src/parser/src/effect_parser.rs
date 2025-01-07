@@ -15,10 +15,10 @@
 use ability_data::effect::{Effect, GameEffect};
 use ability_data::predicate::Predicate;
 use chumsky::prelude::*;
-use chumsky::{text, Parser};
+use chumsky::Parser;
 use core_data::numerics::Spark;
 
-use crate::parser_utils::{phrase, ErrorType};
+use crate::parser_utils::{numeric, phrase, ErrorType};
 use crate::{card_predicate_parser, determiner_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
@@ -27,26 +27,19 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
 
 fn gain_spark<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
     determiner_parser::parser()
-        .then(
-            phrase("gains +")
-                .ignore_then(text::int(10))
-                .then_ignore(phrase("spark"))
-                .map(|s: &str| Spark(s.parse().unwrap())),
-        )
+        .then(numeric("gains +", Spark, "spark"))
         .map(|(predicate, spark)| Effect::Effect(GameEffect::GainsSpark(predicate, spark)))
 }
 
 fn gain_spark_until_next_main_for_each<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
     determiner_parser::parser()
-        .then_ignore(phrase("gains +"))
-        .then(text::int(10))
-        .then_ignore(phrase("spark until your next main phase for each"))
+        .then(numeric("gains +", Spark, "spark until your next main phase for each"))
         .then(card_predicate_parser::parser())
         .then_ignore(phrase("you control"))
         .map(|((target, spark), counted)| {
             Effect::Effect(GameEffect::GainsSparkUntilYourNextMainPhaseForEach(
                 target,
-                Spark(spark.parse().unwrap()),
+                spark,
                 Predicate::Your(counted),
             ))
         })

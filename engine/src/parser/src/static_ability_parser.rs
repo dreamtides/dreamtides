@@ -13,20 +13,15 @@
 // limitations under the License.
 
 use ability_data::static_ability::StaticAbility;
-use chumsky::prelude::*;
 use chumsky::Parser;
 use core_data::numerics::Energy;
 
 use crate::card_predicate_parser;
-use crate::parser_utils::{phrase, ErrorType};
+use crate::parser_utils::{numeric, phrase, ErrorType};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
     phrase("the enemy's")
         .ignore_then(card_predicate_parser::parser())
-        .then_ignore(phrase("cost an additional $"))
-        .then(text::int(10))
-        .then_ignore(phrase("to play"))
-        .map(|(predicate, cost)| {
-            StaticAbility::EnemyAddedCostToPlay(predicate, Energy(cost.parse().unwrap()))
-        })
+        .then(numeric("cost an additional $", Energy, "to play"))
+        .map(|(predicate, cost)| StaticAbility::EnemyAddedCostToPlay(predicate, cost))
 }

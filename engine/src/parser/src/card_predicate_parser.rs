@@ -14,11 +14,11 @@
 
 use ability_data::predicate::{CardPredicate, Operator};
 use chumsky::prelude::choice;
-use chumsky::{text, Parser};
+use chumsky::Parser;
 use core_data::character_type::CharacterType;
 use core_data::numerics::Energy;
 
-use crate::parser_utils::{phrase, ErrorType};
+use crate::parser_utils::{numeric, phrase, ErrorType};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     choice((
@@ -32,12 +32,8 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
 
 fn character_with_cost<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     character()
-        .ignore_then(phrase("with cost $"))
-        .ignore_then(text::int(10))
-        .then_ignore(phrase("or less"))
-        .map(|s: &str| {
-            CardPredicate::CharacterWithCost(Energy(s.parse().unwrap()), Operator::OrLess)
-        })
+        .ignore_then(numeric("with cost $", Energy, "or less"))
+        .map(|cost| CardPredicate::CharacterWithCost(cost, Operator::OrLess))
 }
 
 fn character_type<'a>() -> impl Parser<'a, &'a str, CharacterType, ErrorType<'a>> {
