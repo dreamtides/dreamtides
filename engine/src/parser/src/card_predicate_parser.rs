@@ -23,6 +23,7 @@ use crate::parser_utils::{numeric, phrase, ErrorType};
 pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     choice((
         character_with_cost(),
+        character_with_cost_compared_to_controlled(),
         character_type().map(CardPredicate::CharacterType),
         choice((phrase("cards"), phrase("card"))).to(CardPredicate::Card),
         character().to(CardPredicate::Character),
@@ -35,6 +36,26 @@ fn character_with_cost<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorTyp
     character()
         .ignore_then(numeric("with cost $", Energy, "or less"))
         .map(|cost| CardPredicate::CharacterWithCost(cost, Operator::OrLess))
+        .boxed()
+}
+
+fn character_with_cost_compared_to_controlled<'a>(
+) -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
+    character()
+        .ignore_then(phrase("with cost"))
+        .ignore_then(choice((
+            phrase("less than or equal to").to(Operator::OrLess),
+            phrase("equal to").to(Operator::Exactly),
+            phrase("greater than or equal to").to(Operator::OrMore),
+        )))
+        .then(
+            phrase("the number of")
+                .ignore_then(character_type())
+                .then_ignore(phrase("you control")),
+        )
+        .map(|(operator, character_type)| {
+            CardPredicate::CharacterWithCostComparedToControlled(character_type, operator)
+        })
         .boxed()
 }
 
