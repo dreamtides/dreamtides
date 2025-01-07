@@ -13,35 +13,45 @@
 // limitations under the License.
 
 use ability_data::predicate::{CardPredicate, Operator};
-use chumsky::error::Rich;
 use chumsky::prelude::{choice, just};
-use chumsky::{extra, text, Parser};
+use chumsky::{text, Parser};
 use core_data::character_type::CharacterType;
 use core_data::numerics::Energy;
 
-pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, extra::Err<Rich<'a, char>>> {
+use crate::parser_utils::ErrorType;
+
+pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     choice((
         character_with_cost(),
         character_type().map(CardPredicate::CharacterType),
-        just("card").to(CardPredicate::Card),
-        just("character").to(CardPredicate::Character),
-        just("event").to(CardPredicate::Event),
+        choice((just("cards"), just("card"))).to(CardPredicate::Card),
+        character().to(CardPredicate::Character),
+        choice((just("events"), just("event"))).to(CardPredicate::Event),
     ))
     .padded()
 }
 
-fn character_with_cost<'a>() -> impl Parser<'a, &'a str, CardPredicate, extra::Err<Rich<'a, char>>>
-{
-    just("character with cost $").ignore_then(text::int(10)).then_ignore(just(" or less")).map(
-        |s: &str| CardPredicate::CharacterWithCost(Energy(s.parse().unwrap()), Operator::OrLess),
-    )
+fn character_with_cost<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
+    character()
+        .ignore_then(just("with cost $"))
+        .ignore_then(text::int(10))
+        .then_ignore(just(" or less"))
+        .map(|s: &str| {
+            CardPredicate::CharacterWithCost(Energy(s.parse().unwrap()), Operator::OrLess)
+        })
 }
 
-fn character_type<'a>() -> impl Parser<'a, &'a str, CharacterType, extra::Err<Rich<'a, char>>> {
-    choice((
-        just("{cardtype: warrior}").to(CharacterType::Warrior),
-        just("{cardtype: survivor}").to(CharacterType::Survivor),
-        just("{cardtype: spirit animal}").to(CharacterType::SpiritAnimal),
-    ))
-    .padded()
+fn character_type<'a>() -> impl Parser<'a, &'a str, CharacterType, ErrorType<'a>> {
+    just("{cardtype: ")
+        .ignore_then(choice((
+            choice((just("warriors"), just("warrior"))).to(CharacterType::Warrior),
+            choice((just("survivors"), just("survivor"))).to(CharacterType::Survivor),
+            choice((just("spirit animals"), just("spirit animal"))).to(CharacterType::SpiritAnimal),
+        )))
+        .then_ignore(just("}"))
+        .padded()
+}
+
+fn character<'a>() -> impl Parser<'a, &'a str, &'a str, ErrorType<'a>> {
+    choice((just("characters"), just("character"))).padded()
 }

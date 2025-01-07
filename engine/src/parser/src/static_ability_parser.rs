@@ -12,15 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use ability_data::static_ability::StaticAbility;
+use chumsky::prelude::*;
+use chumsky::Parser;
 use core_data::numerics::Energy;
-use serde::{Deserialize, Serialize};
 
-use crate::predicate::CardPredicate;
+use crate::card_predicate_parser;
+use crate::parser_utils::{phrase, ErrorType};
 
-/// A static ability represents something which modifies the rules of the game,
-/// either for this specific card or globally. Static abilities do not 'happen',
-/// they're just something that is always true.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum StaticAbility {
-    EnemyAddedCostToPlay(CardPredicate, Energy),
+pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+    phrase("the enemy's")
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(phrase("cost an additional $"))
+        .then(text::int(10))
+        .then_ignore(phrase("to play"))
+        .map(|(predicate, cost)| {
+            StaticAbility::EnemyAddedCostToPlay(predicate, Energy(cost.parse().unwrap()))
+        })
 }

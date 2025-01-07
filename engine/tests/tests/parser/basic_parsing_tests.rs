@@ -79,3 +79,12 @@ fn test_gains_spark_until_main_phase_for_each_warrior() {
     @"Event(Effect(GainsSparkUntilYourNextMainPhaseForEach(Your(Character), Spark(1), Your(CharacterType(Warrior)))))"
     );
 }
+
+#[test]
+fn test_enemy_events_cost_more_to_play() {
+    let result = parse("The enemy's events cost an additional $1 to play.");
+    assert_ron_snapshot!(
+    result,
+    @"Static(EnemyAddedCostToPlay(Event, Energy(1)))"
+    );
+}
