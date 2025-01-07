@@ -13,18 +13,26 @@
 // limitations under the License.
 
 use ability_data::predicate::{CardPredicate, Predicate};
-use ability_data::trigger_event::TriggerEvent;
+use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
 use chumsky::prelude::choice;
 use chumsky::Parser;
 
 use crate::determiner_parser;
 use crate::parser_utils::{phrase, ErrorType};
 
-pub fn parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
+pub fn event_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
     choice((
         materialize(),
         phrase("you play a character")
             .to(TriggerEvent::Play(Predicate::Your(CardPredicate::Character))),
+    ))
+}
+
+pub fn keyword_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
+    choice((
+        phrase("$materialized").to(TriggerEvent::Keyword(TriggerKeyword::Materialized)),
+        phrase("$judgment").to(TriggerEvent::Keyword(TriggerKeyword::Judgment)),
+        phrase("$dissolved").to(TriggerEvent::Keyword(TriggerKeyword::Dissolved)),
     ))
 }
 

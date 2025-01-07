@@ -88,3 +88,14 @@ fn test_enemy_events_cost_more_to_play() {
     @"Static(EnemyAddedCostToPlay(Event, Energy(1)))"
     );
 }
+
+#[test]
+fn test_keyword_trigger_draw() {
+    let result = parse("$materialized: Draw a card.");
+    assert_ron_snapshot!(result, @r###"
+    Triggered(TriggeredAbility(
+      trigger: Keyword(Materialized),
+      effect: Effect(DrawCards(1)),
+    ))
+    "###);
+}

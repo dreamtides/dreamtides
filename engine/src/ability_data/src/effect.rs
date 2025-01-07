@@ -48,7 +48,7 @@ pub struct EffectList {
 /// triggered or activated ability on a character card.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum GameEffect {
-    DrawCards(u32),
+    DrawCards(u64),
     GainsSpark(Predicate, Spark),
     GainsSparkUntilYourNextMainPhaseForEach(Predicate, Spark, Predicate),
     DissolveCharacter(Predicate),

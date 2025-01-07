@@ -18,11 +18,25 @@ use chumsky::prelude::*;
 use chumsky::Parser;
 use core_data::numerics::Spark;
 
-use crate::parser_utils::{numeric, phrase, ErrorType};
+use crate::parser_utils::{count, numeric, phrase, ErrorType};
 use crate::{card_predicate_parser, determiner_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
-    choice((gain_spark_until_next_main_for_each(), gain_spark(), dissolve_character()))
+    choice((
+        draw_cards(),
+        gain_spark_until_next_main_for_each(),
+        gain_spark(),
+        dissolve_character(),
+    ))
+}
+
+fn draw_cards<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
+    phrase("draw")
+        .ignore_then(choice((
+            phrase("a card").to(1),
+            numeric("", count, "cards"),
+        )))
+        .map(|count| Effect::Effect(GameEffect::DrawCards(count)))
 }
 
 fn gain_spark<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
