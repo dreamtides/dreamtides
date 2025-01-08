@@ -14,4 +14,5 @@ pub enum StaticAbility {
     OncePerTurnPlayFromVoid(CardPredicate),
     OtherCharactersSparkBonus(CardPredicate, Spark),
     PlayFromVoidForCost { energy_cost: Energy, additional_cost: Cost },
+    HasAllCharacterTypes,
 }

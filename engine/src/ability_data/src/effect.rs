@@ -85,5 +85,4 @@ pub enum StandardEffect {
     BanishCardsFromEnemyVoid {
         count: u64,
     },
-    HasAllCharacterTypes,
 }

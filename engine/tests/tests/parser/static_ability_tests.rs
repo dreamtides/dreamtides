@@ -85,7 +85,7 @@ fn test_has_all_character_types() {
         result,
         @r###"
     [
-      Event(Effect(HasAllCharacterTypes)),
+      Static(HasAllCharacterTypes),
     ]
     "###
     );
