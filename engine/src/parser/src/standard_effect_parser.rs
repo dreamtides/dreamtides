@@ -42,6 +42,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         put_on_top_of_deck(),
         each_matching_gains_spark_for_each(),
         return_all_but_one_character_draw_card_for_each(),
+        banish_then_materialize(),
     ))
     .boxed()
 }
@@ -260,4 +261,12 @@ fn return_all_but_one_character_draw_card_for_each<'a>(
     )
     .to(StandardEffect::ReturnAllButOneCharacterDrawCardForEach)
     .boxed()
+}
+
+fn banish_then_materialize<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("banish")
+        .ignore_then(determiner_parser::target_parser())
+        .then_ignore(phrase(", then materialize it"))
+        .map(|target| StandardEffect::BanishThenMaterialize { target })
+        .boxed()
 }

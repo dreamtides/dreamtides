@@ -146,3 +146,26 @@ fn test_return_all_but_one_draw_for_each() {
     ]
     "###);
 }
+
+#[test]
+fn test_banish_then_materialize() {
+    let result =
+        parse("$materialized: You may banish another character you control, then materialize it.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Keywords([
+          Materialized,
+        ]),
+        effect: WithOptions(EffectWithOptions(
+          effect: BanishThenMaterialize(
+            target: Another(Character),
+          ),
+          optional: true,
+          condition: None,
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}

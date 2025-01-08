@@ -95,6 +95,9 @@ pub enum StandardEffect {
         gained: Energy,
         for_each: Predicate,
     },
+    BanishThenMaterialize {
+        target: Predicate,
+    },
     BanishCardsFromEnemyVoid {
         count: u64,
     },
