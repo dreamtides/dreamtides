@@ -65,3 +65,26 @@ fn test_activated_spark_equal_to_warriors() {
   ]
   "###);
 }
+
+#[test]
+fn test_multi_activated_draw() {
+    let result = parse("$multiActivated $2: Draw a card.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Activated(ActivatedAbility(
+        cost: Energy(Energy(2)),
+        effect: Effect(DrawCards(
+          count: 1,
+        )),
+        options: Some(ActivatedAbilityOptions(
+          is_fast: false,
+          is_immediate: false,
+          is_multi: true,
+        )),
+      )),
+    ]
+    "###
+    );
+}
