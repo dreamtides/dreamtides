@@ -24,6 +24,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         gains_aegis_this_turn(),
         gain_spark_until_next_main_for_each(),
         gain_spark(),
+        gain_energy_for_each(),
         gain_energy(),
         banish_card_from_void(),
         disable_activated_abilities(),
@@ -112,6 +113,12 @@ fn abandon_and_gain_energy_for_spark<'a>() -> impl Parser<'a, &'a str, StandardE
             target: predicate,
             energy_per_spark: energy,
         })
+}
+
+fn gain_energy_for_each<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    numeric("gain $", Energy, "")
+        .then(determiner_parser::counted_parser())
+        .map(|(gained, counted)| StandardEffect::GainEnergyForEach { gained, for_each: counted })
 }
 
 fn create_trigger_until_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>

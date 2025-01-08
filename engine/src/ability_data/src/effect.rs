@@ -86,6 +86,10 @@ pub enum StandardEffect {
     GainEnergy {
         gained: Energy,
     },
+    GainEnergyForEach {
+        gained: Energy,
+        for_each: Predicate,
+    },
     BanishCardsFromEnemyVoid {
         count: u64,
     },
