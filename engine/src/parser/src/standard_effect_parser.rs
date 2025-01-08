@@ -145,7 +145,7 @@ fn abandon_and_gain_energy_for_spark<'a>() -> impl Parser<'a, &'a str, StandardE
 
 fn gain_energy_for_each<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     numeric("gain $", Energy, "")
-        .then(determiner_parser::counted_parser())
+        .then(determiner_parser::for_each_parser())
         .map(|(gained, counted)| StandardEffect::GainEnergyForEach { gained, for_each: counted })
 }
 
@@ -293,7 +293,7 @@ fn banish_any_number_then_materialize<'a>(
 ) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("banish")
         .ignore_then(counting_expression_parser::parser())
-        .then(determiner_parser::target_parser())
+        .then(determiner_parser::counted_parser())
         .then_ignore(phrase(", then materialize them"))
         .map(|(count, target)| StandardEffect::BanishThenMaterializeAllMatching { target, count })
 }

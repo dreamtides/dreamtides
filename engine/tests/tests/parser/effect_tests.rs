@@ -186,6 +186,19 @@ fn test_banish_any_number_then_materialize() {
 }
 
 #[test]
+fn test_banish_up_to_two() {
+    let result = parse("Banish up to two characters you control, then materialize them.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(BanishThenMaterializeAllMatching(
+        target: Your(Character),
+        count: UpTo(2),
+      ))),
+    ]
+    "###);
+}
+
+#[test]
 fn test_banish_up_to_two_activated() {
     let result = parse(
         "$activated $3: Banish up to two other characters you control, then materialize them.",

@@ -29,17 +29,22 @@ pub fn target_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>>
 }
 
 /// Parser for 'for each' expressions which count entities matching a predicate
+pub fn for_each_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>> {
+    phrase("for each").ignore_then(counted_parser()).boxed()
+}
+
+/// Parser for expressions describing multiple matching objects, such as in
+/// "banish two [enemy warriors]"
 pub fn counted_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>> {
-    phrase("for each")
-        .ignore_then(choice((
-            phrase("other")
-                .ignore_then(card_predicate_parser::parser())
-                .then_ignore(phrase("you control"))
-                .map(Predicate::Another),
-            phrase("enemey").ignore_then(card_predicate_parser::parser()).map(Predicate::Enemy),
-            card_predicate_parser::parser().then_ignore(phrase("you control")).map(Predicate::Your),
-        )))
-        .boxed()
+    choice((
+        phrase("other")
+            .ignore_then(card_predicate_parser::parser())
+            .then_ignore(phrase("you control"))
+            .map(Predicate::Another),
+        phrase("enemey").ignore_then(card_predicate_parser::parser()).map(Predicate::Enemy),
+        card_predicate_parser::parser().then_ignore(phrase("you control")).map(Predicate::Your),
+    ))
+    .boxed()
 }
 
 /// Parser for expressions where the controller has already been described as
