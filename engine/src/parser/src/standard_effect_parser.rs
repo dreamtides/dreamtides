@@ -224,7 +224,7 @@ fn abandon_at_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, Erro
 
 fn spend_all_energy_draw_and_discard<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
 {
-    phrase("draw x cards, then discard x cards, where x is the energy spent this way")
+    phrase("spend all your remaining energy. draw x cards then discard x cards, where x is the energy spent this way")
         .to(StandardEffect::SpendAllEnergyDrawAndDiscard)
         .boxed()
 }

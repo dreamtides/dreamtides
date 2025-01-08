@@ -74,7 +74,7 @@ fn test_negate_enemy_dream() {
 
 #[test]
 fn test_spend_all_energy_draw_discard() {
-    let result = parse("Draw X cards, then discard X cards, where X is the energy spent this way.");
+    let result = parse("Spend all your remaining energy. Draw X cards then discard X cards, where X is the energy spent this way.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(Effect(SpendAllEnergyDrawAndDiscard)),
