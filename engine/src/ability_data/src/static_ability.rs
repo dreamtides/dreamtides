@@ -1,4 +1,4 @@
-use core_data::numerics::Energy;
+use core_data::numerics::{Energy, Spark};
 use serde::{Deserialize, Serialize};
 
 use crate::cost::Cost;
@@ -12,5 +12,6 @@ pub enum StaticAbility {
     DisableEnemyMaterializedAbilities,
     EnemyAddedCostToPlay(CardPredicate, Energy),
     OncePerTurnPlayFromVoid(CardPredicate),
+    OtherCharactersSparkBonus(CardPredicate, Spark),
     PlayFromVoidForCost { energy_cost: Energy, additional_cost: Cost },
 }

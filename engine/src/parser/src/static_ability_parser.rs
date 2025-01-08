@@ -15,7 +15,7 @@
 use ability_data::static_ability::StaticAbility;
 use chumsky::prelude::*;
 use chumsky::Parser;
-use core_data::numerics::Energy;
+use core_data::numerics::{Energy, Spark};
 
 use crate::parser_utils::{numeric, phrase, ErrorType};
 use crate::{card_predicate_parser, cost_parser};
@@ -26,6 +26,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
         once_per_turn_play_from_void(),
         enemy_added_cost_to_play(),
         play_from_void_for_cost(),
+        other_spark_bonus(),
     ))
 }
 
@@ -58,4 +59,11 @@ fn disable_enemy_materialized_abilities<'a>(
     phrase("disable the \"$materialized\" abilities of")
         .ignore_then(enemy_characters)
         .to(StaticAbility::DisableEnemyMaterializedAbilities)
+}
+
+fn other_spark_bonus<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+    phrase("other")
+        .ignore_then(card_predicate_parser::parser())
+        .then(numeric("you control have +", Spark, "spark"))
+        .map(|(predicate, spark)| StaticAbility::OtherCharactersSparkBonus(predicate, spark))
 }

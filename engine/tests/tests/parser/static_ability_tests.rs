@@ -64,3 +64,16 @@ fn test_disable_enemy_materialized_abilities_alternate() {
     "###
     );
 }
+
+#[test]
+fn test_other_warriors_spark_bonus() {
+    let result = parse("Other {cardtype: warriors} you control have +1 spark.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Static(OtherCharactersSparkBonus(CharacterType(Warrior), Spark(1))),
+    ]
+    "###
+    );
+}
