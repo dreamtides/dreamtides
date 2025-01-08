@@ -126,4 +126,7 @@ pub enum StandardEffect {
         predicate: CardPredicate,
     },
     SpendAllEnergyDrawAndDiscard,
+    PutOnTopOfEnemyDeck {
+        target: Predicate,
+    },
 }

@@ -11,6 +11,7 @@ pub fn target_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>>
     choice((
         phrase("this character").to(Predicate::This),
         phrase("this event").to(Predicate::This),
+        phrase("this card").to(Predicate::This),
         phrase("that character").to(Predicate::That),
         phrase("that event").to(Predicate::That),
         phrase("that card").to(Predicate::That),

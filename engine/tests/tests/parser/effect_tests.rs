@@ -83,6 +83,31 @@ fn test_spend_all_energy_draw_discard() {
 }
 
 #[test]
+fn test_negate_and_put_on_top() {
+    let result = parse("Negate an enemy dream. Put that card on top of the enemy's deck.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(List([
+        EffectWithOptions(
+          effect: Negate(
+            target: Enemy(Dream),
+          ),
+          optional: false,
+          condition: None,
+        ),
+        EffectWithOptions(
+          effect: PutOnTopOfEnemyDeck(
+            target: That,
+          ),
+          optional: false,
+          condition: None,
+        ),
+      ])),
+    ]
+    "###);
+}
+
+#[test]
 fn test_discard_card_from_enemy_hand() {
     let result = parse("Look at the enemy's hand. Choose a card with cost $3 or less from it. The enemy discards that card.");
     assert_ron_snapshot!(result, @r###"

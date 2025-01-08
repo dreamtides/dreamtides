@@ -39,6 +39,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         discard_card_from_enemy_hand(),
         abandon_at_end_of_turn(),
         spend_all_energy_draw_and_discard(),
+        put_on_top_of_deck(),
     ))
     .boxed()
 }
@@ -226,5 +227,13 @@ fn spend_all_energy_draw_and_discard<'a>() -> impl Parser<'a, &'a str, StandardE
 {
     phrase("spend all your remaining energy. draw x cards then discard x cards, where x is the energy spent this way")
         .to(StandardEffect::SpendAllEnergyDrawAndDiscard)
+        .boxed()
+}
+
+fn put_on_top_of_deck<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("put")
+        .ignore_then(determiner_parser::target_parser())
+        .then_ignore(phrase("on top of the enemy's deck"))
+        .map(|target| StandardEffect::PutOnTopOfEnemyDeck { target })
         .boxed()
 }
