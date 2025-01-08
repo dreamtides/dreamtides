@@ -47,7 +47,7 @@ fn test_return_from_void_to_play() {
     [
       Event(WithOptions(EffectWithOptions(
         effect: ReturnFromYourVoidToPlay(
-          predicate: Your(CharacterType(Warrior)),
+          target: Your(CharacterType(Warrior)),
         ),
         optional: true,
         condition: None,

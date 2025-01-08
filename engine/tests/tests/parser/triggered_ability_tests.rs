@@ -187,3 +187,20 @@ fn test_gain_spark_on_materialize() {
     ]
     "###);
 }
+
+#[test]
+fn test_discard_gains_reclaim() {
+    let result =
+        parse("Whenever you discard a card, that card gains {kw: reclaim} until end of turn.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Discard(Your(Card)),
+        effect: Effect(GainsReclaimUntilEndOfTurn(
+          target: That,
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}

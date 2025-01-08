@@ -108,6 +108,9 @@ pub enum StandardEffect {
         predicate: CardPredicate,
     },
     ReturnFromYourVoidToPlay {
-        predicate: Predicate,
+        target: Predicate,
+    },
+    GainsReclaimUntilEndOfTurn {
+        target: Predicate,
     },
 }

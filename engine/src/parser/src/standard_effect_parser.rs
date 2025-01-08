@@ -33,6 +33,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         discover(),
         materialize_random_characters(),
         return_from_void_to_play(),
+        gains_reclaim_until_end_of_turn(),
     ))
     .boxed()
 }
@@ -176,6 +177,14 @@ fn return_from_void_to_play<'a>() -> impl Parser<'a, &'a str, StandardEffect, Er
     phrase("return")
         .ignore_then(determiner_parser::your_action())
         .then_ignore(phrase("from your void to play"))
-        .map(|predicate| StandardEffect::ReturnFromYourVoidToPlay { predicate })
+        .map(|target| StandardEffect::ReturnFromYourVoidToPlay { target })
+        .boxed()
+}
+
+fn gains_reclaim_until_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
+{
+    determiner_parser::target_parser()
+        .then_ignore(phrase("gains {kw: reclaim} until end of turn"))
+        .map(|target| StandardEffect::GainsReclaimUntilEndOfTurn { target })
         .boxed()
 }

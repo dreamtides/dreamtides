@@ -6,7 +6,7 @@ use crate::determiner_parser;
 use crate::parser_utils::{phrase, ErrorType};
 
 pub fn event_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
-    choice((materialize(), play())).boxed()
+    choice((materialize(), play(), discard())).boxed()
 }
 
 pub fn keyword_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
@@ -33,4 +33,11 @@ fn materialize<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
 
 fn play<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
     phrase("you play").ignore_then(determiner_parser::your_action()).map(TriggerEvent::Play).boxed()
+}
+
+fn discard<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
+    phrase("you discard")
+        .ignore_then(determiner_parser::your_action())
+        .map(TriggerEvent::Discard)
+        .boxed()
 }
