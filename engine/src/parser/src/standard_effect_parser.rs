@@ -21,6 +21,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
         banish_card_from_void(),
         disable_activated_abilities(),
     ))
+    .boxed()
 }
 
 fn draw_cards<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {

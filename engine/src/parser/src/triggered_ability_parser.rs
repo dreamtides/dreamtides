@@ -20,7 +20,7 @@ use crate::parser_utils::{phrase, ErrorType};
 use crate::{effect_parser, trigger_event_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, ErrorType<'a>> {
-    choice((keyword_trigger_parser(), standard_trigger_parser()))
+    choice((keyword_trigger_parser(), standard_trigger_parser())).boxed()
 }
 
 fn keyword_trigger_parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, ErrorType<'a>> {

@@ -27,7 +27,8 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, ActivatedAbility, ErrorType<'a>>
             is_immediate: false,
             is_multi: true,
         })))
-        .or(phrase("$activated").to(None));
+        .or(phrase("$activated").to(None))
+        .boxed();
 
     let costs = cost_parser::parser().separated_by(phrase(",")).collect::<Vec<_>>();
 

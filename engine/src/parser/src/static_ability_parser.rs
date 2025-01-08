@@ -29,6 +29,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
         other_spark_bonus(),
         has_all_character_types(),
     ))
+    .boxed()
 }
 
 fn once_per_turn_play_from_void<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {

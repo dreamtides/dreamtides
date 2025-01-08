@@ -49,4 +49,5 @@ pub fn your_action<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>> {
         phrase("an").ignore_then(card_predicate_parser::parser()).map(Predicate::Your),
         phrase("a").ignore_then(card_predicate_parser::parser()).map(Predicate::Your),
     ))
+    .boxed()
 }

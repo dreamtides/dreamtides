@@ -6,12 +6,15 @@ use crate::parser_utils::{phrase, ErrorType};
 use crate::{condition_parser, standard_effect_parser};
 
 pub fn effect<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
-    single_effect().repeated().at_least(1).collect::<Vec<_>>().map(|effects| {
-        match effects.as_slice() {
+    single_effect()
+        .repeated()
+        .at_least(1)
+        .collect::<Vec<_>>()
+        .map(|effects| match effects.as_slice() {
             [effect] => effect.clone().to_effect(),
             effects => Effect::List(effects.to_vec()),
-        }
-    })
+        })
+        .boxed()
 }
 
 fn single_effect<'a>() -> impl Parser<'a, &'a str, EffectWithOptions, ErrorType<'a>> {
@@ -19,12 +22,18 @@ fn single_effect<'a>() -> impl Parser<'a, &'a str, EffectWithOptions, ErrorType<
         .or(optional_effect())
         .or(standard_effect_parser::parser().map(EffectWithOptions::new))
         .then_ignore(choice((just("."), phrase(", then"))))
+        .boxed()
 }
 
 fn optional_effect<'a>() -> impl Parser<'a, &'a str, EffectWithOptions, ErrorType<'a>> {
-    phrase("you may").ignore_then(standard_effect_parser::parser()).map(|game_effect| {
-        EffectWithOptions { effect: game_effect, optional: true, condition: None }
-    })
+    phrase("you may")
+        .ignore_then(standard_effect_parser::parser())
+        .map(|game_effect| EffectWithOptions {
+            effect: game_effect,
+            optional: true,
+            condition: None,
+        })
+        .boxed()
 }
 
 fn conditional_effect<'a>() -> impl Parser<'a, &'a str, EffectWithOptions, ErrorType<'a>> {
@@ -36,4 +45,5 @@ fn conditional_effect<'a>() -> impl Parser<'a, &'a str, EffectWithOptions, Error
             standard_effect_parser::parser().map(EffectWithOptions::new),
         )))
         .map(|(condition, effect)| effect.with_condition(condition))
+        .boxed()
 }
