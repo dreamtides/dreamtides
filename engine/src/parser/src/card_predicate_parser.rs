@@ -16,13 +16,14 @@ use ability_data::predicate::{CardPredicate, Operator};
 use chumsky::prelude::choice;
 use chumsky::Parser;
 use core_data::character_type::CharacterType;
-use core_data::numerics::Energy;
+use core_data::numerics::{Energy, Spark};
 
 use crate::parser_utils::{numeric, phrase, ErrorType};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     choice((
         character_with_cost(),
+        character_with_spark(),
         character_with_cost_compared_to_controlled(),
         character_type().map(CardPredicate::CharacterType),
         choice((phrase("cards"), phrase("card"))).to(CardPredicate::Card),
@@ -34,8 +35,23 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
 
 fn character_with_cost<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     character()
-        .ignore_then(numeric("with cost $", Energy, "or less"))
-        .map(|cost| CardPredicate::CharacterWithCost(cost, Operator::OrLess))
+        .ignore_then(numeric("with cost $", Energy, ""))
+        .then(choice((
+            phrase("or less").to(Operator::OrLess),
+            phrase("or more").to(Operator::OrMore),
+        )))
+        .map(|(cost, operator)| CardPredicate::CharacterWithCost(cost, operator))
+        .boxed()
+}
+
+fn character_with_spark<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
+    character()
+        .ignore_then(numeric("with spark", Spark, ""))
+        .then(choice((
+            phrase("or less").to(Operator::OrLess),
+            phrase("or more").to(Operator::OrMore),
+        )))
+        .map(|(spark, operator)| CardPredicate::CharacterWithSpark(spark, operator))
         .boxed()
 }
 

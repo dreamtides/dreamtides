@@ -88,3 +88,22 @@ fn test_multi_activated_draw() {
     "###
     );
 }
+
+#[test]
+fn test_abandon_character_with_spark() {
+    let result = parse("$activated Abandon another character with spark 2 or less: Draw a card.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Activated(ActivatedAbility(
+        cost: AbandonCharacter(Another(CharacterWithSpark(Spark(2), OrLess))),
+        effect: Effect(DrawCards(
+          count: 1,
+        )),
+        options: None,
+      )),
+    ]
+    "###
+    );
+}

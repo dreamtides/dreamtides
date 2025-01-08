@@ -17,6 +17,7 @@ use chumsky::prelude::*;
 use chumsky::Parser;
 use core_data::numerics::Energy;
 
+use crate::determiner_parser;
 use crate::parser_utils::{count, numeric, phrase, ErrorType};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
@@ -25,6 +26,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
             .ignore_then(text::int(10))
             .map(|s: &str| Cost::Energy(Energy(s.parse().unwrap()))),
         numeric("banish", count, "cards from your void").map(Cost::BanishCardsFromYourVoid),
+        phrase("abandon").ignore_then(determiner_parser::your_action()).map(Cost::AbandonCharacter),
     ))
     .boxed()
 }
