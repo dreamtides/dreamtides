@@ -49,6 +49,19 @@ fn test_play_from_void_by_banishing() {
 }
 
 #[test]
+fn test_play_event_from_void() {
+    let result = parse("You may play this event from your void for $0 by abandoning a character.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(PlayFromVoidForCost(
+        energy_cost: Energy(0),
+        additional_cost: AbandonCharacters(Your(Character), 1),
+      )),
+    ]
+    "###);
+}
+
+#[test]
 fn test_disable_enemy_materialized_abilities() {
     let result = parse("Disable the \"$materialized\" abilities of the enemy's characters.");
     assert_ron_snapshot!(

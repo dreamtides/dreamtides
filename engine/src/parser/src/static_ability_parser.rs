@@ -40,15 +40,6 @@ fn enemy_added_cost_to_play<'a>() -> impl Parser<'a, &'a str, StaticAbility, Err
         })
 }
 
-fn play_from_void_for_cost<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
-    numeric("you may play this character from your void for $", Energy, "by")
-        .then(cost_parser::inflected_additional_cost())
-        .map(|(energy_cost, additional_cost)| StaticAbility::PlayFromVoidForCost {
-            energy_cost,
-            additional_cost,
-        })
-}
-
 fn disable_enemy_materialized_abilities<'a>(
 ) -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
     let enemy_characters = choice((phrase("the enemy's characters"), phrase("enemy characters")));
@@ -78,6 +69,17 @@ fn cost_reduction<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>
             reduction: cost,
         },
     )
+}
+
+fn play_from_void_for_cost<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+    phrase("you may play")
+        .ignore_then(this())
+        .ignore_then(numeric("from your void for $", Energy, "by"))
+        .then(cost_parser::inflected_additional_cost())
+        .map(|(energy_cost, additional_cost)| StaticAbility::PlayFromVoidForCost {
+            energy_cost,
+            additional_cost,
+        })
 }
 
 fn play_from_void_with_condition<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
