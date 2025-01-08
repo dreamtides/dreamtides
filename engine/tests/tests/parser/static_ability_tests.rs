@@ -77,3 +77,16 @@ fn test_other_warriors_spark_bonus() {
     "###
     );
 }
+
+#[test]
+fn test_has_all_character_types() {
+    let result = parse("This character has all character types.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Event(Effect(HasAllCharacterTypes)),
+    ]
+    "###
+    );
+}

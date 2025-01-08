@@ -20,6 +20,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
         gain_energy(),
         banish_card_from_void(),
         disable_activated_abilities(),
+        has_all_character_types(),
     ))
 }
 
@@ -91,4 +92,8 @@ fn disable_activated_abilities<'a>() -> impl Parser<'a, &'a str, StandardEffect,
         .ignore_then(determiner_parser::target_parser())
         .then_ignore(phrase("while this character is in play"))
         .map(|target| StandardEffect::DisableActivatedAbilitiesWhileInPlay { target })
+}
+
+fn has_all_character_types<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("this character has all character types").to(StandardEffect::HasAllCharacterTypes)
 }
