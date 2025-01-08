@@ -9,7 +9,10 @@ fn test_enemy_events_cost_more_to_play() {
     result,
     @r###"
     [
-      Static(EnemyAddedCostToPlay(Event, Energy(1))),
+      Static(EnemyAddedCostToPlay(
+        matching: Event,
+        increase: Energy(1),
+      )),
     ]
     "###
     );
@@ -21,7 +24,9 @@ fn test_once_per_turn_play_2_or_less_from_void() {
         parse("Once per turn, you may play a character with cost $2 or less from your void.");
     assert_ron_snapshot!(result, @r###"
     [
-      Static(OncePerTurnPlayFromVoid(CharacterWithCost(Energy(2), OrLess))),
+      Static(OncePerTurnPlayFromVoid(
+        matching: CharacterWithCost(Energy(2), OrLess),
+      )),
     ]
     "###);
 }
@@ -72,7 +77,10 @@ fn test_other_warriors_spark_bonus() {
         result,
         @r###"
     [
-      Static(OtherCharactersSparkBonus(CharacterType(Warrior), Spark(1))),
+      Static(OtherCharactersSparkBonus(
+        matching: CharacterType(Warrior),
+        added_spark: Spark(1),
+      )),
     ]
     "###
     );
@@ -86,6 +94,22 @@ fn test_has_all_character_types() {
         @r###"
     [
       Static(HasAllCharacterTypes),
+    ]
+    "###
+    );
+}
+
+#[test]
+fn test_character_cost_reduction() {
+    let result = parse("Characters cost you $2 less.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Static(YourCardsCostReduction(
+        matching: Character,
+        reduction: Energy(2),
+      )),
     ]
     "###
     );
