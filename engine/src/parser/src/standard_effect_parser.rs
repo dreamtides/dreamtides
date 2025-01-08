@@ -54,6 +54,7 @@ fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         discover_and_then_materialize(),
         discover(),
         materialize_random_characters(),
+        return_from_void_to_hand(),
         return_from_void_to_play(),
         gains_reclaim_until_end_of_turn(),
         negate(),
@@ -196,6 +197,14 @@ fn materialize_random_characters<'a>() -> impl Parser<'a, &'a str, StandardEffec
         .boxed()
 }
 
+fn return_from_void_to_hand<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("return")
+        .ignore_then(determiner_parser::your_action())
+        .then_ignore(phrase("from your void to your hand"))
+        .map(|target| StandardEffect::ReturnFromYourVoidToHand { target })
+        .boxed()
+}
+
 fn return_from_void_to_play<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("return")
         .ignore_then(determiner_parser::your_action())
@@ -277,7 +286,7 @@ fn return_all_but_one_character_draw_card_for_each<'a>(
         .then_ignore(phrase(
             "character you control to hand. draw a card for each character returned",
         ))
-        .map(|count| StandardEffect::ReturnCharactersDrawCardForEach { count })
+        .map(|count| StandardEffect::ReturnCharactersToHandDrawCardForEach { count })
         .boxed()
 }
 

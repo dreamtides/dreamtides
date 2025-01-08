@@ -130,6 +130,9 @@ pub enum StandardEffect {
         count: u64,
         predicate: CardPredicate,
     },
+    ReturnFromYourVoidToHand {
+        target: Predicate,
+    },
     ReturnFromYourVoidToPlay {
         target: Predicate,
     },
@@ -149,7 +152,7 @@ pub enum StandardEffect {
     PutOnTopOfEnemyDeck {
         target: Predicate,
     },
-    ReturnCharactersDrawCardForEach {
+    ReturnCharactersToHandDrawCardForEach {
         count: CountingExpression,
     },
 }
