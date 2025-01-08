@@ -9,6 +9,7 @@ use crate::predicate::CardPredicate;
 /// they're just something that is always true.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum StaticAbility {
+    DisableEnemyMaterializedAbilities,
     EnemyAddedCostToPlay(CardPredicate, Energy),
     OncePerTurnPlayFromVoid(CardPredicate),
     PlayFromVoidForCost { energy_cost: Energy, additional_cost: Cost },

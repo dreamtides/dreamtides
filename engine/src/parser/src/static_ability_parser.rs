@@ -21,7 +21,12 @@ use crate::parser_utils::{numeric, phrase, ErrorType};
 use crate::{card_predicate_parser, cost_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
-    choice((once_per_turn_play_from_void(), enemy_added_cost_to_play(), play_from_void_for_cost()))
+    choice((
+        disable_enemy_materialized_abilities(),
+        once_per_turn_play_from_void(),
+        enemy_added_cost_to_play(),
+        play_from_void_for_cost(),
+    ))
 }
 
 fn once_per_turn_play_from_void<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
@@ -45,4 +50,12 @@ fn play_from_void_for_cost<'a>() -> impl Parser<'a, &'a str, StaticAbility, Erro
             energy_cost,
             additional_cost,
         })
+}
+
+fn disable_enemy_materialized_abilities<'a>(
+) -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+    let enemy_characters = choice((phrase("the enemy's characters"), phrase("enemy characters")));
+    phrase("disable the \"$materialized\" abilities of")
+        .ignore_then(enemy_characters)
+        .to(StaticAbility::DisableEnemyMaterializedAbilities)
 }

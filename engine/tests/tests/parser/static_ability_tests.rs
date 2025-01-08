@@ -38,3 +38,29 @@ fn test_play_from_void_by_banishing() {
   ]
   "###);
 }
+
+#[test]
+fn test_disable_enemy_materialized_abilities() {
+    let result = parse("Disable the \"$materialized\" abilities of the enemy's characters.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Static(DisableEnemyMaterializedAbilities),
+    ]
+    "###
+    );
+}
+
+#[test]
+fn test_disable_enemy_materialized_abilities_alternate() {
+    let result = parse("Disable the \"$materialized\" abilities of enemy characters.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Static(DisableEnemyMaterializedAbilities),
+    ]
+    "###
+    );
+}
