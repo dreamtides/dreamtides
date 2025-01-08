@@ -41,12 +41,10 @@ fn test_optional_draw() {
         result,
         @r###"
     [
-      Event(EffectList(EffectList(
-        effects: [
-          DrawCards(
-            count: 1,
-          ),
-        ],
+      Event(WithOptions(EffectWithOptions(
+        effect: DrawCards(
+          count: 1,
+        ),
         optional: true,
         condition: None,
       ))),
@@ -62,12 +60,10 @@ fn test_conditional_gain_energy() {
         result,
         @r###"
     [
-      Event(EffectList(EffectList(
-        effects: [
-          GainEnergy(
-            gained: Energy(1),
-          ),
-        ],
+      Event(WithOptions(EffectWithOptions(
+        effect: GainEnergy(
+          gained: Energy(1),
+        ),
         optional: false,
         condition: Some(PredicateCount(
           count: 2,
@@ -86,12 +82,10 @@ fn test_conditional_optional_gain_energy() {
         result,
         @r###"
     [
-      Event(EffectList(EffectList(
-        effects: [
-          GainEnergy(
-            gained: Energy(1),
-          ),
-        ],
+      Event(WithOptions(EffectWithOptions(
+        effect: GainEnergy(
+          gained: Energy(1),
+        ),
         optional: true,
         condition: Some(PredicateCount(
           count: 2,

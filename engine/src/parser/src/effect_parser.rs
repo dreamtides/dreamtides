@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ability_data::effect::{Effect, EffectList, GameEffect};
+use ability_data::effect::{Effect, EffectWithOptions, StandardEffect};
 use ability_data::predicate::Predicate;
 use chumsky::prelude::*;
 use chumsky::Parser;
@@ -22,42 +22,29 @@ use crate::parser_utils::{count, numeric, phrase, ErrorType};
 use crate::{card_predicate_parser, condition_parser, determiner_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
-    conditional_effect().or(optional_effect()).or(simple_effect())
+    conditional_effect()
+        .map(Effect::WithOptions)
+        .or(optional_effect().map(Effect::WithOptions))
+        .or(standard_effect().map(Effect::Effect))
 }
 
-fn optional_effect<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
-    phrase("you may").ignore_then(base_effect()).map(|game_effect| {
-        Effect::EffectList(EffectList {
-            effects: vec![game_effect],
-            optional: true,
-            condition: None,
-        })
+fn optional_effect<'a>() -> impl Parser<'a, &'a str, EffectWithOptions, ErrorType<'a>> {
+    phrase("you may").ignore_then(standard_effect()).map(|game_effect| EffectWithOptions {
+        effect: game_effect,
+        optional: true,
+        condition: None,
     })
 }
 
-fn simple_effect<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
-    base_effect().map(Effect::Effect)
-}
-
-fn conditional_effect<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
+fn conditional_effect<'a>() -> impl Parser<'a, &'a str, EffectWithOptions, ErrorType<'a>> {
     phrase("if")
         .ignore_then(condition_parser::parser())
         .then_ignore(phrase(","))
-        .then(choice((optional_effect(), simple_effect())))
-        .map(|(condition, effect)| match effect {
-            Effect::Effect(game_effect) => Effect::EffectList(EffectList {
-                effects: vec![game_effect],
-                optional: false,
-                condition: Some(condition),
-            }),
-            Effect::EffectList(mut list) => {
-                list.condition = Some(condition);
-                Effect::EffectList(list)
-            }
-        })
+        .then(choice((optional_effect(), standard_effect().map(EffectWithOptions::new))))
+        .map(|(condition, effect)| effect.with_condition(condition))
 }
 
-fn base_effect<'a>() -> impl Parser<'a, &'a str, GameEffect, ErrorType<'a>> {
+fn standard_effect<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     choice((
         discard_cards(),
         dissolve_character(),
@@ -70,30 +57,30 @@ fn base_effect<'a>() -> impl Parser<'a, &'a str, GameEffect, ErrorType<'a>> {
     ))
 }
 
-fn draw_cards<'a>() -> impl Parser<'a, &'a str, GameEffect, ErrorType<'a>> {
+fn draw_cards<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("draw")
         .ignore_then(choice((phrase("a card").to(1), numeric("", count, "cards"))))
-        .map(|count| GameEffect::DrawCards { count })
+        .map(|count| StandardEffect::DrawCards { count })
 }
 
-fn gain_spark<'a>() -> impl Parser<'a, &'a str, GameEffect, ErrorType<'a>> {
+fn gain_spark<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     determiner_parser::target_parser()
         .then(numeric("gains +", Spark, "spark"))
-        .map(|(predicate, spark)| GameEffect::GainsSpark { target: predicate, gained: spark })
+        .map(|(predicate, spark)| StandardEffect::GainsSpark { target: predicate, gained: spark })
 }
 
-fn gain_energy<'a>() -> impl Parser<'a, &'a str, GameEffect, ErrorType<'a>> {
-    numeric("gain $", Energy, "").map(|energy| GameEffect::GainEnergy { gained: energy })
+fn gain_energy<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    numeric("gain $", Energy, "").map(|energy| StandardEffect::GainEnergy { gained: energy })
 }
 
-fn gain_spark_until_next_main_for_each<'a>() -> impl Parser<'a, &'a str, GameEffect, ErrorType<'a>>
-{
+fn gain_spark_until_next_main_for_each<'a>(
+) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     determiner_parser::target_parser()
         .then(numeric("gains +", Spark, "spark until your next main phase for each"))
         .then(card_predicate_parser::parser())
         .then_ignore(phrase("you control"))
         .map(|((target, spark), counted)| {
-            GameEffect::TargetGainsSparkUntilYourNextMainPhaseForEach {
+            StandardEffect::TargetGainsSparkUntilYourNextMainPhaseForEach {
                 target,
                 gained: spark,
                 for_each: Predicate::Your(counted),
@@ -101,27 +88,27 @@ fn gain_spark_until_next_main_for_each<'a>() -> impl Parser<'a, &'a str, GameEff
         })
 }
 
-fn dissolve_character<'a>() -> impl Parser<'a, &'a str, GameEffect, ErrorType<'a>> {
+fn dissolve_character<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("dissolve")
         .ignore_then(determiner_parser::target_parser())
-        .map(|predicate| GameEffect::DissolveCharacter { target: predicate })
+        .map(|predicate| StandardEffect::DissolveCharacter { target: predicate })
 }
 
-fn discard_cards<'a>() -> impl Parser<'a, &'a str, GameEffect, ErrorType<'a>> {
+fn discard_cards<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("discard")
         .ignore_then(choice((phrase("a card").to(1), numeric("", count, "cards"))))
-        .map(|count| GameEffect::DiscardCards { count })
+        .map(|count| StandardEffect::DiscardCards { count })
 }
 
-fn gains_aegis_this_turn<'a>() -> impl Parser<'a, &'a str, GameEffect, ErrorType<'a>> {
+fn gains_aegis_this_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     determiner_parser::target_parser()
         .then_ignore(phrase("gains {kw: aegis} this turn"))
-        .map(|target| GameEffect::GainsAegisThisTurn { target })
+        .map(|target| StandardEffect::GainsAegisThisTurn { target })
 }
 
-fn draw_matching_card<'a>() -> impl Parser<'a, &'a str, GameEffect, ErrorType<'a>> {
+fn draw_matching_card<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("draw a")
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(phrase("from your deck"))
-        .map(|card_predicate| GameEffect::DrawMatchingCard { predicate: card_predicate })
+        .map(|card_predicate| StandardEffect::DrawMatchingCard { predicate: card_predicate })
 }

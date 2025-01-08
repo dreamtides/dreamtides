@@ -7,18 +7,18 @@ use crate::predicate::{CardPredicate, Predicate};
 /// Represents a mutation to the game state.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Effect {
-    Effect(GameEffect),
-    EffectList(EffectList),
+    Effect(StandardEffect),
+    WithOptions(EffectWithOptions),
+    List(Vec<EffectWithOptions>),
 }
 
-/// Provides a sequence of effects to apply, as well as modifiers which affect
-/// how those effects are applied.
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-pub struct EffectList {
+/// Provides an effect along with configuration options.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EffectWithOptions {
     /// Sequences of effects to apply in the provided order, usually written as
     /// complete sentences or separated by the words "then" or "and" to
     /// indicate order.
-    pub effects: Vec<GameEffect>,
+    pub effect: StandardEffect,
 
     /// True if this is an effect which the controller may choose to apply,
     /// usually prefixed with "You may..."
@@ -29,11 +29,23 @@ pub struct EffectList {
     pub condition: Option<Condition>,
 }
 
+impl EffectWithOptions {
+    pub fn new(effect: StandardEffect) -> Self {
+        Self { effect, optional: false, condition: None }
+    }
+
+    pub fn with_condition(&self, condition: Condition) -> Self {
+        let mut result = self.clone();
+        result.condition = Some(condition);
+        result
+    }
+}
+
 /// Effects are the primary way in which cards modify the game state. This can
 /// be as part of the resolution of an event card, or via the effect text of a
 /// triggered or activated ability on a character card.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum GameEffect {
+pub enum StandardEffect {
     DiscardCards {
         count: u64,
     },

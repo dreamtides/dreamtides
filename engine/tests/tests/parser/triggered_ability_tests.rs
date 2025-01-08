@@ -116,12 +116,10 @@ fn test_multiple_keyword_trigger_conditional() {
           Materialized,
           Judgment,
         ]),
-        effect: EffectList(EffectList(
-          effects: [
-            GainEnergy(
-              gained: Energy(1),
-            ),
-          ],
+        effect: WithOptions(EffectWithOptions(
+          effect: GainEnergy(
+            gained: Energy(1),
+          ),
           optional: false,
           condition: Some(PredicateCount(
             count: 2,
