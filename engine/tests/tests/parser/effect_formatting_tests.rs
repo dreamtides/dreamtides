@@ -163,3 +163,26 @@ fn test_optional_cost() {
     "###
     );
 }
+
+#[test]
+fn test_optional_cost_banish_enemy() {
+    let result = parse("$activated: You may banish a card from the enemy's void to gain $1.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Activated(ActivatedAbility(
+        costs: [],
+        effect: WithOptions(EffectWithOptions(
+          effect: GainEnergy(
+            gained: Energy(1),
+          ),
+          optional: Some(BanishCardsFromEnemyVoid(1)),
+          condition: None,
+        )),
+        options: None,
+      )),
+    ]
+    "###
+    );
+}

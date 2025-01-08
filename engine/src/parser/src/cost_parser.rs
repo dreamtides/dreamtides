@@ -11,7 +11,10 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
     choice((
         numeric("$", Energy, "").map(Cost::Energy),
         numeric("pay $", Energy, "").map(Cost::Energy),
+        phrase("banish a card from your void").to(Cost::BanishCardsFromYourVoid(1)),
         numeric("banish", count, "cards from your void").map(Cost::BanishCardsFromYourVoid),
+        phrase("banish a card from the enemy's void").to(Cost::BanishCardsFromEnemyVoid(1)),
+        numeric("banish", count, "cards from the enemy's void").map(Cost::BanishCardsFromEnemyVoid),
         phrase("abandon")
             .ignore_then(determiner_parser::your_action())
             .map(|p| Cost::AbandonCharacters(p, 1)),

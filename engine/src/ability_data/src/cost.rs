@@ -9,9 +9,10 @@ use crate::predicate::Predicate;
 pub enum Cost {
     NoCost,
     Energy(Energy),
+    BanishCardsFromEnemyVoid(u64),
     BanishCardsFromYourVoid(u64),
     BanishAllCardsFromYourVoid,
+    BanishFromHand(Predicate),
     AbandonCharacters(Predicate, u64),
     DiscardHand,
-    BanishFromHand(Predicate),
 }
