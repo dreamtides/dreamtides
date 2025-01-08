@@ -28,7 +28,7 @@ pub fn inflected_additional_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorTy
         phrase("banishing another card from your void").to(Cost::BanishCardsFromYourVoid(1)),
         phrase("banishing all other cards from your void").to(Cost::BanishAllCardsFromYourVoid),
         phrase("banishing all cards from your void").to(Cost::BanishAllCardsFromYourVoid),
-        numeric("abandoning", count, "")
+        choice((phrase("abandoning a").to(1), numeric("abandoning", count, "")))
             .then(card_predicate_parser::parser())
             .map(|(n, predicate)| Cost::AbandonCharacters(Predicate::Your(predicate), n)),
         phrase("banishing")
