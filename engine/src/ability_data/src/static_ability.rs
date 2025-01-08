@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::condition::Condition;
 use crate::cost::Cost;
+use crate::effect::Effect;
 use crate::predicate::CardPredicate;
 
 /// A static ability represents something which modifies the rules of the game,
@@ -36,8 +37,15 @@ pub enum StaticAbility {
         energy_cost: Energy,
         additional_cost: Cost,
     },
-    PlayForAlternateCost {
-        energy_cost: Energy,
-        additional_cost: Cost,
-    },
+    PlayForAlternateCost(PlayForAlternateCost),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PlayForAlternateCost {
+    pub energy_cost: Energy,
+    pub additional_cost: Cost,
+
+    /// Effect to apply once you play this event/materialize this character if
+    /// you use this alternate cost.
+    pub if_you_do: Option<Effect>,
 }

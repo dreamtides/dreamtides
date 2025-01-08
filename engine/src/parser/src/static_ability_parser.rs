@@ -1,4 +1,4 @@
-use ability_data::static_ability::StaticAbility;
+use ability_data::static_ability::{PlayForAlternateCost, StaticAbility};
 use chumsky::prelude::*;
 use chumsky::Parser;
 use core_data::numerics::{Energy, Spark};
@@ -100,8 +100,11 @@ fn play_for_alternate_cost<'a>() -> impl Parser<'a, &'a str, StaticAbility, Erro
         .ignore_then(this())
         .ignore_then(numeric("for $", Energy, "by"))
         .then(cost_parser::inflected_additional_cost())
-        .map(|(energy_cost, additional_cost)| StaticAbility::PlayForAlternateCost {
-            energy_cost,
-            additional_cost,
+        .map(|(energy_cost, additional_cost)| {
+            StaticAbility::PlayForAlternateCost(PlayForAlternateCost {
+                energy_cost,
+                additional_cost,
+                if_you_do: None,
+            })
         })
 }
