@@ -31,6 +31,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         abandon_and_gain_energy_for_spark(),
         discover(),
         materialize_random_characters(),
+        return_from_void_to_play(),
     ))
     .boxed()
 }
@@ -158,5 +159,13 @@ fn materialize_random_characters<'a>() -> impl Parser<'a, &'a str, StandardEffec
         .then(card_predicate_parser::parser())
         .then_ignore(phrase("from your deck"))
         .map(|(count, predicate)| StandardEffect::MaterializeRandomCharacters { count, predicate })
+        .boxed()
+}
+
+fn return_from_void_to_play<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("return")
+        .ignore_then(determiner_parser::your_action())
+        .then_ignore(phrase("from your void to play"))
+        .map(|predicate| StandardEffect::ReturnFromYourVoidToPlay { predicate })
         .boxed()
 }

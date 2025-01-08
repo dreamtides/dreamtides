@@ -104,4 +104,7 @@ pub enum StandardEffect {
         count: u64,
         predicate: CardPredicate,
     },
+    ReturnFromYourVoidToPlay {
+        predicate: Predicate,
+    },
 }

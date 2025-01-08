@@ -39,3 +39,19 @@ fn test_materialize_random_characters() {
     ]
     "###);
 }
+
+#[test]
+fn test_return_from_void_to_play() {
+    let result = parse("You may return a {cardtype: warrior} from your void to play.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(WithOptions(EffectWithOptions(
+        effect: ReturnFromYourVoidToPlay(
+          predicate: Your(CharacterType(Warrior)),
+        ),
+        optional: true,
+        condition: None,
+      ))),
+    ]
+    "###);
+}
