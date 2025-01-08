@@ -104,7 +104,7 @@ fn test_abandon_character_with_spark() {
     [
       Activated(ActivatedAbility(
         costs: [
-          AbandonCharacter(Another(CharacterWithSpark(Spark(2), OrLess))),
+          AbandonCharacters(Another(CharacterWithSpark(Spark(2), OrLess)), 1),
         ],
         effect: Effect(DrawCards(
           count: 1,
@@ -121,23 +121,23 @@ fn test_activated_ability_multiple_costs() {
     let result =
         parse("$multiActivated $2, Abandon another character with spark 1 or less: Draw 2 cards.");
     assert_ron_snapshot!(result, @r###"
-  [
-    Activated(ActivatedAbility(
-      costs: [
-        Energy(Energy(2)),
-        AbandonCharacter(Another(CharacterWithSpark(Spark(1), OrLess))),
-      ],
-      effect: Effect(DrawCards(
-        count: 2,
+    [
+      Activated(ActivatedAbility(
+        costs: [
+          Energy(Energy(2)),
+          AbandonCharacters(Another(CharacterWithSpark(Spark(1), OrLess)), 1),
+        ],
+        effect: Effect(DrawCards(
+          count: 2,
+        )),
+        options: Some(ActivatedAbilityOptions(
+          is_fast: false,
+          is_immediate: false,
+          is_multi: true,
+        )),
       )),
-      options: Some(ActivatedAbilityOptions(
-        is_fast: false,
-        is_immediate: false,
-        is_multi: true,
-      )),
-    )),
-  ]
-  "###);
+    ]
+    "###);
 }
 
 #[test]
@@ -171,7 +171,7 @@ fn test_multiple_costs_abandon_this() {
       Activated(ActivatedAbility(
         costs: [
           Energy(Energy(2)),
-          AbandonCharacter(This),
+          AbandonCharacters(This, 1),
           DiscardHand,
         ],
         effect: Effect(DrawCards(
@@ -191,7 +191,7 @@ fn test_activated_discover_and_then_materialize() {
     [
       Activated(ActivatedAbility(
         costs: [
-          AbandonCharacter(Your(CharacterType(Warrior))),
+          AbandonCharacters(Your(CharacterType(Warrior)), 1),
         ],
         effect: Effect(DiscoverAndThenMaterialize(
           predicate: CharacterWithCostComparedToAbandoned(

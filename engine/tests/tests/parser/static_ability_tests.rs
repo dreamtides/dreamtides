@@ -114,3 +114,17 @@ fn test_character_cost_reduction() {
     "###
     );
 }
+
+#[test]
+fn test_abandon_characters_cost() {
+    let result =
+        parse("You may play this character from your void for $0 by abandoning 2 characters.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(PlayFromVoidForCost(
+        energy_cost: Energy(0),
+        additional_cost: AbandonCharacters(Your(Character), 2),
+      )),
+    ]
+    "###);
+}
