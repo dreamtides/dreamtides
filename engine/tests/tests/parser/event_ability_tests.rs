@@ -33,3 +33,24 @@ fn test_dissolve_character_with_cost_compared_to_warriors() {
     "###
     );
 }
+
+#[test]
+fn test_optional_draw() {
+    let result = parse("You may draw a card.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Event(EffectList(EffectList(
+        effects: [
+          DrawCards(
+            count: 1,
+          ),
+        ],
+        optional: true,
+        condition: None,
+      ))),
+    ]
+    "###
+    );
+}
