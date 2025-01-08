@@ -137,8 +137,8 @@ fn test_multiple_keyword_trigger_conditional() {
 
 #[test]
 fn test_once_per_turn_materialize() {
-  let result = parse("Once per turn, when you materialize a character, gain $1.");
-  assert_ron_snapshot!(result, @r###"
+    let result = parse("Once per turn, when you materialize a character, gain $1.");
+    assert_ron_snapshot!(result, @r###"
   [
     Triggered(TriggeredAbility(
       trigger: Materialize(Your(Character)),
@@ -151,4 +151,22 @@ fn test_once_per_turn_materialize() {
     )),
   ]
   "###);
+}
+
+#[test]
+fn test_draw_matching_card() {
+    let result = parse("$materialized: Draw a {cardtype: warrior} from your deck.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Keywords([
+          Materialized,
+        ]),
+        effect: Effect(DrawMatchingCard(
+          predicate: CharacterType(Warrior),
+        )),
+        options: None,
+      )),
+    ]
+    "###);
 }

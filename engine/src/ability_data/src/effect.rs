@@ -2,7 +2,7 @@ use core_data::numerics::{Energy, Spark};
 use serde::{Deserialize, Serialize};
 
 use crate::condition::Condition;
-use crate::predicate::Predicate;
+use crate::predicate::{CardPredicate, Predicate};
 
 /// Represents a mutation to the game state.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -39,6 +39,9 @@ pub enum GameEffect {
     },
     DrawCards {
         count: u64,
+    },
+    DrawMatchingCard {
+        predicate: CardPredicate,
     },
     DissolveCharacter {
         target: Predicate,

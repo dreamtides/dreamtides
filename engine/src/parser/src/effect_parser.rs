@@ -62,6 +62,7 @@ fn base_effect<'a>() -> impl Parser<'a, &'a str, GameEffect, ErrorType<'a>> {
         discard_cards(),
         dissolve_character(),
         draw_cards(),
+        draw_matching_card(),
         gain_energy(),
         gain_spark_until_next_main_for_each(),
         gain_spark(),
@@ -116,4 +117,11 @@ fn gains_aegis_this_turn<'a>() -> impl Parser<'a, &'a str, GameEffect, ErrorType
     determiner_parser::target_parser()
         .then_ignore(phrase("gains {kw: aegis} this turn"))
         .map(|target| GameEffect::GainsAegisThisTurn { target })
+}
+
+fn draw_matching_card<'a>() -> impl Parser<'a, &'a str, GameEffect, ErrorType<'a>> {
+    phrase("draw a")
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(phrase("from your deck"))
+        .map(|card_predicate| GameEffect::DrawMatchingCard { predicate: card_predicate })
 }
