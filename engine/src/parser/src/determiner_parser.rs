@@ -44,6 +44,7 @@ pub fn target_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>>
 /// the acting party, for example in "Whenever you materialize <predicate>".
 pub fn your_action<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>> {
     choice((
+        phrase("this character").to(Predicate::This),
         phrase("another").ignore_then(card_predicate_parser::parser()).map(Predicate::Another),
         phrase("an").ignore_then(card_predicate_parser::parser()).map(Predicate::Your),
         phrase("a").ignore_then(card_predicate_parser::parser()).map(Predicate::Your),

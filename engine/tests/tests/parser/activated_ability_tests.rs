@@ -160,3 +160,26 @@ fn test_discard_hand_gain_energy() {
     "###
     );
 }
+
+#[test]
+fn test_multiple_costs_abandon_this() {
+    let result = parse("$activated $2, Abandon this character, discard your hand: Draw 3 cards.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Activated(ActivatedAbility(
+        costs: [
+          Energy(Energy(2)),
+          AbandonCharacter(This),
+          DiscardHand,
+        ],
+        effect: Effect(DrawCards(
+          count: 3,
+        )),
+        options: None,
+      )),
+    ]
+    "###
+    );
+}
