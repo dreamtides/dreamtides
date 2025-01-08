@@ -44,15 +44,25 @@ pub enum CardPredicate {
     Event,
     CharacterType(CharacterType),
     NotCharacterType(CharacterType),
-    CharacterWithSpark(Spark, Operator),
-    CharacterWithCost(Energy, Operator),
-    CharacterWithCostComparedToControlled(CharacterType, Operator),
+    CharacterWithSpark(Spark, Operator<Spark>),
+    CharacterWithCost(Energy, Operator<Energy>),
+    CharacterWithCostComparedToControlled {
+        target: Box<CardPredicate>,
+        cost_operator: Operator<Energy>,
+        count_matching: Box<CardPredicate>,
+    },
+    CharacterWithCostComparedToAbandoned {
+        target: Box<CardPredicate>,
+        cost_operator: Operator<Energy>,
+    },
     CharacterWithMaterializedAbility,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum Operator {
-    OrMore,
-    Exactly,
+pub enum Operator<T> {
+    LowerBy(T),
     OrLess,
+    Exactly,
+    OrMore,
+    HigherBy(T),
 }

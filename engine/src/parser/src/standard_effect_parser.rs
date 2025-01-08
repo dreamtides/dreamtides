@@ -29,6 +29,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         banish_card_from_void(),
         disable_activated_abilities(),
         abandon_and_gain_energy_for_spark(),
+        discover_and_then_materialize(),
         discover(),
         materialize_random_characters(),
         return_from_void_to_play(),
@@ -147,6 +148,15 @@ fn discover<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
         .ignore_then(choice((phrase("a"), phrase("an"))))
         .ignore_then(card_predicate_parser::parser())
         .map(|predicate| StandardEffect::Discover { predicate })
+        .boxed()
+}
+
+fn discover_and_then_materialize<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("{kw: discover}")
+        .ignore_then(choice((phrase("a"), phrase("an"))))
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(phrase("and materialize it"))
+        .map(|predicate| StandardEffect::DiscoverAndThenMaterialize { predicate })
         .boxed()
 }
 

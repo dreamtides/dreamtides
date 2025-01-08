@@ -100,6 +100,9 @@ pub enum StandardEffect {
     Discover {
         predicate: CardPredicate,
     },
+    DiscoverAndThenMaterialize {
+        predicate: CardPredicate,
+    },
     MaterializeRandomCharacters {
         count: u64,
         predicate: CardPredicate,

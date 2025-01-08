@@ -22,9 +22,17 @@ use crate::parser_utils::{numeric, phrase, ErrorType};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     choice((
+        character_with_cost_compared_to_controlled(),
+        character_with_cost_compared_to_abandoned(),
+        non_recursive_predicate(),
+    ))
+    .boxed()
+}
+
+fn non_recursive_predicate<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
+    choice((
         character_with_cost(),
         character_with_spark(),
-        character_with_cost_compared_to_controlled(),
         character_with_materialized_ability(),
         character_type().map(CardPredicate::CharacterType),
         choice((phrase("cards"), phrase("card"))).to(CardPredicate::Card),
@@ -58,20 +66,43 @@ fn character_with_spark<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorTy
 
 fn character_with_cost_compared_to_controlled<'a>(
 ) -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
-    character()
-        .ignore_then(phrase("with cost"))
-        .ignore_then(choice((
+    non_recursive_predicate()
+        .then_ignore(phrase("with cost"))
+        .then(choice((
             phrase("less than or equal to").to(Operator::OrLess),
             phrase("equal to").to(Operator::Exactly),
             phrase("greater than or equal to").to(Operator::OrMore),
         )))
         .then(
             phrase("the number of")
-                .ignore_then(character_type())
+                .ignore_then(non_recursive_predicate())
                 .then_ignore(phrase("you control")),
         )
-        .map(|(operator, character_type)| {
-            CardPredicate::CharacterWithCostComparedToControlled(character_type, operator)
+        .map(|((target, cost_operator), count_matching)| {
+            CardPredicate::CharacterWithCostComparedToControlled {
+                target: Box::new(target),
+                cost_operator,
+                count_matching: Box::new(count_matching),
+            }
+        })
+        .boxed()
+}
+
+fn character_with_cost_compared_to_abandoned<'a>(
+) -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
+    non_recursive_predicate()
+        .then_ignore(phrase("with cost"))
+        .then(choice((
+            numeric("$", Energy, "higher than").map(Operator::HigherBy),
+            numeric("$", Energy, "lower than").map(Operator::LowerBy),
+            phrase("greater than").to(Operator::OrMore),
+            phrase("less than").to(Operator::OrLess),
+            phrase("equal to").to(Operator::Exactly),
+        )))
+        .then_ignore(phrase("the abandoned character"))
+        .map(|(target, cost_operator)| CardPredicate::CharacterWithCostComparedToAbandoned {
+            target: Box::new(target),
+            cost_operator,
         })
         .boxed()
 }

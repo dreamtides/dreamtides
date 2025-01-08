@@ -183,3 +183,24 @@ fn test_multiple_costs_abandon_this() {
     "###
     );
 }
+
+#[test]
+fn test_activated_discover_and_then_materialize() {
+    let result = parse("$activated Abandon a {cardtype: warrior}: {kw: Discover} a {cardtype: warrior} with cost $1 higher than the abandoned character and materialize it.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Activated(ActivatedAbility(
+        costs: [
+          AbandonCharacter(Your(CharacterType(Warrior))),
+        ],
+        effect: Effect(DiscoverAndThenMaterialize(
+          predicate: CharacterWithCostComparedToAbandoned(
+            target: CharacterType(Warrior),
+            cost_operator: HigherBy(Energy(1)),
+          ),
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}

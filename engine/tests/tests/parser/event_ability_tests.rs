@@ -27,7 +27,11 @@ fn test_dissolve_character_with_cost_compared_to_warriors() {
         @r###"
     [
       Event(Effect(DissolveCharacter(
-        target: Enemy(CharacterWithCostComparedToControlled(Warrior, OrLess)),
+        target: Enemy(CharacterWithCostComparedToControlled(
+          target: Character,
+          cost_operator: OrLess,
+          count_matching: CharacterType(Warrior),
+        )),
       ))),
     ]
     "###
