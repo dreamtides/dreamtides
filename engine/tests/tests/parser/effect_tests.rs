@@ -53,7 +53,7 @@ fn test_return_from_void_to_play() {
         effect: ReturnFromYourVoidToPlay(
           target: Your(CharacterType(Warrior)),
         ),
-        optional: true,
+        optional: Some(NoCost),
         condition: None,
       ))),
     ]
@@ -92,14 +92,14 @@ fn test_negate_and_put_on_top() {
           effect: Negate(
             target: Enemy(Dream),
           ),
-          optional: false,
+          optional: None,
           condition: None,
         ),
         EffectWithOptions(
           effect: PutOnTopOfEnemyDeck(
             target: That,
           ),
-          optional: false,
+          optional: None,
           condition: None,
         ),
       ])),
@@ -163,7 +163,7 @@ fn test_banish_then_materialize() {
           effect: BanishThenMaterialize(
             target: Another(Character),
           ),
-          optional: true,
+          optional: Some(NoCost),
           condition: None,
         )),
         options: None,

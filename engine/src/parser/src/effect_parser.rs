@@ -1,3 +1,4 @@
+use ability_data::cost::Cost;
 use ability_data::effect::{Effect, EffectWithOptions};
 use chumsky::prelude::*;
 use chumsky::Parser;
@@ -30,7 +31,7 @@ fn optional_effect<'a>() -> impl Parser<'a, &'a str, EffectWithOptions, ErrorTyp
         .ignore_then(standard_effect_parser::parser())
         .map(|game_effect| EffectWithOptions {
             effect: game_effect,
-            optional: true,
+            optional: Some(Cost::NoCost),
             condition: None,
         })
         .boxed()

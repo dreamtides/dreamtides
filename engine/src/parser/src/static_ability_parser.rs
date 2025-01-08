@@ -92,7 +92,7 @@ fn play_from_void_with_condition<'a>() -> impl Parser<'a, &'a str, StaticAbility
             StaticAbility::PlayFromVoidWithConditionAndCost {
                 condition,
                 energy_cost,
-                additional_cost: additional_cost.unwrap_or(Cost::None),
+                additional_cost: additional_cost.unwrap_or(Cost::NoCost),
             }
         })
 }

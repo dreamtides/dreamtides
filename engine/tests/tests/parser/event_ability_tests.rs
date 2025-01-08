@@ -65,14 +65,14 @@ fn test_abandon_and_gain_energy_for_spark() {
             target: Your(Character),
             energy_per_spark: Energy(1),
           ),
-          optional: false,
+          optional: None,
           condition: None,
         ),
         EffectWithOptions(
           effect: DrawCards(
             count: 1,
           ),
-          optional: false,
+          optional: None,
           condition: None,
         ),
       ])),

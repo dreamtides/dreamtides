@@ -2,6 +2,7 @@ use core_data::numerics::{Energy, Spark};
 use serde::{Deserialize, Serialize};
 
 use crate::condition::Condition;
+use crate::cost::Cost;
 use crate::counting_expression::CountingExpression;
 use crate::predicate::{CardPredicate, Predicate};
 use crate::triggered_ability::TriggeredAbility;
@@ -20,9 +21,11 @@ pub struct EffectWithOptions {
     /// Effect to apply
     pub effect: StandardEffect,
 
-    /// True if this is an effect which the controller may choose to apply,
-    /// usually prefixed with "You may..."
-    pub optional: bool,
+    /// Present if this is an effect which the controller may choose to apply,
+    /// usually phrased as "You may {perform effect}". A cost to perform the
+    /// effect can also be specified via "You may {pay cost} to {perform
+    /// effect}." templating.
+    pub optional: Option<Cost>,
 
     /// Indicates an effect set which occurs only if some condition is met,
     /// usually phrased as "If {condition}, {effect}"
@@ -31,7 +34,7 @@ pub struct EffectWithOptions {
 
 impl EffectWithOptions {
     pub fn new(effect: StandardEffect) -> Self {
-        Self { effect, optional: false, condition: None }
+        Self { effect, optional: None, condition: None }
     }
 
     pub fn with_condition(&self, condition: Condition) -> Self {
@@ -40,8 +43,12 @@ impl EffectWithOptions {
         result
     }
 
+    pub fn is_optional(&self) -> bool {
+        self.optional.is_some()
+    }
+
     pub fn to_effect(self) -> Effect {
-        if !self.optional && self.condition.is_none() {
+        if !self.is_optional() && self.condition.is_none() {
             Effect::Effect(self.effect)
         } else {
             Effect::WithOptions(self)

@@ -7,7 +7,7 @@ use crate::predicate::Predicate;
 /// ability, such as paying energy.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Cost {
-    None,
+    NoCost,
     Energy(Energy),
     BanishCardsFromYourVoid(u64),
     BanishAllCardsFromYourVoid,

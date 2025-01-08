@@ -192,7 +192,7 @@ fn test_play_if_character_dissolved() {
           predicate: Your(Character),
         ),
         energy_cost: Energy(1),
-        additional_cost: None,
+        additional_cost: NoCost,
       )),
     ]
     "###);

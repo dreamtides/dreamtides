@@ -19,14 +19,14 @@ fn test_multiple_effects() {
               target: This,
               gained: Spark(1),
             ),
-            optional: false,
+            optional: None,
             condition: None,
           ),
           EffectWithOptions(
             effect: BanishCardsFromEnemyVoid(
               count: 1,
             ),
-            optional: true,
+            optional: Some(NoCost),
             condition: None,
           ),
         ]),
@@ -46,14 +46,14 @@ fn test_then_separator() {
           effect: DrawCards(
             count: 1,
           ),
-          optional: false,
+          optional: None,
           condition: None,
         ),
         EffectWithOptions(
           effect: DiscardCards(
             count: 1,
           ),
-          optional: false,
+          optional: None,
           condition: None,
         ),
       ])),
@@ -72,7 +72,7 @@ fn test_optional_draw() {
         effect: DrawCards(
           count: 1,
         ),
-        optional: true,
+        optional: Some(NoCost),
         condition: None,
       ))),
     ]
@@ -91,7 +91,7 @@ fn test_conditional_gain_energy() {
         effect: GainEnergy(
           gained: Energy(1),
         ),
-        optional: false,
+        optional: None,
         condition: Some(PredicateCount(
           count: 2,
           predicate: Your(CharacterType(Warrior)),
@@ -113,7 +113,7 @@ fn test_conditional_optional_gain_energy() {
         effect: GainEnergy(
           gained: Energy(1),
         ),
-        optional: true,
+        optional: Some(NoCost),
         condition: Some(PredicateCount(
           count: 2,
           predicate: Your(CharacterType(Warrior)),
