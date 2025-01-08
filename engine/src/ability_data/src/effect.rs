@@ -2,6 +2,7 @@ use core_data::numerics::{Energy, Spark};
 use serde::{Deserialize, Serialize};
 
 use crate::condition::Condition;
+use crate::counting_expression::CountingExpression;
 use crate::predicate::{CardPredicate, Predicate};
 use crate::triggered_ability::TriggeredAbility;
 
@@ -98,8 +99,9 @@ pub enum StandardEffect {
     BanishThenMaterialize {
         target: Predicate,
     },
-    BanishAnyNumberThenMaterialize {
+    BanishThenMaterializeAllMatching {
         target: Predicate,
+        count: CountingExpression,
     },
     BanishCardsFromEnemyVoid {
         count: u64,

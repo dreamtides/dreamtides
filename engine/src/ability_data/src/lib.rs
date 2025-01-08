@@ -2,6 +2,7 @@ pub mod ability;
 pub mod activated_ability;
 pub mod condition;
 pub mod cost;
+pub mod counting_expression;
 pub mod effect;
 pub mod predicate;
 pub mod static_ability;

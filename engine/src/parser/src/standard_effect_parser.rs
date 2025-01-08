@@ -6,7 +6,9 @@ use chumsky::Parser;
 use core_data::numerics::{Energy, Spark};
 
 use crate::parser_utils::{a_or_an, count, numeric, phrase, text_number, ErrorType};
-use crate::{card_predicate_parser, determiner_parser, trigger_event_parser};
+use crate::{
+    card_predicate_parser, counting_expression_parser, determiner_parser, trigger_event_parser,
+};
 
 /// Parses all standard game effects
 pub fn parser<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -287,8 +289,9 @@ fn banish_then_materialize<'a>() -> impl Parser<'a, &'a str, StandardEffect, Err
 
 fn banish_any_number_then_materialize<'a>(
 ) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    phrase("banish any number of")
-        .ignore_then(determiner_parser::target_parser())
+    phrase("banish")
+        .ignore_then(counting_expression_parser::parser())
+        .then(determiner_parser::target_parser())
         .then_ignore(phrase(", then materialize them"))
-        .map(|target| StandardEffect::BanishAnyNumberThenMaterialize { target })
+        .map(|(count, target)| StandardEffect::BanishThenMaterializeAllMatching { target, count })
 }
