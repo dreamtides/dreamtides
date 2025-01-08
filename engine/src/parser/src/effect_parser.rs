@@ -19,19 +19,42 @@ use chumsky::Parser;
 use core_data::numerics::{Energy, Spark};
 
 use crate::parser_utils::{count, numeric, phrase, ErrorType};
-use crate::{card_predicate_parser, determiner_parser};
+use crate::{card_predicate_parser, condition_parser, determiner_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
-    phrase("you may")
-        .ignore_then(base_effect())
-        .map(|game_effect| {
-            Effect::EffectList(EffectList {
-                effects: vec![game_effect],
-                optional: true,
-                condition: None,
-            })
+    conditional_effect().or(optional_effect()).or(simple_effect())
+}
+
+fn optional_effect<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
+    phrase("you may").ignore_then(base_effect()).map(|game_effect| {
+        Effect::EffectList(EffectList {
+            effects: vec![game_effect],
+            optional: true,
+            condition: None,
         })
-        .or(base_effect().map(Effect::Effect))
+    })
+}
+
+fn simple_effect<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
+    base_effect().map(Effect::Effect)
+}
+
+fn conditional_effect<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
+    phrase("if")
+        .ignore_then(condition_parser::parser())
+        .then_ignore(phrase(","))
+        .then(choice((optional_effect(), simple_effect())))
+        .map(|(condition, effect)| match effect {
+            Effect::Effect(game_effect) => Effect::EffectList(EffectList {
+                effects: vec![game_effect],
+                optional: false,
+                condition: Some(condition),
+            }),
+            Effect::EffectList(mut list) => {
+                list.condition = Some(condition);
+                Effect::EffectList(list)
+            }
+        })
 }
 
 fn base_effect<'a>() -> impl Parser<'a, &'a str, GameEffect, ErrorType<'a>> {

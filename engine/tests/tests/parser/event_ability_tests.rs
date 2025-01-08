@@ -54,3 +54,51 @@ fn test_optional_draw() {
     "###
     );
 }
+
+#[test]
+fn test_conditional_gain_energy() {
+    let result = parse("If you control 2 other {cardtype: warriors}, gain $1.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Event(EffectList(EffectList(
+        effects: [
+          GainEnergy(
+            gained: Energy(1),
+          ),
+        ],
+        optional: false,
+        condition: Some(PredicateCount(
+          count: 2,
+          predicate: Your(CharacterType(Warrior)),
+        )),
+      ))),
+    ]
+    "###
+    );
+}
+
+#[test]
+fn test_conditional_optional_gain_energy() {
+    let result = parse("If you control 2 other {cardtype: warriors}, you may gain $1.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Event(EffectList(EffectList(
+        effects: [
+          GainEnergy(
+            gained: Energy(1),
+          ),
+        ],
+        optional: true,
+        condition: Some(PredicateCount(
+          count: 2,
+          predicate: Your(CharacterType(Warrior)),
+        )),
+      ))),
+    ]
+    "###
+    );
+}
