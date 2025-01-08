@@ -144,3 +144,22 @@ fn test_until_end_of_turn() {
     ]
     "###);
 }
+
+#[test]
+fn test_optional_cost() {
+    let result = parse("You may pay $1 to return this character from your void to your hand.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Event(WithOptions(EffectWithOptions(
+        effect: ReturnFromYourVoidToHand(
+          target: This,
+        ),
+        optional: Some(Energy(Energy(1))),
+        condition: None,
+      ))),
+    ]
+    "###
+    );
+}

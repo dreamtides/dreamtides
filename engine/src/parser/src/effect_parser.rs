@@ -4,7 +4,7 @@ use chumsky::prelude::*;
 use chumsky::Parser;
 
 use crate::parser_utils::{phrase, ErrorType};
-use crate::{condition_parser, standard_effect_parser};
+use crate::{condition_parser, cost_parser, standard_effect_parser};
 
 pub fn effect<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
     single_effect()
@@ -28,10 +28,15 @@ fn single_effect<'a>() -> impl Parser<'a, &'a str, EffectWithOptions, ErrorType<
 
 fn optional_effect<'a>() -> impl Parser<'a, &'a str, EffectWithOptions, ErrorType<'a>> {
     phrase("you may")
-        .ignore_then(standard_effect_parser::parser())
-        .map(|game_effect| EffectWithOptions {
+        .ignore_then(
+            cost_parser::parser()
+                .then_ignore(just("to"))
+                .or_not()
+                .then(standard_effect_parser::parser()),
+        )
+        .map(|(maybe_cost, game_effect)| EffectWithOptions {
             effect: game_effect,
-            optional: Some(Cost::NoCost),
+            optional: maybe_cost.or(Some(Cost::NoCost)),
             condition: None,
         })
         .boxed()
