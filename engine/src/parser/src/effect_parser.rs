@@ -21,7 +21,7 @@ fn single_effect<'a>() -> impl Parser<'a, &'a str, EffectWithOptions, ErrorType<
     conditional_effect()
         .or(optional_effect())
         .or(standard_effect_parser::parser().map(EffectWithOptions::new))
-        .then_ignore(choice((just("."), phrase(", then"))))
+        .then_ignore(choice((just("."), phrase(", then"), phrase("and then"))))
         .boxed()
 }
 

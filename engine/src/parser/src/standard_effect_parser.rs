@@ -20,6 +20,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
         gain_energy(),
         banish_card_from_void(),
         disable_activated_abilities(),
+        abandon_and_gain_energy_for_spark(),
     ))
     .boxed()
 }
@@ -92,4 +93,16 @@ fn disable_activated_abilities<'a>() -> impl Parser<'a, &'a str, StandardEffect,
         .ignore_then(determiner_parser::target_parser())
         .then_ignore(phrase("while this character is in play"))
         .map(|target| StandardEffect::DisableActivatedAbilitiesWhileInPlay { target })
+}
+
+fn abandon_and_gain_energy_for_spark<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
+{
+    phrase("abandon")
+        .ignore_then(determiner_parser::your_action())
+        .then(numeric("and gain $", Energy, ""))
+        .then_ignore(phrase("for each point of spark that character had"))
+        .map(|(predicate, energy)| StandardEffect::AbandonAndGainEnergyForSpark {
+            target: predicate,
+            energy_per_spark: energy,
+        })
 }

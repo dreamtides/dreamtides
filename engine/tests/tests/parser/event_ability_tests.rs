@@ -47,3 +47,31 @@ fn test_disable_activated_abilities_while_in_play() {
     ]
     "###);
 }
+
+#[test]
+fn test_abandon_and_gain_energy_for_spark() {
+    let result = parse(
+        "Abandon a character and gain $1 for each point of spark that character had. Draw a card.",
+    );
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(List([
+        EffectWithOptions(
+          effect: AbandonAndGainEnergyForSpark(
+            target: Your(Character),
+            energy_per_spark: Energy(1),
+          ),
+          optional: false,
+          condition: None,
+        ),
+        EffectWithOptions(
+          effect: DrawCards(
+            count: 1,
+          ),
+          optional: false,
+          condition: None,
+        ),
+      ])),
+    ]
+    "###);
+}
