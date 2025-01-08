@@ -47,6 +47,7 @@ pub enum CardPredicate {
     CharacterWithSpark(Spark, Operator),
     CharacterWithCost(Energy, Operator),
     CharacterWithCostComparedToControlled(CharacterType, Operator),
+    CharacterWithMaterializedAbility,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

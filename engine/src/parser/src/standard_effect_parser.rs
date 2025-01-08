@@ -29,6 +29,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         banish_card_from_void(),
         disable_activated_abilities(),
         abandon_and_gain_energy_for_spark(),
+        discover(),
     ))
     .boxed()
 }
@@ -137,4 +138,12 @@ fn create_trigger_until_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEf
                 }),
             }),
         })
+}
+
+fn discover<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("{kw: discover}")
+        .ignore_then(choice((phrase("a"), phrase("an"))))
+        .ignore_then(card_predicate_parser::parser())
+        .map(|predicate| StandardEffect::Discover { predicate })
+        .boxed()
 }

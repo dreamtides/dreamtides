@@ -170,3 +170,20 @@ fn test_draw_matching_card() {
     ]
     "###);
 }
+
+#[test]
+fn test_gain_spark_on_materialize() {
+    let result = parse("Whenever you materialize a character, this character gains +1 spark.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Materialize(Your(Character)),
+        effect: Effect(GainsSpark(
+          target: This,
+          gained: Spark(1),
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}

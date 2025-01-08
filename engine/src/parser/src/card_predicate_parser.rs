@@ -25,6 +25,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
         character_with_cost(),
         character_with_spark(),
         character_with_cost_compared_to_controlled(),
+        character_with_materialized_ability(),
         character_type().map(CardPredicate::CharacterType),
         choice((phrase("cards"), phrase("card"))).to(CardPredicate::Card),
         character().to(CardPredicate::Character),
@@ -72,6 +73,14 @@ fn character_with_cost_compared_to_controlled<'a>(
         .map(|(operator, character_type)| {
             CardPredicate::CharacterWithCostComparedToControlled(character_type, operator)
         })
+        .boxed()
+}
+
+fn character_with_materialized_ability<'a>(
+) -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
+    character()
+        .ignore_then(phrase("with a $materialized ability"))
+        .to(CardPredicate::CharacterWithMaterializedAbility)
         .boxed()
 }
 

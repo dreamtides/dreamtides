@@ -97,4 +97,7 @@ pub enum StandardEffect {
         target: Predicate,
         energy_per_spark: Energy,
     },
+    Discover {
+        predicate: CardPredicate,
+    },
 }
