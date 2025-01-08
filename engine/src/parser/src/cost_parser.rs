@@ -9,9 +9,8 @@ use crate::{card_predicate_parser, determiner_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
     choice((
-        phrase("$")
-            .ignore_then(text::int(10))
-            .map(|s: &str| Cost::Energy(Energy(s.parse().unwrap()))),
+        numeric("$", Energy, "").map(Cost::Energy),
+        numeric("pay $", Energy, "").map(Cost::Energy),
         numeric("banish", count, "cards from your void").map(Cost::BanishCardsFromYourVoid),
         phrase("abandon")
             .ignore_then(determiner_parser::your_action())
