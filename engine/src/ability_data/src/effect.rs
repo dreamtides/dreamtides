@@ -113,4 +113,7 @@ pub enum StandardEffect {
     GainsReclaimUntilEndOfTurn {
         target: Predicate,
     },
+    Kindle {
+        amount: Spark,
+    },
 }

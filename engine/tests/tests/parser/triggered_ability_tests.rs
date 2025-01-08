@@ -204,3 +204,35 @@ fn test_discard_gains_reclaim() {
     ]
     "###);
 }
+
+#[test]
+fn test_once_per_turn_multiple_effects() {
+    let result = parse("Once per turn, when you discard a card, gain $1 and then {kw: kindle} 2.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Discard(Your(Card)),
+        effect: List([
+          EffectWithOptions(
+            effect: GainEnergy(
+              gained: Energy(1),
+            ),
+            optional: false,
+            condition: None,
+          ),
+          EffectWithOptions(
+            effect: Kindle(
+              amount: Spark(2),
+            ),
+            optional: false,
+            condition: None,
+          ),
+        ]),
+        options: Some(TriggeredAbilityOptions(
+          once_per_turn: true,
+          until_end_of_turn: false,
+        )),
+      )),
+    ]
+    "###);
+}

@@ -34,6 +34,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         materialize_random_characters(),
         return_from_void_to_play(),
         gains_reclaim_until_end_of_turn(),
+        kindle(),
     ))
     .boxed()
 }
@@ -187,4 +188,8 @@ fn gains_reclaim_until_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEff
         .then_ignore(phrase("gains {kw: reclaim} until end of turn"))
         .map(|target| StandardEffect::GainsReclaimUntilEndOfTurn { target })
         .boxed()
+}
+
+fn kindle<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    numeric("{kw: kindle}", Spark, "").map(|amount| StandardEffect::Kindle { amount }).boxed()
 }
