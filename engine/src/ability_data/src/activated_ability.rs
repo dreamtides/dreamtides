@@ -21,8 +21,8 @@ pub struct ActivatedAbilityOptions {
 /// written as "> cost: effect".
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ActivatedAbility {
-    /// Cost to activate this ability, paid before it is put on the stack.
-    pub cost: Cost,
+    /// Costs to activate this ability, paid before it is put on the stack.
+    pub costs: Vec<Cost>,
 
     /// Effect of this ability, applied as it resolves on the stack.
     pub effect: Effect,

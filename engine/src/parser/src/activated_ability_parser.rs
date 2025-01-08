@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use ability_data::activated_ability::{ActivatedAbility, ActivatedAbilityOptions};
-use ability_data::cost::Cost;
+use chumsky::prelude::*;
 use chumsky::Parser;
 
 use crate::parser_utils::{phrase, ErrorType};
@@ -28,15 +28,14 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, ActivatedAbility, ErrorType<'a>>
             is_multi: true,
         })))
         .or(phrase("$activated").to(None));
+
+    let costs = cost_parser::parser().separated_by(phrase(",")).collect::<Vec<_>>();
+
     fast_indicator
-        .then(cost_parser::parser().or_not())
+        .then(costs)
         .then_ignore(phrase(":"))
         .then(effect_parser::parser())
         .then_ignore(phrase("."))
-        .map(|((options, cost), effect)| ActivatedAbility {
-            cost: cost.unwrap_or(Cost::None),
-            effect,
-            options,
-        })
+        .map(|((options, costs), effect)| ActivatedAbility { costs, effect, options })
         .boxed()
 }

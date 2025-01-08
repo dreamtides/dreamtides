@@ -10,7 +10,9 @@ fn test_banish_from_void_dissolve_enemy_character() {
         @r###"
     [
       Activated(ActivatedAbility(
-        cost: BanishCardsFromYourVoid(3),
+        costs: [
+          BanishCardsFromYourVoid(3),
+        ],
         effect: Effect(DissolveCharacter(
           target: Enemy(CharacterWithCost(Energy(2), OrLess)),
         )),
@@ -29,7 +31,7 @@ fn test_fast_activated_grant_aegis() {
         @r###"
     [
       Activated(ActivatedAbility(
-        cost: None,
+        costs: [],
         effect: Effect(GainsAegisThisTurn(
           target: Another(Character),
         )),
@@ -48,22 +50,24 @@ fn test_fast_activated_grant_aegis() {
 fn test_activated_spark_equal_to_warriors() {
     let result = parse("$fastActivated $2: Another character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control.");
     assert_ron_snapshot!(result, @r###"
-  [
-    Activated(ActivatedAbility(
-      cost: Energy(Energy(2)),
-      effect: Effect(TargetGainsSparkUntilYourNextMainPhaseForEach(
-        target: Another(Character),
-        gained: Spark(1),
-        for_each: Your(CharacterType(Warrior)),
+    [
+      Activated(ActivatedAbility(
+        costs: [
+          Energy(Energy(2)),
+        ],
+        effect: Effect(TargetGainsSparkUntilYourNextMainPhaseForEach(
+          target: Another(Character),
+          gained: Spark(1),
+          for_each: Your(CharacterType(Warrior)),
+        )),
+        options: Some(ActivatedAbilityOptions(
+          is_fast: true,
+          is_immediate: false,
+          is_multi: false,
+        )),
       )),
-      options: Some(ActivatedAbilityOptions(
-        is_fast: true,
-        is_immediate: false,
-        is_multi: false,
-      )),
-    )),
-  ]
-  "###);
+    ]
+    "###);
 }
 
 #[test]
@@ -74,7 +78,9 @@ fn test_multi_activated_draw() {
         @r###"
     [
       Activated(ActivatedAbility(
-        cost: Energy(Energy(2)),
+        costs: [
+          Energy(Energy(2)),
+        ],
         effect: Effect(DrawCards(
           count: 1,
         )),
@@ -97,7 +103,9 @@ fn test_abandon_character_with_spark() {
         @r###"
     [
       Activated(ActivatedAbility(
-        cost: AbandonCharacter(Another(CharacterWithSpark(Spark(2), OrLess))),
+        costs: [
+          AbandonCharacter(Another(CharacterWithSpark(Spark(2), OrLess))),
+        ],
         effect: Effect(DrawCards(
           count: 1,
         )),
@@ -106,4 +114,28 @@ fn test_abandon_character_with_spark() {
     ]
     "###
     );
+}
+
+#[test]
+fn test_activated_ability_multiple_costs() {
+    let result =
+        parse("$multiActivated $2, Abandon another character with spark 1 or less: Draw 2 cards.");
+    assert_ron_snapshot!(result, @r###"
+  [
+    Activated(ActivatedAbility(
+      costs: [
+        Energy(Energy(2)),
+        AbandonCharacter(Another(CharacterWithSpark(Spark(1), OrLess))),
+      ],
+      effect: Effect(DrawCards(
+        count: 2,
+      )),
+      options: Some(ActivatedAbilityOptions(
+        is_fast: false,
+        is_immediate: false,
+        is_multi: true,
+      )),
+    )),
+  ]
+  "###);
 }
