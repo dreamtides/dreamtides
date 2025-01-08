@@ -102,3 +102,35 @@ fn test_once_per_turn() {
     "###
     );
 }
+
+#[test]
+fn test_multiple_keyword_trigger_conditional() {
+    let result =
+        parse("$materialized, $judgment: If you control 2 other {cardtype: warriors}, gain $1.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Keywords([
+          Materialized,
+          Judgment,
+        ]),
+        effect: EffectList(EffectList(
+          effects: [
+            GainEnergy(
+              gained: Energy(1),
+            ),
+          ],
+          optional: false,
+          condition: Some(PredicateCount(
+            count: 2,
+            predicate: Your(CharacterType(Warrior)),
+          )),
+        )),
+        options: None,
+      )),
+    ]
+    "###
+    );
+}
