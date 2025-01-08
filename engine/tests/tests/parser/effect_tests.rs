@@ -136,3 +136,13 @@ fn test_each_matching_gains_spark_for_each() {
     ]
     "###);
 }
+
+#[test]
+fn test_return_all_but_one_draw_for_each() {
+    let result = parse("Return all but one character you control to hand. Draw a card for each character returned.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(ReturnAllButOneCharacterDrawCardForEach)),
+    ]
+    "###);
+}

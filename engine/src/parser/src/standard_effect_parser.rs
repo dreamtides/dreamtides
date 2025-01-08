@@ -41,6 +41,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         spend_all_energy_draw_and_discard(),
         put_on_top_of_deck(),
         each_matching_gains_spark_for_each(),
+        return_all_but_one_character_draw_card_for_each(),
     ))
     .boxed()
 }
@@ -250,4 +251,13 @@ fn each_matching_gains_spark_for_each<'a>(
             for_each,
         })
         .boxed()
+}
+
+fn return_all_but_one_character_draw_card_for_each<'a>(
+) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase(
+        "return all but one character you control to hand. draw a card for each character returned",
+    )
+    .to(StandardEffect::ReturnAllButOneCharacterDrawCardForEach)
+    .boxed()
 }
