@@ -25,3 +25,16 @@ fn test_once_per_turn_play_2_or_less_from_void() {
     ]
     "###);
 }
+
+#[test]
+fn test_play_from_void_by_banishing() {
+    let result = parse("You may play this character from your void for $2 by banishing another card from your void.");
+    assert_ron_snapshot!(result, @r###"
+  [
+    Static(PlayFromVoidForCost(
+      energy_cost: Energy(2),
+      additional_cost: BanishCardsFromYourVoid(1),
+    )),
+  ]
+  "###);
+}

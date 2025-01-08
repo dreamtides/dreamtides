@@ -1,6 +1,7 @@
 use core_data::numerics::Energy;
 use serde::{Deserialize, Serialize};
 
+use crate::cost::Cost;
 use crate::predicate::CardPredicate;
 
 /// A static ability represents something which modifies the rules of the game,
@@ -10,4 +11,5 @@ use crate::predicate::CardPredicate;
 pub enum StaticAbility {
     EnemyAddedCostToPlay(CardPredicate, Energy),
     OncePerTurnPlayFromVoid(CardPredicate),
+    PlayFromVoidForCost { energy_cost: Energy, additional_cost: Cost },
 }

@@ -17,11 +17,11 @@ use chumsky::prelude::*;
 use chumsky::Parser;
 use core_data::numerics::Energy;
 
-use crate::card_predicate_parser;
 use crate::parser_utils::{numeric, phrase, ErrorType};
+use crate::{card_predicate_parser, cost_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
-    choice((once_per_turn_play_from_void(), enemy_added_cost_to_play()))
+    choice((once_per_turn_play_from_void(), enemy_added_cost_to_play(), play_from_void_for_cost()))
 }
 
 fn once_per_turn_play_from_void<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
@@ -36,4 +36,13 @@ fn enemy_added_cost_to_play<'a>() -> impl Parser<'a, &'a str, StaticAbility, Err
         .ignore_then(card_predicate_parser::parser())
         .then(numeric("cost an additional $", Energy, "to play"))
         .map(|(predicate, cost)| StaticAbility::EnemyAddedCostToPlay(predicate, cost))
+}
+
+fn play_from_void_for_cost<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+    numeric("you may play this character from your void for $", Energy, "by")
+        .then(cost_parser::inflected_additional_cost())
+        .map(|(energy_cost, additional_cost)| StaticAbility::PlayFromVoidForCost {
+            energy_cost,
+            additional_cost,
+        })
 }

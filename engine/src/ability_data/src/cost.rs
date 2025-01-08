@@ -11,5 +11,7 @@ pub enum Cost {
     Energy(Energy),
 
     /// Banish N cards from your void.
+    ///
+    /// The owning card cannot be among those banished.
     BanishCardsFromYourVoid(u64),
 }

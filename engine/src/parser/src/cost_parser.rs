@@ -28,3 +28,9 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
     ))
     .boxed()
 }
+
+/// Alternate phrasing for costs, which are written in static abilities, for
+/// example "You may play this event for $0 by abandoning a character".
+pub fn inflected_additional_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
+    phrase("banishing another card from your void").to(Cost::BanishCardsFromYourVoid(1)).boxed()
+}
