@@ -4,7 +4,7 @@ use chumsky::prelude::*;
 use chumsky::Parser;
 
 use crate::card_predicate_parser;
-use crate::parser_utils::{count, numeric, ErrorType};
+use crate::parser_utils::{count, numeric, phrase, ErrorType};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, Condition, ErrorType<'a>> {
     choice((
@@ -16,5 +16,11 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Condition, ErrorType<'a>> {
         ),
         numeric("you have", count, "or more cards in your void")
             .map(|count| Condition::CardsInVoidCount { count }),
+        phrase("a")
+            .ignore_then(card_predicate_parser::parser())
+            .then_ignore(phrase("you controlled dissolved this turn"))
+            .map(|predicate| Condition::DissolvedThisTurn {
+                predicate: Predicate::Your(predicate),
+            }),
     ))
 }

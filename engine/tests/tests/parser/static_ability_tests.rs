@@ -181,3 +181,19 @@ fn test_play_for_alternate_cost_with_if_you_do() {
     ]
     "###);
 }
+
+#[test]
+fn test_play_if_character_dissolved() {
+    let result = parse("If a character you controlled dissolved this turn, you may play this character from your void for $1.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(PlayFromVoidWithConditionAndCost(
+        condition: DissolvedThisTurn(
+          predicate: Your(Character),
+        ),
+        energy_cost: Energy(1),
+        additional_cost: None,
+      )),
+    ]
+    "###);
+}

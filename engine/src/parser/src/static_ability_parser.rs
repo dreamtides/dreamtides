@@ -1,3 +1,4 @@
+use ability_data::cost::Cost;
 use ability_data::effect::Effect;
 use ability_data::static_ability::{AlternateCost, StaticAbility};
 use chumsky::prelude::*;
@@ -85,13 +86,13 @@ fn play_from_void_with_condition<'a>() -> impl Parser<'a, &'a str, StaticAbility
         .then_ignore(phrase(","))
         .then_ignore(phrase("you may play"))
         .then_ignore(this())
-        .then(numeric("from your void for $", Energy, "by"))
-        .then(cost_parser::inflected_additional_cost())
+        .then(numeric("from your void for $", Energy, ""))
+        .then(phrase("by").ignore_then(cost_parser::inflected_additional_cost()).or_not())
         .map(|((condition, energy_cost), additional_cost)| {
             StaticAbility::PlayFromVoidWithConditionAndCost {
                 condition,
                 energy_cost,
-                additional_cost,
+                additional_cost: additional_cost.unwrap_or(Cost::None),
             }
         })
 }

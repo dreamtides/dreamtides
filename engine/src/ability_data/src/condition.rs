@@ -9,4 +9,5 @@ use crate::predicate::Predicate;
 pub enum Condition {
     PredicateCount { count: u64, predicate: Predicate },
     CardsInVoidCount { count: u64 },
+    DissolvedThisTurn { predicate: Predicate },
 }
