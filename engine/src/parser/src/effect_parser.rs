@@ -20,7 +20,7 @@ fn single_effect<'a>() -> impl Parser<'a, &'a str, EffectWithOptions, ErrorType<
     conditional_effect()
         .or(optional_effect())
         .or(standard_effect().map(EffectWithOptions::new))
-        .then_ignore(just("."))
+        .then_ignore(choice((just("."), phrase(", then"))))
 }
 
 fn optional_effect<'a>() -> impl Parser<'a, &'a str, EffectWithOptions, ErrorType<'a>> {

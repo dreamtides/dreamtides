@@ -37,6 +37,31 @@ fn test_multiple_effects() {
 }
 
 #[test]
+fn test_then_separator() {
+    let result = parse("Draw a card, then discard a card.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(List([
+        EffectWithOptions(
+          effect: DrawCards(
+            count: 1,
+          ),
+          optional: false,
+          condition: None,
+        ),
+        EffectWithOptions(
+          effect: DiscardCards(
+            count: 1,
+          ),
+          optional: false,
+          condition: None,
+        ),
+      ])),
+    ]
+    "###);
+}
+
+#[test]
 fn test_optional_draw() {
     let result = parse("You may draw a card.");
     assert_ron_snapshot!(
