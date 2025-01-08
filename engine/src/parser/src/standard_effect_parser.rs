@@ -35,6 +35,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         return_from_void_to_play(),
         gains_reclaim_until_end_of_turn(),
         kindle(),
+        negate(),
     ))
     .boxed()
 }
@@ -192,4 +193,11 @@ fn gains_reclaim_until_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEff
 
 fn kindle<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     numeric("{kw: kindle}", Spark, "").map(|amount| StandardEffect::Kindle { amount }).boxed()
+}
+
+fn negate<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("negate")
+        .ignore_then(determiner_parser::target_parser())
+        .map(|target| StandardEffect::Negate { target })
+        .boxed()
 }

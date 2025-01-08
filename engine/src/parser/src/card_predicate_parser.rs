@@ -24,6 +24,7 @@ fn non_recursive_predicate<'a>() -> impl Parser<'a, &'a str, CardPredicate, Erro
         choice((phrase("cards"), phrase("card"))).to(CardPredicate::Card),
         character().to(CardPredicate::Character),
         choice((phrase("events"), phrase("event"))).to(CardPredicate::Event),
+        choice((phrase("dreams"), phrase("dream"))).to(CardPredicate::Dream),
     ))
     .boxed()
 }

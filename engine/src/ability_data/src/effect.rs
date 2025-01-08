@@ -116,4 +116,7 @@ pub enum StandardEffect {
     Kindle {
         amount: Spark,
     },
+    Negate {
+        target: Predicate,
+    },
 }

@@ -55,3 +55,15 @@ fn test_return_from_void_to_play() {
     ]
     "###);
 }
+
+#[test]
+fn test_negate_enemy_dream() {
+    let result = parse("Negate an enemy dream.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(Negate(
+        target: Enemy(Dream),
+      ))),
+    ]
+    "###);
+}
