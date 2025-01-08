@@ -40,6 +40,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         abandon_at_end_of_turn(),
         spend_all_energy_draw_and_discard(),
         put_on_top_of_deck(),
+        each_matching_gains_spark_for_each(),
     ))
     .boxed()
 }
@@ -66,12 +67,10 @@ fn gain_spark_until_next_main_for_each<'a>(
         .then(numeric("gains +", Spark, "spark until your next main phase for each"))
         .then(card_predicate_parser::parser())
         .then_ignore(phrase("you control"))
-        .map(|((target, spark), counted)| {
-            StandardEffect::TargetGainsSparkUntilYourNextMainPhaseForEach {
-                target,
-                gained: spark,
-                for_each: Predicate::Your(counted),
-            }
+        .map(|((target, spark), counted)| StandardEffect::GainsSparkUntilYourNextMainPhaseForEach {
+            target,
+            gained: spark,
+            for_each: Predicate::Your(counted),
         })
 }
 
@@ -235,5 +234,20 @@ fn put_on_top_of_deck<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
         .ignore_then(determiner_parser::target_parser())
         .then_ignore(phrase("on top of the enemy's deck"))
         .map(|target| StandardEffect::PutOnTopOfEnemyDeck { target })
+        .boxed()
+}
+
+fn each_matching_gains_spark_for_each<'a>(
+) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("each")
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(phrase("you control gains +x spark, where x is the number of"))
+        .then(card_predicate_parser::parser())
+        .then_ignore(phrase("you control"))
+        .map(|(matching, for_each)| StandardEffect::EachMatchingGainsSparkForEach {
+            matching,
+            gained: Spark(1),
+            for_each,
+        })
         .boxed()
 }

@@ -122,3 +122,17 @@ fn test_discard_card_from_enemy_hand() {
     ]
     "###);
 }
+
+#[test]
+fn test_each_matching_gains_spark_for_each() {
+    let result = parse("Each {cardtype: spirit animal} you control gains +X spark, where X is the number of {cardtype: spirit animals} you control.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(EachMatchingGainsSparkForEach(
+        matching: CharacterType(SpiritAnimal),
+        gained: Spark(1),
+        for_each: CharacterType(SpiritAnimal),
+      ))),
+    ]
+    "###);
+}

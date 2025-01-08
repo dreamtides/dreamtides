@@ -59,7 +59,7 @@ fn test_activated_spark_equal_to_warriors() {
         costs: [
           Energy(Energy(2)),
         ],
-        effect: Effect(TargetGainsSparkUntilYourNextMainPhaseForEach(
+        effect: Effect(GainsSparkUntilYourNextMainPhaseForEach(
           target: Another(Character),
           gained: Spark(1),
           for_each: Your(CharacterType(Warrior)),

@@ -78,7 +78,12 @@ pub enum StandardEffect {
         target: Predicate,
         gained: Spark,
     },
-    TargetGainsSparkUntilYourNextMainPhaseForEach {
+    EachMatchingGainsSparkForEach {
+        matching: CardPredicate,
+        gained: Spark,
+        for_each: CardPredicate,
+    },
+    GainsSparkUntilYourNextMainPhaseForEach {
         target: Predicate,
         gained: Spark,
         for_each: Predicate,
