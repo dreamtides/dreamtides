@@ -14,7 +14,11 @@ fn test_banish_from_void_dissolve_enemy_character() {
           BanishCardsFromYourVoid(3),
         ],
         effect: Effect(DissolveCharacter(
-          target: Enemy(CharacterWithCost(Energy(2), OrLess)),
+          target: Enemy(CardWithCost(
+            target: Character,
+            cost_operator: OrLess,
+            cost: Energy(2),
+          )),
         )),
         options: None,
       )),

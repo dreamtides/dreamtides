@@ -34,7 +34,7 @@ pub fn inflected_additional_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorTy
         phrase("banishing")
             .ignore_then(determiner_parser::your_action())
             .then_ignore(phrase("from your hand"))
-            .map(|predicate| Cost::BanishFromHand(predicate)),
+            .map(Cost::BanishFromHand),
     ))
     .boxed()
 }

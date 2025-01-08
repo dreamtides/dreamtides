@@ -46,7 +46,11 @@ pub enum CardPredicate {
     CharacterType(CharacterType),
     NotCharacterType(CharacterType),
     CharacterWithSpark(Spark, Operator<Spark>),
-    CharacterWithCost(Energy, Operator<Energy>),
+    CardWithCost {
+        target: Box<CardPredicate>,
+        cost_operator: Operator<Energy>,
+        cost: Energy,
+    },
     CharacterWithCostComparedToControlled {
         target: Box<CardPredicate>,
         cost_operator: Operator<Energy>,

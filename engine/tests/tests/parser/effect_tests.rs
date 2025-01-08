@@ -34,7 +34,11 @@ fn test_materialize_random_characters() {
     [
       Event(Effect(MaterializeRandomCharacters(
         count: 2,
-        predicate: CharacterWithCost(Energy(3), OrLess),
+        predicate: CardWithCost(
+          target: Character,
+          cost_operator: OrLess,
+          cost: Energy(3),
+        ),
       ))),
     ]
     "###);
@@ -63,6 +67,22 @@ fn test_negate_enemy_dream() {
     [
       Event(Effect(Negate(
         target: Enemy(Dream),
+      ))),
+    ]
+    "###);
+}
+
+#[test]
+fn test_discard_card_from_enemy_hand() {
+    let result = parse("Look at the enemy's hand. Choose a card with cost $3 or less from it. The enemy discards that card.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(DiscardCardFromEnemyHand(
+        predicate: CardWithCost(
+          target: Card,
+          cost_operator: OrLess,
+          cost: Energy(3),
+        ),
       ))),
     ]
     "###);

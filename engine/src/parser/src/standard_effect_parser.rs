@@ -5,7 +5,7 @@ use chumsky::prelude::*;
 use chumsky::Parser;
 use core_data::numerics::{Energy, Spark};
 
-use crate::parser_utils::{count, numeric, phrase, text_number, ErrorType};
+use crate::parser_utils::{a_or_an, count, numeric, phrase, text_number, ErrorType};
 use crate::{card_predicate_parser, determiner_parser, trigger_event_parser};
 
 /// Parses all standard game effects
@@ -36,6 +36,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         gains_reclaim_until_end_of_turn(),
         kindle(),
         negate(),
+        discard_card_from_enemy_hand(),
     ))
     .boxed()
 }
@@ -199,5 +200,14 @@ fn negate<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("negate")
         .ignore_then(determiner_parser::target_parser())
         .map(|target| StandardEffect::Negate { target })
+        .boxed()
+}
+
+fn discard_card_from_enemy_hand<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("look at the enemy's hand. choose")
+        .ignore_then(a_or_an())
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(phrase("from it. the enemy discards that card"))
+        .map(|predicate| StandardEffect::DiscardCardFromEnemyHand { predicate })
         .boxed()
 }

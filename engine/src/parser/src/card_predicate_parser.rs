@@ -8,6 +8,7 @@ use crate::parser_utils::{numeric, phrase, ErrorType};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     choice((
+        card_with_cost(),
         character_with_cost_compared_to_controlled(),
         character_with_cost_compared_to_abandoned(),
         fast_card(),
@@ -18,7 +19,6 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
 
 fn non_recursive_predicate<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     choice((
-        character_with_cost(),
         character_with_spark(),
         character_with_materialized_ability(),
         character_type().map(CardPredicate::CharacterType),
@@ -30,14 +30,18 @@ fn non_recursive_predicate<'a>() -> impl Parser<'a, &'a str, CardPredicate, Erro
     .boxed()
 }
 
-fn character_with_cost<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
-    character()
-        .ignore_then(numeric("with cost $", Energy, ""))
+fn card_with_cost<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
+    non_recursive_predicate()
+        .then(numeric("with cost $", Energy, ""))
         .then(choice((
             phrase("or less").to(Operator::OrLess),
             phrase("or more").to(Operator::OrMore),
         )))
-        .map(|(cost, operator)| CardPredicate::CharacterWithCost(cost, operator))
+        .map(|((target, cost), operator)| CardPredicate::CardWithCost {
+            target: Box::new(target),
+            cost_operator: operator,
+            cost,
+        })
         .boxed()
 }
 
@@ -115,13 +119,13 @@ fn character_type<'a>() -> impl Parser<'a, &'a str, CharacterType, ErrorType<'a>
         .boxed()
 }
 
-fn character<'a>() -> impl Parser<'a, &'a str, &'a str, ErrorType<'a>> {
-    choice((phrase("characters"), phrase("character"))).boxed()
-}
-
 fn fast_card<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     phrase("'$fast'")
         .ignore_then(non_recursive_predicate())
         .map(|target| CardPredicate::Fast { target: Box::new(target) })
         .boxed()
+}
+
+fn character<'a>() -> impl Parser<'a, &'a str, &'a str, ErrorType<'a>> {
+    choice((phrase("characters"), phrase("character"))).boxed()
 }

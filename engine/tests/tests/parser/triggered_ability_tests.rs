@@ -90,7 +90,11 @@ fn test_once_per_turn() {
         @r###"
     [
       Triggered(TriggeredAbility(
-        trigger: Materialize(Your(CharacterWithCost(Energy(2), OrLess))),
+        trigger: Materialize(Your(CardWithCost(
+          target: Character,
+          cost_operator: OrLess,
+          cost: Energy(2),
+        ))),
         effect: Effect(DrawCards(
           count: 1,
         )),

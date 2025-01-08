@@ -25,7 +25,11 @@ fn test_once_per_turn_play_2_or_less_from_void() {
     assert_ron_snapshot!(result, @r###"
     [
       Static(OncePerTurnPlayFromVoid(
-        matching: CharacterWithCost(Energy(2), OrLess),
+        matching: CardWithCost(
+          target: Character,
+          cost_operator: OrLess,
+          cost: Energy(2),
+        ),
       )),
     ]
     "###);

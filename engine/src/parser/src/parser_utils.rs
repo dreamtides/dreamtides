@@ -33,6 +33,11 @@ pub fn this<'a>() -> impl Parser<'a, &'a str, &'a str, ErrorType<'a>> {
     choice((phrase("this event"), phrase("this character"))).boxed()
 }
 
+/// Parses "a" or "an"
+pub fn a_or_an<'a>() -> impl Parser<'a, &'a str, &'a str, ErrorType<'a>> {
+    choice((phrase("an"), phrase("a"))).boxed()
+}
+
 /// Parses a number that can be either written as text (e.g. "two") or as a
 /// numeral
 pub fn text_number<'a>() -> impl Parser<'a, &'a str, u64, ErrorType<'a>> {

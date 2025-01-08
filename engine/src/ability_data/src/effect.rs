@@ -119,4 +119,7 @@ pub enum StandardEffect {
     Negate {
         target: Predicate,
     },
+    DiscardCardFromEnemyHand {
+        predicate: CardPredicate,
+    },
 }
