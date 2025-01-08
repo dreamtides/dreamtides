@@ -123,3 +123,24 @@ fn test_conditional_optional_gain_energy() {
     "###
     );
 }
+
+#[test]
+fn test_until_end_of_turn() {
+    let result = parse("Until end of turn, whenever you play a character, draw a card.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(CreateTriggerUntilEndOfTurn(
+        trigger: TriggeredAbility(
+          trigger: Play(Your(Character)),
+          effect: Effect(DrawCards(
+            count: 1,
+          )),
+          options: Some(TriggeredAbilityOptions(
+            once_per_turn: false,
+            until_end_of_turn: true,
+          )),
+        ),
+      ))),
+    ]
+    "###);
+}

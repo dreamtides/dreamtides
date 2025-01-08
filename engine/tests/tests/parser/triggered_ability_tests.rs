@@ -96,6 +96,7 @@ fn test_once_per_turn() {
         )),
         options: Some(TriggeredAbilityOptions(
           once_per_turn: true,
+          until_end_of_turn: false,
         )),
       )),
     ]
@@ -137,18 +138,19 @@ fn test_multiple_keyword_trigger_conditional() {
 fn test_once_per_turn_materialize() {
     let result = parse("Once per turn, when you materialize a character, gain $1.");
     assert_ron_snapshot!(result, @r###"
-  [
-    Triggered(TriggeredAbility(
-      trigger: Materialize(Your(Character)),
-      effect: Effect(GainEnergy(
-        gained: Energy(1),
+    [
+      Triggered(TriggeredAbility(
+        trigger: Materialize(Your(Character)),
+        effect: Effect(GainEnergy(
+          gained: Energy(1),
+        )),
+        options: Some(TriggeredAbilityOptions(
+          once_per_turn: true,
+          until_end_of_turn: false,
+        )),
       )),
-      options: Some(TriggeredAbilityOptions(
-        once_per_turn: true,
-      )),
-    )),
-  ]
-  "###);
+    ]
+    "###);
 }
 
 #[test]

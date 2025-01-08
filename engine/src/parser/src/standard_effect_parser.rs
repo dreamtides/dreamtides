@@ -1,14 +1,21 @@
-use ability_data::effect::StandardEffect;
+use ability_data::effect::{Effect, StandardEffect};
 use ability_data::predicate::Predicate;
+use ability_data::triggered_ability::{TriggeredAbility, TriggeredAbilityOptions};
 use chumsky::prelude::*;
 use chumsky::Parser;
 use core_data::numerics::{Energy, Spark};
 
 use crate::parser_utils::{count, numeric, phrase, ErrorType};
-use crate::{card_predicate_parser, determiner_parser};
+use crate::{card_predicate_parser, determiner_parser, trigger_event_parser};
 
 /// Parses all standard game effects
 pub fn parser<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    choice((non_recursive_effects(), create_trigger_until_end_of_turn())).boxed()
+}
+
+/// Parses all standard game effects that do not recursively invoke effect
+/// parsing
+fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     choice((
         dissolve_character(),
         draw_cards(),
@@ -104,5 +111,23 @@ fn abandon_and_gain_energy_for_spark<'a>() -> impl Parser<'a, &'a str, StandardE
         .map(|(predicate, energy)| StandardEffect::AbandonAndGainEnergyForSpark {
             target: predicate,
             energy_per_spark: energy,
+        })
+}
+
+fn create_trigger_until_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
+{
+    phrase("until end of turn, whenever")
+        .ignore_then(trigger_event_parser::event_parser())
+        .then_ignore(phrase(","))
+        .then(non_recursive_effects())
+        .map(move |(trigger, effect)| StandardEffect::CreateTriggerUntilEndOfTurn {
+            trigger: Box::new(TriggeredAbility {
+                trigger,
+                effect: Effect::Effect(effect),
+                options: Some(TriggeredAbilityOptions {
+                    once_per_turn: false,
+                    until_end_of_turn: true,
+                }),
+            }),
         })
 }
