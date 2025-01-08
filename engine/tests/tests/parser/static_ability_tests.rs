@@ -128,3 +128,19 @@ fn test_abandon_characters_cost() {
     ]
     "###);
 }
+
+#[test]
+fn test_play_from_void_with_void_count() {
+    let result = parse("If you have 8 or more cards in your void, you may play this character from your void for $0 by banishing all other cards from your void.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(PlayFromVoidWithConditionAndCost(
+        condition: CardsInVoidCount(
+          count: 8,
+        ),
+        energy_cost: Energy(0),
+        additional_cost: BanishAllCardsFromYourVoid,
+      )),
+    ]
+    "###);
+}

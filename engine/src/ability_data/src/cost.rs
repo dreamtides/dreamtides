@@ -10,6 +10,7 @@ pub enum Cost {
     None,
     Energy(Energy),
     BanishCardsFromYourVoid(u64),
+    BanishAllCardsFromYourVoid,
     AbandonCharacters(Predicate, u64),
     DiscardHand,
 }

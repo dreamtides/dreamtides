@@ -4,7 +4,7 @@ use chumsky::Parser;
 use core_data::numerics::{Energy, Spark};
 
 use crate::parser_utils::{numeric, phrase, ErrorType};
-use crate::{card_predicate_parser, cost_parser};
+use crate::{card_predicate_parser, condition_parser, cost_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
     choice((
@@ -15,6 +15,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
         play_from_void_for_cost(),
         other_spark_bonus(),
         has_all_character_types(),
+        play_from_void_with_condition(),
     ))
     .boxed()
 }
@@ -74,4 +75,19 @@ fn cost_reduction<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>
             reduction: cost,
         },
     )
+}
+
+fn play_from_void_with_condition<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+    phrase("if")
+        .ignore_then(condition_parser::parser())
+        .then_ignore(phrase(","))
+        .then(numeric("you may play this character from your void for $", Energy, "by"))
+        .then(cost_parser::inflected_additional_cost())
+        .map(|((condition, energy_cost), additional_cost)| {
+            StaticAbility::PlayFromVoidWithConditionAndCost {
+                condition,
+                energy_cost,
+                additional_cost,
+            }
+        })
 }

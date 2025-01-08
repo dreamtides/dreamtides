@@ -8,4 +8,5 @@ use crate::predicate::Predicate;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Condition {
     PredicateCount { count: u64, predicate: Predicate },
+    CardsInVoidCount { count: u64 },
 }
