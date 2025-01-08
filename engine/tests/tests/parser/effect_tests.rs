@@ -26,3 +26,16 @@ fn test_discover_materialized_ability() {
     ]
     "###);
 }
+
+#[test]
+fn test_materialize_random_characters() {
+    let result = parse("Materialize two random characters with cost $3 or less from your deck.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(MaterializeRandomCharacters(
+        count: 2,
+        predicate: CharacterWithCost(Energy(3), OrLess),
+      ))),
+    ]
+    "###);
+}

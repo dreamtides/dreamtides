@@ -5,7 +5,7 @@ use chumsky::prelude::*;
 use chumsky::Parser;
 use core_data::numerics::{Energy, Spark};
 
-use crate::parser_utils::{count, numeric, phrase, ErrorType};
+use crate::parser_utils::{count, numeric, phrase, text_number, ErrorType};
 use crate::{card_predicate_parser, determiner_parser, trigger_event_parser};
 
 /// Parses all standard game effects
@@ -30,6 +30,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         disable_activated_abilities(),
         abandon_and_gain_energy_for_spark(),
         discover(),
+        materialize_random_characters(),
     ))
     .boxed()
 }
@@ -145,5 +146,17 @@ fn discover<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
         .ignore_then(choice((phrase("a"), phrase("an"))))
         .ignore_then(card_predicate_parser::parser())
         .map(|predicate| StandardEffect::Discover { predicate })
+        .boxed()
+}
+
+fn materialize_random_characters<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("materialize")
+        .ignore_then(choice((
+            phrase("a random").to(1),
+            text_number().then_ignore(phrase("random")),
+        )))
+        .then(card_predicate_parser::parser())
+        .then_ignore(phrase("from your deck"))
+        .map(|(count, predicate)| StandardEffect::MaterializeRandomCharacters { count, predicate })
         .boxed()
 }

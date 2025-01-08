@@ -41,3 +41,21 @@ pub fn numeric<'a, T>(
         .map(move |s: &str| function(s.parse().unwrap()))
         .boxed()
 }
+
+/// Parses a number that can be either written as text (e.g. "two") or as a
+/// numeral
+pub fn text_number<'a>() -> impl Parser<'a, &'a str, u64, ErrorType<'a>> {
+    choice((
+        phrase("one").to(1),
+        phrase("two").to(2),
+        phrase("three").to(3),
+        phrase("four").to(4),
+        phrase("five").to(5),
+        phrase("six").to(6),
+        phrase("seven").to(7),
+        phrase("eight").to(8),
+        phrase("nine").to(9),
+        text::int(10).from_str().unwrapped(),
+    ))
+    .boxed()
+}
