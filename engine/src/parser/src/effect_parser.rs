@@ -7,11 +7,20 @@ use core_data::numerics::{Energy, Spark};
 use crate::parser_utils::{count, numeric, phrase, ErrorType};
 use crate::{card_predicate_parser, condition_parser, determiner_parser};
 
-pub fn single_effect<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
+pub fn effect<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
+    single_effect().repeated().at_least(1).collect::<Vec<_>>().map(|effects| {
+        match effects.as_slice() {
+            [effect] => effect.clone().to_effect(),
+            effects => Effect::List(effects.to_vec()),
+        }
+    })
+}
+
+fn single_effect<'a>() -> impl Parser<'a, &'a str, EffectWithOptions, ErrorType<'a>> {
     conditional_effect()
-        .map(Effect::WithOptions)
-        .or(optional_effect().map(Effect::WithOptions))
-        .or(standard_effect().map(Effect::Effect))
+        .or(optional_effect())
+        .or(standard_effect().map(EffectWithOptions::new))
+        .then_ignore(just("."))
 }
 
 fn optional_effect<'a>() -> impl Parser<'a, &'a str, EffectWithOptions, ErrorType<'a>> {

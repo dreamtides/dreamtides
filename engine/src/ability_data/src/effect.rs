@@ -37,6 +37,14 @@ impl EffectWithOptions {
         result.condition = Some(condition);
         result
     }
+
+    pub fn to_effect(self) -> Effect {
+        if !self.optional && self.condition.is_none() {
+            Effect::Effect(self.effect)
+        } else {
+            Effect::WithOptions(self)
+        }
+    }
 }
 
 /// Effects are the primary way in which cards modify the game state. This can

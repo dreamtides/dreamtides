@@ -34,8 +34,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, ActivatedAbility, ErrorType<'a>>
     fast_indicator
         .then(costs)
         .then_ignore(phrase(":"))
-        .then(effect_parser::single_effect())
-        .then_ignore(phrase("."))
+        .then(effect_parser::effect())
         .map(|((options, costs), effect)| ActivatedAbility { costs, effect, options })
         .boxed()
 }
