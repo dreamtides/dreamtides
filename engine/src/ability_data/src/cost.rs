@@ -18,4 +18,7 @@ pub enum Cost {
     BanishCardsFromYourVoid(u64),
 
     AbandonCharacter(Predicate),
+
+    /// Discard all cards from your hand
+    DiscardHand,
 }

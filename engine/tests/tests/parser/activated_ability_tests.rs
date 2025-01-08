@@ -139,3 +139,24 @@ fn test_activated_ability_multiple_costs() {
   ]
   "###);
 }
+
+#[test]
+fn test_discard_hand_gain_energy() {
+    let result = parse("$activated Discard your hand: Gain $1.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Activated(ActivatedAbility(
+        costs: [
+          DiscardHand,
+        ],
+        effect: Effect(GainEnergy(
+          gained: Energy(1),
+        )),
+        options: None,
+      )),
+    ]
+    "###
+    );
+}
