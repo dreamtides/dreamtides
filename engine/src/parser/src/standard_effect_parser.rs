@@ -38,6 +38,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         negate(),
         discard_card_from_enemy_hand(),
         abandon_at_end_of_turn(),
+        spend_all_energy_draw_and_discard(),
     ))
     .boxed()
 }
@@ -218,5 +219,12 @@ fn abandon_at_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, Erro
         .ignore_then(determiner_parser::target_parser())
         .then_ignore(phrase("at end of turn"))
         .map(|target| StandardEffect::AbandonAtEndOfTurn { target })
+        .boxed()
+}
+
+fn spend_all_energy_draw_and_discard<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
+{
+    phrase("draw x cards, then discard x cards, where x is the energy spent this way")
+        .to(StandardEffect::SpendAllEnergyDrawAndDiscard)
         .boxed()
 }

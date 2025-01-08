@@ -73,6 +73,16 @@ fn test_negate_enemy_dream() {
 }
 
 #[test]
+fn test_spend_all_energy_draw_discard() {
+    let result = parse("Draw X cards, then discard X cards, where X is the energy spent this way.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(SpendAllEnergyDrawAndDiscard)),
+    ]
+    "###);
+}
+
+#[test]
 fn test_discard_card_from_enemy_hand() {
     let result = parse("Look at the enemy's hand. Choose a card with cost $3 or less from it. The enemy discards that card.");
     assert_ron_snapshot!(result, @r###"

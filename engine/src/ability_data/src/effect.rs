@@ -125,4 +125,5 @@ pub enum StandardEffect {
     DiscardCardFromEnemyHand {
         predicate: CardPredicate,
     },
+    SpendAllEnergyDrawAndDiscard,
 }
