@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::condition::Condition;
 use crate::predicate::{CardPredicate, Predicate};
+use crate::triggered_ability::TriggeredAbility;
 
 /// Represents a mutation to the game state.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -52,6 +53,9 @@ impl EffectWithOptions {
 /// triggered or activated ability on a character card.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum StandardEffect {
+    CreateTriggerUntilEndOfTurn {
+        trigger: Box<TriggeredAbility>,
+    },
     DiscardCards {
         count: u64,
     },

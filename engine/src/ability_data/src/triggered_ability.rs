@@ -7,6 +7,9 @@ use crate::trigger_event::TriggerEvent;
 pub struct TriggeredAbilityOptions {
     /// True if this ability can only trigger once per turn.
     pub once_per_turn: bool,
+
+    /// True if this ability will last only until end of turn.
+    pub until_end_of_turn: bool,
 }
 
 /// A triggered ability is an effect which happens when some triggering

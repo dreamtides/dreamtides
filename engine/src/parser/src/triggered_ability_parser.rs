@@ -20,7 +20,7 @@ use crate::parser_utils::{phrase, ErrorType};
 use crate::{effect_parser, trigger_event_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, ErrorType<'a>> {
-    choice((keyword_trigger_parser(), standard_trigger_parser())).boxed()
+    choice((keyword_trigger_parser(), standard_trigger_parser(false))).boxed()
 }
 
 fn keyword_trigger_parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, ErrorType<'a>> {
@@ -31,17 +31,20 @@ fn keyword_trigger_parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, Er
         .boxed()
 }
 
-fn standard_trigger_parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, ErrorType<'a>> {
+fn standard_trigger_parser<'a>(
+    until_end_of_turn: bool,
+) -> impl Parser<'a, &'a str, TriggeredAbility, ErrorType<'a>> {
     phrase("once per turn,")
         .or_not()
         .then_ignore(choice((phrase("whenever"), phrase("when"))))
         .then(trigger_event_parser::event_parser())
         .then_ignore(phrase(","))
         .then(effect_parser::effect())
-        .map(|((once_per_turn, trigger), effect)| TriggeredAbility {
+        .map(move |((once_per_turn, trigger), effect)| TriggeredAbility {
             trigger,
             effect,
-            options: once_per_turn.map(|_| TriggeredAbilityOptions { once_per_turn: true }),
+            options: once_per_turn
+                .map(|_| TriggeredAbilityOptions { once_per_turn: true, until_end_of_turn }),
         })
         .boxed()
 }
