@@ -64,6 +64,9 @@ pub enum StandardEffect {
     DissolveCharacter {
         target: Predicate,
     },
+    DisableActivatedAbilitiesWhileInPlay {
+        target: Predicate,
+    },
     GainsAegisThisTurn {
         target: Predicate,
     },

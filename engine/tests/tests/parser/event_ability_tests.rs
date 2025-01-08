@@ -33,3 +33,17 @@ fn test_dissolve_character_with_cost_compared_to_warriors() {
     "###
     );
 }
+
+#[test]
+fn test_disable_activated_abilities_while_in_play() {
+    let result = parse(
+        "Disable the activated abilities of an enemy character while this character is in play.",
+    );
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(DisableActivatedAbilitiesWhileInPlay(
+        target: Enemy(Character),
+      ))),
+    ]
+    "###);
+}

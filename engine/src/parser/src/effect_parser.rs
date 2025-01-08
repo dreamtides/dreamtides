@@ -41,15 +41,16 @@ fn conditional_effect<'a>() -> impl Parser<'a, &'a str, EffectWithOptions, Error
 
 fn standard_effect<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     choice((
-        discard_cards(),
         dissolve_character(),
         draw_cards(),
         draw_matching_card(),
-        gain_energy(),
+        discard_cards(),
+        gains_aegis_this_turn(),
         gain_spark_until_next_main_for_each(),
         gain_spark(),
-        gains_aegis_this_turn(),
+        gain_energy(),
         banish_card_from_void(),
+        disable_activated_abilities(),
     ))
 }
 
@@ -114,4 +115,11 @@ fn banish_card_from_void<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         .ignore_then(choice((phrase("a card").to(1), numeric("", count, "cards"))))
         .then_ignore(phrase("from the enemy's void"))
         .map(|count| StandardEffect::BanishCardsFromEnemyVoid { count })
+}
+
+fn disable_activated_abilities<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("disable the activated abilities of")
+        .ignore_then(determiner_parser::target_parser())
+        .then_ignore(phrase("while this character is in play"))
+        .map(|target| StandardEffect::DisableActivatedAbilitiesWhileInPlay { target })
 }
