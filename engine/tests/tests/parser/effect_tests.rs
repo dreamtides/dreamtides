@@ -169,3 +169,15 @@ fn test_banish_then_materialize() {
     ]
     "###);
 }
+
+#[test]
+fn test_banish_any_number_then_materialize() {
+    let result = parse("Banish any number of other characters you control, then materialize them.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(BanishAnyNumberThenMaterialize(
+        target: Another(Character),
+      ))),
+    ]
+    "###);
+}

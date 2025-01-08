@@ -98,6 +98,9 @@ pub enum StandardEffect {
     BanishThenMaterialize {
         target: Predicate,
     },
+    BanishAnyNumberThenMaterialize {
+        target: Predicate,
+    },
     BanishCardsFromEnemyVoid {
         count: u64,
     },

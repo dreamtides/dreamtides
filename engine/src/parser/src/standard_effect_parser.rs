@@ -16,35 +16,49 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
 /// Parses all standard game effects that do not recursively invoke effect
 /// parsing
 fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    choice((card_effects(), spark_effects(), game_effects()))
+}
+
+fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     choice((
-        dissolve_character(),
         draw_cards(),
         draw_matching_card(),
         discard_cards(),
-        gains_aegis_this_turn(),
+        banish_card_from_void(),
+        discard_card_from_enemy_hand(),
+        return_all_but_one_character_draw_card_for_each(),
+        put_on_top_of_deck(),
+        spend_all_energy_draw_and_discard(),
+    ))
+}
+
+fn spark_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    choice((
         gain_spark_until_next_main_for_each(),
         gain_spark(),
+        abandon_and_gain_energy_for_spark(),
+        each_matching_gains_spark_for_each(),
+        kindle(),
+    ))
+}
+
+fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    choice((
+        dissolve_character(),
+        gains_aegis_this_turn(),
         gain_energy_for_each(),
         gain_energy(),
-        banish_card_from_void(),
         disable_activated_abilities(),
-        abandon_and_gain_energy_for_spark(),
         discover_and_then_materialize(),
         discover(),
         materialize_random_characters(),
         return_from_void_to_play(),
         gains_reclaim_until_end_of_turn(),
-        kindle(),
         negate(),
-        discard_card_from_enemy_hand(),
         abandon_at_end_of_turn(),
-        spend_all_energy_draw_and_discard(),
-        put_on_top_of_deck(),
-        each_matching_gains_spark_for_each(),
-        return_all_but_one_character_draw_card_for_each(),
         banish_then_materialize(),
+        banish_any_number_then_materialize(),
     ))
-    .boxed()
 }
 
 fn draw_cards<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -269,4 +283,12 @@ fn banish_then_materialize<'a>() -> impl Parser<'a, &'a str, StandardEffect, Err
         .then_ignore(phrase(", then materialize it"))
         .map(|target| StandardEffect::BanishThenMaterialize { target })
         .boxed()
+}
+
+fn banish_any_number_then_materialize<'a>(
+) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("banish any number of")
+        .ignore_then(determiner_parser::target_parser())
+        .then_ignore(phrase(", then materialize them"))
+        .map(|target| StandardEffect::BanishAnyNumberThenMaterialize { target })
 }
