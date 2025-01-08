@@ -144,3 +144,19 @@ fn test_play_from_void_with_void_count() {
     ]
     "###);
 }
+
+#[test]
+fn test_play_for_alternate_cost() {
+    let result =
+        parse("You may play this event for $0 by banishing a '$fast' card from your hand.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(PlayForAlternateCost(
+        energy_cost: Energy(0),
+        additional_cost: BanishFromHand(Your(Fast(
+          target: Card,
+        ))),
+      )),
+    ]
+    "###);
+}

@@ -26,13 +26,17 @@ pub enum StaticAbility {
         matching: CardPredicate,
         added_spark: Spark,
     },
+    HasAllCharacterTypes,
     PlayFromVoidForCost {
         energy_cost: Energy,
         additional_cost: Cost,
     },
-    HasAllCharacterTypes,
     PlayFromVoidWithConditionAndCost {
         condition: Condition,
+        energy_cost: Energy,
+        additional_cost: Cost,
+    },
+    PlayForAlternateCost {
         energy_cost: Energy,
         additional_cost: Cost,
     },

@@ -31,6 +31,10 @@ pub fn inflected_additional_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorTy
         numeric("abandoning", count, "")
             .then(card_predicate_parser::parser())
             .map(|(n, predicate)| Cost::AbandonCharacters(Predicate::Your(predicate), n)),
+        phrase("banishing")
+            .ignore_then(determiner_parser::your_action())
+            .then_ignore(phrase("from your hand"))
+            .map(|predicate| Cost::BanishFromHand(predicate)),
     ))
     .boxed()
 }

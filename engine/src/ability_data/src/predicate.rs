@@ -57,6 +57,9 @@ pub enum CardPredicate {
         cost_operator: Operator<Energy>,
     },
     CharacterWithMaterializedAbility,
+    Fast {
+        target: Box<CardPredicate>,
+    },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

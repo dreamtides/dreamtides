@@ -10,6 +10,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     choice((
         character_with_cost_compared_to_controlled(),
         character_with_cost_compared_to_abandoned(),
+        fast_card(),
         non_recursive_predicate(),
     ))
     .boxed()
@@ -116,4 +117,11 @@ fn character_type<'a>() -> impl Parser<'a, &'a str, CharacterType, ErrorType<'a>
 
 fn character<'a>() -> impl Parser<'a, &'a str, &'a str, ErrorType<'a>> {
     choice((phrase("characters"), phrase("character"))).boxed()
+}
+
+fn fast_card<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
+    phrase("'$fast'")
+        .ignore_then(non_recursive_predicate())
+        .map(|target| CardPredicate::Fast { target: Box::new(target) })
+        .boxed()
 }

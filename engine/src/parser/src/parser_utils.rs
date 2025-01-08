@@ -28,6 +28,11 @@ pub fn numeric<'a, T>(
         .boxed()
 }
 
+/// Parses "this event" or "this character"
+pub fn this<'a>() -> impl Parser<'a, &'a str, &'a str, ErrorType<'a>> {
+    choice((phrase("this event"), phrase("this character"))).boxed()
+}
+
 /// Parses a number that can be either written as text (e.g. "two") or as a
 /// numeral
 pub fn text_number<'a>() -> impl Parser<'a, &'a str, u64, ErrorType<'a>> {
