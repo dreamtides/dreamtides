@@ -37,11 +37,11 @@ pub enum StaticAbility {
         energy_cost: Energy,
         additional_cost: Cost,
     },
-    PlayForAlternateCost(PlayForAlternateCost),
+    PlayForAlternateCost(AlternateCost),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PlayForAlternateCost {
+pub struct AlternateCost {
     pub energy_cost: Energy,
     pub additional_cost: Cost,
 

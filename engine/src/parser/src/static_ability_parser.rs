@@ -1,10 +1,11 @@
-use ability_data::static_ability::{PlayForAlternateCost, StaticAbility};
+use ability_data::effect::Effect;
+use ability_data::static_ability::{AlternateCost, StaticAbility};
 use chumsky::prelude::*;
 use chumsky::Parser;
 use core_data::numerics::{Energy, Spark};
 
 use crate::parser_utils::{numeric, phrase, this, ErrorType};
-use crate::{card_predicate_parser, condition_parser, cost_parser};
+use crate::{card_predicate_parser, condition_parser, cost_parser, standard_effect_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
     choice((
@@ -100,11 +101,12 @@ fn play_for_alternate_cost<'a>() -> impl Parser<'a, &'a str, StaticAbility, Erro
         .ignore_then(this())
         .ignore_then(numeric("for $", Energy, "by"))
         .then(cost_parser::inflected_additional_cost())
-        .map(|(energy_cost, additional_cost)| {
-            StaticAbility::PlayForAlternateCost(PlayForAlternateCost {
+        .then(phrase(". if you do,").ignore_then(standard_effect_parser::parser()).or_not())
+        .map(|((energy_cost, additional_cost), if_you_do)| {
+            StaticAbility::PlayForAlternateCost(AlternateCost {
                 energy_cost,
                 additional_cost,
-                if_you_do: None,
+                if_you_do: if_you_do.map(Effect::Effect),
             })
         })
 }

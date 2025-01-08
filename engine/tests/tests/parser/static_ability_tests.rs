@@ -155,12 +155,29 @@ fn test_play_for_alternate_cost() {
         parse("You may play this event for $0 by banishing a '$fast' card from your hand.");
     assert_ron_snapshot!(result, @r###"
     [
-      Static(PlayForAlternateCost(
+      Static(PlayForAlternateCost(AlternateCost(
         energy_cost: Energy(0),
         additional_cost: BanishFromHand(Your(Fast(
           target: Card,
         ))),
-      )),
+        if_you_do: None,
+      ))),
+    ]
+    "###);
+}
+
+#[test]
+fn test_play_for_alternate_cost_with_if_you_do() {
+    let result = parse("You may play this character for $0 by abandoning a character. If you do, abandon this character at end of turn.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(PlayForAlternateCost(AlternateCost(
+        energy_cost: Energy(0),
+        additional_cost: AbandonCharacters(Your(Character), 1),
+        if_you_do: Some(Effect(AbandonAtEndOfTurn(
+          target: This,
+        ))),
+      ))),
     ]
     "###);
 }
