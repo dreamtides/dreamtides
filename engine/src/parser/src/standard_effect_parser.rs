@@ -272,11 +272,13 @@ fn each_matching_gains_spark_for_each<'a>(
 
 fn return_all_but_one_character_draw_card_for_each<'a>(
 ) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    phrase(
-        "return all but one character you control to hand. draw a card for each character returned",
-    )
-    .to(StandardEffect::ReturnAllButOneCharacterDrawCardForEach)
-    .boxed()
+    phrase("return")
+        .ignore_then(counting_expression_parser::parser())
+        .then_ignore(phrase(
+            "character you control to hand. draw a card for each character returned",
+        ))
+        .map(|count| StandardEffect::ReturnCharactersDrawCardForEach { count })
+        .boxed()
 }
 
 fn banish_then_materialize<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {

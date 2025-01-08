@@ -142,5 +142,7 @@ pub enum StandardEffect {
     PutOnTopOfEnemyDeck {
         target: Predicate,
     },
-    ReturnAllButOneCharacterDrawCardForEach,
+    ReturnCharactersDrawCardForEach {
+        count: CountingExpression,
+    },
 }
