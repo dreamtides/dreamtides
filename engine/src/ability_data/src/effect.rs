@@ -93,6 +93,9 @@ pub enum StandardEffect {
     BanishCardsFromEnemyVoid {
         count: u64,
     },
+    AbandonAtEndOfTurn {
+        target: Predicate,
+    },
     AbandonAndGainEnergyForSpark {
         target: Predicate,
         energy_per_spark: Energy,

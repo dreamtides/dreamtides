@@ -37,6 +37,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         kindle(),
         negate(),
         discard_card_from_enemy_hand(),
+        abandon_at_end_of_turn(),
     ))
     .boxed()
 }
@@ -209,5 +210,13 @@ fn discard_card_from_enemy_hand<'a>() -> impl Parser<'a, &'a str, StandardEffect
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(phrase("from it. the enemy discards that card"))
         .map(|predicate| StandardEffect::DiscardCardFromEnemyHand { predicate })
+        .boxed()
+}
+
+fn abandon_at_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("abandon")
+        .ignore_then(determiner_parser::target_parser())
+        .then_ignore(phrase("at end of turn"))
+        .map(|target| StandardEffect::AbandonAtEndOfTurn { target })
         .boxed()
 }
