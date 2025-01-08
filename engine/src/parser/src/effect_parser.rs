@@ -21,7 +21,7 @@ use core_data::numerics::{Energy, Spark};
 use crate::parser_utils::{count, numeric, phrase, ErrorType};
 use crate::{card_predicate_parser, condition_parser, determiner_parser};
 
-pub fn parser<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
+pub fn single_effect<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
     conditional_effect()
         .map(Effect::WithOptions)
         .or(optional_effect().map(Effect::WithOptions))
@@ -54,6 +54,7 @@ fn standard_effect<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'
         gain_spark_until_next_main_for_each(),
         gain_spark(),
         gains_aegis_this_turn(),
+        banish_card_from_void(),
     ))
 }
 
@@ -111,4 +112,11 @@ fn draw_matching_card<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(phrase("from your deck"))
         .map(|card_predicate| StandardEffect::DrawMatchingCard { predicate: card_predicate })
+}
+
+fn banish_card_from_void<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("banish")
+        .ignore_then(choice((phrase("a card").to(1), numeric("", count, "cards"))))
+        .then_ignore(phrase("from the enemy's void"))
+        .map(|count| StandardEffect::BanishCardsFromEnemyVoid { count })
 }

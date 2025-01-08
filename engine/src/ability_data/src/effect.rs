@@ -15,9 +15,7 @@ pub enum Effect {
 /// Provides an effect along with configuration options.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EffectWithOptions {
-    /// Sequences of effects to apply in the provided order, usually written as
-    /// complete sentences or separated by the words "then" or "and" to
-    /// indicate order.
+    /// Effect to apply
     pub effect: StandardEffect,
 
     /// True if this is an effect which the controller may choose to apply,
@@ -72,5 +70,8 @@ pub enum StandardEffect {
     },
     GainEnergy {
         gained: Energy,
+    },
+    BanishCardsFromEnemyVoid {
+        count: u64,
     },
 }
