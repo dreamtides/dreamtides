@@ -23,8 +23,9 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
 
 fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     choice((
-        draw_cards(),
         draw_matching_card(),
+        draw_cards_for_each_abandoned(),
+        draw_cards(),
         discard_cards(),
         banish_card_from_void(),
         discard_card_from_enemy_hand(),
@@ -59,6 +60,7 @@ fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         gains_reclaim_until_end_of_turn(),
         negate(),
         abandon_at_end_of_turn(),
+        abandon_characters(),
         banish_then_materialize(),
         banish_any_number_then_materialize(),
     ))
@@ -305,4 +307,18 @@ fn banish_any_number_then_materialize<'a>(
         .then(determiner_parser::counted_parser())
         .then_ignore(phrase(", then materialize them"))
         .map(|(count, target)| StandardEffect::BanishThenMaterializeCount { target, count })
+}
+
+fn abandon_characters<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("abandon")
+        .ignore_then(counting_expression_parser::parser())
+        .then(determiner_parser::your_action_counted_parser())
+        .map(|(count, target)| StandardEffect::AbandonCharactersCount { target, count })
+        .boxed()
+}
+
+fn draw_cards_for_each_abandoned<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("draw a card for each character abandoned")
+        .to(StandardEffect::DrawCardsForEachAbandoned { count: 1 })
+        .boxed()
 }

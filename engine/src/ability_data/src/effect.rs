@@ -63,6 +63,7 @@ impl EffectWithOptions {
 pub enum StandardEffect {
     AbandonAndGainEnergyForSpark { target: Predicate, energy_per_spark: Energy },
     AbandonAtEndOfTurn { target: Predicate },
+    AbandonCharactersCount { target: Predicate, count: CountingExpression },
     BanishCardsFromEnemyVoid { count: u64 },
     BanishThenMaterialize { target: Predicate },
     BanishThenMaterializeCount { target: Predicate, count: CountingExpression },
@@ -74,6 +75,7 @@ pub enum StandardEffect {
     DiscoverAndThenMaterialize { predicate: CardPredicate },
     DissolveCharacter { target: Predicate },
     DrawCards { count: u64 },
+    DrawCardsForEachAbandoned { count: u64 },
     DrawMatchingCard { predicate: CardPredicate },
     EachMatchingGainsSparkForEach { each: CardPredicate, gains: Spark, for_each: CardPredicate },
     GainEnergy { gains: Energy },

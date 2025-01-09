@@ -270,3 +270,30 @@ fn test_multi_activated_dissolve_with_abandoned_spark() {
     ]
     "###);
 }
+
+#[test]
+fn test_abandon_any_number_draw_for_each() {
+    let result =
+        parse("Abandon any number of characters. Draw a card for each character abandoned.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(List([
+        EffectWithOptions(
+          effect: AbandonCharactersCount(
+            target: Your(Character),
+            count: AnyNumberOf,
+          ),
+          optional: None,
+          condition: None,
+        ),
+        EffectWithOptions(
+          effect: DrawCardsForEachAbandoned(
+            count: 1,
+          ),
+          optional: None,
+          condition: None,
+        ),
+      ])),
+    ]
+    "###);
+}

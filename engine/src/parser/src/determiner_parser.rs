@@ -47,6 +47,17 @@ pub fn counted_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>
     .boxed()
 }
 
+/// Parser for expressions describing multiple matching objects, when the
+/// controler is already implicitly specified, for example in 'Abandon any
+/// number of characters.'
+pub fn your_action_counted_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>> {
+    choice((
+        phrase("other").ignore_then(card_predicate_parser::parser()).map(Predicate::Another),
+        card_predicate_parser::parser().map(Predicate::Your),
+    ))
+    .boxed()
+}
+
 /// Parser for expressions where the controller has already been described as
 /// the acting party, for example in "Whenever you materialize <predicate>".
 pub fn your_action<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>> {
