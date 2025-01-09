@@ -1,4 +1,4 @@
-use core_data::numerics::{Energy, Spark};
+use core_data::numerics::{Energy, Points, Spark};
 use serde::{Deserialize, Serialize};
 
 use crate::condition::Condition;
@@ -80,6 +80,7 @@ pub enum StandardEffect {
     EachMatchingGainsSparkForEach { each: CardPredicate, gains: Spark, for_each: CardPredicate },
     GainEnergy { gains: Energy },
     GainEnergyForEach { gains: Energy, for_each: Predicate },
+    GainPoints { gains: Points },
     GainsAegisThisTurn { target: Predicate },
     GainsReclaimUntilEndOfTurn { target: Predicate },
     GainsSpark { target: Predicate, gains: Spark },

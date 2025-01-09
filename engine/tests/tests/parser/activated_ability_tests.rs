@@ -208,3 +208,58 @@ fn test_activated_discover_and_then_materialize() {
     ]
     "###);
 }
+
+#[test]
+fn test_discard_card_draw_gain_point() {
+    let result = parse("$activated Discard a card: Draw a card. Gain 1 $point.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Activated(ActivatedAbility(
+        costs: [
+          DiscardCards(Card, 1),
+        ],
+        effect: List([
+          EffectWithOptions(
+            effect: DrawCards(
+              count: 1,
+            ),
+            optional: None,
+            condition: None,
+          ),
+          EffectWithOptions(
+            effect: GainPoints(
+              gains: Points(1),
+            ),
+            optional: None,
+            condition: None,
+          ),
+        ]),
+        options: None,
+      )),
+    ]
+    "###
+    );
+}
+
+#[test]
+fn test_discard_warriors_gain_energy() {
+    let result = parse("$activated Discard 2 {cardtype: warriors}: Gain $1.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Activated(ActivatedAbility(
+        costs: [
+          DiscardCards(CharacterType(Warrior), 2),
+        ],
+        effect: Effect(GainEnergy(
+          gains: Energy(1),
+        )),
+        options: None,
+      )),
+    ]
+    "###
+    );
+}

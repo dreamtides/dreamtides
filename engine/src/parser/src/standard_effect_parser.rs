@@ -3,7 +3,7 @@ use ability_data::predicate::Predicate;
 use ability_data::triggered_ability::{TriggeredAbility, TriggeredAbilityOptions};
 use chumsky::prelude::*;
 use chumsky::Parser;
-use core_data::numerics::{Energy, Spark};
+use core_data::numerics::{Energy, Points, Spark};
 
 use crate::parser_utils::{a_or_an, count, numeric, phrase, text_number, ErrorType};
 use crate::{
@@ -52,6 +52,7 @@ fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         gains_aegis_this_turn(),
         gain_energy_for_each(),
         gain_energy(),
+        gain_points(),
         disable_activated_abilities(),
         discover_and_then_materialize(),
         discover(),
@@ -329,4 +330,8 @@ fn materialize_character<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         .ignore_then(determiner_parser::target_parser())
         .map(|target| StandardEffect::MaterializeCharacter { target })
         .boxed()
+}
+
+fn gain_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    numeric("gain", Points, "$point").map(|points| StandardEffect::GainPoints { gains: points })
 }

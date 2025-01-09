@@ -4,7 +4,7 @@ use chumsky::prelude::*;
 use chumsky::Parser;
 use core_data::numerics::Energy;
 
-use crate::parser_utils::{count, numeric, phrase, ErrorType};
+use crate::parser_utils::{count, number, numeric, phrase, ErrorType};
 use crate::{card_predicate_parser, determiner_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
@@ -19,6 +19,13 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
             .ignore_then(determiner_parser::your_action())
             .map(|p| Cost::AbandonCharacters(p, 1)),
         phrase("discard your hand").to(Cost::DiscardHand),
+        phrase("discard a")
+            .ignore_then(card_predicate_parser::parser())
+            .map(|predicate| Cost::DiscardCards(predicate, 1)),
+        phrase("discard")
+            .ignore_then(number(count))
+            .then(card_predicate_parser::parser())
+            .map(|(count, predicate)| Cost::DiscardCards(predicate, count)),
     ))
     .boxed()
 }
@@ -37,6 +44,13 @@ pub fn inflected_additional_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorTy
             .ignore_then(determiner_parser::your_action())
             .then_ignore(phrase("from your hand"))
             .map(Cost::BanishFromHand),
+        phrase("discarding a")
+            .ignore_then(card_predicate_parser::parser())
+            .map(|predicate| Cost::DiscardCards(predicate, 1)),
+        phrase("discarding")
+            .ignore_then(number(count))
+            .then(card_predicate_parser::parser())
+            .map(|(count, predicate)| Cost::DiscardCards(predicate, count)),
     ))
     .boxed()
 }
