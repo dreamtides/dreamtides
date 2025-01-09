@@ -347,3 +347,31 @@ fn test_foresee() {
     ]
     "###);
 }
+
+#[test]
+fn test_lose_points() {
+    let result = parse("Dissolve an enemy character. You lose 4 $points.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Event(List([
+        EffectWithOptions(
+          effect: DissolveCharacter(
+            target: Enemy(Character),
+          ),
+          optional: None,
+          condition: None,
+        ),
+        EffectWithOptions(
+          effect: LosePoints(
+            loses: Points(4),
+          ),
+          optional: None,
+          condition: None,
+        ),
+      ])),
+    ]
+    "###
+    );
+}

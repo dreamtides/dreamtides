@@ -86,6 +86,7 @@ pub enum StandardEffect {
     GainsReclaimUntilEndOfTurn { target: Predicate },
     GainsSpark { target: Predicate, gains: Spark },
     GainsSparkUntilYourNextMainForEach { target: Predicate, gains: Spark, for_each: Predicate },
+    LosePoints { loses: Points },
     Kindle { amount: Spark },
     MaterializeCharacter { target: Predicate },
     MaterializeRandomFromDeck { count: u64, predicate: CardPredicate },

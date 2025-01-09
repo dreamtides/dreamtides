@@ -53,6 +53,7 @@ fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         gain_energy_for_each(),
         gain_energy(),
         gain_points(),
+        lose_points(),
         disable_activated_abilities(),
         discover_and_then_materialize(),
         discover(),
@@ -334,9 +335,17 @@ fn materialize_character<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
 }
 
 fn gain_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    numeric("gain", Points, "$point").map(|points| StandardEffect::GainPoints { gains: points })
+    numeric("gain", Points, "$point")
+        .then_ignore(just("s").or_not())
+        .map(|points| StandardEffect::GainPoints { gains: points })
 }
 
 fn foresee<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     numeric("{kw: foresee}", count, "").map(|count| StandardEffect::Foresee { count }).boxed()
+}
+
+fn lose_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    numeric("you lose", Points, "$point")
+        .then_ignore(just("s").or_not())
+        .map(|points| StandardEffect::LosePoints { loses: points })
 }
