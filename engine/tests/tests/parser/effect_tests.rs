@@ -297,3 +297,19 @@ fn test_abandon_any_number_draw_for_each() {
     ]
     "###);
 }
+
+#[test]
+fn test_discover_card_with_cost() {
+    let result = parse("{kw: discover} a card with cost $2.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(Discover(
+        predicate: CardWithCost(
+          target: Card,
+          cost_operator: Exactly,
+          cost: Energy(2),
+        ),
+      ))),
+    ]
+    "###);
+}

@@ -8,12 +8,12 @@ use crate::parser_utils::{numeric, phrase, ErrorType};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     choice((
-        card_with_cost(),
         character_with_cost_compared_to_controlled(),
         character_with_cost_compared_to_abandoned(),
         character_with_spark_compared_to_abandoned_this_turn(),
         character_with_spark_compared_to_abandoned(),
         fast_card(),
+        card_with_cost(),
         non_recursive_predicate(),
     ))
     .boxed()
@@ -35,13 +35,16 @@ fn non_recursive_predicate<'a>() -> impl Parser<'a, &'a str, CardPredicate, Erro
 fn card_with_cost<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     non_recursive_predicate()
         .then(numeric("with cost $", Energy, ""))
-        .then(choice((
-            phrase("or less").to(Operator::OrLess),
-            phrase("or more").to(Operator::OrMore),
-        )))
+        .then(
+            choice((
+                phrase("or less").to(Operator::OrLess),
+                phrase("or more").to(Operator::OrMore),
+            ))
+            .or_not(),
+        )
         .map(|((target, cost), operator)| CardPredicate::CardWithCost {
             target: Box::new(target),
-            cost_operator: operator,
+            cost_operator: operator.unwrap_or(Operator::Exactly),
             cost,
         })
         .boxed()
