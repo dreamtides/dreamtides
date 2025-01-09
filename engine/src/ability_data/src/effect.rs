@@ -64,6 +64,7 @@ pub enum StandardEffect {
     AbandonAndGainEnergyForSpark { target: Predicate, energy_per_spark: Energy },
     AbandonAtEndOfTurn { target: Predicate },
     AbandonCharactersCount { target: Predicate, count: CountingExpression },
+    BanishCharacter { target: Predicate },
     BanishCardsFromEnemyVoid { count: u64 },
     BanishThenMaterialize { target: Predicate },
     BanishThenMaterializeCount { target: Predicate, count: CountingExpression },

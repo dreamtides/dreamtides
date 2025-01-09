@@ -69,6 +69,7 @@ fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         abandon_characters(),
         banish_then_materialize(),
         banish_any_number_then_materialize(),
+        banish_character(),
         foresee(),
     ))
 }
@@ -297,6 +298,12 @@ fn return_all_but_one_character_draw_card_for_each<'a>(
         ))
         .map(|count| StandardEffect::ReturnCharactersToHandDrawCardForEach { count })
         .boxed()
+}
+
+fn banish_character<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("banish")
+        .ignore_then(determiner_parser::target_parser())
+        .map(|predicate| StandardEffect::BanishCharacter { target: predicate })
 }
 
 fn banish_then_materialize<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {

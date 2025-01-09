@@ -409,3 +409,19 @@ fn test_enemy_points() {
     ]
     "###);
 }
+
+#[test]
+fn test_banish_character() {
+    let result = parse("Banish an enemy character with cost $2 or less.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(BanishCharacter(
+        target: Enemy(CardWithCost(
+          target: Character,
+          cost_operator: OrLess,
+          cost: Energy(2),
+        )),
+      ))),
+    ]
+    "###);
+}
