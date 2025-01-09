@@ -11,10 +11,11 @@ pub enum Predicate {
     /// Predicate which only matches the owning card.
     This,
 
-    /// Card targeted by this effect. This is typically used for applying
+    /// Card referenced by this effect. This is typically used for applying
     /// multiple effects to the same target, e.g. "banish a character you
-    /// control, then materialize it."
-    Target,
+    /// control, then materialize it." or when referencing a card triggering
+    /// itself, like "when you discard this card, materialize it."
+    It,
 
     /// Card which triggered an event. Used for applying effects to the
     /// triggering card, e.g. "Whenever you materialize a spirit animal, that

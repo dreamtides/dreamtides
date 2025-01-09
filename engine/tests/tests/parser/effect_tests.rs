@@ -32,7 +32,7 @@ fn test_materialize_random_characters() {
     let result = parse("Materialize two random characters with cost $3 or less from your deck.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(MaterializeRandomCharacters(
+      Event(Effect(MaterializeRandomFromDeck(
         count: 2,
         predicate: CardWithCost(
           target: Character,
@@ -310,6 +310,22 @@ fn test_discover_card_with_cost() {
           cost: Energy(2),
         ),
       ))),
+    ]
+    "###);
+}
+
+#[test]
+fn test_materialize_character_when_discarded() {
+    let result = parse("When you discard this character, materialize it.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Discard(This),
+        effect: Effect(MaterializeCharacter(
+          target: It,
+        )),
+        options: None,
+      )),
     ]
     "###);
 }

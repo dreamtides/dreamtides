@@ -32,6 +32,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         return_all_but_one_character_draw_card_for_each(),
         put_on_top_of_deck(),
         spend_all_energy_draw_and_discard(),
+        materialize_character(),
     ))
 }
 
@@ -195,7 +196,7 @@ fn materialize_random_characters<'a>() -> impl Parser<'a, &'a str, StandardEffec
         )))
         .then(card_predicate_parser::parser())
         .then_ignore(phrase("from your deck"))
-        .map(|(count, predicate)| StandardEffect::MaterializeRandomCharacters { count, predicate })
+        .map(|(count, predicate)| StandardEffect::MaterializeRandomFromDeck { count, predicate })
         .boxed()
 }
 
@@ -320,5 +321,12 @@ fn abandon_characters<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
 fn draw_cards_for_each_abandoned<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("draw a card for each character abandoned")
         .to(StandardEffect::DrawCardsForEachAbandoned { count: 1 })
+        .boxed()
+}
+
+fn materialize_character<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("materialize")
+        .ignore_then(determiner_parser::target_parser())
+        .map(|target| StandardEffect::MaterializeCharacter { target })
         .boxed()
 }
