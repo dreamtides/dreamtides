@@ -240,3 +240,24 @@ fn test_once_per_turn_multiple_effects() {
     ]
     "###);
 }
+
+#[test]
+fn test_materialize_nth_this_turn() {
+    let result = parse(
+        "When you materialize your second character in a turn, return this character from your void to play.",
+    );
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: MaterializeNthThisTurn(Your(Character), 2),
+        effect: Effect(ReturnFromYourVoidToPlay(
+          target: This,
+        )),
+        options: None,
+      )),
+    ]
+    "###
+    );
+}

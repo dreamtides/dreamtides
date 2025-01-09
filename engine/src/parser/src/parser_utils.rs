@@ -55,3 +55,21 @@ pub fn text_number<'a>() -> impl Parser<'a, &'a str, u64, ErrorType<'a>> {
     ))
     .boxed()
 }
+
+/// Parses an ordinal number that can be either written as text (e.g. "first")
+/// or as a numeral with "st", "nd", "rd", or "th" suffix
+pub fn ordinal_number<'a>() -> impl Parser<'a, &'a str, u64, ErrorType<'a>> {
+    choice((
+        phrase("first").to(1),
+        phrase("second").to(2),
+        phrase("third").to(3),
+        phrase("fourth").to(4),
+        phrase("fifth").to(5),
+        phrase("sixth").to(6),
+        phrase("seventh").to(7),
+        phrase("eighth").to(8),
+        phrase("ninth").to(9),
+        numeric("", count, "th"),
+    ))
+    .boxed()
+}

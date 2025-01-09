@@ -1,12 +1,13 @@
+use ability_data::predicate::Predicate;
 use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
 use chumsky::prelude::choice;
 use chumsky::{IterParser, Parser};
 
-use crate::determiner_parser;
-use crate::parser_utils::{phrase, ErrorType};
+use crate::parser_utils::{ordinal_number, phrase, ErrorType};
+use crate::{card_predicate_parser, determiner_parser};
 
 pub fn event_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
-    choice((materialize(), play(), discard())).boxed()
+    choice((materialize_nth_this_turn(), materialize(), play(), discard())).boxed()
 }
 
 pub fn keyword_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
@@ -28,6 +29,15 @@ fn materialize<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
     phrase("you materialize")
         .ignore_then(determiner_parser::your_action())
         .map(TriggerEvent::Materialize)
+        .boxed()
+}
+
+fn materialize_nth_this_turn<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
+    phrase("you materialize your")
+        .ignore_then(ordinal_number())
+        .then(card_predicate_parser::parser())
+        .then_ignore(phrase("in a turn"))
+        .map(|(n, pred)| TriggerEvent::MaterializeNthThisTurn(Predicate::Your(pred), n))
         .boxed()
 }
 

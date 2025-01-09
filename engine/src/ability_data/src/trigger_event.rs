@@ -12,6 +12,10 @@ pub enum TriggerEvent {
     /// Event when a character matching a predicate is materialized.
     Materialize(Predicate),
 
+    /// Event when the nth character matching a predicate is materialized this
+    /// turn
+    MaterializeNthThisTurn(Predicate, u64),
+
     /// Event when a card matching a predicate is played
     Play(Predicate),
 
