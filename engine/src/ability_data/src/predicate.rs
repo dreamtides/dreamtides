@@ -60,6 +60,10 @@ pub enum CardPredicate {
         target: Box<CardPredicate>,
         cost_operator: Operator<Energy>,
     },
+    CharacterWithSparkComparedToAbandonedThisTurn {
+        target: Box<CardPredicate>,
+        spark_operator: Operator<Spark>,
+    },
     CharacterWithMaterializedAbility,
     Fast {
         target: Box<CardPredicate>,

@@ -218,3 +218,24 @@ fn test_banish_up_to_two_activated() {
     ]
     "###);
 }
+
+#[test]
+fn test_dissolve_enemy_character_with_spark_compared_to_abandoned() {
+    let result = parse(
+        "$activated: Dissolve an enemy character with spark X or less, where X is the number of characters you have abandoned this turn.",
+    );
+    assert_ron_snapshot!(result, @r###"
+    [
+      Activated(ActivatedAbility(
+        costs: [],
+        effect: Effect(DissolveCharacter(
+          target: Enemy(CharacterWithSparkComparedToAbandonedThisTurn(
+            target: Character,
+            spark_operator: OrLess,
+          )),
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}
