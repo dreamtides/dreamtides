@@ -45,10 +45,8 @@ pub enum StaticAbility {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AlternateCost {
+    pub condition: Option<Condition>,
     pub energy_cost: Energy,
     pub additional_cost: Cost,
-
-    /// Effect to apply once you play this event/materialize this character if
-    /// you use this alternate cost.
     pub if_you_do: Option<Effect>,
 }

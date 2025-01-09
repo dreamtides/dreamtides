@@ -169,6 +169,7 @@ fn test_play_for_alternate_cost() {
     assert_ron_snapshot!(result, @r###"
     [
       Static(PlayForAlternateCost(AlternateCost(
+        condition: None,
         energy_cost: Energy(0),
         additional_cost: BanishFromHand(Your(Fast(
           target: Card,
@@ -185,6 +186,7 @@ fn test_play_for_alternate_cost_with_if_you_do() {
     assert_ron_snapshot!(result, @r###"
     [
       Static(PlayForAlternateCost(AlternateCost(
+        condition: None,
         energy_cost: Energy(0),
         additional_cost: AbandonCharacters(Your(Character), 1),
         if_you_do: Some(Effect(AbandonAtEndOfTurn(
@@ -235,6 +237,23 @@ fn test_reclaim_with_draw_discard() {
       Static(Reclaim(
         cost: None,
       )),
+    ]
+    "###);
+}
+
+#[test]
+fn test_alternate_cost_with_condition() {
+    let result = parse("If you have discarded a card this turn, this character costs $1.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(PlayForAlternateCost(AlternateCost(
+        condition: Some(CardsDiscardedThisTurn(
+          count: 1,
+        )),
+        energy_cost: Energy(1),
+        additional_cost: NoCost,
+        if_you_do: None,
+      ))),
     ]
     "###);
 }

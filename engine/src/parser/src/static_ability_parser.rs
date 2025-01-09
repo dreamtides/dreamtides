@@ -18,6 +18,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
         other_spark_bonus(),
         has_all_character_types(),
         play_from_void_with_condition(),
+        simple_alternate_cost(),
         play_for_alternate_cost(),
         reclaim(),
     ))
@@ -108,9 +109,26 @@ fn play_for_alternate_cost<'a>() -> impl Parser<'a, &'a str, StaticAbility, Erro
         .then(phrase(". if you do,").ignore_then(standard_effect_parser::parser()).or_not())
         .map(|((energy_cost, additional_cost), if_you_do)| {
             StaticAbility::PlayForAlternateCost(AlternateCost {
+                condition: None,
                 energy_cost,
                 additional_cost: additional_cost.unwrap_or(Cost::NoCost),
                 if_you_do: if_you_do.map(Effect::Effect),
+            })
+        })
+}
+
+fn simple_alternate_cost<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+    phrase("if")
+        .ignore_then(condition_parser::parser())
+        .then_ignore(phrase(","))
+        .then_ignore(this())
+        .then(numeric("costs $", Energy, ""))
+        .map(|(condition, energy_cost)| {
+            StaticAbility::PlayForAlternateCost(AlternateCost {
+                condition: Some(condition),
+                energy_cost,
+                additional_cost: Cost::NoCost,
+                if_you_do: None,
             })
         })
 }
