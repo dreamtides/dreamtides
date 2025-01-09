@@ -55,6 +55,7 @@ fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         gain_energy(),
         gain_points(),
         lose_points(),
+        enemy_gains_points_equal_to_its_spark(),
         enemy_gains_points(),
         enemy_loses_points(),
         disable_activated_abilities(),
@@ -373,6 +374,13 @@ fn enemy_gains_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
         .ignore_then(numeric("", count, "$point"))
         .then_ignore(just("s").or_not())
         .map(|count| StandardEffect::EnemyGainsPoints { count })
+        .boxed()
+}
+
+fn enemy_gains_points_equal_to_its_spark<'a>(
+) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("the enemy gains $points equal to its spark")
+        .to(StandardEffect::EnemyGainsPointsEqualToItsSpark)
         .boxed()
 }
 

@@ -425,3 +425,29 @@ fn test_banish_character() {
     ]
     "###);
 }
+
+#[test]
+fn test_enemy_gains_points_equal_to_its_spark() {
+    let result = parse(
+        "Banish an enemy character that is not a {cardtype: warrior}.
+        The enemy gains $points equal to its spark.",
+    );
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(List([
+        EffectWithOptions(
+          effect: BanishCharacter(
+            target: Enemy(NotCharacterType(Warrior)),
+          ),
+          optional: None,
+          condition: None,
+        ),
+        EffectWithOptions(
+          effect: EnemyGainsPointsEqualToItsSpark,
+          optional: None,
+          condition: None,
+        ),
+      ])),
+    ]
+    "###);
+}

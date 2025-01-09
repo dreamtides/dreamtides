@@ -4,7 +4,7 @@ use chumsky::Parser;
 use core_data::character_type::CharacterType;
 use core_data::numerics::{Energy, Spark};
 
-use crate::parser_utils::{numeric, phrase, ErrorType};
+use crate::parser_utils::{a_or_an, numeric, phrase, ErrorType};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     choice((
@@ -24,6 +24,13 @@ fn non_recursive_predicate<'a>() -> impl Parser<'a, &'a str, CardPredicate, Erro
         character_with_spark(),
         character_with_materialized_ability(),
         character_type().map(CardPredicate::CharacterType),
+        phrase("character that is not")
+            .ignore_then(a_or_an())
+            .ignore_then(character_type())
+            .map(CardPredicate::NotCharacterType),
+        phrase("characters that are not")
+            .ignore_then(character_type())
+            .map(CardPredicate::NotCharacterType),
         choice((phrase("cards"), phrase("card"))).to(CardPredicate::Card),
         character().to(CardPredicate::Character),
         choice((phrase("events"), phrase("event"))).to(CardPredicate::Event),

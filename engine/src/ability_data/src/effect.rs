@@ -81,6 +81,7 @@ pub enum StandardEffect {
     DrawMatchingCard { predicate: CardPredicate },
     EachMatchingGainsSparkForEach { each: CardPredicate, gains: Spark, for_each: CardPredicate },
     EnemyGainsPoints { count: u64 },
+    EnemyGainsPointsEqualToItsSpark,
     EnemyLosesPoints { count: u64 },
     Foresee { count: u64 },
     GainEnergy { gains: Energy },
