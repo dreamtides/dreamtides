@@ -74,6 +74,7 @@ pub enum StandardEffect {
     Discover { predicate: CardPredicate },
     DiscoverAndThenMaterialize { predicate: CardPredicate },
     DissolveCharacter { target: Predicate },
+    DissolveCharactersCount { target: Predicate, count: CountingExpression },
     DrawCards { count: u64 },
     DrawCardsForEachAbandoned { count: u64 },
     DrawMatchingCard { predicate: CardPredicate },

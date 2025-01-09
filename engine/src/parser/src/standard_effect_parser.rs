@@ -33,6 +33,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         put_on_top_of_deck(),
         spend_all_energy_draw_and_discard(),
         materialize_character(),
+        dissolve_characters_count(),
     ))
 }
 
@@ -348,4 +349,12 @@ fn lose_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> 
     numeric("you lose", Points, "$point")
         .then_ignore(just("s").or_not())
         .map(|points| StandardEffect::LosePoints { loses: points })
+}
+
+fn dissolve_characters_count<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("dissolve")
+        .ignore_then(counting_expression_parser::parser())
+        .then(determiner_parser::counted_parser())
+        .map(|(count, target)| StandardEffect::DissolveCharactersCount { target, count })
+        .boxed()
 }

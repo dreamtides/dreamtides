@@ -375,3 +375,16 @@ fn test_lose_points() {
     "###
     );
 }
+
+#[test]
+fn test_dissolve_characters_count() {
+    let result = parse("Dissolve all characters.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(DissolveCharactersCount(
+        target: Any(Character),
+        count: All,
+      ))),
+    ]
+    "###);
+}

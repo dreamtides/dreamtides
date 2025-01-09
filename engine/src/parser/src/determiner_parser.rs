@@ -42,8 +42,9 @@ pub fn counted_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>
             .ignore_then(card_predicate_parser::parser())
             .then_ignore(phrase("you control"))
             .map(Predicate::Another),
-        phrase("enemey").ignore_then(card_predicate_parser::parser()).map(Predicate::Enemy),
+        phrase("enemy").ignore_then(card_predicate_parser::parser()).map(Predicate::Enemy),
         card_predicate_parser::parser().then_ignore(phrase("you control")).map(Predicate::Your),
+        card_predicate_parser::parser().map(Predicate::Any),
     ))
     .boxed()
 }
