@@ -60,7 +60,11 @@ pub enum CardPredicate {
         target: Box<CardPredicate>,
         cost_operator: Operator<Energy>,
     },
-    CharacterWithSparkComparedToAbandonedThisTurn {
+    CharacterWithSparkComparedToAbandoned {
+        target: Box<CardPredicate>,
+        spark_operator: Operator<Spark>,
+    },
+    CharacterWithSparkComparedToAbandonedCountThisTurn {
         target: Box<CardPredicate>,
         spark_operator: Operator<Spark>,
     },

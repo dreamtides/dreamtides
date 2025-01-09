@@ -229,12 +229,43 @@ fn test_dissolve_enemy_character_with_spark_compared_to_abandoned() {
       Activated(ActivatedAbility(
         costs: [],
         effect: Effect(DissolveCharacter(
-          target: Enemy(CharacterWithSparkComparedToAbandonedThisTurn(
+          target: Enemy(CharacterWithSparkComparedToAbandonedCountThisTurn(
             target: Character,
             spark_operator: OrLess,
           )),
         )),
         options: None,
+      )),
+    ]
+    "###);
+}
+
+#[test]
+fn test_multi_activated_dissolve_with_abandoned_spark() {
+    let result = parse(
+        "$multiActivated Abandon another character: You may dissolve an enemy character with spark less than or equal to the abandoned character's spark.",
+    );
+    assert_ron_snapshot!(result, @r###"
+    [
+      Activated(ActivatedAbility(
+        costs: [
+          AbandonCharacters(Another(Character), 1),
+        ],
+        effect: WithOptions(EffectWithOptions(
+          effect: DissolveCharacter(
+            target: Enemy(CharacterWithSparkComparedToAbandoned(
+              target: Character,
+              spark_operator: OrLess,
+            )),
+          ),
+          optional: Some(NoCost),
+          condition: None,
+        )),
+        options: Some(ActivatedAbilityOptions(
+          is_fast: false,
+          is_immediate: false,
+          is_multi: true,
+        )),
       )),
     ]
     "###);

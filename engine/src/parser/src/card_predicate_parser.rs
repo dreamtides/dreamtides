@@ -12,6 +12,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
         character_with_cost_compared_to_controlled(),
         character_with_cost_compared_to_abandoned(),
         character_with_spark_compared_to_abandoned_this_turn(),
+        character_with_spark_compared_to_abandoned(),
         fast_card(),
         non_recursive_predicate(),
     ))
@@ -141,10 +142,27 @@ fn character_with_spark_compared_to_abandoned_this_turn<'a>(
         )))
         .then_ignore(phrase(", where x is the number of characters you have abandoned this turn"))
         .map(|(target, spark_operator)| {
-            CardPredicate::CharacterWithSparkComparedToAbandonedThisTurn {
+            CardPredicate::CharacterWithSparkComparedToAbandonedCountThisTurn {
                 target: Box::new(target),
                 spark_operator,
             }
+        })
+        .boxed()
+}
+
+fn character_with_spark_compared_to_abandoned<'a>(
+) -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
+    non_recursive_predicate()
+        .then_ignore(phrase("with spark"))
+        .then(choice((
+            phrase("less than or equal to").to(Operator::OrLess),
+            phrase("equal to").to(Operator::Exactly),
+            phrase("greater than or equal to").to(Operator::OrMore),
+        )))
+        .then_ignore(phrase("the abandoned character's spark"))
+        .map(|(target, spark_operator)| CardPredicate::CharacterWithSparkComparedToAbandoned {
+            target: Box::new(target),
+            spark_operator,
         })
         .boxed()
 }
