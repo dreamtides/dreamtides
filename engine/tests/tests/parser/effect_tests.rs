@@ -388,3 +388,24 @@ fn test_dissolve_characters_count() {
     ]
     "###);
 }
+
+#[test]
+fn test_enemy_points() {
+    let result = parse("The enemy gains 2 $points.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(EnemyGainsPoints(
+        count: 2,
+      ))),
+    ]
+    "###);
+
+    let result = parse("The enemy loses 1 $point.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(EnemyLosesPoints(
+        count: 1,
+      ))),
+    ]
+    "###);
+}

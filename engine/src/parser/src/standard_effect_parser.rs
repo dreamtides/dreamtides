@@ -55,6 +55,8 @@ fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         gain_energy(),
         gain_points(),
         lose_points(),
+        enemy_gains_points(),
+        enemy_loses_points(),
         disable_activated_abilities(),
         discover_and_then_materialize(),
         discover(),
@@ -356,5 +358,21 @@ fn dissolve_characters_count<'a>() -> impl Parser<'a, &'a str, StandardEffect, E
         .ignore_then(counting_expression_parser::parser())
         .then(determiner_parser::counted_parser())
         .map(|(count, target)| StandardEffect::DissolveCharactersCount { target, count })
+        .boxed()
+}
+
+fn enemy_gains_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("the enemy gains")
+        .ignore_then(numeric("", count, "$point"))
+        .then_ignore(just("s").or_not())
+        .map(|count| StandardEffect::EnemyGainsPoints { count })
+        .boxed()
+}
+
+fn enemy_loses_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("the enemy loses")
+        .ignore_then(numeric("", count, "$point"))
+        .then_ignore(just("s").or_not())
+        .map(|count| StandardEffect::EnemyLosesPoints { count })
         .boxed()
 }
