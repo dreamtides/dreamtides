@@ -93,6 +93,7 @@ pub enum StandardEffect {
     GainsSparkUntilYourNextMainForEach { target: Predicate, gains: Spark, for_each: Predicate },
     LosePoints { loses: Points },
     Kindle { amount: Spark },
+    MaterializeCharacterFromVoid { target: CardPredicate },
     MaterializeCharacter { target: Predicate },
     MaterializeRandomFromDeck { count: u64, predicate: CardPredicate },
     Negate { target: Predicate },

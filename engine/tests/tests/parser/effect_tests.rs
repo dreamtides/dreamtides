@@ -451,3 +451,27 @@ fn test_enemy_gains_points_equal_to_its_spark() {
     ]
     "###);
 }
+
+#[test]
+fn test_materialize_character_from_void() {
+    let result = parse("Whenever you play a {cardtype: warrior}, you may materialize a character with cost $3 or less from your void.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Play(Your(CharacterType(Warrior))),
+        effect: WithOptions(EffectWithOptions(
+          effect: MaterializeCharacterFromVoid(
+            target: CardWithCost(
+              target: Character,
+              cost_operator: OrLess,
+              cost: Energy(3),
+            ),
+          ),
+          optional: Some(NoCost),
+          condition: None,
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}

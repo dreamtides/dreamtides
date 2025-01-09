@@ -32,6 +32,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         return_all_but_one_character_draw_card_for_each(),
         put_on_top_of_deck(),
         spend_all_energy_draw_and_discard(),
+        materialize_character_from_void(),
         materialize_character(),
         dissolve_characters_count(),
     ))
@@ -335,6 +336,16 @@ fn abandon_characters<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
 fn draw_cards_for_each_abandoned<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("draw a card for each character abandoned")
         .to(StandardEffect::DrawCardsForEachAbandoned { count: 1 })
+        .boxed()
+}
+
+fn materialize_character_from_void<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
+{
+    phrase("materialize")
+        .ignore_then(a_or_an())
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(phrase("from your void"))
+        .map(|target| StandardEffect::MaterializeCharacterFromVoid { target })
         .boxed()
 }
 
