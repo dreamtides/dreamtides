@@ -65,6 +65,7 @@ fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         abandon_characters(),
         banish_then_materialize(),
         banish_any_number_then_materialize(),
+        foresee(),
     ))
 }
 
@@ -334,4 +335,8 @@ fn materialize_character<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
 
 fn gain_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     numeric("gain", Points, "$point").map(|points| StandardEffect::GainPoints { gains: points })
+}
+
+fn foresee<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    numeric("{kw: foresee}", count, "").map(|count| StandardEffect::Foresee { count }).boxed()
 }

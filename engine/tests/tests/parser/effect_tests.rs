@@ -329,3 +329,21 @@ fn test_materialize_character_when_discarded() {
     ]
     "###);
 }
+
+#[test]
+fn test_foresee() {
+    let result = parse("$materialized: {kw: Foresee} 2.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Keywords([
+          Materialized,
+        ]),
+        effect: Effect(Foresee(
+          count: 2,
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}
