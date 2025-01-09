@@ -38,6 +38,9 @@ pub enum StaticAbility {
         additional_cost: Cost,
     },
     PlayForAlternateCost(AlternateCost),
+    Reclaim {
+        cost: Option<Cost>,
+    },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -5,7 +5,7 @@ use chumsky::prelude::*;
 use chumsky::Parser;
 use core_data::numerics::{Energy, Spark};
 
-use crate::parser_utils::{numeric, phrase, this, ErrorType};
+use crate::parser_utils::{number, numeric, phrase, this, ErrorType};
 use crate::{card_predicate_parser, condition_parser, cost_parser, standard_effect_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
@@ -19,6 +19,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
         has_all_character_types(),
         play_from_void_with_condition(),
         play_for_alternate_cost(),
+        reclaim(),
     ))
     .boxed()
 }
@@ -112,4 +113,10 @@ fn play_for_alternate_cost<'a>() -> impl Parser<'a, &'a str, StaticAbility, Erro
                 if_you_do: if_you_do.map(Effect::Effect),
             })
         })
+}
+
+fn reclaim<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+    phrase("{kw: reclaim}")
+        .ignore_then(number(Energy).or_not())
+        .map(|n| StaticAbility::Reclaim { cost: n.map(Cost::Energy) })
 }

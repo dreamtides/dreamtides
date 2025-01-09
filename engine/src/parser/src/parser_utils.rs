@@ -28,6 +28,13 @@ pub fn numeric<'a, T>(
         .boxed()
 }
 
+/// Parses a number and maps it to a concrete type
+pub fn number<'a, T>(
+    function: impl Fn(u64) -> T + 'a,
+) -> impl Parser<'a, &'a str, T, ErrorType<'a>> {
+    text::int(10).map(move |s: &str| function(s.parse().unwrap())).boxed()
+}
+
 /// Parses "this event" or "this character"
 pub fn this<'a>() -> impl Parser<'a, &'a str, &'a str, ErrorType<'a>> {
     choice((phrase("this event"), phrase("this character"))).boxed()
