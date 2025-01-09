@@ -6,7 +6,9 @@ use chumsky::Parser;
 use core_data::numerics::{Energy, Spark};
 
 use crate::parser_utils::{number, numeric, phrase, this, ErrorType};
-use crate::{card_predicate_parser, condition_parser, cost_parser, standard_effect_parser};
+use crate::{
+    card_predicate_parser, condition_parser, cost_parser, determiner_parser, standard_effect_parser,
+};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
     choice((
@@ -21,6 +23,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
         simple_alternate_cost(),
         play_for_alternate_cost(),
         reclaim(),
+        spark_equal_to_predicate_count(),
     ))
     .boxed()
 }
@@ -137,4 +140,11 @@ fn reclaim<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
     phrase("{kw: reclaim}")
         .ignore_then(number(Energy).or_not())
         .map(|n| StaticAbility::Reclaim { cost: n.map(Cost::Energy) })
+}
+
+fn spark_equal_to_predicate_count<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+    phrase("this character's spark is equal to the number of")
+        .ignore_then(determiner_parser::counted_parser())
+        .map(|predicate| StaticAbility::SparkEqualToPredicateCount { predicate })
+        .boxed()
 }

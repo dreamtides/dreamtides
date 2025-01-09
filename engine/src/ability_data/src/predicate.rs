@@ -36,6 +36,12 @@ pub enum Predicate {
 
     /// Any other card matching a predicate, including enemy cards.
     AnyOther(CardPredicate),
+
+    /// Any card in your void matching a predicate.
+    YourVoid(CardPredicate),
+
+    /// Any card in the enemy void matching a predicate.
+    EnemyVoid(CardPredicate),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use crate::condition::Condition;
 use crate::cost::Cost;
 use crate::effect::Effect;
-use crate::predicate::CardPredicate;
+use crate::predicate::{CardPredicate, Predicate};
 
 /// A static ability represents something which modifies the rules of the game,
 /// either for this specific card or globally. Static abilities do not 'happen',
@@ -40,6 +40,9 @@ pub enum StaticAbility {
     PlayForAlternateCost(AlternateCost),
     Reclaim {
         cost: Option<Cost>,
+    },
+    SparkEqualToPredicateCount {
+        predicate: Predicate,
     },
 }
 

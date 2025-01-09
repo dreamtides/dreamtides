@@ -257,3 +257,15 @@ fn test_alternate_cost_with_condition() {
     ]
     "###);
 }
+
+#[test]
+fn test_spark_equal_to_void_count() {
+    let result = parse("This character's spark is equal to the number of cards in your void.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(SparkEqualToPredicateCount(
+        predicate: YourVoid(Card),
+      )),
+    ]
+    "###);
+}
