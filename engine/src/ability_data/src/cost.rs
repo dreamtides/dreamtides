@@ -8,6 +8,7 @@ use crate::predicate::{CardPredicate, Predicate};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Cost {
     AbandonCharacters(Predicate, u64),
+    AbandonDreamscapes(u64),
     BanishAllCardsFromYourVoid,
     BanishCardsFromEnemyVoid(u64),
     BanishCardsFromYourVoid(u64),

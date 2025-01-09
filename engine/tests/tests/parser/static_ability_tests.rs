@@ -269,3 +269,18 @@ fn test_spark_equal_to_void_count() {
     ]
     "###);
 }
+
+#[test]
+fn test_play_for_dreamscape_cost() {
+    let result = parse("You may play this event for $0 by abandoning a dreamscape.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(PlayForAlternateCost(AlternateCost(
+        condition: None,
+        energy_cost: Energy(0),
+        additional_cost: AbandonDreamscapes(1),
+        if_you_do: None,
+      ))),
+    ]
+    "###);
+}
