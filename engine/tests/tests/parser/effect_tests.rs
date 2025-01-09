@@ -8,7 +8,7 @@ fn test_gain_energy_for_each() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(Effect(GainEnergyForEach(
-        gained: Energy(1),
+        gains: Energy(1),
         for_each: Another(Character),
       ))),
     ]
@@ -129,8 +129,8 @@ fn test_each_matching_gains_spark_for_each() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(Effect(EachMatchingGainsSparkForEach(
-        matching: CharacterType(SpiritAnimal),
-        gained: Spark(1),
+        each: CharacterType(SpiritAnimal),
+        gains: Spark(1),
         for_each: CharacterType(SpiritAnimal),
       ))),
     ]
@@ -177,7 +177,7 @@ fn test_banish_any_number_then_materialize() {
     let result = parse("Banish any number of other characters you control, then materialize them.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(BanishThenMaterializeAllMatching(
+      Event(Effect(BanishThenMaterializeCount(
         target: Another(Character),
         count: AnyNumberOf,
       ))),
@@ -190,7 +190,7 @@ fn test_banish_up_to_two() {
     let result = parse("Banish up to two characters you control, then materialize them.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(BanishThenMaterializeAllMatching(
+      Event(Effect(BanishThenMaterializeCount(
         target: Your(Character),
         count: UpTo(2),
       ))),
@@ -209,7 +209,7 @@ fn test_banish_up_to_two_activated() {
         costs: [
           Energy(Energy(3)),
         ],
-        effect: Effect(BanishThenMaterializeAllMatching(
+        effect: Effect(BanishThenMaterializeCount(
           target: Another(Character),
           count: UpTo(2),
         )),

@@ -15,7 +15,7 @@ fn test_materialize_warrior_gain_spark() {
         trigger: Materialize(Another(CharacterType(Warrior))),
         effect: Effect(GainsSpark(
           target: This,
-          gained: Spark(1),
+          gains: Spark(1),
         )),
         options: None,
       )),
@@ -123,7 +123,7 @@ fn test_multiple_keyword_trigger_conditional() {
         ]),
         effect: WithOptions(EffectWithOptions(
           effect: GainEnergy(
-            gained: Energy(1),
+            gains: Energy(1),
           ),
           optional: None,
           condition: Some(PredicateCount(
@@ -146,7 +146,7 @@ fn test_once_per_turn_materialize() {
       Triggered(TriggeredAbility(
         trigger: Materialize(Your(Character)),
         effect: Effect(GainEnergy(
-          gained: Energy(1),
+          gains: Energy(1),
         )),
         options: Some(TriggeredAbilityOptions(
           once_per_turn: true,
@@ -184,7 +184,7 @@ fn test_gain_spark_on_materialize() {
         trigger: Materialize(Your(Character)),
         effect: Effect(GainsSpark(
           target: This,
-          gained: Spark(1),
+          gains: Spark(1),
         )),
         options: None,
       )),
@@ -219,7 +219,7 @@ fn test_once_per_turn_multiple_effects() {
         effect: List([
           EffectWithOptions(
             effect: GainEnergy(
-              gained: Energy(1),
+              gains: Energy(1),
             ),
             optional: None,
             condition: None,

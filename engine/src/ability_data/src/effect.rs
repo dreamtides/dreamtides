@@ -61,98 +61,33 @@ impl EffectWithOptions {
 /// triggered or activated ability on a character card.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum StandardEffect {
-    CreateTriggerUntilEndOfTurn {
-        trigger: Box<TriggeredAbility>,
-    },
-    DiscardCards {
-        count: u64,
-    },
-    DrawCards {
-        count: u64,
-    },
-    DrawMatchingCard {
-        predicate: CardPredicate,
-    },
-    DissolveCharacter {
-        target: Predicate,
-    },
-    DisableActivatedAbilitiesWhileInPlay {
-        target: Predicate,
-    },
-    GainsAegisThisTurn {
-        target: Predicate,
-    },
-    GainsSpark {
-        target: Predicate,
-        gained: Spark,
-    },
-    EachMatchingGainsSparkForEach {
-        matching: CardPredicate,
-        gained: Spark,
-        for_each: CardPredicate,
-    },
-    GainsSparkUntilYourNextMainPhaseForEach {
-        target: Predicate,
-        gained: Spark,
-        for_each: Predicate,
-    },
-    GainEnergy {
-        gained: Energy,
-    },
-    GainEnergyForEach {
-        gained: Energy,
-        for_each: Predicate,
-    },
-    BanishThenMaterialize {
-        target: Predicate,
-    },
-    BanishThenMaterializeAllMatching {
-        target: Predicate,
-        count: CountingExpression,
-    },
-    BanishCardsFromEnemyVoid {
-        count: u64,
-    },
-    AbandonAtEndOfTurn {
-        target: Predicate,
-    },
-    AbandonAndGainEnergyForSpark {
-        target: Predicate,
-        energy_per_spark: Energy,
-    },
-    Discover {
-        predicate: CardPredicate,
-    },
-    DiscoverAndThenMaterialize {
-        predicate: CardPredicate,
-    },
-    MaterializeRandomCharacters {
-        count: u64,
-        predicate: CardPredicate,
-    },
-    ReturnFromYourVoidToHand {
-        target: Predicate,
-    },
-    ReturnFromYourVoidToPlay {
-        target: Predicate,
-    },
-    GainsReclaimUntilEndOfTurn {
-        target: Predicate,
-    },
-    Kindle {
-        amount: Spark,
-    },
-    Negate {
-        target: Predicate,
-    },
-    DiscardCardFromEnemyHand {
-        predicate: CardPredicate,
-    },
+    AbandonAndGainEnergyForSpark { target: Predicate, energy_per_spark: Energy },
+    AbandonAtEndOfTurn { target: Predicate },
+    BanishCardsFromEnemyVoid { count: u64 },
+    BanishThenMaterialize { target: Predicate },
+    BanishThenMaterializeCount { target: Predicate, count: CountingExpression },
+    CreateTriggerUntilEndOfTurn { trigger: Box<TriggeredAbility> },
+    DisableActivatedAbilitiesWhileInPlay { target: Predicate },
+    DiscardCardFromEnemyHand { predicate: CardPredicate },
+    DiscardCards { count: u64 },
+    Discover { predicate: CardPredicate },
+    DiscoverAndThenMaterialize { predicate: CardPredicate },
+    DissolveCharacter { target: Predicate },
+    DrawCards { count: u64 },
+    DrawMatchingCard { predicate: CardPredicate },
+    EachMatchingGainsSparkForEach { each: CardPredicate, gains: Spark, for_each: CardPredicate },
+    GainEnergy { gains: Energy },
+    GainEnergyForEach { gains: Energy, for_each: Predicate },
+    GainsAegisThisTurn { target: Predicate },
+    GainsReclaimUntilEndOfTurn { target: Predicate },
+    GainsSpark { target: Predicate, gains: Spark },
+    GainsSparkUntilYourNextMainForEach { target: Predicate, gains: Spark, for_each: Predicate },
+    Kindle { amount: Spark },
+    MaterializeRandomCharacters { count: u64, predicate: CardPredicate },
+    Negate { target: Predicate },
+    PutOnTopOfEnemyDeck { target: Predicate },
+    ReturnCharactersToHandDrawCardForEach { count: CountingExpression },
+    ReturnFromYourVoidToHand { target: Predicate },
+    ReturnFromYourVoidToPlay { target: Predicate },
     SpendAllEnergyDrawAndDiscard,
-    PutOnTopOfEnemyDeck {
-        target: Predicate,
-    },
-    ReturnCharactersToHandDrawCardForEach {
-        count: CountingExpression,
-    },
 }

@@ -59,9 +59,9 @@ fn test_activated_spark_equal_to_warriors() {
         costs: [
           Energy(Energy(2)),
         ],
-        effect: Effect(GainsSparkUntilYourNextMainPhaseForEach(
+        effect: Effect(GainsSparkUntilYourNextMainForEach(
           target: Another(Character),
-          gained: Spark(1),
+          gains: Spark(1),
           for_each: Your(CharacterType(Warrior)),
         )),
         options: Some(ActivatedAbilityOptions(
@@ -156,7 +156,7 @@ fn test_discard_hand_gain_energy() {
           DiscardHand,
         ],
         effect: Effect(GainEnergy(
-          gained: Energy(1),
+          gains: Energy(1),
         )),
         options: None,
       )),

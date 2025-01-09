@@ -17,7 +17,7 @@ fn test_multiple_effects() {
           EffectWithOptions(
             effect: GainsSpark(
               target: This,
-              gained: Spark(1),
+              gains: Spark(1),
             ),
             optional: None,
             condition: None,
@@ -89,7 +89,7 @@ fn test_conditional_gain_energy() {
     [
       Event(WithOptions(EffectWithOptions(
         effect: GainEnergy(
-          gained: Energy(1),
+          gains: Energy(1),
         ),
         optional: None,
         condition: Some(PredicateCount(
@@ -111,7 +111,7 @@ fn test_conditional_optional_gain_energy() {
     [
       Event(WithOptions(EffectWithOptions(
         effect: GainEnergy(
-          gained: Energy(1),
+          gains: Energy(1),
         ),
         optional: Some(NoCost),
         condition: Some(PredicateCount(
@@ -175,7 +175,7 @@ fn test_optional_cost_banish_enemy() {
         costs: [],
         effect: WithOptions(EffectWithOptions(
           effect: GainEnergy(
-            gained: Energy(1),
+            gains: Energy(1),
           ),
           optional: Some(BanishCardsFromEnemyVoid(1)),
           condition: None,

@@ -9,9 +9,9 @@ fn test_gains_spark_until_main_phase_for_each_warrior() {
     result,
     @r###"
     [
-      Event(Effect(GainsSparkUntilYourNextMainPhaseForEach(
+      Event(Effect(GainsSparkUntilYourNextMainForEach(
         target: Your(Character),
-        gained: Spark(1),
+        gains: Spark(1),
         for_each: Your(CharacterType(Warrior)),
       ))),
     ]

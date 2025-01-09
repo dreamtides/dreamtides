@@ -13,7 +13,7 @@ fn test_multiple_abilities_with_br() {
         count: 1,
       ))),
       Event(Effect(GainEnergy(
-        gained: Energy(2),
+        gains: Energy(2),
       ))),
     ]
     "###
