@@ -5,6 +5,7 @@ pub mod cost;
 pub mod counting_expression;
 pub mod effect;
 pub mod predicate;
+pub mod standard_effect;
 pub mod static_ability;
 pub mod trigger_event;
 pub mod triggered_ability;

@@ -1,5 +1,6 @@
-use ability_data::effect::{Effect, StandardEffect};
+use ability_data::effect::Effect;
 use ability_data::predicate::Predicate;
+use ability_data::standard_effect::StandardEffect;
 use ability_data::triggered_ability::{TriggeredAbility, TriggeredAbilityOptions};
 use chumsky::prelude::*;
 use chumsky::Parser;
