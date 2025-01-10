@@ -279,9 +279,11 @@ fn test_abandon_any_number_draw_for_each() {
     [
       Event(List([
         EffectWithOptions(
-          effect: AbandonCharactersCount(
-            target: Your(Character),
-            count: AnyNumberOf,
+          effect: PayCost(
+            cost: AbandonCharactersCount(
+              target: Your(Character),
+              count: AnyNumberOf,
+            ),
           ),
           optional: None,
           condition: None,

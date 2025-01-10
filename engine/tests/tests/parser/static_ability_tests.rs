@@ -227,8 +227,8 @@ fn test_reclaim_with_draw_discard() {
           condition: None,
         ),
         EffectWithOptions(
-          effect: DiscardCards(
-            count: 2,
+          effect: PayCost(
+            cost: DiscardCards(Card, 2),
           ),
           optional: None,
           condition: None,

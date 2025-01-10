@@ -50,8 +50,8 @@ fn test_then_separator() {
           condition: None,
         ),
         EffectWithOptions(
-          effect: DiscardCards(
-            count: 1,
+          effect: PayCost(
+            cost: DiscardCards(Card, 1),
           ),
           optional: None,
           condition: None,

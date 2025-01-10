@@ -7,7 +7,8 @@ use core_data::numerics::{Energy, Points, Spark};
 
 use crate::parser_utils::{a_or_an, count, numeric, phrase, text_number, ErrorType};
 use crate::{
-    card_predicate_parser, counting_expression_parser, determiner_parser, trigger_event_parser,
+    card_predicate_parser, cost_parser, counting_expression_parser, determiner_parser,
+    trigger_event_parser,
 };
 
 /// Parses all standard game effects
@@ -26,8 +27,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         draw_matching_card(),
         draw_cards_for_each_abandoned(),
         draw_cards(),
-        discard_cards(),
-        banish_card_from_void(),
+        banish_card_from_enemy_void(),
         discard_card_from_enemy_hand(),
         return_all_but_one_character_draw_card_for_each(),
         put_on_top_of_deck(),
@@ -68,11 +68,11 @@ fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         gains_reclaim_until_end_of_turn(),
         negate(),
         abandon_at_end_of_turn(),
-        abandon_characters(),
         banish_then_materialize(),
         banish_any_number_then_materialize(),
         banish_character(),
         foresee(),
+        pay_cost(),
     ))
 }
 
@@ -111,12 +111,6 @@ fn dissolve_character<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
         .map(|predicate| StandardEffect::DissolveCharacter { target: predicate })
 }
 
-fn discard_cards<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    phrase("discard")
-        .ignore_then(choice((phrase("a card").to(1), numeric("", count, "cards"))))
-        .map(|count| StandardEffect::DiscardCards { count })
-}
-
 fn gains_aegis_this_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     determiner_parser::target_parser()
         .then_ignore(phrase("gains {kw: aegis} this turn"))
@@ -130,7 +124,7 @@ fn draw_matching_card<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
         .map(|card_predicate| StandardEffect::DrawMatchingCard { predicate: card_predicate })
 }
 
-fn banish_card_from_void<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+fn banish_card_from_enemy_void<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("banish")
         .ignore_then(choice((phrase("a card").to(1), numeric("", count, "cards"))))
         .then_ignore(phrase("from the enemy's void"))
@@ -325,14 +319,6 @@ fn banish_any_number_then_materialize<'a>(
         .map(|(count, target)| StandardEffect::BanishThenMaterializeCount { target, count })
 }
 
-fn abandon_characters<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    phrase("abandon")
-        .ignore_then(counting_expression_parser::parser())
-        .then(determiner_parser::your_action_counted_parser())
-        .map(|(count, target)| StandardEffect::AbandonCharactersCount { target, count })
-        .boxed()
-}
-
 fn draw_cards_for_each_abandoned<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("draw a card for each character abandoned")
         .to(StandardEffect::DrawCardsForEachAbandoned { count: 1 })
@@ -401,4 +387,8 @@ fn enemy_loses_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
         .then_ignore(just("s").or_not())
         .map(|count| StandardEffect::EnemyLosesPoints { count })
         .boxed()
+}
+
+fn pay_cost<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    cost_parser::standard_cost().map(|cost| StandardEffect::PayCost { cost })
 }

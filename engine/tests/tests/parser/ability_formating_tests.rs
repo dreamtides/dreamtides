@@ -44,8 +44,8 @@ fn test_multiple_abilities_with_flavor() {
       Event(Effect(DrawCards(
         count: 1,
       ))),
-      Event(Effect(DiscardCards(
-        count: 1,
+      Event(Effect(PayCost(
+        cost: DiscardCards(Card, 1),
       ))),
     ]
     "###
@@ -76,8 +76,8 @@ fn test_multiple_abilities_with_reminder() {
       Event(Effect(DrawCards(
         count: 1,
       ))),
-      Event(Effect(DiscardCards(
-        count: 1,
+      Event(Effect(PayCost(
+        cost: DiscardCards(Card, 1),
       ))),
     ]
     "###
@@ -96,8 +96,8 @@ fn test_reminder_and_flavor() {
       Event(Effect(DrawCards(
         count: 1,
       ))),
-      Event(Effect(DiscardCards(
-        count: 1,
+      Event(Effect(PayCost(
+        cost: DiscardCards(Card, 1),
       ))),
     ]
     "###

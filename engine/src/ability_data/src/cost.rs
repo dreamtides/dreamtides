@@ -1,6 +1,7 @@
 use core_data::numerics::Energy;
 use serde::{Deserialize, Serialize};
 
+use crate::counting_expression::CountingExpression;
 use crate::predicate::{CardPredicate, Predicate};
 
 /// Any action a player must take in order to play a card or activate an
@@ -8,6 +9,7 @@ use crate::predicate::{CardPredicate, Predicate};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Cost {
     AbandonCharacters(Predicate, u64),
+    AbandonCharactersCount { target: Predicate, count: CountingExpression },
     AbandonDreamscapes(u64),
     BanishAllCardsFromYourVoid,
     BanishCardsFromEnemyVoid(u64),
