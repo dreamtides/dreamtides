@@ -810,3 +810,19 @@ fn test_each_matching_gains_spark_until_next_main() {
     ]
     "###);
 }
+
+#[test]
+fn test_banish_enemy_void() {
+    let result = parse("$materialized: Banish the enemy's void.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Keywords([
+          Materialized,
+        ]),
+        effect: Effect(BanishEnemyVoid),
+        options: None,
+      )),
+    ]
+    "###);
+}

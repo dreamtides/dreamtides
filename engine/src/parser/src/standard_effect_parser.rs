@@ -108,6 +108,7 @@ fn game_state_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
         banish_then_materialize(),
         banish_any_number_then_materialize(),
         banish_character(),
+        banish_enemy_void(),
         take_extra_turn(),
         trigger_judgment_ability(),
         win_game(),
@@ -567,4 +568,8 @@ fn trigger_judgment_ability<'a>() -> impl Parser<'a, &'a str, StandardEffect, Er
 
 fn win_game<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("you win the game").to(StandardEffect::YouWinTheGame).boxed()
+}
+
+fn banish_enemy_void<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("banish the enemy's void").to(StandardEffect::BanishEnemyVoid).boxed()
 }
