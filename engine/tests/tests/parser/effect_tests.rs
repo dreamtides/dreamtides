@@ -553,3 +553,15 @@ fn test_event_gains_reclaim() {
     ]
     "###);
 }
+
+#[test]
+fn return_a_character_to_hand() {
+    let result = parse("Return a character to hand.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(ReturnToHand(
+        target: Any(Character),
+      ))),
+    ]
+    "###);
+}
