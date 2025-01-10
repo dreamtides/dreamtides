@@ -274,9 +274,22 @@ fn test_immediate_activated_banish_materialize() {
     [
       Activated(ActivatedAbility(
         costs: [],
-        effect: Effect(BanishThenMaterialize(
-          target: Another(Character),
-        )),
+        effect: List([
+          EffectWithOptions(
+            effect: BanishCharacter(
+              target: Another(Character),
+            ),
+            optional: None,
+            condition: None,
+          ),
+          EffectWithOptions(
+            effect: MaterializeCharacter(
+              target: It,
+            ),
+            optional: None,
+            condition: None,
+          ),
+        ]),
         options: Some(ActivatedAbilityOptions(
           is_fast: false,
           is_immediate: true,

@@ -108,8 +108,7 @@ fn game_state_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
         cards_in_void_gain_reclaim_this_turn(),
         negate(),
         abandon_at_end_of_turn(),
-        banish_then_materialize(),
-        banish_any_number_then_materialize(),
+        banish_collection(),
         banish_character(),
         banish_enemy_void(),
         take_extra_turn(),
@@ -367,21 +366,11 @@ fn banish_character<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<
         .map(|predicate| StandardEffect::BanishCharacter { target: predicate })
 }
 
-fn banish_then_materialize<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    phrase("banish")
-        .ignore_then(determiner_parser::target_parser())
-        .then_ignore(phrase(", then materialize it"))
-        .map(|target| StandardEffect::BanishThenMaterialize { target })
-        .boxed()
-}
-
-fn banish_any_number_then_materialize<'a>(
-) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+fn banish_collection<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("banish")
         .ignore_then(collection_expression_parser::parser())
         .then(determiner_parser::counted_parser())
-        .then_ignore(phrase(", then materialize them"))
-        .map(|(count, target)| StandardEffect::BanishThenMaterializeCount { target, count })
+        .map(|(collection, target)| StandardEffect::BanishCollection { target, count: collection })
 }
 
 fn materialize_character_from_void<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>

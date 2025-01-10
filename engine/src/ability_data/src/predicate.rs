@@ -17,6 +17,9 @@ pub enum Predicate {
     /// itself, like "when you discard this card, materialize it."
     It,
 
+    /// All cards referenced by this effect.
+    Them,
+
     /// Card which triggered an event. Used for applying effects to the
     /// triggering card, e.g. "Whenever you materialize a spirit animal, that
     /// character gains +1 spark."

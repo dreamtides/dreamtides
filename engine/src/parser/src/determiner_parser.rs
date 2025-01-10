@@ -15,6 +15,7 @@ pub fn target_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>>
         phrase("that character").to(Predicate::That),
         phrase("that event").to(Predicate::That),
         phrase("it").to(Predicate::It),
+        phrase("them").to(Predicate::Them),
         phrase("that card").to(Predicate::That),
         choice((phrase("another"), phrase("other")))
             .ignore_then(card_predicate_parser::parser())

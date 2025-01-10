@@ -18,8 +18,7 @@ pub enum StandardEffect {
     BanishEnemyVoid,
     BanishCharacter { target: Predicate },
     BanishCharacterUntilLeavesPlay { target: Predicate, until_leaves: Predicate },
-    BanishThenMaterialize { target: Predicate },
-    BanishThenMaterializeCount { target: Predicate, count: CollectionExpression },
+    BanishCollection { target: Predicate, count: CollectionExpression },
     CardsInVoidGainReclaimThisTurn { count: CollectionExpression, predicate: CardPredicate },
     Copy { target: Predicate },
     CopyNextPlayed { matching: Predicate, times: Option<u64> },
@@ -71,6 +70,7 @@ pub enum StandardEffect {
     SparkBecomes { collection: CollectionExpression, matching: CardPredicate, spark: Spark },
     SpendAllEnergyDrawAndDiscard,
     TakeExtraTurn,
+    ThenMaterializeIt,
     TriggerJudgmentAbility { matching: Predicate, collection: CollectionExpression },
     YouWinTheGame,
 }

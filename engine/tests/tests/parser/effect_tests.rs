@@ -159,13 +159,22 @@ fn test_banish_then_materialize() {
         trigger: Keywords([
           Materialized,
         ]),
-        effect: WithOptions(EffectWithOptions(
-          effect: BanishThenMaterialize(
-            target: Another(Character),
+        effect: List([
+          EffectWithOptions(
+            effect: BanishCharacter(
+              target: Another(Character),
+            ),
+            optional: Some(NoCost),
+            condition: None,
           ),
-          optional: Some(NoCost),
-          condition: None,
-        )),
+          EffectWithOptions(
+            effect: MaterializeCharacter(
+              target: It,
+            ),
+            optional: None,
+            condition: None,
+          ),
+        ]),
         options: None,
       )),
     ]
@@ -177,10 +186,23 @@ fn test_banish_any_number_then_materialize() {
     let result = parse("Banish any number of other characters you control, then materialize them.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(BanishThenMaterializeCount(
-        target: Another(Character),
-        count: AnyNumberOf,
-      ))),
+      Event(List([
+        EffectWithOptions(
+          effect: BanishCollection(
+            target: Another(Character),
+            count: AnyNumberOf,
+          ),
+          optional: None,
+          condition: None,
+        ),
+        EffectWithOptions(
+          effect: MaterializeCharacter(
+            target: Them,
+          ),
+          optional: None,
+          condition: None,
+        ),
+      ])),
     ]
     "###);
 }
@@ -190,10 +212,23 @@ fn test_banish_up_to_two() {
     let result = parse("Banish up to two characters you control, then materialize them.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(BanishThenMaterializeCount(
-        target: Your(Character),
-        count: UpTo(2),
-      ))),
+      Event(List([
+        EffectWithOptions(
+          effect: BanishCollection(
+            target: Your(Character),
+            count: UpTo(2),
+          ),
+          optional: None,
+          condition: None,
+        ),
+        EffectWithOptions(
+          effect: MaterializeCharacter(
+            target: Them,
+          ),
+          optional: None,
+          condition: None,
+        ),
+      ])),
     ]
     "###);
 }
@@ -209,10 +244,23 @@ fn test_banish_up_to_two_activated() {
         costs: [
           Energy(Energy(3)),
         ],
-        effect: Effect(BanishThenMaterializeCount(
-          target: Another(Character),
-          count: UpTo(2),
-        )),
+        effect: List([
+          EffectWithOptions(
+            effect: BanishCollection(
+              target: Another(Character),
+              count: UpTo(2),
+            ),
+            optional: None,
+            condition: None,
+          ),
+          EffectWithOptions(
+            effect: MaterializeCharacter(
+              target: Them,
+            ),
+            optional: None,
+            condition: None,
+          ),
+        ]),
         options: None,
       )),
     ]
