@@ -8,6 +8,7 @@ mod counting_expression_parser;
 mod determiner_parser;
 mod effect_parser;
 mod parser_utils;
+mod quantity_expression_parser;
 mod standard_effect_parser;
 mod static_ability_parser;
 mod trigger_event_parser;
