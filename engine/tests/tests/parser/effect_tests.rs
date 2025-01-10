@@ -548,6 +548,7 @@ fn test_event_gains_reclaim() {
         ]),
         effect: Effect(GainsReclaimUntilEndOfTurn(
           target: YourVoid(Event),
+          cost: None,
         )),
         options: None,
       )),
@@ -652,6 +653,19 @@ fn test_cards_in_void_gain_reclaim_this_turn() {
       Event(Effect(CardsInVoidGainReclaimThisTurn(
         count: All,
         predicate: Card,
+      ))),
+    ]
+    "###);
+}
+
+#[test]
+fn test_gains_reclaim_until_end_of_turn() {
+    let result = parse("An event in your void gains {kw: reclaim} $0 until end of turn.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(GainsReclaimUntilEndOfTurn(
+        target: YourVoid(Event),
+        cost: Some(Energy(0)),
       ))),
     ]
     "###);

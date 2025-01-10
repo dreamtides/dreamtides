@@ -230,8 +230,10 @@ fn return_from_void_to_play<'a>() -> impl Parser<'a, &'a str, StandardEffect, Er
 fn gains_reclaim_until_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
 {
     determiner_parser::target_parser()
-        .then_ignore(phrase("gains {kw: reclaim} until end of turn"))
-        .map(|target| StandardEffect::GainsReclaimUntilEndOfTurn { target })
+        .then_ignore(phrase("gains {kw: reclaim}"))
+        .then(numeric("$", Energy, "").or_not())
+        .then_ignore(phrase("until end of turn"))
+        .map(|(target, cost)| StandardEffect::GainsReclaimUntilEndOfTurn { target, cost })
         .boxed()
 }
 

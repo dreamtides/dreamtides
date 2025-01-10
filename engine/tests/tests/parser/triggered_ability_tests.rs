@@ -202,6 +202,7 @@ fn test_discard_gains_reclaim() {
         trigger: Discard(Your(Card)),
         effect: Effect(GainsReclaimUntilEndOfTurn(
           target: That,
+          cost: None,
         )),
         options: None,
       )),
