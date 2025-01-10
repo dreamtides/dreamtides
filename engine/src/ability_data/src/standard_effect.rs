@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use crate::cost::Cost;
 use crate::counting_expression::CountingExpression;
 use crate::predicate::{CardPredicate, Predicate};
+use crate::quantity_expression::QuantityExpression;
 use crate::triggered_ability::TriggeredAbility;
 
 /// Effects are the primary way in which cards modify the game state. This can
@@ -37,6 +38,7 @@ pub enum StandardEffect {
     GainEnergy { gains: Energy },
     GainEnergyForEach { gains: Energy, for_each: Predicate },
     GainPoints { gains: Points },
+    GainPointsForEach { gain: Points, for_count: QuantityExpression },
     GainsAegisThisTurn { target: Predicate },
     GainsReclaimUntilEndOfTurn { target: Predicate },
     GainsSpark { target: Predicate, gains: Spark },

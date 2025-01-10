@@ -565,3 +565,16 @@ fn return_a_character_to_hand() {
     ]
     "###);
 }
+
+#[test]
+fn test_gain_points_for_each() {
+    let result = parse("Gain 1 $point for each dream you have played this turn.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(GainPointsForEach(
+        gain: Points(1),
+        for_count: PlayedThisTurn(Dream),
+      ))),
+    ]
+    "###);
+}

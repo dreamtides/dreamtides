@@ -9,7 +9,7 @@ use core_data::numerics::{Energy, Points, Spark};
 use crate::parser_utils::{a_or_an, count, numeric, phrase, text_number, ErrorType};
 use crate::{
     card_predicate_parser, cost_parser, counting_expression_parser, determiner_parser,
-    trigger_event_parser,
+    quantity_expression_parser, trigger_event_parser,
 };
 
 /// Parses all standard game effects
@@ -56,6 +56,7 @@ fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         gains_aegis_this_turn(),
         gain_energy_for_each(),
         gain_energy(),
+        gain_points_for_each(),
         gain_points(),
         gain_control(),
         lose_points(),
@@ -407,5 +408,15 @@ fn return_to_hand<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a
         .ignore_then(determiner_parser::target_parser())
         .then_ignore(phrase("to hand"))
         .map(|target| StandardEffect::ReturnToHand { target })
+        .boxed()
+}
+
+fn gain_points_for_each<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("gain")
+        .ignore_then(numeric("", Points, "$point"))
+        .then_ignore(just("s").or_not())
+        .then_ignore(phrase("for each"))
+        .then(quantity_expression_parser::parser())
+        .map(|(gain, for_count)| StandardEffect::GainPointsForEach { gain, for_count })
         .boxed()
 }
