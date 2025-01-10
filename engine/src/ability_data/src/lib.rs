@@ -1,8 +1,8 @@
 pub mod ability;
 pub mod activated_ability;
+pub mod collection_expression;
 pub mod condition;
 pub mod cost;
-pub mod counting_expression;
 pub mod effect;
 pub mod predicate;
 pub mod quantity_expression;

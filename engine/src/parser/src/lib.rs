@@ -2,9 +2,9 @@ pub mod ability_parser;
 
 mod activated_ability_parser;
 mod card_predicate_parser;
+mod collection_expression_parser;
 mod condition_parser;
 mod cost_parser;
-mod counting_expression_parser;
 mod determiner_parser;
 mod effect_parser;
 mod parser_utils;

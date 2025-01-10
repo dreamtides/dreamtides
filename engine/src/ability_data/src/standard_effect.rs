@@ -1,8 +1,8 @@
 use core_data::numerics::{Energy, Points, Spark};
 use serde::{Deserialize, Serialize};
 
+use crate::collection_expression::CollectionExpression;
 use crate::cost::Cost;
-use crate::counting_expression::CountingExpression;
 use crate::predicate::{CardPredicate, Predicate};
 use crate::quantity_expression::QuantityExpression;
 use crate::triggered_ability::TriggeredAbility;
@@ -17,8 +17,8 @@ pub enum StandardEffect {
     BanishCardsFromEnemyVoid { count: u64 },
     BanishCharacter { target: Predicate },
     BanishThenMaterialize { target: Predicate },
-    BanishThenMaterializeCount { target: Predicate, count: CountingExpression },
-    CardsInVoidGainReclaimThisTurn { count: CountingExpression, predicate: CardPredicate },
+    BanishThenMaterializeCount { target: Predicate, count: CollectionExpression },
+    CardsInVoidGainReclaimThisTurn { count: CollectionExpression, predicate: CardPredicate },
     Copy { target: Predicate },
     CopyNextPlayed { matching: Predicate, times: Option<u64> },
     CreateTriggerUntilEndOfTurn { trigger: Box<TriggeredAbility> },
@@ -28,7 +28,7 @@ pub enum StandardEffect {
     Discover { predicate: CardPredicate },
     DiscoverAndThenMaterialize { predicate: CardPredicate },
     DissolveCharacter { target: Predicate },
-    DissolveCharactersCount { target: Predicate, count: CountingExpression },
+    DissolveCharactersCount { target: Predicate, count: CollectionExpression },
     DissolveCharactersQuantity { target: Predicate, quantity: QuantityExpression },
     DoubleYourEnergy,
     DrawCards { count: u64 },
@@ -59,7 +59,7 @@ pub enum StandardEffect {
     PayCost { cost: Cost },
     PutCardsFromYourDeckIntoVoid { count: u64 },
     PutOnTopOfEnemyDeck { target: Predicate },
-    ReturnCharactersToHandDrawCardForEach { count: CountingExpression },
+    ReturnCharactersToHandDrawCardForEach { count: CollectionExpression },
     ReturnFromYourVoidToHand { target: Predicate },
     ReturnFromYourVoidToPlay { target: Predicate },
     ReturnToHand { target: Predicate },

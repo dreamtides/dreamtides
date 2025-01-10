@@ -10,7 +10,7 @@ use crate::parser_utils::{
     a_or_an, a_or_count, count, number_of_times, numeric, phrase, text_number, ErrorType,
 };
 use crate::{
-    card_predicate_parser, cost_parser, counting_expression_parser, determiner_parser,
+    card_predicate_parser, collection_expression_parser, cost_parser, determiner_parser,
     quantity_expression_parser, trigger_event_parser,
 };
 
@@ -325,7 +325,7 @@ fn each_matching_gains_spark_for_each<'a>(
 fn return_all_but_one_character_draw_card_for_each<'a>(
 ) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("return")
-        .ignore_then(counting_expression_parser::parser())
+        .ignore_then(collection_expression_parser::parser())
         .then_ignore(phrase(
             "character you control to hand. draw a card for each character returned",
         ))
@@ -350,7 +350,7 @@ fn banish_then_materialize<'a>() -> impl Parser<'a, &'a str, StandardEffect, Err
 fn banish_any_number_then_materialize<'a>(
 ) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("banish")
-        .ignore_then(counting_expression_parser::parser())
+        .ignore_then(collection_expression_parser::parser())
         .then(determiner_parser::counted_parser())
         .then_ignore(phrase(", then materialize them"))
         .map(|(count, target)| StandardEffect::BanishThenMaterializeCount { target, count })
@@ -391,7 +391,7 @@ fn lose_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> 
 
 fn dissolve_characters_count<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("dissolve")
-        .ignore_then(counting_expression_parser::parser())
+        .ignore_then(collection_expression_parser::parser())
         .then(determiner_parser::counted_parser())
         .map(|(count, target)| StandardEffect::DissolveCharactersCount { target, count })
         .boxed()
@@ -479,7 +479,7 @@ fn copy_next_played<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<
 fn cards_in_void_gain_reclaim_this_turn<'a>(
 ) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("until end of turn,")
-        .ignore_then(counting_expression_parser::parser())
+        .ignore_then(collection_expression_parser::parser())
         .then(card_predicate_parser::parser())
         .then_ignore(phrase("in your void have {kw: reclaim}"))
         .map(|(count, predicate)| StandardEffect::CardsInVoidGainReclaimThisTurn {
