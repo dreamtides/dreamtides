@@ -643,3 +643,16 @@ fn test_copy_next_played() {
     ]
     "###);
 }
+
+#[test]
+fn test_cards_in_void_gain_reclaim_this_turn() {
+    let result = parse("Until end of turn, all cards in your void have {kw: reclaim}.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(CardsInVoidGainReclaimThisTurn(
+        count: All,
+        predicate: Card,
+      ))),
+    ]
+    "###);
+}

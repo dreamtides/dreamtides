@@ -74,6 +74,7 @@ fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         return_from_void_to_hand(),
         return_from_void_to_play(),
         gains_reclaim_until_end_of_turn(),
+        cards_in_void_gain_reclaim_this_turn(),
         negate(),
         abandon_at_end_of_turn(),
         banish_then_materialize(),
@@ -442,6 +443,19 @@ fn copy_next_played<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<
         .map(|(matching, times)| StandardEffect::CopyNextPlayed {
             matching: Predicate::Your(matching),
             times,
+        })
+        .boxed()
+}
+
+fn cards_in_void_gain_reclaim_this_turn<'a>(
+) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("until end of turn,")
+        .ignore_then(counting_expression_parser::parser())
+        .then(card_predicate_parser::parser())
+        .then_ignore(phrase("in your void have {kw: reclaim}"))
+        .map(|(count, predicate)| StandardEffect::CardsInVoidGainReclaimThisTurn {
+            count,
+            predicate,
         })
         .boxed()
 }
