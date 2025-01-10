@@ -620,3 +620,26 @@ fn test_copy_it() {
     ]
     "###);
 }
+
+#[test]
+fn test_copy_next_played() {
+    let result = parse("Copy the next event you play twice.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(CopyNextPlayed(
+        matching: Your(Event),
+        times: Some(2),
+      ))),
+    ]
+    "###);
+
+    let result = parse("Copy the next character you play.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(CopyNextPlayed(
+        matching: Your(Character),
+        times: None,
+      ))),
+    ]
+    "###);
+}

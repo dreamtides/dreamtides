@@ -6,7 +6,9 @@ use chumsky::prelude::*;
 use chumsky::Parser;
 use core_data::numerics::{Energy, Points, Spark};
 
-use crate::parser_utils::{a_or_an, a_or_count, count, numeric, phrase, text_number, ErrorType};
+use crate::parser_utils::{
+    a_or_an, a_or_count, count, number_of_times, numeric, phrase, text_number, ErrorType,
+};
 use crate::{
     card_predicate_parser, cost_parser, counting_expression_parser, determiner_parser,
     quantity_expression_parser, trigger_event_parser,
@@ -38,6 +40,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         dissolve_characters_count(),
         return_to_hand(),
         copy(),
+        copy_next_played(),
     ))
 }
 
@@ -428,5 +431,17 @@ fn copy<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("copy")
         .ignore_then(determiner_parser::target_parser())
         .map(|target| StandardEffect::Copy { target })
+        .boxed()
+}
+
+fn copy_next_played<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("copy the next")
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(phrase("you play"))
+        .then(number_of_times())
+        .map(|(matching, times)| StandardEffect::CopyNextPlayed {
+            matching: Predicate::Your(matching),
+            times,
+        })
         .boxed()
 }

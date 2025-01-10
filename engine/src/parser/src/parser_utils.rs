@@ -91,3 +91,8 @@ pub fn ordinal_number<'a>() -> impl Parser<'a, &'a str, u64, ErrorType<'a>> {
     ))
     .boxed()
 }
+
+/// Parses "twice" or a number followed by "times"
+pub fn number_of_times<'a>() -> impl Parser<'a, &'a str, Option<u64>, ErrorType<'a>> {
+    choice((phrase("twice").to(2), number(count).then_ignore(phrase("times")))).or_not().boxed()
+}
