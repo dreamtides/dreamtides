@@ -314,3 +314,17 @@ fn test_gain_energy_replacement() {
     ]
     "###);
 }
+
+#[test]
+fn test_draw_all_cards_win_game() {
+    let result = parse("When you draw all of the cards in a copy of your deck, you win the game.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: DrawAllCardsInCopyOfDeck,
+        effect: Effect(YouWinTheGame),
+        options: None,
+      )),
+    ]
+    "###);
+}

@@ -30,6 +30,9 @@ pub enum TriggerEvent {
 
     /// Event when you gain energy
     GainEnergy,
+
+    /// Event when you draw all cards in a copy of your deck
+    DrawAllCardsInCopyOfDeck,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

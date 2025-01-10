@@ -109,6 +109,7 @@ fn game_state_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
         banish_character(),
         take_extra_turn(),
         trigger_judgment_ability(),
+        win_game(),
     ))
     .boxed()
 }
@@ -551,4 +552,8 @@ fn trigger_judgment_ability<'a>() -> impl Parser<'a, &'a str, StandardEffect, Er
             collection: collection.unwrap_or(CollectionExpression::All),
         })
         .boxed()
+}
+
+fn win_game<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("you win the game").to(StandardEffect::YouWinTheGame).boxed()
 }

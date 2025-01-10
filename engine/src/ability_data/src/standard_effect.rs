@@ -67,4 +67,5 @@ pub enum StandardEffect {
     SpendAllEnergyDrawAndDiscard,
     TakeExtraTurn,
     TriggerJudgmentAbility { matching: Predicate, collection: CollectionExpression },
+    YouWinTheGame,
 }

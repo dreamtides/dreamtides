@@ -15,6 +15,7 @@ pub fn event_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a
         discard(),
         end_of_turn(),
         gain_energy(),
+        draw_all_cards_in_copy_of_deck(),
     ))
     .boxed()
 }
@@ -75,4 +76,10 @@ fn end_of_turn<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
 
 fn gain_energy<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
     phrase("you gain energy").to(TriggerEvent::GainEnergy).boxed()
+}
+
+fn draw_all_cards_in_copy_of_deck<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
+    phrase("you draw all of the cards in a copy of your deck")
+        .to(TriggerEvent::DrawAllCardsInCopyOfDeck)
+        .boxed()
 }
