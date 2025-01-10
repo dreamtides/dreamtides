@@ -685,3 +685,13 @@ fn test_gains_spark_for_quantity() {
     ]
     "###);
 }
+
+#[test]
+fn test_take_extra_turn() {
+    let result = parse("Take an extra turn after this one.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(TakeExtraTurn)),
+    ]
+    "###);
+}

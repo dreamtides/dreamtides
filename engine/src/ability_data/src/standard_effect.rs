@@ -60,4 +60,5 @@ pub enum StandardEffect {
     ReturnFromYourVoidToPlay { target: Predicate },
     ReturnToHand { target: Predicate },
     SpendAllEnergyDrawAndDiscard,
+    TakeExtraTurn,
 }

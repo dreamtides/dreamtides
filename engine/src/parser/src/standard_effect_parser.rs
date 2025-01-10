@@ -82,6 +82,7 @@ fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         banish_any_number_then_materialize(),
         banish_character(),
         foresee(),
+        take_extra_turn(),
     ))
 }
 
@@ -473,4 +474,8 @@ fn gains_spark_for_quantity<'a>() -> impl Parser<'a, &'a str, StandardEffect, Er
             for_quantity,
         })
         .boxed()
+}
+
+fn take_extra_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("take an extra turn after this one").to(StandardEffect::TakeExtraTurn).boxed()
 }
