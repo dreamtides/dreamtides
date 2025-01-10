@@ -27,6 +27,9 @@ pub enum TriggerEvent {
 
     /// Event when the end of your turn is reached
     EndOfYourTurn,
+
+    /// Event when you gain energy
+    GainEnergy,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

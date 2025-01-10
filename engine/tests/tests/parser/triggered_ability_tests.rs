@@ -294,3 +294,23 @@ fn test_play_from_hand() {
     ]
     "###);
 }
+
+#[test]
+fn test_gain_energy_replacement() {
+    let result =
+        parse("Until end of turn, whenever you gain energy, gain twice that much energy instead.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(CreateTriggerUntilEndOfTurn(
+        trigger: TriggeredAbility(
+          trigger: GainEnergy,
+          effect: Effect(GainTwiceThatMuchEnergyInstead),
+          options: Some(TriggeredAbilityOptions(
+            once_per_turn: false,
+            until_end_of_turn: true,
+          )),
+        ),
+      ))),
+    ]
+    "###);
+}

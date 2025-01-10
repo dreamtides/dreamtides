@@ -14,6 +14,7 @@ pub fn event_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a
         play(),
         discard(),
         end_of_turn(),
+        gain_energy(),
     ))
     .boxed()
 }
@@ -70,4 +71,8 @@ fn discard<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
 
 fn end_of_turn<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
     phrase("the end of your turn").to(TriggerEvent::EndOfYourTurn).boxed()
+}
+
+fn gain_energy<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
+    phrase("you gain energy").to(TriggerEvent::GainEnergy).boxed()
 }

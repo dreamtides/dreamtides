@@ -48,6 +48,7 @@ pub enum StandardEffect {
     GainsSpark { target: Predicate, gains: Spark },
     GainsSparkForQuantity { target: Predicate, gains: Spark, for_quantity: QuantityExpression },
     GainsSparkUntilYourNextMainForEach { target: Predicate, gains: Spark, for_each: Predicate },
+    GainTwiceThatMuchEnergyInstead,
     Kindle { amount: Spark },
     LosePoints { loses: Points },
     MaterializeCharacter { target: Predicate },

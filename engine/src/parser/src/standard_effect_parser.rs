@@ -29,6 +29,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         enemy_effects(),
         game_state_effects(),
         pay_cost(),
+        gain_twice_that_much_energy_instead(),
     ))
 }
 
@@ -504,5 +505,12 @@ fn take_extra_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'
 fn double_your_energy<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("double the amount of energy in your energy pool")
         .to(StandardEffect::DoubleYourEnergy)
+        .boxed()
+}
+
+fn gain_twice_that_much_energy_instead<'a>(
+) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("gain twice that much energy instead")
+        .to(StandardEffect::GainTwiceThatMuchEnergyInstead)
         .boxed()
 }
