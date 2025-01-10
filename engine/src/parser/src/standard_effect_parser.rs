@@ -55,6 +55,7 @@ fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         gain_energy_for_each(),
         gain_energy(),
         gain_points(),
+        gain_control(),
         lose_points(),
         enemy_gains_points_equal_to_its_spark(),
         enemy_gains_points(),
@@ -390,4 +391,11 @@ fn enemy_loses_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
 
 fn pay_cost<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     cost_parser::standard_cost().map(|cost| StandardEffect::PayCost { cost })
+}
+
+fn gain_control<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("gain control of")
+        .ignore_then(determiner_parser::target_parser())
+        .map(|target| StandardEffect::GainControl { target })
+        .boxed()
 }

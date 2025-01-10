@@ -83,6 +83,7 @@ pub enum StandardEffect {
     EnemyGainsPointsEqualToItsSpark,
     EnemyLosesPoints { count: u64 },
     Foresee { count: u64 },
+    GainControl { target: Predicate },
     GainEnergy { gains: Energy },
     GainEnergyForEach { gains: Energy, for_each: Predicate },
     GainPoints { gains: Points },

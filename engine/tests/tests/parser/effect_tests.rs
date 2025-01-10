@@ -502,3 +502,19 @@ fn test_abandon_a_character_or_discard_a_card() {
     ]
     "###);
 }
+
+#[test]
+fn test_gain_control() {
+    let result = parse("Gain control of an enemy character with cost $2 or less.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(GainControl(
+        target: Enemy(CardWithCost(
+          target: Character,
+          cost_operator: OrLess,
+          cost: Energy(2),
+        )),
+      ))),
+    ]
+    "###);
+}
