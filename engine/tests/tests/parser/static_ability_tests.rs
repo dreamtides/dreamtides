@@ -9,7 +9,7 @@ fn test_enemy_events_cost_more_to_play() {
     result,
     @r###"
     [
-      Static(EnemyAddedCostToPlay(
+      Static(EnemyCardsCostIncrease(
         matching: Event,
         increase: Energy(1),
       )),
@@ -125,6 +125,22 @@ fn test_character_cost_reduction() {
     [
       Static(YourCardsCostReduction(
         matching: Character,
+        reduction: Energy(2),
+      )),
+    ]
+    "###
+    );
+}
+
+#[test]
+fn test_cost_increase() {
+    let result = parse("Events cost you $2 more.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Static(YourCardsCostIncrease(
+        matching: Event,
         reduction: Energy(2),
       )),
     ]

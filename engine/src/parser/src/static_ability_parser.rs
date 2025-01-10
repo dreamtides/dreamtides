@@ -12,6 +12,7 @@ use crate::{
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
     choice((
+        cost_increase(),
         cost_reduction(),
         disable_enemy_materialized_abilities(),
         once_per_turn_play_from_void(),
@@ -40,7 +41,7 @@ fn enemy_added_cost_to_play<'a>() -> impl Parser<'a, &'a str, StaticAbility, Err
     phrase("the enemy's")
         .ignore_then(card_predicate_parser::parser())
         .then(numeric("cost $", Energy, "more"))
-        .map(|(predicate, cost)| StaticAbility::EnemyAddedCostToPlay {
+        .map(|(predicate, cost)| StaticAbility::EnemyCardsCostIncrease {
             matching: predicate,
             increase: cost,
         })
@@ -66,6 +67,15 @@ fn other_spark_bonus<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<
 
 fn has_all_character_types<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
     phrase("this character has all character types").to(StaticAbility::HasAllCharacterTypes)
+}
+
+fn cost_increase<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+    card_predicate_parser::parser().then(numeric("cost you $", Energy, "more")).map(
+        |(predicate, cost)| StaticAbility::YourCardsCostIncrease {
+            matching: predicate,
+            reduction: cost,
+        },
+    )
 }
 
 fn cost_reduction<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {

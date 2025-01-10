@@ -11,12 +11,16 @@ use crate::predicate::{CardPredicate, Predicate};
 /// they're just something that is always true.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum StaticAbility {
+    YourCardsCostIncrease {
+        matching: CardPredicate,
+        reduction: Energy,
+    },
     YourCardsCostReduction {
         matching: CardPredicate,
         reduction: Energy,
     },
     DisableEnemyMaterializedAbilities,
-    EnemyAddedCostToPlay {
+    EnemyCardsCostIncrease {
         matching: CardPredicate,
         increase: Energy,
     },
