@@ -24,6 +24,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
         play_for_alternate_cost(),
         reclaim(),
         spark_equal_to_predicate_count(),
+        characters_in_hand_have_fast(),
     ))
     .boxed()
 }
@@ -147,4 +148,8 @@ fn spark_equal_to_predicate_count<'a>() -> impl Parser<'a, &'a str, StaticAbilit
         .ignore_then(determiner_parser::counted_parser())
         .map(|predicate| StaticAbility::SparkEqualToPredicateCount { predicate })
         .boxed()
+}
+
+fn characters_in_hand_have_fast<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+    phrase("characters in your hand have '$fast'").to(StaticAbility::CharactersInHandHaveFast)
 }

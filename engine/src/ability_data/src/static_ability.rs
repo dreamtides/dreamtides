@@ -44,6 +44,7 @@ pub enum StaticAbility {
     SparkEqualToPredicateCount {
         predicate: Predicate,
     },
+    CharactersInHandHaveFast,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
