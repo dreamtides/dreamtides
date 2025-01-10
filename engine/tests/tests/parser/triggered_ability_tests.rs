@@ -277,3 +277,19 @@ fn test_end_of_turn() {
     ]
     "###);
 }
+
+#[test]
+fn test_play_from_hand() {
+    let result = parse("Whenever you play an event from your hand, copy it.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: PlayFromHand(Your(Event)),
+        effect: Effect(Copy(
+          target: It,
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}

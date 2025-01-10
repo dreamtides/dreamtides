@@ -19,6 +19,9 @@ pub enum TriggerEvent {
     /// Event when a card matching a predicate is played
     Play(Predicate),
 
+    /// Event when a card matching a predicate is played from hand
+    PlayFromHand(Predicate),
+
     /// Event when a card matching a predicate is discarded
     Discard(Predicate),
 
