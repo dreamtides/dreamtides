@@ -6,7 +6,7 @@ use chumsky::prelude::*;
 use chumsky::Parser;
 use core_data::numerics::{Energy, Points, Spark};
 
-use crate::parser_utils::{a_or_an, count, numeric, phrase, text_number, ErrorType};
+use crate::parser_utils::{a_or_an, a_or_count, count, numeric, phrase, text_number, ErrorType};
 use crate::{
     card_predicate_parser, cost_parser, counting_expression_parser, determiner_parser,
     quantity_expression_parser, trigger_event_parser,
@@ -26,6 +26,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
 fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     choice((
         draw_matching_card(),
+        draw_cards_for_each(),
         draw_cards_for_each_abandoned(),
         draw_cards(),
         banish_card_from_enemy_void(),
@@ -419,4 +420,12 @@ fn gain_points_for_each<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorT
         .then(quantity_expression_parser::parser())
         .map(|(gain, for_count)| StandardEffect::GainPointsForEach { gain, for_count })
         .boxed()
+}
+
+fn draw_cards_for_each<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("draw")
+        .ignore_then(a_or_count("card", "cards"))
+        .then_ignore(phrase("for each"))
+        .then(quantity_expression_parser::parser())
+        .map(|(count, for_count)| StandardEffect::DrawCardsForEach { count, for_each: for_count })
 }

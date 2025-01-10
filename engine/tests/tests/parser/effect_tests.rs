@@ -578,3 +578,16 @@ fn test_gain_points_for_each() {
     ]
     "###);
 }
+
+#[test]
+fn test_draw_cards_for_each() {
+    let result = parse("Draw a card for each dream you have played this turn.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(DrawCardsForEach(
+        count: 1,
+        for_each: PlayedThisTurn(Dream),
+      ))),
+    ]
+    "###);
+}

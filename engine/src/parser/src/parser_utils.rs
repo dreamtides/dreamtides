@@ -45,6 +45,17 @@ pub fn a_or_an<'a>() -> impl Parser<'a, &'a str, &'a str, ErrorType<'a>> {
     choice((phrase("an"), phrase("a"))).boxed()
 }
 
+/// Parses "a" or a number followed by a word
+pub fn a_or_count<'a>(
+    string: &'static str,
+    plural: &'static str,
+) -> impl Parser<'a, &'a str, u64, ErrorType<'a>> {
+    choice((
+        phrase("a").then_ignore(phrase(string)).to(1),
+        number(count).then_ignore(phrase(plural)),
+    ))
+}
+
 /// Parses a number that can be either written as text (e.g. "two") or as a
 /// numeral
 pub fn text_number<'a>() -> impl Parser<'a, &'a str, u64, ErrorType<'a>> {
