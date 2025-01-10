@@ -62,6 +62,7 @@ fn spark_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>
         gain_spark(),
         abandon_and_gain_energy_for_spark(),
         each_matching_gains_spark_for_each(),
+        each_matching_gains_spark_until_next_main(),
         kindle(),
     ))
 }
@@ -307,6 +308,16 @@ fn put_on_top_of_deck<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
         .ignore_then(determiner_parser::target_parser())
         .then_ignore(phrase("on top of the enemy's deck"))
         .map(|target| StandardEffect::PutOnTopOfEnemyDeck { target })
+        .boxed()
+}
+
+fn each_matching_gains_spark_until_next_main<'a>(
+) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("each")
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(phrase("you control gains +"))
+        .then(numeric("", Spark, "spark until your next main phase"))
+        .map(|(each, gains)| StandardEffect::EachMatchingGainsSparkUntilNextMain { each, gains })
         .boxed()
 }
 

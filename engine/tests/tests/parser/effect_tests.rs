@@ -795,3 +795,18 @@ fn test_trigger_judgment_ability() {
     ]
     "###);
 }
+
+#[test]
+fn test_each_matching_gains_spark_until_next_main() {
+    let result = parse(
+        "Each {cardtype: spirit animal} you control gains +2 spark until your next main phase.",
+    );
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(EachMatchingGainsSparkUntilNextMain(
+        each: CharacterType(SpiritAnimal),
+        gains: Spark(2),
+      ))),
+    ]
+    "###);
+}
