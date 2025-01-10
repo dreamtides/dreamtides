@@ -18,23 +18,27 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, ActivatedAbility, ErrorType<'a>>
             is_immediate: false,
             is_multi: true,
         })))
-        .or(phrase("$immediate").then(phrase("$activated")).to(Some(ActivatedAbilityOptions {
+        .or(phrase("$activated").to(None))
+        .or(phrase("$immediate $activated").to(Some(ActivatedAbilityOptions {
             is_fast: false,
             is_immediate: true,
             is_multi: false,
         })))
-        .or(phrase("$immediate").then(phrase("$multiactivated")).to(Some(
-            ActivatedAbilityOptions { is_fast: false, is_immediate: true, is_multi: true },
-        )))
-        .or(phrase("$immediate").then(phrase("$fastactivated")).to(Some(ActivatedAbilityOptions {
+        .or(phrase("$immediate $multiactivated").to(Some(ActivatedAbilityOptions {
+            is_fast: false,
+            is_immediate: true,
+            is_multi: true,
+        })))
+        .or(phrase("$immediate $fastactivated").to(Some(ActivatedAbilityOptions {
             is_fast: true,
             is_immediate: true,
             is_multi: false,
         })))
-        .or(phrase("$immediate").then(phrase("$fastmultiactivated")).to(Some(
-            ActivatedAbilityOptions { is_fast: true, is_immediate: true, is_multi: true },
-        )))
-        .or(phrase("$activated").to(None))
+        .or(phrase("$immediate $fastmultiactivated").to(Some(ActivatedAbilityOptions {
+            is_fast: true,
+            is_immediate: true,
+            is_multi: true,
+        })))
         .boxed();
 
     let costs = cost_parser::parser().separated_by(phrase(",")).collect::<Vec<_>>();
