@@ -28,5 +28,11 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Condition, ErrorType<'a>> {
             numeric("you have discarded", count, "cards this turn")
                 .map(|count| Condition::CardsDiscardedThisTurn { count }),
         )),
+        choice((
+            phrase("you have drawn a card this turn")
+                .to(Condition::CardsDrawnThisTurn { count: 1 }),
+            numeric("you have drawn", count, "or more cards this turn")
+                .map(|count| Condition::CardsDrawnThisTurn { count }),
+        )),
     ))
 }

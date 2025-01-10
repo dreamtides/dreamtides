@@ -294,3 +294,19 @@ fn test_characters_in_hand_have_fast() {
     ]
     "###);
 }
+
+#[test]
+fn test_if_you_have_drawn_two_or_more() {
+    let result = parse("If you have drawn 2 or more cards this turn, you may play this character from your void for $1.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(PlayFromVoidWithConditionAndCost(
+        condition: CardsDrawnThisTurn(
+          count: 2,
+        ),
+        energy_cost: Energy(1),
+        additional_cost: NoCost,
+      )),
+    ]
+    "###);
+}
