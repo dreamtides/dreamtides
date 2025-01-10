@@ -52,6 +52,10 @@ pub enum StaticAbility {
     JudgmentTriggersWhenMaterialized {
         predicate: Predicate,
     },
+    YouMayLookAtTopCardOfYourDeck,
+    YouMayPlayFromTopOfDeck {
+        matching: CardPredicate,
+    },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

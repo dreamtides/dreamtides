@@ -27,6 +27,8 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
         spark_equal_to_predicate_count(),
         characters_in_hand_have_fast(),
         judgment_triggers_when_materialized(),
+        look_at_top_card(),
+        play_from_top_of_deck(),
     ))
     .boxed()
 }
@@ -175,4 +177,16 @@ fn judgment_triggers_when_materialized<'a>(
         .ignore_then(determiner_parser::counted_parser())
         .then_ignore(phrase("triggers when you materialize them"))
         .map(|predicate| StaticAbility::JudgmentTriggersWhenMaterialized { predicate })
+}
+
+fn look_at_top_card<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+    phrase("you may look at the top card of your deck")
+        .to(StaticAbility::YouMayLookAtTopCardOfYourDeck)
+}
+
+fn play_from_top_of_deck<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+    phrase("you may play")
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(phrase("from the top of your deck"))
+        .map(|matching| StaticAbility::YouMayPlayFromTopOfDeck { matching })
 }
