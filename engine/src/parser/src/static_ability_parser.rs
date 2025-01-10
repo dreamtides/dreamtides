@@ -116,14 +116,18 @@ fn play_from_void_with_condition<'a>() -> impl Parser<'a, &'a str, StaticAbility
 }
 
 fn play_for_alternate_cost<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
-    phrase("you may play")
-        .ignore_then(this())
-        .ignore_then(numeric("for $", Energy, ""))
+    phrase("if")
+        .ignore_then(condition_parser::parser())
+        .then_ignore(phrase(","))
+        .or_not()
+        .then_ignore(phrase("you may play"))
+        .then_ignore(this())
+        .then(numeric("for $", Energy, ""))
         .then(phrase("by").ignore_then(cost_parser::inflected_additional_cost()).or_not())
         .then(phrase(". if you do,").ignore_then(standard_effect_parser::parser()).or_not())
-        .map(|((energy_cost, additional_cost), if_you_do)| {
+        .map(|(((condition, energy_cost), additional_cost), if_you_do)| {
             StaticAbility::PlayForAlternateCost(AlternateCost {
-                condition: None,
+                condition,
                 energy_cost,
                 additional_cost: additional_cost.unwrap_or(Cost::NoCost),
                 if_you_do: if_you_do.map(Effect::Effect),

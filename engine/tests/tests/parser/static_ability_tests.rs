@@ -326,3 +326,20 @@ fn test_if_you_have_drawn_two_or_more() {
     ]
     "###);
 }
+
+#[test]
+fn test_play_for_alternate_cost_with_condition() {
+    let result = parse("If you have 8 or more cards in your void, you may play this event for $0 by banishing all other cards from your void.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(PlayForAlternateCost(AlternateCost(
+        condition: Some(CardsInVoidCount(
+          count: 8,
+        )),
+        energy_cost: Energy(0),
+        additional_cost: BanishAllCardsFromYourVoid,
+        if_you_do: None,
+      ))),
+    ]
+    "###);
+}
