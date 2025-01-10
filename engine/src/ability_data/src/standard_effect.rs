@@ -25,6 +25,7 @@ pub enum StandardEffect {
     CreateTriggerUntilEndOfTurn { trigger: Box<TriggeredAbility> },
     DisableActivatedAbilitiesWhileInPlay { target: Predicate },
     DiscardCardFromEnemyHand { predicate: CardPredicate },
+    DiscardCardFromEnemyHandThenTheyDraw { predicate: CardPredicate },
     DiscardCards { count: u64 },
     Discover { predicate: CardPredicate },
     DiscoverAndThenMaterialize { predicate: CardPredicate },

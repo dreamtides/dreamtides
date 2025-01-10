@@ -39,6 +39,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         draw_cards_for_each(),
         draw_cards(),
         banish_card_from_enemy_void(),
+        discard_card_from_enemy_hand_then_they_draw(),
         discard_card_from_enemy_hand(),
         return_all_but_one_character_draw_card_for_each(),
         put_on_top_of_deck(),
@@ -287,6 +288,16 @@ fn discard_card_from_enemy_hand<'a>() -> impl Parser<'a, &'a str, StandardEffect
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(phrase("from it. the enemy discards that card"))
         .map(|predicate| StandardEffect::DiscardCardFromEnemyHand { predicate })
+        .boxed()
+}
+
+fn discard_card_from_enemy_hand_then_they_draw<'a>(
+) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("look at the enemy's hand. you may choose")
+        .ignore_then(a_or_an())
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(phrase("from it. the enemy discards that card and then draws a card"))
+        .map(|predicate| StandardEffect::DiscardCardFromEnemyHandThenTheyDraw { predicate })
         .boxed()
 }
 

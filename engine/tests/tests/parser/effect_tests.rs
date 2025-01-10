@@ -847,3 +847,15 @@ fn test_spark_becomes() {
     ]
     "###);
 }
+
+#[test]
+fn test_discard_card_from_enemy_hand_then_they_draw() {
+    let result = parse("Look at the enemy's hand. You may choose a card from it. The enemy discards that card and then draws a card.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(DiscardCardFromEnemyHandThenTheyDraw(
+        predicate: Card,
+      ))),
+    ]
+    "###);
+}
