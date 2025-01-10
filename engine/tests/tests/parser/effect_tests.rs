@@ -927,3 +927,30 @@ fn test_banish_character_until_leaves_play() {
     ]
     "###);
 }
+
+#[test]
+fn test_materialize_character_at_end_of_turn() {
+    let result =
+        parse("Banish any number of characters you control, then materialize them at end of turn.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(List([
+        EffectWithOptions(
+          effect: BanishCollection(
+            target: Your(Character),
+            count: AnyNumberOf,
+          ),
+          optional: None,
+          condition: None,
+        ),
+        EffectWithOptions(
+          effect: MaterializeCharacterAtEndOfTurn(
+            target: Them,
+          ),
+          optional: None,
+          condition: None,
+        ),
+      ])),
+    ]
+    "###);
+}

@@ -56,6 +56,7 @@ pub enum StandardEffect {
     Kindle { amount: Spark },
     LosePoints { loses: Points },
     MaterializeCharacter { target: Predicate },
+    MaterializeCharacterAtEndOfTurn { target: Predicate },
     MaterializeCharacterFromVoid { target: CardPredicate },
     MaterializeRandomFromDeck { count: u64, predicate: CardPredicate },
     Negate { target: Predicate },

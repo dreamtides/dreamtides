@@ -45,6 +45,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         put_on_top_of_deck(),
         spend_all_energy_draw_and_discard(),
         materialize_character_from_void(),
+        materialize_character_at_end_of_turn(),
         materialize_character(),
         dissolve_characters_count(),
         dissolve_characters_quantity(),
@@ -387,6 +388,15 @@ fn materialize_character<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
     phrase("materialize")
         .ignore_then(determiner_parser::target_parser())
         .map(|target| StandardEffect::MaterializeCharacter { target })
+        .boxed()
+}
+
+fn materialize_character_at_end_of_turn<'a>(
+) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("materialize")
+        .ignore_then(determiner_parser::target_parser())
+        .then_ignore(phrase("at end of turn"))
+        .map(|target| StandardEffect::MaterializeCharacterAtEndOfTurn { target })
         .boxed()
 }
 
