@@ -8,7 +8,8 @@ use chumsky::Parser;
 use core_data::numerics::{Energy, Points, Spark};
 
 use crate::parser_utils::{
-    a_or_an, a_or_count, count, number_of_times, numeric, phrase, text_number, ErrorType,
+    a_or_an, a_or_count, card_or_cards, count, number_of_times, numeric, phrase, text_number,
+    ErrorType,
 };
 use crate::{
     card_predicate_parser, collection_expression_parser, cost_parser, determiner_parser,
@@ -55,6 +56,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         copy_next_played(),
         shuffle_hand_and_deck_and_draw(),
         put_cards_from_deck_into_void(),
+        each_player_discard_cards(),
     ))
 }
 
@@ -487,7 +489,8 @@ fn gain_points_for_each<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorT
 
 fn draw_cards_for_each<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("draw")
-        .ignore_then(a_or_count("card", "cards"))
+        .ignore_then(a_or_count())
+        .then_ignore(card_or_cards())
         .then_ignore(phrase("for each"))
         .then(quantity_expression_parser::parser())
         .map(|(count, for_count)| StandardEffect::DrawCardsForEach { count, for_each: for_count })
@@ -627,5 +630,13 @@ fn banish_until_next_main<'a>() -> impl Parser<'a, &'a str, StandardEffect, Erro
         .ignore_then(determiner_parser::target_parser())
         .then_ignore(phrase("until the start of your next main phase"))
         .map(|target| StandardEffect::BanishUntilNextMain { target })
+        .boxed()
+}
+
+fn each_player_discard_cards<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("each player discards")
+        .ignore_then(a_or_count())
+        .then_ignore(card_or_cards())
+        .map(|count| StandardEffect::EachPlayerDiscardCards { count })
         .boxed()
 }

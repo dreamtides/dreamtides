@@ -1010,3 +1010,21 @@ fn test_materialize_copy_character() {
     ]
     "###);
 }
+
+#[test]
+fn test_each_player_discard_cards() {
+    let result = parse("$materialized: Each player discards a card.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Keywords([
+          Materialized,
+        ]),
+        effect: Effect(EachPlayerDiscardCards(
+          count: 1,
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}
