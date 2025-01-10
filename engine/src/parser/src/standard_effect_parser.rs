@@ -1,3 +1,4 @@
+use ability_data::collection_expression::CollectionExpression;
 use ability_data::effect::Effect;
 use ability_data::predicate::Predicate;
 use ability_data::standard_effect::StandardEffect;
@@ -107,6 +108,7 @@ fn game_state_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
         banish_any_number_then_materialize(),
         banish_character(),
         take_extra_turn(),
+        trigger_judgment_ability(),
     ))
     .boxed()
 }
@@ -537,5 +539,16 @@ fn dissolve_characters_quantity<'a>() -> impl Parser<'a, &'a str, StandardEffect
 fn put_cards_from_deck_into_void<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     numeric("put the top", count, "cards of your deck into your void")
         .map(|count| StandardEffect::PutCardsFromYourDeckIntoVoid { count })
+        .boxed()
+}
+
+fn trigger_judgment_ability<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("trigger the '$judgment' ability of")
+        .ignore_then(collection_expression_parser::parser().or_not())
+        .then(determiner_parser::counted_parser())
+        .map(|(collection, matching)| StandardEffect::TriggerJudgmentAbility {
+            matching,
+            collection: collection.unwrap_or(CollectionExpression::All),
+        })
         .boxed()
 }

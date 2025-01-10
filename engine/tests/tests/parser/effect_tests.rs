@@ -782,3 +782,16 @@ fn test_put_cards_from_deck_into_void() {
     ]
     "###);
 }
+
+#[test]
+fn test_trigger_judgment_ability() {
+    let result = parse("Trigger the '$judgment' ability of each character you control.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(TriggerJudgmentAbility(
+        matching: Your(Character),
+        collection: All,
+      ))),
+    ]
+    "###);
+}

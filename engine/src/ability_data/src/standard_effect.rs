@@ -66,4 +66,5 @@ pub enum StandardEffect {
     ShuffleHandAndDeckAndDraw { count: u64 },
     SpendAllEnergyDrawAndDiscard,
     TakeExtraTurn,
+    TriggerJudgmentAbility { matching: Predicate, collection: CollectionExpression },
 }
