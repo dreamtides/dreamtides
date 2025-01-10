@@ -27,7 +27,6 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
     choice((
         draw_matching_card(),
         draw_cards_for_each(),
-        draw_cards_for_each_abandoned(),
         draw_cards(),
         banish_card_from_enemy_void(),
         discard_card_from_enemy_hand(),
@@ -321,12 +320,6 @@ fn banish_any_number_then_materialize<'a>(
         .then(determiner_parser::counted_parser())
         .then_ignore(phrase(", then materialize them"))
         .map(|(count, target)| StandardEffect::BanishThenMaterializeCount { target, count })
-}
-
-fn draw_cards_for_each_abandoned<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    phrase("draw a card for each character abandoned")
-        .to(StandardEffect::DrawCardsForEachAbandoned { count: 1 })
-        .boxed()
 }
 
 fn materialize_character_from_void<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>

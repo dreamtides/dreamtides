@@ -289,8 +289,9 @@ fn test_abandon_any_number_draw_for_each() {
           condition: None,
         ),
         EffectWithOptions(
-          effect: DrawCardsForEachAbandoned(
+          effect: DrawCardsForEach(
             count: 1,
+            for_each: CharacterAbandoned(Character),
           ),
           optional: None,
           condition: None,

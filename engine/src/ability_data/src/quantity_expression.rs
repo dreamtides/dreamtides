@@ -10,4 +10,5 @@ pub enum QuantityExpression {
     CardsDrawnThisTurn(CardPredicate),
     CardsInVoid(CardPredicate),
     PlayedThisTurn(CardPredicate),
+    CharacterAbandoned(CardPredicate),
 }
