@@ -8,7 +8,7 @@ use crate::predicate::CardPredicate;
 pub enum QuantityExpression {
     DiscardedThisTurn(CardPredicate),
     CardsDrawnThisTurn(CardPredicate),
-    CardsInVoid(CardPredicate),
+    CardsInYourVoid(CardPredicate),
     PlayedThisTurn(CardPredicate),
     CharacterAbandoned(CardPredicate),
 }

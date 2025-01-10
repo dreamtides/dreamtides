@@ -757,3 +757,16 @@ fn test_shuffle_hand_and_deck_and_draw() {
     ]
     "###);
 }
+
+#[test]
+fn test_dissolve_characters_quantity() {
+    let result = parse("Dissolve an enemy character with cost less than or equal to the number of cards in your void.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(DissolveCharactersQuantity(
+        target: Enemy(Character),
+        quantity: CardsInYourVoid(Card),
+      ))),
+    ]
+    "###);
+}

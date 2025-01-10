@@ -45,6 +45,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         materialize_character_from_void(),
         materialize_character(),
         dissolve_characters_count(),
+        dissolve_characters_quantity(),
         return_to_hand(),
         copy(),
         copy_next_played(),
@@ -520,5 +521,14 @@ fn shuffle_hand_and_deck_and_draw<'a>() -> impl Parser<'a, &'a str, StandardEffe
     phrase("each player may shuffle their hand and void into their deck and then draw")
         .ignore_then(numeric("", count, "cards"))
         .map(|count| StandardEffect::ShuffleHandAndDeckAndDraw { count })
+        .boxed()
+}
+
+fn dissolve_characters_quantity<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("dissolve")
+        .ignore_then(determiner_parser::target_parser())
+        .then_ignore(phrase("with cost less than or equal to the number of"))
+        .then(quantity_expression_parser::parser())
+        .map(|(target, quantity)| StandardEffect::DissolveCharactersQuantity { target, quantity })
         .boxed()
 }
