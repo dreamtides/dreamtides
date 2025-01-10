@@ -261,3 +261,19 @@ fn test_materialize_nth_this_turn() {
     "###
     );
 }
+
+#[test]
+fn test_end_of_turn() {
+    let result = parse("At the end of your turn, gain $2.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: EndOfYourTurn,
+        effect: Effect(GainEnergy(
+          gains: Energy(2),
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}

@@ -21,6 +21,9 @@ pub enum TriggerEvent {
 
     /// Event when a card matching a predicate is discarded
     Discard(Predicate),
+
+    /// Event when the end of your turn is reached
+    EndOfYourTurn,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

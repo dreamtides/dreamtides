@@ -7,7 +7,7 @@ use crate::parser_utils::{ordinal_number, phrase, ErrorType};
 use crate::{card_predicate_parser, determiner_parser};
 
 pub fn event_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
-    choice((materialize_nth_this_turn(), materialize(), play(), discard())).boxed()
+    choice((materialize_nth_this_turn(), materialize(), play(), discard(), end_of_turn())).boxed()
 }
 
 pub fn keyword_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
@@ -50,4 +50,8 @@ fn discard<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
         .ignore_then(determiner_parser::your_action())
         .map(TriggerEvent::Discard)
         .boxed()
+}
+
+fn end_of_turn<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
+    phrase("the end of your turn").to(TriggerEvent::EndOfYourTurn).boxed()
 }

@@ -20,7 +20,7 @@ fn keyword_trigger_parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, Er
 pub fn standard_trigger_parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, ErrorType<'a>> {
     phrase("once per turn,")
         .or_not()
-        .then_ignore(choice((phrase("whenever"), phrase("when"))))
+        .then_ignore(choice((phrase("whenever"), phrase("when"), phrase("at"))))
         .then(trigger_event_parser::event_parser())
         .then_ignore(phrase(","))
         .then(effect_parser::effect())
