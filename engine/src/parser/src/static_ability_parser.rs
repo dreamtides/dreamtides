@@ -22,6 +22,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
         play_from_void(),
         simple_alternate_cost(),
         play_for_alternate_cost(),
+        play_only_from_void(),
         reclaim(),
         spark_equal_to_predicate_count(),
         characters_in_hand_have_fast(),
@@ -181,4 +182,10 @@ fn play_from_top_of_deck<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorT
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(phrase("from the top of your deck"))
         .map(|matching| StaticAbility::YouMayPlayFromTopOfDeck { matching })
+}
+
+fn play_only_from_void<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+    phrase("you may only play this character from your void")
+        .to(StaticAbility::PlayOnlyFromVoid)
+        .boxed()
 }

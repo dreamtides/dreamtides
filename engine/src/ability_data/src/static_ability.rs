@@ -20,6 +20,7 @@ pub enum StaticAbility {
     HasAllCharacterTypes,
     PlayFromVoid(PlayFromVoid),
     PlayForAlternateCost(AlternateCost),
+    PlayOnlyFromVoid,
     Reclaim { cost: Option<Cost> },
     SparkEqualToPredicateCount { predicate: Predicate },
     CharactersInHandHaveFast,

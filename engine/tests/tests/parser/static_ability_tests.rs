@@ -433,3 +433,13 @@ fn test_play_from_void() {
     ]
     "###);
 }
+
+#[test]
+fn test_play_only_from_void() {
+    let result = parse("You may only play this character from your void.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(PlayOnlyFromVoid),
+    ]
+    "###);
+}
