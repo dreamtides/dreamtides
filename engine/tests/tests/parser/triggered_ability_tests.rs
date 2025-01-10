@@ -328,3 +328,37 @@ fn test_draw_all_cards_win_game() {
     ]
     "###);
 }
+
+#[test]
+fn test_banished_character_gains_spark() {
+    let result =
+        parse("Whenever a character you control is banished, this character gains +1 spark.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Banished(Your(Character)),
+        effect: Effect(GainsSpark(
+          target: This,
+          gains: Spark(1),
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}
+
+#[test]
+fn test_dissolved_character_gains_spark() {
+    let result = parse("Whenever a character you control is dissolved, drawa card.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Dissolved(Your(Character)),
+        effect: Effect(DrawCards(
+          count: 1,
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}

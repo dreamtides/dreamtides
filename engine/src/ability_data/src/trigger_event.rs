@@ -33,6 +33,12 @@ pub enum TriggerEvent {
 
     /// Event when you draw all cards in a copy of your deck
     DrawAllCardsInCopyOfDeck,
+
+    /// Event when a character matching a predicate is dissolved
+    Dissolved(Predicate),
+
+    /// Event when a character matching a predicate is banished
+    Banished(Predicate),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

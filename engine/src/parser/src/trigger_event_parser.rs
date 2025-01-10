@@ -16,6 +16,8 @@ pub fn event_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a
         end_of_turn(),
         gain_energy(),
         draw_all_cards_in_copy_of_deck(),
+        banished(),
+        dissolved(),
     ))
     .boxed()
 }
@@ -81,5 +83,19 @@ fn gain_energy<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
 fn draw_all_cards_in_copy_of_deck<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
     phrase("you draw all of the cards in a copy of your deck")
         .to(TriggerEvent::DrawAllCardsInCopyOfDeck)
+        .boxed()
+}
+
+fn banished<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
+    determiner_parser::target_parser()
+        .then_ignore(phrase("is banished"))
+        .map(TriggerEvent::Banished)
+        .boxed()
+}
+
+fn dissolved<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
+    determiner_parser::target_parser()
+        .then_ignore(phrase("is dissolved"))
+        .map(TriggerEvent::Dissolved)
         .boxed()
 }
