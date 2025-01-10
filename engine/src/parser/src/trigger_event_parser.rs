@@ -87,10 +87,12 @@ fn draw_all_cards_in_copy_of_deck<'a>() -> impl Parser<'a, &'a str, TriggerEvent
 }
 
 fn banished<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
-    determiner_parser::target_parser()
-        .then_ignore(phrase("is banished"))
-        .map(TriggerEvent::Banished)
-        .boxed()
+    choice((
+        determiner_parser::target_parser().then_ignore(phrase("is banished")),
+        phrase("you banish").ignore_then(determiner_parser::your_action()),
+    ))
+    .map(TriggerEvent::Banished)
+    .boxed()
 }
 
 fn dissolved<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {

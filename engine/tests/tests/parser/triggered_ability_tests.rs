@@ -362,3 +362,24 @@ fn test_dissolved_character_gains_spark() {
     ]
     "###);
 }
+
+#[test]
+fn test_banish_until_next_main() {
+    let result = parse("Until end of turn, whenever you banish a character, draw a card.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(CreateTriggerUntilEndOfTurn(
+        trigger: TriggeredAbility(
+          trigger: Banished(Your(Character)),
+          effect: Effect(DrawCards(
+            count: 1,
+          )),
+          options: Some(TriggeredAbilityOptions(
+            once_per_turn: false,
+            until_end_of_turn: true,
+          )),
+        ),
+      ))),
+    ]
+    "###);
+}
