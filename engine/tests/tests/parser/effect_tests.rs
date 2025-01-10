@@ -826,3 +826,24 @@ fn test_banish_enemy_void() {
     ]
     "###);
 }
+
+#[test]
+fn test_spark_becomes() {
+    let result =
+        parse("$activated $3: The spark of each {cardtype: spirit animal} you control becomes 5.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Activated(ActivatedAbility(
+        costs: [
+          Energy(Energy(3)),
+        ],
+        effect: Effect(SparkBecomes(
+          collection: All,
+          matching: CharacterType(SpiritAnimal),
+          spark: Spark(5),
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}

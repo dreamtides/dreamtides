@@ -64,6 +64,7 @@ fn spark_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>
         each_matching_gains_spark_for_each(),
         each_matching_gains_spark_until_next_main(),
         kindle(),
+        spark_becomes(),
     ))
 }
 
@@ -572,4 +573,17 @@ fn win_game<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
 
 fn banish_enemy_void<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("banish the enemy's void").to(StandardEffect::BanishEnemyVoid).boxed()
+}
+
+fn spark_becomes<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("the spark of")
+        .ignore_then(collection_expression_parser::parser().or_not())
+        .then(card_predicate_parser::parser())
+        .then(numeric("you control becomes", Spark, ""))
+        .map(|((collection, matching), spark)| StandardEffect::SparkBecomes {
+            collection: collection.unwrap_or(CollectionExpression::All),
+            matching,
+            spark,
+        })
+        .boxed()
 }

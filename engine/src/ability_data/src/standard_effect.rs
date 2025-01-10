@@ -66,6 +66,7 @@ pub enum StandardEffect {
     ReturnFromYourVoidToPlay { target: Predicate },
     ReturnToHand { target: Predicate },
     ShuffleHandAndDeckAndDraw { count: u64 },
+    SparkBecomes { collection: CollectionExpression, matching: CardPredicate, spark: Spark },
     SpendAllEnergyDrawAndDiscard,
     TakeExtraTurn,
     TriggerJudgmentAbility { matching: Predicate, collection: CollectionExpression },
