@@ -35,6 +35,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         materialize_character_from_void(),
         materialize_character(),
         dissolve_characters_count(),
+        return_to_hand(),
     ))
 }
 
@@ -397,5 +398,13 @@ fn gain_control<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
     phrase("gain control of")
         .ignore_then(determiner_parser::target_parser())
         .map(|target| StandardEffect::GainControl { target })
+        .boxed()
+}
+
+fn return_to_hand<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("return")
+        .ignore_then(determiner_parser::target_parser())
+        .then_ignore(phrase("to hand"))
+        .map(|target| StandardEffect::ReturnToHand { target })
         .boxed()
 }

@@ -102,5 +102,6 @@ pub enum StandardEffect {
     ReturnCharactersToHandDrawCardForEach { count: CountingExpression },
     ReturnFromYourVoidToHand { target: Predicate },
     ReturnFromYourVoidToPlay { target: Predicate },
+    ReturnToHand { target: Predicate },
     SpendAllEnergyDrawAndDiscard,
 }

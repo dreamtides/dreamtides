@@ -518,3 +518,19 @@ fn test_gain_control() {
     ]
     "###);
 }
+
+#[test]
+fn test_return_to_hand() {
+    let result = parse("Return a character with cost $3 or more you control to hand.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(ReturnToHand(
+        target: Your(CardWithCost(
+          target: Character,
+          cost_operator: OrMore,
+          cost: Energy(3),
+        )),
+      ))),
+    ]
+    "###);
+}
