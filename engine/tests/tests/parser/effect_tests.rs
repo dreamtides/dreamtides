@@ -765,7 +765,7 @@ fn test_dissolve_characters_quantity() {
     [
       Event(Effect(DissolveCharactersQuantity(
         target: Enemy(Character),
-        quantity: CardsInYourVoid(Card),
+        quantity: Matching(YourVoid(Card)),
       ))),
     ]
     "###);

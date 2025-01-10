@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::predicate::CardPredicate;
+use crate::predicate::{CardPredicate, Predicate};
 
 /// Represents some quantity, such as the number of cards you have drawn in a
 /// turn.
@@ -8,7 +8,7 @@ use crate::predicate::CardPredicate;
 pub enum QuantityExpression {
     DiscardedThisTurn(CardPredicate),
     CardsDrawnThisTurn(CardPredicate),
-    CardsInYourVoid(CardPredicate),
     PlayedThisTurn(CardPredicate),
     CharacterAbandoned(CardPredicate),
+    Matching(Predicate),
 }
