@@ -5,7 +5,7 @@ use chumsky::prelude::*;
 use chumsky::Parser;
 use core_data::numerics::{Energy, Spark};
 
-use crate::parser_utils::{number, numeric, phrase, this, ErrorType};
+use crate::parser_utils::{numeric, phrase, this, ErrorType};
 use crate::{
     card_predicate_parser, condition_parser, cost_parser, determiner_parser, standard_effect_parser,
 };
@@ -156,7 +156,7 @@ fn simple_alternate_cost<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorT
 
 fn reclaim<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
     phrase("{kw: reclaim}")
-        .ignore_then(number(Energy).or_not())
+        .ignore_then(numeric("$", Energy, "").or_not())
         .map(|n| StaticAbility::Reclaim { cost: n.map(Cost::Energy) })
 }
 

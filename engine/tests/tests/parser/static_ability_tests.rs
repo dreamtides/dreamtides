@@ -370,3 +370,24 @@ fn test_look_at_top_card_and_play() {
     ]
     "###);
 }
+
+#[test]
+fn test_reclaim_costs() {
+    let result = parse("{kw: Reclaim}.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(Reclaim(
+        cost: None,
+      )),
+    ]
+    "###);
+
+    let result = parse("{kw: Reclaim} $2.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(Reclaim(
+        cost: Some(Energy(Energy(2))),
+      )),
+    ]
+    "###);
+}
