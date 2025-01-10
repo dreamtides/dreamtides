@@ -53,6 +53,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         copy_next_played(),
         shuffle_hand_and_deck_and_draw(),
         put_cards_from_deck_into_void(),
+        banish_character_until_leaves_play(),
     ))
 }
 
@@ -595,6 +596,20 @@ fn spark_becomes<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>
             collection: collection.unwrap_or(CollectionExpression::All),
             matching,
             spark,
+        })
+        .boxed()
+}
+
+fn banish_character_until_leaves_play<'a>(
+) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("banish")
+        .ignore_then(determiner_parser::target_parser())
+        .then_ignore(phrase("until"))
+        .then(determiner_parser::target_parser())
+        .then_ignore(phrase("leaves play"))
+        .map(|(target, until_leaves)| StandardEffect::BanishCharacterUntilLeavesPlay {
+            target,
+            until_leaves,
         })
         .boxed()
 }

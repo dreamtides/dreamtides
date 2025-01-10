@@ -859,3 +859,23 @@ fn test_discard_card_from_enemy_hand_then_they_draw() {
     ]
     "###);
 }
+
+#[test]
+fn test_banish_character_until_leaves_play() {
+    let result =
+        parse("$materialized: Banish an enemy character until this character leaves play.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Keywords([
+          Materialized,
+        ]),
+        effect: Effect(BanishCharacterUntilLeavesPlay(
+          target: Enemy(Character),
+          until_leaves: This,
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}
