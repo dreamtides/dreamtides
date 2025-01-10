@@ -695,3 +695,13 @@ fn test_take_extra_turn() {
     ]
     "###);
 }
+
+#[test]
+fn test_double_your_energy() {
+    let result = parse("Double the amount of energy in your energy pool.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(DoubleYourEnergy)),
+    ]
+    "###);
+}

@@ -56,14 +56,26 @@ fn spark_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>
 }
 
 fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    choice((game_effects_group1(), game_effects_group2(), game_effects_group3())).boxed()
+}
+
+fn game_effects_group1<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     choice((
         dissolve_character(),
         gains_aegis_this_turn(),
         gain_energy_for_each(),
         gain_energy(),
+        double_your_energy(),
         gain_points_for_each(),
         gain_points(),
         gain_control(),
+        foresee(),
+    ))
+    .boxed()
+}
+
+fn game_effects_group2<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    choice((
         lose_points(),
         enemy_gains_points_equal_to_its_spark(),
         enemy_gains_points(),
@@ -73,6 +85,12 @@ fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         discover(),
         materialize_random_characters(),
         return_from_void_to_hand(),
+    ))
+    .boxed()
+}
+
+fn game_effects_group3<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    choice((
         return_from_void_to_play(),
         gains_reclaim_until_end_of_turn(),
         cards_in_void_gain_reclaim_this_turn(),
@@ -81,9 +99,9 @@ fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         banish_then_materialize(),
         banish_any_number_then_materialize(),
         banish_character(),
-        foresee(),
         take_extra_turn(),
     ))
+    .boxed()
 }
 
 fn draw_cards<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -478,4 +496,10 @@ fn gains_spark_for_quantity<'a>() -> impl Parser<'a, &'a str, StandardEffect, Er
 
 fn take_extra_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("take an extra turn after this one").to(StandardEffect::TakeExtraTurn).boxed()
+}
+
+fn double_your_energy<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("double the amount of energy in your energy pool")
+        .to(StandardEffect::DoubleYourEnergy)
+        .boxed()
 }
