@@ -263,3 +263,27 @@ fn test_discard_warriors_gain_energy() {
     "###
     );
 }
+
+#[test]
+fn test_immediate_activated_banish_materialize() {
+    let result =
+        parse("$immediate $activated: Banish another character you control, then materialize it.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Activated(ActivatedAbility(
+        costs: [],
+        effect: Effect(BanishThenMaterialize(
+          target: Another(Character),
+        )),
+        options: Some(ActivatedAbilityOptions(
+          is_fast: false,
+          is_immediate: true,
+          is_multi: false,
+        )),
+      )),
+    ]
+    "###
+    );
+}

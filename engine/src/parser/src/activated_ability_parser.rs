@@ -13,6 +13,11 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, ActivatedAbility, ErrorType<'a>>
             is_immediate: false,
             is_multi: true,
         })))
+        .or(phrase("$immediate").then(phrase("$activated")).to(Some(ActivatedAbilityOptions {
+            is_fast: false,
+            is_immediate: true,
+            is_multi: false,
+        })))
         .or(phrase("$activated").to(None))
         .boxed();
 
