@@ -1,6 +1,6 @@
 use ability_data::cost::Cost;
 use ability_data::effect::Effect;
-use ability_data::static_ability::{AlternateCost, StaticAbility};
+use ability_data::static_ability::{AlternateCost, PlayFromVoid, StaticAbility};
 use chumsky::prelude::*;
 use chumsky::Parser;
 use core_data::numerics::{Energy, Spark};
@@ -17,10 +17,9 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
         disable_enemy_materialized_abilities(),
         once_per_turn_play_from_void(),
         enemy_added_cost_to_play(),
-        play_from_void_for_cost(),
         other_spark_bonus(),
         has_all_character_types(),
-        play_from_void_with_condition(),
+        play_from_void(),
         simple_alternate_cost(),
         play_for_alternate_cost(),
         reclaim(),
@@ -90,31 +89,24 @@ fn cost_reduction<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>
     )
 }
 
-fn play_from_void_for_cost<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
-    phrase("you may play")
-        .ignore_then(this())
-        .ignore_then(numeric("from your void for $", Energy, "by"))
-        .then(cost_parser::inflected_additional_cost())
-        .map(|(energy_cost, additional_cost)| StaticAbility::PlayFromVoidForCost {
-            energy_cost,
-            additional_cost,
-        })
-}
-
-fn play_from_void_with_condition<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+fn play_from_void<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
     phrase("if")
         .ignore_then(condition_parser::parser())
         .then_ignore(phrase(","))
+        .or_not()
         .then_ignore(phrase("you may play"))
         .then_ignore(this())
-        .then(numeric("from your void for $", Energy, ""))
+        .then_ignore(phrase("from your void"))
+        .then(numeric("for $", Energy, "").or_not())
         .then(phrase("by").ignore_then(cost_parser::inflected_additional_cost()).or_not())
-        .map(|((condition, energy_cost), additional_cost)| {
-            StaticAbility::PlayFromVoidWithConditionAndCost {
+        .then(phrase(". if you do,").ignore_then(standard_effect_parser::parser()).or_not())
+        .map(|(((condition, energy_cost), additional_cost), if_you_do)| {
+            StaticAbility::PlayFromVoid(PlayFromVoid {
                 condition,
                 energy_cost,
                 additional_cost: additional_cost.unwrap_or(Cost::NoCost),
-            }
+                if_you_do: if_you_do.map(Effect::Effect),
+            })
         })
 }
 

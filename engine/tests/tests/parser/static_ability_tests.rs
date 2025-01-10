@@ -39,13 +39,15 @@ fn test_once_per_turn_play_2_or_less_from_void() {
 fn test_play_from_void_by_banishing() {
     let result = parse("You may play this character from your void for $2 by banishing another card from your void.");
     assert_ron_snapshot!(result, @r###"
-  [
-    Static(PlayFromVoidForCost(
-      energy_cost: Energy(2),
-      additional_cost: BanishCardsFromYourVoid(1),
-    )),
-  ]
-  "###);
+    [
+      Static(PlayFromVoid(PlayFromVoid(
+        condition: None,
+        energy_cost: Some(Energy(2)),
+        additional_cost: BanishCardsFromYourVoid(1),
+        if_you_do: None,
+      ))),
+    ]
+    "###);
 }
 
 #[test]
@@ -53,10 +55,12 @@ fn test_play_event_from_void() {
     let result = parse("You may play this event from your void for $0 by abandoning a character.");
     assert_ron_snapshot!(result, @r###"
     [
-      Static(PlayFromVoidForCost(
-        energy_cost: Energy(0),
+      Static(PlayFromVoid(PlayFromVoid(
+        condition: None,
+        energy_cost: Some(Energy(0)),
         additional_cost: AbandonCharacters(Your(Character), 1),
-      )),
+        if_you_do: None,
+      ))),
     ]
     "###);
 }
@@ -154,10 +158,12 @@ fn test_abandon_characters_cost() {
         parse("You may play this character from your void for $0 by abandoning 2 characters.");
     assert_ron_snapshot!(result, @r###"
     [
-      Static(PlayFromVoidForCost(
-        energy_cost: Energy(0),
+      Static(PlayFromVoid(PlayFromVoid(
+        condition: None,
+        energy_cost: Some(Energy(0)),
         additional_cost: AbandonCharacters(Your(Character), 2),
-      )),
+        if_you_do: None,
+      ))),
     ]
     "###);
 }
@@ -167,13 +173,14 @@ fn test_play_from_void_with_void_count() {
     let result = parse("If you have 8 or more cards in your void, you may play this character from your void for $0 by banishing all other cards from your void.");
     assert_ron_snapshot!(result, @r###"
     [
-      Static(PlayFromVoidWithConditionAndCost(
-        condition: CardsInVoidCount(
+      Static(PlayFromVoid(PlayFromVoid(
+        condition: Some(CardsInVoidCount(
           count: 8,
-        ),
-        energy_cost: Energy(0),
+        )),
+        energy_cost: Some(Energy(0)),
         additional_cost: BanishAllCardsFromYourVoid,
-      )),
+        if_you_do: None,
+      ))),
     ]
     "###);
 }
@@ -218,13 +225,14 @@ fn test_play_if_character_dissolved() {
     let result = parse("If a character you controlled dissolved this turn, you may play this character from your void for $1.");
     assert_ron_snapshot!(result, @r###"
     [
-      Static(PlayFromVoidWithConditionAndCost(
-        condition: DissolvedThisTurn(
+      Static(PlayFromVoid(PlayFromVoid(
+        condition: Some(DissolvedThisTurn(
           predicate: Your(Character),
-        ),
-        energy_cost: Energy(1),
+        )),
+        energy_cost: Some(Energy(1)),
         additional_cost: NoCost,
-      )),
+        if_you_do: None,
+      ))),
     ]
     "###);
 }
@@ -316,13 +324,14 @@ fn test_if_you_have_drawn_two_or_more() {
     let result = parse("If you have drawn 2 or more cards this turn, you may play this character from your void for $1.");
     assert_ron_snapshot!(result, @r###"
     [
-      Static(PlayFromVoidWithConditionAndCost(
-        condition: CardsDrawnThisTurn(
+      Static(PlayFromVoid(PlayFromVoid(
+        condition: Some(CardsDrawnThisTurn(
           count: 2,
-        ),
-        energy_cost: Energy(1),
+        )),
+        energy_cost: Some(Energy(1)),
         additional_cost: NoCost,
-      )),
+        if_you_do: None,
+      ))),
     ]
     "###);
 }
@@ -403,6 +412,21 @@ fn test_you_control_characters() {
           predicate: Your(CharacterType(Survivor)),
         )),
         energy_cost: Energy(1),
+        additional_cost: NoCost,
+        if_you_do: None,
+      ))),
+    ]
+    "###);
+}
+
+#[test]
+fn test_play_from_void() {
+    let result = parse("You may play this character from your void.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(PlayFromVoid(PlayFromVoid(
+        condition: None,
+        energy_cost: None,
         additional_cost: NoCost,
         if_you_do: None,
       ))),

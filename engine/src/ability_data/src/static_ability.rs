@@ -11,51 +11,29 @@ use crate::predicate::{CardPredicate, Predicate};
 /// they're just something that is always true.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum StaticAbility {
-    YourCardsCostIncrease {
-        matching: CardPredicate,
-        reduction: Energy,
-    },
-    YourCardsCostReduction {
-        matching: CardPredicate,
-        reduction: Energy,
-    },
+    YourCardsCostIncrease { matching: CardPredicate, reduction: Energy },
+    YourCardsCostReduction { matching: CardPredicate, reduction: Energy },
     DisableEnemyMaterializedAbilities,
-    EnemyCardsCostIncrease {
-        matching: CardPredicate,
-        increase: Energy,
-    },
-    OncePerTurnPlayFromVoid {
-        matching: CardPredicate,
-    },
-    OtherCharactersSparkBonus {
-        matching: CardPredicate,
-        added_spark: Spark,
-    },
+    EnemyCardsCostIncrease { matching: CardPredicate, increase: Energy },
+    OncePerTurnPlayFromVoid { matching: CardPredicate },
+    OtherCharactersSparkBonus { matching: CardPredicate, added_spark: Spark },
     HasAllCharacterTypes,
-    PlayFromVoidForCost {
-        energy_cost: Energy,
-        additional_cost: Cost,
-    },
-    PlayFromVoidWithConditionAndCost {
-        condition: Condition,
-        energy_cost: Energy,
-        additional_cost: Cost,
-    },
+    PlayFromVoid(PlayFromVoid),
     PlayForAlternateCost(AlternateCost),
-    Reclaim {
-        cost: Option<Cost>,
-    },
-    SparkEqualToPredicateCount {
-        predicate: Predicate,
-    },
+    Reclaim { cost: Option<Cost> },
+    SparkEqualToPredicateCount { predicate: Predicate },
     CharactersInHandHaveFast,
-    JudgmentTriggersWhenMaterialized {
-        predicate: Predicate,
-    },
+    JudgmentTriggersWhenMaterialized { predicate: Predicate },
     YouMayLookAtTopCardOfYourDeck,
-    YouMayPlayFromTopOfDeck {
-        matching: CardPredicate,
-    },
+    YouMayPlayFromTopOfDeck { matching: CardPredicate },
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PlayFromVoid {
+    pub condition: Option<Condition>,
+    pub energy_cost: Option<Energy>,
+    pub additional_cost: Cost,
+    pub if_you_do: Option<Effect>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
