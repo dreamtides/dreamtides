@@ -56,10 +56,10 @@ fn spark_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>
 }
 
 fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    choice((game_effects_group1(), game_effects_group2(), game_effects_group3())).boxed()
+    choice((gain_effects(), enemy_effects(), game_state_effects())).boxed()
 }
 
-fn game_effects_group1<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+fn gain_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     choice((
         dissolve_character(),
         gains_aegis_this_turn(),
@@ -74,23 +74,23 @@ fn game_effects_group1<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTy
     .boxed()
 }
 
-fn game_effects_group2<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+fn enemy_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     choice((
         lose_points(),
         enemy_gains_points_equal_to_its_spark(),
         enemy_gains_points(),
         enemy_loses_points(),
+    ))
+    .boxed()
+}
+
+fn game_state_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    choice((
         disable_activated_abilities(),
         discover_and_then_materialize(),
         discover(),
         materialize_random_characters(),
         return_from_void_to_hand(),
-    ))
-    .boxed()
-}
-
-fn game_effects_group3<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    choice((
         return_from_void_to_play(),
         gains_reclaim_until_end_of_turn(),
         cards_in_void_gain_reclaim_this_turn(),
