@@ -70,6 +70,7 @@ pub enum StandardEffect {
     ShuffleHandAndDeckAndDraw { count: u64 },
     SparkBecomes { collection: CollectionExpression, matching: CardPredicate, spark: Spark },
     SpendAllEnergyDrawAndDiscard,
+    SpendAllEnergyDissolveEnemy,
     TakeExtraTurn,
     ThenMaterializeIt,
     TriggerJudgmentAbility { matching: Predicate, collection: CollectionExpression },

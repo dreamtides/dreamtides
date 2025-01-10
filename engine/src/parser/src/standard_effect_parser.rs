@@ -44,6 +44,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         return_all_but_one_character_draw_card_for_each(),
         put_on_top_of_deck(),
         spend_all_energy_draw_and_discard(),
+        spend_all_energy_dissolve_enemy(),
         materialize_character_from_void(),
         materialize_character_at_end_of_turn(),
         materialize_character(),
@@ -314,6 +315,13 @@ fn spend_all_energy_draw_and_discard<'a>() -> impl Parser<'a, &'a str, StandardE
 {
     phrase("spend all your remaining energy. draw x cards then discard x cards, where x is the energy spent this way")
         .to(StandardEffect::SpendAllEnergyDrawAndDiscard)
+        .boxed()
+}
+
+fn spend_all_energy_dissolve_enemy<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
+{
+    phrase("spend all your remaining energy. dissolve an enemy character with spark less than or equal to the energy spent this way")
+        .to(StandardEffect::SpendAllEnergyDissolveEnemy)
         .boxed()
 }
 

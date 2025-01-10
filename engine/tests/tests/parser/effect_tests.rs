@@ -954,3 +954,13 @@ fn test_materialize_character_at_end_of_turn() {
     ]
     "###);
 }
+
+#[test]
+fn test_spend_all_energy_dissolve_enemy() {
+    let result = parse("Spend all your remaining energy. Dissolve an enemy character with spark less than or equal to the energy spent this way.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(SpendAllEnergyDissolveEnemy)),
+    ]
+    "###);
+}
