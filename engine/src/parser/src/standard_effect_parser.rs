@@ -29,7 +29,6 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         enemy_effects(),
         game_state_effects(),
         pay_cost(),
-        gain_twice_that_much_energy_instead(),
     ))
 }
 
@@ -74,6 +73,7 @@ fn gain_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         gain_points(),
         gain_control(),
         foresee(),
+        gain_twice_that_much_energy_instead(),
     ))
     .boxed()
 }
@@ -464,7 +464,7 @@ fn copy<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
 fn copy_next_played<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("copy the next")
         .ignore_then(card_predicate_parser::parser())
-        .then_ignore(phrase("you play"))
+        .then_ignore(phrase("you play this turn"))
         .then(number_of_times())
         .map(|(matching, times)| StandardEffect::CopyNextPlayed {
             matching: Predicate::Your(matching),

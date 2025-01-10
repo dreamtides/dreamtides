@@ -624,7 +624,7 @@ fn test_copy_it() {
 
 #[test]
 fn test_copy_next_played() {
-    let result = parse("Copy the next event you play twice.");
+    let result = parse("Copy the next event you play this turn twice.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(Effect(CopyNextPlayed(
@@ -634,7 +634,7 @@ fn test_copy_next_played() {
     ]
     "###);
 
-    let result = parse("Copy the next character you play.");
+    let result = parse("Copy the next character you play this turn.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(Effect(CopyNextPlayed(
@@ -722,6 +722,25 @@ fn test_gain_twice_that_much_energy_instead() {
           )),
         ),
       ))),
+    ]
+    "###);
+}
+
+#[test]
+fn test_copy_next_played_this_turn() {
+    let result = parse("$materialized: Copy the next event you play this turn three times.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Keywords([
+          Materialized,
+        ]),
+        effect: Effect(CopyNextPlayed(
+          matching: Your(Event),
+          times: Some(3),
+        )),
+        options: None,
+      )),
     ]
     "###);
 }
