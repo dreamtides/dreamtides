@@ -11,6 +11,12 @@ use crate::predicate::{CardPredicate, Predicate};
 /// they're just something that is always true.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum StaticAbility {
+    StaticAbility(StandardStaticAbility),
+}
+
+/// Basic static abilities
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum StandardStaticAbility {
     YourCardsCostIncrease { matching: CardPredicate, reduction: Energy },
     YourCardsCostReduction { matching: CardPredicate, reduction: Energy },
     DisableEnemyMaterializedAbilities,

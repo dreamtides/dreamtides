@@ -1,6 +1,8 @@
 use ability_data::cost::Cost;
 use ability_data::effect::Effect;
-use ability_data::static_ability::{AlternateCost, PlayFromVoid, StaticAbility};
+use ability_data::static_ability::{
+    AlternateCost, PlayFromVoid, StandardStaticAbility, StaticAbility,
+};
 use chumsky::prelude::*;
 use chumsky::Parser;
 use core_data::numerics::{Energy, Spark};
@@ -11,6 +13,10 @@ use crate::{
 };
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+    standard().map(StaticAbility::StaticAbility).boxed()
+}
+
+fn standard<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     choice((
         cost_increase(),
         cost_reduction(),
@@ -33,64 +39,66 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
     .boxed()
 }
 
-fn once_per_turn_play_from_void<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+fn once_per_turn_play_from_void<'a>(
+) -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     phrase("once per turn, you may play a")
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(phrase("from your void"))
-        .map(|matching| StaticAbility::OncePerTurnPlayFromVoid { matching })
+        .map(|matching| StandardStaticAbility::OncePerTurnPlayFromVoid { matching })
 }
 
-fn enemy_added_cost_to_play<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+fn enemy_added_cost_to_play<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>>
+{
     phrase("the enemy's")
         .ignore_then(card_predicate_parser::parser())
         .then(numeric("cost $", Energy, "more"))
-        .map(|(predicate, cost)| StaticAbility::EnemyCardsCostIncrease {
+        .map(|(predicate, cost)| StandardStaticAbility::EnemyCardsCostIncrease {
             matching: predicate,
             increase: cost,
         })
 }
 
 fn disable_enemy_materialized_abilities<'a>(
-) -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+) -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     let enemy_characters = choice((phrase("the enemy's characters"), phrase("enemy characters")));
     phrase("disable the \"$materialized\" abilities of")
         .ignore_then(enemy_characters)
-        .to(StaticAbility::DisableEnemyMaterializedAbilities)
+        .to(StandardStaticAbility::DisableEnemyMaterializedAbilities)
 }
 
-fn other_spark_bonus<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+fn other_spark_bonus<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     phrase("other")
         .ignore_then(card_predicate_parser::parser())
         .then(numeric("you control have +", Spark, "spark"))
-        .map(|(predicate, spark)| StaticAbility::OtherCharactersSparkBonus {
+        .map(|(predicate, spark)| StandardStaticAbility::OtherCharactersSparkBonus {
             matching: predicate,
             added_spark: spark,
         })
 }
 
-fn has_all_character_types<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
-    phrase("this character has all character types").to(StaticAbility::HasAllCharacterTypes)
+fn has_all_character_types<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
+    phrase("this character has all character types").to(StandardStaticAbility::HasAllCharacterTypes)
 }
 
-fn cost_increase<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+fn cost_increase<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     card_predicate_parser::parser().then(numeric("cost you $", Energy, "more")).map(
-        |(predicate, cost)| StaticAbility::YourCardsCostIncrease {
+        |(predicate, cost)| StandardStaticAbility::YourCardsCostIncrease {
             matching: predicate,
             reduction: cost,
         },
     )
 }
 
-fn cost_reduction<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+fn cost_reduction<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     card_predicate_parser::parser().then(numeric("cost you $", Energy, "less")).map(
-        |(predicate, cost)| StaticAbility::YourCardsCostReduction {
+        |(predicate, cost)| StandardStaticAbility::YourCardsCostReduction {
             matching: predicate,
             reduction: cost,
         },
     )
 }
 
-fn play_from_void<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+fn play_from_void<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     phrase("if")
         .ignore_then(condition_parser::parser())
         .then_ignore(phrase(","))
@@ -102,7 +110,7 @@ fn play_from_void<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>
         .then(phrase("by").ignore_then(cost_parser::inflected_additional_cost()).or_not())
         .then(phrase(". if you do,").ignore_then(standard_effect_parser::parser()).or_not())
         .map(|(((condition, energy_cost), additional_cost), if_you_do)| {
-            StaticAbility::PlayFromVoid(PlayFromVoid {
+            StandardStaticAbility::PlayFromVoid(PlayFromVoid {
                 condition,
                 energy_cost,
                 additional_cost: additional_cost.unwrap_or(Cost::NoCost),
@@ -111,7 +119,7 @@ fn play_from_void<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>
         })
 }
 
-fn play_for_alternate_cost<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+fn play_for_alternate_cost<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     phrase("if")
         .ignore_then(condition_parser::parser())
         .then_ignore(phrase(","))
@@ -122,7 +130,7 @@ fn play_for_alternate_cost<'a>() -> impl Parser<'a, &'a str, StaticAbility, Erro
         .then(phrase("by").ignore_then(cost_parser::inflected_additional_cost()).or_not())
         .then(phrase(". if you do,").ignore_then(standard_effect_parser::parser()).or_not())
         .map(|(((condition, energy_cost), additional_cost), if_you_do)| {
-            StaticAbility::PlayForAlternateCost(AlternateCost {
+            StandardStaticAbility::PlayForAlternateCost(AlternateCost {
                 condition,
                 energy_cost,
                 additional_cost: additional_cost.unwrap_or(Cost::NoCost),
@@ -131,14 +139,14 @@ fn play_for_alternate_cost<'a>() -> impl Parser<'a, &'a str, StaticAbility, Erro
         })
 }
 
-fn simple_alternate_cost<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+fn simple_alternate_cost<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     phrase("if")
         .ignore_then(condition_parser::parser())
         .then_ignore(phrase(","))
         .then_ignore(this())
         .then(numeric("costs $", Energy, ""))
         .map(|(condition, energy_cost)| {
-            StaticAbility::PlayForAlternateCost(AlternateCost {
+            StandardStaticAbility::PlayForAlternateCost(AlternateCost {
                 condition: Some(condition),
                 energy_cost,
                 additional_cost: Cost::NoCost,
@@ -147,45 +155,48 @@ fn simple_alternate_cost<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorT
         })
 }
 
-fn reclaim<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+fn reclaim<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     phrase("{kw: reclaim}")
         .ignore_then(numeric("$", Energy, "").or_not())
-        .map(|n| StaticAbility::Reclaim { cost: n.map(Cost::Energy) })
+        .map(|n| StandardStaticAbility::Reclaim { cost: n.map(Cost::Energy) })
 }
 
-fn spark_equal_to_predicate_count<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+fn spark_equal_to_predicate_count<'a>(
+) -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     phrase("this character's spark is equal to the number of")
         .ignore_then(determiner_parser::counted_parser())
-        .map(|predicate| StaticAbility::SparkEqualToPredicateCount { predicate })
+        .map(|predicate| StandardStaticAbility::SparkEqualToPredicateCount { predicate })
         .boxed()
 }
 
-fn characters_in_hand_have_fast<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
-    phrase("characters in your hand have '$fast'").to(StaticAbility::CharactersInHandHaveFast)
+fn characters_in_hand_have_fast<'a>(
+) -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
+    phrase("characters in your hand have '$fast'")
+        .to(StandardStaticAbility::CharactersInHandHaveFast)
 }
 
 fn judgment_triggers_when_materialized<'a>(
-) -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+) -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     phrase("the '$judgment' ability of")
         .ignore_then(determiner_parser::counted_parser())
         .then_ignore(phrase("triggers when you materialize them"))
-        .map(|predicate| StaticAbility::JudgmentTriggersWhenMaterialized { predicate })
+        .map(|predicate| StandardStaticAbility::JudgmentTriggersWhenMaterialized { predicate })
 }
 
-fn look_at_top_card<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+fn look_at_top_card<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     phrase("you may look at the top card of your deck")
-        .to(StaticAbility::YouMayLookAtTopCardOfYourDeck)
+        .to(StandardStaticAbility::YouMayLookAtTopCardOfYourDeck)
 }
 
-fn play_from_top_of_deck<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+fn play_from_top_of_deck<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     phrase("you may play")
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(phrase("from the top of your deck"))
-        .map(|matching| StaticAbility::YouMayPlayFromTopOfDeck { matching })
+        .map(|matching| StandardStaticAbility::YouMayPlayFromTopOfDeck { matching })
 }
 
-fn play_only_from_void<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+fn play_only_from_void<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     phrase("you may only play this character from your void")
-        .to(StaticAbility::PlayOnlyFromVoid)
+        .to(StandardStaticAbility::PlayOnlyFromVoid)
         .boxed()
 }
