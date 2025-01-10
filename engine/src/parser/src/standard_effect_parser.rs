@@ -22,7 +22,14 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
 /// Parses all standard game effects that do not recursively invoke effect
 /// parsing
 fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    choice((card_effects(), spark_effects(), game_effects(), pay_cost()))
+    choice((
+        card_effects(),
+        spark_effects(),
+        gain_effects(),
+        enemy_effects(),
+        game_state_effects(),
+        pay_cost(),
+    ))
 }
 
 fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -53,10 +60,6 @@ fn spark_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>
         each_matching_gains_spark_for_each(),
         kindle(),
     ))
-}
-
-fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    choice((gain_effects(), enemy_effects(), game_state_effects())).boxed()
 }
 
 fn gain_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
