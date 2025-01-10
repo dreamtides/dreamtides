@@ -49,6 +49,9 @@ pub enum StaticAbility {
         predicate: Predicate,
     },
     CharactersInHandHaveFast,
+    JudgmentTriggersWhenMaterialized {
+        predicate: Predicate,
+    },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

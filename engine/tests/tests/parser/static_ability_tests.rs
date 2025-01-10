@@ -328,6 +328,20 @@ fn test_if_you_have_drawn_two_or_more() {
 }
 
 #[test]
+fn test_judgment_triggers_when_materialized() {
+    let result = parse(
+        "The '$judgment' ability of characters you control triggers when you materialize them.",
+    );
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(JudgmentTriggersWhenMaterialized(
+        predicate: Your(Character),
+      )),
+    ]
+    "###);
+}
+
+#[test]
 fn test_play_for_alternate_cost_with_condition() {
     let result = parse("If you have 8 or more cards in your void, you may play this event for $0 by banishing all cards from your void.");
     assert_ron_snapshot!(result, @r###"

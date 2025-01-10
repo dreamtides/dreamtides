@@ -26,6 +26,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
         reclaim(),
         spark_equal_to_predicate_count(),
         characters_in_hand_have_fast(),
+        judgment_triggers_when_materialized(),
     ))
     .boxed()
 }
@@ -166,4 +167,12 @@ fn spark_equal_to_predicate_count<'a>() -> impl Parser<'a, &'a str, StaticAbilit
 
 fn characters_in_hand_have_fast<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
     phrase("characters in your hand have '$fast'").to(StaticAbility::CharactersInHandHaveFast)
+}
+
+fn judgment_triggers_when_materialized<'a>(
+) -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
+    phrase("the '$judgment' ability of")
+        .ignore_then(determiner_parser::counted_parser())
+        .then_ignore(phrase("triggers when you materialize them"))
+        .map(|predicate| StaticAbility::JudgmentTriggersWhenMaterialized { predicate })
 }
