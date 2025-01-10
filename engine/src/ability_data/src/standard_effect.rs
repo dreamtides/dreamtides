@@ -18,6 +18,7 @@ pub enum StandardEffect {
     BanishEnemyVoid,
     BanishCharacter { target: Predicate },
     BanishCharacterUntilLeavesPlay { target: Predicate, until_leaves: Predicate },
+    BanishUntilNextMain { target: Predicate },
     BanishCollection { target: Predicate, count: CollectionExpression },
     CardsInVoidGainReclaimThisTurn { count: CollectionExpression, predicate: CardPredicate },
     Copy { target: Predicate },

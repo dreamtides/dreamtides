@@ -55,7 +55,6 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         copy_next_played(),
         shuffle_hand_and_deck_and_draw(),
         put_cards_from_deck_into_void(),
-        banish_character_until_leaves_play(),
     ))
 }
 
@@ -110,6 +109,8 @@ fn game_state_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
         cards_in_void_gain_reclaim_this_turn(),
         negate(),
         abandon_at_end_of_turn(),
+        banish_character_until_leaves_play(),
+        banish_until_next_main(),
         banish_collection(),
         banish_character(),
         banish_enemy_void(),
@@ -618,5 +619,13 @@ fn banish_character_until_leaves_play<'a>(
             target,
             until_leaves,
         })
+        .boxed()
+}
+
+fn banish_until_next_main<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("banish")
+        .ignore_then(determiner_parser::target_parser())
+        .then_ignore(phrase("until the start of your next main phase"))
+        .map(|target| StandardEffect::BanishUntilNextMain { target })
         .boxed()
 }

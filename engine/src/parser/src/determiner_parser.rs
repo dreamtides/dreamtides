@@ -19,7 +19,7 @@ pub fn target_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>>
         phrase("that card").to(Predicate::That),
         choice((phrase("another"), phrase("other")))
             .ignore_then(card_predicate_parser::parser())
-            .then_ignore(phrase("you control").or_not())
+            .then_ignore(phrase("you control"))
             .map(Predicate::Another),
         a_or_an()
             .ignore_then(card_predicate_parser::parser())
@@ -34,6 +34,7 @@ pub fn target_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>>
             .then_ignore(phrase("in the enemy's void"))
             .map(Predicate::EnemyVoid),
         phrase("an enemy").ignore_then(card_predicate_parser::parser()).map(Predicate::Enemy),
+        phrase("another").ignore_then(card_predicate_parser::parser()).map(Predicate::AnyOther),
         a_or_an().ignore_then(card_predicate_parser::parser()).map(Predicate::Any),
     ))
     .boxed()

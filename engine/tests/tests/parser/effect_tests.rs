@@ -964,3 +964,27 @@ fn test_spend_all_energy_dissolve_enemy() {
     ]
     "###);
 }
+
+#[test]
+fn test_banish_until_next_main() {
+    let result = parse(
+        "$materialized: You may banish another character until the start of your next main phase.",
+    );
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Keywords([
+          Materialized,
+        ]),
+        effect: WithOptions(EffectWithOptions(
+          effect: BanishUntilNextMain(
+            target: AnyOther(Character),
+          ),
+          optional: Some(NoCost),
+          condition: None,
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}
