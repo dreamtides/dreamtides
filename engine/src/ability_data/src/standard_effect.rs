@@ -18,6 +18,7 @@ pub enum StandardEffect {
     BanishCharacter { target: Predicate },
     BanishThenMaterialize { target: Predicate },
     BanishThenMaterializeCount { target: Predicate, count: CountingExpression },
+    Copy { target: Predicate },
     CreateTriggerUntilEndOfTurn { trigger: Box<TriggeredAbility> },
     DisableActivatedAbilitiesWhileInPlay { target: Predicate },
     DiscardCardFromEnemyHand { predicate: CardPredicate },

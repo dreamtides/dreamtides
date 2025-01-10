@@ -592,3 +592,31 @@ fn test_draw_cards_for_each() {
     ]
     "###);
 }
+
+#[test]
+fn test_copy() {
+    let result = parse("Copy a character.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(Copy(
+        target: Any(Character),
+      ))),
+    ]
+    "###);
+}
+
+#[test]
+fn test_copy_it() {
+    let result = parse("Whenever you play an event, copy it.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Play(Your(Event)),
+        effect: Effect(Copy(
+          target: It,
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}

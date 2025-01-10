@@ -37,6 +37,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         materialize_character(),
         dissolve_characters_count(),
         return_to_hand(),
+        copy(),
     ))
 }
 
@@ -421,4 +422,11 @@ fn draw_cards_for_each<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTy
         .then_ignore(phrase("for each"))
         .then(quantity_expression_parser::parser())
         .map(|(count, for_count)| StandardEffect::DrawCardsForEach { count, for_each: for_count })
+}
+
+fn copy<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("copy")
+        .ignore_then(determiner_parser::target_parser())
+        .map(|target| StandardEffect::Copy { target })
+        .boxed()
 }
