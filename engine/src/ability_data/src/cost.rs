@@ -11,6 +11,7 @@ pub enum Cost {
     AbandonCharacters(Predicate, u64),
     AbandonCharactersCount { target: Predicate, count: CountingExpression },
     AbandonDreamscapes(u64),
+    AbandonACharacterOrDiscardACard,
     BanishAllCardsFromYourVoid,
     BanishCardsFromEnemyVoid(u64),
     BanishCardsFromYourVoid(u64),

@@ -18,6 +18,7 @@ pub fn standard_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
         numeric("banish", count, "cards from your void").map(Cost::BanishCardsFromYourVoid),
         phrase("banish a card from the enemy's void").to(Cost::BanishCardsFromEnemyVoid(1)),
         numeric("banish", count, "cards from the enemy's void").map(Cost::BanishCardsFromEnemyVoid),
+        phrase("abandon a character or discard a card").to(Cost::AbandonACharacterOrDiscardACard),
         phrase("abandon a dreamscape").to(Cost::AbandonDreamscapes(1)),
         numeric("abandon", count, "dreamscapes").map(Cost::AbandonDreamscapes),
         phrase("abandon")

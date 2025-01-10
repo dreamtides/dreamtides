@@ -19,7 +19,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
 /// Parses all standard game effects that do not recursively invoke effect
 /// parsing
 fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    choice((card_effects(), spark_effects(), game_effects()))
+    choice((card_effects(), spark_effects(), game_effects(), pay_cost()))
 }
 
 fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -72,7 +72,6 @@ fn game_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         banish_any_number_then_materialize(),
         banish_character(),
         foresee(),
-        pay_cost(),
     ))
 }
 

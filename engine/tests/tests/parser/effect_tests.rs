@@ -477,3 +477,28 @@ fn test_materialize_character_from_void() {
     ]
     "###);
 }
+
+#[test]
+fn test_abandon_a_character_or_discard_a_card() {
+    let result = parse("Abandon a character or discard a card. Dissolve an enemy character.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(List([
+        EffectWithOptions(
+          effect: PayCost(
+            cost: AbandonACharacterOrDiscardACard,
+          ),
+          optional: None,
+          condition: None,
+        ),
+        EffectWithOptions(
+          effect: DissolveCharacter(
+            target: Enemy(Character),
+          ),
+          optional: None,
+          condition: None,
+        ),
+      ])),
+    ]
+    "###);
+}
