@@ -391,3 +391,21 @@ fn test_reclaim_costs() {
     ]
     "###);
 }
+
+#[test]
+fn test_you_control_characters() {
+    let result = parse("If you control a {cardtype: survivor}, this character costs $1.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(PlayForAlternateCost(AlternateCost(
+        condition: Some(PredicateCount(
+          count: 1,
+          predicate: Your(CharacterType(Survivor)),
+        )),
+        energy_cost: Energy(1),
+        additional_cost: NoCost,
+        if_you_do: None,
+      ))),
+    ]
+    "###);
+}

@@ -128,7 +128,7 @@ fn test_multiple_keyword_trigger_conditional() {
           optional: None,
           condition: Some(PredicateCount(
             count: 2,
-            predicate: Your(CharacterType(Warrior)),
+            predicate: Another(CharacterType(Warrior)),
           )),
         )),
         options: None,

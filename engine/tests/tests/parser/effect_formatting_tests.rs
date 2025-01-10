@@ -94,7 +94,7 @@ fn test_conditional_gain_energy() {
         optional: None,
         condition: Some(PredicateCount(
           count: 2,
-          predicate: Your(CharacterType(Warrior)),
+          predicate: Another(CharacterType(Warrior)),
         )),
       ))),
     ]
@@ -116,7 +116,7 @@ fn test_conditional_optional_gain_energy() {
         optional: Some(NoCost),
         condition: Some(PredicateCount(
           count: 2,
-          predicate: Your(CharacterType(Warrior)),
+          predicate: Another(CharacterType(Warrior)),
         )),
       ))),
     ]
