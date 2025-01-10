@@ -300,3 +300,25 @@ fn test_immediate_activated_banish_materialize() {
     "###
     );
 }
+
+#[test]
+fn test_immediate_multi_activated() {
+    let result = parse("$immediate $multiActivated Abandon another character: Put the top 2 cards of your deck into your void.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Activated(ActivatedAbility(
+        costs: [
+          AbandonCharacters(Another(Character), 1),
+        ],
+        effect: Effect(PutCardsFromYourDeckIntoVoid(
+          count: 2,
+        )),
+        options: Some(ActivatedAbilityOptions(
+          is_fast: false,
+          is_immediate: true,
+          is_multi: true,
+        )),
+      )),
+    ]
+    "###);
+}
