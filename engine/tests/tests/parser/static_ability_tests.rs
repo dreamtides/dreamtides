@@ -284,3 +284,13 @@ fn test_play_for_dreamscape_cost() {
     ]
     "###);
 }
+
+#[test]
+fn test_characters_in_hand_have_fast() {
+    let result = parse("Characters in your hand have '$fast'.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(CharactersInHandHaveFast),
+    ]
+    "###);
+}

@@ -534,3 +534,22 @@ fn test_return_to_hand() {
     ]
     "###);
 }
+
+#[test]
+fn test_event_gains_reclaim() {
+    let result =
+        parse("$materialized: An event in your void gains {kw: reclaim} until end of turn.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Keywords([
+          Materialized,
+        ]),
+        effect: Effect(GainsReclaimUntilEndOfTurn(
+          target: YourVoid(Event),
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}

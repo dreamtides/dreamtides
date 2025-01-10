@@ -3,7 +3,7 @@ use chumsky::prelude::*;
 use chumsky::Parser;
 
 use crate::card_predicate_parser;
-use crate::parser_utils::{phrase, ErrorType};
+use crate::parser_utils::{a_or_an, phrase, ErrorType};
 
 /// Parser for expressions describing the target selected for an effect, for
 /// example in "Dissolve an enemy character".
@@ -20,11 +20,19 @@ pub fn target_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>>
             .ignore_then(card_predicate_parser::parser())
             .then_ignore(phrase("you control").or_not())
             .map(Predicate::Another),
-        phrase("an enemy").ignore_then(card_predicate_parser::parser()).map(Predicate::Enemy),
-        choice((phrase("a"), phrase("an")))
+        a_or_an()
             .ignore_then(card_predicate_parser::parser())
             .then_ignore(phrase("you control"))
             .map(Predicate::Your),
+        a_or_an()
+            .ignore_then(card_predicate_parser::parser())
+            .then_ignore(phrase("in your void"))
+            .map(Predicate::YourVoid),
+        a_or_an()
+            .ignore_then(card_predicate_parser::parser())
+            .then_ignore(phrase("in the enemy's void"))
+            .map(Predicate::EnemyVoid),
+        phrase("an enemy").ignore_then(card_predicate_parser::parser()).map(Predicate::Enemy),
     ))
     .boxed()
 }
