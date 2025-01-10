@@ -770,3 +770,15 @@ fn test_dissolve_characters_quantity() {
     ]
     "###);
 }
+
+#[test]
+fn test_put_cards_from_deck_into_void() {
+    let result = parse("Put the top 3 cards of your deck into your void.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(PutCardsFromYourDeckIntoVoid(
+        count: 3,
+      ))),
+    ]
+    "###);
+}

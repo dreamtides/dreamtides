@@ -50,6 +50,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         copy(),
         copy_next_played(),
         shuffle_hand_and_deck_and_draw(),
+        put_cards_from_deck_into_void(),
     ))
 }
 
@@ -530,5 +531,11 @@ fn dissolve_characters_quantity<'a>() -> impl Parser<'a, &'a str, StandardEffect
         .then_ignore(phrase("with cost less than or equal to the number of"))
         .then(quantity_expression_parser::parser())
         .map(|(target, quantity)| StandardEffect::DissolveCharactersQuantity { target, quantity })
+        .boxed()
+}
+
+fn put_cards_from_deck_into_void<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    numeric("put the top", count, "cards of your deck into your void")
+        .map(|count| StandardEffect::PutCardsFromYourDeckIntoVoid { count })
         .boxed()
 }

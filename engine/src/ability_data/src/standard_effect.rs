@@ -57,6 +57,7 @@ pub enum StandardEffect {
     MaterializeRandomFromDeck { count: u64, predicate: CardPredicate },
     Negate { target: Predicate },
     PayCost { cost: Cost },
+    PutCardsFromYourDeckIntoVoid { count: u64 },
     PutOnTopOfEnemyDeck { target: Predicate },
     ReturnCharactersToHandDrawCardForEach { count: CountingExpression },
     ReturnFromYourVoidToHand { target: Predicate },
