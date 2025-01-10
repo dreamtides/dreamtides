@@ -494,7 +494,7 @@ fn draw_cards_for_each<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTy
 }
 
 fn copy<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    phrase("copy")
+    choice((phrase("copy"), phrase("materialize a copy of")))
         .ignore_then(determiner_parser::target_parser())
         .map(|target| StandardEffect::Copy { target })
         .boxed()

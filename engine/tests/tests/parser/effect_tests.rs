@@ -988,3 +988,25 @@ fn test_banish_until_next_main() {
     ]
     "###);
 }
+
+#[test]
+fn test_materialize_copy_character() {
+    let result = parse("$multiActivated $4: Materialize a copy of another character you control.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Activated(ActivatedAbility(
+        costs: [
+          Energy(Energy(4)),
+        ],
+        effect: Effect(Copy(
+          target: Another(Character),
+        )),
+        options: Some(ActivatedAbilityOptions(
+          is_fast: false,
+          is_immediate: false,
+          is_multi: true,
+        )),
+      )),
+    ]
+    "###);
+}
