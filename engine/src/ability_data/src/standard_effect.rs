@@ -61,6 +61,7 @@ pub enum StandardEffect {
     ReturnFromYourVoidToHand { target: Predicate },
     ReturnFromYourVoidToPlay { target: Predicate },
     ReturnToHand { target: Predicate },
+    ShuffleHandAndDeckAndDraw { count: u64 },
     SpendAllEnergyDrawAndDiscard,
     TakeExtraTurn,
 }

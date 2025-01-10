@@ -48,6 +48,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         return_to_hand(),
         copy(),
         copy_next_played(),
+        shuffle_hand_and_deck_and_draw(),
     ))
 }
 
@@ -512,5 +513,12 @@ fn gain_twice_that_much_energy_instead<'a>(
 ) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("gain twice that much energy instead")
         .to(StandardEffect::GainTwiceThatMuchEnergyInstead)
+        .boxed()
+}
+
+fn shuffle_hand_and_deck_and_draw<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("each player may shuffle their hand and void into their deck and then draw")
+        .ignore_then(numeric("", count, "cards"))
+        .map(|count| StandardEffect::ShuffleHandAndDeckAndDraw { count })
         .boxed()
 }

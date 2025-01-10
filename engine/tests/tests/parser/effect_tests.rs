@@ -744,3 +744,16 @@ fn test_copy_next_played_this_turn() {
     ]
     "###);
 }
+
+#[test]
+fn test_shuffle_hand_and_deck_and_draw() {
+    let result =
+        parse("Each player may shuffle their hand and void into their deck and then draw 4 cards.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(ShuffleHandAndDeckAndDraw(
+        count: 4,
+      ))),
+    ]
+    "###);
+}
