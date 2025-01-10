@@ -45,6 +45,7 @@ pub enum StandardEffect {
     GainsAegisThisTurn { target: Predicate },
     GainsReclaimUntilEndOfTurn { target: Predicate, cost: Option<Energy> },
     GainsSpark { target: Predicate, gains: Spark },
+    GainsSparkForQuantity { target: Predicate, gains: Spark, for_quantity: QuantityExpression },
     GainsSparkUntilYourNextMainForEach { target: Predicate, gains: Spark, for_each: Predicate },
     Kindle { amount: Spark },
     LosePoints { loses: Points },

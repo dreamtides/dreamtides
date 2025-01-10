@@ -46,6 +46,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
 
 fn spark_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     choice((
+        gains_spark_for_quantity(),
         gain_spark_until_next_main_for_each(),
         gain_spark(),
         abandon_and_gain_energy_for_spark(),
@@ -458,6 +459,18 @@ fn cards_in_void_gain_reclaim_this_turn<'a>(
         .map(|(count, predicate)| StandardEffect::CardsInVoidGainReclaimThisTurn {
             count,
             predicate,
+        })
+        .boxed()
+}
+
+fn gains_spark_for_quantity<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    determiner_parser::target_parser()
+        .then(numeric("gains +", Spark, "spark for each"))
+        .then(quantity_expression_parser::parser())
+        .map(|((target, gains), for_quantity)| StandardEffect::GainsSparkForQuantity {
+            target,
+            gains,
+            for_quantity,
         })
         .boxed()
 }

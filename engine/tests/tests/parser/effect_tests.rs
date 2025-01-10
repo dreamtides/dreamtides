@@ -670,3 +670,18 @@ fn test_gains_reclaim_until_end_of_turn() {
     ]
     "###);
 }
+
+#[test]
+fn test_gains_spark_for_quantity() {
+    let result =
+        parse("A character you control gains +1 spark for each dream you have played this turn.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(GainsSparkForQuantity(
+        target: Your(Character),
+        gains: Spark(1),
+        for_quantity: PlayedThisTurn(Dream),
+      ))),
+    ]
+    "###);
+}
