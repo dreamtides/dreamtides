@@ -39,7 +39,7 @@ fn once_per_turn_play_from_void<'a>() -> impl Parser<'a, &'a str, StaticAbility,
 fn enemy_added_cost_to_play<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
     phrase("the enemy's")
         .ignore_then(card_predicate_parser::parser())
-        .then(numeric("cost an additional $", Energy, "to play"))
+        .then(numeric("cost $", Energy, "more"))
         .map(|(predicate, cost)| StaticAbility::EnemyAddedCostToPlay {
             matching: predicate,
             increase: cost,

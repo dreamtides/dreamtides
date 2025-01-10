@@ -4,7 +4,7 @@ use crate::parser::test_utils::parse;
 
 #[test]
 fn test_enemy_events_cost_more_to_play() {
-    let result = parse("The enemy's events cost an additional $1 to play.");
+    let result = parse("The enemy's events cost $1 more.");
     assert_ron_snapshot!(
     result,
     @r###"
