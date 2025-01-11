@@ -82,6 +82,7 @@ pub enum CardPredicate {
     Fast {
         target: Box<CardPredicate>,
     },
+    CharacterWithMultiActivatedAbility,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

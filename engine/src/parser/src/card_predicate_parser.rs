@@ -23,6 +23,7 @@ fn non_recursive_predicate<'a>() -> impl Parser<'a, &'a str, CardPredicate, Erro
     choice((
         character_with_spark(),
         character_with_materialized_ability(),
+        character_with_multi_activated_ability(),
         character_type().map(CardPredicate::CharacterType),
         phrase("character that is not")
             .ignore_then(a_or_an())
@@ -116,6 +117,14 @@ fn character_with_materialized_ability<'a>(
     character()
         .ignore_then(phrase("with a $materialized ability"))
         .to(CardPredicate::CharacterWithMaterializedAbility)
+        .boxed()
+}
+
+fn character_with_multi_activated_ability<'a>(
+) -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
+    character()
+        .ignore_then(phrase("with a $multiactivated ability"))
+        .to(CardPredicate::CharacterWithMultiActivatedAbility)
         .boxed()
 }
 

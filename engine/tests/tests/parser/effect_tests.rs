@@ -1131,3 +1131,29 @@ fn test_draw_for_abandoned_this_turn() {
     ]
     "###);
 }
+
+#[test]
+fn test_discover_multi_activated_ability() {
+    let result =
+        parse("Abandon a character. {kw: Discover} a character with a $multiActivated ability.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(List([
+        EffectWithOptions(
+          effect: PayCost(
+            cost: AbandonCharacters(Your(Character), 1),
+          ),
+          optional: None,
+          condition: None,
+        ),
+        EffectWithOptions(
+          effect: Discover(
+            predicate: CharacterWithMultiActivatedAbility,
+          ),
+          optional: None,
+          condition: None,
+        ),
+      ])),
+    ]
+    "###);
+}
