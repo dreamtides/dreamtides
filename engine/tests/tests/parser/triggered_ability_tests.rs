@@ -383,3 +383,20 @@ fn test_banish_until_next_main() {
     ]
     "###);
 }
+
+#[test]
+fn test_abandon_character_gains_spark() {
+    let result = parse("Whenever you abandon a character, this character gains +1 spark.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Abandon(Your(Character)),
+        effect: Effect(GainsSpark(
+          target: This,
+          gains: Spark(1),
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}

@@ -6,39 +6,18 @@ use crate::predicate::Predicate;
 /// trigger.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum TriggerEvent {
-    /// One or more trigger keywords
-    Keywords(Vec<TriggerKeyword>),
-
-    /// Event when a character matching a predicate is materialized.
-    Materialize(Predicate),
-
-    /// Event when the nth character matching a predicate is materialized this
-    /// turn
-    MaterializeNthThisTurn(Predicate, u64),
-
-    /// Event when a card matching a predicate is played
-    Play(Predicate),
-
-    /// Event when a card matching a predicate is played from hand
-    PlayFromHand(Predicate),
-
-    /// Event when a card matching a predicate is discarded
-    Discard(Predicate),
-
-    /// Event when the end of your turn is reached
-    EndOfYourTurn,
-
-    /// Event when you gain energy
-    GainEnergy,
-
-    /// Event when you draw all cards in a copy of your deck
-    DrawAllCardsInCopyOfDeck,
-
-    /// Event when a character matching a predicate is dissolved
-    Dissolved(Predicate),
-
-    /// Event when a character matching a predicate is banished
+    Abandon(Predicate),
     Banished(Predicate),
+    Discard(Predicate),
+    Dissolved(Predicate),
+    DrawAllCardsInCopyOfDeck,
+    EndOfYourTurn,
+    GainEnergy,
+    Keywords(Vec<TriggerKeyword>),
+    Materialize(Predicate),
+    MaterializeNthThisTurn(Predicate, u64),
+    Play(Predicate),
+    PlayFromHand(Predicate),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

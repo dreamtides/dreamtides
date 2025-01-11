@@ -18,6 +18,7 @@ pub fn event_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a
         draw_all_cards_in_copy_of_deck(),
         banished(),
         dissolved(),
+        abandon(),
     ))
     .boxed()
 }
@@ -99,5 +100,12 @@ fn dissolved<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
     determiner_parser::target_parser()
         .then_ignore(phrase("is dissolved"))
         .map(TriggerEvent::Dissolved)
+        .boxed()
+}
+
+fn abandon<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
+    phrase("you abandon")
+        .ignore_then(determiner_parser::your_action())
+        .map(TriggerEvent::Abandon)
         .boxed()
 }
