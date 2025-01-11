@@ -96,7 +96,7 @@ fn test_other_warriors_spark_bonus() {
         result,
         @r###"
     [
-      Static(StaticAbility(OtherCharactersSparkBonus(
+      Static(StaticAbility(SparkBonusOtherCharacters(
         matching: CharacterType(Warrior),
         added_spark: Spark(1),
       ))),
@@ -445,6 +445,24 @@ fn test_play_only_from_void() {
     assert_ron_snapshot!(result, @r###"
     [
       Static(StaticAbility(PlayOnlyFromVoid)),
+    ]
+    "###);
+}
+
+#[test]
+fn test_this_character_in_your_void() {
+    let result = parse(
+        "If this character is in your void, {cardtype: survivors} you control have +1 spark.",
+    );
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(WithOptions(StaticAbilityWithOptions(
+        ability: SparkBonusYourCharacters(
+          matching: CharacterType(Survivor),
+          added_spark: Spark(1),
+        ),
+        condition: Some(ThisCharacterIsInYourVoid),
+      ))),
     ]
     "###);
 }

@@ -26,22 +26,23 @@ pub struct StaticAbilityWithOptions {
 /// Basic static abilities
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum StandardStaticAbility {
-    YourCardsCostIncrease { matching: CardPredicate, reduction: Energy },
-    YourCardsCostReduction { matching: CardPredicate, reduction: Energy },
+    CharactersInHandHaveFast,
     DisableEnemyMaterializedAbilities,
     EnemyCardsCostIncrease { matching: CardPredicate, increase: Energy },
-    OncePerTurnPlayFromVoid { matching: CardPredicate },
-    OtherCharactersSparkBonus { matching: CardPredicate, added_spark: Spark },
     HasAllCharacterTypes,
-    PlayFromVoid(PlayFromVoid),
+    JudgmentTriggersWhenMaterialized { predicate: Predicate },
+    OncePerTurnPlayFromVoid { matching: CardPredicate },
     PlayForAlternateCost(AlternateCost),
+    PlayFromVoid(PlayFromVoid),
     PlayOnlyFromVoid,
     Reclaim { cost: Option<Cost> },
+    SparkBonusYourCharacters { matching: CardPredicate, added_spark: Spark },
+    SparkBonusOtherCharacters { matching: CardPredicate, added_spark: Spark },
     SparkEqualToPredicateCount { predicate: Predicate },
-    CharactersInHandHaveFast,
-    JudgmentTriggersWhenMaterialized { predicate: Predicate },
     YouMayLookAtTopCardOfYourDeck,
     YouMayPlayFromTopOfDeck { matching: CardPredicate },
+    YourCardsCostIncrease { matching: CardPredicate, reduction: Energy },
+    YourCardsCostReduction { matching: CardPredicate, reduction: Energy },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

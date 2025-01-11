@@ -37,6 +37,7 @@ fn standard<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'
         once_per_turn_play_from_void(),
         enemy_added_cost_to_play(),
         other_spark_bonus(),
+        your_characters_spark_bonus(),
         has_all_character_types(),
         play_from_void(),
         simple_alternate_cost(),
@@ -83,10 +84,20 @@ fn other_spark_bonus<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, Er
     phrase("other")
         .ignore_then(card_predicate_parser::parser())
         .then(numeric("you control have +", Spark, "spark"))
-        .map(|(predicate, spark)| StandardStaticAbility::OtherCharactersSparkBonus {
+        .map(|(predicate, spark)| StandardStaticAbility::SparkBonusOtherCharacters {
             matching: predicate,
             added_spark: spark,
         })
+}
+
+fn your_characters_spark_bonus<'a>(
+) -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
+    card_predicate_parser::parser().then(numeric("you control have +", Spark, "spark")).map(
+        |(predicate, spark)| StandardStaticAbility::SparkBonusYourCharacters {
+            matching: predicate,
+            added_spark: spark,
+        },
+    )
 }
 
 fn has_all_character_types<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {

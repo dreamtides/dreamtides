@@ -42,5 +42,6 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Condition, ErrorType<'a>> {
             numeric("you have drawn", count, "or more cards this turn")
                 .map(|count| Condition::CardsDrawnThisTurn { count }),
         )),
+        phrase("this character is in your void").to(Condition::ThisCharacterIsInYourVoid),
     ))
 }
