@@ -12,20 +12,20 @@ build:
     cargo build --manifest-path engine/Cargo.toml --all-targets --all-features
 
 run *args='':
-    npm run tauri dev
+    pnpm run --prefix client tauri dev
 
 android:
-    npm run tauri android dev
+    pnpm run --prefix client tauri android dev
 
 ios:
-    npm run tauri ios dev
+    pnpm run --prefix client tauri ios dev
 
 run-release:
-  npm run tauri dev -- --release
+    pnpm run --prefix client tauri dev -- --release
 
 # To run under a rust debugger, *first* use this command and then start the rust binary
 dev:
-  npm run dev
+  pnpm run --prefix client dev
 
 test:
     cargo test --manifest-path engine/Cargo.toml
