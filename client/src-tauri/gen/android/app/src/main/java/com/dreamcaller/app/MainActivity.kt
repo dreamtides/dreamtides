@@ -1,3 +1,3 @@
-package com.thedreamcaller
+package com.dreamcaller.app
 
 class MainActivity : TauriActivity()

@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		4382C3CBF889D674ADFDF59D /* libapp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BF9D0BC31C34D5144BA0D0D5 /* libapp.a */; };
 		5780ACB51E9800C0552F0866 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0347A81D94E1F319AA2BAF1 /* MetalKit.framework */; };
-		5B09753E1C6CB027ACC896A3 /* libapp.a in Resources */ = {isa = PBXBuildFile; fileRef = 274B27FB7A53DD089FDCCF9D /* libapp.a */; };
 		5DCCA1CA3192474BAF3B3B4C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D517C6E003424081DA94D78A /* Assets.xcassets */; };
 		6C17EE0AFDF32894B52E895B /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD03A2F0FBF0033A8F36F44E /* WebKit.framework */; };
 		89A4008092DA3D71FC12EDF8 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E5243767E6FEAD991FA7EC0 /* CoreGraphics.framework */; };
@@ -25,7 +24,6 @@
 /* Begin PBXFileReference section */
 		080C45C0B0C2EA6486E88F8A /* main.rs */ = {isa = PBXFileReference; path = main.rs; sourceTree = "<group>"; };
 		0C0ED01280F29C7662DFB694 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		274B27FB7A53DD089FDCCF9D /* libapp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libapp.a; sourceTree = "<group>"; };
 		3E5243767E6FEAD991FA7EC0 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		3F8B3373DC9098938EA76E72 /* lib.rs */ = {isa = PBXFileReference; path = lib.rs; sourceTree = "<group>"; };
 		63E617F1897395E195245065 /* dreamcaller_iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = dreamcaller_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -75,17 +73,8 @@
 		0C1D4AB501AA0C5DFB9C6AC7 /* Externals */ = {
 			isa = PBXGroup;
 			children = (
-				1A7FA4B92AA9401DE8B82E63 /* arm64-sim */,
 			);
 			path = Externals;
-			sourceTree = "<group>";
-		};
-		1A7FA4B92AA9401DE8B82E63 /* arm64-sim */ = {
-			isa = PBXGroup;
-			children = (
-				8DABA0E7BD4296F5EAB3704C /* debug */,
-			);
-			path = "arm64-sim";
 			sourceTree = "<group>";
 		};
 		321079238AA2C2AFD620B9A5 /* dreamcaller */ = {
@@ -103,14 +92,6 @@
 				63E617F1897395E195245065 /* dreamcaller_iOS.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		8DABA0E7BD4296F5EAB3704C /* debug */ = {
-			isa = PBXGroup;
-			children = (
-				274B27FB7A53DD089FDCCF9D /* libapp.a */,
-			);
-			path = debug;
 			sourceTree = "<group>";
 		};
 		C0E89B9C3985B1FBD89BF980 /* Frameworks */ = {
@@ -167,20 +148,6 @@
 			);
 			name = src;
 			path = ../../src;
-			sourceTree = "<group>";
-		};
-		"TEMP_51E8EAD4-A7CA-466C-B266-42E8C0BC8302" /* arm64 */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = arm64;
-			sourceTree = "<group>";
-		};
-		"TEMP_F2CE759B-BCA2-424A-8760-25B95C0FB05E" /* x86_64 */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = x86_64;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -240,7 +207,6 @@
 				5DCCA1CA3192474BAF3B3B4C /* Assets.xcassets in Resources */,
 				BEB9FBF2C68077D294585B0E /* LaunchScreen.storyboard in Resources */,
 				EE7DBBDB27EC02BD747DCB56 /* assets in Resources */,
-				5B09753E1C6CB027ACC896A3 /* libapp.a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -267,7 +233,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "npm run -- tauri ios xcode-script -v --platform ${PLATFORM_DISPLAY_NAME:?} --sdk-root ${SDKROOT:?} --framework-search-paths \"${FRAMEWORK_SEARCH_PATHS:?}\" --header-search-paths \"${HEADER_SEARCH_PATHS:?}\" --gcc-preprocessor-definitions \"${GCC_PREPROCESSOR_DEFINITIONS:-}\" --configuration ${CONFIGURATION:?} ${FORCE_COLOR} ${ARCHS:?}";
+			shellScript = "pnpm tauri ios xcode-script -v --platform ${PLATFORM_DISPLAY_NAME:?} --sdk-root ${SDKROOT:?} --framework-search-paths \"${FRAMEWORK_SEARCH_PATHS:?}\" --header-search-paths \"${HEADER_SEARCH_PATHS:?}\" --gcc-preprocessor-definitions \"${GCC_PREPROCESSOR_DEFINITIONS:-}\" --configuration ${CONFIGURATION:?} ${FORCE_COLOR} ${ARCHS:?}";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -365,7 +331,7 @@
 				"LIBRARY_SEARCH_PATHS[arch=arm64-sim]" = "$(inherited) $(PROJECT_DIR)/Externals/arm64-sim/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
 				"LIBRARY_SEARCH_PATHS[arch=arm64]" = "$(inherited) $(PROJECT_DIR)/Externals/arm64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
 				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = "$(inherited) $(PROJECT_DIR)/Externals/x86_64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.thedreamcaller;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dreamcaller.app;
 				PRODUCT_NAME = dreamcaller;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -399,7 +365,7 @@
 				"LIBRARY_SEARCH_PATHS[arch=arm64-sim]" = "$(inherited) $(PROJECT_DIR)/Externals/arm64-sim/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
 				"LIBRARY_SEARCH_PATHS[arch=arm64]" = "$(inherited) $(PROJECT_DIR)/Externals/arm64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
 				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = "$(inherited) $(PROJECT_DIR)/Externals/x86_64/$(CONFIGURATION) $(SDKROOT)/usr/lib/swift $(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME) $(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)";
-				PRODUCT_BUNDLE_IDENTIFIER = com.thedreamcaller;
+				PRODUCT_BUNDLE_IDENTIFIER = com.dreamcaller.app;
 				PRODUCT_NAME = dreamcaller;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
