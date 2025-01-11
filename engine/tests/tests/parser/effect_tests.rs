@@ -1157,3 +1157,46 @@ fn test_discover_multi_activated_ability() {
     ]
     "###);
 }
+
+#[test]
+fn test_each_player_abandons_characters() {
+    let result = parse("$judgment: Each player abandons a character.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Keywords([
+          Judgment,
+        ]),
+        effect: Effect(EachPlayerAbandonsCharacters(
+          matching: Character,
+          count: 1,
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+
+    let result = parse("Each player abandons two characters with cost $3 or more.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(EachPlayerAbandonsCharacters(
+        matching: CardWithCost(
+          target: Character,
+          cost_operator: OrMore,
+          cost: Energy(3),
+        ),
+        count: 2,
+      ))),
+    ]
+    "###);
+
+    let result = parse("Each player abandons a {cardtype: warrior}.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(EachPlayerAbandonsCharacters(
+        matching: CharacterType(Warrior),
+        count: 1,
+      ))),
+    ]
+    "###);
+}

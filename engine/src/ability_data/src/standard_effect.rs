@@ -39,6 +39,7 @@ pub enum StandardEffect {
     DrawCardsForEach { count: u64, for_each: QuantityExpression },
     EachMatchingGainsSparkUntilNextMain { each: CardPredicate, gains: Spark },
     EachMatchingGainsSparkForEach { each: CardPredicate, gains: Spark, for_each: CardPredicate },
+    EachPlayerAbandonsCharacters { matching: CardPredicate, count: u64 },
     EachPlayerDiscardCards { count: u64 },
     EnemyGainsPoints { count: u64 },
     EnemyGainsPointsEqualToItsSpark,

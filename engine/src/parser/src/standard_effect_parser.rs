@@ -60,6 +60,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         shuffle_hand_and_deck_and_draw(),
         put_cards_from_deck_into_void(),
         each_player_discard_cards(),
+        each_player_abandons_characters(),
     ))
 }
 
@@ -673,5 +674,14 @@ fn materialize_silent_copy<'a>() -> impl Parser<'a, &'a str, StandardEffect, Err
                 }
             }),
         )
+        .boxed()
+}
+
+fn each_player_abandons_characters<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
+{
+    phrase("each player abandons")
+        .ignore_then(a_or_count())
+        .then(card_predicate_parser::parser())
+        .map(|(count, matching)| StandardEffect::EachPlayerAbandonsCharacters { matching, count })
         .boxed()
 }
