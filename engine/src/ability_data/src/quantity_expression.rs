@@ -6,9 +6,10 @@ use crate::predicate::{CardPredicate, Predicate};
 /// turn.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum QuantityExpression {
-    DiscardedThisTurn(CardPredicate),
+    AbandonedThisTurn(CardPredicate),
+    AbandonedThisWay(CardPredicate),
     CardsDrawnThisTurn(CardPredicate),
-    PlayedThisTurn(CardPredicate),
-    CharacterAbandoned(CardPredicate),
+    DiscardedThisTurn(CardPredicate),
     Matching(Predicate),
+    PlayedThisTurn(CardPredicate),
 }

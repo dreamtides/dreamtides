@@ -17,8 +17,11 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, QuantityExpression, ErrorType<'a
             .then_ignore(phrase("you have played this turn"))
             .map(QuantityExpression::PlayedThisTurn),
         card_predicate_parser::parser()
+            .then_ignore(phrase("you abandoned this turn"))
+            .map(QuantityExpression::AbandonedThisTurn),
+        card_predicate_parser::parser()
             .then_ignore(phrase("abandoned"))
-            .map(QuantityExpression::CharacterAbandoned),
+            .map(QuantityExpression::AbandonedThisWay),
         determiner_parser::counted_parser().map(QuantityExpression::Matching),
     ))
     .boxed()

@@ -339,7 +339,7 @@ fn test_abandon_any_number_draw_for_each() {
         EffectWithOptions(
           effect: DrawCardsForEach(
             count: 1,
-            for_each: CharacterAbandoned(Character),
+            for_each: AbandonedThisWay(Character),
           ),
           optional: None,
           condition: None,
@@ -1115,6 +1115,19 @@ fn test_materialize_silent_copy() {
         )),
         options: None,
       )),
+    ]
+    "###);
+}
+
+#[test]
+fn test_draw_for_abandoned_this_turn() {
+    let result = parse("Draw a card for each character you abandoned this turn.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(DrawCardsForEach(
+        count: 1,
+        for_each: AbandonedThisTurn(Character),
+      ))),
     ]
     "###);
 }
