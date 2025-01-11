@@ -64,6 +64,7 @@ pub enum StandardEffect {
     Negate { target: Predicate },
     PayCost { cost: Cost },
     PutCardsFromYourDeckIntoVoid { count: u64 },
+    PutCardsFromVoidOnTopOfDeck { count: u64, matching: CardPredicate },
     PutOnTopOfEnemyDeck { target: Predicate },
     ReturnCharactersToHandDrawCardForEach { count: CollectionExpression },
     ReturnFromYourVoidToHand { target: Predicate },

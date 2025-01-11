@@ -44,6 +44,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         discard_card_from_enemy_hand(),
         return_all_but_one_character_draw_card_for_each(),
         put_on_top_of_deck(),
+        put_cards_from_void_on_top_of_deck(),
         spend_all_energy_draw_and_discard(),
         spend_all_energy_dissolve_enemy(),
         materialize_character_from_void(),
@@ -638,5 +639,15 @@ fn each_player_discard_cards<'a>() -> impl Parser<'a, &'a str, StandardEffect, E
         .ignore_then(a_or_count())
         .then_ignore(card_or_cards())
         .map(|count| StandardEffect::EachPlayerDiscardCards { count })
+        .boxed()
+}
+
+fn put_cards_from_void_on_top_of_deck<'a>(
+) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("put")
+        .ignore_then(a_or_count())
+        .then(card_predicate_parser::parser())
+        .then_ignore(phrase("from your void on top of your deck"))
+        .map(|(count, matching)| StandardEffect::PutCardsFromVoidOnTopOfDeck { count, matching })
         .boxed()
 }

@@ -1028,3 +1028,40 @@ fn test_each_player_discard_cards() {
     ]
     "###);
 }
+
+#[test]
+fn test_put_cards_from_void_on_top_of_deck() {
+    let result = parse("Put a character from your void on top of your deck.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(Effect(PutCardsFromVoidOnTopOfDeck(
+        count: 1,
+        matching: Character,
+      ))),
+    ]
+    "###);
+
+    let result = parse("$immediate $fastMultiActivated Abandon another character: You may put a character from your void on top of your deck.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Activated(ActivatedAbility(
+        costs: [
+          AbandonCharacters(Another(Character), 1),
+        ],
+        effect: WithOptions(EffectWithOptions(
+          effect: PutCardsFromVoidOnTopOfDeck(
+            count: 1,
+            matching: Character,
+          ),
+          optional: Some(NoCost),
+          condition: None,
+        )),
+        options: Some(ActivatedAbilityOptions(
+          is_fast: true,
+          is_immediate: true,
+          is_multi: true,
+        )),
+      )),
+    ]
+    "###);
+}
