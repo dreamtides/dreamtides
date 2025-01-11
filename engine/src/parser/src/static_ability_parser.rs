@@ -10,7 +10,8 @@ use core_data::numerics::{Energy, Spark};
 
 use crate::parser_utils::{numeric, phrase, this, ErrorType};
 use crate::{
-    card_predicate_parser, condition_parser, cost_parser, determiner_parser, standard_effect_parser,
+    card_predicate_parser, condition_parser, cost_parser, determiner_parser,
+    quantity_expression_parser, standard_effect_parser,
 };
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
@@ -35,6 +36,7 @@ fn standard<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'
         cards_in_your_void_have_reclaim(),
         cost_increase(),
         cost_reduction(),
+        cost_reduction_for_each(),
         disable_enemy_materialized_abilities(),
         once_per_turn_play_from_void(),
         enemy_added_cost_to_play(),
@@ -216,6 +218,17 @@ fn cards_in_your_void_have_reclaim<'a>(
     phrase("cards in your void have {kw: reclaim}")
         .map(|_| StandardStaticAbility::CardsInYourVoidHaveReclaim {
             matching: CardPredicate::Card,
+        })
+        .boxed()
+}
+
+fn cost_reduction_for_each<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
+    this()
+        .ignore_then(numeric("costs $", Energy, "less to play for each"))
+        .then(quantity_expression_parser::parser())
+        .map(|(reduction, quantity)| StandardStaticAbility::CostReductionForEach {
+            reduction,
+            quantity,
         })
         .boxed()
 }

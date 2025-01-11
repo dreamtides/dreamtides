@@ -5,6 +5,7 @@ use crate::condition::Condition;
 use crate::cost::Cost;
 use crate::effect::Effect;
 use crate::predicate::{CardPredicate, Predicate};
+use crate::quantity_expression::QuantityExpression;
 
 /// A static ability represents something which modifies the rules of the game,
 /// either for this specific card or globally. Static abilities do not 'happen',
@@ -28,6 +29,7 @@ pub struct StaticAbilityWithOptions {
 pub enum StandardStaticAbility {
     CardsInYourVoidHaveReclaim { matching: CardPredicate },
     CharactersInHandHaveFast,
+    CostReductionForEach { reduction: Energy, quantity: QuantityExpression },
     DisableEnemyMaterializedAbilities,
     EnemyCardsCostIncrease { matching: CardPredicate, increase: Energy },
     HasAllCharacterTypes,

@@ -135,6 +135,23 @@ fn test_character_cost_reduction() {
 }
 
 #[test]
+fn test_cost_reduction_for_each_dissolved() {
+    let result =
+        parse("This event costs $1 less to play for each character which dissolved this turn.");
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Static(StaticAbility(CostReductionForEach(
+        reduction: Energy(1),
+        quantity: DissolvedThisTurn(Character),
+      ))),
+    ]
+    "###
+    );
+}
+
+#[test]
 fn test_cost_increase() {
     let result = parse("Events cost you $2 more.");
     assert_ron_snapshot!(
