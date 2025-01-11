@@ -1,7 +1,7 @@
 use ability_data::cost::Cost;
 use ability_data::effect::Effect;
 use ability_data::static_ability::{
-    AlternateCost, PlayFromVoid, StandardStaticAbility, StaticAbility,
+    AlternateCost, PlayFromVoid, StandardStaticAbility, StaticAbility, StaticAbilityWithOptions,
 };
 use chumsky::prelude::*;
 use chumsky::Parser;
@@ -13,7 +13,20 @@ use crate::{
 };
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
-    standard().map(StaticAbility::StaticAbility).boxed()
+    choice((
+        phrase("if")
+            .ignore_then(condition_parser::parser())
+            .then_ignore(phrase(","))
+            .then(standard())
+            .map(|(condition, ability)| {
+                StaticAbility::WithOptions(StaticAbilityWithOptions {
+                    ability,
+                    condition: Some(condition),
+                })
+            }),
+        standard().map(StaticAbility::StaticAbility).boxed(),
+    ))
+    .boxed()
 }
 
 fn standard<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
@@ -99,19 +112,14 @@ fn cost_reduction<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, Error
 }
 
 fn play_from_void<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
-    phrase("if")
-        .ignore_then(condition_parser::parser())
-        .then_ignore(phrase(","))
-        .or_not()
-        .then_ignore(phrase("you may play"))
-        .then_ignore(this())
-        .then_ignore(phrase("from your void"))
-        .then(numeric("for $", Energy, "").or_not())
+    phrase("you may play")
+        .ignore_then(this())
+        .ignore_then(phrase("from your void"))
+        .ignore_then(numeric("for $", Energy, "").or_not())
         .then(phrase("by").ignore_then(cost_parser::inflected_additional_cost()).or_not())
         .then(phrase(". if you do,").ignore_then(standard_effect_parser::parser()).or_not())
-        .map(|(((condition, energy_cost), additional_cost), if_you_do)| {
+        .map(|((energy_cost, additional_cost), if_you_do)| {
             StandardStaticAbility::PlayFromVoid(PlayFromVoid {
-                condition,
                 energy_cost,
                 additional_cost: additional_cost.unwrap_or(Cost::NoCost),
                 if_you_do: if_you_do.map(Effect::Effect),
@@ -120,18 +128,13 @@ fn play_from_void<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, Error
 }
 
 fn play_for_alternate_cost<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
-    phrase("if")
-        .ignore_then(condition_parser::parser())
-        .then_ignore(phrase(","))
-        .or_not()
-        .then_ignore(phrase("you may play"))
-        .then_ignore(this())
-        .then(numeric("for $", Energy, ""))
+    phrase("you may play")
+        .ignore_then(this())
+        .ignore_then(numeric("for $", Energy, ""))
         .then(phrase("by").ignore_then(cost_parser::inflected_additional_cost()).or_not())
         .then(phrase(". if you do,").ignore_then(standard_effect_parser::parser()).or_not())
-        .map(|(((condition, energy_cost), additional_cost), if_you_do)| {
+        .map(|((energy_cost, additional_cost), if_you_do)| {
             StandardStaticAbility::PlayForAlternateCost(AlternateCost {
-                condition,
                 energy_cost,
                 additional_cost: additional_cost.unwrap_or(Cost::NoCost),
                 if_you_do: if_you_do.map(Effect::Effect),
@@ -140,19 +143,13 @@ fn play_for_alternate_cost<'a>() -> impl Parser<'a, &'a str, StandardStaticAbili
 }
 
 fn simple_alternate_cost<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
-    phrase("if")
-        .ignore_then(condition_parser::parser())
-        .then_ignore(phrase(","))
-        .then_ignore(this())
-        .then(numeric("costs $", Energy, ""))
-        .map(|(condition, energy_cost)| {
-            StandardStaticAbility::PlayForAlternateCost(AlternateCost {
-                condition: Some(condition),
-                energy_cost,
-                additional_cost: Cost::NoCost,
-                if_you_do: None,
-            })
+    this().ignore_then(numeric("costs $", Energy, "")).map(|energy_cost| {
+        StandardStaticAbility::PlayForAlternateCost(AlternateCost {
+            energy_cost,
+            additional_cost: Cost::NoCost,
+            if_you_do: None,
         })
+    })
 }
 
 fn reclaim<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {

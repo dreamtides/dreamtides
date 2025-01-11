@@ -12,6 +12,15 @@ use crate::predicate::{CardPredicate, Predicate};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum StaticAbility {
     StaticAbility(StandardStaticAbility),
+    WithOptions(StaticAbilityWithOptions),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StaticAbilityWithOptions {
+    pub ability: StandardStaticAbility,
+
+    /// Indicates an ability which occurs only if some condition is met,
+    pub condition: Option<Condition>,
 }
 
 /// Basic static abilities
@@ -37,7 +46,6 @@ pub enum StandardStaticAbility {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PlayFromVoid {
-    pub condition: Option<Condition>,
     pub energy_cost: Option<Energy>,
     pub additional_cost: Cost,
     pub if_you_do: Option<Effect>,
@@ -45,7 +53,6 @@ pub struct PlayFromVoid {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AlternateCost {
-    pub condition: Option<Condition>,
     pub energy_cost: Energy,
     pub additional_cost: Cost,
     pub if_you_do: Option<Effect>,
