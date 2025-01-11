@@ -1065,3 +1065,56 @@ fn test_put_cards_from_void_on_top_of_deck() {
     ]
     "###);
 }
+
+#[test]
+fn test_materialize_silent_copy() {
+    let result = parse("$materialized: Materialize a {kw: silent} copy of this character for each dream you have played this turn.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Keywords([
+          Materialized,
+        ]),
+        effect: Effect(MaterializeSilentCopy(
+          target: This,
+          count: 1,
+          quantity: PlayedThisTurn(Dream),
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+
+    let result = parse("$materialized: Materialize two {kw: silent} copies of this character.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Keywords([
+          Materialized,
+        ]),
+        effect: Effect(MaterializeSilentCopy(
+          target: This,
+          count: 2,
+          quantity: Matching(This),
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+
+    let result =
+        parse("Whenever you play a character, materialize a {kw: silent} copy of this character.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Play(Your(Character)),
+        effect: Effect(MaterializeSilentCopy(
+          target: This,
+          count: 1,
+          quantity: Matching(This),
+        )),
+        options: None,
+      )),
+    ]
+    "###);
+}

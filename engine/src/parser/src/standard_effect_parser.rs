@@ -1,6 +1,7 @@
 use ability_data::collection_expression::CollectionExpression;
 use ability_data::effect::Effect;
 use ability_data::predicate::Predicate;
+use ability_data::quantity_expression::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use ability_data::triggered_ability::{TriggeredAbility, TriggeredAbilityOptions};
 use chumsky::prelude::*;
@@ -36,6 +37,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
 
 fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     choice((
+        materialize_silent_copy(),
         draw_matching_card(),
         draw_cards_for_each(),
         draw_cards(),
@@ -649,5 +651,27 @@ fn put_cards_from_void_on_top_of_deck<'a>(
         .then(card_predicate_parser::parser())
         .then_ignore(phrase("from your void on top of your deck"))
         .map(|(count, matching)| StandardEffect::PutCardsFromVoidOnTopOfDeck { count, matching })
+        .boxed()
+}
+
+fn materialize_silent_copy<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("materialize")
+        .ignore_then(
+            choice((
+                phrase("a {kw: silent} copy").to(1),
+                text_number().then_ignore(phrase("{kw: silent} copies")).map(|n| n),
+            ))
+            .then_ignore(phrase("of"))
+            .then(determiner_parser::target_parser())
+            .then(phrase("for each").ignore_then(quantity_expression_parser::parser()).or_not())
+            .map(|((count, target), quantity)| {
+                let target_clone = target.clone();
+                StandardEffect::MaterializeSilentCopy {
+                    target,
+                    count,
+                    quantity: quantity.unwrap_or(QuantityExpression::Matching(target_clone)),
+                }
+            }),
+        )
         .boxed()
 }
