@@ -1,5 +1,6 @@
 use ability_data::cost::Cost;
 use ability_data::effect::Effect;
+use ability_data::predicate::CardPredicate;
 use ability_data::static_ability::{
     AlternateCost, PlayFromVoid, StandardStaticAbility, StaticAbility, StaticAbilityWithOptions,
 };
@@ -31,6 +32,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
 
 fn standard<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     choice((
+        cards_in_your_void_have_reclaim(),
         cost_increase(),
         cost_reduction(),
         disable_enemy_materialized_abilities(),
@@ -206,5 +208,14 @@ fn play_from_top_of_deck<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility
 fn play_only_from_void<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     phrase("you may only play this character from your void")
         .to(StandardStaticAbility::PlayOnlyFromVoid)
+        .boxed()
+}
+
+fn cards_in_your_void_have_reclaim<'a>(
+) -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
+    phrase("cards in your void have {kw: reclaim}")
+        .map(|_| StandardStaticAbility::CardsInYourVoidHaveReclaim {
+            matching: CardPredicate::Card,
+        })
         .boxed()
 }

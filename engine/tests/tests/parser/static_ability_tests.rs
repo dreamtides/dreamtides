@@ -466,3 +466,21 @@ fn test_this_character_in_your_void() {
     ]
     "###);
 }
+
+#[test]
+fn test_cards_in_void_have_reclaim() {
+    let result =
+        parse("If you have 8 or more cards in your void, cards in your void have {kw: reclaim}.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Static(WithOptions(StaticAbilityWithOptions(
+        ability: CardsInYourVoidHaveReclaim(
+          matching: Card,
+        ),
+        condition: Some(CardsInVoidCount(
+          count: 8,
+        )),
+      ))),
+    ]
+    "###);
+}

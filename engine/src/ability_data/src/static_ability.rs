@@ -26,6 +26,7 @@ pub struct StaticAbilityWithOptions {
 /// Basic static abilities
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum StandardStaticAbility {
+    CardsInYourVoidHaveReclaim { matching: CardPredicate },
     CharactersInHandHaveFast,
     DisableEnemyMaterializedAbilities,
     EnemyCardsCostIncrease { matching: CardPredicate, increase: Energy },
