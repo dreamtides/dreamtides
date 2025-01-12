@@ -2,6 +2,13 @@ import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "@nextui-org/react";
 import type { PressEvent } from "@react-types/shared";
+import { memo } from "react";
+
+type NavigationIconButtonProps = {
+  icon: IconProp;
+  ariaLabel: string;
+  onPress?: (e: PressEvent) => void;
+};
 
 /**
  * A button with an icon that is used in the navigation bar.
@@ -9,13 +16,11 @@ import type { PressEvent } from "@react-types/shared";
  * @param icon - The icon to display.
  * @param ariaLabel - The aria label for the button.
  */
-export default function NavigationIconButton(
-  { icon, ariaLabel, onPress }: {
-    icon: IconProp,
-    ariaLabel: string,
-    onPress?: (e: PressEvent) => void
-  }
-) {
+export default memo(function NavigationIconButton({
+  icon,
+  ariaLabel,
+  onPress,
+}: NavigationIconButtonProps) {
   return (
     <Button
       isIconOnly
@@ -29,4 +34,4 @@ export default function NavigationIconButton(
       <FontAwesomeIcon icon={icon} size="lg" />
     </Button>
   );
-}
+});

@@ -1,10 +1,9 @@
-import NavigationBar from "./components/common/NavigationBar";
+import BattleScreen from "./screens/battle/BattleScreen";
 
 function App() {
   return (
     <main>
-      <NavigationBar />
-      <h1>Welcome to Tauri + React</h1>
+      <BattleScreen />
     </main>
   );
 }
