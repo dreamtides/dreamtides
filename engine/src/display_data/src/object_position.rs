@@ -1,8 +1,10 @@
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
+use crate::battle_view::DisplayPlayer;
+
 /// Represents the position of some object in the UI
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Type)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct ObjectPosition {
     /// Position category
@@ -20,7 +22,7 @@ impl Default for ObjectPosition {
 }
 
 /// Possible types of display positions
-#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize, Ord, PartialOrd, Type)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Ord, PartialOrd, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Position {
     /// Object position used in interface elements like the deck viewer which
@@ -38,24 +40,19 @@ pub enum Position {
     Stack,
 
     /// Object is in a player's hand
-    UserHand,
-    EnemyHand,
+    Hand(DisplayPlayer),
 
     /// Object is in a player's deck
-    UserDeck,
-    EnemyDeck,
+    Deck(DisplayPlayer),
 
     /// Object is in a player's void
-    UserVoid,
-    EnemyVoid,
+    Void(DisplayPlayer),
 
     /// Object is in this player's banished zone
-    UserBanished,
-    EnemyBanished,
+    Banished(DisplayPlayer),
 
     /// Object is on the battlefield
-    UserBattlefield,
-    EnemyBattlefield,
+    Battlefield(DisplayPlayer),
 
     /// Object is being displayed in a card browser, e.g. to select from a list
     /// of cards while searching
@@ -64,12 +61,6 @@ pub enum Position {
     /// Object is being displayed in a list of cards available to select in a
     /// card selector.
     CardSelectionChoices,
-
-    /// Object is being displayed in a location for picking its relative order
-    CardOrderLocationUnordered,
-    CardOrderLocationDeck,
-    CardOrderLocationDeckBottom,
-    CardOrderLocationVoid,
 
     /// Object has just been revealed to this viewer
     Revealed,
