@@ -28,7 +28,63 @@ export type Position =
  * Object position used in interface elements like the deck viewer which
  * don't rely on game positioning.
  */
-"default"
+"default" | 
+/**
+ * Object is not visible.
+ */
+"offscreen" | 
+/**
+ * Object is prominently revealed, being shown at a large size after
+ * being played.
+ */
+"played" | 
+/**
+ * Object is on the stack
+ */
+"stack" | 
+/**
+ * Object is in a player's hand
+ */
+"userHand" | "enemyHand" | 
+/**
+ * Object is in a player's deck
+ */
+"userDeck" | "enemyDeck" | 
+/**
+ * Object is in a player's void
+ */
+"userVoid" | "enemyVoid" | 
+/**
+ * Object is in this player's banished zone
+ */
+"userBanished" | "enemyBanished" | 
+/**
+ * Object is on the battlefield
+ */
+"userBattlefield" | "enemyBattlefield" | 
+/**
+ * Object is being displayed in a card browser, e.g. to select from a list
+ * of cards while searching
+ */
+"browser" | 
+/**
+ * Object is being displayed in a list of cards available to select in a
+ * card selector.
+ */
+"cardSelectionChoices" | 
+/**
+ * Object is being displayed in a location for picking its relative order
+ */
+"cardOrderLocationUnordered" | "cardOrderLocationDeck" | "cardOrderLocationDeckBottom" | "cardOrderLocationVoid" | 
+/**
+ * Object has just been revealed to this viewer
+ */
+"revealed" | 
+/**
+ * Object is in a temporary holding space for cards in hand while resolving
+ * some other 'play card' ability.
+ */
+"handStorage"
 
 /** tauri-specta globals **/
 

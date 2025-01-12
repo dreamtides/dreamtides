@@ -517,6 +517,10 @@ version = "0.0.0"
 dependencies = [
  "derive_more 1.0.0",
  "serde",
+ "specta",
+ "specta-typescript",
+ "specta-util",
+ "tauri-specta",
 ]
 
 [[package]]
