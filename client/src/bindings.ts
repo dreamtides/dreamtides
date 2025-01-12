@@ -5,8 +5,8 @@
 
 
 export const commands = {
-async greet() : Promise<Position> {
-    return await TAURI_INVOKE("greet");
+async fetchBattle(id: ClientBattleId) : Promise<BattleView> {
+    return await TAURI_INVOKE("fetch_battle", { id });
 }
 }
 
@@ -20,6 +20,152 @@ async greet() : Promise<Position> {
 
 /** user-defined types **/
 
+/**
+ * Represents the visual state of an ongoing dream battle
+ */
+export type BattleView = { 
+/**
+ * Unique identifier for this dream battle
+ */
+id: ClientBattleId; 
+/**
+ * Player who is operating the client
+ */
+user: PlayerView; 
+/**
+ * Opponent of user
+ */
+enemy: PlayerView; 
+/**
+ * Visual state of cards in the game
+ */
+cards: CardView[]; 
+/**
+ * Describes the status of the game, e.g. which phase & step the game is in
+ */
+statusDescription: string; 
+/**
+ * User interaction options
+ */
+controls: ControlView[] }
+/**
+ * Controls color for buttons
+ */
+export type ButtonKind = 
+/**
+ * Emphasized button, primary game action
+ */
+"primary" | 
+/**
+ * Deemphasized button, additional game actions
+ */
+"default"
+/**
+ * Button to perform some game action
+ */
+export type ButtonView = { label: string; kind: ButtonKind }
+/**
+ * Whether a card is face-down or face-up
+ */
+export type CardFacing = "faceDown" | "faceUp"
+/**
+ * Represents the visual state of a card or ability in a game
+ */
+export type CardView = { 
+/**
+ * Identifier for this card
+ */
+id: ClientCardId; 
+/**
+ * Position of this card in the UI
+ */
+position: ObjectPosition; 
+/**
+ * Card back image
+ */
+cardBack: Url; 
+/**
+ * If this card is revealed to the viewer, contains information on the
+ * revealed face of the card.
+ */
+revealed: RevealedCardView | null; 
+/**
+ * True if this card is in a hidden zone but known to one or more opponents
+ */
+revealedToOpponents: boolean; 
+/**
+ * Face up/face down state for this card
+ */
+cardFacing: CardFacing; 
+/**
+ * Optionally, a position at which to create this card.
+ * 
+ * If this card does not already exist, it will be created at this position
+ * before being animated to [Self::position].
+ */
+createPosition: ObjectPosition | null; 
+/**
+ * Optionally, a position at which to destroy this card.
+ * 
+ * If provided, the card will be animated to this position before being
+ * destroyed.
+ */
+destroyPosition: ObjectPosition | null }
+export type ClientBattleId = string
+/**
+ * Identifies a card in client code
+ * 
+ * Client-opaque serialized value.
+ */
+export type ClientCardId = { cardId: string } | { activatedAbilityId: string } | { triggeredAbilityId: string }
+/**
+ * User interaction options
+ */
+export type ControlView = { button: ButtonView }
+/**
+ * Identifies a player in the context of the user interface.
+ */
+export type DisplayPlayer = 
+/**
+ * Player who is currently operating the client
+ */
+"user" | 
+/**
+ * Opponent of user, i.e. the AI enemy
+ */
+"enemy"
+/**
+ * Represents the position of some object in the UI
+ */
+export type ObjectPosition = { 
+/**
+ * Position category
+ */
+position: Position; 
+/**
+ * Sorting key, determines order within the position
+ */
+sortingKey: number; 
+/**
+ * Sub-key, used to break ties in sorting
+ */
+sortingSubKey: number }
+/**
+ * Represents the visual state of a player in a game
+ */
+export type PlayerView = { 
+/**
+ * Current score total
+ */
+score: Points; 
+/**
+ * Can this player currently take a game action?
+ */
+canAct: boolean }
+/**
+ * Victory points. Enable the player to win the game.
+ */
+export type Points = number
 /**
  * Possible types of display positions
  */
@@ -41,27 +187,27 @@ export type Position =
 /**
  * Object is on the stack
  */
-"stack" | 
+"onStack" | 
 /**
  * Object is in a player's hand
  */
-"userHand" | "enemyHand" | 
+{ inHand: DisplayPlayer } | 
 /**
  * Object is in a player's deck
  */
-"userDeck" | "enemyDeck" | 
+{ inDeck: DisplayPlayer } | 
 /**
  * Object is in a player's void
  */
-"userVoid" | "enemyVoid" | 
+{ inVoid: DisplayPlayer } | 
 /**
  * Object is in this player's banished zone
  */
-"userBanished" | "enemyBanished" | 
+{ inBanished: DisplayPlayer } | 
 /**
  * Object is on the battlefield
  */
-"userBattlefield" | "enemyBattlefield" | 
+{ onBattlefield: DisplayPlayer } | 
 /**
  * Object is being displayed in a card browser, e.g. to select from a list
  * of cards while searching
@@ -73,10 +219,6 @@ export type Position =
  */
 "cardSelectionChoices" | 
 /**
- * Object is being displayed in a location for picking its relative order
- */
-"cardOrderLocationUnordered" | "cardOrderLocationDeck" | "cardOrderLocationDeckBottom" | "cardOrderLocationVoid" | 
-/**
  * Object has just been revealed to this viewer
  */
 "revealed" | 
@@ -85,6 +227,46 @@ export type Position =
  * some other 'play card' ability.
  */
 "handStorage"
+export type RevealedCardStatus = "selected" | "canSelect" | "canPlay"
+/**
+ * Visual state of a revealed card
+ */
+export type RevealedCardView = { 
+/**
+ * Image URL for this card
+ */
+image: Url; 
+/**
+ * Name of this card
+ */
+name: string; 
+/**
+ * Rules text to display for this face
+ */
+rulesText: string; 
+/**
+ * Visual status of this card
+ */
+status: RevealedCardStatus | null; 
+/**
+ * True if this card represents an ability
+ */
+isAbility: boolean; 
+/**
+ * True if this card represents a token
+ */
+isToken: boolean; 
+/**
+ * True if this card can be dragged by the player.
+ * 
+ * The set of valid drag targets is set on the GameView. All draggable
+ * cards can be dragged to and reordered within any valid target.
+ */
+canDrag: boolean }
+/**
+ * A URL
+ */
+export type Url = string
 
 /** tauri-specta globals **/
 

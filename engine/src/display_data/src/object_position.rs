@@ -37,22 +37,22 @@ pub enum Position {
     Played,
 
     /// Object is on the stack
-    Stack,
+    OnStack,
 
     /// Object is in a player's hand
-    Hand(DisplayPlayer),
+    InHand(DisplayPlayer),
 
     /// Object is in a player's deck
-    Deck(DisplayPlayer),
+    InDeck(DisplayPlayer),
 
     /// Object is in a player's void
-    Void(DisplayPlayer),
+    InVoid(DisplayPlayer),
 
     /// Object is in this player's banished zone
-    Banished(DisplayPlayer),
+    InBanished(DisplayPlayer),
 
     /// Object is on the battlefield
-    Battlefield(DisplayPlayer),
+    OnBattlefield(DisplayPlayer),
 
     /// Object is being displayed in a card browser, e.g. to select from a list
     /// of cards while searching

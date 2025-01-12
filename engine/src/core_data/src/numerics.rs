@@ -2,6 +2,7 @@ use derive_more::{
     Add, AddAssign, Display, Div, DivAssign, From, Into, Mul, MulAssign, Sub, SubAssign, Sum,
 };
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 /// A resource used to pay for cards & abilities.
 #[derive(
@@ -27,6 +28,7 @@ use serde::{Deserialize, Serialize};
     Into,
     Serialize,
     Deserialize,
+    Type,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Energy(pub u32);
@@ -56,6 +58,7 @@ pub struct Energy(pub u32);
     Into,
     Serialize,
     Deserialize,
+    Type,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Spark(pub u32);
@@ -84,6 +87,7 @@ pub struct Spark(pub u32);
     Into,
     Serialize,
     Deserialize,
+    Type,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Points(pub u32);

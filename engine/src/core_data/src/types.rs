@@ -11,5 +11,5 @@ pub struct Url(pub String);
 #[serde(rename_all = "camelCase")]
 pub enum CardFacing {
     FaceDown,
-    FaceBup,
+    FaceUp,
 }

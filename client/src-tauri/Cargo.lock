@@ -883,6 +883,7 @@ dependencies = [
 name = "dreamcaller"
 version = "0.1.0"
 dependencies = [
+ "core_data",
  "display_data",
  "serde",
  "serde_json",
