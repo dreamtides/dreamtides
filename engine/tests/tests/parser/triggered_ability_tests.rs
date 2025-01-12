@@ -11,10 +11,10 @@ fn test_materialize_warrior_gain_spark() {
         result,
         @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Materialize(Another(CharacterType(Warrior))),
-        effect: Effect(GainsSpark(
-          target: This,
+      triggered(TriggeredAbility(
+        trigger: materialize(another(characterType(warrior))),
+        effect: effect(gainsSpark(
+          target: this,
           gains: Spark(1),
         )),
         options: None,
@@ -29,11 +29,11 @@ fn test_keyword_trigger_draw() {
     let result = parse("$materialized: Draw a card.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Keywords([
-          Materialized,
+      triggered(TriggeredAbility(
+        trigger: keywords([
+          materialized,
         ]),
-        effect: Effect(DrawCards(
+        effect: effect(drawCards(
           count: 1,
         )),
         options: None,
@@ -47,12 +47,12 @@ fn test_multiple_keyword_trigger() {
     let result = parse("$materialized, $dissolved: Draw a card.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Keywords([
-          Materialized,
-          Dissolved,
+      triggered(TriggeredAbility(
+        trigger: keywords([
+          materialized,
+          dissolved,
         ]),
-        effect: Effect(DrawCards(
+        effect: effect(drawCards(
           count: 1,
         )),
         options: None,
@@ -66,13 +66,13 @@ fn test_three_keyword_trigger() {
     let result = parse("$materialized, $judgment, $dissolved: Draw a card.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Keywords([
-          Materialized,
-          Judgment,
-          Dissolved,
+      triggered(TriggeredAbility(
+        trigger: keywords([
+          materialized,
+          judgment,
+          dissolved,
         ]),
-        effect: Effect(DrawCards(
+        effect: effect(drawCards(
           count: 1,
         )),
         options: None,
@@ -89,18 +89,18 @@ fn test_once_per_turn() {
         result,
         @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Materialize(Your(CardWithCost(
-          target: Character,
-          cost_operator: OrLess,
+      triggered(TriggeredAbility(
+        trigger: materialize(your(cardWithCost(
+          target: character,
+          cost_operator: orLess,
           cost: Energy(2),
         ))),
-        effect: Effect(DrawCards(
+        effect: effect(drawCards(
           count: 1,
         )),
         options: Some(TriggeredAbilityOptions(
-          once_per_turn: true,
-          until_end_of_turn: false,
+          oncePerTurn: true,
+          untilEndOfTurn: false,
         )),
       )),
     ]
@@ -116,19 +116,19 @@ fn test_multiple_keyword_trigger_conditional() {
         result,
         @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Keywords([
-          Materialized,
-          Judgment,
+      triggered(TriggeredAbility(
+        trigger: keywords([
+          materialized,
+          judgment,
         ]),
-        effect: WithOptions(EffectWithOptions(
-          effect: GainEnergy(
+        effect: withOptions(EffectWithOptions(
+          effect: gainEnergy(
             gains: Energy(1),
           ),
           optional: None,
-          condition: Some(PredicateCount(
+          condition: Some(predicateCount(
             count: 2,
-            predicate: Another(CharacterType(Warrior)),
+            predicate: another(characterType(warrior)),
           )),
         )),
         options: None,
@@ -143,14 +143,14 @@ fn test_once_per_turn_materialize() {
     let result = parse("Once per turn, when you materialize a character, gain $1.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Materialize(Your(Character)),
-        effect: Effect(GainEnergy(
+      triggered(TriggeredAbility(
+        trigger: materialize(your(character)),
+        effect: effect(gainEnergy(
           gains: Energy(1),
         )),
         options: Some(TriggeredAbilityOptions(
-          once_per_turn: true,
-          until_end_of_turn: false,
+          oncePerTurn: true,
+          untilEndOfTurn: false,
         )),
       )),
     ]
@@ -162,12 +162,12 @@ fn test_draw_matching_card() {
     let result = parse("$materialized: Draw a {cardtype: warrior} from your deck.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Keywords([
-          Materialized,
+      triggered(TriggeredAbility(
+        trigger: keywords([
+          materialized,
         ]),
-        effect: Effect(DrawMatchingCard(
-          predicate: CharacterType(Warrior),
+        effect: effect(drawMatchingCard(
+          predicate: characterType(warrior),
         )),
         options: None,
       )),
@@ -180,10 +180,10 @@ fn test_gain_spark_on_materialize() {
     let result = parse("Whenever you materialize a character, this character gains +1 spark.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Materialize(Your(Character)),
-        effect: Effect(GainsSpark(
-          target: This,
+      triggered(TriggeredAbility(
+        trigger: materialize(your(character)),
+        effect: effect(gainsSpark(
+          target: this,
           gains: Spark(1),
         )),
         options: None,
@@ -198,10 +198,10 @@ fn test_discard_gains_reclaim() {
         parse("Whenever you discard a card, that card gains {kw: reclaim} until end of turn.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Discard(Your(Card)),
-        effect: Effect(GainsReclaimUntilEndOfTurn(
-          target: That,
+      triggered(TriggeredAbility(
+        trigger: discard(your(card)),
+        effect: effect(gainsReclaimUntilEndOfTurn(
+          target: that,
           cost: None,
         )),
         options: None,
@@ -215,18 +215,18 @@ fn test_once_per_turn_multiple_effects() {
     let result = parse("Once per turn, when you discard a card, gain $1 and then {kw: kindle} 2.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Discard(Your(Card)),
-        effect: List([
+      triggered(TriggeredAbility(
+        trigger: discard(your(card)),
+        effect: list([
           EffectWithOptions(
-            effect: GainEnergy(
+            effect: gainEnergy(
               gains: Energy(1),
             ),
             optional: None,
             condition: None,
           ),
           EffectWithOptions(
-            effect: Kindle(
+            effect: kindle(
               amount: Spark(2),
             ),
             optional: None,
@@ -234,8 +234,8 @@ fn test_once_per_turn_multiple_effects() {
           ),
         ]),
         options: Some(TriggeredAbilityOptions(
-          once_per_turn: true,
-          until_end_of_turn: false,
+          oncePerTurn: true,
+          untilEndOfTurn: false,
         )),
       )),
     ]
@@ -251,10 +251,10 @@ fn test_materialize_nth_this_turn() {
         result,
         @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: MaterializeNthThisTurn(Your(Character), 2),
-        effect: Effect(ReturnFromYourVoidToPlay(
-          target: This,
+      triggered(TriggeredAbility(
+        trigger: materializeNthThisTurn(your(character), 2),
+        effect: effect(returnFromYourVoidToPlay(
+          target: this,
         )),
         options: None,
       )),
@@ -268,9 +268,9 @@ fn test_end_of_turn() {
     let result = parse("At the end of your turn, gain $2.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: EndOfYourTurn,
-        effect: Effect(GainEnergy(
+      triggered(TriggeredAbility(
+        trigger: endOfYourTurn,
+        effect: effect(gainEnergy(
           gains: Energy(2),
         )),
         options: None,
@@ -284,10 +284,10 @@ fn test_play_from_hand() {
     let result = parse("Whenever you play an event from your hand, copy it.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: PlayFromHand(Your(Event)),
-        effect: Effect(Copy(
-          target: It,
+      triggered(TriggeredAbility(
+        trigger: playFromHand(your(event)),
+        effect: effect(copy(
+          target: it,
         )),
         options: None,
       )),
@@ -301,13 +301,13 @@ fn test_gain_energy_replacement() {
         parse("Until end of turn, whenever you gain energy, gain twice that much energy instead.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(CreateTriggerUntilEndOfTurn(
+      event(effect(createTriggerUntilEndOfTurn(
         trigger: TriggeredAbility(
-          trigger: GainEnergy,
-          effect: Effect(GainTwiceThatMuchEnergyInstead),
+          trigger: gainEnergy,
+          effect: effect(gainTwiceThatMuchEnergyInstead),
           options: Some(TriggeredAbilityOptions(
-            once_per_turn: false,
-            until_end_of_turn: true,
+            oncePerTurn: false,
+            untilEndOfTurn: true,
           )),
         ),
       ))),
@@ -320,9 +320,9 @@ fn test_draw_all_cards_win_game() {
     let result = parse("When you draw all of the cards in a copy of your deck, you win the game.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: DrawAllCardsInCopyOfDeck,
-        effect: Effect(YouWinTheGame),
+      triggered(TriggeredAbility(
+        trigger: drawAllCardsInCopyOfDeck,
+        effect: effect(youWinTheGame),
         options: None,
       )),
     ]
@@ -335,10 +335,10 @@ fn test_banished_character_gains_spark() {
         parse("Whenever a character you control is banished, this character gains +1 spark.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Banished(Your(Character)),
-        effect: Effect(GainsSpark(
-          target: This,
+      triggered(TriggeredAbility(
+        trigger: banished(your(character)),
+        effect: effect(gainsSpark(
+          target: this,
           gains: Spark(1),
         )),
         options: None,
@@ -352,9 +352,9 @@ fn test_dissolved_character_gains_spark() {
     let result = parse("Whenever a character you control is dissolved, drawa card.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Dissolved(Your(Character)),
-        effect: Effect(DrawCards(
+      triggered(TriggeredAbility(
+        trigger: dissolved(your(character)),
+        effect: effect(drawCards(
           count: 1,
         )),
         options: None,
@@ -368,15 +368,15 @@ fn test_banish_until_next_main() {
     let result = parse("Until end of turn, whenever you banish a character, draw a card.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(CreateTriggerUntilEndOfTurn(
+      event(effect(createTriggerUntilEndOfTurn(
         trigger: TriggeredAbility(
-          trigger: Banished(Your(Character)),
-          effect: Effect(DrawCards(
+          trigger: banished(your(character)),
+          effect: effect(drawCards(
             count: 1,
           )),
           options: Some(TriggeredAbilityOptions(
-            once_per_turn: false,
-            until_end_of_turn: true,
+            oncePerTurn: false,
+            untilEndOfTurn: true,
           )),
         ),
       ))),
@@ -389,10 +389,10 @@ fn test_abandon_character_gains_spark() {
     let result = parse("Whenever you abandon a character, this character gains +1 spark.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Abandon(Your(Character)),
-        effect: Effect(GainsSpark(
-          target: This,
+      triggered(TriggeredAbility(
+        trigger: abandon(your(character)),
+        effect: effect(gainsSpark(
+          target: this,
           gains: Spark(1),
         )),
         options: None,

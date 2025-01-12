@@ -1,0 +1,18 @@
+[package]
+name = "display_data"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+test = false
+doctest = false
+bench = false
+
+[dependencies]
+core_data = { path = "../core_data" }
+
+serde = { version = "1", features = ["derive"] }
+specta = { version = "=2.0.0-rc.20", features = ["derive","uuid"] }
+specta-typescript = "=0.0.7"
+specta-util = "=0.0.7"
+tauri-specta = { version = "=2.0.0-rc.20", features = ["derive", "typescript"] }

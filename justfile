@@ -4,6 +4,7 @@ code-review: check-format check-ts-format build clippy test check-docs
 
 check:
     cargo check --manifest-path engine/Cargo.toml --workspace --all-targets --all-features
+    cargo check --manifest-path client/src-tauri/Cargo.toml --workspace --all-targets --all-features
 
 check-warnings:
     RUSTFLAGS="--deny warnings" cargo check --manifest-path engine/Cargo.toml --workspace --all-targets --all-features

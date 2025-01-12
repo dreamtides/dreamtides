@@ -7,9 +7,9 @@ fn test_gain_energy_for_each() {
     let result = parse("Gain $1 for each other character you control.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(GainEnergyForEach(
+      event(effect(gainEnergyForEach(
         gains: Energy(1),
-        for_each: Another(Character),
+        for_each: another(character),
       ))),
     ]
     "###);
@@ -20,8 +20,8 @@ fn test_discover_materialized_ability() {
     let result = parse("{kw: discover} a character with a $materialized ability.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(Discover(
-        predicate: CharacterWithMaterializedAbility,
+      event(effect(discover(
+        predicate: characterWithMaterializedAbility,
       ))),
     ]
     "###);
@@ -32,11 +32,11 @@ fn test_materialize_random_characters() {
     let result = parse("Materialize two random characters with cost $3 or less from your deck.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(MaterializeRandomFromDeck(
+      event(effect(materializeRandomFromDeck(
         count: 2,
-        predicate: CardWithCost(
-          target: Character,
-          cost_operator: OrLess,
+        predicate: cardWithCost(
+          target: character,
+          cost_operator: orLess,
           cost: Energy(3),
         ),
       ))),
@@ -49,11 +49,11 @@ fn test_return_from_void_to_play() {
     let result = parse("You may return a {cardtype: warrior} from your void to play.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(WithOptions(EffectWithOptions(
-        effect: ReturnFromYourVoidToPlay(
-          target: Your(CharacterType(Warrior)),
+      event(withOptions(EffectWithOptions(
+        effect: returnFromYourVoidToPlay(
+          target: your(characterType(warrior)),
         ),
-        optional: Some(NoCost),
+        optional: Some(noCost),
         condition: None,
       ))),
     ]
@@ -65,8 +65,8 @@ fn test_negate_enemy_dream() {
     let result = parse("Negate an enemy dream.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(Negate(
-        target: Enemy(Dream),
+      event(effect(negate(
+        target: enemy(dream),
       ))),
     ]
     "###);
@@ -77,7 +77,7 @@ fn test_spend_all_energy_draw_discard() {
     let result = parse("Spend all your remaining energy. Draw X cards then discard X cards, where X is the energy spent this way.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(SpendAllEnergyDrawAndDiscard)),
+      event(effect(spendAllEnergyDrawAndDiscard)),
     ]
     "###);
 }
@@ -87,17 +87,17 @@ fn test_negate_and_put_on_top() {
     let result = parse("Negate an enemy dream. Put that card on top of the enemy's deck.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(List([
+      event(list([
         EffectWithOptions(
-          effect: Negate(
-            target: Enemy(Dream),
+          effect: negate(
+            target: enemy(dream),
           ),
           optional: None,
           condition: None,
         ),
         EffectWithOptions(
-          effect: PutOnTopOfEnemyDeck(
-            target: That,
+          effect: putOnTopOfEnemyDeck(
+            target: that,
           ),
           optional: None,
           condition: None,
@@ -112,10 +112,10 @@ fn test_discard_card_from_enemy_hand() {
     let result = parse("Look at the enemy's hand. Choose a card with cost $3 or less from it. The enemy discards that card.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(DiscardCardFromEnemyHand(
-        predicate: CardWithCost(
-          target: Card,
-          cost_operator: OrLess,
+      event(effect(discardCardFromEnemyHand(
+        predicate: cardWithCost(
+          target: card,
+          cost_operator: orLess,
           cost: Energy(3),
         ),
       ))),
@@ -128,10 +128,10 @@ fn test_each_matching_gains_spark_for_each() {
     let result = parse("Each {cardtype: spirit animal} you control gains +X spark, where X is the number of {cardtype: spirit animals} you control.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(EachMatchingGainsSparkForEach(
-        each: CharacterType(SpiritAnimal),
+      event(effect(eachMatchingGainsSparkForEach(
+        each: characterType(spiritAnimal),
         gains: Spark(1),
-        for_each: CharacterType(SpiritAnimal),
+        for_each: characterType(spiritAnimal),
       ))),
     ]
     "###);
@@ -142,8 +142,8 @@ fn test_return_all_but_one_draw_for_each() {
     let result = parse("Return all but one character you control to hand. Draw a card for each character returned.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(ReturnCharactersToHandDrawCardForEach(
-        count: AllButOne,
+      event(effect(returnCharactersToHandDrawCardForEach(
+        count: allButOne,
       ))),
     ]
     "###);
@@ -155,21 +155,21 @@ fn test_banish_then_materialize() {
         parse("$materialized: You may banish another character you control, then materialize it.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Keywords([
-          Materialized,
+      triggered(TriggeredAbility(
+        trigger: keywords([
+          materialized,
         ]),
-        effect: List([
+        effect: list([
           EffectWithOptions(
-            effect: BanishCharacter(
-              target: Another(Character),
+            effect: banishCharacter(
+              target: another(character),
             ),
-            optional: Some(NoCost),
+            optional: Some(noCost),
             condition: None,
           ),
           EffectWithOptions(
-            effect: MaterializeCharacter(
-              target: It,
+            effect: materializeCharacter(
+              target: it,
             ),
             optional: None,
             condition: None,
@@ -186,18 +186,18 @@ fn test_banish_any_number_then_materialize() {
     let result = parse("Banish any number of other characters you control, then materialize them.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(List([
+      event(list([
         EffectWithOptions(
-          effect: BanishCollection(
-            target: Another(Character),
-            count: AnyNumberOf,
+          effect: banishCollection(
+            target: another(character),
+            count: anyNumberOf,
           ),
           optional: None,
           condition: None,
         ),
         EffectWithOptions(
-          effect: MaterializeCharacter(
-            target: Them,
+          effect: materializeCharacter(
+            target: them,
           ),
           optional: None,
           condition: None,
@@ -212,18 +212,18 @@ fn test_banish_up_to_two() {
     let result = parse("Banish up to two characters you control, then materialize them.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(List([
+      event(list([
         EffectWithOptions(
-          effect: BanishCollection(
-            target: Your(Character),
-            count: UpTo(2),
+          effect: banishCollection(
+            target: your(character),
+            count: upTo(2),
           ),
           optional: None,
           condition: None,
         ),
         EffectWithOptions(
-          effect: MaterializeCharacter(
-            target: Them,
+          effect: materializeCharacter(
+            target: them,
           ),
           optional: None,
           condition: None,
@@ -240,22 +240,22 @@ fn test_banish_up_to_two_activated() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      Activated(ActivatedAbility(
+      activated(ActivatedAbility(
         costs: [
-          Energy(Energy(3)),
+          energy(Energy(3)),
         ],
-        effect: List([
+        effect: list([
           EffectWithOptions(
-            effect: BanishCollection(
-              target: Another(Character),
-              count: UpTo(2),
+            effect: banishCollection(
+              target: another(character),
+              count: upTo(2),
             ),
             optional: None,
             condition: None,
           ),
           EffectWithOptions(
-            effect: MaterializeCharacter(
-              target: Them,
+            effect: materializeCharacter(
+              target: them,
             ),
             optional: None,
             condition: None,
@@ -274,12 +274,12 @@ fn test_dissolve_enemy_character_with_spark_compared_to_abandoned() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      Activated(ActivatedAbility(
+      activated(ActivatedAbility(
         costs: [],
-        effect: Effect(DissolveCharacter(
-          target: Enemy(CharacterWithSparkComparedToAbandonedCountThisTurn(
-            target: Character,
-            spark_operator: OrLess,
+        effect: effect(dissolveCharacter(
+          target: enemy(characterWithSparkComparedToAbandonedCountThisTurn(
+            target: character,
+            spark_operator: orLess,
           )),
         )),
         options: None,
@@ -295,24 +295,24 @@ fn test_multi_activated_dissolve_with_abandoned_spark() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      Activated(ActivatedAbility(
+      activated(ActivatedAbility(
         costs: [
-          AbandonCharacters(Another(Character), 1),
+          abandonCharacters(another(character), 1),
         ],
-        effect: WithOptions(EffectWithOptions(
-          effect: DissolveCharacter(
-            target: Enemy(CharacterWithSparkComparedToAbandoned(
-              target: Character,
-              spark_operator: OrLess,
+        effect: withOptions(EffectWithOptions(
+          effect: dissolveCharacter(
+            target: enemy(characterWithSparkComparedToAbandoned(
+              target: character,
+              spark_operator: orLess,
             )),
           ),
-          optional: Some(NoCost),
+          optional: Some(noCost),
           condition: None,
         )),
         options: Some(ActivatedAbilityOptions(
-          is_fast: false,
-          is_immediate: false,
-          is_multi: true,
+          isFast: false,
+          isImmediate: false,
+          isMulti: true,
         )),
       )),
     ]
@@ -325,21 +325,21 @@ fn test_abandon_any_number_draw_for_each() {
         parse("Abandon any number of characters. Draw a card for each character abandoned.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(List([
+      event(list([
         EffectWithOptions(
-          effect: PayCost(
-            cost: AbandonCharactersCount(
-              target: Your(Character),
-              count: AnyNumberOf,
+          effect: payCost(
+            cost: abandonCharactersCount(
+              target: your(character),
+              count: anyNumberOf,
             ),
           ),
           optional: None,
           condition: None,
         ),
         EffectWithOptions(
-          effect: DrawCardsForEach(
+          effect: drawCardsForEach(
             count: 1,
-            for_each: AbandonedThisWay(Character),
+            for_each: abandonedThisWay(character),
           ),
           optional: None,
           condition: None,
@@ -354,10 +354,10 @@ fn test_discover_card_with_cost() {
     let result = parse("{kw: discover} a card with cost $2.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(Discover(
-        predicate: CardWithCost(
-          target: Card,
-          cost_operator: Exactly,
+      event(effect(discover(
+        predicate: cardWithCost(
+          target: card,
+          cost_operator: exactly,
           cost: Energy(2),
         ),
       ))),
@@ -370,10 +370,10 @@ fn test_materialize_character_when_discarded() {
     let result = parse("When you discard this character, materialize it.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Discard(This),
-        effect: Effect(MaterializeCharacter(
-          target: It,
+      triggered(TriggeredAbility(
+        trigger: discard(this),
+        effect: effect(materializeCharacter(
+          target: it,
         )),
         options: None,
       )),
@@ -386,11 +386,11 @@ fn test_foresee() {
     let result = parse("$materialized: {kw: Foresee} 2.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Keywords([
-          Materialized,
+      triggered(TriggeredAbility(
+        trigger: keywords([
+          materialized,
         ]),
-        effect: Effect(Foresee(
+        effect: effect(foresee(
           count: 2,
         )),
         options: None,
@@ -406,16 +406,16 @@ fn test_lose_points() {
         result,
         @r###"
     [
-      Event(List([
+      event(list([
         EffectWithOptions(
-          effect: DissolveCharacter(
-            target: Enemy(Character),
+          effect: dissolveCharacter(
+            target: enemy(character),
           ),
           optional: None,
           condition: None,
         ),
         EffectWithOptions(
-          effect: LosePoints(
+          effect: losePoints(
             loses: Points(4),
           ),
           optional: None,
@@ -432,9 +432,9 @@ fn test_dissolve_characters_count() {
     let result = parse("Dissolve all characters.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(DissolveCharactersCount(
-        target: Any(Character),
-        count: All,
+      event(effect(dissolveCharactersCount(
+        target: any(character),
+        count: all,
       ))),
     ]
     "###);
@@ -445,7 +445,7 @@ fn test_enemy_points() {
     let result = parse("The enemy gains 2 $points.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(EnemyGainsPoints(
+      event(effect(enemyGainsPoints(
         count: 2,
       ))),
     ]
@@ -454,7 +454,7 @@ fn test_enemy_points() {
     let result = parse("The enemy loses 1 $point.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(EnemyLosesPoints(
+      event(effect(enemyLosesPoints(
         count: 1,
       ))),
     ]
@@ -466,10 +466,10 @@ fn test_banish_character() {
     let result = parse("Banish an enemy character with cost $2 or less.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(BanishCharacter(
-        target: Enemy(CardWithCost(
-          target: Character,
-          cost_operator: OrLess,
+      event(effect(banishCharacter(
+        target: enemy(cardWithCost(
+          target: character,
+          cost_operator: orLess,
           cost: Energy(2),
         )),
       ))),
@@ -485,16 +485,16 @@ fn test_enemy_gains_points_equal_to_its_spark() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      Event(List([
+      event(list([
         EffectWithOptions(
-          effect: BanishCharacter(
-            target: Enemy(NotCharacterType(Warrior)),
+          effect: banishCharacter(
+            target: enemy(notCharacterType(warrior)),
           ),
           optional: None,
           condition: None,
         ),
         EffectWithOptions(
-          effect: EnemyGainsPointsEqualToItsSpark,
+          effect: enemyGainsPointsEqualToItsSpark,
           optional: None,
           condition: None,
         ),
@@ -508,17 +508,17 @@ fn test_materialize_character_from_void() {
     let result = parse("Whenever you play a {cardtype: warrior}, you may materialize a character with cost $3 or less from your void.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Play(Your(CharacterType(Warrior))),
-        effect: WithOptions(EffectWithOptions(
-          effect: MaterializeCharacterFromVoid(
-            target: CardWithCost(
-              target: Character,
-              cost_operator: OrLess,
+      triggered(TriggeredAbility(
+        trigger: play(your(characterType(warrior))),
+        effect: withOptions(EffectWithOptions(
+          effect: materializeCharacterFromVoid(
+            target: cardWithCost(
+              target: character,
+              cost_operator: orLess,
               cost: Energy(3),
             ),
           ),
-          optional: Some(NoCost),
+          optional: Some(noCost),
           condition: None,
         )),
         options: None,
@@ -532,17 +532,17 @@ fn test_abandon_a_character_or_discard_a_card() {
     let result = parse("Abandon a character or discard a card. Dissolve an enemy character.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(List([
+      event(list([
         EffectWithOptions(
-          effect: PayCost(
-            cost: AbandonACharacterOrDiscardACard,
+          effect: payCost(
+            cost: abandonACharacterOrDiscardACard,
           ),
           optional: None,
           condition: None,
         ),
         EffectWithOptions(
-          effect: DissolveCharacter(
-            target: Enemy(Character),
+          effect: dissolveCharacter(
+            target: enemy(character),
           ),
           optional: None,
           condition: None,
@@ -557,10 +557,10 @@ fn test_gain_control() {
     let result = parse("Gain control of an enemy character with cost $2 or less.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(GainControl(
-        target: Enemy(CardWithCost(
-          target: Character,
-          cost_operator: OrLess,
+      event(effect(gainControl(
+        target: enemy(cardWithCost(
+          target: character,
+          cost_operator: orLess,
           cost: Energy(2),
         )),
       ))),
@@ -573,10 +573,10 @@ fn test_return_to_hand() {
     let result = parse("Return a character with cost $3 or more you control to hand.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(ReturnToHand(
-        target: Your(CardWithCost(
-          target: Character,
-          cost_operator: OrMore,
+      event(effect(returnToHand(
+        target: your(cardWithCost(
+          target: character,
+          cost_operator: orMore,
           cost: Energy(3),
         )),
       ))),
@@ -590,12 +590,12 @@ fn test_event_gains_reclaim() {
         parse("$materialized: An event in your void gains {kw: reclaim} until end of turn.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Keywords([
-          Materialized,
+      triggered(TriggeredAbility(
+        trigger: keywords([
+          materialized,
         ]),
-        effect: Effect(GainsReclaimUntilEndOfTurn(
-          target: YourVoid(Event),
+        effect: effect(gainsReclaimUntilEndOfTurn(
+          target: yourVoid(event),
           cost: None,
         )),
         options: None,
@@ -609,8 +609,8 @@ fn return_a_character_to_hand() {
     let result = parse("Return a character to hand.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(ReturnToHand(
-        target: Any(Character),
+      event(effect(returnToHand(
+        target: any(character),
       ))),
     ]
     "###);
@@ -621,9 +621,9 @@ fn test_gain_points_for_each() {
     let result = parse("Gain 1 $point for each dream you have played this turn.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(GainPointsForEach(
+      event(effect(gainPointsForEach(
         gain: Points(1),
-        for_count: PlayedThisTurn(Dream),
+        for_count: playedThisTurn(dream),
       ))),
     ]
     "###);
@@ -634,9 +634,9 @@ fn test_draw_cards_for_each() {
     let result = parse("Draw a card for each dream you have played this turn.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(DrawCardsForEach(
+      event(effect(drawCardsForEach(
         count: 1,
-        for_each: PlayedThisTurn(Dream),
+        for_each: playedThisTurn(dream),
       ))),
     ]
     "###);
@@ -647,8 +647,8 @@ fn test_copy() {
     let result = parse("Copy a character.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(Copy(
-        target: Any(Character),
+      event(effect(copy(
+        target: any(character),
       ))),
     ]
     "###);
@@ -659,10 +659,10 @@ fn test_copy_it() {
     let result = parse("Whenever you play an event, copy it.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Play(Your(Event)),
-        effect: Effect(Copy(
-          target: It,
+      triggered(TriggeredAbility(
+        trigger: play(your(event)),
+        effect: effect(copy(
+          target: it,
         )),
         options: None,
       )),
@@ -675,8 +675,8 @@ fn test_copy_next_played() {
     let result = parse("Copy the next event you play this turn twice.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(CopyNextPlayed(
-        matching: Your(Event),
+      event(effect(copyNextPlayed(
+        matching: your(event),
         times: Some(2),
       ))),
     ]
@@ -685,8 +685,8 @@ fn test_copy_next_played() {
     let result = parse("Copy the next character you play this turn.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(CopyNextPlayed(
-        matching: Your(Character),
+      event(effect(copyNextPlayed(
+        matching: your(character),
         times: None,
       ))),
     ]
@@ -698,9 +698,9 @@ fn test_cards_in_void_gain_reclaim_this_turn() {
     let result = parse("Until end of turn, all cards in your void have {kw: reclaim}.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(CardsInVoidGainReclaimThisTurn(
-        count: All,
-        predicate: Card,
+      event(effect(cardsInVoidGainReclaimThisTurn(
+        count: all,
+        predicate: card,
       ))),
     ]
     "###);
@@ -711,8 +711,8 @@ fn test_gains_reclaim_until_end_of_turn() {
     let result = parse("An event in your void gains {kw: reclaim} $0 until end of turn.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(GainsReclaimUntilEndOfTurn(
-        target: YourVoid(Event),
+      event(effect(gainsReclaimUntilEndOfTurn(
+        target: yourVoid(event),
         cost: Some(Energy(0)),
       ))),
     ]
@@ -725,10 +725,10 @@ fn test_gains_spark_for_quantity() {
         parse("A character you control gains +1 spark for each dream you have played this turn.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(GainsSparkForQuantity(
-        target: Your(Character),
+      event(effect(gainsSparkForQuantity(
+        target: your(character),
         gains: Spark(1),
-        for_quantity: PlayedThisTurn(Dream),
+        for_quantity: playedThisTurn(dream),
       ))),
     ]
     "###);
@@ -739,7 +739,7 @@ fn test_take_extra_turn() {
     let result = parse("Take an extra turn after this one.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(TakeExtraTurn)),
+      event(effect(takeExtraTurn)),
     ]
     "###);
 }
@@ -749,7 +749,7 @@ fn test_double_your_energy() {
     let result = parse("Double the amount of energy in your energy pool.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(DoubleYourEnergy)),
+      event(effect(doubleYourEnergy)),
     ]
     "###);
 }
@@ -760,13 +760,13 @@ fn test_gain_twice_that_much_energy_instead() {
         parse("Until end of turn, whenever you gain energy, gain twice that much energy instead.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(CreateTriggerUntilEndOfTurn(
+      event(effect(createTriggerUntilEndOfTurn(
         trigger: TriggeredAbility(
-          trigger: GainEnergy,
-          effect: Effect(GainTwiceThatMuchEnergyInstead),
+          trigger: gainEnergy,
+          effect: effect(gainTwiceThatMuchEnergyInstead),
           options: Some(TriggeredAbilityOptions(
-            once_per_turn: false,
-            until_end_of_turn: true,
+            oncePerTurn: false,
+            untilEndOfTurn: true,
           )),
         ),
       ))),
@@ -779,12 +779,12 @@ fn test_copy_next_played_this_turn() {
     let result = parse("$materialized: Copy the next event you play this turn three times.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Keywords([
-          Materialized,
+      triggered(TriggeredAbility(
+        trigger: keywords([
+          materialized,
         ]),
-        effect: Effect(CopyNextPlayed(
-          matching: Your(Event),
+        effect: effect(copyNextPlayed(
+          matching: your(event),
           times: Some(3),
         )),
         options: None,
@@ -799,7 +799,7 @@ fn test_shuffle_hand_and_deck_and_draw() {
         parse("Each player may shuffle their hand and void into their deck and then draw 4 cards.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(ShuffleHandAndDeckAndDraw(
+      event(effect(shuffleHandAndDeckAndDraw(
         count: 4,
       ))),
     ]
@@ -811,9 +811,9 @@ fn test_dissolve_characters_quantity() {
     let result = parse("Dissolve an enemy character with cost less than or equal to the number of cards in your void.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(DissolveCharactersQuantity(
-        target: Enemy(Character),
-        quantity: Matching(YourVoid(Card)),
+      event(effect(dissolveCharactersQuantity(
+        target: enemy(character),
+        quantity: matching(yourVoid(card)),
       ))),
     ]
     "###);
@@ -824,7 +824,7 @@ fn test_put_cards_from_deck_into_void() {
     let result = parse("Put the top 3 cards of your deck into your void.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(PutCardsFromYourDeckIntoVoid(
+      event(effect(putCardsFromYourDeckIntoVoid(
         count: 3,
       ))),
     ]
@@ -836,9 +836,9 @@ fn test_trigger_judgment_ability() {
     let result = parse("Trigger the '$judgment' ability of each character you control.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(TriggerJudgmentAbility(
-        matching: Your(Character),
-        collection: All,
+      event(effect(triggerJudgmentAbility(
+        matching: your(character),
+        collection: all,
       ))),
     ]
     "###);
@@ -851,8 +851,8 @@ fn test_each_matching_gains_spark_until_next_main() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(EachMatchingGainsSparkUntilNextMain(
-        each: CharacterType(SpiritAnimal),
+      event(effect(eachMatchingGainsSparkUntilNextMain(
+        each: characterType(spiritAnimal),
         gains: Spark(2),
       ))),
     ]
@@ -864,11 +864,11 @@ fn test_banish_enemy_void() {
     let result = parse("$materialized: Banish the enemy's void.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Keywords([
-          Materialized,
+      triggered(TriggeredAbility(
+        trigger: keywords([
+          materialized,
         ]),
-        effect: Effect(BanishEnemyVoid),
+        effect: effect(banishEnemyVoid),
         options: None,
       )),
     ]
@@ -881,13 +881,13 @@ fn test_spark_becomes() {
         parse("$activated $3: The spark of each {cardtype: spirit animal} you control becomes 5.");
     assert_ron_snapshot!(result, @r###"
     [
-      Activated(ActivatedAbility(
+      activated(ActivatedAbility(
         costs: [
-          Energy(Energy(3)),
+          energy(Energy(3)),
         ],
-        effect: Effect(SparkBecomes(
-          collection: All,
-          matching: CharacterType(SpiritAnimal),
+        effect: effect(sparkBecomes(
+          collection: all,
+          matching: characterType(spiritAnimal),
           spark: Spark(5),
         )),
         options: None,
@@ -901,8 +901,8 @@ fn test_discard_card_from_enemy_hand_then_they_draw() {
     let result = parse("Look at the enemy's hand. You may choose a card from it. The enemy discards that card and then draws a card.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(DiscardCardFromEnemyHandThenTheyDraw(
-        predicate: Card,
+      event(effect(discardCardFromEnemyHandThenTheyDraw(
+        predicate: card,
       ))),
     ]
     "###);
@@ -914,13 +914,13 @@ fn test_banish_character_until_leaves_play() {
         parse("$materialized: Banish an enemy character until this character leaves play.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Keywords([
-          Materialized,
+      triggered(TriggeredAbility(
+        trigger: keywords([
+          materialized,
         ]),
-        effect: Effect(BanishCharacterUntilLeavesPlay(
-          target: Enemy(Character),
-          until_leaves: This,
+        effect: effect(banishCharacterUntilLeavesPlay(
+          target: enemy(character),
+          until_leaves: this,
         )),
         options: None,
       )),
@@ -934,18 +934,18 @@ fn test_materialize_character_at_end_of_turn() {
         parse("Banish any number of characters you control, then materialize them at end of turn.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(List([
+      event(list([
         EffectWithOptions(
-          effect: BanishCollection(
-            target: Your(Character),
-            count: AnyNumberOf,
+          effect: banishCollection(
+            target: your(character),
+            count: anyNumberOf,
           ),
           optional: None,
           condition: None,
         ),
         EffectWithOptions(
-          effect: MaterializeCharacterAtEndOfTurn(
-            target: Them,
+          effect: materializeCharacterAtEndOfTurn(
+            target: them,
           ),
           optional: None,
           condition: None,
@@ -960,7 +960,7 @@ fn test_spend_all_energy_dissolve_enemy() {
     let result = parse("Spend all your remaining energy. Dissolve an enemy character with spark less than or equal to the energy spent this way.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(SpendAllEnergyDissolveEnemy)),
+      event(effect(spendAllEnergyDissolveEnemy)),
     ]
     "###);
 }
@@ -972,15 +972,15 @@ fn test_banish_until_next_main() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Keywords([
-          Materialized,
+      triggered(TriggeredAbility(
+        trigger: keywords([
+          materialized,
         ]),
-        effect: WithOptions(EffectWithOptions(
-          effect: BanishUntilNextMain(
-            target: AnyOther(Character),
+        effect: withOptions(EffectWithOptions(
+          effect: banishUntilNextMain(
+            target: anyOther(character),
           ),
-          optional: Some(NoCost),
+          optional: Some(noCost),
           condition: None,
         )),
         options: None,
@@ -994,17 +994,17 @@ fn test_materialize_copy_character() {
     let result = parse("$multiActivated $4: Materialize a copy of another character you control.");
     assert_ron_snapshot!(result, @r###"
     [
-      Activated(ActivatedAbility(
+      activated(ActivatedAbility(
         costs: [
-          Energy(Energy(4)),
+          energy(Energy(4)),
         ],
-        effect: Effect(Copy(
-          target: Another(Character),
+        effect: effect(copy(
+          target: another(character),
         )),
         options: Some(ActivatedAbilityOptions(
-          is_fast: false,
-          is_immediate: false,
-          is_multi: true,
+          isFast: false,
+          isImmediate: false,
+          isMulti: true,
         )),
       )),
     ]
@@ -1016,11 +1016,11 @@ fn test_each_player_discard_cards() {
     let result = parse("$materialized: Each player discards a card.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Keywords([
-          Materialized,
+      triggered(TriggeredAbility(
+        trigger: keywords([
+          materialized,
         ]),
-        effect: Effect(EachPlayerDiscardCards(
+        effect: effect(eachPlayerDiscardCards(
           count: 1,
         )),
         options: None,
@@ -1034,9 +1034,9 @@ fn test_put_cards_from_void_on_top_of_deck() {
     let result = parse("Put a character from your void on top of your deck.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(PutCardsFromVoidOnTopOfDeck(
+      event(effect(putCardsFromVoidOnTopOfDeck(
         count: 1,
-        matching: Character,
+        matching: character,
       ))),
     ]
     "###);
@@ -1044,22 +1044,22 @@ fn test_put_cards_from_void_on_top_of_deck() {
     let result = parse("$immediate $fastMultiActivated Abandon another character: You may put a character from your void on top of your deck.");
     assert_ron_snapshot!(result, @r###"
     [
-      Activated(ActivatedAbility(
+      activated(ActivatedAbility(
         costs: [
-          AbandonCharacters(Another(Character), 1),
+          abandonCharacters(another(character), 1),
         ],
-        effect: WithOptions(EffectWithOptions(
-          effect: PutCardsFromVoidOnTopOfDeck(
+        effect: withOptions(EffectWithOptions(
+          effect: putCardsFromVoidOnTopOfDeck(
             count: 1,
-            matching: Character,
+            matching: character,
           ),
-          optional: Some(NoCost),
+          optional: Some(noCost),
           condition: None,
         )),
         options: Some(ActivatedAbilityOptions(
-          is_fast: true,
-          is_immediate: true,
-          is_multi: true,
+          isFast: true,
+          isImmediate: true,
+          isMulti: true,
         )),
       )),
     ]
@@ -1071,14 +1071,14 @@ fn test_materialize_silent_copy() {
     let result = parse("$materialized: Materialize a {kw: silent} copy of this character for each dream you have played this turn.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Keywords([
-          Materialized,
+      triggered(TriggeredAbility(
+        trigger: keywords([
+          materialized,
         ]),
-        effect: Effect(MaterializeSilentCopy(
-          target: This,
+        effect: effect(materializeSilentCopy(
+          target: this,
           count: 1,
-          quantity: PlayedThisTurn(Dream),
+          quantity: playedThisTurn(dream),
         )),
         options: None,
       )),
@@ -1088,14 +1088,14 @@ fn test_materialize_silent_copy() {
     let result = parse("$materialized: Materialize two {kw: silent} copies of this character.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Keywords([
-          Materialized,
+      triggered(TriggeredAbility(
+        trigger: keywords([
+          materialized,
         ]),
-        effect: Effect(MaterializeSilentCopy(
-          target: This,
+        effect: effect(materializeSilentCopy(
+          target: this,
           count: 2,
-          quantity: Matching(This),
+          quantity: matching(this),
         )),
         options: None,
       )),
@@ -1106,12 +1106,12 @@ fn test_materialize_silent_copy() {
         parse("Whenever you play a character, materialize a {kw: silent} copy of this character.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Play(Your(Character)),
-        effect: Effect(MaterializeSilentCopy(
-          target: This,
+      triggered(TriggeredAbility(
+        trigger: play(your(character)),
+        effect: effect(materializeSilentCopy(
+          target: this,
           count: 1,
-          quantity: Matching(This),
+          quantity: matching(this),
         )),
         options: None,
       )),
@@ -1124,9 +1124,9 @@ fn test_draw_for_abandoned_this_turn() {
     let result = parse("Draw a card for each character you abandoned this turn.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(DrawCardsForEach(
+      event(effect(drawCardsForEach(
         count: 1,
-        for_each: AbandonedThisTurn(Character),
+        for_each: abandonedThisTurn(character),
       ))),
     ]
     "###);
@@ -1138,17 +1138,17 @@ fn test_discover_multi_activated_ability() {
         parse("Abandon a character. {kw: Discover} a character with a $multiActivated ability.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(List([
+      event(list([
         EffectWithOptions(
-          effect: PayCost(
-            cost: AbandonCharacters(Your(Character), 1),
+          effect: payCost(
+            cost: abandonCharacters(your(character), 1),
           ),
           optional: None,
           condition: None,
         ),
         EffectWithOptions(
-          effect: Discover(
-            predicate: CharacterWithMultiActivatedAbility,
+          effect: discover(
+            predicate: characterWithMultiActivatedAbility,
           ),
           optional: None,
           condition: None,
@@ -1163,12 +1163,12 @@ fn test_each_player_abandons_characters() {
     let result = parse("$judgment: Each player abandons a character.");
     assert_ron_snapshot!(result, @r###"
     [
-      Triggered(TriggeredAbility(
-        trigger: Keywords([
-          Judgment,
+      triggered(TriggeredAbility(
+        trigger: keywords([
+          judgment,
         ]),
-        effect: Effect(EachPlayerAbandonsCharacters(
-          matching: Character,
+        effect: effect(eachPlayerAbandonsCharacters(
+          matching: character,
           count: 1,
         )),
         options: None,
@@ -1179,10 +1179,10 @@ fn test_each_player_abandons_characters() {
     let result = parse("Each player abandons two characters with cost $3 or more.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(EachPlayerAbandonsCharacters(
-        matching: CardWithCost(
-          target: Character,
-          cost_operator: OrMore,
+      event(effect(eachPlayerAbandonsCharacters(
+        matching: cardWithCost(
+          target: character,
+          cost_operator: orMore,
           cost: Energy(3),
         ),
         count: 2,
@@ -1193,8 +1193,8 @@ fn test_each_player_abandons_characters() {
     let result = parse("Each player abandons a {cardtype: warrior}.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(EachPlayerAbandonsCharacters(
-        matching: CharacterType(Warrior),
+      event(effect(eachPlayerAbandonsCharacters(
+        matching: characterType(warrior),
         count: 1,
       ))),
     ]

@@ -18,8 +18,13 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
-tauri-plugin-opener = "2"
+display_data = { path = "../../engine/src/display_data" }
+
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-
+specta = { version = "=2.0.0-rc.20", features = ["derive", "uuid"] }
+specta-typescript = "=0.0.7"
+specta-util = "=0.0.7"
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+tauri-specta = { version = "=2.0.0-rc.20", features = ["derive", "typescript"] }

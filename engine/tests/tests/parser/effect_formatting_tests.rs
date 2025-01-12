@@ -9,24 +9,24 @@ fn test_multiple_effects() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      Activated(ActivatedAbility(
+      activated(ActivatedAbility(
         costs: [
-          Energy(Energy(1)),
+          energy(Energy(1)),
         ],
-        effect: List([
+        effect: list([
           EffectWithOptions(
-            effect: GainsSpark(
-              target: This,
+            effect: gainsSpark(
+              target: this,
               gains: Spark(1),
             ),
             optional: None,
             condition: None,
           ),
           EffectWithOptions(
-            effect: BanishCardsFromEnemyVoid(
+            effect: banishCardsFromEnemyVoid(
               count: 1,
             ),
-            optional: Some(NoCost),
+            optional: Some(noCost),
             condition: None,
           ),
         ]),
@@ -41,17 +41,17 @@ fn test_then_separator() {
     let result = parse("Draw a card, then discard a card.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(List([
+      event(list([
         EffectWithOptions(
-          effect: DrawCards(
+          effect: drawCards(
             count: 1,
           ),
           optional: None,
           condition: None,
         ),
         EffectWithOptions(
-          effect: PayCost(
-            cost: DiscardCards(Card, 1),
+          effect: payCost(
+            cost: discardCards(card, 1),
           ),
           optional: None,
           condition: None,
@@ -68,11 +68,11 @@ fn test_optional_draw() {
         result,
         @r###"
     [
-      Event(WithOptions(EffectWithOptions(
-        effect: DrawCards(
+      event(withOptions(EffectWithOptions(
+        effect: drawCards(
           count: 1,
         ),
-        optional: Some(NoCost),
+        optional: Some(noCost),
         condition: None,
       ))),
     ]
@@ -87,14 +87,14 @@ fn test_conditional_gain_energy() {
         result,
         @r###"
     [
-      Event(WithOptions(EffectWithOptions(
-        effect: GainEnergy(
+      event(withOptions(EffectWithOptions(
+        effect: gainEnergy(
           gains: Energy(1),
         ),
         optional: None,
-        condition: Some(PredicateCount(
+        condition: Some(predicateCount(
           count: 2,
-          predicate: Another(CharacterType(Warrior)),
+          predicate: another(characterType(warrior)),
         )),
       ))),
     ]
@@ -109,14 +109,14 @@ fn test_conditional_optional_gain_energy() {
         result,
         @r###"
     [
-      Event(WithOptions(EffectWithOptions(
-        effect: GainEnergy(
+      event(withOptions(EffectWithOptions(
+        effect: gainEnergy(
           gains: Energy(1),
         ),
-        optional: Some(NoCost),
-        condition: Some(PredicateCount(
+        optional: Some(noCost),
+        condition: Some(predicateCount(
           count: 2,
-          predicate: Another(CharacterType(Warrior)),
+          predicate: another(characterType(warrior)),
         )),
       ))),
     ]
@@ -129,15 +129,15 @@ fn test_until_end_of_turn() {
     let result = parse("Until end of turn, whenever you play a character, draw a card.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(CreateTriggerUntilEndOfTurn(
+      event(effect(createTriggerUntilEndOfTurn(
         trigger: TriggeredAbility(
-          trigger: Play(Your(Character)),
-          effect: Effect(DrawCards(
+          trigger: play(your(character)),
+          effect: effect(drawCards(
             count: 1,
           )),
           options: Some(TriggeredAbilityOptions(
-            once_per_turn: false,
-            until_end_of_turn: true,
+            oncePerTurn: false,
+            untilEndOfTurn: true,
           )),
         ),
       ))),
@@ -152,11 +152,11 @@ fn test_optional_cost() {
         result,
         @r###"
     [
-      Event(WithOptions(EffectWithOptions(
-        effect: ReturnFromYourVoidToHand(
-          target: This,
+      event(withOptions(EffectWithOptions(
+        effect: returnFromYourVoidToHand(
+          target: this,
         ),
-        optional: Some(Energy(Energy(1))),
+        optional: Some(energy(Energy(1))),
         condition: None,
       ))),
     ]
@@ -171,13 +171,13 @@ fn test_optional_cost_banish_enemy() {
         result,
         @r###"
     [
-      Activated(ActivatedAbility(
+      activated(ActivatedAbility(
         costs: [],
-        effect: WithOptions(EffectWithOptions(
-          effect: GainEnergy(
+        effect: withOptions(EffectWithOptions(
+          effect: gainEnergy(
             gains: Energy(1),
           ),
-          optional: Some(BanishCardsFromEnemyVoid(1)),
+          optional: Some(banishCardsFromEnemyVoid(1)),
           condition: None,
         )),
         options: None,

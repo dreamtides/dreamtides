@@ -11,6 +11,7 @@ use crate::triggered_ability::TriggeredAbility;
 /// be as part of the resolution of an event card, or via the effect text of a
 /// triggered or activated ability on a character card.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub enum StandardEffect {
     AbandonAndGainEnergyForSpark { target: Predicate, energy_per_spark: Energy },
     AbandonAtEndOfTurn { target: Predicate },

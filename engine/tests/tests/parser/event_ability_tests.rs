@@ -9,10 +9,10 @@ fn test_gains_spark_until_main_phase_for_each_warrior() {
     result,
     @r###"
     [
-      Event(Effect(GainsSparkUntilYourNextMainForEach(
-        target: Your(Character),
+      event(effect(gainsSparkUntilYourNextMainForEach(
+        target: your(character),
         gains: Spark(1),
-        for_each: Your(CharacterType(Warrior)),
+        for_each: your(characterType(warrior)),
       ))),
     ]
     "###
@@ -26,11 +26,11 @@ fn test_dissolve_character_with_cost_compared_to_warriors() {
         result,
         @r###"
     [
-      Event(Effect(DissolveCharacter(
-        target: Enemy(CharacterWithCostComparedToControlled(
-          target: Character,
-          cost_operator: OrLess,
-          count_matching: CharacterType(Warrior),
+      event(effect(dissolveCharacter(
+        target: enemy(characterWithCostComparedToControlled(
+          target: character,
+          cost_operator: orLess,
+          count_matching: characterType(warrior),
         )),
       ))),
     ]
@@ -45,8 +45,8 @@ fn test_disable_activated_abilities_while_in_play() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      Event(Effect(DisableActivatedAbilitiesWhileInPlay(
-        target: Enemy(Character),
+      event(effect(disableActivatedAbilitiesWhileInPlay(
+        target: enemy(character),
       ))),
     ]
     "###);
@@ -59,17 +59,17 @@ fn test_abandon_and_gain_energy_for_spark() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      Event(List([
+      event(list([
         EffectWithOptions(
-          effect: AbandonAndGainEnergyForSpark(
-            target: Your(Character),
+          effect: abandonAndGainEnergyForSpark(
+            target: your(character),
             energy_per_spark: Energy(1),
           ),
           optional: None,
           condition: None,
         ),
         EffectWithOptions(
-          effect: DrawCards(
+          effect: drawCards(
             count: 1,
           ),
           optional: None,

@@ -28,6 +28,7 @@ use serde::{Deserialize, Serialize};
     Serialize,
     Deserialize,
 )]
+#[serde(rename_all = "camelCase")]
 pub struct Energy(pub u32);
 
 /// Represents the 'power' of characters; the primary way in which players earn
@@ -56,6 +57,7 @@ pub struct Energy(pub u32);
     Serialize,
     Deserialize,
 )]
+#[serde(rename_all = "camelCase")]
 pub struct Spark(pub u32);
 
 /// Victory points. Enable the player to win the game.
@@ -83,4 +85,5 @@ pub struct Spark(pub u32);
     Serialize,
     Deserialize,
 )]
+#[serde(rename_all = "camelCase")]
 pub struct Points(pub u32);

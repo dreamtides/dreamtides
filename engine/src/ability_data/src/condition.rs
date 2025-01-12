@@ -6,6 +6,7 @@ use crate::predicate::Predicate;
 /// text by the word "if", for example "if you control 2 other warriors, draw a
 /// card".
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub enum Condition {
     CardsDiscardedThisTurn { count: u32 },
     CardsDrawnThisTurn { count: u32 },

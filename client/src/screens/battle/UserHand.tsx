@@ -1,4 +1,6 @@
-type UserHandProps = {};
+import { Position } from "../../bindings";
+
+type UserHandProps = { position: Position };
 
 export default function UserHand({}: UserHandProps) {
   return (

@@ -6,6 +6,7 @@ use crate::standard_effect::StandardEffect;
 
 /// Represents a mutation to the game state.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub enum Effect {
     Effect(StandardEffect),
     WithOptions(EffectWithOptions),
@@ -14,6 +15,7 @@ pub enum Effect {
 
 /// Provides an effect along with configuration options.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct EffectWithOptions {
     /// Effect to apply
     pub effect: StandardEffect,

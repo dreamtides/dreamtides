@@ -15,7 +15,7 @@ export default function BattleScreen({}: BattleScreenProps) {
       <BattlePlayerStatus />
       <Battlefield />
       <BattlePlayerStatus />
-      <UserHand />
+      <UserHand position="default" />
     </div>
   );
 }

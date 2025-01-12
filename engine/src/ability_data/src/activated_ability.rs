@@ -4,6 +4,7 @@ use crate::cost::Cost;
 use crate::effect::Effect;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ActivatedAbilityOptions {
     /// True if this ability can be activated in response to enemy game actions.
     pub is_fast: bool,
@@ -20,6 +21,7 @@ pub struct ActivatedAbilityOptions {
 /// controlling player to pay some cost in order to achieve an effect. This is
 /// written as "> cost: effect".
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ActivatedAbility {
     /// Costs to activate this ability, paid before it is put on the stack.
     pub costs: Vec<Cost>,

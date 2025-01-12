@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 /// This is used for both targeting constraints as well as describing the
 /// implicit target of an effect.
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub enum Predicate {
     /// Predicate which only matches the owning card.
     This,
@@ -48,6 +49,7 @@ pub enum Predicate {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub enum CardPredicate {
     Card,
     Character,
@@ -86,6 +88,7 @@ pub enum CardPredicate {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub enum Operator<T> {
     LowerBy(T),
     OrLess,
