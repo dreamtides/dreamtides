@@ -7,10 +7,10 @@ use crate::predicate::Predicate;
 /// card".
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Condition {
-    CardsDiscardedThisTurn { count: u64 },
-    CardsDrawnThisTurn { count: u64 },
-    CardsInVoidCount { count: u64 },
+    CardsDiscardedThisTurn { count: u32 },
+    CardsDrawnThisTurn { count: u32 },
+    CardsInVoidCount { count: u32 },
     DissolvedThisTurn { predicate: Predicate },
-    PredicateCount { count: u64, predicate: Predicate },
+    PredicateCount { count: u32, predicate: Predicate },
     ThisCharacterIsInYourVoid,
 }

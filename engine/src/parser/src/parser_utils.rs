@@ -7,7 +7,7 @@ pub fn phrase<'a>(text: &'static str) -> impl Parser<'a, &'a str, &'a str, Error
 }
 
 /// Standard identity function with a different name for readability
-pub fn count(n: u64) -> u64 {
+pub fn count(n: u32) -> u32 {
     n
 }
 
@@ -15,10 +15,10 @@ pub fn count(n: u64) -> u64 {
 /// surrounds an integer.
 ///
 /// The integer can be mapped to a concrete type via the provided mapping
-/// function, or you can pass [count] to use u64.
+/// function, or you can pass [count] to use u32.
 pub fn numeric<'a, T>(
     before: &'static str,
-    function: impl Fn(u64) -> T + 'a,
+    function: impl Fn(u32) -> T + 'a,
     after: &'static str,
 ) -> impl Parser<'a, &'a str, T, ErrorType<'a>> {
     phrase(before)
@@ -30,7 +30,7 @@ pub fn numeric<'a, T>(
 
 /// Parses a number and maps it to a concrete type
 pub fn number<'a, T>(
-    function: impl Fn(u64) -> T + 'a,
+    function: impl Fn(u32) -> T + 'a,
 ) -> impl Parser<'a, &'a str, T, ErrorType<'a>> {
     text::int(10).map(move |s: &str| function(s.parse().unwrap())).boxed()
 }
@@ -46,7 +46,7 @@ pub fn a_or_an<'a>() -> impl Parser<'a, &'a str, &'a str, ErrorType<'a>> {
 }
 
 /// Parses "a" or a number followed by a word
-pub fn a_or_count<'a>() -> impl Parser<'a, &'a str, u64, ErrorType<'a>> {
+pub fn a_or_count<'a>() -> impl Parser<'a, &'a str, u32, ErrorType<'a>> {
     choice((phrase("a").to(1), number(count), text_number()))
 }
 
@@ -56,7 +56,7 @@ pub fn card_or_cards<'a>() -> impl Parser<'a, &'a str, &'a str, ErrorType<'a>> {
 
 /// Parses a number that can be either written as text (e.g. "two") or as a
 /// numeral
-pub fn text_number<'a>() -> impl Parser<'a, &'a str, u64, ErrorType<'a>> {
+pub fn text_number<'a>() -> impl Parser<'a, &'a str, u32, ErrorType<'a>> {
     choice((
         phrase("one").to(1),
         phrase("two").to(2),
@@ -74,7 +74,7 @@ pub fn text_number<'a>() -> impl Parser<'a, &'a str, u64, ErrorType<'a>> {
 
 /// Parses an ordinal number that can be either written as text (e.g. "first")
 /// or as a numeral with "st", "nd", "rd", or "th" suffix
-pub fn ordinal_number<'a>() -> impl Parser<'a, &'a str, u64, ErrorType<'a>> {
+pub fn ordinal_number<'a>() -> impl Parser<'a, &'a str, u32, ErrorType<'a>> {
     choice((
         phrase("first").to(1),
         phrase("second").to(2),
@@ -91,6 +91,6 @@ pub fn ordinal_number<'a>() -> impl Parser<'a, &'a str, u64, ErrorType<'a>> {
 }
 
 /// Parses "twice" or a number followed by "times"
-pub fn number_of_times<'a>() -> impl Parser<'a, &'a str, Option<u64>, ErrorType<'a>> {
+pub fn number_of_times<'a>() -> impl Parser<'a, &'a str, Option<u32>, ErrorType<'a>> {
     choice((phrase("twice").to(2), text_number().then_ignore(phrase("times")))).or_not().boxed()
 }
