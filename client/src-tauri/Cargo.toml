@@ -29,3 +29,4 @@ specta-util = "=0.0.7"
 tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
 tauri-specta = { version = "=2.0.0-rc.20", features = ["derive", "typescript"] }
+uuid = { version = "1.11.1", features = ["v4", "fast-rng", "macro-diagnostics"] }
