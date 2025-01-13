@@ -1,10 +1,16 @@
-import { BattleView, ClientBattleId, commands } from "../../bindings";
+import {
+  BattleView,
+  CardView,
+  ClientBattleId,
+  commands,
+  Position,
+} from "../../bindings";
 import { ErrorState } from "../../components/common/ErrorState";
 import { Loading } from "../../components/common/Loading";
 import NavigationBar from "../../components/common/NavigationBar";
 import Battlefield from "./Battlefield";
 import BattlePlayerStatus from "./BattlePlayerStatus";
-// import EnemyHand from "./EnemyHand";
+import EnemyHand from "./EnemyHand";
 import UserHand from "./UserHand";
 import useSWR from "swr";
 
@@ -35,16 +41,33 @@ export default function BattleScreen({}: BattleScreenProps) {
     return <ErrorState />;
   }
 
+  const cards = buildCardMap(result.battle);
   return (
     <div className="flex flex-col h-screen w-screen">
       <NavigationBar>
-        {result.battle.id}
-        {/* <EnemyHand /> */}
+        <EnemyHand />
       </NavigationBar>
       <BattlePlayerStatus />
       <Battlefield />
       <BattlePlayerStatus />
-      <UserHand position="default" />
+      <UserHand cards={cards.get(positionKey({ inHand: "user" })) ?? []} />
     </div>
   );
+}
+
+type PositionKey = string;
+
+function positionKey(position: Position): PositionKey {
+  return JSON.stringify(position);
+}
+
+function buildCardMap(battle: BattleView): Map<PositionKey, CardView[]> {
+  const map = new Map<PositionKey, CardView[]>();
+  for (const card of battle.cards) {
+    map.set(positionKey(card.position.position), [
+      ...(map.get(positionKey(card.position.position)) ?? []),
+      card,
+    ]);
+  }
+  return map;
 }

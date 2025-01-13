@@ -1,11 +1,19 @@
-import { Position } from "../../bindings";
+import { CardView } from "../../bindings";
+import { Card } from "../../components/cards/Card";
 
-type UserHandProps = { position: Position };
+type UserHandProps = {
+  cards: CardView[];
+};
 
-export default function UserHand({}: UserHandProps) {
+export default function UserHand({ cards }: UserHandProps) {
   return (
-    <div className="flex bg-blue-600" style={{ height: "30dvh" }}>
-      User Hand
+    <div
+      className="flex bg-blue-600 items-center justify-center"
+      style={{ height: "30dvh" }}
+    >
+      {cards.map((card) => (
+        <Card card={card} className="m-[1px]" />
+      ))}
     </div>
   );
 }
