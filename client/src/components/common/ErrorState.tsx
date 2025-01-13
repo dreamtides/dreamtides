@@ -1,5 +1,5 @@
 type ErrorStateProps = {};
 
 export function ErrorState({}: ErrorStateProps) {
-    return <div>Error</div>;
+  return <div>Error</div>;
 }

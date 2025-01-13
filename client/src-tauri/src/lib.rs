@@ -1,3 +1,5 @@
+use std::env;
+
 use core_data::numerics::Points;
 use core_data::types::{CardFacing, Url};
 use display_data::battle_view::{BattleView, ClientBattleId, DisplayPlayer, PlayerView};
@@ -9,12 +11,15 @@ use uuid::Uuid;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let args: Vec<_> = env::args().collect();
     let specta_builder = Builder::<tauri::Wry>::new().commands(collect_commands![fetch_battle,]);
 
-    #[cfg(debug_assertions)]
-    specta_builder
-        .export(Typescript::default(), "../src/bindings.ts")
-        .expect("Failed to export typescript bindings");
+    if args.len() > 1 && args[1] == "--generate-bindings" {
+        #[cfg(debug_assertions)]
+        specta_builder
+            .export(Typescript::default(), "../src/bindings.ts")
+            .expect("Failed to export typescript bindings");
+    }
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
