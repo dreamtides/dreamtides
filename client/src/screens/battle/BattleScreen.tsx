@@ -45,10 +45,17 @@ export default function BattleScreen({}: BattleScreenProps) {
   return (
     <div className="flex flex-col h-screen w-screen">
       <NavigationBar>
-        <EnemyHand />
+        <EnemyHand battleId="123" />
       </NavigationBar>
       <BattlePlayerStatus />
-      <Battlefield />
+      <Battlefield
+        owner="enemy"
+        cards={cards.get(positionKey({ onBattlefield: "enemy" })) ?? []}
+      />
+      <Battlefield
+        owner="user"
+        cards={cards.get(positionKey({ onBattlefield: "user" })) ?? []}
+      />
       <BattlePlayerStatus />
       <UserHand cards={cards.get(positionKey({ inHand: "user" })) ?? []} />
     </div>
