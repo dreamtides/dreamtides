@@ -1,3 +1,4 @@
+import { LayoutGroup } from "motion/react";
 import {
   BattleView,
   CardView,
@@ -44,20 +45,22 @@ export default function BattleScreen({}: BattleScreenProps) {
   const cards = buildCardMap(result.battle);
   return (
     <div className="flex flex-col h-screen w-screen">
-      <NavigationBar>
-        <EnemyHand battleId="123" />
-      </NavigationBar>
-      <BattlePlayerStatus />
-      <Battlefield
-        owner="enemy"
-        cards={cards.get(positionKey({ onBattlefield: "enemy" })) ?? []}
-      />
-      <Battlefield
-        owner="user"
-        cards={cards.get(positionKey({ onBattlefield: "user" })) ?? []}
-      />
-      <BattlePlayerStatus />
-      <UserHand cards={cards.get(positionKey({ inHand: "user" })) ?? []} />
+      <LayoutGroup>
+        <NavigationBar>
+          <EnemyHand battleId="123" />
+        </NavigationBar>
+        <BattlePlayerStatus />
+        <Battlefield
+          owner="enemy"
+          cards={cards.get(positionKey({ onBattlefield: "enemy" })) ?? []}
+        />
+        <Battlefield
+          owner="user"
+          cards={cards.get(positionKey({ onBattlefield: "user" })) ?? []}
+        />
+        <BattlePlayerStatus />
+        <UserHand cards={cards.get(positionKey({ inHand: "user" })) ?? []} />
+      </LayoutGroup>
     </div>
   );
 }
