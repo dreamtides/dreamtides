@@ -14,6 +14,7 @@ import BattlePlayerStatus from "./BattlePlayerStatus";
 import EnemyHand from "./EnemyHand";
 import UserHand from "./UserHand";
 import useSWR from "swr";
+import { Card } from "../../components/cards/Card";
 
 type BattleFetchResult =
   | { battle: BattleView }
@@ -42,14 +43,19 @@ export default function BattleScreen({}: BattleScreenProps) {
     return <ErrorState />;
   }
 
-  const cards = buildCardMap(result.battle);
+  // const cards = buildCardMap(result.battle);
   return (
     <div className="flex flex-col h-screen w-screen">
       <LayoutGroup>
         <NavigationBar>
           <EnemyHand battleId="123" />
         </NavigationBar>
-        <BattlePlayerStatus />
+        <div
+          style={{ transform: "scale(3) translateY(50px) translateX(150px)" }}
+        >
+          <Card card={result.battle.cards[0]} />
+        </div>
+        {/* <BattlePlayerStatus />
         <Battlefield
           owner="enemy"
           cards={cards.get(positionKey({ onBattlefield: "enemy" })) ?? []}
@@ -59,25 +65,25 @@ export default function BattleScreen({}: BattleScreenProps) {
           cards={cards.get(positionKey({ onBattlefield: "user" })) ?? []}
         />
         <BattlePlayerStatus />
-        <UserHand cards={cards.get(positionKey({ inHand: "user" })) ?? []} />
+        <UserHand cards={cards.get(positionKey({ inHand: "user" })) ?? []} /> */}
       </LayoutGroup>
     </div>
   );
 }
 
-type PositionKey = string;
+// type PositionKey = string;
 
-function positionKey(position: Position): PositionKey {
-  return JSON.stringify(position);
-}
+// function positionKey(position: Position): PositionKey {
+//   return JSON.stringify(position);
+// }
 
-function buildCardMap(battle: BattleView): Map<PositionKey, CardView[]> {
-  const map = new Map<PositionKey, CardView[]>();
-  for (const card of battle.cards) {
-    map.set(positionKey(card.position.position), [
-      ...(map.get(positionKey(card.position.position)) ?? []),
-      card,
-    ]);
-  }
-  return map;
-}
+// function buildCardMap(battle: BattleView): Map<PositionKey, CardView[]> {
+//   const map = new Map<PositionKey, CardView[]>();
+//   for (const card of battle.cards) {
+//     map.set(positionKey(card.position.position), [
+//       ...(map.get(positionKey(card.position.position)) ?? []),
+//       card,
+//     ]);
+//   }
+//   return map;
+// }

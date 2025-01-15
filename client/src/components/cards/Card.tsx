@@ -3,6 +3,8 @@ import { CardView } from "../../bindings";
 import { motion } from "motion/react";
 
 const ASPECT_RATIO = 1.6;
+const WIDTH = 24;
+const HEIGHT = WIDTH * ASPECT_RATIO;
 
 export type CardSize = {
   vw: number;
@@ -11,9 +13,7 @@ export type CardSize = {
 
 export type CardProps = {
   card: CardView;
-  size: CardSize;
   className?: string;
-  onBattlefield?: boolean;
 };
 
 /**
@@ -22,7 +22,7 @@ export type CardProps = {
  * This does not include other types of cards, such as dreamsigns, path cards,
  * etc which have their own components.
  */
-export function Card({ card, size, className, onBattlefield }: CardProps) {
+export function Card({ card, className }: CardProps) {
   const id = JSON.stringify(card.id);
 
   let backgroundColor = "bg-purple-600";
@@ -44,37 +44,51 @@ export function Card({ card, size, className, onBattlefield }: CardProps) {
     <motion.div
       key={id}
       layoutId={id}
-      initial={{ scale: 1 }}
-      animate={{ scale: onBattlefield ? 0.7 : 1 }}
       className={cn(
-        "flex rounded-xl border-1 border-white",
+        "flex rounded-xl border-1 border-white relative",
         backgroundColor,
-        className,
+        className
       )}
-      style={getSizeStyle(size)}
+      style={{
+        width: `${WIDTH}dvw`,
+        height: `${HEIGHT}dvw`,
+      }}
     >
-      <p className="text-lg font-bold">{id.substring(11, 13)}</p>
+      {card.revealed && <EnergyCost cost={card.revealed.cost} />}
     </motion.div>
   );
 }
 
-/**
- * Returns a size style which maintains ASPECT_RATIO while not exceeding the
- * given percentages of the viewport height and the viewport width.
- * @param size
- */
-function getSizeStyle(size: CardSize) {
-  const vwPixels = (window.innerWidth * size.vw) / 100;
-  const vhPixels = (window.innerHeight * size.vh) / 100;
+function EnergyCost({ cost }: { cost: number }) {
+  return (
+    <div
+      className="absolute"
+      style={{
+        top: length(0.5),
+        left: length(0.5),
+        width: length(22),
+        height: length(22),
+        backgroundImage: "url('/assets/energy_cost_background.png')",
+        backgroundSize: "cover",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <span
+        style={{
+          color: "white",
+          fontFamily: "Impact",
+          fontSize: "15px",
+          lineHeight: 1,
+        }}
+      >
+        {cost}
+      </span>
+    </div>
+  );
+}
 
-  const heightFromWidth = vwPixels * ASPECT_RATIO;
-  const widthFromHeight = vhPixels / ASPECT_RATIO;
-
-  const width = Math.min(vwPixels, widthFromHeight);
-  const height = Math.min(vhPixels, heightFromWidth);
-
-  return {
-    width: `${width}px`,
-    height: `${height}px`,
-  };
+function length(value: number) {
+  return `${value * (WIDTH / 100)}dvw`;
 }

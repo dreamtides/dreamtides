@@ -15,9 +15,7 @@ export default function Battlefield({ cards }: BattlefieldProps) {
       {cards.map((card) => (
         <Card
           card={card}
-          size={{ vw: 24, vh: 19 }}
           className="m-[1px]"
-          onBattlefield={true}
         />
       ))}
     </div>
