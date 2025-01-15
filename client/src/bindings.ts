@@ -68,6 +68,7 @@ export type ButtonView = { label: string; kind: ButtonKind }
  * Whether a card is face-down or face-up
  */
 export type CardFacing = "faceDown" | "faceUp"
+export type CardFrame = "character" | "event"
 /**
  * Represents the visual state of a card or ability in a game
  */
@@ -277,6 +278,10 @@ rulesText: string;
  * Visual status of this card
  */
 status: RevealedCardStatus | null; 
+/**
+ * Frame to display for this card
+ */
+frame: CardFrame; 
 /**
  * True if this card can be played during the opponent's turn
  */

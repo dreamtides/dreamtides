@@ -3,7 +3,7 @@ use std::env;
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::{CardFacing, Url};
 use display_data::battle_view::{BattleView, ClientBattleId, DisplayPlayer, PlayerView};
-use display_data::card_view::{CardView, ClientCardId, DisplayImage, RevealedCardView};
+use display_data::card_view::{CardFrame, CardView, ClientCardId, DisplayImage, RevealedCardView};
 use display_data::object_position::{ObjectPosition, Position};
 use rand::Rng;
 use specta_typescript::Typescript;
@@ -103,6 +103,7 @@ fn card(position: Position, sorting_key: u32) -> CardView {
             cost: Energy(6),
             spark: Some(Spark(4)),
             card_type: "Ancient".to_string(),
+            frame: CardFrame::Character,
             is_fast: false,
         }),
         revealed_to_opponents: true,

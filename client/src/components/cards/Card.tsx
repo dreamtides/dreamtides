@@ -1,5 +1,10 @@
 import { cn } from "@nextui-org/react";
-import { CardView, DisplayImage, RevealedCardView } from "../../bindings";
+import {
+  CardView,
+  DisplayImage,
+  RevealedCardView,
+  CardFrame,
+} from "../../bindings";
 import { motion } from "motion/react";
 
 const BASE_WIDTH = 200;
@@ -58,10 +63,10 @@ function RevealedCard({ card }: { card: RevealedCardView }) {
       <CardImage image={card.image} />
       <RulesText text={card.rulesText} />
       <EnergyCost cost={card.cost} />
-      <FrameDecoration side="left" />
-      <FrameDecoration side="right" />
+      <FrameDecoration side="left" frame={card.frame} />
+      <FrameDecoration side="right" frame={card.frame} />
       {card.spark && <SparkValue spark={card.spark} />}
-      <CardName name={card.name} cardType={card.cardType} />
+      <CardName name={card.name} cardType={card.cardType} frame={card.frame} />
     </>
   );
 }
@@ -108,7 +113,13 @@ function EnergyCost({ cost }: { cost: number }) {
   );
 }
 
-function FrameDecoration({ side }: { side: "left" | "right" }) {
+function FrameDecoration({
+  side,
+  frame,
+}: {
+  side: "left" | "right";
+  frame: CardFrame;
+}) {
   return (
     <div
       className="absolute"
@@ -118,7 +129,7 @@ function FrameDecoration({ side }: { side: "left" | "right" }) {
         width: "100%",
         height: "95px",
         backgroundRepeat: "no-repeat",
-        backgroundImage: `url('/assets/card_frame_decoration_${side}.png')`,
+        backgroundImage: `url('${getFrameAssetUrl(frame, side === "left" ? "frame_left" : "frame_right")}')`,
         backgroundSize: "contain",
         transform: side === "right" ? "scaleX(-1)" : undefined,
       }}
@@ -126,13 +137,21 @@ function FrameDecoration({ side }: { side: "left" | "right" }) {
   );
 }
 
-function CardName({ name, cardType }: { name: string; cardType: string }) {
+function CardName({
+  name,
+  cardType,
+  frame,
+}: {
+  name: string;
+  cardType: string;
+  frame: CardFrame;
+}) {
   return (
     <div
       className="absolute w-full flex items-center"
       style={{
         bottom: "60px",
-        backgroundImage: "url('/assets/card_name_background.png')",
+        backgroundImage: `url('${getFrameAssetUrl(frame, "name_background")}')`,
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
         height: "35px",
@@ -241,4 +260,33 @@ function SparkValue({ spark }: { spark: number }) {
       </span>
     </div>
   );
+}
+
+function getFrameAssetUrl(
+  frame: CardFrame,
+  assetType: "frame_left" | "frame_right" | "name_background",
+): string {
+  const prefix = (() => {
+    switch (frame) {
+      case "event":
+        return "event_";
+      case "character":
+        return "";
+      default:
+        return "";
+    }
+  })();
+
+  const assetName = (() => {
+    switch (assetType) {
+      case "frame_left":
+        return "card_frame_decoration_left";
+      case "frame_right":
+        return "card_frame_decoration_right";
+      case "name_background":
+        return "card_name_background";
+    }
+  })();
+
+  return `/assets/${prefix}${assetName}.png`;
 }

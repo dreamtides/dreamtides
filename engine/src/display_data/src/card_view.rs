@@ -77,6 +77,9 @@ pub struct RevealedCardView {
     /// Visual status of this card
     pub status: Option<RevealedCardStatus>,
 
+    /// Frame to display for this card
+    pub frame: CardFrame,
+
     /// True if this card can be played during the opponent's turn
     pub is_fast: bool,
 
@@ -106,4 +109,11 @@ pub enum RevealedCardStatus {
     Selected,
     CanSelect,
     CanPlay,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum CardFrame {
+    Character,
+    Event,
 }
