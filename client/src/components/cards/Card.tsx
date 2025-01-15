@@ -25,29 +25,11 @@ export type CardProps = {
 export function Card({ card, className }: CardProps) {
   const id = JSON.stringify(card.id);
 
-  let backgroundColor = "bg-purple-600";
-  if (id.includes("#0")) {
-    backgroundColor = "bg-green-600";
-  } else if (id.includes("#1")) {
-    backgroundColor = "bg-yellow-600";
-  } else if (id.includes("#2")) {
-    backgroundColor = "bg-blue-600";
-  } else if (id.includes("#3")) {
-    backgroundColor = "bg-red-600";
-  } else if (id.includes("#4")) {
-    backgroundColor = "bg-pink-600";
-  } else if (id.includes("#5")) {
-    backgroundColor = "bg-orange-600";
-  }
-
   return (
     <motion.div
       key={id}
       layoutId={id}
-      className={cn(
-        "flex relative m-2",
-        className
-      )}
+      className={cn("flex relative m-2", className)}
       style={{
         width: `${WIDTH}px`,
         height: `${HEIGHT}px`,
@@ -56,9 +38,12 @@ export function Card({ card, className }: CardProps) {
       {card.revealed && <CardImage image={card.revealed.image} />}
       {card.revealed && <RulesText text={card.revealed.rulesText} />}
       {card.revealed && <EnergyCost cost={card.revealed.cost} />}
-      {card.revealed && <CardName name={card.revealed.name} />}
       <FrameDecoration side="left" />
       <FrameDecoration side="right" />
+      {card.revealed && card.revealed.spark && (
+        <SparkValue spark={card.revealed.spark} />
+      )}
+      {card.revealed && <CardName name={card.revealed.name} />}
     </motion.div>
   );
 }
@@ -180,5 +165,37 @@ function CardImage({ image }: { image: DisplayImage }) {
         backgroundPosition: `${image.imageOffsetX ?? 50}% ${image.imageOffsetY ?? 50}%`,
       }}
     />
+  );
+}
+
+function SparkValue({ spark }: { spark: number }) {
+  return (
+    <div
+      className="absolute"
+      style={{
+        width: "30px",
+        height: "30px",
+        backgroundImage: "url('/assets/spark_background.png')",
+        backgroundSize: "cover",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        bottom: 0,
+        right: 0,
+      }}
+    >
+      <span
+        style={{
+          color: "white",
+          fontFamily: "Impact",
+          fontSize: "20px",
+          lineHeight: 1,
+          WebkitTextStroke: "0.1em black",
+          paintOrder: "stroke",
+        }}
+      >
+        {spark}
+      </span>
+    </div>
   );
 }
