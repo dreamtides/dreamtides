@@ -122,6 +122,19 @@ export type ClientCardId = { cardId: string } | { activatedAbilityId: string } |
  * User interaction options
  */
 export type ControlView = { button: ButtonView }
+export type DisplayImage = { 
+/**
+ * Image URL for this card
+ */
+image: Url; 
+/**
+ * X offset position of this image
+ */
+imageOffsetX: number | null; 
+/**
+ * Y offset position of this image
+ */
+imageOffsetY: number | null }
 /**
  * Identifies a player in the context of the user interface.
  */
@@ -239,7 +252,7 @@ export type RevealedCardView = {
 /**
  * Image URL for this card
  */
-image: Url; 
+image: DisplayImage; 
 /**
  * Name of this card
  */

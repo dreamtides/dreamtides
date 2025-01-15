@@ -1,5 +1,5 @@
 import { cn } from "@nextui-org/react";
-import { CardView } from "../../bindings";
+import { CardView, DisplayImage } from "../../bindings";
 import { motion } from "motion/react";
 
 const ASPECT_RATIO = 1.6;
@@ -45,8 +45,7 @@ export function Card({ card, className }: CardProps) {
       key={id}
       layoutId={id}
       className={cn(
-        "flex rounded-lg border-1 border-white relative",
-        backgroundColor,
+        "flex relative m-2",
         className
       )}
       style={{
@@ -54,6 +53,7 @@ export function Card({ card, className }: CardProps) {
         height: `${HEIGHT}px`,
       }}
     >
+      {card.revealed && <CardImage image={card.revealed.image} />}
       {card.revealed && <RulesText text={card.revealed.rulesText} />}
       {card.revealed && <EnergyCost cost={card.revealed.cost} />}
       {card.revealed && <CardName name={card.revealed.name} />}
@@ -126,9 +126,9 @@ function CardName({ name }: { name: string }) {
         style={{
           color: "white",
           fontFamily: "Garamond",
-          paddingLeft: "20px",
+          paddingLeft: "10px",
           display: "block",
-          fontSize: "15px",
+          fontSize: "13px",
         }}
       >
         {name}
@@ -144,9 +144,9 @@ function RulesText({ text }: { text: string }) {
       style={{
         bottom: "0.25dvw",
         backgroundImage: "url('/assets/rules_text_background.png')",
-        backgroundSize: "contain",
+        backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
-        height: "60px",
+        height: "70px",
         left: "10px",
         right: "10px",
       }}
@@ -159,11 +159,26 @@ function RulesText({ text }: { text: string }) {
           paddingRight: "15px",
           fontSize: "10px",
           lineHeight: "1.0",
-          marginTop: "4px",
         }}
       >
         {text}
       </span>
     </div>
+  );
+}
+
+function CardImage({ image }: { image: DisplayImage }) {
+  return (
+    <div
+      className="absolute top-0 w-full rounded-xl overflow-hidden"
+      style={{
+        height: "260px",
+        width: "100%",
+        backgroundImage: `url("${image.image}")`,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: `${image.imageOffsetX ?? 50}% ${image.imageOffsetY ?? 50}%`,
+      }}
+    />
   );
 }

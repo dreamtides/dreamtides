@@ -57,7 +57,7 @@ pub enum ClientCardId {
 #[serde(rename_all = "camelCase")]
 pub struct RevealedCardView {
     /// Image URL for this card
-    pub image: Url,
+    pub image: DisplayImage,
 
     /// Name of this card
     pub name: String,
@@ -85,6 +85,19 @@ pub struct RevealedCardView {
     /// The set of valid drag targets is set on the GameView. All draggable
     /// cards can be dragged to and reordered within any valid target.
     pub can_drag: bool,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct DisplayImage {
+    /// Image URL for this card
+    pub image: Url,
+
+    /// X offset position of this image
+    pub image_offset_x: Option<u32>,
+
+    /// Y offset position of this image
+    pub image_offset_y: Option<u32>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Type)]

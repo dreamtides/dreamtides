@@ -3,7 +3,7 @@ use std::env;
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::{CardFacing, Url};
 use display_data::battle_view::{BattleView, ClientBattleId, DisplayPlayer, PlayerView};
-use display_data::card_view::{CardView, ClientCardId, RevealedCardView};
+use display_data::card_view::{CardView, ClientCardId, DisplayImage, RevealedCardView};
 use display_data::object_position::{ObjectPosition, Position};
 use rand::Rng;
 use specta_typescript::Typescript;
@@ -91,14 +91,18 @@ fn card(position: Position, sorting_key: u32) -> CardView {
         },
         card_back: Url("".to_string()),
         revealed: Some(RevealedCardView {
-            image: Url("".to_string()),
-            name: "Card".to_string(),
-            rules_text: "Here is some text which wraps to five different lines, which is the maximum number of lines of text which are allowed to be displayed on a card.".to_string(),
+            image: DisplayImage {
+                image: Url("https://www.shutterstock.com/shutterstock/photos/2521694543/display_1500/stock-photo-traveller-in-a-land-of-ancient-statue-digital-art-style-illustration-painting-2521694543.jpg".to_string()),
+                image_offset_x: Some(25),
+                image_offset_y: Some(50)
+            },
+            name: "Titan of Forgotten Echoes".to_string(),
+            rules_text: "When you materialize your second character in a turn, return this character from your void to play.".to_string(),
             status: None,
             can_drag: true,
-            cost: Energy(2),
-            spark: Some(Spark(1)),
-            card_type: "Visitor".to_string(),
+            cost: Energy(6),
+            spark: Some(Spark(4)),
+            card_type: "Ancient".to_string(),
             is_fast: false,
         }),
         revealed_to_opponents: true,
