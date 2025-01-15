@@ -29,7 +29,11 @@ run-release:
 
 # To run under a rust debugger, *first* use this command and then start the rust binary
 dev:
-  pnpm run --prefix client dev
+    pnpm run --prefix client dev
+
+# Need to create a keystore first via keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload -dname "CN=mydomain.com"
+apk:
+     pnpm --prefix client tauri android build --apk
 
 test:
     cargo test --manifest-path engine/Cargo.toml

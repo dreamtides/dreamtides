@@ -25,3 +25,4 @@ dist-ssr
 
 .cursorrules
 public/assets
+src-tauri/gen/android/keystore.properties
