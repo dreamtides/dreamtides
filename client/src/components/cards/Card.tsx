@@ -43,7 +43,9 @@ export function Card({ card, className }: CardProps) {
       {card.revealed && card.revealed.spark && (
         <SparkValue spark={card.revealed.spark} />
       )}
-      {card.revealed && <CardName name={card.revealed.name} />}
+      {card.revealed && (
+        <CardName name={card.revealed.name} cardType={card.revealed.cardType} />
+      )}
     </motion.div>
   );
 }
@@ -94,7 +96,7 @@ function FrameDecoration({ side }: { side: "left" | "right" }) {
   );
 }
 
-function CardName({ name }: { name: string }) {
+function CardName({ name, cardType }: { name: string; cardType: string }) {
   return (
     <div
       className="absolute w-full flex items-center"
@@ -106,18 +108,29 @@ function CardName({ name }: { name: string }) {
         height: "35px",
       }}
     >
-      <span
-        className="font-medium"
-        style={{
-          color: "white",
-          fontFamily: "Garamond",
-          paddingLeft: "10px",
-          display: "block",
-          fontSize: "13px",
-        }}
-      >
-        {name}
-      </span>
+      <div className="flex justify-between w-full items-center">
+        <span
+          className="font-medium"
+          style={{
+            color: "white",
+            fontFamily: "Garamond",
+            paddingLeft: "10px",
+            fontSize: "13px",
+          }}
+        >
+          {name}
+        </span>
+        <span
+          style={{
+            color: "white",
+            fontFamily: "Garamond",
+            paddingRight: "10px",
+            fontSize: "10px",
+          }}
+        >
+          {cardType}
+        </span>
+      </div>
     </div>
   );
 }
