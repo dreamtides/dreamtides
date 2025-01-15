@@ -1,6 +1,6 @@
 use std::env;
 
-use core_data::numerics::Points;
+use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::{CardFacing, Url};
 use display_data::battle_view::{BattleView, ClientBattleId, DisplayPlayer, PlayerView};
 use display_data::card_view::{CardView, ClientCardId, RevealedCardView};
@@ -15,6 +15,7 @@ pub fn run() {
     let specta_builder = Builder::<tauri::Wry>::new().commands(collect_commands![fetch_battle,]);
 
     if args.len() > 1 && args[1] == "--generate-bindings" {
+        eprintln!(">>> Generating bindings");
         #[cfg(debug_assertions)]
         specta_builder
             .export(Typescript::default(), "../src/bindings.ts")
@@ -94,9 +95,11 @@ fn card(position: Position, sorting_key: u32) -> CardView {
             name: "Card".to_string(),
             rules_text: "Rules".to_string(),
             status: None,
-            is_ability: false,
-            is_token: false,
             can_drag: true,
+            cost: Energy(2),
+            spark: Some(Spark(1)),
+            card_type: "Visitor".to_string(),
+            is_fast: false,
         }),
         revealed_to_opponents: true,
         card_facing: CardFacing::FaceUp,

@@ -1,3 +1,4 @@
+use core_data::numerics::{Energy, Spark};
 use core_data::types::{CardFacing, Url};
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -61,17 +62,23 @@ pub struct RevealedCardView {
     /// Name of this card
     pub name: String,
 
+    /// Cost of this card
+    pub cost: Energy,
+
+    /// Spark value for this card
+    pub spark: Option<Spark>,
+
+    /// Type or subtype of this card
+    pub card_type: String,
+
     /// Rules text to display for this face
     pub rules_text: String,
 
     /// Visual status of this card
     pub status: Option<RevealedCardStatus>,
 
-    /// True if this card represents an ability
-    pub is_ability: bool,
-
-    /// True if this card represents a token
-    pub is_token: bool,
+    /// True if this card can be played during the opponent's turn
+    pub is_fast: bool,
 
     /// True if this card can be dragged by the player.
     ///

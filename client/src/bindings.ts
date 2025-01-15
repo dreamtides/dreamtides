@@ -135,6 +135,10 @@ export type DisplayPlayer =
  */
 "enemy"
 /**
+ * A resource used to pay for cards & abilities.
+ */
+export type Energy = number
+/**
  * Represents the position of some object in the UI
  */
 export type ObjectPosition = { 
@@ -241,6 +245,18 @@ image: Url;
  */
 name: string; 
 /**
+ * Cost of this card
+ */
+cost: Energy; 
+/**
+ * Spark value for this card
+ */
+spark: Spark | null; 
+/**
+ * Type or subtype of this card
+ */
+cardType: string; 
+/**
  * Rules text to display for this face
  */
 rulesText: string; 
@@ -249,13 +265,9 @@ rulesText: string;
  */
 status: RevealedCardStatus | null; 
 /**
- * True if this card represents an ability
+ * True if this card can be played during the opponent's turn
  */
-isAbility: boolean; 
-/**
- * True if this card represents a token
- */
-isToken: boolean; 
+isFast: boolean; 
 /**
  * True if this card can be dragged by the player.
  * 
@@ -263,6 +275,11 @@ isToken: boolean;
  * cards can be dragged to and reordered within any valid target.
  */
 canDrag: boolean }
+/**
+ * Represents the 'power' of characters; the primary way in which players earn
+ * victory points.
+ */
+export type Spark = number
 /**
  * A URL
  */

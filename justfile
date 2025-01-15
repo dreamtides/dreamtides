@@ -21,6 +21,9 @@ android:
 ios:
     pnpm run --prefix client tauri ios dev
 
+bindings:
+    pnpm run --prefix client tauri dev -- -- --generate-bindings
+
 run-release:
     pnpm run --prefix client tauri dev -- --release
 
