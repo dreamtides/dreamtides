@@ -55,7 +55,8 @@ export function Card({ card, className }: CardProps) {
       }}
     >
       {card.revealed && <EnergyCost cost={card.revealed.cost} />}
-      <FrameDecoration />
+      <FrameDecoration side="left" />
+      <FrameDecoration side="right" />
     </motion.div>
   );
 }
@@ -88,18 +89,19 @@ function EnergyCost({ cost }: { cost: number }) {
   );
 }
 
-function FrameDecoration() {
+function FrameDecoration({ side }: { side: "left" | "right" }) {
   return (
     <div
       className="absolute"
       style={{
         bottom: 0,
-        left: 0,
+        [side]: 0,
         width: "100%",
         height: "12dvw",
         backgroundRepeat: "no-repeat",
-        backgroundImage: "url('/assets/card_frame_decoration_left.png')",
+        backgroundImage: `url('/assets/card_frame_decoration_${side}.png')`,
         backgroundSize: "contain",
+        transform: side === "right" ? "scaleX(-1)" : undefined,
       }}
     />
   );
