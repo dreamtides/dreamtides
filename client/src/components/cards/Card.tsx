@@ -45,7 +45,7 @@ export function Card({ card, className }: CardProps) {
       key={id}
       layoutId={id}
       className={cn(
-        "flex rounded-xl border-1 border-white relative",
+        "flex rounded-lg border-1 border-white relative",
         backgroundColor,
         className
       )}
@@ -54,6 +54,7 @@ export function Card({ card, className }: CardProps) {
         height: `${HEIGHT}dvw`,
       }}
     >
+      {card.revealed && <RulesText text={card.revealed.rulesText} />}
       {card.revealed && <EnergyCost cost={card.revealed.cost} />}
       {card.revealed && <CardName name={card.revealed.name} />}
       <FrameDecoration side="left" />
@@ -121,15 +122,47 @@ function CardName({ name }: { name: string }) {
       }}
     >
       <span
+        className="font-bold"
         style={{
           color: "white",
           fontFamily: "Garamond",
           paddingLeft: "2dvw",
           display: "block",
-          fontSize: "8px",
+          fontSize: "7px",
         }}
       >
         {name}
+      </span>
+    </div>
+  );
+}
+
+function RulesText({ text }: { text: string }) {
+  return (
+    <div
+      className="absolute w-full flex items-center"
+      style={{
+        bottom: "0.25dvw",
+        backgroundImage: "url('/assets/rules_text_background.png')",
+        backgroundSize: "contain",
+        backgroundRepeat: "no-repeat",
+        height: "9dvw",
+        width: "22dvw",
+        left: "1dvw",
+        right: "1dvw",
+      }}
+    >
+      <span
+        style={{
+          color: "black",
+          fontFamily: "'Libre Baskerville', Georgia, 'Times New Roman', serif",
+          paddingLeft: "3dvw",
+          paddingRight: "3dvw",
+          fontSize: "4px",
+          lineHeight: "1.0",
+        }}
+      >
+        {text}
       </span>
     </div>
   );

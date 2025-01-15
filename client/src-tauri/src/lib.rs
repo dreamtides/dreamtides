@@ -93,7 +93,7 @@ fn card(position: Position, sorting_key: u32) -> CardView {
         revealed: Some(RevealedCardView {
             image: Url("".to_string()),
             name: "Card".to_string(),
-            rules_text: "Rules".to_string(),
+            rules_text: "Here is some text which wraps to five different lines, which is the maximum number of lines of text which are allowed to be displayed on a card.".to_string(),
             status: None,
             can_drag: true,
             cost: Energy(2),
