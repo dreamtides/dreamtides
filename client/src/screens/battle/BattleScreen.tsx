@@ -50,11 +50,7 @@ export default function BattleScreen({}: BattleScreenProps) {
         <NavigationBar>
           <EnemyHand battleId="123" />
         </NavigationBar>
-        <div
-          style={{ transform: "scale(3) translateY(50px) translateX(150px)" }}
-        >
-          <Card card={result.battle.cards[0]} />
-        </div>
+        <Card card={result.battle.cards[0]} />
         {/* <BattlePlayerStatus />
         <Battlefield
           owner="enemy"

@@ -3,7 +3,7 @@ import { CardView } from "../../bindings";
 import { motion } from "motion/react";
 
 const ASPECT_RATIO = 1.6;
-const WIDTH = 24;
+const WIDTH = 200;
 const HEIGHT = WIDTH * ASPECT_RATIO;
 
 export type CardSize = {
@@ -50,8 +50,8 @@ export function Card({ card, className }: CardProps) {
         className
       )}
       style={{
-        width: `${WIDTH}dvw`,
-        height: `${HEIGHT}dvw`,
+        width: `${WIDTH}px`,
+        height: `${HEIGHT}px`,
       }}
     >
       {card.revealed && <RulesText text={card.revealed.rulesText} />}
@@ -68,8 +68,8 @@ function EnergyCost({ cost }: { cost: number }) {
     <div
       className="absolute"
       style={{
-        width: "5.2dvw",
-        height: "5.2dvw",
+        width: "45px",
+        height: "45px",
         backgroundImage: "url('/assets/energy_cost_background.png')",
         backgroundSize: "cover",
         display: "flex",
@@ -81,7 +81,7 @@ function EnergyCost({ cost }: { cost: number }) {
         style={{
           color: "white",
           fontFamily: "Impact",
-          fontSize: "15px",
+          fontSize: "35px",
           lineHeight: 1,
         }}
       >
@@ -99,7 +99,7 @@ function FrameDecoration({ side }: { side: "left" | "right" }) {
         bottom: 0,
         [side]: 0,
         width: "100%",
-        height: "12dvw",
+        height: "95px",
         backgroundRepeat: "no-repeat",
         backgroundImage: `url('/assets/card_frame_decoration_${side}.png')`,
         backgroundSize: "contain",
@@ -114,21 +114,21 @@ function CardName({ name }: { name: string }) {
     <div
       className="absolute w-full flex items-center"
       style={{
-        bottom: "8dvw",
+        bottom: "60px",
         backgroundImage: "url('/assets/card_name_background.png')",
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
-        height: "4dvw",
+        height: "35px",
       }}
     >
       <span
-        className="font-bold"
+        className="font-medium"
         style={{
           color: "white",
           fontFamily: "Garamond",
-          paddingLeft: "2dvw",
+          paddingLeft: "20px",
           display: "block",
-          fontSize: "7px",
+          fontSize: "15px",
         }}
       >
         {name}
@@ -140,26 +140,26 @@ function CardName({ name }: { name: string }) {
 function RulesText({ text }: { text: string }) {
   return (
     <div
-      className="absolute w-full flex items-center"
+      className="absolute flex items-center"
       style={{
         bottom: "0.25dvw",
         backgroundImage: "url('/assets/rules_text_background.png')",
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
-        height: "9dvw",
-        width: "22dvw",
-        left: "1dvw",
-        right: "1dvw",
+        height: "60px",
+        left: "10px",
+        right: "10px",
       }}
     >
       <span
         style={{
           color: "black",
           fontFamily: "'Libre Baskerville', Georgia, 'Times New Roman', serif",
-          paddingLeft: "3dvw",
-          paddingRight: "3dvw",
-          fontSize: "4px",
+          paddingLeft: "25px",
+          paddingRight: "15px",
+          fontSize: "10px",
           lineHeight: "1.0",
+          marginTop: "4px",
         }}
       >
         {text}
