@@ -2,9 +2,9 @@ import { cn } from "@nextui-org/react";
 import { CardView, DisplayImage } from "../../bindings";
 import { motion } from "motion/react";
 
+const BASE_WIDTH = 200;
 const ASPECT_RATIO = 1.6;
-const WIDTH = 200;
-const HEIGHT = WIDTH * ASPECT_RATIO;
+const BASE_HEIGHT = BASE_WIDTH * ASPECT_RATIO;
 
 export type CardSize = {
   vw: number;
@@ -14,6 +14,7 @@ export type CardSize = {
 export type CardProps = {
   card: CardView;
   className?: string;
+  width?: number;
 };
 
 /**
@@ -22,31 +23,42 @@ export type CardProps = {
  * This does not include other types of cards, such as dreamsigns, path cards,
  * etc which have their own components.
  */
-export function Card({ card, className }: CardProps) {
+export function Card({ card, className, width = BASE_WIDTH }: CardProps) {
   const id = JSON.stringify(card.id);
+  const scale = width / BASE_WIDTH;
+  const height = width * ASPECT_RATIO;
 
   return (
-    <motion.div
-      key={id}
-      layoutId={id}
+    <div
       className={cn("flex relative m-2", className)}
       style={{
-        width: `${WIDTH}px`,
-        height: `${HEIGHT}px`,
+        width: `${width}px`,
+        height: `${height}px`,
       }}
     >
-      {card.revealed && <CardImage image={card.revealed.image} />}
-      {card.revealed && <RulesText text={card.revealed.rulesText} />}
-      {card.revealed && <EnergyCost cost={card.revealed.cost} />}
-      <FrameDecoration side="left" />
-      <FrameDecoration side="right" />
-      {card.revealed && card.revealed.spark && (
-        <SparkValue spark={card.revealed.spark} />
-      )}
-      {card.revealed && (
-        <CardName name={card.revealed.name} cardType={card.revealed.cardType} />
-      )}
-    </motion.div>
+      <motion.div
+        key={id}
+        layoutId={id}
+        className="origin-top-left"
+        style={{
+          width: `${BASE_WIDTH}px`,
+          height: `${BASE_HEIGHT}px`,
+          transform: `scale(${scale})`,
+        }}
+      >
+        {card.revealed && <CardImage image={card.revealed.image} />}
+        {card.revealed && <RulesText text={card.revealed.rulesText} />}
+        {card.revealed && <EnergyCost cost={card.revealed.cost} />}
+        <FrameDecoration side="left" />
+        <FrameDecoration side="right" />
+        {card.revealed && card.revealed.spark && (
+          <SparkValue spark={card.revealed.spark} />
+        )}
+        {card.revealed && (
+          <CardName name={card.revealed.name} cardType={card.revealed.cardType} />
+        )}
+      </motion.div>
+    </div>
   );
 }
 
