@@ -67,9 +67,11 @@ function EnergyCost({ cost }: { cost: number }) {
       <span
         style={{
           color: "white",
-          fontFamily: "Impact",
+          fontFamily: "Anton, serif",
           fontSize: "35px",
           lineHeight: 1,
+          WebkitTextStroke: "0.1em black",
+          paintOrder: "stroke",
         }}
       >
         {cost}
@@ -113,7 +115,7 @@ function CardName({ name, cardType }: { name: string; cardType: string }) {
           className="font-medium"
           style={{
             color: "white",
-            fontFamily: "Garamond",
+            fontFamily: "'EB Garamond', serif",
             paddingLeft: "10px",
             fontSize: "13px",
           }}
@@ -123,7 +125,7 @@ function CardName({ name, cardType }: { name: string; cardType: string }) {
         <span
           style={{
             color: "white",
-            fontFamily: "Garamond",
+            fontFamily: "'EB Garamond', serif",
             paddingRight: "10px",
             fontSize: "10px",
           }}
@@ -200,7 +202,7 @@ function SparkValue({ spark }: { spark: number }) {
       <span
         style={{
           color: "white",
-          fontFamily: "Impact",
+          fontFamily: "Anton, serif",
           fontSize: "20px",
           lineHeight: 1,
           WebkitTextStroke: "0.1em black",
