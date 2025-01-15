@@ -13,7 +13,12 @@ export default function Battlefield({ cards }: BattlefieldProps) {
       style={{ height: "20dvh" }}
     >
       {cards.map((card) => (
-        <Card card={card} className="m-[1px]" onBattlefield={true} />
+        <Card
+          card={card}
+          size={{ vw: 24, vh: 19 }}
+          className="m-[1px]"
+          onBattlefield={true}
+        />
       ))}
     </div>
   );

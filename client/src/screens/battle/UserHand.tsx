@@ -12,7 +12,7 @@ export default function UserHand({ cards }: UserHandProps) {
       style={{ height: "30dvh" }}
     >
       {cards.map((card) => (
-        <Card card={card} className="m-[1px]" />
+        <Card card={card} size={{ vw: 24, vh: 29 }} className="m-[1px]" />
       ))}
     </div>
   );
