@@ -1,5 +1,5 @@
 import { cn } from "@nextui-org/react";
-import { CardView, DisplayImage } from "../../bindings";
+import { CardView, DisplayImage, RevealedCardView } from "../../bindings";
 import { motion } from "motion/react";
 
 const BASE_WIDTH = 200;
@@ -46,19 +46,35 @@ export function Card({ card, className, width = BASE_WIDTH }: CardProps) {
           transform: `scale(${scale})`,
         }}
       >
-        {card.revealed && <CardImage image={card.revealed.image} />}
-        {card.revealed && <RulesText text={card.revealed.rulesText} />}
-        {card.revealed && <EnergyCost cost={card.revealed.cost} />}
-        <FrameDecoration side="left" />
-        <FrameDecoration side="right" />
-        {card.revealed && card.revealed.spark && (
-          <SparkValue spark={card.revealed.spark} />
-        )}
-        {card.revealed && (
-          <CardName name={card.revealed.name} cardType={card.revealed.cardType} />
-        )}
+        {card.revealed ? <RevealedCard card={card.revealed} /> : <HiddenCard />}
       </motion.div>
     </div>
+  );
+}
+
+function RevealedCard({ card }: { card: RevealedCardView }) {
+  return (
+    <>
+      <CardImage image={card.image} />
+      <RulesText text={card.rulesText} />
+      <EnergyCost cost={card.cost} />
+      <FrameDecoration side="left" />
+      <FrameDecoration side="right" />
+      {card.spark && <SparkValue spark={card.spark} />}
+      <CardName name={card.name} cardType={card.cardType} />
+    </>
+  );
+}
+
+function HiddenCard() {
+  return (
+    <div
+      className="absolute w-full h-full rounded-xl"
+      style={{
+        backgroundImage: "url('/assets/card_back.png')",
+        backgroundSize: "cover",
+      }}
+    />
   );
 }
 
