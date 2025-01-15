@@ -55,6 +55,7 @@ export function Card({ card, className }: CardProps) {
       }}
     >
       {card.revealed && <EnergyCost cost={card.revealed.cost} />}
+      <FrameDecoration />
     </motion.div>
   );
 }
@@ -64,10 +65,8 @@ function EnergyCost({ cost }: { cost: number }) {
     <div
       className="absolute"
       style={{
-        top: length(0.5),
-        left: length(0.5),
-        width: length(22),
-        height: length(22),
+        width: "5.2dvw",
+        height: "5.2dvw",
         backgroundImage: "url('/assets/energy_cost_background.png')",
         backgroundSize: "cover",
         display: "flex",
@@ -89,6 +88,19 @@ function EnergyCost({ cost }: { cost: number }) {
   );
 }
 
-function length(value: number) {
-  return `${value * (WIDTH / 100)}dvw`;
+function FrameDecoration() {
+  return (
+    <div
+      className="absolute"
+      style={{
+        bottom: 0,
+        left: 0,
+        width: "100%",
+        height: "12dvw",
+        backgroundRepeat: "no-repeat",
+        backgroundImage: "url('/assets/card_frame_decoration_left.png')",
+        backgroundSize: "contain",
+      }}
+    />
+  );
 }
