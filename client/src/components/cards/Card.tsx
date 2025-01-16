@@ -42,7 +42,7 @@ export function Card({
 
   return (
     <motion.div
-      id={id}
+      key={id}
       layoutId={id}
       className={cn("flex relative m-2", className)}
       style={{
@@ -53,9 +53,9 @@ export function Card({
       {!card.revealed ? (
         <HiddenCard />
       ) : layout === "battlefield" ? (
-        <BattlefieldCard card={card.revealed} px={px} />
+        <BattlefieldCard card={card.revealed} id={id} px={px} />
       ) : (
-        <RevealedCard card={card.revealed} px={px} />
+        <RevealedCard card={card.revealed} id={id} px={px} />
       )}
     </motion.div>
   );
@@ -63,25 +63,46 @@ export function Card({
 
 function RevealedCard({
   card,
+  id,
   px,
 }: {
   card: RevealedCardView;
+  id: string;
   px: (x: number) => string;
 }) {
   return (
     <>
-      <CardImage image={card.image} px={px} />
+      <CardImage image={card.image} id={id} px={px} />
       <RulesText text={card.rulesText} px={px} />
       <EnergyCost cost={card.cost} px={px} />
       <FrameDecoration side="left" frame={card.frame} px={px} />
       <FrameDecoration side="right" frame={card.frame} px={px} />
-      {card.spark && <SparkValue spark={card.spark} px={px} />}
+      {card.spark && <SparkValue spark={card.spark} id={id} px={px} />}
       <CardName
         name={card.name}
         cardType={card.cardType}
         frame={card.frame}
         px={px}
       />
+    </>
+  );
+}
+
+function BattlefieldCard({
+  card,
+  id,
+  px,
+}: {
+  card: RevealedCardView;
+  id: string;
+  px: (x: number) => string;
+}) {
+  return (
+    <>
+      <CardImage image={card.image} id={id} px={px} />
+      {card.spark && (
+        <SparkValue spark={card.spark} id={id} px={px} size={60} />
+      )}
     </>
   );
 }
@@ -140,6 +161,7 @@ function FrameDecoration({
   return (
     <div
       className="absolute"
+      key={side}
       style={{
         bottom: 0,
         [side]: 0,
@@ -148,7 +170,7 @@ function FrameDecoration({
         backgroundRepeat: "no-repeat",
         backgroundImage: `url('${getFrameAssetUrl(
           frame,
-          side === "left" ? "frame_left" : "frame_right",
+          side === "left" ? "frame_left" : "frame_right"
         )}')`,
         backgroundSize: "contain",
         transform: side === "right" ? "scaleX(-1)" : undefined,
@@ -238,9 +260,11 @@ function RulesText({ text, px }: { text: string; px: (x: number) => string }) {
 
 function CardImage({
   image,
+  id,
   px,
 }: {
   image: DisplayImage;
+  id: string;
   px: (x: number) => string;
 }) {
   return (
@@ -262,10 +286,12 @@ function CardImage({
 
 function SparkValue({
   spark,
+  id,
   px,
   size = 30,
 }: {
   spark: number;
+  id: string;
   px: (x: number) => string;
   size?: number;
 }) {
@@ -302,7 +328,7 @@ function SparkValue({
 
 function getFrameAssetUrl(
   frame: CardFrame,
-  assetType: "frame_left" | "frame_right" | "name_background",
+  assetType: "frame_left" | "frame_right" | "name_background"
 ): string {
   const prefix = (() => {
     switch (frame) {
@@ -327,19 +353,4 @@ function getFrameAssetUrl(
   })();
 
   return `/assets/${prefix}${assetName}.png`;
-}
-
-function BattlefieldCard({
-  card,
-  px,
-}: {
-  card: RevealedCardView;
-  px: (x: number) => string;
-}) {
-  return (
-    <>
-      <CardImage image={card.image} px={px} />
-      {card.spark && <SparkValue spark={card.spark} px={px} size={60} />}
-    </>
-  );
 }

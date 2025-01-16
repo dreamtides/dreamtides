@@ -12,7 +12,12 @@ export default function UserHand({ cards }: UserHandProps) {
       style={{ height: "30dvh" }}
     >
       {cards.map((card) => (
-        <Card card={card} className="m-[1px]" />
+        <Card
+          key={JSON.stringify(card.id)}
+          card={card}
+          width={100}
+          className="m-[1px]"
+        />
       ))}
     </div>
   );
