@@ -16,10 +16,13 @@ export type CardSize = {
   vh: number;
 };
 
+export type CardLayout = "default" | "battlefield";
+
 export type CardProps = {
   card: CardView;
   className?: string;
   width?: number;
+  layout?: CardLayout;
 };
 
 /**
@@ -30,43 +33,33 @@ export type CardProps = {
  */
 export function Card({ card, className, width = BASE_WIDTH }: CardProps) {
   const id = JSON.stringify(card.id);
-  const scale = width / BASE_WIDTH;
-  const height = width * ASPECT_RATIO;
+  const px = (x: number,) => `${x * (width / BASE_WIDTH)}px`;
 
   return (
-    <div
+    <motion.div
+      id={id}
+      layoutId={id}
       className={cn("flex relative m-2", className)}
       style={{
-        width: `${width}px`,
-        height: `${height}px`,
+        width: px(BASE_WIDTH),
+        height: px(BASE_HEIGHT),
       }}
     >
-      <motion.div
-        key={id}
-        layoutId={id}
-        className="origin-top-left"
-        style={{
-          width: `${BASE_WIDTH}px`,
-          height: `${BASE_HEIGHT}px`,
-          transform: `scale(${scale})`,
-        }}
-      >
-        {card.revealed ? <RevealedCard card={card.revealed} /> : <HiddenCard />}
-      </motion.div>
-    </div>
+      {card.revealed ? <RevealedCard card={card.revealed} px={px} /> : <HiddenCard />}
+    </motion.div>
   );
 }
 
-function RevealedCard({ card }: { card: RevealedCardView }) {
+function RevealedCard({ card, px }: { card: RevealedCardView, px: (x: number) => string }) {
   return (
     <>
-      <CardImage image={card.image} />
-      <RulesText text={card.rulesText} />
-      <EnergyCost cost={card.cost} />
-      <FrameDecoration side="left" frame={card.frame} />
-      <FrameDecoration side="right" frame={card.frame} />
-      {card.spark && <SparkValue spark={card.spark} />}
-      <CardName name={card.name} cardType={card.cardType} frame={card.frame} />
+      <CardImage image={card.image} px={px} />
+      <RulesText text={card.rulesText} px={px} />
+      <EnergyCost cost={card.cost} px={px} />
+      <FrameDecoration side="left" frame={card.frame} px={px} />
+      <FrameDecoration side="right" frame={card.frame} px={px} />
+      {card.spark && <SparkValue spark={card.spark} px={px} />}
+      <CardName name={card.name} cardType={card.cardType} frame={card.frame} px={px} />
     </>
   );
 }
@@ -83,13 +76,13 @@ function HiddenCard() {
   );
 }
 
-function EnergyCost({ cost }: { cost: number }) {
+function EnergyCost({ cost, px }: { cost: number, px: (x: number) => string }) {
   return (
     <div
       className="absolute"
       style={{
-        width: "45px",
-        height: "45px",
+        width: px(45),
+        height: px(45),
         backgroundImage: "url('/assets/energy_cost_background.png')",
         backgroundSize: "cover",
         display: "flex",
@@ -101,7 +94,7 @@ function EnergyCost({ cost }: { cost: number }) {
         style={{
           color: "white",
           fontFamily: "Anton, serif",
-          fontSize: "35px",
+          fontSize: px(35),
           lineHeight: 1,
           WebkitTextStroke: "0.1em black",
           paintOrder: "stroke",
@@ -116,9 +109,11 @@ function EnergyCost({ cost }: { cost: number }) {
 function FrameDecoration({
   side,
   frame,
+  px,
 }: {
   side: "left" | "right";
   frame: CardFrame;
+  px: (x: number) => string;
 }) {
   return (
     <div
@@ -127,7 +122,7 @@ function FrameDecoration({
         bottom: 0,
         [side]: 0,
         width: "100%",
-        height: "95px",
+        height: px(95),
         backgroundRepeat: "no-repeat",
         backgroundImage: `url('${getFrameAssetUrl(frame, side === "left" ? "frame_left" : "frame_right")}')`,
         backgroundSize: "contain",
@@ -141,20 +136,22 @@ function CardName({
   name,
   cardType,
   frame,
+  px,
 }: {
   name: string;
   cardType: string;
   frame: CardFrame;
+  px: (x: number) => string;
 }) {
   return (
     <div
       className="absolute w-full flex items-center"
       style={{
-        bottom: "60px",
+        bottom: px(60),
         backgroundImage: `url('${getFrameAssetUrl(frame, "name_background")}')`,
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
-        height: "35px",
+        height: px(35),
       }}
     >
       <div className="flex justify-between w-full items-center">
@@ -163,8 +160,8 @@ function CardName({
           style={{
             color: "white",
             fontFamily: "'EB Garamond', serif",
-            paddingLeft: "10px",
-            fontSize: "13px",
+            paddingLeft: px(10),
+            fontSize: px(13),
           }}
         >
           {name}
@@ -173,8 +170,8 @@ function CardName({
           style={{
             color: "white",
             fontFamily: "'EB Garamond', serif",
-            paddingRight: "10px",
-            fontSize: "10px",
+            paddingRight: px(10),
+            fontSize: px(10),
           }}
         >
           {cardType}
@@ -184,27 +181,27 @@ function CardName({
   );
 }
 
-function RulesText({ text }: { text: string }) {
+function RulesText({ text, px }: { text: string, px: (x: number) => string }) {
   return (
     <div
       className="absolute flex items-center"
       style={{
-        bottom: "0.25dvw",
+        bottom: px(2),
         backgroundImage: "url('/assets/rules_text_background.png')",
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
-        height: "70px",
-        left: "10px",
-        right: "10px",
+        height: px(70),
+        left: px(10),
+        right: px(10),
       }}
     >
       <span
         style={{
           color: "black",
           fontFamily: "'Libre Baskerville', Georgia, 'Times New Roman', serif",
-          paddingLeft: "25px",
-          paddingRight: "15px",
-          fontSize: "10px",
+          paddingLeft: px(25),
+          paddingRight: px(15),
+          fontSize: px(10),
           lineHeight: "1.0",
         }}
       >
@@ -214,12 +211,12 @@ function RulesText({ text }: { text: string }) {
   );
 }
 
-function CardImage({ image }: { image: DisplayImage }) {
+function CardImage({ image, px }: { image: DisplayImage, px: (x: number) => string }) {
   return (
     <div
       className="absolute top-0 w-full rounded-xl overflow-hidden"
       style={{
-        height: "260px",
+        height: px(260),
         width: "100%",
         backgroundImage: `url("${image.image}")`,
         backgroundSize: "cover",
@@ -230,13 +227,13 @@ function CardImage({ image }: { image: DisplayImage }) {
   );
 }
 
-function SparkValue({ spark }: { spark: number }) {
+function SparkValue({ spark, px }: { spark: number, px: (x: number) => string }) {
   return (
     <div
       className="absolute"
       style={{
-        width: "30px",
-        height: "30px",
+        width: px(30),
+        height: px(30),
         backgroundImage: "url('/assets/spark_background.png')",
         backgroundSize: "cover",
         display: "flex",
@@ -250,7 +247,7 @@ function SparkValue({ spark }: { spark: number }) {
         style={{
           color: "white",
           fontFamily: "Anton, serif",
-          fontSize: "20px",
+          fontSize: px(20),
           lineHeight: 1,
           WebkitTextStroke: "0.1em black",
           paintOrder: "stroke",
