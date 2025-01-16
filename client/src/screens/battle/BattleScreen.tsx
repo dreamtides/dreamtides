@@ -41,7 +41,7 @@ export default function BattleScreen({}: BattleScreenProps) {
         <NavigationBar>
           <EnemyHand battleId="123" />
         </NavigationBar>
-        <Card card={result.battle.cards[0]} width={300} />
+        <Card card={result.battle.cards[0]} width={200} layout="battlefield" />
         {/* <BattlePlayerStatus />
         <Battlefield
           owner="enemy"

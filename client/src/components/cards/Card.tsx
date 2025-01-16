@@ -31,9 +31,14 @@ export type CardProps = {
  * This does not include other types of cards, such as dreamsigns, path cards,
  * etc which have their own components.
  */
-export function Card({ card, className, width = BASE_WIDTH }: CardProps) {
+export function Card({
+  card,
+  className,
+  width = BASE_WIDTH,
+  layout = "default",
+}: CardProps) {
   const id = JSON.stringify(card.id);
-  const px = (x: number,) => `${x * (width / BASE_WIDTH)}px`;
+  const px = (x: number) => `${x * (width / BASE_WIDTH)}px`;
 
   return (
     <motion.div
@@ -42,15 +47,27 @@ export function Card({ card, className, width = BASE_WIDTH }: CardProps) {
       className={cn("flex relative m-2", className)}
       style={{
         width: px(BASE_WIDTH),
-        height: px(BASE_HEIGHT),
+        height: layout === "battlefield" ? px(260) : px(BASE_HEIGHT),
       }}
     >
-      {card.revealed ? <RevealedCard card={card.revealed} px={px} /> : <HiddenCard />}
+      {!card.revealed ? (
+        <HiddenCard />
+      ) : layout === "battlefield" ? (
+        <BattlefieldCard card={card.revealed} px={px} />
+      ) : (
+        <RevealedCard card={card.revealed} px={px} />
+      )}
     </motion.div>
   );
 }
 
-function RevealedCard({ card, px }: { card: RevealedCardView, px: (x: number) => string }) {
+function RevealedCard({
+  card,
+  px,
+}: {
+  card: RevealedCardView;
+  px: (x: number) => string;
+}) {
   return (
     <>
       <CardImage image={card.image} px={px} />
@@ -59,7 +76,12 @@ function RevealedCard({ card, px }: { card: RevealedCardView, px: (x: number) =>
       <FrameDecoration side="left" frame={card.frame} px={px} />
       <FrameDecoration side="right" frame={card.frame} px={px} />
       {card.spark && <SparkValue spark={card.spark} px={px} />}
-      <CardName name={card.name} cardType={card.cardType} frame={card.frame} px={px} />
+      <CardName
+        name={card.name}
+        cardType={card.cardType}
+        frame={card.frame}
+        px={px}
+      />
     </>
   );
 }
@@ -76,7 +98,7 @@ function HiddenCard() {
   );
 }
 
-function EnergyCost({ cost, px }: { cost: number, px: (x: number) => string }) {
+function EnergyCost({ cost, px }: { cost: number; px: (x: number) => string }) {
   return (
     <div
       className="absolute"
@@ -124,7 +146,10 @@ function FrameDecoration({
         width: "100%",
         height: px(95),
         backgroundRepeat: "no-repeat",
-        backgroundImage: `url('${getFrameAssetUrl(frame, side === "left" ? "frame_left" : "frame_right")}')`,
+        backgroundImage: `url('${getFrameAssetUrl(
+          frame,
+          side === "left" ? "frame_left" : "frame_right",
+        )}')`,
         backgroundSize: "contain",
         transform: side === "right" ? "scaleX(-1)" : undefined,
       }}
@@ -181,7 +206,7 @@ function CardName({
   );
 }
 
-function RulesText({ text, px }: { text: string, px: (x: number) => string }) {
+function RulesText({ text, px }: { text: string; px: (x: number) => string }) {
   return (
     <div
       className="absolute flex items-center"
@@ -211,7 +236,13 @@ function RulesText({ text, px }: { text: string, px: (x: number) => string }) {
   );
 }
 
-function CardImage({ image, px }: { image: DisplayImage, px: (x: number) => string }) {
+function CardImage({
+  image,
+  px,
+}: {
+  image: DisplayImage;
+  px: (x: number) => string;
+}) {
   return (
     <div
       className="absolute top-0 w-full rounded-xl overflow-hidden"
@@ -221,19 +252,29 @@ function CardImage({ image, px }: { image: DisplayImage, px: (x: number) => stri
         backgroundImage: `url("${image.image}")`,
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
-        backgroundPosition: `${image.imageOffsetX ?? 50}% ${image.imageOffsetY ?? 50}%`,
+        backgroundPosition: `${image.imageOffsetX ?? 50}% ${
+          image.imageOffsetY ?? 50
+        }%`,
       }}
     />
   );
 }
 
-function SparkValue({ spark, px }: { spark: number, px: (x: number) => string }) {
+function SparkValue({
+  spark,
+  px,
+  size = 30,
+}: {
+  spark: number;
+  px: (x: number) => string;
+  size?: number;
+}) {
   return (
     <div
       className="absolute"
       style={{
-        width: px(30),
-        height: px(30),
+        width: px(size),
+        height: px(size),
         backgroundImage: "url('/assets/spark_background.png')",
         backgroundSize: "cover",
         display: "flex",
@@ -247,7 +288,7 @@ function SparkValue({ spark, px }: { spark: number, px: (x: number) => string })
         style={{
           color: "white",
           fontFamily: "Anton, serif",
-          fontSize: px(20),
+          fontSize: px((size * 2) / 3),
           lineHeight: 1,
           WebkitTextStroke: "0.1em black",
           paintOrder: "stroke",
@@ -286,4 +327,19 @@ function getFrameAssetUrl(
   })();
 
   return `/assets/${prefix}${assetName}.png`;
+}
+
+function BattlefieldCard({
+  card,
+  px,
+}: {
+  card: RevealedCardView;
+  px: (x: number) => string;
+}) {
+  return (
+    <>
+      <CardImage image={card.image} px={px} />
+      {card.spark && <SparkValue spark={card.spark} px={px} size={60} />}
+    </>
+  );
 }
