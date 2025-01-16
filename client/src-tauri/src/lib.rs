@@ -82,6 +82,7 @@ fn enemy_battlefield_card(sorting_key: u32) -> CardView {
 }
 
 fn card(position: Position, sorting_key: u32) -> CardView {
+    let revealed = rand::thread_rng().gen_range(0..5) != 0;
     CardView {
         id: ClientCardId::CardId(format!("#{}", sorting_key)),
         position: ObjectPosition {
@@ -90,7 +91,7 @@ fn card(position: Position, sorting_key: u32) -> CardView {
             sorting_sub_key: 0,
         },
         card_back: Url("".to_string()),
-        revealed: Some(RevealedCardView {
+        revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
                 image: Url("https://www.shutterstock.com/shutterstock/photos/2521694543/display_1500/stock-photo-traveller-in-a-land-of-ancient-statue-digital-art-style-illustration-painting-2521694543.jpg".to_string()),
                 image_offset_x: Some(25),

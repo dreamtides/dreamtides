@@ -42,7 +42,6 @@ export function Card({
 
   return (
     <motion.div
-      key={id}
       layoutId={id}
       className={cn("flex relative m-2", className)}
       style={{
@@ -170,7 +169,7 @@ function FrameDecoration({
         backgroundRepeat: "no-repeat",
         backgroundImage: `url('${getFrameAssetUrl(
           frame,
-          side === "left" ? "frame_left" : "frame_right"
+          side === "left" ? "frame_left" : "frame_right",
         )}')`,
         backgroundSize: "contain",
         transform: side === "right" ? "scaleX(-1)" : undefined,
@@ -328,7 +327,7 @@ function SparkValue({
 
 function getFrameAssetUrl(
   frame: CardFrame,
-  assetType: "frame_left" | "frame_right" | "name_background"
+  assetType: "frame_left" | "frame_right" | "name_background",
 ): string {
   const prefix = (() => {
     switch (frame) {

@@ -1,5 +1,11 @@
 import { LayoutGroup } from "motion/react";
-import { BattleView, CardView, ClientBattleId, commands, Position } from "../../bindings";
+import {
+  BattleView,
+  CardView,
+  ClientBattleId,
+  commands,
+  Position,
+} from "../../bindings";
 import { ErrorState } from "../../components/common/ErrorState";
 import { Loading } from "../../components/common/Loading";
 import NavigationBar from "../../components/common/NavigationBar";
