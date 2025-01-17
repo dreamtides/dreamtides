@@ -52,9 +52,9 @@ export function Card({
       {!card.revealed ? (
         <HiddenCard />
       ) : layout === "battlefield" ? (
-        <BattlefieldCard card={card.revealed} id={id} px={px} />
+        <BattlefieldCard card={card.revealed} px={px} />
       ) : (
-        <RevealedCard card={card.revealed} id={id} px={px} />
+        <RevealedCard card={card.revealed} px={px} />
       )}
     </motion.div>
   );
@@ -62,21 +62,19 @@ export function Card({
 
 function RevealedCard({
   card,
-  id,
   px,
 }: {
   card: RevealedCardView;
-  id: string;
   px: (x: number) => string;
 }) {
   return (
     <>
-      <CardImage image={card.image} id={id} px={px} />
+      <CardImage image={card.image} px={px} />
       <RulesText text={card.rulesText} px={px} />
       <EnergyCost cost={card.cost} px={px} />
       <FrameDecoration side="left" frame={card.frame} px={px} />
       <FrameDecoration side="right" frame={card.frame} px={px} />
-      {card.spark && <SparkValue spark={card.spark} id={id} px={px} />}
+      {card.spark && <SparkValue spark={card.spark} px={px} />}
       <CardName
         name={card.name}
         cardType={card.cardType}
@@ -89,18 +87,16 @@ function RevealedCard({
 
 function BattlefieldCard({
   card,
-  id,
   px,
 }: {
   card: RevealedCardView;
-  id: string;
   px: (x: number) => string;
 }) {
   return (
     <>
-      <CardImage image={card.image} id={id} px={px} />
+      <CardImage image={card.image} px={px} />
       {card.spark && (
-        <SparkValue spark={card.spark} id={id} px={px} size={60} />
+        <SparkValue spark={card.spark} px={px} size={60} />
       )}
     </>
   );
@@ -259,11 +255,9 @@ function RulesText({ text, px }: { text: string; px: (x: number) => string }) {
 
 function CardImage({
   image,
-  id,
   px,
 }: {
   image: DisplayImage;
-  id: string;
   px: (x: number) => string;
 }) {
   return (
@@ -285,12 +279,10 @@ function CardImage({
 
 function SparkValue({
   spark,
-  id,
   px,
   size = 30,
 }: {
   spark: number;
-  id: string;
   px: (x: number) => string;
   size?: number;
 }) {

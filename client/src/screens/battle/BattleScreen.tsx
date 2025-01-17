@@ -11,7 +11,6 @@ import { Loading } from "../../components/common/Loading";
 import NavigationBar from "../../components/common/NavigationBar";
 import EnemyHand from "./EnemyHand";
 import useSWR from "swr";
-import { Card } from "../../components/cards/Card";
 import BattlePlayerStatus from "./BattlePlayerStatus";
 import Battlefield from "./Battlefield";
 import UserHand from "./UserHand";

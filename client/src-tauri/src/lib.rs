@@ -5,7 +5,6 @@ use core_data::types::{CardFacing, Url};
 use display_data::battle_view::{BattleView, ClientBattleId, DisplayPlayer, PlayerView};
 use display_data::card_view::{CardFrame, CardView, ClientCardId, DisplayImage, RevealedCardView};
 use display_data::object_position::{ObjectPosition, Position};
-use rand::Rng;
 use specta_typescript::Typescript;
 use tauri_specta::{collect_commands, Builder};
 
@@ -47,42 +46,27 @@ fn fetch_battle(id: ClientBattleId) -> BattleView {
             score: Points(0),
             can_act: false,
         },
-        cards: vec![
-            random_position_card(0),
-            random_position_card(1),
-            random_position_card(2),
-            random_position_card(3),
-            random_position_card(4),
-            random_position_card(5),
-        ],
+        cards: [
+            cards_in_position(Position::OnBattlefield(DisplayPlayer::User), 0, 4),
+            cards_in_position(Position::InHand(DisplayPlayer::User), 4, 4),
+            cards_in_position(Position::InVoid(DisplayPlayer::User), 8, 6),
+            cards_in_position(Position::InDeck(DisplayPlayer::User), 14, 26),
+        ]
+        .concat()
+        .to_vec(),
         status_description: "Status".to_string(),
         controls: vec![],
     }
 }
 
-fn random_position_card(sorting_key: u32) -> CardView {
-    let position = rand::thread_rng().gen_range(0..3);
-    match position {
-        0 => user_hand_card(sorting_key),
-        1 => user_battlefield_card(sorting_key),
-        _ => enemy_battlefield_card(sorting_key),
-    }
-}
-
-fn user_hand_card(sorting_key: u32) -> CardView {
-    card(Position::InHand(DisplayPlayer::User), sorting_key)
-}
-
-fn user_battlefield_card(sorting_key: u32) -> CardView {
-    card(Position::OnBattlefield(DisplayPlayer::User), sorting_key)
-}
-
-fn enemy_battlefield_card(sorting_key: u32) -> CardView {
-    card(Position::OnBattlefield(DisplayPlayer::Enemy), sorting_key)
+fn cards_in_position(position: Position, start_key: u32, count: u32) -> Vec<CardView> {
+    (0..count)
+        .map(|i| card(position.clone(), start_key + i))
+        .collect()
 }
 
 fn card(position: Position, sorting_key: u32) -> CardView {
-    let revealed = rand::thread_rng().gen_range(0..5) != 0;
+    let revealed = position != Position::InDeck(DisplayPlayer::User);
     CardView {
         id: ClientCardId::CardId(format!("#{}", sorting_key)),
         position: ObjectPosition {

@@ -211,7 +211,11 @@ export type Position =
  */
 { inHand: DisplayPlayer } | 
 /**
- * Object is in a player's deck
+ * Object is on top of a player's deck
+ */
+{ onTopOfDeck: DisplayPlayer } | 
+/**
+ * Object is shuffled into a player's deck
  */
 { inDeck: DisplayPlayer } | 
 /**
