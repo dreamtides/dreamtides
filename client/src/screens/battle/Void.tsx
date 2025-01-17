@@ -1,13 +1,12 @@
 import { CardView } from "../../bindings";
 import { Card, CARD_ASPECT_RATIO } from "../../components/cards/Card";
+import { DECK_CARD_WIDTH } from "./BattleDeck";
 
-type BattleDeckProps = {
+type DiscardPileProps = {
   cards: CardView[];
 };
 
-export const DECK_CARD_WIDTH = 55;
-
-export default function BattleDeck({ cards }: BattleDeckProps) {
+export default function Void({ cards }: DiscardPileProps) {
   return (
     <div
       className="relative my-1"
@@ -32,15 +31,15 @@ export default function BattleDeck({ cards }: BattleDeckProps) {
 }
 
 function getCardOffset(index: number) {
-  if (index < 5) {
+  if (index < 1) {
     return 0;
-  } else if (index < 10) {
+  } else if (index < 2) {
     return 1;
-  } else if (index < 15) {
+  } else if (index < 3) {
     return 2;
-  } else if (index < 20) {
+  } else if (index < 4) {
     return 3;
-  } else if (index < 25) {
+  } else if (index < 5) {
     return 4;
   } else {
     return 5;

@@ -7,9 +7,9 @@ import {
 } from "../../bindings";
 import { motion } from "motion/react";
 
+export const CARD_ASPECT_RATIO = 1.6;
 const BASE_WIDTH = 200;
-const ASPECT_RATIO = 1.6;
-const BASE_HEIGHT = BASE_WIDTH * ASPECT_RATIO;
+const BASE_HEIGHT = BASE_WIDTH * CARD_ASPECT_RATIO;
 
 export type CardSize = {
   vw: number;
@@ -98,7 +98,9 @@ function BattlefieldCard({
   return (
     <>
       <CardImage image={card.image} px={px} />
-      {card.spark && <SparkValue spark={card.spark} px={px} size={60} />}
+      {card.spark != null && (
+        <SparkValue spark={card.spark} px={px} size={80} />
+      )}
     </>
   );
 }

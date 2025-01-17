@@ -21,10 +21,7 @@ type BattleFetchResult =
   | { error: Error }
   | { isLoading: boolean };
 
-export function useBattle(
-  id: ClientBattleId,
-  scene: number,
-): BattleFetchResult {
+function useBattle(id: ClientBattleId, scene: number): BattleFetchResult {
   const { data, error, isLoading } = useSWR([id, scene], ([id, scene]) =>
     commands.fetchBattle(id, scene),
   );
@@ -64,6 +61,7 @@ export default function BattleScreen({}: BattleScreenProps) {
         <BattlePlayerStatus
           owner="enemy"
           deck={cards.get(positionKey({ inDeck: "enemy" })) ?? []}
+          void={cards.get(positionKey({ inVoid: "enemy" })) ?? []}
         />
         <Battlefield
           owner="enemy"
@@ -76,6 +74,7 @@ export default function BattleScreen({}: BattleScreenProps) {
         <BattlePlayerStatus
           owner="user"
           deck={cards.get(positionKey({ inDeck: "user" })) ?? []}
+          void={cards.get(positionKey({ inVoid: "user" })) ?? []}
         />
         <UserHand cards={cards.get(positionKey({ inHand: "user" })) ?? []} />
       </LayoutGroup>
