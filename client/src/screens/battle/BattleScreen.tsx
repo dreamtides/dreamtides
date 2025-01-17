@@ -14,14 +14,15 @@ import useSWR from "swr";
 import BattlePlayerStatus from "./BattlePlayerStatus";
 import Battlefield from "./Battlefield";
 import UserHand from "./UserHand";
+import { useState } from "react";
 
 type BattleFetchResult =
   | { battle: BattleView }
   | { error: Error }
   | { isLoading: boolean };
 
-export function useBattle(id: ClientBattleId): BattleFetchResult {
-  const { data, error, isLoading } = useSWR(id, commands.fetchBattle);
+export function useBattle(id: ClientBattleId, scene: number): BattleFetchResult {
+  const { data, error, isLoading } = useSWR([id, scene], ([id, scene]) => commands.fetchBattle(id, scene));
 
   if (isLoading) {
     return { isLoading: true };
@@ -35,7 +36,13 @@ export function useBattle(id: ClientBattleId): BattleFetchResult {
 type BattleScreenProps = {};
 
 export default function BattleScreen({}: BattleScreenProps) {
-  const result = useBattle("123");
+  const [sceneNumber, setSceneNumber] = useState(0);
+  const result = useBattle("123", sceneNumber);
+
+  const handleSceneChange = () => {
+    setSceneNumber((prev) => (prev + 1) % 2);
+  };
+
   if ("isLoading" in result) {
     return <Loading />;
   } else if ("error" in result) {
@@ -47,7 +54,7 @@ export default function BattleScreen({}: BattleScreenProps) {
     <div className="flex flex-col h-screen w-screen">
       <LayoutGroup>
         <NavigationBar>
-          <EnemyHand battleId="123" />
+          <EnemyHand battleId="123" onSceneChange={handleSceneChange} />
         </NavigationBar>
         <BattlePlayerStatus owner="enemy" />
         <Battlefield

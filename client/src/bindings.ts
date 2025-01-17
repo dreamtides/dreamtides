@@ -5,8 +5,8 @@
 
 
 export const commands = {
-async fetchBattle(id: ClientBattleId) : Promise<BattleView> {
-    return await TAURI_INVOKE("fetch_battle", { id });
+async fetchBattle(id: ClientBattleId, scene: number) : Promise<BattleView> {
+    return await TAURI_INVOKE("fetch_battle", { id, scene });
 }
 }
 
