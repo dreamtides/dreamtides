@@ -8,11 +8,13 @@ type BattlefieldProps = {
 
 export default function Battlefield({ owner, cards }: BattlefieldProps) {
   if (cards.length === 0) {
-      return <div
+    return (
+      <div
         key={owner}
         className="flex bg-orange-600  items-center justify-center"
         style={{ height: "22dvh" }}
       />
+    );
   }
 
   return (

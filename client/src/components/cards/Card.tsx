@@ -21,6 +21,7 @@ export type CardLayout = "default" | "battlefield";
 export type CardProps = {
   card: CardView;
   className?: string;
+  style?: React.CSSProperties;
   width?: number;
   layout?: CardLayout;
 };
@@ -34,6 +35,7 @@ export type CardProps = {
 export function Card({
   card,
   className,
+  style,
   width = BASE_WIDTH,
   layout = "default",
 }: CardProps) {
@@ -43,10 +45,11 @@ export function Card({
   return (
     <motion.div
       layoutId={id}
-      className={cn("flex relative m-2", className)}
+      className={cn("flex relative", className)}
       style={{
         width: px(BASE_WIDTH),
         height: layout === "battlefield" ? px(260) : px(BASE_HEIGHT),
+        ...style,
       }}
     >
       {!card.revealed ? (
@@ -95,9 +98,7 @@ function BattlefieldCard({
   return (
     <>
       <CardImage image={card.image} px={px} />
-      {card.spark && (
-        <SparkValue spark={card.spark} px={px} size={60} />
-      )}
+      {card.spark && <SparkValue spark={card.spark} px={px} size={60} />}
     </>
   );
 }

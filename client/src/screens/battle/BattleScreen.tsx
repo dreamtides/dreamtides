@@ -21,8 +21,13 @@ type BattleFetchResult =
   | { error: Error }
   | { isLoading: boolean };
 
-export function useBattle(id: ClientBattleId, scene: number): BattleFetchResult {
-  const { data, error, isLoading } = useSWR([id, scene], ([id, scene]) => commands.fetchBattle(id, scene));
+export function useBattle(
+  id: ClientBattleId,
+  scene: number,
+): BattleFetchResult {
+  const { data, error, isLoading } = useSWR([id, scene], ([id, scene]) =>
+    commands.fetchBattle(id, scene),
+  );
 
   if (isLoading) {
     return { isLoading: true };
@@ -56,7 +61,10 @@ export default function BattleScreen({}: BattleScreenProps) {
         <NavigationBar>
           <EnemyHand battleId="123" onSceneChange={handleSceneChange} />
         </NavigationBar>
-        <BattlePlayerStatus owner="enemy" />
+        <BattlePlayerStatus
+          owner="enemy"
+          deck={cards.get(positionKey({ inDeck: "enemy" })) ?? []}
+        />
         <Battlefield
           owner="enemy"
           cards={cards.get(positionKey({ onBattlefield: "enemy" })) ?? []}
@@ -65,7 +73,10 @@ export default function BattleScreen({}: BattleScreenProps) {
           owner="user"
           cards={cards.get(positionKey({ onBattlefield: "user" })) ?? []}
         />
-        <BattlePlayerStatus owner="user" />
+        <BattlePlayerStatus
+          owner="user"
+          deck={cards.get(positionKey({ inDeck: "user" })) ?? []}
+        />
         <UserHand cards={cards.get(positionKey({ inHand: "user" })) ?? []} />
       </LayoutGroup>
     </div>

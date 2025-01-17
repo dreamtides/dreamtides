@@ -21,8 +21,8 @@ export default function UserHand({ cards }: UserHandProps) {
     };
 
     updateCardWidth();
-    window.addEventListener('resize', updateCardWidth);
-    return () => window.removeEventListener('resize', updateCardWidth);
+    window.addEventListener("resize", updateCardWidth);
+    return () => window.removeEventListener("resize", updateCardWidth);
   }, []);
 
   return (
