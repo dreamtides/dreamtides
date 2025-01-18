@@ -21,6 +21,7 @@ export type CardLayout = "default" | "battlefield";
 export type CardProps = {
   card: CardView;
   className?: string;
+  rotate?: boolean;
   style?: React.CSSProperties;
   width?: number;
   layout?: CardLayout;
@@ -35,6 +36,7 @@ export type CardProps = {
 export function Card({
   card,
   className,
+  rotate = false,
   style,
   width = BASE_WIDTH,
   layout = "default",
@@ -45,7 +47,12 @@ export function Card({
   return (
     <motion.div
       layoutId={id}
-      className={cn("flex relative", className)}
+      animate={{
+        rotate: rotate ? -90 : 0,
+        originX: 0,
+        originY: 0,
+      }}
+      className={cn("flex relative shrink-0", className)}
       style={{
         width: px(BASE_WIDTH),
         height: layout === "battlefield" ? px(260) : px(BASE_HEIGHT),

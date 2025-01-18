@@ -14,16 +14,18 @@ export default function BattleDeck({ cards }: BattleDeckProps) {
       style={{
         width: `${DECK_CARD_WIDTH * CARD_ASPECT_RATIO}px`,
         height: `${DECK_CARD_WIDTH}px`,
+        transform: `translateY(${DECK_CARD_WIDTH}px)`,
       }}
     >
       {cards.map((card, index) => (
         <Card
+          key={JSON.stringify(card.id)}
           card={card}
           width={DECK_CARD_WIDTH}
-          className="absolute origin-top-left -rotate-90"
+          rotate={true}
           style={{
-            top: `${DECK_CARD_WIDTH - getCardOffset(index)}px`,
             left: `${getCardOffset(index)}px`,
+            position: "absolute",
           }}
         />
       ))}
