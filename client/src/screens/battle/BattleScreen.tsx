@@ -42,7 +42,7 @@ export default function BattleScreen({}: BattleScreenProps) {
   const result = useBattle("123", sceneNumber);
 
   const handleSceneChange = () => {
-    setSceneNumber((prev) => (prev + 1) % 2);
+    setSceneNumber((prev) => (prev + 1) % 3);
   };
 
   if ("isLoading" in result) {

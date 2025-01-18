@@ -28,7 +28,7 @@ export default function UserHand({ cards }: UserHandProps) {
   return (
     <div
       ref={containerRef}
-      className="flex bg-blue-600 items-center justify-center"
+      className="flex bg-blue-600 items-center justify-center overflow-x-auto"
       style={{ height: "26dvh" }}
     >
       {cards.map((card) => (

@@ -39,6 +39,7 @@ fn fetch_battle(id: ClientBattleId, scene: u32) -> BattleView {
     match scene {
         0 => scene_0(id),
         1 => scene_1(id),
+        2 => scene_2(id),
         _ => panic!("Invalid scene number"),
     }
 }
@@ -59,6 +60,32 @@ fn scene_1(id: ClientBattleId) -> BattleView {
             cards_in_position(Position::InHand(DisplayPlayer::User), 5, 3),
             cards_in_position(Position::InVoid(DisplayPlayer::User), 8, 6),
             cards_in_position(Position::InDeck(DisplayPlayer::User), 14, 25),
+            vec![card(Position::InHand(DisplayPlayer::User), 39)],
+        ]
+        .concat()
+        .to_vec(),
+        status_description: "Status".to_string(),
+        controls: vec![],
+    }
+}
+
+fn scene_2(id: ClientBattleId) -> BattleView {
+    BattleView {
+        id,
+        user: PlayerView {
+            score: Points(0),
+            can_act: false,
+        },
+        enemy: PlayerView {
+            score: Points(0),
+            can_act: false,
+        },
+        cards: [
+            cards_in_position(Position::OnBattlefield(DisplayPlayer::User), 0, 5),
+            cards_in_position(Position::InHand(DisplayPlayer::User), 5, 3),
+            cards_in_position(Position::InVoid(DisplayPlayer::User), 8, 6),
+            cards_in_position(Position::InDeck(DisplayPlayer::User), 14, 24),
+            vec![card(Position::InHand(DisplayPlayer::User), 38)],
             vec![card(Position::InHand(DisplayPlayer::User), 39)],
         ]
         .concat()
