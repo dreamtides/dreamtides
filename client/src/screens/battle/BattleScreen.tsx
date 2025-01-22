@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 
 type BattleScreenProps = {};
 
-export default function BattleScreen({ }: BattleScreenProps) {
+export default function BattleScreen({}: BattleScreenProps) {
   const [isAnimating, _setIsAnimating] = useState(false);
   const [_updateQueue, setUpdateQueue] = useState<BattleView[]>([]);
   const [battleView, setBattleView] = useState<BattleView | null>(null);
@@ -28,15 +28,17 @@ export default function BattleScreen({ }: BattleScreenProps) {
 
   useEffect(() => {
     console.log("listening");
-    const unlisten = use(events.updateEvent.listen((event) => {
+    events.updateEvent.listen((event) => {
       console.log("got update", event.payload.id);
       if (isAnimating) {
         setUpdateQueue((prev) => [...prev, event.payload]);
       } else {
         setBattleView(event.payload);
       }
-    }));
-    return unlisten;
+    });
+    return () => {
+      console.log("unlistening");
+    };
   }, []);
 
   if (battleView == null) {
