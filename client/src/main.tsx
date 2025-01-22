@@ -13,9 +13,11 @@ bundle.addResource(enUSResource);
 const l10n = new ReactLocalization([bundle]);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <NextUIProvider>
-    <LocalizationProvider l10n={l10n}>
-      <App />
-    </LocalizationProvider>
-  </NextUIProvider>
+  <React.StrictMode>
+    <NextUIProvider>
+      <LocalizationProvider l10n={l10n}>
+        <App />
+      </LocalizationProvider>
+    </NextUIProvider>
+  </React.StrictMode>,
 );

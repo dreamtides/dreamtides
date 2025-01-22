@@ -166,7 +166,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
         card_back: Url("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                image: Url("https://www.shutterstock.com/shutterstock/photos/2521694543/display_1500/stock-photo-traveller-in-a-land-of-ancient-statue-digital-art-style-illustration-painting-2521694543.jpg".to_string()),
+                image: Url("/assets/2521694543.jpg".to_string()),
                 image_offset_x: Some(25),
                 image_offset_y: Some(50)
             },
@@ -199,7 +199,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
         card_back: Url("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                image: Url("https://www.shutterstock.com/shutterstock/photos/1633431262/display_1500/stock-photo-two-brothers-walking-on-floating-mountain-and-looking-at-a-little-star-in-the-beautiful-sky-1633431262.jpg".to_string()),
+                image: Url("/assets/1633431262.jpg".to_string()),
                 image_offset_x: None,
                 image_offset_y: None,
             },
@@ -232,7 +232,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
         card_back: Url("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                image: Url("https://www.shutterstock.com/shutterstock/photos/2269064817/display_1500/stock-photo-futuristic-man-standing-on-a-large-pile-of-scrap-metal-pieces-digital-art-style-illustration-2269064817.jpg".to_string()),
+                image: Url("/assets/2269064817.jpg".to_string()),
                 image_offset_x: None,
                 image_offset_y: None,
             },
@@ -265,12 +265,13 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
         card_back: Url("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                image: Url("https://www.shutterstock.com/shutterstock/photos/2269064809/display_1500/stock-photo-soldier-waiting-for-a-woman-bidding-farewell-to-a-child-digital-art-style-illustration-painting-2269064809.jpg".to_string()),
+                image: Url("/assets/2269064809.jpg".to_string()),
                 image_offset_x: None,
                 image_offset_y: None,
             },
             name: "Evacuation Enforcer".to_string(),
-            rules_text: "> Draw 2 cards. Discard 3 cards.\nPromises under a stormy sky.".to_string(),
+            rules_text: "> Draw 2 cards. Discard 3 cards.\nPromises under a stormy sky."
+                .to_string(),
             status: None,
             can_drag: true,
             cost: Energy(2),
@@ -298,7 +299,7 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
         card_back: Url("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                image: Url("https://www.shutterstock.com/shutterstock/photos/2027158310/display_1500/stock-photo-young-man-rowing-a-boat-in-the-sea-looking-at-the-crescent-digital-art-style-illustration-painting-2027158310.jpg".to_string()),
+                image: Url("/assets/2027158310.jpg".to_string()),
                 image_offset_x: None,
                 image_offset_y: None,
             },
