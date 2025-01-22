@@ -35,6 +35,11 @@ dev:
 apk:
      pnpm --prefix client tauri android build --apk
 
+# Need to set devlopment team
+# Can literally just drag and drop the .ipa onto an iphone if it's set up properly
+ipa:
+    pnpm --prefix client tauri ios build
+
 test:
     cargo test --manifest-path engine/Cargo.toml
 

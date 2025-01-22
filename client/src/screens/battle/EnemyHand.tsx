@@ -7,7 +7,7 @@ type EnemyHandProps = {
   battleId: ClientBattleId;
 };
 
-export default function EnemyHand({ battleId }: EnemyHandProps) {
+export default function EnemyHand({}: EnemyHandProps) {
   const [sceneNumber, setSceneNumber] = useState(1);
 
   const handleFetch = () => {
