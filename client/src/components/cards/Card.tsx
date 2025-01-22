@@ -47,6 +47,11 @@ export function Card({
   return (
     <motion.div
       layoutId={id}
+      initial={{
+        rotate: rotate ? -90 : 0,
+        originX: 0,
+        originY: 0,
+      }}
       animate={{
         rotate: rotate ? -90 : 0,
         originX: 0,

@@ -1,16 +1,19 @@
 import { Button } from "@nextui-org/react";
 import { ClientBattleId, commands } from "../../bindings";
 import { Localized } from "@fluent/react";
+import { useState } from "react";
 
 type EnemyHandProps = {
   battleId: ClientBattleId;
 };
 
 export default function EnemyHand({ battleId }: EnemyHandProps) {
+  const [sceneNumber, setSceneNumber] = useState(1);
 
   const handleFetch = () => {
     console.log("fetching");
-    commands.handleAction("123", 1);
+    setSceneNumber((sceneNumber + 1) % 3);
+    commands.handleAction("123", sceneNumber);
   };
 
   return (
