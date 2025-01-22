@@ -44,7 +44,6 @@ pub fn run() {
 #[tauri::command]
 #[specta::specta]
 fn connect(app: AppHandle, id: ClientBattleId) {
-    eprintln!("emitting update event");
     app.emit("update-event", UpdateEvent(scene_0(id))).unwrap();
 }
 

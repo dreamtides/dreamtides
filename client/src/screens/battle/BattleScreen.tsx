@@ -22,22 +22,26 @@ export default function BattleScreen({}: BattleScreenProps) {
   const [battleView, setBattleView] = useState<BattleView | null>(null);
 
   useEffect(() => {
-    console.log("connecting");
-    commands.connect("123");
-  }, []);
-
-  useEffect(() => {
-    console.log("listening");
-    events.updateEvent.listen((event) => {
-      console.log("got update", event.payload.id);
+    let unlisten: (() => void) | null = null;
+    const promise = events.updateEvent.listen((event) => {
       if (isAnimating) {
         setUpdateQueue((prev) => [...prev, event.payload]);
       } else {
         setBattleView(event.payload);
       }
     });
+
+    promise.then((fn) => {
+      // Tauri doesn't actually start listening immediately when listen() is
+      // called, so it isn't safe to connect() until this promise resolves.
+      unlisten = fn;
+      commands.connect("123");
+    });
+
     return () => {
-      console.log("unlistening");
+      if (unlisten) {
+        unlisten();
+      }
     };
   }, []);
 
