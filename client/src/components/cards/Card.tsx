@@ -6,6 +6,7 @@ import {
   CardFrame,
 } from "../../bindings";
 import { motion } from "motion/react";
+import { memo } from "react";
 
 export const CARD_ASPECT_RATIO = 1.6;
 const BASE_WIDTH = 200;
@@ -33,7 +34,7 @@ export type CardProps = {
  * This does not include other types of cards, such as dreamsigns, path cards,
  * etc which have their own components.
  */
-export function Card({
+export const Card = memo(function Card({
   card,
   className,
   rotate = false,
@@ -73,9 +74,9 @@ export function Card({
       )}
     </motion.div>
   );
-}
+});
 
-function RevealedCard({
+const RevealedCard = memo(function RevealedCard({
   card,
   px,
 }: {
@@ -98,9 +99,9 @@ function RevealedCard({
       />
     </>
   );
-}
+});
 
-function BattlefieldCard({
+const BattlefieldCard = memo(function BattlefieldCard({
   card,
   px,
 }: {
@@ -115,9 +116,9 @@ function BattlefieldCard({
       )}
     </>
   );
-}
+});
 
-function HiddenCard() {
+const HiddenCard = memo(function HiddenCard() {
   return (
     <div
       className="absolute w-full h-full rounded-xl"
@@ -127,9 +128,15 @@ function HiddenCard() {
       }}
     />
   );
-}
+});
 
-function EnergyCost({ cost, px }: { cost: number; px: (x: number) => string }) {
+const EnergyCost = memo(function EnergyCost({
+  cost,
+  px
+}: {
+  cost: number;
+  px: (x: number) => string;
+}) {
   return (
     <div
       className="absolute"
@@ -157,9 +164,9 @@ function EnergyCost({ cost, px }: { cost: number; px: (x: number) => string }) {
       </span>
     </div>
   );
-}
+});
 
-function FrameDecoration({
+const FrameDecoration = memo(function FrameDecoration({
   side,
   frame,
   px,
@@ -187,9 +194,9 @@ function FrameDecoration({
       }}
     />
   );
-}
+});
 
-function CardName({
+const CardName = memo(function CardName({
   name,
   cardType,
   frame,
@@ -236,9 +243,15 @@ function CardName({
       </div>
     </div>
   );
-}
+});
 
-function RulesText({ text, px }: { text: string; px: (x: number) => string }) {
+const RulesText = memo(function RulesText({
+  text,
+  px
+}: {
+  text: string;
+  px: (x: number) => string;
+}) {
   return (
     <div
       className="absolute flex items-center"
@@ -266,9 +279,9 @@ function RulesText({ text, px }: { text: string; px: (x: number) => string }) {
       </span>
     </div>
   );
-}
+});
 
-function CardImage({
+const CardImage = memo(function CardImage({
   image,
   px,
 }: {
@@ -290,9 +303,9 @@ function CardImage({
       }}
     />
   );
-}
+});
 
-function SparkValue({
+const SparkValue = memo(function SparkValue({
   spark,
   px,
   size = 30,
@@ -330,7 +343,7 @@ function SparkValue({
       </span>
     </div>
   );
-}
+});
 
 function getFrameAssetUrl(
   frame: CardFrame,
