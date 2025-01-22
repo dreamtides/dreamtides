@@ -1,4 +1,3 @@
-import { Button } from "@nextui-org/react";
 import { ClientBattleId, commands } from "../../bindings";
 import { Localized } from "@fluent/react";
 import { useState } from "react";
@@ -18,12 +17,19 @@ export default function EnemyHand({}: EnemyHandProps) {
 
   return (
     <div
-      className="flex bg-yellow-600 px-4 items-center justify-center"
-      style={{ height: "10dvh" }}
+      style={{
+        display: "flex",
+        backgroundColor: "rgb(202, 138, 4)",
+        paddingLeft: "1rem",
+        paddingRight: "1rem",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "10dvh"
+      }}
     >
-      <Button onPress={handleFetch}>
+      <button onClick={handleFetch}>
         <Localized id="fetch">Fetch</Localized>
-      </Button>
+      </button>
     </div>
   );
 }

@@ -27,7 +27,7 @@ export default memo(function NavigationIconButton({
       aria-label={ariaLabel}
       variant="light"
       size="lg"
-      className="m-1"
+      style={{ margin: "0.25rem" }}
       radius="full"
       onPress={onPress}
     >

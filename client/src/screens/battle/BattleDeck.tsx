@@ -10,8 +10,10 @@ export const DECK_CARD_WIDTH = 55;
 export default function BattleDeck({ cards }: BattleDeckProps) {
   return (
     <div
-      className="relative my-1"
       style={{
+        position: "relative",
+        marginTop: "0.25rem",
+        marginBottom: "0.25rem",
         width: `${DECK_CARD_WIDTH * CARD_ASPECT_RATIO}px`,
         height: `${DECK_CARD_WIDTH}px`,
         transform: `translateY(${DECK_CARD_WIDTH}px)`,

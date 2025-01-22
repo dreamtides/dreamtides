@@ -22,7 +22,6 @@ export type CardLayout = "default" | "battlefield";
 
 export type CardProps = {
   card: CardView;
-  className?: string;
   rotate?: boolean;
   style?: React.CSSProperties;
   width?: number;
@@ -37,7 +36,6 @@ export type CardProps = {
  */
 export const Card = memo(function Card({
   card,
-  className,
   rotate = false,
   style,
   width = BASE_WIDTH,
@@ -59,8 +57,10 @@ export const Card = memo(function Card({
         originX: 0,
         originY: 0,
       }}
-      className={cn("flex relative shrink-0", className)}
       style={{
+        display: "flex",
+        position: "relative",
+        flexShrink: 0,
         width: px(BASE_WIDTH),
         height: layout === "battlefield" ? px(260) : px(BASE_HEIGHT),
         ...style,
@@ -75,7 +75,8 @@ export const Card = memo(function Card({
       )}
     </motion.div>
   );
-}, isEqual);
+},
+isEqual);
 
 const RevealedCard = memo(function RevealedCard({
   card,
@@ -100,7 +101,8 @@ const RevealedCard = memo(function RevealedCard({
       />
     </>
   );
-}, isEqual);
+},
+isEqual);
 
 const BattlefieldCard = memo(function BattlefieldCard({
   card,
@@ -117,13 +119,17 @@ const BattlefieldCard = memo(function BattlefieldCard({
       )}
     </>
   );
-}, isEqual);
+},
+isEqual);
 
 const HiddenCard = memo(function HiddenCard() {
   return (
     <div
-      className="absolute w-full h-full rounded-xl"
       style={{
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        borderRadius: "12px",
         backgroundImage: "url('/assets/card_back.png')",
         backgroundSize: "cover",
       }}
@@ -133,15 +139,15 @@ const HiddenCard = memo(function HiddenCard() {
 
 const EnergyCost = memo(function EnergyCost({
   cost,
-  px
+  px,
 }: {
   cost: number;
   px: (x: number) => string;
 }) {
   return (
     <div
-      className="absolute"
       style={{
+        position: "absolute",
         width: px(45),
         height: px(45),
         backgroundImage: "url('/assets/energy_cost_background.png')",
@@ -165,7 +171,8 @@ const EnergyCost = memo(function EnergyCost({
       </span>
     </div>
   );
-}, isEqual);
+},
+isEqual);
 
 const FrameDecoration = memo(function FrameDecoration({
   side,
@@ -178,9 +185,8 @@ const FrameDecoration = memo(function FrameDecoration({
 }) {
   return (
     <div
-      className="absolute"
-      key={side}
       style={{
+        position: "absolute",
         bottom: 0,
         [side]: 0,
         width: "100%",
@@ -188,14 +194,15 @@ const FrameDecoration = memo(function FrameDecoration({
         backgroundRepeat: "no-repeat",
         backgroundImage: `url('${getFrameAssetUrl(
           frame,
-          side === "left" ? "frame_left" : "frame_right",
+          side === "left" ? "frame_left" : "frame_right"
         )}')`,
         backgroundSize: "contain",
         transform: side === "right" ? "scaleX(-1)" : undefined,
       }}
     />
   );
-}, isEqual);
+},
+isEqual);
 
 const CardName = memo(function CardName({
   name,
@@ -210,8 +217,11 @@ const CardName = memo(function CardName({
 }) {
   return (
     <div
-      className="absolute w-full flex items-center"
       style={{
+        position: "absolute",
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
         bottom: px(60),
         backgroundImage: `url('${getFrameAssetUrl(frame, "name_background")}')`,
         backgroundSize: "contain",
@@ -219,14 +229,21 @@ const CardName = memo(function CardName({
         height: px(35),
       }}
     >
-      <div className="flex justify-between w-full items-center">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          width: "100%",
+          alignItems: "center",
+        }}
+      >
         <span
-          className="font-medium"
           style={{
             color: "white",
             fontFamily: "'EB Garamond', serif",
             paddingLeft: px(10),
             fontSize: px(13),
+            fontWeight: 500,
           }}
         >
           {name}
@@ -244,19 +261,22 @@ const CardName = memo(function CardName({
       </div>
     </div>
   );
-}, isEqual);
+},
+isEqual);
 
 const RulesText = memo(function RulesText({
   text,
-  px
+  px,
 }: {
   text: string;
   px: (x: number) => string;
 }) {
   return (
     <div
-      className="absolute flex items-center"
       style={{
+        position: "absolute",
+        display: "flex",
+        alignItems: "center",
         bottom: px(2),
         backgroundImage: "url('/assets/rules_text_background.png')",
         backgroundSize: "cover",
@@ -280,7 +300,8 @@ const RulesText = memo(function RulesText({
       </span>
     </div>
   );
-}, isEqual);
+},
+isEqual);
 
 const CardImage = memo(function CardImage({
   image,
@@ -291,10 +312,13 @@ const CardImage = memo(function CardImage({
 }) {
   return (
     <div
-      className="absolute top-0 w-full rounded-xl overflow-hidden"
       style={{
-        height: px(260),
+        position: "absolute",
+        top: 0,
         width: "100%",
+        borderRadius: "12px",
+        overflow: "hidden",
+        height: px(260),
         backgroundImage: `url("${image.image}")`,
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
@@ -304,7 +328,8 @@ const CardImage = memo(function CardImage({
       }}
     />
   );
-}, isEqual);
+},
+isEqual);
 
 const SparkValue = memo(function SparkValue({
   spark,
@@ -317,8 +342,8 @@ const SparkValue = memo(function SparkValue({
 }) {
   return (
     <div
-      className="absolute"
       style={{
+        position: "absolute",
         width: px(size),
         height: px(size),
         backgroundImage: "url('/assets/spark_background.png')",
@@ -344,11 +369,12 @@ const SparkValue = memo(function SparkValue({
       </span>
     </div>
   );
-}, isEqual);
+},
+isEqual);
 
 function getFrameAssetUrl(
   frame: CardFrame,
-  assetType: "frame_left" | "frame_right" | "name_background",
+  assetType: "frame_left" | "frame_right" | "name_background"
 ): string {
   const prefix = (() => {
     switch (frame) {

@@ -11,8 +11,13 @@ export default function Battlefield({ owner, cards }: BattlefieldProps) {
     return (
       <div
         key={owner}
-        className="flex bg-orange-600  items-center justify-center"
-        style={{ height: "22dvh" }}
+        style={{
+          display: "flex",
+          backgroundColor: "rgb(234, 88, 12)",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "22dvh"
+        }}
       />
     );
   }
@@ -21,8 +26,13 @@ export default function Battlefield({ owner, cards }: BattlefieldProps) {
     <>
       <div
         key={owner}
-        className="flex bg-green-600  items-center justify-center"
-        style={{ height: "11dvh" }}
+        style={{
+          display: "flex",
+          backgroundColor: "rgb(22, 163, 74)",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "11dvh"
+        }}
       >
         {cards.slice(1).map((card) => (
           <Card
@@ -30,21 +40,26 @@ export default function Battlefield({ owner, cards }: BattlefieldProps) {
             card={card}
             width={50}
             layout="battlefield"
-            className="m-[1px]"
+            style={{ margin: "1px" }}
           />
         ))}
       </div>
       <div
         key={`${owner}-2`}
-        className="flex bg-green-600  items-center justify-center"
-        style={{ height: "11dvh" }}
+        style={{
+          display: "flex",
+          backgroundColor: "rgb(22, 163, 74)",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "11dvh"
+        }}
       >
         <Card
           key={JSON.stringify(cards[0].id)}
           card={cards[0]}
           width={50}
           layout="battlefield"
-          className="m-[1px]"
+          style={{ margin: "1px" }}
         />
       </div>
     </>

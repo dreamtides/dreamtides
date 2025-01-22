@@ -51,7 +51,14 @@ export default function BattleScreen({}: BattleScreenProps) {
 
   const cards = buildCardMap(battleView);
   return (
-    <div className="flex flex-col h-screen w-screen">
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        width: "100vw",
+      }}
+    >
       <LayoutGroup>
         <NavigationBar>
           <EnemyHand battleId="123" />

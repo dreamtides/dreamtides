@@ -16,8 +16,14 @@ export default function BattlePlayerStatus({
   return (
     <div
       key={owner}
-      className="flex items-center justify-between px-2"
-      style={{ height: "10dvh" }}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingLeft: "0.5rem",
+        paddingRight: "0.5rem",
+        height: "10dvh"
+      }}
     >
       <BattleDeck cards={deck} />
       <Void cards={discardPile} />

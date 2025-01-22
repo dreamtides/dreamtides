@@ -11,7 +11,13 @@ type NavigationBarProps = { children?: ReactNode };
 export default function NavigationBar({ children }: NavigationBarProps) {
   const { l10n } = useLocalization();
   return (
-    <div className="flex flex-row justify-between">
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between"
+      }}
+    >
       <NavigationIconButton icon={faBars} ariaLabel={l10n.getString("menu")} />
       {children}
       <NavigationIconButton

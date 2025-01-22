@@ -14,7 +14,7 @@ export default function UserHand({ cards }: UserHandProps) {
     const updateCardWidth = () => {
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
-        const marginSpace = 2 * 2; // 1px margin on each side between 3 cards = 2 gaps
+        const marginSpace = 2 * 2;
         const newCardWidth = Math.floor((containerWidth - marginSpace) / 3);
         setCardWidth(newCardWidth);
       }
@@ -32,7 +32,7 @@ export default function UserHand({ cards }: UserHandProps) {
           key={JSON.stringify(card.id)}
           card={card}
           width={90}
-          className="m-[1px]"
+          style={{ margin: "1px" }}
         />
       ));
     }
@@ -45,13 +45,13 @@ export default function UserHand({ cards }: UserHandProps) {
     return (
       <>
         {leftStack.length > 0 && (
-          <div className="absolute left-0 bottom-0" style={{ width: 100 }}>
+          <div style={{ position: "absolute", left: 0, bottom: 0, width: 100 }}>
             {leftStack.map((card, index) => (
               <Card
                 key={JSON.stringify(card.id)}
                 card={card}
                 width={90}
-                className="absolute left-0 bottom-0"
+                style={{ position: "absolute", left: 0, bottom: 0 }}
               />
             ))}
           </div>
@@ -61,17 +61,17 @@ export default function UserHand({ cards }: UserHandProps) {
             key={JSON.stringify(card.id)}
             card={card}
             width={90}
-            className="m-[1px] z-10"
+            style={{ margin: "1px", zIndex: 10 }}
           />
         ))}
         {rightStack.length > 0 && (
-          <div className="absolute right-0 bottom-0" style={{ width: 100 }}>
+          <div style={{ position: "absolute", right: 0, bottom: 0, width: 100 }}>
             {rightStack.map((card, index) => (
               <Card
                 key={JSON.stringify(card.id)}
                 card={card}
                 width={90}
-                className="absolute right-0 bottom-0"
+                style={{ position: "absolute", right: 0, bottom: 0 }}
               />
             ))}
           </div>
@@ -83,8 +83,14 @@ export default function UserHand({ cards }: UserHandProps) {
   return (
     <div
       ref={containerRef}
-      className="flex bg-blue-600 items-center justify-center relative"
-      style={{ height: "26dvh" }}
+      style={{
+        display: "flex",
+        backgroundColor: "rgb(37, 99, 235)",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+        height: "26dvh"
+      }}
     >
       {renderCards()}
     </div>
