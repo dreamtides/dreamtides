@@ -60,6 +60,9 @@ importers:
       '@tauri-apps/cli':
         specifier: ^2
         version: 2.2.3
+      '@types/lodash':
+        specifier: ^4.17.14
+        version: 4.17.14
       '@types/react':
         specifier: ^19.0.0
         version: 19.0.7

@@ -7,6 +7,7 @@ import {
 } from "../../bindings";
 import { motion } from "motion/react";
 import { memo } from "react";
+import isEqual from "lodash/isEqual";
 
 export const CARD_ASPECT_RATIO = 1.6;
 const BASE_WIDTH = 200;
@@ -74,7 +75,7 @@ export const Card = memo(function Card({
       )}
     </motion.div>
   );
-});
+}, isEqual);
 
 const RevealedCard = memo(function RevealedCard({
   card,
@@ -99,7 +100,7 @@ const RevealedCard = memo(function RevealedCard({
       />
     </>
   );
-});
+}, isEqual);
 
 const BattlefieldCard = memo(function BattlefieldCard({
   card,
@@ -116,7 +117,7 @@ const BattlefieldCard = memo(function BattlefieldCard({
       )}
     </>
   );
-});
+}, isEqual);
 
 const HiddenCard = memo(function HiddenCard() {
   return (
@@ -128,7 +129,7 @@ const HiddenCard = memo(function HiddenCard() {
       }}
     />
   );
-});
+}, isEqual);
 
 const EnergyCost = memo(function EnergyCost({
   cost,
@@ -164,7 +165,7 @@ const EnergyCost = memo(function EnergyCost({
       </span>
     </div>
   );
-});
+}, isEqual);
 
 const FrameDecoration = memo(function FrameDecoration({
   side,
@@ -194,7 +195,7 @@ const FrameDecoration = memo(function FrameDecoration({
       }}
     />
   );
-});
+}, isEqual);
 
 const CardName = memo(function CardName({
   name,
@@ -243,7 +244,7 @@ const CardName = memo(function CardName({
       </div>
     </div>
   );
-});
+}, isEqual);
 
 const RulesText = memo(function RulesText({
   text,
@@ -279,7 +280,7 @@ const RulesText = memo(function RulesText({
       </span>
     </div>
   );
-});
+}, isEqual);
 
 const CardImage = memo(function CardImage({
   image,
@@ -303,7 +304,7 @@ const CardImage = memo(function CardImage({
       }}
     />
   );
-});
+}, isEqual);
 
 const SparkValue = memo(function SparkValue({
   spark,
@@ -343,7 +344,7 @@ const SparkValue = memo(function SparkValue({
       </span>
     </div>
   );
-});
+}, isEqual);
 
 function getFrameAssetUrl(
   frame: CardFrame,

@@ -74,7 +74,7 @@ fn scene_1(id: ClientBattleId) -> BattleView {
             cards_in_position(Position::OnBattlefield(DisplayPlayer::User), 0, 5),
             cards_in_position(Position::InHand(DisplayPlayer::User), 5, 3),
             cards_in_position(Position::InVoid(DisplayPlayer::User), 8, 6),
-            cards_in_position(Position::InDeck(DisplayPlayer::User), 14, 25),
+            cards_in_position(Position::InDeck(DisplayPlayer::User), 37, 2),
             vec![card(Position::InHand(DisplayPlayer::User), 39)],
         ]
         .concat()
@@ -99,7 +99,7 @@ fn scene_2(id: ClientBattleId) -> BattleView {
             cards_in_position(Position::OnBattlefield(DisplayPlayer::User), 0, 5),
             cards_in_position(Position::InHand(DisplayPlayer::User), 5, 3),
             cards_in_position(Position::InVoid(DisplayPlayer::User), 8, 6),
-            cards_in_position(Position::InDeck(DisplayPlayer::User), 14, 24),
+            cards_in_position(Position::InDeck(DisplayPlayer::User), 37, 1),
             vec![card(Position::InHand(DisplayPlayer::User), 38)],
             vec![card(Position::InHand(DisplayPlayer::User), 39)],
         ]
@@ -125,7 +125,7 @@ fn scene_0(id: ClientBattleId) -> BattleView {
             cards_in_position(Position::OnBattlefield(DisplayPlayer::User), 0, 5),
             cards_in_position(Position::InHand(DisplayPlayer::User), 5, 3),
             cards_in_position(Position::InVoid(DisplayPlayer::User), 8, 6),
-            cards_in_position(Position::InDeck(DisplayPlayer::User), 14, 26),
+            cards_in_position(Position::InDeck(DisplayPlayer::User), 37, 3),
         ]
         .concat()
         .to_vec(),
