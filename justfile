@@ -19,7 +19,7 @@ android:
     pnpm run --prefix client tauri android dev
 
 ios:
-    pnpm run --prefix client tauri ios dev
+    pnpm run --prefix client tauri ios dev "iPhone SE (3rd generation)"
 
 bindings:
     pnpm run --prefix client tauri dev -- -- --generate-bindings
