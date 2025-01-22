@@ -5,13 +5,21 @@ use core_data::types::{CardFacing, Url};
 use display_data::battle_view::{BattleView, ClientBattleId, DisplayPlayer, PlayerView};
 use display_data::card_view::{CardFrame, CardView, ClientCardId, DisplayImage, RevealedCardView};
 use display_data::object_position::{ObjectPosition, Position};
+use serde::{Deserialize, Serialize};
+use specta::Type;
 use specta_typescript::Typescript;
-use tauri_specta::{collect_commands, Builder};
+use tauri::{AppHandle, Emitter};
+use tauri_specta::{collect_commands, collect_events, Builder, Event};
+
+#[derive(Serialize, Deserialize, Debug, Clone, Type, Event)]
+pub struct UpdateEvent(BattleView);
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let args: Vec<_> = env::args().collect();
-    let specta_builder = Builder::<tauri::Wry>::new().commands(collect_commands![fetch_battle,]);
+    let specta_builder = Builder::<tauri::Wry>::new()
+        .commands(collect_commands![connect, handle_action])
+        .events(collect_events![UpdateEvent]);
 
     if args.len() > 1 && args[1] == "--generate-bindings" {
         eprintln!(">>> Generating bindings");
@@ -24,7 +32,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(specta_builder.invoke_handler())
-        .invoke_handler(tauri::generate_handler![fetch_battle])
+        .invoke_handler(tauri::generate_handler![connect, handle_action])
         .setup(move |app| {
             specta_builder.mount_events(app);
             Ok(())
@@ -35,13 +43,21 @@ pub fn run() {
 
 #[tauri::command]
 #[specta::specta]
-fn fetch_battle(id: ClientBattleId, scene: u32) -> BattleView {
-    match scene {
+fn connect(app: AppHandle, id: ClientBattleId) {
+    eprintln!("emitting update event");
+    app.emit("update-event", UpdateEvent(scene_0(id))).unwrap();
+}
+
+#[tauri::command]
+#[specta::specta]
+fn handle_action(app: AppHandle, id: ClientBattleId, scene: u32) {
+    let view = match scene {
         0 => scene_0(id),
         1 => scene_1(id),
         2 => scene_2(id),
         _ => panic!("Invalid scene number"),
-    }
+    };
+    app.emit("update-event", UpdateEvent(view)).unwrap();
 }
 
 fn scene_1(id: ClientBattleId) -> BattleView {

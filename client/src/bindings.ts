@@ -5,14 +5,22 @@
 
 
 export const commands = {
-async fetchBattle(id: ClientBattleId, scene: number) : Promise<BattleView> {
-    return await TAURI_INVOKE("fetch_battle", { id, scene });
+async connect(id: ClientBattleId) : Promise<void> {
+    await TAURI_INVOKE("connect", { id });
+},
+async handleAction(id: ClientBattleId, scene: number) : Promise<void> {
+    await TAURI_INVOKE("handle_action", { id, scene });
 }
 }
 
 /** user-defined events **/
 
 
+export const events = __makeEvents__<{
+updateEvent: UpdateEvent
+}>({
+updateEvent: "update-event"
+})
 
 /** user-defined constants **/
 
@@ -302,6 +310,7 @@ canDrag: boolean }
  * victory points.
  */
 export type Spark = number
+export type UpdateEvent = BattleView
 /**
  * A URL
  */

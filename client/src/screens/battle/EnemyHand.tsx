@@ -1,19 +1,16 @@
 import { Button } from "@nextui-org/react";
-import { useSWRConfig } from "swr";
-import { ClientBattleId } from "../../bindings";
+import { ClientBattleId, commands } from "../../bindings";
 import { Localized } from "@fluent/react";
 
 type EnemyHandProps = {
   battleId: ClientBattleId;
-  onSceneChange: () => void;
 };
 
-export default function EnemyHand({ battleId, onSceneChange }: EnemyHandProps) {
-  const { mutate } = useSWRConfig();
+export default function EnemyHand({ battleId }: EnemyHandProps) {
 
   const handleFetch = () => {
-    onSceneChange();
-    mutate(battleId);
+    console.log("fetching");
+    commands.handleAction("123", 1);
   };
 
   return (

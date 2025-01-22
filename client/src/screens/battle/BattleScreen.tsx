@@ -2,61 +2,53 @@ import { LayoutGroup } from "motion/react";
 import {
   BattleView,
   CardView,
-  ClientBattleId,
   commands,
+  events,
   Position,
 } from "../../bindings";
-import { ErrorState } from "../../components/common/ErrorState";
 import { Loading } from "../../components/common/Loading";
 import NavigationBar from "../../components/common/NavigationBar";
 import EnemyHand from "./EnemyHand";
-import useSWR from "swr";
 import BattlePlayerStatus from "./BattlePlayerStatus";
 import Battlefield from "./Battlefield";
 import UserHand from "./UserHand";
-import { useState } from "react";
-
-type BattleFetchResult =
-  | { battle: BattleView }
-  | { error: Error }
-  | { isLoading: boolean };
-
-function useBattle(id: ClientBattleId, scene: number): BattleFetchResult {
-  const { data, error, isLoading } = useSWR([id, scene], ([id, scene]) =>
-    commands.fetchBattle(id, scene),
-  );
-
-  if (isLoading) {
-    return { isLoading: true };
-  } else if (error || data == null) {
-    return { error };
-  } else {
-    return { battle: data };
-  }
-}
+import { useEffect, useState } from "react";
 
 type BattleScreenProps = {};
 
-export default function BattleScreen({}: BattleScreenProps) {
-  const [sceneNumber, setSceneNumber] = useState(0);
-  const result = useBattle("123", sceneNumber);
+export default function BattleScreen({ }: BattleScreenProps) {
+  const [isAnimating, _setIsAnimating] = useState(false);
+  const [_updateQueue, setUpdateQueue] = useState<BattleView[]>([]);
+  const [battleView, setBattleView] = useState<BattleView | null>(null);
 
-  const handleSceneChange = () => {
-    setSceneNumber((prev) => (prev + 1) % 3);
-  };
+  useEffect(() => {
+    console.log("connecting");
+    commands.connect("123");
+  }, []);
 
-  if ("isLoading" in result) {
+  useEffect(() => {
+    console.log("listening");
+    const unlisten = use(events.updateEvent.listen((event) => {
+      console.log("got update", event.payload.id);
+      if (isAnimating) {
+        setUpdateQueue((prev) => [...prev, event.payload]);
+      } else {
+        setBattleView(event.payload);
+      }
+    }));
+    return unlisten;
+  }, []);
+
+  if (battleView == null) {
     return <Loading />;
-  } else if ("error" in result) {
-    return <ErrorState />;
   }
 
-  const cards = buildCardMap(result.battle);
+  const cards = buildCardMap(battleView);
   return (
     <div className="flex flex-col h-screen w-screen">
       <LayoutGroup>
         <NavigationBar>
-          <EnemyHand battleId="123" onSceneChange={handleSceneChange} />
+          <EnemyHand battleId="123" />
         </NavigationBar>
         <BattlePlayerStatus
           owner="enemy"

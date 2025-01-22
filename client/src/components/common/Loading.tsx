@@ -4,5 +4,5 @@ type LoadingProps = {};
  * Screen loading state.
  */
 export function Loading({}: LoadingProps) {
-  return <div>Loading...</div>;
+  return <h1>Loading...</h1>;
 }
