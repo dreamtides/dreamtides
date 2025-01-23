@@ -22,7 +22,7 @@ export default function BattlePlayerStatus({
         justifyContent: "space-between",
         paddingLeft: "0.5rem",
         paddingRight: "0.5rem",
-        height: "10dvh"
+        height: "10dvh",
       }}
     >
       <BattleDeck cards={deck} />

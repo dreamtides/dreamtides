@@ -15,7 +15,7 @@ export default function NavigationBar({ children }: NavigationBarProps) {
       style={{
         display: "flex",
         flexDirection: "row",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
       }}
     >
       <NavigationIconButton icon={faBars} ariaLabel={l10n.getString("menu")} />

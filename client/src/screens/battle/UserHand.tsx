@@ -65,7 +65,9 @@ export default function UserHand({ cards }: UserHandProps) {
           />
         ))}
         {rightStack.length > 0 && (
-          <div style={{ position: "absolute", right: 0, bottom: 0, width: 100 }}>
+          <div
+            style={{ position: "absolute", right: 0, bottom: 0, width: 100 }}
+          >
             {rightStack.map((card, index) => (
               <Card
                 key={JSON.stringify(card.id)}
@@ -89,7 +91,7 @@ export default function UserHand({ cards }: UserHandProps) {
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
-        height: "26dvh"
+        height: "26dvh",
       }}
     >
       {renderCards()}

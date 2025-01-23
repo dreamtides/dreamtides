@@ -16,7 +16,7 @@ export default function Battlefield({ owner, cards }: BattlefieldProps) {
           backgroundColor: "rgb(234, 88, 12)",
           alignItems: "center",
           justifyContent: "center",
-          height: "22dvh"
+          height: "22dvh",
         }}
       />
     );
@@ -31,7 +31,7 @@ export default function Battlefield({ owner, cards }: BattlefieldProps) {
           backgroundColor: "rgb(22, 163, 74)",
           alignItems: "center",
           justifyContent: "center",
-          height: "11dvh"
+          height: "11dvh",
         }}
       >
         {cards.slice(1).map((card) => (
@@ -51,7 +51,7 @@ export default function Battlefield({ owner, cards }: BattlefieldProps) {
           backgroundColor: "rgb(22, 163, 74)",
           alignItems: "center",
           justifyContent: "center",
-          height: "11dvh"
+          height: "11dvh",
         }}
       >
         <Card

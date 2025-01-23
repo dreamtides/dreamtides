@@ -16,5 +16,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <LocalizationProvider l10n={l10n}>
       <App />
     </LocalizationProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

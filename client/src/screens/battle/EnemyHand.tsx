@@ -24,7 +24,7 @@ export default function EnemyHand({}: EnemyHandProps) {
         paddingRight: "1rem",
         alignItems: "center",
         justifyContent: "center",
-        height: "10dvh"
+        height: "10dvh",
       }}
     >
       <button onClick={handleFetch}>

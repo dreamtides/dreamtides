@@ -74,8 +74,7 @@ export const Card = memo(function Card({
       )}
     </motion.div>
   );
-},
-isEqual);
+}, isEqual);
 
 const RevealedCard = memo(function RevealedCard({
   card,
@@ -100,8 +99,7 @@ const RevealedCard = memo(function RevealedCard({
       />
     </>
   );
-},
-isEqual);
+}, isEqual);
 
 const BattlefieldCard = memo(function BattlefieldCard({
   card,
@@ -118,8 +116,7 @@ const BattlefieldCard = memo(function BattlefieldCard({
       )}
     </>
   );
-},
-isEqual);
+}, isEqual);
 
 const HiddenCard = memo(function HiddenCard() {
   return (
@@ -170,8 +167,7 @@ const EnergyCost = memo(function EnergyCost({
       </span>
     </div>
   );
-},
-isEqual);
+}, isEqual);
 
 const FrameDecoration = memo(function FrameDecoration({
   side,
@@ -193,15 +189,14 @@ const FrameDecoration = memo(function FrameDecoration({
         backgroundRepeat: "no-repeat",
         backgroundImage: `url('${getFrameAssetUrl(
           frame,
-          side === "left" ? "frame_left" : "frame_right"
+          side === "left" ? "frame_left" : "frame_right",
         )}')`,
         backgroundSize: "contain",
         transform: side === "right" ? "scaleX(-1)" : undefined,
       }}
     />
   );
-},
-isEqual);
+}, isEqual);
 
 const CardName = memo(function CardName({
   name,
@@ -260,8 +255,7 @@ const CardName = memo(function CardName({
       </div>
     </div>
   );
-},
-isEqual);
+}, isEqual);
 
 const RulesText = memo(function RulesText({
   text,
@@ -299,8 +293,7 @@ const RulesText = memo(function RulesText({
       </span>
     </div>
   );
-},
-isEqual);
+}, isEqual);
 
 const CardImage = memo(function CardImage({
   image,
@@ -327,8 +320,7 @@ const CardImage = memo(function CardImage({
       }}
     />
   );
-},
-isEqual);
+}, isEqual);
 
 const SparkValue = memo(function SparkValue({
   spark,
@@ -368,12 +360,11 @@ const SparkValue = memo(function SparkValue({
       </span>
     </div>
   );
-},
-isEqual);
+}, isEqual);
 
 function getFrameAssetUrl(
   frame: CardFrame,
-  assetType: "frame_left" | "frame_right" | "name_background"
+  assetType: "frame_left" | "frame_right" | "name_background",
 ): string {
   const prefix = (() => {
     switch (frame) {
