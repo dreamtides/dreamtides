@@ -36,6 +36,13 @@ export default function UserHand({ cards }: UserHandProps) {
     return offset;
   };
 
+  const getVerticalOffset = (index: number) => {
+    const middleIndex = (cards.length - 1) / 2;
+    const distanceFromMiddle = Math.abs(index - middleIndex);
+    const maxDistance = Math.max(middleIndex, cards.length - 1 - middleIndex);
+    return -10 * (1 - distanceFromMiddle / maxDistance);
+  };
+
   return (
     <div
       ref={containerRef}
@@ -61,6 +68,7 @@ export default function UserHand({ cards }: UserHandProps) {
               cards.length > MAX_CARDS_SIDE_BY_SIDE
                 ? getCardOffset(index)
                 : undefined,
+            top: getVerticalOffset(index),
           }}
         />
       ))}
