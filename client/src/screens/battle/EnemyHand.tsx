@@ -27,9 +27,14 @@ export default function EnemyHand({}: EnemyHandProps) {
         height: "10dvh",
       }}
     >
-      <button onClick={handleFetch}>
-        <Localized id="fetch">Fetch</Localized>
-      </button>
+      <div className="flex gap-2">
+        <button onClick={handleFetch}>
+          <Localized id="fetch">Fetch</Localized>
+        </button>
+        <button onClick={() => window.location.reload()}>
+          <Localized id="refresh">Refresh</Localized>
+        </button>
+      </div>
     </div>
   );
 }
