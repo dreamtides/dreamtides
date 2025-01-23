@@ -40,7 +40,7 @@ export default function UserHand({ cards }: UserHandProps) {
     const middleIndex = (cards.length - 1) / 2;
     const distanceFromMiddle = Math.abs(index - middleIndex);
     const maxDistance = Math.max(middleIndex, cards.length - 1 - middleIndex);
-    return -10 * (1 - distanceFromMiddle / maxDistance);
+    return -5 * (1 - distanceFromMiddle / maxDistance);
   };
 
   return (

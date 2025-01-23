@@ -21,7 +21,7 @@ export type CardLayout = "default" | "battlefield";
 
 export type CardProps = {
   card: CardView;
-  rotate?: boolean;
+  rotate?: number;
   style?: React.CSSProperties;
   width?: number;
   layout?: CardLayout;
@@ -35,7 +35,7 @@ export type CardProps = {
  */
 export const Card = memo(function Card({
   card,
-  rotate = false,
+  rotate,
   style,
   width = BASE_WIDTH,
   layout = "default",
@@ -47,12 +47,12 @@ export const Card = memo(function Card({
     <motion.div
       layoutId={id}
       initial={{
-        rotate: rotate ? -90 : 0,
+        rotate: rotate ?? 0,
         originX: 0,
         originY: 0,
       }}
       animate={{
-        rotate: rotate ? -90 : 0,
+        rotate: rotate ?? 0,
         originX: 0,
         originY: 0,
       }}

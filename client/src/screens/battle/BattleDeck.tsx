@@ -24,7 +24,7 @@ export default function BattleDeck({ cards }: BattleDeckProps) {
           key={JSON.stringify(card.id)}
           card={card}
           width={DECK_CARD_WIDTH}
-          rotate={true}
+          rotate={-90}
           style={{
             left: `${getCardOffset(index)}px`,
             position: "absolute",
