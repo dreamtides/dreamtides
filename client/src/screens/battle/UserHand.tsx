@@ -8,6 +8,7 @@ type UserHandProps = {
 
 const CARD_MARGIN = 1;
 const MAX_CARDS_SIDE_BY_SIDE = 4;
+const SCROLL_THRESHOLD = 6;
 
 export default function UserHand({ cards }: UserHandProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -30,13 +31,20 @@ export default function UserHand({ cards }: UserHandProps) {
 
   const getCardOffset = (index: number) => {
     const totalWidth = containerRef.current?.offsetWidth ?? 0;
+    const availableWidth = totalWidth - cardWidth;
+
+    if (cards.length > SCROLL_THRESHOLD) {
+      // Use the same spacing as with 6 cards
+      const spacingWith6Cards = availableWidth / (SCROLL_THRESHOLD - 1);
+      return index * spacingWith6Cards;
+    }
+
     const totalCardsWidth =
       Math.min(cards.length, MAX_CARDS_SIDE_BY_SIDE) * cardWidth;
     const startX = (totalWidth - totalCardsWidth) / 2;
     if (cards.length <= MAX_CARDS_SIDE_BY_SIDE) {
       return startX + index * cardWidth;
     }
-    const availableWidth = totalWidth - cardWidth;
     return (availableWidth / (cards.length - 1)) * index;
   };
 
@@ -51,32 +59,57 @@ export default function UserHand({ cards }: UserHandProps) {
     return -5 + (10 * index) / (cards.length - 1);
   };
 
+  const containerStyle: React.CSSProperties = {
+    position: "relative",
+    height: "26dvh",
+    backgroundColor: "rgb(37, 99, 235)",
+    ...(cards.length > SCROLL_THRESHOLD
+      ? {
+          overflowX: "auto",
+          overflowY: "hidden",
+          display: "block",
+        }
+      : {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }),
+  };
+
+  const getScrollableWidth = () => {
+    const totalWidth = containerRef.current?.offsetWidth ?? 0;
+    const availableWidth = totalWidth - cardWidth;
+    const spacingWith6Cards = availableWidth / (SCROLL_THRESHOLD - 1);
+    return cardWidth + spacingWith6Cards * (cards.length - 1);
+  };
+
+  const innerContainerStyle: React.CSSProperties =
+    cards.length > SCROLL_THRESHOLD
+      ? {
+          position: "relative",
+          height: "100%",
+          width: `${getScrollableWidth()}px`,
+        }
+      : {};
+
   return (
-    <div
-      ref={containerRef}
-      style={{
-        display: "flex",
-        backgroundColor: "rgb(37, 99, 235)",
-        alignItems: "center",
-        justifyContent: "center",
-        position: "relative",
-        height: "26dvh",
-      }}
-    >
-      {cards.map((card, index) => (
-        <Card
-          key={JSON.stringify(card.id)}
-          card={card}
-          width={cardWidth}
-          rotate={getRotation(index) * 0.5}
-          style={{
-            margin: `${CARD_MARGIN}px`,
-            position: "absolute",
-            left: getCardOffset(index),
-            top: getVerticalOffset(index) + 10,
-          }}
-        />
-      ))}
+    <div ref={containerRef} style={containerStyle}>
+      <div style={innerContainerStyle}>
+        {cards.map((card, index) => (
+          <Card
+            key={JSON.stringify(card.id)}
+            card={card}
+            width={cardWidth}
+            rotate={getRotation(index) * 0.5}
+            style={{
+              margin: `${CARD_MARGIN}px`,
+              position: "absolute",
+              left: getCardOffset(index),
+              top: getVerticalOffset(index) + 10,
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 }
