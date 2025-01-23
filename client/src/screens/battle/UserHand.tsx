@@ -18,7 +18,7 @@ export default function UserHand({ cards }: UserHandProps) {
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
         const marginSpace = 2 * 2;
-        const newCardWidth = Math.floor((containerWidth - marginSpace) / 3);
+        const newCardWidth = Math.floor((containerWidth - marginSpace) / 4);
         setCardWidth(newCardWidth);
       }
     };

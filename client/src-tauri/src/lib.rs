@@ -52,62 +52,30 @@ fn connect(app: AppHandle, id: ClientBattleId) {
 fn handle_action(app: AppHandle, id: ClientBattleId, scene: u32) {
     let view = match scene {
         0 => scene_0(id),
-        1 => scene_1(id),
-        2 => scene_2(id),
+        n if n <= 15 => draw_n_cards(scene_0(id), 14, n),
         _ => panic!("Invalid scene number"),
     };
     app.emit("update-event", UpdateEvent(view)).unwrap();
 }
 
-fn scene_1(id: ClientBattleId) -> BattleView {
-    BattleView {
-        id,
-        user: PlayerView {
-            score: Points(0),
-            can_act: false,
-        },
-        enemy: PlayerView {
-            score: Points(0),
-            can_act: false,
-        },
-        cards: [
-            cards_in_position(Position::OnBattlefield(DisplayPlayer::User), 0, 5),
-            cards_in_position(Position::InHand(DisplayPlayer::User), 5, 3),
-            cards_in_position(Position::InVoid(DisplayPlayer::User), 8, 6),
-            cards_in_position(Position::InDeck(DisplayPlayer::User), 37, 2),
-            vec![card(Position::InHand(DisplayPlayer::User), 39)],
-        ]
-        .concat()
-        .to_vec(),
-        status_description: "Status".to_string(),
-        controls: vec![],
+fn draw_n_cards(mut view: BattleView, start_key: u32, count: u32) -> BattleView {
+    for i in 0..count {
+        view = draw_card(view, start_key + i);
     }
+    view
 }
 
-fn scene_2(id: ClientBattleId) -> BattleView {
-    BattleView {
-        id,
-        user: PlayerView {
-            score: Points(0),
-            can_act: false,
-        },
-        enemy: PlayerView {
-            score: Points(0),
-            can_act: false,
-        },
-        cards: [
-            cards_in_position(Position::OnBattlefield(DisplayPlayer::User), 0, 5),
-            cards_in_position(Position::InHand(DisplayPlayer::User), 5, 3),
-            cards_in_position(Position::InVoid(DisplayPlayer::User), 8, 6),
-            cards_in_position(Position::InDeck(DisplayPlayer::User), 37, 1),
-            vec![card(Position::InHand(DisplayPlayer::User), 38)],
-            vec![card(Position::InHand(DisplayPlayer::User), 39)],
-        ]
-        .concat()
-        .to_vec(),
-        status_description: "Status".to_string(),
-        controls: vec![],
+fn draw_card(mut view: BattleView, sorting_key: u32) -> BattleView {
+    if let Some(found) = view.cards.iter_mut().find(|card| {
+        matches!(
+            card.position.position,
+            Position::InDeck(DisplayPlayer::User)
+        ) && card.position.sorting_key == sorting_key
+    }) {
+        let new_position = Position::InHand(DisplayPlayer::User);
+        *found = card(new_position, sorting_key);
     }
+    view
 }
 
 fn scene_0(id: ClientBattleId) -> BattleView {
@@ -125,7 +93,7 @@ fn scene_0(id: ClientBattleId) -> BattleView {
             cards_in_position(Position::OnBattlefield(DisplayPlayer::User), 0, 5),
             cards_in_position(Position::InHand(DisplayPlayer::User), 5, 3),
             cards_in_position(Position::InVoid(DisplayPlayer::User), 8, 6),
-            cards_in_position(Position::InDeck(DisplayPlayer::User), 37, 3),
+            cards_in_position(Position::InDeck(DisplayPlayer::User), 14, 20),
         ]
         .concat()
         .to_vec(),

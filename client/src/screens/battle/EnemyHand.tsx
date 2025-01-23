@@ -11,7 +11,7 @@ export default function EnemyHand({}: EnemyHandProps) {
 
   const handleFetch = () => {
     console.log("fetching");
-    setSceneNumber((sceneNumber + 1) % 3);
+    setSceneNumber((sceneNumber + 1) % 15);
     commands.handleAction("123", sceneNumber);
   };
 
