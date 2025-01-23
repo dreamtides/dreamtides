@@ -43,6 +43,10 @@ export default function UserHand({ cards }: UserHandProps) {
     return -5 * (1 - distanceFromMiddle / maxDistance);
   };
 
+  const getRotation = (index: number) => {
+    return -5 + (10 * index) / (cards.length - 1);
+  };
+
   return (
     <div
       ref={containerRef}
@@ -60,6 +64,7 @@ export default function UserHand({ cards }: UserHandProps) {
           key={JSON.stringify(card.id)}
           card={card}
           width={cardWidth}
+          rotate={getRotation(index)}
           style={{
             margin: `${CARD_MARGIN}px`,
             position:
