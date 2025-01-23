@@ -29,11 +29,15 @@ export default function UserHand({ cards }: UserHandProps) {
   }, []);
 
   const getCardOffset = (index: number) => {
-    if (cards.length <= MAX_CARDS_SIDE_BY_SIDE) return 0;
     const totalWidth = containerRef.current?.offsetWidth ?? 0;
+    const totalCardsWidth =
+      Math.min(cards.length, MAX_CARDS_SIDE_BY_SIDE) * cardWidth;
+    const startX = (totalWidth - totalCardsWidth) / 2;
+    if (cards.length <= MAX_CARDS_SIDE_BY_SIDE) {
+      return startX + index * cardWidth;
+    }
     const availableWidth = totalWidth - cardWidth;
-    const offset = (availableWidth / (cards.length - 1)) * index;
-    return offset;
+    return (availableWidth / (cards.length - 1)) * index;
   };
 
   const getVerticalOffset = (index: number) => {
@@ -64,16 +68,12 @@ export default function UserHand({ cards }: UserHandProps) {
           key={JSON.stringify(card.id)}
           card={card}
           width={cardWidth}
-          rotate={getRotation(index)}
+          rotate={getRotation(index) * 0.5}
           style={{
             margin: `${CARD_MARGIN}px`,
-            position:
-              cards.length > MAX_CARDS_SIDE_BY_SIDE ? "absolute" : "relative",
-            left:
-              cards.length > MAX_CARDS_SIDE_BY_SIDE
-                ? getCardOffset(index)
-                : undefined,
-            top: getVerticalOffset(index),
+            position: "absolute",
+            left: getCardOffset(index),
+            top: getVerticalOffset(index) + 10,
           }}
         />
       ))}
