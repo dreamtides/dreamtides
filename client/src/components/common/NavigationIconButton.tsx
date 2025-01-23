@@ -1,13 +1,11 @@
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button } from "@nextui-org/react";
-import type { PressEvent } from "@react-types/shared";
 import { memo } from "react";
 
 type NavigationIconButtonProps = {
   icon: IconProp;
   ariaLabel: string;
-  onPress?: (e: PressEvent) => void;
+  onPress?: () => void;
 };
 
 /**
@@ -22,16 +20,12 @@ export default memo(function NavigationIconButton({
   onPress,
 }: NavigationIconButtonProps) {
   return (
-    <Button
-      isIconOnly
+    <button
       aria-label={ariaLabel}
-      variant="light"
-      size="lg"
-      style={{ margin: "0.25rem" }}
-      radius="full"
-      onPress={onPress}
+      style={{ marginLeft: "16px", marginRight: "16px" }}
+      onClick={onPress}
     >
       <FontAwesomeIcon icon={icon} size="lg" />
-    </Button>
+    </button>
   );
 });

@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import { NextUIProvider } from "@nextui-org/react";
 import "./index.css";
 import { FluentBundle, FluentResource } from "@fluent/bundle";
 import { LocalizationProvider, ReactLocalization } from "@fluent/react";
@@ -14,10 +13,8 @@ const l10n = new ReactLocalization([bundle]);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <NextUIProvider>
-      <LocalizationProvider l10n={l10n}>
-        <App />
-      </LocalizationProvider>
-    </NextUIProvider>
-  </React.StrictMode>,
+    <LocalizationProvider l10n={l10n}>
+      <App />
+    </LocalizationProvider>
+  </React.StrictMode>
 );
