@@ -6,6 +6,9 @@ type UserHandProps = {
   cards: CardView[];
 };
 
+const CARD_MARGIN = 1;
+const MAX_CARDS_SIDE_BY_SIDE = 4;
+
 export default function UserHand({ cards }: UserHandProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [cardWidth, setCardWidth] = useState(100);
@@ -25,61 +28,12 @@ export default function UserHand({ cards }: UserHandProps) {
     return () => window.removeEventListener("resize", updateCardWidth);
   }, []);
 
-  const renderCards = () => {
-    if (cards.length < 5) {
-      return cards.map((card) => (
-        <Card
-          key={JSON.stringify(card.id)}
-          card={card}
-          width={90}
-          style={{ margin: "1px" }}
-        />
-      ));
-    }
-
-    const midIndex = Math.floor(cards.length / 2);
-    const visibleCards = cards.slice(midIndex - 1, midIndex + 2);
-    const leftStack = cards.slice(0, midIndex - 1);
-    const rightStack = cards.slice(midIndex + 2);
-
-    return (
-      <>
-        {leftStack.length > 0 && (
-          <div style={{ position: "absolute", left: 0, bottom: 0, width: 100 }}>
-            {leftStack.map((card, index) => (
-              <Card
-                key={JSON.stringify(card.id)}
-                card={card}
-                width={90}
-                style={{ position: "absolute", left: 0, bottom: 0 }}
-              />
-            ))}
-          </div>
-        )}
-        {visibleCards.map((card) => (
-          <Card
-            key={JSON.stringify(card.id)}
-            card={card}
-            width={90}
-            style={{ margin: "1px", zIndex: 10 }}
-          />
-        ))}
-        {rightStack.length > 0 && (
-          <div
-            style={{ position: "absolute", right: 0, bottom: 0, width: 100 }}
-          >
-            {rightStack.map((card, index) => (
-              <Card
-                key={JSON.stringify(card.id)}
-                card={card}
-                width={90}
-                style={{ position: "absolute", right: 0, bottom: 0 }}
-              />
-            ))}
-          </div>
-        )}
-      </>
-    );
+  const getCardOffset = (index: number) => {
+    if (cards.length <= MAX_CARDS_SIDE_BY_SIDE) return 0;
+    const totalWidth = containerRef.current?.offsetWidth ?? 0;
+    const availableWidth = totalWidth - cardWidth;
+    const offset = (availableWidth / (cards.length - 1)) * index;
+    return offset;
   };
 
   return (
@@ -94,7 +48,22 @@ export default function UserHand({ cards }: UserHandProps) {
         height: "26dvh",
       }}
     >
-      {renderCards()}
+      {cards.map((card, index) => (
+        <Card
+          key={JSON.stringify(card.id)}
+          card={card}
+          width={cardWidth}
+          style={{
+            margin: `${CARD_MARGIN}px`,
+            position:
+              cards.length > MAX_CARDS_SIDE_BY_SIDE ? "absolute" : "relative",
+            left:
+              cards.length > MAX_CARDS_SIDE_BY_SIDE
+                ? getCardOffset(index)
+                : undefined,
+          }}
+        />
+      ))}
     </div>
   );
 }
