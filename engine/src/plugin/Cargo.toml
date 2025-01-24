@@ -1,0 +1,13 @@
+[package]
+name = "plugin"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+path = "src/plugin.rs"
+test = false
+doctest = false
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+core_data = { path = "../core_data" }
