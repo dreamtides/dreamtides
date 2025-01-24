@@ -27,7 +27,8 @@ public class CommandService : MonoBehaviour
             ]
         }";
         Account account = JsonConvert.DeserializeObject<Account>(json);
-        _text.text = Plugin.ReturnTwo().ToString() + " " + account.Email;
+        //_text.text = Plugin.ReturnTwo().ToString() + " " + account.Email;
+        _text.text = Plugin.GetScene(0).StatusDescription;
     }
 
     // Update is called once per frame

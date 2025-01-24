@@ -2527,6 +2527,9 @@ name = "plugin"
 version = "0.0.0"
 dependencies = [
  "core_data",
+ "display_data",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

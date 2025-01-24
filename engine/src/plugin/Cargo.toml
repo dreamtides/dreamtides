@@ -11,3 +11,7 @@ crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
 core_data = { path = "../core_data" }
+display_data = { path = "../display_data" }
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
