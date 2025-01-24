@@ -1,6 +1,7 @@
 use derive_more::{
     Add, AddAssign, Display, Div, DivAssign, From, Into, Mul, MulAssign, Sub, SubAssign, Sum,
 };
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
@@ -29,6 +30,7 @@ use specta::Type;
     Serialize,
     Deserialize,
     Type,
+    JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Energy(pub u32);
@@ -59,6 +61,7 @@ pub struct Energy(pub u32);
     Serialize,
     Deserialize,
     Type,
+    JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Spark(pub u32);
@@ -88,6 +91,7 @@ pub struct Spark(pub u32);
     Serialize,
     Deserialize,
     Type,
+    JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Points(pub u32);

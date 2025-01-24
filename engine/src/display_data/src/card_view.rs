@@ -1,12 +1,13 @@
 use core_data::numerics::{Energy, Spark};
 use core_data::types::{CardFacing, Url};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use crate::object_position::ObjectPosition;
 
 /// Represents the visual state of a card or ability in a game
-#[derive(Clone, Debug, Serialize, Deserialize, Type)]
+#[derive(Clone, Debug, Serialize, Deserialize, Type, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct CardView {
     /// Identifier for this card
@@ -44,7 +45,9 @@ pub struct CardView {
 /// Identifies a card in client code
 ///
 /// Client-opaque serialized value.
-#[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, Type)]
+#[derive(
+    Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, Type, JsonSchema,
+)]
 #[serde(rename_all = "camelCase")]
 pub enum ClientCardId {
     CardId(String),
@@ -53,7 +56,7 @@ pub enum ClientCardId {
 }
 
 /// Visual state of a revealed card
-#[derive(Clone, Debug, Serialize, Deserialize, Type)]
+#[derive(Clone, Debug, Serialize, Deserialize, Type, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct RevealedCardView {
     /// Image URL for this card
@@ -90,7 +93,7 @@ pub struct RevealedCardView {
     pub can_drag: bool,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, Type)]
+#[derive(Clone, Debug, Serialize, Deserialize, Type, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct DisplayImage {
     /// Image URL for this card
@@ -103,7 +106,7 @@ pub struct DisplayImage {
     pub image_offset_y: Option<u32>,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Type)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Type, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum RevealedCardStatus {
     Selected,
@@ -111,7 +114,7 @@ pub enum RevealedCardStatus {
     CanPlay,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Type)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, Type, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum CardFrame {
     Character,

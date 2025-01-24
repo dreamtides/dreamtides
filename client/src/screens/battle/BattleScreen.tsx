@@ -12,14 +12,31 @@ import EnemyHand from "./EnemyHand";
 import BattlePlayerStatus from "./BattlePlayerStatus";
 import Battlefield from "./Battlefield";
 import UserHand from "./UserHand";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 type BattleScreenProps = {};
 
 export default function BattleScreen({}: BattleScreenProps) {
-  const [isAnimating, _setIsAnimating] = useState(false);
-  const [_updateQueue, setUpdateQueue] = useState<BattleView[]>([]);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [updateQueue, setUpdateQueue] = useState<BattleView[]>([]);
   const [battleView, setBattleView] = useState<BattleView | null>(null);
+  const intervalRef = useRef<number | null>(null);
+
+  const processQueue = useCallback(() => {
+    setUpdateQueue((prev) => {
+      if (prev.length === 0) {
+        if (intervalRef.current !== null) {
+          window.clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+        setIsAnimating(false);
+        return prev;
+      }
+      const [next, ...rest] = prev;
+      setBattleView(next);
+      return rest;
+    });
+  }, []);
 
   useEffect(() => {
     let unlisten: (() => void) | null = null;
@@ -27,7 +44,11 @@ export default function BattleScreen({}: BattleScreenProps) {
       if (isAnimating) {
         setUpdateQueue((prev) => [...prev, event.payload]);
       } else {
+        setIsAnimating(true);
         setBattleView(event.payload);
+        if (intervalRef.current === null) {
+          intervalRef.current = window.setInterval(processQueue, 300);
+        }
       }
     });
 
@@ -41,6 +62,10 @@ export default function BattleScreen({}: BattleScreenProps) {
     return () => {
       if (unlisten) {
         unlisten();
+      }
+      if (intervalRef.current !== null) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
   }, []);

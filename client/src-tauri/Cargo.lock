@@ -620,6 +620,7 @@ name = "core_data"
 version = "0.0.0"
 dependencies = [
  "derive_more 1.0.0",
+ "schemars",
  "serde",
  "specta",
  "specta-typescript",
@@ -829,6 +830,7 @@ name = "display_data"
 version = "0.0.0"
 dependencies = [
  "core_data",
+ "schemars",
  "serde",
  "specta",
  "specta-typescript",
