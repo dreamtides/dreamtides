@@ -46,6 +46,10 @@ test:
 doc:
     cargo doc --manifest-path engine/Cargo.toml
 
+schema:
+    cargo run --manifest-path engine/Cargo.toml --bin "schema_generator" > schema.json
+    quicktype --lang cs --src-lang schema -t BattleView --framework SystemTextJson --namespace Dreamcaller.Json --density dense --csharp-version 6 --array-type list --features complete --check-required -o Schema.cs schema.json
+
 clippy:
   cargo clippy --manifest-path engine/Cargo.toml --workspace -- -D warnings -D clippy::all
 
