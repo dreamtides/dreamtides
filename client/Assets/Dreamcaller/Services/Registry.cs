@@ -12,6 +12,9 @@ namespace Dreamcaller.Services
     [SerializeField] ObjectLayout? _userHand;
     public ObjectLayout UserHand => Check(_userHand);
 
+    [SerializeField] ObjectLayout? _offscreen;
+    public ObjectLayout Offscreen => Check(_offscreen);
+
     [SerializeField] LayoutUpdateService? _layoutUpdateService;
     public LayoutUpdateService LayoutUpdateService => Check(_layoutUpdateService);
 

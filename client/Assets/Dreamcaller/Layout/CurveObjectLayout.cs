@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using Dreamcaller.Utils;
 using UnityEngine;
 
 namespace Dreamcaller.Layout
@@ -25,7 +26,10 @@ namespace Dreamcaller.Layout
     protected override Vector3? CalculateObjectRotation(int index, int count)
     {
       var curvePosition = CalculateCurvePosition(index, count);
-      return new Vector3(x: 280, y: 0, _zRotationAddition + _zRotationMultiplier * CalculateZRotation(curvePosition));
+      return new Vector3(
+          x: Constants.CameraXAngle,
+          y: 0,
+          z: _zRotationAddition + _zRotationMultiplier * CalculateZRotation(curvePosition));
     }
 
     protected override float? CalculateObjectScale(int index, int count) => _objectScale == 0.0 ? null : _objectScale;

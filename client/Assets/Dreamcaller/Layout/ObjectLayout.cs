@@ -14,10 +14,10 @@ namespace Dreamcaller.Layout
   /// </summary>
   public abstract class ObjectLayout : Displayable
   {
-    private readonly List<Displayable> _objects = new();
+    [SerializeField] List<Displayable> _objects = new();
 
     /// <summary>The objects in this ObjectLayout</summary>
-    public IReadOnlyList<Displayable> Objects => _objects;
+    public IReadOnlyList<Displayable> Objects => _objects.AsReadOnly();
 
     /// <summary>Adds an object to be owned by this ObjectLayout</summary>
     public void Add(Displayable displayable)

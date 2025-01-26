@@ -1,6 +1,5 @@
 #nullable enable
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,38 +8,42 @@ using Dreamcaller.Components;
 using Dreamcaller.Layout;
 using Dreamcaller.Schema;
 using Dreamcaller.Utils;
+using UnityEngine;
 
 namespace Dreamcaller.Services
 {
   public class LayoutUpdateService : Service
   {
-    readonly Dictionary<ClientCardId, Card> _cards = new();
+    [SerializeField] Card? _cardPrefab;
+    Card CardPrefab { get => Errors.CheckNotNull(_cardPrefab); }
+
+    Dictionary<ClientCardId, Card> Cards { get; } = new();
 
     public IEnumerator UpdateLayout(BattleView view)
     {
       var sequence = TweenUtils.Sequence("UpdateLayout").SetEase(Ease.InOutSine);
-      var toDelete = _cards.Keys.ToHashSet();
+      var toDelete = Cards.Keys.ToHashSet();
 
       foreach (var cardView in view.Cards)
       {
         toDelete.Remove(cardView.Id);
         var layout = LayoutForPosition(cardView.Position.Position);
         Card card;
-        if (_cards.ContainsKey(cardView.Id))
+        if (Cards.ContainsKey(cardView.Id))
         {
-          card = _cards[cardView.Id];
+          card = Cards[cardView.Id];
         }
         else
         {
-          card = InstantiateCardPrefab();
-          _cards[cardView.Id] = card;
-          card.transform.position = cardView.CreatePosition != null ?
+          var position = cardView.CreatePosition != null ?
               LayoutForPosition(cardView.CreatePosition.Position).GetTargetPosition() :
               layout.GetTargetPosition();
+          card = ComponentUtils.Instantiate(CardPrefab, position);
+          Cards[cardView.Id] = card;
         }
 
         layout.Add(card);
-        card.Render(cardView, sequence);
+        card.Render(Registry, cardView, sequence);
       }
 
       InsertDeleteAnimations(sequence, toDelete);
@@ -58,7 +61,7 @@ namespace Dreamcaller.Services
     {
       foreach (var cardId in toDelete)
       {
-        var card = Errors.CheckNotNull(_cards[cardId]);
+        var card = Errors.CheckNotNull(Cards[cardId]);
         if (card.CardView.DestroyPosition != null)
         {
           if (card.CardView.DestroyPosition.Position.PositionClass.InDeck != null)
@@ -71,7 +74,7 @@ namespace Dreamcaller.Services
               TweenUtils.MoveAnimationDurationSeconds));
         }
 
-        _cards.Remove(cardId);
+        Cards.Remove(cardId);
 
         if (card.Parent)
         {
@@ -84,11 +87,9 @@ namespace Dreamcaller.Services
     {
       foreach (var cardId in toDelete)
       {
-        Destroy(_cards[cardId].gameObject);
+        Destroy(Cards[cardId].gameObject);
       }
     }
-
-    Card InstantiateCardPrefab() => throw new NotImplementedException();
 
     ObjectLayout LayoutForPosition(Position position)
     {
@@ -97,11 +98,11 @@ namespace Dreamcaller.Services
         return inHand switch
         {
           DisplayPlayer.User => Registry.UserHand,
-          _ => throw new NotImplementedException(),
+          _ => Registry.Offscreen,
         };
       }
 
-      throw new NotImplementedException();
+      return Registry.Offscreen;
     }
   }
 }
