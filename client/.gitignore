@@ -14,10 +14,13 @@
 /Assets/AddressableAssetsData/link.xml
 /Assets/AddressableAssetsData/link.xml.meta
 /Assets/PlayAssetDelivery/Build
+/Assets/ThirdParty/
 /UserSettings/
 /db/
 /debug_db/
 /log/
+
+.plastic
 
 # Visual Studio cache directory
 .vs/jj
