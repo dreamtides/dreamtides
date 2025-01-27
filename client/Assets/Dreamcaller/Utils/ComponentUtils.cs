@@ -7,13 +7,13 @@ namespace Dreamcaller.Utils
 {
   public static class ComponentUtils
   {
-    public static T Instantiate<T>(T prefabComponent, Vector3 position) where T : Component =>
+    public static T Instantiate<T>(T prefabComponent, Vector3? position = null) where T : Component =>
       InstantiateGameObject<T>(Errors.CheckNotNull(prefabComponent).gameObject, position);
 
-    public static T InstantiateGameObject<T>(GameObject prefab, Vector3 position) where T : Component
+    public static T InstantiateGameObject<T>(GameObject prefab, Vector3? position = null) where T : Component
     {
       Errors.CheckNotNull(prefab);
-      var instantiated = UnityEngine.Object.Instantiate(prefab, position, Quaternion.identity);
+      var instantiated = UnityEngine.Object.Instantiate(prefab, position ?? 1000f * Vector3.one, Quaternion.identity);
       var result = instantiated.GetComponent<T>();
       if (!result)
       {

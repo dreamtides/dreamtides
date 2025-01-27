@@ -22,6 +22,7 @@ namespace Dreamcaller.Components
     {
       _registry = registry;
       _cardView = view;
+      _name.text = view.Revealed?.Name;
     }
 
     public void TurnFaceDown(Sequence sequence)

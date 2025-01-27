@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
@@ -53,10 +54,45 @@ namespace Dreamcaller.Layout
     }
 
     /// <summary>
-    /// Gets the position at which objects should be created or destroyed for
-    /// this layout.
+    /// Applies the transform state at which objects should be created or
+    /// destroyed for this layout. If a sequence applied, the transformation
+    /// will be animated.
     /// </summary>
-    public virtual Vector3 GetTargetPosition() => transform.position;
+    public virtual void ApplyTargetTransform(Transform target, Sequence? sequence = null)
+    {
+      var index = _objects.Count == 0 ? 0 : _objects.Count - 1;
+      var position = CalculateObjectPosition(index, _objects.Count);
+      if (sequence != null)
+      {
+        sequence.Insert(0, target.DOMove(position, TweenUtils.MoveAnimationDurationSeconds));
+      }
+      else
+      {
+        target.position = position;
+      }
+      if (CalculateObjectRotation(index, _objects.Count) is { } rotation)
+      {
+        if (sequence != null)
+        {
+          sequence.Insert(0, target.DOLocalRotate(rotation, TweenUtils.MoveAnimationDurationSeconds));
+        }
+        else
+        {
+          target.eulerAngles = rotation;
+        }
+      }
+      if (CalculateObjectScale(index, _objects.Count) is { } scale)
+      {
+        if (sequence != null)
+        {
+          sequence.Insert(0, target.DOScale(scale * Vector3.one, TweenUtils.MoveAnimationDurationSeconds));
+        }
+        else
+        {
+          target.localScale = scale * Vector3.one;
+        }
+      }
+    }
 
     /// <summary>
     /// Inserts a series of animations into a Sequence to move this layout's
@@ -104,10 +140,28 @@ namespace Dreamcaller.Layout
       }
     }
 
+    /// <summary>
+    /// Calculates the position of the object at the given index in the layout.
+    /// </summary>
+    ///
+    /// Note that this may be invoked with index=0, count=0 to compute initial
+    /// object positions.
     protected abstract Vector3 CalculateObjectPosition(int index, int count);
 
+    /// <summary>
+    /// Calculates the rotation of the object at the given index in the layout.
+    /// </summary>
+    ///
+    /// Note that this may be invoked with index=0, count=0 to compute initial
+    /// object rotations.
     protected virtual Vector3? CalculateObjectRotation(int index, int count) => null;
 
+    /// <summary>
+    /// Calculates the scale of the object at the given index in the layout.
+    /// </summary>
+    ///
+    /// Note that this may be invoked with index=0, count=0 to compute initial
+    /// object scales.
     protected virtual float? CalculateObjectScale(int index, int count) => null;
 
     bool IsEquivalent(Displayable displayable, Vector3 position, Vector3? rotation, float scale)

@@ -69,7 +69,7 @@ fn card(position: Position, sorting_key: u32) -> CardView {
 fn card1(position: Position, sorting_key: u32) -> CardView {
     let revealed = position != Position::InDeck(DisplayPlayer::User);
     CardView {
-        id: ClientCardId::CardId(format!("#{}", sorting_key)),
+        id: ClientCardId(format!("#{}", sorting_key)),
         position: ObjectPosition {
             position,
             sorting_key,
@@ -102,7 +102,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
 fn card2(position: Position, sorting_key: u32) -> CardView {
     let revealed = position != Position::InDeck(DisplayPlayer::User);
     CardView {
-        id: ClientCardId::CardId(format!("#{}", sorting_key)),
+        id: ClientCardId(format!("#{}", sorting_key)),
         position: ObjectPosition {
             position,
             sorting_key,
@@ -135,7 +135,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
 fn card3(position: Position, sorting_key: u32) -> CardView {
     let revealed = position != Position::InDeck(DisplayPlayer::User);
     CardView {
-        id: ClientCardId::CardId(format!("#{}", sorting_key)),
+        id: ClientCardId(format!("#{}", sorting_key)),
         position: ObjectPosition {
             position,
             sorting_key,
@@ -168,7 +168,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
 fn card4(position: Position, sorting_key: u32) -> CardView {
     let revealed = position != Position::InDeck(DisplayPlayer::User);
     CardView {
-        id: ClientCardId::CardId(format!("#{}", sorting_key)),
+        id: ClientCardId(format!("#{}", sorting_key)),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         card_back: Url("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
@@ -198,7 +198,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
 fn card5(position: Position, sorting_key: u32) -> CardView {
     let revealed = position != Position::InDeck(DisplayPlayer::User);
     CardView {
-        id: ClientCardId::CardId(format!("#{}", sorting_key)),
+        id: ClientCardId(format!("#{}", sorting_key)),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         card_back: Url("".to_string()),
         revealed: revealed.then_some(RevealedCardView {

@@ -17,7 +17,7 @@ namespace Dreamcaller.Services
     [SerializeField] Card? _cardPrefab;
     Card CardPrefab { get => Errors.CheckNotNull(_cardPrefab); }
 
-    Dictionary<ClientCardId, Card> Cards { get; } = new();
+    Dictionary<string, Card> Cards { get; } = new();
 
     public IEnumerator UpdateLayout(BattleView view)
     {
@@ -35,10 +35,15 @@ namespace Dreamcaller.Services
         }
         else
         {
-          var position = cardView.CreatePosition != null ?
-              LayoutForPosition(cardView.CreatePosition.Position).GetTargetPosition() :
-              layout.GetTargetPosition();
-          card = ComponentUtils.Instantiate(CardPrefab, position);
+          card = ComponentUtils.Instantiate(CardPrefab);
+          if (cardView.CreatePosition != null)
+          {
+            LayoutForPosition(cardView.CreatePosition.Position).ApplyTargetTransform(card.transform);
+          }
+          else
+          {
+            layout.ApplyTargetTransform(card.transform);
+          }
           Cards[cardView.Id] = card;
         }
 
@@ -46,9 +51,12 @@ namespace Dreamcaller.Services
         card.Render(Registry, cardView, sequence);
       }
 
-      InsertDeleteAnimations(sequence, toDelete);
+      var delete = InsertDeleteAnimations(sequence, toDelete);
       InsertAllLayoutAnimations(sequence);
-      sequence.AppendCallback(() => DestroyCards(toDelete));
+      if (delete.Count > 0)
+      {
+        sequence.AppendCallback(() => DestroyCards(delete));
+      }
       yield return sequence.WaitForCompletion();
     }
 
@@ -57,11 +65,13 @@ namespace Dreamcaller.Services
       Registry.UserHand.InsertAnimationSequence(sequence);
     }
 
-    void InsertDeleteAnimations(Sequence sequence, HashSet<ClientCardId> toDelete)
+    List<Card> InsertDeleteAnimations(Sequence sequence, HashSet<string> toDelete)
     {
+      var cards = new List<Card>();
       foreach (var cardId in toDelete)
       {
         var card = Errors.CheckNotNull(Cards[cardId]);
+        cards.Add(card);
         if (card.CardView.DestroyPosition != null)
         {
           if (card.CardView.DestroyPosition.Position.PositionClass.InDeck != null)
@@ -69,9 +79,11 @@ namespace Dreamcaller.Services
             card.TurnFaceDown(sequence);
           }
 
-          var layout = LayoutForPosition(card.CardView.DestroyPosition.Position);
-          sequence.Insert(0, card.transform.DOMove(layout.GetTargetPosition(),
-              TweenUtils.MoveAnimationDurationSeconds));
+          if (card.CardView.DestroyPosition != null)
+          {
+            var layout = LayoutForPosition(card.CardView.DestroyPosition.Position);
+            layout.ApplyTargetTransform(card.transform, sequence);
+          }
         }
 
         Cards.Remove(cardId);
@@ -81,13 +93,16 @@ namespace Dreamcaller.Services
           card.Parent.RemoveIfPresent(card);
         }
       }
+
+      return cards;
     }
 
-    void DestroyCards(HashSet<ClientCardId> toDelete)
+    void DestroyCards(List<Card> delete)
     {
-      foreach (var cardId in toDelete)
+      foreach (var card in delete)
       {
-        Destroy(Cards[cardId].gameObject);
+        Debug.Log($"Destroying card {card.CardView.Revealed?.Name} with id {card.CardView.Id}");
+        Destroy(card.gameObject);
       }
     }
 
@@ -98,7 +113,18 @@ namespace Dreamcaller.Services
         return inHand switch
         {
           DisplayPlayer.User => Registry.UserHand,
-          _ => Registry.Offscreen,
+          DisplayPlayer.Enemy => Registry.EnemyHand,
+          _ => throw Errors.UnknownEnumValue(inHand),
+        };
+      }
+
+      if (position.PositionClass.InDeck is { } inDeck)
+      {
+        return inDeck switch
+        {
+          DisplayPlayer.User => Registry.UserDeck,
+          DisplayPlayer.Enemy => Registry.EnemyDeck,
+          _ => throw Errors.UnknownEnumValue(inDeck),
         };
       }
 

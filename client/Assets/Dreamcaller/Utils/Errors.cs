@@ -51,5 +51,8 @@ namespace Dreamcaller.Utils
 
       return value;
     }
+
+    public static Exception UnknownEnumValue<T>(T value) where T : Enum =>
+      new ArgumentException($"Unknown '{typeof(T).Name}' value: '{value}'");
   }
 }

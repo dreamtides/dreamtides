@@ -95,7 +95,7 @@ namespace Dreamcaller.Schema
         /// Identifier for this card
         /// </summary>
         [JsonProperty("id", Required = Required.Always)]
-        public ClientCardId Id { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// Position of this card in the UI
@@ -175,25 +175,6 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("onBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? OnBattlefield { get; set; }
-    }
-
-    /// <summary>
-    /// Identifier for this card
-    ///
-    /// Identifies a card in client code
-    ///
-    /// Client-opaque serialized value.
-    /// </summary>
-    public partial class ClientCardId
-    {
-        [JsonProperty("cardId", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public string CardId { get; set; }
-
-        [JsonProperty("activatedAbilityId", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public string ActivatedAbilityId { get; set; }
-
-        [JsonProperty("triggeredAbilityId", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public string TriggeredAbilityId { get; set; }
     }
 
     /// <summary>

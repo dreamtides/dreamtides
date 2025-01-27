@@ -36,6 +36,11 @@ namespace Dreamcaller.Layout
 
     float CalculateCurvePosition(int cardIndex, int cardCount)
     {
+      if (cardCount == 0)
+      {
+        return 0.5f;
+      }
+
       if (cardIndex < 0 || cardIndex >= cardCount)
       {
         throw new ArgumentException("Index out of bounds");

@@ -49,11 +49,7 @@ pub struct CardView {
     Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, Type, JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
-pub enum ClientCardId {
-    CardId(String),
-    ActivatedAbilityId(String),
-    TriggeredAbilityId(String),
-}
+pub struct ClientCardId(pub String);
 
 /// Visual state of a revealed card
 #[derive(Clone, Debug, Serialize, Deserialize, Type, JsonSchema)]
