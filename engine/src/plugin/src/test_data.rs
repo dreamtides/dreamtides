@@ -2,14 +2,15 @@ use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::{CardFacing, Url};
 use display_data::battle_view::{BattleView, ClientBattleId, DisplayPlayer, PlayerView};
 use display_data::card_view::{CardFrame, CardView, ClientCardId, DisplayImage, RevealedCardView};
+use display_data::command::{Command, CommandSequence};
 use display_data::object_position::{ObjectPosition, Position};
 
-pub fn get_scene(id: ClientBattleId, scene: u32) -> BattleView {
-    match scene {
+pub fn get_scene(id: ClientBattleId, scene: u32) -> CommandSequence {
+    CommandSequence::from_command(Command::UpdateBattle(match scene {
         0 => scene_0(id),
         n if n <= 15 => draw_n_cards(scene_0(id), 14, n),
         _ => panic!("Invalid scene number"),
-    }
+    }))
 }
 
 fn draw_n_cards(mut view: BattleView, start_key: u32, count: u32) -> BattleView {

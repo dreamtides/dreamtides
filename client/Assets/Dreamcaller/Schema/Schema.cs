@@ -4,7 +4,7 @@
 //
 //    using Dreamcaller.Schema;
 //
-//    var battleView = BattleView.FromJson(jsonString);
+//    var commandSequence = CommandSequence.FromJson(jsonString);
 
 namespace Dreamcaller.Schema
 {
@@ -14,6 +14,33 @@ namespace Dreamcaller.Schema
     using System.Globalization;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
+
+    /// <summary>
+    /// A list of [CommandGroup]s to execute sequentially.
+    /// </summary>
+    public partial class CommandSequence
+    {
+        [JsonProperty("groups", Required = Required.Always)]
+        public List<CommandGroup> Groups { get; set; }
+    }
+
+    /// <summary>
+    /// A set of [Command]s to execute in parallel.
+    /// </summary>
+    public partial class CommandGroup
+    {
+        [JsonProperty("commands", Required = Required.Always)]
+        public List<Command> Commands { get; set; }
+    }
+
+    /// <summary>
+    /// Represents an animated update to the visual state of the game.
+    /// </summary>
+    public partial class Command
+    {
+        [JsonProperty("updateBattle", Required = Required.Always)]
+        public BattleView UpdateBattle { get; set; }
+    }
 
     /// <summary>
     /// Represents the visual state of an ongoing dream battle
@@ -381,14 +408,14 @@ namespace Dreamcaller.Schema
         public static implicit operator Position(PositionClass PositionClass) => new Position { PositionClass = PositionClass };
     }
 
-    public partial class BattleView
+    public partial class CommandSequence
     {
-        public static BattleView FromJson(string json) => JsonConvert.DeserializeObject<BattleView>(json, Dreamcaller.Schema.Converter.Settings);
+        public static CommandSequence FromJson(string json) => JsonConvert.DeserializeObject<CommandSequence>(json, Dreamcaller.Schema.Converter.Settings);
     }
 
     public static class Serialize
     {
-        public static string ToJson(this BattleView self) => JsonConvert.SerializeObject(self, Dreamcaller.Schema.Converter.Settings);
+        public static string ToJson(this CommandSequence self) => JsonConvert.SerializeObject(self, Dreamcaller.Schema.Converter.Settings);
     }
 
     internal static class Converter

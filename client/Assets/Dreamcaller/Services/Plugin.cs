@@ -12,12 +12,12 @@ static class Plugin
         return dreamcaller_return_two();
     }
 
-    public static BattleView GetScene(int scene)
+    public static CommandSequence GetScene(int scene)
     {
         byte[] response = new byte[BufferSize];
         int responseLength = dreamcaller_get_scene(scene, response, BufferSize);
         var json = System.Text.Encoding.UTF8.GetString(response, 0, responseLength);
-        return BattleView.FromJson(json);
+        return CommandSequence.FromJson(json);
     }
 
 #if !UNITY_EDITOR && (UNITY_IOS || UNITY_WEBGL)

@@ -12,8 +12,9 @@ namespace Dreamcaller.Components
 
     public void OnClick()
     {
-      var battleView = Plugin.GetScene(_scene++);
-      Debug.Log($"Starting layout update {battleView}");
+      var commands = Plugin.GetScene(_scene++);
+      Debug.Log($"Starting layout update {commands}");
+      var battleView = commands.Groups[0].Commands[0].UpdateBattle;
       StartCoroutine(_registry.LayoutUpdateService.UpdateLayout(battleView));
     }
   }
