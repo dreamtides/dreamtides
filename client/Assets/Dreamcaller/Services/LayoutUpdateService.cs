@@ -38,11 +38,11 @@ namespace Dreamcaller.Services
           card = ComponentUtils.Instantiate(CardPrefab);
           if (cardView.CreatePosition != null)
           {
-            LayoutForPosition(cardView.CreatePosition.Position).ApplyTargetTransform(card.transform);
+            LayoutForPosition(cardView.CreatePosition.Position).ApplyTargetTransform(card);
           }
           else
           {
-            layout.ApplyTargetTransform(card.transform);
+            layout.ApplyTargetTransform(card);
           }
           Cards[cardView.Id] = card;
         }
@@ -82,7 +82,7 @@ namespace Dreamcaller.Services
           if (card.CardView.DestroyPosition != null)
           {
             var layout = LayoutForPosition(card.CardView.DestroyPosition.Position);
-            layout.ApplyTargetTransform(card.transform, sequence);
+            layout.ApplyTargetTransform(card, sequence);
           }
         }
 

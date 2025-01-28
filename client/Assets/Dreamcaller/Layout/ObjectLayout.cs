@@ -1,6 +1,5 @@
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
@@ -58,40 +57,10 @@ namespace Dreamcaller.Layout
     /// destroyed for this layout. If a sequence applied, the transformation
     /// will be animated.
     /// </summary>
-    public virtual void ApplyTargetTransform(Transform target, Sequence? sequence = null)
+    public virtual void ApplyTargetTransform(Displayable target, Sequence? sequence = null)
     {
       var index = _objects.Count == 0 ? 0 : _objects.Count - 1;
-      var position = CalculateObjectPosition(index, _objects.Count);
-      if (sequence != null)
-      {
-        sequence.Insert(0, target.DOMove(position, TweenUtils.MoveAnimationDurationSeconds));
-      }
-      else
-      {
-        target.position = position;
-      }
-      if (CalculateObjectRotation(index, _objects.Count) is { } rotation)
-      {
-        if (sequence != null)
-        {
-          sequence.Insert(0, target.DOLocalRotate(rotation, TweenUtils.MoveAnimationDurationSeconds));
-        }
-        else
-        {
-          target.eulerAngles = rotation;
-        }
-      }
-      if (CalculateObjectScale(index, _objects.Count) is { } scale)
-      {
-        if (sequence != null)
-        {
-          sequence.Insert(0, target.DOScale(scale * Vector3.one, TweenUtils.MoveAnimationDurationSeconds));
-        }
-        else
-        {
-          target.localScale = scale * Vector3.one;
-        }
-      }
+      ApplyLayout(target, index, sequence);
     }
 
     /// <summary>
@@ -100,43 +69,9 @@ namespace Dreamcaller.Layout
     /// </summary>
     public void InsertAnimationSequence(Sequence sequence)
     {
-      const float duration = TweenUtils.MoveAnimationDurationSeconds;
-
       for (var i = 0; i < _objects.Count; ++i)
       {
-        var displayable = _objects[i];
-        var position = CalculateObjectPosition(i, _objects.Count);
-        var rotation = CalculateObjectRotation(i, _objects.Count);
-        var scale = CalculateObjectScale(i, _objects.Count) ?? displayable.DefaultScale;
-
-        if (displayable is ObjectLayout layout)
-        {
-          /// If this is a child layout, recursively animate its contained elements.
-          layout.transform.position = position;
-          if (rotation is { } r)
-          {
-            displayable.transform.localEulerAngles = r;
-          }
-          layout.transform.localScale = Vector3.one * scale;
-          layout.InsertAnimationSequence(sequence);
-          continue;
-        }
-
-        if (IsEquivalent(displayable, position, rotation, scale))
-        {
-          continue;
-        }
-
-        sequence.Insert(atPosition: 0, displayable.transform.DOMove(position, duration));
-
-        if (rotation is { } vector)
-        {
-          sequence.Insert(atPosition: 0,
-            displayable.transform.DOLocalRotate(vector, duration));
-        }
-
-        sequence.Insert(atPosition: 0,
-          displayable.transform.DOScale(Vector3.one * scale, duration));
+        ApplyLayout(_objects[i], i, sequence);
       }
     }
 
@@ -163,6 +98,69 @@ namespace Dreamcaller.Layout
     /// Note that this may be invoked with index=0, count=0 to compute initial
     /// object scales.
     protected virtual float? CalculateObjectScale(int index, int count) => null;
+
+    void ApplyLayout(Displayable displayable, int i, Sequence? sequence = null, bool applyToChildren = true)
+    {
+      const float duration = TweenUtils.MoveAnimationDurationSeconds;
+      var position = CalculateObjectPosition(i, _objects.Count);
+      var rotation = CalculateObjectRotation(i, _objects.Count);
+      var scale = CalculateObjectScale(i, _objects.Count) ?? displayable.DefaultScale;
+
+      if (applyToChildren && displayable is ObjectLayout layout)
+      {
+        /// If this is a child layout, recursively animate its contained
+        /// elements.
+        ApplyLayout(layout, i, sequence: null, applyToChildren: false);
+        if (sequence != null)
+        {
+          layout.InsertAnimationSequence(sequence);
+        }
+        else
+        {
+          foreach (var child in layout.Objects)
+          {
+            ApplyLayout(child, i);
+          }
+        }
+        return;
+      }
+
+      if (IsEquivalent(displayable, position, rotation, scale))
+      {
+        return;
+      }
+
+      if (sequence != null)
+      {
+        sequence.Insert(atPosition: 0, displayable.transform.DOMove(position, duration));
+      }
+      else
+      {
+        displayable.transform.position = position;
+      }
+
+      if (rotation is { } vector)
+      {
+        if (sequence != null)
+        {
+          sequence.Insert(atPosition: 0,
+            displayable.transform.DOLocalRotate(vector, duration));
+        }
+        else
+        {
+          displayable.transform.localEulerAngles = vector;
+        }
+      }
+
+      if (sequence != null)
+      {
+        sequence.Insert(atPosition: 0, displayable.transform.DOScale(Vector3.one * scale, duration));
+      }
+      else
+      {
+        displayable.transform.localScale = Vector3.one * scale;
+      }
+    }
 
     bool IsEquivalent(Displayable displayable, Vector3 position, Vector3? rotation, float scale)
     {
