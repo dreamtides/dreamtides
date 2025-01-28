@@ -289,6 +289,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _objects: []
+  _debugUpdateContinuously: 1
   _singleElementY: 0.5
 --- !u!114 &23340604
 MonoBehaviour:
@@ -6987,7 +6988,7 @@ Transform:
   m_GameObject: {fileID: 587309318}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -8, z: 18}
+  m_LocalPosition: {x: 0, y: -5, z: 12}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -7010,6 +7011,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _objects: []
+  _debugUpdateContinuously: 1
   _zRotationAddition: 0
   _zRotationMultiplier: 1
   _controlPoint1: {fileID: 1652450122}
@@ -10924,6 +10926,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _objects: []
+  _debugUpdateContinuously: 1
   _zRotationAddition: 0
   _zRotationMultiplier: 1
   _controlPoint1: {fileID: 0}
@@ -18334,6 +18337,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _objects: []
+  _debugUpdateContinuously: 1
   _singleElementY: 0.5
 --- !u!1 &1612766087
 GameObject:
@@ -23036,6 +23040,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _objects: []
+  _debugUpdateContinuously: 1
   _singleElementY: 0.5
 --- !u!114 &1965117211
 MonoBehaviour:

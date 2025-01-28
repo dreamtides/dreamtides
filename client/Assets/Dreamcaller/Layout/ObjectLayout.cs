@@ -15,6 +15,7 @@ namespace Dreamcaller.Layout
   public abstract class ObjectLayout : Displayable
   {
     [SerializeField] List<Displayable> _objects = new();
+    [SerializeField] bool _debugUpdateContinuously = false;
 
     /// <summary>The objects in this ObjectLayout</summary>
     public IReadOnlyList<Displayable> Objects => _objects.AsReadOnly();
@@ -98,6 +99,17 @@ namespace Dreamcaller.Layout
     /// Note that this may be invoked with index=0, count=0 to compute initial
     /// object scales.
     protected virtual float? CalculateObjectScale(int index, int count) => null;
+
+    void Update()
+    {
+      if (_debugUpdateContinuously)
+      {
+        for (var i = 0; i < _objects.Count; ++i)
+        {
+          ApplyLayout(_objects[i], i);
+        }
+      }
+    }
 
     void ApplyLayout(Displayable displayable, int i, Sequence? sequence = null, bool applyToChildren = true)
     {
