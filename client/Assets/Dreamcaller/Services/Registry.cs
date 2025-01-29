@@ -30,6 +30,9 @@ namespace Dreamcaller.Services
     [SerializeField] LayoutUpdateService? _layoutUpdateService;
     public LayoutUpdateService LayoutUpdateService => Check(_layoutUpdateService);
 
+    [SerializeField] ActionService? _actionService;
+    public ActionService ActionService => Check(_actionService);
+
     void Start()
     {
       foreach (var service in GetComponentsInChildren<Service>())

@@ -7,10 +7,12 @@ use display_data::request_data::{
 use engine::test_data;
 
 async fn connect(Json(req): Json<ConnectRequest>) -> Json<ConnectResponse> {
+    println!("Got connect request: {:?}", req);
     Json(test_data::connect(&req))
 }
 
 async fn perform_action(Json(req): Json<PerformActionRequest>) -> Json<PerformActionResponse> {
+    println!("Got perform action request: {:?}", req);
     Json(test_data::perform_action(&req))
 }
 
