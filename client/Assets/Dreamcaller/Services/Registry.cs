@@ -21,6 +21,12 @@ namespace Dreamcaller.Services
     [SerializeField] ObjectLayout? _enemyDeck;
     public ObjectLayout EnemyDeck => Check(_enemyDeck);
 
+    [SerializeField] ObjectLayout? _userBattlefield;
+    public ObjectLayout UserBattlefield => Check(_userBattlefield);
+
+    [SerializeField] ObjectLayout? _enemyBattlefield;
+    public ObjectLayout EnemyBattlefield => Check(_enemyBattlefield);
+
     [SerializeField] ObjectLayout? _offscreen;
     public ObjectLayout Offscreen => Check(_offscreen);
 

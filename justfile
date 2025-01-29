@@ -11,33 +11,11 @@ check-warnings:
 build:
     cargo build --manifest-path engine/Cargo.toml --all-targets --all-features
 
-run *args='':
-    pnpm run --prefix client tauri dev
-
-android:
-    pnpm run --prefix client tauri android dev
-
-ios:
-    pnpm run --prefix client tauri ios dev "iPhone SE (3rd generation)"
-
-bindings:
-    pnpm run --prefix client tauri dev -- -- --generate-bindings
-
-run-release:
-    pnpm run --prefix client tauri dev -- --release
-
-# To run under a rust debugger, *first* use this command and then start the rust binary
 dev:
-    pnpm run --prefix client dev
+    cargo run --manifest-path engine/Cargo.toml --bin "dev_server"
 
-# Need to create a keystore first via keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload -dname "CN=mydomain.com"
-apk:
-     pnpm --prefix client tauri android build --apk
-
-# Need to set devlopment team
-# Can literally just drag and drop the .ipa onto an iphone if it's set up properly
-ipa:
-    pnpm --prefix client tauri ios build
+watch:
+    cargo watch -C engine -x "run --bin dev_server"
 
 test:
     cargo test --manifest-path engine/Cargo.toml

@@ -67,6 +67,8 @@ namespace Dreamcaller.Services
       Registry.EnemyHand.InsertAnimationSequence(sequence);
       Registry.UserDeck.InsertAnimationSequence(sequence);
       Registry.EnemyDeck.InsertAnimationSequence(sequence);
+      Registry.UserBattlefield.InsertAnimationSequence(sequence);
+      Registry.EnemyBattlefield.InsertAnimationSequence(sequence);
       Registry.DrawnCardsPosition.InsertAnimationSequence(sequence);
     }
 
@@ -140,6 +142,16 @@ namespace Dreamcaller.Services
           DisplayPlayer.User => Registry.UserDeck,
           DisplayPlayer.Enemy => Registry.EnemyDeck,
           _ => throw Errors.UnknownEnumValue(inDeck),
+        };
+      }
+
+      if (position.PositionClass.OnBattlefield is { } onBattlefield)
+      {
+        return onBattlefield switch
+        {
+          DisplayPlayer.User => Registry.UserBattlefield,
+          DisplayPlayer.Enemy => Registry.EnemyBattlefield,
+          _ => throw Errors.UnknownEnumValue(onBattlefield),
         };
       }
 

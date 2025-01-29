@@ -26,18 +26,18 @@ pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
 fn get_scene(id: BattleId, scene: u32) -> CommandSequence {
     match scene {
         0 => CommandSequence::from_command(Command::UpdateBattle(scene_0(id))),
-        n if n <= 15 => CommandSequence::from_sequence(vec![
+        1 => CommandSequence::from_sequence(vec![
             Command::UpdateBattle(with_cards_in_position(
                 scene_0(id.clone()),
                 14,
-                n,
+                1,
                 Position::InHand(DisplayPlayer::User),
                 Position::Drawn,
             )),
             Command::UpdateBattle(with_cards_in_position(
                 scene_0(id),
                 14,
-                n,
+                1,
                 Position::InHand(DisplayPlayer::User),
                 Position::InHand(DisplayPlayer::User),
             )),
