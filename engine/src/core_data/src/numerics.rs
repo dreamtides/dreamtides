@@ -3,7 +3,6 @@ use derive_more::{
 };
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use specta::Type;
 
 /// A resource used to pay for cards & abilities.
 #[derive(
@@ -29,7 +28,6 @@ use specta::Type;
     Into,
     Serialize,
     Deserialize,
-    Type,
     JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
@@ -60,7 +58,6 @@ pub struct Energy(pub u32);
     Into,
     Serialize,
     Deserialize,
-    Type,
     JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
@@ -90,7 +87,6 @@ pub struct Spark(pub u32);
     Into,
     Serialize,
     Deserialize,
-    Type,
     JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]

@@ -1,12 +1,11 @@
 use core_data::numerics::Points;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use specta::Type;
 
 use crate::card_view::CardView;
 
 /// Represents the visual state of an ongoing dream battle
-#[derive(Clone, Debug, Serialize, Deserialize, Type, JsonSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct BattleView {
     /// Unique identifier for this dream battle
@@ -28,19 +27,19 @@ pub struct BattleView {
     pub controls: Vec<ControlView>,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, Type, JsonSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct ClientBattleId(pub String);
 
 /// User interaction options
-#[derive(Clone, Debug, Serialize, Deserialize, Type, JsonSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum ControlView {
     Button(ButtonView),
 }
 
 /// Button to perform some game action
-#[derive(Clone, Debug, Serialize, Deserialize, Type, JsonSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct ButtonView {
     pub label: String,
@@ -48,7 +47,7 @@ pub struct ButtonView {
 }
 
 /// Controls color for buttons
-#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Type, JsonSchema)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum ButtonKind {
     /// Emphasized button, primary game action
@@ -60,18 +59,7 @@ pub enum ButtonKind {
 
 /// Identifies a player in the context of the user interface.
 #[derive(
-    Clone,
-    Debug,
-    Eq,
-    PartialEq,
-    Copy,
-    Hash,
-    Ord,
-    PartialOrd,
-    Serialize,
-    Deserialize,
-    Type,
-    JsonSchema,
+    Clone, Debug, Eq, PartialEq, Copy, Hash, Ord, PartialOrd, Serialize, Deserialize, JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
 pub enum DisplayPlayer {
@@ -83,7 +71,7 @@ pub enum DisplayPlayer {
 }
 
 /// Represents the visual state of a player in a game
-#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Type, JsonSchema)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct PlayerView {
     /// Current score total

@@ -1,11 +1,10 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use specta::Type;
 
 use crate::battle_view::DisplayPlayer;
 
 /// Represents the position of some object in the UI
-#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Type, JsonSchema)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct ObjectPosition {
     /// Position category
@@ -24,18 +23,7 @@ impl Default for ObjectPosition {
 
 /// Possible types of display positions
 #[derive(
-    Copy,
-    Clone,
-    Debug,
-    Eq,
-    PartialEq,
-    Hash,
-    Serialize,
-    Deserialize,
-    Ord,
-    PartialOrd,
-    Type,
-    JsonSchema,
+    Copy, Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Ord, PartialOrd, JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
 pub enum Position {
