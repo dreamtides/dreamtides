@@ -12,6 +12,8 @@ bench = false
 
 [dependencies]
 core_data = { path = "../core_data" }
+display_data = { path = "../display_data" }
+engine = { path = "../engine" }
 plugin = { path = "../plugin" }
 
 axum = "0.8"

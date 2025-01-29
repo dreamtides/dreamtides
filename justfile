@@ -4,7 +4,6 @@ code-review: check-format build clippy test check-docs
 
 check:
     cargo check --manifest-path engine/Cargo.toml --workspace --all-targets --all-features
-    cargo check --manifest-path client/src-tauri/Cargo.toml --workspace --all-targets --all-features
 
 check-warnings:
     RUSTFLAGS="--deny warnings" cargo check --manifest-path engine/Cargo.toml --workspace --all-targets --all-features
@@ -149,10 +148,10 @@ machete:
 remove-unused-deps: machete
 
 internal-clean:
-  rm -rf src-tauri/target/debug
-  rm -rf src-tauri/target/release
-  rm -rf src-tauri/target/tmp
-  rm -rf src-tauri/target/release-with-debug
+  rm -rf engine/target/debug
+  rm -rf engine/target/release
+  rm -rf engine/target/tmp
+  rm -rf engine/target/release-with-debug
 
 clean: internal-clean
 

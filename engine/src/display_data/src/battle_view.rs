@@ -1,4 +1,5 @@
 use core_data::numerics::Points;
+use core_data::types::BattleId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -9,7 +10,7 @@ use crate::card_view::CardView;
 #[serde(rename_all = "camelCase")]
 pub struct BattleView {
     /// Unique identifier for this dream battle
-    pub id: ClientBattleId,
+    pub id: BattleId,
 
     /// Player who is operating the client
     pub user: PlayerView,
@@ -26,10 +27,6 @@ pub struct BattleView {
     /// User interaction options
     pub controls: Vec<ControlView>,
 }
-
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct ClientBattleId(pub String);
 
 /// User interaction options
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

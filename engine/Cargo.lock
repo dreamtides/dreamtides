@@ -264,6 +264,8 @@ version = "0.0.0"
 dependencies = [
  "axum",
  "core_data",
+ "display_data",
+ "engine",
  "plugin",
  "serde",
  "serde_json",
@@ -291,6 +293,15 @@ name = "encode_unicode"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "34aa73646ffb006b8f5147f3dc182bd4bcb190227ce861fc4a4844bf8e3cb2c0"
+
+[[package]]
+name = "engine"
+version = "0.0.0"
+dependencies = [
+ "core_data",
+ "display_data",
+ "uuid",
+]
 
 [[package]]
 name = "fnv"
@@ -338,6 +349,17 @@ dependencies = [
  "futures-task",
  "pin-project-lite",
  "pin-utils",
+]
+
+[[package]]
+name = "getrandom"
+version = "0.2.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c4567c8db10ae91089c99af84c68c38da3ec2f087c3f82960bcdbf3656b6f4d7"
+dependencies = [
+ "cfg-if",
+ "libc",
+ "wasi",
 ]
 
 [[package]]
@@ -604,8 +626,10 @@ dependencies = [
  "anyhow",
  "core_data",
  "display_data",
+ "engine",
  "serde",
  "serde_json",
+ "uuid",
 ]
 
 [[package]]
@@ -993,6 +1017,7 @@ version = "1.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b913a3b5fe84142e269d63cc62b64319ccaf89b748fc31fe025177f767a756c4"
 dependencies = [
+ "getrandom",
  "serde",
 ]
 

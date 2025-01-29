@@ -1,11 +1,29 @@
 use core_data::numerics::{Energy, Points, Spark};
-use core_data::types::{CardFacing, Url};
-use display_data::battle_view::{BattleView, ClientBattleId, DisplayPlayer, PlayerView};
+use core_data::types::{BattleId, CardFacing, Url};
+use display_data::battle_view::{BattleView, DisplayPlayer, PlayerView};
 use display_data::card_view::{CardFrame, CardView, ClientCardId, DisplayImage, RevealedCardView};
 use display_data::command::{Command, CommandSequence};
 use display_data::object_position::{ObjectPosition, Position};
+use display_data::request_data::{
+    ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse,
+};
+use uuid::Uuid;
 
-pub fn get_scene(id: ClientBattleId, scene: u32) -> CommandSequence {
+pub fn connect(request: &ConnectRequest) -> ConnectResponse {
+    ConnectResponse {
+        metadata: request.metadata.clone(),
+        commands: get_scene(BattleId(Uuid::new_v4()), 0),
+    }
+}
+
+pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
+    PerformActionResponse {
+        metadata: request.metadata.clone(),
+        commands: get_scene(BattleId(Uuid::new_v4()), request.number as u32),
+    }
+}
+
+fn get_scene(id: BattleId, scene: u32) -> CommandSequence {
     match scene {
         0 => CommandSequence::from_command(Command::UpdateBattle(scene_0(id))),
         n if n <= 15 => CommandSequence::from_sequence(vec![
@@ -52,7 +70,7 @@ fn move_to_position(mut view: BattleView, sorting_key: u32, position: Position) 
     view
 }
 
-fn scene_0(id: ClientBattleId) -> BattleView {
+fn scene_0(id: BattleId) -> BattleView {
     BattleView {
         id,
         user: PlayerView { score: Points(0), can_act: false },

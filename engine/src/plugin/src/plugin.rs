@@ -1,14 +1,10 @@
 #![allow(clippy::missing_safety_doc)] // You only live once, that's the motto - Drake
 
-pub mod test_data;
-
 use std::panic::{self, UnwindSafe};
 
 use anyhow::Result;
-use display_data::battle_view::ClientBattleId;
-use display_data::request_data::{
-    ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse,
-};
+use display_data::request_data::{ConnectRequest, PerformActionRequest};
+use engine::test_data;
 
 /// Synchronize the state of an ongoing game, downloading a full description of
 /// the game state.
@@ -40,9 +36,8 @@ unsafe fn connect_impl(
     let request_data = std::slice::from_raw_parts(request, request_length as usize);
     let deserialized_request = serde_json::from_slice::<ConnectRequest>(request_data)?;
     println!("connect: {:?}", deserialized_request.metadata.user_id);
-    let scene = test_data::get_scene(ClientBattleId("123".to_string()), 0);
-    let reply = ConnectResponse { metadata: deserialized_request.metadata, commands: scene };
-    let json = serde_json::to_string(&reply)?;
+    let scene = test_data::connect(&deserialized_request);
+    let json = serde_json::to_string(&scene)?;
     let json_bytes = json.as_bytes();
 
     if json_bytes.len() > response_length as usize {
@@ -83,10 +78,8 @@ unsafe fn perform_impl(
     let request_data = std::slice::from_raw_parts(request, request_length as usize);
     let deserialized_request = serde_json::from_slice::<PerformActionRequest>(request_data)?;
     println!("perform_action: {:?}", deserialized_request.metadata.user_id);
-    let scene =
-        test_data::get_scene(ClientBattleId("123".to_string()), deserialized_request.number as u32);
-    let reply = PerformActionResponse { metadata: deserialized_request.metadata, commands: scene };
-    let json = serde_json::to_string(&reply)?;
+    let scene = test_data::perform_action(&deserialized_request);
+    let json = serde_json::to_string(&scene)?;
     let json_bytes = json.as_bytes();
 
     if json_bytes.len() > response_length as usize {
