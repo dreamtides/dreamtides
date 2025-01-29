@@ -13,6 +13,7 @@ namespace Dreamcaller.Components
   public class Card : Displayable
   {
     [SerializeField] TextMeshPro _name = null!;
+    [SerializeField] TextMeshPro _rulesText = null!;
     [SerializeField] RectTransform _backingQuad = null!;
     Registry _registry = null!;
     CardView _cardView = null!;
@@ -24,6 +25,7 @@ namespace Dreamcaller.Components
       _registry = registry;
       _cardView = view;
       _name.text = view.Revealed?.Name;
+      _rulesText.text = view.Revealed?.RulesText;
     }
 
     public void TurnFaceDown(Sequence sequence)
@@ -34,11 +36,11 @@ namespace Dreamcaller.Components
     {
       if (newContext.IsBattlefieldContext())
       {
-        _backingQuad.localScale = new Vector3(2.5f, 3f, 1);
+        _backingQuad.localScale = new Vector3(2.25f, 2.75f, 1);
       }
       else
       {
-        _backingQuad.localScale = new Vector3(2.5f, 4f, 1);
+        _backingQuad.localScale = new Vector3(2.25f, 3.75f, 1);
       }
     }
   }
