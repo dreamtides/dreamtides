@@ -11,15 +11,8 @@ static class Plugin
 {
     const int BufferSize = 1_000_000;
 
-    public static CommandSequence Connect()
+    public static ConnectResponse Connect(ConnectRequest request)
     {
-        var request = new ConnectRequest
-        {
-            Metadata = new Metadata
-            {
-                UserId = Guid.NewGuid()
-            }
-        };
         var serialized = JsonConvert.SerializeObject(request, Converter.Settings);
         var encoded = Encoding.UTF8.GetBytes(serialized);
 
@@ -28,19 +21,11 @@ static class Plugin
             dreamcaller_connect(encoded, encoded.Length, response, BufferSize));
         var json = Encoding.UTF8.GetString(response, 0, responseLength);
         var deserialized = JsonConvert.DeserializeObject<ConnectResponse>(json, Converter.Settings);
-        return Errors.CheckNotNull(deserialized, "Error deserializing connect response").Commands;
+        return Errors.CheckNotNull(deserialized, "Error deserializing connect response");
     }
 
-    public static CommandSequence PerformAction(int scene)
+    public static PerformActionResponse PerformAction(PerformActionRequest request)
     {
-        var request = new PerformActionRequest
-        {
-            Metadata = new Metadata
-            {
-                UserId = Guid.NewGuid()
-            },
-            Number = scene
-        };
         var serialized = JsonConvert.SerializeObject(request, Converter.Settings);
         var encoded = Encoding.UTF8.GetBytes(serialized);
 
@@ -49,7 +34,7 @@ static class Plugin
             dreamcaller_perform_action(encoded, encoded.Length, response, BufferSize));
         var json = Encoding.UTF8.GetString(response, 0, responseLength);
         var deserialized = JsonConvert.DeserializeObject<PerformActionResponse>(json, Converter.Settings);
-        return Errors.CheckNotNull(deserialized, "Error deserializing action response").Commands;
+        return Errors.CheckNotNull(deserialized, "Error deserializing action response");
     }
 
 #if !UNITY_EDITOR && (UNITY_IOS || UNITY_WEBGL)

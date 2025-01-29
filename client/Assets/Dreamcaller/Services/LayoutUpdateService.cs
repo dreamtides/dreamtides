@@ -155,6 +155,16 @@ namespace Dreamcaller.Services
         };
       }
 
+      if (position.PositionClass.InVoid is { } inVoid)
+      {
+        return inVoid switch
+        {
+          DisplayPlayer.User => Registry.UserVoid,
+          DisplayPlayer.Enemy => Registry.EnemyVoid,
+          _ => throw Errors.UnknownEnumValue(inVoid),
+        };
+      }
+
       return Registry.Offscreen;
     }
   }

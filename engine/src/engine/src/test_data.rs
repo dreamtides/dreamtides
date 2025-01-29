@@ -42,7 +42,22 @@ fn get_scene(id: BattleId, scene: u32) -> CommandSequence {
                 Position::InHand(DisplayPlayer::User),
             )),
         ]),
-        _ => panic!("Invalid scene number"),
+        n => CommandSequence::from_sequence(vec![
+            Command::UpdateBattle(with_cards_in_position(
+                scene_0(id.clone()),
+                14,
+                n,
+                Position::InHand(DisplayPlayer::User),
+                Position::Drawn,
+            )),
+            Command::UpdateBattle(with_cards_in_position(
+                scene_0(id),
+                14,
+                n,
+                Position::InHand(DisplayPlayer::User),
+                Position::InHand(DisplayPlayer::User),
+            )),
+        ]),
     }
 }
 
@@ -80,6 +95,10 @@ fn scene_0(id: BattleId) -> BattleView {
             cards_in_position(Position::InHand(DisplayPlayer::User), 5, 3),
             cards_in_position(Position::InVoid(DisplayPlayer::User), 8, 6),
             cards_in_position(Position::InDeck(DisplayPlayer::User), 14, 20),
+            cards_in_position(Position::OnBattlefield(DisplayPlayer::Enemy), 100, 8),
+            cards_in_position(Position::InHand(DisplayPlayer::Enemy), 105, 3),
+            cards_in_position(Position::InVoid(DisplayPlayer::Enemy), 108, 6),
+            cards_in_position(Position::InDeck(DisplayPlayer::Enemy), 114, 20),
         ]
         .concat()
         .to_vec(),

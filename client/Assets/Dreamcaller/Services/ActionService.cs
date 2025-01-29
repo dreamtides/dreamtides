@@ -13,12 +13,28 @@ namespace Dreamcaller.Services
   {
     public void Connect(ConnectRequest request)
     {
-      StartCoroutine(ConnectCoroutine(request));
+      if (Application.isEditor)
+      {
+        StartCoroutine(ConnectCoroutine(request));
+      }
+      else
+      {
+        var response = Plugin.Connect(request);
+        StartCoroutine(ApplyCommands(response.Commands));
+      }
     }
 
     public void PerformAction(PerformActionRequest request)
     {
-      StartCoroutine(PerformActionCoroutine(request));
+      if (Application.isEditor)
+      {
+        StartCoroutine(PerformActionCoroutine(request));
+      }
+      else
+      {
+        var response = Plugin.PerformAction(request);
+        StartCoroutine(ApplyCommands(response.Commands));
+      }
     }
 
     private IEnumerator ConnectCoroutine(ConnectRequest request)
