@@ -2,10 +2,8 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using DG.Tweening;
 using Dreamcaller.Schema;
 using Dreamcaller.Services;
-using UnityEditor.Rendering;
 using UnityEngine;
 
 namespace Dreamcaller.Components

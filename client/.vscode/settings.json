@@ -1,4 +1,10 @@
 {
+    "workbench.colorCustomizations": {
+      "editorError.background": "#1A237E",
+      "activityBar.background": "#1565C0",
+      "titleBar.activeBackground": "#283593",
+      "titleBar.activeForeground": "#E3F2FD"
+    },
     "files.exclude": {
         "**/.DS_Store": true,
         "**/.git": true,
