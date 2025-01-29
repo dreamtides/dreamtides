@@ -22,7 +22,7 @@ namespace Dreamcaller.Components
 
     public void OnClick()
     {
-      var commands = Plugin.GetScene(_scene++);
+      var commands = Plugin.PerformAction(_scene++);
       StartCoroutine(ApplyCommands(commands));
     }
 

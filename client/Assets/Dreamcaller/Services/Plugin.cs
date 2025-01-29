@@ -1,8 +1,11 @@
 #nullable enable
 
+using System;
 using System.Runtime.InteropServices;
+using System.Text;
 using Dreamcaller.Schema;
 using Dreamcaller.Utils;
+using Newtonsoft.Json;
 
 static class Plugin
 {
@@ -10,18 +13,43 @@ static class Plugin
 
     public static CommandSequence Connect()
     {
+        var request = new ConnectRequest
+        {
+            Metadata = new Metadata
+            {
+                UserId = Guid.NewGuid()
+            }
+        };
+        var serialized = JsonConvert.SerializeObject(request, Converter.Settings);
+        var encoded = Encoding.UTF8.GetBytes(serialized);
+
         byte[] response = new byte[BufferSize];
-        int responseLength = Errors.CheckNonNegative(dreamcaller_connect(response, BufferSize));
-        var json = System.Text.Encoding.UTF8.GetString(response, 0, responseLength);
-        return CommandSequence.FromJson(json);
+        int responseLength = Errors.CheckNonNegative(
+            dreamcaller_connect(encoded, encoded.Length, response, BufferSize));
+        var json = Encoding.UTF8.GetString(response, 0, responseLength);
+        var deserialized = JsonConvert.DeserializeObject<ConnectResponse>(json, Converter.Settings);
+        return Errors.CheckNotNull(deserialized, "Error deserializing connect response").Commands;
     }
 
-    public static CommandSequence GetScene(int scene)
+    public static CommandSequence PerformAction(int scene)
     {
+        var request = new PerformActionRequest
+        {
+            Metadata = new Metadata
+            {
+                UserId = Guid.NewGuid()
+            },
+            Number = scene
+        };
+        var serialized = JsonConvert.SerializeObject(request, Converter.Settings);
+        var encoded = Encoding.UTF8.GetBytes(serialized);
+
         byte[] response = new byte[BufferSize];
-        int responseLength = Errors.CheckNonNegative(dreamcaller_get_scene(scene, response, BufferSize));
-        var json = System.Text.Encoding.UTF8.GetString(response, 0, responseLength);
-        return CommandSequence.FromJson(json);
+        int responseLength = Errors.CheckNonNegative(
+            dreamcaller_perform_action(encoded, encoded.Length, response, BufferSize));
+        var json = Encoding.UTF8.GetString(response, 0, responseLength);
+        var deserialized = JsonConvert.DeserializeObject<PerformActionResponse>(json, Converter.Settings);
+        return Errors.CheckNotNull(deserialized, "Error deserializing action response").Commands;
     }
 
 #if !UNITY_EDITOR && (UNITY_IOS || UNITY_WEBGL)
@@ -29,12 +57,20 @@ static class Plugin
 #else
     [DllImport("plugin")]
 #endif
-    public static extern int dreamcaller_connect([Out] byte[] response, int responseLength);
+    public static extern int dreamcaller_connect(
+      byte[] request,
+      int requestLength,
+      [Out] byte[] response,
+      int responseLength);
 
 #if !UNITY_EDITOR && (UNITY_IOS || UNITY_WEBGL)
     [DllImport("__Internal")]
 #else
     [DllImport("plugin")]
 #endif
-    public static extern int dreamcaller_get_scene(int scene, [Out] byte[] response, int responseLength);
+    public static extern int dreamcaller_perform_action(
+      byte[] request,
+      int requestLength,
+      [Out] byte[] response,
+      int responseLength);
 }

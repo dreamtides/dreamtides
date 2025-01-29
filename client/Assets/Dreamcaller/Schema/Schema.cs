@@ -4,7 +4,7 @@
 //
 //    using Dreamcaller.Schema;
 //
-//    var commandSequence = CommandSequence.FromJson(jsonString);
+//    var schemaTypes = SchemaTypes.FromJson(jsonString);
 
 namespace Dreamcaller.Schema
 {
@@ -14,6 +14,51 @@ namespace Dreamcaller.Schema
     using System.Globalization;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
+
+    public partial class SchemaTypes
+    {
+        [JsonProperty("connectRequest", Required = Required.Always)]
+        public ConnectRequest ConnectRequest { get; set; }
+
+        [JsonProperty("connectResponse", Required = Required.Always)]
+        public ConnectResponse ConnectResponse { get; set; }
+
+        [JsonProperty("performActionRequest", Required = Required.Always)]
+        public PerformActionRequest PerformActionRequest { get; set; }
+
+        [JsonProperty("performActionResponse", Required = Required.Always)]
+        public PerformActionResponse PerformActionResponse { get; set; }
+
+        [JsonProperty("pollRequest", Required = Required.Always)]
+        public PollRequest PollRequest { get; set; }
+
+        [JsonProperty("pollResponse", Required = Required.Always)]
+        public PollResponse PollResponse { get; set; }
+    }
+
+    public partial class ConnectRequest
+    {
+        [JsonProperty("metadata", Required = Required.Always)]
+        public Metadata Metadata { get; set; }
+    }
+
+    public partial class Metadata
+    {
+        [JsonProperty("battleId")]
+        public Guid? BattleId { get; set; }
+
+        [JsonProperty("userId", Required = Required.Always)]
+        public Guid UserId { get; set; }
+    }
+
+    public partial class ConnectResponse
+    {
+        [JsonProperty("commands", Required = Required.Always)]
+        public CommandSequence Commands { get; set; }
+
+        [JsonProperty("metadata", Required = Required.Always)]
+        public Metadata Metadata { get; set; }
+    }
 
     /// <summary>
     /// A list of [CommandGroup]s to execute sequentially.
@@ -340,6 +385,39 @@ namespace Dreamcaller.Schema
         public long Score { get; set; }
     }
 
+    public partial class PerformActionRequest
+    {
+        [JsonProperty("metadata", Required = Required.Always)]
+        public Metadata Metadata { get; set; }
+
+        [JsonProperty("number", Required = Required.Always)]
+        public long Number { get; set; }
+    }
+
+    public partial class PerformActionResponse
+    {
+        [JsonProperty("commands", Required = Required.Always)]
+        public CommandSequence Commands { get; set; }
+
+        [JsonProperty("metadata", Required = Required.Always)]
+        public Metadata Metadata { get; set; }
+    }
+
+    public partial class PollRequest
+    {
+        [JsonProperty("metadata", Required = Required.Always)]
+        public Metadata Metadata { get; set; }
+    }
+
+    public partial class PollResponse
+    {
+        [JsonProperty("commands", Required = Required.Always)]
+        public CommandSequence Commands { get; set; }
+
+        [JsonProperty("metadata", Required = Required.Always)]
+        public Metadata Metadata { get; set; }
+    }
+
     /// <summary>
     /// Face up/face down state for this card
     ///
@@ -408,14 +486,14 @@ namespace Dreamcaller.Schema
         public static implicit operator Position(PositionClass PositionClass) => new Position { PositionClass = PositionClass };
     }
 
-    public partial class CommandSequence
+    public partial class SchemaTypes
     {
-        public static CommandSequence FromJson(string json) => JsonConvert.DeserializeObject<CommandSequence>(json, Dreamcaller.Schema.Converter.Settings);
+        public static SchemaTypes FromJson(string json) => JsonConvert.DeserializeObject<SchemaTypes>(json, Dreamcaller.Schema.Converter.Settings);
     }
 
     public static class Serialize
     {
-        public static string ToJson(this CommandSequence self) => JsonConvert.SerializeObject(self, Dreamcaller.Schema.Converter.Settings);
+        public static string ToJson(this SchemaTypes self) => JsonConvert.SerializeObject(self, Dreamcaller.Schema.Converter.Settings);
     }
 
     internal static class Converter

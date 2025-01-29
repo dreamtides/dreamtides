@@ -1,18 +1,21 @@
 [package]
-name = "plugin"
+name = "dev_server"
 version = "0.0.0"
 edition = "2021"
 
-[lib]
-path = "src/plugin.rs"
+[[bin]]
+name = "dev_server"
+path = "src/dev_server.rs"
 test = false
 doctest = false
-crate-type = ["cdylib", "staticlib"]
+bench = false
 
 [dependencies]
 core_data = { path = "../core_data" }
-display_data = { path = "../display_data" }
+plugin = { path = "../plugin" }
 
-anyhow = "1"
+axum = "0.8"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+tower = "0.5"
