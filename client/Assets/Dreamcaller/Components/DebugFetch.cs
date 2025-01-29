@@ -15,6 +15,13 @@ namespace Dreamcaller.Components
     int _scene;
     [SerializeField] Registry _registry = null!;
 
+    IEnumerator Start()
+    {
+      yield return new WaitForSeconds(0.1f);
+      var commands = Plugin.Connect();
+      StartCoroutine(ApplyCommands(commands));
+    }
+
     public void OnClick()
     {
       var commands = Plugin.GetScene(_scene++);
