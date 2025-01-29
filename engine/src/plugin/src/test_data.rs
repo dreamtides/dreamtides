@@ -6,27 +6,48 @@ use display_data::command::{Command, CommandSequence};
 use display_data::object_position::{ObjectPosition, Position};
 
 pub fn get_scene(id: ClientBattleId, scene: u32) -> CommandSequence {
-    CommandSequence::from_command(Command::UpdateBattle(match scene {
-        0 => scene_0(id),
-        n if n <= 15 => draw_n_cards(scene_0(id), 14, n),
+    match scene {
+        0 => CommandSequence::from_command(Command::UpdateBattle(scene_0(id))),
+        n if n <= 15 => CommandSequence::from_sequence(vec![
+            Command::UpdateBattle(with_cards_in_position(
+                scene_0(id.clone()),
+                14,
+                n,
+                Position::InHand(DisplayPlayer::User),
+                Position::Drawn,
+            )),
+            Command::UpdateBattle(with_cards_in_position(
+                scene_0(id),
+                14,
+                n,
+                Position::InHand(DisplayPlayer::User),
+                Position::InHand(DisplayPlayer::User),
+            )),
+        ]),
         _ => panic!("Invalid scene number"),
-    }))
+    }
 }
 
-fn draw_n_cards(mut view: BattleView, start_key: u32, count: u32) -> BattleView {
+fn with_cards_in_position(
+    mut view: BattleView,
+    start_key: u32,
+    count: u32,
+    position: Position,
+    last_card_position: Position,
+) -> BattleView {
     for i in 0..count {
-        view = draw_card(view, start_key + i);
+        let pos = if i == count - 1 { last_card_position } else { position };
+        view = move_to_position(view, start_key + i, pos);
     }
     view
 }
 
-fn draw_card(mut view: BattleView, sorting_key: u32) -> BattleView {
+fn move_to_position(mut view: BattleView, sorting_key: u32, position: Position) -> BattleView {
     if let Some(found) = view.cards.iter_mut().find(|card| {
         matches!(card.position.position, Position::InDeck(DisplayPlayer::User))
             && card.position.sorting_key == sorting_key
     }) {
-        let new_position = Position::InHand(DisplayPlayer::User);
-        *found = card(new_position, sorting_key);
+        *found = card(position, sorting_key);
     }
     view
 }
@@ -50,7 +71,7 @@ fn scene_0(id: ClientBattleId) -> BattleView {
 }
 
 fn cards_in_position(position: Position, start_key: u32, count: u32) -> Vec<CardView> {
-    (0..count).map(|i| card(position.clone(), start_key + i)).collect()
+    (0..count).map(|i| card(position, start_key + i)).collect()
 }
 
 fn card(position: Position, sorting_key: u32) -> CardView {

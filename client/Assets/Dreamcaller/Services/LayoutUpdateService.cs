@@ -57,12 +57,17 @@ namespace Dreamcaller.Services
       {
         sequence.AppendCallback(() => DestroyCards(delete));
       }
+
       yield return sequence.WaitForCompletion();
     }
 
     void InsertAllLayoutAnimations(Sequence sequence)
     {
       Registry.UserHand.InsertAnimationSequence(sequence);
+      Registry.EnemyHand.InsertAnimationSequence(sequence);
+      Registry.UserDeck.InsertAnimationSequence(sequence);
+      Registry.EnemyDeck.InsertAnimationSequence(sequence);
+      Registry.DrawnCardsPosition.InsertAnimationSequence(sequence);
     }
 
     List<Card> InsertDeleteAnimations(Sequence sequence, HashSet<string> toDelete)
@@ -108,6 +113,16 @@ namespace Dreamcaller.Services
 
     ObjectLayout LayoutForPosition(Position position)
     {
+      if (position.Enum == PositionEnum.Drawn)
+      {
+        return Registry.DrawnCardsPosition;
+      }
+
+      if (position.PositionClass == null)
+      {
+        return Registry.Offscreen;
+      }
+
       if (position.PositionClass.InHand is { } inHand)
       {
         return inHand switch

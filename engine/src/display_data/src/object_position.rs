@@ -24,7 +24,18 @@ impl Default for ObjectPosition {
 
 /// Possible types of display positions
 #[derive(
-    Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Ord, PartialOrd, Type, JsonSchema,
+    Copy,
+    Clone,
+    Debug,
+    Eq,
+    PartialEq,
+    Hash,
+    Serialize,
+    Deserialize,
+    Ord,
+    PartialOrd,
+    Type,
+    JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
 pub enum Position {
@@ -41,6 +52,10 @@ pub enum Position {
 
     /// Object is on the stack
     OnStack,
+
+    /// Position for cards to be shown to the user immediately after they're
+    /// drawn.
+    Drawn,
 
     /// Object is in a player's hand
     InHand(DisplayPlayer),
@@ -67,9 +82,6 @@ pub enum Position {
     /// Object is being displayed in a list of cards available to select in a
     /// card selector.
     CardSelectionChoices,
-
-    /// Object has just been revealed to this viewer
-    Revealed,
 
     /// Object is in a temporary holding space for cards in hand while resolving
     /// some other 'play card' ability.

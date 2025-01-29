@@ -357,17 +357,17 @@ namespace Dreamcaller.Schema
     ///
     /// Object is on the stack
     ///
+    /// Position for cards to be shown to the user immediately after they're drawn.
+    ///
     /// Object is being displayed in a card browser, e.g. to select from a list of cards while
     /// searching
     ///
     /// Object is being displayed in a list of cards available to select in a card selector.
     ///
-    /// Object has just been revealed to this viewer
-    ///
     /// Object is in a temporary holding space for cards in hand while resolving some other 'play
     /// card' ability.
     /// </summary>
-    public enum PositionEnum { Browser, CardSelectionChoices, Default, HandStorage, Offscreen, OnStack, Played, Revealed };
+    public enum PositionEnum { Browser, CardSelectionChoices, Default, Drawn, HandStorage, Offscreen, OnStack, Played };
 
     /// <summary>
     /// Identifies a player in the context of the user interface.
@@ -498,6 +498,8 @@ namespace Dreamcaller.Schema
                             return new Position { Enum = PositionEnum.CardSelectionChoices };
                         case "default":
                             return new Position { Enum = PositionEnum.Default };
+                        case "drawn":
+                            return new Position { Enum = PositionEnum.Drawn };
                         case "handStorage":
                             return new Position { Enum = PositionEnum.HandStorage };
                         case "offscreen":
@@ -506,8 +508,6 @@ namespace Dreamcaller.Schema
                             return new Position { Enum = PositionEnum.OnStack };
                         case "played":
                             return new Position { Enum = PositionEnum.Played };
-                        case "revealed":
-                            return new Position { Enum = PositionEnum.Revealed };
                     }
                     break;
                 case JsonToken.StartObject:
@@ -533,6 +533,9 @@ namespace Dreamcaller.Schema
                     case PositionEnum.Default:
                         serializer.Serialize(writer, "default");
                         return;
+                    case PositionEnum.Drawn:
+                        serializer.Serialize(writer, "drawn");
+                        return;
                     case PositionEnum.HandStorage:
                         serializer.Serialize(writer, "handStorage");
                         return;
@@ -544,9 +547,6 @@ namespace Dreamcaller.Schema
                         return;
                     case PositionEnum.Played:
                         serializer.Serialize(writer, "played");
-                        return;
-                    case PositionEnum.Revealed:
-                        serializer.Serialize(writer, "revealed");
                         return;
                 }
             }
@@ -618,6 +618,8 @@ namespace Dreamcaller.Schema
                     return PositionEnum.CardSelectionChoices;
                 case "default":
                     return PositionEnum.Default;
+                case "drawn":
+                    return PositionEnum.Drawn;
                 case "handStorage":
                     return PositionEnum.HandStorage;
                 case "offscreen":
@@ -626,8 +628,6 @@ namespace Dreamcaller.Schema
                     return PositionEnum.OnStack;
                 case "played":
                     return PositionEnum.Played;
-                case "revealed":
-                    return PositionEnum.Revealed;
             }
             throw new Exception("Cannot unmarshal type PositionEnum");
         }
@@ -651,6 +651,9 @@ namespace Dreamcaller.Schema
                 case PositionEnum.Default:
                     serializer.Serialize(writer, "default");
                     return;
+                case PositionEnum.Drawn:
+                    serializer.Serialize(writer, "drawn");
+                    return;
                 case PositionEnum.HandStorage:
                     serializer.Serialize(writer, "handStorage");
                     return;
@@ -662,9 +665,6 @@ namespace Dreamcaller.Schema
                     return;
                 case PositionEnum.Played:
                     serializer.Serialize(writer, "played");
-                    return;
-                case PositionEnum.Revealed:
-                    serializer.Serialize(writer, "revealed");
                     return;
             }
             throw new Exception("Cannot marshal type PositionEnum");
