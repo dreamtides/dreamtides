@@ -20,7 +20,8 @@ namespace Dreamcaller.Layout
     protected override Vector3 CalculateObjectPosition(int index, int count)
     {
       var curvePosition = CalculateCurvePosition(index, count);
-      return CalculateBezierPosition(curvePosition);
+      var bezier = CalculateBezierPosition(curvePosition);
+      return new Vector3(bezier.x, bezier.y + index * 0.1f, bezier.z);
     }
 
     protected override Vector3? CalculateObjectRotation(int index, int count)
