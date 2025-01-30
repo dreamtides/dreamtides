@@ -48,6 +48,12 @@ namespace Dreamcaller.Services
     [SerializeField] ActionService? _actionService;
     public ActionService ActionService => Check(_actionService);
 
+    [SerializeField] InputService? _inputService;
+    public InputService InputService => Check(_inputService);
+
+    [SerializeField] DocumentService? _documentService;
+    public DocumentService DocumentService => Check(_documentService);
+
     void Start()
     {
       foreach (var service in GetComponentsInChildren<Service>())

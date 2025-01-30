@@ -29,6 +29,7 @@ namespace Dreamcaller.Components
 
     public void Render(Registry registry, CardView view, Sequence sequence)
     {
+      gameObject.name = view.Revealed?.Name ?? "Hidden Card";
       _registry = registry;
       _cardView = view;
       _name.text = view.Revealed?.Name;
@@ -59,6 +60,8 @@ namespace Dreamcaller.Components
     public void TurnFaceDown(Sequence sequence)
     {
     }
+
+    public override bool CanHandleMouseEvents() => true;
 
     protected override void OnSetGameContext(GameContext oldContext, GameContext newContext)
     {

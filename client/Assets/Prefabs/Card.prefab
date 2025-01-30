@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 3494541168115384546}
   - component: {fileID: 5054030132921160462}
   - component: {fileID: 3206588556960234031}
-  - component: {fileID: 8946090340040713197}
   m_Layer: 0
   m_Name: CardImage
   m_TagString: Untagged
@@ -87,28 +86,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &8946090340040713197
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 646147725960250711}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &4220822472325800156
 GameObject:
   m_ObjectHideFlags: 0
@@ -119,7 +96,7 @@ GameObject:
   m_Component:
   - component: {fileID: 238212233877956}
   - component: {fileID: 8215946370556705966}
-  - component: {fileID: 1158652254238298458}
+  - component: {fileID: 5680000531262599633}
   m_Layer: 0
   m_Name: Card
   m_TagString: Untagged
@@ -167,18 +144,27 @@ MonoBehaviour:
   _material3: {fileID: 2100000, guid: c5407b64d6da74596a69ec2df864a98b, type: 2}
   _material4: {fileID: 2100000, guid: ac5bb8f50b8ae489486baa65ada46f4b, type: 2}
   _material5: {fileID: 2100000, guid: 2b5e167b745a64c1a90ce5e3cdee23a8, type: 2}
---- !u!210 &1158652254238298458
-SortingGroup:
+--- !u!65 &5680000531262599633
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4220822472325800156}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_SortAtRoot: 0
+  serializedVersion: 3
+  m_Size: {x: 2.45, y: 3.75, z: 0.1}
+  m_Center: {x: 0, y: -0.37, z: 0}
 --- !u!1 &6248443762473009055
 GameObject:
   m_ObjectHideFlags: 0
@@ -366,7 +352,6 @@ GameObject:
   - component: {fileID: 7210915172796933044}
   - component: {fileID: 1940695636874803410}
   - component: {fileID: 3746803766052438884}
-  - component: {fileID: 1280233246273090456}
   m_Layer: 0
   m_Name: CardFrame
   m_TagString: Untagged
@@ -442,28 +427,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &1280233246273090456
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6379575600570551373}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &7836659392644693820
 GameObject:
   m_ObjectHideFlags: 0

@@ -34,6 +34,7 @@ namespace Dreamcaller.Layout
 
         displayable.Parent = this;
         _objects.Add(displayable);
+        SortObjects();
 
         displayable.GameContext = GameContext;
       }
@@ -50,6 +51,7 @@ namespace Dreamcaller.Layout
       {
         displayable.Parent = null;
         _objects.Remove(displayable);
+        SortObjects();
       }
     }
 
@@ -58,7 +60,7 @@ namespace Dreamcaller.Layout
     /// destroyed for this layout. If a sequence applied, the transformation
     /// will be animated.
     /// </summary>
-    public virtual void ApplyTargetTransform(Displayable target, Sequence? sequence = null)
+    public void ApplyTargetTransform(Displayable target, Sequence? sequence = null)
     {
       var index = _objects.Count == 0 ? 0 : _objects.Count - 1;
       ApplyLayout(target, index, sequence);
@@ -192,6 +194,11 @@ namespace Dreamcaller.Layout
       }
 
       return true;
+    }
+
+    void SortObjects()
+    {
+      _objects.Sort((a, b) => a.SortingKey.CompareTo(b.SortingKey));
     }
 
     Vector3 EulerAngleDistance(Vector3 a, Vector3 b) => new(

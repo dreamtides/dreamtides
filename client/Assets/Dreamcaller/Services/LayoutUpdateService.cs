@@ -67,6 +67,8 @@ namespace Dreamcaller.Services
       Registry.EnemyHand.InsertAnimationSequence(sequence);
       Registry.UserDeck.InsertAnimationSequence(sequence);
       Registry.EnemyDeck.InsertAnimationSequence(sequence);
+      Registry.UserVoid.InsertAnimationSequence(sequence);
+      Registry.EnemyVoid.InsertAnimationSequence(sequence);
       Registry.UserBattlefield.InsertAnimationSequence(sequence);
       Registry.EnemyBattlefield.InsertAnimationSequence(sequence);
       Registry.DrawnCardsPosition.InsertAnimationSequence(sequence);
