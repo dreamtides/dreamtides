@@ -9,6 +9,9 @@ namespace Dreamcaller.Services
 {
   public class Registry : MonoBehaviour
   {
+    [SerializeField] Camera? _mainCamera;
+    public Camera MainCamera => Check(_mainCamera);
+
     [SerializeField] ObjectLayout? _userHand;
     public ObjectLayout UserHand => Check(_userHand);
 

@@ -21,7 +21,10 @@ namespace Dreamcaller.Layout
     {
       var curvePosition = CalculateCurvePosition(index, count);
       var bezier = CalculateBezierPosition(curvePosition);
-      return new Vector3(bezier.x, bezier.y + index * 0.01f, bezier.z);
+      var offset = index * 0.01f;
+      var cameraPosition = Camera.main.transform.position;
+      var directionToCamera = (cameraPosition - bezier).normalized;
+      return bezier + directionToCamera * offset;
     }
 
     protected override Vector3? CalculateObjectRotation(int index, int count)
