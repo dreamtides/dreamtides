@@ -14,7 +14,7 @@ namespace Dreamcaller.Components
   {
     [SerializeField] TextMeshPro _name = null!;
     [SerializeField] TextMeshPro _rulesText = null!;
-    [SerializeField] RectTransform _backingQuad = null!;
+    [SerializeField] Transform _cardFrame = null!;
     Registry _registry = null!;
     CardView _cardView = null!;
 
@@ -36,11 +36,15 @@ namespace Dreamcaller.Components
     {
       if (newContext.IsBattlefieldContext())
       {
-        _backingQuad.localScale = new Vector3(2.25f, 2.75f, 1);
+        _cardFrame.gameObject.SetActive(false);
+        _name.gameObject.SetActive(false);
+        _rulesText.gameObject.SetActive(false);
       }
       else
       {
-        _backingQuad.localScale = new Vector3(2.25f, 3.75f, 1);
+        _cardFrame.gameObject.SetActive(true);
+        _name.gameObject.SetActive(true);
+        _rulesText.gameObject.SetActive(true);
       }
     }
   }
