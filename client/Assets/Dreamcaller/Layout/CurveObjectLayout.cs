@@ -21,7 +21,7 @@ namespace Dreamcaller.Layout
     {
       var curvePosition = CalculateCurvePosition(index, count);
       var bezier = CalculateBezierPosition(curvePosition);
-      var offset = index * 0.01f;
+      var offset = index * 0.05f;
       var cameraPosition = Camera.main.transform.position;
       var directionToCamera = (cameraPosition - bezier).normalized;
       return bezier + directionToCamera * offset;

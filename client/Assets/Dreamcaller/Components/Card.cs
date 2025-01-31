@@ -103,8 +103,6 @@ namespace Dreamcaller.Components
       }
     }
 
-    bool _ranLayoutForDrag = false;
-
     public override void MouseDrag()
     {
       var mousePosition = _registry.InputService.WorldMousePosition(_dragStartScreenZ);
@@ -116,11 +114,6 @@ namespace Dreamcaller.Components
 
       if (distanceDragged > 0.25f)
       {
-        if (!_ranLayoutForDrag)
-        {
-          _registry.LayoutUpdateService.RunAnimations();
-          _ranLayoutForDrag = true;
-        }
         _registry.CardService.ClearInfoZoom();
       }
 
@@ -134,7 +127,6 @@ namespace Dreamcaller.Components
     {
       _registry.LayoutUpdateService.AddToParent(this);
       _registry.LayoutUpdateService.RunAnimations();
-      _ranLayoutForDrag = false;
     }
 
     bool CanDrag() => CardView.Revealed?.CanDrag == true && _registry.CapabilitiesService.CanMoveCards();
