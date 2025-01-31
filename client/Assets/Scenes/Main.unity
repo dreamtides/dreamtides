@@ -6596,6 +6596,9 @@ GameObject:
   - component: {fileID: 613451855}
   - component: {fileID: 613451856}
   - component: {fileID: 613451857}
+  - component: {fileID: 613451860}
+  - component: {fileID: 613451859}
+  - component: {fileID: 613451858}
   m_Layer: 0
   m_Name: Registry
   m_TagString: Untagged
@@ -6658,6 +6661,9 @@ MonoBehaviour:
   _actionService: {fileID: 613451855}
   _inputService: {fileID: 613451856}
   _documentService: {fileID: 613451857}
+  _capabilitiesService: {fileID: 613451860}
+  _soundService: {fileID: 613451859}
+  _cardService: {fileID: 613451858}
 --- !u!114 &613451855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6693,6 +6699,43 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5d981dad50b5946f794bba330c67ceba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &613451858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 613451850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3901fd40070f3408795a94f8fac9bbf2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _playCardArea: {fileID: 0}
+--- !u!114 &613451859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 613451850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af789cc78014f4323b5d25b05bb49463, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &613451860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 613451850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5d43471501da4d0eb2b28cf20950f37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &614221582

@@ -13,13 +13,22 @@ namespace Dreamcaller.Services
   {
     readonly RaycastHit[] _raycastHitsTempBuffer = new RaycastHit[8];
     [SerializeField] Displayable? _lastClicked;
-    InputAction _clickAction;
-    InputAction _tapPositionAction;
+    InputAction _clickAction = null!;
+    InputAction _tapPositionAction = null!;
 
     void Start()
     {
       _clickAction = InputSystem.actions.FindAction("Click");
       _tapPositionAction = InputSystem.actions.FindAction("TapPosition");
+    }
+
+    public Vector2 TapPosition() => _tapPositionAction.ReadValue<Vector2>();
+
+    public Vector3 WorldMousePosition(float screenZ)
+    {
+      var tapScreenPosition = TapPosition();
+      return Registry.MainCamera.ScreenToWorldPoint(
+          new Vector3(tapScreenPosition.x, tapScreenPosition.y, screenZ));
     }
 
     void Update()
@@ -54,7 +63,6 @@ namespace Dreamcaller.Services
       }
 
       var fired = ObjectAtClickPosition();
-      Debug.Log($"Tapped: '{fired}'");
 
       if (fired && fired != null)
       {
@@ -66,7 +74,7 @@ namespace Dreamcaller.Services
 
     Displayable? ObjectAtClickPosition()
     {
-      var tapScreenPosition = _tapPositionAction.ReadValue<Vector2>();
+      var tapScreenPosition = TapPosition();
       var ray = Registry.MainCamera.ScreenPointToRay(tapScreenPosition);
       var hits = Physics.RaycastNonAlloc(ray, _raycastHitsTempBuffer, 100);
 

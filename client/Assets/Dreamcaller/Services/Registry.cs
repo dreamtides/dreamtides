@@ -54,6 +54,15 @@ namespace Dreamcaller.Services
     [SerializeField] DocumentService? _documentService;
     public DocumentService DocumentService => Check(_documentService);
 
+    [SerializeField] CapabilitiesService? _capabilitiesService;
+    public CapabilitiesService CapabilitiesService => Check(_capabilitiesService);
+
+    [SerializeField] SoundService? _soundService;
+    public SoundService SoundService => Check(_soundService);
+
+    [SerializeField] CardService? _cardService;
+    public CardService CardService => Check(_cardService);
+
     void Start()
     {
       foreach (var service in GetComponentsInChildren<Service>())

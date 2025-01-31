@@ -21,9 +21,15 @@ namespace Dreamcaller.Components
     [SerializeField] Material _material3 = null!;
     [SerializeField] Material _material4 = null!;
     [SerializeField] Material _material5 = null!;
+    [SerializeField] MeshRenderer _outline = null!;
 
     Registry _registry = null!;
     CardView _cardView = null!;
+    ObjectLayout? _previousParent;
+    Quaternion _initialDragRotation;
+    float _dragStartScreenZ;
+    Vector3 _dragStartPosition;
+    Vector3 _dragOffset;
 
     public CardView CardView => Errors.CheckNotNull(_cardView);
 
@@ -78,5 +84,57 @@ namespace Dreamcaller.Components
         _rulesText.gameObject.SetActive(true);
       }
     }
+
+    public override void MouseDown()
+    {
+      if (CanDrag())
+      {
+        _registry.SoundService.PlayCardSound();
+        GameContext = GameContext.Dragging;
+        _previousParent = Parent;
+        if (_previousParent)
+        {
+          _previousParent.RemoveIfPresent(this);
+        }
+        // _outline.gameObject.SetActive(false);
+        transform.position = new Vector3(transform.position.x, transform.position.y + 1, transform.position.z);
+        _initialDragRotation = transform.rotation;
+        _dragStartScreenZ = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
+        _dragStartPosition = _registry.InputService.WorldMousePosition(_dragStartScreenZ);
+        _dragOffset = gameObject.transform.position - _dragStartPosition;
+      }
+    }
+
+    public override void MouseDrag()
+    {
+      var mousePosition = _registry.InputService.WorldMousePosition(_dragStartScreenZ);
+      var distanceDragged = Vector2.Distance(mousePosition, _dragStartPosition);
+      var t = Mathf.Clamp01(distanceDragged / 5);
+      transform.position = _dragOffset + mousePosition;
+      //    var rotation = Quaternion.Slerp(_initialDragRotation, Quaternion.Euler(280, 0, 0), t);
+      //    transform.rotation = rotation;
+
+      if (distanceDragged > 0.25f)
+      {
+        _registry.CardService.ClearInfoZoom();
+      }
+
+      if (_registry.CardService.IsTouchOverPlayCardArea())
+      {
+        Debug.Log("IsTouchOverPlayCardArea");
+      }
+    }
+
+    public override void MouseUp()
+    {
+      if (_previousParent)
+      {
+        _previousParent.Add(this);
+        var sequence = TweenUtils.Sequence("ReturnToHand");
+        _previousParent.InsertAnimationSequence(sequence);
+      }
+    }
+
+    bool CanDrag() => CardView.Revealed?.CanDrag == true && _registry.CapabilitiesService.CanMoveCards();
   }
 }
