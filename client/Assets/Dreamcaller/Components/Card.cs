@@ -25,7 +25,6 @@ namespace Dreamcaller.Components
 
     Registry _registry = null!;
     CardView _cardView = null!;
-    ObjectLayout? _previousParent;
     Quaternion _initialDragRotation;
     float _dragStartScreenZ;
     Vector3 _dragStartPosition;
@@ -38,6 +37,7 @@ namespace Dreamcaller.Components
       gameObject.name = view.Revealed?.Name ?? "Hidden Card";
       _registry = registry;
       _cardView = view;
+      SortingKey = view.Position.SortingKey;
       _name.text = view.Revealed?.Name;
       _rulesText.text = view.Revealed?.RulesText;
 
@@ -91,13 +91,11 @@ namespace Dreamcaller.Components
       {
         _registry.SoundService.PlayCardSound();
         GameContext = GameContext.Dragging;
-        _previousParent = Parent;
-        if (_previousParent)
+        if (Parent)
         {
-          _previousParent.RemoveIfPresent(this);
+          Parent.RemoveIfPresent(this);
         }
         // _outline.gameObject.SetActive(false);
-        transform.position = new Vector3(transform.position.x, transform.position.y + 1, transform.position.z);
         _initialDragRotation = transform.rotation;
         _dragStartScreenZ = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
         _dragStartPosition = _registry.InputService.WorldMousePosition(_dragStartScreenZ);
@@ -105,17 +103,24 @@ namespace Dreamcaller.Components
       }
     }
 
+    bool _ranLayoutForDrag = false;
+
     public override void MouseDrag()
     {
       var mousePosition = _registry.InputService.WorldMousePosition(_dragStartScreenZ);
       var distanceDragged = Vector2.Distance(mousePosition, _dragStartPosition);
-      var t = Mathf.Clamp01(distanceDragged / 5);
+      var t = Mathf.Clamp01(distanceDragged / 2);
       transform.position = _dragOffset + mousePosition;
-      //    var rotation = Quaternion.Slerp(_initialDragRotation, Quaternion.Euler(280, 0, 0), t);
-      //    transform.rotation = rotation;
+      var rotation = Quaternion.Slerp(_initialDragRotation, Quaternion.Euler(Constants.CameraXAngle, 0, 0), t);
+      transform.rotation = rotation;
 
       if (distanceDragged > 0.25f)
       {
+        if (!_ranLayoutForDrag)
+        {
+          _registry.LayoutUpdateService.RunAnimations();
+          _ranLayoutForDrag = true;
+        }
         _registry.CardService.ClearInfoZoom();
       }
 
@@ -127,12 +132,9 @@ namespace Dreamcaller.Components
 
     public override void MouseUp()
     {
-      if (_previousParent)
-      {
-        _previousParent.Add(this);
-        var sequence = TweenUtils.Sequence("ReturnToHand");
-        _previousParent.InsertAnimationSequence(sequence);
-      }
+      _registry.LayoutUpdateService.AddToParent(this);
+      _registry.LayoutUpdateService.RunAnimations();
+      _ranLayoutForDrag = false;
     }
 
     bool CanDrag() => CardView.Revealed?.CanDrag == true && _registry.CapabilitiesService.CanMoveCards();

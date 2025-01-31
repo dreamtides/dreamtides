@@ -93,7 +93,7 @@ namespace Dreamcaller.Services
       return candidates
         .OrderBy(c => c.GameContext)
         .ThenBy(c => c.SortingKey)
-        .FirstOrDefault();
+        .LastOrDefault();
     }
   }
 }

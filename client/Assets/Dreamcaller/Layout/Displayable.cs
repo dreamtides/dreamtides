@@ -10,25 +10,15 @@ namespace Dreamcaller.Layout
   {
     GameContext _gameContext;
     ObjectLayout? _parent;
-    Renderer? _renderer;
-    SortingGroup? _sortingGroup;
-    int _sortingKey;
+    long _sortingKey;
 
     /// <summary>Order items within a sorting layer.</summary>
-    public int SortingKey
+    public long SortingKey
     {
       get => _sortingKey;
       set
       {
         _sortingKey = value;
-        if (_renderer)
-        {
-          _renderer.sortingOrder = value;
-        }
-        if (_sortingGroup)
-        {
-          _sortingGroup.sortingOrder = value;
-        }
       }
     }
 
@@ -42,8 +32,6 @@ namespace Dreamcaller.Layout
 
     protected void Start()
     {
-      _renderer = GetComponent<Renderer>();
-      _sortingGroup = GetComponent<SortingGroup>();
       OnStart();
     }
 
@@ -111,16 +99,6 @@ namespace Dreamcaller.Layout
 
         if (_gameContext != value)
         {
-          if (_renderer)
-          {
-            _renderer.sortingLayerID = value.SortingLayerId();
-          }
-
-          if (_sortingGroup)
-          {
-            _sortingGroup.sortingLayerID = value.SortingLayerId();
-          }
-
           var oldContext = _gameContext;
           _gameContext = value;
           OnSetGameContext(oldContext, value);

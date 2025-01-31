@@ -47,8 +47,8 @@ namespace Dreamcaller.Services
           Cards[cardView.Id] = card;
         }
 
-        layout.Add(card);
         card.Render(Registry, cardView, sequence);
+        layout.Add(card);
       }
 
       var delete = InsertDeleteAnimations(sequence, toDelete);
@@ -58,6 +58,30 @@ namespace Dreamcaller.Services
         sequence.AppendCallback(() => DestroyCards(delete));
       }
 
+      yield return sequence.WaitForCompletion();
+    }
+
+    /// <summary>
+    /// Runs all layout animations immediately
+    /// </summary>
+    public void RunAnimations()
+    {
+      StartCoroutine(RunAnimationsAsync());
+    }
+
+    /// <summary>
+    /// Adds a card to its correct parent layout
+    /// </summary>
+    public void AddToParent(Card card)
+    {
+      var layout = LayoutForPosition(card.CardView.Position.Position);
+      layout.Add(card);
+    }
+
+    IEnumerator RunAnimationsAsync()
+    {
+      var sequence = TweenUtils.Sequence("RunAnimations");
+      InsertAllLayoutAnimations(sequence);
       yield return sequence.WaitForCompletion();
     }
 
