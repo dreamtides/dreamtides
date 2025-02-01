@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::command::CommandSequence;
 
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Metadata {
     pub user_id: UserId,

@@ -11,7 +11,7 @@ use display_data::card_view::{CardFrame, CardView, DisplayImage, RevealedCardVie
 use display_data::command::{Command, CommandSequence};
 use display_data::object_position::{ObjectPosition, Position};
 use display_data::request_data::{
-    ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse,
+    ConnectRequest, ConnectResponse, Metadata, PerformActionRequest, PerformActionResponse,
 };
 use uuid::Uuid;
 
@@ -26,73 +26,44 @@ pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     }
 }
 
-pub fn perform_action2(request: &PerformActionRequest) -> PerformActionResponse {
+pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
     match request.action {
-        UserAction::DebugAction(action) => perform_debug_action(action),
-        UserAction::BattleAction(action) => perform_battle_action(action),
+        UserAction::DebugAction(action) => perform_debug_action(action, request.metadata),
+        UserAction::BattleAction(action) => perform_battle_action(action, request.metadata),
     }
 }
 
-fn perform_debug_action(action: DebugAction) -> PerformActionResponse {
+fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformActionResponse {
     match action {
-        DebugAction::DrawCard => {}
+        DebugAction::DrawCard => {
+            let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+            if let Some(deck_card) = battle
+                .cards
+                .iter()
+                .find(|c| matches!(c.position.position, Position::InDeck(DisplayPlayer::User)))
+            {
+                let card_id = deck_card.id;
+                let sorting_key = deck_card.position.sorting_key;
+                if let Some(card_index) = battle.cards.iter().position(|c| c.id == card_id) {
+                    battle.cards[card_index] =
+                        card(Position::InHand(DisplayPlayer::User), sorting_key);
+                }
+            }
+
+            *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+            PerformActionResponse {
+                metadata,
+                commands: CommandSequence::from_command(Command::UpdateBattle(battle)),
+            }
+        }
     }
-    todo!("")
 }
 
-fn perform_battle_action(action: BattleAction) -> PerformActionResponse {
+fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformActionResponse {
     match action {
         BattleAction::PlayCard(card_id) => {}
     }
     todo!("")
-}
-
-pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
-    let current_id = CURRENT_BATTLE
-        .lock()
-        .unwrap()
-        .as_ref()
-        .map(|b| b.id)
-        .unwrap_or_else(|| BattleId(Uuid::new_v4()));
-
-    let battle = match 1 {
-        n => with_cards_in_position(
-            scene_0(current_id),
-            14,
-            n as u32,
-            Position::InHand(DisplayPlayer::User),
-            Position::InHand(DisplayPlayer::User),
-        ),
-    };
-    *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
-    PerformActionResponse {
-        metadata: request.metadata.clone(),
-        commands: CommandSequence::from_command(Command::UpdateBattle(battle)),
-    }
-}
-
-fn with_cards_in_position(
-    mut view: BattleView,
-    start_key: u32,
-    count: u32,
-    position: Position,
-    last_card_position: Position,
-) -> BattleView {
-    for i in 0..count {
-        let pos = if i == count - 1 { last_card_position } else { position };
-        view = move_to_position(view, start_key + i, pos);
-    }
-    view
-}
-
-fn move_to_position(mut view: BattleView, sorting_key: u32, position: Position) -> BattleView {
-    if let Some(found) = view.cards.iter_mut().find(|card| {
-        matches!(card.position.position, Position::InDeck(DisplayPlayer::User))
-            && card.position.sorting_key == sorting_key
-    }) {
-        *found = card(position, sorting_key);
-    }
-    view
 }
 
 fn scene_0(id: BattleId) -> BattleView {
