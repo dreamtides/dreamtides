@@ -114,7 +114,7 @@ namespace Dreamcaller.Schema
         /// Unique identifier for this dream battle
         /// </summary>
         [JsonProperty("id", Required = Required.Always)]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// Describes the status of the game, e.g. which phase & step the game is in
@@ -304,6 +304,12 @@ namespace Dreamcaller.Schema
         /// </summary>
         [JsonProperty("rulesText", Required = Required.Always)]
         public string RulesText { get; set; }
+
+        /// <summary>
+        /// True if this card should display an outline to indicate it can be played.
+        /// </summary>
+        [JsonProperty("showOutline", Required = Required.Always)]
+        public bool ShowOutline { get; set; }
 
         /// <summary>
         /// Spark value for this card

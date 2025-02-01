@@ -86,6 +86,10 @@ pub struct RevealedCardView {
     /// The set of valid drag targets is set on the GameView. All draggable
     /// cards can be dragged to and reordered within any valid target.
     pub can_drag: bool,
+
+    /// True if this card should display an outline to indicate it can be
+    /// played.
+    pub show_outline: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

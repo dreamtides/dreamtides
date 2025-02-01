@@ -40,6 +40,7 @@ namespace Dreamcaller.Components
       SortingKey = view.Position.SortingKey;
       _name.text = view.Revealed?.Name;
       _rulesText.text = view.Revealed?.RulesText;
+      _outline.gameObject.SetActive(view.Revealed?.CanDrag == true);
 
       if (view.Revealed?.Image?.Image.Contains("1633431262") == true)
       {
@@ -95,7 +96,7 @@ namespace Dreamcaller.Components
         {
           Parent.RemoveIfPresent(this);
         }
-        // _outline.gameObject.SetActive(false);
+        _outline.gameObject.SetActive(false);
         _initialDragRotation = transform.rotation;
         _dragStartScreenZ = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
         _dragStartPosition = _registry.InputService.WorldMousePosition(_dragStartScreenZ);
@@ -127,6 +128,7 @@ namespace Dreamcaller.Components
     {
       _registry.LayoutUpdateService.AddToParent(this);
       _registry.LayoutUpdateService.RunAnimations();
+      _outline.gameObject.SetActive(CardView.Revealed?.CanDrag == true);
     }
 
     bool CanDrag() => CardView.Revealed?.CanDrag == true && _registry.CapabilitiesService.CanMoveCards();
