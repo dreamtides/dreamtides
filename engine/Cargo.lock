@@ -287,6 +287,7 @@ dependencies = [
 name = "display_data"
 version = "0.0.0"
 dependencies = [
+ "action_data",
  "core_data",
  "schemars",
  "serde",
@@ -308,6 +309,7 @@ checksum = "34aa73646ffb006b8f5147f3dc182bd4bcb190227ce861fc4a4844bf8e3cb2c0"
 name = "engine"
 version = "0.0.0"
 dependencies = [
+ "action_data",
  "core_data",
  "display_data",
  "uuid",

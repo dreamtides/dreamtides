@@ -10,7 +10,6 @@ namespace Dreamcaller.Components
 {
   public class DebugFetch : MonoBehaviour
   {
-    int _scene = 1;
     [SerializeField] Registry _registry = null!;
 
     IEnumerator Start()
@@ -34,7 +33,10 @@ namespace Dreamcaller.Components
         {
           UserId = Guid.NewGuid()
         },
-        Number = _scene++
+        Action = new UserAction
+        {
+          DebugAction = DebugAction.DrawCard
+        }
       };
       _registry.ActionService.PerformAction(request);
     }

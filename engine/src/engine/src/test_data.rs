@@ -1,5 +1,8 @@
 use std::sync::{LazyLock, Mutex};
 
+use action_data::battle_action::BattleAction;
+use action_data::debug_action::DebugAction;
+use action_data::user_action::UserAction;
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::{CardFacing, Url};
@@ -23,6 +26,27 @@ pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     }
 }
 
+pub fn perform_action2(request: &PerformActionRequest) -> PerformActionResponse {
+    match request.action {
+        UserAction::DebugAction(action) => perform_debug_action(action),
+        UserAction::BattleAction(action) => perform_battle_action(action),
+    }
+}
+
+fn perform_debug_action(action: DebugAction) -> PerformActionResponse {
+    match action {
+        DebugAction::DrawCard => {}
+    }
+    todo!("")
+}
+
+fn perform_battle_action(action: BattleAction) -> PerformActionResponse {
+    match action {
+        BattleAction::PlayCard(card_id) => {}
+    }
+    todo!("")
+}
+
 pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
     let current_id = CURRENT_BATTLE
         .lock()
@@ -31,7 +55,7 @@ pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
         .map(|b| b.id)
         .unwrap_or_else(|| BattleId(Uuid::new_v4()));
 
-    let battle = match request.number {
+    let battle = match 1 {
         n => with_cards_in_position(
             scene_0(current_id),
             14,

@@ -405,11 +405,32 @@ namespace Dreamcaller.Schema
 
     public partial class PerformActionRequest
     {
+        [JsonProperty("action", Required = Required.Always)]
+        public UserAction Action { get; set; }
+
         [JsonProperty("metadata", Required = Required.Always)]
         public Metadata Metadata { get; set; }
+    }
 
-        [JsonProperty("number", Required = Required.Always)]
-        public long Number { get; set; }
+    /// <summary>
+    /// All possible user interface actions
+    /// </summary>
+    public partial class UserAction
+    {
+        [JsonProperty("debugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DebugAction? DebugAction { get; set; }
+
+        [JsonProperty("battleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public BattleAction BattleAction { get; set; }
+    }
+
+    /// <summary>
+    /// An action that can be performed in a battle#
+    /// </summary>
+    public partial class BattleAction
+    {
+        [JsonProperty("playCard", Required = Required.Always)]
+        public CardId PlayCard { get; set; }
     }
 
     public partial class PerformActionResponse
@@ -491,6 +512,11 @@ namespace Dreamcaller.Schema
     public enum ButtonKind { Default, Primary };
 
     /// <summary>
+    /// Private actions for developer use
+    /// </summary>
+    public enum DebugAction { DrawCard };
+
+    /// <summary>
     /// Position category
     ///
     /// Possible types of display positions
@@ -529,6 +555,7 @@ namespace Dreamcaller.Schema
                 CardFrameConverter.Singleton,
                 RevealedCardStatusConverter.Singleton,
                 ButtonKindConverter.Singleton,
+                DebugActionConverter.Singleton,
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
         };
@@ -895,5 +922,39 @@ namespace Dreamcaller.Schema
         }
 
         public static readonly ButtonKindConverter Singleton = new ButtonKindConverter();
+    }
+
+    internal class DebugActionConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(DebugAction) || t == typeof(DebugAction?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            if (value == "drawCard")
+            {
+                return DebugAction.DrawCard;
+            }
+            throw new Exception("Cannot unmarshal type DebugAction");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (DebugAction)untypedValue;
+            if (value == DebugAction.DrawCard)
+            {
+                serializer.Serialize(writer, "drawCard");
+                return;
+            }
+            throw new Exception("Cannot marshal type DebugAction");
+        }
+
+        public static readonly DebugActionConverter Singleton = new DebugActionConverter();
     }
 }

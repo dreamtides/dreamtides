@@ -1,10 +1,11 @@
 use core_data::identifiers::CardId;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::user_action::UserAction;
 
-/// An action that can be performed in a battle
-#[derive(Debug, Clone, Serialize, Deserialize)]
+/// An action that can be performed in a battle#
+#[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum BattleAction {
     PlayCard(CardId),

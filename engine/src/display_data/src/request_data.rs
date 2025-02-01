@@ -1,3 +1,4 @@
+use action_data::user_action::UserAction;
 use core_data::identifiers::{BattleId, UserId};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -28,7 +29,7 @@ pub struct ConnectResponse {
 #[serde(rename_all = "camelCase")]
 pub struct PerformActionRequest {
     pub metadata: Metadata,
-    pub number: i32,
+    pub action: UserAction,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
