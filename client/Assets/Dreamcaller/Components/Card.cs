@@ -40,7 +40,7 @@ namespace Dreamcaller.Components
       SortingKey = view.Position.SortingKey;
       _name.text = view.Revealed?.Name;
       _rulesText.text = view.Revealed?.RulesText;
-      _outline.gameObject.SetActive(view.Revealed?.CanDrag == true);
+      _outline.gameObject.SetActive(CanPlay());
 
       if (view.Revealed?.Image?.Image.Contains("1633431262") == true)
       {
@@ -88,7 +88,7 @@ namespace Dreamcaller.Components
 
     public override void MouseDown()
     {
-      if (CanDrag())
+      if (CanPlay())
       {
         _registry.SoundService.PlayCardSound();
         GameContext = GameContext.Dragging;
@@ -117,20 +117,44 @@ namespace Dreamcaller.Components
       {
         _registry.CardService.ClearInfoZoom();
       }
-
-      if (_registry.CardService.IsTouchOverPlayCardArea())
-      {
-        Debug.Log("IsTouchOverPlayCardArea");
-      }
     }
 
     public override void MouseUp()
     {
-      _registry.LayoutUpdateService.AddToParent(this);
-      _registry.LayoutUpdateService.RunAnimations();
-      _outline.gameObject.SetActive(CardView.Revealed?.CanDrag == true);
+      _registry.SoundService.PlayCardSound();
+
+      if (ShouldReturnToPreviousParentOnRelease())
+      {
+        _registry.LayoutUpdateService.AddToParent(this);
+        _registry.LayoutUpdateService.RunAnimations(() =>
+        {
+          _outline.gameObject.SetActive(CanPlay());
+        });
+      }
+      else
+      {
+        var action = new UserAction
+        {
+          BattleAction = new BattleAction
+          {
+            PlayCard = CardView.Id
+          }
+        };
+
+        _registry.ActionService.PerformAction(action);
+      }
     }
 
-    bool CanDrag() => CardView.Revealed?.CanDrag == true && _registry.CapabilitiesService.CanMoveCards();
+    bool ShouldReturnToPreviousParentOnRelease()
+    {
+      if (!CanPlay())
+      {
+        return true;
+      }
+
+      return !_registry.CardService.IsTouchOverPlayCardArea();
+    }
+
+    bool CanPlay() => CardView.Revealed?.CanPlay == true && _registry.CapabilitiesService.CanMoveCards();
   }
 }

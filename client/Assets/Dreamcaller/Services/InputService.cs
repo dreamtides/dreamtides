@@ -12,7 +12,7 @@ namespace Dreamcaller.Services
   public class InputService : Service
   {
     readonly RaycastHit[] _raycastHitsTempBuffer = new RaycastHit[8];
-    [SerializeField] Displayable? _lastClicked;
+    Displayable? _lastClicked;
     InputAction _clickAction = null!;
     InputAction _tapPositionAction = null!;
 

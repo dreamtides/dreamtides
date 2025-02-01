@@ -65,6 +65,8 @@ namespace Dreamcaller.Services
 
     void Start()
     {
+      Application.targetFrameRate = 60;
+
       foreach (var service in GetComponentsInChildren<Service>())
       {
         service.Initialize(this);

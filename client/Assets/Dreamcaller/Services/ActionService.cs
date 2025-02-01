@@ -6,6 +6,7 @@ using Dreamcaller.Schema;
 using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
+using System;
 
 namespace Dreamcaller.Services
 {
@@ -15,7 +16,7 @@ namespace Dreamcaller.Services
     {
       if (Application.isEditor)
       {
-        StartCoroutine(ConnectCoroutine(request));
+        StartCoroutine(DevServerConnectCoroutine(request));
       }
       else
       {
@@ -24,11 +25,19 @@ namespace Dreamcaller.Services
       }
     }
 
-    public void PerformAction(PerformActionRequest request)
+    public void PerformAction(UserAction action)
     {
+      var request = new PerformActionRequest
+      {
+        Metadata = new Metadata
+        {
+          UserId = Guid.NewGuid()
+        },
+        Action = action
+      };
       if (Application.isEditor)
       {
-        StartCoroutine(PerformActionCoroutine(request));
+        StartCoroutine(PerformDevServerActionCoroutine(request));
       }
       else
       {
@@ -37,7 +46,7 @@ namespace Dreamcaller.Services
       }
     }
 
-    private IEnumerator ConnectCoroutine(ConnectRequest request)
+    private IEnumerator DevServerConnectCoroutine(ConnectRequest request)
     {
       yield return SendRequest<ConnectRequest, ConnectResponse>(
         request,
@@ -46,7 +55,7 @@ namespace Dreamcaller.Services
         response => ApplyCommands(response.Commands));
     }
 
-    private IEnumerator PerformActionCoroutine(PerformActionRequest request)
+    private IEnumerator PerformDevServerActionCoroutine(PerformActionRequest request)
     {
       yield return SendRequest<PerformActionRequest, PerformActionResponse>(
         request,

@@ -46,7 +46,7 @@ fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformActio
                 let sorting_key = deck_card.position.sorting_key;
                 if let Some(card_index) = battle.cards.iter().position(|c| c.id == card_id) {
                     battle.cards[card_index] =
-                        card(Position::InHand(DisplayPlayer::User), sorting_key);
+                        card_view(Position::InHand(DisplayPlayer::User), sorting_key);
                 }
             }
 
@@ -61,9 +61,23 @@ fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformActio
 
 fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformActionResponse {
     match action {
-        BattleAction::PlayCard(card_id) => {}
+        BattleAction::PlayCard(card_id) => {
+            let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+            if let Some((card_index, card)) =
+                battle.cards.iter().enumerate().find(|(_, c)| c.id == card_id)
+            {
+                let sorting_key = card.position.sorting_key;
+                battle.cards[card_index] =
+                    card_view(Position::OnBattlefield(DisplayPlayer::User), sorting_key);
+            }
+
+            *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+            PerformActionResponse {
+                metadata,
+                commands: CommandSequence::from_command(Command::UpdateBattle(battle)),
+            }
+        }
     }
-    todo!("")
 }
 
 fn scene_0(id: BattleId) -> BattleView {
@@ -89,10 +103,10 @@ fn scene_0(id: BattleId) -> BattleView {
 }
 
 fn cards_in_position(position: Position, start_key: u32, count: u32) -> Vec<CardView> {
-    (0..count).map(|i| card(position, start_key + i)).collect()
+    (0..count).map(|i| card_view(position, start_key + i)).collect()
 }
 
-fn card(position: Position, sorting_key: u32) -> CardView {
+fn card_view(position: Position, sorting_key: u32) -> CardView {
     if sorting_key % 5 == 0 {
         card1(position, sorting_key)
     } else if sorting_key % 5 == 1 {
@@ -125,8 +139,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
             name: "Titan of Forgotten Echoes".to_string(),
             rules_text: "When you materialize your second character in a turn, return this character from your void to play.".to_string(),
             status: None,
-            can_drag: position == Position::InHand(DisplayPlayer::User),
-            show_outline: position == Position::InHand(DisplayPlayer::User),
+            can_play: position == Position::InHand(DisplayPlayer::User),
             cost: Energy(6),
             spark: Some(Spark(4)),
             card_type: "Ancient".to_string(),
@@ -159,8 +172,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
             name: "Beacon of Tomorrow".to_string(),
             rules_text: "Discover a card with cost (2). (pick one of 4 cards with different types to put into your hand.)".to_string(),
             status: None,
-            can_drag: position == Position::InHand(DisplayPlayer::User),
-            show_outline: position == Position::InHand(DisplayPlayer::User),
+            can_play: position == Position::InHand(DisplayPlayer::User),
             cost: Energy(2),
             spark: None,
             card_type: "Event".to_string(),
@@ -193,8 +205,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
             name: "Scrap Reclaimer".to_string(),
             rules_text: "Judgment: Return this character from your void to your hand. Born from rust and resilience.".to_string(),
             status: None,
-            can_drag: position == Position::InHand(DisplayPlayer::User),
-            show_outline: position == Position::InHand(DisplayPlayer::User),
+            can_play: position == Position::InHand(DisplayPlayer::User),
             cost: Energy(4),
             spark: Some(Spark(0)),
             card_type: "Tinkerer".to_string(),
@@ -224,8 +235,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
             rules_text: "> Draw 2 cards. Discard 3 cards.\nPromises under a stormy sky."
                 .to_string(),
             status: None,
-            can_drag: position == Position::InHand(DisplayPlayer::User),
-            show_outline: position == Position::InHand(DisplayPlayer::User),
+            can_play: position == Position::InHand(DisplayPlayer::User),
             cost: Energy(2),
             spark: Some(Spark(0)),
             card_type: "Trooper".to_string(),
@@ -254,8 +264,7 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
             name: "Moonlit Voyage".to_string(),
             rules_text: "Draw 2 cards. Discard 2 cards.\nReclaim".to_string(),
             status: None,
-            can_drag: position == Position::InHand(DisplayPlayer::User),
-            show_outline: position == Position::InHand(DisplayPlayer::User),
+            can_play: position == Position::InHand(DisplayPlayer::User),
             cost: Energy(2),
             spark: None,
             card_type: "Event".to_string(),

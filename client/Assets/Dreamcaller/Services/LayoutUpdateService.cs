@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,9 +67,9 @@ namespace Dreamcaller.Services
     /// <summary>
     /// Runs all layout animations immediately
     /// </summary>
-    public void RunAnimations()
+    public void RunAnimations(Action? onComplete = null)
     {
-      StartCoroutine(RunAnimationsAsync());
+      StartCoroutine(RunAnimationsAsync(onComplete));
     }
 
     /// <summary>
@@ -80,11 +81,12 @@ namespace Dreamcaller.Services
       layout.Add(card);
     }
 
-    IEnumerator RunAnimationsAsync()
+    IEnumerator RunAnimationsAsync(Action? onComplete = null)
     {
       var sequence = TweenUtils.Sequence("RunAnimations");
       InsertAllLayoutAnimations(sequence);
       yield return sequence.WaitForCompletion();
+      onComplete?.Invoke();
     }
 
     void InsertAllLayoutAnimations(Sequence sequence)

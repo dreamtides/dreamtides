@@ -7,7 +7,7 @@ namespace Dreamcaller.Services
   public class CardService : Service
   {
     readonly RaycastHit[] _raycastHitsTempBuffer = new RaycastHit[8];
-    [SerializeField] BoxCollider _playCardArea = null!;
+    [SerializeField] MeshCollider _playCardArea = null!;
 
     public bool IsTouchOverPlayCardArea()
     {

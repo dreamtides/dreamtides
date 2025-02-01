@@ -27,18 +27,10 @@ namespace Dreamcaller.Components
 
     public void OnClick()
     {
-      var request = new PerformActionRequest
+      _registry.ActionService.PerformAction(new UserAction
       {
-        Metadata = new Metadata
-        {
-          UserId = Guid.NewGuid()
-        },
-        Action = new UserAction
-        {
-          DebugAction = DebugAction.DrawCard
-        }
-      };
-      _registry.ActionService.PerformAction(request);
+        DebugAction = DebugAction.DrawCard
+      });
     }
   }
 }

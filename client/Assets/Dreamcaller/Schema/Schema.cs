@@ -267,13 +267,10 @@ namespace Dreamcaller.Schema
     public partial class RevealedCardView
     {
         /// <summary>
-        /// True if this card can be dragged by the player.
-        ///
-        /// The set of valid drag targets is set on the GameView. All draggable cards can be dragged
-        /// to and reordered within any valid target.
+        /// True if this card can currently be played.
         /// </summary>
-        [JsonProperty("canDrag", Required = Required.Always)]
-        public bool CanDrag { get; set; }
+        [JsonProperty("canPlay", Required = Required.Always)]
+        public bool CanPlay { get; set; }
 
         /// <summary>
         /// Type or subtype of this card
@@ -316,12 +313,6 @@ namespace Dreamcaller.Schema
         /// </summary>
         [JsonProperty("rulesText", Required = Required.Always)]
         public string RulesText { get; set; }
-
-        /// <summary>
-        /// True if this card should display an outline to indicate it can be played.
-        /// </summary>
-        [JsonProperty("showOutline", Required = Required.Always)]
-        public bool ShowOutline { get; set; }
 
         /// <summary>
         /// Spark value for this card
