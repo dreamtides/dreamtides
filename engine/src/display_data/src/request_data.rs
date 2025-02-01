@@ -1,4 +1,4 @@
-use core_data::types::{BattleId, UserId};
+use core_data::identifiers::{BattleId, UserId};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 

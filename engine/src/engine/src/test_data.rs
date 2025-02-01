@@ -1,7 +1,10 @@
+use std::sync::{LazyLock, Mutex};
+
+use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
-use core_data::types::{BattleId, CardFacing, Url};
+use core_data::types::{CardFacing, Url};
 use display_data::battle_view::{BattleView, DisplayPlayer, PlayerView};
-use display_data::card_view::{CardFrame, CardView, ClientCardId, DisplayImage, RevealedCardView};
+use display_data::card_view::{CardFrame, CardView, DisplayImage, RevealedCardView};
 use display_data::command::{Command, CommandSequence};
 use display_data::object_position::{ObjectPosition, Position};
 use display_data::request_data::{
@@ -9,55 +12,38 @@ use display_data::request_data::{
 };
 use uuid::Uuid;
 
+static CURRENT_BATTLE: LazyLock<Mutex<Option<BattleView>>> = LazyLock::new(|| Mutex::new(None));
+
 pub fn connect(request: &ConnectRequest) -> ConnectResponse {
+    let battle = scene_0(BattleId(Uuid::new_v4()));
+    *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
     ConnectResponse {
         metadata: request.metadata.clone(),
-        commands: get_scene(BattleId(Uuid::new_v4()), 0),
+        commands: CommandSequence::from_command(Command::UpdateBattle(battle)),
     }
 }
 
 pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
+    let current_id = CURRENT_BATTLE
+        .lock()
+        .unwrap()
+        .as_ref()
+        .map(|b| b.id)
+        .unwrap_or_else(|| BattleId(Uuid::new_v4()));
+
+    let battle = match request.number {
+        n => with_cards_in_position(
+            scene_0(current_id),
+            14,
+            n as u32,
+            Position::InHand(DisplayPlayer::User),
+            Position::InHand(DisplayPlayer::User),
+        ),
+    };
+    *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
     PerformActionResponse {
         metadata: request.metadata.clone(),
-        commands: get_scene(BattleId(Uuid::new_v4()), request.number as u32),
-    }
-}
-
-fn get_scene(id: BattleId, scene: u32) -> CommandSequence {
-    match scene {
-        0 => CommandSequence::from_command(Command::UpdateBattle(scene_0(id))),
-        1 => CommandSequence::from_sequence(vec![
-            Command::UpdateBattle(with_cards_in_position(
-                scene_0(id.clone()),
-                14,
-                1,
-                Position::InHand(DisplayPlayer::User),
-                Position::Drawn,
-            )),
-            Command::UpdateBattle(with_cards_in_position(
-                scene_0(id),
-                14,
-                1,
-                Position::InHand(DisplayPlayer::User),
-                Position::InHand(DisplayPlayer::User),
-            )),
-        ]),
-        n => CommandSequence::from_sequence(vec![
-            Command::UpdateBattle(with_cards_in_position(
-                scene_0(id.clone()),
-                14,
-                n,
-                Position::InHand(DisplayPlayer::User),
-                Position::Drawn,
-            )),
-            Command::UpdateBattle(with_cards_in_position(
-                scene_0(id),
-                14,
-                n,
-                Position::InHand(DisplayPlayer::User),
-                Position::InHand(DisplayPlayer::User),
-            )),
-        ]),
+        commands: CommandSequence::from_command(Command::UpdateBattle(battle)),
     }
 }
 
@@ -128,7 +114,7 @@ fn card(position: Position, sorting_key: u32) -> CardView {
 fn card1(position: Position, sorting_key: u32) -> CardView {
     let revealed = position != Position::InDeck(DisplayPlayer::User);
     CardView {
-        id: ClientCardId(format!("#{}", sorting_key)),
+        id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition {
             position,
             sorting_key,
@@ -162,7 +148,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
 fn card2(position: Position, sorting_key: u32) -> CardView {
     let revealed = position != Position::InDeck(DisplayPlayer::User);
     CardView {
-        id: ClientCardId(format!("#{}", sorting_key)),
+        id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition {
             position,
             sorting_key,
@@ -196,7 +182,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
 fn card3(position: Position, sorting_key: u32) -> CardView {
     let revealed = position != Position::InDeck(DisplayPlayer::User);
     CardView {
-        id: ClientCardId(format!("#{}", sorting_key)),
+        id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition {
             position,
             sorting_key,
@@ -230,7 +216,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
 fn card4(position: Position, sorting_key: u32) -> CardView {
     let revealed = position != Position::InDeck(DisplayPlayer::User);
     CardView {
-        id: ClientCardId(format!("#{}", sorting_key)),
+        id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         card_back: Url("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
@@ -261,7 +247,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
 fn card5(position: Position, sorting_key: u32) -> CardView {
     let revealed = position != Position::InDeck(DisplayPlayer::User);
     CardView {
-        id: ClientCardId(format!("#{}", sorting_key)),
+        id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         card_back: Url("".to_string()),
         revealed: revealed.then_some(RevealedCardView {

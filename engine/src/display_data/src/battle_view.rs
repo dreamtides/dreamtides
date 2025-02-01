@@ -1,5 +1,5 @@
+use core_data::identifiers::BattleId;
 use core_data::numerics::Points;
-use core_data::types::BattleId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 

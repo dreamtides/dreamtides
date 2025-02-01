@@ -167,7 +167,7 @@ namespace Dreamcaller.Schema
         /// Identifier for this card
         /// </summary>
         [JsonProperty("id", Required = Required.Always)]
-        public string Id { get; set; }
+        public CardId Id { get; set; }
 
         /// <summary>
         /// Position of this card in the UI
@@ -247,6 +247,18 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("onBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? OnBattlefield { get; set; }
+    }
+
+    /// <summary>
+    /// Identifier for this card
+    /// </summary>
+    public partial class CardId
+    {
+        [JsonProperty("idx", Required = Required.Always)]
+        public long Idx { get; set; }
+
+        [JsonProperty("version", Required = Required.Always)]
+        public long Version { get; set; }
     }
 
     /// <summary>

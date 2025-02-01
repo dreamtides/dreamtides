@@ -19,6 +19,7 @@ async fn perform_action(Json(req): Json<PerformActionRequest>) -> Json<PerformAc
 #[tokio::main]
 async fn main() {
     println!("Starting server on port 26598");
+
     let app = Router::new()
         .route("/connect", get(connect))
         .route("/perform_action", post(perform_action));

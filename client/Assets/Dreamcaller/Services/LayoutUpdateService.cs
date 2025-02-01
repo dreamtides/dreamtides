@@ -8,6 +8,8 @@ using Dreamcaller.Components;
 using Dreamcaller.Layout;
 using Dreamcaller.Schema;
 using Dreamcaller.Utils;
+using Mono.Cecil.Cil;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Dreamcaller.Services
@@ -26,12 +28,13 @@ namespace Dreamcaller.Services
 
       foreach (var cardView in view.Cards)
       {
-        toDelete.Remove(cardView.Id);
+        var cardId = SerializeCardId(cardView.Id);
+        toDelete.Remove(cardId);
         var layout = LayoutForPosition(cardView.Position.Position);
         Card card;
-        if (Cards.ContainsKey(cardView.Id))
+        if (Cards.ContainsKey(cardId))
         {
-          card = Cards[cardView.Id];
+          card = Cards[cardId];
         }
         else
         {
@@ -44,7 +47,7 @@ namespace Dreamcaller.Services
           {
             layout.ApplyTargetTransform(card);
           }
-          Cards[cardView.Id] = card;
+          Cards[cardId] = card;
         }
 
         card.Render(Registry, cardView, sequence);
@@ -192,6 +195,11 @@ namespace Dreamcaller.Services
       }
 
       return Registry.Offscreen;
+    }
+
+    string SerializeCardId(CardId id)
+    {
+      return JsonConvert.SerializeObject(id, Converter.Settings);
     }
   }
 }

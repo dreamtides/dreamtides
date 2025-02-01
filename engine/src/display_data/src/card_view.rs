@@ -1,3 +1,4 @@
+use core_data::identifiers::CardId;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::{CardFacing, Url};
 use schemars::JsonSchema;
@@ -10,7 +11,7 @@ use crate::object_position::ObjectPosition;
 #[serde(rename_all = "camelCase")]
 pub struct CardView {
     /// Identifier for this card
-    pub id: ClientCardId,
+    pub id: CardId,
 
     /// Position of this card in the UI
     pub position: ObjectPosition,
@@ -40,15 +41,6 @@ pub struct CardView {
     /// destroyed.
     pub destroy_position: Option<ObjectPosition>,
 }
-
-/// Identifies a card in client code
-///
-/// Client-opaque serialized value.
-#[derive(
-    Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ClientCardId(pub String);
 
 /// Visual state of a revealed card
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
