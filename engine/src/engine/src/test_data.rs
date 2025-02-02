@@ -21,7 +21,7 @@ pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     let battle = scene_0(BattleId(Uuid::new_v4()));
     *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
     ConnectResponse {
-        metadata: request.metadata.clone(),
+        metadata: request.metadata,
         commands: CommandSequence::from_command(Command::UpdateBattle(battle)),
     }
 }
