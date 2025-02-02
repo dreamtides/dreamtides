@@ -45,8 +45,21 @@ fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformActio
                 let card_id = deck_card.id;
                 let sorting_key = deck_card.position.sorting_key;
                 if let Some(card_index) = battle.cards.iter().position(|c| c.id == card_id) {
+                    let mut shown_drawn = battle.clone();
+                    shown_drawn.cards[card_index] = card_view(Position::Drawn, sorting_key);
                     battle.cards[card_index] =
                         card_view(Position::InHand(DisplayPlayer::User), sorting_key);
+
+                    *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+
+                    // Return both updates in sequence
+                    return PerformActionResponse {
+                        metadata,
+                        commands: CommandSequence::from_sequence(vec![
+                            Command::UpdateBattle(shown_drawn),
+                            Command::UpdateBattle(battle),
+                        ]),
+                    };
                 }
             }
 

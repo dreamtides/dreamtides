@@ -61,13 +61,16 @@ namespace Dreamcaller.Services
         if (sequence != null)
         {
           sequence.AppendCallback(() => DestroyCards(delete));
-          yield return sequence.WaitForCompletion();
         }
         else
         {
           DestroyCards(delete);
-          yield break;
         }
+      }
+
+      if (sequence != null)
+      {
+        yield return sequence.WaitForCompletion();
       }
     }
 

@@ -26,12 +26,12 @@ namespace Dreamcaller.Services
       };
       if (Application.isEditor)
       {
-        StartCoroutine(DevServerConnectCoroutine(request));
+        StartCoroutine(DevServerConnectAsync(request));
       }
       else
       {
         var response = Plugin.Connect(request);
-        StartCoroutine(ApplyCommands(response.Commands));
+        StartCoroutine(ApplyCommands(response.Commands, animate: false));
       }
     }
 
@@ -45,34 +45,33 @@ namespace Dreamcaller.Services
         },
         Action = action
       };
-      var sequence = TweenUtils.Sequence("PerformAction");
       if (Application.isEditor)
       {
-        StartCoroutine(PerformDevServerActionCoroutine(request, sequence));
+        StartCoroutine(PerformDevServerActionAsync(request));
       }
       else
       {
         var response = Plugin.PerformAction(request);
-        StartCoroutine(ApplyCommands(response.Commands, sequence));
+        StartCoroutine(ApplyCommands(response.Commands, animate: true));
       }
     }
 
-    private IEnumerator DevServerConnectCoroutine(ConnectRequest request)
+    private IEnumerator DevServerConnectAsync(ConnectRequest request)
     {
       yield return SendRequest<ConnectRequest, ConnectResponse>(
         request,
         "connect",
         UnityWebRequest.kHttpVerbGET,
-        response => ApplyCommands(response.Commands));
+        response => ApplyCommands(response.Commands, animate: false));
     }
 
-    private IEnumerator PerformDevServerActionCoroutine(PerformActionRequest request, Sequence? sequence = null)
+    private IEnumerator PerformDevServerActionAsync(PerformActionRequest request)
     {
       yield return SendRequest<PerformActionRequest, PerformActionResponse>(
         request,
         "perform_action",
         UnityWebRequest.kHttpVerbPOST,
-        response => ApplyCommands(response.Commands, sequence));
+        response => ApplyCommands(response.Commands, animate: true));
     }
 
     private IEnumerator SendRequest<TRequest, TResponse>(
@@ -106,17 +105,20 @@ namespace Dreamcaller.Services
       }
     }
 
-    IEnumerator ApplyCommands(CommandSequence commands, Sequence? sequence = null)
+    IEnumerator ApplyCommands(CommandSequence commands, bool animate)
     {
+      Debug.Log($"Applying commands with groups {commands.Groups.Count}");
       foreach (var group in commands.Groups)
       {
-        yield return ApplyGroup(group);
+        yield return ApplyGroup(group, animate);
       }
     }
 
-    IEnumerator ApplyGroup(CommandGroup group, Sequence? sequence = null)
+    IEnumerator ApplyGroup(CommandGroup group, bool animate)
     {
+      Debug.Log($"Applying group with commands {group.Commands.Count}");
       var coroutines = new List<Coroutine>();
+      var sequence = animate ? TweenUtils.Sequence("ApplyGroup") : null;
       foreach (var command in group.Commands)
       {
         if (command.UpdateBattle != null)
