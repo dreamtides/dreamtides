@@ -80,17 +80,13 @@ namespace Dreamcaller.Components
           .Insert(0, faceDown.transform.DOLocalRotate(new Vector3(0, 90, 0), duration))
           .InsertCallback(duration, () =>
           {
-            faceUp.gameObject.SetActive(value: true);
             faceUp.transform.localRotation = Quaternion.Euler(0, -90, 0);
-            faceDown.gameObject.SetActive(value: false);
             onFlipped?.Invoke();
           })
           .Insert(duration, faceUp.transform.DOLocalRotate(Vector3.zero, duration));
       }
       else
       {
-        faceUp.gameObject.SetActive(value: true);
-        faceDown.gameObject.SetActive(value: false);
         onFlipped?.Invoke();
       }
     }
@@ -110,6 +106,8 @@ namespace Dreamcaller.Components
     void RenderRevealedCardView(RevealedCardView revealed)
     {
       _isRevealed = true;
+      _cardFront.gameObject.SetActive(value: true);
+      _cardBack.gameObject.SetActive(value: false);
       _name.text = revealed.Name;
       _rulesText.text = revealed.RulesText;
       _outline.gameObject.SetActive(CanPlay());
@@ -139,6 +137,8 @@ namespace Dreamcaller.Components
     void RenderHiddenCardView()
     {
       _isRevealed = false;
+      _cardFront.gameObject.SetActive(value: false);
+      _cardBack.gameObject.SetActive(value: true);
       gameObject.name = "Hidden Card";
     }
 
