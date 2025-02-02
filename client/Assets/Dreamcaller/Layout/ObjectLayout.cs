@@ -63,18 +63,20 @@ namespace Dreamcaller.Layout
     public void ApplyTargetTransform(Displayable target, Sequence? sequence = null)
     {
       var index = _objects.Count == 0 ? 0 : _objects.Count - 1;
-      ApplyLayout(target, index, sequence);
+      ApplyLayoutToObject(target, index, sequence);
     }
 
     /// <summary>
-    /// Inserts a series of animations into a Sequence to move this layout's
-    /// children to their expected position, rotation, and scale.
+    /// Applie this layout to its children. If a sequence is provied, inserts a
+    /// series of animations to move this layout's children to their expected
+    /// position, rotation, and scale. Otherwise they are immediately set to
+    /// their target values.
     /// </summary>
-    public void InsertAnimationSequence(Sequence sequence)
+    public void ApplyLayout(Sequence? sequence)
     {
       for (var i = 0; i < _objects.Count; ++i)
       {
-        ApplyLayout(_objects[i], i, sequence);
+        ApplyLayoutToObject(_objects[i], i, sequence);
       }
     }
 
@@ -108,12 +110,12 @@ namespace Dreamcaller.Layout
       {
         for (var i = 0; i < _objects.Count; ++i)
         {
-          ApplyLayout(_objects[i], i);
+          ApplyLayoutToObject(_objects[i], i);
         }
       }
     }
 
-    void ApplyLayout(Displayable displayable, int i, Sequence? sequence = null, bool applyToChildren = true)
+    void ApplyLayoutToObject(Displayable displayable, int i, Sequence? sequence = null, bool applyToChildren = true)
     {
       const float duration = TweenUtils.MoveAnimationDurationSeconds;
       var position = CalculateObjectPosition(i, _objects.Count);
@@ -124,16 +126,16 @@ namespace Dreamcaller.Layout
       {
         /// If this is a child layout, recursively animate its contained
         /// elements.
-        ApplyLayout(layout, i, sequence: null, applyToChildren: false);
+        ApplyLayoutToObject(layout, i, sequence: null, applyToChildren: false);
         if (sequence != null)
         {
-          layout.InsertAnimationSequence(sequence);
+          layout.ApplyLayout(sequence);
         }
         else
         {
           foreach (var child in layout.Objects)
           {
-            ApplyLayout(child, i);
+            ApplyLayoutToObject(child, i);
           }
         }
         return;

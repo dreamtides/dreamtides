@@ -21,9 +21,9 @@ namespace Dreamcaller.Services
 
     Dictionary<string, Card> Cards { get; } = new();
 
-    public IEnumerator UpdateLayout(BattleView view)
+    public IEnumerator UpdateLayout(BattleView view, Sequence? sequence = null)
     {
-      var sequence = TweenUtils.Sequence("UpdateLayout").SetEase(Ease.InOutSine);
+      sequence?.SetEase(Ease.InOutSine);
       var toDelete = Cards.Keys.ToHashSet();
 
       foreach (var cardView in view.Cards)
@@ -54,14 +54,21 @@ namespace Dreamcaller.Services
         layout.Add(card);
       }
 
-      var delete = InsertDeleteAnimations(sequence, toDelete);
-      InsertAllLayoutAnimations(sequence);
+      var delete = PrepareToDelete(sequence, toDelete);
+      ApplyAllLayouts(sequence);
       if (delete.Count > 0)
       {
-        sequence.AppendCallback(() => DestroyCards(delete));
+        if (sequence != null)
+        {
+          sequence.AppendCallback(() => DestroyCards(delete));
+          yield return sequence.WaitForCompletion();
+        }
+        else
+        {
+          DestroyCards(delete);
+          yield break;
+        }
       }
-
-      yield return sequence.WaitForCompletion();
     }
 
     /// <summary>
@@ -84,25 +91,25 @@ namespace Dreamcaller.Services
     IEnumerator RunAnimationsAsync(Action? onComplete = null)
     {
       var sequence = TweenUtils.Sequence("RunAnimations");
-      InsertAllLayoutAnimations(sequence);
+      ApplyAllLayouts(sequence);
       yield return sequence.WaitForCompletion();
       onComplete?.Invoke();
     }
 
-    void InsertAllLayoutAnimations(Sequence sequence)
+    void ApplyAllLayouts(Sequence? sequence)
     {
-      Registry.UserHand.InsertAnimationSequence(sequence);
-      Registry.EnemyHand.InsertAnimationSequence(sequence);
-      Registry.UserDeck.InsertAnimationSequence(sequence);
-      Registry.EnemyDeck.InsertAnimationSequence(sequence);
-      Registry.UserVoid.InsertAnimationSequence(sequence);
-      Registry.EnemyVoid.InsertAnimationSequence(sequence);
-      Registry.UserBattlefield.InsertAnimationSequence(sequence);
-      Registry.EnemyBattlefield.InsertAnimationSequence(sequence);
-      Registry.DrawnCardsPosition.InsertAnimationSequence(sequence);
+      Registry.UserHand.ApplyLayout(sequence);
+      Registry.EnemyHand.ApplyLayout(sequence);
+      Registry.UserDeck.ApplyLayout(sequence);
+      Registry.EnemyDeck.ApplyLayout(sequence);
+      Registry.UserVoid.ApplyLayout(sequence);
+      Registry.EnemyVoid.ApplyLayout(sequence);
+      Registry.UserBattlefield.ApplyLayout(sequence);
+      Registry.EnemyBattlefield.ApplyLayout(sequence);
+      Registry.DrawnCardsPosition.ApplyLayout(sequence);
     }
 
-    List<Card> InsertDeleteAnimations(Sequence sequence, HashSet<string> toDelete)
+    List<Card> PrepareToDelete(Sequence? sequence, HashSet<string> toDelete)
     {
       var cards = new List<Card>();
       foreach (var cardId in toDelete)

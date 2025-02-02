@@ -7,13 +7,23 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
 using System;
+using DG.Tweening;
+using Dreamcaller.Utils;
 
 namespace Dreamcaller.Services
 {
   public class ActionService : Service
   {
-    public void Connect(ConnectRequest request)
+    IEnumerator Start()
     {
+      yield return new WaitForSeconds(0.5f);
+      var request = new ConnectRequest
+      {
+        Metadata = new Metadata
+        {
+          UserId = Guid.NewGuid()
+        }
+      };
       if (Application.isEditor)
       {
         StartCoroutine(DevServerConnectCoroutine(request));
@@ -35,14 +45,15 @@ namespace Dreamcaller.Services
         },
         Action = action
       };
+      var sequence = TweenUtils.Sequence("PerformAction");
       if (Application.isEditor)
       {
-        StartCoroutine(PerformDevServerActionCoroutine(request));
+        StartCoroutine(PerformDevServerActionCoroutine(request, sequence));
       }
       else
       {
         var response = Plugin.PerformAction(request);
-        StartCoroutine(ApplyCommands(response.Commands));
+        StartCoroutine(ApplyCommands(response.Commands, sequence));
       }
     }
 
@@ -55,20 +66,20 @@ namespace Dreamcaller.Services
         response => ApplyCommands(response.Commands));
     }
 
-    private IEnumerator PerformDevServerActionCoroutine(PerformActionRequest request)
+    private IEnumerator PerformDevServerActionCoroutine(PerformActionRequest request, Sequence? sequence = null)
     {
       yield return SendRequest<PerformActionRequest, PerformActionResponse>(
         request,
         "perform_action",
         UnityWebRequest.kHttpVerbPOST,
-        response => ApplyCommands(response.Commands));
+        response => ApplyCommands(response.Commands, sequence));
     }
 
     private IEnumerator SendRequest<TRequest, TResponse>(
       TRequest request,
       string endpoint,
       string method,
-      System.Func<TResponse, IEnumerator> handleResponse)
+      Func<TResponse, IEnumerator> handleResponse)
       where TResponse : class
     {
       var json = JsonConvert.SerializeObject(request, Converter.Settings);
@@ -95,7 +106,7 @@ namespace Dreamcaller.Services
       }
     }
 
-    IEnumerator ApplyCommands(CommandSequence commands)
+    IEnumerator ApplyCommands(CommandSequence commands, Sequence? sequence = null)
     {
       foreach (var group in commands.Groups)
       {
@@ -103,14 +114,14 @@ namespace Dreamcaller.Services
       }
     }
 
-    IEnumerator ApplyGroup(CommandGroup group)
+    IEnumerator ApplyGroup(CommandGroup group, Sequence? sequence = null)
     {
       var coroutines = new List<Coroutine>();
       foreach (var command in group.Commands)
       {
         if (command.UpdateBattle != null)
         {
-          coroutines.Add(StartCoroutine(Registry.LayoutUpdateService.UpdateLayout(command.UpdateBattle)));
+          coroutines.Add(StartCoroutine(Registry.LayoutUpdateService.UpdateLayout(command.UpdateBattle, sequence)));
         }
       }
 

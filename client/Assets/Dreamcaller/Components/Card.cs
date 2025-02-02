@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using DG.Tweening;
 using Dreamcaller.Layout;
 using Dreamcaller.Schema;
@@ -12,10 +13,12 @@ namespace Dreamcaller.Components
 {
   public class Card : Displayable
   {
+    [SerializeField] Transform _cardFront = null!;
     [SerializeField] TextMeshPro _name = null!;
     [SerializeField] TextMeshPro _rulesText = null!;
-    [SerializeField] Transform _cardFrame = null!;
+    [SerializeField] MeshRenderer _cardFrame = null!;
     [SerializeField] MeshRenderer _cardImage = null!;
+    [SerializeField] MeshRenderer _cardBack = null!;
     [SerializeField] Material _material1 = null!;
     [SerializeField] Material _material2 = null!;
     [SerializeField] Material _material3 = null!;
@@ -23,6 +26,7 @@ namespace Dreamcaller.Components
     [SerializeField] Material _material5 = null!;
     [SerializeField] MeshRenderer _outline = null!;
 
+    bool _isRevealed = false;
     Registry _registry = null!;
     CardView _cardView = null!;
     Quaternion _initialDragRotation;
@@ -32,43 +36,111 @@ namespace Dreamcaller.Components
 
     public CardView CardView => Errors.CheckNotNull(_cardView);
 
-    public void Render(Registry registry, CardView view, Sequence sequence)
+    public void Render(Registry registry, CardView view, Sequence? sequence = null)
     {
       gameObject.name = view.Revealed?.Name ?? "Hidden Card";
       _registry = registry;
       _cardView = view;
       SortingKey = view.Position.SortingKey;
-      _name.text = view.Revealed?.Name;
-      _rulesText.text = view.Revealed?.RulesText;
+
+      if (view.Revealed != null)
+      {
+        if (_isRevealed)
+        {
+          RenderCardView();
+        }
+        else
+        {
+          Flip(_cardFront, _cardBack, sequence, RenderCardView);
+        }
+      }
+      else
+      {
+        if (_isRevealed)
+        {
+          Flip(_cardBack, _cardFront, sequence, RenderCardView);
+        }
+        else
+        {
+          RenderCardView();
+        }
+      }
+    }
+
+    public void TurnFaceDown(Sequence? sequence = null) => Flip(_cardFront, _cardBack, sequence);
+
+    public override bool CanHandleMouseEvents() => true;
+
+    void Flip(Component faceUp, Component faceDown, Sequence? sequence, Action? onFlipped = null)
+    {
+      if (sequence != null)
+      {
+        const float duration = TweenUtils.FlipAnimationDurationSeconds / 2f;
+        sequence
+          .Insert(0, faceDown.transform.DOLocalRotate(new Vector3(0, 90, 0), duration))
+          .InsertCallback(duration, () =>
+          {
+            faceUp.gameObject.SetActive(value: true);
+            faceUp.transform.localRotation = Quaternion.Euler(0, -90, 0);
+            faceDown.gameObject.SetActive(value: false);
+            onFlipped?.Invoke();
+          })
+          .Insert(duration, faceUp.transform.DOLocalRotate(Vector3.zero, duration));
+      }
+      else
+      {
+        faceUp.gameObject.SetActive(value: true);
+        faceDown.gameObject.SetActive(value: false);
+        onFlipped?.Invoke();
+      }
+    }
+
+    void RenderCardView()
+    {
+      if (CardView.Revealed != null)
+      {
+        RenderRevealedCardView(CardView.Revealed);
+      }
+      else
+      {
+        RenderHiddenCardView();
+      }
+    }
+
+    void RenderRevealedCardView(RevealedCardView revealed)
+    {
+      _isRevealed = true;
+      _name.text = revealed.Name;
+      _rulesText.text = revealed.RulesText;
       _outline.gameObject.SetActive(CanPlay());
 
-      if (view.Revealed?.Image?.Image.Contains("1633431262") == true)
+      if (revealed.Image?.Image.Contains("1633431262") == true)
       {
         _cardImage.material = _material1;
       }
-      else if (view.Revealed?.Image?.Image.Contains("2027158310") == true)
+      else if (revealed.Image?.Image.Contains("2027158310") == true)
       {
         _cardImage.material = _material2;
       }
-      else if (view.Revealed?.Image?.Image.Contains("2269064809") == true)
+      else if (revealed.Image?.Image.Contains("2269064809") == true)
       {
         _cardImage.material = _material3;
       }
-      else if (view.Revealed?.Image?.Image.Contains("2269064817") == true)
+      else if (revealed.Image?.Image.Contains("2269064817") == true)
       {
         _cardImage.material = _material4;
       }
-      else if (view.Revealed?.Image?.Image.Contains("2521694543") == true)
+      else if (revealed.Image?.Image.Contains("2521694543") == true)
       {
         _cardImage.material = _material5;
       }
     }
 
-    public void TurnFaceDown(Sequence sequence)
+    void RenderHiddenCardView()
     {
+      _isRevealed = false;
+      gameObject.name = "Hidden Card";
     }
-
-    public override bool CanHandleMouseEvents() => true;
 
     protected override void OnSetGameContext(GameContext oldContext, GameContext newContext)
     {
