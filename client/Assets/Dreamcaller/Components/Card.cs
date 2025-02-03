@@ -25,6 +25,10 @@ namespace Dreamcaller.Components
     [SerializeField] Material _material4 = null!;
     [SerializeField] Material _material5 = null!;
     [SerializeField] MeshRenderer _outline = null!;
+    [SerializeField] MeshRenderer _costBackground = null!;
+    [SerializeField] TextMeshPro _costText = null!;
+    [SerializeField] MeshRenderer _sparkBackground = null!;
+    [SerializeField] TextMeshPro _sparkText = null!;
 
     bool _isRevealed = false;
     Registry _registry = null!;
@@ -111,6 +115,7 @@ namespace Dreamcaller.Components
       _name.text = revealed.Name;
       _rulesText.text = revealed.RulesText;
       _outline.gameObject.SetActive(CanPlay());
+      _costText.text = revealed.Cost.ToString();
 
       if (revealed.Image?.Image.Contains("1633431262") == true)
       {
