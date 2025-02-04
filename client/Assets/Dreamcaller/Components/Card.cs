@@ -116,6 +116,8 @@ namespace Dreamcaller.Components
       _rulesText.text = revealed.RulesText;
       _outline.gameObject.SetActive(CanPlay());
       _costText.text = revealed.Cost.ToString();
+      _sparkBackground.gameObject.SetActive(revealed.Spark != null);
+      _sparkText.text = revealed.Spark.ToString();
 
       if (revealed.Image?.Image.Contains("1633431262") == true)
       {
