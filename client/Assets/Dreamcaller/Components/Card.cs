@@ -16,6 +16,7 @@ namespace Dreamcaller.Components
     [SerializeField] Transform _cardFront = null!;
     [SerializeField] TextMeshPro _name = null!;
     [SerializeField] TextMeshPro _rulesText = null!;
+    [SerializeField] TextMeshPro _typeText = null!;
     [SerializeField] MeshRenderer _cardFrame = null!;
     [SerializeField] MeshRenderer _cardImage = null!;
     [SerializeField] MeshRenderer _cardBack = null!;
@@ -118,6 +119,7 @@ namespace Dreamcaller.Components
       _costText.text = revealed.Cost.ToString();
       _sparkBackground.gameObject.SetActive(revealed.Spark != null);
       _sparkText.text = revealed.Spark.ToString();
+      _typeText.text = revealed.CardType;
 
       if (revealed.Image?.Image.Contains("1633431262") == true)
       {
