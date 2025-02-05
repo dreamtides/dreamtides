@@ -1,5 +1,5 @@
 [package]
-name = "display_data"
+name = "masonry"
 version = "0.0.0"
 edition = "2021"
 
@@ -11,7 +11,6 @@ bench = false
 [dependencies]
 action_data = { path = "../action_data" }
 core_data = { path = "../core_data" }
-masonry = { path = "../masonry" }
 
 schemars = "0.8"
 serde = { version = "1", features = ["derive"] }

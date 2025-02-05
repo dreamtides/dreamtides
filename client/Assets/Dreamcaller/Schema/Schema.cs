@@ -329,8 +329,8 @@ namespace Dreamcaller.Schema
         /// <summary>
         /// Additional help text about this card, describing its abilities.
         /// </summary>
-        [JsonProperty("supplementalCardInfo", Required = Required.Always)]
-        public List<string> SupplementalCardInfo { get; set; }
+        [JsonProperty("supplementalCardInfo")]
+        public FlexNode SupplementalCardInfo { get; set; }
     }
 
     /// <summary>
@@ -355,6 +355,585 @@ namespace Dreamcaller.Schema
         /// </summary>
         [JsonProperty("imageOffsetY")]
         public long? ImageOffsetY { get; set; }
+    }
+
+    public partial class DraggableNode
+    {
+        [JsonProperty("customDragIndicator")]
+        public FlexNode CustomDragIndicator { get; set; }
+
+        [JsonProperty("dropTargetIdentifiers", Required = Required.Always)]
+        public List<string> DropTargetIdentifiers { get; set; }
+
+        [JsonProperty("hideIndicatorChildren", Required = Required.Always)]
+        public List<string> HideIndicatorChildren { get; set; }
+
+        [JsonProperty("horizontalDragStartDistance")]
+        public long? HorizontalDragStartDistance { get; set; }
+
+        [JsonProperty("onDragDetected")]
+        public OnClickClass OnDragDetected { get; set; }
+
+        [JsonProperty("onDrop")]
+        public OnClickClass OnDrop { get; set; }
+
+        [JsonProperty("overTargetIndicator")]
+        public FlexNode OverTargetIndicator { get; set; }
+
+        [JsonProperty("removeOriginal")]
+        public bool? RemoveOriginal { get; set; }
+    }
+
+    public partial class NodeType
+    {
+        [JsonProperty("text", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public Text Text { get; set; }
+
+        [JsonProperty("scrollViewNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public ScrollViewNode ScrollViewNode { get; set; }
+
+        [JsonProperty("draggableNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DraggableNode DraggableNode { get; set; }
+
+        [JsonProperty("textFieldNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public TextFieldNode TextFieldNode { get; set; }
+
+        [JsonProperty("sliderNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public SliderNode SliderNode { get; set; }
+    }
+
+    public partial class FlexNode
+    {
+        [JsonProperty("children", Required = Required.Always)]
+        public List<FlexNode> Children { get; set; }
+
+        [JsonProperty("eventHandlers")]
+        public EventHandlers EventHandlers { get; set; }
+
+        [JsonProperty("hoverStyle")]
+        public FlexStyle HoverStyle { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("nodeType")]
+        public NodeType NodeType { get; set; }
+
+        [JsonProperty("onAttachStyle")]
+        public FlexStyle OnAttachStyle { get; set; }
+
+        [JsonProperty("pressedStyle")]
+        public FlexStyle PressedStyle { get; set; }
+
+        [JsonProperty("style")]
+        public FlexStyle Style { get; set; }
+    }
+
+    public partial class OnClickClass
+    {
+        [JsonProperty("debugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DebugAction? DebugAction { get; set; }
+
+        [JsonProperty("battleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public BattleAction BattleAction { get; set; }
+    }
+
+    /// <summary>
+    /// An action that can be performed in a battle#
+    /// </summary>
+    public partial class BattleAction
+    {
+        [JsonProperty("playCard", Required = Required.Always)]
+        public CardId PlayCard { get; set; }
+    }
+
+    public partial class ScrollViewNode
+    {
+        [JsonProperty("elasticity")]
+        public double? Elasticity { get; set; }
+
+        [JsonProperty("horizontalPageSize")]
+        public double? HorizontalPageSize { get; set; }
+
+        [JsonProperty("horizontalScrollBar")]
+        public ScrollBar HorizontalScrollBar { get; set; }
+
+        [JsonProperty("horizontalScrollBarVisibility")]
+        public ScrollBarVisibility? HorizontalScrollBarVisibility { get; set; }
+
+        [JsonProperty("mouseWheelScrollSize")]
+        public double? MouseWheelScrollSize { get; set; }
+
+        [JsonProperty("scrollDecelerationRate")]
+        public double? ScrollDecelerationRate { get; set; }
+
+        [JsonProperty("touchScrollBehavior")]
+        public TouchScrollBehavior? TouchScrollBehavior { get; set; }
+
+        [JsonProperty("verticalPageSize")]
+        public double? VerticalPageSize { get; set; }
+
+        [JsonProperty("verticalScrollBar")]
+        public ScrollBar VerticalScrollBar { get; set; }
+
+        [JsonProperty("verticalScrollBarVisibility")]
+        public ScrollBarVisibility? VerticalScrollBarVisibility { get; set; }
+    }
+
+    public partial class ScrollBar
+    {
+        [JsonProperty("style")]
+        public FlexStyle Style { get; set; }
+    }
+
+    public partial class FlexStyle
+    {
+        [JsonProperty("alignContent")]
+        public FlexAlign? AlignContent { get; set; }
+
+        [JsonProperty("alignItems")]
+        public FlexAlign? AlignItems { get; set; }
+
+        [JsonProperty("alignSelf")]
+        public FlexAlign? AlignSelf { get; set; }
+
+        [JsonProperty("backgroundColor")]
+        public FlexColor BackgroundColor { get; set; }
+
+        [JsonProperty("backgroundImage")]
+        public SpriteAddress BackgroundImage { get; set; }
+
+        [JsonProperty("backgroundImageAutoSize")]
+        public BackgroundImageAutoSize? BackgroundImageAutoSize { get; set; }
+
+        [JsonProperty("backgroundImageScaleMode")]
+        public ImageScaleMode? BackgroundImageScaleMode { get; set; }
+
+        [JsonProperty("backgroundImageTintColor")]
+        public FlexColor BackgroundImageTintColor { get; set; }
+
+        [JsonProperty("borderColor")]
+        public BorderColor BorderColor { get; set; }
+
+        [JsonProperty("borderRadius")]
+        public BorderRadius BorderRadius { get; set; }
+
+        [JsonProperty("borderWidth")]
+        public BorderWidth BorderWidth { get; set; }
+
+        [JsonProperty("color")]
+        public FlexColor Color { get; set; }
+
+        [JsonProperty("display")]
+        public FlexDisplayStyle? Display { get; set; }
+
+        [JsonProperty("flexBasis")]
+        public Dimension FlexBasis { get; set; }
+
+        [JsonProperty("flexDirection")]
+        public FlexDirection? FlexDirection { get; set; }
+
+        [JsonProperty("flexGrow")]
+        public double? FlexGrow { get; set; }
+
+        [JsonProperty("flexShrink")]
+        public double? FlexShrink { get; set; }
+
+        [JsonProperty("font")]
+        public FontAddress Font { get; set; }
+
+        [JsonProperty("fontSize")]
+        public Dimension FontSize { get; set; }
+
+        [JsonProperty("fontStyle")]
+        public FontStyle? FontStyle { get; set; }
+
+        [JsonProperty("height")]
+        public Dimension Height { get; set; }
+
+        [JsonProperty("imageSlice")]
+        public ImageSlice ImageSlice { get; set; }
+
+        [JsonProperty("inset")]
+        public DimensionGroup Inset { get; set; }
+
+        [JsonProperty("justifyContent")]
+        public FlexJustify? JustifyContent { get; set; }
+
+        [JsonProperty("letterSpacing")]
+        public Dimension LetterSpacing { get; set; }
+
+        [JsonProperty("margin")]
+        public DimensionGroup Margin { get; set; }
+
+        [JsonProperty("maxHeight")]
+        public Dimension MaxHeight { get; set; }
+
+        [JsonProperty("maxWidth")]
+        public Dimension MaxWidth { get; set; }
+
+        [JsonProperty("minHeight")]
+        public Dimension MinHeight { get; set; }
+
+        [JsonProperty("minWidth")]
+        public Dimension MinWidth { get; set; }
+
+        [JsonProperty("opacity")]
+        public double? Opacity { get; set; }
+
+        [JsonProperty("overflow")]
+        public Flex? Overflow { get; set; }
+
+        [JsonProperty("overflowClipBox")]
+        public OverflowClipBox? OverflowClipBox { get; set; }
+
+        [JsonProperty("padding")]
+        public DimensionGroup Padding { get; set; }
+
+        [JsonProperty("paragraphSpacing")]
+        public Dimension ParagraphSpacing { get; set; }
+
+        [JsonProperty("pickingMode")]
+        public FlexPickingMode? PickingMode { get; set; }
+
+        [JsonProperty("position")]
+        public FlexPosition? Position { get; set; }
+
+        [JsonProperty("rotate")]
+        public FlexRotate Rotate { get; set; }
+
+        [JsonProperty("scale")]
+        public FlexScale Scale { get; set; }
+
+        [JsonProperty("textAlign")]
+        public TextAlign? TextAlign { get; set; }
+
+        [JsonProperty("textOutlineColor")]
+        public FlexColor TextOutlineColor { get; set; }
+
+        [JsonProperty("textOutlineWidth")]
+        public double? TextOutlineWidth { get; set; }
+
+        [JsonProperty("textOverflow")]
+        public TextOverflow? TextOverflow { get; set; }
+
+        [JsonProperty("textOverflowPosition")]
+        public TextOverflowPosition? TextOverflowPosition { get; set; }
+
+        [JsonProperty("textShadow")]
+        public TextShadow TextShadow { get; set; }
+
+        [JsonProperty("transformOrigin")]
+        public FlexTranslate TransformOrigin { get; set; }
+
+        [JsonProperty("transitionDelays")]
+        public List<TimeValue> TransitionDelays { get; set; }
+
+        [JsonProperty("transitionDurations")]
+        public List<TimeValue> TransitionDurations { get; set; }
+
+        [JsonProperty("transitionEasingModes")]
+        public List<string> TransitionEasingModes { get; set; }
+
+        [JsonProperty("transitionProperties")]
+        public List<string> TransitionProperties { get; set; }
+
+        [JsonProperty("translate")]
+        public FlexTranslate Translate { get; set; }
+
+        [JsonProperty("visibility")]
+        public Flex? Visibility { get; set; }
+
+        [JsonProperty("whiteSpace")]
+        public WhiteSpace? WhiteSpace { get; set; }
+
+        [JsonProperty("width")]
+        public Dimension Width { get; set; }
+
+        [JsonProperty("wordSpacing")]
+        public Dimension WordSpacing { get; set; }
+
+        [JsonProperty("wrap")]
+        public FlexWrap? Wrap { get; set; }
+    }
+
+    public partial class FlexColor
+    {
+        [JsonProperty("alpha", Required = Required.Always)]
+        public double Alpha { get; set; }
+
+        [JsonProperty("blue", Required = Required.Always)]
+        public double Blue { get; set; }
+
+        [JsonProperty("green", Required = Required.Always)]
+        public double Green { get; set; }
+
+        [JsonProperty("red", Required = Required.Always)]
+        public double Red { get; set; }
+    }
+
+    public partial class SpriteAddress
+    {
+        [JsonProperty("address", Required = Required.Always)]
+        public string Address { get; set; }
+    }
+
+    public partial class BorderColor
+    {
+        [JsonProperty("bottom", Required = Required.Always)]
+        public FlexColor Bottom { get; set; }
+
+        [JsonProperty("left", Required = Required.Always)]
+        public FlexColor Left { get; set; }
+
+        [JsonProperty("right", Required = Required.Always)]
+        public FlexColor Right { get; set; }
+
+        [JsonProperty("top", Required = Required.Always)]
+        public FlexColor Top { get; set; }
+    }
+
+    public partial class BorderRadius
+    {
+        [JsonProperty("bottomLeft", Required = Required.Always)]
+        public Dimension BottomLeft { get; set; }
+
+        [JsonProperty("bottomRight", Required = Required.Always)]
+        public Dimension BottomRight { get; set; }
+
+        [JsonProperty("topLeft", Required = Required.Always)]
+        public Dimension TopLeft { get; set; }
+
+        [JsonProperty("topRight", Required = Required.Always)]
+        public Dimension TopRight { get; set; }
+    }
+
+    public partial class Dimension
+    {
+        [JsonProperty("unit", Required = Required.Always)]
+        public DimensionUnit Unit { get; set; }
+
+        [JsonProperty("value", Required = Required.Always)]
+        public double Value { get; set; }
+    }
+
+    public partial class BorderWidth
+    {
+        [JsonProperty("bottom", Required = Required.Always)]
+        public double Bottom { get; set; }
+
+        [JsonProperty("left", Required = Required.Always)]
+        public double Left { get; set; }
+
+        [JsonProperty("right", Required = Required.Always)]
+        public double Right { get; set; }
+
+        [JsonProperty("top", Required = Required.Always)]
+        public double Top { get; set; }
+    }
+
+    public partial class FontAddress
+    {
+        [JsonProperty("address", Required = Required.Always)]
+        public string Address { get; set; }
+    }
+
+    public partial class ImageSlice
+    {
+        [JsonProperty("bottom", Required = Required.Always)]
+        public long Bottom { get; set; }
+
+        [JsonProperty("left", Required = Required.Always)]
+        public long Left { get; set; }
+
+        [JsonProperty("right", Required = Required.Always)]
+        public long Right { get; set; }
+
+        [JsonProperty("top", Required = Required.Always)]
+        public long Top { get; set; }
+    }
+
+    public partial class DimensionGroup
+    {
+        [JsonProperty("bottom", Required = Required.Always)]
+        public Dimension Bottom { get; set; }
+
+        [JsonProperty("left", Required = Required.Always)]
+        public Dimension Left { get; set; }
+
+        [JsonProperty("right", Required = Required.Always)]
+        public Dimension Right { get; set; }
+
+        [JsonProperty("top", Required = Required.Always)]
+        public Dimension Top { get; set; }
+    }
+
+    public partial class FlexRotate
+    {
+        [JsonProperty("degrees", Required = Required.Always)]
+        public double Degrees { get; set; }
+    }
+
+    public partial class FlexScale
+    {
+        [JsonProperty("amount", Required = Required.Always)]
+        public FlexVector3 Amount { get; set; }
+    }
+
+    public partial class FlexVector3
+    {
+        [JsonProperty("x", Required = Required.Always)]
+        public double X { get; set; }
+
+        [JsonProperty("y", Required = Required.Always)]
+        public double Y { get; set; }
+
+        [JsonProperty("z", Required = Required.Always)]
+        public double Z { get; set; }
+    }
+
+    public partial class TextShadow
+    {
+        [JsonProperty("blurRadius", Required = Required.Always)]
+        public double BlurRadius { get; set; }
+
+        [JsonProperty("color", Required = Required.Always)]
+        public FlexColor Color { get; set; }
+
+        [JsonProperty("offset", Required = Required.Always)]
+        public FlexVector2 Offset { get; set; }
+    }
+
+    public partial class FlexVector2
+    {
+        [JsonProperty("x", Required = Required.Always)]
+        public double X { get; set; }
+
+        [JsonProperty("y", Required = Required.Always)]
+        public double Y { get; set; }
+    }
+
+    public partial class FlexTranslate
+    {
+        [JsonProperty("x", Required = Required.Always)]
+        public Dimension X { get; set; }
+
+        [JsonProperty("y", Required = Required.Always)]
+        public Dimension Y { get; set; }
+
+        [JsonProperty("z", Required = Required.Always)]
+        public double Z { get; set; }
+    }
+
+    public partial class TimeValue
+    {
+        [JsonProperty("milliseconds", Required = Required.Always)]
+        public long Milliseconds { get; set; }
+    }
+
+    public partial class SliderNode
+    {
+        [JsonProperty("direction")]
+        public SliderDirection? Direction { get; set; }
+
+        [JsonProperty("dragContainerStyle")]
+        public FlexStyle DragContainerStyle { get; set; }
+
+        [JsonProperty("draggerBorderStyle")]
+        public FlexStyle DraggerBorderStyle { get; set; }
+
+        [JsonProperty("draggerStyle")]
+        public FlexStyle DraggerStyle { get; set; }
+
+        [JsonProperty("highValue")]
+        public double? HighValue { get; set; }
+
+        [JsonProperty("initialValue")]
+        public double? InitialValue { get; set; }
+
+        [JsonProperty("inverted")]
+        public bool? Inverted { get; set; }
+
+        [JsonProperty("label")]
+        public string Label { get; set; }
+
+        [JsonProperty("labelStyle")]
+        public FlexStyle LabelStyle { get; set; }
+
+        [JsonProperty("lowValue")]
+        public double? LowValue { get; set; }
+
+        [JsonProperty("pageSize")]
+        public double? PageSize { get; set; }
+
+        [JsonProperty("preferenceKey")]
+        public string PreferenceKey { get; set; }
+
+        [JsonProperty("showInputField")]
+        public bool? ShowInputField { get; set; }
+
+        [JsonProperty("trackerStyle")]
+        public FlexStyle TrackerStyle { get; set; }
+    }
+
+    public partial class Text
+    {
+        [JsonProperty("label", Required = Required.Always)]
+        public string Label { get; set; }
+    }
+
+    public partial class TextFieldNode
+    {
+        [JsonProperty("doubleClickSelectsWord")]
+        public bool? DoubleClickSelectsWord { get; set; }
+
+        [JsonProperty("globalIdentifier")]
+        public string GlobalIdentifier { get; set; }
+
+        [JsonProperty("initialText")]
+        public string InitialText { get; set; }
+
+        [JsonProperty("isPasswordField")]
+        public bool? IsPasswordField { get; set; }
+
+        [JsonProperty("isReadOnly")]
+        public bool? IsReadOnly { get; set; }
+
+        [JsonProperty("maskCharacter")]
+        public string MaskCharacter { get; set; }
+
+        [JsonProperty("maxLength")]
+        public long? MaxLength { get; set; }
+
+        [JsonProperty("multiline")]
+        public bool? Multiline { get; set; }
+
+        [JsonProperty("tripleClickSelectsLine")]
+        public bool? TripleClickSelectsLine { get; set; }
+    }
+
+    public partial class EventHandlers
+    {
+        [JsonProperty("onClick")]
+        public OnClickClass OnClick { get; set; }
+
+        [JsonProperty("onFieldChanged")]
+        public OnClickClass OnFieldChanged { get; set; }
+
+        [JsonProperty("onLongPress")]
+        public OnClickClass OnLongPress { get; set; }
+
+        [JsonProperty("onMouseDown")]
+        public OnClickClass OnMouseDown { get; set; }
+
+        [JsonProperty("onMouseEnter")]
+        public OnClickClass OnMouseEnter { get; set; }
+
+        [JsonProperty("onMouseLeave")]
+        public OnClickClass OnMouseLeave { get; set; }
+
+        [JsonProperty("onMouseUp")]
+        public OnClickClass OnMouseUp { get; set; }
     }
 
     /// <summary>
@@ -419,15 +998,6 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("battleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public BattleAction BattleAction { get; set; }
-    }
-
-    /// <summary>
-    /// An action that can be performed in a battle#
-    /// </summary>
-    public partial class BattleAction
-    {
-        [JsonProperty("playCard", Required = Required.Always)]
-        public CardId PlayCard { get; set; }
     }
 
     public partial class PerformActionResponse
@@ -500,6 +1070,53 @@ namespace Dreamcaller.Schema
     public enum RevealedCardStatus { CanPlay, CanSelect, Selected };
 
     /// <summary>
+    /// Private actions for developer use
+    /// </summary>
+    public enum DebugAction { DrawCard };
+
+    public enum FlexAlign { Auto, Center, FlexEnd, FlexStart, Stretch, Unspecified };
+
+    public enum BackgroundImageAutoSize { FromHeight, FromWidth, Unspecified };
+
+    public enum ImageScaleMode { ScaleAndCrop, ScaleToFit, StretchToFill, Unspecified };
+
+    public enum DimensionUnit { Percentage, Pixels, SafeAreaBottom, SafeAreaLeft, SafeAreaRight, SafeAreaTop, ViewportHeight, ViewportWidth };
+
+    public enum FlexDisplayStyle { Flex, None, Unspecified };
+
+    public enum FlexDirection { Column, ColumnReverse, Row, RowReverse, Unspecified };
+
+    public enum FontStyle { Bold, BoldAndItalic, Italic, Normal, Unspecified };
+
+    public enum FlexJustify { Center, FlexEnd, FlexStart, SpaceAround, SpaceBetween, Unspecified };
+
+    public enum Flex { Hidden, Unspecified, Visible };
+
+    public enum OverflowClipBox { ContentBox, PaddingBox, Unspecified };
+
+    public enum FlexPickingMode { Ignore, Position, Unspecified };
+
+    public enum FlexPosition { Absolute, Relative, Unspecified };
+
+    public enum TextAlign { LowerCenter, LowerLeft, LowerRight, MiddleCenter, MiddleLeft, MiddleRight, Unspecified, UpperCenter, UpperLeft, UpperRight };
+
+    public enum TextOverflow { Clip, Ellipsis, Unspecified };
+
+    public enum TextOverflowPosition { End, Middle, Start, Unspecified };
+
+    public enum EasingMode { Ease, EaseIn, EaseInBack, EaseInBounce, EaseInCirc, EaseInCubic, EaseInElastic, EaseInOut, EaseInOutBack, EaseInOutBounce, EaseInOutCirc, EaseInOutCubic, EaseInOutElastic, EaseInOutSine, EaseInSine, EaseOut, EaseOutBack, EaseOutBounce, EaseOutCirc, EaseOutCubic, EaseOutElastic, EaseOutSine, Linear, Unspecified };
+
+    public enum WhiteSpace { NoWrap, Normal, Unspecified };
+
+    public enum FlexWrap { NoWrap, Unspecified, Wrap, WrapReverse };
+
+    public enum ScrollBarVisibility { AlwaysVisible, Auto, Hidden, Unspecified };
+
+    public enum TouchScrollBehavior { Clamped, Elastic, Unrestricted, Unspecified };
+
+    public enum SliderDirection { Horizontal, Unspecified, Vertical };
+
+    /// <summary>
     /// Controls color for buttons
     ///
     /// Emphasized button, primary game action
@@ -507,11 +1124,6 @@ namespace Dreamcaller.Schema
     /// Deemphasized button, additional game actions
     /// </summary>
     public enum ButtonKind { Default, Primary };
-
-    /// <summary>
-    /// Private actions for developer use
-    /// </summary>
-    public enum DebugAction { DrawCard };
 
     /// <summary>
     /// Position category
@@ -551,8 +1163,29 @@ namespace Dreamcaller.Schema
                 PositionEnumConverter.Singleton,
                 CardFrameConverter.Singleton,
                 RevealedCardStatusConverter.Singleton,
-                ButtonKindConverter.Singleton,
                 DebugActionConverter.Singleton,
+                FlexAlignConverter.Singleton,
+                BackgroundImageAutoSizeConverter.Singleton,
+                ImageScaleModeConverter.Singleton,
+                DimensionUnitConverter.Singleton,
+                FlexDisplayStyleConverter.Singleton,
+                FlexDirectionConverter.Singleton,
+                FontStyleConverter.Singleton,
+                FlexJustifyConverter.Singleton,
+                FlexConverter.Singleton,
+                OverflowClipBoxConverter.Singleton,
+                FlexPickingModeConverter.Singleton,
+                FlexPositionConverter.Singleton,
+                TextAlignConverter.Singleton,
+                TextOverflowConverter.Singleton,
+                TextOverflowPositionConverter.Singleton,
+                EasingModeConverter.Singleton,
+                WhiteSpaceConverter.Singleton,
+                FlexWrapConverter.Singleton,
+                ScrollBarVisibilityConverter.Singleton,
+                TouchScrollBehaviorConverter.Singleton,
+                SliderDirectionConverter.Singleton,
+                ButtonKindConverter.Singleton,
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
         };
@@ -880,6 +1513,1246 @@ namespace Dreamcaller.Schema
         public static readonly RevealedCardStatusConverter Singleton = new RevealedCardStatusConverter();
     }
 
+    internal class DebugActionConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(DebugAction) || t == typeof(DebugAction?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            if (value == "drawCard")
+            {
+                return DebugAction.DrawCard;
+            }
+            throw new Exception("Cannot unmarshal type DebugAction");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (DebugAction)untypedValue;
+            if (value == DebugAction.DrawCard)
+            {
+                serializer.Serialize(writer, "drawCard");
+                return;
+            }
+            throw new Exception("Cannot marshal type DebugAction");
+        }
+
+        public static readonly DebugActionConverter Singleton = new DebugActionConverter();
+    }
+
+    internal class FlexAlignConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(FlexAlign) || t == typeof(FlexAlign?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "auto":
+                    return FlexAlign.Auto;
+                case "center":
+                    return FlexAlign.Center;
+                case "flexEnd":
+                    return FlexAlign.FlexEnd;
+                case "flexStart":
+                    return FlexAlign.FlexStart;
+                case "stretch":
+                    return FlexAlign.Stretch;
+                case "unspecified":
+                    return FlexAlign.Unspecified;
+            }
+            throw new Exception("Cannot unmarshal type FlexAlign");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (FlexAlign)untypedValue;
+            switch (value)
+            {
+                case FlexAlign.Auto:
+                    serializer.Serialize(writer, "auto");
+                    return;
+                case FlexAlign.Center:
+                    serializer.Serialize(writer, "center");
+                    return;
+                case FlexAlign.FlexEnd:
+                    serializer.Serialize(writer, "flexEnd");
+                    return;
+                case FlexAlign.FlexStart:
+                    serializer.Serialize(writer, "flexStart");
+                    return;
+                case FlexAlign.Stretch:
+                    serializer.Serialize(writer, "stretch");
+                    return;
+                case FlexAlign.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+            }
+            throw new Exception("Cannot marshal type FlexAlign");
+        }
+
+        public static readonly FlexAlignConverter Singleton = new FlexAlignConverter();
+    }
+
+    internal class BackgroundImageAutoSizeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(BackgroundImageAutoSize) || t == typeof(BackgroundImageAutoSize?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "fromHeight":
+                    return BackgroundImageAutoSize.FromHeight;
+                case "fromWidth":
+                    return BackgroundImageAutoSize.FromWidth;
+                case "unspecified":
+                    return BackgroundImageAutoSize.Unspecified;
+            }
+            throw new Exception("Cannot unmarshal type BackgroundImageAutoSize");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (BackgroundImageAutoSize)untypedValue;
+            switch (value)
+            {
+                case BackgroundImageAutoSize.FromHeight:
+                    serializer.Serialize(writer, "fromHeight");
+                    return;
+                case BackgroundImageAutoSize.FromWidth:
+                    serializer.Serialize(writer, "fromWidth");
+                    return;
+                case BackgroundImageAutoSize.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+            }
+            throw new Exception("Cannot marshal type BackgroundImageAutoSize");
+        }
+
+        public static readonly BackgroundImageAutoSizeConverter Singleton = new BackgroundImageAutoSizeConverter();
+    }
+
+    internal class ImageScaleModeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(ImageScaleMode) || t == typeof(ImageScaleMode?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "scaleAndCrop":
+                    return ImageScaleMode.ScaleAndCrop;
+                case "scaleToFit":
+                    return ImageScaleMode.ScaleToFit;
+                case "stretchToFill":
+                    return ImageScaleMode.StretchToFill;
+                case "unspecified":
+                    return ImageScaleMode.Unspecified;
+            }
+            throw new Exception("Cannot unmarshal type ImageScaleMode");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (ImageScaleMode)untypedValue;
+            switch (value)
+            {
+                case ImageScaleMode.ScaleAndCrop:
+                    serializer.Serialize(writer, "scaleAndCrop");
+                    return;
+                case ImageScaleMode.ScaleToFit:
+                    serializer.Serialize(writer, "scaleToFit");
+                    return;
+                case ImageScaleMode.StretchToFill:
+                    serializer.Serialize(writer, "stretchToFill");
+                    return;
+                case ImageScaleMode.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+            }
+            throw new Exception("Cannot marshal type ImageScaleMode");
+        }
+
+        public static readonly ImageScaleModeConverter Singleton = new ImageScaleModeConverter();
+    }
+
+    internal class DimensionUnitConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(DimensionUnit) || t == typeof(DimensionUnit?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "percentage":
+                    return DimensionUnit.Percentage;
+                case "pixels":
+                    return DimensionUnit.Pixels;
+                case "safeAreaBottom":
+                    return DimensionUnit.SafeAreaBottom;
+                case "safeAreaLeft":
+                    return DimensionUnit.SafeAreaLeft;
+                case "safeAreaRight":
+                    return DimensionUnit.SafeAreaRight;
+                case "safeAreaTop":
+                    return DimensionUnit.SafeAreaTop;
+                case "viewportHeight":
+                    return DimensionUnit.ViewportHeight;
+                case "viewportWidth":
+                    return DimensionUnit.ViewportWidth;
+            }
+            throw new Exception("Cannot unmarshal type DimensionUnit");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (DimensionUnit)untypedValue;
+            switch (value)
+            {
+                case DimensionUnit.Percentage:
+                    serializer.Serialize(writer, "percentage");
+                    return;
+                case DimensionUnit.Pixels:
+                    serializer.Serialize(writer, "pixels");
+                    return;
+                case DimensionUnit.SafeAreaBottom:
+                    serializer.Serialize(writer, "safeAreaBottom");
+                    return;
+                case DimensionUnit.SafeAreaLeft:
+                    serializer.Serialize(writer, "safeAreaLeft");
+                    return;
+                case DimensionUnit.SafeAreaRight:
+                    serializer.Serialize(writer, "safeAreaRight");
+                    return;
+                case DimensionUnit.SafeAreaTop:
+                    serializer.Serialize(writer, "safeAreaTop");
+                    return;
+                case DimensionUnit.ViewportHeight:
+                    serializer.Serialize(writer, "viewportHeight");
+                    return;
+                case DimensionUnit.ViewportWidth:
+                    serializer.Serialize(writer, "viewportWidth");
+                    return;
+            }
+            throw new Exception("Cannot marshal type DimensionUnit");
+        }
+
+        public static readonly DimensionUnitConverter Singleton = new DimensionUnitConverter();
+    }
+
+    internal class FlexDisplayStyleConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(FlexDisplayStyle) || t == typeof(FlexDisplayStyle?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "flex":
+                    return FlexDisplayStyle.Flex;
+                case "none":
+                    return FlexDisplayStyle.None;
+                case "unspecified":
+                    return FlexDisplayStyle.Unspecified;
+            }
+            throw new Exception("Cannot unmarshal type FlexDisplayStyle");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (FlexDisplayStyle)untypedValue;
+            switch (value)
+            {
+                case FlexDisplayStyle.Flex:
+                    serializer.Serialize(writer, "flex");
+                    return;
+                case FlexDisplayStyle.None:
+                    serializer.Serialize(writer, "none");
+                    return;
+                case FlexDisplayStyle.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+            }
+            throw new Exception("Cannot marshal type FlexDisplayStyle");
+        }
+
+        public static readonly FlexDisplayStyleConverter Singleton = new FlexDisplayStyleConverter();
+    }
+
+    internal class FlexDirectionConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(FlexDirection) || t == typeof(FlexDirection?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "column":
+                    return FlexDirection.Column;
+                case "columnReverse":
+                    return FlexDirection.ColumnReverse;
+                case "row":
+                    return FlexDirection.Row;
+                case "rowReverse":
+                    return FlexDirection.RowReverse;
+                case "unspecified":
+                    return FlexDirection.Unspecified;
+            }
+            throw new Exception("Cannot unmarshal type FlexDirection");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (FlexDirection)untypedValue;
+            switch (value)
+            {
+                case FlexDirection.Column:
+                    serializer.Serialize(writer, "column");
+                    return;
+                case FlexDirection.ColumnReverse:
+                    serializer.Serialize(writer, "columnReverse");
+                    return;
+                case FlexDirection.Row:
+                    serializer.Serialize(writer, "row");
+                    return;
+                case FlexDirection.RowReverse:
+                    serializer.Serialize(writer, "rowReverse");
+                    return;
+                case FlexDirection.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+            }
+            throw new Exception("Cannot marshal type FlexDirection");
+        }
+
+        public static readonly FlexDirectionConverter Singleton = new FlexDirectionConverter();
+    }
+
+    internal class FontStyleConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(FontStyle) || t == typeof(FontStyle?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "bold":
+                    return FontStyle.Bold;
+                case "boldAndItalic":
+                    return FontStyle.BoldAndItalic;
+                case "italic":
+                    return FontStyle.Italic;
+                case "normal":
+                    return FontStyle.Normal;
+                case "unspecified":
+                    return FontStyle.Unspecified;
+            }
+            throw new Exception("Cannot unmarshal type FontStyle");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (FontStyle)untypedValue;
+            switch (value)
+            {
+                case FontStyle.Bold:
+                    serializer.Serialize(writer, "bold");
+                    return;
+                case FontStyle.BoldAndItalic:
+                    serializer.Serialize(writer, "boldAndItalic");
+                    return;
+                case FontStyle.Italic:
+                    serializer.Serialize(writer, "italic");
+                    return;
+                case FontStyle.Normal:
+                    serializer.Serialize(writer, "normal");
+                    return;
+                case FontStyle.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+            }
+            throw new Exception("Cannot marshal type FontStyle");
+        }
+
+        public static readonly FontStyleConverter Singleton = new FontStyleConverter();
+    }
+
+    internal class FlexJustifyConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(FlexJustify) || t == typeof(FlexJustify?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "center":
+                    return FlexJustify.Center;
+                case "flexEnd":
+                    return FlexJustify.FlexEnd;
+                case "flexStart":
+                    return FlexJustify.FlexStart;
+                case "spaceAround":
+                    return FlexJustify.SpaceAround;
+                case "spaceBetween":
+                    return FlexJustify.SpaceBetween;
+                case "unspecified":
+                    return FlexJustify.Unspecified;
+            }
+            throw new Exception("Cannot unmarshal type FlexJustify");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (FlexJustify)untypedValue;
+            switch (value)
+            {
+                case FlexJustify.Center:
+                    serializer.Serialize(writer, "center");
+                    return;
+                case FlexJustify.FlexEnd:
+                    serializer.Serialize(writer, "flexEnd");
+                    return;
+                case FlexJustify.FlexStart:
+                    serializer.Serialize(writer, "flexStart");
+                    return;
+                case FlexJustify.SpaceAround:
+                    serializer.Serialize(writer, "spaceAround");
+                    return;
+                case FlexJustify.SpaceBetween:
+                    serializer.Serialize(writer, "spaceBetween");
+                    return;
+                case FlexJustify.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+            }
+            throw new Exception("Cannot marshal type FlexJustify");
+        }
+
+        public static readonly FlexJustifyConverter Singleton = new FlexJustifyConverter();
+    }
+
+    internal class FlexConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(Flex) || t == typeof(Flex?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "hidden":
+                    return Flex.Hidden;
+                case "unspecified":
+                    return Flex.Unspecified;
+                case "visible":
+                    return Flex.Visible;
+            }
+            throw new Exception("Cannot unmarshal type Flex");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (Flex)untypedValue;
+            switch (value)
+            {
+                case Flex.Hidden:
+                    serializer.Serialize(writer, "hidden");
+                    return;
+                case Flex.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+                case Flex.Visible:
+                    serializer.Serialize(writer, "visible");
+                    return;
+            }
+            throw new Exception("Cannot marshal type Flex");
+        }
+
+        public static readonly FlexConverter Singleton = new FlexConverter();
+    }
+
+    internal class OverflowClipBoxConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(OverflowClipBox) || t == typeof(OverflowClipBox?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "contentBox":
+                    return OverflowClipBox.ContentBox;
+                case "paddingBox":
+                    return OverflowClipBox.PaddingBox;
+                case "unspecified":
+                    return OverflowClipBox.Unspecified;
+            }
+            throw new Exception("Cannot unmarshal type OverflowClipBox");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (OverflowClipBox)untypedValue;
+            switch (value)
+            {
+                case OverflowClipBox.ContentBox:
+                    serializer.Serialize(writer, "contentBox");
+                    return;
+                case OverflowClipBox.PaddingBox:
+                    serializer.Serialize(writer, "paddingBox");
+                    return;
+                case OverflowClipBox.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+            }
+            throw new Exception("Cannot marshal type OverflowClipBox");
+        }
+
+        public static readonly OverflowClipBoxConverter Singleton = new OverflowClipBoxConverter();
+    }
+
+    internal class FlexPickingModeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(FlexPickingMode) || t == typeof(FlexPickingMode?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "ignore":
+                    return FlexPickingMode.Ignore;
+                case "position":
+                    return FlexPickingMode.Position;
+                case "unspecified":
+                    return FlexPickingMode.Unspecified;
+            }
+            throw new Exception("Cannot unmarshal type FlexPickingMode");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (FlexPickingMode)untypedValue;
+            switch (value)
+            {
+                case FlexPickingMode.Ignore:
+                    serializer.Serialize(writer, "ignore");
+                    return;
+                case FlexPickingMode.Position:
+                    serializer.Serialize(writer, "position");
+                    return;
+                case FlexPickingMode.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+            }
+            throw new Exception("Cannot marshal type FlexPickingMode");
+        }
+
+        public static readonly FlexPickingModeConverter Singleton = new FlexPickingModeConverter();
+    }
+
+    internal class FlexPositionConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(FlexPosition) || t == typeof(FlexPosition?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "absolute":
+                    return FlexPosition.Absolute;
+                case "relative":
+                    return FlexPosition.Relative;
+                case "unspecified":
+                    return FlexPosition.Unspecified;
+            }
+            throw new Exception("Cannot unmarshal type FlexPosition");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (FlexPosition)untypedValue;
+            switch (value)
+            {
+                case FlexPosition.Absolute:
+                    serializer.Serialize(writer, "absolute");
+                    return;
+                case FlexPosition.Relative:
+                    serializer.Serialize(writer, "relative");
+                    return;
+                case FlexPosition.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+            }
+            throw new Exception("Cannot marshal type FlexPosition");
+        }
+
+        public static readonly FlexPositionConverter Singleton = new FlexPositionConverter();
+    }
+
+    internal class TextAlignConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(TextAlign) || t == typeof(TextAlign?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "lowerCenter":
+                    return TextAlign.LowerCenter;
+                case "lowerLeft":
+                    return TextAlign.LowerLeft;
+                case "lowerRight":
+                    return TextAlign.LowerRight;
+                case "middleCenter":
+                    return TextAlign.MiddleCenter;
+                case "middleLeft":
+                    return TextAlign.MiddleLeft;
+                case "middleRight":
+                    return TextAlign.MiddleRight;
+                case "unspecified":
+                    return TextAlign.Unspecified;
+                case "upperCenter":
+                    return TextAlign.UpperCenter;
+                case "upperLeft":
+                    return TextAlign.UpperLeft;
+                case "upperRight":
+                    return TextAlign.UpperRight;
+            }
+            throw new Exception("Cannot unmarshal type TextAlign");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (TextAlign)untypedValue;
+            switch (value)
+            {
+                case TextAlign.LowerCenter:
+                    serializer.Serialize(writer, "lowerCenter");
+                    return;
+                case TextAlign.LowerLeft:
+                    serializer.Serialize(writer, "lowerLeft");
+                    return;
+                case TextAlign.LowerRight:
+                    serializer.Serialize(writer, "lowerRight");
+                    return;
+                case TextAlign.MiddleCenter:
+                    serializer.Serialize(writer, "middleCenter");
+                    return;
+                case TextAlign.MiddleLeft:
+                    serializer.Serialize(writer, "middleLeft");
+                    return;
+                case TextAlign.MiddleRight:
+                    serializer.Serialize(writer, "middleRight");
+                    return;
+                case TextAlign.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+                case TextAlign.UpperCenter:
+                    serializer.Serialize(writer, "upperCenter");
+                    return;
+                case TextAlign.UpperLeft:
+                    serializer.Serialize(writer, "upperLeft");
+                    return;
+                case TextAlign.UpperRight:
+                    serializer.Serialize(writer, "upperRight");
+                    return;
+            }
+            throw new Exception("Cannot marshal type TextAlign");
+        }
+
+        public static readonly TextAlignConverter Singleton = new TextAlignConverter();
+    }
+
+    internal class TextOverflowConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(TextOverflow) || t == typeof(TextOverflow?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "clip":
+                    return TextOverflow.Clip;
+                case "ellipsis":
+                    return TextOverflow.Ellipsis;
+                case "unspecified":
+                    return TextOverflow.Unspecified;
+            }
+            throw new Exception("Cannot unmarshal type TextOverflow");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (TextOverflow)untypedValue;
+            switch (value)
+            {
+                case TextOverflow.Clip:
+                    serializer.Serialize(writer, "clip");
+                    return;
+                case TextOverflow.Ellipsis:
+                    serializer.Serialize(writer, "ellipsis");
+                    return;
+                case TextOverflow.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+            }
+            throw new Exception("Cannot marshal type TextOverflow");
+        }
+
+        public static readonly TextOverflowConverter Singleton = new TextOverflowConverter();
+    }
+
+    internal class TextOverflowPositionConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(TextOverflowPosition) || t == typeof(TextOverflowPosition?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "end":
+                    return TextOverflowPosition.End;
+                case "middle":
+                    return TextOverflowPosition.Middle;
+                case "start":
+                    return TextOverflowPosition.Start;
+                case "unspecified":
+                    return TextOverflowPosition.Unspecified;
+            }
+            throw new Exception("Cannot unmarshal type TextOverflowPosition");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (TextOverflowPosition)untypedValue;
+            switch (value)
+            {
+                case TextOverflowPosition.End:
+                    serializer.Serialize(writer, "end");
+                    return;
+                case TextOverflowPosition.Middle:
+                    serializer.Serialize(writer, "middle");
+                    return;
+                case TextOverflowPosition.Start:
+                    serializer.Serialize(writer, "start");
+                    return;
+                case TextOverflowPosition.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+            }
+            throw new Exception("Cannot marshal type TextOverflowPosition");
+        }
+
+        public static readonly TextOverflowPositionConverter Singleton = new TextOverflowPositionConverter();
+    }
+
+    internal class EasingModeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(EasingMode) || t == typeof(EasingMode?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "ease":
+                    return EasingMode.Ease;
+                case "easeIn":
+                    return EasingMode.EaseIn;
+                case "easeInBack":
+                    return EasingMode.EaseInBack;
+                case "easeInBounce":
+                    return EasingMode.EaseInBounce;
+                case "easeInCirc":
+                    return EasingMode.EaseInCirc;
+                case "easeInCubic":
+                    return EasingMode.EaseInCubic;
+                case "easeInElastic":
+                    return EasingMode.EaseInElastic;
+                case "easeInOut":
+                    return EasingMode.EaseInOut;
+                case "easeInOutBack":
+                    return EasingMode.EaseInOutBack;
+                case "easeInOutBounce":
+                    return EasingMode.EaseInOutBounce;
+                case "easeInOutCirc":
+                    return EasingMode.EaseInOutCirc;
+                case "easeInOutCubic":
+                    return EasingMode.EaseInOutCubic;
+                case "easeInOutElastic":
+                    return EasingMode.EaseInOutElastic;
+                case "easeInOutSine":
+                    return EasingMode.EaseInOutSine;
+                case "easeInSine":
+                    return EasingMode.EaseInSine;
+                case "easeOut":
+                    return EasingMode.EaseOut;
+                case "easeOutBack":
+                    return EasingMode.EaseOutBack;
+                case "easeOutBounce":
+                    return EasingMode.EaseOutBounce;
+                case "easeOutCirc":
+                    return EasingMode.EaseOutCirc;
+                case "easeOutCubic":
+                    return EasingMode.EaseOutCubic;
+                case "easeOutElastic":
+                    return EasingMode.EaseOutElastic;
+                case "easeOutSine":
+                    return EasingMode.EaseOutSine;
+                case "linear":
+                    return EasingMode.Linear;
+                case "unspecified":
+                    return EasingMode.Unspecified;
+            }
+            throw new Exception("Cannot unmarshal type EasingMode");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (EasingMode)untypedValue;
+            switch (value)
+            {
+                case EasingMode.Ease:
+                    serializer.Serialize(writer, "ease");
+                    return;
+                case EasingMode.EaseIn:
+                    serializer.Serialize(writer, "easeIn");
+                    return;
+                case EasingMode.EaseInBack:
+                    serializer.Serialize(writer, "easeInBack");
+                    return;
+                case EasingMode.EaseInBounce:
+                    serializer.Serialize(writer, "easeInBounce");
+                    return;
+                case EasingMode.EaseInCirc:
+                    serializer.Serialize(writer, "easeInCirc");
+                    return;
+                case EasingMode.EaseInCubic:
+                    serializer.Serialize(writer, "easeInCubic");
+                    return;
+                case EasingMode.EaseInElastic:
+                    serializer.Serialize(writer, "easeInElastic");
+                    return;
+                case EasingMode.EaseInOut:
+                    serializer.Serialize(writer, "easeInOut");
+                    return;
+                case EasingMode.EaseInOutBack:
+                    serializer.Serialize(writer, "easeInOutBack");
+                    return;
+                case EasingMode.EaseInOutBounce:
+                    serializer.Serialize(writer, "easeInOutBounce");
+                    return;
+                case EasingMode.EaseInOutCirc:
+                    serializer.Serialize(writer, "easeInOutCirc");
+                    return;
+                case EasingMode.EaseInOutCubic:
+                    serializer.Serialize(writer, "easeInOutCubic");
+                    return;
+                case EasingMode.EaseInOutElastic:
+                    serializer.Serialize(writer, "easeInOutElastic");
+                    return;
+                case EasingMode.EaseInOutSine:
+                    serializer.Serialize(writer, "easeInOutSine");
+                    return;
+                case EasingMode.EaseInSine:
+                    serializer.Serialize(writer, "easeInSine");
+                    return;
+                case EasingMode.EaseOut:
+                    serializer.Serialize(writer, "easeOut");
+                    return;
+                case EasingMode.EaseOutBack:
+                    serializer.Serialize(writer, "easeOutBack");
+                    return;
+                case EasingMode.EaseOutBounce:
+                    serializer.Serialize(writer, "easeOutBounce");
+                    return;
+                case EasingMode.EaseOutCirc:
+                    serializer.Serialize(writer, "easeOutCirc");
+                    return;
+                case EasingMode.EaseOutCubic:
+                    serializer.Serialize(writer, "easeOutCubic");
+                    return;
+                case EasingMode.EaseOutElastic:
+                    serializer.Serialize(writer, "easeOutElastic");
+                    return;
+                case EasingMode.EaseOutSine:
+                    serializer.Serialize(writer, "easeOutSine");
+                    return;
+                case EasingMode.Linear:
+                    serializer.Serialize(writer, "linear");
+                    return;
+                case EasingMode.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+            }
+            throw new Exception("Cannot marshal type EasingMode");
+        }
+
+        public static readonly EasingModeConverter Singleton = new EasingModeConverter();
+    }
+
+    internal class WhiteSpaceConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(WhiteSpace) || t == typeof(WhiteSpace?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "noWrap":
+                    return WhiteSpace.NoWrap;
+                case "normal":
+                    return WhiteSpace.Normal;
+                case "unspecified":
+                    return WhiteSpace.Unspecified;
+            }
+            throw new Exception("Cannot unmarshal type WhiteSpace");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (WhiteSpace)untypedValue;
+            switch (value)
+            {
+                case WhiteSpace.NoWrap:
+                    serializer.Serialize(writer, "noWrap");
+                    return;
+                case WhiteSpace.Normal:
+                    serializer.Serialize(writer, "normal");
+                    return;
+                case WhiteSpace.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+            }
+            throw new Exception("Cannot marshal type WhiteSpace");
+        }
+
+        public static readonly WhiteSpaceConverter Singleton = new WhiteSpaceConverter();
+    }
+
+    internal class FlexWrapConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(FlexWrap) || t == typeof(FlexWrap?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "noWrap":
+                    return FlexWrap.NoWrap;
+                case "unspecified":
+                    return FlexWrap.Unspecified;
+                case "wrap":
+                    return FlexWrap.Wrap;
+                case "wrapReverse":
+                    return FlexWrap.WrapReverse;
+            }
+            throw new Exception("Cannot unmarshal type FlexWrap");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (FlexWrap)untypedValue;
+            switch (value)
+            {
+                case FlexWrap.NoWrap:
+                    serializer.Serialize(writer, "noWrap");
+                    return;
+                case FlexWrap.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+                case FlexWrap.Wrap:
+                    serializer.Serialize(writer, "wrap");
+                    return;
+                case FlexWrap.WrapReverse:
+                    serializer.Serialize(writer, "wrapReverse");
+                    return;
+            }
+            throw new Exception("Cannot marshal type FlexWrap");
+        }
+
+        public static readonly FlexWrapConverter Singleton = new FlexWrapConverter();
+    }
+
+    internal class ScrollBarVisibilityConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(ScrollBarVisibility) || t == typeof(ScrollBarVisibility?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "alwaysVisible":
+                    return ScrollBarVisibility.AlwaysVisible;
+                case "auto":
+                    return ScrollBarVisibility.Auto;
+                case "hidden":
+                    return ScrollBarVisibility.Hidden;
+                case "unspecified":
+                    return ScrollBarVisibility.Unspecified;
+            }
+            throw new Exception("Cannot unmarshal type ScrollBarVisibility");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (ScrollBarVisibility)untypedValue;
+            switch (value)
+            {
+                case ScrollBarVisibility.AlwaysVisible:
+                    serializer.Serialize(writer, "alwaysVisible");
+                    return;
+                case ScrollBarVisibility.Auto:
+                    serializer.Serialize(writer, "auto");
+                    return;
+                case ScrollBarVisibility.Hidden:
+                    serializer.Serialize(writer, "hidden");
+                    return;
+                case ScrollBarVisibility.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+            }
+            throw new Exception("Cannot marshal type ScrollBarVisibility");
+        }
+
+        public static readonly ScrollBarVisibilityConverter Singleton = new ScrollBarVisibilityConverter();
+    }
+
+    internal class TouchScrollBehaviorConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(TouchScrollBehavior) || t == typeof(TouchScrollBehavior?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "clamped":
+                    return TouchScrollBehavior.Clamped;
+                case "elastic":
+                    return TouchScrollBehavior.Elastic;
+                case "unrestricted":
+                    return TouchScrollBehavior.Unrestricted;
+                case "unspecified":
+                    return TouchScrollBehavior.Unspecified;
+            }
+            throw new Exception("Cannot unmarshal type TouchScrollBehavior");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (TouchScrollBehavior)untypedValue;
+            switch (value)
+            {
+                case TouchScrollBehavior.Clamped:
+                    serializer.Serialize(writer, "clamped");
+                    return;
+                case TouchScrollBehavior.Elastic:
+                    serializer.Serialize(writer, "elastic");
+                    return;
+                case TouchScrollBehavior.Unrestricted:
+                    serializer.Serialize(writer, "unrestricted");
+                    return;
+                case TouchScrollBehavior.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+            }
+            throw new Exception("Cannot marshal type TouchScrollBehavior");
+        }
+
+        public static readonly TouchScrollBehaviorConverter Singleton = new TouchScrollBehaviorConverter();
+    }
+
+    internal class SliderDirectionConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(SliderDirection) || t == typeof(SliderDirection?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "horizontal":
+                    return SliderDirection.Horizontal;
+                case "unspecified":
+                    return SliderDirection.Unspecified;
+                case "vertical":
+                    return SliderDirection.Vertical;
+            }
+            throw new Exception("Cannot unmarshal type SliderDirection");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (SliderDirection)untypedValue;
+            switch (value)
+            {
+                case SliderDirection.Horizontal:
+                    serializer.Serialize(writer, "horizontal");
+                    return;
+                case SliderDirection.Unspecified:
+                    serializer.Serialize(writer, "unspecified");
+                    return;
+                case SliderDirection.Vertical:
+                    serializer.Serialize(writer, "vertical");
+                    return;
+            }
+            throw new Exception("Cannot marshal type SliderDirection");
+        }
+
+        public static readonly SliderDirectionConverter Singleton = new SliderDirectionConverter();
+    }
+
     internal class ButtonKindConverter : JsonConverter
     {
         public override bool CanConvert(Type t) => t == typeof(ButtonKind) || t == typeof(ButtonKind?);
@@ -919,39 +2792,5 @@ namespace Dreamcaller.Schema
         }
 
         public static readonly ButtonKindConverter Singleton = new ButtonKindConverter();
-    }
-
-    internal class DebugActionConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(DebugAction) || t == typeof(DebugAction?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            if (value == "drawCard")
-            {
-                return DebugAction.DrawCard;
-            }
-            throw new Exception("Cannot unmarshal type DebugAction");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (DebugAction)untypedValue;
-            if (value == DebugAction.DrawCard)
-            {
-                serializer.Serialize(writer, "drawCard");
-                return;
-            }
-            throw new Exception("Cannot marshal type DebugAction");
-        }
-
-        public static readonly DebugActionConverter Singleton = new DebugActionConverter();
     }
 }

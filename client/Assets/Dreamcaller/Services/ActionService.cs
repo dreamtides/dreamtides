@@ -107,7 +107,6 @@ namespace Dreamcaller.Services
 
     IEnumerator ApplyCommands(CommandSequence commands, bool animate)
     {
-      Debug.Log($"Applying commands with groups {commands.Groups.Count}");
       foreach (var group in commands.Groups)
       {
         yield return ApplyGroup(group, animate);
@@ -116,7 +115,6 @@ namespace Dreamcaller.Services
 
     IEnumerator ApplyGroup(CommandGroup group, bool animate)
     {
-      Debug.Log($"Applying group with commands {group.Commands.Count}");
       var coroutines = new List<Coroutine>();
       var sequence = animate ? TweenUtils.Sequence("ApplyGroup") : null;
       foreach (var command in group.Commands)

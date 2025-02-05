@@ -1,6 +1,7 @@
 use core_data::identifiers::CardId;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::{CardFacing, Url};
+use masonry::flex_node::FlexNode;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -71,7 +72,7 @@ pub struct RevealedCardView {
     pub frame: CardFrame,
 
     /// Additional help text about this card, describing its abilities.
-    pub supplemental_card_info: Vec<String>,
+    pub supplemental_card_info: Option<FlexNode>,
 
     /// True if this card can be played during the opponent's turn
     pub is_fast: bool,

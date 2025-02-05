@@ -13,6 +13,7 @@ use display_data::object_position::{ObjectPosition, Position};
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, Metadata, PerformActionRequest, PerformActionResponse,
 };
+use masonry::flex_node::{FlexNode, NodeType, Text};
 use uuid::Uuid;
 
 static CURRENT_BATTLE: LazyLock<Mutex<Option<BattleView>>> = LazyLock::new(|| Mutex::new(None));
@@ -156,7 +157,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
             spark: Some(Spark(4)),
             card_type: "Ancient".to_string(),
             frame: CardFrame::Character,
-            supplemental_card_info: vec!["<b>Materialize</b>: A character entering play.".to_string()],
+            supplemental_card_info: flex_node("<b>Materialize</b>: A character entering play."),
             is_fast: false,
             can_play: position == Position::InHand(DisplayPlayer::User),
         }),
@@ -187,10 +188,9 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
             spark: None,
             card_type: "Event".to_string(),
             frame: CardFrame::Event,
-            supplemental_card_info: vec![
-                "<b>Discover</b>: Pick one of 4 cards with different types to put into your hand."
-                    .to_string(),
-            ],
+            supplemental_card_info: flex_node(
+                "<b>Discover</b>: Pick one of 4 cards with different types to put into your hand.",
+            ),
             is_fast: false,
         }),
         revealed_to_opponents: true,
@@ -224,10 +224,8 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
             spark: Some(Spark(0)),
             card_type: "Tinkerer".to_string(),
             frame: CardFrame::Character,
-            supplemental_card_info: vec![
-                "<b>Judgment</b>: Triggers at the start of your turn."
-                    .to_string(),
-            ],
+            supplemental_card_info: flex_node(
+                "<b>Judgment</b>: Triggers at the start of your turn."),
             is_fast: false,
         }),
         revealed_to_opponents: true,
@@ -258,7 +256,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
             spark: Some(Spark(0)),
             card_type: "Trooper".to_string(),
             frame: CardFrame::Character,
-            supplemental_card_info: vec![],
+            supplemental_card_info: None,
             is_fast: false,
         }),
         revealed_to_opponents: true,
@@ -288,10 +286,9 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
             spark: None,
             card_type: "Event".to_string(),
             frame: CardFrame::Event,
-            supplemental_card_info: vec![
-                "<b>Reclaim</b>: You may play this card from your void, then banish it."
-                    .to_string(),
-            ],
+            supplemental_card_info: flex_node(
+                "<b>Reclaim</b>: You may play this card from your void, then banish it.",
+            ),
             is_fast: false,
         }),
         revealed_to_opponents: true,
@@ -299,4 +296,11 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
         create_position: None,
         destroy_position: None,
     }
+}
+
+fn flex_node(text: impl Into<String>) -> Option<FlexNode> {
+    Some(FlexNode {
+        node_type: Some(NodeType::Text(Text { label: text.into() })),
+        ..Default::default()
+    })
 }
