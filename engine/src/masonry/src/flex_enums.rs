@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum FlexAlign {
-    Unspecified,
     Auto,
     FlexStart,
     Center,
@@ -15,7 +14,6 @@ pub enum FlexAlign {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum FlexDisplayStyle {
-    Unspecified,
     Flex,
     None,
 }
@@ -23,7 +21,6 @@ pub enum FlexDisplayStyle {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum FlexDirection {
-    Unspecified,
     Column,
     ColumnReverse,
     Row,
@@ -33,7 +30,6 @@ pub enum FlexDirection {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum FlexWrap {
-    Unspecified,
     NoWrap,
     Wrap,
     WrapReverse,
@@ -42,7 +38,6 @@ pub enum FlexWrap {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum FlexJustify {
-    Unspecified,
     FlexStart,
     Center,
     FlexEnd,
@@ -53,7 +48,6 @@ pub enum FlexJustify {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum FlexOverflow {
-    Unspecified,
     Visible,
     Hidden,
 }
@@ -61,7 +55,6 @@ pub enum FlexOverflow {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum FlexPosition {
-    Unspecified,
     Relative,
     Absolute,
 }
@@ -69,7 +62,6 @@ pub enum FlexPosition {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum TextOverflow {
-    Unspecified,
     Clip,
     Ellipsis,
 }
@@ -77,7 +69,6 @@ pub enum TextOverflow {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum EasingMode {
-    Unspecified,
     Ease,
     EaseIn,
     EaseOut,
@@ -106,7 +97,6 @@ pub enum EasingMode {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum ImageScaleMode {
-    Unspecified,
     StretchToFill,
     ScaleAndCrop,
     ScaleToFit,
@@ -115,7 +105,6 @@ pub enum ImageScaleMode {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum FontStyle {
-    Unspecified,
     Normal,
     Bold,
     Italic,
@@ -125,7 +114,6 @@ pub enum FontStyle {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum OverflowClipBox {
-    Unspecified,
     PaddingBox,
     ContentBox,
 }
@@ -133,7 +121,6 @@ pub enum OverflowClipBox {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum TextAlign {
-    Unspecified,
     UpperLeft,
     UpperCenter,
     UpperRight,
@@ -148,7 +135,6 @@ pub enum TextAlign {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum TextOverflowPosition {
-    Unspecified,
     End,
     Start,
     Middle,
@@ -157,7 +143,6 @@ pub enum TextOverflowPosition {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum FlexVisibility {
-    Unspecified,
     Visible,
     Hidden,
 }
@@ -165,7 +150,6 @@ pub enum FlexVisibility {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum WhiteSpace {
-    Unspecified,
     Normal,
     NoWrap,
 }

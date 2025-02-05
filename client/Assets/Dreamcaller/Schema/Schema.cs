@@ -1074,47 +1074,47 @@ namespace Dreamcaller.Schema
     /// </summary>
     public enum DebugAction { DrawCard };
 
-    public enum FlexAlign { Auto, Center, FlexEnd, FlexStart, Stretch, Unspecified };
+    public enum FlexAlign { Auto, Center, FlexEnd, FlexStart, Stretch };
 
-    public enum BackgroundImageAutoSize { FromHeight, FromWidth, Unspecified };
+    public enum BackgroundImageAutoSize { FromHeight, FromWidth };
 
-    public enum ImageScaleMode { ScaleAndCrop, ScaleToFit, StretchToFill, Unspecified };
+    public enum ImageScaleMode { ScaleAndCrop, ScaleToFit, StretchToFill };
 
     public enum DimensionUnit { Percentage, Pixels, SafeAreaBottom, SafeAreaLeft, SafeAreaRight, SafeAreaTop, ViewportHeight, ViewportWidth };
 
-    public enum FlexDisplayStyle { Flex, None, Unspecified };
+    public enum FlexDisplayStyle { Flex, None };
 
-    public enum FlexDirection { Column, ColumnReverse, Row, RowReverse, Unspecified };
+    public enum FlexDirection { Column, ColumnReverse, Row, RowReverse };
 
-    public enum FontStyle { Bold, BoldAndItalic, Italic, Normal, Unspecified };
+    public enum FontStyle { Bold, BoldAndItalic, Italic, Normal };
 
-    public enum FlexJustify { Center, FlexEnd, FlexStart, SpaceAround, SpaceBetween, Unspecified };
+    public enum FlexJustify { Center, FlexEnd, FlexStart, SpaceAround, SpaceBetween };
 
-    public enum Flex { Hidden, Unspecified, Visible };
+    public enum Flex { Hidden, Visible };
 
-    public enum OverflowClipBox { ContentBox, PaddingBox, Unspecified };
+    public enum OverflowClipBox { ContentBox, PaddingBox };
 
-    public enum FlexPickingMode { Ignore, Position, Unspecified };
+    public enum FlexPickingMode { Ignore, Position };
 
-    public enum FlexPosition { Absolute, Relative, Unspecified };
+    public enum FlexPosition { Absolute, Relative };
 
-    public enum TextAlign { LowerCenter, LowerLeft, LowerRight, MiddleCenter, MiddleLeft, MiddleRight, Unspecified, UpperCenter, UpperLeft, UpperRight };
+    public enum TextAlign { LowerCenter, LowerLeft, LowerRight, MiddleCenter, MiddleLeft, MiddleRight, UpperCenter, UpperLeft, UpperRight };
 
-    public enum TextOverflow { Clip, Ellipsis, Unspecified };
+    public enum TextOverflow { Clip, Ellipsis };
 
-    public enum TextOverflowPosition { End, Middle, Start, Unspecified };
+    public enum TextOverflowPosition { End, Middle, Start };
 
-    public enum EasingMode { Ease, EaseIn, EaseInBack, EaseInBounce, EaseInCirc, EaseInCubic, EaseInElastic, EaseInOut, EaseInOutBack, EaseInOutBounce, EaseInOutCirc, EaseInOutCubic, EaseInOutElastic, EaseInOutSine, EaseInSine, EaseOut, EaseOutBack, EaseOutBounce, EaseOutCirc, EaseOutCubic, EaseOutElastic, EaseOutSine, Linear, Unspecified };
+    public enum EasingMode { Ease, EaseIn, EaseInBack, EaseInBounce, EaseInCirc, EaseInCubic, EaseInElastic, EaseInOut, EaseInOutBack, EaseInOutBounce, EaseInOutCirc, EaseInOutCubic, EaseInOutElastic, EaseInOutSine, EaseInSine, EaseOut, EaseOutBack, EaseOutBounce, EaseOutCirc, EaseOutCubic, EaseOutElastic, EaseOutSine, Linear };
 
-    public enum WhiteSpace { NoWrap, Normal, Unspecified };
+    public enum WhiteSpace { NoWrap, Normal };
 
-    public enum FlexWrap { NoWrap, Unspecified, Wrap, WrapReverse };
+    public enum FlexWrap { NoWrap, Wrap, WrapReverse };
 
-    public enum ScrollBarVisibility { AlwaysVisible, Auto, Hidden, Unspecified };
+    public enum ScrollBarVisibility { AlwaysVisible, Auto, Hidden };
 
-    public enum TouchScrollBehavior { Clamped, Elastic, Unrestricted, Unspecified };
+    public enum TouchScrollBehavior { Clamped, Elastic, Unrestricted };
 
-    public enum SliderDirection { Horizontal, Unspecified, Vertical };
+    public enum SliderDirection { Horizontal, Vertical };
 
     /// <summary>
     /// Controls color for buttons
@@ -1567,8 +1567,6 @@ namespace Dreamcaller.Schema
                     return FlexAlign.FlexStart;
                 case "stretch":
                     return FlexAlign.Stretch;
-                case "unspecified":
-                    return FlexAlign.Unspecified;
             }
             throw new Exception("Cannot unmarshal type FlexAlign");
         }
@@ -1598,9 +1596,6 @@ namespace Dreamcaller.Schema
                 case FlexAlign.Stretch:
                     serializer.Serialize(writer, "stretch");
                     return;
-                case FlexAlign.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
-                    return;
             }
             throw new Exception("Cannot marshal type FlexAlign");
         }
@@ -1622,8 +1617,6 @@ namespace Dreamcaller.Schema
                     return BackgroundImageAutoSize.FromHeight;
                 case "fromWidth":
                     return BackgroundImageAutoSize.FromWidth;
-                case "unspecified":
-                    return BackgroundImageAutoSize.Unspecified;
             }
             throw new Exception("Cannot unmarshal type BackgroundImageAutoSize");
         }
@@ -1643,9 +1636,6 @@ namespace Dreamcaller.Schema
                     return;
                 case BackgroundImageAutoSize.FromWidth:
                     serializer.Serialize(writer, "fromWidth");
-                    return;
-                case BackgroundImageAutoSize.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
                     return;
             }
             throw new Exception("Cannot marshal type BackgroundImageAutoSize");
@@ -1670,8 +1660,6 @@ namespace Dreamcaller.Schema
                     return ImageScaleMode.ScaleToFit;
                 case "stretchToFill":
                     return ImageScaleMode.StretchToFill;
-                case "unspecified":
-                    return ImageScaleMode.Unspecified;
             }
             throw new Exception("Cannot unmarshal type ImageScaleMode");
         }
@@ -1694,9 +1682,6 @@ namespace Dreamcaller.Schema
                     return;
                 case ImageScaleMode.StretchToFill:
                     serializer.Serialize(writer, "stretchToFill");
-                    return;
-                case ImageScaleMode.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
                     return;
             }
             throw new Exception("Cannot marshal type ImageScaleMode");
@@ -1790,8 +1775,6 @@ namespace Dreamcaller.Schema
                     return FlexDisplayStyle.Flex;
                 case "none":
                     return FlexDisplayStyle.None;
-                case "unspecified":
-                    return FlexDisplayStyle.Unspecified;
             }
             throw new Exception("Cannot unmarshal type FlexDisplayStyle");
         }
@@ -1811,9 +1794,6 @@ namespace Dreamcaller.Schema
                     return;
                 case FlexDisplayStyle.None:
                     serializer.Serialize(writer, "none");
-                    return;
-                case FlexDisplayStyle.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
                     return;
             }
             throw new Exception("Cannot marshal type FlexDisplayStyle");
@@ -1840,8 +1820,6 @@ namespace Dreamcaller.Schema
                     return FlexDirection.Row;
                 case "rowReverse":
                     return FlexDirection.RowReverse;
-                case "unspecified":
-                    return FlexDirection.Unspecified;
             }
             throw new Exception("Cannot unmarshal type FlexDirection");
         }
@@ -1868,9 +1846,6 @@ namespace Dreamcaller.Schema
                 case FlexDirection.RowReverse:
                     serializer.Serialize(writer, "rowReverse");
                     return;
-                case FlexDirection.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
-                    return;
             }
             throw new Exception("Cannot marshal type FlexDirection");
         }
@@ -1896,8 +1871,6 @@ namespace Dreamcaller.Schema
                     return FontStyle.Italic;
                 case "normal":
                     return FontStyle.Normal;
-                case "unspecified":
-                    return FontStyle.Unspecified;
             }
             throw new Exception("Cannot unmarshal type FontStyle");
         }
@@ -1923,9 +1896,6 @@ namespace Dreamcaller.Schema
                     return;
                 case FontStyle.Normal:
                     serializer.Serialize(writer, "normal");
-                    return;
-                case FontStyle.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
                     return;
             }
             throw new Exception("Cannot marshal type FontStyle");
@@ -1954,8 +1924,6 @@ namespace Dreamcaller.Schema
                     return FlexJustify.SpaceAround;
                 case "spaceBetween":
                     return FlexJustify.SpaceBetween;
-                case "unspecified":
-                    return FlexJustify.Unspecified;
             }
             throw new Exception("Cannot unmarshal type FlexJustify");
         }
@@ -1985,9 +1953,6 @@ namespace Dreamcaller.Schema
                 case FlexJustify.SpaceBetween:
                     serializer.Serialize(writer, "spaceBetween");
                     return;
-                case FlexJustify.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
-                    return;
             }
             throw new Exception("Cannot marshal type FlexJustify");
         }
@@ -2007,8 +1972,6 @@ namespace Dreamcaller.Schema
             {
                 case "hidden":
                     return Flex.Hidden;
-                case "unspecified":
-                    return Flex.Unspecified;
                 case "visible":
                     return Flex.Visible;
             }
@@ -2027,9 +1990,6 @@ namespace Dreamcaller.Schema
             {
                 case Flex.Hidden:
                     serializer.Serialize(writer, "hidden");
-                    return;
-                case Flex.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
                     return;
                 case Flex.Visible:
                     serializer.Serialize(writer, "visible");
@@ -2055,8 +2015,6 @@ namespace Dreamcaller.Schema
                     return OverflowClipBox.ContentBox;
                 case "paddingBox":
                     return OverflowClipBox.PaddingBox;
-                case "unspecified":
-                    return OverflowClipBox.Unspecified;
             }
             throw new Exception("Cannot unmarshal type OverflowClipBox");
         }
@@ -2076,9 +2034,6 @@ namespace Dreamcaller.Schema
                     return;
                 case OverflowClipBox.PaddingBox:
                     serializer.Serialize(writer, "paddingBox");
-                    return;
-                case OverflowClipBox.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
                     return;
             }
             throw new Exception("Cannot marshal type OverflowClipBox");
@@ -2101,8 +2056,6 @@ namespace Dreamcaller.Schema
                     return FlexPickingMode.Ignore;
                 case "position":
                     return FlexPickingMode.Position;
-                case "unspecified":
-                    return FlexPickingMode.Unspecified;
             }
             throw new Exception("Cannot unmarshal type FlexPickingMode");
         }
@@ -2122,9 +2075,6 @@ namespace Dreamcaller.Schema
                     return;
                 case FlexPickingMode.Position:
                     serializer.Serialize(writer, "position");
-                    return;
-                case FlexPickingMode.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
                     return;
             }
             throw new Exception("Cannot marshal type FlexPickingMode");
@@ -2147,8 +2097,6 @@ namespace Dreamcaller.Schema
                     return FlexPosition.Absolute;
                 case "relative":
                     return FlexPosition.Relative;
-                case "unspecified":
-                    return FlexPosition.Unspecified;
             }
             throw new Exception("Cannot unmarshal type FlexPosition");
         }
@@ -2168,9 +2116,6 @@ namespace Dreamcaller.Schema
                     return;
                 case FlexPosition.Relative:
                     serializer.Serialize(writer, "relative");
-                    return;
-                case FlexPosition.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
                     return;
             }
             throw new Exception("Cannot marshal type FlexPosition");
@@ -2201,8 +2146,6 @@ namespace Dreamcaller.Schema
                     return TextAlign.MiddleLeft;
                 case "middleRight":
                     return TextAlign.MiddleRight;
-                case "unspecified":
-                    return TextAlign.Unspecified;
                 case "upperCenter":
                     return TextAlign.UpperCenter;
                 case "upperLeft":
@@ -2241,9 +2184,6 @@ namespace Dreamcaller.Schema
                 case TextAlign.MiddleRight:
                     serializer.Serialize(writer, "middleRight");
                     return;
-                case TextAlign.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
-                    return;
                 case TextAlign.UpperCenter:
                     serializer.Serialize(writer, "upperCenter");
                     return;
@@ -2274,8 +2214,6 @@ namespace Dreamcaller.Schema
                     return TextOverflow.Clip;
                 case "ellipsis":
                     return TextOverflow.Ellipsis;
-                case "unspecified":
-                    return TextOverflow.Unspecified;
             }
             throw new Exception("Cannot unmarshal type TextOverflow");
         }
@@ -2295,9 +2233,6 @@ namespace Dreamcaller.Schema
                     return;
                 case TextOverflow.Ellipsis:
                     serializer.Serialize(writer, "ellipsis");
-                    return;
-                case TextOverflow.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
                     return;
             }
             throw new Exception("Cannot marshal type TextOverflow");
@@ -2322,8 +2257,6 @@ namespace Dreamcaller.Schema
                     return TextOverflowPosition.Middle;
                 case "start":
                     return TextOverflowPosition.Start;
-                case "unspecified":
-                    return TextOverflowPosition.Unspecified;
             }
             throw new Exception("Cannot unmarshal type TextOverflowPosition");
         }
@@ -2346,9 +2279,6 @@ namespace Dreamcaller.Schema
                     return;
                 case TextOverflowPosition.Start:
                     serializer.Serialize(writer, "start");
-                    return;
-                case TextOverflowPosition.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
                     return;
             }
             throw new Exception("Cannot marshal type TextOverflowPosition");
@@ -2413,8 +2343,6 @@ namespace Dreamcaller.Schema
                     return EasingMode.EaseOutSine;
                 case "linear":
                     return EasingMode.Linear;
-                case "unspecified":
-                    return EasingMode.Unspecified;
             }
             throw new Exception("Cannot unmarshal type EasingMode");
         }
@@ -2498,9 +2426,6 @@ namespace Dreamcaller.Schema
                 case EasingMode.Linear:
                     serializer.Serialize(writer, "linear");
                     return;
-                case EasingMode.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
-                    return;
             }
             throw new Exception("Cannot marshal type EasingMode");
         }
@@ -2522,8 +2447,6 @@ namespace Dreamcaller.Schema
                     return WhiteSpace.NoWrap;
                 case "normal":
                     return WhiteSpace.Normal;
-                case "unspecified":
-                    return WhiteSpace.Unspecified;
             }
             throw new Exception("Cannot unmarshal type WhiteSpace");
         }
@@ -2544,9 +2467,6 @@ namespace Dreamcaller.Schema
                 case WhiteSpace.Normal:
                     serializer.Serialize(writer, "normal");
                     return;
-                case WhiteSpace.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
-                    return;
             }
             throw new Exception("Cannot marshal type WhiteSpace");
         }
@@ -2566,8 +2486,6 @@ namespace Dreamcaller.Schema
             {
                 case "noWrap":
                     return FlexWrap.NoWrap;
-                case "unspecified":
-                    return FlexWrap.Unspecified;
                 case "wrap":
                     return FlexWrap.Wrap;
                 case "wrapReverse":
@@ -2588,9 +2506,6 @@ namespace Dreamcaller.Schema
             {
                 case FlexWrap.NoWrap:
                     serializer.Serialize(writer, "noWrap");
-                    return;
-                case FlexWrap.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
                     return;
                 case FlexWrap.Wrap:
                     serializer.Serialize(writer, "wrap");
@@ -2621,8 +2536,6 @@ namespace Dreamcaller.Schema
                     return ScrollBarVisibility.Auto;
                 case "hidden":
                     return ScrollBarVisibility.Hidden;
-                case "unspecified":
-                    return ScrollBarVisibility.Unspecified;
             }
             throw new Exception("Cannot unmarshal type ScrollBarVisibility");
         }
@@ -2645,9 +2558,6 @@ namespace Dreamcaller.Schema
                     return;
                 case ScrollBarVisibility.Hidden:
                     serializer.Serialize(writer, "hidden");
-                    return;
-                case ScrollBarVisibility.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
                     return;
             }
             throw new Exception("Cannot marshal type ScrollBarVisibility");
@@ -2672,8 +2582,6 @@ namespace Dreamcaller.Schema
                     return TouchScrollBehavior.Elastic;
                 case "unrestricted":
                     return TouchScrollBehavior.Unrestricted;
-                case "unspecified":
-                    return TouchScrollBehavior.Unspecified;
             }
             throw new Exception("Cannot unmarshal type TouchScrollBehavior");
         }
@@ -2697,9 +2605,6 @@ namespace Dreamcaller.Schema
                 case TouchScrollBehavior.Unrestricted:
                     serializer.Serialize(writer, "unrestricted");
                     return;
-                case TouchScrollBehavior.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
-                    return;
             }
             throw new Exception("Cannot marshal type TouchScrollBehavior");
         }
@@ -2719,8 +2624,6 @@ namespace Dreamcaller.Schema
             {
                 case "horizontal":
                     return SliderDirection.Horizontal;
-                case "unspecified":
-                    return SliderDirection.Unspecified;
                 case "vertical":
                     return SliderDirection.Vertical;
             }
@@ -2739,9 +2642,6 @@ namespace Dreamcaller.Schema
             {
                 case SliderDirection.Horizontal:
                     serializer.Serialize(writer, "horizontal");
-                    return;
-                case SliderDirection.Unspecified:
-                    serializer.Serialize(writer, "unspecified");
                     return;
                 case SliderDirection.Vertical:
                     serializer.Serialize(writer, "vertical");

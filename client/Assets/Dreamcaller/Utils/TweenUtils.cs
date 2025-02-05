@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using DG.Tweening;
 
 namespace Dreamcaller.Utils
@@ -17,5 +18,9 @@ namespace Dreamcaller.Utils
       return result;
     }
 
+    public static void ExecuteAfter(float seconds, Action action)
+    {
+      Sequence("ExecuteAfter").InsertCallback(seconds, () => action());
+    }
   }
 }

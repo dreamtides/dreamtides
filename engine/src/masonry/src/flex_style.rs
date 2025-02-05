@@ -163,7 +163,6 @@ pub struct ImageSlice {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum FlexPickingMode {
-    Unspecified,
     Position,
     Ignore,
 }
@@ -171,7 +170,6 @@ pub enum FlexPickingMode {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum BackgroundImageAutoSize {
-    Unspecified,
     FromWidth,
     FromHeight,
 }

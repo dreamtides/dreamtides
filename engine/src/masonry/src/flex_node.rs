@@ -7,7 +7,6 @@ use crate::flex_style::FlexStyle;
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum ScrollBarVisibility {
-    Unspecified,
     Auto,
     AlwaysVisible,
     Hidden,
@@ -16,7 +15,6 @@ pub enum ScrollBarVisibility {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum TouchScrollBehavior {
-    Unspecified,
     Unrestricted,
     Elastic,
     Clamped,
@@ -25,7 +23,6 @@ pub enum TouchScrollBehavior {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum SliderDirection {
-    Unspecified,
     Horizontal,
     Vertical,
 }

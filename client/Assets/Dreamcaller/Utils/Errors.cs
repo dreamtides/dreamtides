@@ -54,5 +54,13 @@ namespace Dreamcaller.Utils
 
     public static Exception UnknownEnumValue<T>(T value) where T : Enum =>
       new ArgumentException($"Unknown '{typeof(T).Name}' value: '{value}'");
+
+    public static void CheckArgument(bool expression, string message)
+    {
+      if (!expression)
+      {
+        throw new ArgumentException(message);
+      }
+    }
   }
 }
