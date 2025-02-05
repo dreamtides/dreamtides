@@ -30,6 +30,8 @@ namespace Dreamcaller.Components
     [SerializeField] TextMeshPro _costText = null!;
     [SerializeField] MeshRenderer _sparkBackground = null!;
     [SerializeField] TextMeshPro _sparkText = null!;
+    [SerializeField] ObjectLayout? _containedObjects;
+    [SerializeField] ObjectLayout? _stackedObjects;
 
     bool _isRevealed = false;
     Registry _registry = null!;
@@ -38,8 +40,11 @@ namespace Dreamcaller.Components
     float _dragStartScreenZ;
     Vector3 _dragStartPosition;
     Vector3 _dragOffset;
+    bool _isDragging = false;
 
     public CardView CardView => Errors.CheckNotNull(_cardView);
+
+    public string Id => CardView.ClientId();
 
     public void Render(Registry registry, CardView view, Sequence? sequence = null)
     {
@@ -74,7 +79,38 @@ namespace Dreamcaller.Components
 
     public void TurnFaceDown(Sequence? sequence = null) => Flip(_cardFront, _cardBack, sequence);
 
-    public override bool CanHandleMouseEvents() => true;
+    /// <summary>
+    /// Creates a clone of the card for large display in the info zoom.
+    /// </summary>
+    public Card CloneForInfoZoom()
+    {
+      var clone = Instantiate(gameObject, transform.position, transform.rotation);
+      var result = ComponentUtils.Get<Card>(clone);
+
+      if (result._stackedObjects)
+      {
+        Destroy(result._stackedObjects.gameObject);
+        result._stackedObjects = null;
+      }
+
+      if (result._containedObjects)
+      {
+        Destroy(result._containedObjects.gameObject);
+        result._containedObjects = null;
+      }
+
+      result.gameObject.name = "[IZ]" + gameObject.name;
+      result._cardView = CardView;
+      result._outline.enabled = false;
+      result._registry = _registry;
+      result._isRevealed = _isRevealed;
+      result.Parent = null;
+      result.transform.localPosition = Vector3.zero;
+      result.transform.localScale = Vector3.one;
+      result.transform.rotation = Quaternion.identity;
+      result.GameContext = GameContext.InfoZoom;
+      return result;
+    }
 
     void Flip(Component faceUp, Component faceDown, Sequence? sequence, Action? onFlipped = null)
     {
@@ -151,6 +187,8 @@ namespace Dreamcaller.Components
       gameObject.name = "Hidden Card";
     }
 
+    public override bool CanHandleMouseEvents() => true;
+
     protected override void OnSetGameContext(GameContext oldContext, GameContext newContext)
     {
       if (newContext.IsBattlefieldContext())
@@ -169,8 +207,14 @@ namespace Dreamcaller.Components
 
     public override void MouseDown()
     {
+      if (_registry.CapabilitiesService.CanInfoZoom(GameContext))
+      {
+        _registry.CardService.DisplayInfoZoom(this);
+      }
+
       if (CanPlay())
       {
+        _isDragging = true;
         _registry.SoundService.PlayCardSound();
         GameContext = GameContext.Dragging;
         if (Parent)
@@ -187,6 +231,11 @@ namespace Dreamcaller.Components
 
     public override void MouseDrag()
     {
+      if (!_isDragging)
+      {
+        return;
+      }
+
       var mousePosition = _registry.InputService.WorldMousePosition(_dragStartScreenZ);
       var distanceDragged = Vector2.Distance(mousePosition, _dragStartPosition);
       var t = Mathf.Clamp01(distanceDragged / 2);
@@ -202,7 +251,9 @@ namespace Dreamcaller.Components
 
     public override void MouseUp()
     {
+      _isDragging = false;
       _registry.SoundService.PlayCardSound();
+      _registry.CardService.ClearInfoZoom();
 
       if (ShouldReturnToPreviousParentOnRelease())
       {
@@ -233,9 +284,9 @@ namespace Dreamcaller.Components
         return true;
       }
 
-      return !_registry.CardService.IsTouchOverPlayCardArea();
+      return !_registry.CardService.IsPointerOverPlayCardArea();
     }
 
-    bool CanPlay() => CardView.Revealed?.CanPlay == true && _registry.CapabilitiesService.CanMoveCards();
+    bool CanPlay() => CardView.Revealed?.CanPlay == true && _registry.CapabilitiesService.CanDragCards();
   }
 }

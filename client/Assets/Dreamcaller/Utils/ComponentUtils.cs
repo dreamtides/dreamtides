@@ -21,5 +21,30 @@ namespace Dreamcaller.Utils
       }
       return result;
     }
+
+    public static T Get<T>(Component component) where T : Component
+    {
+      Errors.CheckNotNull(component);
+      var result = component.GetComponent<T>();
+      if (!result)
+      {
+        throw new NullReferenceException(
+          $"Expected a component of type {typeof(T).FullName} on {component.gameObject.name}");
+      }
+
+      return result;
+    }
+
+    public static T Get<T>(GameObject gameObject) where T : Component
+    {
+      Errors.CheckNotNull(gameObject);
+      var result = gameObject.GetComponent<T>();
+      if (!result)
+      {
+        throw new NullReferenceException($"Expected a component of type {typeof(T).FullName} on {gameObject.name}");
+      }
+
+      return result;
+    }
   }
 }

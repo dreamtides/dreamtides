@@ -72,7 +72,7 @@ namespace Dreamcaller.Layout
     /// position, rotation, and scale. Otherwise they are immediately set to
     /// their target values.
     /// </summary>
-    public void ApplyLayout(Sequence? sequence)
+    public void ApplyLayout(Sequence? sequence = null)
     {
       for (var i = 0; i < _objects.Count; ++i)
       {

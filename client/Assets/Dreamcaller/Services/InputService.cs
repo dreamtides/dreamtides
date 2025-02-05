@@ -22,11 +22,11 @@ namespace Dreamcaller.Services
       _tapPositionAction = InputSystem.actions.FindAction("TapPosition");
     }
 
-    public Vector2 TapPosition() => _tapPositionAction.ReadValue<Vector2>();
+    public Vector2 PointerPosition() => _tapPositionAction.ReadValue<Vector2>();
 
     public Vector3 WorldMousePosition(float screenZ)
     {
-      var tapScreenPosition = TapPosition();
+      var tapScreenPosition = PointerPosition();
       return Registry.MainCamera.ScreenToWorldPoint(
           new Vector3(tapScreenPosition.x, tapScreenPosition.y, screenZ));
     }
@@ -74,7 +74,7 @@ namespace Dreamcaller.Services
 
     Displayable? ObjectAtClickPosition()
     {
-      var tapScreenPosition = TapPosition();
+      var tapScreenPosition = PointerPosition();
       var ray = Registry.MainCamera.ScreenPointToRay(tapScreenPosition);
       var hits = Physics.RaycastNonAlloc(ray, _raycastHitsTempBuffer, 100);
 

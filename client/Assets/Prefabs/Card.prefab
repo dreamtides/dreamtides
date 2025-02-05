@@ -585,6 +585,8 @@ MonoBehaviour:
   _costText: {fileID: 1608741921414912863}
   _sparkBackground: {fileID: 4747414827766458844}
   _sparkText: {fileID: 8847688324303037262}
+  _containedObjects: {fileID: 0}
+  _stackedObjects: {fileID: 0}
 --- !u!65 &5680000531262599633
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1028,8 +1030,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.0575, y: -1.726}
-  m_SizeDelta: {x: 1.74, y: 0.9257}
+  m_AnchoredPosition: {x: 0.0517, y: -1.761}
+  m_SizeDelta: {x: 1.7284, y: 0.8558}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &7276334165164446115
 MeshRenderer:
@@ -1054,7 +1056,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -7011058989551242589, guid: 091dfafe55daa45969ebd1d3a749181c, type: 2}
+  - {fileID: -5317669338628401487, guid: 6349f93bbba7f4920b91936b35c34e5b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1099,8 +1101,8 @@ MonoBehaviour:
   m_text: Here is some text which wraps to five different lines, which is the maximum
     number of lines of text which are allowed to be displayed on a card.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 091dfafe55daa45969ebd1d3a749181c, type: 2}
-  m_sharedMaterial: {fileID: -7011058989551242589, guid: 091dfafe55daa45969ebd1d3a749181c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 6349f93bbba7f4920b91936b35c34e5b, type: 2}
+  m_sharedMaterial: {fileID: -5317669338628401487, guid: 6349f93bbba7f4920b91936b35c34e5b, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1124,8 +1126,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 1.1
-  m_fontSizeBase: 1.1
+  m_fontSize: 1.25
+  m_fontSizeBase: 1.25
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1162,7 +1164,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -0.026441813, y: 0.025042236, z: 0.044251204, w: -0.006283164}
+  m_margin: {x: -0.0031547546, y: 0.0017959476, z: 0.0035040379, w: -0.006336093}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   _SortingLayer: 0

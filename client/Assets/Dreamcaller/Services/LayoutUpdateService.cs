@@ -28,7 +28,7 @@ namespace Dreamcaller.Services
 
       foreach (var cardView in view.Cards)
       {
-        var cardId = SerializeCardId(cardView.Id);
+        var cardId = cardView.ClientId();
         toDelete.Remove(cardId);
         var layout = LayoutForPosition(cardView.Position.Position);
         Card card;
@@ -206,11 +206,6 @@ namespace Dreamcaller.Services
       }
 
       return Registry.Offscreen;
-    }
-
-    string SerializeCardId(CardId id)
-    {
-      return JsonConvert.SerializeObject(id, Converter.Settings);
     }
   }
 }
