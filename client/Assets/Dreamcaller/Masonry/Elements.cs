@@ -9,15 +9,23 @@ using UnityEngine.UIElements;
 
 namespace Dreamcaller.Masonry
 {
+  public enum NodeType
+  {
+    VisualElement,
+    Draggable,
+    Text,
+    TextField,
+    Slider,
+    ScrollView,
+  }
+
   public interface IMasonElement
   {
     FlexNode? Node { get; set; }
 
-    NodeType? NodeType() => Node?.NodeType;
-
     VisualElement Self { get; }
 
-    VisualElement Clone(Registry registry) => Mason.Render(registry, Errors.CheckNotNull(Node, "Node is null"));
+    IMasonElement Clone(Registry registry) => Mason.Render(registry, Errors.CheckNotNull(Node, "Node is null"));
   }
 
   public interface INodeCallbacks : IMasonElement

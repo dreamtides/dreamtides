@@ -21,6 +21,41 @@ namespace Dreamcaller.Masonry
       return null;
     }
 
+    public static NodeType GetNodeType(FlexNode? node)
+    {
+      if (node == null)
+      {
+        return NodeType.VisualElement;
+      }
+
+      if (node.NodeType.Text != null)
+      {
+        return NodeType.Text;
+      }
+
+      if (node.NodeType.ScrollViewNode != null)
+      {
+        return NodeType.ScrollView;
+      }
+
+      if (node.NodeType.DraggableNode != null)
+      {
+        return NodeType.Draggable;
+      }
+
+      if (node.NodeType.TextFieldNode != null)
+      {
+        return NodeType.TextField;
+      }
+
+      if (node.NodeType.SliderNode != null)
+      {
+        return NodeType.Slider;
+      }
+
+      return NodeType.VisualElement;
+    }
+
     /// <summary>
     /// Merges two FlexStyle objects, preferring values set in 'newStyle'.
     /// </summary>

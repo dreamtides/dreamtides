@@ -16,20 +16,20 @@ namespace Dreamcaller.Masonry
     /// <summary>
     /// Renders the provided Node into a VisualElement, recursively rendering child nodes.
     /// </summary>
-    public static VisualElement Render(Registry registry, FlexNode node)
+    public static IMasonElement Render(Registry registry, FlexNode node)
     {
       var element = CreateElement(node);
       ApplyToElement(registry, element, node);
 
       foreach (var child in node.Children)
       {
-        element.Add(Render(registry, child));
+        element.Self.Add(Render(registry, child).Self);
       }
 
       return element;
     }
 
-    public static VisualElement CreateElement(FlexNode node)
+    public static IMasonElement CreateElement(FlexNode node)
     {
       IMasonElement result;
       if (node.NodeType.Text != null)
@@ -58,11 +58,11 @@ namespace Dreamcaller.Masonry
       }
 
       result.Node = node;
-      return result.Self;
+      return result;
     }
 
-    /// <summary>Applies the configuration in a Node to an existing VisualElement, without modifying children.</summary>
-    public static void ApplyToElement(Registry registry, VisualElement element, FlexNode node)
+    /// <summary>Applies the configuration in a Node to an existing IMasonElement, without modifying children.</summary>
+    public static void ApplyToElement(Registry registry, IMasonElement element, FlexNode node)
     {
       if (node.NodeType.Text != null)
       {
@@ -85,7 +85,7 @@ namespace Dreamcaller.Masonry
         Sliders.Apply(registry, (NodeSlider)element, node.NodeType.SliderNode);
       }
 
-      ApplyNode(registry, node, element);
+      ApplyNode(registry, node, element.Self);
     }
 
     static void ApplyNode(Registry registry, FlexNode node, VisualElement element)
