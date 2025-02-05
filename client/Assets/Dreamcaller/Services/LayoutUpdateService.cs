@@ -30,7 +30,7 @@ namespace Dreamcaller.Services
       {
         var cardId = cardView.ClientId();
         toDelete.Remove(cardId);
-        var layout = LayoutForPosition(cardView.Position.Position);
+        var layout = LayoutForPosition(cardView.Position);
         Card card;
         if (Cards.ContainsKey(cardId))
         {
@@ -41,7 +41,7 @@ namespace Dreamcaller.Services
           card = ComponentUtils.Instantiate(CardPrefab);
           if (cardView.CreatePosition != null)
           {
-            LayoutForPosition(cardView.CreatePosition.Position).ApplyTargetTransform(card);
+            LayoutForPosition(cardView.CreatePosition).ApplyTargetTransform(card);
           }
           else
           {
@@ -87,7 +87,7 @@ namespace Dreamcaller.Services
     /// </summary>
     public void AddToParent(Card card)
     {
-      var layout = LayoutForPosition(card.CardView.Position.Position);
+      var layout = LayoutForPosition(card.CardView.Position);
       layout.Add(card);
     }
 
@@ -101,7 +101,8 @@ namespace Dreamcaller.Services
 
     void ApplyAllLayouts(Sequence? sequence)
     {
-      Registry.UserHand.ApplyLayout(sequence);
+      Registry.UserHandRow1.ApplyLayout(sequence);
+      Registry.UserHandRow2.ApplyLayout(sequence);
       Registry.EnemyHand.ApplyLayout(sequence);
       Registry.UserDeck.ApplyLayout(sequence);
       Registry.EnemyDeck.ApplyLayout(sequence);
@@ -128,7 +129,7 @@ namespace Dreamcaller.Services
 
           if (card.CardView.DestroyPosition != null)
           {
-            var layout = LayoutForPosition(card.CardView.DestroyPosition.Position);
+            var layout = LayoutForPosition(card.CardView.DestroyPosition);
             layout.ApplyTargetTransform(card, sequence);
           }
         }
@@ -148,13 +149,13 @@ namespace Dreamcaller.Services
     {
       foreach (var card in delete)
       {
-        Debug.Log($"Destroying card {card.CardView.Revealed?.Name} with id {card.CardView.Id}");
         Destroy(card.gameObject);
       }
     }
 
-    ObjectLayout LayoutForPosition(Position position)
+    ObjectLayout LayoutForPosition(ObjectPosition objectPosition)
     {
+      var position = objectPosition.Position;
       if (position.Enum == PositionEnum.Drawn)
       {
         return Registry.DrawnCardsPosition;
@@ -169,7 +170,7 @@ namespace Dreamcaller.Services
       {
         return inHand switch
         {
-          DisplayPlayer.User => Registry.UserHand,
+          DisplayPlayer.User => objectPosition.SortingKey > 17 ? Registry.UserHandRow2 : Registry.UserHandRow1,
           DisplayPlayer.Enemy => Registry.EnemyHand,
           _ => throw Errors.UnknownEnumValue(inHand),
         };

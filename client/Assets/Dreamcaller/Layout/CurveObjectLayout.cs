@@ -55,31 +55,54 @@ namespace Dreamcaller.Layout
         case 1:
           return 0.5f;
         case 2:
-          return PositionWithinRange(start: 0.4f, end: 0.6f, cardIndex, cardCount);
+          return new float[] { 0.3333f, 0.6666f }[cardIndex];
         case 3:
-          return PositionWithinRange(start: 0.3f, end: 0.7f, cardIndex, cardCount);
+          return new float[] { 0.25f, 0.5f, 0.75f }[cardIndex];
         case 4:
-          return PositionWithinRange(start: 0.2f, end: 0.8f, cardIndex, cardCount);
+          return new float[] { 0.2f, 0.4f, 0.6f, 0.8f }[cardIndex];
         case 5:
-          return PositionWithinRange(start: 0.1f, end: 0.9f, cardIndex, cardCount);
+          // There's a lot of weird aesthetics going on here. The cards don't
+          // feel right unless you can see the same sliver of each one, but with
+          // rotation and stuff this doesn't seem to work with even spacing.
+          return new float[] { 0.15f, 0.35f, 0.50f, 0.65f, 0.85f }[cardIndex];
+        case 6:
+          // For these two, we kick the right control point over a bunch and
+          // then pull the leftmost cards a little. Because you see so much more
+          // of the "top" card, this gives the illusion of even distribution
+          // even though the spacing itself is uneven. For this to work, the
+          // cards really need to be flush with the screen edges -- if you can
+          // see space around them you will realize they are not centered.
+          return new float[] { 0.08f, 0.28f, 0.42f, 0.56f, 0.7f, 0.86f }[cardIndex];
+        case 7:
+          return new float[] { 0.08f, 0.26f, 0.40f, 0.52f, 0.64f, 0.76f, 0.88f }[cardIndex];
         default:
-          return PositionWithinRange(start: 0.0f, end: 1.0f, cardIndex, cardCount);
+          return 0.1f + (0.8f * cardIndex / (cardCount - 1));
       }
     }
-
-    // Given a start,end range on the 0,1 line, returns the position within that range where card 'index' of of
-    // 'count' total cards should be positioned
-    float PositionWithinRange(float start, float end, int index, int count) =>
-      start + index * ((end - start) / (count - 1.0f));
 
     // Card rotation ranges from 5 to -5
     float CalculateZRotation(float t) => -10.0f * t + 5.0f;
 
     Vector3 CalculateBezierPosition(float t) =>
-      Mathf.Pow(1 - t, 3) * _controlPoint1.position +
-      3 * Mathf.Pow(1 - t, 2) * t * _controlPoint2.position +
-      3 * (1 - t) * Mathf.Pow(t, 2) * _controlPoint3.position +
-      Mathf.Pow(t, 3) * _controlPoint4.position;
+      Mathf.Pow(1 - t, 3) * ControlPointPosition(1) +
+      3 * Mathf.Pow(1 - t, 2) * t * ControlPointPosition(2) +
+      3 * (1 - t) * Mathf.Pow(t, 2) * ControlPointPosition(3) +
+      Mathf.Pow(t, 3) * ControlPointPosition(4);
+
+    Vector3 ControlPointPosition(int index) =>
+      index switch
+      {
+        1 => _controlPoint1.position,
+        2 => _controlPoint2.position,
+        3 => _controlPoint3.position,
+        4 => _controlPoint4.position + Objects.Count switch
+        {
+          6 => new Vector3(1, 0, 0),
+          >= 7 => new Vector3(2.5f, 0, 0),
+          _ => Vector3.zero
+        },
+        _ => throw new ArgumentException("Invalid control point index"),
+      };
 
     void OnDrawGizmosSelected()
     {
