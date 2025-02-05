@@ -582,7 +582,7 @@ namespace Dreamcaller.Schema
         public double? Opacity { get; set; }
 
         [JsonProperty("overflow")]
-        public Flex? Overflow { get; set; }
+        public FlexVisibility? Overflow { get; set; }
 
         [JsonProperty("overflowClipBox")]
         public OverflowClipBox? OverflowClipBox { get; set; }
@@ -626,23 +626,23 @@ namespace Dreamcaller.Schema
         [JsonProperty("transformOrigin")]
         public FlexTranslate TransformOrigin { get; set; }
 
-        [JsonProperty("transitionDelays")]
+        [JsonProperty("transitionDelays", Required = Required.Always)]
         public List<TimeValue> TransitionDelays { get; set; }
 
-        [JsonProperty("transitionDurations")]
+        [JsonProperty("transitionDurations", Required = Required.Always)]
         public List<TimeValue> TransitionDurations { get; set; }
 
-        [JsonProperty("transitionEasingModes")]
-        public List<string> TransitionEasingModes { get; set; }
+        [JsonProperty("transitionEasingModes", Required = Required.Always)]
+        public List<EasingMode> TransitionEasingModes { get; set; }
 
-        [JsonProperty("transitionProperties")]
+        [JsonProperty("transitionProperties", Required = Required.Always)]
         public List<string> TransitionProperties { get; set; }
 
         [JsonProperty("translate")]
         public FlexTranslate Translate { get; set; }
 
         [JsonProperty("visibility")]
-        public Flex? Visibility { get; set; }
+        public FlexVisibility? Visibility { get; set; }
 
         [JsonProperty("whiteSpace")]
         public WhiteSpace? WhiteSpace { get; set; }
@@ -1090,7 +1090,7 @@ namespace Dreamcaller.Schema
 
     public enum FlexJustify { Center, FlexEnd, FlexStart, SpaceAround, SpaceBetween };
 
-    public enum Flex { Hidden, Visible };
+    public enum FlexVisibility { Hidden, Visible };
 
     public enum OverflowClipBox { ContentBox, PaddingBox };
 
@@ -1172,7 +1172,7 @@ namespace Dreamcaller.Schema
                 FlexDirectionConverter.Singleton,
                 FontStyleConverter.Singleton,
                 FlexJustifyConverter.Singleton,
-                FlexConverter.Singleton,
+                FlexVisibilityConverter.Singleton,
                 OverflowClipBoxConverter.Singleton,
                 FlexPickingModeConverter.Singleton,
                 FlexPositionConverter.Singleton,
@@ -1960,9 +1960,9 @@ namespace Dreamcaller.Schema
         public static readonly FlexJustifyConverter Singleton = new FlexJustifyConverter();
     }
 
-    internal class FlexConverter : JsonConverter
+    internal class FlexVisibilityConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(Flex) || t == typeof(Flex?);
+        public override bool CanConvert(Type t) => t == typeof(FlexVisibility) || t == typeof(FlexVisibility?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -1971,11 +1971,11 @@ namespace Dreamcaller.Schema
             switch (value)
             {
                 case "hidden":
-                    return Flex.Hidden;
+                    return FlexVisibility.Hidden;
                 case "visible":
-                    return Flex.Visible;
+                    return FlexVisibility.Visible;
             }
-            throw new Exception("Cannot unmarshal type Flex");
+            throw new Exception("Cannot unmarshal type FlexVisibility");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -1985,20 +1985,20 @@ namespace Dreamcaller.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (Flex)untypedValue;
+            var value = (FlexVisibility)untypedValue;
             switch (value)
             {
-                case Flex.Hidden:
+                case FlexVisibility.Hidden:
                     serializer.Serialize(writer, "hidden");
                     return;
-                case Flex.Visible:
+                case FlexVisibility.Visible:
                     serializer.Serialize(writer, "visible");
                     return;
             }
-            throw new Exception("Cannot marshal type Flex");
+            throw new Exception("Cannot marshal type FlexVisibility");
         }
 
-        public static readonly FlexConverter Singleton = new FlexConverter();
+        public static readonly FlexVisibilityConverter Singleton = new FlexVisibilityConverter();
     }
 
     internal class OverflowClipBoxConverter : JsonConverter

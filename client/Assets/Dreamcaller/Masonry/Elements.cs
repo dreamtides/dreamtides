@@ -15,12 +15,13 @@ namespace Dreamcaller.Masonry
 
     NodeType? NodeType() => Node?.NodeType;
 
+    VisualElement Self { get; }
+
     VisualElement Clone(Registry registry) => Mason.Render(registry, Errors.CheckNotNull(Node, "Node is null"));
   }
 
   public interface INodeCallbacks : IMasonElement
   {
-    VisualElement Self { get; }
     Lazy<Callbacks> Callbacks { get; }
 
     void SetCallback(Callbacks.Event eventType, Action? callback)

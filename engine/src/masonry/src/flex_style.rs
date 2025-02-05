@@ -2,9 +2,9 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::flex_enums::{
-    EasingMode, FlexAlign, FlexDirection, FlexDisplayStyle, FlexJustify, FlexOverflow,
-    FlexPosition, FlexVisibility, FlexWrap, FontStyle, ImageScaleMode, OverflowClipBox, TextAlign,
-    TextOverflow, TextOverflowPosition, WhiteSpace,
+    EasingMode, FlexAlign, FlexDirection, FlexDisplayStyle, FlexJustify, FlexPosition,
+    FlexVisibility, FlexWrap, FontStyle, OverflowClipBox, TextAlign, TextOverflow,
+    TextOverflowPosition, WhiteSpace,
 };
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
@@ -167,13 +167,6 @@ pub enum FlexPickingMode {
     Ignore,
 }
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub enum BackgroundImageAutoSize {
-    FromWidth,
-    FromHeight,
-}
-
 #[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct FlexStyle {
@@ -203,7 +196,7 @@ pub struct FlexStyle {
     pub min_height: Option<Dimension>,
     pub min_width: Option<Dimension>,
     pub opacity: Option<f32>,
-    pub overflow: Option<FlexOverflow>,
+    pub overflow: Option<FlexVisibility>,
     pub padding: Option<DimensionGroup>,
     pub position: Option<FlexPosition>,
     pub rotate: Option<FlexRotate>,
@@ -211,13 +204,12 @@ pub struct FlexStyle {
     pub text_overflow: Option<TextOverflow>,
     pub text_shadow: Option<TextShadow>,
     pub transform_origin: Option<FlexTranslate>,
-    pub transition_delays: Option<Vec<TimeValue>>,
-    pub transition_durations: Option<Vec<TimeValue>>,
-    pub transition_properties: Option<Vec<String>>,
-    pub transition_easing_modes: Option<Vec<EasingMode>>,
+    pub transition_delays: Vec<TimeValue>,
+    pub transition_durations: Vec<TimeValue>,
+    pub transition_properties: Vec<String>,
+    pub transition_easing_modes: Vec<EasingMode>,
     pub translate: Option<FlexTranslate>,
     pub background_image_tint_color: Option<FlexColor>,
-    pub background_image_scale_mode: Option<ImageScaleMode>,
     pub font: Option<FontAddress>,
     pub font_style: Option<FontStyle>,
     pub overflow_clip_box: Option<OverflowClipBox>,
@@ -232,5 +224,4 @@ pub struct FlexStyle {
     pub width: Option<Dimension>,
     pub word_spacing: Option<Dimension>,
     pub picking_mode: Option<FlexPickingMode>,
-    pub background_image_auto_size: Option<BackgroundImageAutoSize>,
 }

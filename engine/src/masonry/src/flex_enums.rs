@@ -47,13 +47,6 @@ pub enum FlexJustify {
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub enum FlexOverflow {
-    Visible,
-    Hidden,
-}
-
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum FlexPosition {
     Relative,
     Absolute,
@@ -92,14 +85,6 @@ pub enum EasingMode {
     EaseInBounce,
     EaseOutBounce,
     EaseInOutBounce,
-}
-
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub enum ImageScaleMode {
-    StretchToFill,
-    ScaleAndCrop,
-    ScaleToFit,
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]

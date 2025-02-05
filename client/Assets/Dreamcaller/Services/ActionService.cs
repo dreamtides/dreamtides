@@ -35,8 +35,13 @@ namespace Dreamcaller.Services
       }
     }
 
-    public void PerformAction(UserAction action)
+    public void PerformAction(UserAction? action)
     {
+      if (action == null)
+      {
+        return;
+      }
+
       var request = new PerformActionRequest
       {
         Metadata = new Metadata

@@ -10,6 +10,7 @@ namespace Dreamcaller.Masonry
 {
   public sealed class Draggable : VisualElement, IMasonElement
   {
+    public VisualElement Self => this;
     public Registry Registry { get; set; }
     public FlexNode? Node { get; set; }
     public List<string> TargetIdentifiers { get; set; }

@@ -66,6 +66,9 @@ namespace Dreamcaller.Services
     [SerializeField] SettingsService? _settingsService;
     public SettingsService SettingsService => Check(_settingsService);
 
+    [SerializeField] AssetService? _assetService;
+    public AssetService AssetService => Check(_assetService);
+
     void Start()
     {
       Application.targetFrameRate = 60;
