@@ -25,7 +25,7 @@ namespace Dreamcaller.Masonry
 
     VisualElement Self { get; }
 
-    IMasonElement Clone(Registry registry) => Mason.Render(registry, Errors.CheckNotNull(Node, "Node is null"));
+    IMasonElement Clone(Registry registry) => MasonRenderer.Render(registry, Errors.CheckNotNull(Node, "Node is null"));
   }
 
   public interface INodeCallbacks : IMasonElement

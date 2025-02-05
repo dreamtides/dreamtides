@@ -29,12 +29,12 @@ namespace Dreamcaller.Masonry
       view.Node = data;
       view.TargetIdentifiers = data.NodeType.DraggableNode.DropTargetIdentifiers.ToList();
       view.OverTargetIndicator = data.NodeType.DraggableNode.OverTargetIndicator;
-      view.OnDrop = MasonUtils.ToUserAction(data.NodeType.DraggableNode.OnDrop);
+      view.OnDrop = Mason.ToUserAction(data.NodeType.DraggableNode.OnDrop);
       view.HorizontalDragStartDistance = data.NodeType.DraggableNode.HorizontalDragStartDistance;
       view.RemoveOriginal = data.NodeType.DraggableNode.RemoveOriginal ?? false;
       view.HideIndicatorChildren = data.NodeType.DraggableNode.HideIndicatorChildren.ToList();
       view.CustomDragIndicator = data.NodeType.DraggableNode.CustomDragIndicator;
-      view.OnDragDetected = MasonUtils.ToUserAction(data.NodeType.DraggableNode.OnDragDetected);
+      view.OnDragDetected = Mason.ToUserAction(data.NodeType.DraggableNode.OnDragDetected);
     }
 
     public Draggable()

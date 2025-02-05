@@ -46,14 +46,14 @@ namespace Dreamcaller.Masonry
           });
       }
 
-      Mason.ApplyStyle(registry, view.labelElement, data.LabelStyle);
-      Mason.ApplyStyle(registry,
+      MasonRenderer.ApplyStyle(registry, view.labelElement, data.LabelStyle);
+      MasonRenderer.ApplyStyle(registry,
         view.Query(className: BaseSlider<float>.dragContainerUssClassName), data.DragContainerStyle);
-      Mason.ApplyStyle(registry,
+      MasonRenderer.ApplyStyle(registry,
         view.Query(className: BaseSlider<float>.trackerUssClassName), data.TrackerStyle);
-      Mason.ApplyStyle(registry,
+      MasonRenderer.ApplyStyle(registry,
         view.Query(className: BaseSlider<float>.draggerUssClassName), data.DraggerStyle);
-      Mason.ApplyStyle(registry,
+      MasonRenderer.ApplyStyle(registry,
         view.Query(className: BaseSlider<float>.draggerBorderUssClassName), data.DraggerBorderStyle);
     }
   }

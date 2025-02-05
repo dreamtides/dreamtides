@@ -13,7 +13,11 @@ use display_data::object_position::{ObjectPosition, Position};
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, Metadata, PerformActionRequest, PerformActionResponse,
 };
+use masonry::flex_enums::WhiteSpace;
 use masonry::flex_node::{FlexNode, NodeType, Text};
+use masonry::flex_style::{
+    BorderRadius, Dimension, DimensionGroup, DimensionUnit, FlexColor, FlexStyle,
+};
 use uuid::Uuid;
 
 static CURRENT_BATTLE: LazyLock<Mutex<Option<BattleView>>> = LazyLock::new(|| Mutex::new(None));
@@ -299,8 +303,28 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
 }
 
 fn flex_node(text: impl Into<String>) -> Option<FlexNode> {
+    let style = FlexStyle {
+        background_color: Some(FlexColor { red: 0.0, green: 0.0, blue: 0.0, alpha: 0.95 }),
+        border_radius: Some(BorderRadius {
+            top_left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            top_right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            bottom_right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            bottom_left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+        }),
+        padding: Some(DimensionGroup {
+            top: Dimension { unit: DimensionUnit::Pixels, value: 8.0 },
+            right: Dimension { unit: DimensionUnit::Pixels, value: 8.0 },
+            bottom: Dimension { unit: DimensionUnit::Pixels, value: 8.0 },
+            left: Dimension { unit: DimensionUnit::Pixels, value: 8.0 },
+        }),
+        color: Some(FlexColor { red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0 }),
+        font_size: Some(Dimension { unit: DimensionUnit::Pixels, value: 7.0 }),
+        white_space: Some(WhiteSpace::Normal),
+        ..Default::default()
+    };
     Some(FlexNode {
         node_type: Some(NodeType::Text(Text { label: text.into() })),
+        style: Some(style),
         ..Default::default()
     })
 }

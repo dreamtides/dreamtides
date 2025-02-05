@@ -40,7 +40,7 @@ namespace Dreamcaller.Masonry
     {
       foreach (var child in scroller.Query<VisualElement>().Build())
       {
-        Mason.ApplyStyle(registry, child, data.Style);
+        MasonRenderer.ApplyStyle(registry, child, data.Style);
       }
     }
 

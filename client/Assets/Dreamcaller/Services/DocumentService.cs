@@ -17,7 +17,7 @@ namespace Dreamcaller.Services
     protected override void OnInitialize()
     {
       _document.rootVisualElement.Clear();
-      AddChild("InfoZoom", out _infoZoom);
+      AddChild("InfoZoomContainer", out _infoZoom);
     }
 
     public bool IsAnyPanelOpen()
@@ -42,7 +42,6 @@ namespace Dreamcaller.Services
       Reconcile(ref _infoZoom, node);
     }
 
-
     public DimensionGroup GetSafeArea()
     {
       var panel = RootVisualElement.panel;
@@ -55,21 +54,23 @@ namespace Dreamcaller.Services
         new Vector2(Screen.width - Screen.safeArea.xMax, Screen.safeArea.yMin)
       );
 
-      return MasonUtils.GroupPx(safeLeftTop.x, safeLeftTop.y, safeRightBottom.x, safeRightBottom.y);
+      return Mason.GroupPx(safeLeftTop.x, safeLeftTop.y, safeRightBottom.x, safeRightBottom.y);
     }
 
     void AddChild(string elementName, out IMasonElement element)
     {
-      var node = MasonUtils.Row(elementName, new FlexStyle
+      var node = Mason.Row(elementName, new FlexStyle
       {
         Position = FlexPosition.Absolute,
-        Inset = MasonUtils.AllPx(0),
+        Inset = Mason.AllPx(0),
         PickingMode = FlexPickingMode.Ignore
       });
-      element = Mason.Render(Registry, node);
-      _document.rootVisualElement.Add(element.Self);
+      var container = MasonRenderer.Render(Registry, node);
+      var result = new NodeVisualElement();
+      container.Self.Add(result);
+      element = result;
+      _document.rootVisualElement.Add(container.Self);
     }
-
 
     void Reconcile(ref IMasonElement previousElement, FlexNode newNode)
     {

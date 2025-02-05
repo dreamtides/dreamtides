@@ -196,12 +196,18 @@ namespace Dreamcaller.Components
         _cardFrame.gameObject.SetActive(false);
         _name.gameObject.SetActive(false);
         _rulesText.gameObject.SetActive(false);
+        _sparkBackground.gameObject.SetActive(false);
+        _costBackground.gameObject.SetActive(false);
+        _typeText.gameObject.SetActive(false);
       }
       else
       {
         _cardFrame.gameObject.SetActive(true);
         _name.gameObject.SetActive(true);
         _rulesText.gameObject.SetActive(true);
+        _sparkBackground.gameObject.SetActive(true);
+        _costBackground.gameObject.SetActive(true);
+        _typeText.gameObject.SetActive(true);
       }
     }
 

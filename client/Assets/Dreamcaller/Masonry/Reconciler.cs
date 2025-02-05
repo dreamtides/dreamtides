@@ -26,8 +26,8 @@ namespace Dreamcaller.Masonry
       FlexNode node,
       IMasonElement? previousElement = null)
     {
-      var nodeType = MasonUtils.GetNodeTypeTag(node);
-      if (previousElement != null && (MasonUtils.GetNodeTypeTag(previousElement.Node) == nodeType))
+      var nodeType = Mason.GetNodeTypeTag(node);
+      if (previousElement != null && (Mason.GetNodeTypeTag(previousElement.Node) == nodeType))
       {
         // If node types match, reuse this node
         return UpdateWhenMatching(registry, node, previousElement);
@@ -45,15 +45,15 @@ namespace Dreamcaller.Masonry
       IMasonElement previousElement)
     {
       UpdateChildren(registry, node, previousElement.Self, previousElement.Self);
-      Mason.ApplyToElement(registry, previousElement, node);
+      MasonRenderer.ApplyToElement(registry, previousElement, node);
       return null;
     }
 
     static IMasonElement UpdateWhenNew(Registry registry, FlexNode node)
     {
-      var result = Mason.CreateElement(node);
+      var result = MasonRenderer.CreateElement(node);
       UpdateChildren(registry, node, result.Self);
-      Mason.ApplyToElement(registry, result, node);
+      MasonRenderer.ApplyToElement(registry, result, node);
       return result;
     }
 
@@ -71,28 +71,31 @@ namespace Dreamcaller.Masonry
       }
 
       var count = 0;
-      while (count < node.Children.Count)
+      if (node.Children != null)
       {
-        var child = node.Children[count];
-        if (previousElement != null && count < previousElement.childCount)
+        while (count < node.Children.Count)
         {
-          // Element exists in previous tree.
-          var result = Update(
-            registry,
-            child,
-            previousElement[count] as IMasonElement);
-          if (result != null)
+          var child = node.Children[count];
+          if (previousElement != null && count < previousElement.childCount)
           {
-            previousElement.RemoveAt(count);
-            previousElement.Insert(count, result.Self);
+            // Element exists in previous tree.
+            var result = Update(
+              registry,
+              child,
+              previousElement[count] as IMasonElement);
+            if (result != null)
+            {
+              previousElement.RemoveAt(count);
+              previousElement.Insert(count, result.Self);
+            }
           }
-        }
-        else
-        {
-          addTo.Add(UpdateWhenNew(registry, child).Self);
-        }
+          else
+          {
+            addTo.Add(UpdateWhenNew(registry, child).Self);
+          }
 
-        count++;
+          count++;
+        }
       }
 
       if (previousElement != null)

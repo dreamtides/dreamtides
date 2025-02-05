@@ -1,6 +1,9 @@
 #nullable enable
 
 using UnityEngine;
+#if !UNITY_EDITOR && (UNITY_IOS || UNITY_WEBGL)
+using System;
+#endif
 
 namespace Dreamcaller.Utils
 {
