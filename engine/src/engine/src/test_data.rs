@@ -152,12 +152,13 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
             name: "Titan of Forgotten Echoes".to_string(),
             rules_text: "When you materialize your second character in a turn, return this character from your void to play.".to_string(),
             status: None,
-            can_play: position == Position::InHand(DisplayPlayer::User),
             cost: Energy(6),
             spark: Some(Spark(4)),
             card_type: "Ancient".to_string(),
             frame: CardFrame::Character,
+            supplemental_card_info: vec!["<b>Materialize</b>: A character entering play.".to_string()],
             is_fast: false,
+            can_play: position == Position::InHand(DisplayPlayer::User),
         }),
         revealed_to_opponents: true,
         card_facing: CardFacing::FaceUp,
@@ -170,11 +171,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
         id: CardId::from_int(sorting_key as u64),
-        position: ObjectPosition {
-            position,
-            sorting_key,
-            sorting_sub_key: 0,
-        },
+        position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         card_back: Url("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
@@ -183,13 +180,17 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
                 image_offset_y: None,
             },
             name: "Beacon of Tomorrow".to_string(),
-            rules_text: "Discover a card with cost (2). (pick one of 4 cards with different types to put into your hand.)".to_string(),
+            rules_text: "Discover a card with cost (2).".to_string(),
             status: None,
             can_play: position == Position::InHand(DisplayPlayer::User),
             cost: Energy(2),
             spark: None,
             card_type: "Event".to_string(),
             frame: CardFrame::Event,
+            supplemental_card_info: vec![
+                "<b>Discover</b>: Pick one of 4 cards with different types to put into your hand."
+                    .to_string(),
+            ],
             is_fast: false,
         }),
         revealed_to_opponents: true,
@@ -223,6 +224,10 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
             spark: Some(Spark(0)),
             card_type: "Tinkerer".to_string(),
             frame: CardFrame::Character,
+            supplemental_card_info: vec![
+                "<b>Judgment</b>: Triggers at the start of your turn."
+                    .to_string(),
+            ],
             is_fast: false,
         }),
         revealed_to_opponents: true,
@@ -253,6 +258,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
             spark: Some(Spark(0)),
             card_type: "Trooper".to_string(),
             frame: CardFrame::Character,
+            supplemental_card_info: vec![],
             is_fast: false,
         }),
         revealed_to_opponents: true,
@@ -282,6 +288,10 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
             spark: None,
             card_type: "Event".to_string(),
             frame: CardFrame::Event,
+            supplemental_card_info: vec![
+                "<b>Reclaim</b>: You may play this card from your void, then banish it."
+                    .to_string(),
+            ],
             is_fast: false,
         }),
         revealed_to_opponents: true,

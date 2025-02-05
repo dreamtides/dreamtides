@@ -61,7 +61,7 @@ pub struct RevealedCardView {
     /// Type or subtype of this card
     pub card_type: String,
 
-    /// Rules text to display for this face
+    /// Rules text to display for this car
     pub rules_text: String,
 
     /// Visual status of this card
@@ -69,6 +69,9 @@ pub struct RevealedCardView {
 
     /// Frame to display for this card
     pub frame: CardFrame,
+
+    /// Additional help text about this card, describing its abilities.
+    pub supplemental_card_info: Vec<String>,
 
     /// True if this card can be played during the opponent's turn
     pub is_fast: bool,

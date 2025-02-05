@@ -90,6 +90,8 @@ mac-plugin:
     mkdir -p {{plugin_out}}/OSX/
     mv plugin.bundle {{plugin_out}}/OSX/
 
+plugins: ios-plugin android-plugin mac-plugin
+
 clippy:
   cargo clippy --manifest-path engine/Cargo.toml --workspace -- -D warnings -D clippy::all
 

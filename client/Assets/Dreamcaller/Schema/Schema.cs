@@ -309,7 +309,7 @@ namespace Dreamcaller.Schema
         public string Name { get; set; }
 
         /// <summary>
-        /// Rules text to display for this face
+        /// Rules text to display for this car
         /// </summary>
         [JsonProperty("rulesText", Required = Required.Always)]
         public string RulesText { get; set; }
@@ -325,6 +325,12 @@ namespace Dreamcaller.Schema
         /// </summary>
         [JsonProperty("status")]
         public RevealedCardStatus? Status { get; set; }
+
+        /// <summary>
+        /// Additional help text about this card, describing its abilities.
+        /// </summary>
+        [JsonProperty("supplementalCardInfo", Required = Required.Always)]
+        public List<string> SupplementalCardInfo { get; set; }
     }
 
     /// <summary>
