@@ -26,8 +26,8 @@ namespace Dreamcaller.Masonry
       FlexNode node,
       IMasonElement? previousElement = null)
     {
-      var nodeType = MasonUtils.GetNodeType(node);
-      if (previousElement != null && (MasonUtils.GetNodeType(previousElement.Node) == nodeType))
+      var nodeType = MasonUtils.GetNodeTypeTag(node);
+      if (previousElement != null && (MasonUtils.GetNodeTypeTag(previousElement.Node) == nodeType))
       {
         // If node types match, reuse this node
         return UpdateWhenMatching(registry, node, previousElement);

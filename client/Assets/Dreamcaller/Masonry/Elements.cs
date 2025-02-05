@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 
 namespace Dreamcaller.Masonry
 {
-  public enum NodeType
+  public enum NodeTypeTag
   {
     VisualElement,
     Draggable,

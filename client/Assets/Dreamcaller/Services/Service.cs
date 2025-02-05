@@ -14,6 +14,9 @@ namespace Dreamcaller.Services
     public void Initialize(Registry registry)
     {
       _registry = registry;
+      OnInitialize();
     }
+
+    protected virtual void OnInitialize() { }
   }
 }

@@ -1,11 +1,223 @@
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Dreamcaller.Schema;
+using UnityEngine;
 
 namespace Dreamcaller.Masonry
 {
   public static class MasonUtils
   {
+    public static Dimension Px(float value) => new()
+    {
+      Unit = DimensionUnit.Pixels,
+      Value = value
+    };
+
+    public static Dimension Percent(float value) => new()
+    {
+      Unit = DimensionUnit.Percentage,
+      Value = value
+    };
+
+    public static DimensionGroup PositionDip(float left, float top) => GroupDip(top, 0, 0, left);
+
+    public static DimensionGroup AllDip(float all) => GroupDip(all, all, all, all);
+
+    public static DimensionGroup LeftRightDip(float leftRight) => GroupDip(0, leftRight, 0, leftRight);
+
+    public static DimensionGroup TopBottomDip(float topBottom) => GroupDip(topBottom, 0, topBottom, 0);
+
+    public static DimensionGroup TopDip(float top) => GroupDip(top, 0, 0, 0);
+
+    public static DimensionGroup RightDip(float right) => GroupDip(0, right, 0, 0);
+
+    public static DimensionGroup BottomDip(float bottom) => GroupDip(0, 0, bottom, 0);
+
+    public static DimensionGroup LeftDip(float left) => GroupDip(0, 0, 0, left);
+
+    public static DimensionGroup GroupDip(float top, float right, float bottom, float left) => new()
+    {
+      Top = Px(top),
+      Right = Px(right),
+      Bottom = Px(bottom),
+      Left = Px(left)
+    };
+
+    public static FlexColor MakeColor(string hexString)
+    {
+      if (ColorUtility.TryParseHtmlString(hexString, out var color))
+      {
+        return MakeColor(color);
+      }
+      else
+      {
+        throw new ArgumentException($"Invalid color: {hexString}");
+      }
+    }
+
+    public static FlexColor MakeColor(Color color, float? setAlpha = null) => new()
+    {
+      Red = color.r,
+      Green = color.g,
+      Blue = color.b,
+      Alpha = setAlpha ?? color.a
+    };
+
+    public static BorderColor AllBordersColor(Color color) => new()
+    {
+      Top = MakeColor(color),
+      Right = MakeColor(color),
+      Bottom = MakeColor(color),
+      Left = MakeColor(color)
+    };
+
+    public static BorderWidth AllBordersWidth(float width) => new()
+    {
+      Top = width,
+      Right = width,
+      Bottom = width,
+      Left = width
+    };
+
+    public static BorderRadius AllBordersRadiusDip(float radius) => new()
+    {
+      TopLeft = Px(radius),
+      TopRight = Px(radius),
+      BottomRight = Px(radius),
+      BottomLeft = Px(radius)
+    };
+
+    public static SpriteAddress Sprite(string address) => new()
+    {
+      Address = address
+    };
+
+    public static FontAddress Font(string address) => new()
+    {
+      Address = address
+    };
+
+    public static FlexNode Row(string name, FlexStyle? style, IEnumerable<FlexNode?> children) =>
+      Row(name, style, children.ToArray());
+
+    public static FlexNode Row(string name, FlexStyle? style = null, params FlexNode?[] children) =>
+      Row(name, style, handlers: null, children);
+
+    public static FlexNode Row(
+      string name,
+      FlexStyle? style = null,
+      EventHandlers? handlers = null,
+      params FlexNode?[] children)
+    {
+      style ??= new FlexStyle();
+      style.FlexDirection = FlexDirection.Row;
+      return MakeFlexbox(name, style, handlers, children);
+    }
+
+    public static FlexNode Column(string name, FlexStyle? style, IEnumerable<FlexNode?> children) =>
+      Column(name, style, children.ToArray());
+
+    public static FlexNode Column(string name, FlexStyle? style = null, params FlexNode?[] children) =>
+      Column(name, style, handlers: null, children);
+
+    public static FlexNode Column(
+      string name,
+      FlexStyle? style = null,
+      EventHandlers? handlers = null,
+      params FlexNode?[] children)
+    {
+      style ??= new FlexStyle();
+      style.FlexDirection = FlexDirection.Column;
+      return MakeFlexbox(name, style, handlers, children);
+    }
+
+    public static FlexNode? WithStyle(FlexNode? input, Action<FlexStyle> styleFn)
+    {
+      if (input != null)
+      {
+        styleFn(input.Style);
+      }
+
+      return input;
+    }
+
+    public static FlexNode Text(string label, FlexStyle style) => new()
+    {
+      NodeType = new NodeType
+      {
+        Text = new Text
+        {
+          Label = label,
+        }
+      },
+      Style = style,
+    };
+
+    public static FlexScale Scale(float amount) => Scale(amount, amount);
+
+    public static FlexScale Scale(float x, float y) => new()
+    {
+      Amount = new FlexVector3
+      {
+        X = x,
+        Y = y,
+        Z = 0
+      }
+    };
+
+    public static FlexRotate Rotate(float degrees) => new()
+    {
+      Degrees = degrees
+    };
+
+    public static FlexTranslate TranslateDip(float x, float y, float z = 0) => new()
+    {
+      X = Px(x),
+      Y = Px(y),
+      Z = z
+    };
+
+    public static FlexTranslate TranslatePercent(float x, float y, float z = 0) => new()
+    {
+      X = Percent(x),
+      Y = Percent(y),
+      Z = z
+    };
+
+
+    public static TimeValue DurationMs(uint ms) => new()
+    {
+      Milliseconds = ms
+    };
+
+    public static ImageSlice ImageSlice(uint slice) => ImageSlice(slice, slice);
+
+    public static ImageSlice ImageSlice(uint topBottom, uint rightLeft) =>
+      ImageSlice(topBottom, rightLeft, topBottom, rightLeft);
+
+    public static ImageSlice ImageSlice(uint top, uint right, uint bottom, uint left) => new()
+    {
+      Top = top,
+      Right = right,
+      Bottom = bottom,
+      Left = left
+    };
+
+    static FlexNode MakeFlexbox(string name, FlexStyle style, EventHandlers? handlers, params FlexNode?[] children)
+    {
+      var result = new FlexNode
+      {
+        Style = style,
+        EventHandlers = handlers,
+        Name = name
+      };
+      result.Children.AddRange(children.Where(child => child != null));
+      return result;
+    }
+
     public static UserAction? ToUserAction(OnClickClass? onClick)
     {
       if (onClick?.BattleAction != null)
@@ -21,39 +233,39 @@ namespace Dreamcaller.Masonry
       return null;
     }
 
-    public static NodeType GetNodeType(FlexNode? node)
+    public static NodeTypeTag GetNodeTypeTag(FlexNode? node)
     {
       if (node == null)
       {
-        return NodeType.VisualElement;
+        return NodeTypeTag.VisualElement;
       }
 
       if (node.NodeType.Text != null)
       {
-        return NodeType.Text;
+        return NodeTypeTag.Text;
       }
 
       if (node.NodeType.ScrollViewNode != null)
       {
-        return NodeType.ScrollView;
+        return NodeTypeTag.ScrollView;
       }
 
       if (node.NodeType.DraggableNode != null)
       {
-        return NodeType.Draggable;
+        return NodeTypeTag.Draggable;
       }
 
       if (node.NodeType.TextFieldNode != null)
       {
-        return NodeType.TextField;
+        return NodeTypeTag.TextField;
       }
 
       if (node.NodeType.SliderNode != null)
       {
-        return NodeType.Slider;
+        return NodeTypeTag.Slider;
       }
 
-      return NodeType.VisualElement;
+      return NodeTypeTag.VisualElement;
     }
 
     /// <summary>
