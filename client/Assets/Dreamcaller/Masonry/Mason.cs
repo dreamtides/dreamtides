@@ -32,23 +32,23 @@ namespace Dreamcaller.Masonry
     public static IMasonElement CreateElement(FlexNode node)
     {
       IMasonElement result;
-      if (node.NodeType.Text != null)
+      if (node.NodeType?.Text != null)
       {
         result = new NodeLabel();
       }
-      else if (node.NodeType.ScrollViewNode != null)
+      else if (node.NodeType?.ScrollViewNode != null)
       {
         result = new NodeScrollView();
       }
-      else if (node.NodeType.DraggableNode != null)
+      else if (node.NodeType?.DraggableNode != null)
       {
         result = new Draggable();
       }
-      else if (node.NodeType.TextFieldNode != null)
+      else if (node.NodeType?.TextFieldNode != null)
       {
         result = new NodeTextField();
       }
-      else if (node.NodeType.SliderNode != null)
+      else if (node.NodeType?.SliderNode != null)
       {
         result = new NodeSlider();
       }
@@ -64,23 +64,23 @@ namespace Dreamcaller.Masonry
     /// <summary>Applies the configuration in a Node to an existing IMasonElement, without modifying children.</summary>
     public static void ApplyToElement(Registry registry, IMasonElement element, FlexNode node)
     {
-      if (node.NodeType.Text != null)
+      if (node.NodeType?.Text != null)
       {
         ApplyText((NodeLabel)element, node.NodeType.Text);
       }
-      else if (node.NodeType.ScrollViewNode != null)
+      else if (node.NodeType?.ScrollViewNode != null)
       {
         ScrollViews.Apply(registry, (NodeScrollView)element, node.NodeType.ScrollViewNode);
       }
-      else if (node.NodeType.DraggableNode != null)
+      else if (node.NodeType?.DraggableNode != null)
       {
         Draggable.Apply(registry, (Draggable)element, node);
       }
-      else if (node.NodeType.TextFieldNode != null)
+      else if (node.NodeType?.TextFieldNode != null)
       {
         TextFields.Apply(registry, (NodeTextField)element, node.NodeType.TextFieldNode);
       }
-      else if (node.NodeType.SliderNode != null)
+      else if (node.NodeType?.SliderNode != null)
       {
         Sliders.Apply(registry, (NodeSlider)element, node.NodeType.SliderNode);
       }
@@ -301,8 +301,8 @@ namespace Dreamcaller.Masonry
       _ => new StyleEnum<Align>(StyleKeyword.Null)
     };
 
-    static StyleList<TResult> AdaptList<TSource, TResult>(IList<TSource> field, Func<TSource, TResult> selector) =>
-      field.Count == 0
+    static StyleList<TResult> AdaptList<TSource, TResult>(IList<TSource>? field, Func<TSource, TResult> selector) =>
+      field == null || field.Count == 0
         ? new StyleList<TResult>(StyleKeyword.Null)
         : new StyleList<TResult>(field.Select(selector).ToList());
 
@@ -311,11 +311,6 @@ namespace Dreamcaller.Masonry
       if (input == null)
       {
         return;
-      }
-
-      foreach (var name in e.GetClasses().ToList().Where(name => name.StartsWith("sd_")))
-      {
-        e.RemoveFromClassList(name);
       }
 
       e.style.alignContent = AdaptAlign(input.AlignContent);

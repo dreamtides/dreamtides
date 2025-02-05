@@ -55,13 +55,7 @@ namespace Dreamcaller.Services
         new Vector2(Screen.width - Screen.safeArea.xMax, Screen.safeArea.yMin)
       );
 
-      return new DimensionGroup
-      {
-        Left = new Dimension { Value = safeLeftTop.x, Unit = DimensionUnit.Pixels },
-        Top = new Dimension { Value = safeLeftTop.y, Unit = DimensionUnit.Pixels },
-        Right = new Dimension { Value = safeRightBottom.x, Unit = DimensionUnit.Pixels },
-        Bottom = new Dimension { Value = safeRightBottom.y, Unit = DimensionUnit.Pixels }
-      };
+      return MasonUtils.GroupPx(safeLeftTop.x, safeLeftTop.y, safeRightBottom.x, safeRightBottom.y);
     }
 
     void AddChild(string elementName, out IMasonElement element)
@@ -69,7 +63,7 @@ namespace Dreamcaller.Services
       var node = MasonUtils.Row(elementName, new FlexStyle
       {
         Position = FlexPosition.Absolute,
-        Inset = MasonUtils.AllDip(0),
+        Inset = MasonUtils.AllPx(0),
         PickingMode = FlexPickingMode.Ignore
       });
       element = Mason.Render(Registry, node);

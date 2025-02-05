@@ -22,23 +22,23 @@ namespace Dreamcaller.Masonry
       Value = value
     };
 
-    public static DimensionGroup PositionDip(float left, float top) => GroupDip(top, 0, 0, left);
+    public static DimensionGroup PositionDip(float left, float top) => GroupPx(top, 0, 0, left);
 
-    public static DimensionGroup AllDip(float all) => GroupDip(all, all, all, all);
+    public static DimensionGroup AllPx(float all) => GroupPx(all, all, all, all);
 
-    public static DimensionGroup LeftRightDip(float leftRight) => GroupDip(0, leftRight, 0, leftRight);
+    public static DimensionGroup LeftRightPx(float leftRight) => GroupPx(0, leftRight, 0, leftRight);
 
-    public static DimensionGroup TopBottomDip(float topBottom) => GroupDip(topBottom, 0, topBottom, 0);
+    public static DimensionGroup TopBottomPx(float topBottom) => GroupPx(topBottom, 0, topBottom, 0);
 
-    public static DimensionGroup TopDip(float top) => GroupDip(top, 0, 0, 0);
+    public static DimensionGroup TopDip(float top) => GroupPx(top, 0, 0, 0);
 
-    public static DimensionGroup RightDip(float right) => GroupDip(0, right, 0, 0);
+    public static DimensionGroup RightDip(float right) => GroupPx(0, right, 0, 0);
 
-    public static DimensionGroup BottomDip(float bottom) => GroupDip(0, 0, bottom, 0);
+    public static DimensionGroup BottomDip(float bottom) => GroupPx(0, 0, bottom, 0);
 
-    public static DimensionGroup LeftDip(float left) => GroupDip(0, 0, 0, left);
+    public static DimensionGroup LeftDip(float left) => GroupPx(0, 0, 0, left);
 
-    public static DimensionGroup GroupDip(float top, float right, float bottom, float left) => new()
+    public static DimensionGroup GroupPx(float top, float right, float bottom, float left) => new()
     {
       Top = Px(top),
       Right = Px(right),
@@ -212,7 +212,8 @@ namespace Dreamcaller.Masonry
       {
         Style = style,
         EventHandlers = handlers,
-        Name = name
+        Name = name,
+        Children = new()
       };
       result.Children.AddRange(children.Where(child => child != null));
       return result;
