@@ -12,11 +12,8 @@ namespace Dreamcaller.Services
     [SerializeField] Camera? _mainCamera;
     public Camera MainCamera => Check(_mainCamera);
 
-    [SerializeField] ObjectLayout? _userHandRow1;
-    public ObjectLayout UserHandRow1 => Check(_userHandRow1);
-
-    [SerializeField] ObjectLayout? _userHandRow2;
-    public ObjectLayout UserHandRow2 => Check(_userHandRow2);
+    [SerializeField] ObjectLayout? _userHand;
+    public ObjectLayout UserHand => Check(_userHand);
 
     [SerializeField] ObjectLayout? _enemyHand;
     public ObjectLayout EnemyHand => Check(_enemyHand);

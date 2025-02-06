@@ -101,8 +101,7 @@ namespace Dreamcaller.Services
 
     void ApplyAllLayouts(Sequence? sequence)
     {
-      Registry.UserHandRow1.ApplyLayout(sequence);
-      Registry.UserHandRow2.ApplyLayout(sequence);
+      Registry.UserHand.ApplyLayout(sequence);
       Registry.EnemyHand.ApplyLayout(sequence);
       Registry.UserDeck.ApplyLayout(sequence);
       Registry.EnemyDeck.ApplyLayout(sequence);
@@ -170,7 +169,7 @@ namespace Dreamcaller.Services
       {
         return inHand switch
         {
-          DisplayPlayer.User => objectPosition.SortingKey > 17 ? Registry.UserHandRow2 : Registry.UserHandRow1,
+          DisplayPlayer.User => Registry.UserHand,
           DisplayPlayer.Enemy => Registry.EnemyHand,
           _ => throw Errors.UnknownEnumValue(inHand),
         };

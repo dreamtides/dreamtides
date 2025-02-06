@@ -4161,6 +4161,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 449699475}
   - {fileID: 587309319}
   - {fileID: 312928727}
   - {fileID: 1665816865}
@@ -5581,6 +5582,53 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4839270071094572, guid: fb0131aa61eef7c4d95b2efaf17614ec, type: 3}
   m_PrefabInstance: {fileID: 449162267}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &449699474
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 449699475}
+  - component: {fileID: 449699476}
+  m_Layer: 0
+  m_Name: UserHand
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &449699475
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 449699474}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 330585546}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &449699476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 449699474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b26961d58477a4997bab4854e27ff39d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _layout1: {fileID: 587309320}
+  _layout2: {fileID: 312928729}
+  _useSecondLayoutAfter: 6
 --- !u!1001 &467176336
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7137,8 +7185,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mainCamera: {fileID: 330585545}
-  _userHandRow1: {fileID: 587309320}
-  _userHandRow2: {fileID: 312928729}
+  _userHand: {fileID: 449699476}
   _enemyHand: {fileID: 963159506}
   _userDeck: {fileID: 1607976028}
   _enemyDeck: {fileID: 1965117210}

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Dreamcaller.Layout
 {
-  public class CurveObjectLayout : ObjectLayout
+  public class CurveObjectLayout : StandardObjectLayout
   {
     [SerializeField] int _zRotationAddition;
     [SerializeField] int _zRotationMultiplier;

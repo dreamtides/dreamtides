@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Dreamcaller.Layout
 {
-  public sealed class RectangularObjectLayout : ObjectLayout
+  public sealed class RectangularObjectLayout : StandardObjectLayout
   {
     [SerializeField] float _width;
     [SerializeField] float _height;
