@@ -14,13 +14,13 @@ namespace Dreamcaller.Layout
     [SerializeField] float _itemHeight;
     [SerializeField] int _rowCount;
 
-    public override Vector3 CalculateObjectPosition(int index, int count) =>
+    protected override Vector3 CalculateObjectPosition(int index, int count) =>
       transform.position + new Vector3(
         CalculateXOffset(index, count),
         0.5f,
         CalculateZOffset(index, count));
 
-    public override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
+    protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
 
     float CalculateXOffset(int index, int count)
     {

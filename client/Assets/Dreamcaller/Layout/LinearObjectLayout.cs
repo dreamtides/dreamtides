@@ -11,13 +11,13 @@ namespace Dreamcaller.Layout
     [SerializeField] float _cardSize;
     [SerializeField] bool _vertical;
 
-    public override Vector3 CalculateObjectPosition(int index, int count)
+    protected override Vector3 CalculateObjectPosition(int index, int count)
     {
       var offset = CalculateOffset(_width, _initialSpacing, _cardSize, index, count);
       return transform.position + (_vertical ? new Vector3(0, 0, offset) : new Vector3(offset, 0, 0));
     }
 
-    public override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
+    protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
 
     public static float CalculateOffset(
       float width,

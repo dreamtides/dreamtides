@@ -17,7 +17,7 @@ namespace Dreamcaller.Layout
     [SerializeField] float _gizmoRadius = 1.0f;
     [SerializeField] float _objectScale;
 
-    public override Vector3 CalculateObjectPosition(int index, int count)
+    protected override Vector3 CalculateObjectPosition(int index, int count)
     {
       var curvePosition = CalculateCurvePosition(index, count);
       var bezier = CalculateBezierPosition(curvePosition);
@@ -27,7 +27,7 @@ namespace Dreamcaller.Layout
       return bezier + directionToCamera * offset;
     }
 
-    public override Vector3? CalculateObjectRotation(int index, int count)
+    protected override Vector3? CalculateObjectRotation(int index, int count)
     {
       var curvePosition = CalculateCurvePosition(index, count);
       return new Vector3(
@@ -36,7 +36,7 @@ namespace Dreamcaller.Layout
           z: _zRotationAddition + _zRotationMultiplier * CalculateZRotation(curvePosition));
     }
 
-    public override float? CalculateObjectScale(int index, int count) => _objectScale == 0.0 ? null : _objectScale;
+    protected override float? CalculateObjectScale(int index, int count) => _objectScale == 0.0 ? null : _objectScale;
 
     float CalculateCurvePosition(int cardIndex, int cardCount)
     {

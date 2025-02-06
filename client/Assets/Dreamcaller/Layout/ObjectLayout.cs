@@ -86,7 +86,7 @@ namespace Dreamcaller.Layout
     ///
     /// Note that this may be invoked with index=0, count=0 to compute initial
     /// object positions.
-    public abstract Vector3 CalculateObjectPosition(int index, int count);
+    protected abstract Vector3 CalculateObjectPosition(int index, int count);
 
     /// <summary>
     /// Calculates the rotation of the object at the given index in the layout.
@@ -94,7 +94,7 @@ namespace Dreamcaller.Layout
     ///
     /// Note that this may be invoked with index=0, count=0 to compute initial
     /// object rotations.
-    public virtual Vector3? CalculateObjectRotation(int index, int count) => null;
+    protected virtual Vector3? CalculateObjectRotation(int index, int count) => null;
 
     /// <summary>
     /// Calculates the scale of the object at the given index in the layout.
@@ -102,7 +102,7 @@ namespace Dreamcaller.Layout
     ///
     /// Note that this may be invoked with index=0, count=0 to compute initial
     /// object scales.
-    public virtual float? CalculateObjectScale(int index, int count) => null;
+    protected virtual float? CalculateObjectScale(int index, int count) => null;
 
     void Update()
     {

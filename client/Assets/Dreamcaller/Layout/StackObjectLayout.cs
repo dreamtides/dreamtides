@@ -10,13 +10,13 @@ namespace Dreamcaller.Layout
   {
     [SerializeField] float _singleElementY = 0.5f;
 
-    public override Vector3 CalculateObjectPosition(int index, int count) =>
+    protected override Vector3 CalculateObjectPosition(int index, int count) =>
       new(
         transform.position.x,
         transform.position.y + Mathf.Lerp(0f, 1f, YPosition(index, count)),
         transform.position.z);
 
-    public override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
+    protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
 
     float YPosition(int index, int count) => count switch
     {
