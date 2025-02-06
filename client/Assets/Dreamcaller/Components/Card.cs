@@ -147,13 +147,13 @@ namespace Dreamcaller.Components
     void RenderRevealedCardView(RevealedCardView revealed)
     {
       _isRevealed = true;
+      ToggleActiveElements();
       _cardFront.gameObject.SetActive(value: true);
       _cardBack.gameObject.SetActive(value: false);
       _name.text = revealed.Name;
       _rulesText.text = revealed.RulesText;
       _outline.gameObject.SetActive(CanPlay());
       _costText.text = revealed.Cost.ToString();
-      _sparkBackground.gameObject.SetActive(revealed.Spark != null);
       _sparkText.text = revealed.Spark.ToString();
       _typeText.text = revealed.CardType;
 
@@ -191,24 +191,7 @@ namespace Dreamcaller.Components
 
     protected override void OnSetGameContext(GameContext oldContext, GameContext newContext)
     {
-      if (newContext.IsBattlefieldContext())
-      {
-        _cardFrame.gameObject.SetActive(false);
-        _name.gameObject.SetActive(false);
-        _rulesText.gameObject.SetActive(false);
-        _sparkBackground.gameObject.SetActive(false);
-        _costBackground.gameObject.SetActive(false);
-        _typeText.gameObject.SetActive(false);
-      }
-      else
-      {
-        _cardFrame.gameObject.SetActive(true);
-        _name.gameObject.SetActive(true);
-        _rulesText.gameObject.SetActive(true);
-        _sparkBackground.gameObject.SetActive(CardView.Revealed?.Spark != null);
-        _costBackground.gameObject.SetActive(true);
-        _typeText.gameObject.SetActive(true);
-      }
+      ToggleActiveElements();
     }
 
     public override void MouseDown()
@@ -280,6 +263,28 @@ namespace Dreamcaller.Components
         };
 
         _registry.ActionService.PerformAction(action);
+      }
+    }
+
+    void ToggleActiveElements()
+    {
+      if (HasGameContext && GameContext.IsBattlefieldContext())
+      {
+        _cardFrame.gameObject.SetActive(false);
+        _name.gameObject.SetActive(false);
+        _rulesText.gameObject.SetActive(false);
+        _sparkBackground.gameObject.SetActive(false);
+        _costBackground.gameObject.SetActive(false);
+        _typeText.gameObject.SetActive(false);
+      }
+      else
+      {
+        _cardFrame.gameObject.SetActive(true);
+        _name.gameObject.SetActive(true);
+        _rulesText.gameObject.SetActive(true);
+        _sparkBackground.gameObject.SetActive(CardView.Revealed?.Spark != null);
+        _costBackground.gameObject.SetActive(true);
+        _typeText.gameObject.SetActive(true);
       }
     }
 

@@ -106,6 +106,8 @@ namespace Dreamcaller.Layout
       }
     }
 
+    public bool HasGameContext => _gameContext != GameContext.Unspecified;
+
     protected virtual void OnSetGameContext(GameContext oldContext, GameContext newContext) { }
   }
 }
