@@ -72,9 +72,9 @@ namespace Dreamcaller.Layout
           // even though the spacing itself is uneven. For this to work, the
           // cards really need to be flush with the screen edges -- if you can
           // see space around them you will realize they are not centered.
-          return new float[] { 0.08f, 0.28f, 0.42f, 0.56f, 0.7f, 0.86f }[cardIndex];
+          return new float[] { 0.06f, 0.28f, 0.42f, 0.56f, 0.7f, 0.86f }[cardIndex];
         case 7:
-          return new float[] { 0.08f, 0.26f, 0.40f, 0.52f, 0.64f, 0.76f, 0.88f }[cardIndex];
+          return new float[] { 0.06f, 0.26f, 0.40f, 0.52f, 0.64f, 0.76f, 0.88f }[cardIndex];
         default:
           return 0.1f + (0.8f * cardIndex / (cardCount - 1));
       }
