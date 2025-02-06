@@ -5628,7 +5628,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _layout1: {fileID: 587309320}
   _layout2: {fileID: 312928729}
-  _useSecondLayoutAfter: 6
+  _useSecondLayoutAfter: 5
 --- !u!1001 &467176336
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -9,8 +9,8 @@ namespace Dreamcaller.Layout
 {
   public class ObjectLayoutPair : ObjectLayout
   {
-    [SerializeField] ObjectLayout _layout1 = null!;
-    [SerializeField] ObjectLayout _layout2 = null!;
+    [SerializeField] StandardObjectLayout _layout1 = null!;
+    [SerializeField] StandardObjectLayout _layout2 = null!;
     [SerializeField] int _useSecondLayoutAfter;
 
     public override IReadOnlyList<Displayable> Objects
@@ -26,17 +26,7 @@ namespace Dreamcaller.Layout
 
     public override void Add(Displayable displayable)
     {
-      var totalObjects = Objects.Count;
-
-      // If we haven't hit the threshold yet, add to layout1
-      if (totalObjects < _useSecondLayoutAfter)
-      {
-        _layout1.Add(displayable);
-        return;
-      }
-
-      // Add to the layout with fewer objects, preferring layout1 if equal
-      if (_layout1.Objects.Count <= _layout2.Objects.Count)
+      if (Objects.Count < _useSecondLayoutAfter)
       {
         _layout1.Add(displayable);
       }
@@ -64,13 +54,22 @@ namespace Dreamcaller.Layout
 
     public override void ApplyTargetTransform(Displayable target, Sequence? sequence = null)
     {
-      // Apply transform using layout1 by default
-      _layout1.ApplyTargetTransform(target, sequence);
+      if (Objects.Count <= _useSecondLayoutAfter)
+      {
+        _layout1.ApplyTargetTransform(target, sequence);
+      }
+      else
+      {
+        _layout2.ApplyTargetTransform(target, sequence);
+      }
     }
 
     public override void RemoveIfPresent(Displayable? displayable)
     {
-      if (displayable == null) return;
+      if (displayable == null)
+      {
+        return;
+      }
 
       _layout1.RemoveIfPresent(displayable);
       _layout2.RemoveIfPresent(displayable);
@@ -78,38 +77,28 @@ namespace Dreamcaller.Layout
       RebalanceLayouts();
     }
 
-
     void RebalanceLayouts()
     {
       var totalObjects = Objects.Count;
+      var targetLayout1Size = totalObjects <= _useSecondLayoutAfter
+        ? totalObjects  // If we're below threshold, everything goes in layout1
+        : totalObjects / 2;  // Otherwise aim for an even split
 
-      // If we're under the threshold, move everything to layout1
-      if (totalObjects <= _useSecondLayoutAfter)
-      {
-        foreach (var obj in _layout2.Objects.ToList())
-        {
-          _layout2.RemoveIfPresent(obj);
-          _layout1.Add(obj);
-        }
-        return;
-      }
-
-      // Calculate target sizes for balanced distribution
-      var targetLayout1Size = (totalObjects + 1) / 2; // Rounds up for odd numbers
-      var targetLayout2Size = totalObjects / 2; // Rounds down for odd numbers
-
-      // Move objects between layouts to achieve balance
+      // Balance by moving objects between layouts
       while (_layout1.Objects.Count > targetLayout1Size)
       {
-        var obj = _layout1.Objects[0];
-        _layout1.RemoveIfPresent(obj);
+        // Move last object from layout1 to layout2
+        var lastIndex = _layout1.Objects.Count - 1;
+        var obj = _layout1.Objects[lastIndex];
+        _layout1.RemoveAtIndex(lastIndex);
         _layout2.Add(obj);
       }
 
-      while (_layout2.Objects.Count > targetLayout2Size)
+      while (_layout1.Objects.Count < targetLayout1Size && _layout2.Objects.Count > 0)
       {
+        // Move first object from layout2 to layout1
         var obj = _layout2.Objects[0];
-        _layout2.RemoveIfPresent(obj);
+        _layout2.RemoveAtIndex(0);
         _layout1.Add(obj);
       }
     }

@@ -54,6 +54,13 @@ namespace Dreamcaller.Layout
       }
     }
 
+    /// <summary>Removes the object at the given index.</summary>
+    public void RemoveAtIndex(int index)
+    {
+      _objects.RemoveAt(index);
+      SortObjects();
+    }
+
     /// <summary>
     /// Applies the transform state at which objects should be created or
     /// destroyed for this layout. If a sequence applied, the transformation
