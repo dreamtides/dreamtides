@@ -30,6 +30,8 @@ namespace Dreamcaller.Components
     [SerializeField] TextMeshPro _costText = null!;
     [SerializeField] MeshRenderer _sparkBackground = null!;
     [SerializeField] TextMeshPro _sparkText = null!;
+    [SerializeField] MeshRenderer _battlefieldSparkBackground = null!;
+    [SerializeField] TextMeshPro _battlefieldSparkText = null!;
     [SerializeField] ObjectLayout? _containedObjects;
     [SerializeField] ObjectLayout? _stackedObjects;
 
@@ -155,6 +157,7 @@ namespace Dreamcaller.Components
       _outline.gameObject.SetActive(CanPlay());
       _costText.text = revealed.Cost.ToString();
       _sparkText.text = revealed.Spark.ToString();
+      _battlefieldSparkText.text = revealed.Spark.ToString();
       _typeText.text = revealed.CardType;
 
       if (revealed.Image?.Image.Contains("1633431262") == true)
@@ -276,6 +279,7 @@ namespace Dreamcaller.Components
         _sparkBackground.gameObject.SetActive(false);
         _costBackground.gameObject.SetActive(false);
         _typeText.gameObject.SetActive(false);
+        _battlefieldSparkBackground.gameObject.SetActive(CardView.Revealed?.Spark != null);
       }
       else
       {
@@ -285,6 +289,7 @@ namespace Dreamcaller.Components
         _sparkBackground.gameObject.SetActive(CardView.Revealed?.Spark != null);
         _costBackground.gameObject.SetActive(true);
         _typeText.gameObject.SetActive(true);
+        _battlefieldSparkBackground.gameObject.SetActive(false);
       }
     }
 
