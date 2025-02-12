@@ -62,14 +62,14 @@ namespace Dreamcaller.Services
           new FlexStyle
           {
             Position = FlexPosition.Absolute,
-            Height = Mason.Px(80),
+            Height = Mason.Px(160),
             JustifyContent = shouldShowOnLeft ? FlexJustify.FlexStart : FlexJustify.FlexEnd,
             AlignItems = FlexAlign.FlexStart,
             Inset = new DimensionGroup
             {
               Left = Mason.Px(0),
               Right = Mason.Px(0),
-              Bottom = Mason.Px(135),
+              Bottom = Mason.Px(200),
             }
           },
           info
