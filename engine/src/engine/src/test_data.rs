@@ -139,7 +139,8 @@ fn card_view(position: Position, sorting_key: u32) -> CardView {
 }
 
 fn card1(position: Position, sorting_key: u32) -> CardView {
-    let revealed = !matches!(position, Position::InDeck(_));
+    let revealed = !matches!(position, Position::InDeck(_))
+        && position != Position::InHand(DisplayPlayer::Enemy);
     CardView {
         id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition {
@@ -173,7 +174,8 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
 }
 
 fn card2(position: Position, sorting_key: u32) -> CardView {
-    let revealed = !matches!(position, Position::InDeck(_));
+    let revealed = !matches!(position, Position::InDeck(_))
+        && position != Position::InHand(DisplayPlayer::Enemy);
     CardView {
         id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
@@ -205,7 +207,8 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
 }
 
 fn card3(position: Position, sorting_key: u32) -> CardView {
-    let revealed = !matches!(position, Position::InDeck(_));
+    let revealed = !matches!(position, Position::InDeck(_))
+        && position != Position::InHand(DisplayPlayer::Enemy);
     CardView {
         id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition {
@@ -240,7 +243,8 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
 }
 
 fn card4(position: Position, sorting_key: u32) -> CardView {
-    let revealed = !matches!(position, Position::InDeck(_));
+    let revealed = !matches!(position, Position::InDeck(_))
+        && position != Position::InHand(DisplayPlayer::Enemy);
     CardView {
         id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
@@ -271,7 +275,8 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
 }
 
 fn card5(position: Position, sorting_key: u32) -> CardView {
-    let revealed = !matches!(position, Position::InDeck(_));
+    let revealed = !matches!(position, Position::InDeck(_))
+        && position != Position::InHand(DisplayPlayer::Enemy);
     CardView {
         id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
