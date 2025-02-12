@@ -280,8 +280,6 @@ namespace Dreamcaller.Masonry
       result.AlignSelf = newStyle.AlignSelf ?? original.AlignSelf;
       result.BackgroundColor = newStyle.BackgroundColor ?? original.BackgroundColor;
       result.BackgroundImage = newStyle.BackgroundImage ?? original.BackgroundImage;
-      result.BackgroundImageAutoSize = newStyle.BackgroundImageAutoSize ?? original.BackgroundImageAutoSize;
-      result.BackgroundImageScaleMode = newStyle.BackgroundImageScaleMode ?? original.BackgroundImageScaleMode;
       result.BackgroundImageTintColor = newStyle.BackgroundImageTintColor ?? original.BackgroundImageTintColor;
       result.BorderColor = newStyle.BorderColor ?? original.BorderColor;
       result.BorderRadius = newStyle.BorderRadius ?? original.BorderRadius;

@@ -42,6 +42,12 @@ namespace Dreamcaller.Services
     [SerializeField] ObjectLayout? _drawnCardsPosition;
     public ObjectLayout DrawnCardsPosition => Check(_drawnCardsPosition);
 
+    [SerializeField] ObjectLayout? _selectingTargetsEnemy;
+    public ObjectLayout SelectingTargetsEnemy => Check(_selectingTargetsEnemy);
+
+    [SerializeField] ObjectLayout? _selectingTargetsUser;
+    public ObjectLayout SelectingTargetsUser => Check(_selectingTargetsUser);
+
     [SerializeField] LayoutUpdateService? _layoutUpdateService;
     public LayoutUpdateService LayoutUpdateService => Check(_layoutUpdateService);
 

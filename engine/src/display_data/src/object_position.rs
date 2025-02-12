@@ -38,6 +38,10 @@ pub enum Position {
     /// being played.
     Played,
 
+    /// The user is selecting targets for this card from among characters
+    /// controlled by the indicated player.
+    SelectingTargets(DisplayPlayer),
+
     /// Object is on the stack
     OnStack,
 

@@ -216,6 +216,9 @@ namespace Dreamcaller.Schema
     }
 
     /// <summary>
+    /// The user is selecting targets for this card from among characters controlled by the
+    /// indicated player.
+    ///
     /// Object is in a player's hand
     ///
     /// Object is on top of a player's deck
@@ -230,6 +233,9 @@ namespace Dreamcaller.Schema
     /// </summary>
     public partial class PositionClass
     {
+        [JsonProperty("selectingTargets", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPlayer? SelectingTargets { get; set; }
+
         [JsonProperty("inHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? InHand { get; set; }
 
@@ -502,12 +508,6 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("backgroundImage")]
         public SpriteAddress BackgroundImage { get; set; }
-
-        [JsonProperty("backgroundImageAutoSize")]
-        public BackgroundImageAutoSize? BackgroundImageAutoSize { get; set; }
-
-        [JsonProperty("backgroundImageScaleMode")]
-        public ImageScaleMode? BackgroundImageScaleMode { get; set; }
 
         [JsonProperty("backgroundImageTintColor")]
         public FlexColor BackgroundImageTintColor { get; set; }
@@ -1076,10 +1076,6 @@ namespace Dreamcaller.Schema
 
     public enum FlexAlign { Auto, Center, FlexEnd, FlexStart, Stretch };
 
-    public enum BackgroundImageAutoSize { FromHeight, FromWidth };
-
-    public enum ImageScaleMode { ScaleAndCrop, ScaleToFit, StretchToFill };
-
     public enum DimensionUnit { Percentage, Pixels, SafeAreaBottom, SafeAreaLeft, SafeAreaRight, SafeAreaTop, ViewportHeight, ViewportWidth };
 
     public enum FlexDisplayStyle { Flex, None };
@@ -1165,8 +1161,6 @@ namespace Dreamcaller.Schema
                 RevealedCardStatusConverter.Singleton,
                 DebugActionConverter.Singleton,
                 FlexAlignConverter.Singleton,
-                BackgroundImageAutoSizeConverter.Singleton,
-                ImageScaleModeConverter.Singleton,
                 DimensionUnitConverter.Singleton,
                 FlexDisplayStyleConverter.Singleton,
                 FlexDirectionConverter.Singleton,
@@ -1601,93 +1595,6 @@ namespace Dreamcaller.Schema
         }
 
         public static readonly FlexAlignConverter Singleton = new FlexAlignConverter();
-    }
-
-    internal class BackgroundImageAutoSizeConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(BackgroundImageAutoSize) || t == typeof(BackgroundImageAutoSize?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "fromHeight":
-                    return BackgroundImageAutoSize.FromHeight;
-                case "fromWidth":
-                    return BackgroundImageAutoSize.FromWidth;
-            }
-            throw new Exception("Cannot unmarshal type BackgroundImageAutoSize");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (BackgroundImageAutoSize)untypedValue;
-            switch (value)
-            {
-                case BackgroundImageAutoSize.FromHeight:
-                    serializer.Serialize(writer, "fromHeight");
-                    return;
-                case BackgroundImageAutoSize.FromWidth:
-                    serializer.Serialize(writer, "fromWidth");
-                    return;
-            }
-            throw new Exception("Cannot marshal type BackgroundImageAutoSize");
-        }
-
-        public static readonly BackgroundImageAutoSizeConverter Singleton = new BackgroundImageAutoSizeConverter();
-    }
-
-    internal class ImageScaleModeConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(ImageScaleMode) || t == typeof(ImageScaleMode?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "scaleAndCrop":
-                    return ImageScaleMode.ScaleAndCrop;
-                case "scaleToFit":
-                    return ImageScaleMode.ScaleToFit;
-                case "stretchToFill":
-                    return ImageScaleMode.StretchToFill;
-            }
-            throw new Exception("Cannot unmarshal type ImageScaleMode");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (ImageScaleMode)untypedValue;
-            switch (value)
-            {
-                case ImageScaleMode.ScaleAndCrop:
-                    serializer.Serialize(writer, "scaleAndCrop");
-                    return;
-                case ImageScaleMode.ScaleToFit:
-                    serializer.Serialize(writer, "scaleToFit");
-                    return;
-                case ImageScaleMode.StretchToFill:
-                    serializer.Serialize(writer, "stretchToFill");
-                    return;
-            }
-            throw new Exception("Cannot marshal type ImageScaleMode");
-        }
-
-        public static readonly ImageScaleModeConverter Singleton = new ImageScaleModeConverter();
     }
 
     internal class DimensionUnitConverter : JsonConverter

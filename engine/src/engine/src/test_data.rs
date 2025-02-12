@@ -85,8 +85,12 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 battle.cards.iter().enumerate().find(|(_, c)| c.id == card_id)
             {
                 let sorting_key = card.position.sorting_key;
-                battle.cards[card_index] =
-                    card_view(Position::OnBattlefield(DisplayPlayer::User), sorting_key);
+                let position = if sorting_key % 5 == 1 {
+                    Position::SelectingTargets(DisplayPlayer::User)
+                } else {
+                    Position::OnBattlefield(DisplayPlayer::User)
+                };
+                battle.cards[card_index] = card_view(position, sorting_key);
             }
 
             *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());

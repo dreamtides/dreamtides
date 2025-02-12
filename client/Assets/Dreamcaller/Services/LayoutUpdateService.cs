@@ -110,6 +110,8 @@ namespace Dreamcaller.Services
       Registry.UserBattlefield.ApplyLayout(sequence);
       Registry.EnemyBattlefield.ApplyLayout(sequence);
       Registry.DrawnCardsPosition.ApplyLayout(sequence);
+      Registry.SelectingTargetsEnemy.ApplyLayout(sequence);
+      Registry.SelectingTargetsUser.ApplyLayout(sequence);
     }
 
     List<Card> PrepareToDelete(Sequence? sequence, HashSet<string> toDelete)
@@ -202,6 +204,16 @@ namespace Dreamcaller.Services
           DisplayPlayer.User => Registry.UserVoid,
           DisplayPlayer.Enemy => Registry.EnemyVoid,
           _ => throw Errors.UnknownEnumValue(inVoid),
+        };
+      }
+
+      if (position.PositionClass.SelectingTargets is { } selectingTargets)
+      {
+        return selectingTargets switch
+        {
+          DisplayPlayer.User => Registry.SelectingTargetsUser,
+          DisplayPlayer.Enemy => Registry.SelectingTargetsEnemy,
+          _ => throw Errors.UnknownEnumValue(selectingTargets),
         };
       }
 
