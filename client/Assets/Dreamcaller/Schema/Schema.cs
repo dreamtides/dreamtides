@@ -99,12 +99,6 @@ namespace Dreamcaller.Schema
         public List<CardView> Cards { get; set; }
 
         /// <summary>
-        /// User interaction options
-        /// </summary>
-        [JsonProperty("controls", Required = Required.Always)]
-        public List<ControlView> Controls { get; set; }
-
-        /// <summary>
         /// Opponent of user
         /// </summary>
         [JsonProperty("enemy", Required = Required.Always)]
@@ -115,6 +109,12 @@ namespace Dreamcaller.Schema
         /// </summary>
         [JsonProperty("id", Required = Required.Always)]
         public Guid Id { get; set; }
+
+        /// <summary>
+        /// UI to display to the player.
+        /// </summary>
+        [JsonProperty("interface", Required = Required.Always)]
+        public InterfaceView Interface { get; set; }
 
         /// <summary>
         /// Describes the status of the game, e.g. which phase & step the game is in
@@ -555,7 +555,7 @@ namespace Dreamcaller.Schema
         public ImageSlice ImageSlice { get; set; }
 
         [JsonProperty("inset")]
-        public DimensionGroup Inset { get; set; }
+        public FlexInsets Inset { get; set; }
 
         [JsonProperty("justifyContent")]
         public FlexJustify? JustifyContent { get; set; }
@@ -753,6 +753,21 @@ namespace Dreamcaller.Schema
         public long Top { get; set; }
     }
 
+    public partial class FlexInsets
+    {
+        [JsonProperty("bottom")]
+        public Dimension Bottom { get; set; }
+
+        [JsonProperty("left")]
+        public Dimension Left { get; set; }
+
+        [JsonProperty("right")]
+        public Dimension Right { get; set; }
+
+        [JsonProperty("top")]
+        public Dimension Top { get; set; }
+    }
+
     public partial class DimensionGroup
     {
         [JsonProperty("bottom", Required = Required.Always)]
@@ -937,27 +952,6 @@ namespace Dreamcaller.Schema
     }
 
     /// <summary>
-    /// User interaction options
-    /// </summary>
-    public partial class ControlView
-    {
-        [JsonProperty("button", Required = Required.Always)]
-        public ButtonView Button { get; set; }
-    }
-
-    /// <summary>
-    /// Button to perform some game action
-    /// </summary>
-    public partial class ButtonView
-    {
-        [JsonProperty("kind", Required = Required.Always)]
-        public ButtonKind Kind { get; set; }
-
-        [JsonProperty("label", Required = Required.Always)]
-        public string Label { get; set; }
-    }
-
-    /// <summary>
     /// Opponent of user
     ///
     /// Represents the visual state of a player in a game
@@ -977,6 +971,20 @@ namespace Dreamcaller.Schema
         /// </summary>
         [JsonProperty("score", Required = Required.Always)]
         public long Score { get; set; }
+    }
+
+    /// <summary>
+    /// UI to display to the player.
+    ///
+    /// User interaction options
+    /// </summary>
+    public partial class InterfaceView
+    {
+        /// <summary>
+        /// Content to display on top of all other game UI.
+        /// </summary>
+        [JsonProperty("screenOverlay")]
+        public FlexNode ScreenOverlay { get; set; }
     }
 
     public partial class PerformActionRequest
@@ -1113,15 +1121,6 @@ namespace Dreamcaller.Schema
     public enum SliderDirection { Horizontal, Vertical };
 
     /// <summary>
-    /// Controls color for buttons
-    ///
-    /// Emphasized button, primary game action
-    ///
-    /// Deemphasized button, additional game actions
-    /// </summary>
-    public enum ButtonKind { Default, Primary };
-
-    /// <summary>
     /// Position category
     ///
     /// Possible types of display positions
@@ -1179,7 +1178,6 @@ namespace Dreamcaller.Schema
                 ScrollBarVisibilityConverter.Singleton,
                 TouchScrollBehaviorConverter.Singleton,
                 SliderDirectionConverter.Singleton,
-                ButtonKindConverter.Singleton,
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
         };
@@ -2558,46 +2556,5 @@ namespace Dreamcaller.Schema
         }
 
         public static readonly SliderDirectionConverter Singleton = new SliderDirectionConverter();
-    }
-
-    internal class ButtonKindConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(ButtonKind) || t == typeof(ButtonKind?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "default":
-                    return ButtonKind.Default;
-                case "primary":
-                    return ButtonKind.Primary;
-            }
-            throw new Exception("Cannot unmarshal type ButtonKind");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (ButtonKind)untypedValue;
-            switch (value)
-            {
-                case ButtonKind.Default:
-                    serializer.Serialize(writer, "default");
-                    return;
-                case ButtonKind.Primary:
-                    serializer.Serialize(writer, "primary");
-                    return;
-            }
-            throw new Exception("Cannot marshal type ButtonKind");
-        }
-
-        public static readonly ButtonKindConverter Singleton = new ButtonKindConverter();
     }
 }

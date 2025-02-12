@@ -92,6 +92,15 @@ pub struct DimensionGroup {
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
+pub struct FlexInsets {
+    pub top: Option<Dimension>,
+    pub right: Option<Dimension>,
+    pub bottom: Option<Dimension>,
+    pub left: Option<Dimension>,
+}
+
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct BorderWidth {
     pub top: f32,
     pub right: f32,
@@ -178,7 +187,7 @@ pub struct FlexStyle {
     pub border_color: Option<BorderColor>,
     pub border_radius: Option<BorderRadius>,
     pub border_width: Option<BorderWidth>,
-    pub inset: Option<DimensionGroup>,
+    pub inset: Option<FlexInsets>,
     pub color: Option<FlexColor>,
     pub display: Option<FlexDisplayStyle>,
     pub flex_basis: Option<Dimension>,

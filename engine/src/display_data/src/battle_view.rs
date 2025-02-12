@@ -1,5 +1,6 @@
 use core_data::identifiers::BattleId;
 use core_data::numerics::Points;
+use masonry::flex_node::FlexNode;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -24,15 +25,19 @@ pub struct BattleView {
     /// Describes the status of the game, e.g. which phase & step the game is in
     pub status_description: String,
 
-    /// User interaction options
-    pub controls: Vec<ControlView>,
+    /// UI to display to the player.
+    pub interface: InterfaceView,
 }
 
 /// User interaction options
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub enum ControlView {
-    Button(ButtonView),
+pub struct InterfaceView {
+    /// Content to display on top of all other game UI.
+    pub screen_overlay: Option<FlexNode>,
+
+    /// Label for the primary action button, if one should be shown.
+    pub primary_action_button: Option<String>,
 }
 
 /// Button to perform some game action

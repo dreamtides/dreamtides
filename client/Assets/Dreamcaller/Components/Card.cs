@@ -50,10 +50,11 @@ namespace Dreamcaller.Components
 
     public void Render(Registry registry, CardView view, Sequence? sequence = null)
     {
-      gameObject.name = view.Revealed?.Name ?? "Hidden Card";
+      var name = view.Revealed?.Name ?? "Hidden Card";
       _registry = registry;
       _cardView = view;
       SortingKey = view.Position.SortingKey;
+      gameObject.name = $"{name} [{Id}]";
 
       if (view.Revealed != null)
       {
@@ -187,7 +188,6 @@ namespace Dreamcaller.Components
       _isRevealed = false;
       _cardFront.gameObject.SetActive(value: false);
       _cardBack.gameObject.SetActive(value: true);
-      gameObject.name = "Hidden Card";
     }
 
     public override bool CanHandleMouseEvents() => true;

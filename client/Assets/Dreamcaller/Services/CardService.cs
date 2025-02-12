@@ -65,12 +65,12 @@ namespace Dreamcaller.Services
             Height = Mason.Px(160),
             JustifyContent = shouldShowOnLeft ? FlexJustify.FlexStart : FlexJustify.FlexEnd,
             AlignItems = FlexAlign.FlexStart,
-            Inset = new DimensionGroup
+            Inset = new FlexInsets()
             {
+              Bottom = Mason.Px(200),
               Left = Mason.Px(0),
               Right = Mason.Px(0),
-              Bottom = Mason.Px(200),
-            }
+            },
           },
           info
         );

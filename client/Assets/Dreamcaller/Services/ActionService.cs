@@ -126,6 +126,7 @@ namespace Dreamcaller.Services
       {
         if (command.UpdateBattle != null)
         {
+          Registry.DocumentService.RenderScreenOverlay(command.UpdateBattle.Interface?.ScreenOverlay);
           coroutines.Add(StartCoroutine(Registry.LayoutUpdateService.UpdateLayout(command.UpdateBattle, sequence)));
         }
       }

@@ -6,17 +6,17 @@ use action_data::user_action::UserAction;
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::{CardFacing, Url};
-use display_data::battle_view::{BattleView, DisplayPlayer, PlayerView};
+use display_data::battle_view::{BattleView, DisplayPlayer, InterfaceView, PlayerView};
 use display_data::card_view::{CardFrame, CardView, DisplayImage, RevealedCardView};
 use display_data::command::{Command, CommandSequence};
 use display_data::object_position::{ObjectPosition, Position};
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, Metadata, PerformActionRequest, PerformActionResponse,
 };
-use masonry::flex_enums::WhiteSpace;
+use masonry::flex_enums::{FlexPosition, TextAlign, WhiteSpace};
 use masonry::flex_node::{FlexNode, NodeType, Text};
 use masonry::flex_style::{
-    BorderRadius, Dimension, DimensionGroup, DimensionUnit, FlexColor, FlexStyle,
+    BorderRadius, Dimension, DimensionGroup, DimensionUnit, FlexColor, FlexInsets, FlexStyle,
 };
 use uuid::Uuid;
 
@@ -86,7 +86,10 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
             {
                 let sorting_key = card.position.sorting_key;
                 let position = if sorting_key % 5 == 1 {
-                    Position::SelectingTargets(DisplayPlayer::User)
+                    battle.interface.screen_overlay = Some(select_target_message());
+                    battle.interface.primary_action_button = None;
+                    set_can_play_to_false(&mut battle);
+                    Position::SelectingTargets(DisplayPlayer::Enemy)
                 } else {
                     Position::OnBattlefield(DisplayPlayer::User)
                 };
@@ -99,6 +102,12 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 commands: CommandSequence::from_command(Command::UpdateBattle(battle)),
             }
         }
+    }
+}
+
+fn set_can_play_to_false(battle: &mut BattleView) {
+    for card in battle.cards.iter_mut() {
+        card.revealed.as_mut().map(|revealed| revealed.can_play = false);
     }
 }
 
@@ -120,7 +129,10 @@ fn scene_0(id: BattleId) -> BattleView {
         .concat()
         .to_vec(),
         status_description: "Status".to_string(),
-        controls: vec![],
+        interface: InterfaceView {
+            primary_action_button: Some("End Turn".to_string()),
+            ..Default::default()
+        },
     }
 }
 
@@ -143,8 +155,7 @@ fn card_view(position: Position, sorting_key: u32) -> CardView {
 }
 
 fn card1(position: Position, sorting_key: u32) -> CardView {
-    let revealed = !matches!(position, Position::InDeck(_))
-        && position != Position::InHand(DisplayPlayer::Enemy);
+    let revealed = !matches!(position, Position::InDeck(_));
     CardView {
         id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition {
@@ -178,8 +189,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
 }
 
 fn card2(position: Position, sorting_key: u32) -> CardView {
-    let revealed = !matches!(position, Position::InDeck(_))
-        && position != Position::InHand(DisplayPlayer::Enemy);
+    let revealed = !matches!(position, Position::InDeck(_));
     CardView {
         id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
@@ -211,8 +221,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
 }
 
 fn card3(position: Position, sorting_key: u32) -> CardView {
-    let revealed = !matches!(position, Position::InDeck(_))
-        && position != Position::InHand(DisplayPlayer::Enemy);
+    let revealed = !matches!(position, Position::InDeck(_));
     CardView {
         id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition {
@@ -247,8 +256,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
 }
 
 fn card4(position: Position, sorting_key: u32) -> CardView {
-    let revealed = !matches!(position, Position::InDeck(_))
-        && position != Position::InHand(DisplayPlayer::Enemy);
+    let revealed = !matches!(position, Position::InDeck(_));
     CardView {
         id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
@@ -279,8 +287,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
 }
 
 fn card5(position: Position, sorting_key: u32) -> CardView {
-    let revealed = !matches!(position, Position::InDeck(_))
-        && position != Position::InHand(DisplayPlayer::Enemy);
+    let revealed = !matches!(position, Position::InDeck(_));
     CardView {
         id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
@@ -338,4 +345,49 @@ fn flex_node(text: impl Into<String>) -> Option<FlexNode> {
         style: Some(style),
         ..Default::default()
     })
+}
+
+fn select_target_message() -> FlexNode {
+    let style = FlexStyle {
+        background_color: Some(FlexColor { red: 0.0, green: 0.0, blue: 0.0, alpha: 0.95 }),
+        border_radius: Some(BorderRadius {
+            top_left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            top_right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            bottom_right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            bottom_left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+        }),
+        padding: Some(DimensionGroup {
+            top: Dimension { unit: DimensionUnit::Pixels, value: 8.0 },
+            right: Dimension { unit: DimensionUnit::Pixels, value: 8.0 },
+            bottom: Dimension { unit: DimensionUnit::Pixels, value: 8.0 },
+            left: Dimension { unit: DimensionUnit::Pixels, value: 8.0 },
+        }),
+        color: Some(FlexColor { red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0 }),
+        font_size: Some(Dimension { unit: DimensionUnit::Pixels, value: 20.0 }),
+        min_height: Some(Dimension { unit: DimensionUnit::Pixels, value: 44.0 }),
+        white_space: Some(WhiteSpace::Normal),
+        text_align: Some(TextAlign::MiddleCenter),
+        ..Default::default()
+    };
+
+    let message = FlexNode {
+        node_type: Some(NodeType::Text(Text { label: "Choose an enemy character".into() })),
+        style: Some(style),
+        ..Default::default()
+    };
+
+    FlexNode {
+        style: Some(FlexStyle {
+            position: Some(FlexPosition::Absolute),
+            inset: Some(FlexInsets {
+                top: None,
+                right: Some(Dimension { unit: DimensionUnit::Pixels, value: 32.0 }),
+                bottom: Some(Dimension { unit: DimensionUnit::Pixels, value: 150.0 }),
+                left: Some(Dimension { unit: DimensionUnit::Pixels, value: 32.0 }),
+            }),
+            ..Default::default()
+        }),
+        children: vec![message],
+        ..Default::default()
+    }
 }

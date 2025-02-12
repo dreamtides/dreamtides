@@ -11,6 +11,7 @@ namespace Dreamcaller.Services
   {
     [SerializeField] UIDocument _document = null!;
     IMasonElement _infoZoom = null!;
+    IMasonElement _screenOverlay = null!;
 
     public VisualElement RootVisualElement => _document.rootVisualElement;
 
@@ -18,6 +19,7 @@ namespace Dreamcaller.Services
     {
       _document.rootVisualElement.Clear();
       AddChild("InfoZoomContainer", out _infoZoom);
+      AddChild("ScreenOverlay", out _screenOverlay);
     }
 
     public bool IsAnyPanelOpen()
@@ -32,14 +34,19 @@ namespace Dreamcaller.Services
 
     public float ScreenPxToElementPx(float value) => value * _document.panelSettings.referenceDpi / Screen.dpi;
 
-    public void ClearInfoZoom()
+    public void RenderScreenOverlay(FlexNode? node)
     {
-      Reconcile(ref _infoZoom, new FlexNode());
+      Reconcile(ref _screenOverlay, node ?? new FlexNode());
     }
 
     public void RenderInfoZoom(FlexNode node)
     {
       Reconcile(ref _infoZoom, node);
+    }
+
+    public void ClearInfoZoom()
+    {
+      Reconcile(ref _infoZoom, new FlexNode());
     }
 
     public DimensionGroup GetSafeArea()
@@ -62,7 +69,13 @@ namespace Dreamcaller.Services
       var node = Mason.Row(elementName, new FlexStyle
       {
         Position = FlexPosition.Absolute,
-        Inset = Mason.AllPx(0),
+        Inset = new FlexInsets()
+        {
+          Bottom = Mason.Px(0),
+          Left = Mason.Px(0),
+          Right = Mason.Px(0),
+          Top = Mason.Px(0)
+        },
         PickingMode = FlexPickingMode.Ignore
       });
       var container = MasonRenderer.Render(Registry, node);
