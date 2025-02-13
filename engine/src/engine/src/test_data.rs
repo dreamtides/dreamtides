@@ -7,7 +7,9 @@ use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::{CardFacing, Url};
 use display_data::battle_view::{BattleView, DisplayPlayer, InterfaceView, PlayerView};
-use display_data::card_view::{CardFrame, CardView, DisplayImage, RevealedCardView};
+use display_data::card_view::{
+    CardActions, CardFrame, CardView, DisplayImage, RevealedCardStatus, RevealedCardView,
+};
 use display_data::command::{Command, CommandSequence};
 use display_data::object_position::{ObjectPosition, Position};
 use display_data::request_data::{
@@ -89,6 +91,16 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                     battle.interface.screen_overlay = Some(select_target_message());
                     battle.interface.primary_action_button = None;
                     set_can_play_to_false(&mut battle);
+                    for card in battle.cards.iter_mut() {
+                        if matches!(
+                            card.position.position,
+                            Position::OnBattlefield(DisplayPlayer::Enemy)
+                        ) {
+                            if let Some(revealed) = &mut card.revealed {
+                                revealed.status = Some(RevealedCardStatus::CanSelectNegative);
+                            }
+                        }
+                    }
                     Position::SelectingTargets(DisplayPlayer::Enemy)
                 } else {
                     Position::OnBattlefield(DisplayPlayer::User)
@@ -107,7 +119,9 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
 
 fn set_can_play_to_false(battle: &mut BattleView) {
     for card in battle.cards.iter_mut() {
-        card.revealed.as_mut().map(|revealed| revealed.can_play = false);
+        if let Some(revealed) = card.revealed.as_mut() {
+            revealed.actions.can_play = false;
+        }
     }
 }
 
@@ -179,7 +193,10 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
             frame: CardFrame::Character,
             supplemental_card_info: flex_node("<b>Materialize</b>: A character entering play."),
             is_fast: false,
-            can_play: position == Position::InHand(DisplayPlayer::User),
+            actions: CardActions {
+                can_play: position == Position::InHand(DisplayPlayer::User),
+                on_click: None,
+            },
         }),
         revealed_to_opponents: true,
         card_facing: CardFacing::FaceUp,
@@ -203,7 +220,6 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
             name: "Beacon of Tomorrow".to_string(),
             rules_text: "Discover a card with cost (2).".to_string(),
             status: None,
-            can_play: position == Position::InHand(DisplayPlayer::User),
             cost: Energy(2),
             spark: None,
             card_type: "Event".to_string(),
@@ -212,6 +228,10 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
                 "<b>Discover</b>: Pick one of 4 cards with different types to put into your hand.",
             ),
             is_fast: false,
+            actions: CardActions {
+                can_play: position == Position::InHand(DisplayPlayer::User),
+                on_click: None,
+            },
         }),
         revealed_to_opponents: true,
         card_facing: CardFacing::FaceUp,
@@ -239,7 +259,6 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
             name: "Scrap Reclaimer".to_string(),
             rules_text: "Judgment: Return this character from your void to your hand. Born from rust and resilience.".to_string(),
             status: None,
-            can_play: position == Position::InHand(DisplayPlayer::User),
             cost: Energy(4),
             spark: Some(Spark(0)),
             card_type: "Tinkerer".to_string(),
@@ -247,6 +266,10 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
             supplemental_card_info: flex_node(
                 "<b>Judgment</b>: Triggers at the start of your turn."),
             is_fast: false,
+            actions: CardActions {
+                can_play: position == Position::InHand(DisplayPlayer::User),
+                on_click: None,
+            },
         }),
         revealed_to_opponents: true,
         card_facing: CardFacing::FaceUp,
@@ -271,13 +294,16 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
             rules_text: "> Draw 2 cards. Discard 3 cards.\nPromises under a stormy sky."
                 .to_string(),
             status: None,
-            can_play: position == Position::InHand(DisplayPlayer::User),
             cost: Energy(2),
             spark: Some(Spark(0)),
             card_type: "Trooper".to_string(),
             frame: CardFrame::Character,
             supplemental_card_info: None,
             is_fast: false,
+            actions: CardActions {
+                can_play: position == Position::InHand(DisplayPlayer::User),
+                on_click: None,
+            },
         }),
         revealed_to_opponents: true,
         card_facing: CardFacing::FaceUp,
@@ -301,7 +327,6 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
             name: "Moonlit Voyage".to_string(),
             rules_text: "Draw 2 cards. Discard 2 cards.\nReclaim".to_string(),
             status: None,
-            can_play: position == Position::InHand(DisplayPlayer::User),
             cost: Energy(2),
             spark: None,
             card_type: "Event".to_string(),
@@ -310,6 +335,10 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
                 "<b>Reclaim</b>: You may play this card from your void, then banish it.",
             ),
             is_fast: false,
+            actions: CardActions {
+                can_play: position == Position::InHand(DisplayPlayer::User),
+                on_click: None,
+            },
         }),
         revealed_to_opponents: true,
         card_facing: CardFacing::FaceUp,

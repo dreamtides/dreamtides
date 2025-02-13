@@ -273,10 +273,10 @@ namespace Dreamcaller.Schema
     public partial class RevealedCardView
     {
         /// <summary>
-        /// True if this card can currently be played.
+        /// Actions available for this card
         /// </summary>
-        [JsonProperty("canPlay", Required = Required.Always)]
-        public bool CanPlay { get; set; }
+        [JsonProperty("actions", Required = Required.Always)]
+        public CardActions Actions { get; set; }
 
         /// <summary>
         /// Type or subtype of this card
@@ -337,6 +337,42 @@ namespace Dreamcaller.Schema
         /// </summary>
         [JsonProperty("supplementalCardInfo")]
         public FlexNode SupplementalCardInfo { get; set; }
+    }
+
+    /// <summary>
+    /// Actions available for this card
+    /// </summary>
+    public partial class CardActions
+    {
+        /// <summary>
+        /// True if this card can currently be played from hand.
+        /// </summary>
+        [JsonProperty("canPlay", Required = Required.Always)]
+        public bool CanPlay { get; set; }
+
+        /// <summary>
+        /// Action to perform when this card is clicked.
+        /// </summary>
+        [JsonProperty("onClick")]
+        public OnClickClass OnClick { get; set; }
+    }
+
+    public partial class OnClickClass
+    {
+        [JsonProperty("debugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DebugAction? DebugAction { get; set; }
+
+        [JsonProperty("battleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public BattleAction BattleAction { get; set; }
+    }
+
+    /// <summary>
+    /// An action that can be performed in a battle#
+    /// </summary>
+    public partial class BattleAction
+    {
+        [JsonProperty("playCard", Required = Required.Always)]
+        public CardId PlayCard { get; set; }
     }
 
     /// <summary>
@@ -433,24 +469,6 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("style")]
         public FlexStyle Style { get; set; }
-    }
-
-    public partial class OnClickClass
-    {
-        [JsonProperty("debugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DebugAction? DebugAction { get; set; }
-
-        [JsonProperty("battleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public BattleAction BattleAction { get; set; }
-    }
-
-    /// <summary>
-    /// An action that can be performed in a battle#
-    /// </summary>
-    public partial class BattleAction
-    {
-        [JsonProperty("playCard", Required = Required.Always)]
-        public CardId PlayCard { get; set; }
     }
 
     public partial class ScrollViewNode
@@ -981,6 +999,12 @@ namespace Dreamcaller.Schema
     public partial class InterfaceView
     {
         /// <summary>
+        /// Label for the primary action button, if one should be shown.
+        /// </summary>
+        [JsonProperty("primaryActionButton")]
+        public string PrimaryActionButton { get; set; }
+
+        /// <summary>
         /// Content to display on top of all other game UI.
         /// </summary>
         [JsonProperty("screenOverlay")]
@@ -1071,16 +1095,16 @@ namespace Dreamcaller.Schema
     public enum DisplayPlayer { Enemy, User };
 
     /// <summary>
+    /// Private actions for developer use
+    /// </summary>
+    public enum DebugAction { DrawCard };
+
+    /// <summary>
     /// Frame to display for this card
     /// </summary>
     public enum CardFrame { Character, Event };
 
-    public enum RevealedCardStatus { CanPlay, CanSelect, Selected };
-
-    /// <summary>
-    /// Private actions for developer use
-    /// </summary>
-    public enum DebugAction { DrawCard };
+    public enum RevealedCardStatus { CanPlay, CanSelectNegative, CanSelectPositive, Selected };
 
     public enum FlexAlign { Auto, Center, FlexEnd, FlexStart, Stretch };
 
@@ -1156,9 +1180,9 @@ namespace Dreamcaller.Schema
                 PositionConverter.Singleton,
                 DisplayPlayerConverter.Singleton,
                 PositionEnumConverter.Singleton,
+                DebugActionConverter.Singleton,
                 CardFrameConverter.Singleton,
                 RevealedCardStatusConverter.Singleton,
-                DebugActionConverter.Singleton,
                 FlexAlignConverter.Singleton,
                 DimensionUnitConverter.Singleton,
                 FlexDisplayStyleConverter.Singleton,
@@ -1418,6 +1442,40 @@ namespace Dreamcaller.Schema
         public static readonly PositionEnumConverter Singleton = new PositionEnumConverter();
     }
 
+    internal class DebugActionConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(DebugAction) || t == typeof(DebugAction?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            if (value == "drawCard")
+            {
+                return DebugAction.DrawCard;
+            }
+            throw new Exception("Cannot unmarshal type DebugAction");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (DebugAction)untypedValue;
+            if (value == DebugAction.DrawCard)
+            {
+                serializer.Serialize(writer, "drawCard");
+                return;
+            }
+            throw new Exception("Cannot marshal type DebugAction");
+        }
+
+        public static readonly DebugActionConverter Singleton = new DebugActionConverter();
+    }
+
     internal class CardFrameConverter : JsonConverter
     {
         public override bool CanConvert(Type t) => t == typeof(CardFrame) || t == typeof(CardFrame?);
@@ -1471,8 +1529,10 @@ namespace Dreamcaller.Schema
             {
                 case "canPlay":
                     return RevealedCardStatus.CanPlay;
-                case "canSelect":
-                    return RevealedCardStatus.CanSelect;
+                case "canSelectNegative":
+                    return RevealedCardStatus.CanSelectNegative;
+                case "canSelectPositive":
+                    return RevealedCardStatus.CanSelectPositive;
                 case "selected":
                     return RevealedCardStatus.Selected;
             }
@@ -1492,8 +1552,11 @@ namespace Dreamcaller.Schema
                 case RevealedCardStatus.CanPlay:
                     serializer.Serialize(writer, "canPlay");
                     return;
-                case RevealedCardStatus.CanSelect:
-                    serializer.Serialize(writer, "canSelect");
+                case RevealedCardStatus.CanSelectNegative:
+                    serializer.Serialize(writer, "canSelectNegative");
+                    return;
+                case RevealedCardStatus.CanSelectPositive:
+                    serializer.Serialize(writer, "canSelectPositive");
                     return;
                 case RevealedCardStatus.Selected:
                     serializer.Serialize(writer, "selected");
@@ -1503,40 +1566,6 @@ namespace Dreamcaller.Schema
         }
 
         public static readonly RevealedCardStatusConverter Singleton = new RevealedCardStatusConverter();
-    }
-
-    internal class DebugActionConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(DebugAction) || t == typeof(DebugAction?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            if (value == "drawCard")
-            {
-                return DebugAction.DrawCard;
-            }
-            throw new Exception("Cannot unmarshal type DebugAction");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (DebugAction)untypedValue;
-            if (value == DebugAction.DrawCard)
-            {
-                serializer.Serialize(writer, "drawCard");
-                return;
-            }
-            throw new Exception("Cannot marshal type DebugAction");
-        }
-
-        public static readonly DebugActionConverter Singleton = new DebugActionConverter();
     }
 
     internal class FlexAlignConverter : JsonConverter

@@ -1,3 +1,4 @@
+use action_data::user_action::UserAction;
 use core_data::identifiers::CardId;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::{CardFacing, Url};
@@ -77,8 +78,8 @@ pub struct RevealedCardView {
     /// True if this card can be played during the opponent's turn
     pub is_fast: bool,
 
-    /// True if this card can currently be played.
-    pub can_play: bool,
+    /// Actions available for this card
+    pub actions: CardActions,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -94,12 +95,23 @@ pub struct DisplayImage {
     pub image_offset_y: Option<u32>,
 }
 
+#[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct CardActions {
+    /// True if this card can currently be played from hand.
+    pub can_play: bool,
+
+    /// Action to perform when this card is clicked.
+    pub on_click: Option<UserAction>,
+}
+
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum RevealedCardStatus {
-    Selected,
-    CanSelect,
     CanPlay,
+    CanSelectNegative,
+    CanSelectPositive,
+    Selected,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]

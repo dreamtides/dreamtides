@@ -26,6 +26,7 @@ namespace Dreamcaller.Components
     [SerializeField] Material _material4 = null!;
     [SerializeField] Material _material5 = null!;
     [SerializeField] MeshRenderer _outline = null!;
+    [SerializeField] MeshRenderer _battlefieldOutline = null!;
     [SerializeField] MeshRenderer _costBackground = null!;
     [SerializeField] TextMeshPro _costText = null!;
     [SerializeField] MeshRenderer _sparkBackground = null!;
@@ -280,6 +281,8 @@ namespace Dreamcaller.Components
         _costBackground.gameObject.SetActive(false);
         _typeText.gameObject.SetActive(false);
         _battlefieldSparkBackground.gameObject.SetActive(CardView.Revealed?.Spark != null);
+        _battlefieldOutline.gameObject.SetActive(
+          CardView.Revealed?.Status == RevealedCardStatus.CanSelectNegative);
       }
       else
       {
@@ -290,6 +293,7 @@ namespace Dreamcaller.Components
         _costBackground.gameObject.SetActive(true);
         _typeText.gameObject.SetActive(true);
         _battlefieldSparkBackground.gameObject.SetActive(false);
+        _battlefieldOutline.gameObject.SetActive(false);
       }
     }
 
@@ -303,6 +307,7 @@ namespace Dreamcaller.Components
       return !_registry.CardService.IsPointerOverPlayCardArea();
     }
 
-    bool CanPlay() => CardView.Revealed?.CanPlay == true && _registry.CapabilitiesService.CanDragCards();
+    bool CanPlay() => CardView.Revealed?.Actions.CanPlay == true &&
+      _registry.CapabilitiesService.CanDragCards();
   }
 }
