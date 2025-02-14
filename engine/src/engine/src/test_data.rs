@@ -97,6 +97,9 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                             Position::OnBattlefield(DisplayPlayer::Enemy)
                         ) {
                             if let Some(revealed) = &mut card.revealed {
+                                revealed.actions.on_click = Some(UserAction::BattleAction(
+                                    BattleAction::SelectTarget(card.id),
+                                ));
                                 revealed.status = Some(RevealedCardStatus::CanSelectNegative);
                             }
                         }
@@ -114,6 +117,49 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 commands: CommandSequence::from_command(Command::UpdateBattle(battle)),
             }
         }
+        BattleAction::SelectTarget(card_id) => {
+            let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+
+            // First collect all the cards we need to move
+            let cards_to_move: Vec<(usize, u32)> = battle
+                .cards
+                .iter()
+                .enumerate()
+                .filter_map(|(index, card)| {
+                    if card.id == card_id {
+                        Some((index, card.position.sorting_key))
+                    } else if matches!(
+                        card.position.position,
+                        Position::SelectingTargets(DisplayPlayer::Enemy)
+                    ) {
+                        Some((index, card.position.sorting_key))
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+
+            // Now update all the cards
+            for (index, sorting_key) in cards_to_move {
+                let position = if battle.cards[index].id == card_id {
+                    Position::InVoid(DisplayPlayer::Enemy)
+                } else {
+                    Position::InVoid(DisplayPlayer::User)
+                };
+                battle.cards[index] = card_view(position, sorting_key);
+            }
+
+            // Reset interface state
+            battle.interface.screen_overlay = None;
+            battle.interface.primary_action_button = Some("End Turn".to_string());
+
+            clear_all_statuses(&mut battle);
+            *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+            PerformActionResponse {
+                metadata,
+                commands: CommandSequence::from_command(Command::UpdateBattle(battle)),
+            }
+        }
     }
 }
 
@@ -121,6 +167,14 @@ fn set_can_play_to_false(battle: &mut BattleView) {
     for card in battle.cards.iter_mut() {
         if let Some(revealed) = card.revealed.as_mut() {
             revealed.actions.can_play = false;
+        }
+    }
+}
+
+fn clear_all_statuses(battle: &mut BattleView) {
+    for card in battle.cards.iter_mut() {
+        if let Some(revealed) = card.revealed.as_mut() {
+            revealed.status = None;
         }
     }
 }

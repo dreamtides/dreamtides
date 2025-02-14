@@ -248,6 +248,15 @@ namespace Dreamcaller.Components
       _registry.SoundService.PlayCardSound();
       _registry.CardService.ClearInfoZoom();
 
+      if (CardView.Revealed?.Actions?.OnClick is { } onClick)
+      {
+        _registry.ActionService.PerformAction(new UserAction
+        {
+          DebugAction = onClick.DebugAction,
+          BattleAction = onClick.BattleAction,
+        });
+      }
+
       if (ShouldReturnToPreviousParentOnRelease())
       {
         _registry.LayoutUpdateService.AddToParent(this);

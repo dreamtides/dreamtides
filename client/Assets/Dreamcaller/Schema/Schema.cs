@@ -367,12 +367,17 @@ namespace Dreamcaller.Schema
     }
 
     /// <summary>
-    /// An action that can be performed in a battle#
+    /// An action that can be performed in a battle
+    ///
+    /// Set a card as a target of the card currently being played.
     /// </summary>
     public partial class BattleAction
     {
-        [JsonProperty("playCard", Required = Required.Always)]
+        [JsonProperty("playCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardId PlayCard { get; set; }
+
+        [JsonProperty("selectTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public CardId SelectTarget { get; set; }
     }
 
     /// <summary>
