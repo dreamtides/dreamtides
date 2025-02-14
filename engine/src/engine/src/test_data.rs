@@ -126,12 +126,12 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 .iter()
                 .enumerate()
                 .filter_map(|(index, card)| {
-                    if card.id == card_id {
-                        Some((index, card.position.sorting_key))
-                    } else if matches!(
-                        card.position.position,
-                        Position::SelectingTargets(DisplayPlayer::Enemy)
-                    ) {
+                    if card.id == card_id
+                        || matches!(
+                            card.position.position,
+                            Position::SelectingTargets(DisplayPlayer::Enemy)
+                        )
+                    {
                         Some((index, card.position.sorting_key))
                     } else {
                         None
