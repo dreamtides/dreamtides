@@ -162,23 +162,23 @@ namespace Dreamcaller.Components
       _battlefieldSparkText.text = revealed.Spark.ToString();
       _typeText.text = revealed.CardType;
 
-      if (revealed.Image?.Image.Contains("1633431262") == true)
+      if (revealed.Image?.Image?.UrlValue.Contains("1633431262") == true)
       {
         _cardImage.material = _material1;
       }
-      else if (revealed.Image?.Image.Contains("2027158310") == true)
+      else if (revealed.Image?.Image.UrlValue.Contains("2027158310") == true)
       {
         _cardImage.material = _material2;
       }
-      else if (revealed.Image?.Image.Contains("2269064809") == true)
+      else if (revealed.Image?.Image.UrlValue.Contains("2269064809") == true)
       {
         _cardImage.material = _material3;
       }
-      else if (revealed.Image?.Image.Contains("2269064817") == true)
+      else if (revealed.Image?.Image.UrlValue.Contains("2269064817") == true)
       {
         _cardImage.material = _material4;
       }
-      else if (revealed.Image?.Image.Contains("2521694543") == true)
+      else if (revealed.Image?.Image.UrlValue.Contains("2521694543") == true)
       {
         _cardImage.material = _material5;
       }

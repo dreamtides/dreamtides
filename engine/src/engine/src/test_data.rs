@@ -3,9 +3,10 @@ use std::sync::{LazyLock, Mutex};
 use action_data::battle_action::BattleAction;
 use action_data::debug_action::DebugAction;
 use action_data::user_action::UserAction;
+use core_data::display_types::Url;
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
-use core_data::types::{CardFacing, Url};
+use core_data::types::CardFacing;
 use display_data::battle_view::{BattleView, DisplayPlayer, InterfaceView, PlayerView};
 use display_data::card_view::{
     CardActions, CardFrame, CardView, DisplayImage, RevealedCardStatus, RevealedCardView,
@@ -231,10 +232,10 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
             sorting_key,
             sorting_sub_key: 0,
         },
-        card_back: Url("".to_string()),
+        card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                image: Url("/assets/2521694543.jpg".to_string()),
+                image: Url::new("/assets/2521694543.jpg".to_string()),
                 image_offset_x: Some(25),
                 image_offset_y: Some(50)
             },
@@ -264,10 +265,10 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
     CardView {
         id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
-        card_back: Url("".to_string()),
+        card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                image: Url("/assets/1633431262.jpg".to_string()),
+                image: Url::new("/assets/1633431262.jpg".to_string()),
                 image_offset_x: None,
                 image_offset_y: None,
             },
@@ -303,10 +304,10 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
             sorting_key,
             sorting_sub_key: 0,
         },
-        card_back: Url("".to_string()),
+        card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                image: Url("/assets/2269064817.jpg".to_string()),
+                image: Url::new("/assets/2269064817.jpg".to_string()),
                 image_offset_x: None,
                 image_offset_y: None,
             },
@@ -337,10 +338,10 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
     CardView {
         id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
-        card_back: Url("".to_string()),
+        card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                image: Url("/assets/2269064809.jpg".to_string()),
+                image: Url::new("/assets/2269064809.jpg".to_string()),
                 image_offset_x: None,
                 image_offset_y: None,
             },
@@ -371,10 +372,10 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
     CardView {
         id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
-        card_back: Url("".to_string()),
+        card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                image: Url("/assets/2027158310.jpg".to_string()),
+                image: Url::new("/assets/2027158310.jpg".to_string()),
                 image_offset_x: None,
                 image_offset_y: None,
             },

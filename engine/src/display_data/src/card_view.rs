@@ -1,7 +1,8 @@
 use action_data::user_action::UserAction;
+use core_data::display_types::Url;
 use core_data::identifiers::CardId;
 use core_data::numerics::{Energy, Spark};
-use core_data::types::{CardFacing, Url};
+use core_data::types::CardFacing;
 use masonry::flex_node::FlexNode;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};

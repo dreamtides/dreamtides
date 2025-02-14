@@ -16,7 +16,7 @@ pub enum TriggerEvent {
     GainEnergy,
     Keywords(Vec<TriggerKeyword>),
     Materialize(Predicate),
-    MaterializeNthThisTurn(Predicate, u32),
+    MaterializeNthThisTurn(Predicate, u64),
     Play(Predicate),
     PlayFromHand(Predicate),
 }

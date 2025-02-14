@@ -8,10 +8,10 @@ use crate::predicate::Predicate;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum Condition {
-    CardsDiscardedThisTurn { count: u32 },
-    CardsDrawnThisTurn { count: u32 },
-    CardsInVoidCount { count: u32 },
+    CardsDiscardedThisTurn { count: u64 },
+    CardsDrawnThisTurn { count: u64 },
+    CardsInVoidCount { count: u64 },
     DissolvedThisTurn { predicate: Predicate },
-    PredicateCount { count: u32, predicate: Predicate },
+    PredicateCount { count: u64, predicate: Predicate },
     ThisCharacterIsInYourVoid,
 }

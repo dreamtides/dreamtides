@@ -83,110 +83,65 @@ namespace Dreamcaller.Schema
     /// </summary>
     public partial class Command
     {
-        [JsonProperty("updateBattle", Required = Required.Always)]
+        [JsonProperty("updateBattle", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public BattleView UpdateBattle { get; set; }
+
+        [JsonProperty("fireProjectile", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public FireProjectileCommand FireProjectile { get; set; }
     }
 
-    /// <summary>
-    /// Represents the visual state of an ongoing dream battle
-    /// </summary>
-    public partial class BattleView
+    public partial class FireProjectileCommand
     {
-        /// <summary>
-        /// Visual state of cards in the game
-        /// </summary>
-        [JsonProperty("cards", Required = Required.Always)]
-        public List<CardView> Cards { get; set; }
+        [JsonProperty("additionalHit", Required = Required.Always)]
+        public EffectAddress AdditionalHit { get; set; }
 
-        /// <summary>
-        /// Opponent of user
-        /// </summary>
-        [JsonProperty("enemy", Required = Required.Always)]
-        public PlayerView Enemy { get; set; }
+        [JsonProperty("additionalHitDelay")]
+        public Milliseconds AdditionalHitDelay { get; set; }
 
-        /// <summary>
-        /// Unique identifier for this dream battle
-        /// </summary>
-        [JsonProperty("id", Required = Required.Always)]
-        public Guid Id { get; set; }
+        [JsonProperty("fireSound", Required = Required.Always)]
+        public AudioClipAddress FireSound { get; set; }
 
-        /// <summary>
-        /// UI to display to the player.
-        /// </summary>
-        [JsonProperty("interface", Required = Required.Always)]
-        public InterfaceView Interface { get; set; }
+        [JsonProperty("hideOnHit", Required = Required.Always)]
+        public bool HideOnHit { get; set; }
 
-        /// <summary>
-        /// Describes the status of the game, e.g. which phase & step the game is in
-        /// </summary>
-        [JsonProperty("statusDescription", Required = Required.Always)]
-        public string StatusDescription { get; set; }
+        [JsonProperty("impactSound", Required = Required.Always)]
+        public AudioClipAddress ImpactSound { get; set; }
 
-        /// <summary>
-        /// Player who is operating the client
-        /// </summary>
-        [JsonProperty("user", Required = Required.Always)]
-        public PlayerView User { get; set; }
+        [JsonProperty("jumpToPosition")]
+        public ObjectPosition JumpToPosition { get; set; }
+
+        [JsonProperty("projectile", Required = Required.Always)]
+        public ProjectileAddress Projectile { get; set; }
+
+        [JsonProperty("sourceId", Required = Required.Always)]
+        public GameObjectId SourceId { get; set; }
+
+        [JsonProperty("targetId", Required = Required.Always)]
+        public GameObjectId TargetId { get; set; }
+
+        [JsonProperty("travelDuration", Required = Required.Always)]
+        public Milliseconds TravelDuration { get; set; }
+
+        [JsonProperty("waitDuration", Required = Required.Always)]
+        public Milliseconds WaitDuration { get; set; }
     }
 
-    /// <summary>
-    /// Represents the visual state of a card or ability in a game
-    /// </summary>
-    public partial class CardView
+    public partial class EffectAddress
     {
-        /// <summary>
-        /// Card back image
-        /// </summary>
-        [JsonProperty("cardBack", Required = Required.Always)]
-        public string CardBack { get; set; }
+        [JsonProperty("effect", Required = Required.Always)]
+        public string Effect { get; set; }
+    }
 
-        /// <summary>
-        /// Face up/face down state for this card
-        /// </summary>
-        [JsonProperty("cardFacing", Required = Required.Always)]
-        public CardFacing CardFacing { get; set; }
+    public partial class Milliseconds
+    {
+        [JsonProperty("millisecondsValue", Required = Required.Always)]
+        public long MillisecondsValue { get; set; }
+    }
 
-        /// <summary>
-        /// Optionally, a position at which to create this card.
-        ///
-        /// If this card does not already exist, it will be created at this position before being
-        /// animated to [Self::position].
-        /// </summary>
-        [JsonProperty("createPosition")]
-        public ObjectPosition CreatePosition { get; set; }
-
-        /// <summary>
-        /// Optionally, a position at which to destroy this card.
-        ///
-        /// If provided, the card will be animated to this position before being destroyed.
-        /// </summary>
-        [JsonProperty("destroyPosition")]
-        public ObjectPosition DestroyPosition { get; set; }
-
-        /// <summary>
-        /// Identifier for this card
-        /// </summary>
-        [JsonProperty("id", Required = Required.Always)]
-        public CardId Id { get; set; }
-
-        /// <summary>
-        /// Position of this card in the UI
-        /// </summary>
-        [JsonProperty("position", Required = Required.Always)]
-        public ObjectPosition Position { get; set; }
-
-        /// <summary>
-        /// If this card is revealed to the viewer, contains information on the revealed face of the
-        /// card.
-        /// </summary>
-        [JsonProperty("revealed")]
-        public RevealedCardView Revealed { get; set; }
-
-        /// <summary>
-        /// True if this card is in a hidden zone but known to one or more opponents
-        /// </summary>
-        [JsonProperty("revealedToOpponents", Required = Required.Always)]
-        public bool RevealedToOpponents { get; set; }
+    public partial class AudioClipAddress
+    {
+        [JsonProperty("audioClip", Required = Required.Always)]
+        public string AudioClip { get; set; }
     }
 
     /// <summary>
@@ -255,6 +210,27 @@ namespace Dreamcaller.Schema
         public DisplayPlayer? OnBattlefield { get; set; }
     }
 
+    public partial class ProjectileAddress
+    {
+        [JsonProperty("projectile", Required = Required.Always)]
+        public string Projectile { get; set; }
+    }
+
+    public partial class GameObjectId
+    {
+        [JsonProperty("cardId", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public CardId CardId { get; set; }
+
+        [JsonProperty("deck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPlayer? Deck { get; set; }
+
+        [JsonProperty("void", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPlayer? Void { get; set; }
+
+        [JsonProperty("avatar", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPlayer? Avatar { get; set; }
+    }
+
     /// <summary>
     /// Identifier for this card
     /// </summary>
@@ -265,6 +241,121 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("version", Required = Required.Always)]
         public long Version { get; set; }
+    }
+
+    /// <summary>
+    /// Represents the visual state of an ongoing dream battle
+    /// </summary>
+    public partial class BattleView
+    {
+        /// <summary>
+        /// Visual state of cards in the game
+        /// </summary>
+        [JsonProperty("cards", Required = Required.Always)]
+        public List<CardView> Cards { get; set; }
+
+        /// <summary>
+        /// Opponent of user
+        /// </summary>
+        [JsonProperty("enemy", Required = Required.Always)]
+        public PlayerView Enemy { get; set; }
+
+        /// <summary>
+        /// Unique identifier for this dream battle
+        /// </summary>
+        [JsonProperty("id", Required = Required.Always)]
+        public Guid Id { get; set; }
+
+        /// <summary>
+        /// UI to display to the player.
+        /// </summary>
+        [JsonProperty("interface", Required = Required.Always)]
+        public InterfaceView Interface { get; set; }
+
+        /// <summary>
+        /// Describes the status of the game, e.g. which phase & step the game is in
+        /// </summary>
+        [JsonProperty("statusDescription", Required = Required.Always)]
+        public string StatusDescription { get; set; }
+
+        /// <summary>
+        /// Player who is operating the client
+        /// </summary>
+        [JsonProperty("user", Required = Required.Always)]
+        public PlayerView User { get; set; }
+    }
+
+    /// <summary>
+    /// Represents the visual state of a card or ability in a game
+    /// </summary>
+    public partial class CardView
+    {
+        /// <summary>
+        /// Card back image
+        /// </summary>
+        [JsonProperty("cardBack", Required = Required.Always)]
+        public Url CardBack { get; set; }
+
+        /// <summary>
+        /// Face up/face down state for this card
+        /// </summary>
+        [JsonProperty("cardFacing", Required = Required.Always)]
+        public CardFacing CardFacing { get; set; }
+
+        /// <summary>
+        /// Optionally, a position at which to create this card.
+        ///
+        /// If this card does not already exist, it will be created at this position before being
+        /// animated to [Self::position].
+        /// </summary>
+        [JsonProperty("createPosition")]
+        public ObjectPosition CreatePosition { get; set; }
+
+        /// <summary>
+        /// Optionally, a position at which to destroy this card.
+        ///
+        /// If provided, the card will be animated to this position before being destroyed.
+        /// </summary>
+        [JsonProperty("destroyPosition")]
+        public ObjectPosition DestroyPosition { get; set; }
+
+        /// <summary>
+        /// Identifier for this card
+        /// </summary>
+        [JsonProperty("id", Required = Required.Always)]
+        public CardId Id { get; set; }
+
+        /// <summary>
+        /// Position of this card in the UI
+        /// </summary>
+        [JsonProperty("position", Required = Required.Always)]
+        public ObjectPosition Position { get; set; }
+
+        /// <summary>
+        /// If this card is revealed to the viewer, contains information on the revealed face of the
+        /// card.
+        /// </summary>
+        [JsonProperty("revealed")]
+        public RevealedCardView Revealed { get; set; }
+
+        /// <summary>
+        /// True if this card is in a hidden zone but known to one or more opponents
+        /// </summary>
+        [JsonProperty("revealedToOpponents", Required = Required.Always)]
+        public bool RevealedToOpponents { get; set; }
+    }
+
+    /// <summary>
+    /// Card back image
+    ///
+    /// A URL
+    ///
+    /// Image URL for this card
+    /// </summary>
+    public partial class Url
+    {
+        [JsonProperty("urlValue", Required = Required.Always)]
+        public string UrlValue { get; set; }
     }
 
     /// <summary>
@@ -389,7 +480,7 @@ namespace Dreamcaller.Schema
         /// Image URL for this card
         /// </summary>
         [JsonProperty("image", Required = Required.Always)]
-        public string Image { get; set; }
+        public Url Image { get; set; }
 
         /// <summary>
         /// X offset position of this image
@@ -1062,13 +1153,6 @@ namespace Dreamcaller.Schema
     }
 
     /// <summary>
-    /// Face up/face down state for this card
-    ///
-    /// Whether a card is face-down or face-up
-    /// </summary>
-    public enum CardFacing { FaceDown, FaceUp };
-
-    /// <summary>
     /// Object position used in interface elements like the deck viewer which don't rely on game
     /// positioning.
     ///
@@ -1098,6 +1182,13 @@ namespace Dreamcaller.Schema
     /// Opponent of user, i.e. the AI enemy
     /// </summary>
     public enum DisplayPlayer { Enemy, User };
+
+    /// <summary>
+    /// Face up/face down state for this card
+    ///
+    /// Whether a card is face-down or face-up
+    /// </summary>
+    public enum CardFacing { FaceDown, FaceUp };
 
     /// <summary>
     /// Private actions for developer use
@@ -1181,10 +1272,10 @@ namespace Dreamcaller.Schema
             DateParseHandling = DateParseHandling.None,
             Converters =
             {
-                CardFacingConverter.Singleton,
                 PositionConverter.Singleton,
                 DisplayPlayerConverter.Singleton,
                 PositionEnumConverter.Singleton,
+                CardFacingConverter.Singleton,
                 DebugActionConverter.Singleton,
                 CardFrameConverter.Singleton,
                 RevealedCardStatusConverter.Singleton,
@@ -1210,47 +1301,6 @@ namespace Dreamcaller.Schema
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
         };
-    }
-
-    internal class CardFacingConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(CardFacing) || t == typeof(CardFacing?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "faceDown":
-                    return CardFacing.FaceDown;
-                case "faceUp":
-                    return CardFacing.FaceUp;
-            }
-            throw new Exception("Cannot unmarshal type CardFacing");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (CardFacing)untypedValue;
-            switch (value)
-            {
-                case CardFacing.FaceDown:
-                    serializer.Serialize(writer, "faceDown");
-                    return;
-                case CardFacing.FaceUp:
-                    serializer.Serialize(writer, "faceUp");
-                    return;
-            }
-            throw new Exception("Cannot marshal type CardFacing");
-        }
-
-        public static readonly CardFacingConverter Singleton = new CardFacingConverter();
     }
 
     internal class PositionConverter : JsonConverter
@@ -1445,6 +1495,47 @@ namespace Dreamcaller.Schema
         }
 
         public static readonly PositionEnumConverter Singleton = new PositionEnumConverter();
+    }
+
+    internal class CardFacingConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(CardFacing) || t == typeof(CardFacing?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "faceDown":
+                    return CardFacing.FaceDown;
+                case "faceUp":
+                    return CardFacing.FaceUp;
+            }
+            throw new Exception("Cannot unmarshal type CardFacing");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (CardFacing)untypedValue;
+            switch (value)
+            {
+                case CardFacing.FaceDown:
+                    serializer.Serialize(writer, "faceDown");
+                    return;
+                case CardFacing.FaceUp:
+                    serializer.Serialize(writer, "faceUp");
+                    return;
+            }
+            throw new Exception("Cannot marshal type CardFacing");
+        }
+
+        public static readonly CardFacingConverter Singleton = new CardFacingConverter();
     }
 
     internal class DebugActionConverter : JsonConverter
