@@ -188,9 +188,9 @@ namespace Dreamcaller.Masonry
     };
 
 
-    public static TimeValue DurationMs(uint ms) => new()
+    public static Milliseconds DurationMs(uint ms) => new()
     {
-      Milliseconds = ms
+      MillisecondsValue = ms
     };
 
     public static ImageSlice ImageSlice(uint slice) => ImageSlice(slice, slice);

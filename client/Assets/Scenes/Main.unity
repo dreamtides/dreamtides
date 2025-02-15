@@ -7302,6 +7302,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 654814e266a5f465482a130c4cf37a0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _projectiles:
+  - {fileID: 1261555563981962, guid: 24c86df1468884d499ca1d5cb865a6f7, type: 3}
+  - {fileID: 1032096471364102, guid: 084af1218a1e0ee41a43bdf9d52aea29, type: 3}
+  - {fileID: 1294834399362254, guid: 9226726c851a790469d64d3093814ad4, type: 3}
+  - {fileID: 1878987882032996, guid: 7fa473b70378b654a84307886f90d064, type: 3}
+  - {fileID: 1481587283673810, guid: cf0756612a842cb4ba09ad101dd6bcb3, type: 3}
 --- !u!1001 &616268838
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -6,4 +6,9 @@ namespace Dreamcaller.Schema
   {
     public string ClientId() => $"{Id.Idx}-{Id.Version}";
   }
+
+  public partial class Milliseconds
+  {
+    public float ToSeconds() => MillisecondsValue / 1000f;
+  }
 }

@@ -4,8 +4,8 @@ using System.Collections;
 using DG.Tweening;
 using Dreamcaller.Schema;
 using Dreamcaller.Services;
+using Dreamcaller.Utils;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 
 namespace Dreamcaller.Components
 {
@@ -25,68 +25,67 @@ namespace Dreamcaller.Components
     public IEnumerator Fire(
       Registry registry,
       Transform target,
-      TimeValue? duration,
+      Milliseconds? duration,
       EffectAddress? additionalHit,
-      TimeValue? additionalHitDelay,
+      Milliseconds? additionalHitDelay,
       AudioClipAddress? fireSound,
       AudioClipAddress? impactSound)
     {
       transform.localScale = _scale * Vector3.one;
       transform.LookAt(target);
       var rotation = Quaternion.LookRotation(transform.position - target.position);
-      yield return null;
 
-      // if (_flash && _flash != null)
-      // {
-      //   var flash = registry.AssetPoolService.Create(_flash, transform.position);
-      //   flash.transform.rotation = rotation;
-      //   flash.transform.localScale = _scale * Vector3.one;
-      // }
+      if (_flash)
+      {
+        var flash = registry.AssetPoolService.Create(_flash, transform.position);
+        flash.transform.rotation = rotation;
+        flash.transform.localScale = _scale * Vector3.one;
+      }
 
-      // if (fireSound != null)
-      // {
-      //   AssetUtil.PlayOneShot(registry.MainAudioSource, registry.AssetService.GetAudioClip(fireSound));
-      // }
-      // else
-      // {
-      //   registry.StaticAssets.PlayFireProjectileSound();
-      // }
+      if (fireSound != null)
+      {
+        registry.MainAudioSource.PlayOneShot(registry.AssetService.GetAudioClip(fireSound));
+      }
+      else
+      {
+        registry.SoundService.PlayFireProjectileSound();
+      }
 
-      // yield return TweenUtils.Sequence($"{name} Projectile")
-      //   .Append(transform.DOMove(target.position, DataUtils.ToSeconds(duration, 300)).SetEase(Ease.Linear))
-      //   .WaitForCompletion();
+      yield return TweenUtils.Sequence($"{name} Projectile")
+        .Append(transform.DOMove(target.position, duration?.ToSeconds() ?? 0.3f).SetEase(Ease.Linear))
+        .WaitForCompletion();
 
-      // TimedEffect? hit = null;
-      // if (_hit && _hit != null)
-      // {
-      //   hit = registry.AssetPoolService.Create(_hit, transform.position);
-      //   hit.transform.rotation = rotation;
-      //   hit.transform.localScale = _scale * Vector3.one;
-      // }
+      TimedEffect? hit = null;
+      if (_hit)
+      {
+        hit = registry.AssetPoolService.Create(_hit, transform.position);
+        hit.transform.rotation = rotation;
+        hit.transform.localScale = _scale * Vector3.one;
+      }
 
-      // if (impactSound != null)
-      // {
-      //   AssetUtil.PlayOneShot(registry.MainAudioSource, registry.AssetService.GetAudioClip(impactSound));
-      // }
-      // else
-      // {
-      //   registry.StaticAssets.PlayImpactSound();
-      // }
+      if (impactSound != null)
+      {
+        registry.MainAudioSource.PlayOneShot(registry.AssetService.GetAudioClip(impactSound));
+      }
+      else
+      {
+        registry.SoundService.PlayImpactProjectileSound();
+      }
 
-      // gameObject.SetActive(value: false);
+      gameObject.SetActive(value: false);
 
-      // if (additionalHit != null)
-      // {
-      //   yield return new WaitForSeconds(DataUtils.ToSeconds(additionalHitDelay, 0));
-      //   var additionalHitEffect =
-      //     registry.AssetPoolService.Create(registry.AssetService.GetEffect(additionalHit), transform.position);
-      //   additionalHitEffect.transform.rotation = rotation;
+      if (additionalHit != null)
+      {
+        yield return new WaitForSeconds(additionalHitDelay?.ToSeconds() ?? 0);
+        var additionalHitEffect =
+          registry.AssetPoolService.Create(registry.AssetService.GetEffect(additionalHit), transform.position);
+        additionalHitEffect.transform.rotation = rotation;
 
-      //   if (hit)
-      //   {
-      //     hit!.gameObject.SetActive(false);
-      //   }
-      // }
+        if (hit)
+        {
+          hit!.gameObject.SetActive(false);
+        }
+      }
     }
   }
 }

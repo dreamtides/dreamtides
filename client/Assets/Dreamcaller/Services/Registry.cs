@@ -12,6 +12,9 @@ namespace Dreamcaller.Services
     [SerializeField] Camera? _mainCamera;
     public Camera MainCamera => Check(_mainCamera);
 
+    [SerializeField] AudioSource? _mainAudioSource;
+    public AudioSource MainAudioSource => Check(_mainAudioSource);
+
     [SerializeField] ObjectLayout? _userHand;
     public ObjectLayout UserHand => Check(_userHand);
 
@@ -74,6 +77,9 @@ namespace Dreamcaller.Services
 
     [SerializeField] AssetService? _assetService;
     public AssetService AssetService => Check(_assetService);
+
+    [SerializeField] AssetPoolService? _assetPoolService;
+    public AssetPoolService AssetPoolService => Check(_assetPoolService);
 
     void Start()
     {

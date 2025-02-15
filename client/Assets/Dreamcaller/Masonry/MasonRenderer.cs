@@ -417,9 +417,9 @@ namespace Dreamcaller.Masonry
         ? new TransformOrigin(AdaptDimensionNonNull(registry, to.X), AdaptDimensionNonNull(registry, to.Y), (float)to.Z)
         : new StyleTransformOrigin(StyleKeyword.Null);
       e.style.transitionDelay =
-        AdaptList(input.TransitionDelays, t => new UnityEngine.UIElements.TimeValue(t.Milliseconds, TimeUnit.Millisecond));
+        AdaptList(input.TransitionDelays, t => new TimeValue(t.MillisecondsValue, TimeUnit.Millisecond));
       e.style.transitionDuration = AdaptList(input.TransitionDurations,
-        t => new UnityEngine.UIElements.TimeValue(t.Milliseconds, TimeUnit.Millisecond));
+        t => new TimeValue(t.MillisecondsValue, TimeUnit.Millisecond));
       e.style.transitionProperty = AdaptList(input.TransitionProperties, p => new StylePropertyName(p));
       e.style.transitionTimingFunction = AdaptList(input.TransitionEasingModes, mode => new EasingFunction(mode switch
       {

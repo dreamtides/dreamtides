@@ -741,10 +741,10 @@ namespace Dreamcaller.Schema
         public FlexTranslate TransformOrigin { get; set; }
 
         [JsonProperty("transitionDelays", Required = Required.Always)]
-        public List<TimeValue> TransitionDelays { get; set; }
+        public List<Milliseconds> TransitionDelays { get; set; }
 
         [JsonProperty("transitionDurations", Required = Required.Always)]
-        public List<TimeValue> TransitionDurations { get; set; }
+        public List<Milliseconds> TransitionDurations { get; set; }
 
         [JsonProperty("transitionEasingModes", Required = Required.Always)]
         public List<EasingMode> TransitionEasingModes { get; set; }
@@ -952,12 +952,6 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("z", Required = Required.Always)]
         public double Z { get; set; }
-    }
-
-    public partial class TimeValue
-    {
-        [JsonProperty("milliseconds", Required = Required.Always)]
-        public long Milliseconds { get; set; }
     }
 
     public partial class SliderNode

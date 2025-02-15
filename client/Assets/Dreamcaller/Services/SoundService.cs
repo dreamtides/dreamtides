@@ -7,5 +7,13 @@ namespace Dreamcaller.Services
     public void PlayCardSound()
     {
     }
+
+    public void PlayFireProjectileSound()
+    {
+    }
+
+    public void PlayImpactProjectileSound()
+    {
+    }
   }
 }

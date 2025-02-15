@@ -1,3 +1,4 @@
+use core_data::display_types::Milliseconds;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -138,12 +139,6 @@ pub struct TextShadow {
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct TimeValue {
-    pub milliseconds: u32,
-}
-
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct ImageSlice {
     pub top: u32,
     pub right: u32,
@@ -195,8 +190,8 @@ pub struct FlexStyle {
     pub text_overflow: Option<TextOverflow>,
     pub text_shadow: Option<TextShadow>,
     pub transform_origin: Option<FlexTranslate>,
-    pub transition_delays: Vec<TimeValue>,
-    pub transition_durations: Vec<TimeValue>,
+    pub transition_delays: Vec<Milliseconds>,
+    pub transition_durations: Vec<Milliseconds>,
     pub transition_properties: Vec<String>,
     pub transition_easing_modes: Vec<EasingMode>,
     pub translate: Option<FlexTranslate>,
