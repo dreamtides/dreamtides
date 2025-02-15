@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
@@ -15,6 +16,11 @@ namespace Dreamcaller.Layout
   {
     [SerializeField] List<Displayable> _objects = new();
     [SerializeField] bool _debugUpdateContinuously = false;
+
+    /// <summary>
+    /// If true, the layout will update continuously.
+    /// </summary>
+    public bool DebugUpdateContinuously { get => _debugUpdateContinuously; set => _debugUpdateContinuously = value; }
 
     /// <summary>The objects in this ObjectLayout</summary>
     public override IReadOnlyList<Displayable> Objects => _objects.AsReadOnly();

@@ -1,6 +1,7 @@
 #nullable enable
 
 using System.Collections;
+using System.Collections.Generic;
 using DG.Tweening;
 using Dreamcaller.Schema;
 using Dreamcaller.Services;
@@ -13,14 +14,14 @@ namespace Dreamcaller.Components
   public sealed class Projectile : MonoBehaviour
   {
     [SerializeField] float _scale = 3f;
-    [SerializeField] TimedEffect? _flash;
-    [SerializeField] TimedEffect? _hit;
-
-    public void EditorSetEffects(TimedEffect? hit, TimedEffect? flash)
-    {
-      _hit = hit;
-      _flash = flash;
-    }
+    [SerializeField] public TimedEffect? _flash;
+    [SerializeField] public TimedEffect? _hit;
+    [SerializeField] public bool _useFirePointRotation;
+    [SerializeField] public Vector3 _rotationOffset = new Vector3(0, 0, 0);
+    [SerializeField] public ParticleSystem? _hitParticleSystem;
+    [SerializeField] public Light? _light;
+    [SerializeField] public List<GameObject> _detached = new();
+    [SerializeField] public ParticleSystem? _projectileParticleSystem;
 
     public IEnumerator Fire(
       Registry registry,
