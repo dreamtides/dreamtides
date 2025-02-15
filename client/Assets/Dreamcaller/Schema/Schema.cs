@@ -618,13 +618,13 @@ namespace Dreamcaller.Schema
         public FlexAlign? AlignSelf { get; set; }
 
         [JsonProperty("backgroundColor")]
-        public FlexColor BackgroundColor { get; set; }
+        public DisplayColor BackgroundColor { get; set; }
 
         [JsonProperty("backgroundImage")]
         public SpriteAddress BackgroundImage { get; set; }
 
         [JsonProperty("backgroundImageTintColor")]
-        public FlexColor BackgroundImageTintColor { get; set; }
+        public DisplayColor BackgroundImageTintColor { get; set; }
 
         [JsonProperty("borderColor")]
         public BorderColor BorderColor { get; set; }
@@ -636,7 +636,7 @@ namespace Dreamcaller.Schema
         public BorderWidth BorderWidth { get; set; }
 
         [JsonProperty("color")]
-        public FlexColor Color { get; set; }
+        public DisplayColor Color { get; set; }
 
         [JsonProperty("display")]
         public FlexDisplayStyle? Display { get; set; }
@@ -723,7 +723,7 @@ namespace Dreamcaller.Schema
         public TextAlign? TextAlign { get; set; }
 
         [JsonProperty("textOutlineColor")]
-        public FlexColor TextOutlineColor { get; set; }
+        public DisplayColor TextOutlineColor { get; set; }
 
         [JsonProperty("textOutlineWidth")]
         public double? TextOutlineWidth { get; set; }
@@ -771,7 +771,10 @@ namespace Dreamcaller.Schema
         public FlexWrap? Wrap { get; set; }
     }
 
-    public partial class FlexColor
+    /// <summary>
+    /// Represents a color with the given RGBA values represented as floats in the 0-1 range.
+    /// </summary>
+    public partial class DisplayColor
     {
         [JsonProperty("alpha", Required = Required.Always)]
         public double Alpha { get; set; }
@@ -788,23 +791,23 @@ namespace Dreamcaller.Schema
 
     public partial class SpriteAddress
     {
-        [JsonProperty("address", Required = Required.Always)]
-        public string Address { get; set; }
+        [JsonProperty("sprite", Required = Required.Always)]
+        public string Sprite { get; set; }
     }
 
     public partial class BorderColor
     {
         [JsonProperty("bottom", Required = Required.Always)]
-        public FlexColor Bottom { get; set; }
+        public DisplayColor Bottom { get; set; }
 
         [JsonProperty("left", Required = Required.Always)]
-        public FlexColor Left { get; set; }
+        public DisplayColor Left { get; set; }
 
         [JsonProperty("right", Required = Required.Always)]
-        public FlexColor Right { get; set; }
+        public DisplayColor Right { get; set; }
 
         [JsonProperty("top", Required = Required.Always)]
-        public FlexColor Top { get; set; }
+        public DisplayColor Top { get; set; }
     }
 
     public partial class BorderRadius
@@ -848,8 +851,8 @@ namespace Dreamcaller.Schema
 
     public partial class FontAddress
     {
-        [JsonProperty("address", Required = Required.Always)]
-        public string Address { get; set; }
+        [JsonProperty("font", Required = Required.Always)]
+        public string Font { get; set; }
     }
 
     public partial class ImageSlice
@@ -927,7 +930,7 @@ namespace Dreamcaller.Schema
         public double BlurRadius { get; set; }
 
         [JsonProperty("color", Required = Required.Always)]
-        public FlexColor Color { get; set; }
+        public DisplayColor Color { get; set; }
 
         [JsonProperty("offset", Required = Required.Always)]
         public FlexVector2 Offset { get; set; }

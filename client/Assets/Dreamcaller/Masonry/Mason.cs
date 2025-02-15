@@ -46,7 +46,7 @@ namespace Dreamcaller.Masonry
       Left = Px(left)
     };
 
-    public static FlexColor MakeColor(string hexString)
+    public static DisplayColor MakeColor(string hexString)
     {
       if (ColorUtility.TryParseHtmlString(hexString, out var color))
       {
@@ -58,7 +58,7 @@ namespace Dreamcaller.Masonry
       }
     }
 
-    public static FlexColor MakeColor(Color color, float? setAlpha = null) => new()
+    public static DisplayColor MakeColor(Color color, float? setAlpha = null) => new()
     {
       Red = color.r,
       Green = color.g,
@@ -92,12 +92,12 @@ namespace Dreamcaller.Masonry
 
     public static SpriteAddress Sprite(string address) => new()
     {
-      Address = address
+      Sprite = address
     };
 
     public static FontAddress Font(string address) => new()
     {
-      Address = address
+      Font = address
     };
 
     public static FlexNode Row(string name, FlexStyle? style, IEnumerable<FlexNode?> children) =>

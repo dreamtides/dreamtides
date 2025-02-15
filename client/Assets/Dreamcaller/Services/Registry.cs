@@ -39,6 +39,12 @@ namespace Dreamcaller.Services
     [SerializeField] ObjectLayout? _enemyVoid;
     public ObjectLayout EnemyVoid => Check(_enemyVoid);
 
+    [SerializeField] ObjectLayout? _userAvatar;
+    public ObjectLayout UserAvatar => Check(_userAvatar);
+
+    [SerializeField] ObjectLayout? _enemyAvatar;
+    public ObjectLayout EnemyAvatar => Check(_enemyAvatar);
+
     [SerializeField] ObjectLayout? _offscreen;
     public ObjectLayout Offscreen => Check(_offscreen);
 
@@ -51,8 +57,8 @@ namespace Dreamcaller.Services
     [SerializeField] ObjectLayout? _selectingTargetsUser;
     public ObjectLayout SelectingTargetsUser => Check(_selectingTargetsUser);
 
-    [SerializeField] LayoutUpdateService? _layoutUpdateService;
-    public LayoutUpdateService LayoutUpdateService => Check(_layoutUpdateService);
+    [SerializeField] LayoutService? _layoutService;
+    public LayoutService LayoutService => Check(_layoutService);
 
     [SerializeField] ActionService? _actionService;
     public ActionService ActionService => Check(_actionService);
@@ -80,6 +86,9 @@ namespace Dreamcaller.Services
 
     [SerializeField] AssetPoolService? _assetPoolService;
     public AssetPoolService AssetPoolService => Check(_assetPoolService);
+
+    [SerializeField] EffectService? _effectService;
+    public EffectService EffectService => Check(_effectService);
 
     void Start()
     {

@@ -1,4 +1,4 @@
-use core_data::display_types::Milliseconds;
+use core_data::display_types::{DisplayColor, FontAddress, Milliseconds, SpriteAddress};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -7,27 +7,6 @@ use crate::flex_enums::{
     FlexVisibility, FlexWrap, FontStyle, OverflowClipBox, TextAlign, TextOverflow,
     TextOverflowPosition, WhiteSpace,
 };
-
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct FlexColor {
-    pub red: f32,
-    pub green: f32,
-    pub blue: f32,
-    pub alpha: f32,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct SpriteAddress {
-    pub address: String,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct FontAddress {
-    pub address: String,
-}
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
@@ -94,10 +73,10 @@ pub struct BorderWidth {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct BorderColor {
-    pub top: FlexColor,
-    pub right: FlexColor,
-    pub bottom: FlexColor,
-    pub left: FlexColor,
+    pub top: DisplayColor,
+    pub right: DisplayColor,
+    pub bottom: DisplayColor,
+    pub left: DisplayColor,
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
@@ -134,7 +113,7 @@ pub struct FlexScale {
 pub struct TextShadow {
     pub offset: FlexVector2,
     pub blur_radius: f32,
-    pub color: FlexColor,
+    pub color: DisplayColor,
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
@@ -159,13 +138,13 @@ pub struct FlexStyle {
     pub align_content: Option<FlexAlign>,
     pub align_items: Option<FlexAlign>,
     pub align_self: Option<FlexAlign>,
-    pub background_color: Option<FlexColor>,
+    pub background_color: Option<DisplayColor>,
     pub background_image: Option<SpriteAddress>,
     pub border_color: Option<BorderColor>,
     pub border_radius: Option<BorderRadius>,
     pub border_width: Option<BorderWidth>,
     pub inset: Option<FlexInsets>,
-    pub color: Option<FlexColor>,
+    pub color: Option<DisplayColor>,
     pub display: Option<FlexDisplayStyle>,
     pub flex_basis: Option<Dimension>,
     pub flex_direction: Option<FlexDirection>,
@@ -195,14 +174,14 @@ pub struct FlexStyle {
     pub transition_properties: Vec<String>,
     pub transition_easing_modes: Vec<EasingMode>,
     pub translate: Option<FlexTranslate>,
-    pub background_image_tint_color: Option<FlexColor>,
+    pub background_image_tint_color: Option<DisplayColor>,
     pub font: Option<FontAddress>,
     pub font_style: Option<FontStyle>,
     pub overflow_clip_box: Option<OverflowClipBox>,
     pub paragraph_spacing: Option<Dimension>,
     pub image_slice: Option<ImageSlice>,
     pub text_align: Option<TextAlign>,
-    pub text_outline_color: Option<FlexColor>,
+    pub text_outline_color: Option<DisplayColor>,
     pub text_outline_width: Option<f32>,
     pub text_overflow_position: Option<TextOverflowPosition>,
     pub visibility: Option<FlexVisibility>,

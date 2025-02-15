@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace Dreamcaller.Services
 {
-  public class LayoutUpdateService : Service
+  public class LayoutService : Service
   {
     [SerializeField] Card? _cardPrefab;
     Card CardPrefab { get => Errors.CheckNotNull(_cardPrefab); }
@@ -75,6 +75,44 @@ namespace Dreamcaller.Services
     }
 
     /// <summary>
+    /// Returns the game object for the given game object id.
+    /// </summary>
+    public Displayable GetGameObject(GameObjectId id)
+    {
+      if (id.Deck is { } deck)
+      {
+        return deck switch
+        {
+          DisplayPlayer.User => Registry.UserDeck,
+          DisplayPlayer.Enemy => Registry.EnemyDeck,
+          _ => throw Errors.UnknownEnumValue(deck)
+        };
+      }
+
+      if (id.Void is { } voidPile)
+      {
+        return voidPile switch
+        {
+          DisplayPlayer.User => Registry.UserVoid,
+          DisplayPlayer.Enemy => Registry.EnemyVoid,
+          _ => throw Errors.UnknownEnumValue(voidPile)
+        };
+      }
+
+      if (id.Avatar is { } avatar)
+      {
+        return avatar switch
+        {
+          DisplayPlayer.User => Registry.UserAvatar,
+          DisplayPlayer.Enemy => Registry.EnemyAvatar,
+          _ => throw Errors.UnknownEnumValue(avatar)
+        };
+      }
+
+      return Errors.CheckNotNull(Cards[id.CardId.ClientId()]);
+    }
+
+    /// <summary>
     /// Runs all layout animations immediately
     /// </summary>
     public void RunAnimations(Action? onComplete = null)
@@ -89,6 +127,17 @@ namespace Dreamcaller.Services
     {
       var layout = LayoutForPosition(card.CardView.Position);
       layout.Add(card);
+    }
+
+    /// <summary>
+    /// Moves an object to a new target ObjectLayout, optionally animating the
+    /// transition if a sequence is provided.
+    /// </summary>
+    public void MoveObject(Displayable displayable, ObjectPosition position, Sequence? sequence = null)
+    {
+      var layout = LayoutForPosition(position);
+      layout.Add(displayable);
+      ApplyAllLayouts(sequence);
     }
 
     IEnumerator RunAnimationsAsync(Action? onComplete = null)
@@ -107,6 +156,8 @@ namespace Dreamcaller.Services
       Registry.EnemyDeck.ApplyLayout(sequence);
       Registry.UserVoid.ApplyLayout(sequence);
       Registry.EnemyVoid.ApplyLayout(sequence);
+      Registry.UserAvatar.ApplyLayout(sequence);
+      Registry.EnemyAvatar.ApplyLayout(sequence);
       Registry.UserBattlefield.ApplyLayout(sequence);
       Registry.EnemyBattlefield.ApplyLayout(sequence);
       Registry.DrawnCardsPosition.ApplyLayout(sequence);

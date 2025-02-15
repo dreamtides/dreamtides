@@ -255,10 +255,10 @@ namespace Dreamcaller.Masonry
       label.text = text.Label;
     }
 
-    public static Color ToUnityColor(FlexColor color) => new(
+    public static Color ToUnityColor(DisplayColor color) => new(
       (float)color.Red, (float)color.Green, (float)color.Blue, (float)color.Alpha);
 
-    static StyleColor AdaptColor(FlexColor? color) =>
+    static StyleColor AdaptColor(DisplayColor? color) =>
       color == null ? new StyleColor(StyleKeyword.Null) : ToUnityColor(color);
 
     static StyleFloat AdaptFloat(double? input) => (float?)input ?? new StyleFloat(StyleKeyword.Null);

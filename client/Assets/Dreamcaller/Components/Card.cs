@@ -259,8 +259,8 @@ namespace Dreamcaller.Components
 
       if (ShouldReturnToPreviousParentOnRelease())
       {
-        _registry.LayoutUpdateService.AddToParent(this);
-        _registry.LayoutUpdateService.RunAnimations(() =>
+        _registry.LayoutService.AddToParent(this);
+        _registry.LayoutService.RunAnimations(() =>
         {
           _outline.gameObject.SetActive(CanPlay());
         });

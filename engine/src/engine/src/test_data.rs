@@ -3,7 +3,7 @@ use std::sync::{LazyLock, Mutex};
 use action_data::battle_action::BattleAction;
 use action_data::debug_action::DebugAction;
 use action_data::user_action::UserAction;
-use core_data::display_types::Url;
+use core_data::display_types::{DisplayColor, Url};
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::CardFacing;
@@ -19,7 +19,7 @@ use display_data::request_data::{
 use masonry::flex_enums::{FlexPosition, TextAlign, WhiteSpace};
 use masonry::flex_node::{FlexNode, NodeType, Text};
 use masonry::flex_style::{
-    BorderRadius, Dimension, DimensionGroup, DimensionUnit, FlexColor, FlexInsets, FlexStyle,
+    BorderRadius, Dimension, DimensionGroup, DimensionUnit, FlexInsets, FlexStyle,
 };
 use uuid::Uuid;
 
@@ -404,7 +404,7 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
 
 fn flex_node(text: impl Into<String>) -> Option<FlexNode> {
     let style = FlexStyle {
-        background_color: Some(FlexColor { red: 0.0, green: 0.0, blue: 0.0, alpha: 0.95 }),
+        background_color: Some(DisplayColor { red: 0.0, green: 0.0, blue: 0.0, alpha: 0.95 }),
         border_radius: Some(BorderRadius {
             top_left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
             top_right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
@@ -417,7 +417,7 @@ fn flex_node(text: impl Into<String>) -> Option<FlexNode> {
             bottom: Dimension { unit: DimensionUnit::Pixels, value: 8.0 },
             left: Dimension { unit: DimensionUnit::Pixels, value: 8.0 },
         }),
-        color: Some(FlexColor { red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0 }),
+        color: Some(DisplayColor { red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0 }),
         font_size: Some(Dimension { unit: DimensionUnit::Pixels, value: 14.0 }),
         max_width: Some(Dimension { unit: DimensionUnit::Percentage, value: 80.0 }),
         min_height: Some(Dimension { unit: DimensionUnit::Pixels, value: 44.0 }),
@@ -433,7 +433,7 @@ fn flex_node(text: impl Into<String>) -> Option<FlexNode> {
 
 fn select_target_message() -> FlexNode {
     let style = FlexStyle {
-        background_color: Some(FlexColor { red: 0.0, green: 0.0, blue: 0.0, alpha: 0.95 }),
+        background_color: Some(DisplayColor { red: 0.0, green: 0.0, blue: 0.0, alpha: 0.95 }),
         border_radius: Some(BorderRadius {
             top_left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
             top_right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
@@ -446,7 +446,7 @@ fn select_target_message() -> FlexNode {
             bottom: Dimension { unit: DimensionUnit::Pixels, value: 8.0 },
             left: Dimension { unit: DimensionUnit::Pixels, value: 8.0 },
         }),
-        color: Some(FlexColor { red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0 }),
+        color: Some(DisplayColor { red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0 }),
         font_size: Some(Dimension { unit: DimensionUnit::Pixels, value: 20.0 }),
         min_height: Some(Dimension { unit: DimensionUnit::Pixels, value: 44.0 }),
         white_space: Some(WhiteSpace::Normal),
