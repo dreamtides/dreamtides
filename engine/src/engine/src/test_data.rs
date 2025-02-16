@@ -177,7 +177,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
             let fire_projectile = Command::FireProjectile(FireProjectileCommand {
                 source_id: GameObjectId::CardId(source_card_id),
                 target_id: GameObjectId::CardId(card_id),
-                projectile: ProjectileAddress { projectile: "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile 1 nature arrow.prefab".to_string() },
+                projectile: ProjectileAddress { projectile: "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile 2 electro.prefab".to_string() },
                 travel_duration: None,
                 fire_sound: None,
                 impact_sound: None,

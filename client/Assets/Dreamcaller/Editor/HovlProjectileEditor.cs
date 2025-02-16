@@ -20,6 +20,12 @@ namespace Dreamcaller.Editors
         var projectile = (HS_ProjectileMover)target;
         var added = projectile.gameObject.AddComponent<Projectile>();
 
+        // TODO: The Hovl projectiles now store their flash & hit effects as
+        // children of the current component, which breaks some assumptions of
+        // our system (e.g. the hit doesn't have "play on awake"). We need to
+        // either standardize on this pattern or have the upgrade script delete
+        // these children and directly reference prefabs.
+
         TimedEffect? flash = null;
         if (projectile.flash)
         {
