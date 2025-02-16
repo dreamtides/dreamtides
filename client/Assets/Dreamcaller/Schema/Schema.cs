@@ -92,19 +92,19 @@ namespace Dreamcaller.Schema
 
     public partial class FireProjectileCommand
     {
-        [JsonProperty("additionalHit", Required = Required.Always)]
+        [JsonProperty("additionalHit")]
         public EffectAddress AdditionalHit { get; set; }
 
         [JsonProperty("additionalHitDelay")]
         public Milliseconds AdditionalHitDelay { get; set; }
 
-        [JsonProperty("fireSound", Required = Required.Always)]
+        [JsonProperty("fireSound")]
         public AudioClipAddress FireSound { get; set; }
 
         [JsonProperty("hideOnHit", Required = Required.Always)]
         public bool HideOnHit { get; set; }
 
-        [JsonProperty("impactSound", Required = Required.Always)]
+        [JsonProperty("impactSound")]
         public AudioClipAddress ImpactSound { get; set; }
 
         [JsonProperty("jumpToPosition")]
@@ -119,10 +119,10 @@ namespace Dreamcaller.Schema
         [JsonProperty("targetId", Required = Required.Always)]
         public GameObjectId TargetId { get; set; }
 
-        [JsonProperty("travelDuration", Required = Required.Always)]
+        [JsonProperty("travelDuration")]
         public Milliseconds TravelDuration { get; set; }
 
-        [JsonProperty("waitDuration", Required = Required.Always)]
+        [JsonProperty("waitDuration")]
         public Milliseconds WaitDuration { get; set; }
     }
 

@@ -79,7 +79,7 @@ namespace Dreamcaller.Components
       {
         yield return new WaitForSeconds(additionalHitDelay?.ToSeconds() ?? 0);
         var additionalHitEffect =
-          registry.AssetPoolService.Create(registry.AssetService.GetEffect(additionalHit), transform.position);
+          registry.AssetPoolService.Create(registry.AssetService.GetEffectPrefab(additionalHit), transform.position);
         additionalHitEffect.transform.rotation = rotation;
 
         if (hit)

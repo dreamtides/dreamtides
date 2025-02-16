@@ -34,7 +34,7 @@ namespace Dreamcaller.Services
       }
 
       var projectile = Registry.AssetPoolService.Create(
-        Registry.AssetService.GetProjectile(command.Projectile), source.transform.position);
+        Registry.AssetService.GetProjectilePrefab(command.Projectile), source.transform.position);
 
       var startPosition = source.transform.position;
       var throwSequence = TweenUtils.Sequence("ProjectileThrow")
@@ -64,6 +64,7 @@ namespace Dreamcaller.Services
 
       if (command.WaitDuration != null)
       {
+        Debug.Log($"Waiting for {command.WaitDuration.ToSeconds()} seconds");
         yield return new WaitForSeconds(command.WaitDuration.ToSeconds());
       }
 

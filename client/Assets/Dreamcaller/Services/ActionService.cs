@@ -129,6 +129,12 @@ namespace Dreamcaller.Services
           Registry.DocumentService.RenderScreenOverlay(command.UpdateBattle.Interface?.ScreenOverlay);
           coroutines.Add(StartCoroutine(Registry.LayoutService.UpdateLayout(command.UpdateBattle, sequence)));
         }
+
+        if (command.FireProjectile != null)
+        {
+          coroutines.Add(StartCoroutine(
+            Registry.EffectService.HandleFireProjectileCommand(command.FireProjectile)));
+        }
       }
 
       foreach (var coroutine in coroutines)

@@ -16,13 +16,15 @@ namespace Dreamcaller.Services
 
     public AudioClip GetAudioClip(AudioClipAddress address) => GetAsset<AudioClip>(address.AudioClip);
 
-    public TimedEffect GetEffect(EffectAddress address) => GetAssetComponent<TimedEffect>(address.Effect);
+    public TimedEffect GetEffectPrefab(EffectAddress address) =>
+        GetAssetComponent<TimedEffect>(address.Effect);
 
-    public Projectile GetProjectile(ProjectileAddress address) => GetAssetComponent<Projectile>(address.Projectile);
+    public Projectile GetProjectilePrefab(ProjectileAddress address) =>
+        GetAssetComponent<Projectile>(address.Projectile);
 
     T GetAsset<T>(string address) where T : class
     {
-      var op = Addressables.LoadAssetAsync<T>("myGameObjectKey");
+      var op = Addressables.LoadAssetAsync<T>(address);
       var result = op.WaitForCompletion();
       return Errors.CheckNotNull(result);
     }

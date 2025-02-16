@@ -3,7 +3,7 @@ use std::sync::{LazyLock, Mutex};
 use action_data::battle_action::BattleAction;
 use action_data::debug_action::DebugAction;
 use action_data::user_action::UserAction;
-use core_data::display_types::{DisplayColor, Url};
+use core_data::display_types::{DisplayColor, Milliseconds, ProjectileAddress, Url};
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::CardFacing;
@@ -11,7 +11,7 @@ use display_data::battle_view::{BattleView, DisplayPlayer, InterfaceView, Player
 use display_data::card_view::{
     CardActions, CardFrame, CardView, DisplayImage, RevealedCardStatus, RevealedCardView,
 };
-use display_data::command::{Command, CommandSequence};
+use display_data::command::{Command, CommandSequence, FireProjectileCommand, GameObjectId};
 use display_data::object_position::{ObjectPosition, Position};
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, Metadata, PerformActionRequest, PerformActionResponse,
@@ -140,6 +140,22 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 })
                 .collect();
 
+            // Find the source card (the one in SelectingTargets position)
+            let source_card_id = battle
+                .cards
+                .iter()
+                .find_map(|card| {
+                    if matches!(
+                        card.position.position,
+                        Position::SelectingTargets(DisplayPlayer::Enemy)
+                    ) {
+                        Some(card.id)
+                    } else {
+                        None
+                    }
+                })
+                .unwrap();
+
             // Now update all the cards
             for (index, sorting_key) in cards_to_move {
                 let position = if battle.cards[index].id == card_id {
@@ -156,9 +172,28 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
 
             clear_all_statuses(&mut battle);
             *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+
+            // Create the fire projectile command
+            let fire_projectile = Command::FireProjectile(FireProjectileCommand {
+                source_id: GameObjectId::CardId(source_card_id),
+                target_id: GameObjectId::CardId(card_id),
+                projectile: ProjectileAddress { projectile: "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile 1 nature arrow.prefab".to_string() },
+                travel_duration: None,
+                fire_sound: None,
+                impact_sound: None,
+                additional_hit: None,
+                additional_hit_delay: None,
+                wait_duration: Some(Milliseconds { milliseconds_value: 5000 }),
+                hide_on_hit: false,
+                jump_to_position: None,
+            });
+
             PerformActionResponse {
                 metadata,
-                commands: CommandSequence::from_command(Command::UpdateBattle(battle)),
+                commands: CommandSequence::from_sequence(vec![
+                    fire_projectile,
+                    Command::UpdateBattle(battle),
+                ]),
             }
         }
     }

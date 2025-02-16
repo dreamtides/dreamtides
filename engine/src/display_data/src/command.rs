@@ -21,6 +21,15 @@ impl CommandSequence {
     pub fn from_sequence(sequence: Vec<Command>) -> Self {
         Self { groups: sequence.into_iter().map(|c| CommandGroup { commands: vec![c] }).collect() }
     }
+
+    pub fn from_optional_sequence(sequence: Vec<Option<Command>>) -> Self {
+        Self {
+            groups: sequence
+                .into_iter()
+                .filter_map(|c| c.map(|c| CommandGroup { commands: vec![c] }))
+                .collect(),
+        }
+    }
 }
 
 /// A set of [Command]s to execute in parallel.
@@ -41,28 +50,33 @@ pub enum Command {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct FireProjectileCommand {
+    // The source to fire the projectile from.
     pub source_id: GameObjectId,
+
+    // The target to fire the projectile to.
     pub target_id: GameObjectId,
 
     // Projectile to fire from the 'source_id' card to 'target_id'
     pub projectile: ProjectileAddress,
 
-    // How long the projectile should take to hit its target.
-    pub travel_duration: Milliseconds,
+    // How long the projectile should take to hit its target. Defaults to 300ms.
+    pub travel_duration: Option<Milliseconds>,
 
-    pub fire_sound: AudioClipAddress,
+    // Sound to play when the projectile is fired.
+    pub fire_sound: Option<AudioClipAddress>,
 
-    pub impact_sound: AudioClipAddress,
+    // Sound to play when the projectile hits its target.
+    pub impact_sound: Option<AudioClipAddress>,
 
     // Additional effect to display on the target on hit.
-    pub additional_hit: EffectAddress,
+    pub additional_hit: Option<EffectAddress>,
 
     // Delay before showing the additional hit. If provided, the original
     // projectile Hit effect will be hidden before showing the new hit effect.
     pub additional_hit_delay: Option<Milliseconds>,
 
     // During to wait for the project's impact effect before continuing
-    pub wait_duration: Milliseconds,
+    pub wait_duration: Option<Milliseconds>,
 
     // If true, the target will be hidden after being hit during the
     // 'wait_duration' and before jumping to 'jump_to_position'.
