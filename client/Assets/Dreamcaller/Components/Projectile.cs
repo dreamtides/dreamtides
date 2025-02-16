@@ -62,6 +62,7 @@ namespace Dreamcaller.Components
         hit = registry.AssetPoolService.Create(_hit, transform.position);
         hit.transform.rotation = rotation;
         hit.transform.localScale = _scale * Vector3.one;
+        hit.gameObject.SetActive(true);
       }
 
       if (impactSound != null)
@@ -84,9 +85,12 @@ namespace Dreamcaller.Components
 
         if (hit)
         {
-          hit!.gameObject.SetActive(false);
+          hit.gameObject.SetActive(false);
         }
       }
+
+      hit!.gameObject.SetActive(true);
+      registry.LayoutService.MoveTowardsCamera(hit, 5f);
     }
   }
 }

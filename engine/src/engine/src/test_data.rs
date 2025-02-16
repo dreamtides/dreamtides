@@ -183,7 +183,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 impact_sound: None,
                 additional_hit: None,
                 additional_hit_delay: None,
-                wait_duration: Some(Milliseconds { milliseconds_value: 5000 }),
+                wait_duration: Some(Milliseconds::from_seconds(5.0)),
                 hide_on_hit: false,
                 jump_to_position: None,
             });

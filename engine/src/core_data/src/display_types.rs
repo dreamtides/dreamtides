@@ -42,6 +42,10 @@ impl Milliseconds {
     pub fn new(milliseconds_value: u64) -> Self {
         Self { milliseconds_value }
     }
+
+    pub fn from_seconds(seconds: f32) -> Self {
+        Self { milliseconds_value: (seconds * 1000.0) as u64 }
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

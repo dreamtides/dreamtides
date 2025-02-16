@@ -21,6 +21,8 @@ namespace Dreamcaller.Services
       var target = Registry.LayoutService.GetGameObject(command.TargetId);
       var originalPosition = source.transform.position;
       var originalRotation = source.transform.rotation.eulerAngles;
+      var projectileSourcePosition = source.ProjectileSourcePosition ?
+          source.ProjectileSourcePosition : source.transform;
 
       if (source.GameContext.IsBattlefieldContext())
       {
@@ -34,7 +36,7 @@ namespace Dreamcaller.Services
       }
 
       var projectile = Registry.AssetPoolService.Create(
-        Registry.AssetService.GetProjectilePrefab(command.Projectile), source.transform.position);
+        Registry.AssetService.GetProjectilePrefab(command.Projectile), projectileSourcePosition.position);
 
       var startPosition = source.transform.position;
       var throwSequence = TweenUtils.Sequence("ProjectileThrow")

@@ -140,6 +140,15 @@ namespace Dreamcaller.Services
       ApplyAllLayouts(sequence);
     }
 
+    /// <summary>
+    /// Jumps an object towards the camera by 'distance' units
+    /// </summary>
+    public void MoveTowardsCamera(MonoBehaviour component, float distance)
+    {
+      var towardsCameraDirection = -Registry.MainCamera.transform.forward;
+      component.transform.position += towardsCameraDirection * distance;
+    }
+
     IEnumerator RunAnimationsAsync(Action? onComplete = null)
     {
       var sequence = TweenUtils.Sequence("RunAnimations");

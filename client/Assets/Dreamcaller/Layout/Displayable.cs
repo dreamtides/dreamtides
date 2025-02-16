@@ -8,6 +8,7 @@ namespace Dreamcaller.Layout
 {
   public abstract class Displayable : MonoBehaviour
   {
+    [SerializeField] Transform? _projectileSourcePosition;
     GameContext _gameContext;
     ObjectLayout? _parent;
     long _sortingKey;
@@ -29,6 +30,11 @@ namespace Dreamcaller.Layout
     }
 
     public virtual float DefaultScale => 1.0f;
+
+    /// <summary>
+    /// The position that a projectile will be fired from this object.
+    /// </summary>
+    public Transform? ProjectileSourcePosition => _projectileSourcePosition;
 
     protected void Start()
     {

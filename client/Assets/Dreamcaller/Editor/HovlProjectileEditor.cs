@@ -32,8 +32,6 @@ namespace Dreamcaller.Editors
           hit = projectile.hit.AddComponent<TimedEffect>();
         }
 
-
-
         added._flash = flash;
         added._hit = hit;
         added._useFirePointRotation = projectile.UseFirePointRotation;
@@ -43,11 +41,32 @@ namespace Dreamcaller.Editors
         added._detached = projectile.Detached.ToList();
         added._projectileParticleSystem = projectile.projectilePS;
 
+        // Set Play on Awake for all particle systems
+        SetPlayOnAwakeForParticleSystems(projectile.gameObject);
+        if (hit != null)
+        {
+          SetPlayOnAwakeForParticleSystems(hit.gameObject);
+        }
+        if (flash != null)
+        {
+          SetPlayOnAwakeForParticleSystems(flash.gameObject);
+        }
+
         CleanUpChildren(projectile.transform);
         DestroyImmediate(projectile.gameObject.GetComponent<Rigidbody>(), allowDestroyingAssets: true);
         DestroyImmediate(projectile.gameObject.GetComponent<SphereCollider>(), allowDestroyingAssets: true);
         DestroyImmediate(projectile.gameObject.GetComponent<HS_Poolable>(), allowDestroyingAssets: true);
         DestroyImmediate(projectile, allowDestroyingAssets: true);
+      }
+    }
+
+    private void SetPlayOnAwakeForParticleSystems(GameObject gameObject)
+    {
+      var particleSystems = gameObject.GetComponentsInChildren<ParticleSystem>(includeInactive: true);
+      foreach (var ps in particleSystems)
+      {
+        var main = ps.main;
+        main.playOnAwake = true;
       }
     }
 
