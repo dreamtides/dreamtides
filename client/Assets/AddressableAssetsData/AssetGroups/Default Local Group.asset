@@ -15,6 +15,12 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: 6d53c802c8e16429f9f60127ce1df612
   m_SerializeEntries:
+  - m_GUID: 084af1218a1e0ee41a43bdf9d52aea29
+    m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile
+      2 electro.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 24c86df1468884d499ca1d5cb865a6f7
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile
       1 nature arrow.prefab
