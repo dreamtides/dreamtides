@@ -89,8 +89,11 @@ namespace Dreamcaller.Components
         }
       }
 
-      hit!.gameObject.SetActive(true);
-      registry.LayoutService.MoveTowardsCamera(hit, 5f);
+      if (hit)
+      {
+        hit.gameObject.SetActive(true);
+        registry.LayoutService.MoveTowardsCamera(hit, 5f);
+      }
     }
   }
 }

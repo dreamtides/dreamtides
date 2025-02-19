@@ -3,7 +3,7 @@ use std::sync::{LazyLock, Mutex};
 use action_data::battle_action::BattleAction;
 use action_data::debug_action::DebugAction;
 use action_data::user_action::UserAction;
-use core_data::display_types::{DisplayColor, Milliseconds, ProjectileAddress, Url};
+use core_data::display_types::{DisplayColor, ProjectileAddress, Url};
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::CardFacing;
@@ -164,6 +164,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                     Position::InVoid(DisplayPlayer::User)
                 };
                 battle.cards[index] = card_view(position, sorting_key);
+                set_sorting_key(&mut battle.cards[index], 999);
             }
 
             // Reset interface state
@@ -183,7 +184,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 impact_sound: None,
                 additional_hit: None,
                 additional_hit_delay: None,
-                wait_duration: Some(Milliseconds::from_seconds(5.0)),
+                wait_duration: None,
                 hide_on_hit: false,
                 jump_to_position: None,
             });
@@ -213,6 +214,10 @@ fn clear_all_statuses(battle: &mut BattleView) {
             revealed.status = None;
         }
     }
+}
+
+fn set_sorting_key(card: &mut CardView, sorting_key: u32) {
+    card.position.sorting_key = sorting_key;
 }
 
 fn scene_0(id: BattleId) -> BattleView {

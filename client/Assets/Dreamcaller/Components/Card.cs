@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.Collections;
 using DG.Tweening;
 using Dreamcaller.Layout;
 using Dreamcaller.Schema;
@@ -44,7 +45,7 @@ namespace Dreamcaller.Components
     Vector3 _dragStartPosition;
     Vector3 _dragOffset;
     bool _isDragging = false;
-
+    bool _isDissolving = false;
     public CardView CardView => Errors.CheckNotNull(_cardView);
 
     public string Id => CardView.ClientId();
@@ -82,6 +83,16 @@ namespace Dreamcaller.Components
     }
 
     public void TurnFaceDown(Sequence? sequence = null) => Flip(_cardFront, _cardBack, sequence);
+
+    public IEnumerator StartDissolve()
+    {
+      _isDissolving = true;
+      _battlefieldSparkBackground.gameObject.SetActive(false);
+      _battlefieldOutline.gameObject.SetActive(false);
+      var dissolveEffect = ComponentUtils.Get<DissolveEffect>(gameObject);
+      yield return dissolveEffect.StartDissolve();
+      _isDissolving = false;
+    }
 
     /// <summary>
     /// Creates a clone of the card for large display in the info zoom.
@@ -281,7 +292,7 @@ namespace Dreamcaller.Components
 
     void ToggleActiveElements()
     {
-      if (HasGameContext && GameContext.IsBattlefieldContext())
+      if ((HasGameContext && GameContext.IsBattlefieldContext()) || _isDissolving)
       {
         _cardFrame.gameObject.SetActive(false);
         _name.gameObject.SetActive(false);

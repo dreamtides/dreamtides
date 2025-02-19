@@ -2,6 +2,7 @@
 
 using System.Collections;
 using DG.Tweening;
+using Dreamcaller.Components;
 using Dreamcaller.Layout;
 using Dreamcaller.Schema;
 using Dreamcaller.Utils;
@@ -59,6 +60,9 @@ namespace Dreamcaller.Services
         command.FireSound,
         command.ImpactSound);
 
+      var targetCard = ComponentUtils.Get<Card>(target);
+      yield return targetCard.StartDissolve();
+
       if (command.HideOnHit)
       {
         target.gameObject.transform.position = Vector3.zero;
@@ -66,7 +70,6 @@ namespace Dreamcaller.Services
 
       if (command.WaitDuration != null)
       {
-        Debug.Log($"Waiting for {command.WaitDuration.ToSeconds()} seconds");
         yield return new WaitForSeconds(command.WaitDuration.ToSeconds());
       }
 
