@@ -7401,6 +7401,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af789cc78014f4323b5d25b05bb49463, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _cardSounds:
+  - {fileID: 8300000, guid: f3625edcb2697a443a15e9865ead50d3, type: 3}
+  - {fileID: 8300000, guid: bf88dfa0ad62c6148b3f1e120faa35bd, type: 3}
+  - {fileID: 8300000, guid: f362f6052f450954986a21cb1c19996f, type: 3}
+  - {fileID: 8300000, guid: b7bf144cbde5dc149b15966d01a32a2e, type: 3}
+  - {fileID: 8300000, guid: 0cd92487c9956274398e507fd06ee91a, type: 3}
+  - {fileID: 8300000, guid: 6212ae00255e8ac499fb5afc4b5d50f3, type: 3}
+  - {fileID: 8300000, guid: a533a39cd620f0c46971426e0da527f5, type: 3}
+  - {fileID: 8300000, guid: 024be541fa78dbd4ba15bcf9b0083300, type: 3}
+  - {fileID: 8300000, guid: ded5c9eeb2a3c634180c9a0c8b2a901b, type: 3}
+  - {fileID: 8300000, guid: fc9f2b2c3fdc5d8498e5208e3b8f54fa, type: 3}
+  - {fileID: 8300000, guid: f1f5771149224f0429d3c0177b03c987, type: 3}
+  - {fileID: 8300000, guid: f083c4b6de88b954da562c3b0d28dd92, type: 3}
+  - {fileID: 8300000, guid: f52e02a8ecc98d54ebf8134a70e3fe97, type: 3}
+  _fireProjectileSounds: []
+  _impactProjectileSounds: []
 --- !u!114 &613451860
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21445,7 +21461,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 177638, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11406562, guid: 0abab5bb77339e4428787a870eb31bd3, type: 3}
       propertyPath: m_Enabled

@@ -45,7 +45,7 @@ namespace Dreamcaller.Components
 
       if (fireSound != null)
       {
-        registry.MainAudioSource.PlayOneShot(registry.AssetService.GetAudioClip(fireSound));
+        registry.SoundService.Play(fireSound);
       }
       else
       {
@@ -67,7 +67,7 @@ namespace Dreamcaller.Components
 
       if (impactSound != null)
       {
-        registry.MainAudioSource.PlayOneShot(registry.AssetService.GetAudioClip(impactSound));
+        registry.SoundService.Play(impactSound);
       }
       else
       {

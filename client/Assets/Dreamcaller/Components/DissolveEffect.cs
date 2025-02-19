@@ -9,8 +9,8 @@ namespace Dreamcaller.Components
 {
   public class DissolveEffect : MonoBehaviour
   {
-    [SerializeField] MeshRenderer _meshRenderer;
-    [SerializeField] Material _dissolveMaterial;
+    [SerializeField] MeshRenderer _meshRenderer = null!;
+    [SerializeField] Material _dissolveMaterial = null!;
     [SerializeField] Color _edgeColor;
     [SerializeField] float _dissolveSpeed = 0.1f;
     Material? _originalMaterial;
@@ -21,7 +21,7 @@ namespace Dreamcaller.Components
     public IEnumerator StartDissolve(DissolveCardCommand command)
     {
       _reverse = command.Reverse;
-      // _originalMaterial = _meshRenderer.material;
+      _originalMaterial = _meshRenderer.material;
 
       var material = Instantiate(_dissolveMaterial);
       material.mainTexture = _meshRenderer.material.mainTexture;
@@ -65,7 +65,7 @@ namespace Dreamcaller.Components
       {
         if (_reverse)
         {
-          // _meshRenderer.material = _originalMaterial;
+          _meshRenderer.material = _originalMaterial;
         }
         _running = false;
       }
