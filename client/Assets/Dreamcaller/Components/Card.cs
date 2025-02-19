@@ -40,7 +40,7 @@ namespace Dreamcaller.Components
     Vector3 _dragStartPosition;
     Vector3 _dragOffset;
     bool _isDragging = false;
-    bool _isDissolving = false;
+    bool _isDissolved = false;
     public CardView CardView => Errors.CheckNotNull(_cardView);
 
     public string Id => CardView.ClientId();
@@ -79,14 +79,18 @@ namespace Dreamcaller.Components
 
     public void TurnFaceDown(Sequence? sequence = null) => Flip(_cardFront, _cardBack, sequence);
 
-    public IEnumerator StartDissolve()
+    public IEnumerator StartDissolve(DissolveCardCommand command)
     {
-      _isDissolving = true;
-      _battlefieldSparkBackground.gameObject.SetActive(false);
-      _battlefieldOutline.gameObject.SetActive(false);
+      _isDissolved = true;
+      ToggleActiveElements();
       var dissolveEffect = ComponentUtils.Get<DissolveEffect>(gameObject);
-      yield return dissolveEffect.StartDissolve();
-      _isDissolving = false;
+      yield return dissolveEffect.StartDissolve(command);
+
+      if (command.Reverse)
+      {
+        _isDissolved = false;
+        ToggleActiveElements();
+      }
     }
 
     /// <summary>
@@ -267,7 +271,18 @@ namespace Dreamcaller.Components
 
     void ToggleActiveElements()
     {
-      if ((HasGameContext && GameContext.IsBattlefieldContext()) || _isDissolving)
+      if (_isDissolved)
+      {
+        _cardFrame.gameObject.SetActive(false);
+        _name.gameObject.SetActive(false);
+        _rulesText.gameObject.SetActive(false);
+        _sparkBackground.gameObject.SetActive(false);
+        _costBackground.gameObject.SetActive(false);
+        _typeText.gameObject.SetActive(false);
+        _battlefieldSparkBackground.gameObject.SetActive(false);
+        _battlefieldOutline.gameObject.SetActive(false);
+      }
+      else if (HasGameContext && GameContext.IsBattlefieldContext())
       {
         _cardFrame.gameObject.SetActive(false);
         _name.gameObject.SetActive(false);

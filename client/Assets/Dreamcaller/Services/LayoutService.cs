@@ -74,6 +74,9 @@ namespace Dreamcaller.Services
       }
     }
 
+    public Card GetCard(CardId id) =>
+        Errors.CheckNotNull(Cards[id.ClientId()]);
+
     /// <summary>
     /// Returns the game object for the given game object id.
     /// </summary>
@@ -109,7 +112,7 @@ namespace Dreamcaller.Services
         };
       }
 
-      return Errors.CheckNotNull(Cards[id.CardId.ClientId()]);
+      return GetCard(id.CardId);
     }
 
     /// <summary>

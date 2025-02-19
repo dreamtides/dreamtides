@@ -135,6 +135,12 @@ namespace Dreamcaller.Services
           coroutines.Add(StartCoroutine(
             Registry.EffectService.HandleFireProjectileCommand(command.FireProjectile)));
         }
+
+        if (command.DissolveCard != null)
+        {
+          coroutines.Add(StartCoroutine(
+            Registry.EffectService.HandleDissolveCommand(command.DissolveCard)));
+        }
       }
 
       foreach (var coroutine in coroutines)

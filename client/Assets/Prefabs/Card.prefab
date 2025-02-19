@@ -841,11 +841,6 @@ MonoBehaviour:
   _cardFrame: {fileID: 3746803766052438884}
   _cardImage: {fileID: 3206588556960234031}
   _cardBack: {fileID: 2565455935476004323}
-  _material1: {fileID: 2100000, guid: d683a85941831436eb4086fbf02072d6, type: 2}
-  _material2: {fileID: 2100000, guid: d1c9adee4c941436aae3a27c948da760, type: 2}
-  _material3: {fileID: 2100000, guid: c5407b64d6da74596a69ec2df864a98b, type: 2}
-  _material4: {fileID: 2100000, guid: ac5bb8f50b8ae489486baa65ada46f4b, type: 2}
-  _material5: {fileID: 2100000, guid: 2b5e167b745a64c1a90ce5e3cdee23a8, type: 2}
   _outline: {fileID: 1110056180377369919}
   _battlefieldOutline: {fileID: 8552518645419932969}
   _costBackground: {fileID: 4941045815394787486}
@@ -892,7 +887,7 @@ MonoBehaviour:
   _meshRenderer: {fileID: 3206588556960234031}
   _dissolveMaterial: {fileID: 2100000, guid: 38311384ca0854adfbc4d44a2fc1f62d, type: 2}
   _edgeColor: {r: 1, g: 0.51687396, b: 0, a: 0}
-  _dissolveSpeed: 1
+  _dissolveSpeed: 1.5
 --- !u!1 &4992566138778899403
 GameObject:
   m_ObjectHideFlags: 0

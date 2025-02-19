@@ -45,6 +45,7 @@ pub struct CommandGroup {
 pub enum Command {
     UpdateBattle(BattleView),
     FireProjectile(FireProjectileCommand),
+    DissolveCard(DissolveCardCommand),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -84,6 +85,19 @@ pub struct FireProjectileCommand {
 
     // Position for the target to jump to after being hit.
     pub jump_to_position: Option<ObjectPosition>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct DissolveCardCommand {
+    /// The card to dissolve.
+    ///
+    /// Once a card is dissolved, it will be invisible until a reverse dissolve
+    /// is applied to it.
+    pub target: CardId,
+
+    /// If true, dissolve will be played backwards to "create" the card.
+    pub reverse: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

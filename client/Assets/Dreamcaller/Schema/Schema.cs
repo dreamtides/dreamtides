@@ -88,6 +88,42 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("fireProjectile", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public FireProjectileCommand FireProjectile { get; set; }
+
+        [JsonProperty("dissolveCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DissolveCardCommand DissolveCard { get; set; }
+    }
+
+    public partial class DissolveCardCommand
+    {
+        /// <summary>
+        /// If true, dissolve will be played backwards to "create" the card.
+        /// </summary>
+        [JsonProperty("reverse", Required = Required.Always)]
+        public bool Reverse { get; set; }
+
+        /// <summary>
+        /// The card to dissolve.
+        ///
+        /// Once a card is dissolved, it will be invisible until a reverse dissolve is applied to it.
+        /// </summary>
+        [JsonProperty("target", Required = Required.Always)]
+        public CardId Target { get; set; }
+    }
+
+    /// <summary>
+    /// Identifier for this card
+    ///
+    /// The card to dissolve.
+    ///
+    /// Once a card is dissolved, it will be invisible until a reverse dissolve is applied to it.
+    /// </summary>
+    public partial class CardId
+    {
+        [JsonProperty("idx", Required = Required.Always)]
+        public long Idx { get; set; }
+
+        [JsonProperty("version", Required = Required.Always)]
+        public long Version { get; set; }
     }
 
     public partial class FireProjectileCommand
@@ -229,18 +265,6 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("avatar", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? Avatar { get; set; }
-    }
-
-    /// <summary>
-    /// Identifier for this card
-    /// </summary>
-    public partial class CardId
-    {
-        [JsonProperty("idx", Required = Required.Always)]
-        public long Idx { get; set; }
-
-        [JsonProperty("version", Required = Required.Always)]
-        public long Version { get; set; }
     }
 
     /// <summary>

@@ -11,7 +11,9 @@ use display_data::battle_view::{BattleView, DisplayPlayer, InterfaceView, Player
 use display_data::card_view::{
     CardActions, CardFrame, CardView, DisplayImage, RevealedCardStatus, RevealedCardView,
 };
-use display_data::command::{Command, CommandSequence, FireProjectileCommand, GameObjectId};
+use display_data::command::{
+    Command, CommandSequence, DissolveCardCommand, FireProjectileCommand, GameObjectId,
+};
 use display_data::object_position::{ObjectPosition, Position};
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, Metadata, PerformActionRequest, PerformActionResponse,
@@ -193,7 +195,9 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 metadata,
                 commands: CommandSequence::from_sequence(vec![
                     fire_projectile,
+                    Command::DissolveCard(DissolveCardCommand { target: card_id, reverse: false }),
                     Command::UpdateBattle(battle),
+                    Command::DissolveCard(DissolveCardCommand { target: card_id, reverse: true }),
                 ]),
             }
         }

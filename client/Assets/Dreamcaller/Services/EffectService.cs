@@ -60,9 +60,6 @@ namespace Dreamcaller.Services
         command.FireSound,
         command.ImpactSound);
 
-      var targetCard = ComponentUtils.Get<Card>(target);
-      yield return targetCard.StartDissolve();
-
       if (command.HideOnHit)
       {
         target.gameObject.transform.position = Vector3.zero;
@@ -84,6 +81,12 @@ namespace Dreamcaller.Services
       {
         yield return throwSequence.WaitForCompletion();
       }
+    }
+
+    public IEnumerator HandleDissolveCommand(DissolveCardCommand command)
+    {
+      var target = Registry.LayoutService.GetCard(command.Target);
+      yield return target.StartDissolve(command);
     }
   }
 }
