@@ -7417,6 +7417,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: f52e02a8ecc98d54ebf8134a70e3fe97, type: 3}
   _fireProjectileSounds: []
   _impactProjectileSounds: []
+  _whooshSounds:
+  - {fileID: 8300000, guid: ec87c5a9fc6564ca4bdfd0776b7382bf, type: 3}
 --- !u!114 &613451860
 MonoBehaviour:
   m_ObjectHideFlags: 0

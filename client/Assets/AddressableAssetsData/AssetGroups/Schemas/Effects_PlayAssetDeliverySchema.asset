@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ddf04df31ada87443bbb32712b3e2e4b, type: 3}
-  m_Name: Default Local Group_PlayAssetDeliverySchema
+  m_Name: Effects_PlayAssetDeliverySchema
   m_EditorClassIdentifier: 
   m_Group: {fileID: 11400000, guid: 5612d86c9f76a455fa082e6852555055, type: 2}
   m_AssetPackDeliveryType: 2

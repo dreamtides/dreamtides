@@ -11,6 +11,7 @@ namespace Dreamcaller.Services
     [SerializeField] List<AudioClip> _cardSounds = null!;
     [SerializeField] List<AudioClip> _fireProjectileSounds = null!;
     [SerializeField] List<AudioClip> _impactProjectileSounds = null!;
+    [SerializeField] List<AudioClip> _whooshSounds = null!;
 
     public void Play(AudioClip clip)
     {
@@ -35,6 +36,11 @@ namespace Dreamcaller.Services
     public void PlayImpactProjectileSound()
     {
       PlayRandom(_impactProjectileSounds);
+    }
+
+    public void PlayWhooshSound()
+    {
+      PlayRandom(_whooshSounds);
     }
 
     void PlayRandom(List<AudioClip> clips)

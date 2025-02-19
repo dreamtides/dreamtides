@@ -258,6 +258,7 @@ namespace Dreamcaller.Components
       }
       else
       {
+        _registry.SoundService.PlayWhooshSound();
         var action = new UserAction
         {
           BattleAction = new BattleAction
