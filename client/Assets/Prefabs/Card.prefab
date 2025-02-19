@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3494541168115384546}
   - component: {fileID: 5054030132921160462}
   - component: {fileID: 3206588556960234031}
+  - component: {fileID: 4148553225448060228}
   m_Layer: 0
   m_Name: CardImage
   m_TagString: Untagged
@@ -86,6 +87,22 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &4148553225448060228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 646147725960250711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 256d5be5330ae406da482ba7c67053a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _meshRenderer: {fileID: 3206588556960234031}
+  _dissolveMaterial: {fileID: 2100000, guid: 38311384ca0854adfbc4d44a2fc1f62d, type: 2}
+  _edgeColor: {r: 1, g: 0.34313208, b: 0, a: 0}
+  _dissolveSpeed: 1.5
 --- !u!1 &1101506740847986339
 GameObject:
   m_ObjectHideFlags: 0
@@ -839,7 +856,9 @@ MonoBehaviour:
   _rulesText: {fileID: 9119093439582104047}
   _typeText: {fileID: 1303211261265750374}
   _cardFrame: {fileID: 3746803766052438884}
+  _cardFrameDissolve: {fileID: 0}
   _cardImage: {fileID: 3206588556960234031}
+  _cardImageDissolve: {fileID: 4148553225448060228}
   _cardBack: {fileID: 2565455935476004323}
   _outline: {fileID: 1110056180377369919}
   _battlefieldOutline: {fileID: 8552518645419932969}

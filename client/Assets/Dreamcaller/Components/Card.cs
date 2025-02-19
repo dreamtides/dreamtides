@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using DG.Tweening;
 using Dreamcaller.Layout;
 using Dreamcaller.Schema;
@@ -20,6 +21,7 @@ namespace Dreamcaller.Components
     [SerializeField] TextMeshPro _typeText = null!;
     [SerializeField] MeshRenderer _cardFrame = null!;
     [SerializeField] MeshRenderer _cardImage = null!;
+    [SerializeField] DissolveEffect _cardImageDissolve = null!;
     [SerializeField] MeshRenderer _cardBack = null!;
     [SerializeField] MeshRenderer _outline = null!;
     [SerializeField] MeshRenderer _battlefieldOutline = null!;
@@ -83,8 +85,7 @@ namespace Dreamcaller.Components
     {
       _isDissolved = true;
       ToggleActiveElements();
-      var dissolveEffect = ComponentUtils.Get<DissolveEffect>(gameObject);
-      yield return dissolveEffect.StartDissolve(command);
+      yield return StartCoroutine(_cardImageDissolve.StartDissolve(command));
 
       if (command.Reverse)
       {
@@ -273,7 +274,7 @@ namespace Dreamcaller.Components
     {
       if (_isDissolved)
       {
-        _cardFrame.gameObject.SetActive(false);
+        _cardFrame.gameObject.SetActive(!GameContext.IsBattlefieldContext());
         _name.gameObject.SetActive(false);
         _rulesText.gameObject.SetActive(false);
         _sparkBackground.gameObject.SetActive(false);
