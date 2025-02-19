@@ -349,8 +349,6 @@ namespace Dreamcaller.Schema
     /// Card back image
     ///
     /// A URL
-    ///
-    /// Image URL for this card
     /// </summary>
     public partial class Url
     {
@@ -477,22 +475,19 @@ namespace Dreamcaller.Schema
     public partial class DisplayImage
     {
         /// <summary>
-        /// Image URL for this card
+        /// Image texture address for this card
         /// </summary>
-        [JsonProperty("image", Required = Required.Always)]
-        public Url Image { get; set; }
+        [JsonProperty("address", Required = Required.Always)]
+        public TextureAddress Address { get; set; }
+    }
 
-        /// <summary>
-        /// X offset position of this image
-        /// </summary>
-        [JsonProperty("imageOffsetX")]
-        public long? ImageOffsetX { get; set; }
-
-        /// <summary>
-        /// Y offset position of this image
-        /// </summary>
-        [JsonProperty("imageOffsetY")]
-        public long? ImageOffsetY { get; set; }
+    /// <summary>
+    /// Image texture address for this card
+    /// </summary>
+    public partial class TextureAddress
+    {
+        [JsonProperty("texture", Required = Required.Always)]
+        public string Texture { get; set; }
     }
 
     public partial class DraggableNode

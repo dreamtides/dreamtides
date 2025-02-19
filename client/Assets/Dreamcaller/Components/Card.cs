@@ -21,11 +21,6 @@ namespace Dreamcaller.Components
     [SerializeField] MeshRenderer _cardFrame = null!;
     [SerializeField] MeshRenderer _cardImage = null!;
     [SerializeField] MeshRenderer _cardBack = null!;
-    [SerializeField] Material _material1 = null!;
-    [SerializeField] Material _material2 = null!;
-    [SerializeField] Material _material3 = null!;
-    [SerializeField] Material _material4 = null!;
-    [SerializeField] Material _material5 = null!;
     [SerializeField] MeshRenderer _outline = null!;
     [SerializeField] MeshRenderer _battlefieldOutline = null!;
     [SerializeField] MeshRenderer _costBackground = null!;
@@ -172,27 +167,7 @@ namespace Dreamcaller.Components
       _sparkText.text = revealed.Spark.ToString();
       _battlefieldSparkText.text = revealed.Spark.ToString();
       _typeText.text = revealed.CardType;
-
-      if (revealed.Image?.Image?.UrlValue.Contains("1633431262") == true)
-      {
-        _cardImage.material = _material1;
-      }
-      else if (revealed.Image?.Image.UrlValue.Contains("2027158310") == true)
-      {
-        _cardImage.material = _material2;
-      }
-      else if (revealed.Image?.Image.UrlValue.Contains("2269064809") == true)
-      {
-        _cardImage.material = _material3;
-      }
-      else if (revealed.Image?.Image.UrlValue.Contains("2269064817") == true)
-      {
-        _cardImage.material = _material4;
-      }
-      else if (revealed.Image?.Image.UrlValue.Contains("2521694543") == true)
-      {
-        _cardImage.material = _material5;
-      }
+      _cardImage.material.mainTexture = _registry.AssetService.GetTexture(revealed.Image.Address);
     }
 
     void RenderHiddenCardView()

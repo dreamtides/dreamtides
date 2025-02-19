@@ -1,5 +1,5 @@
 use action_data::user_action::UserAction;
-use core_data::display_types::Url;
+use core_data::display_types::{TextureAddress, Url};
 use core_data::identifiers::CardId;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::CardFacing;
@@ -86,14 +86,8 @@ pub struct RevealedCardView {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct DisplayImage {
-    /// Image URL for this card
-    pub image: Url,
-
-    /// X offset position of this image
-    pub image_offset_x: Option<u32>,
-
-    /// Y offset position of this image
-    pub image_offset_y: Option<u32>,
+    /// Image texture address for this card
+    pub address: TextureAddress,
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]

@@ -32,6 +32,30 @@ pub struct AudioClipAddress {
     pub audio_clip: String,
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct TextureAddress {
+    pub texture: String,
+}
+
+impl TextureAddress {
+    pub fn new(texture: impl Into<String>) -> Self {
+        Self { texture: texture.into() }
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct SpriteAddress {
+    pub sprite: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct FontAddress {
+    pub font: String,
+}
+
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Milliseconds {
@@ -46,18 +70,6 @@ impl Milliseconds {
     pub fn from_seconds(seconds: f32) -> Self {
         Self { milliseconds_value: (seconds * 1000.0) as u64 }
     }
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct SpriteAddress {
-    pub sprite: String,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct FontAddress {
-    pub font: String,
 }
 
 /// Represents a color with the given RGBA values represented as floats in the

@@ -16,6 +16,8 @@ namespace Dreamcaller.Services
 
     public AudioClip GetAudioClip(AudioClipAddress address) => GetAsset<AudioClip>(address.AudioClip);
 
+    public Texture GetTexture(TextureAddress address) => GetAsset<Texture>(address.Texture);
+
     public TimedEffect GetEffectPrefab(EffectAddress address) =>
         GetAssetComponent<TimedEffect>(address.Effect);
 

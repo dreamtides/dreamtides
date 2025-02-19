@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: CardImages
+  m_EditorClassIdentifier: 
+  m_GroupName: CardImages
+  m_GUID: 0e1a448110f5a499d90d688e02ac959b
+  m_SerializeEntries:
+  - m_GUID: 20c72fdd75b7e4ee682473e597c0525c
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/2027158310.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5e0930dafb3524b55b972ad349299d67
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/2521694543.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6761eeb7b5c4b4d208be1a1c10f1d0c1
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/1633431262.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e279243d2b40043ef9aa4e7ab6fde553
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/2269064817.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e8da2e685b68a4813961f0409f5135e9
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/2269064809.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: c8037e81ec5c14ea6ad9dae81e0a140c, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 9e6f2dd5a2fd54fdea2eb699bacc0592, type: 2}
+    - {fileID: 11400000, guid: 1b50b385608474e4ab079fbc9643fefc, type: 2}

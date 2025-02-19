@@ -3,7 +3,7 @@ use std::sync::{LazyLock, Mutex};
 use action_data::battle_action::BattleAction;
 use action_data::debug_action::DebugAction;
 use action_data::user_action::UserAction;
-use core_data::display_types::{DisplayColor, ProjectileAddress, Url};
+use core_data::display_types::{DisplayColor, ProjectileAddress, TextureAddress, Url};
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::CardFacing;
@@ -275,9 +275,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
         card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                image: Url::new("/assets/2521694543.jpg".to_string()),
-                image_offset_x: Some(25),
-                image_offset_y: Some(50)
+                address: TextureAddress::new("Assets/ThirdParty/GameAssets/CardImages/2521694543.png"),
             },
             name: "Titan of Forgotten Echoes".to_string(),
             rules_text: "When you materialize your second character in a turn, return this character from your void to play.".to_string(),
@@ -308,9 +306,9 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
         card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                image: Url::new("/assets/1633431262.jpg".to_string()),
-                image_offset_x: None,
-                image_offset_y: None,
+                address: TextureAddress::new(
+                    "Assets/ThirdParty/GameAssets/CardImages/1633431262.png",
+                ),
             },
             name: "Beacon of Tomorrow".to_string(),
             rules_text: "Discover a card with cost (2).".to_string(),
@@ -347,9 +345,9 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
         card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                image: Url::new("/assets/2269064817.jpg".to_string()),
-                image_offset_x: None,
-                image_offset_y: None,
+                address: TextureAddress::new(
+                    "Assets/ThirdParty/GameAssets/CardImages/2269064817.png",
+                ),
             },
             name: "Scrap Reclaimer".to_string(),
             rules_text: "Judgment: Return this character from your void to your hand. Born from rust and resilience.".to_string(),
@@ -381,9 +379,9 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
         card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                image: Url::new("/assets/2269064809.jpg".to_string()),
-                image_offset_x: None,
-                image_offset_y: None,
+                address: TextureAddress::new(
+                    "Assets/ThirdParty/GameAssets/CardImages/2269064809.png",
+                ),
             },
             name: "Evacuation Enforcer".to_string(),
             rules_text: "> Draw 2 cards. Discard 3 cards.\nPromises under a stormy sky."
@@ -415,9 +413,9 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
         card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                image: Url::new("/assets/2027158310.jpg".to_string()),
-                image_offset_x: None,
-                image_offset_y: None,
+                address: TextureAddress::new(
+                    "Assets/ThirdParty/GameAssets/CardImages/2027158310.png",
+                ),
             },
             name: "Moonlit Voyage".to_string(),
             rules_text: "Draw 2 cards. Discard 2 cards.\nReclaim".to_string(),
