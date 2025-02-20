@@ -13,7 +13,7 @@ namespace Dreamcaller.Components
     [SerializeField] Material _dissolveMaterial = null!;
     [SerializeField] Color _edgeColor;
     [SerializeField] float _dissolveSpeed = 0.1f;
-    Material? _originalMaterial;
+    [SerializeField] Material _originalMaterial = null!;
     bool _running = false;
     float _clipValue = 0;
     bool _reverse = false;
@@ -21,7 +21,10 @@ namespace Dreamcaller.Components
     public IEnumerator StartDissolve(DissolveCardCommand command)
     {
       _reverse = command.Reverse;
-      _originalMaterial = _meshRenderer.material;
+      if (!_reverse)
+      {
+        _originalMaterial = _meshRenderer.material;
+      }
 
       var material = Instantiate(_dissolveMaterial);
       material.mainTexture = _meshRenderer.material.mainTexture;
