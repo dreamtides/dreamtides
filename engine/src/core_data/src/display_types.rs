@@ -32,6 +32,12 @@ pub struct AudioClipAddress {
     pub audio_clip: String,
 }
 
+impl AudioClipAddress {
+    pub fn new(audio_clip: impl Into<String>) -> Self {
+        Self { audio_clip: audio_clip.into() }
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct TextureAddress {

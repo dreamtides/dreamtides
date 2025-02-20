@@ -1,5 +1,5 @@
 use action_data::user_action::UserAction;
-use core_data::display_types::{TextureAddress, Url};
+use core_data::display_types::{AudioClipAddress, TextureAddress, Url};
 use core_data::identifiers::CardId;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::CardFacing;
@@ -95,6 +95,9 @@ pub struct DisplayImage {
 pub struct CardActions {
     /// True if this card can currently be played from hand.
     pub can_play: bool,
+
+    /// Sound to play when this card is played.
+    pub on_play_sound: Option<AudioClipAddress>,
 
     /// Action to perform when this card is clicked.
     pub on_click: Option<UserAction>,

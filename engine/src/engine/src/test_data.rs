@@ -3,7 +3,9 @@ use std::sync::{LazyLock, Mutex};
 use action_data::battle_action::BattleAction;
 use action_data::debug_action::DebugAction;
 use action_data::user_action::UserAction;
-use core_data::display_types::{DisplayColor, ProjectileAddress, TextureAddress, Url};
+use core_data::display_types::{
+    AudioClipAddress, DisplayColor, ProjectileAddress, TextureAddress, Url,
+};
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::CardFacing;
@@ -12,7 +14,8 @@ use display_data::card_view::{
     CardActions, CardFrame, CardView, DisplayImage, RevealedCardStatus, RevealedCardView,
 };
 use display_data::command::{
-    Command, CommandSequence, DissolveCardCommand, FireProjectileCommand, GameObjectId,
+    Command, CommandGroup, CommandSequence, DissolveCardCommand, FireProjectileCommand,
+    GameObjectId, UpdateBattleCommand,
 };
 use display_data::object_position::{ObjectPosition, Position};
 use display_data::request_data::{
@@ -32,7 +35,9 @@ pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
     ConnectResponse {
         metadata: request.metadata,
-        commands: CommandSequence::from_command(Command::UpdateBattle(battle)),
+        commands: CommandSequence::from_command(Command::UpdateBattle(UpdateBattleCommand::new(
+            battle,
+        ))),
     }
 }
 
@@ -65,10 +70,20 @@ fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformActio
                     // Return both updates in sequence
                     return PerformActionResponse {
                         metadata,
-                        commands: CommandSequence::from_sequence(vec![
-                            Command::UpdateBattle(shown_drawn),
-                            Command::UpdateBattle(battle),
-                        ]),
+                        commands: CommandSequence {
+                            groups: vec![
+                                CommandGroup {
+                                    commands: vec![Command::UpdateBattle(
+                                        UpdateBattleCommand::new(shown_drawn),
+                                    )],
+                                },
+                                CommandGroup {
+                                    commands: vec![Command::UpdateBattle(
+                                        UpdateBattleCommand::new(battle),
+                                    )],
+                                },
+                            ],
+                        },
                     };
                 }
             }
@@ -76,7 +91,11 @@ fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformActio
             *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
             PerformActionResponse {
                 metadata,
-                commands: CommandSequence::from_command(Command::UpdateBattle(battle)),
+                commands: CommandSequence {
+                    groups: vec![CommandGroup {
+                        commands: vec![Command::UpdateBattle(UpdateBattleCommand::new(battle))],
+                    }],
+                },
             }
         }
     }
@@ -117,7 +136,9 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
             *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
             PerformActionResponse {
                 metadata,
-                commands: CommandSequence::from_command(Command::UpdateBattle(battle)),
+                commands: CommandSequence::from_command(Command::UpdateBattle(
+                    UpdateBattleCommand::new(battle),
+                )),
             }
         }
         BattleAction::SelectTarget(card_id) => {
@@ -182,8 +203,8 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 target_id: GameObjectId::CardId(card_id),
                 projectile: ProjectileAddress { projectile: "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile 2 electro.prefab".to_string() },
                 travel_duration: None,
-                fire_sound: None,
-                impact_sound: None,
+                fire_sound: Some(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Electric Magic/RPG3_ElectricMagic_Cast02.wav")),
+                impact_sound: Some(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Electric Magic/RPG3_ElectricMagic2_LightImpact01.wav")),
                 additional_hit: None,
                 additional_hit_delay: None,
                 wait_duration: None,
@@ -193,12 +214,26 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
 
             PerformActionResponse {
                 metadata,
-                commands: CommandSequence::from_sequence(vec![
-                    fire_projectile,
-                    Command::DissolveCard(DissolveCardCommand { target: card_id, reverse: false }),
-                    Command::UpdateBattle(battle),
-                    Command::DissolveCard(DissolveCardCommand { target: card_id, reverse: true }),
-                ]),
+                commands: CommandSequence {
+                    groups: vec![
+                        CommandGroup { commands: vec![fire_projectile] },
+                        CommandGroup { commands: vec![
+                            Command::DissolveCard(DissolveCardCommand { target: card_id, reverse: false }),
+                        ] },
+                        CommandGroup { commands: vec![
+                            Command::UpdateBattle(UpdateBattleCommand {
+                                battle,
+                                update_sound: Some(AudioClipAddress::new(
+                                    "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Generic_SubtleWhoosh04.wav")),
+                            }),
+                            Command::DissolveCard(DissolveCardCommand {
+                                target: card_id,
+                                reverse: true,
+                            }),
+                        ] },
+                        CommandGroup { commands: vec![] },
+                    ],
+                },
             }
         }
     }
@@ -292,7 +327,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
             is_fast: false,
             actions: CardActions {
                 can_play: position == Position::InHand(DisplayPlayer::User),
-                on_click: None,
+                ..Default::default()
             },
         }),
         revealed_to_opponents: true,
@@ -327,7 +362,8 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
             is_fast: false,
             actions: CardActions {
                 can_play: position == Position::InHand(DisplayPlayer::User),
-                on_click: None,
+                on_play_sound: Some(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Electric Magic/RPG3_ElectricMagic_Cast01.wav")),
+                ..Default::default()
             },
         }),
         revealed_to_opponents: true,
@@ -365,7 +401,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
             is_fast: false,
             actions: CardActions {
                 can_play: position == Position::InHand(DisplayPlayer::User),
-                on_click: None,
+                ..Default::default()
             },
         }),
         revealed_to_opponents: true,
@@ -399,7 +435,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
             is_fast: false,
             actions: CardActions {
                 can_play: position == Position::InHand(DisplayPlayer::User),
-                on_click: None,
+                ..Default::default()
             },
         }),
         revealed_to_opponents: true,
@@ -434,7 +470,7 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
             is_fast: false,
             actions: CardActions {
                 can_play: position == Position::InHand(DisplayPlayer::User),
-                on_click: None,
+                ..Default::default()
             },
         }),
         revealed_to_opponents: true,

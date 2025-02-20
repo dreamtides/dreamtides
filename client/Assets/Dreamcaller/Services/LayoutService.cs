@@ -21,10 +21,15 @@ namespace Dreamcaller.Services
 
     Dictionary<string, Card> Cards { get; } = new();
 
-    public IEnumerator UpdateLayout(BattleView view, Sequence? sequence = null)
+    public IEnumerator UpdateLayout(UpdateBattleCommand command, Sequence? sequence = null)
     {
-      sequence?.SetEase(Ease.InOutSine);
+      var view = command.Battle;
       var toDelete = Cards.Keys.ToHashSet();
+
+      if (command.UpdateSound != null)
+      {
+        Registry.SoundService.Play(command.UpdateSound);
+      }
 
       foreach (var cardView in view.Cards)
       {

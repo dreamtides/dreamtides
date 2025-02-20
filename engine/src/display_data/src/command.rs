@@ -43,9 +43,25 @@ pub struct CommandGroup {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum Command {
-    UpdateBattle(BattleView),
+    UpdateBattle(UpdateBattleCommand),
     FireProjectile(FireProjectileCommand),
     DissolveCard(DissolveCardCommand),
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateBattleCommand {
+    /// The battle to update.
+    pub battle: BattleView,
+
+    /// Sound to play when the battle is updated.
+    pub update_sound: Option<AudioClipAddress>,
+}
+
+impl UpdateBattleCommand {
+    pub fn new(battle: BattleView) -> Self {
+        Self { battle, update_sound: None }
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

@@ -258,7 +258,14 @@ namespace Dreamcaller.Components
       }
       else
       {
-        _registry.SoundService.PlayWhooshSound();
+        if (CardView.Revealed?.Actions?.OnPlaySound is { } onPlaySound)
+        {
+          _registry.SoundService.Play(onPlaySound);
+        }
+        else
+        {
+          _registry.SoundService.PlayWhooshSound();
+        }
         var action = new UserAction
         {
           BattleAction = new BattleAction

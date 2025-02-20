@@ -84,7 +84,7 @@ namespace Dreamcaller.Schema
     public partial class Command
     {
         [JsonProperty("updateBattle", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public BattleView UpdateBattle { get; set; }
+        public UpdateBattleCommand UpdateBattle { get; set; }
 
         [JsonProperty("fireProjectile", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public FireProjectileCommand FireProjectile { get; set; }
@@ -267,7 +267,24 @@ namespace Dreamcaller.Schema
         public DisplayPlayer? Avatar { get; set; }
     }
 
+    public partial class UpdateBattleCommand
+    {
+        /// <summary>
+        /// The battle to update.
+        /// </summary>
+        [JsonProperty("battle", Required = Required.Always)]
+        public BattleView Battle { get; set; }
+
+        /// <summary>
+        /// Sound to play when the battle is updated.
+        /// </summary>
+        [JsonProperty("updateSound")]
+        public AudioClipAddress UpdateSound { get; set; }
+    }
+
     /// <summary>
+    /// The battle to update.
+    ///
     /// Represents the visual state of an ongoing dream battle
     /// </summary>
     public partial class BattleView
@@ -468,6 +485,12 @@ namespace Dreamcaller.Schema
         /// </summary>
         [JsonProperty("onClick")]
         public OnClickClass OnClick { get; set; }
+
+        /// <summary>
+        /// Sound to play when this card is played.
+        /// </summary>
+        [JsonProperty("onPlaySound")]
+        public AudioClipAddress OnPlaySound { get; set; }
     }
 
     public partial class OnClickClass
