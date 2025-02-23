@@ -33,7 +33,7 @@ namespace Dreamcaller.Components
     IEnumerator Start()
     {
       yield return new WaitForSeconds(3f);
-      yield return Show(GameMessageType.Defeat);
+      yield return Show(GameMessageType.YourTurn);
     }
 
     public IEnumerator Show(GameMessageType messageType)
@@ -71,6 +71,9 @@ namespace Dreamcaller.Components
 
       if (moveToTop)
       {
+        _registry.BattlefieldOverlay.gameObject.SetActive(true);
+        _registry.BattlefieldOverlay.color = new Color(0, 0, 0, 0);
+        _registry.BattlefieldOverlay.DOFade(1.0f, 0.3f);
         var sequence = TweenUtils.Sequence("MoveToTop")
           .Insert(0, content.Text.transform.DOMove(_top.position, 0.3f));
         sequence.Insert(0, content.Effect.transform.DOMove(_top.position, 0.3f));

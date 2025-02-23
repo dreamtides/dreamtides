@@ -57,6 +57,9 @@ namespace Dreamcaller.Services
     [SerializeField] ObjectLayout? _selectingTargetsUser;
     public ObjectLayout SelectingTargetsUser => Check(_selectingTargetsUser);
 
+    [SerializeField] SpriteRenderer? _battlefieldOverlay;
+    public SpriteRenderer BattlefieldOverlay => Check(_battlefieldOverlay);
+
     [SerializeField] LayoutService? _layoutService;
     public LayoutService LayoutService => Check(_layoutService);
 
