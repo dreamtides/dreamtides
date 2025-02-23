@@ -30,12 +30,6 @@ namespace Dreamcaller.Components
     [SerializeField] MessageContent _victory = null!;
     [SerializeField] MessageContent _defeat = null!;
 
-    IEnumerator Start()
-    {
-      yield return new WaitForSeconds(3f);
-      yield return Show(GameMessageType.YourTurn);
-    }
-
     public IEnumerator Show(GameMessageType messageType)
     {
       _registry.SoundService.PlayMessageSound(messageType);
