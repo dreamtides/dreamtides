@@ -103,6 +103,7 @@ MonoBehaviour:
   _dissolveMaterial: {fileID: 2100000, guid: 38311384ca0854adfbc4d44a2fc1f62d, type: 2}
   _edgeColor: {r: 1, g: 0.34313208, b: 0, a: 0}
   _dissolveSpeed: 1.5
+  _originalMaterial: {fileID: 0}
 --- !u!1 &1101506740847986339
 GameObject:
   m_ObjectHideFlags: 0
@@ -269,7 +270,7 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &6297391878885746620
 MonoBehaviour:
@@ -856,7 +857,6 @@ MonoBehaviour:
   _rulesText: {fileID: 9119093439582104047}
   _typeText: {fileID: 1303211261265750374}
   _cardFrame: {fileID: 3746803766052438884}
-  _cardFrameDissolve: {fileID: 0}
   _cardImage: {fileID: 3206588556960234031}
   _cardImageDissolve: {fileID: 4148553225448060228}
   _cardBack: {fileID: 2565455935476004323}
@@ -907,6 +907,7 @@ MonoBehaviour:
   _dissolveMaterial: {fileID: 2100000, guid: 38311384ca0854adfbc4d44a2fc1f62d, type: 2}
   _edgeColor: {r: 1, g: 0.51687396, b: 0, a: 0}
   _dissolveSpeed: 1.5
+  _originalMaterial: {fileID: 0}
 --- !u!1 &4992566138778899403
 GameObject:
   m_ObjectHideFlags: 0

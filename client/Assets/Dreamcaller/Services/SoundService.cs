@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using Dreamcaller.Schema;
+using Dreamcaller.Utils;
 using UnityEngine;
 
 namespace Dreamcaller.Services
@@ -12,6 +13,10 @@ namespace Dreamcaller.Services
     [SerializeField] List<AudioClip> _fireProjectileSounds = null!;
     [SerializeField] List<AudioClip> _impactProjectileSounds = null!;
     [SerializeField] List<AudioClip> _whooshSounds = null!;
+    [SerializeField] AudioClip _yourTurnSound = null!;
+    [SerializeField] AudioClip _enemyTurnSound = null!;
+    [SerializeField] AudioClip _victorySound = null!;
+    [SerializeField] AudioClip _defeatSound = null!;
 
     public void Play(AudioClip clip)
     {
@@ -41,6 +46,27 @@ namespace Dreamcaller.Services
     public void PlayWhooshSound()
     {
       PlayRandom(_whooshSounds);
+    }
+
+    public void PlayMessageSound(GameMessageType messageType)
+    {
+      switch (messageType)
+      {
+        case GameMessageType.YourTurn:
+          Play(_yourTurnSound);
+          break;
+        case GameMessageType.EnemyTurn:
+          Play(_enemyTurnSound);
+          break;
+        case GameMessageType.Victory:
+          Play(_victorySound);
+          break;
+        case GameMessageType.Defeat:
+          Play(_defeatSound);
+          break;
+        default:
+          throw Errors.UnknownEnumValue(messageType);
+      }
     }
 
     void PlayRandom(List<AudioClip> clips)

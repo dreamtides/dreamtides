@@ -23,6 +23,16 @@ namespace Dreamcaller.Services
       PlayNextTrack();
     }
 
+    public void Mute()
+    {
+      _musicAudioSource.volume = 0;
+    }
+
+    public void Unmute()
+    {
+      _musicAudioSource.volume = 1;
+    }
+
     void ShufflePlaylist()
     {
       _shuffledIndices = Enumerable.Range(0, _tracks.Count).ToList();

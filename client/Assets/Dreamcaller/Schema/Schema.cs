@@ -91,6 +91,9 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("dissolveCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DissolveCardCommand DissolveCard { get; set; }
+
+        [JsonProperty("displayGameMessage", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public GameMessageType? DisplayGameMessage { get; set; }
     }
 
     public partial class DissolveCardCommand
@@ -1191,6 +1194,8 @@ namespace Dreamcaller.Schema
         public Metadata Metadata { get; set; }
     }
 
+    public enum GameMessageType { Defeat, EnemyTurn, Victory, YourTurn };
+
     /// <summary>
     /// Object position used in interface elements like the deck viewer which don't rely on game
     /// positioning.
@@ -1311,6 +1316,7 @@ namespace Dreamcaller.Schema
             DateParseHandling = DateParseHandling.None,
             Converters =
             {
+                GameMessageTypeConverter.Singleton,
                 PositionConverter.Singleton,
                 DisplayPlayerConverter.Singleton,
                 PositionEnumConverter.Singleton,
@@ -1340,6 +1346,57 @@ namespace Dreamcaller.Schema
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
         };
+    }
+
+    internal class GameMessageTypeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(GameMessageType) || t == typeof(GameMessageType?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "defeat":
+                    return GameMessageType.Defeat;
+                case "enemyTurn":
+                    return GameMessageType.EnemyTurn;
+                case "victory":
+                    return GameMessageType.Victory;
+                case "yourTurn":
+                    return GameMessageType.YourTurn;
+            }
+            throw new Exception("Cannot unmarshal type GameMessageType");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (GameMessageType)untypedValue;
+            switch (value)
+            {
+                case GameMessageType.Defeat:
+                    serializer.Serialize(writer, "defeat");
+                    return;
+                case GameMessageType.EnemyTurn:
+                    serializer.Serialize(writer, "enemyTurn");
+                    return;
+                case GameMessageType.Victory:
+                    serializer.Serialize(writer, "victory");
+                    return;
+                case GameMessageType.YourTurn:
+                    serializer.Serialize(writer, "yourTurn");
+                    return;
+            }
+            throw new Exception("Cannot marshal type GameMessageType");
+        }
+
+        public static readonly GameMessageTypeConverter Singleton = new GameMessageTypeConverter();
     }
 
     internal class PositionConverter : JsonConverter

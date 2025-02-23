@@ -90,6 +90,9 @@ namespace Dreamcaller.Services
     [SerializeField] EffectService? _effectService;
     public EffectService EffectService => Check(_effectService);
 
+    [SerializeField] MusicService? _musicService;
+    public MusicService MusicService => Check(_musicService);
+
     void Start()
     {
       Application.targetFrameRate = 60;

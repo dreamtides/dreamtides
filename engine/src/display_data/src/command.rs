@@ -46,6 +46,7 @@ pub enum Command {
     UpdateBattle(UpdateBattleCommand),
     FireProjectile(FireProjectileCommand),
     DissolveCard(DissolveCardCommand),
+    DisplayGameMessage(GameMessageType),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -123,4 +124,13 @@ pub enum GameObjectId {
     Deck(DisplayPlayer),
     Void(DisplayPlayer),
     Avatar(DisplayPlayer),
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum GameMessageType {
+    YourTurn,
+    EnemyTurn,
+    Victory,
+    Defeat,
 }
