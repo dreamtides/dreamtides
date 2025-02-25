@@ -424,6 +424,12 @@ namespace Dreamcaller.Schema
         public long Cost { get; set; }
 
         /// <summary>
+        /// Special effects to display for this card
+        /// </summary>
+        [JsonProperty("effects", Required = Required.Always)]
+        public CardEffects Effects { get; set; }
+
+        /// <summary>
         /// Frame to display for this card
         /// </summary>
         [JsonProperty("frame", Required = Required.Always)]
@@ -517,6 +523,18 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("selectTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardId SelectTarget { get; set; }
+    }
+
+    /// <summary>
+    /// Special effects to display for this card
+    /// </summary>
+    public partial class CardEffects
+    {
+        /// <summary>
+        /// Projectile to display as a trail behind this card.
+        /// </summary>
+        [JsonProperty("cardTrail")]
+        public ProjectileAddress CardTrail { get; set; }
     }
 
     /// <summary>

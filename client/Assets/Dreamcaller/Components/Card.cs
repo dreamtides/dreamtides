@@ -33,6 +33,7 @@ namespace Dreamcaller.Components
     [SerializeField] TextMeshPro _battlefieldSparkText = null!;
     [SerializeField] ObjectLayout? _containedObjects;
     [SerializeField] ObjectLayout? _stackedObjects;
+    [SerializeField] Transform _cardTrailPosition = null!;
 
     bool _isRevealed = false;
     Registry _registry = null!;
@@ -44,6 +45,7 @@ namespace Dreamcaller.Components
     bool _isDragging = false;
     bool _isDissolved = false;
     public CardView CardView => Errors.CheckNotNull(_cardView);
+    GameObject? _cardTrail;
 
     public string Id => CardView.ClientId();
 
@@ -173,6 +175,19 @@ namespace Dreamcaller.Components
       _battlefieldSparkText.text = revealed.Spark.ToString();
       _typeText.text = revealed.CardType;
       _cardImage.material.mainTexture = _registry.AssetService.GetTexture(revealed.Image.Address);
+
+      if (_cardTrail)
+      {
+        Destroy(_cardTrail);
+      }
+      if (revealed.Effects.CardTrail != null)
+      {
+        var trail = _registry.AssetService.GetProjectilePrefab(revealed.Effects.CardTrail);
+        _cardTrail = Instantiate(trail.gameObject);
+        _cardTrail.transform.SetParent(_cardTrailPosition, worldPositionStays: false);
+        _cardTrail.transform.localPosition = Vector3.zero;
+        _cardTrail.transform.localRotation = Quaternion.identity;
+      }
     }
 
     void RenderHiddenCardView()

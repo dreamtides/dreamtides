@@ -11,7 +11,8 @@ use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::CardFacing;
 use display_data::battle_view::{BattleView, DisplayPlayer, InterfaceView, PlayerView};
 use display_data::card_view::{
-    CardActions, CardFrame, CardView, DisplayImage, RevealedCardStatus, RevealedCardView,
+    CardActions, CardEffects, CardFrame, CardView, DisplayImage, RevealedCardStatus,
+    RevealedCardView,
 };
 use display_data::command::{
     Command, CommandGroup, CommandSequence, DissolveCardCommand, FireProjectileCommand,
@@ -52,52 +53,44 @@ fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformActio
     match action {
         DebugAction::DrawCard => {
             let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
-            if let Some(deck_card) = battle
-                .cards
-                .iter()
-                .find(|c| matches!(c.position.position, Position::InDeck(DisplayPlayer::User)))
-            {
-                let card_id = deck_card.id;
-                let sorting_key = deck_card.position.sorting_key;
-                if let Some(card_index) = battle.cards.iter().position(|c| c.id == card_id) {
-                    let mut shown_drawn = battle.clone();
-                    shown_drawn.cards[card_index] = card_view(Position::Drawn, sorting_key);
-                    battle.cards[card_index] =
-                        card_view(Position::InHand(DisplayPlayer::User), sorting_key);
-
-                    *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
-
-                    // Return both updates in sequence
-                    return PerformActionResponse {
-                        metadata,
-                        commands: CommandSequence {
-                            groups: vec![
-                                CommandGroup {
-                                    commands: vec![Command::UpdateBattle(
-                                        UpdateBattleCommand::new(shown_drawn),
-                                    )],
-                                },
-                                CommandGroup {
-                                    commands: vec![Command::UpdateBattle(
-                                        UpdateBattleCommand::new(battle),
-                                    )],
-                                },
-                            ],
-                        },
-                    };
-                }
-            }
-
+            draw_card(&mut battle, None);
             *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
             PerformActionResponse {
                 metadata,
-                commands: CommandSequence {
-                    groups: vec![CommandGroup {
-                        commands: vec![Command::UpdateBattle(UpdateBattleCommand::new(battle))],
-                    }],
-                },
+                commands: CommandSequence::from_command(Command::UpdateBattle(
+                    UpdateBattleCommand::new(battle),
+                )),
             }
         }
+    }
+}
+
+fn draw_card(battle: &mut BattleView, trail: Option<ProjectileAddress>) -> Option<CardId> {
+    if let Some(deck_card) = battle
+        .cards
+        .iter()
+        .find(|c| matches!(c.position.position, Position::InDeck(DisplayPlayer::User)))
+    {
+        let card_id = deck_card.id;
+        let sorting_key = deck_card.position.sorting_key;
+        if let Some(card_index) = battle.cards.iter().position(|c| c.id == card_id) {
+            let mut shown_drawn = battle.clone();
+            shown_drawn.cards[card_index] = card_view(Position::Drawn, sorting_key);
+            let mut view = card_view(Position::InHand(DisplayPlayer::User), sorting_key);
+            if let Some(trail) = trail {
+                if let Some(revealed) = view.revealed.as_mut() {
+                    revealed.effects.card_trail = Some(trail);
+                }
+            }
+            battle.cards[card_index] = view;
+
+            *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+            Some(card_id)
+        } else {
+            None
+        }
+    } else {
+        None
     }
 }
 
@@ -127,6 +120,14 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                         }
                     }
                     Position::SelectingTargets(DisplayPlayer::Enemy)
+                } else if sorting_key % 5 == 2 {
+                    draw_card(&mut battle, Some(ProjectileAddress {
+                        projectile: "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile 1 nature arrow trail.prefab".to_string()
+                    }));
+                    draw_card(&mut battle, Some(ProjectileAddress {
+                        projectile: "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile 1 nature arrow trail.prefab".to_string()
+                    }));
+                    Position::InVoid(DisplayPlayer::User)
                 } else {
                     Position::OnBattlefield(DisplayPlayer::User)
                 };
@@ -329,6 +330,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
                 can_play: position == Position::InHand(DisplayPlayer::User),
                 ..Default::default()
             },
+            effects: CardEffects::default(),
         }),
         revealed_to_opponents: true,
         card_facing: CardFacing::FaceUp,
@@ -365,6 +367,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
                 on_play_sound: Some(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Electric Magic/RPG3_ElectricMagic_Cast01.wav")),
                 ..Default::default()
             },
+            effects: CardEffects::default(),
         }),
         revealed_to_opponents: true,
         card_facing: CardFacing::FaceUp,
@@ -403,6 +406,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
                 can_play: position == Position::InHand(DisplayPlayer::User),
                 ..Default::default()
             },
+            effects: CardEffects::default(),
         }),
         revealed_to_opponents: true,
         card_facing: CardFacing::FaceUp,
@@ -437,6 +441,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
                 can_play: position == Position::InHand(DisplayPlayer::User),
                 ..Default::default()
             },
+            effects: CardEffects::default(),
         }),
         revealed_to_opponents: true,
         card_facing: CardFacing::FaceUp,
@@ -472,6 +477,7 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
                 can_play: position == Position::InHand(DisplayPlayer::User),
                 ..Default::default()
             },
+            effects: CardEffects::default(),
         }),
         revealed_to_opponents: true,
         card_facing: CardFacing::FaceUp,

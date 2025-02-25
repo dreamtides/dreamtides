@@ -39,6 +39,12 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5bfa9efc6d6124b84a9fdd0237d35dbf
+    m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile
+      1 nature arrow trail.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5c0f09c6cb11c4d9f8cd793a4b434e10
     m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Electric
       Magic/RPG3_ElectricMagic2_LightImpact01.wav

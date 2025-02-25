@@ -477,7 +477,7 @@ Transform:
   m_GameObject: {fileID: 3023780679663560669}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1, z: 1}
+  m_LocalPosition: {x: -0.89, y: 1.17, z: 1}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -902,6 +902,7 @@ MonoBehaviour:
   _battlefieldSparkText: {fileID: 6297391878885746620}
   _containedObjects: {fileID: 0}
   _stackedObjects: {fileID: 0}
+  _cardTrailPosition: {fileID: 3031101844611411820}
 --- !u!65 &5680000531262599633
 BoxCollider:
   m_ObjectHideFlags: 0

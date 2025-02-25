@@ -1,5 +1,5 @@
 use action_data::user_action::UserAction;
-use core_data::display_types::{AudioClipAddress, TextureAddress, Url};
+use core_data::display_types::{AudioClipAddress, ProjectileAddress, TextureAddress, Url};
 use core_data::identifiers::CardId;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::CardFacing;
@@ -81,6 +81,9 @@ pub struct RevealedCardView {
 
     /// Actions available for this card
     pub actions: CardActions,
+
+    /// Special effects to display for this card
+    pub effects: CardEffects,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -101,6 +104,13 @@ pub struct CardActions {
 
     /// Action to perform when this card is clicked.
     pub on_click: Option<UserAction>,
+}
+
+#[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct CardEffects {
+    /// Projectile to display as a trail behind this card.
+    pub card_trail: Option<ProjectileAddress>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
