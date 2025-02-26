@@ -9,7 +9,7 @@ namespace Dreamcaller.Components
 {
   public class DissolveEffect : MonoBehaviour
   {
-    [SerializeField] MeshRenderer _meshRenderer = null!;
+    [SerializeField] Renderer _target = null!;
     [SerializeField] Material _dissolveMaterial = null!;
     [SerializeField] Color _edgeColor;
     [SerializeField] float _dissolveSpeed = 0.1f;
@@ -23,11 +23,11 @@ namespace Dreamcaller.Components
       _reverse = command.Reverse;
       if (!_reverse)
       {
-        _originalMaterial = _meshRenderer.material;
+        _originalMaterial = _target.material;
       }
 
       var material = Instantiate(_dissolveMaterial);
-      material.mainTexture = _meshRenderer.material.mainTexture;
+      material.mainTexture = _target.material.mainTexture;
       AdvancedDissolveKeywords.SetKeyword(
           material,
           AdvancedDissolveKeywords.State.Enabled, true);
@@ -45,7 +45,7 @@ namespace Dreamcaller.Components
           material,
           AdvancedDissolveProperties.Edge.Base.Property.Shape,
           AdvancedDissolveProperties.Edge.Base.Shape.Smoother);
-      _meshRenderer.material = material;
+      _target.material = material;
       _running = true;
       yield return new WaitUntil(() => !_running);
     }
@@ -60,7 +60,7 @@ namespace Dreamcaller.Components
       _clipValue += Time.deltaTime * _dissolveSpeed * (_reverse ? -1 : 1);
       _clipValue = Mathf.Clamp01(_clipValue);
       AdvancedDissolveProperties.Cutout.Standard.UpdateLocalProperty(
-        _meshRenderer.material,
+        _target.material,
         AdvancedDissolveProperties.Cutout.Standard.Property.Clip,
         _clipValue);
 
@@ -68,7 +68,7 @@ namespace Dreamcaller.Components
       {
         if (_reverse)
         {
-          _meshRenderer.material = _originalMaterial;
+          _target.material = _originalMaterial;
         }
         _running = false;
       }

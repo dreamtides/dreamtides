@@ -315,7 +315,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8750030602801031296
 Transform:
   m_ObjectHideFlags: 0
@@ -325,8 +325,8 @@ Transform:
   m_GameObject: {fileID: 551648483260697378}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.0047, y: -0.5475, z: 0.05}
-  m_LocalScale: {x: 2.1208227, y: 3.615948, z: 1}
+  m_LocalPosition: {x: 0.0002, y: -0.5481, z: 0.05}
+  m_LocalScale: {x: 2.4739506, y: 3.9536166, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5304334944730395346}
@@ -347,7 +347,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 551648483260697378}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 3
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -656,6 +656,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6786175555026096534}
   - component: {fileID: 3051495475621405458}
+  - component: {fileID: 6359641432255363025}
   m_Layer: 0
   m_Name: BattlefieldCardImage
   m_TagString: Untagged
@@ -733,6 +734,23 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &6359641432255363025
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1881264574601767295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 256d5be5330ae406da482ba7c67053a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _target: {fileID: 3051495475621405458}
+  _dissolveMaterial: {fileID: 2100000, guid: 38311384ca0854adfbc4d44a2fc1f62d, type: 2}
+  _edgeColor: {r: 1, g: 0.6136042, b: 0, a: 0}
+  _dissolveSpeed: 1
+  _originalMaterial: {fileID: 0}
 --- !u!1 &1907525521544829116
 GameObject:
   m_ObjectHideFlags: 0
@@ -782,8 +800,8 @@ SortingGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1907525521544829116}
   m_Enabled: 1
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1187263697
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_SortAtRoot: 0
 --- !u!1 &3023780679663560669
@@ -1054,7 +1072,7 @@ MonoBehaviour:
   _cardFrame: {fileID: 7304862604459217761}
   _cardImage: {fileID: 5442503120378194473}
   _battlefieldCardImage: {fileID: 3051495475621405458}
-  _cardImageDissolve: {fileID: 0}
+  _cardImageDissolve: {fileID: 6359641432255363025}
   _cardBack: {fileID: 2565455935476004323}
   _outline: {fileID: 6363849548364678257}
   _battlefieldOutline: {fileID: 8854911267464912627}
@@ -1100,7 +1118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 256d5be5330ae406da482ba7c67053a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _meshRenderer: {fileID: 0}
+  _target: {fileID: 0}
   _dissolveMaterial: {fileID: 2100000, guid: 38311384ca0854adfbc4d44a2fc1f62d, type: 2}
   _edgeColor: {r: 1, g: 0.51687396, b: 0, a: 0}
   _dissolveSpeed: 1.5
@@ -1209,7 +1227,7 @@ Transform:
   m_GameObject: {fileID: 4735529314863193521}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.7071068, z: 0.7071068, w: 0}
-  m_LocalPosition: {x: 0.01, y: 0.66, z: 0.14}
+  m_LocalPosition: {x: 0, y: 0.704, z: -0}
   m_LocalScale: {x: 6.398279, y: 3.1500008, z: 6.200707}
   m_ConstrainProportionsScale: 0
   m_Children: []
