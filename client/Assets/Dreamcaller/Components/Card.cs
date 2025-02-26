@@ -2,13 +2,13 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using DG.Tweening;
 using Dreamcaller.Layout;
 using Dreamcaller.Schema;
 using Dreamcaller.Services;
 using Dreamcaller.Utils;
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Dreamcaller.Components
@@ -176,6 +176,8 @@ namespace Dreamcaller.Components
       _typeText.text = revealed.CardType;
       _cardImage.sprite = _registry.AssetService.GetSprite(revealed.Image.Address);
       _battlefieldCardImage.sprite = _registry.AssetService.GetSprite(revealed.Image.Address);
+      _outline.material.SetInt("_Seed", UnityEngine.Random.Range(0, 9999));
+      _battlefieldOutline.material.SetInt("_Seed", UnityEngine.Random.Range(0, 9999));
 
       if (_cardTrail)
       {
