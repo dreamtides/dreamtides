@@ -73,6 +73,7 @@ namespace Dreamcaller.Layout
       GameContext.BehindBattlefield => true,
       GameContext.Battlefield => true,
       GameContext.Dreamsigns => true,
+      GameContext.DiscardPile => true,
       _ => false
     };
   }

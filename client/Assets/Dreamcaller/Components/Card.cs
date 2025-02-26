@@ -16,20 +16,22 @@ namespace Dreamcaller.Components
   public class Card : Displayable
   {
     [SerializeField] Transform _cardFront = null!;
+    [SerializeField] Transform _battlefieldCardFront = null!;
     [SerializeField] TextMeshPro _name = null!;
     [SerializeField] TextMeshPro _rulesText = null!;
     [SerializeField] TextMeshPro _typeText = null!;
-    [SerializeField] MeshRenderer _cardFrame = null!;
-    [SerializeField] MeshRenderer _cardImage = null!;
+    [SerializeField] Renderer _cardFrame = null!;
+    [SerializeField] SpriteRenderer _cardImage = null!;
+    [SerializeField] SpriteRenderer _battlefieldCardImage = null!;
     [SerializeField] DissolveEffect _cardImageDissolve = null!;
-    [SerializeField] MeshRenderer _cardBack = null!;
-    [SerializeField] MeshRenderer _outline = null!;
-    [SerializeField] MeshRenderer _battlefieldOutline = null!;
-    [SerializeField] MeshRenderer _costBackground = null!;
+    [SerializeField] Renderer _cardBack = null!;
+    [SerializeField] Renderer _outline = null!;
+    [SerializeField] Renderer _battlefieldOutline = null!;
+    [SerializeField] Renderer _costBackground = null!;
     [SerializeField] TextMeshPro _costText = null!;
-    [SerializeField] MeshRenderer _sparkBackground = null!;
+    [SerializeField] Renderer _sparkBackground = null!;
     [SerializeField] TextMeshPro _sparkText = null!;
-    [SerializeField] MeshRenderer _battlefieldSparkBackground = null!;
+    [SerializeField] Renderer _battlefieldSparkBackground = null!;
     [SerializeField] TextMeshPro _battlefieldSparkText = null!;
     [SerializeField] ObjectLayout? _containedObjects;
     [SerializeField] ObjectLayout? _stackedObjects;
@@ -165,8 +167,6 @@ namespace Dreamcaller.Components
     {
       _isRevealed = true;
       ToggleActiveElements();
-      _cardFront.gameObject.SetActive(value: true);
-      _cardBack.gameObject.SetActive(value: false);
       _name.text = revealed.Name;
       _rulesText.text = revealed.RulesText;
       _outline.gameObject.SetActive(CanPlay());
@@ -174,7 +174,8 @@ namespace Dreamcaller.Components
       _sparkText.text = revealed.Spark.ToString();
       _battlefieldSparkText.text = revealed.Spark.ToString();
       _typeText.text = revealed.CardType;
-      _cardImage.material.mainTexture = _registry.AssetService.GetTexture(revealed.Image.Address);
+      _cardImage.sprite = _registry.AssetService.GetSprite(revealed.Image.Address);
+      _battlefieldCardImage.sprite = _registry.AssetService.GetSprite(revealed.Image.Address);
 
       if (_cardTrail)
       {
@@ -193,8 +194,7 @@ namespace Dreamcaller.Components
     void RenderHiddenCardView()
     {
       _isRevealed = false;
-      _cardFront.gameObject.SetActive(value: false);
-      _cardBack.gameObject.SetActive(value: true);
+      ToggleActiveElements();
     }
 
     public override bool CanHandleMouseEvents() => true;
@@ -295,39 +295,37 @@ namespace Dreamcaller.Components
 
     void ToggleActiveElements()
     {
-      if (_isDissolved)
+      if (!_isRevealed)
       {
+        _cardBack.gameObject.SetActive(true);
+        _cardFront.gameObject.SetActive(false);
+        _battlefieldCardFront.gameObject.SetActive(false);
+      }
+      else if (_isDissolved)
+      {
+        _cardBack.gameObject.SetActive(false);
+        _cardFront.gameObject.SetActive(!GameContext.IsBattlefieldContext());
+        _battlefieldCardFront.gameObject.SetActive(GameContext.IsBattlefieldContext());
         _cardFrame.gameObject.SetActive(!GameContext.IsBattlefieldContext());
-        _name.gameObject.SetActive(false);
-        _rulesText.gameObject.SetActive(false);
-        _sparkBackground.gameObject.SetActive(false);
-        _costBackground.gameObject.SetActive(false);
-        _typeText.gameObject.SetActive(false);
         _battlefieldSparkBackground.gameObject.SetActive(false);
         _battlefieldOutline.gameObject.SetActive(false);
       }
       else if (HasGameContext && GameContext.IsBattlefieldContext())
       {
-        _cardFrame.gameObject.SetActive(false);
-        _name.gameObject.SetActive(false);
-        _rulesText.gameObject.SetActive(false);
-        _sparkBackground.gameObject.SetActive(false);
-        _costBackground.gameObject.SetActive(false);
-        _typeText.gameObject.SetActive(false);
-        _battlefieldSparkBackground.gameObject.SetActive(CardView.Revealed?.Spark != null);
+        _cardBack.gameObject.SetActive(false);
+        _cardFront.gameObject.SetActive(false);
+        _battlefieldCardFront.gameObject.SetActive(true);
+        _battlefieldSparkBackground.gameObject.SetActive(
+            GameContext != GameContext.DiscardPile && CardView.Revealed?.Spark != null);
         _battlefieldOutline.gameObject.SetActive(
           CardView.Revealed?.Status == RevealedCardStatus.CanSelectNegative);
       }
       else
       {
-        _cardFrame.gameObject.SetActive(true);
-        _name.gameObject.SetActive(true);
-        _rulesText.gameObject.SetActive(true);
+        _cardBack.gameObject.SetActive(false);
+        _cardFront.gameObject.SetActive(true);
+        _battlefieldCardFront.gameObject.SetActive(false);
         _sparkBackground.gameObject.SetActive(CardView.Revealed?.Spark != null);
-        _costBackground.gameObject.SetActive(true);
-        _typeText.gameObject.SetActive(true);
-        _battlefieldSparkBackground.gameObject.SetActive(false);
-        _battlefieldOutline.gameObject.SetActive(false);
       }
     }
 

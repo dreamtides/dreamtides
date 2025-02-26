@@ -10,6 +10,7 @@ namespace Dreamcaller.Layout
   {
     [SerializeField] Transform? _projectileSourcePosition;
     [SerializeField] Transform? _displayEffectPosition;
+    [SerializeField] SortingGroup? _sortingGroup;
 
     GameContext _gameContext;
     ObjectLayout? _parent;
@@ -42,6 +43,11 @@ namespace Dreamcaller.Layout
     /// Position at which to display particle effects on this object.
     /// </summary>
     public Transform? DisplayEffectPosition => _displayEffectPosition;
+
+    /// <summary>
+    /// SortingGroup for this object.
+    /// </summary>
+    public SortingGroup? SortingGroup => _sortingGroup;
 
     protected void Start()
     {

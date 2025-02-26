@@ -127,18 +127,23 @@ namespace Dreamcaller.Layout
       }
     }
 
-    void ApplyLayoutToObject(Displayable displayable, int i, Sequence? sequence = null, bool applyToChildren = true)
+    void ApplyLayoutToObject(Displayable displayable, int index, Sequence? sequence = null, bool applyToChildren = true)
     {
       const float duration = TweenUtils.MoveAnimationDurationSeconds;
-      var position = CalculateObjectPosition(i, _objects.Count);
-      var rotation = CalculateObjectRotation(i, _objects.Count);
-      var scale = CalculateObjectScale(i, _objects.Count) ?? displayable.DefaultScale;
+      var position = CalculateObjectPosition(index, _objects.Count);
+      var rotation = CalculateObjectRotation(index, _objects.Count);
+      var scale = CalculateObjectScale(index, _objects.Count) ?? displayable.DefaultScale;
+
+      if (displayable.SortingGroup)
+      {
+        displayable.SortingGroup.sortingOrder = index;
+      }
 
       if (applyToChildren && displayable is ObjectLayout layout)
       {
         /// If this is a child layout, recursively animate its contained
         /// elements.
-        ApplyLayoutToObject(layout, i, sequence: null, applyToChildren: false);
+        ApplyLayoutToObject(layout, index, sequence: null, applyToChildren: false);
         if (sequence != null)
         {
           layout.ApplyLayout(sequence);
@@ -147,7 +152,7 @@ namespace Dreamcaller.Layout
         {
           foreach (var child in layout.Objects)
           {
-            ApplyLayoutToObject(child, i);
+            ApplyLayoutToObject(child, index);
           }
         }
         return;

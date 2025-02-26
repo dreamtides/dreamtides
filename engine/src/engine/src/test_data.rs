@@ -4,7 +4,7 @@ use action_data::battle_action::BattleAction;
 use action_data::debug_action::DebugAction;
 use action_data::user_action::UserAction;
 use core_data::display_types::{
-    AudioClipAddress, DisplayColor, EffectAddress, Milliseconds, ProjectileAddress, TextureAddress,
+    AudioClipAddress, DisplayColor, EffectAddress, Milliseconds, ProjectileAddress, SpriteAddress,
     Url,
 };
 use core_data::identifiers::{BattleId, CardId};
@@ -320,7 +320,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
         card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                address: TextureAddress::new("Assets/ThirdParty/GameAssets/CardImages/2521694543.png"),
+                address: SpriteAddress::new("Assets/ThirdParty/GameAssets/CardImages/2521694543.png"),
             },
             name: "Titan of Forgotten Echoes".to_string(),
             rules_text: "When you materialize your second character in a turn, return this character from your void to play.".to_string(),
@@ -352,7 +352,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
         card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                address: TextureAddress::new(
+                address: SpriteAddress::new(
                     "Assets/ThirdParty/GameAssets/CardImages/1633431262.png",
                 ),
             },
@@ -393,7 +393,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
         card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                address: TextureAddress::new(
+                address: SpriteAddress::new(
                     "Assets/ThirdParty/GameAssets/CardImages/2269064817.png",
                 ),
             },
@@ -428,7 +428,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
         card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                address: TextureAddress::new(
+                address: SpriteAddress::new(
                     "Assets/ThirdParty/GameAssets/CardImages/2269064809.png",
                 ),
             },
@@ -463,7 +463,7 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
         card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                address: TextureAddress::new(
+                address: SpriteAddress::new(
                     "Assets/ThirdParty/GameAssets/CardImages/2027158310.png",
                 ),
             },

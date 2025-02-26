@@ -61,7 +61,7 @@ namespace Dreamcaller.Schema
     }
 
     /// <summary>
-    /// A list of [CommandGroup]s to execute sequentially.
+    /// A list of [ParallelCommandGroup]s to execute sequentially.
     /// </summary>
     public partial class CommandSequence
     {
@@ -496,7 +496,7 @@ namespace Dreamcaller.Schema
         public CardFrame Frame { get; set; }
 
         /// <summary>
-        /// Image URL for this card
+        /// Image for this card
         /// </summary>
         [JsonProperty("image", Required = Required.Always)]
         public DisplayImage Image { get; set; }
@@ -598,7 +598,7 @@ namespace Dreamcaller.Schema
     }
 
     /// <summary>
-    /// Image URL for this card
+    /// Image for this card
     /// </summary>
     public partial class DisplayImage
     {
@@ -606,16 +606,16 @@ namespace Dreamcaller.Schema
         /// Image texture address for this card
         /// </summary>
         [JsonProperty("address", Required = Required.Always)]
-        public TextureAddress Address { get; set; }
+        public SpriteAddress Address { get; set; }
     }
 
     /// <summary>
     /// Image texture address for this card
     /// </summary>
-    public partial class TextureAddress
+    public partial class SpriteAddress
     {
-        [JsonProperty("texture", Required = Required.Always)]
-        public string Texture { get; set; }
+        [JsonProperty("sprite", Required = Required.Always)]
+        public string Sprite { get; set; }
     }
 
     public partial class DraggableNode
@@ -910,12 +910,6 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("red", Required = Required.Always)]
         public double Red { get; set; }
-    }
-
-    public partial class SpriteAddress
-    {
-        [JsonProperty("sprite", Required = Required.Always)]
-        public string Sprite { get; set; }
     }
 
     public partial class BorderColor

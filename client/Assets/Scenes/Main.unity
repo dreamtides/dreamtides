@@ -475,6 +475,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSourcePosition: {fileID: 0}
   _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
   _objects: []
   _debugUpdateContinuously: 1
   _singleElementY: 0.5
@@ -1275,6 +1276,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSourcePosition: {fileID: 0}
   _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
   _objects: []
   _debugUpdateContinuously: 0
   _width: 0
@@ -1659,6 +1661,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSourcePosition: {fileID: 0}
   _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
   _objects: []
   _debugUpdateContinuously: 0
   _width: 0
@@ -3143,6 +3146,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSourcePosition: {fileID: 0}
   _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
   _objects: []
   _debugUpdateContinuously: 0
   _width: 15
@@ -3764,6 +3768,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSourcePosition: {fileID: 0}
   _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
   _objects: []
   _debugUpdateContinuously: 0
   _zRotationAddition: 0
@@ -4521,6 +4526,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSourcePosition: {fileID: 0}
   _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
   _objects: []
   _debugUpdateContinuously: 0
   _singleElementY: 0.5
@@ -6087,6 +6093,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSourcePosition: {fileID: 0}
   _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
   _layout1: {fileID: 587309320}
   _layout2: {fileID: 312928729}
   _layout3: {fileID: 670813420}
@@ -8160,6 +8167,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSourcePosition: {fileID: 0}
   _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
   _objects: []
   _debugUpdateContinuously: 0
   _zRotationAddition: 0
@@ -9323,6 +9331,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSourcePosition: {fileID: 0}
   _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
   _objects: []
   _debugUpdateContinuously: 0
   _zRotationAddition: 0
@@ -12234,6 +12243,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSourcePosition: {fileID: 0}
   _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
   _objects: []
   _debugUpdateContinuously: 0
   _singleElementY: 0.5
@@ -12942,6 +12952,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSourcePosition: {fileID: 0}
   _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
   _objects: []
   _debugUpdateContinuously: 0
   _singleElementY: 0.5
@@ -13037,6 +13048,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSourcePosition: {fileID: 0}
   _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
   _objects: []
   _debugUpdateContinuously: 0
   _zRotationAddition: 0
@@ -13879,6 +13891,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSourcePosition: {fileID: 0}
   _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
   _objects: []
   _debugUpdateContinuously: 0
   _width: 15
@@ -19555,6 +19568,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSourcePosition: {fileID: 0}
   _displayEffectPosition: {fileID: 2087896264}
+  _sortingGroup: {fileID: 0}
   _objects: []
   _debugUpdateContinuously: 0
   _singleElementY: 0.5
@@ -19927,6 +19941,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSourcePosition: {fileID: 0}
   _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
   _objects: []
   _debugUpdateContinuously: 0
   _singleElementY: 0.5
@@ -20992,6 +21007,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSourcePosition: {fileID: 0}
   _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
   _objects: []
   _debugUpdateContinuously: 0
   _singleElementY: 0.5
@@ -21017,7 +21033,7 @@ Transform:
   m_GameObject: {fileID: 1744911438}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -3, y: 0, z: -22.5}
+  m_LocalPosition: {x: -3, y: 0, z: -23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -23361,6 +23377,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileSourcePosition: {fileID: 0}
   _displayEffectPosition: {fileID: 840638065}
+  _sortingGroup: {fileID: 0}
   _objects: []
   _debugUpdateContinuously: 0
   _singleElementY: 0.5

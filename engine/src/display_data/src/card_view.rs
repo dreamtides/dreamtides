@@ -1,5 +1,5 @@
 use action_data::user_action::UserAction;
-use core_data::display_types::{AudioClipAddress, ProjectileAddress, TextureAddress, Url};
+use core_data::display_types::{AudioClipAddress, ProjectileAddress, SpriteAddress, Url};
 use core_data::identifiers::CardId;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::CardFacing;
@@ -49,7 +49,7 @@ pub struct CardView {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct RevealedCardView {
-    /// Image URL for this card
+    /// Image for this card
     pub image: DisplayImage,
 
     /// Name of this card
@@ -90,7 +90,7 @@ pub struct RevealedCardView {
 #[serde(rename_all = "camelCase")]
 pub struct DisplayImage {
     /// Image texture address for this card
-    pub address: TextureAddress,
+    pub address: SpriteAddress,
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
