@@ -74,12 +74,11 @@ namespace Dreamcaller.Layout
     /// </summary>
     public override void ApplyTargetTransform(Displayable target, Sequence? sequence = null)
     {
-      var index = _objects.Count == 0 ? 0 : _objects.Count - 1;
-      ApplyLayoutToObject(target, index, sequence);
+      ApplyLayoutToObject(target, _objects.Count, _objects.Count + 1, sequence);
     }
 
     /// <summary>
-    /// Applie this layout to its children. If a sequence is provied, inserts a
+    /// Applies this layout to its children. If a sequence is provied, inserts a
     /// series of animations to move this layout's children to their expected
     /// position, rotation, and scale. Otherwise they are immediately set to
     /// their target values.
@@ -88,7 +87,7 @@ namespace Dreamcaller.Layout
     {
       for (var i = 0; i < _objects.Count; ++i)
       {
-        ApplyLayoutToObject(_objects[i], i, sequence);
+        ApplyLayoutToObject(_objects[i], i, _objects.Count, sequence);
       }
     }
 
@@ -122,17 +121,21 @@ namespace Dreamcaller.Layout
       {
         for (var i = 0; i < _objects.Count; ++i)
         {
-          ApplyLayoutToObject(_objects[i], i);
+          ApplyLayoutToObject(_objects[i], _objects.Count, i);
         }
       }
     }
 
-    void ApplyLayoutToObject(Displayable displayable, int index, Sequence? sequence = null, bool applyToChildren = true)
+    void ApplyLayoutToObject(
+      Displayable displayable,
+      int index, int count,
+      Sequence? sequence = null,
+      bool applyToChildren = true)
     {
       const float duration = TweenUtils.MoveAnimationDurationSeconds;
-      var position = CalculateObjectPosition(index, _objects.Count);
-      var rotation = CalculateObjectRotation(index, _objects.Count);
-      var scale = CalculateObjectScale(index, _objects.Count) ?? displayable.DefaultScale;
+      var position = CalculateObjectPosition(index, count);
+      var rotation = CalculateObjectRotation(index, count);
+      var scale = CalculateObjectScale(index, count) ?? displayable.DefaultScale;
 
       if (displayable.SortingGroup)
       {
@@ -143,7 +146,7 @@ namespace Dreamcaller.Layout
       {
         /// If this is a child layout, recursively animate its contained
         /// elements.
-        ApplyLayoutToObject(layout, index, sequence: null, applyToChildren: false);
+        ApplyLayoutToObject(layout, index, count, sequence: null, applyToChildren: false);
         if (sequence != null)
         {
           layout.ApplyLayout(sequence);
@@ -152,7 +155,7 @@ namespace Dreamcaller.Layout
         {
           foreach (var child in layout.Objects)
           {
-            ApplyLayoutToObject(child, index);
+            ApplyLayoutToObject(child, index, count);
           }
         }
         return;

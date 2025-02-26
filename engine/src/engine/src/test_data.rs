@@ -16,8 +16,8 @@ use display_data::card_view::{
     RevealedCardView,
 };
 use display_data::command::{
-    Command, CommandSequence, DisplayEffectCommand, DissolveCardCommand, FireProjectileCommand,
-    GameObjectId, ParallelCommandGroup, UpdateBattleCommand,
+    Command, CommandSequence, DisplayEffectCommand, DissolveCardCommand, DrawUserCardsCommand,
+    FireProjectileCommand, GameObjectId, ParallelCommandGroup, UpdateBattleCommand,
 };
 use display_data::object_position::{ObjectPosition, Position};
 use display_data::request_data::{
@@ -53,20 +53,22 @@ pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
 fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformActionResponse {
     match action {
         DebugAction::DrawCard => {
+            let mut commands = vec![];
             let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
-            draw_card(&mut battle, None);
+            let card = draw_card(&mut battle, None);
+            commands.push(Command::DrawUserCards(DrawUserCardsCommand {
+                cards: vec![card.unwrap()],
+                stagger_interval: Milliseconds::new(100),
+                pause_duration: Milliseconds::new(100),
+            }));
             *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
-            PerformActionResponse {
-                metadata,
-                commands: CommandSequence::from_command(Command::UpdateBattle(
-                    UpdateBattleCommand::new(battle),
-                )),
-            }
+            commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle)));
+            PerformActionResponse { metadata, commands: CommandSequence::sequential(commands) }
         }
     }
 }
 
-fn draw_card(battle: &mut BattleView, trail: Option<ProjectileAddress>) -> Option<CardId> {
+fn draw_card(battle: &mut BattleView, trail: Option<ProjectileAddress>) -> Option<CardView> {
     if let Some(deck_card) = battle
         .cards
         .iter()
@@ -83,10 +85,9 @@ fn draw_card(battle: &mut BattleView, trail: Option<ProjectileAddress>) -> Optio
                     revealed.effects.card_trail = Some(trail);
                 }
             }
-            battle.cards[card_index] = view;
-
+            battle.cards[card_index] = view.clone();
             *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
-            Some(card_id)
+            Some(view)
         } else {
             None
         }
@@ -123,18 +124,25 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                     }
                     Position::SelectingTargets(DisplayPlayer::Enemy)
                 } else if sorting_key % 5 == 2 {
-                    draw_card(&mut battle, Some(ProjectileAddress {
+                    battle.cards[card_index] = card_view(Position::OnStack, sorting_key);
+                    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+                    let c1 = draw_card(&mut battle, Some(ProjectileAddress {
                         projectile: "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile 1 nature arrow trail.prefab".to_string()
                     }));
-                    draw_card(&mut battle, Some(ProjectileAddress {
+                    let c2 = draw_card(&mut battle, Some(ProjectileAddress {
                         projectile: "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile 1 nature arrow trail.prefab".to_string()
                     }));
                     commands.push(Command::DisplayEffect(DisplayEffectCommand {
                         target: GameObjectId::Deck(DisplayPlayer::User),
                         effect: EffectAddress::new("Assets/ThirdParty/Hovl Studio/Magic circles/Prefabs/Magic circle 1 Variant.prefab"),
-                        duration: Milliseconds::new(500),
+                        duration: Milliseconds::new(100),
                         scale: FlexVector3::one(),
                         sound: Some(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Magic2_Cast03v1.wav"))
+                    }));
+                    commands.push(Command::DrawUserCards(DrawUserCardsCommand {
+                        cards: vec![c1.unwrap(), c2.unwrap()],
+                        stagger_interval: Milliseconds::new(300),
+                        pause_duration: Milliseconds::new(100),
                     }));
                     Position::InVoid(DisplayPlayer::User)
                 } else {

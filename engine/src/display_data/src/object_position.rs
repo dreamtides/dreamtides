@@ -34,10 +34,6 @@ pub enum Position {
     /// Object is not visible.
     Offscreen,
 
-    /// Object is prominently revealed, being shown at a large size after
-    /// being played.
-    Played,
-
     /// The user is selecting targets for this card from among characters
     /// controlled by the indicated player.
     SelectingTargets(DisplayPlayer),

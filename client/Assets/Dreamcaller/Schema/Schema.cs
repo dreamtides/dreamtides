@@ -97,6 +97,9 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("displayEffect", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayEffectCommand DisplayEffect { get; set; }
+
+        [JsonProperty("drawUserCards", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DrawUserCardsCommand DrawUserCards { get; set; }
     }
 
     public partial class DisplayEffectCommand
@@ -134,6 +137,12 @@ namespace Dreamcaller.Schema
 
     /// <summary>
     /// How long to wait before continuing with animations.
+    ///
+    /// Time to display each card before moving it to hand.
+    ///
+    /// Should be less than stagger_interval for best results.
+    ///
+    /// Time to wait between drawing subsequent cards.
     /// </summary>
     public partial class Milliseconds
     {
@@ -222,171 +231,27 @@ namespace Dreamcaller.Schema
         public CardId Target { get; set; }
     }
 
-    public partial class FireProjectileCommand
-    {
-        [JsonProperty("additionalHit")]
-        public EffectAddress AdditionalHit { get; set; }
-
-        [JsonProperty("additionalHitDelay")]
-        public Milliseconds AdditionalHitDelay { get; set; }
-
-        [JsonProperty("fireSound")]
-        public AudioClipAddress FireSound { get; set; }
-
-        [JsonProperty("hideOnHit", Required = Required.Always)]
-        public bool HideOnHit { get; set; }
-
-        [JsonProperty("impactSound")]
-        public AudioClipAddress ImpactSound { get; set; }
-
-        [JsonProperty("jumpToPosition")]
-        public ObjectPosition JumpToPosition { get; set; }
-
-        [JsonProperty("projectile", Required = Required.Always)]
-        public ProjectileAddress Projectile { get; set; }
-
-        [JsonProperty("sourceId", Required = Required.Always)]
-        public GameObjectId SourceId { get; set; }
-
-        [JsonProperty("targetId", Required = Required.Always)]
-        public GameObjectId TargetId { get; set; }
-
-        [JsonProperty("travelDuration")]
-        public Milliseconds TravelDuration { get; set; }
-
-        [JsonProperty("waitDuration")]
-        public Milliseconds WaitDuration { get; set; }
-    }
-
-    /// <summary>
-    /// Represents the position of some object in the UI
-    ///
-    /// Position of this card in the UI
-    /// </summary>
-    public partial class ObjectPosition
+    public partial class DrawUserCardsCommand
     {
         /// <summary>
-        /// Position category
-        /// </summary>
-        [JsonProperty("position", Required = Required.Always)]
-        public Position Position { get; set; }
-
-        /// <summary>
-        /// Sorting key, determines order within the position
-        /// </summary>
-        [JsonProperty("sortingKey", Required = Required.Always)]
-        public long SortingKey { get; set; }
-
-        /// <summary>
-        /// Sub-key, used to break ties in sorting
-        /// </summary>
-        [JsonProperty("sortingSubKey", Required = Required.Always)]
-        public long SortingSubKey { get; set; }
-    }
-
-    /// <summary>
-    /// The user is selecting targets for this card from among characters controlled by the
-    /// indicated player.
-    ///
-    /// Object is in a player's hand
-    ///
-    /// Object is on top of a player's deck
-    ///
-    /// Object is shuffled into a player's deck
-    ///
-    /// Object is in a player's void
-    ///
-    /// Object is in this player's banished zone
-    ///
-    /// Object is on the battlefield
-    /// </summary>
-    public partial class PositionClass
-    {
-        [JsonProperty("selectingTargets", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? SelectingTargets { get; set; }
-
-        [JsonProperty("inHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? InHand { get; set; }
-
-        [JsonProperty("onTopOfDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? OnTopOfDeck { get; set; }
-
-        [JsonProperty("inDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? InDeck { get; set; }
-
-        [JsonProperty("inVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? InVoid { get; set; }
-
-        [JsonProperty("inBanished", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? InBanished { get; set; }
-
-        [JsonProperty("onBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? OnBattlefield { get; set; }
-    }
-
-    public partial class ProjectileAddress
-    {
-        [JsonProperty("projectile", Required = Required.Always)]
-        public string Projectile { get; set; }
-    }
-
-    public partial class UpdateBattleCommand
-    {
-        /// <summary>
-        /// The battle to update.
-        /// </summary>
-        [JsonProperty("battle", Required = Required.Always)]
-        public BattleView Battle { get; set; }
-
-        /// <summary>
-        /// Sound to play when the battle is updated.
-        /// </summary>
-        [JsonProperty("updateSound")]
-        public AudioClipAddress UpdateSound { get; set; }
-    }
-
-    /// <summary>
-    /// The battle to update.
-    ///
-    /// Represents the visual state of an ongoing dream battle
-    /// </summary>
-    public partial class BattleView
-    {
-        /// <summary>
-        /// Visual state of cards in the game
+        /// Cards to draw. Must already be present in user deck.
         /// </summary>
         [JsonProperty("cards", Required = Required.Always)]
         public List<CardView> Cards { get; set; }
 
         /// <summary>
-        /// Opponent of user
+        /// Time to display each card before moving it to hand.
+        ///
+        /// Should be less than stagger_interval for best results.
         /// </summary>
-        [JsonProperty("enemy", Required = Required.Always)]
-        public PlayerView Enemy { get; set; }
+        [JsonProperty("pauseDuration", Required = Required.Always)]
+        public Milliseconds PauseDuration { get; set; }
 
         /// <summary>
-        /// Unique identifier for this dream battle
+        /// Time to wait between drawing subsequent cards.
         /// </summary>
-        [JsonProperty("id", Required = Required.Always)]
-        public Guid Id { get; set; }
-
-        /// <summary>
-        /// UI to display to the player.
-        /// </summary>
-        [JsonProperty("interface", Required = Required.Always)]
-        public InterfaceView Interface { get; set; }
-
-        /// <summary>
-        /// Describes the status of the game, e.g. which phase & step the game is in
-        /// </summary>
-        [JsonProperty("statusDescription", Required = Required.Always)]
-        public string StatusDescription { get; set; }
-
-        /// <summary>
-        /// Player who is operating the client
-        /// </summary>
-        [JsonProperty("user", Required = Required.Always)]
-        public PlayerView User { get; set; }
+        [JsonProperty("staggerInterval", Required = Required.Always)]
+        public Milliseconds StaggerInterval { get; set; }
     }
 
     /// <summary>
@@ -458,6 +323,72 @@ namespace Dreamcaller.Schema
     {
         [JsonProperty("urlValue", Required = Required.Always)]
         public string UrlValue { get; set; }
+    }
+
+    /// <summary>
+    /// Represents the position of some object in the UI
+    ///
+    /// Position of this card in the UI
+    /// </summary>
+    public partial class ObjectPosition
+    {
+        /// <summary>
+        /// Position category
+        /// </summary>
+        [JsonProperty("position", Required = Required.Always)]
+        public Position Position { get; set; }
+
+        /// <summary>
+        /// Sorting key, determines order within the position
+        /// </summary>
+        [JsonProperty("sortingKey", Required = Required.Always)]
+        public long SortingKey { get; set; }
+
+        /// <summary>
+        /// Sub-key, used to break ties in sorting
+        /// </summary>
+        [JsonProperty("sortingSubKey", Required = Required.Always)]
+        public long SortingSubKey { get; set; }
+    }
+
+    /// <summary>
+    /// The user is selecting targets for this card from among characters controlled by the
+    /// indicated player.
+    ///
+    /// Object is in a player's hand
+    ///
+    /// Object is on top of a player's deck
+    ///
+    /// Object is shuffled into a player's deck
+    ///
+    /// Object is in a player's void
+    ///
+    /// Object is in this player's banished zone
+    ///
+    /// Object is on the battlefield
+    /// </summary>
+    public partial class PositionClass
+    {
+        [JsonProperty("selectingTargets", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPlayer? SelectingTargets { get; set; }
+
+        [JsonProperty("inHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPlayer? InHand { get; set; }
+
+        [JsonProperty("onTopOfDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPlayer? OnTopOfDeck { get; set; }
+
+        [JsonProperty("inDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPlayer? InDeck { get; set; }
+
+        [JsonProperty("inVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPlayer? InVoid { get; set; }
+
+        [JsonProperty("inBanished", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPlayer? InBanished { get; set; }
+
+        [JsonProperty("onBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPlayer? OnBattlefield { get; set; }
     }
 
     /// <summary>
@@ -595,6 +526,12 @@ namespace Dreamcaller.Schema
         /// </summary>
         [JsonProperty("cardTrail")]
         public ProjectileAddress CardTrail { get; set; }
+    }
+
+    public partial class ProjectileAddress
+    {
+        [JsonProperty("projectile", Required = Required.Always)]
+        public string Projectile { get; set; }
     }
 
     /// <summary>
@@ -1167,6 +1104,101 @@ namespace Dreamcaller.Schema
         public OnClickClass OnMouseUp { get; set; }
     }
 
+    public partial class FireProjectileCommand
+    {
+        [JsonProperty("additionalHit")]
+        public EffectAddress AdditionalHit { get; set; }
+
+        [JsonProperty("additionalHitDelay")]
+        public Milliseconds AdditionalHitDelay { get; set; }
+
+        [JsonProperty("fireSound")]
+        public AudioClipAddress FireSound { get; set; }
+
+        [JsonProperty("hideOnHit", Required = Required.Always)]
+        public bool HideOnHit { get; set; }
+
+        [JsonProperty("impactSound")]
+        public AudioClipAddress ImpactSound { get; set; }
+
+        [JsonProperty("jumpToPosition")]
+        public ObjectPosition JumpToPosition { get; set; }
+
+        [JsonProperty("projectile", Required = Required.Always)]
+        public ProjectileAddress Projectile { get; set; }
+
+        [JsonProperty("sourceId", Required = Required.Always)]
+        public GameObjectId SourceId { get; set; }
+
+        [JsonProperty("targetId", Required = Required.Always)]
+        public GameObjectId TargetId { get; set; }
+
+        [JsonProperty("travelDuration")]
+        public Milliseconds TravelDuration { get; set; }
+
+        [JsonProperty("waitDuration")]
+        public Milliseconds WaitDuration { get; set; }
+    }
+
+    public partial class UpdateBattleCommand
+    {
+        /// <summary>
+        /// The battle to update.
+        /// </summary>
+        [JsonProperty("battle", Required = Required.Always)]
+        public BattleView Battle { get; set; }
+
+        /// <summary>
+        /// Sound to play when the battle is updated.
+        /// </summary>
+        [JsonProperty("updateSound")]
+        public AudioClipAddress UpdateSound { get; set; }
+    }
+
+    /// <summary>
+    /// The battle to update.
+    ///
+    /// Represents the visual state of an ongoing dream battle
+    /// </summary>
+    public partial class BattleView
+    {
+        /// <summary>
+        /// Visual state of cards in the game
+        /// </summary>
+        [JsonProperty("cards", Required = Required.Always)]
+        public List<CardView> Cards { get; set; }
+
+        /// <summary>
+        /// Opponent of user
+        /// </summary>
+        [JsonProperty("enemy", Required = Required.Always)]
+        public PlayerView Enemy { get; set; }
+
+        /// <summary>
+        /// Unique identifier for this dream battle
+        /// </summary>
+        [JsonProperty("id", Required = Required.Always)]
+        public Guid Id { get; set; }
+
+        /// <summary>
+        /// UI to display to the player.
+        /// </summary>
+        [JsonProperty("interface", Required = Required.Always)]
+        public InterfaceView Interface { get; set; }
+
+        /// <summary>
+        /// Describes the status of the game, e.g. which phase & step the game is in
+        /// </summary>
+        [JsonProperty("statusDescription", Required = Required.Always)]
+        public string StatusDescription { get; set; }
+
+        /// <summary>
+        /// Player who is operating the client
+        /// </summary>
+        [JsonProperty("user", Required = Required.Always)]
+        public PlayerView User { get; set; }
+    }
+
     /// <summary>
     /// Opponent of user
     ///
@@ -1266,6 +1298,13 @@ namespace Dreamcaller.Schema
     public enum GameMessageType { Defeat, EnemyTurn, Victory, YourTurn };
 
     /// <summary>
+    /// Face up/face down state for this card
+    ///
+    /// Whether a card is face-down or face-up
+    /// </summary>
+    public enum CardFacing { FaceDown, FaceUp };
+
+    /// <summary>
     /// Object position used in interface elements like the deck viewer which don't rely on game
     /// positioning.
     ///
@@ -1286,13 +1325,6 @@ namespace Dreamcaller.Schema
     /// card' ability.
     /// </summary>
     public enum PositionEnum { Browser, CardSelectionChoices, Default, Drawn, HandStorage, Offscreen, OnStack, Played };
-
-    /// <summary>
-    /// Face up/face down state for this card
-    ///
-    /// Whether a card is face-down or face-up
-    /// </summary>
-    public enum CardFacing { FaceDown, FaceUp };
 
     /// <summary>
     /// Private actions for developer use
@@ -1378,9 +1410,9 @@ namespace Dreamcaller.Schema
             {
                 DisplayPlayerConverter.Singleton,
                 GameMessageTypeConverter.Singleton,
+                CardFacingConverter.Singleton,
                 PositionConverter.Singleton,
                 PositionEnumConverter.Singleton,
-                CardFacingConverter.Singleton,
                 DebugActionConverter.Singleton,
                 CardFrameConverter.Singleton,
                 RevealedCardStatusConverter.Singleton,
@@ -1498,6 +1530,47 @@ namespace Dreamcaller.Schema
         }
 
         public static readonly GameMessageTypeConverter Singleton = new GameMessageTypeConverter();
+    }
+
+    internal class CardFacingConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(CardFacing) || t == typeof(CardFacing?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "faceDown":
+                    return CardFacing.FaceDown;
+                case "faceUp":
+                    return CardFacing.FaceUp;
+            }
+            throw new Exception("Cannot unmarshal type CardFacing");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (CardFacing)untypedValue;
+            switch (value)
+            {
+                case CardFacing.FaceDown:
+                    serializer.Serialize(writer, "faceDown");
+                    return;
+                case CardFacing.FaceUp:
+                    serializer.Serialize(writer, "faceUp");
+                    return;
+            }
+            throw new Exception("Cannot marshal type CardFacing");
+        }
+
+        public static readonly CardFacingConverter Singleton = new CardFacingConverter();
     }
 
     internal class PositionConverter : JsonConverter
@@ -1651,47 +1724,6 @@ namespace Dreamcaller.Schema
         }
 
         public static readonly PositionEnumConverter Singleton = new PositionEnumConverter();
-    }
-
-    internal class CardFacingConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(CardFacing) || t == typeof(CardFacing?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "faceDown":
-                    return CardFacing.FaceDown;
-                case "faceUp":
-                    return CardFacing.FaceUp;
-            }
-            throw new Exception("Cannot unmarshal type CardFacing");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (CardFacing)untypedValue;
-            switch (value)
-            {
-                case CardFacing.FaceDown:
-                    serializer.Serialize(writer, "faceDown");
-                    return;
-                case CardFacing.FaceUp:
-                    serializer.Serialize(writer, "faceUp");
-                    return;
-            }
-            throw new Exception("Cannot marshal type CardFacing");
-        }
-
-        public static readonly CardFacingConverter Singleton = new CardFacingConverter();
     }
 
     internal class DebugActionConverter : JsonConverter

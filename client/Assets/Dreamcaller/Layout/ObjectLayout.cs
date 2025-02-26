@@ -30,7 +30,7 @@ namespace Dreamcaller.Layout
 
     /// <summary>
     /// Applies the transform state at which objects should be created or
-    /// destroyed for this layout. If a sequence applied, the transformation
+    /// destroyed for this layout. If a sequence is provided, the transformation
     /// will be animated.
     /// </summary>
     public abstract void ApplyTargetTransform(Displayable target, Sequence? sequence = null);

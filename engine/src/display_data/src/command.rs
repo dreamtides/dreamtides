@@ -5,6 +5,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::battle_view::{BattleView, DisplayPlayer};
+use crate::card_view::CardView;
 use crate::object_position::ObjectPosition;
 
 /// A list of [ParallelCommandGroup]s to execute sequentially.
@@ -26,6 +27,10 @@ impl CommandSequence {
                 .map(|c| ParallelCommandGroup { commands: vec![c] })
                 .collect(),
         }
+    }
+
+    pub fn parallel(commands: Vec<Command>) -> Self {
+        Self { groups: vec![ParallelCommandGroup { commands }] }
     }
 
     pub fn optional_sequential(sequence: Vec<Option<Command>>) -> Self {
@@ -54,6 +59,7 @@ pub enum Command {
     DissolveCard(DissolveCardCommand),
     DisplayGameMessage(GameMessageType),
     DisplayEffect(DisplayEffectCommand),
+    DrawUserCards(DrawUserCardsCommand),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -141,6 +147,21 @@ pub struct DisplayEffectCommand {
 
     /// Sound to play along with effect
     pub sound: Option<AudioClipAddress>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct DrawUserCardsCommand {
+    /// Cards to draw. Must already be present in user deck.
+    pub cards: Vec<CardView>,
+
+    /// Time to wait between drawing subsequent cards.
+    pub stagger_interval: Milliseconds,
+
+    /// Time to display each card before moving it to hand.
+    ///
+    /// Should be less than stagger_interval for best results.
+    pub pause_duration: Milliseconds,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

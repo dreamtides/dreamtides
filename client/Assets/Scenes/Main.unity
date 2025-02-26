@@ -8382,6 +8382,7 @@ MonoBehaviour:
   _enemyAvatar: {fileID: 368858824}
   _offscreen: {fileID: 23340603}
   _drawnCardsPosition: {fileID: 1665816866}
+  _stack: {fileID: 1685416112}
   _selectingTargetsEnemy: {fileID: 344495137}
   _selectingTargetsUser: {fileID: 961817158}
   _battlefieldOverlay: {fileID: 763927452}
@@ -20051,6 +20052,70 @@ Transform:
   m_Children: []
   m_Father: {fileID: 312928727}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1685416111
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1685416114}
+  - component: {fileID: 1685416113}
+  - component: {fileID: 1685416112}
+  m_Layer: 0
+  m_Name: Stack
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1685416112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1685416111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 518962cfb277243c0b2e1d83d1c50db9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _projectileSourcePosition: {fileID: 0}
+  _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
+  _objects: []
+  _debugUpdateContinuously: 0
+  _singleElementY: 0.5
+--- !u!114 &1685416113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1685416111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9759a954d17ef433b809b76238ccb912, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _startingContext: 11
+--- !u!4 &1685416114
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1685416111}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.60876137, y: 0, z: 0, w: 0.7933534}
+  m_LocalPosition: {x: 1.5, y: 18.5, z: -22.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 270, z: 0}
 --- !u!1001 &1686165744
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -25535,6 +25600,7 @@ SceneRoots:
   - {fileID: 1956671492}
   - {fileID: 2050468475}
   - {fileID: 344495139}
+  - {fileID: 1685416114}
   - {fileID: 961817160}
   - {fileID: 23340602}
   - {fileID: 963159505}

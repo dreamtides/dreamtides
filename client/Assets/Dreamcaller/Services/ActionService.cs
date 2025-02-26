@@ -151,6 +151,11 @@ namespace Dreamcaller.Services
         {
           coroutines.Add(StartCoroutine(Registry.EffectService.HandleDisplayEffectCommand(command.DisplayEffect)));
         }
+
+        if (command.DrawUserCards != null)
+        {
+          coroutines.Add(StartCoroutine(Registry.CardService.HandleDrawUserCards(command.DrawUserCards)));
+        }
       }
 
       foreach (var coroutine in coroutines)

@@ -1,9 +1,12 @@
 #nullable enable
 
+using System.Collections;
+using DG.Tweening;
 using Dreamcaller.Components;
 using Dreamcaller.Layout;
 using Dreamcaller.Masonry;
 using Dreamcaller.Schema;
+using Dreamcaller.Utils;
 using UnityEngine;
 
 namespace Dreamcaller.Services
@@ -15,6 +18,48 @@ namespace Dreamcaller.Services
     [SerializeField] ObjectLayout _infoZoomLeft = null!;
     [SerializeField] ObjectLayout _infoZoomRight = null!;
     Card? _currentInfoZoom;
+
+    public IEnumerator HandleDrawUserCards(DrawUserCardsCommand command)
+    {
+      for (var i = 0; i < command.Cards.Count; ++i)
+      {
+        if (i < command.Cards.Count - 1)
+        {
+          StartCoroutine(DrawUserCard(command, i));
+          yield return new WaitForSeconds(command.StaggerInterval.ToSeconds());
+        }
+        else
+        {
+          yield return DrawUserCard(command, i);
+        }
+      }
+    }
+
+    IEnumerator DrawUserCard(DrawUserCardsCommand command, int index)
+    {
+      var cardView = command.Cards[index];
+      var card = Registry.LayoutService.GetCard(cardView.Id);
+      if (card.Parent)
+      {
+        card.Parent.RemoveIfPresent(card);
+      }
+
+      var sequence = TweenUtils.Sequence("DrawUserCard");
+      var moveDuration = 0.3f;
+      card.Render(Registry, cardView, sequence);
+      sequence.Insert(
+        0,
+        card.transform.DOMove(
+          Registry.DrawnCardsPosition.transform.position, moveDuration)
+            .SetEase(Ease.OutCubic));
+      sequence.Insert(
+        0,
+        card.transform.DORotateQuaternion(Registry.DrawnCardsPosition.transform.rotation, moveDuration));
+      yield return new WaitForSeconds(moveDuration + command.PauseDuration.ToSeconds());
+
+      Registry.UserHand.Add(card);
+      Registry.UserHand.ApplyLayout(TweenUtils.Sequence("DrawUserCardMoveToHand"));
+    }
 
     public bool IsPointerOverPlayCardArea()
     {

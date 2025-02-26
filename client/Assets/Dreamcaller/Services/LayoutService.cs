@@ -178,6 +178,7 @@ namespace Dreamcaller.Services
       Registry.UserBattlefield.ApplyLayout(sequence);
       Registry.EnemyBattlefield.ApplyLayout(sequence);
       Registry.DrawnCardsPosition.ApplyLayout(sequence);
+      Registry.Stack.ApplyLayout(sequence);
       Registry.SelectingTargetsEnemy.ApplyLayout(sequence);
       Registry.SelectingTargetsUser.ApplyLayout(sequence);
     }
@@ -230,9 +231,14 @@ namespace Dreamcaller.Services
         return Registry.DrawnCardsPosition;
       }
 
+      if (position.Enum == PositionEnum.OnStack)
+      {
+        return Registry.Stack;
+      }
+
       if (position.PositionClass == null)
       {
-        return Registry.Offscreen;
+        throw new InvalidOperationException($"Unknown layout position: ${position.Enum}");
       }
 
       if (position.PositionClass.InHand is { } inHand)
@@ -285,7 +291,7 @@ namespace Dreamcaller.Services
         };
       }
 
-      return Registry.Offscreen;
+      throw new InvalidOperationException($"Unknown layout position: ${position.PositionClass}, ${position.Enum}");
     }
   }
 }
