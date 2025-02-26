@@ -9,6 +9,8 @@ namespace Dreamcaller.Layout
   public abstract class Displayable : MonoBehaviour
   {
     [SerializeField] Transform? _projectileSourcePosition;
+    [SerializeField] Transform? _displayEffectPosition;
+
     GameContext _gameContext;
     ObjectLayout? _parent;
     long _sortingKey;
@@ -35,6 +37,11 @@ namespace Dreamcaller.Layout
     /// The position that a projectile will be fired from this object.
     /// </summary>
     public Transform? ProjectileSourcePosition => _projectileSourcePosition;
+
+    /// <summary>
+    /// Position at which to display particle effects on this object.
+    /// </summary>
+    public Transform? DisplayEffectPosition => _displayEffectPosition;
 
     protected void Start()
     {

@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using Dreamcaller.Components;
 using Dreamcaller.Layout;
 using Dreamcaller.Utils;
 using UnityEngine;
@@ -59,6 +60,9 @@ namespace Dreamcaller.Services
 
     [SerializeField] SpriteRenderer? _battlefieldOverlay;
     public SpriteRenderer BattlefieldOverlay => Check(_battlefieldOverlay);
+
+    [SerializeField] GameMessage? _gameMessage;
+    public GameMessage GameMessage => Check(_gameMessage);
 
     [SerializeField] LayoutService? _layoutService;
     public LayoutService LayoutService => Check(_layoutService);

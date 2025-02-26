@@ -51,9 +51,21 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 828951a51d69a418d9de14a1a4ea193b
+    m_Address: Assets/ThirdParty/Hovl Studio/Magic circles/Prefabs/Magic circle 1
+      Variant.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 97d7e590715d24b7ab420ad274465588
     m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic
       Magic and Impacts/RPG3_Generic_SubtleWhoosh04.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9e562fe28ab2f4d8e8e3a0c90173fab3
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic
+      Magic and Impacts/RPG3_Magic2_Cast03v1.wav
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

@@ -4,7 +4,8 @@ use action_data::battle_action::BattleAction;
 use action_data::debug_action::DebugAction;
 use action_data::user_action::UserAction;
 use core_data::display_types::{
-    AudioClipAddress, DisplayColor, ProjectileAddress, TextureAddress, Url,
+    AudioClipAddress, DisplayColor, EffectAddress, Milliseconds, ProjectileAddress, TextureAddress,
+    Url,
 };
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
@@ -15,8 +16,8 @@ use display_data::card_view::{
     RevealedCardView,
 };
 use display_data::command::{
-    Command, CommandGroup, CommandSequence, DissolveCardCommand, FireProjectileCommand,
-    GameObjectId, UpdateBattleCommand,
+    Command, CommandSequence, DisplayEffectCommand, DissolveCardCommand, FireProjectileCommand,
+    GameObjectId, ParallelCommandGroup, UpdateBattleCommand,
 };
 use display_data::object_position::{ObjectPosition, Position};
 use display_data::request_data::{
@@ -25,7 +26,7 @@ use display_data::request_data::{
 use masonry::flex_enums::{FlexPosition, TextAlign, WhiteSpace};
 use masonry::flex_node::{FlexNode, NodeType, Text};
 use masonry::flex_style::{
-    BorderRadius, Dimension, DimensionGroup, DimensionUnit, FlexInsets, FlexStyle,
+    BorderRadius, Dimension, DimensionGroup, DimensionUnit, FlexInsets, FlexStyle, FlexVector3,
 };
 use uuid::Uuid;
 
@@ -97,6 +98,7 @@ fn draw_card(battle: &mut BattleView, trail: Option<ProjectileAddress>) -> Optio
 fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformActionResponse {
     match action {
         BattleAction::PlayCard(card_id) => {
+            let mut commands = Vec::new();
             let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
             if let Some((card_index, card)) =
                 battle.cards.iter().enumerate().find(|(_, c)| c.id == card_id)
@@ -127,6 +129,13 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                     draw_card(&mut battle, Some(ProjectileAddress {
                         projectile: "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile 1 nature arrow trail.prefab".to_string()
                     }));
+                    commands.push(Command::DisplayEffect(DisplayEffectCommand {
+                        target: GameObjectId::Deck(DisplayPlayer::User),
+                        effect: EffectAddress::new("Assets/ThirdParty/Hovl Studio/Magic circles/Prefabs/Magic circle 1 Variant.prefab"),
+                        duration: Milliseconds::new(500),
+                        scale: FlexVector3::one(),
+                        sound: Some(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Magic2_Cast03v1.wav"))
+                    }));
                     Position::InVoid(DisplayPlayer::User)
                 } else {
                     Position::OnBattlefield(DisplayPlayer::User)
@@ -135,12 +144,8 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
             }
 
             *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
-            PerformActionResponse {
-                metadata,
-                commands: CommandSequence::from_command(Command::UpdateBattle(
-                    UpdateBattleCommand::new(battle),
-                )),
-            }
+            commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle)));
+            PerformActionResponse { metadata, commands: CommandSequence::sequential(commands) }
         }
         BattleAction::SelectTarget(card_id) => {
             let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
@@ -217,11 +222,11 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 metadata,
                 commands: CommandSequence {
                     groups: vec![
-                        CommandGroup { commands: vec![fire_projectile] },
-                        CommandGroup { commands: vec![
+                        ParallelCommandGroup { commands: vec![fire_projectile] },
+                        ParallelCommandGroup { commands: vec![
                             Command::DissolveCard(DissolveCardCommand { target: card_id, reverse: false }),
                         ] },
-                        CommandGroup { commands: vec![
+                        ParallelCommandGroup { commands: vec![
                             Command::UpdateBattle(UpdateBattleCommand {
                                 battle,
                                 update_sound: Some(AudioClipAddress::new(
@@ -232,7 +237,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                                 reverse: true,
                             }),
                         ] },
-                        CommandGroup { commands: vec![] },
+                        ParallelCommandGroup { commands: vec![] },
                     ],
                 },
             }

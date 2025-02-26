@@ -118,7 +118,7 @@ namespace Dreamcaller.Services
       }
     }
 
-    IEnumerator ApplyGroup(CommandGroup group, bool animate)
+    IEnumerator ApplyGroup(ParallelCommandGroup group, bool animate)
     {
       var coroutines = new List<Coroutine>();
       var sequence = animate ? TweenUtils.Sequence("ApplyGroup") : null;
@@ -140,6 +140,16 @@ namespace Dreamcaller.Services
         {
           coroutines.Add(StartCoroutine(
             Registry.EffectService.HandleDissolveCommand(command.DissolveCard)));
+        }
+
+        if (command.DisplayGameMessage != null)
+        {
+          coroutines.Add(StartCoroutine(Registry.GameMessage.Show(command.DisplayGameMessage.Value)));
+        }
+
+        if (command.DisplayEffect != null)
+        {
+          coroutines.Add(StartCoroutine(Registry.EffectService.HandleDisplayEffectCommand(command.DisplayEffect)));
         }
       }
 

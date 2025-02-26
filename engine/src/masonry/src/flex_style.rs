@@ -23,6 +23,12 @@ pub struct FlexVector3 {
     pub z: f32,
 }
 
+impl FlexVector3 {
+    pub fn one() -> Self {
+        Self { x: 1.0, y: 1.0, z: 1.0 }
+    }
+}
+
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum DimensionUnit {

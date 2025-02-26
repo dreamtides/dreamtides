@@ -1,41 +1,47 @@
 use core_data::display_types::{AudioClipAddress, EffectAddress, Milliseconds, ProjectileAddress};
 use core_data::identifiers::CardId;
+use masonry::flex_style::FlexVector3;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::battle_view::{BattleView, DisplayPlayer};
 use crate::object_position::ObjectPosition;
 
-/// A list of [CommandGroup]s to execute sequentially.
+/// A list of [ParallelCommandGroup]s to execute sequentially.
 #[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct CommandSequence {
-    pub groups: Vec<CommandGroup>,
+    pub groups: Vec<ParallelCommandGroup>,
 }
 
 impl CommandSequence {
     pub fn from_command(command: Command) -> Self {
-        Self { groups: vec![CommandGroup { commands: vec![command] }] }
+        Self { groups: vec![ParallelCommandGroup { commands: vec![command] }] }
     }
 
-    pub fn from_sequence(sequence: Vec<Command>) -> Self {
-        Self { groups: sequence.into_iter().map(|c| CommandGroup { commands: vec![c] }).collect() }
-    }
-
-    pub fn from_optional_sequence(sequence: Vec<Option<Command>>) -> Self {
+    pub fn sequential(sequence: Vec<Command>) -> Self {
         Self {
             groups: sequence
                 .into_iter()
-                .filter_map(|c| c.map(|c| CommandGroup { commands: vec![c] }))
+                .map(|c| ParallelCommandGroup { commands: vec![c] })
+                .collect(),
+        }
+    }
+
+    pub fn optional_sequential(sequence: Vec<Option<Command>>) -> Self {
+        Self {
+            groups: sequence
+                .into_iter()
+                .filter_map(|c| c.map(|c| ParallelCommandGroup { commands: vec![c] }))
                 .collect(),
         }
     }
 }
 
-/// A set of [Command]s to execute in parallel.
+/// A set of [Command]s to execute simultaneously.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct CommandGroup {
+pub struct ParallelCommandGroup {
     pub commands: Vec<Command>,
 }
 
@@ -47,6 +53,7 @@ pub enum Command {
     FireProjectile(FireProjectileCommand),
     DissolveCard(DissolveCardCommand),
     DisplayGameMessage(GameMessageType),
+    DisplayEffect(DisplayEffectCommand),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -115,6 +122,25 @@ pub struct DissolveCardCommand {
 
     /// If true, dissolve will be played backwards to "create" the card.
     pub reverse: bool,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct DisplayEffectCommand {
+    /// The target to display the effect on.
+    pub target: GameObjectId,
+
+    /// The effect to display.
+    pub effect: EffectAddress,
+
+    /// How long to wait before continuing with animations.
+    pub duration: Milliseconds,
+
+    /// Local scale to apply to this effect
+    pub scale: FlexVector3,
+
+    /// Sound to play along with effect
+    pub sound: Option<AudioClipAddress>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

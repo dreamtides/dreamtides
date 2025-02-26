@@ -66,13 +66,13 @@ namespace Dreamcaller.Schema
     public partial class CommandSequence
     {
         [JsonProperty("groups", Required = Required.Always)]
-        public List<CommandGroup> Groups { get; set; }
+        public List<ParallelCommandGroup> Groups { get; set; }
     }
 
     /// <summary>
-    /// A set of [Command]s to execute in parallel.
+    /// A set of [Command]s to execute simultaneously.
     /// </summary>
-    public partial class CommandGroup
+    public partial class ParallelCommandGroup
     {
         [JsonProperty("commands", Required = Required.Always)]
         public List<Command> Commands { get; set; }
@@ -94,6 +94,115 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("displayGameMessage", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public GameMessageType? DisplayGameMessage { get; set; }
+
+        [JsonProperty("displayEffect", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayEffectCommand DisplayEffect { get; set; }
+    }
+
+    public partial class DisplayEffectCommand
+    {
+        /// <summary>
+        /// How long to wait before continuing with animations.
+        /// </summary>
+        [JsonProperty("duration", Required = Required.Always)]
+        public Milliseconds Duration { get; set; }
+
+        /// <summary>
+        /// The effect to display.
+        /// </summary>
+        [JsonProperty("effect", Required = Required.Always)]
+        public EffectAddress Effect { get; set; }
+
+        /// <summary>
+        /// Local scale to apply to this effect
+        /// </summary>
+        [JsonProperty("scale", Required = Required.Always)]
+        public FlexVector3 Scale { get; set; }
+
+        /// <summary>
+        /// Sound to play along with effect
+        /// </summary>
+        [JsonProperty("sound")]
+        public AudioClipAddress Sound { get; set; }
+
+        /// <summary>
+        /// The target to display the effect on.
+        /// </summary>
+        [JsonProperty("target", Required = Required.Always)]
+        public GameObjectId Target { get; set; }
+    }
+
+    /// <summary>
+    /// How long to wait before continuing with animations.
+    /// </summary>
+    public partial class Milliseconds
+    {
+        [JsonProperty("millisecondsValue", Required = Required.Always)]
+        public long MillisecondsValue { get; set; }
+    }
+
+    /// <summary>
+    /// The effect to display.
+    /// </summary>
+    public partial class EffectAddress
+    {
+        [JsonProperty("effect", Required = Required.Always)]
+        public string Effect { get; set; }
+    }
+
+    /// <summary>
+    /// Local scale to apply to this effect
+    /// </summary>
+    public partial class FlexVector3
+    {
+        [JsonProperty("x", Required = Required.Always)]
+        public double X { get; set; }
+
+        [JsonProperty("y", Required = Required.Always)]
+        public double Y { get; set; }
+
+        [JsonProperty("z", Required = Required.Always)]
+        public double Z { get; set; }
+    }
+
+    public partial class AudioClipAddress
+    {
+        [JsonProperty("audioClip", Required = Required.Always)]
+        public string AudioClip { get; set; }
+    }
+
+    /// <summary>
+    /// The target to display the effect on.
+    /// </summary>
+    public partial class GameObjectId
+    {
+        [JsonProperty("cardId", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public CardId CardId { get; set; }
+
+        [JsonProperty("deck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPlayer? Deck { get; set; }
+
+        [JsonProperty("void", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPlayer? Void { get; set; }
+
+        [JsonProperty("avatar", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPlayer? Avatar { get; set; }
+    }
+
+    /// <summary>
+    /// Identifier for this card
+    ///
+    /// The card to dissolve.
+    ///
+    /// Once a card is dissolved, it will be invisible until a reverse dissolve is applied to it.
+    /// </summary>
+    public partial class CardId
+    {
+        [JsonProperty("idx", Required = Required.Always)]
+        public long Idx { get; set; }
+
+        [JsonProperty("version", Required = Required.Always)]
+        public long Version { get; set; }
     }
 
     public partial class DissolveCardCommand
@@ -111,22 +220,6 @@ namespace Dreamcaller.Schema
         /// </summary>
         [JsonProperty("target", Required = Required.Always)]
         public CardId Target { get; set; }
-    }
-
-    /// <summary>
-    /// Identifier for this card
-    ///
-    /// The card to dissolve.
-    ///
-    /// Once a card is dissolved, it will be invisible until a reverse dissolve is applied to it.
-    /// </summary>
-    public partial class CardId
-    {
-        [JsonProperty("idx", Required = Required.Always)]
-        public long Idx { get; set; }
-
-        [JsonProperty("version", Required = Required.Always)]
-        public long Version { get; set; }
     }
 
     public partial class FireProjectileCommand
@@ -163,24 +256,6 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("waitDuration")]
         public Milliseconds WaitDuration { get; set; }
-    }
-
-    public partial class EffectAddress
-    {
-        [JsonProperty("effect", Required = Required.Always)]
-        public string Effect { get; set; }
-    }
-
-    public partial class Milliseconds
-    {
-        [JsonProperty("millisecondsValue", Required = Required.Always)]
-        public long MillisecondsValue { get; set; }
-    }
-
-    public partial class AudioClipAddress
-    {
-        [JsonProperty("audioClip", Required = Required.Always)]
-        public string AudioClip { get; set; }
     }
 
     /// <summary>
@@ -253,21 +328,6 @@ namespace Dreamcaller.Schema
     {
         [JsonProperty("projectile", Required = Required.Always)]
         public string Projectile { get; set; }
-    }
-
-    public partial class GameObjectId
-    {
-        [JsonProperty("cardId", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public CardId CardId { get; set; }
-
-        [JsonProperty("deck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? Deck { get; set; }
-
-        [JsonProperty("void", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? Void { get; set; }
-
-        [JsonProperty("avatar", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? Avatar { get; set; }
     }
 
     public partial class UpdateBattleCommand
@@ -975,18 +1035,6 @@ namespace Dreamcaller.Schema
         public FlexVector3 Amount { get; set; }
     }
 
-    public partial class FlexVector3
-    {
-        [JsonProperty("x", Required = Required.Always)]
-        public double X { get; set; }
-
-        [JsonProperty("y", Required = Required.Always)]
-        public double Y { get; set; }
-
-        [JsonProperty("z", Required = Required.Always)]
-        public double Z { get; set; }
-    }
-
     public partial class TextShadow
     {
         [JsonProperty("blurRadius", Required = Required.Always)]
@@ -1212,6 +1260,15 @@ namespace Dreamcaller.Schema
         public Metadata Metadata { get; set; }
     }
 
+    /// <summary>
+    /// Identifies a player in the context of the user interface.
+    ///
+    /// Player who is currently operating the client
+    ///
+    /// Opponent of user, i.e. the AI enemy
+    /// </summary>
+    public enum DisplayPlayer { Enemy, User };
+
     public enum GameMessageType { Defeat, EnemyTurn, Victory, YourTurn };
 
     /// <summary>
@@ -1235,15 +1292,6 @@ namespace Dreamcaller.Schema
     /// card' ability.
     /// </summary>
     public enum PositionEnum { Browser, CardSelectionChoices, Default, Drawn, HandStorage, Offscreen, OnStack, Played };
-
-    /// <summary>
-    /// Identifies a player in the context of the user interface.
-    ///
-    /// Player who is currently operating the client
-    ///
-    /// Opponent of user, i.e. the AI enemy
-    /// </summary>
-    public enum DisplayPlayer { Enemy, User };
 
     /// <summary>
     /// Face up/face down state for this card
@@ -1334,9 +1382,9 @@ namespace Dreamcaller.Schema
             DateParseHandling = DateParseHandling.None,
             Converters =
             {
+                DisplayPlayerConverter.Singleton,
                 GameMessageTypeConverter.Singleton,
                 PositionConverter.Singleton,
-                DisplayPlayerConverter.Singleton,
                 PositionEnumConverter.Singleton,
                 CardFacingConverter.Singleton,
                 DebugActionConverter.Singleton,
@@ -1364,6 +1412,47 @@ namespace Dreamcaller.Schema
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
         };
+    }
+
+    internal class DisplayPlayerConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(DisplayPlayer) || t == typeof(DisplayPlayer?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "enemy":
+                    return DisplayPlayer.Enemy;
+                case "user":
+                    return DisplayPlayer.User;
+            }
+            throw new Exception("Cannot unmarshal type DisplayPlayer");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (DisplayPlayer)untypedValue;
+            switch (value)
+            {
+                case DisplayPlayer.Enemy:
+                    serializer.Serialize(writer, "enemy");
+                    return;
+                case DisplayPlayer.User:
+                    serializer.Serialize(writer, "user");
+                    return;
+            }
+            throw new Exception("Cannot marshal type DisplayPlayer");
+        }
+
+        public static readonly DisplayPlayerConverter Singleton = new DisplayPlayerConverter();
     }
 
     internal class GameMessageTypeConverter : JsonConverter
@@ -1497,47 +1586,6 @@ namespace Dreamcaller.Schema
         }
 
         public static readonly PositionConverter Singleton = new PositionConverter();
-    }
-
-    internal class DisplayPlayerConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(DisplayPlayer) || t == typeof(DisplayPlayer?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "enemy":
-                    return DisplayPlayer.Enemy;
-                case "user":
-                    return DisplayPlayer.User;
-            }
-            throw new Exception("Cannot unmarshal type DisplayPlayer");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (DisplayPlayer)untypedValue;
-            switch (value)
-            {
-                case DisplayPlayer.Enemy:
-                    serializer.Serialize(writer, "enemy");
-                    return;
-                case DisplayPlayer.User:
-                    serializer.Serialize(writer, "user");
-                    return;
-            }
-            throw new Exception("Cannot marshal type DisplayPlayer");
-        }
-
-        public static readonly DisplayPlayerConverter Singleton = new DisplayPlayerConverter();
     }
 
     internal class PositionEnumConverter : JsonConverter

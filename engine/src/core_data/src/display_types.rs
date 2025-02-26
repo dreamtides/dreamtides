@@ -20,10 +20,22 @@ pub struct ProjectileAddress {
     pub projectile: String,
 }
 
+impl ProjectileAddress {
+    pub fn new(projectile: impl Into<String>) -> Self {
+        Self { projectile: projectile.into() }
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct EffectAddress {
     pub effect: String,
+}
+
+impl EffectAddress {
+    pub fn new(effect: impl Into<String>) -> Self {
+        Self { effect: effect.into() }
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -56,10 +68,22 @@ pub struct SpriteAddress {
     pub sprite: String,
 }
 
+impl SpriteAddress {
+    pub fn new(sprite: impl Into<String>) -> Self {
+        Self { sprite: sprite.into() }
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct FontAddress {
     pub font: String,
+}
+
+impl FontAddress {
+    pub fn new(font: impl Into<String>) -> Self {
+        Self { font: font.into() }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]

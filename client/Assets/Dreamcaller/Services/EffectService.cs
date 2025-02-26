@@ -2,7 +2,6 @@
 
 using System.Collections;
 using DG.Tweening;
-using Dreamcaller.Components;
 using Dreamcaller.Layout;
 using Dreamcaller.Schema;
 using Dreamcaller.Utils;
@@ -12,6 +11,36 @@ namespace Dreamcaller.Services
 {
   public class EffectService : Service
   {
+    /// <summary>
+    /// Handles a DisplayEffectCommand by creating an effect and waiting for it to
+    /// finish.
+    /// </summary>
+    public IEnumerator HandleDisplayEffectCommand(DisplayEffectCommand command)
+    {
+      var target = Registry.LayoutService.GetGameObject(command.Target);
+      var effectPosition = target.DisplayEffectPosition;
+      var effect = Registry.AssetService.GetEffectPrefab(command.Effect);
+
+      if (effectPosition)
+      {
+        Registry.AssetPoolService.Create(effect, effectPosition.position);
+        effect.transform.forward = effectPosition.forward;
+      }
+      else
+      {
+        Registry.AssetPoolService.Create(effect, target.transform.position);
+        var rotation = Quaternion.LookRotation(target.transform.position - Registry.MainCamera.transform.position);
+        effect.transform.rotation = rotation;
+      }
+
+      if (command.Sound != null)
+      {
+        Registry.SoundService.Play(command.Sound);
+      }
+
+      yield return new WaitForSeconds(command.Duration.ToSeconds());
+    }
+
     /// <summary>
     /// Handles a FireProjectileCommand by creating a projectile and animating
     /// its flight.

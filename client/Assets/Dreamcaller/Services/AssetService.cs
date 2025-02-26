@@ -24,6 +24,14 @@ namespace Dreamcaller.Services
     public Projectile GetProjectilePrefab(ProjectileAddress address) =>
         GetAssetComponent<Projectile>(address.Projectile);
 
+    protected override void OnInitialize()
+    {
+      GetEffectPrefab(new EffectAddress
+      {
+        Effect = "Assets/ThirdParty/Hovl Studio/Magic circles/Prefabs/Magic circle 1 Variant.prefab"
+      });
+    }
+
     T GetAsset<T>(string address) where T : class
     {
       var op = Addressables.LoadAssetAsync<T>(address);
