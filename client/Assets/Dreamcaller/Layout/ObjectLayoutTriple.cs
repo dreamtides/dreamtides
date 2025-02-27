@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using DG.Tweening;
+using Mono.Cecil.Cil;
 using UnityEngine;
 
 namespace Dreamcaller.Layout
@@ -57,6 +58,7 @@ namespace Dreamcaller.Layout
       _layout1.ApplyLayout(sequence);
       _layout2.ApplyLayout(sequence);
       _layout3.ApplyLayout(sequence);
+      SetSortingKeys();
     }
 
     public override void ApplyTargetTransform(Displayable target, Sequence? sequence = null)
@@ -73,6 +75,7 @@ namespace Dreamcaller.Layout
       {
         _layout3.ApplyTargetTransform(target, sequence);
       }
+      SetSortingKeys();
     }
 
     public override void RemoveIfPresent(Displayable? displayable)
@@ -87,6 +90,18 @@ namespace Dreamcaller.Layout
       _layout3.RemoveIfPresent(displayable);
 
       RebalanceLayouts();
+    }
+
+    void SetSortingKeys()
+    {
+      for (var i = 0; i < Objects.Count; ++i)
+      {
+        var obj = Objects[i];
+        if (obj.SortingGroup)
+        {
+          obj.SortingGroup.sortingOrder = i;
+        }
+      }
     }
 
     void RebalanceLayouts()

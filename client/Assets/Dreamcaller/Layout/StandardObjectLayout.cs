@@ -128,7 +128,8 @@ namespace Dreamcaller.Layout
 
     void ApplyLayoutToObject(
       Displayable displayable,
-      int index, int count,
+      int index,
+      int count,
       Sequence? sequence = null,
       bool applyToChildren = true)
     {
