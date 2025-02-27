@@ -12,7 +12,7 @@ use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::CardFacing;
 use display_data::battle_view::{BattleView, DisplayPlayer, InterfaceView, PlayerView};
 use display_data::card_view::{
-    CardActions, CardEffects, CardFrame, CardView, DisplayImage, RevealedCardStatus,
+    CardActions, CardEffects, CardFrame, CardPrefab, CardView, DisplayImage, RevealedCardStatus,
     RevealedCardView,
 };
 use display_data::command::{
@@ -340,6 +340,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
         card_facing: CardFacing::FaceUp,
         create_position: None,
         destroy_position: None,
+        prefab: CardPrefab::Default,
     }
 }
 
@@ -377,6 +378,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
         card_facing: CardFacing::FaceUp,
         create_position: None,
         destroy_position: None,
+        prefab: CardPrefab::Default,
     }
 }
 
@@ -416,6 +418,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
         card_facing: CardFacing::FaceUp,
         create_position: None,
         destroy_position: None,
+        prefab: CardPrefab::Default,
     }
 }
 
@@ -451,6 +454,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
         card_facing: CardFacing::FaceUp,
         create_position: None,
         destroy_position: None,
+        prefab: CardPrefab::Default,
     }
 }
 
@@ -487,6 +491,7 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
         card_facing: CardFacing::FaceUp,
         create_position: None,
         destroy_position: None,
+        prefab: CardPrefab::Token,
     }
 }
 

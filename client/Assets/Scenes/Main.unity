@@ -8356,6 +8356,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cardPrefab: {fileID: 8215946370556705966, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
+  _tokenPrefab: {fileID: 541007035191917201, guid: 43f7112fc2cf849599a2b9442170a621, type: 3}
 --- !u!114 &613451854
 MonoBehaviour:
   m_ObjectHideFlags: 0

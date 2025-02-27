@@ -301,6 +301,12 @@ namespace Dreamcaller.Schema
         public ObjectPosition Position { get; set; }
 
         /// <summary>
+        /// Represents the general category of card being displayed.
+        /// </summary>
+        [JsonProperty("prefab", Required = Required.Always)]
+        public CardPrefab Prefab { get; set; }
+
+        /// <summary>
         /// If this card is revealed to the viewer, contains information on the revealed face of the
         /// card.
         /// </summary>
@@ -1310,8 +1316,6 @@ namespace Dreamcaller.Schema
     ///
     /// Object is not visible.
     ///
-    /// Object is prominently revealed, being shown at a large size after being played.
-    ///
     /// Object is on the stack
     ///
     /// Position for cards to be shown to the user immediately after they're drawn.
@@ -1324,7 +1328,12 @@ namespace Dreamcaller.Schema
     /// Object is in a temporary holding space for cards in hand while resolving some other 'play
     /// card' ability.
     /// </summary>
-    public enum PositionEnum { Browser, CardSelectionChoices, Default, Drawn, HandStorage, Offscreen, OnStack, Played };
+    public enum PositionEnum { Browser, CardSelectionChoices, Default, Drawn, HandStorage, Offscreen, OnStack };
+
+    /// <summary>
+    /// Represents the general category of card being displayed.
+    /// </summary>
+    public enum CardPrefab { Default, Token };
 
     /// <summary>
     /// Private actions for developer use
@@ -1413,6 +1422,7 @@ namespace Dreamcaller.Schema
                 CardFacingConverter.Singleton,
                 PositionConverter.Singleton,
                 PositionEnumConverter.Singleton,
+                CardPrefabConverter.Singleton,
                 DebugActionConverter.Singleton,
                 CardFrameConverter.Singleton,
                 RevealedCardStatusConverter.Singleton,
@@ -1600,8 +1610,6 @@ namespace Dreamcaller.Schema
                             return new Position { Enum = PositionEnum.Offscreen };
                         case "onStack":
                             return new Position { Enum = PositionEnum.OnStack };
-                        case "played":
-                            return new Position { Enum = PositionEnum.Played };
                     }
                     break;
                 case JsonToken.StartObject:
@@ -1638,9 +1646,6 @@ namespace Dreamcaller.Schema
                         return;
                     case PositionEnum.OnStack:
                         serializer.Serialize(writer, "onStack");
-                        return;
-                    case PositionEnum.Played:
-                        serializer.Serialize(writer, "played");
                         return;
                 }
             }
@@ -1679,8 +1684,6 @@ namespace Dreamcaller.Schema
                     return PositionEnum.Offscreen;
                 case "onStack":
                     return PositionEnum.OnStack;
-                case "played":
-                    return PositionEnum.Played;
             }
             throw new Exception("Cannot unmarshal type PositionEnum");
         }
@@ -1716,14 +1719,52 @@ namespace Dreamcaller.Schema
                 case PositionEnum.OnStack:
                     serializer.Serialize(writer, "onStack");
                     return;
-                case PositionEnum.Played:
-                    serializer.Serialize(writer, "played");
-                    return;
             }
             throw new Exception("Cannot marshal type PositionEnum");
         }
 
         public static readonly PositionEnumConverter Singleton = new PositionEnumConverter();
+    }
+
+    internal class CardPrefabConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(CardPrefab) || t == typeof(CardPrefab?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "default":
+                    return CardPrefab.Default;
+                case "token":
+                    return CardPrefab.Token;
+            }
+            throw new Exception("Cannot unmarshal type CardPrefab");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (CardPrefab)untypedValue;
+            switch (value)
+            {
+                case CardPrefab.Default:
+                    serializer.Serialize(writer, "default");
+                    return;
+                case CardPrefab.Token:
+                    serializer.Serialize(writer, "token");
+                    return;
+            }
+            throw new Exception("Cannot marshal type CardPrefab");
+        }
+
+        public static readonly CardPrefabConverter Singleton = new CardPrefabConverter();
     }
 
     internal class DebugActionConverter : JsonConverter

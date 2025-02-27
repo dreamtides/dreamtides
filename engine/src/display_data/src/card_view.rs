@@ -43,6 +43,9 @@ pub struct CardView {
     /// If provided, the card will be animated to this position before being
     /// destroyed.
     pub destroy_position: Option<ObjectPosition>,
+
+    /// Represents the general category of card being displayed.
+    pub prefab: CardPrefab,
 }
 
 /// Visual state of a revealed card
@@ -120,6 +123,13 @@ pub enum RevealedCardStatus {
     CanSelectNegative,
     CanSelectPositive,
     Selected,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum CardPrefab {
+    Default,
+    Token,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]

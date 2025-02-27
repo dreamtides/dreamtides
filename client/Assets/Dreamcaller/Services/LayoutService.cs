@@ -9,15 +9,14 @@ using Dreamcaller.Components;
 using Dreamcaller.Layout;
 using Dreamcaller.Schema;
 using Dreamcaller.Utils;
-using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Dreamcaller.Services
 {
   public class LayoutService : Service
   {
-    [SerializeField] Card? _cardPrefab;
-    Card CardPrefab { get => Errors.CheckNotNull(_cardPrefab); }
+    [SerializeField] Card _cardPrefab = null!;
+    [SerializeField] Card _tokenPrefab = null!;
 
     Dictionary<string, Card> Cards { get; } = new();
 
@@ -43,7 +42,11 @@ namespace Dreamcaller.Services
         }
         else
         {
-          card = ComponentUtils.Instantiate(CardPrefab);
+          card = cardView.Prefab switch
+          {
+            CardPrefab.Token => ComponentUtils.Instantiate(_tokenPrefab),
+            _ => ComponentUtils.Instantiate(_cardPrefab)
+          };
           if (cardView.CreatePosition != null)
           {
             LayoutForPosition(cardView.CreatePosition).ApplyTargetTransform(card);
