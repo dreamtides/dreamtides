@@ -55,7 +55,7 @@ fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformActio
         DebugAction::DrawCard => {
             let mut commands = vec![];
             let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
-            let card = draw_card(&mut battle, None);
+            let card = draw_card(&mut battle);
             commands.push(Command::DrawUserCards(DrawUserCardsCommand {
                 cards: vec![card.unwrap()],
                 stagger_interval: Milliseconds::new(100),
@@ -68,7 +68,7 @@ fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformActio
     }
 }
 
-fn draw_card(battle: &mut BattleView, trail: Option<ProjectileAddress>) -> Option<CardView> {
+fn draw_card(battle: &mut BattleView) -> Option<CardView> {
     if let Some(deck_card) = battle
         .cards
         .iter()
@@ -79,12 +79,7 @@ fn draw_card(battle: &mut BattleView, trail: Option<ProjectileAddress>) -> Optio
         if let Some(card_index) = battle.cards.iter().position(|c| c.id == card_id) {
             let mut shown_drawn = battle.clone();
             shown_drawn.cards[card_index] = card_view(Position::Drawn, sorting_key);
-            let mut view = card_view(Position::InHand(DisplayPlayer::User), sorting_key);
-            if let Some(trail) = trail {
-                if let Some(revealed) = view.revealed.as_mut() {
-                    revealed.effects.card_trail = Some(trail);
-                }
-            }
+            let view = card_view(Position::InHand(DisplayPlayer::User), sorting_key);
             battle.cards[card_index] = view.clone();
             *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
             Some(view)
@@ -126,12 +121,8 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 } else if sorting_key % 5 == 2 {
                     battle.cards[card_index] = card_view(Position::OnStack, sorting_key);
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
-                    let c1 = draw_card(&mut battle, Some(ProjectileAddress {
-                        projectile: "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile 1 nature arrow trail.prefab".to_string()
-                    }));
-                    let c2 = draw_card(&mut battle, Some(ProjectileAddress {
-                        projectile: "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile 1 nature arrow trail.prefab".to_string()
-                    }));
+                    let c1 = draw_card(&mut battle);
+                    let c2 = draw_card(&mut battle);
                     commands.push(Command::DisplayEffect(DisplayEffectCommand {
                         target: GameObjectId::Deck(DisplayPlayer::User),
                         effect: EffectAddress::new("Assets/ThirdParty/Hovl Studio/Magic circles/Prefabs/Magic circle 1 Variant.prefab"),
