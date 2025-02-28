@@ -136,6 +136,42 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                         pause_duration: Milliseconds::new(100),
                     }));
                     Position::InVoid(DisplayPlayer::User)
+                } else if sorting_key % 5 == 0 {
+                    let mut battle_clone = battle.clone();
+                    battle_clone.cards[card_index] =
+                        card_view(Position::OnBattlefield(DisplayPlayer::User), sorting_key);
+                    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(
+                        battle_clone.clone(),
+                    )));
+                    let mut trigger_card = card_view(Position::OnStack, 1234);
+                    trigger_card.prefab = CardPrefab::Token;
+                    trigger_card.create_position = Some(ObjectPosition {
+                        position: Position::HiddenWithinCard(card.id),
+                        sorting_key: 1,
+                        sorting_sub_key: 0,
+                    });
+                    trigger_card.destroy_position = Some(ObjectPosition {
+                        position: Position::HiddenWithinCard(card.id),
+                        sorting_key: 1,
+                        sorting_sub_key: 0,
+                    });
+                    battle_clone.cards.push(trigger_card);
+                    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle_clone)));
+                    commands.push(Command::Wait(Milliseconds::new(1000)));
+                    let c1 = draw_card(&mut battle);
+                    commands.push(Command::DisplayEffect(DisplayEffectCommand {
+                        target: GameObjectId::Deck(DisplayPlayer::User),
+                        effect: EffectAddress::new("Assets/ThirdParty/Hovl Studio/Magic circles/Prefabs/Magic circle 1 Variant.prefab"),
+                        duration: Milliseconds::new(100),
+                        scale: FlexVector3::one(),
+                        sound: Some(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Magic2_Cast03v1.wav"))
+                    }));
+                    commands.push(Command::DrawUserCards(DrawUserCardsCommand {
+                        cards: vec![c1.unwrap()],
+                        stagger_interval: Milliseconds::new(300),
+                        pause_duration: Milliseconds::new(100),
+                    }));
+                    Position::OnBattlefield(DisplayPlayer::User)
                 } else {
                     Position::OnBattlefield(DisplayPlayer::User)
                 };

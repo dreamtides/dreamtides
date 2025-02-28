@@ -1,3 +1,4 @@
+use core_data::identifiers::CardId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -74,4 +75,6 @@ pub enum Position {
     /// Object is in a temporary holding space for cards in hand while resolving
     /// some other 'play card' ability.
     HandStorage,
+
+    HiddenWithinCard(CardId),
 }

@@ -55,6 +55,7 @@ pub struct ParallelCommandGroup {
 #[serde(rename_all = "camelCase")]
 pub enum Command {
     UpdateBattle(UpdateBattleCommand),
+    Wait(Milliseconds),
     FireProjectile(FireProjectileCommand),
     DissolveCard(DissolveCardCommand),
     DisplayGameMessage(GameMessageType),

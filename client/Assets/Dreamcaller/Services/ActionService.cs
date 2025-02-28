@@ -130,6 +130,11 @@ namespace Dreamcaller.Services
           coroutines.Add(StartCoroutine(Registry.LayoutService.UpdateLayout(command.UpdateBattle, sequence)));
         }
 
+        if (command.Wait != null)
+        {
+          coroutines.Add(StartCoroutine(Wait(command.Wait)));
+        }
+
         if (command.FireProjectile != null)
         {
           coroutines.Add(StartCoroutine(
@@ -162,6 +167,11 @@ namespace Dreamcaller.Services
       {
         yield return coroutine;
       }
+    }
+
+    IEnumerator Wait(Milliseconds milliseconds)
+    {
+      yield return new WaitForSeconds(milliseconds.ToSeconds());
     }
   }
 }

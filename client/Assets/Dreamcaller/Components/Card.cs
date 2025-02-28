@@ -8,7 +8,6 @@ using Dreamcaller.Schema;
 using Dreamcaller.Services;
 using Dreamcaller.Utils;
 using TMPro;
-using Unity.Mathematics;
 using UnityEngine;
 
 namespace Dreamcaller.Components
@@ -27,7 +26,6 @@ namespace Dreamcaller.Components
     [SerializeField] Renderer _cardBack = null!;
     [SerializeField] Renderer _outline = null!;
     [SerializeField] Renderer _battlefieldOutline = null!;
-    [SerializeField] Renderer _costBackground = null!;
     [SerializeField] TextMeshPro _costText = null!;
     [SerializeField] Renderer _sparkBackground = null!;
     [SerializeField] TextMeshPro _sparkText = null!;
@@ -50,6 +48,8 @@ namespace Dreamcaller.Components
     GameObject? _cardTrail;
 
     public string Id => CardView.ClientId();
+
+    public ObjectLayout ContainedObjects => Errors.CheckNotNull(_containedObjects);
 
     public void Render(Registry registry, CardView view, Sequence? sequence = null)
     {

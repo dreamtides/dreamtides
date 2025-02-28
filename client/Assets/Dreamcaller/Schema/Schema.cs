@@ -86,6 +86,9 @@ namespace Dreamcaller.Schema
         [JsonProperty("updateBattle", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public UpdateBattleCommand UpdateBattle { get; set; }
 
+        [JsonProperty("wait", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public Milliseconds Wait { get; set; }
+
         [JsonProperty("fireProjectile", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public FireProjectileCommand FireProjectile { get; set; }
 
@@ -395,6 +398,9 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("onBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? OnBattlefield { get; set; }
+
+        [JsonProperty("hiddenWithinCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public CardId HiddenWithinCard { get; set; }
     }
 
     /// <summary>

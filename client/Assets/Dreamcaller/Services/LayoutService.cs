@@ -294,6 +294,11 @@ namespace Dreamcaller.Services
         };
       }
 
+      if (position.PositionClass.HiddenWithinCard is { } cardId)
+      {
+        return GetCard(cardId).ContainedObjects;
+      }
+
       throw new InvalidOperationException($"Unknown layout position: ${position.PositionClass}, ${position.Enum}");
     }
   }
