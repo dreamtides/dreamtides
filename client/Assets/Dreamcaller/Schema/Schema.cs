@@ -1339,7 +1339,7 @@ namespace Dreamcaller.Schema
     /// <summary>
     /// Represents the general category of card being displayed.
     /// </summary>
-    public enum CardPrefab { Default, Token };
+    public enum CardPrefab { Default, Dreamwell, Token };
 
     /// <summary>
     /// Private actions for developer use
@@ -1744,6 +1744,8 @@ namespace Dreamcaller.Schema
             {
                 case "default":
                     return CardPrefab.Default;
+                case "dreamwell":
+                    return CardPrefab.Dreamwell;
                 case "token":
                     return CardPrefab.Token;
             }
@@ -1762,6 +1764,9 @@ namespace Dreamcaller.Schema
             {
                 case CardPrefab.Default:
                     serializer.Serialize(writer, "default");
+                    return;
+                case CardPrefab.Dreamwell:
+                    serializer.Serialize(writer, "dreamwell");
                     return;
                 case CardPrefab.Token:
                     serializer.Serialize(writer, "token");

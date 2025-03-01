@@ -6,15 +6,14 @@
 set -e
 set -u
 
-# Check for correct number of args
-if [ $# -lt 2 ]; then
-  echo "Usage: $0 <input_directory> <output_directory>"
+if [ $# -lt 3 ]; then
+  echo "Usage: $0 <input_directory> <output_directory> <mask_file>"
   exit 1
 fi
 
 INPUT_DIR="$1"
-OUTPUT_DIR="$2" # Path to mask file — adjust if needed
-MASK_FILE="image_mask.png"
+OUTPUT_DIR="$2"
+MASK_FILE="$3"
 
 # Create output directory if it doesn't exist
 mkdir -p "$OUTPUT_DIR"

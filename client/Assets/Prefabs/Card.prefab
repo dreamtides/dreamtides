@@ -1475,7 +1475,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -6840370101087103202, guid: c28a903ccd9d54c51b1275e05e8328b2, type: 2}
+  - {fileID: -6840370101087103202, guid: 1b53bb35a15e146cf9aa4b3bb1a1af3a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1519,8 +1519,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Beacon of Tomorrow
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: c28a903ccd9d54c51b1275e05e8328b2, type: 2}
-  m_sharedMaterial: {fileID: -6840370101087103202, guid: c28a903ccd9d54c51b1275e05e8328b2, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1b53bb35a15e146cf9aa4b3bb1a1af3a, type: 2}
+  m_sharedMaterial: {fileID: -6840370101087103202, guid: 1b53bb35a15e146cf9aa4b3bb1a1af3a, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2091,7 +2091,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -6840370101087103202, guid: c28a903ccd9d54c51b1275e05e8328b2, type: 2}
+  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2135,8 +2135,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Event
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: c28a903ccd9d54c51b1275e05e8328b2, type: 2}
-  m_sharedMaterial: {fileID: -6840370101087103202, guid: c28a903ccd9d54c51b1275e05e8328b2, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

@@ -130,6 +130,7 @@ pub enum RevealedCardStatus {
 pub enum CardPrefab {
     Default,
     Token,
+    Dreamwell,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]

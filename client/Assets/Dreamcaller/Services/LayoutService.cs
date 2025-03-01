@@ -17,6 +17,7 @@ namespace Dreamcaller.Services
   {
     [SerializeField] Card _cardPrefab = null!;
     [SerializeField] Card _tokenPrefab = null!;
+    [SerializeField] Card _dreamwellPrefab = null!;
 
     Dictionary<string, Card> Cards { get; } = new();
 
@@ -45,6 +46,7 @@ namespace Dreamcaller.Services
           card = cardView.Prefab switch
           {
             CardPrefab.Token => ComponentUtils.Instantiate(_tokenPrefab),
+            CardPrefab.Dreamwell => ComponentUtils.Instantiate(_dreamwellPrefab),
             _ => ComponentUtils.Instantiate(_cardPrefab)
           };
           if (cardView.CreatePosition != null)
