@@ -96,8 +96,8 @@ namespace Dreamcaller.Services
       {
         return deck switch
         {
-          DisplayPlayer.User => Registry.UserDeck,
-          DisplayPlayer.Enemy => Registry.EnemyDeck,
+          DisplayPlayer.User => Registry.Layout.UserDeck,
+          DisplayPlayer.Enemy => Registry.Layout.EnemyDeck,
           _ => throw Errors.UnknownEnumValue(deck)
         };
       }
@@ -106,8 +106,8 @@ namespace Dreamcaller.Services
       {
         return voidPile switch
         {
-          DisplayPlayer.User => Registry.UserVoid,
-          DisplayPlayer.Enemy => Registry.EnemyVoid,
+          DisplayPlayer.User => Registry.Layout.UserVoid,
+          DisplayPlayer.Enemy => Registry.Layout.EnemyVoid,
           _ => throw Errors.UnknownEnumValue(voidPile)
         };
       }
@@ -116,8 +116,8 @@ namespace Dreamcaller.Services
       {
         return avatar switch
         {
-          DisplayPlayer.User => Registry.UserAvatar,
-          DisplayPlayer.Enemy => Registry.EnemyAvatar,
+          DisplayPlayer.User => Registry.Layout.UserAvatar,
+          DisplayPlayer.Enemy => Registry.Layout.EnemyAvatar,
           _ => throw Errors.UnknownEnumValue(avatar)
         };
       }
@@ -158,7 +158,7 @@ namespace Dreamcaller.Services
     /// </summary>
     public void MoveTowardsCamera(MonoBehaviour component, float distance)
     {
-      var towardsCameraDirection = -Registry.MainCamera.transform.forward;
+      var towardsCameraDirection = -Registry.Layout.MainCamera.transform.forward;
       component.transform.position += towardsCameraDirection * distance;
     }
 
@@ -172,20 +172,20 @@ namespace Dreamcaller.Services
 
     void ApplyAllLayouts(Sequence? sequence)
     {
-      Registry.UserHand.ApplyLayout(sequence);
-      Registry.EnemyHand.ApplyLayout(sequence);
-      Registry.UserDeck.ApplyLayout(sequence);
-      Registry.EnemyDeck.ApplyLayout(sequence);
-      Registry.UserVoid.ApplyLayout(sequence);
-      Registry.EnemyVoid.ApplyLayout(sequence);
-      Registry.UserAvatar.ApplyLayout(sequence);
-      Registry.EnemyAvatar.ApplyLayout(sequence);
-      Registry.UserBattlefield.ApplyLayout(sequence);
-      Registry.EnemyBattlefield.ApplyLayout(sequence);
-      Registry.DrawnCardsPosition.ApplyLayout(sequence);
-      Registry.Stack.ApplyLayout(sequence);
-      Registry.SelectingTargetsEnemy.ApplyLayout(sequence);
-      Registry.SelectingTargetsUser.ApplyLayout(sequence);
+      Registry.Layout.UserHand.ApplyLayout(sequence);
+      Registry.Layout.EnemyHand.ApplyLayout(sequence);
+      Registry.Layout.UserDeck.ApplyLayout(sequence);
+      Registry.Layout.EnemyDeck.ApplyLayout(sequence);
+      Registry.Layout.UserVoid.ApplyLayout(sequence);
+      Registry.Layout.EnemyVoid.ApplyLayout(sequence);
+      Registry.Layout.UserAvatar.ApplyLayout(sequence);
+      Registry.Layout.EnemyAvatar.ApplyLayout(sequence);
+      Registry.Layout.UserBattlefield.ApplyLayout(sequence);
+      Registry.Layout.EnemyBattlefield.ApplyLayout(sequence);
+      Registry.Layout.DrawnCardsPosition.ApplyLayout(sequence);
+      Registry.Layout.Stack.ApplyLayout(sequence);
+      Registry.Layout.SelectingTargetsEnemy.ApplyLayout(sequence);
+      Registry.Layout.SelectingTargetsUser.ApplyLayout(sequence);
     }
 
     List<Card> PrepareToDelete(Sequence? sequence, HashSet<string> toDelete)
@@ -233,12 +233,12 @@ namespace Dreamcaller.Services
       var position = objectPosition.Position;
       if (position.Enum == PositionEnum.Drawn)
       {
-        return Registry.DrawnCardsPosition;
+        return Registry.Layout.DrawnCardsPosition;
       }
 
       if (position.Enum == PositionEnum.OnStack)
       {
-        return Registry.Stack;
+        return Registry.Layout.Stack;
       }
 
       if (position.PositionClass == null)
@@ -250,8 +250,8 @@ namespace Dreamcaller.Services
       {
         return inHand switch
         {
-          DisplayPlayer.User => Registry.UserHand,
-          DisplayPlayer.Enemy => Registry.EnemyHand,
+          DisplayPlayer.User => Registry.Layout.UserHand,
+          DisplayPlayer.Enemy => Registry.Layout.EnemyHand,
           _ => throw Errors.UnknownEnumValue(inHand),
         };
       }
@@ -260,8 +260,8 @@ namespace Dreamcaller.Services
       {
         return inDeck switch
         {
-          DisplayPlayer.User => Registry.UserDeck,
-          DisplayPlayer.Enemy => Registry.EnemyDeck,
+          DisplayPlayer.User => Registry.Layout.UserDeck,
+          DisplayPlayer.Enemy => Registry.Layout.EnemyDeck,
           _ => throw Errors.UnknownEnumValue(inDeck),
         };
       }
@@ -270,8 +270,8 @@ namespace Dreamcaller.Services
       {
         return onBattlefield switch
         {
-          DisplayPlayer.User => Registry.UserBattlefield,
-          DisplayPlayer.Enemy => Registry.EnemyBattlefield,
+          DisplayPlayer.User => Registry.Layout.UserBattlefield,
+          DisplayPlayer.Enemy => Registry.Layout.EnemyBattlefield,
           _ => throw Errors.UnknownEnumValue(onBattlefield),
         };
       }
@@ -280,8 +280,8 @@ namespace Dreamcaller.Services
       {
         return inVoid switch
         {
-          DisplayPlayer.User => Registry.UserVoid,
-          DisplayPlayer.Enemy => Registry.EnemyVoid,
+          DisplayPlayer.User => Registry.Layout.UserVoid,
+          DisplayPlayer.Enemy => Registry.Layout.EnemyVoid,
           _ => throw Errors.UnknownEnumValue(inVoid),
         };
       }
@@ -290,8 +290,8 @@ namespace Dreamcaller.Services
       {
         return selectingTargets switch
         {
-          DisplayPlayer.User => Registry.SelectingTargetsUser,
-          DisplayPlayer.Enemy => Registry.SelectingTargetsEnemy,
+          DisplayPlayer.User => Registry.Layout.SelectingTargetsUser,
+          DisplayPlayer.Enemy => Registry.Layout.SelectingTargetsEnemy,
           _ => throw Errors.UnknownEnumValue(selectingTargets),
         };
       }

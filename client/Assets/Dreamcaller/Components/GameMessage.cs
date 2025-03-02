@@ -65,9 +65,9 @@ namespace Dreamcaller.Components
 
       if (moveToTop)
       {
-        _registry.BattlefieldOverlay.gameObject.SetActive(true);
-        _registry.BattlefieldOverlay.color = new Color(0, 0, 0, 0);
-        _registry.BattlefieldOverlay.DOFade(1.0f, 0.3f);
+        _registry.Layout.BattlefieldOverlay.gameObject.SetActive(true);
+        _registry.Layout.BattlefieldOverlay.color = new Color(0, 0, 0, 0);
+        _registry.Layout.BattlefieldOverlay.DOFade(1.0f, 0.3f);
         var sequence = TweenUtils.Sequence("MoveToTop")
           .Insert(0, content.Text.transform.DOMove(_top.position, 0.3f));
         sequence.Insert(0, content.Effect.transform.DOMove(_top.position, 0.3f));

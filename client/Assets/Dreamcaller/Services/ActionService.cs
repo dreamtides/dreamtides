@@ -149,7 +149,7 @@ namespace Dreamcaller.Services
 
         if (command.DisplayGameMessage != null)
         {
-          coroutines.Add(StartCoroutine(Registry.GameMessage.Show(command.DisplayGameMessage.Value)));
+          coroutines.Add(StartCoroutine(Registry.Layout.GameMessage.Show(command.DisplayGameMessage.Value)));
         }
 
         if (command.DisplayEffect != null)

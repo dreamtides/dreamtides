@@ -20,12 +20,12 @@ namespace Dreamcaller.Services
 
     public void Play(AudioClip clip)
     {
-      Registry.MainAudioSource.PlayOneShot(clip);
+      Registry.Layout.MainAudioSource.PlayOneShot(clip);
     }
 
     public void Play(AudioClipAddress clipAddress)
     {
-      Registry.MainAudioSource.PlayOneShot(Registry.AssetService.GetAudioClip(clipAddress));
+      Registry.Layout.MainAudioSource.PlayOneShot(Registry.AssetService.GetAudioClip(clipAddress));
     }
 
     public void PlayCardSound()

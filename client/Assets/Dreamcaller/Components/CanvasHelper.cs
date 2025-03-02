@@ -21,8 +21,8 @@ namespace Dreamcaller.Components
     private static Rect lastSafeArea = Rect.zero;
     private bool isDisabled = false;
 
-    private Canvas canvas;
-    private RectTransform safeAreaTransform;
+    private Canvas canvas = null!;
+    private RectTransform safeAreaTransform = null!;
 
     void Start()
     {

@@ -27,7 +27,7 @@ namespace Dreamcaller.Services
     public Vector3 WorldMousePosition(float screenZ)
     {
       var tapScreenPosition = PointerPosition();
-      return Registry.MainCamera.ScreenToWorldPoint(
+      return Registry.Layout.MainCamera.ScreenToWorldPoint(
           new Vector3(tapScreenPosition.x, tapScreenPosition.y, screenZ));
     }
 
@@ -75,7 +75,7 @@ namespace Dreamcaller.Services
     Displayable? ObjectAtClickPosition()
     {
       var tapScreenPosition = PointerPosition();
-      var ray = Registry.MainCamera.ScreenPointToRay(tapScreenPosition);
+      var ray = Registry.Layout.MainCamera.ScreenPointToRay(tapScreenPosition);
       var hits = Physics.RaycastNonAlloc(ray, _raycastHitsTempBuffer, 100);
 
       var candidates = new List<Displayable>();

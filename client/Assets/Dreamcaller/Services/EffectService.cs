@@ -29,7 +29,7 @@ namespace Dreamcaller.Services
       else
       {
         Registry.AssetPoolService.Create(effect, target.transform.position);
-        var rotation = Quaternion.LookRotation(target.transform.position - Registry.MainCamera.transform.position);
+        var rotation = Quaternion.LookRotation(target.transform.position - Registry.Layout.MainCamera.transform.position);
         effect.transform.rotation = rotation;
       }
 
@@ -61,7 +61,7 @@ namespace Dreamcaller.Services
           .Insert(0, source.transform.DORotate(new Vector3(280, 0, 0), 0.2f))
           .Insert(0,
             source.transform.DOMove(
-              Vector3.MoveTowards(source.transform.position, Registry.MainCamera.transform.position, 20f), 0.2f))
+              Vector3.MoveTowards(source.transform.position, Registry.Layout.MainCamera.transform.position, 20f), 0.2f))
           .WaitForCompletion();
       }
 

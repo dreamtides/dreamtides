@@ -10,7 +10,6 @@ namespace Dreamcaller.Services
   public class MusicService : Service
   {
     [SerializeField] List<AudioClip> _tracks = null!;
-    [SerializeField] AudioSource _musicAudioSource = null!;
     [SerializeField] float _crossFadeDuration = 2f;
 
     List<int> _shuffledIndices = new();
@@ -25,12 +24,12 @@ namespace Dreamcaller.Services
 
     public void Mute()
     {
-      _musicAudioSource.volume = 0;
+      Registry.Layout.MusicAudioSource.volume = 0;
     }
 
     public void Unmute()
     {
-      _musicAudioSource.volume = 1;
+      Registry.Layout.MusicAudioSource.volume = 1;
     }
 
     void ShufflePlaylist()
@@ -65,27 +64,27 @@ namespace Dreamcaller.Services
 
     IEnumerator CrossfadeToTrack(AudioClip nextTrack)
     {
-      float startVolume = _musicAudioSource.volume;
+      float startVolume = Registry.Layout.MusicAudioSource.volume;
       float elapsed = 0;
 
       // Fade out current track if playing
-      while (elapsed < _crossFadeDuration && _musicAudioSource.isPlaying)
+      while (elapsed < _crossFadeDuration && Registry.Layout.MusicAudioSource.isPlaying)
       {
         elapsed += Time.deltaTime;
-        _musicAudioSource.volume = Mathf.Lerp(startVolume, 0, elapsed / _crossFadeDuration);
+        Registry.Layout.MusicAudioSource.volume = Mathf.Lerp(startVolume, 0, elapsed / _crossFadeDuration);
         yield return null;
       }
 
       // Switch to new track
-      _musicAudioSource.clip = nextTrack;
-      _musicAudioSource.Play();
+      Registry.Layout.MusicAudioSource.clip = nextTrack;
+      Registry.Layout.MusicAudioSource.Play();
       elapsed = 0;
 
       // Fade in new track
       while (elapsed < _crossFadeDuration)
       {
         elapsed += Time.deltaTime;
-        _musicAudioSource.volume = Mathf.Lerp(0, startVolume, elapsed / _crossFadeDuration);
+        Registry.Layout.MusicAudioSource.volume = Mathf.Lerp(0, startVolume, elapsed / _crossFadeDuration);
         yield return null;
       }
     }
@@ -93,8 +92,9 @@ namespace Dreamcaller.Services
     IEnumerator MonitorTrackCompletion()
     {
       yield return new WaitUntil(() =>
-        !_musicAudioSource.isPlaying ||
-        (_musicAudioSource.clip && _musicAudioSource.time >= _musicAudioSource.clip.length - _crossFadeDuration));
+        !Registry.Layout.MusicAudioSource.isPlaying ||
+        (Registry.Layout.MusicAudioSource.clip &&
+        Registry.Layout.MusicAudioSource.time >= Registry.Layout.MusicAudioSource.clip.length - _crossFadeDuration));
 
       PlayNextTrack();
     }

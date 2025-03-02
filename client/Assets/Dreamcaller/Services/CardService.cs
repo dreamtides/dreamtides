@@ -50,20 +50,20 @@ namespace Dreamcaller.Services
       sequence.Insert(
         0,
         card.transform.DOMove(
-          Registry.DrawnCardsPosition.transform.position, moveDuration)
+          Registry.Layout.DrawnCardsPosition.transform.position, moveDuration)
             .SetEase(Ease.OutCubic));
       sequence.Insert(
         0,
-        card.transform.DORotateQuaternion(Registry.DrawnCardsPosition.transform.rotation, moveDuration));
+        card.transform.DORotateQuaternion(Registry.Layout.DrawnCardsPosition.transform.rotation, moveDuration));
       yield return new WaitForSeconds(moveDuration + command.PauseDuration.ToSeconds());
 
-      Registry.UserHand.Add(card);
-      Registry.UserHand.ApplyLayout(TweenUtils.Sequence("DrawUserCardMoveToHand"));
+      Registry.Layout.UserHand.Add(card);
+      Registry.Layout.UserHand.ApplyLayout(TweenUtils.Sequence("DrawUserCardMoveToHand"));
     }
 
     public bool IsPointerOverPlayCardArea()
     {
-      var ray = Registry.MainCamera.ScreenPointToRay(Registry.InputService.PointerPosition());
+      var ray = Registry.Layout.MainCamera.ScreenPointToRay(Registry.InputService.PointerPosition());
       var hits = Physics.RaycastNonAlloc(ray, _raycastHitsTempBuffer, 100);
       for (var i = 0; i < hits; ++i)
       {
