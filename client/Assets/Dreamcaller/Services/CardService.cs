@@ -14,9 +14,6 @@ namespace Dreamcaller.Services
   public class CardService : Service
   {
     readonly RaycastHit[] _raycastHitsTempBuffer = new RaycastHit[8];
-    [SerializeField] MeshCollider _playCardArea = null!;
-    [SerializeField] ObjectLayout _infoZoomLeft = null!;
-    [SerializeField] ObjectLayout _infoZoomRight = null!;
     Card? _currentInfoZoom;
 
     public IEnumerator HandleDrawUserCards(DrawUserCardsCommand command)
@@ -68,7 +65,7 @@ namespace Dreamcaller.Services
       for (var i = 0; i < hits; ++i)
       {
         var hit = _raycastHitsTempBuffer[i];
-        if (hit.collider == _playCardArea)
+        if (hit.collider == Registry.Layout.PlayCardArea)
         {
           return true;
         }
@@ -92,13 +89,13 @@ namespace Dreamcaller.Services
       _currentInfoZoom = card.CloneForInfoZoom();
       if (shouldShowOnLeft)
       {
-        _infoZoomLeft.Add(_currentInfoZoom);
-        _infoZoomLeft.ApplyLayout();
+        Registry.Layout.InfoZoomLeft.Add(_currentInfoZoom);
+        Registry.Layout.InfoZoomLeft.ApplyLayout();
       }
       else
       {
-        _infoZoomRight.Add(_currentInfoZoom);
-        _infoZoomRight.ApplyLayout();
+        Registry.Layout.InfoZoomRight.Add(_currentInfoZoom);
+        Registry.Layout.InfoZoomRight.ApplyLayout();
       }
 
       if (_currentInfoZoom.CardView.Revealed?.SupplementalCardInfo is { } info)

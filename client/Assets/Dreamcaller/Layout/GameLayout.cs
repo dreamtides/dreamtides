@@ -68,6 +68,15 @@ namespace Dreamcaller.Layout
     [SerializeField] GameMessage? _gameMessage;
     public GameMessage GameMessage => Check(_gameMessage);
 
+    [SerializeField] MeshCollider _playCardArea = null!;
+    public MeshCollider PlayCardArea => Check(_playCardArea);
+
+    [SerializeField] ObjectLayout _infoZoomLeft = null!;
+    public ObjectLayout InfoZoomLeft => Check(_infoZoomLeft);
+
+    [SerializeField] ObjectLayout _infoZoomRight = null!;
+    public ObjectLayout InfoZoomRight => Check(_infoZoomRight);
+
     T Check<T>(T? value) where T : UnityEngine.Object =>
         Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
   }
