@@ -22,6 +22,7 @@ namespace Dreamcaller.Layout
 
     float YPosition(int index, int count) => count switch
     {
+      _ when index >= count => 0.65f,
       0 => _singleElementY,
       1 => _singleElementY,
       2 => new[] { 0.4f, 0.6f }[index],

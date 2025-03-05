@@ -10,10 +10,11 @@ namespace Dreamcaller.Services
 {
   public class Registry : MonoBehaviour
   {
+    bool _isPortrait = false;
     [SerializeField] GameLayout? _portraitLayout;
     [SerializeField] GameLayout? _landscapeLayout;
 
-    public bool IsPortrait => Application.isMobilePlatform || (Application.isEditor && Screen.width < Screen.height);
+    public bool IsPortrait => _isPortrait;
 
     public GameLayout Layout =>
         IsPortrait ? Check(_portraitLayout) : Check(_landscapeLayout);
@@ -57,6 +58,18 @@ namespace Dreamcaller.Services
     void Start()
     {
       Application.targetFrameRate = 60;
+
+      _isPortrait = Screen.width < Screen.height;
+      if (_isPortrait)
+      {
+        Check(_portraitLayout).gameObject.SetActive(true);
+        Check(_landscapeLayout).gameObject.SetActive(false);
+      }
+      else
+      {
+        Check(_portraitLayout).gameObject.SetActive(false);
+        Check(_landscapeLayout).gameObject.SetActive(true);
+      }
 
       foreach (var service in GetComponentsInChildren<Service>())
       {

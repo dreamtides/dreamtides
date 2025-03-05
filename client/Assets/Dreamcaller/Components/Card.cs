@@ -177,7 +177,6 @@ namespace Dreamcaller.Components
       _cardImage.sprite = _registry.AssetService.GetSprite(revealed.Image.Address);
       _battlefieldCardImage.sprite = _registry.AssetService.GetSprite(revealed.Image.Address);
       _outline.material.SetInt("_Seed", UnityEngine.Random.Range(0, 9999));
-      _battlefieldOutline.material.SetInt("_Seed", UnityEngine.Random.Range(0, 9999));
 
       if (_cardTrail)
       {
@@ -319,8 +318,6 @@ namespace Dreamcaller.Components
         _battlefieldCardFront.gameObject.SetActive(true);
         _battlefieldSparkBackground.gameObject.SetActive(
             GameContext != GameContext.DiscardPile && CardView.Revealed?.Spark != null);
-        _battlefieldOutline.gameObject.SetActive(
-          CardView.Revealed?.Status == RevealedCardStatus.CanSelectNegative);
       }
       else
       {
