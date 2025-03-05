@@ -13,8 +13,10 @@ namespace Dreamcaller.Services
     [SerializeField] GameLayout? _portraitLayout;
     [SerializeField] GameLayout? _landscapeLayout;
 
+    public bool IsPortrait => Application.isMobilePlatform || (Application.isEditor && Screen.width < Screen.height);
+
     public GameLayout Layout =>
-        Application.isMobilePlatform ? Check(_portraitLayout) : Check(_landscapeLayout);
+        IsPortrait ? Check(_portraitLayout) : Check(_landscapeLayout);
 
     [SerializeField] LayoutService? _layoutService;
     public LayoutService LayoutService => Check(_layoutService);

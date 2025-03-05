@@ -314,6 +314,9 @@ fn scene_0(id: BattleId) -> BattleView {
             cards_in_position(Position::InHand(DisplayPlayer::Enemy), 105, 3),
             cards_in_position(Position::InVoid(DisplayPlayer::Enemy), 108, 6),
             cards_in_position(Position::InDeck(DisplayPlayer::Enemy), 114, 20),
+            cards_in_position(Position::OnBattlefield(DisplayPlayer::User), 533, 3),
+            cards_in_position(Position::OnBattlefield(DisplayPlayer::Enemy), 633, 3),
+            cards_in_position(Position::InHand(DisplayPlayer::Enemy), 733, 5),
         ]
         .concat()
         .to_vec(),
