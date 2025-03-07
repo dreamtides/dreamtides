@@ -55,7 +55,10 @@ namespace Dreamcaller.Services
     [SerializeField] MusicService? _musicService;
     public MusicService MusicService => Check(_musicService);
 
-    void Start()
+    [SerializeField] EnvironmentService? _environmentService;
+    public EnvironmentService EnvironmentService => Check(_environmentService);
+
+    void Awake()
     {
       Application.targetFrameRate = 60;
 
