@@ -71,11 +71,11 @@ namespace Dreamcaller.Layout
     [SerializeField] MeshCollider _playCardArea = null!;
     public MeshCollider PlayCardArea => Check(_playCardArea);
 
-    [SerializeField] RectTransform _infoZoomLeft = null!;
-    public RectTransform InfoZoomLeft => Check(_infoZoomLeft);
+    [SerializeField] Transform _infoZoomLeft = null!;
+    public Transform InfoZoomLeft => Check(_infoZoomLeft);
 
-    [SerializeField] RectTransform _infoZoomRight = null!;
-    public RectTransform InfoZoomRight => Check(_infoZoomRight);
+    [SerializeField] Transform _infoZoomRight = null!;
+    public Transform InfoZoomRight => Check(_infoZoomRight);
 
     T Check<T>(T? value) where T : UnityEngine.Object =>
         Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");

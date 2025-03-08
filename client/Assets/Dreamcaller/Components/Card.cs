@@ -124,9 +124,6 @@ namespace Dreamcaller.Components
       result._registry = _registry;
       result._isRevealed = _isRevealed;
       result.Parent = null;
-      result.transform.localPosition = Vector3.zero;
-      result.transform.localScale = Vector3.one;
-      result.transform.rotation = Quaternion.identity;
       result.GameContext = GameContext.InfoZoom;
       return result;
     }

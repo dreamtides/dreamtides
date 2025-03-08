@@ -3,7 +3,6 @@
 using System.Collections;
 using DG.Tweening;
 using Dreamcaller.Components;
-using Dreamcaller.Layout;
 using Dreamcaller.Masonry;
 using Dreamcaller.Schema;
 using Dreamcaller.Utils;
@@ -14,6 +13,7 @@ namespace Dreamcaller.Services
   public class CardService : Service
   {
     readonly RaycastHit[] _raycastHitsTempBuffer = new RaycastHit[8];
+    [SerializeField] GameObject _infoZoomContainer = null!;
     Card? _currentInfoZoom;
 
     public IEnumerator HandleDrawUserCards(DrawUserCardsCommand command)
@@ -87,15 +87,11 @@ namespace Dreamcaller.Services
       ClearInfoZoom();
       var shouldShowOnLeft = Registry.InputService.PointerPosition().x > Screen.width / 2.0;
       _currentInfoZoom = card.CloneForInfoZoom();
-
-      var infoZoomLayout = shouldShowOnLeft ? Registry.Layout.InfoZoomLeft : Registry.Layout.InfoZoomRight;
-      var screenPoint = TransformUtils.RectTransformToScreenSpace(infoZoomLayout).center;
-      var tmp = new Vector3(screenPoint.x, screenPoint.y, Registry.IsPortrait ? 10 : 8);
-      var anchor = Registry.Layout.MainCamera.ScreenToWorldPoint(tmp);
-      // Offset by half the card's world space size
-      var cardSizeOffset = new Vector3(shouldShowOnLeft ? 1.4f : -1.4f, 0, -1.85f);
-      _currentInfoZoom.transform.position = anchor + cardSizeOffset;
-      _currentInfoZoom.transform.rotation = Quaternion.Euler(Constants.CameraXAngle, Registry.IsPortrait ? 0 : 90, 0);
+      var anchor = shouldShowOnLeft ? Registry.Layout.InfoZoomLeft : Registry.Layout.InfoZoomRight;
+      _currentInfoZoom.transform.SetParent(anchor);
+      _currentInfoZoom.transform.localPosition = Vector3.zero;
+      _currentInfoZoom.transform.localScale = Vector3.one;
+      _currentInfoZoom.transform.forward = anchor.forward;
 
       if (_currentInfoZoom.CardView.Revealed?.SupplementalCardInfo is { } info)
       {
