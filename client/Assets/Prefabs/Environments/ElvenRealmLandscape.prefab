@@ -8,17 +8,57 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3146134242075428511, guid: 68cbaf29c2e494f79b330c9328c8d165, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 12.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 3146134242075428511, guid: 68cbaf29c2e494f79b330c9328c8d165, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -5.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3217396595651455097, guid: 68cbaf29c2e494f79b330c9328c8d165, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 8.64
+      objectReference: {fileID: 0}
+    - target: {fileID: 3217396595651455097, guid: 68cbaf29c2e494f79b330c9328c8d165, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -6.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 7198058949206307976, guid: 68cbaf29c2e494f79b330c9328c8d165, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 7198058949206307976, guid: 68cbaf29c2e494f79b330c9328c8d165, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 15.13
+      objectReference: {fileID: 0}
+    - target: {fileID: 7406361877519362743, guid: 68cbaf29c2e494f79b330c9328c8d165, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -4.27
+      objectReference: {fileID: 0}
+    - target: {fileID: 7406361877519362743, guid: 68cbaf29c2e494f79b330c9328c8d165, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -11.29
+      objectReference: {fileID: 0}
+    - target: {fileID: 7620758882750012391, guid: 68cbaf29c2e494f79b330c9328c8d165, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.96
+      objectReference: {fileID: 0}
+    - target: {fileID: 7620758882750012391, guid: 68cbaf29c2e494f79b330c9328c8d165, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 15.83
+      objectReference: {fileID: 0}
     - target: {fileID: 8205827746083705650, guid: 68cbaf29c2e494f79b330c9328c8d165, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8205827746083705650, guid: 68cbaf29c2e494f79b330c9328c8d165, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 8205827746083705650, guid: 68cbaf29c2e494f79b330c9328c8d165, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.95
       objectReference: {fileID: 0}
     - target: {fileID: 8205827746083705650, guid: 68cbaf29c2e494f79b330c9328c8d165, type: 3}
       propertyPath: m_LocalRotation.w
@@ -50,10 +90,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8726779211575337287, guid: 68cbaf29c2e494f79b330c9328c8d165, type: 3}
       propertyPath: m_Name
-      value: ElvenRealm
+      value: ElvenRealmLandscape
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 1509513481453184845, guid: 68cbaf29c2e494f79b330c9328c8d165, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 68cbaf29c2e494f79b330c9328c8d165, type: 3}
