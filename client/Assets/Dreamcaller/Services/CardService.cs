@@ -87,16 +87,15 @@ namespace Dreamcaller.Services
       ClearInfoZoom();
       var shouldShowOnLeft = Registry.InputService.PointerPosition().x > Screen.width / 2.0;
       _currentInfoZoom = card.CloneForInfoZoom();
-      if (shouldShowOnLeft)
-      {
-        Registry.Layout.InfoZoomLeft.Add(_currentInfoZoom);
-        Registry.Layout.InfoZoomLeft.ApplyLayout();
-      }
-      else
-      {
-        Registry.Layout.InfoZoomRight.Add(_currentInfoZoom);
-        Registry.Layout.InfoZoomRight.ApplyLayout();
-      }
+
+      var infoZoomLayout = shouldShowOnLeft ? Registry.Layout.InfoZoomLeft : Registry.Layout.InfoZoomRight;
+      var screenPoint = TransformUtils.RectTransformToScreenSpace(infoZoomLayout).center;
+      var tmp = new Vector3(screenPoint.x, screenPoint.y, Registry.IsPortrait ? 10 : 8);
+      var anchor = Registry.Layout.MainCamera.ScreenToWorldPoint(tmp);
+      // Offset by half the card's world space size
+      var cardSizeOffset = new Vector3(shouldShowOnLeft ? 1.4f : -1.4f, 0, -1.85f);
+      _currentInfoZoom.transform.position = anchor + cardSizeOffset;
+      _currentInfoZoom.transform.rotation = Quaternion.Euler(Constants.CameraXAngle, Registry.IsPortrait ? 0 : 90, 0);
 
       if (_currentInfoZoom.CardView.Revealed?.SupplementalCardInfo is { } info)
       {
