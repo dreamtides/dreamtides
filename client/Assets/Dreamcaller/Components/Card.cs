@@ -25,7 +25,7 @@ namespace Dreamcaller.Components
     [SerializeField] DissolveEffect _cardImageDissolve = null!;
     [SerializeField] Renderer _cardBack = null!;
     [SerializeField] Renderer _outline = null!;
-    [SerializeField] Renderer _battlefieldOutline = null!;
+    [SerializeField] SpriteRenderer _battlefieldOutline = null!;
     [SerializeField] TextMeshPro _costText = null!;
     [SerializeField] Renderer _sparkBackground = null!;
     [SerializeField] TextMeshPro _sparkText = null!;
@@ -174,6 +174,13 @@ namespace Dreamcaller.Components
       _cardImage.sprite = _registry.AssetService.GetSprite(revealed.Image.Address);
       _battlefieldCardImage.sprite = _registry.AssetService.GetSprite(revealed.Image.Address);
       _outline.material.SetInt("_Seed", UnityEngine.Random.Range(0, 9999));
+      _battlefieldOutline.color = revealed.Status switch
+      {
+        RevealedCardStatus.CanSelectNegative => new Color(0.9f, 0f, 0f),
+        RevealedCardStatus.CanSelectPositive => new Color(0f, 0.9f, 0f),
+        RevealedCardStatus.Selected => new Color(0f, 0f, 0.9f),
+        _ => new Color(0.9f, 0.9f, 0.9f)
+      };
 
       if (_cardTrail)
       {
