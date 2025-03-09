@@ -77,7 +77,13 @@ namespace Dreamcaller.Layout
     [SerializeField] Transform _infoZoomRight = null!;
     public Transform InfoZoomRight => Check(_infoZoomRight);
 
-    T Check<T>(T? value) where T : UnityEngine.Object =>
+    [SerializeField] Transform _supplementalCardInfoLeft = null!;
+    public Transform SupplementalCardInfoLeft => Check(_supplementalCardInfoLeft);
+
+    [SerializeField] Transform _supplementalCardInfoRight = null!;
+    public Transform SupplementalCardInfoRight => Check(_supplementalCardInfoRight);
+
+    T Check<T>(T? value) where T : Object =>
         Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
   }
 }

@@ -733,7 +733,8 @@ Transform:
   m_LocalPosition: {x: 1.25, y: 0, z: -1.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 771826220}
   m_Father: {fileID: 837311875}
   m_LocalEulerAnglesHint: {x: 75, y: 0, z: 0}
 --- !u!1001 &54685874
@@ -2047,7 +2048,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: \uf188 Bug
+  m_text: Cheat
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 092441523ab71452fa05820df56a047e, type: 2}
   m_sharedMaterial: {fileID: -3468430125157895141, guid: 092441523ab71452fa05820df56a047e, type: 2}
@@ -12247,6 +12248,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4962039562683002, guid: bbc12ae2f967ec04e8c3c39eeb92733b, type: 3}
   m_PrefabInstance: {fileID: 770366790}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &771826219
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 771826220}
+  m_Layer: 0
+  m_Name: LeftContainerSupplemental
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &771826220
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 771826219}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.60876137, y: -0, z: -0, w: 0.7933534}
+  m_LocalPosition: {x: 1.3, y: 1.4, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 48821750}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &782002771
 GameObject:
   m_ObjectHideFlags: 0
@@ -12766,7 +12798,7 @@ GameObject:
   - component: {fileID: 794038736}
   - component: {fileID: 794038735}
   m_Layer: 5
-  m_Name: BugButton
+  m_Name: CheatButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13176,6 +13208,7 @@ RectTransform:
   - {fileID: 794038734}
   - {fileID: 956895792}
   - {fileID: 1149104254}
+  - {fileID: 1493806307}
   m_Father: {fileID: 1552810619}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
@@ -18988,6 +19021,37 @@ Material:
     - _ShineColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
+--- !u!1 &1146880179
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1146880180}
+  m_Layer: 0
+  m_Name: RightContainerSupplemental
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1146880180
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1146880179}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.60876137, y: -0, z: -0, w: 0.7933534}
+  m_LocalPosition: {x: -1.3, y: 1.4, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1649505033}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1149104253
 GameObject:
   m_ObjectHideFlags: 0
@@ -21518,6 +21582,8 @@ MonoBehaviour:
   _playCardArea: {fileID: 1619803302}
   _infoZoomLeft: {fileID: 48821750}
   _infoZoomRight: {fileID: 1649505033}
+  _supplementalCardInfoLeft: {fileID: 771826220}
+  _supplementalCardInfoRight: {fileID: 1146880180}
 --- !u!1001 &1305588118
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22722,6 +22788,8 @@ MonoBehaviour:
   _playCardArea: {fileID: 1769063852}
   _infoZoomLeft: {fileID: 1576221497}
   _infoZoomRight: {fileID: 267398375}
+  _supplementalCardInfoLeft: {fileID: 0}
+  _supplementalCardInfoRight: {fileID: 0}
 --- !u!1001 &1436808300
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23081,7 +23149,7 @@ GameObject:
   - component: {fileID: 1455934549}
   - component: {fileID: 1455934548}
   m_Layer: 5
-  m_Name: CheatButton
+  m_Name: BugButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23431,6 +23499,81 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 568955153227547005, guid: a41d38262995b4547b50efac0518ad65, type: 3}
   m_PrefabInstance: {fileID: 1487012673}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1493806306
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1493806307}
+  - component: {fileID: 1493806309}
+  - component: {fileID: 1493806308}
+  m_Layer: 5
+  m_Name: Square
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1493806307
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1493806306}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 811111597}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 10, y: -60}
+  m_SizeDelta: {x: 5, y: 5}
+  m_Pivot: {x: 0, y: 1}
+--- !u!114 &1493806308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1493806306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: fab06e0be9375cc4d823efa71629885c, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1493806309
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1493806306}
+  m_CullTransparentMesh: 1
 --- !u!1001 &1501915096
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24939,7 +25082,8 @@ Transform:
   m_LocalPosition: {x: -1.25, y: 0, z: -1.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1146880180}
   m_Father: {fileID: 1199308783}
   m_LocalEulerAnglesHint: {x: 75, y: 0, z: 0}
 --- !u!1 &1652450121
@@ -28234,7 +28378,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Cheat
+  m_text: \uf188 Bug
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 092441523ab71452fa05820df56a047e, type: 2}
   m_sharedMaterial: {fileID: -3468430125157895141, guid: 092441523ab71452fa05820df56a047e, type: 2}

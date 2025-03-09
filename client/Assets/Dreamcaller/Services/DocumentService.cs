@@ -32,7 +32,27 @@ namespace Dreamcaller.Services
       return false;
     }
 
-    public float ScreenPxToElementPx(float value) => value * _document.panelSettings.referenceDpi / Screen.dpi;
+    public float ScreenPxToElementPx(float value)
+    {
+      return value * _document.panelSettings.referenceDpi / Screen.dpi;
+    }
+
+    /// <summary>
+    /// Converts a position from Screen coordinates to Element coordinates.
+    ///
+    /// Screen space is defined in pixels. The lower left pixel of the screen
+    /// is (0, 0). The upper right pixel of the screen is
+    /// (screen width in pixels - 1, screen height in pixels - 1).
+    ///
+    /// Element space is defined in density-independent 'pixels' based on a
+    /// given reference DPI with (0, 0) appearing in the top right corner of the
+    /// screen.
+    /// </summary>
+    public Vector2 ScreenPositionToElementPosition(Vector2 screenPosition) =>
+  new(
+    ScreenPxToElementPx(screenPosition.x),
+    ScreenPxToElementPx(Screen.height - screenPosition.y)
+  );
 
     public void RenderScreenOverlay(FlexNode? node)
     {

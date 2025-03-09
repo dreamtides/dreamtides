@@ -551,7 +551,6 @@ fn flex_node(text: impl Into<String>) -> Option<FlexNode> {
         }),
         color: Some(DisplayColor { red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0 }),
         font_size: Some(Dimension { unit: DimensionUnit::Pixels, value: 14.0 }),
-        max_width: Some(Dimension { unit: DimensionUnit::Percentage, value: 80.0 }),
         min_height: Some(Dimension { unit: DimensionUnit::Pixels, value: 44.0 }),
         white_space: Some(WhiteSpace::Normal),
         ..Default::default()

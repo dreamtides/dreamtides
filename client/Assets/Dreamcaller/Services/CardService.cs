@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using System.Collections;
 using DG.Tweening;
 using Dreamcaller.Components;
@@ -100,18 +101,26 @@ namespace Dreamcaller.Services
 
       if (_currentInfoZoom.CardView.Revealed?.SupplementalCardInfo is { } info)
       {
+        var infoAnchor = shouldShowOnLeft ?
+            Registry.Layout.SupplementalCardInfoLeft : Registry.Layout.SupplementalCardInfoRight;
+        var screenPosition = Registry.Layout.MainCamera.WorldToScreenPoint(infoAnchor.position);
+        var width = Mathf.Min(275f, Registry.DocumentService.ScreenPxToElementPx(Screen.width / 2.2f));
+
         var node = Mason.Row("InfoZoom",
           new FlexStyle
           {
             Position = FlexPosition.Absolute,
-            Height = Mason.Px(160),
+            Width = Mason.Px(width),
             JustifyContent = shouldShowOnLeft ? FlexJustify.FlexStart : FlexJustify.FlexEnd,
             AlignItems = FlexAlign.FlexStart,
-            Inset = new FlexInsets()
+            Inset = shouldShowOnLeft ? new FlexInsets()
             {
-              Bottom = Mason.Px(200),
-              Left = Mason.Px(0),
-              Right = Mason.Px(0),
+              Left = Mason.Px(Registry.DocumentService.ScreenPxToElementPx(screenPosition.x)),
+              Top = Mason.Px(Registry.DocumentService.ScreenPxToElementPx(Screen.height - screenPosition.y)),
+            } : new FlexInsets()
+            {
+              Right = Mason.Px(Registry.DocumentService.ScreenPxToElementPx(Screen.width - screenPosition.x)),
+              Top = Mason.Px(Registry.DocumentService.ScreenPxToElementPx(Screen.height - screenPosition.y)),
             },
           },
           info
