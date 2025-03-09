@@ -596,7 +596,7 @@ fn select_target_message() -> FlexNode {
             inset: Some(FlexInsets {
                 top: None,
                 right: Some(Dimension { unit: DimensionUnit::Pixels, value: 32.0 }),
-                bottom: Some(Dimension { unit: DimensionUnit::Pixels, value: 150.0 }),
+                bottom: Some(Dimension { unit: DimensionUnit::Pixels, value: 50.0 }),
                 left: Some(Dimension { unit: DimensionUnit::Pixels, value: 32.0 }),
             }),
             ..Default::default()
