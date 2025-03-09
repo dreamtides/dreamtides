@@ -87,6 +87,11 @@ namespace Dreamcaller.Services
       ClearInfoZoom();
       var shouldShowOnLeft = Registry.InputService.PointerPosition().x > Screen.width / 2.0;
       _currentInfoZoom = card.CloneForInfoZoom();
+      if (_currentInfoZoom.SortingGroup)
+      {
+        _currentInfoZoom.SortingGroup.sortingLayerName = "Top";
+      }
+
       var anchor = shouldShowOnLeft ? Registry.Layout.InfoZoomLeft : Registry.Layout.InfoZoomRight;
       _currentInfoZoom.transform.SetParent(anchor);
       _currentInfoZoom.transform.localPosition = Vector3.zero;
