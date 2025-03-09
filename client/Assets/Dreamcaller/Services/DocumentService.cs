@@ -34,7 +34,7 @@ namespace Dreamcaller.Services
 
     public float ScreenPxToElementPx(float value)
     {
-      return value * _document.panelSettings.referenceDpi / Screen.dpi;
+      return value * (400f / Screen.height);
     }
 
     /// <summary>
