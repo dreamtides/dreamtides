@@ -192,13 +192,13 @@ namespace Dreamcaller.Schema
         public CardId CardId { get; set; }
 
         [JsonProperty("deck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? Deck { get; set; }
+        public PlayerName? Deck { get; set; }
 
         [JsonProperty("void", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? Void { get; set; }
+        public PlayerName? Void { get; set; }
 
         [JsonProperty("avatar", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? Avatar { get; set; }
+        public PlayerName? Avatar { get; set; }
     }
 
     /// <summary>
@@ -379,25 +379,25 @@ namespace Dreamcaller.Schema
     public partial class PositionClass
     {
         [JsonProperty("selectingTargets", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? SelectingTargets { get; set; }
+        public PlayerName? SelectingTargets { get; set; }
 
         [JsonProperty("inHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? InHand { get; set; }
+        public PlayerName? InHand { get; set; }
 
         [JsonProperty("onTopOfDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? OnTopOfDeck { get; set; }
+        public PlayerName? OnTopOfDeck { get; set; }
 
         [JsonProperty("inDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? InDeck { get; set; }
+        public PlayerName? InDeck { get; set; }
 
         [JsonProperty("inVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? InVoid { get; set; }
+        public PlayerName? InVoid { get; set; }
 
         [JsonProperty("inBanished", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? InBanished { get; set; }
+        public PlayerName? InBanished { get; set; }
 
         [JsonProperty("onBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? OnBattlefield { get; set; }
+        public PlayerName? OnBattlefield { get; set; }
 
         [JsonProperty("hiddenWithinCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardId HiddenWithinCard { get; set; }
@@ -518,6 +518,8 @@ namespace Dreamcaller.Schema
     /// An action that can be performed in a battle
     ///
     /// Set a card as a target of the card currently being played.
+    ///
+    /// Show cards in a zone
     /// </summary>
     public partial class BattleAction
     {
@@ -526,6 +528,9 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("selectTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardId SelectTarget { get; set; }
+
+        [JsonProperty("browseCards", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public CardBrowserType? BrowseCards { get; set; }
     }
 
     /// <summary>
@@ -1299,13 +1304,13 @@ namespace Dreamcaller.Schema
     }
 
     /// <summary>
-    /// Identifies a player in the context of the user interface.
+    /// Identifies a player in an ongoing battle.
     ///
     /// Player who is currently operating the client
     ///
     /// Opponent of user, i.e. the AI enemy
     /// </summary>
-    public enum DisplayPlayer { Enemy, User };
+    public enum PlayerName { Enemy, User };
 
     public enum GameMessageType { Defeat, EnemyTurn, Victory, YourTurn };
 
@@ -1340,6 +1345,8 @@ namespace Dreamcaller.Schema
     /// Represents the general category of card being displayed.
     /// </summary>
     public enum CardPrefab { Default, Dreamwell, Token };
+
+    public enum CardBrowserType { EnemyDeck, EnemyStatus, EnemyVoid, UserDeck, UserStatus, UserVoid };
 
     /// <summary>
     /// Private actions for developer use
@@ -1423,12 +1430,13 @@ namespace Dreamcaller.Schema
             DateParseHandling = DateParseHandling.None,
             Converters =
             {
-                DisplayPlayerConverter.Singleton,
+                PlayerNameConverter.Singleton,
                 GameMessageTypeConverter.Singleton,
                 CardFacingConverter.Singleton,
                 PositionConverter.Singleton,
                 PositionEnumConverter.Singleton,
                 CardPrefabConverter.Singleton,
+                CardBrowserTypeConverter.Singleton,
                 DebugActionConverter.Singleton,
                 CardFrameConverter.Singleton,
                 RevealedCardStatusConverter.Singleton,
@@ -1456,9 +1464,9 @@ namespace Dreamcaller.Schema
         };
     }
 
-    internal class DisplayPlayerConverter : JsonConverter
+    internal class PlayerNameConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(DisplayPlayer) || t == typeof(DisplayPlayer?);
+        public override bool CanConvert(Type t) => t == typeof(PlayerName) || t == typeof(PlayerName?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -1467,11 +1475,11 @@ namespace Dreamcaller.Schema
             switch (value)
             {
                 case "enemy":
-                    return DisplayPlayer.Enemy;
+                    return PlayerName.Enemy;
                 case "user":
-                    return DisplayPlayer.User;
+                    return PlayerName.User;
             }
-            throw new Exception("Cannot unmarshal type DisplayPlayer");
+            throw new Exception("Cannot unmarshal type PlayerName");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -1481,20 +1489,20 @@ namespace Dreamcaller.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (DisplayPlayer)untypedValue;
+            var value = (PlayerName)untypedValue;
             switch (value)
             {
-                case DisplayPlayer.Enemy:
+                case PlayerName.Enemy:
                     serializer.Serialize(writer, "enemy");
                     return;
-                case DisplayPlayer.User:
+                case PlayerName.User:
                     serializer.Serialize(writer, "user");
                     return;
             }
-            throw new Exception("Cannot marshal type DisplayPlayer");
+            throw new Exception("Cannot marshal type PlayerName");
         }
 
-        public static readonly DisplayPlayerConverter Singleton = new DisplayPlayerConverter();
+        public static readonly PlayerNameConverter Singleton = new PlayerNameConverter();
     }
 
     internal class GameMessageTypeConverter : JsonConverter
@@ -1776,6 +1784,67 @@ namespace Dreamcaller.Schema
         }
 
         public static readonly CardPrefabConverter Singleton = new CardPrefabConverter();
+    }
+
+    internal class CardBrowserTypeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(CardBrowserType) || t == typeof(CardBrowserType?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "enemyDeck":
+                    return CardBrowserType.EnemyDeck;
+                case "enemyStatus":
+                    return CardBrowserType.EnemyStatus;
+                case "enemyVoid":
+                    return CardBrowserType.EnemyVoid;
+                case "userDeck":
+                    return CardBrowserType.UserDeck;
+                case "userStatus":
+                    return CardBrowserType.UserStatus;
+                case "userVoid":
+                    return CardBrowserType.UserVoid;
+            }
+            throw new Exception("Cannot unmarshal type CardBrowserType");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (CardBrowserType)untypedValue;
+            switch (value)
+            {
+                case CardBrowserType.EnemyDeck:
+                    serializer.Serialize(writer, "enemyDeck");
+                    return;
+                case CardBrowserType.EnemyStatus:
+                    serializer.Serialize(writer, "enemyStatus");
+                    return;
+                case CardBrowserType.EnemyVoid:
+                    serializer.Serialize(writer, "enemyVoid");
+                    return;
+                case CardBrowserType.UserDeck:
+                    serializer.Serialize(writer, "userDeck");
+                    return;
+                case CardBrowserType.UserStatus:
+                    serializer.Serialize(writer, "userStatus");
+                    return;
+                case CardBrowserType.UserVoid:
+                    serializer.Serialize(writer, "userVoid");
+                    return;
+            }
+            throw new Exception("Cannot marshal type CardBrowserType");
+        }
+
+        public static readonly CardBrowserTypeConverter Singleton = new CardBrowserTypeConverter();
     }
 
     internal class DebugActionConverter : JsonConverter

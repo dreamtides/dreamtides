@@ -10,3 +10,16 @@ pub enum CardFacing {
     FaceDown,
     FaceUp,
 }
+
+/// Identifies a player in an ongoing battle.
+#[derive(
+    Clone, Debug, Eq, PartialEq, Copy, Hash, Ord, PartialOrd, Serialize, Deserialize, JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
+pub enum PlayerName {
+    /// Player who is currently operating the client
+    User,
+
+    /// Opponent of user, i.e. the AI enemy
+    Enemy,
+}

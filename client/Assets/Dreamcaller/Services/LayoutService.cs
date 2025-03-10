@@ -96,8 +96,8 @@ namespace Dreamcaller.Services
       {
         return deck switch
         {
-          DisplayPlayer.User => Registry.Layout.UserDeck,
-          DisplayPlayer.Enemy => Registry.Layout.EnemyDeck,
+          PlayerName.User => Registry.Layout.UserDeck,
+          PlayerName.Enemy => Registry.Layout.EnemyDeck,
           _ => throw Errors.UnknownEnumValue(deck)
         };
       }
@@ -106,8 +106,8 @@ namespace Dreamcaller.Services
       {
         return voidPile switch
         {
-          DisplayPlayer.User => Registry.Layout.UserVoid,
-          DisplayPlayer.Enemy => Registry.Layout.EnemyVoid,
+          PlayerName.User => Registry.Layout.UserVoid,
+          PlayerName.Enemy => Registry.Layout.EnemyVoid,
           _ => throw Errors.UnknownEnumValue(voidPile)
         };
       }
@@ -116,8 +116,8 @@ namespace Dreamcaller.Services
       {
         return avatar switch
         {
-          DisplayPlayer.User => Registry.Layout.UserAvatar,
-          DisplayPlayer.Enemy => Registry.Layout.EnemyAvatar,
+          PlayerName.User => Registry.Layout.UserAvatar,
+          PlayerName.Enemy => Registry.Layout.EnemyAvatar,
           _ => throw Errors.UnknownEnumValue(avatar)
         };
       }
@@ -250,8 +250,8 @@ namespace Dreamcaller.Services
       {
         return inHand switch
         {
-          DisplayPlayer.User => Registry.Layout.UserHand,
-          DisplayPlayer.Enemy => Registry.Layout.EnemyHand,
+          PlayerName.User => Registry.Layout.UserHand,
+          PlayerName.Enemy => Registry.Layout.EnemyHand,
           _ => throw Errors.UnknownEnumValue(inHand),
         };
       }
@@ -260,8 +260,8 @@ namespace Dreamcaller.Services
       {
         return inDeck switch
         {
-          DisplayPlayer.User => Registry.Layout.UserDeck,
-          DisplayPlayer.Enemy => Registry.Layout.EnemyDeck,
+          PlayerName.User => Registry.Layout.UserDeck,
+          PlayerName.Enemy => Registry.Layout.EnemyDeck,
           _ => throw Errors.UnknownEnumValue(inDeck),
         };
       }
@@ -270,8 +270,8 @@ namespace Dreamcaller.Services
       {
         return onBattlefield switch
         {
-          DisplayPlayer.User => Registry.Layout.UserBattlefield,
-          DisplayPlayer.Enemy => Registry.Layout.EnemyBattlefield,
+          PlayerName.User => Registry.Layout.UserBattlefield,
+          PlayerName.Enemy => Registry.Layout.EnemyBattlefield,
           _ => throw Errors.UnknownEnumValue(onBattlefield),
         };
       }
@@ -280,8 +280,8 @@ namespace Dreamcaller.Services
       {
         return inVoid switch
         {
-          DisplayPlayer.User => Registry.Layout.UserVoid,
-          DisplayPlayer.Enemy => Registry.Layout.EnemyVoid,
+          PlayerName.User => Registry.Layout.UserVoid,
+          PlayerName.Enemy => Registry.Layout.EnemyVoid,
           _ => throw Errors.UnknownEnumValue(inVoid),
         };
       }
@@ -290,8 +290,8 @@ namespace Dreamcaller.Services
       {
         return selectingTargets switch
         {
-          DisplayPlayer.User => Registry.Layout.SelectingTargetsUser,
-          DisplayPlayer.Enemy => Registry.Layout.SelectingTargetsEnemy,
+          PlayerName.User => Registry.Layout.SelectingTargetsUser,
+          PlayerName.Enemy => Registry.Layout.SelectingTargetsEnemy,
           _ => throw Errors.UnknownEnumValue(selectingTargets),
         };
       }

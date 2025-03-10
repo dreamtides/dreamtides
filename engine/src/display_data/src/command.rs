@@ -1,10 +1,11 @@
 use core_data::display_types::{AudioClipAddress, EffectAddress, Milliseconds, ProjectileAddress};
 use core_data::identifiers::CardId;
+use core_data::types::PlayerName;
 use masonry::flex_style::FlexVector3;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::battle_view::{BattleView, DisplayPlayer};
+use crate::battle_view::BattleView;
 use crate::card_view::CardView;
 use crate::object_position::ObjectPosition;
 
@@ -169,9 +170,9 @@ pub struct DrawUserCardsCommand {
 #[serde(rename_all = "camelCase")]
 pub enum GameObjectId {
     CardId(CardId),
-    Deck(DisplayPlayer),
-    Void(DisplayPlayer),
-    Avatar(DisplayPlayer),
+    Deck(PlayerName),
+    Void(PlayerName),
+    Avatar(PlayerName),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

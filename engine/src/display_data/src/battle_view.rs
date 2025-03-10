@@ -59,19 +59,6 @@ pub enum ButtonKind {
     Default,
 }
 
-/// Identifies a player in the context of the user interface.
-#[derive(
-    Clone, Debug, Eq, PartialEq, Copy, Hash, Ord, PartialOrd, Serialize, Deserialize, JsonSchema,
-)]
-#[serde(rename_all = "camelCase")]
-pub enum DisplayPlayer {
-    /// Player who is currently operating the client
-    User,
-
-    /// Opponent of user, i.e. the AI enemy
-    Enemy,
-}
-
 /// Represents the visual state of a player in a game
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]

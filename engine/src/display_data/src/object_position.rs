@@ -1,8 +1,7 @@
 use core_data::identifiers::CardId;
+use core_data::types::PlayerName;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-
-use crate::battle_view::DisplayPlayer;
 
 /// Represents the position of some object in the UI
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
@@ -37,7 +36,7 @@ pub enum Position {
 
     /// The user is selecting targets for this card from among characters
     /// controlled by the indicated player.
-    SelectingTargets(DisplayPlayer),
+    SelectingTargets(PlayerName),
 
     /// Object is on the stack
     OnStack,
@@ -47,22 +46,22 @@ pub enum Position {
     Drawn,
 
     /// Object is in a player's hand
-    InHand(DisplayPlayer),
+    InHand(PlayerName),
 
     /// Object is on top of a player's deck
-    OnTopOfDeck(DisplayPlayer),
+    OnTopOfDeck(PlayerName),
 
     /// Object is shuffled into a player's deck
-    InDeck(DisplayPlayer),
+    InDeck(PlayerName),
 
     /// Object is in a player's void
-    InVoid(DisplayPlayer),
+    InVoid(PlayerName),
 
     /// Object is in this player's banished zone
-    InBanished(DisplayPlayer),
+    InBanished(PlayerName),
 
     /// Object is on the battlefield
-    OnBattlefield(DisplayPlayer),
+    OnBattlefield(PlayerName),
 
     /// Object is being displayed in a card browser, e.g. to select from a list
     /// of cards while searching

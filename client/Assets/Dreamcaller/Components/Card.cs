@@ -202,7 +202,8 @@ namespace Dreamcaller.Components
       ToggleActiveElements();
     }
 
-    public override bool CanHandleMouseEvents() => true;
+    public override bool CanHandleMouseEvents() =>
+        GameContext != GameContext.Deck && GameContext != GameContext.DiscardPile;
 
     protected override void OnSetGameContext(GameContext oldContext, GameContext newContext)
     {

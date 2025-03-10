@@ -9,8 +9,8 @@ use core_data::display_types::{
 };
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
-use core_data::types::CardFacing;
-use display_data::battle_view::{BattleView, DisplayPlayer, InterfaceView, PlayerView};
+use core_data::types::{CardFacing, PlayerName};
+use display_data::battle_view::{BattleView, InterfaceView, PlayerView};
 use display_data::card_view::{
     CardActions, CardEffects, CardFrame, CardPrefab, CardView, DisplayImage, RevealedCardStatus,
     RevealedCardView,
@@ -72,14 +72,14 @@ fn draw_card(battle: &mut BattleView) -> Option<CardView> {
     if let Some(deck_card) = battle
         .cards
         .iter()
-        .find(|c| matches!(c.position.position, Position::InDeck(DisplayPlayer::User)))
+        .find(|c| matches!(c.position.position, Position::InDeck(PlayerName::User)))
     {
         let card_id = deck_card.id;
         let sorting_key = deck_card.position.sorting_key;
         if let Some(card_index) = battle.cards.iter().position(|c| c.id == card_id) {
             let mut shown_drawn = battle.clone();
             shown_drawn.cards[card_index] = card_view(Position::Drawn, sorting_key);
-            let view = card_view(Position::InHand(DisplayPlayer::User), sorting_key);
+            let view = card_view(Position::InHand(PlayerName::User), sorting_key);
             battle.cards[card_index] = view.clone();
             *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
             Some(view)
@@ -107,7 +107,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                     for card in battle.cards.iter_mut() {
                         if matches!(
                             card.position.position,
-                            Position::OnBattlefield(DisplayPlayer::Enemy)
+                            Position::OnBattlefield(PlayerName::Enemy)
                         ) {
                             if let Some(revealed) = &mut card.revealed {
                                 revealed.actions.on_click = Some(UserAction::BattleAction(
@@ -117,14 +117,14 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                             }
                         }
                     }
-                    Position::SelectingTargets(DisplayPlayer::Enemy)
+                    Position::SelectingTargets(PlayerName::Enemy)
                 } else if sorting_key % 5 == 2 {
                     battle.cards[card_index] = card_view(Position::OnStack, sorting_key);
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
                     let c1 = draw_card(&mut battle);
                     let c2 = draw_card(&mut battle);
                     commands.push(Command::DisplayEffect(DisplayEffectCommand {
-                        target: GameObjectId::Deck(DisplayPlayer::User),
+                        target: GameObjectId::Deck(PlayerName::User),
                         effect: EffectAddress::new("Assets/ThirdParty/Hovl Studio/Magic circles/Prefabs/Magic circle 1 Variant.prefab"),
                         duration: Milliseconds::new(100),
                         scale: FlexVector3::one(),
@@ -135,11 +135,11 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                         stagger_interval: Milliseconds::new(300),
                         pause_duration: Milliseconds::new(100),
                     }));
-                    Position::InVoid(DisplayPlayer::User)
+                    Position::InVoid(PlayerName::User)
                 } else if sorting_key % 5 == 0 {
                     let mut battle_clone = battle.clone();
                     battle_clone.cards[card_index] =
-                        card_view(Position::OnBattlefield(DisplayPlayer::User), sorting_key);
+                        card_view(Position::OnBattlefield(PlayerName::User), sorting_key);
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(
                         battle_clone.clone(),
                     )));
@@ -160,7 +160,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                     commands.push(Command::Wait(Milliseconds::new(1000)));
                     let c1 = draw_card(&mut battle);
                     commands.push(Command::DisplayEffect(DisplayEffectCommand {
-                        target: GameObjectId::Deck(DisplayPlayer::User),
+                        target: GameObjectId::Deck(PlayerName::User),
                         effect: EffectAddress::new("Assets/ThirdParty/Hovl Studio/Magic circles/Prefabs/Magic circle 1 Variant.prefab"),
                         duration: Milliseconds::new(100),
                         scale: FlexVector3::one(),
@@ -171,9 +171,9 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                         stagger_interval: Milliseconds::new(300),
                         pause_duration: Milliseconds::new(100),
                     }));
-                    Position::OnBattlefield(DisplayPlayer::User)
+                    Position::OnBattlefield(PlayerName::User)
                 } else {
-                    Position::OnBattlefield(DisplayPlayer::User)
+                    Position::OnBattlefield(PlayerName::User)
                 };
                 battle.cards[card_index] = card_view(position, sorting_key);
             }
@@ -194,7 +194,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                     if card.id == card_id
                         || matches!(
                             card.position.position,
-                            Position::SelectingTargets(DisplayPlayer::Enemy)
+                            Position::SelectingTargets(PlayerName::Enemy)
                         )
                     {
                         Some((index, card.position.sorting_key))
@@ -211,7 +211,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 .find_map(|card| {
                     if matches!(
                         card.position.position,
-                        Position::SelectingTargets(DisplayPlayer::Enemy)
+                        Position::SelectingTargets(PlayerName::Enemy)
                     ) {
                         Some(card.id)
                     } else {
@@ -223,9 +223,9 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
             // Now update all the cards
             for (index, sorting_key) in cards_to_move {
                 let position = if battle.cards[index].id == card_id {
-                    Position::InVoid(DisplayPlayer::Enemy)
+                    Position::InVoid(PlayerName::Enemy)
                 } else {
-                    Position::InVoid(DisplayPlayer::User)
+                    Position::InVoid(PlayerName::User)
                 };
                 battle.cards[index] = card_view(position, sorting_key);
                 set_sorting_key(&mut battle.cards[index], 999);
@@ -277,6 +277,10 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 },
             }
         }
+        BattleAction::BrowseCards(card_browser) => {
+            println!("BrowseCards: {:?}", card_browser);
+            PerformActionResponse { metadata, commands: CommandSequence::sequential(vec![]) }
+        }
     }
 }
 
@@ -306,17 +310,17 @@ fn scene_0(id: BattleId) -> BattleView {
         user: PlayerView { score: Points(0), can_act: false },
         enemy: PlayerView { score: Points(0), can_act: false },
         cards: [
-            cards_in_position(Position::OnBattlefield(DisplayPlayer::User), 0, 5),
-            cards_in_position(Position::InHand(DisplayPlayer::User), 5, 3),
-            cards_in_position(Position::InVoid(DisplayPlayer::User), 8, 6),
-            cards_in_position(Position::InDeck(DisplayPlayer::User), 14, 20),
-            cards_in_position(Position::OnBattlefield(DisplayPlayer::Enemy), 100, 8),
-            cards_in_position(Position::InHand(DisplayPlayer::Enemy), 105, 3),
-            cards_in_position(Position::InVoid(DisplayPlayer::Enemy), 108, 6),
-            cards_in_position(Position::InDeck(DisplayPlayer::Enemy), 114, 20),
-            cards_in_position(Position::OnBattlefield(DisplayPlayer::User), 533, 3),
-            cards_in_position(Position::OnBattlefield(DisplayPlayer::Enemy), 633, 3),
-            cards_in_position(Position::InHand(DisplayPlayer::Enemy), 733, 5),
+            cards_in_position(Position::OnBattlefield(PlayerName::User), 0, 5),
+            cards_in_position(Position::InHand(PlayerName::User), 5, 3),
+            cards_in_position(Position::InVoid(PlayerName::User), 8, 6),
+            cards_in_position(Position::InDeck(PlayerName::User), 14, 20),
+            cards_in_position(Position::OnBattlefield(PlayerName::Enemy), 100, 8),
+            cards_in_position(Position::InHand(PlayerName::Enemy), 105, 3),
+            cards_in_position(Position::InVoid(PlayerName::Enemy), 108, 6),
+            cards_in_position(Position::InDeck(PlayerName::Enemy), 114, 20),
+            cards_in_position(Position::OnBattlefield(PlayerName::User), 533, 3),
+            cards_in_position(Position::OnBattlefield(PlayerName::Enemy), 633, 3),
+            cards_in_position(Position::InHand(PlayerName::Enemy), 733, 5),
         ]
         .concat()
         .to_vec(),
@@ -370,7 +374,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
             supplemental_card_info: flex_node("<b>Materialize</b>: A character entering play."),
             is_fast: false,
             actions: CardActions {
-                can_play: position == Position::InHand(DisplayPlayer::User),
+                can_play: position == Position::InHand(PlayerName::User),
                 ..Default::default()
             },
             effects: CardEffects::default(),
@@ -407,7 +411,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
             ),
             is_fast: false,
             actions: CardActions {
-                can_play: position == Position::InHand(DisplayPlayer::User),
+                can_play: position == Position::InHand(PlayerName::User),
                 on_play_sound: Some(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Electric Magic/RPG3_ElectricMagic_Cast01.wav")),
                 ..Default::default()
             },
@@ -448,7 +452,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
                 "<b>Judgment</b>: Triggers at the start of your turn."),
             is_fast: false,
             actions: CardActions {
-                can_play: position == Position::InHand(DisplayPlayer::User),
+                can_play: position == Position::InHand(PlayerName::User),
                 ..Default::default()
             },
             effects: CardEffects::default(),
@@ -484,7 +488,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
             supplemental_card_info: None,
             is_fast: false,
             actions: CardActions {
-                can_play: position == Position::InHand(DisplayPlayer::User),
+                can_play: position == Position::InHand(PlayerName::User),
                 ..Default::default()
             },
             effects: CardEffects::default(),
@@ -521,7 +525,7 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
             ),
             is_fast: false,
             actions: CardActions {
-                can_play: position == Position::InHand(DisplayPlayer::User),
+                can_play: position == Position::InHand(PlayerName::User),
                 ..Default::default()
             },
             effects: CardEffects::default(),
