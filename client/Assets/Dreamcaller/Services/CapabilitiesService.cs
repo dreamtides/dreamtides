@@ -7,13 +7,13 @@ namespace Dreamcaller.Services
 {
   public class CapabilitiesService : Service
   {
-    public bool CanDragCards() => true;
+    public bool CanDragCards() => !Registry.Layout.BackgroundOverlay.IsVisible;
 
     /// <summary>
     /// Returns true if a card browser is currently open, e.g. to select a card
     /// or view the contents of the void.
     /// </summary>
-    public bool AnyBrowserOpen() => false;
+    public bool AnyBrowserOpen() => Registry.Layout.BackgroundOverlay.IsVisible;
 
     /// <summary>
     /// Can the user currently info zoom a card that exists in the provided

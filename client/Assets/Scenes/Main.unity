@@ -12013,13 +12013,14 @@ GameObject:
   m_Component:
   - component: {fileID: 763927451}
   - component: {fileID: 763927452}
+  - component: {fileID: 763927453}
   m_Layer: 0
   m_Name: BattlefieldOverlay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &763927451
 Transform:
   m_ObjectHideFlags: 0
@@ -12042,7 +12043,7 @@ SpriteRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 763927450}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
@@ -12090,6 +12091,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &763927453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 763927450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e60c32a6d2664adb8af01341d96bc23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _overlay: {fileID: 763927452}
 --- !u!1001 &766824633
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21676,6 +21690,7 @@ MonoBehaviour:
   _supplementalCardInfoLeft: {fileID: 771826220}
   _supplementalCardInfoRight: {fileID: 1146880180}
   _browser: {fileID: 1167298978}
+  _backgroundOverlay: {fileID: 763927453}
 --- !u!1001 &1305588118
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22883,6 +22898,7 @@ MonoBehaviour:
   _supplementalCardInfoLeft: {fileID: 547011407}
   _supplementalCardInfoRight: {fileID: 601474231}
   _browser: {fileID: 1167298978}
+  _backgroundOverlay: {fileID: 0}
 --- !u!1001 &1436808300
 PrefabInstance:
   m_ObjectHideFlags: 0

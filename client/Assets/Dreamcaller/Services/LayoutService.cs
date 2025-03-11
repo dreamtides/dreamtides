@@ -172,6 +172,15 @@ namespace Dreamcaller.Services
 
     void ApplyAllLayouts(Sequence? sequence)
     {
+      if (Registry.Layout.Browser.Objects.Count > 0)
+      {
+        Registry.Layout.BackgroundOverlay.Show(BackgroundOverlay.DisplayOver.Battlefield, 0.75f, sequence);
+      }
+      else
+      {
+        Registry.Layout.BackgroundOverlay.Hide(sequence);
+      }
+
       Registry.Layout.UserHand.ApplyLayout(sequence);
       Registry.Layout.EnemyHand.ApplyLayout(sequence);
       Registry.Layout.UserDeck.ApplyLayout(sequence);

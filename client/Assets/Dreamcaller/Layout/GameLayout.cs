@@ -86,6 +86,9 @@ namespace Dreamcaller.Layout
     [SerializeField] ObjectLayout _browser = null!;
     public ObjectLayout Browser => Check(_browser);
 
+    [SerializeField] BackgroundOverlay _backgroundOverlay = null!;
+    public BackgroundOverlay BackgroundOverlay => Check(_backgroundOverlay);
+
     T Check<T>(T? value) where T : Object =>
         Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
   }
