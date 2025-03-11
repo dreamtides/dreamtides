@@ -83,6 +83,9 @@ namespace Dreamcaller.Layout
     [SerializeField] Transform _supplementalCardInfoRight = null!;
     public Transform SupplementalCardInfoRight => Check(_supplementalCardInfoRight);
 
+    [SerializeField] ObjectLayout _browser = null!;
+    public ObjectLayout Browser => Check(_browser);
+
     T Check<T>(T? value) where T : Object =>
         Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
   }

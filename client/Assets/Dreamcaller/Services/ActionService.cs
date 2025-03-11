@@ -16,7 +16,7 @@ namespace Dreamcaller.Services
   {
     IEnumerator Start()
     {
-      yield return new WaitForSeconds(0.5f);
+      yield return new WaitForEndOfFrame();
       var request = new ConnectRequest
       {
         Metadata = new Metadata

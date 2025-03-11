@@ -14,7 +14,6 @@ namespace Dreamcaller.Services
   public class CardService : Service
   {
     readonly RaycastHit[] _raycastHitsTempBuffer = new RaycastHit[8];
-    [SerializeField] GameObject _infoZoomContainer = null!;
     Card? _currentInfoZoom;
 
     public IEnumerator HandleDrawUserCards(DrawUserCardsCommand command)

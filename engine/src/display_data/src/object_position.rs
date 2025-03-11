@@ -63,6 +63,9 @@ pub enum Position {
     /// Object is on the battlefield
     OnBattlefield(PlayerName),
 
+    /// Object is in the user's status zone
+    InUserStatus(PlayerName),
+
     /// Object is being displayed in a card browser, e.g. to select from a list
     /// of cards while searching
     Browser,
@@ -75,5 +78,6 @@ pub enum Position {
     /// some other 'play card' ability.
     HandStorage,
 
+    /// Object is hidden within a card
     HiddenWithinCard(CardId),
 }

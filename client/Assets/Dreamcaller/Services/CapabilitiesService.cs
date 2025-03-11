@@ -28,7 +28,7 @@ namespace Dreamcaller.Services
 
       switch (gameContext)
       {
-        case GameContext.CardChoiceBrowser:
+        case GameContext.Browser:
         case GameContext.RewardBrowser:
         case GameContext.CardZoneBrowser:
         case GameContext.Hand:

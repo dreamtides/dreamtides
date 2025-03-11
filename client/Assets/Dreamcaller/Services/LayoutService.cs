@@ -186,6 +186,7 @@ namespace Dreamcaller.Services
       Registry.Layout.Stack.ApplyLayout(sequence);
       Registry.Layout.SelectingTargetsEnemy.ApplyLayout(sequence);
       Registry.Layout.SelectingTargetsUser.ApplyLayout(sequence);
+      Registry.Layout.Browser.ApplyLayout(sequence);
     }
 
     List<Card> PrepareToDelete(Sequence? sequence, HashSet<string> toDelete)
@@ -239,6 +240,11 @@ namespace Dreamcaller.Services
       if (position.Enum == PositionEnum.OnStack)
       {
         return Registry.Layout.Stack;
+      }
+
+      if (position.Enum == PositionEnum.Browser)
+      {
+        return Registry.Layout.Browser;
       }
 
       if (position.PositionClass == null)

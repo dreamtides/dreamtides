@@ -1,6 +1,6 @@
 use std::sync::{LazyLock, Mutex};
 
-use action_data::battle_action::BattleAction;
+use action_data::battle_action::{BattleAction, CardBrowserType};
 use action_data::debug_action::DebugAction;
 use action_data::user_action::UserAction;
 use core_data::display_types::{
@@ -278,8 +278,30 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
             }
         }
         BattleAction::BrowseCards(card_browser) => {
-            println!("BrowseCards: {:?}", card_browser);
-            PerformActionResponse { metadata, commands: CommandSequence::sequential(vec![]) }
+            let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+
+            let source_position = match card_browser {
+                CardBrowserType::UserDeck => Position::InDeck(PlayerName::User),
+                CardBrowserType::EnemyDeck => Position::InDeck(PlayerName::Enemy),
+                CardBrowserType::UserVoid => Position::InVoid(PlayerName::User),
+                CardBrowserType::EnemyVoid => Position::InVoid(PlayerName::Enemy),
+                CardBrowserType::UserStatus => Position::InUserStatus(PlayerName::User),
+                CardBrowserType::EnemyStatus => Position::InUserStatus(PlayerName::Enemy),
+            };
+            for card in battle.cards.iter_mut() {
+                if card.position.position == source_position {
+                    card.position.position = Position::Browser;
+                }
+            }
+
+            *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+
+            PerformActionResponse {
+                metadata,
+                commands: CommandSequence::sequential(vec![Command::UpdateBattle(
+                    UpdateBattleCommand::new(battle),
+                )]),
+            }
         }
     }
 }
@@ -312,7 +334,7 @@ fn scene_0(id: BattleId) -> BattleView {
         cards: [
             cards_in_position(Position::OnBattlefield(PlayerName::User), 0, 5),
             cards_in_position(Position::InHand(PlayerName::User), 5, 3),
-            cards_in_position(Position::InVoid(PlayerName::User), 8, 6),
+            cards_in_position(Position::InVoid(PlayerName::User), 8, 3),
             cards_in_position(Position::InDeck(PlayerName::User), 14, 20),
             cards_in_position(Position::OnBattlefield(PlayerName::Enemy), 100, 8),
             cards_in_position(Position::InHand(PlayerName::Enemy), 105, 3),
