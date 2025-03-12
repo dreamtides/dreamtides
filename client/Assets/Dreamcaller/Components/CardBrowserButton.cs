@@ -16,7 +16,6 @@ namespace Dreamcaller.Components
 
     public override void MouseUp()
     {
-      Debug.Log($"CardBrowserButton {_type} clicked");
       var action = new UserAction
       {
         BattleAction = new BattleAction

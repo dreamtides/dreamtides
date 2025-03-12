@@ -1,5 +1,7 @@
 #nullable enable
 
+using DG.Tweening;
+using Dreamcaller.Services;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +14,39 @@ namespace Dreamcaller.Layout
     [SerializeField] Transform _rightEdge = null!;
     [SerializeField] float _scrollAmount;
     [SerializeField] Scrollbar _scrollbar = null!;
+    [SerializeField] bool _isOpen;
+
+    public void Show(Registry registry, Sequence? sequence)
+    {
+      if (!_isOpen)
+      {
+        registry.Layout.BackgroundOverlay.Show(BackgroundOverlay.DisplayOver.Battlefield, 0.75f, sequence);
+        if (sequence != null)
+        {
+          sequence.AppendCallback(() => _isOpen = true);
+        }
+        else
+        {
+          _isOpen = true;
+        }
+      }
+    }
+
+    public void Hide(Registry registry, Sequence? sequence)
+    {
+      if (_isOpen)
+      {
+        registry.Layout.BackgroundOverlay.Hide(sequence);
+        if (sequence != null)
+        {
+          sequence.AppendCallback(() => _isOpen = false);
+        }
+        else
+        {
+          _isOpen = false;
+        }
+      }
+    }
 
     protected override Vector3 CalculateObjectPosition(int index, int count)
     {
@@ -23,9 +58,9 @@ namespace Dreamcaller.Layout
 
     protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
 
-    void Update()
+    protected override void OnUpdate()
     {
-      if (Objects.Count > 0)
+      if (_isOpen)
       {
         _scrollbar.gameObject.SetActive(true);
         _scrollAmount = _scrollbar.value;

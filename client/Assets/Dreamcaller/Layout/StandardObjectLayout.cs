@@ -120,13 +120,17 @@ namespace Dreamcaller.Layout
     /// </summary>
     protected virtual int SortingOrder(int index, int count) => index;
 
-    void Update()
+    protected void Update()
     {
       if (_debugUpdateContinuously)
       {
         ApplyLayout();
       }
+
+      OnUpdate();
     }
+
+    protected virtual void OnUpdate() { }
 
     void ApplyLayoutToObject(
       Displayable displayable,

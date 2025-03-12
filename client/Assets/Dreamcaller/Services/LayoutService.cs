@@ -174,11 +174,11 @@ namespace Dreamcaller.Services
     {
       if (Registry.Layout.Browser.Objects.Count > 0)
       {
-        Registry.Layout.BackgroundOverlay.Show(BackgroundOverlay.DisplayOver.Battlefield, 0.75f, sequence);
+        Registry.Layout.Browser.Show(Registry, sequence);
       }
       else
       {
-        Registry.Layout.BackgroundOverlay.Hide(sequence);
+        Registry.Layout.Browser.Hide(Registry, sequence);
       }
 
       Registry.Layout.UserHand.ApplyLayout(sequence);
