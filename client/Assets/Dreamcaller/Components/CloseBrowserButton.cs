@@ -10,6 +10,7 @@ public class CloseBrowserButton : MonoBehaviour
 
   public void OnClick()
   {
+    _registry.SoundService.PlayClickSound();
     var action = new UserAction
     {
       BattleAction = new()

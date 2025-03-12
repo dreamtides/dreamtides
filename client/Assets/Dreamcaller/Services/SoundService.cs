@@ -13,6 +13,7 @@ namespace Dreamcaller.Services
     [SerializeField] List<AudioClip> _fireProjectileSounds = null!;
     [SerializeField] List<AudioClip> _impactProjectileSounds = null!;
     [SerializeField] List<AudioClip> _whooshSounds = null!;
+    [SerializeField] List<AudioClip> _clickSounds = null!;
     [SerializeField] AudioClip _yourTurnSound = null!;
     [SerializeField] AudioClip _enemyTurnSound = null!;
     [SerializeField] AudioClip _victorySound = null!;
@@ -46,6 +47,11 @@ namespace Dreamcaller.Services
     public void PlayWhooshSound()
     {
       PlayRandom(_whooshSounds);
+    }
+
+    public void PlayClickSound()
+    {
+      PlayRandom(_clickSounds);
     }
 
     public void PlayMessageSound(GameMessageType messageType)

@@ -16,6 +16,7 @@ namespace Dreamcaller.Components
 
     public override void MouseUp()
     {
+      _registry.SoundService.PlayClickSound();
       var action = new UserAction
       {
         BattleAction = new()
