@@ -119,10 +119,7 @@ namespace Dreamcaller.Layout
     {
       if (_debugUpdateContinuously)
       {
-        for (var i = 0; i < _objects.Count; ++i)
-        {
-          ApplyLayoutToObject(_objects[i], _objects.Count, i);
-        }
+        ApplyLayout();
       }
     }
 
