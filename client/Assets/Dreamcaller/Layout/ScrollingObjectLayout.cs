@@ -1,6 +1,7 @@
 #nullable enable
 
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Dreamcaller.Layout
 {
@@ -10,6 +11,7 @@ namespace Dreamcaller.Layout
     [SerializeField] Transform _leftEdge = null!;
     [SerializeField] Transform _rightEdge = null!;
     [SerializeField] float _scrollAmount;
+    [SerializeField] Scrollbar _scrollbar = null!;
 
     protected override Vector3 CalculateObjectPosition(int index, int count)
     {
@@ -20,6 +22,20 @@ namespace Dreamcaller.Layout
     }
 
     protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
+
+    void Update()
+    {
+      if (Objects.Count > 0)
+      {
+        _scrollbar.gameObject.SetActive(true);
+        _scrollAmount = _scrollbar.value;
+        ApplyLayout();
+      }
+      else
+      {
+        _scrollbar.gameObject.SetActive(false);
+      }
+    }
 
     protected override int SortingOrder(int index, int count)
     {

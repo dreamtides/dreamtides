@@ -60,6 +60,7 @@ namespace Dreamcaller.Services
 
     void Awake()
     {
+      Debug.Log("Starting Dreamcaller");
       Application.targetFrameRate = 60;
 
       _isPortrait = Screen.width < Screen.height;
