@@ -11,8 +11,7 @@ namespace Dreamcaller.Layout
     [SerializeField] Transform? _projectileSourcePosition;
     [SerializeField] Transform? _displayEffectPosition;
     [SerializeField] SortingGroup? _sortingGroup;
-
-    GameContext _gameContext;
+    [SerializeField] GameContext _internalGameContext;
     ObjectLayout? _parent;
 
     /// <summary>Order items within a sorting layer.</summary>
@@ -123,21 +122,21 @@ namespace Dreamcaller.Layout
 
     public GameContext GameContext
     {
-      get => Errors.CheckNotDefault(_gameContext);
+      get => Errors.CheckNotDefault(_internalGameContext);
       set
       {
         Errors.CheckNotDefault(value);
 
-        if (_gameContext != value)
+        if (_internalGameContext != value)
         {
-          var oldContext = _gameContext;
-          _gameContext = value;
+          var oldContext = _internalGameContext;
+          _internalGameContext = value;
           OnSetGameContext(oldContext, value);
         }
       }
     }
 
-    public bool HasGameContext => _gameContext != GameContext.Unspecified;
+    public bool HasGameContext => _internalGameContext != GameContext.Unspecified;
 
     protected virtual void OnSetGameContext(GameContext oldContext, GameContext newContext) { }
   }

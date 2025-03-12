@@ -13,7 +13,7 @@ namespace Dreamcaller.Services
     /// Returns true if a card browser is currently open, e.g. to select a card
     /// or view the contents of the void.
     /// </summary>
-    public bool AnyBrowserOpen() => Registry.Layout.BackgroundOverlay.IsVisible;
+    public bool AnyBrowserOpen() => Registry.Layout.Browser.IsOpen;
 
     /// <summary>
     /// Can the user currently info zoom a card that exists in the provided

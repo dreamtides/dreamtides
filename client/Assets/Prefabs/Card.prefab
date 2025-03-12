@@ -1152,6 +1152,7 @@ MonoBehaviour:
   _projectileSourcePosition: {fileID: 1332052378211390788}
   _displayEffectPosition: {fileID: 0}
   _sortingGroup: {fileID: 6069954923991036801}
+  _internalGameContext: 0
   _cardFront: {fileID: 5304334944730395346}
   _battlefieldCardFront: {fileID: 9139255936787382272}
   _name: {fileID: 8401684551806214642}
@@ -1187,7 +1188,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -2255,6 +2256,7 @@ MonoBehaviour:
   _projectileSourcePosition: {fileID: 0}
   _displayEffectPosition: {fileID: 0}
   _sortingGroup: {fileID: 0}
+  _internalGameContext: 0
   _objects: []
   _debugUpdateContinuously: 0
   _singleElementY: 0.5

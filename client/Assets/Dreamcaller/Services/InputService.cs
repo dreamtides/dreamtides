@@ -74,6 +74,7 @@ namespace Dreamcaller.Services
 
     Displayable? ObjectAtClickPosition()
     {
+      var allowedContexts = Registry.DocumentService.AllowedContextForClicks();
       var tapScreenPosition = PointerPosition();
       var ray = Registry.Layout.MainCamera.ScreenPointToRay(tapScreenPosition);
       var hits = Physics.RaycastNonAlloc(
@@ -88,7 +89,8 @@ namespace Dreamcaller.Services
       {
         var hit = _raycastHitsTempBuffer[i];
         var displayable = hit.collider.GetComponent<Displayable>();
-        if (displayable && displayable.CanHandleMouseEvents())
+        if (displayable && displayable.CanHandleMouseEvents() &&
+            (allowedContexts == null || allowedContexts.Contains(displayable.GameContext)))
         {
           candidates.Add(displayable);
         }

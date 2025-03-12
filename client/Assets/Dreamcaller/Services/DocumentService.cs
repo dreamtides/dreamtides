@@ -1,5 +1,7 @@
 #nullable enable
 
+using System.Collections.Generic;
+using Dreamcaller.Layout;
 using Dreamcaller.Masonry;
 using Dreamcaller.Schema;
 using UnityEngine;
@@ -30,6 +32,22 @@ namespace Dreamcaller.Services
     public bool MouseOverScreenElement()
     {
       return false;
+    }
+
+    /// <summary>
+    /// Returns the GameContext values which are currently allowed for
+    /// mouse/touch events to be handled. Displayable objects without a
+    /// matching GameContext will ignore events. Returns null if all events
+    /// are currently valid.
+    /// </summary>
+    public HashSet<GameContext>? AllowedContextForClicks()
+    {
+      if (Registry.Layout.Browser.Objects.Count > 0)
+      {
+        return new HashSet<GameContext> { GameContext.Browser, GameContext.Hand };
+      }
+
+      return null;
     }
 
     public float ScreenPxToElementPx(float value)

@@ -16,6 +16,8 @@ namespace Dreamcaller.Layout
     [SerializeField] Scrollbar _scrollbar = null!;
     [SerializeField] bool _isOpen;
 
+    public bool IsOpen => _isOpen;
+
     public void Show(Registry registry, Sequence? sequence)
     {
       if (!_isOpen)
