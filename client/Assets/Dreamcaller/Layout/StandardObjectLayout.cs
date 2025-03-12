@@ -115,6 +115,11 @@ namespace Dreamcaller.Layout
     /// object scales.
     protected virtual float? CalculateObjectScale(int index, int count) => null;
 
+    /// <summary>
+    /// Calculates the sorting order of the object at the given index in the layout.
+    /// </summary>
+    protected virtual int SortingOrder(int index, int count) => index;
+
     void Update()
     {
       if (_debugUpdateContinuously)
@@ -137,7 +142,7 @@ namespace Dreamcaller.Layout
 
       if (displayable.SortingGroup)
       {
-        displayable.SortingGroup.sortingOrder = index;
+        displayable.SortingGroup.sortingOrder = SortingOrder(index, count);
       }
 
       if (applyToChildren && displayable is ObjectLayout layout)

@@ -13,10 +13,61 @@ namespace Dreamcaller.Layout
 
     protected override Vector3 CalculateObjectPosition(int index, int count)
     {
-      return new Vector3(SmoothedXOffset(index, count, Mathf.Clamp01(_scrollAmount)), transform.position.y, transform.position.z);
+      return new Vector3(
+        SmoothedXOffset(index, count, Mathf.Clamp01(_scrollAmount)),
+        YOffset(index, count, Mathf.Clamp01(_scrollAmount)),
+        transform.position.z);
     }
 
     protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
+
+    protected override int SortingOrder(int index, int count) => 1;
+
+    float YOffset(float index, float count, float scrollAmount)
+    {
+      // If all objects fit in view, return transform.position.y (no offset)
+      if (count <= WindowSize())
+      {
+        return transform.position.y;
+      }
+
+      // Calculate the maximum scroll offset
+      var maxScrollOffset = count - WindowSize();
+
+      // Calculate the current scroll offset based on _scrollAmount
+      var currentScrollOffset = scrollAmount * maxScrollOffset;
+
+      // Calculate the effective index with scrolling applied
+      var effectiveIndex = index - currentScrollOffset;
+
+      // Determine if the object is visible (within the window)
+      var isVisible = effectiveIndex >= 0 && effectiveIndex < WindowSize();
+
+      // Visible objects get higher Y positions (closer to 0 offset)
+      // Non-visible objects get lower Y positions (closer to 1 offset)
+      float yOffset;
+
+      if (isVisible)
+      {
+        // Distribute visible objects evenly in the upper range (0 to 0.4)
+        yOffset = 0.4f * (effectiveIndex / WindowSize());
+      }
+      else if (effectiveIndex < 0)
+      {
+        // Objects before the view window
+        // Position is based on how far off-screen they are, clamped to max 1.0
+        yOffset = 0.4f + Mathf.Min(0.6f, -effectiveIndex / WindowSize());
+      }
+      else
+      {
+        // Objects after the view window
+        // Position is based on how far off-screen they are, clamped to max 1.0
+        yOffset = 0.4f + Mathf.Min(0.6f, (effectiveIndex - WindowSize()) / WindowSize());
+      }
+
+      // Apply the offset to transform.position.y
+      return transform.position.y - yOffset;
+    }
 
     /// <summary>
     /// Returns the x offset for an object with smoothing between positions.
