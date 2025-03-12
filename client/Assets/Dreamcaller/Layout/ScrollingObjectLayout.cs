@@ -15,6 +15,7 @@ namespace Dreamcaller.Layout
     [SerializeField] float _scrollAmount;
     [SerializeField] Scrollbar _scrollbar = null!;
     [SerializeField] bool _isOpen;
+    [SerializeField] bool _zAxis;
 
     public bool IsOpen => _isOpen;
 
@@ -52,10 +53,13 @@ namespace Dreamcaller.Layout
 
     protected override Vector3 CalculateObjectPosition(int index, int count)
     {
+      // In landscape mode we *decrease* Z positions as we move towards screen
+      // right, which in retrospect was stupid. So now we have to invert
+      // everything to scroll on the Z axis.
       return new Vector3(
-        SmoothedXOffset(index, count, Mathf.Clamp01(_scrollAmount)),
-        transform.position.y - YOffset(index, count, Mathf.Clamp01(_scrollAmount)),
-        transform.position.z);
+        _zAxis ? transform.position.x : SmoothedOffset(index, count, Mathf.Clamp01(_scrollAmount)),
+        transform.position.y - YOffset(index, count, Mathf.Clamp01(_zAxis ? 1 - _scrollAmount : _scrollAmount)),
+        _zAxis ? SmoothedOffset(index, count, Mathf.Clamp01(1 - _scrollAmount)) - TotalWidth() : transform.position.z);
     }
 
     protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
@@ -86,7 +90,7 @@ namespace Dreamcaller.Layout
       var maxScrollOffset = count - WindowSize();
 
       // Calculate the current scroll offset based on _scrollAmount
-      var currentScrollOffset = Mathf.Clamp01(_scrollAmount) * maxScrollOffset;
+      var currentScrollOffset = Mathf.Clamp01(_zAxis ? 1 - _scrollAmount : _scrollAmount) * maxScrollOffset;
 
       // Calculate the effective index with scrolling applied
       var effectiveIndex = index - currentScrollOffset;
@@ -164,12 +168,12 @@ namespace Dreamcaller.Layout
     /// <summary>
     /// Returns the x offset for an object with smoothing between positions.
     /// </summary>
-    float SmoothedXOffset(int index, int count, float scrollAmount)
+    float SmoothedOffset(int index, int count, float scrollAmount)
     {
       if (count <= WindowSize())
       {
         // If all objects fit in view, no smoothing needed
-        return ScrolledXOffset(index, count, scrollAmount);
+        return ScrolledOffset(index, count, scrollAmount);
       }
 
       // Calculate the maximum scroll offset
@@ -203,7 +207,7 @@ namespace Dreamcaller.Layout
     {
       // Set _scrollAmount to the normalized position for this scroll offset
       var scrollAmount = (float)scrollOffset / (count - WindowSize());
-      return ScrolledXOffset(index, count, scrollAmount);
+      return ScrolledOffset(index, count, scrollAmount);
     }
 
     /// <summary>
@@ -211,12 +215,12 @@ namespace Dreamcaller.Layout
     /// objects, shifting to smaller x coordinates as the _scrollAmount
     /// increases.
     /// </summary>
-    float ScrolledXOffset(int index, int count, float scrollAmount)
+    float ScrolledOffset(int index, int count, float scrollAmount)
     {
       if (count <= WindowSize())
       {
         // If all objects fit in view, no scrolling needed
-        return ObjectXOffset(index, count);
+        return ObjectOffset(index, count);
       }
 
       // Calculate the maximum scroll offset (number of objects that can be scrolled)
@@ -231,24 +235,24 @@ namespace Dreamcaller.Layout
       // Handle objects that are scrolled off to the left (before view)
       if (effectiveIndex < 0)
       {
-        return ObjectXOffset(0, count);
+        return ObjectOffset(0, count);
       }
       // Handle objects that are in view
       else if (effectiveIndex < count)
       {
-        return ObjectXOffset(Mathf.FloorToInt(effectiveIndex), count);
+        return ObjectOffset(Mathf.FloorToInt(effectiveIndex), count);
       }
       // This shouldn't happen, but handle it just in case
       else
       {
-        return ObjectXOffset(count - 1, count);
+        return ObjectOffset(count - 1, count);
       }
     }
 
     /// <summary>
     /// Returns the total width of the layout.
     /// </summary>
-    float TotalWidth() => _rightEdge.position.x - _leftEdge.position.x;
+    float TotalWidth() => Mathf.Abs(RightEdge() - LeftEdge());
 
     /// <summary>
     /// Returns the maximum number of objects that can be displayed.
@@ -260,7 +264,7 @@ namespace Dreamcaller.Layout
     /// objects. If 'count' is larger than the number of objects that will fit,
     /// places all remaining objects at the position of the last visible object.
     /// </summary>
-    float ObjectXOffset(int index, int count)
+    float ObjectOffset(int index, int count)
     {
       if (count <= 0)
       {
@@ -275,7 +279,7 @@ namespace Dreamcaller.Layout
         // Calculate the width needed for maximum objects that can fit
         var neededWidth = (objectsInView - 1) * _cardWidth;
         // Calculate the starting X position
-        var startX = _leftEdge.position.x + (TotalWidth() - neededWidth) / 2;
+        var startX = LeftEdge() + (TotalWidth() - neededWidth) / 2;
         // Calculate the position for this specific object
         return startX + (index * _cardWidth);
       }
@@ -283,10 +287,14 @@ namespace Dreamcaller.Layout
       {
         // All overflow objects share the position of the last visible object
         var neededWidth = (maxObjectsInView - 1) * _cardWidth;
-        var startX = _leftEdge.position.x + (TotalWidth() - neededWidth) / 2;
+        var startX = LeftEdge() + (TotalWidth() - neededWidth) / 2;
         return startX + ((maxObjectsInView - 1) * _cardWidth);
       }
     }
+
+    float LeftEdge() => _zAxis ? _leftEdge.position.z : _leftEdge.position.x;
+
+    float RightEdge() => _zAxis ? _rightEdge.position.z : _rightEdge.position.x;
 
     void OnDrawGizmosSelected()
     {
