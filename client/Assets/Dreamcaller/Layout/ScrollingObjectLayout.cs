@@ -64,7 +64,7 @@ namespace Dreamcaller.Layout
     {
       if (_isOpen)
       {
-        _scrollbar.gameObject.SetActive(true);
+        _scrollbar.gameObject.SetActive(Objects.Count > WindowSize());
         _scrollAmount = _scrollbar.value;
         ApplyLayout();
       }
