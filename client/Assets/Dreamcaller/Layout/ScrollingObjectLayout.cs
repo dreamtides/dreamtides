@@ -15,20 +15,59 @@ namespace Dreamcaller.Layout
     {
       return new Vector3(
         SmoothedXOffset(index, count, Mathf.Clamp01(_scrollAmount)),
-        YOffset(index, count, Mathf.Clamp01(_scrollAmount)),
+        transform.position.y - YOffset(index, count, Mathf.Clamp01(_scrollAmount)),
         transform.position.z);
     }
 
     protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
 
-    protected override int SortingOrder(int index, int count) => 1;
+    protected override int SortingOrder(int index, int count)
+    {
+      // If all objects fit in view, sort by index (higher index = lower priority)
+      if (count <= WindowSize())
+      {
+        return count - index - 1;
+      }
+
+      // Calculate the maximum scroll offset
+      var maxScrollOffset = count - WindowSize();
+
+      // Calculate the current scroll offset based on _scrollAmount
+      var currentScrollOffset = Mathf.Clamp01(_scrollAmount) * maxScrollOffset;
+
+      // Calculate the effective index with scrolling applied
+      var effectiveIndex = index - currentScrollOffset;
+
+      // Determine if the object is visible (within the window)
+      var isVisible = effectiveIndex >= 0 && effectiveIndex < WindowSize();
+
+      if (isVisible)
+      {
+        // Visible objects get highest priority (count-1 down to count-WindowSize)
+        // Objects closer to the front of the window get higher priority
+        return count - 1 - Mathf.FloorToInt(effectiveIndex);
+      }
+      else if (effectiveIndex < 0)
+      {
+        // Objects before the window get medium-low priority
+        // Further off-screen = lower priority
+        return Mathf.Max(0, Mathf.FloorToInt(count - WindowSize() - 1 + effectiveIndex));
+      }
+      else
+      {
+        // Objects after the window get lowest priority
+        // Further off-screen = lower priority
+        var positionsAfterWindow = effectiveIndex - WindowSize();
+        return Mathf.Max(0, Mathf.FloorToInt(count - WindowSize() - 1 - positionsAfterWindow));
+      }
+    }
 
     float YOffset(float index, float count, float scrollAmount)
     {
       // If all objects fit in view, return transform.position.y (no offset)
       if (count <= WindowSize())
       {
-        return transform.position.y;
+        return 0;
       }
 
       // Calculate the maximum scroll offset
@@ -66,7 +105,7 @@ namespace Dreamcaller.Layout
       }
 
       // Apply the offset to transform.position.y
-      return transform.position.y - yOffset;
+      return yOffset;
     }
 
     /// <summary>

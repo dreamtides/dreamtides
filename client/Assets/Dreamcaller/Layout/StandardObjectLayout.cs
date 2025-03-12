@@ -140,10 +140,7 @@ namespace Dreamcaller.Layout
       var rotation = CalculateObjectRotation(index, count);
       var scale = CalculateObjectScale(index, count) ?? displayable.DefaultScale;
 
-      if (displayable.SortingGroup)
-      {
-        displayable.SortingGroup.sortingOrder = SortingOrder(index, count);
-      }
+      displayable.SortingKey = SortingOrder(index, count);
 
       if (applyToChildren && displayable is ObjectLayout layout)
       {

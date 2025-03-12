@@ -14,15 +14,27 @@ namespace Dreamcaller.Layout
 
     GameContext _gameContext;
     ObjectLayout? _parent;
-    long _sortingKey;
 
     /// <summary>Order items within a sorting layer.</summary>
-    public long SortingKey
+    public int SortingKey
     {
-      get => _sortingKey;
+      get
+      {
+        if (_sortingGroup)
+        {
+          return _sortingGroup.sortingOrder;
+        }
+        else
+        {
+          return 0;
+        }
+      }
       set
       {
-        _sortingKey = value;
+        if (_sortingGroup)
+        {
+          _sortingGroup.sortingOrder = value;
+        }
       }
     }
 

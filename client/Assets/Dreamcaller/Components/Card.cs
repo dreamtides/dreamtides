@@ -56,7 +56,7 @@ namespace Dreamcaller.Components
       var name = view.Revealed?.Name ?? "Hidden Card";
       _registry = registry;
       _cardView = view;
-      SortingKey = view.Position.SortingKey;
+      // SortingKey = (int)view.Position.SortingKey;
       gameObject.name = $"{name} [{Id}]";
 
       if (view.Revealed != null)
