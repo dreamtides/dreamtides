@@ -13,17 +13,62 @@ namespace Dreamcaller.Layout
 
     protected override Vector3 CalculateObjectPosition(int index, int count)
     {
-      return new Vector3(ScrolledXOffset(index, count), transform.position.y, transform.position.z);
+      return new Vector3(SmoothedXOffset(index, count, Mathf.Clamp01(_scrollAmount)), transform.position.y, transform.position.z);
     }
 
     protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
+
+    /// <summary>
+    /// Returns the x offset for an object with smoothing between positions.
+    /// </summary>
+    float SmoothedXOffset(int index, int count, float scrollAmount)
+    {
+      if (count <= WindowSize())
+      {
+        // If all objects fit in view, no smoothing needed
+        return ScrolledXOffset(index, count, scrollAmount);
+      }
+
+      // Calculate the maximum scroll offset
+      var maxScrollOffset = count - WindowSize();
+
+      // Get the integer and fractional parts of the current scroll position
+      var currentScrollPosition = scrollAmount * maxScrollOffset;
+      var intScrollPosition = Mathf.FloorToInt(currentScrollPosition);
+      var fraction = currentScrollPosition - intScrollPosition;
+
+      // Calculate position at the current integer scroll position
+      var currentPosition = CalculatePositionAtScroll(index, count, intScrollPosition);
+
+      // Only calculate next position if we're not at the end of the scroll range
+      if (intScrollPosition < maxScrollOffset)
+      {
+        // Calculate position at the next integer scroll position
+        var nextPosition = CalculatePositionAtScroll(index, count, intScrollPosition + 1);
+
+        // Return smoothed position by linear interpolation
+        return Mathf.Lerp(currentPosition, nextPosition, fraction);
+      }
+
+      return currentPosition;
+    }
+
+    /// <summary>
+    /// Helper method to calculate the position at a specific scroll offset.
+    /// </summary>
+    float CalculatePositionAtScroll(int index, int count, int scrollOffset)
+    {
+      // Set _scrollAmount to the normalized position for this scroll offset
+      var scrollAmount = (float)scrollOffset / (count - WindowSize());
+      return ScrolledXOffset(index, count, scrollAmount);
+    }
 
     /// <summary>
     /// Returns the x offset for an object at a given index in a list of
     /// objects, shifting to smaller x coordinates as the _scrollAmount
     /// increases.
     /// </summary>
-    float ScrolledXOffset(int index, int count)
+    float ScrolledXOffset(int index, int count, float scrollAmount)
     {
       if (count <= WindowSize())
       {
@@ -32,13 +77,13 @@ namespace Dreamcaller.Layout
       }
 
       // Calculate the maximum scroll offset (number of objects that can be scrolled)
-      int maxScrollOffset = count - WindowSize();
+      var maxScrollOffset = count - WindowSize();
 
       // Calculate the current scroll offset based on _scrollAmount
-      float currentScrollOffset = _scrollAmount * maxScrollOffset;
+      var currentScrollOffset = scrollAmount * maxScrollOffset;
 
       // Calculate the effective index with scrolling applied
-      float effectiveIndex = index - currentScrollOffset;
+      var effectiveIndex = index - currentScrollOffset;
 
       // Handle objects that are scrolled off to the left (before view)
       if (effectiveIndex < 0)
