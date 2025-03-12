@@ -13,6 +13,8 @@ pub enum BattleAction {
     SelectTarget(CardId),
     /// Show cards in a zone
     BrowseCards(CardBrowserType),
+    /// Close the card browser
+    CloseCardBrowser,
 }
 
 impl From<BattleAction> for UserAction {

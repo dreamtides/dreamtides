@@ -289,9 +289,12 @@ namespace Dreamcaller.Components
         }
         var action = new UserAction
         {
-          BattleAction = new BattleAction
+          BattleAction = new()
           {
-            PlayCard = CardView.Id
+            BattleActionClass = new()
+            {
+              PlayCard = CardView.Id
+            }
           }
         };
 

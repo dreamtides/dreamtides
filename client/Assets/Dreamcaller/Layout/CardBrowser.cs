@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using DG.Tweening;
 using Dreamcaller.Services;
 using UnityEngine;
@@ -7,7 +8,7 @@ using UnityEngine.UI;
 
 namespace Dreamcaller.Layout
 {
-  public class ScrollingObjectLayout : StandardObjectLayout
+  public class CardBrowser : StandardObjectLayout
   {
     [SerializeField] float _cardWidth = 2.5f;
     [SerializeField] Transform _leftEdge = null!;
@@ -16,6 +17,7 @@ namespace Dreamcaller.Layout
     [SerializeField] Scrollbar _scrollbar = null!;
     [SerializeField] bool _isOpen;
     [SerializeField] bool _zAxis;
+    [SerializeField] Button _closeButton = null!;
 
     public bool IsOpen => _isOpen;
 
@@ -37,16 +39,23 @@ namespace Dreamcaller.Layout
 
     public void Hide(Registry registry, Sequence? sequence)
     {
+      void onHidden()
+      {
+        _isOpen = false;
+        _scrollbar.value = 0;
+        _scrollAmount = 0;
+      }
+
       if (_isOpen)
       {
         registry.Layout.BackgroundOverlay.Hide(sequence);
         if (sequence != null)
         {
-          sequence.AppendCallback(() => _isOpen = false);
+          sequence.AppendCallback(onHidden);
         }
         else
         {
-          _isOpen = false;
+          onHidden();
         }
       }
     }
@@ -57,9 +66,9 @@ namespace Dreamcaller.Layout
       // right, which in retrospect was stupid. So now we have to invert
       // everything to scroll on the Z axis.
       return new Vector3(
-        _zAxis ? transform.position.x : SmoothedOffset(index, count, Mathf.Clamp01(_scrollAmount)),
+        _zAxis ? _leftEdge.position.x : SmoothedOffset(index, count, Mathf.Clamp01(_scrollAmount)),
         transform.position.y - YOffset(index, count, Mathf.Clamp01(_zAxis ? 1 - _scrollAmount : _scrollAmount)),
-        _zAxis ? SmoothedOffset(index, count, Mathf.Clamp01(1 - _scrollAmount)) - TotalWidth() : transform.position.z);
+        _zAxis ? SmoothedOffset(index, count, Mathf.Clamp01(1 - _scrollAmount)) - TotalWidth() : _leftEdge.position.z);
     }
 
     protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
@@ -69,12 +78,15 @@ namespace Dreamcaller.Layout
       if (_isOpen)
       {
         _scrollbar.gameObject.SetActive(Objects.Count > WindowSize());
+        _closeButton.gameObject.SetActive(Objects.Count > WindowSize());
+        _scrollbar.size = (float)WindowSize() / Objects.Count;
         _scrollAmount = _scrollbar.value;
         ApplyLayout();
       }
       else
       {
         _scrollbar.gameObject.SetActive(false);
+        _closeButton.gameObject.SetActive(false);
       }
     }
 

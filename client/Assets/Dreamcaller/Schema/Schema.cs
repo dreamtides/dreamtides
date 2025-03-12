@@ -375,6 +375,10 @@ namespace Dreamcaller.Schema
     /// Object is in this player's banished zone
     ///
     /// Object is on the battlefield
+    ///
+    /// Object is in the user's status zone
+    ///
+    /// Object is hidden within a card
     /// </summary>
     public partial class PositionClass
     {
@@ -398,6 +402,9 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("onBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayerName? OnBattlefield { get; set; }
+
+        [JsonProperty("inUserStatus", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PlayerName? InUserStatus { get; set; }
 
         [JsonProperty("hiddenWithinCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardId HiddenWithinCard { get; set; }
@@ -511,17 +518,15 @@ namespace Dreamcaller.Schema
         public DebugAction? DebugAction { get; set; }
 
         [JsonProperty("battleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public BattleAction BattleAction { get; set; }
+        public BattleAction? BattleAction { get; set; }
     }
 
     /// <summary>
-    /// An action that can be performed in a battle
-    ///
     /// Set a card as a target of the card currently being played.
     ///
     /// Show cards in a zone
     /// </summary>
-    public partial class BattleAction
+    public partial class BattleActionClass
     {
         [JsonProperty("playCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardId PlayCard { get; set; }
@@ -1276,7 +1281,7 @@ namespace Dreamcaller.Schema
         public DebugAction? DebugAction { get; set; }
 
         [JsonProperty("battleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public BattleAction BattleAction { get; set; }
+        public BattleAction? BattleAction { get; set; }
     }
 
     public partial class PerformActionResponse
@@ -1346,6 +1351,11 @@ namespace Dreamcaller.Schema
     /// </summary>
     public enum CardPrefab { Default, Dreamwell, Token };
 
+    /// <summary>
+    /// Close the card browser
+    /// </summary>
+    public enum BattleActionEnum { CloseCardBrowser };
+
     public enum CardBrowserType { EnemyDeck, EnemyStatus, EnemyVoid, UserDeck, UserStatus, UserVoid };
 
     /// <summary>
@@ -1412,6 +1422,18 @@ namespace Dreamcaller.Schema
         public static implicit operator Position(PositionClass PositionClass) => new Position { PositionClass = PositionClass };
     }
 
+    /// <summary>
+    /// An action that can be performed in a battle
+    /// </summary>
+    public partial struct BattleAction
+    {
+        public BattleActionClass BattleActionClass;
+        public BattleActionEnum? Enum;
+
+        public static implicit operator BattleAction(BattleActionClass BattleActionClass) => new BattleAction { BattleActionClass = BattleActionClass };
+        public static implicit operator BattleAction(BattleActionEnum Enum) => new BattleAction { Enum = Enum };
+    }
+
     public partial class SchemaTypes
     {
         public static SchemaTypes FromJson(string json) => JsonConvert.DeserializeObject<SchemaTypes>(json, Dreamcaller.Schema.Converter.Settings);
@@ -1436,7 +1458,9 @@ namespace Dreamcaller.Schema
                 PositionConverter.Singleton,
                 PositionEnumConverter.Singleton,
                 CardPrefabConverter.Singleton,
+                BattleActionConverter.Singleton,
                 CardBrowserTypeConverter.Singleton,
+                BattleActionEnumConverter.Singleton,
                 DebugActionConverter.Singleton,
                 CardFrameConverter.Singleton,
                 RevealedCardStatusConverter.Singleton,
@@ -1786,6 +1810,51 @@ namespace Dreamcaller.Schema
         public static readonly CardPrefabConverter Singleton = new CardPrefabConverter();
     }
 
+    internal class BattleActionConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(BattleAction) || t == typeof(BattleAction?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            switch (reader.TokenType)
+            {
+                case JsonToken.String:
+                case JsonToken.Date:
+                    var stringValue = serializer.Deserialize<string>(reader);
+                    if (stringValue == "closeCardBrowser")
+                    {
+                        return new BattleAction { Enum = BattleActionEnum.CloseCardBrowser };
+                    }
+                    break;
+                case JsonToken.StartObject:
+                    var objectValue = serializer.Deserialize<BattleActionClass>(reader);
+                    return new BattleAction { BattleActionClass = objectValue };
+            }
+            throw new Exception("Cannot unmarshal type BattleAction");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            var value = (BattleAction)untypedValue;
+            if (value.Enum != null)
+            {
+                if (value.Enum == BattleActionEnum.CloseCardBrowser)
+                {
+                    serializer.Serialize(writer, "closeCardBrowser");
+                    return;
+                }
+            }
+            if (value.BattleActionClass != null)
+            {
+                serializer.Serialize(writer, value.BattleActionClass);
+                return;
+            }
+            throw new Exception("Cannot marshal type BattleAction");
+        }
+
+        public static readonly BattleActionConverter Singleton = new BattleActionConverter();
+    }
+
     internal class CardBrowserTypeConverter : JsonConverter
     {
         public override bool CanConvert(Type t) => t == typeof(CardBrowserType) || t == typeof(CardBrowserType?);
@@ -1845,6 +1914,40 @@ namespace Dreamcaller.Schema
         }
 
         public static readonly CardBrowserTypeConverter Singleton = new CardBrowserTypeConverter();
+    }
+
+    internal class BattleActionEnumConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(BattleActionEnum) || t == typeof(BattleActionEnum?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            if (value == "closeCardBrowser")
+            {
+                return BattleActionEnum.CloseCardBrowser;
+            }
+            throw new Exception("Cannot unmarshal type BattleActionEnum");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (BattleActionEnum)untypedValue;
+            if (value == BattleActionEnum.CloseCardBrowser)
+            {
+                serializer.Serialize(writer, "closeCardBrowser");
+                return;
+            }
+            throw new Exception("Cannot marshal type BattleActionEnum");
+        }
+
+        public static readonly BattleActionEnumConverter Singleton = new BattleActionEnumConverter();
     }
 
     internal class DebugActionConverter : JsonConverter

@@ -83,8 +83,8 @@ namespace Dreamcaller.Layout
     [SerializeField] Transform _supplementalCardInfoRight = null!;
     public Transform SupplementalCardInfoRight => Check(_supplementalCardInfoRight);
 
-    [SerializeField] ScrollingObjectLayout _browser = null!;
-    public ScrollingObjectLayout Browser => Check(_browser);
+    [SerializeField] CardBrowser _browser = null!;
+    public CardBrowser Browser => Check(_browser);
 
     [SerializeField] BackgroundOverlay _backgroundOverlay = null!;
     public BackgroundOverlay BackgroundOverlay => Check(_backgroundOverlay);

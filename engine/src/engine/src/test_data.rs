@@ -31,6 +31,7 @@ use masonry::flex_style::{
 use uuid::Uuid;
 
 static CURRENT_BATTLE: LazyLock<Mutex<Option<BattleView>>> = LazyLock::new(|| Mutex::new(None));
+static CARD_BROWSER_SOURCE: LazyLock<Mutex<Option<Position>>> = LazyLock::new(|| Mutex::new(None));
 
 pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     let battle = scene_0(BattleId(Uuid::new_v4()));
@@ -288,12 +289,42 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 CardBrowserType::UserStatus => Position::InUserStatus(PlayerName::User),
                 CardBrowserType::EnemyStatus => Position::InUserStatus(PlayerName::Enemy),
             };
+
+            // Store the source position for later use when closing browser
+            *CARD_BROWSER_SOURCE.lock().unwrap() = Some(source_position);
+
             for card in battle.cards.iter_mut() {
                 if card.position.position == source_position {
                     card.position.position = Position::Browser;
                 }
             }
 
+            *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+
+            PerformActionResponse {
+                metadata,
+                commands: CommandSequence::sequential(vec![Command::UpdateBattle(
+                    UpdateBattleCommand::new(battle),
+                )]),
+            }
+        }
+        BattleAction::CloseCardBrowser => {
+            let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+
+            // Get the source position from our stored global state
+            let source_position = *CARD_BROWSER_SOURCE.lock().unwrap();
+
+            if let Some(position) = source_position {
+                // Move cards from browser back to the original position
+                for card in battle.cards.iter_mut() {
+                    if card.position.position == Position::Browser {
+                        card.position.position = position;
+                    }
+                }
+            }
+
+            // Clear the stored source position
+            *CARD_BROWSER_SOURCE.lock().unwrap() = None;
             *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
 
             PerformActionResponse {
