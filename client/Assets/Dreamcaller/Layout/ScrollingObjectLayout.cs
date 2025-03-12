@@ -25,7 +25,36 @@ namespace Dreamcaller.Layout
     /// </summary>
     float ScrolledXOffset(int index, int count)
     {
-      return ObjectXOffset(index, count);
+      if (count <= WindowSize())
+      {
+        // If all objects fit in view, no scrolling needed
+        return ObjectXOffset(index, count);
+      }
+
+      // Calculate the maximum scroll offset (number of objects that can be scrolled)
+      int maxScrollOffset = count - WindowSize();
+
+      // Calculate the current scroll offset based on _scrollAmount
+      float currentScrollOffset = _scrollAmount * maxScrollOffset;
+
+      // Calculate the effective index with scrolling applied
+      float effectiveIndex = index - currentScrollOffset;
+
+      // Handle objects that are scrolled off to the left (before view)
+      if (effectiveIndex < 0)
+      {
+        return ObjectXOffset(0, count);
+      }
+      // Handle objects that are in view
+      else if (effectiveIndex < count)
+      {
+        return ObjectXOffset(Mathf.FloorToInt(effectiveIndex), count);
+      }
+      // This shouldn't happen, but handle it just in case
+      else
+      {
+        return ObjectXOffset(count - 1, count);
+      }
     }
 
     /// <summary>
