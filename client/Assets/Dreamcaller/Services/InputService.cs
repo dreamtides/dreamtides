@@ -76,7 +76,12 @@ namespace Dreamcaller.Services
     {
       var tapScreenPosition = PointerPosition();
       var ray = Registry.Layout.MainCamera.ScreenPointToRay(tapScreenPosition);
-      var hits = Physics.RaycastNonAlloc(ray, _raycastHitsTempBuffer, 100);
+      var hits = Physics.RaycastNonAlloc(
+          ray,
+          _raycastHitsTempBuffer,
+          maxDistance: 256,
+          LayerMask.GetMask("Default"),
+          QueryTriggerInteraction.Ignore);
 
       var candidates = new List<Displayable>();
       for (var i = 0; i < hits; ++i)
