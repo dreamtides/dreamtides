@@ -77,17 +77,16 @@ namespace Dreamcaller.Services
       var allowedContexts = Registry.DocumentService.AllowedContextForClicks();
       var tapScreenPosition = PointerPosition();
       var ray = Registry.Layout.MainCamera.ScreenPointToRay(tapScreenPosition);
-      var hits = Physics.RaycastNonAlloc(
+      var hits = Physics.RaycastAll(
           ray,
-          _raycastHitsTempBuffer,
           maxDistance: 256,
           LayerMask.GetMask("Default"),
           QueryTriggerInteraction.Ignore);
 
       var candidates = new List<Displayable>();
-      for (var i = 0; i < hits; ++i)
+      for (var i = 0; i < hits.Length; ++i)
       {
-        var hit = _raycastHitsTempBuffer[i];
+        var hit = hits[i];
         var displayable = hit.collider.GetComponent<Displayable>();
         if (displayable && displayable.CanHandleMouseEvents() &&
             (allowedContexts == null || allowedContexts.Contains(displayable.GameContext)))

@@ -73,7 +73,7 @@ namespace Dreamcaller.Layout
       // everything to scroll on the Z axis.
       return new Vector3(
         _zAxis ? _leftEdge.position.x : SmoothedOffset(index, count, Mathf.Clamp01(_scrollAmount)),
-        transform.position.y - YOffset(index, count, Mathf.Clamp01(_zAxis ? 1 - _scrollAmount : _scrollAmount)),
+        transform.position.y,
         _zAxis ? SmoothedOffset(index, count, Mathf.Clamp01(1 - _scrollAmount)) - TotalWidth() : _leftEdge.position.z);
     }
 
@@ -133,52 +133,6 @@ namespace Dreamcaller.Layout
         var positionsAfterWindow = effectiveIndex - WindowSize();
         return Mathf.Max(0, Mathf.FloorToInt(count - WindowSize() - 1 - positionsAfterWindow));
       }
-    }
-
-    float YOffset(float index, float count, float scrollAmount)
-    {
-      // If all objects fit in view, return transform.position.y (no offset)
-      if (count <= WindowSize())
-      {
-        return 0;
-      }
-
-      // Calculate the maximum scroll offset
-      var maxScrollOffset = count - WindowSize();
-
-      // Calculate the current scroll offset based on _scrollAmount
-      var currentScrollOffset = scrollAmount * maxScrollOffset;
-
-      // Calculate the effective index with scrolling applied
-      var effectiveIndex = index - currentScrollOffset;
-
-      // Determine if the object is visible (within the window)
-      var isVisible = effectiveIndex >= 0 && effectiveIndex < WindowSize();
-
-      // Visible objects get higher Y positions (closer to 0 offset)
-      // Non-visible objects get lower Y positions (closer to 1 offset)
-      float yOffset;
-
-      if (isVisible)
-      {
-        // Distribute visible objects evenly in the upper range (0 to 0.4)
-        yOffset = 0.4f * (effectiveIndex / WindowSize());
-      }
-      else if (effectiveIndex < 0)
-      {
-        // Objects before the view window
-        // Position is based on how far off-screen they are, clamped to max 1.0
-        yOffset = 0.4f + Mathf.Min(0.6f, -effectiveIndex / WindowSize());
-      }
-      else
-      {
-        // Objects after the view window
-        // Position is based on how far off-screen they are, clamped to max 1.0
-        yOffset = 0.4f + Mathf.Min(0.6f, (effectiveIndex - WindowSize()) / WindowSize());
-      }
-
-      // Apply the offset to transform.position.y
-      return yOffset;
     }
 
     /// <summary>
