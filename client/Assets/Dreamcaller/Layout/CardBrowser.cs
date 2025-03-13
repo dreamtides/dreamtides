@@ -22,16 +22,22 @@ namespace Dreamcaller.Layout
 
     public void Show(Registry registry, Sequence? sequence)
     {
+      void OnShow()
+      {
+        _closeButton.gameObject.SetActive(true);
+        _isOpen = true;
+      }
+
       if (!_isOpen)
       {
         registry.Layout.BackgroundOverlay.Show(BackgroundOverlay.DisplayOver.Battlefield, 0.75f, sequence);
         if (sequence != null)
         {
-          sequence.AppendCallback(() => _isOpen = true);
+          sequence.AppendCallback(OnShow);
         }
         else
         {
-          _isOpen = true;
+          OnShow();
         }
       }
     }
@@ -47,6 +53,7 @@ namespace Dreamcaller.Layout
 
       if (_isOpen)
       {
+        _closeButton.gameObject.SetActive(false);
         registry.Layout.BackgroundOverlay.Hide(sequence);
         if (sequence != null)
         {
@@ -77,7 +84,6 @@ namespace Dreamcaller.Layout
       if (_isOpen)
       {
         _scrollbar.gameObject.SetActive(Objects.Count > WindowSize());
-        _closeButton.gameObject.SetActive(Objects.Count > WindowSize());
         _scrollbar.size = (float)WindowSize() / Objects.Count;
         _scrollAmount = _scrollbar.value;
         ApplyLayout();
@@ -85,7 +91,6 @@ namespace Dreamcaller.Layout
       else
       {
         _scrollbar.gameObject.SetActive(false);
-        _closeButton.gameObject.SetActive(false);
       }
     }
 
