@@ -22,6 +22,9 @@ namespace Dreamcaller.Layout
 
     public void Show(Registry registry, Sequence? sequence)
     {
+      _scrollbar.value = _zAxis ? 1 : 0;
+      _scrollAmount = _zAxis ? 1 : 0;
+
       void OnShow()
       {
         _closeButton.gameObject.SetActive(true);
@@ -47,8 +50,6 @@ namespace Dreamcaller.Layout
       void onHidden()
       {
         _isOpen = false;
-        _scrollbar.value = 0;
-        _scrollAmount = 0;
       }
 
       if (_isOpen)
