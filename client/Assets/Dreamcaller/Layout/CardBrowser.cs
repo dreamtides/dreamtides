@@ -17,7 +17,7 @@ namespace Dreamcaller.Layout
     [SerializeField] bool _isOpen;
     [SerializeField] bool _zAxis;
     [SerializeField] Button _closeButton = null!;
-
+    [SerializeField] float _maxStackOffsetRight = 1f;
     public bool IsOpen => _isOpen;
 
     public void Show(Registry registry, Sequence? sequence)
@@ -208,14 +208,14 @@ namespace Dreamcaller.Layout
         return ObjectOffset(0, count);
       }
       // Handle objects that are in view
-      else if (effectiveIndex < count)
+      else if (effectiveIndex < WindowSize())
       {
         return ObjectOffset(Mathf.FloorToInt(effectiveIndex), count);
       }
-      // This shouldn't happen, but handle it just in case
+      // Handle objects after the view
       else
       {
-        return ObjectOffset(count - 1, count);
+        return ObjectOffset(Mathf.Min(index, count - 1), count);
       }
     }
 
@@ -255,10 +255,19 @@ namespace Dreamcaller.Layout
       }
       else
       {
-        // All overflow objects share the position of the last visible object
+        // For objects after the visible window, add a small stacking offset
+        // Calculate how many objects are in the stack
+        int overflowCount = count - maxObjectsInView;
+        // Calculate relative position in the overflow stack (0 to 1)
+        float stackPosition = (float)(index - maxObjectsInView) / overflowCount;
+        // Maximum stacking offset
+        // Apply offset based on position in stack
+        float stackOffset = stackPosition * _maxStackOffsetRight;
+
+        // Position at the right edge with the calculated stack offset
         var neededWidth = (maxObjectsInView - 1) * _cardWidth;
         var startX = LeftEdge() + (TotalWidth() - neededWidth) / 2;
-        return startX + ((maxObjectsInView - 1) * _cardWidth);
+        return startX + ((maxObjectsInView - 1) * _cardWidth) + stackOffset;
       }
     }
 
