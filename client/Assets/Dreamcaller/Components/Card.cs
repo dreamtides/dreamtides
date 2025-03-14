@@ -128,6 +128,11 @@ namespace Dreamcaller.Components
       return result;
     }
 
+    void Update()
+    {
+      _outline.gameObject.SetActive(CanPlay() && GameContext == GameContext.Hand);
+    }
+
     void Flip(Component faceUp, Component faceDown, Sequence? sequence, Action? onFlipped = null)
     {
       if (sequence != null)
@@ -166,7 +171,6 @@ namespace Dreamcaller.Components
       ToggleActiveElements();
       _name.text = revealed.Name;
       _rulesText.text = revealed.RulesText;
-      _outline.gameObject.SetActive(CanPlay());
       _costText.text = revealed.Cost.ToString();
       _sparkText.text = revealed.Spark.ToString();
       _battlefieldSparkText.text = revealed.Spark.ToString();
@@ -226,7 +230,6 @@ namespace Dreamcaller.Components
         {
           Parent.RemoveIfPresent(this);
         }
-        _outline.gameObject.SetActive(false);
         _initialDragRotation = transform.rotation;
         _dragStartScreenZ = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
         _dragStartPosition = _registry.InputService.WorldMousePosition(_dragStartScreenZ);
@@ -256,7 +259,6 @@ namespace Dreamcaller.Components
 
     public override void MouseUp()
     {
-      _isDragging = false;
       _registry.SoundService.PlayCardSound();
       _registry.CardService.ClearInfoZoom();
 
@@ -274,11 +276,12 @@ namespace Dreamcaller.Components
         _registry.LayoutService.AddToParent(this);
         _registry.LayoutService.RunAnimations(() =>
         {
-          _outline.gameObject.SetActive(CanPlay());
+          _isDragging = false;
         });
       }
       else
       {
+        _isDragging = false;
         if (CardView.Revealed?.Actions?.OnPlaySound is { } onPlaySound)
         {
           _registry.SoundService.Play(onPlaySound);
