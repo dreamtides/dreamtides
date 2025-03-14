@@ -1237,10 +1237,22 @@ namespace Dreamcaller.Schema
         public bool CanAct { get; set; }
 
         /// <summary>
+        /// Energy available to this player
+        /// </summary>
+        [JsonProperty("energy", Required = Required.Always)]
+        public long Energy { get; set; }
+
+        /// <summary>
         /// Current score total
         /// </summary>
         [JsonProperty("score", Required = Required.Always)]
         public long Score { get; set; }
+
+        /// <summary>
+        /// Total spark for this player
+        /// </summary>
+        [JsonProperty("totalSpark", Required = Required.Always)]
+        public long TotalSpark { get; set; }
     }
 
     /// <summary>

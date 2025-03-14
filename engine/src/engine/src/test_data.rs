@@ -77,6 +77,7 @@ fn draw_card(battle: &mut BattleView) -> Option<CardView> {
     {
         let card_id = deck_card.id;
         let sorting_key = deck_card.position.sorting_key;
+        battle.user.total_spark += Spark(11);
         if let Some(card_index) = battle.cards.iter().position(|c| c.id == card_id) {
             let mut shown_drawn = battle.clone();
             shown_drawn.cards[card_index] = card_view(Position::Drawn, sorting_key);
@@ -360,8 +361,18 @@ fn set_sorting_key(card: &mut CardView, sorting_key: u32) {
 fn scene_0(id: BattleId) -> BattleView {
     BattleView {
         id,
-        user: PlayerView { score: Points(0), can_act: false },
-        enemy: PlayerView { score: Points(0), can_act: false },
+        user: PlayerView {
+            score: Points(0),
+            can_act: false,
+            energy: Energy(0),
+            total_spark: Spark(0),
+        },
+        enemy: PlayerView {
+            score: Points(0),
+            can_act: false,
+            energy: Energy(0),
+            total_spark: Spark(0),
+        },
         cards: [
             cards_in_position(Position::OnBattlefield(PlayerName::User), 0, 5),
             cards_in_position(Position::InHand(PlayerName::User), 5, 3),

@@ -1,5 +1,5 @@
 use core_data::identifiers::BattleId;
-use core_data::numerics::Points;
+use core_data::numerics::{Energy, Points, Spark};
 use masonry::flex_node::FlexNode;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -68,4 +68,10 @@ pub struct PlayerView {
 
     /// Can this player currently take a game action?
     pub can_act: bool,
+
+    /// Energy available to this player
+    pub energy: Energy,
+
+    /// Total spark for this player
+    pub total_spark: Spark,
 }

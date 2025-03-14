@@ -41,11 +41,11 @@ namespace Dreamcaller.Layout
     [SerializeField] ObjectLayout? _enemyVoid;
     public ObjectLayout EnemyVoid => Check(_enemyVoid);
 
-    [SerializeField] ObjectLayout? _userAvatar;
-    public ObjectLayout UserAvatar => Check(_userAvatar);
+    [SerializeField] PlayerStatusDisplay? _userStatusDisplay;
+    public PlayerStatusDisplay UserStatusDisplay => Check(_userStatusDisplay);
 
-    [SerializeField] ObjectLayout? _enemyAvatar;
-    public ObjectLayout EnemyAvatar => Check(_enemyAvatar);
+    [SerializeField] PlayerStatusDisplay? _enemyStatusDisplay;
+    public PlayerStatusDisplay EnemyStatusDisplay => Check(_enemyStatusDisplay);
 
     [SerializeField] ObjectLayout? _offscreen;
     public ObjectLayout Offscreen => Check(_offscreen);

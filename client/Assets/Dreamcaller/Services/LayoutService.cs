@@ -116,8 +116,8 @@ namespace Dreamcaller.Services
       {
         return avatar switch
         {
-          PlayerName.User => Registry.Layout.UserAvatar,
-          PlayerName.Enemy => Registry.Layout.EnemyAvatar,
+          PlayerName.User => Registry.Layout.UserStatusDisplay,
+          PlayerName.Enemy => Registry.Layout.EnemyStatusDisplay,
           _ => throw Errors.UnknownEnumValue(avatar)
         };
       }
@@ -187,8 +187,8 @@ namespace Dreamcaller.Services
       Registry.Layout.EnemyDeck.ApplyLayout(sequence);
       Registry.Layout.UserVoid.ApplyLayout(sequence);
       Registry.Layout.EnemyVoid.ApplyLayout(sequence);
-      Registry.Layout.UserAvatar.ApplyLayout(sequence);
-      Registry.Layout.EnemyAvatar.ApplyLayout(sequence);
+      Registry.Layout.UserStatusDisplay.ApplyLayout(sequence);
+      Registry.Layout.EnemyStatusDisplay.ApplyLayout(sequence);
       Registry.Layout.UserBattlefield.ApplyLayout(sequence);
       Registry.Layout.EnemyBattlefield.ApplyLayout(sequence);
       Registry.Layout.DrawnCardsPosition.ApplyLayout(sequence);

@@ -126,6 +126,8 @@ namespace Dreamcaller.Services
       {
         if (command.UpdateBattle != null)
         {
+          Registry.Layout.UserStatusDisplay.UpdatePlayerView(command.UpdateBattle.Battle.User, animate);
+          Registry.Layout.EnemyStatusDisplay.UpdatePlayerView(command.UpdateBattle.Battle.Enemy, animate);
           Registry.DocumentService.RenderScreenOverlay(command.UpdateBattle.Battle.Interface?.ScreenOverlay);
           coroutines.Add(StartCoroutine(Registry.LayoutService.UpdateLayout(command.UpdateBattle, sequence)));
         }
