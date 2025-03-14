@@ -130,7 +130,7 @@ namespace Dreamcaller.Components
 
     void Update()
     {
-      _outline.gameObject.SetActive(CanPlay() && GameContext == GameContext.Hand);
+      _outline.gameObject.SetActive(CanPlay());
     }
 
     void Flip(Component faceUp, Component faceDown, Sequence? sequence, Action? onFlipped = null)
@@ -271,37 +271,40 @@ namespace Dreamcaller.Components
         });
       }
 
-      if (ShouldReturnToPreviousParentOnRelease())
+      if (_isDragging)
       {
-        _registry.LayoutService.AddToParent(this);
-        _registry.LayoutService.RunAnimations(() =>
+        if (ShouldReturnToPreviousParentOnRelease())
         {
-          _isDragging = false;
-        });
-      }
-      else
-      {
-        _isDragging = false;
-        if (CardView.Revealed?.Actions?.OnPlaySound is { } onPlaySound)
-        {
-          _registry.SoundService.Play(onPlaySound);
+          _registry.LayoutService.AddToParent(this);
+          _registry.LayoutService.RunAnimations(() =>
+          {
+            _isDragging = false;
+          });
         }
         else
         {
-          _registry.SoundService.PlayWhooshSound();
-        }
-        var action = new UserAction
-        {
-          BattleAction = new()
+          _isDragging = false;
+          if (CardView.Revealed?.Actions?.OnPlaySound is { } onPlaySound)
           {
-            BattleActionClass = new()
-            {
-              PlayCard = CardView.Id
-            }
+            _registry.SoundService.Play(onPlaySound);
           }
-        };
+          else
+          {
+            _registry.SoundService.PlayWhooshSound();
+          }
+          var action = new UserAction
+          {
+            BattleAction = new()
+            {
+              BattleActionClass = new()
+              {
+                PlayCard = CardView.Id
+              }
+            }
+          };
 
-        _registry.ActionService.PerformAction(action);
+          _registry.ActionService.PerformAction(action);
+        }
       }
     }
 
@@ -350,6 +353,7 @@ namespace Dreamcaller.Components
     }
 
     bool CanPlay() => CardView.Revealed?.Actions.CanPlay == true &&
-      _registry.CapabilitiesService.CanDragCards();
+      _registry.CapabilitiesService.CanDragCards() &&
+      GameContext == GameContext.Hand;
   }
 }
