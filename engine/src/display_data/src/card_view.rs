@@ -59,7 +59,7 @@ pub struct RevealedCardView {
     pub name: String,
 
     /// Cost of this card
-    pub cost: Energy,
+    pub cost: Option<Energy>,
 
     /// Spark value for this card
     pub spark: Option<Spark>,
@@ -131,11 +131,14 @@ pub enum CardPrefab {
     Default,
     Token,
     Dreamwell,
+    Enemy,
+    Dreamsign,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum CardFrame {
+    Default,
     Character,
     Event,
 }

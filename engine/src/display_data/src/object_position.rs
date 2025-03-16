@@ -63,8 +63,8 @@ pub enum Position {
     /// Object is on the battlefield
     OnBattlefield(PlayerName),
 
-    /// Object is in the user's status zone
-    InUserStatus(PlayerName),
+    /// Object is in a player's status zone
+    InPlayerStatus(PlayerName),
 
     /// Object is being displayed in a card browser, e.g. to select from a list
     /// of cards while searching

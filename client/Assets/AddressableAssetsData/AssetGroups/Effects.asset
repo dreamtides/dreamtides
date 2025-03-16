@@ -27,6 +27,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 20c72fdd75b7e4ee682473e597c0525c
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/2027158310.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 24c86df1468884d499ca1d5cb865a6f7
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile
       1 nature arrow.prefab
@@ -51,6 +56,16 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5e0930dafb3524b55b972ad349299d67
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/2521694543.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6761eeb7b5c4b4d208be1a1c10f1d0c1
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/1633431262.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 828951a51d69a418d9de14a1a4ea193b
     m_Address: Assets/ThirdParty/Hovl Studio/Magic circles/Prefabs/Magic circle 1
       Variant.prefab
@@ -66,6 +81,16 @@ MonoBehaviour:
   - m_GUID: 9e562fe28ab2f4d8e8e3a0c90173fab3
     m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic
       Magic and Impacts/RPG3_Magic2_Cast03v1.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e279243d2b40043ef9aa4e7ab6fde553
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/2269064817.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e8da2e685b68a4813961f0409f5135e9
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/2269064809.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

@@ -18,6 +18,7 @@ namespace Dreamcaller.Layout
     [SerializeField] bool _zAxis;
     [SerializeField] Button _closeButton = null!;
     [SerializeField] float _maxStackOffsetRight = 1f;
+    [SerializeField] Transform _singleCardPosition = null!;
     public bool IsOpen => _isOpen;
 
     public void Show(Registry registry, Sequence? sequence)
@@ -69,6 +70,11 @@ namespace Dreamcaller.Layout
 
     protected override Vector3 CalculateObjectPosition(int index, int count)
     {
+      if (count == 1)
+      {
+        return _singleCardPosition.position;
+      }
+
       // In landscape mode we *decrease* Z positions as we move towards screen
       // right, which in retrospect was stupid. So now we have to invert
       // everything to scroll on the Z axis.

@@ -287,8 +287,8 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 CardBrowserType::EnemyDeck => Position::InDeck(PlayerName::Enemy),
                 CardBrowserType::UserVoid => Position::InVoid(PlayerName::User),
                 CardBrowserType::EnemyVoid => Position::InVoid(PlayerName::Enemy),
-                CardBrowserType::UserStatus => Position::InUserStatus(PlayerName::User),
-                CardBrowserType::EnemyStatus => Position::InUserStatus(PlayerName::Enemy),
+                CardBrowserType::UserStatus => Position::InPlayerStatus(PlayerName::User),
+                CardBrowserType::EnemyStatus => Position::InPlayerStatus(PlayerName::Enemy),
             };
 
             // Store the source position for later use when closing browser
@@ -386,6 +386,7 @@ fn scene_0(id: BattleId) -> BattleView {
             cards_in_position(Position::OnBattlefield(PlayerName::User), 533, 3),
             cards_in_position(Position::OnBattlefield(PlayerName::Enemy), 633, 3),
             cards_in_position(Position::InHand(PlayerName::Enemy), 733, 5),
+            vec![enemy_card(Position::InPlayerStatus(PlayerName::Enemy), 738)],
         ]
         .concat()
         .to_vec(),
@@ -427,12 +428,12 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
         card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
-                address: SpriteAddress::new("Assets/ThirdParty/GameAssets/CardImages/2521694543.png"),
+                address: SpriteAddress::new("Assets/ThirdParty/GameAssets/CardImages/Standard/2521694543.png"),
             },
             name: "Titan of Forgotten Echoes".to_string(),
             rules_text: "When you materialize your second character in a turn, return this character from your void to play.".to_string(),
             status: None,
-            cost: Energy(6),
+            cost: Some(Energy(6)),
             spark: Some(Spark(4)),
             card_type: "Ancient".to_string(),
             frame: CardFrame::Character,
@@ -461,13 +462,13 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
                 address: SpriteAddress::new(
-                    "Assets/ThirdParty/GameAssets/CardImages/1633431262.png",
+                    "Assets/ThirdParty/GameAssets/CardImages/Standard/1633431262.png",
                 ),
             },
             name: "Beacon of Tomorrow".to_string(),
             rules_text: "Discover a card with cost (2).".to_string(),
             status: None,
-            cost: Energy(2),
+            cost: Some(Energy(2)),
             spark: None,
             card_type: "Event".to_string(),
             frame: CardFrame::Event,
@@ -503,13 +504,13 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
                 address: SpriteAddress::new(
-                    "Assets/ThirdParty/GameAssets/CardImages/2269064817.png",
+                    "Assets/ThirdParty/GameAssets/CardImages/Standard/2269064817.png",
                 ),
             },
             name: "Scrap Reclaimer".to_string(),
             rules_text: "Judgment: Return this character from your void to your hand. Born from rust and resilience.".to_string(),
             status: None,
-            cost: Energy(4),
+            cost: Some(Energy(4)),
             spark: Some(Spark(0)),
             card_type: "Tinkerer".to_string(),
             frame: CardFrame::Character,
@@ -539,14 +540,14 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
                 address: SpriteAddress::new(
-                    "Assets/ThirdParty/GameAssets/CardImages/2269064809.png",
+                    "Assets/ThirdParty/GameAssets/CardImages/Standard/2269064809.png",
                 ),
             },
             name: "Evacuation Enforcer".to_string(),
             rules_text: "> Draw 2 cards. Discard 3 cards.\nPromises under a stormy sky."
                 .to_string(),
             status: None,
-            cost: Energy(2),
+            cost: Some(Energy(2)),
             spark: Some(Spark(0)),
             card_type: "Trooper".to_string(),
             frame: CardFrame::Character,
@@ -575,13 +576,13 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
                 address: SpriteAddress::new(
-                    "Assets/ThirdParty/GameAssets/CardImages/2027158310.png",
+                    "Assets/ThirdParty/GameAssets/CardImages/Standard/2027158310.png",
                 ),
             },
             name: "Moonlit Voyage".to_string(),
             rules_text: "Draw 2 cards. Discard 2 cards.\nReclaim".to_string(),
             status: None,
-            cost: Energy(2),
+            cost: Some(Energy(2)),
             spark: None,
             card_type: "Event".to_string(),
             frame: CardFrame::Event,
@@ -600,6 +601,39 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
         create_position: None,
         destroy_position: None,
         prefab: CardPrefab::Token,
+    }
+}
+
+fn enemy_card(position: Position, sorting_key: u32) -> CardView {
+    CardView {
+        id: CardId::from_int(sorting_key as u64),
+        position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
+        card_back: Url::new("".to_string()),
+        revealed: Some(RevealedCardView {
+            image: DisplayImage {
+                address: SpriteAddress::new(
+                    "Assets/ThirdParty/GameAssets/CardImages/Enemy/Korrak.png",
+                ),
+            },
+            name: "<size=200%>Korrak</size>\nHellfire Sovereign".to_string(),
+            rules_text: ">Judgment: A character you control gains +2 spark.".to_string(),
+            status: None,
+            cost: None,
+            spark: None,
+            card_type: "Enemey".to_string(),
+            frame: CardFrame::Default,
+            supplemental_card_info: flex_node(
+                "<b>Judgment</b>: Triggers at the start of enemy's turn.",
+            ),
+            is_fast: false,
+            actions: CardActions::default(),
+            effects: CardEffects::default(),
+        }),
+        revealed_to_opponents: true,
+        card_facing: CardFacing::FaceUp,
+        create_position: None,
+        destroy_position: None,
+        prefab: CardPrefab::Enemy,
     }
 }
 

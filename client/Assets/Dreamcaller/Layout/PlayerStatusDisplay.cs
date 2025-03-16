@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Dreamcaller.Layout
 {
-  public class PlayerStatusDisplay : StackObjectLayout
+  public class PlayerStatusDisplay : StandardObjectLayout
   {
     [SerializeField] BattlefieldNumber _energy = null!;
     [SerializeField] BattlefieldNumber _score = null!;
@@ -17,5 +17,11 @@ namespace Dreamcaller.Layout
       _score.SetNumber(playerView.Score, animate);
       _totalSpark.SetNumber(playerView.TotalSpark, animate);
     }
+
+    protected override Vector3 CalculateObjectPosition(int index, int count) => transform.position;
+
+    protected override Vector3? CalculateObjectRotation(int index, int count) => new(90, 0, 0);
+
+    protected override float? CalculateObjectScale(int index, int count) => 0;
   }
 }

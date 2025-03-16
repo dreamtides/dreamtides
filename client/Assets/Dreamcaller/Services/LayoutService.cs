@@ -18,6 +18,8 @@ namespace Dreamcaller.Services
     [SerializeField] Card _cardPrefab = null!;
     [SerializeField] Card _tokenPrefab = null!;
     [SerializeField] Card _dreamwellPrefab = null!;
+    [SerializeField] Card _enemyPrefab = null!;
+    [SerializeField] Card _dreamsignPrefab = null!;
 
     Dictionary<string, Card> Cards { get; } = new();
 
@@ -47,6 +49,8 @@ namespace Dreamcaller.Services
           {
             CardPrefab.Token => ComponentUtils.Instantiate(_tokenPrefab),
             CardPrefab.Dreamwell => ComponentUtils.Instantiate(_dreamwellPrefab),
+            CardPrefab.Enemy => ComponentUtils.Instantiate(_enemyPrefab),
+            CardPrefab.Dreamsign => ComponentUtils.Instantiate(_dreamsignPrefab),
             _ => ComponentUtils.Instantiate(_cardPrefab)
           };
           if (cardView.CreatePosition != null)
@@ -298,6 +302,16 @@ namespace Dreamcaller.Services
           PlayerName.User => Registry.Layout.UserVoid,
           PlayerName.Enemy => Registry.Layout.EnemyVoid,
           _ => throw Errors.UnknownEnumValue(inVoid),
+        };
+      }
+
+      if (position.PositionClass.InPlayerStatus is { } inPlayerStatus)
+      {
+        return inPlayerStatus switch
+        {
+          PlayerName.User => Registry.Layout.UserStatusDisplay,
+          PlayerName.Enemy => Registry.Layout.EnemyStatusDisplay,
+          _ => throw Errors.UnknownEnumValue(inPlayerStatus),
         };
       }
 

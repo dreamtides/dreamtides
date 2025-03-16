@@ -376,7 +376,7 @@ namespace Dreamcaller.Schema
     ///
     /// Object is on the battlefield
     ///
-    /// Object is in the user's status zone
+    /// Object is in a player's status zone
     ///
     /// Object is hidden within a card
     /// </summary>
@@ -403,8 +403,8 @@ namespace Dreamcaller.Schema
         [JsonProperty("onBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayerName? OnBattlefield { get; set; }
 
-        [JsonProperty("inUserStatus", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? InUserStatus { get; set; }
+        [JsonProperty("inPlayerStatus", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PlayerName? InPlayerStatus { get; set; }
 
         [JsonProperty("hiddenWithinCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardId HiddenWithinCard { get; set; }
@@ -430,8 +430,8 @@ namespace Dreamcaller.Schema
         /// <summary>
         /// Cost of this card
         /// </summary>
-        [JsonProperty("cost", Required = Required.Always)]
-        public long Cost { get; set; }
+        [JsonProperty("cost")]
+        public long? Cost { get; set; }
 
         /// <summary>
         /// Special effects to display for this card
@@ -1361,7 +1361,7 @@ namespace Dreamcaller.Schema
     /// <summary>
     /// Represents the general category of card being displayed.
     /// </summary>
-    public enum CardPrefab { Default, Dreamwell, Token };
+    public enum CardPrefab { Default, Dreamsign, Dreamwell, Enemy, Token };
 
     /// <summary>
     /// Close the card browser
@@ -1378,7 +1378,7 @@ namespace Dreamcaller.Schema
     /// <summary>
     /// Frame to display for this card
     /// </summary>
-    public enum CardFrame { Character, Event };
+    public enum CardFrame { Character, Default, Event };
 
     public enum RevealedCardStatus { CanPlay, CanSelectNegative, CanSelectPositive, Selected };
 
@@ -1788,8 +1788,12 @@ namespace Dreamcaller.Schema
             {
                 case "default":
                     return CardPrefab.Default;
+                case "dreamsign":
+                    return CardPrefab.Dreamsign;
                 case "dreamwell":
                     return CardPrefab.Dreamwell;
+                case "enemy":
+                    return CardPrefab.Enemy;
                 case "token":
                     return CardPrefab.Token;
             }
@@ -1809,8 +1813,14 @@ namespace Dreamcaller.Schema
                 case CardPrefab.Default:
                     serializer.Serialize(writer, "default");
                     return;
+                case CardPrefab.Dreamsign:
+                    serializer.Serialize(writer, "dreamsign");
+                    return;
                 case CardPrefab.Dreamwell:
                     serializer.Serialize(writer, "dreamwell");
+                    return;
+                case CardPrefab.Enemy:
+                    serializer.Serialize(writer, "enemy");
                     return;
                 case CardPrefab.Token:
                     serializer.Serialize(writer, "token");
@@ -2008,6 +2018,8 @@ namespace Dreamcaller.Schema
             {
                 case "character":
                     return CardFrame.Character;
+                case "default":
+                    return CardFrame.Default;
                 case "event":
                     return CardFrame.Event;
             }
@@ -2026,6 +2038,9 @@ namespace Dreamcaller.Schema
             {
                 case CardFrame.Character:
                     serializer.Serialize(writer, "character");
+                    return;
+                case CardFrame.Default:
+                    serializer.Serialize(writer, "default");
                     return;
                 case CardFrame.Event:
                     serializer.Serialize(writer, "event");

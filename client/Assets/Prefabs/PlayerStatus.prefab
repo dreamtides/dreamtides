@@ -117,7 +117,6 @@ MonoBehaviour:
   _internalGameContext: 0
   _objects: []
   _debugUpdateContinuously: 0
-  _singleElementY: 0.5
   _energy: {fileID: 6444596420884388508}
   _score: {fileID: 5763517836396328896}
   _totalSpark: {fileID: 0}
