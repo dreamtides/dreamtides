@@ -387,6 +387,7 @@ fn scene_0(id: BattleId) -> BattleView {
             cards_in_position(Position::OnBattlefield(PlayerName::Enemy), 633, 3),
             cards_in_position(Position::InHand(PlayerName::Enemy), 733, 5),
             vec![enemy_card(Position::InPlayerStatus(PlayerName::Enemy), 738)],
+            vec![dreamsign_card(Position::InPlayerStatus(PlayerName::User), 739)],
         ]
         .concat()
         .to_vec(),
@@ -620,7 +621,7 @@ fn enemy_card(position: Position, sorting_key: u32) -> CardView {
             status: None,
             cost: None,
             spark: None,
-            card_type: "Enemey".to_string(),
+            card_type: "Enemy".to_string(),
             frame: CardFrame::Default,
             supplemental_card_info: flex_node(
                 "<b>Judgment</b>: Triggers at the start of enemy's turn.",
@@ -634,6 +635,40 @@ fn enemy_card(position: Position, sorting_key: u32) -> CardView {
         create_position: None,
         destroy_position: None,
         prefab: CardPrefab::Enemy,
+    }
+}
+
+fn dreamsign_card(position: Position, sorting_key: u32) -> CardView {
+    CardView {
+        id: CardId::from_int(sorting_key as u64),
+        position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
+        card_back: Url::new("".to_string()),
+        revealed: Some(RevealedCardView {
+            image: DisplayImage {
+                address: SpriteAddress::new(
+                    "Assets/ThirdParty/GameAssets/CardImages/Dreamsign/DragonEgg.png",
+                ),
+            },
+            name: "Dragon Egg".to_string(),
+            rules_text: ">Judgment: If you control 3 characters with the same type, draw a card."
+                .to_string(),
+            status: None,
+            cost: None,
+            spark: None,
+            card_type: "Dreamsign".to_string(),
+            frame: CardFrame::Default,
+            supplemental_card_info: flex_node(
+                "<b>Judgment</b>: Triggers at the start of enemy's turn.",
+            ),
+            is_fast: false,
+            actions: CardActions::default(),
+            effects: CardEffects::default(),
+        }),
+        revealed_to_opponents: true,
+        card_facing: CardFacing::FaceUp,
+        create_position: None,
+        destroy_position: None,
+        prefab: CardPrefab::Dreamsign,
     }
 }
 

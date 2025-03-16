@@ -10,6 +10,7 @@ namespace Dreamcaller.Layout
     [SerializeField] BattlefieldNumber _energy = null!;
     [SerializeField] BattlefieldNumber _score = null!;
     [SerializeField] BattlefieldNumber _totalSpark = null!;
+    [SerializeField] bool _isLandscape;
 
     public void UpdatePlayerView(PlayerView playerView, bool animate)
     {
@@ -20,7 +21,7 @@ namespace Dreamcaller.Layout
 
     protected override Vector3 CalculateObjectPosition(int index, int count) => transform.position;
 
-    protected override Vector3? CalculateObjectRotation(int index, int count) => new(90, 0, 0);
+    protected override Vector3? CalculateObjectRotation(int index, int count) => new(90, _isLandscape ? 90 : 0, 0);
 
     protected override float? CalculateObjectScale(int index, int count) => 0;
   }
