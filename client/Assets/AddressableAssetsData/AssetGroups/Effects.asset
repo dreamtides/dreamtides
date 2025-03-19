@@ -78,6 +78,12 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9923ce196f3004c15a141fab6be7b221
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic
+      Magic and Impacts/RPG3_Magic2_Projectiles02.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9e562fe28ab2f4d8e8e3a0c90173fab3
     m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic
       Magic and Impacts/RPG3_Magic2_Cast03v1.wav

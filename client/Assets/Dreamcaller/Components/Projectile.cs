@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -27,10 +28,11 @@ namespace Dreamcaller.Components
       Registry registry,
       Transform target,
       Milliseconds? duration,
-      EffectAddress? additionalHit,
-      Milliseconds? additionalHitDelay,
-      AudioClipAddress? fireSound,
-      AudioClipAddress? impactSound)
+      EffectAddress? additionalHit = null,
+      Milliseconds? additionalHitDelay = null,
+      AudioClipAddress? fireSound = null,
+      AudioClipAddress? impactSound = null,
+      Action? onHit = null)
     {
       transform.localScale = _scale * Vector3.one;
       transform.LookAt(target);
@@ -64,6 +66,8 @@ namespace Dreamcaller.Components
         hit.transform.localScale = _scale * Vector3.one;
         hit.gameObject.SetActive(true);
       }
+
+      onHit?.Invoke();
 
       if (impactSound != null)
       {

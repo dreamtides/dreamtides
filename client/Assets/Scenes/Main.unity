@@ -8698,8 +8698,10 @@ MonoBehaviour:
   - {fileID: 8300000, guid: f1f5771149224f0429d3c0177b03c987, type: 3}
   - {fileID: 8300000, guid: f083c4b6de88b954da562c3b0d28dd92, type: 3}
   - {fileID: 8300000, guid: f52e02a8ecc98d54ebf8134a70e3fe97, type: 3}
-  _fireProjectileSounds: []
-  _impactProjectileSounds: []
+  _fireProjectileSounds:
+  - {fileID: 8300000, guid: 41a02e63b56db4edcb017528155471e9, type: 3}
+  _impactProjectileSounds:
+  - {fileID: 8300000, guid: 2abe8897646e346f795d4e7357f8cb1a, type: 3}
   _whooshSounds:
   - {fileID: 8300000, guid: ec87c5a9fc6564ca4bdfd0776b7382bf, type: 3}
   _clickSounds:
@@ -8824,6 +8826,7 @@ MonoBehaviour:
   _noPointsSound: {fileID: 8300000, guid: 92e209a799fa946439c66c987abac0ef, type: 3}
   _pointsSound: {fileID: 8300000, guid: 40ff546e59bd542c58259da9c6580b71, type: 3}
   _hitEffectPrefab: {fileID: 5647749798983906044, guid: 0ab1512bca508474988328505f3d7685, type: 3}
+  _scorePointsProjectilePrefab: {fileID: 1777540147525750836, guid: 084af1218a1e0ee41a43bdf9d52aea29, type: 3}
 --- !u!1001 &625589745
 PrefabInstance:
   m_ObjectHideFlags: 0

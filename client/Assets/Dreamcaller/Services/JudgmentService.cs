@@ -5,7 +5,7 @@ using DG.Tweening;
 using Dreamcaller.Components;
 using Dreamcaller.Schema;
 using Dreamcaller.Utils;
-using Graphy.Runtime.UI;
+using UnityEditor;
 using UnityEngine;
 
 namespace Dreamcaller.Services
@@ -20,15 +20,17 @@ namespace Dreamcaller.Services
     [SerializeField] AudioClip _noPointsSound = null!;
     [SerializeField] AudioClip _pointsSound = null!;
     [SerializeField] TimedEffect _hitEffectPrefab = null!;
+    [SerializeField] Projectile _scorePointsProjectilePrefab = null!;
 
     public IEnumerator HandleDisplayJudgmentCommand(DisplayJudgmentCommand displayJudgment)
     {
       var sequence = TweenUtils.Sequence("DisplayJudgment");
       var actorIsUser = displayJudgment.Player == PlayerName.User;
       var actorScoredPoints = displayJudgment.NewScore != null;
-      var actorSparkTotal = actorIsUser ?
-          Registry.Layout.UserStatusDisplay.TotalSpark.transform :
-          Registry.Layout.EnemyStatusDisplay.TotalSpark.transform;
+      var actorStatusDisplay = actorIsUser ?
+          Registry.Layout.UserStatusDisplay :
+          Registry.Layout.EnemyStatusDisplay;
+      var actorSparkTotal = actorStatusDisplay.TotalSpark.transform;
       var opponentSparkTotal = actorIsUser ?
           Registry.Layout.EnemyStatusDisplay.TotalSpark.transform :
           Registry.Layout.UserStatusDisplay.TotalSpark.transform;
@@ -70,6 +72,17 @@ namespace Dreamcaller.Services
         hit.transform.rotation = rotation;
         hit.transform.localScale = 5f * Vector3.one;
         Registry.SoundService.Play(actorScoredPoints ? _pointsSound : _noPointsSound);
+        if (actorScoredPoints)
+        {
+          var projectile = Registry.AssetPoolService.Create(_scorePointsProjectilePrefab, actorSparkTotal.position);
+          StartCoroutine(projectile.Fire(Registry, actorStatusDisplay.transform, new Milliseconds
+          {
+            MillisecondsValue = 500,
+          }, onHit: () =>
+          {
+            actorStatusDisplay.Score.SetNumber(displayJudgment.NewScore!.Value, true);
+          }));
+        }
       });
 
       // Add shake effect after collision
@@ -79,10 +92,14 @@ namespace Dreamcaller.Services
       // Animate both objects returning to their original positions
       sequence.Append(actorSparkTotal.DOMove(actorOriginalPos, _durationMultiplier * 0.1f));
       sequence.Join(opponentSparkTotal.DOMove(opponentOriginalPos, _durationMultiplier * 0.1f));
-      sequence.AppendCallback(() =>
+
+      if (!actorScoredPoints)
       {
-        Registry.SoundService.Play(_startSound);
-      });
+        sequence.AppendCallback(() =>
+        {
+          Registry.SoundService.Play(_startSound);
+        });
+      }
 
       yield return sequence.WaitForCompletion();
     }
