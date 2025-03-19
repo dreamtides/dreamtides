@@ -14,10 +14,10 @@ namespace Dreamcaller.Services
     [SerializeField] GameLayout? _portraitLayout;
     [SerializeField] GameLayout? _landscapeLayout;
 
-    public bool IsPortrait => _isPortrait;
+    public bool IsLandscape => !_isPortrait;
 
     public GameLayout Layout =>
-        IsPortrait ? Check(_portraitLayout) : Check(_landscapeLayout);
+        IsLandscape ? Check(_landscapeLayout) : Check(_portraitLayout);
 
     [SerializeField] LayoutService? _layoutService;
     public LayoutService LayoutService => Check(_layoutService);

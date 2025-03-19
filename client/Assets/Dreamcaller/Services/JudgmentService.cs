@@ -5,7 +5,7 @@ using DG.Tweening;
 using Dreamcaller.Components;
 using Dreamcaller.Schema;
 using Dreamcaller.Utils;
-using UnityEditor;
+
 using UnityEngine;
 
 namespace Dreamcaller.Services
@@ -24,6 +24,7 @@ namespace Dreamcaller.Services
 
     public IEnumerator HandleDisplayJudgmentCommand(DisplayJudgmentCommand displayJudgment)
     {
+      var isLandscape = Registry.IsLandscape;
       var sequence = TweenUtils.Sequence("DisplayJudgment");
       var actorIsUser = displayJudgment.Player == PlayerName.User;
       var actorScoredPoints = displayJudgment.NewScore != null;
@@ -39,32 +40,42 @@ namespace Dreamcaller.Services
 
       Registry.SoundService.Play(_startSound);
       var actorUpPosition = new Vector3(
-        actorOriginalPos.x + 1f,
+        actorOriginalPos.x + (isLandscape ? 0 : 1f),
         actorOriginalPos.y + 3,
-        actorOriginalPos.z
+        actorOriginalPos.z - (isLandscape ? 2f : 0)
       );
       var opponentUpPosition = new Vector3(
-        opponentOriginalPos.x + 1f,
+        opponentOriginalPos.x + (isLandscape ? 0 : 1f),
         opponentOriginalPos.y + 3,
-        opponentOriginalPos.z
+        opponentOriginalPos.z - (isLandscape ? 2f : 0)
       );
       sequence.Append(actorSparkTotal.DOMove(actorUpPosition, _durationMultiplier * 0.1f));
       sequence.Join(opponentSparkTotal.DOMove(opponentUpPosition, _durationMultiplier * 0.1f));
 
+      // Calculate movement direction based on orientation and player
+      float moveDirection = actorIsUser ? -1f : 1f;
+      Vector3 moveAwayPosition = actorUpPosition;
+      Vector3 moveBackPosition = actorUpPosition;
+
+      if (isLandscape)
+      {
+        // In landscape, move along X axis
+        moveAwayPosition.x += moveDirection;
+        moveBackPosition.x -= moveDirection; // Opposite direction for moving back
+      }
+      else
+      {
+        // In portrait, move along Z axis
+        moveAwayPosition.z += moveDirection;
+        moveBackPosition.z -= moveDirection; // Opposite direction for moving back
+      }
+
       // Move away from opponent
-      sequence.Append(actorSparkTotal.DOMove(new Vector3(
-        actorUpPosition.x,
-        actorUpPosition.y,
-        actorUpPosition.z + (actorIsUser ? -1f : 1f)
-      ), _durationMultiplier * 0.1f));
+      sequence.Append(actorSparkTotal.DOMove(moveAwayPosition, _durationMultiplier * 0.1f));
       sequence.AppendCallback(() => Registry.SoundService.Play(_windUpSound));
 
       // Rapidly move back towards opponent
-      sequence.Append(actorSparkTotal.DOMove(new Vector3(
-        actorUpPosition.x,
-        actorUpPosition.y,
-        actorUpPosition.z + (actorIsUser ? 1f : -1f)
-      ), _durationMultiplier * 0.05f));
+      sequence.Append(actorSparkTotal.DOMove(moveBackPosition, _durationMultiplier * 0.05f));
       sequence.AppendCallback(() =>
       {
         var hit = Registry.AssetPoolService.Create(_hitEffectPrefab, actorSparkTotal.position);

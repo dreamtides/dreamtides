@@ -12,8 +12,8 @@ namespace Dreamcaller.Components
 
     public void Activate(Registry registry)
     {
-      _portrait.gameObject.SetActive(registry.IsPortrait);
-      _landscape.gameObject.SetActive(!registry.IsPortrait);
+      _portrait.gameObject.SetActive(!registry.IsLandscape);
+      _landscape.gameObject.SetActive(registry.IsLandscape);
     }
   }
 }
