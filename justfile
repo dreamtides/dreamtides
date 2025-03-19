@@ -149,14 +149,3 @@ samply-benchmark *args='':
     BENCHMARK=`echo ./src-tauri/target/release/deps/benchmarks-*([1])`
     echo "Running" $BENCHMARK
     samply record $BENCHMARK --bench --profile-time 5 "$@"
-
-
-Determinate progress ring
-Indeterminate progress ring
-Inline Reactions
-Vertical grid
-
-Attribute selector
-Composer
-Determinate progress ring
-Vertical grid
