@@ -8816,9 +8816,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84cf9e3b2da50487bbf81f05607d1d84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _durationMultiplier: 3
+  _durationMultiplier: 2
   _shakeStrength: 0.3
   _shakeVibrato: 10
+  _startSound: {fileID: 8300000, guid: ec87c5a9fc6564ca4bdfd0776b7382bf, type: 3}
+  _windUpSound: {fileID: 8300000, guid: 9c1aee3bcc1e0431a97b0c28e41e60e3, type: 3}
+  _noPointsSound: {fileID: 8300000, guid: 92e209a799fa946439c66c987abac0ef, type: 3}
+  _pointsSound: {fileID: 8300000, guid: 40ff546e59bd542c58259da9c6580b71, type: 3}
+  _hitEffectPrefab: {fileID: 5647749798983906044, guid: 0ab1512bca508474988328505f3d7685, type: 3}
 --- !u!1001 &625589745
 PrefabInstance:
   m_ObjectHideFlags: 0
