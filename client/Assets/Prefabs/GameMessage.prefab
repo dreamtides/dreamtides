@@ -366,9 +366,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'YOUR TURN
-
-    <size=60%><cspace="-0.5em">> JUDGMENT <</cspace></size>'
+  m_text: "YOUR TURN\n<size=60%><cspace=\"-0.5em\">\u25CF JUDGMENT \u25CF</cspace></size>"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2be120b2218e34571b466d19bded3ddf, type: 2}
   m_sharedMaterial: {fileID: 2023162549472097733, guid: 2be120b2218e34571b466d19bded3ddf, type: 2}
@@ -545,9 +543,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'ENEMY TURN
-
-    <size=60%><cspace="-0.5em">> JUDGMENT <</cspace></size>'
+  m_text: "ENEMY TURN\n<size=60%><cspace=\"-0.5em\">\u25CF JUDGMENT \u25CF</cspace></size>"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2be120b2218e34571b466d19bded3ddf, type: 2}
   m_sharedMaterial: {fileID: 2023162549472097733, guid: 2be120b2218e34571b466d19bded3ddf, type: 2}

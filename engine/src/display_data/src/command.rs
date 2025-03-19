@@ -1,5 +1,6 @@
 use core_data::display_types::{AudioClipAddress, EffectAddress, Milliseconds, ProjectileAddress};
 use core_data::identifiers::CardId;
+use core_data::numerics::Points;
 use core_data::types::PlayerName;
 use masonry::flex_style::FlexVector3;
 use schemars::JsonSchema;
@@ -62,6 +63,7 @@ pub enum Command {
     DisplayGameMessage(GameMessageType),
     DisplayEffect(DisplayEffectCommand),
     DrawUserCards(DrawUserCardsCommand),
+    DisplayJudgment(DisplayJudgmentCommand),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -164,6 +166,16 @@ pub struct DrawUserCardsCommand {
     ///
     /// Should be less than stagger_interval for best results.
     pub pause_duration: Milliseconds,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct DisplayJudgmentCommand {
+    /// The player to display the judgment animation for.
+    pub player: PlayerName,
+
+    /// The new score for the player, if it has changed.
+    pub new_score: Option<Points>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

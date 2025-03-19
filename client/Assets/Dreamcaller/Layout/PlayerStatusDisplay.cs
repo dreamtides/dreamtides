@@ -12,6 +12,10 @@ namespace Dreamcaller.Layout
     [SerializeField] BattlefieldNumber _totalSpark = null!;
     [SerializeField] bool _isLandscape;
 
+    public BattlefieldNumber Energy => _energy;
+    public BattlefieldNumber Score => _score;
+    public BattlefieldNumber TotalSpark => _totalSpark;
+
     public void UpdatePlayerView(PlayerView playerView, bool animate)
     {
       _energy.SetNumber(playerView.Energy, animate);

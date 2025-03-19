@@ -8555,6 +8555,7 @@ GameObject:
   - component: {fileID: 613451863}
   - component: {fileID: 613451865}
   - component: {fileID: 613451866}
+  - component: {fileID: 613451867}
   m_Layer: 0
   m_Name: Registry
   m_TagString: Untagged
@@ -8621,6 +8622,7 @@ MonoBehaviour:
   _effectService: {fileID: 613451863}
   _musicService: {fileID: 613451865}
   _environmentService: {fileID: 613451866}
+  _judgmentService: {fileID: 613451867}
 --- !u!114 &613451855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8802,6 +8804,21 @@ MonoBehaviour:
   - {fileID: 213779695}
   - {fileID: 924212132}
   - {fileID: 1389530453}
+--- !u!114 &613451867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 613451850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84cf9e3b2da50487bbf81f05607d1d84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _durationMultiplier: 3
+  _shakeStrength: 0.3
+  _shakeVibrato: 10
 --- !u!1001 &625589745
 PrefabInstance:
   m_ObjectHideFlags: 0

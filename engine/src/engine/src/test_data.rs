@@ -16,9 +16,9 @@ use display_data::card_view::{
     RevealedCardView,
 };
 use display_data::command::{
-    Command, CommandSequence, DisplayEffectCommand, DissolveCardCommand, DrawUserCardsCommand,
-    FireProjectileCommand, GameMessageType, GameObjectId, ParallelCommandGroup,
-    UpdateBattleCommand,
+    Command, CommandSequence, DisplayEffectCommand, DisplayJudgmentCommand, DissolveCardCommand,
+    DrawUserCardsCommand, FireProjectileCommand, GameMessageType, GameObjectId,
+    ParallelCommandGroup, UpdateBattleCommand,
 };
 use display_data::object_position::{ObjectPosition, Position};
 use display_data::request_data::{
@@ -69,15 +69,23 @@ fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformActio
         }
         DebugAction::TriggerUserJudgment => PerformActionResponse {
             metadata,
-            commands: CommandSequence::sequential(vec![Command::DisplayGameMessage(
-                GameMessageType::YourTurn,
-            )]),
+            commands: CommandSequence::sequential(vec![
+                Command::DisplayGameMessage(GameMessageType::YourTurn),
+                Command::DisplayJudgment(DisplayJudgmentCommand {
+                    player: PlayerName::User,
+                    new_score: None,
+                }),
+            ]),
         },
         DebugAction::TriggerEnemyJudgment => PerformActionResponse {
             metadata,
-            commands: CommandSequence::sequential(vec![Command::DisplayGameMessage(
-                GameMessageType::EnemyTurn,
-            )]),
+            commands: CommandSequence::sequential(vec![
+                Command::DisplayGameMessage(GameMessageType::EnemyTurn),
+                Command::DisplayJudgment(DisplayJudgmentCommand {
+                    player: PlayerName::Enemy,
+                    new_score: Some(Points(10)),
+                }),
+            ]),
         },
     }
 }

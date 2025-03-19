@@ -121,7 +121,6 @@ namespace Dreamcaller.Services
     IEnumerator ApplyGroup(ParallelCommandGroup group, bool animate)
     {
       var coroutines = new List<Coroutine>();
-      var sequence = animate ? TweenUtils.Sequence("ApplyGroup") : null;
       foreach (var command in group.Commands)
       {
         if (command.UpdateBattle != null)
@@ -129,7 +128,9 @@ namespace Dreamcaller.Services
           Registry.Layout.UserStatusDisplay.UpdatePlayerView(command.UpdateBattle.Battle.User, animate);
           Registry.Layout.EnemyStatusDisplay.UpdatePlayerView(command.UpdateBattle.Battle.Enemy, animate);
           Registry.DocumentService.RenderScreenOverlay(command.UpdateBattle.Battle.Interface?.ScreenOverlay);
-          coroutines.Add(StartCoroutine(Registry.LayoutService.UpdateLayout(command.UpdateBattle, sequence)));
+          coroutines.Add(StartCoroutine(Registry.LayoutService.UpdateLayout(
+              command.UpdateBattle,
+              animate ? TweenUtils.Sequence("UpdateLayout") : null)));
         }
 
         if (command.Wait != null)
@@ -162,6 +163,11 @@ namespace Dreamcaller.Services
         if (command.DrawUserCards != null)
         {
           coroutines.Add(StartCoroutine(Registry.CardService.HandleDrawUserCards(command.DrawUserCards)));
+        }
+
+        if (command.DisplayJudgment != null)
+        {
+          coroutines.Add(StartCoroutine(Registry.JudgmentService.HandleDisplayJudgmentCommand(command.DisplayJudgment)));
         }
       }
 

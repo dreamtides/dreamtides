@@ -103,6 +103,9 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("drawUserCards", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DrawUserCardsCommand DrawUserCards { get; set; }
+
+        [JsonProperty("displayJudgment", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayJudgmentCommand DisplayJudgment { get; set; }
     }
 
     public partial class DisplayEffectCommand
@@ -215,6 +218,21 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("version", Required = Required.Always)]
         public long Version { get; set; }
+    }
+
+    public partial class DisplayJudgmentCommand
+    {
+        /// <summary>
+        /// The new score for the player, if it has changed.
+        /// </summary>
+        [JsonProperty("newScore")]
+        public long? NewScore { get; set; }
+
+        /// <summary>
+        /// The player to display the judgment animation for.
+        /// </summary>
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
     }
 
     public partial class DissolveCardCommand
@@ -1322,6 +1340,8 @@ namespace Dreamcaller.Schema
 
     /// <summary>
     /// Identifies a player in an ongoing battle.
+    ///
+    /// The player to display the judgment animation for.
     ///
     /// Player who is currently operating the client
     ///

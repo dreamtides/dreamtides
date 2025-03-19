@@ -58,6 +58,9 @@ namespace Dreamcaller.Services
     [SerializeField] EnvironmentService? _environmentService;
     public EnvironmentService EnvironmentService => Check(_environmentService);
 
+    [SerializeField] JudgmentService? _judgmentService;
+    public JudgmentService JudgmentService => Check(_judgmentService);
+
     void Awake()
     {
       Debug.Log("Starting Dreamcaller");
