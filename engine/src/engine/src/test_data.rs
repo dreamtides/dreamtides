@@ -17,7 +17,8 @@ use display_data::card_view::{
 };
 use display_data::command::{
     Command, CommandSequence, DisplayEffectCommand, DissolveCardCommand, DrawUserCardsCommand,
-    FireProjectileCommand, GameObjectId, ParallelCommandGroup, UpdateBattleCommand,
+    FireProjectileCommand, GameMessageType, GameObjectId, ParallelCommandGroup,
+    UpdateBattleCommand,
 };
 use display_data::object_position::{ObjectPosition, Position};
 use display_data::request_data::{
@@ -66,6 +67,18 @@ fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformActio
             commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle)));
             PerformActionResponse { metadata, commands: CommandSequence::sequential(commands) }
         }
+        DebugAction::TriggerUserJudgment => PerformActionResponse {
+            metadata,
+            commands: CommandSequence::sequential(vec![Command::DisplayGameMessage(
+                GameMessageType::YourTurn,
+            )]),
+        },
+        DebugAction::TriggerEnemyJudgment => PerformActionResponse {
+            metadata,
+            commands: CommandSequence::sequential(vec![Command::DisplayGameMessage(
+                GameMessageType::EnemyTurn,
+            )]),
+        },
     }
 }
 

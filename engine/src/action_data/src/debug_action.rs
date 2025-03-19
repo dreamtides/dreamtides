@@ -8,6 +8,8 @@ use crate::user_action::UserAction;
 #[serde(rename_all = "camelCase")]
 pub enum DebugAction {
     DrawCard,
+    TriggerUserJudgment,
+    TriggerEnemyJudgment,
 }
 
 impl From<DebugAction> for UserAction {

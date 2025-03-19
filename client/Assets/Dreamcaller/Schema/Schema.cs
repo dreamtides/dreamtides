@@ -1373,7 +1373,7 @@ namespace Dreamcaller.Schema
     /// <summary>
     /// Private actions for developer use
     /// </summary>
-    public enum DebugAction { DrawCard };
+    public enum DebugAction { DrawCard, TriggerEnemyJudgment, TriggerUserJudgment };
 
     /// <summary>
     /// Frame to display for this card
@@ -1980,9 +1980,14 @@ namespace Dreamcaller.Schema
         {
             if (reader.TokenType == JsonToken.Null) return null;
             var value = serializer.Deserialize<string>(reader);
-            if (value == "drawCard")
+            switch (value)
             {
-                return DebugAction.DrawCard;
+                case "drawCard":
+                    return DebugAction.DrawCard;
+                case "triggerEnemyJudgment":
+                    return DebugAction.TriggerEnemyJudgment;
+                case "triggerUserJudgment":
+                    return DebugAction.TriggerUserJudgment;
             }
             throw new Exception("Cannot unmarshal type DebugAction");
         }
@@ -1995,10 +2000,17 @@ namespace Dreamcaller.Schema
                 return;
             }
             var value = (DebugAction)untypedValue;
-            if (value == DebugAction.DrawCard)
+            switch (value)
             {
-                serializer.Serialize(writer, "drawCard");
-                return;
+                case DebugAction.DrawCard:
+                    serializer.Serialize(writer, "drawCard");
+                    return;
+                case DebugAction.TriggerEnemyJudgment:
+                    serializer.Serialize(writer, "triggerEnemyJudgment");
+                    return;
+                case DebugAction.TriggerUserJudgment:
+                    serializer.Serialize(writer, "triggerUserJudgment");
+                    return;
             }
             throw new Exception("Cannot marshal type DebugAction");
         }

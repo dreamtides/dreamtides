@@ -19,5 +19,21 @@ namespace Dreamcaller.Components
         DebugAction = DebugAction.DrawCard
       });
     }
+
+    public void TriggerJudgment()
+    {
+      _registry.ActionService.PerformAction(new UserAction
+      {
+        DebugAction = DebugAction.TriggerUserJudgment
+      });
+    }
+
+    public void TriggerEnemyJudgment()
+    {
+      _registry.ActionService.PerformAction(new UserAction
+      {
+        DebugAction = DebugAction.TriggerEnemyJudgment
+      });
+    }
   }
 }
