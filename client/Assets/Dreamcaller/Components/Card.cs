@@ -344,7 +344,7 @@ namespace Dreamcaller.Components
 
     bool ShouldReturnToPreviousParentOnRelease()
     {
-      if (!CanPlay())
+      if (CardView.Revealed?.Actions.CanPlay != true)
       {
         return true;
       }
