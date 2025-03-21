@@ -31,7 +31,7 @@ use serde::{Deserialize, Serialize};
     JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
-pub struct Energy(pub u64);
+pub struct Energy(pub u32);
 
 /// Represents the 'power' of characters; the primary way in which players earn
 /// victory points.
@@ -61,7 +61,7 @@ pub struct Energy(pub u64);
     JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
-pub struct Spark(pub u64);
+pub struct Spark(pub u32);
 
 /// Victory points. Enable the player to win the game.
 #[derive(
@@ -90,4 +90,4 @@ pub struct Spark(pub u64);
     JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
-pub struct Points(pub u64);
+pub struct Points(pub u32);

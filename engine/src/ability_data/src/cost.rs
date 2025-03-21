@@ -9,15 +9,15 @@ use crate::predicate::{CardPredicate, Predicate};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum Cost {
-    AbandonCharacters(Predicate, u64),
+    AbandonCharacters(Predicate, u32),
     AbandonCharactersCount { target: Predicate, count: CollectionExpression },
-    AbandonDreamscapes(u64),
+    AbandonDreamscapes(u32),
     AbandonACharacterOrDiscardACard,
     BanishAllCardsFromYourVoid,
-    BanishCardsFromEnemyVoid(u64),
-    BanishCardsFromYourVoid(u64),
+    BanishCardsFromEnemyVoid(u32),
+    BanishCardsFromYourVoid(u32),
     BanishFromHand(Predicate),
-    DiscardCards(CardPredicate, u64),
+    DiscardCards(CardPredicate, u32),
     DiscardHand,
     Energy(Energy),
     NoCost,

@@ -10,7 +10,7 @@ pub enum CollectionExpression {
     EachOther,
     AnyNumberOf,
     AllButOne,
-    UpTo(u64),
-    Exactly(u64),
-    OrMore(u64),
+    UpTo(u32),
+    Exactly(u32),
+    OrMore(u32),
 }

@@ -89,16 +89,16 @@ impl FontAddress {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Milliseconds {
-    pub milliseconds_value: u64,
+    pub milliseconds_value: u32,
 }
 
 impl Milliseconds {
-    pub fn new(milliseconds_value: u64) -> Self {
+    pub fn new(milliseconds_value: u32) -> Self {
         Self { milliseconds_value }
     }
 
     pub fn from_seconds(seconds: f32) -> Self {
-        Self { milliseconds_value: (seconds * 1000.0) as u64 }
+        Self { milliseconds_value: (seconds * 1000.0) as u32 }
     }
 }
 
