@@ -15,6 +15,11 @@ MonoBehaviour:
   m_GroupName: CardImages
   m_GUID: 0e1a448110f5a499d90d688e02ac959b
   m_SerializeEntries:
+  - m_GUID: 2baa5f939fff6462dac0190aaf0a96f2
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/Dreamwell/1963305268.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b10c587384558472782f7afd79e7a84b
     m_Address: Assets/ThirdParty/GameAssets/CardImages/Enemy/Korrak.png
     m_ReadOnly: 0

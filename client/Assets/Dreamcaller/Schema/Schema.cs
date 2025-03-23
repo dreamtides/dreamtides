@@ -482,6 +482,12 @@ namespace Dreamcaller.Schema
         public string Name { get; set; }
 
         /// <summary>
+        /// Energy produced by this card
+        /// </summary>
+        [JsonProperty("produced")]
+        public long? Produced { get; set; }
+
+        /// <summary>
         /// Rules text to display for this car
         /// </summary>
         [JsonProperty("rulesText", Required = Required.Always)]
@@ -1375,8 +1381,10 @@ namespace Dreamcaller.Schema
     ///
     /// Object is in a temporary holding space for cards in hand while resolving some other 'play
     /// card' ability.
+    ///
+    /// Object is in the dreamwell (usually off-screen).
     /// </summary>
-    public enum PositionEnum { Browser, CardSelectionChoices, Default, Drawn, HandStorage, Offscreen, OnStack };
+    public enum PositionEnum { Browser, CardSelectionChoices, Default, Drawn, Dreamwell, HandStorage, Offscreen, OnStack };
 
     /// <summary>
     /// Represents the general category of card being displayed.
@@ -1674,6 +1682,8 @@ namespace Dreamcaller.Schema
                             return new Position { Enum = PositionEnum.Default };
                         case "drawn":
                             return new Position { Enum = PositionEnum.Drawn };
+                        case "dreamwell":
+                            return new Position { Enum = PositionEnum.Dreamwell };
                         case "handStorage":
                             return new Position { Enum = PositionEnum.HandStorage };
                         case "offscreen":
@@ -1707,6 +1717,9 @@ namespace Dreamcaller.Schema
                         return;
                     case PositionEnum.Drawn:
                         serializer.Serialize(writer, "drawn");
+                        return;
+                    case PositionEnum.Dreamwell:
+                        serializer.Serialize(writer, "dreamwell");
                         return;
                     case PositionEnum.HandStorage:
                         serializer.Serialize(writer, "handStorage");
@@ -1748,6 +1761,8 @@ namespace Dreamcaller.Schema
                     return PositionEnum.Default;
                 case "drawn":
                     return PositionEnum.Drawn;
+                case "dreamwell":
+                    return PositionEnum.Dreamwell;
                 case "handStorage":
                     return PositionEnum.HandStorage;
                 case "offscreen":
@@ -1779,6 +1794,9 @@ namespace Dreamcaller.Schema
                     return;
                 case PositionEnum.Drawn:
                     serializer.Serialize(writer, "drawn");
+                    return;
+                case PositionEnum.Dreamwell:
+                    serializer.Serialize(writer, "dreamwell");
                     return;
                 case PositionEnum.HandStorage:
                     serializer.Serialize(writer, "handStorage");

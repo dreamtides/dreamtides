@@ -409,6 +409,7 @@ fn scene_0(id: BattleId) -> BattleView {
             cards_in_position(Position::InHand(PlayerName::Enemy), 733, 5),
             vec![enemy_card(Position::InPlayerStatus(PlayerName::Enemy), 738)],
             vec![dreamsign_card(Position::InPlayerStatus(PlayerName::User), 739)],
+            vec![dreamwell_card(Position::Dreamwell, 740)],
         ]
         .concat()
         .to_vec(),
@@ -456,6 +457,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
             rules_text: "When you materialize your second character in a turn, return this character from your void to play.".to_string(),
             status: None,
             cost: Some(Energy(6)),
+            produced: None,
             spark: Some(Spark(4)),
             card_type: "Ancient".to_string(),
             frame: CardFrame::Character,
@@ -491,6 +493,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
             rules_text: "Discover a card with cost (2).".to_string(),
             status: None,
             cost: Some(Energy(2)),
+            produced: None,
             spark: None,
             card_type: "Event".to_string(),
             frame: CardFrame::Event,
@@ -533,6 +536,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
             rules_text: "Judgment: Return this character from your void to your hand. Born from rust and resilience.".to_string(),
             status: None,
             cost: Some(Energy(4)),
+            produced: None,
             spark: Some(Spark(0)),
             card_type: "Tinkerer".to_string(),
             frame: CardFrame::Character,
@@ -570,6 +574,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
                 .to_string(),
             status: None,
             cost: Some(Energy(2)),
+            produced: None,
             spark: Some(Spark(0)),
             card_type: "Trooper".to_string(),
             frame: CardFrame::Character,
@@ -605,6 +610,7 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
             rules_text: "Draw 2 cards. Discard 2 cards.\nReclaim".to_string(),
             status: None,
             cost: Some(Energy(2)),
+            produced: None,
             spark: None,
             card_type: "Event".to_string(),
             frame: CardFrame::Event,
@@ -641,6 +647,7 @@ fn enemy_card(position: Position, sorting_key: u32) -> CardView {
             rules_text: ">Judgment: A character you control gains +2 spark.".to_string(),
             status: None,
             cost: None,
+            produced: None,
             spark: None,
             card_type: "Enemy".to_string(),
             frame: CardFrame::Default,
@@ -675,6 +682,7 @@ fn dreamsign_card(position: Position, sorting_key: u32) -> CardView {
                 .to_string(),
             status: None,
             cost: None,
+            produced: None,
             spark: None,
             card_type: "Dreamsign".to_string(),
             frame: CardFrame::Default,
@@ -690,6 +698,38 @@ fn dreamsign_card(position: Position, sorting_key: u32) -> CardView {
         create_position: None,
         destroy_position: None,
         prefab: CardPrefab::Dreamsign,
+    }
+}
+
+fn dreamwell_card(position: Position, sorting_key: u32) -> CardView {
+    CardView {
+        id: CardId::from_int(sorting_key as u64),
+        position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
+        card_back: Url::new("".to_string()),
+        revealed: Some(RevealedCardView {
+            image: DisplayImage {
+                address: SpriteAddress::new(
+                    "Assets/ThirdParty/GameAssets/CardImages/Dreamwell/1963305268.png",
+                ),
+            },
+            name: "Rising Dawn".to_string(),
+            rules_text: "Draw a card.".to_string(),
+            status: None,
+            cost: None,
+            produced: Some(Energy(2)),
+            spark: None,
+            card_type: "Dreamwell".to_string(),
+            frame: CardFrame::Default,
+            supplemental_card_info: None,
+            is_fast: false,
+            actions: CardActions::default(),
+            effects: CardEffects::default(),
+        }),
+        revealed_to_opponents: true,
+        card_facing: CardFacing::FaceUp,
+        create_position: None,
+        destroy_position: None,
+        prefab: CardPrefab::Dreamwell,
     }
 }
 

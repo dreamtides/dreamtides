@@ -61,6 +61,9 @@ pub struct RevealedCardView {
     /// Cost of this card
     pub cost: Option<Energy>,
 
+    /// Energy produced by this card
+    pub produced: Option<Energy>,
+
     /// Spark value for this card
     pub spark: Option<Spark>,
 

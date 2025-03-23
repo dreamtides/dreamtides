@@ -78,6 +78,9 @@ pub enum Position {
     /// some other 'play card' ability.
     HandStorage,
 
+    /// Object is in the dreamwell (usually off-screen).
+    Dreamwell,
+
     /// Object is hidden within a card
     HiddenWithinCard(CardId),
 }
