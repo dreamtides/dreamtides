@@ -72,6 +72,9 @@ pub struct PlayerView {
     /// Energy available to this player
     pub energy: Energy,
 
+    /// Energy produced by this player at the start of the current turn
+    pub produced_energy: Energy,
+
     /// Total spark for this player
     pub total_spark: Spark,
 }

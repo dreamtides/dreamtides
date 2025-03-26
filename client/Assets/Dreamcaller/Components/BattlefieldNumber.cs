@@ -11,11 +11,11 @@ namespace Dreamcaller
     [SerializeField] TextMeshPro _text = null!;
     [SerializeField] TimedEffect _onChange = null!;
 
-    public void SetNumber(long number, bool animate)
+    public void SetText(string text, bool animate)
     {
-      if (_text.text != number.ToString())
+      if (_text.text != text)
       {
-        _text.text = number.ToString();
+        _text.text = text;
         if (animate)
         {
           // Toggle to restart animation if needed

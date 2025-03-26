@@ -149,3 +149,5 @@ samply-benchmark *args='':
     BENCHMARK=`echo ./src-tauri/target/release/deps/benchmarks-*([1])`
     echo "Running" $BENCHMARK
     samply record $BENCHMARK --bench --profile-time 5 "$@"
+
+

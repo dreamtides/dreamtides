@@ -385,13 +385,15 @@ fn scene_0(id: BattleId) -> BattleView {
         user: PlayerView {
             score: Points(0),
             can_act: false,
-            energy: Energy(0),
+            energy: Energy(2),
+            produced_energy: Energy(2),
             total_spark: Spark(0),
         },
         enemy: PlayerView {
             score: Points(0),
             can_act: false,
-            energy: Energy(0),
+            energy: Energy(2),
+            produced_energy: Energy(2),
             total_spark: Spark(0),
         },
         cards: [

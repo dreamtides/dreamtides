@@ -1267,6 +1267,12 @@ namespace Dreamcaller.Schema
         public long Energy { get; set; }
 
         /// <summary>
+        /// Energy produced by this player at the start of the current turn
+        /// </summary>
+        [JsonProperty("producedEnergy", Required = Required.Always)]
+        public long ProducedEnergy { get; set; }
+
+        /// <summary>
         /// Current score total
         /// </summary>
         [JsonProperty("score", Required = Required.Always)]

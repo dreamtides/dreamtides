@@ -91,7 +91,7 @@ namespace Dreamcaller.Services
             MillisecondsValue = 500,
           }, onHit: () =>
           {
-            actorStatusDisplay.Score.SetNumber(displayJudgment.NewScore!.Value, true);
+            actorStatusDisplay.SetScore(displayJudgment.NewScore!.Value, true);
           }));
         }
       });
