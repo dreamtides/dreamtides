@@ -26,7 +26,7 @@ namespace Dreamcaller.Layout
     public void SetEnergy(long currentEnergy, long producedEnergy, bool animate = true)
     {
       _energy.SetText(
-          $"{currentEnergy} / {producedEnergy} <color=#00838F><voffset=0.1em>\uf7e4</voffset></color>",
+          $"{currentEnergy}/{producedEnergy} <color=#00838F><voffset=0.1em>\uf7e4</voffset></color>",
           animate);
     }
 

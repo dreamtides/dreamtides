@@ -60,9 +60,10 @@ namespace Dreamcaller.Services
       var flipSequence = TweenUtils.Sequence("DreamwellActivationFlip");
       Registry.SoundService.Play(_revealSound);
 
+      var flippedAngles = Registry.IsLandscape ? new Vector3(160, 90, 0) : new Vector3(150, 0, 0);
       // Now start the flip sequence
       flipSequence
-        .Insert(0, card.transform.DOLocalRotate(new Vector3(150, 0, 0), flipDuration))
+        .Insert(0, card.transform.DOLocalRotate(flippedAngles, flipDuration))
         .InsertCallback(flipDuration, () =>
         {
           card.TurnFaceUp();
