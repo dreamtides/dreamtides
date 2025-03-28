@@ -8017,6 +8017,7 @@ GameObject:
   - component: {fileID: 613451865}
   - component: {fileID: 613451866}
   - component: {fileID: 613451867}
+  - component: {fileID: 613451868}
   m_Layer: 0
   m_Name: Registry
   m_TagString: Untagged
@@ -8084,6 +8085,7 @@ MonoBehaviour:
   _musicService: {fileID: 613451865}
   _environmentService: {fileID: 613451866}
   _judgmentService: {fileID: 613451867}
+  _dreamwellActivationService: {fileID: 613451868}
 --- !u!114 &613451855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8288,6 +8290,25 @@ MonoBehaviour:
   _pointsSound: {fileID: 8300000, guid: 40ff546e59bd542c58259da9c6580b71, type: 3}
   _hitEffectPrefab: {fileID: 5647749798983906044, guid: 0ab1512bca508474988328505f3d7685, type: 3}
   _scorePointsProjectilePrefab: {fileID: 1777540147525750836, guid: 084af1218a1e0ee41a43bdf9d52aea29, type: 3}
+--- !u!114 &613451868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 613451850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c8799b90e7b148d8b1be1bdca8c8357, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _displayPauseDurationSeconds: 2.5
+  _durationMultiplier: 1
+  _updateEnergyProjectilePrefab: {fileID: 1777540147525750836, guid: 084af1218a1e0ee41a43bdf9d52aea29, type: 3}
+  _startSound: {fileID: 8300000, guid: 41a02e63b56db4edcb017528155471e9, type: 3}
+  _revealSound: {fileID: 8300000, guid: f02ba3db5a0ec4271927c8f84ed55731, type: 3}
+  _fireSound: {fileID: 8300000, guid: 97d7e590715d24b7ab420ad274465588, type: 3}
+  _energyUpdateSound: {fileID: 8300000, guid: 96214742bce4a4f2caa21e086cb04942, type: 3}
 --- !u!1001 &625589745
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14693,7 +14714,7 @@ GameObject:
   - component: {fileID: 979220814}
   - component: {fileID: 979220815}
   m_Layer: 0
-  m_Name: Dreamwell
+  m_Name: UserDreamwell
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19942,6 +19963,71 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4289126748202998, guid: 9672218ecb324c240ae58e7a390701f2, type: 3}
   m_PrefabInstance: {fileID: 1275907820}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1288685200
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1288685201}
+  - component: {fileID: 1288685203}
+  - component: {fileID: 1288685202}
+  m_Layer: 0
+  m_Name: DreamwellActivation
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1288685201
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1288685200}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 5, z: -15}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1302820460}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!114 &1288685202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1288685200}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9759a954d17ef433b809b76238ccb912, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _startingContext: 15
+--- !u!114 &1288685203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1288685200}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 518962cfb277243c0b2e1d83d1c50db9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _projectileSourcePosition: {fileID: 0}
+  _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
+  _internalGameContext: 0
+  _objects: []
+  _debugUpdateContinuously: 0
+  _singleElementY: 0.5
 --- !u!1001 &1289829262
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20431,6 +20517,9 @@ Transform:
   - {fileID: 67029926}
   - {fileID: 1167298976}
   - {fileID: 979220813}
+  - {fileID: 1818363640}
+  - {fileID: 1288685201}
+  - {fileID: 2109462077}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1302820461
@@ -20472,7 +20561,10 @@ MonoBehaviour:
   _supplementalCardInfoRight: {fileID: 1146880180}
   _browser: {fileID: 1167298978}
   _backgroundOverlay: {fileID: 763927453}
-  _dreamwell: {fileID: 979220814}
+  _userDreamwell: {fileID: 979220814}
+  _enemyDreamwell: {fileID: 1818363642}
+  _dreamwellActivation: {fileID: 1288685203}
+  _dreamwellDisplay: {fileID: 2109462077}
 --- !u!1001 &1305588118
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22137,7 +22229,10 @@ MonoBehaviour:
   _supplementalCardInfoRight: {fileID: 601474231}
   _browser: {fileID: 1886409221}
   _backgroundOverlay: {fileID: 1541877255}
-  _dreamwell: {fileID: 0}
+  _userDreamwell: {fileID: 0}
+  _enemyDreamwell: {fileID: 0}
+  _dreamwellActivation: {fileID: 0}
+  _dreamwellDisplay: {fileID: 0}
 --- !u!1001 &1436808300
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -26673,6 +26768,71 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1813757690}
   m_CullTransparentMesh: 1
+--- !u!1 &1818363639
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1818363640}
+  - component: {fileID: 1818363642}
+  - component: {fileID: 1818363641}
+  m_Layer: 0
+  m_Name: EnemyDreamwell
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1818363640
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1818363639}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 5, z: 3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1302820460}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!114 &1818363641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1818363639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9759a954d17ef433b809b76238ccb912, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _startingContext: 5
+--- !u!114 &1818363642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1818363639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 518962cfb277243c0b2e1d83d1c50db9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _projectileSourcePosition: {fileID: 0}
+  _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
+  _internalGameContext: 0
+  _objects: []
+  _debugUpdateContinuously: 0
+  _singleElementY: 0.5
 --- !u!1 &1827703712
 GameObject:
   m_ObjectHideFlags: 0
@@ -30654,6 +30814,37 @@ Transform:
   - {fileID: 756017784}
   m_Father: {fileID: 1435083753}
   m_LocalEulerAnglesHint: {x: 75, y: 90, z: 0}
+--- !u!1 &2109462076
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2109462077}
+  m_Layer: 0
+  m_Name: DreamwellDisplay
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2109462077
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2109462076}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.60876137, y: 0, z: 0, w: 0.7933534}
+  m_LocalPosition: {x: 0, y: 18, z: -19}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1302820460}
+  m_LocalEulerAnglesHint: {x: 75, y: 0, z: 0}
 --- !u!1001 &2113759229
 PrefabInstance:
   m_ObjectHideFlags: 0

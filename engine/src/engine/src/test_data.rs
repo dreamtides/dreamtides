@@ -16,9 +16,9 @@ use display_data::card_view::{
     RevealedCardView,
 };
 use display_data::command::{
-    Command, CommandSequence, DisplayEffectCommand, DisplayJudgmentCommand, DissolveCardCommand,
-    DrawUserCardsCommand, FireProjectileCommand, GameMessageType, GameObjectId,
-    ParallelCommandGroup, UpdateBattleCommand,
+    Command, CommandSequence, DisplayDreamwellActivationCommand, DisplayEffectCommand,
+    DisplayJudgmentCommand, DissolveCardCommand, DrawUserCardsCommand, FireProjectileCommand,
+    GameMessageType, GameObjectId, ParallelCommandGroup, UpdateBattleCommand,
 };
 use display_data::object_position::{ObjectPosition, Position};
 use display_data::request_data::{
@@ -52,7 +52,7 @@ pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
     }
 }
 
-fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformActionResponse {
+pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformActionResponse {
     match action {
         DebugAction::DrawCard => {
             let mut commands = vec![];
@@ -67,16 +67,41 @@ fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformActio
             commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle)));
             PerformActionResponse { metadata, commands: CommandSequence::sequential(commands) }
         }
-        DebugAction::TriggerUserJudgment => PerformActionResponse {
-            metadata,
-            commands: CommandSequence::sequential(vec![
-                Command::DisplayGameMessage(GameMessageType::YourTurn),
-                Command::DisplayJudgment(DisplayJudgmentCommand {
-                    player: PlayerName::User,
-                    new_score: None,
-                }),
-            ]),
-        },
+        DebugAction::TriggerUserJudgment => {
+            let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+
+            // Update user's energy and produced energy to 3
+            battle.user.energy = Energy(3);
+            battle.user.produced_energy = Energy(3);
+            *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+
+            let dreamwell_card_id = battle
+                .cards
+                .iter()
+                .find(|card| {
+                    matches!(card.position.position, Position::InDreamwell(PlayerName::User))
+                })
+                .map(|card| card.id)
+                .unwrap_or(battle.cards[0].id);
+
+            PerformActionResponse {
+                metadata,
+                commands: CommandSequence::sequential(vec![
+                    Command::DisplayGameMessage(GameMessageType::YourTurn),
+                    Command::DisplayJudgment(DisplayJudgmentCommand {
+                        player: PlayerName::User,
+                        new_score: None,
+                    }),
+                    Command::DisplayDreamwellActivation(DisplayDreamwellActivationCommand {
+                        card_id: dreamwell_card_id,
+                        player: PlayerName::User,
+                        new_energy: Some(Energy(3)),
+                        new_produced_energy: Some(Energy(3)),
+                    }),
+                    Command::UpdateBattle(UpdateBattleCommand::new(battle)),
+                ]),
+            }
+        }
         DebugAction::TriggerEnemyJudgment => PerformActionResponse {
             metadata,
             commands: CommandSequence::sequential(vec![
@@ -411,7 +436,7 @@ fn scene_0(id: BattleId) -> BattleView {
             cards_in_position(Position::InHand(PlayerName::Enemy), 733, 5),
             vec![enemy_card(Position::InPlayerStatus(PlayerName::Enemy), 738)],
             vec![dreamsign_card(Position::InPlayerStatus(PlayerName::User), 739)],
-            vec![dreamwell_card(Position::Dreamwell, 740)],
+            vec![dreamwell_card(Position::InDreamwell(PlayerName::User), 740)],
         ]
         .concat()
         .to_vec(),

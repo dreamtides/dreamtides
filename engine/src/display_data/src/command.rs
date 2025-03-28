@@ -1,6 +1,6 @@
 use core_data::display_types::{AudioClipAddress, EffectAddress, Milliseconds, ProjectileAddress};
 use core_data::identifiers::CardId;
-use core_data::numerics::Points;
+use core_data::numerics::{Energy, Points};
 use core_data::types::PlayerName;
 use masonry::flex_style::FlexVector3;
 use schemars::JsonSchema;
@@ -64,6 +64,7 @@ pub enum Command {
     DisplayEffect(DisplayEffectCommand),
     DrawUserCards(DrawUserCardsCommand),
     DisplayJudgment(DisplayJudgmentCommand),
+    DisplayDreamwellActivation(DisplayDreamwellActivationCommand),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -176,6 +177,31 @@ pub struct DisplayJudgmentCommand {
 
     /// The new score for the player, if it has changed.
     pub new_score: Option<Points>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct DisplayDreamwellActivationCommand {
+    /// The player to display the dreamwell activation for.
+    pub player: PlayerName,
+
+    /// The card to display an activation for. This card will be moved from its
+    /// current position (assumed to be the 'Dreamwell' position) to the
+    /// DreamwellActivation position, and an update to the player's produced
+    /// energy value will be displayed.
+    ///
+    /// If there are triggered events as a result of this activation, the card
+    /// should be kept in the DreamwellActivation position for the next
+    /// update. Otherwise it's typical to return the card to the Dreamwell
+    /// position.
+    pub card_id: CardId,
+
+    /// New energy available to this player, if it has changed.
+    pub new_energy: Option<Energy>,
+
+    /// New energy produced by this player at the start of the turn, if it has
+    /// changed.
+    pub new_produced_energy: Option<Energy>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

@@ -32,7 +32,8 @@ namespace Dreamcaller.Components
       Milliseconds? additionalHitDelay = null,
       AudioClipAddress? fireSound = null,
       AudioClipAddress? impactSound = null,
-      Action? onHit = null)
+      Action? onHit = null,
+      bool mute = false)
     {
       transform.localScale = _scale * Vector3.one;
       transform.LookAt(target);
@@ -49,7 +50,7 @@ namespace Dreamcaller.Components
       {
         registry.SoundService.Play(fireSound);
       }
-      else
+      else if (!mute)
       {
         registry.SoundService.PlayFireProjectileSound();
       }
@@ -73,7 +74,7 @@ namespace Dreamcaller.Components
       {
         registry.SoundService.Play(impactSound);
       }
-      else
+      else if (!mute)
       {
         registry.SoundService.PlayImpactProjectileSound();
       }

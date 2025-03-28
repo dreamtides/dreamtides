@@ -57,7 +57,6 @@ namespace Dreamcaller.Components
       var name = view.Revealed?.Name ?? "Hidden Card";
       _registry = registry;
       _cardView = view;
-      // SortingKey = (int)view.Position.SortingKey;
       gameObject.name = $"{name} [{Id}]";
 
       if (view.Revealed != null)
@@ -84,7 +83,23 @@ namespace Dreamcaller.Components
       }
     }
 
-    public void TurnFaceDown(Sequence? sequence = null) => Flip(_cardFront, _cardBack, sequence);
+    public void TurnFaceDown(Sequence? sequence = null)
+    {
+      Flip(_cardBack, _cardFront, sequence, () =>
+      {
+        _cardBack.gameObject.SetActive(true);
+        _cardFront.gameObject.SetActive(false);
+      });
+    }
+
+    public void TurnFaceUp(Sequence? sequence = null)
+    {
+      Flip(_cardFront, _cardBack, sequence, () =>
+      {
+        _cardBack.gameObject.SetActive(false);
+        _cardFront.gameObject.SetActive(true);
+      });
+    }
 
     public IEnumerator StartDissolve(DissolveCardCommand command)
     {

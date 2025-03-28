@@ -200,7 +200,9 @@ namespace Dreamcaller.Services
       Registry.Layout.SelectingTargetsEnemy.ApplyLayout(sequence);
       Registry.Layout.SelectingTargetsUser.ApplyLayout(sequence);
       Registry.Layout.Browser.ApplyLayout(sequence);
-      Registry.Layout.Dreamwell.ApplyLayout(sequence);
+      Registry.Layout.UserDreamwell.ApplyLayout(sequence);
+      Registry.Layout.EnemyDreamwell.ApplyLayout(sequence);
+      Registry.Layout.DreamwellActivation.ApplyLayout(sequence);
     }
 
     List<Card> PrepareToDelete(Sequence? sequence, HashSet<string> toDelete)
@@ -261,9 +263,9 @@ namespace Dreamcaller.Services
         return Registry.Layout.Browser;
       }
 
-      if (position.Enum == PositionEnum.Dreamwell)
+      if (position.Enum == PositionEnum.DreamwellActivation)
       {
-        return Registry.Layout.Dreamwell;
+        return Registry.Layout.DreamwellActivation;
       }
 
       if (position.PositionClass == null)
@@ -328,6 +330,16 @@ namespace Dreamcaller.Services
           PlayerName.User => Registry.Layout.SelectingTargetsUser,
           PlayerName.Enemy => Registry.Layout.SelectingTargetsEnemy,
           _ => throw Errors.UnknownEnumValue(selectingTargets),
+        };
+      }
+
+      if (position.PositionClass.InDreamwell is { } inDreamwell)
+      {
+        return inDreamwell switch
+        {
+          PlayerName.User => Registry.Layout.UserDreamwell,
+          PlayerName.Enemy => Registry.Layout.EnemyDreamwell,
+          _ => throw Errors.UnknownEnumValue(inDreamwell),
         };
       }
 

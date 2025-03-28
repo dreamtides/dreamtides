@@ -78,8 +78,12 @@ pub enum Position {
     /// some other 'play card' ability.
     HandStorage,
 
-    /// Object is in the dreamwell (usually off-screen).
-    Dreamwell,
+    /// Object is in the dreamwell for a player (usually off-screen).
+    InDreamwell(PlayerName),
+
+    /// Object is in a position to display itself as part of a dreamwell
+    /// activation.
+    DreamwellActivation,
 
     /// Object is hidden within a card
     HiddenWithinCard(CardId),

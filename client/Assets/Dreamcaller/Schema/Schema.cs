@@ -106,6 +106,67 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("displayJudgment", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayJudgmentCommand DisplayJudgment { get; set; }
+
+        [JsonProperty("displayDreamwellActivation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayDreamwellActivationCommand DisplayDreamwellActivation { get; set; }
+    }
+
+    public partial class DisplayDreamwellActivationCommand
+    {
+        /// <summary>
+        /// The card to display an activation for. This card will be moved from its current position
+        /// (assumed to be the 'Dreamwell' position) to the DreamwellActivation position, and an
+        /// update to the player's produced energy value will be displayed.
+        ///
+        /// If there are triggered events as a result of this activation, the card should be kept in
+        /// the DreamwellActivation position for the next update. Otherwise it's typical to return
+        /// the card to the Dreamwell position.
+        /// </summary>
+        [JsonProperty("cardId", Required = Required.Always)]
+        public CardId CardId { get; set; }
+
+        /// <summary>
+        /// New energy available to this player, if it has changed.
+        /// </summary>
+        [JsonProperty("newEnergy")]
+        public long? NewEnergy { get; set; }
+
+        /// <summary>
+        /// New energy produced by this player at the start of the turn, if it has changed.
+        /// </summary>
+        [JsonProperty("newProducedEnergy")]
+        public long? NewProducedEnergy { get; set; }
+
+        /// <summary>
+        /// The player to display the dreamwell activation for.
+        /// </summary>
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+    }
+
+    /// <summary>
+    /// Identifier for this card
+    ///
+    /// The card to dissolve.
+    ///
+    /// Once a card is dissolved, it will be invisible until a reverse dissolve is applied to
+    /// it.
+    ///
+    /// The card to display an activation for. This card will be moved from its current position
+    /// (assumed to be the 'Dreamwell' position) to the DreamwellActivation position, and an
+    /// update to the player's produced energy value will be displayed.
+    ///
+    /// If there are triggered events as a result of this activation, the card should be kept in
+    /// the DreamwellActivation position for the next update. Otherwise it's typical to return
+    /// the card to the Dreamwell position.
+    /// </summary>
+    public partial class CardId
+    {
+        [JsonProperty("idx", Required = Required.Always)]
+        public long Idx { get; set; }
+
+        [JsonProperty("version", Required = Required.Always)]
+        public long Version { get; set; }
     }
 
     public partial class DisplayEffectCommand
@@ -202,22 +263,6 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("avatar", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayerName? Avatar { get; set; }
-    }
-
-    /// <summary>
-    /// Identifier for this card
-    ///
-    /// The card to dissolve.
-    ///
-    /// Once a card is dissolved, it will be invisible until a reverse dissolve is applied to it.
-    /// </summary>
-    public partial class CardId
-    {
-        [JsonProperty("idx", Required = Required.Always)]
-        public long Idx { get; set; }
-
-        [JsonProperty("version", Required = Required.Always)]
-        public long Version { get; set; }
     }
 
     public partial class DisplayJudgmentCommand
@@ -396,6 +441,8 @@ namespace Dreamcaller.Schema
     ///
     /// Object is in a player's status zone
     ///
+    /// Object is in the dreamwell for a player (usually off-screen).
+    ///
     /// Object is hidden within a card
     /// </summary>
     public partial class PositionClass
@@ -423,6 +470,9 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("inPlayerStatus", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayerName? InPlayerStatus { get; set; }
+
+        [JsonProperty("inDreamwell", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PlayerName? InDreamwell { get; set; }
 
         [JsonProperty("hiddenWithinCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardId HiddenWithinCard { get; set; }
@@ -1355,6 +1405,8 @@ namespace Dreamcaller.Schema
     ///
     /// The player to display the judgment animation for.
     ///
+    /// The player to display the dreamwell activation for.
+    ///
     /// Player who is currently operating the client
     ///
     /// Opponent of user, i.e. the AI enemy
@@ -1388,9 +1440,9 @@ namespace Dreamcaller.Schema
     /// Object is in a temporary holding space for cards in hand while resolving some other 'play
     /// card' ability.
     ///
-    /// Object is in the dreamwell (usually off-screen).
+    /// Object is in a position to display itself as part of a dreamwell activation.
     /// </summary>
-    public enum PositionEnum { Browser, CardSelectionChoices, Default, Drawn, Dreamwell, HandStorage, Offscreen, OnStack };
+    public enum PositionEnum { Browser, CardSelectionChoices, Default, Drawn, DreamwellActivation, HandStorage, Offscreen, OnStack };
 
     /// <summary>
     /// Represents the general category of card being displayed.
@@ -1688,8 +1740,8 @@ namespace Dreamcaller.Schema
                             return new Position { Enum = PositionEnum.Default };
                         case "drawn":
                             return new Position { Enum = PositionEnum.Drawn };
-                        case "dreamwell":
-                            return new Position { Enum = PositionEnum.Dreamwell };
+                        case "dreamwellActivation":
+                            return new Position { Enum = PositionEnum.DreamwellActivation };
                         case "handStorage":
                             return new Position { Enum = PositionEnum.HandStorage };
                         case "offscreen":
@@ -1724,8 +1776,8 @@ namespace Dreamcaller.Schema
                     case PositionEnum.Drawn:
                         serializer.Serialize(writer, "drawn");
                         return;
-                    case PositionEnum.Dreamwell:
-                        serializer.Serialize(writer, "dreamwell");
+                    case PositionEnum.DreamwellActivation:
+                        serializer.Serialize(writer, "dreamwellActivation");
                         return;
                     case PositionEnum.HandStorage:
                         serializer.Serialize(writer, "handStorage");
@@ -1767,8 +1819,8 @@ namespace Dreamcaller.Schema
                     return PositionEnum.Default;
                 case "drawn":
                     return PositionEnum.Drawn;
-                case "dreamwell":
-                    return PositionEnum.Dreamwell;
+                case "dreamwellActivation":
+                    return PositionEnum.DreamwellActivation;
                 case "handStorage":
                     return PositionEnum.HandStorage;
                 case "offscreen":
@@ -1801,8 +1853,8 @@ namespace Dreamcaller.Schema
                 case PositionEnum.Drawn:
                     serializer.Serialize(writer, "drawn");
                     return;
-                case PositionEnum.Dreamwell:
-                    serializer.Serialize(writer, "dreamwell");
+                case PositionEnum.DreamwellActivation:
+                    serializer.Serialize(writer, "dreamwellActivation");
                     return;
                 case PositionEnum.HandStorage:
                     serializer.Serialize(writer, "handStorage");

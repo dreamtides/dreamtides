@@ -150,4 +150,3 @@ samply-benchmark *args='':
     echo "Running" $BENCHMARK
     samply record $BENCHMARK --bench --profile-time 5 "$@"
 
-

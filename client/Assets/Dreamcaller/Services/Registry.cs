@@ -61,6 +61,9 @@ namespace Dreamcaller.Services
     [SerializeField] JudgmentService? _judgmentService;
     public JudgmentService JudgmentService => Check(_judgmentService);
 
+    [SerializeField] DreamwellActivationService? _dreamwellActivationService;
+    public DreamwellActivationService DreamwellActivationService => Check(_dreamwellActivationService);
+
     void Awake()
     {
       Debug.Log("Starting Dreamcaller");

@@ -89,8 +89,17 @@ namespace Dreamcaller.Layout
     [SerializeField] BackgroundOverlay _backgroundOverlay = null!;
     public BackgroundOverlay BackgroundOverlay => Check(_backgroundOverlay);
 
-    [SerializeField] ObjectLayout? _dreamwell;
-    public ObjectLayout Dreamwell => Check(_dreamwell);
+    [SerializeField] ObjectLayout? _userDreamwell;
+    public ObjectLayout UserDreamwell => Check(_userDreamwell);
+
+    [SerializeField] ObjectLayout? _enemyDreamwell;
+    public ObjectLayout EnemyDreamwell => Check(_enemyDreamwell);
+
+    [SerializeField] ObjectLayout? _dreamwellActivation;
+    public ObjectLayout DreamwellActivation => Check(_dreamwellActivation);
+
+    [SerializeField] Transform? _dreamwellDisplay;
+    public Transform DreamwellDisplay => Check(_dreamwellDisplay);
 
     T Check<T>(T? value) where T : Object =>
         Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
