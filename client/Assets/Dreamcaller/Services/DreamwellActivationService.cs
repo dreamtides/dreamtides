@@ -79,7 +79,6 @@ namespace Dreamcaller.Services
       // Fire energy update projectile if energy change is specified
       if (command.NewProducedEnergy.HasValue && command.NewEnergy.HasValue)
       {
-        var userStatusDisplay = Registry.Layout.UserStatusDisplay;
         var projectile = Registry.AssetPoolService.Create(
           _updateEnergyProjectilePrefab,
           card.transform.position
@@ -92,19 +91,25 @@ namespace Dreamcaller.Services
 
         // Create a throw animation sequence
         var startPosition = card.transform.position;
-        var targetPosition = userStatusDisplay.transform.position;
+        var statusDisplay = command.Player switch
+        {
+          PlayerName.Enemy => Registry.Layout.EnemyStatusDisplay,
+          PlayerName.User => Registry.Layout.UserStatusDisplay,
+          _ => throw Errors.UnknownEnumValue(command.Player)
+        };
+        var targetPosition = statusDisplay.transform.position;
         var throwSequence = TweenUtils.Sequence("DreamwellThrow")
           .Insert(0, card.transform.DOMove(Vector3.Lerp(startPosition, targetPosition, 0.1f), 0.1f))
           .Insert(0.1f, card.transform.DOMove(startPosition, 0.1f));
 
         StartCoroutine(projectile.Fire(
           Registry,
-          userStatusDisplay.transform,
+          statusDisplay.transform,
           new Milliseconds { MillisecondsValue = 500 },
           onHit: () =>
           {
             Registry.SoundService.Play(_energyUpdateSound);
-            userStatusDisplay.SetEnergy(command.NewEnergy.Value, command.NewProducedEnergy.Value, true);
+            statusDisplay.SetEnergy(command.NewEnergy.Value, command.NewProducedEnergy.Value, true);
           },
           mute: true
         ));

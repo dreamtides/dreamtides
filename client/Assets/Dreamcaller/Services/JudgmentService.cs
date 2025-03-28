@@ -113,6 +113,11 @@ namespace Dreamcaller.Services
       }
 
       yield return sequence.WaitForCompletion();
+
+      if (actorScoredPoints)
+      {
+        yield return new WaitForSeconds(1f);
+      }
     }
   }
 }
