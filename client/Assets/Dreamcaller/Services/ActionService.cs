@@ -128,6 +128,7 @@ namespace Dreamcaller.Services
           Registry.Layout.UserStatusDisplay.UpdatePlayerView(command.UpdateBattle.Battle.User, animate);
           Registry.Layout.EnemyStatusDisplay.UpdatePlayerView(command.UpdateBattle.Battle.Enemy, animate);
           Registry.DocumentService.RenderScreenOverlay(command.UpdateBattle.Battle.Interface?.ScreenOverlay);
+          Registry.Layout.CardOrderSelector.View = command.UpdateBattle.Battle.Interface?.CardOrderSelector;
           coroutines.Add(StartCoroutine(Registry.LayoutService.UpdateLayout(
               command.UpdateBattle,
               animate ? TweenUtils.Sequence("UpdateLayout") : null)));

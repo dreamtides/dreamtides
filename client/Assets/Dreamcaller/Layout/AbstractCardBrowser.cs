@@ -26,6 +26,7 @@ namespace Dreamcaller.Layout
 
       if (!_isOpen)
       {
+        OnShowStart();
         registry.Layout.BackgroundOverlay.Show(BackgroundOverlay.DisplayOver.Battlefield, 0.75f, sequence);
         if (sequence != null)
         {
@@ -48,6 +49,7 @@ namespace Dreamcaller.Layout
 
       if (_isOpen)
       {
+        OnHideStart();
         registry.Layout.BackgroundOverlay.Hide(sequence);
         if (sequence != null)
         {
@@ -60,7 +62,11 @@ namespace Dreamcaller.Layout
       }
     }
 
+    protected virtual void OnShowStart() { }
+
     protected virtual void OnShowComplete() { }
+
+    protected virtual void OnHideStart() { }
 
     protected virtual void OnHideComplete() { }
 
@@ -71,6 +77,9 @@ namespace Dreamcaller.Layout
     protected float RightEdge() => _zAxis ? _rightEdge.position.z : _rightEdge.position.x;
 
     protected float GetAxisPosition(Transform t) => _zAxis ? t.position.z : t.position.x;
+
+    protected Vector3 ToAxisPosition(float distance) =>
+         _zAxis ? new Vector3(0, 0, -distance) : new Vector3(distance, 0, 0);
 
     protected virtual void OnDrawGizmosSelected()
     {

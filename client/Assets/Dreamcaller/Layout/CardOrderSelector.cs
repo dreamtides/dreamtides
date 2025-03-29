@@ -1,5 +1,7 @@
 #nullable enable
 
+using Dreamcaller.Schema;
+using Dreamcaller.Utils;
 using UnityEngine;
 
 namespace Dreamcaller.Layout
@@ -7,11 +9,16 @@ namespace Dreamcaller.Layout
   public class CardOrderSelector : AbstractCardBrowser
   {
     [SerializeField] float _initialSpacing = 0.5f;
+    [SerializeField] float _initialOffset;
+    [SerializeField] GameObject _deckImage;
+    [SerializeField] GameObject _voidImage;
+
+    public CardOrderSelectorView? View { get; set; }
 
     protected override Vector3 CalculateObjectPosition(int index, int count)
     {
       var offset = LinearObjectLayout.CalculateOffset(TotalWidth(), _initialSpacing, _cardWidth, index, count);
-      return transform.position + new Vector3(offset, 0, 0);
+      return _leftEdge.position + ToAxisPosition(offset + _initialOffset);
     }
 
     protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
@@ -50,6 +57,38 @@ namespace Dreamcaller.Layout
       }
 
       return 0;
+    }
+
+    protected override void OnShowStart()
+    {
+      if (View?.IncludeDeck == true)
+      {
+        _deckImage.SetActive(true);
+        TweenUtils.FadeIn(_deckImage.GetComponent<SpriteRenderer>());
+      }
+      if (View?.IncludeVoid == true)
+      {
+        _voidImage.SetActive(true);
+        TweenUtils.FadeIn(_voidImage.GetComponent<SpriteRenderer>());
+      }
+    }
+
+    protected override void OnHideStart()
+    {
+      if (View?.IncludeDeck == true)
+      {
+        TweenUtils.FadeOut(_deckImage.GetComponent<SpriteRenderer>());
+      }
+      if (View?.IncludeVoid == true)
+      {
+        TweenUtils.FadeOut(_voidImage.GetComponent<SpriteRenderer>());
+      }
+    }
+
+    protected override void OnHideComplete()
+    {
+      _deckImage.SetActive(false);
+      _voidImage.SetActive(false);
     }
   }
 }
