@@ -314,7 +314,7 @@ namespace Dreamcaller.Components
                 SelectCardOrder = new()
                 {
                   CardId = CardView.Id,
-                  Position = 0,
+                  Position = _registry.Layout.CardOrderSelector.HorizontalIndexPositionWithinDisplay(transform),
                 }
               }
             }

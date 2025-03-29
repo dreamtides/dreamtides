@@ -70,6 +70,8 @@ namespace Dreamcaller.Layout
 
     protected float RightEdge() => _zAxis ? _rightEdge.position.z : _rightEdge.position.x;
 
+    protected float GetAxisPosition(Transform t) => _zAxis ? t.position.z : t.position.x;
+
     protected virtual void OnDrawGizmosSelected()
     {
       Gizmos.color = Color.blue;
