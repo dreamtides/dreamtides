@@ -304,7 +304,7 @@ namespace Dreamcaller.Components
         {
           _isDragging = false;
           _isDraggingForOrdering = false;
-          _registry.SoundService.PlayWhooshSound();
+          _registry.SoundService.PlayCardSound();
           var action = new UserAction
           {
             BattleAction = new()

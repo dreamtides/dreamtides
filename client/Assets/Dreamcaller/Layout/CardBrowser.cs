@@ -7,66 +7,40 @@ using UnityEngine.UI;
 
 namespace Dreamcaller.Layout
 {
-  public class CardBrowser : StandardObjectLayout
+  public class CardBrowser : AbstractCardBrowser
   {
-    [SerializeField] float _cardWidth = 2.5f;
-    [SerializeField] Transform _leftEdge = null!;
-    [SerializeField] Transform _rightEdge = null!;
     [SerializeField] float _scrollAmount;
     [SerializeField] Scrollbar _scrollbar = null!;
-    [SerializeField] bool _isOpen;
-    [SerializeField] bool _zAxis;
     [SerializeField] Button _closeButton = null!;
     [SerializeField] float _maxStackOffsetRight = 1f;
     [SerializeField] Transform _singleCardPosition = null!;
 
-    public bool IsOpen => _isOpen;
-
-    public void Show(Registry registry, Sequence? sequence)
+    public override void Show(Registry registry, Sequence? sequence)
     {
       _scrollbar.value = _zAxis ? 1 : 0;
       _scrollAmount = _zAxis ? 1 : 0;
 
-      void OnShow()
-      {
-        _closeButton.gameObject.SetActive(true);
-        _isOpen = true;
-      }
-
-      if (!_isOpen)
-      {
-        registry.Layout.BackgroundOverlay.Show(BackgroundOverlay.DisplayOver.Battlefield, 0.75f, sequence);
-        if (sequence != null)
-        {
-          sequence.AppendCallback(OnShow);
-        }
-        else
-        {
-          OnShow();
-        }
-      }
+      base.Show(registry, sequence);
     }
 
-    public void Hide(Registry registry, Sequence? sequence)
+    protected override void OnShowComplete()
     {
-      void onHidden()
-      {
-        _isOpen = false;
-      }
+      _closeButton.gameObject.SetActive(true);
+    }
 
+    protected override void OnHideComplete()
+    {
+      _closeButton.gameObject.SetActive(false);
+    }
+
+    public override void Hide(Registry registry, Sequence? sequence)
+    {
       if (_isOpen)
       {
         _closeButton.gameObject.SetActive(false);
-        registry.Layout.BackgroundOverlay.Hide(sequence);
-        if (sequence != null)
-        {
-          sequence.AppendCallback(onHidden);
-        }
-        else
-        {
-          onHidden();
-        }
       }
+
+      base.Hide(registry, sequence);
     }
 
     protected override Vector3 CalculateObjectPosition(int index, int count)
@@ -228,11 +202,6 @@ namespace Dreamcaller.Layout
     }
 
     /// <summary>
-    /// Returns the total width of the layout.
-    /// </summary>
-    float TotalWidth() => Mathf.Abs(RightEdge() - LeftEdge());
-
-    /// <summary>
     /// Returns the maximum number of objects that can be displayed.
     /// </summary>
     int WindowSize() => Mathf.Max(1, Mathf.FloorToInt(TotalWidth() / _cardWidth));
@@ -276,23 +245,6 @@ namespace Dreamcaller.Layout
         var neededWidth = (maxObjectsInView - 1) * _cardWidth;
         var startX = LeftEdge() + (TotalWidth() - neededWidth) / 2;
         return startX + ((maxObjectsInView - 1) * _cardWidth) + stackOffset;
-      }
-    }
-
-    float LeftEdge() => _zAxis ? _leftEdge.position.z : _leftEdge.position.x;
-
-    float RightEdge() => _zAxis ? _rightEdge.position.z : _rightEdge.position.x;
-
-    void OnDrawGizmosSelected()
-    {
-      Gizmos.color = Color.blue;
-      if (_leftEdge)
-      {
-        Gizmos.DrawSphere(_leftEdge.position, radius: 1);
-      }
-      if (_rightEdge)
-      {
-        Gizmos.DrawSphere(_rightEdge.position, radius: 1);
       }
     }
   }
