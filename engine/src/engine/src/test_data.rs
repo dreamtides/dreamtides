@@ -1,6 +1,6 @@
 use std::sync::{LazyLock, Mutex};
 
-use action_data::battle_action::{BattleAction, CardBrowserType};
+use action_data::battle_action::{BattleAction, CardBrowserType, SelectCardOrder};
 use action_data::debug_action::DebugAction;
 use action_data::user_action::UserAction;
 use core_data::display_types::{
@@ -10,7 +10,7 @@ use core_data::display_types::{
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::{CardFacing, PlayerName};
-use display_data::battle_view::{BattleView, InterfaceView, PlayerView};
+use display_data::battle_view::{BattleView, CardOrderSelectorView, InterfaceView, PlayerView};
 use display_data::card_view::{
     CardActions, CardEffects, CardFrame, CardPrefab, CardView, DisplayImage, RevealedCardStatus,
     RevealedCardView,
@@ -193,6 +193,26 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
                     let c1 = draw_card(&mut battle);
                     let c2 = draw_card(&mut battle);
+
+                    if let (Some(c1_view), Some(c2_view)) = (c1, c2) {
+                        for card in battle.cards.iter_mut() {
+                            if card.id == c1_view.id || card.id == c2_view.id {
+                                card.position.position = Position::CardOrderSelector;
+                                card.revealed.as_mut().unwrap().actions.can_select_order = true;
+                            }
+                        }
+                    }
+                    battle.interface.card_order_selector =
+                        Some(CardOrderSelectorView { include_deck: true, include_void: true });
+
+                    *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+                    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+                    Position::InVoid(PlayerName::User)
+                } else if sorting_key % 5 == 3 {
+                    battle.cards[card_index] = card_view(Position::OnStack, sorting_key);
+                    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+                    let c1 = draw_card(&mut battle);
+                    let c2 = draw_card(&mut battle);
                     commands.push(Command::DisplayEffect(DisplayEffectCommand {
                         target: GameObjectId::Deck(PlayerName::User),
                         effect: EffectAddress::new("Assets/ThirdParty/Hovl Studio/Magic circles/Prefabs/Magic circle 1 Variant.prefab"),
@@ -345,6 +365,66 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                         ParallelCommandGroup { commands: vec![] },
                     ],
                 },
+            }
+        }
+        BattleAction::SelectCardOrder(SelectCardOrder { card_id, position }) => {
+            let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+
+            // Print all cards in CardOrderSelector position
+            println!("Cards in CardOrderSelector before reordering:");
+            for (i, card) in battle.cards.iter().enumerate() {
+                if card.position.position == Position::CardOrderSelector {
+                    println!(
+                        "Card index: {}, ID: {:?}, Name: {}, Sorting key: {}",
+                        i,
+                        card.id,
+                        card.revealed.as_ref().map_or("Unknown", |r| &r.name),
+                        card.position.sorting_key
+                    );
+                }
+            }
+            println!("Reordering card {:?} to position {}", card_id, position);
+
+            // Find all cards in the CardOrderSelector
+            let mut selector_cards: Vec<(usize, CardId, u32)> = battle
+                .cards
+                .iter()
+                .enumerate()
+                .filter_map(|(idx, card)| {
+                    if card.position.position == Position::CardOrderSelector {
+                        Some((idx, card.id, card.position.sorting_key))
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+
+            // Sort cards by their current sorting key
+            selector_cards.sort_by_key(|(_, _, key)| *key);
+
+            // Find the index of the selected card
+            if let Some(selected_idx) = selector_cards.iter().position(|(_, id, _)| *id == card_id)
+            {
+                // Remove the card from its current position
+                let (card_index, _, _) = selector_cards.remove(selected_idx);
+
+                // Insert it at the new position, capped by the number of cards
+                let new_position = position.min(selector_cards.len());
+                selector_cards.insert(new_position, (card_index, card_id, 0));
+
+                // Update sorting keys for all cards in the selector
+                for (i, (idx, _, _)) in selector_cards.iter().enumerate() {
+                    battle.cards[*idx].position.sorting_key = i as u32;
+                }
+            }
+
+            *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+
+            PerformActionResponse {
+                metadata,
+                commands: CommandSequence::sequential(vec![Command::UpdateBattle(
+                    UpdateBattleCommand::new(battle),
+                )]),
             }
         }
         BattleAction::BrowseCards(card_browser) => {

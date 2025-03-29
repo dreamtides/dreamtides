@@ -44,6 +44,7 @@ namespace Dreamcaller.Components
     Vector3 _dragStartPosition;
     Vector3 _dragOffset;
     bool _isDragging = false;
+    bool _isDraggingForOrdering = false;
     bool _isDissolved = false;
     public CardView CardView => Errors.CheckNotNull(_cardView);
     GameObject? _cardTrail;
@@ -146,7 +147,7 @@ namespace Dreamcaller.Components
 
     void Update()
     {
-      _outline.gameObject.SetActive(CanPlay());
+      _outline.gameObject.SetActive(CanPlay() || CanSelectOrder());
     }
 
     void Flip(Component faceUp, Component faceDown, Sequence? sequence, Action? onFlipped = null)
@@ -238,9 +239,10 @@ namespace Dreamcaller.Components
         _registry.CardService.DisplayInfoZoom(this);
       }
 
-      if (CanPlay())
+      if (CanPlay() || CanSelectOrder())
       {
         _isDragging = true;
+        _isDraggingForOrdering = CanSelectOrder();
         _registry.SoundService.PlayCardSound();
         GameContext = GameContext.Dragging;
         if (Parent)
@@ -297,6 +299,28 @@ namespace Dreamcaller.Components
           {
             _isDragging = false;
           });
+        }
+        else if (_isDraggingForOrdering)
+        {
+          _isDragging = false;
+          _isDraggingForOrdering = false;
+          _registry.SoundService.PlayWhooshSound();
+          var action = new UserAction
+          {
+            BattleAction = new()
+            {
+              BattleActionClass = new()
+              {
+                SelectCardOrder = new()
+                {
+                  CardId = CardView.Id,
+                  Position = 0,
+                }
+              }
+            }
+          };
+
+          _registry.ActionService.PerformAction(action);
         }
         else
         {
@@ -361,7 +385,7 @@ namespace Dreamcaller.Components
 
     bool ShouldReturnToPreviousParentOnRelease()
     {
-      if (CardView.Revealed?.Actions.CanPlay != true)
+      if (CardView.Revealed?.Actions.CanPlay != true && CardView.Revealed?.Actions.CanSelectOrder != true)
       {
         return true;
       }
@@ -370,7 +394,9 @@ namespace Dreamcaller.Components
     }
 
     bool CanPlay() => CardView.Revealed?.Actions.CanPlay == true &&
-      _registry.CapabilitiesService.CanDragCards() &&
+      _registry.CapabilitiesService.CanPlayCards() &&
       GameContext == GameContext.Hand;
+
+    bool CanSelectOrder() => CardView.Revealed?.Actions.CanSelectOrder == true;
   }
 }

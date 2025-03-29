@@ -105,6 +105,9 @@ pub struct CardActions {
     /// True if this card can currently be played from hand.
     pub can_play: bool,
 
+    /// True if this card can currently be dragged within a Card Order Selector.
+    pub can_select_order: bool,
+
     /// Sound to play when this card is played.
     pub on_play_sound: Option<AudioClipAddress>,
 

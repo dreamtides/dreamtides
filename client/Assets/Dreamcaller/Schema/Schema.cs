@@ -574,6 +574,12 @@ namespace Dreamcaller.Schema
         public bool CanPlay { get; set; }
 
         /// <summary>
+        /// True if this card can currently be dragged within a Card Order Selector.
+        /// </summary>
+        [JsonProperty("canSelectOrder", Required = Required.Always)]
+        public bool CanSelectOrder { get; set; }
+
+        /// <summary>
         /// Action to perform when this card is clicked.
         /// </summary>
         [JsonProperty("onClick")]
@@ -598,6 +604,8 @@ namespace Dreamcaller.Schema
     /// <summary>
     /// Set a card as a target of the card currently being played.
     ///
+    /// Sets the position of a card in a card order selector.
+    ///
     /// Show cards in a zone
     /// </summary>
     public partial class BattleActionClass
@@ -608,8 +616,20 @@ namespace Dreamcaller.Schema
         [JsonProperty("selectTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardId SelectTarget { get; set; }
 
+        [JsonProperty("selectCardOrder", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public SelectCardOrder SelectCardOrder { get; set; }
+
         [JsonProperty("browseCards", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardBrowserType? BrowseCards { get; set; }
+    }
+
+    public partial class SelectCardOrder
+    {
+        [JsonProperty("cardId", Required = Required.Always)]
+        public CardId CardId { get; set; }
+
+        [JsonProperty("position", Required = Required.Always)]
+        public long Position { get; set; }
     }
 
     /// <summary>
@@ -1343,6 +1363,12 @@ namespace Dreamcaller.Schema
     public partial class InterfaceView
     {
         /// <summary>
+        /// Options for display of the card order selector
+        /// </summary>
+        [JsonProperty("cardOrderSelector")]
+        public CardOrderSelectorView CardOrderSelector { get; set; }
+
+        /// <summary>
         /// Label for the primary action button, if one should be shown.
         /// </summary>
         [JsonProperty("primaryActionButton")]
@@ -1353,6 +1379,21 @@ namespace Dreamcaller.Schema
         /// </summary>
         [JsonProperty("screenOverlay")]
         public FlexNode ScreenOverlay { get; set; }
+    }
+
+    public partial class CardOrderSelectorView
+    {
+        /// <summary>
+        /// Include the user's deck as a card drop target
+        /// </summary>
+        [JsonProperty("includeDeck", Required = Required.Always)]
+        public bool IncludeDeck { get; set; }
+
+        /// <summary>
+        /// Include the user's void as a card drop target
+        /// </summary>
+        [JsonProperty("includeVoid", Required = Required.Always)]
+        public bool IncludeVoid { get; set; }
     }
 
     public partial class PerformActionRequest
@@ -1435,14 +1476,18 @@ namespace Dreamcaller.Schema
     /// Object is being displayed in a card browser, e.g. to select from a list of cards while
     /// searching
     ///
-    /// Object is being displayed in a list of cards available to select in a card selector.
+    /// Object is being displayed in a selector to determine the order of cards, e.g. when
+    /// resolving the "forsee" effect.
+    ///
+    /// Object is being displayed in a list of cards available to pick options from, e.g. when
+    /// selecting targets.
     ///
     /// Object is in a temporary holding space for cards in hand while resolving some other 'play
     /// card' ability.
     ///
     /// Object is in a position to display itself as part of a dreamwell activation.
     /// </summary>
-    public enum PositionEnum { Browser, CardSelectionChoices, Default, Drawn, DreamwellActivation, HandStorage, Offscreen, OnStack };
+    public enum PositionEnum { Browser, CardOrderSelector, CardPicker, Default, Drawn, DreamwellActivation, HandStorage, Offscreen, OnStack };
 
     /// <summary>
     /// Represents the general category of card being displayed.
@@ -1734,8 +1779,10 @@ namespace Dreamcaller.Schema
                     {
                         case "browser":
                             return new Position { Enum = PositionEnum.Browser };
-                        case "cardSelectionChoices":
-                            return new Position { Enum = PositionEnum.CardSelectionChoices };
+                        case "cardOrderSelector":
+                            return new Position { Enum = PositionEnum.CardOrderSelector };
+                        case "cardPicker":
+                            return new Position { Enum = PositionEnum.CardPicker };
                         case "default":
                             return new Position { Enum = PositionEnum.Default };
                         case "drawn":
@@ -1767,8 +1814,11 @@ namespace Dreamcaller.Schema
                     case PositionEnum.Browser:
                         serializer.Serialize(writer, "browser");
                         return;
-                    case PositionEnum.CardSelectionChoices:
-                        serializer.Serialize(writer, "cardSelectionChoices");
+                    case PositionEnum.CardOrderSelector:
+                        serializer.Serialize(writer, "cardOrderSelector");
+                        return;
+                    case PositionEnum.CardPicker:
+                        serializer.Serialize(writer, "cardPicker");
                         return;
                     case PositionEnum.Default:
                         serializer.Serialize(writer, "default");
@@ -1813,8 +1863,10 @@ namespace Dreamcaller.Schema
             {
                 case "browser":
                     return PositionEnum.Browser;
-                case "cardSelectionChoices":
-                    return PositionEnum.CardSelectionChoices;
+                case "cardOrderSelector":
+                    return PositionEnum.CardOrderSelector;
+                case "cardPicker":
+                    return PositionEnum.CardPicker;
                 case "default":
                     return PositionEnum.Default;
                 case "drawn":
@@ -1844,8 +1896,11 @@ namespace Dreamcaller.Schema
                 case PositionEnum.Browser:
                     serializer.Serialize(writer, "browser");
                     return;
-                case PositionEnum.CardSelectionChoices:
-                    serializer.Serialize(writer, "cardSelectionChoices");
+                case PositionEnum.CardOrderSelector:
+                    serializer.Serialize(writer, "cardOrderSelector");
+                    return;
+                case PositionEnum.CardPicker:
+                    serializer.Serialize(writer, "cardPicker");
                     return;
                 case PositionEnum.Default:
                     serializer.Serialize(writer, "default");

@@ -19,6 +19,7 @@ namespace Dreamcaller.Layout
     [SerializeField] Button _closeButton = null!;
     [SerializeField] float _maxStackOffsetRight = 1f;
     [SerializeField] Transform _singleCardPosition = null!;
+
     public bool IsOpen => _isOpen;
 
     public void Show(Registry registry, Sequence? sequence)

@@ -64,6 +64,7 @@ namespace Dreamcaller.Services
           Cards[cardId] = card;
         }
 
+        card.SortingKey = (int)cardView.Position.SortingKey;
         card.Render(Registry, cardView, sequence);
         layout.Add(card);
       }
@@ -185,6 +186,15 @@ namespace Dreamcaller.Services
         Registry.Layout.Browser.Hide(Registry, sequence);
       }
 
+      if (Registry.Layout.CardOrderSelector.Objects.Count > 0)
+      {
+        Registry.Layout.CardOrderSelector.Show(Registry, sequence);
+      }
+      else
+      {
+        Registry.Layout.CardOrderSelector.Hide(Registry, sequence);
+      }
+
       Registry.Layout.UserHand.ApplyLayout(sequence);
       Registry.Layout.EnemyHand.ApplyLayout(sequence);
       Registry.Layout.UserDeck.ApplyLayout(sequence);
@@ -203,6 +213,7 @@ namespace Dreamcaller.Services
       Registry.Layout.UserDreamwell.ApplyLayout(sequence);
       Registry.Layout.EnemyDreamwell.ApplyLayout(sequence);
       Registry.Layout.DreamwellActivation.ApplyLayout(sequence);
+      Registry.Layout.CardOrderSelector.ApplyLayout(sequence);
     }
 
     List<Card> PrepareToDelete(Sequence? sequence, HashSet<string> toDelete)
@@ -266,6 +277,11 @@ namespace Dreamcaller.Services
       if (position.Enum == PositionEnum.DreamwellActivation)
       {
         return Registry.Layout.DreamwellActivation;
+      }
+
+      if (position.Enum == PositionEnum.CardOrderSelector)
+      {
+        return Registry.Layout.CardOrderSelector;
       }
 
       if (position.PositionClass == null)

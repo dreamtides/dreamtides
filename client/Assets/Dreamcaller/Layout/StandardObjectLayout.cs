@@ -39,10 +39,11 @@ namespace Dreamcaller.Layout
 
         displayable.Parent = this;
         _objects.Add(displayable);
-        SortObjects();
 
         displayable.GameContext = GameContext;
       }
+
+      SortObjects();
     }
 
     /// <summary>Adds a range of objects to this ObjectLayout</summary>
@@ -144,7 +145,7 @@ namespace Dreamcaller.Layout
       var rotation = CalculateObjectRotation(index, count);
       var scale = CalculateObjectScale(index, count) ?? displayable.DefaultScale;
 
-      displayable.SortingKey = SortingOrder(index, count);
+      // displayable.SortingKey = SortingOrder(index, count);
 
       if (applyToChildren && displayable is ObjectLayout layout)
       {

@@ -101,6 +101,9 @@ namespace Dreamcaller.Layout
     [SerializeField] Transform? _dreamwellDisplay;
     public Transform DreamwellDisplay => Check(_dreamwellDisplay);
 
+    [SerializeField] CardOrderSelector? _cardOrderSelector;
+    public CardOrderSelector CardOrderSelector => Check(_cardOrderSelector);
+
     T Check<T>(T? value) where T : Object =>
         Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
   }

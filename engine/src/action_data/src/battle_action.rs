@@ -11,6 +11,8 @@ pub enum BattleAction {
     PlayCard(CardId),
     /// Set a card as a target of the card currently being played.
     SelectTarget(CardId),
+    /// Sets the position of a card in a card order selector.
+    SelectCardOrder(SelectCardOrder),
     /// Show cards in a zone
     BrowseCards(CardBrowserType),
     /// Close the card browser
@@ -21,6 +23,13 @@ impl From<BattleAction> for UserAction {
     fn from(action: BattleAction) -> Self {
         UserAction::BattleAction(action)
     }
+}
+
+#[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct SelectCardOrder {
+    pub card_id: CardId,
+    pub position: usize,
 }
 
 #[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]

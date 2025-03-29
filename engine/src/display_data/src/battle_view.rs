@@ -38,6 +38,19 @@ pub struct InterfaceView {
 
     /// Label for the primary action button, if one should be shown.
     pub primary_action_button: Option<String>,
+
+    /// Options for display of the card order selector
+    pub card_order_selector: Option<CardOrderSelectorView>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct CardOrderSelectorView {
+    /// Include the user's deck as a card drop target
+    pub include_deck: bool,
+
+    /// Include the user's void as a card drop target
+    pub include_void: bool,
 }
 
 /// Button to perform some game action
