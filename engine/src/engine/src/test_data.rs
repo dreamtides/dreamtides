@@ -376,16 +376,6 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 battle.cards[card_index].position.position = Position::CardOrderSelector(target);
             }
 
-            // if target == CardOrderSelectionTarget::Void {
-            //     *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
-            //     return PerformActionResponse {
-            //         metadata,
-            //         commands: CommandSequence::sequential(vec![Command::UpdateBattle(
-            //             UpdateBattleCommand::new(battle),
-            //         )]),
-            //     };
-            // }
-
             // Find all cards in the CardOrderSelector
             let mut selector_cards: Vec<(usize, CardId, u32)> = battle
                 .cards
