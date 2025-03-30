@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using DG.Tweening;
 using Dreamcaller.Layout;
+using Dreamcaller.Masonry;
 using Dreamcaller.Schema;
 using Dreamcaller.Services;
 using Dreamcaller.Utils;
@@ -147,7 +148,9 @@ namespace Dreamcaller.Components
 
     void Update()
     {
-      _outline.gameObject.SetActive(CanPlay() || CanSelectOrder());
+      _outline.gameObject.SetActive(CanPlay() ||
+          CanSelectOrder() ||
+          (!GameContext.IsBattlefieldContext() && CardView.Revealed?.OutlineColor != null));
     }
 
     void Flip(Component faceUp, Component faceDown, Sequence? sequence, Action? onFlipped = null)
@@ -196,13 +199,18 @@ namespace Dreamcaller.Components
       _cardImage.sprite = _registry.AssetService.GetSprite(revealed.Image.Address);
       _battlefieldCardImage.sprite = _registry.AssetService.GetSprite(revealed.Image.Address);
       _outline.material.SetInt("_Seed", UnityEngine.Random.Range(0, 9999));
-      _battlefieldOutline.color = revealed.Status switch
+      if (revealed.OutlineColor == null)
       {
-        RevealedCardStatus.CanSelectNegative => new Color(0.9f, 0f, 0f),
-        RevealedCardStatus.CanSelectPositive => new Color(0f, 0.9f, 0f),
-        RevealedCardStatus.Selected => new Color(0f, 0f, 0.9f),
-        _ => new Color(0.9f, 0.9f, 0.9f)
-      };
+        _outline.material.SetColor("_Color", new Color(0f, 1f, 0f));
+        _outline.material.SetColor("_HiColor", new Color(0f, 1f, 0f));
+        _battlefieldOutline.color = new Color(1f, 1f, 1f);
+      }
+      else
+      {
+        _outline.material.SetColor("_Color", MasonRenderer.ToUnityColor(revealed.OutlineColor));
+        _outline.material.SetColor("_HiColor", MasonRenderer.ToUnityColor(revealed.OutlineColor));
+        _battlefieldOutline.color = MasonRenderer.ToUnityColor(revealed.OutlineColor);
+      }
 
       if (_cardTrail)
       {

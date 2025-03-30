@@ -1,4 +1,5 @@
-use core_data::display_types::{DisplayColor, FontAddress, Milliseconds, SpriteAddress};
+use core_data::display_color::DisplayColor;
+use core_data::display_types::{FontAddress, Milliseconds, SpriteAddress};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 

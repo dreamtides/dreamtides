@@ -5,17 +5,16 @@ use action_data::battle_action::{
 };
 use action_data::debug_action::DebugAction;
 use action_data::user_action::UserAction;
+use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::{
-    AudioClipAddress, DisplayColor, EffectAddress, Milliseconds, ProjectileAddress, SpriteAddress,
-    Url,
+    AudioClipAddress, EffectAddress, Milliseconds, ProjectileAddress, SpriteAddress, Url,
 };
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::{CardFacing, PlayerName};
 use display_data::battle_view::{BattleView, CardOrderSelectorView, InterfaceView, PlayerView};
 use display_data::card_view::{
-    CardActions, CardEffects, CardFrame, CardPrefab, CardView, DisplayImage, RevealedCardStatus,
-    RevealedCardView,
+    CardActions, CardEffects, CardFrame, CardPrefab, CardView, DisplayImage, RevealedCardView,
 };
 use display_data::command::{
     Command, CommandSequence, DisplayDreamwellActivationCommand, DisplayEffectCommand,
@@ -33,6 +32,7 @@ use masonry::flex_style::{
 };
 use uuid::Uuid;
 
+static RESOLVING_MULLIGAN: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 static CURRENT_BATTLE: LazyLock<Mutex<Option<BattleView>>> = LazyLock::new(|| Mutex::new(None));
 static CARD_BROWSER_SOURCE: LazyLock<Mutex<Option<Position>>> = LazyLock::new(|| Mutex::new(None));
 
@@ -136,6 +136,40 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                 ]),
             }
         }
+        DebugAction::PerformSomeAction => {
+            // Set mulligan state
+            let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+
+            // Set the global RESOLVING_MULLIGAN flag to true
+            *RESOLVING_MULLIGAN.lock().unwrap() = true;
+
+            // Update all cards in the user's hand to have "select card" action and disable
+            // "can play"
+            for card in battle.cards.iter_mut() {
+                if matches!(card.position.position, Position::InHand(PlayerName::User)) {
+                    if let Some(revealed) = &mut card.revealed {
+                        // Set on_click action to select this card
+                        revealed.actions.on_click =
+                            Some(UserAction::BattleAction(BattleAction::SelectCard(card.id)));
+                        // Disable can_play action
+                        revealed.actions.can_play = false;
+                        // Set visual status to indicate selectable
+                        revealed.outline_color = Some(display_color::WHITE);
+                    }
+                }
+            }
+
+            // Add a screen overlay with mulligan instructions
+            battle.interface.screen_overlay = Some(mulligan_message());
+
+            // Disable the primary action button during mulligan
+            battle.interface.primary_action_button = None;
+
+            let commands = vec![Command::UpdateBattle(UpdateBattleCommand::new(battle.clone()))];
+            *CURRENT_BATTLE.lock().unwrap() = Some(battle);
+
+            PerformActionResponse { metadata, commands: CommandSequence::sequential(commands) }
+        }
     }
 }
 
@@ -183,9 +217,9 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                         ) {
                             if let Some(revealed) = &mut card.revealed {
                                 revealed.actions.on_click = Some(UserAction::BattleAction(
-                                    BattleAction::SelectTarget(card.id),
+                                    BattleAction::SelectCard(card.id),
                                 ));
-                                revealed.status = Some(RevealedCardStatus::CanSelectNegative);
+                                revealed.outline_color = Some(display_color::RED_500);
                             }
                         }
                     }
@@ -275,8 +309,37 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
             commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle)));
             PerformActionResponse { metadata, commands: CommandSequence::sequential(commands) }
         }
-        BattleAction::SelectTarget(card_id) => {
+        BattleAction::SelectCard(card_id) => {
             let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+
+            // Check if we're in mulligan mode
+            if *RESOLVING_MULLIGAN.lock().unwrap() {
+                // Handle card selection during mulligan
+                if let Some(card_index) = battle.cards.iter().position(|card| card.id == card_id) {
+                    // Toggle the selection status
+                    if let Some(revealed) = &mut battle.cards[card_index].revealed {
+                        if revealed.outline_color == Some(display_color::WHITE) {
+                            revealed.outline_color = Some(display_color::GREEN);
+                        } else {
+                            revealed.outline_color = Some(display_color::WHITE);
+                        }
+                    }
+                }
+
+                // Add a "Confirm Mulligan" button if it doesn't exist
+                if battle.interface.primary_action_button.is_none() {
+                    battle.interface.primary_action_button = Some("Confirm Mulligan".to_string());
+                }
+
+                *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+
+                return PerformActionResponse {
+                    metadata,
+                    commands: CommandSequence::sequential(vec![Command::UpdateBattle(
+                        UpdateBattleCommand::new(battle),
+                    )]),
+                };
+            }
 
             // First collect all the cards we need to move
             let cards_to_move: Vec<(usize, u32)> = battle
@@ -489,7 +552,7 @@ fn set_can_play_to_false(battle: &mut BattleView) {
 fn clear_all_statuses(battle: &mut BattleView) {
     for card in battle.cards.iter_mut() {
         if let Some(revealed) = card.revealed.as_mut() {
-            revealed.status = None;
+            revealed.outline_color = None;
         }
     }
 }
@@ -577,7 +640,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
             },
             name: "Titan of Forgotten Echoes".to_string(),
             rules_text: "When you materialize your second character in a turn, return this character from your void to play.".to_string(),
-            status: None,
+            outline_color: (position == Position::InHand(PlayerName::User)).then_some(display_color::GREEN),
             cost: Some(Energy(6)),
             produced: None,
             spark: Some(Spark(4)),
@@ -613,7 +676,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
             },
             name: "Beacon of Tomorrow".to_string(),
             rules_text: "Discover a card with cost (2).".to_string(),
-            status: None,
+            outline_color: (position == Position::InHand(PlayerName::User)).then_some(display_color::GREEN),
             cost: Some(Energy(2)),
             produced: None,
             spark: None,
@@ -656,7 +719,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
             },
             name: "Scrap Reclaimer".to_string(),
             rules_text: "Judgment: Return this character from your void to your hand. Born from rust and resilience.".to_string(),
-            status: None,
+            outline_color: (position == Position::InHand(PlayerName::User)).then_some(display_color::GREEN),
             cost: Some(Energy(4)),
             produced: None,
             spark: Some(Spark(0)),
@@ -694,7 +757,8 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
             name: "Evacuation Enforcer".to_string(),
             rules_text: "> Draw 2 cards. Discard 3 cards.\nPromises under a stormy sky."
                 .to_string(),
-            status: None,
+            outline_color: (position == Position::InHand(PlayerName::User))
+                .then_some(display_color::GREEN),
             cost: Some(Energy(2)),
             produced: None,
             spark: Some(Spark(0)),
@@ -730,7 +794,8 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
             },
             name: "Moonlit Voyage".to_string(),
             rules_text: "Draw 2 cards. Discard 2 cards.\nReclaim".to_string(),
-            status: None,
+            outline_color: (position == Position::InHand(PlayerName::User))
+                .then_some(display_color::GREEN),
             cost: Some(Energy(2)),
             produced: None,
             spark: None,
@@ -767,7 +832,7 @@ fn enemy_card(position: Position, sorting_key: u32) -> CardView {
             },
             name: "<size=200%>Korrak</size>\nHellfire Sovereign".to_string(),
             rules_text: ">Judgment: A character you control gains +2 spark.".to_string(),
-            status: None,
+            outline_color: None,
             cost: None,
             produced: None,
             spark: None,
@@ -802,7 +867,7 @@ fn dreamsign_card(position: Position, sorting_key: u32) -> CardView {
             name: "Dragon Egg".to_string(),
             rules_text: ">Judgment: If you control 3 characters with the same type, draw a card."
                 .to_string(),
-            status: None,
+            outline_color: None,
             cost: None,
             produced: None,
             spark: None,
@@ -836,7 +901,7 @@ fn dreamwell_card(position: Position, sorting_key: u32) -> CardView {
             },
             name: "Rising Dawn".to_string(),
             rules_text: "Draw a card.".to_string(),
-            status: None,
+            outline_color: None,
             cost: None,
             produced: Some(Energy(2)),
             spark: None,
@@ -918,6 +983,53 @@ fn select_target_message() -> FlexNode {
                 top: None,
                 right: Some(Dimension { unit: DimensionUnit::Pixels, value: 32.0 }),
                 bottom: Some(Dimension { unit: DimensionUnit::Pixels, value: 50.0 }),
+                left: Some(Dimension { unit: DimensionUnit::Pixels, value: 32.0 }),
+            }),
+            ..Default::default()
+        }),
+        children: vec![message],
+        ..Default::default()
+    }
+}
+
+fn mulligan_message() -> FlexNode {
+    let style = FlexStyle {
+        background_color: Some(DisplayColor { red: 0.0, green: 0.0, blue: 0.0, alpha: 0.95 }),
+        border_radius: Some(BorderRadius {
+            top_left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            top_right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            bottom_right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            bottom_left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+        }),
+        padding: Some(DimensionGroup {
+            top: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            bottom: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+        }),
+        color: Some(DisplayColor { red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0 }),
+        font_size: Some(Dimension { unit: DimensionUnit::Pixels, value: 10.0 }),
+        min_height: Some(Dimension { unit: DimensionUnit::Pixels, value: 22.0 }),
+        white_space: Some(WhiteSpace::Normal),
+        text_align: Some(TextAlign::MiddleCenter),
+        ..Default::default()
+    };
+
+    let message = FlexNode {
+        node_type: Some(NodeType::Text(Text {
+            label: "Resolve Mulligan: Select cards in hand to replace.".into(),
+        })),
+        style: Some(style),
+        ..Default::default()
+    };
+
+    FlexNode {
+        style: Some(FlexStyle {
+            position: Some(FlexPosition::Absolute),
+            inset: Some(FlexInsets {
+                top: None,
+                right: Some(Dimension { unit: DimensionUnit::Pixels, value: 32.0 }),
+                bottom: Some(Dimension { unit: DimensionUnit::Pixels, value: 135.0 }),
                 left: Some(Dimension { unit: DimensionUnit::Pixels, value: 32.0 }),
             }),
             ..Default::default()

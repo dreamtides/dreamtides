@@ -9,8 +9,9 @@ use crate::user_action::UserAction;
 #[serde(rename_all = "camelCase")]
 pub enum BattleAction {
     PlayCard(CardId),
-    /// Set a card as a target of the card currently being played.
-    SelectTarget(CardId),
+    /// Select a card by ID in resopnse to some prompt, e.g. as a target of a
+    /// card being played.
+    SelectCard(CardId),
     /// Sets the position of a card in a card order selector.
     SelectCardOrder(SelectCardOrder),
     /// Show cards in a zone

@@ -75,10 +75,6 @@ pub enum Position {
     /// e.g. when resolving the "forsee" effect.
     CardOrderSelector(CardOrderSelectionTarget),
 
-    /// Object is being displayed in a list of cards available to pick options
-    /// from, e.g. when selecting targets.
-    CardPicker,
-
     /// Object is in a temporary holding space for cards in hand while resolving
     /// some other 'play card' ability.
     HandStorage,

@@ -10,6 +10,7 @@ pub enum DebugAction {
     DrawCard,
     TriggerUserJudgment,
     TriggerEnemyJudgment,
+    PerformSomeAction,
 }
 
 impl From<DebugAction> for UserAction {

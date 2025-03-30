@@ -1,4 +1,5 @@
 use action_data::user_action::UserAction;
+use core_data::display_color::DisplayColor;
 use core_data::display_types::{AudioClipAddress, ProjectileAddress, SpriteAddress, Url};
 use core_data::identifiers::CardId;
 use core_data::numerics::{Energy, Spark};
@@ -73,8 +74,8 @@ pub struct RevealedCardView {
     /// Rules text to display for this car
     pub rules_text: String,
 
-    /// Visual status of this card
-    pub status: Option<RevealedCardStatus>,
+    /// Outline color of this card
+    pub outline_color: Option<DisplayColor>,
 
     /// Frame to display for this card
     pub frame: CardFrame,
@@ -120,15 +121,6 @@ pub struct CardActions {
 pub struct CardEffects {
     /// Projectile to display as a trail behind this card.
     pub card_trail: Option<ProjectileAddress>,
-}
-
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub enum RevealedCardStatus {
-    CanPlay,
-    CanSelectNegative,
-    CanSelectPositive,
-    Selected,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]

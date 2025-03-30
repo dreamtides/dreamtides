@@ -101,14 +101,3 @@ impl Milliseconds {
         Self { milliseconds_value: (seconds * 1000.0) as u32 }
     }
 }
-
-/// Represents a color with the given RGBA values represented as floats in the
-/// 0-1 range.
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct DisplayColor {
-    pub red: f32,
-    pub green: f32,
-    pub blue: f32,
-    pub alpha: f32,
-}

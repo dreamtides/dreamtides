@@ -20,6 +20,14 @@ namespace Dreamcaller.Components
       });
     }
 
+    public void PerformSomeAction()
+    {
+      _registry.ActionService.PerformAction(new UserAction
+      {
+        DebugAction = DebugAction.PerformSomeAction
+      });
+    }
+
     public void TriggerJudgment()
     {
       _registry.ActionService.PerformAction(new UserAction

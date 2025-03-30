@@ -538,6 +538,12 @@ namespace Dreamcaller.Schema
         public string Name { get; set; }
 
         /// <summary>
+        /// Outline color of this card
+        /// </summary>
+        [JsonProperty("outlineColor")]
+        public DisplayColor OutlineColor { get; set; }
+
+        /// <summary>
         /// Energy produced by this card
         /// </summary>
         [JsonProperty("produced")]
@@ -554,12 +560,6 @@ namespace Dreamcaller.Schema
         /// </summary>
         [JsonProperty("spark")]
         public long? Spark { get; set; }
-
-        /// <summary>
-        /// Visual status of this card
-        /// </summary>
-        [JsonProperty("status")]
-        public RevealedCardStatus? Status { get; set; }
 
         /// <summary>
         /// Additional help text about this card, describing its abilities.
@@ -608,7 +608,7 @@ namespace Dreamcaller.Schema
     }
 
     /// <summary>
-    /// Set a card as a target of the card currently being played.
+    /// Select a card by ID in resopnse to some prompt, e.g. as a target of a card being played.
     ///
     /// Sets the position of a card in a card order selector.
     ///
@@ -619,8 +619,8 @@ namespace Dreamcaller.Schema
         [JsonProperty("playCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardId PlayCard { get; set; }
 
-        [JsonProperty("selectTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public CardId SelectTarget { get; set; }
+        [JsonProperty("selectCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public CardId SelectCard { get; set; }
 
         [JsonProperty("selectCardOrder", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SelectCardOrder SelectCardOrder { get; set; }
@@ -678,6 +678,24 @@ namespace Dreamcaller.Schema
     {
         [JsonProperty("sprite", Required = Required.Always)]
         public string Sprite { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a color with the given RGBA values represented as floats in the 0-1 range.
+    /// </summary>
+    public partial class DisplayColor
+    {
+        [JsonProperty("alpha", Required = Required.Always)]
+        public double Alpha { get; set; }
+
+        [JsonProperty("blue", Required = Required.Always)]
+        public double Blue { get; set; }
+
+        [JsonProperty("green", Required = Required.Always)]
+        public double Green { get; set; }
+
+        [JsonProperty("red", Required = Required.Always)]
+        public double Red { get; set; }
     }
 
     public partial class DraggableNode
@@ -954,24 +972,6 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("wrap")]
         public FlexWrap? Wrap { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a color with the given RGBA values represented as floats in the 0-1 range.
-    /// </summary>
-    public partial class DisplayColor
-    {
-        [JsonProperty("alpha", Required = Required.Always)]
-        public double Alpha { get; set; }
-
-        [JsonProperty("blue", Required = Required.Always)]
-        public double Blue { get; set; }
-
-        [JsonProperty("green", Required = Required.Always)]
-        public double Green { get; set; }
-
-        [JsonProperty("red", Required = Required.Always)]
-        public double Red { get; set; }
     }
 
     public partial class BorderColor
@@ -1485,15 +1485,12 @@ namespace Dreamcaller.Schema
     /// Object is being displayed in a card browser, e.g. to select from a list of cards while
     /// searching
     ///
-    /// Object is being displayed in a list of cards available to pick options from, e.g. when
-    /// selecting targets.
-    ///
     /// Object is in a temporary holding space for cards in hand while resolving some other 'play
     /// card' ability.
     ///
     /// Object is in a position to display itself as part of a dreamwell activation.
     /// </summary>
-    public enum PositionEnum { Browser, CardPicker, Default, Drawn, DreamwellActivation, HandStorage, Offscreen, OnStack };
+    public enum PositionEnum { Browser, Default, Drawn, DreamwellActivation, HandStorage, Offscreen, OnStack };
 
     public enum CardOrderSelectionTarget { Deck, Void };
 
@@ -1512,14 +1509,12 @@ namespace Dreamcaller.Schema
     /// <summary>
     /// Private actions for developer use
     /// </summary>
-    public enum DebugAction { DrawCard, TriggerEnemyJudgment, TriggerUserJudgment };
+    public enum DebugAction { DrawCard, PerformSomeAction, TriggerEnemyJudgment, TriggerUserJudgment };
 
     /// <summary>
     /// Frame to display for this card
     /// </summary>
     public enum CardFrame { Character, Default, Event };
-
-    public enum RevealedCardStatus { CanPlay, CanSelectNegative, CanSelectPositive, Selected };
 
     public enum FlexAlign { Auto, Center, FlexEnd, FlexStart, Stretch };
 
@@ -1615,7 +1610,6 @@ namespace Dreamcaller.Schema
                 BattleActionEnumConverter.Singleton,
                 DebugActionConverter.Singleton,
                 CardFrameConverter.Singleton,
-                RevealedCardStatusConverter.Singleton,
                 FlexAlignConverter.Singleton,
                 DimensionUnitConverter.Singleton,
                 FlexDisplayStyleConverter.Singleton,
@@ -1788,8 +1782,6 @@ namespace Dreamcaller.Schema
                     {
                         case "browser":
                             return new Position { Enum = PositionEnum.Browser };
-                        case "cardPicker":
-                            return new Position { Enum = PositionEnum.CardPicker };
                         case "default":
                             return new Position { Enum = PositionEnum.Default };
                         case "drawn":
@@ -1820,9 +1812,6 @@ namespace Dreamcaller.Schema
                 {
                     case PositionEnum.Browser:
                         serializer.Serialize(writer, "browser");
-                        return;
-                    case PositionEnum.CardPicker:
-                        serializer.Serialize(writer, "cardPicker");
                         return;
                     case PositionEnum.Default:
                         serializer.Serialize(writer, "default");
@@ -1908,8 +1897,6 @@ namespace Dreamcaller.Schema
             {
                 case "browser":
                     return PositionEnum.Browser;
-                case "cardPicker":
-                    return PositionEnum.CardPicker;
                 case "default":
                     return PositionEnum.Default;
                 case "drawn":
@@ -1938,9 +1925,6 @@ namespace Dreamcaller.Schema
             {
                 case PositionEnum.Browser:
                     serializer.Serialize(writer, "browser");
-                    return;
-                case PositionEnum.CardPicker:
-                    serializer.Serialize(writer, "cardPicker");
                     return;
                 case PositionEnum.Default:
                     serializer.Serialize(writer, "default");
@@ -2175,6 +2159,8 @@ namespace Dreamcaller.Schema
             {
                 case "drawCard":
                     return DebugAction.DrawCard;
+                case "performSomeAction":
+                    return DebugAction.PerformSomeAction;
                 case "triggerEnemyJudgment":
                     return DebugAction.TriggerEnemyJudgment;
                 case "triggerUserJudgment":
@@ -2195,6 +2181,9 @@ namespace Dreamcaller.Schema
             {
                 case DebugAction.DrawCard:
                     serializer.Serialize(writer, "drawCard");
+                    return;
+                case DebugAction.PerformSomeAction:
+                    serializer.Serialize(writer, "performSomeAction");
                     return;
                 case DebugAction.TriggerEnemyJudgment:
                     serializer.Serialize(writer, "triggerEnemyJudgment");
@@ -2253,57 +2242,6 @@ namespace Dreamcaller.Schema
         }
 
         public static readonly CardFrameConverter Singleton = new CardFrameConverter();
-    }
-
-    internal class RevealedCardStatusConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(RevealedCardStatus) || t == typeof(RevealedCardStatus?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "canPlay":
-                    return RevealedCardStatus.CanPlay;
-                case "canSelectNegative":
-                    return RevealedCardStatus.CanSelectNegative;
-                case "canSelectPositive":
-                    return RevealedCardStatus.CanSelectPositive;
-                case "selected":
-                    return RevealedCardStatus.Selected;
-            }
-            throw new Exception("Cannot unmarshal type RevealedCardStatus");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (RevealedCardStatus)untypedValue;
-            switch (value)
-            {
-                case RevealedCardStatus.CanPlay:
-                    serializer.Serialize(writer, "canPlay");
-                    return;
-                case RevealedCardStatus.CanSelectNegative:
-                    serializer.Serialize(writer, "canSelectNegative");
-                    return;
-                case RevealedCardStatus.CanSelectPositive:
-                    serializer.Serialize(writer, "canSelectPositive");
-                    return;
-                case RevealedCardStatus.Selected:
-                    serializer.Serialize(writer, "selected");
-                    return;
-            }
-            throw new Exception("Cannot marshal type RevealedCardStatus");
-        }
-
-        public static readonly RevealedCardStatusConverter Singleton = new RevealedCardStatusConverter();
     }
 
     internal class FlexAlignConverter : JsonConverter
