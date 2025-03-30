@@ -10,8 +10,9 @@ namespace Dreamcaller.Layout
   {
     [SerializeField] float _initialSpacing = 0.5f;
     [SerializeField] float _initialOffset;
-    [SerializeField] GameObject _deckImage;
-    [SerializeField] GameObject _voidImage;
+    [SerializeField] GameObject _deckImage = null!;
+    [SerializeField] GameObject _voidImage = null!;
+    [SerializeField] ObjectLayout _cardOrderSelectorVoid = null!;
 
     public CardOrderSelectorView? View { get; set; }
 
@@ -27,22 +28,48 @@ namespace Dreamcaller.Layout
     /// Returns the index position within the selector which most closely maps
     /// to the position of the given Transform.
     /// </summary>
-    public int HorizontalIndexPositionWithinDisplay(Transform t)
+    public SelectCardOrder SelectCardOrderWithinDisplay(Transform t, CardId cardId)
     {
-      if (Objects.Count == 0)
+      var targetPosition = GetAxisPosition(t);
+
+      if (targetPosition > GetAxisPosition(_cardOrderSelectorVoid.transform) - _cardWidth)
       {
-        return 0;
+        return new SelectCardOrder
+        {
+          CardId = cardId,
+          Position = _cardOrderSelectorVoid.Objects.Count,
+          Target = CardOrderSelectionTarget.Void,
+        };
       }
 
-      var targetPosition = GetAxisPosition(t);
+      if (Objects.Count == 0)
+      {
+        return new SelectCardOrder
+        {
+          CardId = cardId,
+          Position = 0,
+          Target = CardOrderSelectionTarget.Deck,
+        };
+      }
+
       if (targetPosition < GetAxisPosition(Objects[0].transform))
       {
-        return 0;
+        return new SelectCardOrder
+        {
+          CardId = cardId,
+          Position = 0,
+          Target = CardOrderSelectionTarget.Deck,
+        };
       }
 
       if (targetPosition > GetAxisPosition(Objects[Objects.Count - 1].transform))
       {
-        return Objects.Count;
+        return new SelectCardOrder
+        {
+          CardId = cardId,
+          Position = Objects.Count,
+          Target = CardOrderSelectionTarget.Deck,
+        };
       }
 
       for (int i = 0; i < Objects.Count - 1; i++)
@@ -52,11 +79,21 @@ namespace Dreamcaller.Layout
 
         if (targetPosition >= currentPosition && targetPosition <= nextPosition)
         {
-          return (targetPosition - currentPosition < nextPosition - targetPosition) ? i + 1 : i + 2;
+          return new SelectCardOrder
+          {
+            CardId = cardId,
+            Position = (targetPosition - currentPosition < nextPosition - targetPosition) ? i + 1 : i + 2,
+            Target = CardOrderSelectionTarget.Deck,
+          };
         }
       }
 
-      return 0;
+      return new SelectCardOrder
+      {
+        CardId = cardId,
+        Position = 0,
+        Target = CardOrderSelectionTarget.Deck,
+      };
     }
 
     protected override void OnShowStart()

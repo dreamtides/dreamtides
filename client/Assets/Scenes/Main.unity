@@ -7127,6 +7127,7 @@ MonoBehaviour:
   _initialOffset: 4.1
   _deckImage: {fileID: 1324142407}
   _voidImage: {fileID: 1579506596}
+  _cardOrderSelectorVoid: {fileID: 753406003}
 --- !u!1001 &516333624
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10427,6 +10428,72 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4289126748202998, guid: 9672218ecb324c240ae58e7a390701f2, type: 3}
   m_PrefabInstance: {fileID: 740610533}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &753406000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 753406001}
+  - component: {fileID: 753406003}
+  - component: {fileID: 753406002}
+  m_Layer: 0
+  m_Name: VoidLayout
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &753406001
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 753406000}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2, y: -0.24, z: -0.07}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1579506597}
+  m_Father: {fileID: 845375159}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &753406002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 753406000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9759a954d17ef433b809b76238ccb912, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _startingContext: 15
+--- !u!114 &753406003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 753406000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 518962cfb277243c0b2e1d83d1c50db9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _projectileSourcePosition: {fileID: 0}
+  _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
+  _internalGameContext: 0
+  _objects: []
+  _debugUpdateContinuously: 0
+  _singleElementY: 0.5
 --- !u!1 &756017783
 GameObject:
   m_ObjectHideFlags: 0
@@ -12482,7 +12549,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1579506597}
+  - {fileID: 753406001}
   m_Father: {fileID: 510663037}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &848994295
@@ -20771,6 +20838,7 @@ MonoBehaviour:
   _dreamwellActivation: {fileID: 1288685203}
   _dreamwellDisplay: {fileID: 2109462077}
   _cardOrderSelector: {fileID: 510663039}
+  _cardOrderSelectorVoid: {fileID: 753406003}
 --- !u!1001 &1305588118
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21173,7 +21241,7 @@ GameObject:
   - component: {fileID: 1324142408}
   - component: {fileID: 1324142409}
   m_Layer: 0
-  m_Name: Deck
+  m_Name: DeckImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -22596,6 +22664,7 @@ MonoBehaviour:
   _dreamwellActivation: {fileID: 209689866}
   _dreamwellDisplay: {fileID: 1819942634}
   _cardOrderSelector: {fileID: 0}
+  _cardOrderSelectorVoid: {fileID: 0}
 --- !u!1001 &1436808300
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23768,7 +23837,7 @@ GameObject:
   - component: {fileID: 1579506597}
   - component: {fileID: 1579506598}
   m_Layer: 0
-  m_Name: Void
+  m_Name: VoidImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23783,11 +23852,11 @@ Transform:
   m_GameObject: {fileID: 1579506596}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2, y: -0.46, z: -0.13}
+  m_LocalPosition: {x: 0, y: -0.2, z: -0.1}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 845375159}
+  m_Father: {fileID: 753406001}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1579506598
 SpriteRenderer:

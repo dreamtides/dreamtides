@@ -28,8 +28,18 @@ impl From<BattleAction> for UserAction {
 #[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct SelectCardOrder {
+    pub target: CardOrderSelectionTarget,
     pub card_id: CardId,
     pub position: usize,
+}
+
+#[derive(
+    Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
+pub enum CardOrderSelectionTarget {
+    Deck,
+    Void,
 }
 
 #[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]

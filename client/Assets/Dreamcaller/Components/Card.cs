@@ -311,11 +311,8 @@ namespace Dreamcaller.Components
             {
               BattleActionClass = new()
               {
-                SelectCardOrder = new()
-                {
-                  CardId = CardView.Id,
-                  Position = _registry.Layout.CardOrderSelector.HorizontalIndexPositionWithinDisplay(transform),
-                }
+                SelectCardOrder =
+                    _registry.Layout.CardOrderSelector.SelectCardOrderWithinDisplay(transform, CardView.Id),
               }
             }
           };

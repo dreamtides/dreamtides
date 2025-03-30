@@ -104,6 +104,9 @@ namespace Dreamcaller.Layout
     [SerializeField] CardOrderSelector? _cardOrderSelector;
     public CardOrderSelector CardOrderSelector => Check(_cardOrderSelector);
 
+    [SerializeField] ObjectLayout? _cardOrderSelectorVoid;
+    public ObjectLayout CardOrderSelectorVoid => Check(_cardOrderSelectorVoid);
+
     T Check<T>(T? value) where T : Object =>
         Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
   }

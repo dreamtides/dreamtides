@@ -1,6 +1,8 @@
 use std::sync::{LazyLock, Mutex};
 
-use action_data::battle_action::{BattleAction, CardBrowserType, SelectCardOrder};
+use action_data::battle_action::{
+    BattleAction, CardBrowserType, CardOrderSelectionTarget, SelectCardOrder,
+};
 use action_data::debug_action::DebugAction;
 use action_data::user_action::UserAction;
 use core_data::display_types::{
@@ -197,7 +199,8 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                     if let (Some(c1_view), Some(c2_view)) = (c1, c2) {
                         for card in battle.cards.iter_mut() {
                             if card.id == c1_view.id || card.id == c2_view.id {
-                                card.position.position = Position::CardOrderSelector;
+                                card.position.position =
+                                    Position::CardOrderSelector(CardOrderSelectionTarget::Deck);
                                 card.revealed.as_mut().unwrap().actions.can_select_order = true;
                             }
                         }
@@ -367,23 +370,21 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 },
             }
         }
-        BattleAction::SelectCardOrder(SelectCardOrder { card_id, position }) => {
+        BattleAction::SelectCardOrder(SelectCardOrder { target, card_id, position }) => {
             let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
-
-            // Print all cards in CardOrderSelector position
-            println!("Cards in CardOrderSelector before reordering:");
-            for (i, card) in battle.cards.iter().enumerate() {
-                if card.position.position == Position::CardOrderSelector {
-                    println!(
-                        "Card index: {}, ID: {:?}, Name: {}, Sorting key: {}",
-                        i,
-                        card.id,
-                        card.revealed.as_ref().map_or("Unknown", |r| &r.name),
-                        card.position.sorting_key
-                    );
-                }
+            if let Some(card_index) = battle.cards.iter().position(|card| card.id == card_id) {
+                battle.cards[card_index].position.position = Position::CardOrderSelector(target);
             }
-            println!("Reordering card {:?} to position {}", card_id, position);
+
+            // if target == CardOrderSelectionTarget::Void {
+            //     *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+            //     return PerformActionResponse {
+            //         metadata,
+            //         commands: CommandSequence::sequential(vec![Command::UpdateBattle(
+            //             UpdateBattleCommand::new(battle),
+            //         )]),
+            //     };
+            // }
 
             // Find all cards in the CardOrderSelector
             let mut selector_cards: Vec<(usize, CardId, u32)> = battle
@@ -391,7 +392,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 .iter()
                 .enumerate()
                 .filter_map(|(idx, card)| {
-                    if card.position.position == Position::CardOrderSelector {
+                    if card.position.position == Position::CardOrderSelector(target) {
                         Some((idx, card.id, card.position.sorting_key))
                     } else {
                         None
@@ -414,6 +415,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
 
                 // Update sorting keys for all cards in the selector
                 for (i, (idx, _, _)) in selector_cards.iter().enumerate() {
+                    battle.cards[*idx].position.position = Position::CardOrderSelector(target);
                     battle.cards[*idx].position.sorting_key = i as u32;
                 }
             }

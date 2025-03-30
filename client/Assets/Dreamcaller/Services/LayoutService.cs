@@ -186,7 +186,8 @@ namespace Dreamcaller.Services
         Registry.Layout.Browser.Hide(Registry, sequence);
       }
 
-      if (Registry.Layout.CardOrderSelector.Objects.Count > 0)
+      if (Registry.Layout.CardOrderSelector.Objects.Count > 0 ||
+          Registry.Layout.CardOrderSelectorVoid.Objects.Count > 0)
       {
         Registry.Layout.CardOrderSelector.Show(Registry, sequence);
       }
@@ -214,6 +215,7 @@ namespace Dreamcaller.Services
       Registry.Layout.EnemyDreamwell.ApplyLayout(sequence);
       Registry.Layout.DreamwellActivation.ApplyLayout(sequence);
       Registry.Layout.CardOrderSelector.ApplyLayout(sequence);
+      Registry.Layout.CardOrderSelectorVoid.ApplyLayout(sequence);
     }
 
     List<Card> PrepareToDelete(Sequence? sequence, HashSet<string> toDelete)
@@ -277,11 +279,6 @@ namespace Dreamcaller.Services
       if (position.Enum == PositionEnum.DreamwellActivation)
       {
         return Registry.Layout.DreamwellActivation;
-      }
-
-      if (position.Enum == PositionEnum.CardOrderSelector)
-      {
-        return Registry.Layout.CardOrderSelector;
       }
 
       if (position.PositionClass == null)
@@ -362,6 +359,16 @@ namespace Dreamcaller.Services
       if (position.PositionClass.HiddenWithinCard is { } cardId)
       {
         return GetCard(cardId).ContainedObjects;
+      }
+
+      if (position.PositionClass.CardOrderSelector is { } cardOrderSelectorTarget)
+      {
+        return cardOrderSelectorTarget switch
+        {
+          CardOrderSelectionTarget.Deck => Registry.Layout.CardOrderSelector,
+          CardOrderSelectionTarget.Void => Registry.Layout.CardOrderSelectorVoid,
+          _ => throw Errors.UnknownEnumValue(cardOrderSelectorTarget),
+        };
       }
 
       throw new InvalidOperationException($"Unknown layout position: ${position.PositionClass}, ${position.Enum}");

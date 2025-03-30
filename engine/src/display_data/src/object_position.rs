@@ -1,3 +1,4 @@
+use action_data::battle_action::CardOrderSelectionTarget;
 use core_data::identifiers::CardId;
 use core_data::types::PlayerName;
 use schemars::JsonSchema;
@@ -72,7 +73,7 @@ pub enum Position {
 
     /// Object is being displayed in a selector to determine the order of cards,
     /// e.g. when resolving the "forsee" effect.
-    CardOrderSelector,
+    CardOrderSelector(CardOrderSelectionTarget),
 
     /// Object is being displayed in a list of cards available to pick options
     /// from, e.g. when selecting targets.
