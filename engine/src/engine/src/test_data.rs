@@ -595,6 +595,7 @@ fn scene_0(id: BattleId) -> BattleView {
             vec![dreamsign_card(Position::InPlayerStatus(PlayerName::User), 739)],
             vec![dreamwell_card(Position::InDreamwell(PlayerName::User), 740)],
             vec![dreamwell_card(Position::InDreamwell(PlayerName::Enemy), 741)],
+            vec![game_modifier_card(Position::GameModifier, 742)],
         ]
         .concat()
         .to_vec(),
@@ -917,6 +918,40 @@ fn dreamwell_card(position: Position, sorting_key: u32) -> CardView {
         create_position: None,
         destroy_position: None,
         prefab: CardPrefab::Dreamwell,
+    }
+}
+
+fn game_modifier_card(position: Position, sorting_key: u32) -> CardView {
+    let revealed = !matches!(position, Position::InDeck(_));
+    CardView {
+        id: CardId::from_int(sorting_key as u64),
+        position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
+        card_back: Url::new("".to_string()),
+        revealed: revealed.then_some(RevealedCardView {
+            image: DisplayImage {
+                address: SpriteAddress::new(
+                    "Assets/ThirdParty/GameAssets/CardImages/Standard/2027158310.png",
+                ),
+            },
+            name: "Celestial Reverie".to_string(),
+            rules_text: "Until end of turn, whenever you play a character, draw a card. "
+                .to_string(),
+            outline_color: None,
+            cost: None,
+            produced: None,
+            spark: None,
+            card_type: "Game Modifier".to_string(),
+            frame: CardFrame::Event,
+            supplemental_card_info: None,
+            is_fast: false,
+            actions: CardActions::default(),
+            effects: CardEffects::default(),
+        }),
+        revealed_to_opponents: true,
+        card_facing: CardFacing::FaceUp,
+        create_position: None,
+        destroy_position: None,
+        prefab: CardPrefab::Token,
     }
 }
 

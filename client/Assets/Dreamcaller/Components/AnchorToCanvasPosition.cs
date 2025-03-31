@@ -1,6 +1,7 @@
 #nullable enable
 
 using System.Collections;
+using Dreamcaller.Layout;
 using Dreamcaller.Services;
 using Dreamcaller.Utils;
 using UnityEngine;
@@ -21,6 +22,10 @@ namespace Dreamcaller.Components
       var anchor = _registry.Layout.MainCamera.ScreenToWorldPoint(
           new Vector3(screenPoint.x, screenPoint.y, _distanceFromCamera));
       transform.position = anchor;
+      if (GetComponent<ObjectLayout>() is { } layout)
+      {
+        layout.ApplyLayout();
+      }
     }
   }
 }

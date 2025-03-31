@@ -88,4 +88,7 @@ pub enum Position {
 
     /// Object is hidden within a card
     HiddenWithinCard(CardId),
+
+    /// Object describes a game modifier or ongoing game effect
+    GameModifier,
 }

@@ -19,6 +19,8 @@ namespace Dreamcaller.Layout
 
     protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
 
+    protected override float? CalculateObjectScale(int index, int count) => transform.localScale.x;
+
     public static float CalculateOffset(
       float width,
       float initialSpacing,

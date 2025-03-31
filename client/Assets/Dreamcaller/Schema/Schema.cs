@@ -1489,8 +1489,10 @@ namespace Dreamcaller.Schema
     /// card' ability.
     ///
     /// Object is in a position to display itself as part of a dreamwell activation.
+    ///
+    /// Object describes a game modifier or ongoing game effect
     /// </summary>
-    public enum PositionEnum { Browser, Default, Drawn, DreamwellActivation, HandStorage, Offscreen, OnStack };
+    public enum PositionEnum { Browser, Default, Drawn, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnStack };
 
     public enum CardOrderSelectionTarget { Deck, Void };
 
@@ -1788,6 +1790,8 @@ namespace Dreamcaller.Schema
                             return new Position { Enum = PositionEnum.Drawn };
                         case "dreamwellActivation":
                             return new Position { Enum = PositionEnum.DreamwellActivation };
+                        case "gameModifier":
+                            return new Position { Enum = PositionEnum.GameModifier };
                         case "handStorage":
                             return new Position { Enum = PositionEnum.HandStorage };
                         case "offscreen":
@@ -1821,6 +1825,9 @@ namespace Dreamcaller.Schema
                         return;
                     case PositionEnum.DreamwellActivation:
                         serializer.Serialize(writer, "dreamwellActivation");
+                        return;
+                    case PositionEnum.GameModifier:
+                        serializer.Serialize(writer, "gameModifier");
                         return;
                     case PositionEnum.HandStorage:
                         serializer.Serialize(writer, "handStorage");
@@ -1903,6 +1910,8 @@ namespace Dreamcaller.Schema
                     return PositionEnum.Drawn;
                 case "dreamwellActivation":
                     return PositionEnum.DreamwellActivation;
+                case "gameModifier":
+                    return PositionEnum.GameModifier;
                 case "handStorage":
                     return PositionEnum.HandStorage;
                 case "offscreen":
@@ -1934,6 +1943,9 @@ namespace Dreamcaller.Schema
                     return;
                 case PositionEnum.DreamwellActivation:
                     serializer.Serialize(writer, "dreamwellActivation");
+                    return;
+                case PositionEnum.GameModifier:
+                    serializer.Serialize(writer, "gameModifier");
                     return;
                 case PositionEnum.HandStorage:
                     serializer.Serialize(writer, "handStorage");

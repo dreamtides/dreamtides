@@ -27,6 +27,7 @@ namespace Dreamcaller.Components
     [SerializeField] Renderer _cardBack = null!;
     [SerializeField] Renderer _outline = null!;
     [SerializeField] SpriteRenderer _battlefieldOutline = null!;
+    [SerializeField] Renderer _costBackground = null!;
     [SerializeField] TextMeshPro _costText = null!;
     [SerializeField] TextMeshPro _producedEnergyText = null!;
     [SerializeField] Renderer _sparkBackground = null!;
@@ -191,6 +192,7 @@ namespace Dreamcaller.Components
       ToggleActiveElements();
       _name.text = revealed.Name;
       _rulesText.text = revealed.RulesText;
+      _costBackground.gameObject.SetActive(revealed.Cost != null);
       _costText.text = revealed.Cost?.ToString();
       _producedEnergyText.text = revealed.Produced?.ToString();
       _sparkText.text = revealed.Spark?.ToString();

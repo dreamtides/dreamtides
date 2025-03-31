@@ -1254,6 +1254,7 @@ MonoBehaviour:
   _cardBack: {fileID: 2565455935476004323}
   _outline: {fileID: 6363849548364678257}
   _battlefieldOutline: {fileID: 5211427439138302304}
+  _costBackground: {fileID: 7911059802122490047}
   _costText: {fileID: 3850561557669642518}
   _producedEnergyText: {fileID: 2580083443595500976}
   _sparkBackground: {fileID: 4974585064578092744}

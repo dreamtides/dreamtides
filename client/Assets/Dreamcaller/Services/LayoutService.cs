@@ -216,6 +216,7 @@ namespace Dreamcaller.Services
       Registry.Layout.DreamwellActivation.ApplyLayout(sequence);
       Registry.Layout.CardOrderSelector.ApplyLayout(sequence);
       Registry.Layout.CardOrderSelectorVoid.ApplyLayout(sequence);
+      Registry.Layout.GameModifiersDisplay.ApplyLayout(sequence);
     }
 
     List<Card> PrepareToDelete(Sequence? sequence, HashSet<string> toDelete)
@@ -279,6 +280,11 @@ namespace Dreamcaller.Services
       if (position.Enum == PositionEnum.DreamwellActivation)
       {
         return Registry.Layout.DreamwellActivation;
+      }
+
+      if (position.Enum == PositionEnum.GameModifier)
+      {
+        return Registry.Layout.GameModifiersDisplay;
       }
 
       if (position.PositionClass == null)
