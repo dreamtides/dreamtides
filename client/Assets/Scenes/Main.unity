@@ -7375,7 +7375,6 @@ MonoBehaviour:
   _cardWidth: 2.5
   _leftEdge: {fileID: 418040942}
   _rightEdge: {fileID: 845375159}
-  _zAxis: 0
   _isOpen: 0
   _initialSpacing: -0.5
   _initialOffset: 4.1
@@ -13752,13 +13751,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 890713213}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.60876137, y: -0, z: -0, w: 0.7933534}
-  m_LocalPosition: {x: 13.6, y: -46.4, z: -14.5}
+  m_LocalRotation: {x: 0.4304593, y: 0.56098557, z: -0.4304593, w: 0.56098557}
+  m_LocalPosition: {x: -1, y: 7, z: -25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1435083753}
-  m_LocalEulerAnglesHint: {x: 90, y: 270, z: 0}
+  m_LocalEulerAnglesHint: {x: 75, y: 90, z: 0}
 --- !u!114 &890713215
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18791,7 +18790,6 @@ MonoBehaviour:
   _cardWidth: 2.5
   _leftEdge: {fileID: 241295664}
   _rightEdge: {fileID: 951965639}
-  _zAxis: 0
   _isOpen: 0
   _scrollAmount: 0
   _scrollbar: {fileID: 2133012749}
@@ -19202,13 +19200,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1184722215}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.60876137, y: -0, z: -0, w: 0.7933534}
-  m_LocalPosition: {x: 20.8, y: -34.7, z: -8}
+  m_LocalRotation: {x: 0.4304593, y: 0.56098557, z: -0.4304593, w: 0.56098557}
+  m_LocalPosition: {x: -1, y: 7, z: -25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1435083753}
-  m_LocalEulerAnglesHint: {x: 90, y: 270, z: 0}
+  m_LocalEulerAnglesHint: {x: 75, y: 90, z: 0}
 --- !u!114 &1184722217
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27033,7 +27031,6 @@ MonoBehaviour:
   _cardWidth: 2.5
   _leftEdge: {fileID: 962841404}
   _rightEdge: {fileID: 488176971}
-  _zAxis: 0
   _isOpen: 0
   _initialSpacing: -0.5
   _initialOffset: 4.1
@@ -29596,7 +29593,6 @@ MonoBehaviour:
   _cardWidth: 2.5
   _leftEdge: {fileID: 124367195}
   _rightEdge: {fileID: 565470941}
-  _zAxis: 0
   _isOpen: 0
   _scrollAmount: 0
   _scrollbar: {fileID: 62616640}
