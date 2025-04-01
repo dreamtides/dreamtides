@@ -40,6 +40,7 @@ static CARD_BROWSER_SOURCE: LazyLock<Mutex<Option<Position>>> = LazyLock::new(||
 static ORDER_SELECTOR_VISIBLE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<Mutex<std::collections::HashMap<CardId, Position>>> =
     LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
+const STUFF_TO_DO: u32 = 2;
 
 pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     let battle = scene_0(BattleId(Uuid::new_v4()));
@@ -142,38 +143,67 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
             }
         }
         DebugAction::PerformSomeAction => {
-            // Set mulligan state
-            let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+            if STUFF_TO_DO == 1 {
+                // Set mulligan state
+                let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
 
-            // Set the global RESOLVING_MULLIGAN flag to true
-            *RESOLVING_MULLIGAN.lock().unwrap() = true;
+                // Set the global RESOLVING_MULLIGAN flag to true
+                *RESOLVING_MULLIGAN.lock().unwrap() = true;
 
-            // Update all cards in the user's hand to have "select card" action and disable
-            // "can play"
-            for card in battle.cards.iter_mut() {
-                if matches!(card.position.position, Position::InHand(PlayerName::User)) {
-                    if let Some(revealed) = &mut card.revealed {
-                        // Set on_click action to select this card
-                        revealed.actions.on_click =
-                            Some(UserAction::BattleAction(BattleAction::SelectCard(card.id)));
-                        // Disable can_play action
-                        revealed.actions.can_play = false;
-                        // Set visual status to indicate selectable
-                        revealed.outline_color = Some(display_color::WHITE);
+                // Update all cards in the user's hand to have "select card" action and disable
+                // "can play"
+                for card in battle.cards.iter_mut() {
+                    if matches!(card.position.position, Position::InHand(PlayerName::User)) {
+                        if let Some(revealed) = &mut card.revealed {
+                            // Set on_click action to select this card
+                            revealed.actions.on_click =
+                                Some(UserAction::BattleAction(BattleAction::SelectCard(card.id)));
+                            // Disable can_play action
+                            revealed.actions.can_play = false;
+                            // Set visual status to indicate selectable
+                            revealed.outline_color = Some(display_color::WHITE);
+                        }
                     }
                 }
+
+                // Add a screen overlay with mulligan instructions
+                battle.interface.screen_overlay = Some(mulligan_message());
+
+                // Disable the primary action button during mulligan
+                battle.interface.primary_action_button = None;
+
+                let commands =
+                    vec![Command::UpdateBattle(UpdateBattleCommand::new(battle.clone()))];
+                *CURRENT_BATTLE.lock().unwrap() = Some(battle);
+
+                PerformActionResponse { metadata, commands: CommandSequence::sequential(commands) }
+            } else {
+                // Find the first card in enemy hand
+                let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+                let mut commands = Vec::new();
+
+                if let Some((card_index, card)) = battle.cards.iter().enumerate().find(|(_, c)| {
+                    matches!(c.position.position, Position::InHand(PlayerName::Enemy))
+                }) {
+                    let sorting_key = card.position.sorting_key;
+
+                    // Move card to stack
+                    battle.cards[card_index] = card_view(Position::OnStack, sorting_key);
+                    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+
+                    // Wait for animation
+                    commands.push(Command::Wait(Milliseconds::new(1500)));
+
+                    // Move card to battlefield
+                    battle.cards[card_index] =
+                        card_view(Position::OnBattlefield(PlayerName::Enemy), sorting_key);
+                    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+
+                    *CURRENT_BATTLE.lock().unwrap() = Some(battle);
+                }
+
+                PerformActionResponse { metadata, commands: CommandSequence::sequential(commands) }
             }
-
-            // Add a screen overlay with mulligan instructions
-            battle.interface.screen_overlay = Some(mulligan_message());
-
-            // Disable the primary action button during mulligan
-            battle.interface.primary_action_button = None;
-
-            let commands = vec![Command::UpdateBattle(UpdateBattleCommand::new(battle.clone()))];
-            *CURRENT_BATTLE.lock().unwrap() = Some(battle);
-
-            PerformActionResponse { metadata, commands: CommandSequence::sequential(commands) }
         }
     }
 }
@@ -648,16 +678,14 @@ fn scene_0(id: BattleId) -> BattleView {
             total_spark: Spark(0),
         },
         cards: [
-            cards_in_position(Position::OnBattlefield(PlayerName::User), 0, 5),
             cards_in_position(Position::InHand(PlayerName::User), 5, 3),
             cards_in_position(Position::InVoid(PlayerName::User), 8, 6),
             cards_in_position(Position::InDeck(PlayerName::User), 14, 20),
-            cards_in_position(Position::OnBattlefield(PlayerName::Enemy), 100, 8),
             cards_in_position(Position::InHand(PlayerName::Enemy), 105, 3),
             cards_in_position(Position::InVoid(PlayerName::Enemy), 108, 6),
             cards_in_position(Position::InDeck(PlayerName::Enemy), 114, 20),
             cards_in_position(Position::InVoid(PlayerName::User), 150, 4),
-            cards_in_position(Position::OnBattlefield(PlayerName::User), 533, 3),
+            cards_in_position(Position::OnBattlefield(PlayerName::User), 533, 2),
             cards_in_position(Position::OnBattlefield(PlayerName::Enemy), 633, 3),
             cards_in_position(Position::InHand(PlayerName::Enemy), 733, 5),
             vec![enemy_card(Position::InPlayerStatus(PlayerName::Enemy), 738)],
@@ -681,7 +709,7 @@ fn cards_in_position(position: Position, start_key: u32, count: u32) -> Vec<Card
 }
 
 fn card_view(position: Position, sorting_key: u32) -> CardView {
-    if sorting_key % 5 == 0 {
+    let mut card = if sorting_key % 5 == 0 {
         card1(position, sorting_key)
     } else if sorting_key % 5 == 1 {
         card2(position, sorting_key)
@@ -691,7 +719,15 @@ fn card_view(position: Position, sorting_key: u32) -> CardView {
         card4(position, sorting_key)
     } else {
         card5(position, sorting_key)
+    };
+
+    // If the card is in the enemy's hand, it shouldn't be revealed to the player
+    if position == Position::InHand(PlayerName::Enemy) {
+        card.revealed = None;
+        card.revealed_to_opponents = false;
     }
+
+    card
 }
 
 fn card1(position: Position, sorting_key: u32) -> CardView {
