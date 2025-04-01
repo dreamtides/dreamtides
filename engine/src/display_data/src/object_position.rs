@@ -35,10 +35,16 @@ pub enum Position {
     /// Object is not visible.
     Offscreen,
 
-    /// Object is on the stack
-    OnStack,
-
-    SelectingTargets(SelectingTargets),
+    /// Object is on the stack, typically used by cards which were just played.
+    ///
+    /// There are three types of stacks. By default, cards display at a large
+    /// display size, blocking the view of the battlefield. However, if any
+    /// cards are present on the stack which target a character on the
+    /// battlefield, the cards are displayed at a small size in the user or
+    /// enemy stack position in order to enable viewing & selecting targets
+    /// appropriately. In that case the stack of whichever player first played a
+    /// card is used.
+    OnStack(StackType),
 
     /// Position for cards to be shown to the user immediately after they're
     /// drawn.
@@ -100,7 +106,8 @@ pub enum Position {
     Copy, Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Ord, PartialOrd, JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
-pub struct SelectingTargets {
-    pub actor: PlayerName,
-    pub targeting: PlayerName,
+pub enum StackType {
+    Default,
+    User,
+    Enemy,
 }

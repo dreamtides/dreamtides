@@ -424,8 +424,13 @@ namespace Dreamcaller.Schema
     }
 
     /// <summary>
-    /// An 'actor' player is selecting targets for this card from among characters controlled by
-    /// the indicated 'targeting' player.
+    /// Object is on the stack, typically used by cards which were just played.
+    ///
+    /// There are three types of stacks. By default, cards display at a large display size,
+    /// blocking the view of the battlefield. However, if any cards are present on the stack
+    /// which target a character on the battlefield, the cards are displayed at a small size in
+    /// the user or enemy stack position in order to enable viewing & selecting targets
+    /// appropriately. In that case the stack of whichever player first played a card is used.
     ///
     /// Object is in a player's hand
     ///
@@ -450,8 +455,8 @@ namespace Dreamcaller.Schema
     /// </summary>
     public partial class PositionClass
     {
-        [JsonProperty("selectingTargets", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public SelectingTargets SelectingTargets { get; set; }
+        [JsonProperty("onStack", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public StackType? OnStack { get; set; }
 
         [JsonProperty("inHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayerName? InHand { get; set; }
@@ -482,15 +487,6 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("hiddenWithinCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardId HiddenWithinCard { get; set; }
-    }
-
-    public partial class SelectingTargets
-    {
-        [JsonProperty("actor", Required = Required.Always)]
-        public PlayerName Actor { get; set; }
-
-        [JsonProperty("targeting", Required = Required.Always)]
-        public PlayerName Targeting { get; set; }
     }
 
     /// <summary>
@@ -1505,8 +1501,6 @@ namespace Dreamcaller.Schema
     ///
     /// Object is not visible.
     ///
-    /// Object is on the stack
-    ///
     /// Position for cards to be shown to the user immediately after they're drawn.
     ///
     /// Object is being displayed in a card browser, e.g. to select from a list of cards while
@@ -1523,9 +1517,11 @@ namespace Dreamcaller.Schema
     /// they're not being focused on, e.g. when the user hides a card browser to get a better
     /// view of the battlefield.
     /// </summary>
-    public enum PositionEnum { Browser, Default, Drawn, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnScreenStorage, OnStack };
+    public enum PositionEnum { Browser, Default, Drawn, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnScreenStorage };
 
     public enum CardOrderSelectionTarget { Deck, Void };
+
+    public enum StackType { Default, Enemy, User };
 
     /// <summary>
     /// Represents the general category of card being displayed.
@@ -1638,6 +1634,7 @@ namespace Dreamcaller.Schema
                 CardFacingConverter.Singleton,
                 PositionConverter.Singleton,
                 CardOrderSelectionTargetConverter.Singleton,
+                StackTypeConverter.Singleton,
                 PositionEnumConverter.Singleton,
                 CardPrefabConverter.Singleton,
                 BattleActionConverter.Singleton,
@@ -1831,8 +1828,6 @@ namespace Dreamcaller.Schema
                             return new Position { Enum = PositionEnum.Offscreen };
                         case "onScreenStorage":
                             return new Position { Enum = PositionEnum.OnScreenStorage };
-                        case "onStack":
-                            return new Position { Enum = PositionEnum.OnStack };
                     }
                     break;
                 case JsonToken.StartObject:
@@ -1872,9 +1867,6 @@ namespace Dreamcaller.Schema
                         return;
                     case PositionEnum.OnScreenStorage:
                         serializer.Serialize(writer, "onScreenStorage");
-                        return;
-                    case PositionEnum.OnStack:
-                        serializer.Serialize(writer, "onStack");
                         return;
                 }
             }
@@ -1930,6 +1922,52 @@ namespace Dreamcaller.Schema
         public static readonly CardOrderSelectionTargetConverter Singleton = new CardOrderSelectionTargetConverter();
     }
 
+    internal class StackTypeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(StackType) || t == typeof(StackType?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "default":
+                    return StackType.Default;
+                case "enemy":
+                    return StackType.Enemy;
+                case "user":
+                    return StackType.User;
+            }
+            throw new Exception("Cannot unmarshal type StackType");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (StackType)untypedValue;
+            switch (value)
+            {
+                case StackType.Default:
+                    serializer.Serialize(writer, "default");
+                    return;
+                case StackType.Enemy:
+                    serializer.Serialize(writer, "enemy");
+                    return;
+                case StackType.User:
+                    serializer.Serialize(writer, "user");
+                    return;
+            }
+            throw new Exception("Cannot marshal type StackType");
+        }
+
+        public static readonly StackTypeConverter Singleton = new StackTypeConverter();
+    }
+
     internal class PositionEnumConverter : JsonConverter
     {
         public override bool CanConvert(Type t) => t == typeof(PositionEnum) || t == typeof(PositionEnum?);
@@ -1956,8 +1994,6 @@ namespace Dreamcaller.Schema
                     return PositionEnum.Offscreen;
                 case "onScreenStorage":
                     return PositionEnum.OnScreenStorage;
-                case "onStack":
-                    return PositionEnum.OnStack;
             }
             throw new Exception("Cannot unmarshal type PositionEnum");
         }
@@ -1995,9 +2031,6 @@ namespace Dreamcaller.Schema
                     return;
                 case PositionEnum.OnScreenStorage:
                     serializer.Serialize(writer, "onScreenStorage");
-                    return;
-                case PositionEnum.OnStack:
-                    serializer.Serialize(writer, "onStack");
                     return;
             }
             throw new Exception("Cannot marshal type PositionEnum");

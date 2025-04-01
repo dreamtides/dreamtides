@@ -207,11 +207,9 @@ namespace Dreamcaller.Services
       Registry.Layout.UserBattlefield.ApplyLayout(sequence);
       Registry.Layout.EnemyBattlefield.ApplyLayout(sequence);
       Registry.Layout.DrawnCardsPosition.ApplyLayout(sequence);
-      Registry.Layout.Stack.ApplyLayout(sequence);
-      Registry.Layout.SelectingTargetsUserToUser.ApplyLayout(sequence);
-      Registry.Layout.SelectingTargetsUserToEnemy.ApplyLayout(sequence);
-      Registry.Layout.SelectingTargetsEnemyToUser.ApplyLayout(sequence);
-      Registry.Layout.SelectingTargetsEnemyToEnemy.ApplyLayout(sequence);
+      Registry.Layout.DefaultStack.ApplyLayout(sequence);
+      Registry.Layout.UserStack.ApplyLayout(sequence);
+      Registry.Layout.EnemyStack.ApplyLayout(sequence);
       Registry.Layout.Browser.ApplyLayout(sequence);
       Registry.Layout.UserDreamwell.ApplyLayout(sequence);
       Registry.Layout.EnemyDreamwell.ApplyLayout(sequence);
@@ -268,11 +266,6 @@ namespace Dreamcaller.Services
       if (position.Enum == PositionEnum.Drawn)
       {
         return Registry.Layout.DrawnCardsPosition;
-      }
-
-      if (position.Enum == PositionEnum.OnStack)
-      {
-        return Registry.Layout.Stack;
       }
 
       if (position.Enum == PositionEnum.Browser)
@@ -350,23 +343,14 @@ namespace Dreamcaller.Services
         };
       }
 
-      if (position.PositionClass.SelectingTargets is { } selectingTargets)
+      if (position.PositionClass.OnStack is { } onStack)
       {
-        return selectingTargets.Actor switch
+        return onStack switch
         {
-          PlayerName.User => selectingTargets.Targeting switch
-          {
-            PlayerName.User => Registry.Layout.SelectingTargetsUserToUser,
-            PlayerName.Enemy => Registry.Layout.SelectingTargetsUserToEnemy,
-            _ => throw Errors.UnknownEnumValue(selectingTargets.Targeting),
-          },
-          PlayerName.Enemy => selectingTargets.Targeting switch
-          {
-            PlayerName.User => Registry.Layout.SelectingTargetsEnemyToUser,
-            PlayerName.Enemy => Registry.Layout.SelectingTargetsEnemyToEnemy,
-            _ => throw Errors.UnknownEnumValue(selectingTargets.Targeting),
-          },
-          _ => throw Errors.UnknownEnumValue(selectingTargets.Actor),
+          StackType.Default => Registry.Layout.DefaultStack,
+          StackType.User => Registry.Layout.UserStack,
+          StackType.Enemy => Registry.Layout.EnemyStack,
+          _ => throw Errors.UnknownEnumValue(onStack),
         };
       }
 

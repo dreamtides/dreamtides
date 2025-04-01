@@ -23,7 +23,7 @@ use display_data::command::{
     DisplayJudgmentCommand, DissolveCardCommand, DrawUserCardsCommand, FireProjectileCommand,
     GameMessageType, GameObjectId, ParallelCommandGroup, UpdateBattleCommand,
 };
-use display_data::object_position::{ObjectPosition, Position, SelectingTargets};
+use display_data::object_position::{ObjectPosition, Position, StackType};
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, Metadata, PerformActionRequest, PerformActionResponse,
 };
@@ -187,13 +187,8 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                 }) {
                     let sorting_key = card.position.sorting_key;
 
-                    battle.cards[card_index] = card_view(
-                        Position::SelectingTargets(SelectingTargets {
-                            actor: PlayerName::Enemy,
-                            targeting: PlayerName::User,
-                        }),
-                        sorting_key,
-                    );
+                    battle.cards[card_index] =
+                        card_view(Position::OnStack(StackType::Enemy), sorting_key);
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
                     *CURRENT_BATTLE.lock().unwrap() = Some(battle);
                 }
@@ -210,16 +205,18 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                     let sorting_key = card.position.sorting_key;
 
                     // Move card to stack
-                    battle.cards[card_index] = card_view(Position::OnStack, sorting_key);
+                    battle.cards[card_index] =
+                        card_view(Position::OnStack(StackType::Default), sorting_key);
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
 
                     // Wait for animation
                     commands.push(Command::Wait(Milliseconds::new(1500)));
 
                     // Move card to battlefield
-                    battle.cards[card_index] =
-                        card_view(Position::OnBattlefield(PlayerName::Enemy), sorting_key);
-                    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+                    // battle.cards[card_index] =
+                    //     card_view(Position::OnBattlefield(PlayerName::Enemy), sorting_key);
+                    // commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.
+                    // clone())));
 
                     *CURRENT_BATTLE.lock().unwrap() = Some(battle);
                 }
@@ -280,12 +277,10 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                             }
                         }
                     }
-                    Position::SelectingTargets(SelectingTargets {
-                        actor: PlayerName::User,
-                        targeting: PlayerName::Enemy,
-                    })
+                    Position::OnStack(StackType::User)
                 } else if sorting_key % 5 == 2 {
-                    battle.cards[card_index] = card_view(Position::OnStack, sorting_key);
+                    battle.cards[card_index] =
+                        card_view(Position::OnStack(StackType::Default), sorting_key);
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
                     commands.push(Command::Wait(Milliseconds::new(500)));
                     battle.cards[card_index] =
@@ -319,7 +314,8 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
                     Position::InVoid(PlayerName::User)
                 } else if sorting_key % 5 == 3 {
-                    battle.cards[card_index] = card_view(Position::OnStack, sorting_key);
+                    battle.cards[card_index] =
+                        card_view(Position::OnStack(StackType::Default), sorting_key);
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
                     let c1 = draw_card(&mut battle);
                     let c2 = draw_card(&mut battle);
@@ -343,7 +339,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(
                         battle_clone.clone(),
                     )));
-                    let mut trigger_card = card_view(Position::OnStack, 1234);
+                    let mut trigger_card = card_view(Position::OnStack(StackType::Default), 1234);
                     trigger_card.prefab = CardPrefab::Token;
                     trigger_card.create_position = Some(ObjectPosition {
                         position: Position::HiddenWithinCard(card.id),
@@ -420,8 +416,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 .iter()
                 .enumerate()
                 .filter_map(|(index, card)| {
-                    if card.id == card_id
-                        || matches!(card.position.position, Position::SelectingTargets(_))
+                    if card.id == card_id || matches!(card.position.position, Position::OnStack(_))
                     {
                         Some((index, card.position.sorting_key))
                     } else {
@@ -435,7 +430,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 .cards
                 .iter()
                 .find_map(|card| {
-                    if matches!(card.position.position, Position::SelectingTargets(_)) {
+                    if matches!(card.position.position, Position::OnStack(_)) {
                         Some(card.id)
                     } else {
                         None
