@@ -13,6 +13,7 @@ namespace Dreamcaller.Layout
     [SerializeField] GameObject _deckImage = null!;
     [SerializeField] GameObject _voidImage = null!;
     [SerializeField] ObjectLayout _cardOrderSelectorVoid = null!;
+    [SerializeField] CanvasGroup _toggleBrowserVisibilityButton = null!;
 
     public CardOrderSelectorView? View { get; set; }
 
@@ -101,31 +102,38 @@ namespace Dreamcaller.Layout
       if (View?.IncludeDeck == true)
       {
         _deckImage.SetActive(true);
-        TweenUtils.FadeIn(_deckImage.GetComponent<SpriteRenderer>());
+        TweenUtils.FadeInSprite(_deckImage.GetComponent<SpriteRenderer>());
       }
       if (View?.IncludeVoid == true)
       {
         _voidImage.SetActive(true);
-        TweenUtils.FadeIn(_voidImage.GetComponent<SpriteRenderer>());
+        TweenUtils.FadeInSprite(_voidImage.GetComponent<SpriteRenderer>());
       }
+
+      _toggleBrowserVisibilityButton.gameObject.SetActive(true);
+      TweenUtils.FadeInCanvasGroup(_toggleBrowserVisibilityButton);
     }
 
     protected override void OnHideStart()
     {
       if (View?.IncludeDeck == true)
       {
-        TweenUtils.FadeOut(_deckImage.GetComponent<SpriteRenderer>());
+        TweenUtils.FadeOutSprite(_deckImage.GetComponent<SpriteRenderer>());
       }
+
       if (View?.IncludeVoid == true)
       {
-        TweenUtils.FadeOut(_voidImage.GetComponent<SpriteRenderer>());
+        TweenUtils.FadeOutSprite(_voidImage.GetComponent<SpriteRenderer>());
       }
+
+      TweenUtils.FadeOutCanvasGroup(_toggleBrowserVisibilityButton);
     }
 
     protected override void OnHideComplete()
     {
       _deckImage.SetActive(false);
       _voidImage.SetActive(false);
+      _toggleBrowserVisibilityButton.gameObject.SetActive(false);
     }
   }
 }

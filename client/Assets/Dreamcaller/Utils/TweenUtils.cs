@@ -19,7 +19,23 @@ namespace Dreamcaller.Utils
       return result;
     }
 
-    public static Sequence FadeIn(SpriteRenderer spriteRenderer)
+    public static Sequence FadeInCanvasGroup(CanvasGroup canvasGroup)
+    {
+      canvasGroup.alpha = 0;
+      var result = Sequence($"FadeIn{canvasGroup.gameObject.name}");
+      result.Insert(0, canvasGroup.DOFade(1, MoveAnimationDurationSeconds));
+      return result;
+    }
+
+    public static Sequence FadeOutCanvasGroup(CanvasGroup canvasGroup)
+    {
+      canvasGroup.alpha = 1;
+      var result = Sequence($"FadeOut{canvasGroup.gameObject.name}");
+      result.Insert(0, canvasGroup.DOFade(0, MoveAnimationDurationSeconds));
+      return result;
+    }
+
+    public static Sequence FadeInSprite(SpriteRenderer spriteRenderer)
     {
       spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 0);
       var result = Sequence($"FadeIn{spriteRenderer.gameObject.name}");
@@ -27,7 +43,7 @@ namespace Dreamcaller.Utils
       return result;
     }
 
-    public static Sequence FadeOut(SpriteRenderer spriteRenderer)
+    public static Sequence FadeOutSprite(SpriteRenderer spriteRenderer)
     {
       spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 1);
       var result = Sequence($"FadeOut{spriteRenderer.gameObject.name}");

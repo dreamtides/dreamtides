@@ -227,6 +227,10 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 } else if sorting_key % 5 == 2 {
                     battle.cards[card_index] = card_view(Position::OnStack, sorting_key);
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+                    commands.push(Command::Wait(Milliseconds::new(500)));
+                    battle.cards[card_index] =
+                        card_view(Position::InVoid(PlayerName::User), sorting_key);
+                    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
                     let c1 = draw_card(&mut battle);
                     let c2 = draw_card(&mut battle);
 
