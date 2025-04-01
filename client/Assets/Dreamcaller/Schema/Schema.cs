@@ -1372,6 +1372,12 @@ namespace Dreamcaller.Schema
     public partial class InterfaceView
     {
         /// <summary>
+        /// Button most often used for toggling the visibility of card browsers.
+        /// </summary>
+        [JsonProperty("bottomRightButton")]
+        public ButtonView BottomRightButton { get; set; }
+
+        /// <summary>
         /// Options for display of the card order selector
         /// </summary>
         [JsonProperty("cardOrderSelector")]
@@ -1388,6 +1394,30 @@ namespace Dreamcaller.Schema
         /// </summary>
         [JsonProperty("screenOverlay")]
         public FlexNode ScreenOverlay { get; set; }
+    }
+
+    /// <summary>
+    /// Button to perform some game action
+    /// </summary>
+    public partial class ButtonView
+    {
+        [JsonProperty("action", Required = Required.Always)]
+        public UserAction Action { get; set; }
+
+        [JsonProperty("label", Required = Required.Always)]
+        public string Label { get; set; }
+    }
+
+    /// <summary>
+    /// All possible user interface actions
+    /// </summary>
+    public partial class UserAction
+    {
+        [JsonProperty("debugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DebugAction? DebugAction { get; set; }
+
+        [JsonProperty("battleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public BattleAction? BattleAction { get; set; }
     }
 
     public partial class CardOrderSelectorView
@@ -1412,18 +1442,6 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("metadata", Required = Required.Always)]
         public Metadata Metadata { get; set; }
-    }
-
-    /// <summary>
-    /// All possible user interface actions
-    /// </summary>
-    public partial class UserAction
-    {
-        [JsonProperty("debugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DebugAction? DebugAction { get; set; }
-
-        [JsonProperty("battleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public BattleAction? BattleAction { get; set; }
     }
 
     public partial class PerformActionResponse
@@ -1491,8 +1509,12 @@ namespace Dreamcaller.Schema
     /// Object is in a position to display itself as part of a dreamwell activation.
     ///
     /// Object describes a game modifier or ongoing game effect
+    ///
+    /// Object is in the on-screen storage area, used to hold objects at a small size when
+    /// they're not being focused on, e.g. when the user hides a card browser to get a better
+    /// view of the battlefield.
     /// </summary>
-    public enum PositionEnum { Browser, Default, Drawn, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnStack };
+    public enum PositionEnum { Browser, Default, Drawn, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnScreenStorage, OnStack };
 
     public enum CardOrderSelectionTarget { Deck, Void };
 
@@ -1503,8 +1525,10 @@ namespace Dreamcaller.Schema
 
     /// <summary>
     /// Close the card browser
+    ///
+    /// Toggle the visibility of the card order selector
     /// </summary>
-    public enum BattleActionEnum { CloseCardBrowser };
+    public enum BattleActionEnum { CloseCardBrowser, ToggleOrderSelectorVisibility };
 
     public enum CardBrowserType { EnemyDeck, EnemyStatus, EnemyVoid, UserDeck, UserStatus, UserVoid };
 
@@ -1796,6 +1820,8 @@ namespace Dreamcaller.Schema
                             return new Position { Enum = PositionEnum.HandStorage };
                         case "offscreen":
                             return new Position { Enum = PositionEnum.Offscreen };
+                        case "onScreenStorage":
+                            return new Position { Enum = PositionEnum.OnScreenStorage };
                         case "onStack":
                             return new Position { Enum = PositionEnum.OnStack };
                     }
@@ -1834,6 +1860,9 @@ namespace Dreamcaller.Schema
                         return;
                     case PositionEnum.Offscreen:
                         serializer.Serialize(writer, "offscreen");
+                        return;
+                    case PositionEnum.OnScreenStorage:
+                        serializer.Serialize(writer, "onScreenStorage");
                         return;
                     case PositionEnum.OnStack:
                         serializer.Serialize(writer, "onStack");
@@ -1916,6 +1945,8 @@ namespace Dreamcaller.Schema
                     return PositionEnum.HandStorage;
                 case "offscreen":
                     return PositionEnum.Offscreen;
+                case "onScreenStorage":
+                    return PositionEnum.OnScreenStorage;
                 case "onStack":
                     return PositionEnum.OnStack;
             }
@@ -1952,6 +1983,9 @@ namespace Dreamcaller.Schema
                     return;
                 case PositionEnum.Offscreen:
                     serializer.Serialize(writer, "offscreen");
+                    return;
+                case PositionEnum.OnScreenStorage:
+                    serializer.Serialize(writer, "onScreenStorage");
                     return;
                 case PositionEnum.OnStack:
                     serializer.Serialize(writer, "onStack");
@@ -2030,9 +2064,12 @@ namespace Dreamcaller.Schema
                 case JsonToken.String:
                 case JsonToken.Date:
                     var stringValue = serializer.Deserialize<string>(reader);
-                    if (stringValue == "closeCardBrowser")
+                    switch (stringValue)
                     {
-                        return new BattleAction { Enum = BattleActionEnum.CloseCardBrowser };
+                        case "closeCardBrowser":
+                            return new BattleAction { Enum = BattleActionEnum.CloseCardBrowser };
+                        case "toggleOrderSelectorVisibility":
+                            return new BattleAction { Enum = BattleActionEnum.ToggleOrderSelectorVisibility };
                     }
                     break;
                 case JsonToken.StartObject:
@@ -2047,10 +2084,14 @@ namespace Dreamcaller.Schema
             var value = (BattleAction)untypedValue;
             if (value.Enum != null)
             {
-                if (value.Enum == BattleActionEnum.CloseCardBrowser)
+                switch (value.Enum)
                 {
-                    serializer.Serialize(writer, "closeCardBrowser");
-                    return;
+                    case BattleActionEnum.CloseCardBrowser:
+                        serializer.Serialize(writer, "closeCardBrowser");
+                        return;
+                    case BattleActionEnum.ToggleOrderSelectorVisibility:
+                        serializer.Serialize(writer, "toggleOrderSelectorVisibility");
+                        return;
                 }
             }
             if (value.BattleActionClass != null)
@@ -2133,9 +2174,12 @@ namespace Dreamcaller.Schema
         {
             if (reader.TokenType == JsonToken.Null) return null;
             var value = serializer.Deserialize<string>(reader);
-            if (value == "closeCardBrowser")
+            switch (value)
             {
-                return BattleActionEnum.CloseCardBrowser;
+                case "closeCardBrowser":
+                    return BattleActionEnum.CloseCardBrowser;
+                case "toggleOrderSelectorVisibility":
+                    return BattleActionEnum.ToggleOrderSelectorVisibility;
             }
             throw new Exception("Cannot unmarshal type BattleActionEnum");
         }
@@ -2148,10 +2192,14 @@ namespace Dreamcaller.Schema
                 return;
             }
             var value = (BattleActionEnum)untypedValue;
-            if (value == BattleActionEnum.CloseCardBrowser)
+            switch (value)
             {
-                serializer.Serialize(writer, "closeCardBrowser");
-                return;
+                case BattleActionEnum.CloseCardBrowser:
+                    serializer.Serialize(writer, "closeCardBrowser");
+                    return;
+                case BattleActionEnum.ToggleOrderSelectorVisibility:
+                    serializer.Serialize(writer, "toggleOrderSelectorVisibility");
+                    return;
             }
             throw new Exception("Cannot marshal type BattleActionEnum");
         }

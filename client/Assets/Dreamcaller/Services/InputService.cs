@@ -24,7 +24,7 @@ namespace Dreamcaller.Services
 
     public Vector2 PointerPosition() => _tapPositionAction.ReadValue<Vector2>();
 
-    public Vector3 WorldMousePosition(float screenZ)
+    public Vector3 WorldPointerPosition(float screenZ)
     {
       var tapScreenPosition = PointerPosition();
       return Registry.Layout.MainCamera.ScreenToWorldPoint(
@@ -57,7 +57,7 @@ namespace Dreamcaller.Services
     Displayable? FireClick()
     {
       if (Registry.DocumentService.IsAnyPanelOpen() ||
-          Registry.DocumentService.MouseOverScreenElement())
+          Registry.DocumentService.IsOverScreenElement(PointerPosition()))
       {
         return null;
       }

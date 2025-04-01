@@ -29,7 +29,7 @@ namespace Dreamcaller.Services
       return false;
     }
 
-    public bool MouseOverScreenElement()
+    public bool IsOverScreenElement(Vector2 screenPosition)
     {
       return false;
     }

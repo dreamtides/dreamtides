@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using Dreamcaller.Buttons;
 using Dreamcaller.Components;
 using Dreamcaller.Layout;
 using Dreamcaller.Utils;
@@ -63,6 +64,9 @@ namespace Dreamcaller.Services
 
     [SerializeField] DreamwellActivationService? _dreamwellActivationService;
     public DreamwellActivationService DreamwellActivationService => Check(_dreamwellActivationService);
+
+    [SerializeField] ControlledButton? _bottomRightButton;
+    public ControlledButton BottomRightButton => Check(_bottomRightButton);
 
     void Awake()
     {

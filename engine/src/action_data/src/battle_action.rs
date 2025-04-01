@@ -18,6 +18,8 @@ pub enum BattleAction {
     BrowseCards(CardBrowserType),
     /// Close the card browser
     CloseCardBrowser,
+    /// Toggle the visibility of the card order selector
+    ToggleOrderSelectorVisibility,
 }
 
 impl From<BattleAction> for UserAction {

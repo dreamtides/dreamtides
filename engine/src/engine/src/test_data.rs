@@ -12,7 +12,9 @@ use core_data::display_types::{
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::{CardFacing, PlayerName};
-use display_data::battle_view::{BattleView, CardOrderSelectorView, InterfaceView, PlayerView};
+use display_data::battle_view::{
+    BattleView, ButtonView, CardOrderSelectorView, InterfaceView, PlayerView,
+};
 use display_data::card_view::{
     CardActions, CardEffects, CardFrame, CardPrefab, CardView, DisplayImage, RevealedCardView,
 };
@@ -35,6 +37,9 @@ use uuid::Uuid;
 static RESOLVING_MULLIGAN: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 static CURRENT_BATTLE: LazyLock<Mutex<Option<BattleView>>> = LazyLock::new(|| Mutex::new(None));
 static CARD_BROWSER_SOURCE: LazyLock<Mutex<Option<Position>>> = LazyLock::new(|| Mutex::new(None));
+static ORDER_SELECTOR_VISIBLE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
+static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<Mutex<std::collections::HashMap<CardId, Position>>> =
+    LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
 
 pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     let battle = scene_0(BattleId(Uuid::new_v4()));
@@ -233,6 +238,15 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
                     let c1 = draw_card(&mut battle);
                     let c2 = draw_card(&mut battle);
+                    *ORDER_SELECTOR_VISIBLE.lock().unwrap() = true;
+                    *CARD_ORDER_ORIGINAL_POSITIONS.lock().unwrap() =
+                        std::collections::HashMap::new();
+                    battle.interface.bottom_right_button = Some(ButtonView {
+                        label: "\u{f070} Hide Browser".to_string(),
+                        action: UserAction::BattleAction(
+                            BattleAction::ToggleOrderSelectorVisibility,
+                        ),
+                    });
 
                     if let (Some(c1_view), Some(c2_view)) = (c1, c2) {
                         for card in battle.cards.iter_mut() {
@@ -533,6 +547,57 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
 
             // Clear the stored source position
             *CARD_BROWSER_SOURCE.lock().unwrap() = None;
+            *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+
+            PerformActionResponse {
+                metadata,
+                commands: CommandSequence::sequential(vec![Command::UpdateBattle(
+                    UpdateBattleCommand::new(battle),
+                )]),
+            }
+        }
+        BattleAction::ToggleOrderSelectorVisibility => {
+            let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+            let mut is_visible = ORDER_SELECTOR_VISIBLE.lock().unwrap();
+            let mut original_positions = CARD_ORDER_ORIGINAL_POSITIONS.lock().unwrap();
+
+            // Toggle the visibility state
+            *is_visible = !*is_visible;
+
+            if *is_visible {
+                battle.interface.bottom_right_button = Some(ButtonView {
+                    label: "\u{f070} Hide Browser".to_string(),
+                    action: UserAction::BattleAction(BattleAction::ToggleOrderSelectorVisibility),
+                });
+
+                // If toggling to visible, restore cards from storage to their original
+                // positions
+                for card in battle.cards.iter_mut() {
+                    if card.position.position == Position::OnScreenStorage {
+                        println!("Restoring original position for card {:?}", card.id);
+                        if let Some(original_position) = original_positions.remove(&card.id) {
+                            card.position.position = original_position;
+                        }
+                    }
+                }
+                // Clear the saved positions as they're no longer needed
+                original_positions.clear();
+            } else {
+                battle.interface.bottom_right_button = Some(ButtonView {
+                    label: "\u{f06e} Show Browser".to_string(),
+                    action: UserAction::BattleAction(BattleAction::ToggleOrderSelectorVisibility),
+                });
+
+                // If toggling to hidden, move cards to storage and save original positions
+                for card in battle.cards.iter_mut() {
+                    if let Position::CardOrderSelector(_) = card.position.position {
+                        println!("Saving original position for card {:?}", card.id);
+                        original_positions.insert(card.id, card.position.position);
+                        card.position.position = Position::OnScreenStorage;
+                    }
+                }
+            }
+
             *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
 
             PerformActionResponse {

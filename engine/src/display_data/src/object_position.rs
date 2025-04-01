@@ -91,4 +91,9 @@ pub enum Position {
 
     /// Object describes a game modifier or ongoing game effect
     GameModifier,
+
+    /// Object is in the on-screen storage area, used to hold objects at a small
+    /// size when they're not being focused on, e.g. when the user hides a
+    /// card browser to get a better view of the battlefield.
+    OnScreenStorage,
 }

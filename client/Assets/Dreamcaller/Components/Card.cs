@@ -261,7 +261,7 @@ namespace Dreamcaller.Components
         }
         _initialDragRotation = transform.rotation;
         _dragStartScreenZ = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
-        _dragStartPosition = _registry.InputService.WorldMousePosition(_dragStartScreenZ);
+        _dragStartPosition = _registry.InputService.WorldPointerPosition(_dragStartScreenZ);
         _dragOffset = gameObject.transform.position - _dragStartPosition;
       }
     }
@@ -273,7 +273,7 @@ namespace Dreamcaller.Components
         return;
       }
 
-      var mousePosition = _registry.InputService.WorldMousePosition(_dragStartScreenZ);
+      var mousePosition = _registry.InputService.WorldPointerPosition(_dragStartScreenZ);
       var distanceDragged = Vector2.Distance(mousePosition, _dragStartPosition);
       var t = Mathf.Clamp01(distanceDragged / 2);
       transform.position = _dragOffset + mousePosition;

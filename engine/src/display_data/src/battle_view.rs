@@ -1,3 +1,4 @@
+use action_data::user_action::UserAction;
 use core_data::identifiers::BattleId;
 use core_data::numerics::{Energy, Points, Spark};
 use masonry::flex_node::FlexNode;
@@ -41,6 +42,9 @@ pub struct InterfaceView {
 
     /// Options for display of the card order selector
     pub card_order_selector: Option<CardOrderSelectorView>,
+
+    /// Button most often used for toggling the visibility of card browsers.
+    pub bottom_right_button: Option<ButtonView>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
@@ -58,18 +62,7 @@ pub struct CardOrderSelectorView {
 #[serde(rename_all = "camelCase")]
 pub struct ButtonView {
     pub label: String,
-    pub kind: ButtonKind,
-}
-
-/// Controls color for buttons
-#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub enum ButtonKind {
-    /// Emphasized button, primary game action
-    Primary,
-
-    /// Deemphasized button, additional game actions
-    Default,
+    pub action: UserAction,
 }
 
 /// Represents the visual state of a player in a game

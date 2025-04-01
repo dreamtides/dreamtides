@@ -110,6 +110,9 @@ namespace Dreamcaller.Layout
     [SerializeField] ObjectLayout? _gameModifiersDisplay;
     public ObjectLayout GameModifiersDisplay => Check(_gameModifiersDisplay);
 
+    [SerializeField] ObjectLayout? _onScreenStorage;
+    public ObjectLayout OnScreenStorage => Check(_onScreenStorage);
+
     T Check<T>(T? value) where T : Object =>
         Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
   }
