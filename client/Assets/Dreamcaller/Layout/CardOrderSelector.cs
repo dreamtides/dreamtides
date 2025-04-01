@@ -19,7 +19,7 @@ namespace Dreamcaller.Layout
     protected override Vector3 CalculateObjectPosition(int index, int count)
     {
       var offset = LinearObjectLayout.CalculateOffset(TotalWidth(), _initialSpacing, _cardWidth, index, count);
-      return _leftEdge.position + ToAxisPosition(offset + _initialOffset);
+      return _leftEdge.position + new Vector3(offset + _initialOffset, 0, 0);
     }
 
     protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
@@ -30,9 +30,9 @@ namespace Dreamcaller.Layout
     /// </summary>
     public SelectCardOrder SelectCardOrderWithinDisplay(Transform t, CardId cardId)
     {
-      var targetPosition = GetAxisPosition(t);
+      var targetPosition = t.position.x;
 
-      if (targetPosition > GetAxisPosition(_cardOrderSelectorVoid.transform) - _cardWidth)
+      if (targetPosition > _cardOrderSelectorVoid.transform.position.x - _cardWidth)
       {
         return new SelectCardOrder
         {
@@ -52,7 +52,7 @@ namespace Dreamcaller.Layout
         };
       }
 
-      if (targetPosition < GetAxisPosition(Objects[0].transform))
+      if (targetPosition < Objects[0].transform.position.x)
       {
         return new SelectCardOrder
         {
@@ -62,7 +62,7 @@ namespace Dreamcaller.Layout
         };
       }
 
-      if (targetPosition > GetAxisPosition(Objects[Objects.Count - 1].transform))
+      if (targetPosition > Objects[Objects.Count - 1].transform.position.x)
       {
         return new SelectCardOrder
         {
@@ -74,8 +74,8 @@ namespace Dreamcaller.Layout
 
       for (int i = 0; i < Objects.Count - 1; i++)
       {
-        var currentPosition = GetAxisPosition(Objects[i].transform);
-        var nextPosition = GetAxisPosition(Objects[i + 1].transform);
+        var currentPosition = Objects[i].transform.position.x;
+        var nextPosition = Objects[i + 1].transform.position.x;
 
         if (targetPosition >= currentPosition && targetPosition <= nextPosition)
         {

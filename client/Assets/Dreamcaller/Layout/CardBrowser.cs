@@ -17,8 +17,8 @@ namespace Dreamcaller.Layout
 
     public override void Show(Registry registry, Sequence? sequence)
     {
-      _scrollbar.value = _zAxis ? 1 : 0;
-      _scrollAmount = _zAxis ? 1 : 0;
+      _scrollbar.value = 0;
+      _scrollAmount = 0;
 
       base.Show(registry, sequence);
     }
@@ -50,13 +50,10 @@ namespace Dreamcaller.Layout
         return _singleCardPosition.position;
       }
 
-      // In landscape mode we *decrease* Z positions as we move towards screen
-      // right, which in retrospect was stupid. So now we have to invert
-      // everything to scroll on the Z axis.
       return new Vector3(
-        _zAxis ? _leftEdge.position.x : SmoothedOffset(index, count, Mathf.Clamp01(_scrollAmount)),
+        SmoothedOffset(index, count, Mathf.Clamp01(_scrollAmount)),
         transform.position.y,
-        _zAxis ? SmoothedOffset(index, count, Mathf.Clamp01(1 - _scrollAmount)) - TotalWidth() : _leftEdge.position.z);
+        _leftEdge.position.z);
     }
 
     protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
@@ -88,7 +85,7 @@ namespace Dreamcaller.Layout
       var maxScrollOffset = count - WindowSize();
 
       // Calculate the current scroll offset based on _scrollAmount
-      var currentScrollOffset = Mathf.Clamp01(_zAxis ? 1 - _scrollAmount : _scrollAmount) * maxScrollOffset;
+      var currentScrollOffset = Mathf.Clamp01(_scrollAmount) * maxScrollOffset;
 
       // Calculate the effective index with scrolling applied
       var effectiveIndex = index - currentScrollOffset;

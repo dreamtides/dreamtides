@@ -11,7 +11,6 @@ namespace Dreamcaller.Layout
     [SerializeField] protected float _cardWidth = 2.5f;
     [SerializeField] protected Transform _leftEdge = null!;
     [SerializeField] protected Transform _rightEdge = null!;
-    [SerializeField] protected bool _zAxis = false;
     [SerializeField] protected bool _isOpen = false;
 
     public bool IsOpen => _isOpen;
@@ -72,14 +71,9 @@ namespace Dreamcaller.Layout
 
     protected float TotalWidth() => Mathf.Abs(RightEdge() - LeftEdge());
 
-    protected float LeftEdge() => _zAxis ? _leftEdge.position.z : _leftEdge.position.x;
+    protected float LeftEdge() => _leftEdge.position.x;
 
-    protected float RightEdge() => _zAxis ? _rightEdge.position.z : _rightEdge.position.x;
-
-    protected float GetAxisPosition(Transform t) => _zAxis ? t.position.z : t.position.x;
-
-    protected Vector3 ToAxisPosition(float distance) =>
-         _zAxis ? new Vector3(0, 0, -distance) : new Vector3(distance, 0, 0);
+    protected float RightEdge() => _rightEdge.position.x;
 
     protected virtual void OnDrawGizmosSelected()
     {
