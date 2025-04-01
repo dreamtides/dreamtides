@@ -424,8 +424,8 @@ namespace Dreamcaller.Schema
     }
 
     /// <summary>
-    /// The user is selecting targets for this card from among characters controlled by the
-    /// indicated player.
+    /// An 'actor' player is selecting targets for this card from among characters controlled by
+    /// the indicated 'targeting' player.
     ///
     /// Object is in a player's hand
     ///
@@ -451,7 +451,7 @@ namespace Dreamcaller.Schema
     public partial class PositionClass
     {
         [JsonProperty("selectingTargets", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? SelectingTargets { get; set; }
+        public SelectingTargets SelectingTargets { get; set; }
 
         [JsonProperty("inHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayerName? InHand { get; set; }
@@ -482,6 +482,15 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("hiddenWithinCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardId HiddenWithinCard { get; set; }
+    }
+
+    public partial class SelectingTargets
+    {
+        [JsonProperty("actor", Required = Required.Always)]
+        public PlayerName Actor { get; set; }
+
+        [JsonProperty("targeting", Required = Required.Always)]
+        public PlayerName Targeting { get; set; }
     }
 
     /// <summary>

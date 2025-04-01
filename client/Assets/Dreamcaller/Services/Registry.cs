@@ -68,6 +68,9 @@ namespace Dreamcaller.Services
     [SerializeField] ControlledButton? _bottomRightButton;
     public ControlledButton BottomRightButton => Check(_bottomRightButton);
 
+    [SerializeField] ArrowService? _arrowService;
+    public ArrowService ArrowService => Check(_arrowService);
+
     void Awake()
     {
       Debug.Log("Starting Dreamcaller");

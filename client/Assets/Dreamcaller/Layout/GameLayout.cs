@@ -56,11 +56,17 @@ namespace Dreamcaller.Layout
     [SerializeField] ObjectLayout? _stack;
     public ObjectLayout Stack => Check(_stack);
 
-    [SerializeField] ObjectLayout? _selectingTargetsEnemy;
-    public ObjectLayout SelectingTargetsEnemy => Check(_selectingTargetsEnemy);
+    [SerializeField] ObjectLayout? _selectingTargetsUserToUser;
+    public ObjectLayout SelectingTargetsUserToUser => Check(_selectingTargetsUserToUser);
 
-    [SerializeField] ObjectLayout? _selectingTargetsUser;
-    public ObjectLayout SelectingTargetsUser => Check(_selectingTargetsUser);
+    [SerializeField] ObjectLayout? _selectingTargetsEnemyToUser;
+    public ObjectLayout SelectingTargetsEnemyToUser => Check(_selectingTargetsEnemyToUser);
+
+    [SerializeField] ObjectLayout? _selectingTargetsEnemyToEnemy;
+    public ObjectLayout SelectingTargetsEnemyToEnemy => Check(_selectingTargetsEnemyToEnemy);
+
+    [SerializeField] ObjectLayout? _selectingTargetsUserToEnemy;
+    public ObjectLayout SelectingTargetsUserToEnemy => Check(_selectingTargetsUserToEnemy);
 
     [SerializeField] SpriteRenderer? _battlefieldOverlay;
     public SpriteRenderer BattlefieldOverlay => Check(_battlefieldOverlay);

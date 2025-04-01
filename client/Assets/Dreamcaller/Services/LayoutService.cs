@@ -208,8 +208,10 @@ namespace Dreamcaller.Services
       Registry.Layout.EnemyBattlefield.ApplyLayout(sequence);
       Registry.Layout.DrawnCardsPosition.ApplyLayout(sequence);
       Registry.Layout.Stack.ApplyLayout(sequence);
-      Registry.Layout.SelectingTargetsEnemy.ApplyLayout(sequence);
-      Registry.Layout.SelectingTargetsUser.ApplyLayout(sequence);
+      Registry.Layout.SelectingTargetsUserToUser.ApplyLayout(sequence);
+      Registry.Layout.SelectingTargetsUserToEnemy.ApplyLayout(sequence);
+      Registry.Layout.SelectingTargetsEnemyToUser.ApplyLayout(sequence);
+      Registry.Layout.SelectingTargetsEnemyToEnemy.ApplyLayout(sequence);
       Registry.Layout.Browser.ApplyLayout(sequence);
       Registry.Layout.UserDreamwell.ApplyLayout(sequence);
       Registry.Layout.EnemyDreamwell.ApplyLayout(sequence);
@@ -350,11 +352,21 @@ namespace Dreamcaller.Services
 
       if (position.PositionClass.SelectingTargets is { } selectingTargets)
       {
-        return selectingTargets switch
+        return selectingTargets.Actor switch
         {
-          PlayerName.User => Registry.Layout.SelectingTargetsUser,
-          PlayerName.Enemy => Registry.Layout.SelectingTargetsEnemy,
-          _ => throw Errors.UnknownEnumValue(selectingTargets),
+          PlayerName.User => selectingTargets.Targeting switch
+          {
+            PlayerName.User => Registry.Layout.SelectingTargetsUserToUser,
+            PlayerName.Enemy => Registry.Layout.SelectingTargetsUserToEnemy,
+            _ => throw Errors.UnknownEnumValue(selectingTargets.Targeting),
+          },
+          PlayerName.Enemy => selectingTargets.Targeting switch
+          {
+            PlayerName.User => Registry.Layout.SelectingTargetsEnemyToUser,
+            PlayerName.Enemy => Registry.Layout.SelectingTargetsEnemyToEnemy,
+            _ => throw Errors.UnknownEnumValue(selectingTargets.Targeting),
+          },
+          _ => throw Errors.UnknownEnumValue(selectingTargets.Actor),
         };
       }
 

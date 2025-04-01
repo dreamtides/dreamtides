@@ -35,12 +35,10 @@ pub enum Position {
     /// Object is not visible.
     Offscreen,
 
-    /// The user is selecting targets for this card from among characters
-    /// controlled by the indicated player.
-    SelectingTargets(PlayerName),
-
     /// Object is on the stack
     OnStack,
+
+    SelectingTargets(SelectingTargets),
 
     /// Position for cards to be shown to the user immediately after they're
     /// drawn.
@@ -96,4 +94,13 @@ pub enum Position {
     /// size when they're not being focused on, e.g. when the user hides a
     /// card browser to get a better view of the battlefield.
     OnScreenStorage,
+}
+
+#[derive(
+    Copy, Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Ord, PartialOrd, JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
+pub struct SelectingTargets {
+    pub actor: PlayerName,
+    pub targeting: PlayerName,
 }

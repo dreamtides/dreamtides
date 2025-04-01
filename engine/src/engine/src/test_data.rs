@@ -23,7 +23,7 @@ use display_data::command::{
     DisplayJudgmentCommand, DissolveCardCommand, DrawUserCardsCommand, FireProjectileCommand,
     GameMessageType, GameObjectId, ParallelCommandGroup, UpdateBattleCommand,
 };
-use display_data::object_position::{ObjectPosition, Position};
+use display_data::object_position::{ObjectPosition, Position, SelectingTargets};
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, Metadata, PerformActionRequest, PerformActionResponse,
 };
@@ -40,7 +40,7 @@ static CARD_BROWSER_SOURCE: LazyLock<Mutex<Option<Position>>> = LazyLock::new(||
 static ORDER_SELECTOR_VISIBLE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<Mutex<std::collections::HashMap<CardId, Position>>> =
     LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
-const STUFF_TO_DO: u32 = 2;
+const STUFF_TO_DO: u32 = 3;
 
 pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     let battle = scene_0(BattleId(Uuid::new_v4()));
@@ -177,6 +177,28 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                 *CURRENT_BATTLE.lock().unwrap() = Some(battle);
 
                 PerformActionResponse { metadata, commands: CommandSequence::sequential(commands) }
+            } else if STUFF_TO_DO == 3 {
+                // Find the first card in enemy hand
+                let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+                let mut commands = Vec::new();
+
+                if let Some((card_index, card)) = battle.cards.iter().enumerate().find(|(_, c)| {
+                    matches!(c.position.position, Position::InHand(PlayerName::Enemy))
+                }) {
+                    let sorting_key = card.position.sorting_key;
+
+                    battle.cards[card_index] = card_view(
+                        Position::SelectingTargets(SelectingTargets {
+                            actor: PlayerName::Enemy,
+                            targeting: PlayerName::User,
+                        }),
+                        sorting_key,
+                    );
+                    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+                    *CURRENT_BATTLE.lock().unwrap() = Some(battle);
+                }
+
+                PerformActionResponse { metadata, commands: CommandSequence::sequential(commands) }
             } else {
                 // Find the first card in enemy hand
                 let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
@@ -258,7 +280,10 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                             }
                         }
                     }
-                    Position::SelectingTargets(PlayerName::Enemy)
+                    Position::SelectingTargets(SelectingTargets {
+                        actor: PlayerName::User,
+                        targeting: PlayerName::Enemy,
+                    })
                 } else if sorting_key % 5 == 2 {
                     battle.cards[card_index] = card_view(Position::OnStack, sorting_key);
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
@@ -396,10 +421,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 .enumerate()
                 .filter_map(|(index, card)| {
                     if card.id == card_id
-                        || matches!(
-                            card.position.position,
-                            Position::SelectingTargets(PlayerName::Enemy)
-                        )
+                        || matches!(card.position.position, Position::SelectingTargets(_))
                     {
                         Some((index, card.position.sorting_key))
                     } else {
@@ -413,10 +435,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 .cards
                 .iter()
                 .find_map(|card| {
-                    if matches!(
-                        card.position.position,
-                        Position::SelectingTargets(PlayerName::Enemy)
-                    ) {
+                    if matches!(card.position.position, Position::SelectingTargets(_)) {
                         Some(card.id)
                     } else {
                         None
@@ -685,8 +704,8 @@ fn scene_0(id: BattleId) -> BattleView {
             cards_in_position(Position::InVoid(PlayerName::Enemy), 108, 6),
             cards_in_position(Position::InDeck(PlayerName::Enemy), 114, 20),
             cards_in_position(Position::InVoid(PlayerName::User), 150, 4),
-            cards_in_position(Position::OnBattlefield(PlayerName::User), 533, 2),
-            cards_in_position(Position::OnBattlefield(PlayerName::Enemy), 633, 3),
+            cards_in_position(Position::OnBattlefield(PlayerName::User), 533, 8),
+            cards_in_position(Position::OnBattlefield(PlayerName::Enemy), 633, 8),
             cards_in_position(Position::InHand(PlayerName::Enemy), 733, 5),
             vec![enemy_card(Position::InPlayerStatus(PlayerName::Enemy), 738)],
             vec![dreamsign_card(Position::InPlayerStatus(PlayerName::User), 739)],
