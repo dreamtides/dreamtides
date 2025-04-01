@@ -663,6 +663,7 @@ fn set_can_play_to_false(battle: &mut BattleView) {
     for card in battle.cards.iter_mut() {
         if let Some(revealed) = card.revealed.as_mut() {
             revealed.actions.can_play = false;
+            revealed.outline_color = None;
         }
     }
 }

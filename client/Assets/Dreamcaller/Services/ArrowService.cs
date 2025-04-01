@@ -27,7 +27,7 @@ namespace Dreamcaller.Services
 
     void Start()
     {
-      ShowArrow(Type.Red, _testSource, _testTarget);
+      // ShowArrow(Type.Red, _testSource, _testTarget);
     }
 
     public void ShowArrow(Type type, Transform source, Transform target)
