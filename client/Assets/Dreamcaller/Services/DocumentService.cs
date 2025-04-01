@@ -5,6 +5,7 @@ using Dreamcaller.Layout;
 using Dreamcaller.Masonry;
 using Dreamcaller.Schema;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 
 namespace Dreamcaller.Services
@@ -29,9 +30,9 @@ namespace Dreamcaller.Services
       return false;
     }
 
-    public bool IsOverScreenElement(Vector2 screenPosition)
+    public bool IsPointerOverScreenElement()
     {
-      return false;
+      return EventSystem.current.IsPointerOverGameObject();
     }
 
     /// <summary>

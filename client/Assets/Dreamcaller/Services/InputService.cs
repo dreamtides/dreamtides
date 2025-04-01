@@ -57,7 +57,7 @@ namespace Dreamcaller.Services
     Displayable? FireClick()
     {
       if (Registry.DocumentService.IsAnyPanelOpen() ||
-          Registry.DocumentService.IsOverScreenElement(PointerPosition()))
+          Registry.DocumentService.IsPointerOverScreenElement())
       {
         return null;
       }
