@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Dreamcaller.Layout
 {
-  public class StackObjectLayout : StandardObjectLayout
+  public class PileObjectLayout : StandardObjectLayout
   {
     [SerializeField] float _singleElementY = 0.5f;
 
