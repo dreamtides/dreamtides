@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5617475523399267133}
   - component: {fileID: 4398724434938230037}
   m_Layer: 0
-  m_Name: ArrowRed
+  m_Name: ArrowGreen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47,8 +47,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _pieceSize: 0.5
   _pieceFadeDistance: 0.35
-  _headPrefab: {fileID: 1047237291554972, guid: 54906e8377663c64384ec02c430495dd, type: 3}
-  _piecePrefab: {fileID: 1648654368789128, guid: ab82086137c07244abcfb06ec0e02ce9, type: 3}
+  _headPrefab: {fileID: 1558564487493764, guid: 6284aac27f98f4fc29ae2be01a3b047f, type: 3}
+  _piecePrefab: {fileID: 1121374110014508, guid: 7f941b8ee9927448f99bd0fa712bbc11, type: 3}
   _source: {fileID: 0}
   _target: {fileID: 0}
   _radiusMultiplier: 10

@@ -13,6 +13,7 @@ namespace Dreamcaller.Components
     [SerializeField] GameObject _piecePrefab = null!;
     [SerializeField] Transform _source = null!;
     [SerializeField] Transform _target = null!;
+    [SerializeField] float _radiusMultiplier = 1f;
     Transform? _arrow;
 
     readonly List<Transform> _segments = new();
@@ -43,7 +44,7 @@ namespace Dreamcaller.Components
     void Update()
     {
       var distance = Vector3.Distance(Source.position, Target.position);
-      var radius = (1f / 2f) + distance * distance / 8f;
+      var radius = ((1f / 2f) + distance * distance / 8f) * _radiusMultiplier;
       var diff = radius - 1f;
       var angle = 2f * Mathf.Acos(diff / radius);
       var length = angle * radius;
