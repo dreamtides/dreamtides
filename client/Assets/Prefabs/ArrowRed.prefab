@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1782317830281553484}
   - component: {fileID: 5617475523399267133}
+  - component: {fileID: 4398724434938230037}
   m_Layer: 0
   m_Name: ArrowRed
   m_TagString: Untagged
@@ -48,3 +49,17 @@ MonoBehaviour:
   _pieceFadeDistance: 0.35
   _headPrefab: {fileID: 1047237291554972, guid: 54906e8377663c64384ec02c430495dd, type: 3}
   _piecePrefab: {fileID: 1648654368789128, guid: ab82086137c07244abcfb06ec0e02ce9, type: 3}
+  _source: {fileID: 0}
+  _target: {fileID: 0}
+--- !u!210 &4398724434938230037
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 687746106814423704}
+  m_Enabled: 1
+  m_SortingLayerID: -1815889713
+  m_SortingLayer: 2
+  m_SortingOrder: 0
+  m_SortAtRoot: 0

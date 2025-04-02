@@ -11,13 +11,24 @@ namespace Dreamcaller.Components
     [SerializeField] float _pieceFadeDistance = 0.35f;
     [SerializeField] GameObject _headPrefab = null!;
     [SerializeField] GameObject _piecePrefab = null!;
+    [SerializeField] Transform _source = null!;
+    [SerializeField] Transform _target = null!;
     Transform? _arrow;
 
     readonly List<Transform> _segments = new();
     readonly List<MeshRenderer> _renderers = new();
 
-    public Transform Source { get; set; } = null!;
-    public Transform Target { get; set; } = null!;
+    public Transform Source
+    {
+      get => _source;
+      set => _source = value;
+    }
+
+    public Transform Target
+    {
+      get => _target;
+      set => _target = value;
+    }
 
     public GameObject HeadPrefab
     {

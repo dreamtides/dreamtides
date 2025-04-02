@@ -41,7 +41,7 @@ static CARD_BROWSER_SOURCE: LazyLock<Mutex<Option<Position>>> = LazyLock::new(||
 static ORDER_SELECTOR_VISIBLE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<Mutex<std::collections::HashMap<CardId, Position>>> =
     LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
-const STUFF_TO_DO: u32 = 3;
+const STUFF_TO_DO: u32 = 2;
 
 pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     let battle = scene_0(BattleId(Uuid::new_v4()));
@@ -233,9 +233,10 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                     commands.push(Command::Wait(Milliseconds::new(1500)));
 
                     // Move card to battlefield
-                    battle.cards[card_index] =
-                        card_view(Position::OnBattlefield(PlayerName::Enemy), sorting_key);
-                    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+                    // battle.cards[card_index] =
+                    //     card_view(Position::OnBattlefield(PlayerName::Enemy), sorting_key);
+                    // commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.
+                    // clone())));
 
                     *CURRENT_BATTLE.lock().unwrap() = Some(battle);
                 }
