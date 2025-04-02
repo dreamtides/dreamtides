@@ -2,6 +2,7 @@
 
 namespace Dreamcaller.Layout
 {
+  using Dreamcaller.Buttons;
   using Dreamcaller.Components;
   using Dreamcaller.Utils;
   using UnityEngine;
@@ -115,6 +116,9 @@ namespace Dreamcaller.Layout
 
     [SerializeField] ObjectLayout? _onScreenStorage;
     public ObjectLayout OnScreenStorage => Check(_onScreenStorage);
+
+    [SerializeField] PrimaryActionButton? _primaryActionButton;
+    public PrimaryActionButton PrimaryActionButton => Check(_primaryActionButton);
 
     T Check<T>(T? value) where T : Object =>
         Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");

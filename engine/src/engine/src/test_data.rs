@@ -14,6 +14,7 @@ use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::{CardFacing, PlayerName};
 use display_data::battle_view::{
     BattleView, ButtonView, CardOrderSelectorView, InterfaceView, PlayerView,
+    PrimaryActionButtonView,
 };
 use display_data::card_view::{
     CardActions, CardEffects, CardFrame, CardPrefab, CardView, DisplayImage, RevealedCardView,
@@ -112,6 +113,8 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
         }
         DebugAction::TriggerEnemyJudgment => {
             let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+            let mut orig_battle = battle.clone();
+            orig_battle.interface.primary_action_button = None;
 
             battle.enemy.energy = Energy(3);
             battle.enemy.produced_energy = Energy(3);
@@ -128,6 +131,7 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
             PerformActionResponse {
                 metadata,
                 commands: CommandSequence::sequential(vec![
+                    Command::UpdateBattle(UpdateBattleCommand::new(orig_battle)),
                     Command::DisplayGameMessage(GameMessageType::EnemyTurn),
                     Command::DisplayJudgment(DisplayJudgmentCommand {
                         player: PlayerName::Enemy,
@@ -419,7 +423,11 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
 
                 // Add a "Confirm Mulligan" button if it doesn't exist
                 if battle.interface.primary_action_button.is_none() {
-                    battle.interface.primary_action_button = Some("Confirm Mulligan".to_string());
+                    battle.interface.primary_action_button = Some(PrimaryActionButtonView {
+                        label: "Confirm Mulligan".to_string(),
+                        action: UserAction::DebugAction(DebugAction::DrawCard),
+                        show_on_idle_duration: None,
+                    });
                 }
 
                 *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
@@ -473,7 +481,11 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
 
             // Reset interface state
             battle.interface.screen_overlay = None;
-            battle.interface.primary_action_button = Some("End Turn".to_string());
+            battle.interface.primary_action_button = Some(PrimaryActionButtonView {
+                label: "End Turn".to_string(),
+                action: UserAction::DebugAction(DebugAction::TriggerEnemyJudgment),
+                show_on_idle_duration: Some(Milliseconds::new(2500)),
+            });
 
             clear_all_statuses(&mut battle);
             *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
@@ -735,7 +747,11 @@ fn scene_0(id: BattleId) -> BattleView {
         .to_vec(),
         status_description: "Status".to_string(),
         interface: InterfaceView {
-            primary_action_button: Some("End Turn".to_string()),
+            primary_action_button: Some(PrimaryActionButtonView {
+                label: "End Turn".to_string(),
+                action: UserAction::DebugAction(DebugAction::TriggerEnemyJudgment),
+                show_on_idle_duration: Some(Milliseconds::new(2500)),
+            }),
             ..Default::default()
         },
     }

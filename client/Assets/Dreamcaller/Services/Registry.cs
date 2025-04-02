@@ -65,11 +65,11 @@ namespace Dreamcaller.Services
     [SerializeField] DreamwellActivationService? _dreamwellActivationService;
     public DreamwellActivationService DreamwellActivationService => Check(_dreamwellActivationService);
 
-    [SerializeField] ControlledButton? _bottomRightButton;
-    public ControlledButton BottomRightButton => Check(_bottomRightButton);
-
     [SerializeField] ArrowService? _arrowService;
     public ArrowService ArrowService => Check(_arrowService);
+
+    [SerializeField] ControlledButton? _bottomRightButton;
+    public ControlledButton BottomRightButton => Check(_bottomRightButton);
 
     void Awake()
     {

@@ -129,6 +129,7 @@ namespace Dreamcaller.Services
           Registry.Layout.EnemyStatusDisplay.UpdatePlayerView(command.UpdateBattle.Battle.Enemy, animate);
           Registry.DocumentService.RenderScreenOverlay(command.UpdateBattle.Battle.Interface?.ScreenOverlay);
           Registry.Layout.CardOrderSelector.View = command.UpdateBattle.Battle.Interface?.CardOrderSelector;
+          Registry.Layout.PrimaryActionButton.SetView(command.UpdateBattle.Battle.Interface?.PrimaryActionButton);
           Registry.BottomRightButton.SetView(command.UpdateBattle.Battle.Interface?.BottomRightButton);
           coroutines.Add(StartCoroutine(Registry.LayoutService.UpdateLayout(
               command.UpdateBattle,

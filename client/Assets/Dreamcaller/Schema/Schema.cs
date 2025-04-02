@@ -1410,10 +1410,11 @@ namespace Dreamcaller.Schema
         public CardOrderSelectorView CardOrderSelector { get; set; }
 
         /// <summary>
-        /// Label for the primary action button, if one should be shown.
+        /// Primary action button, used for confirming selections and ending the turn. None indicates
+        /// no button should be shown.
         /// </summary>
         [JsonProperty("primaryActionButton")]
-        public string PrimaryActionButton { get; set; }
+        public PrimaryActionButtonView PrimaryActionButton { get; set; }
 
         /// <summary>
         /// Content to display on top of all other game UI.
@@ -1459,6 +1460,22 @@ namespace Dreamcaller.Schema
         /// </summary>
         [JsonProperty("includeVoid", Required = Required.Always)]
         public bool IncludeVoid { get; set; }
+    }
+
+    public partial class PrimaryActionButtonView
+    {
+        [JsonProperty("action", Required = Required.Always)]
+        public UserAction Action { get; set; }
+
+        [JsonProperty("label", Required = Required.Always)]
+        public string Label { get; set; }
+
+        /// <summary>
+        /// If provided, when the button is not visible, the button will wait for this duration after
+        /// the last "update" before appearing. If this is None the button will display immediately.
+        /// </summary>
+        [JsonProperty("showOnIdleDuration")]
+        public Milliseconds ShowOnIdleDuration { get; set; }
     }
 
     public partial class PerformActionRequest

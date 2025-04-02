@@ -1,4 +1,5 @@
 use action_data::user_action::UserAction;
+use core_data::display_types::Milliseconds;
 use core_data::identifiers::BattleId;
 use core_data::numerics::{Energy, Points, Spark};
 use masonry::flex_node::FlexNode;
@@ -37,8 +38,9 @@ pub struct InterfaceView {
     /// Content to display on top of all other game UI.
     pub screen_overlay: Option<FlexNode>,
 
-    /// Label for the primary action button, if one should be shown.
-    pub primary_action_button: Option<String>,
+    /// Primary action button, used for confirming selections and ending the
+    /// turn. None indicates no button should be shown.
+    pub primary_action_button: Option<PrimaryActionButtonView>,
 
     /// Options for display of the card order selector
     pub card_order_selector: Option<CardOrderSelectorView>,
@@ -55,6 +57,18 @@ pub struct CardOrderSelectorView {
 
     /// Include the user's void as a card drop target
     pub include_void: bool,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct PrimaryActionButtonView {
+    pub label: String,
+    pub action: UserAction,
+
+    /// If provided, when the button is not visible, the button will wait for
+    /// this duration after the last "update" before appearing. If this is None
+    /// the button will display immediately.
+    pub show_on_idle_duration: Option<Milliseconds>,
 }
 
 /// Button to perform some game action

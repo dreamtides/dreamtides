@@ -2227,6 +2227,7 @@ MonoBehaviour:
   _animationDuration: 0.1
   _moveDistance: 0.5
   _onClickSound: {fileID: 8300000, guid: b0a890dd89d7e7145a043327b4bb9589, type: 3}
+  _fadeDuration: 0.3
 --- !u!114 &121130226
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9131,8 +9132,8 @@ MonoBehaviour:
   _environmentService: {fileID: 613451866}
   _judgmentService: {fileID: 613451867}
   _dreamwellActivationService: {fileID: 613451868}
-  _bottomRightButton: {fileID: 262976513}
   _arrowService: {fileID: 613451869}
+  _bottomRightButton: {fileID: 262976513}
 --- !u!114 &613451855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13926,7 +13927,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &863902626
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20592,7 +20593,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1247881203
 RectTransform:
   m_ObjectHideFlags: 0
@@ -21833,6 +21834,7 @@ MonoBehaviour:
   _cardOrderSelectorVoid: {fileID: 753406003}
   _gameModifiersDisplay: {fileID: 552589597}
   _onScreenStorage: {fileID: 574549273}
+  _primaryActionButton: {fileID: 121130225}
 --- !u!1 &1305327827
 GameObject:
   m_ObjectHideFlags: 0
@@ -23685,6 +23687,7 @@ MonoBehaviour:
   _cardOrderSelectorVoid: {fileID: 1331834006}
   _gameModifiersDisplay: {fileID: 482914639}
   _onScreenStorage: {fileID: 6969416}
+  _primaryActionButton: {fileID: 0}
 --- !u!1001 &1436808300
 PrefabInstance:
   m_ObjectHideFlags: 0
