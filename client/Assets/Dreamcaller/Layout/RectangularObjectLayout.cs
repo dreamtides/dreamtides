@@ -24,7 +24,7 @@ namespace Dreamcaller.Layout
 
     float CalculateXOffset(int index, int count)
     {
-      return LinearObjectLayout.CalculateOffset(
+      return CenteredObjectLayout.CalculateOffset(
         _width,
         _itemHorizontalSpacing,
         _itemWidth,

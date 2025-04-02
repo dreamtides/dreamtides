@@ -16,7 +16,7 @@ namespace Dreamcaller.Services
   {
     bool _devModeAutoConnect;
     float _lastConnectAttemptTime;
-    Metadata _metadata;
+    Metadata? _metadata;
 
     IEnumerator Start()
     {
@@ -49,7 +49,7 @@ namespace Dreamcaller.Services
         {
           StartCoroutine(DevServerConnectAsync(new ConnectRequest
           {
-            Metadata = _metadata
+            Metadata = _metadata!
           }));
           _lastConnectAttemptTime = now;
         }

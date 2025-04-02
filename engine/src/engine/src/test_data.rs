@@ -42,7 +42,8 @@ static CARD_BROWSER_SOURCE: LazyLock<Mutex<Option<Position>>> = LazyLock::new(||
 static ORDER_SELECTOR_VISIBLE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<Mutex<std::collections::HashMap<CardId, Position>>> =
     LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
-const STUFF_TO_DO: u32 = 1;
+static ADD_TO_STACK: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
+const STUFF_TO_DO: u32 = 3;
 
 pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     let battle = scene_0(BattleId(Uuid::new_v4()));
@@ -189,6 +190,7 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
             } else if STUFF_TO_DO == 3 {
                 // Find the first card in enemy hand
                 let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+                *ADD_TO_STACK.lock().unwrap() = true;
                 let mut commands = Vec::new();
 
                 if let Some((card_index, card)) = battle.cards.iter().enumerate().find(|(_, c)| {
@@ -309,20 +311,38 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                     }
                     Position::OnStack(StackType::TargetingEnemyBattlefield)
                 } else if sorting_key % 5 == 2 {
-                    battle.cards[card_index] =
-                        card_view(Position::OnStack(StackType::Default), sorting_key);
+                    let add_to_stack = *ADD_TO_STACK.lock().unwrap();
+                    battle.cards[card_index] = card_view(
+                        Position::OnStack(if add_to_stack {
+                            StackType::TargetingUserBattlefield
+                        } else {
+                            StackType::Default
+                        }),
+                        sorting_key,
+                    );
+                    battle.cards[card_index].position.sorting_key = 500;
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+
                     commands.push(Command::DisplayEffect(DisplayEffectCommand {
                         target: GameObjectId::CardId(card_id),
-                        effect: EffectAddress::new("Assets/ThirdParty/Hovl Studio/Magic hits/Prefabs/_Hit 10.prefab"),
+                        effect: EffectAddress::new(
+                            "Assets/ThirdParty/Hovl Studio/Magic hits/Prefabs/_Hit 10.prefab",
+                        ),
                         duration: Milliseconds::new(500),
                         scale: FlexVector3::new(5.0, 5.0, 5.0),
-                        sound: Some(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Generic_SubtleWhoosh04.wav")),
+                        sound: Some(AudioClipAddress::new(
+                            "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Generic_SubtleWhoosh04.wav",
+                        )),
                     }));
                     battle.cards[card_index] =
                         card_view(Position::InVoid(PlayerName::User), sorting_key);
-                    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())
-                            .with_update_sound(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Magic2_Projectiles02.wav"))));
+                    commands.push(Command::UpdateBattle(
+                        UpdateBattleCommand::new(battle.clone()).with_update_sound(
+                            AudioClipAddress::new(
+                                "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Magic2_Projectiles02.wav",
+                            ),
+                        ),
+                    ));
                     let c1 = draw_card(&mut battle);
                     let c2 = draw_card(&mut battle);
                     *ORDER_SELECTOR_VISIBLE.lock().unwrap() = true;
@@ -415,6 +435,10 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                     Position::OnBattlefield(PlayerName::User)
                 };
                 battle.cards[card_index] = card_view(position, sorting_key);
+                let add_to_stack = *ADD_TO_STACK.lock().unwrap();
+                if add_to_stack {
+                    battle.cards[card_index].position.sorting_key = 500;
+                }
             }
 
             *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());

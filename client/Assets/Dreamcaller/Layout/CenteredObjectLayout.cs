@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Dreamcaller.Layout
 {
-  public class LinearObjectLayout : StandardObjectLayout
+  public class CenteredObjectLayout : StandardObjectLayout
   {
     [SerializeField] float _width;
     [SerializeField] float _initialSpacing;
