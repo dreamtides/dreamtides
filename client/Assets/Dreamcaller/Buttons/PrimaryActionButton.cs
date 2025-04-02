@@ -23,7 +23,7 @@ namespace Dreamcaller.Buttons
 
     Vector3 _originalPosition;
     Color _originalColor;
-    Material _originalMaterial;
+    Material _originalMaterial = null!;
     Vector3 _originalBackgroundLocalScale;
     Vector3 _originalTextLocalScale;
     Sequence? _currentAnimation;

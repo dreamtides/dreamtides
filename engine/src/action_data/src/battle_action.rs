@@ -20,6 +20,10 @@ pub enum BattleAction {
     CloseCardBrowser,
     /// Toggle the visibility of the card order selector
     ToggleOrderSelectorVisibility,
+    /// End the turn
+    EndTurn,
+    /// Confirm the selected cards to mulligan
+    SubmitMulligan,
 }
 
 impl From<BattleAction> for UserAction {

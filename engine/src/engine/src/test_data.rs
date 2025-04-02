@@ -42,7 +42,7 @@ static CARD_BROWSER_SOURCE: LazyLock<Mutex<Option<Position>>> = LazyLock::new(||
 static ORDER_SELECTOR_VISIBLE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<Mutex<std::collections::HashMap<CardId, Position>>> =
     LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
-const STUFF_TO_DO: u32 = 3;
+const STUFF_TO_DO: u32 = 1;
 
 pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     let battle = scene_0(BattleId(Uuid::new_v4()));
@@ -175,7 +175,11 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                 battle.interface.screen_overlay = Some(mulligan_message());
 
                 // Disable the primary action button during mulligan
-                battle.interface.primary_action_button = None;
+                battle.interface.primary_action_button = Some(PrimaryActionButtonView {
+                    label: "Confirm".to_string(),
+                    action: UserAction::BattleAction(BattleAction::SubmitMulligan),
+                    show_on_idle_duration: None,
+                });
 
                 let commands =
                     vec![Command::UpdateBattle(UpdateBattleCommand::new(battle.clone()))];
@@ -437,8 +441,8 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 // Add a "Confirm Mulligan" button if it doesn't exist
                 if battle.interface.primary_action_button.is_none() {
                     battle.interface.primary_action_button = Some(PrimaryActionButtonView {
-                        label: "Confirm Mulligan".to_string(),
-                        action: UserAction::DebugAction(DebugAction::DrawCard),
+                        label: "Confirm".to_string(),
+                        action: UserAction::BattleAction(BattleAction::SubmitMulligan),
                         show_on_idle_duration: None,
                     });
                 }
@@ -697,6 +701,141 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                     UpdateBattleCommand::new(battle),
                 )]),
             }
+        }
+        BattleAction::EndTurn => {
+            let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+            let mut orig_battle = battle.clone();
+            orig_battle.interface.primary_action_button = None;
+
+            battle.enemy.energy = Energy(3);
+            battle.enemy.produced_energy = Energy(3);
+            *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+            let dreamwell_card_id = battle
+                .cards
+                .iter()
+                .find(|card| {
+                    matches!(card.position.position, Position::InDreamwell(PlayerName::Enemy))
+                })
+                .map(|card| card.id)
+                .unwrap_or(battle.cards[0].id);
+
+            PerformActionResponse {
+                metadata,
+                commands: CommandSequence::sequential(vec![
+                    Command::UpdateBattle(UpdateBattleCommand::new(orig_battle)),
+                    Command::DisplayGameMessage(GameMessageType::EnemyTurn),
+                    Command::DisplayJudgment(DisplayJudgmentCommand {
+                        player: PlayerName::Enemy,
+                        new_score: Some(Points(10)),
+                    }),
+                    Command::DisplayDreamwellActivation(DisplayDreamwellActivationCommand {
+                        card_id: dreamwell_card_id,
+                        player: PlayerName::Enemy,
+                        new_energy: Some(Energy(3)),
+                        new_produced_energy: Some(Energy(3)),
+                    }),
+                    Command::UpdateBattle(UpdateBattleCommand::new(battle)),
+                ]),
+            }
+        }
+        BattleAction::SubmitMulligan => {
+            let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+            let mut commands = Vec::new();
+
+            // Find all selected cards (those with GREEN outline)
+            let selected_cards: Vec<(usize, CardId)> = battle
+                .cards
+                .iter()
+                .enumerate()
+                .filter_map(|(idx, card)| {
+                    if let Some(revealed) = &card.revealed {
+                        if revealed.outline_color == Some(display_color::GREEN) {
+                            return Some((idx, card.id));
+                        }
+                    }
+                    None
+                })
+                .collect();
+
+            // Clear the mulligan state
+            *RESOLVING_MULLIGAN.lock().unwrap() = false;
+
+            // Remove the screen overlay
+            battle.interface.screen_overlay = None;
+
+            // Reset all card outlines and actions
+            for card in battle.cards.iter_mut() {
+                if let Some(revealed) = &mut card.revealed {
+                    revealed.outline_color = None;
+                    if matches!(card.position.position, Position::InHand(PlayerName::User)) {
+                        revealed.actions.can_play = true;
+                        revealed.actions.on_click = None;
+                    }
+                }
+            }
+
+            battle.interface.primary_action_button = None;
+
+            for (idx, _) in &selected_cards {
+                let sorting_key = battle.cards[*idx].position.sorting_key;
+                battle.cards[*idx] = card_view(Position::InDeck(PlayerName::User), sorting_key);
+            }
+
+            commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+
+            // Draw replacement cards
+            let mut drawn_cards = Vec::new();
+            for _ in 0..selected_cards.len() {
+                if let Some(card) = draw_card(&mut battle) {
+                    drawn_cards.push(card);
+                }
+            }
+
+            // Add draw cards command if we have cards to draw
+            if !drawn_cards.is_empty() {
+                commands.push(Command::DrawUserCards(DrawUserCardsCommand {
+                    cards: drawn_cards,
+                    stagger_interval: Milliseconds::new(300),
+                    pause_duration: Milliseconds::new(100),
+                }));
+            }
+
+            // Restore the primary action button
+            battle.interface.primary_action_button = Some(PrimaryActionButtonView {
+                label: "End Turn".to_string(),
+                action: UserAction::DebugAction(DebugAction::TriggerEnemyJudgment),
+                show_on_idle_duration: Some(Milliseconds::new(5000)),
+            });
+
+            commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+
+            let dreamwell_card_id = battle
+                .cards
+                .iter()
+                .find(|card| {
+                    matches!(card.position.position, Position::InDreamwell(PlayerName::User))
+                })
+                .map(|card| card.id)
+                .unwrap_or(battle.cards[0].id);
+
+            commands.extend(vec![
+                Command::Wait(Milliseconds::new(1000)),
+                Command::DisplayGameMessage(GameMessageType::YourTurn),
+                Command::DisplayJudgment(DisplayJudgmentCommand {
+                    player: PlayerName::User,
+                    new_score: None,
+                }),
+                Command::DisplayDreamwellActivation(DisplayDreamwellActivationCommand {
+                    card_id: dreamwell_card_id,
+                    player: PlayerName::User,
+                    new_energy: Some(Energy(3)),
+                    new_produced_energy: Some(Energy(3)),
+                }),
+                Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())),
+            ]);
+
+            *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+            PerformActionResponse { metadata, commands: CommandSequence::sequential(commands) }
         }
     }
 }

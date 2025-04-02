@@ -1572,8 +1572,12 @@ namespace Dreamcaller.Schema
     /// Close the card browser
     ///
     /// Toggle the visibility of the card order selector
+    ///
+    /// End the turn
+    ///
+    /// Confirm the selected cards to mulligan
     /// </summary>
-    public enum BattleActionEnum { CloseCardBrowser, ToggleOrderSelectorVisibility };
+    public enum BattleActionEnum { CloseCardBrowser, EndTurn, SubmitMulligan, ToggleOrderSelectorVisibility };
 
     public enum CardBrowserType { EnemyDeck, EnemyStatus, EnemyVoid, UserDeck, UserStatus, UserVoid };
 
@@ -2202,6 +2206,10 @@ namespace Dreamcaller.Schema
                     {
                         case "closeCardBrowser":
                             return new BattleAction { Enum = BattleActionEnum.CloseCardBrowser };
+                        case "endTurn":
+                            return new BattleAction { Enum = BattleActionEnum.EndTurn };
+                        case "submitMulligan":
+                            return new BattleAction { Enum = BattleActionEnum.SubmitMulligan };
                         case "toggleOrderSelectorVisibility":
                             return new BattleAction { Enum = BattleActionEnum.ToggleOrderSelectorVisibility };
                     }
@@ -2222,6 +2230,12 @@ namespace Dreamcaller.Schema
                 {
                     case BattleActionEnum.CloseCardBrowser:
                         serializer.Serialize(writer, "closeCardBrowser");
+                        return;
+                    case BattleActionEnum.EndTurn:
+                        serializer.Serialize(writer, "endTurn");
+                        return;
+                    case BattleActionEnum.SubmitMulligan:
+                        serializer.Serialize(writer, "submitMulligan");
                         return;
                     case BattleActionEnum.ToggleOrderSelectorVisibility:
                         serializer.Serialize(writer, "toggleOrderSelectorVisibility");
@@ -2312,6 +2326,10 @@ namespace Dreamcaller.Schema
             {
                 case "closeCardBrowser":
                     return BattleActionEnum.CloseCardBrowser;
+                case "endTurn":
+                    return BattleActionEnum.EndTurn;
+                case "submitMulligan":
+                    return BattleActionEnum.SubmitMulligan;
                 case "toggleOrderSelectorVisibility":
                     return BattleActionEnum.ToggleOrderSelectorVisibility;
             }
@@ -2330,6 +2348,12 @@ namespace Dreamcaller.Schema
             {
                 case BattleActionEnum.CloseCardBrowser:
                     serializer.Serialize(writer, "closeCardBrowser");
+                    return;
+                case BattleActionEnum.EndTurn:
+                    serializer.Serialize(writer, "endTurn");
+                    return;
+                case BattleActionEnum.SubmitMulligan:
+                    serializer.Serialize(writer, "submitMulligan");
                     return;
                 case BattleActionEnum.ToggleOrderSelectorVisibility:
                     serializer.Serialize(writer, "toggleOrderSelectorVisibility");
