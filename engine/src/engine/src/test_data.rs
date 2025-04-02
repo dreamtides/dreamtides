@@ -762,6 +762,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
 
             // Remove the screen overlay
             battle.interface.screen_overlay = None;
+            battle.interface.primary_action_button = None;
 
             // Reset all card outlines and actions
             for card in battle.cards.iter_mut() {
@@ -773,8 +774,6 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                     }
                 }
             }
-
-            battle.interface.primary_action_button = None;
 
             for (idx, _) in &selected_cards {
                 let sorting_key = battle.cards[*idx].position.sorting_key;

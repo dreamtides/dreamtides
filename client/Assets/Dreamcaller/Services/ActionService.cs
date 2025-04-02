@@ -14,15 +14,20 @@ namespace Dreamcaller.Services
 {
   public class ActionService : Service
   {
+    bool _devModeAutoConnect;
+    float _lastConnectAttemptTime;
+    Metadata _metadata;
+
     IEnumerator Start()
     {
       yield return new WaitForEndOfFrame();
+      _metadata = new Metadata
+      {
+        UserId = Guid.NewGuid()
+      };
       var request = new ConnectRequest
       {
-        Metadata = new Metadata
-        {
-          UserId = Guid.NewGuid()
-        }
+        Metadata = _metadata
       };
       if (Application.isEditor)
       {
@@ -35,6 +40,21 @@ namespace Dreamcaller.Services
       }
     }
 
+    void Update()
+    {
+      if (_devModeAutoConnect)
+      {
+        var now = Time.time;
+        if (now - _lastConnectAttemptTime > 0.5f)
+        {
+          StartCoroutine(DevServerConnectAsync(new ConnectRequest
+          {
+            Metadata = _metadata
+          }));
+          _lastConnectAttemptTime = now;
+        }
+      }
+    }
     public void PerformAction(UserAction? action)
     {
       if (action == null)
@@ -63,7 +83,7 @@ namespace Dreamcaller.Services
 
     private IEnumerator DevServerConnectAsync(ConnectRequest request)
     {
-      yield return SendRequest<ConnectRequest, ConnectResponse>(
+      yield return SendDevServerRequest<ConnectRequest, ConnectResponse>(
         request,
         "connect",
         UnityWebRequest.kHttpVerbGET,
@@ -72,14 +92,14 @@ namespace Dreamcaller.Services
 
     private IEnumerator PerformDevServerActionAsync(PerformActionRequest request)
     {
-      yield return SendRequest<PerformActionRequest, PerformActionResponse>(
+      yield return SendDevServerRequest<PerformActionRequest, PerformActionResponse>(
         request,
         "perform_action",
         UnityWebRequest.kHttpVerbPOST,
         response => ApplyCommands(response.Commands, animate: true));
     }
 
-    private IEnumerator SendRequest<TRequest, TResponse>(
+    private IEnumerator SendDevServerRequest<TRequest, TResponse>(
       TRequest request,
       string endpoint,
       string method,
@@ -97,6 +117,7 @@ namespace Dreamcaller.Services
 
       if (webRequest.result == UnityWebRequest.Result.Success)
       {
+        _devModeAutoConnect = false;
         var responseJson = webRequest.downloadHandler.text;
         var response = JsonConvert.DeserializeObject<TResponse>(responseJson, Converter.Settings);
         if (response != null)
@@ -106,7 +127,7 @@ namespace Dreamcaller.Services
       }
       else
       {
-        Debug.LogError($"{endpoint} request failed: {webRequest.error}");
+        _devModeAutoConnect = true;
       }
     }
 
