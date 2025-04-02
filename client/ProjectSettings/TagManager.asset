@@ -44,6 +44,9 @@ TagManager:
   - name: Hand
     uniqueID: 3107703599
     locked: 0
+  - name: Effects
+    uniqueID: 672069627
+    locked: 0
   - name: Top
     uniqueID: 2479077583
     locked: 0

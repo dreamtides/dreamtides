@@ -27,11 +27,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 20c72fdd75b7e4ee682473e597c0525c
-    m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/2027158310.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 24c86df1468884d499ca1d5cb865a6f7
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile
       1 nature arrow.prefab
@@ -53,16 +48,6 @@ MonoBehaviour:
   - m_GUID: 5c0f09c6cb11c4d9f8cd793a4b434e10
     m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Electric
       Magic/RPG3_ElectricMagic2_LightImpact01.wav
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 5e0930dafb3524b55b972ad349299d67
-    m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/2521694543.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 6761eeb7b5c4b4d208be1a1c10f1d0c1
-    m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/1633431262.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -90,13 +75,8 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: e279243d2b40043ef9aa4e7ab6fde553
-    m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/2269064817.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: e8da2e685b68a4813961f0409f5135e9
-    m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/2269064809.png
+  - m_GUID: 9ec5d918811f0417589df599e9da959f
+    m_Address: Assets/ThirdParty/Hovl Studio/Magic hits/Prefabs/_Hit 10.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

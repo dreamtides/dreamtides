@@ -32,6 +32,7 @@ namespace Dreamcaller.Buttons
     float? _lastSetViewTime;
     PrimaryActionButtonView? _pendingView;
     bool _isVisible = false;
+    private bool _isAnimating = false;
 
     protected override void OnStart()
     {
@@ -57,7 +58,6 @@ namespace Dreamcaller.Buttons
 
     public void SetView(PrimaryActionButtonView? view)
     {
-      Debug.Log($"Setting view: '{view?.Label}'");
       _lastSetViewTime = Time.time;
 
       if (view == null)
@@ -82,10 +82,36 @@ namespace Dreamcaller.Buttons
 
     private void ApplyView(PrimaryActionButtonView? view)
     {
+      if (_isAnimating)
+      {
+        if (view == null)
+        {
+          _action = null;
+          _text.text = "";
+        }
+        else
+        {
+          _text.text = view.Label;
+          _action = view.Action;
+          if (!_isVisible)
+          {
+            DOTween.Kill("ButtonHideAnimation");
+            _background.transform.localScale = _originalBackgroundLocalScale;
+            _text.transform.localScale = _originalTextLocalScale;
+            _background.gameObject.SetActive(true);
+            _text.gameObject.SetActive(true);
+            _isVisible = true;
+            _isAnimating = false;
+          }
+        }
+        return;
+      }
+
       if (view == null)
       {
         if (_isVisible)
         {
+          _isAnimating = true;
           var hideSequence = TweenUtils.Sequence("ButtonHideAnimation");
           hideSequence.Join(_background.transform.DOScale(Vector3.zero, _fadeDuration));
           hideSequence.Join(_text.transform.DOScale(Vector3.zero, _fadeDuration));
@@ -97,6 +123,7 @@ namespace Dreamcaller.Buttons
             _action = null;
             _text.text = "";
             _isVisible = false;
+            _isAnimating = false;
 
             _background.transform.localScale = _originalBackgroundLocalScale;
             _text.transform.localScale = _originalTextLocalScale;
@@ -115,14 +142,20 @@ namespace Dreamcaller.Buttons
       {
         _text.text = view.Label;
         _action = view.Action;
-        _background.transform.localScale = Vector3.zero;
-        _text.transform.localScale = Vector3.zero;
 
-        _background.gameObject.SetActive(true);
-        _text.gameObject.SetActive(true);
-        Sequence showSequence = TweenUtils.Sequence("ButtonShowAnimation");
-        showSequence.Join(_background.transform.DOScale(_originalBackgroundLocalScale, _fadeDuration));
-        showSequence.Join(_text.transform.DOScale(_originalTextLocalScale, _fadeDuration));
+        if (!_isVisible)
+        {
+          _isAnimating = true;
+          _background.transform.localScale = Vector3.zero;
+          _text.transform.localScale = Vector3.zero;
+
+          _background.gameObject.SetActive(true);
+          _text.gameObject.SetActive(true);
+          Sequence showSequence = TweenUtils.Sequence("ButtonShowAnimation");
+          showSequence.Join(_background.transform.DOScale(_originalBackgroundLocalScale, _fadeDuration));
+          showSequence.Join(_text.transform.DOScale(_originalTextLocalScale, _fadeDuration));
+          showSequence.OnComplete(() => _isAnimating = false);
+        }
 
         _isVisible = true;
       }

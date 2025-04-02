@@ -308,10 +308,17 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                     battle.cards[card_index] =
                         card_view(Position::OnStack(StackType::Default), sorting_key);
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
-                    commands.push(Command::Wait(Milliseconds::new(500)));
+                    commands.push(Command::DisplayEffect(DisplayEffectCommand {
+                        target: GameObjectId::CardId(card_id),
+                        effect: EffectAddress::new("Assets/ThirdParty/Hovl Studio/Magic hits/Prefabs/_Hit 10.prefab"),
+                        duration: Milliseconds::new(500),
+                        scale: FlexVector3::new(5.0, 5.0, 5.0),
+                        sound: Some(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Generic_SubtleWhoosh04.wav")),
+                    }));
                     battle.cards[card_index] =
                         card_view(Position::InVoid(PlayerName::User), sorting_key);
-                    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+                    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())
+                            .with_update_sound(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Magic2_Projectiles02.wav"))));
                     let c1 = draw_card(&mut battle);
                     let c2 = draw_card(&mut battle);
                     *ORDER_SELECTOR_VISIBLE.lock().unwrap() = true;
@@ -335,9 +342,15 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                     }
                     battle.interface.card_order_selector =
                         Some(CardOrderSelectorView { include_deck: true, include_void: true });
+                    battle.interface.primary_action_button = Some(PrimaryActionButtonView {
+                        label: "End Turn".to_string(),
+                        action: UserAction::DebugAction(DebugAction::TriggerEnemyJudgment),
+                        show_on_idle_duration: None,
+                    });
 
                     *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
-                    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+                    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())
+                            .with_update_sound(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Electric Magic/RPG3_ElectricMagic_Cast02.wav"))));
                     Position::InVoid(PlayerName::User)
                 } else if sorting_key % 5 == 3 {
                     battle.cards[card_index] =

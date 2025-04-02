@@ -82,6 +82,11 @@ impl UpdateBattleCommand {
     pub fn new(battle: BattleView) -> Self {
         Self { battle, update_sound: None }
     }
+
+    pub fn with_update_sound(mut self, update_sound: AudioClipAddress) -> Self {
+        self.update_sound = Some(update_sound);
+        self
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
