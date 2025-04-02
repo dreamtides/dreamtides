@@ -447,11 +447,11 @@ namespace Dreamcaller.Schema
     /// <summary>
     /// Object is on the stack, typically used by cards which were just played.
     ///
-    /// There are three types of stacks. By default, cards display at a large display size,
+    /// There are four types of stacks. By default, cards display at a large display size,
     /// blocking the view of the battlefield. However, if any cards are present on the stack
-    /// which target a character on the battlefield, the cards are displayed at a small size in
-    /// the user or enemy stack position in order to enable viewing & selecting targets
-    /// appropriately. In that case the stack of whichever player first played a card is used.
+    /// which target a character on the battlefield, the cards are displayed at a smaller size in
+    /// order to enable viewing & selecting targets appropriately, based on the set of cards
+    /// which are current or eligible targets.
     ///
     /// Object is in a player's hand
     ///
@@ -1544,7 +1544,7 @@ namespace Dreamcaller.Schema
 
     public enum CardOrderSelectionTarget { Deck, Void };
 
-    public enum StackType { Default, Enemy, User };
+    public enum StackType { Default, TargetingBothBattlefields, TargetingEnemyBattlefield, TargetingUserBattlefield };
 
     /// <summary>
     /// Represents the general category of card being displayed.
@@ -2004,10 +2004,12 @@ namespace Dreamcaller.Schema
             {
                 case "default":
                     return StackType.Default;
-                case "enemy":
-                    return StackType.Enemy;
-                case "user":
-                    return StackType.User;
+                case "targetingBothBattlefields":
+                    return StackType.TargetingBothBattlefields;
+                case "targetingEnemyBattlefield":
+                    return StackType.TargetingEnemyBattlefield;
+                case "targetingUserBattlefield":
+                    return StackType.TargetingUserBattlefield;
             }
             throw new Exception("Cannot unmarshal type StackType");
         }
@@ -2025,11 +2027,14 @@ namespace Dreamcaller.Schema
                 case StackType.Default:
                     serializer.Serialize(writer, "default");
                     return;
-                case StackType.Enemy:
-                    serializer.Serialize(writer, "enemy");
+                case StackType.TargetingBothBattlefields:
+                    serializer.Serialize(writer, "targetingBothBattlefields");
                     return;
-                case StackType.User:
-                    serializer.Serialize(writer, "user");
+                case StackType.TargetingEnemyBattlefield:
+                    serializer.Serialize(writer, "targetingEnemyBattlefield");
+                    return;
+                case StackType.TargetingUserBattlefield:
+                    serializer.Serialize(writer, "targetingUserBattlefield");
                     return;
             }
             throw new Exception("Cannot marshal type StackType");

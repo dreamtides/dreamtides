@@ -37,13 +37,12 @@ pub enum Position {
 
     /// Object is on the stack, typically used by cards which were just played.
     ///
-    /// There are three types of stacks. By default, cards display at a large
+    /// There are four types of stacks. By default, cards display at a large
     /// display size, blocking the view of the battlefield. However, if any
     /// cards are present on the stack which target a character on the
-    /// battlefield, the cards are displayed at a small size in the user or
-    /// enemy stack position in order to enable viewing & selecting targets
-    /// appropriately. In that case the stack of whichever player first played a
-    /// card is used.
+    /// battlefield, the cards are displayed at a smaller size in order to
+    /// enable viewing & selecting targets appropriately, based on the set of
+    /// cards which are current or eligible targets.
     OnStack(StackType),
 
     /// Position for cards to be shown to the user immediately after they're
@@ -108,6 +107,7 @@ pub enum Position {
 #[serde(rename_all = "camelCase")]
 pub enum StackType {
     Default,
-    User,
-    Enemy,
+    TargetingUserBattlefield,
+    TargetingEnemyBattlefield,
+    TargetingBothBattlefields,
 }

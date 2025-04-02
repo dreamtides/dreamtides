@@ -56,11 +56,14 @@ namespace Dreamcaller.Layout
     [SerializeField] ObjectLayout? _defaultStack;
     public ObjectLayout DefaultStack => Check(_defaultStack);
 
-    [SerializeField] ObjectLayout? _userStack;
-    public ObjectLayout UserStack => Check(_userStack);
+    [SerializeField] ObjectLayout? _targetingUserStack;
+    public ObjectLayout TargetingUserStack => Check(_targetingUserStack);
 
-    [SerializeField] ObjectLayout? _enemyStack;
-    public ObjectLayout EnemyStack => Check(_enemyStack);
+    [SerializeField] ObjectLayout? _targetingEnemyStack;
+    public ObjectLayout TargetingEnemyStack => Check(_targetingEnemyStack);
+
+    [SerializeField] ObjectLayout? _targetingBothStack;
+    public ObjectLayout TargetingBothStack => Check(_targetingBothStack);
 
     [SerializeField] SpriteRenderer? _battlefieldOverlay;
     public SpriteRenderer BattlefieldOverlay => Check(_battlefieldOverlay);

@@ -208,8 +208,9 @@ namespace Dreamcaller.Services
       Registry.Layout.EnemyBattlefield.ApplyLayout(sequence);
       Registry.Layout.DrawnCardsPosition.ApplyLayout(sequence);
       Registry.Layout.DefaultStack.ApplyLayout(sequence);
-      Registry.Layout.UserStack.ApplyLayout(sequence);
-      Registry.Layout.EnemyStack.ApplyLayout(sequence);
+      Registry.Layout.TargetingUserStack.ApplyLayout(sequence);
+      Registry.Layout.TargetingEnemyStack.ApplyLayout(sequence);
+      Registry.Layout.TargetingBothStack.ApplyLayout(sequence);
       Registry.Layout.Browser.ApplyLayout(sequence);
       Registry.Layout.UserDreamwell.ApplyLayout(sequence);
       Registry.Layout.EnemyDreamwell.ApplyLayout(sequence);
@@ -348,8 +349,9 @@ namespace Dreamcaller.Services
         return onStack switch
         {
           StackType.Default => Registry.Layout.DefaultStack,
-          StackType.User => Registry.Layout.UserStack,
-          StackType.Enemy => Registry.Layout.EnemyStack,
+          StackType.TargetingUserBattlefield => Registry.Layout.TargetingUserStack,
+          StackType.TargetingEnemyBattlefield => Registry.Layout.TargetingEnemyStack,
+          StackType.TargetingBothBattlefields => Registry.Layout.TargetingBothStack,
           _ => throw Errors.UnknownEnumValue(onStack),
         };
       }

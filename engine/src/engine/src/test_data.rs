@@ -41,7 +41,7 @@ static CARD_BROWSER_SOURCE: LazyLock<Mutex<Option<Position>>> = LazyLock::new(||
 static ORDER_SELECTOR_VISIBLE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<Mutex<std::collections::HashMap<CardId, Position>>> =
     LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
-const STUFF_TO_DO: u32 = 2;
+const STUFF_TO_DO: u32 = 3;
 
 pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     let battle = scene_0(BattleId(Uuid::new_v4()));
@@ -200,8 +200,10 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                         card_view(Position::OnStack(StackType::Default), sorting_key);
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
                     commands.push(Command::Wait(Milliseconds::new(500)));
-                    battle.cards[card_index] =
-                        card_view(Position::OnStack(StackType::Enemy), sorting_key);
+                    battle.cards[card_index] = card_view(
+                        Position::OnStack(StackType::TargetingUserBattlefield),
+                        sorting_key,
+                    );
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
                     commands.push(Command::DisplayArrowsCommand(DisplayArrowsCommand {
                         arrows: vec![DisplayArrow {
@@ -297,7 +299,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                             }
                         }
                     }
-                    Position::OnStack(StackType::User)
+                    Position::OnStack(StackType::TargetingEnemyBattlefield)
                 } else if sorting_key % 5 == 2 {
                     battle.cards[card_index] =
                         card_view(Position::OnStack(StackType::Default), sorting_key);
