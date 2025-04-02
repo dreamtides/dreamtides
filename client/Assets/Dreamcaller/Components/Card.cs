@@ -286,7 +286,7 @@ namespace Dreamcaller.Components
       }
     }
 
-    public override void MouseUp()
+    public override void MouseUp(bool isSameObject)
     {
       _registry.SoundService.PlayCardSound();
       _registry.CardService.ClearInfoZoom();

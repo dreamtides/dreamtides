@@ -49,7 +49,8 @@ namespace Dreamcaller.Services
         case false when _lastClicked:
           var last = _lastClicked;
           _lastClicked = null;
-          last.MouseUp();
+          var objectAtClickPosition = ObjectAtClickPosition();
+          last.MouseUp(objectAtClickPosition == last);
           break;
       }
     }
@@ -63,8 +64,7 @@ namespace Dreamcaller.Services
       }
 
       var fired = ObjectAtClickPosition();
-
-      if (fired && fired != null)
+      if (fired)
       {
         fired.MouseDown();
       }

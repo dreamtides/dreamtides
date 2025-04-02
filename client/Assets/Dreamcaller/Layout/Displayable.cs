@@ -93,9 +93,12 @@ namespace Dreamcaller.Layout
     }
 
     /// <summary>
-    /// Sent on *any* mouse up event, anywhere on screen, to objects which received a <see cref="MouseDown"/>.
+    /// Sent on *any* mouse up event, anywhere on screen, to objects which
+    /// received a <see cref="MouseDown"/>. If "isSameObject" is true, it means
+    /// the pointer was released over the same Displayable which received
+    /// MouseDown.
     /// </summary>
-    public virtual void MouseUp()
+    public virtual void MouseUp(bool isSameObject)
     {
     }
 
