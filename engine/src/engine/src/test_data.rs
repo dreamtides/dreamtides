@@ -192,10 +192,7 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                         .cards
                         .iter()
                         .find(|c| {
-                            matches!(
-                                c.position.position,
-                                Position::OnBattlefield(PlayerName::Enemy)
-                            )
+                            matches!(c.position.position, Position::OnBattlefield(PlayerName::User))
                         })
                         .map(|c| c.id)
                         .unwrap_or(card_id); // Fallback to the card's own ID if no target found
@@ -204,7 +201,7 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
                     commands.push(Command::Wait(Milliseconds::new(500)));
                     battle.cards[card_index] = card_view(
-                        Position::OnStack(StackType::TargetingEnemyBattlefield),
+                        Position::OnStack(StackType::TargetingUserBattlefield),
                         sorting_key,
                     );
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
@@ -212,7 +209,7 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                         arrows: vec![DisplayArrow {
                             source: GameObjectId::CardId(card_id),
                             target: GameObjectId::CardId(target_id),
-                            color: ArrowStyle::Green,
+                            color: ArrowStyle::Red,
                         }],
                     }));
                     *CURRENT_BATTLE.lock().unwrap() = Some(battle);

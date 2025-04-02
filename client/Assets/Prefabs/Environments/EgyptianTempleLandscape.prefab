@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 807354673311610438, guid: 0e5a171b1e3aa4a38a082f7f7269e973, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 212
       objectReference: {fileID: 0}
     - target: {fileID: 807354673311610438, guid: 0e5a171b1e3aa4a38a082f7f7269e973, type: 3}
       propertyPath: m_LocalPosition.y
@@ -22,7 +22,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 807354673311610438, guid: 0e5a171b1e3aa4a38a082f7f7269e973, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 807354673311610438, guid: 0e5a171b1e3aa4a38a082f7f7269e973, type: 3}
       propertyPath: m_LocalRotation.x
@@ -30,7 +30,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 807354673311610438, guid: 0e5a171b1e3aa4a38a082f7f7269e973, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 807354673311610438, guid: 0e5a171b1e3aa4a38a082f7f7269e973, type: 3}
       propertyPath: m_LocalRotation.z
@@ -42,7 +42,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 807354673311610438, guid: 0e5a171b1e3aa4a38a082f7f7269e973, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: 807354673311610438, guid: 0e5a171b1e3aa4a38a082f7f7269e973, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -50,7 +50,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8305104717603104780, guid: 0e5a171b1e3aa4a38a082f7f7269e973, type: 3}
       propertyPath: m_Name
-      value: EgyptianTemple
+      value: EgyptianTempleLandscape
+      objectReference: {fileID: 0}
+    - target: {fileID: 8305104717603104780, guid: 0e5a171b1e3aa4a38a082f7f7269e973, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

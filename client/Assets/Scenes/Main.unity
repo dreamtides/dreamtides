@@ -2193,7 +2193,7 @@ Transform:
   m_GameObject: {fileID: 121130223}
   serializedVersion: 2
   m_LocalRotation: {x: 0.60876137, y: -0, z: -0, w: 0.7933534}
-  m_LocalPosition: {x: 3.7, y: 5.83, z: -24.18}
+  m_LocalPosition: {x: -4, y: 5.83, z: -24.18}
   m_LocalScale: {x: 0.75, y: 0.75, z: 0.75}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -2715,7 +2715,7 @@ Transform:
   m_GameObject: {fileID: 154927845}
   serializedVersion: 2
   m_LocalRotation: {x: 0.60876137, y: 0, z: 0, w: 0.7933534}
-  m_LocalPosition: {x: -4.5, y: 2, z: -22.5}
+  m_LocalPosition: {x: 4.5, y: 2, z: -22.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -7070,7 +7070,7 @@ Transform:
   m_GameObject: {fileID: 461729274}
   serializedVersion: 2
   m_LocalRotation: {x: 0.60876137, y: -0, z: -0, w: 0.7933534}
-  m_LocalPosition: {x: -3, y: 10, z: -12}
+  m_LocalPosition: {x: 3, y: 10, z: -12}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -7383,7 +7383,7 @@ Transform:
   m_GameObject: {fileID: 479069923}
   serializedVersion: 2
   m_LocalRotation: {x: 0.60876137, y: 0, z: 0, w: 0.7933534}
-  m_LocalPosition: {x: -3, y: 10, z: -21}
+  m_LocalPosition: {x: 3, y: 10, z: -21}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -8935,10 +8935,6 @@ PrefabInstance:
     - target: {fileID: 3046208254237056033, guid: ac9cc52e2bd2846ba91551da8140acbb, type: 3}
       propertyPath: m_Name
       value: PlanetaryBaseLandscape
-      objectReference: {fileID: 0}
-    - target: {fileID: 3046208254237056033, guid: ac9cc52e2bd2846ba91551da8140acbb, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -12936,10 +12932,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: ElvenRealmLandscape
       objectReference: {fileID: 0}
-    - target: {fileID: 3345209016087543405, guid: f55945765d7014dcf92344c09ae9b863, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -12960,7 +12952,7 @@ GameObject:
   m_Component:
   - component: {fileID: 811111597}
   m_Layer: 5
-  m_Name: LeftSide
+  m_Name: ' TopLeft'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13972,10 +13964,6 @@ PrefabInstance:
     - target: {fileID: 1151761717100319042, guid: e4aaf6e3ba7fd4997bede40be8ab93b4, type: 3}
       propertyPath: m_Name
       value: VikingVillageLandscape
-      objectReference: {fileID: 0}
-    - target: {fileID: 1151761717100319042, guid: e4aaf6e3ba7fd4997bede40be8ab93b4, type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5074291377748358571, guid: e4aaf6e3ba7fd4997bede40be8ab93b4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -24332,10 +24320,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: EgyptianTempleLandscape
       objectReference: {fileID: 0}
-    - target: {fileID: 9192042293561630519, guid: a41d38262995b4547b50efac0518ad65, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -25278,7 +25262,7 @@ Transform:
   m_GameObject: {fileID: 1607976025}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -6, y: 0, z: -22.5}
+  m_LocalPosition: {x: 6, y: 0, z: -22.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -26198,7 +26182,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1674304087}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -26208,7 +26192,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -3.1, y: -29.3}
+  m_AnchoredPosition: {x: -2.5, y: -30}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &1677757037
@@ -26573,7 +26557,7 @@ Transform:
   m_GameObject: {fileID: 1685416111}
   serializedVersion: 2
   m_LocalRotation: {x: 0.60876137, y: -0, z: -0, w: 0.7933534}
-  m_LocalPosition: {x: -1.5, y: 18.5, z: -20}
+  m_LocalPosition: {x: 1.5, y: 18.5, z: -20}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -27665,7 +27649,7 @@ Transform:
   m_GameObject: {fileID: 1744911438}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -3, y: 0, z: -23}
+  m_LocalPosition: {x: 3, y: 0, z: -23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
