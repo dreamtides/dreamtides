@@ -109,6 +109,70 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("displayDreamwellActivation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayDreamwellActivationCommand DisplayDreamwellActivation { get; set; }
+
+        [JsonProperty("displayArrowsCommand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayArrowsCommand DisplayArrowsCommand { get; set; }
+    }
+
+    public partial class DisplayArrowsCommand
+    {
+        [JsonProperty("arrows", Required = Required.Always)]
+        public List<DisplayArrow> Arrows { get; set; }
+    }
+
+    public partial class DisplayArrow
+    {
+        [JsonProperty("color", Required = Required.Always)]
+        public ArrowStyle Color { get; set; }
+
+        [JsonProperty("source", Required = Required.Always)]
+        public GameObjectId Source { get; set; }
+
+        [JsonProperty("target", Required = Required.Always)]
+        public GameObjectId Target { get; set; }
+    }
+
+    /// <summary>
+    /// The target to display the effect on.
+    /// </summary>
+    public partial class GameObjectId
+    {
+        [JsonProperty("cardId", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public CardId CardId { get; set; }
+
+        [JsonProperty("deck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PlayerName? Deck { get; set; }
+
+        [JsonProperty("void", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PlayerName? Void { get; set; }
+
+        [JsonProperty("avatar", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PlayerName? Avatar { get; set; }
+    }
+
+    /// <summary>
+    /// Identifier for this card
+    ///
+    /// The card to dissolve.
+    ///
+    /// Once a card is dissolved, it will be invisible until a reverse dissolve is applied to
+    /// it.
+    ///
+    /// The card to display an activation for. This card will be moved from its current position
+    /// (assumed to be the 'Dreamwell' position) to the DreamwellActivation position, and an
+    /// update to the player's produced energy value will be displayed.
+    ///
+    /// If there are triggered events as a result of this activation, the card should be kept in
+    /// the DreamwellActivation position for the next update. Otherwise it's typical to return
+    /// the card to the Dreamwell position.
+    /// </summary>
+    public partial class CardId
+    {
+        [JsonProperty("idx", Required = Required.Always)]
+        public long Idx { get; set; }
+
+        [JsonProperty("version", Required = Required.Always)]
+        public long Version { get; set; }
     }
 
     public partial class DisplayDreamwellActivationCommand
@@ -142,31 +206,6 @@ namespace Dreamcaller.Schema
         /// </summary>
         [JsonProperty("player", Required = Required.Always)]
         public PlayerName Player { get; set; }
-    }
-
-    /// <summary>
-    /// Identifier for this card
-    ///
-    /// The card to dissolve.
-    ///
-    /// Once a card is dissolved, it will be invisible until a reverse dissolve is applied to
-    /// it.
-    ///
-    /// The card to display an activation for. This card will be moved from its current position
-    /// (assumed to be the 'Dreamwell' position) to the DreamwellActivation position, and an
-    /// update to the player's produced energy value will be displayed.
-    ///
-    /// If there are triggered events as a result of this activation, the card should be kept in
-    /// the DreamwellActivation position for the next update. Otherwise it's typical to return
-    /// the card to the Dreamwell position.
-    /// </summary>
-    public partial class CardId
-    {
-        [JsonProperty("idx", Required = Required.Always)]
-        public long Idx { get; set; }
-
-        [JsonProperty("version", Required = Required.Always)]
-        public long Version { get; set; }
     }
 
     public partial class DisplayEffectCommand
@@ -245,24 +284,6 @@ namespace Dreamcaller.Schema
     {
         [JsonProperty("audioClip", Required = Required.Always)]
         public string AudioClip { get; set; }
-    }
-
-    /// <summary>
-    /// The target to display the effect on.
-    /// </summary>
-    public partial class GameObjectId
-    {
-        [JsonProperty("cardId", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public CardId CardId { get; set; }
-
-        [JsonProperty("deck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? Deck { get; set; }
-
-        [JsonProperty("void", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? Void { get; set; }
-
-        [JsonProperty("avatar", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? Avatar { get; set; }
     }
 
     public partial class DisplayJudgmentCommand
@@ -1473,6 +1494,8 @@ namespace Dreamcaller.Schema
         public Metadata Metadata { get; set; }
     }
 
+    public enum ArrowStyle { Blue, Green, Red };
+
     /// <summary>
     /// Identifies a player in an ongoing battle.
     ///
@@ -1629,6 +1652,7 @@ namespace Dreamcaller.Schema
             DateParseHandling = DateParseHandling.None,
             Converters =
             {
+                ArrowStyleConverter.Singleton,
                 PlayerNameConverter.Singleton,
                 GameMessageTypeConverter.Singleton,
                 CardFacingConverter.Singleton,
@@ -1664,6 +1688,52 @@ namespace Dreamcaller.Schema
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
         };
+    }
+
+    internal class ArrowStyleConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(ArrowStyle) || t == typeof(ArrowStyle?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "blue":
+                    return ArrowStyle.Blue;
+                case "green":
+                    return ArrowStyle.Green;
+                case "red":
+                    return ArrowStyle.Red;
+            }
+            throw new Exception("Cannot unmarshal type ArrowStyle");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (ArrowStyle)untypedValue;
+            switch (value)
+            {
+                case ArrowStyle.Blue:
+                    serializer.Serialize(writer, "blue");
+                    return;
+                case ArrowStyle.Green:
+                    serializer.Serialize(writer, "green");
+                    return;
+                case ArrowStyle.Red:
+                    serializer.Serialize(writer, "red");
+                    return;
+            }
+            throw new Exception("Cannot marshal type ArrowStyle");
+        }
+
+        public static readonly ArrowStyleConverter Singleton = new ArrowStyleConverter();
     }
 
     internal class PlayerNameConverter : JsonConverter

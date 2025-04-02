@@ -176,6 +176,11 @@ namespace Dreamcaller.Services
         {
           coroutines.Add(StartCoroutine(Registry.DreamwellActivationService.HandleDreamwellActivationCommand(command.DisplayDreamwellActivation)));
         }
+
+        if (command.DisplayArrowsCommand != null)
+        {
+          Registry.ArrowService.HandleDisplayArrowsCommand(command.DisplayArrowsCommand);
+        }
       }
 
       foreach (var coroutine in coroutines)

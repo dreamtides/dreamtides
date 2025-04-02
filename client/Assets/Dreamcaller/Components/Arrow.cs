@@ -16,8 +16,8 @@ namespace Dreamcaller.Components
     readonly List<Transform> _segments = new();
     readonly List<MeshRenderer> _renderers = new();
 
-    public Vector3 Source { get; set; }
-    public Vector3 Target { get; set; }
+    public Transform Source { get; set; } = null!;
+    public Transform Target { get; set; } = null!;
 
     public GameObject HeadPrefab
     {
@@ -31,7 +31,7 @@ namespace Dreamcaller.Components
 
     void Update()
     {
-      var distance = Vector3.Distance(Source, Target);
+      var distance = Vector3.Distance(Source.position, Target.position);
       var radius = (1f / 2f) + distance * distance / 8f;
       var diff = radius - 1f;
       var angle = 2f * Mathf.Acos(diff / radius);
@@ -90,8 +90,8 @@ namespace Dreamcaller.Components
 
       _arrow!.localPosition = right;
       _arrow.localRotation = Quaternion.FromToRotation(Vector3.up, right - center);
-      transform.position = Source;
-      transform.rotation = Quaternion.LookRotation(Target - Source, Vector3.up);
+      transform.position = Source.position;
+      transform.rotation = Quaternion.LookRotation(Target.position - Source.position, Vector3.up);
     }
   }
 }

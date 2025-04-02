@@ -19,9 +19,10 @@ use display_data::card_view::{
     CardActions, CardEffects, CardFrame, CardPrefab, CardView, DisplayImage, RevealedCardView,
 };
 use display_data::command::{
-    Command, CommandSequence, DisplayDreamwellActivationCommand, DisplayEffectCommand,
-    DisplayJudgmentCommand, DissolveCardCommand, DrawUserCardsCommand, FireProjectileCommand,
-    GameMessageType, GameObjectId, ParallelCommandGroup, UpdateBattleCommand,
+    ArrowStyle, Command, CommandSequence, DisplayArrow, DisplayArrowsCommand,
+    DisplayDreamwellActivationCommand, DisplayEffectCommand, DisplayJudgmentCommand,
+    DissolveCardCommand, DrawUserCardsCommand, FireProjectileCommand, GameMessageType,
+    GameObjectId, ParallelCommandGroup, UpdateBattleCommand,
 };
 use display_data::object_position::{ObjectPosition, Position, StackType};
 use display_data::request_data::{
@@ -186,10 +187,29 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                     matches!(c.position.position, Position::InHand(PlayerName::Enemy))
                 }) {
                     let sorting_key = card.position.sorting_key;
-
+                    let card_id = card.id;
+                    let target_id = battle
+                        .cards
+                        .iter()
+                        .find(|c| {
+                            matches!(c.position.position, Position::OnBattlefield(PlayerName::User))
+                        })
+                        .map(|c| c.id)
+                        .unwrap_or(card_id); // Fallback to the card's own ID if no target found
+                    battle.cards[card_index] =
+                        card_view(Position::OnStack(StackType::Default), sorting_key);
+                    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+                    commands.push(Command::Wait(Milliseconds::new(500)));
                     battle.cards[card_index] =
                         card_view(Position::OnStack(StackType::Enemy), sorting_key);
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+                    commands.push(Command::DisplayArrowsCommand(DisplayArrowsCommand {
+                        arrows: vec![DisplayArrow {
+                            source: GameObjectId::CardId(card_id),
+                            target: GameObjectId::CardId(target_id),
+                            color: ArrowStyle::Red,
+                        }],
+                    }));
                     *CURRENT_BATTLE.lock().unwrap() = Some(battle);
                 }
 
@@ -213,10 +233,9 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                     commands.push(Command::Wait(Milliseconds::new(1500)));
 
                     // Move card to battlefield
-                    // battle.cards[card_index] =
-                    //     card_view(Position::OnBattlefield(PlayerName::Enemy), sorting_key);
-                    // commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.
-                    // clone())));
+                    battle.cards[card_index] =
+                        card_view(Position::OnBattlefield(PlayerName::Enemy), sorting_key);
+                    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
 
                     *CURRENT_BATTLE.lock().unwrap() = Some(battle);
                 }

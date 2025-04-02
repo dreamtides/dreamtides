@@ -65,6 +65,7 @@ pub enum Command {
     DrawUserCards(DrawUserCardsCommand),
     DisplayJudgment(DisplayJudgmentCommand),
     DisplayDreamwellActivation(DisplayDreamwellActivationCommand),
+    DisplayArrowsCommand(DisplayArrowsCommand),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -202,6 +203,28 @@ pub struct DisplayDreamwellActivationCommand {
     /// New energy produced by this player at the start of the turn, if it has
     /// changed.
     pub new_produced_energy: Option<Energy>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct DisplayArrowsCommand {
+    pub arrows: Vec<DisplayArrow>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct DisplayArrow {
+    pub source: GameObjectId,
+    pub target: GameObjectId,
+    pub color: ArrowStyle,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum ArrowStyle {
+    Red,
+    Blue,
+    Green,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
