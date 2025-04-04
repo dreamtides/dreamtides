@@ -90,8 +90,8 @@ namespace Dreamcaller.Layout
     [SerializeField] CardBrowser _browser = null!;
     public CardBrowser Browser => Check(_browser);
 
-    [SerializeField] BackgroundOverlay _backgroundOverlay = null!;
-    public BackgroundOverlay BackgroundOverlay => Check(_backgroundOverlay);
+    [SerializeField] BrowserBackground _browserBackground = null!;
+    public BrowserBackground BrowserBackground => Check(_browserBackground);
 
     [SerializeField] ObjectLayout? _userDreamwell;
     public ObjectLayout UserDreamwell => Check(_userDreamwell);

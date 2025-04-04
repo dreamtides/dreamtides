@@ -2813,7 +2813,7 @@ MonoBehaviour:
   _internalGameContext: 0
   _objects: []
   _debugUpdateContinuously: 0
-  _offset: -1
+  _offset: 1
 --- !u!1001 &158442905
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5287,7 +5287,6 @@ Transform:
   - {fileID: 1665816865}
   - {fileID: 430791827}
   - {fileID: 3889870396586875614}
-  - {fileID: 763927451}
   m_Father: {fileID: 1302820460}
   m_LocalEulerAnglesHint: {x: 75, y: 0, z: 0}
 --- !u!114 &330585547
@@ -7489,7 +7488,7 @@ MonoBehaviour:
   _internalGameContext: 0
   _objects: []
   _debugUpdateContinuously: 0
-  _offset: -1
+  _offset: 2.5
 --- !u!1 &482914635
 GameObject:
   m_ObjectHideFlags: 0
@@ -8533,7 +8532,7 @@ Transform:
   m_GameObject: {fileID: 574549271}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -5.53, y: 1, z: -21.67}
+  m_LocalPosition: {x: -5.53, y: 5, z: -21.67}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -9581,7 +9580,6 @@ Transform:
   - {fileID: 930174513}
   - {fileID: 1248400906}
   - {fileID: 840192634}
-  - {fileID: 1541877253}
   m_Father: {fileID: 1435083753}
   m_LocalEulerAnglesHint: {x: 75, y: 90, z: 0}
 --- !u!114 &654984203
@@ -11933,7 +11931,7 @@ GameObject:
   - component: {fileID: 763927452}
   - component: {fileID: 763927453}
   m_Layer: 0
-  m_Name: BattlefieldOverlay
+  m_Name: BrowserBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11947,12 +11945,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 763927450}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.19, z: 23}
-  m_LocalScale: {x: 50, y: 50, z: 1}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 15, z: -15}
+  m_LocalScale: {x: 100, y: 100, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 330585546}
+  m_Father: {fileID: 1302820460}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &763927452
 SpriteRenderer:
@@ -11995,9 +11993,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -1815889713
-  m_SortingLayer: 3
-  m_SortingOrder: 5
+  m_SortingLayerID: 1624649563
+  m_SortingLayer: 16
+  m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_FlipX: 0
@@ -21770,6 +21768,7 @@ Transform:
   - {fileID: 963159505}
   - {fileID: 1607976026}
   - {fileID: 1965117212}
+  - {fileID: 763927451}
   - {fileID: 278946543}
   - {fileID: 1044994182}
   - {fileID: 1744911441}
@@ -21833,7 +21832,7 @@ MonoBehaviour:
   _supplementalCardInfoLeft: {fileID: 771826220}
   _supplementalCardInfoRight: {fileID: 1146880180}
   _browser: {fileID: 1167298978}
-  _backgroundOverlay: {fileID: 763927453}
+  _browserBackground: {fileID: 763927453}
   _userDreamwell: {fileID: 979220814}
   _enemyDreamwell: {fileID: 1818363642}
   _dreamwellActivation: {fileID: 1288685203}
@@ -23625,6 +23624,7 @@ Transform:
   - {fileID: 788297806}
   - {fileID: 1987221022}
   - {fileID: 1336044148}
+  - {fileID: 1541877253}
   - {fileID: 2089258713}
   - {fileID: 456934529}
   - {fileID: 626250855}
@@ -23690,7 +23690,7 @@ MonoBehaviour:
   _supplementalCardInfoLeft: {fileID: 547011407}
   _supplementalCardInfoRight: {fileID: 601474231}
   _browser: {fileID: 1886409221}
-  _backgroundOverlay: {fileID: 1541877255}
+  _browserBackground: {fileID: 1541877255}
   _userDreamwell: {fileID: 1682023335}
   _enemyDreamwell: {fileID: 1408188857}
   _dreamwellActivation: {fileID: 209689866}
@@ -24591,7 +24591,7 @@ GameObject:
   - component: {fileID: 1541877254}
   - component: {fileID: 1541877255}
   m_Layer: 0
-  m_Name: BattlefieldOverlay
+  m_Name: BrowserBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24605,12 +24605,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1541877252}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 20, z: 8}
+  m_LocalRotation: {x: 0.4304593, y: 0.56098557, z: -0.4304593, w: 0.56098557}
+  m_LocalPosition: {x: 16.389072, y: 14.448978, z: -16}
   m_LocalScale: {x: 50, y: 50, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 654984202}
+  m_Father: {fileID: 1435083753}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1541877254
 SpriteRenderer:
@@ -26637,7 +26637,7 @@ MonoBehaviour:
   _internalGameContext: 0
   _objects: []
   _debugUpdateContinuously: 0
-  _offset: -1
+  _offset: 2.5
 --- !u!1001 &1686215495
 PrefabInstance:
   m_ObjectHideFlags: 0

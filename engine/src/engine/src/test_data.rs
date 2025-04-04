@@ -293,6 +293,23 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
             {
                 let sorting_key = card.position.sorting_key;
                 let position = if sorting_key % 5 == 1 {
+                    let add_to_stack = *ADD_TO_STACK.lock().unwrap();
+                    let pos = if add_to_stack {
+                        StackType::TargetingBothBattlefields
+                    } else {
+                        StackType::TargetingEnemyBattlefield
+                    };
+                    battle.cards[card_index] = card_view(Position::OnStack(pos), sorting_key);
+                    battle.cards[card_index].position.sorting_key = 500;
+                    if add_to_stack {
+                        for other_card in battle.cards.iter_mut() {
+                            if matches!(other_card.position.position, Position::OnStack(_)) {
+                                other_card.position.position =
+                                    Position::OnStack(StackType::TargetingBothBattlefields);
+                            }
+                        }
+                    }
+
                     battle.interface.screen_overlay = Some(select_target_message());
                     battle.interface.primary_action_button = None;
                     set_can_play_to_false(&mut battle);
@@ -309,7 +326,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                             }
                         }
                     }
-                    Position::OnStack(StackType::TargetingEnemyBattlefield)
+                    Position::OnStack(pos)
                 } else if sorting_key % 5 == 2 {
                     let add_to_stack = *ADD_TO_STACK.lock().unwrap();
                     battle.cards[card_index] = card_view(

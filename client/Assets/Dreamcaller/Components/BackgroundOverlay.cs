@@ -3,20 +3,14 @@
 using DG.Tweening;
 using UnityEngine;
 
-public class BackgroundOverlay : MonoBehaviour
+public class BrowserBackground : MonoBehaviour
 {
   [SerializeField] SpriteRenderer _overlay = null!;
   bool _isVisible = false;
 
   public bool IsVisible => _isVisible;
 
-  public enum DisplayOver
-  {
-    Battlefield,
-    Everything,
-  }
-
-  public void Show(DisplayOver displayOver, float alpha, Sequence? sequence)
+  public void Show(float alpha, Sequence? sequence)
   {
     if (_isVisible)
     {
@@ -26,15 +20,6 @@ public class BackgroundOverlay : MonoBehaviour
     _isVisible = true;
     _overlay.enabled = true;
     _overlay.color = Color.clear;
-    switch (displayOver)
-    {
-      case DisplayOver.Battlefield:
-        _overlay.sortingLayerName = "Default";
-        break;
-      case DisplayOver.Everything:
-        _overlay.sortingLayerName = "Top";
-        break;
-    }
 
     if (sequence != null)
     {

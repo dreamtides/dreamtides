@@ -78,6 +78,7 @@ namespace Dreamcaller.Layout
       GameContext.Battlefield => true,
       GameContext.PlayerStatus => true,
       GameContext.DiscardPile => true,
+      GameContext.GameModifiers => true,
       _ => false
     };
   }

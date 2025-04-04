@@ -26,7 +26,7 @@ namespace Dreamcaller.Layout
       if (!_isOpen)
       {
         OnShowStart();
-        registry.Layout.BackgroundOverlay.Show(BackgroundOverlay.DisplayOver.Battlefield, 0.75f, sequence);
+        registry.Layout.BrowserBackground.Show(0.75f, sequence);
         if (sequence != null)
         {
           sequence.AppendCallback(OnShow);
@@ -49,7 +49,7 @@ namespace Dreamcaller.Layout
       if (_isOpen)
       {
         OnHideStart();
-        registry.Layout.BackgroundOverlay.Hide(sequence);
+        registry.Layout.BrowserBackground.Hide(sequence);
         if (sequence != null)
         {
           sequence.AppendCallback(OnHidden);
