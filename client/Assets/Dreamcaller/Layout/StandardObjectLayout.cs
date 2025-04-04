@@ -145,8 +145,6 @@ namespace Dreamcaller.Layout
       var rotation = CalculateObjectRotation(index, count);
       var scale = CalculateObjectScale(index, count) ?? displayable.DefaultScale;
 
-      // displayable.SortingKey = SortingOrder(index, count);
-
       if (applyToChildren && displayable is ObjectLayout layout)
       {
         /// If this is a child layout, recursively animate its contained

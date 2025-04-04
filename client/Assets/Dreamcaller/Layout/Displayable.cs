@@ -134,6 +134,10 @@ namespace Dreamcaller.Layout
         {
           var oldContext = _internalGameContext;
           _internalGameContext = value;
+          if (_sortingGroup)
+          {
+            _sortingGroup.sortingLayerID = value.SortingLayerId();
+          }
           OnSetGameContext(oldContext, value);
         }
       }

@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using DG.Tweening;
 using Dreamcaller.Components;
+using Dreamcaller.Layout;
 using Dreamcaller.Masonry;
 using Dreamcaller.Schema;
 using Dreamcaller.Utils;
@@ -89,7 +90,7 @@ namespace Dreamcaller.Services
       _currentInfoZoom = card.CloneForInfoZoom();
       if (_currentInfoZoom.SortingGroup)
       {
-        _currentInfoZoom.SortingGroup.sortingLayerName = "Top";
+        _currentInfoZoom.SortingGroup.sortingLayerID = GameContext.InfoZoom.SortingLayerId();
       }
 
       var anchor = shouldShowOnLeft ? Registry.Layout.InfoZoomLeft : Registry.Layout.InfoZoomRight;

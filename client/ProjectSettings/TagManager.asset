@@ -41,14 +41,77 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Hand
+  - name: Hidden
     uniqueID: 3107703599
     locked: 0
-  - name: Effects
+  - name: BattlefieldBackground
     uniqueID: 672069627
     locked: 0
-  - name: Top
+  - name: Battlefield
     uniqueID: 2479077583
+    locked: 0
+  - name: PlayerStatus
+    uniqueID: 2074638925
+    locked: 0
+  - name: Deck
+    uniqueID: 2469222263
+    locked: 0
+  - name: DiscardPile
+    uniqueID: 2887456905
+    locked: 0
+  - name: PrimaryActionButton
+    uniqueID: 4174185377
+    locked: 0
+  - name: GameModifiers
+    uniqueID: 3951544605
+    locked: 0
+  - name: OnScreenStorage
+    uniqueID: 517345639
+    locked: 0
+  - name: Interface
+    uniqueID: 1402573125
+    locked: 0
+  - name: CardActivation
+    uniqueID: 585467307
+    locked: 0
+  - name: Stack
+    uniqueID: 241319633
+    locked: 0
+  - name: DrawnCards
+    uniqueID: 2250508145
+    locked: 0
+  - name: RevealedCards
+    uniqueID: 4122478283
+    locked: 0
+  - name: Hand
+    uniqueID: 222202603
+    locked: 0
+  - name: BrowserBackground
+    uniqueID: 1624649563
+    locked: 0
+  - name: Browser
+    uniqueID: 3077926559
+    locked: 0
+  - name: Effects
+    uniqueID: 270103837
+    locked: 0
+  - name: UserMessage
+    uniqueID: 1517910463
+    locked: 0
+  - name: InfoZoom
+    uniqueID: 1750796169
+    locked: 0
+  - name: Dragging
+    uniqueID: 2117650799
+    locked: 0
+  - name: BrowserOverlay
+    uniqueID: 723533933
+    locked: 0
+  - name: InterfaceOverlay
+    uniqueID: 1353028155
+    locked: 0
+  - name: SplashScreen
+    uniqueID: 2397976441
     locked: 0
   m_RenderingLayers:
   - Default

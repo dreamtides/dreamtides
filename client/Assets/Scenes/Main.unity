@@ -6954,6 +6954,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: UserStatus
       objectReference: {fileID: 0}
+    - target: {fileID: 1134871698008332319, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
+      propertyPath: _startingContext
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 2259028208598664077, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.9
