@@ -9406,7 +9406,7 @@ MonoBehaviour:
   _noPointsSound: {fileID: 8300000, guid: 92e209a799fa946439c66c987abac0ef, type: 3}
   _pointsSound: {fileID: 8300000, guid: 40ff546e59bd542c58259da9c6580b71, type: 3}
   _hitEffectPrefab: {fileID: 5647749798983906044, guid: 0ab1512bca508474988328505f3d7685, type: 3}
-  _scorePointsProjectilePrefab: {fileID: 1777540147525750836, guid: 084af1218a1e0ee41a43bdf9d52aea29, type: 3}
+  _scorePointsProjectilePrefab: {fileID: -1347453531924985717, guid: 7c63b2917711a453d991e0fc6f50deb0, type: 3}
 --- !u!114 &613451868
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9421,7 +9421,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _displayPauseDurationSeconds: 2.5
   _durationMultiplier: 1
-  _updateEnergyProjectilePrefab: {fileID: 1777540147525750836, guid: 084af1218a1e0ee41a43bdf9d52aea29, type: 3}
+  _updateEnergyProjectilePrefab: {fileID: 6283276072837885087, guid: e46e89594c1b24d50939d221c4c6ec69, type: 3}
   _startSound: {fileID: 8300000, guid: 41a02e63b56db4edcb017528155471e9, type: 3}
   _revealSound: {fileID: 8300000, guid: f02ba3db5a0ec4271927c8f84ed55731, type: 3}
   _fireSound: {fileID: 8300000, guid: 97d7e590715d24b7ab420ad274465588, type: 3}
