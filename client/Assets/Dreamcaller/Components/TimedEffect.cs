@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -10,6 +11,7 @@ namespace Dreamcaller.Components
   {
     [SerializeField] float _duration;
     [SerializeField] bool _looping;
+    public Action? OnDisable { get; set; }
 
     void OnEnable()
     {
@@ -57,6 +59,7 @@ namespace Dreamcaller.Components
       // Add a little extra time for safety
       yield return new WaitForSeconds(duration + 0.5f);
       gameObject.SetActive(value: false);
+      OnDisable?.Invoke();
     }
   }
 }

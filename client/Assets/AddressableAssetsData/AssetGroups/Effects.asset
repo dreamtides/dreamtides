@@ -15,8 +15,8 @@ MonoBehaviour:
   m_GroupName: Effects
   m_GUID: 6d53c802c8e16429f9f60127ce1df612
   m_SerializeEntries:
-  - m_GUID: 084af1218a1e0ee41a43bdf9d52aea29
-    m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile
+  - m_GUID: 013474595246f44709a65cbb8f45fd8e
+    m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       2 electro.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
@@ -27,21 +27,9 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 24c86df1468884d499ca1d5cb865a6f7
-    m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile
-      1 nature arrow.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 548856596ba4b4af5b77ca7342ccdd02
     m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Electric
       Magic/RPG3_ElectricMagic_Cast02.wav
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 5bfa9efc6d6124b84a9fdd0237d35dbf
-    m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Projectiles(transform)/Projectile
-      1 nature arrow trail.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -77,6 +65,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9ec5d918811f0417589df599e9da959f
     m_Address: Assets/ThirdParty/Hovl Studio/Magic hits/Prefabs/_Hit 10.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ebfed14b49cf94e6ca605658c88ec418
+    m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
+      1 nature arrow.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

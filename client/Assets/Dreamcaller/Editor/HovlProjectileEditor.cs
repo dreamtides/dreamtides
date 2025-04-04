@@ -3,6 +3,7 @@
 using System.Linq;
 using CGT.Pooling;
 using Dreamcaller.Components;
+using Dreamcaller.Layout;
 using UnityEditor;
 using UnityEngine;
 
@@ -48,14 +49,14 @@ namespace Dreamcaller.Editors
         added._projectileParticleSystem = projectile.projectilePS;
 
         // Set Play on Awake for all particle systems
-        SetPlayOnAwakeForParticleSystems(projectile.gameObject);
+        UpdateParticleSystems(projectile.gameObject);
         if (hit != null)
         {
-          SetPlayOnAwakeForParticleSystems(hit.gameObject);
+          UpdateParticleSystems(hit.gameObject);
         }
         if (flash != null)
         {
-          SetPlayOnAwakeForParticleSystems(flash.gameObject);
+          UpdateParticleSystems(flash.gameObject);
         }
 
         CleanUpChildren(projectile.transform);
@@ -66,13 +67,19 @@ namespace Dreamcaller.Editors
       }
     }
 
-    private void SetPlayOnAwakeForParticleSystems(GameObject gameObject)
+    private void UpdateParticleSystems(GameObject gameObject)
     {
       var particleSystems = gameObject.GetComponentsInChildren<ParticleSystem>(includeInactive: true);
       foreach (var ps in particleSystems)
       {
         var main = ps.main;
         main.playOnAwake = true;
+        main.scalingMode = ParticleSystemScalingMode.Hierarchy;
+        var renderer = ps.GetComponent<Renderer>();
+        if (renderer != null)
+        {
+          renderer.sortingLayerID = GameContext.Effects.SortingLayerId();
+        }
       }
     }
 
