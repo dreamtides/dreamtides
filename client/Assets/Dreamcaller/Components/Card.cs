@@ -45,9 +45,12 @@ namespace Dreamcaller.Components
     float _dragStartScreenZ;
     Vector3 _dragStartPosition;
     Vector3 _dragOffset;
+    float _lastMouseDownTime;
     bool _isDragging = false;
     bool _isDraggingForOrdering = false;
     bool _isDissolved = false;
+    bool _firedLongPress = false;
+    bool _draggedToThreshold = false;
     public CardView CardView => Errors.CheckNotNull(_cardView);
     GameObject? _cardTrail;
 
@@ -244,10 +247,9 @@ namespace Dreamcaller.Components
 
     public override void MouseDown()
     {
-      if (_registry.CapabilitiesService.CanInfoZoom(GameContext))
-      {
-        _registry.CardService.DisplayInfoZoom(this);
-      }
+      _lastMouseDownTime = Time.time;
+      _firedLongPress = false;
+      _draggedToThreshold = false;
 
       if (CanPlay() || CanSelectOrder())
       {
@@ -268,6 +270,15 @@ namespace Dreamcaller.Components
 
     public override void MouseDrag()
     {
+      if (_registry.CapabilitiesService.CanInfoZoom(GameContext) &&
+          !_firedLongPress &&
+          !_draggedToThreshold &&
+          Time.time - _lastMouseDownTime > 0.15f)
+      {
+        _firedLongPress = true;
+        _registry.CardService.DisplayInfoZoom(this);
+      }
+
       if (!_isDragging)
       {
         return;
@@ -283,6 +294,7 @@ namespace Dreamcaller.Components
       if (distanceDragged > 0.25f)
       {
         _registry.CardService.ClearInfoZoom();
+        _draggedToThreshold = true;
       }
     }
 
