@@ -303,7 +303,7 @@ namespace Dreamcaller.Components
       _registry.SoundService.PlayCardSound();
       _registry.CardService.ClearInfoZoom();
 
-      if (CardView.Revealed?.Actions?.OnClick is { } onClick)
+      if (CardView.Revealed?.Actions?.OnClick is { } onClick && isSameObject && (Time.time - _lastMouseDownTime < 1f))
       {
         _registry.ActionService.PerformAction(new UserAction
         {

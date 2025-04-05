@@ -49,7 +49,7 @@ namespace Dreamcaller.Services
         case false when _lastClicked:
           var last = _lastClicked;
           _lastClicked = null;
-          var objectAtClickPosition = ObjectAtClickPosition();
+          var objectAtClickPosition = ObjectAtPointerPosition();
           last.MouseUp(objectAtClickPosition == last);
           break;
       }
@@ -63,7 +63,7 @@ namespace Dreamcaller.Services
         return null;
       }
 
-      var fired = ObjectAtClickPosition();
+      var fired = ObjectAtPointerPosition();
       if (fired)
       {
         fired.MouseDown();
@@ -72,7 +72,7 @@ namespace Dreamcaller.Services
       return fired;
     }
 
-    Displayable? ObjectAtClickPosition()
+    Displayable? ObjectAtPointerPosition()
     {
       var allowedContexts = Registry.DocumentService.AllowedContextForClicks();
       var tapScreenPosition = PointerPosition();
