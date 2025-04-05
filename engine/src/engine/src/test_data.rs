@@ -44,7 +44,7 @@ static ORDER_SELECTOR_VISIBLE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::n
 static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<Mutex<std::collections::HashMap<CardId, Position>>> =
     LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
 static ADD_TO_STACK: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
-const STUFF_TO_DO: u32 = 3;
+const STUFF_TO_DO: u32 = 5;
 
 pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     let battle = scene_0(BattleId(Uuid::new_v4()));
@@ -227,6 +227,20 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                 }
 
                 PerformActionResponse { metadata, commands: CommandSequence::sequential(commands) }
+            } else if STUFF_TO_DO == 4 {
+                PerformActionResponse {
+                    metadata,
+                    commands: CommandSequence::sequential(vec![Command::DisplayGameMessage(
+                        GameMessageType::Victory,
+                    )]),
+                }
+            } else if STUFF_TO_DO == 5 {
+                PerformActionResponse {
+                    metadata,
+                    commands: CommandSequence::sequential(vec![Command::DisplayGameMessage(
+                        GameMessageType::Defeat,
+                    )]),
+                }
             } else {
                 // Find the first card in enemy hand
                 let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
