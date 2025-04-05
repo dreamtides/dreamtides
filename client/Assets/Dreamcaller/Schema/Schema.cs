@@ -304,6 +304,24 @@ namespace Dreamcaller.Schema
     public partial class DissolveCardCommand
     {
         /// <summary>
+        /// The color to use for the dissolve effect.
+        /// </summary>
+        [JsonProperty("color", Required = Required.Always)]
+        public DisplayColor Color { get; set; }
+
+        /// <summary>
+        /// The speed multiplier of the dissolve effect. Defaults to 1.
+        /// </summary>
+        [JsonProperty("dissolveSpeed")]
+        public double? DissolveSpeed { get; set; }
+
+        /// <summary>
+        /// The material to use for the dissolve effect.
+        /// </summary>
+        [JsonProperty("material", Required = Required.Always)]
+        public MaterialAddress Material { get; set; }
+
+        /// <summary>
         /// If true, dissolve will be played backwards to "create" the card.
         /// </summary>
         [JsonProperty("reverse", Required = Required.Always)]
@@ -316,6 +334,35 @@ namespace Dreamcaller.Schema
         /// </summary>
         [JsonProperty("target", Required = Required.Always)]
         public CardId Target { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a color with the given RGBA values represented as floats in the 0-1 range.
+    ///
+    /// The color to use for the dissolve effect.
+    /// </summary>
+    public partial class DisplayColor
+    {
+        [JsonProperty("alpha", Required = Required.Always)]
+        public double Alpha { get; set; }
+
+        [JsonProperty("blue", Required = Required.Always)]
+        public double Blue { get; set; }
+
+        [JsonProperty("green", Required = Required.Always)]
+        public double Green { get; set; }
+
+        [JsonProperty("red", Required = Required.Always)]
+        public double Red { get; set; }
+    }
+
+    /// <summary>
+    /// The material to use for the dissolve effect.
+    /// </summary>
+    public partial class MaterialAddress
+    {
+        [JsonProperty("material", Required = Required.Always)]
+        public string Material { get; set; }
     }
 
     public partial class DrawUserCardsCommand
@@ -704,24 +751,6 @@ namespace Dreamcaller.Schema
     {
         [JsonProperty("sprite", Required = Required.Always)]
         public string Sprite { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a color with the given RGBA values represented as floats in the 0-1 range.
-    /// </summary>
-    public partial class DisplayColor
-    {
-        [JsonProperty("alpha", Required = Required.Always)]
-        public double Alpha { get; set; }
-
-        [JsonProperty("blue", Required = Required.Always)]
-        public double Blue { get; set; }
-
-        [JsonProperty("green", Required = Required.Always)]
-        public double Green { get; set; }
-
-        [JsonProperty("red", Required = Required.Always)]
-        public double Red { get; set; }
     }
 
     public partial class DraggableNode

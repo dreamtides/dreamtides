@@ -1,4 +1,7 @@
-use core_data::display_types::{AudioClipAddress, EffectAddress, Milliseconds, ProjectileAddress};
+use core_data::display_color::DisplayColor;
+use core_data::display_types::{
+    AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
+};
 use core_data::identifiers::CardId;
 use core_data::numerics::{Energy, Points};
 use core_data::types::PlayerName;
@@ -139,6 +142,15 @@ pub struct DissolveCardCommand {
 
     /// If true, dissolve will be played backwards to "create" the card.
     pub reverse: bool,
+
+    /// The material to use for the dissolve effect.
+    pub material: MaterialAddress,
+
+    /// The color to use for the dissolve effect.
+    pub color: DisplayColor,
+
+    /// The speed multiplier of the dissolve effect. Defaults to 1.
+    pub dissolve_speed: Option<f64>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

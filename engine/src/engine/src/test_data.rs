@@ -7,7 +7,8 @@ use action_data::debug_action::DebugAction;
 use action_data::user_action::UserAction;
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::{
-    AudioClipAddress, EffectAddress, Milliseconds, ProjectileAddress, SpriteAddress, Url,
+    AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
+    SpriteAddress, Url,
 };
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
@@ -568,20 +569,33 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 commands: CommandSequence {
                     groups: vec![
                         ParallelCommandGroup { commands: vec![fire_projectile] },
-                        ParallelCommandGroup { commands: vec![
-                            Command::DissolveCard(DissolveCardCommand { target: card_id, reverse: false }),
-                        ] },
-                        ParallelCommandGroup { commands: vec![
-                            Command::UpdateBattle(UpdateBattleCommand {
-                                battle,
-                                update_sound: Some(AudioClipAddress::new(
-                                    "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Generic_SubtleWhoosh04.wav")),
-                            }),
-                            Command::DissolveCard(DissolveCardCommand {
+                        ParallelCommandGroup {
+                            commands: vec![Command::DissolveCard(DissolveCardCommand {
                                 target: card_id,
-                                reverse: true,
-                            }),
-                        ] },
+                                reverse: false,
+                                material: MaterialAddress::new(
+                                    "Assets/Content/Dissolves/Dissolve15.mat".to_string(),
+                                ),
+                                color: display_color::BLUE_500,
+                                dissolve_speed: None,
+                            })],
+                        },
+                        ParallelCommandGroup {
+                            commands: vec![
+                                Command::UpdateBattle(UpdateBattleCommand {
+                                    battle,
+                                    update_sound: Some(AudioClipAddress::new(
+                                        "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Generic_SubtleWhoosh04.wav")),
+                                }),
+                                Command::DissolveCard(DissolveCardCommand {
+                                    target: card_id,
+                                    reverse: true,
+                                    material: MaterialAddress::new("Assets/Content/Dissolves/Dissolve15.mat".to_string()),
+                                    color: display_color::BLUE_500,
+                                    dissolve_speed: None,
+                                }),
+                            ],
+                        },
                         ParallelCommandGroup { commands: vec![] },
                     ],
                 },

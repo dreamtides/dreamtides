@@ -108,7 +108,7 @@ namespace Dreamcaller.Components
     {
       _isDissolved = true;
       ToggleActiveElements();
-      yield return StartCoroutine(_cardImageDissolve.StartDissolve(command));
+      yield return StartCoroutine(_cardImageDissolve.StartDissolve(_registry, command));
 
       if (command.Reverse)
       {

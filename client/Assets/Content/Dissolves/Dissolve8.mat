@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: DissolveMaterial
+  m_Name: Dissolve8
   m_Shader: {fileID: 4800000, guid: 74814cb4b79e6a045b11d51772c4b3ea, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -50,11 +50,11 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AdvancedDissolveCutoutStandardMap1:
-        m_Texture: {fileID: 2800000, guid: 15156bfb2d3680b42b640ccf7d864400, type: 3}
+        m_Texture: {fileID: 2800000, guid: 4bf2f2d4474e8c54a9fccbdaa8fad103, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _AdvancedDissolveCutoutStandardMap2:
-        m_Texture: {fileID: 2800000, guid: c3bd6708d93ce374a9372e75f88fc25d, type: 3}
+        m_Texture: {fileID: 2800000, guid: d06375c236d59ed4daf50dcdda894283, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _AdvancedDissolveCutoutStandardMap3:
@@ -326,7 +326,7 @@ Material:
     - _AdvancedDissolveEdgeAdditionalColorMapOffset: {r: 0, g: 0, b: 0, a: 0}
     - _AdvancedDissolveEdgeAdditionalColorMapScroll: {r: 0, g: 0, b: 0, a: 0}
     - _AdvancedDissolveEdgeAdditionalColorMapTiling: {r: 1, g: 1, b: 1, a: 0}
-    - _AdvancedDissolveEdgeBaseColor: {r: 1, g: 0.7045614, b: 0, a: 1}
+    - _AdvancedDissolveEdgeBaseColor: {r: 1, g: 0, b: 0.18548632, a: 1}
     - _AdvancedDissolveEdgeBaseColorIntensity: {r: 0, g: 0, b: 0, a: 0}
     - _AdvancedDissolveEdgeUVDistortionMapOffset: {r: 0, g: 0, b: 0, a: 0}
     - _AdvancedDissolveEdgeUVDistortionMapScroll: {r: 0, g: 0, b: 0, a: 0}

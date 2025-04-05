@@ -76,6 +76,18 @@ impl SpriteAddress {
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
+pub struct MaterialAddress {
+    pub material: String,
+}
+
+impl MaterialAddress {
+    pub fn new(material: impl Into<String>) -> Self {
+        Self { material: material.into() }
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct FontAddress {
     pub font: String,
 }

@@ -21,9 +21,24 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 04684b9d669834a88915ac7cecda0ffd
+    m_Address: Assets/Content/Dissolves/Dissolve11.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0c7a1654ade614871b9dc468a3f3aec8
+    m_Address: Assets/Content/Dissolves/Dissolve14.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0d4c580a4710c48d2bce16c0efca1630
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       15 pink crystal.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 139907bfc7eb3494ca7621c898e6ac0f
+    m_Address: Assets/Content/Dissolves/Dissolve13.mat
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -48,6 +63,16 @@ MonoBehaviour:
   - m_GUID: 2c885be4bc30f46c68107ed76822b2b6
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       11 orange arrow.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2dfe6d7d82ed446d8bd9fa2e86bc9857
+    m_Address: Assets/Content/Dissolves/Dissolve5.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 38311384ca0854adfbc4d44a2fc1f62d
+    m_Address: Assets/Content/Dissolves/Dissolve1.mat
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -93,9 +118,24 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5ef0929c9dafb4b5884ffd8bcbece0fa
+    m_Address: Assets/Content/Dissolves/Dissolve4.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 65a7c851395434a48b13a97dc62e560c
+    m_Address: Assets/Content/Dissolves/Dissolve12.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 745935e0555824669946da81b3905841
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       14 blue rapid.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 75eb8c268a7634eb2a6e02646b0bbaa4
+    m_Address: Assets/Content/Dissolves/Dissolve10.mat
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -117,9 +157,19 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 842bc1afcaaa54976b0388ce94072089
+    m_Address: Assets/Content/Dissolves/Dissolve9.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8605807bc6cc948dd9ab7e2254b0012a
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       13 red laser.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 86d5668e828cd48e4a8171499454aec0
+    m_Address: Assets/Content/Dissolves/Dissolve7.mat
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -132,6 +182,11 @@ MonoBehaviour:
   - m_GUID: 8d7cbae9eb0d54811bdd662844b72046
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       20 pink arrow.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 90aeb77d1a2704964a5953b91400227e
+    m_Address: Assets/Content/Dissolves/Dissolve6.mat
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -150,6 +205,11 @@ MonoBehaviour:
   - m_GUID: 9923ce196f3004c15a141fab6be7b221
     m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic
       Magic and Impacts/RPG3_Magic2_Projectiles02.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9d1c9c13fabca4a2baeeb891ae2a9411
+    m_Address: Assets/Content/Dissolves/Dissolve3.mat
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -185,6 +245,21 @@ MonoBehaviour:
   - m_GUID: b66b13bfc2f9341d1b74615d72e4e11c
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       22 cute star.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: be471abb721854affa08b63a93ad7f62
+    m_Address: Assets/Content/Dissolves/Dissolve15.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bfe2934aca22b4c3a9b247ae6213a533
+    m_Address: Assets/Content/Dissolves/Dissolve2.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d12c6290ea0814236bb71ca2f4e160c2
+    m_Address: Assets/Content/Dissolves/Dissolve8.mat
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
