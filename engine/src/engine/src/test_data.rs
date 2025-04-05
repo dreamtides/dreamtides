@@ -990,7 +990,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
                 address: SpriteAddress::new("Assets/ThirdParty/GameAssets/CardImages/Standard/2521694543.png"),
             },
             name: "Titan of Forgotten Echoes".to_string(),
-            rules_text: "When you materialize your second character in a turn, return this character from your void to play.".to_string(),
+            rules_text: "When you \u{f0a3} materialize your second character in a turn, return this character from your void to play.".to_string(),
             outline_color: (position == Position::InHand(PlayerName::User)).then_some(display_color::GREEN),
             cost: Some(Energy(6)),
             produced: None,
