@@ -6,7 +6,7 @@ use masonry::flex_node::FlexNode;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::card_view::CardView;
+use crate::card_view::{CardPreviewView, CardView};
 
 /// Represents the visual state of an ongoing dream battle
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -29,6 +29,16 @@ pub struct BattleView {
 
     /// UI to display to the player.
     pub interface: InterfaceView,
+}
+
+/// Preview of a potential future state of a battle, shown e.g. in response to a
+/// card being selected to be played.
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct BattlePreviewView {
+    pub user: PlayerPreviewView,
+    pub enemy: PlayerPreviewView,
+    pub cards: Vec<CardPreviewView>,
 }
 
 /// User interaction options
@@ -97,4 +107,21 @@ pub struct PlayerView {
 
     /// Total spark for this player
     pub total_spark: Spark,
+}
+
+/// Preview of a potential future state of a player
+#[derive(Clone, Debug, Default, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct PlayerPreviewView {
+    /// New score total
+    pub score: Option<Points>,
+
+    /// New energy available to this player
+    pub energy: Option<Energy>,
+
+    /// New energy produced total
+    pub produced_energy: Option<Energy>,
+
+    /// New total spark for this player
+    pub total_spark: Option<Spark>,
 }

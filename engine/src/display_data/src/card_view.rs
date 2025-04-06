@@ -8,6 +8,7 @@ use masonry::flex_node::FlexNode;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use crate::battle_view::BattlePreviewView;
 use crate::object_position::ObjectPosition;
 
 /// Represents the visual state of a card or ability in a game
@@ -47,6 +48,19 @@ pub struct CardView {
 
     /// Represents the general category of card being displayed.
     pub prefab: CardPrefab,
+}
+
+/// Preview of a potential future state of a card.
+#[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct CardPreviewView {
+    pub card_id: CardId,
+
+    /// New cost value for this card
+    pub cost: Option<Energy>,
+
+    /// New spark value for this card
+    pub spark: Option<Spark>,
 }
 
 /// Visual state of a revealed card
@@ -114,6 +128,9 @@ pub struct CardActions {
 
     /// Action to perform when this card is clicked.
     pub on_click: Option<UserAction>,
+
+    /// Preview of the battle state after this card is played.
+    pub play_effect_preview: Option<BattlePreviewView>,
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]

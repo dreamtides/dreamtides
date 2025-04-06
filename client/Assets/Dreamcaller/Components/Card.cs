@@ -120,6 +120,33 @@ namespace Dreamcaller.Components
       }
     }
 
+    public void ApplyPreview(CardPreviewView preview, Color textColor)
+    {
+      if (preview.Cost != null)
+      {
+        _costText.text = preview.Cost.ToString();
+        _costText.color = textColor;
+      }
+
+      if (preview.Spark != null)
+      {
+        _sparkText.text = preview.Spark.ToString();
+        _battlefieldSparkText.text = preview.Spark.ToString();
+        _sparkText.color = textColor;
+        _battlefieldSparkText.color = textColor;
+      }
+    }
+
+    public void ClearPreview()
+    {
+      _costText.text = CardView.Revealed?.Cost?.ToString();
+      _sparkText.text = CardView.Revealed?.Spark?.ToString();
+      _battlefieldSparkText.text = CardView.Revealed?.Spark?.ToString();
+      _costText.color = Color.white;
+      _sparkText.color = Color.white;
+      _battlefieldSparkText.color = Color.white;
+    }
+
     /// <summary>
     /// Creates a clone of the card for large display in the info zoom.
     /// </summary>
@@ -273,7 +300,7 @@ namespace Dreamcaller.Components
       if (_registry.CapabilitiesService.CanInfoZoom(GameContext) &&
           !_firedLongPress &&
           !_draggedToThreshold &&
-          Time.time - _lastMouseDownTime > 0.15f)
+          Time.time - _lastMouseDownTime > 0.25f)
       {
         _firedLongPress = true;
         _registry.CardService.DisplayInfoZoom(this);
@@ -294,6 +321,10 @@ namespace Dreamcaller.Components
       if (distanceDragged > 0.25f)
       {
         _registry.CardService.ClearInfoZoom();
+        if (CardView.Revealed?.Actions.PlayEffectPreview is { } playEffectPreview)
+        {
+          _registry.CardEffectPreviewService.DisplayPlayEffectPreview(playEffectPreview);
+        }
         _draggedToThreshold = true;
       }
     }
@@ -302,6 +333,7 @@ namespace Dreamcaller.Components
     {
       _registry.SoundService.PlayCardSound();
       _registry.CardService.ClearInfoZoom();
+      _registry.CardEffectPreviewService.ClearPlayEffectPreview();
 
       if (CardView.Revealed?.Actions?.OnClick is { } onClick && isSameObject && (Time.time - _lastMouseDownTime < 1f))
       {

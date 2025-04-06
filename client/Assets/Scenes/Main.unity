@@ -9133,6 +9133,7 @@ GameObject:
   - component: {fileID: 613451867}
   - component: {fileID: 613451868}
   - component: {fileID: 613451869}
+  - component: {fileID: 613451870}
   m_Layer: 0
   m_Name: Registry
   m_TagString: Untagged
@@ -9202,6 +9203,7 @@ MonoBehaviour:
   _judgmentService: {fileID: 613451867}
   _dreamwellActivationService: {fileID: 613451868}
   _arrowService: {fileID: 613451869}
+  _cardEffectPreviewService: {fileID: 613451870}
   _bottomRightButton: {fileID: 262976513}
 --- !u!114 &613451855
 MonoBehaviour:
@@ -9441,6 +9443,18 @@ MonoBehaviour:
   _redArrowPrefab: {fileID: 5617475523399267133, guid: 35adb7ecc5b5f4ec4b9e024255e7e7fc, type: 3}
   _greenArrowPrefab: {fileID: 5617475523399267133, guid: 2dce2d5e6795c442a8eb420b6fdd0012, type: 3}
   _blueArrowPrefab: {fileID: 5617475523399267133, guid: 15ec0563e20114b42bc07f2653979033, type: 3}
+--- !u!114 &613451870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 613451850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a20a0fe8ed44403a8ea12a5da4817a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &625589745
 PrefabInstance:
   m_ObjectHideFlags: 0

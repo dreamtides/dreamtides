@@ -669,6 +669,12 @@ namespace Dreamcaller.Schema
         /// </summary>
         [JsonProperty("onPlaySound")]
         public AudioClipAddress OnPlaySound { get; set; }
+
+        /// <summary>
+        /// Preview of the battle state after this card is played.
+        /// </summary>
+        [JsonProperty("playEffectPreview")]
+        public BattlePreviewView PlayEffectPreview { get; set; }
     }
 
     public partial class OnClickClass
@@ -712,6 +718,73 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("target", Required = Required.Always)]
         public CardOrderSelectionTarget Target { get; set; }
+    }
+
+    /// <summary>
+    /// Preview of a potential future state of a battle, shown e.g. in response to a card being
+    /// selected to be played.
+    /// </summary>
+    public partial class BattlePreviewView
+    {
+        [JsonProperty("cards", Required = Required.Always)]
+        public List<CardPreviewView> Cards { get; set; }
+
+        [JsonProperty("enemy", Required = Required.Always)]
+        public PlayerPreviewView Enemy { get; set; }
+
+        [JsonProperty("user", Required = Required.Always)]
+        public PlayerPreviewView User { get; set; }
+    }
+
+    /// <summary>
+    /// Preview of a potential future state of a card.
+    /// </summary>
+    public partial class CardPreviewView
+    {
+        [JsonProperty("cardId", Required = Required.Always)]
+        public CardId CardId { get; set; }
+
+        /// <summary>
+        /// New cost value for this card
+        /// </summary>
+        [JsonProperty("cost")]
+        public long? Cost { get; set; }
+
+        /// <summary>
+        /// New spark value for this card
+        /// </summary>
+        [JsonProperty("spark")]
+        public long? Spark { get; set; }
+    }
+
+    /// <summary>
+    /// Preview of a potential future state of a player
+    /// </summary>
+    public partial class PlayerPreviewView
+    {
+        /// <summary>
+        /// New energy available to this player
+        /// </summary>
+        [JsonProperty("energy")]
+        public long? Energy { get; set; }
+
+        /// <summary>
+        /// New energy produced total
+        /// </summary>
+        [JsonProperty("producedEnergy")]
+        public long? ProducedEnergy { get; set; }
+
+        /// <summary>
+        /// New score total
+        /// </summary>
+        [JsonProperty("score")]
+        public long? Score { get; set; }
+
+        /// <summary>
+        /// New total spark for this player
+        /// </summary>
+        [JsonProperty("totalSpark")]
+        public long? TotalSpark { get; set; }
     }
 
     /// <summary>

@@ -14,8 +14,8 @@ use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::{CardFacing, PlayerName};
 use display_data::battle_view::{
-    BattleView, ButtonView, CardOrderSelectorView, InterfaceView, PlayerView,
-    PrimaryActionButtonView,
+    BattlePreviewView, BattleView, ButtonView, CardOrderSelectorView, InterfaceView,
+    PlayerPreviewView, PlayerView, PrimaryActionButtonView,
 };
 use display_data::card_view::{
     CardActions, CardEffects, CardFrame, CardPrefab, CardView, DisplayImage, RevealedCardView,
@@ -1029,6 +1029,13 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
             is_fast: false,
             actions: CardActions {
                 can_play: position == Position::InHand(PlayerName::User),
+                play_effect_preview: Some(BattlePreviewView {
+                    user: PlayerPreviewView {
+                        total_spark: Some(Spark(5)),
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                }),
                 ..Default::default()
             },
             effects: CardEffects::default(),

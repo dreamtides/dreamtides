@@ -1,6 +1,5 @@
 #nullable enable
 
-using System;
 using System.Collections;
 using DG.Tweening;
 using Dreamcaller.Components;

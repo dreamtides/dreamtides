@@ -68,6 +68,9 @@ namespace Dreamcaller.Services
     [SerializeField] ArrowService? _arrowService;
     public ArrowService ArrowService => Check(_arrowService);
 
+    [SerializeField] CardEffectPreviewService? _cardEffectPreviewService;
+    public CardEffectPreviewService CardEffectPreviewService => Check(_cardEffectPreviewService);
+
     [SerializeField] ControlledButton? _bottomRightButton;
     public ControlledButton BottomRightButton => Check(_bottomRightButton);
 
