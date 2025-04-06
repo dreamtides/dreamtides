@@ -732,6 +732,9 @@ namespace Dreamcaller.Schema
         [JsonProperty("enemy", Required = Required.Always)]
         public PlayerPreviewView Enemy { get; set; }
 
+        [JsonProperty("previewMessage")]
+        public FlexNode PreviewMessage { get; set; }
+
         [JsonProperty("user", Required = Required.Always)]
         public PlayerPreviewView User { get; set; }
     }
@@ -785,45 +788,6 @@ namespace Dreamcaller.Schema
         /// </summary>
         [JsonProperty("totalSpark")]
         public long? TotalSpark { get; set; }
-    }
-
-    /// <summary>
-    /// Special effects to display for this card
-    /// </summary>
-    public partial class CardEffects
-    {
-        /// <summary>
-        /// Projectile to display as a trail behind this card.
-        /// </summary>
-        [JsonProperty("cardTrail")]
-        public ProjectileAddress CardTrail { get; set; }
-    }
-
-    public partial class ProjectileAddress
-    {
-        [JsonProperty("projectile", Required = Required.Always)]
-        public string Projectile { get; set; }
-    }
-
-    /// <summary>
-    /// Image for this card
-    /// </summary>
-    public partial class DisplayImage
-    {
-        /// <summary>
-        /// Image texture address for this card
-        /// </summary>
-        [JsonProperty("address", Required = Required.Always)]
-        public SpriteAddress Address { get; set; }
-    }
-
-    /// <summary>
-    /// Image texture address for this card
-    /// </summary>
-    public partial class SpriteAddress
-    {
-        [JsonProperty("sprite", Required = Required.Always)]
-        public string Sprite { get; set; }
     }
 
     public partial class DraggableNode
@@ -1102,6 +1066,15 @@ namespace Dreamcaller.Schema
         public FlexWrap? Wrap { get; set; }
     }
 
+    /// <summary>
+    /// Image texture address for this card
+    /// </summary>
+    public partial class SpriteAddress
+    {
+        [JsonProperty("sprite", Required = Required.Always)]
+        public string Sprite { get; set; }
+    }
+
     public partial class BorderColor
     {
         [JsonProperty("bottom", Required = Required.Always)]
@@ -1355,6 +1328,36 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("onMouseUp")]
         public OnClickClass OnMouseUp { get; set; }
+    }
+
+    /// <summary>
+    /// Special effects to display for this card
+    /// </summary>
+    public partial class CardEffects
+    {
+        /// <summary>
+        /// Projectile to display as a trail behind this card.
+        /// </summary>
+        [JsonProperty("cardTrail")]
+        public ProjectileAddress CardTrail { get; set; }
+    }
+
+    public partial class ProjectileAddress
+    {
+        [JsonProperty("projectile", Required = Required.Always)]
+        public string Projectile { get; set; }
+    }
+
+    /// <summary>
+    /// Image for this card
+    /// </summary>
+    public partial class DisplayImage
+    {
+        /// <summary>
+        /// Image texture address for this card
+        /// </summary>
+        [JsonProperty("address", Required = Required.Always)]
+        public SpriteAddress Address { get; set; }
     }
 
     public partial class FireProjectileCommand
@@ -1688,11 +1691,6 @@ namespace Dreamcaller.Schema
     /// </summary>
     public enum DebugAction { DrawCard, PerformSomeAction, TriggerEnemyJudgment, TriggerUserJudgment };
 
-    /// <summary>
-    /// Frame to display for this card
-    /// </summary>
-    public enum CardFrame { Character, Default, Event };
-
     public enum FlexAlign { Auto, Center, FlexEnd, FlexStart, Stretch };
 
     public enum DimensionUnit { Percentage, Pixels, SafeAreaBottom, SafeAreaLeft, SafeAreaRight, SafeAreaTop, ViewportHeight, ViewportWidth };
@@ -1730,6 +1728,11 @@ namespace Dreamcaller.Schema
     public enum TouchScrollBehavior { Clamped, Elastic, Unrestricted };
 
     public enum SliderDirection { Horizontal, Vertical };
+
+    /// <summary>
+    /// Frame to display for this card
+    /// </summary>
+    public enum CardFrame { Character, Default, Event };
 
     /// <summary>
     /// Position category
@@ -1788,7 +1791,6 @@ namespace Dreamcaller.Schema
                 CardBrowserTypeConverter.Singleton,
                 BattleActionEnumConverter.Singleton,
                 DebugActionConverter.Singleton,
-                CardFrameConverter.Singleton,
                 FlexAlignConverter.Singleton,
                 DimensionUnitConverter.Singleton,
                 FlexDisplayStyleConverter.Singleton,
@@ -1808,6 +1810,7 @@ namespace Dreamcaller.Schema
                 ScrollBarVisibilityConverter.Singleton,
                 TouchScrollBehaviorConverter.Singleton,
                 SliderDirectionConverter.Singleton,
+                CardFrameConverter.Singleton,
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
         };
@@ -2516,52 +2519,6 @@ namespace Dreamcaller.Schema
         }
 
         public static readonly DebugActionConverter Singleton = new DebugActionConverter();
-    }
-
-    internal class CardFrameConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(CardFrame) || t == typeof(CardFrame?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "character":
-                    return CardFrame.Character;
-                case "default":
-                    return CardFrame.Default;
-                case "event":
-                    return CardFrame.Event;
-            }
-            throw new Exception("Cannot unmarshal type CardFrame");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (CardFrame)untypedValue;
-            switch (value)
-            {
-                case CardFrame.Character:
-                    serializer.Serialize(writer, "character");
-                    return;
-                case CardFrame.Default:
-                    serializer.Serialize(writer, "default");
-                    return;
-                case CardFrame.Event:
-                    serializer.Serialize(writer, "event");
-                    return;
-            }
-            throw new Exception("Cannot marshal type CardFrame");
-        }
-
-        public static readonly CardFrameConverter Singleton = new CardFrameConverter();
     }
 
     internal class FlexAlignConverter : JsonConverter
@@ -3581,5 +3538,51 @@ namespace Dreamcaller.Schema
         }
 
         public static readonly SliderDirectionConverter Singleton = new SliderDirectionConverter();
+    }
+
+    internal class CardFrameConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(CardFrame) || t == typeof(CardFrame?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "character":
+                    return CardFrame.Character;
+                case "default":
+                    return CardFrame.Default;
+                case "event":
+                    return CardFrame.Event;
+            }
+            throw new Exception("Cannot unmarshal type CardFrame");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (CardFrame)untypedValue;
+            switch (value)
+            {
+                case CardFrame.Character:
+                    serializer.Serialize(writer, "character");
+                    return;
+                case CardFrame.Default:
+                    serializer.Serialize(writer, "default");
+                    return;
+                case CardFrame.Event:
+                    serializer.Serialize(writer, "event");
+                    return;
+            }
+            throw new Exception("Cannot marshal type CardFrame");
+        }
+
+        public static readonly CardFrameConverter Singleton = new CardFrameConverter();
     }
 }

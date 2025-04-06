@@ -25,6 +25,7 @@ namespace Dreamcaller.Services
       if (_current != null)
       {
         ClearAppliedPreviews();
+        Registry.DocumentService.RenderScreenOverlay(null);
       }
       _current = null;
     }
@@ -41,6 +42,12 @@ namespace Dreamcaller.Services
 
       Registry.Layout.UserStatusDisplay.ApplyPlayerPreview(_current.User, _previewTextColor);
       Registry.Layout.EnemyStatusDisplay.ApplyPlayerPreview(_current.Enemy, _previewTextColor);
+
+      // Display preview message if present
+      if (_current.PreviewMessage != null)
+      {
+        Registry.DocumentService.RenderScreenOverlay(_current.PreviewMessage);
+      }
     }
 
     private void ClearAppliedPreviews()

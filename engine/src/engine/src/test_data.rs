@@ -1116,6 +1116,10 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
             is_fast: false,
             actions: CardActions {
                 can_play: position == Position::InHand(PlayerName::User),
+                play_effect_preview: Some(BattlePreviewView {
+                    preview_message: Some(hand_size_limit_message()),
+                    ..Default::default()
+                }),
                 ..Default::default()
             },
             effects: CardEffects::default(),
@@ -1450,6 +1454,53 @@ fn mulligan_message() -> FlexNode {
                 top: None,
                 right: Some(Dimension { unit: DimensionUnit::Pixels, value: 32.0 }),
                 bottom: Some(Dimension { unit: DimensionUnit::Pixels, value: 135.0 }),
+                left: Some(Dimension { unit: DimensionUnit::Pixels, value: 32.0 }),
+            }),
+            ..Default::default()
+        }),
+        children: vec![message],
+        ..Default::default()
+    }
+}
+
+fn hand_size_limit_message() -> FlexNode {
+    let style = FlexStyle {
+        background_color: Some(DisplayColor { red: 0.0, green: 0.0, blue: 0.0, alpha: 0.95 }),
+        border_radius: Some(BorderRadius {
+            top_left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            top_right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            bottom_right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            bottom_left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+        }),
+        padding: Some(DimensionGroup {
+            top: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            bottom: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+        }),
+        color: Some(DisplayColor { red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0 }),
+        font_size: Some(Dimension { unit: DimensionUnit::Pixels, value: 10.0 }),
+        min_height: Some(Dimension { unit: DimensionUnit::Pixels, value: 22.0 }),
+        white_space: Some(WhiteSpace::Normal),
+        text_align: Some(TextAlign::MiddleCenter),
+        ..Default::default()
+    };
+
+    let message = FlexNode {
+        node_type: Some(NodeType::Text(Text {
+            label: "Note: cards drawn in excess of 10 become \u{f7e4} instead.".into(),
+        })),
+        style: Some(style),
+        ..Default::default()
+    };
+
+    FlexNode {
+        style: Some(FlexStyle {
+            position: Some(FlexPosition::Absolute),
+            inset: Some(FlexInsets {
+                top: Some(Dimension { unit: DimensionUnit::Pixels, value: 50.0 }),
+                right: Some(Dimension { unit: DimensionUnit::Pixels, value: 32.0 }),
+                bottom: None,
                 left: Some(Dimension { unit: DimensionUnit::Pixels, value: 32.0 }),
             }),
             ..Default::default()

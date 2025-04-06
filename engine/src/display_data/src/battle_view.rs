@@ -39,6 +39,7 @@ pub struct BattlePreviewView {
     pub user: PlayerPreviewView,
     pub enemy: PlayerPreviewView,
     pub cards: Vec<CardPreviewView>,
+    pub preview_message: Option<FlexNode>,
 }
 
 /// User interaction options
