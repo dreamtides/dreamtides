@@ -58,22 +58,6 @@ namespace Dreamcaller.Services
       Registry.Layout.UserHand.ApplyLayout(TweenUtils.Sequence("DrawUserCardMoveToHand"));
     }
 
-    public bool IsPointerOverPlayCardArea()
-    {
-      var ray = Registry.Layout.MainCamera.ScreenPointToRay(Registry.InputService.PointerPosition());
-      var hits = Physics.RaycastNonAlloc(ray, _raycastHitsTempBuffer, 100);
-      for (var i = 0; i < hits; ++i)
-      {
-        var hit = _raycastHitsTempBuffer[i];
-        if (hit.collider == Registry.Layout.PlayCardArea)
-        {
-          return true;
-        }
-      }
-
-      return false;
-    }
-
     /// <summary>
     /// Displays a large format version of the provided card in the info zoom.
     /// </summary>

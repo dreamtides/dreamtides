@@ -56,6 +56,7 @@ namespace Dreamcaller.Components
     bool _draggedToThreshold = false;
     public CardView CardView => Errors.CheckNotNull(_cardView);
     GameObject? _cardTrail;
+    float _distanceDragged;
 
     public string Id => CardView.ClientId();
 
@@ -288,6 +289,7 @@ namespace Dreamcaller.Components
       _lastMouseDownTime = Time.time;
       _firedLongPress = false;
       _draggedToThreshold = false;
+      _distanceDragged = 0;
 
       if (CanPlay() || CanSelectOrder())
       {
@@ -323,13 +325,13 @@ namespace Dreamcaller.Components
       }
 
       var mousePosition = _registry.InputService.WorldPointerPosition(_dragStartScreenZ);
-      var distanceDragged = Vector2.Distance(mousePosition, _dragStartPosition);
-      var t = Mathf.Clamp01(distanceDragged / 2);
+      _distanceDragged = Vector2.Distance(mousePosition, _dragStartPosition);
+      var t = Mathf.Clamp01(_distanceDragged / 2);
       transform.position = _dragOffset + mousePosition;
       var rotation = Quaternion.Slerp(_initialDragRotation, Quaternion.Euler(Constants.CameraXAngle, 0, 0), t);
       transform.rotation = rotation;
 
-      if (distanceDragged > 0.25f)
+      if (_distanceDragged > 0.25f)
       {
         _registry.CardService.ClearInfoZoom();
         if (CardView.Revealed?.Actions.PlayEffectPreview is { } playEffectPreview)
@@ -457,7 +459,9 @@ namespace Dreamcaller.Components
         return true;
       }
 
-      return !_registry.CardService.IsPointerOverPlayCardArea();
+      var mousePosition = _registry.InputService.WorldPointerPosition(_dragStartScreenZ);
+      var zDistance = mousePosition.z - _dragStartPosition.z;
+      return zDistance < 1f;
     }
 
     bool CanPlay() => CardView.Revealed?.Actions.CanPlay == true &&

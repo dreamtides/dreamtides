@@ -72,9 +72,6 @@ namespace Dreamcaller.Layout
     [SerializeField] GameMessage? _gameMessage;
     public GameMessage GameMessage => Check(_gameMessage);
 
-    [SerializeField] MeshCollider _playCardArea = null!;
-    public MeshCollider PlayCardArea => Check(_playCardArea);
-
     [SerializeField] Transform _infoZoomLeft = null!;
     public Transform InfoZoomLeft => Check(_infoZoomLeft);
 
