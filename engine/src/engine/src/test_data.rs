@@ -966,9 +966,9 @@ fn scene_0(id: BattleId) -> BattleView {
             total_spark: Spark(0),
         },
         cards: [
-            cards_in_position(Position::InHand(PlayerName::User), 5, 3),
-            cards_in_position(Position::InVoid(PlayerName::User), 8, 6),
-            cards_in_position(Position::InDeck(PlayerName::User), 14, 20),
+            cards_in_position(Position::InHand(PlayerName::User), 5, 2),
+            cards_in_position(Position::InVoid(PlayerName::User), 16, 6),
+            cards_in_position(Position::InDeck(PlayerName::User), 22, 20),
             cards_in_position(Position::InHand(PlayerName::Enemy), 105, 3),
             cards_in_position(Position::InVoid(PlayerName::Enemy), 108, 6),
             cards_in_position(Position::InDeck(PlayerName::Enemy), 114, 20),

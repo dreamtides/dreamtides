@@ -6,13 +6,13 @@ using UnityEngine;
 
 namespace Dreamcaller.Layout
 {
-  public class ObjectLayoutTriple : ObjectLayout
+  public class UserHandLayout : ObjectLayout
   {
     [SerializeField] StandardObjectLayout _layout1 = null!;
     [SerializeField] StandardObjectLayout _layout2 = null!;
-    [SerializeField] StandardObjectLayout _layout3 = null!;
+    [SerializeField] ScrollableUserHandLayout _scrollableHand = null!;
     [SerializeField] int _useSecondLayoutAfter;
-    [SerializeField] int _useThirdLayoutAfter;
+    [SerializeField] int _useBrowserAfter;
 
     public override IReadOnlyList<Displayable> Objects
     {
@@ -21,7 +21,7 @@ namespace Dreamcaller.Layout
         var objects = new List<Displayable>();
         objects.AddRange(_layout1.Objects);
         objects.AddRange(_layout2.Objects);
-        objects.AddRange(_layout3.Objects);
+        objects.AddRange(_scrollableHand.Objects);
         return objects.AsReadOnly();
       }
     }
@@ -32,13 +32,13 @@ namespace Dreamcaller.Layout
       {
         _layout1.Add(displayable);
       }
-      else if (Objects.Count <= _useThirdLayoutAfter)
+      else if (Objects.Count <= _useBrowserAfter)
       {
         _layout2.Add(displayable);
       }
       else
       {
-        _layout3.Add(displayable);
+        _scrollableHand.Add(displayable);
       }
 
       RebalanceLayouts();
@@ -56,7 +56,7 @@ namespace Dreamcaller.Layout
     {
       _layout1.ApplyLayout(sequence);
       _layout2.ApplyLayout(sequence);
-      _layout3.ApplyLayout(sequence);
+      _scrollableHand.ApplyLayout(sequence);
       SetSortingKeys();
     }
 
@@ -66,13 +66,13 @@ namespace Dreamcaller.Layout
       {
         _layout1.ApplyTargetTransform(target, sequence);
       }
-      else if (Objects.Count <= _useThirdLayoutAfter)
+      else if (Objects.Count <= _useBrowserAfter)
       {
         _layout2.ApplyTargetTransform(target, sequence);
       }
       else
       {
-        _layout3.ApplyTargetTransform(target, sequence);
+        _scrollableHand.ApplyTargetTransform(target, sequence);
       }
       SetSortingKeys();
     }
@@ -86,7 +86,7 @@ namespace Dreamcaller.Layout
 
       _layout1.RemoveIfPresent(displayable);
       _layout2.RemoveIfPresent(displayable);
-      _layout3.RemoveIfPresent(displayable);
+      _scrollableHand.RemoveIfPresent(displayable);
 
       RebalanceLayouts();
     }
@@ -107,23 +107,34 @@ namespace Dreamcaller.Layout
     {
       var totalObjects = Objects.Count;
 
-      // Calculate target sizes based on thresholds
-      int targetLayout1Size, targetLayout2Size;
+      if (totalObjects > _useBrowserAfter)
+      {
+        while (_layout1.Objects.Count > 0)
+        {
+          var obj = _layout1.Objects[0];
+          _layout1.RemoveAtIndex(0);
+          _scrollableHand.Add(obj);
+        }
+
+        while (_layout2.Objects.Count > 0)
+        {
+          var obj = _layout2.Objects[0];
+          _layout2.RemoveAtIndex(0);
+          _scrollableHand.Add(obj);
+        }
+
+        return;
+      }
+
+      int targetLayout1Size;
 
       if (totalObjects <= _useSecondLayoutAfter)
       {
         targetLayout1Size = totalObjects;
-        targetLayout2Size = 0;
-      }
-      else if (totalObjects <= _useThirdLayoutAfter)
-      {
-        targetLayout1Size = totalObjects / 2;
-        targetLayout2Size = totalObjects - targetLayout1Size;
       }
       else
       {
-        targetLayout1Size = totalObjects / 3;
-        targetLayout2Size = totalObjects / 3;
+        targetLayout1Size = totalObjects / 2;
       }
 
       // Move objects between layout1 and layout2
@@ -141,23 +152,6 @@ namespace Dreamcaller.Layout
         var obj = _layout2.Objects[0];
         _layout2.RemoveAtIndex(0);
         _layout1.Add(obj);
-      }
-
-      // Move objects between layout2 and layout3
-      while (_layout2.Objects.Count > targetLayout2Size)
-      {
-        // Move from end of layout2 to start of layout3
-        var lastIndex = _layout2.Objects.Count - 1;
-        var obj = _layout2.Objects[lastIndex];
-        _layout2.RemoveAtIndex(lastIndex);
-        _layout3.Add(obj);
-      }
-      while (_layout2.Objects.Count < targetLayout2Size && _layout3.Objects.Count > 0)
-      {
-        // Move from start of layout3 to end of layout2
-        var obj = _layout3.Objects[0];
-        _layout3.RemoveAtIndex(0);
-        _layout2.Add(obj);
       }
     }
   }
