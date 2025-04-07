@@ -22,9 +22,9 @@ use display_data::card_view::{
 };
 use display_data::command::{
     ArrowStyle, Command, CommandSequence, DisplayArrow, DisplayArrowsCommand,
-    DisplayDreamwellActivationCommand, DisplayEffectCommand, DisplayJudgmentCommand,
-    DissolveCardCommand, DrawUserCardsCommand, FireProjectileCommand, GameMessageType,
-    GameObjectId, ParallelCommandGroup, UpdateBattleCommand,
+    DisplayDreamwellActivationCommand, DisplayEffectCommand, DisplayEnemyMessageCommand,
+    DisplayJudgmentCommand, DissolveCardCommand, DrawUserCardsCommand, FireProjectileCommand,
+    GameMessageType, GameObjectId, ParallelCommandGroup, UpdateBattleCommand,
 };
 use display_data::object_position::{ObjectPosition, Position, StackType};
 use display_data::request_data::{
@@ -44,7 +44,7 @@ static ORDER_SELECTOR_VISIBLE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::n
 static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<Mutex<std::collections::HashMap<CardId, Position>>> =
     LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
 static ADD_TO_STACK: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
-const STUFF_TO_DO: u32 = 5;
+const STUFF_TO_DO: u32 = 6;
 
 pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     let battle = scene_0(BattleId(Uuid::new_v4()));
@@ -217,7 +217,7 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                         sorting_key,
                     );
                     commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
-                    commands.push(Command::DisplayArrowsCommand(DisplayArrowsCommand {
+                    commands.push(Command::DisplayArrows(DisplayArrowsCommand {
                         arrows: vec![DisplayArrow {
                             source: GameObjectId::CardId(card_id),
                             target: GameObjectId::CardId(target_id),
@@ -240,6 +240,16 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                     metadata,
                     commands: CommandSequence::sequential(vec![Command::DisplayGameMessage(
                         GameMessageType::Defeat,
+                    )]),
+                }
+            } else if STUFF_TO_DO == 6 {
+                PerformActionResponse {
+                    metadata,
+                    commands: CommandSequence::sequential(vec![Command::DisplayEnemyMessage(
+                        DisplayEnemyMessageCommand {
+                            message: "1 card to void.".to_string(),
+                            show_duration: Milliseconds::new(1000),
+                        },
                     )]),
                 }
             } else {

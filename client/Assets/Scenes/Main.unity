@@ -5869,6 +5869,10 @@ PrefabInstance:
       propertyPath: _startingContext
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 1419594840991334233, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 1933970337777554216, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
       propertyPath: m_LocalPosition.z
       value: -1.13
@@ -5925,6 +5929,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2705748821687970090, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: -5317669338628401487, guid: 6349f93bbba7f4920b91936b35c34e5b, type: 2}
     - target: {fileID: 2890979179986655714, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
       propertyPath: m_LocalScale.x
       value: 1.5
@@ -5957,6 +5965,10 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 8581205909532990035, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5977,6 +5989,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3e19fcfded3da4682914e6536d1c459b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &368858825 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 316782417241459670, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
+  m_PrefabInstance: {fileID: 368858823}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb0e43659ef1e43a3b0fc74e9a7204d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &369714915
@@ -7015,6 +7038,10 @@ PrefabInstance:
       propertyPath: _startingContext
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 1419594840991334233, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 2259028208598664077, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.9
@@ -7067,6 +7094,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2705748821687970090, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: -5317669338628401487, guid: 6349f93bbba7f4920b91936b35c34e5b, type: 2}
     - target: {fileID: 3380541676553837138, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -21967,6 +21998,7 @@ MonoBehaviour:
   _gameModifiersDisplay: {fileID: 552589597}
   _onScreenStorage: {fileID: 574549273}
   _primaryActionButton: {fileID: 121130225}
+  _enemyMessage: {fileID: 368858825}
 --- !u!1 &1305327827
 GameObject:
   m_ObjectHideFlags: 0
@@ -23335,6 +23367,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e19fcfded3da4682914e6536d1c459b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1395752109 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3488630869222939344, guid: b30ec3ff71deb4574b7370cd7ad256ae, type: 3}
+  m_PrefabInstance: {fileID: 1395752106}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb0e43659ef1e43a3b0fc74e9a7204d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1395882936
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23825,6 +23868,7 @@ MonoBehaviour:
   _gameModifiersDisplay: {fileID: 482914639}
   _onScreenStorage: {fileID: 6969416}
   _primaryActionButton: {fileID: 882822325}
+  _enemyMessage: {fileID: 1395752109}
 --- !u!1001 &1436808300
 PrefabInstance:
   m_ObjectHideFlags: 0

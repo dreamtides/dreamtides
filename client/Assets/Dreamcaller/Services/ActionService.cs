@@ -199,9 +199,14 @@ namespace Dreamcaller.Services
           coroutines.Add(StartCoroutine(Registry.DreamwellActivationService.HandleDreamwellActivationCommand(command.DisplayDreamwellActivation)));
         }
 
-        if (command.DisplayArrowsCommand != null)
+        if (command.DisplayArrows != null)
         {
-          Registry.ArrowService.HandleDisplayArrowsCommand(command.DisplayArrowsCommand);
+          Registry.ArrowService.HandleDisplayArrowsCommand(command.DisplayArrows);
+        }
+
+        if (command.DisplayEnemyMessage != null)
+        {
+          Registry.Layout.EnemyMessage.Show(command.DisplayEnemyMessage);
         }
       }
 

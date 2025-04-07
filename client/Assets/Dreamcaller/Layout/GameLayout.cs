@@ -120,6 +120,9 @@ namespace Dreamcaller.Layout
     [SerializeField] PrimaryActionButton? _primaryActionButton;
     public PrimaryActionButton PrimaryActionButton => Check(_primaryActionButton);
 
+    [SerializeField] EnemyMessage? _enemyMessage;
+    public EnemyMessage EnemyMessage => Check(_enemyMessage);
+
     T Check<T>(T? value) where T : Object =>
         Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
   }

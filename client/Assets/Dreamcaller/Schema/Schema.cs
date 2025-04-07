@@ -110,8 +110,11 @@ namespace Dreamcaller.Schema
         [JsonProperty("displayDreamwellActivation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayDreamwellActivationCommand DisplayDreamwellActivation { get; set; }
 
-        [JsonProperty("displayArrowsCommand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayArrowsCommand DisplayArrowsCommand { get; set; }
+        [JsonProperty("displayArrows", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayArrowsCommand DisplayArrows { get; set; }
+
+        [JsonProperty("displayEnemyMessage", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayEnemyMessageCommand DisplayEnemyMessage { get; set; }
     }
 
     public partial class DisplayArrowsCommand
@@ -284,6 +287,15 @@ namespace Dreamcaller.Schema
     {
         [JsonProperty("audioClip", Required = Required.Always)]
         public string AudioClip { get; set; }
+    }
+
+    public partial class DisplayEnemyMessageCommand
+    {
+        [JsonProperty("message", Required = Required.Always)]
+        public string Message { get; set; }
+
+        [JsonProperty("showDuration", Required = Required.Always)]
+        public Milliseconds ShowDuration { get; set; }
     }
 
     public partial class DisplayJudgmentCommand

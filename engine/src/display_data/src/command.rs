@@ -68,7 +68,8 @@ pub enum Command {
     DrawUserCards(DrawUserCardsCommand),
     DisplayJudgment(DisplayJudgmentCommand),
     DisplayDreamwellActivation(DisplayDreamwellActivationCommand),
-    DisplayArrowsCommand(DisplayArrowsCommand),
+    DisplayArrows(DisplayArrowsCommand),
+    DisplayEnemyMessage(DisplayEnemyMessageCommand),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -242,6 +243,13 @@ pub enum ArrowStyle {
     Red,
     Blue,
     Green,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct DisplayEnemyMessageCommand {
+    pub message: String,
+    pub show_duration: Milliseconds,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
