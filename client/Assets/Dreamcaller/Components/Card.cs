@@ -468,6 +468,6 @@ namespace Dreamcaller.Components
       _registry.CapabilitiesService.CanPlayCards() &&
       GameContext == GameContext.Hand;
 
-    bool CanSelectOrder() => CardView.Revealed?.Actions.CanSelectOrder == true;
+    bool CanSelectOrder() => CardView.Revealed?.Actions.CanSelectOrder == true && GameContext == GameContext.Browser;
   }
 }
