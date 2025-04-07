@@ -61,6 +61,12 @@ pub struct CardPreviewView {
 
     /// New spark value for this card
     pub spark: Option<Spark>,
+
+    /// Icon to display over this card on the battlefield
+    pub battlefield_icon: Option<String>,
+
+    /// Color of the battlefield icon
+    pub battlefield_icon_color: Option<DisplayColor>,
 }
 
 /// Visual state of a revealed card

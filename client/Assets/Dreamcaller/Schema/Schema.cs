@@ -744,6 +744,18 @@ namespace Dreamcaller.Schema
     /// </summary>
     public partial class CardPreviewView
     {
+        /// <summary>
+        /// Icon to display over this card on the battlefield
+        /// </summary>
+        [JsonProperty("battlefieldIcon")]
+        public string BattlefieldIcon { get; set; }
+
+        /// <summary>
+        /// Color of the battlefield icon
+        /// </summary>
+        [JsonProperty("battlefieldIconColor")]
+        public DisplayColor BattlefieldIconColor { get; set; }
+
         [JsonProperty("cardId", Required = Required.Always)]
         public CardId CardId { get; set; }
 

@@ -18,7 +18,8 @@ use display_data::battle_view::{
     PlayerPreviewView, PlayerView, PrimaryActionButtonView,
 };
 use display_data::card_view::{
-    CardActions, CardEffects, CardFrame, CardPrefab, CardView, DisplayImage, RevealedCardView,
+    CardActions, CardEffects, CardFrame, CardPrefab, CardPreviewView, CardView, DisplayImage,
+    RevealedCardView,
 };
 use display_data::command::{
     ArrowStyle, Command, CommandSequence, DisplayArrow, DisplayArrowsCommand,
@@ -1030,10 +1031,19 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
             actions: CardActions {
                 can_play: position == Position::InHand(PlayerName::User),
                 play_effect_preview: Some(BattlePreviewView {
+                    preview_message: Some(character_limit_message()),
                     user: PlayerPreviewView {
                         total_spark: Some(Spark(5)),
                         ..Default::default()
                     },
+                    cards: vec![
+                        CardPreviewView {
+                            card_id: CardId::from_int(539),
+                            battlefield_icon: Some("\u{f06a}".to_string()),
+                            battlefield_icon_color: Some(display_color::RED_900),
+                            ..Default::default()
+                        }
+                    ],
                     ..Default::default()
                 }),
                 ..Default::default()
@@ -1479,7 +1489,7 @@ fn hand_size_limit_message() -> FlexNode {
             left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
         }),
         color: Some(DisplayColor { red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0 }),
-        font_size: Some(Dimension { unit: DimensionUnit::Pixels, value: 10.0 }),
+        font_size: Some(Dimension { unit: DimensionUnit::Pixels, value: 8.0 }),
         min_height: Some(Dimension { unit: DimensionUnit::Pixels, value: 22.0 }),
         white_space: Some(WhiteSpace::Normal),
         text_align: Some(TextAlign::MiddleCenter),
@@ -1499,9 +1509,54 @@ fn hand_size_limit_message() -> FlexNode {
             position: Some(FlexPosition::Absolute),
             inset: Some(FlexInsets {
                 top: Some(Dimension { unit: DimensionUnit::Pixels, value: 50.0 }),
-                right: Some(Dimension { unit: DimensionUnit::Pixels, value: 32.0 }),
+                right: Some(Dimension { unit: DimensionUnit::Pixels, value: 8.0 }),
                 bottom: None,
-                left: Some(Dimension { unit: DimensionUnit::Pixels, value: 32.0 }),
+                left: Some(Dimension { unit: DimensionUnit::Pixels, value: 8.0 }),
+            }),
+            ..Default::default()
+        }),
+        children: vec![message],
+        ..Default::default()
+    }
+}
+
+fn character_limit_message() -> FlexNode {
+    let style = FlexStyle {
+        background_color: Some(DisplayColor { red: 0.0, green: 0.0, blue: 0.0, alpha: 0.95 }),
+        border_radius: Some(BorderRadius {
+            top_left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            top_right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            bottom_right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            bottom_left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+        }),
+        padding: Some(DimensionGroup {
+            top: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            bottom: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+        }),
+        color: Some(DisplayColor { red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0 }),
+        font_size: Some(Dimension { unit: DimensionUnit::Pixels, value: 8.0 }),
+        min_height: Some(Dimension { unit: DimensionUnit::Pixels, value: 22.0 }),
+        white_space: Some(WhiteSpace::Normal),
+        text_align: Some(TextAlign::MiddleCenter),
+        ..Default::default()
+    };
+
+    let message = FlexNode {
+        node_type: Some(NodeType::Text(Text { label: "You have 8 characters in play. A character will be dissolved, with its spark permanently added to your total.".into() })),
+        style: Some(style),
+        ..Default::default()
+    };
+
+    FlexNode {
+        style: Some(FlexStyle {
+            position: Some(FlexPosition::Absolute),
+            inset: Some(FlexInsets {
+                top: Some(Dimension { unit: DimensionUnit::Pixels, value: 50.0 }),
+                right: Some(Dimension { unit: DimensionUnit::Pixels, value: 8.0 }),
+                bottom: None,
+                left: Some(Dimension { unit: DimensionUnit::Pixels, value: 8.0 }),
             }),
             ..Default::default()
         }),

@@ -37,6 +37,8 @@ namespace Dreamcaller.Components
     [SerializeField] ObjectLayout? _containedObjects;
     [SerializeField] ObjectLayout? _stackedObjects;
     [SerializeField] Transform _cardTrailPosition = null!;
+    [SerializeField] GameObject _battlefieldIconContainer = null!;
+    [SerializeField] TextMeshPro _battlefieldIcon = null!;
 
     bool _isRevealed = false;
     Registry _registry = null!;
@@ -135,6 +137,13 @@ namespace Dreamcaller.Components
         _sparkText.color = textColor;
         _battlefieldSparkText.color = textColor;
       }
+
+      if (preview.BattlefieldIcon != null)
+      {
+        _battlefieldIconContainer.SetActive(true);
+        _battlefieldIcon.text = preview.BattlefieldIcon;
+        _battlefieldIcon.color = MasonRenderer.ToUnityColor(preview.BattlefieldIconColor);
+      }
     }
 
     public void ClearPreview()
@@ -145,6 +154,7 @@ namespace Dreamcaller.Components
       _costText.color = Color.white;
       _sparkText.color = Color.white;
       _battlefieldSparkText.color = Color.white;
+      _battlefieldIconContainer.SetActive(false);
     }
 
     /// <summary>
