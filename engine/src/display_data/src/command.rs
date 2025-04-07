@@ -70,6 +70,7 @@ pub enum Command {
     DisplayDreamwellActivation(DisplayDreamwellActivationCommand),
     DisplayArrows(DisplayArrowsCommand),
     DisplayEnemyMessage(DisplayEnemyMessageCommand),
+    ToggleThinkingIndicator(ToggleThinkingIndicatorCommand),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -250,6 +251,12 @@ pub enum ArrowStyle {
 pub struct DisplayEnemyMessageCommand {
     pub message: String,
     pub show_duration: Milliseconds,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct ToggleThinkingIndicatorCommand {
+    pub show: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

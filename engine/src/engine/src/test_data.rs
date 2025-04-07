@@ -24,7 +24,8 @@ use display_data::command::{
     ArrowStyle, Command, CommandSequence, DisplayArrow, DisplayArrowsCommand,
     DisplayDreamwellActivationCommand, DisplayEffectCommand, DisplayEnemyMessageCommand,
     DisplayJudgmentCommand, DissolveCardCommand, DrawUserCardsCommand, FireProjectileCommand,
-    GameMessageType, GameObjectId, ParallelCommandGroup, UpdateBattleCommand,
+    GameMessageType, GameObjectId, ParallelCommandGroup, ToggleThinkingIndicatorCommand,
+    UpdateBattleCommand,
 };
 use display_data::object_position::{ObjectPosition, Position, StackType};
 use display_data::request_data::{
@@ -44,7 +45,7 @@ static ORDER_SELECTOR_VISIBLE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::n
 static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<Mutex<std::collections::HashMap<CardId, Position>>> =
     LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
 static ADD_TO_STACK: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
-const STUFF_TO_DO: u32 = 6;
+const STUFF_TO_DO: u32 = 7;
 
 pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     let battle = scene_0(BattleId(Uuid::new_v4()));
@@ -250,6 +251,13 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                             message: "1 card to void.".to_string(),
                             show_duration: Milliseconds::new(1000),
                         },
+                    )]),
+                }
+            } else if STUFF_TO_DO == 7 {
+                PerformActionResponse {
+                    metadata,
+                    commands: CommandSequence::sequential(vec![Command::ToggleThinkingIndicator(
+                        ToggleThinkingIndicatorCommand { show: true },
                     )]),
                 }
             } else {

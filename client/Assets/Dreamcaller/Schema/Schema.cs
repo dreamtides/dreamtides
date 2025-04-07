@@ -115,6 +115,9 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("displayEnemyMessage", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayEnemyMessageCommand DisplayEnemyMessage { get; set; }
+
+        [JsonProperty("toggleThinkingIndicator", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public ToggleThinkingIndicatorCommand ToggleThinkingIndicator { get; set; }
     }
 
     public partial class DisplayArrowsCommand
@@ -1412,6 +1415,12 @@ namespace Dreamcaller.Schema
 
         [JsonProperty("waitDuration")]
         public Milliseconds WaitDuration { get; set; }
+    }
+
+    public partial class ToggleThinkingIndicatorCommand
+    {
+        [JsonProperty("show", Required = Required.Always)]
+        public bool Show { get; set; }
     }
 
     public partial class UpdateBattleCommand

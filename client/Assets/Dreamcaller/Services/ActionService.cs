@@ -208,6 +208,11 @@ namespace Dreamcaller.Services
         {
           Registry.Layout.EnemyMessage.Show(command.DisplayEnemyMessage);
         }
+
+        if (command.ToggleThinkingIndicator != null)
+        {
+          Registry.Layout.ThinkingIndicator.SetActive(command.ToggleThinkingIndicator.Show);
+        }
       }
 
       foreach (var coroutine in coroutines)

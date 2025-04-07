@@ -120,6 +120,9 @@ namespace Dreamcaller.Layout
     [SerializeField] EnemyMessage? _enemyMessage;
     public EnemyMessage EnemyMessage => Check(_enemyMessage);
 
+    [SerializeField] GameObject? _thinkingIndicator;
+    public GameObject ThinkingIndicator => Check(_thinkingIndicator);
+
     T Check<T>(T? value) where T : Object =>
         Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
   }
