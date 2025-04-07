@@ -16,6 +16,7 @@ namespace Dreamcaller.Services
   public class LayoutService : Service
   {
     [SerializeField] Card _cardPrefab = null!;
+    [SerializeField] Card _eventCardPrefab = null!;
     [SerializeField] Card _tokenPrefab = null!;
     [SerializeField] Card _dreamwellPrefab = null!;
     [SerializeField] Card _enemyPrefab = null!;
@@ -51,6 +52,7 @@ namespace Dreamcaller.Services
             CardPrefab.Dreamwell => ComponentUtils.Instantiate(_dreamwellPrefab),
             CardPrefab.Enemy => ComponentUtils.Instantiate(_enemyPrefab),
             CardPrefab.Dreamsign => ComponentUtils.Instantiate(_dreamsignPrefab),
+            CardPrefab.Event => ComponentUtils.Instantiate(_eventCardPrefab),
             _ => ComponentUtils.Instantiate(_cardPrefab)
           };
           if (cardView.CreatePosition != null)

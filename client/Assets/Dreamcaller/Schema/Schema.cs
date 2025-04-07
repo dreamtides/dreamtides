@@ -587,12 +587,6 @@ namespace Dreamcaller.Schema
         public CardEffects Effects { get; set; }
 
         /// <summary>
-        /// Frame to display for this card
-        /// </summary>
-        [JsonProperty("frame", Required = Required.Always)]
-        public CardFrame Frame { get; set; }
-
-        /// <summary>
         /// Image for this card
         /// </summary>
         [JsonProperty("image", Required = Required.Always)]
@@ -1683,7 +1677,7 @@ namespace Dreamcaller.Schema
     /// <summary>
     /// Represents the general category of card being displayed.
     /// </summary>
-    public enum CardPrefab { Default, Dreamsign, Dreamwell, Enemy, Token };
+    public enum CardPrefab { Character, Dreamsign, Dreamwell, Enemy, Event, Token };
 
     /// <summary>
     /// Close the card browser
@@ -1740,11 +1734,6 @@ namespace Dreamcaller.Schema
     public enum TouchScrollBehavior { Clamped, Elastic, Unrestricted };
 
     public enum SliderDirection { Horizontal, Vertical };
-
-    /// <summary>
-    /// Frame to display for this card
-    /// </summary>
-    public enum CardFrame { Character, Default, Event };
 
     /// <summary>
     /// Position category
@@ -1822,7 +1811,6 @@ namespace Dreamcaller.Schema
                 ScrollBarVisibilityConverter.Singleton,
                 TouchScrollBehaviorConverter.Singleton,
                 SliderDirectionConverter.Singleton,
-                CardFrameConverter.Singleton,
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
         };
@@ -2262,14 +2250,16 @@ namespace Dreamcaller.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "default":
-                    return CardPrefab.Default;
+                case "character":
+                    return CardPrefab.Character;
                 case "dreamsign":
                     return CardPrefab.Dreamsign;
                 case "dreamwell":
                     return CardPrefab.Dreamwell;
                 case "enemy":
                     return CardPrefab.Enemy;
+                case "event":
+                    return CardPrefab.Event;
                 case "token":
                     return CardPrefab.Token;
             }
@@ -2286,8 +2276,8 @@ namespace Dreamcaller.Schema
             var value = (CardPrefab)untypedValue;
             switch (value)
             {
-                case CardPrefab.Default:
-                    serializer.Serialize(writer, "default");
+                case CardPrefab.Character:
+                    serializer.Serialize(writer, "character");
                     return;
                 case CardPrefab.Dreamsign:
                     serializer.Serialize(writer, "dreamsign");
@@ -2297,6 +2287,9 @@ namespace Dreamcaller.Schema
                     return;
                 case CardPrefab.Enemy:
                     serializer.Serialize(writer, "enemy");
+                    return;
+                case CardPrefab.Event:
+                    serializer.Serialize(writer, "event");
                     return;
                 case CardPrefab.Token:
                     serializer.Serialize(writer, "token");
@@ -3550,51 +3543,5 @@ namespace Dreamcaller.Schema
         }
 
         public static readonly SliderDirectionConverter Singleton = new SliderDirectionConverter();
-    }
-
-    internal class CardFrameConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(CardFrame) || t == typeof(CardFrame?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "character":
-                    return CardFrame.Character;
-                case "default":
-                    return CardFrame.Default;
-                case "event":
-                    return CardFrame.Event;
-            }
-            throw new Exception("Cannot unmarshal type CardFrame");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (CardFrame)untypedValue;
-            switch (value)
-            {
-                case CardFrame.Character:
-                    serializer.Serialize(writer, "character");
-                    return;
-                case CardFrame.Default:
-                    serializer.Serialize(writer, "default");
-                    return;
-                case CardFrame.Event:
-                    serializer.Serialize(writer, "event");
-                    return;
-            }
-            throw new Exception("Cannot marshal type CardFrame");
-        }
-
-        public static readonly CardFrameConverter Singleton = new CardFrameConverter();
     }
 }

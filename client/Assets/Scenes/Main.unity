@@ -9169,6 +9169,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cardPrefab: {fileID: 8215946370556705966, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
+  _eventCardPrefab: {fileID: 1728281907688477115, guid: 027115e5635924b31be05517b1165552, type: 3}
   _tokenPrefab: {fileID: 541007035191917201, guid: 43f7112fc2cf849599a2b9442170a621, type: 3}
   _dreamwellPrefab: {fileID: 631307711510562611, guid: e5c8e79cb6a34405f84d625fa9bbfe39, type: 3}
   _enemyPrefab: {fileID: 3544012458288250925, guid: f12dabf436baa48379c54e3be923188f, type: 3}

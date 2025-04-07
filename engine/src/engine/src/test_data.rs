@@ -18,8 +18,7 @@ use display_data::battle_view::{
     PlayerPreviewView, PlayerView, PrimaryActionButtonView,
 };
 use display_data::card_view::{
-    CardActions, CardEffects, CardFrame, CardPrefab, CardPreviewView, CardView, DisplayImage,
-    RevealedCardView,
+    CardActions, CardEffects, CardPrefab, CardPreviewView, CardView, DisplayImage, RevealedCardView,
 };
 use display_data::command::{
     ArrowStyle, Command, CommandSequence, DisplayArrow, DisplayArrowsCommand,
@@ -1025,7 +1024,6 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
             produced: None,
             spark: Some(Spark(4)),
             card_type: "Ancient".to_string(),
-            frame: CardFrame::Character,
             supplemental_card_info: flex_node("<b>Materialize</b>: A character entering play."),
             is_fast: false,
             actions: CardActions {
@@ -1054,7 +1052,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
         card_facing: CardFacing::FaceUp,
         create_position: None,
         destroy_position: None,
-        prefab: CardPrefab::Default,
+        prefab: CardPrefab::Character,
     }
 }
 
@@ -1077,7 +1075,6 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
             produced: None,
             spark: None,
             card_type: "Event".to_string(),
-            frame: CardFrame::Event,
             supplemental_card_info: flex_node(
                 "<b>Discover</b>: Pick one of 4 cards with different types to put into your hand.",
             ),
@@ -1093,7 +1090,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
         card_facing: CardFacing::FaceUp,
         create_position: None,
         destroy_position: None,
-        prefab: CardPrefab::Default,
+        prefab: CardPrefab::Event,
     }
 }
 
@@ -1120,7 +1117,6 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
             produced: None,
             spark: Some(Spark(0)),
             card_type: "Tinkerer".to_string(),
-            frame: CardFrame::Character,
             supplemental_card_info: flex_node(
                 "<b>Judgment</b>: Triggers at the start of your turn."),
             is_fast: false,
@@ -1138,7 +1134,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
         card_facing: CardFacing::FaceUp,
         create_position: None,
         destroy_position: None,
-        prefab: CardPrefab::Default,
+        prefab: CardPrefab::Event,
     }
 }
 
@@ -1163,7 +1159,6 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
             produced: None,
             spark: Some(Spark(0)),
             card_type: "Trooper".to_string(),
-            frame: CardFrame::Character,
             supplemental_card_info: None,
             is_fast: false,
             actions: CardActions {
@@ -1176,7 +1171,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
         card_facing: CardFacing::FaceUp,
         create_position: None,
         destroy_position: None,
-        prefab: CardPrefab::Default,
+        prefab: CardPrefab::Character,
     }
 }
 
@@ -1200,7 +1195,6 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
             produced: None,
             spark: None,
             card_type: "Event".to_string(),
-            frame: CardFrame::Event,
             supplemental_card_info: flex_node(
                 "<b>Reclaim</b>: You may play this card from your void, then banish it.",
             ),
@@ -1237,7 +1231,6 @@ fn enemy_card(position: Position, sorting_key: u32) -> CardView {
             produced: None,
             spark: None,
             card_type: "Enemy".to_string(),
-            frame: CardFrame::Default,
             supplemental_card_info: flex_node(
                 "<b>Judgment</b>: Triggers at the start of enemy's turn.",
             ),
@@ -1272,7 +1265,6 @@ fn dreamsign_card(position: Position, sorting_key: u32) -> CardView {
             produced: None,
             spark: None,
             card_type: "Dreamsign".to_string(),
-            frame: CardFrame::Default,
             supplemental_card_info: flex_node(
                 "<b>Judgment</b>: Triggers at the start of enemy's turn.",
             ),
@@ -1306,7 +1298,6 @@ fn dreamwell_card(position: Position, sorting_key: u32) -> CardView {
             produced: Some(Energy(2)),
             spark: None,
             card_type: "Dreamwell".to_string(),
-            frame: CardFrame::Default,
             supplemental_card_info: None,
             is_fast: false,
             actions: CardActions::default(),
@@ -1340,7 +1331,6 @@ fn game_modifier_card(position: Position, sorting_key: u32) -> CardView {
             produced: None,
             spark: None,
             card_type: "Game Modifier".to_string(),
-            frame: CardFrame::Event,
             supplemental_card_info: None,
             is_fast: false,
             actions: CardActions::default(),

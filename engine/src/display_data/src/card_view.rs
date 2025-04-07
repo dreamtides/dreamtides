@@ -97,9 +97,6 @@ pub struct RevealedCardView {
     /// Outline color of this card
     pub outline_color: Option<DisplayColor>,
 
-    /// Frame to display for this card
-    pub frame: CardFrame,
-
     /// Additional help text about this card, describing its abilities.
     pub supplemental_card_info: Option<FlexNode>,
 
@@ -149,17 +146,10 @@ pub struct CardEffects {
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum CardPrefab {
-    Default,
+    Character,
+    Event,
     Token,
     Dreamwell,
     Enemy,
     Dreamsign,
-}
-
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub enum CardFrame {
-    Default,
-    Character,
-    Event,
 }
