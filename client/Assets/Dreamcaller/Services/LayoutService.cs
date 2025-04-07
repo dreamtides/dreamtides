@@ -85,8 +85,10 @@ namespace Dreamcaller.Services
         }
       }
 
-      if (sequence != null)
+      if (sequence != null && sequence.Duration() > 0)
       {
+        // WaitForCompletion takes ~50ms on an empty Sequence, so skip it if
+        // there is no duration.
         yield return sequence.WaitForCompletion();
       }
     }

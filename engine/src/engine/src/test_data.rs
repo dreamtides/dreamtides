@@ -69,6 +69,7 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
         DebugAction::DrawCard => {
             let mut commands = vec![];
             let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+            commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
             let card = draw_card(&mut battle);
             commands.push(Command::DrawUserCards(DrawUserCardsCommand {
                 cards: vec![card.unwrap()],
