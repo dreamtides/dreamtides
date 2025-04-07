@@ -13,6 +13,8 @@ namespace Dreamcaller.Components
     [SerializeField] Registry _registry = null!;
     [SerializeField] RectTransform _rectTransform = null!;
     [SerializeField] float _distanceFromCamera = 10.0f;
+    [SerializeField] bool _xCoordinateOnly;
+    [SerializeField] ObjectLayout? _toUpdate;
 
     public IEnumerator Start()
     {
@@ -21,10 +23,22 @@ namespace Dreamcaller.Components
       var screenPoint = TransformUtils.RectTransformToScreenSpace(_rectTransform).center;
       var anchor = _registry.Layout.MainCamera.ScreenToWorldPoint(
           new Vector3(screenPoint.x, screenPoint.y, _distanceFromCamera));
-      transform.position = anchor;
+      if (_xCoordinateOnly)
+      {
+        transform.position = new Vector3(anchor.x, transform.position.y, transform.position.z);
+      }
+      else
+      {
+        transform.position = anchor;
+      }
+
       if (GetComponent<ObjectLayout>() is { } layout)
       {
         layout.ApplyLayout();
+      }
+      if (_toUpdate)
+      {
+        _toUpdate.ApplyLayout();
       }
     }
   }
