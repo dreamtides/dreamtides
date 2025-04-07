@@ -15,7 +15,7 @@ namespace Dreamcaller.Services
   {
     readonly RaycastHit[] _raycastHitsTempBuffer = new RaycastHit[8];
     Card? _currentInfoZoom;
-
+    bool _hidCloseButton;
     public IEnumerator HandleDrawUserCards(DrawUserCardsCommand command)
     {
       for (var i = 0; i < command.Cards.Count; ++i)
@@ -85,7 +85,15 @@ namespace Dreamcaller.Services
       }
 
       ClearInfoZoom();
+
       var shouldShowOnLeft = Registry.InputService.PointerPosition().x > Screen.width / 2.0;
+
+      // Close button overlaps infozoom
+      if (!shouldShowOnLeft)
+      {
+        _hidCloseButton = Registry.Layout.Browser.SetCloseButtonVisible(false);
+      }
+
       _currentInfoZoom = card.CloneForInfoZoom();
       if (_currentInfoZoom.SortingGroup)
       {
@@ -131,6 +139,12 @@ namespace Dreamcaller.Services
     public void ClearInfoZoom()
     {
       Registry.DocumentService.ClearInfoZoom();
+      if (_hidCloseButton)
+      {
+        Registry.Layout.Browser.SetCloseButtonVisible(true);
+        _hidCloseButton = false;
+      }
+
       if (_currentInfoZoom)
       {
         if (_currentInfoZoom.Parent)

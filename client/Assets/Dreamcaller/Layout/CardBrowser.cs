@@ -25,22 +25,33 @@ namespace Dreamcaller.Layout
 
     protected override void OnShowComplete()
     {
-      _closeButton.gameObject.SetActive(true);
+      SetCloseButtonVisible(true);
     }
 
     protected override void OnHideComplete()
     {
-      _closeButton.gameObject.SetActive(false);
+      SetCloseButtonVisible(false);
     }
 
     public override void Hide(Registry registry, Sequence? sequence)
     {
       if (_isOpen)
       {
-        _closeButton.gameObject.SetActive(false);
+        SetCloseButtonVisible(false);
       }
 
       base.Hide(registry, sequence);
+    }
+
+    public bool SetCloseButtonVisible(bool visible)
+    {
+      if (_closeButton.gameObject.activeSelf == visible)
+      {
+        return false;
+      }
+
+      _closeButton.gameObject.SetActive(visible);
+      return true;
     }
 
     protected override Vector3 CalculateObjectPosition(int index, int count)
