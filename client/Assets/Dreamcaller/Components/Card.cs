@@ -334,7 +334,7 @@ namespace Dreamcaller.Components
       if (_distanceDragged > 0.25f)
       {
         _registry.CardService.ClearInfoZoom();
-        if (CardView.Revealed?.Actions.PlayEffectPreview is { } playEffectPreview)
+        if (CardView.Revealed?.Actions.PlayEffectPreview is { } playEffectPreview && !_isDraggingForOrdering)
         {
           _registry.CardEffectPreviewService.DisplayPlayEffectPreview(playEffectPreview);
         }
@@ -359,15 +359,7 @@ namespace Dreamcaller.Components
 
       if (_isDragging)
       {
-        if (ShouldReturnToPreviousParentOnRelease())
-        {
-          _registry.LayoutService.AddToParent(this);
-          _registry.LayoutService.RunAnimations(() =>
-          {
-            _isDragging = false;
-          });
-        }
-        else if (_isDraggingForOrdering)
+        if (_isDraggingForOrdering)
         {
           _isDragging = false;
           _isDraggingForOrdering = false;
@@ -385,6 +377,14 @@ namespace Dreamcaller.Components
           };
 
           _registry.ActionService.PerformAction(action);
+        }
+        else if (ShouldReturnToPreviousParentOnRelease())
+        {
+          _registry.LayoutService.AddToParent(this);
+          _registry.LayoutService.RunAnimations(() =>
+          {
+            _isDragging = false;
+          });
         }
         else
         {
