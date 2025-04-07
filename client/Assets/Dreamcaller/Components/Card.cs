@@ -24,6 +24,7 @@ namespace Dreamcaller.Components
     [SerializeField] SpriteRenderer _cardImage = null!;
     [SerializeField] SpriteRenderer _battlefieldCardImage = null!;
     [SerializeField] DissolveEffect _cardImageDissolve = null!;
+    [SerializeField] BoxCollider _cardCollider = null!;
     [SerializeField] Renderer _cardBack = null!;
     [SerializeField] Renderer _outline = null!;
     [SerializeField] SpriteRenderer _battlefieldOutline = null!;
@@ -435,6 +436,8 @@ namespace Dreamcaller.Components
         _battlefieldCardFront.gameObject.SetActive(true);
         _battlefieldSparkBackground.gameObject.SetActive(
             GameContext != GameContext.DiscardPile && CardView.Revealed?.Spark != null);
+        _cardCollider.center = Vector3.zero;
+        _cardCollider.size = new Vector3(2.5f, 3f, 1f);
       }
       else
       {
@@ -442,6 +445,8 @@ namespace Dreamcaller.Components
         _cardFront.gameObject.SetActive(true);
         _battlefieldCardFront.gameObject.SetActive(false);
         _sparkBackground.gameObject.SetActive(CardView.Revealed?.Spark != null);
+        _cardCollider.center = new Vector3(0, -0.5f, 0);
+        _cardCollider.size = new Vector3(2.5f, 4f, 1f);
       }
     }
 

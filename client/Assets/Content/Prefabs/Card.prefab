@@ -367,7 +367,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &9139255936787382272
 Transform:
   m_ObjectHideFlags: 0
@@ -1028,7 +1028,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5304334944730395346
 Transform:
   m_ObjectHideFlags: 0
@@ -1527,6 +1527,7 @@ MonoBehaviour:
   _cardImage: {fileID: 5442503120378194473}
   _battlefieldCardImage: {fileID: 3051495475621405458}
   _cardImageDissolve: {fileID: 6359641432255363025}
+  _cardCollider: {fileID: 5680000531262599633}
   _cardBack: {fileID: 2565455935476004323}
   _outline: {fileID: 6363849548364678257}
   _battlefieldOutline: {fileID: 5211427439138302304}
@@ -1561,7 +1562,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.45, y: 4, z: 0.1}
+  m_Size: {x: 2.5, y: 4, z: 0.1}
   m_Center: {x: 0, y: -0.5, z: 0}
 --- !u!114 &5379523554163701485
 MonoBehaviour:
