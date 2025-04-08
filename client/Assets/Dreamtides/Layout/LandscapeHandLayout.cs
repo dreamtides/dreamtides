@@ -53,7 +53,7 @@ namespace Dreamtides.Layout
         case 1:
           return 0.5f;
         case 2:
-          return new float[] { 0.4f, 0.6f }[cardIndex];
+          return new float[] { 0.45f, 0.55f }[cardIndex];
         case 3:
           return new float[] { 0.4f, 0.5f, 0.6f }[cardIndex];
         case 4:
