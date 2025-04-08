@@ -296,7 +296,12 @@ namespace Dreamcaller.Components
       if (GameContext == GameContext.Hand)
       {
         // Jump to large size when in hand
-        var target = transform.position + new Vector3(0, 3, 1.75f);
+        var screenZ = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
+        var worldPosition = _registry.InputService.WorldPointerPosition(screenZ);
+        var offset = gameObject.transform.position - worldPosition;
+
+        // Keep card above user's finger on mobile so they can read it.
+        var target = transform.position + new Vector3(0, 3, Mathf.Max(1.75f, 3f - offset.z));
         target.x = Mathf.Clamp(target.x, -1f, 1f);
         target.y = Mathf.Clamp(target.y, 20f, 25f);
         target.z = Mathf.Clamp(target.z, -25f, -20f);
