@@ -29,11 +29,11 @@ namespace Dreamcaller.Services
       {
         case GameContext.Browser:
         case GameContext.BrowserOverlay:
-        case GameContext.Stack:
         case GameContext.Dragging:
-        case GameContext.Hand:
           return true;
         case GameContext.Battlefield:
+        case GameContext.Hand:
+        case GameContext.Stack:
         case GameContext.GameModifiers:
           return !AnyBrowserOpen();
         default:

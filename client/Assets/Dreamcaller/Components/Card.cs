@@ -51,8 +51,7 @@ namespace Dreamcaller.Components
     bool _isDraggingFromHand = false;
     bool _isDraggingForOrdering = false;
     bool _isDissolved = false;
-    bool _firedLongPress = false;
-    bool _draggedToThreshold = false;
+    bool _draggedToClearThreshold = false;
     bool _draggedToPlayThreshold = false;
     public CardView CardView => Errors.CheckNotNull(_cardView);
     GameObject? _cardTrail;
@@ -287,12 +286,11 @@ namespace Dreamcaller.Components
     public override void MouseDown()
     {
       _lastMouseDownTime = Time.time;
-      _firedLongPress = false;
-      _draggedToThreshold = false;
+      _draggedToClearThreshold = false;
       _draggedToPlayThreshold = false;
       _distanceDragged = 0;
 
-      if (GameContext == GameContext.Hand)
+      if (GameContext == GameContext.Hand && !_registry.CapabilitiesService.AnyBrowserOpen())
       {
         // Jump to large size when in hand
         var screenZ = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
@@ -306,6 +304,10 @@ namespace Dreamcaller.Components
         target.z = Mathf.Clamp(target.z, -25f, -20f);
         transform.position = target;
         transform.rotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0);
+      }
+      else if (_registry.CapabilitiesService.CanInfoZoom(GameContext) && !_draggedToClearThreshold)
+      {
+        _registry.CardService.DisplayInfoZoom(this);
       }
 
       if (CanPlay() || CanSelectOrder())
@@ -328,16 +330,6 @@ namespace Dreamcaller.Components
 
     public override void MouseDrag()
     {
-      if (_registry.CapabilitiesService.CanInfoZoom(GameContext) &&
-          !_firedLongPress &&
-          !_draggedToThreshold &&
-          !_isDraggingFromHand &&
-          Time.time - _lastMouseDownTime > 0.25f)
-      {
-        _firedLongPress = true;
-        _registry.CardService.DisplayInfoZoom(this);
-      }
-
       if (!(_isDraggingFromHand || _isDraggingForOrdering))
       {
         return;
@@ -345,14 +337,15 @@ namespace Dreamcaller.Components
 
       var mousePositionInStartingPlane = _registry.InputService.WorldPointerPosition(_dragStartScreenZ);
       _distanceDragged = Vector2.Distance(mousePositionInStartingPlane, _dragStartPosition);
-      if (_distanceDragged > 1.5f || _draggedToPlayThreshold)
+      const float playThreshold = 0.5f;
+      if (_distanceDragged > playThreshold || _draggedToPlayThreshold)
       {
         _draggedToPlayThreshold = true;
         transform.position = _registry.InputService.WorldPointerPosition(20f);
       }
       else
       {
-        float t = Mathf.Clamp01(_distanceDragged / 1.5f);
+        float t = Mathf.Clamp01(_distanceDragged / playThreshold);
         Vector3 startPosition = _dragOffset + mousePositionInStartingPlane;
         Vector3 endPosition = _registry.InputService.WorldPointerPosition(20f);
         transform.position = Vector3.Lerp(startPosition, endPosition, t);
@@ -365,7 +358,7 @@ namespace Dreamcaller.Components
         {
           _registry.CardEffectPreviewService.DisplayPlayEffectPreview(playEffectPreview);
         }
-        _draggedToThreshold = true;
+        _draggedToClearThreshold = true;
       }
     }
 
