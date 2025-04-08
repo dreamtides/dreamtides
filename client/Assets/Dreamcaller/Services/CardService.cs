@@ -13,9 +13,9 @@ namespace Dreamcaller.Services
 {
   public class CardService : Service
   {
-    readonly RaycastHit[] _raycastHitsTempBuffer = new RaycastHit[8];
     Card? _currentInfoZoom;
     bool _hidCloseButton;
+
     public IEnumerator HandleDrawUserCards(DrawUserCardsCommand command)
     {
       for (var i = 0; i < command.Cards.Count; ++i)

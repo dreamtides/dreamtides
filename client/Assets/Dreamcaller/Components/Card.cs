@@ -44,10 +44,12 @@ namespace Dreamcaller.Components
     bool _isRevealed = false;
     Registry _registry = null!;
     CardView _cardView = null!;
-    Quaternion _initialDragRotation;
     float _dragStartScreenZ;
     Vector3 _dragStartPosition;
+    Quaternion _initialDragRotation;
     Vector3 _dragOffset;
+    Vector3 _targetDragPosition;
+    Quaternion _targetDragRotation;
     float _lastMouseDownTime;
     bool _isDraggingFromHand = false;
     bool _isDraggingForOrdering = false;
@@ -297,14 +299,18 @@ namespace Dreamcaller.Components
         _isDraggingForOrdering = CanSelectOrder();
         _registry.SoundService.PlayCardSound();
         GameContext = GameContext.Dragging;
+
         if (Parent)
         {
           Parent.RemoveIfPresent(this);
         }
+
         _initialDragRotation = transform.rotation;
         _dragStartScreenZ = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
         _dragStartPosition = _registry.InputService.WorldPointerPosition(_dragStartScreenZ);
         _dragOffset = gameObject.transform.position - _dragStartPosition;
+        _targetDragPosition = TargetDragPosition();
+        _targetDragRotation = TargetDragRotation();
       }
     }
 
@@ -313,6 +319,7 @@ namespace Dreamcaller.Components
       if (_registry.CapabilitiesService.CanInfoZoom(GameContext) &&
           !_firedLongPress &&
           !_draggedToThreshold &&
+          !_isDraggingFromHand &&
           Time.time - _lastMouseDownTime > 0.25f)
       {
         _firedLongPress = true;
@@ -326,10 +333,7 @@ namespace Dreamcaller.Components
 
       var mousePosition = _registry.InputService.WorldPointerPosition(_dragStartScreenZ);
       _distanceDragged = Vector2.Distance(mousePosition, _dragStartPosition);
-      var t = Mathf.Clamp01(_distanceDragged / 2);
       transform.position = _dragOffset + mousePosition;
-      var rotation = Quaternion.Slerp(_initialDragRotation, Quaternion.Euler(Constants.CameraXAngle, 0, 0), t);
-      transform.rotation = rotation;
 
       if (_distanceDragged > 0.25f)
       {
@@ -408,6 +412,20 @@ namespace Dreamcaller.Components
 
         _registry.ActionService.PerformAction(action);
       }
+    }
+
+    Vector3 TargetDragPosition()
+    {
+      var target = transform.position + new Vector3(0, 3, 1.75f);
+      target.x = Mathf.Clamp(target.x, -1f, 1f);
+      target.y = Mathf.Clamp(target.y, 20f, 25f);
+      target.z = Mathf.Clamp(target.z, -25f, -20f);
+      return target;
+    }
+
+    Quaternion TargetDragRotation()
+    {
+      return Quaternion.Euler(Constants.CameraXAngle, 0, 0);
     }
 
     void ToggleActiveElements()

@@ -9705,6 +9705,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3901fd40070f3408795a94f8fac9bbf2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playCardOffset: {x: 0, y: 3, z: 1.75}
 --- !u!114 &613451859
 MonoBehaviour:
   m_ObjectHideFlags: 0
