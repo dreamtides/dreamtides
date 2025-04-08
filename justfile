@@ -3,28 +3,28 @@ set positional-arguments
 code-review: check-format build clippy test check-docs
 
 check:
-    cargo check --manifest-path engine/Cargo.toml --workspace --all-targets --all-features
+    cargo check --manifest-path rules_engine/Cargo.toml --workspace --all-targets --all-features
 
 check-warnings:
-    RUSTFLAGS="--deny warnings" cargo check --manifest-path engine/Cargo.toml --workspace --all-targets --all-features
+    RUSTFLAGS="--deny warnings" cargo check --manifest-path rules_engine/Cargo.toml --workspace --all-targets --all-features
 
 build:
-    cargo build --manifest-path engine/Cargo.toml --all-targets --all-features
+    cargo build --manifest-path rules_engine/Cargo.toml --all-targets --all-features
 
 dev:
-    cargo run --manifest-path engine/Cargo.toml --bin "dev_server"
+    cargo run --manifest-path rules_engine/Cargo.toml --bin "dev_server"
 
 watch:
-    cargo watch -C engine -x "run --bin dev_server"
+    cargo watch -C rules_engine -x "run --bin dev_server"
 
 test:
-    cargo test --manifest-path engine/Cargo.toml
+    cargo test --manifest-path rules_engine/Cargo.toml
 
 doc:
-    cargo doc --manifest-path engine/Cargo.toml
+    cargo doc --manifest-path rules_engine/Cargo.toml
 
 schema:
-    cargo run --manifest-path engine/Cargo.toml --bin "schema_generator" > schema.json
+    cargo run --manifest-path rules_engine/Cargo.toml --bin "schema_generator" > schema.json
     quicktype --lang cs --src-lang schema -t SchemaTypes --namespace Dreamtides.Schema --csharp-version 6 --array-type list --features complete --check-required -o client/Assets/Dreamtides/Schema/Schema.cs schema.json
     rm schema.json
 
@@ -32,9 +32,9 @@ plugin_out := "client/Assets/Plugins"
 target_ios := "aarch64-apple-ios"
 
 ios-plugin:
-    cargo build --manifest-path engine/Cargo.toml -p plugin --release --target={{target_ios}}
+    cargo build --manifest-path rules_engine/Cargo.toml -p plugin --release --target={{target_ios}}
     mkdir -p {{plugin_out}}/iOS/
-    cp engine/target/{{target_ios}}/release/libplugin.a {{plugin_out}}/iOS
+    cp rules_engine/target/{{target_ios}}/release/libplugin.a {{plugin_out}}/iOS
 
 # install via rustup target add aarch64-linux-android
 target_android := "aarch64-linux-android"
@@ -70,10 +70,10 @@ android-plugin:
     # Note: builds for Android that use native plugins must use IL2CPP
     # This is only arm64, need to do arm7 at some point too
     echo "Using linker:\n {{android_linker}}"
-    CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="{{android_linker}}" TARGET_AR="{{target_ar}}" TARGET_CC="{{android_linker}}" cargo build --manifest-path engine/Cargo.toml --release -p plugin --target={{target_android}}
+    CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="{{android_linker}}" TARGET_AR="{{target_ar}}" TARGET_CC="{{android_linker}}" cargo build --manifest-path rules_engine/Cargo.toml --release -p plugin --target={{target_android}}
     mkdir -p {{plugin_out}}/Android
     # You see, standalone osx builds *do not* want the lib prefix but android fails *without* it...
-    cp engine/target/{{target_android}}/release/libplugin.so {{plugin_out}}/Android/
+    cp rules_engine/target/{{target_android}}/release/libplugin.so {{plugin_out}}/Android/
 
 target_arm := "aarch64-apple-darwin"
 target_x86 := "x86_64-apple-darwin"
@@ -81,69 +81,69 @@ target_x86 := "x86_64-apple-darwin"
 # Builds mac plugin. This will only work in the editor if the "build profile" is set to macOS
 mac-plugin:
     # you may need to run codesign --deep -s - -f my.app before running
-    cargo build --manifest-path engine/Cargo.toml -p plugin --release --target={{target_arm}}
-    cargo build --manifest-path engine/Cargo.toml -p plugin --release --target={{target_x86}}
+    cargo build --manifest-path rules_engine/Cargo.toml -p plugin --release --target={{target_arm}}
+    cargo build --manifest-path rules_engine/Cargo.toml -p plugin --release --target={{target_x86}}
     # lib prefix breaks on mac standalone
     lipo -create -output plugin.bundle \
-        engine/target/{{target_arm}}/release/libplugin.dylib \
-        engine/target/{{target_x86}}/release/libplugin.dylib
+        rules_engine/target/{{target_arm}}/release/libplugin.dylib \
+        rules_engine/target/{{target_x86}}/release/libplugin.dylib
     mkdir -p {{plugin_out}}/OSX/
     mv plugin.bundle {{plugin_out}}/OSX/
 
 plugins: ios-plugin android-plugin mac-plugin
 
 clippy:
-  cargo clippy --manifest-path engine/Cargo.toml --workspace -- -D warnings -D clippy::all
+  cargo clippy --manifest-path rules_engine/Cargo.toml --workspace -- -D warnings -D clippy::all
 
 benchmark *args='':
-  cargo criterion --manifest-path engine/Cargo.toml "$@"
+  cargo criterion --manifest-path rules_engine/Cargo.toml "$@"
 
 parser *args='':
-  cargo run --manifest-path engine/Cargo.toml --bin "parser_cli" -- "$@"
+  cargo run --manifest-path rules_engine/Cargo.toml --bin "parser_cli" -- "$@"
 
 insta:
-  cd engine && cargo insta review
+  cd rules_engine && cargo insta review
 
 # Reformats code. Requires nightly because several useful options (e.g. imports_granularity) are
 # nightly-only
 fmt:
-    cd engine && cargo +nightly fmt
+    cd rules_engine && cargo +nightly fmt
 
 check-format:
-    cd engine && cargo +nightly fmt -- --check
+    cd rules_engine && cargo +nightly fmt -- --check
 
 check-docs:
-    RUSTDOCFLAGS="-D rustdoc::broken-intra-doc-links -D rustdoc::private-intra-doc-links -D rustdoc::bare-urls" cargo doc --manifest-path engine/Cargo.toml --all
+    RUSTDOCFLAGS="-D rustdoc::broken-intra-doc-links -D rustdoc::private-intra-doc-links -D rustdoc::bare-urls" cargo doc --manifest-path rules_engine/Cargo.toml --all
 
 outdated:
     # Check for outdated dependencies, consider installing cargo-edit and running 'cargo upgrade' if this fails
-    cargo outdated ---manifest-path engine/Cargo.toml -exit-code 1
+    cargo outdated ---manifest-path rules_engine/Cargo.toml -exit-code 1
 
 upgrade:
-    cargo upgrade --manifest-path engine/Cargo.toml --workspace
+    cargo upgrade --manifest-path rules_engine/Cargo.toml --workspace
 
 machete:
-    cargo machete --manifest-path engine/Cargo.toml --fix
+    cargo machete --manifest-path rules_engine/Cargo.toml --fix
 
 remove-unused-deps: machete
 
 internal-clean:
-  rm -rf engine/target/debug
-  rm -rf engine/target/release
-  rm -rf engine/target/tmp
-  rm -rf engine/target/release-with-debug
+  rm -rf rules_engine/target/debug
+  rm -rf rules_engine/target/release
+  rm -rf rules_engine/target/tmp
+  rm -rf rules_engine/target/release-with-debug
 
 clean: internal-clean
 
 build-release-with-debug:
-    cargo build --manifest-path engine/Cargo.toml --no-default-features --bin client  --profile=release-with-debug
+    cargo build --manifest-path rules_engine/Cargo.toml --no-default-features --bin client  --profile=release-with-debug
 
 samply: build-release-with-debug
     samply record ./src-tauri/target/release-with-debug/client
 
 samply-benchmark *args='':
     #!/bin/zsh
-    cargo criterion --manifest-path engine/Cargo.toml --no-run
+    cargo criterion --manifest-path rules_engine/Cargo.toml --no-run
     ALL_BENCHMARKS=`echo ./src-tauri/target/release/deps/benchmarks-*`
     echo "Found benchmark binaries" $ALL_BENCHMARKS
     BENCHMARK=`echo ./src-tauri/target/release/deps/benchmarks-*([1])`
