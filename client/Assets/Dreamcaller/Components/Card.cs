@@ -49,7 +49,7 @@ namespace Dreamcaller.Components
     Vector3 _dragStartPosition;
     Vector3 _dragOffset;
     float _lastMouseDownTime;
-    bool _isDragging = false;
+    bool _isDraggingFromHand = false;
     bool _isDraggingForOrdering = false;
     bool _isDissolved = false;
     bool _firedLongPress = false;
@@ -293,7 +293,7 @@ namespace Dreamcaller.Components
 
       if (CanPlay() || CanSelectOrder())
       {
-        _isDragging = true;
+        _isDraggingFromHand = GameContext == GameContext.Hand;
         _isDraggingForOrdering = CanSelectOrder();
         _registry.SoundService.PlayCardSound();
         GameContext = GameContext.Dragging;
@@ -319,7 +319,7 @@ namespace Dreamcaller.Components
         _registry.CardService.DisplayInfoZoom(this);
       }
 
-      if (!_isDragging)
+      if (!(_isDraggingFromHand || _isDraggingForOrdering))
       {
         return;
       }
@@ -357,59 +357,56 @@ namespace Dreamcaller.Components
         });
       }
 
-      if (_isDragging)
+      if (_isDraggingForOrdering)
       {
-        if (_isDraggingForOrdering)
+        _isDraggingFromHand = false;
+        _isDraggingForOrdering = false;
+        _registry.SoundService.PlayCardSound();
+        var action = new UserAction
         {
-          _isDragging = false;
-          _isDraggingForOrdering = false;
-          _registry.SoundService.PlayCardSound();
-          var action = new UserAction
+          BattleAction = new()
           {
-            BattleAction = new()
+            BattleActionClass = new()
             {
-              BattleActionClass = new()
-              {
-                SelectCardOrder =
-                    _registry.Layout.CardOrderSelector.SelectCardOrderWithinDisplay(transform, CardView.Id),
-              }
+              SelectCardOrder =
+                  _registry.Layout.CardOrderSelector.SelectCardOrderWithinDisplay(transform, CardView.Id),
             }
-          };
+          }
+        };
 
-          _registry.ActionService.PerformAction(action);
-        }
-        else if (ShouldReturnToPreviousParentOnRelease())
+        _registry.ActionService.PerformAction(action);
+      }
+      else if (_isDraggingFromHand && ShouldReturnToPreviousParentOnRelease())
+      {
+        _registry.LayoutService.AddToParent(this);
+        _registry.LayoutService.RunAnimations(() =>
         {
-          _registry.LayoutService.AddToParent(this);
-          _registry.LayoutService.RunAnimations(() =>
-          {
-            _isDragging = false;
-          });
+          _isDraggingFromHand = false;
+        });
+      }
+      else if (_isDraggingFromHand)
+      {
+        _isDraggingFromHand = false;
+        if (CardView.Revealed?.Actions?.OnPlaySound is { } onPlaySound)
+        {
+          _registry.SoundService.Play(onPlaySound);
         }
         else
         {
-          _isDragging = false;
-          if (CardView.Revealed?.Actions?.OnPlaySound is { } onPlaySound)
-          {
-            _registry.SoundService.Play(onPlaySound);
-          }
-          else
-          {
-            _registry.SoundService.PlayWhooshSound();
-          }
-          var action = new UserAction
-          {
-            BattleAction = new()
-            {
-              BattleActionClass = new()
-              {
-                PlayCard = CardView.Id
-              }
-            }
-          };
-
-          _registry.ActionService.PerformAction(action);
+          _registry.SoundService.PlayWhooshSound();
         }
+        var action = new UserAction
+        {
+          BattleAction = new()
+          {
+            BattleActionClass = new()
+            {
+              PlayCard = CardView.Id
+            }
+          }
+        };
+
+        _registry.ActionService.PerformAction(action);
       }
     }
 
