@@ -192,7 +192,7 @@ namespace Dreamtides.Components
     {
       _outline.gameObject.SetActive(CanPlay() ||
           CanSelectOrder() ||
-          (!GameContext.IsBattlefieldContext() && CardView.Revealed?.OutlineColor != null));
+          (GameContext == GameContext.Hand && CardView.Revealed?.OutlineColor != null));
     }
 
     void Flip(Component faceUp, Component faceDown, Sequence? sequence, Action? onFlipped = null)
