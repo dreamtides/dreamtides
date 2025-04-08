@@ -9,7 +9,10 @@ namespace Dreamcaller.Layout
   {
     [SerializeField] float _offset;
     [SerializeField] Scrollbar _scrollbar = null!;
-    [SerializeField] float _cardWidth = 1.0f;
+    [SerializeField] float _cardWidth;
+    [SerializeField] Transform _leftEdge = null!;
+    [SerializeField] Transform _rightEdge = null!;
+
     private float _scrollAmount = 0f;
     private float _previousScrollAmount = 0f;
 
@@ -57,24 +60,19 @@ namespace Dreamcaller.Layout
     /// <summary>
     /// Returns the maximum number of objects that can be displayed.
     /// </summary>
-    int WindowSize() => Mathf.Max(1, Mathf.FloorToInt(TotalWidth() / _cardWidth));
+    float WindowSize() => TotalWidth() / _cardWidth;
 
-    /// <summary>
-    /// Returns the total width available for displaying objects
-    /// </summary>
-    float TotalWidth() => _cardWidth * 4f;
+    float TotalWidth() => Mathf.Abs(RightEdge() - LeftEdge());
+
+    float LeftEdge() => _leftEdge.position.x;
+
+    float RightEdge() => _rightEdge.position.x;
 
     /// <summary>
     /// Returns the x offset for an object at a given index, accounting for scrolling
     /// </summary>
     float ScrolledOffset(int index, int count, float scrollAmount)
     {
-      if (count <= WindowSize())
-      {
-        // If all objects fit in view, no scrolling needed
-        return index * _offset;
-      }
-
       var maxScrollOffset = count - WindowSize();
       var effectiveIndex = index - (scrollAmount * maxScrollOffset);
       return effectiveIndex * _offset;
