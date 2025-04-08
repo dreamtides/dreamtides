@@ -1075,7 +1075,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 63280832}
-        m_TargetAssemblyTypeName: Dreamcaller.Components.DebugFetch, Dreamcaller
+        m_TargetAssemblyTypeName: Dreamtides.Components.DebugFetch, Dreamtides
         m_MethodName: PerformSomeAction
         m_Mode: 1
         m_Arguments:
@@ -13101,7 +13101,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 794038735}
-        m_TargetAssemblyTypeName: Dreamcaller.Components.DebugFetch, Assembly-CSharp
+        m_TargetAssemblyTypeName: Dreamtides.Components.DebugFetch, Assembly-CSharp
         m_MethodName: TriggerJudgment
         m_Mode: 1
         m_Arguments:
@@ -25048,7 +25048,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1455934548}
-        m_TargetAssemblyTypeName: Dreamcaller.Components.DebugFetch, Assembly-CSharp
+        m_TargetAssemblyTypeName: Dreamtides.Components.DebugFetch, Assembly-CSharp
         m_MethodName: TriggerEnemyJudgment
         m_Mode: 1
         m_Arguments:
@@ -26127,7 +26127,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1589782132}
-        m_TargetAssemblyTypeName: Dreamcaller.Components.DebugFetch, Assembly-CSharp
+        m_TargetAssemblyTypeName: Dreamtides.Components.DebugFetch, Assembly-CSharp
         m_MethodName: OnClick
         m_Mode: 1
         m_Arguments:
@@ -33218,8 +33218,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 262976513}
-        m_TargetAssemblyTypeName: Dreamcaller.Buttons.ToggleBrowserVisibilityButton,
-          Dreamcaller
+        m_TargetAssemblyTypeName: Dreamtides.Buttons.ToggleBrowserVisibilityButton,
+          Dreamtides
         m_MethodName: OnClick
         m_Mode: 1
         m_Arguments:

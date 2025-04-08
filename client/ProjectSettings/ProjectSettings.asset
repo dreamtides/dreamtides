@@ -12,8 +12,8 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: DefaultCompany
-  productName: Dreamcaller
+  companyName: Dreamtides
+  productName: Dreamtides
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -165,9 +165,9 @@ PlayerSettings:
   androidMaxAspectRatio: 2.4
   androidMinAspectRatio: 1
   applicationIdentifier:
-    Android: com.dreamcaller.Dreamcaller
+    Android: com.Dreamtides.Dreamtides
     Standalone: com.Unity-Technologies.com.unity.template.urp-blank
-    iPhone: com.dreamcaller.Dreamcaller
+    iPhone: com.Dreamtides.Dreamtides
   buildNumber:
     Standalone: 0
     VisionOS: 0
@@ -859,14 +859,14 @@ PlayerSettings:
   editorAssembliesCompatibilityLevel: 1
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: Dreamcaller
+  metroPackageName: Dreamtides
   metroPackageVersion: 
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
   metroCertificateIssuer: 
   metroCertificateNotAfter: 0000000000000000
-  metroApplicationDescription: Dreamcaller
+  metroApplicationDescription: Dreamtides
   wsaImages: {}
   metroTileShortName: 
   metroTileShowName: 0
