@@ -545,7 +545,9 @@ namespace Dreamtides.Components
         var worldPosition = _registry.InputService.WorldPointerPosition(screenZ);
         var offset = gameObject.transform.position - worldPosition;
         var target = transform.position + new Vector3(0, 3, Mathf.Max(1.75f, 3.25f - offset.z));
-        target.x = Mathf.Clamp(target.x, -1f, 1f);
+        target.x = Mathf.Clamp(target.x,
+            _registry.Layout.InfoZoomLeft.position.x,
+            _registry.Layout.InfoZoomRight.position.x);
         target.y = Mathf.Clamp(target.y, 20f, 25f);
         target.z = Mathf.Clamp(target.z, -25f, -20f);
         return target;

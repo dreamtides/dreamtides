@@ -59,7 +59,7 @@ namespace Dreamtides.Services
 
     void HandleDisplayableHover()
     {
-      if (_clickAction.IsPressed())
+      if (_clickAction.IsPressed() || !Registry.IsLandscape)
       {
         return;
       }
