@@ -56,6 +56,9 @@ namespace Dreamtides.Components
     public CardView CardView => Errors.CheckNotNull(_cardView);
     GameObject? _cardTrail;
     float _distanceDragged;
+    float _hoverStartTime;
+    bool _hoveringForInfoZoom;
+    bool _longHoverFired;
 
     public string Id => CardView.ClientId();
 
@@ -276,7 +279,9 @@ namespace Dreamtides.Components
     }
 
     public override bool CanHandleMouseEvents() =>
-        GameContext != GameContext.Deck && GameContext != GameContext.DiscardPile;
+        GameContext != GameContext.Deck &&
+        GameContext != GameContext.DiscardPile &&
+        GameContext != GameContext.InfoZoom;
 
     protected override void OnSetGameContext(GameContext oldContext, GameContext newContext)
     {
@@ -291,7 +296,8 @@ namespace Dreamtides.Components
       _distanceDragged = 0;
       _registry.CardService.IsPointerDownOnCard = true;
 
-      if (GameContext == GameContext.Hand && !_registry.CapabilitiesService.AnyBrowserOpen())
+      var showJump = GameContext == GameContext.Hand || GameContext == GameContext.Hovering;
+      if (showJump && !_registry.CapabilitiesService.AnyBrowserOpen())
       {
         // Jump to large size when in hand
         transform.position = HandCardJumpPosition();
@@ -433,6 +439,34 @@ namespace Dreamtides.Components
       }
     }
 
+    public override void MouseHoverStart()
+    {
+      if (_registry.CapabilitiesService.CanInfoZoom(GameContext) && GameContext != GameContext.Hand)
+      {
+        _hoverStartTime = Time.time;
+        _hoveringForInfoZoom = true;
+      }
+    }
+
+    public override void MouseHover()
+    {
+      if (Time.time - _hoverStartTime > 0.3f && _hoveringForInfoZoom && !_longHoverFired)
+      {
+        _registry.CardService.DisplayInfoZoom(this);
+        _longHoverFired = true;
+      }
+    }
+
+    public override void MouseHoverEnd()
+    {
+      if (_hoveringForInfoZoom)
+      {
+        _registry.CardService.ClearInfoZoom();
+        _hoveringForInfoZoom = false;
+        _longHoverFired = false;
+      }
+    }
+
     void ToggleActiveElements()
     {
       if (!_isRevealed)
@@ -459,7 +493,7 @@ namespace Dreamtides.Components
         _battlefieldSparkBackground.gameObject.SetActive(
             GameContext != GameContext.DiscardPile && CardView.Revealed?.Spark != null);
         _cardCollider.center = Vector3.zero;
-        _cardCollider.size = new Vector3(2.5f, 3f, 1f);
+        _cardCollider.size = new Vector3(2.5f, 3f, 0.1f);
       }
       else
       {
@@ -468,7 +502,7 @@ namespace Dreamtides.Components
         _battlefieldCardFront.gameObject.SetActive(false);
         _sparkBackground.gameObject.SetActive(CardView.Revealed?.Spark != null);
         _cardCollider.center = new Vector3(0, -0.5f, 0);
-        _cardCollider.size = new Vector3(2.5f, 4f, 1f);
+        _cardCollider.size = new Vector3(2.5f, 4f, 0.1f);
       }
     }
 

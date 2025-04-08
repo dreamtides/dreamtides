@@ -101,6 +101,9 @@ TagManager:
   - name: InfoZoom
     uniqueID: 1750796169
     locked: 0
+  - name: Hovering
+    uniqueID: 2144465451
+    locked: 0
   - name: Dragging
     uniqueID: 2117650799
     locked: 0

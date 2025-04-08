@@ -12,6 +12,7 @@ namespace Dreamtides.Services
   public class InputService : Service
   {
     readonly RaycastHit[] _raycastHitsTempBuffer = new RaycastHit[8];
+    Displayable? _lastHovered;
     Displayable? _lastClicked;
     InputAction _clickAction = null!;
     InputAction _tapPositionAction = null!;
@@ -34,6 +35,7 @@ namespace Dreamtides.Services
     void Update()
     {
       HandleDisplayableClickAndDrag();
+      HandleDisplayableHover();
     }
 
     void HandleDisplayableClickAndDrag()
@@ -52,6 +54,36 @@ namespace Dreamtides.Services
           var objectAtClickPosition = ObjectAtPointerPosition();
           last.MouseUp(objectAtClickPosition == last);
           break;
+      }
+    }
+
+    void HandleDisplayableHover()
+    {
+      if (_clickAction.IsPressed())
+      {
+        return;
+      }
+
+      var current = ObjectAtPointerPosition();
+      if (current && !_lastHovered)
+      {
+        current.MouseHoverStart();
+        _lastHovered = current;
+      }
+      else if (!current && _lastHovered)
+      {
+        _lastHovered.MouseHoverEnd();
+        _lastHovered = null;
+      }
+      else if (current && _lastHovered && current != _lastHovered)
+      {
+        _lastHovered.MouseHoverEnd();
+        current.MouseHoverStart();
+        _lastHovered = current;
+      }
+      else if (current && current == _lastHovered)
+      {
+        current.MouseHover();
       }
     }
 
