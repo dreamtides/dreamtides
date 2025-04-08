@@ -16,6 +16,8 @@ namespace Dreamtides.Services
     Card? _currentInfoZoom;
     bool _hidCloseButton;
 
+    public bool IsPointerDownOnCard { get; set; } = false;
+
     public IEnumerator HandleDrawUserCards(DrawUserCardsCommand command)
     {
       for (var i = 0; i < command.Cards.Count; ++i)

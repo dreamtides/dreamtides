@@ -4882,6 +4882,7 @@ MonoBehaviour:
   _internalGameContext: 0
   _objects: []
   _debugUpdateContinuously: 0
+  _registry: {fileID: 613451854}
   _offset: 2
   _scrollbar: {fileID: 1088937435}
   _cardWidth: 1.7
@@ -9078,6 +9079,7 @@ MonoBehaviour:
   _internalGameContext: 0
   _objects: []
   _debugUpdateContinuously: 0
+  _registry: {fileID: 613451854}
   _offset: 2
   _scrollbar: {fileID: 1088937435}
   _cardWidth: 4

@@ -1,5 +1,6 @@
 #nullable enable
 
+using Dreamtides.Services;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +8,7 @@ namespace Dreamtides.Layout
 {
   public class ScrollableUserHandLayout : StandardObjectLayout
   {
+    [SerializeField] Registry _registry = null!;
     [SerializeField] float _offset;
     [SerializeField] Scrollbar _scrollbar = null!;
     [SerializeField] float _cardWidth;
@@ -28,7 +30,8 @@ namespace Dreamtides.Layout
     {
       if (Objects.Count > 0)
       {
-        _scrollbar.gameObject.SetActive(Objects.Count > WindowSize());
+        _scrollbar.gameObject.SetActive(Objects.Count > WindowSize() &&
+            !_registry.CardService.IsPointerDownOnCard);
         _scrollbar.size = (float)WindowSize() / Objects.Count;
 
         _scrollAmount = _scrollbar.value;

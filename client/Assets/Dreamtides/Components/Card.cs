@@ -289,6 +289,7 @@ namespace Dreamtides.Components
       _draggedToClearThreshold = false;
       _draggedToPlayThreshold = false;
       _distanceDragged = 0;
+      _registry.CardService.IsPointerDownOnCard = true;
 
       if (GameContext == GameContext.Hand && !_registry.CapabilitiesService.AnyBrowserOpen())
       {
@@ -368,6 +369,7 @@ namespace Dreamtides.Components
       _registry.SoundService.PlayCardSound();
       _registry.CardService.ClearInfoZoom();
       _registry.CardEffectPreviewService.ClearPlayEffectPreview();
+      _registry.CardService.IsPointerDownOnCard = false;
 
       if (CardView.Revealed?.Actions?.OnClick is { } onClick && isSameObject && (Time.time - _lastMouseDownTime < 1f))
       {
