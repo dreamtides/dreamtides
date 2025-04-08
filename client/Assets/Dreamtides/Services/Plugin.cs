@@ -18,7 +18,7 @@ static class Plugin
 
         byte[] response = new byte[BufferSize];
         int responseLength = Errors.CheckNonNegative(
-            Dreamtides_connect(encoded, encoded.Length, response, BufferSize));
+            dreamtides_connect(encoded, encoded.Length, response, BufferSize));
         var json = Encoding.UTF8.GetString(response, 0, responseLength);
         var deserialized = JsonConvert.DeserializeObject<ConnectResponse>(json, Converter.Settings);
         return Errors.CheckNotNull(deserialized, "Error deserializing connect response");
@@ -31,7 +31,7 @@ static class Plugin
 
         byte[] response = new byte[BufferSize];
         int responseLength = Errors.CheckNonNegative(
-            Dreamtides_perform_action(encoded, encoded.Length, response, BufferSize));
+            dreamtides_perform_action(encoded, encoded.Length, response, BufferSize));
         var json = Encoding.UTF8.GetString(response, 0, responseLength);
         var deserialized = JsonConvert.DeserializeObject<PerformActionResponse>(json, Converter.Settings);
         return Errors.CheckNotNull(deserialized, "Error deserializing action response");
@@ -42,7 +42,7 @@ static class Plugin
 #else
     [DllImport("plugin")]
 #endif
-    public static extern int Dreamtides_connect(
+    public static extern int dreamtides_connect(
       byte[] request,
       int requestLength,
       [Out] byte[] response,
@@ -53,7 +53,7 @@ static class Plugin
 #else
     [DllImport("plugin")]
 #endif
-    public static extern int Dreamtides_perform_action(
+    public static extern int dreamtides_perform_action(
       byte[] request,
       int requestLength,
       [Out] byte[] response,

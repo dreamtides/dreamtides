@@ -167,7 +167,7 @@ PlayerSettings:
   applicationIdentifier:
     Android: com.Dreamtides.Dreamtides
     Standalone: com.Unity-Technologies.com.unity.template.urp-blank
-    iPhone: com.Dreamtides.Dreamtides
+    iPhone: io.github.dreamtides.Dreamtides
   buildNumber:
     Standalone: 0
     VisionOS: 0

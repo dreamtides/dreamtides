@@ -25,7 +25,7 @@ doc:
 
 schema:
     cargo run --manifest-path engine/Cargo.toml --bin "schema_generator" > schema.json
-    quicktype --lang cs --src-lang schema -t SchemaTypes --namespace Dreamcaller.Schema --csharp-version 6 --array-type list --features complete --check-required -o client/Assets/Dreamcaller/Schema/Schema.cs schema.json
+    quicktype --lang cs --src-lang schema -t SchemaTypes --namespace Dreamtides.Schema --csharp-version 6 --array-type list --features complete --check-required -o client/Assets/Dreamtides/Schema/Schema.cs schema.json
     rm schema.json
 
 plugin_out := "client/Assets/Plugins"

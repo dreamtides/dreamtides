@@ -18,7 +18,7 @@ use engine::test_data;
 /// Returns the number of bytes written to the `response` buffer, or -1 on
 /// error.
 #[no_mangle]
-pub unsafe extern "C" fn dreamcaller_connect(
+pub unsafe extern "C" fn dreamtides_connect(
     request: *const u8,
     request_length: i32,
     response: *mut u8,
@@ -60,7 +60,7 @@ unsafe fn connect_impl(
 /// Returns the number of bytes written to the `response` buffer, or -1 on
 /// error.
 #[no_mangle]
-pub unsafe extern "C" fn dreamcaller_perform_action(
+pub unsafe extern "C" fn dreamtides_perform_action(
     request: *const u8,
     request_length: i32,
     response: *mut u8,
