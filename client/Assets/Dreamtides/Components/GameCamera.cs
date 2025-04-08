@@ -1,6 +1,5 @@
 #nullable enable
 
-using System.Collections;
 using UnityEngine;
 
 namespace Dreamtides.Components
@@ -14,21 +13,21 @@ namespace Dreamtides.Components
 
     void Start()
     {
-      for (int i = 0; i < 10; i++)
+      for (int i = 0; i < 20; i++)
       {
-        var topLeft = _camera.WorldToViewportPoint(_bottomLeft.position);
-        if (topLeft.x > _zoomInThreshold)
+        var bottomLeft = _camera.WorldToViewportPoint(_bottomLeft.position);
+        if (bottomLeft.x > _zoomInThreshold)
         {
           _camera.fieldOfView -= 1;
         }
 
-        if (topLeft.x < 0)
+        if (bottomLeft.x < 0)
         {
           _camera.fieldOfView += 1;
         }
       }
 
-      for (int i = 0; i < 10; i++)
+      for (int i = 0; i < 20; i++)
       {
         var topLeft = _camera.WorldToViewportPoint(_topLeft.position);
         if (topLeft.x > _zoomInThreshold)
