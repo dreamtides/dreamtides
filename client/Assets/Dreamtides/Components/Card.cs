@@ -293,16 +293,7 @@ namespace Dreamtides.Components
       if (GameContext == GameContext.Hand && !_registry.CapabilitiesService.AnyBrowserOpen())
       {
         // Jump to large size when in hand
-        var screenZ = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
-        var worldPosition = _registry.InputService.WorldPointerPosition(screenZ);
-        var offset = gameObject.transform.position - worldPosition;
-
-        // Keep card above user's finger on mobile so they can read it.
-        var target = transform.position + new Vector3(0, 3, Mathf.Max(1.75f, 3.25f - offset.z));
-        target.x = Mathf.Clamp(target.x, -1f, 1f);
-        target.y = Mathf.Clamp(target.y, 20f, 25f);
-        target.z = Mathf.Clamp(target.z, -25f, -20f);
-        transform.position = target;
+        transform.position = HandCardJumpPosition();
         transform.rotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0);
       }
       else if (_registry.CapabilitiesService.CanInfoZoom(GameContext) && !_draggedToClearThreshold)
@@ -337,29 +328,39 @@ namespace Dreamtides.Components
 
       var mousePositionInStartingPlane = _registry.InputService.WorldPointerPosition(_dragStartScreenZ);
       _distanceDragged = Vector2.Distance(mousePositionInStartingPlane, _dragStartPosition);
-      const float playThreshold = 0.5f;
-      if (_distanceDragged > playThreshold || _draggedToPlayThreshold)
+
+      if (_isDraggingForOrdering || _registry.IsLandscape)
       {
-        _draggedToPlayThreshold = true;
-        transform.position = _registry.InputService.WorldPointerPosition(20f);
+        transform.position = mousePositionInStartingPlane + _dragOffset;
       }
       else
       {
-        float t = Mathf.Clamp01(_distanceDragged / playThreshold);
-        Vector3 startPosition = _dragOffset + mousePositionInStartingPlane;
-        Vector3 endPosition = _registry.InputService.WorldPointerPosition(20f);
-        transform.position = Vector3.Lerp(startPosition, endPosition, t);
+        // On mobile we shrink the card down as it is dragged from hand to
+        // improve visibility.
+        const float playThreshold = 0.5f;
+        if (_distanceDragged > playThreshold || _draggedToPlayThreshold)
+        {
+          _draggedToPlayThreshold = true;
+          transform.position = _registry.InputService.WorldPointerPosition(20f);
+        }
+        else
+        {
+          float t = Mathf.Clamp01(_distanceDragged / playThreshold);
+          Vector3 startPosition = _dragOffset + mousePositionInStartingPlane;
+          Vector3 endPosition = _registry.InputService.WorldPointerPosition(20f);
+          transform.position = Vector3.Lerp(startPosition, endPosition, t);
+        }
       }
 
       if (_distanceDragged > 0.25f)
-      {
-        _registry.CardService.ClearInfoZoom();
-        if (CardView.Revealed?.Actions.PlayEffectPreview is { } playEffectPreview && !_isDraggingForOrdering)
         {
-          _registry.CardEffectPreviewService.DisplayPlayEffectPreview(playEffectPreview);
+          _registry.CardService.ClearInfoZoom();
+          if (CardView.Revealed?.Actions.PlayEffectPreview is { } playEffectPreview && !_isDraggingForOrdering)
+          {
+            _registry.CardEffectPreviewService.DisplayPlayEffectPreview(playEffectPreview);
+          }
+          _draggedToClearThreshold = true;
         }
-        _draggedToClearThreshold = true;
-      }
     }
 
     public override void MouseUp(bool isSameObject)
@@ -466,6 +467,26 @@ namespace Dreamtides.Components
         _sparkBackground.gameObject.SetActive(CardView.Revealed?.Spark != null);
         _cardCollider.center = new Vector3(0, -0.5f, 0);
         _cardCollider.size = new Vector3(2.5f, 4f, 1f);
+      }
+    }
+
+    Vector3 HandCardJumpPosition()
+    {
+      if (_registry.IsLandscape)
+      {
+        return transform.position + new Vector3(0, 3f, 1.5f);
+      }
+      else
+      {
+        // Keep card above user's finger on mobile so they can read it.
+        var screenZ = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
+        var worldPosition = _registry.InputService.WorldPointerPosition(screenZ);
+        var offset = gameObject.transform.position - worldPosition;
+        var target = transform.position + new Vector3(0, 3, Mathf.Max(1.75f, 3.25f - offset.z));
+        target.x = Mathf.Clamp(target.x, -1f, 1f);
+        target.y = Mathf.Clamp(target.y, 20f, 25f);
+        target.z = Mathf.Clamp(target.z, -25f, -20f);
+        return target;
       }
     }
 
