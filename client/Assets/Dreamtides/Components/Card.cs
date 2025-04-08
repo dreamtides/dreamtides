@@ -59,6 +59,8 @@ namespace Dreamtides.Components
     float _hoverStartTime;
     bool _hoveringForInfoZoom;
     bool _longHoverFired;
+    Vector3 _positionBeforeHover;
+    Tween? _hoverMoveTween;
 
     public string Id => CardView.ClientId();
 
@@ -193,9 +195,10 @@ namespace Dreamtides.Components
 
     void Update()
     {
+      var outlineContext = GameContext == GameContext.Hand || GameContext == GameContext.Hovering;
       _outline.gameObject.SetActive(CanPlay() ||
           CanSelectOrder() ||
-          (GameContext == GameContext.Hand && CardView.Revealed?.OutlineColor != null));
+          (outlineContext && CardView.Revealed?.OutlineColor != null));
     }
 
     void Flip(Component faceUp, Component faceDown, Sequence? sequence, Action? onFlipped = null)
@@ -296,8 +299,8 @@ namespace Dreamtides.Components
       _distanceDragged = 0;
       _registry.CardService.IsPointerDownOnCard = true;
 
-      var showJump = GameContext == GameContext.Hand || GameContext == GameContext.Hovering;
-      if (showJump && !_registry.CapabilitiesService.AnyBrowserOpen())
+      EndHandHover();
+      if (GameContext == GameContext.Hand && !_registry.CapabilitiesService.AnyBrowserOpen())
       {
         // Jump to large size when in hand
         transform.position = HandCardJumpPosition();
@@ -360,14 +363,14 @@ namespace Dreamtides.Components
       }
 
       if (_distanceDragged > 0.25f)
+      {
+        _registry.CardService.ClearInfoZoom();
+        if (CardView.Revealed?.Actions.PlayEffectPreview is { } playEffectPreview && !_isDraggingForOrdering)
         {
-          _registry.CardService.ClearInfoZoom();
-          if (CardView.Revealed?.Actions.PlayEffectPreview is { } playEffectPreview && !_isDraggingForOrdering)
-          {
-            _registry.CardEffectPreviewService.DisplayPlayEffectPreview(playEffectPreview);
-          }
-          _draggedToClearThreshold = true;
+          _registry.CardEffectPreviewService.DisplayPlayEffectPreview(playEffectPreview);
         }
+        _draggedToClearThreshold = true;
+      }
     }
 
     public override void MouseUp(bool isSameObject)
@@ -441,7 +444,13 @@ namespace Dreamtides.Components
 
     public override void MouseHoverStart()
     {
-      if (_registry.CapabilitiesService.CanInfoZoom(GameContext) && GameContext != GameContext.Hand)
+      if (GameContext == GameContext.Hand)
+      {
+        _positionBeforeHover = transform.position;
+        _hoverMoveTween = transform.DOMove(transform.position + new Vector3(0, 0.5f, 0.25f), 0.1f);
+        GameContext = GameContext.Hovering;
+      }
+      else if (_registry.CapabilitiesService.CanInfoZoom(GameContext))
       {
         _hoverStartTime = Time.time;
         _hoveringForInfoZoom = true;
@@ -464,6 +473,18 @@ namespace Dreamtides.Components
         _registry.CardService.ClearInfoZoom();
         _hoveringForInfoZoom = false;
         _longHoverFired = false;
+      }
+
+      EndHandHover();
+    }
+
+    void EndHandHover()
+    {
+      if (GameContext == GameContext.Hovering)
+      {
+        _hoverMoveTween?.Kill();
+        transform.position = _positionBeforeHover;
+        GameContext = GameContext.Hand;
       }
     }
 
