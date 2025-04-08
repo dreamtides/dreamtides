@@ -293,6 +293,17 @@ namespace Dreamcaller.Components
       _draggedToThreshold = false;
       _distanceDragged = 0;
 
+      if (GameContext == GameContext.Hand)
+      {
+        // Jump to large size when in hand
+        var target = transform.position + new Vector3(0, 3, 1.75f);
+        target.x = Mathf.Clamp(target.x, -1f, 1f);
+        target.y = Mathf.Clamp(target.y, 20f, 25f);
+        target.z = Mathf.Clamp(target.z, -25f, -20f);
+        transform.position = target;
+        transform.rotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0);
+      }
+
       if (CanPlay() || CanSelectOrder())
       {
         _isDraggingFromHand = GameContext == GameContext.Hand;
