@@ -12,6 +12,7 @@ namespace Dreamtides.Layout
     [SerializeField] float _cardWidth;
     [SerializeField] Transform _leftEdge = null!;
     [SerializeField] Transform _rightEdge = null!;
+    [SerializeField] bool _hideWhenOutsideWindow;
 
     private float _scrollAmount = 0f;
     private float _previousScrollAmount = 0f;
@@ -75,6 +76,15 @@ namespace Dreamtides.Layout
     {
       var maxScrollOffset = count - WindowSize();
       var effectiveIndex = index - (scrollAmount * maxScrollOffset);
+
+      if (_hideWhenOutsideWindow && (effectiveIndex < 0 || effectiveIndex >= WindowSize()))
+      {
+        // In landscape we hide the cards outside of the center to prevent
+        // geometry clipping issues. Should eventually figure out a
+        // cleaner fix for this.
+        return -9999f;
+      }
+
       return effectiveIndex * _offset;
     }
   }
