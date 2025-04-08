@@ -474,7 +474,12 @@ namespace Dreamtides.Components
     {
       if (_registry.IsLandscape)
       {
-        return transform.position + new Vector3(0, 3f, 1.5f);
+        // Bias slightly towards screen center
+        var horizontalPosition = Mathf.Clamp01((transform.position.x - 8f) / 14f);
+        return transform.position + Vector3.Lerp(
+          new Vector3(2f, 4f, 2f),
+          new Vector3(-2f, 4f, 2f),
+          horizontalPosition);
       }
       else
       {
