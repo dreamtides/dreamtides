@@ -28,7 +28,7 @@ namespace Dreamtides.Components
     [SerializeField] Renderer _cardBack = null!;
     [SerializeField] Renderer _outline = null!;
     [SerializeField] SpriteRenderer _battlefieldOutline = null!;
-    [SerializeField] Renderer _costBackground = null!;
+    [SerializeField] SpriteRenderer _costBackground = null!;
     [SerializeField] TextMeshPro _costText = null!;
     [SerializeField] TextMeshPro _producedEnergyText = null!;
     [SerializeField] Renderer _sparkBackground = null!;
@@ -65,6 +65,8 @@ namespace Dreamtides.Components
     public string Id => CardView.ClientId();
 
     public ObjectLayout ContainedObjects => Errors.CheckNotNull(_containedObjects);
+
+    public SpriteRenderer CostBackgroundForTests => Errors.CheckNotNull(_costBackground);
 
     public void Render(Registry registry, CardView view, Sequence? sequence = null)
     {

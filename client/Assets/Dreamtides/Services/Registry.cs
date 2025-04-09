@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.Collections;
 using Dreamtides.Buttons;
 using Dreamtides.Components;
 using Dreamtides.Layout;
@@ -74,9 +75,20 @@ namespace Dreamtides.Services
     [SerializeField] ControlledButton? _bottomRightButton;
     public ControlledButton BottomRightButton => Check(_bottomRightButton);
 
+    public static bool IsTest { get; set; }
+
     void Awake()
     {
-      Debug.Log("Starting Dreamtides");
+      if (IsTest)
+      {
+        Debug.Log($"Running Tests");
+      }
+      else
+      {
+        Debug.Log($"Starting Dreamtides");
+      }
+
+      IsTest = false;
       Application.targetFrameRate = 60;
 
       _isPortrait = Screen.width < Screen.height;
@@ -93,7 +105,7 @@ namespace Dreamtides.Services
 
       foreach (var service in GetComponentsInChildren<Service>())
       {
-        service.Initialize(this);
+        service.Initialize(this, IsTest ? Service.TestMode.Testing : Service.TestMode.None);
       }
     }
 

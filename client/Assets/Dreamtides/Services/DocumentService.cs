@@ -18,7 +18,7 @@ namespace Dreamtides.Services
 
     public VisualElement RootVisualElement => _document.rootVisualElement;
 
-    protected override void OnInitialize()
+    protected override void OnInitialize(TestMode testMode)
     {
       _document.rootVisualElement.Clear();
       AddChild("InfoZoomContainer", out _infoZoom);

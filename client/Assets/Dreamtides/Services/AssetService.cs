@@ -24,7 +24,7 @@ namespace Dreamtides.Services
     public Projectile GetProjectilePrefab(ProjectileAddress address) =>
         GetAssetComponent<Projectile>(address.Projectile);
 
-    protected override void OnInitialize()
+    protected override void OnInitialize(TestMode testMode)
     {
       GetEffectPrefab(new EffectAddress
       {

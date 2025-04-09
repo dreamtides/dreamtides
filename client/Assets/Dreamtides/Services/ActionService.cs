@@ -7,7 +7,6 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
 using System;
-using DG.Tweening;
 using Dreamtides.Utils;
 
 namespace Dreamtides.Services
@@ -18,7 +17,12 @@ namespace Dreamtides.Services
     float _lastConnectAttemptTime;
     Metadata? _metadata;
 
-    IEnumerator Start()
+    protected override void OnInitialize(TestMode testMode)
+    {
+      StartCoroutine(InitializeAsync(testMode));
+    }
+
+    IEnumerator InitializeAsync(TestMode testMode)
     {
       yield return new WaitForEndOfFrame();
       _metadata = new Metadata
@@ -29,6 +33,7 @@ namespace Dreamtides.Services
       {
         Metadata = _metadata
       };
+
       if (Application.isEditor)
       {
         StartCoroutine(DevServerConnectAsync(request));

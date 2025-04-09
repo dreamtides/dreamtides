@@ -16,7 +16,7 @@ namespace Dreamtides.Services
     int _currentTrackIndex = -1;
     Coroutine? _trackMonitorCoroutine;
 
-    protected override void OnInitialize()
+    protected override void OnInitialize(TestMode testMode)
     {
       ShufflePlaylist();
       PlayNextTrack();
