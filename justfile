@@ -1,6 +1,6 @@
 set positional-arguments
 
-code-review: check-format build clippy test check-docs
+code-review: check-format build clippy test check-docs unity-tests
 
 check:
     cargo check --manifest-path rules_engine/Cargo.toml --workspace --all-targets --all-features
@@ -114,6 +114,9 @@ check-format:
 
 check-docs:
     RUSTDOCFLAGS="-D rustdoc::broken-intra-doc-links -D rustdoc::private-intra-doc-links -D rustdoc::bare-urls" cargo doc --manifest-path rules_engine/Cargo.toml --all
+
+unity-tests:
+    ./client/scripts/test.py
 
 outdated:
     # Check for outdated dependencies, consider installing cargo-edit and running 'cargo upgrade' if this fails
