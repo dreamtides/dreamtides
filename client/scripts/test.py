@@ -5,6 +5,8 @@ import shutil
 import platform
 import xml.etree.ElementTree as ET
 from pathlib import Path
+import socket
+import sys
 
 def find_highest_unity_version(hub_path):
     if not hub_path.exists():
@@ -79,8 +81,22 @@ def print_test_summary(results_path):
     except FileNotFoundError:
         print("Test results file not found")
 
+def is_port_in_use(port):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        try:
+            s.connect(('localhost', port))
+            return True
+        except socket.error:
+            return False
+
 def main():
     print("Starting Unity tests...")
+    
+    if not is_port_in_use(26598):
+        print("Error: No server listening on port 26598")
+        print("Make sure the server is running before executing tests")
+        sys.exit(1)
+
     script_dir = Path(__file__).parent
     project_root = script_dir.parent
     test_output_dir = project_root / "test_output"
