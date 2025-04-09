@@ -7,6 +7,9 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 import socket
 import sys
+import time
+import os
+import threading
 
 def find_highest_unity_version(hub_path):
     if not hub_path.exists():
@@ -89,12 +92,60 @@ def is_port_in_use(port):
         except socket.error:
             return False
 
+def check_rsync_available():
+    try:
+        subprocess.run(["rsync", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+        return True
+    except (subprocess.SubprocessError, FileNotFoundError):
+        return False
+
+def sync_project_to_temp(project_root):
+    temp_project_path = Path("/tmp/unity_tests/client")
+    
+    # Ensure the parent directory exists
+    temp_parent = temp_project_path.parent
+    temp_parent.mkdir(parents=True, exist_ok=True)
+    
+    print(f"Syncing project to {temp_project_path}...")
+    
+    try:
+        result = subprocess.run(
+            ["rsync", "--delete", "--stats", "-avqr", str(project_root), "/tmp/unity_tests/"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        print("Sync completed successfully")
+        return str(temp_project_path)
+    except subprocess.CalledProcessError as e:
+        print(f"Error syncing project: {e}")
+        print(f"stderr: {e.stderr}")
+        sys.exit(1)
+
+def monitor_log_file(log_file_path):
+    """Monitor log file and print a dot for each update."""
+    previous_size = 0
+    
+    while True:
+        if os.path.exists(log_file_path):
+            current_size = os.path.getsize(log_file_path)
+            if current_size > previous_size:
+                print(".", end="", flush=True)
+                previous_size = current_size
+        time.sleep(0.5)
+
 def main():
     print("Starting Unity tests...")
     
     if not is_port_in_use(26598):
         print("Error: No server listening on port 26598")
         print("Make sure the server is running before executing tests")
+        sys.exit(1)
+
+    if not check_rsync_available():
+        print("Error: rsync binary not found on the system")
+        print("Please install rsync before running tests")
         sys.exit(1)
 
     script_dir = Path(__file__).parent
@@ -105,8 +156,10 @@ def main():
         shutil.rmtree(test_output_dir)
     test_output_dir.mkdir(exist_ok=True)
     
+    # Sync project to temp directory
+    project_path = sync_project_to_temp(project_root)
+    
     unity_path = get_unity_path()
-    project_path = str(project_root)
     test_results = str(test_output_dir / "results.xml")
     log_file = str(test_output_dir / "logs.txt")
     
@@ -121,7 +174,15 @@ def main():
 
     try:
         print(f"{unity_path} \\\n ", " \\\n  ".join(args))
+        
+        # Start log file monitoring in a separate thread
+        monitor_thread = threading.Thread(target=monitor_log_file, args=(log_file,), daemon=True)
+        monitor_thread.start()
+        
         subprocess.run(executable=unity_path, args=args, check=True)
+        
+        print("\n")
+        
         if Path(test_results).exists():
             print("Unity tests completed")
             print_test_summary(test_results)
@@ -129,13 +190,13 @@ def main():
             print("Error: Test results file not found")
             exit(1)
     except subprocess.CalledProcessError as e:
-        print(f"Error running Unity tests: {e}")
+        print(f"\nError running Unity tests: {e}")
         exit(1)
     except FileNotFoundError as e:
-        print(f"Error: {e}")
+        print(f"\nError: {e}")
         exit(1)
     except OSError as e:
-        print(f"Error: {e}")
+        print(f"\nError: {e}")
         exit(1)
 
 if __name__ == "__main__":

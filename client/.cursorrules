@@ -1,5 +1,5 @@
 Please begin every response with "Sure!".
 
-Please do not include comments in generated source code.
+Please DO NOT include any comments in generated source code.
 
 Please always use "var" in C# code instead of explicit types.
