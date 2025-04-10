@@ -13,29 +13,37 @@ namespace Dreamtides.Components
 
     void Awake()
     {
-      for (int i = 0; i < 20; i++)
+      for (int i = 0; i < 25; i++)
       {
         var bottomLeft = _camera.WorldToViewportPoint(_bottomLeft.position);
         if (bottomLeft.x > _zoomInThreshold)
         {
           _camera.fieldOfView -= 1;
         }
-
-        if (bottomLeft.x < 0)
-        {
-          _camera.fieldOfView += 1;
-        }
       }
 
-      for (int i = 0; i < 20; i++)
+      for (int i = 0; i < 25; i++)
       {
         var topLeft = _camera.WorldToViewportPoint(_topLeft.position);
         if (topLeft.x > _zoomInThreshold)
         {
           _camera.fieldOfView -= 1;
         }
+      }
 
-        if (topLeft.x < 0)
+      for (int i = 0; i < 25; i++)
+      {
+        var bottomLeft = _camera.WorldToViewportPoint(_bottomLeft.position);
+        if (bottomLeft.x < 0 || bottomLeft.y < 0)
+        {
+          _camera.fieldOfView += 1;
+        }
+      }
+
+      for (int i = 0; i < 25; i++)
+      {
+        var topLeft = _camera.WorldToViewportPoint(_topLeft.position);
+        if (topLeft.x < 0 || topLeft.y < 0)
         {
           _camera.fieldOfView += 1;
         }
