@@ -38,7 +38,7 @@ namespace Dreamtides.Tests
       yield return WaitForAnimations();
     }
 
-    static IEnumerator WaitForAnimations()
+    public static IEnumerator WaitForAnimations()
     {
       yield return TweenUtils.WaitForActiveSequences();
 

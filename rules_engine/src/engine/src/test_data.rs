@@ -278,12 +278,6 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                     // Wait for animation
                     commands.push(Command::Wait(Milliseconds::new(1500)));
 
-                    // Move card to battlefield
-                    // battle.cards[card_index] =
-                    //     card_view(Position::OnBattlefield(PlayerName::Enemy), sorting_key);
-                    // commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.
-                    // clone())));
-
                     *CURRENT_BATTLE.lock().unwrap() = Some(battle);
                 }
 
@@ -966,7 +960,7 @@ fn scene_0(id: BattleId) -> BattleView {
             total_spark: Spark(0),
         },
         cards: [
-            cards_in_position(Position::InHand(PlayerName::User), 2, 3),
+            cards_in_position(Position::InHand(PlayerName::User), 5, 3),
             cards_in_position(Position::InVoid(PlayerName::User), 16, 6),
             cards_in_position(Position::InDeck(PlayerName::User), 22, 20),
             cards_in_position(Position::InHand(PlayerName::Enemy), 105, 3),

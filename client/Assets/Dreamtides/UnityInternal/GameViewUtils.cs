@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -25,6 +26,18 @@ namespace Dreamtides.UnityInternal
 
   public static class GameViewUtils
   {
+    static object gameViewSizesInstance;
+    static MethodInfo getGroup;
+
+    static GameViewUtils()
+    {
+      var sizesType = typeof(Editor).Assembly.GetType("UnityEditor.GameViewSizes");
+      var singleType = typeof(ScriptableSingleton<>).MakeGenericType(sizesType);
+      var instanceProp = singleType.GetProperty("instance");
+      getGroup = sizesType.GetMethod("GetGroup");
+      gameViewSizesInstance = instanceProp.GetValue(null, null);
+    }
+
     public static void SetGameViewResolution(GameViewResolution resolution)
     {
       // By creating an assembly named "Unity.InternalAPIEditorBridge.020", we have
@@ -68,6 +81,45 @@ namespace Dreamtides.UnityInternal
         default:
           throw new InvalidOperationException($"Invalid game view resolution: {resolution}");
       }
+    }
+
+    [MenuItem("Tools/Add Resolutions")]
+    public static void AddResolutions()
+    {
+      foreach (GameViewResolution resolution in Enum.GetValues(typeof(GameViewResolution)))
+      {
+        AddCustomSize(resolution);
+      }
+    }
+
+    static void AddCustomSize(GameViewResolution resolution)
+    {
+      var group = GetGroup(GameViewSizeGroupType.Standalone);
+      var addCustomSize = getGroup.ReturnType.GetMethod("AddCustomSize"); // or group.GetType().
+      string assemblyName = "UnityEditor.dll";
+      Assembly assembly = Assembly.Load(assemblyName);
+      Type gameViewSize = assembly.GetType("UnityEditor.GameViewSize");
+      Type gameViewSizeType = assembly.GetType("UnityEditor.GameViewSizeType");
+      ConstructorInfo ctor = gameViewSize.GetConstructor(new Type[]
+          {
+                 gameViewSizeType,
+                 typeof(int),
+                 typeof(int),
+                 typeof(string)
+          });
+      var resolutionVector = GetResolution(resolution);
+      var newSize = ctor.Invoke(new object[] {
+        GameViewSizeType.FixedResolution,
+        (int)resolutionVector.x,
+        (int)resolutionVector.y,
+        resolution.ToString()
+      });
+      addCustomSize.Invoke(group, new object[] { newSize });
+    }
+
+    static object GetGroup(GameViewSizeGroupType type)
+    {
+      return getGroup.Invoke(gameViewSizesInstance, new object[] { (int)type });
     }
   }
 }

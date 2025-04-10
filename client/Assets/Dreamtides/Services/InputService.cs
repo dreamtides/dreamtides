@@ -9,25 +9,55 @@ using UnityEngine.InputSystem;
 
 namespace Dreamtides.Services
 {
-  public class InputService : Service
+  public interface IInputProvider
   {
-    readonly RaycastHit[] _raycastHitsTempBuffer = new RaycastHit[8];
-    Displayable? _lastHovered;
-    Displayable? _lastClicked;
-    InputAction _clickAction = null!;
-    InputAction _tapPositionAction = null!;
+    /// <summary>
+    /// Returns true if the mouse, pointing device, or a finger is currently
+    /// pressed down.
+    /// </summary>
+    bool IsPointerPressed();
 
-    void Start()
+    /// <summary>
+    /// Returns the current or last-known screen position of the mouse, pointing
+    /// device, or finger contacting the touch screen in screen coordinates.
+    /// </summary>
+    Vector2 PointerPosition();
+  }
+
+  public class UnityInputProvider : IInputProvider
+  {
+    InputAction _clickAction;
+    InputAction _tapPositionAction;
+
+    public UnityInputProvider()
     {
       _clickAction = InputSystem.actions.FindAction("Click");
       _tapPositionAction = InputSystem.actions.FindAction("TapPosition");
     }
 
+    public bool IsPointerPressed() => _clickAction.IsPressed();
+
     public Vector2 PointerPosition() => _tapPositionAction.ReadValue<Vector2>();
+  }
+
+  public class InputService : Service
+  {
+    readonly RaycastHit[] _raycastHitsTempBuffer = new RaycastHit[8];
+    Displayable? _lastHovered;
+    Displayable? _lastClicked;
+
+    public IInputProvider InputProvider { get; set; } = null!;
+
+    protected override void OnInitialize(TestConfiguration? testConfiguration)
+    {
+      InputProvider = new UnityInputProvider();
+    }
+
+    public Vector2 PointerPosition() => InputProvider.PointerPosition();
 
     public Vector3 WorldPointerPosition(float screenZ)
     {
-      var tapScreenPosition = PointerPosition();
+      var tapScreenPosition = InputProvider.PointerPosition();
       return Registry.Layout.MainCamera.ScreenToWorldPoint(
           new Vector3(tapScreenPosition.x, tapScreenPosition.y, screenZ));
     }
@@ -40,7 +70,7 @@ namespace Dreamtides.Services
 
     void HandleDisplayableClickAndDrag()
     {
-      switch (_clickAction.IsPressed())
+      switch (InputProvider.IsPointerPressed())
       {
         case true when _lastClicked:
           _lastClicked.MouseDrag();
@@ -59,7 +89,7 @@ namespace Dreamtides.Services
 
     void HandleDisplayableHover()
     {
-      if (_clickAction.IsPressed() || !Registry.IsLandscape)
+      if (InputProvider.IsPointerPressed() || Application.isMobilePlatform)
       {
         return;
       }
@@ -107,7 +137,7 @@ namespace Dreamtides.Services
     Displayable? ObjectAtPointerPosition()
     {
       var allowedContexts = Registry.DocumentService.AllowedContextForClicks();
-      var tapScreenPosition = PointerPosition();
+      var tapScreenPosition = InputProvider.PointerPosition();
       var ray = Registry.Layout.MainCamera.ScreenPointToRay(tapScreenPosition);
       var hits = Physics.RaycastAll(
           ray,

@@ -1,17 +1,19 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using DG.Tweening;
 using Dreamtides.Services;
 using UnityEngine;
 using UnityEngine.UI;
 
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 namespace Dreamtides.Layout
 {
   public class CardBrowser : AbstractCardBrowser
   {
     [SerializeField] float _scrollAmount;
     [SerializeField] Scrollbar _scrollbar = null!;
-    [SerializeField] Button _closeButton = null!;
+    [SerializeField] internal Button _closeButton = null!;
     [SerializeField] float _maxStackOffsetRight = 1f;
     [SerializeField] Transform _singleCardPosition = null!;
 

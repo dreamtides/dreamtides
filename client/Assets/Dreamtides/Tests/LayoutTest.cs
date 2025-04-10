@@ -55,6 +55,24 @@ namespace Dreamtides.Tests
       yield return TestUtil.TearDownScenario();
     }
 
+    [UnityTest]
+    public IEnumerator TestOpenUserVoidBrowser()
+    {
+      Registry registry = null;
+      yield return TestUtil.LoadScenario(GameViewResolution.Resolution16x9, "basic", (r) =>
+      {
+        registry = r;
+      });
+
+      ComponentAssertions.AssertNotEmpty(registry.Layout.UserVoid);
+      yield return TestClickInputProvider.ClickOn(registry, registry.Layout.UserVoid.transform);
+      ComponentAssertions.AssertEmpty(registry.Layout.UserVoid);
+      ComponentAssertions.AssertNotEmpty(registry.Layout.Browser);
+      ComponentAssertions.AssertActive(registry.Layout.Browser._closeButton);
+
+      yield return TestUtil.TearDownScenario();
+    }
+
     static BoxCollider GetBoxCollider(Component component)
     {
       return Errors.CheckNotNull(component.GetComponentInChildren<BoxCollider>(),

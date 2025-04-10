@@ -34,7 +34,8 @@ namespace Dreamtides.Utils
 
     public static IEnumerator WaitForActiveSequences()
     {
-      foreach (var sequence in _activeSequences)
+      var sequences = new List<Sequence>(_activeSequences);
+      foreach (var sequence in sequences)
       {
         if (sequence.IsActive())
         {

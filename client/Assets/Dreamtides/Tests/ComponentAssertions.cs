@@ -1,5 +1,6 @@
 #nullable enable
 
+using Dreamtides.Layout;
 using Dreamtides.Services;
 using Dreamtides.Utils;
 using NUnit.Framework;
@@ -9,6 +10,21 @@ namespace Dreamtides.Tests
 {
   public static class ComponentAssertions
   {
+    public static void AssertEmpty(ObjectLayout objectLayout)
+    {
+      Assert.That(objectLayout.Objects.Count, Is.EqualTo(0));
+    }
+
+    public static void AssertNotEmpty(ObjectLayout objectLayout)
+    {
+      Assert.That(objectLayout.Objects.Count, Is.GreaterThan(0));
+    }
+
+    public static void AssertActive(Component component)
+    {
+      Assert.That(component.gameObject.activeSelf, Is.True);
+    }
+
     public static void AssertBoxColliderIsOnScreen(Registry registry, BoxCollider collider, string? message = null)
     {
       var bounds = collider.bounds;
