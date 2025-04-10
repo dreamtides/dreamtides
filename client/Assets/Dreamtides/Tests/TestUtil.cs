@@ -16,6 +16,7 @@ namespace Dreamtides.Tests
     public static IEnumerator LoadScenario(GameViewResolution resolution, string scenario, Action<Registry> action)
     {
       Registry.TestConfiguration = new TestConfiguration(scenario);
+      TweenUtils.TestMode = true;
       GameViewUtils.SetGameViewResolution(resolution);
       SceneManager.LoadScene("Assets/Scenes/Main.unity", LoadSceneMode.Single);
       yield return WaitForSceneLoad();
@@ -25,10 +26,34 @@ namespace Dreamtides.Tests
           $"Resolution {resolution} not set");
 
       yield return new WaitUntil(() => registry.ActionService.Connected);
+      yield return WaitForAnimations();
+
       action(registry);
     }
 
-    private static IEnumerator WaitForSceneLoad()
+    public static IEnumerator TearDownScenario()
+    {
+      Registry.TestConfiguration = null;
+      TweenUtils.TestMode = false;
+      yield return WaitForAnimations();
+    }
+
+    static IEnumerator WaitForAnimations()
+    {
+      yield return TweenUtils.WaitForActiveSequences();
+
+      foreach (var system in UnityEngine.Object.FindObjectsByType<ParticleSystem>(FindObjectsSortMode.None))
+      {
+        if (system.isPlaying && !system.main.loop)
+        {
+          yield return new WaitUntil(() => !system.isPlaying);
+        }
+      }
+
+      yield return new WaitForEndOfFrame();
+    }
+
+    static IEnumerator WaitForSceneLoad()
     {
       while (SceneManager.GetActiveScene().buildIndex > 0)
       {

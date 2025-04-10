@@ -3,6 +3,7 @@
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
+        "DOTween.Modules",
         "UnityEditor.TestRunner",
         "Dreamtides",
         "DreamtidesEditor",

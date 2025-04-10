@@ -1,6 +1,8 @@
 #nullable enable
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
@@ -12,11 +14,33 @@ namespace Dreamtides.Utils
     public const float MoveAnimationDurationSeconds = 0.3f * GlobalAnimationMultiplier;
     public const float FlipAnimationDurationSeconds = 0.4f * GlobalAnimationMultiplier;
 
+    public static bool TestMode { get; set; }
+    static List<Sequence> _activeSequences { get; } = new List<Sequence>();
+
     public static Sequence Sequence(string name)
     {
       var result = DOTween.Sequence();
       result.stringId = name;
+      if (TestMode)
+      {
+        _activeSequences.Add(result);
+        result.OnComplete(() =>
+        {
+          _activeSequences.Remove(result);
+        });
+      }
       return result;
+    }
+
+    public static IEnumerator WaitForActiveSequences()
+    {
+      foreach (var sequence in _activeSequences)
+      {
+        if (sequence.IsActive())
+        {
+          yield return sequence.WaitForCompletion();
+        }
+      }
     }
 
     public static Sequence FadeInCanvasGroup(CanvasGroup canvasGroup)

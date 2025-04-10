@@ -1,7 +1,5 @@
 using System.Collections;
 using NUnit.Framework;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using Dreamtides.Services;
 using Dreamtides.Utils;
@@ -29,12 +27,6 @@ namespace Dreamtides.Tests
       GameViewResolution.ResolutionPixel5,
     };
 
-    [TearDown]
-    public void TearDown()
-    {
-      Registry.TestConfiguration = null;
-    }
-
     [UnityTest]
     public IEnumerator TestBasicLayout([ValueSource("Resolutions")] GameViewResolution resolution)
     {
@@ -49,6 +41,8 @@ namespace Dreamtides.Tests
         var card = ComponentUtils.Get<Card>(displayable);
         ComponentAssertions.AssertSpriteIsOnScreen(registry, card.CostBackgroundForTests, $"Card {card.Id}");
       }
+
+      yield return TestUtil.TearDownScenario();
     }
   }
 }
