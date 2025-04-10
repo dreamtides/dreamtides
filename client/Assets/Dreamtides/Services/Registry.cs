@@ -78,7 +78,7 @@ namespace Dreamtides.Services
     void Awake()
     {
       var testConfiguration = TestConfiguration;
-      if (_debugTestScenarioOverride != null)
+      if (!string.IsNullOrEmpty(_debugTestScenarioOverride))
       {
         testConfiguration = new TestConfiguration(_debugTestScenarioOverride);
       }
