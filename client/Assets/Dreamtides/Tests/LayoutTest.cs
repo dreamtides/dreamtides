@@ -20,6 +20,13 @@ namespace Dreamtides.Tests
       GameViewResolution.Resolution4x3,
       GameViewResolution.Resolution5x4,
       GameViewResolution.Resolution32x9,
+      GameViewResolution.ResolutionIPhone12,
+      GameViewResolution.ResolutionIPhoneSE,
+      GameViewResolution.ResolutionIPadPro12,
+      GameViewResolution.ResolutionIPodTouch6,
+      GameViewResolution.ResolutionSamsungNote20,
+      GameViewResolution.ResolutionSamsungZFold2,
+      GameViewResolution.ResolutionPixel5,
     };
 
     [SetUp]
