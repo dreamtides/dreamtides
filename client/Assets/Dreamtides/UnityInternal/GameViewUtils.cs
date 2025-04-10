@@ -23,16 +23,14 @@ namespace Dreamtides.UnityInternal
     ResolutionPixel5,
   }
 
-  /// <summary>
-  /// By creating an assembly named "Unity.InternalAPIEditorBridge.020", we have
-  /// access to Unity's internal APIs.
-  ///
-  /// See https://stackoverflow.com/questions/79563229
-  /// </summary>
   public static class GameViewUtils
   {
     public static void SetGameViewResolution(GameViewResolution resolution)
     {
+      // By creating an assembly named "Unity.InternalAPIEditorBridge.020", we have
+      // access to Unity's internal APIs.
+      //
+      // See https://stackoverflow.com/questions/79563229
       var gameView = EditorWindow.GetWindow<GameView>();
       gameView.SetCustomResolution(GetResolution(resolution), "TestResolution");
     }

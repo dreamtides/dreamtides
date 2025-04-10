@@ -5,6 +5,7 @@ using Dreamtides.Services;
 using Dreamtides.Utils;
 using Dreamtides.Components;
 using Dreamtides.UnityInternal;
+using UnityEngine;
 
 namespace Dreamtides.Tests
 {
@@ -36,6 +37,15 @@ namespace Dreamtides.Tests
         registry = r;
       });
 
+      ComponentAssertions.AssertBoxColliderIsOnScreen(registry,
+          GetBoxCollider(registry.Layout.UserDeck), "User deck is not on screen");
+      ComponentAssertions.AssertBoxColliderIsOnScreen(registry,
+          GetBoxCollider(registry.Layout.EnemyDeck), "Enemy deck is not on screen");
+      ComponentAssertions.AssertBoxColliderIsOnScreen(registry,
+          GetBoxCollider(registry.Layout.UserVoid), "User void is not on screen");
+      ComponentAssertions.AssertBoxColliderIsOnScreen(registry,
+          GetBoxCollider(registry.Layout.EnemyVoid), "Enemy void is not on screen");
+
       foreach (var displayable in registry.Layout.UserHand.Objects)
       {
         var card = ComponentUtils.Get<Card>(displayable);
@@ -43,6 +53,12 @@ namespace Dreamtides.Tests
       }
 
       yield return TestUtil.TearDownScenario();
+    }
+
+    static BoxCollider GetBoxCollider(Component component)
+    {
+      return Errors.CheckNotNull(component.GetComponentInChildren<BoxCollider>(),
+          $"No BoxCollider found on {component.gameObject}");
     }
   }
 }
