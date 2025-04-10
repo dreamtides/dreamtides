@@ -16,13 +16,15 @@ namespace Dreamtides.Services
     bool _devModeAutoConnect;
     float _lastConnectAttemptTime;
     Metadata? _metadata;
+    string? _testScenario;
 
-    protected override void OnInitialize(TestMode testMode)
+    protected override void OnInitialize(TestConfiguration? testConfiguration)
     {
-      StartCoroutine(InitializeAsync(testMode));
+      _testScenario = testConfiguration?.TestScenario;
+      StartCoroutine(InitializeAsync());
     }
 
-    IEnumerator InitializeAsync(TestMode testMode)
+    IEnumerator InitializeAsync()
     {
       yield return new WaitForEndOfFrame();
       _metadata = new Metadata
@@ -31,7 +33,8 @@ namespace Dreamtides.Services
       };
       var request = new ConnectRequest
       {
-        Metadata = _metadata
+        Metadata = _metadata,
+        TestScenario = _testScenario
       };
 
       if (Application.isEditor)
@@ -73,7 +76,8 @@ namespace Dreamtides.Services
         {
           UserId = Guid.NewGuid()
         },
-        Action = action
+        Action = action,
+        TestScenario = _testScenario
       };
       if (Application.isEditor)
       {

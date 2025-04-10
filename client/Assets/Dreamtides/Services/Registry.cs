@@ -1,7 +1,5 @@
 #nullable enable
 
-using System.Collections;
-using System.Threading;
 using Dreamtides.Buttons;
 using Dreamtides.Layout;
 using Dreamtides.Utils;
@@ -11,11 +9,14 @@ namespace Dreamtides.Services
 {
   public class Registry : MonoBehaviour
   {
-    bool _isPortrait = false;
+    public static TestConfiguration? TestConfiguration { get; set; }
+
+    [SerializeField] string? _debugTestScenarioOverride;
     [SerializeField] GameLayout? _portraitLayout;
     [SerializeField] GameLayout? _landscapeLayout;
+    bool _isLandscape = false;
 
-    public bool IsLandscape => !_isPortrait;
+    public bool IsLandscape => _isLandscape;
 
     public GameLayout Layout =>
         IsLandscape ? Check(_landscapeLayout) : Check(_portraitLayout);
@@ -74,40 +75,44 @@ namespace Dreamtides.Services
     [SerializeField] ControlledButton? _bottomRightButton;
     public ControlledButton BottomRightButton => Check(_bottomRightButton);
 
-    public static bool IsTest { get; set; }
-
     void Awake()
     {
-      if (IsTest)
+      var testConfiguration = TestConfiguration;
+      if (_debugTestScenarioOverride != null)
       {
-        Debug.Log($"Running Tests");
+        testConfiguration = new TestConfiguration(_debugTestScenarioOverride);
+      }
+
+      if (testConfiguration != null)
+      {
+        Debug.Log($"Running test scenario: {testConfiguration.TestScenario}");
       }
       else
       {
         Debug.Log($"Starting Dreamtides");
       }
 
-      IsTest = false;
       Application.targetFrameRate = 60;
 
-      _isPortrait = Screen.width < Screen.height;
-      if (_isPortrait)
-      {
-        Check(_portraitLayout).gameObject.SetActive(true);
-        Check(_landscapeLayout).gameObject.SetActive(false);
-      }
-      else
+      _isLandscape = Screen.width > Screen.height;
+      if (_isLandscape)
       {
         Check(_portraitLayout).gameObject.SetActive(false);
         Check(_landscapeLayout).gameObject.SetActive(true);
       }
+      else
+      {
+        Check(_portraitLayout).gameObject.SetActive(true);
+        Check(_landscapeLayout).gameObject.SetActive(false);
+      }
+
       foreach (var service in GetComponentsInChildren<Service>())
       {
-        service.Initialize(this, IsTest ? Service.TestMode.Testing : Service.TestMode.None);
+        service.Initialize(this, testConfiguration);
       }
     }
 
-    T Check<T>(T? value) where T : UnityEngine.Object =>
+    T Check<T>(T? value) where T : Object =>
         Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
   }
 }

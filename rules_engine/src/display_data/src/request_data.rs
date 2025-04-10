@@ -16,6 +16,7 @@ pub struct Metadata {
 #[serde(rename_all = "camelCase")]
 pub struct ConnectRequest {
     pub metadata: Metadata,
+    pub test_scenario: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -30,6 +31,7 @@ pub struct ConnectResponse {
 pub struct PerformActionRequest {
     pub metadata: Metadata,
     pub action: UserAction,
+    pub test_scenario: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

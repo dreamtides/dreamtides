@@ -29,21 +29,16 @@ namespace Dreamtides.Tests
       GameViewResolution.ResolutionPixel5,
     };
 
-    [SetUp]
-    public void SetUp()
-    {
-      Registry.IsTest = true;
-    }
-
     [TearDown]
     public void TearDown()
     {
-      Registry.IsTest = false;
+      Registry.TestConfiguration = null;
     }
 
     [UnityTest]
     public IEnumerator TestBasicLayout([ValueSource("Resolutions")] GameViewResolution resolution)
     {
+      Registry.TestConfiguration = new TestConfiguration("basic");
       GameViewUtils.SetGameViewResolution(resolution);
       SceneManager.LoadScene("Assets/Scenes/Main.unity", LoadSceneMode.Single);
       yield return WaitForSceneLoad();

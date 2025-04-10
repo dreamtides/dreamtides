@@ -40,6 +40,9 @@ namespace Dreamtides.Schema
     {
         [JsonProperty("metadata", Required = Required.Always)]
         public Metadata Metadata { get; set; }
+
+        [JsonProperty("testScenario")]
+        public string TestScenario { get; set; }
     }
 
     public partial class Metadata
@@ -1617,6 +1620,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("metadata", Required = Required.Always)]
         public Metadata Metadata { get; set; }
+
+        [JsonProperty("testScenario")]
+        public string TestScenario { get; set; }
     }
 
     public partial class PerformActionResponse
