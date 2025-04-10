@@ -38,29 +38,16 @@ namespace Dreamtides.Tests
     [UnityTest]
     public IEnumerator TestBasicLayout([ValueSource("Resolutions")] GameViewResolution resolution)
     {
-      Registry.TestConfiguration = new TestConfiguration("basic");
-      GameViewUtils.SetGameViewResolution(resolution);
-      SceneManager.LoadScene("Assets/Scenes/Main.unity", LoadSceneMode.Single);
-      yield return WaitForSceneLoad();
-      var registry = ComponentUtils.Get<Registry>(GameObject.Find("Registry"));
-      Assert.IsNotNull(registry);
-      Debug.Log($"Running tests at {Screen.width}x{Screen.height}");
-      Assert.AreEqual(1 + 1, 2);
-
-      yield return new WaitUntil(() => registry.ActionService.Connected);
+      Registry registry = null;
+      yield return TestUtil.LoadScenario(resolution, "basic", (r) =>
+      {
+        registry = r;
+      });
 
       foreach (var displayable in registry.Layout.UserHand.Objects)
       {
         var card = ComponentUtils.Get<Card>(displayable);
         ComponentAssertions.AssertSpriteIsOnScreen(registry, card.CostBackgroundForTests, $"Card {card.Id}");
-      }
-    }
-
-    private IEnumerator WaitForSceneLoad()
-    {
-      while (SceneManager.GetActiveScene().buildIndex > 0)
-      {
-        yield return null;
       }
     }
   }

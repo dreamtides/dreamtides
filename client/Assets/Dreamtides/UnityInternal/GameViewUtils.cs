@@ -37,7 +37,7 @@ namespace Dreamtides.UnityInternal
       gameView.SetCustomResolution(GetResolution(resolution), "TestResolution");
     }
 
-    static Vector2 GetResolution(GameViewResolution resolution)
+    public static Vector2 GetResolution(GameViewResolution resolution)
     {
       switch (resolution)
       {
