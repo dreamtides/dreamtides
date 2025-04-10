@@ -18,8 +18,12 @@ namespace Dreamtides.Services
 
     protected override void OnInitialize(TestConfiguration? testConfiguration)
     {
-      ShufflePlaylist();
-      PlayNextTrack();
+      if (testConfiguration == null)
+      {
+        // Don't play music in tests
+        ShufflePlaylist();
+        PlayNextTrack();
+      }
     }
 
     public void Mute()

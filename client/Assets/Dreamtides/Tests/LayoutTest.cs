@@ -47,7 +47,7 @@ namespace Dreamtides.Tests
       Debug.Log($"Running tests at {Screen.width}x{Screen.height}");
       Assert.AreEqual(1 + 1, 2);
 
-      yield return new WaitForSeconds(5f);
+      yield return new WaitUntil(() => registry.ActionService.Connected);
 
       foreach (var displayable in registry.Layout.UserHand.Objects)
       {

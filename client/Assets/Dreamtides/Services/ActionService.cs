@@ -18,8 +18,11 @@ namespace Dreamtides.Services
     Metadata? _metadata;
     string? _testScenario;
 
+    public bool Connected { get; private set; }
+
     protected override void OnInitialize(TestConfiguration? testConfiguration)
     {
+      Connected = false;
       _testScenario = testConfiguration?.TestScenario;
       StartCoroutine(InitializeAsync());
     }
@@ -63,6 +66,7 @@ namespace Dreamtides.Services
         }
       }
     }
+
     public void PerformAction(UserAction? action)
     {
       if (action == null)
@@ -145,6 +149,12 @@ namespace Dreamtides.Services
       foreach (var group in commands.Groups)
       {
         yield return ApplyGroup(group, animate);
+      }
+
+      if (!Connected)
+      {
+        yield return new WaitForEndOfFrame();
+        Connected = true;
       }
     }
 
