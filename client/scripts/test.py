@@ -84,6 +84,34 @@ def print_test_summary(results_path):
     except FileNotFoundError:
         print("Test results file not found")
 
+def print_detailed_failures(results_path):
+    try:
+        tree = ET.parse(results_path)
+        test_run = tree.getroot()
+        
+        print("\nDetailed Error Information:")
+        
+        # Find all failed test cases
+        for test_case in test_run.findall('.//test-case[@result="Failed"]'):
+            name = test_case.get('name', 'Unknown')
+            print(f"\n- {name}")
+            
+            # Extract error message from the failure element
+            failure = test_case.find('./failure/message')
+            if failure is not None and failure.text:
+                # Skip the "One or more child tests had errors" generic messages
+                if "One or more child tests had errors" not in failure.text:
+                    # Clean up the message - remove CDATA wrapper if present
+                    message = failure.text
+                    if message.startswith('<![CDATA[') and message.endswith(']]>'):
+                        message = message[9:-3]
+                    print(f"  Error: {message}")
+        
+    except ET.ParseError as e:
+        print(f"Error parsing test results for detailed failures: {e}")
+    except FileNotFoundError:
+        print("Test results file not found")
+
 def is_port_in_use(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
@@ -191,6 +219,13 @@ def main():
             exit(1)
     except subprocess.CalledProcessError as e:
         print(f"\nError running Unity tests: {e}")
+
+        # Check if we have test results to parse
+        if Path(test_results).exists():
+            print("Tests failed but results file was generated.")
+            print_test_summary(test_results)
+            print_detailed_failures(test_results) 
+
         exit(1)
     except FileNotFoundError as e:
         print(f"\nError: {e}")
