@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using DG.Tweening;
 using Dreamtides.Layout;
 using Dreamtides.Masonry;
@@ -11,35 +12,36 @@ using Dreamtides.Utils;
 using TMPro;
 using UnityEngine;
 
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 namespace Dreamtides.Components
 {
   public class Card : Displayable
   {
-    [SerializeField] Transform _cardFront = null!;
-    [SerializeField] Transform _battlefieldCardFront = null!;
-    [SerializeField] TextMeshPro _name = null!;
-    [SerializeField] TextMeshPro _rulesText = null!;
-    [SerializeField] TextMeshPro _typeText = null!;
-    [SerializeField] Renderer _cardFrame = null!;
-    [SerializeField] SpriteRenderer _cardImage = null!;
-    [SerializeField] SpriteRenderer _battlefieldCardImage = null!;
-    [SerializeField] DissolveEffect _cardImageDissolve = null!;
-    [SerializeField] BoxCollider _cardCollider = null!;
-    [SerializeField] Renderer _cardBack = null!;
-    [SerializeField] Renderer _outline = null!;
-    [SerializeField] SpriteRenderer _battlefieldOutline = null!;
-    [SerializeField] SpriteRenderer _costBackground = null!;
-    [SerializeField] TextMeshPro _costText = null!;
-    [SerializeField] TextMeshPro _producedEnergyText = null!;
-    [SerializeField] Renderer _sparkBackground = null!;
-    [SerializeField] TextMeshPro _sparkText = null!;
-    [SerializeField] Renderer _battlefieldSparkBackground = null!;
-    [SerializeField] TextMeshPro _battlefieldSparkText = null!;
-    [SerializeField] ObjectLayout? _containedObjects;
-    [SerializeField] ObjectLayout? _stackedObjects;
-    [SerializeField] Transform _cardTrailPosition = null!;
-    [SerializeField] GameObject _battlefieldIconContainer = null!;
-    [SerializeField] TextMeshPro _battlefieldIcon = null!;
+    [SerializeField] internal Transform _cardFront = null!;
+    [SerializeField] internal Transform _battlefieldCardFront = null!;
+    [SerializeField] internal TextMeshPro _name = null!;
+    [SerializeField] internal TextMeshPro _rulesText = null!;
+    [SerializeField] internal TextMeshPro _typeText = null!;
+    [SerializeField] internal Renderer _cardFrame = null!;
+    [SerializeField] internal SpriteRenderer _cardImage = null!;
+    [SerializeField] internal SpriteRenderer _battlefieldCardImage = null!;
+    [SerializeField] internal DissolveEffect _cardImageDissolve = null!;
+    [SerializeField] internal BoxCollider _cardCollider = null!;
+    [SerializeField] internal Renderer _cardBack = null!;
+    [SerializeField] internal Renderer _outline = null!;
+    [SerializeField] internal SpriteRenderer _battlefieldOutline = null!;
+    [SerializeField] internal SpriteRenderer _costBackground = null!;
+    [SerializeField] internal TextMeshPro _costText = null!;
+    [SerializeField] internal TextMeshPro _producedEnergyText = null!;
+    [SerializeField] internal Renderer _sparkBackground = null!;
+    [SerializeField] internal TextMeshPro _sparkText = null!;
+    [SerializeField] internal Renderer _battlefieldSparkBackground = null!;
+    [SerializeField] internal TextMeshPro _battlefieldSparkText = null!;
+    [SerializeField] internal ObjectLayout? _containedObjects;
+    [SerializeField] internal ObjectLayout? _stackedObjects;
+    [SerializeField] internal Transform _cardTrailPosition = null!;
+    [SerializeField] internal GameObject _battlefieldIconContainer = null!;
+    [SerializeField] internal TextMeshPro _battlefieldIcon = null!;
 
     bool _isRevealed = false;
     Registry _registry = null!;
@@ -65,8 +67,6 @@ namespace Dreamtides.Components
     public string Id => CardView.ClientId();
 
     public ObjectLayout ContainedObjects => Errors.CheckNotNull(_containedObjects);
-
-    public SpriteRenderer CostBackgroundForTests => Errors.CheckNotNull(_costBackground);
 
     public void Render(Registry registry, CardView view, Sequence? sequence = null)
     {

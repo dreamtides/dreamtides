@@ -22,27 +22,61 @@ namespace Dreamtides.Services
     /// device, or finger contacting the touch screen in screen coordinates.
     /// </summary>
     Vector2 PointerPosition();
+
+    Displayable? ObjectAtPointerPosition();
   }
 
   public class UnityInputProvider : IInputProvider
   {
-    InputAction _clickAction;
-    InputAction _tapPositionAction;
+    readonly RaycastHit[] _raycastHitsTempBuffer = new RaycastHit[8];
+    readonly Registry _registry;
+    readonly InputAction _clickAction;
+    readonly InputAction _tapPositionAction;
 
-    public UnityInputProvider()
+    public UnityInputProvider(Registry registry)
     {
+      _registry = registry;
       _clickAction = InputSystem.actions.FindAction("Click");
       _tapPositionAction = InputSystem.actions.FindAction("TapPosition");
     }
 
     public bool IsPointerPressed() => _clickAction.IsPressed();
 
+    public Displayable? ObjectAtPointerPosition()
+    {
+      var allowedContexts = _registry.DocumentService.AllowedContextForClicks();
+      var tapScreenPosition = PointerPosition();
+      var ray = _registry.Layout.MainCamera.ScreenPointToRay(tapScreenPosition);
+      var hits = Physics.RaycastAll(
+          ray,
+          maxDistance: 256,
+          LayerMask.GetMask("Default"),
+          QueryTriggerInteraction.Ignore);
+
+      var candidates = new List<Displayable>();
+      for (var i = 0; i < hits.Length; ++i)
+      {
+        var hit = hits[i];
+        var displayable = hit.collider.GetComponent<Displayable>();
+        if (displayable && displayable.CanHandleMouseEvents() &&
+            (allowedContexts == null || allowedContexts.Contains(displayable.GameContext)))
+        {
+          candidates.Add(displayable);
+        }
+      }
+
+      Array.Clear(_raycastHitsTempBuffer, 0, _raycastHitsTempBuffer.Length);
+      return candidates
+        .OrderBy(c => c.GameContext)
+        .ThenBy(c => c.SortingKey)
+        .LastOrDefault();
+    }
+
     public Vector2 PointerPosition() => _tapPositionAction.ReadValue<Vector2>();
   }
 
   public class InputService : Service
   {
-    readonly RaycastHit[] _raycastHitsTempBuffer = new RaycastHit[8];
     Displayable? _lastHovered;
     Displayable? _lastClicked;
 
@@ -50,7 +84,7 @@ namespace Dreamtides.Services
 
     protected override void OnInitialize(TestConfiguration? testConfiguration)
     {
-      InputProvider = new UnityInputProvider();
+      InputProvider = new UnityInputProvider(Registry);
     }
 
     public Vector2 PointerPosition() => InputProvider.PointerPosition();
@@ -81,7 +115,7 @@ namespace Dreamtides.Services
         case false when _lastClicked:
           var last = _lastClicked;
           _lastClicked = null;
-          var objectAtClickPosition = ObjectAtPointerPosition();
+          var objectAtClickPosition = InputProvider.ObjectAtPointerPosition();
           last.MouseUp(objectAtClickPosition == last);
           break;
       }
@@ -94,7 +128,7 @@ namespace Dreamtides.Services
         return;
       }
 
-      var current = ObjectAtPointerPosition();
+      var current = InputProvider.ObjectAtPointerPosition();
       if (current && !_lastHovered)
       {
         current.MouseHoverStart();
@@ -125,43 +159,13 @@ namespace Dreamtides.Services
         return null;
       }
 
-      var fired = ObjectAtPointerPosition();
+      var fired = InputProvider.ObjectAtPointerPosition();
       if (fired)
       {
         fired.MouseDown();
       }
 
       return fired;
-    }
-
-    Displayable? ObjectAtPointerPosition()
-    {
-      var allowedContexts = Registry.DocumentService.AllowedContextForClicks();
-      var tapScreenPosition = InputProvider.PointerPosition();
-      var ray = Registry.Layout.MainCamera.ScreenPointToRay(tapScreenPosition);
-      var hits = Physics.RaycastAll(
-          ray,
-          maxDistance: 256,
-          LayerMask.GetMask("Default"),
-          QueryTriggerInteraction.Ignore);
-
-      var candidates = new List<Displayable>();
-      for (var i = 0; i < hits.Length; ++i)
-      {
-        var hit = hits[i];
-        var displayable = hit.collider.GetComponent<Displayable>();
-        if (displayable && displayable.CanHandleMouseEvents() &&
-            (allowedContexts == null || allowedContexts.Contains(displayable.GameContext)))
-        {
-          candidates.Add(displayable);
-        }
-      }
-
-      Array.Clear(_raycastHitsTempBuffer, 0, _raycastHitsTempBuffer.Length);
-      return candidates
-        .OrderBy(c => c.GameContext)
-        .ThenBy(c => c.SortingKey)
-        .LastOrDefault();
     }
   }
 }

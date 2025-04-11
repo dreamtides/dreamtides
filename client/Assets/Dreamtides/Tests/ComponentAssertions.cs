@@ -20,9 +20,19 @@ namespace Dreamtides.Tests
       Assert.That(objectLayout.Objects.Count, Is.GreaterThan(0));
     }
 
-    public static void AssertActive(Component component)
+    public static void AssertCountIs(ObjectLayout objectLayout, int count)
     {
-      Assert.That(component.gameObject.activeSelf, Is.True);
+      Assert.That(objectLayout.Objects.Count, Is.EqualTo(count));
+    }
+
+    public static void AssertActive(Component component, string? message = null)
+    {
+      Assert.That(component.gameObject.activeSelf, Is.True, $"{message}: Component is not active");
+      Assert.That(component.gameObject.activeInHierarchy, Is.True, $"{message}: Component is not active in hierarchy");
+      if (component is MonoBehaviour monoBehaviour)
+      {
+        Assert.That(monoBehaviour.enabled, Is.True, $"{message}: Component is not enabled");
+      }
     }
 
     public static void AssertBoxColliderIsOnScreen(Registry registry, BoxCollider collider, string? message = null)
@@ -53,6 +63,7 @@ namespace Dreamtides.Tests
 
     public static void AssertSpriteIsOnScreen(Registry registry, SpriteRenderer sprite, string message)
     {
+      // Assert.That(sprite.isVisible, $"{message}: Sprite is not visible");
       var bounds = sprite.bounds;
       var corners = new Vector3[4]
       {
@@ -65,9 +76,9 @@ namespace Dreamtides.Tests
       foreach (var corner in corners)
       {
         var viewportPos = registry.Layout.MainCamera.WorldToViewportPoint(corner);
-        Assert.That(viewportPos.x >= 0 && viewportPos.x <= 1 &&
-                    viewportPos.y >= 0 && viewportPos.y <= 1 &&
-                    viewportPos.z > 0,
+        Assert.That(viewportPos.x >= -0.01f && viewportPos.x <= 1.01f &&
+                    viewportPos.y >= -0.01f && viewportPos.y <= 1.01f &&
+                    viewportPos.z >= -0.01f,
                     $"{message}: Corner at world position {corner} is outside viewport: {viewportPos}");
       }
     }

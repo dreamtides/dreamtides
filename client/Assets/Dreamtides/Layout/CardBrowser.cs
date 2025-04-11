@@ -11,11 +11,11 @@ namespace Dreamtides.Layout
 {
   public class CardBrowser : AbstractCardBrowser
   {
-    [SerializeField] float _scrollAmount;
-    [SerializeField] Scrollbar _scrollbar = null!;
+    [SerializeField] internal float _scrollAmount;
+    [SerializeField] internal Scrollbar _scrollbar = null!;
     [SerializeField] internal Button _closeButton = null!;
-    [SerializeField] float _maxStackOffsetRight = 1f;
-    [SerializeField] Transform _singleCardPosition = null!;
+    [SerializeField] internal float _maxStackOffsetRight = 1f;
+    [SerializeField] internal Transform _singleCardPosition = null!;
 
     public override void Show(Registry registry, Sequence? sequence)
     {

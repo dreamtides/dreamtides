@@ -72,6 +72,9 @@ namespace Dreamtides.Services
     [SerializeField] CardEffectPreviewService? _cardEffectPreviewService;
     public CardEffectPreviewService CardEffectPreviewService => Check(_cardEffectPreviewService);
 
+    [SerializeField] TestHelperService? _testHelperService;
+    public TestHelperService TestHelperService => Check(_testHelperService);
+
     [SerializeField] ControlledButton? _bottomRightButton;
     public ControlledButton BottomRightButton => Check(_bottomRightButton);
 

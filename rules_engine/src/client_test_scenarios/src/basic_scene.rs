@@ -1,7 +1,7 @@
 use action_data::debug_action::DebugAction;
 use action_data::user_action::UserAction;
 use core_data::display_color::{self, DisplayColor};
-use core_data::display_types::{AudioClipAddress, Milliseconds, SpriteAddress, Url};
+use core_data::display_types::{AudioClipAddress, SpriteAddress, Url};
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::{CardFacing, PlayerName};
@@ -37,14 +37,14 @@ pub fn create(id: BattleId) -> BattleView {
             total_spark: Spark(0),
         },
         cards: [
-            cards_in_position(Position::InHand(PlayerName::User), 5, 3),
+            cards_in_position(Position::InHand(PlayerName::User), 5, 5),
             cards_in_position(Position::InVoid(PlayerName::User), 16, 6),
             cards_in_position(Position::InDeck(PlayerName::User), 22, 20),
             cards_in_position(Position::InHand(PlayerName::Enemy), 105, 3),
             cards_in_position(Position::InVoid(PlayerName::Enemy), 108, 6),
             cards_in_position(Position::InDeck(PlayerName::Enemy), 114, 20),
             cards_in_position(Position::InVoid(PlayerName::User), 150, 4),
-            cards_in_position(Position::OnBattlefield(PlayerName::User), 533, 8),
+            cards_in_position(Position::OnBattlefield(PlayerName::User), 533, 7),
             cards_in_position(Position::OnBattlefield(PlayerName::Enemy), 633, 8),
             cards_in_position(Position::InHand(PlayerName::Enemy), 733, 5),
             vec![enemy_card(Position::InPlayerStatus(PlayerName::Enemy), 738)],
@@ -60,7 +60,7 @@ pub fn create(id: BattleId) -> BattleView {
             primary_action_button: Some(PrimaryActionButtonView {
                 label: "End Turn".to_string(),
                 action: UserAction::DebugAction(DebugAction::TriggerEnemyJudgment),
-                show_on_idle_duration: Some(Milliseconds::new(2500)),
+                show_on_idle_duration: None,
             }),
             ..Default::default()
         },

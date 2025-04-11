@@ -68,10 +68,10 @@ namespace Dreamtides.Services
     /// screen.
     /// </summary>
     public Vector2 ScreenPositionToElementPosition(Vector2 screenPosition) =>
-  new(
-    ScreenPxToElementPx(screenPosition.x),
-    ScreenPxToElementPx(Screen.height - screenPosition.y)
-  );
+      new(
+        ScreenPxToElementPx(screenPosition.x),
+        ScreenPxToElementPx(Screen.height - screenPosition.y)
+      );
 
     public void RenderScreenOverlay(FlexNode? node)
     {

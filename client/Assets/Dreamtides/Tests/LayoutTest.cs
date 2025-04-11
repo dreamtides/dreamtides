@@ -28,6 +28,12 @@ namespace Dreamtides.Tests
       GameViewResolution.ResolutionPixel5,
     };
 
+    [TearDown]
+    public void TearDown()
+    {
+      Registry.TestConfiguration = null;
+    }
+
     [UnityTest]
     public IEnumerator TestBasicLayout([ValueSource("Resolutions")] GameViewResolution resolution)
     {
@@ -49,10 +55,10 @@ namespace Dreamtides.Tests
       foreach (var displayable in registry.Layout.UserHand.Objects)
       {
         var card = ComponentUtils.Get<Card>(displayable);
-        ComponentAssertions.AssertSpriteIsOnScreen(registry, card.CostBackgroundForTests, $"Card {card.Id}");
+        ComponentAssertions.AssertSpriteIsOnScreen(registry, card._costBackground, $"Energy Cost of {card.Id}");
       }
 
-      yield return TestUtil.TearDownScenario();
+      yield return TestUtil.TearDownScenario(registry);
     }
 
     [UnityTest]
@@ -65,12 +71,51 @@ namespace Dreamtides.Tests
       });
 
       ComponentAssertions.AssertNotEmpty(registry.Layout.UserVoid);
-      yield return TestClickInputProvider.ClickOn(registry, registry.Layout.UserVoid.transform);
+      yield return TestClickInputProvider.ClickOn(registry,
+          registry.Layout.UserVoid.GetComponentInChildren<CardBrowserButton>());
       ComponentAssertions.AssertEmpty(registry.Layout.UserVoid);
       ComponentAssertions.AssertNotEmpty(registry.Layout.Browser);
       ComponentAssertions.AssertActive(registry.Layout.Browser._closeButton);
 
-      yield return TestUtil.TearDownScenario();
+      yield return TestUtil.TearDownScenario(registry);
+    }
+
+    [UnityTest]
+    public IEnumerator TestPlayCharacter()
+    {
+      Registry registry = null;
+      yield return TestUtil.LoadScenario(GameViewResolution.Resolution16x9, "basic", (r) =>
+      {
+        registry = r;
+      });
+
+      var card = GameObject.Find("Moonlit Voyage [9-1]").GetComponent<Card>();
+
+      ComponentAssertions.AssertCountIs(registry.Layout.UserBattlefield, 7);
+      ComponentAssertions.AssertCountIs(registry.Layout.UserHand, 5);
+      yield return PlayCardToBattlefield(registry, card);
+      ComponentAssertions.AssertCountIs(registry.Layout.UserHand, 4);
+      ComponentAssertions.AssertSpriteIsOnScreen(registry,
+          card._battlefieldCardImage, $"Battlefield card image should be visible");
+      if (!card._battlefieldCardFront.gameObject.activeSelf)
+      {
+        Debug.Break();
+      }
+      ComponentAssertions.AssertActive(card._battlefieldCardFront, "Battlefield card front should be active");
+      ComponentAssertions.AssertActive(card._battlefieldCardImage, "Battlefield card image should be active");
+      Assert.That(card._cardImage.isVisible, Is.False, $"Card image should not be visible");
+
+      yield return TestUtil.TearDownScenario(registry);
+    }
+
+    IEnumerator PlayCardToBattlefield(Registry registry, Card card)
+    {
+      yield return TestDragInputProvider.DragTo(
+        registry,
+        card,
+        registry.Layout.DefaultStack);
+      yield return new WaitUntil(() => registry.Layout.UserBattlefield.Objects.Count == 8);
+      yield return registry.TestHelperService.WaitForIdle();
     }
 
     static BoxCollider GetBoxCollider(Component component)

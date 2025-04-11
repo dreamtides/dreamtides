@@ -4,7 +4,7 @@ use std::sync::{LazyLock, Mutex};
 
 use action_data::battle_action::{BattleAction, CardBrowserType};
 use action_data::user_action::UserAction;
-use core_data::identifiers::BattleId;
+use core_data::identifiers::{BattleId, CardId};
 use core_data::types::PlayerName;
 use display_data::battle_view::BattleView;
 use display_data::command::{Command, CommandSequence, UpdateBattleCommand};
@@ -45,6 +45,7 @@ fn perform_battle_action(
     _scenario: &str,
 ) -> PerformActionResponse {
     let commands = match action {
+        BattleAction::PlayCard(card_id) => play_card(card_id),
         BattleAction::BrowseCards(card_browser) => browse_cards(card_browser),
         BattleAction::CloseCardBrowser => close_card_browser(),
         _ => {
@@ -53,6 +54,26 @@ fn perform_battle_action(
     };
 
     PerformActionResponse { metadata, commands }
+}
+
+fn play_card(card_id: CardId) -> CommandSequence {
+    let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+    let Some((card_index, card)) = battle.cards.iter().enumerate().find(|(_, c)| c.id == card_id)
+    else {
+        panic!("Card not found: {:?}", card_id);
+    };
+    let sorting_key = card.position.sorting_key;
+
+    match sorting_key % 5 {
+        3 | 4 => {
+            battle.cards[card_index].position.position = Position::OnBattlefield(PlayerName::User);
+        }
+        _ => {
+            panic!("Card {:?} not implemented: ({:?})", sorting_key, sorting_key % 5);
+        }
+    }
+
+    CommandSequence::sequential(vec![Command::UpdateBattle(UpdateBattleCommand::new(battle))])
 }
 
 fn browse_cards(card_browser: CardBrowserType) -> CommandSequence {
