@@ -10,7 +10,7 @@ use core_data::display_types::{
     AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
     SpriteAddress, Url,
 };
-use core_data::identifiers::{BattleId, CardId};
+use core_data::identifiers::{BattleId, CardDataIdentifier};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::{CardFacing, PlayerName};
 use display_data::battle_view::{
@@ -42,8 +42,9 @@ static RESOLVING_MULLIGAN: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(f
 static CURRENT_BATTLE: LazyLock<Mutex<Option<BattleView>>> = LazyLock::new(|| Mutex::new(None));
 static CARD_BROWSER_SOURCE: LazyLock<Mutex<Option<Position>>> = LazyLock::new(|| Mutex::new(None));
 static ORDER_SELECTOR_VISIBLE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
-static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<Mutex<std::collections::HashMap<CardId, Position>>> =
-    LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
+static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<
+    Mutex<std::collections::HashMap<CardDataIdentifier, Position>>,
+> = LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
 static ADD_TO_STACK: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 const STUFF_TO_DO: u32 = 7;
 
@@ -636,7 +637,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
             }
 
             // Find all cards in the CardOrderSelector
-            let mut selector_cards: Vec<(usize, CardId, u32)> = battle
+            let mut selector_cards: Vec<(usize, CardDataIdentifier, u32)> = battle
                 .cards
                 .iter()
                 .enumerate()
@@ -826,7 +827,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
             let mut commands = Vec::new();
 
             // Find all selected cards (those with GREEN outline)
-            let selected_cards: Vec<(usize, CardId)> = battle
+            let selected_cards: Vec<(usize, CardDataIdentifier)> = battle
                 .cards
                 .iter()
                 .enumerate()
@@ -1020,7 +1021,7 @@ fn card_view(position: Position, sorting_key: u32) -> CardView {
 fn card1(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardId::from_int(sorting_key as u64),
+        id: CardDataIdentifier::from_int(sorting_key as u64),
         position: ObjectPosition {
             position,
             sorting_key,
@@ -1050,7 +1051,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
                     },
                     cards: vec![
                         CardPreviewView {
-                            card_id: CardId::from_int(539),
+                            card_id: CardDataIdentifier::from_int(539),
                             battlefield_icon: Some("\u{f06a}".to_string()),
                             battlefield_icon_color: Some(display_color::RED_900),
                             ..Default::default()
@@ -1073,7 +1074,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
 fn card2(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardId::from_int(sorting_key as u64),
+        id: CardDataIdentifier::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
@@ -1111,7 +1112,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
 fn card3(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardId::from_int(sorting_key as u64),
+        id: CardDataIdentifier::from_int(sorting_key as u64),
         position: ObjectPosition {
             position,
             sorting_key,
@@ -1155,7 +1156,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
 fn card4(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardId::from_int(sorting_key as u64),
+        id: CardDataIdentifier::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
@@ -1192,7 +1193,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
 fn card5(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardId::from_int(sorting_key as u64),
+        id: CardDataIdentifier::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
@@ -1229,7 +1230,7 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
 
 fn enemy_card(position: Position, sorting_key: u32) -> CardView {
     CardView {
-        id: CardId::from_int(sorting_key as u64),
+        id: CardDataIdentifier::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         card_back: Url::new("".to_string()),
         revealed: Some(RevealedCardView {
@@ -1262,7 +1263,7 @@ fn enemy_card(position: Position, sorting_key: u32) -> CardView {
 
 fn dreamsign_card(position: Position, sorting_key: u32) -> CardView {
     CardView {
-        id: CardId::from_int(sorting_key as u64),
+        id: CardDataIdentifier::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         card_back: Url::new("".to_string()),
         revealed: Some(RevealedCardView {
@@ -1296,7 +1297,7 @@ fn dreamsign_card(position: Position, sorting_key: u32) -> CardView {
 
 fn dreamwell_card(position: Position, sorting_key: u32) -> CardView {
     CardView {
-        id: CardId::from_int(sorting_key as u64),
+        id: CardDataIdentifier::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         card_back: Url::new("".to_string()),
         revealed: Some(RevealedCardView {
@@ -1328,7 +1329,7 @@ fn dreamwell_card(position: Position, sorting_key: u32) -> CardView {
 fn game_modifier_card(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardId::from_int(sorting_key as u64),
+        id: CardDataIdentifier::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {

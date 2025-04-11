@@ -1,2 +1,3 @@
-pub mod battle_data;
-pub mod player_data;
+pub mod battle;
+pub mod cards;
+pub mod player;

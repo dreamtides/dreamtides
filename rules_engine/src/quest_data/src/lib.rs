@@ -1,1 +1,1 @@
-pub mod quest_data;
+pub mod quest;

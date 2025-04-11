@@ -1,5 +1,5 @@
 use action_data::battle_action::CardOrderSelectionTarget;
-use core_data::identifiers::CardId;
+use core_data::identifiers::CardDataIdentifier;
 use core_data::types::PlayerName;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -90,7 +90,7 @@ pub enum Position {
     DreamwellActivation,
 
     /// Object is hidden within a card
-    HiddenWithinCard(CardId),
+    HiddenWithinCard(CardDataIdentifier),
 
     /// Object describes a game modifier or ongoing game effect
     GameModifier,

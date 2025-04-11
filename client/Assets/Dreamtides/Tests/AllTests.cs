@@ -162,6 +162,7 @@ namespace Dreamtides.Tests
       }
       ComponentAssertions.AssertLayoutContains(registry.Layout.UserVoid, card, "Card should be in user void");
       ComponentAssertions.AssertLayoutContains(registry.Layout.EnemyVoid, target, "Target should be in enemy void");
+
       yield return TestUtil.TearDownScenario(registry);
     }
 

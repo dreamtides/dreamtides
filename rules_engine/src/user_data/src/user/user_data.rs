@@ -1,5 +1,5 @@
 use core_data::identifiers::UserId;
-use quest_data::quest_data::QuestData;
+use quest_data::quest::quest_data::QuestData;
 
 /// Represents the overall state of a human user.
 ///
