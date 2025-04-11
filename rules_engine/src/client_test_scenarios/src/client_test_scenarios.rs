@@ -276,12 +276,14 @@ fn play_card_with_targets(battle: &mut BattleView, card_id: CardId, stack: Stack
     };
     let sorting_key = card.position.sorting_key;
     battle.cards[card_index] = basic_scene::card_view(Position::OnStack(stack), sorting_key);
-    battle.cards[card_index].position.sorting_key = 999;
+    if stack == StackType::TargetingBothBattlefields {
+        battle.cards[card_index].position.sorting_key = 999;
+    }
 
     // Move any other cards currently on any stack position to the new stack
     // position
     for card in battle.cards.iter_mut() {
-        if matches!(card.position.position, Position::OnStack(_)) {
+        if matches!(card.position.position, Position::OnStack(_)) && card.id != card_id {
             card.position.position = Position::OnStack(stack);
         }
     }

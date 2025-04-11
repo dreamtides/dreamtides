@@ -29,11 +29,11 @@ namespace Dreamtides.Tests
 
     public static void AssertActive(Component component, string? message = null)
     {
-      Assert.That(component.gameObject.activeSelf, Is.True, $"{message}: Component is not active");
-      Assert.That(component.gameObject.activeInHierarchy, Is.True, $"{message}: Component is not active in hierarchy");
+      Assert.That(component.gameObject.activeSelf, Is.True, $"{message}. Component is not active");
+      Assert.That(component.gameObject.activeInHierarchy, Is.True, $"{message}. Component is not active in hierarchy");
       if (component is MonoBehaviour monoBehaviour)
       {
-        Assert.That(monoBehaviour.enabled, Is.True, $"{message}: Component is not enabled");
+        Assert.That(monoBehaviour.enabled, Is.True, $"{message}. Component is not enabled");
       }
     }
 
@@ -41,7 +41,7 @@ namespace Dreamtides.Tests
     {
       Assert.That(objectLayout.Objects.Any(obj => obj.GetComponent<Displayable>() == displayable),
           Is.True,
-          $"{message}: Displayable not found in layout {objectLayout.name}");
+          $"{message}. {displayable.name} not found in layout {objectLayout.name}");
     }
 
     public static void AssertBoxColliderIsOnScreen(Registry registry, BoxCollider collider, string? message = null)

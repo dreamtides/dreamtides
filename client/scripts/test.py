@@ -73,17 +73,20 @@ def print_test_summary(results_path):
         print(f"Total Tests: {total}")
         print(f"Passed: {passed}")
         print(f"Failed: {failed}")
-        print(f"Duration: {duration:.2f} seconds")
+        print(f"Run Duration: {duration:.2f} seconds")
         
         if failed > 0:
             print("\nFailed Tests:")
             for test_case in test_run.findall('.//test-case[@result="Failed"]'):
                 name = test_case.get('name', 'Unknown')
                 print(f"- {name}")
+            exit(1)
     except ET.ParseError as e:
         print(f"Error parsing test results: {e}")
+        exit(1)
     except FileNotFoundError:
         print("Test results file not found")
+        exit(1)
 
 def print_detailed_failures(results_path):
     try:
