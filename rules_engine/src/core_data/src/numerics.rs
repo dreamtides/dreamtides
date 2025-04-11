@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 #[derive(
     Debug,
     Display,
+    Default,
     Copy,
     Clone,
     PartialEq,
@@ -38,6 +39,7 @@ pub struct Energy(pub u32);
 #[derive(
     Debug,
     Display,
+    Default,
     Copy,
     Clone,
     PartialEq,
@@ -67,6 +69,7 @@ pub struct Spark(pub u32);
 #[derive(
     Debug,
     Display,
+    Default,
     Copy,
     Clone,
     PartialEq,
@@ -96,6 +99,7 @@ pub struct Points(pub u32);
 #[derive(
     Debug,
     Display,
+    Default,
     Copy,
     Clone,
     PartialEq,

@@ -5,7 +5,7 @@ use core_data::numerics::{Energy, Points};
 /// Terminology note: we always refer to a participant in a battle as a
 /// "player". We use the term "user" to refer to the human playing the game. For
 /// information about the user's overall save file state, refer to `UserData`.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct PlayerData {
     pub points: Points,
     pub current_energy: Energy,

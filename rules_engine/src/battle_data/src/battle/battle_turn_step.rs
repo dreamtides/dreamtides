@@ -5,7 +5,7 @@ use enumset::EnumSetType;
 #[derive(Debug, Ord, PartialOrd, Hash, EnumSetType, Sequence)]
 pub enum BattleTurnStep {
     Judgment,
-    DreamwellActivation,
+    Dreamwell,
     Draw,
     Main,
     Ending,

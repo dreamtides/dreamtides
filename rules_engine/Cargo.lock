@@ -467,6 +467,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "game_creation"
+version = "0.0.0"
+dependencies = [
+ "battle_data",
+ "core_data",
+ "uuid",
+]
+
+[[package]]
 name = "getrandom"
 version = "0.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
