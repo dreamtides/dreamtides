@@ -1,10 +1,12 @@
 #nullable enable
 
+using System.Linq;
 using Dreamtides.Layout;
 using Dreamtides.Services;
 using Dreamtides.Utils;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Dreamtides.Tests
 {
@@ -33,6 +35,13 @@ namespace Dreamtides.Tests
       {
         Assert.That(monoBehaviour.enabled, Is.True, $"{message}: Component is not enabled");
       }
+    }
+
+    public static void AssertLayoutContains(ObjectLayout objectLayout, Displayable displayable, string? message = null)
+    {
+      Assert.That(objectLayout.Objects.Any(obj => obj.GetComponent<Displayable>() == displayable),
+          Is.True,
+          $"{message}: Displayable not found in layout {objectLayout.name}");
     }
 
     public static void AssertBoxColliderIsOnScreen(Registry registry, BoxCollider collider, string? message = null)
@@ -81,6 +90,14 @@ namespace Dreamtides.Tests
                     viewportPos.z >= -0.01f,
                     $"{message}: Corner at world position {corner} is outside viewport: {viewportPos}");
       }
+    }
+
+    public static void AssertTextIsInInterface(Registry registry, string text, string message)
+    {
+      var root = registry.DocumentService.RootVisualElement;
+      var textElements = root.Query<TextElement>().ToList();
+      var found = textElements.Any(element => element.text.Contains(text));
+      Assert.That(found, Is.True, $"{message}: Text '{text}' not found in any text elements");
     }
   }
 }

@@ -5336,7 +5336,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fd7d91a98e924a9eab8bcda02414680, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _debugTestScenarioOverride: 
+  _debugTestScenarioOverride: basic
   _portraitLayout: {fileID: 1302820461}
   _landscapeLayout: {fileID: 1435083754}
   _layoutService: {fileID: 613451853}

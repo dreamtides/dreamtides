@@ -3,14 +3,25 @@ pub mod basic_scene;
 use std::sync::{LazyLock, Mutex};
 
 use action_data::battle_action::{BattleAction, CardBrowserType};
+use action_data::debug_action::DebugAction;
 use action_data::user_action::UserAction;
+use core_data::display_color::{self, DisplayColor};
+use core_data::display_types::{AudioClipAddress, MaterialAddress, ProjectileAddress};
 use core_data::identifiers::{BattleId, CardId};
 use core_data::types::PlayerName;
-use display_data::battle_view::BattleView;
-use display_data::command::{Command, CommandSequence, UpdateBattleCommand};
-use display_data::object_position::Position;
+use display_data::battle_view::{BattleView, PrimaryActionButtonView};
+use display_data::command::{
+    Command, CommandSequence, DissolveCardCommand, FireProjectileCommand, GameObjectId,
+    ParallelCommandGroup, UpdateBattleCommand,
+};
+use display_data::object_position::{Position, StackType};
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, Metadata, PerformActionRequest, PerformActionResponse,
+};
+use masonry::flex_enums::{FlexPosition, TextAlign, WhiteSpace};
+use masonry::flex_node::{FlexNode, NodeType, Text};
+use masonry::flex_style::{
+    BorderRadius, Dimension, DimensionGroup, DimensionUnit, FlexInsets, FlexStyle,
 };
 use uuid::Uuid;
 
@@ -48,6 +59,7 @@ fn perform_battle_action(
         BattleAction::PlayCard(card_id) => play_card(card_id),
         BattleAction::BrowseCards(card_browser) => browse_cards(card_browser),
         BattleAction::CloseCardBrowser => close_card_browser(),
+        BattleAction::SelectCard(card_id) => select_card(card_id),
         _ => {
             panic!("Not implemented: {:?}", action);
         }
@@ -63,8 +75,10 @@ fn play_card(card_id: CardId) -> CommandSequence {
         panic!("Card not found: {:?}", card_id);
     };
     let sorting_key = card.position.sorting_key;
+    let mut commands = Vec::new();
 
     match sorting_key % 5 {
+        1 => play_card_with_targets(&mut battle, card_id),
         3 | 4 => {
             battle.cards[card_index].position.position = Position::OnBattlefield(PlayerName::User);
         }
@@ -73,7 +87,9 @@ fn play_card(card_id: CardId) -> CommandSequence {
         }
     }
 
-    CommandSequence::sequential(vec![Command::UpdateBattle(UpdateBattleCommand::new(battle))])
+    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+    *CURRENT_BATTLE.lock().unwrap() = Some(battle);
+    CommandSequence::sequential(commands)
 }
 
 fn browse_cards(card_browser: CardBrowserType) -> CommandSequence {
@@ -118,4 +134,188 @@ fn close_card_browser() -> CommandSequence {
     *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
 
     CommandSequence::sequential(vec![Command::UpdateBattle(UpdateBattleCommand::new(battle))])
+}
+
+fn select_card(card_id: CardId) -> CommandSequence {
+    let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+
+    let cards_to_move: Vec<(usize, u32)> = battle
+        .cards
+        .iter()
+        .enumerate()
+        .filter_map(|(index, card)| {
+            if card.id == card_id || matches!(card.position.position, Position::OnStack(_)) {
+                Some((index, card.position.sorting_key))
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    let source_card_id = battle
+        .cards
+        .iter()
+        .find_map(|card| {
+            if matches!(card.position.position, Position::OnStack(_)) {
+                Some(card.id)
+            } else {
+                None
+            }
+        })
+        .unwrap();
+
+    for (index, sorting_key) in cards_to_move {
+        let position = if battle.cards[index].id == card_id {
+            Position::InVoid(PlayerName::Enemy)
+        } else {
+            Position::InVoid(PlayerName::User)
+        };
+        battle.cards[index] = basic_scene::card_view(position, sorting_key);
+        battle.cards[index].position.sorting_key = 999;
+    }
+
+    battle.interface.screen_overlay = None;
+    battle.interface.primary_action_button = Some(PrimaryActionButtonView {
+        label: "End Turn".to_string(),
+        action: UserAction::DebugAction(DebugAction::TriggerEnemyJudgment),
+        show_on_idle_duration: None,
+    });
+
+    clear_all_statuses(&mut battle);
+    *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+
+    let fire_projectile = Command::FireProjectile(FireProjectileCommand {
+        source_id: GameObjectId::CardId(source_card_id),
+        target_id: GameObjectId::CardId(card_id),
+        projectile: ProjectileAddress { projectile: "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 2 electro.prefab".to_string() },
+        travel_duration: None,
+        fire_sound: Some(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Electric Magic/RPG3_ElectricMagic_Cast02.wav")),
+        impact_sound: Some(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Electric Magic/RPG3_ElectricMagic2_LightImpact01.wav")),
+        additional_hit: None,
+        additional_hit_delay: None,
+        wait_duration: None,
+        hide_on_hit: false,
+        jump_to_position: None,
+    });
+
+    CommandSequence {
+        groups: vec![
+            ParallelCommandGroup { commands: vec![fire_projectile] },
+            ParallelCommandGroup {
+                commands: vec![Command::DissolveCard(DissolveCardCommand {
+                    target: card_id,
+                    reverse: false,
+                    material: MaterialAddress::new(
+                        "Assets/Content/Dissolves/Dissolve15.mat".to_string(),
+                    ),
+                    color: display_color::BLUE_500,
+                    dissolve_speed: None,
+                })],
+            },
+            ParallelCommandGroup {
+                commands: vec![
+                    Command::UpdateBattle(UpdateBattleCommand {
+                        battle,
+                        update_sound: Some(AudioClipAddress::new(
+                            "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Generic_SubtleWhoosh04.wav")),
+                    }),
+                    Command::DissolveCard(DissolveCardCommand {
+                        target: card_id,
+                        reverse: true,
+                        material: MaterialAddress::new("Assets/Content/Dissolves/Dissolve15.mat".to_string()),
+                        color: display_color::BLUE_500,
+                        dissolve_speed: None,
+                    }),
+                ],
+            },
+            ParallelCommandGroup { commands: vec![] },
+        ],
+    }
+}
+
+fn play_card_with_targets(battle: &mut BattleView, card_id: CardId) {
+    let Some((card_index, card)) = battle.cards.iter().enumerate().find(|(_, c)| c.id == card_id)
+    else {
+        panic!("Card not found: {:?}", card_id);
+    };
+
+    let sorting_key = card.position.sorting_key;
+    let pos = StackType::TargetingEnemyBattlefield;
+    battle.cards[card_index] = basic_scene::card_view(Position::OnStack(pos), sorting_key);
+    eprintln!("Play card with targets: {:?}", card_id);
+
+    battle.interface.screen_overlay = Some(select_target_message());
+    battle.interface.primary_action_button = None;
+    set_can_play_to_false(battle);
+    for card in battle.cards.iter_mut() {
+        if matches!(card.position.position, Position::OnBattlefield(PlayerName::Enemy)) {
+            if let Some(revealed) = &mut card.revealed {
+                revealed.actions.on_click =
+                    Some(UserAction::BattleAction(BattleAction::SelectCard(card.id)));
+                revealed.outline_color = Some(display_color::RED_500);
+            }
+        }
+    }
+}
+
+fn select_target_message() -> FlexNode {
+    let style = FlexStyle {
+        background_color: Some(DisplayColor { red: 0.0, green: 0.0, blue: 0.0, alpha: 0.95 }),
+        border_radius: Some(BorderRadius {
+            top_left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            top_right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            bottom_right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            bottom_left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+        }),
+        padding: Some(DimensionGroup {
+            top: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            bottom: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+            left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
+        }),
+        color: Some(DisplayColor { red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0 }),
+        font_size: Some(Dimension { unit: DimensionUnit::Pixels, value: 10.0 }),
+        min_height: Some(Dimension { unit: DimensionUnit::Pixels, value: 22.0 }),
+        white_space: Some(WhiteSpace::Normal),
+        text_align: Some(TextAlign::MiddleCenter),
+        ..Default::default()
+    };
+
+    let message = FlexNode {
+        node_type: Some(NodeType::Text(Text { label: "Choose an enemy character".into() })),
+        style: Some(style),
+        ..Default::default()
+    };
+
+    FlexNode {
+        style: Some(FlexStyle {
+            position: Some(FlexPosition::Absolute),
+            inset: Some(FlexInsets {
+                top: None,
+                right: Some(Dimension { unit: DimensionUnit::Pixels, value: 32.0 }),
+                bottom: Some(Dimension { unit: DimensionUnit::Pixels, value: 50.0 }),
+                left: Some(Dimension { unit: DimensionUnit::Pixels, value: 32.0 }),
+            }),
+            ..Default::default()
+        }),
+        children: vec![message],
+        ..Default::default()
+    }
+}
+
+fn set_can_play_to_false(battle: &mut BattleView) {
+    for card in battle.cards.iter_mut() {
+        if let Some(revealed) = card.revealed.as_mut() {
+            revealed.actions.can_play = false;
+            revealed.outline_color = None;
+        }
+    }
+}
+
+fn clear_all_statuses(battle: &mut BattleView) {
+    for card in battle.cards.iter_mut() {
+        if let Some(revealed) = card.revealed.as_mut() {
+            revealed.outline_color = None;
+        }
+    }
 }

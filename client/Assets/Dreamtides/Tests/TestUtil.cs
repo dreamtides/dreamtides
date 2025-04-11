@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections;
+using Dreamtides.Layout;
 using Dreamtides.Services;
 using Dreamtides.UnityInternal;
 using Dreamtides.Utils;
@@ -28,6 +29,12 @@ namespace Dreamtides.Tests
       yield return registry.TestHelperService.WaitForIdle();
 
       action(registry);
+    }
+
+    public static IEnumerator WaitForCount(Registry registry, ObjectLayout layout, int count)
+    {
+      yield return new WaitUntil(() => layout.Objects.Count == count);
+      yield return registry.TestHelperService.WaitForIdle();
     }
 
     public static IEnumerator TearDownScenario(Registry registry)

@@ -6,6 +6,7 @@ using Dreamtides.Utils;
 using Dreamtides.Components;
 using Dreamtides.UnityInternal;
 using UnityEngine;
+using System.Linq;
 
 namespace Dreamtides.Tests
 {
@@ -93,14 +94,17 @@ namespace Dreamtides.Tests
 
       ComponentAssertions.AssertCountIs(registry.Layout.UserBattlefield, 7);
       ComponentAssertions.AssertCountIs(registry.Layout.UserHand, 5);
-      yield return PlayCardToBattlefield(registry, card);
+
+      yield return TestDragInputProvider.DragTo(
+        registry,
+        card,
+        registry.Layout.DefaultStack);
+      yield return new WaitUntil(() => registry.Layout.UserBattlefield.Objects.Count == 8);
+      yield return registry.TestHelperService.WaitForIdle();
+
       ComponentAssertions.AssertCountIs(registry.Layout.UserHand, 4);
       ComponentAssertions.AssertSpriteIsOnScreen(registry,
           card._battlefieldCardImage, $"Battlefield card image should be visible");
-      if (!card._battlefieldCardFront.gameObject.activeSelf)
-      {
-        Debug.Break();
-      }
       ComponentAssertions.AssertActive(card._battlefieldCardFront, "Battlefield card front should be active");
       ComponentAssertions.AssertActive(card._battlefieldCardImage, "Battlefield card image should be active");
       Assert.That(card._cardImage.isVisible, Is.False, $"Card image should not be visible");
@@ -108,14 +112,58 @@ namespace Dreamtides.Tests
       yield return TestUtil.TearDownScenario(registry);
     }
 
-    IEnumerator PlayCardToBattlefield(Registry registry, Card card)
+    [UnityTest]
+    public IEnumerator TestPlayEventWithTarget()
     {
+      Registry registry = null;
+      yield return TestUtil.LoadScenario(GameViewResolution.Resolution16x9, "basic", (r) =>
+      {
+        registry = r;
+      });
+
+      var card = GameObject.Find("Beacon of Tomorrow [6-1]").GetComponent<Card>();
+
+      ComponentAssertions.AssertCountIs(registry.Layout.UserBattlefield, 7);
+      ComponentAssertions.AssertCountIs(registry.Layout.UserHand, 5);
+      ComponentAssertions.AssertCountIs(registry.Layout.UserVoid, 10);
+      foreach (var enemy in registry.Layout.EnemyBattlefield.Objects)
+      {
+        var enemyCard = ComponentUtils.Get<Card>(enemy);
+        Assert.That(enemyCard._battlefieldOutline.color, Is.EqualTo(Color.white),
+            "Enemy card outline should be white before targeting");
+      }
+
       yield return TestDragInputProvider.DragTo(
         registry,
         card,
-        registry.Layout.DefaultStack);
-      yield return new WaitUntil(() => registry.Layout.UserBattlefield.Objects.Count == 8);
-      yield return registry.TestHelperService.WaitForIdle();
+        registry.Layout.TargetingEnemyStack);
+      yield return TestUtil.WaitForCount(registry, registry.Layout.TargetingEnemyStack, 1);
+
+      ComponentAssertions.AssertCountIs(registry.Layout.UserHand, 4);
+      ComponentAssertions.AssertTextIsInInterface(registry,
+          "Choose an enemy character",
+          "Target prompt message not found");
+      foreach (var enemy in registry.Layout.EnemyBattlefield.Objects)
+      {
+        var enemyCard = ComponentUtils.Get<Card>(enemy);
+        Assert.That(enemyCard._battlefieldOutline.color, Is.Not.EqualTo(Color.white),
+            "Enemy card outline should not be white during targeting");
+      }
+
+      var target = registry.Layout.EnemyBattlefield.Objects.Last().GetComponent<Card>();
+      yield return TestClickInputProvider.ClickOn(registry, target);
+      yield return TestUtil.WaitForCount(registry, registry.Layout.UserVoid, 11);
+
+      foreach (var enemy in registry.Layout.EnemyBattlefield.Objects)
+      {
+        var enemyCard = ComponentUtils.Get<Card>(enemy);
+        Assert.That(enemyCard._battlefieldOutline.color, Is.EqualTo(Color.white),
+            "Enemy card outline should be white after selecting");
+      }
+      ComponentAssertions.AssertLayoutContains(registry.Layout.UserVoid, card, "Card should be in user void");
+      ComponentAssertions.AssertLayoutContains(registry.Layout.EnemyVoid, target, "Target should be in enemy void");
+
+      yield return TestUtil.TearDownScenario(registry);
     }
 
     static BoxCollider GetBoxCollider(Component component)

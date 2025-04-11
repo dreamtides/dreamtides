@@ -71,7 +71,7 @@ fn cards_in_position(position: Position, start_key: u32, count: u32) -> Vec<Card
     (0..count).map(|i| card_view(position, start_key + i)).collect()
 }
 
-fn card_view(position: Position, sorting_key: u32) -> CardView {
+pub fn card_view(position: Position, sorting_key: u32) -> CardView {
     let mut card = if sorting_key % 5 == 0 {
         card1(position, sorting_key)
     } else if sorting_key % 5 == 1 {
