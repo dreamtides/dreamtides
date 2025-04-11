@@ -1,5 +1,5 @@
 [package]
-name = "game_creation"
+name = "battle_mutations"
 version = "0.0.0"
 edition = "2021"
 
@@ -10,9 +10,6 @@ bench = false
 
 [dependencies]
 battle_data = { path = "../battle_data" }
-battle_mutations = { path = "../battle_mutations" }
 core_data = { path = "../core_data" }
 
-rand = "0.9"
-rand_xoshiro = "0.7"
-uuid = { version = "1", features = ["serde"] }
+tracing = "0.1"

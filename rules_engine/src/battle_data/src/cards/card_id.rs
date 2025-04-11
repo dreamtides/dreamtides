@@ -29,7 +29,7 @@ impl CardId for CardDataIdentifier {
 
 impl CardId for CardObjectId {
     fn card_identifier(&self, cards: &AllCards) -> Option<CardDataIdentifier> {
-        if cards.card(self.card_id)?.id().object_id() == self.object_id {
+        if cards.card(self.card_id)?.id.object_id() == self.object_id {
             Some(self.card_id)
         } else {
             None

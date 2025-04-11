@@ -1,17 +1,46 @@
 use core_data::identifiers::CardIdentity;
+use core_data::numerics::TurnNumber;
 use core_data::types::PlayerName;
 
+use crate::battle::turn_data::TurnData;
+use crate::cards::card_id::{CharacterId, StackCardId};
 use crate::cards::card_instance_id::CardInstanceId;
 use crate::cards::card_properties::CardProperties;
+use crate::cards::zone::Zone;
+
+#[derive(Clone, Debug)]
+pub enum TargetId {
+    StackCard(StackCardId),
+    Character(CharacterId),
+}
 
 #[derive(Clone, Debug)]
 pub struct CardData {
-    id: CardInstanceId,
-    identity: CardIdentity,
-    owner: PlayerName,
-    properties: CardProperties,
-    revealed_to_owner: bool,
-    revealed_to_opponent: bool,
+    /// Unique identifier for this card within a zone.
+    pub id: CardInstanceId,
+
+    /// Identifier for the name & rules text for this card.
+    pub identity: CardIdentity,
+
+    /// The owner of this card.
+    pub owner: PlayerName,
+
+    /// Properties of this card.
+    pub properties: CardProperties,
+
+    /// Whether this card is revealed to its owner.
+    pub revealed_to_owner: bool,
+
+    /// Whether this card is revealed to its opponent.
+    pub revealed_to_opponent: bool,
+
+    /// The targets of this card while it is on the stack.
+    pub targets: Vec<TargetId>,
+
+    /// Turn on which this card last entered its current zone.
+    ///
+    /// Do not mutate this field directly, use the `move_card` module instead.
+    pub turn_entered_current_zone: TurnData,
 }
 
 impl CardData {
@@ -28,32 +57,17 @@ impl CardData {
             properties,
             revealed_to_owner: false,
             revealed_to_opponent: false,
+            targets: Vec::new(),
+            turn_entered_current_zone: TurnData {
+                active_player: PlayerName::User,
+                turn_number: TurnNumber(0),
+            },
         }
     }
 
-    /// Unique identifier for this card within a zone.
-    pub fn id(&self) -> CardInstanceId {
-        self.id
-    }
-
-    /// Identifier for the name & rules text for this card.
-    pub fn identity(&self) -> CardIdentity {
-        self.identity
-    }
-
-    /// The owner of this card.
-    pub fn owner(&self) -> PlayerName {
-        self.owner
-    }
-
-    /// Properties of this card.
-    pub fn properties(&self) -> &CardProperties {
-        &self.properties
-    }
-
-    /// Properties of this card.
-    pub fn properties_mut(&mut self) -> &mut CardProperties {
-        &mut self.properties
+    /// The zone this card is currently in.
+    pub fn zone(&self) -> Zone {
+        self.id.zone()
     }
 
     /// Whether this card is revealed to the given player.
@@ -73,6 +87,11 @@ impl CardData {
             PlayerName::User => self.revealed_to_owner = revealed,
             PlayerName::Enemy => self.revealed_to_opponent = revealed,
         }
+    }
+
+    /// The controller of this card.
+    pub fn controller(&self) -> PlayerName {
+        self.owner
     }
 
     pub(crate) fn internal_set_id(&mut self, id: CardInstanceId) {

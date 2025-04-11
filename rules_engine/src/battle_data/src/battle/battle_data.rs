@@ -1,8 +1,10 @@
 use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
+use rand_xoshiro::Xoshiro256PlusPlus;
 
 use crate::battle::battle_status::BattleStatus;
 use crate::battle::battle_turn_step::BattleTurnStep;
+use crate::battle::request_context::RequestContext;
 use crate::battle::turn_data::TurnData;
 use crate::cards::all_cards::AllCards;
 use crate::player::player_data::PlayerData;
@@ -18,6 +20,8 @@ pub struct BattleData {
     pub status: BattleStatus,
     pub turn: TurnData,
     pub step: BattleTurnStep,
+    pub rng: Xoshiro256PlusPlus,
+    pub request_context: RequestContext,
 }
 
 impl BattleData {

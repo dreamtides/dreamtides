@@ -1,5 +1,8 @@
+use core_data::identifiers::CardDataIdentifier;
+
+use crate::cards::all_cards::AllCards;
 use crate::cards::card_id::{
-    BanishedCardId, CharacterId, DeckCardId, HandCardId, ObjectId, StackCardId, VoidCardId,
+    BanishedCardId, CardId, CharacterId, DeckCardId, HandCardId, ObjectId, StackCardId, VoidCardId,
 };
 use crate::cards::zone::Zone;
 
@@ -12,6 +15,19 @@ pub enum CardInstanceId {
     Hand(HandCardId),
     Stack(StackCardId),
     Void(VoidCardId),
+}
+
+impl CardId for CardInstanceId {
+    fn card_identifier(&self, cards: &AllCards) -> Option<CardDataIdentifier> {
+        match self {
+            Self::Banished(id) => id.card_identifier(cards),
+            Self::Battlefield(id) => id.card_identifier(cards),
+            Self::Deck(id) => id.card_identifier(cards),
+            Self::Hand(id) => id.card_identifier(cards),
+            Self::Stack(id) => id.card_identifier(cards),
+            Self::Void(id) => id.card_identifier(cards),
+        }
+    }
 }
 
 impl CardInstanceId {

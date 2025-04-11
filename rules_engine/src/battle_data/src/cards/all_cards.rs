@@ -101,8 +101,8 @@ impl AllCards {
     pub fn move_card(&mut self, card_id: impl CardId, to: Zone) -> Option<ObjectId> {
         let card_data_id = card_id.card_identifier(self)?;
         let card = self.card(card_data_id)?;
-        let owner = card.owner();
-        self.remove_from_zone(owner, card.id());
+        let owner = card.owner;
+        self.remove_from_zone(owner, card.id);
         let object_id = self.new_object_id();
         self.add_to_zone(owner, card_data_id, object_id, to)?;
         Some(object_id)
