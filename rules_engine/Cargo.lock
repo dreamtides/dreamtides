@@ -166,6 +166,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
 
 [[package]]
+name = "battle_data"
+version = "0.0.0"
+dependencies = [
+ "core_data",
+ "schemars",
+ "serde",
+]
+
+[[package]]
 name = "bitflags"
 version = "1.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -687,6 +696,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "quest_data"
+version = "0.0.0"
+dependencies = [
+ "battle_data",
+ "core_data",
+ "schemars",
+ "serde",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1056,6 +1075,17 @@ name = "unicode-xid"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f962df74c8c05a667b5ee8bcf162993134c104e96440b663c8daa176dc772d8c"
+
+[[package]]
+name = "user_data"
+version = "0.0.0"
+dependencies = [
+ "battle_data",
+ "core_data",
+ "quest_data",
+ "schemars",
+ "serde",
+]
 
 [[package]]
 name = "uuid"

@@ -5,19 +5,23 @@ use serde::{Deserialize, Serialize};
 use slotmap::{new_key_type, Key, KeyData};
 use uuid::Uuid;
 
-/// A User ID
 #[derive(
     Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UserId(pub Uuid);
 
-/// A Battle ID
 #[derive(
     Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BattleId(pub Uuid);
+
+#[derive(
+    Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
+pub struct QuestId(pub Uuid);
 
 new_key_type! {
     /// Identifies a card or card-like object such as:
