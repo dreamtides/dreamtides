@@ -12,7 +12,7 @@ use crate::cards::card_instance_id::CardInstanceId;
 use crate::cards::card_properties::CardProperties;
 use crate::cards::zone::Zone;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct AllCards {
     cards: SlotMap<CardDataIdentifier, CardData>,
     battlefield: UnorderedZone<CharacterId>,
@@ -70,6 +70,8 @@ impl AllCards {
     }
 
     /// Creates a card instance in the given zone.
+    ///
+    /// This does *not* make the card revealed to any player.
     pub fn create_card(
         &mut self,
         identity: CardIdentity,
@@ -81,20 +83,26 @@ impl AllCards {
         let tmp_instance_id =
             create_card_instance_id(zone, object_id, CardDataIdentifier::default());
         let card_data_id =
-            self.cards.insert(CardData { id: tmp_instance_id, identity, owner, properties });
-        self.cards[card_data_id].id = create_card_instance_id(zone, object_id, card_data_id);
+            self.cards.insert(CardData::new(tmp_instance_id, identity, owner, properties));
+        self.cards[card_data_id].internal_set_id(create_card_instance_id(
+            zone,
+            object_id,
+            card_data_id,
+        ));
         card_data_id
     }
 
     /// Moves a card from its current zone to a new zone, if it is present.
+    /// Generally you should use the `move_card` module instead of invoking this
+    /// directly.
     ///
     /// Returns the new ObjectId for the card if a moved occurred, or None if
     /// the card was not found.
     pub fn move_card(&mut self, card_id: impl CardId, to: Zone) -> Option<ObjectId> {
         let card_data_id = card_id.card_identifier(self)?;
         let card = self.card(card_data_id)?;
-        let owner = card.owner;
-        self.remove_from_zone(owner, card.id);
+        let owner = card.owner();
+        self.remove_from_zone(owner, card.id());
         let object_id = self.new_object_id();
         self.add_to_zone(owner, card_data_id, object_id, to)?;
         Some(object_id)
@@ -114,7 +122,7 @@ impl AllCards {
         zone: Zone,
     ) -> Option<()> {
         let instance_id = create_card_instance_id(zone, new_object_id, card_id);
-        self.card_mut(card_id)?.id = instance_id;
+        self.card_mut(card_id)?.internal_set_id(instance_id);
 
         match instance_id {
             CardInstanceId::Banished(id) => self.banished.add(owner, id),
@@ -171,7 +179,7 @@ fn create_card_instance_id(
     }
 }
 
-#[derive(Default, Debug, Clone)]
+#[derive(Debug, Clone)]
 struct UnorderedZone<T> {
     user: BTreeSet<T>,
     enemy: BTreeSet<T>,
@@ -201,7 +209,13 @@ impl<T: CardId> UnorderedZone<T> {
     }
 }
 
-#[derive(Default, Debug, Clone)]
+impl<T: CardId> Default for UnorderedZone<T> {
+    fn default() -> Self {
+        Self { user: BTreeSet::new(), enemy: BTreeSet::new() }
+    }
+}
+
+#[derive(Debug, Clone)]
 struct OrderedZone<T> {
     user: VecDeque<T>,
     enemy: VecDeque<T>,
@@ -234,5 +248,11 @@ impl<T: CardId> OrderedZone<T> {
         } else {
             None
         }
+    }
+}
+
+impl<T: CardId> Default for OrderedZone<T> {
+    fn default() -> Self {
+        Self { user: VecDeque::new(), enemy: VecDeque::new() }
     }
 }

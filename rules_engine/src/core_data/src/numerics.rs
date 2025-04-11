@@ -91,3 +91,32 @@ pub struct Spark(pub u32);
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Points(pub u32);
+
+/// A resource used to pay for cards & abilities.
+#[derive(
+    Debug,
+    Display,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    Ord,
+    PartialOrd,
+    Hash,
+    From,
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Sum,
+    AddAssign,
+    SubAssign,
+    MulAssign,
+    DivAssign,
+    Into,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
+pub struct TurnNumber(pub u32);

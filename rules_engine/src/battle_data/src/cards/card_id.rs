@@ -18,7 +18,7 @@ pub trait CardId: Hash + Eq + PartialEq + Debug + Ord + Copy {
 /// An identifier for an object while it is in a given zone. A new zone object
 /// ID is assigned each time a card changes zones, meaning that it can be
 /// used for targeting effects that end when the card changes zones.
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
+#[derive(Copy, Clone, Default, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
 pub struct ObjectId(pub u32);
 
 impl CardId for CardDataIdentifier {
@@ -29,7 +29,7 @@ impl CardId for CardDataIdentifier {
 
 impl CardId for CardObjectId {
     fn card_identifier(&self, cards: &AllCards) -> Option<CardDataIdentifier> {
-        if cards.card(self.card_id)?.id.object_id() == self.object_id {
+        if cards.card(self.card_id)?.id().object_id() == self.object_id {
             Some(self.card_id)
         } else {
             None

@@ -1,3 +1,4 @@
+use enumset::EnumSetType;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -12,9 +13,7 @@ pub enum CardFacing {
 }
 
 /// Identifies a player in an ongoing battle.
-#[derive(
-    Clone, Debug, Eq, PartialEq, Copy, Hash, Ord, PartialOrd, Serialize, Deserialize, JsonSchema,
-)]
+#[derive(Debug, Hash, Ord, PartialOrd, Serialize, Deserialize, JsonSchema, EnumSetType)]
 #[serde(rename_all = "camelCase")]
 pub enum PlayerName {
     /// Player who is currently operating the client
