@@ -116,7 +116,7 @@ namespace Dreamtides.Tests
     public IEnumerator TestPlayEventWithTarget()
     {
       Registry registry = null;
-      yield return TestUtil.LoadScenario(GameViewResolution.Resolution16x9, "basic", (r) =>
+      yield return TestUtil.LoadScenario(GameViewResolution.Resolution16x9, "play_card_with_targets", (r) =>
       {
         registry = r;
       });

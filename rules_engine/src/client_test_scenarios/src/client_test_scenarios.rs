@@ -39,10 +39,10 @@ pub fn connect(request: &ConnectRequest, _scenario: &str) -> ConnectResponse {
     }
 }
 
-pub fn perform_action(request: &PerformActionRequest, _scenario: &str) -> PerformActionResponse {
+pub fn perform_action(request: &PerformActionRequest, scenario: &str) -> PerformActionResponse {
     match &request.action {
         UserAction::BattleAction(action) => {
-            perform_battle_action(*action, request.metadata, _scenario)
+            perform_battle_action(*action, request.metadata, scenario)
         }
         _ => {
             panic!("Not implemented: {:?}", request);
@@ -53,10 +53,10 @@ pub fn perform_action(request: &PerformActionRequest, _scenario: &str) -> Perfor
 fn perform_battle_action(
     action: BattleAction,
     metadata: Metadata,
-    _scenario: &str,
+    scenario: &str,
 ) -> PerformActionResponse {
     let commands = match action {
-        BattleAction::PlayCard(card_id) => play_card(card_id),
+        BattleAction::PlayCard(card_id) => play_card(card_id, scenario),
         BattleAction::BrowseCards(card_browser) => browse_cards(card_browser),
         BattleAction::CloseCardBrowser => close_card_browser(),
         BattleAction::SelectCard(card_id) => select_card(card_id),
@@ -68,22 +68,23 @@ fn perform_battle_action(
     PerformActionResponse { metadata, commands }
 }
 
-fn play_card(card_id: CardId) -> CommandSequence {
+fn play_card(card_id: CardId, scenario: &str) -> CommandSequence {
     let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
-    let Some((card_index, card)) = battle.cards.iter().enumerate().find(|(_, c)| c.id == card_id)
+    let Some((card_index, _)) = battle.cards.iter().enumerate().find(|(_, c)| c.id == card_id)
     else {
         panic!("Card not found: {:?}", card_id);
     };
-    let sorting_key = card.position.sorting_key;
     let mut commands = Vec::new();
 
-    match sorting_key % 5 {
-        1 => play_card_with_targets(&mut battle, card_id),
-        3 | 4 => {
+    match scenario {
+        "basic" => {
             battle.cards[card_index].position.position = Position::OnBattlefield(PlayerName::User);
         }
+        "play_card_with_targets" => {
+            play_card_with_targets(&mut battle, card_id);
+        }
         _ => {
-            panic!("Card {:?} not implemented: ({:?})", sorting_key, sorting_key % 5);
+            panic!("Scenario not implemented: {:?}", scenario);
         }
     }
 
