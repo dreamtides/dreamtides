@@ -152,17 +152,59 @@ def sync_project_to_temp(project_root):
         print(f"stderr: {e.stderr}")
         sys.exit(1)
 
-def monitor_log_file(log_file_path):
-    """Monitor log file and print a dot for each update."""
+def read_previous_run_time(test_output_dir):
+    run_time_file = test_output_dir / "run_time.txt"
+    if run_time_file.exists():
+        try:
+            with open(run_time_file, 'r') as f:
+                return float(f.read().strip())
+        except (ValueError, IOError):
+            pass
+    print("Previous run time not found, returning 300 seconds")
+    return 300
+
+def write_run_time(test_output_dir, run_time):
+    run_time_file = test_output_dir / "run_time.txt"
+    with open(run_time_file, 'w') as f:
+        f.write(str(run_time))
+
+def format_time(seconds):
+    minutes = int(seconds // 60)
+    seconds = int(seconds % 60)
+    return f"{minutes:02d}:{seconds:02d}"
+
+def display_countdown(estimated_time, start_time):
+    while True:
+        elapsed = time.time() - start_time
+        remaining = max(0, estimated_time - elapsed)
+        print(f"\rEstimated time remaining: {format_time(remaining)}", end="", flush=True)
+        if remaining <= 0:
+            break
+        time.sleep(1)
+
+def monitor_log_file(log_file_path, estimated_time, start_time):
+    """Monitor log file and show countdown with [*] indicator for log changes."""
     previous_size = 0
+    last_update = time.time()
     
     while True:
+        current_time = time.time()
+        elapsed = current_time - start_time
+        remaining = max(0, estimated_time - elapsed)
+        
+        log_changed = False
         if os.path.exists(log_file_path):
             current_size = os.path.getsize(log_file_path)
             if current_size > previous_size:
-                print(".", end="", flush=True)
+                log_changed = True
                 previous_size = current_size
-        time.sleep(0.5)
+
+        if current_time - last_update >= 1.0:
+            indicator = "[*]" if log_changed else " > "
+            print(f"\r{indicator} Estimated time remaining: {format_time(remaining)}", end="", flush=True)
+            last_update = current_time
+        
+        time.sleep(0.1)
 
 def main():
     print("Starting Unity tests...")
@@ -180,6 +222,11 @@ def main():
     script_dir = Path(__file__).parent
     project_root = script_dir.parent
     test_output_dir = project_root / "test_output"
+
+    # Get previous run time if available
+    previous_run_time = read_previous_run_time(test_output_dir)
+    if previous_run_time:
+        print(f"Previous test run took {format_time(previous_run_time)}")    
     
     if test_output_dir.exists():
         shutil.rmtree(test_output_dir)
@@ -204,8 +251,14 @@ def main():
     try:
         print(f"{unity_path} \\\n ", " \\\n  ".join(args))
         
+        start_time = time.time()
+        
         # Start log file monitoring in a separate thread
-        monitor_thread = threading.Thread(target=monitor_log_file, args=(log_file,), daemon=True)
+        monitor_thread = threading.Thread(
+            target=monitor_log_file,
+            args=(log_file, previous_run_time, start_time),
+            daemon=True
+        )
         monitor_thread.start()
         
         # Create a process group for the Unity process
@@ -231,10 +284,17 @@ def main():
         # Wait for the process to complete
         process.wait()
         
+        end_time = time.time()
+        total_time = end_time - start_time
+        
+        # Save the run time for future reference
+        write_run_time(test_output_dir, total_time)
+        
         print("\n")
         
         if Path(test_results).exists():
             print("Unity tests completed")
+            print(f"Total execution time: {format_time(total_time)}")
             print_test_summary(test_results)
         else:
             print("Error: Test results file not found")
