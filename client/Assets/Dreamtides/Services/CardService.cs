@@ -15,8 +15,14 @@ namespace Dreamtides.Services
   {
     Card? _currentInfoZoom;
     bool _hidCloseButton;
+    bool _infoZoomDisabled;
 
     public bool IsPointerDownOnCard { get; set; } = false;
+
+    protected override void OnInitialize(TestConfiguration? testConfiguration)
+    {
+      _infoZoomDisabled = testConfiguration != null;
+    }
 
     public IEnumerator HandleDrawUserCards(DrawUserCardsCommand command)
     {
@@ -65,7 +71,7 @@ namespace Dreamtides.Services
     /// </summary>
     public void DisplayInfoZoom(Card card)
     {
-      if (_currentInfoZoom && card.Id == _currentInfoZoom.Id)
+      if ((_currentInfoZoom && card.Id == _currentInfoZoom.Id) || _infoZoomDisabled)
       {
         return;
       }
@@ -124,6 +130,11 @@ namespace Dreamtides.Services
 
     public void ClearInfoZoom()
     {
+      if (_infoZoomDisabled)
+      {
+        return;
+      }
+
       Registry.DocumentService.ClearInfoZoom();
       if (_hidCloseButton)
       {
