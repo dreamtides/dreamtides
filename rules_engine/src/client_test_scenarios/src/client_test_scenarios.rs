@@ -2,17 +2,25 @@ pub mod basic_scene;
 
 use std::sync::{LazyLock, Mutex};
 
-use action_data::battle_action::{BattleAction, CardBrowserType};
+use action_data::battle_action::{
+    BattleAction, CardBrowserType, CardOrderSelectionTarget, SelectCardOrder,
+};
 use action_data::debug_action::DebugAction;
 use action_data::user_action::UserAction;
 use core_data::display_color::{self, DisplayColor};
-use core_data::display_types::{AudioClipAddress, MaterialAddress, ProjectileAddress};
+use core_data::display_types::{
+    AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
+};
 use core_data::identifiers::{BattleId, CardId};
+use core_data::numerics::Spark;
 use core_data::types::PlayerName;
-use display_data::battle_view::{BattleView, PrimaryActionButtonView};
+use display_data::battle_view::{
+    BattleView, ButtonView, CardOrderSelectorView, PrimaryActionButtonView,
+};
+use display_data::card_view::CardView;
 use display_data::command::{
-    Command, CommandSequence, DissolveCardCommand, FireProjectileCommand, GameObjectId,
-    ParallelCommandGroup, UpdateBattleCommand,
+    Command, CommandSequence, DisplayEffectCommand, DissolveCardCommand, FireProjectileCommand,
+    GameObjectId, ParallelCommandGroup, UpdateBattleCommand,
 };
 use display_data::object_position::{Position, StackType};
 use display_data::request_data::{
@@ -21,12 +29,15 @@ use display_data::request_data::{
 use masonry::flex_enums::{FlexPosition, TextAlign, WhiteSpace};
 use masonry::flex_node::{FlexNode, NodeType, Text};
 use masonry::flex_style::{
-    BorderRadius, Dimension, DimensionGroup, DimensionUnit, FlexInsets, FlexStyle,
+    BorderRadius, Dimension, DimensionGroup, DimensionUnit, FlexInsets, FlexStyle, FlexVector3,
 };
 use uuid::Uuid;
 
 static CURRENT_BATTLE: LazyLock<Mutex<Option<BattleView>>> = LazyLock::new(|| Mutex::new(None));
 static CARD_BROWSER_SOURCE: LazyLock<Mutex<Option<Position>>> = LazyLock::new(|| Mutex::new(None));
+static ORDER_SELECTOR_VISIBLE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
+static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<Mutex<std::collections::HashMap<CardId, Position>>> =
+    LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
 
 pub fn connect(request: &ConnectRequest, _scenario: &str) -> ConnectResponse {
     let battle = basic_scene::create(BattleId(Uuid::new_v4()));
@@ -60,6 +71,7 @@ fn perform_battle_action(
         BattleAction::BrowseCards(card_browser) => browse_cards(card_browser),
         BattleAction::CloseCardBrowser => close_card_browser(),
         BattleAction::SelectCard(card_id) => select_card(card_id),
+        BattleAction::SelectCardOrder(select_order) => select_card_order(select_order),
         _ => {
             panic!("Not implemented: {:?}", action);
         }
@@ -82,6 +94,9 @@ fn play_card(card_id: CardId, scenario: &str) -> CommandSequence {
         }
         "play_card_with_targets" => {
             play_card_with_targets(&mut battle, card_id);
+        }
+        "play_card_with_order_selector" => {
+            play_card_with_order_selector(&mut battle, &mut commands, card_id);
         }
         _ => {
             panic!("Scenario not implemented: {:?}", scenario);
@@ -239,7 +254,6 @@ fn play_card_with_targets(battle: &mut BattleView, card_id: CardId) {
     else {
         panic!("Card not found: {:?}", card_id);
     };
-
     let sorting_key = card.position.sorting_key;
     let pos = StackType::TargetingEnemyBattlefield;
     battle.cards[card_index] = basic_scene::card_view(Position::OnStack(pos), sorting_key);
@@ -257,6 +271,111 @@ fn play_card_with_targets(battle: &mut BattleView, card_id: CardId) {
             }
         }
     }
+}
+
+fn play_card_with_order_selector(
+    battle: &mut BattleView,
+    commands: &mut Vec<Command>,
+    card_id: CardId,
+) {
+    let Some((card_index, card)) = battle.cards.iter().enumerate().find(|(_, c)| c.id == card_id)
+    else {
+        panic!("Card not found: {:?}", card_id);
+    };
+    let sorting_key = card.position.sorting_key;
+    battle.cards[card_index] =
+        basic_scene::card_view(Position::OnStack(StackType::Default), sorting_key);
+    battle.cards[card_index].position.sorting_key = 500;
+    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+
+    commands.push(Command::DisplayEffect(DisplayEffectCommand {
+        target: GameObjectId::CardId(card_id),
+        effect: EffectAddress::new(
+            "Assets/ThirdParty/Hovl Studio/Magic hits/Prefabs/_Hit 10.prefab",
+        ),
+        duration: Milliseconds::new(500),
+        scale: FlexVector3::new(5.0, 5.0, 5.0),
+        sound: Some(AudioClipAddress::new(
+            "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Generic_SubtleWhoosh04.wav",
+        )),
+    }));
+    battle.cards[card_index] =
+        basic_scene::card_view(Position::InVoid(PlayerName::User), sorting_key);
+    commands.push(Command::UpdateBattle(
+        UpdateBattleCommand::new(battle.clone()).with_update_sound(
+            AudioClipAddress::new(
+                "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Magic2_Projectiles02.wav",
+            ),
+        ),
+    ));
+    let c1 = draw_card(battle);
+    let c2 = draw_card(battle);
+    *ORDER_SELECTOR_VISIBLE.lock().unwrap() = true;
+    *CARD_ORDER_ORIGINAL_POSITIONS.lock().unwrap() = std::collections::HashMap::new();
+    battle.interface.bottom_right_button = Some(ButtonView {
+        label: "\u{f070} Hide Browser".to_string(),
+        action: UserAction::BattleAction(BattleAction::ToggleOrderSelectorVisibility),
+    });
+
+    if let (Some(c1_view), Some(c2_view)) = (c1, c2) {
+        for card in battle.cards.iter_mut() {
+            if card.id == c1_view.id || card.id == c2_view.id {
+                card.position.position =
+                    Position::CardOrderSelector(CardOrderSelectionTarget::Deck);
+                card.revealed.as_mut().unwrap().actions.can_select_order = true;
+            }
+        }
+    }
+    battle.interface.card_order_selector =
+        Some(CardOrderSelectorView { include_deck: true, include_void: true });
+    battle.interface.primary_action_button = Some(PrimaryActionButtonView {
+        label: "End Turn".to_string(),
+        action: UserAction::DebugAction(DebugAction::TriggerEnemyJudgment),
+        show_on_idle_duration: None,
+    });
+
+    *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())
+        .with_update_sound(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Electric Magic/RPG3_ElectricMagic_Cast02.wav"))));
+}
+
+fn select_card_order(select_order: SelectCardOrder) -> CommandSequence {
+    let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+    if let Some(card_index) = battle.cards.iter().position(|card| card.id == select_order.card_id) {
+        battle.cards[card_index].position.position =
+            Position::CardOrderSelector(select_order.target);
+    }
+
+    let mut selector_cards: Vec<(usize, CardId, u32)> = battle
+        .cards
+        .iter()
+        .enumerate()
+        .filter_map(|(idx, card)| {
+            if card.position.position == Position::CardOrderSelector(select_order.target) {
+                Some((idx, card.id, card.position.sorting_key))
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    selector_cards.sort_by_key(|(_, _, key)| *key);
+
+    if let Some(selected_idx) =
+        selector_cards.iter().position(|(_, id, _)| *id == select_order.card_id)
+    {
+        let (card_index, _, _) = selector_cards.remove(selected_idx);
+        let new_position = select_order.position.min(selector_cards.len());
+        selector_cards.insert(new_position, (card_index, select_order.card_id, 0));
+        for (i, (idx, _, _)) in selector_cards.iter().enumerate() {
+            battle.cards[*idx].position.position = Position::CardOrderSelector(select_order.target);
+            battle.cards[*idx].position.sorting_key = i as u32;
+        }
+    }
+
+    *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+
+    CommandSequence::sequential(vec![Command::UpdateBattle(UpdateBattleCommand::new(battle))])
 }
 
 fn select_target_message() -> FlexNode {
@@ -301,6 +420,30 @@ fn select_target_message() -> FlexNode {
         }),
         children: vec![message],
         ..Default::default()
+    }
+}
+
+fn draw_card(battle: &mut BattleView) -> Option<CardView> {
+    if let Some(deck_card) = battle
+        .cards
+        .iter()
+        .find(|c| matches!(c.position.position, Position::InDeck(PlayerName::User)))
+    {
+        let card_id = deck_card.id;
+        let sorting_key = deck_card.position.sorting_key;
+        battle.user.total_spark += Spark(11);
+        if let Some(card_index) = battle.cards.iter().position(|c| c.id == card_id) {
+            let mut shown_drawn = battle.clone();
+            shown_drawn.cards[card_index] = basic_scene::card_view(Position::Drawn, sorting_key);
+            let view = basic_scene::card_view(Position::InHand(PlayerName::User), sorting_key);
+            battle.cards[card_index] = view.clone();
+            *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+            Some(view)
+        } else {
+            None
+        }
+    } else {
+        None
     }
 }
 

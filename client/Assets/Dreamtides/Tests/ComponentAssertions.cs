@@ -22,9 +22,9 @@ namespace Dreamtides.Tests
       Assert.That(objectLayout.Objects.Count, Is.GreaterThan(0));
     }
 
-    public static void AssertCountIs(ObjectLayout objectLayout, int count)
+    public static void AssertCountIs(ObjectLayout objectLayout, int count, string? message = null)
     {
-      Assert.That(objectLayout.Objects.Count, Is.EqualTo(count));
+      Assert.That(objectLayout.Objects.Count, Is.EqualTo(count), message);
     }
 
     public static void AssertActive(Component component, string? message = null)

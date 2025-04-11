@@ -1,18 +1,20 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using Dreamtides.Schema;
 using Dreamtides.Utils;
 using UnityEngine;
 
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 namespace Dreamtides.Layout
 {
   public class CardOrderSelector : AbstractCardBrowser
   {
-    [SerializeField] float _initialSpacing = 0.5f;
-    [SerializeField] float _initialOffset;
-    [SerializeField] GameObject _deckImage = null!;
-    [SerializeField] GameObject _voidImage = null!;
-    [SerializeField] ObjectLayout _cardOrderSelectorVoid = null!;
+    [SerializeField] internal float _initialSpacing = 0.5f;
+    [SerializeField] internal float _initialOffset;
+    [SerializeField] internal GameObject _deckImage = null!;
+    [SerializeField] internal GameObject _voidImage = null!;
+    [SerializeField] internal ObjectLayout _cardOrderSelectorVoid = null!;
 
     public CardOrderSelectorView? View { get; set; }
 
