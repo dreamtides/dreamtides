@@ -7,6 +7,7 @@ use crate::user_action::UserAction;
 #[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum DebugAction {
+    ApplyTestScenarioAction,
     DrawCard,
     TriggerUserJudgment,
     TriggerEnemyJudgment,

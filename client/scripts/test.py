@@ -10,6 +10,7 @@ import sys
 import time
 import os
 import threading
+import signal
 
 def find_highest_unity_version(hub_path):
     if not hub_path.exists():
@@ -137,7 +138,7 @@ def sync_project_to_temp(project_root):
     print(f"Syncing project to {temp_project_path}...")
     
     try:
-        result = subprocess.run(
+        subprocess.run(
             ["rsync", "--delete", "--stats", "-avqr", str(project_root), "/tmp/unity_tests/"],
             check=True,
             stdout=subprocess.PIPE,
@@ -207,7 +208,28 @@ def main():
         monitor_thread = threading.Thread(target=monitor_log_file, args=(log_file,), daemon=True)
         monitor_thread.start()
         
-        subprocess.run(executable=unity_path, args=args, check=True)
+        # Create a process group for the Unity process
+        process = subprocess.Popen(
+            executable=unity_path,
+            args=args,
+            preexec_fn=os.setsid if os.name != 'nt' else None
+        )
+        
+        # Function to handle termination signals
+        def signal_handler(signum, frame):
+            print("\nTerminating Unity process...")
+            if os.name == 'nt':
+                process.terminate()
+            else:
+                os.killpg(os.getpgid(process.pid), signal.SIGTERM)
+            sys.exit(0)
+        
+        # Register signal handlers
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTERM, signal_handler)
+        
+        # Wait for the process to complete
+        process.wait()
         
         print("\n")
         

@@ -19,6 +19,14 @@ namespace Dreamtides.Services
     [SerializeField] AudioClip _victorySound = null!;
     [SerializeField] AudioClip _defeatSound = null!;
 
+    protected override void OnInitialize(TestConfiguration? testConfiguration)
+    {
+      if (testConfiguration != null)
+      {
+        Registry.Layout.MainAudioSource.volume = 0.0f;
+      }
+    }
+
     public void Play(AudioClip clip)
     {
       Registry.Layout.MainAudioSource.PlayOneShot(clip);

@@ -12,15 +12,17 @@ use core_data::display_types::{
     AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
 };
 use core_data::identifiers::{BattleId, CardId};
-use core_data::numerics::Spark;
+use core_data::numerics::{Energy, Spark};
 use core_data::types::PlayerName;
 use display_data::battle_view::{
     BattleView, ButtonView, CardOrderSelectorView, PrimaryActionButtonView,
 };
 use display_data::card_view::CardView;
 use display_data::command::{
-    Command, CommandSequence, DisplayEffectCommand, DissolveCardCommand, FireProjectileCommand,
-    GameObjectId, ParallelCommandGroup, UpdateBattleCommand,
+    ArrowStyle, Command, CommandSequence, DisplayArrow, DisplayArrowsCommand,
+    DisplayDreamwellActivationCommand, DisplayEffectCommand, DisplayJudgmentCommand,
+    DissolveCardCommand, FireProjectileCommand, GameMessageType, GameObjectId,
+    ParallelCommandGroup, UpdateBattleCommand,
 };
 use display_data::object_position::{Position, StackType};
 use display_data::request_data::{
@@ -55,8 +57,8 @@ pub fn perform_action(request: &PerformActionRequest, scenario: &str) -> Perform
         UserAction::BattleAction(action) => {
             perform_battle_action(*action, request.metadata, scenario)
         }
-        _ => {
-            panic!("Not implemented: {:?}", request);
+        UserAction::DebugAction(action) => {
+            perform_debug_action(*action, request.metadata, scenario)
         }
     }
 }
@@ -72,6 +74,21 @@ fn perform_battle_action(
         BattleAction::CloseCardBrowser => close_card_browser(),
         BattleAction::SelectCard(card_id) => select_card(card_id),
         BattleAction::SelectCardOrder(select_order) => select_card_order(select_order),
+        _ => {
+            panic!("Not implemented: {:?}", action);
+        }
+    };
+
+    PerformActionResponse { metadata, commands }
+}
+
+fn perform_debug_action(
+    action: DebugAction,
+    metadata: Metadata,
+    scenario: &str,
+) -> PerformActionResponse {
+    let commands = match action {
+        DebugAction::ApplyTestScenarioAction => apply_test_scenario_action(scenario),
         _ => {
             panic!("Not implemented: {:?}", action);
         }
@@ -376,6 +393,83 @@ fn select_card_order(select_order: SelectCardOrder) -> CommandSequence {
     *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
 
     CommandSequence::sequential(vec![Command::UpdateBattle(UpdateBattleCommand::new(battle))])
+}
+
+fn apply_test_scenario_action(scenario: &str) -> CommandSequence {
+    let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
+    let mut commands = Vec::new();
+    match scenario {
+        "user_judgment_phase" => trigger_user_judgment_phase(&mut battle, &mut commands),
+        "respond_to_enemy_card" => respond_to_enemy_card(&mut battle, &mut commands),
+        _ => {
+            panic!("Scenario not implemented: {:?}", scenario);
+        }
+    }
+    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+    *CURRENT_BATTLE.lock().unwrap() = Some(battle);
+    CommandSequence::sequential(commands)
+}
+
+fn respond_to_enemy_card(battle: &mut BattleView, commands: &mut Vec<Command>) {
+    // Find the first card in enemy hand
+    if let Some((card_index, card)) = battle
+        .cards
+        .iter()
+        .enumerate()
+        .find(|(_, c)| matches!(c.position.position, Position::InHand(PlayerName::Enemy)))
+    {
+        let sorting_key = card.position.sorting_key;
+        let card_id = card.id;
+        let target_id = battle
+            .cards
+            .iter()
+            .find(|c| matches!(c.position.position, Position::OnBattlefield(PlayerName::User)))
+            .map(|c| c.id)
+            .unwrap_or(card_id); // Fallback to the card's own ID if no target found
+        battle.cards[card_index] =
+            basic_scene::card_view(Position::OnStack(StackType::Default), sorting_key);
+        commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+        commands.push(Command::Wait(Milliseconds::new(500)));
+        battle.cards[card_index] = basic_scene::card_view(
+            Position::OnStack(StackType::TargetingUserBattlefield),
+            sorting_key,
+        );
+        commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+        commands.push(Command::DisplayArrows(DisplayArrowsCommand {
+            arrows: vec![DisplayArrow {
+                source: GameObjectId::CardId(card_id),
+                target: GameObjectId::CardId(target_id),
+                color: ArrowStyle::Red,
+            }],
+        }));
+    }
+}
+
+fn trigger_user_judgment_phase(battle: &mut BattleView, commands: &mut Vec<Command>) {
+    battle.user.energy = Energy(3);
+    battle.user.produced_energy = Energy(3);
+    *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
+
+    let dreamwell_card_id = battle
+        .cards
+        .iter()
+        .find(|card| matches!(card.position.position, Position::InDreamwell(PlayerName::User)))
+        .map(|card| card.id)
+        .unwrap_or(battle.cards[0].id);
+
+    commands.extend(vec![
+        Command::DisplayGameMessage(GameMessageType::YourTurn),
+        Command::DisplayJudgment(DisplayJudgmentCommand {
+            player: PlayerName::User,
+            new_score: None,
+        }),
+        Command::DisplayDreamwellActivation(DisplayDreamwellActivationCommand {
+            card_id: dreamwell_card_id,
+            player: PlayerName::User,
+            new_energy: Some(Energy(3)),
+            new_produced_energy: Some(Energy(3)),
+        }),
+    ]);
 }
 
 fn select_target_message() -> FlexNode {

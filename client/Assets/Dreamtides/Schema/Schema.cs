@@ -1722,7 +1722,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Private actions for developer use
     /// </summary>
-    public enum DebugAction { DrawCard, PerformSomeAction, TriggerEnemyJudgment, TriggerUserJudgment };
+    public enum DebugAction { ApplyTestScenarioAction, DrawCard, PerformSomeAction, TriggerEnemyJudgment, TriggerUserJudgment };
 
     public enum FlexAlign { Auto, Center, FlexEnd, FlexStart, Stretch };
 
@@ -2512,6 +2512,8 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
+                case "applyTestScenarioAction":
+                    return DebugAction.ApplyTestScenarioAction;
                 case "drawCard":
                     return DebugAction.DrawCard;
                 case "performSomeAction":
@@ -2534,6 +2536,9 @@ namespace Dreamtides.Schema
             var value = (DebugAction)untypedValue;
             switch (value)
             {
+                case DebugAction.ApplyTestScenarioAction:
+                    serializer.Serialize(writer, "applyTestScenarioAction");
+                    return;
                 case DebugAction.DrawCard:
                     serializer.Serialize(writer, "drawCard");
                     return;

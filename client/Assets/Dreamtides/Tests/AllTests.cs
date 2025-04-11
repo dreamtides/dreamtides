@@ -197,6 +197,26 @@ namespace Dreamtides.Tests
       yield return TestUtil.TearDownScenario(registry);
     }
 
+    [UnityTest]
+    public IEnumerator TestUserJudgmentPhase()
+    {
+      Registry registry = null;
+      yield return TestUtil.LoadScenario(GameViewResolution.Resolution16x9, "user_judgment_phase", (r) =>
+      {
+        registry = r;
+      });
+
+      yield return TestClickInputProvider.ClickOn(registry, registry.Layout.PrimaryActionButton);
+      Assert.That(registry.TestHelperService.DidObjectMove(registry.Layout.UserStatusDisplay.TotalSpark),
+          Is.True,
+          "User spark should have moved");
+      Assert.That(registry.TestHelperService.DidObjectMove(registry.Layout.EnemyStatusDisplay.TotalSpark),
+          Is.True,
+          "Enemy spark should have moved");
+
+      yield return TestUtil.TearDownScenario(registry);
+    }
+
     static BoxCollider GetBoxCollider(Component component)
     {
       return Errors.CheckNotNull(component.GetComponentInChildren<BoxCollider>(),

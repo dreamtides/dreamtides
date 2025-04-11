@@ -3,56 +3,109 @@
 using System.Collections;
 using System.Collections.Generic;
 using Dreamtides.Layout;
+using Dreamtides.Components;
 using UnityEngine;
 
 namespace Dreamtides.Services
 {
   public class TestHelperService : Service
   {
+    private Dictionary<MonoBehaviour, List<Vector3>> movementHistory = new();
+
+    public bool DidObjectMove(MonoBehaviour obj)
+    {
+      if (movementHistory.TryGetValue(obj, out var positions))
+      {
+        return positions.Count > 1;
+      }
+      return false;
+    }
+
     public IEnumerator WaitForIdle()
     {
       var epsilon = 0.1f;
       var waitTime = 1.0f;
-      var lastPositions = new Dictionary<Displayable, Vector3>();
+      var lastPositions = new Dictionary<MonoBehaviour, Vector3>();
       var timer = 0.0f;
+      movementHistory.Clear();
 
-      var displayables = FindObjectsByType<Displayable>(FindObjectsSortMode.None);
-      foreach (var displayable in displayables)
+      void TrackObjects<T>() where T : MonoBehaviour
       {
-        lastPositions[displayable] = displayable.transform.position;
+        var objects = FindObjectsByType<T>(FindObjectsSortMode.None);
+        foreach (var obj in objects)
+        {
+          lastPositions[obj] = obj.transform.position;
+          if (!movementHistory.ContainsKey(obj))
+          {
+            movementHistory[obj] = new List<Vector3> { obj.transform.position };
+          }
+        }
       }
 
-      yield return new WaitForEndOfFrame();
-
-      // Keep checking until stable for waitTime seconds
-      while (timer < waitTime)
+      bool CheckMovement<T>() where T : MonoBehaviour
       {
-        var hasMovement = false;
-        displayables = FindObjectsByType<Displayable>(FindObjectsSortMode.None);
-
-        // Check for movement or new objects
-        foreach (var displayable in displayables)
+        var objects = FindObjectsByType<T>(FindObjectsSortMode.None);
+        foreach (var obj in objects)
         {
-          var currentPosition = displayable.transform.position;
+          if (obj is TimedEffect or Projectile)
+          {
+            if (obj.gameObject.activeSelf)
+            {
+              return true;
+            }
+          }
 
-          if (lastPositions.TryGetValue(displayable, out var lastPosition))
+          var currentPosition = obj.transform.position;
+
+          if (lastPositions.TryGetValue(obj, out var lastPosition))
           {
             if (Vector3.Distance(currentPosition, lastPosition) > epsilon)
             {
-              // Movement detected
-              hasMovement = true;
-              lastPositions[displayable] = currentPosition;
+              lastPositions[obj] = currentPosition;
+              if (!movementHistory.ContainsKey(obj))
+              {
+                movementHistory[obj] = new List<Vector3> { currentPosition };
+              }
+              else
+              {
+                movementHistory[obj].Add(currentPosition);
+              }
+              return true;
             }
           }
           else
           {
-            // New object found
-            lastPositions[displayable] = currentPosition;
-            hasMovement = true;
+            lastPositions[obj] = currentPosition;
+            if (!movementHistory.ContainsKey(obj))
+            {
+              movementHistory[obj] = new List<Vector3> { currentPosition };
+            }
+            else
+            {
+              movementHistory[obj].Add(currentPosition);
+            }
+            return true;
           }
         }
+        return false;
+      }
 
-        // Reset or increment timer based on movement
+      TrackObjects<Displayable>();
+      TrackObjects<BattlefieldNumber>();
+      TrackObjects<Projectile>();
+      TrackObjects<TimedEffect>();
+
+      yield return new WaitForEndOfFrame();
+
+      while (timer < waitTime)
+      {
+        var hasMovement = false;
+
+        hasMovement |= CheckMovement<Displayable>();
+        hasMovement |= CheckMovement<BattlefieldNumber>();
+        hasMovement |= CheckMovement<Projectile>();
+        hasMovement |= CheckMovement<TimedEffect>();
+
         if (hasMovement)
         {
           timer = 0.0f;

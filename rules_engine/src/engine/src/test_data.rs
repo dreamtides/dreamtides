@@ -284,6 +284,7 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                 PerformActionResponse { metadata, commands: CommandSequence::sequential(commands) }
             }
         }
+        DebugAction::ApplyTestScenarioAction => todo!(),
     }
 }
 
