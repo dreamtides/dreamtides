@@ -110,10 +110,13 @@ fn play_card(card_id: CardId, scenario: &str) -> CommandSequence {
             battle.cards[card_index].position.position = Position::OnBattlefield(PlayerName::User);
         }
         "play_card_with_targets" => {
-            play_card_with_targets(&mut battle, card_id);
+            play_card_with_targets(&mut battle, card_id, StackType::TargetingEnemyBattlefield);
         }
         "play_card_with_order_selector" => {
             play_card_with_order_selector(&mut battle, &mut commands, card_id);
+        }
+        "respond_to_enemy_card" => {
+            play_card_with_targets(&mut battle, card_id, StackType::TargetingBothBattlefields);
         }
         _ => {
             panic!("Scenario not implemented: {:?}", scenario);
@@ -266,15 +269,22 @@ fn select_card(card_id: CardId) -> CommandSequence {
     }
 }
 
-fn play_card_with_targets(battle: &mut BattleView, card_id: CardId) {
+fn play_card_with_targets(battle: &mut BattleView, card_id: CardId, stack: StackType) {
     let Some((card_index, card)) = battle.cards.iter().enumerate().find(|(_, c)| c.id == card_id)
     else {
         panic!("Card not found: {:?}", card_id);
     };
     let sorting_key = card.position.sorting_key;
-    let pos = StackType::TargetingEnemyBattlefield;
-    battle.cards[card_index] = basic_scene::card_view(Position::OnStack(pos), sorting_key);
-    eprintln!("Play card with targets: {:?}", card_id);
+    battle.cards[card_index] = basic_scene::card_view(Position::OnStack(stack), sorting_key);
+    battle.cards[card_index].position.sorting_key = 999;
+
+    // Move any other cards currently on any stack position to the new stack
+    // position
+    for card in battle.cards.iter_mut() {
+        if matches!(card.position.position, Position::OnStack(_)) {
+            card.position.position = Position::OnStack(stack);
+        }
+    }
 
     battle.interface.screen_overlay = Some(select_target_message());
     battle.interface.primary_action_button = None;
@@ -411,7 +421,6 @@ fn apply_test_scenario_action(scenario: &str) -> CommandSequence {
 }
 
 fn respond_to_enemy_card(battle: &mut BattleView, commands: &mut Vec<Command>) {
-    // Find the first card in enemy hand
     if let Some((card_index, card)) = battle
         .cards
         .iter()

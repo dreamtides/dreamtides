@@ -2636,8 +2636,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 313160890}
-  - {fileID: 434655082}
   - {fileID: 756204725}
+  - {fileID: 434655082}
   - {fileID: 760589604}
   m_Father: {fileID: 1435083753}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2764,7 +2764,7 @@ GameObject:
   m_Component:
   - component: {fileID: 313160890}
   - component: {fileID: 313160892}
-  - component: {fileID: 313160891}
+  - component: {fileID: 313160893}
   m_Layer: 0
   m_Name: DefaultStack
   m_TagString: Untagged
@@ -2787,25 +2787,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 303492987}
   m_LocalEulerAnglesHint: {x: 75, y: 0, z: 0}
---- !u!114 &313160891
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 313160889}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 518962cfb277243c0b2e1d83d1c50db9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _projectileSourcePosition: {fileID: 0}
-  _displayEffectPosition: {fileID: 0}
-  _sortingGroup: {fileID: 0}
-  _internalGameContext: 0
-  _objects: []
-  _debugUpdateContinuously: 0
-  _singleElementY: 0.5
 --- !u!114 &313160892
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2819,6 +2800,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _startingContext: 40
+--- !u!114 &313160893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 313160889}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8045cfc1c0ed344c4b6c28b653374c39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _projectileSourcePosition: {fileID: 0}
+  _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
+  _internalGameContext: 0
+  _objects: []
+  _debugUpdateContinuously: 0
+  _offset: 2.5
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -3911,7 +3911,7 @@ GameObject:
   m_Component:
   - component: {fileID: 434655082}
   - component: {fileID: 434655084}
-  - component: {fileID: 434655083}
+  - component: {fileID: 434655085}
   m_Layer: 0
   m_Name: TargetingEnemy
   m_TagString: Untagged
@@ -3934,25 +3934,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 303492987}
   m_LocalEulerAnglesHint: {x: 75, y: 0, z: 0}
---- !u!114 &434655083
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 434655081}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 518962cfb277243c0b2e1d83d1c50db9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _projectileSourcePosition: {fileID: 0}
-  _displayEffectPosition: {fileID: 0}
-  _sortingGroup: {fileID: 0}
-  _internalGameContext: 0
-  _objects: []
-  _debugUpdateContinuously: 0
-  _singleElementY: 0.5
 --- !u!114 &434655084
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3966,6 +3947,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _startingContext: 40
+--- !u!114 &434655085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 434655081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8045cfc1c0ed344c4b6c28b653374c39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _projectileSourcePosition: {fileID: 0}
+  _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
+  _internalGameContext: 0
+  _objects: []
+  _debugUpdateContinuously: 0
+  _offset: 2.5
 --- !u!1 &449699474
 GameObject:
   m_ObjectHideFlags: 0
@@ -6648,7 +6648,7 @@ GameObject:
   m_Component:
   - component: {fileID: 756204725}
   - component: {fileID: 756204727}
-  - component: {fileID: 756204726}
+  - component: {fileID: 756204728}
   m_Layer: 0
   m_Name: TargetingUser
   m_TagString: Untagged
@@ -6671,25 +6671,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 303492987}
   m_LocalEulerAnglesHint: {x: 75, y: 0, z: 0}
---- !u!114 &756204726
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 756204724}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 518962cfb277243c0b2e1d83d1c50db9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _projectileSourcePosition: {fileID: 0}
-  _displayEffectPosition: {fileID: 0}
-  _sortingGroup: {fileID: 0}
-  _internalGameContext: 0
-  _objects: []
-  _debugUpdateContinuously: 0
-  _singleElementY: 0.5
 --- !u!114 &756204727
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6703,6 +6684,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _startingContext: 40
+--- !u!114 &756204728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 756204724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8045cfc1c0ed344c4b6c28b653374c39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _projectileSourcePosition: {fileID: 0}
+  _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
+  _internalGameContext: 0
+  _objects: []
+  _debugUpdateContinuously: 0
+  _offset: 2.5
 --- !u!1 &760589603
 GameObject:
   m_ObjectHideFlags: 0
@@ -6713,7 +6713,7 @@ GameObject:
   m_Component:
   - component: {fileID: 760589604}
   - component: {fileID: 760589606}
-  - component: {fileID: 760589605}
+  - component: {fileID: 760589607}
   m_Layer: 0
   m_Name: TargetingBoth
   m_TagString: Untagged
@@ -6736,25 +6736,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 303492987}
   m_LocalEulerAnglesHint: {x: 75, y: 0, z: 0}
---- !u!114 &760589605
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 760589603}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 518962cfb277243c0b2e1d83d1c50db9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _projectileSourcePosition: {fileID: 0}
-  _displayEffectPosition: {fileID: 0}
-  _sortingGroup: {fileID: 0}
-  _internalGameContext: 0
-  _objects: []
-  _debugUpdateContinuously: 0
-  _singleElementY: 0.5
 --- !u!114 &760589606
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6768,6 +6749,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _startingContext: 40
+--- !u!114 &760589607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 760589603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8045cfc1c0ed344c4b6c28b653374c39, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _projectileSourcePosition: {fileID: 0}
+  _displayEffectPosition: {fileID: 0}
+  _sortingGroup: {fileID: 0}
+  _internalGameContext: 0
+  _objects: []
+  _debugUpdateContinuously: 0
+  _offset: 1
 --- !u!1 &761815411
 GameObject:
   m_ObjectHideFlags: 0
@@ -12678,10 +12678,10 @@ MonoBehaviour:
   _enemyStatusDisplay: {fileID: 1395752108}
   _offscreen: {fileID: 1827703715}
   _drawnCardsPosition: {fileID: 930174515}
-  _defaultStack: {fileID: 313160891}
-  _targetingUserStack: {fileID: 756204726}
-  _targetingEnemyStack: {fileID: 434655083}
-  _targetingBothStack: {fileID: 760589605}
+  _defaultStack: {fileID: 313160893}
+  _targetingUserStack: {fileID: 756204728}
+  _targetingEnemyStack: {fileID: 434655085}
+  _targetingBothStack: {fileID: 760589607}
   _battlefieldOverlay: {fileID: 1541877254}
   _gameMessage: {fileID: 840192635}
   _infoZoomLeft: {fileID: 1576221497}

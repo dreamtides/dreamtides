@@ -113,7 +113,7 @@ namespace Dreamtides.Tests
     }
 
     [UnityTest]
-    public IEnumerator TestPlayEventWithTarget()
+    public IEnumerator TestPlayCardWithTarget()
     {
       Registry registry = null;
       yield return TestUtil.LoadScenario(GameViewResolution.Resolution16x9, "play_card_with_targets", (r) =>
@@ -216,6 +216,42 @@ namespace Dreamtides.Tests
 
       yield return TestUtil.TearDownScenario(registry);
     }
+
+    [UnityTest]
+    public IEnumerator TestRespondToEnemyCard()
+    {
+      Registry registry = null;
+      yield return TestUtil.LoadScenario(GameViewResolution.Resolution16x9, "respond_to_enemy_card", (r) =>
+      {
+        registry = r;
+      });
+
+      yield return TestClickInputProvider.ClickOn(registry, registry.Layout.PrimaryActionButton);
+      yield return TestUtil.WaitForCount(registry, registry.Layout.TargetingUserStack, 1);
+
+      var card = GameObject.Find("Beacon of Tomorrow [6-1]").GetComponent<Card>();
+      foreach (var enemy in registry.Layout.EnemyBattlefield.Objects)
+      {
+        var enemyCard = ComponentUtils.Get<Card>(enemy);
+        Assert.That(enemyCard._battlefieldOutline.color, Is.EqualTo(Color.white),
+            "Enemy card outline should be white before targeting");
+      }
+
+      yield return TestDragInputProvider.DragTo(
+        registry,
+        card,
+        registry.Layout.TargetingBothStack);
+      yield return TestUtil.WaitForCount(registry, registry.Layout.TargetingBothStack, 2);
+      foreach (var enemy in registry.Layout.EnemyBattlefield.Objects)
+      {
+        var enemyCard = ComponentUtils.Get<Card>(enemy);
+        Assert.That(enemyCard._battlefieldOutline.color, Is.Not.EqualTo(Color.white),
+            "Enemy card outline should not be white during targeting");
+      }
+
+      yield return TestUtil.TearDownScenario(registry);
+    }
+
 
     static BoxCollider GetBoxCollider(Component component)
     {
