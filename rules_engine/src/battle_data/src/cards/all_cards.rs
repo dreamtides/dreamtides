@@ -1,6 +1,6 @@
 use std::collections::{BTreeSet, VecDeque};
 
-use core_data::identifiers::CardDataIdentifier;
+use core_data::identifiers::{CardDataIdentifier, CardIdentity};
 use core_data::types::PlayerName;
 use slotmap::SlotMap;
 
@@ -9,6 +9,7 @@ use crate::cards::card_id::{
     BanishedCardId, CardId, CharacterId, DeckCardId, HandCardId, ObjectId, StackCardId, VoidCardId,
 };
 use crate::cards::card_instance_id::CardInstanceId;
+use crate::cards::card_properties::CardProperties;
 use crate::cards::zone::Zone;
 
 #[derive(Clone, Debug)]
@@ -68,11 +69,21 @@ impl AllCards {
         self.banished.cards(player_name)
     }
 
-    /// Allocates a new ObjectId to track instances within zones.
-    pub fn new_object_id(&mut self) -> ObjectId {
-        let result = self.next_object_id;
-        self.next_object_id = ObjectId(result.0 + 1);
-        result
+    /// Creates a card instance in the given zone.
+    pub fn create_card(
+        &mut self,
+        identity: CardIdentity,
+        owner: PlayerName,
+        zone: Zone,
+        properties: CardProperties,
+    ) -> CardDataIdentifier {
+        let object_id = self.new_object_id();
+        let tmp_instance_id =
+            create_card_instance_id(zone, object_id, CardDataIdentifier::default());
+        let card_data_id =
+            self.cards.insert(CardData { id: tmp_instance_id, identity, owner, properties });
+        self.cards[card_data_id].id = create_card_instance_id(zone, object_id, card_data_id);
+        card_data_id
     }
 
     /// Moves a card from its current zone to a new zone, if it is present.
@@ -89,6 +100,12 @@ impl AllCards {
         Some(object_id)
     }
 
+    fn new_object_id(&mut self) -> ObjectId {
+        let result = self.next_object_id;
+        self.next_object_id = ObjectId(result.0 + 1);
+        result
+    }
+
     fn add_to_zone(
         &mut self,
         owner: PlayerName,
@@ -96,37 +113,16 @@ impl AllCards {
         new_object_id: ObjectId,
         zone: Zone,
     ) -> Option<()> {
-        match zone {
-            Zone::Banished => {
-                let id = BanishedCardId::new(new_object_id, card_id);
-                self.card_mut(id)?.id = CardInstanceId::Banished(id);
-                self.banished.add(owner, id);
-            }
-            Zone::Battlefield => {
-                let id = CharacterId::new(new_object_id, card_id);
-                self.card_mut(id)?.id = CardInstanceId::Battlefield(id);
-                self.battlefield.add(owner, id);
-            }
-            Zone::Deck => {
-                let id = DeckCardId::new(new_object_id, card_id);
-                self.card_mut(id)?.id = CardInstanceId::Deck(id);
-                self.deck.add(owner, id);
-            }
-            Zone::Hand => {
-                let id = HandCardId::new(new_object_id, card_id);
-                self.card_mut(id)?.id = CardInstanceId::Hand(id);
-                self.hand.add(owner, id);
-            }
-            Zone::Stack => {
-                let id = StackCardId::new(new_object_id, card_id);
-                self.card_mut(id)?.id = CardInstanceId::Stack(id);
-                self.stack.push(id);
-            }
-            Zone::Void => {
-                let id = VoidCardId::new(new_object_id, card_id);
-                self.card_mut(id)?.id = CardInstanceId::Void(id);
-                self.void.add(owner, id);
-            }
+        let instance_id = create_card_instance_id(zone, new_object_id, card_id);
+        self.card_mut(card_id)?.id = instance_id;
+
+        match instance_id {
+            CardInstanceId::Banished(id) => self.banished.add(owner, id),
+            CardInstanceId::Battlefield(id) => self.battlefield.add(owner, id),
+            CardInstanceId::Deck(id) => self.deck.add(owner, id),
+            CardInstanceId::Hand(id) => self.hand.add(owner, id),
+            CardInstanceId::Stack(id) => self.stack.push(id),
+            CardInstanceId::Void(id) => self.void.add(owner, id),
         }
 
         Some(())
@@ -157,6 +153,21 @@ impl AllCards {
                 self.void.remove_if_present(owner, id);
             }
         }
+    }
+}
+
+fn create_card_instance_id(
+    zone: Zone,
+    object_id: ObjectId,
+    card_id: CardDataIdentifier,
+) -> CardInstanceId {
+    match zone {
+        Zone::Banished => CardInstanceId::Banished(BanishedCardId::new(object_id, card_id)),
+        Zone::Battlefield => CardInstanceId::Battlefield(CharacterId::new(object_id, card_id)),
+        Zone::Deck => CardInstanceId::Deck(DeckCardId::new(object_id, card_id)),
+        Zone::Hand => CardInstanceId::Hand(HandCardId::new(object_id, card_id)),
+        Zone::Stack => CardInstanceId::Stack(StackCardId::new(object_id, card_id)),
+        Zone::Void => CardInstanceId::Void(VoidCardId::new(object_id, card_id)),
     }
 }
 

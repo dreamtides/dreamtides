@@ -23,6 +23,17 @@ pub struct BattleId(pub Uuid);
 #[serde(rename_all = "camelCase")]
 pub struct QuestId(pub Uuid);
 
+/// Identifies a named card with given rules text.
+///
+/// Two cards with the same identity are considered to be "the same card", in
+/// the same sense that two copies of Lightning Bolt are "the same card" in
+/// Magic even though they may be in different game positions.
+#[derive(
+    Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
+pub struct CardIdentity(pub Uuid);
+
 new_key_type! {
     /// Identifies a card or card-like object such as:
     ///
