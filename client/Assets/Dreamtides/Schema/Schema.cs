@@ -412,12 +412,6 @@ namespace Dreamtides.Schema
     public partial class CardView
     {
         /// <summary>
-        /// Card back image
-        /// </summary>
-        [JsonProperty("cardBack", Required = Required.Always)]
-        public Url CardBack { get; set; }
-
-        /// <summary>
         /// Face up/face down state for this card
         /// </summary>
         [JsonProperty("cardFacing", Required = Required.Always)]
@@ -470,17 +464,6 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("revealedToOpponents", Required = Required.Always)]
         public bool RevealedToOpponents { get; set; }
-    }
-
-    /// <summary>
-    /// Card back image
-    ///
-    /// A URL
-    /// </summary>
-    public partial class Url
-    {
-        [JsonProperty("urlValue", Required = Required.Always)]
-        public string UrlValue { get; set; }
     }
 
     /// <summary>
@@ -1471,12 +1454,6 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("interface", Required = Required.Always)]
         public InterfaceView Interface { get; set; }
-
-        /// <summary>
-        /// Describes the status of the game, e.g. which phase & step the game is in
-        /// </summary>
-        [JsonProperty("statusDescription", Required = Required.Always)]
-        public string StatusDescription { get; set; }
 
         /// <summary>
         /// Player who is operating the client

@@ -52,4 +52,18 @@ impl CardInstanceId {
             Self::Void(id) => id.0.object_id,
         }
     }
+
+    /// Returns card identifier for use in UI.
+    ///
+    /// Note that this bypasses existence checks for the ID.
+    pub fn card_identifier_for_display(&self) -> CardDataIdentifier {
+        match self {
+            Self::Banished(id) => id.0.card_id,
+            Self::Battlefield(id) => id.0.card_id,
+            Self::Deck(id) => id.0.card_id,
+            Self::Hand(id) => id.0.card_id,
+            Self::Stack(id) => id.0.card_id,
+            Self::Void(id) => id.0.card_id,
+        }
+    }
 }

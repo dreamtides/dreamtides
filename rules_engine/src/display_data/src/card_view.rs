@@ -1,6 +1,6 @@
 use action_data::user_action::UserAction;
 use core_data::display_color::DisplayColor;
-use core_data::display_types::{AudioClipAddress, ProjectileAddress, SpriteAddress, Url};
+use core_data::display_types::{AudioClipAddress, ProjectileAddress, SpriteAddress};
 use core_data::identifiers::CardDataIdentifier;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::CardFacing;
@@ -20,9 +20,6 @@ pub struct CardView {
 
     /// Position of this card in the UI
     pub position: ObjectPosition,
-
-    /// Card back image
-    pub card_back: Url,
 
     /// If this card is revealed to the viewer, contains information on the
     /// revealed face of the card.

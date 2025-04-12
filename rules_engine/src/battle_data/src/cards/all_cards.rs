@@ -39,6 +39,11 @@ impl AllCards {
         self.cards.get_mut(id.card_identifier(self)?)
     }
 
+    /// Returns all currently known cards in an undefined order
+    pub fn all_cards(&self) -> impl Iterator<Item = &CardData> {
+        self.cards.values()
+    }
+
     /// Returns the set of characters on the battlefield for a given player.
     pub fn battlefield(&self, player_name: PlayerName) -> &BTreeSet<CharacterId> {
         self.battlefield.cards(player_name)
@@ -89,6 +94,7 @@ impl AllCards {
             object_id,
             card_data_id,
         ));
+        self.add_to_zone(owner, card_data_id, object_id, zone);
         card_data_id
     }
 

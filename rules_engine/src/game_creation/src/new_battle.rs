@@ -9,7 +9,7 @@ use battle_data::cards::zone::Zone;
 use battle_data::player::player_data::PlayerData;
 use battle_mutations::zones::deck;
 use core_data::identifiers::{BattleId, CardIdentity};
-use core_data::numerics::{Spark, TurnNumber};
+use core_data::numerics::{Energy, Spark, TurnNumber};
 use core_data::source::Source;
 use core_data::types::PlayerName;
 use rand::SeedableRng;
@@ -40,10 +40,12 @@ fn create_cards(battle: &mut BattleData) {
     for _ in 0..30 {
         let identity = CardIdentity(Uuid::new_v4());
         battle.cards.create_card(identity, PlayerName::User, Zone::Deck, CardProperties {
-            spark: Spark(2),
+            spark: Some(Spark(2)),
+            cost: Some(Energy(2)),
         });
         battle.cards.create_card(identity, PlayerName::Enemy, Zone::Deck, CardProperties {
-            spark: Spark(2),
+            spark: Some(Spark(2)),
+            cost: Some(Energy(2)),
         });
     }
 }

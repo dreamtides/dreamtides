@@ -21,6 +21,7 @@ pub fn draw_card(
     };
     let identifier = id.card_identifier(&battle.cards)?;
     let object_id = move_card::run(battle, source, id, Zone::Hand)?;
+    battle.cards.card_mut(identifier)?.set_revealed_to(player, true);
     Some(HandCardId::new(object_id, identifier))
 }
 

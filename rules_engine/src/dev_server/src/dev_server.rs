@@ -4,7 +4,7 @@ use axum::Router;
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse,
 };
-use engine::test_data;
+use rules_engine::engine;
 
 async fn connect(Json(req): Json<ConnectRequest>) -> Json<ConnectResponse> {
     if let Some(scenario) = req.test_scenario.as_ref() {
@@ -12,7 +12,7 @@ async fn connect(Json(req): Json<ConnectRequest>) -> Json<ConnectResponse> {
         Json(client_test_scenarios::connect(&req, scenario))
     } else {
         println!("Got connect request: {:?}", req);
-        Json(test_data::connect(&req))
+        Json(engine::connect(&req))
     }
 }
 
@@ -22,7 +22,7 @@ async fn perform_action(Json(req): Json<PerformActionRequest>) -> Json<PerformAc
         Json(client_test_scenarios::perform_action(&req, scenario))
     } else {
         println!("Got perform action request: {:?}", req);
-        Json(test_data::perform_action(&req))
+        Json(engine::perform_action(&req))
     }
 }
 

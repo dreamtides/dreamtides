@@ -345,12 +345,23 @@ dependencies = [
  "client_test_scenarios",
  "core_data",
  "display_data",
- "engine",
  "plugin",
+ "rules_engine",
  "serde",
  "serde_json",
  "tokio",
  "tower",
+]
+
+[[package]]
+name = "display"
+version = "0.0.0"
+dependencies = [
+ "action_data",
+ "battle_data",
+ "core_data",
+ "display_data",
+ "masonry",
 ]
 
 [[package]]
@@ -375,17 +386,6 @@ name = "encode_unicode"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "34aa73646ffb006b8f5147f3dc182bd4bcb190227ce861fc4a4844bf8e3cb2c0"
-
-[[package]]
-name = "engine"
-version = "0.0.0"
-dependencies = [
- "action_data",
- "core_data",
- "display_data",
- "masonry",
- "uuid",
-]
 
 [[package]]
 name = "enum-iterator"
@@ -792,7 +792,7 @@ dependencies = [
  "anyhow",
  "core_data",
  "display_data",
- "engine",
+ "rules_engine",
  "serde",
  "serde_json",
  "uuid",
@@ -936,6 +936,20 @@ dependencies = [
  "bitflags 2.6.0",
  "serde",
  "serde_derive",
+]
+
+[[package]]
+name = "rules_engine"
+version = "0.0.0"
+dependencies = [
+ "action_data",
+ "battle_data",
+ "core_data",
+ "display",
+ "display_data",
+ "game_creation",
+ "masonry",
+ "uuid",
 ]
 
 [[package]]

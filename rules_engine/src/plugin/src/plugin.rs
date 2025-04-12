@@ -4,7 +4,7 @@ use std::panic::{self, UnwindSafe};
 
 use anyhow::Result;
 use display_data::request_data::{ConnectRequest, PerformActionRequest};
-use engine::test_data;
+use rules_engine::test_data;
 
 /// Synchronize the state of an ongoing game, downloading a full description of
 /// the game state.

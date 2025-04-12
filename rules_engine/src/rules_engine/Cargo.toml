@@ -1,0 +1,20 @@
+[package]
+name = "rules_engine"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+test = false
+doctest = false
+bench = false
+
+[dependencies]
+action_data = { path = "../action_data" }
+battle_data = { path = "../battle_data" }
+core_data = { path = "../core_data" }
+display = { path = "../display" }
+display_data = { path = "../display_data" }
+game_creation = { path = "../game_creation" }
+masonry = { path = "../masonry" }
+
+uuid = { version = "1", features = ["serde", "v4"] }

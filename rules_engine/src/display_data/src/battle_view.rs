@@ -24,9 +24,6 @@ pub struct BattleView {
     /// Visual state of cards in the game
     pub cards: Vec<CardView>,
 
-    /// Describes the status of the game, e.g. which phase & step the game is in
-    pub status_description: String,
-
     /// UI to display to the player.
     pub interface: InterfaceView,
 }

@@ -8,7 +8,7 @@ use action_data::user_action::UserAction;
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::{
     AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
-    SpriteAddress, Url,
+    SpriteAddress,
 };
 use core_data::identifiers::{BattleId, CardDataIdentifier};
 use core_data::numerics::{Energy, Points, Spark};
@@ -980,7 +980,6 @@ fn scene_0(id: BattleId) -> BattleView {
         ]
         .concat()
         .to_vec(),
-        status_description: "Status".to_string(),
         interface: InterfaceView {
             primary_action_button: Some(PrimaryActionButtonView {
                 label: "End Turn".to_string(),
@@ -1027,7 +1026,6 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
             sorting_key,
             sorting_sub_key: 0,
         },
-        card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
                 address: SpriteAddress::new("Assets/ThirdParty/GameAssets/CardImages/Standard/2521694543.png"),
@@ -1076,7 +1074,6 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
     CardView {
         id: CardDataIdentifier::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
-        card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
                 address: SpriteAddress::new(
@@ -1118,7 +1115,6 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
             sorting_key,
             sorting_sub_key: 0,
         },
-        card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
                 address: SpriteAddress::new(
@@ -1158,7 +1154,6 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
     CardView {
         id: CardDataIdentifier::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
-        card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
                 address: SpriteAddress::new(
@@ -1195,7 +1190,6 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
     CardView {
         id: CardDataIdentifier::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
-        card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
                 address: SpriteAddress::new(
@@ -1232,7 +1226,6 @@ fn enemy_card(position: Position, sorting_key: u32) -> CardView {
     CardView {
         id: CardDataIdentifier::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
-        card_back: Url::new("".to_string()),
         revealed: Some(RevealedCardView {
             image: DisplayImage {
                 address: SpriteAddress::new(
@@ -1265,7 +1258,6 @@ fn dreamsign_card(position: Position, sorting_key: u32) -> CardView {
     CardView {
         id: CardDataIdentifier::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
-        card_back: Url::new("".to_string()),
         revealed: Some(RevealedCardView {
             image: DisplayImage {
                 address: SpriteAddress::new(
@@ -1299,7 +1291,6 @@ fn dreamwell_card(position: Position, sorting_key: u32) -> CardView {
     CardView {
         id: CardDataIdentifier::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
-        card_back: Url::new("".to_string()),
         revealed: Some(RevealedCardView {
             image: DisplayImage {
                 address: SpriteAddress::new(
@@ -1331,7 +1322,6 @@ fn game_modifier_card(position: Position, sorting_key: u32) -> CardView {
     CardView {
         id: CardDataIdentifier::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
-        card_back: Url::new("".to_string()),
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
                 address: SpriteAddress::new(
