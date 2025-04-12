@@ -10,6 +10,7 @@ bench = false
 
 [dependencies]
 action_data = { path = "../action_data" }
+actions = { path = "../actions" }
 battle_data = { path = "../battle_data" }
 core_data = { path = "../core_data" }
 display = { path = "../display" }

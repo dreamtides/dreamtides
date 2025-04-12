@@ -1,4 +1,4 @@
-use core_data::identifiers::CardDataIdentifier;
+use core_data::identifiers::CardId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -8,10 +8,10 @@ use crate::user_action::UserAction;
 #[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum BattleAction {
-    PlayCard(CardDataIdentifier),
+    PlayCard(CardId),
     /// Select a card by ID in resopnse to some prompt, e.g. as a target of a
     /// card being played.
-    SelectCard(CardDataIdentifier),
+    SelectCard(CardId),
     /// Sets the position of a card in a card order selector.
     SelectCardOrder(SelectCardOrder),
     /// Show cards in a zone
@@ -36,7 +36,7 @@ impl From<BattleAction> for UserAction {
 #[serde(rename_all = "camelCase")]
 pub struct SelectCardOrder {
     pub target: CardOrderSelectionTarget,
-    pub card_id: CardDataIdentifier,
+    pub card_id: CardId,
     pub position: usize,
 }
 

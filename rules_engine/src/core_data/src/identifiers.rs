@@ -40,10 +40,10 @@ new_key_type! {
     /// - A normal card
     /// - A copy of a card on the stack
     /// - A token or copy of a card in play
-    pub struct CardDataIdentifier;
+    pub struct CardId;
 }
 
-impl JsonSchema for CardDataIdentifier {
+impl JsonSchema for CardId {
     fn schema_name() -> String {
         "CardId".to_string()
     }
@@ -60,7 +60,7 @@ impl JsonSchema for CardDataIdentifier {
     }
 }
 
-impl CardDataIdentifier {
+impl CardId {
     /// Converts an opaque number received from [Self::to_int] into a card
     /// id
     pub fn from_int(value: u64) -> Self {

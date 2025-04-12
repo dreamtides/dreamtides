@@ -5,11 +5,12 @@ use battle_data::battle::request_context::RequestContext;
 use battle_data::battle::turn_data::TurnData;
 use battle_data::cards::all_cards::AllCards;
 use battle_data::cards::card_properties::CardProperties;
+use battle_data::cards::card_types::{CardType, CharacterType};
 use battle_data::cards::zone::Zone;
 use battle_data::player::player_data::PlayerData;
 use battle_mutations::zones::deck;
 use core_data::identifiers::{BattleId, CardIdentity};
-use core_data::numerics::{Energy, Spark, TurnNumber};
+use core_data::numerics::{Energy, Points, Spark, TurnNumber};
 use core_data::source::Source;
 use core_data::types::PlayerName;
 use rand::SeedableRng;
@@ -20,8 +21,16 @@ use uuid::Uuid;
 pub fn create_and_start(id: BattleId) -> BattleData {
     let mut battle = BattleData {
         id,
-        user: PlayerData::default(),
-        enemy: PlayerData::default(),
+        user: PlayerData {
+            points: Points(0),
+            current_energy: Energy(99),
+            produced_energy: Energy(99),
+        },
+        enemy: PlayerData {
+            points: Points(0),
+            current_energy: Energy(99),
+            produced_energy: Energy(99),
+        },
         cards: AllCards::default(),
         status: BattleStatus::Setup,
         turn: TurnData { active_player: PlayerName::User, turn_number: TurnNumber::default() },
@@ -42,10 +51,14 @@ fn create_cards(battle: &mut BattleData) {
         battle.cards.create_card(identity, PlayerName::User, Zone::Deck, CardProperties {
             spark: Some(Spark(2)),
             cost: Some(Energy(2)),
+            card_type: CardType::Character(CharacterType::Explorer),
+            is_fast: false,
         });
         battle.cards.create_card(identity, PlayerName::Enemy, Zone::Deck, CardProperties {
             spark: Some(Spark(2)),
             cost: Some(Energy(2)),
+            card_type: CardType::Character(CharacterType::Explorer),
+            is_fast: false,
         });
     }
 }

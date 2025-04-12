@@ -1,5 +1,5 @@
 use battle_data::battle::battle_data::BattleData;
-use battle_data::cards::card_id::{CardId, HandCardId};
+use battle_data::cards::card_id::{CardIdType, HandCardId};
 use battle_data::cards::zone::Zone;
 use core_data::source::Source;
 use core_data::types::PlayerName;

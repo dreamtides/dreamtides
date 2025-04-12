@@ -1,12 +1,13 @@
 use std::collections::{BTreeSet, VecDeque};
 
-use core_data::identifiers::{CardDataIdentifier, CardIdentity};
+use core_data::identifiers::{CardId, CardIdentity};
 use core_data::types::PlayerName;
 use slotmap::SlotMap;
 
 use crate::cards::card_data::CardData;
 use crate::cards::card_id::{
-    BanishedCardId, CardId, CharacterId, DeckCardId, HandCardId, ObjectId, StackCardId, VoidCardId,
+    BanishedCardId, CardIdType, CharacterId, DeckCardId, HandCardId, ObjectId, StackCardId,
+    VoidCardId,
 };
 use crate::cards::card_instance_id::CardInstanceId;
 use crate::cards::card_properties::CardProperties;
@@ -14,7 +15,7 @@ use crate::cards::zone::Zone;
 
 #[derive(Clone, Debug, Default)]
 pub struct AllCards {
-    cards: SlotMap<CardDataIdentifier, CardData>,
+    cards: SlotMap<CardId, CardData>,
     battlefield: UnorderedZone<CharacterId>,
     void: UnorderedZone<VoidCardId>,
     hand: UnorderedZone<HandCardId>,
@@ -30,12 +31,12 @@ impl AllCards {
     /// Returns None if this card or id no longer exists, e.g. if it's the ID of
     /// a token which has been destroyed, a permanent which is no longer on the
     /// battlefield, etc.
-    pub fn card(&self, id: impl CardId) -> Option<&CardData> {
+    pub fn card(&self, id: impl CardIdType) -> Option<&CardData> {
         self.cards.get(id.card_identifier(self)?)
     }
 
     /// Mutable equivalent of [Self::card]
-    pub fn card_mut(&mut self, id: impl CardId) -> Option<&mut CardData> {
+    pub fn card_mut(&mut self, id: impl CardIdType) -> Option<&mut CardData> {
         self.cards.get_mut(id.card_identifier(self)?)
     }
 
@@ -83,10 +84,10 @@ impl AllCards {
         owner: PlayerName,
         zone: Zone,
         properties: CardProperties,
-    ) -> CardDataIdentifier {
+    ) -> CardId {
         let object_id = self.new_object_id();
         let tmp_instance_id =
-            create_card_instance_id(zone, object_id, CardDataIdentifier::default());
+            create_card_instance_id(zone, object_id, CardId::default());
         let card_data_id =
             self.cards.insert(CardData::new(tmp_instance_id, identity, owner, properties));
         self.cards[card_data_id].internal_set_id(create_card_instance_id(
@@ -104,7 +105,7 @@ impl AllCards {
     ///
     /// Returns the new ObjectId for the card if a moved occurred, or None if
     /// the card was not found.
-    pub fn move_card(&mut self, card_id: impl CardId, to: Zone) -> Option<ObjectId> {
+    pub fn move_card(&mut self, card_id: impl CardIdType, to: Zone) -> Option<ObjectId> {
         let card_data_id = card_id.card_identifier(self)?;
         let card = self.card(card_data_id)?;
         let owner = card.owner;
@@ -123,7 +124,7 @@ impl AllCards {
     fn add_to_zone(
         &mut self,
         owner: PlayerName,
-        card_id: CardDataIdentifier,
+        card_id: CardId,
         new_object_id: ObjectId,
         zone: Zone,
     ) -> Option<()> {
@@ -173,7 +174,7 @@ impl AllCards {
 fn create_card_instance_id(
     zone: Zone,
     object_id: ObjectId,
-    card_id: CardDataIdentifier,
+    card_id: CardId,
 ) -> CardInstanceId {
     match zone {
         Zone::Banished => CardInstanceId::Banished(BanishedCardId::new(object_id, card_id)),
@@ -191,7 +192,7 @@ struct UnorderedZone<T> {
     enemy: BTreeSet<T>,
 }
 
-impl<T: CardId> UnorderedZone<T> {
+impl<T: CardIdType> UnorderedZone<T> {
     pub fn cards(&self, player_name: PlayerName) -> &BTreeSet<T> {
         match player_name {
             PlayerName::User => &self.user,
@@ -215,7 +216,7 @@ impl<T: CardId> UnorderedZone<T> {
     }
 }
 
-impl<T: CardId> Default for UnorderedZone<T> {
+impl<T: CardIdType> Default for UnorderedZone<T> {
     fn default() -> Self {
         Self { user: BTreeSet::new(), enemy: BTreeSet::new() }
     }
@@ -227,7 +228,7 @@ struct OrderedZone<T> {
     enemy: VecDeque<T>,
 }
 
-impl<T: CardId> OrderedZone<T> {
+impl<T: CardIdType> OrderedZone<T> {
     pub fn cards(&self, player_name: PlayerName) -> &VecDeque<T> {
         match player_name {
             PlayerName::User => &self.user,
@@ -257,7 +258,7 @@ impl<T: CardId> OrderedZone<T> {
     }
 }
 
-impl<T: CardId> Default for OrderedZone<T> {
+impl<T: CardIdType> Default for OrderedZone<T> {
     fn default() -> Self {
         Self { user: VecDeque::new(), enemy: VecDeque::new() }
     }

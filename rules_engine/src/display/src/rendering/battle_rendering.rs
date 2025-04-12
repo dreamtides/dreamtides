@@ -1,9 +1,10 @@
+use action_data::battle_action::BattleAction;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
 use battle_data::player::player_data::PlayerData;
 use core_data::numerics::Spark;
 use core_data::types::PlayerName;
-use display_data::battle_view::{BattleView, InterfaceView, PlayerView};
+use display_data::battle_view::{BattleView, InterfaceView, PlayerView, PrimaryActionButtonView};
 use display_data::command::{Command, GameMessageType, UpdateBattleCommand};
 
 use crate::core::card_view_context::CardViewContext;
@@ -51,7 +52,11 @@ fn player_view(player: &PlayerData) -> PlayerView {
 fn interface_view(_battle: &BattleData) -> InterfaceView {
     InterfaceView {
         screen_overlay: None,
-        primary_action_button: None,
+        primary_action_button: Some(PrimaryActionButtonView {
+            label: "End Turn".to_string(),
+            action: BattleAction::EndTurn.into(),
+            show_on_idle_duration: None,
+        }),
         card_order_selector: None,
         bottom_right_button: None,
     }

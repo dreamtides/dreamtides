@@ -1,5 +1,5 @@
 [package]
-name = "parser"
+name = "actions"
 version = "0.0.0"
 edition = "2021"
 
@@ -9,8 +9,9 @@ doctest = false
 bench = false
 
 [dependencies]
+action_data = { path = "../action_data" }
 battle_data = { path = "../battle_data" }
+battle_mutations = { path = "../battle_mutations" }
 core_data = { path = "../core_data" }
-ability_data = { path = "../ability_data" }
 
-chumsky = "1.0.0-alpha.7"
+tracing = "0.1"

@@ -1,4 +1,4 @@
-use core_data::character_type::CharacterType;
+use battle_data::cards::card_types::CharacterType;
 use core_data::numerics::{Energy, Spark};
 use serde::{Deserialize, Serialize};
 
@@ -9,7 +9,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum Predicate {
-    /// Predicate which only matches the owning card.
+    /// Predicate which matches the owning card, e.g. "Whenever you draw a
+    /// card, this character gains +1 spark".
     This,
 
     /// Card referenced by this effect. This is typically used for applying
@@ -18,7 +19,8 @@ pub enum Predicate {
     /// itself, like "when you discard this card, materialize it."
     It,
 
-    /// All cards referenced by this effect.
+    /// All cards referenced by this effect, as in "Banish any number of cards,
+    /// then materialize them".
     Them,
 
     /// Card which triggered an event. Used for applying effects to the

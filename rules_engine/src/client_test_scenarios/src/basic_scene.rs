@@ -2,7 +2,7 @@ use action_data::debug_action::DebugAction;
 use action_data::user_action::UserAction;
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::{AudioClipAddress, SpriteAddress};
-use core_data::identifiers::{BattleId, CardDataIdentifier};
+use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::{CardFacing, PlayerName};
 use display_data::battle_view::{
@@ -94,7 +94,7 @@ pub fn card_view(position: Position, sorting_key: u32) -> CardView {
 fn card1(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardDataIdentifier::from_int(sorting_key as u64),
+        id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition {
             position,
             sorting_key,
@@ -123,7 +123,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
                     },
                     cards: vec![
                         CardPreviewView {
-                            card_id: CardDataIdentifier::from_int(539),
+                            card_id: CardId::from_int(539),
                             battlefield_icon: Some("\u{f06a}".to_string()),
                             battlefield_icon_color: Some(display_color::RED_900),
                             ..Default::default()
@@ -146,7 +146,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
 fn card2(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardDataIdentifier::from_int(sorting_key as u64),
+        id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
@@ -183,7 +183,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
 fn card3(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardDataIdentifier::from_int(sorting_key as u64),
+        id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition {
             position,
             sorting_key,
@@ -226,7 +226,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
 fn card4(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardDataIdentifier::from_int(sorting_key as u64),
+        id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
@@ -262,7 +262,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
 fn card5(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardDataIdentifier::from_int(sorting_key as u64),
+        id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
@@ -298,7 +298,7 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
 
 fn enemy_card(position: Position, sorting_key: u32) -> CardView {
     CardView {
-        id: CardDataIdentifier::from_int(sorting_key as u64),
+        id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: Some(RevealedCardView {
             image: DisplayImage {
@@ -330,7 +330,7 @@ fn enemy_card(position: Position, sorting_key: u32) -> CardView {
 
 fn dreamsign_card(position: Position, sorting_key: u32) -> CardView {
     CardView {
-        id: CardDataIdentifier::from_int(sorting_key as u64),
+        id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: Some(RevealedCardView {
             image: DisplayImage {
@@ -363,7 +363,7 @@ fn dreamsign_card(position: Position, sorting_key: u32) -> CardView {
 
 fn dreamwell_card(position: Position, sorting_key: u32) -> CardView {
     CardView {
-        id: CardDataIdentifier::from_int(sorting_key as u64),
+        id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: Some(RevealedCardView {
             image: DisplayImage {
@@ -394,7 +394,7 @@ fn dreamwell_card(position: Position, sorting_key: u32) -> CardView {
 fn game_modifier_card(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardDataIdentifier::from_int(sorting_key as u64),
+        id: CardId::from_int(sorting_key as u64),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {

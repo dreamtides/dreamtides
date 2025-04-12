@@ -1,5 +1,5 @@
 use battle_data::battle::battle_data::BattleData;
-use battle_data::cards::card_id::{CardId, ObjectId};
+use battle_data::cards::card_id::{CardIdType, ObjectId};
 use battle_data::cards::zone::Zone;
 use core_data::source::Source;
 use tracing::debug;
@@ -14,7 +14,7 @@ use tracing::debug;
 pub fn run(
     battle: &mut BattleData,
     _source: Source,
-    id: impl CardId,
+    id: impl CardIdType,
     new: Zone,
 ) -> Option<ObjectId> {
     let card = battle.cards.card(id)?;

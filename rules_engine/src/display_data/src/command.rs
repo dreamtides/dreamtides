@@ -2,7 +2,7 @@ use core_data::display_color::DisplayColor;
 use core_data::display_types::{
     AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
 };
-use core_data::identifiers::CardDataIdentifier;
+use core_data::identifiers::CardId;
 use core_data::numerics::{Energy, Points};
 use core_data::types::PlayerName;
 use masonry::flex_style::FlexVector3;
@@ -140,7 +140,7 @@ pub struct DissolveCardCommand {
     ///
     /// Once a card is dissolved, it will be invisible until a reverse dissolve
     /// is applied to it.
-    pub target: CardDataIdentifier,
+    pub target: CardId,
 
     /// If true, dissolve will be played backwards to "create" the card.
     pub reverse: bool,
@@ -214,7 +214,7 @@ pub struct DisplayDreamwellActivationCommand {
     /// should be kept in the DreamwellActivation position for the next
     /// update. Otherwise it's typical to return the card to the Dreamwell
     /// position.
-    pub card_id: CardDataIdentifier,
+    pub card_id: CardId,
 
     /// New energy available to this player, if it has changed.
     pub new_energy: Option<Energy>,
@@ -262,7 +262,7 @@ pub struct ToggleThinkingIndicatorCommand {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum GameObjectId {
-    CardId(CardDataIdentifier),
+    CardId(CardId),
     Deck(PlayerName),
     Void(PlayerName),
     Avatar(PlayerName),
