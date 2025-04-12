@@ -1,4 +1,5 @@
 use std::cell::RefCell;
+use std::fmt::Write;
 use std::panic::{self, AssertUnwindSafe};
 use std::sync::{LazyLock, Mutex};
 
@@ -21,11 +22,11 @@ use crate::error_message;
 static CURRENT_BATTLE: LazyLock<Mutex<Option<BattleData>>> = LazyLock::new(|| Mutex::new(None));
 
 thread_local! {
-    static PANIC_INFO: RefCell<Option<(String, String, Backtrace)>> = RefCell::new(None);
+    static PANIC_INFO: RefCell<Option<(String, String, Backtrace)>> = const { RefCell::new(None) };
 }
 
 pub fn connect(request: &ConnectRequest) -> ConnectResponse {
-    let metadata = request.metadata.clone();
+    let metadata = request.metadata;
     let commands = catch_panic(
         AssertUnwindSafe(|| {
             let id = BattleId(Uuid::new_v4());
@@ -41,7 +42,7 @@ pub fn connect(request: &ConnectRequest) -> ConnectResponse {
 
 pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
     let battle_data = CURRENT_BATTLE.lock().unwrap().clone();
-    let metadata = request.metadata.clone();
+    let metadata = request.metadata;
     let commands = catch_panic(
         AssertUnwindSafe(|| {
             let mut battle = match &battle_data {
@@ -98,18 +99,21 @@ where
         Err(panic_error) => {
             // Extract a more meaningful error message from the panic payload
             let panic_msg = match panic_error.downcast_ref::<&'static str>() {
-                Some(s) => format!("{}", s),
+                Some(s) => s.to_string(),
                 None => match panic_error.downcast_ref::<String>() {
-                    Some(s) => format!("{}", s),
+                    Some(s) => s.to_string(),
                     None => "Unknown panic".to_string(),
                 },
             };
 
             let mut error_message = PANIC_INFO.with(|info| {
                 if let Some((location, info, backtrace)) = &*info.borrow() {
+                    let backtrace_str = format!("{:?}", backtrace);
+                    let filtered_backtrace = filter_backtrace(&backtrace_str);
+
                     format!(
-                        "Error: {} at {}\n\nError details for developers:\n{}\n{:?}",
-                        panic_msg, location, info, backtrace
+                        "Error: {} at {}\n\nError details for developers:\n{}\n{}",
+                        panic_msg, location, info, filtered_backtrace
                     )
                 } else {
                     format!("Error: {}\n\nNo backtrace available", panic_msg)
@@ -117,8 +121,8 @@ where
             });
 
             // Limit the length of the error message to avoid overwhelming the UI
-            if error_message.len() > 5000 {
-                error_message = format!("{}...(truncated)", &error_message[..5000]);
+            if error_message.len() > 3000 {
+                error_message = format!("{}...(truncated)", &error_message[..3000]);
             }
 
             match battle {
@@ -134,4 +138,27 @@ where
             }
         }
     }
+}
+
+fn filter_backtrace(backtrace: &str) -> String {
+    let mut result = String::new();
+    let mut found_begin_unwind = false;
+
+    for line in backtrace.lines() {
+        if found_begin_unwind {
+            writeln!(result, "{}", line).ok();
+        }
+
+        if line.contains("rust_begin_unwind") {
+            found_begin_unwind = true;
+            writeln!(result, "[...filtered...]").ok();
+            continue;
+        }
+    }
+
+    if !found_begin_unwind {
+        return backtrace.to_string();
+    }
+
+    result
 }

@@ -43,7 +43,7 @@ fn render_message(text: String) -> FlexNode {
     };
 
     let message = FlexNode {
-        node_type: Some(NodeType::Text(Text { label: text.into(), ..Default::default() })),
+        node_type: Some(NodeType::Text(Text { label: text })),
         style: Some(style),
         ..Default::default()
     };

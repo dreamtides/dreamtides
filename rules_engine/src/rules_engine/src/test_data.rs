@@ -42,9 +42,8 @@ static RESOLVING_MULLIGAN: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(f
 static CURRENT_BATTLE: LazyLock<Mutex<Option<BattleView>>> = LazyLock::new(|| Mutex::new(None));
 static CARD_BROWSER_SOURCE: LazyLock<Mutex<Option<Position>>> = LazyLock::new(|| Mutex::new(None));
 static ORDER_SELECTOR_VISIBLE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
-static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<
-    Mutex<std::collections::HashMap<CardId, Position>>,
-> = LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
+static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<Mutex<std::collections::HashMap<CardId, Position>>> =
+    LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
 static ADD_TO_STACK: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
 const STUFF_TO_DO: u32 = 7;
 

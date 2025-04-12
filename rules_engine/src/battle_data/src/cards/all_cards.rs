@@ -86,8 +86,7 @@ impl AllCards {
         properties: CardProperties,
     ) -> CardId {
         let object_id = self.new_object_id();
-        let tmp_instance_id =
-            create_card_instance_id(zone, object_id, CardId::default());
+        let tmp_instance_id = create_card_instance_id(zone, object_id, CardId::default());
         let card_data_id =
             self.cards.insert(CardData::new(tmp_instance_id, identity, owner, properties));
         self.cards[card_data_id].internal_set_id(create_card_instance_id(
@@ -171,11 +170,7 @@ impl AllCards {
     }
 }
 
-fn create_card_instance_id(
-    zone: Zone,
-    object_id: ObjectId,
-    card_id: CardId,
-) -> CardInstanceId {
+fn create_card_instance_id(zone: Zone, object_id: ObjectId, card_id: CardId) -> CardInstanceId {
     match zone {
         Zone::Banished => CardInstanceId::Banished(BanishedCardId::new(object_id, card_id)),
         Zone::Battlefield => CardInstanceId::Battlefield(CharacterId::new(object_id, card_id)),

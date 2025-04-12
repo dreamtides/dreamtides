@@ -2,7 +2,8 @@ use core_data::identifiers::CardId;
 
 use crate::cards::all_cards::AllCards;
 use crate::cards::card_id::{
-    BanishedCardId, CardIdType, CharacterId, DeckCardId, HandCardId, ObjectId, StackCardId, VoidCardId,
+    BanishedCardId, CardIdType, CharacterId, DeckCardId, HandCardId, ObjectId, StackCardId,
+    VoidCardId,
 };
 use crate::cards::zone::Zone;
 
