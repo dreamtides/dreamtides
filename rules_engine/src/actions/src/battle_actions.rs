@@ -11,6 +11,8 @@ pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction
         BattleAction::PlayCard(card_id) => {
             play_card::execute(battle, player, Source::Game, card_id);
         }
-        _ => {}
+        _ => {
+            todo!("Implement {:?}", action);
+        }
     }
 }

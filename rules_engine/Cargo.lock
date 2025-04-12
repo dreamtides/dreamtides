@@ -957,6 +957,7 @@ version = "0.0.0"
 dependencies = [
  "action_data",
  "actions",
+ "backtrace",
  "battle_data",
  "core_data",
  "display",

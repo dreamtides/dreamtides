@@ -12,21 +12,8 @@ use crate::core::response_builder::ResponseBuilder;
 use crate::rendering::card_rendering;
 
 pub fn run(builder: &mut ResponseBuilder, battle: &BattleData) {
-    let cards = battle
-        .cards
-        .all_cards()
-        .map(|c| card_rendering::card_view(builder, &CardViewContext::Battle(battle, c)))
-        .collect::<Vec<_>>();
-
-    let battle_view = BattleView {
-        id: battle.id,
-        user: player_view(&battle.user),
-        enemy: player_view(&battle.enemy),
-        cards,
-        interface: interface_view(battle),
-    };
     builder.push(Command::UpdateBattle(UpdateBattleCommand {
-        battle: battle_view,
+        battle: battle_view(builder, battle),
         update_sound: None,
     }));
 
@@ -36,6 +23,22 @@ pub fn run(builder: &mut ResponseBuilder, battle: &BattleData) {
         } else {
             GameMessageType::Defeat
         }));
+    }
+}
+
+pub fn battle_view(builder: &ResponseBuilder, battle: &BattleData) -> BattleView {
+    let cards = battle
+        .cards
+        .all_cards()
+        .map(|c| card_rendering::card_view(builder, &CardViewContext::Battle(battle, c)))
+        .collect::<Vec<_>>();
+
+    BattleView {
+        id: battle.id,
+        user: player_view(&battle.user),
+        enemy: player_view(&battle.enemy),
+        cards,
+        interface: interface_view(battle),
     }
 }
 
