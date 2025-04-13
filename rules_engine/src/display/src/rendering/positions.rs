@@ -1,14 +1,14 @@
-use battle_data::cards::card_data::CardData;
+use battle_data::battle_cards::card_data::CardData;
 use display_data::object_position::{ObjectPosition, Position, StackType};
 
 pub fn calculate(card: &CardData) -> ObjectPosition {
     let position = match card.zone() {
-        battle_data::cards::zone::Zone::Hand => Position::InHand(card.owner),
-        battle_data::cards::zone::Zone::Deck => Position::InDeck(card.owner),
-        battle_data::cards::zone::Zone::Battlefield => Position::OnBattlefield(card.owner),
-        battle_data::cards::zone::Zone::Stack => Position::OnStack(StackType::Default),
-        battle_data::cards::zone::Zone::Void => Position::InVoid(card.owner),
-        battle_data::cards::zone::Zone::Banished => Position::InBanished(card.owner),
+        battle_data::battle_cards::zone::Zone::Hand => Position::InHand(card.owner),
+        battle_data::battle_cards::zone::Zone::Deck => Position::InDeck(card.owner),
+        battle_data::battle_cards::zone::Zone::Battlefield => Position::OnBattlefield(card.owner),
+        battle_data::battle_cards::zone::Zone::Stack => Position::OnStack(StackType::Default),
+        battle_data::battle_cards::zone::Zone::Void => Position::InVoid(card.owner),
+        battle_data::battle_cards::zone::Zone::Banished => Position::InBanished(card.owner),
     };
 
     for_card(card, position)

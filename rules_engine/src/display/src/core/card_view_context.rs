@@ -1,5 +1,5 @@
 use battle_data::battle::battle_data::BattleData;
-use battle_data::cards::card_data::CardData;
+use battle_data::battle_cards::card_data::CardData;
 
 /// Provides the context in which a card view is being displayed, i.e. either
 /// during an active battle or in a deck or draft context.

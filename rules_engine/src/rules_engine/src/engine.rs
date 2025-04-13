@@ -142,22 +142,11 @@ where
 
 fn filter_backtrace(backtrace: &str) -> String {
     let mut result = String::new();
-    let mut found_begin_unwind = false;
 
     for line in backtrace.lines() {
-        if found_begin_unwind {
+        if !(line.contains("rustc") || line.contains(".cargo")) {
             writeln!(result, "{}", line).ok();
         }
-
-        if line.contains("rust_begin_unwind") {
-            found_begin_unwind = true;
-            writeln!(result, "[...filtered...]").ok();
-            continue;
-        }
-    }
-
-    if !found_begin_unwind {
-        return backtrace.to_string();
     }
 
     result

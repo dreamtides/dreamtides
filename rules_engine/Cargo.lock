@@ -196,6 +196,16 @@ name = "battle_mutations"
 version = "0.0.0"
 dependencies = [
  "battle_data",
+ "battle_queries",
+ "core_data",
+ "tracing",
+]
+
+[[package]]
+name = "battle_queries"
+version = "0.0.0"
+dependencies = [
+ "battle_data",
  "core_data",
  "tracing",
 ]

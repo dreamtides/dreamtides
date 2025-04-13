@@ -1,6 +1,6 @@
 use battle_data::battle::battle_data::BattleData;
-use battle_data::cards::card_id::{CardIdType, ObjectId};
-use battle_data::cards::zone::Zone;
+use battle_data::battle_cards::card_id::{CardIdType, ObjectId};
+use battle_data::battle_cards::zone::Zone;
 use core_data::source::Source;
 use tracing::debug;
 

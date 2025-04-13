@@ -1,18 +1,12 @@
 use core_data::identifiers::CardIdentity;
-use core_data::numerics::TurnNumber;
+use core_data::numerics::TurnId;
 use core_data::types::PlayerName;
 
 use crate::battle::turn_data::TurnData;
-use crate::cards::card_id::{CharacterId, StackCardId};
-use crate::cards::card_instance_id::CardInstanceId;
-use crate::cards::card_properties::CardProperties;
-use crate::cards::zone::Zone;
-
-#[derive(Clone, Debug)]
-pub enum TargetId {
-    StackCard(StackCardId),
-    Character(CharacterId),
-}
+use crate::battle_cards::card_id::{CharacterId, StackCardId};
+use crate::battle_cards::card_instance_id::CardInstanceId;
+use crate::battle_cards::card_properties::CardProperties;
+use crate::battle_cards::zone::Zone;
 
 #[derive(Clone, Debug)]
 pub struct CardData {
@@ -60,7 +54,7 @@ impl CardData {
             targets: Vec::new(),
             turn_entered_current_zone: TurnData {
                 active_player: PlayerName::User,
-                turn_number: TurnNumber(0),
+                turn_id: TurnId(0),
             },
         }
     }
@@ -97,4 +91,10 @@ impl CardData {
     pub(crate) fn internal_set_id(&mut self, id: CardInstanceId) {
         self.id = id;
     }
+}
+
+#[derive(Clone, Debug)]
+pub enum TargetId {
+    StackCard(StackCardId),
+    Character(CharacterId),
 }

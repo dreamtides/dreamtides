@@ -95,7 +95,7 @@ pub struct Spark(pub u32);
 #[serde(rename_all = "camelCase")]
 pub struct Points(pub u32);
 
-/// A resource used to pay for cards & abilities.
+/// Identifies a turn within a game.
 #[derive(
     Debug,
     Display,
@@ -123,4 +123,4 @@ pub struct Points(pub u32);
     JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
-pub struct TurnNumber(pub u32);
+pub struct TurnId(pub u32);

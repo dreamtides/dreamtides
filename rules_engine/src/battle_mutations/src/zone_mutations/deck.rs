@@ -1,10 +1,10 @@
 use battle_data::battle::battle_data::BattleData;
-use battle_data::cards::card_id::{CardIdType, HandCardId};
-use battle_data::cards::zone::Zone;
+use battle_data::battle_cards::card_id::{CardIdType, HandCardId};
+use battle_data::battle_cards::zone::Zone;
 use core_data::source::Source;
 use core_data::types::PlayerName;
 
-use crate::zones::move_card;
+use crate::zone_mutations::move_card;
 
 /// Draw a card from `player`'s deck and put it into their hand. If their deck
 /// is empty, it will be replaced with a new shuffled copy of the deck.

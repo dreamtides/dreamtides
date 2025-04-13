@@ -1,5 +1,5 @@
 [package]
-name = "battle_mutations"
+name = "battle_queries"
 version = "0.0.0"
 edition = "2021"
 
@@ -10,7 +10,6 @@ bench = false
 
 [dependencies]
 battle_data = { path = "../battle_data" }
-battle_queries = { path = "../battle_queries" }
 core_data = { path = "../core_data" }
 
 tracing = "0.1"

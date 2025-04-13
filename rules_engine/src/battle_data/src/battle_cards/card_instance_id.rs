@@ -1,11 +1,11 @@
 use core_data::identifiers::CardId;
 
-use crate::cards::all_cards::AllCards;
-use crate::cards::card_id::{
+use crate::battle_cards::all_cards::AllCards;
+use crate::battle_cards::card_id::{
     BanishedCardId, CardIdType, CharacterId, DeckCardId, HandCardId, ObjectId, StackCardId,
     VoidCardId,
 };
-use crate::cards::zone::Zone;
+use crate::battle_cards::zone::Zone;
 
 /// An identifier for a card while it is in a given zone.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]

@@ -1,7 +1,7 @@
 use action_data::battle_action::BattleAction;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
-use battle_data::player::player_data::PlayerData;
+use battle_data::battle_player::player_data::PlayerData;
 use core_data::numerics::Spark;
 use core_data::types::PlayerName;
 use display_data::battle_view::{BattleView, InterfaceView, PlayerView, PrimaryActionButtonView};

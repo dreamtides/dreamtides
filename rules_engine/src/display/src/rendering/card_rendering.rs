@@ -1,4 +1,4 @@
-use battle_data::cards::zone::Zone;
+use battle_data::battle_cards::zone::Zone;
 use core_data::display_color;
 use core_data::display_types::SpriteAddress;
 use core_data::types::{CardFacing, PlayerName};

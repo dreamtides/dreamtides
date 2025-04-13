@@ -1,4 +1,4 @@
-use battle_data::cards::card_types::CharacterType;
+use battle_data::battle_cards::card_types::CharacterType;
 use core_data::numerics::{Energy, Spark};
 use serde::{Deserialize, Serialize};
 

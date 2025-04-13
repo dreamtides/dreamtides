@@ -1,3 +1,4 @@
 pub mod battle;
-pub mod cards;
-pub mod player;
+pub mod battle_animations;
+pub mod battle_cards;
+pub mod battle_player;

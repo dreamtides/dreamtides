@@ -3,7 +3,7 @@ use std::hash::Hash;
 
 use core_data::identifiers::CardId;
 
-use crate::cards::all_cards::AllCards;
+use crate::battle_cards::all_cards::AllCards;
 
 /// A trait for identifiers which correspond 1:1 with cards.
 pub trait CardIdType: Hash + Eq + PartialEq + Debug + Ord + Copy {

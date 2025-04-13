@@ -4,14 +4,14 @@ use core_data::identifiers::{CardId, CardIdentity};
 use core_data::types::PlayerName;
 use slotmap::SlotMap;
 
-use crate::cards::card_data::CardData;
-use crate::cards::card_id::{
+use crate::battle_cards::card_data::CardData;
+use crate::battle_cards::card_id::{
     BanishedCardId, CardIdType, CharacterId, DeckCardId, HandCardId, ObjectId, StackCardId,
     VoidCardId,
 };
-use crate::cards::card_instance_id::CardInstanceId;
-use crate::cards::card_properties::CardProperties;
-use crate::cards::zone::Zone;
+use crate::battle_cards::card_instance_id::CardInstanceId;
+use crate::battle_cards::card_properties::CardProperties;
+use crate::battle_cards::zone::Zone;
 
 #[derive(Clone, Debug, Default)]
 pub struct AllCards {
@@ -48,6 +48,12 @@ impl AllCards {
     /// Returns the set of characters on the battlefield for a given player.
     pub fn battlefield(&self, player_name: PlayerName) -> &BTreeSet<CharacterId> {
         self.battlefield.cards(player_name)
+    }
+
+    /// Returns an iterator over all characters on the battlefield for a given
+    /// player.
+    pub fn battlefield_cards(&self, player_name: PlayerName) -> impl Iterator<Item = &CardData> {
+        self.battlefield.cards(player_name).iter().map(|id| &self.cards[id.0.card_id])
     }
 
     /// Returns the set of cards in the void for a given player.
