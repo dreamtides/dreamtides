@@ -2,7 +2,7 @@ use battle_data::battle::battle_data::BattleData;
 use display_data::command::CommandSequence;
 
 use crate::core::response_builder::ResponseBuilder;
-use crate::rendering::battle_rendering;
+use crate::rendering::{animations, battle_rendering};
 
 /// Returns a [CommandSequence] which fully describe the current state of the
 /// provided game
@@ -17,6 +17,14 @@ pub fn connect(battle: &BattleData) -> CommandSequence {
 /// manner as returned by [connect].
 pub fn render_updates(battle: &BattleData) -> CommandSequence {
     let mut builder = ResponseBuilder { animate: true, commands: CommandSequence::default() };
+
+    if let Some(animations) = &battle.animations {
+        for step in &animations.steps {
+            battle_rendering::run(&mut builder, &step.snapshot);
+            animations::render(&mut builder, &step.animation, &step.snapshot);
+        }
+    }
+
     battle_rendering::run(&mut builder, battle);
     builder.commands
 }

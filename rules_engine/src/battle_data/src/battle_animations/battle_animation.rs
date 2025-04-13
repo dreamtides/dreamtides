@@ -14,7 +14,7 @@ pub enum BattleAnimation {
     },
     DreamwellActivation {
         player: PlayerName,
-        dreamwell_card_id: Option<CardId>,
+        dreamwell_card_id: CardId,
         new_energy: Energy,
         new_produced_energy: Energy,
     },

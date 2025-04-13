@@ -1,4 +1,5 @@
 use battle_data::battle::battle_data::BattleData;
+use battle_data::battle_animations::battle_animation::BattleAnimation;
 use core_data::numerics::TurnId;
 use core_data::source::Source;
 
@@ -11,6 +12,7 @@ pub fn run(battle: &mut BattleData, source: Source) {
     let next_player = battle.turn.active_player.opponent();
     battle.turn.active_player = next_player;
     battle.turn.turn_id += TurnId(1);
+    battle.push_animation(|| BattleAnimation::StartTurn { player: next_player });
     judgment::run(battle, battle.turn.active_player, source);
     dreamwell::activate(battle, battle.turn.active_player, source);
 }
