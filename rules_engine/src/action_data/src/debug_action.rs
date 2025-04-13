@@ -1,7 +1,7 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::user_action::UserAction;
+use crate::game_action::GameAction;
 
 /// Private actions for developer use
 #[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
@@ -14,8 +14,8 @@ pub enum DebugAction {
     PerformSomeAction,
 }
 
-impl From<DebugAction> for UserAction {
+impl From<DebugAction> for GameAction {
     fn from(action: DebugAction) -> Self {
-        UserAction::DebugAction(action)
+        GameAction::DebugAction(action)
     }
 }

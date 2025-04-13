@@ -3,7 +3,7 @@ use std::fmt::Write;
 use std::panic::{self, AssertUnwindSafe};
 use std::sync::{LazyLock, Mutex};
 
-use action_data::user_action::UserAction;
+use action_data::game_action::GameAction;
 use actions::battle_actions;
 use backtrace::Backtrace;
 use battle_data::battle::battle_data::BattleData;
@@ -50,7 +50,7 @@ pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
                 None => panic!("No battle found"),
             };
             match request.action {
-                UserAction::BattleAction(action) => {
+                GameAction::BattleAction(action) => {
                     battle_actions::execute(&mut battle, PlayerName::User, action)
                 }
                 _ => todo!("Implement other actions"),

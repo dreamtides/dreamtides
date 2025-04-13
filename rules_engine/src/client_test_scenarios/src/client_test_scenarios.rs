@@ -6,7 +6,7 @@ use action_data::battle_action::{
     BattleAction, CardBrowserType, CardOrderSelectionTarget, SelectCardOrder,
 };
 use action_data::debug_action::DebugAction;
-use action_data::user_action::UserAction;
+use action_data::game_action::GameAction;
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::{
     AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
@@ -54,10 +54,10 @@ pub fn connect(request: &ConnectRequest, _scenario: &str) -> ConnectResponse {
 
 pub fn perform_action(request: &PerformActionRequest, scenario: &str) -> PerformActionResponse {
     match &request.action {
-        UserAction::BattleAction(action) => {
+        GameAction::BattleAction(action) => {
             perform_battle_action(*action, request.metadata, scenario)
         }
-        UserAction::DebugAction(action) => {
+        GameAction::DebugAction(action) => {
             perform_debug_action(*action, request.metadata, scenario)
         }
     }
@@ -213,7 +213,7 @@ fn select_card(card_id: CardId) -> CommandSequence {
     battle.interface.screen_overlay = None;
     battle.interface.primary_action_button = Some(PrimaryActionButtonView {
         label: "End Turn".to_string(),
-        action: UserAction::DebugAction(DebugAction::TriggerEnemyJudgment),
+        action: GameAction::DebugAction(DebugAction::TriggerEnemyJudgment),
         show_on_idle_duration: None,
     });
 
@@ -295,7 +295,7 @@ fn play_card_with_targets(battle: &mut BattleView, card_id: CardId, stack: Stack
         if matches!(card.position.position, Position::OnBattlefield(PlayerName::Enemy)) {
             if let Some(revealed) = &mut card.revealed {
                 revealed.actions.on_click =
-                    Some(UserAction::BattleAction(BattleAction::SelectCard(card.id)));
+                    Some(GameAction::BattleAction(BattleAction::SelectCard(card.id)));
                 revealed.outline_color = Some(display_color::RED_500);
             }
         }
@@ -343,7 +343,7 @@ fn play_card_with_order_selector(
     *CARD_ORDER_ORIGINAL_POSITIONS.lock().unwrap() = std::collections::HashMap::new();
     battle.interface.bottom_right_button = Some(ButtonView {
         label: "\u{f070} Hide Browser".to_string(),
-        action: UserAction::BattleAction(BattleAction::ToggleOrderSelectorVisibility),
+        action: GameAction::BattleAction(BattleAction::ToggleOrderSelectorVisibility),
     });
 
     if let (Some(c1_view), Some(c2_view)) = (c1, c2) {
@@ -359,7 +359,7 @@ fn play_card_with_order_selector(
         Some(CardOrderSelectorView { include_deck: true, include_void: true });
     battle.interface.primary_action_button = Some(PrimaryActionButtonView {
         label: "End Turn".to_string(),
-        action: UserAction::DebugAction(DebugAction::TriggerEnemyJudgment),
+        action: GameAction::DebugAction(DebugAction::TriggerEnemyJudgment),
         show_on_idle_duration: None,
     });
 

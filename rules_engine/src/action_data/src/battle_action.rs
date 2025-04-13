@@ -2,7 +2,7 @@ use core_data::identifiers::CardId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::user_action::UserAction;
+use crate::game_action::GameAction;
 
 /// An action that can be performed in a battle
 #[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
@@ -26,9 +26,9 @@ pub enum BattleAction {
     SubmitMulligan,
 }
 
-impl From<BattleAction> for UserAction {
+impl From<BattleAction> for GameAction {
     fn from(action: BattleAction) -> Self {
-        UserAction::BattleAction(action)
+        GameAction::BattleAction(action)
     }
 }
 

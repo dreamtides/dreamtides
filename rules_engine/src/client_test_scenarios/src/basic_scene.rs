@@ -1,5 +1,5 @@
 use action_data::debug_action::DebugAction;
-use action_data::user_action::UserAction;
+use action_data::game_action::GameAction;
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::{AudioClipAddress, SpriteAddress};
 use core_data::identifiers::{BattleId, CardId};
@@ -58,7 +58,7 @@ pub fn create(id: BattleId) -> BattleView {
         interface: InterfaceView {
             primary_action_button: Some(PrimaryActionButtonView {
                 label: "End Turn".to_string(),
-                action: UserAction::DebugAction(DebugAction::ApplyTestScenarioAction),
+                action: GameAction::DebugAction(DebugAction::ApplyTestScenarioAction),
                 show_on_idle_duration: None,
             }),
             ..Default::default()

@@ -1541,7 +1541,7 @@ namespace Dreamtides.Schema
     public partial class ButtonView
     {
         [JsonProperty("action", Required = Required.Always)]
-        public UserAction Action { get; set; }
+        public GameAction Action { get; set; }
 
         [JsonProperty("label", Required = Required.Always)]
         public string Label { get; set; }
@@ -1550,7 +1550,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// All possible user interface actions
     /// </summary>
-    public partial class UserAction
+    public partial class GameAction
     {
         [JsonProperty("debugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DebugAction? DebugAction { get; set; }
@@ -1577,7 +1577,7 @@ namespace Dreamtides.Schema
     public partial class PrimaryActionButtonView
     {
         [JsonProperty("action", Required = Required.Always)]
-        public UserAction Action { get; set; }
+        public GameAction Action { get; set; }
 
         [JsonProperty("label", Required = Required.Always)]
         public string Label { get; set; }
@@ -1593,7 +1593,7 @@ namespace Dreamtides.Schema
     public partial class PerformActionRequest
     {
         [JsonProperty("action", Required = Required.Always)]
-        public UserAction Action { get; set; }
+        public GameAction Action { get; set; }
 
         [JsonProperty("metadata", Required = Required.Always)]
         public Metadata Metadata { get; set; }

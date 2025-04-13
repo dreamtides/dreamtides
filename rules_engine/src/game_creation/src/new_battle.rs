@@ -11,10 +11,10 @@ use battle_data::battle_cards::zone::Zone;
 use battle_data::battle_player::player_data::PlayerData;
 use battle_mutations::zone_mutations::deck;
 use core_data::identifiers::{BattleId, CardIdentity};
-use core_data::numerics::{Energy, Points, Spark, TurnId};
+use core_data::numerics::{Energy, Spark, TurnId};
 use core_data::source::Source;
 use core_data::types::PlayerName;
-use rand::SeedableRng;
+use rand::{Rng, SeedableRng};
 use rand_xoshiro::Xoshiro256PlusPlus;
 use uuid::Uuid;
 
@@ -23,16 +23,14 @@ pub fn create_and_start(id: BattleId) -> BattleData {
     let mut battle = BattleData {
         id,
         user: PlayerData {
-            points: Points(0),
-            current_energy: Energy(50),
-            produced_energy: Energy(50),
-            spark_bonus: Spark(0),
+            current_energy: Energy(2),
+            produced_energy: Energy(2),
+            ..Default::default()
         },
         enemy: PlayerData {
-            points: Points(0),
-            current_energy: Energy(50),
-            produced_energy: Energy(50),
-            spark_bonus: Spark(0),
+            current_energy: Energy(2),
+            produced_energy: Energy(2),
+            ..Default::default()
         },
         cards: AllCards::default(),
         status: BattleStatus::Setup,
@@ -53,14 +51,14 @@ fn create_cards(battle: &mut BattleData) {
     for _ in 0..30 {
         let identity = CardIdentity(Uuid::new_v4());
         battle.cards.create_card(identity, PlayerName::User, Zone::Deck, CardProperties {
-            spark: Some(Spark(2)),
-            cost: Some(Energy(2)),
+            spark: Some(Spark(rand::rng().random_range(1..=5))),
+            cost: Some(Energy(rand::rng().random_range(1..=5))),
             card_type: CardType::Character(CharacterType::Explorer),
             is_fast: false,
         });
         battle.cards.create_card(identity, PlayerName::Enemy, Zone::Deck, CardProperties {
-            spark: Some(Spark(2)),
-            cost: Some(Energy(2)),
+            spark: Some(Spark(rand::rng().random_range(1..=5))),
+            cost: Some(Energy(rand::rng().random_range(1..=5))),
             card_type: CardType::Character(CharacterType::Explorer),
             is_fast: false,
         });

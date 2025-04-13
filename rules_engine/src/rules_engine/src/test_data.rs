@@ -4,7 +4,7 @@ use action_data::battle_action::{
     BattleAction, CardBrowserType, CardOrderSelectionTarget, SelectCardOrder,
 };
 use action_data::debug_action::DebugAction;
-use action_data::user_action::UserAction;
+use action_data::game_action::GameAction;
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::{
     AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
@@ -60,8 +60,8 @@ pub fn connect(request: &ConnectRequest) -> ConnectResponse {
 
 pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
     match request.action {
-        UserAction::DebugAction(action) => perform_debug_action(action, request.metadata),
-        UserAction::BattleAction(action) => perform_battle_action(action, request.metadata),
+        GameAction::DebugAction(action) => perform_debug_action(action, request.metadata),
+        GameAction::BattleAction(action) => perform_battle_action(action, request.metadata),
     }
 }
 
@@ -166,7 +166,7 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                         if let Some(revealed) = &mut card.revealed {
                             // Set on_click action to select this card
                             revealed.actions.on_click =
-                                Some(UserAction::BattleAction(BattleAction::SelectCard(card.id)));
+                                Some(GameAction::BattleAction(BattleAction::SelectCard(card.id)));
                             // Disable can_play action
                             revealed.actions.can_play = false;
                             // Set visual status to indicate selectable
@@ -181,7 +181,7 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                 // Disable the primary action button during mulligan
                 battle.interface.primary_action_button = Some(PrimaryActionButtonView {
                     label: "Confirm".to_string(),
-                    action: UserAction::BattleAction(BattleAction::SubmitMulligan),
+                    action: GameAction::BattleAction(BattleAction::SubmitMulligan),
                     show_on_idle_duration: None,
                 });
 
@@ -348,7 +348,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                             Position::OnBattlefield(PlayerName::Enemy)
                         ) {
                             if let Some(revealed) = &mut card.revealed {
-                                revealed.actions.on_click = Some(UserAction::BattleAction(
+                                revealed.actions.on_click = Some(GameAction::BattleAction(
                                     BattleAction::SelectCard(card.id),
                                 ));
                                 revealed.outline_color = Some(display_color::RED_500);
@@ -396,7 +396,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                         std::collections::HashMap::new();
                     battle.interface.bottom_right_button = Some(ButtonView {
                         label: "\u{f070} Hide Browser".to_string(),
-                        action: UserAction::BattleAction(
+                        action: GameAction::BattleAction(
                             BattleAction::ToggleOrderSelectorVisibility,
                         ),
                     });
@@ -414,7 +414,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                         Some(CardOrderSelectorView { include_deck: true, include_void: true });
                     battle.interface.primary_action_button = Some(PrimaryActionButtonView {
                         label: "End Turn".to_string(),
-                        action: UserAction::DebugAction(DebugAction::TriggerEnemyJudgment),
+                        action: GameAction::DebugAction(DebugAction::TriggerEnemyJudgment),
                         show_on_idle_duration: None,
                     });
 
@@ -512,7 +512,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                 if battle.interface.primary_action_button.is_none() {
                     battle.interface.primary_action_button = Some(PrimaryActionButtonView {
                         label: "Confirm".to_string(),
-                        action: UserAction::BattleAction(BattleAction::SubmitMulligan),
+                        action: GameAction::BattleAction(BattleAction::SubmitMulligan),
                         show_on_idle_duration: None,
                     });
                 }
@@ -570,7 +570,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
             battle.interface.screen_overlay = None;
             battle.interface.primary_action_button = Some(PrimaryActionButtonView {
                 label: "End Turn".to_string(),
-                action: UserAction::DebugAction(DebugAction::TriggerEnemyJudgment),
+                action: GameAction::DebugAction(DebugAction::TriggerEnemyJudgment),
                 show_on_idle_duration: Some(Milliseconds::new(2500)),
             });
 
@@ -745,7 +745,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
             if *is_visible {
                 battle.interface.bottom_right_button = Some(ButtonView {
                     label: "\u{f070} Hide Browser".to_string(),
-                    action: UserAction::BattleAction(BattleAction::ToggleOrderSelectorVisibility),
+                    action: GameAction::BattleAction(BattleAction::ToggleOrderSelectorVisibility),
                 });
 
                 // If toggling to visible, restore cards from storage to their original
@@ -763,7 +763,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
             } else {
                 battle.interface.bottom_right_button = Some(ButtonView {
                     label: "\u{f06e} Show Browser".to_string(),
-                    action: UserAction::BattleAction(BattleAction::ToggleOrderSelectorVisibility),
+                    action: GameAction::BattleAction(BattleAction::ToggleOrderSelectorVisibility),
                 });
 
                 // If toggling to hidden, move cards to storage and save original positions
@@ -885,7 +885,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
             // Restore the primary action button
             battle.interface.primary_action_button = Some(PrimaryActionButtonView {
                 label: "End Turn".to_string(),
-                action: UserAction::DebugAction(DebugAction::TriggerEnemyJudgment),
+                action: GameAction::DebugAction(DebugAction::TriggerEnemyJudgment),
                 show_on_idle_duration: Some(Milliseconds::new(5000)),
             });
 
@@ -982,7 +982,7 @@ fn scene_0(id: BattleId) -> BattleView {
         interface: InterfaceView {
             primary_action_button: Some(PrimaryActionButtonView {
                 label: "End Turn".to_string(),
-                action: UserAction::DebugAction(DebugAction::TriggerEnemyJudgment),
+                action: GameAction::DebugAction(DebugAction::TriggerEnemyJudgment),
                 show_on_idle_duration: Some(Milliseconds::new(2500)),
             }),
             ..Default::default()

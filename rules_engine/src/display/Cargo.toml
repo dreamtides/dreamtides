@@ -11,6 +11,7 @@ bench = false
 [dependencies]
 action_data = { path = "../action_data" }
 battle_data = { path = "../battle_data" }
+battle_queries = { path = "../battle_queries" }
 core_data = { path = "../core_data" }
 display_data = { path = "../display_data" }
 masonry = { path = "../masonry" }

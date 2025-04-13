@@ -1,4 +1,4 @@
-use action_data::user_action::UserAction;
+use action_data::game_action::GameAction;
 use core_data::display_types::Milliseconds;
 use core_data::identifiers::BattleId;
 use core_data::numerics::{Energy, Points, Spark};
@@ -71,7 +71,7 @@ pub struct CardOrderSelectorView {
 #[serde(rename_all = "camelCase")]
 pub struct PrimaryActionButtonView {
     pub label: String,
-    pub action: UserAction,
+    pub action: GameAction,
 
     /// If provided, when the button is not visible, the button will wait for
     /// this duration after the last "update" before appearing. If this is None
@@ -84,7 +84,7 @@ pub struct PrimaryActionButtonView {
 #[serde(rename_all = "camelCase")]
 pub struct ButtonView {
     pub label: String,
-    pub action: UserAction,
+    pub action: GameAction,
 }
 
 /// Represents the visual state of a player in a game

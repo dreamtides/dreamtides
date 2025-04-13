@@ -1,4 +1,5 @@
-use battle_data::battle_cards::zone::Zone;
+use action_data::battle_action::BattleAction;
+use battle_queries::legal_action_queries::legal_actions;
 use core_data::display_color;
 use core_data::display_types::SpriteAddress;
 use core_data::types::{CardFacing, PlayerName};
@@ -27,7 +28,14 @@ pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardVi
 }
 
 fn revealed_card_view(_builder: &ResponseBuilder, context: &CardViewContext) -> RevealedCardView {
-    let can_play = context.card().owner == PlayerName::User && context.card().zone() == Zone::Hand;
+    let battle = context.battle();
+    let card_id = context.card().id.card_identifier_for_display();
+
+    let can_play =
+        legal_actions::compute(battle, PlayerName::User, legal_actions::LegalActions::default())
+            .into_iter()
+            .any(|action| matches!(action, BattleAction::PlayCard(id) if id == card_id));
+
     RevealedCardView {
         image: DisplayImage {
             address: SpriteAddress::new(

@@ -1,4 +1,4 @@
-use action_data::user_action::UserAction;
+use action_data::game_action::GameAction;
 use core_data::display_color::DisplayColor;
 use core_data::display_types::{AudioClipAddress, ProjectileAddress, SpriteAddress};
 use core_data::identifiers::CardId;
@@ -127,7 +127,7 @@ pub struct CardActions {
     pub on_play_sound: Option<AudioClipAddress>,
 
     /// Action to perform when this card is clicked.
-    pub on_click: Option<UserAction>,
+    pub on_click: Option<GameAction>,
 
     /// Preview of the battle state after this card is played.
     pub play_effect_preview: Option<BattlePreviewView>,

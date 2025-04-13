@@ -1,4 +1,4 @@
-use action_data::user_action::UserAction;
+use action_data::game_action::GameAction;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -53,12 +53,12 @@ pub struct ScrollViewNode {
 pub struct DraggableNode {
     pub drop_target_identifiers: Vec<String>,
     pub over_target_indicator: Option<Box<FlexNode>>,
-    pub on_drop: Option<UserAction>,
+    pub on_drop: Option<GameAction>,
     pub horizontal_drag_start_distance: Option<u32>,
     pub remove_original: Option<bool>,
     pub hide_indicator_children: Vec<String>,
     pub custom_drag_indicator: Option<Box<FlexNode>>,
-    pub on_drag_detected: Option<UserAction>,
+    pub on_drag_detected: Option<GameAction>,
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
@@ -107,13 +107,13 @@ pub enum NodeType {
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct EventHandlers {
-    pub on_click: Option<UserAction>,
-    pub on_long_press: Option<UserAction>,
-    pub on_mouse_enter: Option<UserAction>,
-    pub on_mouse_leave: Option<UserAction>,
-    pub on_mouse_down: Option<UserAction>,
-    pub on_mouse_up: Option<UserAction>,
-    pub on_field_changed: Option<UserAction>,
+    pub on_click: Option<GameAction>,
+    pub on_long_press: Option<GameAction>,
+    pub on_mouse_enter: Option<GameAction>,
+    pub on_mouse_leave: Option<GameAction>,
+    pub on_mouse_down: Option<GameAction>,
+    pub on_mouse_up: Option<GameAction>,
+    pub on_field_changed: Option<GameAction>,
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]

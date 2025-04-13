@@ -205,6 +205,7 @@ dependencies = [
 name = "battle_queries"
 version = "0.0.0"
 dependencies = [
+ "action_data",
  "battle_data",
  "core_data",
  "tracing",
@@ -381,6 +382,7 @@ version = "0.0.0"
 dependencies = [
  "action_data",
  "battle_data",
+ "battle_queries",
  "core_data",
  "display_data",
  "masonry",

@@ -76,6 +76,12 @@ impl AllCards {
         self.hand.cards(player_name)
     }
 
+    /// Returns an iterator over all characters on the battlefield for a given
+    /// player.
+    pub fn hand_cards(&self, player_name: PlayerName) -> impl Iterator<Item = &CardData> {
+        self.hand.cards(player_name).iter().map(|id| &self.cards[id.0.card_id])
+    }
+
     /// Returns the set of banished cards for a given player.
     pub fn banished(&self, player_name: PlayerName) -> &BTreeSet<BanishedCardId> {
         self.banished.cards(player_name)
