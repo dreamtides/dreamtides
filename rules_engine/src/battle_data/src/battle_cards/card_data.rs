@@ -69,9 +69,11 @@ impl CardData {
     /// Note that cards in Dreamtides currently have no concept of "face down"
     /// or "face up", they're simply revealed or not revealed to a given player.
     pub fn is_revealed_to(&self, player_name: PlayerName) -> bool {
-        match player_name {
-            PlayerName::User => self.revealed_to_owner,
-            PlayerName::Enemy => self.revealed_to_opponent,
+        match (self.owner, player_name) {
+            (PlayerName::User, PlayerName::User) => self.revealed_to_owner,
+            (PlayerName::User, PlayerName::Enemy) => self.revealed_to_opponent,
+            (PlayerName::Enemy, PlayerName::User) => self.revealed_to_opponent,
+            (PlayerName::Enemy, PlayerName::Enemy) => self.revealed_to_owner,
         }
     }
 

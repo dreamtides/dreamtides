@@ -26,7 +26,6 @@ pub fn compute(
     let mut actions = Vec::new();
 
     if is_active_player {
-        actions.push(BattleAction::EndTurn);
         for card in battle.cards.hand_cards(player) {
             if let Some(cost) = card.properties.cost {
                 if cost <= player_data.current_energy {
@@ -34,7 +33,14 @@ pub fn compute(
                 }
             }
         }
+        actions.push(BattleAction::EndTurn);
     }
 
     actions
+}
+
+/// Returns the player who can currently take game actions in the provided
+/// [BattleData] state.
+pub fn next_to_act(battle: &BattleData) -> PlayerName {
+    battle.turn.active_player
 }

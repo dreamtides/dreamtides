@@ -23,6 +23,7 @@ pub fn execute(
     if let Some(energy_cost) = battle.cards.card(card_id)?.properties.cost {
         energy::spend(battle, player, source, energy_cost);
     }
+    battle.cards.card_mut(card_id)?.revealed_to_opponent = true;
     move_card::run(
         battle,
         source,

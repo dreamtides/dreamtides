@@ -48,6 +48,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "512761e0bb2578dd7380c6baaa0f4ce03e84f95e960231d1dec8bf4d7d6e2627"
 
 [[package]]
+name = "agent_data"
+version = "0.0.0"
+dependencies = [
+ "core_data",
+ "serde",
+]
+
+[[package]]
+name = "agents"
+version = "0.0.0"
+dependencies = [
+ "action_data",
+ "agent_data",
+ "battle_data",
+ "battle_mutations",
+ "battle_queries",
+ "core_data",
+]
+
+[[package]]
 name = "ahash"
 version = "0.8.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -181,6 +201,7 @@ checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
 name = "battle_data"
 version = "0.0.0"
 dependencies = [
+ "agent_data",
  "core_data",
  "enum-iterator",
  "enumset",
@@ -969,13 +990,16 @@ version = "0.0.0"
 dependencies = [
  "action_data",
  "actions",
+ "agents",
  "backtrace",
  "battle_data",
+ "battle_queries",
  "core_data",
  "display",
  "display_data",
  "game_creation",
  "masonry",
+ "tracing",
  "uuid",
 ]
 

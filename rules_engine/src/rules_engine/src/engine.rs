@@ -4,9 +4,9 @@ use std::panic::{self, AssertUnwindSafe};
 use std::sync::{LazyLock, Mutex};
 
 use action_data::game_action::GameAction;
-use actions::battle_actions;
 use backtrace::Backtrace;
 use battle_data::battle::battle_data::BattleData;
+use battle_data::battle_animations::animation_data::AnimationData;
 use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
 use display::rendering::renderer;
@@ -17,7 +17,7 @@ use display_data::request_data::{
 use game_creation::new_battle;
 use uuid::Uuid;
 
-use crate::error_message;
+use crate::{error_message, handle_battle_action};
 
 static CURRENT_BATTLE: LazyLock<Mutex<Option<BattleData>>> = LazyLock::new(|| Mutex::new(None));
 
@@ -49,13 +49,13 @@ pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
                 Some(battle) => battle.clone(),
                 None => panic!("No battle found"),
             };
-            match request.action {
+            battle.animations = Some(AnimationData::default());
+            let commands = match request.action {
                 GameAction::BattleAction(action) => {
-                    battle_actions::execute(&mut battle, PlayerName::User, action)
+                    handle_battle_action::execute(&mut battle, PlayerName::User, action)
                 }
                 _ => todo!("Implement other actions"),
-            }
-            let commands = renderer::render_updates(&battle);
+            };
             *CURRENT_BATTLE.lock().unwrap() = Some(battle);
             commands
         }),

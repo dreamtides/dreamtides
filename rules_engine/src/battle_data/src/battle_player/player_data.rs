@@ -1,3 +1,4 @@
+use agent_data::agent::Agent;
 use core_data::numerics::{Energy, Points, Spark};
 
 /// Represents the state of a player within a battle.
@@ -7,6 +8,9 @@ use core_data::numerics::{Energy, Points, Spark};
 /// information about the user's overall save file state, refer to `UserData`.
 #[derive(Clone, Debug, Default)]
 pub struct PlayerData {
+    /// Optionally, an AI agent to select actions for this player.
+    pub agent: Option<Agent>,
+
     /// Current score
     pub points: Points,
 
