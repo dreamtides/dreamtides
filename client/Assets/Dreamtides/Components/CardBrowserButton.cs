@@ -22,7 +22,7 @@ namespace Dreamtides.Components
       }
 
       _registry.SoundService.PlayClickSound();
-      var action = new UserAction
+      var action = new GameAction
       {
         BattleAction = new()
         {

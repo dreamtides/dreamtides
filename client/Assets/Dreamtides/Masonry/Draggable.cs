@@ -15,12 +15,12 @@ namespace Dreamtides.Masonry
     public FlexNode? Node { get; set; }
     public List<string> TargetIdentifiers { get; set; }
     public FlexNode? OverTargetIndicator { get; set; }
-    public UserAction? OnDrop { get; set; }
+    public GameAction? OnDrop { get; set; }
     public long? HorizontalDragStartDistance { get; set; }
     public bool RemoveOriginal { get; set; }
     public List<string> HideIndicatorChildren { get; set; }
     public FlexNode? CustomDragIndicator { get; set; }
-    public UserAction? OnDragDetected { get; set; }
+    public GameAction? OnDragDetected { get; set; }
     bool _firedDragDetected;
 
     public static void Apply(Registry registry, Draggable view, FlexNode data)
@@ -29,12 +29,12 @@ namespace Dreamtides.Masonry
       view.Node = data;
       view.TargetIdentifiers = data.NodeType.DraggableNode.DropTargetIdentifiers.ToList();
       view.OverTargetIndicator = data.NodeType.DraggableNode.OverTargetIndicator;
-      view.OnDrop = Mason.ToUserAction(data.NodeType.DraggableNode.OnDrop);
+      view.OnDrop = Mason.ToGameAction(data.NodeType.DraggableNode.OnDrop);
       view.HorizontalDragStartDistance = data.NodeType.DraggableNode.HorizontalDragStartDistance;
       view.RemoveOriginal = data.NodeType.DraggableNode.RemoveOriginal ?? false;
       view.HideIndicatorChildren = data.NodeType.DraggableNode.HideIndicatorChildren.ToList();
       view.CustomDragIndicator = data.NodeType.DraggableNode.CustomDragIndicator;
-      view.OnDragDetected = Mason.ToUserAction(data.NodeType.DraggableNode.OnDragDetected);
+      view.OnDragDetected = Mason.ToGameAction(data.NodeType.DraggableNode.OnDragDetected);
     }
 
     public Draggable()

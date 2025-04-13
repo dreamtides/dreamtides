@@ -107,7 +107,7 @@ namespace Dreamtides.Masonry
           {
             if (node.EventHandlers?.OnMouseEnter != null)
             {
-              registry.ActionService.PerformAction(Mason.ToUserAction(node.EventHandlers.OnMouseEnter));
+              registry.ActionService.PerformAction(Mason.ToGameAction(node.EventHandlers.OnMouseEnter));
             }
 
             ApplyStyle(registry, element, hoverStyle);
@@ -116,7 +116,7 @@ namespace Dreamtides.Masonry
           {
             if (node.EventHandlers?.OnMouseLeave != null)
             {
-              registry.ActionService.PerformAction(Mason.ToUserAction(node.EventHandlers.OnMouseLeave));
+              registry.ActionService.PerformAction(Mason.ToGameAction(node.EventHandlers.OnMouseLeave));
             }
 
             var originalStyle = new FlexStyle();
@@ -128,10 +128,10 @@ namespace Dreamtides.Masonry
         else
         {
           SetCallback(registry, callbacks,
-            Mason.ToUserAction(node.EventHandlers?.OnMouseEnter),
+            Mason.ToGameAction(node.EventHandlers?.OnMouseEnter),
             Callbacks.Event.MouseEnter);
           SetCallback(registry, callbacks,
-            Mason.ToUserAction(node.EventHandlers?.OnMouseLeave),
+            Mason.ToGameAction(node.EventHandlers?.OnMouseLeave),
             Callbacks.Event.MouseLeave);
         }
 
@@ -148,7 +148,7 @@ namespace Dreamtides.Masonry
 
             if (node.EventHandlers?.OnMouseDown is { } onMouseDown)
             {
-              registry.ActionService.PerformAction(Mason.ToUserAction(onMouseDown));
+              registry.ActionService.PerformAction(Mason.ToGameAction(onMouseDown));
             }
           });
           callbacks.SetCallback(Callbacks.Event.MouseUp, () =>
@@ -169,17 +169,17 @@ namespace Dreamtides.Masonry
 
             if (node.EventHandlers?.OnMouseUp is { } onMouseUp)
             {
-              registry.ActionService.PerformAction(Mason.ToUserAction(onMouseUp));
+              registry.ActionService.PerformAction(Mason.ToGameAction(onMouseUp));
             }
           });
         }
         else
         {
           SetCallback(registry, callbacks,
-            Mason.ToUserAction(node.EventHandlers?.OnMouseDown),
+            Mason.ToGameAction(node.EventHandlers?.OnMouseDown),
             Callbacks.Event.MouseDown);
           SetCallback(registry, callbacks,
-            Mason.ToUserAction(node.EventHandlers?.OnMouseUp),
+            Mason.ToGameAction(node.EventHandlers?.OnMouseUp),
             Callbacks.Event.MouseUp);
         }
 
@@ -210,11 +210,11 @@ namespace Dreamtides.Masonry
         }
 
         SetCallback(registry, callbacks,
-          Mason.ToUserAction(node.EventHandlers?.OnClick), Callbacks.Event.Click);
+          Mason.ToGameAction(node.EventHandlers?.OnClick), Callbacks.Event.Click);
         SetCallback(registry, callbacks,
-          Mason.ToUserAction(node.EventHandlers?.OnLongPress), Callbacks.Event.LongPress);
+          Mason.ToGameAction(node.EventHandlers?.OnLongPress), Callbacks.Event.LongPress);
         SetCallback(registry, callbacks,
-          Mason.ToUserAction(node.EventHandlers?.OnFieldChanged), Callbacks.Event.FieldChanged);
+          Mason.ToGameAction(node.EventHandlers?.OnFieldChanged), Callbacks.Event.FieldChanged);
 
         if (node.PressedStyle != null || node.HoverStyle != null || node.EventHandlers != null)
         {
@@ -235,7 +235,7 @@ namespace Dreamtides.Masonry
       }
     }
 
-    static void SetCallback(Registry registry, INodeCallbacks element, UserAction? action, Callbacks.Event eventType)
+    static void SetCallback(Registry registry, INodeCallbacks element, GameAction? action, Callbacks.Event eventType)
     {
       if (action != null)
       {

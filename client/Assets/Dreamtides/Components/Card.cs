@@ -384,7 +384,7 @@ namespace Dreamtides.Components
 
       if (CardView.Revealed?.Actions?.OnClick is { } onClick && isSameObject && (Time.time - _lastMouseDownTime < 1f))
       {
-        _registry.ActionService.PerformAction(new UserAction
+        _registry.ActionService.PerformAction(new GameAction
         {
           DebugAction = onClick.DebugAction,
           BattleAction = onClick.BattleAction,
@@ -396,7 +396,7 @@ namespace Dreamtides.Components
         _isDraggingFromHand = false;
         _isDraggingForOrdering = false;
         _registry.SoundService.PlayCardSound();
-        var action = new UserAction
+        var action = new GameAction
         {
           BattleAction = new()
           {
@@ -429,7 +429,7 @@ namespace Dreamtides.Components
         {
           _registry.SoundService.PlayWhooshSound();
         }
-        var action = new UserAction
+        var action = new GameAction
         {
           BattleAction = new()
           {

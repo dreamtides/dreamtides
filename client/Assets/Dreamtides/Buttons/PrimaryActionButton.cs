@@ -27,7 +27,7 @@ namespace Dreamtides.Buttons
     Vector3 _originalBackgroundLocalScale;
     Vector3 _originalTextLocalScale;
     Sequence? _currentAnimation;
-    UserAction? _action;
+    GameAction? _action;
     float? _showOnIdleDuration;
     float? _lastSetViewTime;
     PrimaryActionButtonView? _pendingView;

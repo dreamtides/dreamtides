@@ -67,7 +67,7 @@ namespace Dreamtides.Services
       }
     }
 
-    public void PerformAction(UserAction? action)
+    public void PerformAction(GameAction? action)
     {
       if (action == null)
       {

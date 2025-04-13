@@ -14,7 +14,7 @@ namespace Dreamtides.Components
 
     public void OnClick()
     {
-      _registry.ActionService.PerformAction(new UserAction
+      _registry.ActionService.PerformAction(new GameAction
       {
         DebugAction = DebugAction.DrawCard
       });
@@ -22,7 +22,7 @@ namespace Dreamtides.Components
 
     public void PerformSomeAction()
     {
-      _registry.ActionService.PerformAction(new UserAction
+      _registry.ActionService.PerformAction(new GameAction
       {
         DebugAction = DebugAction.PerformSomeAction
       });
@@ -30,7 +30,7 @@ namespace Dreamtides.Components
 
     public void TriggerJudgment()
     {
-      _registry.ActionService.PerformAction(new UserAction
+      _registry.ActionService.PerformAction(new GameAction
       {
         DebugAction = DebugAction.TriggerUserJudgment
       });
@@ -38,7 +38,7 @@ namespace Dreamtides.Components
 
     public void TriggerEnemyJudgment()
     {
-      _registry.ActionService.PerformAction(new UserAction
+      _registry.ActionService.PerformAction(new GameAction
       {
         DebugAction = DebugAction.TriggerEnemyJudgment
       });
