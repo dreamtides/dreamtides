@@ -77,14 +77,6 @@ impl CardData {
         }
     }
 
-    /// Set whether this card is revealed to the given player.
-    pub fn set_revealed_to(&mut self, player_name: PlayerName, revealed: bool) {
-        match player_name {
-            PlayerName::User => self.revealed_to_owner = revealed,
-            PlayerName::Enemy => self.revealed_to_opponent = revealed,
-        }
-    }
-
     /// The controller of this card.
     pub fn controller(&self) -> PlayerName {
         self.owner

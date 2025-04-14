@@ -1,5 +1,4 @@
 use action_data::battle_action::BattleAction;
-use battle_data::battle_cards::zone::Zone;
 use battle_queries::legal_action_queries::legal_actions;
 use core_data::display_color;
 use core_data::display_types::SpriteAddress;
@@ -13,11 +12,6 @@ use crate::core::response_builder::ResponseBuilder;
 use crate::rendering::positions;
 
 pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardView {
-    if context.card().zone() == Zone::Battlefield {
-        dbg!(&context.card().properties);
-        let rev = context.card().is_revealed_to(PlayerName::User);
-        dbg!(&rev);
-    }
     CardView {
         id: context.card().id.card_identifier_for_display(),
         position: positions::calculate(context.card()),

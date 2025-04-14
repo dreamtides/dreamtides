@@ -301,12 +301,12 @@ namespace Dreamtides.Components
       _distanceDragged = 0;
       _registry.CardService.IsPointerDownOnCard = true;
 
-      EndHandHover();
       if (GameContext == GameContext.Hand && !_registry.CapabilitiesService.AnyBrowserOpen())
       {
         // Jump to large size when in hand
         transform.position = HandCardJumpPosition();
         transform.rotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0);
+        GameContext = GameContext.Hovering;
       }
       else if (_registry.CapabilitiesService.CanInfoZoom(GameContext) && !_draggedToClearThreshold)
       {
@@ -410,7 +410,7 @@ namespace Dreamtides.Components
 
         _registry.ActionService.PerformAction(action);
       }
-      else if (_isDraggingFromHand && ShouldReturnToPreviousParentOnRelease())
+      else if (ShouldReturnToPreviousParentOnRelease())
       {
         _registry.LayoutService.AddToParent(this);
         _registry.LayoutService.RunAnimations(() =>
@@ -446,13 +446,7 @@ namespace Dreamtides.Components
 
     public override void MouseHoverStart()
     {
-      if (GameContext == GameContext.Hand)
-      {
-        _positionBeforeHover = transform.position;
-        _hoverMoveTween = transform.DOMove(transform.position + new Vector3(0, 0.5f, 0.25f), 0.1f);
-        GameContext = GameContext.Hovering;
-      }
-      else if (_registry.CapabilitiesService.CanInfoZoom(GameContext))
+      if (_registry.CapabilitiesService.CanInfoZoom(GameContext) && GameContext != GameContext.Hand)
       {
         _hoverStartTime = Time.time;
         _hoveringForInfoZoom = true;
@@ -475,18 +469,6 @@ namespace Dreamtides.Components
         _registry.CardService.ClearInfoZoom();
         _hoveringForInfoZoom = false;
         _longHoverFired = false;
-      }
-
-      EndHandHover();
-    }
-
-    void EndHandHover()
-    {
-      if (GameContext == GameContext.Hovering)
-      {
-        _hoverMoveTween?.Kill();
-        transform.position = _positionBeforeHover;
-        GameContext = GameContext.Hand;
       }
     }
 
@@ -536,8 +518,8 @@ namespace Dreamtides.Components
         // Bias slightly towards screen center
         var horizontalPosition = Mathf.Clamp01((transform.position.x - 8f) / 14f);
         return transform.position + Vector3.Lerp(
-          new Vector3(2f, 4f, 2f),
-          new Vector3(-2f, 4f, 2f),
+          new Vector3(2f, 6f, 2.5f),
+          new Vector3(-2f, 6f, 2.5f),
           horizontalPosition);
       }
       else

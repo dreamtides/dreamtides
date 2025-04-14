@@ -39,10 +39,9 @@ namespace Dreamtides.Layout
 
         displayable.Parent = this;
         _objects.Add(displayable);
-
-        displayable.GameContext = GameContext;
       }
 
+      displayable.GameContext = GameContext;
       SortObjects();
     }
 
