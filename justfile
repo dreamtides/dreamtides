@@ -142,14 +142,14 @@ build-release-with-debug:
     cargo build --manifest-path rules_engine/Cargo.toml --no-default-features --bin client  --profile=release-with-debug
 
 samply: build-release-with-debug
-    samply record ./src-tauri/target/release-with-debug/client
+    samply record ./rules_engine/target/release-with-debug/client
 
 samply-benchmark *args='':
     #!/bin/zsh
     cargo criterion --manifest-path rules_engine/Cargo.toml --no-run
-    ALL_BENCHMARKS=`echo ./src-tauri/target/release/deps/benchmarks-*`
+    ALL_BENCHMARKS=`echo ./rules_engine/target/release/deps/benchmarks-*`
     echo "Found benchmark binaries" $ALL_BENCHMARKS
-    BENCHMARK=`echo ./src-tauri/target/release/deps/benchmarks-*([1])`
+    BENCHMARK=`echo ./rules_engine/target/release/deps/benchmarks-*([1])`
     echo "Running" $BENCHMARK
     samply record $BENCHMARK --bench --profile-time 5 "$@"
 

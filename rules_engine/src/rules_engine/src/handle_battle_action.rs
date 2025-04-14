@@ -16,12 +16,14 @@ pub fn execute(
 ) -> CommandSequence {
     battle_actions::execute(battle, player, action);
     let Some(next_player) = legal_actions::next_to_act(battle) else {
+        // Game over.
         return renderer::render_updates(battle);
     };
-    if next_player == PlayerName::User {
-        renderer::render_updates(battle)
-    } else {
-        let next_action = agent_search::select_action(battle, next_player);
+    if let Some(agent) = battle.player(next_player).agent.as_ref() {
+        let next_action = agent_search::select_action(battle, next_player, agent);
         execute(battle, next_player, next_action)
+    } else {
+        // Return response for human player.
+        renderer::render_updates(battle)
     }
 }

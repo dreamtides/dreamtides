@@ -15,3 +15,5 @@ battle_data = { path = "../battle_data" }
 battle_mutations = { path = "../battle_mutations" }
 battle_queries = { path = "../battle_queries" }
 core_data = { path = "../core_data" }
+
+rand = "0.9"

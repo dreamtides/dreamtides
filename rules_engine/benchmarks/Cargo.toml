@@ -1,0 +1,25 @@
+[package]
+name = "benchmarks"
+version = "0.0.0"
+edition = "2021"
+
+[[bench]]
+name = "benchmarks"
+harness = false
+
+[dependencies]
+actions = { path = "../src/actions", version = "0.0.0" }
+action_data = { path = "../src/action_data", version = "0.0.0" }
+agent_data = { path = "../src/agent_data", version = "0.0.0" }
+agents = { path = "../src/agents", version = "0.0.0" }
+battle_data = { path = "../src/battle_data", version = "0.0.0" }
+battle_queries = { path = "../src/battle_queries", version = "0.0.0" }
+core_data = { path = "../src/core_data", version = "0.0.0" }
+game_creation = { path = "../src/game_creation", version = "0.0.0" }
+
+tracing = "0.1"
+tracing-subscriber = { version = "0.3.17", features = ["env-filter", "serde"] }
+uuid = { version = "1", features = ["serde"] }
+
+[dev-dependencies]
+criterion = { version = "0.5.1", features = ["html_reports"] }
