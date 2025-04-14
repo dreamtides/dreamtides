@@ -1,5 +1,6 @@
 use action_data::battle_action::BattleAction;
 use battle_data::battle::battle_data::BattleData;
+use battle_data::battle::battle_status::BattleStatus;
 use core_data::types::PlayerName;
 use tracing::instrument;
 
@@ -40,7 +41,11 @@ pub fn compute(
 }
 
 /// Returns the player who can currently take game actions in the provided
-/// [BattleData] state.
-pub fn next_to_act(battle: &BattleData) -> PlayerName {
-    battle.turn.active_player
+/// [BattleData] state, or None if the battle has ended.
+pub fn next_to_act(battle: &BattleData) -> Option<PlayerName> {
+    if matches!(battle.status, BattleStatus::GameOver { .. }) {
+        None
+    } else {
+        Some(battle.turn.active_player)
+    }
 }
