@@ -1,18 +1,11 @@
 use battle_data::battle::battle_data::BattleData;
-use battle_data::battle_animations::battle_animation::BattleAnimation;
-use core_data::numerics::TurnId;
 use core_data::source::Source;
 
-use crate::dreamwell_phase::dreamwell;
-use crate::judgment_phase::judgment;
+use crate::turn_step_mutations::start_turn;
 
 /// End the current player's turn and start the next turn, running a judgment
 /// phase & dreamwell activation.
 pub fn run(battle: &mut BattleData, source: Source) {
     let next_player = battle.turn.active_player.opponent();
-    battle.turn.active_player = next_player;
-    battle.turn.turn_id += TurnId(1);
-    battle.push_animation(|| BattleAnimation::StartTurn { player: next_player });
-    judgment::run(battle, battle.turn.active_player, source);
-    dreamwell::activate(battle, battle.turn.active_player, source);
+    start_turn::run(battle, next_player, source);
 }

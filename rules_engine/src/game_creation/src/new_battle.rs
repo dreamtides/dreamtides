@@ -11,7 +11,7 @@ use battle_data::battle_cards::zone::Zone;
 use battle_data::battle_player::player_data::PlayerData;
 use battle_mutations::zone_mutations::deck;
 use core_data::identifiers::{BattleId, CardIdentity};
-use core_data::numerics::{Energy, Spark, TurnId};
+use core_data::numerics::{Energy, Points, Spark, TurnId};
 use core_data::source::Source;
 use core_data::types::PlayerName;
 use rand::{Rng, SeedableRng};
@@ -23,14 +23,20 @@ pub fn create_and_start(id: BattleId) -> BattleData {
     let mut battle = BattleData {
         id,
         user: PlayerData {
+            name: PlayerName::User,
+            agent: None,
+            points: Points(0),
+            spark_bonus: Spark(0),
             current_energy: Energy(2),
             produced_energy: Energy(2),
-            ..Default::default()
         },
         enemy: PlayerData {
+            name: PlayerName::Enemy,
+            agent: None,
+            points: Points(0),
+            spark_bonus: Spark(0),
             current_energy: Energy(2),
             produced_energy: Energy(2),
-            ..Default::default()
         },
         cards: AllCards::default(),
         status: BattleStatus::Setup,

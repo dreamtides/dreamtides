@@ -306,7 +306,6 @@ namespace Dreamtides.Components
         // Jump to large size when in hand
         transform.position = HandCardJumpPosition();
         transform.rotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0);
-        GameContext = GameContext.Hovering;
       }
       else if (_registry.CapabilitiesService.CanInfoZoom(GameContext) && !_draggedToClearThreshold)
       {
@@ -328,6 +327,10 @@ namespace Dreamtides.Components
         _dragStartScreenZ = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
         _dragStartPosition = _registry.InputService.WorldPointerPosition(_dragStartScreenZ);
         _dragOffset = gameObject.transform.position - _dragStartPosition;
+      }
+      else if (GameContext == GameContext.Hand && !_registry.CapabilitiesService.AnyBrowserOpen())
+      {
+        GameContext = GameContext.Hovering;
       }
     }
 

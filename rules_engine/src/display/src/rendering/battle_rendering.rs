@@ -2,7 +2,8 @@ use action_data::battle_action::BattleAction;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
 use battle_data::battle_player::player_data::PlayerData;
-use core_data::numerics::Spark;
+use battle_queries::player_battle_queries::spark_total;
+use core_data::source::Source;
 use core_data::types::PlayerName;
 use display_data::battle_view::{BattleView, InterfaceView, PlayerView, PrimaryActionButtonView};
 use display_data::command::{Command, GameMessageType, UpdateBattleCommand};
@@ -35,20 +36,20 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleData) -> BattleView
 
     BattleView {
         id: battle.id,
-        user: player_view(&battle.user),
-        enemy: player_view(&battle.enemy),
+        user: player_view(battle, &battle.user),
+        enemy: player_view(battle, &battle.enemy),
         cards,
         interface: interface_view(battle),
     }
 }
 
-fn player_view(player: &PlayerData) -> PlayerView {
+fn player_view(battle: &BattleData, player: &PlayerData) -> PlayerView {
     PlayerView {
         score: player.points,
         can_act: true,
         energy: player.current_energy,
         produced_energy: player.produced_energy,
-        total_spark: Spark(0),
+        total_spark: spark_total::query(battle, player.name, Source::Game),
     }
 }
 
