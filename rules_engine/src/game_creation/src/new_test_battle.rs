@@ -1,4 +1,4 @@
-use agent_data::agent::Agent;
+use ai_data::agent::Agent;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
 use battle_data::battle::battle_turn_step::BattleTurnStep;

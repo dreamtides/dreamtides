@@ -9,7 +9,7 @@ doctest = false
 bench = false
 
 [dependencies]
-agent_data = { path = "../agent_data" }
+ai_data = { path = "../ai_data" }
 core_data = { path = "../core_data" }
 
 enum-iterator = "2.1"

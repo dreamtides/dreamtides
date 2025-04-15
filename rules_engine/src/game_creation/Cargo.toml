@@ -9,7 +9,7 @@ doctest = false
 bench = false
 
 [dependencies]
-agent_data = { path = "../agent_data" }
+ai_data = { path = "../ai_data" }
 battle_data = { path = "../battle_data" }
 battle_mutations = { path = "../battle_mutations" }
 core_data = { path = "../core_data" }

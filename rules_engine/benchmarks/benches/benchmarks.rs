@@ -1,8 +1,8 @@
 use std::time::Duration;
 
 use actions::battle_actions;
-use agent_data::agent::Agent;
-use agents::agent_search;
+use ai_agents::agent_search;
+use ai_data::agent::Agent;
 use battle_data::battle::battle_data::BattleData;
 use battle_queries::legal_action_queries::legal_actions;
 use core_data::identifiers::BattleId;

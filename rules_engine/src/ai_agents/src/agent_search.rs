@@ -1,5 +1,5 @@
 use action_data::battle_action::BattleAction;
-use agent_data::agent::Agent;
+use ai_data::agent::Agent;
 use battle_data::battle::battle_data::BattleData;
 use battle_queries::legal_action_queries::legal_actions::{self, LegalActions};
 use core_data::types::PlayerName;

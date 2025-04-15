@@ -1,4 +1,4 @@
-use agent_data::agent::Agent;
+use ai_data::agent::Agent;
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::PlayerName;
 

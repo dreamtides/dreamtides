@@ -1,6 +1,6 @@
 use action_data::battle_action::BattleAction;
 use actions::battle_actions;
-use agents::agent_search;
+use ai_agents::agent_search;
 use battle_data::battle::battle_data::BattleData;
 use battle_queries::legal_action_queries::legal_actions;
 use core_data::types::PlayerName;
