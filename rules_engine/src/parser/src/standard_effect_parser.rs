@@ -33,6 +33,7 @@ fn non_recursive_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, Error
         game_state_effects(),
         pay_cost(),
     ))
+    .boxed()
 }
 
 fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -62,6 +63,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         each_player_discard_cards(),
         each_player_abandons_characters(),
     ))
+    .boxed()
 }
 
 fn spark_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -75,6 +77,7 @@ fn spark_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>
         kindle(),
         spark_becomes(),
     ))
+    .boxed()
 }
 
 fn gain_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -230,7 +233,6 @@ fn discover<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
         .ignore_then(a_or_an())
         .ignore_then(card_predicate_parser::parser())
         .map(|predicate| StandardEffect::Discover { predicate })
-        .boxed()
 }
 
 fn discover_and_then_materialize<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -239,7 +241,6 @@ fn discover_and_then_materialize<'a>() -> impl Parser<'a, &'a str, StandardEffec
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(phrase("and materialize it"))
         .map(|predicate| StandardEffect::DiscoverAndThenMaterialize { predicate })
-        .boxed()
 }
 
 fn materialize_random_characters<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -251,7 +252,6 @@ fn materialize_random_characters<'a>() -> impl Parser<'a, &'a str, StandardEffec
         .then(card_predicate_parser::parser())
         .then_ignore(phrase("from your deck"))
         .map(|(count, predicate)| StandardEffect::MaterializeRandomFromDeck { count, predicate })
-        .boxed()
 }
 
 fn return_from_void_to_hand<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -259,7 +259,6 @@ fn return_from_void_to_hand<'a>() -> impl Parser<'a, &'a str, StandardEffect, Er
         .ignore_then(determiner_parser::your_action())
         .then_ignore(phrase("from your void to your hand"))
         .map(|target| StandardEffect::ReturnFromYourVoidToHand { target })
-        .boxed()
 }
 
 fn return_from_void_to_play<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -267,7 +266,6 @@ fn return_from_void_to_play<'a>() -> impl Parser<'a, &'a str, StandardEffect, Er
         .ignore_then(determiner_parser::your_action())
         .then_ignore(phrase("from your void to play"))
         .map(|target| StandardEffect::ReturnFromYourVoidToPlay { target })
-        .boxed()
 }
 
 fn gains_reclaim_until_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
@@ -277,18 +275,16 @@ fn gains_reclaim_until_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEff
         .then(numeric("$", Energy, "").or_not())
         .then_ignore(phrase("until end of turn"))
         .map(|(target, cost)| StandardEffect::GainsReclaimUntilEndOfTurn { target, cost })
-        .boxed()
 }
 
 fn kindle<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    numeric("{kw: kindle}", Spark, "").map(|amount| StandardEffect::Kindle { amount }).boxed()
+    numeric("{kw: kindle}", Spark, "").map(|amount| StandardEffect::Kindle { amount })
 }
 
 fn negate<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("negate")
         .ignore_then(determiner_parser::target_parser())
         .map(|target| StandardEffect::Negate { target })
-        .boxed()
 }
 
 fn discard_card_from_enemy_hand<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -297,7 +293,6 @@ fn discard_card_from_enemy_hand<'a>() -> impl Parser<'a, &'a str, StandardEffect
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(phrase("from it. the enemy discards that card"))
         .map(|predicate| StandardEffect::DiscardCardFromEnemyHand { predicate })
-        .boxed()
 }
 
 fn discard_card_from_enemy_hand_then_they_draw<'a>(
@@ -307,7 +302,6 @@ fn discard_card_from_enemy_hand_then_they_draw<'a>(
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(phrase("from it. the enemy discards that card and then draws a card"))
         .map(|predicate| StandardEffect::DiscardCardFromEnemyHandThenTheyDraw { predicate })
-        .boxed()
 }
 
 fn abandon_at_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -315,21 +309,18 @@ fn abandon_at_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, Erro
         .ignore_then(determiner_parser::target_parser())
         .then_ignore(phrase("at end of turn"))
         .map(|target| StandardEffect::AbandonAtEndOfTurn { target })
-        .boxed()
 }
 
 fn spend_all_energy_draw_and_discard<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
 {
     phrase("spend all your remaining energy. draw x cards then discard x cards, where x is the energy spent this way")
         .to(StandardEffect::SpendAllEnergyDrawAndDiscard)
-        .boxed()
 }
 
 fn spend_all_energy_dissolve_enemy<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
 {
     phrase("spend all your remaining energy. dissolve an enemy character with spark less than or equal to the energy spent this way")
         .to(StandardEffect::SpendAllEnergyDissolveEnemy)
-        .boxed()
 }
 
 fn put_on_top_of_deck<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -337,7 +328,6 @@ fn put_on_top_of_deck<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
         .ignore_then(determiner_parser::target_parser())
         .then_ignore(phrase("on top of the enemy's deck"))
         .map(|target| StandardEffect::PutOnTopOfEnemyDeck { target })
-        .boxed()
 }
 
 fn each_matching_gains_spark_until_next_main<'a>(
@@ -347,7 +337,6 @@ fn each_matching_gains_spark_until_next_main<'a>(
         .then_ignore(phrase("you control gains +"))
         .then(numeric("", Spark, "spark until your next main phase"))
         .map(|(each, gains)| StandardEffect::EachMatchingGainsSparkUntilNextMain { each, gains })
-        .boxed()
 }
 
 fn each_matching_gains_spark_for_each<'a>(
@@ -362,7 +351,6 @@ fn each_matching_gains_spark_for_each<'a>(
             gains: Spark(1),
             for_each,
         })
-        .boxed()
 }
 
 fn return_all_but_one_character_draw_card_for_each<'a>(
@@ -373,7 +361,6 @@ fn return_all_but_one_character_draw_card_for_each<'a>(
             "character you control to hand. draw a card for each character returned",
         ))
         .map(|count| StandardEffect::ReturnCharactersToHandDrawCardForEach { count })
-        .boxed()
 }
 
 fn banish_character<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -396,14 +383,12 @@ fn materialize_character_from_void<'a>() -> impl Parser<'a, &'a str, StandardEff
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(phrase("from your void"))
         .map(|target| StandardEffect::MaterializeCharacterFromVoid { target })
-        .boxed()
 }
 
 fn materialize_character<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("materialize")
         .ignore_then(determiner_parser::target_parser())
         .map(|target| StandardEffect::MaterializeCharacter { target })
-        .boxed()
 }
 
 fn materialize_character_at_end_of_turn<'a>(
@@ -412,7 +397,6 @@ fn materialize_character_at_end_of_turn<'a>(
         .ignore_then(determiner_parser::target_parser())
         .then_ignore(phrase("at end of turn"))
         .map(|target| StandardEffect::MaterializeCharacterAtEndOfTurn { target })
-        .boxed()
 }
 
 fn gain_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -422,7 +406,7 @@ fn gain_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> 
 }
 
 fn foresee<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    numeric("{kw: foresee}", count, "").map(|count| StandardEffect::Foresee { count }).boxed()
+    numeric("{kw: foresee}", count, "").map(|count| StandardEffect::Foresee { count })
 }
 
 fn lose_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -436,7 +420,6 @@ fn dissolve_characters_count<'a>() -> impl Parser<'a, &'a str, StandardEffect, E
         .ignore_then(collection_expression_parser::parser())
         .then(determiner_parser::counted_parser())
         .map(|(count, target)| StandardEffect::DissolveCharactersCount { target, count })
-        .boxed()
 }
 
 fn enemy_gains_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -444,14 +427,12 @@ fn enemy_gains_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
         .ignore_then(numeric("", count, "$point"))
         .then_ignore(just("s").or_not())
         .map(|count| StandardEffect::EnemyGainsPoints { count })
-        .boxed()
 }
 
 fn enemy_gains_points_equal_to_its_spark<'a>(
 ) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("the enemy gains $points equal to its spark")
         .to(StandardEffect::EnemyGainsPointsEqualToItsSpark)
-        .boxed()
 }
 
 fn enemy_loses_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -459,7 +440,6 @@ fn enemy_loses_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
         .ignore_then(numeric("", count, "$point"))
         .then_ignore(just("s").or_not())
         .map(|count| StandardEffect::EnemyLosesPoints { count })
-        .boxed()
 }
 
 fn pay_cost<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -470,7 +450,6 @@ fn gain_control<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
     phrase("gain control of")
         .ignore_then(determiner_parser::target_parser())
         .map(|target| StandardEffect::GainControl { target })
-        .boxed()
 }
 
 fn return_to_hand<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -478,7 +457,6 @@ fn return_to_hand<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a
         .ignore_then(determiner_parser::target_parser())
         .then_ignore(phrase("to hand"))
         .map(|target| StandardEffect::ReturnToHand { target })
-        .boxed()
 }
 
 fn gain_points_for_each<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -488,7 +466,6 @@ fn gain_points_for_each<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorT
         .then_ignore(phrase("for each"))
         .then(quantity_expression_parser::parser())
         .map(|(gain, for_count)| StandardEffect::GainPointsForEach { gain, for_count })
-        .boxed()
 }
 
 fn draw_cards_for_each<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -504,7 +481,6 @@ fn copy<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     choice((phrase("copy"), phrase("materialize a copy of")))
         .ignore_then(determiner_parser::target_parser())
         .map(|target| StandardEffect::Copy { target })
-        .boxed()
 }
 
 fn copy_next_played<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -516,7 +492,6 @@ fn copy_next_played<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<
             matching: Predicate::Your(matching),
             times,
         })
-        .boxed()
 }
 
 fn cards_in_void_gain_reclaim_this_turn<'a>(
@@ -529,7 +504,6 @@ fn cards_in_void_gain_reclaim_this_turn<'a>(
             count,
             predicate,
         })
-        .boxed()
 }
 
 fn gains_spark_for_quantity<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -541,31 +515,25 @@ fn gains_spark_for_quantity<'a>() -> impl Parser<'a, &'a str, StandardEffect, Er
             gains,
             for_quantity,
         })
-        .boxed()
 }
 
 fn take_extra_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    phrase("take an extra turn after this one").to(StandardEffect::TakeExtraTurn).boxed()
+    phrase("take an extra turn after this one").to(StandardEffect::TakeExtraTurn)
 }
 
 fn double_your_energy<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    phrase("double the amount of energy in your energy pool")
-        .to(StandardEffect::DoubleYourEnergy)
-        .boxed()
+    phrase("double the amount of energy in your energy pool").to(StandardEffect::DoubleYourEnergy)
 }
 
 fn gain_twice_that_much_energy_instead<'a>(
 ) -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    phrase("gain twice that much energy instead")
-        .to(StandardEffect::GainTwiceThatMuchEnergyInstead)
-        .boxed()
+    phrase("gain twice that much energy instead").to(StandardEffect::GainTwiceThatMuchEnergyInstead)
 }
 
 fn shuffle_hand_and_deck_and_draw<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("each player may shuffle their hand and void into their deck and then draw")
         .ignore_then(numeric("", count, "cards"))
         .map(|count| StandardEffect::ShuffleHandAndDeckAndDraw { count })
-        .boxed()
 }
 
 fn dissolve_characters_quantity<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -574,13 +542,11 @@ fn dissolve_characters_quantity<'a>() -> impl Parser<'a, &'a str, StandardEffect
         .then_ignore(phrase("with cost less than or equal to the number of"))
         .then(quantity_expression_parser::parser())
         .map(|(target, quantity)| StandardEffect::DissolveCharactersQuantity { target, quantity })
-        .boxed()
 }
 
 fn put_cards_from_deck_into_void<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     numeric("put the top", count, "cards of your deck into your void")
         .map(|count| StandardEffect::PutCardsFromYourDeckIntoVoid { count })
-        .boxed()
 }
 
 fn trigger_judgment_ability<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -591,15 +557,14 @@ fn trigger_judgment_ability<'a>() -> impl Parser<'a, &'a str, StandardEffect, Er
             matching,
             collection: collection.unwrap_or(CollectionExpression::All),
         })
-        .boxed()
 }
 
 fn win_game<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    phrase("you win the game").to(StandardEffect::YouWinTheGame).boxed()
+    phrase("you win the game").to(StandardEffect::YouWinTheGame)
 }
 
 fn banish_enemy_void<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    phrase("banish the enemy's void").to(StandardEffect::BanishEnemyVoid).boxed()
+    phrase("banish the enemy's void").to(StandardEffect::BanishEnemyVoid)
 }
 
 fn spark_becomes<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -612,7 +577,6 @@ fn spark_becomes<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>
             matching,
             spark,
         })
-        .boxed()
 }
 
 fn banish_character_until_leaves_play<'a>(
@@ -626,7 +590,6 @@ fn banish_character_until_leaves_play<'a>(
             target,
             until_leaves,
         })
-        .boxed()
 }
 
 fn banish_until_next_main<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -634,7 +597,6 @@ fn banish_until_next_main<'a>() -> impl Parser<'a, &'a str, StandardEffect, Erro
         .ignore_then(determiner_parser::target_parser())
         .then_ignore(phrase("until the start of your next main phase"))
         .map(|target| StandardEffect::BanishUntilNextMain { target })
-        .boxed()
 }
 
 fn each_player_discard_cards<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
@@ -642,7 +604,6 @@ fn each_player_discard_cards<'a>() -> impl Parser<'a, &'a str, StandardEffect, E
         .ignore_then(a_or_count())
         .then_ignore(card_or_cards())
         .map(|count| StandardEffect::EachPlayerDiscardCards { count })
-        .boxed()
 }
 
 fn put_cards_from_void_on_top_of_deck<'a>(
@@ -652,29 +613,26 @@ fn put_cards_from_void_on_top_of_deck<'a>(
         .then(card_predicate_parser::parser())
         .then_ignore(phrase("from your void on top of your deck"))
         .map(|(count, matching)| StandardEffect::PutCardsFromVoidOnTopOfDeck { count, matching })
-        .boxed()
 }
 
 fn materialize_silent_copy<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    phrase("materialize")
-        .ignore_then(
-            choice((
-                phrase("a {kw: silent} copy").to(1),
-                text_number().then_ignore(phrase("{kw: silent} copies")).map(|n| n),
-            ))
-            .then_ignore(phrase("of"))
-            .then(determiner_parser::target_parser())
-            .then(phrase("for each").ignore_then(quantity_expression_parser::parser()).or_not())
-            .map(|((count, target), quantity)| {
-                let target_clone = target.clone();
-                StandardEffect::MaterializeSilentCopy {
-                    target,
-                    count,
-                    quantity: quantity.unwrap_or(QuantityExpression::Matching(target_clone)),
-                }
-            }),
-        )
-        .boxed()
+    phrase("materialize").ignore_then(
+        choice((
+            phrase("a {kw: silent} copy").to(1),
+            text_number().then_ignore(phrase("{kw: silent} copies")).map(|n| n),
+        ))
+        .then_ignore(phrase("of"))
+        .then(determiner_parser::target_parser())
+        .then(phrase("for each").ignore_then(quantity_expression_parser::parser()).or_not())
+        .map(|((count, target), quantity)| {
+            let target_clone = target.clone();
+            StandardEffect::MaterializeSilentCopy {
+                target,
+                count,
+                quantity: quantity.unwrap_or(QuantityExpression::Matching(target_clone)),
+            }
+        }),
+    )
 }
 
 fn each_player_abandons_characters<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
@@ -683,5 +641,4 @@ fn each_player_abandons_characters<'a>() -> impl Parser<'a, &'a str, StandardEff
         .ignore_then(a_or_count())
         .then(card_predicate_parser::parser())
         .map(|(count, matching)| StandardEffect::EachPlayerAbandonsCharacters { matching, count })
-        .boxed()
 }

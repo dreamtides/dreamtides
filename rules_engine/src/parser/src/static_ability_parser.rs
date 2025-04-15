@@ -26,7 +26,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, StaticAbility, ErrorType<'a>> {
                     condition: Some(condition),
                 })
             }),
-        standard().map(StaticAbility::StaticAbility).boxed(),
+        standard().map(StaticAbility::StaticAbility),
     ))
     .boxed()
 }
@@ -178,7 +178,6 @@ fn spark_equal_to_predicate_count<'a>(
     phrase("this character's spark is equal to the number of")
         .ignore_then(determiner_parser::counted_parser())
         .map(|predicate| StandardStaticAbility::SparkEqualToPredicateCount { predicate })
-        .boxed()
 }
 
 fn characters_in_hand_have_fast<'a>(
@@ -210,16 +209,13 @@ fn play_from_top_of_deck<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility
 fn play_only_from_void<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     phrase("you may only play this character from your void")
         .to(StandardStaticAbility::PlayOnlyFromVoid)
-        .boxed()
 }
 
 fn cards_in_your_void_have_reclaim<'a>(
 ) -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
-    phrase("cards in your void have {kw: reclaim}")
-        .map(|_| StandardStaticAbility::CardsInYourVoidHaveReclaim {
-            matching: CardPredicate::Card,
-        })
-        .boxed()
+    phrase("cards in your void have {kw: reclaim}").map(|_| {
+        StandardStaticAbility::CardsInYourVoidHaveReclaim { matching: CardPredicate::Card }
+    })
 }
 
 fn cost_reduction_for_each<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
@@ -230,5 +226,4 @@ fn cost_reduction_for_each<'a>() -> impl Parser<'a, &'a str, StandardStaticAbili
             reduction,
             quantity,
         })
-        .boxed()
 }

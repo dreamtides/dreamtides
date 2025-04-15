@@ -8,7 +8,7 @@ use crate::parser_utils::{count, number, numeric, phrase, ErrorType};
 use crate::{card_predicate_parser, collection_expression_parser, determiner_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
-    choice((numeric("$", Energy, "").map(Cost::Energy), standard_cost())).boxed()
+    choice((numeric("$", Energy, "").map(Cost::Energy), standard_cost()))
 }
 
 pub fn standard_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
@@ -34,7 +34,6 @@ pub fn standard_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
             .then(card_predicate_parser::parser())
             .map(|(count, predicate)| Cost::DiscardCards(predicate, count)),
     ))
-    .boxed()
 }
 
 /// Alternate phrasing for costs, which are written in static abilities, for
@@ -61,7 +60,6 @@ pub fn inflected_additional_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorTy
             .then(card_predicate_parser::parser())
             .map(|(count, predicate)| Cost::DiscardCards(predicate, count)),
     ))
-    .boxed()
 }
 
 fn abandon_characters_count<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
@@ -69,5 +67,4 @@ fn abandon_characters_count<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a
         .ignore_then(collection_expression_parser::parser())
         .then(determiner_parser::your_action_counted_parser())
         .map(|(count, target)| Cost::AbandonCharactersCount { target, count })
-        .boxed()
 }

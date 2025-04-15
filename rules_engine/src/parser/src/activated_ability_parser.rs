@@ -48,5 +48,4 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, ActivatedAbility, ErrorType<'a>>
         .then_ignore(phrase(":"))
         .then(effect_parser::effect())
         .map(|((options, costs), effect)| ActivatedAbility { costs, effect, options })
-        .boxed()
 }

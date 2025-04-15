@@ -16,7 +16,6 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
         card_with_cost(),
         non_recursive_predicate(),
     ))
-    .boxed()
 }
 
 fn non_recursive_predicate<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
@@ -55,7 +54,6 @@ fn card_with_cost<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>
             cost_operator: operator.unwrap_or(Operator::Exactly),
             cost,
         })
-        .boxed()
 }
 
 fn character_with_spark<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
@@ -66,7 +64,6 @@ fn character_with_spark<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorTy
             phrase("or more").to(Operator::OrMore),
         )))
         .map(|(spark, operator)| CardPredicate::CharacterWithSpark(spark, operator))
-        .boxed()
 }
 
 fn character_with_cost_compared_to_controlled<'a>(
@@ -90,7 +87,6 @@ fn character_with_cost_compared_to_controlled<'a>(
                 count_matching: Box::new(count_matching),
             }
         })
-        .boxed()
 }
 
 fn character_with_cost_compared_to_abandoned<'a>(
@@ -109,7 +105,6 @@ fn character_with_cost_compared_to_abandoned<'a>(
             target: Box::new(target),
             cost_operator,
         })
-        .boxed()
 }
 
 fn character_with_materialized_ability<'a>(
@@ -117,7 +112,6 @@ fn character_with_materialized_ability<'a>(
     character()
         .ignore_then(phrase("with a $materialized ability"))
         .to(CardPredicate::CharacterWithMaterializedAbility)
-        .boxed()
 }
 
 fn character_with_multi_activated_ability<'a>(
@@ -125,7 +119,6 @@ fn character_with_multi_activated_ability<'a>(
     character()
         .ignore_then(phrase("with a $multiactivated ability"))
         .to(CardPredicate::CharacterWithMultiActivatedAbility)
-        .boxed()
 }
 
 fn character_type<'a>() -> impl Parser<'a, &'a str, CharacterType, ErrorType<'a>> {
@@ -137,18 +130,16 @@ fn character_type<'a>() -> impl Parser<'a, &'a str, CharacterType, ErrorType<'a>
                 .to(CharacterType::SpiritAnimal),
         )))
         .then_ignore(phrase("}"))
-        .boxed()
 }
 
 fn fast_card<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     phrase("'$fast'")
         .ignore_then(non_recursive_predicate())
         .map(|target| CardPredicate::Fast { target: Box::new(target) })
-        .boxed()
 }
 
 fn character<'a>() -> impl Parser<'a, &'a str, &'a str, ErrorType<'a>> {
-    choice((phrase("characters"), phrase("character"))).boxed()
+    choice((phrase("characters"), phrase("character")))
 }
 
 fn character_with_spark_compared_to_abandoned_this_turn<'a>(
@@ -166,7 +157,6 @@ fn character_with_spark_compared_to_abandoned_this_turn<'a>(
                 spark_operator,
             }
         })
-        .boxed()
 }
 
 fn character_with_spark_compared_to_abandoned<'a>(
@@ -183,5 +173,4 @@ fn character_with_spark_compared_to_abandoned<'a>(
             target: Box::new(target),
             spark_operator,
         })
-        .boxed()
 }

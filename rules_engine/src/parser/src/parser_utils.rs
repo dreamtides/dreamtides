@@ -3,7 +3,7 @@ use chumsky::prelude::*;
 pub type ErrorType<'a> = extra::Err<Rich<'a, char>>;
 
 pub fn phrase<'a>(text: &'static str) -> impl Parser<'a, &'a str, &'a str, ErrorType<'a>> {
-    just(text).padded().boxed()
+    just(text).padded()
 }
 
 /// Standard identity function with a different name for readability
@@ -25,24 +25,23 @@ pub fn numeric<'a, T>(
         .ignore_then(text::int(10))
         .then_ignore(phrase(after))
         .map(move |s: &str| function(s.parse().unwrap()))
-        .boxed()
 }
 
 /// Parses a number and maps it to a concrete type
 pub fn number<'a, T>(
     function: impl Fn(u32) -> T + 'a,
 ) -> impl Parser<'a, &'a str, T, ErrorType<'a>> {
-    text::int(10).map(move |s: &str| function(s.parse().unwrap())).boxed()
+    text::int(10).map(move |s: &str| function(s.parse().unwrap()))
 }
 
 /// Parses "this event" or "this character"
 pub fn this<'a>() -> impl Parser<'a, &'a str, &'a str, ErrorType<'a>> {
-    choice((phrase("this event"), phrase("this character"))).boxed()
+    choice((phrase("this event"), phrase("this character")))
 }
 
 /// Parses "a" or "an"
 pub fn a_or_an<'a>() -> impl Parser<'a, &'a str, &'a str, ErrorType<'a>> {
-    choice((phrase("an"), phrase("a"))).boxed()
+    choice((phrase("an"), phrase("a")))
 }
 
 /// Parses "a" or a number followed by a word
@@ -69,7 +68,6 @@ pub fn text_number<'a>() -> impl Parser<'a, &'a str, u32, ErrorType<'a>> {
         phrase("nine").to(9),
         text::int(10).from_str().unwrapped(),
     ))
-    .boxed()
 }
 
 /// Parses an ordinal number that can be either written as text (e.g. "first")
@@ -87,10 +85,9 @@ pub fn ordinal_number<'a>() -> impl Parser<'a, &'a str, u32, ErrorType<'a>> {
         phrase("ninth").to(9),
         numeric("", count, "th"),
     ))
-    .boxed()
 }
 
 /// Parses "twice" or a number followed by "times"
 pub fn number_of_times<'a>() -> impl Parser<'a, &'a str, Option<u32>, ErrorType<'a>> {
-    choice((phrase("twice").to(2), text_number().then_ignore(phrase("times")))).or_not().boxed()
+    choice((phrase("twice").to(2), text_number().then_ignore(phrase("times")))).or_not()
 }

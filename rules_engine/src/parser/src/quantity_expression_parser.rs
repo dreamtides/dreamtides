@@ -27,5 +27,4 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, QuantityExpression, ErrorType<'a
             .map(QuantityExpression::AbandonedThisWay),
         determiner_parser::counted_parser().map(QuantityExpression::Matching),
     ))
-    .boxed()
 }

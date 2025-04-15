@@ -13,4 +13,4 @@ battle_data = { path = "../battle_data" }
 core_data = { path = "../core_data" }
 ability_data = { path = "../ability_data" }
 
-chumsky = "1.0.0-alpha.7"
+chumsky = "0.10"

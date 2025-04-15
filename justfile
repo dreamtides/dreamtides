@@ -101,6 +101,9 @@ benchmark *args='':
 parser *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --bin "parser_cli" -- "$@"
 
+parser-release *args='':
+  cargo run --manifest-path rules_engine/Cargo.toml --release --bin "parser_cli" -- "$@"
+
 insta:
   cd rules_engine && cargo insta review
 

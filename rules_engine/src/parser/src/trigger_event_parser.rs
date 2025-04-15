@@ -35,14 +35,12 @@ pub fn keyword_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<
         .at_least(1)
         .collect::<Vec<_>>()
         .map(TriggerEvent::Keywords)
-        .boxed()
 }
 
 fn materialize<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
     phrase("you materialize")
         .ignore_then(determiner_parser::your_action())
         .map(TriggerEvent::Materialize)
-        .boxed()
 }
 
 fn materialize_nth_this_turn<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
@@ -51,7 +49,6 @@ fn materialize_nth_this_turn<'a>() -> impl Parser<'a, &'a str, TriggerEvent, Err
         .then(card_predicate_parser::parser())
         .then_ignore(phrase("in a turn"))
         .map(|(n, pred)| TriggerEvent::MaterializeNthThisTurn(Predicate::Your(pred), n))
-        .boxed()
 }
 
 fn play_from_hand<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
@@ -59,32 +56,27 @@ fn play_from_hand<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>>
         .ignore_then(determiner_parser::your_action())
         .then_ignore(phrase("from your hand"))
         .map(TriggerEvent::PlayFromHand)
-        .boxed()
 }
 
 fn play<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
-    phrase("you play").ignore_then(determiner_parser::your_action()).map(TriggerEvent::Play).boxed()
+    phrase("you play").ignore_then(determiner_parser::your_action()).map(TriggerEvent::Play)
 }
 
 fn discard<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
-    phrase("you discard")
-        .ignore_then(determiner_parser::your_action())
-        .map(TriggerEvent::Discard)
-        .boxed()
+    phrase("you discard").ignore_then(determiner_parser::your_action()).map(TriggerEvent::Discard)
 }
 
 fn end_of_turn<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
-    phrase("the end of your turn").to(TriggerEvent::EndOfYourTurn).boxed()
+    phrase("the end of your turn").to(TriggerEvent::EndOfYourTurn)
 }
 
 fn gain_energy<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
-    phrase("you gain energy").to(TriggerEvent::GainEnergy).boxed()
+    phrase("you gain energy").to(TriggerEvent::GainEnergy)
 }
 
 fn draw_all_cards_in_copy_of_deck<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
     phrase("you draw all of the cards in a copy of your deck")
         .to(TriggerEvent::DrawAllCardsInCopyOfDeck)
-        .boxed()
 }
 
 fn banished<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
@@ -93,19 +85,14 @@ fn banished<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
         phrase("you banish").ignore_then(determiner_parser::your_action()),
     ))
     .map(TriggerEvent::Banished)
-    .boxed()
 }
 
 fn dissolved<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
     determiner_parser::target_parser()
         .then_ignore(phrase("is dissolved"))
         .map(TriggerEvent::Dissolved)
-        .boxed()
 }
 
 fn abandon<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
-    phrase("you abandon")
-        .ignore_then(determiner_parser::your_action())
-        .map(TriggerEvent::Abandon)
-        .boxed()
+    phrase("you abandon").ignore_then(determiner_parser::your_action()).map(TriggerEvent::Abandon)
 }

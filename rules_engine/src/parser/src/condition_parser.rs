@@ -44,4 +44,5 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Condition, ErrorType<'a>> {
         )),
         phrase("this character is in your void").to(Condition::ThisCharacterIsInYourVoid),
     ))
+    .boxed()
 }

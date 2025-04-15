@@ -42,7 +42,7 @@ pub fn target_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>>
 
 /// Parser for 'for each' expressions which count entities matching a predicate
 pub fn for_each_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>> {
-    phrase("for each").ignore_then(counted_parser()).boxed()
+    phrase("for each").ignore_then(counted_parser())
 }
 
 /// Parser for expressions describing multiple matching objects, such as in
@@ -63,7 +63,6 @@ pub fn counted_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>
             .map(Predicate::EnemyVoid),
         card_predicate_parser::parser().map(Predicate::Any),
     ))
-    .boxed()
 }
 
 /// Parser for expressions describing multiple matching objects, when the
@@ -74,7 +73,6 @@ pub fn your_action_counted_parser<'a>() -> impl Parser<'a, &'a str, Predicate, E
         phrase("other").ignore_then(card_predicate_parser::parser()).map(Predicate::Another),
         card_predicate_parser::parser().map(Predicate::Your),
     ))
-    .boxed()
 }
 
 /// Parser for expressions where the controller has already been described as
@@ -87,5 +85,4 @@ pub fn your_action<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>> {
         phrase("an").ignore_then(card_predicate_parser::parser()).map(Predicate::Your),
         phrase("a").ignore_then(card_predicate_parser::parser()).map(Predicate::Your),
     ))
-    .boxed()
 }

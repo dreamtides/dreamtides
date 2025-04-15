@@ -14,7 +14,6 @@ fn keyword_trigger_parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, Er
         .then_ignore(phrase(":"))
         .then(effect_parser::effect())
         .map(|(trigger, effect)| TriggeredAbility { trigger, effect, options: None })
-        .boxed()
 }
 
 pub fn standard_trigger_parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, ErrorType<'a>> {
@@ -30,5 +29,4 @@ pub fn standard_trigger_parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbilit
             options: once_per_turn
                 .map(|_| TriggeredAbilityOptions { once_per_turn: true, until_end_of_turn: false }),
         })
-        .boxed()
 }

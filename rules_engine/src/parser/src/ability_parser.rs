@@ -32,5 +32,4 @@ fn parser<'a>() -> impl Parser<'a, &'a str, Vec<Ability>, ErrorType<'a>> {
         .collect()
         .then_ignore(flavor_text.or_not())
         .then_ignore(end())
-        .boxed()
 }
