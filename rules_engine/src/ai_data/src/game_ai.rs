@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum Agent {
+pub enum GameAI {
     FirstAvailableAction,
     RandomAction,
+    IterativeDeepening,
 }

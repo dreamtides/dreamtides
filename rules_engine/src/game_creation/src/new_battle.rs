@@ -1,3 +1,4 @@
+use ai_data::game_ai::GameAI;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
 use battle_data::battle::battle_turn_step::BattleTurnStep;
@@ -24,7 +25,7 @@ pub fn create_and_start(id: BattleId) -> BattleData {
         id,
         user: PlayerData {
             name: PlayerName::User,
-            agent: None,
+            ai: None,
             points: Points(0),
             spark_bonus: Spark(0),
             current_energy: Energy(2),
@@ -32,7 +33,7 @@ pub fn create_and_start(id: BattleId) -> BattleData {
         },
         enemy: PlayerData {
             name: PlayerName::Enemy,
-            agent: None,
+            ai: Some(GameAI::IterativeDeepening),
             points: Points(0),
             spark_bonus: Spark(0),
             current_energy: Energy(2),

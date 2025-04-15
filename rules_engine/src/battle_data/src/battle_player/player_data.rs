@@ -1,4 +1,4 @@
-use ai_data::agent::Agent;
+use ai_data::game_ai::GameAI;
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::PlayerName;
 
@@ -13,7 +13,7 @@ pub struct PlayerData {
     pub name: PlayerName,
 
     /// Optionally, an AI agent to select actions for this player.
-    pub agent: Option<Agent>,
+    pub ai: Option<GameAI>,
 
     /// Current score
     pub points: Points,

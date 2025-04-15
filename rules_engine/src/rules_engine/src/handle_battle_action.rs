@@ -19,7 +19,7 @@ pub fn execute(
         // Game over.
         return renderer::render_updates(battle);
     };
-    if let Some(agent) = battle.player(next_player).agent.as_ref() {
+    if let Some(agent) = battle.player(next_player).ai.as_ref() {
         let next_action = agent_search::select_action(battle, next_player, agent);
         execute(battle, next_player, next_action)
     } else {

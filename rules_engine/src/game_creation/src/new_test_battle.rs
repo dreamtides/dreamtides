@@ -1,4 +1,4 @@
-use ai_data::agent::Agent;
+use ai_data::game_ai::GameAI;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
 use battle_data::battle::battle_turn_step::BattleTurnStep;
@@ -19,12 +19,12 @@ use rand_xoshiro::Xoshiro256PlusPlus;
 use uuid::Uuid;
 
 /// Creates a new test battle between two Agents and starts it.
-pub fn create_and_start(id: BattleId, agent: Agent) -> BattleData {
+pub fn create_and_start(id: BattleId, agent: GameAI) -> BattleData {
     let mut battle = BattleData {
         id,
         user: PlayerData {
             name: PlayerName::User,
-            agent: Some(agent.clone()),
+            ai: Some(agent.clone()),
             points: Points(0),
             spark_bonus: Spark(0),
             current_energy: Energy(2),
@@ -32,7 +32,7 @@ pub fn create_and_start(id: BattleId, agent: Agent) -> BattleData {
         },
         enemy: PlayerData {
             name: PlayerName::Enemy,
-            agent: Some(agent),
+            ai: Some(agent),
             points: Points(0),
             spark_bonus: Spark(0),
             current_energy: Energy(2),

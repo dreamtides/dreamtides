@@ -36,7 +36,7 @@ impl SelectionAlgorithm for AlphaBetaAlgorithm {
     }
 }
 
-fn run_internal<N, E>(
+pub fn run_internal<N, E>(
     config: AgentConfig,
     node: &N,
     evaluator: &E,

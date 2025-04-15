@@ -73,7 +73,11 @@ name = "ai_agents"
 version = "0.0.0"
 dependencies = [
  "action_data",
+ "ai_core",
  "ai_data",
+ "ai_game_integration",
+ "ai_monte_carlo",
+ "ai_tree_search",
  "battle_data",
  "battle_mutations",
  "battle_queries",
