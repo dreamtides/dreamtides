@@ -153,3 +153,6 @@ samply-benchmark *args='':
     echo "Running" $BENCHMARK
     samply record $BENCHMARK --bench --profile-time 5 "$@"
 
+@nim *args='':
+    cargo run --manifest-path rules_engine/Cargo.toml --bin run_nim -- $@
+
