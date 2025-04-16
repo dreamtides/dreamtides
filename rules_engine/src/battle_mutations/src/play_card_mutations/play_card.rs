@@ -1,7 +1,7 @@
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_cards::card_id::ObjectId;
-use battle_data::battle_cards::card_types::CardType;
 use battle_data::battle_cards::zone::Zone;
+use core_data::card_types::CardType;
 use core_data::identifiers::CardId;
 use core_data::source::Source;
 use core_data::types::PlayerName;

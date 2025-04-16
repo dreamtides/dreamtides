@@ -1,4 +1,4 @@
-use core_data::identifiers::CardIdentity;
+use ability_data::ability::Ability;
 use core_data::numerics::TurnId;
 use core_data::types::PlayerName;
 
@@ -13,14 +13,14 @@ pub struct CardData {
     /// Unique identifier for this card within a zone.
     pub id: CardInstanceId,
 
-    /// Identifier for the name & rules text for this card.
-    pub identity: CardIdentity,
-
     /// The owner of this card.
     pub owner: PlayerName,
 
     /// Properties of this card.
     pub properties: CardProperties,
+
+    /// Abilities of this card.
+    pub abilities: Vec<Ability>,
 
     /// Whether this card is revealed to its owner.
     pub revealed_to_owner: bool,
@@ -40,15 +40,15 @@ pub struct CardData {
 impl CardData {
     pub fn new(
         id: CardInstanceId,
-        identity: CardIdentity,
         owner: PlayerName,
         properties: CardProperties,
+        abilities: Vec<Ability>,
     ) -> Self {
         Self {
             id,
-            identity,
             owner,
             properties,
+            abilities,
             revealed_to_owner: false,
             revealed_to_opponent: false,
             targets: Vec::new(),

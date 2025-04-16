@@ -6,7 +6,6 @@ version = 4
 name = "ability_data"
 version = "0.0.0"
 dependencies = [
- "battle_data",
  "core_data",
  "schemars",
  "serde",
@@ -310,6 +309,7 @@ checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
 name = "battle_data"
 version = "0.0.0"
 dependencies = [
+ "ability_data",
  "ai_data",
  "core_data",
  "enum-iterator",

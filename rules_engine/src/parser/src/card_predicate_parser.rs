@@ -1,7 +1,7 @@
 use ability_data::predicate::{CardPredicate, Operator};
-use battle_data::battle_cards::card_types::CharacterType;
 use chumsky::prelude::choice;
 use chumsky::Parser;
+use core_data::card_types::CharacterType;
 use core_data::numerics::{Energy, Spark};
 
 use crate::parser_utils::{a_or_an, numeric, phrase, ErrorType};

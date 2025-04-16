@@ -1,6 +1,5 @@
+use core_data::card_types::CardType;
 use core_data::numerics::{Energy, Spark};
-
-use crate::battle_cards::card_types::CardType;
 
 #[derive(Clone, Debug)]
 pub struct CardProperties {

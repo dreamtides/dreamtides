@@ -1,6 +1,7 @@
 use std::collections::{BTreeSet, VecDeque};
 
-use core_data::identifiers::{CardId, CardIdentity};
+use ability_data::ability::Ability;
+use core_data::identifiers::CardId;
 use core_data::types::PlayerName;
 use slotmap::SlotMap;
 
@@ -92,15 +93,15 @@ impl AllCards {
     /// This does *not* make the card revealed to any player.
     pub fn create_card(
         &mut self,
-        identity: CardIdentity,
         owner: PlayerName,
         zone: Zone,
         properties: CardProperties,
+        abilities: Vec<Ability>,
     ) -> CardId {
         let object_id = self.new_object_id();
         let tmp_instance_id = create_card_instance_id(zone, object_id, CardId::default());
         let card_data_id =
-            self.cards.insert(CardData::new(tmp_instance_id, identity, owner, properties));
+            self.cards.insert(CardData::new(tmp_instance_id, owner, properties, abilities));
         self.cards[card_data_id].internal_set_id(create_card_instance_id(
             zone,
             object_id,
