@@ -27,7 +27,8 @@ pub fn random_playout(c: &mut Criterion) {
                 || {
                     new_test_battle::create_and_start(
                         BattleId(Uuid::new_v4()),
-                        GameAI::RandomAction,
+                        Some(GameAI::RandomAction),
+                        Some(GameAI::RandomAction),
                     )
                 },
                 |mut battle| run_battle_until_completion(&mut battle),

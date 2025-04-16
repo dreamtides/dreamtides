@@ -1,7 +1,7 @@
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_cards::card_id::{CardIdType, HandCardId};
 use battle_data::battle_cards::zone::Zone;
-use core_data::source::Source;
+use core_data::effect_source::EffectSource;
 use core_data::types::PlayerName;
 
 use crate::zone_mutations::move_card;
@@ -13,7 +13,7 @@ use crate::zone_mutations::move_card;
 /// card was drawn (e.g. if the draw was prevented by a game effect).
 pub fn draw_card(
     battle: &mut BattleData,
-    source: Source,
+    source: EffectSource,
     player: PlayerName,
 ) -> Option<HandCardId> {
     let Some(&id) = battle.cards.deck(player).back() else {
@@ -30,7 +30,7 @@ pub fn draw_card(
 /// Returns the new [HandCardId]s for the cards that were drawn, if any.
 pub fn draw_cards(
     battle: &mut BattleData,
-    source: Source,
+    source: EffectSource,
     player: PlayerName,
     count: u32,
 ) -> Vec<HandCardId> {

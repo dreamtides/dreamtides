@@ -919,6 +919,9 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
             *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
             PerformActionResponse { metadata, commands: CommandSequence::sequential(commands) }
         }
+        _ => {
+            todo!("Implement {:?}", action)
+        }
     }
 }
 

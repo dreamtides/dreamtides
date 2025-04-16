@@ -2,7 +2,7 @@ use core_data::card_types::CharacterType;
 use core_data::numerics::{Energy, Spark};
 use serde::{Deserialize, Serialize};
 
-/// Specifies which game object is being effected by a card.
+/// Specifies which game object is being affected by a card.
 ///
 /// This is used for both targeting constraints as well as describing the
 /// implicit target of an effect.

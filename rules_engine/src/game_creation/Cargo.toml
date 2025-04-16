@@ -17,4 +17,4 @@ core_data = { path = "../core_data" }
 
 rand = "0.9"
 rand_xoshiro = "0.7"
-uuid = { version = "1", features = ["serde"] }
+uuid = { version = "1", features = ["serde", "v4"] }

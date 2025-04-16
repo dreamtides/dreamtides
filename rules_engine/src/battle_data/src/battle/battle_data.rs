@@ -10,6 +10,7 @@ use crate::battle_animations::animation_data::{AnimationData, AnimationStep};
 use crate::battle_animations::battle_animation::BattleAnimation;
 use crate::battle_cards::all_cards::AllCards;
 use crate::battle_player::player_data::PlayerData;
+use crate::prompts::prompt_data::PromptData;
 
 /// Contains data types for a "battle", a single instance of playing a game
 /// against an enemy.
@@ -45,6 +46,12 @@ pub struct BattleData {
     /// Animation tracker for this battle. If this is None it means we are not
     /// currently rendering for display.
     pub animations: Option<AnimationData>,
+
+    /// Prompt to display to a player.
+    ///
+    /// Only one prompt may be active at a time. It is an error to attempt to
+    /// display another prompt while a choice is pending.
+    pub prompt: Option<PromptData>,
 }
 
 impl BattleData {
@@ -81,6 +88,7 @@ impl BattleData {
                 step: self.step,
                 rng: self.rng.clone(),
                 animations: None,
+                prompt: self.prompt.clone(),
             };
             animations.steps.push(AnimationStep { snapshot, animation: update() });
         }

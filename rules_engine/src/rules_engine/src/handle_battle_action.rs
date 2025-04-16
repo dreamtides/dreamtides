@@ -15,10 +15,19 @@ pub fn execute(
     action: BattleAction,
 ) -> CommandSequence {
     battle_actions::execute(battle, player, action);
+
     let Some(next_player) = legal_actions::next_to_act(battle) else {
         // Game over.
         return renderer::render_updates(battle);
     };
+
+    // Check if the only legal action is ResolveStack and automatically execute it
+    let legal_actions =
+        legal_actions::compute(battle, next_player, legal_actions::LegalActions::default());
+    if legal_actions == vec![BattleAction::ResolveStack] {
+        return execute(battle, next_player, BattleAction::ResolveStack);
+    }
+
     if let Some(agent) = battle.player(next_player).ai.as_ref() {
         let next_action = agent_search::select_action(battle, next_player, agent);
         execute(battle, next_player, next_action)

@@ -1,7 +1,7 @@
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_cards::card_id::{CardIdType, ObjectId};
 use battle_data::battle_cards::zone::Zone;
-use core_data::source::Source;
+use core_data::effect_source::EffectSource;
 use tracing::debug;
 
 /// Moves a card to a new zone, updates indices, assigns a new
@@ -13,7 +13,7 @@ use tracing::debug;
 /// [ObjectId] for the card.
 pub fn run(
     battle: &mut BattleData,
-    _source: Source,
+    _source: EffectSource,
     id: impl CardIdType,
     new: Zone,
 ) -> Option<ObjectId> {

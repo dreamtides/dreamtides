@@ -8,10 +8,16 @@ use crate::game_action::GameAction;
 #[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum BattleAction {
+    /// Play a card
     PlayCard(CardId),
-    /// Select a card by ID in resopnse to some prompt, e.g. as a target of a
+    /// Pass on taking actions in response to a card being played by the
+    /// opponent, thus causing the stack to be resolved.
+    ResolveStack,
+    /// Select a card by ID in response to some prompt, e.g. as a target of a
     /// card being played.
     SelectCard(CardId),
+    /// End the turn
+    EndTurn,
     /// Sets the position of a card in a card order selector.
     SelectCardOrder(SelectCardOrder),
     /// Show cards in a zone
@@ -20,8 +26,6 @@ pub enum BattleAction {
     CloseCardBrowser,
     /// Toggle the visibility of the card order selector
     ToggleOrderSelectorVisibility,
-    /// End the turn
-    EndTurn,
     /// Confirm the selected cards to mulligan
     SubmitMulligan,
 }

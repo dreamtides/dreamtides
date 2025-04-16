@@ -149,6 +149,7 @@ samply: build-release-with-debug
 
 samply-benchmark *args='':
     #!/bin/zsh
+    rm ./rules_engine/target/release/deps/benchmarks-*
     cargo criterion --manifest-path rules_engine/Cargo.toml --no-run
     ALL_BENCHMARKS=`echo ./rules_engine/target/release/deps/benchmarks-*`
     echo "Found benchmark binaries" $ALL_BENCHMARKS

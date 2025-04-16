@@ -22,7 +22,7 @@ parser = { path = "../src/parser", version = "0.0.0" }
 
 tracing = "0.1"
 tracing-subscriber = { version = "0.3.17", features = ["env-filter", "serde"] }
-uuid = { version = "1", features = ["serde"] }
+uuid = { version = "1", features = ["serde", "v4"] }
 
 [dev-dependencies]
 criterion = { version = "0.5.1", features = ["html_reports"] }

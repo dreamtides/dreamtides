@@ -336,6 +336,7 @@ dependencies = [
 name = "battle_queries"
 version = "0.0.0"
 dependencies = [
+ "ability_data",
  "action_data",
  "battle_data",
  "core_data",
