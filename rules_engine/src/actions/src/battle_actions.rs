@@ -1,6 +1,6 @@
 use action_data::battle_action::BattleAction;
 use battle_data::battle::battle_data::BattleData;
-use battle_mutations::play_cards::{play_card, resolve_cards};
+use battle_mutations::play_cards::{play_card, resolve_cards, select_card};
 use battle_mutations::turn_step_mutations::end_turn;
 use core_data::effect_source::EffectSource;
 use core_data::types::PlayerName;
@@ -17,6 +17,9 @@ pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction
         }
         BattleAction::EndTurn => {
             end_turn::run(battle, EffectSource::Game);
+        }
+        BattleAction::SelectCard(card_id) => {
+            select_card::select_for_prompt(battle, EffectSource::Game, card_id);
         }
         _ => {
             todo!("Implement {:?}", action);
