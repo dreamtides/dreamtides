@@ -1,3 +1,4 @@
+use ability_data::ability::Ability;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_cards::card_id::ObjectId;
 use battle_data::battle_cards::zone::Zone;
@@ -6,10 +7,11 @@ use core_data::identifiers::CardId;
 use core_data::source::Source;
 use core_data::types::PlayerName;
 
+use crate::effects::apply_effect;
 use crate::player_mutations::energy;
 use crate::zone_mutations::move_card;
 
-/// Attempts to play a card as `player`.
+/// Attempts to play a card to the stack as `player`.
 ///
 /// Returns the [ObjectId] of the card it its new zone if the card was played
 /// successfully, otherwise returns `None`, e.g. if this card is prevented from
@@ -24,12 +26,32 @@ pub fn execute(
         energy::spend(battle, player, source, energy_cost);
     }
     battle.cards.card_mut(card_id)?.revealed_to_opponent = true;
+    apply_event_effects(battle, source, card_id);
     move_card::run(
         battle,
         source,
         card_id,
         destination_zone(battle.cards.card(card_id)?.properties.card_type),
     )
+}
+
+fn apply_event_effects(battle: &mut BattleData, source: Source, card_id: CardId) -> Option<()> {
+    let effects = battle
+        .cards
+        .card(card_id)?
+        .abilities
+        .iter()
+        .filter_map(|ability| match ability {
+            Ability::Event(effect) => Some(effect),
+            _ => None,
+        })
+        .cloned()
+        .collect::<Vec<_>>();
+
+    for effect in effects {
+        apply_effect::apply(battle, source, effect, battle.cards.card(card_id)?.targets.clone());
+    }
+    Some(())
 }
 
 fn destination_zone(card_type: CardType) -> Zone {

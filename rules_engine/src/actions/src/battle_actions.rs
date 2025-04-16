@@ -1,6 +1,6 @@
 use action_data::battle_action::BattleAction;
 use battle_data::battle::battle_data::BattleData;
-use battle_mutations::play_card_mutations::play_card;
+use battle_mutations::play_cards::play_card;
 use battle_mutations::turn_step_mutations::end_turn;
 use core_data::source::Source;
 use core_data::types::PlayerName;

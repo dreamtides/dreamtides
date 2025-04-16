@@ -325,6 +325,7 @@ dependencies = [
 name = "battle_mutations"
 version = "0.0.0"
 dependencies = [
+ "ability_data",
  "battle_data",
  "battle_queries",
  "core_data",
@@ -870,6 +871,7 @@ dependencies = [
 name = "game_creation"
 version = "0.0.0"
 dependencies = [
+ "ability_data",
  "ai_data",
  "battle_data",
  "battle_mutations",

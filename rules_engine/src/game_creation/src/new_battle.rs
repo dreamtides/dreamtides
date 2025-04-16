@@ -1,3 +1,7 @@
+use ability_data::ability::Ability;
+use ability_data::effect::Effect;
+use ability_data::predicate::{CardPredicate, Predicate};
+use ability_data::standard_effect::StandardEffect;
 use ai_data::game_ai::GameAI;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
@@ -46,28 +50,18 @@ pub fn create_and_start(id: BattleId) -> BattleData {
         request_context: RequestContext::UserRequest,
         animations: Some(AnimationData::default()),
     };
-    create_cards(&mut battle);
+    create_cards(&mut battle, PlayerName::User);
+    create_cards(&mut battle, PlayerName::Enemy);
     battle.status = BattleStatus::Playing;
     deck::draw_cards(&mut battle, Source::Game, PlayerName::User, 3);
     deck::draw_cards(&mut battle, Source::Game, PlayerName::Enemy, 4);
     battle
 }
 
-fn create_cards(battle: &mut BattleData) {
+fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
     for _ in 0..30 {
         battle.cards.create_card(
-            PlayerName::User,
-            Zone::Deck,
-            CardProperties {
-                spark: Some(Spark(rand::rng().random_range(1..=5))),
-                cost: Some(Energy(rand::rng().random_range(1..=5))),
-                card_type: CardType::Character(CharacterType::Explorer),
-                is_fast: false,
-            },
-            vec![],
-        );
-        battle.cards.create_card(
-            PlayerName::Enemy,
+            player_name,
             Zone::Deck,
             CardProperties {
                 spark: Some(Spark(rand::rng().random_range(1..=5))),
@@ -78,4 +72,18 @@ fn create_cards(battle: &mut BattleData) {
             vec![],
         );
     }
+
+    battle.cards.create_card(
+        player_name,
+        Zone::Deck,
+        CardProperties {
+            spark: None,
+            cost: Some(Energy(2)),
+            card_type: CardType::Event,
+            is_fast: true,
+        },
+        vec![Ability::Event(Effect::Effect(StandardEffect::DissolveCharacter {
+            target: Predicate::Enemy(CardPredicate::Character),
+        }))],
+    );
 }
