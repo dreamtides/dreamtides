@@ -1,20 +1,24 @@
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_cards::card_data::TargetId;
+use battle_data::battle_cards::card_id::CharacterId;
 use battle_data::battle_cards::card_instance_id::CardInstanceId;
 use battle_data::prompts::prompt_data::Prompt;
 use core_data::effect_source::EffectSource;
-use core_data::identifiers::CardId;
 use tracing::info;
 
 /// Applies whatever game effect is required for a card being selected in the
 /// UI, e.g. setting it as a chosen target of a card on the stack.
-pub fn select_for_prompt(battle: &mut BattleData, _source: EffectSource, card_id: CardId) {
+pub fn select_for_prompt(
+    battle: &mut BattleData,
+    _source: EffectSource,
+    character_id: CharacterId,
+) {
     assert!(battle.prompt.is_some(), "No active prompt when selecting a card");
     let prompt = battle.prompt.as_ref().expect("Prompt should exist");
 
     match &prompt.prompt {
         Prompt::ChooseCharacter { valid } => {
-            let card = battle.cards.card(card_id);
+            let card = battle.cards.card(character_id);
             assert!(card.is_some(), "Selected card does not exist");
             let character_id = match card.expect("Card should exist").id {
                 CardInstanceId::Battlefield(char_id) if valid.contains(&char_id) => char_id,

@@ -33,12 +33,12 @@ impl AllCards {
     /// a token which has been destroyed, a permanent which is no longer on the
     /// battlefield, etc.
     pub fn card(&self, id: impl CardIdType) -> Option<&CardData> {
-        self.cards.get(id.card_identifier(self)?)
+        self.cards.get(id.card_id())
     }
 
     /// Mutable equivalent of [Self::card]
     pub fn card_mut(&mut self, id: impl CardIdType) -> Option<&mut CardData> {
-        self.cards.get_mut(id.card_identifier(self)?)
+        self.cards.get_mut(id.card_id())
     }
 
     /// Returns all currently known cards in an undefined order
@@ -54,7 +54,7 @@ impl AllCards {
     /// Returns an iterator over all characters on the battlefield for a given
     /// player.
     pub fn battlefield_cards(&self, player_name: PlayerName) -> impl Iterator<Item = &CardData> {
-        self.battlefield.cards(player_name).iter().map(|id| &self.cards[id.0.card_id])
+        self.battlefield.cards(player_name).iter().map(|id| &self.cards[id.card_id()])
     }
 
     /// Returns the set of cards in the void for a given player.
@@ -80,7 +80,7 @@ impl AllCards {
     /// Returns an iterator over all characters on the battlefield for a given
     /// player.
     pub fn hand_cards(&self, player_name: PlayerName) -> impl Iterator<Item = &CardData> {
-        self.hand.cards(player_name).iter().map(|id| &self.cards[id.0.card_id])
+        self.hand.cards(player_name).iter().map(|id| &self.cards[id.card_id()])
     }
 
     /// Returns the set of banished cards for a given player.
@@ -99,15 +99,16 @@ impl AllCards {
         abilities: Vec<Ability>,
     ) -> CardId {
         let object_id = self.new_object_id();
-        let tmp_instance_id = create_card_instance_id(zone, object_id, CardId::default());
-        let card_data_id =
-            self.cards.insert(CardData::new(tmp_instance_id, owner, properties, abilities));
-        self.cards[card_data_id].internal_set_id(create_card_instance_id(
-            zone,
+        let tmp_instance_id = create_card_instance_id(zone, CardId::default());
+        let card_data_id = self.cards.insert(CardData::new(
+            tmp_instance_id,
+            owner,
             object_id,
-            card_data_id,
+            properties,
+            abilities,
         ));
-        self.add_to_zone(owner, card_data_id, object_id, zone);
+        self.cards[card_data_id].internal_set_id(create_card_instance_id(zone, card_data_id));
+        self.add_to_zone(owner, card_data_id, zone);
         card_data_id
     }
 
@@ -118,12 +119,12 @@ impl AllCards {
     /// Returns the new ObjectId for the card if a moved occurred, or None if
     /// the card was not found.
     pub fn move_card(&mut self, card_id: impl CardIdType, to: Zone) -> Option<ObjectId> {
-        let card_data_id = card_id.card_identifier(self)?;
-        let card = self.card(card_data_id)?;
+        let id = card_id.card_id();
+        let card = self.card(id)?;
         let owner = card.owner;
         self.remove_from_zone(owner, card.id);
         let object_id = self.new_object_id();
-        self.add_to_zone(owner, card_data_id, object_id, to)?;
+        self.add_to_zone(owner, id, to)?;
         Some(object_id)
     }
 
@@ -133,14 +134,8 @@ impl AllCards {
         result
     }
 
-    fn add_to_zone(
-        &mut self,
-        owner: PlayerName,
-        card_id: CardId,
-        new_object_id: ObjectId,
-        zone: Zone,
-    ) -> Option<()> {
-        let instance_id = create_card_instance_id(zone, new_object_id, card_id);
+    fn add_to_zone(&mut self, owner: PlayerName, card_id: CardId, zone: Zone) -> Option<()> {
+        let instance_id = create_card_instance_id(zone, card_id);
         self.card_mut(card_id)?.internal_set_id(instance_id);
 
         match instance_id {
@@ -183,14 +178,14 @@ impl AllCards {
     }
 }
 
-fn create_card_instance_id(zone: Zone, object_id: ObjectId, card_id: CardId) -> CardInstanceId {
+fn create_card_instance_id(zone: Zone, card_id: CardId) -> CardInstanceId {
     match zone {
-        Zone::Banished => CardInstanceId::Banished(BanishedCardId::new(object_id, card_id)),
-        Zone::Battlefield => CardInstanceId::Battlefield(CharacterId::new(object_id, card_id)),
-        Zone::Deck => CardInstanceId::Deck(DeckCardId::new(object_id, card_id)),
-        Zone::Hand => CardInstanceId::Hand(HandCardId::new(object_id, card_id)),
-        Zone::Stack => CardInstanceId::Stack(StackCardId::new(object_id, card_id)),
-        Zone::Void => CardInstanceId::Void(VoidCardId::new(object_id, card_id)),
+        Zone::Banished => CardInstanceId::Banished(BanishedCardId(card_id)),
+        Zone::Battlefield => CardInstanceId::Battlefield(CharacterId(card_id)),
+        Zone::Deck => CardInstanceId::Deck(DeckCardId(card_id)),
+        Zone::Hand => CardInstanceId::Hand(HandCardId(card_id)),
+        Zone::Stack => CardInstanceId::Stack(StackCardId(card_id)),
+        Zone::Void => CardInstanceId::Void(VoidCardId(card_id)),
     }
 }
 

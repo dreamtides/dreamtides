@@ -9,7 +9,7 @@ use tracing::instrument;
 #[instrument(name = "actions_execute", level = "debug", skip(battle))]
 pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction) {
     match action {
-        BattleAction::PlayCard(card_id) => {
+        BattleAction::PlayCardFromHand(card_id) => {
             play_card::execute(battle, player, EffectSource::Game, card_id);
         }
         BattleAction::ResolveStack => {
@@ -18,8 +18,8 @@ pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction
         BattleAction::EndTurn => {
             end_turn::run(battle, EffectSource::Game);
         }
-        BattleAction::SelectCard(card_id) => {
-            select_card::select_for_prompt(battle, EffectSource::Game, card_id);
+        BattleAction::SelectCharacter(character_id) => {
+            select_card::select_for_prompt(battle, EffectSource::Game, character_id);
         }
         _ => {
             todo!("Implement {:?}", action);

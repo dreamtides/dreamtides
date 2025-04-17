@@ -5,6 +5,7 @@ use action_data::battle_action::{
 };
 use action_data::debug_action::DebugAction;
 use action_data::game_action::GameAction;
+use battle_data::battle_cards::card_id::{CardIdType, CharacterId};
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::{
     AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
@@ -165,8 +166,9 @@ pub fn perform_debug_action(action: DebugAction, metadata: Metadata) -> PerformA
                     if matches!(card.position.position, Position::InHand(PlayerName::User)) {
                         if let Some(revealed) = &mut card.revealed {
                             // Set on_click action to select this card
-                            revealed.actions.on_click =
-                                Some(GameAction::BattleAction(BattleAction::SelectCard(card.id)));
+                            revealed.actions.on_click = Some(GameAction::BattleAction(
+                                BattleAction::SelectCharacter(CharacterId(card.id)),
+                            ));
                             // Disable can_play action
                             revealed.actions.can_play = false;
                             // Set visual status to indicate selectable
@@ -314,7 +316,8 @@ fn draw_card(battle: &mut BattleView) -> Option<CardView> {
 
 fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformActionResponse {
     match action {
-        BattleAction::PlayCard(card_id) => {
+        BattleAction::PlayCardFromHand(id) => {
+            let card_id = id.card_id();
             let mut commands = Vec::new();
             let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
             if let Some((card_index, card)) =
@@ -349,7 +352,7 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
                         ) {
                             if let Some(revealed) = &mut card.revealed {
                                 revealed.actions.on_click = Some(GameAction::BattleAction(
-                                    BattleAction::SelectCard(card.id),
+                                    BattleAction::SelectCharacter(CharacterId(card.id)),
                                 ));
                                 revealed.outline_color = Some(display_color::RED_500);
                             }
@@ -491,7 +494,8 @@ fn perform_battle_action(action: BattleAction, metadata: Metadata) -> PerformAct
             commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle)));
             PerformActionResponse { metadata, commands: CommandSequence::sequential(commands) }
         }
-        BattleAction::SelectCard(card_id) => {
+        BattleAction::SelectCharacter(id) => {
+            let card_id = id.card_id();
             let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
 
             // Check if we're in mulligan mode

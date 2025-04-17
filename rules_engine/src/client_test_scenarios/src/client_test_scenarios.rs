@@ -7,6 +7,7 @@ use action_data::battle_action::{
 };
 use action_data::debug_action::DebugAction;
 use action_data::game_action::GameAction;
+use battle_data::battle_cards::card_id::{CardIdType, CharacterId};
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::{
     AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
@@ -69,10 +70,10 @@ fn perform_battle_action(
     scenario: &str,
 ) -> PerformActionResponse {
     let commands = match action {
-        BattleAction::PlayCard(card_id) => play_card(card_id, scenario),
+        BattleAction::PlayCardFromHand(id) => play_card(id.card_id(), scenario),
         BattleAction::BrowseCards(card_browser) => browse_cards(card_browser),
         BattleAction::CloseCardBrowser => close_card_browser(),
-        BattleAction::SelectCard(card_id) => select_card(card_id),
+        BattleAction::SelectCharacter(id) => select_card(id.card_id()),
         BattleAction::SelectCardOrder(select_order) => select_card_order(select_order),
         _ => {
             panic!("Not implemented: {:?}", action);
@@ -294,8 +295,9 @@ fn play_card_with_targets(battle: &mut BattleView, card_id: CardId, stack: Stack
     for card in battle.cards.iter_mut() {
         if matches!(card.position.position, Position::OnBattlefield(PlayerName::Enemy)) {
             if let Some(revealed) = &mut card.revealed {
-                revealed.actions.on_click =
-                    Some(GameAction::BattleAction(BattleAction::SelectCard(card.id)));
+                revealed.actions.on_click = Some(GameAction::BattleAction(
+                    BattleAction::SelectCharacter(CharacterId(card.id)),
+                ));
                 revealed.outline_color = Some(display_color::RED_500);
             }
         }

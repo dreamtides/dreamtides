@@ -1,6 +1,7 @@
 use action_data::battle_action::BattleAction;
 use action_data::game_action::GameAction;
 use battle_data::battle::battle_data::BattleData;
+use battle_data::battle_cards::card_id::{CardIdType, CharacterId};
 use battle_data::prompts::prompt_data::Prompt;
 use battle_queries::legal_action_queries::legal_actions;
 use core_data::display_color;
@@ -17,7 +18,7 @@ use crate::rendering::positions;
 
 pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardView {
     CardView {
-        id: context.card().id.card_identifier_for_display(),
+        id: context.card().id.card_id(),
         position: positions::calculate(context.card()),
         revealed: context
             .card()
@@ -33,13 +34,16 @@ pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardVi
 
 fn revealed_card_view(_builder: &ResponseBuilder, context: &CardViewContext) -> RevealedCardView {
     let battle = context.battle();
-    let card_id = context.card().id.card_identifier_for_display();
+    let card_id = context.card().id.card_id();
 
-    let can_play =
-        legal_actions::compute(battle, PlayerName::User, legal_actions::LegalActions::default())
-            .into_iter()
-            .any(|action| matches!(action, BattleAction::PlayCard(id) if id == card_id));
-    let can_select = is_selection_target(context.battle(), card_id);
+    let can_play = legal_actions::compute(
+        battle,
+        PlayerName::User,
+        legal_actions::LegalActions::default(),
+    )
+    .into_iter()
+    .any(|action| matches!(action, BattleAction::PlayCardFromHand(id) if id.card_id() == card_id));
+    let selection_target = character_selection_target(context.battle(), card_id);
 
     RevealedCardView {
         image: DisplayImage {
@@ -47,7 +51,7 @@ fn revealed_card_view(_builder: &ResponseBuilder, context: &CardViewContext) -> 
                 "Assets/ThirdParty/GameAssets/CardImages/Standard/2521694543.png",
             ),
         },
-        name: format!("{:?}", context.card().id.card_identifier_for_display()),
+        name: format!("{:?}", context.card().id.card_id()),
         cost: context.card().properties.cost,
         produced: None,
         spark: context.card().properties.spark,
@@ -55,31 +59,31 @@ fn revealed_card_view(_builder: &ResponseBuilder, context: &CardViewContext) -> 
         rules_text: format!("{:?}", context.card().abilities),
         outline_color: match () {
             _ if can_play => Some(display_color::GREEN),
-            _ if can_select => Some(display_color::RED_500),
+            _ if selection_target.is_some() => Some(display_color::RED_500),
             _ => None,
         },
         supplemental_card_info: None,
         is_fast: false,
         actions: CardActions {
             can_play,
-            on_click: can_select
-                .then_some(GameAction::BattleAction(BattleAction::SelectCard(card_id))),
+            on_click: selection_target
+                .map(|id| GameAction::BattleAction(BattleAction::SelectCharacter(id))),
             ..Default::default()
         },
         effects: CardEffects::default(),
     }
 }
 
-fn is_selection_target(battle: &BattleData, card_id: CardId) -> bool {
+fn character_selection_target(battle: &BattleData, card_id: CardId) -> Option<CharacterId> {
     if let Some(prompt_data) = &battle.prompt {
         if prompt_data.player == PlayerName::User {
             match &prompt_data.prompt {
                 Prompt::ChooseCharacter { valid } => {
-                    return valid.iter().any(|target_id| target_id.0.card_id == card_id)
+                    return valid.iter().find(|target_id| target_id.card_id() == card_id).copied()
                 }
             }
         }
     }
 
-    false
+    None
 }

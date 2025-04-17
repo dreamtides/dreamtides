@@ -15,6 +15,7 @@ dependencies = [
 name = "action_data"
 version = "0.0.0"
 dependencies = [
+ "battle_data",
  "core_data",
  "schemars",
  "serde",
@@ -535,6 +536,7 @@ name = "client_test_scenarios"
 version = "0.0.0"
 dependencies = [
  "action_data",
+ "battle_data",
  "core_data",
  "display_data",
  "masonry",

@@ -1,8 +1,7 @@
 use battle_data::battle::battle_data::BattleData;
-use battle_data::battle_cards::card_id::{ObjectId, StackCardId};
+use battle_data::battle_cards::card_id::{HandCardId, ObjectId, StackCardId};
 use battle_data::battle_cards::zone::Zone;
 use core_data::effect_source::EffectSource;
-use core_data::identifiers::CardId;
 use core_data::types::PlayerName;
 
 use crate::play_cards::target_prompt::add_target_prompt;
@@ -19,13 +18,13 @@ pub fn execute(
     battle: &mut BattleData,
     player: PlayerName,
     source: EffectSource,
-    card_id: CardId,
+    card_id: HandCardId,
 ) -> Option<ObjectId> {
     if let Some(energy_cost) = battle.cards.card(card_id)?.properties.cost {
         energy::spend(battle, player, source, energy_cost);
     }
     battle.cards.card_mut(card_id)?.revealed_to_opponent = true;
     let object_id = move_card::run(battle, source, card_id, Zone::Stack)?;
-    add_target_prompt(battle, source, StackCardId::new(object_id, card_id));
+    add_target_prompt(battle, source, StackCardId(card_id.0));
     Some(object_id)
 }

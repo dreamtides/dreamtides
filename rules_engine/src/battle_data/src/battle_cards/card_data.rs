@@ -3,7 +3,7 @@ use core_data::numerics::TurnId;
 use core_data::types::PlayerName;
 
 use crate::battle::turn_data::TurnData;
-use crate::battle_cards::card_id::{CharacterId, StackCardId};
+use crate::battle_cards::card_id::{CharacterId, ObjectId, StackCardId};
 use crate::battle_cards::card_instance_id::CardInstanceId;
 use crate::battle_cards::card_properties::CardProperties;
 use crate::battle_cards::zone::Zone;
@@ -15,6 +15,9 @@ pub struct CardData {
 
     /// The owner of this card.
     pub owner: PlayerName,
+
+    /// Unique identifier for this card within a zone.
+    pub object_id: ObjectId,
 
     /// Properties of this card.
     pub properties: CardProperties,
@@ -41,12 +44,14 @@ impl CardData {
     pub fn new(
         id: CardInstanceId,
         owner: PlayerName,
+        object_id: ObjectId,
         properties: CardProperties,
         abilities: Vec<Ability>,
     ) -> Self {
         Self {
             id,
             owner,
+            object_id,
             properties,
             abilities,
             revealed_to_owner: false,

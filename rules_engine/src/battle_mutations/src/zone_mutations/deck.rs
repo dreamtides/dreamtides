@@ -1,5 +1,5 @@
 use battle_data::battle::battle_data::BattleData;
-use battle_data::battle_cards::card_id::{CardIdType, HandCardId};
+use battle_data::battle_cards::card_id::HandCardId;
 use battle_data::battle_cards::zone::Zone;
 use core_data::effect_source::EffectSource;
 use core_data::types::PlayerName;
@@ -19,10 +19,9 @@ pub fn draw_card(
     let Some(&id) = battle.cards.deck(player).back() else {
         todo!("Todo: implement this");
     };
-    let identifier = id.card_identifier(&battle.cards)?;
-    let object_id = move_card::run(battle, source, id, Zone::Hand)?;
-    battle.cards.card_mut(identifier)?.revealed_to_owner = true;
-    Some(HandCardId::new(object_id, identifier))
+    move_card::run(battle, source, id, Zone::Hand)?;
+    battle.cards.card_mut(id)?.revealed_to_owner = true;
+    Some(HandCardId(id.0))
 }
 
 /// Draw a number of cards from `player`'s deck and put them into their hand.

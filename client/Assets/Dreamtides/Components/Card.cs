@@ -438,7 +438,7 @@ namespace Dreamtides.Components
           {
             BattleActionClass = new()
             {
-              PlayCard = CardView.Id
+              PlayCardFromHand = CardView.Id
             }
           }
         };

@@ -1,9 +1,7 @@
 use core_data::identifiers::CardId;
 
-use crate::battle_cards::all_cards::AllCards;
 use crate::battle_cards::card_id::{
-    BanishedCardId, CardIdType, CharacterId, DeckCardId, HandCardId, ObjectId, StackCardId,
-    VoidCardId,
+    BanishedCardId, CardIdType, CharacterId, DeckCardId, HandCardId, StackCardId, VoidCardId,
 };
 use crate::battle_cards::zone::Zone;
 
@@ -19,14 +17,14 @@ pub enum CardInstanceId {
 }
 
 impl CardIdType for CardInstanceId {
-    fn card_identifier(&self, cards: &AllCards) -> Option<CardId> {
+    fn card_id(self) -> CardId {
         match self {
-            Self::Banished(id) => id.card_identifier(cards),
-            Self::Battlefield(id) => id.card_identifier(cards),
-            Self::Deck(id) => id.card_identifier(cards),
-            Self::Hand(id) => id.card_identifier(cards),
-            Self::Stack(id) => id.card_identifier(cards),
-            Self::Void(id) => id.card_identifier(cards),
+            Self::Banished(id) => id.card_id(),
+            Self::Battlefield(id) => id.card_id(),
+            Self::Deck(id) => id.card_id(),
+            Self::Hand(id) => id.card_id(),
+            Self::Stack(id) => id.card_id(),
+            Self::Void(id) => id.card_id(),
         }
     }
 }
@@ -40,31 +38,6 @@ impl CardInstanceId {
             Self::Hand(_) => Zone::Hand,
             Self::Stack(_) => Zone::Stack,
             Self::Void(_) => Zone::Void,
-        }
-    }
-
-    pub fn object_id(&self) -> ObjectId {
-        match self {
-            Self::Banished(id) => id.0.object_id,
-            Self::Battlefield(id) => id.0.object_id,
-            Self::Deck(id) => id.0.object_id,
-            Self::Hand(id) => id.0.object_id,
-            Self::Stack(id) => id.0.object_id,
-            Self::Void(id) => id.0.object_id,
-        }
-    }
-
-    /// Returns card identifier for use in UI.
-    ///
-    /// Note that this bypasses existence checks for the ID.
-    pub fn card_identifier_for_display(&self) -> CardId {
-        match self {
-            Self::Banished(id) => id.0.card_id,
-            Self::Battlefield(id) => id.0.card_id,
-            Self::Deck(id) => id.0.card_id,
-            Self::Hand(id) => id.0.card_id,
-            Self::Stack(id) => id.0.card_id,
-            Self::Void(id) => id.0.card_id,
         }
     }
 }

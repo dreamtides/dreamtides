@@ -682,7 +682,10 @@ namespace Dreamtides.Schema
     }
 
     /// <summary>
-    /// Select a card by ID in resopnse to some prompt, e.g. as a target of a card being played.
+    /// Play a card in the user's hand.
+    ///
+    /// Select a character by ID in response to some prompt, e.g. as a target of a  card being
+    /// played.
     ///
     /// Sets the position of a card in a card order selector.
     ///
@@ -690,11 +693,11 @@ namespace Dreamtides.Schema
     /// </summary>
     public partial class BattleActionClass
     {
-        [JsonProperty("playCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public CardId PlayCard { get; set; }
+        [JsonProperty("playCardFromHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public CardId PlayCardFromHand { get; set; }
 
-        [JsonProperty("selectCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public CardId SelectCard { get; set; }
+        [JsonProperty("selectCharacter", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public CardId SelectCharacter { get; set; }
 
         [JsonProperty("selectCardOrder", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SelectCardOrder SelectCardOrder { get; set; }
@@ -1684,15 +1687,18 @@ namespace Dreamtides.Schema
     public enum CardPrefab { Character, Dreamsign, Dreamwell, Enemy, Event, Token };
 
     /// <summary>
+    /// Pass on taking actions in response to a card being played by the opponent, thus causing
+    /// the stack to be resolved.
+    ///
+    /// End the turn
+    ///
     /// Close the card browser
     ///
     /// Toggle the visibility of the card order selector
     ///
-    /// End the turn
-    ///
     /// Confirm the selected cards to mulligan
     /// </summary>
-    public enum BattleActionEnum { CloseCardBrowser, EndTurn, SubmitMulligan, ToggleOrderSelectorVisibility };
+    public enum BattleActionEnum { CloseCardBrowser, EndTurn, ResolveStack, SubmitMulligan, ToggleOrderSelectorVisibility };
 
     public enum CardBrowserType { EnemyDeck, EnemyStatus, EnemyVoid, UserDeck, UserStatus, UserVoid };
 
@@ -2322,6 +2328,8 @@ namespace Dreamtides.Schema
                             return new BattleAction { Enum = BattleActionEnum.CloseCardBrowser };
                         case "endTurn":
                             return new BattleAction { Enum = BattleActionEnum.EndTurn };
+                        case "resolveStack":
+                            return new BattleAction { Enum = BattleActionEnum.ResolveStack };
                         case "submitMulligan":
                             return new BattleAction { Enum = BattleActionEnum.SubmitMulligan };
                         case "toggleOrderSelectorVisibility":
@@ -2347,6 +2355,9 @@ namespace Dreamtides.Schema
                         return;
                     case BattleActionEnum.EndTurn:
                         serializer.Serialize(writer, "endTurn");
+                        return;
+                    case BattleActionEnum.ResolveStack:
+                        serializer.Serialize(writer, "resolveStack");
                         return;
                     case BattleActionEnum.SubmitMulligan:
                         serializer.Serialize(writer, "submitMulligan");
@@ -2442,6 +2453,8 @@ namespace Dreamtides.Schema
                     return BattleActionEnum.CloseCardBrowser;
                 case "endTurn":
                     return BattleActionEnum.EndTurn;
+                case "resolveStack":
+                    return BattleActionEnum.ResolveStack;
                 case "submitMulligan":
                     return BattleActionEnum.SubmitMulligan;
                 case "toggleOrderSelectorVisibility":
@@ -2465,6 +2478,9 @@ namespace Dreamtides.Schema
                     return;
                 case BattleActionEnum.EndTurn:
                     serializer.Serialize(writer, "endTurn");
+                    return;
+                case BattleActionEnum.ResolveStack:
+                    serializer.Serialize(writer, "resolveStack");
                     return;
                 case BattleActionEnum.SubmitMulligan:
                     serializer.Serialize(writer, "submitMulligan");

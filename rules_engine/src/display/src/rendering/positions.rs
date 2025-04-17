@@ -15,6 +15,6 @@ pub fn calculate(card: &CardData) -> ObjectPosition {
 }
 
 pub fn for_card(card: &CardData, position: Position) -> ObjectPosition {
-    let sorting_key = card.id.object_id().0;
+    let sorting_key = card.object_id.0;
     ObjectPosition { position, sorting_key, sorting_sub_key: 0 }
 }

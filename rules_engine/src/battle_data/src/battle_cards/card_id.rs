@@ -2,17 +2,13 @@ use std::fmt::Debug;
 use std::hash::Hash;
 
 use core_data::identifiers::CardId;
-
-use crate::battle_cards::all_cards::AllCards;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 
 /// A trait for identifiers which correspond 1:1 with cards.
 pub trait CardIdType: Hash + Eq + PartialEq + Debug + Ord + Copy {
-    /// Returns the internal identifier for the card, if this card exists and
-    /// this identifier is currently valid.
-    ///
-    /// Normally it should not be necessary to call this method in rules engine
-    /// code.
-    fn card_identifier(&self, cards: &AllCards) -> Option<CardId>;
+    /// Returns ths associated Card Id for this type.
+    fn card_id(self) -> CardId;
 }
 
 /// An identifier for an object while it is in a given zone. A new zone object
@@ -22,113 +18,65 @@ pub trait CardIdType: Hash + Eq + PartialEq + Debug + Ord + Copy {
 pub struct ObjectId(pub u32);
 
 impl CardIdType for CardId {
-    fn card_identifier(&self, _cards: &AllCards) -> Option<CardId> {
-        Some(*self)
+    fn card_id(self) -> CardId {
+        self
     }
 }
 
-impl CardIdType for CardObjectId {
-    fn card_identifier(&self, cards: &AllCards) -> Option<CardId> {
-        if cards.card(self.card_id)?.id.object_id() == self.object_id {
-            Some(self.card_id)
-        } else {
-            None
-        }
-    }
-}
-
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub struct CardObjectId {
-    pub object_id: ObjectId,
-    pub card_id: CardId,
-}
-
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub struct CharacterId(pub CardObjectId);
-
-impl CharacterId {
-    pub fn new(object_id: ObjectId, card_id: CardId) -> Self {
-        Self(CardObjectId { object_id, card_id })
-    }
-}
+#[derive(
+    Debug, Copy, Clone, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
+pub struct CharacterId(pub CardId);
 
 impl CardIdType for CharacterId {
-    fn card_identifier(&self, cards: &AllCards) -> Option<CardId> {
-        self.0.card_identifier(cards)
+    fn card_id(self) -> CardId {
+        self.0
     }
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub struct VoidCardId(pub CardObjectId);
-
-impl VoidCardId {
-    pub fn new(object_id: ObjectId, card_id: CardId) -> Self {
-        Self(CardObjectId { object_id, card_id })
-    }
-}
+pub struct VoidCardId(pub CardId);
 
 impl CardIdType for VoidCardId {
-    fn card_identifier(&self, cards: &AllCards) -> Option<CardId> {
-        self.0.card_identifier(cards)
+    fn card_id(self) -> CardId {
+        self.0
     }
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub struct DeckCardId(pub CardObjectId);
-
-impl DeckCardId {
-    pub fn new(object_id: ObjectId, card_id: CardId) -> Self {
-        Self(CardObjectId { object_id, card_id })
-    }
-}
+pub struct DeckCardId(pub CardId);
 
 impl CardIdType for DeckCardId {
-    fn card_identifier(&self, cards: &AllCards) -> Option<CardId> {
-        self.0.card_identifier(cards)
+    fn card_id(self) -> CardId {
+        self.0
     }
 }
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub struct HandCardId(pub CardObjectId);
-
-impl HandCardId {
-    pub fn new(object_id: ObjectId, card_id: CardId) -> Self {
-        Self(CardObjectId { object_id, card_id })
-    }
-}
+#[derive(
+    Debug, Copy, Clone, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
+pub struct HandCardId(pub CardId);
 
 impl CardIdType for HandCardId {
-    fn card_identifier(&self, cards: &AllCards) -> Option<CardId> {
-        self.0.card_identifier(cards)
+    fn card_id(self) -> CardId {
+        self.0
     }
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub struct StackCardId(pub CardObjectId);
-
-impl StackCardId {
-    pub fn new(object_id: ObjectId, card_id: CardId) -> Self {
-        Self(CardObjectId { object_id, card_id })
-    }
-}
+pub struct StackCardId(pub CardId);
 
 impl CardIdType for StackCardId {
-    fn card_identifier(&self, cards: &AllCards) -> Option<CardId> {
-        self.0.card_identifier(cards)
+    fn card_id(self) -> CardId {
+        self.0
     }
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub struct BanishedCardId(pub CardObjectId);
-
-impl BanishedCardId {
-    pub fn new(object_id: ObjectId, card_id: CardId) -> Self {
-        Self(CardObjectId { object_id, card_id })
-    }
-}
+pub struct BanishedCardId(pub CardId);
 
 impl CardIdType for BanishedCardId {
-    fn card_identifier(&self, cards: &AllCards) -> Option<CardId> {
-        self.0.card_identifier(cards)
+    fn card_id(self) -> CardId {
+        self.0
     }
 }

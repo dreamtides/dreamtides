@@ -1,10 +1,11 @@
 use action_data::battle_action::BattleAction;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
-use battle_data::battle_cards::card_data::CardData;
 use battle_data::prompts::prompt_data::Prompt;
 use core_data::types::PlayerName;
 use tracing::instrument;
+
+use crate::legal_action_queries::can_play_card;
 
 #[derive(Debug, Default, Clone, Copy)]
 pub struct LegalActions {
@@ -30,14 +31,13 @@ pub fn compute(
         if prompt_data.player == player {
             match &prompt_data.prompt {
                 Prompt::ChooseCharacter { valid } => {
-                    return valid.iter().map(|id| BattleAction::SelectCard(id.0.card_id)).collect()
+                    return valid.iter().map(|&id| BattleAction::SelectCharacter(id)).collect()
                 }
             }
         }
     }
 
     let is_active_player = battle.turn.active_player == player;
-    let player_data = battle.player(player);
     let mut actions = Vec::new();
 
     let stack = battle.cards.stack();
@@ -54,38 +54,21 @@ pub fn compute(
         }
     }
 
-    if is_active_player && !has_stack_cards {
-        // Only the active player can play cards when the stack is empty
-        for card in battle.cards.hand_cards(player) {
-            if let Some(cost) = card.properties.cost {
-                if cost <= player_data.current_energy {
-                    actions.push(BattleAction::PlayCard(card.id.card_identifier_for_display()));
-                }
-            }
-        }
-    } else if has_stack_cards {
-        // When the stack has cards, only fast cards can be played
-        for card in battle.cards.hand_cards(player) {
-            if let Some(cost) = card.properties.cost {
-                if cost <= player_data.current_energy
-                    && card.properties.is_fast
-                    && has_valid_target(card)
-                {
-                    actions.push(BattleAction::PlayCard(card.id.card_identifier_for_display()));
-                }
-            }
-        }
-    }
+    actions.extend(
+        battle
+            .cards
+            .hand(player)
+            .iter()
+            .filter(|&&id| can_play_card::from_hand(battle, id) == Some(true))
+            .copied()
+            .map(BattleAction::PlayCardFromHand),
+    );
 
     if is_active_player && !has_stack_cards {
         actions.push(BattleAction::EndTurn);
     }
 
     actions
-}
-
-fn has_valid_target(_: &CardData) -> bool {
-    false
 }
 
 /// Returns the player who can currently take game actions in the provided
