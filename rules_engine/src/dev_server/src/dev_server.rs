@@ -4,7 +4,8 @@ use axum::Router;
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse,
 };
-use rules_engine::{engine, logging};
+use logging;
+use rules_engine::engine;
 use tracing::info;
 
 async fn connect(Json(req): Json<ConnectRequest>) -> Json<ConnectResponse> {

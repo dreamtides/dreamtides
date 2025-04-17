@@ -13,8 +13,7 @@ use tracing_subscriber::{EnvFilter, Layer};
 pub fn initialize() {
     let env_filter =
         if let Ok(v) = env::var("RUST_LOG") { EnvFilter::new(v) } else { EnvFilter::new("debug") };
-    let forest_layer = ForestLayer::new(PrettyPrinter::new(), tag_parser).with_filter(env_filter);
-
+    let forest_layer = create_forest_layer(env_filter);
     let log_path = PathBuf::from("..").join("dreamtides.log");
     let log_file = File::create(log_path).expect("Error creating log file");
     let file_subscriber = tracing_subscriber::fmt::layer()
@@ -30,6 +29,14 @@ pub fn initialize() {
         .with(file_subscriber)
         .with(ErrorLayer::default())
         .init();
+}
+
+/// Returns a ForestLayer configured with the given EnvFilter
+pub fn create_forest_layer<S>(env_filter: EnvFilter) -> impl Layer<S> + Send + Sync
+where
+    S: tracing::Subscriber + for<'a> tracing_subscriber::registry::LookupSpan<'a>,
+{
+    ForestLayer::new(PrettyPrinter::new(), tag_parser).with_filter(env_filter)
 }
 
 fn tag_parser(event: &Event) -> Option<Tag> {
@@ -49,8 +56,5 @@ fn tag_parser(event: &Event) -> Option<Tag> {
         },
     };
 
-    let mut builder = Tag::builder().level(level).icon(icon);
-    builder = builder.prefix(target).suffix("rs");
-
-    Some(builder.build())
+    Some(Tag::builder().level(level).icon(icon).prefix(target).suffix("rs").build())
 }

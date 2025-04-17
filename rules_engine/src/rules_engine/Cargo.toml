@@ -18,11 +18,9 @@ core_data = { path = "../core_data" }
 display = { path = "../display" }
 display_data = { path = "../display_data" }
 game_creation = { path = "../game_creation" }
+logging = { path = "../logging" }
 masonry = { path = "../masonry" }
 
 backtrace = "0.3"
 tracing = "0.1"
-tracing-error = "0.2"
-tracing-forest = "0.1"
-tracing-subscriber = "0.3"
 uuid = { version = "1", features = ["serde", "v4"] }

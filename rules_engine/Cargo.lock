@@ -70,6 +70,7 @@ dependencies = [
  "battle_mutations",
  "battle_queries",
  "core_data",
+ "logging",
  "rand",
  "tracing",
  "tracing-subscriber",
@@ -716,6 +717,7 @@ dependencies = [
  "client_test_scenarios",
  "core_data",
  "display_data",
+ "logging",
  "plugin",
  "rules_engine",
  "serde",
@@ -1167,6 +1169,16 @@ name = "log"
 version = "0.4.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
+
+[[package]]
+name = "logging"
+version = "0.0.0"
+dependencies = [
+ "tracing",
+ "tracing-error",
+ "tracing-forest",
+ "tracing-subscriber",
+]
 
 [[package]]
 name = "masonry"
@@ -1631,11 +1643,9 @@ dependencies = [
  "display",
  "display_data",
  "game_creation",
+ "logging",
  "masonry",
  "tracing",
- "tracing-error",
- "tracing-forest",
- "tracing-subscriber",
  "uuid",
 ]
 

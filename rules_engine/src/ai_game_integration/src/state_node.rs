@@ -44,10 +44,13 @@ impl GameStateNode for AgentBattleState {
         &'a self,
         player: PlayerName,
     ) -> Box<dyn Iterator<Item = BattleAction> + 'a> {
-        Box::new(
-            legal_actions::compute(self, player, LegalActions { for_human_player: false })
-                .into_iter(),
-        )
+        let actions =
+            legal_actions::compute(self, player, LegalActions { for_human_player: false });
+        if actions.is_empty() {
+            let status = self.status();
+            panic!("No legal actions for player: {:?} with status: {:?}", player, status);
+        }
+        Box::new(actions.into_iter())
     }
 
     fn execute_action(&mut self, player: PlayerName, action: BattleAction) {

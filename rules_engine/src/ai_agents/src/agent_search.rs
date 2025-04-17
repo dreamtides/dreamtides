@@ -7,8 +7,10 @@ use ai_tree_search::iterative_deepening_search::IterativeDeepeningSearch;
 use battle_data::battle::battle_data::BattleData;
 use battle_queries::legal_action_queries::legal_actions::{self, LegalActions};
 use core_data::types::PlayerName;
+use logging;
 use rand::seq::IndexedRandom;
 use tracing::subscriber;
+use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::EnvFilter;
 
 /// Selects an action for the given player using the given AI agent.
@@ -17,16 +19,17 @@ pub fn select_action(battle: &BattleData, player: PlayerName, game_ai: &GameAI) 
 
     let filter = EnvFilter::new(
         "warn,\
-        ai_tree_search=debug,\
         ai_agents=debug,\
-        ai_monte_carlo=debug,\
         ai_core=debug,\
         ai_data=debug,\
         ai_game_integration=debug,\
-        ai_testing=debug",
+        ai_monte_carlo=debug,\
+        ai_testing=debug,\
+        ai_tree_search=debug,",
     );
-    let warn_subscriber = tracing_subscriber::fmt().with_env_filter(filter).finish();
-    subscriber::with_default(warn_subscriber, || match game_ai {
+    let forest_subscriber =
+        tracing_subscriber::registry().with(logging::create_forest_layer(filter));
+    subscriber::with_default(forest_subscriber, || match game_ai {
         GameAI::FirstAvailableAction => first_available_action(battle, player),
         GameAI::RandomAction => random_action(battle, player),
         GameAI::IterativeDeepening => iterative_deepening_action(battle),
