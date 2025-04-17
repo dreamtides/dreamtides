@@ -1,7 +1,6 @@
 use ability_data::ability::Ability;
 use battle_data::battle::battle_data::BattleData;
-use battle_data::battle_cards::card_id::{ObjectId, StackCardId};
-use battle_data::battle_cards::zone::Zone;
+use battle_data::battle_cards::card_id::StackCardId;
 use core_data::card_types::CardType;
 use core_data::effect_source::EffectSource;
 
@@ -21,21 +20,21 @@ pub fn resolve_stack(battle: &mut BattleData, source: EffectSource) {
 ///
 /// Returns the [ObjectId] of the card in its new zone, or None if the card
 /// failed to resolve, e.g. because it no longer exists.
-fn resolve_card(
-    battle: &mut BattleData,
-    source: EffectSource,
-    card_id: StackCardId,
-) -> Option<ObjectId> {
+fn resolve_card(battle: &mut BattleData, source: EffectSource, card_id: StackCardId) -> Option<()> {
     if battle.cards.card(card_id)?.properties.card_type == CardType::Event {
         apply_event_effects(battle, source, card_id);
     }
 
-    move_card::run(
-        battle,
-        source,
-        card_id,
-        destination_zone(battle.cards.card(card_id)?.properties.card_type),
-    )
+    match battle.cards.card(card_id)?.properties.card_type {
+        CardType::Character(_) => {
+            move_card::to_battlefield(battle, source, card_id);
+        }
+        _ => {
+            move_card::to_void(battle, source, card_id);
+        }
+    }
+
+    Some(())
 }
 
 fn apply_event_effects(
@@ -59,12 +58,4 @@ fn apply_event_effects(
         apply_effect::apply(battle, source, effect, battle.cards.card(card_id)?.targets.clone());
     }
     Some(())
-}
-
-fn destination_zone(card_type: CardType) -> Zone {
-    match card_type {
-        CardType::Character(_) => Zone::Battlefield,
-        CardType::Event => Zone::Void,
-        _ => panic!("Invalid card type: {:?}", card_type),
-    }
 }
