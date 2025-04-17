@@ -81,6 +81,16 @@ impl AllCards {
         &self.stack
     }
 
+    /// Returns the card at the top of the stack, if there is one.
+    pub fn top_of_stack(&self) -> Option<&CardData> {
+        self.card(*self.stack.last()?)
+    }
+
+    /// Mutable equivalent of [Self::top_of_stack].
+    pub fn top_of_stack_mut(&mut self) -> Option<&mut CardData> {
+        self.card_mut(*self.stack.last()?)
+    }
+
     /// Returns the set of cards in the hand for a given player.
     pub fn hand(&self, player_name: PlayerName) -> &BTreeSet<HandCardId> {
         self.hand.cards(player_name)

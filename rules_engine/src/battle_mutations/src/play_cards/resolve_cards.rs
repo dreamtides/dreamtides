@@ -17,9 +17,6 @@ pub fn resolve_stack(battle: &mut BattleData, source: EffectSource) {
 
 /// Resolves a card currently on the stack, applying its effects and moving it
 /// to the appropriate zone.
-///
-/// Returns the [ObjectId] of the card in its new zone, or None if the card
-/// failed to resolve, e.g. because it no longer exists.
 fn resolve_card(battle: &mut BattleData, source: EffectSource, card_id: StackCardId) -> Option<()> {
     if battle.cards.card(card_id)?.properties.card_type == CardType::Event {
         apply_event_effects(battle, source, card_id);

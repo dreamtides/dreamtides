@@ -14,10 +14,9 @@ pub fn select_for_prompt(
 ) {
     match &battle.expect_prompt().prompt {
         Prompt::ChooseCharacter { .. } => {
-            let stack_id = *battle.cards.stack().last().expect("No card on stack");
-            let top_stack_card = battle.cards.expect_card_mut(stack_id);
-            top_stack_card.targets.push(TargetId::Character(character_id));
-            info!("Targets for {:?} updated to {:?}", stack_id, top_stack_card.targets);
+            let stack_card = battle.cards.top_of_stack_mut().expect("No active stack");
+            stack_card.targets.push(TargetId::Character(character_id));
+            info!("Targets for {:?} updated to {:?}", stack_card.id, stack_card.targets);
             battle.prompt = None;
         }
     }

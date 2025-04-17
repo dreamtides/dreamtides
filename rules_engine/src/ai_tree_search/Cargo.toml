@@ -12,3 +12,4 @@ test = false
 [dependencies]
 ai_core = { path = "../ai_core", version = "0.0.0" }
 
+tracing = "0.1"

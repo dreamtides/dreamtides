@@ -71,6 +71,8 @@ dependencies = [
  "battle_queries",
  "core_data",
  "rand",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
@@ -129,6 +131,7 @@ name = "ai_tree_search"
 version = "0.0.0"
 dependencies = [
  "ai_core",
+ "tracing",
 ]
 
 [[package]]

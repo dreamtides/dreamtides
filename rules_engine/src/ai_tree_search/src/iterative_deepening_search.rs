@@ -4,6 +4,7 @@ use ai_core::agent::AgentConfig;
 use ai_core::game_state_node::GameStateNode;
 use ai_core::selection_algorithm::SelectionAlgorithm;
 use ai_core::state_evaluator::StateEvaluator;
+use tracing::info;
 
 use crate::alpha_beta;
 
@@ -39,6 +40,7 @@ impl SelectionAlgorithm for IterativeDeepeningSearch {
             );
             best_action = Some(result.action());
             depth += 1;
+            info!("Searching for actions at depth: {}", depth);
         }
 
         best_action.expect("No action found")

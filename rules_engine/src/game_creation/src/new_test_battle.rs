@@ -77,19 +77,17 @@ fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
         );
     }
 
-    if player_name == PlayerName::User {
-        battle.cards.create_card(
-            player_name,
-            Zone::Deck,
-            CardProperties {
-                spark: None,
-                cost: Some(Energy(2)),
-                card_type: CardType::Event,
-                is_fast: true,
-            },
-            vec![Ability::Event(Effect::Effect(StandardEffect::DissolveCharacter {
-                target: Predicate::Enemy(CardPredicate::Character),
-            }))],
-        );
-    }
+    battle.cards.create_card(
+        player_name,
+        Zone::Deck,
+        CardProperties {
+            spark: None,
+            cost: Some(Energy(2)),
+            card_type: CardType::Event,
+            is_fast: true,
+        },
+        vec![Ability::Event(Effect::Effect(StandardEffect::DissolveCharacter {
+            target: Predicate::Enemy(CardPredicate::Character),
+        }))],
+    );
 }
