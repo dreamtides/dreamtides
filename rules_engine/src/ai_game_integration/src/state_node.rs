@@ -48,7 +48,11 @@ impl GameStateNode for AgentBattleState {
             legal_actions::compute(self, player, LegalActions { for_human_player: false });
         if actions.is_empty() {
             let status = self.status();
-            panic!("No legal actions for player: {:?} with status: {:?}", player, status);
+            let snapshot = self.debug_snapshot();
+            panic!(
+                "No legal actions for player: {:?}, status: {:?}, snapshot: {:?}",
+                player, status, snapshot
+            );
         }
         Box::new(actions.into_iter())
     }

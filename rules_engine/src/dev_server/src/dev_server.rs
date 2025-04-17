@@ -4,7 +4,6 @@ use axum::Router;
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse,
 };
-use logging;
 use rules_engine::engine;
 use tracing::info;
 

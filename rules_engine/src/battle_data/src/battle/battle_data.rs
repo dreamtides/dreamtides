@@ -10,6 +10,7 @@ use crate::battle_animations::animation_data::{AnimationData, AnimationStep};
 use crate::battle_animations::battle_animation::BattleAnimation;
 use crate::battle_cards::all_cards::AllCards;
 use crate::battle_player::player_data::PlayerData;
+use crate::debug_snapshots::debug_battle_data::DebugBattleData;
 use crate::prompts::prompt_data::PromptData;
 
 /// Contains data types for a "battle", a single instance of playing a game
@@ -98,5 +99,13 @@ impl BattleData {
             };
             animations.steps.push(AnimationStep { snapshot, animation: update() });
         }
+    }
+
+    /// Returns a debug snapshot of this battle, with string representations of
+    /// the current state. This is intended for use with a debugger like GDB,
+    /// to enable a readable description of the state in a flat hierarchy of
+    /// variables.
+    pub fn debug_snapshot(&self) -> DebugBattleData {
+        DebugBattleData::new(self.clone())
     }
 }
