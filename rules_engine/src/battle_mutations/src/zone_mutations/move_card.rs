@@ -77,7 +77,7 @@ fn to_zone(
 ) -> Option<ObjectId> {
     let card = battle.cards.card(id)?;
     let card_id = card.id;
-    let old = card.zone();
+    let old = card.zone;
     debug!(?card_id, ?old, ?new, "Moving card to zone");
     battle.cards.move_card(card_id, new)
 }

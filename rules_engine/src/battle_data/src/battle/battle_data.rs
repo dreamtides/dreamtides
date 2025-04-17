@@ -69,6 +69,12 @@ impl BattleData {
         }
     }
 
+    /// Returns the currently active [PromptData]. Panics if there is no active
+    /// prompt.
+    pub fn expect_prompt(&self) -> &PromptData {
+        self.prompt.as_ref().expect("Expected an active prompt")
+    }
+
     /// Pushes a new animation step onto the animation tracker, if animation
     /// tracking is enabled.
     ///

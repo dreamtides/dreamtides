@@ -10,7 +10,6 @@ use crate::battle_cards::card_id::{
     BanishedCardId, CardIdType, CharacterId, DeckCardId, HandCardId, ObjectId, StackCardId,
     VoidCardId,
 };
-use crate::battle_cards::card_instance_id::CardInstanceId;
 use crate::battle_cards::card_properties::CardProperties;
 use crate::battle_cards::zone::Zone;
 
@@ -36,9 +35,19 @@ impl AllCards {
         self.cards.get(id.card_id())
     }
 
+    /// Looks up the state for a card. Panics if it does not exist.
+    pub fn expect_card(&self, id: impl CardIdType) -> &CardData {
+        self.cards.get(id.card_id()).unwrap_or_else(|| panic!("Card {:?} does not exist", id))
+    }
+
     /// Mutable equivalent of [Self::card]
     pub fn card_mut(&mut self, id: impl CardIdType) -> Option<&mut CardData> {
         self.cards.get_mut(id.card_id())
+    }
+
+    /// Mutable equivalent of [Self::expect_card]
+    pub fn expect_card_mut(&mut self, id: impl CardIdType) -> &mut CardData {
+        self.cards.get_mut(id.card_id()).unwrap_or_else(|| panic!("Card {:?} does not exist", id))
     }
 
     /// Returns all currently known cards in an undefined order
@@ -99,17 +108,17 @@ impl AllCards {
         abilities: Vec<Ability>,
     ) -> CardId {
         let object_id = self.new_object_id();
-        let tmp_instance_id = create_card_instance_id(zone, CardId::default());
-        let card_data_id = self.cards.insert(CardData::new(
-            tmp_instance_id,
+        let card_id = self.cards.insert(CardData::new(
+            CardId::default(),
             owner,
+            zone,
             object_id,
             properties,
             abilities,
         ));
-        self.cards[card_data_id].internal_set_id(create_card_instance_id(zone, card_data_id));
-        self.add_to_zone(owner, card_data_id, zone);
-        card_data_id
+        self.cards[card_id].id = card_id;
+        self.add_to_zone(owner, card_id, zone);
+        card_id
     }
 
     /// Moves a card from its current zone to a new zone, if it is present.
@@ -122,7 +131,7 @@ impl AllCards {
         let id = card_id.card_id();
         let card = self.card(id)?;
         let owner = card.owner;
-        self.remove_from_zone(owner, card.id);
+        self.remove_from_zone(owner, card.zone, card.id);
         let object_id = self.new_object_id();
         self.add_to_zone(owner, id, to)?;
         Some(object_id)
@@ -135,57 +144,49 @@ impl AllCards {
     }
 
     fn add_to_zone(&mut self, owner: PlayerName, card_id: CardId, zone: Zone) -> Option<()> {
-        let instance_id = create_card_instance_id(zone, card_id);
-        self.card_mut(card_id)?.internal_set_id(instance_id);
+        self.card_mut(card_id)?.zone = zone;
 
-        match instance_id {
-            CardInstanceId::Banished(id) => self.banished.add(owner, id),
-            CardInstanceId::Battlefield(id) => self.battlefield.add(owner, id),
-            CardInstanceId::Deck(id) => self.deck.add(owner, id),
-            CardInstanceId::Hand(id) => self.hand.add(owner, id),
-            CardInstanceId::Stack(id) => self.stack.push(id),
-            CardInstanceId::Void(id) => self.void.add(owner, id),
+        match zone {
+            Zone::Banished => self.banished.add(owner, BanishedCardId(card_id)),
+            Zone::Battlefield => self.battlefield.add(owner, CharacterId(card_id)),
+            Zone::Deck => self.deck.add(owner, DeckCardId(card_id)),
+            Zone::Hand => self.hand.add(owner, HandCardId(card_id)),
+            Zone::Stack => self.stack.push(StackCardId(card_id)),
+            Zone::Void => self.void.add(owner, VoidCardId(card_id)),
         }
 
         Some(())
     }
 
-    fn remove_from_zone(&mut self, owner: PlayerName, instance_id: CardInstanceId) {
-        match instance_id {
-            CardInstanceId::Banished(id) => {
-                self.banished.remove_if_present(owner, id);
+    fn remove_from_zone(&mut self, owner: PlayerName, zone: Zone, card_id: CardId) {
+        match zone {
+            Zone::Banished => {
+                self.banished.remove_if_present(owner, BanishedCardId(card_id));
             }
-            CardInstanceId::Battlefield(id) => {
-                self.battlefield.remove_if_present(owner, id);
+            Zone::Battlefield => {
+                self.battlefield.remove_if_present(owner, CharacterId(card_id));
             }
-            CardInstanceId::Deck(id) => {
-                self.deck.remove_if_present(owner, id);
+            Zone::Deck => {
+                self.deck.remove_if_present(owner, DeckCardId(card_id));
             }
-            CardInstanceId::Hand(id) => {
-                self.hand.remove_if_present(owner, id);
+            Zone::Hand => {
+                self.hand.remove_if_present(owner, HandCardId(card_id));
             }
-            CardInstanceId::Stack(id) => {
-                if let Some((i, _)) =
-                    self.stack.iter().enumerate().rev().find(|(_, &stack_id)| id == stack_id)
+            Zone::Stack => {
+                if let Some((i, _)) = self
+                    .stack
+                    .iter()
+                    .enumerate()
+                    .rev()
+                    .find(|(_, &stack_id)| card_id == stack_id.card_id())
                 {
                     self.stack.remove(i);
                 }
             }
-            CardInstanceId::Void(id) => {
-                self.void.remove_if_present(owner, id);
+            Zone::Void => {
+                self.void.remove_if_present(owner, VoidCardId(card_id));
             }
         }
-    }
-}
-
-fn create_card_instance_id(zone: Zone, card_id: CardId) -> CardInstanceId {
-    match zone {
-        Zone::Banished => CardInstanceId::Banished(BanishedCardId(card_id)),
-        Zone::Battlefield => CardInstanceId::Battlefield(CharacterId(card_id)),
-        Zone::Deck => CardInstanceId::Deck(DeckCardId(card_id)),
-        Zone::Hand => CardInstanceId::Hand(HandCardId(card_id)),
-        Zone::Stack => CardInstanceId::Stack(StackCardId(card_id)),
-        Zone::Void => CardInstanceId::Void(VoidCardId(card_id)),
     }
 }
 

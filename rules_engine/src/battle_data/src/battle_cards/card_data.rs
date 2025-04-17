@@ -1,20 +1,23 @@
 use ability_data::ability::Ability;
+use core_data::identifiers::CardId;
 use core_data::numerics::TurnId;
 use core_data::types::PlayerName;
 
 use crate::battle::turn_data::TurnData;
 use crate::battle_cards::card_id::{CharacterId, ObjectId, StackCardId};
-use crate::battle_cards::card_instance_id::CardInstanceId;
 use crate::battle_cards::card_properties::CardProperties;
 use crate::battle_cards::zone::Zone;
 
 #[derive(Clone, Debug)]
 pub struct CardData {
-    /// Unique identifier for this card within a zone.
-    pub id: CardInstanceId,
+    /// Unique identifier for this card
+    pub id: CardId,
 
     /// The owner of this card.
     pub owner: PlayerName,
+
+    /// The zone this card is currently in.
+    pub zone: Zone,
 
     /// Unique identifier for this card within a zone.
     pub object_id: ObjectId,
@@ -42,8 +45,9 @@ pub struct CardData {
 
 impl CardData {
     pub fn new(
-        id: CardInstanceId,
+        id: CardId,
         owner: PlayerName,
+        zone: Zone,
         object_id: ObjectId,
         properties: CardProperties,
         abilities: Vec<Ability>,
@@ -51,6 +55,7 @@ impl CardData {
         Self {
             id,
             owner,
+            zone,
             object_id,
             properties,
             abilities,
@@ -62,11 +67,6 @@ impl CardData {
                 turn_id: TurnId(0),
             },
         }
-    }
-
-    /// The zone this card is currently in.
-    pub fn zone(&self) -> Zone {
-        self.id.zone()
     }
 
     /// Whether this card is revealed to the given player.
@@ -85,10 +85,6 @@ impl CardData {
     /// The controller of this card.
     pub fn controller(&self) -> PlayerName {
         self.owner
-    }
-
-    pub(crate) fn internal_set_id(&mut self, id: CardInstanceId) {
-        self.id = id;
     }
 }
 
