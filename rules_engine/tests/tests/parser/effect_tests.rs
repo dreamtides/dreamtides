@@ -1200,3 +1200,16 @@ fn test_each_player_abandons_characters() {
     ]
     "###);
 }
+
+#[test]
+fn test_negate_unless_pays_cost() {
+    let result = parse("Negate an enemy event unless they pay $2.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      event(effect(negateUnlessPaysCost(
+        target: enemy(event),
+        cost: energy(Energy(2)),
+      ))),
+    ]
+    "###);
+}

@@ -38,13 +38,9 @@ pub fn matching_cards_on_stack(
     predicate: StackPredicate,
 ) -> Vec<StackCardId> {
     match predicate.0 {
-        Predicate::Enemy(card_predicate) => on_stack(
-            battle,
-            controller,
-            source,
-            battle.cards.stack().iter().cloned().collect::<Vec<_>>(),
-            card_predicate,
-        ),
+        Predicate::Enemy(card_predicate) => {
+            on_stack(battle, controller, source, battle.cards.stack().to_vec(), card_predicate)
+        }
         _ => todo!("Implement {:?}", predicate),
     }
 }

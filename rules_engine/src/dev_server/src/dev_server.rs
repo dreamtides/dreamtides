@@ -55,7 +55,7 @@ type AppResult<T> = Result<T, AppError>;
 async fn connect(
     result: Result<Json<ConnectRequest>, JsonRejection>,
 ) -> AppResult<Json<ConnectResponse>> {
-    println!("");
+    println!();
 
     // Handle potential JSON parse errors
     let Json(req) = result?;
@@ -72,7 +72,7 @@ async fn connect(
 async fn perform_action(
     result: Result<Json<PerformActionRequest>, JsonRejection>,
 ) -> AppResult<Json<PerformActionResponse>> {
-    println!("");
+    println!();
 
     // Handle potential JSON parse errors
     let Json(req) = result?;

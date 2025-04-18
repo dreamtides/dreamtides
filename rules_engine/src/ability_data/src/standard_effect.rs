@@ -65,6 +65,7 @@ pub enum StandardEffect {
     MaterializeRandomFromDeck { count: u32, predicate: CardPredicate },
     MaterializeSilentCopy { target: Predicate, count: u32, quantity: QuantityExpression },
     Negate { target: Predicate },
+    NegateUnlessPaysCost { target: Predicate, cost: Cost },
     PayCost { cost: Cost },
     PutCardsFromYourDeckIntoVoid { count: u32 },
     PutCardsFromVoidOnTopOfDeck { count: u32, matching: CardPredicate },

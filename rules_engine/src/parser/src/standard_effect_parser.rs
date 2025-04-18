@@ -116,6 +116,7 @@ fn game_state_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
         return_from_void_to_play(),
         gains_reclaim_until_end_of_turn(),
         cards_in_void_gain_reclaim_this_turn(),
+        negate_unless_pays_cost(),
         negate(),
         abandon_at_end_of_turn(),
         banish_character_until_leaves_play(),
@@ -279,6 +280,14 @@ fn gains_reclaim_until_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEff
 
 fn kindle<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     numeric("{kw: kindle}", Spark, "").map(|amount| StandardEffect::Kindle { amount })
+}
+
+fn negate_unless_pays_cost<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("negate")
+        .ignore_then(determiner_parser::target_parser())
+        .then_ignore(phrase("unless they"))
+        .then(cost_parser::their_cost())
+        .map(|(target, cost)| StandardEffect::NegateUnlessPaysCost { target, cost })
 }
 
 fn negate<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {

@@ -62,6 +62,29 @@ pub fn inflected_additional_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorTy
     ))
 }
 
+pub fn their_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
+    choice((
+        numeric("pay $", Energy, "").map(Cost::Energy),
+        phrase("banish a card from their void").to(Cost::BanishCardsFromYourVoid(1)),
+        numeric("banish", count, "cards from their void").map(Cost::BanishCardsFromYourVoid),
+        phrase("abandon a character or discard a card").to(Cost::AbandonACharacterOrDiscardACard),
+        phrase("abandon a dreamscape").to(Cost::AbandonDreamscapes(1)),
+        numeric("abandon", count, "dreamscapes").map(Cost::AbandonDreamscapes),
+        phrase("abandon")
+            .ignore_then(determiner_parser::your_action())
+            .map(|p| Cost::AbandonCharacters(p, 1)),
+        abandon_characters_count(),
+        phrase("discard their hand").to(Cost::DiscardHand),
+        phrase("discard a")
+            .ignore_then(card_predicate_parser::parser())
+            .map(|predicate| Cost::DiscardCards(predicate, 1)),
+        phrase("discard")
+            .ignore_then(number(count))
+            .then(card_predicate_parser::parser())
+            .map(|(count, predicate)| Cost::DiscardCards(predicate, count)),
+    ))
+}
+
 fn abandon_characters_count<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
     phrase("abandon")
         .ignore_then(collection_expression_parser::parser())
