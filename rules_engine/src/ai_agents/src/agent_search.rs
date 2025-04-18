@@ -3,6 +3,8 @@ use ai_core::agent::{Agent, AgentConfig, AgentData};
 use ai_data::game_ai::GameAI;
 use ai_game_integration::evaluators::WinLossEvaluator;
 use ai_game_integration::state_node::AgentBattleState;
+use ai_monte_carlo::monte_carlo::{MonteCarloAlgorithm, RandomPlayoutEvaluator};
+use ai_monte_carlo::uct1::Uct1;
 use ai_tree_search::iterative_deepening_search::IterativeDeepeningSearch;
 use battle_data::battle::battle_data::BattleData;
 use battle_queries::legal_action_queries::legal_actions::{self, LegalActions};
@@ -33,6 +35,7 @@ pub fn select_action(battle: &BattleData, player: PlayerName, game_ai: &GameAI) 
         GameAI::FirstAvailableAction => first_available_action(battle, player),
         GameAI::RandomAction => random_action(battle, player),
         GameAI::IterativeDeepening => iterative_deepening_action(battle),
+        GameAI::Uct1 => uct1_action(battle),
     })
 }
 
@@ -51,5 +54,14 @@ fn random_action(battle: &BattleData, player: PlayerName) -> BattleAction {
 fn iterative_deepening_action(battle: &BattleData) -> BattleAction {
     let agent =
         AgentData::omniscient("IterativeDeepening", IterativeDeepeningSearch, WinLossEvaluator);
+    agent.pick_action(AgentConfig::with_deadline(1), &AgentBattleState(battle.clone()))
+}
+
+fn uct1_action(battle: &BattleData) -> BattleAction {
+    let agent = AgentData::omniscient(
+        "UCT1",
+        MonteCarloAlgorithm { child_score_algorithm: Uct1 {} },
+        RandomPlayoutEvaluator {},
+    );
     agent.pick_action(AgentConfig::with_deadline(1), &AgentBattleState(battle.clone()))
 }

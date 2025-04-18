@@ -5,4 +5,5 @@ pub enum GameAI {
     FirstAvailableAction,
     RandomAction,
     IterativeDeepening,
+    Uct1,
 }

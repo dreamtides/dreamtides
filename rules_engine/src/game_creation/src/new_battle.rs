@@ -7,7 +7,7 @@ use crate::new_test_battle;
 
 /// Creates a new battle and starts it.
 pub fn create_and_start(id: BattleId) -> BattleData {
-    let mut battle = new_test_battle::create_and_start(id, None, Some(GameAI::IterativeDeepening));
+    let mut battle = new_test_battle::create_and_start(id, None, Some(GameAI::Uct1));
     battle.animations = Some(AnimationData::default());
     battle
 }
