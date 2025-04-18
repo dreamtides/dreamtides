@@ -26,6 +26,10 @@ pub fn compute(
     player: PlayerName,
     _options: LegalActions,
 ) -> Vec<BattleAction> {
+    if matches!(battle.status, BattleStatus::GameOver { .. }) {
+        return vec![];
+    }
+
     // If there's an active prompt for this player, the only legal actions are those
     // corresponding to the prompt
     if let Some(prompt_data) = &battle.prompt {

@@ -1,11 +1,12 @@
 use action_data::battle_action::BattleAction;
 use action_data::game_action::GameAction;
 use battle_data::battle::battle_data::BattleData;
-use battle_data::battle_cards::card_id::{CardIdType, CharacterId};
+use battle_data::battle_cards::card_id::{CardIdType, CharacterId, HandCardId};
 use battle_data::prompts::prompt_data::Prompt;
-use battle_queries::legal_action_queries::legal_actions;
+use battle_queries::legal_action_queries::can_play_card;
 use core_data::display_color;
 use core_data::display_types::SpriteAddress;
+use core_data::effect_source::EffectSource;
 use core_data::identifiers::CardId;
 use core_data::types::{CardFacing, PlayerName};
 use display_data::card_view::{
@@ -36,13 +37,7 @@ fn revealed_card_view(_builder: &ResponseBuilder, context: &CardViewContext) -> 
     let battle = context.battle();
     let card_id = context.card().id.card_id();
 
-    let can_play = legal_actions::compute(
-        battle,
-        PlayerName::User,
-        legal_actions::LegalActions::default(),
-    )
-    .into_iter()
-    .any(|action| matches!(action, BattleAction::PlayCardFromHand(id) if id.card_id() == card_id));
+    let can_play = can_play_card::from_hand(battle, EffectSource::Game, HandCardId(card_id));
     let selection_target = character_selection_target(context.battle(), card_id);
 
     RevealedCardView {

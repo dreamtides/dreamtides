@@ -1,3 +1,4 @@
+use assert_with::expect;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_cards::card_data::TargetId;
 use battle_data::battle_cards::card_id::CharacterId;
@@ -12,9 +13,16 @@ pub fn select_for_prompt(
     _source: EffectSource,
     character_id: CharacterId,
 ) {
-    match &battle.expect_prompt().prompt {
+    let prompt_data = expect!(battle.prompt.as_ref(), battle, || format!(
+        "No active prompt for selecting {:?}",
+        character_id
+    ));
+    let stack_card = expect!(battle.cards.top_of_stack_mut(), battle, || format!(
+        "No active stack for selecting {:?}",
+        character_id
+    ));
+    match prompt_data.prompt {
         Prompt::ChooseCharacter { .. } => {
-            let stack_card = battle.cards.top_of_stack_mut().expect("No active stack");
             stack_card.targets.push(TargetId::Character(character_id));
             info!("Targets for {:?} updated to {:?}", stack_card.id, stack_card.targets);
             battle.prompt = None;

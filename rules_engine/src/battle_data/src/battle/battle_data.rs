@@ -70,10 +70,9 @@ impl BattleData {
         }
     }
 
-    /// Returns the currently active [PromptData]. Panics if there is no active
-    /// prompt.
-    pub fn expect_prompt(&self) -> &PromptData {
-        self.prompt.as_ref().expect("Expected an active prompt")
+    /// Returns a clone of this battle data with the animation tracker removed.
+    pub fn clone_without_animations(&self) -> Self {
+        Self { animations: None, ..self.clone() }
     }
 
     /// Pushes a new animation step onto the animation tracker, if animation

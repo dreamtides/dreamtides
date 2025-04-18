@@ -66,6 +66,7 @@ dependencies = [
  "ai_game_integration",
  "ai_monte_carlo",
  "ai_tree_search",
+ "assert_with",
  "battle_data",
  "battle_mutations",
  "battle_queries",
@@ -97,6 +98,7 @@ dependencies = [
  "ai_core",
  "ai_monte_carlo",
  "ai_tree_search",
+ "assert_with",
  "battle_data",
  "battle_mutations",
  "battle_queries",
@@ -210,6 +212,17 @@ checksum = "367fd0ad87307588d087544707bc5fbf4805ded96c7db922b70d368fa1cb5702"
 dependencies = [
  "unicode-width",
  "yansi",
+]
+
+[[package]]
+name = "assert_with"
+version = "0.0.0"
+dependencies = [
+ "battle_data",
+ "core_data",
+ "rand_xoshiro",
+ "tracing",
+ "uuid",
 ]
 
 [[package]]
@@ -331,6 +344,7 @@ name = "battle_mutations"
 version = "0.0.0"
 dependencies = [
  "ability_data",
+ "assert_with",
  "battle_data",
  "battle_queries",
  "core_data",
@@ -343,6 +357,7 @@ version = "0.0.0"
 dependencies = [
  "ability_data",
  "action_data",
+ "assert_with",
  "battle_data",
  "core_data",
  "tracing",

@@ -1,5 +1,6 @@
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_cards::card_id::HandCardId;
+use battle_data::battle_cards::zone::Zone;
 use core_data::effect_source::EffectSource;
 
 use crate::legal_action_queries::{has_legal_targets, legal_actions};
@@ -9,6 +10,11 @@ pub fn from_hand(battle: &BattleData, source: EffectSource, card_id: HandCardId)
     let Some(card) = battle.cards.card(card_id) else {
         return false;
     };
+
+    if card.zone != Zone::Hand {
+        return false;
+    }
+
     let controller = card.controller();
     if legal_actions::next_to_act(battle) != Some(controller) {
         return false;

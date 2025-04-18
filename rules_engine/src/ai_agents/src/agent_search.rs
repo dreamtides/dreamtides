@@ -6,6 +6,7 @@ use ai_game_integration::state_node::AgentBattleState;
 use ai_monte_carlo::monte_carlo::{MonteCarloAlgorithm, RandomPlayoutEvaluator};
 use ai_monte_carlo::uct1::Uct1;
 use ai_tree_search::iterative_deepening_search::IterativeDeepeningSearch;
+use assert_with::assert_with;
 use battle_data::battle::battle_data::BattleData;
 use battle_queries::legal_action_queries::legal_actions::{self, LegalActions};
 use core_data::types::PlayerName;
@@ -40,15 +41,21 @@ pub fn select_action(battle: &BattleData, player: PlayerName, game_ai: &GameAI) 
 }
 
 fn first_available_action(battle: &BattleData, player: PlayerName) -> BattleAction {
-    *legal_actions::compute(battle, player, LegalActions { for_human_player: false })
-        .first()
-        .expect("Invoked agent search with no legal actions available")
+    let actions = legal_actions::compute(battle, player, LegalActions { for_human_player: false });
+    assert_with!(!actions.is_empty(), battle, || format!(
+        "Invoked agent search with no legal actions available for player: {:?}",
+        player
+    ));
+    *actions.first().unwrap()
 }
 
 fn random_action(battle: &BattleData, player: PlayerName) -> BattleAction {
-    *legal_actions::compute(battle, player, LegalActions { for_human_player: false })
-        .choose(&mut rand::rng())
-        .expect("Invoked agent search with no legal actions available")
+    let actions = legal_actions::compute(battle, player, LegalActions { for_human_player: false });
+    assert_with!(!actions.is_empty(), battle, || format!(
+        "Invoked agent search with no legal actions available for player: {:?}",
+        player
+    ));
+    *actions.choose(&mut rand::rng()).unwrap()
 }
 
 fn iterative_deepening_action(battle: &BattleData) -> BattleAction {

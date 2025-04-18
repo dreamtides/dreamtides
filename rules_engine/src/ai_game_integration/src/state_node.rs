@@ -3,6 +3,7 @@ use std::ops::{Deref, DerefMut};
 use action_data::battle_action::BattleAction;
 use actions::battle_actions;
 use ai_core::game_state_node::{GameStateNode, GameStatus};
+use assert_with::{assert_with, expect};
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
 use battle_queries::legal_action_queries::legal_actions::{self, LegalActions};
@@ -30,13 +31,17 @@ impl GameStateNode for AgentBattleState {
     type PlayerName = PlayerName;
 
     fn make_copy(&self) -> Self {
-        Self(self.0.clone())
+        Self(self.clone_without_animations())
     }
 
     fn status(&self) -> GameStatus<PlayerName> {
         match self.status {
             BattleStatus::GameOver { winner } => GameStatus::Completed { winner },
-            _ => GameStatus::InProgress { current_turn: legal_actions::next_to_act(self).unwrap() },
+            _ => GameStatus::InProgress {
+                current_turn: expect!(legal_actions::next_to_act(self), self, || {
+                    "No player to act"
+                }),
+            },
         }
     }
 
@@ -46,14 +51,10 @@ impl GameStateNode for AgentBattleState {
     ) -> Box<dyn Iterator<Item = BattleAction> + 'a> {
         let actions =
             legal_actions::compute(self, player, LegalActions { for_human_player: false });
-        if actions.is_empty() {
-            let status = self.status();
-            let snapshot = self.debug_snapshot();
-            panic!(
-                "No legal actions for player: {:?}, status: {:?}, snapshot: {:?}",
-                player, status, snapshot
-            );
-        }
+        assert_with!(!actions.is_empty(), self, || format!(
+            "No legal actions for player: {:?}",
+            player
+        ));
         Box::new(actions.into_iter())
     }
 

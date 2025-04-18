@@ -35,19 +35,9 @@ impl AllCards {
         self.cards.get(id.card_id())
     }
 
-    /// Looks up the state for a card. Panics if it does not exist.
-    pub fn expect_card(&self, id: impl CardIdType) -> &CardData {
-        self.cards.get(id.card_id()).unwrap_or_else(|| panic!("Card {:?} does not exist", id))
-    }
-
     /// Mutable equivalent of [Self::card]
     pub fn card_mut(&mut self, id: impl CardIdType) -> Option<&mut CardData> {
         self.cards.get_mut(id.card_id())
-    }
-
-    /// Mutable equivalent of [Self::expect_card]
-    pub fn expect_card_mut(&mut self, id: impl CardIdType) -> &mut CardData {
-        self.cards.get_mut(id.card_id()).unwrap_or_else(|| panic!("Card {:?} does not exist", id))
     }
 
     /// Returns all currently known cards in an undefined order
