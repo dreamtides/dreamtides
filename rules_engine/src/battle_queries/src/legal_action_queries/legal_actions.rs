@@ -2,6 +2,7 @@ use action_data::battle_action::BattleAction;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
 use battle_data::prompts::prompt_data::Prompt;
+use core_data::effect_source::EffectSource;
 use core_data::types::PlayerName;
 use tracing::instrument;
 
@@ -59,7 +60,7 @@ pub fn compute(
             .cards
             .hand(player)
             .iter()
-            .filter(|&&id| can_play_card::from_hand(battle, id) == Some(true))
+            .filter(|&&id| can_play_card::from_hand(battle, EffectSource::Game, id))
             .copied()
             .map(BattleAction::PlayCardFromHand),
     );
