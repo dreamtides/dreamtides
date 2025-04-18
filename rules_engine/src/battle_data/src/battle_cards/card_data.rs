@@ -1,6 +1,5 @@
 use ability_data::ability::Ability;
 use core_data::identifiers::CardId;
-use core_data::numerics::TurnId;
 use core_data::types::PlayerName;
 
 use crate::battle::turn_data::TurnData;
@@ -44,6 +43,7 @@ pub struct CardData {
 }
 
 impl CardData {
+    /// Creates a new CardData instance
     pub fn new(
         id: CardId,
         owner: PlayerName,
@@ -52,20 +52,17 @@ impl CardData {
         properties: CardProperties,
         abilities: Vec<Ability>,
     ) -> Self {
-        Self {
+        CardData {
             id,
             owner,
             zone,
             object_id,
             properties,
             abilities,
-            revealed_to_owner: false,
+            revealed_to_owner: true,
             revealed_to_opponent: false,
             targets: Vec::new(),
-            turn_entered_current_zone: TurnData {
-                active_player: PlayerName::User,
-                turn_id: TurnId(0),
-            },
+            turn_entered_current_zone: TurnData::default(),
         }
     }
 

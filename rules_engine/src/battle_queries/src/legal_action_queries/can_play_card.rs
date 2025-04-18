@@ -31,5 +31,5 @@ pub fn from_hand(battle: &BattleData, source: EffectSource, card_id: HandCardId)
         return false;
     }
 
-    battle.cards.stack().is_empty()
+    battle.cards.stack().is_empty() || card.properties.is_fast
 }

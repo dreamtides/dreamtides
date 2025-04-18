@@ -13,3 +13,9 @@ pub struct TurnData {
     /// turn 0 for the starting player and then turn 1 for the next player.
     pub turn_id: TurnId,
 }
+
+impl Default for TurnData {
+    fn default() -> Self {
+        TurnData { active_player: PlayerName::User, turn_id: TurnId::default() }
+    }
+}

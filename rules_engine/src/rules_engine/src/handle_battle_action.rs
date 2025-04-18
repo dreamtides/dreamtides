@@ -2,7 +2,7 @@ use action_data::battle_action::BattleAction;
 use actions::battle_actions;
 use ai_agents::agent_search;
 use battle_data::battle::battle_data::BattleData;
-use battle_queries::legal_action_queries::legal_actions;
+use battle_queries::legal_action_queries::legal_actions::{self, LegalActions};
 use core_data::types::PlayerName;
 use display::rendering::renderer;
 use display_data::command::CommandSequence;
@@ -23,8 +23,7 @@ pub fn execute(
     };
 
     // Check if the only legal action is ResolveStack and automatically execute it
-    let legal_actions =
-        legal_actions::compute(battle, next_player, legal_actions::LegalActions::default());
+    let legal_actions = legal_actions::compute(battle, next_player, LegalActions::default());
     if legal_actions == vec![BattleAction::ResolveStack] {
         info!("Automatically executing ResolveStack");
         return execute(battle, next_player, BattleAction::ResolveStack);

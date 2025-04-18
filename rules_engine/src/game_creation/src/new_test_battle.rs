@@ -9,6 +9,8 @@ use battle_data::battle::battle_turn_step::BattleTurnStep;
 use battle_data::battle::request_context::RequestContext;
 use battle_data::battle::turn_data::TurnData;
 use battle_data::battle_cards::all_cards::AllCards;
+use battle_data::battle_cards::card_data::CardData;
+use battle_data::battle_cards::card_id::ObjectId;
 use battle_data::battle_cards::card_properties::CardProperties;
 use battle_data::battle_cards::zone::Zone;
 use battle_data::battle_player::player_data::PlayerData;
@@ -64,30 +66,62 @@ pub fn create_and_start(
 
 fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
     for _ in 0..30 {
-        battle.cards.create_card(
-            player_name,
-            Zone::Deck,
-            CardProperties {
+        battle.cards.create_card(CardData {
+            id: Default::default(),
+            owner: player_name,
+            zone: Zone::Deck,
+            object_id: ObjectId(0),
+            properties: CardProperties {
                 spark: Some(Spark(rand::rng().random_range(1..=5))),
                 cost: Some(Energy(rand::rng().random_range(1..=5))),
                 card_type: CardType::Character(CharacterType::Explorer),
                 is_fast: false,
             },
-            vec![],
-        );
+            abilities: vec![],
+            revealed_to_owner: false,
+            revealed_to_opponent: false,
+            targets: Vec::new(),
+            turn_entered_current_zone: TurnData::default(),
+        });
     }
 
-    battle.cards.create_card(
-        player_name,
-        Zone::Deck,
-        CardProperties {
+    battle.cards.create_card(CardData {
+        id: Default::default(),
+        owner: player_name,
+        zone: Zone::Deck,
+        object_id: ObjectId(0),
+        properties: CardProperties {
             spark: None,
             cost: Some(Energy(2)),
             card_type: CardType::Event,
             is_fast: true,
         },
-        vec![Ability::Event(Effect::Effect(StandardEffect::DissolveCharacter {
+        abilities: vec![Ability::Event(Effect::Effect(StandardEffect::DissolveCharacter {
             target: Predicate::Enemy(CardPredicate::Character),
         }))],
-    );
+        revealed_to_owner: false,
+        revealed_to_opponent: false,
+        targets: Vec::new(),
+        turn_entered_current_zone: TurnData::default(),
+    });
+
+    battle.cards.create_card(CardData {
+        id: Default::default(),
+        owner: player_name,
+        zone: Zone::Deck,
+        object_id: ObjectId(0),
+        properties: CardProperties {
+            spark: None,
+            cost: Some(Energy(1)),
+            card_type: CardType::Event,
+            is_fast: true,
+        },
+        abilities: vec![Ability::Event(Effect::Effect(StandardEffect::Negate {
+            target: Predicate::Enemy(CardPredicate::Dream),
+        }))],
+        revealed_to_owner: false,
+        revealed_to_opponent: false,
+        targets: Vec::new(),
+        turn_entered_current_zone: TurnData::default(),
+    });
 }

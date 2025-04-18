@@ -1,6 +1,5 @@
 use std::collections::{BTreeSet, VecDeque};
 
-use ability_data::ability::Ability;
 use core_data::identifiers::CardId;
 use core_data::types::PlayerName;
 use slotmap::SlotMap;
@@ -10,7 +9,6 @@ use crate::battle_cards::card_id::{
     BanishedCardId, CardIdType, CharacterId, DeckCardId, HandCardId, ObjectId, StackCardId,
     VoidCardId,
 };
-use crate::battle_cards::card_properties::CardProperties;
 use crate::battle_cards::zone::Zone;
 
 #[derive(Clone, Debug, Default)]
@@ -97,25 +95,15 @@ impl AllCards {
         self.banished.cards(player_name)
     }
 
-    /// Creates a card instance in the given zone.
+    /// Creates a card instance in its associated zone and assigns a [CardId] to
+    /// it. The expected way to call this method is by passing a [CardData]
+    /// which has been assigned the default CardId.
     ///
     /// This does *not* make the card revealed to any player.
-    pub fn create_card(
-        &mut self,
-        owner: PlayerName,
-        zone: Zone,
-        properties: CardProperties,
-        abilities: Vec<Ability>,
-    ) -> CardId {
-        let object_id = self.new_object_id();
-        let card_id = self.cards.insert(CardData::new(
-            CardId::default(),
-            owner,
-            zone,
-            object_id,
-            properties,
-            abilities,
-        ));
+    pub fn create_card(&mut self, card_data: CardData) -> CardId {
+        let zone = card_data.zone;
+        let owner = card_data.owner;
+        let card_id = self.cards.insert(card_data);
         self.cards[card_id].id = card_id;
         self.add_to_zone(owner, card_id, zone);
         card_id
@@ -132,9 +120,7 @@ impl AllCards {
         let card = self.card(id)?;
         let owner = card.owner;
         self.remove_from_zone(owner, card.zone, card.id);
-        let object_id = self.new_object_id();
-        self.add_to_zone(owner, id, to)?;
-        Some(object_id)
+        self.add_to_zone(owner, id, to)
     }
 
     fn new_object_id(&mut self) -> ObjectId {
@@ -143,8 +129,10 @@ impl AllCards {
         result
     }
 
-    fn add_to_zone(&mut self, owner: PlayerName, card_id: CardId, zone: Zone) -> Option<()> {
+    fn add_to_zone(&mut self, owner: PlayerName, card_id: CardId, zone: Zone) -> Option<ObjectId> {
+        let object_id = self.new_object_id();
         self.card_mut(card_id)?.zone = zone;
+        self.card_mut(card_id)?.object_id = object_id;
 
         match zone {
             Zone::Banished => self.banished.add(owner, BanishedCardId(card_id)),
@@ -155,7 +143,7 @@ impl AllCards {
             Zone::Void => self.void.add(owner, VoidCardId(card_id)),
         }
 
-        Some(())
+        Some(object_id)
     }
 
     fn remove_from_zone(&mut self, owner: PlayerName, zone: Zone, card_id: CardId) {
