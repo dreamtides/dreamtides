@@ -2,6 +2,8 @@ use action_data::battle_action::BattleAction;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
 use battle_data::battle_player::player_data::PlayerData;
+use battle_queries::legal_action_queries::legal_actions;
+use battle_queries::legal_action_queries::legal_actions::LegalActions;
 use battle_queries::player_queries::spark_total;
 use core_data::effect_source::EffectSource;
 use core_data::types::PlayerName;
@@ -53,14 +55,30 @@ fn player_view(battle: &BattleData, player: &PlayerData) -> PlayerView {
     }
 }
 
-fn interface_view(_battle: &BattleData) -> InterfaceView {
-    InterfaceView {
-        screen_overlay: None,
-        primary_action_button: Some(PrimaryActionButtonView {
+fn interface_view(battle: &BattleData) -> InterfaceView {
+    let user_name = PlayerName::User;
+    let legal_actions =
+        legal_actions::compute(battle, user_name, LegalActions { for_human_player: true });
+
+    let primary_action_button = if legal_actions.contains(&BattleAction::ResolveStack) {
+        Some(PrimaryActionButtonView {
+            label: "Resolve".to_string(),
+            action: BattleAction::ResolveStack.into(),
+            show_on_idle_duration: None,
+        })
+    } else if legal_actions.contains(&BattleAction::EndTurn) {
+        Some(PrimaryActionButtonView {
             label: "End Turn".to_string(),
             action: BattleAction::EndTurn.into(),
             show_on_idle_duration: None,
-        }),
+        })
+    } else {
+        None
+    };
+
+    InterfaceView {
+        screen_overlay: None,
+        primary_action_button,
         card_order_selector: None,
         bottom_right_button: None,
     }
