@@ -3,7 +3,7 @@ use std::ops::{Deref, DerefMut};
 use action_data::battle_action::BattleAction;
 use actions::battle_actions;
 use ai_core::game_state_node::{GameStateNode, GameStatus};
-use assert_with::{assert_with, expect};
+use assert_with::{assert_that, expect};
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
 use battle_queries::legal_action_queries::legal_actions::{self, LegalActions};
@@ -51,7 +51,7 @@ impl GameStateNode for AgentBattleState {
     ) -> Box<dyn Iterator<Item = BattleAction> + 'a> {
         let actions =
             legal_actions::compute(self, player, LegalActions { for_human_player: false });
-        assert_with!(!actions.is_empty(), self, || format!(
+        assert_that!(!actions.is_empty(), self, || format!(
             "No legal actions for player: {:?}",
             player
         ));

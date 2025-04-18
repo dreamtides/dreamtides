@@ -197,7 +197,9 @@ namespace Dreamtides.Components
 
     void Update()
     {
-      var outlineContext = GameContext == GameContext.Hand || GameContext == GameContext.Hovering;
+      var outlineContext = GameContext == GameContext.Hand ||
+          GameContext == GameContext.Hovering ||
+          GameContext == GameContext.Stack;
       _outline.gameObject.SetActive(CanPlay() ||
           CanSelectOrder() ||
           (outlineContext && CardView.Revealed?.OutlineColor != null));

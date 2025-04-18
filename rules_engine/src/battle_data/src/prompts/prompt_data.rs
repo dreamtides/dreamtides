@@ -1,6 +1,6 @@
 use core_data::types::PlayerName;
 
-use crate::battle_cards::card_id::CharacterId;
+use crate::battle_cards::card_id::{CharacterId, StackCardId};
 
 /// Data for a prompt to be displayed to a player.
 #[derive(Debug, Clone)]
@@ -22,6 +22,7 @@ pub struct PromptData {
 #[derive(Debug, Clone)]
 pub enum Prompt {
     ChooseCharacter { valid: Vec<CharacterId> },
+    ChooseStackCard { valid: Vec<StackCardId> },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

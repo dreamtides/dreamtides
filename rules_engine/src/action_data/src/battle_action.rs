@@ -1,4 +1,4 @@
-use battle_data::battle_cards::card_id::{CharacterId, HandCardId};
+use battle_data::battle_cards::card_id::{CharacterId, HandCardId, StackCardId};
 use core_data::identifiers::CardId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -17,6 +17,9 @@ pub enum BattleAction {
     /// Select a character by ID in response to some prompt, e.g. as a target of
     /// a  card being played.
     SelectCharacter(CharacterId),
+    /// Select a card on the stack by ID in response to some prompt, e.g. as a
+    /// target of a card being played.
+    SelectStackCard(StackCardId),
     /// End the turn
     EndTurn,
     /// Sets the position of a card in a card order selector.

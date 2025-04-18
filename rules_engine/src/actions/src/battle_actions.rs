@@ -19,7 +19,10 @@ pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction
             end_turn::run(battle, EffectSource::Game);
         }
         BattleAction::SelectCharacter(character_id) => {
-            select_card::select_for_prompt(battle, EffectSource::Game, character_id);
+            select_card::select_character_for_prompt(battle, EffectSource::Game, character_id);
+        }
+        BattleAction::SelectStackCard(stack_card_id) => {
+            select_card::select_stack_card_for_prompt(battle, EffectSource::Game, stack_card_id);
         }
         _ => {
             todo!("Implement {:?}", action);

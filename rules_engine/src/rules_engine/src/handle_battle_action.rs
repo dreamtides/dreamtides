@@ -14,7 +14,7 @@ pub fn execute(
     player: PlayerName,
     action: BattleAction,
 ) -> CommandSequence {
-    info!("Executing battle action: {:?}", action);
+    info!(?action, "Executing battle action");
     battle_actions::execute(battle, player, action);
 
     let Some(next_player) = legal_actions::next_to_act(battle) else {
@@ -32,7 +32,7 @@ pub fn execute(
     if let Some(agent) = battle.player(next_player).ai.as_ref() {
         info!("Selecting action for AI player");
         let next_action = agent_search::select_action(battle, next_player, agent);
-        info!("Executing action for AI player: {:?}", next_action);
+        info!(?next_action, "Executing action for AI player");
         execute(battle, next_player, next_action)
     } else {
         info!("Rendering updates for human player");

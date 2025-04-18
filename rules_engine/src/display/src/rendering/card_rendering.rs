@@ -1,7 +1,7 @@
 use action_data::battle_action::BattleAction;
 use action_data::game_action::GameAction;
 use battle_data::battle::battle_data::BattleData;
-use battle_data::battle_cards::card_id::{CardIdType, CharacterId, HandCardId};
+use battle_data::battle_cards::card_id::{CardIdType, HandCardId};
 use battle_data::prompts::prompt_data::Prompt;
 use battle_queries::legal_action_queries::can_play_card;
 use core_data::display_color;
@@ -38,7 +38,7 @@ fn revealed_card_view(_builder: &ResponseBuilder, context: &CardViewContext) -> 
     let card_id = context.card().id.card_id();
 
     let can_play = can_play_card::from_hand(battle, EffectSource::Game, HandCardId(card_id));
-    let selection_target = character_selection_target(context.battle(), card_id);
+    let selection_target = selection_target(context.battle(), card_id);
 
     RevealedCardView {
         image: DisplayImage {
@@ -59,22 +59,26 @@ fn revealed_card_view(_builder: &ResponseBuilder, context: &CardViewContext) -> 
         },
         supplemental_card_info: None,
         is_fast: false,
-        actions: CardActions {
-            can_play,
-            on_click: selection_target
-                .map(|id| GameAction::BattleAction(BattleAction::SelectCharacter(id))),
-            ..Default::default()
-        },
+        actions: CardActions { can_play, on_click: selection_target, ..Default::default() },
         effects: CardEffects::default(),
     }
 }
 
-fn character_selection_target(battle: &BattleData, card_id: CardId) -> Option<CharacterId> {
+fn selection_target(battle: &BattleData, card_id: CardId) -> Option<GameAction> {
     if let Some(prompt_data) = &battle.prompt {
         if prompt_data.player == PlayerName::User {
             match &prompt_data.prompt {
                 Prompt::ChooseCharacter { valid } => {
-                    return valid.iter().find(|target_id| target_id.card_id() == card_id).copied()
+                    return valid
+                        .iter()
+                        .find(|target_id| target_id.card_id() == card_id)
+                        .map(|&id| GameAction::BattleAction(BattleAction::SelectCharacter(id)));
+                }
+                Prompt::ChooseStackCard { valid } => {
+                    return valid
+                        .iter()
+                        .find(|target_id| target_id.card_id() == card_id)
+                        .map(|&id| GameAction::BattleAction(BattleAction::SelectStackCard(id)));
                 }
             }
         }

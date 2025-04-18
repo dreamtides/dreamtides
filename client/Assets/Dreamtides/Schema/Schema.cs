@@ -687,6 +687,9 @@ namespace Dreamtides.Schema
     /// Select a character by ID in response to some prompt, e.g. as a target of a  card being
     /// played.
     ///
+    /// Select a card on the stack by ID in response to some prompt, e.g. as a target of a card
+    /// being played.
+    ///
     /// Sets the position of a card in a card order selector.
     ///
     /// Show cards in a zone
@@ -698,6 +701,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("selectCharacter", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardId SelectCharacter { get; set; }
+
+        [JsonProperty("selectStackCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public CardId SelectStackCard { get; set; }
 
         [JsonProperty("selectCardOrder", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SelectCardOrder SelectCardOrder { get; set; }

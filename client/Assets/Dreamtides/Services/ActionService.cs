@@ -42,7 +42,7 @@ namespace Dreamtides.Services
 
       if (Application.isEditor)
       {
-        StartCoroutine(DevServerConnectAsync(request));
+        StartCoroutine(DevServerConnectAsync(request, reconnect: false));
       }
       else
       {
@@ -61,7 +61,7 @@ namespace Dreamtides.Services
           StartCoroutine(DevServerConnectAsync(new ConnectRequest
           {
             Metadata = _metadata!
-          }));
+          }, reconnect: true));
           _lastConnectAttemptTime = now;
         }
       }
@@ -94,8 +94,17 @@ namespace Dreamtides.Services
       }
     }
 
-    private IEnumerator DevServerConnectAsync(ConnectRequest request)
+    private IEnumerator DevServerConnectAsync(ConnectRequest request, bool reconnect)
     {
+      if (reconnect)
+      {
+        Debug.Log("Reconnecting...");
+      }
+      else
+      {
+        Debug.Log("Connecting...");
+      }
+
       yield return SendDevServerRequest<ConnectRequest, ConnectResponse>(
         request,
         "connect",
@@ -140,6 +149,7 @@ namespace Dreamtides.Services
       }
       else
       {
+        Debug.LogError($"Error sending dev server request: {webRequest.error}");
         _devModeAutoConnect = true;
       }
     }

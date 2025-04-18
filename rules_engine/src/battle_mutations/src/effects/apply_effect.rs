@@ -2,10 +2,11 @@ use ability_data::effect::{Effect, EffectWithOptions};
 use ability_data::standard_effect::StandardEffect;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_cards::card_data::TargetId;
-use battle_data::battle_cards::card_id::CharacterId;
+use battle_data::battle_cards::card_id::{CharacterId, StackCardId};
 use core_data::effect_source::EffectSource;
 
 use crate::character_mutations::dissolve;
+use crate::effects::negate;
 
 /// Applies an effect to the battle state.
 pub fn apply(
@@ -58,6 +59,11 @@ fn apply_standard_effect(
                 dissolve::apply(battle, source, character_id);
             }
         }
+        StandardEffect::Negate { .. } => {
+            for stack_card_id in stack_card_ids(targets) {
+                negate::apply(battle, source, stack_card_id);
+            }
+        }
         _ => todo!("Implement {:?}", effect),
     }
     Some(())
@@ -66,6 +72,13 @@ fn apply_standard_effect(
 fn character_ids(targets: &[TargetId]) -> impl Iterator<Item = CharacterId> + '_ {
     targets.iter().filter_map(|target| match target {
         TargetId::Character(character_id) => Some(*character_id),
+        _ => None,
+    })
+}
+
+fn stack_card_ids(targets: &[TargetId]) -> impl Iterator<Item = StackCardId> + '_ {
+    targets.iter().filter_map(|target| match target {
+        TargetId::StackCard(stack_card_id) => Some(*stack_card_id),
         _ => None,
     })
 }

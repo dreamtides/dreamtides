@@ -38,6 +38,9 @@ pub fn compute(
                 Prompt::ChooseCharacter { valid } => {
                     return valid.iter().map(|&id| BattleAction::SelectCharacter(id)).collect()
                 }
+                Prompt::ChooseStackCard { valid } => {
+                    return valid.iter().map(|&id| BattleAction::SelectStackCard(id)).collect()
+                }
             }
         }
     }

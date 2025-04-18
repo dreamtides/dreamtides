@@ -17,7 +17,7 @@ use battle_data::battle_player::player_data::PlayerData;
 use battle_mutations::zone_mutations::deck;
 use core_data::card_types::{CardType, CharacterType};
 use core_data::effect_source::EffectSource;
-use core_data::identifiers::BattleId;
+use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark, TurnId};
 use core_data::types::PlayerName;
 use rand::{Rng, SeedableRng};
@@ -67,10 +67,10 @@ pub fn create_and_start(
 fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
     for _ in 0..30 {
         battle.cards.create_card(CardData {
-            id: Default::default(),
+            id: CardId::default(),
             owner: player_name,
             zone: Zone::Deck,
-            object_id: ObjectId(0),
+            object_id: ObjectId::default(),
             properties: CardProperties {
                 spark: Some(Spark(rand::rng().random_range(1..=5))),
                 cost: Some(Energy(rand::rng().random_range(1..=5))),
@@ -80,16 +80,16 @@ fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
             abilities: vec![],
             revealed_to_owner: false,
             revealed_to_opponent: false,
-            targets: Vec::new(),
+            targets: vec![],
             turn_entered_current_zone: TurnData::default(),
         });
     }
 
     battle.cards.create_card(CardData {
-        id: Default::default(),
+        id: CardId::default(),
         owner: player_name,
         zone: Zone::Deck,
-        object_id: ObjectId(0),
+        object_id: ObjectId::default(),
         properties: CardProperties {
             spark: None,
             cost: Some(Energy(2)),
@@ -101,15 +101,15 @@ fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
         }))],
         revealed_to_owner: false,
         revealed_to_opponent: false,
-        targets: Vec::new(),
+        targets: vec![],
         turn_entered_current_zone: TurnData::default(),
     });
 
     battle.cards.create_card(CardData {
-        id: Default::default(),
+        id: CardId::default(),
         owner: player_name,
         zone: Zone::Deck,
-        object_id: ObjectId(0),
+        object_id: ObjectId::default(),
         properties: CardProperties {
             spark: None,
             cost: Some(Energy(1)),
@@ -121,7 +121,7 @@ fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
         }))],
         revealed_to_owner: false,
         revealed_to_opponent: false,
-        targets: Vec::new(),
+        targets: vec![],
         turn_entered_current_zone: TurnData::default(),
     });
 }

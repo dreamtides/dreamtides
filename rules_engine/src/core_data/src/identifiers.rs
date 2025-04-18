@@ -1,3 +1,5 @@
+use std::fmt;
+
 use schemars::gen::SchemaGenerator;
 use schemars::schema::{InstanceType, Schema, SchemaObject};
 use schemars::JsonSchema;
@@ -41,6 +43,12 @@ new_key_type! {
     /// - A copy of a card on the stack
     /// - A token or copy of a card in play
     pub struct CardId;
+}
+
+impl fmt::Display for CardId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self.0)
+    }
 }
 
 impl JsonSchema for CardId {

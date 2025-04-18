@@ -1,5 +1,6 @@
 use ability_data::ability::Ability;
 use ability_data::effect::Effect;
+use ability_data::standard_effect::StandardEffect;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_cards::card_id::CardIdType;
 use core_data::effect_source::EffectSource;
@@ -33,25 +34,36 @@ fn has_legal_targets_for_effect(
 ) -> bool {
     match effect {
         Effect::Effect(standard_effect) => {
-            if let Some(predicate) = predicates::get_target_predicate(standard_effect) {
-                !predicates::matching_characters(battle, controller, source, predicate).is_empty()
-            } else {
-                true
-            }
+            has_legal_targets_for_standard_effect(battle, controller, source, standard_effect)
         }
-        Effect::WithOptions(effect_with_options) => {
-            if let Some(predicate) = predicates::get_target_predicate(&effect_with_options.effect) {
-                !predicates::matching_characters(battle, controller, source, predicate).is_empty()
-            } else {
-                true
-            }
-        }
+        Effect::WithOptions(effect_with_options) => has_legal_targets_for_standard_effect(
+            battle,
+            controller,
+            source,
+            &effect_with_options.effect,
+        ),
         Effect::List(effects) => effects.iter().all(|effect_with_options| {
-            if let Some(predicate) = predicates::get_target_predicate(&effect_with_options.effect) {
-                !predicates::matching_characters(battle, controller, source, predicate).is_empty()
-            } else {
-                true
-            }
+            has_legal_targets_for_standard_effect(
+                battle,
+                controller,
+                source,
+                &effect_with_options.effect,
+            )
         }),
+    }
+}
+
+fn has_legal_targets_for_standard_effect(
+    battle: &BattleData,
+    controller: PlayerName,
+    source: EffectSource,
+    effect: &StandardEffect,
+) -> bool {
+    if let Some(predicate) = predicates::get_character_target_predicate(effect) {
+        !predicates::matching_characters(battle, controller, source, predicate).is_empty()
+    } else if let Some(predicate) = predicates::get_stack_target_predicate(effect) {
+        !predicates::matching_cards_on_stack(battle, controller, source, predicate).is_empty()
+    } else {
+        true
     }
 }

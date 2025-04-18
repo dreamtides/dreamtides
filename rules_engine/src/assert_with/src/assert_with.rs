@@ -42,14 +42,40 @@ macro_rules! expect {
 ///
 /// Example:
 /// ```rust
-/// assert_with!(2 == 2, battle, || "should not fail");
+/// assert_that!(2 == 2, battle, || "should not fail");
 /// ```
 #[macro_export]
-macro_rules! assert_with {
+macro_rules! assert_that {
     ($condition:expr, $battle:expr, $message:expr) => {
         if !$condition {
             let snapshot = $battle.debug_snapshot();
             let message = $crate::panic_message(snapshot, $message());
+            panic!("{}", message)
+        }
+    };
+}
+
+/// Panics with a message, including battle debug information.
+///
+/// This is a macro version of the `panic!` macro which records more debug
+/// information before panicking.
+///
+/// Arguments:
+/// - `$battle`: The battle data.
+/// - `$($arg:tt)*`: Format string and arguments, just like in the standard
+///   panic! macro.
+///
+/// Example:
+/// ```rust
+/// panic_with!(battle, "Invalid state: {}", state);
+/// ```
+#[macro_export]
+macro_rules! panic_with {
+    ($battle:expr, $($arg:tt)*) => {
+        {
+            let snapshot = $battle.debug_snapshot();
+            let formatted_message = format!($($arg)*);
+            let message = $crate::panic_message(snapshot, formatted_message);
             panic!("{}", message)
         }
     };
@@ -104,14 +130,21 @@ mod tests {
     #[test]
     fn test_assert_with_true() {
         let battle = get_test_battle();
-        crate::assert_with!(2 == 2, battle, || "should not fail");
+        crate::assert_that!(2 == 2, battle, || "should not fail");
     }
 
     #[test]
     #[should_panic(expected = "assertion failed, battle:")]
     fn test_assert_with_false() {
         let battle = get_test_battle();
-        crate::assert_with!(2 == 3, battle, || "assertion failed");
+        crate::assert_that!(2 == 3, battle, || "assertion failed");
+    }
+
+    #[test]
+    #[should_panic(expected = "Error occurred: test panic, battle:")]
+    fn test_panic_with() {
+        let battle = get_test_battle();
+        crate::panic_with!(battle, "Error occurred: {}", "test panic");
     }
 
     fn get_test_battle() -> BattleData {
