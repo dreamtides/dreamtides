@@ -3,10 +3,10 @@ use ability_data::effect::Effect;
 use ability_data::standard_effect::StandardEffect;
 use assert_with::assert_that;
 use battle_data::battle::battle_data::BattleData;
+use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_cards::card_id::StackCardId;
-use battle_data::prompts::prompt_data::{Prompt, PromptContext, PromptData};
+use battle_data::prompt_types::prompt_data::{Prompt, PromptContext, PromptData, PromptOptions};
 use battle_queries::predicate_queries::predicates;
-use core_data::effect_source::EffectSource;
 use core_data::types::PlayerName;
 use tracing::info;
 
@@ -38,9 +38,9 @@ fn create_prompt_for_effect(
 ) -> Option<PromptData> {
     match effect {
         Effect::Effect(standard_effect) => {
-            create_prompt_for_standard_effect(battle, player, source, standard_effect, false)
+            create_prompt_for_targeting(battle, player, source, standard_effect, false)
         }
-        Effect::WithOptions(with_options) => create_prompt_for_standard_effect(
+        Effect::WithOptions(with_options) => create_prompt_for_targeting(
             battle,
             player,
             source,
@@ -49,7 +49,7 @@ fn create_prompt_for_effect(
         ),
         Effect::List(effects) => {
             for effect_with_options in effects {
-                if let Some(prompt_data) = create_prompt_for_standard_effect(
+                if let Some(prompt_data) = create_prompt_for_targeting(
                     battle,
                     player,
                     source,
@@ -66,7 +66,7 @@ fn create_prompt_for_effect(
 
 /// Creates a prompt data for a standard effect if it requires target selection.
 /// Returns the prompt data if created, None otherwise.
-fn create_prompt_for_standard_effect(
+fn create_prompt_for_targeting(
     battle: &BattleData,
     player: PlayerName,
     source: EffectSource,
@@ -74,31 +74,31 @@ fn create_prompt_for_standard_effect(
     optional: bool,
 ) -> Option<PromptData> {
     if let Some(target_predicate) = predicates::get_character_target_predicate(std_effect) {
-        let valid =
-            predicates::matching_characters(battle, player, source, target_predicate.clone());
+        let valid = predicates::matching_characters(battle, source, target_predicate.clone());
         assert_that!(!valid.is_empty(), battle, || format!(
             "No valid characters for {:?}",
             std_effect
         ));
         info!("Adding prompt for characters {:?}", valid);
         Some(PromptData {
+            source,
             player,
             prompt: Prompt::ChooseCharacter { valid },
-            optional,
             context: get_prompt_context(std_effect),
+            options: PromptOptions { optional, ..Default::default() },
         })
     } else if let Some(target_predicate) = predicates::get_stack_target_predicate(std_effect) {
-        let valid =
-            predicates::matching_cards_on_stack(battle, player, source, target_predicate.clone());
+        let valid = predicates::matching_cards_on_stack(battle, source, target_predicate.clone());
         assert_that!(!valid.is_empty(), battle, || format!(
             "No valid stack cards for {:?}",
             std_effect
         ));
         Some(PromptData {
+            source,
             player,
             prompt: Prompt::ChooseStackCard { valid },
-            optional,
             context: get_prompt_context(std_effect),
+            options: PromptOptions { optional, ..Default::default() },
         })
     } else {
         None

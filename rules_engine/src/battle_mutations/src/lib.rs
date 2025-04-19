@@ -1,4 +1,5 @@
 pub mod character_mutations;
+pub mod core;
 pub mod dreamwell_phase;
 pub mod effects;
 pub mod judgment_phase;

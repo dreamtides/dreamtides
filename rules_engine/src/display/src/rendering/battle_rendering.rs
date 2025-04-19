@@ -1,11 +1,12 @@
 use action_data::battle_action::BattleAction;
+use assert_with::{assert_that, expect, panic_with};
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
 use battle_data::battle_player::player_data::PlayerData;
+use battle_data::prompt_types::prompt_data::Prompt;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions::LegalActions;
 use battle_queries::player_queries::spark_total;
-use core_data::effect_source::EffectSource;
 use core_data::types::PlayerName;
 use display_data::battle_view::{BattleView, InterfaceView, PlayerView, PrimaryActionButtonView};
 use display_data::command::{Command, GameMessageType, UpdateBattleCommand};
@@ -51,7 +52,7 @@ fn player_view(battle: &BattleData, player: &PlayerData) -> PlayerView {
         can_act: true,
         energy: player.current_energy,
         produced_energy: player.produced_energy,
-        total_spark: spark_total::query(battle, player.name, EffectSource::Game),
+        total_spark: spark_total::query(battle, player.name),
     }
 }
 
@@ -60,7 +61,36 @@ fn interface_view(battle: &BattleData) -> InterfaceView {
     let legal_actions =
         legal_actions::compute(battle, user_name, LegalActions { for_human_player: true });
 
-    let primary_action_button = if legal_actions.contains(&BattleAction::ResolveStack) {
+    let primary_action_button = primary_action_button(battle, &legal_actions);
+
+    InterfaceView {
+        screen_overlay: None,
+        primary_action_button,
+        card_order_selector: None,
+        bottom_right_button: None,
+    }
+}
+
+fn primary_action_button(
+    battle: &BattleData,
+    legal_actions: &[BattleAction],
+) -> Option<PrimaryActionButtonView> {
+    if legal_actions.contains(&BattleAction::SelectPromptChoice(0)) {
+        let prompt = expect!(battle.prompt.as_ref(), battle, || {
+            "Expected prompt for SelectPromptChoice action"
+        });
+        let Prompt::Choose { choices } = &prompt.prompt else {
+            panic_with!(battle, "Expected a Choose prompt");
+        };
+        assert_that!(!choices.is_empty(), battle, || "Expected a Choose prompt with choices");
+        return Some(PrimaryActionButtonView {
+            label: choices[0].label.clone(),
+            action: BattleAction::SelectPromptChoice(0).into(),
+            show_on_idle_duration: None,
+        });
+    }
+
+    if legal_actions.contains(&BattleAction::ResolveStack) {
         Some(PrimaryActionButtonView {
             label: "Resolve".to_string(),
             action: BattleAction::ResolveStack.into(),
@@ -74,12 +104,5 @@ fn interface_view(battle: &BattleData) -> InterfaceView {
         })
     } else {
         None
-    };
-
-    InterfaceView {
-        screen_overlay: None,
-        primary_action_button,
-        card_order_selector: None,
-        bottom_right_button: None,
     }
 }

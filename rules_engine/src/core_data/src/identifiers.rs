@@ -81,3 +81,10 @@ impl CardId {
         self.data().as_ffi()
     }
 }
+
+/// Identifies an ability of a card.
+#[derive(
+    Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
+pub struct AbilityNumber(pub usize);

@@ -1,9 +1,9 @@
 use assert_with::{expect, panic_with};
 use battle_data::battle::battle_data::BattleData;
+use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_cards::card_data::TargetId;
 use battle_data::battle_cards::card_id::{CharacterId, StackCardId};
-use battle_data::prompts::prompt_data::Prompt;
-use core_data::effect_source::EffectSource;
+use battle_data::prompt_types::prompt_data::Prompt;
 use tracing::info;
 
 /// Applies whatever game effect is required for a card being selected in the
@@ -27,8 +27,8 @@ pub fn select_character_for_prompt(
             info!("Targets for {:?} updated to {:?}", stack_card.id, stack_card.targets);
             battle.prompt = None;
         }
-        Prompt::ChooseStackCard { .. } => {
-            panic_with!(battle, "Cannot choose a stack card for a character card prompt");
+        _ => {
+            panic_with!(battle, "Expected a character prompt");
         }
     }
 }
@@ -54,8 +54,8 @@ pub fn select_stack_card_for_prompt(
             info!("Targets for {:?} updated to {:?}", stack_card.id, stack_card.targets);
             battle.prompt = None;
         }
-        Prompt::ChooseCharacter { .. } => {
-            panic_with!(battle, "Cannot choose a character for a stack card prompt");
+        _ => {
+            panic_with!(battle, "Expected a stack card prompt");
         }
     }
 }

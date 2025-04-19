@@ -1,8 +1,9 @@
 use ability_data::ability::Ability;
 use battle_data::battle::battle_data::BattleData;
+use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_cards::card_id::StackCardId;
 use core_data::card_types::CardType;
-use core_data::effect_source::EffectSource;
+use core_data::identifiers::AbilityNumber;
 
 use crate::effects::apply_effect;
 use crate::zone_mutations::move_card;
@@ -51,8 +52,18 @@ fn apply_event_effects(
         .cloned()
         .collect::<Vec<_>>();
 
-    for effect in effects {
-        apply_effect::apply(battle, source, effect, battle.cards.card(card_id)?.targets.clone());
+    for (i, effect) in effects.into_iter().enumerate() {
+        let event_source = EffectSource::Event {
+            controller: source.controller(),
+            card: card_id,
+            ability_number: AbilityNumber(i),
+        };
+        apply_effect::apply(
+            battle,
+            event_source,
+            effect,
+            battle.cards.card(card_id)?.targets.clone(),
+        );
     }
     Some(())
 }

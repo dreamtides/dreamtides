@@ -1,9 +1,9 @@
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
 use battle_data::battle::battle_data::BattleData;
+use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_cards::card_id::{CharacterId, StackCardId};
-use core_data::effect_source::EffectSource;
-use core_data::types::PlayerName;
+use core_data::card_types::CardType;
 
 #[derive(Debug, Clone)]
 pub struct CharacterPredicate(pub Predicate);
@@ -14,16 +14,19 @@ pub struct StackPredicate(pub Predicate);
 /// Returns the set of characters on the battlefield matching this `predicate`.
 pub fn matching_characters(
     battle: &BattleData,
-    controller: PlayerName,
     source: EffectSource,
     predicate: CharacterPredicate,
 ) -> Vec<CharacterId> {
     match predicate.0 {
         Predicate::Enemy(card_predicate) => on_battlefield(
             battle,
-            controller,
             source,
-            battle.cards.battlefield(controller.opponent()).iter().cloned().collect::<Vec<_>>(),
+            battle
+                .cards
+                .battlefield(source.controller().opponent())
+                .iter()
+                .cloned()
+                .collect::<Vec<_>>(),
             card_predicate,
         ),
         _ => todo!("Implement {:?}", predicate),
@@ -33,13 +36,12 @@ pub fn matching_characters(
 /// Returns the set of cards on the stack matching this `predicate`.
 pub fn matching_cards_on_stack(
     battle: &BattleData,
-    controller: PlayerName,
     source: EffectSource,
     predicate: StackPredicate,
 ) -> Vec<StackCardId> {
     match predicate.0 {
         Predicate::Enemy(card_predicate) => {
-            on_stack(battle, controller, source, battle.cards.stack().to_vec(), card_predicate)
+            on_stack(battle, source, battle.cards.stack().to_vec(), card_predicate)
         }
         _ => todo!("Implement {:?}", predicate),
     }
@@ -87,7 +89,6 @@ pub fn get_stack_target_predicate(effect: &StandardEffect) -> Option<StackPredic
 /// match `predicate`.
 fn on_battlefield(
     _battle: &BattleData,
-    _controller: PlayerName,
     _source: EffectSource,
     collection: Vec<CharacterId>,
     predicate: CardPredicate,
@@ -101,14 +102,23 @@ fn on_battlefield(
 /// Returns the set of cards on the stack from `collection` which match
 /// `predicate`.
 fn on_stack(
-    _battle: &BattleData,
-    _controller: PlayerName,
+    battle: &BattleData,
     _source: EffectSource,
     collection: Vec<StackCardId>,
     predicate: CardPredicate,
 ) -> Vec<StackCardId> {
     match predicate {
         CardPredicate::Card | CardPredicate::Dream => collection,
+        CardPredicate::Event => collection
+            .iter()
+            .filter(|&&id| {
+                battle
+                    .cards
+                    .card(id)
+                    .map_or(false, |card| card.properties.card_type == CardType::Event)
+            })
+            .cloned()
+            .collect(),
         _ => todo!("Implement {:?}", predicate),
     }
 }

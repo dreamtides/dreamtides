@@ -1,5 +1,5 @@
 use battle_data::battle::battle_data::BattleData;
-use core_data::effect_source::EffectSource;
+use battle_data::battle::effect_source::EffectSource;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 

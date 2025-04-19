@@ -11,7 +11,7 @@ use crate::battle_animations::battle_animation::BattleAnimation;
 use crate::battle_cards::all_cards::AllCards;
 use crate::battle_player::player_data::PlayerData;
 use crate::debug_snapshots::debug_battle_data::DebugBattleData;
-use crate::prompts::prompt_data::PromptData;
+use crate::prompt_types::prompt_data::PromptData;
 
 /// Contains data types for a "battle", a single instance of playing a game
 /// against an enemy.

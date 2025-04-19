@@ -1,6 +1,6 @@
 use battle_data::battle::battle_data::BattleData;
+use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_animations::battle_animation::BattleAnimation;
-use core_data::effect_source::EffectSource;
 use core_data::numerics::TurnId;
 use core_data::types::PlayerName;
 

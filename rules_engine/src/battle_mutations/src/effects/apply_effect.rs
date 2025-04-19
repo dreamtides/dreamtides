@@ -1,11 +1,19 @@
+use ability_data::cost::Cost;
 use ability_data::effect::{Effect, EffectWithOptions};
+use ability_data::predicate::Predicate;
 use ability_data::standard_effect::StandardEffect;
 use battle_data::battle::battle_data::BattleData;
+use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_cards::card_data::TargetId;
 use battle_data::battle_cards::card_id::{CharacterId, StackCardId};
-use core_data::effect_source::EffectSource;
+use battle_data::battle_cards::zone::Zone;
+use battle_data::prompt_types::prompt_data::{
+    Prompt, PromptChoice, PromptContext, PromptData, PromptOptions,
+};
+use core_data::numerics::Energy;
 
 use crate::character_mutations::dissolve;
+use crate::core::prompts;
 use crate::effects::negate;
 
 /// Applies an effect to the battle state.
@@ -63,6 +71,32 @@ fn apply_standard_effect(
             for stack_card_id in stack_card_ids(targets) {
                 negate::apply(battle, source, stack_card_id);
             }
+        }
+        StandardEffect::NegateUnlessPaysCost { .. } => {
+            prompts::set(battle, PromptData {
+                source,
+                player: source.controller().opponent(),
+                prompt: Prompt::Choose {
+                    choices: vec![
+                        PromptChoice {
+                            label: "Pay $2".to_string(),
+                            effect: Effect::Effect(StandardEffect::PayCost {
+                                cost: Cost::Energy(Energy(2)),
+                            }),
+                            targets: vec![],
+                        },
+                        PromptChoice {
+                            label: "Decline".to_string(),
+                            effect: Effect::Effect(StandardEffect::Negate {
+                                target: Predicate::It,
+                            }),
+                            targets: targets.to_vec(),
+                        },
+                    ],
+                },
+                context: PromptContext::TargetNegativeEffect,
+                options: PromptOptions { move_source_to: Some(Zone::Void), ..Default::default() },
+            });
         }
         _ => todo!("Implement {:?}", effect),
     }

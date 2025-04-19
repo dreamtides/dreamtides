@@ -14,14 +14,16 @@ pub enum BattleAction {
     /// Pass on taking actions in response to a card being played by the
     /// opponent, thus causing the stack to be resolved.
     ResolveStack,
+    /// End the turn
+    EndTurn,
     /// Select a character by ID in response to some prompt, e.g. as a target of
     /// a  card being played.
     SelectCharacter(CharacterId),
     /// Select a card on the stack by ID in response to some prompt, e.g. as a
     /// target of a card being played.
     SelectStackCard(StackCardId),
-    /// End the turn
-    EndTurn,
+    /// Select a choice at a given index position in response to a prompt.
+    SelectPromptChoice(usize),
     /// Sets the position of a card in a card order selector.
     SelectCardOrder(SelectCardOrder),
     /// Show cards in a zone

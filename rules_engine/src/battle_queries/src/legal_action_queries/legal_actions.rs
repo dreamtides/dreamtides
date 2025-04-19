@@ -1,8 +1,7 @@
 use action_data::battle_action::BattleAction;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
-use battle_data::prompts::prompt_data::Prompt;
-use core_data::effect_source::EffectSource;
+use battle_data::prompt_types::prompt_data::Prompt;
 use core_data::types::PlayerName;
 use tracing::instrument;
 
@@ -34,14 +33,19 @@ pub fn compute(
     // corresponding to the prompt
     if let Some(prompt_data) = &battle.prompt {
         if prompt_data.player == player {
-            match &prompt_data.prompt {
+            return match &prompt_data.prompt {
                 Prompt::ChooseCharacter { valid } => {
-                    return valid.iter().map(|&id| BattleAction::SelectCharacter(id)).collect()
+                    valid.iter().map(|&id| BattleAction::SelectCharacter(id)).collect()
                 }
                 Prompt::ChooseStackCard { valid } => {
-                    return valid.iter().map(|&id| BattleAction::SelectStackCard(id)).collect()
+                    valid.iter().map(|&id| BattleAction::SelectStackCard(id)).collect()
                 }
-            }
+                Prompt::Choose { choices } => choices
+                    .iter()
+                    .enumerate()
+                    .map(|(i, _)| BattleAction::SelectPromptChoice(i))
+                    .collect(),
+            };
         }
     }
 
@@ -67,7 +71,7 @@ pub fn compute(
             .cards
             .hand(player)
             .iter()
-            .filter(|&&id| can_play_card::from_hand(battle, EffectSource::Game, id))
+            .filter(|&&id| can_play_card::from_hand(battle, id))
             .copied()
             .map(BattleAction::PlayCardFromHand),
     );
