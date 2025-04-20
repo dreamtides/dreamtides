@@ -41,10 +41,27 @@ pub fn matching_cards_on_stack(
 ) -> Vec<StackCardId> {
     match predicate.0 {
         Predicate::Enemy(card_predicate) => {
-            on_stack(battle, source, battle.cards.stack().to_vec(), card_predicate)
+            let enemy_cards = battle
+                .cards
+                .stack()
+                .iter()
+                .filter(|&&id| {
+                    battle
+                        .cards
+                        .card(id)
+                        .map_or(false, |card| card.controller() == source.controller().opponent())
+                })
+                .cloned()
+                .collect::<Vec<_>>();
+            on_stack(battle, source, enemy_cards, card_predicate)
         }
         _ => todo!("Implement {:?}", predicate),
     }
+}
+
+/// Returns true if a standard effect requires a target to resolve.
+pub fn has_targets(effect: &StandardEffect) -> bool {
+    get_character_target_predicate(effect).is_some() || get_stack_target_predicate(effect).is_some()
 }
 
 /// Extracts a character target predicate from a standard effect, if any.
@@ -80,6 +97,7 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<Charact
 pub fn get_stack_target_predicate(effect: &StandardEffect) -> Option<StackPredicate> {
     let predicate = match effect {
         StandardEffect::Negate { target, .. } => Some(target.clone()),
+        StandardEffect::NegateUnlessPaysCost { target, .. } => Some(target.clone()),
         _ => None,
     }?;
     Some(StackPredicate(predicate))

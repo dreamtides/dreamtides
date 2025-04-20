@@ -1,3 +1,4 @@
+use assert_with::assert_that;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::effect_source::EffectSource;
 use core_data::numerics::Energy;
@@ -8,7 +9,10 @@ use core_data::types::PlayerName;
 /// Panics if `player` has insufficient energy available.
 pub fn spend(battle: &mut BattleData, player: PlayerName, _source: EffectSource, amount: Energy) {
     let player_state = battle.player_mut(player);
-    assert!(player_state.current_energy >= amount);
+    assert_that!(player_state.current_energy >= amount, battle, || format!(
+        "{:?} has insufficient energy to pay {:?}",
+        player, amount
+    ));
     player_state.current_energy -= amount;
 }
 

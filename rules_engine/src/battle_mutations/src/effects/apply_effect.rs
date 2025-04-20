@@ -1,20 +1,21 @@
-use ability_data::cost::Cost;
 use ability_data::effect::{Effect, EffectWithOptions};
 use ability_data::predicate::Predicate;
 use ability_data::standard_effect::StandardEffect;
+use assert_with::assert_that;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_cards::card_data::TargetId;
 use battle_data::battle_cards::card_id::{CharacterId, StackCardId};
 use battle_data::battle_cards::zone::Zone;
 use battle_data::prompt_types::prompt_data::{
-    Prompt, PromptChoice, PromptContext, PromptData, PromptOptions,
+    Prompt, PromptChoice, PromptConfiguration, PromptContext, PromptData,
 };
-use core_data::numerics::Energy;
+use battle_queries::cost_queries::costs;
+use battle_queries::predicate_queries::effect_predicates;
 
 use crate::character_mutations::dissolve;
 use crate::core::prompts;
-use crate::effects::negate;
+use crate::effects::{negate, pay_cost};
 
 /// Applies an effect to the battle state.
 pub fn apply(
@@ -61,46 +62,60 @@ fn apply_standard_effect(
     effect: StandardEffect,
     targets: &[TargetId],
 ) -> Option<()> {
+    if effect_predicates::has_targets(&effect) {
+        assert_that!(!targets.is_empty(), battle, || format!(
+            "Effect {:?} requires targets",
+            effect
+        ));
+    }
     match effect {
         StandardEffect::DissolveCharacter { .. } => {
             for character_id in character_ids(targets) {
                 dissolve::apply(battle, source, character_id);
             }
         }
-        StandardEffect::Negate { .. } => {
-            for stack_card_id in stack_card_ids(targets) {
-                negate::apply(battle, source, stack_card_id);
+        StandardEffect::Negate { .. } => negate(battle, source, targets),
+        StandardEffect::NegateUnlessPaysCost { cost, .. } => {
+            if costs::can_pay(battle, source.controller().opponent(), &cost) {
+                prompts::set(battle, PromptData {
+                    source,
+                    player: source.controller().opponent(),
+                    prompt: Prompt::Choose {
+                        choices: vec![
+                            PromptChoice {
+                                label: "Pay $2".to_string(),
+                                effect: Effect::Effect(StandardEffect::PayCost { cost }),
+                                targets: vec![],
+                            },
+                            PromptChoice {
+                                label: "Decline".to_string(),
+                                effect: Effect::Effect(StandardEffect::Negate {
+                                    target: Predicate::It,
+                                }),
+                                targets: targets.to_vec(),
+                            },
+                        ],
+                    },
+                    context: PromptContext::TargetNegativeEffect,
+                    configuration: PromptConfiguration {
+                        move_source_to: Some(Zone::Void),
+                        ..Default::default()
+                    },
+                });
+            } else {
+                negate(battle, source, targets);
             }
         }
-        StandardEffect::NegateUnlessPaysCost { .. } => {
-            prompts::set(battle, PromptData {
-                source,
-                player: source.controller().opponent(),
-                prompt: Prompt::Choose {
-                    choices: vec![
-                        PromptChoice {
-                            label: "Pay $2".to_string(),
-                            effect: Effect::Effect(StandardEffect::PayCost {
-                                cost: Cost::Energy(Energy(2)),
-                            }),
-                            targets: vec![],
-                        },
-                        PromptChoice {
-                            label: "Decline".to_string(),
-                            effect: Effect::Effect(StandardEffect::Negate {
-                                target: Predicate::It,
-                            }),
-                            targets: targets.to_vec(),
-                        },
-                    ],
-                },
-                context: PromptContext::TargetNegativeEffect,
-                options: PromptOptions { move_source_to: Some(Zone::Void), ..Default::default() },
-            });
-        }
+        StandardEffect::PayCost { cost } => pay_cost::apply(battle, source, cost),
         _ => todo!("Implement {:?}", effect),
     }
     Some(())
+}
+
+fn negate(battle: &mut BattleData, source: EffectSource, targets: &[TargetId]) {
+    for stack_card_id in stack_card_ids(targets) {
+        negate::apply(battle, source, stack_card_id);
+    }
 }
 
 fn character_ids(targets: &[TargetId]) -> impl Iterator<Item = CharacterId> + '_ {

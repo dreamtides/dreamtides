@@ -16,7 +16,7 @@ pub fn to_hand(
     source: EffectSource,
     id: impl CardIdType,
 ) -> Option<HandCardId> {
-    to_zone(battle, source, id, Zone::Hand)?;
+    to_destination_zone(battle, source, id, Zone::Hand)?;
     Some(HandCardId(id.card_id()))
 }
 
@@ -30,7 +30,7 @@ pub fn to_stack(
     source: EffectSource,
     id: impl CardIdType,
 ) -> Option<StackCardId> {
-    to_zone(battle, source, id, Zone::Stack)?;
+    to_destination_zone(battle, source, id, Zone::Stack)?;
     Some(StackCardId(id.card_id()))
 }
 
@@ -44,7 +44,7 @@ pub fn to_battlefield(
     source: EffectSource,
     id: impl CardIdType,
 ) -> Option<CharacterId> {
-    to_zone(battle, source, id, Zone::Battlefield)?;
+    to_destination_zone(battle, source, id, Zone::Battlefield)?;
     Some(CharacterId(id.card_id()))
 }
 
@@ -58,7 +58,7 @@ pub fn to_void(
     source: EffectSource,
     id: impl CardIdType,
 ) -> Option<VoidCardId> {
-    to_zone(battle, source, id, Zone::Void)?;
+    to_destination_zone(battle, source, id, Zone::Void)?;
     Some(VoidCardId(id.card_id()))
 }
 
@@ -69,7 +69,7 @@ pub fn to_void(
 ///
 /// Returns None if the card no longer exists, otherwise returns the new
 /// [ObjectId] for the card.
-fn to_zone(
+pub fn to_destination_zone(
     battle: &mut BattleData,
     _source: EffectSource,
     id: impl CardIdType,

@@ -1,1 +1,1 @@
-pub mod predicates;
+pub mod effect_predicates;

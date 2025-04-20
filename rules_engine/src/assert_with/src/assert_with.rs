@@ -23,8 +23,7 @@ macro_rules! expect {
             Some(v) => v,
             None => {
                 let snapshot = $battle.debug_snapshot();
-                let message = $crate::panic_message(snapshot, $message());
-                panic!("{}", message)
+                $crate::panic_with_snapshot(snapshot, $message());
             }
         }
     };
@@ -49,8 +48,7 @@ macro_rules! assert_that {
     ($condition:expr, $battle:expr, $message:expr) => {
         if !$condition {
             let snapshot = $battle.debug_snapshot();
-            let message = $crate::panic_message(snapshot, $message());
-            panic!("{}", message)
+            $crate::panic_with_snapshot(snapshot, $message());
         }
     };
 }
@@ -75,14 +73,13 @@ macro_rules! panic_with {
         {
             let snapshot = $battle.debug_snapshot();
             let formatted_message = format!($($arg)*);
-            let message = $crate::panic_message(snapshot, formatted_message);
-            panic!("{}", message)
+            $crate::panic_with_snapshot(snapshot, formatted_message);
         }
     };
 }
 
-pub fn panic_message(snapshot: DebugBattleData, message: impl AsRef<str>) -> String {
-    format!("{}, battle: {:?}", message.as_ref(), snapshot.id)
+pub fn panic_with_snapshot(snapshot: DebugBattleData, message: impl AsRef<str>) -> ! {
+    panic!("{}, battle: {:?}", message.as_ref(), snapshot.id)
 }
 
 #[cfg(test)]

@@ -9,10 +9,12 @@ use crate::effects::apply_effect;
 use crate::zone_mutations::move_card;
 
 /// Resolves all cards currently on the stack, applying their effects.
+///
+/// Cards resolve in Last In, First Out order, meaning the top card of the stack
+/// is resolved first.
 pub fn resolve_stack(battle: &mut BattleData, source: EffectSource) {
-    let stack_cards = battle.cards.stack().to_vec();
-    for card_id in stack_cards {
-        resolve_card(battle, source, card_id);
+    while let Some(card_id) = battle.cards.stack().last() {
+        resolve_card(battle, source, *card_id);
     }
 }
 
@@ -23,6 +25,7 @@ fn resolve_card(battle: &mut BattleData, source: EffectSource, card_id: StackCar
         apply_event_effects(battle, source, card_id);
     }
 
+    battle.cards.card_mut(card_id)?.targets.clear();
     match battle.cards.card(card_id)?.properties.card_type {
         CardType::Character(_) => {
             move_card::to_battlefield(battle, source, card_id);

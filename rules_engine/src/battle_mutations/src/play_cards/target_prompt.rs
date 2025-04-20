@@ -5,8 +5,10 @@ use assert_with::assert_that;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_cards::card_id::StackCardId;
-use battle_data::prompt_types::prompt_data::{Prompt, PromptContext, PromptData, PromptOptions};
-use battle_queries::predicate_queries::predicates;
+use battle_data::prompt_types::prompt_data::{
+    Prompt, PromptConfiguration, PromptContext, PromptData,
+};
+use battle_queries::predicate_queries::effect_predicates;
 use core_data::types::PlayerName;
 use tracing::info;
 
@@ -73,8 +75,9 @@ fn create_prompt_for_targeting(
     std_effect: &StandardEffect,
     optional: bool,
 ) -> Option<PromptData> {
-    if let Some(target_predicate) = predicates::get_character_target_predicate(std_effect) {
-        let valid = predicates::matching_characters(battle, source, target_predicate.clone());
+    if let Some(target_predicate) = effect_predicates::get_character_target_predicate(std_effect) {
+        let valid =
+            effect_predicates::matching_characters(battle, source, target_predicate.clone());
         assert_that!(!valid.is_empty(), battle, || format!(
             "No valid characters for {:?}",
             std_effect
@@ -85,10 +88,12 @@ fn create_prompt_for_targeting(
             player,
             prompt: Prompt::ChooseCharacter { valid },
             context: get_prompt_context(std_effect),
-            options: PromptOptions { optional, ..Default::default() },
+            configuration: PromptConfiguration { optional, ..Default::default() },
         })
-    } else if let Some(target_predicate) = predicates::get_stack_target_predicate(std_effect) {
-        let valid = predicates::matching_cards_on_stack(battle, source, target_predicate.clone());
+    } else if let Some(target_predicate) = effect_predicates::get_stack_target_predicate(std_effect)
+    {
+        let valid =
+            effect_predicates::matching_cards_on_stack(battle, source, target_predicate.clone());
         assert_that!(!valid.is_empty(), battle, || format!(
             "No valid stack cards for {:?}",
             std_effect
@@ -98,7 +103,7 @@ fn create_prompt_for_targeting(
             player,
             prompt: Prompt::ChooseStackCard { valid },
             context: get_prompt_context(std_effect),
-            options: PromptOptions { optional, ..Default::default() },
+            configuration: PromptConfiguration { optional, ..Default::default() },
         })
     } else {
         None

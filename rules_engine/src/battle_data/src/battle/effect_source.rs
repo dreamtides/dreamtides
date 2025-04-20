@@ -1,8 +1,8 @@
-use core_data::identifiers::AbilityNumber;
+use core_data::identifiers::{AbilityNumber, CardId};
 use core_data::types::PlayerName;
 use serde::{Deserialize, Serialize};
 
-use crate::battle_cards::card_id::{CharacterId, StackCardId};
+use crate::battle_cards::card_id::{CardIdType, CharacterId, StackCardId};
 
 /// Describes the source of some mutation or query.
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, Serialize, Deserialize)]
@@ -23,12 +23,23 @@ pub enum EffectSource {
 }
 
 impl EffectSource {
+    /// Returns the controller of this effect.
     pub fn controller(&self) -> PlayerName {
         match self {
             EffectSource::Game { controller } => *controller,
             EffectSource::Event { controller, .. } => *controller,
             EffectSource::Activated { controller, .. } => *controller,
             EffectSource::Triggered { controller, .. } => *controller,
+        }
+    }
+
+    /// Returns the card ID of the source of this effect, if it is a card.
+    pub fn card_id(&self) -> Option<CardId> {
+        match self {
+            EffectSource::Event { card, .. } => Some(card.card_id()),
+            EffectSource::Activated { card, .. } => Some(card.card_id()),
+            EffectSource::Triggered { card, .. } => Some(card.card_id()),
+            _ => None,
         }
     }
 }

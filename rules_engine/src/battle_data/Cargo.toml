@@ -20,3 +20,5 @@ rand_xoshiro = "0.7"
 schemars = "0.8"
 serde = { version = "1", features = ["derive"] }
 slotmap = "1.0"
+strum = "0.27"
+strum_macros = "0.27"

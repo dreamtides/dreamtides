@@ -1,5 +1,6 @@
 use ability_data::effect::Effect;
 use core_data::types::PlayerName;
+use strum_macros::EnumDiscriminants;
 
 use crate::battle::effect_source::EffectSource;
 use crate::battle_cards::card_data::TargetId;
@@ -22,11 +23,12 @@ pub struct PromptData {
     /// the player what is happening.
     pub context: PromptContext,
 
-    /// Options for the prompt.
-    pub options: PromptOptions,
+    /// Configuration options for the prompt.
+    pub configuration: PromptConfiguration,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, EnumDiscriminants)]
+#[strum_discriminants()]
 pub enum Prompt {
     ChooseCharacter { valid: Vec<CharacterId> },
     ChooseStackCard { valid: Vec<StackCardId> },
@@ -39,8 +41,8 @@ pub enum PromptContext {
     TargetPositiveEffect,
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct PromptOptions {
+#[derive(Debug, Clone, Copy, Default)]
+pub struct PromptConfiguration {
     /// Can the player select no option to resolve this prompt?
     pub optional: bool,
 
