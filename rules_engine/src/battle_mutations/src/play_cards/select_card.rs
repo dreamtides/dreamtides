@@ -3,6 +3,7 @@ use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_cards::card_data::TargetId;
 use battle_data::battle_cards::card_id::{CharacterId, StackCardId};
 use battle_data::prompt_types::prompt_data::Prompt;
+use logging::battle_trace;
 use tracing::info;
 
 /// Applies whatever game effect is required for a card being selected in the
@@ -20,6 +21,12 @@ pub fn select_character_for_prompt(battle: &mut BattleData, character_id: Charac
         Prompt::ChooseCharacter { .. } => {
             stack_card.targets.push(TargetId::Character(character_id));
             info!("Targets for {:?} updated to {:?}", stack_card.id, stack_card.targets);
+            battle_trace!(
+                "Selected character target",
+                battle,
+                for_card = stack_card.id,
+                target = character_id
+            );
             battle.prompt = None;
         }
         _ => {
@@ -43,6 +50,12 @@ pub fn select_stack_card_for_prompt(battle: &mut BattleData, stack_card_id: Stac
         Prompt::ChooseStackCard { .. } => {
             stack_card.targets.push(TargetId::StackCard(stack_card_id));
             info!("Targets for {:?} updated to {:?}", stack_card.id, stack_card.targets);
+            battle_trace!(
+                "Selected stack target",
+                battle,
+                for_card = stack_card.id,
+                target = stack_card_id
+            );
             battle.prompt = None;
         }
         _ => {

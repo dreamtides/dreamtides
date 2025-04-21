@@ -16,15 +16,19 @@ pub struct BattleTracing {
 
 #[derive(Debug, Clone)]
 pub struct BattleTraceEvent {
-    /// Description of event
-    pub message: String,
+    /// Description of event.
+    ///
+    /// Short variable name to improve readability in LLDB.
+    pub m: String,
+
+    /// String representation of the values
+    ///
+    /// Short variable name to improve readability in LLDB.
+    pub vs: String,
 
     /// Map from symbol names to symbol values for relevant symbols at the time
     /// this trace event was captured
     pub values: BTreeMap<String, String>,
-
-    /// String representation of the values
-    pub values_string: String,
 
     /// Snapshot of the battle state at the time this trace event was captured
     pub snapshot: DebugBattleData,

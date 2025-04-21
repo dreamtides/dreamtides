@@ -2,6 +2,7 @@ use ability_data::ability::Ability;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_cards::card_id::StackCardId;
+use battle_data::prompt_types::prompt_data::PromptResumeAction;
 use core_data::card_types::CardType;
 use core_data::identifiers::AbilityNumber;
 use logging::battle_trace;
@@ -16,6 +17,12 @@ use crate::zone_mutations::move_card;
 pub fn resolve_stack(battle: &mut BattleData) {
     while let Some(card_id) = battle.cards.stack().last() {
         resolve_card(battle, *card_id);
+
+        // Stop resolving the stack if a prompt is pending.
+        if battle.prompt.is_some() {
+            battle.prompt_resume_action = Some(PromptResumeAction::ResolveStack);
+            break;
+        }
     }
 }
 

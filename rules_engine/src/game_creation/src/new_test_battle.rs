@@ -57,6 +57,7 @@ pub fn create_and_start(
         request_context: RequestContext::UserRequest,
         animations: None,
         prompt: None,
+        prompt_resume_action: None,
         tracing: Some(BattleTracing::default()),
     };
     create_cards(&mut battle, PlayerName::User);

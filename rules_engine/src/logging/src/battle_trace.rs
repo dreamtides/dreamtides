@@ -27,9 +27,9 @@ macro_rules! battle_trace {
     ($message:expr, $battle:expr) => {{
         if $battle.tracing.is_some() {
             $battle.add_tracing_event(battle_data::battle::battle_tracing::BattleTraceEvent {
-                message: $message.to_string(),
+                m: $message.to_string(),
+                vs: String::new(),
                 values: std::collections::BTreeMap::new(),
-                values_string: String::new(),
                 snapshot: $battle.debug_snapshot(),
             });
         }
@@ -44,9 +44,9 @@ macro_rules! battle_trace {
             )*
 
             $battle.add_tracing_event(battle_data::battle::battle_tracing::BattleTraceEvent {
-                message: $message.to_string(),
+                m: $message.to_string(),
+                vs: values_string,
                 values,
-                values_string,
                 snapshot: $battle.debug_snapshot(),
             });
         }
@@ -61,9 +61,9 @@ macro_rules! battle_trace {
             )*
 
             $battle.add_tracing_event(battle_data::battle::battle_tracing::BattleTraceEvent {
-                message: $message.to_string(),
+                m: $message.to_string(),
+                vs: values_string,
                 values,
-                values_string,
                 snapshot: $battle.debug_snapshot(),
             });
         }
@@ -135,6 +135,7 @@ mod tests {
             rng: Xoshiro256PlusPlus::seed_from_u64(12345),
             animations: None,
             prompt: None,
+            prompt_resume_action: None,
             tracing: Some(BattleTracing::default()),
         }
     }
@@ -146,9 +147,9 @@ mod tests {
 
         let events = &battle.tracing.unwrap().current;
         assert_eq!(events.len(), 1);
-        assert_eq!(events[0].message, "Something happened");
+        assert_eq!(events[0].m, "Something happened");
         assert!(events[0].values.is_empty());
-        assert_eq!(events[0].values_string, "");
+        assert_eq!(events[0].vs, "");
     }
 
     #[test]
@@ -161,11 +162,11 @@ mod tests {
 
         let events = &battle.tracing.unwrap().current;
         assert_eq!(events.len(), 1);
-        assert_eq!(events[0].message, "Drawing cards");
+        assert_eq!(events[0].m, "Drawing cards");
         assert_eq!(events[0].values.get("player").unwrap(), "User");
         assert_eq!(events[0].values.get("count").unwrap(), "2");
-        assert!(events[0].values_string.contains("player: User"));
-        assert!(events[0].values_string.contains("count: 2"));
+        assert!(events[0].vs.contains("player: User"));
+        assert!(events[0].vs.contains("count: 2"));
     }
 
     #[test]
@@ -181,15 +182,15 @@ mod tests {
         let events = &battle.tracing.unwrap().current;
         assert_eq!(events.len(), 2);
 
-        assert_eq!(events[0].message, "First event");
+        assert_eq!(events[0].m, "First event");
         assert!(events[0].values.is_empty());
-        assert_eq!(events[0].values_string, "");
+        assert_eq!(events[0].vs, "");
 
-        assert_eq!(events[1].message, "Damage dealt");
+        assert_eq!(events[1].m, "Damage dealt");
         assert_eq!(events[1].values.get("damage").unwrap(), "5");
         assert_eq!(events[1].values.get("target").unwrap(), "\"enemy character\"");
-        assert!(events[1].values_string.contains("damage: 5"));
-        assert!(events[1].values_string.contains("target: \"enemy character\""));
+        assert!(events[1].vs.contains("damage: 5"));
+        assert!(events[1].vs.contains("target: \"enemy character\""));
     }
 
     #[test]
@@ -204,7 +205,7 @@ mod tests {
         assert_eq!(events.len(), 1);
 
         let expected_format = "number: 42, text: \"sample text\", ";
-        assert_eq!(events[0].values_string, expected_format);
+        assert_eq!(events[0].vs, expected_format);
     }
 
     #[test]
@@ -227,11 +228,11 @@ mod tests {
         let events = &battle.tracing.unwrap().current;
         assert_eq!(events.len(), 2);
 
-        assert_eq!(events[0].message, "Simple trace");
+        assert_eq!(events[0].m, "Simple trace");
         assert_eq!(events[0].values.get("player").unwrap(), "User");
         assert_eq!(events[0].values.get("count").unwrap(), "2");
 
-        assert_eq!(events[1].message, "With expressions");
+        assert_eq!(events[1].m, "With expressions");
         assert_eq!(events[1].values.get("player_name").unwrap(), "\"User\"");
         assert_eq!(events[1].values.get("doubled_count").unwrap(), "4");
     }

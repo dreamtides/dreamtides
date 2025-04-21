@@ -1,5 +1,6 @@
 use action_data::battle_action::BattleAction;
 use battle_data::battle::battle_data::BattleData;
+use battle_data::prompt_types::prompt_data::PromptResumeAction;
 use battle_mutations::core::select_prompt_choice;
 use battle_mutations::play_cards::{play_card, resolve_cards, select_card};
 use battle_mutations::turn_step_mutations::end_turn;
@@ -31,6 +32,19 @@ pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction
         }
         _ => {
             todo!("Implement {:?}", action);
+        }
+    }
+
+    // Continue any actions that were interrupted by a prompt.
+    if battle.prompt.is_none() {
+        if let Some(resume_action) = battle.prompt_resume_action {
+            match resume_action {
+                PromptResumeAction::ResolveStack => {
+                    battle_trace!("Resuming stack resolution", battle);
+                    resolve_cards::resolve_stack(battle);
+                }
+            }
+            battle.prompt_resume_action = None;
         }
     }
 }
