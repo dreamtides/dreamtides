@@ -2,6 +2,7 @@ use strum::IntoDiscriminant;
 
 use crate::prompt_types::prompt_data::{Prompt, PromptData};
 
+#[derive(Debug, Clone)]
 pub struct DebugPromptData {
     pub player: String,
     pub prompt_kind: String,

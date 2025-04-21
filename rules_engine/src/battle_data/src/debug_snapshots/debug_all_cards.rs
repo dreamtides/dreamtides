@@ -5,6 +5,7 @@ use crate::battle_cards::card_data::CardData;
 use crate::battle_cards::card_id::CardIdType;
 use crate::debug_snapshots::debug_card_data::DebugCardData;
 
+#[derive(Debug, Clone)]
 pub struct DebugAllCards {
     pub cards: Vec<DebugCardData>,
     pub user_battlefield: Vec<DebugCardData>,

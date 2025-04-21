@@ -1,5 +1,6 @@
 use crate::battle_cards::card_data::CardData;
 
+#[derive(Debug, Clone)]
 pub struct DebugCardData {
     pub id: String,
     pub owner: String,
@@ -39,6 +40,7 @@ impl DebugCardData {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct DebugCardProperties {
     pub card_type: String,
     pub spark: String,

@@ -13,5 +13,6 @@ action_data = { path = "../action_data" }
 battle_data = { path = "../battle_data" }
 battle_mutations = { path = "../battle_mutations" }
 core_data = { path = "../core_data" }
+logging = { path = "../logging" }
 
 tracing = "0.1"

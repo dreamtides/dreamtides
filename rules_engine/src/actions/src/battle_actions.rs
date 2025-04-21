@@ -5,11 +5,13 @@ use battle_mutations::core::select_prompt_choice;
 use battle_mutations::play_cards::{play_card, resolve_cards, select_card};
 use battle_mutations::turn_step_mutations::end_turn;
 use core_data::types::PlayerName;
+use logging::battle_trace;
 use tracing::instrument;
 
 #[instrument(name = "actions_execute", level = "debug", skip(battle))]
 pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction) {
-    let source = EffectSource::Game { controller: player };
+    battle_trace!("Executing action", battle, player, action);
+    let source = EffectSource::Player { controller: player };
     match action {
         BattleAction::PlayCardFromHand(card_id) => {
             play_card::execute(battle, player, source, card_id);

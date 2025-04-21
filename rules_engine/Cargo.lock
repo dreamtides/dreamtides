@@ -29,6 +29,7 @@ dependencies = [
  "battle_data",
  "battle_mutations",
  "core_data",
+ "logging",
  "tracing",
 ]
 
@@ -362,6 +363,7 @@ dependencies = [
  "battle_data",
  "battle_queries",
  "core_data",
+ "logging",
  "tracing",
 ]
 
@@ -1205,10 +1207,14 @@ checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
 name = "logging"
 version = "0.0.0"
 dependencies = [
+ "battle_data",
+ "core_data",
+ "rand_xoshiro",
  "tracing",
  "tracing-error",
  "tracing-forest",
  "tracing-subscriber",
+ "uuid",
 ]
 
 [[package]]

@@ -12,6 +12,9 @@ pub enum EffectSource {
     /// effect.
     Game { controller: PlayerName },
 
+    /// Effect caused by a player action, e.g. playing a card.
+    Player { controller: PlayerName },
+
     /// Effect caused by an ability of a card on the stack
     Event { controller: PlayerName, card: StackCardId, ability_number: AbilityNumber },
 
@@ -27,6 +30,7 @@ impl EffectSource {
     pub fn controller(&self) -> PlayerName {
         match self {
             EffectSource::Game { controller } => *controller,
+            EffectSource::Player { controller } => *controller,
             EffectSource::Event { controller, .. } => *controller,
             EffectSource::Activated { controller, .. } => *controller,
             EffectSource::Triggered { controller, .. } => *controller,

@@ -6,6 +6,7 @@ use ability_data::standard_effect::StandardEffect;
 use ai_data::game_ai::GameAI;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
+use battle_data::battle::battle_tracing::BattleTracing;
 use battle_data::battle::battle_turn_step::BattleTurnStep;
 use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle::request_context::RequestContext;
@@ -56,6 +57,7 @@ pub fn create_and_start(
         request_context: RequestContext::UserRequest,
         animations: None,
         prompt: None,
+        tracing: Some(BattleTracing::default()),
     };
     create_cards(&mut battle, PlayerName::User);
     create_cards(&mut battle, PlayerName::Enemy);

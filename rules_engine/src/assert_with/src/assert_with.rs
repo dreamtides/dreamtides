@@ -171,6 +171,7 @@ mod tests {
             rng: Xoshiro256PlusPlus::seed_from_u64(12345),
             animations: None,
             prompt: None,
+            tracing: None,
         }
     }
 }

@@ -3,6 +3,7 @@ use core_data::types::PlayerName;
 use rand_xoshiro::Xoshiro256PlusPlus;
 
 use crate::battle::battle_status::BattleStatus;
+use crate::battle::battle_tracing::{BattleTraceEvent, BattleTracing};
 use crate::battle::battle_turn_step::BattleTurnStep;
 use crate::battle::request_context::RequestContext;
 use crate::battle::turn_data::TurnData;
@@ -53,6 +54,9 @@ pub struct BattleData {
     /// Only one prompt may be active at a time. It is an error to attempt to
     /// display another prompt while a choice is pending.
     pub prompt: Option<PromptData>,
+
+    /// Debug tracing data for this battle
+    pub tracing: Option<BattleTracing>,
 }
 
 impl BattleData {
@@ -95,8 +99,20 @@ impl BattleData {
                 rng: self.rng.clone(),
                 animations: None,
                 prompt: self.prompt.clone(),
+                tracing: None,
             };
             animations.steps.push(AnimationStep { snapshot, animation: update() });
+        }
+    }
+
+    /// Adds a new tracing event for the current turn
+    pub fn add_tracing_event(&mut self, event: BattleTraceEvent) {
+        if let Some(tracing) = &mut self.tracing {
+            if tracing.turn != self.turn.turn_id {
+                tracing.turn = self.turn.turn_id;
+                tracing.current.clear();
+            }
+            tracing.current.push(event);
         }
     }
 

@@ -1,5 +1,6 @@
 use crate::battle_player::player_data::PlayerData;
 
+#[derive(Debug, Clone)]
 pub struct DebugPlayerData {
     pub name: String,
     pub points: String,

@@ -14,5 +14,6 @@ assert_with = { path = "../assert_with" }
 battle_data = { path = "../battle_data" }
 battle_queries = { path = "../battle_queries" }
 core_data = { path = "../core_data" }
+logging = { path = "../logging" }
 
 tracing = "0.1"
