@@ -13,21 +13,22 @@ use crate::zone_mutations::move_card;
 ///
 /// Cards resolve in Last In, First Out order, meaning the top card of the stack
 /// is resolved first.
-pub fn resolve_stack(battle: &mut BattleData, source: EffectSource) {
+pub fn resolve_stack(battle: &mut BattleData) {
     while let Some(card_id) = battle.cards.stack().last() {
-        resolve_card(battle, source, *card_id);
+        resolve_card(battle, *card_id);
     }
 }
 
 /// Resolves a card currently on the stack, applying its effects and moving it
 /// to the appropriate zone.
-fn resolve_card(battle: &mut BattleData, source: EffectSource, card_id: StackCardId) -> Option<()> {
-    battle_trace!("Resolving card", battle, card_id = card_id, controller = source.controller());
+fn resolve_card(battle: &mut BattleData, card_id: StackCardId) -> Option<()> {
+    battle_trace!("Resolving card", battle, card_id);
     if battle.cards.card(card_id)?.properties.card_type == CardType::Event {
-        apply_event_effects(battle, source, card_id);
+        apply_event_effects(battle, card_id);
     }
 
     battle.cards.card_mut(card_id)?.targets.clear();
+    let source = EffectSource::Game { controller: battle.turn.active_player };
     match battle.cards.card(card_id)?.properties.card_type {
         CardType::Character(_) => {
             move_card::to_battlefield(battle, source, card_id);
@@ -40,14 +41,10 @@ fn resolve_card(battle: &mut BattleData, source: EffectSource, card_id: StackCar
     Some(())
 }
 
-fn apply_event_effects(
-    battle: &mut BattleData,
-    source: EffectSource,
-    card_id: StackCardId,
-) -> Option<()> {
-    let effects = battle
-        .cards
-        .card(card_id)?
+fn apply_event_effects(battle: &mut BattleData, card_id: StackCardId) -> Option<()> {
+    let card = battle.cards.card(card_id)?;
+    let controller = card.controller();
+    let effects = card
         .abilities
         .iter()
         .filter_map(|ability| match ability {
@@ -58,11 +55,8 @@ fn apply_event_effects(
         .collect::<Vec<_>>();
 
     for (i, effect) in effects.into_iter().enumerate() {
-        let event_source = EffectSource::Event {
-            controller: source.controller(),
-            card: card_id,
-            ability_number: AbilityNumber(i),
-        };
+        let event_source =
+            EffectSource::Event { controller, card: card_id, ability_number: AbilityNumber(i) };
         apply_effect::apply(
             battle,
             event_source,

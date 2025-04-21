@@ -16,9 +16,9 @@ use crate::zone_mutations::move_card;
 pub fn execute(
     battle: &mut BattleData,
     player: PlayerName,
-    source: EffectSource,
     card_id: HandCardId,
 ) -> Option<StackCardId> {
+    let source = EffectSource::Game { controller: player };
     if let Some(energy_cost) = battle.cards.card(card_id)?.properties.cost {
         energy::spend(battle, player, source, energy_cost);
     }

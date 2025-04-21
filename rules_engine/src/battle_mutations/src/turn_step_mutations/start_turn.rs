@@ -9,9 +9,10 @@ use crate::judgment_phase::judgment;
 use crate::zone_mutations::deck;
 
 /// Start a turn for `player`.
-pub fn run(battle: &mut BattleData, player: PlayerName, source: EffectSource) {
+pub fn run(battle: &mut BattleData, player: PlayerName) {
     battle.turn.active_player = player;
     battle.turn.turn_id += TurnId(1);
+    let source = EffectSource::Game { controller: player };
     battle.push_animation(|| BattleAnimation::StartTurn { player });
     judgment::run(battle, battle.turn.active_player, source);
     dreamwell::activate(battle, battle.turn.active_player, source);
