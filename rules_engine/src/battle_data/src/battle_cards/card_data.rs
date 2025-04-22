@@ -85,8 +85,21 @@ impl CardData {
     }
 }
 
+/// Represents a target for a card or ability.
+///
+/// Targets are scoped to a specific [ObjectId] -- if a target changes zones, it
+/// ceases to be a valid target.
 #[derive(Clone, Debug)]
 pub enum TargetId {
-    StackCard(StackCardId),
-    Character(CharacterId),
+    StackCard(StackCardId, ObjectId),
+    Character(CharacterId, ObjectId),
+}
+
+impl TargetId {
+    pub fn object_id(&self) -> ObjectId {
+        match self {
+            TargetId::StackCard(_, object_id) => *object_id,
+            TargetId::Character(_, object_id) => *object_id,
+        }
+    }
 }

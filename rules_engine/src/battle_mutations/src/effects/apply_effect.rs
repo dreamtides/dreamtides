@@ -1,7 +1,6 @@
 use ability_data::effect::{Effect, EffectWithOptions};
 use ability_data::predicate::Predicate;
 use ability_data::standard_effect::StandardEffect;
-use assert_with::assert_that;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_cards::card_data::TargetId;
@@ -11,19 +10,24 @@ use battle_data::prompt_types::prompt_data::{
     Prompt, PromptChoice, PromptConfiguration, PromptContext, PromptData,
 };
 use battle_queries::cost_queries::costs;
-use battle_queries::predicate_queries::effect_predicates;
 
 use crate::character_mutations::dissolve;
 use crate::core::prompts;
 use crate::effects::{negate, pay_cost};
 
-/// Applies an effect to the battle state.
+/// Applies an effect to a set of [TargetId]s.
+///
+/// Any targets in the provided list which are no longer valid (e.g. because
+/// they have changed zones) are removed before applying effects. This may cause
+/// the effect to do nothing.
 pub fn apply(
     battle: &mut BattleData,
     source: EffectSource,
     effect: Effect,
-    targets: Vec<TargetId>,
+    mut targets: Vec<TargetId>,
 ) -> Option<()> {
+    remove_invalid_targets(battle, &mut targets);
+
     match effect {
         Effect::Effect(standard_effect) => {
             apply_standard_effect(battle, source, standard_effect, &targets)
@@ -33,6 +37,20 @@ pub fn apply(
         }
         Effect::List(effects) => apply_list_effect(battle, source, effects, &targets),
     }
+}
+
+fn remove_invalid_targets(battle: &BattleData, targets: &mut Vec<TargetId>) {
+    targets.retain(|target| {
+        let current_card = match target {
+            TargetId::StackCard(stack_id, _) => battle.cards.card(*stack_id),
+            TargetId::Character(character_id, _) => battle.cards.card(*character_id),
+        };
+
+        match current_card {
+            Some(card) => card.object_id == target.object_id(),
+            None => false,
+        }
+    });
 }
 
 fn apply_effect_with_options(
@@ -62,13 +80,6 @@ fn apply_standard_effect(
     effect: StandardEffect,
     targets: &[TargetId],
 ) -> Option<()> {
-    if effect_predicates::has_targets(&effect) {
-        assert_that!(!targets.is_empty(), battle, || format!(
-            "Effect {:?} requires targets",
-            effect
-        ));
-    }
-
     match effect {
         StandardEffect::DissolveCharacter { .. } => {
             for character_id in character_ids(targets) {
@@ -126,14 +137,14 @@ fn negate(battle: &mut BattleData, source: EffectSource, targets: &[TargetId]) {
 
 fn character_ids(targets: &[TargetId]) -> impl Iterator<Item = CharacterId> + '_ {
     targets.iter().filter_map(|target| match target {
-        TargetId::Character(character_id) => Some(*character_id),
+        TargetId::Character(character_id, _) => Some(*character_id),
         _ => None,
     })
 }
 
 fn stack_card_ids(targets: &[TargetId]) -> impl Iterator<Item = StackCardId> + '_ {
     targets.iter().filter_map(|target| match target {
-        TargetId::StackCard(stack_card_id) => Some(*stack_card_id),
+        TargetId::StackCard(stack_card_id, _) => Some(*stack_card_id),
         _ => None,
     })
 }
