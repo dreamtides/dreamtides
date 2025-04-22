@@ -68,6 +68,7 @@ fn apply_standard_effect(
             effect
         ));
     }
+
     match effect {
         StandardEffect::DissolveCharacter { .. } => {
             for character_id in character_ids(targets) {
@@ -84,7 +85,7 @@ fn apply_standard_effect(
                         choices: vec![
                             PromptChoice {
                                 label: "Pay $2".to_string(),
-                                effect: Effect::Effect(StandardEffect::PayCost { cost }),
+                                effect: Effect::Effect(StandardEffect::OpponentPaysCost { cost }),
                                 targets: vec![],
                             },
                             PromptChoice {
@@ -106,7 +107,12 @@ fn apply_standard_effect(
                 negate(battle, source, targets);
             }
         }
-        StandardEffect::PayCost { cost } => pay_cost::apply(battle, source, cost),
+        StandardEffect::OpponentPaysCost { cost } => {
+            pay_cost::apply(battle, source, source.controller().opponent(), cost)
+        }
+        StandardEffect::PayCost { cost } => {
+            pay_cost::apply(battle, source, source.controller(), cost)
+        }
         _ => todo!("Implement {:?}", effect),
     }
     Some(())

@@ -67,6 +67,7 @@ pub enum StandardEffect {
     Negate { target: Predicate },
     NegateUnlessPaysCost { target: Predicate, cost: Cost },
     NoEffect,
+    OpponentPaysCost { cost: Cost },
     PayCost { cost: Cost },
     PutCardsFromYourDeckIntoVoid { count: u32 },
     PutCardsFromVoidOnTopOfDeck { count: u32, matching: CardPredicate },
