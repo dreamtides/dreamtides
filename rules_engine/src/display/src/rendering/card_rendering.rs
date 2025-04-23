@@ -84,7 +84,7 @@ fn selection_target(
                         .find(|target_id| target_id.card_id() == card_id)
                         .map(|&id| GameAction::BattleAction(BattleAction::SelectStackCard(id)));
                 }
-                Prompt::Choose { .. } => {}
+                _ => {}
             }
         }
     }

@@ -2,6 +2,7 @@ use ability_data::ability::{Ability, EventAbility};
 use ability_data::cost::Cost;
 use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
+use ability_data::quantity_expression::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
@@ -156,6 +157,30 @@ fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
             effect: Effect::Effect(StandardEffect::NegateUnlessPaysCost {
                 target: Predicate::Enemy(CardPredicate::Event),
                 cost: Cost::Energy(Energy(2)),
+            }),
+        })],
+        revealed_to_owner: false,
+        revealed_to_opponent: false,
+        targets: vec![],
+        turn_entered_current_zone: TurnData::default(),
+    });
+
+    battle.cards.create_card(CardData {
+        id: CardId::default(),
+        owner: player_name,
+        zone: Zone::Deck,
+        object_id: ObjectId::default(),
+        properties: CardProperties {
+            spark: None,
+            cost: Some(Energy(1)),
+            card_type: CardType::Event,
+            is_fast: true,
+        },
+        abilities: vec![Ability::Event(EventAbility {
+            additional_cost: Some(Cost::SpendAnyAmountOfEnergy),
+            effect: Effect::Effect(StandardEffect::DrawCardsForEach {
+                count: 1,
+                for_each: QuantityExpression::ForEachEnergySpentOnThisCard,
             }),
         })],
         revealed_to_owner: false,

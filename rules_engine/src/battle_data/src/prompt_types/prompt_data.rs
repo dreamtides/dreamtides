@@ -33,12 +33,14 @@ pub enum Prompt {
     ChooseCharacter { valid: Vec<CharacterId> },
     ChooseStackCard { valid: Vec<StackCardId> },
     Choose { choices: Vec<PromptChoice> },
+    ChooseNumber { minimum: u32, current: u32, maximum: u32 },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum PromptContext {
     TargetNegativeEffect,
     TargetPositiveEffect,
+    PickAmountOfEnergyToSpend,
 }
 
 #[derive(Debug, Clone, Copy, Default)]

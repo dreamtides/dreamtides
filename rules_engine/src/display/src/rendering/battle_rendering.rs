@@ -88,6 +88,14 @@ fn primary_action_button(
         });
     }
 
+    if let Some(Prompt::ChooseNumber { current, .. }) = battle.prompt.as_ref().map(|p| &p.prompt) {
+        return Some(ActionButtonView {
+            label: format!("Spend {}\u{f7e4}", current),
+            action: BattleAction::SelectNumber(*current).into(),
+            show_on_idle_duration: None,
+        });
+    }
+
     if legal_actions.contains(&BattleAction::ResolveStack) {
         Some(ActionButtonView {
             label: "Resolve".to_string(),

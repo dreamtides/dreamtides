@@ -45,6 +45,9 @@ pub fn compute(
                     .enumerate()
                     .map(|(i, _)| BattleAction::SelectPromptChoice(i))
                     .collect(),
+                Prompt::ChooseNumber { minimum, maximum, .. } => {
+                    (*minimum..=*maximum).map(|i| BattleAction::SelectNumber(i)).collect()
+                }
             };
         } else {
             return vec![];

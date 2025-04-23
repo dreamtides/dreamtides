@@ -3,7 +3,7 @@ use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_cards::card_id::{HandCardId, StackCardId};
 use core_data::types::PlayerName;
 
-use crate::play_cards::target_prompt;
+use crate::play_cards::{additional_cost_prompt, target_prompt};
 use crate::player_mutations::energy;
 use crate::zone_mutations::move_card;
 
@@ -25,5 +25,6 @@ pub fn execute(
     battle.cards.card_mut(card_id)?.revealed_to_opponent = true;
     let id = move_card::to_stack(battle, source, card_id)?;
     target_prompt::add_target_prompt(battle, source, id);
+    additional_cost_prompt::add_additional_cost_prompt(battle, source, id);
     Some(id)
 }

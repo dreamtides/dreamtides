@@ -692,6 +692,8 @@ namespace Dreamtides.Schema
     ///
     /// Select a choice at a given index position in response to a prompt.
     ///
+    /// Pick a number in response to a number prompt.
+    ///
     /// Sets the position of a card in a card order selector.
     ///
     /// Show cards in a zone
@@ -709,6 +711,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("selectPromptChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectPromptChoice { get; set; }
+
+        [JsonProperty("selectNumber", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SelectNumber { get; set; }
 
         [JsonProperty("selectCardOrder", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SelectCardOrder SelectCardOrder { get; set; }

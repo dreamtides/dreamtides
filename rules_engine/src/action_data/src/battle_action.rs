@@ -24,6 +24,8 @@ pub enum BattleAction {
     SelectStackCard(StackCardId),
     /// Select a choice at a given index position in response to a prompt.
     SelectPromptChoice(usize),
+    /// Pick a number in response to a number prompt.
+    SelectNumber(u32),
     /// Sets the position of a card in a card order selector.
     SelectCardOrder(SelectCardOrder),
     /// Show cards in a zone
