@@ -59,12 +59,13 @@ async fn connect(
 
     // Handle potential JSON parse errors
     let Json(req) = result?;
+    let user_id = req.metadata.user_id;
 
     if let Some(scenario) = req.test_scenario.as_ref() {
-        info!(?scenario, "Got connect request");
+        info!(?user_id, ?scenario, "Got connect request");
         Ok(Json(client_test_scenarios::connect(&req, scenario)))
     } else {
-        info!("Got connect request");
+        info!(?user_id, "Got connect request");
         Ok(Json(engine::connect(&req)))
     }
 }

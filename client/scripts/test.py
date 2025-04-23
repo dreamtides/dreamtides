@@ -11,6 +11,7 @@ import time
 import os
 import threading
 import signal
+import argparse
 
 def find_highest_unity_version(hub_path):
     if not hub_path.exists():
@@ -227,12 +228,19 @@ def monitor_log_file(log_file_path, estimated_time, start_time):
         time.sleep(0.1)
 
 def main():
-    print("Starting Unity tests...")
+    parser = argparse.ArgumentParser(description="Run Unity tests or sync project files.")
+    parser.add_argument("--sync-only", action="store_true", help="Only sync project files without running tests")
+    args = parser.parse_args()
     
-    if not is_port_in_use(26598):
-        print("Error: No server listening on port 26598")
-        print("Make sure the server is running before executing tests")
-        sys.exit(1)
+    if args.sync_only:
+        print("Running in sync-only mode...")
+    else:
+        print("Starting Unity tests...")
+        
+        if not is_port_in_use(26598):
+            print("Error: No server listening on port 26598")
+            print("Make sure the server is running before executing tests")
+            sys.exit(1)
 
     if not check_rsync_available():
         print("Error: rsync binary not found on the system")
@@ -242,24 +250,29 @@ def main():
     script_dir = Path(__file__).parent
     project_root = script_dir.parent
     test_output_dir = project_root / "test_output"
+    
+    previous_run_time = 300  # Default to 5 minutes
 
-    # Get previous run time if available
-    previous_run_time = read_previous_run_time(test_output_dir)
-    if previous_run_time:
-        print(f"Previous test run took {format_time(previous_run_time)}")    
+    if not args.sync_only:
+        previous_run_time = read_previous_run_time(test_output_dir)
+        if previous_run_time:
+            print(f"Previous test run took {format_time(previous_run_time)}")    
+        
+        if test_output_dir.exists():
+            shutil.rmtree(test_output_dir)
+        test_output_dir.mkdir(exist_ok=True)
     
-    if test_output_dir.exists():
-        shutil.rmtree(test_output_dir)
-    test_output_dir.mkdir(exist_ok=True)
-    
-    # Sync project to temp directory
     project_path = sync_project_to_temp(project_root)
-    
+
+    if args.sync_only:
+        print("Project sync completed. Exiting without running tests.")
+        sys.exit(0)    
+
     unity_path = get_unity_path()
     test_results = str(test_output_dir / "results.xml")
     log_file = str(test_output_dir / "logs.txt")
     
-    args = [
+    unity_args = [
         "-runTests",
         "-batchmode",
         f"-projectPath", project_path,
@@ -269,7 +282,7 @@ def main():
     ]
 
     try:
-        print(f"{unity_path} \\\n ", " \\\n  ".join(args))
+        print(f"{unity_path} \\\n ", " \\\n  ".join(unity_args))
         
         start_time = time.time()
         
@@ -284,7 +297,7 @@ def main():
         # Create a process group for the Unity process
         process = subprocess.Popen(
             executable=unity_path,
-            args=args,
+            args=unity_args,
             preexec_fn=os.setsid if os.name != 'nt' else None
         )
         

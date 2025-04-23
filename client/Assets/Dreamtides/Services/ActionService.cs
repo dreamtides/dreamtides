@@ -30,10 +30,14 @@ namespace Dreamtides.Services
     IEnumerator InitializeAsync()
     {
       yield return new WaitForEndOfFrame();
+      Debug.Log("Initializing ActionService with data path: " + Application.dataPath);
       _metadata = new Metadata
       {
-        UserId = Guid.NewGuid()
+        UserId = Application.dataPath.Contains("test_client") ?
+            Guid.Parse("25e89dde-37d7-464b-8a1c-f985102ca029") :
+            Guid.NewGuid()
       };
+      Debug.Log("Metadata UserId: " + _metadata.UserId);
       var request = new ConnectRequest
       {
         Metadata = _metadata,
