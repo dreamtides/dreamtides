@@ -29,7 +29,7 @@ pub fn compute(
         return vec![];
     }
 
-    // If there's an active prompt for this player, the only legal actions are those
+    // If there's an active prompt, the only legal actions are those
     // corresponding to the prompt
     if let Some(prompt_data) = &battle.prompt {
         if prompt_data.player == player {
@@ -46,6 +46,8 @@ pub fn compute(
                     .map(|(i, _)| BattleAction::SelectPromptChoice(i))
                     .collect(),
             };
+        } else {
+            return vec![];
         }
     }
 

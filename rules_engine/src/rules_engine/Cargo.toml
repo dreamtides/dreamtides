@@ -12,6 +12,7 @@ bench = false
 action_data = { path = "../action_data" }
 actions = { path = "../actions" }
 ai_agents = { path = "../ai_agents" }
+assert_with = { path = "../assert_with" }
 battle_data = { path = "../battle_data" }
 battle_queries = { path = "../battle_queries" }
 core_data = { path = "../core_data" }

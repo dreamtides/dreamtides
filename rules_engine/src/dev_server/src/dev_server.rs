@@ -7,7 +7,8 @@ use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::Router;
 use display_data::request_data::{
-    ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse,
+    ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse, PollRequest,
+    PollResponse,
 };
 use rules_engine::engine;
 use tracing::{error, info, info_span};
@@ -57,7 +58,6 @@ async fn connect(
 ) -> AppResult<Json<ConnectResponse>> {
     println!();
 
-    // Handle potential JSON parse errors
     let Json(req) = result?;
     let user_id = req.metadata.user_id;
 
@@ -75,7 +75,6 @@ async fn perform_action(
 ) -> AppResult<Json<PerformActionResponse>> {
     println!();
 
-    // Handle potential JSON parse errors
     let Json(req) = result?;
     let action = req.action;
     let user_id = req.metadata.user_id;
@@ -90,6 +89,13 @@ async fn perform_action(
     }
 }
 
+async fn poll(result: Result<Json<PollRequest>, JsonRejection>) -> AppResult<Json<PollResponse>> {
+    let Json(req) = result?;
+    let user_id = req.metadata.user_id;
+    let commands = engine::poll(user_id);
+    Ok(Json(PollResponse { metadata: req.metadata, commands }))
+}
+
 #[tokio::main]
 async fn main() {
     logging::initialize();
@@ -97,7 +103,8 @@ async fn main() {
 
     let app = Router::new()
         .route("/connect", get(connect))
-        .route("/perform_action", post(perform_action));
+        .route("/perform_action", post(perform_action))
+        .route("/poll", get(poll));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:26598").await.unwrap_or_else(|e| {
         error!(error.message = %e, "Failed to bind to port 26598");

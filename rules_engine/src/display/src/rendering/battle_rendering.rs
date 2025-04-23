@@ -38,8 +38,8 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleData) -> BattleView
 
     BattleView {
         id: battle.id,
-        user: player_view(battle, &battle.player(builder.player)),
-        enemy: player_view(battle, &battle.player(builder.player.opponent())),
+        user: player_view(battle, battle.player(builder.player)),
+        enemy: player_view(battle, battle.player(builder.player.opponent())),
         cards,
         interface: interface_view(builder, battle),
     }

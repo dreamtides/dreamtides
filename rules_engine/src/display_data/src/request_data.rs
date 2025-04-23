@@ -51,7 +51,7 @@ pub struct PollRequest {
 #[serde(rename_all = "camelCase")]
 pub struct PollResponse {
     pub metadata: Metadata,
-    pub commands: CommandSequence,
+    pub commands: Option<CommandSequence>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

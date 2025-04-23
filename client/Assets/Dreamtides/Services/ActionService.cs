@@ -67,6 +67,13 @@ namespace Dreamtides.Services
           _lastConnectAttemptTime = now;
         }
       }
+      else if (_metadata != null)
+      {
+        StartCoroutine(DevServerPollAsync(new PollRequest
+        {
+          Metadata = _metadata!
+        }));
+      }
     }
 
     public void PerformAction(GameAction? action)
@@ -111,6 +118,16 @@ namespace Dreamtides.Services
         response => ApplyCommands(response.Commands, animate: false));
     }
 
+    private IEnumerator DevServerPollAsync(PollRequest request)
+    {
+      yield return SendDevServerRequest<PollRequest, PollResponse>(
+        request,
+        "poll",
+        UnityWebRequest.kHttpVerbGET,
+        response => ApplyCommands(response.Commands, animate: true)
+      );
+    }
+
     private IEnumerator PerformDevServerActionAsync(PerformActionRequest request)
     {
       yield return SendDevServerRequest<PerformActionRequest, PerformActionResponse>(
@@ -153,8 +170,13 @@ namespace Dreamtides.Services
       }
     }
 
-    IEnumerator ApplyCommands(CommandSequence commands, bool animate)
+    IEnumerator ApplyCommands(CommandSequence? commands, bool animate)
     {
+      if (commands == null)
+      {
+        yield break;
+      }
+
       foreach (var group in commands.Groups)
       {
         yield return ApplyGroup(group, animate);

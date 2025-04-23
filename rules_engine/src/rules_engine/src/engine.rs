@@ -9,14 +9,13 @@ use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_animations::animation_data::AnimationData;
 use battle_data::battle_player::player_data::PlayerType;
 use core_data::identifiers::{BattleId, UserId};
-use core_data::types::PlayerName;
 use display::rendering::renderer;
 use display_data::command::CommandSequence;
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse,
 };
 use game_creation::new_battle;
-use tracing::info;
+use tracing::{error, info};
 use uuid::Uuid;
 
 use crate::{error_message, handle_battle_action};
@@ -42,6 +41,36 @@ pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     ConnectResponse { metadata, commands }
 }
 
+pub fn poll(user_id: UserId) -> Option<CommandSequence> {
+    handle_battle_action::poll(user_id)
+}
+
+pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
+    let battle_data = CURRENT_BATTLE.lock().unwrap().clone();
+    let metadata = request.metadata;
+    let user_id = metadata.user_id;
+    let commands = catch_panic(
+        AssertUnwindSafe(|| {
+            let mut battle = match &battle_data {
+                Some(battle) => battle.clone(),
+                None => panic!("No battle found"),
+            };
+            battle.animations = Some(AnimationData::default());
+            let commands = match request.action {
+                GameAction::BattleAction(action) => {
+                    let player = renderer::player_name_for_user(&battle, user_id);
+                    handle_battle_action::execute(&mut battle, user_id, player, action)
+                }
+                _ => todo!("Implement other actions"),
+            };
+            *CURRENT_BATTLE.lock().unwrap() = Some(battle);
+            commands
+        }),
+        battle_data.as_ref(),
+    );
+    PerformActionResponse { metadata, commands }
+}
+
 fn connect_internal(user_id: UserId) {
     let mut battle_lock = CURRENT_BATTLE.lock().unwrap();
 
@@ -65,6 +94,7 @@ fn connect_internal(user_id: UserId) {
 
         // User is neither the "user" player nor the "enemy" player and a battle
         // already exists; set them as the enemy player
+        info!(?user_id, "Joining current battle");
         let mut updated_battle = battle.clone();
         updated_battle.enemy.player_type = PlayerType::User(user_id);
         *battle_lock = Some(updated_battle);
@@ -74,31 +104,6 @@ fn connect_internal(user_id: UserId) {
     // No current battle, create a new one
     info!(?user_id, "No current battle, creating");
     *battle_lock = Some(new_battle::create_and_start(user_id, BattleId(Uuid::new_v4())));
-}
-
-pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
-    let battle_data = CURRENT_BATTLE.lock().unwrap().clone();
-    let metadata = request.metadata;
-    let user_id = metadata.user_id;
-    let commands = catch_panic(
-        AssertUnwindSafe(|| {
-            let mut battle = match &battle_data {
-                Some(battle) => battle.clone(),
-                None => panic!("No battle found"),
-            };
-            battle.animations = Some(AnimationData::default());
-            let commands = match request.action {
-                GameAction::BattleAction(action) => {
-                    handle_battle_action::execute(&mut battle, user_id, PlayerName::User, action)
-                }
-                _ => todo!("Implement other actions"),
-            };
-            *CURRENT_BATTLE.lock().unwrap() = Some(battle);
-            commands
-        }),
-        battle_data.as_ref(),
-    );
-    PerformActionResponse { metadata, commands }
 }
 
 fn catch_panic<F>(f: F, battle: Option<&BattleData>) -> CommandSequence
@@ -161,6 +166,8 @@ where
             if error_message.len() > 3000 {
                 error_message = format!("{}...(truncated)", &error_message[..3000]);
             }
+
+            error!("Captured panic: {}", error_message);
 
             match battle {
                 Some(battle_data) => {

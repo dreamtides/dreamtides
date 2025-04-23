@@ -46,7 +46,9 @@ pub fn render_updates(battle: &BattleData, user_id: UserId) -> CommandSequence {
     builder.commands
 }
 
-fn player_name_for_user(battle: &BattleData, user_id: UserId) -> PlayerName {
+/// Returns the name of the player for a given user ID, or panics if this user
+/// is not a participant in this battle.
+pub fn player_name_for_user(battle: &BattleData, user_id: UserId) -> PlayerName {
     if let PlayerType::User(id) = &battle.user.player_type {
         if *id == user_id {
             return battle.user.name;

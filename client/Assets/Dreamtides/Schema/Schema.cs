@@ -690,6 +690,8 @@ namespace Dreamtides.Schema
     /// Select a card on the stack by ID in response to some prompt, e.g. as a target of a card
     /// being played.
     ///
+    /// Select a choice at a given index position in response to a prompt.
+    ///
     /// Sets the position of a card in a card order selector.
     ///
     /// Show cards in a zone
@@ -704,6 +706,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("selectStackCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardId SelectStackCard { get; set; }
+
+        [JsonProperty("selectPromptChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SelectPromptChoice { get; set; }
 
         [JsonProperty("selectCardOrder", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SelectCardOrder SelectCardOrder { get; set; }
@@ -1628,7 +1633,7 @@ namespace Dreamtides.Schema
 
     public partial class PollResponse
     {
-        [JsonProperty("commands", Required = Required.Always)]
+        [JsonProperty("commands")]
         public CommandSequence Commands { get; set; }
 
         [JsonProperty("metadata", Required = Required.Always)]
