@@ -1387,3 +1387,19 @@ fn test_negate_unless_pays_cost() {
     ]
     "###);
 }
+
+#[test]
+fn test_energy_spent_on_this_card() {
+    let result = parse("Spend any amount of energy: draw a card for each energy spent.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      event(EventAbility(
+        additional_cost: Some(spendAnyAmountOfEnergy),
+        effect: effect(drawCardsForEach(
+          count: 1,
+          for_each: forEachEnergySpentOnThisCard,
+        )),
+      )),
+    ]
+    "###);
+}

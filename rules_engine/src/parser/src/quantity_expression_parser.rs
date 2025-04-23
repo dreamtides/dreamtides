@@ -25,6 +25,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, QuantityExpression, ErrorType<'a
         card_predicate_parser::parser()
             .then_ignore(phrase("abandoned"))
             .map(QuantityExpression::AbandonedThisWay),
+        phrase("energy spent").to(QuantityExpression::ForEachEnergySpentOnThisCard),
         determiner_parser::counted_parser().map(QuantityExpression::Matching),
     ))
 }

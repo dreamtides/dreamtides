@@ -33,6 +33,7 @@ pub fn standard_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
             .ignore_then(number(count))
             .then(card_predicate_parser::parser())
             .map(|(count, predicate)| Cost::DiscardCards(predicate, count)),
+        phrase("spend any amount of energy").to(Cost::SpendAnyAmountOfEnergy),
     ))
 }
 
