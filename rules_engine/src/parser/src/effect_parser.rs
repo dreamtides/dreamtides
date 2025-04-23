@@ -1,10 +1,12 @@
-use ability_data::cost::Cost;
 use ability_data::effect::{Effect, EffectWithOptions};
 use chumsky::prelude::*;
 use chumsky::Parser;
 
 use crate::parser_utils::{phrase, ErrorType};
 use crate::{condition_parser, cost_parser, standard_effect_parser};
+
+// pub fn pub fn event_effect<'a>() -> impl Parser<'a, &'a str, Effect,
+// ErrorType<'a>> { }
 
 pub fn effect<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
     single_effect().repeated().at_least(1).collect::<Vec<_>>().map(|effects| {
@@ -32,7 +34,8 @@ fn optional_effect<'a>() -> impl Parser<'a, &'a str, EffectWithOptions, ErrorTyp
         )
         .map(|(maybe_cost, game_effect)| EffectWithOptions {
             effect: game_effect,
-            optional: maybe_cost.or(Some(Cost::NoCost)),
+            optional: true,
+            cost: maybe_cost,
             condition: None,
         })
 }

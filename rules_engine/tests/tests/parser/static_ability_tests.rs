@@ -42,7 +42,7 @@ fn test_play_from_void_by_banishing() {
     [
       static(StaticAbility(playFromVoid(PlayFromVoid(
         energyCost: Some(Energy(2)),
-        additionalCost: banishCardsFromYourVoid(1),
+        additionalCost: Some(banishCardsFromYourVoid(1)),
         ifYouDo: None,
       )))),
     ]
@@ -56,7 +56,7 @@ fn test_play_event_from_void() {
     [
       static(StaticAbility(playFromVoid(PlayFromVoid(
         energyCost: Some(Energy(0)),
-        additionalCost: abandonCharacters(your(character), 1),
+        additionalCost: Some(abandonCharacters(your(character), 1)),
         ifYouDo: None,
       )))),
     ]
@@ -175,7 +175,7 @@ fn test_abandon_characters_cost() {
     [
       static(StaticAbility(playFromVoid(PlayFromVoid(
         energyCost: Some(Energy(0)),
-        additionalCost: abandonCharacters(your(character), 2),
+        additionalCost: Some(abandonCharacters(your(character), 2)),
         ifYouDo: None,
       )))),
     ]
@@ -190,7 +190,7 @@ fn test_play_from_void_with_void_count() {
       static(WithOptions(StaticAbilityWithOptions(
         ability: playFromVoid(PlayFromVoid(
           energyCost: Some(Energy(0)),
-          additionalCost: banishAllCardsFromYourVoid,
+          additionalCost: Some(banishAllCardsFromYourVoid),
           ifYouDo: None,
         )),
         condition: Some(cardsInVoidCount(
@@ -209,9 +209,9 @@ fn test_play_for_alternate_cost() {
     [
       static(StaticAbility(playForAlternateCost(AlternateCost(
         energyCost: Energy(0),
-        additionalCost: banishFromHand(your(fast(
+        additionalCost: Some(banishFromHand(your(fast(
           target: card,
-        ))),
+        )))),
         ifYouDo: None,
       )))),
     ]
@@ -225,7 +225,7 @@ fn test_play_for_alternate_cost_with_if_you_do() {
     [
       static(StaticAbility(playForAlternateCost(AlternateCost(
         energyCost: Energy(0),
-        additionalCost: abandonCharacters(your(character), 1),
+        additionalCost: Some(abandonCharacters(your(character), 1)),
         ifYouDo: Some(effect(abandonAtEndOfTurn(
           target: this,
         ))),
@@ -242,7 +242,7 @@ fn test_play_if_character_dissolved() {
       static(WithOptions(StaticAbilityWithOptions(
         ability: playFromVoid(PlayFromVoid(
           energyCost: Some(Energy(1)),
-          additionalCost: noCost,
+          additionalCost: None,
           ifYouDo: None,
         )),
         condition: Some(dissolvedThisTurn(
@@ -263,14 +263,16 @@ fn test_reclaim_with_draw_discard() {
           effect: drawCards(
             count: 2,
           ),
-          optional: None,
+          optional: false,
+          cost: None,
           condition: None,
         ),
         EffectWithOptions(
           effect: payCost(
             cost: discardCards(card, 2),
           ),
-          optional: None,
+          optional: false,
+          cost: None,
           condition: None,
         ),
       ])),
@@ -289,7 +291,7 @@ fn test_alternate_cost_with_condition() {
       static(WithOptions(StaticAbilityWithOptions(
         ability: playForAlternateCost(AlternateCost(
           energyCost: Energy(1),
-          additionalCost: noCost,
+          additionalCost: None,
           ifYouDo: None,
         )),
         condition: Some(cardsDiscardedThisTurn(
@@ -319,7 +321,7 @@ fn test_play_for_dreamscape_cost() {
     [
       static(StaticAbility(playForAlternateCost(AlternateCost(
         energyCost: Energy(0),
-        additionalCost: abandonDreamscapes(1),
+        additionalCost: Some(abandonDreamscapes(1)),
         ifYouDo: None,
       )))),
     ]
@@ -344,7 +346,7 @@ fn test_if_you_have_drawn_two_or_more() {
       static(WithOptions(StaticAbilityWithOptions(
         ability: playFromVoid(PlayFromVoid(
           energyCost: Some(Energy(1)),
-          additionalCost: noCost,
+          additionalCost: None,
           ifYouDo: None,
         )),
         condition: Some(cardsDrawnThisTurn(
@@ -377,7 +379,7 @@ fn test_play_for_alternate_cost_with_condition() {
       static(WithOptions(StaticAbilityWithOptions(
         ability: playForAlternateCost(AlternateCost(
           energyCost: Energy(0),
-          additionalCost: banishAllCardsFromYourVoid,
+          additionalCost: Some(banishAllCardsFromYourVoid),
           ifYouDo: None,
         )),
         condition: Some(cardsInVoidCount(
@@ -430,7 +432,7 @@ fn test_you_control_characters() {
       static(WithOptions(StaticAbilityWithOptions(
         ability: playForAlternateCost(AlternateCost(
           energyCost: Energy(1),
-          additionalCost: noCost,
+          additionalCost: None,
           ifYouDo: None,
         )),
         condition: Some(predicateCount(
@@ -449,7 +451,7 @@ fn test_play_from_void() {
     [
       static(StaticAbility(playFromVoid(PlayFromVoid(
         energyCost: None,
-        additionalCost: noCost,
+        additionalCost: None,
         ifYouDo: None,
       )))),
     ]

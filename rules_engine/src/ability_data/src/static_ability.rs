@@ -53,7 +53,7 @@ pub enum StandardStaticAbility {
 #[serde(rename_all = "camelCase")]
 pub struct PlayFromVoid {
     pub energy_cost: Option<Energy>,
-    pub additional_cost: Cost,
+    pub additional_cost: Option<Cost>,
     pub if_you_do: Option<Effect>,
 }
 
@@ -61,6 +61,6 @@ pub struct PlayFromVoid {
 #[serde(rename_all = "camelCase")]
 pub struct AlternateCost {
     pub energy_cost: Energy,
-    pub additional_cost: Cost,
+    pub additional_cost: Option<Cost>,
     pub if_you_do: Option<Effect>,
 }

@@ -225,14 +225,16 @@ fn test_discard_card_draw_gain_point() {
             effect: drawCards(
               count: 1,
             ),
-            optional: None,
+            optional: false,
+            cost: None,
             condition: None,
           ),
           EffectWithOptions(
             effect: gainPoints(
               gains: Points(1),
             ),
-            optional: None,
+            optional: false,
+            cost: None,
             condition: None,
           ),
         ]),
@@ -279,14 +281,16 @@ fn test_immediate_activated_banish_materialize() {
             effect: banishCharacter(
               target: another(character),
             ),
-            optional: None,
+            optional: false,
+            cost: None,
             condition: None,
           ),
           EffectWithOptions(
             effect: materializeCharacter(
               target: it,
             ),
-            optional: None,
+            optional: false,
+            cost: None,
             condition: None,
           ),
         ]),

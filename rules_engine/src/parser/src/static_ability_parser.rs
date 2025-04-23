@@ -136,7 +136,7 @@ fn play_from_void<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, Error
         .map(|((energy_cost, additional_cost), if_you_do)| {
             StandardStaticAbility::PlayFromVoid(PlayFromVoid {
                 energy_cost,
-                additional_cost: additional_cost.unwrap_or(Cost::NoCost),
+                additional_cost,
                 if_you_do: if_you_do.map(Effect::Effect),
             })
         })
@@ -151,7 +151,7 @@ fn play_for_alternate_cost<'a>() -> impl Parser<'a, &'a str, StandardStaticAbili
         .map(|((energy_cost, additional_cost), if_you_do)| {
             StandardStaticAbility::PlayForAlternateCost(AlternateCost {
                 energy_cost,
-                additional_cost: additional_cost.unwrap_or(Cost::NoCost),
+                additional_cost,
                 if_you_do: if_you_do.map(Effect::Effect),
             })
         })
@@ -161,7 +161,7 @@ fn simple_alternate_cost<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility
     this().ignore_then(numeric("costs $", Energy, "")).map(|energy_cost| {
         StandardStaticAbility::PlayForAlternateCost(AlternateCost {
             energy_cost,
-            additional_cost: Cost::NoCost,
+            additional_cost: None,
             if_you_do: None,
         })
     })

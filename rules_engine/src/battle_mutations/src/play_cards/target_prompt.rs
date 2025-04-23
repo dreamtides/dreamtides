@@ -47,7 +47,7 @@ fn create_prompt_for_effect(
             player,
             source,
             &with_options.effect,
-            with_options.is_optional(),
+            with_options.optional,
         ),
         Effect::List(effects) => {
             for effect_with_options in effects {
@@ -56,7 +56,7 @@ fn create_prompt_for_effect(
                     player,
                     source,
                     &effect_with_options.effect,
-                    effect_with_options.is_optional(),
+                    effect_with_options.optional,
                 ) {
                     return Some(prompt_data);
                 }

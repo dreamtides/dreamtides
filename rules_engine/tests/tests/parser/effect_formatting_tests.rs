@@ -19,14 +19,16 @@ fn test_multiple_effects() {
               target: this,
               gains: Spark(1),
             ),
-            optional: None,
+            optional: false,
+            cost: None,
             condition: None,
           ),
           EffectWithOptions(
             effect: banishCardsFromEnemyVoid(
               count: 1,
             ),
-            optional: Some(noCost),
+            optional: true,
+            cost: None,
             condition: None,
           ),
         ]),
@@ -46,14 +48,16 @@ fn test_then_separator() {
           effect: drawCards(
             count: 1,
           ),
-          optional: None,
+          optional: false,
+          cost: None,
           condition: None,
         ),
         EffectWithOptions(
           effect: payCost(
             cost: discardCards(card, 1),
           ),
-          optional: None,
+          optional: false,
+          cost: None,
           condition: None,
         ),
       ])),
@@ -72,7 +76,8 @@ fn test_optional_draw() {
         effect: drawCards(
           count: 1,
         ),
-        optional: Some(noCost),
+        optional: true,
+        cost: None,
         condition: None,
       ))),
     ]
@@ -91,7 +96,8 @@ fn test_conditional_gain_energy() {
         effect: gainEnergy(
           gains: Energy(1),
         ),
-        optional: None,
+        optional: false,
+        cost: None,
         condition: Some(predicateCount(
           count: 2,
           predicate: another(characterType(warrior)),
@@ -113,7 +119,8 @@ fn test_conditional_optional_gain_energy() {
         effect: gainEnergy(
           gains: Energy(1),
         ),
-        optional: Some(noCost),
+        optional: true,
+        cost: None,
         condition: Some(predicateCount(
           count: 2,
           predicate: another(characterType(warrior)),
@@ -156,7 +163,8 @@ fn test_optional_cost() {
         effect: returnFromYourVoidToHand(
           target: this,
         ),
-        optional: Some(energy(Energy(1))),
+        optional: true,
+        cost: Some(energy(Energy(1))),
         condition: None,
       ))),
     ]
@@ -177,7 +185,8 @@ fn test_optional_cost_banish_enemy() {
           effect: gainEnergy(
             gains: Energy(1),
           ),
-          optional: Some(banishCardsFromEnemyVoid(1)),
+          optional: true,
+          cost: Some(banishCardsFromEnemyVoid(1)),
           condition: None,
         )),
         options: None,
