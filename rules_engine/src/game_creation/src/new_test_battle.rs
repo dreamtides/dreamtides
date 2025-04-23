@@ -3,7 +3,6 @@ use ability_data::cost::Cost;
 use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
-use ai_data::game_ai::GameAI;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
 use battle_data::battle::battle_tracing::BattleTracing;
@@ -16,7 +15,7 @@ use battle_data::battle_cards::card_data::CardData;
 use battle_data::battle_cards::card_id::ObjectId;
 use battle_data::battle_cards::card_properties::CardProperties;
 use battle_data::battle_cards::zone::Zone;
-use battle_data::battle_player::player_data::PlayerData;
+use battle_data::battle_player::player_data::{PlayerData, PlayerType};
 use battle_mutations::zone_mutations::deck;
 use core_data::card_types::{CardType, CharacterType};
 use core_data::identifiers::{BattleId, CardId};
@@ -26,16 +25,12 @@ use rand::{Rng, SeedableRng};
 use rand_xoshiro::Xoshiro256PlusPlus;
 
 /// Creates a new test battle between two Agents and starts it.
-pub fn create_and_start(
-    id: BattleId,
-    user_agent: Option<GameAI>,
-    enemy_agent: Option<GameAI>,
-) -> BattleData {
+pub fn create_and_start(id: BattleId, user: PlayerType, enemy: PlayerType) -> BattleData {
     let mut battle = BattleData {
         id,
         user: PlayerData {
             name: PlayerName::User,
-            ai: user_agent,
+            player_type: user,
             points: Points(0),
             spark_bonus: Spark(0),
             current_energy: Energy(2),
@@ -43,7 +38,7 @@ pub fn create_and_start(
         },
         enemy: PlayerData {
             name: PlayerName::Enemy,
-            ai: enemy_agent,
+            player_type: enemy,
             points: Points(0),
             spark_bonus: Spark(0),
             current_energy: Energy(2),

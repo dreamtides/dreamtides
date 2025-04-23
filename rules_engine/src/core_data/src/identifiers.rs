@@ -8,7 +8,18 @@ use slotmap::{new_key_type, Key, KeyData};
 use uuid::Uuid;
 
 #[derive(
-    Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+    Copy,
+    Clone,
+    Debug,
+    Default,
+    Eq,
+    PartialEq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Serialize,
+    Deserialize,
+    JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UserId(pub Uuid);

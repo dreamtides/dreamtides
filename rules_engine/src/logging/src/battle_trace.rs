@@ -100,8 +100,8 @@ mod tests {
     use battle_data::battle::request_context::RequestContext;
     use battle_data::battle::turn_data::TurnData;
     use battle_data::battle_cards::all_cards::AllCards;
-    use battle_data::battle_player::player_data::PlayerData;
-    use core_data::identifiers::BattleId;
+    use battle_data::battle_player::player_data::{PlayerData, PlayerType};
+    use core_data::identifiers::{BattleId, UserId};
     use core_data::numerics::{Energy, Points, Spark, TurnId};
     use core_data::types::PlayerName;
     use rand_xoshiro::rand_core::SeedableRng;
@@ -114,7 +114,7 @@ mod tests {
             request_context: RequestContext::UserRequest,
             user: PlayerData {
                 name: PlayerName::User,
-                ai: None,
+                player_type: PlayerType::User(UserId::default()),
                 points: Points(0),
                 current_energy: Energy(2),
                 produced_energy: Energy(2),
@@ -122,7 +122,7 @@ mod tests {
             },
             enemy: PlayerData {
                 name: PlayerName::Enemy,
-                ai: None,
+                player_type: PlayerType::User(UserId::default()),
                 points: Points(0),
                 current_energy: Energy(2),
                 produced_energy: Energy(2),

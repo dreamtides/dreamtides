@@ -4,6 +4,7 @@ use actions::battle_actions;
 use ai_agents::agent_search;
 use ai_data::game_ai::GameAI;
 use battle_data::battle::battle_data::BattleData;
+use battle_data::battle_player::player_data::PlayerType;
 use battle_queries::legal_action_queries::legal_actions;
 use core_data::identifiers::BattleId;
 use criterion::{criterion_group, BatchSize, Criterion};
@@ -27,8 +28,8 @@ pub fn random_playout(c: &mut Criterion) {
                 || {
                     new_test_battle::create_and_start(
                         BattleId(Uuid::new_v4()),
-                        Some(GameAI::RandomAction),
-                        Some(GameAI::RandomAction),
+                        PlayerType::Agent(GameAI::RandomAction),
+                        PlayerType::Agent(GameAI::RandomAction),
                     )
                 },
                 |mut battle| run_battle_until_completion(&mut battle),
@@ -40,7 +41,7 @@ pub fn random_playout(c: &mut Criterion) {
 
 fn run_battle_until_completion(battle: &mut BattleData) {
     while let Some(player) = legal_actions::next_to_act(battle) {
-        let Some(agent) = battle.player(player).ai.as_ref() else {
+        let PlayerType::Agent(agent) = &battle.player(player).player_type else {
             panic!("Player has no agent");
         };
         let action = agent_search::select_action(battle, player, agent);

@@ -2,6 +2,7 @@ use action_data::battle_action::BattleAction;
 use actions::battle_actions;
 use ai_agents::agent_search;
 use battle_data::battle::battle_data::BattleData;
+use battle_data::battle_player::player_data::PlayerType;
 use battle_queries::legal_action_queries::legal_actions::{self, LegalActions};
 use core_data::types::PlayerName;
 use display::rendering::renderer;
@@ -29,7 +30,7 @@ pub fn execute(
         return execute(battle, next_player, BattleAction::ResolveStack);
     }
 
-    if let Some(agent) = battle.player(next_player).ai.as_ref() {
+    if let PlayerType::Agent(agent) = &battle.player(next_player).player_type {
         info!("Selecting action for AI player");
         let next_action = agent_search::select_action(battle, next_player, agent);
         info!(?next_action, "Executing action for AI player");

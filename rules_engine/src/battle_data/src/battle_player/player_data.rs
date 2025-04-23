@@ -1,4 +1,5 @@
 use ai_data::game_ai::GameAI;
+use core_data::identifiers::UserId;
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::PlayerName;
 
@@ -12,8 +13,8 @@ pub struct PlayerData {
     /// Name of the player
     pub name: PlayerName,
 
-    /// Optionally, an AI agent to select actions for this player.
-    pub ai: Option<GameAI>,
+    /// Contains the player's UserId or AI game agent info.
+    pub player_type: PlayerType,
 
     /// Current score
     pub points: Points,
@@ -26,4 +27,10 @@ pub struct PlayerData {
 
     /// Additional spark for this player
     pub spark_bonus: Spark,
+}
+
+#[derive(Clone, Debug)]
+pub enum PlayerType {
+    User(UserId),
+    Agent(GameAI),
 }

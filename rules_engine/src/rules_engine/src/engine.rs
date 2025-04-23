@@ -7,7 +7,8 @@ use action_data::game_action::GameAction;
 use backtrace::Backtrace;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_animations::animation_data::AnimationData;
-use core_data::identifiers::BattleId;
+use battle_data::battle_player::player_data::PlayerType;
+use core_data::identifiers::{BattleId, UserId};
 use core_data::types::PlayerName;
 use display::rendering::renderer;
 use display_data::command::CommandSequence;
@@ -29,15 +30,43 @@ pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     let metadata = request.metadata;
     let commands = catch_panic(
         AssertUnwindSafe(|| {
-            let id = BattleId(Uuid::new_v4());
-            let battle = new_battle::create_and_start(id);
-            let commands = renderer::connect(&battle);
-            *CURRENT_BATTLE.lock().unwrap() = Some(battle);
-            commands
+            connect_internal(request.metadata.user_id);
+            renderer::connect(CURRENT_BATTLE.lock().unwrap().as_ref().unwrap())
         }),
         None,
     );
     ConnectResponse { metadata, commands }
+}
+
+fn connect_internal(user_id: UserId) {
+    let mut battle_lock = CURRENT_BATTLE.lock().unwrap();
+
+    if let Some(battle) = battle_lock.as_ref() {
+        if let PlayerType::User(current_user_id) = &battle.user.player_type {
+            if *current_user_id == user_id {
+                // Create a new battle if the user id matches the current "user" player
+                *battle_lock =
+                    Some(new_battle::create_and_start(user_id, BattleId(Uuid::new_v4())));
+                return;
+            }
+        }
+
+        if let PlayerType::User(enemy_user_id) = &battle.enemy.player_type {
+            if *enemy_user_id == user_id {
+                return;
+            }
+        }
+
+        // User is neither the "user" player nor the "enemy" player and a battle
+        // already exists; set them as the enemy player
+        let mut updated_battle = battle.clone();
+        updated_battle.enemy.player_type = PlayerType::User(user_id);
+        *battle_lock = Some(updated_battle);
+        return;
+    }
+
+    // No current battle, create a new one
+    *battle_lock = Some(new_battle::create_and_start(user_id, BattleId(Uuid::new_v4())));
 }
 
 pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
@@ -132,7 +161,7 @@ where
                 None => {
                     // Create a dummy battle if none exists
                     let id = BattleId(Uuid::new_v4());
-                    let dummy_battle = new_battle::create_and_start(id);
+                    let dummy_battle = new_battle::create_and_start(UserId::default(), id);
                     error_message::display_error_message(&dummy_battle, error_message)
                 }
             }
