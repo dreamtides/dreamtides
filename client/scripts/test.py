@@ -132,27 +132,44 @@ def check_rsync_available():
         return False
 
 def sync_project_to_temp(project_root):
-    temp_project_path = Path("/tmp/unity_tests/client")
+    home_dir = Path.home()
+    final_project_path = home_dir / "unity_tests/test_client"
     
-    # Ensure the parent directory exists
-    temp_parent = temp_project_path.parent
+    temp_parent = Path(home_dir / "unity_tests")
     temp_parent.mkdir(parents=True, exist_ok=True)
     
-    print(f"Syncing project to {temp_project_path}...")
+    print(f"Syncing project to {final_project_path}...")
+
+    source_path = str(project_root) + "/"
+    rsync_cmd = [
+        "rsync", 
+        "--delete", 
+        "--stats", 
+        "--copy-links", 
+        "-avqr", 
+        source_path, 
+        str(final_project_path)
+    ]
+    
+    print(rsync_cmd)
     
     try:
         subprocess.run(
-            ["rsync", "--delete", "--stats", "-avqr", str(project_root), "/tmp/unity_tests/"],
+            rsync_cmd,
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True
         )
-        print("Sync completed successfully")
-        return str(temp_project_path)
+        print("Sync completed successfully to", final_project_path)
+        
+        return str(final_project_path)
     except subprocess.CalledProcessError as e:
         print(f"Error syncing project: {e}")
         print(f"stderr: {e.stderr}")
+        sys.exit(1)
+    except (shutil.Error, OSError) as e:
+        print(f"Error moving project directory: {e}")
         sys.exit(1)
 
 def read_previous_run_time(test_output_dir):
