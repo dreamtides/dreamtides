@@ -1,5 +1,6 @@
 use battle_data::battle::battle_data::BattleData;
 use core_data::display_color::DisplayColor;
+use core_data::types::PlayerName;
 use display::core::response_builder::ResponseBuilder;
 use display::rendering::battle_rendering;
 use display_data::command::{Command, CommandSequence, UpdateBattleCommand};
@@ -12,7 +13,11 @@ use masonry::flex_style::{
 /// Attempts to display an error message to the player describing a rules engine
 /// error.
 pub fn display_error_message(battle: &BattleData, message: String) -> CommandSequence {
-    let mut builder = ResponseBuilder { animate: false, commands: CommandSequence::default() };
+    let mut builder = ResponseBuilder {
+        player: PlayerName::User,
+        animate: false,
+        commands: CommandSequence::default(),
+    };
     let mut view = battle_rendering::battle_view(&builder, battle);
     view.interface.screen_overlay = Some(render_message(message));
     builder.push(Command::UpdateBattle(UpdateBattleCommand { battle: view, update_sound: None }));

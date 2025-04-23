@@ -32,7 +32,9 @@ namespace Dreamtides.Services
       yield return new WaitForEndOfFrame();
       _metadata = new Metadata
       {
-        UserId = Guid.NewGuid()
+        UserId = Application.dataPath.Contains("test_client") ?
+            Guid.Parse("25e89dde-37d7-464b-8a1c-f985102ca029") :
+            Guid.Parse("d2da9785-f20e-4879-bed5-35b2e1926faf")
       };
       var request = new ConnectRequest
       {

@@ -16,6 +16,7 @@ use display_data::request_data::{
     ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse,
 };
 use game_creation::new_battle;
+use tracing::info;
 use uuid::Uuid;
 
 use crate::{error_message, handle_battle_action};
@@ -31,7 +32,10 @@ pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     let commands = catch_panic(
         AssertUnwindSafe(|| {
             connect_internal(request.metadata.user_id);
-            renderer::connect(CURRENT_BATTLE.lock().unwrap().as_ref().unwrap())
+            renderer::connect(
+                CURRENT_BATTLE.lock().unwrap().as_ref().unwrap(),
+                request.metadata.user_id,
+            )
         }),
         None,
     );
@@ -44,7 +48,9 @@ fn connect_internal(user_id: UserId) {
     if let Some(battle) = battle_lock.as_ref() {
         if let PlayerType::User(current_user_id) = &battle.user.player_type {
             if *current_user_id == user_id {
-                // Create a new battle if the user id matches the current "user" player
+                // Create a new battle if the user id matches the current "user"
+                // player
+                info!(?user_id, "Restarting current battle");
                 *battle_lock =
                     Some(new_battle::create_and_start(user_id, BattleId(Uuid::new_v4())));
                 return;
@@ -66,6 +72,7 @@ fn connect_internal(user_id: UserId) {
     }
 
     // No current battle, create a new one
+    info!(?user_id, "No current battle, creating");
     *battle_lock = Some(new_battle::create_and_start(user_id, BattleId(Uuid::new_v4())));
 }
 

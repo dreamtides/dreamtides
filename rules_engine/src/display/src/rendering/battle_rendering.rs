@@ -7,7 +7,6 @@ use battle_data::prompt_types::prompt_data::Prompt;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions::LegalActions;
 use battle_queries::player_queries::spark_total;
-use core_data::types::PlayerName;
 use display_data::battle_view::{BattleView, InterfaceView, PlayerView, PrimaryActionButtonView};
 use display_data::command::{Command, GameMessageType, UpdateBattleCommand};
 
@@ -22,7 +21,7 @@ pub fn run(builder: &mut ResponseBuilder, battle: &BattleData) {
     }));
 
     if let BattleStatus::GameOver { winner } = battle.status {
-        builder.push(Command::DisplayGameMessage(if winner == PlayerName::User {
+        builder.push(Command::DisplayGameMessage(if winner == builder.player {
             GameMessageType::Victory
         } else {
             GameMessageType::Defeat
@@ -39,10 +38,10 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleData) -> BattleView
 
     BattleView {
         id: battle.id,
-        user: player_view(battle, &battle.user),
-        enemy: player_view(battle, &battle.enemy),
+        user: player_view(battle, &battle.player(builder.player)),
+        enemy: player_view(battle, &battle.player(builder.player.opponent())),
         cards,
-        interface: interface_view(battle),
+        interface: interface_view(builder, battle),
     }
 }
 
@@ -56,10 +55,9 @@ fn player_view(battle: &BattleData, player: &PlayerData) -> PlayerView {
     }
 }
 
-fn interface_view(battle: &BattleData) -> InterfaceView {
-    let user_name = PlayerName::User;
+fn interface_view(builder: &ResponseBuilder, battle: &BattleData) -> InterfaceView {
     let legal_actions =
-        legal_actions::compute(battle, user_name, LegalActions { for_human_player: true });
+        legal_actions::compute(battle, builder.player, LegalActions { for_human_player: true });
 
     let primary_action_button = primary_action_button(battle, &legal_actions);
 

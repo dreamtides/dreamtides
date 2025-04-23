@@ -2,14 +2,17 @@ use battle_data::battle_cards::card_data::CardData;
 use battle_data::battle_cards::zone::Zone;
 use display_data::object_position::{ObjectPosition, Position, StackType};
 
-pub fn calculate(card: &CardData) -> ObjectPosition {
+use crate::core::response_builder::ResponseBuilder;
+
+pub fn calculate(builder: &ResponseBuilder, card: &CardData) -> ObjectPosition {
+    let player = builder.to_display_player(card.controller());
     let position = match card.zone {
-        Zone::Hand => Position::InHand(card.owner),
-        Zone::Deck => Position::InDeck(card.owner),
-        Zone::Battlefield => Position::OnBattlefield(card.owner),
+        Zone::Hand => Position::InHand(player),
+        Zone::Deck => Position::InDeck(player),
+        Zone::Battlefield => Position::OnBattlefield(player),
         Zone::Stack => Position::OnStack(StackType::Default),
-        Zone::Void => Position::InVoid(card.owner),
-        Zone::Banished => Position::InBanished(card.owner),
+        Zone::Void => Position::InVoid(player),
+        Zone::Banished => Position::InBanished(card.controller()),
     };
 
     for_card(card, position)

@@ -10,7 +10,7 @@ use crate::legal_action_queries::can_play_card;
 #[derive(Debug, Default, Clone, Copy)]
 pub struct LegalActions {
     /// Include 'interface only' actions in the response which don't affect the
-    /// game, e.g. removing a declared attacker.
+    /// game
     ///
     /// These are excluded from AI agent options in order to prevent infinite
     /// loops of game actions which do not progress the game state.

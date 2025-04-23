@@ -7,7 +7,7 @@ use battle_queries::legal_action_queries::can_play_card;
 use core_data::display_color;
 use core_data::display_types::SpriteAddress;
 use core_data::identifiers::CardId;
-use core_data::types::{CardFacing, PlayerName};
+use core_data::types::CardFacing;
 use display_data::card_view::{
     CardActions, CardEffects, CardPrefab, CardView, DisplayImage, RevealedCardView,
 };
@@ -19,10 +19,10 @@ use crate::rendering::positions;
 pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardView {
     CardView {
         id: context.card().id.card_id(),
-        position: positions::calculate(context.card()),
+        position: positions::calculate(builder, context.card()),
         revealed: context
             .card()
-            .is_revealed_to(PlayerName::User)
+            .is_revealed_to(builder.player)
             .then(|| revealed_card_view(builder, context)),
         revealed_to_opponents: context.card().revealed_to_opponent,
         card_facing: CardFacing::FaceUp,
@@ -32,12 +32,13 @@ pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardVi
     }
 }
 
-fn revealed_card_view(_builder: &ResponseBuilder, context: &CardViewContext) -> RevealedCardView {
+fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> RevealedCardView {
     let battle = context.battle();
     let card_id = context.card().id.card_id();
 
-    let can_play = can_play_card::from_hand(battle, HandCardId(card_id));
-    let selection_target = selection_target(context.battle(), card_id);
+    let can_play = context.card().controller() == builder.player
+        && can_play_card::from_hand(battle, HandCardId(card_id));
+    let selection_target = selection_target(builder, context.battle(), card_id);
 
     RevealedCardView {
         image: DisplayImage {
@@ -63,9 +64,13 @@ fn revealed_card_view(_builder: &ResponseBuilder, context: &CardViewContext) -> 
     }
 }
 
-fn selection_target(battle: &BattleData, card_id: CardId) -> Option<GameAction> {
+fn selection_target(
+    builder: &ResponseBuilder,
+    battle: &BattleData,
+    card_id: CardId,
+) -> Option<GameAction> {
     if let Some(prompt_data) = &battle.prompt {
-        if prompt_data.player == PlayerName::User {
+        if prompt_data.player == builder.player {
             match &prompt_data.prompt {
                 Prompt::ChooseCharacter { valid } => {
                     return valid
