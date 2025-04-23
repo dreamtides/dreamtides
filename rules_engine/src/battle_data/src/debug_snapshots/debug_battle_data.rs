@@ -23,8 +23,8 @@ impl DebugBattleData {
         Self {
             id: format!("{:?}", battle_data.id),
             request_context: format!("{:?}", battle_data.request_context),
-            user: DebugPlayerData::new(battle_data.user),
-            enemy: DebugPlayerData::new(battle_data.enemy),
+            user: DebugPlayerData::new(battle_data.player_one),
+            enemy: DebugPlayerData::new(battle_data.player_two),
             cards: DebugAllCards::new(battle_data.cards),
             status: format!("{:?}", battle_data.status),
             turn: format!(

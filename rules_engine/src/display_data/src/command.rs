@@ -4,12 +4,11 @@ use core_data::display_types::{
 };
 use core_data::identifiers::CardId;
 use core_data::numerics::{Energy, Points};
-use core_data::types::PlayerName;
 use masonry::flex_style::FlexVector3;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::battle_view::BattleView;
+use crate::battle_view::{BattleView, DisplayPlayer};
 use crate::card_view::CardView;
 use crate::object_position::ObjectPosition;
 
@@ -193,7 +192,7 @@ pub struct DrawUserCardsCommand {
 #[serde(rename_all = "camelCase")]
 pub struct DisplayJudgmentCommand {
     /// The player to display the judgment animation for.
-    pub player: PlayerName,
+    pub player: DisplayPlayer,
 
     /// The new score for the player, if it has changed.
     pub new_score: Option<Points>,
@@ -203,7 +202,7 @@ pub struct DisplayJudgmentCommand {
 #[serde(rename_all = "camelCase")]
 pub struct DisplayDreamwellActivationCommand {
     /// The player to display the dreamwell activation for.
-    pub player: PlayerName,
+    pub player: DisplayPlayer,
 
     /// The card to display an activation for. This card will be moved from its
     /// current position (assumed to be the 'Dreamwell' position) to the
@@ -263,9 +262,9 @@ pub struct ToggleThinkingIndicatorCommand {
 #[serde(rename_all = "camelCase")]
 pub enum GameObjectId {
     CardId(CardId),
-    Deck(PlayerName),
-    Void(PlayerName),
-    Avatar(PlayerName),
+    Deck(DisplayPlayer),
+    Void(DisplayPlayer),
+    Avatar(DisplayPlayer),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

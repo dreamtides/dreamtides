@@ -75,7 +75,7 @@ fn connect_internal(user_id: UserId) {
     let mut battle_lock = CURRENT_BATTLE.lock().unwrap();
 
     if let Some(battle) = battle_lock.as_ref() {
-        if let PlayerType::User(current_user_id) = &battle.user.player_type {
+        if let PlayerType::User(current_user_id) = &battle.player_one.player_type {
             if *current_user_id == user_id {
                 // Create a new battle if the user id matches the current "user"
                 // player
@@ -86,7 +86,7 @@ fn connect_internal(user_id: UserId) {
             }
         }
 
-        if let PlayerType::User(enemy_user_id) = &battle.enemy.player_type {
+        if let PlayerType::User(enemy_user_id) = &battle.player_two.player_type {
             if *enemy_user_id == user_id {
                 return;
             }
@@ -96,7 +96,7 @@ fn connect_internal(user_id: UserId) {
         // already exists; set them as the enemy player
         info!(?user_id, "Joining current battle");
         let mut updated_battle = battle.clone();
-        updated_battle.enemy.player_type = PlayerType::User(user_id);
+        updated_battle.player_two.player_type = PlayerType::User(user_id);
         *battle_lock = Some(updated_battle);
         return;
     }

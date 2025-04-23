@@ -1,8 +1,9 @@
 use action_data::battle_action::CardOrderSelectionTarget;
 use core_data::identifiers::CardId;
-use core_data::types::PlayerName;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+
+use crate::battle_view::DisplayPlayer;
 
 /// Represents the position of some object in the UI
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
@@ -50,25 +51,25 @@ pub enum Position {
     Drawn,
 
     /// Object is in a player's hand
-    InHand(PlayerName),
+    InHand(DisplayPlayer),
 
     /// Object is on top of a player's deck
-    OnTopOfDeck(PlayerName),
+    OnTopOfDeck(DisplayPlayer),
 
     /// Object is shuffled into a player's deck
-    InDeck(PlayerName),
+    InDeck(DisplayPlayer),
 
     /// Object is in a player's void
-    InVoid(PlayerName),
+    InVoid(DisplayPlayer),
 
     /// Object is in this player's banished zone
-    InBanished(PlayerName),
+    InBanished(DisplayPlayer),
 
     /// Object is on the battlefield
-    OnBattlefield(PlayerName),
+    OnBattlefield(DisplayPlayer),
 
     /// Object is in a player's status zone
-    InPlayerStatus(PlayerName),
+    InPlayerStatus(DisplayPlayer),
 
     /// Object is being displayed in a card browser, e.g. to select from a list
     /// of cards while searching
@@ -83,7 +84,7 @@ pub enum Position {
     HandStorage,
 
     /// Object is in the dreamwell for a player (usually off-screen).
-    InDreamwell(PlayerName),
+    InDreamwell(DisplayPlayer),
 
     /// Object is in a position to display itself as part of a dreamwell
     /// activation.

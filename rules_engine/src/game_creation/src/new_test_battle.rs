@@ -28,16 +28,16 @@ use rand_xoshiro::Xoshiro256PlusPlus;
 pub fn create_and_start(id: BattleId, user: PlayerType, enemy: PlayerType) -> BattleData {
     let mut battle = BattleData {
         id,
-        user: PlayerData {
-            name: PlayerName::User,
+        player_one: PlayerData {
+            name: PlayerName::One,
             player_type: user,
             points: Points(0),
             spark_bonus: Spark(0),
             current_energy: Energy(2),
             produced_energy: Energy(2),
         },
-        enemy: PlayerData {
-            name: PlayerName::Enemy,
+        player_two: PlayerData {
+            name: PlayerName::Two,
             player_type: enemy,
             points: Points(0),
             spark_bonus: Spark(0),
@@ -46,7 +46,7 @@ pub fn create_and_start(id: BattleId, user: PlayerType, enemy: PlayerType) -> Ba
         },
         cards: AllCards::default(),
         status: BattleStatus::Setup,
-        turn: TurnData { active_player: PlayerName::User, turn_id: TurnId::default() },
+        turn: TurnData { active_player: PlayerName::One, turn_id: TurnId::default() },
         step: BattleTurnStep::Judgment,
         rng: Xoshiro256PlusPlus::seed_from_u64(3141592653589793),
         request_context: RequestContext::UserRequest,
@@ -55,19 +55,19 @@ pub fn create_and_start(id: BattleId, user: PlayerType, enemy: PlayerType) -> Ba
         prompt_resume_action: None,
         tracing: Some(BattleTracing::default()),
     };
-    create_cards(&mut battle, PlayerName::User);
-    create_cards(&mut battle, PlayerName::Enemy);
+    create_cards(&mut battle, PlayerName::One);
+    create_cards(&mut battle, PlayerName::Two);
     battle.status = BattleStatus::Playing;
     deck::draw_cards(
         &mut battle,
-        EffectSource::Game { controller: PlayerName::User },
-        PlayerName::User,
+        EffectSource::Game { controller: PlayerName::One },
+        PlayerName::One,
         5,
     );
     deck::draw_cards(
         &mut battle,
-        EffectSource::Game { controller: PlayerName::Enemy },
-        PlayerName::Enemy,
+        EffectSource::Game { controller: PlayerName::Two },
+        PlayerName::Two,
         5,
     );
     battle

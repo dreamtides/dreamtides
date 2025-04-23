@@ -105,8 +105,8 @@ namespace Dreamtides.Services
       {
         return deck switch
         {
-          PlayerName.User => Registry.Layout.UserDeck,
-          PlayerName.Enemy => Registry.Layout.EnemyDeck,
+          DisplayPlayer.User => Registry.Layout.UserDeck,
+          DisplayPlayer.Enemy => Registry.Layout.EnemyDeck,
           _ => throw Errors.UnknownEnumValue(deck)
         };
       }
@@ -115,8 +115,8 @@ namespace Dreamtides.Services
       {
         return voidPile switch
         {
-          PlayerName.User => Registry.Layout.UserVoid,
-          PlayerName.Enemy => Registry.Layout.EnemyVoid,
+          DisplayPlayer.User => Registry.Layout.UserVoid,
+          DisplayPlayer.Enemy => Registry.Layout.EnemyVoid,
           _ => throw Errors.UnknownEnumValue(voidPile)
         };
       }
@@ -125,8 +125,8 @@ namespace Dreamtides.Services
       {
         return avatar switch
         {
-          PlayerName.User => Registry.Layout.UserStatusDisplay,
-          PlayerName.Enemy => Registry.Layout.EnemyStatusDisplay,
+          DisplayPlayer.User => Registry.Layout.UserStatusDisplay,
+          DisplayPlayer.Enemy => Registry.Layout.EnemyStatusDisplay,
           _ => throw Errors.UnknownEnumValue(avatar)
         };
       }
@@ -302,8 +302,8 @@ namespace Dreamtides.Services
       {
         return inHand switch
         {
-          PlayerName.User => Registry.Layout.UserHand,
-          PlayerName.Enemy => Registry.Layout.EnemyHand,
+          DisplayPlayer.User => Registry.Layout.UserHand,
+          DisplayPlayer.Enemy => Registry.Layout.EnemyHand,
           _ => throw Errors.UnknownEnumValue(inHand),
         };
       }
@@ -312,8 +312,8 @@ namespace Dreamtides.Services
       {
         return inDeck switch
         {
-          PlayerName.User => Registry.Layout.UserDeck,
-          PlayerName.Enemy => Registry.Layout.EnemyDeck,
+          DisplayPlayer.User => Registry.Layout.UserDeck,
+          DisplayPlayer.Enemy => Registry.Layout.EnemyDeck,
           _ => throw Errors.UnknownEnumValue(inDeck),
         };
       }
@@ -322,8 +322,8 @@ namespace Dreamtides.Services
       {
         return onBattlefield switch
         {
-          PlayerName.User => Registry.Layout.UserBattlefield,
-          PlayerName.Enemy => Registry.Layout.EnemyBattlefield,
+          DisplayPlayer.User => Registry.Layout.UserBattlefield,
+          DisplayPlayer.Enemy => Registry.Layout.EnemyBattlefield,
           _ => throw Errors.UnknownEnumValue(onBattlefield),
         };
       }
@@ -332,8 +332,8 @@ namespace Dreamtides.Services
       {
         return inVoid switch
         {
-          PlayerName.User => Registry.Layout.UserVoid,
-          PlayerName.Enemy => Registry.Layout.EnemyVoid,
+          DisplayPlayer.User => Registry.Layout.UserVoid,
+          DisplayPlayer.Enemy => Registry.Layout.EnemyVoid,
           _ => throw Errors.UnknownEnumValue(inVoid),
         };
       }
@@ -342,8 +342,8 @@ namespace Dreamtides.Services
       {
         return inPlayerStatus switch
         {
-          PlayerName.User => Registry.Layout.UserStatusDisplay,
-          PlayerName.Enemy => Registry.Layout.EnemyStatusDisplay,
+          DisplayPlayer.User => Registry.Layout.UserStatusDisplay,
+          DisplayPlayer.Enemy => Registry.Layout.EnemyStatusDisplay,
           _ => throw Errors.UnknownEnumValue(inPlayerStatus),
         };
       }
@@ -364,8 +364,8 @@ namespace Dreamtides.Services
       {
         return inDreamwell switch
         {
-          PlayerName.User => Registry.Layout.UserDreamwell,
-          PlayerName.Enemy => Registry.Layout.EnemyDreamwell,
+          DisplayPlayer.User => Registry.Layout.UserDreamwell,
+          DisplayPlayer.Enemy => Registry.Layout.EnemyDreamwell,
           _ => throw Errors.UnknownEnumValue(inDreamwell),
         };
       }

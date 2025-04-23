@@ -24,11 +24,11 @@ pub struct BattleData {
     /// Context of the request which triggered this rules engine execution
     pub request_context: RequestContext,
 
-    /// Player data for the user
-    pub user: PlayerData,
+    /// Player data for the starting player
+    pub player_one: PlayerData,
 
-    /// Player data for the enemy
-    pub enemy: PlayerData,
+    /// Player data for the non-starting player
+    pub player_two: PlayerData,
 
     /// All cards in this battle
     pub cards: AllCards,
@@ -66,15 +66,15 @@ pub struct BattleData {
 impl BattleData {
     pub fn player(&self, player_name: PlayerName) -> &PlayerData {
         match player_name {
-            PlayerName::User => &self.user,
-            PlayerName::Enemy => &self.enemy,
+            PlayerName::One => &self.player_one,
+            PlayerName::Two => &self.player_two,
         }
     }
 
     pub fn player_mut(&mut self, player_name: PlayerName) -> &mut PlayerData {
         match player_name {
-            PlayerName::User => &mut self.user,
-            PlayerName::Enemy => &mut self.enemy,
+            PlayerName::One => &mut self.player_one,
+            PlayerName::Two => &mut self.player_two,
         }
     }
 
@@ -94,8 +94,8 @@ impl BattleData {
             let snapshot = Self {
                 id: self.id,
                 request_context: self.request_context,
-                user: self.user.clone(),
-                enemy: self.enemy.clone(),
+                player_one: self.player_one.clone(),
+                player_two: self.player_two.clone(),
                 cards: self.cards.clone(),
                 status: self.status.clone(),
                 turn: self.turn,

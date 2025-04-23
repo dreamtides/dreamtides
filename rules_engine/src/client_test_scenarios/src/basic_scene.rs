@@ -4,9 +4,9 @@ use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::{AudioClipAddress, SpriteAddress};
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
-use core_data::types::{CardFacing, PlayerName};
+use core_data::types::CardFacing;
 use display_data::battle_view::{
-    BattlePreviewView, BattleView, InterfaceView, PlayerPreviewView, PlayerView,
+    BattlePreviewView, BattleView, DisplayPlayer, InterfaceView, PlayerPreviewView, PlayerView,
     PrimaryActionButtonView,
 };
 use display_data::card_view::{
@@ -37,20 +37,20 @@ pub fn create(id: BattleId) -> BattleView {
             total_spark: Spark(0),
         },
         cards: [
-            cards_in_position(Position::InHand(PlayerName::User), 5, 5),
-            cards_in_position(Position::InVoid(PlayerName::User), 16, 6),
-            cards_in_position(Position::InDeck(PlayerName::User), 22, 20),
-            cards_in_position(Position::InHand(PlayerName::Enemy), 105, 3),
-            cards_in_position(Position::InVoid(PlayerName::Enemy), 108, 6),
-            cards_in_position(Position::InDeck(PlayerName::Enemy), 114, 20),
-            cards_in_position(Position::InVoid(PlayerName::User), 150, 4),
-            cards_in_position(Position::OnBattlefield(PlayerName::User), 533, 7),
-            cards_in_position(Position::OnBattlefield(PlayerName::Enemy), 633, 8),
-            cards_in_position(Position::InHand(PlayerName::Enemy), 733, 5),
-            vec![enemy_card(Position::InPlayerStatus(PlayerName::Enemy), 738)],
-            vec![dreamsign_card(Position::InPlayerStatus(PlayerName::User), 739)],
-            vec![dreamwell_card(Position::InDreamwell(PlayerName::User), 740)],
-            vec![dreamwell_card(Position::InDreamwell(PlayerName::Enemy), 741)],
+            cards_in_position(Position::InHand(DisplayPlayer::User), 5, 5),
+            cards_in_position(Position::InVoid(DisplayPlayer::User), 16, 6),
+            cards_in_position(Position::InDeck(DisplayPlayer::User), 22, 20),
+            cards_in_position(Position::InHand(DisplayPlayer::Enemy), 105, 3),
+            cards_in_position(Position::InVoid(DisplayPlayer::Enemy), 108, 6),
+            cards_in_position(Position::InDeck(DisplayPlayer::Enemy), 114, 20),
+            cards_in_position(Position::InVoid(DisplayPlayer::User), 150, 4),
+            cards_in_position(Position::OnBattlefield(DisplayPlayer::User), 533, 7),
+            cards_in_position(Position::OnBattlefield(DisplayPlayer::Enemy), 633, 8),
+            cards_in_position(Position::InHand(DisplayPlayer::Enemy), 733, 5),
+            vec![enemy_card(Position::InPlayerStatus(DisplayPlayer::Enemy), 738)],
+            vec![dreamsign_card(Position::InPlayerStatus(DisplayPlayer::User), 739)],
+            vec![dreamwell_card(Position::InDreamwell(DisplayPlayer::User), 740)],
+            vec![dreamwell_card(Position::InDreamwell(DisplayPlayer::Enemy), 741)],
             vec![game_modifier_card(Position::GameModifier, 742)],
         ]
         .concat()
@@ -83,7 +83,7 @@ pub fn card_view(position: Position, sorting_key: u32) -> CardView {
         card5(position, sorting_key)
     };
 
-    if position == Position::InHand(PlayerName::Enemy) {
+    if position == Position::InHand(DisplayPlayer::Enemy) {
         card.revealed = None;
         card.revealed_to_opponents = false;
     }
@@ -106,7 +106,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
             },
             name: "Titan of Forgotten Echoes".to_string(),
             rules_text: "When you \u{f0a3} materialize your second character in a turn, return this character from your void to play.".to_string(),
-            outline_color: (position == Position::InHand(PlayerName::User)).then_some(display_color::GREEN),
+            outline_color: (position == Position::InHand(DisplayPlayer::User)).then_some(display_color::GREEN),
             cost: Some(Energy(6)),
             produced: None,
             spark: Some(Spark(4)),
@@ -114,7 +114,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
             supplemental_card_info: flex_node("<b>Materialize</b>: A character entering play."),
             is_fast: false,
             actions: CardActions {
-                can_play: position == Position::InHand(PlayerName::User),
+                can_play: position == Position::InHand(DisplayPlayer::User),
                 play_effect_preview: Some(BattlePreviewView {
                     preview_message: Some(character_limit_message()),
                     user: PlayerPreviewView {
@@ -156,7 +156,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
             },
             name: "Beacon of Tomorrow".to_string(),
             rules_text: "Discover a card with cost (2).".to_string(),
-            outline_color: (position == Position::InHand(PlayerName::User)).then_some(display_color::GREEN),
+            outline_color: (position == Position::InHand(DisplayPlayer::User)).then_some(display_color::GREEN),
             cost: Some(Energy(2)),
             produced: None,
             spark: None,
@@ -166,7 +166,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
             ),
             is_fast: false,
             actions: CardActions {
-                can_play: position == Position::InHand(PlayerName::User),
+                can_play: position == Position::InHand(DisplayPlayer::User),
                 on_play_sound: Some(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Electric Magic/RPG3_ElectricMagic_Cast01.wav")),
                 ..Default::default()
             },
@@ -197,7 +197,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
             },
             name: "Scrap Reclaimer".to_string(),
             rules_text: "Judgment: Return this character from your void to your hand. Born from rust and resilience.".to_string(),
-            outline_color: (position == Position::InHand(PlayerName::User)).then_some(display_color::GREEN),
+            outline_color: (position == Position::InHand(DisplayPlayer::User)).then_some(display_color::GREEN),
             cost: Some(Energy(4)),
             produced: None,
             spark: Some(Spark(0)),
@@ -206,7 +206,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
                 "<b>Judgment</b>: Triggers at the start of your turn."),
             is_fast: false,
             actions: CardActions {
-                can_play: position == Position::InHand(PlayerName::User),
+                can_play: position == Position::InHand(DisplayPlayer::User),
                 play_effect_preview: Some(BattlePreviewView {
                     preview_message: Some(hand_size_limit_message()),
                     ..Default::default()
@@ -237,7 +237,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
             name: "Evacuation Enforcer".to_string(),
             rules_text: "> Draw 2 cards. Discard 3 cards.\nPromises under a stormy sky."
                 .to_string(),
-            outline_color: (position == Position::InHand(PlayerName::User))
+            outline_color: (position == Position::InHand(DisplayPlayer::User))
                 .then_some(display_color::GREEN),
             cost: Some(Energy(2)),
             produced: None,
@@ -246,7 +246,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
             supplemental_card_info: None,
             is_fast: false,
             actions: CardActions {
-                can_play: position == Position::InHand(PlayerName::User),
+                can_play: position == Position::InHand(DisplayPlayer::User),
                 ..Default::default()
             },
             effects: CardEffects::default(),
@@ -272,7 +272,7 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
             },
             name: "Moonlit Voyage".to_string(),
             rules_text: "Draw 2 cards. Discard 2 cards.\nReclaim".to_string(),
-            outline_color: (position == Position::InHand(PlayerName::User))
+            outline_color: (position == Position::InHand(DisplayPlayer::User))
                 .then_some(display_color::GREEN),
             cost: Some(Energy(2)),
             produced: None,
@@ -283,7 +283,7 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
             ),
             is_fast: false,
             actions: CardActions {
-                can_play: position == Position::InHand(PlayerName::User),
+                can_play: position == Position::InHand(DisplayPlayer::User),
                 ..Default::default()
             },
             effects: CardEffects::default(),

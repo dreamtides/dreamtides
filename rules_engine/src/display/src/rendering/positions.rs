@@ -12,7 +12,7 @@ pub fn calculate(builder: &ResponseBuilder, card: &CardData) -> ObjectPosition {
         Zone::Battlefield => Position::OnBattlefield(player),
         Zone::Stack => Position::OnStack(StackType::Default),
         Zone::Void => Position::InVoid(player),
-        Zone::Banished => Position::InBanished(card.controller()),
+        Zone::Banished => Position::InBanished(player),
     };
 
     for_card(card, position)

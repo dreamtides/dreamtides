@@ -187,15 +187,15 @@ struct UnorderedZone<T> {
 impl<T: CardIdType> UnorderedZone<T> {
     pub fn cards(&self, player_name: PlayerName) -> &BTreeSet<T> {
         match player_name {
-            PlayerName::User => &self.user,
-            PlayerName::Enemy => &self.enemy,
+            PlayerName::One => &self.user,
+            PlayerName::Two => &self.enemy,
         }
     }
 
     pub fn cards_mut(&mut self, player_name: PlayerName) -> &mut BTreeSet<T> {
         match player_name {
-            PlayerName::User => &mut self.user,
-            PlayerName::Enemy => &mut self.enemy,
+            PlayerName::One => &mut self.user,
+            PlayerName::Two => &mut self.enemy,
         }
     }
 
@@ -223,15 +223,15 @@ struct OrderedZone<T> {
 impl<T: CardIdType> OrderedZone<T> {
     pub fn cards(&self, player_name: PlayerName) -> &VecDeque<T> {
         match player_name {
-            PlayerName::User => &self.user,
-            PlayerName::Enemy => &self.enemy,
+            PlayerName::One => &self.user,
+            PlayerName::Two => &self.enemy,
         }
     }
 
     pub fn cards_mut(&mut self, player_name: PlayerName) -> &mut VecDeque<T> {
         match player_name {
-            PlayerName::User => &mut self.user,
-            PlayerName::Enemy => &mut self.enemy,
+            PlayerName::One => &mut self.user,
+            PlayerName::Two => &mut self.enemy,
         }
     }
 

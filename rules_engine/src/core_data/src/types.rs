@@ -16,18 +16,15 @@ pub enum CardFacing {
 #[derive(Debug, Hash, Ord, PartialOrd, Serialize, Deserialize, JsonSchema, EnumSetType)]
 #[serde(rename_all = "camelCase")]
 pub enum PlayerName {
-    /// Player who is currently operating the client
-    User,
-
-    /// Opponent of user, i.e. the AI enemy
-    Enemy,
+    One,
+    Two,
 }
 
 impl PlayerName {
     pub fn opponent(self) -> PlayerName {
         match self {
-            PlayerName::User => PlayerName::Enemy,
-            PlayerName::Enemy => PlayerName::User,
+            PlayerName::One => PlayerName::Two,
+            PlayerName::Two => PlayerName::One,
         }
     }
 }

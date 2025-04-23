@@ -150,13 +150,13 @@ namespace Dreamtides.Schema
         public CardId CardId { get; set; }
 
         [JsonProperty("deck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? Deck { get; set; }
+        public DisplayPlayer? Deck { get; set; }
 
         [JsonProperty("void", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? Void { get; set; }
+        public DisplayPlayer? Void { get; set; }
 
         [JsonProperty("avatar", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? Avatar { get; set; }
+        public DisplayPlayer? Avatar { get; set; }
     }
 
     /// <summary>
@@ -214,7 +214,7 @@ namespace Dreamtides.Schema
         /// The player to display the dreamwell activation for.
         /// </summary>
         [JsonProperty("player", Required = Required.Always)]
-        public PlayerName Player { get; set; }
+        public DisplayPlayer Player { get; set; }
     }
 
     public partial class DisplayEffectCommand
@@ -316,7 +316,7 @@ namespace Dreamtides.Schema
         /// The player to display the judgment animation for.
         /// </summary>
         [JsonProperty("player", Required = Required.Always)]
-        public PlayerName Player { get; set; }
+        public DisplayPlayer Player { get; set; }
     }
 
     public partial class DissolveCardCommand
@@ -528,31 +528,31 @@ namespace Dreamtides.Schema
         public StackType? OnStack { get; set; }
 
         [JsonProperty("inHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? InHand { get; set; }
+        public DisplayPlayer? InHand { get; set; }
 
         [JsonProperty("onTopOfDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? OnTopOfDeck { get; set; }
+        public DisplayPlayer? OnTopOfDeck { get; set; }
 
         [JsonProperty("inDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? InDeck { get; set; }
+        public DisplayPlayer? InDeck { get; set; }
 
         [JsonProperty("inVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? InVoid { get; set; }
+        public DisplayPlayer? InVoid { get; set; }
 
         [JsonProperty("inBanished", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? InBanished { get; set; }
+        public DisplayPlayer? InBanished { get; set; }
 
         [JsonProperty("onBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? OnBattlefield { get; set; }
+        public DisplayPlayer? OnBattlefield { get; set; }
 
         [JsonProperty("inPlayerStatus", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? InPlayerStatus { get; set; }
+        public DisplayPlayer? InPlayerStatus { get; set; }
 
         [JsonProperty("cardOrderSelector", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardOrderSelectionTarget? CardOrderSelector { get; set; }
 
         [JsonProperty("inDreamwell", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? InDreamwell { get; set; }
+        public DisplayPlayer? InDreamwell { get; set; }
 
         [JsonProperty("hiddenWithinCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardId HiddenWithinCard { get; set; }
@@ -1643,17 +1643,16 @@ namespace Dreamtides.Schema
     public enum ArrowStyle { Blue, Green, Red };
 
     /// <summary>
-    /// Identifies a player in an ongoing battle.
+    /// Represents a player within the context of the display layer.
+    ///
+    /// The "viewer" is always the player operating the game client, this may correspond to
+    /// either of the actual players in the game.
     ///
     /// The player to display the judgment animation for.
     ///
     /// The player to display the dreamwell activation for.
-    ///
-    /// Player who is currently operating the client
-    ///
-    /// Opponent of user, i.e. the AI enemy
     /// </summary>
-    public enum PlayerName { Enemy, User };
+    public enum DisplayPlayer { Enemy, User };
 
     public enum GameMessageType { Defeat, EnemyTurn, Victory, YourTurn };
 
@@ -1801,7 +1800,7 @@ namespace Dreamtides.Schema
             Converters =
             {
                 ArrowStyleConverter.Singleton,
-                PlayerNameConverter.Singleton,
+                DisplayPlayerConverter.Singleton,
                 GameMessageTypeConverter.Singleton,
                 CardFacingConverter.Singleton,
                 PositionConverter.Singleton,
@@ -1883,9 +1882,9 @@ namespace Dreamtides.Schema
         public static readonly ArrowStyleConverter Singleton = new ArrowStyleConverter();
     }
 
-    internal class PlayerNameConverter : JsonConverter
+    internal class DisplayPlayerConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(PlayerName) || t == typeof(PlayerName?);
+        public override bool CanConvert(Type t) => t == typeof(DisplayPlayer) || t == typeof(DisplayPlayer?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -1893,12 +1892,12 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "enemy":
-                    return PlayerName.Enemy;
-                case "user":
-                    return PlayerName.User;
+                case "Enemy":
+                    return DisplayPlayer.Enemy;
+                case "User":
+                    return DisplayPlayer.User;
             }
-            throw new Exception("Cannot unmarshal type PlayerName");
+            throw new Exception("Cannot unmarshal type DisplayPlayer");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -1908,20 +1907,20 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (PlayerName)untypedValue;
+            var value = (DisplayPlayer)untypedValue;
             switch (value)
             {
-                case PlayerName.Enemy:
-                    serializer.Serialize(writer, "enemy");
+                case DisplayPlayer.Enemy:
+                    serializer.Serialize(writer, "Enemy");
                     return;
-                case PlayerName.User:
-                    serializer.Serialize(writer, "user");
+                case DisplayPlayer.User:
+                    serializer.Serialize(writer, "User");
                     return;
             }
-            throw new Exception("Cannot marshal type PlayerName");
+            throw new Exception("Cannot marshal type DisplayPlayer");
         }
 
-        public static readonly PlayerNameConverter Singleton = new PlayerNameConverter();
+        public static readonly DisplayPlayerConverter Singleton = new DisplayPlayerConverter();
     }
 
     internal class GameMessageTypeConverter : JsonConverter

@@ -22,7 +22,7 @@ pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardVi
         position: positions::calculate(builder, context.card()),
         revealed: context
             .card()
-            .is_revealed_to(builder.player)
+            .is_revealed_to(builder.display_for_player())
             .then(|| revealed_card_view(builder, context)),
         revealed_to_opponents: context.card().revealed_to_opponent,
         card_facing: CardFacing::FaceUp,
@@ -36,7 +36,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
     let battle = context.battle();
     let card_id = context.card().id.card_id();
 
-    let can_play = context.card().controller() == builder.player
+    let can_play = context.card().controller() == builder.act_for_player()
         && can_play_card::from_hand(battle, HandCardId(card_id));
     let selection_target = selection_target(builder, context.battle(), card_id);
 
@@ -70,7 +70,7 @@ fn selection_target(
     card_id: CardId,
 ) -> Option<GameAction> {
     if let Some(prompt_data) = &battle.prompt {
-        if prompt_data.player == builder.player {
+        if prompt_data.player == builder.act_for_player() {
             match &prompt_data.prompt {
                 Prompt::ChooseCharacter { valid } => {
                     return valid

@@ -16,6 +16,6 @@ pub struct TurnData {
 
 impl Default for TurnData {
     fn default() -> Self {
-        TurnData { active_player: PlayerName::User, turn_id: TurnId::default() }
+        TurnData { active_player: PlayerName::One, turn_id: TurnId::default() }
     }
 }

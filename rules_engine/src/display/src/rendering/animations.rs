@@ -9,7 +9,7 @@ use crate::core::response_builder::ResponseBuilder;
 pub fn render(builder: &mut ResponseBuilder, animation: &BattleAnimation, _snapshot: &BattleData) {
     match animation {
         BattleAnimation::StartTurn { player } => {
-            builder.push(Command::DisplayGameMessage(if *player == builder.player {
+            builder.push(Command::DisplayGameMessage(if *player == builder.display_for_player() {
                 GameMessageType::YourTurn
             } else {
                 GameMessageType::EnemyTurn
@@ -28,7 +28,7 @@ pub fn render(builder: &mut ResponseBuilder, animation: &BattleAnimation, _snaps
             new_produced_energy,
         } => {
             builder.push(Command::DisplayDreamwellActivation(DisplayDreamwellActivationCommand {
-                player: *player,
+                player: builder.to_display_player(*player),
                 card_id: *dreamwell_card_id,
                 new_energy: Some(*new_energy),
                 new_produced_energy: Some(*new_produced_energy),

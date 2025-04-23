@@ -123,3 +123,15 @@ pub struct PlayerPreviewView {
     /// New total spark for this player
     pub total_spark: Option<Spark>,
 }
+
+/// Represents a player within the context of the display layer.
+///
+/// The "viewer" is always the player operating the game client, this may
+/// correspond to either of the actual players in the game.
+#[derive(
+    Debug, Clone, Copy, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
+pub enum DisplayPlayer {
+    User,
+    Enemy,
+}

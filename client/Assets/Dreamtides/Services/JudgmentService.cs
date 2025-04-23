@@ -25,7 +25,7 @@ namespace Dreamtides.Services
     public IEnumerator HandleDisplayJudgmentCommand(DisplayJudgmentCommand displayJudgment)
     {
       var sequence = TweenUtils.Sequence("DisplayJudgment");
-      var actorIsUser = displayJudgment.Player == PlayerName.User;
+      var actorIsUser = displayJudgment.Player == DisplayPlayer.User;
       var actorScoredPoints = displayJudgment.NewScore != null;
       var actorStatusDisplay = actorIsUser ?
           Registry.Layout.UserStatusDisplay :

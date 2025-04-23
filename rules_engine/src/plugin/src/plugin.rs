@@ -4,7 +4,7 @@ use std::panic::{self, UnwindSafe};
 
 use anyhow::Result;
 use display_data::request_data::{ConnectRequest, PerformActionRequest};
-use rules_engine::test_data;
+use rules_engine::engine;
 
 /// Synchronize the state of an ongoing game, downloading a full description of
 /// the game state.
@@ -36,7 +36,7 @@ unsafe fn connect_impl(
     let request_data = std::slice::from_raw_parts(request, request_length as usize);
     let deserialized_request = serde_json::from_slice::<ConnectRequest>(request_data)?;
     println!("connect: {:?}", deserialized_request.metadata.user_id);
-    let scene = test_data::connect(&deserialized_request);
+    let scene = engine::connect(&deserialized_request);
     let json = serde_json::to_string(&scene)?;
     let json_bytes = json.as_bytes();
 
@@ -78,7 +78,7 @@ unsafe fn perform_impl(
     let request_data = std::slice::from_raw_parts(request, request_length as usize);
     let deserialized_request = serde_json::from_slice::<PerformActionRequest>(request_data)?;
     println!("perform_action: {:?}", deserialized_request.metadata.user_id);
-    let scene = test_data::perform_action(&deserialized_request);
+    let scene = engine::perform_action(&deserialized_request);
     let json = serde_json::to_string(&scene)?;
     let json_bytes = json.as_bytes();
 

@@ -21,7 +21,7 @@ pub fn run(builder: &mut ResponseBuilder, battle: &BattleData) {
     }));
 
     if let BattleStatus::GameOver { winner } = battle.status {
-        builder.push(Command::DisplayGameMessage(if winner == builder.player {
+        builder.push(Command::DisplayGameMessage(if winner == builder.display_for_player() {
             GameMessageType::Victory
         } else {
             GameMessageType::Defeat
@@ -38,8 +38,8 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleData) -> BattleView
 
     BattleView {
         id: battle.id,
-        user: player_view(battle, battle.player(builder.player)),
-        enemy: player_view(battle, battle.player(builder.player.opponent())),
+        user: player_view(battle, battle.player(builder.display_for_player())),
+        enemy: player_view(battle, battle.player(builder.display_for_player())),
         cards,
         interface: interface_view(builder, battle),
     }
@@ -56,8 +56,9 @@ fn player_view(battle: &BattleData, player: &PlayerData) -> PlayerView {
 }
 
 fn interface_view(builder: &ResponseBuilder, battle: &BattleData) -> InterfaceView {
-    let legal_actions =
-        legal_actions::compute(battle, builder.player, LegalActions { for_human_player: true });
+    let legal_actions = legal_actions::compute(battle, builder.act_for_player(), LegalActions {
+        for_human_player: true,
+    });
 
     let primary_action_button = primary_action_button(battle, &legal_actions);
 

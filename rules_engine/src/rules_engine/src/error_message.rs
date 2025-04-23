@@ -13,15 +13,11 @@ use masonry::flex_style::{
 /// Attempts to display an error message to the player describing a rules engine
 /// error.
 pub fn display_error_message(battle: &BattleData, message: String) -> CommandSequence {
-    let mut builder = ResponseBuilder {
-        player: PlayerName::User,
-        animate: false,
-        commands: CommandSequence::default(),
-    };
+    let mut builder = ResponseBuilder::new(PlayerName::One, false);
     let mut view = battle_rendering::battle_view(&builder, battle);
     view.interface.screen_overlay = Some(render_message(message));
     builder.push(Command::UpdateBattle(UpdateBattleCommand { battle: view, update_sound: None }));
-    builder.commands
+    builder.commands()
 }
 
 fn render_message(text: String) -> FlexNode {

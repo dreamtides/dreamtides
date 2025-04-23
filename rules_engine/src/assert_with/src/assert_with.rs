@@ -148,16 +148,16 @@ mod tests {
         BattleData {
             id: BattleId(Uuid::new_v4()),
             request_context: RequestContext::UserRequest,
-            user: PlayerData {
-                name: PlayerName::User,
+            player_one: PlayerData {
+                name: PlayerName::One,
                 player_type: PlayerType::User(UserId::default()),
                 points: Points(0),
                 current_energy: Energy(2),
                 produced_energy: Energy(2),
                 spark_bonus: Spark(0),
             },
-            enemy: PlayerData {
-                name: PlayerName::Enemy,
+            player_two: PlayerData {
+                name: PlayerName::Two,
                 player_type: PlayerType::User(UserId::default()),
                 points: Points(0),
                 current_energy: Energy(2),
@@ -166,7 +166,7 @@ mod tests {
             },
             cards: AllCards::default(),
             status: BattleStatus::Playing,
-            turn: TurnData { active_player: PlayerName::User, turn_id: TurnId(1) },
+            turn: TurnData { active_player: PlayerName::One, turn_id: TurnId(1) },
             step: BattleTurnStep::Main,
             rng: Xoshiro256PlusPlus::seed_from_u64(12345),
             animations: None,

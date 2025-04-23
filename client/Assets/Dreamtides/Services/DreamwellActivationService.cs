@@ -94,8 +94,8 @@ namespace Dreamtides.Services
         var startPosition = card.transform.position;
         var statusDisplay = command.Player switch
         {
-          PlayerName.Enemy => Registry.Layout.EnemyStatusDisplay,
-          PlayerName.User => Registry.Layout.UserStatusDisplay,
+          DisplayPlayer.Enemy => Registry.Layout.EnemyStatusDisplay,
+          DisplayPlayer.User => Registry.Layout.UserStatusDisplay,
           _ => throw Errors.UnknownEnumValue(command.Player)
         };
         var targetPosition = statusDisplay.transform.position;

@@ -14,9 +14,8 @@ use core_data::display_types::{
 };
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Spark};
-use core_data::types::PlayerName;
 use display_data::battle_view::{
-    BattleView, ButtonView, CardOrderSelectorView, PrimaryActionButtonView,
+    BattleView, ButtonView, CardOrderSelectorView, DisplayPlayer, PrimaryActionButtonView,
 };
 use display_data::card_view::CardView;
 use display_data::command::{
@@ -108,7 +107,8 @@ fn play_card(card_id: CardId, scenario: &str) -> CommandSequence {
 
     match scenario {
         "basic" => {
-            battle.cards[card_index].position.position = Position::OnBattlefield(PlayerName::User);
+            battle.cards[card_index].position.position =
+                Position::OnBattlefield(DisplayPlayer::User);
         }
         "play_card_with_targets" => {
             play_card_with_targets(&mut battle, card_id, StackType::TargetingEnemyBattlefield);
@@ -133,12 +133,12 @@ fn browse_cards(card_browser: CardBrowserType) -> CommandSequence {
     let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
 
     let source_position = match card_browser {
-        CardBrowserType::UserDeck => Position::InDeck(PlayerName::User),
-        CardBrowserType::EnemyDeck => Position::InDeck(PlayerName::Enemy),
-        CardBrowserType::UserVoid => Position::InVoid(PlayerName::User),
-        CardBrowserType::EnemyVoid => Position::InVoid(PlayerName::Enemy),
-        CardBrowserType::UserStatus => Position::InPlayerStatus(PlayerName::User),
-        CardBrowserType::EnemyStatus => Position::InPlayerStatus(PlayerName::Enemy),
+        CardBrowserType::UserDeck => Position::InDeck(DisplayPlayer::User),
+        CardBrowserType::EnemyDeck => Position::InDeck(DisplayPlayer::Enemy),
+        CardBrowserType::UserVoid => Position::InVoid(DisplayPlayer::User),
+        CardBrowserType::EnemyVoid => Position::InVoid(DisplayPlayer::Enemy),
+        CardBrowserType::UserStatus => Position::InPlayerStatus(DisplayPlayer::User),
+        CardBrowserType::EnemyStatus => Position::InPlayerStatus(DisplayPlayer::Enemy),
     };
 
     // Store the source position for later use when closing browser
@@ -203,9 +203,9 @@ fn select_card(card_id: CardId) -> CommandSequence {
 
     for (index, sorting_key) in cards_to_move {
         let position = if battle.cards[index].id == card_id {
-            Position::InVoid(PlayerName::Enemy)
+            Position::InVoid(DisplayPlayer::Enemy)
         } else {
-            Position::InVoid(PlayerName::User)
+            Position::InVoid(DisplayPlayer::User)
         };
         battle.cards[index] = basic_scene::card_view(position, sorting_key);
         battle.cards[index].position.sorting_key = 999;
@@ -293,7 +293,7 @@ fn play_card_with_targets(battle: &mut BattleView, card_id: CardId, stack: Stack
     battle.interface.primary_action_button = None;
     set_can_play_to_false(battle);
     for card in battle.cards.iter_mut() {
-        if matches!(card.position.position, Position::OnBattlefield(PlayerName::Enemy)) {
+        if matches!(card.position.position, Position::OnBattlefield(DisplayPlayer::Enemy)) {
             if let Some(revealed) = &mut card.revealed {
                 revealed.actions.on_click = Some(GameAction::BattleAction(
                     BattleAction::SelectCharacter(CharacterId(card.id)),
@@ -331,7 +331,7 @@ fn play_card_with_order_selector(
         )),
     }));
     battle.cards[card_index] =
-        basic_scene::card_view(Position::InVoid(PlayerName::User), sorting_key);
+        basic_scene::card_view(Position::InVoid(DisplayPlayer::User), sorting_key);
     commands.push(Command::UpdateBattle(
         UpdateBattleCommand::new(battle.clone()).with_update_sound(
             AudioClipAddress::new(
@@ -429,14 +429,14 @@ fn respond_to_enemy_card(battle: &mut BattleView, commands: &mut Vec<Command>) {
         .cards
         .iter()
         .enumerate()
-        .find(|(_, c)| matches!(c.position.position, Position::InHand(PlayerName::Enemy)))
+        .find(|(_, c)| matches!(c.position.position, Position::InHand(DisplayPlayer::Enemy)))
     {
         let sorting_key = card.position.sorting_key;
         let card_id = card.id;
         let target_id = battle
             .cards
             .iter()
-            .find(|c| matches!(c.position.position, Position::OnBattlefield(PlayerName::User)))
+            .find(|c| matches!(c.position.position, Position::OnBattlefield(DisplayPlayer::User)))
             .map(|c| c.id)
             .unwrap_or(card_id); // Fallback to the card's own ID if no target found
         battle.cards[card_index] =
@@ -466,19 +466,19 @@ fn trigger_user_judgment_phase(battle: &mut BattleView, commands: &mut Vec<Comma
     let dreamwell_card_id = battle
         .cards
         .iter()
-        .find(|card| matches!(card.position.position, Position::InDreamwell(PlayerName::User)))
+        .find(|card| matches!(card.position.position, Position::InDreamwell(DisplayPlayer::User)))
         .map(|card| card.id)
         .unwrap_or(battle.cards[0].id);
 
     commands.extend(vec![
         Command::DisplayGameMessage(GameMessageType::YourTurn),
         Command::DisplayJudgment(DisplayJudgmentCommand {
-            player: PlayerName::User,
+            player: DisplayPlayer::User,
             new_score: None,
         }),
         Command::DisplayDreamwellActivation(DisplayDreamwellActivationCommand {
             card_id: dreamwell_card_id,
-            player: PlayerName::User,
+            player: DisplayPlayer::User,
             new_energy: Some(Energy(3)),
             new_produced_energy: Some(Energy(3)),
         }),
@@ -534,7 +534,7 @@ fn draw_card(battle: &mut BattleView) -> Option<CardView> {
     if let Some(deck_card) = battle
         .cards
         .iter()
-        .find(|c| matches!(c.position.position, Position::InDeck(PlayerName::User)))
+        .find(|c| matches!(c.position.position, Position::InDeck(DisplayPlayer::User)))
     {
         let card_id = deck_card.id;
         let sorting_key = deck_card.position.sorting_key;
@@ -542,7 +542,7 @@ fn draw_card(battle: &mut BattleView) -> Option<CardView> {
         if let Some(card_index) = battle.cards.iter().position(|c| c.id == card_id) {
             let mut shown_drawn = battle.clone();
             shown_drawn.cards[card_index] = basic_scene::card_view(Position::Drawn, sorting_key);
-            let view = basic_scene::card_view(Position::InHand(PlayerName::User), sorting_key);
+            let view = basic_scene::card_view(Position::InHand(DisplayPlayer::User), sorting_key);
             battle.cards[card_index] = view.clone();
             *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
             Some(view)

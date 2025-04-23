@@ -26,27 +26,27 @@ impl DebugAllCards {
     pub fn new(all_cards: AllCards) -> Self {
         Self {
             cards: Self::cards_to_debug(all_cards.all_cards()),
-            user_battlefield: Self::cards_to_debug(all_cards.battlefield_cards(PlayerName::User)),
-            enemy_battlefield: Self::cards_to_debug(all_cards.battlefield_cards(PlayerName::Enemy)),
-            user_void: Self::card_ids_to_debug(all_cards.void(PlayerName::User).iter(), &all_cards),
+            user_battlefield: Self::cards_to_debug(all_cards.battlefield_cards(PlayerName::One)),
+            enemy_battlefield: Self::cards_to_debug(all_cards.battlefield_cards(PlayerName::Two)),
+            user_void: Self::card_ids_to_debug(all_cards.void(PlayerName::One).iter(), &all_cards),
             enemy_void: Self::card_ids_to_debug(
-                all_cards.void(PlayerName::Enemy).iter(),
+                all_cards.void(PlayerName::Two).iter(),
                 &all_cards,
             ),
-            user_hand: Self::cards_to_debug(all_cards.hand_cards(PlayerName::User)),
-            enemy_hand: Self::cards_to_debug(all_cards.hand_cards(PlayerName::Enemy)),
-            user_deck: Self::card_ids_to_debug(all_cards.deck(PlayerName::User).iter(), &all_cards),
+            user_hand: Self::cards_to_debug(all_cards.hand_cards(PlayerName::One)),
+            enemy_hand: Self::cards_to_debug(all_cards.hand_cards(PlayerName::Two)),
+            user_deck: Self::card_ids_to_debug(all_cards.deck(PlayerName::One).iter(), &all_cards),
             enemy_deck: Self::card_ids_to_debug(
-                all_cards.deck(PlayerName::Enemy).iter(),
+                all_cards.deck(PlayerName::Two).iter(),
                 &all_cards,
             ),
             stack: Self::card_ids_to_debug(all_cards.stack().iter(), &all_cards),
             user_banished: Self::card_ids_to_debug(
-                all_cards.banished(PlayerName::User).iter(),
+                all_cards.banished(PlayerName::One).iter(),
                 &all_cards,
             ),
             enemy_banished: Self::card_ids_to_debug(
-                all_cards.banished(PlayerName::Enemy).iter(),
+                all_cards.banished(PlayerName::Two).iter(),
                 &all_cards,
             ),
             next_object_id: format!(
