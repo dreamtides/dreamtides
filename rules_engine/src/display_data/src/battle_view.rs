@@ -48,7 +48,10 @@ pub struct InterfaceView {
 
     /// Primary action button, used for confirming selections and ending the
     /// turn. None indicates no button should be shown.
-    pub primary_action_button: Option<PrimaryActionButtonView>,
+    pub primary_action_button: Option<ActionButtonView>,
+
+    /// Secondary action button, used for alternative choice options.
+    pub secondary_action_button: Option<ActionButtonView>,
 
     /// Options for display of the card order selector
     pub card_order_selector: Option<CardOrderSelectorView>,
@@ -69,7 +72,7 @@ pub struct CardOrderSelectorView {
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct PrimaryActionButtonView {
+pub struct ActionButtonView {
     pub label: String,
     pub action: GameAction,
 

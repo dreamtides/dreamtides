@@ -10,7 +10,7 @@ using Dreamtides.Schema;
 
 namespace Dreamtides.Buttons
 {
-  public sealed class PrimaryActionButton : Displayable
+  public sealed class ActionButton : Displayable
   {
     [SerializeField] Registry _registry = null!;
     [SerializeField] SpriteRenderer _background = null!;
@@ -30,17 +30,13 @@ namespace Dreamtides.Buttons
     GameAction? _action;
     float? _showOnIdleDuration;
     float? _lastSetViewTime;
-    PrimaryActionButtonView? _pendingView;
+    ActionButtonView? _pendingView;
     bool _isVisible = false;
     private bool _isAnimating = false;
 
     protected override void OnStart()
     {
-      _originalPosition = transform.position;
-      _originalColor = _background.color;
-      _originalMaterial = _background.material;
-      _originalBackgroundLocalScale = _background.transform.localScale;
-      _originalTextLocalScale = _text.transform.localScale;
+      SaveCurrentValues();
     }
 
     private void Update()
@@ -56,7 +52,7 @@ namespace Dreamtides.Buttons
       }
     }
 
-    public void SetView(PrimaryActionButtonView? view)
+    public void SetView(ActionButtonView? view)
     {
       _lastSetViewTime = Time.time;
 
@@ -80,7 +76,7 @@ namespace Dreamtides.Buttons
       }
     }
 
-    private void ApplyView(PrimaryActionButtonView? view)
+    private void ApplyView(ActionButtonView? view)
     {
       if (_isAnimating)
       {
@@ -165,6 +161,8 @@ namespace Dreamtides.Buttons
 
     public override void MouseDown()
     {
+      SaveCurrentValues();
+
       _currentAnimation?.Kill();
       Vector3 directionFromCamera = (transform.position - _registry.Layout.MainCamera.transform.position).normalized;
       Vector3 targetPosition = transform.position + directionFromCamera * _moveDistance;
@@ -186,6 +184,15 @@ namespace Dreamtides.Buttons
         _registry.SoundService.Play(_onClickSound);
         _registry.ActionService.PerformAction(_action);
       }
+    }
+
+    private void SaveCurrentValues()
+    {
+      _originalPosition = transform.position;
+      _originalColor = _background.color;
+      _originalMaterial = _background.material;
+      _originalBackgroundLocalScale = _background.transform.localScale;
+      _originalTextLocalScale = _text.transform.localScale;
     }
   }
 }

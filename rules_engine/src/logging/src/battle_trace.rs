@@ -163,9 +163,9 @@ mod tests {
         let events = &battle.tracing.unwrap().current;
         assert_eq!(events.len(), 1);
         assert_eq!(events[0].m, "Drawing cards");
-        assert_eq!(events[0].values.get("player").unwrap(), "User");
+        assert_eq!(events[0].values.get("player").unwrap(), "One");
         assert_eq!(events[0].values.get("count").unwrap(), "2");
-        assert!(events[0].vs.contains("player: User"));
+        assert!(events[0].vs.contains("player: One"));
         assert!(events[0].vs.contains("count: 2"));
     }
 
@@ -229,11 +229,11 @@ mod tests {
         assert_eq!(events.len(), 2);
 
         assert_eq!(events[0].m, "Simple trace");
-        assert_eq!(events[0].values.get("player").unwrap(), "User");
+        assert_eq!(events[0].values.get("player").unwrap(), "One");
         assert_eq!(events[0].values.get("count").unwrap(), "2");
 
         assert_eq!(events[1].m, "With expressions");
-        assert_eq!(events[1].values.get("player_name").unwrap(), "\"User\"");
+        assert_eq!(events[1].values.get("player_name").unwrap(), "\"One\"");
         assert_eq!(events[1].values.get("doubled_count").unwrap(), "4");
     }
 }

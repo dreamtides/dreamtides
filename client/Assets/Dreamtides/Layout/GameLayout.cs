@@ -114,8 +114,11 @@ namespace Dreamtides.Layout
     [SerializeField] ObjectLayout? _onScreenStorage;
     public ObjectLayout OnScreenStorage => Check(_onScreenStorage);
 
-    [SerializeField] PrimaryActionButton? _primaryActionButton;
-    public PrimaryActionButton PrimaryActionButton => Check(_primaryActionButton);
+    [SerializeField] ActionButton? _primaryActionButton;
+    public ActionButton PrimaryActionButton => Check(_primaryActionButton);
+
+    [SerializeField] ActionButton? _secondaryActionButton;
+    public ActionButton SecondaryActionButton => Check(_secondaryActionButton);
 
     [SerializeField] EnemyMessage? _enemyMessage;
     public EnemyMessage EnemyMessage => Check(_enemyMessage);

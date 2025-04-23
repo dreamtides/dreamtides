@@ -1540,13 +1540,19 @@ namespace Dreamtides.Schema
         /// no button should be shown.
         /// </summary>
         [JsonProperty("primaryActionButton")]
-        public PrimaryActionButtonView PrimaryActionButton { get; set; }
+        public ActionButtonView PrimaryActionButton { get; set; }
 
         /// <summary>
         /// Content to display on top of all other game UI.
         /// </summary>
         [JsonProperty("screenOverlay")]
         public FlexNode ScreenOverlay { get; set; }
+
+        /// <summary>
+        /// Secondary action button, used for alternative choice options.
+        /// </summary>
+        [JsonProperty("secondaryActionButton")]
+        public ActionButtonView SecondaryActionButton { get; set; }
     }
 
     /// <summary>
@@ -1588,7 +1594,7 @@ namespace Dreamtides.Schema
         public bool IncludeVoid { get; set; }
     }
 
-    public partial class PrimaryActionButtonView
+    public partial class ActionButtonView
     {
         [JsonProperty("action", Required = Required.Always)]
         public GameAction Action { get; set; }

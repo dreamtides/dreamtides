@@ -15,7 +15,7 @@ use core_data::display_types::{
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Spark};
 use display_data::battle_view::{
-    BattleView, ButtonView, CardOrderSelectorView, DisplayPlayer, PrimaryActionButtonView,
+    ActionButtonView, BattleView, ButtonView, CardOrderSelectorView, DisplayPlayer,
 };
 use display_data::card_view::CardView;
 use display_data::command::{
@@ -212,7 +212,7 @@ fn select_card(card_id: CardId) -> CommandSequence {
     }
 
     battle.interface.screen_overlay = None;
-    battle.interface.primary_action_button = Some(PrimaryActionButtonView {
+    battle.interface.primary_action_button = Some(ActionButtonView {
         label: "End Turn".to_string(),
         action: GameAction::DebugAction(DebugAction::TriggerEnemyJudgment),
         show_on_idle_duration: None,
@@ -359,7 +359,7 @@ fn play_card_with_order_selector(
     }
     battle.interface.card_order_selector =
         Some(CardOrderSelectorView { include_deck: true, include_void: true });
-    battle.interface.primary_action_button = Some(PrimaryActionButtonView {
+    battle.interface.primary_action_button = Some(ActionButtonView {
         label: "End Turn".to_string(),
         action: GameAction::DebugAction(DebugAction::TriggerEnemyJudgment),
         show_on_idle_duration: None,

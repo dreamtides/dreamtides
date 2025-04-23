@@ -30,6 +30,7 @@ pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction
         BattleAction::SelectPromptChoice(choice_index) => {
             select_prompt_choice::select(battle, choice_index);
         }
+        BattleAction::BrowseCards(_) => {}
         _ => {
             todo!("Implement {:?}", action);
         }

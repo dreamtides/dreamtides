@@ -7,7 +7,7 @@ use battle_data::prompt_types::prompt_data::Prompt;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions::LegalActions;
 use battle_queries::player_queries::spark_total;
-use display_data::battle_view::{BattleView, InterfaceView, PlayerView, PrimaryActionButtonView};
+use display_data::battle_view::{ActionButtonView, BattleView, InterfaceView, PlayerView};
 use display_data::command::{Command, GameMessageType, UpdateBattleCommand};
 
 use crate::core::card_view_context::CardViewContext;
@@ -39,7 +39,7 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleData) -> BattleView
     BattleView {
         id: battle.id,
         user: player_view(battle, battle.player(builder.display_for_player())),
-        enemy: player_view(battle, battle.player(builder.display_for_player())),
+        enemy: player_view(battle, battle.player(builder.display_for_player().opponent())),
         cards,
         interface: interface_view(builder, battle),
     }
@@ -60,11 +60,10 @@ fn interface_view(builder: &ResponseBuilder, battle: &BattleData) -> InterfaceVi
         for_human_player: true,
     });
 
-    let primary_action_button = primary_action_button(battle, &legal_actions);
-
     InterfaceView {
         screen_overlay: None,
-        primary_action_button,
+        primary_action_button: primary_action_button(battle, &legal_actions),
+        secondary_action_button: secondary_action_button(battle, &legal_actions),
         card_order_selector: None,
         bottom_right_button: None,
     }
@@ -73,7 +72,7 @@ fn interface_view(builder: &ResponseBuilder, battle: &BattleData) -> InterfaceVi
 fn primary_action_button(
     battle: &BattleData,
     legal_actions: &[BattleAction],
-) -> Option<PrimaryActionButtonView> {
+) -> Option<ActionButtonView> {
     if legal_actions.contains(&BattleAction::SelectPromptChoice(0)) {
         let prompt = expect!(battle.prompt.as_ref(), battle, || {
             "Expected prompt for SelectPromptChoice action"
@@ -82,7 +81,7 @@ fn primary_action_button(
             panic_with!(battle, "Expected a Choose prompt");
         };
         assert_that!(!choices.is_empty(), battle, || "Expected a Choose prompt with choices");
-        return Some(PrimaryActionButtonView {
+        return Some(ActionButtonView {
             label: choices[0].label.clone(),
             action: BattleAction::SelectPromptChoice(0).into(),
             show_on_idle_duration: None,
@@ -90,15 +89,37 @@ fn primary_action_button(
     }
 
     if legal_actions.contains(&BattleAction::ResolveStack) {
-        Some(PrimaryActionButtonView {
+        Some(ActionButtonView {
             label: "Resolve".to_string(),
             action: BattleAction::ResolveStack.into(),
             show_on_idle_duration: None,
         })
     } else if legal_actions.contains(&BattleAction::EndTurn) {
-        Some(PrimaryActionButtonView {
+        Some(ActionButtonView {
             label: "End Turn".to_string(),
             action: BattleAction::EndTurn.into(),
+            show_on_idle_duration: None,
+        })
+    } else {
+        None
+    }
+}
+
+fn secondary_action_button(
+    battle: &BattleData,
+    legal_actions: &[BattleAction],
+) -> Option<ActionButtonView> {
+    if legal_actions.contains(&BattleAction::SelectPromptChoice(1)) {
+        let prompt = expect!(battle.prompt.as_ref(), battle, || {
+            "Expected prompt for SelectPromptChoice action"
+        });
+        let Prompt::Choose { choices } = &prompt.prompt else {
+            panic_with!(battle, "Expected a Choose prompt");
+        };
+        assert_that!(!choices.is_empty(), battle, || "Expected a Choose prompt with choices");
+        Some(ActionButtonView {
+            label: choices[1].label.clone(),
+            action: BattleAction::SelectPromptChoice(1).into(),
             show_on_idle_duration: None,
         })
     } else {

@@ -29,17 +29,11 @@ impl DebugAllCards {
             user_battlefield: Self::cards_to_debug(all_cards.battlefield_cards(PlayerName::One)),
             enemy_battlefield: Self::cards_to_debug(all_cards.battlefield_cards(PlayerName::Two)),
             user_void: Self::card_ids_to_debug(all_cards.void(PlayerName::One).iter(), &all_cards),
-            enemy_void: Self::card_ids_to_debug(
-                all_cards.void(PlayerName::Two).iter(),
-                &all_cards,
-            ),
+            enemy_void: Self::card_ids_to_debug(all_cards.void(PlayerName::Two).iter(), &all_cards),
             user_hand: Self::cards_to_debug(all_cards.hand_cards(PlayerName::One)),
             enemy_hand: Self::cards_to_debug(all_cards.hand_cards(PlayerName::Two)),
             user_deck: Self::card_ids_to_debug(all_cards.deck(PlayerName::One).iter(), &all_cards),
-            enemy_deck: Self::card_ids_to_debug(
-                all_cards.deck(PlayerName::Two).iter(),
-                &all_cards,
-            ),
+            enemy_deck: Self::card_ids_to_debug(all_cards.deck(PlayerName::Two).iter(), &all_cards),
             stack: Self::card_ids_to_debug(all_cards.stack().iter(), &all_cards),
             user_banished: Self::card_ids_to_debug(
                 all_cards.banished(PlayerName::One).iter(),
