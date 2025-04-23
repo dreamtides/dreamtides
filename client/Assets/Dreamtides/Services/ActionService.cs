@@ -78,10 +78,7 @@ namespace Dreamtides.Services
 
       var request = new PerformActionRequest
       {
-        Metadata = new Metadata
-        {
-          UserId = Guid.NewGuid()
-        },
+        Metadata = _metadata,
         Action = action,
         TestScenario = _testScenario
       };

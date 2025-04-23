@@ -78,13 +78,14 @@ async fn perform_action(
     // Handle potential JSON parse errors
     let Json(req) = result?;
     let action = req.action;
+    let user_id = req.metadata.user_id;
 
     let _span = info_span!("perform_action", ?action);
     if let Some(scenario) = req.test_scenario.as_ref() {
-        info!(?action, ?scenario, "Got perform action request");
+        info!(?action, ?scenario, ?user_id, "Got perform action request");
         Ok(Json(client_test_scenarios::perform_action(&req, scenario)))
     } else {
-        info!(?action, "Got perform action request");
+        info!(?action, ?user_id, "Got perform action request");
         Ok(Json(engine::perform_action(&req)))
     }
 }

@@ -79,6 +79,7 @@ fn connect_internal(user_id: UserId) {
 pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
     let battle_data = CURRENT_BATTLE.lock().unwrap().clone();
     let metadata = request.metadata;
+    let user_id = metadata.user_id;
     let commands = catch_panic(
         AssertUnwindSafe(|| {
             let mut battle = match &battle_data {
@@ -88,7 +89,7 @@ pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
             battle.animations = Some(AnimationData::default());
             let commands = match request.action {
                 GameAction::BattleAction(action) => {
-                    handle_battle_action::execute(&mut battle, PlayerName::User, action)
+                    handle_battle_action::execute(&mut battle, user_id, PlayerName::User, action)
                 }
                 _ => todo!("Implement other actions"),
             };

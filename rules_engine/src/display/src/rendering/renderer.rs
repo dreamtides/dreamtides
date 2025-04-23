@@ -24,9 +24,9 @@ pub fn connect(battle: &BattleData, user_id: UserId) -> CommandSequence {
 /// Returns a series of commands which contain animations for recent changes to
 /// game states, followed by a snapshot of the current game state in the same
 /// manner as returned by [connect].
-pub fn render_updates(battle: &BattleData) -> CommandSequence {
+pub fn render_updates(battle: &BattleData, user_id: UserId) -> CommandSequence {
     let mut builder = ResponseBuilder {
-        player: PlayerName::User,
+        player: player_name_for_user(battle, user_id),
         animate: true,
         commands: CommandSequence::default(),
     };
