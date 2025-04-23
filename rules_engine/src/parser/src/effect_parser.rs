@@ -1,3 +1,4 @@
+use ability_data::ability::EventAbility;
 use ability_data::effect::{Effect, EffectWithOptions};
 use chumsky::prelude::*;
 use chumsky::Parser;
@@ -5,8 +6,13 @@ use chumsky::Parser;
 use crate::parser_utils::{phrase, ErrorType};
 use crate::{condition_parser, cost_parser, standard_effect_parser};
 
-// pub fn pub fn event_effect<'a>() -> impl Parser<'a, &'a str, Effect,
-// ErrorType<'a>> { }
+pub fn event<'a>() -> impl Parser<'a, &'a str, EventAbility, ErrorType<'a>> {
+    cost_parser::parser()
+        .then_ignore(just(":"))
+        .or_not()
+        .then(effect())
+        .map(|(additional_cost, effect)| EventAbility { additional_cost, effect })
+}
 
 pub fn effect<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
     single_effect().repeated().at_least(1).collect::<Vec<_>>().map(|effects| {

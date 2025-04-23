@@ -1,4 +1,4 @@
-use ability_data::ability::Ability;
+use ability_data::ability::{Ability, EventAbility};
 use ability_data::cost::Cost;
 use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
@@ -105,9 +105,12 @@ fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
             card_type: CardType::Event,
             is_fast: true,
         },
-        abilities: vec![Ability::Event(Effect::Effect(StandardEffect::DissolveCharacter {
-            target: Predicate::Enemy(CardPredicate::Character),
-        }))],
+        abilities: vec![Ability::Event(EventAbility {
+            additional_cost: None,
+            effect: Effect::Effect(StandardEffect::DissolveCharacter {
+                target: Predicate::Enemy(CardPredicate::Character),
+            }),
+        })],
         revealed_to_owner: false,
         revealed_to_opponent: false,
         targets: vec![],
@@ -125,9 +128,12 @@ fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
             card_type: CardType::Event,
             is_fast: true,
         },
-        abilities: vec![Ability::Event(Effect::Effect(StandardEffect::Negate {
-            target: Predicate::Enemy(CardPredicate::Dream),
-        }))],
+        abilities: vec![Ability::Event(EventAbility {
+            additional_cost: None,
+            effect: Effect::Effect(StandardEffect::Negate {
+                target: Predicate::Enemy(CardPredicate::Dream),
+            }),
+        })],
         revealed_to_owner: false,
         revealed_to_opponent: false,
         targets: vec![],
@@ -145,10 +151,13 @@ fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
             card_type: CardType::Event,
             is_fast: true,
         },
-        abilities: vec![Ability::Event(Effect::Effect(StandardEffect::NegateUnlessPaysCost {
-            target: Predicate::Enemy(CardPredicate::Event),
-            cost: Cost::Energy(Energy(2)),
-        }))],
+        abilities: vec![Ability::Event(EventAbility {
+            additional_cost: None,
+            effect: Effect::Effect(StandardEffect::NegateUnlessPaysCost {
+                target: Predicate::Enemy(CardPredicate::Event),
+                cost: Cost::Energy(Energy(2)),
+            }),
+        })],
         revealed_to_owner: false,
         revealed_to_opponent: false,
         targets: vec![],

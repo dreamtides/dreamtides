@@ -9,11 +9,14 @@ fn test_gains_spark_until_main_phase_for_each_warrior() {
     result,
     @r###"
     [
-      event(effect(gainsSparkUntilYourNextMainForEach(
-        target: your(character),
-        gains: Spark(1),
-        for_each: your(characterType(warrior)),
-      ))),
+      event(EventAbility(
+        additional_cost: None,
+        effect: effect(gainsSparkUntilYourNextMainForEach(
+          target: your(character),
+          gains: Spark(1),
+          for_each: your(characterType(warrior)),
+        )),
+      )),
     ]
     "###
     );
@@ -26,13 +29,16 @@ fn test_dissolve_character_with_cost_compared_to_warriors() {
         result,
         @r###"
     [
-      event(effect(dissolveCharacter(
-        target: enemy(characterWithCostComparedToControlled(
-          target: character,
-          cost_operator: orLess,
-          count_matching: characterType(warrior),
+      event(EventAbility(
+        additional_cost: None,
+        effect: effect(dissolveCharacter(
+          target: enemy(characterWithCostComparedToControlled(
+            target: character,
+            cost_operator: orLess,
+            count_matching: characterType(warrior),
+          )),
         )),
-      ))),
+      )),
     ]
     "###
     );
@@ -45,9 +51,12 @@ fn test_disable_activated_abilities_while_in_play() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      event(effect(disableActivatedAbilitiesWhileInPlay(
-        target: enemy(character),
-      ))),
+      event(EventAbility(
+        additional_cost: None,
+        effect: effect(disableActivatedAbilitiesWhileInPlay(
+          target: enemy(character),
+        )),
+      )),
     ]
     "###);
 }
@@ -59,25 +68,28 @@ fn test_abandon_and_gain_energy_for_spark() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      event(list([
-        EffectWithOptions(
-          effect: abandonAndGainEnergyForSpark(
-            target: your(character),
-            energy_per_spark: Energy(1),
+      event(EventAbility(
+        additional_cost: None,
+        effect: list([
+          EffectWithOptions(
+            effect: abandonAndGainEnergyForSpark(
+              target: your(character),
+              energy_per_spark: Energy(1),
+            ),
+            optional: false,
+            cost: None,
+            condition: None,
           ),
-          optional: false,
-          cost: None,
-          condition: None,
-        ),
-        EffectWithOptions(
-          effect: drawCards(
-            count: 1,
+          EffectWithOptions(
+            effect: drawCards(
+              count: 1,
+            ),
+            optional: false,
+            cost: None,
+            condition: None,
           ),
-          optional: false,
-          cost: None,
-          condition: None,
-        ),
-      ])),
+        ]),
+      )),
     ]
     "###);
 }

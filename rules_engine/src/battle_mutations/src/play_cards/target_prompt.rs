@@ -21,8 +21,10 @@ pub fn add_target_prompt(battle: &mut BattleData, source: EffectSource, card_id:
     let player = card.controller();
 
     for ability in &card.abilities {
-        if let Ability::Event(effect) = ability {
-            if let Some(prompt_data) = create_prompt_for_effect(battle, player, source, effect) {
+        if let Ability::Event(event) = ability {
+            if let Some(prompt_data) =
+                create_prompt_for_effect(battle, player, source, &event.effect)
+            {
                 battle.prompt = Some(prompt_data);
                 return;
             }

@@ -304,16 +304,19 @@ fn test_gain_energy_replacement() {
         parse("Until end of turn, whenever you gain energy, gain twice that much energy instead.");
     assert_ron_snapshot!(result, @r###"
     [
-      event(effect(createTriggerUntilEndOfTurn(
-        trigger: TriggeredAbility(
-          trigger: gainEnergy,
-          effect: effect(gainTwiceThatMuchEnergyInstead),
-          options: Some(TriggeredAbilityOptions(
-            oncePerTurn: false,
-            untilEndOfTurn: true,
-          )),
-        ),
-      ))),
+      event(EventAbility(
+        additional_cost: None,
+        effect: effect(createTriggerUntilEndOfTurn(
+          trigger: TriggeredAbility(
+            trigger: gainEnergy,
+            effect: effect(gainTwiceThatMuchEnergyInstead),
+            options: Some(TriggeredAbilityOptions(
+              oncePerTurn: false,
+              untilEndOfTurn: true,
+            )),
+          ),
+        )),
+      )),
     ]
     "###);
 }
@@ -371,18 +374,21 @@ fn test_banish_until_next_main() {
     let result = parse("Until end of turn, whenever you banish a character, draw a card.");
     assert_ron_snapshot!(result, @r###"
     [
-      event(effect(createTriggerUntilEndOfTurn(
-        trigger: TriggeredAbility(
-          trigger: banished(your(character)),
-          effect: effect(drawCards(
-            count: 1,
-          )),
-          options: Some(TriggeredAbilityOptions(
-            oncePerTurn: false,
-            untilEndOfTurn: true,
-          )),
-        ),
-      ))),
+      event(EventAbility(
+        additional_cost: None,
+        effect: effect(createTriggerUntilEndOfTurn(
+          trigger: TriggeredAbility(
+            trigger: banished(your(character)),
+            effect: effect(drawCards(
+              count: 1,
+            )),
+            options: Some(TriggeredAbilityOptions(
+              oncePerTurn: false,
+              untilEndOfTurn: true,
+            )),
+          ),
+        )),
+      )),
     ]
     "###);
 }

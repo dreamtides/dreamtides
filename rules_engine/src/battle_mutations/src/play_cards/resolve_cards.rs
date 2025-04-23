@@ -61,13 +61,13 @@ fn apply_event_effects(battle: &mut BattleData, card_id: StackCardId) -> Option<
         .cloned()
         .collect::<Vec<_>>();
 
-    for (i, effect) in effects.into_iter().enumerate() {
+    for (i, event) in effects.into_iter().enumerate() {
         let event_source =
             EffectSource::Event { controller, card: card_id, ability_number: AbilityNumber(i) };
         apply_effect::apply(
             battle,
             event_source,
-            effect,
+            event.effect,
             battle.cards.card(card_id)?.targets.clone(),
         );
     }

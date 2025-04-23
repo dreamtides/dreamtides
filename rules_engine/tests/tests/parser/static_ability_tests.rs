@@ -258,24 +258,27 @@ fn test_reclaim_with_draw_discard() {
     let result = parse("Draw 2 cards. Discard 2 cards.$br{kw: Reclaim}. {reminder: (you may play this dream from your void, then banish it.)}");
     assert_ron_snapshot!(result, @r###"
     [
-      event(list([
-        EffectWithOptions(
-          effect: drawCards(
-            count: 2,
+      event(EventAbility(
+        additional_cost: None,
+        effect: list([
+          EffectWithOptions(
+            effect: drawCards(
+              count: 2,
+            ),
+            optional: false,
+            cost: None,
+            condition: None,
           ),
-          optional: false,
-          cost: None,
-          condition: None,
-        ),
-        EffectWithOptions(
-          effect: payCost(
-            cost: discardCards(card, 2),
+          EffectWithOptions(
+            effect: payCost(
+              cost: discardCards(card, 2),
+            ),
+            optional: false,
+            cost: None,
+            condition: None,
           ),
-          optional: false,
-          cost: None,
-          condition: None,
-        ),
-      ])),
+        ]),
+      )),
       static(StaticAbility(reclaim(
         cost: None,
       ))),

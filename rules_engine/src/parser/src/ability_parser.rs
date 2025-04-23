@@ -21,7 +21,7 @@ fn parser<'a>() -> impl Parser<'a, &'a str, Vec<Ability>, ErrorType<'a>> {
     let single_ability = choice((
         triggered_ability_parser::parser().map(Ability::Triggered),
         activated_ability_parser::parser().map(Ability::Activated),
-        effect_parser::effect().map(Ability::Event),
+        effect_parser::event().map(Ability::Event),
         static_ability_parser::parser().then_ignore(phrase(".")).map(Ability::Static),
     ))
     .then_ignore(reminder_text.or_not());

@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::activated_ability::ActivatedAbility;
+use crate::cost::Cost;
 use crate::effect::Effect;
 use crate::static_ability::StaticAbility;
 use crate::triggered_ability::TriggeredAbility;
@@ -14,7 +15,7 @@ pub enum Ability {
     /// An event ability happens immediately when an event card is played, and
     /// then the event card is discarded. Character cards cannot have
     /// 'event' abilities.
-    Event(Effect),
+    Event(EventAbility),
 
     /// A static ability represents something which modifies the rules of the
     /// game, either for this specific card or globally. Static abilities do
@@ -30,4 +31,17 @@ pub enum Ability {
     /// event occurs, typically while its card is in play. Indicated in card
     /// text by "When", "Whenever", "At", or by a trigger keyword.
     Triggered(TriggeredAbility),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EventAbility {
+    /// If a [Cost] is specified this cost must be paid immediately upon playing
+    /// the event card, *not* when it resolves. This is typically written as
+    /// "{cost}: {effect}" on event cards.
+    ///
+    /// The energy cost to play an Event card is *not* represented here.
+    pub additional_cost: Option<Cost>,
+
+    /// Effect of this ability when it resolves.
+    pub effect: Effect,
 }
