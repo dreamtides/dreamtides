@@ -46,7 +46,7 @@ pub fn compute(
                     .map(|(i, _)| BattleAction::SelectPromptChoice(i))
                     .collect(),
                 Prompt::ChooseNumber { minimum, maximum, .. } => {
-                    (*minimum..=*maximum).map(|i| BattleAction::SelectNumber(i)).collect()
+                    (*minimum..=*maximum).map(BattleAction::SelectNumber).collect()
                 }
             };
         } else {
