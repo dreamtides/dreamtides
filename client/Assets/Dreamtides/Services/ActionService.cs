@@ -202,6 +202,8 @@ namespace Dreamtides.Services
           Registry.Layout.CardOrderSelector.View = command.UpdateBattle.Battle.Interface?.CardOrderSelector;
           Registry.Layout.PrimaryActionButton.SetView(command.UpdateBattle.Battle.Interface?.PrimaryActionButton);
           Registry.Layout.SecondaryActionButton.SetView(command.UpdateBattle.Battle.Interface?.SecondaryActionButton);
+          Registry.Layout.IncrementActionButton.SetView(command.UpdateBattle.Battle.Interface?.IncrementButton);
+          Registry.Layout.DecrementActionButton.SetView(command.UpdateBattle.Battle.Interface?.DecrementButton);
           Registry.BottomRightButton.SetView(command.UpdateBattle.Battle.Interface?.BottomRightButton);
           coroutines.Add(StartCoroutine(Registry.LayoutService.UpdateLayout(
               command.UpdateBattle,

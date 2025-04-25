@@ -53,6 +53,12 @@ pub struct InterfaceView {
     /// Secondary action button, used for alternative choice options.
     pub secondary_action_button: Option<ActionButtonView>,
 
+    /// Button to increment the number shown in a number prompt.
+    pub increment_button: Option<ActionButtonView>,
+
+    /// Button to decrement the number shown in a number prompt.
+    pub decrement_button: Option<ActionButtonView>,
+
     /// Options for display of the card order selector
     pub card_order_selector: Option<CardOrderSelectorView>,
 
@@ -74,7 +80,10 @@ pub struct CardOrderSelectorView {
 #[serde(rename_all = "camelCase")]
 pub struct ActionButtonView {
     pub label: String,
-    pub action: GameAction,
+
+    /// Action to perform when the button is clicked. If None is provided, the
+    /// button will appear disabled.
+    pub action: Option<GameAction>,
 
     /// If provided, when the button is not visible, the button will wait for
     /// this duration after the last "update" before appearing. If this is None

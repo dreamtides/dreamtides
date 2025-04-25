@@ -214,7 +214,7 @@ fn select_card(card_id: CardId) -> CommandSequence {
     battle.interface.screen_overlay = None;
     battle.interface.primary_action_button = Some(ActionButtonView {
         label: "End Turn".to_string(),
-        action: GameAction::DebugAction(DebugAction::TriggerEnemyJudgment),
+        action: Some(GameAction::DebugAction(DebugAction::TriggerEnemyJudgment)),
         show_on_idle_duration: None,
     });
 
@@ -361,7 +361,7 @@ fn play_card_with_order_selector(
         Some(CardOrderSelectorView { include_deck: true, include_void: true });
     battle.interface.primary_action_button = Some(ActionButtonView {
         label: "End Turn".to_string(),
-        action: GameAction::DebugAction(DebugAction::TriggerEnemyJudgment),
+        action: Some(GameAction::DebugAction(DebugAction::TriggerEnemyJudgment)),
         show_on_idle_duration: None,
     });
 

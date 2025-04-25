@@ -49,7 +49,7 @@ pub fn matching_cards_on_stack(
                     battle
                         .cards
                         .card(id)
-                        .map_or(false, |card| card.controller() == source.controller().opponent())
+                        .is_some_and(|card| card.controller() == source.controller().opponent())
                 })
                 .cloned()
                 .collect::<Vec<_>>();
@@ -133,7 +133,7 @@ fn on_stack(
                 battle
                     .cards
                     .card(id)
-                    .map_or(false, |card| card.properties.card_type == CardType::Event)
+                    .is_some_and(|card| card.properties.card_type == CardType::Event)
             })
             .cloned()
             .collect(),

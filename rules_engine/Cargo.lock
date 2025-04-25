@@ -26,6 +26,7 @@ name = "actions"
 version = "0.0.0"
 dependencies = [
  "action_data",
+ "assert_with",
  "battle_data",
  "battle_mutations",
  "core_data",

@@ -16,4 +16,13 @@ namespace Dreamtides.Schema
   {
     public float ToSeconds() => MillisecondsValue / 1000f;
   }
+
+  public partial class ActionClass
+  {
+    public GameAction ToGameAction() => new GameAction
+    {
+      DebugAction = DebugAction,
+      BattleAction = BattleAction,
+    };
+  }
 }

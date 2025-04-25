@@ -219,21 +219,6 @@ namespace Dreamtides.Masonry
       return result;
     }
 
-    public static GameAction? ToGameAction(OnClickClass? onClick)
-    {
-      if (onClick?.BattleAction != null)
-      {
-        return new GameAction { BattleAction = onClick.BattleAction };
-      }
-
-      if (onClick?.DebugAction != null)
-      {
-        return new GameAction { DebugAction = onClick.DebugAction };
-      }
-
-      return null;
-    }
-
     public static NodeTypeTag GetNodeTypeTag(FlexNode? node)
     {
       if (node == null)

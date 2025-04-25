@@ -7,6 +7,7 @@ use battle_data::prompt_types::prompt_data::Prompt;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions::LegalActions;
 use battle_queries::player_queries::spark_total;
+use core_data::numerics::Energy;
 use display_data::battle_view::{ActionButtonView, BattleView, InterfaceView, PlayerView};
 use display_data::command::{Command, GameMessageType, UpdateBattleCommand};
 
@@ -62,14 +63,17 @@ fn interface_view(builder: &ResponseBuilder, battle: &BattleData) -> InterfaceVi
 
     InterfaceView {
         screen_overlay: None,
-        primary_action_button: primary_action_button(battle, &legal_actions),
+        primary_action_button: primary_action_button(builder, battle, &legal_actions),
         secondary_action_button: secondary_action_button(battle, &legal_actions),
+        increment_button: increment_button(builder, battle),
+        decrement_button: decrement_button(builder, battle),
         card_order_selector: None,
         bottom_right_button: None,
     }
 }
 
 fn primary_action_button(
+    builder: &ResponseBuilder,
     battle: &BattleData,
     legal_actions: &[BattleAction],
 ) -> Option<ActionButtonView> {
@@ -83,15 +87,18 @@ fn primary_action_button(
         assert_that!(!choices.is_empty(), battle, || "Expected a Choose prompt with choices");
         return Some(ActionButtonView {
             label: choices[0].label.clone(),
-            action: BattleAction::SelectPromptChoice(0).into(),
+            action: Some(BattleAction::SelectPromptChoice(0).into()),
             show_on_idle_duration: None,
         });
     }
 
-    if let Some(Prompt::ChooseNumber { current, .. }) = battle.prompt.as_ref().map(|p| &p.prompt) {
+    if let Some(prompt) = battle.prompt.as_ref()
+        && prompt.player == builder.act_for_player()
+        && let Prompt::ChooseNumber { current, .. } = &prompt.prompt
+    {
         return Some(ActionButtonView {
             label: format!("Spend {}\u{f7e4}", current),
-            action: BattleAction::SelectNumber(*current).into(),
+            action: Some(BattleAction::SelectNumber(*current).into()),
             show_on_idle_duration: None,
         });
     }
@@ -99,13 +106,13 @@ fn primary_action_button(
     if legal_actions.contains(&BattleAction::ResolveStack) {
         Some(ActionButtonView {
             label: "Resolve".to_string(),
-            action: BattleAction::ResolveStack.into(),
+            action: Some(BattleAction::ResolveStack.into()),
             show_on_idle_duration: None,
         })
     } else if legal_actions.contains(&BattleAction::EndTurn) {
         Some(ActionButtonView {
             label: "End Turn".to_string(),
-            action: BattleAction::EndTurn.into(),
+            action: Some(BattleAction::EndTurn.into()),
             show_on_idle_duration: None,
         })
     } else {
@@ -127,10 +134,48 @@ fn secondary_action_button(
         assert_that!(!choices.is_empty(), battle, || "Expected a Choose prompt with choices");
         Some(ActionButtonView {
             label: choices[1].label.clone(),
-            action: BattleAction::SelectPromptChoice(1).into(),
+            action: Some(BattleAction::SelectPromptChoice(1).into()),
             show_on_idle_duration: None,
         })
     } else {
         None
     }
+}
+
+fn increment_button(builder: &ResponseBuilder, battle: &BattleData) -> Option<ActionButtonView> {
+    if let Some(prompt) = battle.prompt.as_ref()
+        && prompt.player == builder.act_for_player()
+        && let Prompt::ChooseNumber { current, .. } = &prompt.prompt
+    {
+        return Some(ActionButtonView {
+            label: "+1\u{f7e4}".to_string(),
+            action: if Energy(*current) < battle.player(builder.act_for_player()).current_energy {
+                Some(BattleAction::SetSelectedNumber(*current + 1).into())
+            } else {
+                None
+            },
+            show_on_idle_duration: None,
+        });
+    }
+
+    None
+}
+
+fn decrement_button(builder: &ResponseBuilder, battle: &BattleData) -> Option<ActionButtonView> {
+    if let Some(prompt) = battle.prompt.as_ref()
+        && prompt.player == builder.act_for_player()
+        && let Prompt::ChooseNumber { current, .. } = &prompt.prompt
+    {
+        return Some(ActionButtonView {
+            label: "\u{2212}1\u{f7e4}".to_string(),
+            action: if *current > 0 {
+                Some(BattleAction::SetSelectedNumber(*current - 1).into())
+            } else {
+                None
+            },
+            show_on_idle_duration: None,
+        });
+    }
+
+    None
 }

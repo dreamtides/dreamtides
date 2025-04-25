@@ -58,7 +58,7 @@ pub fn create(id: BattleId) -> BattleView {
         interface: InterfaceView {
             primary_action_button: Some(ActionButtonView {
                 label: "End Turn".to_string(),
-                action: GameAction::DebugAction(DebugAction::ApplyTestScenarioAction),
+                action: Some(GameAction::DebugAction(DebugAction::ApplyTestScenarioAction)),
                 show_on_idle_duration: None,
             }),
             ..Default::default()

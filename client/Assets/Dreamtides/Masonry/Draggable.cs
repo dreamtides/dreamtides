@@ -29,12 +29,12 @@ namespace Dreamtides.Masonry
       view.Node = data;
       view.TargetIdentifiers = data.NodeType.DraggableNode.DropTargetIdentifiers.ToList();
       view.OverTargetIndicator = data.NodeType.DraggableNode.OverTargetIndicator;
-      view.OnDrop = Mason.ToGameAction(data.NodeType.DraggableNode.OnDrop);
+      view.OnDrop = data.NodeType.DraggableNode.OnDrop.ToGameAction();
       view.HorizontalDragStartDistance = data.NodeType.DraggableNode.HorizontalDragStartDistance;
       view.RemoveOriginal = data.NodeType.DraggableNode.RemoveOriginal ?? false;
       view.HideIndicatorChildren = data.NodeType.DraggableNode.HideIndicatorChildren.ToList();
       view.CustomDragIndicator = data.NodeType.DraggableNode.CustomDragIndicator;
-      view.OnDragDetected = Mason.ToGameAction(data.NodeType.DraggableNode.OnDragDetected);
+      view.OnDragDetected = data.NodeType.DraggableNode.OnDragDetected.ToGameAction();
     }
 
     public Draggable()

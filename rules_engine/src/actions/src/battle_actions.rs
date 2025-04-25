@@ -1,6 +1,7 @@
 use action_data::battle_action::BattleAction;
+use assert_with::panic_with;
 use battle_data::battle::battle_data::BattleData;
-use battle_data::prompt_types::prompt_data::PromptResumeAction;
+use battle_data::prompt_types::prompt_data::{Prompt, PromptResumeAction};
 use battle_mutations::core::select_prompt_choice;
 use battle_mutations::play_cards::{play_card, resolve_cards, select_card};
 use battle_mutations::turn_step_mutations::end_turn;
@@ -29,6 +30,15 @@ pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction
         }
         BattleAction::SelectPromptChoice(choice_index) => {
             select_prompt_choice::select(battle, choice_index);
+        }
+        BattleAction::SelectNumber(_) => {}
+        BattleAction::SetSelectedNumber(n) => {
+            let Some(Prompt::ChooseNumber { current, .. }) =
+                battle.prompt.as_mut().map(|p| &mut p.prompt)
+            else {
+                panic_with!(battle, "Expected a ChooseNumber prompt");
+            };
+            *current = n;
         }
         BattleAction::BrowseCards(_) => {}
         _ => {

@@ -20,6 +20,7 @@ namespace Dreamtides.Buttons
     [SerializeField] float _moveDistance = 1f;
     [SerializeField] AudioClip _onClickSound = null!;
     [SerializeField] float _fadeDuration = 0.1f;
+    [SerializeField] Collider _collider = null!;
 
     Vector3 _originalPosition;
     Color _originalColor;
@@ -34,9 +35,14 @@ namespace Dreamtides.Buttons
     bool _isVisible = false;
     private bool _isAnimating = false;
 
+    private readonly Color _enabledColor = Color.white;
+    private readonly Color _disabledColor = new Color(0.7f, 0.7f, 0.7f); // Gray
+
     protected override void OnStart()
     {
       SaveCurrentValues();
+      _collider.enabled = _isVisible;
+      UpdateButtonColors();
     }
 
     private void Update()
@@ -50,6 +56,13 @@ namespace Dreamtides.Buttons
           _pendingView = null;
         }
       }
+    }
+
+    private void UpdateButtonColors()
+    {
+      var targetColor = _action != null ? _enabledColor : _disabledColor;
+      _text.color = targetColor;
+      _background.color = targetColor;
     }
 
     public void SetView(ActionButtonView? view)
@@ -84,11 +97,13 @@ namespace Dreamtides.Buttons
         {
           _action = null;
           _text.text = "";
+          UpdateButtonColors();
         }
         else
         {
           _text.text = view.Label;
-          _action = view.Action;
+          _action = view.Action?.ToGameAction();
+          UpdateButtonColors();
           if (!_isVisible)
           {
             DOTween.Kill("ButtonHideAnimation");
@@ -97,6 +112,7 @@ namespace Dreamtides.Buttons
             _background.gameObject.SetActive(true);
             _text.gameObject.SetActive(true);
             _isVisible = true;
+            _collider.enabled = true;
             _isAnimating = false;
           }
         }
@@ -119,10 +135,12 @@ namespace Dreamtides.Buttons
             _action = null;
             _text.text = "";
             _isVisible = false;
+            _collider.enabled = false;
             _isAnimating = false;
 
             _background.transform.localScale = _originalBackgroundLocalScale;
             _text.transform.localScale = _originalTextLocalScale;
+            UpdateButtonColors();
           });
         }
         else
@@ -132,12 +150,15 @@ namespace Dreamtides.Buttons
           _action = null;
           _text.text = "";
           _isVisible = false;
+          _collider.enabled = false;
+          UpdateButtonColors();
         }
       }
       else
       {
         _text.text = view.Label;
-        _action = view.Action;
+        _action = view.Action?.ToGameAction();
+        UpdateButtonColors();
 
         if (!_isVisible)
         {
@@ -147,6 +168,7 @@ namespace Dreamtides.Buttons
 
           _background.gameObject.SetActive(true);
           _text.gameObject.SetActive(true);
+          _collider.enabled = true;
           Sequence showSequence = TweenUtils.Sequence("ButtonShowAnimation");
           showSequence.Join(_background.transform.DOScale(_originalBackgroundLocalScale, _fadeDuration));
           showSequence.Join(_text.transform.DOScale(_originalTextLocalScale, _fadeDuration));
@@ -154,6 +176,7 @@ namespace Dreamtides.Buttons
         }
 
         _isVisible = true;
+        _collider.enabled = true;
       }
     }
 
@@ -161,6 +184,8 @@ namespace Dreamtides.Buttons
 
     public override void MouseDown()
     {
+      if (_action == null) return;
+
       SaveCurrentValues();
 
       _currentAnimation?.Kill();
@@ -174,6 +199,8 @@ namespace Dreamtides.Buttons
 
     public override void MouseUp(bool isSameObject)
     {
+      if (_action == null) return;
+
       _currentAnimation?.Kill();
       _currentAnimation = TweenUtils.Sequence("ButtonReleaseAnimation");
       _currentAnimation.Insert(0, transform.DOMove(_originalPosition, _animationDuration));

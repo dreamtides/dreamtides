@@ -657,7 +657,7 @@ namespace Dreamtides.Schema
         /// Action to perform when this card is clicked.
         /// </summary>
         [JsonProperty("onClick")]
-        public OnClickClass OnClick { get; set; }
+        public ActionClass OnClick { get; set; }
 
         /// <summary>
         /// Sound to play when this card is played.
@@ -672,7 +672,7 @@ namespace Dreamtides.Schema
         public BattlePreviewView PlayEffectPreview { get; set; }
     }
 
-    public partial class OnClickClass
+    public partial class ActionClass
     {
         [JsonProperty("debugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DebugAction? DebugAction { get; set; }
@@ -694,6 +694,8 @@ namespace Dreamtides.Schema
     ///
     /// Pick a number in response to a number prompt.
     ///
+    /// Set the selected number in a number prompt.
+    ///
     /// Sets the position of a card in a card order selector.
     ///
     /// Show cards in a zone
@@ -714,6 +716,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("selectNumber", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectNumber { get; set; }
+
+        [JsonProperty("setSelectedNumber", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SetSelectedNumber { get; set; }
 
         [JsonProperty("selectCardOrder", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SelectCardOrder SelectCardOrder { get; set; }
@@ -831,10 +836,10 @@ namespace Dreamtides.Schema
         public long? HorizontalDragStartDistance { get; set; }
 
         [JsonProperty("onDragDetected")]
-        public OnClickClass OnDragDetected { get; set; }
+        public ActionClass OnDragDetected { get; set; }
 
         [JsonProperty("onDrop")]
-        public OnClickClass OnDrop { get; set; }
+        public ActionClass OnDrop { get; set; }
 
         [JsonProperty("overTargetIndicator")]
         public FlexNode OverTargetIndicator { get; set; }
@@ -1335,25 +1340,25 @@ namespace Dreamtides.Schema
     public partial class EventHandlers
     {
         [JsonProperty("onClick")]
-        public OnClickClass OnClick { get; set; }
+        public ActionClass OnClick { get; set; }
 
         [JsonProperty("onFieldChanged")]
-        public OnClickClass OnFieldChanged { get; set; }
+        public ActionClass OnFieldChanged { get; set; }
 
         [JsonProperty("onLongPress")]
-        public OnClickClass OnLongPress { get; set; }
+        public ActionClass OnLongPress { get; set; }
 
         [JsonProperty("onMouseDown")]
-        public OnClickClass OnMouseDown { get; set; }
+        public ActionClass OnMouseDown { get; set; }
 
         [JsonProperty("onMouseEnter")]
-        public OnClickClass OnMouseEnter { get; set; }
+        public ActionClass OnMouseEnter { get; set; }
 
         [JsonProperty("onMouseLeave")]
-        public OnClickClass OnMouseLeave { get; set; }
+        public ActionClass OnMouseLeave { get; set; }
 
         [JsonProperty("onMouseUp")]
-        public OnClickClass OnMouseUp { get; set; }
+        public ActionClass OnMouseUp { get; set; }
     }
 
     /// <summary>
@@ -1541,6 +1546,18 @@ namespace Dreamtides.Schema
         public CardOrderSelectorView CardOrderSelector { get; set; }
 
         /// <summary>
+        /// Button to decrement the number shown in a number prompt.
+        /// </summary>
+        [JsonProperty("decrementButton")]
+        public ActionButtonView DecrementButton { get; set; }
+
+        /// <summary>
+        /// Button to increment the number shown in a number prompt.
+        /// </summary>
+        [JsonProperty("incrementButton")]
+        public ActionButtonView IncrementButton { get; set; }
+
+        /// <summary>
         /// Primary action button, used for confirming selections and ending the turn. None indicates
         /// no button should be shown.
         /// </summary>
@@ -1601,8 +1618,12 @@ namespace Dreamtides.Schema
 
     public partial class ActionButtonView
     {
-        [JsonProperty("action", Required = Required.Always)]
-        public GameAction Action { get; set; }
+        /// <summary>
+        /// Action to perform when the button is clicked. If None is provided, the button will appear
+        /// disabled.
+        /// </summary>
+        [JsonProperty("action")]
+        public ActionClass Action { get; set; }
 
         [JsonProperty("label", Required = Required.Always)]
         public string Label { get; set; }
