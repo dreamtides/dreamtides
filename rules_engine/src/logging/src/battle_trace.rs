@@ -1,7 +1,8 @@
-use std::fs::File;
-use std::io::Write;
+use std::fs::{File, OpenOptions};
+use std::io::{Read, Seek, SeekFrom, Write};
+use std::path::Path;
 
-use battle_data::battle::battle_data::BattleData;
+use battle_data::battle::battle_tracing::BattleTraceEvent;
 use serde_json;
 use tracing::error;
 
@@ -37,13 +38,14 @@ macro_rules! battle_trace {
         tracing::debug!($message);
 
         if $battle.tracing.is_some() {
-            $battle.add_tracing_event(battle_data::battle::battle_tracing::BattleTraceEvent {
+            let event = battle_data::battle::battle_tracing::BattleTraceEvent {
                 m: $message.to_string(),
                 vs: String::new(),
                 values: std::collections::BTreeMap::new(),
                 snapshot: $battle.debug_snapshot(),
-            });
-            $crate::battle_trace::write_log_file(&$battle);
+            };
+            $battle.add_tracing_event(event.clone());
+            $crate::battle_trace::write_log_file(&event);
         }
     }};
     ($message:expr, $battle:expr, $($key:ident),* $(,)?) => {{
@@ -58,13 +60,14 @@ macro_rules! battle_trace {
                 values_string.push_str(&format!("{}: {:?}, ", stringify!($key), $key));
             )*
 
-            $battle.add_tracing_event(battle_data::battle::battle_tracing::BattleTraceEvent {
+            let event = battle_data::battle::battle_tracing::BattleTraceEvent {
                 m: $message.to_string(),
                 vs: values_string,
                 values,
                 snapshot: $battle.debug_snapshot(),
-            });
-            $crate::battle_trace::write_log_file(&$battle);
+            };
+            $battle.add_tracing_event(event.clone());
+            $crate::battle_trace::write_log_file(&event);
         }
     }};
     ($message:expr, $battle:expr, $($key:ident = $value:expr),* $(,)?) => {{
@@ -78,13 +81,14 @@ macro_rules! battle_trace {
                 values_string.push_str(&format!("{}: {:?}, ", stringify!($key), $value));
             )*
 
-            $battle.add_tracing_event(battle_data::battle::battle_tracing::BattleTraceEvent {
+            let event = battle_data::battle::battle_tracing::BattleTraceEvent {
                 m: $message.to_string(),
                 vs: values_string,
                 values,
                 snapshot: $battle.debug_snapshot(),
-            });
-            $crate::battle_trace::write_log_file(&$battle);
+            };
+            $battle.add_tracing_event(event.clone());
+            $crate::battle_trace::write_log_file(&event);
         }
     }};
     ($message:expr, $battle:expr, $($simple_key:ident),+ $(,)? $($complex_key:ident = $complex_value:expr),+ $(,)?) => {{
@@ -104,31 +108,83 @@ macro_rules! battle_trace {
                 values_string.push_str(&format!("{}: {:?}, ", stringify!($complex_key), $complex_value));
             )*
 
-            $battle.add_tracing_event(battle_data::battle::battle_tracing::BattleTraceEvent {
+            let event = battle_data::battle::battle_tracing::BattleTraceEvent {
                 m: $message.to_string(),
                 vs: values_string,
                 values,
                 snapshot: $battle.debug_snapshot(),
-            });
-            $crate::battle_trace::write_log_file(&$battle);
+            };
+            $battle.add_tracing_event(event.clone());
+            $crate::battle_trace::write_log_file(&event);
         }
     }};
 }
 
-pub fn write_log_file(battle: &BattleData) {
-    if battle.tracing.is_none() {
+pub fn write_log_file(event: &BattleTraceEvent) {
+    let log_path = Path::new("log.json");
+
+    match serde_json::to_string_pretty(event) {
+        Ok(event_json) => {
+            if !log_path.exists() {
+                match File::create(log_path) {
+                    Ok(mut file) => {
+                        if let Err(e) = file.write_all(format!("[\n{}\n]", event_json).as_bytes()) {
+                            error!("Failed to write to log.json: {}", e);
+                        }
+                    }
+                    Err(e) => error!("Failed to create log.json: {}", e),
+                }
+                return;
+            }
+
+            match OpenOptions::new().read(true).write(true).open(log_path) {
+                Ok(mut file) => match file.metadata() {
+                    Ok(metadata) => {
+                        if metadata.len() > 0 {
+                            if file.seek(SeekFrom::End(-1)).is_err() {
+                                reset_file(&mut file, &event_json);
+                                return;
+                            }
+
+                            let mut last_char = [0u8; 1];
+                            if file.read_exact(&mut last_char).is_err() {
+                                reset_file(&mut file, &event_json);
+                                return;
+                            }
+
+                            if last_char[0] == b']' {
+                                if file.seek(SeekFrom::End(-1)).is_err() {
+                                    reset_file(&mut file, &event_json);
+                                    return;
+                                }
+
+                                if let Err(e) =
+                                    file.write_all(format!(",\n{}\n]", event_json).as_bytes())
+                                {
+                                    error!("Failed to append to log.json: {}", e);
+                                }
+                                return;
+                            }
+                        }
+                        reset_file(&mut file, &event_json);
+                    }
+                    Err(_) => reset_file(&mut file, &event_json),
+                },
+                Err(e) => error!("Failed to open log.json for appending: {}", e),
+            }
+        }
+        Err(e) => error!("Failed to serialize event: {}", e),
+    }
+}
+
+fn reset_file(file: &mut File, event_json: &str) {
+    if file.seek(SeekFrom::Start(0)).is_err() || file.set_len(0).is_err() {
+        error!("Failed to reset file");
         return;
     }
 
-    match serde_json::to_string_pretty(battle.tracing.as_ref().unwrap()) {
-        Ok(json) => match File::create("log.json") {
-            Ok(mut file) => match file.write_all(json.as_bytes()) {
-                Ok(_) => (),
-                Err(e) => error!("Failed to write to log.json: {}", e),
-            },
-            Err(e) => error!("Failed to create log.json: {}", e),
-        },
-        Err(e) => error!("Failed to serialize tracing data: {}", e),
+    if let Err(e) = file.write_all(format!("[\n{}\n]", event_json).as_bytes()) {
+        error!("Failed to write to log.json: {}", e);
     }
 }
 
