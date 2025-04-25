@@ -1,8 +1,9 @@
+use serde::Serialize;
 use strum::IntoDiscriminant;
 
 use crate::prompt_types::prompt_data::{Prompt, PromptData};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct DebugPromptData {
     pub player: String,
     pub prompt_kind: String,

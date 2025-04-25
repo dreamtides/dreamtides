@@ -1,6 +1,8 @@
+use serde::Serialize;
+
 use crate::battle_player::player_data::PlayerData;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct DebugPlayerData {
     pub name: String,
     pub points: String,

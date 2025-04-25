@@ -1,11 +1,13 @@
 use std::fmt;
 
+use serde::Serialize;
+
 use crate::battle::battle_data::BattleData;
 use crate::debug_snapshots::debug_all_cards::DebugAllCards;
 use crate::debug_snapshots::debug_player_data::DebugPlayerData;
 use crate::debug_snapshots::debug_prompt_data::DebugPromptData;
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct DebugBattleData {
     pub id: String,
     pub request_context: String,

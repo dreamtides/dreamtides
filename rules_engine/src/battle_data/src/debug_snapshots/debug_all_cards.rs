@@ -1,11 +1,12 @@
 use core_data::types::PlayerName;
+use serde::Serialize;
 
 use crate::battle_cards::all_cards::AllCards;
 use crate::battle_cards::card_data::CardData;
 use crate::battle_cards::card_id::CardIdType;
 use crate::debug_snapshots::debug_card_data::DebugCardData;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct DebugAllCards {
     pub cards: Vec<DebugCardData>,
     pub user_battlefield: Vec<DebugCardData>,

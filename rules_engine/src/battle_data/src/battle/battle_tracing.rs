@@ -1,11 +1,12 @@
 use std::collections::BTreeMap;
 
 use core_data::numerics::TurnId;
+use serde::Serialize;
 
 use crate::debug_snapshots::debug_battle_data::DebugBattleData;
 
 /// Data structure for storing debug traces of events during a turn of a battle.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize)]
 pub struct BattleTracing {
     /// The turn for which we are storing tracing data
     pub turn: TurnId,
@@ -14,7 +15,7 @@ pub struct BattleTracing {
     pub current: Vec<BattleTraceEvent>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct BattleTraceEvent {
     /// Description of event.
     ///

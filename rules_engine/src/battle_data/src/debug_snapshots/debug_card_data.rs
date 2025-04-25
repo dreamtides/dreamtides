@@ -1,6 +1,8 @@
+use serde::Serialize;
+
 use crate::battle_cards::card_data::CardData;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct DebugCardData {
     pub id: String,
     pub owner: String,
@@ -40,7 +42,7 @@ impl DebugCardData {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct DebugCardProperties {
     pub card_type: String,
     pub spark: String,
