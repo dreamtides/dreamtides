@@ -25,31 +25,40 @@ pub fn execute(
     player: PlayerName,
     action: BattleAction,
 ) -> CommandSequence {
-    battle_trace!("Executing battle action", battle, action);
-    battle_actions::execute(battle, player, action);
+    let mut current_player = player;
+    let mut current_action = action;
 
-    let Some(next_player) = legal_actions::next_to_act(battle) else {
-        battle_trace!("Rendering updates for game over", battle);
-        return render_updates(battle, initiated_by);
-    };
+    loop {
+        battle_trace!("Executing battle action", battle, current_action);
+        battle_actions::execute(battle, current_player, current_action);
 
-    // Check if the only legal action is ResolveStack and automatically execute it
-    let legal_actions = legal_actions::compute(battle, next_player, LegalActions::default());
-    if legal_actions == vec![BattleAction::ResolveStack] {
-        battle_trace!("Automatically executing ResolveStack", battle);
-        return execute(battle, initiated_by, next_player, BattleAction::ResolveStack);
-    }
+        let Some(next_player) = legal_actions::next_to_act(battle) else {
+            battle_trace!("Rendering updates for game over", battle);
+            return render_updates(battle, initiated_by);
+        };
 
-    if let PlayerType::Agent(agent) = battle.player(next_player).player_type.clone() {
-        battle_trace!("Selecting action for AI player", battle);
-        let next_action = agent_search::select_action(battle, next_player, &agent);
-        battle_trace!("Executing action for AI player", battle, next_action);
-        execute(battle, initiated_by, next_player, next_action)
-    } else {
-        battle_trace!("Rendering updates for player", battle);
-        let result = render_updates(battle, initiated_by);
-        battle.animations = Some(AnimationData::default());
-        result
+        // Check if the only legal action is ResolveStack and automatically execute it
+        let legal_actions = legal_actions::compute(battle, next_player, LegalActions::default());
+        if legal_actions == vec![BattleAction::ResolveStack] {
+            battle_trace!("Automatically executing ResolveStack", battle);
+            current_player = next_player;
+            current_action = BattleAction::ResolveStack;
+            continue;
+        }
+
+        if let PlayerType::Agent(agent) = battle.player(next_player).player_type.clone() {
+            battle_trace!("Selecting action for AI player", battle);
+            let next_action = agent_search::select_action(battle, next_player, &agent);
+            battle_trace!("Executing action for AI player", battle, next_action);
+            current_player = next_player;
+            current_action = next_action;
+            continue;
+        } else {
+            battle_trace!("Rendering updates for player", battle);
+            let result = render_updates(battle, initiated_by);
+            battle.animations = Some(AnimationData::default());
+            return result;
+        }
     }
 }
 

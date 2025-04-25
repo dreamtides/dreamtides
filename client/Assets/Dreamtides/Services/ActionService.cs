@@ -165,7 +165,6 @@ namespace Dreamtides.Services
       }
       else
       {
-        Debug.LogError($"Error sending dev server request: {webRequest.error}");
         _devModeAutoConnect = true;
       }
     }
