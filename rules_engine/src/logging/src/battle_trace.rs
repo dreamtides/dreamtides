@@ -1,3 +1,10 @@
+use std::fs::File;
+use std::io::Write;
+
+use battle_data::battle::battle_data::BattleData;
+use serde_json;
+use tracing::error;
+
 /// Macro for adding a tracing event to a battle.
 ///
 /// This macro does two things:
@@ -36,6 +43,7 @@ macro_rules! battle_trace {
                 values: std::collections::BTreeMap::new(),
                 snapshot: $battle.debug_snapshot(),
             });
+            $crate::battle_trace::write_log_file(&$battle);
         }
     }};
     ($message:expr, $battle:expr, $($key:ident),* $(,)?) => {{
@@ -56,6 +64,7 @@ macro_rules! battle_trace {
                 values,
                 snapshot: $battle.debug_snapshot(),
             });
+            $crate::battle_trace::write_log_file(&$battle);
         }
     }};
     ($message:expr, $battle:expr, $($key:ident = $value:expr),* $(,)?) => {{
@@ -75,6 +84,7 @@ macro_rules! battle_trace {
                 values,
                 snapshot: $battle.debug_snapshot(),
             });
+            $crate::battle_trace::write_log_file(&$battle);
         }
     }};
     ($message:expr, $battle:expr, $($simple_key:ident),+ $(,)? $($complex_key:ident = $complex_value:expr),+ $(,)?) => {{
@@ -100,8 +110,26 @@ macro_rules! battle_trace {
                 values,
                 snapshot: $battle.debug_snapshot(),
             });
+            $crate::battle_trace::write_log_file(&$battle);
         }
     }};
+}
+
+pub fn write_log_file(battle: &BattleData) {
+    if battle.tracing.is_none() {
+        return;
+    }
+
+    match serde_json::to_string_pretty(battle.tracing.as_ref().unwrap()) {
+        Ok(json) => match File::create("log.json") {
+            Ok(mut file) => match file.write_all(json.as_bytes()) {
+                Ok(_) => (),
+                Err(e) => error!("Failed to write to log.json: {}", e),
+            },
+            Err(e) => error!("Failed to create log.json: {}", e),
+        },
+        Err(e) => error!("Failed to serialize tracing data: {}", e),
+    }
 }
 
 #[cfg(test)]
