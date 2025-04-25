@@ -4,7 +4,7 @@ use battle_data::battle_cards::card_id::{
     CardIdType, CharacterId, HandCardId, ObjectId, StackCardId, VoidCardId,
 };
 use battle_data::battle_cards::zone::Zone;
-use tracing::debug;
+use logging::battle_trace;
 
 /// Moves a card to the hand, updates indices, assigns a new
 /// [HandCardId] to it, and fires all relevant events.
@@ -78,6 +78,6 @@ pub fn to_destination_zone(
     let card = battle.cards.card(id)?;
     let card_id = card.id;
     let old = card.zone;
-    debug!(?card_id, ?old, ?new, "Moving card to zone");
+    battle_trace!("Moving card to zone", battle, card_id, old, new);
     battle.cards.move_card(card_id, new)
 }

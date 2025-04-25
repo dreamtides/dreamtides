@@ -1,7 +1,7 @@
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_cards::card_id::{StackCardId, VoidCardId};
-use tracing::info;
+use logging::battle_trace;
 
 use crate::zone_mutations::move_card;
 
@@ -10,6 +10,6 @@ use crate::zone_mutations::move_card;
 /// Returns the [VoidCardId] for the character if it has been successfully moved
 /// to the void.
 pub fn apply(battle: &mut BattleData, source: EffectSource, id: StackCardId) -> Option<VoidCardId> {
-    info!(?id, "Negating card");
+    battle_trace!("Negating card", battle, id);
     move_card::to_void(battle, source, id)
 }

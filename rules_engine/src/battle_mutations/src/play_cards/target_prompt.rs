@@ -10,7 +10,7 @@ use battle_data::prompt_types::prompt_data::{
 };
 use battle_queries::predicate_queries::effect_predicates;
 use core_data::types::PlayerName;
-use tracing::info;
+use logging::battle_trace;
 
 /// Adds a prompt to the `battle` for targets required to play the `card_id`
 /// card.
@@ -25,6 +25,7 @@ pub fn add_target_prompt(battle: &mut BattleData, source: EffectSource, card_id:
             if let Some(prompt_data) =
                 create_prompt_for_effect(battle, player, source, &event.effect)
             {
+                battle_trace!("Adding target prompt", battle, prompt_data);
                 battle.prompt = Some(prompt_data);
                 return;
             }
@@ -84,7 +85,6 @@ fn create_prompt_for_targeting(
             "No valid characters for {:?}",
             std_effect
         ));
-        info!("Adding prompt for characters {:?}", valid);
         Some(PromptData {
             source,
             player,

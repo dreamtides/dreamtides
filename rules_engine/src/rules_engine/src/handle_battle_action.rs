@@ -12,7 +12,8 @@ use core_data::identifiers::UserId;
 use core_data::types::PlayerName;
 use display::rendering::renderer;
 use display_data::command::CommandSequence;
-use tracing::{info, instrument};
+use logging::battle_trace;
+use tracing::instrument;
 
 static PENDING_UPDATES: LazyLock<Mutex<HashMap<UserId, Vec<CommandSequence>>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
@@ -24,28 +25,28 @@ pub fn execute(
     player: PlayerName,
     action: BattleAction,
 ) -> CommandSequence {
-    info!(?action, "Executing battle action");
+    battle_trace!("Executing battle action", battle, action);
     battle_actions::execute(battle, player, action);
 
     let Some(next_player) = legal_actions::next_to_act(battle) else {
-        info!("Rendering updates for game over");
+        battle_trace!("Rendering updates for game over", battle);
         return render_updates(battle, initiated_by);
     };
 
     // Check if the only legal action is ResolveStack and automatically execute it
     let legal_actions = legal_actions::compute(battle, next_player, LegalActions::default());
     if legal_actions == vec![BattleAction::ResolveStack] {
-        info!("Automatically executing ResolveStack");
+        battle_trace!("Automatically executing ResolveStack", battle);
         return execute(battle, initiated_by, next_player, BattleAction::ResolveStack);
     }
 
-    if let PlayerType::Agent(agent) = &battle.player(next_player).player_type {
-        info!("Selecting action for AI player");
-        let next_action = agent_search::select_action(battle, next_player, agent);
-        info!(?next_action, "Executing action for AI player");
+    if let PlayerType::Agent(agent) = battle.player(next_player).player_type.clone() {
+        battle_trace!("Selecting action for AI player", battle);
+        let next_action = agent_search::select_action(battle, next_player, &agent);
+        battle_trace!("Executing action for AI player", battle, next_action);
         execute(battle, initiated_by, next_player, next_action)
     } else {
-        info!(?initiated_by, "Rendering updates for player");
+        battle_trace!("Rendering updates for player", battle);
         let result = render_updates(battle, initiated_by);
         battle.animations = Some(AnimationData::default());
         result

@@ -1,7 +1,9 @@
 /// Macro for adding a tracing event to a battle.
 ///
-/// If tracing is enabled, this will record an event for the current battle
-/// turn as well as emitting an event via the 'tracing' crate.
+/// This macro does two things:
+/// 1. If tracing is enabled for the battle, it records an event in the battle's
+///    trace history.
+/// 2. It emits a debug-level trace event via the 'tracing' crate.
 ///
 /// Arguments:
 /// - `$message`: A message describing the event.
@@ -25,6 +27,8 @@
 #[macro_export]
 macro_rules! battle_trace {
     ($message:expr, $battle:expr) => {{
+        tracing::debug!($message);
+
         if $battle.tracing.is_some() {
             $battle.add_tracing_event(battle_data::battle::battle_tracing::BattleTraceEvent {
                 m: $message.to_string(),
@@ -35,6 +39,9 @@ macro_rules! battle_trace {
         }
     }};
     ($message:expr, $battle:expr, $($key:ident),* $(,)?) => {{
+        $( let $key = &$key; )*
+        tracing::debug!(message = %$message, $($key = ?$key),*);
+
         if $battle.tracing.is_some() {
             let mut values = std::collections::BTreeMap::new();
             let mut values_string = String::new();
@@ -52,6 +59,8 @@ macro_rules! battle_trace {
         }
     }};
     ($message:expr, $battle:expr, $($key:ident = $value:expr),* $(,)?) => {{
+        tracing::debug!(message = %$message, $($key = ?$value),*);
+
         if $battle.tracing.is_some() {
             let mut values = std::collections::BTreeMap::new();
             let mut values_string = String::new();
@@ -69,6 +78,10 @@ macro_rules! battle_trace {
         }
     }};
     ($message:expr, $battle:expr, $($simple_key:ident),+ $(,)? $($complex_key:ident = $complex_value:expr),+ $(,)?) => {{
+        $( let $simple_key = &$simple_key; )*
+        tracing::debug!(message = %$message,
+            $($simple_key = ?$simple_key,)* $($complex_key = ?$complex_value),*);
+
         if $battle.tracing.is_some() {
             let mut values = std::collections::BTreeMap::new();
             let mut values_string = String::new();
@@ -82,9 +95,9 @@ macro_rules! battle_trace {
             )*
 
             $battle.add_tracing_event(battle_data::battle::battle_tracing::BattleTraceEvent {
-                message: $message.to_string(),
+                m: $message.to_string(),
+                vs: values_string,
                 values,
-                values_string,
                 snapshot: $battle.debug_snapshot(),
             });
         }
