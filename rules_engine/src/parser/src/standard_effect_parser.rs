@@ -1,7 +1,7 @@
 use ability_data::collection_expression::CollectionExpression;
 use ability_data::effect::Effect;
 use ability_data::predicate::Predicate;
-use ability_data::quantity_expression::QuantityExpression;
+use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use ability_data::triggered_ability::{TriggeredAbility, TriggeredAbilityOptions};
 use chumsky::prelude::*;

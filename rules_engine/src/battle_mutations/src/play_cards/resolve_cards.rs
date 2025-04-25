@@ -64,8 +64,11 @@ fn apply_event_effects(battle: &mut BattleData, card_id: StackCardId) -> Option<
         .collect::<Vec<_>>();
 
     for (i, event) in effects.into_iter().enumerate() {
-        let event_source =
-            EffectSource::Event { controller, card: card_id, ability_number: AbilityNumber(i) };
+        let event_source = EffectSource::Event {
+            controller,
+            stack_card_id: card_id,
+            ability_number: AbilityNumber(i),
+        };
         apply_effect::apply(
             battle,
             event_source,

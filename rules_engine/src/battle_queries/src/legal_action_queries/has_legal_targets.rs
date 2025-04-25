@@ -19,7 +19,7 @@ pub fn for_event(battle: &BattleData, card_id: impl CardIdType) -> bool {
         if let Ability::Event(event) = ability {
             let source = EffectSource::Event {
                 controller,
-                card: StackCardId(card_id.card_id()),
+                stack_card_id: StackCardId(card_id.card_id()),
                 ability_number: AbilityNumber(ability_index),
             };
             if !has_legal_targets_for_effect(battle, source, &event.effect) {

@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use crate::collection_expression::CollectionExpression;
 use crate::cost::Cost;
 use crate::predicate::{CardPredicate, Predicate};
-use crate::quantity_expression::QuantityExpression;
+use crate::quantity_expression_data::QuantityExpression;
 use crate::triggered_ability::TriggeredAbility;
 
 /// Effects are the primary way in which cards modify the game state. This can

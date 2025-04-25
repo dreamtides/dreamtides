@@ -16,13 +16,13 @@ pub enum EffectSource {
     Player { controller: PlayerName },
 
     /// Effect caused by an ability of a card on the stack
-    Event { controller: PlayerName, card: StackCardId, ability_number: AbilityNumber },
+    Event { controller: PlayerName, stack_card_id: StackCardId, ability_number: AbilityNumber },
 
     /// Effect caused by an activated ability of a character on the battlefield
-    Activated { controller: PlayerName, card: CharacterId, ability_number: AbilityNumber },
+    Activated { controller: PlayerName, character_id: CharacterId, ability_number: AbilityNumber },
 
     /// Effect caused by a triggered ability of a character on the battlefield
-    Triggered { controller: PlayerName, card: CharacterId, ability_number: AbilityNumber },
+    Triggered { controller: PlayerName, character_id: CharacterId, ability_number: AbilityNumber },
 }
 
 impl EffectSource {
@@ -40,9 +40,9 @@ impl EffectSource {
     /// Returns the card ID of the source of this effect, if it is a card.
     pub fn card_id(&self) -> Option<CardId> {
         match self {
-            EffectSource::Event { card, .. } => Some(card.card_id()),
-            EffectSource::Activated { card, .. } => Some(card.card_id()),
-            EffectSource::Triggered { card, .. } => Some(card.card_id()),
+            EffectSource::Event { stack_card_id: card, .. } => Some(card.card_id()),
+            EffectSource::Activated { character_id: card, .. } => Some(card.card_id()),
+            EffectSource::Triggered { character_id: card, .. } => Some(card.card_id()),
             _ => None,
         }
     }

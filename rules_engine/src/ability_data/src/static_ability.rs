@@ -5,7 +5,7 @@ use crate::condition::Condition;
 use crate::cost::Cost;
 use crate::effect::Effect;
 use crate::predicate::{CardPredicate, Predicate};
-use crate::quantity_expression::QuantityExpression;
+use crate::quantity_expression_data::QuantityExpression;
 
 /// A static ability represents something which modifies the rules of the game,
 /// either for this specific card or globally. Static abilities do not 'happen',

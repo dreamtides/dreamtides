@@ -5,7 +5,7 @@ pub mod condition;
 pub mod cost;
 pub mod effect;
 pub mod predicate;
-pub mod quantity_expression;
+pub mod quantity_expression_data;
 pub mod standard_effect;
 pub mod static_ability;
 pub mod trigger_event;

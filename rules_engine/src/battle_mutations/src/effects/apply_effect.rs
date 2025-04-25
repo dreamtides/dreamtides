@@ -1,5 +1,6 @@
 use ability_data::effect::{Effect, EffectWithOptions};
 use ability_data::predicate::Predicate;
+use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::effect_source::EffectSource;
@@ -10,10 +11,12 @@ use battle_data::prompt_types::prompt_data::{
     Prompt, PromptChoice, PromptConfiguration, PromptContext, PromptData,
 };
 use battle_queries::cost_queries::costs;
+use battle_queries::player_queries;
 
 use crate::character_mutations::dissolve;
 use crate::core::prompts;
 use crate::effects::{negate, pay_cost};
+use crate::zone_mutations::deck;
 
 /// Applies an effect to a set of [TargetId]s.
 ///
@@ -81,6 +84,9 @@ fn apply_standard_effect(
     targets: &[TargetId],
 ) -> Option<()> {
     match effect {
+        StandardEffect::DrawCardsForEach { count, for_each } => {
+            draw_cards_for_each(battle, source, count, for_each)
+        }
         StandardEffect::DissolveCharacter { .. } => {
             for character_id in character_ids(targets) {
                 dissolve::apply(battle, source, character_id);
@@ -88,35 +94,7 @@ fn apply_standard_effect(
         }
         StandardEffect::Negate { .. } => negate(battle, source, targets),
         StandardEffect::NegateUnlessPaysCost { cost, .. } => {
-            if costs::can_pay(battle, source.controller().opponent(), &cost) {
-                prompts::set(battle, PromptData {
-                    source,
-                    player: source.controller().opponent(),
-                    prompt: Prompt::Choose {
-                        choices: vec![
-                            PromptChoice {
-                                label: "Pay $2".to_string(),
-                                effect: Effect::Effect(StandardEffect::OpponentPaysCost { cost }),
-                                targets: vec![],
-                            },
-                            PromptChoice {
-                                label: "Decline".to_string(),
-                                effect: Effect::Effect(StandardEffect::Negate {
-                                    target: Predicate::It,
-                                }),
-                                targets: targets.to_vec(),
-                            },
-                        ],
-                    },
-                    context: PromptContext::TargetNegativeEffect,
-                    configuration: PromptConfiguration {
-                        move_source_to: Some(Zone::Void),
-                        ..Default::default()
-                    },
-                });
-            } else {
-                negate(battle, source, targets);
-            }
+            negate_unless_pays_cost(battle, source, targets, cost)
         }
         StandardEffect::OpponentPaysCost { cost } => {
             pay_cost::apply(battle, source, source.controller().opponent(), cost)
@@ -129,9 +107,54 @@ fn apply_standard_effect(
     Some(())
 }
 
+fn draw_cards_for_each(
+    battle: &mut BattleData,
+    source: EffectSource,
+    count: u32,
+    for_each: QuantityExpression,
+) {
+    let matching = player_queries::quantity_expression::count(battle, source, for_each);
+    deck::draw_cards(battle, source, source.controller(), count * matching);
+}
+
 fn negate(battle: &mut BattleData, source: EffectSource, targets: &[TargetId]) {
     for stack_card_id in stack_card_ids(targets) {
         negate::apply(battle, source, stack_card_id);
+    }
+}
+
+fn negate_unless_pays_cost(
+    battle: &mut BattleData,
+    source: EffectSource,
+    targets: &[TargetId],
+    cost: ability_data::cost::Cost,
+) {
+    if costs::can_pay(battle, source.controller().opponent(), &cost) {
+        prompts::set(battle, PromptData {
+            source,
+            player: source.controller().opponent(),
+            prompt: Prompt::Choose {
+                choices: vec![
+                    PromptChoice {
+                        label: "Pay $2".to_string(),
+                        effect: Effect::Effect(StandardEffect::OpponentPaysCost { cost }),
+                        targets: vec![],
+                    },
+                    PromptChoice {
+                        label: "Decline".to_string(),
+                        effect: Effect::Effect(StandardEffect::Negate { target: Predicate::It }),
+                        targets: targets.to_vec(),
+                    },
+                ],
+            },
+            context: PromptContext::TargetNegativeEffect,
+            configuration: PromptConfiguration {
+                move_source_to: Some(Zone::Void),
+                ..Default::default()
+            },
+        });
+    } else {
+        negate(battle, source, targets);
     }
 }
 

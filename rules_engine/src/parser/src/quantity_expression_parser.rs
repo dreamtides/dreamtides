@@ -1,4 +1,4 @@
-use ability_data::quantity_expression::QuantityExpression;
+use ability_data::quantity_expression_data::QuantityExpression;
 use chumsky::prelude::*;
 use chumsky::Parser;
 

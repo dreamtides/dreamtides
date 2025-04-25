@@ -2,7 +2,7 @@ use ability_data::ability::{Ability, EventAbility};
 use ability_data::cost::Cost;
 use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
-use ability_data::quantity_expression::QuantityExpression;
+use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
