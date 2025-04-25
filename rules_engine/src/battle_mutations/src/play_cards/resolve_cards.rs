@@ -35,6 +35,8 @@ fn resolve_card(battle: &mut BattleData, card_id: StackCardId) -> Option<()> {
     }
 
     battle.cards.card_mut(card_id)?.targets.clear();
+    battle.cards.card_mut(card_id)?.additional_cost_choices.clear();
+
     let source = EffectSource::Game { controller: battle.turn.active_player };
     match battle.cards.card(card_id)?.properties.card_type {
         CardType::Character(_) => {

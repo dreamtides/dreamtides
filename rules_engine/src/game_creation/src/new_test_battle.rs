@@ -91,6 +91,7 @@ fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
             revealed_to_owner: false,
             revealed_to_opponent: false,
             targets: vec![],
+            additional_cost_choices: vec![],
             turn_entered_current_zone: TurnData::default(),
         });
     }
@@ -115,6 +116,7 @@ fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
         revealed_to_owner: false,
         revealed_to_opponent: false,
         targets: vec![],
+        additional_cost_choices: vec![],
         turn_entered_current_zone: TurnData::default(),
     });
 
@@ -138,6 +140,7 @@ fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
         revealed_to_owner: false,
         revealed_to_opponent: false,
         targets: vec![],
+        additional_cost_choices: vec![],
         turn_entered_current_zone: TurnData::default(),
     });
 
@@ -162,6 +165,7 @@ fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
         revealed_to_owner: false,
         revealed_to_opponent: false,
         targets: vec![],
+        additional_cost_choices: vec![],
         turn_entered_current_zone: TurnData::default(),
     });
 
@@ -186,6 +190,7 @@ fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
         revealed_to_owner: false,
         revealed_to_opponent: false,
         targets: vec![],
+        additional_cost_choices: vec![],
         turn_entered_current_zone: TurnData::default(),
     });
 }

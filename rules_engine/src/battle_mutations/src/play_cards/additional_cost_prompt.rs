@@ -8,6 +8,7 @@ use battle_data::battle_cards::card_id::StackCardId;
 use battle_data::prompt_types::prompt_data::{
     Prompt, PromptConfiguration, PromptContext, PromptData,
 };
+use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 
 /// Adds a prompt for the controller of the `card_id` card to pay additional
@@ -42,9 +43,13 @@ fn create_prompt_for_cost(
 ) -> Option<PromptData> {
     let (prompt, context) = match cost? {
         Cost::SpendAnyAmountOfEnergy => {
-            let energy = battle.player(player).current_energy.into();
+            let energy = battle.player(player).current_energy;
             (
-                Prompt::ChooseNumber { minimum: 0, current: cmp::min(1, energy), maximum: energy },
+                Prompt::ChooseEnergyValue {
+                    minimum: Energy(0),
+                    current: cmp::min(Energy(1), energy),
+                    maximum: energy,
+                },
                 PromptContext::PickAmountOfEnergyToSpend,
             )
         }

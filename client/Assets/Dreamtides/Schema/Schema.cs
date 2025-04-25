@@ -684,17 +684,15 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Play a card in the user's hand.
     ///
-    /// Select a character by ID in response to some prompt, e.g. as a target of a  card being
-    /// played.
+    /// Select a character as a target
     ///
-    /// Select a card on the stack by ID in response to some prompt, e.g. as a target of a card
-    /// being played.
+    /// Select a card on the stack as a target
     ///
     /// Select a choice at a given index position in response to a prompt.
     ///
-    /// Pick a number in response to a number prompt.
+    /// Pick an amount of energy to pay as an additional cost to play a card.
     ///
-    /// Set the selected number in a number prompt.
+    /// Sets the selected amount of energy to pay as an additional cost to play a card.
     ///
     /// Sets the position of a card in a card order selector.
     ///
@@ -705,20 +703,20 @@ namespace Dreamtides.Schema
         [JsonProperty("playCardFromHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardId PlayCardFromHand { get; set; }
 
-        [JsonProperty("selectCharacter", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public CardId SelectCharacter { get; set; }
+        [JsonProperty("selectCharacterTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public CardId SelectCharacterTarget { get; set; }
 
-        [JsonProperty("selectStackCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public CardId SelectStackCard { get; set; }
+        [JsonProperty("selectStackCardTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public CardId SelectStackCardTarget { get; set; }
 
         [JsonProperty("selectPromptChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectPromptChoice { get; set; }
 
-        [JsonProperty("selectNumber", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? SelectNumber { get; set; }
+        [JsonProperty("selectEnergyAdditionalCost", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SelectEnergyAdditionalCost { get; set; }
 
-        [JsonProperty("setSelectedNumber", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? SetSelectedNumber { get; set; }
+        [JsonProperty("setSelectedEnergyAdditionalCost", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SetSelectedEnergyAdditionalCost { get; set; }
 
         [JsonProperty("selectCardOrder", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SelectCardOrder SelectCardOrder { get; set; }

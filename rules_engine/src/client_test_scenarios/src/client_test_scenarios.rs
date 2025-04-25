@@ -72,7 +72,7 @@ fn perform_battle_action(
         BattleAction::PlayCardFromHand(id) => play_card(id.card_id(), scenario),
         BattleAction::BrowseCards(card_browser) => browse_cards(card_browser),
         BattleAction::CloseCardBrowser => close_card_browser(),
-        BattleAction::SelectCharacter(id) => select_card(id.card_id()),
+        BattleAction::SelectCharacterTarget(id) => select_card(id.card_id()),
         BattleAction::SelectCardOrder(select_order) => select_card_order(select_order),
         _ => {
             panic!("Not implemented: {:?}", action);
@@ -296,7 +296,7 @@ fn play_card_with_targets(battle: &mut BattleView, card_id: CardId, stack: Stack
         if matches!(card.position.position, Position::OnBattlefield(DisplayPlayer::Enemy)) {
             if let Some(revealed) = &mut card.revealed {
                 revealed.actions.on_click = Some(GameAction::BattleAction(
-                    BattleAction::SelectCharacter(CharacterId(card.id)),
+                    BattleAction::SelectCharacterTarget(CharacterId(card.id)),
                 ));
                 revealed.outline_color = Some(display_color::RED_500);
             }

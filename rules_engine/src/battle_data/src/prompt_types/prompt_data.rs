@@ -1,4 +1,5 @@
 use ability_data::effect::Effect;
+use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use strum_macros::EnumDiscriminants;
 
@@ -33,7 +34,7 @@ pub enum Prompt {
     ChooseCharacter { valid: Vec<CharacterId> },
     ChooseStackCard { valid: Vec<StackCardId> },
     Choose { choices: Vec<PromptChoice> },
-    ChooseNumber { minimum: u32, current: u32, maximum: u32 },
+    ChooseEnergyValue { minimum: Energy, current: Energy, maximum: Energy },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

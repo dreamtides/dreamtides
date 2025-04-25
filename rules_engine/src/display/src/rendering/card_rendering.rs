@@ -73,16 +73,14 @@ fn selection_target(
         if prompt_data.player == builder.act_for_player() {
             match &prompt_data.prompt {
                 Prompt::ChooseCharacter { valid } => {
-                    return valid
-                        .iter()
-                        .find(|target_id| target_id.card_id() == card_id)
-                        .map(|&id| GameAction::BattleAction(BattleAction::SelectCharacter(id)));
+                    return valid.iter().find(|target_id| target_id.card_id() == card_id).map(
+                        |&id| GameAction::BattleAction(BattleAction::SelectCharacterTarget(id)),
+                    );
                 }
                 Prompt::ChooseStackCard { valid } => {
-                    return valid
-                        .iter()
-                        .find(|target_id| target_id.card_id() == card_id)
-                        .map(|&id| GameAction::BattleAction(BattleAction::SelectStackCard(id)));
+                    return valid.iter().find(|target_id| target_id.card_id() == card_id).map(
+                        |&id| GameAction::BattleAction(BattleAction::SelectStackCardTarget(id)),
+                    );
                 }
                 _ => {}
             }

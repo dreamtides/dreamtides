@@ -3,6 +3,7 @@ use core_data::identifiers::CardId;
 use core_data::types::PlayerName;
 
 use crate::battle::turn_data::TurnData;
+use crate::battle_cards::additional_cost_choice_data::AdditionalCostData;
 use crate::battle_cards::card_id::{CharacterId, ObjectId, StackCardId};
 use crate::battle_cards::card_properties::CardProperties;
 use crate::battle_cards::zone::Zone;
@@ -34,7 +35,20 @@ pub struct CardData {
     pub revealed_to_opponent: bool,
 
     /// The targets of this card while it is on the stack.
+    ///
+    /// This value is cleared during card resolution before it is removed from
+    /// the stack.
     pub targets: Vec<TargetId>,
+
+    /// Choices about additional costs to play this card.
+    ///
+    /// Additional costs are paid immediately when a card is put on the stack.
+    /// They're persisted here so that card effects can reference what cost was
+    /// paid, if any.
+    ///
+    /// This value is cleared during card resolution before it is removed from
+    /// the stack.
+    pub additional_cost_choices: Vec<AdditionalCostData>,
 
     /// Turn on which this card last entered its current zone.
     ///
@@ -61,7 +75,8 @@ impl CardData {
             abilities,
             revealed_to_owner: true,
             revealed_to_opponent: false,
-            targets: Vec::new(),
+            targets: vec![],
+            additional_cost_choices: vec![],
             turn_entered_current_zone: TurnData::default(),
         }
     }

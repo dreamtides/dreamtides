@@ -94,11 +94,11 @@ fn primary_action_button(
 
     if let Some(prompt) = battle.prompt.as_ref()
         && prompt.player == builder.act_for_player()
-        && let Prompt::ChooseNumber { current, .. } = &prompt.prompt
+        && let Prompt::ChooseEnergyValue { current, .. } = &prompt.prompt
     {
         return Some(ActionButtonView {
             label: format!("Spend {}\u{f7e4}", current),
-            action: Some(BattleAction::SelectNumber(*current).into()),
+            action: Some(BattleAction::SelectEnergyAdditionalCost(*current).into()),
             show_on_idle_duration: None,
         });
     }
@@ -145,12 +145,12 @@ fn secondary_action_button(
 fn increment_button(builder: &ResponseBuilder, battle: &BattleData) -> Option<ActionButtonView> {
     if let Some(prompt) = battle.prompt.as_ref()
         && prompt.player == builder.act_for_player()
-        && let Prompt::ChooseNumber { current, .. } = &prompt.prompt
+        && let Prompt::ChooseEnergyValue { current, .. } = &prompt.prompt
     {
         return Some(ActionButtonView {
             label: "+1\u{f7e4}".to_string(),
-            action: if Energy(*current) < battle.player(builder.act_for_player()).current_energy {
-                Some(BattleAction::SetSelectedNumber(*current + 1).into())
+            action: if *current < battle.player(builder.act_for_player()).current_energy {
+                Some(BattleAction::SetSelectedEnergyAdditionalCost(*current + Energy(1)).into())
             } else {
                 None
             },
@@ -164,12 +164,12 @@ fn increment_button(builder: &ResponseBuilder, battle: &BattleData) -> Option<Ac
 fn decrement_button(builder: &ResponseBuilder, battle: &BattleData) -> Option<ActionButtonView> {
     if let Some(prompt) = battle.prompt.as_ref()
         && prompt.player == builder.act_for_player()
-        && let Prompt::ChooseNumber { current, .. } = &prompt.prompt
+        && let Prompt::ChooseEnergyValue { current, .. } = &prompt.prompt
     {
         return Some(ActionButtonView {
             label: "\u{2212}1\u{f7e4}".to_string(),
-            action: if *current > 0 {
-                Some(BattleAction::SetSelectedNumber(*current - 1).into())
+            action: if *current > Energy(0) {
+                Some(BattleAction::SetSelectedEnergyAdditionalCost(*current - Energy(1)).into())
             } else {
                 None
             },

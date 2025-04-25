@@ -2,6 +2,7 @@ use action_data::battle_action::BattleAction;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
 use battle_data::prompt_types::prompt_data::Prompt;
+use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use tracing::instrument;
 
@@ -35,19 +36,19 @@ pub fn compute(
         if prompt_data.player == player {
             return match &prompt_data.prompt {
                 Prompt::ChooseCharacter { valid } => {
-                    valid.iter().map(|&id| BattleAction::SelectCharacter(id)).collect()
+                    valid.iter().map(|&id| BattleAction::SelectCharacterTarget(id)).collect()
                 }
                 Prompt::ChooseStackCard { valid } => {
-                    valid.iter().map(|&id| BattleAction::SelectStackCard(id)).collect()
+                    valid.iter().map(|&id| BattleAction::SelectStackCardTarget(id)).collect()
                 }
                 Prompt::Choose { choices } => choices
                     .iter()
                     .enumerate()
                     .map(|(i, _)| BattleAction::SelectPromptChoice(i))
                     .collect(),
-                Prompt::ChooseNumber { minimum, maximum, .. } => {
-                    (*minimum..=*maximum).map(BattleAction::SelectNumber).collect()
-                }
+                Prompt::ChooseEnergyValue { minimum, maximum, .. } => (minimum.0..=maximum.0)
+                    .map(|e| BattleAction::SelectEnergyAdditionalCost(Energy(e)))
+                    .collect(),
             };
         } else {
             return vec![];

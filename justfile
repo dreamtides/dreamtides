@@ -95,6 +95,9 @@ plugins: ios-plugin android-plugin mac-plugin
 clippy:
   cargo clippy --manifest-path rules_engine/Cargo.toml --workspace -- -D warnings -D clippy::all
 
+fix:
+  cargo clippy --manifest-path rules_engine/Cargo.toml --fix --allow-dirty -- -D warnings -D clippy::all
+
 benchmark *args='':
   cargo criterion --manifest-path rules_engine/Cargo.toml "$@"
 

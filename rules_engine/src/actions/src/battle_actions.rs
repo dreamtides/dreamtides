@@ -3,7 +3,9 @@ use assert_with::panic_with;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::prompt_types::prompt_data::{Prompt, PromptResumeAction};
 use battle_mutations::core::select_prompt_choice;
-use battle_mutations::play_cards::{play_card, resolve_cards, select_card};
+use battle_mutations::play_cards::{
+    apply_additional_cost, play_card, resolve_cards, select_target,
+};
 use battle_mutations::turn_step_mutations::end_turn;
 use core_data::types::PlayerName;
 use logging::battle_trace;
@@ -22,18 +24,20 @@ pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction
         BattleAction::EndTurn => {
             end_turn::run(battle);
         }
-        BattleAction::SelectCharacter(character_id) => {
-            select_card::select_character_for_prompt(battle, character_id);
+        BattleAction::SelectCharacterTarget(character_id) => {
+            select_target::character(battle, character_id);
         }
-        BattleAction::SelectStackCard(stack_card_id) => {
-            select_card::select_stack_card_for_prompt(battle, stack_card_id);
+        BattleAction::SelectStackCardTarget(stack_card_id) => {
+            select_target::stack_card(battle, stack_card_id);
         }
         BattleAction::SelectPromptChoice(choice_index) => {
             select_prompt_choice::select(battle, choice_index);
         }
-        BattleAction::SelectNumber(_) => {}
-        BattleAction::SetSelectedNumber(n) => {
-            let Some(Prompt::ChooseNumber { current, .. }) =
+        BattleAction::SelectEnergyAdditionalCost(cost) => {
+            apply_additional_cost::energy_cost(battle, player, cost);
+        }
+        BattleAction::SetSelectedEnergyAdditionalCost(n) => {
+            let Some(Prompt::ChooseEnergyValue { current, .. }) =
                 battle.prompt.as_mut().map(|p| &mut p.prompt)
             else {
                 panic_with!(battle, "Expected a ChooseNumber prompt");

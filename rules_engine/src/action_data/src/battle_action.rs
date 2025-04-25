@@ -1,5 +1,6 @@
 use battle_data::battle_cards::card_id::{CharacterId, HandCardId, StackCardId};
 use core_data::identifiers::CardId;
+use core_data::numerics::Energy;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -16,18 +17,17 @@ pub enum BattleAction {
     ResolveStack,
     /// End the turn
     EndTurn,
-    /// Select a character by ID in response to some prompt, e.g. as a target of
-    /// a  card being played.
-    SelectCharacter(CharacterId),
-    /// Select a card on the stack by ID in response to some prompt, e.g. as a
-    /// target of a card being played.
-    SelectStackCard(StackCardId),
+    /// Select a character as a target
+    SelectCharacterTarget(CharacterId),
+    /// Select a card on the stack as a target
+    SelectStackCardTarget(StackCardId),
     /// Select a choice at a given index position in response to a prompt.
     SelectPromptChoice(usize),
-    /// Pick a number in response to a number prompt.
-    SelectNumber(u32),
-    /// Set the selected number in a number prompt.
-    SetSelectedNumber(u32),
+    /// Pick an amount of energy to pay as an additional cost to play a card.
+    SelectEnergyAdditionalCost(Energy),
+    /// Sets the selected amount of energy to pay as an additional cost to play
+    /// a card.
+    SetSelectedEnergyAdditionalCost(Energy),
     /// Sets the position of a card in a card order selector.
     SelectCardOrder(SelectCardOrder),
     /// Show cards in a zone

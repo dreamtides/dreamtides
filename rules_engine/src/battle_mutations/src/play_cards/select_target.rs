@@ -5,9 +5,8 @@ use battle_data::battle_cards::card_id::{CharacterId, StackCardId};
 use battle_data::prompt_types::prompt_data::Prompt;
 use logging::battle_trace;
 
-/// Applies whatever game effect is required for a card being selected in the
-/// UI, e.g. setting it as a chosen target of a card on the stack.
-pub fn select_character_for_prompt(battle: &mut BattleData, character_id: CharacterId) {
+/// Selects a character as the target of a card on the stack.
+pub fn character(battle: &mut BattleData, character_id: CharacterId) {
     let object_id = expect!(
         battle.cards.card(character_id).map(|c| c.object_id),
         battle,
@@ -39,9 +38,8 @@ pub fn select_character_for_prompt(battle: &mut BattleData, character_id: Charac
     }
 }
 
-/// Applies whatever game effect is required for a card being selected in the
-/// UI, e.g. setting it as a chosen target of a card on the stack.
-pub fn select_stack_card_for_prompt(battle: &mut BattleData, stack_card_id: StackCardId) {
+/// Selects a card on the stack as a target of a card on the stack.
+pub fn stack_card(battle: &mut BattleData, stack_card_id: StackCardId) {
     let object_id = expect!(
         battle.cards.card(stack_card_id).map(|c| c.object_id),
         battle,
