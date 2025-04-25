@@ -1674,6 +1674,7 @@ dependencies = [
  "action_data",
  "actions",
  "ai_agents",
+ "ai_data",
  "assert_with",
  "backtrace",
  "battle_data",
@@ -1684,6 +1685,7 @@ dependencies = [
  "game_creation",
  "logging",
  "masonry",
+ "tokio",
  "tracing",
  "uuid",
 ]

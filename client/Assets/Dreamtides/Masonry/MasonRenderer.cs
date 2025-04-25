@@ -230,7 +230,7 @@ namespace Dreamtides.Masonry
       {
         if (node.PressedStyle != null || node.HoverStyle != null || node.EventHandlers != null)
         {
-          LogUtils.LogError($"Custom element {element} cannot have interaction");
+          LogUtils.LogError("MasonRenderer", $"Custom element {element} cannot have interaction");
         }
       }
     }
