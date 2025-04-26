@@ -4,6 +4,8 @@ use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
+use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
+use ability_data::triggered_ability::TriggeredAbility;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
 use battle_data::battle::battle_tracing::BattleTracing;
@@ -22,7 +24,7 @@ use core_data::card_types::{CardType, CharacterType};
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark, TurnId};
 use core_data::types::PlayerName;
-use rand::{Rng, SeedableRng};
+use rand::SeedableRng;
 use rand_xoshiro::Xoshiro256PlusPlus;
 
 /// Creates a new test battle between two Agents and starts it.
@@ -75,28 +77,64 @@ pub fn create_and_start(id: BattleId, user: PlayerType, enemy: PlayerType) -> Ba
 }
 
 fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
-    for _ in 0..30 {
-        battle.cards.create_card(CardData {
-            id: CardId::default(),
-            owner: player_name,
-            zone: Zone::Deck,
-            object_id: ObjectId::default(),
-            properties: CardProperties {
-                spark: Some(Spark(rand::rng().random_range(1..=5))),
-                cost: Some(Energy(rand::rng().random_range(1..=5))),
-                card_type: CardType::Character(CharacterType::Explorer),
-                is_fast: false,
-            },
-            abilities: vec![],
-            revealed_to_owner: false,
-            revealed_to_opponent: false,
-            targets: vec![],
-            additional_cost_choices: vec![],
-            turn_entered_current_zone: TurnData::default(),
-        });
-    }
+    add_copies(battle, 3, CardData {
+        id: CardId::default(),
+        owner: player_name,
+        zone: Zone::Deck,
+        object_id: ObjectId::default(),
+        properties: CardProperties {
+            spark: Some(Spark(2)),
+            cost: Some(Energy(2)),
+            card_type: CardType::Character(CharacterType::Explorer),
+            is_fast: false,
+        },
+        abilities: vec![],
+        revealed_to_owner: false,
+        revealed_to_opponent: false,
+        targets: vec![],
+        additional_cost_choices: vec![],
+        turn_entered_current_zone: TurnData::default(),
+    });
 
-    battle.cards.create_card(CardData {
+    add_copies(battle, 3, CardData {
+        id: CardId::default(),
+        owner: player_name,
+        zone: Zone::Deck,
+        object_id: ObjectId::default(),
+        properties: CardProperties {
+            spark: Some(Spark(3)),
+            cost: Some(Energy(3)),
+            card_type: CardType::Character(CharacterType::Explorer),
+            is_fast: false,
+        },
+        abilities: vec![],
+        revealed_to_owner: false,
+        revealed_to_opponent: false,
+        targets: vec![],
+        additional_cost_choices: vec![],
+        turn_entered_current_zone: TurnData::default(),
+    });
+
+    add_copies(battle, 3, CardData {
+        id: CardId::default(),
+        owner: player_name,
+        zone: Zone::Deck,
+        object_id: ObjectId::default(),
+        properties: CardProperties {
+            spark: Some(Spark(4)),
+            cost: Some(Energy(4)),
+            card_type: CardType::Character(CharacterType::Explorer),
+            is_fast: false,
+        },
+        abilities: vec![],
+        revealed_to_owner: false,
+        revealed_to_opponent: false,
+        targets: vec![],
+        additional_cost_choices: vec![],
+        turn_entered_current_zone: TurnData::default(),
+    });
+
+    add_copies(battle, 3, CardData {
         id: CardId::default(),
         owner: player_name,
         zone: Zone::Deck,
@@ -120,7 +158,7 @@ fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
         turn_entered_current_zone: TurnData::default(),
     });
 
-    battle.cards.create_card(CardData {
+    add_copies(battle, 3, CardData {
         id: CardId::default(),
         owner: player_name,
         zone: Zone::Deck,
@@ -144,7 +182,7 @@ fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
         turn_entered_current_zone: TurnData::default(),
     });
 
-    battle.cards.create_card(CardData {
+    add_copies(battle, 3, CardData {
         id: CardId::default(),
         owner: player_name,
         zone: Zone::Deck,
@@ -169,7 +207,7 @@ fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
         turn_entered_current_zone: TurnData::default(),
     });
 
-    battle.cards.create_card(CardData {
+    add_copies(battle, 3, CardData {
         id: CardId::default(),
         owner: player_name,
         zone: Zone::Deck,
@@ -193,4 +231,33 @@ fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
         additional_cost_choices: vec![],
         turn_entered_current_zone: TurnData::default(),
     });
+
+    add_copies(battle, 3, CardData {
+        id: CardId::default(),
+        owner: player_name,
+        zone: Zone::Deck,
+        object_id: ObjectId::default(),
+        properties: CardProperties {
+            spark: Some(Spark(0)),
+            cost: Some(Energy(2)),
+            card_type: CardType::Character(CharacterType::Visitor),
+            is_fast: false,
+        },
+        abilities: vec![Ability::Triggered(TriggeredAbility {
+            trigger: TriggerEvent::Keywords(vec![TriggerKeyword::Judgment]),
+            effect: Effect::Effect(StandardEffect::GainPoints { gains: Points(3) }),
+            options: Default::default(),
+        })],
+        revealed_to_owner: false,
+        revealed_to_opponent: false,
+        targets: vec![],
+        additional_cost_choices: vec![],
+        turn_entered_current_zone: TurnData::default(),
+    });
+}
+
+fn add_copies(battle: &mut BattleData, count: usize, card: CardData) {
+    for _ in 0..count {
+        battle.cards.create_card(card.clone());
+    }
 }
