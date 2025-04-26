@@ -382,7 +382,9 @@ mod tests {
 
         assert!(fs::metadata(log_path).is_ok());
         let contents = fs::read_to_string(log_path).unwrap();
-        assert!(contents.contains("groups"));
+        assert!(contents.contains("\"sequence\""));
+        assert!(contents.contains("\"groups\""));
+        assert!(contents.contains("\"m\": \"Command sequence\""));
 
         fs::remove_file(log_path).unwrap();
     }

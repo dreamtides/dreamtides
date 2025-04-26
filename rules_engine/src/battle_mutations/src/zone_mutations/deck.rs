@@ -40,3 +40,8 @@ pub fn draw_cards(
     }
     result
 }
+
+/// Shuffles the deck for the [PlayerName] player.
+pub fn shuffle(battle: &mut BattleData, player: PlayerName) {
+    battle.cards.shuffle_deck(player, &mut battle.rng);
+}

@@ -2,6 +2,8 @@ use std::collections::{BTreeSet, VecDeque};
 
 use core_data::identifiers::CardId;
 use core_data::types::PlayerName;
+use rand::seq::SliceRandom;
+use rand_xoshiro::Xoshiro256PlusPlus;
 use slotmap::SlotMap;
 
 use crate::battle_cards::card_data::CardData;
@@ -146,6 +148,11 @@ impl AllCards {
         Some(object_id)
     }
 
+    /// Shuffles the deck for a given player.
+    pub fn shuffle_deck(&mut self, player: PlayerName, rng: &mut Xoshiro256PlusPlus) {
+        self.deck.shuffle(player, rng);
+    }
+
     fn remove_from_zone(&mut self, owner: PlayerName, zone: Zone, card_id: CardId) {
         match zone {
             Zone::Banished => {
@@ -247,6 +254,11 @@ impl<T: CardIdType> OrderedZone<T> {
         } else {
             None
         }
+    }
+
+    pub fn shuffle(&mut self, player: PlayerName, rng: &mut Xoshiro256PlusPlus) {
+        let cards = self.cards_mut(player);
+        cards.make_contiguous().shuffle(rng);
     }
 }
 

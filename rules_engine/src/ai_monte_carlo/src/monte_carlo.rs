@@ -113,7 +113,7 @@ impl<TScoreAlgorithm: ChildScoreAlgorithm> SelectionAlgorithm
         self.run_search(
             |i| {
                 i % 100 == 0 && config.deadline < Instant::now()
-                    || self.max_iterations.map_or(false, |max| i >= max)
+                    || self.max_iterations.is_some_and(|max| i >= max)
             },
             node,
             evaluator,

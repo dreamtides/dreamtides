@@ -4,8 +4,6 @@ use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
-use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
-use ability_data::triggered_ability::TriggeredAbility;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
 use battle_data::battle::battle_tracing::BattleTracing;
@@ -24,6 +22,7 @@ use core_data::card_types::{CardType, CharacterType};
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark, TurnId};
 use core_data::types::PlayerName;
+use rand::seq::SliceRandom;
 use rand::SeedableRng;
 use rand_xoshiro::Xoshiro256PlusPlus;
 
@@ -58,8 +57,23 @@ pub fn create_and_start(id: BattleId, user: PlayerType, enemy: PlayerType) -> Ba
         prompt_resume_action: None,
         tracing: Some(BattleTracing::default()),
     };
-    create_cards(&mut battle, PlayerName::One);
-    create_cards(&mut battle, PlayerName::Two);
+
+    for _ in 0..5 {
+        let mut p1_cards = create_cards(PlayerName::One);
+        p1_cards.shuffle(&mut battle.rng);
+        for card in p1_cards {
+            battle.cards.create_card(card);
+        }
+    }
+
+    for _ in 0..5 {
+        let mut p2_cards = create_cards(PlayerName::Two);
+        p2_cards.shuffle(&mut battle.rng);
+        for card in p2_cards {
+            battle.cards.create_card(card);
+        }
+    }
+
     battle.status = BattleStatus::Playing;
     deck::draw_cards(
         &mut battle,
@@ -76,188 +90,135 @@ pub fn create_and_start(id: BattleId, user: PlayerType, enemy: PlayerType) -> Ba
     battle
 }
 
-fn create_cards(battle: &mut BattleData, player_name: PlayerName) {
-    add_copies(battle, 3, CardData {
-        id: CardId::default(),
-        owner: player_name,
-        zone: Zone::Deck,
-        object_id: ObjectId::default(),
-        properties: CardProperties {
-            spark: Some(Spark(2)),
-            cost: Some(Energy(2)),
-            card_type: CardType::Character(CharacterType::Explorer),
-            is_fast: false,
-        },
-        abilities: vec![],
-        revealed_to_owner: false,
-        revealed_to_opponent: false,
-        targets: vec![],
-        additional_cost_choices: vec![],
-        turn_entered_current_zone: TurnData::default(),
-    });
+fn create_cards(player_name: PlayerName) -> Vec<CardData> {
+    let mut cards = Vec::new();
 
-    add_copies(battle, 3, CardData {
-        id: CardId::default(),
-        owner: player_name,
-        zone: Zone::Deck,
-        object_id: ObjectId::default(),
-        properties: CardProperties {
-            spark: Some(Spark(3)),
-            cost: Some(Energy(3)),
-            card_type: CardType::Character(CharacterType::Explorer),
-            is_fast: false,
-        },
-        abilities: vec![],
-        revealed_to_owner: false,
-        revealed_to_opponent: false,
-        targets: vec![],
-        additional_cost_choices: vec![],
-        turn_entered_current_zone: TurnData::default(),
-    });
-
-    add_copies(battle, 3, CardData {
-        id: CardId::default(),
-        owner: player_name,
-        zone: Zone::Deck,
-        object_id: ObjectId::default(),
-        properties: CardProperties {
-            spark: Some(Spark(4)),
-            cost: Some(Energy(4)),
-            card_type: CardType::Character(CharacterType::Explorer),
-            is_fast: false,
-        },
-        abilities: vec![],
-        revealed_to_owner: false,
-        revealed_to_opponent: false,
-        targets: vec![],
-        additional_cost_choices: vec![],
-        turn_entered_current_zone: TurnData::default(),
-    });
-
-    add_copies(battle, 3, CardData {
-        id: CardId::default(),
-        owner: player_name,
-        zone: Zone::Deck,
-        object_id: ObjectId::default(),
-        properties: CardProperties {
-            spark: None,
-            cost: Some(Energy(2)),
-            card_type: CardType::Event,
-            is_fast: true,
-        },
-        abilities: vec![Ability::Event(EventAbility {
-            additional_cost: None,
-            effect: Effect::Effect(StandardEffect::DissolveCharacter {
-                target: Predicate::Enemy(CardPredicate::Character),
-            }),
-        })],
-        revealed_to_owner: false,
-        revealed_to_opponent: false,
-        targets: vec![],
-        additional_cost_choices: vec![],
-        turn_entered_current_zone: TurnData::default(),
-    });
-
-    add_copies(battle, 3, CardData {
-        id: CardId::default(),
-        owner: player_name,
-        zone: Zone::Deck,
-        object_id: ObjectId::default(),
-        properties: CardProperties {
-            spark: None,
-            cost: Some(Energy(1)),
-            card_type: CardType::Event,
-            is_fast: true,
-        },
-        abilities: vec![Ability::Event(EventAbility {
-            additional_cost: None,
-            effect: Effect::Effect(StandardEffect::Negate {
-                target: Predicate::Enemy(CardPredicate::Dream),
-            }),
-        })],
-        revealed_to_owner: false,
-        revealed_to_opponent: false,
-        targets: vec![],
-        additional_cost_choices: vec![],
-        turn_entered_current_zone: TurnData::default(),
-    });
-
-    add_copies(battle, 3, CardData {
-        id: CardId::default(),
-        owner: player_name,
-        zone: Zone::Deck,
-        object_id: ObjectId::default(),
-        properties: CardProperties {
-            spark: None,
-            cost: Some(Energy(1)),
-            card_type: CardType::Event,
-            is_fast: true,
-        },
-        abilities: vec![Ability::Event(EventAbility {
-            additional_cost: None,
-            effect: Effect::Effect(StandardEffect::NegateUnlessPaysCost {
-                target: Predicate::Enemy(CardPredicate::Event),
-                cost: Cost::Energy(Energy(2)),
-            }),
-        })],
-        revealed_to_owner: false,
-        revealed_to_opponent: false,
-        targets: vec![],
-        additional_cost_choices: vec![],
-        turn_entered_current_zone: TurnData::default(),
-    });
-
-    add_copies(battle, 3, CardData {
-        id: CardId::default(),
-        owner: player_name,
-        zone: Zone::Deck,
-        object_id: ObjectId::default(),
-        properties: CardProperties {
-            spark: None,
-            cost: Some(Energy(1)),
-            card_type: CardType::Event,
-            is_fast: true,
-        },
-        abilities: vec![Ability::Event(EventAbility {
-            additional_cost: Some(Cost::SpendAnyAmountOfEnergy),
-            effect: Effect::Effect(StandardEffect::DrawCardsForEach {
-                count: 1,
-                for_each: QuantityExpression::ForEachEnergySpentOnThisCard,
-            }),
-        })],
-        revealed_to_owner: false,
-        revealed_to_opponent: false,
-        targets: vec![],
-        additional_cost_choices: vec![],
-        turn_entered_current_zone: TurnData::default(),
-    });
-
-    add_copies(battle, 3, CardData {
-        id: CardId::default(),
-        owner: player_name,
-        zone: Zone::Deck,
-        object_id: ObjectId::default(),
-        properties: CardProperties {
-            spark: Some(Spark(0)),
-            cost: Some(Energy(2)),
-            card_type: CardType::Character(CharacterType::Visitor),
-            is_fast: false,
-        },
-        abilities: vec![Ability::Triggered(TriggeredAbility {
-            trigger: TriggerEvent::Keywords(vec![TriggerKeyword::Judgment]),
-            effect: Effect::Effect(StandardEffect::GainPoints { gains: Points(3) }),
-            options: Default::default(),
-        })],
-        revealed_to_owner: false,
-        revealed_to_opponent: false,
-        targets: vec![],
-        additional_cost_choices: vec![],
-        turn_entered_current_zone: TurnData::default(),
-    });
-}
-
-fn add_copies(battle: &mut BattleData, count: usize, card: CardData) {
-    for _ in 0..count {
-        battle.cards.create_card(card.clone());
+    for _ in 0..6 {
+        cards.push(CardData {
+            id: CardId::default(),
+            owner: player_name,
+            zone: Zone::Deck,
+            object_id: ObjectId::default(),
+            properties: CardProperties {
+                spark: Some(Spark(5)),
+                cost: Some(Energy(2)),
+                card_type: CardType::Character(CharacterType::Explorer),
+                is_fast: false,
+            },
+            abilities: vec![],
+            revealed_to_owner: false,
+            revealed_to_opponent: false,
+            targets: vec![],
+            additional_cost_choices: vec![],
+            turn_entered_current_zone: TurnData::default(),
+        });
     }
+
+    for _ in 0..3 {
+        cards.push(CardData {
+            id: CardId::default(),
+            owner: player_name,
+            zone: Zone::Deck,
+            object_id: ObjectId::default(),
+            properties: CardProperties {
+                spark: None,
+                cost: Some(Energy(2)),
+                card_type: CardType::Event,
+                is_fast: true,
+            },
+            abilities: vec![Ability::Event(EventAbility {
+                additional_cost: None,
+                effect: Effect::Effect(StandardEffect::DissolveCharacter {
+                    target: Predicate::Enemy(CardPredicate::Character),
+                }),
+            })],
+            revealed_to_owner: false,
+            revealed_to_opponent: false,
+            targets: vec![],
+            additional_cost_choices: vec![],
+            turn_entered_current_zone: TurnData::default(),
+        });
+    }
+
+    for _ in 0..3 {
+        cards.push(CardData {
+            id: CardId::default(),
+            owner: player_name,
+            zone: Zone::Deck,
+            object_id: ObjectId::default(),
+            properties: CardProperties {
+                spark: None,
+                cost: Some(Energy(2)),
+                card_type: CardType::Event,
+                is_fast: true,
+            },
+            abilities: vec![Ability::Event(EventAbility {
+                additional_cost: None,
+                effect: Effect::Effect(StandardEffect::Negate {
+                    target: Predicate::Enemy(CardPredicate::Dream),
+                }),
+            })],
+            revealed_to_owner: false,
+            revealed_to_opponent: false,
+            targets: vec![],
+            additional_cost_choices: vec![],
+            turn_entered_current_zone: TurnData::default(),
+        });
+    }
+
+    for _ in 0..3 {
+        cards.push(CardData {
+            id: CardId::default(),
+            owner: player_name,
+            zone: Zone::Deck,
+            object_id: ObjectId::default(),
+            properties: CardProperties {
+                spark: None,
+                cost: Some(Energy(1)),
+                card_type: CardType::Event,
+                is_fast: true,
+            },
+            abilities: vec![Ability::Event(EventAbility {
+                additional_cost: None,
+                effect: Effect::Effect(StandardEffect::NegateUnlessPaysCost {
+                    target: Predicate::Enemy(CardPredicate::Event),
+                    cost: Cost::Energy(Energy(2)),
+                }),
+            })],
+            revealed_to_owner: false,
+            revealed_to_opponent: false,
+            targets: vec![],
+            additional_cost_choices: vec![],
+            turn_entered_current_zone: TurnData::default(),
+        });
+    }
+
+    for _ in 0..3 {
+        cards.push(CardData {
+            id: CardId::default(),
+            owner: player_name,
+            zone: Zone::Deck,
+            object_id: ObjectId::default(),
+            properties: CardProperties {
+                spark: None,
+                cost: Some(Energy(1)),
+                card_type: CardType::Event,
+                is_fast: true,
+            },
+            abilities: vec![Ability::Event(EventAbility {
+                additional_cost: Some(Cost::SpendAnyAmountOfEnergy),
+                effect: Effect::Effect(StandardEffect::DrawCardsForEach {
+                    count: 1,
+                    for_each: QuantityExpression::ForEachEnergySpentOnThisCard,
+                }),
+            })],
+            revealed_to_owner: false,
+            revealed_to_opponent: false,
+            targets: vec![],
+            additional_cost_choices: vec![],
+            turn_entered_current_zone: TurnData::default(),
+        });
+    }
+
+    cards
 }
