@@ -1,12 +1,9 @@
 use std::collections::HashMap;
 use std::sync::{LazyLock, Mutex};
-use std::thread;
-use std::time::Duration;
 
 use action_data::battle_action::BattleAction;
 use actions::battle_actions;
 use ai_agents::agent_search;
-use ai_data::game_ai::GameAI;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_animations::animation_data::AnimationData;
 use battle_data::battle_player::player_data::PlayerType;
@@ -50,13 +47,15 @@ pub fn execute(
         }
 
         if let PlayerType::Agent(agent) = battle.player(next_player).player_type.clone() {
+            battle_trace!("Rendering updates for AI player turn", battle);
             render_updates(battle, initiated_by);
             battle.animations = Some(AnimationData::default());
-            execute_agent_action(battle, next_player, agent);
-            render_updates(battle, initiated_by);
-            return;
+
+            battle_trace!("Selecting action for AI player", battle);
+            current_action = agent_search::select_action(battle, next_player, &agent);
+            current_player = next_player;
         } else {
-            battle_trace!("Rendering updates for player", battle);
+            battle_trace!("Rendering updates for human player turn", battle);
             render_updates(battle, initiated_by);
             battle.animations = Some(AnimationData::default());
             return;
@@ -78,14 +77,6 @@ pub fn poll(user_id: UserId) -> Option<CommandSequence> {
 pub fn append_update(user_id: UserId, update: CommandSequence) {
     let mut updates = PENDING_UPDATES.lock().unwrap();
     updates.entry(user_id).or_default().push(update);
-}
-
-fn execute_agent_action(battle: &mut BattleData, player: PlayerName, agent: GameAI) {
-    battle_trace!("Selecting action for AI player", battle);
-    let next_action = agent_search::select_action(battle, player, &agent);
-    battle_trace!("Executing action for AI player", battle, next_action);
-    thread::sleep(Duration::from_secs(2));
-    battle_actions::execute(battle, player, next_action);
 }
 
 fn render_updates(battle: &BattleData, user_id: UserId) {
