@@ -2,7 +2,11 @@ use std::fs::{File, OpenOptions};
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::Path;
 
+use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_tracing::BattleTraceEvent;
+use battle_data::debug_snapshots::debug_battle_data::DebugBattleData;
+use display_data::command::CommandSequence;
+use serde::Serialize;
 use serde_json;
 use tracing::error;
 
@@ -45,7 +49,7 @@ macro_rules! battle_trace {
                 snapshot: $battle.debug_snapshot(),
             };
             $battle.add_tracing_event(event.clone());
-            $crate::battle_trace::write_log_file(&event);
+            $crate::battle_trace::write_battle_event(&event);
         }
     }};
     ($message:expr, $battle:expr, $($key:ident),* $(,)?) => {{
@@ -67,7 +71,7 @@ macro_rules! battle_trace {
                 snapshot: $battle.debug_snapshot(),
             };
             $battle.add_tracing_event(event.clone());
-            $crate::battle_trace::write_log_file(&event);
+            $crate::battle_trace::write_battle_event(&event);
         }
     }};
     ($message:expr, $battle:expr, $($key:ident = $value:expr),* $(,)?) => {{
@@ -88,7 +92,7 @@ macro_rules! battle_trace {
                 snapshot: $battle.debug_snapshot(),
             };
             $battle.add_tracing_event(event.clone());
-            $crate::battle_trace::write_log_file(&event);
+            $crate::battle_trace::write_battle_event(&event);
         }
     }};
     ($message:expr, $battle:expr, $($simple_key:ident),+ $(,)? $($complex_key:ident = $complex_value:expr),+ $(,)?) => {{
@@ -115,81 +119,103 @@ macro_rules! battle_trace {
                 snapshot: $battle.debug_snapshot(),
             };
             $battle.add_tracing_event(event.clone());
-            $crate::battle_trace::write_log_file(&event);
+            $crate::battle_trace::write_battle_event(&event);
         }
     }};
 }
 
-pub fn write_log_file(event: &BattleTraceEvent) {
-    let log_path = Path::new("log.json");
+#[derive(Debug, Clone, Serialize)]
+pub struct CommandTraceEvent {
+    pub m: String,
+    pub snapshot: Option<DebugBattleData>,
+    pub sequence: CommandSequence,
+}
 
+pub fn write_commands(
+    battle: Option<&BattleData>,
+    message: &'static str,
+    sequence: &CommandSequence,
+) {
+    let snapshot = battle.filter(|b| b.tracing.is_some()).map(|b| b.debug_snapshot());
+    let event = CommandTraceEvent { m: message.to_string(), snapshot, sequence: sequence.clone() };
+    match serde_json::to_string_pretty(&event) {
+        Ok(json) => write_json_to_log_file(&json),
+        Err(e) => error!("Failed to serialize CommandSequence: {}", e),
+    }
+}
+
+pub fn write_battle_event(event: &BattleTraceEvent) {
     match serde_json::to_string_pretty(event) {
-        Ok(event_json) => {
-            if !log_path.exists() {
-                match File::create(log_path) {
-                    Ok(mut file) => {
-                        if let Err(e) = file.write_all(format!("[\n{}\n]", event_json).as_bytes()) {
-                            error!("Failed to write to log.json: {}", e);
-                        }
-                    }
-                    Err(e) => error!("Failed to create log.json: {}", e),
-                }
-                return;
-            }
-
-            match OpenOptions::new().read(true).write(true).open(log_path) {
-                Ok(mut file) => match file.metadata() {
-                    Ok(metadata) => {
-                        if metadata.len() > 0 {
-                            if file.seek(SeekFrom::End(-1)).is_err() {
-                                reset_file(&mut file, &event_json);
-                                return;
-                            }
-
-                            let mut last_char = [0u8; 1];
-                            if file.read_exact(&mut last_char).is_err() {
-                                reset_file(&mut file, &event_json);
-                                return;
-                            }
-
-                            if last_char[0] == b']' {
-                                if file.seek(SeekFrom::End(-1)).is_err() {
-                                    reset_file(&mut file, &event_json);
-                                    return;
-                                }
-
-                                if let Err(e) =
-                                    file.write_all(format!(",\n{}\n]", event_json).as_bytes())
-                                {
-                                    error!("Failed to append to log.json: {}", e);
-                                }
-                                return;
-                            }
-                        }
-                        reset_file(&mut file, &event_json);
-                    }
-                    Err(_) => reset_file(&mut file, &event_json),
-                },
-                Err(e) => error!("Failed to open log.json for appending: {}", e),
-            }
-        }
+        Ok(json) => write_json_to_log_file(&json),
         Err(e) => error!("Failed to serialize event: {}", e),
     }
 }
 
-fn reset_file(file: &mut File, event_json: &str) {
+fn write_json_to_log_file(json_str: &str) {
+    let log_path = Path::new("log.json");
+
+    if !log_path.exists() {
+        match File::create(log_path) {
+            Ok(mut file) => {
+                if let Err(e) = file.write_all(format!("[\n{}\n]", json_str).as_bytes()) {
+                    error!("Failed to write to log.json: {}", e);
+                }
+            }
+            Err(e) => error!("Failed to create log.json: {}", e),
+        }
+        return;
+    }
+
+    match OpenOptions::new().read(true).write(true).open(log_path) {
+        Ok(mut file) => match file.metadata() {
+            Ok(metadata) => {
+                if metadata.len() > 0 {
+                    if file.seek(SeekFrom::End(-1)).is_err() {
+                        reset_file(&mut file, json_str);
+                        return;
+                    }
+
+                    let mut last_char = [0u8; 1];
+                    if file.read_exact(&mut last_char).is_err() {
+                        reset_file(&mut file, json_str);
+                        return;
+                    }
+
+                    if last_char[0] == b']' {
+                        if file.seek(SeekFrom::End(-1)).is_err() {
+                            reset_file(&mut file, json_str);
+                            return;
+                        }
+
+                        if let Err(e) = file.write_all(format!(",\n{}\n]", json_str).as_bytes()) {
+                            error!("Failed to append to log.json: {}", e);
+                        }
+                        return;
+                    }
+                }
+                reset_file(&mut file, json_str);
+            }
+            Err(_) => reset_file(&mut file, json_str),
+        },
+        Err(e) => error!("Failed to open log.json for appending: {}", e),
+    }
+}
+
+fn reset_file(file: &mut File, json_str: &str) {
     if file.seek(SeekFrom::Start(0)).is_err() || file.set_len(0).is_err() {
         error!("Failed to reset file");
         return;
     }
 
-    if let Err(e) = file.write_all(format!("[\n{}\n]", event_json).as_bytes()) {
+    if let Err(e) = file.write_all(format!("[\n{}\n]", json_str).as_bytes()) {
         error!("Failed to write to log.json: {}", e);
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::fs;
+
     use battle_data::battle::battle_data::BattleData;
     use battle_data::battle::battle_status::BattleStatus;
     use battle_data::battle::battle_tracing::BattleTracing;
@@ -201,6 +227,7 @@ mod tests {
     use core_data::identifiers::{BattleId, UserId};
     use core_data::numerics::{Energy, Points, Spark, TurnId};
     use core_data::types::PlayerName;
+    use display_data::command::CommandSequence;
     use rand_xoshiro::rand_core::SeedableRng;
     use rand_xoshiro::Xoshiro256PlusPlus;
     use uuid::Uuid;
@@ -332,5 +359,24 @@ mod tests {
         assert_eq!(events[1].m, "With expressions");
         assert_eq!(events[1].values.get("player_name").unwrap(), "\"One\"");
         assert_eq!(events[1].values.get("doubled_count").unwrap(), "4");
+    }
+
+    #[test]
+    fn test_write_commands() {
+        let sequence = CommandSequence { groups: vec![] };
+        let battle = create_test_battle();
+
+        let log_path = "log.json";
+        if fs::metadata(log_path).is_ok() {
+            fs::remove_file(log_path).unwrap();
+        }
+
+        super::write_commands(Some(&battle), "Command sequence", &sequence);
+
+        assert!(fs::metadata(log_path).is_ok());
+        let contents = fs::read_to_string(log_path).unwrap();
+        assert!(contents.contains("groups"));
+
+        fs::remove_file(log_path).unwrap();
     }
 }

@@ -15,6 +15,7 @@ use display_data::request_data::{
     ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse,
 };
 use game_creation::new_battle;
+use logging::battle_trace;
 use tracing::{error, info};
 use uuid::Uuid;
 
@@ -42,7 +43,11 @@ pub fn connect(request: &ConnectRequest) -> ConnectResponse {
 }
 
 pub fn poll(user_id: UserId) -> Option<CommandSequence> {
-    handle_battle_action::poll(user_id)
+    if let Some(commands) = handle_battle_action::poll(user_id) {
+        battle_trace::write_commands(None, "Returning async command sequence", &commands);
+        return Some(commands);
+    }
+    None
 }
 
 pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
@@ -59,7 +64,14 @@ pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
             let commands = match request.action {
                 GameAction::BattleAction(action) => {
                     let player = renderer::player_name_for_user(&battle, user_id);
-                    handle_battle_action::execute(&mut battle, user_id, player, action)
+                    let response =
+                        handle_battle_action::execute(&mut battle, user_id, player, action);
+                    battle_trace::write_commands(
+                        Some(&battle),
+                        "Returning command sequence",
+                        &response,
+                    );
+                    response
                 }
                 _ => todo!("Implement other actions"),
             };

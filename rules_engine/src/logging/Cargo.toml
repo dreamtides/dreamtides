@@ -9,9 +9,9 @@ doctest = false
 bench = false
 
 [dependencies]
+display_data = { path = "../display_data" }
 battle_data = { path = "../battle_data" }
 core_data = { path = "../core_data" }
-assert_with = { path = "../assert_with" }
 
 rand_xoshiro = "0.7"
 serde = { version = "1", features = ["derive"] }

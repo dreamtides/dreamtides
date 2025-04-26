@@ -87,7 +87,7 @@ fn execute_agent_action(
         let next_action = agent_search::select_action(&battle, player, &agent);
         battle_trace!("Executing action for AI player", battle, next_action);
 
-        thread::sleep(Duration::from_secs(1));
+        thread::sleep(Duration::from_secs(2));
 
         battle_actions::execute(&mut battle, player, next_action);
 

@@ -1208,9 +1208,9 @@ checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
 name = "logging"
 version = "0.0.0"
 dependencies = [
- "assert_with",
  "battle_data",
  "core_data",
+ "display_data",
  "rand_xoshiro",
  "serde",
  "serde_json",

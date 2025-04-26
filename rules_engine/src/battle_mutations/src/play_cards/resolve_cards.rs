@@ -1,4 +1,5 @@
 use ability_data::ability::Ability;
+use assert_with::assert_that;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_cards::card_id::StackCardId;
@@ -15,6 +16,8 @@ use crate::zone_mutations::move_card;
 /// Cards resolve in Last In, First Out order, meaning the top card of the stack
 /// is resolved first.
 pub fn resolve_stack(battle: &mut BattleData) {
+    assert_that!(!battle.cards.stack().is_empty(), battle, || "No cards on the stack to resolve");
+
     while let Some(card_id) = battle.cards.stack().last() {
         resolve_card(battle, *card_id);
 

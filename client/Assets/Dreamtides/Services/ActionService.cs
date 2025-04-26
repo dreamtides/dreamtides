@@ -14,10 +14,19 @@ namespace Dreamtides.Services
 {
   public class ActionService : Service
   {
+    private struct CommandBatch
+    {
+      public CommandSequence? Commands;
+      public bool Animate;
+    }
+
     bool _devModeAutoConnect;
     float _lastConnectAttemptTime;
     Metadata? _metadata;
     string? _testScenario;
+
+    private Queue<CommandBatch> _commandQueue = new Queue<CommandBatch>();
+    private bool _isProcessingCommands = false;
 
     public bool Connected { get; private set; }
 
@@ -178,6 +187,16 @@ namespace Dreamtides.Services
       {
         yield break;
       }
+
+      if (_isProcessingCommands)
+      {
+        LogUtils.Log("ActionService", "Queueing commands for later processing");
+        _commandQueue.Enqueue(new CommandBatch { Commands = commands, Animate = animate });
+        yield break;
+      }
+
+      _isProcessingCommands = true;
+
       var count = commands.Groups.Sum(group => group.Commands.Count);
       if (count > 1)
       {
@@ -193,6 +212,15 @@ namespace Dreamtides.Services
       {
         yield return new WaitForEndOfFrame();
         Connected = true;
+      }
+
+      _isProcessingCommands = false;
+
+      if (_commandQueue.Count > 0)
+      {
+        LogUtils.Log("ActionService", $"Processing {_commandQueue.Count} queued command sequences");
+        var nextBatch = _commandQueue.Dequeue();
+        StartCoroutine(ApplyCommands(nextBatch.Commands, nextBatch.Animate));
       }
     }
 
