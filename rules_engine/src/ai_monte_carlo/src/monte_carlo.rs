@@ -93,6 +93,7 @@ type SearchGraph<TState> = Graph<SearchNode<TState>, SearchEdge<TState>>;
 /// ```
 pub struct MonteCarloAlgorithm<TScoreAlgorithm: ChildScoreAlgorithm> {
     pub child_score_algorithm: TScoreAlgorithm,
+    pub max_iterations: Option<u32>,
 }
 
 impl<TScoreAlgorithm: ChildScoreAlgorithm> SelectionAlgorithm
@@ -110,7 +111,10 @@ impl<TScoreAlgorithm: ChildScoreAlgorithm> SelectionAlgorithm
         TEvaluator: StateEvaluator<TStateNode>,
     {
         self.run_search(
-            |i| i % 100 == 0 && config.deadline < Instant::now(),
+            |i| {
+                i % 100 == 0 && config.deadline < Instant::now()
+                    || self.max_iterations.map_or(false, |max| i >= max)
+            },
             node,
             evaluator,
             player,

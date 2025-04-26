@@ -24,6 +24,6 @@ pub const NIM_ALPHA_BETA_AGENT: AgentData<AlphaBetaAlgorithm, NimWinLossEvaluato
 pub const NIM_UCT1_AGENT: AgentData<MonteCarloAlgorithm<Uct1>, RandomPlayoutEvaluator, NimState> =
     AgentData::omniscient(
         "UCT1",
-        MonteCarloAlgorithm { child_score_algorithm: Uct1 {} },
+        MonteCarloAlgorithm { child_score_algorithm: Uct1 {}, max_iterations: None },
         RandomPlayoutEvaluator {},
     );

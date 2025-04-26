@@ -33,10 +33,12 @@ pub fn select_action(battle: &BattleData, player: PlayerName, game_ai: &GameAI) 
     let forest_subscriber =
         tracing_subscriber::registry().with(logging::create_forest_layer(filter));
     subscriber::with_default(forest_subscriber, || match game_ai {
+        GameAI::AlwaysPanic => panic!("Always panic agent called for an action"),
         GameAI::FirstAvailableAction => first_available_action(battle, player),
         GameAI::RandomAction => random_action(battle, player),
         GameAI::IterativeDeepening => iterative_deepening_action(battle),
-        GameAI::Uct1 => uct1_action(battle),
+        GameAI::Uct1 => uct1_action(battle, None),
+        GameAI::Uct1MaxIterations(max_iterations) => uct1_action(battle, Some(*max_iterations)),
     })
 }
 
@@ -64,10 +66,10 @@ fn iterative_deepening_action(battle: &BattleData) -> BattleAction {
     agent.pick_action(AgentConfig::with_deadline(1), &AgentBattleState(battle.clone()))
 }
 
-fn uct1_action(battle: &BattleData) -> BattleAction {
+fn uct1_action(battle: &BattleData, max_iterations: Option<u32>) -> BattleAction {
     let agent = AgentData::omniscient(
         "UCT1",
-        MonteCarloAlgorithm { child_score_algorithm: Uct1 {} },
+        MonteCarloAlgorithm { child_score_algorithm: Uct1 {}, max_iterations },
         RandomPlayoutEvaluator {},
     );
     agent.pick_action(AgentConfig::with_deadline(1), &AgentBattleState(battle.clone()))
