@@ -93,6 +93,7 @@ fn connect_internal(user_id: UserId) {
                 info!(?user_id, "Restarting current battle");
                 *battle_lock =
                     Some(new_battle::create_and_start(user_id, BattleId(Uuid::new_v4())));
+                battle_trace::clear_log_file();
                 return;
             }
         }

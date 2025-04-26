@@ -79,8 +79,8 @@ impl BattleData {
     }
 
     /// Returns a clone of this battle data with the animation tracker removed.
-    pub fn clone_without_animations(&self) -> Self {
-        Self { animations: None, ..self.clone() }
+    pub fn clone_for_ai_search(&self) -> Self {
+        Self { animations: None, tracing: None, ..self.clone() }
     }
 
     /// Pushes a new animation step onto the animation tracker, if animation

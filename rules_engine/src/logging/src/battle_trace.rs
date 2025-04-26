@@ -1,4 +1,4 @@
-use std::fs::{File, OpenOptions};
+use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::Path;
 
@@ -148,6 +148,13 @@ pub fn write_battle_event(event: &BattleTraceEvent) {
     match serde_json::to_string_pretty(event) {
         Ok(json) => write_json_to_log_file(&json),
         Err(e) => error!("Failed to serialize event: {}", e),
+    }
+}
+
+pub fn clear_log_file() {
+    let log_path = Path::new("log.json");
+    if log_path.exists() {
+        fs::remove_file(log_path).expect("Failed to clear log.json");
     }
 }
 

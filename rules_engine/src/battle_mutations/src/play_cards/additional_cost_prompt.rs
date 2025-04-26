@@ -10,6 +10,7 @@ use battle_data::prompt_types::prompt_data::{
 };
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
+use logging::battle_trace;
 
 /// Adds a prompt for the controller of the `card_id` card to pay additional
 /// costs for this card, if any.
@@ -28,6 +29,7 @@ pub fn add_additional_cost_prompt(
             if let Some(prompt_data) =
                 create_prompt_for_cost(battle, player, source, event.additional_cost.as_ref())
             {
+                battle_trace!("Adding additional cost prompt", battle, prompt_data);
                 battle.prompt = Some(prompt_data);
                 return;
             }

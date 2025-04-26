@@ -31,7 +31,7 @@ impl GameStateNode for AgentBattleState {
     type PlayerName = PlayerName;
 
     fn make_copy(&self) -> Self {
-        Self(self.clone_without_animations())
+        Self(self.clone_for_ai_search())
     }
 
     fn status(&self) -> GameStatus<PlayerName> {
