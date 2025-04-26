@@ -6,6 +6,7 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::Router;
+use display_data::command::CommandSequence;
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse, PollRequest,
     PollResponse,
@@ -85,7 +86,9 @@ async fn perform_action(
         Ok(Json(client_test_scenarios::perform_action(&req, scenario)))
     } else {
         info!(?action, ?user_id, "Got perform action request");
-        Ok(Json(engine::perform_action(&req)))
+        let metadata = req.metadata;
+        engine::perform_action(req);
+        Ok(Json(PerformActionResponse { metadata, commands: CommandSequence::default() }))
     }
 }
 

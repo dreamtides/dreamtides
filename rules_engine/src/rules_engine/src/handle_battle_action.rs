@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::{LazyLock, Mutex};
+use std::thread;
 use std::time::Duration;
-use std::{panic, thread};
 
 use action_data::battle_action::BattleAction;
 use actions::battle_actions;
@@ -16,8 +16,7 @@ use core_data::types::PlayerName;
 use display::rendering::renderer;
 use display_data::command::CommandSequence;
 use logging::battle_trace;
-use tokio::task::{self};
-use tracing::{error, instrument};
+use tracing::instrument;
 
 static PENDING_UPDATES: LazyLock<Mutex<HashMap<UserId, Vec<CommandSequence>>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
@@ -28,7 +27,7 @@ pub fn execute(
     initiated_by: UserId,
     player: PlayerName,
     action: BattleAction,
-) -> CommandSequence {
+) {
     let mut current_player = player;
     let mut current_action = action;
 
@@ -38,7 +37,8 @@ pub fn execute(
 
         let Some(next_player) = legal_actions::next_to_act(battle) else {
             battle_trace!("Rendering updates for game over", battle);
-            return render_updates(battle, initiated_by);
+            render_updates(battle, initiated_by);
+            return;
         };
 
         let legal_actions = legal_actions::compute(battle, next_player, LegalActions::default());
@@ -50,61 +50,17 @@ pub fn execute(
         }
 
         if let PlayerType::Agent(agent) = battle.player(next_player).player_type.clone() {
-            battle_trace!("Starting async agent action selection", battle);
-            let result = render_updates(battle, initiated_by);
+            render_updates(battle, initiated_by);
             battle.animations = Some(AnimationData::default());
-            spawn_agent_task(battle.clone(), next_player, agent, initiated_by);
-            return result;
+            execute_agent_action(battle, next_player, agent);
+            render_updates(battle, initiated_by);
+            return;
         } else {
             battle_trace!("Rendering updates for player", battle);
-            let result = render_updates(battle, initiated_by);
+            render_updates(battle, initiated_by);
             battle.animations = Some(AnimationData::default());
-            return result;
+            return;
         }
-    }
-}
-
-fn spawn_agent_task(battle: BattleData, player: PlayerName, agent: GameAI, initiated_by: UserId) {
-    task::spawn(async move {
-        let task_result =
-            task::spawn_blocking(move || execute_agent_action(battle, player, agent, initiated_by))
-                .await;
-
-        if let Err(e) = task_result {
-            error!("Agent task panicked: {}", e);
-        }
-    });
-}
-
-fn execute_agent_action(
-    mut battle: BattleData,
-    player: PlayerName,
-    agent: GameAI,
-    initiated_by: UserId,
-) {
-    let panic_result = panic::catch_unwind(panic::AssertUnwindSafe(|| {
-        battle_trace!("Selecting action for AI player", battle);
-        let next_action = agent_search::select_action(&battle, player, &agent);
-        battle_trace!("Executing action for AI player", battle, next_action);
-
-        thread::sleep(Duration::from_secs(2));
-
-        battle_actions::execute(&mut battle, player, next_action);
-
-        let updates = render_updates(&battle, initiated_by);
-
-        if let PlayerType::User(opponent_id) = battle.player(player.opponent()).player_type {
-            let mut pending_updates = PENDING_UPDATES.lock().unwrap();
-            pending_updates.entry(opponent_id).or_default().push(updates.clone());
-            pending_updates.entry(initiated_by).or_default().push(updates);
-        } else {
-            let mut pending_updates = PENDING_UPDATES.lock().unwrap();
-            pending_updates.entry(initiated_by).or_default().push(updates);
-        }
-    }));
-
-    if let Err(e) = panic_result {
-        error!("Agent action selection panicked: {:?}", e);
     }
 }
 
@@ -118,15 +74,28 @@ pub fn poll(user_id: UserId) -> Option<CommandSequence> {
     None
 }
 
-fn render_updates(battle: &BattleData, user_id: UserId) -> CommandSequence {
+/// Appends an update to the pending updates for a user.
+pub fn append_update(user_id: UserId, update: CommandSequence) {
+    let mut updates = PENDING_UPDATES.lock().unwrap();
+    updates.entry(user_id).or_default().push(update);
+}
+
+fn execute_agent_action(battle: &mut BattleData, player: PlayerName, agent: GameAI) {
+    battle_trace!("Selecting action for AI player", battle);
+    let next_action = agent_search::select_action(battle, player, &agent);
+    battle_trace!("Executing action for AI player", battle, next_action);
+    thread::sleep(Duration::from_secs(2));
+    battle_actions::execute(battle, player, next_action);
+}
+
+fn render_updates(battle: &BattleData, user_id: UserId) {
     let player_name = renderer::player_name_for_user(battle, user_id);
     let player_updates = renderer::render_updates(battle, user_id);
+    let mut updates = PENDING_UPDATES.lock().unwrap();
+    updates.entry(user_id).or_default().push(player_updates);
 
     if let PlayerType::User(opponent_id) = &battle.player(player_name.opponent()).player_type {
         let opponent_updates = renderer::render_updates(battle, *opponent_id);
-        let mut updates = PENDING_UPDATES.lock().unwrap();
         updates.entry(*opponent_id).or_default().push(opponent_updates);
     }
-
-    player_updates
 }

@@ -3,7 +3,8 @@
 use std::panic::{self, UnwindSafe};
 
 use anyhow::Result;
-use display_data::request_data::{ConnectRequest, PerformActionRequest};
+use display_data::command::CommandSequence;
+use display_data::request_data::{ConnectRequest, PerformActionRequest, PerformActionResponse};
 use rules_engine::engine;
 
 /// Synchronize the state of an ongoing game, downloading a full description of
@@ -77,8 +78,10 @@ unsafe fn perform_impl(
 ) -> Result<i32> {
     let request_data = std::slice::from_raw_parts(request, request_length as usize);
     let deserialized_request = serde_json::from_slice::<PerformActionRequest>(request_data)?;
-    println!("perform_action: {:?}", deserialized_request.metadata.user_id);
-    let scene = engine::perform_action(&deserialized_request);
+    let metadata = deserialized_request.metadata;
+    engine::perform_action(deserialized_request);
+    // TODO: Implement this
+    let scene = PerformActionResponse { metadata, commands: CommandSequence::default() };
     let json = serde_json::to_string(&scene)?;
     let json_bytes = json.as_bytes();
 

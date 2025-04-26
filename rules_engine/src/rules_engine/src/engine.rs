@@ -11,11 +11,10 @@ use battle_data::battle_player::player_data::PlayerType;
 use core_data::identifiers::{BattleId, UserId};
 use display::rendering::renderer;
 use display_data::command::CommandSequence;
-use display_data::request_data::{
-    ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse,
-};
+use display_data::request_data::{ConnectRequest, ConnectResponse, PerformActionRequest};
 use game_creation::new_battle;
 use logging::battle_trace;
+use tokio::task;
 use tracing::{error, info};
 use uuid::Uuid;
 
@@ -32,14 +31,14 @@ pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     let commands = catch_panic(
         AssertUnwindSafe(|| {
             connect_internal(request.metadata.user_id);
-            renderer::connect(
+            Some(renderer::connect(
                 CURRENT_BATTLE.lock().unwrap().as_ref().unwrap(),
                 request.metadata.user_id,
-            )
+            ))
         }),
         None,
     );
-    ConnectResponse { metadata, commands }
+    ConnectResponse { metadata, commands: commands.unwrap() }
 }
 
 pub fn poll(user_id: UserId) -> Option<CommandSequence> {
@@ -50,37 +49,37 @@ pub fn poll(user_id: UserId) -> Option<CommandSequence> {
     None
 }
 
-pub fn perform_action(request: &PerformActionRequest) -> PerformActionResponse {
+pub fn perform_action(request: PerformActionRequest) {
+    task::spawn_blocking(move || perform_action_internal(&request));
+}
+
+fn perform_action_internal(request: &PerformActionRequest) {
     let battle_data = CURRENT_BATTLE.lock().unwrap().clone();
     let metadata = request.metadata;
     let user_id = metadata.user_id;
-    let commands = catch_panic(
+    let panic_commands = catch_panic(
         AssertUnwindSafe(|| {
             let mut battle = match &battle_data {
                 Some(battle) => battle.clone(),
                 None => panic!("No battle found"),
             };
             battle.animations = Some(AnimationData::default());
-            let commands = match request.action {
+            match request.action {
                 GameAction::BattleAction(action) => {
                     let player = renderer::player_name_for_user(&battle, user_id);
-                    let response =
-                        handle_battle_action::execute(&mut battle, user_id, player, action);
-                    battle_trace::write_commands(
-                        Some(&battle),
-                        "Returning command sequence",
-                        &response,
-                    );
-                    response
+                    handle_battle_action::execute(&mut battle, user_id, player, action);
                 }
                 _ => todo!("Implement other actions"),
             };
             *CURRENT_BATTLE.lock().unwrap() = Some(battle);
-            commands
+            None
         }),
         battle_data.as_ref(),
     );
-    PerformActionResponse { metadata, commands }
+
+    if let Some(commands) = panic_commands {
+        handle_battle_action::append_update(user_id, commands);
+    }
 }
 
 fn connect_internal(user_id: UserId) {
@@ -118,9 +117,9 @@ fn connect_internal(user_id: UserId) {
     *battle_lock = Some(new_battle::create_and_start(user_id, BattleId(Uuid::new_v4())));
 }
 
-fn catch_panic<F>(f: F, battle: Option<&BattleData>) -> CommandSequence
+fn catch_panic<F>(f: F, battle: Option<&BattleData>) -> Option<CommandSequence>
 where
-    F: FnOnce() -> CommandSequence + panic::UnwindSafe,
+    F: FnOnce() -> Option<CommandSequence> + panic::UnwindSafe,
 {
     // Clear any previous panic info
     PANIC_INFO.with(|info| {
@@ -183,13 +182,13 @@ where
 
             match battle {
                 Some(battle_data) => {
-                    error_message::display_error_message(battle_data, error_message)
+                    Some(error_message::display_error_message(battle_data, error_message))
                 }
                 None => {
                     // Create a dummy battle if none exists
                     let id = BattleId(Uuid::new_v4());
                     let dummy_battle = new_battle::create_and_start(UserId::default(), id);
-                    error_message::display_error_message(&dummy_battle, error_message)
+                    Some(error_message::display_error_message(&dummy_battle, error_message))
                 }
             }
         }
