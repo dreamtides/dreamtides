@@ -114,6 +114,7 @@ dependencies = [
  "ai_core",
  "petgraph",
  "rand",
+ "tracing",
 ]
 
 [[package]]

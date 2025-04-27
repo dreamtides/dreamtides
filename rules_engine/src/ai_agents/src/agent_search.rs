@@ -37,8 +37,10 @@ pub fn select_action(battle: &BattleData, player: PlayerName, game_ai: &GameAI) 
         GameAI::FirstAvailableAction => first_available_action(battle, player),
         GameAI::RandomAction => random_action(battle, player),
         GameAI::IterativeDeepening => iterative_deepening_action(battle),
-        GameAI::Uct1 => uct1_action(battle, None),
-        GameAI::Uct1MaxIterations(max_iterations) => uct1_action(battle, Some(*max_iterations)),
+        GameAI::Uct1 => uct1_action(battle, 10, None),
+        GameAI::Uct1MaxIterations(max_iterations) => {
+            uct1_action(battle, 1000, Some(*max_iterations))
+        }
     })
 }
 
@@ -66,11 +68,11 @@ fn iterative_deepening_action(battle: &BattleData) -> BattleAction {
     agent.pick_action(AgentConfig::with_deadline(1), &AgentBattleState(battle.clone()))
 }
 
-fn uct1_action(battle: &BattleData, max_iterations: Option<u32>) -> BattleAction {
+fn uct1_action(battle: &BattleData, deadline: u64, max_iterations: Option<u32>) -> BattleAction {
     let agent = AgentData::omniscient(
         "UCT1",
         MonteCarloAlgorithm { child_score_algorithm: Uct1 {}, max_iterations },
         RandomPlayoutEvaluator {},
     );
-    agent.pick_action(AgentConfig::with_deadline(1), &AgentBattleState(battle.clone()))
+    agent.pick_action(AgentConfig::with_deadline(deadline), &AgentBattleState(battle.clone()))
 }

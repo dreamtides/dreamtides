@@ -14,3 +14,4 @@ ai_core = { path = "../ai_core", version = "0.0.0" }
 
 petgraph = "0.6"
 rand = "0.9"
+tracing = "0.1"

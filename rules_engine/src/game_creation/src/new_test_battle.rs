@@ -58,7 +58,7 @@ pub fn create_and_start(id: BattleId, user: PlayerType, enemy: PlayerType) -> Ba
         tracing: Some(BattleTracing::default()),
     };
 
-    for _ in 0..5 {
+    for _ in 0..25 {
         let mut p1_cards = create_cards(PlayerName::One);
         p1_cards.shuffle(&mut battle.rng);
         for card in p1_cards {
@@ -66,7 +66,7 @@ pub fn create_and_start(id: BattleId, user: PlayerType, enemy: PlayerType) -> Ba
         }
     }
 
-    for _ in 0..5 {
+    for _ in 0..25 {
         let mut p2_cards = create_cards(PlayerName::Two);
         p2_cards.shuffle(&mut battle.rng);
         for card in p2_cards {
