@@ -7,6 +7,7 @@ use battle_data::battle::request_context::RequestContext;
 use battle_data::battle::turn_data::TurnData;
 use battle_data::battle_cards::all_cards::AllCards;
 use battle_data::battle_player::player_data::{PlayerData, PlayerType};
+use battle_mutations::turn_step_mutations::start_turn;
 use battle_mutations::zone_mutations::{create_test_deck, deck};
 use core_data::identifiers::BattleId;
 use core_data::numerics::{Energy, Points, Spark, TurnId};
@@ -28,16 +29,16 @@ pub fn create_and_start(
             player_type: user,
             points: Points(0),
             spark_bonus: Spark(0),
-            current_energy: Energy(2),
-            produced_energy: Energy(2),
+            current_energy: Energy(0),
+            produced_energy: Energy(0),
         },
         player_two: PlayerData {
             name: PlayerName::Two,
             player_type: enemy,
             points: Points(0),
             spark_bonus: Spark(0),
-            current_energy: Energy(2),
-            produced_energy: Energy(2),
+            current_energy: Energy(0),
+            produced_energy: Energy(0),
         },
         cards: AllCards::default(),
         status: BattleStatus::Setup,
@@ -68,6 +69,6 @@ pub fn create_and_start(
         PlayerName::Two,
         5,
     );
-    battle.step = BattleTurnStep::Main;
+    start_turn::run(&mut battle, PlayerName::One);
     battle
 }
