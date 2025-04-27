@@ -48,16 +48,21 @@ pub struct InterfaceView {
 
     /// Primary action button, used for confirming selections and ending the
     /// turn. None indicates no button should be shown.
-    pub primary_action_button: Option<ActionButtonView>,
+    pub primary_action_button: Option<ButtonView>,
+
+    /// If provided, when the primary action button is not visible, the button
+    /// will wait for this duration after the last "update" before appearing. If
+    /// this is None the button will display immediately.
+    pub primary_action_show_on_idle_duration: Option<Milliseconds>,
 
     /// Secondary action button, used for alternative choice options.
-    pub secondary_action_button: Option<ActionButtonView>,
+    pub secondary_action_button: Option<ButtonView>,
 
     /// Button to increment the number shown in a number prompt.
-    pub increment_button: Option<ActionButtonView>,
+    pub increment_button: Option<ButtonView>,
 
     /// Button to decrement the number shown in a number prompt.
-    pub decrement_button: Option<ActionButtonView>,
+    pub decrement_button: Option<ButtonView>,
 
     /// Options for display of the card order selector
     pub card_order_selector: Option<CardOrderSelectorView>,
@@ -76,27 +81,15 @@ pub struct CardOrderSelectorView {
     pub include_void: bool,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct ActionButtonView {
-    pub label: String,
-
-    /// Action to perform when the button is clicked. If None is provided, the
-    /// button will appear disabled.
-    pub action: Option<GameAction>,
-
-    /// If provided, when the button is not visible, the button will wait for
-    /// this duration after the last "update" before appearing. If this is None
-    /// the button will display immediately.
-    pub show_on_idle_duration: Option<Milliseconds>,
-}
-
 /// Button to perform some game action
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct ButtonView {
     pub label: String,
-    pub action: GameAction,
+
+    /// Action to perform when the button is clicked. If None is provided, the
+    /// button will appear disabled.
+    pub action: Option<GameAction>,
 }
 
 /// Represents the visual state of a player in a game

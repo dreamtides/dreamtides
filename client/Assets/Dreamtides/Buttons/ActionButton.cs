@@ -31,7 +31,7 @@ namespace Dreamtides.Buttons
     GameAction? _action;
     float? _showOnIdleDuration;
     float? _lastSetViewTime;
-    ActionButtonView? _pendingView;
+    ButtonView? _pendingView;
     bool _isVisible = false;
     private bool _isAnimating = false;
 
@@ -65,7 +65,7 @@ namespace Dreamtides.Buttons
       _background.color = targetColor;
     }
 
-    public void SetView(ActionButtonView? view)
+    public void SetView(ButtonView? view, Milliseconds? showOnIdleDuration = null)
     {
       _lastSetViewTime = Time.time;
 
@@ -77,7 +77,7 @@ namespace Dreamtides.Buttons
         return;
       }
 
-      _showOnIdleDuration = view.ShowOnIdleDuration?.ToSeconds();
+      _showOnIdleDuration = showOnIdleDuration?.ToSeconds();
 
       if (_showOnIdleDuration.HasValue && !_isVisible)
       {
@@ -89,7 +89,7 @@ namespace Dreamtides.Buttons
       }
     }
 
-    private void ApplyView(ActionButtonView? view)
+    private void ApplyView(ButtonView? view)
     {
       if (_isAnimating)
       {

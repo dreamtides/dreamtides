@@ -6,8 +6,8 @@ use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::CardFacing;
 use display_data::battle_view::{
-    ActionButtonView, BattlePreviewView, BattleView, DisplayPlayer, InterfaceView,
-    PlayerPreviewView, PlayerView,
+    BattlePreviewView, BattleView, ButtonView, DisplayPlayer, InterfaceView, PlayerPreviewView,
+    PlayerView,
 };
 use display_data::card_view::{
     CardActions, CardEffects, CardPrefab, CardPreviewView, CardView, DisplayImage, RevealedCardView,
@@ -56,10 +56,9 @@ pub fn create(id: BattleId) -> BattleView {
         .concat()
         .to_vec(),
         interface: InterfaceView {
-            primary_action_button: Some(ActionButtonView {
+            primary_action_button: Some(ButtonView {
                 label: "End Turn".to_string(),
                 action: Some(GameAction::DebugAction(DebugAction::ApplyTestScenarioAction)),
-                show_on_idle_duration: None,
             }),
             ..Default::default()
         },

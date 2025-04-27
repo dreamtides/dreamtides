@@ -14,9 +14,7 @@ use core_data::display_types::{
 };
 use core_data::identifiers::{BattleId, CardId};
 use core_data::numerics::{Energy, Spark};
-use display_data::battle_view::{
-    ActionButtonView, BattleView, ButtonView, CardOrderSelectorView, DisplayPlayer,
-};
+use display_data::battle_view::{BattleView, ButtonView, CardOrderSelectorView, DisplayPlayer};
 use display_data::card_view::CardView;
 use display_data::command::{
     ArrowStyle, Command, CommandSequence, DisplayArrow, DisplayArrowsCommand,
@@ -212,10 +210,9 @@ fn select_card(card_id: CardId) -> CommandSequence {
     }
 
     battle.interface.screen_overlay = None;
-    battle.interface.primary_action_button = Some(ActionButtonView {
+    battle.interface.primary_action_button = Some(ButtonView {
         label: "End Turn".to_string(),
         action: Some(GameAction::DebugAction(DebugAction::TriggerEnemyJudgment)),
-        show_on_idle_duration: None,
     });
 
     clear_all_statuses(&mut battle);
@@ -345,7 +342,7 @@ fn play_card_with_order_selector(
     *CARD_ORDER_ORIGINAL_POSITIONS.lock().unwrap() = std::collections::HashMap::new();
     battle.interface.bottom_right_button = Some(ButtonView {
         label: "\u{f070} Hide Browser".to_string(),
-        action: GameAction::BattleAction(BattleAction::ToggleOrderSelectorVisibility),
+        action: Some(GameAction::BattleAction(BattleAction::ToggleOrderSelectorVisibility)),
     });
 
     if let (Some(c1_view), Some(c2_view)) = (c1, c2) {
@@ -359,10 +356,9 @@ fn play_card_with_order_selector(
     }
     battle.interface.card_order_selector =
         Some(CardOrderSelectorView { include_deck: true, include_void: true });
-    battle.interface.primary_action_button = Some(ActionButtonView {
+    battle.interface.primary_action_button = Some(ButtonView {
         label: "End Turn".to_string(),
         action: Some(GameAction::DebugAction(DebugAction::TriggerEnemyJudgment)),
-        show_on_idle_duration: None,
     });
 
     *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());

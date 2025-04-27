@@ -8,7 +8,7 @@ use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions::LegalActions;
 use battle_queries::player_queries::spark_total;
 use core_data::numerics::Energy;
-use display_data::battle_view::{ActionButtonView, BattleView, InterfaceView, PlayerView};
+use display_data::battle_view::{BattleView, ButtonView, InterfaceView, PlayerView};
 use display_data::command::{Command, GameMessageType, UpdateBattleCommand};
 
 use crate::core::card_view_context::CardViewContext;
@@ -68,6 +68,7 @@ fn interface_view(builder: &ResponseBuilder, battle: &BattleData) -> InterfaceVi
     InterfaceView {
         screen_overlay: None,
         primary_action_button: primary_action_button(builder, battle, &legal_actions),
+        primary_action_show_on_idle_duration: None,
         secondary_action_button: secondary_action_button(battle, &legal_actions),
         increment_button: increment_button(builder, battle),
         decrement_button: decrement_button(builder, battle),
@@ -80,7 +81,7 @@ fn primary_action_button(
     builder: &ResponseBuilder,
     battle: &BattleData,
     legal_actions: &[BattleAction],
-) -> Option<ActionButtonView> {
+) -> Option<ButtonView> {
     if legal_actions.contains(&BattleAction::SelectPromptChoice(0)) {
         let prompt = expect!(battle.prompt.as_ref(), battle, || {
             "Expected prompt for SelectPromptChoice action"
@@ -89,10 +90,9 @@ fn primary_action_button(
             panic_with!(battle, "Expected a Choose prompt");
         };
         assert_that!(!choices.is_empty(), battle, || "Expected a Choose prompt with choices");
-        return Some(ActionButtonView {
+        return Some(ButtonView {
             label: choices[0].label.clone(),
             action: Some(BattleAction::SelectPromptChoice(0).into()),
-            show_on_idle_duration: None,
         });
     }
 
@@ -100,30 +100,26 @@ fn primary_action_button(
         && prompt.player == builder.act_for_player()
         && let Prompt::ChooseEnergyValue { current, .. } = &prompt.prompt
     {
-        return Some(ActionButtonView {
+        return Some(ButtonView {
             label: format!("Spend {}\u{f7e4}", current),
             action: Some(BattleAction::SelectEnergyAdditionalCost(*current).into()),
-            show_on_idle_duration: None,
         });
     }
 
     if legal_actions.contains(&BattleAction::PassPriority) {
-        Some(ActionButtonView {
+        Some(ButtonView {
             label: "Resolve".to_string(),
             action: Some(BattleAction::PassPriority.into()),
-            show_on_idle_duration: None,
         })
     } else if legal_actions.contains(&BattleAction::EndTurn) {
-        Some(ActionButtonView {
+        Some(ButtonView {
             label: "End Turn".to_string(),
             action: Some(BattleAction::EndTurn.into()),
-            show_on_idle_duration: None,
         })
     } else if legal_actions.contains(&BattleAction::StartNextTurn) {
-        Some(ActionButtonView {
+        Some(ButtonView {
             label: "Next Turn".to_string(),
             action: Some(BattleAction::StartNextTurn.into()),
-            show_on_idle_duration: None,
         })
     } else {
         None
@@ -133,7 +129,7 @@ fn primary_action_button(
 fn secondary_action_button(
     battle: &BattleData,
     legal_actions: &[BattleAction],
-) -> Option<ActionButtonView> {
+) -> Option<ButtonView> {
     if legal_actions.contains(&BattleAction::SelectPromptChoice(1)) {
         let prompt = expect!(battle.prompt.as_ref(), battle, || {
             "Expected prompt for SelectPromptChoice action"
@@ -142,48 +138,45 @@ fn secondary_action_button(
             panic_with!(battle, "Expected a Choose prompt");
         };
         assert_that!(!choices.is_empty(), battle, || "Expected a Choose prompt with choices");
-        Some(ActionButtonView {
+        Some(ButtonView {
             label: choices[1].label.clone(),
             action: Some(BattleAction::SelectPromptChoice(1).into()),
-            show_on_idle_duration: None,
         })
     } else {
         None
     }
 }
 
-fn increment_button(builder: &ResponseBuilder, battle: &BattleData) -> Option<ActionButtonView> {
+fn increment_button(builder: &ResponseBuilder, battle: &BattleData) -> Option<ButtonView> {
     if let Some(prompt) = battle.prompt.as_ref()
         && prompt.player == builder.act_for_player()
         && let Prompt::ChooseEnergyValue { current, .. } = &prompt.prompt
     {
-        return Some(ActionButtonView {
+        return Some(ButtonView {
             label: "+1\u{f7e4}".to_string(),
             action: if *current < battle.player(builder.act_for_player()).current_energy {
                 Some(BattleAction::SetSelectedEnergyAdditionalCost(*current + Energy(1)).into())
             } else {
                 None
             },
-            show_on_idle_duration: None,
         });
     }
 
     None
 }
 
-fn decrement_button(builder: &ResponseBuilder, battle: &BattleData) -> Option<ActionButtonView> {
+fn decrement_button(builder: &ResponseBuilder, battle: &BattleData) -> Option<ButtonView> {
     if let Some(prompt) = battle.prompt.as_ref()
         && prompt.player == builder.act_for_player()
         && let Prompt::ChooseEnergyValue { current, .. } = &prompt.prompt
     {
-        return Some(ActionButtonView {
+        return Some(ButtonView {
             label: "\u{2212}1\u{f7e4}".to_string(),
             action: if *current > Energy(0) {
                 Some(BattleAction::SetSelectedEnergyAdditionalCost(*current - Energy(1)).into())
             } else {
                 None
             },
-            show_on_idle_duration: None,
         });
     }
 

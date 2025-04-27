@@ -240,7 +240,9 @@ namespace Dreamtides.Services
           Registry.Layout.EnemyStatusDisplay.UpdatePlayerView(command.UpdateBattle.Battle.Enemy, animate);
           Registry.DocumentService.RenderScreenOverlay(command.UpdateBattle.Battle.Interface?.ScreenOverlay);
           Registry.Layout.CardOrderSelector.View = command.UpdateBattle.Battle.Interface?.CardOrderSelector;
-          Registry.Layout.PrimaryActionButton.SetView(command.UpdateBattle.Battle.Interface?.PrimaryActionButton);
+          Registry.Layout.PrimaryActionButton.SetView(
+              command.UpdateBattle.Battle.Interface?.PrimaryActionButton,
+              command.UpdateBattle.Battle.Interface?.PrimaryActionShowOnIdleDuration);
           Registry.Layout.SecondaryActionButton.SetView(command.UpdateBattle.Battle.Interface?.SecondaryActionButton);
           Registry.Layout.IncrementActionButton.SetView(command.UpdateBattle.Battle.Interface?.IncrementButton);
           Registry.Layout.DecrementActionButton.SetView(command.UpdateBattle.Battle.Interface?.DecrementButton);

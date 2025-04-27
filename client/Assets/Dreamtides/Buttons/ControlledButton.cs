@@ -21,7 +21,10 @@ namespace Dreamtides.Buttons
 
     public void OnClick()
     {
-      _registry.ActionService.PerformAction(Errors.CheckNotNull(_view?.Action));
+      if (_view?.Action != null)
+      {
+        _registry.ActionService.PerformAction(_view.Action.ToGameAction());
+      }
     }
 
     public void SetView(ButtonView? view)

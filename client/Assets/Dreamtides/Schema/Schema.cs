@@ -1547,20 +1547,28 @@ namespace Dreamtides.Schema
         /// Button to decrement the number shown in a number prompt.
         /// </summary>
         [JsonProperty("decrementButton")]
-        public ActionButtonView DecrementButton { get; set; }
+        public ButtonView DecrementButton { get; set; }
 
         /// <summary>
         /// Button to increment the number shown in a number prompt.
         /// </summary>
         [JsonProperty("incrementButton")]
-        public ActionButtonView IncrementButton { get; set; }
+        public ButtonView IncrementButton { get; set; }
 
         /// <summary>
         /// Primary action button, used for confirming selections and ending the turn. None indicates
         /// no button should be shown.
         /// </summary>
         [JsonProperty("primaryActionButton")]
-        public ActionButtonView PrimaryActionButton { get; set; }
+        public ButtonView PrimaryActionButton { get; set; }
+
+        /// <summary>
+        /// If provided, when the primary action button is not visible, the button will wait for this
+        /// duration after the last "update" before appearing. If this is None the button will
+        /// display immediately.
+        /// </summary>
+        [JsonProperty("primaryActionShowOnIdleDuration")]
+        public Milliseconds PrimaryActionShowOnIdleDuration { get; set; }
 
         /// <summary>
         /// Content to display on top of all other game UI.
@@ -1572,7 +1580,7 @@ namespace Dreamtides.Schema
         /// Secondary action button, used for alternative choice options.
         /// </summary>
         [JsonProperty("secondaryActionButton")]
-        public ActionButtonView SecondaryActionButton { get; set; }
+        public ButtonView SecondaryActionButton { get; set; }
     }
 
     /// <summary>
@@ -1580,23 +1588,15 @@ namespace Dreamtides.Schema
     /// </summary>
     public partial class ButtonView
     {
-        [JsonProperty("action", Required = Required.Always)]
-        public GameAction Action { get; set; }
+        /// <summary>
+        /// Action to perform when the button is clicked. If None is provided, the button will appear
+        /// disabled.
+        /// </summary>
+        [JsonProperty("action")]
+        public ActionClass Action { get; set; }
 
         [JsonProperty("label", Required = Required.Always)]
         public string Label { get; set; }
-    }
-
-    /// <summary>
-    /// All possible user interface actions
-    /// </summary>
-    public partial class GameAction
-    {
-        [JsonProperty("debugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DebugAction? DebugAction { get; set; }
-
-        [JsonProperty("battleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public BattleAction? BattleAction { get; set; }
     }
 
     public partial class CardOrderSelectorView
@@ -1614,26 +1614,6 @@ namespace Dreamtides.Schema
         public bool IncludeVoid { get; set; }
     }
 
-    public partial class ActionButtonView
-    {
-        /// <summary>
-        /// Action to perform when the button is clicked. If None is provided, the button will appear
-        /// disabled.
-        /// </summary>
-        [JsonProperty("action")]
-        public ActionClass Action { get; set; }
-
-        [JsonProperty("label", Required = Required.Always)]
-        public string Label { get; set; }
-
-        /// <summary>
-        /// If provided, when the button is not visible, the button will wait for this duration after
-        /// the last "update" before appearing. If this is None the button will display immediately.
-        /// </summary>
-        [JsonProperty("showOnIdleDuration")]
-        public Milliseconds ShowOnIdleDuration { get; set; }
-    }
-
     public partial class PerformActionRequest
     {
         [JsonProperty("action", Required = Required.Always)]
@@ -1644,6 +1624,18 @@ namespace Dreamtides.Schema
 
         [JsonProperty("testScenario")]
         public string TestScenario { get; set; }
+    }
+
+    /// <summary>
+    /// All possible user interface actions
+    /// </summary>
+    public partial class GameAction
+    {
+        [JsonProperty("debugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DebugAction? DebugAction { get; set; }
+
+        [JsonProperty("battleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public BattleAction? BattleAction { get; set; }
     }
 
     public partial class PerformActionResponse
