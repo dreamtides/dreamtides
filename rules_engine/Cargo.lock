@@ -366,6 +366,8 @@ dependencies = [
  "battle_queries",
  "core_data",
  "logging",
+ "rand",
+ "rand_xoshiro",
  "tracing",
 ]
 

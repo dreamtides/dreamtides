@@ -11,7 +11,7 @@ pub fn create_and_start(user_id: UserId, battle_id: BattleId) -> BattleData {
     let mut battle = new_test_battle::create_and_start(
         battle_id,
         PlayerType::User(user_id),
-        PlayerType::Agent(GameAI::IterativeDeepening),
+        PlayerType::Agent(GameAI::Uct1MaxIterations(1000)),
     );
     battle.animations = Some(AnimationData::default());
     battle

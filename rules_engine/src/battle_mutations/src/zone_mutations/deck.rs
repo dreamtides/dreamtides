@@ -3,7 +3,7 @@ use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_cards::card_id::HandCardId;
 use core_data::types::PlayerName;
 
-use crate::zone_mutations::move_card;
+use crate::zone_mutations::{create_test_deck, move_card};
 
 /// Draw a card from `player`'s deck and put it into their hand. If their deck
 /// is empty, it will be replaced with a new shuffled copy of the deck.
@@ -16,7 +16,8 @@ pub fn draw_card(
     player: PlayerName,
 ) -> Option<HandCardId> {
     let Some(&id) = battle.cards.deck(player).back() else {
-        todo!("Todo: implement this");
+        create_test_deck::add(battle, player);
+        return draw_card(battle, source, player);
     };
     let id = move_card::to_hand(battle, source, id)?;
     battle.cards.card_mut(id)?.revealed_to_owner = true;
@@ -39,9 +40,4 @@ pub fn draw_cards(
         }
     }
     result
-}
-
-/// Shuffles the deck for the [PlayerName] player.
-pub fn shuffle(battle: &mut BattleData, player: PlayerName) {
-    battle.cards.shuffle_deck(player, &mut battle.rng);
 }
