@@ -62,5 +62,6 @@ pub fn create_and_start(id: BattleId, user: PlayerType, enemy: PlayerType) -> Ba
         PlayerName::Two,
         5,
     );
+    battle.step = BattleTurnStep::Main;
     battle
 }

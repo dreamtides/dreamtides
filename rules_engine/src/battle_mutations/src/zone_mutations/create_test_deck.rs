@@ -53,7 +53,7 @@ fn create_cards(player_name: PlayerName) -> Vec<CardData> {
     for _ in 0..3 {
         cards.push(CardData {
             id: CardId::default(),
-            identity: card_identities::UNKNOWN,
+            identity: card_identities::IMMOLATE,
             owner: player_name,
             zone: Zone::Deck,
             object_id: ObjectId::default(),
@@ -80,7 +80,7 @@ fn create_cards(player_name: PlayerName) -> Vec<CardData> {
     for _ in 0..3 {
         cards.push(CardData {
             id: CardId::default(),
-            identity: card_identities::UNKNOWN,
+            identity: card_identities::ABOLISH,
             owner: player_name,
             zone: Zone::Deck,
             object_id: ObjectId::default(),
@@ -107,7 +107,7 @@ fn create_cards(player_name: PlayerName) -> Vec<CardData> {
     for _ in 0..3 {
         cards.push(CardData {
             id: CardId::default(),
-            identity: card_identities::UNKNOWN,
+            identity: card_identities::RIPPLE_OF_DEFIANCE,
             owner: player_name,
             zone: Zone::Deck,
             object_id: ObjectId::default(),
@@ -135,7 +135,7 @@ fn create_cards(player_name: PlayerName) -> Vec<CardData> {
     for _ in 0..3 {
         cards.push(CardData {
             id: CardId::default(),
-            identity: card_identities::UNKNOWN,
+            identity: card_identities::DREAMSCATTER,
             owner: player_name,
             zone: Zone::Deck,
             object_id: ObjectId::default(),

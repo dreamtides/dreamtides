@@ -92,6 +92,18 @@ fn card_image(identity: CardIdentity) -> SpriteAddress {
         card_identities::MINSTREL_OF_FALLING_LIGHT => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
+        card_identities::IMMOLATE => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png",
+        ),
+        card_identities::RIPPLE_OF_DEFIANCE => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_2123360837.png",
+        ),
+        card_identities::ABOLISH => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1282908322.png",
+        ),
+        card_identities::DREAMSCATTER => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
+        ),
         _ => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1486924805.png",
         ),

@@ -15,13 +15,33 @@ MonoBehaviour:
   m_GroupName: CardImages
   m_GUID: 0e1a448110f5a499d90d688e02ac959b
   m_SerializeEntries:
+  - m_GUID: 0400f4ef9201d4ef993f6e0db258e594
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 20c72fdd75b7e4ee682473e597c0525c
     m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/2027158310.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2371f5c65086648448412877ac9f9a39
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2baa5f939fff6462dac0190aaf0a96f2
     m_Address: Assets/ThirdParty/GameAssets/CardImages/Dreamwell/1963305268.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4f4cab2ed010a4fff963a1b19fa5d75e
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1282908322.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 53a98bf68a1f442a7bfcf32372c89eed
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_2123360837.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -32,6 +52,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 6761eeb7b5c4b4d208be1a1c10f1d0c1
     m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/1633431262.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b0fc7f8f114584881b8742c9408fde14
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1486924805.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
