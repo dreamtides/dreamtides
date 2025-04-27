@@ -1799,6 +1799,7 @@ MonoBehaviour:
   _objects: []
   _debugUpdateContinuously: 0
   _offset: 1
+  _stackRight: 0
 --- !u!1 &163676054
 GameObject:
   m_ObjectHideFlags: 0
@@ -2938,7 +2939,8 @@ MonoBehaviour:
   _internalGameContext: 0
   _objects: []
   _debugUpdateContinuously: 0
-  _offset: 2.5
+  _offset: 1.5
+  _stackRight: 1
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -4090,7 +4092,8 @@ MonoBehaviour:
   _internalGameContext: 0
   _objects: []
   _debugUpdateContinuously: 0
-  _offset: 2.5
+  _offset: 1.5
+  _stackRight: 1
 --- !u!1 &449699474
 GameObject:
   m_ObjectHideFlags: 0
@@ -4394,6 +4397,7 @@ MonoBehaviour:
   _objects: []
   _debugUpdateContinuously: 0
   _offset: 2.5
+  _stackRight: 0
 --- !u!1 &466137856
 GameObject:
   m_ObjectHideFlags: 0
@@ -4509,6 +4513,7 @@ MonoBehaviour:
   _objects: []
   _debugUpdateContinuously: 0
   _offset: 2.5
+  _stackRight: 0
 --- !u!1 &482914635
 GameObject:
   m_ObjectHideFlags: 0
@@ -6884,7 +6889,8 @@ MonoBehaviour:
   _internalGameContext: 0
   _objects: []
   _debugUpdateContinuously: 0
-  _offset: 2.5
+  _offset: 1.5
+  _stackRight: 1
 --- !u!1 &760589603
 GameObject:
   m_ObjectHideFlags: 0
@@ -6950,6 +6956,7 @@ MonoBehaviour:
   _objects: []
   _debugUpdateContinuously: 0
   _offset: 1
+  _stackRight: 1
 --- !u!1 &761815411
 GameObject:
   m_ObjectHideFlags: 0
@@ -14155,6 +14162,7 @@ MonoBehaviour:
   _objects: []
   _debugUpdateContinuously: 0
   _offset: 2.5
+  _stackRight: 0
 --- !u!1 &1714488540
 GameObject:
   m_ObjectHideFlags: 0
