@@ -50,7 +50,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
         produced: None,
         spark: context.card().properties.spark,
         card_type: card_type(context.card()),
-        rules_text: format!("{:?}", context.card().abilities),
+        rules_text: rules_text(context.card().identity),
         outline_color: match () {
             _ if can_play => Some(display_color::GREEN),
             _ if selection_target.is_some() => Some(display_color::RED_500),
@@ -136,5 +136,20 @@ fn card_type(card: &CardData) -> String {
         format!("\u{f0e7} {}", result)
     } else {
         result
+    }
+}
+
+fn rules_text(identity: CardIdentity) -> String {
+    match identity {
+        card_identities::MINSTREL_OF_FALLING_LIGHT => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
+        card_identities::IMMOLATE => "Dissolve an enemy character.".to_string(),
+        card_identities::RIPPLE_OF_DEFIANCE => {
+            "Negate an enemy event unless they pay 2\u{f7e4}.".to_string()
+        }
+        card_identities::ABOLISH => "Negate an enemy card".to_string(),
+        card_identities::DREAMSCATTER => {
+            "Pay one or more \u{f7e4}: Draw a card for each \u{f7e4} spent.".to_string()
+        }
+        _ => format!("{:?}", identity),
     }
 }
