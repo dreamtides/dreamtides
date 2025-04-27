@@ -9,17 +9,17 @@ use crate::debug_snapshots::debug_card_data::DebugCardData;
 #[derive(Debug, Clone, Serialize)]
 pub struct DebugAllCards {
     pub cards: Vec<DebugCardData>,
-    pub user_battlefield: Vec<DebugCardData>,
-    pub enemy_battlefield: Vec<DebugCardData>,
-    pub user_void: Vec<DebugCardData>,
-    pub enemy_void: Vec<DebugCardData>,
-    pub user_hand: Vec<DebugCardData>,
-    pub enemy_hand: Vec<DebugCardData>,
-    pub user_deck: Vec<DebugCardData>,
-    pub enemy_deck: Vec<DebugCardData>,
+    pub p1_battlefield: Vec<DebugCardData>,
+    pub p2_battlefield: Vec<DebugCardData>,
+    pub p1_void: Vec<DebugCardData>,
+    pub p2_void: Vec<DebugCardData>,
+    pub p1_hand: Vec<DebugCardData>,
+    pub p2_hand: Vec<DebugCardData>,
+    pub p1_deck: Vec<DebugCardData>,
+    pub p2_deck: Vec<DebugCardData>,
     pub stack: Vec<DebugCardData>,
-    pub user_banished: Vec<DebugCardData>,
-    pub enemy_banished: Vec<DebugCardData>,
+    pub p1_banished: Vec<DebugCardData>,
+    pub p2_banished: Vec<DebugCardData>,
     pub next_object_id: String,
 }
 
@@ -27,20 +27,20 @@ impl DebugAllCards {
     pub fn new(all_cards: AllCards) -> Self {
         Self {
             cards: Self::cards_to_debug(all_cards.all_cards()),
-            user_battlefield: Self::cards_to_debug(all_cards.battlefield_cards(PlayerName::One)),
-            enemy_battlefield: Self::cards_to_debug(all_cards.battlefield_cards(PlayerName::Two)),
-            user_void: Self::card_ids_to_debug(all_cards.void(PlayerName::One).iter(), &all_cards),
-            enemy_void: Self::card_ids_to_debug(all_cards.void(PlayerName::Two).iter(), &all_cards),
-            user_hand: Self::cards_to_debug(all_cards.hand_cards(PlayerName::One)),
-            enemy_hand: Self::cards_to_debug(all_cards.hand_cards(PlayerName::Two)),
-            user_deck: Self::card_ids_to_debug(all_cards.deck(PlayerName::One).iter(), &all_cards),
-            enemy_deck: Self::card_ids_to_debug(all_cards.deck(PlayerName::Two).iter(), &all_cards),
+            p1_battlefield: Self::cards_to_debug(all_cards.battlefield_cards(PlayerName::One)),
+            p2_battlefield: Self::cards_to_debug(all_cards.battlefield_cards(PlayerName::Two)),
+            p1_void: Self::card_ids_to_debug(all_cards.void(PlayerName::One).iter(), &all_cards),
+            p2_void: Self::card_ids_to_debug(all_cards.void(PlayerName::Two).iter(), &all_cards),
+            p1_hand: Self::cards_to_debug(all_cards.hand_cards(PlayerName::One)),
+            p2_hand: Self::cards_to_debug(all_cards.hand_cards(PlayerName::Two)),
+            p1_deck: Self::card_ids_to_debug(all_cards.deck(PlayerName::One).iter(), &all_cards),
+            p2_deck: Self::card_ids_to_debug(all_cards.deck(PlayerName::Two).iter(), &all_cards),
             stack: Self::card_ids_to_debug(all_cards.stack().iter(), &all_cards),
-            user_banished: Self::card_ids_to_debug(
+            p1_banished: Self::card_ids_to_debug(
                 all_cards.banished(PlayerName::One).iter(),
                 &all_cards,
             ),
-            enemy_banished: Self::card_ids_to_debug(
+            p2_banished: Self::card_ids_to_debug(
                 all_cards.banished(PlayerName::Two).iter(),
                 &all_cards,
             ),

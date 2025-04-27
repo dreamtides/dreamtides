@@ -1,3 +1,4 @@
+use battle_data::battle::battle_tracing::BattleTraceEvent;
 use battle_data::debug_snapshots::debug_battle_data::DebugBattleData;
 
 /// Unwraps an Option value, returning the Some contained within it, or panics.
@@ -22,8 +23,16 @@ macro_rules! expect {
         match $option {
             Some(v) => v,
             None => {
+                let message = $message();
+                let event = battle_data::battle::battle_tracing::BattleTraceEvent {
+                    m: format!("EXPECT FAILED: {}", message),
+                    vs: String::new(),
+                    values: std::collections::BTreeMap::new(),
+                    snapshot: $battle.debug_snapshot(),
+                };
+                $crate::write_battle_event(&event);
                 let snapshot = $battle.debug_snapshot();
-                $crate::panic_with_snapshot(snapshot, $message());
+                $crate::panic_with_snapshot(snapshot, message);
             }
         }
     };
@@ -47,8 +56,16 @@ macro_rules! expect {
 macro_rules! assert_that {
     ($condition:expr, $battle:expr, $message:expr) => {
         if !$condition {
+            let message = $message();
+            let event = battle_data::battle::battle_tracing::BattleTraceEvent {
+                m: format!("ASSERTION FAILED: {}", message),
+                vs: String::new(),
+                values: std::collections::BTreeMap::new(),
+                snapshot: $battle.debug_snapshot(),
+            };
+            $crate::write_battle_event(&event);
             let snapshot = $battle.debug_snapshot();
-            $crate::panic_with_snapshot(snapshot, $message());
+            $crate::panic_with_snapshot(snapshot, message);
         }
     };
 }
@@ -71,11 +88,22 @@ macro_rules! assert_that {
 macro_rules! panic_with {
     ($battle:expr, $($arg:tt)*) => {
         {
-            let snapshot = $battle.debug_snapshot();
             let formatted_message = format!($($arg)*);
+            let event = battle_data::battle::battle_tracing::BattleTraceEvent {
+                m: format!("PANIC: {}", formatted_message),
+                vs: String::new(),
+                values: std::collections::BTreeMap::new(),
+                snapshot: $battle.debug_snapshot(),
+            };
+            $crate::write_battle_event(&event);
+            let snapshot = $battle.debug_snapshot();
             $crate::panic_with_snapshot(snapshot, formatted_message);
         }
     };
+}
+
+pub fn write_battle_event(event: &BattleTraceEvent) {
+    logging::battle_trace::write_battle_event(event);
 }
 
 pub fn panic_with_snapshot(snapshot: DebugBattleData, message: impl AsRef<str>) -> ! {

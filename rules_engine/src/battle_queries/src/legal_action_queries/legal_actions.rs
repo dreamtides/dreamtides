@@ -95,22 +95,9 @@ pub fn next_to_act(battle: &BattleData) -> Option<PlayerName> {
         return None;
     }
 
-    // If there's an active prompt, the prompted player is next to act
     if let Some(prompt_data) = &battle.prompt {
         return Some(prompt_data.player);
     }
 
-    if let Some(top_card_id) = battle.cards.stack().last() {
-        if let Some(top_card) = battle.cards.card(*top_card_id) {
-            let controller = top_card.controller();
-            // The opponent of the controller of the top card on the stack gets to act
-            return Some(controller.opponent());
-        }
-    }
-
-    if battle.step == BattleTurnStep::Ending {
-        return Some(battle.turn.active_player.opponent());
-    }
-
-    Some(battle.turn.active_player)
+    Some(battle.priority)
 }

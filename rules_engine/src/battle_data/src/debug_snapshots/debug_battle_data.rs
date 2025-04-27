@@ -11,10 +11,11 @@ use crate::debug_snapshots::debug_prompt_data::DebugPromptData;
 pub struct DebugBattleData {
     pub id: String,
     pub request_context: String,
-    pub user: DebugPlayerData,
-    pub enemy: DebugPlayerData,
+    pub player_one: DebugPlayerData,
+    pub player_two: DebugPlayerData,
     pub cards: DebugAllCards,
     pub status: String,
+    pub priority: String,
     pub turn: String,
     pub step: String,
     pub prompt: Option<DebugPromptData>,
@@ -25,10 +26,11 @@ impl DebugBattleData {
         Self {
             id: format!("{:?}", battle_data.id),
             request_context: format!("{:?}", battle_data.request_context),
-            user: DebugPlayerData::new(battle_data.player_one),
-            enemy: DebugPlayerData::new(battle_data.player_two),
+            player_one: DebugPlayerData::new(battle_data.player_one),
+            player_two: DebugPlayerData::new(battle_data.player_two),
             cards: DebugAllCards::new(battle_data.cards),
             status: format!("{:?}", battle_data.status),
+            priority: format!("{:?}", battle_data.priority),
             turn: format!(
                 "TurnData {{ active_player: {:?}, turn_id: TurnId({}) }}",
                 battle_data.turn.active_player, battle_data.turn.turn_id.0
