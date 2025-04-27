@@ -1,10 +1,12 @@
 use action_data::battle_action_data::BattleAction;
 use action_data::game_action::GameAction;
 use battle_data::battle::battle_data::BattleData;
+use battle_data::battle_cards::card_data::CardData;
 use battle_data::battle_cards::card_id::{CardIdType, HandCardId};
 use battle_data::battle_cards::card_identities;
 use battle_data::prompt_types::prompt_data::Prompt;
 use battle_queries::legal_action_queries::can_play_card;
+use core_data::card_types::CardType;
 use core_data::display_color;
 use core_data::display_types::SpriteAddress;
 use core_data::identifiers::{CardId, CardIdentity};
@@ -43,11 +45,11 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
 
     RevealedCardView {
         image: DisplayImage { address: card_image(context.card().identity) },
-        name: format!("{:?}", context.card().id.card_id()),
+        name: card_name(context.card().identity),
         cost: context.card().properties.cost,
         produced: None,
         spark: context.card().properties.spark,
-        card_type: "Character".to_string(),
+        card_type: card_type(context.card()),
         rules_text: format!("{:?}", context.card().abilities),
         outline_color: match () {
             _ if can_play => Some(display_color::GREEN),
@@ -107,5 +109,32 @@ fn card_image(identity: CardIdentity) -> SpriteAddress {
         _ => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1486924805.png",
         ),
+    }
+}
+
+fn card_name(identity: CardIdentity) -> String {
+    match identity {
+        card_identities::MINSTREL_OF_FALLING_LIGHT => "Minstrel of Falling Light".to_string(),
+        card_identities::IMMOLATE => "Immolate".to_string(),
+        card_identities::RIPPLE_OF_DEFIANCE => "Ripple of Defiance".to_string(),
+        card_identities::ABOLISH => "Abolish".to_string(),
+        card_identities::DREAMSCATTER => "Dreamscatter".to_string(),
+        _ => format!("{:?}", identity),
+    }
+}
+
+fn card_type(card: &CardData) -> String {
+    let result = match card.properties.card_type {
+        CardType::Character(t) => t.to_string(),
+        CardType::Event => "Event".to_string(),
+        CardType::Dreamsign => "Dreamsign".to_string(),
+        CardType::Enemy => "Enemy".to_string(),
+        CardType::Dreamwell => "Dreamwell".to_string(),
+    };
+
+    if card.properties.is_fast {
+        format!("\u{f0e7} {}", result)
+    } else {
+        result
     }
 }
