@@ -35,6 +35,50 @@ def create_rounded_rectangle_mask(width, height, output_path, corner_radius=15, 
         output_path
     ], check=True)
 
+def process_image(image_file, output_file, corner_radius=15, verbose=False):
+    """Process a single image file, adding rounded corners and resizing."""
+    log(f"Processing: {image_file}", verbose)
+    
+    # Get image dimensions
+    _, orig_height = get_image_dimensions(image_file, verbose)  
+    
+    # Calculate target width (height / 1.15)
+    target_width = int(orig_height / 1.15)
+    
+    # Create a temporary directory for our intermediate files
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # Create temporary file paths
+        resized_file = os.path.join(temp_dir, "resized.png")
+        mask_file = os.path.join(temp_dir, "mask.png")
+        
+        log(f"Step 1: Creating a {target_width}x{orig_height} version of the image", verbose)
+        # Create a resized version that maintains the original aspect ratio but fills the target space
+        subprocess.run([
+            "magick",
+            image_file,
+            "-resize", f"{target_width}x{orig_height}^",  # ^ means maintain aspect ratio and fill the space
+            "-gravity", "center", 
+            "-extent", f"{target_width}x{orig_height}",
+            resized_file
+        ], check=True)
+        
+        # Double-check the dimensions of the output file to ensure proper mask creation
+        resized_width, resized_height = get_image_dimensions(resized_file, verbose)
+        
+        # Create a rounded rectangle mask with the same dimensions as the resized image
+        create_rounded_rectangle_mask(resized_width, resized_height, mask_file, corner_radius, verbose)
+        
+        log(f"Step 2: Applying rounded rectangle mask", verbose)
+        # Apply the mask to create rounded corners
+        subprocess.run([
+            "magick",
+            resized_file,
+            mask_file,
+            "-compose", "CopyOpacity",
+            "-composite",
+            output_file
+        ], check=True)
+
 def main():
     parser = argparse.ArgumentParser(description='Process images with ImageMagick to create rounded rectangles.')
     parser.add_argument('--input', '-i', required=True, help='Input directory containing JPG files')
@@ -50,69 +94,42 @@ def main():
     corner_radius = args.corner_radius
     verbose = args.verbose
 
-    # Create output directory if it doesn't exist
-    os.makedirs(output_dir, exist_ok=True)
-
-    # Get all .jpg files in the input directory
-    jpg_files = glob.glob(os.path.join(input_dir, "*.jpg"))
+    # Count of processed files
+    processed_count = 0
     
-    if not jpg_files:
-        print(f"No JPG files found in {input_dir}")
-        return
+    # Walk through all directories and subdirectories in the input directory
+    for root, _, files in os.walk(input_dir):
+        # Get all .jpg files in the current directory
+        jpg_files = [f for f in files if f.lower().endswith('.jpg')]
+        
+        if jpg_files:
+            # Get the relative path from input directory to create the same structure in output
+            rel_path = os.path.relpath(root, input_dir)
+            # Create the corresponding output directory
+            curr_output_dir = os.path.join(output_dir, rel_path) if rel_path != '.' else output_dir
+            os.makedirs(curr_output_dir, exist_ok=True)
+            
+            if verbose:
+                print(f"Found {len(jpg_files)} JPG files in {root}")
+            
+            for jpg_file in jpg_files:
+                # Full path to the input file
+                image_file = os.path.join(root, jpg_file)
+                
+                # Extract base name (without extension)
+                filename = os.path.splitext(jpg_file)[0]
+                
+                # Construct the full path for the output
+                output_file = os.path.join(curr_output_dir, f"{filename}.png")
+                
+                # Process the image
+                process_image(image_file, output_file, corner_radius, verbose)
+                processed_count += 1
     
-    if verbose:
-        print(f"Found {len(jpg_files)} JPG files to process")
-    
-    for image_file in jpg_files:
-        # Extract base name (without path and extension)
-        filename = os.path.splitext(os.path.basename(image_file))[0]
-        
-        # Construct the full path for the output
-        output_file = os.path.join(output_dir, f"{filename}.png")
-
-        log(f"Processing: {filename}.jpg", verbose)
-        
-        # Get image dimensions
-        _, orig_height = get_image_dimensions(image_file, verbose)  
-        
-        # Calculate target width (height / 1.15)
-        target_width = int(orig_height / 1.15)
-        
-        # Create a temporary directory for our intermediate files
-        with tempfile.TemporaryDirectory() as temp_dir:
-            # Create temporary file paths
-            resized_file = os.path.join(temp_dir, "resized.png")
-            mask_file = os.path.join(temp_dir, "mask.png")
-            
-            log(f"Step 1: Creating a {target_width}x{orig_height} version of the image", verbose)
-            # Create a resized version that maintains the original aspect ratio but fills the target space
-            subprocess.run([
-                "magick",
-                image_file,
-                "-resize", f"{target_width}x{orig_height}^",  # ^ means maintain aspect ratio and fill the space
-                "-gravity", "center", 
-                "-extent", f"{target_width}x{orig_height}",
-                resized_file
-            ], check=True)
-            
-            # Double-check the dimensions of the output file to ensure proper mask creation
-            resized_width, resized_height = get_image_dimensions(resized_file, verbose)
-            
-            # Create a rounded rectangle mask with the same dimensions as the resized image
-            create_rounded_rectangle_mask(resized_width, resized_height, mask_file, corner_radius, verbose)
-            
-            log(f"Step 2: Applying rounded rectangle mask", verbose)
-            # Apply the mask to create rounded corners
-            subprocess.run([
-                "magick",
-                resized_file,
-                mask_file,
-                "-compose", "CopyOpacity",
-                "-composite",
-                output_file
-            ], check=True)
-    
-    log(f"Done! Files saved to: {output_dir}", verbose)
+    if processed_count == 0:
+        print(f"No JPG files found in {input_dir} or its subdirectories")
+    else:
+        log(f"Done! Processed {processed_count} files, saved to: {output_dir}", verbose)
 
 if __name__ == "__main__":
     main() 

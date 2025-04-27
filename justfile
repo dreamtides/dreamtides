@@ -164,4 +164,4 @@ samply-benchmark *args='':
     cargo run --manifest-path rules_engine/Cargo.toml --bin run_nim -- $@
 
 card-images:
-    ./client/scripts/card_images.py --input client/Assets/ThirdParty/GameAssets/SourceImages --output client/Assets/ThirdParty/GameAssets/CardImages -r 120
+    ./client/scripts/card_images.py --input client/Assets/ThirdParty/GameAssets/SourceImages --output client/Assets/ThirdParty/GameAssets/CardImages -r 50
