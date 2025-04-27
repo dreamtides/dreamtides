@@ -36,6 +36,14 @@ pub struct BattleData {
     /// Status of this battle, including whether it has ended.
     pub status: BattleStatus,
 
+    /// Player who currently has priority in this game, or who last held
+    /// priority if the game has ended.
+    ///
+    /// This is the player who is next to act, *except* if a `prompt` is
+    /// specified below, in which case the prompted player takes precedence over
+    /// this value.
+    pub priority: PlayerName,
+
     /// Current turn
     pub turn: TurnData,
 
@@ -98,6 +106,7 @@ impl BattleData {
                 player_two: self.player_two.clone(),
                 cards: self.cards.clone(),
                 status: self.status.clone(),
+                priority: self.priority,
                 turn: self.turn,
                 step: self.step,
                 rng: self.rng.clone(),

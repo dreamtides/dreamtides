@@ -18,8 +18,8 @@ pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction
         BattleAction::PlayCardFromHand(card_id) => {
             play_card::execute(battle, player, card_id);
         }
-        BattleAction::ResolveStack => {
-            resolve_cards::resolve_stack(battle);
+        BattleAction::PassPriority => {
+            resolve_cards::pass_priority(battle, player);
         }
         BattleAction::EndTurn => {
             end_turn::run(battle);
@@ -59,7 +59,7 @@ pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction
             match resume_action {
                 PromptResumeAction::ResolveStack => {
                     battle_trace!("Resuming stack resolution", battle);
-                    resolve_cards::resolve_stack(battle);
+                    resolve_cards::resume_stack_resolution(battle);
                 }
             }
             battle.prompt_resume_action = None;

@@ -2,6 +2,7 @@ use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_cards::card_id::{HandCardId, StackCardId};
 use core_data::types::PlayerName;
+use logging::battle_trace;
 
 use crate::play_cards::{additional_cost_prompt, target_prompt};
 use crate::player_mutations::energy;
@@ -24,6 +25,8 @@ pub fn execute(
     }
     battle.cards.card_mut(card_id)?.revealed_to_opponent = true;
     let id = move_card::to_stack(battle, source, card_id)?;
+    battle_trace!("Setting priority to", battle, player = player.opponent());
+    battle.priority = player.opponent();
     target_prompt::add_target_prompt(battle, source, id);
     additional_cost_prompt::add_additional_cost_prompt(battle, source, id);
     Some(id)

@@ -1,29 +1,68 @@
 use ability_data::ability::Ability;
+use assert_with::{assert_that, panic_with};
 use battle_data::battle::battle_data::BattleData;
+use battle_data::battle::battle_turn_step::BattleTurnStep;
 use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_cards::card_id::StackCardId;
-use battle_data::prompt_types::prompt_data::PromptResumeAction;
 use core_data::card_types::CardType;
 use core_data::identifiers::AbilityNumber;
+use core_data::types::PlayerName;
 use logging::battle_trace;
 
 use crate::effects::apply_effect;
 use crate::zone_mutations::move_card;
 
-/// Resolves all cards currently on the stack, applying their effects.
+/// Marks a player as having taken the "pass" action on the current stack.
+///
+/// Card resolution works as follows in Dreamtides: A player may play a card
+/// (during their turn or at the end of their opponent's turn), which creates a
+/// "stack", which is resolved via a system of "priority":
+///
+/// - Whenever a card is played, the opponent of the card's controller receives
+///   priority.
+/// - Whenever a card resolves, the controller of that card receives priority
+///   (if the stack is not empty).
+///
+/// Priority cannot be "held", and players cannot add more than one card to the
+/// stack at a time.
+///
+/// When a player has priority, they may either play a card or take the "pass"
+/// action. If the player with priority takes the "pass" action, the top card of
+/// the stack resolves. Note that only *one* player is ever required to pass
+/// priority to resolve a card on the stack.
 ///
 /// Cards resolve in Last In, First Out order, meaning the top card of the stack
 /// is resolved first.
-pub fn resolve_stack(battle: &mut BattleData) {
-    while let Some(card_id) = battle.cards.stack().last() {
-        resolve_card(battle, *card_id);
+pub fn pass_priority(battle: &mut BattleData, player: PlayerName) {
+    assert_that!(battle.priority == player, battle, || "Player does not have priority");
 
-        // Stop resolving the stack if a prompt is pending.
-        if battle.prompt.is_some() {
-            battle.prompt_resume_action = Some(PromptResumeAction::ResolveStack);
-            break;
+    if let Some(card_id) = battle.cards.stack().last() {
+        let card_id = *card_id;
+        let Some(card) = battle.cards.card(card_id) else {
+            panic_with!(battle, "Card not found on stack");
+        };
+        let controller = card.controller();
+
+        resolve_card(battle, card_id);
+
+        // After a card resolves, its controller receives priority (if stack is not
+        // empty)
+        if battle.cards.stack().is_empty() {
+            battle.priority = if battle.step == BattleTurnStep::Ending {
+                battle.turn.active_player.opponent()
+            } else {
+                battle.turn.active_player
+            };
+        } else {
+            battle.priority = controller;
         }
+    } else {
+        panic_with!(battle, "No cards on stack");
     }
+}
+
+pub fn resume_stack_resolution(_battle: &mut BattleData) {
+    todo!("Implement this");
 }
 
 /// Resolves a card currently on the stack, applying its effects and moving it

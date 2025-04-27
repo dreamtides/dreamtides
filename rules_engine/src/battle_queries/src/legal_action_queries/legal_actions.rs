@@ -56,21 +56,15 @@ pub fn compute(
         }
     }
 
-    let is_active_player = battle.turn.active_player == player;
-    let mut actions = Vec::new();
+    if battle.priority != player {
+        return vec![];
+    }
 
-    let stack = battle.cards.stack();
-    let has_stack_cards = !stack.is_empty();
+    let mut actions = Vec::new();
+    let has_stack_cards = !battle.cards.stack().is_empty();
 
     if has_stack_cards {
-        if let Some(top_card_id) = stack.last() {
-            if let Some(top_card) = battle.cards.card(*top_card_id) {
-                if top_card.controller() != player {
-                    // If the player doesn't control the top card, they can resolve the stack
-                    actions.push(BattleAction::ResolveStack);
-                }
-            }
-        }
+        actions.push(BattleAction::PassPriority);
     }
 
     actions.extend(
@@ -83,11 +77,11 @@ pub fn compute(
             .map(BattleAction::PlayCardFromHand),
     );
 
-    if is_active_player && !has_stack_cards && battle.step != BattleTurnStep::Ending {
+    if !has_stack_cards && battle.step != BattleTurnStep::Ending {
         actions.push(BattleAction::EndTurn);
     }
 
-    if !is_active_player && !has_stack_cards && battle.step == BattleTurnStep::Ending {
+    if !has_stack_cards && battle.step == BattleTurnStep::Ending {
         actions.push(BattleAction::StartNextTurn);
     }
 

@@ -39,15 +39,15 @@ pub fn execute(
         };
 
         let legal_actions = legal_actions::compute(battle, next_player, LegalActions::default());
-        if legal_actions == vec![BattleAction::ResolveStack] {
-            battle_trace!("Automatically executing ResolveStack", battle);
+        if legal_actions == vec![BattleAction::PassPriority] {
+            battle_trace!("Automatically executing PassPriority", battle, next_player);
             current_player = next_player;
-            current_action = BattleAction::ResolveStack;
+            current_action = BattleAction::PassPriority;
             continue;
         }
 
         if legal_actions == vec![BattleAction::StartNextTurn] {
-            battle_trace!("Automatically executing StartNextTurn", battle);
+            battle_trace!("Automatically executing StartNextTurn", battle, next_player);
             current_player = next_player;
             current_action = BattleAction::StartNextTurn;
             continue;

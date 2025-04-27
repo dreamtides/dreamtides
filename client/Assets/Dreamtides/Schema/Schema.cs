@@ -1740,7 +1740,7 @@ namespace Dreamtides.Schema
     ///
     /// Confirm the selected cards to mulligan
     /// </summary>
-    public enum BattleActionEnum { CloseCardBrowser, EndTurn, ResolveStack, StartNextTurn, SubmitMulligan, ToggleOrderSelectorVisibility };
+    public enum BattleActionEnum { CloseCardBrowser, EndTurn, PassPriority, StartNextTurn, SubmitMulligan, ToggleOrderSelectorVisibility };
 
     public enum CardBrowserType { EnemyDeck, EnemyStatus, EnemyVoid, UserDeck, UserStatus, UserVoid };
 
@@ -2370,8 +2370,8 @@ namespace Dreamtides.Schema
                             return new BattleAction { Enum = BattleActionEnum.CloseCardBrowser };
                         case "endTurn":
                             return new BattleAction { Enum = BattleActionEnum.EndTurn };
-                        case "resolveStack":
-                            return new BattleAction { Enum = BattleActionEnum.ResolveStack };
+                        case "passPriority":
+                            return new BattleAction { Enum = BattleActionEnum.PassPriority };
                         case "startNextTurn":
                             return new BattleAction { Enum = BattleActionEnum.StartNextTurn };
                         case "submitMulligan":
@@ -2400,8 +2400,8 @@ namespace Dreamtides.Schema
                     case BattleActionEnum.EndTurn:
                         serializer.Serialize(writer, "endTurn");
                         return;
-                    case BattleActionEnum.ResolveStack:
-                        serializer.Serialize(writer, "resolveStack");
+                    case BattleActionEnum.PassPriority:
+                        serializer.Serialize(writer, "passPriority");
                         return;
                     case BattleActionEnum.StartNextTurn:
                         serializer.Serialize(writer, "startNextTurn");
@@ -2500,8 +2500,8 @@ namespace Dreamtides.Schema
                     return BattleActionEnum.CloseCardBrowser;
                 case "endTurn":
                     return BattleActionEnum.EndTurn;
-                case "resolveStack":
-                    return BattleActionEnum.ResolveStack;
+                case "passPriority":
+                    return BattleActionEnum.PassPriority;
                 case "startNextTurn":
                     return BattleActionEnum.StartNextTurn;
                 case "submitMulligan":
@@ -2528,8 +2528,8 @@ namespace Dreamtides.Schema
                 case BattleActionEnum.EndTurn:
                     serializer.Serialize(writer, "endTurn");
                     return;
-                case BattleActionEnum.ResolveStack:
-                    serializer.Serialize(writer, "resolveStack");
+                case BattleActionEnum.PassPriority:
+                    serializer.Serialize(writer, "passPriority");
                     return;
                 case BattleActionEnum.StartNextTurn:
                     serializer.Serialize(writer, "startNextTurn");

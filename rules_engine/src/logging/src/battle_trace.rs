@@ -261,6 +261,7 @@ mod tests {
             },
             cards: AllCards::default(),
             status: BattleStatus::Playing,
+            priority: PlayerName::One,
             turn: TurnData { active_player: PlayerName::One, turn_id: TurnId(1) },
             step: BattleTurnStep::Main,
             rng: Xoshiro256PlusPlus::seed_from_u64(12345),

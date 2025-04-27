@@ -3,7 +3,7 @@ use battle_data::battle::battle_turn_step::BattleTurnStep;
 use battle_data::battle_cards::card_id::HandCardId;
 use battle_data::battle_cards::zone::Zone;
 
-use crate::legal_action_queries::{has_legal_targets, legal_actions};
+use crate::legal_action_queries::has_legal_targets;
 
 /// Returns true if a card can currently be played from hand by its controller.
 pub fn from_hand(battle: &BattleData, card_id: HandCardId) -> bool {
@@ -16,7 +16,7 @@ pub fn from_hand(battle: &BattleData, card_id: HandCardId) -> bool {
     }
 
     let controller = card.controller();
-    if legal_actions::next_to_act(battle) != Some(controller) {
+    if battle.priority != controller {
         return false;
     }
 

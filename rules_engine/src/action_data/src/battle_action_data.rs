@@ -14,7 +14,7 @@ pub enum BattleAction {
     PlayCardFromHand(HandCardId),
     /// Pass on taking actions in response to a card being played by the
     /// opponent, thus causing the stack to be resolved.
-    ResolveStack,
+    PassPriority,
     /// End your turn
     EndTurn,
     /// Start your next turn after the opponent takes the `EndTurn` action.

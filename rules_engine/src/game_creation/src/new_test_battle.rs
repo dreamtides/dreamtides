@@ -41,6 +41,7 @@ pub fn create_and_start(
         },
         cards: AllCards::default(),
         status: BattleStatus::Setup,
+        priority: PlayerName::One,
         turn: TurnData { active_player: PlayerName::One, turn_id: TurnId::default() },
         step: BattleTurnStep::Judgment,
         rng: Xoshiro256PlusPlus::seed_from_u64(seed),

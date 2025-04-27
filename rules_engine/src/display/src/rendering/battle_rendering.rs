@@ -103,10 +103,10 @@ fn primary_action_button(
         });
     }
 
-    if legal_actions.contains(&BattleAction::ResolveStack) {
+    if legal_actions.contains(&BattleAction::PassPriority) {
         Some(ActionButtonView {
             label: "Resolve".to_string(),
-            action: Some(BattleAction::ResolveStack.into()),
+            action: Some(BattleAction::PassPriority.into()),
             show_on_idle_duration: None,
         })
     } else if legal_actions.contains(&BattleAction::EndTurn) {
