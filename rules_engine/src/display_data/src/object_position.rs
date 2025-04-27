@@ -1,4 +1,4 @@
-use action_data::battle_action::CardOrderSelectionTarget;
+use action_data::battle_action_data::CardOrderSelectionTarget;
 use core_data::identifiers::CardId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};

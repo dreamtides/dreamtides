@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::{LazyLock, Mutex};
 
-use action_data::battle_action::BattleAction;
+use action_data::battle_action_data::BattleAction;
 use actions::battle_actions;
 use ai_agents::agent_search;
 use battle_data::battle::battle_data::BattleData;
@@ -43,6 +43,13 @@ pub fn execute(
             battle_trace!("Automatically executing ResolveStack", battle);
             current_player = next_player;
             current_action = BattleAction::ResolveStack;
+            continue;
+        }
+
+        if legal_actions == vec![BattleAction::StartNextTurn] {
+            battle_trace!("Automatically executing StartNextTurn", battle);
+            current_player = next_player;
+            current_action = BattleAction::StartNextTurn;
             continue;
         }
 

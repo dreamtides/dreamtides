@@ -1,4 +1,5 @@
 use battle_data::battle::battle_data::BattleData;
+use battle_data::battle::battle_turn_step::BattleTurnStep;
 use battle_data::battle_cards::card_id::HandCardId;
 use battle_data::battle_cards::zone::Zone;
 
@@ -30,5 +31,8 @@ pub fn from_hand(battle: &BattleData, card_id: HandCardId) -> bool {
         return false;
     }
 
-    battle.cards.stack().is_empty() || card.properties.is_fast
+    let main_phase = battle.step == BattleTurnStep::Main
+        && battle.turn.active_player == controller
+        && battle.cards.stack().is_empty();
+    main_phase || card.properties.is_fast
 }

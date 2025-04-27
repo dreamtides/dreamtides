@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 
-use action_data::battle_action::BattleAction;
+use action_data::battle_action_data::BattleAction;
 use actions::battle_actions;
 use ai_core::game_state_node::{GameStateNode, GameStatus};
 use assert_with::{assert_that, expect};

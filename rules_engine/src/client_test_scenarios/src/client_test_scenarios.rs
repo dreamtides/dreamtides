@@ -2,7 +2,7 @@ pub mod basic_scene;
 
 use std::sync::{LazyLock, Mutex};
 
-use action_data::battle_action::{
+use action_data::battle_action_data::{
     BattleAction, CardBrowserType, CardOrderSelectionTarget, SelectCardOrder,
 };
 use action_data::debug_action::DebugAction;

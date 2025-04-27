@@ -1,4 +1,5 @@
 use battle_data::battle::battle_data::BattleData;
+use battle_data::battle::battle_turn_step::BattleTurnStep;
 use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_animations::battle_animation::BattleAnimation;
 use battle_queries::player_queries::spark_total;
@@ -10,6 +11,7 @@ use crate::player_mutations::points;
 /// Runs a Judgment phase for the indicated player, comparing their total spark
 /// to their opponent's and assigning points.
 pub fn run(battle: &mut BattleData, player: PlayerName, source: EffectSource) {
+    battle.step = BattleTurnStep::Judgment;
     let spark = spark_total::query(battle, player);
     let opponent_spark = spark_total::query(battle, player.opponent());
 

@@ -1,4 +1,4 @@
-use action_data::battle_action::BattleAction;
+use action_data::battle_action_data::BattleAction;
 use assert_with::{assert_that, expect, panic_with};
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
@@ -113,6 +113,12 @@ fn primary_action_button(
         Some(ActionButtonView {
             label: "End Turn".to_string(),
             action: Some(BattleAction::EndTurn.into()),
+            show_on_idle_duration: None,
+        })
+    } else if legal_actions.contains(&BattleAction::StartNextTurn) {
+        Some(ActionButtonView {
+            label: "Next Turn".to_string(),
+            action: Some(BattleAction::StartNextTurn.into()),
             show_on_idle_duration: None,
         })
     } else {

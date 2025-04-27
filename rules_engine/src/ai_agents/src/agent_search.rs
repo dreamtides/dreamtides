@@ -1,4 +1,4 @@
-use action_data::battle_action::BattleAction;
+use action_data::battle_action_data::BattleAction;
 use ai_core::agent::{Agent, AgentConfig, AgentData};
 use ai_data::game_ai::GameAI;
 use ai_game_integration::evaluators::WinLossEvaluator;

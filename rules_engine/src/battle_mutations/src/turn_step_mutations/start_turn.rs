@@ -1,4 +1,5 @@
 use battle_data::battle::battle_data::BattleData;
+use battle_data::battle::battle_turn_step::BattleTurnStep;
 use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_animations::battle_animation::BattleAnimation;
 use core_data::numerics::TurnId;
@@ -16,5 +17,7 @@ pub fn run(battle: &mut BattleData, player: PlayerName) {
     battle.push_animation(|| BattleAnimation::StartTurn { player });
     judgment::run(battle, battle.turn.active_player, source);
     dreamwell::activate(battle, battle.turn.active_player, source);
+    battle.step = BattleTurnStep::Draw;
     deck::draw_cards(battle, source, player, 1);
+    battle.step = BattleTurnStep::Main;
 }

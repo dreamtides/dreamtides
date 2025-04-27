@@ -1,6 +1,7 @@
-use action_data::battle_action::BattleAction;
+use action_data::battle_action_data::BattleAction;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
+use battle_data::battle::battle_turn_step::BattleTurnStep;
 use battle_data::prompt_types::prompt_data::Prompt;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
@@ -82,8 +83,12 @@ pub fn compute(
             .map(BattleAction::PlayCardFromHand),
     );
 
-    if is_active_player && !has_stack_cards {
+    if is_active_player && !has_stack_cards && battle.step != BattleTurnStep::Ending {
         actions.push(BattleAction::EndTurn);
+    }
+
+    if !is_active_player && !has_stack_cards && battle.step == BattleTurnStep::Ending {
+        actions.push(BattleAction::StartNextTurn);
     }
 
     actions
@@ -107,6 +112,10 @@ pub fn next_to_act(battle: &BattleData) -> Option<PlayerName> {
             // The opponent of the controller of the top card on the stack gets to act
             return Some(controller.opponent());
         }
+    }
+
+    if battle.step == BattleTurnStep::Ending {
+        return Some(battle.turn.active_player.opponent());
     }
 
     Some(battle.turn.active_player)

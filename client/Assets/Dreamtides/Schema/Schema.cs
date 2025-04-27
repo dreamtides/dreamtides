@@ -1730,7 +1730,9 @@ namespace Dreamtides.Schema
     /// Pass on taking actions in response to a card being played by the opponent, thus causing
     /// the stack to be resolved.
     ///
-    /// End the turn
+    /// End your turn
+    ///
+    /// Start your next turn after the opponent takes the `EndTurn` action.
     ///
     /// Close the card browser
     ///
@@ -1738,7 +1740,7 @@ namespace Dreamtides.Schema
     ///
     /// Confirm the selected cards to mulligan
     /// </summary>
-    public enum BattleActionEnum { CloseCardBrowser, EndTurn, ResolveStack, SubmitMulligan, ToggleOrderSelectorVisibility };
+    public enum BattleActionEnum { CloseCardBrowser, EndTurn, ResolveStack, StartNextTurn, SubmitMulligan, ToggleOrderSelectorVisibility };
 
     public enum CardBrowserType { EnemyDeck, EnemyStatus, EnemyVoid, UserDeck, UserStatus, UserVoid };
 
@@ -2370,6 +2372,8 @@ namespace Dreamtides.Schema
                             return new BattleAction { Enum = BattleActionEnum.EndTurn };
                         case "resolveStack":
                             return new BattleAction { Enum = BattleActionEnum.ResolveStack };
+                        case "startNextTurn":
+                            return new BattleAction { Enum = BattleActionEnum.StartNextTurn };
                         case "submitMulligan":
                             return new BattleAction { Enum = BattleActionEnum.SubmitMulligan };
                         case "toggleOrderSelectorVisibility":
@@ -2398,6 +2402,9 @@ namespace Dreamtides.Schema
                         return;
                     case BattleActionEnum.ResolveStack:
                         serializer.Serialize(writer, "resolveStack");
+                        return;
+                    case BattleActionEnum.StartNextTurn:
+                        serializer.Serialize(writer, "startNextTurn");
                         return;
                     case BattleActionEnum.SubmitMulligan:
                         serializer.Serialize(writer, "submitMulligan");
@@ -2495,6 +2502,8 @@ namespace Dreamtides.Schema
                     return BattleActionEnum.EndTurn;
                 case "resolveStack":
                     return BattleActionEnum.ResolveStack;
+                case "startNextTurn":
+                    return BattleActionEnum.StartNextTurn;
                 case "submitMulligan":
                     return BattleActionEnum.SubmitMulligan;
                 case "toggleOrderSelectorVisibility":
@@ -2521,6 +2530,9 @@ namespace Dreamtides.Schema
                     return;
                 case BattleActionEnum.ResolveStack:
                     serializer.Serialize(writer, "resolveStack");
+                    return;
+                case BattleActionEnum.StartNextTurn:
+                    serializer.Serialize(writer, "startNextTurn");
                     return;
                 case BattleActionEnum.SubmitMulligan:
                     serializer.Serialize(writer, "submitMulligan");

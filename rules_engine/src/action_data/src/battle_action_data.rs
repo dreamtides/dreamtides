@@ -15,8 +15,10 @@ pub enum BattleAction {
     /// Pass on taking actions in response to a card being played by the
     /// opponent, thus causing the stack to be resolved.
     ResolveStack,
-    /// End the turn
+    /// End your turn
     EndTurn,
+    /// Start your next turn after the opponent takes the `EndTurn` action.
+    StartNextTurn,
     /// Select a character as a target
     SelectCharacterTarget(CharacterId),
     /// Select a card on the stack as a target

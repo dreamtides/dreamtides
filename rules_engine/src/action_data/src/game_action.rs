@@ -3,7 +3,7 @@ use std::fmt::{self, Debug, Formatter};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::battle_action::BattleAction;
+use crate::battle_action_data::BattleAction;
 use crate::debug_action::DebugAction;
 
 /// All possible user interface actions
