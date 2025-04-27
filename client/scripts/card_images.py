@@ -9,7 +9,6 @@ import glob
 import subprocess
 import argparse
 import tempfile
-import json
 
 def log(message, verbose_mode=False):
     """Helper function to log messages only in verbose mode."""
