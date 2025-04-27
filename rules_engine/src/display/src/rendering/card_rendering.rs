@@ -2,11 +2,12 @@ use action_data::battle_action_data::BattleAction;
 use action_data::game_action::GameAction;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_cards::card_id::{CardIdType, HandCardId};
+use battle_data::battle_cards::card_identities;
 use battle_data::prompt_types::prompt_data::Prompt;
 use battle_queries::legal_action_queries::can_play_card;
 use core_data::display_color;
 use core_data::display_types::SpriteAddress;
-use core_data::identifiers::CardId;
+use core_data::identifiers::{CardId, CardIdentity};
 use core_data::types::CardFacing;
 use display_data::card_view::{
     CardActions, CardEffects, CardPrefab, CardView, DisplayImage, RevealedCardView,
@@ -41,11 +42,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
     let selection_target = selection_target(builder, context.battle(), card_id);
 
     RevealedCardView {
-        image: DisplayImage {
-            address: SpriteAddress::new(
-                "Assets/ThirdParty/GameAssets/CardImages/Standard/2521694543.png",
-            ),
-        },
+        image: DisplayImage { address: card_image(context.card().identity) },
         name: format!("{:?}", context.card().id.card_id()),
         cost: context.card().properties.cost,
         produced: None,
@@ -88,4 +85,15 @@ fn selection_target(
     }
 
     None
+}
+
+fn card_image(identity: CardIdentity) -> SpriteAddress {
+    match identity {
+        card_identities::MINSTREL_OF_FALLING_LIGHT => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
+        ),
+        _ => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1486924805.png",
+        ),
+    }
 }

@@ -9,6 +9,7 @@ import glob
 import subprocess
 import argparse
 import tempfile
+import sys
 
 def log(message, verbose_mode=False):
     """Helper function to log messages only in verbose mode."""
@@ -40,7 +41,11 @@ def process_image(image_file, output_file, corner_radius=15, verbose=False):
     log(f"Processing: {image_file}", verbose)
     
     # Get image dimensions
-    _, orig_height = get_image_dimensions(image_file, verbose)  
+    _, orig_height = get_image_dimensions(image_file, verbose)
+    
+    # Check if image height is exactly 1000 pixels
+    if orig_height != 1000:
+        raise ValueError(f"Error: Image {image_file} height is {orig_height}px. All images must be exactly 1000px tall.")
     
     # Calculate target width (height / 1.15)
     target_width = int(orig_height / 1.15)
@@ -122,9 +127,13 @@ def main():
                 # Construct the full path for the output
                 output_file = os.path.join(curr_output_dir, f"{filename}.png")
                 
-                # Process the image
-                process_image(image_file, output_file, corner_radius, verbose)
-                processed_count += 1
+                try:
+                    # Process the image
+                    process_image(image_file, output_file, corner_radius, verbose)
+                    processed_count += 1
+                except ValueError as e:
+                    print(e)
+                    sys.exit(1)
     
     if processed_count == 0:
         print(f"No JPG files found in {input_dir} or its subdirectories")

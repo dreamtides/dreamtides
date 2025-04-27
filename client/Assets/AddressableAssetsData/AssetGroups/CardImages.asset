@@ -55,6 +55,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f3c2d1ecbae25456782555e28091a8d8
+    m_Address: Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: c8037e81ec5c14ea6ad9dae81e0a140c, type: 2}
   m_SchemaSet:

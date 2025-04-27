@@ -165,3 +165,6 @@ samply-benchmark *args='':
 
 card-images:
     ./client/scripts/card_images.py --input client/Assets/ThirdParty/GameAssets/SourceImages --output client/Assets/ThirdParty/GameAssets/CardImages -r 50
+
+resize-images:
+    ./client/scripts/resize.py --input client/Assets/ThirdParty/GameAssets/SourceImages

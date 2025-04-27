@@ -1,5 +1,5 @@
 use ability_data::ability::Ability;
-use core_data::identifiers::CardId;
+use core_data::identifiers::{CardId, CardIdentity};
 use core_data::types::PlayerName;
 
 use crate::battle::turn_data::TurnData;
@@ -12,6 +12,9 @@ use crate::battle_cards::zone::Zone;
 pub struct CardData {
     /// Unique identifier for this card
     pub id: CardId,
+
+    /// Identifies the art & rules text for this card
+    pub identity: CardIdentity,
 
     /// The owner of this card.
     pub owner: PlayerName,
@@ -57,30 +60,6 @@ pub struct CardData {
 }
 
 impl CardData {
-    /// Creates a new CardData instance
-    pub fn new(
-        id: CardId,
-        owner: PlayerName,
-        zone: Zone,
-        object_id: ObjectId,
-        properties: CardProperties,
-        abilities: Vec<Ability>,
-    ) -> Self {
-        CardData {
-            id,
-            owner,
-            zone,
-            object_id,
-            properties,
-            abilities,
-            revealed_to_owner: true,
-            revealed_to_opponent: false,
-            targets: vec![],
-            additional_cost_choices: vec![],
-            turn_entered_current_zone: TurnData::default(),
-        }
-    }
-
     /// Whether this card is revealed to the given player.
     ///
     /// Note that cards in Dreamtides currently have no concept of "face down"

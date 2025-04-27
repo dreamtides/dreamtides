@@ -354,6 +354,7 @@ dependencies = [
  "slotmap",
  "strum",
  "strum_macros",
+ "uuid",
 ]
 
 [[package]]

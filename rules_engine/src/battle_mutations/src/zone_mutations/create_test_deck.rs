@@ -8,6 +8,7 @@ use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::turn_data::TurnData;
 use battle_data::battle_cards::card_data::CardData;
 use battle_data::battle_cards::card_id::ObjectId;
+use battle_data::battle_cards::card_identities;
 use battle_data::battle_cards::card_properties::CardProperties;
 use battle_data::battle_cards::zone::Zone;
 use core_data::card_types::{CardType, CharacterType};
@@ -30,6 +31,7 @@ fn create_cards(player_name: PlayerName) -> Vec<CardData> {
     for _ in 0..6 {
         cards.push(CardData {
             id: CardId::default(),
+            identity: card_identities::MINSTREL_OF_FALLING_LIGHT,
             owner: player_name,
             zone: Zone::Deck,
             object_id: ObjectId::default(),
@@ -51,6 +53,7 @@ fn create_cards(player_name: PlayerName) -> Vec<CardData> {
     for _ in 0..3 {
         cards.push(CardData {
             id: CardId::default(),
+            identity: card_identities::UNKNOWN,
             owner: player_name,
             zone: Zone::Deck,
             object_id: ObjectId::default(),
@@ -77,6 +80,7 @@ fn create_cards(player_name: PlayerName) -> Vec<CardData> {
     for _ in 0..3 {
         cards.push(CardData {
             id: CardId::default(),
+            identity: card_identities::UNKNOWN,
             owner: player_name,
             zone: Zone::Deck,
             object_id: ObjectId::default(),
@@ -103,6 +107,7 @@ fn create_cards(player_name: PlayerName) -> Vec<CardData> {
     for _ in 0..3 {
         cards.push(CardData {
             id: CardId::default(),
+            identity: card_identities::UNKNOWN,
             owner: player_name,
             zone: Zone::Deck,
             object_id: ObjectId::default(),
@@ -130,6 +135,7 @@ fn create_cards(player_name: PlayerName) -> Vec<CardData> {
     for _ in 0..3 {
         cards.push(CardData {
             id: CardId::default(),
+            identity: card_identities::UNKNOWN,
             owner: player_name,
             zone: Zone::Deck,
             object_id: ObjectId::default(),
