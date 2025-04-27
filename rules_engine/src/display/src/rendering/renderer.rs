@@ -22,6 +22,7 @@ pub fn connect(battle: &BattleData, user_id: UserId) -> CommandSequence {
 /// manner as returned by [connect].
 pub fn render_updates(battle: &BattleData, user_id: UserId) -> CommandSequence {
     let mut builder = ResponseBuilder::new(player_name_for_user(battle, user_id), true);
+    builder.set_for_animation(true);
     if let Some(animations) = &battle.animations {
         for step in &animations.steps {
             battle_rendering::run(&mut builder, &step.snapshot);
@@ -33,6 +34,7 @@ pub fn render_updates(battle: &BattleData, user_id: UserId) -> CommandSequence {
         }
     }
 
+    builder.set_for_animation(false);
     battle_rendering::run(&mut builder, battle);
     builder.commands()
 }

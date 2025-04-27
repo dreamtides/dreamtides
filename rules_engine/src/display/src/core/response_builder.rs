@@ -12,11 +12,14 @@ pub struct ResponseBuilder {
 
     /// Commands to be executed as part of the response.
     commands: CommandSequence,
+
+    /// Whether this is the last update for the animation sequence
+    for_animation: bool,
 }
 
 impl ResponseBuilder {
     pub fn new(player: PlayerName, animate: bool) -> Self {
-        Self { player, animate, commands: CommandSequence::default() }
+        Self { player, animate, commands: CommandSequence::default(), for_animation: false }
     }
 
     pub fn push(&mut self, command: Command) {
@@ -37,6 +40,14 @@ impl ResponseBuilder {
 
     pub fn commands(self) -> CommandSequence {
         self.commands
+    }
+
+    pub fn set_for_animation(&mut self, for_animation: bool) {
+        self.for_animation = for_animation;
+    }
+
+    pub fn is_for_animation(&self) -> bool {
+        self.for_animation
     }
 
     pub fn to_display_player(&self, player: PlayerName) -> DisplayPlayer {

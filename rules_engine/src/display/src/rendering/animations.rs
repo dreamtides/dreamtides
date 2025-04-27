@@ -1,5 +1,6 @@
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_animations::battle_animation::BattleAnimation;
+use core_data::display_types::Milliseconds;
 use display_data::command::{
     Command, DisplayDreamwellActivationCommand, DisplayJudgmentCommand, GameMessageType,
 };
@@ -33,6 +34,11 @@ pub fn render(builder: &mut ResponseBuilder, animation: &BattleAnimation, _snaps
                 new_energy: Some(*new_energy),
                 new_produced_energy: Some(*new_produced_energy),
             }));
+        }
+        BattleAnimation::PlayCardFromHand { player, .. } => {
+            if *player != builder.display_for_player() {
+                builder.push(Command::Wait(Milliseconds::new(1500)));
+            }
         }
     }
 }

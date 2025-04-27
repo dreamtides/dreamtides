@@ -57,6 +57,10 @@ fn player_view(battle: &BattleData, player: &PlayerData) -> PlayerView {
 }
 
 fn interface_view(builder: &ResponseBuilder, battle: &BattleData) -> InterfaceView {
+    if builder.is_for_animation() {
+        return InterfaceView::default();
+    }
+
     let legal_actions = legal_actions::compute(battle, builder.act_for_player(), LegalActions {
         for_human_player: true,
     });
