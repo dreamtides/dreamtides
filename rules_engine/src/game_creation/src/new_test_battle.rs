@@ -15,7 +15,12 @@ use rand::SeedableRng;
 use rand_xoshiro::Xoshiro256PlusPlus;
 
 /// Creates a new test battle between two Agents and starts it.
-pub fn create_and_start(id: BattleId, user: PlayerType, enemy: PlayerType) -> BattleData {
+pub fn create_and_start(
+    id: BattleId,
+    seed: u64,
+    user: PlayerType,
+    enemy: PlayerType,
+) -> BattleData {
     let mut battle = BattleData {
         id,
         player_one: PlayerData {
@@ -38,7 +43,7 @@ pub fn create_and_start(id: BattleId, user: PlayerType, enemy: PlayerType) -> Ba
         status: BattleStatus::Setup,
         turn: TurnData { active_player: PlayerName::One, turn_id: TurnId::default() },
         step: BattleTurnStep::Judgment,
-        rng: Xoshiro256PlusPlus::seed_from_u64(3141592653589793),
+        rng: Xoshiro256PlusPlus::seed_from_u64(seed),
         request_context: RequestContext::UserRequest,
         animations: None,
         prompt: None,

@@ -29,6 +29,7 @@ pub fn random_playout(c: &mut Criterion) {
                 || {
                     new_test_battle::create_and_start(
                         BattleId(Uuid::new_v4()),
+                        3141592653589793,
                         PlayerType::Agent(GameAI::RandomAction),
                         PlayerType::Agent(GameAI::RandomAction),
                     )
@@ -54,6 +55,7 @@ pub fn uct1_first_action(c: &mut Criterion) {
                 || {
                     new_test_battle::create_and_start(
                         BattleId(Uuid::new_v4()),
+                        3141592653589793,
                         PlayerType::Agent(GameAI::AlwaysPanic),
                         PlayerType::Agent(GameAI::AlwaysPanic),
                     )
