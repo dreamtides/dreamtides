@@ -4,11 +4,11 @@ use core_data::types::PlayerName;
 use display::core::response_builder::ResponseBuilder;
 use display::rendering::battle_rendering;
 use display_data::command::{Command, CommandSequence, UpdateBattleCommand};
+use masonry::borders::BorderRadius;
+use masonry::dimension::{Dimension, DimensionGroup, DimensionUnit, FlexInsets};
 use masonry::flex_enums::{FlexPosition, TextAlign, WhiteSpace};
 use masonry::flex_node::{FlexNode, NodeType, Text};
-use masonry::flex_style::{
-    BorderRadius, Dimension, DimensionGroup, DimensionUnit, FlexInsets, FlexStyle,
-};
+use masonry::flex_style::FlexStyle;
 
 /// Attempts to display an error message to the player describing a rules engine
 /// error.

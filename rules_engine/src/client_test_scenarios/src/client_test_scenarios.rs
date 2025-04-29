@@ -26,11 +26,11 @@ use display_data::object_position::{Position, StackType};
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, Metadata, PerformActionRequest, PerformActionResponse,
 };
+use masonry::borders::BorderRadius;
+use masonry::dimension::{Dimension, DimensionGroup, DimensionUnit, FlexInsets};
 use masonry::flex_enums::{FlexPosition, TextAlign, WhiteSpace};
 use masonry::flex_node::{FlexNode, NodeType, Text};
-use masonry::flex_style::{
-    BorderRadius, Dimension, DimensionGroup, DimensionUnit, FlexInsets, FlexStyle, FlexVector3,
-};
+use masonry::flex_style::{FlexStyle, FlexVector3};
 use uuid::Uuid;
 
 static CURRENT_BATTLE: LazyLock<Mutex<Option<BattleView>>> = LazyLock::new(|| Mutex::new(None));

@@ -12,5 +12,6 @@ bench = false
 action_data = { path = "../action_data" }
 core_data = { path = "../core_data" }
 
+bon = "3"
 schemars = "0.8"
 serde = { version = "1", features = ["derive"] }

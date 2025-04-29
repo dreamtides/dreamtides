@@ -13,11 +13,11 @@ use display_data::card_view::{
     CardActions, CardEffects, CardPrefab, CardPreviewView, CardView, DisplayImage, RevealedCardView,
 };
 use display_data::object_position::{ObjectPosition, Position};
+use masonry::borders::BorderRadius;
+use masonry::dimension::{Dimension, DimensionGroup, DimensionUnit, FlexInsets};
 use masonry::flex_enums::{FlexPosition, TextAlign, WhiteSpace};
 use masonry::flex_node::{FlexNode, NodeType, Text};
-use masonry::flex_style::{
-    BorderRadius, Dimension, DimensionGroup, DimensionUnit, FlexInsets, FlexStyle,
-};
+use masonry::flex_style::FlexStyle;
 
 pub fn create(id: BattleId) -> BattleView {
     BattleView {

@@ -7,9 +7,12 @@ use battle_data::prompt_types::prompt_data::Prompt;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions::LegalActions;
 use battle_queries::player_queries::spark_total;
+use core_data::display_color;
 use core_data::numerics::Energy;
 use display_data::battle_view::{BattleView, ButtonView, InterfaceView, PlayerView};
 use display_data::command::{Command, GameMessageType, UpdateBattleCommand};
+use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify};
+use masonry::flex_style::FlexStyle;
 
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
@@ -145,6 +148,22 @@ fn secondary_action_button(
     } else {
         None
     }
+}
+
+pub fn create_flex_style() -> FlexStyle {
+    FlexStyle::builder()
+        .padding((8, 12))
+        .margin(4)
+        .flex_direction(FlexDirection::Row)
+        .flex_basis(12)
+        .flex_grow(1)
+        .flex_shrink(1)
+        .align_items(FlexAlign::Center)
+        .justify_content(FlexJustify::Center)
+        .border_radius(4)
+        .border_width(1)
+        .border_color(display_color::RED_100)
+        .build()
 }
 
 fn increment_button(builder: &ResponseBuilder, battle: &BattleData) -> Option<ButtonView> {
