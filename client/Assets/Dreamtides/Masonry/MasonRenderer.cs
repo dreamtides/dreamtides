@@ -308,40 +308,35 @@ namespace Dreamtides.Masonry
 
     public static void ApplyStyle(Registry registry, VisualElement e, FlexStyle? input)
     {
-      // if (input == null)
-      // {
-      //   return;
-      // }
-
-      e.style.alignContent = AdaptAlign(input.AlignContent);
-      e.style.alignItems = AdaptAlign(input.AlignItems);
-      e.style.alignSelf = AdaptAlign(input.AlignSelf);
-      e.style.backgroundColor = AdaptColor(input.BackgroundColor);
-      e.style.borderTopColor = AdaptColor(input.BorderColor?.Top);
-      e.style.borderRightColor = AdaptColor(input.BorderColor?.Right);
-      e.style.borderBottomColor = AdaptColor(input.BorderColor?.Bottom);
-      e.style.borderLeftColor = AdaptColor(input.BorderColor?.Left);
-      e.style.borderTopLeftRadius = AdaptDimension(registry, input.BorderRadius?.TopLeft);
-      e.style.borderTopRightRadius = AdaptDimension(registry, input.BorderRadius?.TopRight);
-      e.style.borderBottomRightRadius = AdaptDimension(registry, input.BorderRadius?.BottomRight);
-      e.style.borderBottomLeftRadius = AdaptDimension(registry, input.BorderRadius?.BottomLeft);
-      e.style.borderTopWidth = AdaptFloat(input.BorderWidth?.Top);
-      e.style.borderRightWidth = AdaptFloat(input.BorderWidth?.Right);
-      e.style.borderBottomWidth = AdaptFloat(input.BorderWidth?.Bottom);
-      e.style.borderLeftWidth = AdaptFloat(input.BorderWidth?.Left);
-      e.style.top = AdaptDimension(registry, input.Inset?.Top);
-      e.style.right = AdaptDimension(registry, input.Inset?.Right);
-      e.style.bottom = AdaptDimension(registry, input.Inset?.Bottom);
-      e.style.left = AdaptDimension(registry, input.Inset?.Left);
-      e.style.color = AdaptColor(input.Color);
-      e.style.display = input.Display switch
+      e.style.alignContent = AdaptAlign(input?.AlignContent);
+      e.style.alignItems = AdaptAlign(input?.AlignItems);
+      e.style.alignSelf = AdaptAlign(input?.AlignSelf);
+      e.style.backgroundColor = AdaptColor(input?.BackgroundColor);
+      e.style.borderTopColor = AdaptColor(input?.BorderColor?.Top);
+      e.style.borderRightColor = AdaptColor(input?.BorderColor?.Right);
+      e.style.borderBottomColor = AdaptColor(input?.BorderColor?.Bottom);
+      e.style.borderLeftColor = AdaptColor(input?.BorderColor?.Left);
+      e.style.borderTopLeftRadius = AdaptDimension(registry, input?.BorderRadius?.TopLeft);
+      e.style.borderTopRightRadius = AdaptDimension(registry, input?.BorderRadius?.TopRight);
+      e.style.borderBottomRightRadius = AdaptDimension(registry, input?.BorderRadius?.BottomRight);
+      e.style.borderBottomLeftRadius = AdaptDimension(registry, input?.BorderRadius?.BottomLeft);
+      e.style.borderTopWidth = AdaptFloat(input?.BorderWidth?.Top);
+      e.style.borderRightWidth = AdaptFloat(input?.BorderWidth?.Right);
+      e.style.borderBottomWidth = AdaptFloat(input?.BorderWidth?.Bottom);
+      e.style.borderLeftWidth = AdaptFloat(input?.BorderWidth?.Left);
+      e.style.top = AdaptDimension(registry, input?.Inset?.Top);
+      e.style.right = AdaptDimension(registry, input?.Inset?.Right);
+      e.style.bottom = AdaptDimension(registry, input?.Inset?.Bottom);
+      e.style.left = AdaptDimension(registry, input?.Inset?.Left);
+      e.style.color = AdaptColor(input?.Color);
+      e.style.display = input?.Display switch
       {
         FlexDisplayStyle.Flex => DisplayStyle.Flex,
         FlexDisplayStyle.None => DisplayStyle.None,
         _ => new StyleEnum<DisplayStyle>(StyleKeyword.Null)
       };
-      e.style.flexBasis = AdaptDimension(registry, input.FlexBasis);
-      e.style.flexDirection = input.FlexDirection switch
+      e.style.flexBasis = AdaptDimension(registry, input?.FlexBasis);
+      e.style.flexDirection = input?.FlexDirection switch
       {
         Schema.FlexDirection.Column => UnityEngine.UIElements.FlexDirection.Column,
         Schema.FlexDirection.ColumnReverse => UnityEngine.UIElements.FlexDirection.ColumnReverse,
@@ -349,18 +344,18 @@ namespace Dreamtides.Masonry
         Schema.FlexDirection.RowReverse => UnityEngine.UIElements.FlexDirection.RowReverse,
         _ => new StyleEnum<UnityEngine.UIElements.FlexDirection>(StyleKeyword.Null)
       };
-      e.style.flexGrow = AdaptFloat(input.FlexGrow);
-      e.style.flexShrink = AdaptFloat(input.FlexShrink);
-      e.style.flexWrap = input.Wrap switch
+      e.style.flexGrow = AdaptFloat(input?.FlexGrow);
+      e.style.flexShrink = AdaptFloat(input?.FlexShrink);
+      e.style.flexWrap = input?.Wrap switch
       {
         FlexWrap.NoWrap => Wrap.NoWrap,
         FlexWrap.Wrap => Wrap.Wrap,
         FlexWrap.WrapReverse => Wrap.WrapReverse,
         _ => new StyleEnum<Wrap>(StyleKeyword.Null)
       };
-      e.style.fontSize = AdaptDimension(registry, input.FontSize);
-      e.style.height = AdaptDimension(registry, input.Height);
-      e.style.justifyContent = input.JustifyContent switch
+      e.style.fontSize = AdaptDimension(registry, input?.FontSize);
+      e.style.height = AdaptDimension(registry, input?.Height);
+      e.style.justifyContent = input?.JustifyContent switch
       {
         FlexJustify.FlexStart => Justify.FlexStart,
         FlexJustify.Center => Justify.Center,
@@ -369,43 +364,43 @@ namespace Dreamtides.Masonry
         FlexJustify.SpaceAround => Justify.SpaceAround,
         _ => new StyleEnum<Justify>(StyleKeyword.Null)
       };
-      e.style.letterSpacing = AdaptDimension(registry, input.LetterSpacing);
-      e.style.marginTop = AdaptDimension(registry, input.Margin?.Top);
-      e.style.marginRight = AdaptDimension(registry, input.Margin?.Right);
-      e.style.marginBottom = AdaptDimension(registry, input.Margin?.Bottom);
-      e.style.marginLeft = AdaptDimension(registry, input.Margin?.Left);
-      e.style.maxHeight = AdaptDimension(registry, input.MaxHeight);
-      e.style.maxWidth = AdaptDimension(registry, input.MaxWidth);
-      e.style.minHeight = AdaptDimension(registry, input.MinHeight);
-      e.style.minWidth = AdaptDimension(registry, input.MinWidth);
-      e.style.opacity = AdaptFloat(input.Opacity);
-      e.style.overflow = input.Overflow switch
+      e.style.letterSpacing = AdaptDimension(registry, input?.LetterSpacing);
+      e.style.marginTop = AdaptDimension(registry, input?.Margin?.Top);
+      e.style.marginRight = AdaptDimension(registry, input?.Margin?.Right);
+      e.style.marginBottom = AdaptDimension(registry, input?.Margin?.Bottom);
+      e.style.marginLeft = AdaptDimension(registry, input?.Margin?.Left);
+      e.style.maxHeight = AdaptDimension(registry, input?.MaxHeight);
+      e.style.maxWidth = AdaptDimension(registry, input?.MaxWidth);
+      e.style.minHeight = AdaptDimension(registry, input?.MinHeight);
+      e.style.minWidth = AdaptDimension(registry, input?.MinWidth);
+      e.style.opacity = AdaptFloat(input?.Opacity);
+      e.style.overflow = input?.Overflow switch
       {
         FlexVisibility.Visible => Overflow.Visible,
         FlexVisibility.Hidden => Overflow.Hidden,
         _ => new StyleEnum<Overflow>(StyleKeyword.Null)
       };
-      e.style.paddingTop = AdaptDimension(registry, input.Padding?.Top);
-      e.style.paddingRight = AdaptDimension(registry, input.Padding?.Right);
-      e.style.paddingBottom = AdaptDimension(registry, input.Padding?.Bottom);
-      e.style.paddingLeft = AdaptDimension(registry, input.Padding?.Left);
-      e.style.position = input.Position switch
+      e.style.paddingTop = AdaptDimension(registry, input?.Padding?.Top);
+      e.style.paddingRight = AdaptDimension(registry, input?.Padding?.Right);
+      e.style.paddingBottom = AdaptDimension(registry, input?.Padding?.Bottom);
+      e.style.paddingLeft = AdaptDimension(registry, input?.Padding?.Left);
+      e.style.position = input?.Position switch
       {
         FlexPosition.Relative => UnityEngine.UIElements.Position.Relative,
         FlexPosition.Absolute => UnityEngine.UIElements.Position.Absolute,
         _ => new StyleEnum<UnityEngine.UIElements.Position>(StyleKeyword.Null)
       };
-      e.style.rotate = input.Rotate is { } r
+      e.style.rotate = input?.Rotate is { } r
         ? new Rotate(Angle.Degrees((float)r.Degrees))
         : new StyleRotate(StyleKeyword.Null);
-      e.style.scale = input.Scale is { } s ? new Scale(AdaptVector3(s.Amount)) : new StyleScale(StyleKeyword.Null);
-      e.style.textOverflow = input.TextOverflow switch
+      e.style.scale = input?.Scale is { } s ? new Scale(AdaptVector3(s.Amount)) : new StyleScale(StyleKeyword.Null);
+      e.style.textOverflow = input?.TextOverflow switch
       {
         Schema.TextOverflow.Clip => UnityEngine.UIElements.TextOverflow.Clip,
         Schema.TextOverflow.Ellipsis => UnityEngine.UIElements.TextOverflow.Ellipsis,
         _ => new StyleEnum<UnityEngine.UIElements.TextOverflow>(StyleKeyword.Null)
       };
-      e.style.textShadow = input.TextShadow is { } ts
+      e.style.textShadow = input?.TextShadow is { } ts
         ? new UnityEngine.UIElements.TextShadow
         {
           offset = AdaptVector2(ts.Offset),
@@ -413,15 +408,15 @@ namespace Dreamtides.Masonry
           color = ts.Color == null ? Color.black : ToUnityColor(ts.Color)
         }
         : new StyleTextShadow(StyleKeyword.Null);
-      e.style.transformOrigin = input.TransformOrigin is { } to
+      e.style.transformOrigin = input?.TransformOrigin is { } to
         ? new TransformOrigin(AdaptDimensionNonNull(registry, to.X), AdaptDimensionNonNull(registry, to.Y), (float)to.Z)
         : new StyleTransformOrigin(StyleKeyword.Null);
       e.style.transitionDelay =
-        AdaptList(input.TransitionDelays, t => new TimeValue(t.MillisecondsValue, TimeUnit.Millisecond));
-      e.style.transitionDuration = AdaptList(input.TransitionDurations,
+        AdaptList(input?.TransitionDelays, t => new TimeValue(t.MillisecondsValue, TimeUnit.Millisecond));
+      e.style.transitionDuration = AdaptList(input?.TransitionDurations,
         t => new TimeValue(t.MillisecondsValue, TimeUnit.Millisecond));
-      e.style.transitionProperty = AdaptList(input.TransitionProperties, p => new StylePropertyName(p));
-      e.style.transitionTimingFunction = AdaptList(input.TransitionEasingModes, mode => new EasingFunction(mode switch
+      e.style.transitionProperty = AdaptList(input?.TransitionProperties, p => new StylePropertyName(p));
+      e.style.transitionTimingFunction = AdaptList(input?.TransitionEasingModes, mode => new EasingFunction(mode switch
       {
         Schema.EasingMode.Ease => UnityEngine.UIElements.EasingMode.Ease,
         Schema.EasingMode.EaseIn => UnityEngine.UIElements.EasingMode.EaseIn,
@@ -448,15 +443,15 @@ namespace Dreamtides.Masonry
         Schema.EasingMode.EaseInOutBounce => UnityEngine.UIElements.EasingMode.EaseInOutBounce,
         _ => UnityEngine.UIElements.EasingMode.Ease
       }));
-      e.style.translate = input.Translate is { } translate
+      e.style.translate = input?.Translate is { } translate
         ? new Translate(AdaptDimensionNonNull(registry, translate.X), AdaptDimensionNonNull(registry, translate.Y),
           (float)translate.Z)
         : new StyleTranslate(StyleKeyword.Null);
-      e.style.unityBackgroundImageTintColor = AdaptColor(input.BackgroundImageTintColor);
-      e.style.unityFontDefinition = input.Font is { } font
+      e.style.unityBackgroundImageTintColor = AdaptColor(input?.BackgroundImageTintColor);
+      e.style.unityFontDefinition = input?.Font is { } font
         ? new StyleFontDefinition(registry.AssetService.GetFont(font))
         : new StyleFontDefinition(StyleKeyword.Null);
-      e.style.unityFontStyleAndWeight = input.FontStyle switch
+      e.style.unityFontStyleAndWeight = input?.FontStyle switch
       {
         Schema.FontStyle.Normal => UnityEngine.FontStyle.Normal,
         Schema.FontStyle.Bold => UnityEngine.FontStyle.Bold,
@@ -464,18 +459,18 @@ namespace Dreamtides.Masonry
         Schema.FontStyle.BoldAndItalic => UnityEngine.FontStyle.BoldAndItalic,
         _ => new StyleEnum<UnityEngine.FontStyle>(StyleKeyword.Null)
       };
-      e.style.unityOverflowClipBox = input.OverflowClipBox switch
+      e.style.unityOverflowClipBox = input?.OverflowClipBox switch
       {
         Schema.OverflowClipBox.PaddingBox => UnityEngine.UIElements.OverflowClipBox.PaddingBox,
         Schema.OverflowClipBox.ContentBox => UnityEngine.UIElements.OverflowClipBox.ContentBox,
         _ => new StyleEnum<UnityEngine.UIElements.OverflowClipBox>(StyleKeyword.Null)
       };
-      e.style.unityParagraphSpacing = AdaptDimension(registry, input.ParagraphSpacing);
-      e.style.unitySliceTop = AdaptInt(input.ImageSlice?.Top);
-      e.style.unitySliceRight = AdaptInt(input.ImageSlice?.Right);
-      e.style.unitySliceBottom = AdaptInt(input.ImageSlice?.Bottom);
-      e.style.unitySliceLeft = AdaptInt(input.ImageSlice?.Left);
-      e.style.unityTextAlign = input.TextAlign switch
+      e.style.unityParagraphSpacing = AdaptDimension(registry, input?.ParagraphSpacing);
+      e.style.unitySliceTop = AdaptInt(input?.ImageSlice?.Top);
+      e.style.unitySliceRight = AdaptInt(input?.ImageSlice?.Right);
+      e.style.unitySliceBottom = AdaptInt(input?.ImageSlice?.Bottom);
+      e.style.unitySliceLeft = AdaptInt(input?.ImageSlice?.Left);
+      e.style.unityTextAlign = input?.TextAlign switch
       {
         TextAlign.UpperLeft => TextAnchor.UpperLeft,
         TextAlign.UpperCenter => TextAnchor.UpperCenter,
@@ -488,34 +483,33 @@ namespace Dreamtides.Masonry
         TextAlign.LowerRight => TextAnchor.LowerRight,
         _ => new StyleEnum<TextAnchor>(StyleKeyword.Null)
       };
-      e.style.unityTextOutlineColor = AdaptColor(input.TextOutlineColor);
-      e.style.unityTextOutlineWidth = AdaptFloat(input.TextOutlineWidth);
-      e.style.unityTextOverflowPosition = input.TextOverflowPosition switch
+      e.style.unityTextOutlineColor = AdaptColor(input?.TextOutlineColor);
+      e.style.unityTextOutlineWidth = AdaptFloat(input?.TextOutlineWidth);
+      e.style.unityTextOverflowPosition = input?.TextOverflowPosition switch
       {
         Schema.TextOverflowPosition.End => UnityEngine.UIElements.TextOverflowPosition.End,
         Schema.TextOverflowPosition.Start => UnityEngine.UIElements.TextOverflowPosition.Start,
         Schema.TextOverflowPosition.Middle => UnityEngine.UIElements.TextOverflowPosition.Middle,
         _ => new StyleEnum<UnityEngine.UIElements.TextOverflowPosition>(StyleKeyword.Null)
       };
-      e.style.visibility = input.Visibility switch
+      e.style.visibility = input?.Visibility switch
       {
         FlexVisibility.Visible => Visibility.Visible,
         FlexVisibility.Hidden => Visibility.Hidden,
         _ => new StyleEnum<Visibility>(StyleKeyword.Null)
       };
-      e.style.whiteSpace = input.WhiteSpace switch
+      e.style.whiteSpace = input?.WhiteSpace switch
       {
         Schema.WhiteSpace.Normal => UnityEngine.UIElements.WhiteSpace.Normal,
         Schema.WhiteSpace.NoWrap => UnityEngine.UIElements.WhiteSpace.NoWrap,
         _ => new StyleEnum<UnityEngine.UIElements.WhiteSpace>(StyleKeyword.Null)
       };
-      e.style.width = AdaptDimension(registry, input.Width);
-      e.style.wordSpacing = AdaptDimension(registry, input.WordSpacing);
+      e.style.width = AdaptDimension(registry, input?.Width);
+      e.style.wordSpacing = AdaptDimension(registry, input?.WordSpacing);
 
-      if (input.BackgroundImage is { } bi)
+      if (input?.BackgroundImage is { } bi)
       {
         var sprite = registry.AssetService.GetSprite(bi);
-        var aspectRatio = sprite == null ? 0 : ((float)sprite.texture.width) / sprite.texture.height;
         e.style.backgroundImage = new StyleBackground(sprite);
       }
       else
@@ -523,7 +517,7 @@ namespace Dreamtides.Masonry
         e.style.backgroundImage = new StyleBackground(StyleKeyword.Null);
       }
 
-      e.pickingMode = input.PickingMode switch
+      e.pickingMode = input?.PickingMode switch
       {
         null => PickingMode.Position,
         FlexPickingMode.Position => PickingMode.Position,

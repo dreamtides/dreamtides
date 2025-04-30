@@ -1,5 +1,5 @@
 #![feature(let_chains)]
 
 pub mod core;
-pub mod rendering;
 pub mod panels;
+pub mod rendering;

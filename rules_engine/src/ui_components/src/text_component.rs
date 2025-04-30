@@ -35,9 +35,8 @@ impl Component for TextComponent {
     }
 
     fn flex_node(&self) -> Option<FlexNode> {
-        let mut style = FlexStyle::default();
-        style.margin = Some(0.into());
-        style.padding = Some(0.into());
+        let mut style =
+            FlexStyle { margin: Some(0.into()), padding: Some(0.into()), ..Default::default() };
         typography::apply(&self.typography, &mut style);
         style_options::apply(&self.style_options, &mut style);
 
