@@ -1,3 +1,4 @@
+use action_data::game_action::GameAction;
 use asset_paths::poneti_ui;
 use bon::Builder;
 use masonry::flex_enums::{FlexAlign, FlexJustify};
@@ -13,6 +14,8 @@ use crate::typography::Typography;
 pub struct ButtonComponent {
     #[builder(into)]
     pub label: String,
+    #[builder(into)]
+    pub action: GameAction,
     pub style_options: Option<StyleOptions>,
     pub flex_grow: Option<FlexGrow>,
 }
@@ -35,6 +38,7 @@ impl Component for ButtonComponent {
                         .padding((12, 0))
                         .build(),
                 )
+                .on_click(self.action)
                 .child(
                     TextComponent::builder()
                         .text(self.label)

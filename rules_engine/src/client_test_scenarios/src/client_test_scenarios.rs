@@ -216,7 +216,7 @@ fn select_card(card_id: CardId) -> CommandSequence {
     battle.interface.screen_overlay = None;
     battle.interface.primary_action_button = Some(ButtonView {
         label: "End Turn".to_string(),
-        action: Some(GameAction::DebugAction(DebugAction::TriggerEnemyJudgment)),
+        action: Some(GameAction::DebugAction(DebugAction::ApplyTestScenarioAction)),
     });
 
     clear_all_statuses(&mut battle);
@@ -362,7 +362,7 @@ fn play_card_with_order_selector(
         Some(CardOrderSelectorView { include_deck: true, include_void: true });
     battle.interface.primary_action_button = Some(ButtonView {
         label: "End Turn".to_string(),
-        action: Some(GameAction::DebugAction(DebugAction::TriggerEnemyJudgment)),
+        action: Some(GameAction::DebugAction(DebugAction::ApplyTestScenarioAction)),
     });
 
     *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());

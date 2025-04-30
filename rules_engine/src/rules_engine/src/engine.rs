@@ -18,7 +18,7 @@ use tokio::task;
 use tracing::{error, info};
 use uuid::Uuid;
 
-use crate::{error_message, handle_battle_action};
+use crate::{debug_actions, error_message, handle_battle_action};
 
 static CURRENT_BATTLE: LazyLock<Mutex<Option<BattleData>>> = LazyLock::new(|| Mutex::new(None));
 
@@ -65,6 +65,14 @@ fn perform_action_internal(request: &PerformActionRequest) {
             };
             battle.animations = Some(AnimationData::default());
             match request.action {
+                GameAction::DebugAction(action) => {
+                    let player = renderer::player_name_for_user(&battle, user_id);
+                    debug_actions::execute(&mut battle, player, action);
+                    handle_battle_action::append_update(
+                        user_id,
+                        renderer::connect(&battle, user_id),
+                    );
+                }
                 GameAction::BattleAction(action) => {
                     let player = renderer::player_name_for_user(&battle, user_id);
                     handle_battle_action::execute(&mut battle, user_id, player, action);
@@ -83,7 +91,6 @@ fn perform_action_internal(request: &PerformActionRequest) {
                         renderer::connect(&battle, user_id),
                     );
                 }
-                _ => todo!("Implement other actions"),
             };
             *CURRENT_BATTLE.lock().unwrap() = Some(battle);
             None

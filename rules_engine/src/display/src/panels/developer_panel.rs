@@ -1,3 +1,4 @@
+use action_data::debug_action::DebugAction;
 use ui_components::button_component::ButtonComponent;
 use ui_components::component::Component;
 use ui_components::panel_component::PanelComponent;
@@ -10,7 +11,12 @@ impl Component for DeveloperPanel {
         Some(
             PanelComponent::builder()
                 .title("Developer")
-                .content(ButtonComponent::builder().label("Restart").build())
+                .content(
+                    ButtonComponent::builder()
+                        .label("Draw Card")
+                        .action(DebugAction::DrawCard)
+                        .build(),
+                )
                 .build(),
         )
     }
