@@ -308,10 +308,10 @@ namespace Dreamtides.Masonry
 
     public static void ApplyStyle(Registry registry, VisualElement e, FlexStyle? input)
     {
-      if (input == null)
-      {
-        return;
-      }
+      // if (input == null)
+      // {
+      //   return;
+      // }
 
       e.style.alignContent = AdaptAlign(input.AlignContent);
       e.style.alignItems = AdaptAlign(input.AlignItems);

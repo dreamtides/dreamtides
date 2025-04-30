@@ -5,6 +5,7 @@ use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition};
 use masonry::flex_style::FlexStyle;
 
 use crate::box_component::BoxComponent;
+use crate::close_button_component::CloseButtonComponent;
 use crate::component::Component;
 
 #[derive(Clone, Builder)]
@@ -30,6 +31,18 @@ impl<T: Component> Component for PanelComponent<T> {
                         .justify_content(FlexJustify::Center)
                         .padding(4)
                         .position(FlexPosition::Absolute)
+                        .build(),
+                )
+                .child(
+                    BoxComponent::builder()
+                        .name("Close Button Container")
+                        .style(
+                            FlexStyle::builder()
+                                .position(FlexPosition::Absolute)
+                                .inset(FlexInsets::builder().top(10).right(10).build())
+                                .build(),
+                        )
+                        .child(CloseButtonComponent::default())
                         .build(),
                 )
                 .child(self.content)

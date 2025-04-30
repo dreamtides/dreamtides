@@ -18,7 +18,10 @@ use display_data::command::{Command, GameMessageType, UpdateBattleCommand};
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify};
 use masonry::flex_node::FlexNode;
 use masonry::flex_style::FlexStyle;
+use ui_components::box_component::BoxComponent;
 use ui_components::component::Component;
+use ui_components::text_component::TextComponent;
+use ui_components::typography::Typography;
 
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
@@ -72,7 +75,7 @@ pub fn open_panel(address: PanelAddress) {
 /// Closes the currently-displayed panel.
 pub fn close_current_panel() {
     let mut current_panel = CURRENT_PANEL.lock().unwrap();
-    *current_panel = None;
+    *current_panel = BoxComponent::builder().name("Box").build().flex_node();
 }
 
 fn player_view(battle: &BattleData, player: &PlayerData) -> PlayerView {

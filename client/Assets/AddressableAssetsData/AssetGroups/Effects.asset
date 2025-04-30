@@ -26,6 +26,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0a32d70ab53d59e45af4603bafd387e9
+    m_Address: Assets/ThirdParty/Poneti/ClassicFantasyRPG_UI/ARTWORKS/UIelements/Buttons/Square/Button_RED_s.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0c7a1654ade614871b9dc468a3f3aec8
     m_Address: Assets/Content/Dissolves/Dissolve14.mat
     m_ReadOnly: 0
@@ -266,11 +271,6 @@ MonoBehaviour:
   - m_GUID: d95f78e19394048d88a81bba1531de7f
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       23 cube.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: d9a26175ec3d7a94884393ba6d72da23
-    m_Address: Assets/ThirdParty/Poneti/ClassicFantasyRPG_UI/ARTWORKS/UIelements/Buttons/Medium/Button_Purple.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

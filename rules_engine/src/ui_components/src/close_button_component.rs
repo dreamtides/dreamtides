@@ -1,7 +1,8 @@
+use action_data::game_action::GameAction;
 use asset_paths::poneti_ui;
 use bon::Builder;
 use masonry::flex_enums::{FlexAlign, FlexJustify};
-use masonry::flex_style::{FlexGrow, FlexStyle};
+use masonry::flex_style::FlexStyle;
 
 use crate::box_component::BoxComponent;
 use crate::component::Component;
@@ -9,35 +10,31 @@ use crate::style_options::StyleOptions;
 use crate::text_component::TextComponent;
 use crate::typography::Typography;
 
-#[derive(Clone, Builder)]
-pub struct ButtonComponent {
-    #[builder(into)]
-    pub label: String,
+#[derive(Clone, Builder, Default)]
+pub struct CloseButtonComponent {
     pub style_options: Option<StyleOptions>,
-    pub flex_grow: Option<FlexGrow>,
 }
 
-impl Component for ButtonComponent {
+impl Component for CloseButtonComponent {
     fn render(self) -> Option<impl Component> {
         Some(
             BoxComponent::builder()
-                .name(format!("{} Button", self.label))
+                .name("Close Button")
                 .style(
                     FlexStyle::builder()
                         .align_items(FlexAlign::Center)
-                        .background_image(poneti_ui::primary_button_background())
-                        .flex_grow(self.flex_grow.unwrap_or_default())
+                        .background_image(poneti_ui::close_button_background())
                         .flex_shrink(0)
-                        .height(32)
-                        .image_slice(45)
+                        .height(24)
+                        .image_slice(100)
                         .justify_content(FlexJustify::Center)
-                        .min_width(32)
-                        .padding((12, 0))
+                        .width(24)
                         .build(),
                 )
+                .on_click(GameAction::CloseCurrentPanel)
                 .child(
                     TextComponent::builder()
-                        .text(self.label)
+                        .text("\u{f00d}")
                         .typography(Typography::ButtonLabel)
                         .build(),
                 )

@@ -75,6 +75,7 @@ namespace Dreamtides.Services
 
     public void RenderScreenOverlay(FlexNode? node)
     {
+      Debug.Log($"RenderScreenOverlay with node '{node?.Name}'");
       Reconcile(ref _screenOverlay, node ?? new FlexNode());
     }
 

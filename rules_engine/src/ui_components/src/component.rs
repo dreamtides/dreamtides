@@ -15,6 +15,16 @@ pub trait Component: Clone {
     }
 }
 
+impl<T: Component> Component for Option<T> {
+    fn render(self) -> Option<impl Component> {
+        if let Some(c) = self {
+            c.render()
+        } else {
+            None
+        }
+    }
+}
+
 #[derive(Clone)]
 pub struct NodeComponent;
 
