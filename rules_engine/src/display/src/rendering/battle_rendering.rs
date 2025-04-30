@@ -1,3 +1,5 @@
+use std::sync::{LazyLock, Mutex};
+
 use action_data::battle_action_data::BattleAction;
 use action_data::game_action::GameAction;
 use action_data::panel_address::PanelAddress;
@@ -14,11 +16,16 @@ use core_data::numerics::Energy;
 use display_data::battle_view::{BattleView, ButtonView, InterfaceView, PlayerView};
 use display_data::command::{Command, GameMessageType, UpdateBattleCommand};
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify};
+use masonry::flex_node::FlexNode;
 use masonry::flex_style::FlexStyle;
+use ui_components::component::Component;
 
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
+use crate::panels::developer_panel::DeveloperPanel;
 use crate::rendering::card_rendering;
+
+static CURRENT_PANEL: LazyLock<Mutex<Option<FlexNode>>> = LazyLock::new(|| Mutex::new(None));
 
 pub fn run(builder: &mut ResponseBuilder, battle: &BattleData) {
     builder.push(Command::UpdateBattle(UpdateBattleCommand {
@@ -51,6 +58,23 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleData) -> BattleView
     }
 }
 
+/// Opens a panel based on its [PanelAddress], replacing any
+/// previously-displayed panel.
+pub fn open_panel(address: PanelAddress) {
+    let mut current_panel = CURRENT_PANEL.lock().unwrap();
+    match address {
+        PanelAddress::Developer => {
+            *current_panel = DeveloperPanel.flex_node();
+        }
+    }
+}
+
+/// Closes the currently-displayed panel.
+pub fn close_current_panel() {
+    let mut current_panel = CURRENT_PANEL.lock().unwrap();
+    *current_panel = None;
+}
+
 fn player_view(battle: &BattleData, player: &PlayerData) -> PlayerView {
     PlayerView {
         score: player.points,
@@ -66,12 +90,13 @@ fn interface_view(builder: &ResponseBuilder, battle: &BattleData) -> InterfaceVi
         return InterfaceView::default();
     }
 
+    let current_panel = CURRENT_PANEL.lock().unwrap().clone();
     let legal_actions = legal_actions::compute(battle, builder.act_for_player(), LegalActions {
         for_human_player: true,
     });
 
     InterfaceView {
-        screen_overlay: None,
+        screen_overlay: current_panel,
         primary_action_button: primary_action_button(builder, battle, &legal_actions),
         primary_action_show_on_idle_duration: None,
         secondary_action_button: secondary_action_button(battle, &legal_actions),

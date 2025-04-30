@@ -9,7 +9,7 @@ use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_animations::animation_data::AnimationData;
 use battle_data::battle_player::player_data::PlayerType;
 use core_data::identifiers::{BattleId, UserId};
-use display::rendering::renderer;
+use display::rendering::{battle_rendering, renderer};
 use display_data::command::CommandSequence;
 use display_data::request_data::{ConnectRequest, ConnectResponse, PerformActionRequest};
 use game_creation::new_battle;
@@ -68,6 +68,20 @@ fn perform_action_internal(request: &PerformActionRequest) {
                 GameAction::BattleAction(action) => {
                     let player = renderer::player_name_for_user(&battle, user_id);
                     handle_battle_action::execute(&mut battle, user_id, player, action);
+                }
+                GameAction::OpenPanel(address) => {
+                    battle_rendering::open_panel(address);
+                    handle_battle_action::append_update(
+                        user_id,
+                        renderer::connect(&battle, user_id),
+                    );
+                }
+                GameAction::CloseCurrentPanel => {
+                    battle_rendering::close_current_panel();
+                    handle_battle_action::append_update(
+                        user_id,
+                        renderer::connect(&battle, user_id),
+                    );
                 }
                 _ => todo!("Implement other actions"),
             };
