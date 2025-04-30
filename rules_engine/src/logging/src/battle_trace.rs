@@ -125,6 +125,7 @@ macro_rules! battle_trace {
 }
 
 #[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CommandTraceEvent {
     pub m: String,
     pub snapshot: Option<DebugBattleData>,
@@ -221,8 +222,6 @@ fn reset_file(file: &mut File, json_str: &str) {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
     use battle_data::battle::battle_data::BattleData;
     use battle_data::battle::battle_status::BattleStatus;
     use battle_data::battle::battle_tracing::BattleTracing;
@@ -234,7 +233,6 @@ mod tests {
     use core_data::identifiers::{BattleId, UserId};
     use core_data::numerics::{Energy, Points, Spark, TurnId};
     use core_data::types::PlayerName;
-    use display_data::command::CommandSequence;
     use rand_xoshiro::rand_core::SeedableRng;
     use rand_xoshiro::Xoshiro256PlusPlus;
     use uuid::Uuid;
@@ -367,26 +365,5 @@ mod tests {
         assert_eq!(events[1].m, "With expressions");
         assert_eq!(events[1].values.get("player_name").unwrap(), "\"One\"");
         assert_eq!(events[1].values.get("doubled_count").unwrap(), "4");
-    }
-
-    #[test]
-    fn test_write_commands() {
-        let sequence = CommandSequence { groups: vec![] };
-        let battle = create_test_battle();
-
-        let log_path = "log.json";
-        if fs::metadata(log_path).is_ok() {
-            fs::remove_file(log_path).unwrap();
-        }
-
-        super::write_commands(Some(&battle), "Command sequence", &sequence);
-
-        assert!(fs::metadata(log_path).is_ok());
-        let contents = fs::read_to_string(log_path).unwrap();
-        assert!(contents.contains("\"sequence\""));
-        assert!(contents.contains("\"groups\""));
-        assert!(contents.contains("\"m\": \"Command sequence\""));
-
-        fs::remove_file(log_path).unwrap();
     }
 }

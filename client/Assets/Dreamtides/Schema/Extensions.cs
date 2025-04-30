@@ -19,15 +19,23 @@ namespace Dreamtides.Schema
 
   public partial struct ActionUnion
   {
-    public GameAction ToGameAction() => new GameAction
+    public GameAction? ToGameAction()
     {
-      Enum = Enum,
-      GameActionClass = new()
+      if (IsNull)
       {
-        DebugAction = ActionClass.DebugAction,
-        BattleAction = ActionClass.BattleAction,
-        OpenPanel = ActionClass.OpenPanel,
+        return null;
       }
-    };
+
+      return new GameAction
+      {
+        Enum = Enum,
+        GameActionClass = new()
+        {
+          DebugAction = ActionClass?.DebugAction,
+          BattleAction = ActionClass?.BattleAction,
+          OpenPanel = ActionClass?.OpenPanel,
+        }
+      };
+    }
   }
 }

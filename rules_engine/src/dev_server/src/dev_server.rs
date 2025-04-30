@@ -1,17 +1,16 @@
 use std::fmt;
 
-use axum::extract::rejection::JsonRejection;
-use axum::extract::Json;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
-use axum::Router;
+use axum::{Json, Router};
 use display_data::command::CommandSequence;
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse, PollRequest,
     PollResponse,
 };
 use rules_engine::engine;
+use serde::de::DeserializeOwned;
 use tracing::{error, info, info_span};
 
 // Custom error type for better error handling
@@ -36,30 +35,24 @@ impl IntoResponse for AppError {
             AppError::Internal(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg.clone()),
         };
 
-        // Log the error with tracing
         error!(%status, error.message = %message, "Request error");
-
-        // Create the HTTP response
         (status, message).into_response()
-    }
-}
-
-// Convert JsonRejection into our AppError
-impl From<JsonRejection> for AppError {
-    fn from(rejection: JsonRejection) -> Self {
-        error!(error.kind = %rejection.body_text(), "JSON parsing error");
-        AppError::BadRequest(format!("Invalid JSON: {}", rejection.body_text()))
     }
 }
 
 type AppResult<T> = Result<T, AppError>;
 
-async fn connect(
-    result: Result<Json<ConnectRequest>, JsonRejection>,
-) -> AppResult<Json<ConnectResponse>> {
+fn parse_json<T: DeserializeOwned>(json_str: &str) -> AppResult<T> {
+    serde_json::from_str(json_str).map_err(|e| {
+        error!(input = %json_str, error = %e, "JSON parsing error");
+        AppError::BadRequest(format!("Invalid JSON: {}\nInput: {}", e, json_str))
+    })
+}
+
+async fn connect(body: String) -> AppResult<Json<ConnectResponse>> {
     println!();
 
-    let Json(req) = result?;
+    let req: ConnectRequest = parse_json(&body)?;
     let user_id = req.metadata.user_id;
 
     if let Some(scenario) = req.test_scenario.as_ref() {
@@ -71,12 +64,10 @@ async fn connect(
     }
 }
 
-async fn perform_action(
-    result: Result<Json<PerformActionRequest>, JsonRejection>,
-) -> AppResult<Json<PerformActionResponse>> {
+async fn perform_action(body: String) -> AppResult<Json<PerformActionResponse>> {
     println!();
 
-    let Json(req) = result?;
+    let req: PerformActionRequest = parse_json(&body)?;
     let action = req.action;
     let user_id = req.metadata.user_id;
 
@@ -92,8 +83,8 @@ async fn perform_action(
     }
 }
 
-async fn poll(result: Result<Json<PollRequest>, JsonRejection>) -> AppResult<Json<PollResponse>> {
-    let Json(req) = result?;
+async fn poll(body: String) -> AppResult<Json<PollResponse>> {
+    let req: PollRequest = parse_json(&body)?;
     let user_id = req.metadata.user_id;
     let commands = engine::poll(user_id);
     Ok(Json(PollResponse { metadata: req.metadata, commands }))
