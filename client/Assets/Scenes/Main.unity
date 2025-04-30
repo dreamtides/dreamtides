@@ -531,7 +531,6 @@ GameObject:
   - component: {fileID: 63280835}
   - component: {fileID: 63280834}
   - component: {fileID: 63280833}
-  - component: {fileID: 63280832}
   m_Layer: 5
   m_Name: UndoButton
   m_TagString: Untagged
@@ -559,19 +558,6 @@ RectTransform:
   m_AnchoredPosition: {x: -15.399984, y: -5.3}
   m_SizeDelta: {x: 25, y: 25}
   m_Pivot: {x: 1, y: 1}
---- !u!114 &63280832
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 63280830}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f0df26f7d9d34a5fa04d508dfb40d5d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _registry: {fileID: 613451854}
 --- !u!114 &63280833
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -616,7 +602,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 63280832}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Dreamtides.Components.DebugFetch, Dreamtides
         m_MethodName: PerformSomeAction
         m_Mode: 1
@@ -1385,7 +1371,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Cheat
+  m_text: \uf0ad Dev
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 092441523ab71452fa05820df56a047e, type: 2}
   m_sharedMaterial: {fileID: -3468430125157895141, guid: 092441523ab71452fa05820df56a047e, type: 2}
@@ -7363,9 +7349,10 @@ GameObject:
   - component: {fileID: 794038738}
   - component: {fileID: 794038737}
   - component: {fileID: 794038736}
-  - component: {fileID: 794038735}
+  - component: {fileID: 794038739}
+  - component: {fileID: 794038740}
   m_Layer: 5
-  m_Name: CheatButton
+  m_Name: DevButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7391,19 +7378,6 @@ RectTransform:
   m_AnchoredPosition: {x: 8.6, y: -35.7}
   m_SizeDelta: {x: 28.6507, y: 12.8774}
   m_Pivot: {x: 0, y: 1}
---- !u!114 &794038735
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 794038733}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f0df26f7d9d34a5fa04d508dfb40d5d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _registry: {fileID: 613451854}
 --- !u!114 &794038736
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7448,9 +7422,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 794038735}
-        m_TargetAssemblyTypeName: Dreamtides.Components.DebugFetch, Assembly-CSharp
-        m_MethodName: TriggerJudgment
+      - m_Target: {fileID: 794038739}
+        m_TargetAssemblyTypeName: Dreamtides.Buttons.ControlledButton, Dreamtides
+        m_MethodName: OnClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7498,6 +7472,34 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 794038733}
   m_CullTransparentMesh: 1
+--- !u!114 &794038739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 794038733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1c1b36d9f5c44e1aae6cb8708cdeb8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _registry: {fileID: 613451854}
+  _canvasGroup: {fileID: 794038740}
+  _showing: 0
+  _text: {fileID: 109627238}
+--- !u!225 &794038740
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 794038733}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1001 &805660137
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11513,6 +11515,7 @@ MonoBehaviour:
   _secondaryActionButton: {fileID: 1383227989}
   _incrementActionButton: {fileID: 2423837261359150460}
   _decrementActionButton: {fileID: 2423837261359150459}
+  _devButton: {fileID: 794038739}
   _enemyMessage: {fileID: 368858825}
   _thinkingIndicator: {fileID: 1469154542}
 --- !u!1 &1305327827
@@ -12670,6 +12673,7 @@ MonoBehaviour:
   _secondaryActionButton: {fileID: 97342985}
   _incrementActionButton: {fileID: 235976237}
   _decrementActionButton: {fileID: 1224380720}
+  _devButton: {fileID: 794038739}
   _enemyMessage: {fileID: 1395752109}
   _thinkingIndicator: {fileID: 603395029}
 --- !u!1 &1445320602
@@ -12734,7 +12738,6 @@ GameObject:
   - component: {fileID: 1455934551}
   - component: {fileID: 1455934550}
   - component: {fileID: 1455934549}
-  - component: {fileID: 1455934548}
   m_Layer: 5
   m_Name: BugButton
   m_TagString: Untagged
@@ -12762,19 +12765,6 @@ RectTransform:
   m_AnchoredPosition: {x: -13, y: -35}
   m_SizeDelta: {x: 28.650696, y: 12.8774}
   m_Pivot: {x: 1, y: 1}
---- !u!114 &1455934548
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1455934546}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f0df26f7d9d34a5fa04d508dfb40d5d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _registry: {fileID: 613451854}
 --- !u!114 &1455934549
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12819,7 +12809,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1455934548}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Dreamtides.Components.DebugFetch, Assembly-CSharp
         m_MethodName: TriggerEnemyJudgment
         m_Mode: 1
@@ -13422,7 +13412,6 @@ GameObject:
   - component: {fileID: 1589782135}
   - component: {fileID: 1589782134}
   - component: {fileID: 1589782133}
-  - component: {fileID: 1589782132}
   m_Layer: 5
   m_Name: MenuButton
   m_TagString: Untagged
@@ -13450,19 +13439,6 @@ RectTransform:
   m_AnchoredPosition: {x: -15.399984, y: -5.3}
   m_SizeDelta: {x: 25, y: 25}
   m_Pivot: {x: 1, y: 1}
---- !u!114 &1589782132
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1589782130}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f0df26f7d9d34a5fa04d508dfb40d5d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _registry: {fileID: 613451854}
 --- !u!114 &1589782133
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13507,7 +13483,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1589782132}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Dreamtides.Components.DebugFetch, Assembly-CSharp
         m_MethodName: OnClick
         m_Mode: 1

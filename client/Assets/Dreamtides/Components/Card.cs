@@ -389,11 +389,7 @@ namespace Dreamtides.Components
 
       if (CardView.Revealed?.Actions?.OnClick is { } onClick && isSameObject && (Time.time - _lastMouseDownTime < 1f))
       {
-        _registry.ActionService.PerformAction(new GameAction
-        {
-          DebugAction = onClick.DebugAction,
-          BattleAction = onClick.BattleAction,
-        });
+        _registry.ActionService.PerformAction(onClick.ToGameAction());
       }
 
       if (_isDraggingForOrdering)
@@ -403,12 +399,15 @@ namespace Dreamtides.Components
         _registry.SoundService.PlayCardSound();
         var action = new GameAction
         {
-          BattleAction = new()
+          GameActionClass = new()
           {
-            BattleActionClass = new()
+            BattleAction = new()
             {
-              SelectCardOrder =
+              BattleActionClass = new()
+              {
+                SelectCardOrder =
                   _registry.Layout.CardOrderSelector.SelectCardOrderWithinDisplay(transform, CardView.Id),
+              }
             }
           }
         };
@@ -436,11 +435,14 @@ namespace Dreamtides.Components
         }
         var action = new GameAction
         {
-          BattleAction = new()
+          GameActionClass = new()
           {
-            BattleActionClass = new()
+            BattleAction = new()
             {
-              PlayCardFromHand = CardView.Id
+              BattleActionClass = new()
+              {
+                PlayCardFromHand = CardView.Id
+              }
             }
           }
         };

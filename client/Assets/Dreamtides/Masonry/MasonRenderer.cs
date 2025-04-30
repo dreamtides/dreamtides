@@ -107,7 +107,7 @@ namespace Dreamtides.Masonry
           {
             if (node.EventHandlers?.OnMouseEnter != null)
             {
-              registry.ActionService.PerformAction(node.EventHandlers.OnMouseEnter.ToGameAction());
+              registry.ActionService.PerformAction(node.EventHandlers.OnMouseEnter?.ToGameAction());
             }
 
             ApplyStyle(registry, element, hoverStyle);
@@ -116,7 +116,7 @@ namespace Dreamtides.Masonry
           {
             if (node.EventHandlers?.OnMouseLeave != null)
             {
-              registry.ActionService.PerformAction(node.EventHandlers.OnMouseLeave.ToGameAction());
+              registry.ActionService.PerformAction(node.EventHandlers.OnMouseLeave?.ToGameAction());
             }
 
             var originalStyle = new FlexStyle();

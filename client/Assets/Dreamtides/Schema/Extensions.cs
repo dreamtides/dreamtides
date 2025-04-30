@@ -17,12 +17,17 @@ namespace Dreamtides.Schema
     public float ToSeconds() => MillisecondsValue / 1000f;
   }
 
-  public partial class ActionClass
+  public partial struct ActionUnion
   {
     public GameAction ToGameAction() => new GameAction
     {
-      DebugAction = DebugAction,
-      BattleAction = BattleAction,
+      Enum = Enum,
+      GameActionClass = new()
+      {
+        DebugAction = ActionClass.DebugAction,
+        BattleAction = ActionClass.BattleAction,
+        OpenPanel = ActionClass.OpenPanel,
+      }
     };
   }
 }

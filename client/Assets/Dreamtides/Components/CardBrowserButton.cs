@@ -24,11 +24,14 @@ namespace Dreamtides.Components
       _registry.SoundService.PlayClickSound();
       var action = new GameAction
       {
-        BattleAction = new()
+        GameActionClass = new()
         {
-          BattleActionClass = new()
+          BattleAction = new()
           {
-            BrowseCards = _type
+            BattleActionClass = new()
+            {
+              BrowseCards = _type
+            }
           }
         }
       };

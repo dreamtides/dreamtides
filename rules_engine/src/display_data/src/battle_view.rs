@@ -64,6 +64,9 @@ pub struct InterfaceView {
     /// Button to decrement the number shown in a number prompt.
     pub decrement_button: Option<ButtonView>,
 
+    /// Button to toggle the display of the developer panel
+    pub dev_button: Option<ButtonView>,
+
     /// Options for display of the card order selector
     pub card_order_selector: Option<CardOrderSelectorView>,
 

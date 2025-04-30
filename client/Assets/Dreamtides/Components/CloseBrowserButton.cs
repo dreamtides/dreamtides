@@ -13,9 +13,12 @@ public class CloseBrowserButton : MonoBehaviour
     _registry.SoundService.PlayClickSound();
     var action = new GameAction
     {
-      BattleAction = new()
+      GameActionClass = new()
       {
-        Enum = BattleActionEnum.CloseCardBrowser
+        BattleAction = new()
+        {
+          Enum = BattleActionEnum.CloseCardBrowser
+        }
       }
     };
     _registry.ActionService.PerformAction(action);

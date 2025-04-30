@@ -126,6 +126,9 @@ namespace Dreamtides.Layout
     [SerializeField] ActionButton? _decrementActionButton;
     public ActionButton DecrementActionButton => Check(_decrementActionButton);
 
+    [SerializeField] ControlledButton? _devButton;
+    public ControlledButton DevButton => Check(_devButton);
+
     [SerializeField] EnemyMessage? _enemyMessage;
     public EnemyMessage EnemyMessage => Check(_enemyMessage);
 

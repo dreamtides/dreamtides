@@ -98,7 +98,7 @@ namespace Dreamtides.Services
       var request = new PerformActionRequest
       {
         Metadata = _metadata,
-        Action = action,
+        Action = action.Value,
         TestScenario = _testScenario
       };
       if (Application.isEditor)
@@ -246,6 +246,7 @@ namespace Dreamtides.Services
           Registry.Layout.SecondaryActionButton.SetView(command.UpdateBattle.Battle.Interface?.SecondaryActionButton);
           Registry.Layout.IncrementActionButton.SetView(command.UpdateBattle.Battle.Interface?.IncrementButton);
           Registry.Layout.DecrementActionButton.SetView(command.UpdateBattle.Battle.Interface?.DecrementButton);
+          Registry.Layout.DevButton.SetView(command.UpdateBattle.Battle.Interface?.DevButton);
           Registry.BottomRightButton.SetView(command.UpdateBattle.Battle.Interface?.BottomRightButton);
           coroutines.Add(StartCoroutine(Registry.LayoutService.UpdateLayout(
               command.UpdateBattle,

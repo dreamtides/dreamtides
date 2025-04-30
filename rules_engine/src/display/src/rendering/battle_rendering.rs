@@ -1,4 +1,6 @@
 use action_data::battle_action_data::BattleAction;
+use action_data::game_action::GameAction;
+use action_data::panel_address::PanelAddress;
 use assert_with::{assert_that, expect, panic_with};
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
@@ -75,6 +77,10 @@ fn interface_view(builder: &ResponseBuilder, battle: &BattleData) -> InterfaceVi
         secondary_action_button: secondary_action_button(battle, &legal_actions),
         increment_button: increment_button(builder, battle),
         decrement_button: decrement_button(builder, battle),
+        dev_button: Some(ButtonView {
+            label: "\u{f0ad} Dev".to_string(),
+            action: Some(GameAction::OpenPanel(PanelAddress::Developer)),
+        }),
         card_order_selector: None,
         bottom_right_button: None,
     }

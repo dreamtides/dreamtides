@@ -23,7 +23,7 @@ namespace Dreamtides.Buttons
     {
       if (_view?.Action != null)
       {
-        _registry.ActionService.PerformAction(_view.Action.ToGameAction());
+        _registry.ActionService.PerformAction(_view.Action?.ToGameAction());
       }
     }
 
