@@ -2,40 +2,67 @@ use action_data::game_action::GameAction;
 use masonry::flex_node::{EventHandlers, FlexNode};
 use masonry::flex_style::FlexStyle;
 
+use crate::component::{Component, NodeComponent};
+
 /// Represents a generic flexbox which can contain other UI components.
+#[derive(Clone)]
 pub struct BoxComponent(pub FlexNode);
 
-#[derive(Default)]
-pub struct BoxComponentBuilder {
-    pub name: Option<String>,
-    pub children: Vec<FlexNode>,
-    pub event_handlers: Option<EventHandlers>,
-    pub style: Option<FlexStyle>,
-    pub hover_style: Option<FlexStyle>,
-    pub pressed_style: Option<FlexStyle>,
-    pub on_attach_style: Option<FlexStyle>,
+impl Component for BoxComponent {
+    fn render(self) -> Option<impl Component> {
+        Some(NodeComponent)
+    }
+
+    fn flex_node(&self) -> Option<FlexNode> {
+        Some(self.0.clone())
+    }
+}
+
+pub struct Unnamed;
+
+pub struct Named(pub String);
+
+pub struct BoxComponentBuilder<T> {
+    name: T,
+    children: Vec<FlexNode>,
+    event_handlers: Option<EventHandlers>,
+    style: Option<FlexStyle>,
+    hover_style: Option<FlexStyle>,
+    pressed_style: Option<FlexStyle>,
+    on_attach_style: Option<FlexStyle>,
 }
 
 impl BoxComponent {
-    pub fn builder() -> BoxComponentBuilder {
-        BoxComponentBuilder::default()
+    pub fn builder() -> BoxComponentBuilder<Unnamed> {
+        BoxComponentBuilder {
+            name: Unnamed,
+            children: Vec::new(),
+            event_handlers: None,
+            style: None,
+            hover_style: None,
+            pressed_style: None,
+            on_attach_style: None,
+        }
     }
 }
 
-impl From<BoxComponent> for Option<FlexNode> {
-    fn from(component: BoxComponent) -> Self {
-        Some(component.0)
+impl BoxComponentBuilder<Unnamed> {
+    pub fn name(self, name: impl Into<String>) -> BoxComponentBuilder<Named> {
+        BoxComponentBuilder {
+            name: Named(name.into()),
+            children: self.children,
+            event_handlers: self.event_handlers,
+            style: self.style,
+            hover_style: self.hover_style,
+            pressed_style: self.pressed_style,
+            on_attach_style: self.on_attach_style,
+        }
     }
 }
 
-impl BoxComponentBuilder {
-    pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.name = Some(name.into());
-        self
-    }
-
-    pub fn child(mut self, child: impl Into<Option<FlexNode>>) -> Self {
-        if let Some(child) = child.into() {
+impl BoxComponentBuilder<Named> {
+    pub fn child(mut self, child: impl Component) -> Self {
+        if let Some(child) = child.flex_node() {
             self.children.push(child);
         }
         self
@@ -75,10 +102,12 @@ impl BoxComponentBuilder {
         self.on_attach_style = Some(on_attach_style);
         self
     }
+}
 
+impl BoxComponentBuilder<Named> {
     pub fn build(self) -> BoxComponent {
         BoxComponent(FlexNode {
-            name: self.name,
+            name: Some(self.name.0),
             node_type: None,
             children: self.children,
             event_handlers: self.event_handlers,

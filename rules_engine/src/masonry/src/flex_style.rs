@@ -43,11 +43,14 @@ pub struct FlexRotate {
     pub degrees: f32,
 }
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema, Builder)]
 #[serde(rename_all = "camelCase")]
 pub struct FlexTranslate {
+    #[builder(into)]
     pub x: Dimension,
+    #[builder(into)]
     pub y: Dimension,
+    #[builder(default)]
     pub z: f32,
 }
 

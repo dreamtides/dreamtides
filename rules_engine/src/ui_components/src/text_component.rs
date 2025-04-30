@@ -3,10 +3,11 @@ use masonry::flex_enums::{TextAlign, WhiteSpace};
 use masonry::flex_node::{FlexNode, NodeType, TextNode};
 use masonry::flex_style::{FlexGrow, FlexShrink, FlexStyle};
 
+use crate::component::{Component, NodeComponent};
 use crate::style_options::{self, StyleOptions};
 use crate::typography::{self, Typography};
 
-#[derive(Builder)]
+#[derive(Clone, Builder)]
 pub struct TextComponent {
     /// The text to display
     #[builder(into)]
@@ -28,31 +29,35 @@ pub struct TextComponent {
     pub white_space: Option<WhiteSpace>,
 }
 
-impl From<TextComponent> for Option<FlexNode> {
-    fn from(component: TextComponent) -> Self {
+impl Component for TextComponent {
+    fn render(self) -> Option<impl Component> {
+        Some(NodeComponent)
+    }
+
+    fn flex_node(&self) -> Option<FlexNode> {
         let mut style = FlexStyle::default();
 
-        typography::apply(component.typography, &mut style);
-        style_options::apply(component.style_options, &mut style);
+        typography::apply(&self.typography, &mut style);
+        style_options::apply(&self.style_options, &mut style);
 
-        if let Some(flex_grow) = component.flex_grow {
+        if let Some(flex_grow) = self.flex_grow {
             style.flex_grow = Some(flex_grow);
         }
 
-        if let Some(flex_shrink) = component.flex_shrink {
+        if let Some(flex_shrink) = self.flex_shrink {
             style.flex_shrink = Some(flex_shrink);
         }
 
-        if let Some(text_align) = component.text_align {
+        if let Some(text_align) = self.text_align {
             style.text_align = Some(text_align);
         }
 
-        if let Some(white_space) = component.white_space {
+        if let Some(white_space) = self.white_space {
             style.white_space = Some(white_space);
         }
 
         Some(FlexNode {
-            node_type: Some(NodeType::Text(TextNode { label: component.text })),
+            node_type: Some(NodeType::Text(TextNode { label: self.text.clone() })),
             style: Some(style),
             ..Default::default()
         })

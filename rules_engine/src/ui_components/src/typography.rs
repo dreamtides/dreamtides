@@ -6,12 +6,13 @@ use masonry::flex_enums::FontStyle;
 use masonry::flex_style::{FlexStyle, TextShadow};
 
 /// A named configuration of typography values, such as font size and color.
+#[derive(Clone)]
 pub enum Typography {
     StackTrace,
 }
 
 /// Mutates a [FlexStyle] to apply typography options to it.
-pub fn apply(typography: Typography, style: &mut FlexStyle) {
+pub fn apply(typography: &Typography, style: &mut FlexStyle) {
     let options = match typography {
         Typography::StackTrace => {
             TypographyOptions::builder().color(display_color::WHITE).font_size(6).build()

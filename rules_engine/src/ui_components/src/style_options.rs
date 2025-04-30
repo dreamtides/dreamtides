@@ -5,7 +5,7 @@ use masonry::flex_style::{FlexStyle, FlexTranslate, Opacity};
 
 /// A subset of the full style API, used in higher-level components that do not
 /// require arbitrary styling.
-#[derive(Builder)]
+#[derive(Clone, Builder)]
 pub struct StyleOptions {
     pub align_self: Option<FlexAlign>,
     pub display: Option<FlexDisplayStyle>,
@@ -24,7 +24,7 @@ pub struct StyleOptions {
 }
 
 /// Mutates a [FlexStyle] to apply style options to it.
-pub fn apply(options: Option<StyleOptions>, style: &mut FlexStyle) {
+pub fn apply(options: &Option<StyleOptions>, style: &mut FlexStyle) {
     if let Some(options) = options {
         style.align_self = options.align_self;
         style.display = options.display;

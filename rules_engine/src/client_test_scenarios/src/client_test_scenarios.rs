@@ -58,6 +58,10 @@ pub fn perform_action(request: &PerformActionRequest, scenario: &str) -> Perform
         GameAction::DebugAction(action) => {
             perform_debug_action(*action, request.metadata, scenario)
         }
+        _ => PerformActionResponse {
+            metadata: request.metadata,
+            commands: CommandSequence::default(),
+        },
     }
 }
 

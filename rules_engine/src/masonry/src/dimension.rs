@@ -15,6 +15,8 @@ pub enum DimensionUnit {
     SafeAreaLeft,
 }
 
+pub struct Percent(pub i32);
+
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Dimension {
@@ -31,6 +33,12 @@ impl From<i32> for Dimension {
 impl From<f32> for Dimension {
     fn from(value: f32) -> Self {
         Self { unit: DimensionUnit::Pixels, value }
+    }
+}
+
+impl From<Percent> for Dimension {
+    fn from(value: Percent) -> Self {
+        Self { unit: DimensionUnit::Percentage, value: value.0 as f32 }
     }
 }
 
