@@ -849,7 +849,7 @@ namespace Dreamtides.Schema
     public partial class NodeType
     {
         [JsonProperty("text", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public Text Text { get; set; }
+        public TextNode Text { get; set; }
 
         [JsonProperty("scrollViewNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public ScrollViewNode ScrollViewNode { get; set; }
@@ -1299,7 +1299,7 @@ namespace Dreamtides.Schema
         public FlexStyle TrackerStyle { get; set; }
     }
 
-    public partial class Text
+    public partial class TextNode
     {
         [JsonProperty("label", Required = Required.Always)]
         public string Label { get; set; }

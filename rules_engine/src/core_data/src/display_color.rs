@@ -31,6 +31,7 @@ pub const BLACK: DisplayColor = color(0.0, 0.0, 0.0, 1.0);
 pub const BLACK_ALPHA_25: DisplayColor = color(0.0, 0.0, 0.0, 0.25);
 pub const BLACK_ALPHA_50: DisplayColor = color(0.0, 0.0, 0.0, 0.5);
 pub const BLACK_ALPHA_75: DisplayColor = color(0.0, 0.0, 0.0, 0.75);
+pub const BLACK_ALPHA_95: DisplayColor = color(0.0, 0.0, 0.0, 0.95);
 pub const RED_100: DisplayColor = color(1.0, 0.8, 0.82, 1.0);
 pub const RED_500: DisplayColor = color(0.96, 0.26, 0.21, 1.0);
 pub const RED_600: DisplayColor = color(0.9, 0.22, 0.21, 1.0);

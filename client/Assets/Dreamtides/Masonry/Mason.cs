@@ -148,7 +148,7 @@ namespace Dreamtides.Masonry
     {
       NodeType = new NodeType
       {
-        Text = new Text
+        Text = new TextNode
         {
           Label = label,
         }

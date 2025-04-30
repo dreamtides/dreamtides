@@ -97,7 +97,7 @@ pub struct SliderNode {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum NodeType {
-    Text(Text),
+    Text(TextNode),
     ScrollViewNode(Box<ScrollViewNode>),
     DraggableNode(DraggableNode),
     TextFieldNode(TextFieldNode),
@@ -131,10 +131,6 @@ pub struct FlexNode {
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct Text {
+pub struct TextNode {
     pub label: String,
 }
-
-#[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct Flexbox {}

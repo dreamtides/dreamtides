@@ -1,13 +1,12 @@
 use battle_data::battle::battle_data::BattleData;
-use core_data::display_color::DisplayColor;
+use core_data::display_color::{self};
 use core_data::types::PlayerName;
 use display::core::response_builder::ResponseBuilder;
 use display::rendering::battle_rendering;
 use display_data::command::{Command, CommandSequence, UpdateBattleCommand};
-use masonry::borders::BorderRadius;
-use masonry::dimension::{Dimension, DimensionGroup, DimensionUnit, FlexInsets};
+use masonry::dimension::{Dimension, DimensionUnit, FlexInsets};
 use masonry::flex_enums::{FlexPosition, TextAlign, WhiteSpace};
-use masonry::flex_node::{FlexNode, NodeType, Text};
+use masonry::flex_node::{FlexNode, NodeType, TextNode};
 use masonry::flex_style::FlexStyle;
 
 /// Attempts to display an error message to the player describing a rules engine
@@ -21,30 +20,19 @@ pub fn display_error_message(battle: &BattleData, message: String) -> CommandSeq
 }
 
 fn render_message(text: String) -> FlexNode {
-    let style = FlexStyle {
-        background_color: Some(DisplayColor { red: 0.0, green: 0.0, blue: 0.0, alpha: 0.95 }),
-        border_radius: Some(BorderRadius {
-            top_left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
-            top_right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
-            bottom_right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
-            bottom_left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
-        }),
-        padding: Some(DimensionGroup {
-            top: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
-            right: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
-            bottom: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
-            left: Dimension { unit: DimensionUnit::Pixels, value: 4.0 },
-        }),
-        color: Some(DisplayColor { red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0 }),
-        font_size: Some(Dimension { unit: DimensionUnit::Pixels, value: 6.0 }),
-        min_height: Some(Dimension { unit: DimensionUnit::Pixels, value: 22.0 }),
-        white_space: Some(WhiteSpace::Normal),
-        text_align: Some(TextAlign::MiddleLeft),
-        ..Default::default()
-    };
+    let style = FlexStyle::builder()
+        .background_color(display_color::BLACK_ALPHA_95)
+        .border_radius(4)
+        .padding(4)
+        .color(display_color::WHITE)
+        .font_size(6)
+        .min_height(22)
+        .white_space(WhiteSpace::Normal)
+        .text_align(TextAlign::MiddleLeft)
+        .build();
 
     let message = FlexNode {
-        node_type: Some(NodeType::Text(Text { label: text })),
+        node_type: Some(NodeType::Text(TextNode { label: text })),
         style: Some(style),
         ..Default::default()
     };

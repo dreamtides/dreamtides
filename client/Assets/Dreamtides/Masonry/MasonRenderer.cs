@@ -250,7 +250,7 @@ namespace Dreamtides.Masonry
       }
     }
 
-    static void ApplyText(Label label, Text text)
+    static void ApplyText(Label label, TextNode text)
     {
       label.text = text.Label;
     }

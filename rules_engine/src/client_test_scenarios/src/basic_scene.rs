@@ -16,7 +16,7 @@ use display_data::object_position::{ObjectPosition, Position};
 use masonry::borders::BorderRadius;
 use masonry::dimension::{Dimension, DimensionGroup, DimensionUnit, FlexInsets};
 use masonry::flex_enums::{FlexPosition, TextAlign, WhiteSpace};
-use masonry::flex_node::{FlexNode, NodeType, Text};
+use masonry::flex_node::{FlexNode, NodeType, TextNode};
 use masonry::flex_style::FlexStyle;
 
 pub fn create(id: BattleId) -> BattleView {
@@ -443,7 +443,7 @@ fn flex_node(text: impl Into<String>) -> Option<FlexNode> {
         ..Default::default()
     };
     Some(FlexNode {
-        node_type: Some(NodeType::Text(Text { label: text.into() })),
+        node_type: Some(NodeType::Text(TextNode { label: text.into() })),
         style: Some(style),
         ..Default::default()
     })
@@ -473,7 +473,7 @@ fn hand_size_limit_message() -> FlexNode {
     };
 
     let message = FlexNode {
-        node_type: Some(NodeType::Text(Text {
+        node_type: Some(NodeType::Text(TextNode {
             label: "Note: cards drawn in excess of 10 become \u{f7e4} instead.".into(),
         })),
         style: Some(style),
@@ -520,7 +520,7 @@ fn character_limit_message() -> FlexNode {
     };
 
     let message = FlexNode {
-        node_type: Some(NodeType::Text(Text { label: "You have 8 characters in play. A character will be dissolved, with its spark permanently added to your total.".into() })),
+        node_type: Some(NodeType::Text(TextNode { label: "You have 8 characters in play. A character will be dissolved, with its spark permanently added to your total.".into() })),
         style: Some(style),
         ..Default::default()
     };

@@ -29,7 +29,7 @@ use display_data::request_data::{
 use masonry::borders::BorderRadius;
 use masonry::dimension::{Dimension, DimensionGroup, DimensionUnit, FlexInsets};
 use masonry::flex_enums::{FlexPosition, TextAlign, WhiteSpace};
-use masonry::flex_node::{FlexNode, NodeType, Text};
+use masonry::flex_node::{FlexNode, NodeType, TextNode};
 use masonry::flex_style::{FlexStyle, FlexVector3};
 use uuid::Uuid;
 
@@ -505,7 +505,7 @@ fn select_target_message() -> FlexNode {
     };
 
     let message = FlexNode {
-        node_type: Some(NodeType::Text(Text { label: "Choose an enemy character".into() })),
+        node_type: Some(NodeType::Text(TextNode { label: "Choose an enemy character".into() })),
         style: Some(style),
         ..Default::default()
     };
