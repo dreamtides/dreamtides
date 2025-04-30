@@ -1,6 +1,4 @@
-use core_data::display_color;
-use masonry::flex_style::FlexStyle;
-use ui_components::box_component::BoxComponent;
+use ui_components::button_component::ButtonComponent;
 use ui_components::component::Component;
 use ui_components::panel_component::PanelComponent;
 
@@ -12,18 +10,7 @@ impl Component for DeveloperPanel {
         Some(
             PanelComponent::builder()
                 .title("Developer")
-                .content(
-                    BoxComponent::builder()
-                        .name("Box")
-                        .style(
-                            FlexStyle::builder()
-                                .width(100)
-                                .height(100)
-                                .background_color(display_color::RED_500)
-                                .build(),
-                        )
-                        .build(),
-                )
+                .content(ButtonComponent::builder().label("Restart").build())
                 .build(),
         )
     }

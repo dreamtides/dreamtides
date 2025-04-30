@@ -9,6 +9,7 @@ use masonry::flex_style::{FlexStyle, TextShadow};
 #[derive(Clone)]
 pub enum Typography {
     StackTrace,
+    ButtonLabel,
 }
 
 /// Mutates a [FlexStyle] to apply typography options to it.
@@ -16,6 +17,9 @@ pub fn apply(typography: &Typography, style: &mut FlexStyle) {
     let options = match typography {
         Typography::StackTrace => {
             TypographyOptions::builder().color(display_color::WHITE).font_size(6).build()
+        }
+        Typography::ButtonLabel => {
+            TypographyOptions::builder().color(display_color::WHITE).font_size(12).build()
         }
     };
 

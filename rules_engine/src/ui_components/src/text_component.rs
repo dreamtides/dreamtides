@@ -36,7 +36,8 @@ impl Component for TextComponent {
 
     fn flex_node(&self) -> Option<FlexNode> {
         let mut style = FlexStyle::default();
-
+        style.margin = Some(0.into());
+        style.padding = Some(0.into());
         typography::apply(&self.typography, &mut style);
         style_options::apply(&self.style_options, &mut style);
 
@@ -50,6 +51,8 @@ impl Component for TextComponent {
 
         if let Some(text_align) = self.text_align {
             style.text_align = Some(text_align);
+        } else {
+            style.text_align = Some(TextAlign::MiddleCenter);
         }
 
         if let Some(white_space) = self.white_space {

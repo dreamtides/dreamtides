@@ -1,5 +1,5 @@
+use asset_paths::poneti_ui;
 use bon::Builder;
-use core_data::display_color;
 use masonry::dimension::FlexInsets;
 use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition};
 use masonry::flex_style::FlexStyle;
@@ -23,13 +23,13 @@ impl<T: Component> Component for PanelComponent<T> {
                 .name(self.title)
                 .style(
                     FlexStyle::builder()
-                        .position(FlexPosition::Absolute)
-                        .inset(FlexInsets::builder().top(12).bottom(12).left(8).right(8).build())
-                        .padding(4)
                         .align_items(FlexAlign::Center)
+                        .background_image(poneti_ui::window_background())
+                        .image_slice(500)
+                        .inset(FlexInsets::builder().top(12).bottom(12).left(8).right(8).build())
                         .justify_content(FlexJustify::Center)
-                        .background_color(display_color::BLACK_ALPHA_95)
-                        .border_radius(8)
+                        .padding(4)
+                        .position(FlexPosition::Absolute)
                         .build(),
                 )
                 .child(self.content)
