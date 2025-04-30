@@ -26,6 +26,9 @@ impl<T: Component> Component for PanelComponent<T> {
                     FlexStyle::builder()
                         .align_items(FlexAlign::Center)
                         .background_image(poneti_ui::window_background())
+                        // These slice offsets rely on large "pixels per unit"
+                        // values in Unity, e.g. 2048 pixels per unit in this
+                        // case. I don't really know why.
                         .image_slice(500)
                         .inset(FlexInsets::builder().top(12).bottom(12).left(8).right(8).build())
                         .justify_content(FlexJustify::Center)

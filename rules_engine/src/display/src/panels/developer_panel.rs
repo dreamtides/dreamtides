@@ -22,9 +22,9 @@ impl Component for DeveloperPanel {
                         .style(
                             FlexStyle::builder()
                                 .align_items(FlexAlign::Center)
-                                .flex_direction(FlexDirection::Row)
+                                .flex_direction(FlexDirection::Column)
                                 .flex_grow(1)
-                                .justify_content(FlexJustify::SpaceBetween)
+                                .justify_content(FlexJustify::Center)
                                 .wrap(FlexWrap::Wrap)
                                 .build(),
                         )
