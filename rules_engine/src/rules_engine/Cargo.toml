@@ -22,6 +22,7 @@ display_data = { path = "../display_data" }
 game_creation = { path = "../game_creation" }
 logging = { path = "../logging" }
 masonry = { path = "../masonry" }
+ui_components = { path = "../ui_components" }
 
 backtrace = "0.3"
 tokio = { version = "1", features = ["full"] }

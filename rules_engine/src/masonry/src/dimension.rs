@@ -1,3 +1,4 @@
+use bon::Builder;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -88,11 +89,15 @@ impl From<(f32, f32, f32, f32)> for DimensionGroup {
     }
 }
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema, Builder)]
 #[serde(rename_all = "camelCase")]
 pub struct FlexInsets {
+    #[builder(into)]
     pub top: Option<Dimension>,
+    #[builder(into)]
     pub right: Option<Dimension>,
+    #[builder(into)]
     pub bottom: Option<Dimension>,
+    #[builder(into)]
     pub left: Option<Dimension>,
 }

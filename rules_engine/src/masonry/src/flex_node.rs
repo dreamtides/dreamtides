@@ -4,6 +4,19 @@ use serde::{Deserialize, Serialize};
 
 use crate::flex_style::FlexStyle;
 
+#[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct FlexNode {
+    pub name: Option<String>,
+    pub node_type: Option<NodeType>,
+    pub children: Vec<FlexNode>,
+    pub event_handlers: Option<EventHandlers>,
+    pub style: Option<FlexStyle>,
+    pub hover_style: Option<FlexStyle>,
+    pub pressed_style: Option<FlexStyle>,
+    pub on_attach_style: Option<FlexStyle>,
+}
+
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum ScrollBarVisibility {
@@ -94,6 +107,12 @@ pub struct SliderNode {
     pub dragger_border_style: Option<FlexStyle>,
 }
 
+#[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct TextNode {
+    pub label: String,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum NodeType {
@@ -114,23 +133,4 @@ pub struct EventHandlers {
     pub on_mouse_down: Option<GameAction>,
     pub on_mouse_up: Option<GameAction>,
     pub on_field_changed: Option<GameAction>,
-}
-
-#[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct FlexNode {
-    pub name: Option<String>,
-    pub node_type: Option<NodeType>,
-    pub children: Vec<FlexNode>,
-    pub event_handlers: Option<EventHandlers>,
-    pub style: Option<FlexStyle>,
-    pub hover_style: Option<FlexStyle>,
-    pub pressed_style: Option<FlexStyle>,
-    pub on_attach_style: Option<FlexStyle>,
-}
-
-#[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct TextNode {
-    pub label: String,
 }

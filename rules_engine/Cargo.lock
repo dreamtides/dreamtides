@@ -1733,6 +1733,7 @@ dependencies = [
  "masonry",
  "tokio",
  "tracing",
+ "ui_components",
  "uuid",
 ]
 
@@ -2206,6 +2207,16 @@ dependencies = [
  "tracing",
  "tracing-core",
  "tracing-log",
+]
+
+[[package]]
+name = "ui_components"
+version = "0.0.0"
+dependencies = [
+ "action_data",
+ "bon",
+ "core_data",
+ "masonry",
 ]
 
 [[package]]

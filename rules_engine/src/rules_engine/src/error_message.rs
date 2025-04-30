@@ -4,51 +4,35 @@ use core_data::types::PlayerName;
 use display::core::response_builder::ResponseBuilder;
 use display::rendering::battle_rendering;
 use display_data::command::{Command, CommandSequence, UpdateBattleCommand};
-use masonry::dimension::{Dimension, DimensionUnit, FlexInsets};
-use masonry::flex_enums::{FlexPosition, TextAlign, WhiteSpace};
-use masonry::flex_node::{FlexNode, NodeType, TextNode};
+use masonry::dimension::FlexInsets;
+use masonry::flex_enums::FlexPosition;
 use masonry::flex_style::FlexStyle;
+use ui_components::box_component::BoxComponent;
+use ui_components::text_component::TextComponent;
+use ui_components::typography::Typography;
 
 /// Attempts to display an error message to the player describing a rules engine
 /// error.
 pub fn display_error_message(battle: &BattleData, message: String) -> CommandSequence {
     let mut builder = ResponseBuilder::new(PlayerName::One, false);
     let mut view = battle_rendering::battle_view(&builder, battle);
-    view.interface.screen_overlay = Some(render_message(message));
+    view.interface.screen_overlay = render_message(message).into();
     builder.push(Command::UpdateBattle(UpdateBattleCommand { battle: view, update_sound: None }));
     builder.commands()
 }
 
-fn render_message(text: String) -> FlexNode {
-    let style = FlexStyle::builder()
-        .background_color(display_color::BLACK_ALPHA_95)
-        .border_radius(4)
-        .padding(4)
-        .color(display_color::WHITE)
-        .font_size(6)
-        .min_height(22)
-        .white_space(WhiteSpace::Normal)
-        .text_align(TextAlign::MiddleLeft)
-        .build();
-
-    let message = FlexNode {
-        node_type: Some(NodeType::Text(TextNode { label: text })),
-        style: Some(style),
-        ..Default::default()
-    };
-
-    FlexNode {
-        style: Some(FlexStyle {
-            position: Some(FlexPosition::Absolute),
-            inset: Some(FlexInsets {
-                top: Some(Dimension { unit: DimensionUnit::Pixels, value: 50.0 }),
-                right: Some(Dimension { unit: DimensionUnit::Pixels, value: 8.0 }),
-                bottom: None,
-                left: Some(Dimension { unit: DimensionUnit::Pixels, value: 8.0 }),
-            }),
-            ..Default::default()
-        }),
-        children: vec![message],
-        ..Default::default()
-    }
+fn render_message(text: String) -> BoxComponent {
+    BoxComponent::builder()
+        .style(
+            FlexStyle::builder()
+                .background_color(display_color::BLACK_ALPHA_95)
+                .border_radius(4)
+                .inset(FlexInsets::builder().top(12).left(8).right(8).build())
+                .min_height(22)
+                .padding(4)
+                .position(FlexPosition::Absolute)
+                .build(),
+        )
+        .child(TextComponent::builder().text(text).typography(Typography::StackTrace).build())
+        .build()
 }

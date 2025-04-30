@@ -111,6 +111,7 @@ impl From<i32> for FlexShrink {
     }
 }
 
+#[derive(Copy, Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
 pub struct Opacity(pub f32);
 
 impl From<f32> for Opacity {
@@ -140,7 +141,6 @@ pub struct FlexStyle {
     pub border_radius: Option<BorderRadius>,
     #[builder(into)]
     pub border_width: Option<BorderWidth>,
-    #[builder(into)]
     pub inset: Option<FlexInsets>,
     pub color: Option<DisplayColor>,
     pub display: Option<FlexDisplayStyle>,
@@ -171,7 +171,7 @@ pub struct FlexStyle {
     #[builder(into)]
     pub min_width: Option<Dimension>,
     #[builder(into)]
-    pub opacity: Option<f32>,
+    pub opacity: Option<Opacity>,
     pub overflow: Option<FlexVisibility>,
     #[builder(into)]
     pub padding: Option<DimensionGroup>,
