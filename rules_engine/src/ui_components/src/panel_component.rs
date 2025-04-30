@@ -29,6 +29,7 @@ impl<T: Component> Component for PanelComponent<T> {
                         .align_items(FlexAlign::Center)
                         .justify_content(FlexJustify::Center)
                         .background_color(display_color::BLACK_ALPHA_95)
+                        .border_radius(8)
                         .build(),
                 )
                 .child(self.content)

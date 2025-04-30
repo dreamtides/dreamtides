@@ -68,13 +68,19 @@ pub struct TextShadow {
     pub color: DisplayColor,
 }
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema, Builder)]
 #[serde(rename_all = "camelCase")]
 pub struct ImageSlice {
     pub top: u32,
     pub right: u32,
     pub bottom: u32,
     pub left: u32,
+}
+
+impl From<u32> for ImageSlice {
+    fn from(value: u32) -> Self {
+        Self { top: value, right: value, bottom: value, left: value }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
@@ -129,6 +135,14 @@ impl From<i32> for Opacity {
     }
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum ImageScaleMode {
+    StretchToFill,
+    ScaleAndCrop,
+    ScaleToFit,
+}
+
 #[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema, Builder)]
 #[serde(rename_all = "camelCase")]
 pub struct FlexStyle {
@@ -159,6 +173,7 @@ pub struct FlexStyle {
     pub font_size: Option<Dimension>,
     #[builder(into)]
     pub height: Option<Dimension>,
+    #[builder(into)]
     pub image_slice: Option<ImageSlice>,
     pub justify_content: Option<FlexJustify>,
     #[builder(into)]

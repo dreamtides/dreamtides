@@ -230,6 +230,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "asset_paths"
+version = "0.0.0"
+dependencies = [
+ "core_data",
+]
+
+[[package]]
 name = "atty"
 version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2214,6 +2221,7 @@ name = "ui_components"
 version = "0.0.0"
 dependencies = [
  "action_data",
+ "asset_paths",
  "bon",
  "core_data",
  "masonry",
