@@ -1,19 +1,15 @@
 use action_data::game_action::GameAction;
 use asset_paths::poneti_ui;
-use bon::Builder;
 use masonry::flex_enums::{FlexAlign, FlexJustify};
 use masonry::flex_style::FlexStyle;
 
 use crate::box_component::BoxComponent;
 use crate::component::Component;
-use crate::style_options::StyleOptions;
 use crate::text_component::TextComponent;
 use crate::typography::Typography;
 
-#[derive(Clone, Builder, Default)]
-pub struct CloseButtonComponent {
-    pub style_options: Option<StyleOptions>,
-}
+#[derive(Clone)]
+pub struct CloseButtonComponent;
 
 impl Component for CloseButtonComponent {
     fn render(self) -> Option<impl Component> {

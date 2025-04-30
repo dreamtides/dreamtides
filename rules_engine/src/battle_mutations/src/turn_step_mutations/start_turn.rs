@@ -21,6 +21,10 @@ pub fn run(battle: &mut BattleData, player: PlayerName) {
     judgment::run(battle, battle.turn.active_player, source);
     dreamwell::activate(battle, battle.turn.active_player, source);
     battle.step = BattleTurnStep::Draw;
-    deck::draw_cards(battle, source, player, 1);
+
+    if battle.turn.turn_id != TurnId(1) {
+        deck::draw_cards(battle, source, player, 1);
+    }
+
     battle.step = BattleTurnStep::Main;
 }

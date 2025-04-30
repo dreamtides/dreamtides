@@ -9,6 +9,7 @@ use crate::game_action::GameAction;
 pub enum DebugAction {
     ApplyTestScenarioAction,
     DrawCard,
+    RestartBattle,
 }
 
 impl From<DebugAction> for GameAction {

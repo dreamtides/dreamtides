@@ -4,7 +4,6 @@ use masonry::flex_node::{FlexNode, NodeType, TextNode};
 use masonry::flex_style::{FlexGrow, FlexShrink, FlexStyle};
 
 use crate::component::{Component, NodeComponent};
-use crate::style_options::{self, StyleOptions};
 use crate::typography::{self, Typography};
 
 #[derive(Clone, Builder)]
@@ -15,8 +14,6 @@ pub struct TextComponent {
 
     /// Controls the visual display of the text (size, color, etc)
     pub typography: Typography,
-
-    pub style_options: Option<StyleOptions>,
 
     #[builder(into)]
     pub flex_grow: Option<FlexGrow>,
@@ -38,7 +35,6 @@ impl Component for TextComponent {
         let mut style =
             FlexStyle { margin: Some(0.into()), padding: Some(0.into()), ..Default::default() };
         typography::apply(&self.typography, &mut style);
-        style_options::apply(&self.style_options, &mut style);
 
         if let Some(flex_grow) = self.flex_grow {
             style.flex_grow = Some(flex_grow);

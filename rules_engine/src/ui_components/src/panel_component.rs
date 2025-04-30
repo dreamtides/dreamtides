@@ -42,7 +42,7 @@ impl<T: Component> Component for PanelComponent<T> {
                                 .inset(FlexInsets::builder().top(10).right(10).build())
                                 .build(),
                         )
-                        .child(CloseButtonComponent::default())
+                        .child(CloseButtonComponent)
                         .build(),
                 )
                 .child(self.content)

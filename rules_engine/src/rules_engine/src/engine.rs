@@ -53,56 +53,6 @@ pub fn perform_action(request: PerformActionRequest) {
     task::spawn_blocking(move || perform_action_internal(&request));
 }
 
-fn perform_action_internal(request: &PerformActionRequest) {
-    let battle_data = CURRENT_BATTLE.lock().unwrap().clone();
-    let metadata = request.metadata;
-    let user_id = metadata.user_id;
-    let panic_commands = catch_panic(
-        AssertUnwindSafe(|| {
-            let mut battle = match &battle_data {
-                Some(battle) => battle.clone(),
-                None => panic!("No battle found"),
-            };
-            battle.animations = Some(AnimationData::default());
-            match request.action {
-                GameAction::DebugAction(action) => {
-                    let player = renderer::player_name_for_user(&battle, user_id);
-                    debug_actions::execute(&mut battle, player, action);
-                    handle_battle_action::append_update(
-                        user_id,
-                        renderer::connect(&battle, user_id),
-                    );
-                }
-                GameAction::BattleAction(action) => {
-                    let player = renderer::player_name_for_user(&battle, user_id);
-                    handle_battle_action::execute(&mut battle, user_id, player, action);
-                }
-                GameAction::OpenPanel(address) => {
-                    battle_rendering::open_panel(address);
-                    handle_battle_action::append_update(
-                        user_id,
-                        renderer::connect(&battle, user_id),
-                    );
-                }
-                GameAction::CloseCurrentPanel => {
-                    battle_rendering::close_current_panel();
-                    handle_battle_action::append_update(
-                        user_id,
-                        renderer::connect(&battle, user_id),
-                    );
-                }
-            };
-            *CURRENT_BATTLE.lock().unwrap() = Some(battle);
-            None
-        }),
-        battle_data.as_ref(),
-    );
-
-    if let Some(commands) = panic_commands {
-        handle_battle_action::append_update(user_id, commands);
-    }
-}
-
 fn connect_internal(user_id: UserId) {
     let mut battle_lock = CURRENT_BATTLE.lock().unwrap();
 
@@ -137,6 +87,56 @@ fn connect_internal(user_id: UserId) {
     // No current battle, create a new one
     info!(?user_id, "No current battle, creating");
     *battle_lock = Some(new_battle::create_and_start(user_id, BattleId(Uuid::new_v4())));
+}
+
+fn perform_action_internal(request: &PerformActionRequest) {
+    let battle_data = CURRENT_BATTLE.lock().unwrap().clone();
+    let metadata = request.metadata;
+    let user_id = metadata.user_id;
+    let panic_commands = catch_panic(
+        AssertUnwindSafe(|| {
+            let mut battle = match &battle_data {
+                Some(battle) => battle.clone(),
+                None => panic!("No battle found"),
+            };
+            battle.animations = Some(AnimationData::default());
+            match request.action {
+                GameAction::DebugAction(action) => {
+                    let player = renderer::player_name_for_user(&battle, user_id);
+                    debug_actions::execute(&mut battle, user_id, player, action);
+                    handle_battle_action::append_update(
+                        user_id,
+                        renderer::connect(&battle, user_id),
+                    );
+                }
+                GameAction::BattleAction(action) => {
+                    let player = renderer::player_name_for_user(&battle, user_id);
+                    handle_battle_action::execute(&mut battle, user_id, player, action);
+                }
+                GameAction::OpenPanel(address) => {
+                    battle_rendering::open_panel(address);
+                    handle_battle_action::append_update(
+                        user_id,
+                        renderer::connect(&battle, user_id),
+                    );
+                }
+                GameAction::CloseCurrentPanel => {
+                    battle_rendering::close_current_panel();
+                    handle_battle_action::append_update(
+                        user_id,
+                        renderer::connect(&battle, user_id),
+                    );
+                }
+            };
+            *CURRENT_BATTLE.lock().unwrap() = Some(battle);
+            None
+        }),
+        battle_data.as_ref(),
+    );
+
+    if let Some(commands) = panic_commands {
+        handle_battle_action::append_update(user_id, commands);
+    }
 }
 
 fn catch_panic<F>(f: F, battle: Option<&BattleData>) -> Option<CommandSequence>

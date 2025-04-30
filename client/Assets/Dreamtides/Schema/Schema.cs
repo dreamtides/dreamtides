@@ -1750,7 +1750,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Private actions for developer use
     /// </summary>
-    public enum DebugAction { ApplyTestScenarioAction, DrawCard, PerformSomeAction, TriggerEnemyJudgment, TriggerUserJudgment };
+    public enum DebugAction { ApplyTestScenarioAction, DrawCard, RestartBattle };
 
     /// <summary>
     /// Identifies a window on screen containing UI elements
@@ -2647,12 +2647,8 @@ namespace Dreamtides.Schema
                     return DebugAction.ApplyTestScenarioAction;
                 case "drawCard":
                     return DebugAction.DrawCard;
-                case "performSomeAction":
-                    return DebugAction.PerformSomeAction;
-                case "triggerEnemyJudgment":
-                    return DebugAction.TriggerEnemyJudgment;
-                case "triggerUserJudgment":
-                    return DebugAction.TriggerUserJudgment;
+                case "restartBattle":
+                    return DebugAction.RestartBattle;
             }
             throw new Exception("Cannot unmarshal type DebugAction");
         }
@@ -2673,14 +2669,8 @@ namespace Dreamtides.Schema
                 case DebugAction.DrawCard:
                     serializer.Serialize(writer, "drawCard");
                     return;
-                case DebugAction.PerformSomeAction:
-                    serializer.Serialize(writer, "performSomeAction");
-                    return;
-                case DebugAction.TriggerEnemyJudgment:
-                    serializer.Serialize(writer, "triggerEnemyJudgment");
-                    return;
-                case DebugAction.TriggerUserJudgment:
-                    serializer.Serialize(writer, "triggerUserJudgment");
+                case DebugAction.RestartBattle:
+                    serializer.Serialize(writer, "restartBattle");
                     return;
             }
             throw new Exception("Cannot marshal type DebugAction");

@@ -6,7 +6,6 @@ use masonry::flex_style::{FlexGrow, FlexStyle};
 
 use crate::box_component::BoxComponent;
 use crate::component::Component;
-use crate::style_options::StyleOptions;
 use crate::text_component::TextComponent;
 use crate::typography::Typography;
 
@@ -16,7 +15,6 @@ pub struct ButtonComponent {
     pub label: String,
     #[builder(into)]
     pub action: GameAction,
-    pub style_options: Option<StyleOptions>,
     pub flex_grow: Option<FlexGrow>,
 }
 
