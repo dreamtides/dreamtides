@@ -61,7 +61,15 @@ impl Component for DeveloperPanel {
                             DebugButton::builder()
                                 .label("UCT 10,000")
                                 .action(DebugAction::SetOpponentAgent(GameAI::Uct1MaxIterations(
-                                    10000,
+                                    10_000,
+                                )))
+                                .build(),
+                        )
+                        .child(
+                            DebugButton::builder()
+                                .label("UCT 50,000")
+                                .action(DebugAction::SetOpponentAgent(GameAI::Uct1MaxIterations(
+                                    50_000,
                                 )))
                                 .build(),
                         )

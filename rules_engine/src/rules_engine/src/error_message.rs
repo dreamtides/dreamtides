@@ -3,6 +3,7 @@ use core_data::types::PlayerName;
 use display::core::response_builder::ResponseBuilder;
 use display::rendering::battle_rendering;
 use display_data::command::{Command, CommandSequence, UpdateBattleCommand};
+use masonry::flex_enums::{TextAlign, WhiteSpace};
 use ui_components::component::Component;
 use ui_components::panel_component::PanelComponent;
 use ui_components::text_component::TextComponent;
@@ -21,6 +22,13 @@ pub fn display_error_message(battle: &BattleData, message: String) -> CommandSeq
 fn render_message(text: String) -> impl Component {
     PanelComponent::builder()
         .title("Error Message")
-        .content(TextComponent::builder().text(text).typography(Typography::StackTrace).build())
+        .content(
+            TextComponent::builder()
+                .text(text)
+                .text_align(TextAlign::UpperLeft)
+                .typography(Typography::StackTrace)
+                .white_space(WhiteSpace::Normal)
+                .build(),
+        )
         .build()
 }

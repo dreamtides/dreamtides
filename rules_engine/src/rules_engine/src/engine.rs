@@ -219,9 +219,19 @@ where
 
 fn filter_backtrace(backtrace: &str) -> String {
     let mut result = String::new();
+    let skip = [
+        "rustc",
+        ".cargo",
+        "backtrace",
+        "catch_panic",
+        "rust_panic_with_hook",
+        "panic_fmt",
+        "rust_begin_unwind",
+        "begin_panic_handler",
+    ];
 
     for line in backtrace.lines() {
-        if !(line.contains("rustc") || line.contains(".cargo")) {
+        if !skip.iter().any(|s| line.contains(s)) {
             writeln!(result, "{}", line).ok();
         }
     }

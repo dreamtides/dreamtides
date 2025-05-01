@@ -32,7 +32,7 @@ impl<T: Component> Component for PanelComponent<T> {
                         .image_slice(500)
                         .inset(FlexInsets::builder().top(36).bottom(12).left(8).right(8).build())
                         .justify_content(FlexJustify::Center)
-                        .padding(4)
+                        .padding((32, 12, 12, 12))
                         .position(FlexPosition::Absolute)
                         .build(),
                 )
