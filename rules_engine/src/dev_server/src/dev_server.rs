@@ -78,7 +78,7 @@ async fn perform_action(body: String) -> AppResult<Json<PerformActionResponse>> 
     } else {
         info!(?action, ?user_id, "Got perform action request");
         let metadata = req.metadata;
-        engine::perform_action(req);
+        engine::perform_action(req).await;
         Ok(Json(PerformActionResponse { metadata, commands: CommandSequence::default() }))
     }
 }

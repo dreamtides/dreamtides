@@ -37,6 +37,19 @@ static class Plugin
         return Errors.CheckNotNull(deserialized, "Error deserializing action response");
     }
 
+    public static PollResponse Poll(PollRequest request)
+    {
+        var serialized = JsonConvert.SerializeObject(request, Converter.Settings);
+        var encoded = Encoding.UTF8.GetBytes(serialized);
+
+        byte[] response = new byte[BufferSize];
+        int responseLength = Errors.CheckNonNegative(
+            dreamtides_poll(encoded, encoded.Length, response, BufferSize));
+        var json = Encoding.UTF8.GetString(response, 0, responseLength);
+        var deserialized = JsonConvert.DeserializeObject<PollResponse>(json, Converter.Settings);
+        return Errors.CheckNotNull(deserialized, "Error deserializing poll response");
+    }
+
 #if !UNITY_EDITOR && (UNITY_IOS || UNITY_WEBGL)
     [DllImport("__Internal")]
 #else
@@ -54,6 +67,17 @@ static class Plugin
     [DllImport("plugin")]
 #endif
     public static extern int dreamtides_perform_action(
+      byte[] request,
+      int requestLength,
+      [Out] byte[] response,
+      int responseLength);
+
+#if !UNITY_EDITOR && (UNITY_IOS || UNITY_WEBGL)
+    [DllImport("__Internal")]
+#else
+    [DllImport("plugin")]
+#endif
+    public static extern int dreamtides_poll(
       byte[] request,
       int requestLength,
       [Out] byte[] response,

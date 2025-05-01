@@ -1,5 +1,3 @@
-#define ENABLE_GAME_VIEW_UTILS
-
 using System;
 using System.Reflection;
 using UnityEditor;
@@ -31,25 +29,21 @@ namespace Dreamtides.UnityInternal
 
     static GameViewUtils()
     {
-#if ENABLE_GAME_VIEW_UTILS
       var sizesType = typeof(Editor).Assembly.GetType("UnityEditor.GameViewSizes");
       var singleType = typeof(ScriptableSingleton<>).MakeGenericType(sizesType);
       var instanceProp = singleType.GetProperty("instance");
       getGroup = sizesType.GetMethod("GetGroup");
       gameViewSizesInstance = instanceProp.GetValue(null, null);
-#endif
     }
 
     public static void SetGameViewResolution(GameViewResolution resolution)
     {
-#if ENABLE_GAME_VIEW_UTILS
       // By creating an assembly named "Unity.InternalAPIEditorBridge.020", we have
       // access to Unity's internal APIs.
       //
       // See https://stackoverflow.com/questions/79563229
       var gameView = EditorWindow.GetWindow<GameView>();
       gameView.SetCustomResolution(GetResolution(resolution), "TestResolution");
-#endif
     }
 
     public static Vector2 GetResolution(GameViewResolution resolution)
@@ -87,7 +81,6 @@ namespace Dreamtides.UnityInternal
       }
     }
 
-#if ENABLE_GAME_VIEW_UTILS
     [MenuItem("Tools/Add Resolutions")]
     public static void AddResolutions()
     {
@@ -126,6 +119,5 @@ namespace Dreamtides.UnityInternal
     {
       return getGroup.Invoke(gameViewSizesInstance, new object[] { (int)type });
     }
-#endif
   }
 }

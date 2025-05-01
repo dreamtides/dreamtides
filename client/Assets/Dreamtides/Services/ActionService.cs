@@ -79,10 +79,22 @@ namespace Dreamtides.Services
       }
       else if (_metadata != null)
       {
-        StartCoroutine(DevServerPollAsync(new PollRequest
+        if (Application.isEditor)
         {
-          Metadata = _metadata!
-        }));
+          StartCoroutine(DevServerPollAsync(new PollRequest
+          {
+            Metadata = _metadata!
+          }));
+        }
+        else
+        {
+          var request = new PollRequest
+          {
+            Metadata = _metadata!
+          };
+          var response = Plugin.Poll(request);
+          StartCoroutine(ApplyCommands(response.Commands, animate: true));
+        }
       }
     }
 

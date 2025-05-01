@@ -1,11 +1,21 @@
 #![allow(clippy::missing_safety_doc)] // You only live once, that's the motto - Drake
 
 use std::panic::{self, UnwindSafe};
+use std::sync::OnceLock;
 
 use anyhow::Result;
 use display_data::command::CommandSequence;
-use display_data::request_data::{ConnectRequest, PerformActionRequest, PerformActionResponse};
+use display_data::request_data::{
+    ConnectRequest, PerformActionRequest, PerformActionResponse, PollRequest, PollResponse,
+};
 use rules_engine::engine;
+use tokio::runtime::Runtime;
+
+static RUNTIME: OnceLock<Runtime> = OnceLock::new();
+
+fn get_runtime() -> &'static Runtime {
+    RUNTIME.get_or_init(|| Runtime::new().expect("Failed to create Tokio runtime"))
+}
 
 /// Synchronize the state of an ongoing game, downloading a full description of
 /// the game state.
@@ -79,10 +89,57 @@ unsafe fn perform_impl(
     let request_data = std::slice::from_raw_parts(request, request_length as usize);
     let deserialized_request = serde_json::from_slice::<PerformActionRequest>(request_data)?;
     let metadata = deserialized_request.metadata;
-    engine::perform_action(deserialized_request);
-    // TODO: Implement this
-    let scene = PerformActionResponse { metadata, commands: CommandSequence::default() };
-    let json = serde_json::to_string(&scene)?;
+
+    get_runtime().block_on(async {
+        engine::perform_action(deserialized_request).await;
+    });
+
+    // Currently we do not return any commands from the perform action call.
+    let empty_commands = PerformActionResponse { metadata, commands: CommandSequence::default() };
+    let json = serde_json::to_string(&empty_commands)?;
+    let json_bytes = json.as_bytes();
+
+    if json_bytes.len() > response_length as usize {
+        return Err(anyhow::anyhow!("Response buffer too small"));
+    }
+
+    let out = std::slice::from_raw_parts_mut(response, response_length as usize);
+    out[..json_bytes.len()].copy_from_slice(json_bytes);
+    Ok(json_bytes.len() as i32)
+}
+
+/// Polls for pending updates for a user.
+///
+/// `request` should be a buffer including the json serialization of a
+/// `PollRequest` message of `request_length` bytes. `response` should be an
+/// empty buffer of `response_length` bytes, this buffer will be populated with
+/// a json-serialized `PollResponse` describing any pending updates for the
+/// user.
+///
+/// Returns the number of bytes written to the `response` buffer, or -1 on
+/// error.
+#[no_mangle]
+pub unsafe extern "C" fn dreamtides_poll(
+    request: *const u8,
+    request_length: i32,
+    response: *mut u8,
+    response_length: i32,
+) -> i32 {
+    error_boundary(|| poll_impl(request, request_length, response, response_length))
+}
+
+unsafe fn poll_impl(
+    request: *const u8,
+    request_length: i32,
+    response: *mut u8,
+    response_length: i32,
+) -> Result<i32> {
+    let request_data = std::slice::from_raw_parts(request, request_length as usize);
+    let deserialized_request = serde_json::from_slice::<PollRequest>(request_data)?;
+    let metadata = deserialized_request.metadata;
+    let commands = engine::poll(metadata.user_id);
+    let response_data = PollResponse { metadata, commands };
+    let json = serde_json::to_string(&response_data)?;
     let json_bytes = json.as_bytes();
 
     if json_bytes.len() > response_length as usize {
