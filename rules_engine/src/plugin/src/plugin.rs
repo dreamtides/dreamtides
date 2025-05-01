@@ -1,7 +1,6 @@
 #![allow(clippy::missing_safety_doc)] // You only live once, that's the motto - Drake
 
 use std::panic::{self, UnwindSafe};
-use std::sync::OnceLock;
 
 use anyhow::Result;
 use display_data::command::CommandSequence;
@@ -9,13 +8,6 @@ use display_data::request_data::{
     ConnectRequest, PerformActionRequest, PerformActionResponse, PollRequest, PollResponse,
 };
 use rules_engine::engine;
-use tokio::runtime::Runtime;
-
-static RUNTIME: OnceLock<Runtime> = OnceLock::new();
-
-fn get_runtime() -> &'static Runtime {
-    RUNTIME.get_or_init(|| Runtime::new().expect("Failed to create Tokio runtime"))
-}
 
 /// Synchronize the state of an ongoing game, downloading a full description of
 /// the game state.
@@ -90,9 +82,12 @@ unsafe fn perform_impl(
     let deserialized_request = serde_json::from_slice::<PerformActionRequest>(request_data)?;
     let metadata = deserialized_request.metadata;
 
-    get_runtime().block_on(async {
-        engine::perform_action(deserialized_request).await;
-    });
+    #[tokio::main]
+    async fn run_action(request: PerformActionRequest) {
+        engine::perform_action(request);
+    }
+
+    run_action(deserialized_request);
 
     // Currently we do not return any commands from the perform action call.
     let empty_commands = PerformActionResponse { metadata, commands: CommandSequence::default() };

@@ -49,8 +49,8 @@ pub fn poll(user_id: UserId) -> Option<CommandSequence> {
     None
 }
 
-pub async fn perform_action(request: PerformActionRequest) {
-    task::spawn_blocking(move || perform_action_internal(&request)).await.unwrap();
+pub fn perform_action(request: PerformActionRequest) {
+    task::spawn_blocking(move || perform_action_internal(&request));
 }
 
 fn connect_internal(user_id: UserId) {
