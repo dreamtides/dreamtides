@@ -9,6 +9,7 @@ doctest = false
 bench = false
 
 [dependencies]
+ai_data = { path = "../ai_data" }
 battle_data = { path = "../battle_data" }
 core_data = { path = "../core_data" }
 

@@ -1,4 +1,4 @@
-use action_data::game_action::GameAction;
+use action_data::game_action_data::GameAction;
 use asset_paths::poneti_ui;
 use bon::Builder;
 use masonry::flex_enums::{FlexAlign, FlexJustify};
@@ -29,11 +29,11 @@ impl Component for ButtonComponent {
                         .background_image(poneti_ui::primary_button_background())
                         .flex_grow(self.flex_grow.unwrap_or_default())
                         .flex_shrink(0)
-                        .height(32)
+                        .height(20)
                         .image_slice(45)
                         .justify_content(FlexJustify::Center)
-                        .min_width(32)
-                        .padding((12, 0))
+                        .min_width(20)
+                        .padding((6, 0))
                         .build(),
                 )
                 .on_click(self.action)

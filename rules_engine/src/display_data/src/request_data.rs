@@ -1,4 +1,4 @@
-use action_data::game_action::GameAction;
+use action_data::game_action_data::GameAction;
 use core_data::identifiers::{BattleId, UserId};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};

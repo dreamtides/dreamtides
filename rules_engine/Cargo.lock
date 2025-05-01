@@ -15,6 +15,7 @@ dependencies = [
 name = "action_data"
 version = "0.0.0"
 dependencies = [
+ "ai_data",
  "battle_data",
  "core_data",
  "schemars",
@@ -88,6 +89,7 @@ name = "ai_data"
 version = "0.0.0"
 dependencies = [
  "core_data",
+ "schemars",
  "serde",
 ]
 
@@ -804,6 +806,7 @@ name = "display"
 version = "0.0.0"
 dependencies = [
  "action_data",
+ "ai_data",
  "assert_with",
  "battle_data",
  "battle_queries",

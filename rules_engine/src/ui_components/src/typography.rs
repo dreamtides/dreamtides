@@ -19,7 +19,7 @@ pub fn apply(typography: &Typography, style: &mut FlexStyle) {
             TypographyOptions::builder().color(display_color::WHITE).font_size(6).build()
         }
         Typography::ButtonLabel => {
-            TypographyOptions::builder().color(display_color::WHITE).font_size(12).build()
+            TypographyOptions::builder().color(display_color::WHITE).font_size(8).build()
         }
     };
 

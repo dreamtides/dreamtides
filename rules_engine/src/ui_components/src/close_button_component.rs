@@ -1,4 +1,4 @@
-use action_data::game_action::GameAction;
+use action_data::game_action_data::GameAction;
 use asset_paths::poneti_ui;
 use masonry::flex_enums::{FlexAlign, FlexJustify};
 use masonry::flex_style::FlexStyle;
@@ -21,10 +21,10 @@ impl Component for CloseButtonComponent {
                         .align_items(FlexAlign::Center)
                         .background_image(poneti_ui::close_button_background())
                         .flex_shrink(0)
-                        .height(24)
+                        .height(18)
                         .image_slice(100)
                         .justify_content(FlexJustify::Center)
-                        .width(24)
+                        .width(18)
                         .build(),
                 )
                 .on_click(GameAction::CloseCurrentPanel)

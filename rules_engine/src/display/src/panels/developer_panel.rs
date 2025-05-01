@@ -1,5 +1,6 @@
-use action_data::debug_action::DebugAction;
-use action_data::game_action::GameAction;
+use action_data::debug_action_data::DebugAction;
+use action_data::game_action_data::GameAction;
+use ai_data::game_ai::GameAI;
 use bon::Builder;
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify, FlexWrap};
 use masonry::flex_style::FlexStyle;
@@ -38,6 +39,36 @@ impl Component for DeveloperPanel {
                             DebugButton::builder()
                                 .label("Restart Battle")
                                 .action(DebugAction::RestartBattle)
+                                .build(),
+                        )
+                        .child(
+                            DebugButton::builder()
+                                .label("UCT 1000")
+                                .action(DebugAction::SetOpponentAgent(GameAI::Uct1MaxIterations(
+                                    1000,
+                                )))
+                                .build(),
+                        )
+                        .child(
+                            DebugButton::builder()
+                                .label("UCT 5000")
+                                .action(DebugAction::SetOpponentAgent(GameAI::Uct1MaxIterations(
+                                    5000,
+                                )))
+                                .build(),
+                        )
+                        .child(
+                            DebugButton::builder()
+                                .label("UCT 10,000")
+                                .action(DebugAction::SetOpponentAgent(GameAI::Uct1MaxIterations(
+                                    10000,
+                                )))
+                                .build(),
+                        )
+                        .child(
+                            DebugButton::builder()
+                                .label("Iterative Deepening")
+                                .action(DebugAction::SetOpponentAgent(GameAI::IterativeDeepening))
                                 .build(),
                         )
                         .build(),

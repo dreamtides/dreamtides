@@ -4,7 +4,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::battle_action_data::BattleAction;
-use crate::debug_action::DebugAction;
+use crate::debug_action_data::DebugAction;
 use crate::panel_address::PanelAddress;
 
 /// All possible user interface actions

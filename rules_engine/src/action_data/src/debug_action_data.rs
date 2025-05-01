@@ -1,7 +1,8 @@
+use ai_data::game_ai::GameAI;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::game_action::GameAction;
+use crate::game_action_data::GameAction;
 
 /// Private actions for developer use
 #[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
@@ -10,6 +11,7 @@ pub enum DebugAction {
     ApplyTestScenarioAction,
     DrawCard,
     RestartBattle,
+    SetOpponentAgent(GameAI),
 }
 
 impl From<DebugAction> for GameAction {

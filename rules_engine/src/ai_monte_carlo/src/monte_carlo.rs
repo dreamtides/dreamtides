@@ -14,7 +14,7 @@ use ai_core::state_evaluator::StateEvaluator;
 use petgraph::prelude::{EdgeRef, NodeIndex};
 use petgraph::{Direction, Graph};
 use rand::seq::IteratorRandom;
-use tracing::debug;
+use tracing::info;
 
 use crate::child_score::{ChildScoreAlgorithm, SelectionMode};
 
@@ -142,7 +142,7 @@ impl<TScoreAlgorithm: ChildScoreAlgorithm> MonteCarloAlgorithm<TScoreAlgorithm> 
             i += 1;
         }
 
-        debug!("Halting monte carlo search after {} iterations", i);
+        info!("Halting monte carlo search after {} iterations", i);
 
         let (action, _) = self.best_child(
             &graph,

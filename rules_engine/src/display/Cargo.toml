@@ -10,6 +10,7 @@ bench = false
 
 [dependencies]
 action_data = { path = "../action_data" }
+ai_data = { path = "../ai_data" }
 assert_with = { path = "../assert_with" }
 battle_data = { path = "../battle_data" }
 battle_queries = { path = "../battle_queries" }

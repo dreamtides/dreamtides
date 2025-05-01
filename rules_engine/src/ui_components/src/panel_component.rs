@@ -30,7 +30,7 @@ impl<T: Component> Component for PanelComponent<T> {
                         // values in Unity, e.g. 2048 pixels per unit in this
                         // case. I don't really know why.
                         .image_slice(500)
-                        .inset(FlexInsets::builder().top(12).bottom(12).left(8).right(8).build())
+                        .inset(FlexInsets::builder().top(36).bottom(12).left(8).right(8).build())
                         .justify_content(FlexJustify::Center)
                         .padding(4)
                         .position(FlexPosition::Absolute)

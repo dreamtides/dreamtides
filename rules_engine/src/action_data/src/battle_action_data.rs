@@ -4,7 +4,7 @@ use core_data::numerics::Energy;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::game_action::GameAction;
+use crate::game_action_data::GameAction;
 
 /// An action that can be performed in a battle
 #[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]

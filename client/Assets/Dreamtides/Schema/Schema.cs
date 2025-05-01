@@ -740,6 +740,18 @@ namespace Dreamtides.Schema
         public CardOrderSelectionTarget Target { get; set; }
     }
 
+    public partial class DebugActionClass
+    {
+        [JsonProperty("setOpponentAgent", Required = Required.Always)]
+        public GameAi SetOpponentAgent { get; set; }
+    }
+
+    public partial class GameAiClass
+    {
+        [JsonProperty("uct1MaxIterations", Required = Required.Always)]
+        public long Uct1MaxIterations { get; set; }
+    }
+
     /// <summary>
     /// Preview of a potential future state of a battle, shown e.g. in response to a card being
     /// selected to be played.
@@ -1747,10 +1759,9 @@ namespace Dreamtides.Schema
 
     public enum CardBrowserType { EnemyDeck, EnemyStatus, EnemyVoid, UserDeck, UserStatus, UserVoid };
 
-    /// <summary>
-    /// Private actions for developer use
-    /// </summary>
-    public enum DebugAction { ApplyTestScenarioAction, DrawCard, RestartBattle };
+    public enum DebugActionEnum { ApplyTestScenarioAction, DrawCard, RestartBattle };
+
+    public enum GameAiEnum { AlwaysPanic, FirstAvailableAction, IterativeDeepening, RandomAction, Uct1 };
 
     /// <summary>
     /// Identifies a window on screen containing UI elements
@@ -1821,6 +1832,27 @@ namespace Dreamtides.Schema
         public static implicit operator BattleAction(BattleActionEnum Enum) => new BattleAction { Enum = Enum };
     }
 
+    public partial struct GameAi
+    {
+        public GameAiEnum? Enum;
+        public GameAiClass GameAiClass;
+
+        public static implicit operator GameAi(GameAiEnum Enum) => new GameAi { Enum = Enum };
+        public static implicit operator GameAi(GameAiClass GameAiClass) => new GameAi { GameAiClass = GameAiClass };
+    }
+
+    /// <summary>
+    /// Private actions for developer use
+    /// </summary>
+    public partial struct DebugAction
+    {
+        public DebugActionClass DebugActionClass;
+        public DebugActionEnum? Enum;
+
+        public static implicit operator DebugAction(DebugActionClass DebugActionClass) => new DebugAction { DebugActionClass = DebugActionClass };
+        public static implicit operator DebugAction(DebugActionEnum Enum) => new DebugAction { Enum = Enum };
+    }
+
     public partial struct ActionUnion
     {
         public ActionClass ActionClass;
@@ -1875,6 +1907,9 @@ namespace Dreamtides.Schema
                 CardBrowserTypeConverter.Singleton,
                 BattleActionEnumConverter.Singleton,
                 DebugActionConverter.Singleton,
+                GameAiConverter.Singleton,
+                GameAiEnumConverter.Singleton,
+                DebugActionEnumConverter.Singleton,
                 PanelAddressConverter.Singleton,
                 GameActionEnumConverter.Singleton,
                 FlexAlignConverter.Singleton,
@@ -2639,18 +2674,146 @@ namespace Dreamtides.Schema
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
+            switch (reader.TokenType)
+            {
+                case JsonToken.String:
+                case JsonToken.Date:
+                    var stringValue = serializer.Deserialize<string>(reader);
+                    switch (stringValue)
+                    {
+                        case "applyTestScenarioAction":
+                            return new DebugAction { Enum = DebugActionEnum.ApplyTestScenarioAction };
+                        case "drawCard":
+                            return new DebugAction { Enum = DebugActionEnum.DrawCard };
+                        case "restartBattle":
+                            return new DebugAction { Enum = DebugActionEnum.RestartBattle };
+                    }
+                    break;
+                case JsonToken.StartObject:
+                    var objectValue = serializer.Deserialize<DebugActionClass>(reader);
+                    return new DebugAction { DebugActionClass = objectValue };
+            }
+            throw new Exception("Cannot unmarshal type DebugAction");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            var value = (DebugAction)untypedValue;
+            if (value.Enum != null)
+            {
+                switch (value.Enum)
+                {
+                    case DebugActionEnum.ApplyTestScenarioAction:
+                        serializer.Serialize(writer, "applyTestScenarioAction");
+                        return;
+                    case DebugActionEnum.DrawCard:
+                        serializer.Serialize(writer, "drawCard");
+                        return;
+                    case DebugActionEnum.RestartBattle:
+                        serializer.Serialize(writer, "restartBattle");
+                        return;
+                }
+            }
+            if (value.DebugActionClass != null)
+            {
+                serializer.Serialize(writer, value.DebugActionClass);
+                return;
+            }
+            throw new Exception("Cannot marshal type DebugAction");
+        }
+
+        public static readonly DebugActionConverter Singleton = new DebugActionConverter();
+    }
+
+    internal class GameAiConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(GameAi) || t == typeof(GameAi?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            switch (reader.TokenType)
+            {
+                case JsonToken.String:
+                case JsonToken.Date:
+                    var stringValue = serializer.Deserialize<string>(reader);
+                    switch (stringValue)
+                    {
+                        case "alwaysPanic":
+                            return new GameAi { Enum = GameAiEnum.AlwaysPanic };
+                        case "firstAvailableAction":
+                            return new GameAi { Enum = GameAiEnum.FirstAvailableAction };
+                        case "iterativeDeepening":
+                            return new GameAi { Enum = GameAiEnum.IterativeDeepening };
+                        case "randomAction":
+                            return new GameAi { Enum = GameAiEnum.RandomAction };
+                        case "uct1":
+                            return new GameAi { Enum = GameAiEnum.Uct1 };
+                    }
+                    break;
+                case JsonToken.StartObject:
+                    var objectValue = serializer.Deserialize<GameAiClass>(reader);
+                    return new GameAi { GameAiClass = objectValue };
+            }
+            throw new Exception("Cannot unmarshal type GameAi");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            var value = (GameAi)untypedValue;
+            if (value.Enum != null)
+            {
+                switch (value.Enum)
+                {
+                    case GameAiEnum.AlwaysPanic:
+                        serializer.Serialize(writer, "alwaysPanic");
+                        return;
+                    case GameAiEnum.FirstAvailableAction:
+                        serializer.Serialize(writer, "firstAvailableAction");
+                        return;
+                    case GameAiEnum.IterativeDeepening:
+                        serializer.Serialize(writer, "iterativeDeepening");
+                        return;
+                    case GameAiEnum.RandomAction:
+                        serializer.Serialize(writer, "randomAction");
+                        return;
+                    case GameAiEnum.Uct1:
+                        serializer.Serialize(writer, "uct1");
+                        return;
+                }
+            }
+            if (value.GameAiClass != null)
+            {
+                serializer.Serialize(writer, value.GameAiClass);
+                return;
+            }
+            throw new Exception("Cannot marshal type GameAi");
+        }
+
+        public static readonly GameAiConverter Singleton = new GameAiConverter();
+    }
+
+    internal class GameAiEnumConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(GameAiEnum) || t == typeof(GameAiEnum?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
             if (reader.TokenType == JsonToken.Null) return null;
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "applyTestScenarioAction":
-                    return DebugAction.ApplyTestScenarioAction;
-                case "drawCard":
-                    return DebugAction.DrawCard;
-                case "restartBattle":
-                    return DebugAction.RestartBattle;
+                case "alwaysPanic":
+                    return GameAiEnum.AlwaysPanic;
+                case "firstAvailableAction":
+                    return GameAiEnum.FirstAvailableAction;
+                case "iterativeDeepening":
+                    return GameAiEnum.IterativeDeepening;
+                case "randomAction":
+                    return GameAiEnum.RandomAction;
+                case "uct1":
+                    return GameAiEnum.Uct1;
             }
-            throw new Exception("Cannot unmarshal type DebugAction");
+            throw new Exception("Cannot unmarshal type GameAiEnum");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -2660,23 +2823,75 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (DebugAction)untypedValue;
+            var value = (GameAiEnum)untypedValue;
             switch (value)
             {
-                case DebugAction.ApplyTestScenarioAction:
+                case GameAiEnum.AlwaysPanic:
+                    serializer.Serialize(writer, "alwaysPanic");
+                    return;
+                case GameAiEnum.FirstAvailableAction:
+                    serializer.Serialize(writer, "firstAvailableAction");
+                    return;
+                case GameAiEnum.IterativeDeepening:
+                    serializer.Serialize(writer, "iterativeDeepening");
+                    return;
+                case GameAiEnum.RandomAction:
+                    serializer.Serialize(writer, "randomAction");
+                    return;
+                case GameAiEnum.Uct1:
+                    serializer.Serialize(writer, "uct1");
+                    return;
+            }
+            throw new Exception("Cannot marshal type GameAiEnum");
+        }
+
+        public static readonly GameAiEnumConverter Singleton = new GameAiEnumConverter();
+    }
+
+    internal class DebugActionEnumConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(DebugActionEnum) || t == typeof(DebugActionEnum?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "applyTestScenarioAction":
+                    return DebugActionEnum.ApplyTestScenarioAction;
+                case "drawCard":
+                    return DebugActionEnum.DrawCard;
+                case "restartBattle":
+                    return DebugActionEnum.RestartBattle;
+            }
+            throw new Exception("Cannot unmarshal type DebugActionEnum");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (DebugActionEnum)untypedValue;
+            switch (value)
+            {
+                case DebugActionEnum.ApplyTestScenarioAction:
                     serializer.Serialize(writer, "applyTestScenarioAction");
                     return;
-                case DebugAction.DrawCard:
+                case DebugActionEnum.DrawCard:
                     serializer.Serialize(writer, "drawCard");
                     return;
-                case DebugAction.RestartBattle:
+                case DebugActionEnum.RestartBattle:
                     serializer.Serialize(writer, "restartBattle");
                     return;
             }
-            throw new Exception("Cannot marshal type DebugAction");
+            throw new Exception("Cannot marshal type DebugActionEnum");
         }
 
-        public static readonly DebugActionConverter Singleton = new DebugActionConverter();
+        public static readonly DebugActionEnumConverter Singleton = new DebugActionEnumConverter();
     }
 
     internal class PanelAddressConverter : JsonConverter

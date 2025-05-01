@@ -3,7 +3,7 @@ use std::fmt::Write;
 use std::panic::{self, AssertUnwindSafe};
 use std::sync::{LazyLock, Mutex};
 
-use action_data::game_action::GameAction;
+use action_data::game_action_data::GameAction;
 use backtrace::Backtrace;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_animations::animation_data::AnimationData;

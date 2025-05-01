@@ -1,4 +1,4 @@
-use action_data::game_action::GameAction;
+use action_data::game_action_data::GameAction;
 use masonry::flex_node::{EventHandlers, FlexNode};
 use masonry::flex_style::FlexStyle;
 

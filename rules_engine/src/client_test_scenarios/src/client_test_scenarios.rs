@@ -5,8 +5,8 @@ use std::sync::{LazyLock, Mutex};
 use action_data::battle_action_data::{
     BattleAction, CardBrowserType, CardOrderSelectionTarget, SelectCardOrder,
 };
-use action_data::debug_action::DebugAction;
-use action_data::game_action::GameAction;
+use action_data::debug_action_data::DebugAction;
+use action_data::game_action_data::GameAction;
 use battle_data::battle_cards::card_id::{CardIdType, CharacterId};
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::{

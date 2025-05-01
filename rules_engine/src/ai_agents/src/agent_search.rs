@@ -6,7 +6,7 @@ use ai_game_integration::state_node::AgentBattleState;
 use ai_monte_carlo::monte_carlo::{MonteCarloAlgorithm, RandomPlayoutEvaluator};
 use ai_monte_carlo::uct1::Uct1;
 use ai_tree_search::iterative_deepening_search::IterativeDeepeningSearch;
-use assert_with::assert_that;
+use assert_with::panic_with;
 use battle_data::battle::battle_data::BattleData;
 use battle_queries::legal_action_queries::legal_actions::{self, LegalActions};
 use core_data::types::PlayerName;
@@ -19,6 +19,15 @@ use tracing_subscriber::EnvFilter;
 /// Selects an action for the given player using the given AI agent.
 pub fn select_action(battle: &BattleData, player: PlayerName, game_ai: &GameAI) -> BattleAction {
     assert_eq!(legal_actions::next_to_act(battle), Some(player));
+
+    let legal_actions =
+        legal_actions::compute(battle, player, LegalActions { for_human_player: false });
+    if legal_actions.is_empty() {
+        panic_with!(battle, "No legal actions available for player: {:?}", player);
+    }
+    if legal_actions.len() == 1 {
+        return legal_actions[0];
+    }
 
     let filter = EnvFilter::new(
         "warn,\
@@ -46,19 +55,11 @@ pub fn select_action(battle: &BattleData, player: PlayerName, game_ai: &GameAI) 
 
 fn first_available_action(battle: &BattleData, player: PlayerName) -> BattleAction {
     let actions = legal_actions::compute(battle, player, LegalActions { for_human_player: false });
-    assert_that!(!actions.is_empty(), battle, || format!(
-        "Invoked agent search with no legal actions available for player: {:?}",
-        player
-    ));
     *actions.first().unwrap()
 }
 
 fn random_action(battle: &BattleData, player: PlayerName) -> BattleAction {
     let actions = legal_actions::compute(battle, player, LegalActions { for_human_player: false });
-    assert_that!(!actions.is_empty(), battle, || format!(
-        "Invoked agent search with no legal actions available for player: {:?}",
-        player
-    ));
     *actions.choose(&mut rand::rng()).unwrap()
 }
 

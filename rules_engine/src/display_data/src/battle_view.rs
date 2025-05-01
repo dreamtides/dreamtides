@@ -1,4 +1,4 @@
-use action_data::game_action::GameAction;
+use action_data::game_action_data::GameAction;
 use core_data::display_types::Milliseconds;
 use core_data::identifiers::BattleId;
 use core_data::numerics::{Energy, Points, Spark};
