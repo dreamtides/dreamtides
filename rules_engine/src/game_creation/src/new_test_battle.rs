@@ -1,4 +1,5 @@
 use battle_data::battle::battle_data::BattleData;
+use battle_data::battle::battle_history::BattleHistory;
 use battle_data::battle::battle_status::BattleStatus;
 use battle_data::battle::battle_tracing::BattleTracing;
 use battle_data::battle::battle_turn_step::BattleTurnStep;
@@ -51,6 +52,7 @@ pub fn create_and_start(
         prompt: None,
         prompt_resume_action: None,
         tracing: Some(BattleTracing::default()),
+        history: Some(BattleHistory::default()),
     };
 
     create_test_deck::add(&mut battle, PlayerName::One);

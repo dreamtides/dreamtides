@@ -202,6 +202,7 @@ mod tests {
             prompt: None,
             prompt_resume_action: None,
             tracing: None,
+            history: None,
         }
     }
 }

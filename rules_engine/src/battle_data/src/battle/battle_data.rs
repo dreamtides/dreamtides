@@ -2,6 +2,8 @@ use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
 use rand_xoshiro::Xoshiro256PlusPlus;
 
+use crate::actions::battle_action_data::BattleAction;
+use crate::battle::battle_history::BattleHistory;
 use crate::battle::battle_status::BattleStatus;
 use crate::battle::battle_tracing::{BattleTraceEvent, BattleTracing};
 use crate::battle::battle_turn_step::BattleTurnStep;
@@ -69,6 +71,11 @@ pub struct BattleData {
 
     /// Debug tracing data for this battle
     pub tracing: Option<BattleTracing>,
+
+    /// History of actions and events during this battle.
+    ///
+    /// Can be None if history tracking is disabled, e.g. during AI simulation.
+    pub history: Option<BattleHistory>,
 }
 
 impl BattleData {
@@ -88,7 +95,7 @@ impl BattleData {
 
     /// Returns a clone of this battle data with the animation tracker removed.
     pub fn clone_for_ai_search(&self) -> Self {
-        Self { animations: None, tracing: None, ..self.clone() }
+        Self { animations: None, tracing: None, history: None, ..self.clone() }
     }
 
     /// Pushes a new animation step onto the animation tracker, if animation
@@ -114,6 +121,7 @@ impl BattleData {
                 prompt: self.prompt.clone(),
                 prompt_resume_action: None,
                 tracing: None,
+                history: None,
             };
             animations.steps.push(AnimationStep { snapshot, animation: update() });
         }
@@ -127,6 +135,13 @@ impl BattleData {
                 tracing.current.clear();
             }
             tracing.current.push(event);
+        }
+    }
+
+    /// Adds a new action to the history of this battle.
+    pub fn push_history_action(&mut self, player: PlayerName, action: BattleAction) {
+        if let Some(history) = &mut self.history {
+            history.push_action(player, action);
         }
     }
 

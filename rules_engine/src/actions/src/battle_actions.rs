@@ -65,4 +65,17 @@ pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction
             battle.prompt_resume_action = None;
         }
     }
+
+    if should_record_in_history(action) {
+        battle.push_history_action(player, action);
+    }
+}
+
+fn should_record_in_history(action: BattleAction) -> bool {
+    !matches!(
+        action,
+        BattleAction::BrowseCards(..)
+            | BattleAction::CloseCardBrowser
+            | BattleAction::ToggleOrderSelectorVisibility
+    )
 }
