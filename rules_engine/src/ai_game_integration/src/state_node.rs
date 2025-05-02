@@ -1,9 +1,9 @@
 use std::ops::{Deref, DerefMut};
 
-use action_data::battle_action_data::BattleAction;
 use actions::battle_actions;
 use ai_core::game_state_node::{GameStateNode, GameStatus};
 use assert_with::{assert_that, expect};
+use battle_data::actions::battle_action_data::BattleAction;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
 use battle_queries::legal_action_queries::legal_actions::{self, LegalActions};

@@ -1,4 +1,5 @@
 pub mod battle_data;
+pub mod battle_history;
 pub mod battle_status;
 pub mod battle_tracing;
 pub mod battle_turn_step;

@@ -1,4 +1,3 @@
-use action_data::battle_action_data::BattleAction;
 use ai_core::agent::{Agent, AgentConfig, AgentData};
 use ai_data::game_ai::GameAI;
 use ai_game_integration::evaluators::WinLossEvaluator;
@@ -7,6 +6,7 @@ use ai_monte_carlo::monte_carlo::{MonteCarloAlgorithm, RandomPlayoutEvaluator};
 use ai_monte_carlo::uct1::Uct1;
 use ai_tree_search::iterative_deepening_search::IterativeDeepeningSearch;
 use assert_with::panic_with;
+use battle_data::actions::battle_action_data::BattleAction;
 use battle_data::battle::battle_data::BattleData;
 use battle_queries::legal_action_queries::legal_actions::{self, LegalActions};
 use core_data::types::PlayerName;

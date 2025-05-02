@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 use std::sync::{LazyLock, Mutex};
 
-use action_data::battle_action_data::BattleAction;
 use actions::battle_actions;
 use ai_agents::agent_search;
+use battle_data::actions::battle_action_data::BattleAction;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_animations::animation_data::AnimationData;
 use battle_data::battle_player::player_data::PlayerType;

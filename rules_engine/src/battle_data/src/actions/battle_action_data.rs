@@ -1,10 +1,9 @@
-use battle_data::battle_cards::card_id::{CharacterId, HandCardId, StackCardId};
 use core_data::identifiers::CardId;
 use core_data::numerics::Energy;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::game_action_data::GameAction;
+use crate::battle_cards::card_id::{CharacterId, HandCardId, StackCardId};
 
 /// An action that can be performed in a battle
 #[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
@@ -40,12 +39,6 @@ pub enum BattleAction {
     ToggleOrderSelectorVisibility,
     /// Confirm the selected cards to mulligan
     SubmitMulligan,
-}
-
-impl From<BattleAction> for GameAction {
-    fn from(action: BattleAction) -> Self {
-        GameAction::BattleAction(action)
-    }
 }
 
 #[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]

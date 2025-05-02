@@ -1,5 +1,5 @@
-use action_data::battle_action_data::BattleAction;
 use assert_with::panic_with;
+use battle_data::actions::battle_action_data::BattleAction;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::prompt_types::prompt_data::{Prompt, PromptResumeAction};
 use battle_mutations::core::select_prompt_choice;

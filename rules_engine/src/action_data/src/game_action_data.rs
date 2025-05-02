@@ -1,9 +1,9 @@
 use std::fmt::{self, Debug, Formatter};
 
+use battle_data::actions::battle_action_data::BattleAction;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::battle_action_data::BattleAction;
 use crate::debug_action_data::DebugAction;
 use crate::panel_address::PanelAddress;
 
@@ -25,5 +25,11 @@ impl Debug for GameAction {
             GameAction::OpenPanel(panel) => write!(f, "{:?}", panel),
             GameAction::CloseCurrentPanel => write!(f, "CloseCurrentPanel"),
         }
+    }
+}
+
+impl From<BattleAction> for GameAction {
+    fn from(action: BattleAction) -> Self {
+        GameAction::BattleAction(action)
     }
 }

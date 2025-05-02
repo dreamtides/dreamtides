@@ -1,5 +1,5 @@
-use action_data::battle_action_data::BattleAction;
 use action_data::game_action_data::GameAction;
+use battle_data::actions::battle_action_data::BattleAction;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_cards::card_data::CardData;
 use battle_data::battle_cards::card_id::{CardIdType, HandCardId};
