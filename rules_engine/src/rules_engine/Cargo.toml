@@ -18,6 +18,7 @@ battle_data = { path = "../battle_data" }
 battle_mutations = { path = "../battle_mutations" }
 battle_queries = { path = "../battle_queries" }
 core_data = { path = "../core_data" }
+database = { path = "../database" }
 display = { path = "../display" }
 display_data = { path = "../display_data" }
 game_creation = { path = "../game_creation" }

@@ -1795,6 +1795,7 @@ dependencies = [
  "battle_mutations",
  "battle_queries",
  "core_data",
+ "database",
  "display",
  "display_data",
  "game_creation",

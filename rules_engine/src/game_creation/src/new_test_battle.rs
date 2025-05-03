@@ -46,6 +46,7 @@ pub fn create_and_start(
         priority: PlayerName::One,
         turn: TurnData { active_player: PlayerName::One, turn_id: TurnId::default() },
         step: BattleTurnStep::Judgment,
+        seed,
         rng: Xoshiro256PlusPlus::seed_from_u64(seed),
         request_context: RequestContext::UserRequest,
         animations: None,

@@ -52,6 +52,9 @@ pub struct BattleData {
     /// Current step within the turn
     pub step: BattleTurnStep,
 
+    /// Seed used to initialize the random number generator
+    pub seed: u64,
+
     /// Random number generator for this battle
     pub rng: Xoshiro256PlusPlus,
 
@@ -116,6 +119,7 @@ impl BattleData {
                 priority: self.priority,
                 turn: self.turn,
                 step: self.step,
+                seed: self.seed,
                 rng: self.rng.clone(),
                 animations: None,
                 prompt: self.prompt.clone(),

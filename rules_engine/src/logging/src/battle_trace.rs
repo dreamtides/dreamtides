@@ -262,6 +262,7 @@ mod tests {
             priority: PlayerName::One,
             turn: TurnData { active_player: PlayerName::One, turn_id: TurnId(1) },
             step: BattleTurnStep::Main,
+            seed: 12345,
             rng: Xoshiro256PlusPlus::seed_from_u64(12345),
             animations: None,
             prompt: None,
