@@ -1,6 +1,7 @@
 use std::cell::RefCell;
 use std::fmt::Write;
 use std::panic::{self, AssertUnwindSafe};
+use std::path::PathBuf;
 use std::sync::{LazyLock, Mutex};
 
 use action_data::game_action_data::GameAction;
@@ -9,6 +10,7 @@ use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_animations::animation_data::AnimationData;
 use battle_data::battle_player::player_data::PlayerType;
 use core_data::identifiers::{BattleId, UserId};
+use database::sqlite_database::{self};
 use display::rendering::{battle_rendering, renderer};
 use display_data::command::CommandSequence;
 use display_data::request_data::{ConnectRequest, ConnectResponse, PerformActionRequest};
@@ -30,11 +32,7 @@ pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     let metadata = request.metadata;
     let commands = catch_panic(
         AssertUnwindSafe(|| {
-            connect_internal(request.metadata.user_id);
-            Some(renderer::connect(
-                CURRENT_BATTLE.lock().unwrap().as_ref().unwrap(),
-                request.metadata.user_id,
-            ))
+            Some(connect_internal(request.metadata.user_id, &request.persistent_data_path))
         }),
         None,
     );
@@ -53,8 +51,14 @@ pub fn perform_action(request: PerformActionRequest) {
     task::spawn_blocking(move || perform_action_internal(&request));
 }
 
-fn connect_internal(user_id: UserId) {
+fn connect_internal(user_id: UserId, persistent_data_path: &str) -> CommandSequence {
     let mut battle_lock = CURRENT_BATTLE.lock().unwrap();
+    let database = match sqlite_database::initialize(PathBuf::from(persistent_data_path)) {
+        Ok(database) => database,
+        Err(error) => {
+            return error_message::display_error_message(None, error.to_string());
+        }
+    };
 
     if let Some(battle) = battle_lock.as_ref() {
         if let PlayerType::User(current_user_id) = &battle.player_one.player_type {
@@ -65,13 +69,13 @@ fn connect_internal(user_id: UserId) {
                 *battle_lock =
                     Some(new_battle::create_and_start(user_id, BattleId(Uuid::new_v4())));
                 battle_trace::clear_log_file();
-                return;
+                return renderer::connect(battle_lock.as_ref().unwrap(), user_id);
             }
         }
 
         if let PlayerType::User(enemy_user_id) = &battle.player_two.player_type {
             if *enemy_user_id == user_id {
-                return;
+                return renderer::connect(battle_lock.as_ref().unwrap(), user_id);
             }
         }
 
@@ -81,12 +85,13 @@ fn connect_internal(user_id: UserId) {
         let mut updated_battle = battle.clone();
         updated_battle.player_two.player_type = PlayerType::User(user_id);
         *battle_lock = Some(updated_battle);
-        return;
+        return renderer::connect(battle_lock.as_ref().unwrap(), user_id);
     }
 
     // No current battle, create a new one
     info!(?user_id, "No current battle, creating");
     *battle_lock = Some(new_battle::create_and_start(user_id, BattleId(Uuid::new_v4())));
+    renderer::connect(battle_lock.as_ref().unwrap(), user_id)
 }
 
 fn perform_action_internal(request: &PerformActionRequest) {
@@ -201,18 +206,7 @@ where
             }
 
             error!("Captured panic: {}", error_message);
-
-            match battle {
-                Some(battle_data) => {
-                    Some(error_message::display_error_message(battle_data, error_message))
-                }
-                None => {
-                    // Create a dummy battle if none exists
-                    let id = BattleId(Uuid::new_v4());
-                    let dummy_battle = new_battle::create_and_start(UserId::default(), id);
-                    Some(error_message::display_error_message(&dummy_battle, error_message))
-                }
-            }
+            Some(error_message::display_error_message(battle, error_message))
         }
     }
 }
