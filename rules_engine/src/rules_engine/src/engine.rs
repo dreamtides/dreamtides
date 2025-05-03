@@ -147,13 +147,14 @@ fn handle_user_not_in_battle(
 
     // Extract quest ID from user's save file
     match database.fetch_save(user_id) {
-        Ok(Some(save_file)) => {
-            let quest_id = extract_quest_id_from_save_file(&save_file);
-            save_battle_to_database(database, user_id, quest_id, &battle).map_or_else(
-                |error| error_message::display_error_message(None, error),
-                |_| renderer::connect(&battle, user_id),
-            )
-        }
+        Ok(Some(save_file)) => match extract_quest_id_from_save_file(&save_file) {
+            Ok(quest_id) => save_battle_to_database(database, user_id, quest_id, &battle)
+                .map_or_else(
+                    |error| error_message::display_error_message(None, error),
+                    |_| renderer::connect(&battle, user_id),
+                ),
+            Err(error) => error_message::display_error_message(Some(&battle), error),
+        },
         _ => {
             // Create a new quest ID if we can't get one from the save file
             let quest_id = QuestId(Uuid::new_v4());
@@ -165,9 +166,12 @@ fn handle_user_not_in_battle(
     }
 }
 
-fn extract_quest_id_from_save_file(save_file: &SaveFile) -> QuestId {
+fn extract_quest_id_from_save_file(save_file: &SaveFile) -> Result<QuestId, String> {
     match save_file {
-        SaveFile::V1(ref v1) => v1.quest.as_ref().map_or_else(|| QuestId(Uuid::new_v4()), |q| q.id),
+        SaveFile::V1(ref v1) => v1
+            .quest
+            .as_ref()
+            .map_or_else(|| Err("No active quest found in save file".to_string()), |q| Ok(q.id)),
     }
 }
 
