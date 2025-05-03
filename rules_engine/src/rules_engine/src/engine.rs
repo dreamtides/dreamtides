@@ -9,8 +9,9 @@ use backtrace::Backtrace;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_animations::animation_data::AnimationData;
 use battle_data::battle_player::player_data::PlayerType;
-use core_data::identifiers::{BattleId, UserId};
-use database::sqlite_database::{self};
+use core_data::identifiers::{BattleId, QuestId, UserId};
+use database::save_file::SaveFile;
+use database::sqlite_database::{self, Database};
 use display::rendering::{battle_rendering, renderer};
 use display_data::command::CommandSequence;
 use display_data::request_data::{ConnectRequest, ConnectResponse, PerformActionRequest};
@@ -20,7 +21,7 @@ use tokio::task;
 use tracing::{error, info};
 use uuid::Uuid;
 
-use crate::{debug_actions, error_message, handle_battle_action};
+use crate::{debug_actions, error_message, handle_battle_action, serialize_save_file};
 
 static CURRENT_BATTLE: LazyLock<Mutex<Option<BattleData>>> = LazyLock::new(|| Mutex::new(None));
 
@@ -52,46 +53,134 @@ pub fn perform_action(request: PerformActionRequest) {
 }
 
 fn connect_internal(user_id: UserId, persistent_data_path: &str) -> CommandSequence {
-    let mut battle_lock = CURRENT_BATTLE.lock().unwrap();
-    let database = match sqlite_database::initialize(PathBuf::from(persistent_data_path)) {
-        Ok(database) => database,
-        Err(error) => {
-            return error_message::display_error_message(None, error.to_string());
-        }
+    battle_trace::clear_log_file();
+
+    let database = match initialize_database(persistent_data_path) {
+        Ok(db) => db,
+        Err(error) => return error_message::display_error_message(None, error),
     };
 
-    if let Some(battle) = battle_lock.as_ref() {
-        if let PlayerType::User(current_user_id) = &battle.player_one.player_type {
-            if *current_user_id == user_id {
-                // Create a new battle if the user id matches the current "user"
-                // player
-                info!(?user_id, "Restarting current battle");
-                *battle_lock =
-                    Some(new_battle::create_and_start(user_id, BattleId(Uuid::new_v4())));
-                battle_trace::clear_log_file();
-                return renderer::connect(battle_lock.as_ref().unwrap(), user_id);
+    // Try to load existing battle from the database
+    match load_battle_from_database(&database, user_id) {
+        Ok(LoadBattleResult::ExistingBattle(battle)) => {
+            if is_user_in_battle(&battle, user_id) {
+                return renderer::connect(&battle, user_id);
+            } else {
+                handle_user_not_in_battle(user_id, battle, &database)
             }
         }
+        Ok(LoadBattleResult::NewBattle(battle)) => renderer::connect(&battle, user_id),
+        Err(error) => error_message::display_error_message(None, error),
+    }
+}
 
-        if let PlayerType::User(enemy_user_id) = &battle.player_two.player_type {
-            if *enemy_user_id == user_id {
-                return renderer::connect(battle_lock.as_ref().unwrap(), user_id);
+enum LoadBattleResult {
+    ExistingBattle(BattleData),
+    NewBattle(BattleData),
+}
+
+fn initialize_database(persistent_data_path: &str) -> Result<Database, String> {
+    sqlite_database::initialize(PathBuf::from(persistent_data_path)).map_err(|e| e.to_string())
+}
+
+fn load_battle_from_database(
+    database: &Database,
+    user_id: UserId,
+) -> Result<LoadBattleResult, String> {
+    match database.fetch_save(user_id) {
+        Ok(Some(save_file)) => match crate::deserialize_save_file::battle(&save_file) {
+            Some(battle) => Ok(LoadBattleResult::ExistingBattle(battle)),
+            None => Err("No battle in save file".to_string()),
+        },
+        Ok(None) => {
+            // No save file exists, create a new battle
+            info!(?user_id, "No save file found, creating new battle");
+            let new_battle = new_battle::create_and_start(user_id, BattleId(Uuid::new_v4()));
+
+            // Save new battle to database
+            let quest_id = QuestId(Uuid::new_v4());
+            let save_file = serialize_save_file::battle(user_id, quest_id, &new_battle);
+            match database.write_save(save_file) {
+                Ok(_) => Ok(LoadBattleResult::NewBattle(new_battle)),
+                Err(error) => Err(error.to_string()),
             }
         }
+        Err(error) => Err(error.to_string()),
+    }
+}
 
-        // User is neither the "user" player nor the "enemy" player and a battle
-        // already exists; set them as the enemy player
-        info!(?user_id, "Joining current battle");
-        let mut updated_battle = battle.clone();
-        updated_battle.player_two.player_type = PlayerType::User(user_id);
-        *battle_lock = Some(updated_battle);
-        return renderer::connect(battle_lock.as_ref().unwrap(), user_id);
+fn is_user_in_battle(battle: &BattleData, user_id: UserId) -> bool {
+    match &battle.player_one.player_type {
+        PlayerType::User(id) if *id == user_id => true,
+        _ => match &battle.player_two.player_type {
+            PlayerType::User(id) if *id == user_id => true,
+            _ => false,
+        },
+    }
+}
+
+fn handle_user_not_in_battle(
+    user_id: UserId,
+    mut battle: BattleData,
+    database: &Database,
+) -> CommandSequence {
+    // Check if both players are already human users (but not this user)
+    let both_human_players = match (&battle.player_one.player_type, &battle.player_two.player_type)
+    {
+        (PlayerType::User(id1), PlayerType::User(id2)) => *id1 != user_id && *id2 != user_id,
+        _ => false,
+    };
+
+    if both_human_players {
+        return error_message::display_error_message(
+            Some(&battle),
+            "Cannot join battle: both players are already human users".to_string(),
+        );
     }
 
-    // No current battle, create a new one
-    info!(?user_id, "No current battle, creating");
-    *battle_lock = Some(new_battle::create_and_start(user_id, BattleId(Uuid::new_v4())));
-    renderer::connect(battle_lock.as_ref().unwrap(), user_id)
+    // Replace the first non-human player with this user
+    if !matches!(battle.player_one.player_type, PlayerType::User(_)) {
+        info!(?user_id, "Replacing player one with user");
+        battle.player_one.player_type = PlayerType::User(user_id);
+    } else if !matches!(battle.player_two.player_type, PlayerType::User(_)) {
+        info!(?user_id, "Replacing player two with user");
+        battle.player_two.player_type = PlayerType::User(user_id);
+    }
+
+    // Extract quest ID from user's save file
+    match database.fetch_save(user_id) {
+        Ok(Some(save_file)) => {
+            let quest_id = extract_quest_id_from_save_file(&save_file);
+            save_battle_to_database(database, user_id, quest_id, &battle).map_or_else(
+                |error| error_message::display_error_message(None, error),
+                |_| renderer::connect(&battle, user_id),
+            )
+        }
+        _ => {
+            // Create a new quest ID if we can't get one from the save file
+            let quest_id = QuestId(Uuid::new_v4());
+            save_battle_to_database(database, user_id, quest_id, &battle).map_or_else(
+                |error| error_message::display_error_message(None, error),
+                |_| renderer::connect(&battle, user_id),
+            )
+        }
+    }
+}
+
+fn extract_quest_id_from_save_file(save_file: &SaveFile) -> QuestId {
+    match save_file {
+        SaveFile::V1(ref v1) => v1.quest.as_ref().map_or_else(|| QuestId(Uuid::new_v4()), |q| q.id),
+    }
+}
+
+fn save_battle_to_database(
+    database: &Database,
+    user_id: UserId,
+    quest_id: QuestId,
+    battle: &BattleData,
+) -> Result<(), String> {
+    let save_file = serialize_save_file::battle(user_id, quest_id, battle);
+    database.write_save(save_file).map_err(|e| e.to_string())
 }
 
 fn perform_action_internal(request: &PerformActionRequest) {

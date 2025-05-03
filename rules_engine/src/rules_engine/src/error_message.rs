@@ -14,7 +14,11 @@ use uuid::Uuid;
 
 /// Attempts to display an error message to the player describing a rules engine
 /// error.
-pub fn display_error_message(battle: Option<&BattleData>, message: String) -> CommandSequence {
+pub fn display_error_message(
+    battle: Option<&BattleData>,
+    message: impl Into<String>,
+) -> CommandSequence {
+    let message = message.into();
     match battle {
         Some(existing_battle) => display_error_message_with_battle(existing_battle, message),
         None => {
