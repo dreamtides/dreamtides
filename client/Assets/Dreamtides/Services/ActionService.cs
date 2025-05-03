@@ -49,6 +49,7 @@ namespace Dreamtides.Services
       var request = new ConnectRequest
       {
         Metadata = _metadata,
+        PersistentDataPath = Application.persistentDataPath,
         TestScenario = _testScenario
       };
 
@@ -72,7 +73,8 @@ namespace Dreamtides.Services
         {
           StartCoroutine(DevServerConnectAsync(new ConnectRequest
           {
-            Metadata = _metadata!
+            Metadata = _metadata!,
+            PersistentDataPath = Application.persistentDataPath
           }, reconnect: true));
           _lastConnectAttemptTime = now;
         }

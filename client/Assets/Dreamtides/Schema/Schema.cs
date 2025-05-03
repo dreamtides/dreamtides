@@ -41,6 +41,17 @@ namespace Dreamtides.Schema
         [JsonProperty("metadata", Required = Required.Always)]
         public Metadata Metadata { get; set; }
 
+        /// <summary>
+        /// Contains the path to a persistent data directory.
+        ///
+        /// When you build the Unity application, a GUID is generated that is based on the Bundle
+        /// Identifier. This GUID is part of persistentDataPath. If you keep the same Bundle
+        /// Identifier in future versions, the application keeps accessing the same location on every
+        /// update.
+        /// </summary>
+        [JsonProperty("persistentDataPath", Required = Required.Always)]
+        public string PersistentDataPath { get; set; }
+
         [JsonProperty("testScenario")]
         public string TestScenario { get; set; }
     }

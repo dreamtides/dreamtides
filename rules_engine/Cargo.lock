@@ -1803,6 +1803,7 @@ dependencies = [
  "masonry",
  "tokio",
  "tracing",
+ "tracing-subscriber",
  "ui_components",
  "uuid",
 ]

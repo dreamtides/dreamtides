@@ -7,6 +7,9 @@ use serde::{Deserialize, Serialize};
 use slotmap::{new_key_type, Key, KeyData};
 use uuid::Uuid;
 
+/// Identifies a human player of the game.
+///
+/// Equivalently, this identifies a save file.
 #[derive(
     Copy,
     Clone,

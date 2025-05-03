@@ -1,24 +1,26 @@
 use std::cell::OnceCell;
 use std::fmt::Display;
 use std::path::PathBuf;
-use std::sync::{Arc, OnceLock};
+use std::rc::Rc;
+use std::sync::OnceLock;
 
 use core_data::identifiers::UserId;
 use rusqlite::{Connection, Error, OptionalExtension};
 use serde_json::{self, ser};
+use tracing::info;
 
 use crate::save_file::SaveFile;
 
 static DATABASE_PATH: OnceLock<PathBuf> = OnceLock::new();
 thread_local! {
-    static DATABASE: OnceCell<Database> = OnceCell::new();
+    static DATABASE: OnceCell<Database> = const { OnceCell::new() };
 }
 
 /// Sets the database path which will be used by all threads for their database
 /// connections, then returns a [Database] connection for the current thread.
 pub fn initialize(path: PathBuf) -> Result<Database, DatabaseError> {
     // Try to set the database path
-    if let Err(_) = DATABASE_PATH.set(path.clone()) {
+    if DATABASE_PATH.set(path.clone()).is_err() {
         // Path is already set, check if it's the same
         if let Some(existing_path) = DATABASE_PATH.get() {
             if existing_path != &path {
@@ -36,7 +38,7 @@ pub fn initialize(path: PathBuf) -> Result<Database, DatabaseError> {
             Ok(db.clone())
         } else {
             let db = Database::new(path)?;
-            if let Err(_) = cell.set(db.clone()) {
+            if cell.set(db.clone()).is_err() {
                 return Err(DatabaseError(
                     "Failed to store database in thread-local storage.".to_string(),
                 ));
@@ -59,7 +61,7 @@ pub fn get() -> Result<Database, DatabaseError> {
             match DATABASE_PATH.get() {
                 Some(path) => {
                     let db = Database::new(path.clone())?;
-                    if let Err(_) = cell.set(db.clone()) {
+                    if cell.set(db.clone()).is_err() {
                         return Err(DatabaseError(
                             "Failed to store database in thread-local storage.".to_string(),
                         ));
@@ -90,13 +92,15 @@ impl Display for DatabaseError {
 /// way to pass the connection between callers.
 #[derive(Debug, Clone)]
 pub struct Database {
-    connection: Arc<Connection>,
+    connection: Rc<Connection>,
 }
 
 impl Database {
     pub fn new(directory: PathBuf) -> Result<Self, DatabaseError> {
-        let connection = Connection::open(directory.join("game.sqlite"))
-            .map_err(|e| to_database_error(e, "opening connection"))?;
+        let path = directory.join("saves.sqlite");
+        info!(?path, "Opening new database connection");
+        let connection =
+            Connection::open(path).map_err(|e| to_database_error(e, "opening connection"))?;
 
         connection
             .pragma_update(None, "foreign_keys", true)
@@ -112,11 +116,12 @@ impl Database {
             )
             .map_err(|e| to_database_error(e, "creating saves table"))?;
 
-        Ok(Self { connection: Arc::new(connection) })
+        Ok(Self { connection: Rc::new(connection) })
     }
 
     /// Fetches a save file from the database by user ID.
     pub fn fetch_save(&self, user_id: UserId) -> Result<Option<SaveFile>, DatabaseError> {
+        info!(?user_id, "Fetching save file");
         let data: Option<Vec<u8>> = self
             .connection
             .query_row("SELECT data FROM saves WHERE id = ?1", [&user_id.0], |row| row.get(0))
@@ -139,8 +144,10 @@ impl Database {
 
     /// Writes a save file to the database.
     pub fn write_save(&self, save: SaveFile) -> Result<(), DatabaseError> {
+        let save_id = save.id();
+        info!(?save_id, "Writing save file to database");
         let data = ser::to_vec(&save).map_err(|e| {
-            DatabaseError(format!("Error serializing save file {:?}: {:?}", save.id(), e))
+            DatabaseError(format!("Error serializing save file {:?}: {:?}", save_id, e))
         })?;
 
         self.connection
@@ -150,7 +157,7 @@ impl Database {
                 ON CONFLICT(id) DO UPDATE SET data = ?2",
                 (&save.id().0, &data),
             )
-            .map_err(|e| to_database_error(e, &format!("writing save file {:?}", save.id())))?;
+            .map_err(|e| to_database_error(e, &format!("writing save file {:?}", save_id)))?;
 
         Ok(())
     }

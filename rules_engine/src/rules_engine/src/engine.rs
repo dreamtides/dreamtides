@@ -1,8 +1,7 @@
 use std::cell::RefCell;
 use std::fmt::Write;
-use std::panic::{self, AssertUnwindSafe};
+use std::panic::{self};
 use std::path::PathBuf;
-use std::sync::{LazyLock, Mutex};
 
 use action_data::game_action_data::GameAction;
 use backtrace::Backtrace;
@@ -21,9 +20,9 @@ use tokio::task;
 use tracing::{error, info};
 use uuid::Uuid;
 
-use crate::{debug_actions, error_message, handle_battle_action, serialize_save_file};
-
-static CURRENT_BATTLE: LazyLock<Mutex<Option<BattleData>>> = LazyLock::new(|| Mutex::new(None));
+use crate::{
+    debug_actions, deserialize_save_file, error_message, handle_battle_action, serialize_save_file,
+};
 
 thread_local! {
     static PANIC_INFO: RefCell<Option<(String, String, Backtrace)>> = const { RefCell::new(None) };
@@ -31,13 +30,13 @@ thread_local! {
 
 pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     let metadata = request.metadata;
-    let commands = catch_panic(
-        AssertUnwindSafe(|| {
-            Some(connect_internal(request.metadata.user_id, &request.persistent_data_path))
-        }),
-        None,
-    );
-    ConnectResponse { metadata, commands: commands.unwrap() }
+    let result =
+        catch_panic(|| connect_internal(request.metadata.user_id, &request.persistent_data_path));
+    let commands = match result {
+        Ok(commands) => commands,
+        Err(error) => error_message::display_error_message(None, error),
+    };
+    ConnectResponse { metadata, commands }
 }
 
 pub fn poll(user_id: UserId) -> Option<CommandSequence> {
@@ -60,11 +59,11 @@ fn connect_internal(user_id: UserId, persistent_data_path: &str) -> CommandSeque
         Err(error) => return error_message::display_error_message(None, error),
     };
 
-    // Try to load existing battle from the database
+    info!(?user_id, "Loading battle from database");
     match load_battle_from_database(&database, user_id) {
         Ok(LoadBattleResult::ExistingBattle(battle)) => {
             if is_user_in_battle(&battle, user_id) {
-                return renderer::connect(&battle, user_id);
+                renderer::connect(&battle, user_id)
             } else {
                 handle_user_not_in_battle(user_id, battle, &database)
             }
@@ -89,7 +88,7 @@ fn load_battle_from_database(
 ) -> Result<LoadBattleResult, String> {
     match database.fetch_save(user_id) {
         Ok(Some(save_file)) => match crate::deserialize_save_file::battle(&save_file) {
-            Some(battle) => Ok(LoadBattleResult::ExistingBattle(battle)),
+            Some((battle, _)) => Ok(LoadBattleResult::ExistingBattle(battle)),
             None => Err("No battle in save file".to_string()),
         },
         Ok(None) => {
@@ -112,10 +111,7 @@ fn load_battle_from_database(
 fn is_user_in_battle(battle: &BattleData, user_id: UserId) -> bool {
     match &battle.player_one.player_type {
         PlayerType::User(id) if *id == user_id => true,
-        _ => match &battle.player_two.player_type {
-            PlayerType::User(id) if *id == user_id => true,
-            _ => false,
-        },
+        _ => matches!(&battle.player_two.player_type, PlayerType::User(id) if *id == user_id),
     }
 }
 
@@ -124,6 +120,8 @@ fn handle_user_not_in_battle(
     mut battle: BattleData,
     database: &Database,
 ) -> CommandSequence {
+    battle_trace!("User is not a player in this battle", battle, user_id);
+
     // Check if both players are already human users (but not this user)
     let both_human_players = match (&battle.player_one.player_type, &battle.player_two.player_type)
     {
@@ -184,58 +182,66 @@ fn save_battle_to_database(
 }
 
 fn perform_action_internal(request: &PerformActionRequest) {
-    let battle_data = CURRENT_BATTLE.lock().unwrap().clone();
     let metadata = request.metadata;
     let user_id = metadata.user_id;
-    let panic_commands = catch_panic(
-        AssertUnwindSafe(|| {
-            let mut battle = match &battle_data {
-                Some(battle) => battle.clone(),
-                None => panic!("No battle found"),
-            };
-            battle.animations = Some(AnimationData::default());
-            match request.action {
-                GameAction::DebugAction(action) => {
-                    let player = renderer::player_name_for_user(&battle, user_id);
-                    debug_actions::execute(&mut battle, user_id, player, action);
-                    handle_battle_action::append_update(
-                        user_id,
-                        renderer::connect(&battle, user_id),
-                    );
-                }
-                GameAction::BattleAction(action) => {
-                    let player = renderer::player_name_for_user(&battle, user_id);
-                    handle_battle_action::execute(&mut battle, user_id, player, action);
-                }
-                GameAction::OpenPanel(address) => {
-                    battle_rendering::open_panel(address);
-                    handle_battle_action::append_update(
-                        user_id,
-                        renderer::connect(&battle, user_id),
-                    );
-                }
-                GameAction::CloseCurrentPanel => {
-                    battle_rendering::close_current_panel();
-                    handle_battle_action::append_update(
-                        user_id,
-                        renderer::connect(&battle, user_id),
-                    );
-                }
-            };
-            *CURRENT_BATTLE.lock().unwrap() = Some(battle);
-            None
-        }),
-        battle_data.as_ref(),
-    );
+    let result = catch_panic(|| {
+        let Ok(database) = sqlite_database::get() else {
+            show_error_message(user_id, None, "No database found".to_string());
+            return;
+        };
+        let Ok(Some(save)) = database.fetch_save(request.metadata.user_id) else {
+            show_error_message(user_id, None, "No save file found".to_string());
+            return;
+        };
 
-    if let Some(commands) = panic_commands {
-        handle_battle_action::append_update(user_id, commands);
+        let Some((mut battle, quest_id)) = deserialize_save_file::battle(&save) else {
+            show_error_message(user_id, None, "No battle found".to_string());
+            return;
+        };
+
+        battle.animations = Some(AnimationData::default());
+        match request.action {
+            GameAction::DebugAction(action) => {
+                let player = renderer::player_name_for_user(&battle, user_id);
+                debug_actions::execute(&mut battle, user_id, player, action);
+                handle_battle_action::append_update(user_id, renderer::connect(&battle, user_id));
+            }
+            GameAction::BattleAction(action) => {
+                let player = renderer::player_name_for_user(&battle, user_id);
+                handle_battle_action::execute(&mut battle, user_id, player, action);
+            }
+            GameAction::OpenPanel(address) => {
+                battle_rendering::open_panel(address);
+                handle_battle_action::append_update(user_id, renderer::connect(&battle, user_id));
+            }
+            GameAction::CloseCurrentPanel => {
+                battle_rendering::close_current_panel();
+                handle_battle_action::append_update(user_id, renderer::connect(&battle, user_id));
+            }
+        };
+
+        if let Err(error) =
+            database.write_save(serialize_save_file::battle(user_id, quest_id, &battle))
+        {
+            show_error_message(user_id, Some(&battle), format!("Failed to save battle: {}", error));
+        }
+    });
+
+    if let Err(error) = result {
+        show_error_message(user_id, None, error);
     }
 }
 
-fn catch_panic<F>(f: F, battle: Option<&BattleData>) -> Option<CommandSequence>
+pub fn show_error_message(user_id: UserId, battle: Option<&BattleData>, error_message: String) {
+    handle_battle_action::append_update(
+        user_id,
+        error_message::display_error_message(battle, error_message),
+    )
+}
+
+fn catch_panic<F, T>(function: F) -> Result<T, String>
 where
-    F: FnOnce() -> Option<CommandSequence> + panic::UnwindSafe,
+    F: FnOnce() -> T + panic::UnwindSafe,
 {
     // Clear any previous panic info
     PANIC_INFO.with(|info| {
@@ -258,13 +264,13 @@ where
         });
     }));
 
-    let result = panic::catch_unwind(f);
+    let result = panic::catch_unwind(function);
 
     // Restore the original panic hook
     panic::set_hook(prev_hook);
 
     match result {
-        Ok(commands) => commands,
+        Ok(value) => Ok(value),
         Err(panic_error) => {
             // Extract a more meaningful error message from the panic payload
             let panic_msg = match panic_error.downcast_ref::<&'static str>() {
@@ -295,7 +301,7 @@ where
             }
 
             error!("Captured panic: {}", error_message);
-            Some(error_message::display_error_message(battle, error_message))
+            Err(error_message)
         }
     }
 }
