@@ -1,8 +1,9 @@
 use action_data::game_action_data::GameAction;
 use asset_paths::poneti_ui;
 use bon::Builder;
+use core_data::display_color;
 use masonry::flex_enums::{FlexAlign, FlexJustify};
-use masonry::flex_style::{FlexGrow, FlexStyle};
+use masonry::flex_style::{FlexGrow, FlexScale, FlexStyle};
 
 use crate::box_component::BoxComponent;
 use crate::component::Component;
@@ -34,6 +35,17 @@ impl Component for ButtonComponent {
                         .justify_content(FlexJustify::Center)
                         .min_width(20)
                         .padding((0, 6))
+                        .build(),
+                )
+                .hover_style(
+                    FlexStyle::builder()
+                        .background_image_tint_color(display_color::GRAY_300)
+                        .build(),
+                )
+                .pressed_style(
+                    FlexStyle::builder()
+                        .background_image_tint_color(display_color::GRAY_500)
+                        .scale(FlexScale::new(0.97))
                         .build(),
                 )
                 .on_click(self.action)

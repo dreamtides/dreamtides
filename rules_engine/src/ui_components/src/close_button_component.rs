@@ -1,7 +1,8 @@
 use action_data::game_action_data::GameAction;
 use asset_paths::poneti_ui;
+use core_data::display_color;
 use masonry::flex_enums::{FlexAlign, FlexJustify};
-use masonry::flex_style::FlexStyle;
+use masonry::flex_style::{FlexScale, FlexStyle};
 
 use crate::box_component::BoxComponent;
 use crate::component::Component;
@@ -25,6 +26,17 @@ impl Component for CloseButtonComponent {
                         .image_slice(100)
                         .justify_content(FlexJustify::Center)
                         .width(18)
+                        .build(),
+                )
+                .hover_style(
+                    FlexStyle::builder()
+                        .background_image_tint_color(display_color::GRAY_300)
+                        .build(),
+                )
+                .pressed_style(
+                    FlexStyle::builder()
+                        .background_image_tint_color(display_color::GRAY_500)
+                        .scale(FlexScale::new(0.97))
                         .build(),
                 )
                 .on_click(GameAction::CloseCurrentPanel)

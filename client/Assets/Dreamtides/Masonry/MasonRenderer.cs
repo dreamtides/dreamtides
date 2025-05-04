@@ -112,27 +112,12 @@ namespace Dreamtides.Masonry
 
             ApplyStyle(registry, element, hoverStyle);
           });
-          callbacks.SetCallback(Callbacks.Event.MouseLeave, () =>
-          {
-            if (node.EventHandlers?.OnMouseLeave != null)
-            {
-              registry.ActionService.PerformAction(node.EventHandlers.OnMouseLeave?.ToGameAction());
-            }
-
-            var originalStyle = new FlexStyle();
-            originalStyle = Mason.MergeStyles(originalStyle, node.Style);
-            originalStyle = Mason.MergeStyles(originalStyle, node.OnAttachStyle);
-            ApplyStyle(registry, element, originalStyle);
-          });
         }
         else
         {
           SetCallback(registry, callbacks,
             node.EventHandlers?.OnMouseEnter?.ToGameAction(),
             Callbacks.Event.MouseEnter);
-          SetCallback(registry, callbacks,
-            node.EventHandlers?.OnMouseLeave?.ToGameAction(),
-            Callbacks.Event.MouseLeave);
         }
 
         if (node.PressedStyle != null)
@@ -224,6 +209,28 @@ namespace Dreamtides.Masonry
         {
           // Ignore mouse events on non-interactive elements
           element.pickingMode = PickingMode.Ignore;
+        }
+
+        if (node.HoverStyle != null || node.PressedStyle != null)
+        {
+          callbacks.SetCallback(Callbacks.Event.MouseLeave, () =>
+          {
+            if (node.EventHandlers?.OnMouseLeave != null)
+            {
+              registry.ActionService.PerformAction(node.EventHandlers.OnMouseLeave?.ToGameAction());
+            }
+
+            var originalStyle = new FlexStyle();
+            originalStyle = Mason.MergeStyles(originalStyle, node.Style);
+            originalStyle = Mason.MergeStyles(originalStyle, node.OnAttachStyle);
+            ApplyStyle(registry, element, originalStyle);
+          });
+        }
+        else
+        {
+          SetCallback(registry, callbacks,
+            node.EventHandlers?.OnMouseLeave?.ToGameAction(),
+            Callbacks.Event.MouseLeave);
         }
       }
       else

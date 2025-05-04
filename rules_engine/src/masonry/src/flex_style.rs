@@ -60,6 +60,12 @@ pub struct FlexScale {
     pub amount: FlexVector3,
 }
 
+impl FlexScale {
+    pub fn new(amount: f32) -> Self {
+        Self { amount: FlexVector3::new(amount, amount, amount) }
+    }
+}
+
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct TextShadow {

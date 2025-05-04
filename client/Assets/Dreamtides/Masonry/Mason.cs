@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Dreamtides.Schema;
+using Dreamtides.Utils;
 using UnityEngine;
 
 namespace Dreamtides.Masonry
@@ -257,8 +258,14 @@ namespace Dreamtides.Masonry
     /// <summary>
     /// Merges two FlexStyle objects, preferring values set in 'newStyle'.
     /// </summary>
-    public static FlexStyle MergeStyles(FlexStyle original, FlexStyle newStyle)
+    public static FlexStyle MergeStyles(FlexStyle original, FlexStyle? newStyle)
     {
+      Errors.CheckNotNull(original, "Original style is null");
+      if (newStyle == null)
+      {
+        return original;
+      }
+
       var result = new FlexStyle();
       result.AlignContent = newStyle.AlignContent ?? original.AlignContent;
       result.AlignItems = newStyle.AlignItems ?? original.AlignItems;

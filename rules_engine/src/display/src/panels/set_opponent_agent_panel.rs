@@ -19,7 +19,7 @@ pub struct SetOpponentAgentPanel<'a> {
     pub battle: &'a BattleData,
 }
 
-impl<'a> Component for SetOpponentAgentPanel<'a> {
+impl Component for SetOpponentAgentPanel<'_> {
     fn render(self) -> Option<impl Component> {
         Some(
             PanelComponent::builder()
@@ -81,7 +81,7 @@ impl<'a> Component for SetOpponentAgentPanel<'a> {
     }
 }
 
-impl<'a> SetOpponentAgentPanel<'a> {
+impl SetOpponentAgentPanel<'_> {
     fn get_opponent_agent(&self) -> String {
         match self.battle.player(self.user_player.opponent()).player_type {
             PlayerType::User(id) => format!("User: {:?}", id),
