@@ -1,6 +1,6 @@
 use action_data::debug_action_data::DebugAction;
 use action_data::game_action_data::GameAction;
-use ai_data::game_ai::GameAI;
+use action_data::panel_address::PanelAddress;
 use bon::Builder;
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify, FlexWrap};
 use masonry::flex_style::FlexStyle;
@@ -31,6 +31,12 @@ impl Component for DeveloperPanel {
                         )
                         .child(
                             DebugButton::builder()
+                                .label("Set AI")
+                                .action(GameAction::OpenPanel(PanelAddress::SetOpponentAgent))
+                                .build(),
+                        )
+                        .child(
+                            DebugButton::builder()
                                 .label("Draw Card")
                                 .action(DebugAction::DrawCard)
                                 .build(),
@@ -39,44 +45,6 @@ impl Component for DeveloperPanel {
                             DebugButton::builder()
                                 .label("Restart Battle")
                                 .action(DebugAction::RestartBattle)
-                                .build(),
-                        )
-                        .child(
-                            DebugButton::builder()
-                                .label("UCT 1000")
-                                .action(DebugAction::SetOpponentAgent(GameAI::Uct1MaxIterations(
-                                    1000,
-                                )))
-                                .build(),
-                        )
-                        .child(
-                            DebugButton::builder()
-                                .label("UCT 5000")
-                                .action(DebugAction::SetOpponentAgent(GameAI::Uct1MaxIterations(
-                                    5000,
-                                )))
-                                .build(),
-                        )
-                        .child(
-                            DebugButton::builder()
-                                .label("UCT 10,000")
-                                .action(DebugAction::SetOpponentAgent(GameAI::Uct1MaxIterations(
-                                    10_000,
-                                )))
-                                .build(),
-                        )
-                        .child(
-                            DebugButton::builder()
-                                .label("UCT 50,000")
-                                .action(DebugAction::SetOpponentAgent(GameAI::Uct1MaxIterations(
-                                    50_000,
-                                )))
-                                .build(),
-                        )
-                        .child(
-                            DebugButton::builder()
-                                .label("Iterative Deepening")
-                                .action(DebugAction::SetOpponentAgent(GameAI::IterativeDeepening))
                                 .build(),
                         )
                         .build(),

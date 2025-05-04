@@ -64,7 +64,7 @@ impl From<f32> for DimensionGroup {
 }
 
 impl From<(i32, i32)> for DimensionGroup {
-    fn from((horizontal, vertical): (i32, i32)) -> Self {
+    fn from((vertical, horizontal): (i32, i32)) -> Self {
         Self {
             top: vertical.into(),
             right: horizontal.into(),
@@ -75,7 +75,7 @@ impl From<(i32, i32)> for DimensionGroup {
 }
 
 impl From<(f32, f32)> for DimensionGroup {
-    fn from((horizontal, vertical): (f32, f32)) -> Self {
+    fn from((vertical, horizontal): (f32, f32)) -> Self {
         Self {
             top: vertical.into(),
             right: horizontal.into(),

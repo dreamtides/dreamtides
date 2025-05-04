@@ -1777,7 +1777,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Identifies a window on screen containing UI elements
     /// </summary>
-    public enum PanelAddress { Developer };
+    public enum PanelAddress { Developer, SetOpponentAgent };
 
     public enum FlexAlign { Auto, Center, FlexEnd, FlexStart, Stretch };
 
@@ -2913,9 +2913,12 @@ namespace Dreamtides.Schema
         {
             if (reader.TokenType == JsonToken.Null) return null;
             var value = serializer.Deserialize<string>(reader);
-            if (value == "developer")
+            switch (value)
             {
-                return PanelAddress.Developer;
+                case "developer":
+                    return PanelAddress.Developer;
+                case "setOpponentAgent":
+                    return PanelAddress.SetOpponentAgent;
             }
             throw new Exception("Cannot unmarshal type PanelAddress");
         }
@@ -2928,10 +2931,14 @@ namespace Dreamtides.Schema
                 return;
             }
             var value = (PanelAddress)untypedValue;
-            if (value == PanelAddress.Developer)
+            switch (value)
             {
-                serializer.Serialize(writer, "developer");
-                return;
+                case PanelAddress.Developer:
+                    serializer.Serialize(writer, "developer");
+                    return;
+                case PanelAddress.SetOpponentAgent:
+                    serializer.Serialize(writer, "setOpponentAgent");
+                    return;
             }
             throw new Exception("Cannot marshal type PanelAddress");
         }

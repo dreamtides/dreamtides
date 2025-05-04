@@ -106,12 +106,21 @@ impl BoxComponentBuilder<Named> {
 
 impl BoxComponentBuilder<Named> {
     pub fn build(self) -> BoxComponent {
+        // Default flex direction to Row.
+        let style = match self.style {
+            Some(mut style) if style.flex_direction.is_none() => {
+                style.flex_direction = Some(masonry::flex_enums::FlexDirection::Row);
+                Some(style)
+            }
+            other => other,
+        };
+
         BoxComponent(FlexNode {
             name: Some(self.name.0),
             node_type: None,
             children: self.children,
             event_handlers: self.event_handlers,
-            style: self.style,
+            style,
             hover_style: self.hover_style,
             pressed_style: self.pressed_style,
             on_attach_style: self.on_attach_style,

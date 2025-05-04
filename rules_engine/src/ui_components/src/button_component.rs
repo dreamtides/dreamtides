@@ -33,7 +33,7 @@ impl Component for ButtonComponent {
                         .image_slice(45)
                         .justify_content(FlexJustify::Center)
                         .min_width(20)
-                        .padding((6, 0))
+                        .padding((0, 6))
                         .build(),
                 )
                 .on_click(self.action)
