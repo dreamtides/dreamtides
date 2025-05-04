@@ -215,7 +215,7 @@ fn perform_action_internal(request: &PerformActionRequest) {
                 handle_battle_action::execute(&mut battle, user_id, player, action);
             }
             GameAction::OpenPanel(address) => {
-                battle_rendering::open_panel(address);
+                battle_rendering::open_panel(user_id, &battle, address);
                 handle_battle_action::append_update(user_id, renderer::connect(&battle, user_id));
             }
             GameAction::CloseCurrentPanel => {

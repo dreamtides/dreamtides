@@ -12,6 +12,7 @@ use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions::LegalActions;
 use battle_queries::player_queries::spark_total;
 use core_data::display_color;
+use core_data::identifiers::UserId;
 use core_data::numerics::Energy;
 use display_data::battle_view::{BattleView, ButtonView, InterfaceView, PlayerView};
 use display_data::command::{Command, GameMessageType, UpdateBattleCommand};
@@ -23,7 +24,8 @@ use ui_components::component::Component;
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
 use crate::panels::developer_panel::DeveloperPanel;
-use crate::rendering::card_rendering;
+use crate::panels::set_opponent_agent_panel::SetOpponentAgentPanel;
+use crate::rendering::{card_rendering, renderer};
 
 static CURRENT_PANEL: LazyLock<Mutex<Option<FlexNode>>> = LazyLock::new(|| Mutex::new(None));
 
@@ -60,11 +62,15 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleData) -> BattleView
 
 /// Opens a panel based on its [PanelAddress], replacing any
 /// previously-displayed panel.
-pub fn open_panel(address: PanelAddress) {
+pub fn open_panel(user_id: UserId, battle: &BattleData, address: PanelAddress) {
     let mut current_panel = CURRENT_PANEL.lock().unwrap();
+    let player = renderer::player_name_for_user(&battle, user_id);
     match address {
         PanelAddress::Developer => {
             *current_panel = DeveloperPanel.flex_node();
+        }
+        PanelAddress::SetOpponentAgent => {
+            *current_panel = SetOpponentAgentPanel { user_player: player }.flex_node();
         }
     }
 }
