@@ -20,13 +20,16 @@ namespace Dreamtides.Services
       public bool Animate;
     }
 
+    readonly Guid _userGuid = Guid.Parse("d2da9785-f20e-4879-bed5-35b2e1926faf");
+    readonly Guid _testOpponentGuid = Guid.Parse("25e89dde-37d7-464b-8a1c-f985102ca029");
     bool _devModeAutoConnect;
     float _lastConnectAttemptTime;
     Metadata? _metadata;
     string? _testScenario;
+    Queue<CommandBatch> _commandQueue = new Queue<CommandBatch>();
+    bool _isProcessingCommands = false;
 
-    private Queue<CommandBatch> _commandQueue = new Queue<CommandBatch>();
-    private bool _isProcessingCommands = false;
+    bool IsTestOpponentClient => Application.dataPath.Contains("test_client");
 
     public bool Connected { get; private set; }
 
@@ -42,14 +45,13 @@ namespace Dreamtides.Services
       yield return new WaitForEndOfFrame();
       _metadata = new Metadata
       {
-        UserId = Application.dataPath.Contains("test_client") ?
-            Guid.Parse("25e89dde-37d7-464b-8a1c-f985102ca029") :
-            Guid.Parse("d2da9785-f20e-4879-bed5-35b2e1926faf")
+        UserId = IsTestOpponentClient ? _testOpponentGuid : _userGuid
       };
       var request = new ConnectRequest
       {
         Metadata = _metadata,
         PersistentDataPath = Application.persistentDataPath,
+        VsOpponent = IsTestOpponentClient ? _userGuid : null,
         TestScenario = _testScenario
       };
 
@@ -74,7 +76,8 @@ namespace Dreamtides.Services
           StartCoroutine(DevServerConnectAsync(new ConnectRequest
           {
             Metadata = _metadata!,
-            PersistentDataPath = Application.persistentDataPath
+            PersistentDataPath = Application.persistentDataPath,
+            VsOpponent = IsTestOpponentClient ? _userGuid : null,
           }, reconnect: true));
           _lastConnectAttemptTime = now;
         }

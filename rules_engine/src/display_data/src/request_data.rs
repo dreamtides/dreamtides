@@ -25,6 +25,9 @@ pub struct ConnectRequest {
     /// keeps accessing the same location on every update.
     pub persistent_data_path: String,
 
+    /// If specified, connect to an ongoing game owned by the provided user.
+    pub vs_opponent: Option<UserId>,
+
     pub test_scenario: Option<String>,
 }
 

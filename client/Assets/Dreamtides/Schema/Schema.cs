@@ -54,6 +54,12 @@ namespace Dreamtides.Schema
 
         [JsonProperty("testScenario")]
         public string TestScenario { get; set; }
+
+        /// <summary>
+        /// If specified, connect to an ongoing game owned by the provided user.
+        /// </summary>
+        [JsonProperty("vsOpponent")]
+        public Guid? VsOpponent { get; set; }
     }
 
     public partial class Metadata

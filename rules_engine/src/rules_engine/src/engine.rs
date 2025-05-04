@@ -30,8 +30,7 @@ thread_local! {
 
 pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     let metadata = request.metadata;
-    let result =
-        catch_panic(|| connect_internal(request.metadata.user_id, &request.persistent_data_path));
+    let result = catch_panic(|| connect_internal(request));
     let commands = match result {
         Ok(commands) => commands,
         Err(error) => error_message::display_error_message(None, error),
@@ -51,7 +50,9 @@ pub fn perform_action(request: PerformActionRequest) {
     task::spawn_blocking(move || perform_action_internal(&request));
 }
 
-fn connect_internal(user_id: UserId, persistent_data_path: &str) -> CommandSequence {
+fn connect_internal(request: &ConnectRequest) -> CommandSequence {
+    let user_id = request.metadata.user_id;
+    let persistent_data_path = &request.persistent_data_path;
     battle_trace::clear_log_file();
 
     let database = match initialize_database(persistent_data_path) {
