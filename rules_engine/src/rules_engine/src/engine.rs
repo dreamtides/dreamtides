@@ -214,6 +214,19 @@ fn perform_action_internal(request: &PerformActionRequest) {
                 let player = renderer::player_name_for_user(&battle, user_id);
                 handle_battle_action::execute(&mut battle, user_id, player, action);
             }
+            GameAction::Undo(player) => {
+                let Some((undone_battle, _)) = deserialize_save_file::undo(&save, player) else {
+                    show_error_message(
+                        user_id,
+                        None,
+                        "Failed to undo: Battle state not found.".to_string(),
+                    );
+                    return;
+                };
+
+                battle = undone_battle;
+                handle_battle_action::append_update(user_id, renderer::connect(&battle, user_id));
+            }
             GameAction::OpenPanel(address) => {
                 battle_rendering::open_panel(address);
                 handle_battle_action::append_update(user_id, renderer::connect(&battle, user_id));

@@ -9,7 +9,6 @@ use crate::game_action_data::GameAction;
 #[serde(rename_all = "camelCase")]
 pub enum DebugAction {
     ApplyTestScenarioAction,
-    DrawCard,
     RestartBattle,
     SetOpponentAgent(GameAI),
 }

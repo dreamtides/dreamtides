@@ -11,10 +11,15 @@ use core_data::types::PlayerName;
 use logging::battle_trace;
 use tracing::instrument;
 
+use crate::debug_battle_action;
+
 #[instrument(name = "actions_execute", level = "debug", skip(battle))]
 pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction) {
     battle_trace!("Executing action", battle, player, action);
     match action {
+        BattleAction::Debug(debug_action) => {
+            debug_battle_action::execute(battle, player, debug_action);
+        }
         BattleAction::PlayCardFromHand(card_id) => {
             play_card::execute(battle, player, card_id);
         }
@@ -75,6 +80,7 @@ fn should_record_in_history(action: BattleAction) -> bool {
     !matches!(
         action,
         BattleAction::BrowseCards(..)
+            | BattleAction::SelectEnergyAdditionalCost(..)
             | BattleAction::CloseCardBrowser
             | BattleAction::ToggleOrderSelectorVisibility
     )

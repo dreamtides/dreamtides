@@ -104,6 +104,10 @@ fn interface_view(builder: &ResponseBuilder, battle: &BattleData) -> InterfaceVi
             label: "\u{f0ad} Dev".to_string(),
             action: Some(GameAction::OpenPanel(PanelAddress::Developer)),
         }),
+        undo_button: Some(ButtonView {
+            label: "\u{f0e2}".to_string(),
+            action: Some(GameAction::Undo(builder.act_for_player())),
+        }),
         card_order_selector: None,
         bottom_right_button: None,
     }

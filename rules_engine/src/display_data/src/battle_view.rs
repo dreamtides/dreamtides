@@ -67,6 +67,9 @@ pub struct InterfaceView {
     /// Button to toggle the display of the developer panel
     pub dev_button: Option<ButtonView>,
 
+    /// Button to perform an undo operation
+    pub undo_button: Option<ButtonView>,
+
     /// Options for display of the card order selector
     pub card_order_selector: Option<CardOrderSelectorView>,
 

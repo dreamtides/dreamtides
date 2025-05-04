@@ -1,5 +1,6 @@
 use core_data::identifiers::CardId;
 use core_data::numerics::Energy;
+use core_data::types::PlayerName;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -9,6 +10,8 @@ use crate::battle_cards::card_id::{CharacterId, HandCardId, StackCardId};
 #[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum BattleAction {
+    /// Developer action
+    Debug(DebugBattleAction),
     /// Play a card in the user's hand.
     PlayCardFromHand(HandCardId),
     /// Pass on taking actions in response to a card being played by the
@@ -39,6 +42,15 @@ pub enum BattleAction {
     ToggleOrderSelectorVisibility,
     /// Confirm the selected cards to mulligan
     SubmitMulligan,
+}
+
+#[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum DebugBattleAction {
+    /// Draw a card
+    DrawCard(PlayerName),
+    /// Set the energy of the player
+    SetEnergy(PlayerName, Energy),
 }
 
 #[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]

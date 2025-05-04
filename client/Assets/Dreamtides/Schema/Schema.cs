@@ -691,11 +691,16 @@ namespace Dreamtides.Schema
         [JsonProperty("battleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public BattleAction? BattleAction { get; set; }
 
+        [JsonProperty("undo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PlayerName? Undo { get; set; }
+
         [JsonProperty("openPanel", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PanelAddress? OpenPanel { get; set; }
     }
 
     /// <summary>
+    /// Developer action
+    ///
     /// Play a card in the user's hand.
     ///
     /// Select a character as a target
@@ -714,6 +719,9 @@ namespace Dreamtides.Schema
     /// </summary>
     public partial class BattleActionClass
     {
+        [JsonProperty("debug", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DebugBattleAction Debug { get; set; }
+
         [JsonProperty("playCardFromHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardId PlayCardFromHand { get; set; }
 
@@ -737,6 +745,20 @@ namespace Dreamtides.Schema
 
         [JsonProperty("browseCards", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardBrowserType? BrowseCards { get; set; }
+    }
+
+    /// <summary>
+    /// Draw a card
+    ///
+    /// Set the energy of the player
+    /// </summary>
+    public partial class DebugBattleAction
+    {
+        [JsonProperty("drawCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PlayerName? DrawCard { get; set; }
+
+        [JsonProperty("setEnergy", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public List<SetEnergy> SetEnergy { get; set; }
     }
 
     public partial class SelectCardOrder
@@ -1613,6 +1635,12 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("secondaryActionButton")]
         public ButtonView SecondaryActionButton { get; set; }
+
+        /// <summary>
+        /// Button to perform an undo operation
+        /// </summary>
+        [JsonProperty("undoButton")]
+        public ButtonView UndoButton { get; set; }
     }
 
     /// <summary>
@@ -1665,6 +1693,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("battleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public BattleAction? BattleAction { get; set; }
+
+        [JsonProperty("undo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PlayerName? Undo { get; set; }
 
         [JsonProperty("openPanel", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PanelAddress? OpenPanel { get; set; }
@@ -1770,7 +1801,12 @@ namespace Dreamtides.Schema
 
     public enum CardBrowserType { EnemyDeck, EnemyStatus, EnemyVoid, UserDeck, UserStatus, UserVoid };
 
-    public enum DebugActionEnum { ApplyTestScenarioAction, DrawCard, RestartBattle };
+    /// <summary>
+    /// Identifies a player in an ongoing battle.
+    /// </summary>
+    public enum PlayerName { One, Two };
+
+    public enum DebugActionEnum { ApplyTestScenarioAction, RestartBattle };
 
     public enum GameAiEnum { AlwaysPanic, FirstAvailableAction, IterativeDeepening, RandomAction, Uct1 };
 
@@ -1829,6 +1865,15 @@ namespace Dreamtides.Schema
 
         public static implicit operator Position(PositionEnum Enum) => new Position { Enum = Enum };
         public static implicit operator Position(PositionClass PositionClass) => new Position { PositionClass = PositionClass };
+    }
+
+    public partial struct SetEnergy
+    {
+        public PlayerName? Enum;
+        public long? Integer;
+
+        public static implicit operator SetEnergy(PlayerName Enum) => new SetEnergy { Enum = Enum };
+        public static implicit operator SetEnergy(long Integer) => new SetEnergy { Integer = Integer };
     }
 
     /// <summary>
@@ -1916,6 +1961,8 @@ namespace Dreamtides.Schema
                 ActionUnionConverter.Singleton,
                 BattleActionConverter.Singleton,
                 CardBrowserTypeConverter.Singleton,
+                PlayerNameConverter.Singleton,
+                SetEnergyConverter.Singleton,
                 BattleActionEnumConverter.Singleton,
                 DebugActionConverter.Singleton,
                 GameAiConverter.Singleton,
@@ -2618,6 +2665,99 @@ namespace Dreamtides.Schema
         public static readonly CardBrowserTypeConverter Singleton = new CardBrowserTypeConverter();
     }
 
+    internal class PlayerNameConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(PlayerName) || t == typeof(PlayerName?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "one":
+                    return PlayerName.One;
+                case "two":
+                    return PlayerName.Two;
+            }
+            throw new Exception("Cannot unmarshal type PlayerName");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (PlayerName)untypedValue;
+            switch (value)
+            {
+                case PlayerName.One:
+                    serializer.Serialize(writer, "one");
+                    return;
+                case PlayerName.Two:
+                    serializer.Serialize(writer, "two");
+                    return;
+            }
+            throw new Exception("Cannot marshal type PlayerName");
+        }
+
+        public static readonly PlayerNameConverter Singleton = new PlayerNameConverter();
+    }
+
+    internal class SetEnergyConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(SetEnergy) || t == typeof(SetEnergy?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            switch (reader.TokenType)
+            {
+                case JsonToken.Integer:
+                    var integerValue = serializer.Deserialize<long>(reader);
+                    return new SetEnergy { Integer = integerValue };
+                case JsonToken.String:
+                case JsonToken.Date:
+                    var stringValue = serializer.Deserialize<string>(reader);
+                    switch (stringValue)
+                    {
+                        case "one":
+                            return new SetEnergy { Enum = PlayerName.One };
+                        case "two":
+                            return new SetEnergy { Enum = PlayerName.Two };
+                    }
+                    break;
+            }
+            throw new Exception("Cannot unmarshal type SetEnergy");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            var value = (SetEnergy)untypedValue;
+            if (value.Integer != null)
+            {
+                serializer.Serialize(writer, value.Integer.Value);
+                return;
+            }
+            if (value.Enum != null)
+            {
+                switch (value.Enum)
+                {
+                    case PlayerName.One:
+                        serializer.Serialize(writer, "one");
+                        return;
+                    case PlayerName.Two:
+                        serializer.Serialize(writer, "two");
+                        return;
+                }
+            }
+            throw new Exception("Cannot marshal type SetEnergy");
+        }
+
+        public static readonly SetEnergyConverter Singleton = new SetEnergyConverter();
+    }
+
     internal class BattleActionEnumConverter : JsonConverter
     {
         public override bool CanConvert(Type t) => t == typeof(BattleActionEnum) || t == typeof(BattleActionEnum?);
@@ -2694,8 +2834,6 @@ namespace Dreamtides.Schema
                     {
                         case "applyTestScenarioAction":
                             return new DebugAction { Enum = DebugActionEnum.ApplyTestScenarioAction };
-                        case "drawCard":
-                            return new DebugAction { Enum = DebugActionEnum.DrawCard };
                         case "restartBattle":
                             return new DebugAction { Enum = DebugActionEnum.RestartBattle };
                     }
@@ -2716,9 +2854,6 @@ namespace Dreamtides.Schema
                 {
                     case DebugActionEnum.ApplyTestScenarioAction:
                         serializer.Serialize(writer, "applyTestScenarioAction");
-                        return;
-                    case DebugActionEnum.DrawCard:
-                        serializer.Serialize(writer, "drawCard");
                         return;
                     case DebugActionEnum.RestartBattle:
                         serializer.Serialize(writer, "restartBattle");
@@ -2871,8 +3006,6 @@ namespace Dreamtides.Schema
             {
                 case "applyTestScenarioAction":
                     return DebugActionEnum.ApplyTestScenarioAction;
-                case "drawCard":
-                    return DebugActionEnum.DrawCard;
                 case "restartBattle":
                     return DebugActionEnum.RestartBattle;
             }
@@ -2891,9 +3024,6 @@ namespace Dreamtides.Schema
             {
                 case DebugActionEnum.ApplyTestScenarioAction:
                     serializer.Serialize(writer, "applyTestScenarioAction");
-                    return;
-                case DebugActionEnum.DrawCard:
-                    serializer.Serialize(writer, "drawCard");
                     return;
                 case DebugActionEnum.RestartBattle:
                     serializer.Serialize(writer, "restartBattle");

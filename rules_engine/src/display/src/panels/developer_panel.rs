@@ -1,7 +1,10 @@
 use action_data::debug_action_data::DebugAction;
 use action_data::game_action_data::GameAction;
 use action_data::panel_address::PanelAddress;
+use battle_data::actions::battle_action_data::{BattleAction, DebugBattleAction};
 use bon::Builder;
+use core_data::numerics::Energy;
+use core_data::types::PlayerName;
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify, FlexWrap};
 use masonry::flex_style::FlexStyle;
 use ui_components::box_component::BoxComponent;
@@ -9,8 +12,10 @@ use ui_components::button_component::ButtonComponent;
 use ui_components::component::Component;
 use ui_components::panel_component::PanelComponent;
 
-#[derive(Clone)]
-pub struct DeveloperPanel;
+#[derive(Clone, Builder)]
+pub struct DeveloperPanel {
+    pub user_player: PlayerName,
+}
 
 impl Component for DeveloperPanel {
     fn render(self) -> Option<impl Component> {
@@ -38,7 +43,18 @@ impl Component for DeveloperPanel {
                         .child(
                             DebugButton::builder()
                                 .label("Draw Card")
-                                .action(DebugAction::DrawCard)
+                                .action(BattleAction::Debug(DebugBattleAction::DrawCard(
+                                    self.user_player,
+                                )))
+                                .build(),
+                        )
+                        .child(
+                            DebugButton::builder()
+                                .label("99\u{f7e4}")
+                                .action(BattleAction::Debug(DebugBattleAction::SetEnergy(
+                                    self.user_player,
+                                    Energy(99),
+                                )))
                                 .build(),
                         )
                         .child(

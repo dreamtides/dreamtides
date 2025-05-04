@@ -1,6 +1,7 @@
 use std::fmt::{self, Debug, Formatter};
 
 use battle_data::actions::battle_action_data::BattleAction;
+use core_data::types::PlayerName;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -13,6 +14,7 @@ use crate::panel_address::PanelAddress;
 pub enum GameAction {
     DebugAction(DebugAction),
     BattleAction(BattleAction),
+    Undo(PlayerName),
     OpenPanel(PanelAddress),
     CloseCurrentPanel,
 }
@@ -22,6 +24,7 @@ impl Debug for GameAction {
         match self {
             GameAction::DebugAction(action) => write!(f, "{:?}", action),
             GameAction::BattleAction(action) => write!(f, "{:?}", action),
+            GameAction::Undo(player) => write!(f, "Undo({:?})", player),
             GameAction::OpenPanel(panel) => write!(f, "{:?}", panel),
             GameAction::CloseCurrentPanel => write!(f, "CloseCurrentPanel"),
         }

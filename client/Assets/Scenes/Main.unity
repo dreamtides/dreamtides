@@ -531,6 +531,8 @@ GameObject:
   - component: {fileID: 63280835}
   - component: {fileID: 63280834}
   - component: {fileID: 63280833}
+  - component: {fileID: 63280837}
+  - component: {fileID: 63280836}
   m_Layer: 5
   m_Name: UndoButton
   m_TagString: Untagged
@@ -602,9 +604,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Dreamtides.Components.DebugFetch, Dreamtides
-        m_MethodName: PerformSomeAction
+      - m_Target: {fileID: 63280836}
+        m_TargetAssemblyTypeName: Dreamtides.Buttons.ControlledButton, Dreamtides
+        m_MethodName: OnClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -652,6 +654,34 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 63280830}
   m_CullTransparentMesh: 1
+--- !u!114 &63280836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 63280830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1c1b36d9f5c44e1aae6cb8708cdeb8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _registry: {fileID: 613451854}
+  _canvasGroup: {fileID: 63280837}
+  _showing: 0
+  _text: {fileID: 69273721}
+--- !u!225 &63280837
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 63280830}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &67029922
 GameObject:
   m_ObjectHideFlags: 0
@@ -11515,6 +11545,7 @@ MonoBehaviour:
   _secondaryActionButton: {fileID: 1383227989}
   _incrementActionButton: {fileID: 2423837261359150460}
   _decrementActionButton: {fileID: 2423837261359150459}
+  _undoButton: {fileID: 63280836}
   _devButton: {fileID: 794038739}
   _enemyMessage: {fileID: 368858825}
   _thinkingIndicator: {fileID: 1469154542}
@@ -12673,6 +12704,7 @@ MonoBehaviour:
   _secondaryActionButton: {fileID: 97342985}
   _incrementActionButton: {fileID: 235976237}
   _decrementActionButton: {fileID: 1224380720}
+  _undoButton: {fileID: 63280836}
   _devButton: {fileID: 794038739}
   _enemyMessage: {fileID: 1395752109}
   _thinkingIndicator: {fileID: 603395029}

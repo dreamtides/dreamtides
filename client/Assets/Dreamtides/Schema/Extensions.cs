@@ -33,6 +33,7 @@ namespace Dreamtides.Schema
         {
           DebugAction = ActionClass?.DebugAction,
           BattleAction = ActionClass?.BattleAction,
+          Undo = ActionClass?.Undo,
           OpenPanel = ActionClass?.OpenPanel,
         }
       };

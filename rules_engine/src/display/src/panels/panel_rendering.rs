@@ -14,7 +14,9 @@ pub fn render_panel(
     battle: &BattleData,
 ) -> Option<FlexNode> {
     match address {
-        PanelAddress::Developer => DeveloperPanel.flex_node(),
+        PanelAddress::Developer => {
+            DeveloperPanel::builder().user_player(builder.display_for_player()).build().flex_node()
+        }
         PanelAddress::SetOpponentAgent => SetOpponentAgentPanel::builder()
             .user_player(builder.display_for_player())
             .battle(battle)
