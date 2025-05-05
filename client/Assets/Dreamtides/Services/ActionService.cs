@@ -116,6 +116,7 @@ namespace Dreamtides.Services
       {
         Metadata = _metadata,
         Action = action.Value,
+        VsOpponent = IsTestOpponentClient ? _userGuid : null,
         TestScenario = _testScenario
       };
       if (Application.isEditor)

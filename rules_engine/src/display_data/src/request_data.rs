@@ -25,7 +25,8 @@ pub struct ConnectRequest {
     /// keeps accessing the same location on every update.
     pub persistent_data_path: String,
 
-    /// If specified, connect to an ongoing game owned by the provided user.
+    /// If specified, treats this as a multiplayer game using the save file
+    /// provided in this ID and adds this use as a player in the battle.
     pub vs_opponent: Option<UserId>,
 
     pub test_scenario: Option<String>,
@@ -43,6 +44,11 @@ pub struct ConnectResponse {
 pub struct PerformActionRequest {
     pub metadata: Metadata,
     pub action: GameAction,
+
+    /// If specified, treats this as a multiplayer game using the save file
+    /// provided in this ID instead of reading the user's own save file.
+    pub vs_opponent: Option<UserId>,
+
     pub test_scenario: Option<String>,
 }
 

@@ -60,13 +60,18 @@ fn connect_internal(request: &ConnectRequest) -> CommandSequence {
         Err(error) => return error_message::display_error_message(None, error),
     };
 
+    // Check if this is a multiplayer connection request
+    if let Some(vs_opponent) = request.vs_opponent {
+        return connect_for_multiplayer(&database, user_id, vs_opponent);
+    }
+
     info!(?user_id, "Loading battle from database");
     match load_battle_from_database(&database, user_id) {
-        Ok(LoadBattleResult::ExistingBattle(battle)) => {
+        Ok(LoadBattleResult::ExistingBattle(battle, quest_id)) => {
             if is_user_in_battle(&battle, user_id) {
                 renderer::connect(&battle, user_id)
             } else {
-                handle_user_not_in_battle(user_id, battle, &database)
+                handle_user_not_in_battle(user_id, battle, quest_id, &database, None)
             }
         }
         Ok(LoadBattleResult::NewBattle(battle)) => renderer::connect(&battle, user_id),
@@ -74,8 +79,52 @@ fn connect_internal(request: &ConnectRequest) -> CommandSequence {
     }
 }
 
+/// Handles a connection request for multiplayer games.
+///
+/// Instead of loading the requesting user's save file, this loads the
+/// opponent's save file and joins the battle if possible.
+fn connect_for_multiplayer(
+    database: &Database,
+    user_id: UserId,
+    vs_opponent: UserId,
+) -> CommandSequence {
+    info!(?user_id, ?vs_opponent, "Loading multiplayer battle from opponent's database");
+
+    // Load opponent's save file
+    match database.fetch_save(vs_opponent) {
+        Ok(Some(save_file)) => {
+            match deserialize_save_file::battle(&save_file) {
+                Some((battle, quest_id)) => {
+                    // Check if the connecting user is already in the battle
+                    if is_user_in_battle(&battle, user_id) {
+                        return renderer::connect(&battle, user_id);
+                    }
+
+                    // If not in the battle, try to join by replacing an AI player
+                    handle_user_not_in_battle(
+                        user_id,
+                        battle,
+                        quest_id,
+                        database,
+                        Some(vs_opponent),
+                    )
+                }
+                None => error_message::display_error_message(
+                    None,
+                    "No battle found in opponent's save file".to_string(),
+                ),
+            }
+        }
+        Ok(None) => error_message::display_error_message(
+            None,
+            format!("No save file found for opponent ID: {:?}", vs_opponent),
+        ),
+        Err(error) => error_message::display_error_message(None, error.to_string()),
+    }
+}
+
 enum LoadBattleResult {
-    ExistingBattle(BattleData),
+    ExistingBattle(BattleData, QuestId),
     NewBattle(BattleData),
 }
 
@@ -89,7 +138,7 @@ fn load_battle_from_database(
 ) -> Result<LoadBattleResult, String> {
     match database.fetch_save(user_id) {
         Ok(Some(save_file)) => match crate::deserialize_save_file::battle(&save_file) {
-            Some((battle, _)) => Ok(LoadBattleResult::ExistingBattle(battle)),
+            Some((battle, quest_id)) => Ok(LoadBattleResult::ExistingBattle(battle, quest_id)),
             None => Err("No battle in save file".to_string()),
         },
         Ok(None) => {
@@ -119,7 +168,9 @@ fn is_user_in_battle(battle: &BattleData, user_id: UserId) -> bool {
 fn handle_user_not_in_battle(
     user_id: UserId,
     mut battle: BattleData,
+    quest_id: QuestId,
     database: &Database,
+    vs_opponent: Option<UserId>,
 ) -> CommandSequence {
     battle_trace!("User is not a player in this battle", battle, user_id);
 
@@ -146,33 +197,10 @@ fn handle_user_not_in_battle(
         battle.player_two.player_type = PlayerType::User(user_id);
     }
 
-    // Extract quest ID from user's save file
-    match database.fetch_save(user_id) {
-        Ok(Some(save_file)) => match extract_quest_id_from_save_file(&save_file) {
-            Ok(quest_id) => save_battle_to_database(database, user_id, quest_id, &battle)
-                .map_or_else(
-                    |error| error_message::display_error_message(None, error),
-                    |_| renderer::connect(&battle, user_id),
-                ),
-            Err(error) => error_message::display_error_message(Some(&battle), error),
-        },
-        _ => {
-            // Create a new quest ID if we can't get one from the save file
-            let quest_id = QuestId(Uuid::new_v4());
-            save_battle_to_database(database, user_id, quest_id, &battle).map_or_else(
-                |error| error_message::display_error_message(None, error),
-                |_| renderer::connect(&battle, user_id),
-            )
-        }
-    }
-}
-
-fn extract_quest_id_from_save_file(save_file: &SaveFile) -> Result<QuestId, String> {
-    match save_file {
-        SaveFile::V1(ref v1) => v1
-            .quest
-            .as_ref()
-            .map_or_else(|| Err("No active quest found in save file".to_string()), |q| Ok(q.id)),
+    let save_user_id = vs_opponent.unwrap_or(user_id);
+    match save_battle_to_database(database, save_user_id, quest_id, &battle) {
+        Ok(_) => renderer::connect(&battle, user_id),
+        Err(error) => error_message::display_error_message(None, error),
     }
 }
 
@@ -194,8 +222,16 @@ fn perform_action_internal(request: &PerformActionRequest) {
             show_error_message(user_id, None, "No database found".to_string());
             return;
         };
-        let Ok(Some(save)) = database.fetch_save(request.metadata.user_id) else {
-            show_error_message(user_id, None, "No save file found".to_string());
+
+        // Use vs_opponent's save file if specified, otherwise use the user's save file
+        let save_user_id = request.vs_opponent.unwrap_or(user_id);
+        let Ok(Some(save)) = database.fetch_save(save_user_id) else {
+            let error_msg = if request.vs_opponent.is_some() {
+                format!("No save file found for opponent ID: {:?}", save_user_id)
+            } else {
+                "No save file found".to_string()
+            };
+            show_error_message(user_id, None, error_msg);
             return;
         };
 
@@ -205,41 +241,11 @@ fn perform_action_internal(request: &PerformActionRequest) {
         };
 
         battle.animations = Some(AnimationData::default());
-        match request.action {
-            GameAction::DebugAction(action) => {
-                let player = renderer::player_name_for_user(&battle, user_id);
-                debug_actions::execute(&mut battle, user_id, player, action);
-                handle_battle_action::append_update(user_id, renderer::connect(&battle, user_id));
-            }
-            GameAction::BattleAction(action) => {
-                let player = renderer::player_name_for_user(&battle, user_id);
-                handle_battle_action::execute(&mut battle, user_id, player, action);
-            }
-            GameAction::Undo(player) => {
-                let Some((undone_battle, _)) = deserialize_save_file::undo(&save, player) else {
-                    show_error_message(
-                        user_id,
-                        None,
-                        "Failed to undo: Battle state not found.".to_string(),
-                    );
-                    return;
-                };
+        handle_request_action(request, user_id, save, &mut battle);
 
-                battle = undone_battle;
-                handle_battle_action::append_update(user_id, renderer::connect(&battle, user_id));
-            }
-            GameAction::OpenPanel(address) => {
-                battle_rendering::open_panel(address);
-                handle_battle_action::append_update(user_id, renderer::connect(&battle, user_id));
-            }
-            GameAction::CloseCurrentPanel => {
-                battle_rendering::close_current_panel();
-                handle_battle_action::append_update(user_id, renderer::connect(&battle, user_id));
-            }
-        };
-
+        // Always save to the save_user_id (either opponent or user)
         if let Err(error) =
-            database.write_save(serialize_save_file::battle(user_id, quest_id, &battle))
+            database.write_save(serialize_save_file::battle(save_user_id, quest_id, &battle))
         {
             show_error_message(user_id, Some(&battle), format!("Failed to save battle: {}", error));
         }
@@ -248,6 +254,46 @@ fn perform_action_internal(request: &PerformActionRequest) {
     if let Err(error) = result {
         show_error_message(user_id, None, error);
     }
+}
+
+fn handle_request_action(
+    request: &PerformActionRequest,
+    user_id: UserId,
+    save: SaveFile,
+    battle: &mut BattleData,
+) {
+    match request.action {
+        GameAction::DebugAction(action) => {
+            let player = renderer::player_name_for_user(&*battle, user_id);
+            debug_actions::execute(battle, user_id, player, action);
+            handle_battle_action::append_update(user_id, renderer::connect(&*battle, user_id));
+        }
+        GameAction::BattleAction(action) => {
+            let player = renderer::player_name_for_user(&*battle, user_id);
+            handle_battle_action::execute(battle, user_id, player, action);
+        }
+        GameAction::Undo(player) => {
+            let Some((undone_battle, _)) = deserialize_save_file::undo(&save, player) else {
+                show_error_message(
+                    user_id,
+                    None,
+                    "Failed to undo: Battle state not found.".to_string(),
+                );
+                return;
+            };
+
+            *battle = undone_battle;
+            handle_battle_action::append_update(user_id, renderer::connect(&*battle, user_id));
+        }
+        GameAction::OpenPanel(address) => {
+            battle_rendering::open_panel(address);
+            handle_battle_action::append_update(user_id, renderer::connect(&*battle, user_id));
+        }
+        GameAction::CloseCurrentPanel => {
+            battle_rendering::close_current_panel();
+            handle_battle_action::append_update(user_id, renderer::connect(&*battle, user_id));
+        }
+    };
 }
 
 pub fn show_error_message(user_id: UserId, battle: Option<&BattleData>, error_message: String) {

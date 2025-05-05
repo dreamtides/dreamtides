@@ -27,22 +27,22 @@ pub fn undo(file: &SaveFile, player: PlayerName) -> Option<(BattleData, QuestId)
 fn get_battle_impl(file: &SaveFile, undo: Option<PlayerName>) -> Option<(BattleData, QuestId)> {
     match file {
         SaveFile::V1(v1) => {
-            let quest_id = v1.quest.as_ref()?.id;
-            let file = v1.quest.as_ref()?.battle.as_ref()?;
-            let mut battle = new_battle::create_and_start_with_options(
-                file.id,
-                file.seed,
-                file.player_types.one.clone(),
-                file.player_types.two.clone(),
-            );
-            battle.animations = Some(AnimationData::default());
-
             info!("Replaying battle history to construct state");
             let filter = EnvFilter::new("warn");
             let forest_subscriber =
                 tracing_subscriber::registry().with(logging::create_forest_layer(filter));
 
             subscriber::with_default(forest_subscriber, || {
+                let quest_id = v1.quest.as_ref()?.id;
+                let file = v1.quest.as_ref()?.battle.as_ref()?;
+                let mut battle = new_battle::create_and_start_with_options(
+                    file.id,
+                    file.seed,
+                    file.player_types.one.clone(),
+                    file.player_types.two.clone(),
+                );
+                battle.animations = Some(AnimationData::default());
+
                 // Find the last action by the undo player if specified
                 let replay_limit = match undo {
                     Some(player) => file
@@ -67,9 +67,9 @@ fn get_battle_impl(file: &SaveFile, undo: Option<PlayerName>) -> Option<(BattleD
                         history_action.action,
                     );
                 }
-            });
 
-            Some((battle, quest_id))
+                Some((battle, quest_id))
+            })
         }
     }
 }

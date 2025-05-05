@@ -42,17 +42,27 @@ pub fn render_updates(battle: &BattleData, user_id: UserId) -> CommandSequence {
 /// Returns the name of the player for a given user ID, or panics if this user
 /// is not a participant in this battle.
 pub fn player_name_for_user(battle: &BattleData, user_id: UserId) -> PlayerName {
+    if let Some(name) = player_name_for_user_optional(battle, user_id) {
+        name
+    } else {
+        panic_with!(battle, "User is not a player in this battle {:?}", user_id);
+    }
+}
+
+/// Returns the name of the player for a given user ID, or panics if this user
+/// is not a participant in this battle.
+pub fn player_name_for_user_optional(battle: &BattleData, user_id: UserId) -> Option<PlayerName> {
     if let PlayerType::User(id) = &battle.player_one.player_type {
         if *id == user_id {
-            return battle.player_one.name;
+            return Some(battle.player_one.name);
         }
     }
 
     if let PlayerType::User(id) = &battle.player_two.player_type {
         if *id == user_id {
-            return battle.player_two.name;
+            return Some(battle.player_two.name);
         }
     }
 
-    panic_with!(battle, "User is not a player in this battle {:?}", user_id);
+    None
 }

@@ -56,7 +56,8 @@ namespace Dreamtides.Schema
         public string TestScenario { get; set; }
 
         /// <summary>
-        /// If specified, connect to an ongoing game owned by the provided user.
+        /// If specified, treats this as a multiplayer game using the save file provided in this ID
+        /// and adds this use as a player in the battle.
         /// </summary>
         [JsonProperty("vsOpponent")]
         public Guid? VsOpponent { get; set; }
@@ -1690,6 +1691,13 @@ namespace Dreamtides.Schema
 
         [JsonProperty("testScenario")]
         public string TestScenario { get; set; }
+
+        /// <summary>
+        /// If specified, treats this as a multiplayer game using the save file provided in this ID
+        /// instead of reading the user's own save file.
+        /// </summary>
+        [JsonProperty("vsOpponent")]
+        public Guid? VsOpponent { get; set; }
     }
 
     public partial class GameActionClass
