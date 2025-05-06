@@ -28,7 +28,7 @@ pub fn add(battle: &mut BattleData, player: PlayerName) {
 fn create_cards(player_name: PlayerName) -> Vec<CardData> {
     let mut cards = Vec::new();
 
-    for _ in 0..6 {
+    for _ in 0..60 {
         cards.push(CardData {
             id: CardId::default(),
             identity: card_identities::MINSTREL_OF_FALLING_LIGHT,

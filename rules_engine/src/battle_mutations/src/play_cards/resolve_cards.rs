@@ -10,6 +10,7 @@ use core_data::types::PlayerName;
 use logging::battle_trace;
 
 use crate::effects::apply_effect;
+use crate::play_cards::character_limit;
 use crate::zone_mutations::move_card;
 
 /// Marks a player as having taken the "pass" action on the current stack.
@@ -42,8 +43,7 @@ pub fn pass_priority(battle: &mut BattleData, player: PlayerName) {
             panic_with!(battle, "Card not found on stack");
         };
         let controller = card.controller();
-
-        resolve_card(battle, card_id);
+        resolve_card(battle, card_id, controller);
 
         // After a card resolves, its controller receives priority (if stack is not
         // empty)
@@ -63,7 +63,11 @@ pub fn pass_priority(battle: &mut BattleData, player: PlayerName) {
 
 /// Resolves a card currently on the stack, applying its effects and moving it
 /// to the appropriate zone.
-fn resolve_card(battle: &mut BattleData, card_id: StackCardId) -> Option<()> {
+fn resolve_card(
+    battle: &mut BattleData,
+    card_id: StackCardId,
+    controller: PlayerName,
+) -> Option<()> {
     battle_trace!("Resolving card", battle, card_id);
     if battle.cards.card(card_id)?.properties.card_type == CardType::Event {
         apply_event_effects(battle, card_id);
@@ -75,7 +79,8 @@ fn resolve_card(battle: &mut BattleData, card_id: StackCardId) -> Option<()> {
     let source = EffectSource::Game { controller: battle.turn.active_player };
     match battle.cards.card(card_id)?.properties.card_type {
         CardType::Character(_) => {
-            move_card::to_battlefield(battle, source, card_id);
+            let character_id = move_card::to_battlefield(battle, source, card_id)?;
+            character_limit::apply(battle, source, controller, character_id);
         }
         _ => {
             move_card::to_void(battle, source, card_id);

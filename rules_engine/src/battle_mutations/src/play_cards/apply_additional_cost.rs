@@ -7,6 +7,10 @@ use core_data::types::PlayerName;
 use crate::player_mutations::energy;
 
 pub fn energy_cost(battle: &mut BattleData, player: PlayerName, cost: Energy) {
+    if battle.cards.top_of_stack_mut().is_none() {
+        return;
+    }
+
     let source = expect!(battle.prompt.as_ref().map(|p| p.source), battle, || format!(
         "No active prompt for applying additional cost {:?}",
         cost
