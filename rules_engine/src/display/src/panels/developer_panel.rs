@@ -10,6 +10,7 @@ use masonry::flex_style::FlexStyle;
 use ui_components::box_component::BoxComponent;
 use ui_components::button_component::ButtonComponent;
 use ui_components::component::Component;
+use ui_components::icon;
 use ui_components::panel_component::PanelComponent;
 
 #[derive(Clone, Builder)]
@@ -50,7 +51,7 @@ impl Component for DeveloperPanel {
                         )
                         .child(
                             DebugButton::builder()
-                                .label("99\u{f7e4}")
+                                .label(format!("99 {}", icon::ENERGY))
                                 .action(BattleAction::Debug(DebugBattleAction::SetEnergy(
                                     self.user_player,
                                     Energy(99),
