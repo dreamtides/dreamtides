@@ -14,7 +14,7 @@ use crate::battle_animations::battle_animation::BattleAnimation;
 use crate::battle_cards::all_cards::AllCards;
 use crate::battle_player::player_data::PlayerData;
 use crate::debug_snapshots::debug_battle_data::DebugBattleData;
-use crate::prompt_types::prompt_data::{PromptData, PromptResumeAction};
+use crate::prompt_types::prompt_data::PromptData;
 
 /// Contains data types for a "battle", a single instance of playing a game
 /// against an enemy.
@@ -68,10 +68,6 @@ pub struct BattleData {
     /// display another prompt while a choice is pending.
     pub prompt: Option<PromptData>,
 
-    /// Action to take after a prompt is resolved, used if the prompt
-    /// interrupted some other mutation.
-    pub prompt_resume_action: Option<PromptResumeAction>,
-
     /// Debug tracing data for this battle
     pub tracing: Option<BattleTracing>,
 
@@ -123,7 +119,6 @@ impl BattleData {
                 rng: self.rng.clone(),
                 animations: None,
                 prompt: self.prompt.clone(),
-                prompt_resume_action: None,
                 tracing: None,
                 history: None,
             };

@@ -1,1 +1,1 @@
-pub const ENERGY: &'static str = "\u{f7e4}";
+pub const ENERGY: &str = "\u{f7e4}";

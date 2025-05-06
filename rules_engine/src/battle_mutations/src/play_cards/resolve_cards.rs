@@ -20,8 +20,8 @@ use crate::zone_mutations::move_card;
 ///
 /// - Whenever a card is played, the opponent of the card's controller receives
 ///   priority.
-/// - Whenever a card resolves, the controller of that card receives priority
-///   (if the stack is not empty).
+/// - Whenever a card resolves, the controller of that card receives priority if
+///   the stack is not empty.
 ///
 /// Priority cannot be "held", and players cannot add more than one card to the
 /// stack at a time.
@@ -59,10 +59,6 @@ pub fn pass_priority(battle: &mut BattleData, player: PlayerName) {
     } else {
         panic_with!(battle, "No cards on stack");
     }
-}
-
-pub fn resume_stack_resolution(_battle: &mut BattleData) {
-    todo!("Implement this");
 }
 
 /// Resolves a card currently on the stack, applying its effects and moving it

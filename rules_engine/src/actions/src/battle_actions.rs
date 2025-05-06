@@ -1,7 +1,7 @@
 use assert_with::panic_with;
 use battle_data::actions::battle_action_data::BattleAction;
 use battle_data::battle::battle_data::BattleData;
-use battle_data::prompt_types::prompt_data::{Prompt, PromptResumeAction};
+use battle_data::prompt_types::prompt_data::Prompt;
 use battle_mutations::core::select_prompt_choice;
 use battle_mutations::play_cards::{
     apply_additional_cost, play_card, resolve_cards, select_target,
@@ -55,19 +55,6 @@ pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction
         BattleAction::BrowseCards(_) => {}
         _ => {
             todo!("Implement {:?}", action);
-        }
-    }
-
-    // Continue any actions that were interrupted by a prompt.
-    if battle.prompt.is_none() {
-        if let Some(resume_action) = battle.prompt_resume_action {
-            match resume_action {
-                PromptResumeAction::ResolveStack => {
-                    battle_trace!("Resuming stack resolution", battle);
-                    resolve_cards::resume_stack_resolution(battle);
-                }
-            }
-            battle.prompt_resume_action = None;
         }
     }
 

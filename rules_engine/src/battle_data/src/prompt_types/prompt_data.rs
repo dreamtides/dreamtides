@@ -65,8 +65,3 @@ pub struct PromptChoice {
     /// Optionally, a list of targets to apply the effect to.
     pub targets: Vec<TargetId>,
 }
-
-#[derive(Debug, Clone, Copy)]
-pub enum PromptResumeAction {
-    ResolveStack,
-}
