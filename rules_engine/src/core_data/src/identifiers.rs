@@ -50,6 +50,17 @@ pub struct QuestId(pub Uuid);
 #[serde(rename_all = "camelCase")]
 pub struct CardIdentity(pub Uuid);
 
+#[derive(
+    Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
+pub enum CardName {
+    MinstrelOfFallingLight,
+    Immolate,
+    RippleOfDefiance,
+    Abolish,
+    Dreamscatter,
+}
+
 new_key_type! {
     /// Identifies a card or card-like object such as:
     ///

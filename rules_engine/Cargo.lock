@@ -369,6 +369,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "battle_mutations"
+version = "0.0.0"
+dependencies = [
+ "ability_data",
+ "assert_with",
+ "battle_queries",
+ "battle_state",
+ "core_data",
+ "logging",
+ "rand",
+ "rand_xoshiro",
+ "tracing",
+]
+
+[[package]]
 name = "battle_mutations_old"
 version = "0.0.0"
 dependencies = [
@@ -384,6 +399,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "battle_queries"
+version = "0.0.0"
+dependencies = [
+ "ability_data",
+ "action_data",
+ "assert_with",
+ "battle_state",
+ "core_data",
+ "tracing",
+]
+
+[[package]]
 name = "battle_queries_old"
 version = "0.0.0"
 dependencies = [
@@ -393,6 +420,26 @@ dependencies = [
  "battle_data_old",
  "core_data",
  "tracing",
+]
+
+[[package]]
+name = "battle_state"
+version = "0.0.0"
+dependencies = [
+ "ability_data",
+ "ai_data",
+ "bit-set",
+ "core_data",
+ "enum-iterator",
+ "enumset",
+ "rand",
+ "rand_xoshiro",
+ "schemars",
+ "serde",
+ "slotmap",
+ "strum",
+ "strum_macros",
+ "uuid",
 ]
 
 [[package]]
@@ -413,6 +460,21 @@ dependencies = [
  "tracing-subscriber",
  "uuid",
 ]
+
+[[package]]
+name = "bit-set"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "08807e080ed7f9d5433fa9b275196cfc35414f66a0c79d864dc51a0d825231a3"
+dependencies = [
+ "bit-vec",
+]
+
+[[package]]
+name = "bit-vec"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5e764a1d40d510daf35e07be9eb06e75770908c27d411ee6c92109c9840eaaf7"
 
 [[package]]
 name = "bitflags"
