@@ -39,7 +39,7 @@ impl GameStateNode for AgentBattleState {
         Self: Sized,
     {
         let mut result = self.clone_for_ai_search();
-        result.cards.randomize_player(player, &mut result.rng);
+        result.cards.randomize_player(player.opponent(), &mut result.rng);
         Self(result)
     }
 

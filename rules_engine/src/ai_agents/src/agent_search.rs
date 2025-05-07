@@ -12,7 +12,7 @@ use battle_queries::legal_action_queries::legal_actions::{self, LegalActions};
 use core_data::types::PlayerName;
 use logging;
 use rand::seq::IndexedRandom;
-use tracing::subscriber;
+use tracing::{info, subscriber};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::EnvFilter;
 
@@ -26,6 +26,7 @@ pub fn select_action(battle: &BattleData, player: PlayerName, game_ai: &GameAI) 
         panic_with!(battle, "No legal actions available for player: {:?}", player);
     }
     if legal_actions.len() == 1 {
+        info!("Automatically selecting action {:?}", legal_actions[0]);
         return legal_actions[0];
     }
 

@@ -134,9 +134,12 @@ impl<TScoreAlgorithm: ChildScoreAlgorithm> MonteCarloAlgorithm<TScoreAlgorithm> 
     ) -> TStateNode::Action {
         let mut graph = SearchGraph::new();
         let root = graph.add_node(SearchNode { total_reward: 0.0, visit_count: 1, player });
+        let legal = node.legal_actions(player).collect::<HashSet<_>>();
+        assert!(legal.len() > 1, "Expected two or more legal actions");
+
         let mut i = 0;
         while !should_halt(i) {
-            let mut game = node.make_copy();
+            let mut game = node.make_randomized_copy(player);
             let node = self.tree_policy(&mut graph, &mut game, root);
             let reward = f64::from(evaluator.evaluate(&game, player));
             Self::backup(&mut graph, player, node, reward);
@@ -144,14 +147,9 @@ impl<TScoreAlgorithm: ChildScoreAlgorithm> MonteCarloAlgorithm<TScoreAlgorithm> 
         }
 
         info!("Halting monte carlo search after {} iterations", i);
-        self.log_results(&graph, root, node.legal_actions(player).collect());
+        self.log_results(&graph, root, &legal);
 
-        let (action, _) = self.best_child(
-            &graph,
-            root,
-            node.legal_actions(player).collect(),
-            SelectionMode::Best,
-        );
+        let (action, _) = self.best_child(&graph, root, &legal, SelectionMode::Best);
         action
     }
 
@@ -198,7 +196,7 @@ impl<TScoreAlgorithm: ChildScoreAlgorithm> MonteCarloAlgorithm<TScoreAlgorithm> 
             } else {
                 // All actions have been tried, recursively search the best candidate
                 let (action, best) =
-                    self.best_child(graph, node, actions, SelectionMode::Exploration);
+                    self.best_child(graph, node, &actions, SelectionMode::Exploration);
                 game.execute_action(current_turn, action);
                 node = best;
             }
@@ -251,7 +249,7 @@ impl<TScoreAlgorithm: ChildScoreAlgorithm> MonteCarloAlgorithm<TScoreAlgorithm> 
         &self,
         graph: &SearchGraph<TState>,
         node: NodeIndex,
-        legal: HashSet<TState::Action>,
+        legal: &HashSet<TState::Action>,
         selection_mode: SelectionMode,
     ) -> (TState::Action, NodeIndex) {
         let parent_visits = graph[node].visit_count;
@@ -315,13 +313,12 @@ impl<TScoreAlgorithm: ChildScoreAlgorithm> MonteCarloAlgorithm<TScoreAlgorithm> 
         &self,
         graph: &SearchGraph<TState>,
         node: NodeIndex,
-        legal: HashSet<TState::Action>,
+        legal: &HashSet<TState::Action>,
     ) {
         let parent_visits = graph[node].visit_count;
 
         let mut scored_actions = graph
             .edges(node)
-            .filter(|edge| legal.contains(&edge.weight().action))
             .map(|edge| {
                 let child = &graph[edge.target()];
                 assert_ne!(child.visit_count, 0);
@@ -345,17 +342,27 @@ impl<TScoreAlgorithm: ChildScoreAlgorithm> MonteCarloAlgorithm<TScoreAlgorithm> 
 
         let display_count = cmp::min(3, scored_actions.len());
         if display_count > 0 {
-            debug!("Top {} actions:", display_count);
+            debug!("Top {} actions of {}:", display_count, scored_actions.len());
             for (i, (action, score, visits, reward)) in
                 scored_actions.iter().enumerate().take(display_count)
             {
+                let is_legal = legal.contains(action);
+                let legal_str =
+                    legal.iter().map(|a| format!("{:?}", a)).collect::<Vec<_>>().join(", ");
+                assert!(
+                    is_legal,
+                    "Action {:?} is not legal, legal actions are {:?}",
+                    action, legal_str
+                );
+
                 debug!(
-                    "  Action {}: {:?} Score={:.4}, Visits={}, Reward={:.4}",
+                    "  Action {}: {:?} Score={:.4}, Visits={}, Reward={:.4}, Legal={}",
                     i + 1,
                     action,
                     score,
                     visits,
-                    reward
+                    reward,
+                    is_legal
                 );
             }
         } else {
