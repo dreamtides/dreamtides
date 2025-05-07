@@ -1,5 +1,5 @@
-use battle_data::battle::battle_history::BattleHistoryAction;
-use battle_data::battle_player::player_data::PlayerType;
+use battle_data_old::battle::battle_history::BattleHistoryAction;
+use battle_data_old::battle_player::player_data::PlayerType;
 use core_data::identifiers::BattleId;
 use serde::{Deserialize, Serialize};
 

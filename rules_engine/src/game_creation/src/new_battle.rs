@@ -1,7 +1,7 @@
 use ai_data::game_ai::GameAI;
-use battle_data::battle::battle_data::BattleData;
-use battle_data::battle_animations::animation_data::AnimationData;
-use battle_data::battle_player::player_data::PlayerType;
+use battle_data_old::battle::old_battle_data::BattleData;
+use battle_data_old::battle_animations::animation_data::AnimationData;
+use battle_data_old::battle_player::player_data::PlayerType;
 use core_data::identifiers::{BattleId, UserId};
 use rand::RngCore;
 

@@ -1,11 +1,11 @@
 use action_data::game_action_data::GameAction;
-use battle_data::actions::battle_action_data::BattleAction;
-use battle_data::battle::battle_data::BattleData;
-use battle_data::battle_cards::card_data::CardData;
-use battle_data::battle_cards::card_id::{CardIdType, HandCardId};
-use battle_data::battle_cards::card_identities;
-use battle_data::prompt_types::prompt_data::PromptType;
-use battle_queries::legal_action_queries::can_play_card;
+use battle_data_old::actions::battle_action_data::BattleAction;
+use battle_data_old::battle::old_battle_data::BattleData;
+use battle_data_old::battle_cards::card_data::CardData;
+use battle_data_old::battle_cards::card_id::{CardIdType, HandCardId};
+use battle_data_old::battle_cards::card_identities;
+use battle_data_old::prompt_types::prompt_data::PromptType;
+use battle_queries_old::legal_action_queries::can_play_card;
 use core_data::card_types::CardType;
 use core_data::display_color;
 use core_data::display_types::SpriteAddress;

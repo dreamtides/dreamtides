@@ -4,10 +4,10 @@ use std::sync::{LazyLock, Mutex};
 
 use action_data::debug_action_data::DebugAction;
 use action_data::game_action_data::GameAction;
-use battle_data::actions::battle_action_data::{
+use battle_data_old::actions::battle_action_data::{
     BattleAction, CardBrowserType, CardOrderSelectionTarget, SelectCardOrder,
 };
-use battle_data::battle_cards::card_id::{CardIdType, CharacterId};
+use battle_data_old::battle_cards::card_id::{CardIdType, CharacterId};
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::{
     AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,

@@ -3,10 +3,10 @@ use std::ops::{Deref, DerefMut};
 use actions::battle_actions;
 use ai_core::game_state_node::{GameStateNode, GameStatus};
 use assert_with::{assert_that, expect};
-use battle_data::actions::battle_action_data::BattleAction;
-use battle_data::battle::battle_data::BattleData;
-use battle_data::battle::battle_status::BattleStatus;
-use battle_queries::legal_action_queries::legal_actions::{self, LegalActions};
+use battle_data_old::actions::battle_action_data::BattleAction;
+use battle_data_old::battle::old_battle_data::BattleData;
+use battle_data_old::battle::battle_status::BattleStatus;
+use battle_queries_old::legal_action_queries::legal_actions::{self, LegalActions};
 use core_data::types::PlayerName;
 
 /// Wrapper over [BattleData] to allow trait to be implemented in this crate.

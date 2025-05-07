@@ -1,13 +1,13 @@
 use assert_with::panic_with;
-use battle_data::actions::battle_action_data::BattleAction;
-use battle_data::battle::battle_data::BattleData;
-use battle_data::prompt_types::prompt_data::PromptType;
-use battle_mutations::core::select_prompt_choice;
-use battle_mutations::play_cards::{
+use battle_data_old::actions::battle_action_data::BattleAction;
+use battle_data_old::battle::old_battle_data::BattleData;
+use battle_data_old::prompt_types::prompt_data::PromptType;
+use battle_mutations_old::core::select_prompt_choice;
+use battle_mutations_old::play_cards::{
     apply_additional_cost, play_card, resolve_cards, select_target,
 };
-use battle_mutations::turn_step_mutations::{end_turn, start_turn};
-use battle_queries::legal_action_queries::legal_actions::{self, LegalActions};
+use battle_mutations_old::turn_step_mutations::{end_turn, start_turn};
+use battle_queries_old::legal_action_queries::legal_actions::{self, LegalActions};
 use core_data::types::PlayerName;
 use logging::battle_trace;
 use tracing::instrument;

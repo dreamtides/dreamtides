@@ -2,9 +2,9 @@ use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::Path;
 
-use battle_data::battle::battle_data::BattleData;
-use battle_data::battle::battle_tracing::BattleTraceEvent;
-use battle_data::debug_snapshots::debug_battle_data::DebugBattleData;
+use battle_data_old::battle::old_battle_data::BattleData;
+use battle_data_old::battle::battle_tracing::BattleTraceEvent;
+use battle_data_old::debug_snapshots::debug_battle_data_old::DebugBattleData;
 use display_data::command::CommandSequence;
 use serde::Serialize;
 use serde_json;
@@ -42,7 +42,7 @@ macro_rules! battle_trace {
         tracing::debug!($message);
 
         if $battle.tracing.is_some() {
-            let event = battle_data::battle::battle_tracing::BattleTraceEvent {
+            let event = battle_data_old::battle::battle_tracing::BattleTraceEvent {
                 m: $message.to_string(),
                 vs: String::new(),
                 values: std::collections::BTreeMap::new(),
@@ -64,7 +64,7 @@ macro_rules! battle_trace {
                 values_string.push_str(&format!("{}: {:?}, ", stringify!($key), $key));
             )*
 
-            let event = battle_data::battle::battle_tracing::BattleTraceEvent {
+            let event = battle_data_old::battle::battle_tracing::BattleTraceEvent {
                 m: $message.to_string(),
                 vs: values_string,
                 values,
@@ -85,7 +85,7 @@ macro_rules! battle_trace {
                 values_string.push_str(&format!("{}: {:?}, ", stringify!($key), $value));
             )*
 
-            let event = battle_data::battle::battle_tracing::BattleTraceEvent {
+            let event = battle_data_old::battle::battle_tracing::BattleTraceEvent {
                 m: $message.to_string(),
                 vs: values_string,
                 values,
@@ -112,7 +112,7 @@ macro_rules! battle_trace {
                 values_string.push_str(&format!("{}: {:?}, ", stringify!($complex_key), $complex_value));
             )*
 
-            let event = battle_data::battle::battle_tracing::BattleTraceEvent {
+            let event = battle_data_old::battle::battle_tracing::BattleTraceEvent {
                 m: $message.to_string(),
                 vs: values_string,
                 values,
@@ -222,14 +222,14 @@ fn reset_file(file: &mut File, json_str: &str) {
 
 #[cfg(test)]
 mod tests {
-    use battle_data::battle::battle_data::BattleData;
-    use battle_data::battle::battle_status::BattleStatus;
-    use battle_data::battle::battle_tracing::BattleTracing;
-    use battle_data::battle::battle_turn_step::BattleTurnStep;
-    use battle_data::battle::request_context::RequestContext;
-    use battle_data::battle::turn_data::TurnData;
-    use battle_data::battle_cards::all_cards::AllCards;
-    use battle_data::battle_player::player_data::{PlayerData, PlayerType};
+    use battle_data_old::battle::old_battle_data::BattleData;
+    use battle_data_old::battle::battle_status::BattleStatus;
+    use battle_data_old::battle::battle_tracing::BattleTracing;
+    use battle_data_old::battle::battle_turn_step::BattleTurnStep;
+    use battle_data_old::battle::request_context::RequestContext;
+    use battle_data_old::battle::turn_data::TurnData;
+    use battle_data_old::battle_cards::all_cards::AllCards;
+    use battle_data_old::battle_player::player_data::{PlayerData, PlayerType};
     use core_data::identifiers::{BattleId, UserId};
     use core_data::numerics::{Energy, Points, Spark, TurnId};
     use core_data::types::PlayerName;

@@ -16,7 +16,7 @@ name = "action_data"
 version = "0.0.0"
 dependencies = [
  "ai_data",
- "battle_data",
+ "battle_data_old",
  "core_data",
  "schemars",
  "serde",
@@ -28,9 +28,9 @@ version = "0.0.0"
 dependencies = [
  "action_data",
  "assert_with",
- "battle_data",
- "battle_mutations",
- "battle_queries",
+ "battle_data_old",
+ "battle_mutations_old",
+ "battle_queries_old",
  "core_data",
  "logging",
  "tracing",
@@ -71,9 +71,9 @@ dependencies = [
  "ai_monte_carlo",
  "ai_tree_search",
  "assert_with",
- "battle_data",
- "battle_mutations",
- "battle_queries",
+ "battle_data_old",
+ "battle_mutations_old",
+ "battle_queries_old",
  "core_data",
  "logging",
  "rand",
@@ -104,9 +104,9 @@ dependencies = [
  "ai_monte_carlo",
  "ai_tree_search",
  "assert_with",
- "battle_data",
- "battle_mutations",
- "battle_queries",
+ "battle_data_old",
+ "battle_mutations_old",
+ "battle_queries_old",
  "core_data",
 ]
 
@@ -128,9 +128,9 @@ dependencies = [
  "ai_game_integration",
  "ai_monte_carlo",
  "ai_tree_search",
- "battle_data",
- "battle_mutations",
- "battle_queries",
+ "battle_data_old",
+ "battle_mutations_old",
+ "battle_queries_old",
  "clap 3.2.25",
  "core_data",
 ]
@@ -224,7 +224,7 @@ dependencies = [
 name = "assert_with"
 version = "0.0.0"
 dependencies = [
- "battle_data",
+ "battle_data_old",
  "core_data",
  "logging",
  "rand_xoshiro",
@@ -350,7 +350,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
 
 [[package]]
-name = "battle_data"
+name = "battle_data_old"
 version = "0.0.0"
 dependencies = [
  "ability_data",
@@ -369,13 +369,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "battle_mutations"
+name = "battle_mutations_old"
 version = "0.0.0"
 dependencies = [
  "ability_data",
  "assert_with",
- "battle_data",
- "battle_queries",
+ "battle_data_old",
+ "battle_queries_old",
  "core_data",
  "logging",
  "rand",
@@ -384,13 +384,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "battle_queries"
+name = "battle_queries_old"
 version = "0.0.0"
 dependencies = [
  "ability_data",
  "action_data",
  "assert_with",
- "battle_data",
+ "battle_data_old",
  "core_data",
  "tracing",
 ]
@@ -403,8 +403,8 @@ dependencies = [
  "actions",
  "ai_agents",
  "ai_data",
- "battle_data",
- "battle_queries",
+ "battle_data_old",
+ "battle_queries_old",
  "core_data",
  "criterion",
  "game_creation",
@@ -612,7 +612,7 @@ name = "client_test_scenarios"
 version = "0.0.0"
 dependencies = [
  "action_data",
- "battle_data",
+ "battle_data_old",
  "core_data",
  "display_data",
  "masonry",
@@ -767,7 +767,7 @@ version = "0.0.0"
 dependencies = [
  "action_data",
  "ai_data",
- "battle_data",
+ "battle_data_old",
  "core_data",
  "quest_data",
  "rusqlite",
@@ -825,8 +825,8 @@ dependencies = [
  "action_data",
  "ai_data",
  "assert_with",
- "battle_data",
- "battle_queries",
+ "battle_data_old",
+ "battle_queries_old",
  "bon",
  "core_data",
  "display_data",
@@ -839,7 +839,7 @@ name = "display_data"
 version = "0.0.0"
 dependencies = [
  "action_data",
- "battle_data",
+ "battle_data_old",
  "core_data",
  "masonry",
  "schemars",
@@ -990,8 +990,8 @@ version = "0.0.0"
 dependencies = [
  "ability_data",
  "ai_data",
- "battle_data",
- "battle_mutations",
+ "battle_data_old",
+ "battle_mutations_old",
  "core_data",
  "rand",
  "rand_xoshiro",
@@ -1302,7 +1302,7 @@ checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
 name = "logging"
 version = "0.0.0"
 dependencies = [
- "battle_data",
+ "battle_data_old",
  "core_data",
  "display_data",
  "rand_xoshiro",
@@ -1453,7 +1453,7 @@ name = "parser"
 version = "0.0.0"
 dependencies = [
  "ability_data",
- "battle_data",
+ "battle_data_old",
  "chumsky",
  "core_data",
 ]
@@ -1609,7 +1609,7 @@ dependencies = [
 name = "quest_data"
 version = "0.0.0"
 dependencies = [
- "battle_data",
+ "battle_data_old",
  "core_data",
  "schemars",
  "serde",
@@ -1792,9 +1792,9 @@ dependencies = [
  "ai_data",
  "assert_with",
  "backtrace",
- "battle_data",
- "battle_mutations",
- "battle_queries",
+ "battle_data_old",
+ "battle_mutations_old",
+ "battle_queries_old",
  "core_data",
  "database",
  "display",
@@ -2336,7 +2336,7 @@ checksum = "f962df74c8c05a667b5ee8bcf162993134c104e96440b663c8daa176dc772d8c"
 name = "user_data"
 version = "0.0.0"
 dependencies = [
- "battle_data",
+ "battle_data_old",
  "core_data",
  "quest_data",
  "schemars",

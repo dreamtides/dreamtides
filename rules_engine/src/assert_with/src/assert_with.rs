@@ -1,5 +1,5 @@
-use battle_data::battle::battle_tracing::BattleTraceEvent;
-use battle_data::debug_snapshots::debug_battle_data::DebugBattleData;
+use battle_data_old::battle::battle_tracing::BattleTraceEvent;
+use battle_data_old::debug_snapshots::debug_battle_data_old::DebugBattleData;
 
 /// Unwraps an Option value, returning the Some contained within it, or panics.
 ///
@@ -24,7 +24,7 @@ macro_rules! expect {
             Some(v) => v,
             None => {
                 let message = $message();
-                let event = battle_data::battle::battle_tracing::BattleTraceEvent {
+                let event = battle_data_old::battle::battle_tracing::BattleTraceEvent {
                     m: format!("EXPECT FAILED: {}", message),
                     vs: String::new(),
                     values: std::collections::BTreeMap::new(),
@@ -57,7 +57,7 @@ macro_rules! assert_that {
     ($condition:expr, $battle:expr, $message:expr) => {
         if !$condition {
             let message = $message();
-            let event = battle_data::battle::battle_tracing::BattleTraceEvent {
+            let event = battle_data_old::battle::battle_tracing::BattleTraceEvent {
                 m: format!("ASSERTION FAILED: {}", message),
                 vs: String::new(),
                 values: std::collections::BTreeMap::new(),
@@ -89,7 +89,7 @@ macro_rules! panic_with {
     ($battle:expr, $($arg:tt)*) => {
         {
             let formatted_message = format!($($arg)*);
-            let event = battle_data::battle::battle_tracing::BattleTraceEvent {
+            let event = battle_data_old::battle::battle_tracing::BattleTraceEvent {
                 m: format!("PANIC: {}", formatted_message),
                 vs: String::new(),
                 values: std::collections::BTreeMap::new(),
@@ -112,13 +112,13 @@ pub fn panic_with_snapshot(snapshot: DebugBattleData, message: impl AsRef<str>) 
 
 #[cfg(test)]
 mod tests {
-    use battle_data::battle::battle_data::BattleData;
-    use battle_data::battle::battle_status::BattleStatus;
-    use battle_data::battle::battle_turn_step::BattleTurnStep;
-    use battle_data::battle::request_context::RequestContext;
-    use battle_data::battle::turn_data::TurnData;
-    use battle_data::battle_cards::all_cards::AllCards;
-    use battle_data::battle_player::player_data::{PlayerData, PlayerType};
+    use battle_data_old::battle::old_battle_data::BattleData;
+    use battle_data_old::battle::battle_status::BattleStatus;
+    use battle_data_old::battle::battle_turn_step::BattleTurnStep;
+    use battle_data_old::battle::request_context::RequestContext;
+    use battle_data_old::battle::turn_data::TurnData;
+    use battle_data_old::battle_cards::all_cards::AllCards;
+    use battle_data_old::battle_player::player_data::{PlayerData, PlayerType};
     use core_data::identifiers::{BattleId, UserId};
     use core_data::numerics::{Energy, Points, Spark, TurnId};
     use core_data::types::PlayerName;

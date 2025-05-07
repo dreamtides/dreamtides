@@ -19,9 +19,9 @@ ai_core = { path = "../ai_core", version = "0.0.0" }
 ai_game_integration = { path = "../ai_game_integration", version = "0.0.0" }
 ai_monte_carlo = { path = "../ai_monte_carlo", version = "0.0.0" }
 ai_tree_search = { path = "../ai_tree_search", version = "0.0.0" }
-battle_data = { path = "../battle_data", version = "0.0.0" }
-battle_mutations = { path = "../battle_mutations", version = "0.0.0" }
-battle_queries = { path = "../battle_queries", version = "0.0.0" }
+battle_data_old = { path = "../battle_data_old", version = "0.0.0" }
+battle_mutations_old = { path = "../battle_mutations_old", version = "0.0.0" }
+battle_queries_old = { path = "../battle_queries_old", version = "0.0.0" }
 core_data = { path = "../core_data", version = "0.0.0" }
 
 clap = {version = "3.2", features = ["derive"]}

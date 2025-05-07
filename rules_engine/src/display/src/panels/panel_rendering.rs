@@ -1,5 +1,5 @@
 use action_data::panel_address::PanelAddress;
-use battle_data::battle::battle_data::BattleData;
+use battle_data_old::battle::old_battle_data::BattleData;
 use masonry::flex_node::FlexNode;
 use ui_components::component::Component;
 

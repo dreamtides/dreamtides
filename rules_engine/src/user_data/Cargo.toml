@@ -9,7 +9,7 @@ doctest = false
 bench = false
 
 [dependencies]
-battle_data = { path = "../battle_data" }
+battle_data_old = { path = "../battle_data_old" }
 core_data = { path = "../core_data" }
 quest_data = { path = "../quest_data" }
 

@@ -1,4 +1,4 @@
-use battle_data::battle::battle_data::BattleData;
+use battle_data_old::battle::old_battle_data::BattleData;
 use core_data::identifiers::{BattleId, UserId};
 use core_data::types::PlayerName;
 use display::core::response_builder::ResponseBuilder;

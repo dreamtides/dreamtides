@@ -14,8 +14,8 @@ action_data = { path = "../src/action_data", version = "0.0.0" }
 actions = { path = "../src/actions", version = "0.0.0" }
 ai_agents = { path = "../src/ai_agents", version = "0.0.0" }
 ai_data = { path = "../src/ai_data", version = "0.0.0" }
-battle_data = { path = "../src/battle_data", version = "0.0.0" }
-battle_queries = { path = "../src/battle_queries", version = "0.0.0" }
+battle_data_old = { path = "../src/battle_data_old", version = "0.0.0" }
+battle_queries_old = { path = "../src/battle_queries_old", version = "0.0.0" }
 core_data = { path = "../src/core_data", version = "0.0.0" }
 game_creation = { path = "../src/game_creation", version = "0.0.0" }
 parser = { path = "../src/parser", version = "0.0.0" }

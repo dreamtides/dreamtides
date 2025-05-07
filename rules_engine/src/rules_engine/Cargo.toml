@@ -14,9 +14,9 @@ actions = { path = "../actions" }
 ai_agents = { path = "../ai_agents" }
 ai_data = { path = "../ai_data" }
 assert_with = { path = "../assert_with" }
-battle_data = { path = "../battle_data" }
-battle_mutations = { path = "../battle_mutations" }
-battle_queries = { path = "../battle_queries" }
+battle_data_old = { path = "../battle_data_old" }
+battle_mutations_old = { path = "../battle_mutations_old" }
+battle_queries_old = { path = "../battle_queries_old" }
 core_data = { path = "../core_data" }
 database = { path = "../database" }
 display = { path = "../display" }

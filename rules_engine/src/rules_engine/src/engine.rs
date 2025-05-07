@@ -5,9 +5,9 @@ use std::path::PathBuf;
 
 use action_data::game_action_data::GameAction;
 use backtrace::Backtrace;
-use battle_data::battle::battle_data::BattleData;
-use battle_data::battle_animations::animation_data::AnimationData;
-use battle_data::battle_player::player_data::PlayerType;
+use battle_data_old::battle::old_battle_data::BattleData;
+use battle_data_old::battle_animations::animation_data::AnimationData;
+use battle_data_old::battle_player::player_data::PlayerType;
 use core_data::identifiers::{BattleId, QuestId, UserId};
 use database::save_file::SaveFile;
 use database::sqlite_database::{self, Database};

@@ -3,11 +3,11 @@ use std::sync::{LazyLock, Mutex};
 
 use actions::battle_actions;
 use ai_agents::agent_search;
-use battle_data::actions::battle_action_data::BattleAction;
-use battle_data::battle::battle_data::BattleData;
-use battle_data::battle_animations::animation_data::AnimationData;
-use battle_data::battle_player::player_data::PlayerType;
-use battle_queries::legal_action_queries::legal_actions::{self, LegalActions};
+use battle_data_old::actions::battle_action_data::BattleAction;
+use battle_data_old::battle::old_battle_data::BattleData;
+use battle_data_old::battle_animations::animation_data::AnimationData;
+use battle_data_old::battle_player::player_data::PlayerType;
+use battle_queries_old::legal_action_queries::legal_actions::{self, LegalActions};
 use core_data::identifiers::UserId;
 use core_data::types::PlayerName;
 use display::rendering::renderer;

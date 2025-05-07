@@ -10,7 +10,7 @@ bench = false
 
 [dependencies]
 ai_data = { path = "../ai_data" }
-battle_data = { path = "../battle_data" }
+battle_data_old = { path = "../battle_data_old" }
 core_data = { path = "../core_data" }
 
 schemars = "0.8"

@@ -1,0 +1,18 @@
+[package]
+name = "battle_queries_old"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+test = false
+doctest = false
+bench = false
+
+[dependencies]
+ability_data = { path = "../ability_data" }
+action_data = { path = "../action_data" }
+assert_with = { path = "../assert_with" }
+battle_data_old = { path = "../battle_data_old" }
+core_data = { path = "../core_data" }
+
+tracing = "0.1"

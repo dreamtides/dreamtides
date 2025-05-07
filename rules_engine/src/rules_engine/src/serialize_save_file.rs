@@ -1,5 +1,5 @@
 use assert_with::expect;
-use battle_data::battle::battle_data::BattleData;
+use battle_data_old::battle::old_battle_data::BattleData;
 use core_data::identifiers::{QuestId, UserId};
 use database::battle_save_file::{BattleSaveFile, PlayerMap};
 use database::quest_save_file::QuestSaveFile;

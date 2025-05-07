@@ -1,6 +1,6 @@
 use action_data::debug_action_data::DebugAction;
-use battle_data::battle::battle_data::BattleData;
-use battle_data::battle_player::player_data::PlayerType;
+use battle_data_old::battle::old_battle_data::BattleData;
+use battle_data_old::battle_player::player_data::PlayerType;
 use core_data::identifiers::{BattleId, UserId};
 use core_data::types::PlayerName;
 use game_creation::new_battle;

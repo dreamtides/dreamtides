@@ -1,5 +1,5 @@
-use battle_data::battle::battle_data::BattleData;
-use battle_data::battle_animations::battle_animation::BattleAnimation;
+use battle_data_old::battle::old_battle_data::BattleData;
+use battle_data_old::battle_animations::battle_animation::BattleAnimation;
 use core_data::display_types::Milliseconds;
 use display_data::command::{
     Command, DisplayDreamwellActivationCommand, DisplayJudgmentCommand, GameMessageType,

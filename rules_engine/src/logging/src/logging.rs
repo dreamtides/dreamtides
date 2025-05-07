@@ -47,8 +47,8 @@ fn tag_parser(event: &Event) -> Option<Tag> {
     let icon = match target {
         _ if level == Level::ERROR => '🚨',
         _ if level == Level::WARN => '🚧',
-        _ if target.contains("battle_queries") => '🔎',
-        _ if target.contains("battle_mutations") => '💻',
+        _ if target.contains("battle_queries_old") => '🔎',
+        _ if target.contains("battle_mutations_old") => '💻',
         _ if target.contains("rules_engine") => '🌐',
         _ if target.contains("ai") => '🤖',
         _ => match level {

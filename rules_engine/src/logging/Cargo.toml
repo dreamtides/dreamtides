@@ -10,7 +10,7 @@ bench = false
 
 [dependencies]
 display_data = { path = "../display_data" }
-battle_data = { path = "../battle_data" }
+battle_data_old = { path = "../battle_data_old" }
 core_data = { path = "../core_data" }
 
 rand_xoshiro = "0.7"

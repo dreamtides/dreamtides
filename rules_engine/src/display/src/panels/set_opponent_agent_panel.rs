@@ -1,7 +1,7 @@
 use action_data::debug_action_data::DebugAction;
 use ai_data::game_ai::GameAI;
-use battle_data::battle::battle_data::BattleData;
-use battle_data::battle_player::player_data::PlayerType;
+use battle_data_old::battle::old_battle_data::BattleData;
+use battle_data_old::battle_player::player_data::PlayerType;
 use bon::Builder;
 use core_data::types::PlayerName;
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify};

@@ -1,5 +1,5 @@
 use ai_core::state_evaluator::StateEvaluator;
-use battle_data::battle::battle_status::BattleStatus;
+use battle_data_old::battle::battle_status::BattleStatus;
 use core_data::types::PlayerName;
 
 use crate::state_node::AgentBattleState;

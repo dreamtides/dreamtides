@@ -1,0 +1,21 @@
+[package]
+name = "battle_mutations_old"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+test = false
+doctest = false
+bench = false
+
+[dependencies]
+ability_data = { path = "../ability_data" }
+assert_with = { path = "../assert_with" }
+battle_data_old = { path = "../battle_data_old" }
+battle_queries_old = { path = "../battle_queries_old" }
+core_data = { path = "../core_data" }
+logging = { path = "../logging" }
+
+rand = "0.9"
+rand_xoshiro = "0.7"
+tracing = "0.1"
