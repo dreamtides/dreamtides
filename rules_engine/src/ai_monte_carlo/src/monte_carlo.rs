@@ -346,8 +346,9 @@ impl<TScoreAlgorithm: ChildScoreAlgorithm> MonteCarloAlgorithm<TScoreAlgorithm> 
         let display_count = cmp::min(3, scored_actions.len());
         if display_count > 0 {
             debug!("Top {} actions:", display_count);
-            for i in 0..display_count {
-                let (action, score, visits, reward) = &scored_actions[i];
+            for (i, (action, score, visits, reward)) in
+                scored_actions.iter().enumerate().take(display_count)
+            {
                 debug!(
                     "  Action {}: {:?} Score={:.4}, Visits={}, Reward={:.4}",
                     i + 1,

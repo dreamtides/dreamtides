@@ -1,7 +1,7 @@
 use serde::Serialize;
 use strum::IntoDiscriminant;
 
-use crate::prompt_types::prompt_data::{PromptType, PromptData};
+use crate::prompt_types::prompt_data::{PromptData, PromptType};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct DebugPromptData {
@@ -26,13 +26,21 @@ impl DebugPromptData {
 
 fn format_prompt_choices(prompt: &PromptType) -> Vec<String> {
     match prompt {
-        PromptType::ChooseCharacter { valid } => valid.iter().map(|id| format!("{:?}", id)).collect(),
-        PromptType::ChooseStackCard { valid } => valid.iter().map(|id| format!("{:?}", id)).collect(),
+        PromptType::ChooseCharacter { valid } => {
+            valid.iter().map(|id| format!("{:?}", id)).collect()
+        }
+        PromptType::ChooseStackCard { valid } => {
+            valid.iter().map(|id| format!("{:?}", id)).collect()
+        }
         PromptType::Choose { choices } => {
             choices.iter().map(|choice| format!("{:?}", choice)).collect()
         }
         PromptType::ChooseEnergyValue { minimum, current, maximum } => {
-            vec![format!("{}", minimum), format!("{}", current), format!("{}", maximum)]
+            vec![
+                format!("min {}", minimum),
+                format!("current {}", current),
+                format!("max {}", maximum),
+            ]
         }
     }
 }

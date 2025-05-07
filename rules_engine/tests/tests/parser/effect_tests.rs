@@ -1394,7 +1394,7 @@ fn test_energy_spent_on_this_card() {
     assert_ron_snapshot!(result, @r###"
     [
       event(EventAbility(
-        additional_cost: Some(spendAnyAmountOfEnergy),
+        additional_cost: Some(spendOneOrMoreEnergy),
         effect: effect(drawCardsForEach(
           count: 1,
           for_each: forEachEnergySpentOnThisCard,

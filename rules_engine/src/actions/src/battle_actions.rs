@@ -1,4 +1,4 @@
-use assert_with::{assert_that, panic_with};
+use assert_with::panic_with;
 use battle_data::actions::battle_action_data::BattleAction;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::prompt_types::prompt_data::PromptType;
@@ -18,7 +18,18 @@ use crate::debug_battle_action;
 pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction) {
     battle_trace!("Executing action", battle, player, action);
     let legal = legal_actions::compute(battle, player, LegalActions { for_human_player: true });
-    assert_that!(legal.contains(&action), battle, || format!("Action {:?} is not legal", action));
+
+    if let Some(PromptType::ChooseEnergyValue { minimum, current, maximum }) =
+        battle.prompt.as_mut().map(|p| &mut p.prompt_type)
+    {
+        battle_trace!("Energy prompt is", battle, player, minimum, current, maximum);
+    } else {
+        battle_trace!("No energy prompt", battle, player);
+    }
+
+    if !legal.contains(&action) {
+        panic_with!(battle, "Action {:?} is not legal,\nLegal Actions: {:?}", action, legal);
+    }
 
     match action {
         BattleAction::Debug(debug_action) => {
@@ -71,7 +82,6 @@ fn should_record_in_history(action: BattleAction) -> bool {
     !matches!(
         action,
         BattleAction::BrowseCards(..)
-            | BattleAction::SelectEnergyAdditionalCost(..)
             | BattleAction::CloseCardBrowser
             | BattleAction::ToggleOrderSelectorVisibility
     )

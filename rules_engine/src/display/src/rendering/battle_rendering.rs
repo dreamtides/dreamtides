@@ -98,8 +98,8 @@ fn interface_view(builder: &ResponseBuilder, battle: &BattleData) -> InterfaceVi
         primary_action_button: primary_action_button(builder, battle, &legal_actions),
         primary_action_show_on_idle_duration: None,
         secondary_action_button: secondary_action_button(battle, &legal_actions),
-        increment_button: increment_button(builder, battle),
-        decrement_button: decrement_button(builder, battle),
+        increment_button: increment_button(builder, battle, &legal_actions),
+        decrement_button: decrement_button(builder, battle, &legal_actions),
         dev_button: Some(ButtonView {
             label: "\u{f0ad} Dev".to_string(),
             action: Some(GameAction::OpenPanel(PanelAddress::Developer)),
@@ -199,14 +199,20 @@ pub fn create_flex_style() -> FlexStyle {
         .build()
 }
 
-fn increment_button(builder: &ResponseBuilder, battle: &BattleData) -> Option<ButtonView> {
+fn increment_button(
+    builder: &ResponseBuilder,
+    battle: &BattleData,
+    legal_actions: &[BattleAction],
+) -> Option<ButtonView> {
     if let Some(prompt) = battle.prompt.as_ref()
         && prompt.player == builder.act_for_player()
         && let PromptType::ChooseEnergyValue { current, .. } = &prompt.prompt_type
     {
         return Some(ButtonView {
             label: "+1\u{f7e4}".to_string(),
-            action: if *current < battle.player(builder.act_for_player()).current_energy {
+            action: if legal_actions
+                .contains(&BattleAction::SetSelectedEnergyAdditionalCost(*current + Energy(1)))
+            {
                 Some(BattleAction::SetSelectedEnergyAdditionalCost(*current + Energy(1)).into())
             } else {
                 None
@@ -217,14 +223,20 @@ fn increment_button(builder: &ResponseBuilder, battle: &BattleData) -> Option<Bu
     None
 }
 
-fn decrement_button(builder: &ResponseBuilder, battle: &BattleData) -> Option<ButtonView> {
+fn decrement_button(
+    builder: &ResponseBuilder,
+    battle: &BattleData,
+    legal_actions: &[BattleAction],
+) -> Option<ButtonView> {
     if let Some(prompt) = battle.prompt.as_ref()
         && prompt.player == builder.act_for_player()
         && let PromptType::ChooseEnergyValue { current, .. } = &prompt.prompt_type
     {
         return Some(ButtonView {
             label: "\u{2212}1\u{f7e4}".to_string(),
-            action: if *current > Energy(0) {
+            action: if legal_actions
+                .contains(&BattleAction::SetSelectedEnergyAdditionalCost(*current - Energy(1)))
+            {
                 Some(BattleAction::SetSelectedEnergyAdditionalCost(*current - Energy(1)).into())
             } else {
                 None

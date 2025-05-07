@@ -1,12 +1,10 @@
-use std::cmp;
-
 use ability_data::ability::Ability;
 use ability_data::cost::Cost;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_cards::card_id::StackCardId;
 use battle_data::prompt_types::prompt_data::{
-    PromptType, PromptConfiguration, PromptContext, PromptData,
+    PromptConfiguration, PromptContext, PromptData, PromptType,
 };
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
@@ -49,7 +47,7 @@ fn create_prompt_for_cost(
             (
                 PromptType::ChooseEnergyValue {
                     minimum: Energy(1),
-                    current: cmp::min(Energy(1), energy),
+                    current: Energy(1),
                     maximum: energy,
                 },
                 PromptContext::PickAmountOfEnergyToSpend,

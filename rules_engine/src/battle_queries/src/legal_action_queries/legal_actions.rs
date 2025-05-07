@@ -25,7 +25,7 @@ pub struct LegalActions {
 pub fn compute(
     battle: &BattleData,
     player: PlayerName,
-    _options: LegalActions,
+    options: LegalActions,
 ) -> Vec<BattleAction> {
     if matches!(battle.status, BattleStatus::GameOver { .. }) {
         return vec![];
@@ -47,9 +47,26 @@ pub fn compute(
                     .enumerate()
                     .map(|(i, _)| BattleAction::SelectPromptChoice(i))
                     .collect(),
-                PromptType::ChooseEnergyValue { minimum, maximum, .. } => (minimum.0..=maximum.0)
-                    .map(|e| BattleAction::SelectEnergyAdditionalCost(Energy(e)))
-                    .collect(),
+                PromptType::ChooseEnergyValue { minimum, current, maximum } => {
+                    let mut actions = (minimum.0..=maximum.0)
+                        .map(|e| BattleAction::SelectEnergyAdditionalCost(Energy(e)))
+                        .collect::<Vec<_>>();
+
+                    if options.for_human_player {
+                        if current > minimum {
+                            actions.push(BattleAction::SetSelectedEnergyAdditionalCost(
+                                *current - Energy(1),
+                            ));
+                        }
+                        if current < maximum {
+                            actions.push(BattleAction::SetSelectedEnergyAdditionalCost(
+                                *current + Energy(1),
+                            ));
+                        }
+                    }
+
+                    actions
+                }
             };
         } else {
             return vec![];
