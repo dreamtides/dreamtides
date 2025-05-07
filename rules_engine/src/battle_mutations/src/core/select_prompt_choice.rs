@@ -1,6 +1,6 @@
 use assert_with::{expect, panic_with};
 use battle_data::battle::battle_data::BattleData;
-use battle_data::prompt_types::prompt_data::Prompt;
+use battle_data::prompt_types::prompt_data::PromptType;
 use logging::battle_trace;
 
 use crate::core::prompts;
@@ -14,7 +14,7 @@ pub fn select(battle: &mut BattleData, choice_index: usize) {
     };
     let source = prompt.source;
     let options = prompt.configuration;
-    let Prompt::Choose { choices } = &prompt.prompt else {
+    let PromptType::Choose { choices } = &prompt.prompt_type else {
         panic_with!(battle, "Expected a Prompt::Choose prompt");
     };
     let choice = expect!(choices.get(choice_index), battle, || format!(

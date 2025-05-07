@@ -18,7 +18,7 @@ pub struct PromptData {
     pub player: PlayerName,
 
     /// Propmt to display.
-    pub prompt: Prompt,
+    pub prompt_type: PromptType,
 
     /// Why is this prompt being shown? Controls UI displayed to communicate to
     /// the player what is happening.
@@ -30,7 +30,7 @@ pub struct PromptData {
 
 #[derive(Debug, Clone, EnumDiscriminants)]
 #[strum_discriminants()]
-pub enum Prompt {
+pub enum PromptType {
     ChooseCharacter { valid: Vec<CharacterId> },
     ChooseStackCard { valid: Vec<StackCardId> },
     Choose { choices: Vec<PromptChoice> },

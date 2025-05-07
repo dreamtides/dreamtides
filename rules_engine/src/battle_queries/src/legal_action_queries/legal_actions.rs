@@ -2,7 +2,7 @@ use battle_data::actions::battle_action_data::BattleAction;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
 use battle_data::battle::battle_turn_step::BattleTurnStep;
-use battle_data::prompt_types::prompt_data::Prompt;
+use battle_data::prompt_types::prompt_data::PromptType;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use tracing::instrument;
@@ -35,19 +35,19 @@ pub fn compute(
     // corresponding to the prompt
     if let Some(prompt_data) = &battle.prompt {
         if prompt_data.player == player {
-            return match &prompt_data.prompt {
-                Prompt::ChooseCharacter { valid } => {
+            return match &prompt_data.prompt_type {
+                PromptType::ChooseCharacter { valid } => {
                     valid.iter().map(|&id| BattleAction::SelectCharacterTarget(id)).collect()
                 }
-                Prompt::ChooseStackCard { valid } => {
+                PromptType::ChooseStackCard { valid } => {
                     valid.iter().map(|&id| BattleAction::SelectStackCardTarget(id)).collect()
                 }
-                Prompt::Choose { choices } => choices
+                PromptType::Choose { choices } => choices
                     .iter()
                     .enumerate()
                     .map(|(i, _)| BattleAction::SelectPromptChoice(i))
                     .collect(),
-                Prompt::ChooseEnergyValue { minimum, maximum, .. } => (minimum.0..=maximum.0)
+                PromptType::ChooseEnergyValue { minimum, maximum, .. } => (minimum.0..=maximum.0)
                     .map(|e| BattleAction::SelectEnergyAdditionalCost(Energy(e)))
                     .collect(),
             };

@@ -4,6 +4,7 @@
 //! Carlo Tree Search Methods" by Browne et al. in IEEE Transactions on
 //! Computational Intelligence and AI in Games, Vol. 4, No. 1, March 2012.
 
+use std::cmp;
 use std::collections::HashSet;
 use std::time::Instant;
 
@@ -14,7 +15,7 @@ use ai_core::state_evaluator::StateEvaluator;
 use petgraph::prelude::{EdgeRef, NodeIndex};
 use petgraph::{Direction, Graph};
 use rand::seq::IteratorRandom;
-use tracing::info;
+use tracing::{debug, info};
 
 use crate::child_score::{ChildScoreAlgorithm, SelectionMode};
 
@@ -143,6 +144,7 @@ impl<TScoreAlgorithm: ChildScoreAlgorithm> MonteCarloAlgorithm<TScoreAlgorithm> 
         }
 
         info!("Halting monte carlo search after {} iterations", i);
+        self.log_results(&graph, root, node.legal_actions(player).collect());
 
         let (action, _) = self.best_child(
             &graph,
@@ -306,6 +308,57 @@ impl<TScoreAlgorithm: ChildScoreAlgorithm> MonteCarloAlgorithm<TScoreAlgorithm> 
                 Some(n) => n,
                 _ => break,
             };
+        }
+    }
+
+    fn log_results<TState: GameStateNode>(
+        &self,
+        graph: &SearchGraph<TState>,
+        node: NodeIndex,
+        legal: HashSet<TState::Action>,
+    ) {
+        let parent_visits = graph[node].visit_count;
+
+        let mut scored_actions = graph
+            .edges(node)
+            .filter(|edge| legal.contains(&edge.weight().action))
+            .map(|edge| {
+                let child = &graph[edge.target()];
+                assert_ne!(child.visit_count, 0);
+                (
+                    edge.weight().action,
+                    self.child_score_algorithm.score(
+                        f64::from(parent_visits),
+                        f64::from(child.visit_count),
+                        child.total_reward,
+                        SelectionMode::Best,
+                    ),
+                    child.visit_count,
+                    child.total_reward,
+                )
+            })
+            .collect::<Vec<_>>();
+
+        scored_actions.sort_by(|(_, a_score, _, _), (_, b_score, _, _)| {
+            b_score.partial_cmp(a_score).unwrap()
+        });
+
+        let display_count = cmp::min(3, scored_actions.len());
+        if display_count > 0 {
+            debug!("Top {} actions:", display_count);
+            for i in 0..display_count {
+                let (action, score, visits, reward) = &scored_actions[i];
+                debug!(
+                    "  Action {}: {:?} Score={:.4}, Visits={}, Reward={:.4}",
+                    i + 1,
+                    action,
+                    score,
+                    visits,
+                    reward
+                );
+            }
+        } else {
+            debug!("No actions found to log");
         }
     }
 }

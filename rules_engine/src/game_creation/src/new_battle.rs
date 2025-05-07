@@ -13,7 +13,7 @@ pub fn create_and_start(user_id: UserId, battle_id: BattleId) -> BattleData {
         battle_id,
         rand::rng().next_u64(),
         PlayerType::User(user_id),
-        PlayerType::Agent(GameAI::Uct1MaxIterations(1000)),
+        PlayerType::Agent(GameAI::Uct1MaxIterations(50_000)),
     )
 }
 

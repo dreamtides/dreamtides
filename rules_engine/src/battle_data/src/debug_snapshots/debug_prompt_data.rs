@@ -1,7 +1,7 @@
 use serde::Serialize;
 use strum::IntoDiscriminant;
 
-use crate::prompt_types::prompt_data::{Prompt, PromptData};
+use crate::prompt_types::prompt_data::{PromptType, PromptData};
 
 #[derive(Debug, Clone, Serialize)]
 pub struct DebugPromptData {
@@ -16,22 +16,22 @@ impl DebugPromptData {
     pub fn new(prompt_data: PromptData) -> Self {
         Self {
             player: format!("{:?}", prompt_data.player),
-            prompt_kind: format!("{:?}", prompt_data.prompt.discriminant()),
-            choices: format_prompt_choices(&prompt_data.prompt),
+            prompt_kind: format!("{:?}", prompt_data.prompt_type.discriminant()),
+            choices: format_prompt_choices(&prompt_data.prompt_type),
             configuration: format!("{:?}", prompt_data.configuration),
             context: format!("{:?}", prompt_data.context),
         }
     }
 }
 
-fn format_prompt_choices(prompt: &Prompt) -> Vec<String> {
+fn format_prompt_choices(prompt: &PromptType) -> Vec<String> {
     match prompt {
-        Prompt::ChooseCharacter { valid } => valid.iter().map(|id| format!("{:?}", id)).collect(),
-        Prompt::ChooseStackCard { valid } => valid.iter().map(|id| format!("{:?}", id)).collect(),
-        Prompt::Choose { choices } => {
+        PromptType::ChooseCharacter { valid } => valid.iter().map(|id| format!("{:?}", id)).collect(),
+        PromptType::ChooseStackCard { valid } => valid.iter().map(|id| format!("{:?}", id)).collect(),
+        PromptType::Choose { choices } => {
             choices.iter().map(|choice| format!("{:?}", choice)).collect()
         }
-        Prompt::ChooseEnergyValue { minimum, current, maximum } => {
+        PromptType::ChooseEnergyValue { minimum, current, maximum } => {
             vec![format!("{}", minimum), format!("{}", current), format!("{}", maximum)]
         }
     }

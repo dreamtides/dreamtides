@@ -1,12 +1,13 @@
-use assert_with::panic_with;
+use assert_with::{assert_that, panic_with};
 use battle_data::actions::battle_action_data::BattleAction;
 use battle_data::battle::battle_data::BattleData;
-use battle_data::prompt_types::prompt_data::Prompt;
+use battle_data::prompt_types::prompt_data::PromptType;
 use battle_mutations::core::select_prompt_choice;
 use battle_mutations::play_cards::{
     apply_additional_cost, play_card, resolve_cards, select_target,
 };
 use battle_mutations::turn_step_mutations::{end_turn, start_turn};
+use battle_queries::legal_action_queries::legal_actions::{self, LegalActions};
 use core_data::types::PlayerName;
 use logging::battle_trace;
 use tracing::instrument;
@@ -16,6 +17,9 @@ use crate::debug_battle_action;
 #[instrument(name = "actions_execute", level = "debug", skip(battle))]
 pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction) {
     battle_trace!("Executing action", battle, player, action);
+    let legal = legal_actions::compute(battle, player, LegalActions { for_human_player: true });
+    assert_that!(legal.contains(&action), battle, || format!("Action {:?} is not legal", action));
+
     match action {
         BattleAction::Debug(debug_action) => {
             debug_battle_action::execute(battle, player, debug_action);
@@ -45,8 +49,8 @@ pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction
             apply_additional_cost::energy_cost(battle, player, cost);
         }
         BattleAction::SetSelectedEnergyAdditionalCost(n) => {
-            let Some(Prompt::ChooseEnergyValue { current, .. }) =
-                battle.prompt.as_mut().map(|p| &mut p.prompt)
+            let Some(PromptType::ChooseEnergyValue { current, .. }) =
+                battle.prompt.as_mut().map(|p| &mut p.prompt_type)
             else {
                 panic_with!(battle, "Expected a ChooseNumber prompt");
             };

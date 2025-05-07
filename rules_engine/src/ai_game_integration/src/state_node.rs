@@ -34,6 +34,15 @@ impl GameStateNode for AgentBattleState {
         Self(self.clone_for_ai_search())
     }
 
+    fn make_randomized_copy(&self, player: PlayerName) -> Self
+    where
+        Self: Sized,
+    {
+        let mut result = self.clone_for_ai_search();
+        result.cards.randomize_player(player, &mut result.rng);
+        Self(result)
+    }
+
     fn status(&self) -> GameStatus<PlayerName> {
         match self.status {
             BattleStatus::GameOver { winner } => GameStatus::Completed { winner },

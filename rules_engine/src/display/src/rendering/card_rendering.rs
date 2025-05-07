@@ -4,7 +4,7 @@ use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_cards::card_data::CardData;
 use battle_data::battle_cards::card_id::{CardIdType, HandCardId};
 use battle_data::battle_cards::card_identities;
-use battle_data::prompt_types::prompt_data::Prompt;
+use battle_data::prompt_types::prompt_data::PromptType;
 use battle_queries::legal_action_queries::can_play_card;
 use core_data::card_types::CardType;
 use core_data::display_color;
@@ -70,13 +70,13 @@ fn selection_target(
 ) -> Option<GameAction> {
     if let Some(prompt_data) = &battle.prompt {
         if prompt_data.player == builder.act_for_player() {
-            match &prompt_data.prompt {
-                Prompt::ChooseCharacter { valid } => {
+            match &prompt_data.prompt_type {
+                PromptType::ChooseCharacter { valid } => {
                     return valid.iter().find(|target_id| target_id.card_id() == card_id).map(
                         |&id| GameAction::BattleAction(BattleAction::SelectCharacterTarget(id)),
                     );
                 }
-                Prompt::ChooseStackCard { valid } => {
+                PromptType::ChooseStackCard { valid } => {
                     return valid.iter().find(|target_id| target_id.card_id() == card_id).map(
                         |&id| GameAction::BattleAction(BattleAction::SelectStackCardTarget(id)),
                     );

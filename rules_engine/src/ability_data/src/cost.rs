@@ -20,5 +20,5 @@ pub enum Cost {
     DiscardCards(CardPredicate, u32),
     DiscardHand,
     Energy(Energy),
-    SpendAnyAmountOfEnergy,
+    SpendOneOrMoreEnergy,
 }

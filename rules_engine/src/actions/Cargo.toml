@@ -13,6 +13,7 @@ action_data = { path = "../action_data" }
 assert_with = { path = "../assert_with" }
 battle_data = { path = "../battle_data" }
 battle_mutations = { path = "../battle_mutations" }
+battle_queries = { path = "../battle_queries" }
 core_data = { path = "../core_data" }
 logging = { path = "../logging" }
 

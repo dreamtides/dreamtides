@@ -7,7 +7,7 @@ use battle_data::actions::battle_action_data::BattleAction;
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::battle_status::BattleStatus;
 use battle_data::battle_player::player_data::PlayerData;
-use battle_data::prompt_types::prompt_data::Prompt;
+use battle_data::prompt_types::prompt_data::PromptType;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions::LegalActions;
 use battle_queries::player_queries::spark_total;
@@ -122,7 +122,7 @@ fn primary_action_button(
         let prompt = expect!(battle.prompt.as_ref(), battle, || {
             "Expected prompt for SelectPromptChoice action"
         });
-        let Prompt::Choose { choices } = &prompt.prompt else {
+        let PromptType::Choose { choices } = &prompt.prompt_type else {
             panic_with!(battle, "Expected a Choose prompt");
         };
         assert_that!(!choices.is_empty(), battle, || "Expected a Choose prompt with choices");
@@ -134,7 +134,7 @@ fn primary_action_button(
 
     if let Some(prompt) = battle.prompt.as_ref()
         && prompt.player == builder.act_for_player()
-        && let Prompt::ChooseEnergyValue { current, .. } = &prompt.prompt
+        && let PromptType::ChooseEnergyValue { current, .. } = &prompt.prompt_type
     {
         return Some(ButtonView {
             label: format!("Spend {}\u{f7e4}", current),
@@ -170,7 +170,7 @@ fn secondary_action_button(
         let prompt = expect!(battle.prompt.as_ref(), battle, || {
             "Expected prompt for SelectPromptChoice action"
         });
-        let Prompt::Choose { choices } = &prompt.prompt else {
+        let PromptType::Choose { choices } = &prompt.prompt_type else {
             panic_with!(battle, "Expected a Choose prompt");
         };
         assert_that!(!choices.is_empty(), battle, || "Expected a Choose prompt with choices");
@@ -202,7 +202,7 @@ pub fn create_flex_style() -> FlexStyle {
 fn increment_button(builder: &ResponseBuilder, battle: &BattleData) -> Option<ButtonView> {
     if let Some(prompt) = battle.prompt.as_ref()
         && prompt.player == builder.act_for_player()
-        && let Prompt::ChooseEnergyValue { current, .. } = &prompt.prompt
+        && let PromptType::ChooseEnergyValue { current, .. } = &prompt.prompt_type
     {
         return Some(ButtonView {
             label: "+1\u{f7e4}".to_string(),
@@ -220,7 +220,7 @@ fn increment_button(builder: &ResponseBuilder, battle: &BattleData) -> Option<Bu
 fn decrement_button(builder: &ResponseBuilder, battle: &BattleData) -> Option<ButtonView> {
     if let Some(prompt) = battle.prompt.as_ref()
         && prompt.player == builder.act_for_player()
-        && let Prompt::ChooseEnergyValue { current, .. } = &prompt.prompt
+        && let PromptType::ChooseEnergyValue { current, .. } = &prompt.prompt_type
     {
         return Some(ButtonView {
             label: "\u{2212}1\u{f7e4}".to_string(),

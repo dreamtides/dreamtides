@@ -2,7 +2,7 @@ use assert_with::{expect, panic_with};
 use battle_data::battle::battle_data::BattleData;
 use battle_data::battle_cards::card_data::TargetId;
 use battle_data::battle_cards::card_id::{CharacterId, StackCardId};
-use battle_data::prompt_types::prompt_data::Prompt;
+use battle_data::prompt_types::prompt_data::PromptType;
 use logging::battle_trace;
 
 /// Selects a character as the target of a card on the stack.
@@ -21,8 +21,8 @@ pub fn character(battle: &mut BattleData, character_id: CharacterId) {
         character_id
     ));
 
-    match prompt_data.prompt {
-        Prompt::ChooseCharacter { .. } => {
+    match prompt_data.prompt_type {
+        PromptType::ChooseCharacter { .. } => {
             stack_card.targets.push(TargetId::Character(character_id, object_id));
             battle_trace!(
                 "Selected character target",
@@ -53,8 +53,8 @@ pub fn stack_card(battle: &mut BattleData, stack_card_id: StackCardId) {
         "No active stack for selecting {:?}",
         stack_card_id
     ));
-    match prompt_data.prompt {
-        Prompt::ChooseStackCard { .. } => {
+    match prompt_data.prompt_type {
+        PromptType::ChooseStackCard { .. } => {
             stack_card.targets.push(TargetId::StackCard(stack_card_id, object_id));
             battle_trace!(
                 "Selected stack target",

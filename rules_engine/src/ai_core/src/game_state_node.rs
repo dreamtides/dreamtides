@@ -28,6 +28,15 @@ pub trait GameStateNode {
     /// relevant for selection algorithms.
     fn make_copy(&self) -> Self;
 
+    /// Optionally, creates a copy with visible state randomized to prevent the
+    /// agent from gaining access to unknown information.
+    fn make_randomized_copy(&self, _: Self::PlayerName) -> Self
+    where
+        Self: Sized,
+    {
+        self.make_copy()
+    }
+
     /// Returns the status for the game, either the player whose turn it is or
     /// the player who won.
     fn status(&self) -> GameStatus<Self::PlayerName>;

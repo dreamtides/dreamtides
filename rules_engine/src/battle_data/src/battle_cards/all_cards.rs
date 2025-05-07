@@ -125,6 +125,35 @@ impl AllCards {
         self.add_to_zone(owner, id, to)
     }
 
+    /// Shuffles the deck for a given player.
+    pub fn shuffle_deck(&mut self, player: PlayerName, rng: &mut Xoshiro256PlusPlus) {
+        self.deck.shuffle(player, rng);
+    }
+
+    /// Randomizes the hand of the provided `player` and both players' decks.
+    ///
+    /// - Moves all cards from this player's hand to their deck.
+    /// - Shuffles both decks
+    /// - Returns an equivalent number random of cards from this player's deck
+    ///   to their hand.
+    pub fn randomize_player(&mut self, player: PlayerName, rng: &mut Xoshiro256PlusPlus) {
+        let hand_cards: Vec<HandCardId> = self.hand(player).iter().copied().collect();
+        let hand_count = hand_cards.len();
+
+        for card_id in hand_cards {
+            self.move_card(card_id, Zone::Deck);
+        }
+
+        self.shuffle_deck(PlayerName::One, rng);
+        self.shuffle_deck(PlayerName::Two, rng);
+
+        for _ in 0..hand_count {
+            if let Some(&deck_card) = self.deck(player).front() {
+                self.move_card(deck_card, Zone::Hand);
+            }
+        }
+    }
+
     fn new_object_id(&mut self) -> ObjectId {
         let result = self.next_object_id;
         self.next_object_id = ObjectId(result.0 + 1);
@@ -146,11 +175,6 @@ impl AllCards {
         }
 
         Some(object_id)
-    }
-
-    /// Shuffles the deck for a given player.
-    pub fn shuffle_deck(&mut self, player: PlayerName, rng: &mut Xoshiro256PlusPlus) {
-        self.deck.shuffle(player, rng);
     }
 
     fn remove_from_zone(&mut self, owner: PlayerName, zone: Zone, card_id: CardId) {

@@ -28,7 +28,7 @@ pub fn add(battle: &mut BattleData, player: PlayerName) {
 fn create_cards(player_name: PlayerName) -> Vec<CardData> {
     let mut cards = Vec::new();
 
-    for _ in 0..60 {
+    for _ in 0..6 {
         cards.push(CardData {
             id: CardId::default(),
             identity: card_identities::MINSTREL_OF_FALLING_LIGHT,
@@ -146,7 +146,7 @@ fn create_cards(player_name: PlayerName) -> Vec<CardData> {
                 is_fast: true,
             },
             abilities: vec![Ability::Event(EventAbility {
-                additional_cost: Some(Cost::SpendAnyAmountOfEnergy),
+                additional_cost: Some(Cost::SpendOneOrMoreEnergy),
                 effect: Effect::Effect(StandardEffect::DrawCardsForEach {
                     count: 1,
                     for_each: QuantityExpression::ForEachEnergySpentOnThisCard,

@@ -6,7 +6,7 @@ use battle_data::battle::battle_data::BattleData;
 use battle_data::battle::effect_source::EffectSource;
 use battle_data::battle_cards::card_id::StackCardId;
 use battle_data::prompt_types::prompt_data::{
-    Prompt, PromptConfiguration, PromptContext, PromptData,
+    PromptConfiguration, PromptContext, PromptData, PromptType,
 };
 use battle_queries::predicate_queries::effect_predicates;
 use core_data::types::PlayerName;
@@ -88,7 +88,7 @@ fn create_prompt_for_targeting(
         Some(PromptData {
             source,
             player,
-            prompt: Prompt::ChooseCharacter { valid },
+            prompt_type: PromptType::ChooseCharacter { valid },
             context: get_prompt_context(std_effect),
             configuration: PromptConfiguration { optional, ..Default::default() },
         })
@@ -103,7 +103,7 @@ fn create_prompt_for_targeting(
         Some(PromptData {
             source,
             player,
-            prompt: Prompt::ChooseStackCard { valid },
+            prompt_type: PromptType::ChooseStackCard { valid },
             context: get_prompt_context(std_effect),
             configuration: PromptConfiguration { optional, ..Default::default() },
         })

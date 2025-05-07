@@ -8,7 +8,7 @@ use battle_data::battle_cards::card_data::TargetId;
 use battle_data::battle_cards::card_id::{CharacterId, StackCardId};
 use battle_data::battle_cards::zone::Zone;
 use battle_data::prompt_types::prompt_data::{
-    Prompt, PromptChoice, PromptConfiguration, PromptContext, PromptData,
+    PromptChoice, PromptConfiguration, PromptContext, PromptData, PromptType,
 };
 use battle_queries::cost_queries::costs;
 use battle_queries::player_queries;
@@ -133,7 +133,7 @@ fn negate_unless_pays_cost(
         prompts::set(battle, PromptData {
             source,
             player: source.controller().opponent(),
-            prompt: Prompt::Choose {
+            prompt_type: PromptType::Choose {
                 choices: vec![
                     PromptChoice {
                         label: "Pay $2".to_string(),

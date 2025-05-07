@@ -3,7 +3,7 @@ use battle_data::battle::battle_turn_step::BattleTurnStep;
 use battle_data::battle_cards::card_id::HandCardId;
 use battle_data::battle_cards::zone::Zone;
 
-use crate::legal_action_queries::has_legal_targets;
+use crate::legal_action_queries::{has_legal_additional_costs, has_legal_targets};
 
 /// Returns true if a card can currently be played from hand by its controller.
 pub fn from_hand(battle: &BattleData, card_id: HandCardId) -> bool {
@@ -28,6 +28,10 @@ pub fn from_hand(battle: &BattleData, card_id: HandCardId) -> bool {
     }
 
     if !has_legal_targets::for_event(battle, card_id) {
+        return false;
+    }
+
+    if !has_legal_additional_costs::for_event(battle, card_id, cost) {
         return false;
     }
 

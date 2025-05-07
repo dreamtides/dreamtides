@@ -30,6 +30,7 @@ dependencies = [
  "assert_with",
  "battle_data",
  "battle_mutations",
+ "battle_queries",
  "core_data",
  "logging",
  "tracing",
