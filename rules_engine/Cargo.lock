@@ -373,14 +373,14 @@ name = "battle_mutations"
 version = "0.0.0"
 dependencies = [
  "ability_data",
- "assert_with",
  "battle_queries",
  "battle_state",
+ "bit-set",
  "core_data",
- "logging",
  "rand",
  "rand_xoshiro",
  "tracing",
+ "tracing_macros",
 ]
 
 [[package]]
@@ -2357,6 +2357,23 @@ dependencies = [
  "tracing",
  "tracing-core",
  "tracing-log",
+]
+
+[[package]]
+name = "tracing_macros"
+version = "0.0.0"
+dependencies = [
+ "battle_state",
+ "core_data",
+ "display_data",
+ "rand_xoshiro",
+ "serde",
+ "serde_json",
+ "tracing",
+ "tracing-error",
+ "tracing-forest",
+ "tracing-subscriber",
+ "uuid",
 ]
 
 [[package]]

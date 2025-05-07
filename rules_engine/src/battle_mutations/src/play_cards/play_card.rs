@@ -15,6 +15,7 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, card_id: HandCardId
         energy::spend(battle, player, source, cost);
     }
     move_card::from_hand_to_stack(battle, source, player, card_id);
+
     // Opponent gets priority when a card is played
     battle.stack_priority = Some(player.opponent());
 }

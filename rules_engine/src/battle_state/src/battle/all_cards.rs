@@ -41,6 +41,11 @@ impl AllCards {
             .and_then(|character_state| character_state.spark)
     }
 
+    /// Returns true if a stack is currently active.
+    pub fn has_stack(&self) -> bool {
+        !self.stack.is_empty()
+    }
+
     /// Returns the top card on the stack, if any.
     pub fn top_of_stack(&self) -> Option<&StackCardState> {
         self.stack.last()
