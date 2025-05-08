@@ -1,6 +1,6 @@
-use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle::battle_status::BattleStatus;
 use battle_data_old::battle::effect_source::EffectSource;
+use battle_data_old::battle::old_battle_data::BattleData;
 use core_data::numerics::Points;
 use core_data::types::PlayerName;
 

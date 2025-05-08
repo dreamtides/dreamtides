@@ -112,9 +112,9 @@ pub fn panic_with_snapshot(snapshot: DebugBattleData, message: impl AsRef<str>) 
 
 #[cfg(test)]
 mod tests {
-    use battle_data_old::battle::old_battle_data::BattleData;
     use battle_data_old::battle::battle_status::BattleStatus;
     use battle_data_old::battle::battle_turn_step::BattleTurnStep;
+    use battle_data_old::battle::old_battle_data::BattleData;
     use battle_data_old::battle::request_context::RequestContext;
     use battle_data_old::battle::turn_data::TurnData;
     use battle_data_old::battle_cards::all_cards::AllCards;

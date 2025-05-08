@@ -418,6 +418,7 @@ dependencies = [
  "action_data",
  "assert_with",
  "battle_state",
+ "bit-set",
  "core_data",
  "tracing",
 ]

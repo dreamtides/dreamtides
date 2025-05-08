@@ -6,7 +6,7 @@ use core_data::types::PlayerName;
 pub fn spark_total(battle: &BattleState, player: PlayerName) -> Spark {
     battle
         .cards
-        .battlefield(player)
+        .battlefield_state(player)
         .iter()
         .map(|(_, character_state)| character_state.spark)
         .sum::<Spark>()

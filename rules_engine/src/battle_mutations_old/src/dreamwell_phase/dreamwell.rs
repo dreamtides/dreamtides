@@ -1,6 +1,6 @@
-use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle::battle_turn_step::BattleTurnStep;
 use battle_data_old::battle::effect_source::EffectSource;
+use battle_data_old::battle::old_battle_data::BattleData;
 use core_data::numerics::{Energy, TurnId};
 use core_data::types::PlayerName;
 

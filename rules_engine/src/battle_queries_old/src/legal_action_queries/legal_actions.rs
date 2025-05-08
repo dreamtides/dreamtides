@@ -1,7 +1,7 @@
 use battle_data_old::actions::battle_action_data::BattleAction;
-use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle::battle_status::BattleStatus;
 use battle_data_old::battle::battle_turn_step::BattleTurnStep;
+use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::prompt_types::prompt_data::PromptType;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;

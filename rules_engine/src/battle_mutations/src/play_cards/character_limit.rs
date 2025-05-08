@@ -26,13 +26,13 @@ const CHARACTER_LIMIT: usize = 8;
 /// The current spark value of the abandoned character is permanently granted to
 /// its controller as a 'spark bonus'.
 pub fn apply(battle: &mut BattleState, source: EffectSource, player: PlayerName) -> Option<()> {
-    if battle.cards.battlefield(player).len() < CHARACTER_LIMIT {
+    if battle.cards.battlefield_state(player).len() < CHARACTER_LIMIT {
         return None;
     }
 
     let (target_id, _) = battle
         .cards
-        .battlefield(player)
+        .battlefield_state(player)
         .iter()
         .min_by_key(|(&id, state)| (state.spark, card_properties::cost(battle, id)))?;
 

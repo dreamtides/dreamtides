@@ -1,5 +1,5 @@
-use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle::battle_turn_step::BattleTurnStep;
+use battle_data_old::battle::old_battle_data::BattleData;
 use logging::battle_trace;
 
 /// End the current player's turn.

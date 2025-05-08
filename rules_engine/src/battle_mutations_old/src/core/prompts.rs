@@ -1,6 +1,6 @@
 use assert_with::assert_that;
-use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle::effect_source::EffectSource;
+use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::prompt_types::prompt_data::{PromptConfiguration, PromptData};
 
 use crate::zone_mutations::move_card;

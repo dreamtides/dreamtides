@@ -1,8 +1,8 @@
 use ability_data::ability::Ability;
 use ability_data::effect::Effect;
 use ability_data::standard_effect::StandardEffect;
-use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle::effect_source::EffectSource;
+use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle_cards::card_id::{CardIdType, StackCardId};
 use core_data::identifiers::AbilityNumber;
 

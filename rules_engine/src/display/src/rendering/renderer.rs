@@ -1,6 +1,6 @@
 use assert_with::panic_with;
-use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle::battle_status::BattleStatus;
+use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle_player::player_data::PlayerType;
 use core_data::identifiers::UserId;
 use core_data::types::PlayerName;

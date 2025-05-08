@@ -2,8 +2,8 @@ use ability_data::ability::Ability;
 use ability_data::effect::Effect;
 use ability_data::standard_effect::StandardEffect;
 use assert_with::assert_that;
-use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle::effect_source::EffectSource;
+use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle_cards::card_id::StackCardId;
 use battle_data_old::prompt_types::prompt_data::{
     PromptConfiguration, PromptContext, PromptData, PromptType,

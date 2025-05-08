@@ -1,5 +1,5 @@
-use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle::effect_source::EffectSource;
+use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle_animations::battle_animation::BattleAnimation;
 use battle_data_old::battle_cards::card_id::{HandCardId, StackCardId};
 use core_data::types::PlayerName;

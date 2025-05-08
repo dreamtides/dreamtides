@@ -1,7 +1,7 @@
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
-use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle::effect_source::EffectSource;
+use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle_cards::card_id::{CharacterId, StackCardId};
 use core_data::card_types::CardType;
 

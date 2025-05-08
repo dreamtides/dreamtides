@@ -16,11 +16,13 @@ use crate::battle_cards::zone::Zone;
 #[derive(Clone, Debug, Default)]
 pub struct AllCards {
     card_names: Rc<Vec<CardName>>,
-    battlefield: PlayerMap<SmallMap<8, CharacterId, CharacterState>>,
+    battlefield: PlayerMap<BitSet<usize>>,
+    battlefield_state: PlayerMap<SmallMap<8, CharacterId, CharacterState>>,
     void: PlayerMap<BitSet<usize>>,
     hands: PlayerMap<BitSet<usize>>,
     decks: PlayerMap<BitSet<usize>>,
     stack: SmallVec<[StackCardState; 2]>,
+    stack_set: PlayerMap<BitSet<usize>>,
     banished: PlayerMap<BitSet<usize>>,
 }
 
@@ -36,12 +38,23 @@ impl AllCards {
     ///
     /// Returns None if this character is not present on the battlefield.
     pub fn spark(&self, controller: PlayerName, id: CharacterId) -> Option<Spark> {
-        self.battlefield.player(controller).get(&id).map(|character_state| character_state.spark)
+        self.battlefield_state
+            .player(controller)
+            .get(&id)
+            .map(|character_state| character_state.spark)
     }
 
-    /// Returns the characters on the battlefield for a given player
-    pub fn battlefield(&self, player: PlayerName) -> &SmallMap<8, CharacterId, CharacterState> {
+    /// Returns the set of characters on the battlefield for a given player
+    pub fn battlefield(&self, player: PlayerName) -> &BitSet<usize> {
         self.battlefield.player(player)
+    }
+
+    /// Returns the state of characters on the battlefield for a given player
+    pub fn battlefield_state(
+        &self,
+        player: PlayerName,
+    ) -> &SmallMap<8, CharacterId, CharacterState> {
+        self.battlefield_state.player(player)
     }
 
     /// Returns true if a stack is currently active.
@@ -52,6 +65,11 @@ impl AllCards {
     /// Returns the top card on the stack, if any.
     pub fn top_of_stack(&self) -> Option<&StackCardState> {
         self.stack.last()
+    }
+
+    /// Returns the set of cards on the stack for a given player.
+    pub fn stack_set(&self, player: PlayerName) -> &BitSet<usize> {
+        self.stack_set.player(player)
     }
 
     /// Returns all currently known Card IDs in an undefined order
@@ -83,14 +101,10 @@ impl AllCards {
     pub fn contains_card(&self, controller: PlayerName, card_id: CardId, zone: Zone) -> bool {
         match zone {
             Zone::Banished => self.banished.player(controller).contains(card_id.0),
-            Zone::Battlefield => {
-                self.battlefield.player(controller).get(&CharacterId(card_id)).is_some()
-            }
+            Zone::Battlefield => self.battlefield.player(controller).contains(card_id.0),
             Zone::Deck => self.decks.player(controller).contains(card_id.0),
             Zone::Hand => self.hands.player(controller).contains(card_id.0),
-            Zone::Stack => {
-                self.stack.iter().any(|stack_card| stack_card.id == StackCardId(card_id))
-            }
+            Zone::Stack => self.stack_set.player(controller).contains(card_id.0),
             Zone::Void => self.void.player(controller).contains(card_id.0),
         }
     }
@@ -101,7 +115,8 @@ impl AllCards {
                 self.banished.player_mut(controller).insert(card_id.0);
             }
             Zone::Battlefield => {
-                self.battlefield
+                self.battlefield.player_mut(controller).insert(card_id.0);
+                self.battlefield_state
                     .player_mut(controller)
                     .insert(CharacterId(card_id), CharacterState::default());
             }
@@ -112,6 +127,7 @@ impl AllCards {
                 self.hands.player_mut(controller).insert(card_id.0);
             }
             Zone::Stack => {
+                self.stack_set.player_mut(controller).insert(card_id.0);
                 self.stack.push(StackCardState {
                     id: StackCardId(card_id),
                     controller,
@@ -130,7 +146,8 @@ impl AllCards {
                 self.banished.player_mut(controller).remove(card_id.0);
             }
             Zone::Battlefield => {
-                self.battlefield.player_mut(controller).remove(&CharacterId(card_id));
+                self.battlefield.player_mut(controller).remove(card_id.0);
+                self.battlefield_state.player_mut(controller).remove(&CharacterId(card_id));
             }
             Zone::Deck => {
                 self.decks.player_mut(controller).remove(card_id.0);
@@ -139,6 +156,7 @@ impl AllCards {
                 self.hands.player_mut(controller).remove(card_id.0);
             }
             Zone::Stack => {
+                self.stack_set.player_mut(controller).remove(card_id.0);
                 if let Some((i, _)) = self
                     .stack
                     .iter()

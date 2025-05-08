@@ -1,6 +1,6 @@
 use ability_data::quantity_expression_data::QuantityExpression;
-use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle::effect_source::EffectSource;
+use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle_cards::additional_cost_choice_data::AdditionalCostData;
 
 /// Returns the number of items which currently match this [QuantityExpression].
