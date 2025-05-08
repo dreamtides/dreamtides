@@ -14,6 +14,7 @@ ai_data = { path = "../ai_data" }
 core_data = { path = "../core_data" }
 
 bit-set = "0.8"
+bit-vec = "0.8"
 enum-iterator = "2"
 enumset = { version = "1", features = ["serde"] }
 rand = "0.9"
@@ -21,6 +22,7 @@ rand_xoshiro = "0.7"
 schemars = "0.8"
 serde = { version = "1", features = ["derive"] }
 slotmap = "1"
+small-map = "0.1"
 strum = "0.27"
 strum_macros = "0.27"
 uuid = "1"

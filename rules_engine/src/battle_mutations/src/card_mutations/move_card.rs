@@ -1,5 +1,5 @@
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CardIdType, CharacterId, HandCardId};
+use battle_state::battle::card_id::{CardIdType, CharacterId, HandCardId, StackCardId};
 use battle_state::battle_cards::zone::Zone;
 use battle_state::core::effect_source::EffectSource;
 use core_data::types::PlayerName;
@@ -15,6 +15,37 @@ pub fn from_hand_to_stack(
     card_id: HandCardId,
 ) {
     to_destination_zone(battle, source, controller, card_id.card_id(), Zone::Hand, Zone::Stack);
+}
+
+/// Moves a card from the stack to the 'controller' player's battlefield.
+///
+/// Panics if this card is not found on the stack.
+pub fn from_stack_to_battlefield(
+    battle: &mut BattleState,
+    source: EffectSource,
+    controller: PlayerName,
+    card_id: StackCardId,
+) {
+    to_destination_zone(
+        battle,
+        source,
+        controller,
+        card_id.card_id(),
+        Zone::Stack,
+        Zone::Battlefield,
+    );
+}
+
+/// Moves a card from the stack to the 'controller' player's void.
+///
+/// Panics if this card is not found on the stack.
+pub fn from_stack_to_void(
+    battle: &mut BattleState,
+    source: EffectSource,
+    controller: PlayerName,
+    card_id: StackCardId,
+) {
+    to_destination_zone(battle, source, controller, card_id.card_id(), Zone::Stack, Zone::Void);
 }
 
 /// Moves a character from the 'controller' player's battlefield to the void.

@@ -1,24 +1,26 @@
+use std::rc::Rc;
+
 use bit_set::BitSet;
 use core_data::identifiers::CardName;
 use core_data::numerics::Spark;
 use core_data::types::PlayerName;
+use small_map::SmallMap;
 
 use crate::battle::card_id::{CardId, CardIdType, CharacterId, StackCardId};
 use crate::battle::player_map::PlayerMap;
 use crate::battle_cards::character_state::CharacterState;
-use crate::battle_cards::stack_card_state::StackCardState;
+use crate::battle_cards::stack_card_state::{StackCardState, StackCardTargets};
 use crate::battle_cards::zone::Zone;
 
 #[derive(Clone, Debug, Default)]
 pub struct AllCards {
-    card_names: Vec<CardName>,
-    character_states: PlayerMap<Vec<CharacterState>>,
-    battlefield: PlayerMap<BitSet>,
-    void: PlayerMap<BitSet>,
-    hands: PlayerMap<BitSet>,
-    decks: PlayerMap<BitSet>,
+    card_names: Rc<Vec<CardName>>,
+    battlefield: PlayerMap<SmallMap<8, CardId, CharacterState>>,
+    void: PlayerMap<BitSet<usize>>,
+    hands: PlayerMap<BitSet<usize>>,
+    decks: PlayerMap<BitSet<usize>>,
     stack: Vec<StackCardState>,
-    banished: PlayerMap<BitSet>,
+    banished: PlayerMap<BitSet<usize>>,
 }
 
 impl AllCards {
@@ -31,14 +33,12 @@ impl AllCards {
 
     /// Returns the spark value of a character.
     ///
-    /// Returns None if this character is not present on the battlefield or has
-    /// no Spark value.
+    /// Returns None if this character is not present on the battlefield.
     pub fn spark(&self, controller: PlayerName, id: CharacterId) -> Option<Spark> {
-        self.character_states
+        self.battlefield
             .player(controller)
-            .iter()
-            .find(|character_state| character_state.id == id)
-            .and_then(|character_state| character_state.spark)
+            .get(&id.card_id())
+            .map(|character_state| character_state.spark)
     }
 
     /// Returns true if a stack is currently active.
@@ -60,7 +60,10 @@ impl AllCards {
     /// Generally you should use the `move_card` module instead of invoking this
     /// directly.
     ///
-    /// Panics if the indicated card is not found in the 'from' zone.
+    /// This *only* updates the position of the card, and writes the default
+    /// card state values in its new zone (e.g. 0 spark for a character on the
+    /// battlefield). You should write a correct state value for the new zone if
+    /// appropriate.
     pub fn move_card(
         &mut self,
         controller: PlayerName,
@@ -77,7 +80,7 @@ impl AllCards {
     pub fn contains_card(&self, controller: PlayerName, card_id: CardId, zone: Zone) -> bool {
         match zone {
             Zone::Banished => self.banished.player(controller).contains(card_id.0),
-            Zone::Battlefield => self.battlefield.player(controller).contains(card_id.0),
+            Zone::Battlefield => self.battlefield.player(controller).get(&card_id).is_some(),
             Zone::Deck => self.decks.player(controller).contains(card_id.0),
             Zone::Hand => self.hands.player(controller).contains(card_id.0),
             Zone::Stack => {
@@ -93,7 +96,7 @@ impl AllCards {
                 self.banished.player_mut(controller).insert(card_id.0);
             }
             Zone::Battlefield => {
-                self.battlefield.player_mut(controller).insert(card_id.0);
+                self.battlefield.player_mut(controller).insert(card_id, CharacterState::default());
             }
             Zone::Deck => {
                 self.decks.player_mut(controller).insert(card_id.0);
@@ -105,7 +108,7 @@ impl AllCards {
                 self.stack.push(StackCardState {
                     id: StackCardId(card_id),
                     controller,
-                    targets: BitSet::new(),
+                    targets: StackCardTargets::None,
                 });
             }
             Zone::Void => {
@@ -120,7 +123,7 @@ impl AllCards {
                 self.banished.player_mut(controller).remove(card_id.0);
             }
             Zone::Battlefield => {
-                self.battlefield.player_mut(controller).remove(card_id.0);
+                self.battlefield.player_mut(controller).remove(&card_id);
             }
             Zone::Deck => {
                 self.decks.player_mut(controller).remove(card_id.0);

@@ -1,9 +1,6 @@
 use core_data::numerics::Spark;
 
-use crate::battle::card_id::CharacterId;
-
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct CharacterState {
-    pub id: CharacterId,
-    pub spark: Option<Spark>,
+    pub spark: Spark,
 }

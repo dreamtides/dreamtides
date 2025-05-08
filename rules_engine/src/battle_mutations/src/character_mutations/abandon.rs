@@ -4,7 +4,7 @@ use battle_state::core::effect_source::EffectSource;
 use core_data::types::PlayerName;
 use tracing_macros::battle_trace;
 
-use crate::card_mutations::move_card;
+use crate::character_mutations::dissolve;
 
 /// Dissolves a character, moving it to the void.
 pub fn apply(
@@ -13,6 +13,6 @@ pub fn apply(
     controller: PlayerName,
     id: CharacterId,
 ) {
-    battle_trace!("Dissolving character", battle, id);
-    move_card::from_battlefield_to_void(battle, source, controller, id);
+    battle_trace!("Abandoning character", battle, id);
+    dissolve::apply(battle, source, controller, id);
 }

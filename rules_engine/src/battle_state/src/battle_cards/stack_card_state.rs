@@ -1,11 +1,17 @@
-use bit_set::BitSet;
 use core_data::types::PlayerName;
 
-use crate::battle::card_id::StackCardId;
+use crate::battle::card_id::{CharacterId, StackCardId};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct StackCardState {
     pub id: StackCardId,
     pub controller: PlayerName,
-    pub targets: BitSet,
+    pub targets: StackCardTargets,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum StackCardTargets {
+    None,
+    Character(CharacterId),
+    StackCard(StackCardId),
 }

@@ -22,7 +22,7 @@ pub fn query(
     card_id: impl CardIdType,
 ) -> &'static [(AbilityNumber, Ability)] {
     match battle.cards.name(card_id) {
-        CardName::MinstrelOfFallingLight => MINSTREL_ABILITIES.get_or_init(|| vec![]),
+        CardName::MinstrelOfFallingLight => MINSTREL_ABILITIES.get_or_init(Vec::new),
         CardName::Immolate => IMMOLATE_ABILITIES.get_or_init(|| {
             vec![(
                 AbilityNumber(0),

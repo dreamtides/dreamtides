@@ -1,3 +1,5 @@
+use battle_state::battle::battle_state::BattleState;
+
 /// Macro for firing panics with tracing
 ///
 /// This macro does three things:
@@ -31,15 +33,20 @@
 macro_rules! panic_with {
     ($message:expr, $battle:expr) => {{
         tracing::error!($message);
+        $crate::write_battle_event($battle);
         panic!("Error: {}", $message);
     }};
     ($message:expr, $battle:expr, $($key:ident),* $(,)?) => {{
             $( let $key = &$key; )*
             tracing::error!(message = %$message, $($key = ?$key),*);
+            $crate::write_battle_event($battle);
             panic!("Error: {}", $message);
     }};
     ($message:expr, $battle:expr, $($key:ident = $value:expr),* $(,)?) => {{
         tracing::error!(message = %$message, $($key = ?$value),*);
+        $crate::write_battle_event($battle);
         panic!("Error: {}", $message);
     }};
 }
+
+pub fn write_battle_event(_battle: &mut BattleState) {}

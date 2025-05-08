@@ -3,11 +3,15 @@ use core_data::types::PlayerName;
 use rand_xoshiro::Xoshiro256PlusPlus;
 
 use crate::battle::all_cards::AllCards;
+use crate::battle::animation_data::AnimationData;
+use crate::battle::battle_history::BattleHistory;
 use crate::battle::battle_status::BattleStatus;
 use crate::battle::battle_turn_step::BattleTurnStep;
 use crate::battle::player_map::PlayerMap;
 use crate::battle::turn_data::TurnData;
 use crate::battle_player::battle_player_state::BattlePlayerState;
+use crate::battle_trace::battle_tracing::BattleTracing;
+use crate::prompt_types::prompt_data::PromptData;
 
 #[derive(Clone, Debug)]
 pub struct BattleState {
@@ -23,7 +27,7 @@ pub struct BattleState {
     /// Status of this battle, including whether it has ended.
     pub status: BattleStatus,
 
-    /// Player who is currently next to act when a stack of cards is active.
+    /// Player who is currently next to act when a stack is active.
     pub stack_priority: Option<PlayerName>,
 
     /// Current turn
@@ -37,4 +41,22 @@ pub struct BattleState {
 
     /// Random number generator for this battle
     pub rng: Xoshiro256PlusPlus,
+
+    /// Prompt to display to a player.
+    ///
+    /// Only one prompt may be active at a time. It is an error to attempt to
+    /// display another prompt while a choice is pending.
+    pub prompt: Option<PromptData>,
+
+    /// Animation tracker for this battle. If this is None it means we are not
+    /// currently rendering for display.
+    pub animations: Option<AnimationData>,
+
+    /// Debug tracing data for this battle
+    pub tracing: Option<BattleTracing>,
+
+    /// History of actions and events during this battle.
+    ///
+    /// Can be None if history tracking is disabled, e.g. during AI simulation.
+    pub history: Option<BattleHistory>,
 }
