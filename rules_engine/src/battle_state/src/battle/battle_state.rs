@@ -3,10 +3,11 @@ use core_data::types::PlayerName;
 use rand_xoshiro::Xoshiro256PlusPlus;
 
 use crate::battle::all_cards::AllCards;
-use crate::battle::animation_data::AnimationData;
+use crate::battle::animation_data::{AnimationData, AnimationStep};
+use crate::battle::battle_animation::BattleAnimation;
 use crate::battle::battle_history::BattleHistory;
 use crate::battle::battle_status::BattleStatus;
-use crate::battle::battle_turn_step::BattleTurnStep;
+use crate::battle::battle_turn_phase::BattleTurnPhase;
 use crate::battle::player_map::PlayerMap;
 use crate::battle::turn_data::TurnData;
 use crate::battle_player::battle_player_state::BattlePlayerState;
@@ -33,8 +34,8 @@ pub struct BattleState {
     /// Current turn
     pub turn: TurnData,
 
-    /// Current step within the turn
-    pub step: BattleTurnStep,
+    /// Current phase within the turn
+    pub phase: BattleTurnPhase,
 
     /// Seed used to initialize the random number generator
     pub seed: u64,
@@ -59,4 +60,55 @@ pub struct BattleState {
     ///
     /// Can be None if history tracking is disabled, e.g. during AI simulation.
     pub history: Option<BattleHistory>,
+}
+
+impl BattleState {
+    /// Returns a clone of this battle state with only the elements populated
+    /// that directly affect game logic.
+    ///
+    /// Suitable for use in e.g. AI simulation.
+    pub fn logical_clone(&self) -> Self {
+        Self {
+            id: self.id,
+            cards: self.cards.clone(),
+            players: self.players.clone(),
+            status: self.status.clone(),
+            stack_priority: self.stack_priority,
+            turn: self.turn,
+            phase: self.phase,
+            seed: self.seed,
+            rng: self.rng.clone(),
+            prompt: self.prompt.clone(),
+            animations: None,
+            tracing: None,
+            history: None,
+        }
+    }
+
+    /// Pushes a new animation step onto the animation tracker, if animation
+    /// tracking is enabled.
+    ///
+    /// This takes a function instead of a [BattleAnimation]. If you need to do
+    /// any computation to determine the animation values, put it within the
+    /// function so it won't run when animations are not being tracked.
+    pub fn push_animation(&mut self, update: impl FnOnce() -> BattleAnimation) {
+        if let Some(animations) = &mut self.animations {
+            let snapshot = Self {
+                id: self.id,
+                cards: self.cards.clone(),
+                players: self.players.clone(),
+                status: self.status.clone(),
+                stack_priority: self.stack_priority,
+                turn: self.turn,
+                phase: self.phase,
+                seed: self.seed,
+                rng: self.rng.clone(),
+                prompt: self.prompt.clone(),
+                animations: None,
+                tracing: None,
+                history: None,
+            };
+            animations.steps.push(AnimationStep { snapshot, animation: update() });
+        }
+    }
 }

@@ -39,7 +39,7 @@ pub fn pass_priority(battle: &mut BattleState, player: PlayerName) {
         player
     );
 
-    let Some(stack_card) = battle.cards.top_of_stack().copied() else {
+    let Some(stack_card) = battle.cards.top_of_stack().cloned() else {
         panic_with!("No cards on stack", battle);
     };
 

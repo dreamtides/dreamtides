@@ -451,6 +451,7 @@ dependencies = [
  "serde",
  "slotmap",
  "small-map",
+ "smallvec",
  "strum",
  "strum_macros",
  "uuid",

@@ -2,6 +2,7 @@ use ability_data::effect::Effect;
 use bit_set::BitSet;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
+use smallvec::SmallVec;
 use strum_macros::EnumDiscriminants;
 
 use crate::battle_cards::stack_card_state::StackCardTargets;
@@ -32,7 +33,7 @@ pub struct PromptData {
 pub enum PromptType {
     ChooseCharacter { valid: BitSet<usize> },
     ChooseStackCard { valid: BitSet<usize> },
-    Choose { choices: Vec<PromptChoice> },
+    Choose { choices: SmallVec<[PromptChoice; 2]> },
     ChooseEnergyValue { minimum: Energy, current: Energy, maximum: Energy },
 }
 

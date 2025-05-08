@@ -5,6 +5,7 @@ use core_data::identifiers::CardName;
 use core_data::numerics::Spark;
 use core_data::types::PlayerName;
 use small_map::SmallMap;
+use smallvec::SmallVec;
 
 use crate::battle::card_id::{CardId, CardIdType, CharacterId, StackCardId};
 use crate::battle::player_map::PlayerMap;
@@ -19,7 +20,7 @@ pub struct AllCards {
     void: PlayerMap<BitSet<usize>>,
     hands: PlayerMap<BitSet<usize>>,
     decks: PlayerMap<BitSet<usize>>,
-    stack: Vec<StackCardState>,
+    stack: SmallVec<[StackCardState; 2]>,
     banished: PlayerMap<BitSet<usize>>,
 }
 
@@ -39,6 +40,12 @@ impl AllCards {
             .player(controller)
             .get(&id.card_id())
             .map(|character_state| character_state.spark)
+    }
+
+    /// Returns an iterator over the characters on the battlefield for the
+    /// indicated player.
+    pub fn battlefield(&self, player: PlayerName) -> impl Iterator<Item = &CharacterState> + '_ {
+        self.battlefield.player(player).iter().map(|(_, character_state)| character_state)
     }
 
     /// Returns true if a stack is currently active.
