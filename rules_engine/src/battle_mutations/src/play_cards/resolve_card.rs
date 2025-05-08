@@ -9,6 +9,7 @@ use tracing_macros::{assert_that, battle_trace, panic_with};
 
 use crate::card_mutations::move_card;
 use crate::effects::apply_effect;
+use crate::play_cards::character_limit;
 
 /// Marks a player as having taken the "pass" action on the current stack.
 ///
@@ -52,21 +53,13 @@ pub fn pass_priority(battle: &mut BattleState, player: PlayerName) {
 
 fn resolve_card(battle: &mut BattleState, card: &StackCardState) {
     battle_trace!("Resolving card", battle, card_id = card.id);
+    let source = EffectSource::Game { controller: card.controller };
     if card_properties::card_type(battle, card.id) == CardType::Event {
         apply_event_effects(battle, card);
-        move_card::from_stack_to_void(
-            battle,
-            EffectSource::Game { controller: card.controller },
-            card.controller,
-            card.id,
-        );
+        move_card::from_stack_to_void(battle, source, card.controller, card.id);
     } else {
-        move_card::from_stack_to_battlefield(
-            battle,
-            EffectSource::Game { controller: card.controller },
-            card.controller,
-            card.id,
-        );
+        character_limit::apply(battle, source, card.controller);
+        move_card::from_stack_to_battlefield(battle, source, card.controller, card.id);
     }
 }
 
