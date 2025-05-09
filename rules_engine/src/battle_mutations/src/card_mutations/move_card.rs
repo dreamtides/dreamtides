@@ -1,5 +1,7 @@
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CardIdType, CharacterId, HandCardId, StackCardId};
+use battle_state::battle::card_id::{
+    CardIdType, CharacterId, DeckCardId, HandCardId, StackCardId, VoidCardId,
+};
 use battle_state::battle_cards::zone::Zone;
 use battle_state::core::effect_source::EffectSource;
 use core_data::types::PlayerName;
@@ -13,8 +15,9 @@ pub fn from_hand_to_stack(
     source: EffectSource,
     controller: PlayerName,
     card_id: HandCardId,
-) {
+) -> StackCardId {
     to_destination_zone(battle, source, controller, card_id.card_id(), Zone::Hand, Zone::Stack);
+    StackCardId(card_id.card_id())
 }
 
 /// Moves a card from the stack to the 'controller' player's battlefield.
@@ -25,7 +28,7 @@ pub fn from_stack_to_battlefield(
     source: EffectSource,
     controller: PlayerName,
     card_id: StackCardId,
-) {
+) -> CharacterId {
     to_destination_zone(
         battle,
         source,
@@ -34,6 +37,7 @@ pub fn from_stack_to_battlefield(
         Zone::Stack,
         Zone::Battlefield,
     );
+    CharacterId(card_id.card_id())
 }
 
 /// Moves a card from the stack to the 'controller' player's void.
@@ -44,8 +48,9 @@ pub fn from_stack_to_void(
     source: EffectSource,
     controller: PlayerName,
     card_id: StackCardId,
-) {
+) -> VoidCardId {
     to_destination_zone(battle, source, controller, card_id.card_id(), Zone::Stack, Zone::Void);
+    VoidCardId(card_id.card_id())
 }
 
 /// Moves a character from the 'controller' player's battlefield to the void.
@@ -56,7 +61,7 @@ pub fn from_battlefield_to_void(
     source: EffectSource,
     controller: PlayerName,
     card_id: CharacterId,
-) {
+) -> VoidCardId {
     to_destination_zone(
         battle,
         source,
@@ -65,6 +70,20 @@ pub fn from_battlefield_to_void(
         Zone::Battlefield,
         Zone::Void,
     );
+    VoidCardId(card_id.card_id())
+}
+
+/// Moves a card from the 'controller' player's deck to their hand.
+///
+/// Panics if this card is not found in the deck.
+pub fn from_deck_to_hand(
+    battle: &mut BattleState,
+    source: EffectSource,
+    controller: PlayerName,
+    card_id: DeckCardId,
+) -> HandCardId {
+    to_destination_zone(battle, source, controller, card_id.card_id(), Zone::Deck, Zone::Hand);
+    HandCardId(card_id.card_id())
 }
 
 /// Moves a card from the 'old' zone to the 'new' zone.

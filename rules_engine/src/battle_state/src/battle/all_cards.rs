@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use bit_set::BitSet;
 use core_data::identifiers::CardName;
 use core_data::numerics::Spark;
@@ -15,7 +13,7 @@ use crate::battle_cards::zone::Zone;
 
 #[derive(Clone, Debug, Default)]
 pub struct AllCards {
-    card_names: Rc<Vec<CardName>>,
+    card_names: Vec<CardName>,
     battlefield: PlayerMap<BitSet<usize>>,
     battlefield_state: PlayerMap<SmallMap<8, CharacterId, CharacterState>>,
     void: PlayerMap<BitSet<usize>>,
@@ -44,6 +42,16 @@ impl AllCards {
             .map(|character_state| character_state.spark)
     }
 
+    /// Returns the set of cards in a player's hand.
+    pub fn hand(&self, player: PlayerName) -> &BitSet<usize> {
+        self.hands.player(player)
+    }
+
+    /// Returns the set of cards in a player's deck.
+    pub fn deck(&self, player: PlayerName) -> &BitSet<usize> {
+        self.decks.player(player)
+    }
+
     /// Returns the set of characters on the battlefield for a given player
     pub fn battlefield(&self, player: PlayerName) -> &BitSet<usize> {
         self.battlefield.player(player)
@@ -67,6 +75,11 @@ impl AllCards {
         self.stack.last()
     }
 
+    /// Mutable equivalent to [Self::top_of_stack].
+    pub fn top_of_stack_mut(&mut self) -> Option<&mut StackCardState> {
+        self.stack.last_mut()
+    }
+
     /// Returns the set of cards on the stack for a given player.
     pub fn stack_set(&self, player: PlayerName) -> &BitSet<usize> {
         self.stack_set.player(player)
@@ -75,6 +88,15 @@ impl AllCards {
     /// Returns all currently known Card IDs in an undefined order
     pub fn all_cards(&self) -> impl Iterator<Item = CardId> + '_ {
         self.card_names.iter().enumerate().map(|(i, _)| CardId(i))
+    }
+
+    /// Creates a set of cards with the indicated names in a player's deck.
+    pub fn create_cards_in_deck(&mut self, owner: PlayerName, cards: Vec<CardName>) {
+        for name in cards {
+            let id = self.card_names.len();
+            self.card_names.push(name);
+            self.decks.player_mut(owner).insert(id);
+        }
     }
 
     /// Moves a card from its current zone to a new zone, if it is present.
