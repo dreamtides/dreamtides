@@ -27,13 +27,22 @@
 #[macro_export]
 macro_rules! battle_trace {
     ($message:expr, $battle:expr) => {{
-        tracing::debug!($message);
+        if $battle.tracing.is_some() {
+            $crate::write_battle_event($battle);
+            tracing::debug!($message);
+        }
     }};
     ($message:expr, $battle:expr, $($key:ident),* $(,)?) => {{
         $( let $key = &$key; )*
-        tracing::debug!(message = %$message, $($key = ?$key),*);
+        if $battle.tracing.is_some() {
+            $crate::write_battle_event($battle);
+            tracing::debug!(message = %$message, $($key = ?$key),*);
+        }
     }};
     ($message:expr, $battle:expr, $($key:ident = $value:expr),* $(,)?) => {{
-        tracing::debug!(message = %$message, $($key = ?$value),*);
+        if $battle.tracing.is_some() {
+            $crate::write_battle_event($battle);
+            tracing::debug!(message = %$message, $($key = ?$value),*);
+        }
     }};
 }

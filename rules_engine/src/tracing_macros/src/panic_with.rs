@@ -1,5 +1,3 @@
-use battle_state::battle::battle_state::BattleState;
-
 /// Macro for firing panics with tracing
 ///
 /// This macro does three things:
@@ -48,5 +46,3 @@ macro_rules! panic_with {
         panic!("Error: {}", $message);
     }};
 }
-
-pub fn write_battle_event(_battle: &mut BattleState) {}

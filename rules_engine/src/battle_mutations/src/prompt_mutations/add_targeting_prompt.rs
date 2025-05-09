@@ -10,7 +10,7 @@ use battle_state::prompt_types::prompt_data::{
     PromptConfiguration, PromptContext, PromptData, PromptType,
 };
 use core_data::types::PlayerName;
-use tracing_macros::{assert_that, battle_trace};
+use tracing_macros::battle_trace;
 
 /// Adds a prompt to the `battle` for targets required to play the `card_id`
 /// card.
@@ -68,7 +68,9 @@ fn targeting_prompt(
 }
 
 /// Creates a prompt data for a standard effect if it requires target selection.
-/// Returns the prompt data if created, None otherwise.
+///
+/// Returns the prompt data if targets are required and there are legal targets
+/// available and None otherwise.
 fn standard_effect_targeting_prompt(
     battle: &BattleState,
     player: PlayerName,
@@ -78,7 +80,10 @@ fn standard_effect_targeting_prompt(
 ) -> Option<PromptData> {
     if let Some(target_predicate) = effect_predicates::get_character_target_predicate(effect) {
         let valid = effect_predicates::matching_characters(battle, source, target_predicate);
-        assert_that!(!valid.is_empty(), "No valid characters", battle, effect);
+        if valid.is_empty() {
+            return None;
+        }
+
         Some(PromptData {
             source,
             player,
@@ -88,7 +93,10 @@ fn standard_effect_targeting_prompt(
         })
     } else if let Some(target_predicate) = effect_predicates::get_stack_target_predicate(effect) {
         let valid = effect_predicates::matching_cards_on_stack(battle, source, target_predicate);
-        assert_that!(!valid.is_empty(), "No valid stack cards", battle, effect);
+        if valid.is_empty() {
+            return None;
+        }
+
         Some(PromptData {
             source,
             player,
