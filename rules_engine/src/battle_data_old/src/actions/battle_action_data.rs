@@ -1,4 +1,4 @@
-use core_data::identifiers::CardId;
+use core_data::identifiers::CardIdent;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use schemars::JsonSchema;
@@ -57,7 +57,7 @@ pub enum DebugBattleAction {
 #[serde(rename_all = "camelCase")]
 pub struct SelectCardOrder {
     pub target: CardOrderSelectionTarget,
-    pub card_id: CardId,
+    pub card_id: CardIdent,
     pub position: usize,
 }
 

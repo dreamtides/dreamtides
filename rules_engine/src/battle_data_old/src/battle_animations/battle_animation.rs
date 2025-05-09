@@ -1,4 +1,4 @@
-use core_data::identifiers::CardId;
+use core_data::identifiers::CardIdent;
 use core_data::numerics::{Energy, Points};
 use core_data::types::PlayerName;
 
@@ -16,7 +16,7 @@ pub enum BattleAnimation {
     },
     DreamwellActivation {
         player: PlayerName,
-        dreamwell_card_id: CardId,
+        dreamwell_card_id: CardIdent,
         new_energy: Energy,
         new_produced_energy: Energy,
     },

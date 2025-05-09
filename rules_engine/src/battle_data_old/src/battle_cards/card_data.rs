@@ -1,5 +1,5 @@
 use ability_data::ability::Ability;
-use core_data::identifiers::{CardId, CardIdentity};
+use core_data::identifiers::{CardIdent, CardIdentity};
 use core_data::types::PlayerName;
 
 use crate::battle::turn_data::TurnData;
@@ -11,7 +11,7 @@ use crate::battle_cards::zone::Zone;
 #[derive(Clone, Debug)]
 pub struct CardData {
     /// Unique identifier for this card
-    pub id: CardId,
+    pub id: CardIdent,
 
     /// Identifies the art & rules text for this card
     pub identity: CardIdentity,

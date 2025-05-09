@@ -9,7 +9,7 @@ use battle_queries_old::legal_action_queries::can_play_card;
 use core_data::card_types::CardType;
 use core_data::display_color;
 use core_data::display_types::SpriteAddress;
-use core_data::identifiers::{CardId, CardIdentity};
+use core_data::identifiers::{CardIdent, CardIdentity};
 use core_data::types::CardFacing;
 use display_data::card_view::{
     CardActions, CardEffects, CardPrefab, CardView, DisplayImage, RevealedCardView,
@@ -66,7 +66,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
 fn selection_target(
     builder: &ResponseBuilder,
     battle: &BattleData,
-    card_id: CardId,
+    card_id: CardIdent,
 ) -> Option<GameAction> {
     if let Some(prompt_data) = &battle.prompt {
         if prompt_data.player == builder.act_for_player() {

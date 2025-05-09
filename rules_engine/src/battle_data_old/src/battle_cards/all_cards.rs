@@ -1,6 +1,6 @@
 use std::collections::{BTreeSet, VecDeque};
 
-use core_data::identifiers::CardId;
+use core_data::identifiers::CardIdent;
 use core_data::types::PlayerName;
 use rand::seq::SliceRandom;
 use rand_xoshiro::Xoshiro256PlusPlus;
@@ -15,7 +15,7 @@ use crate::battle_cards::zone::Zone;
 
 #[derive(Clone, Debug, Default)]
 pub struct AllCards {
-    cards: SlotMap<CardId, CardData>,
+    cards: SlotMap<CardIdent, CardData>,
     battlefield: UnorderedZone<CharacterId>,
     void: UnorderedZone<VoidCardId>,
     hand: UnorderedZone<HandCardId>,
@@ -102,7 +102,7 @@ impl AllCards {
     /// which has been assigned the default CardId.
     ///
     /// This does *not* make the card revealed to any player.
-    pub fn create_card(&mut self, card_data: CardData) -> CardId {
+    pub fn create_card(&mut self, card_data: CardData) -> CardIdent {
         let zone = card_data.zone;
         let owner = card_data.owner;
         let card_id = self.cards.insert(card_data);
@@ -160,7 +160,12 @@ impl AllCards {
         result
     }
 
-    fn add_to_zone(&mut self, owner: PlayerName, card_id: CardId, zone: Zone) -> Option<ObjectId> {
+    fn add_to_zone(
+        &mut self,
+        owner: PlayerName,
+        card_id: CardIdent,
+        zone: Zone,
+    ) -> Option<ObjectId> {
         let object_id = self.new_object_id();
         self.card_mut(card_id)?.zone = zone;
         self.card_mut(card_id)?.object_id = object_id;
@@ -177,7 +182,7 @@ impl AllCards {
         Some(object_id)
     }
 
-    fn remove_from_zone(&mut self, owner: PlayerName, zone: Zone, card_id: CardId) {
+    fn remove_from_zone(&mut self, owner: PlayerName, zone: Zone, card_id: CardIdent) {
         match zone {
             Zone::Banished => {
                 self.banished.remove_if_present(owner, BanishedCardId(card_id));

@@ -67,16 +67,16 @@ new_key_type! {
     /// - A normal card
     /// - A copy of a card on the stack
     /// - A token or copy of a card in play
-    pub struct CardId;
+    pub struct CardIdent;
 }
 
-impl fmt::Display for CardId {
+impl fmt::Display for CardIdent {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{:?}", self.0)
     }
 }
 
-impl JsonSchema for CardId {
+impl JsonSchema for CardIdent {
     fn schema_name() -> String {
         "CardId".to_string()
     }
@@ -93,7 +93,7 @@ impl JsonSchema for CardId {
     }
 }
 
-impl CardId {
+impl CardIdent {
     /// Converts an opaque number received from [Self::to_int] into a card
     /// id
     pub fn from_int(value: u64) -> Self {

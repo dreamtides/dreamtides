@@ -12,7 +12,7 @@ use battle_data_old::battle_cards::card_identities;
 use battle_data_old::battle_cards::card_properties::CardProperties;
 use battle_data_old::battle_cards::zone::Zone;
 use core_data::card_types::{CardType, CharacterType};
-use core_data::identifiers::CardId;
+use core_data::identifiers::CardIdent;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::PlayerName;
 use rand::seq::SliceRandom;
@@ -30,7 +30,7 @@ fn create_cards(player_name: PlayerName) -> Vec<CardData> {
 
     for _ in 0..6 {
         cards.push(CardData {
-            id: CardId::default(),
+            id: CardIdent::default(),
             identity: card_identities::MINSTREL_OF_FALLING_LIGHT,
             owner: player_name,
             zone: Zone::Deck,
@@ -52,7 +52,7 @@ fn create_cards(player_name: PlayerName) -> Vec<CardData> {
 
     for _ in 0..3 {
         cards.push(CardData {
-            id: CardId::default(),
+            id: CardIdent::default(),
             identity: card_identities::IMMOLATE,
             owner: player_name,
             zone: Zone::Deck,
@@ -79,7 +79,7 @@ fn create_cards(player_name: PlayerName) -> Vec<CardData> {
 
     for _ in 0..3 {
         cards.push(CardData {
-            id: CardId::default(),
+            id: CardIdent::default(),
             identity: card_identities::ABOLISH,
             owner: player_name,
             zone: Zone::Deck,
@@ -106,7 +106,7 @@ fn create_cards(player_name: PlayerName) -> Vec<CardData> {
 
     for _ in 0..3 {
         cards.push(CardData {
-            id: CardId::default(),
+            id: CardIdent::default(),
             identity: card_identities::RIPPLE_OF_DEFIANCE,
             owner: player_name,
             zone: Zone::Deck,
@@ -134,7 +134,7 @@ fn create_cards(player_name: PlayerName) -> Vec<CardData> {
 
     for _ in 0..3 {
         cards.push(CardData {
-            id: CardId::default(),
+            id: CardIdent::default(),
             identity: card_identities::DREAMSCATTER,
             owner: player_name,
             zone: Zone::Deck,

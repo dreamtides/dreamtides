@@ -1,4 +1,4 @@
-use core_data::identifiers::{AbilityNumber, CardId};
+use core_data::identifiers::{AbilityNumber, CardIdent};
 use core_data::types::PlayerName;
 use serde::{Deserialize, Serialize};
 
@@ -38,7 +38,7 @@ impl EffectSource {
     }
 
     /// Returns the card ID of the source of this effect, if it is a card.
-    pub fn card_id(&self) -> Option<CardId> {
+    pub fn card_id(&self) -> Option<CardIdent> {
         match self {
             EffectSource::Event { stack_card_id: card, .. } => Some(card.card_id()),
             EffectSource::Activated { character_id: card, .. } => Some(card.card_id()),
