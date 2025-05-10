@@ -14,5 +14,5 @@ pub fn apply(
     id: CharacterId,
 ) {
     battle_trace!("Abandoning character", battle, id);
-    dissolve::apply(battle, source, controller, id);
+    dissolve::execute(battle, source, controller, id);
 }

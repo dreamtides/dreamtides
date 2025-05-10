@@ -8,7 +8,9 @@ use smallvec::SmallVec;
 use crate::battle::card_id::{CardId, CardIdType, CharacterId, StackCardId};
 use crate::battle::player_map::PlayerMap;
 use crate::battle_cards::character_state::CharacterState;
-use crate::battle_cards::stack_card_state::{StackCardState, StackCardTargets};
+use crate::battle_cards::stack_card_state::{
+    StackCardAdditionalCostsPaid, StackCardState, StackCardTargets,
+};
 use crate::battle_cards::zone::Zone;
 
 #[derive(Clone, Debug, Default)]
@@ -68,6 +70,11 @@ impl AllCards {
     /// Returns true if a stack is currently active.
     pub fn has_stack(&self) -> bool {
         !self.stack.is_empty()
+    }
+
+    /// Returns the state of a card on the stack, if any.
+    pub fn stack_card(&self, id: StackCardId) -> Option<&StackCardState> {
+        self.stack.iter().rev().find(|card| card.id == id)
     }
 
     /// Returns the top card on the stack, if any.
@@ -154,6 +161,7 @@ impl AllCards {
                     id: StackCardId(card_id),
                     controller,
                     targets: StackCardTargets::None,
+                    additional_costs_paid: StackCardAdditionalCostsPaid::None,
                 });
             }
             Zone::Void => {

@@ -32,7 +32,7 @@ macro_rules! assert_that {
     ($condition:expr, $message:expr, $battle:expr) => {{
         if !$condition {
             tracing::error!($message);
-            $crate::write_battle_event($battle);
+            $crate::snapshot($battle);
             panic!("Assertion failed: {}", $message);
         }
     }};
@@ -40,14 +40,14 @@ macro_rules! assert_that {
         if !$condition {
             $( let $key = &$key; )*
             tracing::error!(message = %$message, $($key = ?$key),*);
-            $crate::write_battle_event($battle);
+            $crate::snapshot($battle);
             panic!("Assertion failed: {}", $message);
         }
     }};
     ($condition:expr, $message:expr, $battle:expr, $($key:ident = $value:expr),* $(,)?) => {{
         if !$condition {
             tracing::error!(message = %$message, $($key = ?$value),*);
-            $crate::write_battle_event($battle);
+            $crate::snapshot($battle);
             panic!("Assertion failed: {}", $message);
         }
     }};

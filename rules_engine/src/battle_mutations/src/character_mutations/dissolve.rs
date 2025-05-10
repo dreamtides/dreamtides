@@ -7,7 +7,7 @@ use tracing_macros::battle_trace;
 use crate::card_mutations::move_card;
 
 /// Dissolves a character, moving it to the void.
-pub fn apply(
+pub fn execute(
     battle: &mut BattleState,
     source: EffectSource,
     controller: PlayerName,

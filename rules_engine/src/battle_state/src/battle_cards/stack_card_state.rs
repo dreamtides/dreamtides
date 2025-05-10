@@ -1,3 +1,4 @@
+use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 
 use crate::battle::card_id::{CharacterId, StackCardId};
@@ -7,6 +8,7 @@ pub struct StackCardState {
     pub id: StackCardId,
     pub controller: PlayerName,
     pub targets: StackCardTargets,
+    pub additional_costs_paid: StackCardAdditionalCostsPaid,
 }
 
 #[derive(Clone, Debug)]
@@ -14,4 +16,10 @@ pub enum StackCardTargets {
     None,
     Character(CharacterId),
     StackCard(StackCardId),
+}
+
+#[derive(Clone, Debug)]
+pub enum StackCardAdditionalCostsPaid {
+    None,
+    Energy(Energy),
 }

@@ -2,7 +2,6 @@ use ability_data::effect::Effect;
 use bit_set::BitSet;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
-use smallvec::SmallVec;
 use strum_macros::EnumDiscriminants;
 
 use crate::battle_cards::stack_card_state::StackCardTargets;
@@ -33,7 +32,7 @@ pub struct PromptData {
 pub enum PromptType {
     ChooseCharacter { valid: BitSet<usize> },
     ChooseStackCard { valid: BitSet<usize> },
-    Choose { choices: SmallVec<[PromptChoice; 2]> },
+    Choose { choices: Vec<PromptChoice> },
     ChooseEnergyValue { minimum: Energy, current: Energy, maximum: Energy },
 }
 
@@ -57,7 +56,7 @@ pub struct PromptChoice {
 
     /// Effect to apply when this choice is selected. This effect is resolved as
     /// applied by the 'controller' player.
-    pub effect: &'static Effect,
+    pub effect: Effect,
 
     /// Optionally, targets to apply the effect to.
     pub targets: StackCardTargets,
@@ -65,6 +64,6 @@ pub struct PromptChoice {
 
 #[derive(Debug, Clone, Copy)]
 pub enum PromptChoiceLabel {
-    Resolve,
+    Decline,
     PayEnergy(Energy),
 }
