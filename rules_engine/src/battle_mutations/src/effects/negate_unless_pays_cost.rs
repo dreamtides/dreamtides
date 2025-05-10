@@ -21,7 +21,7 @@ pub fn execute(
     targets: &StackCardTargets,
     cost: &Cost,
 ) {
-    if costs::can_pay(battle, source.controller().opponent(), &cost) {
+    if costs::can_pay(battle, source.controller().opponent(), cost) {
         prompts::set(battle, PromptData {
             source,
             player: source.controller().opponent(),

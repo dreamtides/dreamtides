@@ -97,8 +97,8 @@ impl AllCards {
         self.banished.cards(player_name)
     }
 
-    /// Creates a card instance in its associated zone and assigns a [CardId] to
-    /// it. The expected way to call this method is by passing a [CardData]
+    /// Creates a card instance in its associated zone and assigns a [CardIdent]
+    /// to  it. The expected way to call this method is by passing a [CardData]
     /// which has been assigned the default CardId.
     ///
     /// This does *not* make the card revealed to any player.

@@ -1,4 +1,3 @@
-use ability_data::cost::Cost;
 use ability_data::effect::Effect;
 use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
@@ -9,7 +8,7 @@ use battle_state::core::effect_source::EffectSource;
 
 use crate::card_mutations::{deck, negate};
 use crate::character_mutations::dissolve;
-use crate::effects::{negate_unless_pays_cost, targeting};
+use crate::effects::{negate_unless_pays_cost, pay_cost, targeting};
 
 pub fn execute(
     battle: &mut BattleState,
@@ -38,8 +37,12 @@ fn apply_standard_effect(
         StandardEffect::NegateUnlessPaysCost { cost, .. } => {
             negate_unless_pays_cost::execute(battle, source, targets, cost)
         }
-        StandardEffect::OpponentPaysCost { cost } => opponent_pays_cost(battle, source, cost),
-        StandardEffect::PayCost { cost } => pay_cost(battle, source, cost),
+        StandardEffect::OpponentPaysCost { cost } => {
+            pay_cost::execute(battle, source, source.controller().opponent(), cost)
+        }
+        StandardEffect::PayCost { cost } => {
+            pay_cost::execute(battle, source, source.controller(), cost)
+        }
         _ => todo!("Implement {:?}", effect),
     }
 }
@@ -65,7 +68,3 @@ fn negate(battle: &mut BattleState, source: EffectSource, targets: &StackCardTar
     // TODO: Get controller for negate target
     negate::execute(battle, source, source.controller().opponent(), id);
 }
-
-fn opponent_pays_cost(battle: &mut BattleState, source: EffectSource, cost: &Cost) {}
-
-fn pay_cost(battle: &mut BattleState, source: EffectSource, cost: &Cost) {}

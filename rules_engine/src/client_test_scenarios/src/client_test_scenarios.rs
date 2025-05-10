@@ -36,8 +36,9 @@ use uuid::Uuid;
 static CURRENT_BATTLE: LazyLock<Mutex<Option<BattleView>>> = LazyLock::new(|| Mutex::new(None));
 static CARD_BROWSER_SOURCE: LazyLock<Mutex<Option<Position>>> = LazyLock::new(|| Mutex::new(None));
 static ORDER_SELECTOR_VISIBLE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
-static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<Mutex<std::collections::HashMap<CardIdent, Position>>> =
-    LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
+static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<
+    Mutex<std::collections::HashMap<CardIdent, Position>>,
+> = LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
 
 pub fn connect(request: &ConnectRequest, _scenario: &str) -> ConnectResponse {
     let battle = basic_scene::create(BattleId(Uuid::new_v4()));
