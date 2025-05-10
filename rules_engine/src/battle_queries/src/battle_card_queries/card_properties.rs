@@ -23,3 +23,13 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
         CardName::Dreamscatter => CardType::Event,
     }
 }
+
+pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
+    match battle.cards.name(card_id) {
+        CardName::MinstrelOfFallingLight => false,
+        CardName::Immolate => true,
+        CardName::RippleOfDefiance => true,
+        CardName::Abolish => true,
+        CardName::Dreamscatter => true,
+    }
+}

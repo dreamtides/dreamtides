@@ -97,7 +97,7 @@ impl AllCards {
         self.banished.cards(player_name)
     }
 
-    /// Creates a card instance in its associated zone and assigns a [CardIdent]
+    /// Creates a card instance in its associated zone and assigns a sent]
     /// to  it. The expected way to call this method is by passing a [CardData]
     /// which has been assigned the default CardId.
     ///

@@ -5,6 +5,7 @@ use bit_set::BitSet;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use rand::seq::IteratorRandom;
+use rand_xoshiro::Xoshiro256PlusPlus;
 
 use crate::card_mutations::{create_test_deck, move_card};
 use crate::player_mutations::energy;
@@ -29,7 +30,7 @@ pub fn draw_card(
         return None;
     }
 
-    let Some(id) = random_element(battle.cards.deck(player)) else {
+    let Some(id) = random_element(battle.cards.deck(player), &mut battle.rng) else {
         create_test_deck::add(battle, player);
         return draw_card(battle, source, player);
     };
@@ -44,7 +45,6 @@ pub fn draw_cards(battle: &mut BattleState, source: EffectSource, player: Player
 }
 
 /// Returns a random element from the given set.
-fn random_element(set: &BitSet<usize>) -> Option<usize> {
-    let mut rng = rand::rng();
-    set.iter().choose(&mut rng)
+fn random_element(set: &BitSet<usize>, rng: &mut Xoshiro256PlusPlus) -> Option<usize> {
+    set.iter().choose(rng)
 }

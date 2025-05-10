@@ -1,0 +1,45 @@
+use ability_data::ability::Ability;
+use ability_data::cost::Cost;
+use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::card_id::{CardId, StackCardId};
+use battle_state::core::effect_source::EffectSource;
+use core_data::numerics::Energy;
+use core_data::types::PlayerName;
+
+use crate::battle_card_queries::card_abilities;
+
+/// Returns true if the given card has legal additional cost choices for its
+/// event abilities after paying the energy cost value `paid`, or if this
+/// card does not require additional cost choices.
+pub fn for_event(battle: &BattleState, player: PlayerName, card_id: CardId, paid: Energy) -> bool {
+    for (ability_number, ability) in card_abilities::query(battle, card_id) {
+        if let Ability::Event(event) = ability
+            && let Some(additional_cost) = event.additional_cost.as_ref()
+        {
+            let source = EffectSource::Event {
+                controller: player,
+                stack_card_id: StackCardId(card_id),
+                ability_number: *ability_number,
+            };
+            if !has_legal_additional_cost_choices(battle, source, additional_cost, paid) {
+                return false;
+            }
+        }
+    }
+
+    true
+}
+
+fn has_legal_additional_cost_choices(
+    battle: &BattleState,
+    source: EffectSource,
+    cost: &Cost,
+    paid: Energy,
+) -> bool {
+    match cost {
+        Cost::SpendOneOrMoreEnergy => {
+            battle.players.player(source.controller()).current_energy > paid
+        }
+        _ => todo!("Implement additional cost choices"),
+    }
+}
