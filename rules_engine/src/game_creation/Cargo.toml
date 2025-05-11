@@ -1,0 +1,20 @@
+[package]
+name = "game_creation"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+test = false
+doctest = false
+bench = false
+
+[dependencies]
+ability_data = { path = "../ability_data" }
+ai_data = { path = "../ai_data" }
+battle_mutations = { path = "../battle_mutations" }
+battle_state = { path = "../battle_state" }
+core_data = { path = "../core_data" }
+
+rand = "0.9"
+rand_xoshiro = "0.7"
+uuid = { version = "1", features = ["serde", "v4"] }

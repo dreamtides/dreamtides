@@ -1082,6 +1082,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "game_creation"
+version = "0.0.0"
+dependencies = [
+ "ability_data",
+ "ai_data",
+ "battle_mutations",
+ "battle_state",
+ "core_data",
+ "rand",
+ "rand_xoshiro",
+ "uuid",
+]
+
+[[package]]
 name = "game_creation_old"
 version = "0.0.0"
 dependencies = [
