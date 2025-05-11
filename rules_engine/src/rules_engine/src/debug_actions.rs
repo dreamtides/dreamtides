@@ -3,7 +3,7 @@ use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle_player::player_data::PlayerType;
 use core_data::identifiers::{BattleId, UserId};
 use core_data::types::PlayerName;
-use game_creation::new_battle;
+use game_creation_old::new_battle;
 use uuid::Uuid;
 
 pub fn execute(

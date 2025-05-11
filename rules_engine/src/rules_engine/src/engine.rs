@@ -14,7 +14,7 @@ use database::sqlite_database::{self, Database};
 use display::rendering::{battle_rendering, renderer};
 use display_data::command::CommandSequence;
 use display_data::request_data::{ConnectRequest, ConnectResponse, PerformActionRequest};
-use game_creation::new_battle;
+use game_creation_old::new_battle;
 use logging::battle_trace;
 use tokio::task;
 use tracing::{error, info};

@@ -21,7 +21,7 @@ core_data = { path = "../core_data" }
 database = { path = "../database" }
 display = { path = "../display" }
 display_data = { path = "../display_data" }
-game_creation = { path = "../game_creation" }
+game_creation_old = { path = "../game_creation_old" }
 logging = { path = "../logging" }
 masonry = { path = "../masonry" }
 ui_components = { path = "../ui_components" }

@@ -17,7 +17,7 @@ ai_data = { path = "../src/ai_data", version = "0.0.0" }
 battle_data_old = { path = "../src/battle_data_old", version = "0.0.0" }
 battle_queries_old = { path = "../src/battle_queries_old", version = "0.0.0" }
 core_data = { path = "../src/core_data", version = "0.0.0" }
-game_creation = { path = "../src/game_creation", version = "0.0.0" }
+game_creation_old = { path = "../src/game_creation_old", version = "0.0.0" }
 parser = { path = "../src/parser", version = "0.0.0" }
 
 tracing = "0.1"

@@ -4,7 +4,7 @@ use core_data::types::PlayerName;
 use display::core::response_builder::ResponseBuilder;
 use display::rendering::battle_rendering;
 use display_data::command::{Command, CommandSequence, UpdateBattleCommand};
-use game_creation::new_battle;
+use game_creation_old::new_battle;
 use masonry::flex_enums::{TextAlign, WhiteSpace};
 use ui_components::component::Component;
 use ui_components::panel_component::PanelComponent;

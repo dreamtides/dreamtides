@@ -9,7 +9,7 @@ use battle_queries_old::legal_action_queries::legal_actions;
 use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
 use criterion::{criterion_group, BatchSize, Criterion};
-use game_creation::new_test_battle;
+use game_creation_old::new_test_battle;
 use tracing::{subscriber, Level};
 use uuid::Uuid;
 
