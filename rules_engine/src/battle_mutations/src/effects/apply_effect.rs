@@ -3,8 +3,11 @@ use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use battle_queries::battle_player_queries::quantity_expression;
 use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::card_id::CardIdType;
 use battle_state::battle_cards::stack_card_state::StackCardTargets;
+use battle_state::battle_cards::zone::Zone;
 use battle_state::core::effect_source::EffectSource;
+use core_data::types::PlayerName;
 
 use crate::card_mutations::{deck, negate};
 use crate::character_mutations::dissolve;
@@ -16,6 +19,10 @@ pub fn execute(
     effect: &Effect,
     targets: &StackCardTargets,
 ) {
+    if !targets_are_valid(battle, source.controller(), targets) {
+        return;
+    }
+
     match effect {
         Effect::Effect(standard) => apply_standard_effect(battle, source, standard, targets),
         _ => todo!("Implement this"),
@@ -44,6 +51,25 @@ fn apply_standard_effect(
             pay_cost::execute(battle, source, source.controller(), cost)
         }
         _ => todo!("Implement {:?}", effect),
+    }
+}
+
+fn targets_are_valid(
+    battle: &BattleState,
+    controller: PlayerName,
+    targets: &StackCardTargets,
+) -> bool {
+    // TODO: Get correct target player
+    match targets {
+        StackCardTargets::Character(character_id) => battle.cards.contains_card(
+            controller.opponent(),
+            character_id.card_id(),
+            Zone::Battlefield,
+        ),
+        StackCardTargets::StackCard(stack_card_id) => {
+            battle.cards.contains_card(controller.opponent(), stack_card_id.card_id(), Zone::Stack)
+        }
+        StackCardTargets::None => true,
     }
 }
 

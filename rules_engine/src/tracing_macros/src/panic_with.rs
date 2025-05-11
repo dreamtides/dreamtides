@@ -31,17 +31,22 @@
 macro_rules! panic_with {
     ($message:expr, $battle:expr) => {{
         tracing::error!($message);
+        eprintln!("Error: {}", $message);
         $crate::snapshot($battle);
         panic!("Error: {}", $message);
     }};
     ($message:expr, $battle:expr, $($key:ident),* $(,)?) => {{
             $( let $key = &$key; )*
             tracing::error!(message = %$message, $($key = ?$key),*);
+            eprintln!("Error: {}", $message);
+            $(eprintln!("  {}: {:?}", stringify!($key), $key);)*
             $crate::snapshot($battle);
             panic!("Error: {}", $message);
     }};
     ($message:expr, $battle:expr, $($key:ident = $value:expr),* $(,)?) => {{
         tracing::error!(message = %$message, $($key = ?$value),*);
+        eprintln!("Error: {}", $message);
+        $(eprintln!("  {}: {:?}", stringify!($key), $value);)*
         $crate::snapshot($battle);
         panic!("Error: {}", $message);
     }};

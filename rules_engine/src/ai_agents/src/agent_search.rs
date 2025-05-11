@@ -21,7 +21,7 @@ pub fn select_action(battle: &BattleState, player: PlayerName, game_ai: &GameAI)
 
     let legal_actions = legal_actions::compute(battle, player);
     if legal_actions.is_empty() {
-        panic_with!("No legal actions available for player", battle, player);
+        panic_with!("No legal actions available for player", battle, player, legal_actions);
     }
 
     if legal_actions.len() == 1 {

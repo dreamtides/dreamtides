@@ -10,7 +10,7 @@ pub fn character_id(battle: &mut BattleState, targets: &StackCardTargets) -> Cha
     match targets {
         StackCardTargets::Character(character_id) => *character_id,
         _ => {
-            panic_with!("Stack card targets should be a character", battle)
+            panic_with!("Card targets should be a character", battle)
         }
     }
 }
@@ -22,7 +22,7 @@ pub fn stack_card_id(battle: &BattleState, targets: &StackCardTargets) -> StackC
     match targets {
         StackCardTargets::StackCard(stack_card_id) => *stack_card_id,
         _ => {
-            panic_with!("Stack card targets should be a stack card", battle)
+            panic_with!("Card targets should be a stack card", battle)
         }
     }
 }

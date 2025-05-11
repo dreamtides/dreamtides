@@ -9,6 +9,7 @@ pub fn character(battle: &mut BattleState, character_id: CharacterId) {
         panic_with!("No active stack", battle);
     };
     stack_card.targets = StackCardTargets::Character(character_id);
+    battle.prompt = None;
 }
 
 /// Selects a card on the stack as a target of another card on the stack.
@@ -17,4 +18,5 @@ pub fn on_stack(battle: &mut BattleState, stack_card_id: StackCardId) {
         panic_with!("No active stack", battle);
     };
     stack_card.targets = StackCardTargets::StackCard(stack_card_id);
+    battle.prompt = None;
 }

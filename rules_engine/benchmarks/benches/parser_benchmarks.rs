@@ -2,12 +2,11 @@ use std::fs;
 use std::path::Path;
 use std::time::Duration;
 
-use criterion::{criterion_group, criterion_main, BatchSize, Criterion};
+use criterion::{criterion_group, BatchSize, Criterion};
 use parser::ability_parser;
 use tracing::{subscriber, Level};
 
 criterion_group!(parser_benchmarks, parse_abilities);
-criterion_main!(parser_benchmarks);
 
 pub fn parse_abilities(c: &mut Criterion) {
     let mut group = c.benchmark_group("parse_abilities");

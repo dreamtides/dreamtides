@@ -105,10 +105,10 @@ impl LegalActions {
             | LegalActions::NoActionsOpponentPriority
             | LegalActions::NoActionsInCurrentPhase => true,
             LegalActions::Standard { .. } => false,
-            LegalActions::SelectCharacterPrompt { valid } => !valid.is_empty(),
-            LegalActions::SelectStackCardPrompt { valid } => !valid.is_empty(),
-            LegalActions::SelectPromptChoicePrompt { choice_count } => *choice_count > 0,
-            LegalActions::SelectEnergyValuePrompt { minimum, maximum } => maximum >= minimum,
+            LegalActions::SelectCharacterPrompt { valid } => valid.is_empty(),
+            LegalActions::SelectStackCardPrompt { valid } => valid.is_empty(),
+            LegalActions::SelectPromptChoicePrompt { choice_count } => *choice_count == 0,
+            LegalActions::SelectEnergyValuePrompt { minimum, maximum } => maximum < minimum,
         }
     }
 
