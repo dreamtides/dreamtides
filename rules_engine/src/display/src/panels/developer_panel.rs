@@ -1,6 +1,6 @@
-use action_data::debug_action_data::DebugAction;
-use action_data::game_action_data::GameAction;
-use action_data::panel_address::PanelAddress;
+use action_data_old::debug_action_data::DebugAction;
+use action_data_old::game_action_data::GameAction;
+use action_data_old::panel_address::PanelAddress;
 use battle_data_old::actions::battle_action_data::{BattleAction, DebugBattleAction};
 use bon::Builder;
 use core_data::numerics::Energy;

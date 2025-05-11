@@ -1,4 +1,4 @@
-use action_data::game_action_data::GameAction;
+use action_data_old::game_action_data::GameAction;
 use battle_data_old::actions::battle_action_data::BattleAction;
 use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle_cards::card_data::CardData;

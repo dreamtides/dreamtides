@@ -1,4 +1,4 @@
-use action_data::debug_action_data::DebugAction;
+use action_data_old::debug_action_data::DebugAction;
 use ai_data::game_ai::GameAI;
 use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle_player::player_data::PlayerType;

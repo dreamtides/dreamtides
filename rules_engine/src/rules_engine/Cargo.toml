@@ -9,7 +9,7 @@ doctest = false
 bench = false
 
 [dependencies]
-action_data = { path = "../action_data" }
+action_data_old = { path = "../action_data_old" }
 actions = { path = "../actions" }
 ai_agents = { path = "../ai_agents" }
 ai_data = { path = "../ai_data" }

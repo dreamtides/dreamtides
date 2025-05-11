@@ -1,7 +1,7 @@
 use std::sync::{LazyLock, Mutex};
 
-use action_data::game_action_data::GameAction;
-use action_data::panel_address::PanelAddress;
+use action_data_old::game_action_data::GameAction;
+use action_data_old::panel_address::PanelAddress;
 use assert_with::{assert_that, expect, panic_with};
 use battle_data_old::actions::battle_action_data::BattleAction;
 use battle_data_old::battle::battle_status::BattleStatus;

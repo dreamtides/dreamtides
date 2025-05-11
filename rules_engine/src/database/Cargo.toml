@@ -10,7 +10,7 @@ bench = false
 
 [dependencies]
 ai_data = { path = "../ai_data" }
-action_data = { path = "../action_data" }
+action_data_old = { path = "../action_data_old" }
 battle_data_old = { path = "../battle_data_old" }
 core_data = { path = "../core_data" }
 quest_data = { path = "../quest_data" }

@@ -1,4 +1,4 @@
-use action_data::game_action_data::GameAction;
+use action_data_old::game_action_data::GameAction;
 use core_data::display_color::DisplayColor;
 use core_data::display_types::{AudioClipAddress, ProjectileAddress, SpriteAddress};
 use core_data::identifiers::CardIdent;

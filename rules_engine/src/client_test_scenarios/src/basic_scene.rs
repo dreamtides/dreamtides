@@ -1,5 +1,5 @@
-use action_data::debug_action_data::DebugAction;
-use action_data::game_action_data::GameAction;
+use action_data_old::debug_action_data::DebugAction;
+use action_data_old::game_action_data::GameAction;
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::{AudioClipAddress, SpriteAddress};
 use core_data::identifiers::{BattleId, CardIdent};

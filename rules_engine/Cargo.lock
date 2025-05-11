@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "action_data"
+name = "action_data_old"
 version = "0.0.0"
 dependencies = [
  "ai_data",
@@ -26,7 +26,7 @@ dependencies = [
 name = "actions"
 version = "0.0.0"
 dependencies = [
- "action_data",
+ "action_data_old",
  "assert_with",
  "battle_data_old",
  "battle_mutations_old",
@@ -76,7 +76,7 @@ dependencies = [
 name = "ai_agents"
 version = "0.0.0"
 dependencies = [
- "action_data",
+ "action_data_old",
  "ai_core",
  "ai_data",
  "ai_game_integration_old",
@@ -110,7 +110,7 @@ dependencies = [
 name = "ai_game_integration_old"
 version = "0.0.0"
 dependencies = [
- "action_data",
+ "action_data_old",
  "actions",
  "ai_core",
  "ai_monte_carlo",
@@ -415,7 +415,7 @@ name = "battle_queries"
 version = "0.0.0"
 dependencies = [
  "ability_data",
- "action_data",
+ "action_data_old",
  "assert_with",
  "battle_state",
  "bit-set",
@@ -428,7 +428,7 @@ name = "battle_queries_old"
 version = "0.0.0"
 dependencies = [
  "ability_data",
- "action_data",
+ "action_data_old",
  "assert_with",
  "battle_data_old",
  "core_data",
@@ -462,7 +462,7 @@ dependencies = [
 name = "benchmarks"
 version = "0.0.0"
 dependencies = [
- "action_data",
+ "action_data_old",
  "actions",
  "ai_agents",
  "ai_data",
@@ -689,7 +689,7 @@ checksum = "f46ad14479a25103f283c0f10005961cf086d8dc42205bb44c46ac563475dca6"
 name = "client_test_scenarios"
 version = "0.0.0"
 dependencies = [
- "action_data",
+ "action_data_old",
  "battle_data_old",
  "core_data",
  "display_data",
@@ -843,7 +843,7 @@ dependencies = [
 name = "database"
 version = "0.0.0"
 dependencies = [
- "action_data",
+ "action_data_old",
  "ai_data",
  "battle_data_old",
  "core_data",
@@ -900,7 +900,7 @@ dependencies = [
 name = "display"
 version = "0.0.0"
 dependencies = [
- "action_data",
+ "action_data_old",
  "ai_data",
  "assert_with",
  "battle_data_old",
@@ -916,7 +916,7 @@ dependencies = [
 name = "display_data"
 version = "0.0.0"
 dependencies = [
- "action_data",
+ "action_data_old",
  "battle_data_old",
  "core_data",
  "masonry",
@@ -1406,7 +1406,7 @@ dependencies = [
 name = "masonry"
 version = "0.0.0"
 dependencies = [
- "action_data",
+ "action_data_old",
  "bon",
  "core_data",
  "schemars",
@@ -1873,7 +1873,7 @@ dependencies = [
 name = "rules_engine"
 version = "0.0.0"
 dependencies = [
- "action_data",
+ "action_data_old",
  "actions",
  "ai_agents",
  "ai_data",
@@ -2422,7 +2422,7 @@ dependencies = [
 name = "ui_components"
 version = "0.0.0"
 dependencies = [
- "action_data",
+ "action_data_old",
  "asset_paths",
  "bon",
  "core_data",
