@@ -1,5 +1,5 @@
 [package]
-name = "ai_game_integration"
+name = "ai_game_integration_old"
 version = "0.0.0"
 license = "Apache-2.0"
 edition = "2021"

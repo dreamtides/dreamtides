@@ -16,7 +16,7 @@ test = false
 
 [dependencies]
 ai_core = { path = "../ai_core", version = "0.0.0" }
-ai_game_integration = { path = "../ai_game_integration", version = "0.0.0" }
+ai_game_integration_old = { path = "../ai_game_integration_old", version = "0.0.0" }
 ai_monte_carlo = { path = "../ai_monte_carlo", version = "0.0.0" }
 ai_tree_search = { path = "../ai_tree_search", version = "0.0.0" }
 battle_data_old = { path = "../battle_data_old", version = "0.0.0" }

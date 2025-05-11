@@ -79,7 +79,7 @@ dependencies = [
  "action_data",
  "ai_core",
  "ai_data",
- "ai_game_integration",
+ "ai_game_integration_old",
  "ai_monte_carlo",
  "ai_tree_search",
  "assert_with",
@@ -107,7 +107,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ai_game_integration"
+name = "ai_game_integration_old"
 version = "0.0.0"
 dependencies = [
  "action_data",
@@ -137,7 +137,7 @@ name = "ai_testing"
 version = "0.0.0"
 dependencies = [
  "ai_core",
- "ai_game_integration",
+ "ai_game_integration_old",
  "ai_monte_carlo",
  "ai_tree_search",
  "battle_data_old",

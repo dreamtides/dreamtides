@@ -1,7 +1,7 @@
 use ai_core::agent::{Agent, AgentConfig, AgentData};
 use ai_data::game_ai::GameAI;
-use ai_game_integration::evaluators::WinLossEvaluator;
-use ai_game_integration::state_node::AgentBattleState;
+use ai_game_integration_old::evaluators::WinLossEvaluator;
+use ai_game_integration_old::state_node::AgentBattleState;
 use ai_monte_carlo::monte_carlo::{MonteCarloAlgorithm, RandomPlayoutEvaluator};
 use ai_monte_carlo::uct1::Uct1;
 use ai_tree_search::iterative_deepening_search::IterativeDeepeningSearch;
@@ -35,7 +35,7 @@ pub fn select_action(battle: &BattleData, player: PlayerName, game_ai: &GameAI) 
         ai_agents=debug,\
         ai_core=debug,\
         ai_data=debug,\
-        ai_game_integration=debug,\
+        ai_game_integration_old=debug,\
         ai_monte_carlo=debug,\
         ai_testing=debug,\
         ai_tree_search=debug,",
