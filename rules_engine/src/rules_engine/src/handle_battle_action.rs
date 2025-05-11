@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::sync::{LazyLock, Mutex};
 
 use actions::battle_actions;
-use ai_agents::agent_search;
+use ai_agents_old::agent_search;
 use battle_data_old::actions::battle_action_data::BattleAction;
 use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle_animations::animation_data::AnimationData;

@@ -73,7 +73,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ai_agents"
+name = "ai_agents_old"
 version = "0.0.0"
 dependencies = [
  "action_data_old",
@@ -464,7 +464,7 @@ version = "0.0.0"
 dependencies = [
  "action_data_old",
  "actions",
- "ai_agents",
+ "ai_agents_old",
  "ai_data",
  "battle_data_old",
  "battle_queries_old",
@@ -1875,7 +1875,7 @@ version = "0.0.0"
 dependencies = [
  "action_data_old",
  "actions",
- "ai_agents",
+ "ai_agents_old",
  "ai_data",
  "assert_with",
  "backtrace",

@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use actions::battle_actions;
-use ai_agents::agent_search;
+use ai_agents_old::agent_search;
 use ai_data::game_ai::GameAI;
 use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle_player::player_data::PlayerType;
