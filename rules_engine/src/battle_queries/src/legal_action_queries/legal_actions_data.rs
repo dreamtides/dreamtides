@@ -98,6 +98,46 @@ impl LegalActions {
         }
     }
 
+    pub fn is_empty(&self) -> bool {
+        match self {
+            LegalActions::NoActionsGameOver
+            | LegalActions::NoActionsOpponentPrompt
+            | LegalActions::NoActionsOpponentPriority
+            | LegalActions::NoActionsInCurrentPhase => true,
+            LegalActions::Standard { .. } => false,
+            LegalActions::SelectCharacterPrompt { valid } => !valid.is_empty(),
+            LegalActions::SelectStackCardPrompt { valid } => !valid.is_empty(),
+            LegalActions::SelectPromptChoicePrompt { choice_count } => *choice_count > 0,
+            LegalActions::SelectEnergyValuePrompt { minimum, maximum } => maximum >= minimum,
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        match self {
+            LegalActions::NoActionsGameOver
+            | LegalActions::NoActionsOpponentPrompt
+            | LegalActions::NoActionsOpponentPriority
+            | LegalActions::NoActionsInCurrentPhase => 0,
+
+            LegalActions::Standard { actions } => {
+                let primary_count = 1;
+                let play_cards_count = actions.play_card_from_hand.len();
+                primary_count + play_cards_count
+            }
+
+            LegalActions::SelectCharacterPrompt { valid } => valid.len(),
+            LegalActions::SelectStackCardPrompt { valid } => valid.len(),
+            LegalActions::SelectPromptChoicePrompt { choice_count } => *choice_count,
+            LegalActions::SelectEnergyValuePrompt { minimum, maximum } => {
+                if maximum >= minimum {
+                    (maximum.0 - minimum.0 + 1) as usize
+                } else {
+                    0
+                }
+            }
+        }
+    }
+
     pub fn all(&self) -> Vec<BattleAction> {
         match self {
             LegalActions::NoActionsGameOver
