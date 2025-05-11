@@ -107,6 +107,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "ai_game_integration"
+version = "0.0.0"
+dependencies = [
+ "action_data_old",
+ "actions",
+ "ai_core",
+ "ai_monte_carlo",
+ "ai_tree_search",
+ "battle_mutations",
+ "battle_queries",
+ "battle_state",
+ "core_data",
+ "rand",
+ "rand_xoshiro",
+ "tracing",
+ "tracing_macros",
+]
+
+[[package]]
 name = "ai_game_integration_old"
 version = "0.0.0"
 dependencies = [

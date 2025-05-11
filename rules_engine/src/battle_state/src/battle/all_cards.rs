@@ -67,6 +67,14 @@ impl AllCards {
         self.battlefield_state.player(player)
     }
 
+    /// Mutable equivalent to [Self::battlefield_state]
+    pub fn battlefield_state_mut(
+        &mut self,
+        player: PlayerName,
+    ) -> &mut SmallMap<8, CharacterId, CharacterState> {
+        self.battlefield_state.player_mut(player)
+    }
+
     /// Returns true if a stack is currently active.
     pub fn has_stack(&self) -> bool {
         !self.stack.is_empty()

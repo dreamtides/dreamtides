@@ -1,11 +1,13 @@
+use battle_queries::battle_card_queries::card_properties;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{
     CardIdType, CharacterId, DeckCardId, HandCardId, StackCardId, VoidCardId,
 };
+use battle_state::battle_cards::character_state::CharacterState;
 use battle_state::battle_cards::zone::Zone;
 use battle_state::core::effect_source::EffectSource;
 use core_data::types::PlayerName;
-use tracing_macros::assert_that;
+use tracing_macros::{assert_that, panic_with};
 
 /// Moves a card from the 'controller' player's hand to the stack.
 ///
@@ -37,7 +39,9 @@ pub fn from_stack_to_battlefield(
         Zone::Stack,
         Zone::Battlefield,
     );
-    CharacterId(card_id.card_id())
+    let id = CharacterId(card_id.card_id());
+    write_character_state(battle, controller, id);
+    id
 }
 
 /// Moves a card from the stack to the 'controller' player's void.
@@ -106,4 +110,11 @@ pub fn to_destination_zone(
         new
     );
     battle.cards.move_card(controller, id.card_id(), old, new);
+}
+
+fn write_character_state(battle: &mut BattleState, controller: PlayerName, id: CharacterId) {
+    let Some(spark) = card_properties::base_spark(battle, id) else {
+        panic_with!("Character has no base spark value", battle, id);
+    };
+    battle.cards.battlefield_state_mut(controller).insert(id, CharacterState { spark });
 }

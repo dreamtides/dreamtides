@@ -1,5 +1,5 @@
 use battle_state::actions::battle_actions::BattleAction;
-use battle_state::battle::card_id::CardIdType;
+use battle_state::battle::card_id::{CardId, CardIdType, CharacterId, HandCardId, StackCardId};
 use bit_set::BitSet;
 use core_data::numerics::Energy;
 
@@ -95,6 +95,49 @@ impl LegalActions {
             BattleAction::CloseCardBrowser => true,
             BattleAction::ToggleOrderSelectorVisibility => true,
             BattleAction::SubmitMulligan => todo!("Implement this"),
+        }
+    }
+
+    pub fn all(&self) -> Vec<BattleAction> {
+        match self {
+            LegalActions::NoActionsGameOver
+            | LegalActions::NoActionsOpponentPrompt
+            | LegalActions::NoActionsOpponentPriority
+            | LegalActions::NoActionsInCurrentPhase => vec![],
+
+            LegalActions::Standard { actions } => {
+                let mut result = vec![];
+
+                match actions.primary {
+                    PrimaryLegalAction::PassPriority => result.push(BattleAction::PassPriority),
+                    PrimaryLegalAction::EndTurn => result.push(BattleAction::EndTurn),
+                    PrimaryLegalAction::StartNextTurn => result.push(BattleAction::StartNextTurn),
+                }
+
+                for card_id in actions.play_card_from_hand.iter() {
+                    result.push(BattleAction::PlayCardFromHand(HandCardId(CardId(card_id))));
+                }
+
+                result
+            }
+
+            LegalActions::SelectCharacterPrompt { valid } => valid
+                .iter()
+                .map(|card_id| BattleAction::SelectCharacterTarget(CharacterId(CardId(card_id))))
+                .collect::<Vec<_>>(),
+
+            LegalActions::SelectStackCardPrompt { valid } => valid
+                .iter()
+                .map(|card_id| BattleAction::SelectStackCardTarget(StackCardId(CardId(card_id))))
+                .collect::<Vec<_>>(),
+
+            LegalActions::SelectPromptChoicePrompt { choice_count } => {
+                (0..*choice_count).map(BattleAction::SelectPromptChoice).collect::<Vec<_>>()
+            }
+
+            LegalActions::SelectEnergyValuePrompt { minimum, maximum } => (minimum.0..=maximum.0)
+                .map(|e| BattleAction::SelectEnergyAdditionalCost(Energy(e)))
+                .collect::<Vec<_>>(),
         }
     }
 }

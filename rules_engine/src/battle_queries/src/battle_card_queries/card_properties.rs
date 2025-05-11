@@ -2,7 +2,7 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardIdType;
 use core_data::card_types::{CardType, CharacterType};
 use core_data::identifiers::CardName;
-use core_data::numerics::Energy;
+use core_data::numerics::{Energy, Spark};
 
 pub fn cost(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
     match battle.cards.name(card_id) {
@@ -11,6 +11,13 @@ pub fn cost(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
         CardName::RippleOfDefiance => Some(Energy(1)),
         CardName::Abolish => Some(Energy(2)),
         CardName::Dreamscatter => Some(Energy(1)),
+    }
+}
+
+pub fn base_spark(battle: &BattleState, card_id: impl CardIdType) -> Option<Spark> {
+    match battle.cards.name(card_id) {
+        CardName::MinstrelOfFallingLight => Some(Spark(5)),
+        _ => None,
     }
 }
 
