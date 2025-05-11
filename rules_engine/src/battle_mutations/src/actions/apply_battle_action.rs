@@ -1,4 +1,4 @@
-use battle_queries::legal_action_queries::legal_actions::{self, LegalActionOptions};
+use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::prompt_types::prompt_data::PromptType;
@@ -14,10 +14,9 @@ use crate::prompt_mutations::{select_additional_costs, select_choice_prompt_at_i
 #[instrument(name = "apply_battle_action", level = "debug", skip(battle))]
 pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleAction) {
     battle_trace!("Executing action", battle, player, action);
-    let legal_actions =
-        legal_actions::compute(battle, player, LegalActionOptions { for_human_player: true });
+    let legal_actions = legal_actions::compute(battle, player);
 
-    if !legal_actions.is_legal(action) {
+    if !legal_actions.contains(action) {
         panic_with!("Action is not legal", battle, action);
     }
 

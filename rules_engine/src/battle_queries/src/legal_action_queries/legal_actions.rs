@@ -9,16 +9,7 @@ use crate::legal_action_queries::legal_actions_data::{
     LegalActions, PrimaryLegalAction, StandardLegalActions,
 };
 
-#[derive(Debug, Clone)]
-pub struct LegalActionOptions {
-    pub for_human_player: bool,
-}
-
-pub fn compute(
-    battle: &BattleState,
-    player: PlayerName,
-    _options: LegalActionOptions,
-) -> LegalActions {
+pub fn compute(battle: &BattleState, player: PlayerName) -> LegalActions {
     if matches!(battle.status, BattleStatus::GameOver { .. }) {
         return LegalActions::NoActionsGameOver;
     }
@@ -79,6 +70,30 @@ pub fn compute(
         }
     } else {
         LegalActions::NoActionsInCurrentPhase
+    }
+}
+
+/// Returns the player who is next to act.
+///
+/// Returns None if the game is over or if invoked during a turn phase in which
+/// no player can act.
+pub fn next_to_act(battle: &BattleState) -> Option<PlayerName> {
+    if matches!(battle.status, BattleStatus::GameOver { .. }) {
+        return None;
+    }
+
+    if let Some(prompt_data) = &battle.prompt {
+        return Some(prompt_data.player);
+    }
+
+    if let Some(priority) = battle.stack_priority {
+        Some(priority)
+    } else if battle.phase == BattleTurnPhase::Main {
+        Some(battle.turn.active_player)
+    } else if battle.phase == BattleTurnPhase::Ending {
+        Some(battle.turn.active_player.opponent())
+    } else {
+        None
     }
 }
 

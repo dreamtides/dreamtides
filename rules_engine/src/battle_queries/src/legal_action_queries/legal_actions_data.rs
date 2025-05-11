@@ -30,7 +30,7 @@ pub enum PrimaryLegalAction {
 }
 
 impl LegalActions {
-    pub fn is_legal(&self, action: BattleAction) -> bool {
+    pub fn contains(&self, action: BattleAction) -> bool {
         match action {
             BattleAction::Debug(..) => true,
             BattleAction::PlayCardFromHand(hand_card_id) => {
