@@ -2,54 +2,12 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::prompt_types::prompt_data::PromptType;
-use bit_set::BitSet;
-use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 
 use crate::legal_action_queries::can_play_cards::{self, FastOnly};
-
-#[derive(Debug, Clone)]
-pub enum LegalActions {
-    NoActionsGameOver,
-    NoActionsOpponentPrompt,
-    NoActionsOpponentPriority,
-    NoActionsInCurrentPhase,
-    Standard {
-        actions: StandardLegalActions,
-    },
-    SelectCharacterPrompt {
-        valid: BitSet<usize>,
-    },
-    SelectStackCardPrompt {
-        valid: BitSet<usize>,
-    },
-    SelectPromptChoicePrompt {
-        choice_count: usize,
-    },
-    SelectEnergyValuePrompt {
-        minimum: Energy,
-        maximum: Energy,
-    },
-    SelectEnergyValuePromptForHumanPlayer {
-        minimum: Energy,
-        maximum: Energy,
-        can_decrement: bool,
-        can_increment: bool,
-    },
-}
-
-#[derive(Debug, Clone)]
-pub struct StandardLegalActions {
-    pub primary: PrimaryLegalAction,
-    pub play_card_from_hand: BitSet<usize>,
-}
-
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
-pub enum PrimaryLegalAction {
-    PassPriority,
-    EndTurn,
-    StartNextTurn,
-}
+use crate::legal_action_queries::legal_actions_data::{
+    LegalActions, PrimaryLegalAction, StandardLegalActions,
+};
 
 #[derive(Debug, Clone)]
 pub struct LegalActionOptions {
@@ -59,7 +17,7 @@ pub struct LegalActionOptions {
 pub fn compute(
     battle: &BattleState,
     player: PlayerName,
-    options: LegalActionOptions,
+    _options: LegalActionOptions,
 ) -> LegalActions {
     if matches!(battle.status, BattleStatus::GameOver { .. }) {
         return LegalActions::NoActionsGameOver;
@@ -82,17 +40,8 @@ pub fn compute(
             PromptType::Choose { choices } => {
                 LegalActions::SelectPromptChoicePrompt { choice_count: choices.len() }
             }
-            PromptType::ChooseEnergyValue { minimum, current, maximum } => {
-                if options.for_human_player {
-                    LegalActions::SelectEnergyValuePromptForHumanPlayer {
-                        minimum: *minimum,
-                        maximum: *maximum,
-                        can_decrement: *current > *minimum,
-                        can_increment: *current < *maximum,
-                    }
-                } else {
-                    LegalActions::SelectEnergyValuePrompt { minimum: *minimum, maximum: *maximum }
-                }
+            PromptType::ChooseEnergyValue { minimum, maximum, .. } => {
+                LegalActions::SelectEnergyValuePrompt { minimum: *minimum, maximum: *maximum }
             }
         };
     }

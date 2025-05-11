@@ -2,6 +2,7 @@ use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
 use rand_xoshiro::Xoshiro256PlusPlus;
 
+use crate::actions::battle_actions::BattleAction;
 use crate::battle::all_cards::AllCards;
 use crate::battle::animation_data::{AnimationData, AnimationStep};
 use crate::battle::battle_animation::BattleAnimation;
@@ -109,6 +110,13 @@ impl BattleState {
                 history: None,
             };
             animations.steps.push(AnimationStep { snapshot, animation: update() });
+        }
+    }
+
+    /// Adds a new action to the history of this battle.
+    pub fn push_history_action(&mut self, player: PlayerName, action: BattleAction) {
+        if let Some(history) = &mut self.history {
+            history.push_action(player, action);
         }
     }
 }
