@@ -347,14 +347,6 @@ impl<TScoreAlgorithm: ChildScoreAlgorithm> MonteCarloAlgorithm<TScoreAlgorithm> 
                 scored_actions.iter().enumerate().take(display_count)
             {
                 let is_legal = legal.contains(action);
-                let legal_str =
-                    legal.iter().map(|a| format!("{:?}", a)).collect::<Vec<_>>().join(", ");
-                assert!(
-                    is_legal,
-                    "Action {:?} is not legal, legal actions are {:?}",
-                    action, legal_str
-                );
-
                 debug!(
                     "  Action {}: {:?} Score={:.4}, Visits={}, Reward={:.4}, Legal={}",
                     i + 1,

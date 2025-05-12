@@ -17,18 +17,12 @@ use crate::debug_battle_action;
 #[instrument(name = "actions_execute", level = "debug", skip(battle))]
 pub fn execute(battle: &mut BattleData, player: PlayerName, action: BattleAction) {
     battle_trace!("Executing action", battle, player, action);
-    let legal = legal_actions::compute(battle, player, LegalActions { for_human_player: true });
+    if battle.tracing.is_some() {
+        let legal = legal_actions::compute(battle, player, LegalActions { for_human_player: true });
 
-    if let Some(PromptType::ChooseEnergyValue { minimum, current, maximum }) =
-        battle.prompt.as_mut().map(|p| &mut p.prompt_type)
-    {
-        battle_trace!("Energy prompt is", battle, player, minimum, current, maximum);
-    } else {
-        battle_trace!("No energy prompt", battle, player);
-    }
-
-    if !legal.contains(&action) {
-        panic_with!(battle, "Action {:?} is not legal,\nLegal Actions: {:?}", action, legal);
+        if !legal.contains(&action) {
+            panic_with!(battle, "Action {:?} is not legal,\nLegal Actions: {:?}", action, legal);
+        }
     }
 
     match action {

@@ -41,7 +41,19 @@ pub fn select_action(battle: &BattleState, player: PlayerName, game_ai: &GameAI)
     );
     let forest_subscriber =
         tracing_subscriber::registry().with(logging::create_forest_layer(filter));
-    subscriber::with_default(forest_subscriber, || match game_ai {
+    subscriber::with_default(forest_subscriber, || select_action_unchecked(battle, player, game_ai))
+}
+
+/// Selects an action for the given player using the given AI agent, without
+/// checking for validity.
+///
+/// Mostly intended for use in benchmarking agents.
+pub fn select_action_unchecked(
+    battle: &BattleState,
+    player: PlayerName,
+    game_ai: &GameAI,
+) -> BattleAction {
+    match game_ai {
         GameAI::AlwaysPanic => panic!("Always panic agent called for an action"),
         GameAI::FirstAvailableAction => first_available_action(battle, player),
         GameAI::RandomAction => random_action(battle, player),
@@ -50,7 +62,7 @@ pub fn select_action(battle: &BattleState, player: PlayerName, game_ai: &GameAI)
         GameAI::Uct1MaxIterations(max_iterations) => {
             uct1_action(battle, 1000, Some(*max_iterations))
         }
-    })
+    }
 }
 
 fn first_available_action(battle: &BattleState, player: PlayerName) -> BattleAction {

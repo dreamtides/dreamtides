@@ -5,11 +5,12 @@ use ai_agents_old::agent_search;
 use ai_data::game_ai::GameAI;
 use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle_player::player_data::PlayerType;
-use battle_queries_old::legal_action_queries::legal_actions;
+use battle_queries_old::legal_action_queries::legal_actions::{self, LegalActions};
 use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
 use criterion::{criterion_group, BatchSize, Criterion};
 use game_creation_old::new_test_battle;
+use rand::seq::IteratorRandom;
 use tracing::{subscriber, Level};
 use uuid::Uuid;
 
@@ -61,7 +62,7 @@ pub fn old_uct1_first_action(c: &mut Criterion) {
                     )
                 },
                 |battle| {
-                    criterion::black_box(agent_search::select_action(
+                    criterion::black_box(agent_search::select_action_unchecked(
                         &battle,
                         PlayerName::One,
                         &GameAI::Uct1MaxIterations(1000),
@@ -75,10 +76,9 @@ pub fn old_uct1_first_action(c: &mut Criterion) {
 
 fn run_battle_until_completion(battle: &mut BattleData) {
     while let Some(player) = legal_actions::next_to_act(battle) {
-        let PlayerType::Agent(agent) = &battle.player(player).player_type else {
-            panic!("Player has no agent");
-        };
-        let action = agent_search::select_action(battle, player, agent);
+        let actions =
+            legal_actions::compute(battle, player, LegalActions { for_human_player: false });
+        let action = *actions.iter().choose(&mut battle.rng).unwrap();
         battle_actions::execute(battle, player, action);
     }
 }
