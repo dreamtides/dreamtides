@@ -38,7 +38,7 @@ pub fn execute(
                     PromptChoice {
                         label: PromptChoiceLabel::Decline,
                         effect: Effect::Effect(StandardEffect::Negate { target: Predicate::It }),
-                        targets: StackCardTargets::None,
+                        targets: targets.clone(),
                     },
                 ],
             },

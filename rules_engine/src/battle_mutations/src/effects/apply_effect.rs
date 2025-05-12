@@ -8,6 +8,7 @@ use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use battle_state::battle_cards::zone::Zone;
 use battle_state::core::effect_source::EffectSource;
 use core_data::types::PlayerName;
+use tracing_macros::battle_trace;
 
 use crate::card_mutations::{deck, negate};
 use crate::character_mutations::dissolve;
@@ -35,6 +36,8 @@ fn apply_standard_effect(
     effect: &StandardEffect,
     targets: &StackCardTargets,
 ) {
+    battle_trace!("Applying effect", battle, source, effect, targets);
+
     match effect {
         StandardEffect::DrawCardsForEach { count, for_each } => {
             draw_cards_for_each(battle, source, *count, for_each)
