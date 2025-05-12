@@ -32,22 +32,46 @@ macro_rules! panic_with {
     ($message:expr, $battle:expr) => {{
         tracing::error!($message);
         eprintln!("Error: {}", $message);
-        $crate::write_panic_snapshot($battle);
+        $crate::write_panic_snapshot(
+            $battle,
+            $message.to_string(),
+            std::collections::BTreeMap::new())
+        ;
         panic!("Error: {}", $message);
     }};
     ($message:expr, $battle:expr, $($key:ident),* $(,)?) => {{
-            $( let $key = &$key; )*
-            tracing::error!(message = %$message, $($key = ?$key),*);
-            eprintln!("Error: {}", $message);
-            $(eprintln!("  {}: {:?}", stringify!($key), $key);)*
-            $crate::write_panic_snapshot($battle);
-            panic!("Error: {}", $message);
+        $( let $key = &$key; )*
+        tracing::error!(message = %$message, $($key = ?$key),*);
+        eprintln!("Error: {}", $message);
+        $(eprintln!("  {}: {:?}", stringify!($key), $key);)*
+
+        let mut values = std::collections::BTreeMap::new();
+        $(
+            values.insert(stringify!($key).to_string(), format!("{:?}", $key));
+        )*
+
+        $crate::write_panic_snapshot(
+            $battle,
+            $message.to_string(),
+            values
+        );
+        panic!("Error: {}", $message);
     }};
     ($message:expr, $battle:expr, $($key:ident = $value:expr),* $(,)?) => {{
         tracing::error!(message = %$message, $($key = ?$value),*);
         eprintln!("Error: {}", $message);
         $(eprintln!("  {}: {:?}", stringify!($key), $value);)*
-        $crate::write_panic_snapshot($battle);
+
+        let mut values = std::collections::BTreeMap::new();
+        $(
+            values.insert(stringify!($key).to_string(), format!("{:?}", $value));
+        )*
+
+        $crate::write_panic_snapshot(
+            $battle,
+            $message.to_string(),
+            values
+        );
         panic!("Error: {}", $message);
     }};
 }

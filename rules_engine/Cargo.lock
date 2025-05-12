@@ -521,6 +521,7 @@ dependencies = [
  "parser",
  "tracing",
  "tracing-subscriber",
+ "tracing_macros",
  "uuid",
 ]
 

@@ -31,24 +31,17 @@
 macro_rules! assert_that {
     ($condition:expr, $message:expr, $battle:expr) => {{
         if !$condition {
-            tracing::error!($message);
-            $crate::write_panic_snapshot($battle);
-            panic!("Assertion failed: {}", $message);
+            $crate::panic_with!($message, $battle);
         }
     }};
     ($condition:expr, $message:expr, $battle:expr, $($key:ident),* $(,)?) => {{
         if !$condition {
-            $( let $key = &$key; )*
-            tracing::error!(message = %$message, $($key = ?$key),*);
-            $crate::write_panic_snapshot($battle);
-            panic!("Assertion failed: {}", $message);
+            $crate::panic_with!($message, $battle, $($key),*);
         }
     }};
     ($condition:expr, $message:expr, $battle:expr, $($key:ident = $value:expr),* $(,)?) => {{
         if !$condition {
-            tracing::error!(message = %$message, $($key = ?$value),*);
-            $crate::write_panic_snapshot($battle);
-            panic!("Assertion failed: {}", $message);
+            $crate::panic_with!($message, $battle, $($key = $value),*);
         }
     }};
 }
