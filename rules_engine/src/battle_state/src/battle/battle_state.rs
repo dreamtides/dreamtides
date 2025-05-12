@@ -9,9 +9,9 @@ use crate::battle::battle_animation::BattleAnimation;
 use crate::battle::battle_history::BattleHistory;
 use crate::battle::battle_status::BattleStatus;
 use crate::battle::battle_turn_phase::BattleTurnPhase;
-use crate::battle::player_map::PlayerMap;
 use crate::battle::turn_data::TurnData;
 use crate::battle_player::battle_player_state::BattlePlayerState;
+use crate::battle_player::player_map::PlayerMap;
 use crate::battle_trace::battle_tracing::BattleTracing;
 use crate::prompt_types::prompt_data::PromptData;
 

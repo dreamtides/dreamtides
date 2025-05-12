@@ -6,12 +6,12 @@ use small_map::SmallMap;
 use smallvec::SmallVec;
 
 use crate::battle::card_id::{CardId, CardIdType, CharacterId, StackCardId};
-use crate::battle::player_map::PlayerMap;
 use crate::battle_cards::character_state::CharacterState;
 use crate::battle_cards::stack_card_state::{
     StackCardAdditionalCostsPaid, StackCardState, StackCardTargets,
 };
 use crate::battle_cards::zone::Zone;
+use crate::battle_player::player_map::PlayerMap;
 
 #[derive(Clone, Debug, Default)]
 pub struct AllCards {
@@ -75,6 +75,11 @@ impl AllCards {
         self.battlefield_state.player_mut(player)
     }
 
+    /// Returns the set of cards in a player's void
+    pub fn void(&self, player: PlayerName) -> &BitSet<usize> {
+        self.void.player(player)
+    }
+
     /// Returns true if a stack is currently active.
     pub fn has_stack(&self) -> bool {
         !self.stack.is_empty()
@@ -95,9 +100,19 @@ impl AllCards {
         self.stack.last_mut()
     }
 
+    /// Returns all cards currently on the stack.
+    pub fn all_cards_on_stack(&self) -> &SmallVec<[StackCardState; 2]> {
+        &self.stack
+    }
+
     /// Returns the set of cards on the stack for a given player.
     pub fn stack_set(&self, player: PlayerName) -> &BitSet<usize> {
         self.stack_set.player(player)
+    }
+
+    /// Returns the set of banished cards for a given player.
+    pub fn banished(&self, player: PlayerName) -> &BitSet<usize> {
+        self.banished.player(player)
     }
 
     /// Returns all currently known Card IDs in an undefined order

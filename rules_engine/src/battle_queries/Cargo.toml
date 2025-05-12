@@ -16,4 +16,6 @@ battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 
 bit-set = "0.8"
+strum = "0.27"
+strum_macros = "0.27"
 tracing = "0.1"

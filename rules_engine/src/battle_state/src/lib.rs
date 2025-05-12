@@ -4,4 +4,5 @@ pub mod battle_cards;
 pub mod battle_player;
 pub mod battle_trace;
 pub mod core;
+pub mod debug;
 pub mod prompt_types;

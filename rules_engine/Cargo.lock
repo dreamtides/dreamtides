@@ -460,6 +460,8 @@ dependencies = [
  "battle_state",
  "bit-set",
  "core_data",
+ "strum",
+ "strum_macros",
  "tracing",
 ]
 
