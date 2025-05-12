@@ -32,7 +32,7 @@ macro_rules! panic_with {
     ($message:expr, $battle:expr) => {{
         tracing::error!($message);
         eprintln!("Error: {}", $message);
-        $crate::snapshot($battle);
+        $crate::write_panic_snapshot($battle);
         panic!("Error: {}", $message);
     }};
     ($message:expr, $battle:expr, $($key:ident),* $(,)?) => {{
@@ -40,14 +40,14 @@ macro_rules! panic_with {
             tracing::error!(message = %$message, $($key = ?$key),*);
             eprintln!("Error: {}", $message);
             $(eprintln!("  {}: {:?}", stringify!($key), $key);)*
-            $crate::snapshot($battle);
+            $crate::write_panic_snapshot($battle);
             panic!("Error: {}", $message);
     }};
     ($message:expr, $battle:expr, $($key:ident = $value:expr),* $(,)?) => {{
         tracing::error!(message = %$message, $($key = ?$value),*);
         eprintln!("Error: {}", $message);
         $(eprintln!("  {}: {:?}", stringify!($key), $value);)*
-        $crate::snapshot($battle);
+        $crate::write_panic_snapshot($battle);
         panic!("Error: {}", $message);
     }};
 }

@@ -8,7 +8,7 @@ doctest = false
 bench = false
 
 [dependencies]
-display_data = { path = "../display_data" }
+battle_queries = { path = "../battle_queries" }
 battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 

@@ -2466,9 +2466,9 @@ dependencies = [
 name = "tracing_macros"
 version = "0.0.0"
 dependencies = [
+ "battle_queries",
  "battle_state",
  "core_data",
- "display_data",
  "rand_xoshiro",
  "serde",
  "serde_json",
