@@ -1,4 +1,6 @@
 use ai_data::game_ai::GameAI;
+use battle_data_old::battle::battle_history::BattleHistory;
+use battle_data_old::battle::battle_tracing::BattleTracing;
 use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle_animations::animation_data::AnimationData;
 use battle_data_old::battle_player::player_data::PlayerType;
@@ -27,5 +29,7 @@ pub fn create_and_start_with_options(
 ) -> BattleData {
     let mut battle = new_test_battle::create_and_start(battle_id, seed, player_one, player_two);
     battle.animations = Some(AnimationData::default());
+    battle.tracing = Some(BattleTracing::default());
+    battle.history = Some(BattleHistory::default());
     battle
 }

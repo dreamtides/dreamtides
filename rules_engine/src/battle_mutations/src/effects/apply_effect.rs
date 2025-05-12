@@ -28,6 +28,12 @@ pub fn execute(
         Effect::Effect(standard) => apply_standard_effect(battle, source, standard, targets),
         _ => todo!("Implement this"),
     }
+
+    if !battle.cards.has_stack() {
+        // If this effect removed the last card from the stack, stack priority
+        // is ended.
+        battle.stack_priority = None;
+    }
 }
 
 fn apply_standard_effect(

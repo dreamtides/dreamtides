@@ -519,6 +519,8 @@ dependencies = [
  "game_creation",
  "game_creation_old",
  "parser",
+ "rand",
+ "rand_xoshiro",
  "tracing",
  "tracing-subscriber",
  "tracing_macros",

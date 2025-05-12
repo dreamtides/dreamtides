@@ -26,6 +26,8 @@ game_creation_old = { path = "../src/game_creation_old" }
 parser = { path = "../src/parser" }
 tracing_macros = { path = "../src/tracing_macros" }
 
+rand = "0.9"
+rand_xoshiro = "0.7"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3.17", features = ["env-filter", "serde"] }
 uuid = { version = "1", features = ["serde", "v4"] }

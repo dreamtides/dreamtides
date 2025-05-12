@@ -1,6 +1,4 @@
-use battle_data_old::battle::battle_history::BattleHistory;
 use battle_data_old::battle::battle_status::BattleStatus;
-use battle_data_old::battle::battle_tracing::BattleTracing;
 use battle_data_old::battle::battle_turn_step::BattleTurnStep;
 use battle_data_old::battle::effect_source::EffectSource;
 use battle_data_old::battle::old_battle_data::BattleData;
@@ -51,8 +49,8 @@ pub fn create_and_start(
         request_context: RequestContext::UserRequest,
         animations: None,
         prompt: None,
-        tracing: Some(BattleTracing::default()),
-        history: Some(BattleHistory::default()),
+        tracing: None,
+        history: None,
     };
 
     create_test_deck::add(&mut battle, PlayerName::One);

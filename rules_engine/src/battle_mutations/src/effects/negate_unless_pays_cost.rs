@@ -33,7 +33,7 @@ pub fn execute(
                         effect: Effect::Effect(StandardEffect::OpponentPaysCost {
                             cost: cost.clone(),
                         }),
-                        targets: StackCardTargets::None,
+                        targets: targets.clone(),
                     },
                     PromptChoice {
                         label: PromptChoiceLabel::Decline,

@@ -7,6 +7,8 @@ use crate::effects::apply_effect;
 /// Selects a choice at a given index position in an active Prompt::Choice
 /// prompt
 pub fn select(battle: &mut BattleState, choice_index: usize) {
+    battle_trace!("Applying prompt choice", battle, choice_index);
+
     let Some(prompt) = battle.prompt.take() else {
         panic_with!("Expected an active prompt", battle);
     };
@@ -17,8 +19,6 @@ pub fn select(battle: &mut BattleState, choice_index: usize) {
     let Some(choice) = choices.get(choice_index) else {
         panic_with!("Invalid choice index", battle, choice_index);
     };
-    let label = choice.label;
     apply_effect::execute(battle, source, &choice.effect, &choice.targets.clone());
     battle.prompt = None;
-    battle_trace!("Applied prompt choice", battle, label);
 }

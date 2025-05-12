@@ -1,4 +1,5 @@
 use std::collections::BTreeMap;
+use std::fmt::Write as FmtWrite;
 use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::Path;
@@ -17,8 +18,10 @@ pub fn write_battle_event(
     let snapshot = debug_battle_snapshot::capture(battle);
 
     if let Some(tracing) = &mut battle.tracing {
-        let values_string =
-            values.iter().map(|(k, v)| format!("{}: {}, ", k, v)).collect::<String>();
+        let values_string = values.iter().fold(String::new(), |mut acc, (k, v)| {
+            let _ = write!(acc, "{}: {}, ", k, v);
+            acc
+        });
         let event = BattleTraceEvent { m: message, vs: values_string, values, snapshot };
 
         write_event_to_log_file(&event);
@@ -38,7 +41,10 @@ pub fn write_panic_snapshot(
     values: BTreeMap<String, String>,
 ) {
     let snapshot = debug_battle_snapshot::capture(battle);
-    let values_string = values.iter().map(|(k, v)| format!("{}: {}, ", k, v)).collect::<String>();
+    let values_string = values.iter().fold(String::new(), |mut acc, (k, v)| {
+        let _ = write!(acc, "{}: {}, ", k, v);
+        acc
+    });
     let event =
         BattleTraceEvent { m: format!("PANIC: {}", message), vs: values_string, values, snapshot };
     write_event_to_log_file(&event);
