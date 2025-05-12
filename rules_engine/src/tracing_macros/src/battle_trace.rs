@@ -28,20 +28,40 @@
 macro_rules! battle_trace {
     ($message:expr, $battle:expr) => {{
         if $battle.tracing.is_some() {
-            $crate::write_battle_event($battle);
+            $crate::write_battle_event(
+                $battle,
+                $message.to_string(),
+                std::collections::BTreeMap::new()
+            );
             tracing::debug!($message);
         }
     }};
     ($message:expr, $battle:expr, $($key:ident),* $(,)?) => {{
         $( let $key = &$key; )*
         if $battle.tracing.is_some() {
-            $crate::write_battle_event($battle);
+            let mut values = std::collections::BTreeMap::new();
+            $(
+                values.insert(stringify!($key).to_string(), format!("{:?}", $key));
+            )*
+            $crate::write_battle_event(
+                $battle,
+                $message.to_string(),
+                values
+            );
             tracing::debug!(message = %$message, $($key = ?$key),*);
         }
     }};
     ($message:expr, $battle:expr, $($key:ident = $value:expr),* $(,)?) => {{
         if $battle.tracing.is_some() {
-            $crate::write_battle_event($battle);
+            let mut values = std::collections::BTreeMap::new();
+            $(
+                values.insert(stringify!($key).to_string(), format!("{:?}", $value));
+            )*
+            $crate::write_battle_event(
+                $battle,
+                $message.to_string(),
+                values
+            );
             tracing::debug!(message = %$message, $($key = ?$value),*);
         }
     }};

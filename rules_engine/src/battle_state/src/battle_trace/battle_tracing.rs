@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use core_data::numerics::TurnId;
 use serde::Serialize;
 
-use crate::battle_trace::tracing_battle_state::TracingBattleState;
+use crate::debug::debug_battle_state::DebugBattleState;
 
 /// Data structure for storing debug traces of events during a turn of a battle.
 #[derive(Debug, Clone, Default, Serialize)]
@@ -32,5 +32,5 @@ pub struct BattleTraceEvent {
     pub values: BTreeMap<String, String>,
 
     /// Snapshot of the battle state at the time this trace event was captured
-    pub snapshot: TracingBattleState,
+    pub snapshot: DebugBattleState,
 }
