@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use ai_core::agent::{Agent, AgentConfig, AgentData};
 use ai_data::game_ai::GameAI;
 use ai_game_integration::evaluators::WinLossEvaluator;
@@ -41,7 +43,13 @@ pub fn select_action(battle: &BattleState, player: PlayerName, game_ai: &GameAI)
     );
     let forest_subscriber =
         tracing_subscriber::registry().with(logging::create_forest_layer(filter));
-    subscriber::with_default(forest_subscriber, || select_action_unchecked(battle, player, game_ai))
+
+    let start_time = Instant::now();
+    let action = subscriber::with_default(forest_subscriber, || {
+        select_action_unchecked(battle, player, game_ai)
+    });
+    info!("Agent selected action in {:.3} seconds", start_time.elapsed().as_secs_f64());
+    action
 }
 
 /// Selects an action for the given player using the given AI agent, without
