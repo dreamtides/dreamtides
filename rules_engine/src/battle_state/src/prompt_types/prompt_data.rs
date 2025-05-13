@@ -1,9 +1,9 @@
 use ability_data::effect::Effect;
-use bit_set::BitSet;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use strum_macros::EnumDiscriminants;
 
+use crate::battle::all_cards::CardSet;
 use crate::battle_cards::stack_card_state::StackCardTargets;
 use crate::core::effect_source::EffectSource;
 
@@ -30,8 +30,8 @@ pub struct PromptData {
 #[derive(Debug, Clone, EnumDiscriminants)]
 #[strum_discriminants()]
 pub enum PromptType {
-    ChooseCharacter { valid: BitSet<usize> },
-    ChooseStackCard { valid: BitSet<usize> },
+    ChooseCharacter { valid: CardSet },
+    ChooseStackCard { valid: CardSet },
     Choose { choices: Vec<PromptChoice> },
     ChooseEnergyValue { minimum: Energy, current: Energy, maximum: Energy },
 }

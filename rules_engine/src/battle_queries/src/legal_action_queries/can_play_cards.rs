@@ -1,6 +1,6 @@
+use battle_state::battle::all_cards::CardSet;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardId;
-use bit_set::BitSet;
 use core_data::types::PlayerName;
 
 use crate::battle_card_queries::card_properties;
@@ -19,8 +19,8 @@ pub enum FastOnly {
 ///
 /// This does *not* check whether it is legal to play cards in the larger
 /// current battle state, e.g. whether it is the player's turn.
-pub fn from_hand(battle: &BattleState, player: PlayerName, fast_only: FastOnly) -> BitSet<usize> {
-    let mut legal_cards = BitSet::default();
+pub fn from_hand(battle: &BattleState, player: PlayerName, fast_only: FastOnly) -> CardSet {
+    let mut legal_cards = CardSet::default();
     for card_id in battle.cards.hand(player) {
         let id = CardId(card_id);
         if fast_only == FastOnly::Yes && !card_properties::is_fast(battle, id) {

@@ -1,7 +1,7 @@
+use battle_state::battle::all_cards::CardSet;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, DeckCardId, HandCardId};
 use battle_state::core::effect_source::EffectSource;
-use bit_set::BitSet;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use rand::seq::IteratorRandom;
@@ -45,6 +45,6 @@ pub fn draw_cards(battle: &mut BattleState, source: EffectSource, player: Player
 }
 
 /// Returns a random element from the given set.
-fn random_element(set: &BitSet<usize>, rng: &mut Xoshiro256PlusPlus) -> Option<usize> {
+fn random_element(set: &CardSet, rng: &mut Xoshiro256PlusPlus) -> Option<usize> {
     set.iter().choose(rng)
 }

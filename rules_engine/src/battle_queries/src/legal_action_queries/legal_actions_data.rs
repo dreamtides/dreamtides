@@ -1,6 +1,6 @@
 use battle_state::actions::battle_actions::BattleAction;
+use battle_state::battle::all_cards::CardSet;
 use battle_state::battle::card_id::{CardId, CardIdType, CharacterId, HandCardId, StackCardId};
-use bit_set::BitSet;
 use core_data::numerics::Energy;
 
 #[derive(Debug, Clone)]
@@ -10,8 +10,8 @@ pub enum LegalActions {
     NoActionsOpponentPriority,
     NoActionsInCurrentPhase,
     Standard { actions: StandardLegalActions },
-    SelectCharacterPrompt { valid: BitSet<usize> },
-    SelectStackCardPrompt { valid: BitSet<usize> },
+    SelectCharacterPrompt { valid: CardSet },
+    SelectStackCardPrompt { valid: CardSet },
     SelectPromptChoicePrompt { choice_count: usize },
     SelectEnergyValuePrompt { minimum: Energy, maximum: Energy },
 }
@@ -19,7 +19,7 @@ pub enum LegalActions {
 #[derive(Debug, Clone)]
 pub struct StandardLegalActions {
     pub primary: PrimaryLegalAction,
-    pub play_card_from_hand: BitSet<usize>,
+    pub play_card_from_hand: CardSet,
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]

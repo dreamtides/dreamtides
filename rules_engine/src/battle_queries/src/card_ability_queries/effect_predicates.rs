@@ -1,9 +1,9 @@
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
+use battle_state::battle::all_cards::CardSet;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardId;
 use battle_state::core::effect_source::EffectSource;
-use bit_set::BitSet;
 use core_data::card_types::CardType;
 
 use crate::battle_card_queries::card_properties;
@@ -13,7 +13,7 @@ pub fn matching_characters(
     battle: &BattleState,
     source: EffectSource,
     predicate: &Predicate,
-) -> BitSet<usize> {
+) -> CardSet {
     match predicate {
         Predicate::Enemy(card_predicate) => {
             let battlefield = battle.cards.battlefield(source.controller().opponent()).clone();
@@ -28,7 +28,7 @@ pub fn matching_cards_on_stack(
     battle: &BattleState,
     source: EffectSource,
     predicate: &Predicate,
-) -> BitSet<usize> {
+) -> CardSet {
     match predicate {
         Predicate::Enemy(card_predicate) => {
             let battlefield = battle.cards.stack_set(source.controller().opponent()).clone();
@@ -80,13 +80,13 @@ pub fn get_stack_target_predicate(effect: &StandardEffect) -> Option<&Predicate>
     }
 }
 
-/// Returns all characters from `collection`` which match a `predicate`.
+/// Returns all characters from `collection` which match a `predicate`.
 fn on_battlefield(
     _battle: &BattleState,
     _source: EffectSource,
-    collection: BitSet<usize>,
+    collection: CardSet,
     predicate: &CardPredicate,
-) -> BitSet<usize> {
+) -> CardSet {
     match predicate {
         CardPredicate::Card | CardPredicate::Character => collection,
         _ => todo!("Implement {:?}", predicate),
@@ -97,13 +97,13 @@ fn on_battlefield(
 fn on_stack(
     battle: &BattleState,
     _source: EffectSource,
-    collection: BitSet<usize>,
+    collection: CardSet,
     predicate: &CardPredicate,
-) -> BitSet<usize> {
+) -> CardSet {
     match predicate {
         CardPredicate::Card | CardPredicate::Dream => collection,
         CardPredicate::Event => {
-            let mut events: BitSet<usize> = BitSet::default();
+            let mut events = CardSet::default();
             for id in collection.iter() {
                 if card_properties::card_type(battle, CardId(id)) == CardType::Event {
                     events.insert(id);

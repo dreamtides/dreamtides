@@ -35,18 +35,23 @@ use crate::battle_player::player_map::PlayerMap;
 )]
 pub struct ObjectId(pub usize);
 
+/// A set of cards
+///
+/// BitSet<usize> usually beats BitSet<u32> by around 2% in our benchmarks.
+pub type CardSet = BitSet<usize>;
+
 #[derive(Clone, Debug, Default)]
 pub struct AllCards {
     card_names: Vec<CardName>,
     card_object_ids: Vec<ObjectId>,
-    battlefield: PlayerMap<BitSet<usize>>,
+    battlefield: PlayerMap<CardSet>,
     battlefield_state: PlayerMap<SmallMap<8, CharacterId, CharacterState>>,
-    void: PlayerMap<BitSet<usize>>,
-    hands: PlayerMap<BitSet<usize>>,
-    decks: PlayerMap<BitSet<usize>>,
+    void: PlayerMap<CardSet>,
+    hands: PlayerMap<CardSet>,
+    decks: PlayerMap<CardSet>,
     stack: SmallVec<[StackCardState; 2]>,
-    stack_set: PlayerMap<BitSet<usize>>,
-    banished: PlayerMap<BitSet<usize>>,
+    stack_set: PlayerMap<CardSet>,
+    banished: PlayerMap<CardSet>,
     next_object_id: ObjectId,
 }
 
@@ -76,17 +81,17 @@ impl AllCards {
     }
 
     /// Returns the set of cards in a player's hand.
-    pub fn hand(&self, player: PlayerName) -> &BitSet<usize> {
+    pub fn hand(&self, player: PlayerName) -> &CardSet {
         self.hands.player(player)
     }
 
     /// Returns the set of cards in a player's deck.
-    pub fn deck(&self, player: PlayerName) -> &BitSet<usize> {
+    pub fn deck(&self, player: PlayerName) -> &CardSet {
         self.decks.player(player)
     }
 
     /// Returns the set of characters on the battlefield for a given player
-    pub fn battlefield(&self, player: PlayerName) -> &BitSet<usize> {
+    pub fn battlefield(&self, player: PlayerName) -> &CardSet {
         self.battlefield.player(player)
     }
 
@@ -107,7 +112,7 @@ impl AllCards {
     }
 
     /// Returns the set of cards in a player's void
-    pub fn void(&self, player: PlayerName) -> &BitSet<usize> {
+    pub fn void(&self, player: PlayerName) -> &CardSet {
         self.void.player(player)
     }
 
@@ -137,12 +142,12 @@ impl AllCards {
     }
 
     /// Returns the set of cards on the stack for a given player.
-    pub fn stack_set(&self, player: PlayerName) -> &BitSet<usize> {
+    pub fn stack_set(&self, player: PlayerName) -> &CardSet {
         self.stack_set.player(player)
     }
 
     /// Returns the set of banished cards for a given player.
-    pub fn banished(&self, player: PlayerName) -> &BitSet<usize> {
+    pub fn banished(&self, player: PlayerName) -> &CardSet {
         self.banished.player(player)
     }
 
