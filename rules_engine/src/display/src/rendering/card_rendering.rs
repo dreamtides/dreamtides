@@ -11,7 +11,7 @@ use core_data::display_color;
 use core_data::display_types::SpriteAddress;
 use core_data::identifiers::{CardIdent, CardIdentity};
 use core_data::types::CardFacing;
-use display_data::card_view::{
+use display_data_old::card_view::{
     CardActions, CardEffects, CardPrefab, CardView, DisplayImage, RevealedCardView,
 };
 

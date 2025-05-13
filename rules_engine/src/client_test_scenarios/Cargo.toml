@@ -13,7 +13,7 @@ bench = false
 action_data_old = { path = "../action_data_old" }
 battle_data_old = { path = "../battle_data_old" }
 core_data = { path = "../core_data" }
-display_data = { path = "../display_data" }
+display_data_old = { path = "../display_data_old" }
 masonry = { path = "../masonry" }
 
 uuid = { version = "1", features = ["serde", "v4"] }

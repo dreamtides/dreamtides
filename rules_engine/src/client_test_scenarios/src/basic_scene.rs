@@ -5,14 +5,14 @@ use core_data::display_types::{AudioClipAddress, SpriteAddress};
 use core_data::identifiers::{BattleId, CardIdent};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::CardFacing;
-use display_data::battle_view::{
+use display_data_old::battle_view::{
     BattlePreviewView, BattleView, ButtonView, DisplayPlayer, InterfaceView, PlayerPreviewView,
     PlayerView,
 };
-use display_data::card_view::{
+use display_data_old::card_view::{
     CardActions, CardEffects, CardPrefab, CardPreviewView, CardView, DisplayImage, RevealedCardView,
 };
-use display_data::object_position::{ObjectPosition, Position};
+use display_data_old::object_position::{ObjectPosition, Position};
 use masonry::borders::BorderRadius;
 use masonry::dimension::{Dimension, DimensionGroup, DimensionUnit, FlexInsets};
 use masonry::flex_enums::{FlexPosition, TextAlign, WhiteSpace};

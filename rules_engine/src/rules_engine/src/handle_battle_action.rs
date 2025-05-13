@@ -11,7 +11,7 @@ use battle_queries_old::legal_action_queries::legal_actions::{self, LegalActions
 use core_data::identifiers::UserId;
 use core_data::types::PlayerName;
 use display::rendering::renderer;
-use display_data::command::CommandSequence;
+use display_data_old::command::CommandSequence;
 use logging::battle_trace;
 use tracing::instrument;
 

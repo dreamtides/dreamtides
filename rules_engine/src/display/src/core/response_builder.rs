@@ -1,6 +1,6 @@
 use core_data::types::PlayerName;
-use display_data::battle_view::DisplayPlayer;
-use display_data::command::{Command, CommandSequence, ParallelCommandGroup};
+use display_data_old::battle_view::DisplayPlayer;
+use display_data_old::command::{Command, CommandSequence, ParallelCommandGroup};
 
 /// Primary builder used to render game state.
 pub struct ResponseBuilder {

@@ -5,7 +5,7 @@ use std::path::Path;
 use battle_data_old::battle::battle_tracing::BattleTraceEvent;
 use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::debug_snapshots::debug_battle_data_old::DebugBattleData;
-use display_data::command::CommandSequence;
+use display_data_old::command::CommandSequence;
 use serde::Serialize;
 use serde_json;
 use tracing::error;

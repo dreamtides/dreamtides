@@ -1,4 +1,4 @@
-use display_data::request_data::SchemaTypes;
+use display_data_old::request_data::SchemaTypes;
 use schemars::schema_for;
 
 fn main() {

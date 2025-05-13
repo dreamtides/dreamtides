@@ -20,7 +20,7 @@ battle_queries_old = { path = "../battle_queries_old" }
 core_data = { path = "../core_data" }
 database = { path = "../database" }
 display = { path = "../display" }
-display_data = { path = "../display_data" }
+display_data_old = { path = "../display_data_old" }
 game_creation_old = { path = "../game_creation_old" }
 logging = { path = "../logging" }
 masonry = { path = "../masonry" }

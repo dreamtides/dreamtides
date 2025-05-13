@@ -14,16 +14,16 @@ use core_data::display_types::{
 };
 use core_data::identifiers::{BattleId, CardIdent};
 use core_data::numerics::{Energy, Spark};
-use display_data::battle_view::{BattleView, ButtonView, CardOrderSelectorView, DisplayPlayer};
-use display_data::card_view::CardView;
-use display_data::command::{
+use display_data_old::battle_view::{BattleView, ButtonView, CardOrderSelectorView, DisplayPlayer};
+use display_data_old::card_view::CardView;
+use display_data_old::command::{
     ArrowStyle, Command, CommandSequence, DisplayArrow, DisplayArrowsCommand,
     DisplayDreamwellActivationCommand, DisplayEffectCommand, DisplayJudgmentCommand,
     DissolveCardCommand, FireProjectileCommand, GameMessageType, GameObjectId,
     ParallelCommandGroup, UpdateBattleCommand,
 };
-use display_data::object_position::{Position, StackType};
-use display_data::request_data::{
+use display_data_old::object_position::{Position, StackType};
+use display_data_old::request_data::{
     ConnectRequest, ConnectResponse, Metadata, PerformActionRequest, PerformActionResponse,
 };
 use masonry::borders::BorderRadius;

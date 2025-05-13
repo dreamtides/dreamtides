@@ -4,7 +4,7 @@ use battle_data_old::battle::old_battle_data::BattleData;
 use battle_data_old::battle_player::player_data::PlayerType;
 use core_data::identifiers::UserId;
 use core_data::types::PlayerName;
-use display_data::command::CommandSequence;
+use display_data_old::command::CommandSequence;
 
 use crate::core::response_builder::ResponseBuilder;
 use crate::rendering::{animations, battle_rendering};

@@ -4,8 +4,8 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Json, Router};
-use display_data::command::CommandSequence;
-use display_data::request_data::{
+use display_data_old::command::CommandSequence;
+use display_data_old::request_data::{
     ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse, PollRequest,
     PollResponse,
 };

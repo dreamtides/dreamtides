@@ -3,8 +3,8 @@
 use std::panic::{self, UnwindSafe};
 
 use anyhow::Result;
-use display_data::command::CommandSequence;
-use display_data::request_data::{
+use display_data_old::command::CommandSequence;
+use display_data_old::request_data::{
     ConnectRequest, PerformActionRequest, PerformActionResponse, PollRequest, PollResponse,
 };
 use rules_engine::engine;

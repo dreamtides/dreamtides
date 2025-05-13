@@ -13,8 +13,8 @@ use battle_queries_old::legal_action_queries::legal_actions::LegalActions;
 use battle_queries_old::player_queries::spark_total;
 use core_data::display_color;
 use core_data::numerics::Energy;
-use display_data::battle_view::{BattleView, ButtonView, InterfaceView, PlayerView};
-use display_data::command::{Command, GameMessageType, UpdateBattleCommand};
+use display_data_old::battle_view::{BattleView, ButtonView, InterfaceView, PlayerView};
+use display_data_old::command::{Command, GameMessageType, UpdateBattleCommand};
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify};
 use masonry::flex_style::FlexStyle;
 
