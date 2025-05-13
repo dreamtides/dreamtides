@@ -40,12 +40,14 @@ pub struct ObjectId(pub usize);
 /// BitSet<usize> usually beats BitSet<u32> by around 2% in our benchmarks.
 pub type CardSet = BitSet<usize>;
 
+pub type CharacterMap = SmallMap<8, CharacterId, CharacterState>;
+
 #[derive(Clone, Debug, Default)]
 pub struct AllCards {
     card_names: Vec<CardName>,
     card_object_ids: Vec<ObjectId>,
     battlefield: PlayerMap<CardSet>,
-    battlefield_state: PlayerMap<SmallMap<8, CharacterId, CharacterState>>,
+    battlefield_state: PlayerMap<CharacterMap>,
     void: PlayerMap<CardSet>,
     hands: PlayerMap<CardSet>,
     decks: PlayerMap<CardSet>,
@@ -96,18 +98,12 @@ impl AllCards {
     }
 
     /// Returns the state of characters on the battlefield for a given player
-    pub fn battlefield_state(
-        &self,
-        player: PlayerName,
-    ) -> &SmallMap<8, CharacterId, CharacterState> {
+    pub fn battlefield_state(&self, player: PlayerName) -> &CharacterMap {
         self.battlefield_state.player(player)
     }
 
     /// Mutable equivalent to [Self::battlefield_state]
-    pub fn battlefield_state_mut(
-        &mut self,
-        player: PlayerName,
-    ) -> &mut SmallMap<8, CharacterId, CharacterState> {
+    pub fn battlefield_state_mut(&mut self, player: PlayerName) -> &mut CharacterMap {
         self.battlefield_state.player_mut(player)
     }
 
