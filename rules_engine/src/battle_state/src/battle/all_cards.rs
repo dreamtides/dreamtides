@@ -1,4 +1,3 @@
-use bit_set::BitSet;
 use core_data::identifiers::CardName;
 use core_data::numerics::Spark;
 use core_data::types::PlayerName;
@@ -7,7 +6,11 @@ use serde::{Deserialize, Serialize};
 use small_map::SmallMap;
 use smallvec::SmallVec;
 
-use crate::battle::card_id::{CardId, CardIdType, CharacterId, StackCardId};
+use crate::battle::card_id::{
+    BanishedCardId, CardId, CardIdType, CharacterId, DeckCardId, HandCardId, StackCardId,
+    VoidCardId,
+};
+use crate::battle_cards::card_set::CardSet;
 use crate::battle_cards::character_state::CharacterState;
 use crate::battle_cards::stack_card_state::{
     StackCardAdditionalCostsPaid, StackCardState, StackCardTargets,
@@ -35,25 +38,28 @@ use crate::battle_player::player_map::PlayerMap;
 )]
 pub struct ObjectId(pub usize);
 
-/// A set of cards
+/// A map of characters on the battlefield to their states
 ///
-/// BitSet<usize> usually beats BitSet<u32> by around 2% in our benchmarks.
-pub type CardSet = BitSet<usize>;
-
+/// No significant differences between BTreeMap and SmallMap here.
 pub type CharacterMap = SmallMap<8, CharacterId, CharacterState>;
+
+/// A vector of cards on the stack
+///
+/// No significant differences between SmallVec and Vec here.
+pub type StackCards = SmallVec<[StackCardState; 4]>;
 
 #[derive(Clone, Debug, Default)]
 pub struct AllCards {
     card_names: Vec<CardName>,
     card_object_ids: Vec<ObjectId>,
-    battlefield: PlayerMap<CardSet>,
+    battlefield: PlayerMap<CardSet<CharacterId>>,
     battlefield_state: PlayerMap<CharacterMap>,
-    void: PlayerMap<CardSet>,
-    hands: PlayerMap<CardSet>,
-    decks: PlayerMap<CardSet>,
-    stack: SmallVec<[StackCardState; 2]>,
-    stack_set: PlayerMap<CardSet>,
-    banished: PlayerMap<CardSet>,
+    void: PlayerMap<CardSet<VoidCardId>>,
+    hands: PlayerMap<CardSet<HandCardId>>,
+    decks: PlayerMap<CardSet<DeckCardId>>,
+    stack: StackCards,
+    stack_set: PlayerMap<CardSet<StackCardId>>,
+    banished: PlayerMap<CardSet<BanishedCardId>>,
     next_object_id: ObjectId,
 }
 
@@ -83,17 +89,17 @@ impl AllCards {
     }
 
     /// Returns the set of cards in a player's hand.
-    pub fn hand(&self, player: PlayerName) -> &CardSet {
+    pub fn hand(&self, player: PlayerName) -> &CardSet<HandCardId> {
         self.hands.player(player)
     }
 
     /// Returns the set of cards in a player's deck.
-    pub fn deck(&self, player: PlayerName) -> &CardSet {
+    pub fn deck(&self, player: PlayerName) -> &CardSet<DeckCardId> {
         self.decks.player(player)
     }
 
     /// Returns the set of characters on the battlefield for a given player
-    pub fn battlefield(&self, player: PlayerName) -> &CardSet {
+    pub fn battlefield(&self, player: PlayerName) -> &CardSet<CharacterId> {
         self.battlefield.player(player)
     }
 
@@ -108,7 +114,7 @@ impl AllCards {
     }
 
     /// Returns the set of cards in a player's void
-    pub fn void(&self, player: PlayerName) -> &CardSet {
+    pub fn void(&self, player: PlayerName) -> &CardSet<VoidCardId> {
         self.void.player(player)
     }
 
@@ -133,17 +139,17 @@ impl AllCards {
     }
 
     /// Returns all cards currently on the stack.
-    pub fn all_cards_on_stack(&self) -> &SmallVec<[StackCardState; 2]> {
+    pub fn all_cards_on_stack(&self) -> &StackCards {
         &self.stack
     }
 
     /// Returns the set of cards on the stack for a given player.
-    pub fn stack_set(&self, player: PlayerName) -> &CardSet {
+    pub fn stack_set(&self, player: PlayerName) -> &CardSet<StackCardId> {
         self.stack_set.player(player)
     }
 
     /// Returns the set of banished cards for a given player.
-    pub fn banished(&self, player: PlayerName) -> &CardSet {
+    pub fn banished(&self, player: PlayerName) -> &CardSet<BanishedCardId> {
         self.banished.player(player)
     }
 
@@ -159,7 +165,7 @@ impl AllCards {
             self.card_names.push(name);
             let object_id = self.new_object_id();
             self.card_object_ids.push(object_id);
-            self.decks.player_mut(owner).insert(id);
+            self.decks.player_mut(owner).insert(DeckCardId(CardId(id)));
         }
     }
 
@@ -187,12 +193,16 @@ impl AllCards {
     /// Returns true if the indicated card is present in the indicated zone.
     pub fn contains_card(&self, controller: PlayerName, card_id: CardId, zone: Zone) -> bool {
         match zone {
-            Zone::Banished => self.banished.player(controller).contains(card_id.0),
-            Zone::Battlefield => self.battlefield.player(controller).contains(card_id.0),
-            Zone::Deck => self.decks.player(controller).contains(card_id.0),
-            Zone::Hand => self.hands.player(controller).contains(card_id.0),
-            Zone::Stack => self.stack_set.player(controller).contains(card_id.0),
-            Zone::Void => self.void.player(controller).contains(card_id.0),
+            Zone::Banished => {
+                self.banished.player(controller).contains(BanishedCardId(CardId(card_id.0)))
+            }
+            Zone::Battlefield => self.battlefield.player(controller).contains(CharacterId(card_id)),
+            Zone::Deck => self.decks.player(controller).contains(DeckCardId(CardId(card_id.0))),
+            Zone::Hand => self.hands.player(controller).contains(HandCardId(CardId(card_id.0))),
+            Zone::Stack => {
+                self.stack_set.player(controller).contains(StackCardId(CardId(card_id.0)))
+            }
+            Zone::Void => self.void.player(controller).contains(VoidCardId(CardId(card_id.0))),
         }
     }
 
@@ -205,22 +215,22 @@ impl AllCards {
     fn add_to_zone(&mut self, controller: PlayerName, card_id: CardId, zone: Zone) {
         match zone {
             Zone::Banished => {
-                self.banished.player_mut(controller).insert(card_id.0);
+                self.banished.player_mut(controller).insert(BanishedCardId(card_id));
             }
             Zone::Battlefield => {
-                self.battlefield.player_mut(controller).insert(card_id.0);
+                self.battlefield.player_mut(controller).insert(CharacterId(card_id));
                 self.battlefield_state
                     .player_mut(controller)
                     .insert(CharacterId(card_id), CharacterState::default());
             }
             Zone::Deck => {
-                self.decks.player_mut(controller).insert(card_id.0);
+                self.decks.player_mut(controller).insert(DeckCardId(card_id));
             }
             Zone::Hand => {
-                self.hands.player_mut(controller).insert(card_id.0);
+                self.hands.player_mut(controller).insert(HandCardId(card_id));
             }
             Zone::Stack => {
-                self.stack_set.player_mut(controller).insert(card_id.0);
+                self.stack_set.player_mut(controller).insert(StackCardId(card_id));
                 self.stack.push(StackCardState {
                     id: StackCardId(card_id),
                     controller,
@@ -229,7 +239,7 @@ impl AllCards {
                 });
             }
             Zone::Void => {
-                self.void.player_mut(controller).insert(card_id.0);
+                self.void.player_mut(controller).insert(VoidCardId(card_id));
             }
         }
     }
@@ -237,20 +247,20 @@ impl AllCards {
     fn remove_from_zone(&mut self, controller: PlayerName, card_id: CardId, zone: Zone) {
         match zone {
             Zone::Banished => {
-                self.banished.player_mut(controller).remove(card_id.0);
+                self.banished.player_mut(controller).remove(BanishedCardId(card_id));
             }
             Zone::Battlefield => {
-                self.battlefield.player_mut(controller).remove(card_id.0);
+                self.battlefield.player_mut(controller).remove(CharacterId(card_id));
                 self.battlefield_state.player_mut(controller).remove(&CharacterId(card_id));
             }
             Zone::Deck => {
-                self.decks.player_mut(controller).remove(card_id.0);
+                self.decks.player_mut(controller).remove(DeckCardId(card_id));
             }
             Zone::Hand => {
-                self.hands.player_mut(controller).remove(card_id.0);
+                self.hands.player_mut(controller).remove(HandCardId(card_id));
             }
             Zone::Stack => {
-                self.stack_set.player_mut(controller).remove(card_id.0);
+                self.stack_set.player_mut(controller).remove(StackCardId(card_id));
                 if let Some((i, _)) = self
                     .stack
                     .iter()
@@ -262,7 +272,7 @@ impl AllCards {
                 }
             }
             Zone::Void => {
-                self.void.player_mut(controller).remove(card_id.0);
+                self.void.player_mut(controller).remove(VoidCardId(card_id));
             }
         }
     }

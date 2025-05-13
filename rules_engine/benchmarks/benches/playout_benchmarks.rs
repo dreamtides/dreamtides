@@ -9,7 +9,7 @@ use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
-use battle_state::battle::card_id::{CardId, HandCardId};
+use battle_state::battle::card_id::{CardId, CardIdType, HandCardId};
 use battle_state::battle_player::battle_player_state::PlayerType;
 use core_data::identifiers::{BattleId, CardName};
 use core_data::numerics::Energy;
@@ -84,11 +84,7 @@ pub fn uct1_first_action(c: &mut Criterion) {
 
 pub fn uct_1k_action(c: &mut Criterion) {
     let mut group = c.benchmark_group("uct_1k_action");
-    group
-        .significance_level(0.01)
-        .sample_size(500)
-        .noise_threshold(0.03)
-        .measurement_time(Duration::from_secs(15));
+    group.significance_level(0.01).sample_size(500).measurement_time(Duration::from_secs(15));
     let error_subscriber = tracing_subscriber::fmt().with_max_level(Level::ERROR).finish();
     subscriber::with_default(error_subscriber, || {
         group.bench_function("uct_1k_action", |b| {
@@ -125,14 +121,14 @@ fn build_benchmark_battle() -> BattleState {
 
     let mut player_one_cards = HashMap::new();
     for id in battle.cards.hand(PlayerName::One).iter() {
-        let card_name = battle.cards.name(CardId(id));
-        player_one_cards.insert(id, card_name);
+        let card_name = battle.cards.name(id);
+        player_one_cards.insert(id.card_id().0, card_name);
     }
 
     let mut player_two_cards = HashMap::new();
     for id in battle.cards.hand(PlayerName::Two).iter() {
-        let card_name = battle.cards.name(CardId(id));
-        player_two_cards.insert(id, card_name);
+        let card_name = battle.cards.name(id);
+        player_two_cards.insert(id.card_id().0, card_name);
     }
 
     let mut expected_player_one = HashMap::new();

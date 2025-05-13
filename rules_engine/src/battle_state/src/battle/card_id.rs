@@ -24,6 +24,8 @@ pub struct CardId(pub usize);
 pub trait CardIdType: Hash + Eq + PartialEq + Debug + Ord + Copy {
     /// Returns ths associated Card Id for this type.
     fn card_id(self) -> CardId;
+
+    fn from_card_id(card_id: CardId) -> Self;
 }
 
 /// An identifier for an object while it is in a given zone. A new zone object
@@ -36,6 +38,10 @@ impl CardIdType for CardId {
     fn card_id(self) -> CardId {
         self
     }
+
+    fn from_card_id(card_id: CardId) -> Self {
+        card_id
+    }
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema)]
@@ -44,6 +50,10 @@ pub struct CharacterId(pub CardId);
 impl CardIdType for CharacterId {
     fn card_id(self) -> CardId {
         self.0
+    }
+
+    fn from_card_id(card_id: CardId) -> Self {
+        Self(card_id)
     }
 }
 
@@ -66,6 +76,10 @@ impl CardIdType for VoidCardId {
     fn card_id(self) -> CardId {
         self.0
     }
+
+    fn from_card_id(card_id: CardId) -> Self {
+        Self(card_id)
+    }
 }
 
 impl fmt::Display for VoidCardId {
@@ -86,6 +100,10 @@ pub struct DeckCardId(pub CardId);
 impl CardIdType for DeckCardId {
     fn card_id(self) -> CardId {
         self.0
+    }
+
+    fn from_card_id(card_id: CardId) -> Self {
+        Self(card_id)
     }
 }
 
@@ -108,6 +126,10 @@ impl CardIdType for HandCardId {
     fn card_id(self) -> CardId {
         self.0
     }
+
+    fn from_card_id(card_id: CardId) -> Self {
+        Self(card_id)
+    }
 }
 
 impl fmt::Display for HandCardId {
@@ -129,6 +151,10 @@ impl CardIdType for StackCardId {
     fn card_id(self) -> CardId {
         self.0
     }
+
+    fn from_card_id(card_id: CardId) -> Self {
+        Self(card_id)
+    }
 }
 
 impl fmt::Display for StackCardId {
@@ -149,6 +175,10 @@ pub struct BanishedCardId(pub CardId);
 impl CardIdType for BanishedCardId {
     fn card_id(self) -> CardId {
         self.0
+    }
+
+    fn from_card_id(card_id: CardId) -> Self {
+        Self(card_id)
     }
 }
 

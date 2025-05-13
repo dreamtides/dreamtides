@@ -1,8 +1,8 @@
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
-use battle_state::battle::all_cards::CardSet;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::CardId;
+use battle_state::battle::card_id::{CharacterId, StackCardId};
+use battle_state::battle_cards::card_set::CardSet;
 use battle_state::core::effect_source::EffectSource;
 use core_data::card_types::CardType;
 
@@ -13,7 +13,7 @@ pub fn matching_characters(
     battle: &BattleState,
     source: EffectSource,
     predicate: &Predicate,
-) -> CardSet {
+) -> CardSet<CharacterId> {
     match predicate {
         Predicate::Enemy(card_predicate) => {
             let battlefield = battle.cards.battlefield(source.controller().opponent()).clone();
@@ -28,7 +28,7 @@ pub fn matching_cards_on_stack(
     battle: &BattleState,
     source: EffectSource,
     predicate: &Predicate,
-) -> CardSet {
+) -> CardSet<StackCardId> {
     match predicate {
         Predicate::Enemy(card_predicate) => {
             let battlefield = battle.cards.stack_set(source.controller().opponent()).clone();
@@ -84,9 +84,9 @@ pub fn get_stack_target_predicate(effect: &StandardEffect) -> Option<&Predicate>
 fn on_battlefield(
     _battle: &BattleState,
     _source: EffectSource,
-    collection: CardSet,
+    collection: CardSet<CharacterId>,
     predicate: &CardPredicate,
-) -> CardSet {
+) -> CardSet<CharacterId> {
     match predicate {
         CardPredicate::Card | CardPredicate::Character => collection,
         _ => todo!("Implement {:?}", predicate),
@@ -97,15 +97,15 @@ fn on_battlefield(
 fn on_stack(
     battle: &BattleState,
     _source: EffectSource,
-    collection: CardSet,
+    collection: CardSet<StackCardId>,
     predicate: &CardPredicate,
-) -> CardSet {
+) -> CardSet<StackCardId> {
     match predicate {
         CardPredicate::Card | CardPredicate::Dream => collection,
         CardPredicate::Event => {
             let mut events = CardSet::default();
             for id in collection.iter() {
-                if card_properties::card_type(battle, CardId(id)) == CardType::Event {
+                if card_properties::card_type(battle, id) == CardType::Event {
                     events.insert(id);
                 }
             }

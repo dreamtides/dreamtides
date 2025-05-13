@@ -1,6 +1,6 @@
-use battle_state::battle::all_cards::CardSet;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::CardId;
+use battle_state::battle::card_id::{CardIdType, HandCardId};
+use battle_state::battle_cards::card_set::CardSet;
 use core_data::types::PlayerName;
 
 use crate::battle_card_queries::card_properties;
@@ -19,15 +19,18 @@ pub enum FastOnly {
 ///
 /// This does *not* check whether it is legal to play cards in the larger
 /// current battle state, e.g. whether it is the player's turn.
-pub fn from_hand(battle: &BattleState, player: PlayerName, fast_only: FastOnly) -> CardSet {
+pub fn from_hand(
+    battle: &BattleState,
+    player: PlayerName,
+    fast_only: FastOnly,
+) -> CardSet<HandCardId> {
     let mut legal_cards = CardSet::default();
     for card_id in battle.cards.hand(player) {
-        let id = CardId(card_id);
-        if fast_only == FastOnly::Yes && !card_properties::is_fast(battle, id) {
+        if fast_only == FastOnly::Yes && !card_properties::is_fast(battle, card_id) {
             continue;
         }
 
-        let Some(cost) = card_properties::cost(battle, id) else {
+        let Some(cost) = card_properties::cost(battle, card_id) else {
             continue;
         };
 
@@ -35,11 +38,11 @@ pub fn from_hand(battle: &BattleState, player: PlayerName, fast_only: FastOnly) 
             continue;
         }
 
-        if !has_legal_targets::for_event(battle, player, id) {
+        if !has_legal_targets::for_event(battle, player, card_id.card_id()) {
             continue;
         }
 
-        if !has_legal_additional_costs::for_event(battle, player, id, cost) {
+        if !has_legal_additional_costs::for_event(battle, player, card_id.card_id(), cost) {
             continue;
         }
 

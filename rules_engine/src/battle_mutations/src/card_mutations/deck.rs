@@ -1,6 +1,6 @@
-use battle_state::battle::all_cards::CardSet;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CardId, DeckCardId, HandCardId};
+use battle_state::battle::card_id::{DeckCardId, HandCardId};
+use battle_state::battle_cards::card_set::CardSet;
 use battle_state::core::effect_source::EffectSource;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
@@ -34,7 +34,7 @@ pub fn draw_card(
         create_test_deck::add(battle, player);
         return draw_card(battle, source, player);
     };
-    Some(move_card::from_deck_to_hand(battle, source, player, DeckCardId(CardId(id))))
+    Some(move_card::from_deck_to_hand(battle, source, player, id))
 }
 
 /// Draw a number of cards from `player`'s deck and put them into their hand.
@@ -45,6 +45,6 @@ pub fn draw_cards(battle: &mut BattleState, source: EffectSource, player: Player
 }
 
 /// Returns a random element from the given set.
-fn random_element(set: &CardSet, rng: &mut Xoshiro256PlusPlus) -> Option<usize> {
+fn random_element(set: &CardSet<DeckCardId>, rng: &mut Xoshiro256PlusPlus) -> Option<DeckCardId> {
     set.iter().choose(rng)
 }

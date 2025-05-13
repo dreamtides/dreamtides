@@ -48,31 +48,31 @@ fn debug_all_cards(battle: &BattleState) -> DebugAllCards {
             battle,
             Zone::Battlefield,
             PlayerName::One,
-            battle.cards.battlefield(PlayerName::One).iter().map(CardId),
+            battle.cards.battlefield(PlayerName::One).iter().map(|c| c.card_id()),
         ),
         p2_battlefield: debug_zone(
             battle,
             Zone::Battlefield,
             PlayerName::Two,
-            battle.cards.battlefield(PlayerName::Two).iter().map(CardId),
+            battle.cards.battlefield(PlayerName::Two).iter().map(|c| c.card_id()),
         ),
         p1_void: debug_zone(
             battle,
             Zone::Void,
             PlayerName::One,
-            battle.cards.void(PlayerName::One).iter().map(CardId),
+            battle.cards.void(PlayerName::One).iter().map(|c| c.card_id()),
         ),
         p2_void: debug_zone(
             battle,
             Zone::Void,
             PlayerName::Two,
-            battle.cards.void(PlayerName::Two).iter().map(CardId),
+            battle.cards.void(PlayerName::Two).iter().map(|c| c.card_id()),
         ),
         p1_hand: debug_zone(
             battle,
             Zone::Hand,
             PlayerName::One,
-            battle.cards.hand(PlayerName::One).iter().map(CardId),
+            battle.cards.hand(PlayerName::One).iter().map(|c| c.card_id()),
         ),
         p2_hand: debug_zone(
             battle,
@@ -84,13 +84,13 @@ fn debug_all_cards(battle: &BattleState) -> DebugAllCards {
             battle,
             Zone::Deck,
             PlayerName::One,
-            battle.cards.deck(PlayerName::One).iter().map(CardId),
+            battle.cards.deck(PlayerName::One).iter().map(|c| c.card_id()),
         ),
         p2_deck: debug_zone(
             battle,
             Zone::Deck,
             PlayerName::Two,
-            battle.cards.deck(PlayerName::Two).iter().map(CardId),
+            battle.cards.deck(PlayerName::Two).iter().map(|c| c.card_id()),
         ),
         stack: debug_zone(
             battle,
@@ -102,13 +102,13 @@ fn debug_all_cards(battle: &BattleState) -> DebugAllCards {
             battle,
             Zone::Banished,
             PlayerName::One,
-            battle.cards.banished(PlayerName::One).iter().map(CardId),
+            battle.cards.banished(PlayerName::One).iter().map(|c| c.card_id()),
         ),
         p2_banished: debug_zone(
             battle,
             Zone::Banished,
             PlayerName::Two,
-            battle.cards.banished(PlayerName::Two).iter().map(CardId),
+            battle.cards.banished(PlayerName::Two).iter().map(|c| c.card_id()),
         ),
     }
 }

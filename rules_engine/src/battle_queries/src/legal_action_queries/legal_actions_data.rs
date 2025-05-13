@@ -1,6 +1,6 @@
 use battle_state::actions::battle_actions::BattleAction;
-use battle_state::battle::all_cards::CardSet;
-use battle_state::battle::card_id::{CardId, CardIdType, CharacterId, HandCardId, StackCardId};
+use battle_state::battle::card_id::{CharacterId, HandCardId, StackCardId};
+use battle_state::battle_cards::card_set::CardSet;
 use core_data::numerics::Energy;
 
 #[derive(Debug, Clone)]
@@ -10,8 +10,8 @@ pub enum LegalActions {
     NoActionsOpponentPriority,
     NoActionsInCurrentPhase,
     Standard { actions: StandardLegalActions },
-    SelectCharacterPrompt { valid: CardSet },
-    SelectStackCardPrompt { valid: CardSet },
+    SelectCharacterPrompt { valid: CardSet<CharacterId> },
+    SelectStackCardPrompt { valid: CardSet<StackCardId> },
     SelectPromptChoicePrompt { choice_count: usize },
     SelectEnergyValuePrompt { minimum: Energy, maximum: Energy },
 }
@@ -19,7 +19,7 @@ pub enum LegalActions {
 #[derive(Debug, Clone)]
 pub struct StandardLegalActions {
     pub primary: PrimaryLegalAction,
-    pub play_card_from_hand: CardSet,
+    pub play_card_from_hand: CardSet<HandCardId>,
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
@@ -35,7 +35,7 @@ impl LegalActions {
             BattleAction::Debug(..) => true,
             BattleAction::PlayCardFromHand(hand_card_id) => {
                 if let LegalActions::Standard { actions } = self {
-                    actions.play_card_from_hand.contains(hand_card_id.card_id().0)
+                    actions.play_card_from_hand.contains(hand_card_id)
                 } else {
                     false
                 }
@@ -63,14 +63,14 @@ impl LegalActions {
             }
             BattleAction::SelectCharacterTarget(character_id) => {
                 if let LegalActions::SelectCharacterPrompt { valid } = self {
-                    valid.contains(character_id.card_id().0)
+                    valid.contains(character_id)
                 } else {
                     false
                 }
             }
             BattleAction::SelectStackCardTarget(stack_card_id) => {
                 if let LegalActions::SelectStackCardPrompt { valid } = self {
-                    valid.contains(stack_card_id.card_id().0)
+                    valid.contains(stack_card_id)
                 } else {
                     false
                 }
@@ -155,7 +155,7 @@ impl LegalActions {
                 }
 
                 for card_id in actions.play_card_from_hand.iter() {
-                    result.push(BattleAction::PlayCardFromHand(HandCardId(CardId(card_id))));
+                    result.push(BattleAction::PlayCardFromHand(card_id));
                 }
 
                 result
@@ -163,12 +163,12 @@ impl LegalActions {
 
             LegalActions::SelectCharacterPrompt { valid } => valid
                 .iter()
-                .map(|card_id| BattleAction::SelectCharacterTarget(CharacterId(CardId(card_id))))
+                .map(|card_id| BattleAction::SelectCharacterTarget(card_id))
                 .collect::<Vec<_>>(),
 
             LegalActions::SelectStackCardPrompt { valid } => valid
                 .iter()
-                .map(|card_id| BattleAction::SelectStackCardTarget(StackCardId(CardId(card_id))))
+                .map(|card_id| BattleAction::SelectStackCardTarget(card_id))
                 .collect::<Vec<_>>(),
 
             LegalActions::SelectPromptChoicePrompt { choice_count } => {

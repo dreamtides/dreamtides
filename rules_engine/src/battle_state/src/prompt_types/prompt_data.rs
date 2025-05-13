@@ -3,7 +3,8 @@ use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use strum_macros::EnumDiscriminants;
 
-use crate::battle::all_cards::CardSet;
+use crate::battle::card_id::{CharacterId, StackCardId};
+use crate::battle_cards::card_set::CardSet;
 use crate::battle_cards::stack_card_state::StackCardTargets;
 use crate::core::effect_source::EffectSource;
 
@@ -30,8 +31,8 @@ pub struct PromptData {
 #[derive(Debug, Clone, EnumDiscriminants)]
 #[strum_discriminants()]
 pub enum PromptType {
-    ChooseCharacter { valid: CardSet },
-    ChooseStackCard { valid: CardSet },
+    ChooseCharacter { valid: CardSet<CharacterId> },
+    ChooseStackCard { valid: CardSet<StackCardId> },
     Choose { choices: Vec<PromptChoice> },
     ChooseEnergyValue { minimum: Energy, current: Energy, maximum: Energy },
 }
