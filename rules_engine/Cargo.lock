@@ -890,7 +890,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "database"
+name = "database_old"
 version = "0.0.0"
 dependencies = [
  "action_data_old",
@@ -1947,7 +1947,7 @@ dependencies = [
  "battle_mutations_old",
  "battle_queries_old",
  "core_data",
- "database",
+ "database_old",
  "display_data_old",
  "display_old",
  "game_creation_old",

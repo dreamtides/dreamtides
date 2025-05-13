@@ -1,9 +1,9 @@
 use assert_with::expect;
 use battle_data_old::battle::old_battle_data::BattleData;
 use core_data::identifiers::{QuestId, UserId};
-use database::battle_save_file::{BattleSaveFile, PlayerMap};
-use database::quest_save_file::QuestSaveFile;
-use database::save_file::{SaveFile, SaveFileV1};
+use database_old::battle_save_file::{BattleSaveFile, PlayerMap};
+use database_old::quest_save_file::QuestSaveFile;
+use database_old::save_file::{SaveFile, SaveFileV1};
 
 /// Serializes a [BattleData] to a [SaveFile] for a given [UserId] and
 /// [QuestId].
