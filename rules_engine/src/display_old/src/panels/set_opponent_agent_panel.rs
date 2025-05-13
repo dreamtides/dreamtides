@@ -6,12 +6,12 @@ use bon::Builder;
 use core_data::types::PlayerName;
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify};
 use masonry::flex_style::FlexStyle;
-use ui_components::box_component::BoxComponent;
-use ui_components::button_component::ButtonComponent;
-use ui_components::component::Component;
-use ui_components::panel_component::PanelComponent;
-use ui_components::text_component::TextComponent;
-use ui_components::typography::Typography;
+use ui_components_old::box_component::BoxComponent;
+use ui_components_old::button_component::ButtonComponent;
+use ui_components_old::component::Component;
+use ui_components_old::panel_component::PanelComponent;
+use ui_components_old::text_component::TextComponent;
+use ui_components_old::typography::Typography;
 
 #[derive(Clone, Builder)]
 pub struct SetOpponentAgentPanel<'a> {

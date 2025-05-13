@@ -24,7 +24,7 @@ display_data_old = { path = "../display_data_old" }
 game_creation_old = { path = "../game_creation_old" }
 logging = { path = "../logging" }
 masonry = { path = "../masonry" }
-ui_components = { path = "../ui_components" }
+ui_components_old = { path = "../ui_components_old" }
 
 backtrace = "0.3"
 tokio = { version = "1", features = ["full"] }

@@ -971,7 +971,7 @@ dependencies = [
  "core_data",
  "display_data_old",
  "masonry",
- "ui_components",
+ "ui_components_old",
 ]
 
 [[package]]
@@ -1956,7 +1956,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
- "ui_components",
+ "ui_components_old",
  "uuid",
 ]
 
@@ -2483,7 +2483,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ui_components"
+name = "ui_components_old"
 version = "0.0.0"
 dependencies = [
  "action_data_old",

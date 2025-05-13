@@ -7,11 +7,11 @@ use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify, FlexWrap};
 use masonry::flex_style::FlexStyle;
-use ui_components::box_component::BoxComponent;
-use ui_components::button_component::ButtonComponent;
-use ui_components::component::Component;
-use ui_components::icon;
-use ui_components::panel_component::PanelComponent;
+use ui_components_old::box_component::BoxComponent;
+use ui_components_old::button_component::ButtonComponent;
+use ui_components_old::component::Component;
+use ui_components_old::icon;
+use ui_components_old::panel_component::PanelComponent;
 
 #[derive(Clone, Builder)]
 pub struct DeveloperPanel {

@@ -6,10 +6,10 @@ use display_old::rendering::battle_rendering;
 use display_data_old::command::{Command, CommandSequence, UpdateBattleCommand};
 use game_creation_old::new_battle;
 use masonry::flex_enums::{TextAlign, WhiteSpace};
-use ui_components::component::Component;
-use ui_components::panel_component::PanelComponent;
-use ui_components::text_component::TextComponent;
-use ui_components::typography::Typography;
+use ui_components_old::component::Component;
+use ui_components_old::panel_component::PanelComponent;
+use ui_components_old::text_component::TextComponent;
+use ui_components_old::typography::Typography;
 use uuid::Uuid;
 
 /// Attempts to display an error message to the player describing a rules engine
