@@ -16,6 +16,8 @@ use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::{EnvFilter, Layer};
 use uuid::Uuid;
 
+const MAX_TURNS: usize = 50;
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq, ValueEnum)]
 enum Verbosity {
     None,
@@ -58,6 +60,13 @@ struct MatchResult {
     ai_two_wins: usize,
     total_turns: usize,
     total_elapsed: std::time::Duration,
+    timed_out: usize,
+}
+
+#[derive(Debug)]
+enum MatchOutcome {
+    Winner(PlayerName, usize, std::time::Duration),
+    TimedOut(usize, std::time::Duration),
 }
 
 fn run_match(
@@ -66,7 +75,7 @@ fn run_match(
     seed: u64,
     verbosity: Verbosity,
     swap_positions: bool,
-) -> (PlayerName, usize, std::time::Duration) {
+) -> MatchOutcome {
     let ai_one_parsed = from_str(ai_one).unwrap();
     let ai_two_parsed = from_str(ai_two).unwrap();
 
@@ -109,10 +118,22 @@ fn run_match(
         new_test_battle::create_and_start(battle_id, seed, battle_ai_one, battle_ai_two);
 
     let start_time = Instant::now();
+    let mut turn_count = 0;
 
     subscriber::with_default(subscriber, || {
         while !matches!(battle.status, BattleStatus::GameOver { .. }) {
             let turn = battle.turn.turn_id;
+            turn_count = turn.0 as usize;
+
+            // Check if we've exceeded the maximum number of turns
+            if turn_count > MAX_TURNS {
+                if verbosity != Verbosity::None {
+                    print!("\r\x1B[2K");
+                    println!("Match timed out after {} turns", MAX_TURNS);
+                }
+                return;
+            }
+
             if let Some(player) = legal_actions::next_to_act(&battle) {
                 let player_ai = match (player, swap_positions) {
                     (PlayerName::One, false) | (PlayerName::Two, true) => ai_one_parsed,
@@ -161,12 +182,15 @@ fn run_match(
 
     let elapsed = start_time.elapsed();
 
-    let winner = match battle.status {
-        BattleStatus::GameOver { winner } => winner,
-        _ => panic!("Game ended without a winner"),
-    };
+    // Check if the game timed out after returning from the subscriber
+    if turn_count > MAX_TURNS {
+        return MatchOutcome::TimedOut(turn_count, elapsed);
+    }
 
-    (winner, battle.turn.turn_id.0 as usize, elapsed)
+    match battle.status {
+        BattleStatus::GameOver { winner } => MatchOutcome::Winner(winner, turn_count, elapsed),
+        _ => panic!("Game ended without a winner"),
+    }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -183,6 +207,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ai_two_wins: 0,
         total_turns: 0,
         total_elapsed: std::time::Duration::default(),
+        timed_out: 0,
     };
 
     if args.matches > 1 {
@@ -203,7 +228,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             io::stdout().flush().unwrap();
         }
 
-        let (winner, turns, elapsed) = run_match(
+        let outcome = run_match(
             &args.player_one_ai,
             &args.player_two_ai,
             args.seed,
@@ -211,41 +236,57 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             swap_positions,
         );
 
-        match (winner, swap_positions) {
-            (PlayerName::One, false) => {
-                results.player_one_wins += 1;
-                results.ai_one_wins += 1;
-            }
-            (PlayerName::Two, false) => {
-                results.player_two_wins += 1;
-                results.ai_two_wins += 1;
-            }
-            (PlayerName::One, true) => {
-                results.player_one_wins += 1;
-                results.ai_two_wins += 1;
-            }
-            (PlayerName::Two, true) => {
-                results.player_two_wins += 1;
-                results.ai_one_wins += 1;
-            }
-        }
+        match outcome {
+            MatchOutcome::Winner(winner, turns, elapsed) => {
+                match (winner, swap_positions) {
+                    (PlayerName::One, false) => {
+                        results.player_one_wins += 1;
+                        results.ai_one_wins += 1;
+                    }
+                    (PlayerName::Two, false) => {
+                        results.player_two_wins += 1;
+                        results.ai_two_wins += 1;
+                    }
+                    (PlayerName::One, true) => {
+                        results.player_one_wins += 1;
+                        results.ai_two_wins += 1;
+                    }
+                    (PlayerName::Two, true) => {
+                        results.player_two_wins += 1;
+                        results.ai_one_wins += 1;
+                    }
+                }
 
-        results.total_turns += turns;
-        results.total_elapsed += elapsed;
+                results.total_turns += turns;
+                results.total_elapsed += elapsed;
 
-        let winner_ai = if (winner == PlayerName::One && !swap_positions)
-            || (winner == PlayerName::Two && swap_positions)
-        {
-            &args.player_one_ai
-        } else {
-            &args.player_two_ai
-        };
+                let winner_ai = if (winner == PlayerName::One && !swap_positions)
+                    || (winner == PlayerName::Two && swap_positions)
+                {
+                    &args.player_one_ai
+                } else {
+                    &args.player_two_ai
+                };
 
-        if args.matches > 1 {
-            println!("Winner: {}, Turns: {}, Time: {:.2?}", winner_ai, turns, elapsed);
-        } else {
-            println!("\nGame over after {} turns in {:.2?}!", turns, elapsed);
-            println!("Winner: AI {}", winner_ai);
+                if args.matches > 1 {
+                    println!("Winner: {}, Turns: {}, Time: {:.2?}", winner_ai, turns, elapsed);
+                } else {
+                    println!("\nGame over after {} turns in {:.2?}!", turns, elapsed);
+                    println!("Winner: AI {}", winner_ai);
+                }
+            }
+            MatchOutcome::TimedOut(turns, elapsed) => {
+                results.timed_out += 1;
+                results.total_turns += turns;
+                results.total_elapsed += elapsed;
+
+                if args.matches > 1 {
+                    println!("Timed out after {} turns, Time: {:.2?}", turns, elapsed);
+                } else {
+                    println!("\nMatch timed out after {} turns in {:.2?}!", turns, elapsed);
+                    println!("Maximum turn limit ({}) exceeded", MAX_TURNS);
+                }
+            }
         }
     }
 
@@ -253,34 +294,51 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("\n===== Match Results =====");
         println!("Total matches: {}", args.matches);
         println!(
-            "Average turns per match: {:.1}",
-            results.total_turns as f64 / args.matches as f64
-        );
-        println!("Average time per match: {:.2?}", results.total_elapsed / args.matches as u32);
-        println!("By player position:");
-        println!(
-            "  Player One wins: {} ({:.1}%)",
-            results.player_one_wins,
-            (results.player_one_wins as f64 / args.matches as f64) * 100.0
+            "Completed matches: {} ({:.1}%)",
+            args.matches - results.timed_out,
+            ((args.matches - results.timed_out) as f64 / args.matches as f64) * 100.0
         );
         println!(
-            "  Player Two wins: {} ({:.1}%)",
-            results.player_two_wins,
-            (results.player_two_wins as f64 / args.matches as f64) * 100.0
+            "Timed-out matches: {} ({:.1}%)",
+            results.timed_out,
+            (results.timed_out as f64 / args.matches as f64) * 100.0
         );
-        println!("By AI:");
-        println!(
-            "  {} wins: {} ({:.1}%)",
-            args.player_one_ai,
-            results.ai_one_wins,
-            (results.ai_one_wins as f64 / args.matches as f64) * 100.0
-        );
-        println!(
-            "  {} wins: {} ({:.1}%)",
-            args.player_two_ai,
-            results.ai_two_wins,
-            (results.ai_two_wins as f64 / args.matches as f64) * 100.0
-        );
+
+        if args.matches > results.timed_out {
+            println!(
+                "Average turns per completed match: {:.1}",
+                results.total_turns as f64 / (args.matches - results.timed_out) as f64
+            );
+            println!("Average time per match: {:.2?}", results.total_elapsed / args.matches as u32);
+
+            println!("By player position:");
+            println!(
+                "  Player One wins: {} ({:.1}%)",
+                results.player_one_wins,
+                (results.player_one_wins as f64 / (args.matches - results.timed_out) as f64)
+                    * 100.0
+            );
+            println!(
+                "  Player Two wins: {} ({:.1}%)",
+                results.player_two_wins,
+                (results.player_two_wins as f64 / (args.matches - results.timed_out) as f64)
+                    * 100.0
+            );
+
+            println!("By AI:");
+            println!(
+                "  {} wins: {} ({:.1}%)",
+                args.player_one_ai,
+                results.ai_one_wins,
+                (results.ai_one_wins as f64 / (args.matches - results.timed_out) as f64) * 100.0
+            );
+            println!(
+                "  {} wins: {} ({:.1}%)",
+                args.player_two_ai,
+                results.ai_two_wins,
+                (results.ai_two_wins as f64 / (args.matches - results.timed_out) as f64) * 100.0
+            );
+        }
     }
 
     Ok(())
