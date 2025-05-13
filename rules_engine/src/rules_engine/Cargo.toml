@@ -1,0 +1,32 @@
+[package]
+name = "rules_engine"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+test = false
+doctest = false
+bench = false
+
+[dependencies]
+action_data = { path = "../action_data" }
+ai_agents = { path = "../ai_agents" }
+ai_data = { path = "../ai_data" }
+battle_state = { path = "../battle_state" }
+battle_mutations = { path = "../battle_mutations" }
+battle_queries = { path = "../battle_queries" }
+core_data = { path = "../core_data" }
+database = { path = "../database" }
+display = { path = "../display" }
+display_data = { path = "../display_data" }
+game_creation = { path = "../game_creation" }
+logging = { path = "../logging" }
+masonry = { path = "../masonry" }
+tracing_macros = { path = "../tracing_macros" }
+ui_components = { path = "../ui_components" }
+
+backtrace = "0.3"
+tokio = { version = "1", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+uuid = { version = "1", features = ["serde", "v4"] }

@@ -11,6 +11,7 @@ bench = false
 battle_queries = { path = "../battle_queries" }
 battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
+display_data = { path = "../display_data" }
 
 rand_xoshiro = "0.7"
 serde = { version = "1", features = ["derive"] }

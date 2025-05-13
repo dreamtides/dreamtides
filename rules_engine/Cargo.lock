@@ -2001,6 +2001,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "rules_engine"
+version = "0.0.0"
+dependencies = [
+ "action_data",
+ "ai_agents",
+ "ai_data",
+ "backtrace",
+ "battle_mutations",
+ "battle_queries",
+ "battle_state",
+ "core_data",
+ "database",
+ "display",
+ "display_data",
+ "game_creation",
+ "logging",
+ "masonry",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+ "tracing_macros",
+ "ui_components",
+ "uuid",
+]
+
+[[package]]
 name = "rules_engine_old"
 version = "0.0.0"
 dependencies = [
@@ -2539,6 +2565,7 @@ dependencies = [
  "battle_queries",
  "battle_state",
  "core_data",
+ "display_data",
  "rand_xoshiro",
  "serde",
  "serde_json",

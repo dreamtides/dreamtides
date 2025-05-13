@@ -7,6 +7,9 @@ use std::path::Path;
 use battle_queries::debug_snapshot::debug_battle_snapshot;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_trace::battle_tracing::BattleTraceEvent;
+use battle_state::debug::debug_battle_state::DebugBattleState;
+use display_data::command::CommandSequence;
+use serde::Serialize;
 use serde_json;
 use tracing::error;
 
@@ -48,6 +51,27 @@ pub fn write_panic_snapshot(
     let event =
         BattleTraceEvent { m: format!("PANIC: {}", message), vs: values_string, values, snapshot };
     write_event_to_log_file(&event);
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct CommandTraceEvent {
+    pub m: String,
+    pub snapshot: Option<DebugBattleState>,
+    pub sequence: CommandSequence,
+}
+
+pub fn write_commands(
+    battle: Option<&BattleState>,
+    message: &'static str,
+    sequence: &CommandSequence,
+) {
+    let snapshot = battle.filter(|b| b.tracing.is_some()).map(debug_battle_snapshot::capture);
+    let event = CommandTraceEvent { m: message.to_string(), snapshot, sequence: sequence.clone() };
+    match serde_json::to_string_pretty(&event) {
+        Ok(json) => write_json_to_log_file(&json),
+        Err(e) => error!("Failed to serialize CommandSequence: {}", e),
+    }
 }
 
 pub fn clear_log_file() {
