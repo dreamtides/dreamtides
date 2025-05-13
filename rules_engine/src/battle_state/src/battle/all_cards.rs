@@ -2,6 +2,8 @@ use bit_set::BitSet;
 use core_data::identifiers::CardName;
 use core_data::numerics::Spark;
 use core_data::types::PlayerName;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 use small_map::SmallMap;
 use smallvec::SmallVec;
 
@@ -13,9 +15,30 @@ use crate::battle_cards::stack_card_state::{
 use crate::battle_cards::zone::Zone;
 use crate::battle_player::player_map::PlayerMap;
 
+/// Identifies a card within a zone.
+///
+/// A new ObjectId is assigned each time a card changes zones, meaning that it
+/// can be used for targeting effects that end when the card changes zones.
+#[derive(
+    Copy,
+    Clone,
+    Debug,
+    Default,
+    Eq,
+    PartialEq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+)]
+pub struct ObjectId(pub usize);
+
 #[derive(Clone, Debug, Default)]
 pub struct AllCards {
     card_names: Vec<CardName>,
+    card_object_ids: Vec<ObjectId>,
     battlefield: PlayerMap<BitSet<usize>>,
     battlefield_state: PlayerMap<SmallMap<8, CharacterId, CharacterState>>,
     void: PlayerMap<BitSet<usize>>,
@@ -24,6 +47,7 @@ pub struct AllCards {
     stack: SmallVec<[StackCardState; 2]>,
     stack_set: PlayerMap<BitSet<usize>>,
     banished: PlayerMap<BitSet<usize>>,
+    next_object_id: ObjectId,
 }
 
 impl AllCards {
@@ -32,6 +56,13 @@ impl AllCards {
     /// Panics if no card with this ID exists.
     pub fn name(&self, id: impl CardIdType) -> CardName {
         self.card_names[id.card_id().0]
+    }
+
+    /// Returns the ObjectId of a card.
+    ///
+    /// Panics if no card with this ID exists.
+    pub fn object_id(&self, id: impl CardIdType) -> ObjectId {
+        self.card_object_ids[id.card_id().0]
     }
 
     /// Returns the spark value of a character.
@@ -125,6 +156,8 @@ impl AllCards {
         for name in cards {
             let id = self.card_names.len();
             self.card_names.push(name);
+            let object_id = self.new_object_id();
+            self.card_object_ids.push(object_id);
             self.decks.player_mut(owner).insert(id);
         }
     }
@@ -147,6 +180,7 @@ impl AllCards {
         let id = card_id.card_id();
         self.remove_from_zone(controller, id, from);
         self.add_to_zone(controller, id, to);
+        self.card_object_ids[id.0] = self.new_object_id();
     }
 
     /// Returns true if the indicated card is present in the indicated zone.
@@ -159,6 +193,12 @@ impl AllCards {
             Zone::Stack => self.stack_set.player(controller).contains(card_id.0),
             Zone::Void => self.void.player(controller).contains(card_id.0),
         }
+    }
+
+    fn new_object_id(&mut self) -> ObjectId {
+        let result = self.next_object_id;
+        self.next_object_id = ObjectId(result.0 + 1);
+        result
     }
 
     fn add_to_zone(&mut self, controller: PlayerName, card_id: CardId, zone: Zone) {
