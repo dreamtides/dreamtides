@@ -1,10 +1,12 @@
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CardIdType, HandCardId};
+use battle_state::battle::card_id::HandCardId;
 use battle_state::battle_cards::card_set::CardSet;
+use core_data::card_types::CardType;
+use core_data::identifiers::CardName;
+use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 
 use crate::battle_card_queries::card_properties;
-use crate::legal_action_queries::{has_legal_additional_costs, has_legal_targets};
 
 /// Whether only cards with the `fast` property should be returned.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -38,11 +40,11 @@ pub fn from_hand(
             continue;
         }
 
-        if !has_legal_targets::for_event(battle, player, card_id.card_id()) {
+        if !has_legal_targets(battle, player, battle.cards.name(card_id)) {
             continue;
         }
 
-        if !has_legal_additional_costs::for_event(battle, player, card_id.card_id(), cost) {
+        if !has_legal_additional_costs(battle, player, battle.cards.name(card_id), cost) {
             continue;
         }
 
@@ -50,4 +52,30 @@ pub fn from_hand(
     }
 
     legal_cards
+}
+
+fn has_legal_targets(battle: &BattleState, controller: PlayerName, card: CardName) -> bool {
+    match card {
+        CardName::MinstrelOfFallingLight => true,
+        CardName::Immolate => !battle.cards.battlefield(controller.opponent()).is_empty(),
+        CardName::RippleOfDefiance => battle
+            .cards
+            .stack_set(controller.opponent())
+            .iter()
+            .any(|id| card_properties::card_type(battle, id) == CardType::Event),
+        CardName::Abolish => !battle.cards.stack_set(controller.opponent()).is_empty(),
+        CardName::Dreamscatter => true,
+    }
+}
+
+fn has_legal_additional_costs(
+    battle: &BattleState,
+    controller: PlayerName,
+    card: CardName,
+    paid: Energy,
+) -> bool {
+    match card {
+        CardName::Dreamscatter => battle.players.player(controller).current_energy > paid,
+        _ => true,
+    }
 }
