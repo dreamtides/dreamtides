@@ -9,7 +9,7 @@ use display_data_old::request_data::{
     ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse, PollRequest,
     PollResponse,
 };
-use rules_engine::engine;
+use rules_engine_old::engine;
 use serde::de::DeserializeOwned;
 use tracing::{error, info, info_span};
 

@@ -1,5 +1,5 @@
 [package]
-name = "rules_engine"
+name = "rules_engine_old"
 version = "0.0.0"
 edition = "2021"
 

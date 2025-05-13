@@ -16,7 +16,7 @@ core_data = { path = "../core_data" }
 display_data_old = { path = "../display_data_old" }
 logging = { path = "../logging" }
 plugin = { path = "../plugin" }
-rules_engine = { path = "../rules_engine" }
+rules_engine_old = { path = "../rules_engine_old" }
 
 axum = { version = "0.8", features = ["macros"] }
 axum-macros = "0.5"

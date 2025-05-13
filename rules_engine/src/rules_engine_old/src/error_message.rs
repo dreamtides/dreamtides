@@ -1,9 +1,9 @@
 use battle_data_old::battle::old_battle_data::BattleData;
 use core_data::identifiers::{BattleId, UserId};
 use core_data::types::PlayerName;
+use display_data_old::command::{Command, CommandSequence, UpdateBattleCommand};
 use display_old::core::response_builder::ResponseBuilder;
 use display_old::rendering::battle_rendering;
-use display_data_old::command::{Command, CommandSequence, UpdateBattleCommand};
 use game_creation_old::new_battle;
 use masonry::flex_enums::{TextAlign, WhiteSpace};
 use ui_components_old::component::Component;

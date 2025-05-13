@@ -7,7 +7,7 @@ use display_data_old::command::CommandSequence;
 use display_data_old::request_data::{
     ConnectRequest, PerformActionRequest, PerformActionResponse, PollRequest, PollResponse,
 };
-use rules_engine::engine;
+use rules_engine_old::engine;
 
 /// Synchronize the state of an ongoing game, downloading a full description of
 /// the game state.

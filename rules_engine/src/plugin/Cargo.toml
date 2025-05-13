@@ -12,7 +12,7 @@ crate-type = ["cdylib", "staticlib"]
 [dependencies]
 core_data = { path = "../core_data" }
 display_data_old = { path = "../display_data_old" }
-rules_engine = { path = "../rules_engine" }
+rules_engine_old = { path = "../rules_engine_old" }
 
 anyhow = "1"
 serde = { version = "1", features = ["derive"] }

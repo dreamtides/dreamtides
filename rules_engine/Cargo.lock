@@ -938,7 +938,7 @@ dependencies = [
  "display_data_old",
  "logging",
  "plugin",
- "rules_engine",
+ "rules_engine_old",
  "serde",
  "serde_json",
  "tokio",
@@ -1688,7 +1688,7 @@ dependencies = [
  "anyhow",
  "core_data",
  "display_data_old",
- "rules_engine",
+ "rules_engine_old",
  "serde",
  "serde_json",
  "tokio",
@@ -1934,7 +1934,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rules_engine"
+name = "rules_engine_old"
 version = "0.0.0"
 dependencies = [
  "action_data_old",
