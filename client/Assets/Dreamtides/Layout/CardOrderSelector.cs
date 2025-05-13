@@ -30,7 +30,7 @@ namespace Dreamtides.Layout
     /// Returns the index position within the selector which most closely maps
     /// to the position of the given Transform.
     /// </summary>
-    public SelectCardOrder SelectCardOrderWithinDisplay(Transform t, CardId cardId)
+    public SelectCardOrder SelectCardOrderWithinDisplay(Transform t, long cardId)
     {
       var targetPosition = t.position.x;
 

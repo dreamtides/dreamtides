@@ -93,8 +93,8 @@ namespace Dreamtides.Services
       }
     }
 
-    public Card GetCard(CardId id) =>
-        Errors.CheckNotNull(Cards[id.ClientId()]);
+    public Card GetCard(long id) =>
+        Errors.CheckNotNull(Cards[id.ToString()]);
 
     /// <summary>
     /// Returns the game object for the given game object id.
@@ -131,7 +131,7 @@ namespace Dreamtides.Services
         };
       }
 
-      return GetCard(id.CardId);
+      return GetCard(Errors.CheckNotNull(id.CardId));
     }
 
     /// <summary>

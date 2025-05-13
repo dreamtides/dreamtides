@@ -11,7 +11,7 @@ bench = false
 
 [dependencies]
 core_data = { path = "../core_data" }
-display_data_old = { path = "../display_data_old" }
+display_data = { path = "../display_data" }
 
 schemars = "0.8"
 serde = { version = "1", features = ["derive"] }

@@ -165,7 +165,7 @@ namespace Dreamtides.Schema
     public partial class GameObjectId
     {
         [JsonProperty("cardId", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public CardId CardId { get; set; }
+        public long? CardId { get; set; }
 
         [JsonProperty("deck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? Deck { get; set; }
@@ -175,31 +175,6 @@ namespace Dreamtides.Schema
 
         [JsonProperty("avatar", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? Avatar { get; set; }
-    }
-
-    /// <summary>
-    /// Identifier for this card
-    ///
-    /// The card to dissolve.
-    ///
-    /// Once a card is dissolved, it will be invisible until a reverse dissolve is applied to
-    /// it.
-    ///
-    /// The card to display an activation for. This card will be moved from its current position
-    /// (assumed to be the 'Dreamwell' position) to the DreamwellActivation position, and an
-    /// update to the player's produced energy value will be displayed.
-    ///
-    /// If there are triggered events as a result of this activation, the card should be kept in
-    /// the DreamwellActivation position for the next update. Otherwise it's typical to return
-    /// the card to the Dreamwell position.
-    /// </summary>
-    public partial class CardId
-    {
-        [JsonProperty("idx", Required = Required.Always)]
-        public long Idx { get; set; }
-
-        [JsonProperty("version", Required = Required.Always)]
-        public long Version { get; set; }
     }
 
     public partial class DisplayDreamwellActivationCommand
@@ -214,7 +189,7 @@ namespace Dreamtides.Schema
         /// the card to the Dreamwell position.
         /// </summary>
         [JsonProperty("cardId", Required = Required.Always)]
-        public CardId CardId { get; set; }
+        public long CardId { get; set; }
 
         /// <summary>
         /// New energy available to this player, if it has changed.
@@ -369,7 +344,7 @@ namespace Dreamtides.Schema
         /// Once a card is dissolved, it will be invisible until a reverse dissolve is applied to it.
         /// </summary>
         [JsonProperty("target", Required = Required.Always)]
-        public CardId Target { get; set; }
+        public long Target { get; set; }
     }
 
     /// <summary>
@@ -456,7 +431,7 @@ namespace Dreamtides.Schema
         /// Identifier for this card
         /// </summary>
         [JsonProperty("id", Required = Required.Always)]
-        public CardId Id { get; set; }
+        public long Id { get; set; }
 
         /// <summary>
         /// Position of this card in the UI
@@ -573,7 +548,7 @@ namespace Dreamtides.Schema
         public DisplayPlayer? InDreamwell { get; set; }
 
         [JsonProperty("hiddenWithinCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public CardId HiddenWithinCard { get; set; }
+        public long? HiddenWithinCard { get; set; }
     }
 
     /// <summary>
@@ -730,13 +705,13 @@ namespace Dreamtides.Schema
         public DebugBattleAction Debug { get; set; }
 
         [JsonProperty("playCardFromHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public CardId PlayCardFromHand { get; set; }
+        public long? PlayCardFromHand { get; set; }
 
         [JsonProperty("selectCharacterTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public CardId SelectCharacterTarget { get; set; }
+        public long? SelectCharacterTarget { get; set; }
 
         [JsonProperty("selectStackCardTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public CardId SelectStackCardTarget { get; set; }
+        public long? SelectStackCardTarget { get; set; }
 
         [JsonProperty("selectPromptChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectPromptChoice { get; set; }
@@ -771,7 +746,7 @@ namespace Dreamtides.Schema
     public partial class SelectCardOrder
     {
         [JsonProperty("cardId", Required = Required.Always)]
-        public CardId CardId { get; set; }
+        public long CardId { get; set; }
 
         [JsonProperty("position", Required = Required.Always)]
         public long Position { get; set; }
@@ -829,7 +804,7 @@ namespace Dreamtides.Schema
         public DisplayColor BattlefieldIconColor { get; set; }
 
         [JsonProperty("cardId", Required = Required.Always)]
-        public CardId CardId { get; set; }
+        public long CardId { get; set; }
 
         /// <summary>
         /// New cost value for this card

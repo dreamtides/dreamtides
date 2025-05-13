@@ -2107,7 +2107,7 @@ name = "schema_generator"
 version = "0.0.0"
 dependencies = [
  "core_data",
- "display_data_old",
+ "display_data",
  "schemars",
  "serde",
  "serde_json",
