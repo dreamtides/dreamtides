@@ -1,7 +1,7 @@
 use bon::Builder;
-use masonry_old::flex_enums::{TextAlign, WhiteSpace};
-use masonry_old::flex_node::{FlexNode, NodeType, TextNode};
-use masonry_old::flex_style::{FlexGrow, FlexShrink, FlexStyle};
+use masonry::flex_enums::{TextAlign, WhiteSpace};
+use masonry::flex_node::{FlexNode, NodeType, TextNode};
+use masonry::flex_style::{FlexGrow, FlexShrink, FlexStyle};
 
 use crate::component::{Component, NodeComponent};
 use crate::typography::{self, Typography};

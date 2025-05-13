@@ -754,7 +754,7 @@ dependencies = [
  "battle_data_old",
  "core_data",
  "display_data_old",
- "masonry",
+ "masonry_old",
  "uuid",
 ]
 
@@ -958,13 +958,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "display"
+version = "0.0.0"
+dependencies = [
+ "action_data",
+ "ai_data",
+ "battle_queries",
+ "battle_state",
+ "bon",
+ "core_data",
+ "display_data",
+ "masonry",
+ "tracing_macros",
+ "ui_components",
+]
+
+[[package]]
 name = "display_data"
 version = "0.0.0"
 dependencies = [
  "action_data",
  "battle_state",
  "core_data",
- "masonry",
+ "masonry_old",
  "schemars",
  "serde",
 ]
@@ -976,7 +992,7 @@ dependencies = [
  "action_data_old",
  "battle_data_old",
  "core_data",
- "masonry",
+ "masonry_old",
  "schemars",
  "serde",
 ]
@@ -993,7 +1009,7 @@ dependencies = [
  "bon",
  "core_data",
  "display_data_old",
- "masonry",
+ "masonry_old",
  "ui_components_old",
 ]
 
@@ -1493,6 +1509,17 @@ dependencies = [
 name = "masonry"
 version = "0.0.0"
 dependencies = [
+ "action_data",
+ "bon",
+ "core_data",
+ "schemars",
+ "serde",
+]
+
+[[package]]
+name = "masonry_old"
+version = "0.0.0"
+dependencies = [
  "action_data_old",
  "bon",
  "core_data",
@@ -1975,7 +2002,7 @@ dependencies = [
  "display_old",
  "game_creation_old",
  "logging",
- "masonry",
+ "masonry_old",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -2506,6 +2533,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "ui_components"
+version = "0.0.0"
+dependencies = [
+ "action_data",
+ "asset_paths",
+ "bon",
+ "core_data",
+ "masonry",
+]
+
+[[package]]
 name = "ui_components_old"
 version = "0.0.0"
 dependencies = [
@@ -2513,7 +2551,7 @@ dependencies = [
  "asset_paths",
  "bon",
  "core_data",
- "masonry",
+ "masonry_old",
 ]
 
 [[package]]

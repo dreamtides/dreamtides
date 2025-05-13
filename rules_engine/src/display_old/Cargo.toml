@@ -16,7 +16,7 @@ battle_data_old = { path = "../battle_data_old" }
 battle_queries_old = { path = "../battle_queries_old" }
 core_data = { path = "../core_data" }
 display_data_old = { path = "../display_data_old" }
-masonry = { path = "../masonry" }
+masonry_old = { path = "../masonry_old" }
 ui_components_old = { path = "../ui_components_old" }
 
 bon = "3"

@@ -1,6 +1,6 @@
 use action_data_old::panel_address::PanelAddress;
 use battle_data_old::battle::old_battle_data::BattleData;
-use masonry::flex_node::FlexNode;
+use masonry_old::flex_node::FlexNode;
 use ui_components_old::component::Component;
 
 use crate::core::response_builder::ResponseBuilder;

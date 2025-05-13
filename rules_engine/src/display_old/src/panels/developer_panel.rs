@@ -5,8 +5,8 @@ use battle_data_old::actions::battle_action_data::{BattleAction, DebugBattleActi
 use bon::Builder;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
-use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify, FlexWrap};
-use masonry::flex_style::FlexStyle;
+use masonry_old::flex_enums::{FlexAlign, FlexDirection, FlexJustify, FlexWrap};
+use masonry_old::flex_style::FlexStyle;
 use ui_components_old::box_component::BoxComponent;
 use ui_components_old::button_component::ButtonComponent;
 use ui_components_old::component::Component;

@@ -4,7 +4,7 @@ use core_data::display_types::{AudioClipAddress, ProjectileAddress, SpriteAddres
 use core_data::identifiers::CardIdent;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::CardFacing;
-use masonry::flex_node::FlexNode;
+use masonry_old::flex_node::FlexNode;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 

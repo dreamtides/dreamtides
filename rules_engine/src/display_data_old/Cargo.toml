@@ -12,7 +12,7 @@ bench = false
 action_data_old = { path = "../action_data_old" }
 battle_data_old = { path = "../battle_data_old" }
 core_data = { path = "../core_data" }
-masonry = { path = "../masonry" }
+masonry_old = { path = "../masonry_old" }
 
 schemars = "0.8"
 serde = { version = "1", features = ["derive"] }

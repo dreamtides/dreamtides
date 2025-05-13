@@ -15,8 +15,8 @@ use core_data::display_color;
 use core_data::numerics::Energy;
 use display_data_old::battle_view::{BattleView, ButtonView, InterfaceView, PlayerView};
 use display_data_old::command::{Command, GameMessageType, UpdateBattleCommand};
-use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify};
-use masonry::flex_style::FlexStyle;
+use masonry_old::flex_enums::{FlexAlign, FlexDirection, FlexJustify};
+use masonry_old::flex_style::FlexStyle;
 
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;

@@ -5,7 +5,7 @@ use display_data_old::command::{Command, CommandSequence, UpdateBattleCommand};
 use display_old::core::response_builder::ResponseBuilder;
 use display_old::rendering::battle_rendering;
 use game_creation_old::new_battle;
-use masonry::flex_enums::{TextAlign, WhiteSpace};
+use masonry_old::flex_enums::{TextAlign, WhiteSpace};
 use ui_components_old::component::Component;
 use ui_components_old::panel_component::PanelComponent;
 use ui_components_old::text_component::TextComponent;

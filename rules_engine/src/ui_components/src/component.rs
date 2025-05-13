@@ -1,4 +1,4 @@
-use masonry_old::flex_node::FlexNode;
+use masonry::flex_node::FlexNode;
 
 /// A component is any reusable piece of UI.
 ///

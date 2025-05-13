@@ -1,8 +1,8 @@
 use asset_paths::poneti_ui;
 use bon::Builder;
-use masonry_old::dimension::FlexInsets;
-use masonry_old::flex_enums::{FlexAlign, FlexJustify, FlexPosition};
-use masonry_old::flex_style::FlexStyle;
+use masonry::dimension::FlexInsets;
+use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition};
+use masonry::flex_style::FlexStyle;
 
 use crate::box_component::BoxComponent;
 use crate::close_button_component::CloseButtonComponent;

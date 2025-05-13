@@ -1,4 +1,4 @@
-use action_data::game_action_data::GameAction;
+use action_data_old::game_action_data::GameAction;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 

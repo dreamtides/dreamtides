@@ -2,8 +2,8 @@ use action_data_old::game_action_data::GameAction;
 use asset_paths::poneti_ui;
 use bon::Builder;
 use core_data::display_color;
-use masonry::flex_enums::{FlexAlign, FlexJustify};
-use masonry::flex_style::{FlexGrow, FlexScale, FlexStyle};
+use masonry_old::flex_enums::{FlexAlign, FlexJustify};
+use masonry_old::flex_style::{FlexGrow, FlexScale, FlexStyle};
 
 use crate::box_component::BoxComponent;
 use crate::component::Component;

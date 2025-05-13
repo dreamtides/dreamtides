@@ -1,9 +1,9 @@
 use bon::Builder;
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::FontAddress;
-use masonry_old::dimension::Dimension;
-use masonry_old::flex_enums::FontStyle;
-use masonry_old::flex_style::{FlexStyle, TextShadow};
+use masonry::dimension::Dimension;
+use masonry::flex_enums::FontStyle;
+use masonry::flex_style::{FlexStyle, TextShadow};
 
 /// A named configuration of typography values, such as font size and color.
 #[derive(Clone)]
