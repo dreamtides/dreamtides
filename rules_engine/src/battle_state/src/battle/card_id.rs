@@ -5,7 +5,18 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(
-    Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+    Copy,
+    Clone,
+    Debug,
+    Default,
+    Eq,
+    PartialEq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Serialize,
+    Deserialize,
+    JsonSchema,
 )]
 pub struct CardId(pub usize);
 

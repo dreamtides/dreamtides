@@ -1,7 +1,7 @@
 use action_data::game_action_data::GameAction;
+use battle_state::battle::card_id::CardId;
 use core_data::display_color::DisplayColor;
 use core_data::display_types::{AudioClipAddress, ProjectileAddress, SpriteAddress};
-use core_data::identifiers::CardIdent;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::CardFacing;
 use masonry_old::flex_node::FlexNode;
@@ -16,7 +16,7 @@ use crate::object_position::ObjectPosition;
 #[serde(rename_all = "camelCase")]
 pub struct CardView {
     /// Identifier for this card
-    pub id: CardIdent,
+    pub id: CardId,
 
     /// Position of this card in the UI
     pub position: ObjectPosition,
@@ -51,7 +51,7 @@ pub struct CardView {
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct CardPreviewView {
-    pub card_id: CardIdent,
+    pub card_id: CardId,
 
     /// New cost value for this card
     pub cost: Option<Energy>,

@@ -1,5 +1,5 @@
 use battle_state::actions::battle_actions::CardOrderSelectionTarget;
-use core_data::identifiers::CardIdent;
+use battle_state::battle::card_id::CardId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -91,7 +91,7 @@ pub enum Position {
     DreamwellActivation,
 
     /// Object is hidden within a card
-    HiddenWithinCard(CardIdent),
+    HiddenWithinCard(CardId),
 
     /// Object describes a game modifier or ongoing game effect
     GameModifier,
