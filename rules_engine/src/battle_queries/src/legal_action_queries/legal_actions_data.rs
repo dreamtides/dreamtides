@@ -161,15 +161,13 @@ impl LegalActions {
                 result
             }
 
-            LegalActions::SelectCharacterPrompt { valid } => valid
-                .iter()
-                .map(|card_id| BattleAction::SelectCharacterTarget(card_id))
-                .collect::<Vec<_>>(),
+            LegalActions::SelectCharacterPrompt { valid } => {
+                valid.iter().map(BattleAction::SelectCharacterTarget).collect::<Vec<_>>()
+            }
 
-            LegalActions::SelectStackCardPrompt { valid } => valid
-                .iter()
-                .map(|card_id| BattleAction::SelectStackCardTarget(card_id))
-                .collect::<Vec<_>>(),
+            LegalActions::SelectStackCardPrompt { valid } => {
+                valid.iter().map(BattleAction::SelectStackCardTarget).collect::<Vec<_>>()
+            }
 
             LegalActions::SelectPromptChoicePrompt { choice_count } => {
                 (0..*choice_count).map(BattleAction::SelectPromptChoice).collect::<Vec<_>>()

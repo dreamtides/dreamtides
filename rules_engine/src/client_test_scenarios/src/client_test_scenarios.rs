@@ -2,43 +2,42 @@ pub mod basic_scene;
 
 use std::sync::{LazyLock, Mutex};
 
-use action_data_old::debug_action_data::DebugAction;
-use action_data_old::game_action_data::GameAction;
-use battle_data_old::actions::battle_action_data::{
+use action_data::debug_action_data::DebugAction;
+use action_data::game_action_data::GameAction;
+use battle_state::actions::battle_actions::{
     BattleAction, CardBrowserType, CardOrderSelectionTarget, SelectCardOrder,
 };
-use battle_data_old::battle_cards::card_id::{CardIdType, CharacterId};
+use battle_state::battle::card_id::{CardId, CardIdType, CharacterId};
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::{
     AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
 };
-use core_data::identifiers::{BattleId, CardIdent};
+use core_data::identifiers::BattleId;
 use core_data::numerics::{Energy, Spark};
-use display_data_old::battle_view::{BattleView, ButtonView, CardOrderSelectorView, DisplayPlayer};
-use display_data_old::card_view::CardView;
-use display_data_old::command::{
+use display_data::battle_view::{BattleView, ButtonView, CardOrderSelectorView, DisplayPlayer};
+use display_data::card_view::CardView;
+use display_data::command::{
     ArrowStyle, Command, CommandSequence, DisplayArrow, DisplayArrowsCommand,
     DisplayDreamwellActivationCommand, DisplayEffectCommand, DisplayJudgmentCommand,
     DissolveCardCommand, FireProjectileCommand, GameMessageType, GameObjectId,
     ParallelCommandGroup, UpdateBattleCommand,
 };
-use display_data_old::object_position::{Position, StackType};
-use display_data_old::request_data::{
+use display_data::object_position::{Position, StackType};
+use display_data::request_data::{
     ConnectRequest, ConnectResponse, Metadata, PerformActionRequest, PerformActionResponse,
 };
-use masonry_old::borders::BorderRadius;
-use masonry_old::dimension::{Dimension, DimensionGroup, DimensionUnit, FlexInsets};
-use masonry_old::flex_enums::{FlexPosition, TextAlign, WhiteSpace};
-use masonry_old::flex_node::{FlexNode, NodeType, TextNode};
-use masonry_old::flex_style::{FlexStyle, FlexVector3};
+use masonry::borders::BorderRadius;
+use masonry::dimension::{Dimension, DimensionGroup, DimensionUnit, FlexInsets};
+use masonry::flex_enums::{FlexPosition, TextAlign, WhiteSpace};
+use masonry::flex_node::{FlexNode, NodeType, TextNode};
+use masonry::flex_style::{FlexStyle, FlexVector3};
 use uuid::Uuid;
 
 static CURRENT_BATTLE: LazyLock<Mutex<Option<BattleView>>> = LazyLock::new(|| Mutex::new(None));
 static CARD_BROWSER_SOURCE: LazyLock<Mutex<Option<Position>>> = LazyLock::new(|| Mutex::new(None));
 static ORDER_SELECTOR_VISIBLE: LazyLock<Mutex<bool>> = LazyLock::new(|| Mutex::new(false));
-static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<
-    Mutex<std::collections::HashMap<CardIdent, Position>>,
-> = LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
+static CARD_ORDER_ORIGINAL_POSITIONS: LazyLock<Mutex<std::collections::HashMap<CardId, Position>>> =
+    LazyLock::new(|| Mutex::new(std::collections::HashMap::new()));
 
 pub fn connect(request: &ConnectRequest, _scenario: &str) -> ConnectResponse {
     let battle = basic_scene::create(BattleId(Uuid::new_v4()));
@@ -100,7 +99,7 @@ fn perform_debug_action(
     PerformActionResponse { metadata, commands }
 }
 
-fn play_card(card_id: CardIdent, scenario: &str) -> CommandSequence {
+fn play_card(card_id: CardId, scenario: &str) -> CommandSequence {
     let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
     let Some((card_index, _)) = battle.cards.iter().enumerate().find(|(_, c)| c.id == card_id)
     else {
@@ -176,7 +175,7 @@ fn close_card_browser() -> CommandSequence {
     CommandSequence::sequential(vec![Command::UpdateBattle(UpdateBattleCommand::new(battle))])
 }
 
-fn select_card(card_id: CardIdent) -> CommandSequence {
+fn select_card(card_id: CardId) -> CommandSequence {
     let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
 
     let cards_to_move: Vec<(usize, u32)> = battle
@@ -272,7 +271,7 @@ fn select_card(card_id: CardIdent) -> CommandSequence {
     }
 }
 
-fn play_card_with_targets(battle: &mut BattleView, card_id: CardIdent, stack: StackType) {
+fn play_card_with_targets(battle: &mut BattleView, card_id: CardId, stack: StackType) {
     let Some((card_index, card)) = battle.cards.iter().enumerate().find(|(_, c)| c.id == card_id)
     else {
         panic!("Card not found: {:?}", card_id);
@@ -309,7 +308,7 @@ fn play_card_with_targets(battle: &mut BattleView, card_id: CardIdent, stack: St
 fn play_card_with_order_selector(
     battle: &mut BattleView,
     commands: &mut Vec<Command>,
-    card_id: CardIdent,
+    card_id: CardId,
 ) {
     let Some((card_index, card)) = battle.cards.iter().enumerate().find(|(_, c)| c.id == card_id)
     else {
@@ -378,7 +377,7 @@ fn select_card_order(select_order: SelectCardOrder) -> CommandSequence {
             Position::CardOrderSelector(select_order.target);
     }
 
-    let mut selector_cards: Vec<(usize, CardIdent, u32)> = battle
+    let mut selector_cards: Vec<(usize, CardId, u32)> = battle
         .cards
         .iter()
         .enumerate()

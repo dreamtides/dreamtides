@@ -1,23 +1,24 @@
-use action_data_old::debug_action_data::DebugAction;
-use action_data_old::game_action_data::GameAction;
+use action_data::debug_action_data::DebugAction;
+use action_data::game_action_data::GameAction;
+use battle_state::battle::card_id::CardId;
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::{AudioClipAddress, SpriteAddress};
-use core_data::identifiers::{BattleId, CardIdent};
+use core_data::identifiers::BattleId;
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::CardFacing;
-use display_data_old::battle_view::{
+use display_data::battle_view::{
     BattlePreviewView, BattleView, ButtonView, DisplayPlayer, InterfaceView, PlayerPreviewView,
     PlayerView,
 };
-use display_data_old::card_view::{
+use display_data::card_view::{
     CardActions, CardEffects, CardPrefab, CardPreviewView, CardView, DisplayImage, RevealedCardView,
 };
-use display_data_old::object_position::{ObjectPosition, Position};
-use masonry_old::borders::BorderRadius;
-use masonry_old::dimension::{Dimension, DimensionGroup, DimensionUnit, FlexInsets};
-use masonry_old::flex_enums::{FlexPosition, TextAlign, WhiteSpace};
-use masonry_old::flex_node::{FlexNode, NodeType, TextNode};
-use masonry_old::flex_style::FlexStyle;
+use display_data::object_position::{ObjectPosition, Position};
+use masonry::borders::BorderRadius;
+use masonry::dimension::{Dimension, DimensionGroup, DimensionUnit, FlexInsets};
+use masonry::flex_enums::{FlexPosition, TextAlign, WhiteSpace};
+use masonry::flex_node::{FlexNode, NodeType, TextNode};
+use masonry::flex_style::FlexStyle;
 
 pub fn create(id: BattleId) -> BattleView {
     BattleView {
@@ -93,7 +94,7 @@ pub fn card_view(position: Position, sorting_key: u32) -> CardView {
 fn card1(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardIdent::from_int(sorting_key as u64),
+        id: CardId(sorting_key as usize),
         position: ObjectPosition {
             position,
             sorting_key,
@@ -122,7 +123,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
                     },
                     cards: vec![
                         CardPreviewView {
-                            card_id: CardIdent::from_int(539),
+                            card_id: CardId(539),
                             battlefield_icon: Some("\u{f06a}".to_string()),
                             battlefield_icon_color: Some(display_color::RED_900),
                             ..Default::default()
@@ -145,7 +146,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
 fn card2(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardIdent::from_int(sorting_key as u64),
+        id: CardId(sorting_key as usize),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
@@ -182,7 +183,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
 fn card3(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardIdent::from_int(sorting_key as u64),
+        id: CardId(sorting_key as usize),
         position: ObjectPosition {
             position,
             sorting_key,
@@ -225,7 +226,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
 fn card4(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardIdent::from_int(sorting_key as u64),
+        id: CardId(sorting_key as usize),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
@@ -261,7 +262,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
 fn card5(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardIdent::from_int(sorting_key as u64),
+        id: CardId(sorting_key as usize),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
@@ -297,7 +298,7 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
 
 fn enemy_card(position: Position, sorting_key: u32) -> CardView {
     CardView {
-        id: CardIdent::from_int(sorting_key as u64),
+        id: CardId(sorting_key as usize),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: Some(RevealedCardView {
             image: DisplayImage {
@@ -329,7 +330,7 @@ fn enemy_card(position: Position, sorting_key: u32) -> CardView {
 
 fn dreamsign_card(position: Position, sorting_key: u32) -> CardView {
     CardView {
-        id: CardIdent::from_int(sorting_key as u64),
+        id: CardId(sorting_key as usize),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: Some(RevealedCardView {
             image: DisplayImage {
@@ -362,7 +363,7 @@ fn dreamsign_card(position: Position, sorting_key: u32) -> CardView {
 
 fn dreamwell_card(position: Position, sorting_key: u32) -> CardView {
     CardView {
-        id: CardIdent::from_int(sorting_key as u64),
+        id: CardId(sorting_key as usize),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: Some(RevealedCardView {
             image: DisplayImage {
@@ -393,7 +394,7 @@ fn dreamwell_card(position: Position, sorting_key: u32) -> CardView {
 fn game_modifier_card(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardIdent::from_int(sorting_key as u64),
+        id: CardId(sorting_key as usize),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage {
