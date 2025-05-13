@@ -9,3 +9,5 @@ edition = "2021"
 doctest = false
 test = false
 
+[dependencies]
+rand = "0.9"

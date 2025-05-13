@@ -14,7 +14,6 @@ use ai_core::selection_algorithm::SelectionAlgorithm;
 use ai_core::state_evaluator::StateEvaluator;
 use petgraph::prelude::{EdgeRef, NodeIndex};
 use petgraph::{Direction, Graph};
-use rand::seq::IteratorRandom;
 use tracing::{debug, info};
 
 use crate::child_score::{ChildScoreAlgorithm, SelectionMode};
@@ -40,10 +39,7 @@ impl<TState: GameStateNode> StateEvaluator<TState> for RandomPlayoutEvaluator {
                     return if winner == player { 1 } else { -1 };
                 }
                 GameStatus::InProgress { current_turn } => {
-                    let action = game
-                        .legal_actions(current_turn)
-                        .choose(&mut rand::rng())
-                        .expect("No actions found");
+                    let action = game.random_action(current_turn);
                     game.execute_action(current_turn, action);
                 }
             }

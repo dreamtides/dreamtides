@@ -1,6 +1,8 @@
 use std::fmt::Debug;
 use std::hash::Hash;
 
+use rand::seq::IteratorRandom;
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum GameStatus<TPlayer: Eq> {
     /// Game is still ongoing, it is TPlayer's turn.
@@ -58,6 +60,11 @@ pub trait GameStateNode {
         &'a self,
         player: Self::PlayerName,
     ) -> Box<dyn Iterator<Item = Self::Action> + 'a>;
+
+    /// Returns a random action for the given player.
+    fn random_action(&self, player: Self::PlayerName) -> Self::Action {
+        self.legal_actions(player).choose(&mut rand::rng()).expect("No actions found")
+    }
 
     /// Apply the result of a given action to this game state.
     fn execute_action(&mut self, player: Self::PlayerName, action: Self::Action);

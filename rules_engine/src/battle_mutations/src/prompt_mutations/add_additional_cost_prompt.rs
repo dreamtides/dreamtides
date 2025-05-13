@@ -57,7 +57,7 @@ fn create_prompt_for_cost(
         player,
         prompt_type: prompt,
         source,
-        configuration: PromptConfiguration { optional: false, ..Default::default() },
+        configuration: PromptConfiguration { optional: false },
         context,
     }
 }
