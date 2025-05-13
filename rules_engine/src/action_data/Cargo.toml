@@ -1,0 +1,17 @@
+[package]
+name = "action_data"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+test = false
+doctest = false
+bench = false
+
+[dependencies]
+ai_data = { path = "../ai_data" }
+battle_state = { path = "../battle_state" }
+core_data = { path = "../core_data" }
+
+schemars = "0.8"
+serde = { version = "1", features = ["derive"] }

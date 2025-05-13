@@ -12,6 +12,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "action_data"
+version = "0.0.0"
+dependencies = [
+ "ai_data",
+ "battle_state",
+ "core_data",
+ "schemars",
+ "serde",
+]
+
+[[package]]
 name = "action_data_old"
 version = "0.0.0"
 dependencies = [
@@ -944,6 +955,18 @@ dependencies = [
  "tokio",
  "tower",
  "tracing",
+]
+
+[[package]]
+name = "display_data"
+version = "0.0.0"
+dependencies = [
+ "action_data",
+ "battle_state",
+ "core_data",
+ "masonry",
+ "schemars",
+ "serde",
 ]
 
 [[package]]
