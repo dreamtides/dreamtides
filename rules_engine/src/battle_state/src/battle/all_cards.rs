@@ -1,10 +1,10 @@
+use std::collections::BTreeMap;
+
 use core_data::identifiers::CardName;
 use core_data::numerics::Spark;
 use core_data::types::PlayerName;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use small_map::SmallMap;
-use smallvec::SmallVec;
 
 use crate::battle::card_id::{
     BanishedCardId, CardId, CardIdType, CharacterId, DeckCardId, HandCardId, StackCardId,
@@ -41,12 +41,12 @@ pub struct ObjectId(pub usize);
 /// A map of characters on the battlefield to their states
 ///
 /// No significant differences between BTreeMap and SmallMap here.
-pub type CharacterMap = SmallMap<8, CharacterId, CharacterState>;
+pub type CharacterMap = BTreeMap<CharacterId, CharacterState>;
 
 /// A vector of cards on the stack
 ///
 /// No significant differences between SmallVec and Vec here.
-pub type StackCards = SmallVec<[StackCardState; 4]>;
+pub type StackCards = Vec<StackCardState>;
 
 #[derive(Clone, Debug, Default)]
 pub struct AllCards {
