@@ -2,8 +2,7 @@ use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::card_id::{CharacterId, HandCardId, StackCardId};
 use battle_state::battle_cards::card_set::CardSet;
 use core_data::numerics::Energy;
-use rand::seq::IteratorRandom;
-use rand::Rng;
+use fastrand;
 
 #[derive(Debug, Clone)]
 pub enum LegalActions {
@@ -197,7 +196,7 @@ impl LegalActions {
                     return None;
                 }
 
-                let index = rand::rng().random_range(0..total_actions);
+                let index = fastrand::usize(..total_actions);
 
                 if index == 0 {
                     Some(match actions.primary {
@@ -216,28 +215,36 @@ impl LegalActions {
             }
 
             LegalActions::SelectCharacterPrompt { valid } => {
-                valid.iter().choose(&mut rand::rng()).map(BattleAction::SelectCharacterTarget)
+                if valid.is_empty() {
+                    None
+                } else {
+                    let index = fastrand::usize(..valid.len());
+                    valid.iter().nth(index).map(BattleAction::SelectCharacterTarget)
+                }
             }
 
             LegalActions::SelectStackCardPrompt { valid } => {
-                valid.iter().choose(&mut rand::rng()).map(BattleAction::SelectStackCardTarget)
+                if valid.is_empty() {
+                    None
+                } else {
+                    let index = fastrand::usize(..valid.len());
+                    valid.iter().nth(index).map(BattleAction::SelectStackCardTarget)
+                }
             }
 
             LegalActions::SelectPromptChoicePrompt { choice_count } => {
                 if *choice_count == 0 {
                     None
                 } else {
-                    Some(BattleAction::SelectPromptChoice(
-                        rand::rng().random_range(0..*choice_count),
-                    ))
+                    Some(BattleAction::SelectPromptChoice(fastrand::usize(..*choice_count)))
                 }
             }
 
             LegalActions::SelectEnergyValuePrompt { minimum, maximum } => {
                 if maximum >= minimum {
-                    Some(BattleAction::SelectEnergyAdditionalCost(Energy(
-                        rand::rng().random_range(minimum.0..=maximum.0),
-                    )))
+                    Some(BattleAction::SelectEnergyAdditionalCost(Energy(fastrand::u32(
+                        minimum.0..=maximum.0,
+                    ))))
                 } else {
                     None
                 }
