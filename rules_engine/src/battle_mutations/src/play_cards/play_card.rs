@@ -7,7 +7,7 @@ use core_data::types::PlayerName;
 
 use crate::card_mutations::move_card;
 use crate::player_mutations::energy;
-use crate::prompt_mutations::add_targeting_prompt;
+use crate::prompt_mutations::{add_additional_cost_prompt, add_targeting_prompt};
 
 /// Plays a card to the stack as `player` by paying its costs. If the
 /// card requires targets or choices, a prompt will be displayed.
@@ -22,4 +22,5 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, card_id: HandCardId
     battle.stack_priority = Some(player.opponent());
     battle.push_animation(|| BattleAnimation::PlayCardFromHand { player, card_id });
     add_targeting_prompt::execute(battle, player, stack_card_id);
+    add_additional_cost_prompt::execute(battle, player, stack_card_id);
 }

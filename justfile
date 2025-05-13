@@ -18,7 +18,7 @@ release:
     cargo run --manifest-path rules_engine/Cargo.toml --release --bin "dev_server"
 
 watch:
-    cargo watch -C rules_engine -x "run --bin dev_server" --ignore log.json
+    cargo watch -C rules_engine -x "run --bin dev_server" --ignore dreamtides.json
 
 test:
     cargo test --manifest-path rules_engine/Cargo.toml
