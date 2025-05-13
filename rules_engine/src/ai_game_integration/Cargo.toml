@@ -9,8 +9,6 @@ doctest = false
 test = false
 
 [dependencies]
-actions = { path = "../actions", version = "0.0.0" }
-action_data_old = { path = "../action_data_old", version = "0.0.0" }
 ai_core = { path = "../ai_core", version = "0.0.0" }
 ai_monte_carlo = { path = "../ai_monte_carlo", version = "0.0.0" }
 ai_tree_search = { path = "../ai_tree_search", version = "0.0.0" }

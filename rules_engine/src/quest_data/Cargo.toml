@@ -9,7 +9,7 @@ doctest = false
 bench = false
 
 [dependencies]
-battle_data_old = { path = "../battle_data_old" }
+battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 
 schemars = "0.8"

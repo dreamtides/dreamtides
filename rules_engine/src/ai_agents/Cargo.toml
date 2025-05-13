@@ -14,7 +14,6 @@ ai_data = { path = "../ai_data" }
 ai_game_integration = { path = "../ai_game_integration" }
 ai_monte_carlo = { path = "../ai_monte_carlo" }
 ai_tree_search = { path = "../ai_tree_search" }
-assert_with = { path = "../assert_with" }
 battle_mutations = { path = "../battle_mutations" }
 battle_queries = { path = "../battle_queries" }
 battle_state = { path = "../battle_state" }

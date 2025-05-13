@@ -9,11 +9,6 @@ doctest = false
 bench = false
 
 [dependencies]
-display_data_old = { path = "../display_data_old" }
-battle_data_old = { path = "../battle_data_old" }
-core_data = { path = "../core_data" }
-
-rand_xoshiro = "0.7"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tracing = "0.1"

@@ -23,31 +23,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "action_data_old"
-version = "0.0.0"
-dependencies = [
- "ai_data",
- "battle_data_old",
- "core_data",
- "schemars",
- "serde",
-]
-
-[[package]]
-name = "actions"
-version = "0.0.0"
-dependencies = [
- "action_data_old",
- "assert_with",
- "battle_data_old",
- "battle_mutations_old",
- "battle_queries_old",
- "core_data",
- "logging",
- "tracing",
-]
-
-[[package]]
 name = "addr2line"
 version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -80,7 +55,6 @@ dependencies = [
  "ai_game_integration",
  "ai_monte_carlo",
  "ai_tree_search",
- "assert_with",
  "battle_mutations",
  "battle_queries",
  "battle_state",
@@ -90,27 +64,6 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "tracing_macros",
-]
-
-[[package]]
-name = "ai_agents_old"
-version = "0.0.0"
-dependencies = [
- "action_data_old",
- "ai_core",
- "ai_data",
- "ai_game_integration_old",
- "ai_monte_carlo",
- "ai_tree_search",
- "assert_with",
- "battle_data_old",
- "battle_mutations_old",
- "battle_queries_old",
- "core_data",
- "logging",
- "rand",
- "tracing",
- "tracing-subscriber",
 ]
 
 [[package]]
@@ -133,8 +86,6 @@ dependencies = [
 name = "ai_game_integration"
 version = "0.0.0"
 dependencies = [
- "action_data_old",
- "actions",
  "ai_core",
  "ai_monte_carlo",
  "ai_tree_search",
@@ -146,22 +97,6 @@ dependencies = [
  "rand_xoshiro",
  "tracing",
  "tracing_macros",
-]
-
-[[package]]
-name = "ai_game_integration_old"
-version = "0.0.0"
-dependencies = [
- "action_data_old",
- "actions",
- "ai_core",
- "ai_monte_carlo",
- "ai_tree_search",
- "assert_with",
- "battle_data_old",
- "battle_mutations_old",
- "battle_queries_old",
- "core_data",
 ]
 
 [[package]]
@@ -179,12 +114,11 @@ name = "ai_testing"
 version = "0.0.0"
 dependencies = [
  "ai_core",
- "ai_game_integration_old",
+ "ai_game_integration",
  "ai_monte_carlo",
  "ai_tree_search",
- "battle_data_old",
- "battle_mutations_old",
- "battle_queries_old",
+ "battle_mutations",
+ "battle_queries",
  "clap 3.2.25",
  "core_data",
 ]
@@ -272,18 +206,6 @@ checksum = "367fd0ad87307588d087544707bc5fbf4805ded96c7db922b70d368fa1cb5702"
 dependencies = [
  "unicode-width",
  "yansi",
-]
-
-[[package]]
-name = "assert_with"
-version = "0.0.0"
-dependencies = [
- "battle_data_old",
- "core_data",
- "logging",
- "rand_xoshiro",
- "tracing",
- "uuid",
 ]
 
 [[package]]
@@ -404,25 +326,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
 
 [[package]]
-name = "battle_data_old"
-version = "0.0.0"
-dependencies = [
- "ability_data",
- "ai_data",
- "core_data",
- "enum-iterator",
- "enumset",
- "rand",
- "rand_xoshiro",
- "schemars",
- "serde",
- "slotmap",
- "strum",
- "strum_macros",
- "uuid",
-]
-
-[[package]]
 name = "battle_mutations"
 version = "0.0.0"
 dependencies = [
@@ -438,27 +341,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "battle_mutations_old"
-version = "0.0.0"
-dependencies = [
- "ability_data",
- "assert_with",
- "battle_data_old",
- "battle_queries_old",
- "core_data",
- "logging",
- "rand",
- "rand_xoshiro",
- "tracing",
-]
-
-[[package]]
 name = "battle_queries"
 version = "0.0.0"
 dependencies = [
  "ability_data",
- "action_data_old",
- "assert_with",
  "battle_state",
  "bit-set",
  "core_data",
@@ -466,18 +352,6 @@ dependencies = [
  "rand",
  "strum",
  "strum_macros",
- "tracing",
-]
-
-[[package]]
-name = "battle_queries_old"
-version = "0.0.0"
-dependencies = [
- "ability_data",
- "action_data_old",
- "assert_with",
- "battle_data_old",
- "core_data",
  "tracing",
 ]
 
@@ -506,20 +380,14 @@ dependencies = [
 name = "benchmarks"
 version = "0.0.0"
 dependencies = [
- "action_data_old",
- "actions",
  "ai_agents",
- "ai_agents_old",
  "ai_data",
- "battle_data_old",
  "battle_mutations",
  "battle_queries",
- "battle_queries_old",
  "battle_state",
  "core_data",
  "criterion",
  "game_creation",
- "game_creation_old",
  "parser",
  "rand",
  "rand_xoshiro",
@@ -908,22 +776,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "database_old"
-version = "0.0.0"
-dependencies = [
- "action_data_old",
- "ai_data",
- "battle_data_old",
- "core_data",
- "quest_data",
- "rusqlite",
- "serde",
- "serde_json",
- "tracing",
- "uuid",
-]
-
-[[package]]
 name = "derive_more"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -991,34 +843,6 @@ dependencies = [
  "masonry",
  "schemars",
  "serde",
-]
-
-[[package]]
-name = "display_data_old"
-version = "0.0.0"
-dependencies = [
- "action_data_old",
- "battle_data_old",
- "core_data",
- "masonry_old",
- "schemars",
- "serde",
-]
-
-[[package]]
-name = "display_old"
-version = "0.0.0"
-dependencies = [
- "action_data_old",
- "ai_data",
- "assert_with",
- "battle_data_old",
- "battle_queries_old",
- "bon",
- "core_data",
- "display_data_old",
- "masonry_old",
- "ui_components_old",
 ]
 
 [[package]]
@@ -1173,20 +997,6 @@ dependencies = [
  "ai_data",
  "battle_mutations",
  "battle_state",
- "core_data",
- "rand",
- "rand_xoshiro",
- "uuid",
-]
-
-[[package]]
-name = "game_creation_old"
-version = "0.0.0"
-dependencies = [
- "ability_data",
- "ai_data",
- "battle_data_old",
- "battle_mutations_old",
  "core_data",
  "rand",
  "rand_xoshiro",
@@ -1497,10 +1307,6 @@ checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
 name = "logging"
 version = "0.0.0"
 dependencies = [
- "battle_data_old",
- "core_data",
- "display_data_old",
- "rand_xoshiro",
  "serde",
  "serde_json",
  "tracing",
@@ -1515,17 +1321,6 @@ name = "masonry"
 version = "0.0.0"
 dependencies = [
  "action_data",
- "bon",
- "core_data",
- "schemars",
- "serde",
-]
-
-[[package]]
-name = "masonry_old"
-version = "0.0.0"
-dependencies = [
- "action_data_old",
  "bon",
  "core_data",
  "schemars",
@@ -1659,7 +1454,7 @@ name = "parser"
 version = "0.0.0"
 dependencies = [
  "ability_data",
- "battle_data_old",
+ "battle_state",
  "chumsky",
  "core_data",
 ]
@@ -1815,7 +1610,7 @@ dependencies = [
 name = "quest_data"
 version = "0.0.0"
 dependencies = [
- "battle_data_old",
+ "battle_state",
  "core_data",
  "schemars",
  "serde",
@@ -2011,33 +1806,6 @@ dependencies = [
  "tracing-subscriber",
  "tracing_macros",
  "ui_components",
- "uuid",
-]
-
-[[package]]
-name = "rules_engine_old"
-version = "0.0.0"
-dependencies = [
- "action_data_old",
- "actions",
- "ai_agents_old",
- "ai_data",
- "assert_with",
- "backtrace",
- "battle_data_old",
- "battle_mutations_old",
- "battle_queries_old",
- "core_data",
- "database_old",
- "display_data_old",
- "display_old",
- "game_creation_old",
- "logging",
- "masonry_old",
- "tokio",
- "tracing",
- "tracing-subscriber",
- "ui_components_old",
  "uuid",
 ]
 
@@ -2559,17 +2327,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ui_components_old"
-version = "0.0.0"
-dependencies = [
- "action_data_old",
- "asset_paths",
- "bon",
- "core_data",
- "masonry_old",
-]
-
-[[package]]
 name = "unicode-ident"
 version = "1.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2597,7 +2354,7 @@ checksum = "f962df74c8c05a667b5ee8bcf162993134c104e96440b663c8daa176dc772d8c"
 name = "user_data"
 version = "0.0.0"
 dependencies = [
- "battle_data_old",
+ "battle_state",
  "core_data",
  "quest_data",
  "schemars",

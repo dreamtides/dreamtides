@@ -10,19 +10,13 @@ test = false
 doctest = false
 
 [dependencies]
-action_data_old = { path = "../src/action_data_old" }
-actions = { path = "../src/actions" }
 ai_agents = { path = "../src/ai_agents" }
-ai_agents_old = { path = "../src/ai_agents_old" }
 ai_data = { path = "../src/ai_data" }
-battle_data_old = { path = "../src/battle_data_old" }
 battle_mutations = { path = "../src/battle_mutations" }
 battle_queries = { path = "../src/battle_queries" }
-battle_queries_old = { path = "../src/battle_queries_old" }
 battle_state = { path = "../src/battle_state" }
 core_data = { path = "../src/core_data" }
 game_creation = { path = "../src/game_creation" }
-game_creation_old = { path = "../src/game_creation_old" }
 parser = { path = "../src/parser" }
 tracing_macros = { path = "../src/tracing_macros" }
 
