@@ -1,0 +1,32 @@
+[package]
+name = "run_matchup"
+version = "0.0.0"
+license = "Apache-2.0"
+edition = "2021"
+
+[[bin]]
+name = "run_matchup"
+path = "src/run_matchup.rs"
+test = false
+
+[dependencies]
+ai_agents = { path = "../ai_agents" }
+ai_core = { path = "../ai_core" }
+ai_data = { path = "../ai_data" }
+ai_monte_carlo = { path = "../ai_monte_carlo" }
+ai_tree_search = { path = "../ai_tree_search" }
+battle_state = { path = "../battle_state" }
+battle_mutations = { path = "../battle_mutations" }
+battle_queries = { path = "../battle_queries" }
+core_data = { path = "../core_data" }
+game_creation = { path = "../game_creation" }
+tracing_macros = { path = "../tracing_macros" }
+
+clap = { version = "4", features = ["derive"] }
+rand = "0.9"
+rand_xoshiro = "0.7"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+uuid = "1"

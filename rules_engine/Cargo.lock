@@ -1810,6 +1810,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "run_matchup"
+version = "0.0.0"
+dependencies = [
+ "ai_agents",
+ "ai_core",
+ "ai_data",
+ "ai_monte_carlo",
+ "ai_tree_search",
+ "battle_mutations",
+ "battle_queries",
+ "battle_state",
+ "clap 4.5.36",
+ "core_data",
+ "game_creation",
+ "rand",
+ "rand_xoshiro",
+ "serde",
+ "serde_json",
+ "tracing",
+ "tracing-subscriber",
+ "tracing_macros",
+ "uuid",
+]
+
+[[package]]
 name = "rusqlite"
 version = "0.35.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
