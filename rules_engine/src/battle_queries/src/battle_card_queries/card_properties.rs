@@ -1,8 +1,9 @@
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::CardIdType;
+use battle_state::battle::card_id::{CardIdType, CharacterId};
 use core_data::card_types::{CardType, CharacterType};
 use core_data::identifiers::CardName;
 use core_data::numerics::{Energy, Spark};
+use core_data::types::PlayerName;
 
 pub fn cost(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
     match battle.cards.name(card_id) {
@@ -12,6 +13,10 @@ pub fn cost(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
         CardName::Abolish => Some(Energy(2)),
         CardName::Dreamscatter => Some(Energy(1)),
     }
+}
+
+pub fn spark(battle: &BattleState, controller: PlayerName, id: CharacterId) -> Option<Spark> {
+    battle.cards.spark(controller, id)
 }
 
 pub fn base_spark(battle: &BattleState, card_id: impl CardIdType) -> Option<Spark> {

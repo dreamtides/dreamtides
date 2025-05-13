@@ -969,6 +969,7 @@ dependencies = [
  "core_data",
  "display_data",
  "masonry",
+ "tracing",
  "tracing_macros",
  "ui_components",
 ]
@@ -980,7 +981,7 @@ dependencies = [
  "action_data",
  "battle_state",
  "core_data",
- "masonry_old",
+ "masonry",
  "schemars",
  "serde",
 ]

@@ -4,7 +4,7 @@ use core_data::display_types::{
     AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
 };
 use core_data::numerics::{Energy, Points};
-use masonry_old::flex_style::FlexVector3;
+use masonry::flex_style::FlexVector3;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 

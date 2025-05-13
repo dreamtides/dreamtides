@@ -20,3 +20,4 @@ tracing_macros = { path = "../tracing_macros" }
 ui_components = { path = "../ui_components" }
 
 bon = "3"
+tracing = "0.1"

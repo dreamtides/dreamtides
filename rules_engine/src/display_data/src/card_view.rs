@@ -4,7 +4,7 @@ use core_data::display_color::DisplayColor;
 use core_data::display_types::{AudioClipAddress, ProjectileAddress, SpriteAddress};
 use core_data::numerics::{Energy, Spark};
 use core_data::types::CardFacing;
-use masonry_old::flex_node::FlexNode;
+use masonry::flex_node::FlexNode;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
