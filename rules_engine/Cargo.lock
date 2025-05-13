@@ -901,6 +901,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "database"
+version = "0.0.0"
+dependencies = [
+ "action_data",
+ "ai_data",
+ "battle_state",
+ "core_data",
+ "quest_data",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
 name = "database_old"
 version = "0.0.0"
 dependencies = [
