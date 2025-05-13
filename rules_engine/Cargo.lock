@@ -947,7 +947,19 @@ dependencies = [
 ]
 
 [[package]]
-name = "display"
+name = "display_data_old"
+version = "0.0.0"
+dependencies = [
+ "action_data_old",
+ "battle_data_old",
+ "core_data",
+ "masonry",
+ "schemars",
+ "serde",
+]
+
+[[package]]
+name = "display_old"
 version = "0.0.0"
 dependencies = [
  "action_data_old",
@@ -960,18 +972,6 @@ dependencies = [
  "display_data_old",
  "masonry",
  "ui_components",
-]
-
-[[package]]
-name = "display_data_old"
-version = "0.0.0"
-dependencies = [
- "action_data_old",
- "battle_data_old",
- "core_data",
- "masonry",
- "schemars",
- "serde",
 ]
 
 [[package]]
@@ -1948,8 +1948,8 @@ dependencies = [
  "battle_queries_old",
  "core_data",
  "database",
- "display",
  "display_data_old",
+ "display_old",
  "game_creation_old",
  "logging",
  "masonry",

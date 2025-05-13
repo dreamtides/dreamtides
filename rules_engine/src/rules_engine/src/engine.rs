@@ -11,7 +11,7 @@ use battle_data_old::battle_player::player_data::PlayerType;
 use core_data::identifiers::{BattleId, QuestId, UserId};
 use database::save_file::SaveFile;
 use database::sqlite_database::{self, Database};
-use display::rendering::{battle_rendering, renderer};
+use display_old::rendering::{battle_rendering, renderer};
 use display_data_old::command::CommandSequence;
 use display_data_old::request_data::{ConnectRequest, ConnectResponse, PerformActionRequest};
 use game_creation_old::new_battle;
