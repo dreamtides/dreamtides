@@ -474,6 +474,7 @@ dependencies = [
  "battle_state",
  "bit-set",
  "core_data",
+ "rand",
  "strum",
  "strum_macros",
  "tracing",

@@ -2,6 +2,8 @@ use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::card_id::{CharacterId, HandCardId, StackCardId};
 use battle_state::battle_cards::card_set::CardSet;
 use core_data::numerics::Energy;
+use rand::seq::IteratorRandom;
+use rand::Rng;
 
 #[derive(Debug, Clone)]
 pub enum LegalActions {
@@ -176,6 +178,70 @@ impl LegalActions {
             LegalActions::SelectEnergyValuePrompt { minimum, maximum } => (minimum.0..=maximum.0)
                 .map(|e| BattleAction::SelectEnergyAdditionalCost(Energy(e)))
                 .collect::<Vec<_>>(),
+        }
+    }
+
+    /// Returns a random action from the legal actions.
+    ///
+    /// Returns `None` if there are no legal actions.
+    pub fn random_action(&self) -> Option<BattleAction> {
+        match self {
+            LegalActions::NoActionsGameOver
+            | LegalActions::NoActionsOpponentPrompt
+            | LegalActions::NoActionsOpponentPriority
+            | LegalActions::NoActionsInCurrentPhase => None,
+
+            LegalActions::Standard { actions } => {
+                let total_actions = self.len();
+                if total_actions == 0 {
+                    return None;
+                }
+
+                let index = rand::rng().random_range(0..total_actions);
+
+                if index == 0 {
+                    Some(match actions.primary {
+                        PrimaryLegalAction::PassPriority => BattleAction::PassPriority,
+                        PrimaryLegalAction::EndTurn => BattleAction::EndTurn,
+                        PrimaryLegalAction::StartNextTurn => BattleAction::StartNextTurn,
+                    })
+                } else {
+                    let hand_card_index = index - 1;
+                    actions
+                        .play_card_from_hand
+                        .iter()
+                        .nth(hand_card_index)
+                        .map(BattleAction::PlayCardFromHand)
+                }
+            }
+
+            LegalActions::SelectCharacterPrompt { valid } => {
+                valid.iter().choose(&mut rand::rng()).map(BattleAction::SelectCharacterTarget)
+            }
+
+            LegalActions::SelectStackCardPrompt { valid } => {
+                valid.iter().choose(&mut rand::rng()).map(BattleAction::SelectStackCardTarget)
+            }
+
+            LegalActions::SelectPromptChoicePrompt { choice_count } => {
+                if *choice_count == 0 {
+                    None
+                } else {
+                    Some(BattleAction::SelectPromptChoice(
+                        rand::rng().random_range(0..*choice_count),
+                    ))
+                }
+            }
+
+            LegalActions::SelectEnergyValuePrompt { minimum, maximum } => {
+                if maximum >= minimum {
+                    Some(BattleAction::SelectEnergyAdditionalCost(Energy(
+                        rand::rng().random_range(minimum.0..=maximum.0),
+                    )))
+                } else {
+                    None
+                }
+            }
         }
     }
 }

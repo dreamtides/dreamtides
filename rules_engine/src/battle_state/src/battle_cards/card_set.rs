@@ -8,6 +8,9 @@ use crate::battle::card_id::{CardId, CardIdType};
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CardSet<T> {
     // BitSet<usize> does around 2% in our benchmarks than BitSet<u32>
+    //
+    // I've tried FixedBitSet here, but it generally seems to perform the same
+    // or worse.
     set: BitSet<usize>,
     _marker: PhantomData<T>,
 }

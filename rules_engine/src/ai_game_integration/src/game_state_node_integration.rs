@@ -55,6 +55,10 @@ impl GameStateNode for AgentBattleState {
         Box::new(actions.into_iter())
     }
 
+    fn random_action(&self, player: PlayerName) -> BattleAction {
+        legal_actions::compute(&self.state, player).random_action().expect("No actions available")
+    }
+
     fn execute_action(&mut self, player: PlayerName, action: BattleAction) {
         apply_battle_action::execute(&mut self.state, player, action);
     }
