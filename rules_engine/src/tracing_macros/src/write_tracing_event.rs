@@ -1,8 +1,9 @@
 use std::collections::BTreeMap;
+use std::env;
 use std::fmt::Write as FmtWrite;
 use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Seek, SeekFrom, Write};
-use std::path::Path;
+use std::path::PathBuf;
 use std::time::SystemTime;
 
 use battle_queries::debug_snapshot::debug_battle_snapshot;
@@ -59,6 +60,7 @@ pub fn write_panic_snapshot(
         snapshot,
         timestamp,
     };
+
     write_event_to_log_file(&event);
 }
 
@@ -97,9 +99,15 @@ fn format_current_time() -> String {
 }
 
 pub fn clear_log_file() {
-    let log_path = Path::new("dreamtides.json");
-    if log_path.exists() {
-        fs::remove_file(log_path).expect("Failed to clear dreamtides.json");
+    match get_log_file_path() {
+        Ok(log_path) => {
+            if log_path.exists() {
+                if let Err(e) = fs::remove_file(&log_path) {
+                    error!("Failed to clear dreamtides.json: {}", e);
+                }
+            }
+        }
+        Err(e) => error!("Failed to determine log file path: {}", e),
     }
 }
 
@@ -111,11 +119,20 @@ fn write_event_to_log_file(event: &BattleTraceEvent) {
 }
 
 fn write_json_to_log_file(json_str: &str) {
-    let log_path = Path::new("dreamtides.json");
+    eprintln!("Writing JSON to log file");
+
+    let log_path = match get_log_file_path() {
+        Ok(path) => path,
+        Err(e) => {
+            error!("Failed to determine log file path: {}", e);
+            return;
+        }
+    };
 
     if !log_path.exists() {
-        match File::create(log_path) {
+        match File::create(&log_path) {
             Ok(mut file) => {
+                eprintln!("Writing event to new log file");
                 if let Err(e) = file.write_all(format!("[\n{}\n]", json_str).as_bytes()) {
                     error!("Failed to write to dreamtides.json: {}", e);
                 }
@@ -125,7 +142,8 @@ fn write_json_to_log_file(json_str: &str) {
         return;
     }
 
-    match OpenOptions::new().read(true).write(true).open(log_path) {
+    eprintln!("Opening log file {:?}", log_path);
+    match OpenOptions::new().read(true).write(true).open(&log_path) {
         Ok(mut file) => match file.metadata() {
             Ok(metadata) => {
                 if metadata.len() > 0 {
@@ -169,4 +187,16 @@ fn reset_file(file: &mut File, json_str: &str) {
     if let Err(e) = file.write_all(format!("[\n{}\n]", json_str).as_bytes()) {
         error!("Failed to write to dreamtides.json: {}", e);
     }
+}
+
+fn get_log_file_path() -> Result<PathBuf, String> {
+    let manifest_dir = env!("CARGO_MANIFEST_DIR");
+    // Go up two levels from tracing_macros crate to workspace root
+    let manifest_path = PathBuf::from(manifest_dir);
+    let parent = manifest_path
+        .parent()
+        .ok_or_else(|| "Failed to find parent directory of manifest".to_string())?;
+    let workspace_root =
+        parent.parent().ok_or_else(|| "Failed to find workspace root directory".to_string())?;
+    Ok(workspace_root.join("dreamtides.json"))
 }
