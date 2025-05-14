@@ -10,4 +10,5 @@ pub enum GameAI {
     IterativeDeepening,
     Uct1,
     Uct1MaxIterations(u32),
+    NewUct(u32),
 }

@@ -7,6 +7,8 @@ use ai_game_integration::game_state_node_integration::AgentBattleState;
 use ai_monte_carlo::monte_carlo::{MonteCarloAlgorithm, RandomPlayoutEvaluator};
 use ai_monte_carlo::uct1::Uct1;
 use ai_tree_search::iterative_deepening_search::IterativeDeepeningSearch;
+use ai_uct::uct_config::UctConfig;
+use ai_uct::uct_search;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
@@ -39,7 +41,8 @@ pub fn select_action(battle: &BattleState, player: PlayerName, game_ai: &GameAI)
         ai_game_integration_old=debug,\
         ai_monte_carlo=debug,\
         ai_testing=debug,\
-        ai_tree_search=debug,",
+        ai_tree_search=debug,\
+        ai_uct=debug",
     );
     let forest_subscriber =
         tracing_subscriber::registry().with(logging::create_forest_layer(filter));
@@ -69,6 +72,12 @@ pub fn select_action_unchecked(
         GameAI::Uct1 => uct1_action(battle, 10, None),
         GameAI::Uct1MaxIterations(max_iterations) => {
             uct1_action(battle, 1000, Some(*max_iterations))
+        }
+        GameAI::NewUct(max_iterations) => {
+            uct_search::search_from_empty(battle, player, &UctConfig {
+                max_iterations: *max_iterations,
+            })
+            .action
         }
     }
 }

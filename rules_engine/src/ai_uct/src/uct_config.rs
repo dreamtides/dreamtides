@@ -1,6 +1,6 @@
 #[derive(Debug, Clone)]
 pub struct UctConfig {
-    pub max_iterations: usize,
+    pub max_iterations: u32,
 }
 
 impl Default for UctConfig {

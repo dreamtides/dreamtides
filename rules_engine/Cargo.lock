@@ -55,6 +55,7 @@ dependencies = [
  "ai_game_integration",
  "ai_monte_carlo",
  "ai_tree_search",
+ "ai_uct",
  "battle_mutations",
  "battle_queries",
  "battle_state",

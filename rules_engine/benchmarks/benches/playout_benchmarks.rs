@@ -94,7 +94,7 @@ pub fn uct_1k_action(c: &mut Criterion) {
                     criterion::black_box(agent_search::select_action_unchecked(
                         &battle,
                         PlayerName::One,
-                        &GameAI::Uct1MaxIterations(1000),
+                        &GameAI::NewUct(1000),
                     ))
                 },
                 BatchSize::SmallInput,

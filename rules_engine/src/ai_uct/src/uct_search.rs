@@ -24,7 +24,6 @@ use crate::uct_tree::{SearchEdge, SearchGraph, SearchNode, SelectionMode, UctSea
 /// Searches for an action for `player` to take in the given `battle` state. The
 /// provided `graph` and `root` should correspond to a search graph rooted at
 /// this state, i.e. one where the agent's possible actions form outgoing edges.
-/// When starting, it's fine to provide an empty graph with a default root node.
 ///
 /// Returns a [UctSearchResult] with an action to perform as well as graph data
 /// to reuse in future searches.
@@ -76,6 +75,19 @@ pub fn search(
         next_graph: SearchGraph::default(),
         next_root: NodeIndex::default(),
     }
+}
+
+/// Equivalent to [search] for use where there is no previous search graph
+/// available.
+pub fn search_from_empty(
+    initial_battle: &BattleState,
+    player: PlayerName,
+    config: &UctConfig,
+) -> UctSearchResult {
+    let mut graph = SearchGraph::default();
+    let root =
+        graph.add_node(SearchNode { player, total_reward: OrderedFloat(0.0), visit_count: 0 });
+    search(initial_battle, player, config, &mut graph, root)
 }
 
 /// Returns a descendant node to evaluate next for the provided parent node.
