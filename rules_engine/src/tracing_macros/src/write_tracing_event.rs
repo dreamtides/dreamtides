@@ -3,11 +3,13 @@ use std::fmt::Write as FmtWrite;
 use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::Path;
+use std::time::SystemTime;
 
 use battle_queries::debug_snapshot::debug_battle_snapshot;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_trace::battle_tracing::BattleTraceEvent;
 use battle_state::debug::debug_battle_state::DebugBattleState;
+use chrono::{DateTime, Local};
 use display_data::command::CommandSequence;
 use serde::Serialize;
 use serde_json;
@@ -25,7 +27,8 @@ pub fn write_battle_event(
             let _ = write!(acc, "{}: {}, ", k, v);
             acc
         });
-        let event = BattleTraceEvent { m: message, vs: values_string, values, snapshot };
+        let timestamp = format_current_time();
+        let event = BattleTraceEvent { m: message, vs: values_string, values, snapshot, timestamp };
 
         write_event_to_log_file(&event);
 
@@ -48,8 +51,14 @@ pub fn write_panic_snapshot(
         let _ = write!(acc, "{}: {}, ", k, v);
         acc
     });
-    let event =
-        BattleTraceEvent { m: format!("PANIC: {}", message), vs: values_string, values, snapshot };
+    let timestamp = format_current_time();
+    let event = BattleTraceEvent {
+        m: format!("PANIC: {}", message),
+        vs: values_string,
+        values,
+        snapshot,
+        timestamp,
+    };
     write_event_to_log_file(&event);
 }
 
@@ -59,6 +68,7 @@ struct CommandTraceEvent {
     pub m: String,
     pub snapshot: Option<DebugBattleState>,
     pub sequence: CommandSequence,
+    pub timestamp: String,
 }
 
 pub fn write_commands(
@@ -67,11 +77,23 @@ pub fn write_commands(
     sequence: &CommandSequence,
 ) {
     let snapshot = battle.filter(|b| b.tracing.is_some()).map(debug_battle_snapshot::capture);
-    let event = CommandTraceEvent { m: message.to_string(), snapshot, sequence: sequence.clone() };
+    let timestamp = format_current_time();
+    let event = CommandTraceEvent {
+        m: message.to_string(),
+        snapshot,
+        sequence: sequence.clone(),
+        timestamp,
+    };
     match serde_json::to_string_pretty(&event) {
         Ok(json) => write_json_to_log_file(&json),
         Err(e) => error!("Failed to serialize CommandSequence: {}", e),
     }
+}
+
+fn format_current_time() -> String {
+    let now = SystemTime::now();
+    let datetime: DateTime<Local> = now.into();
+    datetime.format("%Y-%m-%d %H:%M:%S%.3f %z").to_string()
 }
 
 pub fn clear_log_file() {

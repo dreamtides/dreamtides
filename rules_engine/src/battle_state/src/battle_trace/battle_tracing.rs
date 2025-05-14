@@ -33,4 +33,7 @@ pub struct BattleTraceEvent {
 
     /// Snapshot of the battle state at the time this trace event was captured
     pub snapshot: DebugBattleState,
+
+    /// Human-readable timestamp showing when this event was created
+    pub timestamp: String,
 }
