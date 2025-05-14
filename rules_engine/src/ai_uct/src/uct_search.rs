@@ -1,13 +1,23 @@
+use std::collections::HashSet;
 use std::f64::consts;
 
+use battle_mutations::actions::apply_battle_action;
+use battle_mutations::player_mutations::player_state;
+use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::battle_status::BattleStatus;
 use core_data::types::PlayerName;
+use ordered_float::OrderedFloat;
 use petgraph::prelude::NodeIndex;
+use petgraph::visit::EdgeRef;
+use petgraph::Direction;
+use tracing::info;
+use tracing_macros::panic_with;
 
 use crate::uct_config::UctConfig;
-use crate::uct_tree::{SearchGraph, SelectionMode, UctSearchResult};
+use crate::uct_tree::{SearchEdge, SearchGraph, SearchNode, SelectionMode, UctSearchResult};
 
 /// Monte Carlo search algorithm.
 ///
@@ -44,13 +54,28 @@ use crate::uct_tree::{SearchGraph, SelectionMode, UctSearchResult};
 ///   𝐫𝐞𝐭𝐮𝐫𝐧 𝒂(BESTCHILD(v₀, 0))
 /// ```
 pub fn search(
-    battle: &BattleState,
+    initial_battle: &BattleState,
     player: PlayerName,
     config: &UctConfig,
-    graph: &SearchGraph,
+    graph: &mut SearchGraph,
     root: NodeIndex,
 ) -> UctSearchResult {
-    todo!("Implement UCT search")
+    for _ in 0..config.max_iterations {
+        let mut battle = player_state::randomize_battle_player(initial_battle, player.opponent());
+        let node = next_evaluation_target(&mut battle, graph, root);
+        let reward = evaluate(&mut battle, player);
+        back_propagate_rewards(graph, player, node, reward);
+    }
+
+    info!("Halting monte carlo search after {} iterations", config.max_iterations);
+    log_results(graph, root);
+
+    let legal = legal_actions::compute(initial_battle, player);
+    UctSearchResult {
+        action: best_child(graph, root, &legal, SelectionMode::RewardOnly).action,
+        next_graph: SearchGraph::default(),
+        next_root: NodeIndex::default(),
+    }
 }
 
 /// Returns a descendant node to evaluate next for the provided parent node.
@@ -87,10 +112,25 @@ fn next_evaluation_target(
     graph: &mut SearchGraph,
     from_node: NodeIndex,
 ) -> NodeIndex {
-    todo!("Implement UCT search")
+    let mut node = from_node;
+    while let Some(player) = legal_actions::next_to_act(battle) {
+        let actions = legal_actions::compute(battle, player);
+        let explored = graph.edges(node).map(|e| e.weight().action).collect::<HashSet<_>>();
+        if let Some(action) = actions.all().iter().find(|a| !explored.contains(a)) {
+            // An action exists from this node which has not yet been tried
+            return add_child(battle, graph, player, node, *action);
+        } else {
+            // All actions from this node have been tried, recursively search
+            // the best candidate
+            let best = best_child(graph, node, &actions, SelectionMode::Exploration);
+            apply_battle_action::execute(battle, player, best.action);
+            node = best.node;
+        }
+    }
+    node
 }
 
-/// Adds a new node to the search graph, the 'expand' function.
+/// Adds a new child node to the search graph (the 'expand' function).
 ///
 /// Generates a new tree node by applying the next untried action from the
 /// provided input node. Mutates the provided [GameState] to apply the
@@ -105,14 +145,18 @@ fn next_evaluation_target(
 ///     and 𝒂(v′) = 𝒂
 ///   𝐫𝐞𝐭𝐮𝐫𝐧 v′
 /// ```
-fn add_node(
+fn add_child(
     battle: &mut BattleState,
     graph: &mut SearchGraph,
     player: PlayerName,
-    from_node: NodeIndex,
+    parent: NodeIndex,
     action: BattleAction,
 ) -> NodeIndex {
-    todo!("Implement UCT search")
+    apply_battle_action::execute(battle, player, action);
+    let child =
+        graph.add_node(SearchNode { player, total_reward: OrderedFloat(0.0), visit_count: 0 });
+    graph.add_edge(parent, child, SearchEdge { action });
+    child
 }
 
 struct BestChild {
@@ -123,15 +167,33 @@ struct BestChild {
 /// Picks the most promising child node to explore next.
 ///
 /// This picks a child based on its computed reward and visit count, subject to
-/// the requested [SelectionMode]. Returns the action taken to produce this
-/// child and its associated node.
+/// the requested [SelectionMode].
+///
+/// Returns the action taken to produce this child and its associated node.
+///
+/// Panics if the provided `from_node` has no legal children.
 fn best_child(
     graph: &SearchGraph,
     from_node: NodeIndex,
     legal: &LegalActions,
     selection_mode: SelectionMode,
 ) -> BestChild {
-    todo!("Implement UCT search")
+    let parent_visits = graph[from_node].visit_count;
+
+    graph
+        .edges(from_node)
+        .filter(|e| legal.contains(e.weight().action))
+        .max_by_key(|edge| {
+            let target = edge.target();
+            child_score(
+                parent_visits,
+                graph[target].visit_count,
+                graph[target].total_reward,
+                selection_mode,
+            )
+        })
+        .map(|edge| BestChild { action: edge.weight().action, node: edge.target() })
+        .expect("No legal children available")
 }
 
 /// Walks back up the search tree, adding the resulting reward value to each
@@ -150,9 +212,47 @@ fn back_propagate_rewards(
     graph: &mut SearchGraph,
     maximizing_player: PlayerName,
     leaf_node: NodeIndex,
-    reward: f64,
+    reward: OrderedFloat<f64>,
 ) {
-    todo!("Implement UCT search")
+    let mut node = leaf_node;
+    loop {
+        let weight = &mut graph[node];
+        weight.visit_count += 1;
+        weight.total_reward += if weight.player == maximizing_player { reward } else { -reward };
+
+        node = match graph.neighbors_directed(node, Direction::Incoming).next() {
+            Some(n) => n,
+            _ => break,
+        };
+    }
+}
+
+/// Scores a given [BattleState] for the maximizing player (the 'default policy'
+/// of the search).
+///
+/// Plays out a game using random moves until a terminal state is reached.
+///
+/// Pseudocode:
+/// ```text
+/// 𝐟𝐮𝐧𝐜𝐭𝐢𝐨𝐧 DEFAULTPOLICY(s)
+///   𝐰𝐡𝐢𝐥𝐞 s is non-terminal 𝐝𝐨
+///     choose 𝒂 ∈ A(s) uniformly at random
+///     s ← f(s,𝒂)
+///   𝐫𝐞𝐭𝐮𝐫𝐧 reward for state s
+/// ```
+fn evaluate(battle: &mut BattleState, maximizing_player: PlayerName) -> OrderedFloat<f64> {
+    while let Some(player) = legal_actions::next_to_act(battle) {
+        let Some(action) = legal_actions::compute(battle, player).random_action() else {
+            panic_with!("No legal actions available", battle, player);
+        };
+        apply_battle_action::execute(battle, player, action);
+    }
+
+    let BattleStatus::GameOver { winner } = battle.status else {
+        panic_with!("Battle has not ended", battle);
+    };
+    let reward = if winner == maximizing_player { 1.0 } else { -1.0 };
+    OrderedFloat(reward)
 }
 
 /// Computes the score for a child node based on its parent's visit count and
@@ -173,15 +273,18 @@ fn back_propagate_rewards(
 fn child_score(
     parent_visits: u32,
     child_visits: u32,
-    reward: f64,
+    reward: OrderedFloat<f64>,
     selection_mode: SelectionMode,
-) -> f64 {
+) -> OrderedFloat<f64> {
     let exploitation = reward / f64::from(child_visits);
     let exploration =
         f64::sqrt((2.0 * f64::ln(f64::from(parent_visits))) / f64::from(child_visits));
     let exploration_bias = match selection_mode {
         SelectionMode::Exploration => consts::FRAC_1_SQRT_2,
-        SelectionMode::Best => 0.0,
+        SelectionMode::RewardOnly => 0.0,
     };
     exploitation + (exploration_bias * exploration)
 }
+
+/// Logs search results & best available actions.
+fn log_results(_graph: &SearchGraph, _node: NodeIndex) {}

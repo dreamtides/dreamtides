@@ -1,5 +1,6 @@
 use battle_state::actions::battle_actions::BattleAction;
 use core_data::types::PlayerName;
+use ordered_float::OrderedFloat;
 use petgraph::prelude::NodeIndex;
 use petgraph::Graph;
 
@@ -16,7 +17,7 @@ pub struct SearchNode {
     /// Player who acted to create this node
     pub player: PlayerName,
     /// Q(v): Total reward of all playouts that passed through this state
-    pub total_reward: f64,
+    pub total_reward: OrderedFloat<f64>,
     /// N(v): Visit count for this node
     pub visit_count: u32,
 }
@@ -44,5 +45,5 @@ pub enum SelectionMode {
     /// Balance between trying new children and re-visiting existing children.
     Exploration,
     /// Select the best overall child without giving any weight to exploration.
-    Best,
+    RewardOnly,
 }

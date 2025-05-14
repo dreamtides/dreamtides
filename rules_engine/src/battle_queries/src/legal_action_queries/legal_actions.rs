@@ -75,8 +75,7 @@ pub fn compute(battle: &BattleState, player: PlayerName) -> LegalActions {
 
 /// Returns the player who is next to act.
 ///
-/// Returns None if the game is over or if invoked during a turn phase in which
-/// no player can act.
+/// Returns None if the game is over.
 pub fn next_to_act(battle: &BattleState) -> Option<PlayerName> {
     if matches!(battle.status, BattleStatus::GameOver { .. }) {
         return None;
@@ -88,12 +87,10 @@ pub fn next_to_act(battle: &BattleState) -> Option<PlayerName> {
 
     if let Some(priority) = battle.stack_priority {
         Some(priority)
-    } else if battle.phase == BattleTurnPhase::Main {
+    } else if battle.phase != BattleTurnPhase::Ending {
         Some(battle.turn.active_player)
-    } else if battle.phase == BattleTurnPhase::Ending {
-        Some(battle.turn.active_player.opponent())
     } else {
-        None
+        Some(battle.turn.active_player.opponent())
     }
 }
 
