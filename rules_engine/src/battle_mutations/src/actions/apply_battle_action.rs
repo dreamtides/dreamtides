@@ -14,6 +14,10 @@ use crate::prompt_mutations::{select_additional_costs, select_choice_prompt_at_i
 #[instrument(name = "apply_battle_action", level = "debug", skip(battle))]
 pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleAction) {
     battle_trace!("Executing action", battle, player, action);
+    if battle.turn.turn_id.0 > 500 {
+        panic_with!("Turn limit exceeded", battle);
+    }
+
     if battle.tracing.is_some() {
         let legal_actions = legal_actions::compute(battle, player);
 

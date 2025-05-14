@@ -1,13 +1,11 @@
 use ai_core::game_state_node::{GameStateNode, GameStatus};
 use battle_mutations::actions::apply_battle_action;
-use battle_mutations::card_mutations::player_hand;
+use battle_mutations::player_mutations::player_state;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use core_data::types::PlayerName;
-use rand::{Rng, SeedableRng};
-use rand_xoshiro::Xoshiro256PlusPlus;
 use tracing_macros::panic_with;
 
 /// Wrapper over [BattleState] to allow trait to be implemented in this crate.
@@ -27,12 +25,7 @@ impl GameStateNode for AgentBattleState {
     where
         Self: Sized,
     {
-        let mut result = self.state.logical_clone();
-        let seed = rand::rng().random();
-        result.rng = Xoshiro256PlusPlus::seed_from_u64(seed);
-        result.seed = seed;
-        player_hand::randomize_player_hand(&mut result, player);
-        Self { state: result }
+        AgentBattleState { state: player_state::randomize_battle_player(&self.state, player) }
     }
 
     fn status(&self) -> GameStatus<PlayerName> {

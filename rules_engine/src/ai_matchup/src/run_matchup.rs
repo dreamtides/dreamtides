@@ -16,7 +16,7 @@ use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::{EnvFilter, Layer};
 use uuid::Uuid;
 
-const MAX_TURNS: usize = 50;
+const MAX_TURNS: usize = 100;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, ValueEnum)]
 enum Verbosity {
