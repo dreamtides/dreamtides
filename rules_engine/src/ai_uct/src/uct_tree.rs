@@ -3,7 +3,7 @@ use core_data::types::PlayerName;
 use ego_tree::Tree;
 
 pub struct UctTree {
-    tree: Tree<SearchNode>,
+    _tree: Tree<SearchNode>,
 }
 
 pub struct SearchNode {
