@@ -13,6 +13,6 @@ pub enum BattleStatus {
 
     /// Battle has ended and the [PlayerName] player has won.
     ///
-    /// It is not possible for the battle to end in a draw.
-    GameOver { winner: PlayerName },
+    /// If the winner is None, the battle has ended in a draw.
+    GameOver { winner: Option<PlayerName> },
 }

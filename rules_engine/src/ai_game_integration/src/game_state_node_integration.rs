@@ -30,7 +30,9 @@ impl GameStateNode for AgentBattleState {
 
     fn status(&self) -> GameStatus<PlayerName> {
         match self.state.status {
-            BattleStatus::GameOver { winner } => GameStatus::Completed { winner },
+            BattleStatus::GameOver { winner } => {
+                GameStatus::Completed { winner: winner.unwrap_or(PlayerName::One) }
+            }
             _ => {
                 let Some(next) = legal_actions::next_to_act(&self.state) else {
                     panic_with!("No player to act", &self.state);

@@ -9,6 +9,6 @@ pub fn gain(battle: &mut BattleState, player: PlayerName, _source: EffectSource,
     let player_state = battle.players.player_mut(player);
     player_state.points += amount;
     if player_state.points >= Points(25) {
-        battle.status = BattleStatus::GameOver { winner: player };
+        battle.status = BattleStatus::GameOver { winner: Some(player) };
     }
 }

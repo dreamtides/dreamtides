@@ -16,8 +16,6 @@ use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::{EnvFilter, Layer};
 use uuid::Uuid;
 
-const MAX_TURNS: usize = 100;
-
 #[derive(Debug, Copy, Clone, PartialEq, Eq, ValueEnum)]
 enum Verbosity {
     None,
@@ -66,7 +64,7 @@ struct MatchResult {
 #[derive(Debug)]
 enum MatchOutcome {
     Winner(PlayerName, usize, std::time::Duration),
-    TimedOut(usize, std::time::Duration),
+    Draw(usize, std::time::Duration),
 }
 
 fn run_match(
@@ -125,15 +123,6 @@ fn run_match(
             let turn = battle.turn.turn_id;
             turn_count = turn.0 as usize;
 
-            // Check if we've exceeded the maximum number of turns
-            if turn_count > MAX_TURNS {
-                if verbosity != Verbosity::None {
-                    print!("\r\x1B[2K");
-                    println!("Match timed out after {} turns", MAX_TURNS);
-                }
-                return;
-            }
-
             if let Some(player) = legal_actions::next_to_act(&battle) {
                 let player_ai = match (player, swap_positions) {
                     (PlayerName::One, false) | (PlayerName::Two, true) => ai_one_parsed,
@@ -182,13 +171,11 @@ fn run_match(
 
     let elapsed = start_time.elapsed();
 
-    // Check if the game timed out after returning from the subscriber
-    if turn_count > MAX_TURNS {
-        return MatchOutcome::TimedOut(turn_count, elapsed);
-    }
-
     match battle.status {
-        BattleStatus::GameOver { winner } => MatchOutcome::Winner(winner, turn_count, elapsed),
+        BattleStatus::GameOver { winner: None } => MatchOutcome::Draw(turn_count, elapsed),
+        BattleStatus::GameOver { winner: Some(winner) } => {
+            MatchOutcome::Winner(winner, turn_count, elapsed)
+        }
         _ => panic!("Game ended without a winner"),
     }
 }
@@ -275,16 +262,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     println!("Winner: AI {}", winner_ai);
                 }
             }
-            MatchOutcome::TimedOut(turns, elapsed) => {
+            MatchOutcome::Draw(turns, elapsed) => {
                 results.timed_out += 1;
                 results.total_turns += turns;
                 results.total_elapsed += elapsed;
 
                 if args.matches > 1 {
-                    println!("Timed out after {} turns, Time: {:.2?}", turns, elapsed);
+                    println!("Draw after {} turns, Time: {:.2?}", turns, elapsed);
                 } else {
-                    println!("\nMatch timed out after {} turns in {:.2?}!", turns, elapsed);
-                    println!("Maximum turn limit ({}) exceeded", MAX_TURNS);
+                    println!("\nMatch ended in a draw after {} turns in {:.2?}!", turns, elapsed);
                 }
             }
         }
