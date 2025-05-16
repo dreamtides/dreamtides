@@ -35,11 +35,13 @@ pub fn run(builder: &mut ResponseBuilder, battle: &BattleState) {
     }));
 
     if let BattleStatus::GameOver { winner } = battle.status {
-        builder.push(Command::DisplayGameMessage(if winner == builder.display_for_player() {
-            GameMessageType::Victory
-        } else {
-            GameMessageType::Defeat
-        }));
+        builder.push(Command::DisplayGameMessage(
+            if winner == Some(builder.display_for_player()) {
+                GameMessageType::Victory
+            } else {
+                GameMessageType::Defeat
+            },
+        ));
     }
 }
 
