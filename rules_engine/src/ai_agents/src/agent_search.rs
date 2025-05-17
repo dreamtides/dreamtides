@@ -76,6 +76,8 @@ pub fn select_action_unchecked(
         GameAI::NewUct(max_iterations) => {
             uct_search::search_from_empty(battle, player, &UctConfig {
                 max_iterations: *max_iterations,
+                randomize_every_n_iterations: 100,
+                ..Default::default()
             })
             .action
         }

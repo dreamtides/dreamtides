@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use std::f64::consts;
 
 use battle_mutations::actions::apply_battle_action;
@@ -59,8 +58,13 @@ pub fn search(
     graph: &mut SearchGraph,
     root: NodeIndex,
 ) -> UctSearchResult {
-    for _ in 0..config.max_iterations {
-        let mut battle = player_state::randomize_battle_player(initial_battle, player.opponent());
+    for i in 0..config.max_iterations {
+        let mut battle = if !config.omniscient && i % config.randomize_every_n_iterations == 0 {
+            player_state::randomize_battle_player(initial_battle, player.opponent())
+        } else {
+            initial_battle.logical_clone()
+        };
+
         let node = next_evaluation_target(&mut battle, graph, root);
         let reward = evaluate(&mut battle, player);
         back_propagate_rewards(graph, player, node, reward);
@@ -127,7 +131,7 @@ fn next_evaluation_target(
     let mut node = from_node;
     while let Some(player) = legal_actions::next_to_act(battle) {
         let actions = legal_actions::compute(battle, player);
-        let explored = graph.edges(node).map(|e| e.weight().action).collect::<HashSet<_>>();
+        let explored = graph.edges(node).map(|e| e.weight().action).collect::<Vec<_>>();
         if let Some(action) = actions.all().iter().find(|a| !explored.contains(a)) {
             // An action exists from this node which has not yet been tried
             return add_child(battle, graph, player, node, *action);
