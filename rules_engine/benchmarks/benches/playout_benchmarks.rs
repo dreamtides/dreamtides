@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::time::Duration;
 
 use ai_agents::agent_search;
@@ -6,17 +5,23 @@ use ai_data::game_ai::GameAI;
 use battle_mutations::actions::apply_battle_action;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
+use battle_state::battle::all_cards::AllCards;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
-use battle_state::battle::card_id::{CardId, CardIdType, HandCardId};
-use battle_state::battle_player::battle_player_state::PlayerType;
+use battle_state::battle::card_id::{CardId, CharacterId, HandCardId};
+use battle_state::battle::turn_data::TurnData;
+use battle_state::battle_cards::zone::Zone;
+use battle_state::battle_player::battle_player_state::{BattlePlayerState, PlayerType};
+use battle_state::battle_player::player_map::PlayerMap;
 use core_data::identifiers::{BattleId, CardName};
-use core_data::numerics::Energy;
+use core_data::numerics::{Energy, Points, Spark, TurnId};
 use core_data::types::PlayerName;
 use criterion::{criterion_group, BatchSize, Criterion};
 use game_creation::new_test_battle;
 use rand::seq::IteratorRandom;
+use rand::SeedableRng;
+use rand_xoshiro::Xoshiro256PlusPlus;
 use tracing::{subscriber, Level};
 use tracing_macros::write_tracing_event;
 use uuid::Uuid;
@@ -89,7 +94,7 @@ pub fn uct_1k_action(c: &mut Criterion) {
     subscriber::with_default(error_subscriber, || {
         group.bench_function("uct_1k_action", |b| {
             b.iter_batched(
-                || build_benchmark_battle(),
+                benchmark_battle,
                 |battle| {
                     criterion::black_box(agent_search::select_action_unchecked(
                         &battle,
@@ -111,77 +116,289 @@ fn run_battle_until_completion(battle: &mut BattleState) {
     }
 }
 
-fn build_benchmark_battle() -> BattleState {
-    let mut battle = new_test_battle::create_and_start(
-        BattleId(Uuid::new_v4()),
-        12345678912345,
-        PlayerType::Agent(GameAI::AlwaysPanic),
-        PlayerType::Agent(GameAI::AlwaysPanic),
-    );
+struct BenchmarkCardSpec {
+    id: usize,
+    name: CardName,
+    owner: PlayerName,
+    zone: Zone,
+}
 
-    let mut player_one_cards = HashMap::new();
-    for id in battle.cards.hand(PlayerName::One).iter() {
-        let card_name = battle.cards.name(id);
-        player_one_cards.insert(id.card_id().0, card_name);
+fn benchmark_battle() -> BattleState {
+    let card_specs = vec![
+        // Player One
+        BenchmarkCardSpec {
+            id: 0,
+            name: CardName::MinstrelOfFallingLight,
+            owner: PlayerName::One,
+            zone: Zone::Battlefield,
+        },
+        BenchmarkCardSpec {
+            id: 1,
+            name: CardName::MinstrelOfFallingLight,
+            owner: PlayerName::One,
+            zone: Zone::Deck,
+        },
+        BenchmarkCardSpec {
+            id: 2,
+            name: CardName::MinstrelOfFallingLight,
+            owner: PlayerName::One,
+            zone: Zone::Hand,
+        },
+        BenchmarkCardSpec {
+            id: 3,
+            name: CardName::MinstrelOfFallingLight,
+            owner: PlayerName::One,
+            zone: Zone::Deck,
+        },
+        BenchmarkCardSpec {
+            id: 4,
+            name: CardName::MinstrelOfFallingLight,
+            owner: PlayerName::One,
+            zone: Zone::Battlefield,
+        },
+        BenchmarkCardSpec {
+            id: 5,
+            name: CardName::MinstrelOfFallingLight,
+            owner: PlayerName::One,
+            zone: Zone::Deck,
+        },
+        BenchmarkCardSpec {
+            id: 6,
+            name: CardName::Immolate,
+            owner: PlayerName::One,
+            zone: Zone::Hand,
+        },
+        BenchmarkCardSpec {
+            id: 7,
+            name: CardName::Immolate,
+            owner: PlayerName::One,
+            zone: Zone::Hand,
+        },
+        BenchmarkCardSpec {
+            id: 8,
+            name: CardName::Immolate,
+            owner: PlayerName::One,
+            zone: Zone::Deck,
+        },
+        BenchmarkCardSpec {
+            id: 9,
+            name: CardName::Abolish,
+            owner: PlayerName::One,
+            zone: Zone::Hand,
+        },
+        BenchmarkCardSpec {
+            id: 10,
+            name: CardName::Abolish,
+            owner: PlayerName::One,
+            zone: Zone::Deck,
+        },
+        BenchmarkCardSpec {
+            id: 11,
+            name: CardName::Abolish,
+            owner: PlayerName::One,
+            zone: Zone::Hand,
+        },
+        BenchmarkCardSpec {
+            id: 12,
+            name: CardName::RippleOfDefiance,
+            owner: PlayerName::One,
+            zone: Zone::Deck,
+        },
+        BenchmarkCardSpec {
+            id: 13,
+            name: CardName::RippleOfDefiance,
+            owner: PlayerName::One,
+            zone: Zone::Deck,
+        },
+        BenchmarkCardSpec {
+            id: 14,
+            name: CardName::RippleOfDefiance,
+            owner: PlayerName::One,
+            zone: Zone::Hand,
+        },
+        BenchmarkCardSpec {
+            id: 15,
+            name: CardName::Dreamscatter,
+            owner: PlayerName::One,
+            zone: Zone::Deck,
+        },
+        BenchmarkCardSpec {
+            id: 16,
+            name: CardName::Dreamscatter,
+            owner: PlayerName::One,
+            zone: Zone::Deck,
+        },
+        BenchmarkCardSpec {
+            id: 17,
+            name: CardName::Dreamscatter,
+            owner: PlayerName::One,
+            zone: Zone::Hand,
+        },
+        // Player Two
+        BenchmarkCardSpec {
+            id: 18,
+            name: CardName::MinstrelOfFallingLight,
+            owner: PlayerName::Two,
+            zone: Zone::Deck,
+        },
+        BenchmarkCardSpec {
+            id: 19,
+            name: CardName::MinstrelOfFallingLight,
+            owner: PlayerName::Two,
+            zone: Zone::Battlefield,
+        },
+        BenchmarkCardSpec {
+            id: 20,
+            name: CardName::MinstrelOfFallingLight,
+            owner: PlayerName::Two,
+            zone: Zone::Deck,
+        },
+        BenchmarkCardSpec {
+            id: 21,
+            name: CardName::MinstrelOfFallingLight,
+            owner: PlayerName::Two,
+            zone: Zone::Deck,
+        },
+        BenchmarkCardSpec {
+            id: 22,
+            name: CardName::MinstrelOfFallingLight,
+            owner: PlayerName::Two,
+            zone: Zone::Deck,
+        },
+        BenchmarkCardSpec {
+            id: 23,
+            name: CardName::MinstrelOfFallingLight,
+            owner: PlayerName::Two,
+            zone: Zone::Deck,
+        },
+        BenchmarkCardSpec {
+            id: 24,
+            name: CardName::Immolate,
+            owner: PlayerName::Two,
+            zone: Zone::Hand,
+        },
+        BenchmarkCardSpec {
+            id: 25,
+            name: CardName::Immolate,
+            owner: PlayerName::Two,
+            zone: Zone::Hand,
+        },
+        BenchmarkCardSpec {
+            id: 26,
+            name: CardName::Immolate,
+            owner: PlayerName::Two,
+            zone: Zone::Deck,
+        },
+        BenchmarkCardSpec {
+            id: 27,
+            name: CardName::Abolish,
+            owner: PlayerName::Two,
+            zone: Zone::Deck,
+        },
+        BenchmarkCardSpec {
+            id: 28,
+            name: CardName::Abolish,
+            owner: PlayerName::Two,
+            zone: Zone::Hand,
+        },
+        BenchmarkCardSpec {
+            id: 29,
+            name: CardName::Abolish,
+            owner: PlayerName::Two,
+            zone: Zone::Hand,
+        },
+        BenchmarkCardSpec {
+            id: 30,
+            name: CardName::RippleOfDefiance,
+            owner: PlayerName::Two,
+            zone: Zone::Hand,
+        },
+        BenchmarkCardSpec {
+            id: 31,
+            name: CardName::RippleOfDefiance,
+            owner: PlayerName::Two,
+            zone: Zone::Hand,
+        },
+        BenchmarkCardSpec {
+            id: 32,
+            name: CardName::RippleOfDefiance,
+            owner: PlayerName::Two,
+            zone: Zone::Deck,
+        },
+        BenchmarkCardSpec {
+            id: 33,
+            name: CardName::Dreamscatter,
+            owner: PlayerName::Two,
+            zone: Zone::Hand,
+        },
+        BenchmarkCardSpec {
+            id: 34,
+            name: CardName::Dreamscatter,
+            owner: PlayerName::Two,
+            zone: Zone::Hand,
+        },
+        BenchmarkCardSpec {
+            id: 35,
+            name: CardName::Dreamscatter,
+            owner: PlayerName::Two,
+            zone: Zone::Deck,
+        },
+    ];
+
+    let seed = 12345678912345;
+    let mut battle = BattleState {
+        id: BattleId(Uuid::new_v4()),
+        cards: AllCards::default(),
+        players: PlayerMap {
+            one: BattlePlayerState {
+                player_type: PlayerType::Agent(GameAI::AlwaysPanic),
+                points: Points(15),
+                current_energy: Energy(6),
+                produced_energy: Energy(6),
+                spark_bonus: Spark(0),
+            },
+            two: BattlePlayerState {
+                player_type: PlayerType::Agent(GameAI::AlwaysPanic),
+                points: Points(0),
+                current_energy: Energy(5),
+                produced_energy: Energy(5),
+                spark_bonus: Spark(0),
+            },
+        },
+        status: BattleStatus::Playing,
+        stack_priority: None,
+        turn: TurnData { active_player: PlayerName::One, turn_id: TurnId(9) },
+        phase: BattleTurnPhase::Main,
+        seed,
+        rng: Xoshiro256PlusPlus::seed_from_u64(seed),
+        prompt: None,
+        animations: None,
+        tracing: None,
+        history: None,
+    };
+
+    for spec in &card_specs {
+        assert_eq!(battle.cards.all_cards().count(), spec.id, "Card ID mismatch during creation");
+        battle.cards.create_cards_in_deck(spec.owner, vec![spec.name]);
     }
 
-    let mut player_two_cards = HashMap::new();
-    for id in battle.cards.hand(PlayerName::Two).iter() {
-        let card_name = battle.cards.name(id);
-        player_two_cards.insert(id.card_id().0, card_name);
-    }
+    for spec in &card_specs {
+        let card_id = CardId(spec.id);
+        if spec.zone != Zone::Deck {
+            battle.cards.move_card(spec.owner, card_id, Zone::Deck, spec.zone);
+        }
 
-    let mut expected_player_one = HashMap::new();
-    expected_player_one.insert(0, CardName::MinstrelOfFallingLight);
-    expected_player_one.insert(4, CardName::MinstrelOfFallingLight);
-    expected_player_one.insert(6, CardName::Immolate);
-    expected_player_one.insert(11, CardName::Abolish);
-    expected_player_one.insert(14, CardName::RippleOfDefiance);
-
-    let mut expected_player_two = HashMap::new();
-    expected_player_two.insert(19, CardName::MinstrelOfFallingLight);
-    expected_player_two.insert(28, CardName::Abolish);
-    expected_player_two.insert(30, CardName::RippleOfDefiance);
-    expected_player_two.insert(31, CardName::RippleOfDefiance);
-    expected_player_two.insert(34, CardName::Dreamscatter);
-
-    assert_eq!(
-        player_one_cards, expected_player_one,
-        "Player One's hand does not match expected cards"
-    );
-    assert_eq!(
-        player_two_cards, expected_player_two,
-        "Player Two's hand does not match expected cards"
-    );
-
-    apply_battle_action::execute(
-        &mut battle,
-        PlayerName::One,
-        BattleAction::PlayCardFromHand(HandCardId(CardId(0))),
-    );
-    apply_battle_action::execute(&mut battle, PlayerName::Two, BattleAction::PassPriority);
-    apply_battle_action::execute(&mut battle, PlayerName::One, BattleAction::EndTurn);
-    apply_battle_action::execute(&mut battle, PlayerName::Two, BattleAction::StartNextTurn);
-    apply_battle_action::execute(
-        &mut battle,
-        PlayerName::Two,
-        BattleAction::PlayCardFromHand(HandCardId(CardId(19))),
-    );
-    apply_battle_action::execute(&mut battle, PlayerName::One, BattleAction::PassPriority);
-    apply_battle_action::execute(&mut battle, PlayerName::Two, BattleAction::EndTurn);
-    apply_battle_action::execute(&mut battle, PlayerName::One, BattleAction::StartNextTurn);
-    apply_battle_action::execute(
-        &mut battle,
-        PlayerName::One,
-        BattleAction::PlayCardFromHand(HandCardId(CardId(4))),
-    );
-    apply_battle_action::execute(&mut battle, PlayerName::Two, BattleAction::PassPriority);
-
-    for _ in 0..3 {
-        apply_battle_action::execute(&mut battle, PlayerName::One, BattleAction::EndTurn);
-        apply_battle_action::execute(&mut battle, PlayerName::Two, BattleAction::StartNextTurn);
-        apply_battle_action::execute(&mut battle, PlayerName::Two, BattleAction::EndTurn);
-        apply_battle_action::execute(&mut battle, PlayerName::One, BattleAction::StartNextTurn);
+        if spec.zone == Zone::Battlefield {
+            let character_id = CharacterId(card_id);
+            let card_name = battle.cards.name(character_id);
+            if card_name == CardName::MinstrelOfFallingLight {
+                if let Some(char_state) =
+                    battle.cards.battlefield_state_mut(spec.owner).get_mut(&character_id)
+                {
+                    char_state.spark = Spark(5);
+                }
+            }
+        }
     }
 
     assert_eq!(battle.players.one.current_energy, Energy(6));
@@ -201,7 +418,7 @@ fn build_benchmark_battle() -> BattleState {
         BattleAction::PlayCardFromHand(HandCardId(CardId(17))),
     ];
 
-    let legal_actions_vec: Vec<BattleAction> = legal.all().iter().cloned().collect();
+    let legal_actions_vec: Vec<BattleAction> = legal.all().to_vec();
     assert_eq!(
         legal_actions_vec.len(),
         expected_actions.len(),

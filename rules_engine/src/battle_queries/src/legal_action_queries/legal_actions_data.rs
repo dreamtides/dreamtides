@@ -176,12 +176,12 @@ impl LegalActions {
             LegalActions::SelectCharacterPrompt { valid } => valid
                 .iter()
                 .find(|id| !actions.contains(&BattleAction::SelectCharacterTarget(*id)))
-                .map(|id| BattleAction::SelectCharacterTarget(id)),
+                .map(BattleAction::SelectCharacterTarget),
 
             LegalActions::SelectStackCardPrompt { valid } => valid
                 .iter()
                 .find(|id| !actions.contains(&BattleAction::SelectStackCardTarget(*id)))
-                .map(|id| BattleAction::SelectStackCardTarget(id)),
+                .map(BattleAction::SelectStackCardTarget),
 
             LegalActions::SelectPromptChoicePrompt { choice_count } => (0..*choice_count)
                 .find(|&i| !actions.contains(&BattleAction::SelectPromptChoice(i)))
@@ -262,8 +262,7 @@ impl LegalActions {
                     let hand_card_index = index - 1;
                     actions
                         .play_card_from_hand
-                        .iter()
-                        .nth(hand_card_index)
+                        .get(hand_card_index)
                         .map(|card_id| BattleAction::PlayCardFromHand(*card_id))
                 }
             }
