@@ -20,7 +20,10 @@ pub struct SearchNode {
     pub total_reward: OrderedFloat<f64>,
     /// N(v): Visit count for this node
     pub visit_count: u32,
-    /// Actions we have already tried in this state
+    /// Actions we have already tried in this state.
+    ///
+    /// Vec has generally outperformed various set & bitset data structures
+    /// here.
     pub tried: Vec<BattleAction>,
 }
 

@@ -139,6 +139,60 @@ impl LegalActions {
         }
     }
 
+    /// Returns a legal [BattleAction] from this action set which is *not*
+    /// present in `actions`, if any.
+    pub fn find_missing(&self, actions: &[BattleAction]) -> Option<BattleAction> {
+        match self {
+            LegalActions::NoActionsGameOver
+            | LegalActions::NoActionsOpponentPrompt
+            | LegalActions::NoActionsOpponentPriority
+            | LegalActions::NoActionsInCurrentPhase => None,
+
+            LegalActions::Standard { actions: standard_actions } => {
+                match standard_actions.primary {
+                    PrimaryLegalAction::PassPriority
+                        if !actions.contains(&BattleAction::PassPriority) =>
+                    {
+                        Some(BattleAction::PassPriority)
+                    }
+                    PrimaryLegalAction::EndTurn if !actions.contains(&BattleAction::EndTurn) => {
+                        Some(BattleAction::EndTurn)
+                    }
+                    PrimaryLegalAction::StartNextTurn
+                        if !actions.contains(&BattleAction::StartNextTurn) =>
+                    {
+                        Some(BattleAction::StartNextTurn)
+                    }
+                    _ => standard_actions
+                        .play_card_from_hand
+                        .iter()
+                        .find(|&&card_id| {
+                            !actions.contains(&BattleAction::PlayCardFromHand(card_id))
+                        })
+                        .map(|card_id| BattleAction::PlayCardFromHand(*card_id)),
+                }
+            }
+
+            LegalActions::SelectCharacterPrompt { valid } => valid
+                .iter()
+                .find(|id| !actions.contains(&BattleAction::SelectCharacterTarget(*id)))
+                .map(|id| BattleAction::SelectCharacterTarget(id)),
+
+            LegalActions::SelectStackCardPrompt { valid } => valid
+                .iter()
+                .find(|id| !actions.contains(&BattleAction::SelectStackCardTarget(*id)))
+                .map(|id| BattleAction::SelectStackCardTarget(id)),
+
+            LegalActions::SelectPromptChoicePrompt { choice_count } => (0..*choice_count)
+                .find(|&i| !actions.contains(&BattleAction::SelectPromptChoice(i)))
+                .map(BattleAction::SelectPromptChoice),
+
+            LegalActions::SelectEnergyValuePrompt { minimum, maximum } => (minimum.0..=maximum.0)
+                .find(|&e| !actions.contains(&BattleAction::SelectEnergyAdditionalCost(Energy(e))))
+                .map(|e| BattleAction::SelectEnergyAdditionalCost(Energy(e))),
+        }
+    }
+
     pub fn all(&self) -> Vec<BattleAction> {
         match self {
             LegalActions::NoActionsGameOver

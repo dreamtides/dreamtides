@@ -6,7 +6,9 @@ use serde::{Deserialize, Serialize};
 use crate::battle::card_id::{CardId, CharacterId, HandCardId, StackCardId};
 
 /// An action that can be performed in a battle
-#[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
+#[derive(
+    Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
+)]
 #[serde(rename_all = "camelCase")]
 pub enum BattleAction {
     /// Developer action
@@ -43,7 +45,9 @@ pub enum BattleAction {
     SubmitMulligan,
 }
 
-#[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
+#[derive(
+    Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
+)]
 #[serde(rename_all = "camelCase")]
 pub enum DebugBattleAction {
     /// Draw a card
@@ -52,7 +56,9 @@ pub enum DebugBattleAction {
     SetEnergy(PlayerName, Energy),
 }
 
-#[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
+#[derive(
+    Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
+)]
 #[serde(rename_all = "camelCase")]
 pub struct SelectCardOrder {
     pub target: CardOrderSelectionTarget,
@@ -69,7 +75,9 @@ pub enum CardOrderSelectionTarget {
     Void,
 }
 
-#[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
+#[derive(
+    Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
+)]
 #[serde(rename_all = "camelCase")]
 pub enum CardBrowserType {
     UserDeck,

@@ -93,7 +93,7 @@ pub fn search_from_empty(
         player,
         total_reward: OrderedFloat(0.0),
         visit_count: 0,
-        tried: vec![],
+        tried: Vec::new(),
     });
     search(initial_battle, player, config, &mut graph, root)
 }
@@ -138,9 +138,9 @@ fn next_evaluation_target(
         let explored = &graph[node].tried;
         // Keeping track of tried actions on the node is a small performance boost
         // over iterating through edges (~3% benchmark improvement).
-        if let Some(action) = actions.all().iter().find(|a| !explored.contains(a)) {
+        if let Some(action) = actions.find_missing(explored) {
             // An action exists from this node which has not yet been tried
-            return add_child(battle, graph, player, node, *action);
+            return add_child(battle, graph, player, node, action);
         } else {
             // All actions from this node have been tried, recursively search
             // the best candidate
@@ -180,7 +180,7 @@ fn add_child(
         player,
         total_reward: OrderedFloat(0.0),
         visit_count: 0,
-        tried: vec![],
+        tried: Vec::new(),
     });
     graph.add_edge(parent, child, SearchEdge { action });
     child
