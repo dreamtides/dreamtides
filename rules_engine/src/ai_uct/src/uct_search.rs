@@ -89,8 +89,12 @@ pub fn search_from_empty(
     config: &UctConfig,
 ) -> UctSearchResult {
     let mut graph = SearchGraph::default();
-    let root =
-        graph.add_node(SearchNode { player, total_reward: OrderedFloat(0.0), visit_count: 0 });
+    let root = graph.add_node(SearchNode {
+        player,
+        total_reward: OrderedFloat(0.0),
+        visit_count: 0,
+        tried: vec![],
+    });
     search(initial_battle, player, config, &mut graph, root)
 }
 
@@ -131,7 +135,7 @@ fn next_evaluation_target(
     let mut node = from_node;
     while let Some(player) = legal_actions::next_to_act(battle) {
         let actions = legal_actions::compute(battle, player);
-        let explored = graph.edges(node).map(|e| e.weight().action).collect::<Vec<_>>();
+        let explored = &graph[node].tried;
         if let Some(action) = actions.all().iter().find(|a| !explored.contains(a)) {
             // An action exists from this node which has not yet been tried
             return add_child(battle, graph, player, node, *action);
@@ -168,9 +172,14 @@ fn add_child(
     parent: NodeIndex,
     action: BattleAction,
 ) -> NodeIndex {
+    graph[parent].tried.push(action);
     apply_battle_action::execute(battle, player, action);
-    let child =
-        graph.add_node(SearchNode { player, total_reward: OrderedFloat(0.0), visit_count: 0 });
+    let child = graph.add_node(SearchNode {
+        player,
+        total_reward: OrderedFloat(0.0),
+        visit_count: 0,
+        tried: vec![],
+    });
     graph.add_edge(parent, child, SearchEdge { action });
     child
 }
