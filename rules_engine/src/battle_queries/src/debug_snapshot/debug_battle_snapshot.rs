@@ -77,8 +77,8 @@ fn debug_all_cards(battle: &BattleState) -> DebugAllCards {
         p2_hand: debug_zone(
             battle,
             Zone::Stack,
-            PlayerName::One,
-            battle.cards.all_cards_on_stack().iter().map(|state| state.id.card_id()),
+            PlayerName::Two,
+            battle.cards.hand(PlayerName::Two).iter().map(|c| c.card_id()),
         ),
         p1_deck: debug_zone(
             battle,

@@ -18,7 +18,7 @@ use criterion::{criterion_group, BatchSize, Criterion};
 use game_creation::new_test_battle;
 use rand::seq::IteratorRandom;
 use tracing::{subscriber, Level};
-use tracing_macros::{panic_with, write_tracing_event};
+use tracing_macros::write_tracing_event;
 use uuid::Uuid;
 
 criterion_group!(playout_benchmarks, random_playout, uct1_first_action, uct_1k_action);
@@ -224,8 +224,6 @@ fn build_benchmark_battle() -> BattleState {
             action
         );
     }
-
-    panic_with!("Done setting up battle", &battle);
 
     battle
 }

@@ -1,6 +1,5 @@
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::HandCardId;
-use battle_state::battle_cards::card_set::CardSet;
 use core_data::card_types::CardType;
 use core_data::identifiers::CardName;
 use core_data::numerics::Energy;
@@ -22,6 +21,8 @@ pub enum FastOnly {
 /// This does *not* check whether it is legal to play cards in the larger
 /// current battle state, e.g. whether it is the player's turn.
 pub fn from_hand(battle: &BattleState, player: PlayerName, fast_only: FastOnly) -> Vec<HandCardId> {
+    // Tested using a bitset here, but Vec is consistently faster (4% overall
+    // benchmark improvement) possibly due to better random element selection.
     let mut legal_cards = Vec::new();
     for card_id in battle.cards.hand(player) {
         if fast_only == FastOnly::Yes && !card_properties::is_fast(battle, card_id) {
