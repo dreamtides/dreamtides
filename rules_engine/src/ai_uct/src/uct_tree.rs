@@ -20,6 +20,7 @@ pub struct SearchNode {
     pub total_reward: OrderedFloat<f64>,
     /// N(v): Visit count for this node
     pub visit_count: u32,
+    /// Actions we have already tried in this state
     pub tried: Vec<BattleAction>,
 }
 

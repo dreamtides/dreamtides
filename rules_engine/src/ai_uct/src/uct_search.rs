@@ -136,6 +136,8 @@ fn next_evaluation_target(
     while let Some(player) = legal_actions::next_to_act(battle) {
         let actions = legal_actions::compute(battle, player);
         let explored = &graph[node].tried;
+        // Keeping track of tried actions on the node is a small performance boost
+        // over iterating through edges (~3% benchmark improvement).
         if let Some(action) = actions.all().iter().find(|a| !explored.contains(a)) {
             // An action exists from this node which has not yet been tried
             return add_child(battle, graph, player, node, *action);
