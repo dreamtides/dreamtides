@@ -26,7 +26,13 @@ use tracing::{subscriber, Level};
 use tracing_macros::write_tracing_event;
 use uuid::Uuid;
 
-criterion_group!(playout_benchmarks, random_playout, uct1_first_action, uct_1k_action);
+criterion_group!(
+    playout_benchmarks,
+    random_playout,
+    uct1_first_action,
+    uct_1k_action,
+    uct_100k_action
+);
 
 pub fn random_playout(c: &mut Criterion) {
     write_tracing_event::clear_log_file();
@@ -100,6 +106,27 @@ pub fn uct_1k_action(c: &mut Criterion) {
                         &battle,
                         PlayerName::One,
                         &GameAI::NewUct(1000),
+                    ))
+                },
+                BatchSize::SmallInput,
+            );
+        });
+    });
+}
+
+pub fn uct_100k_action(c: &mut Criterion) {
+    let mut group = c.benchmark_group("uct_100k_action");
+    group.significance_level(0.01).measurement_time(Duration::from_secs(100));
+    let error_subscriber = tracing_subscriber::fmt().with_max_level(Level::ERROR).finish();
+    subscriber::with_default(error_subscriber, || {
+        group.bench_function("uct_100k_action", |b| {
+            b.iter_batched(
+                benchmark_battle,
+                |battle| {
+                    criterion::black_box(agent_search::select_action_unchecked(
+                        &battle,
+                        PlayerName::One,
+                        &GameAI::NewUct(100_000),
                     ))
                 },
                 BatchSize::SmallInput,
