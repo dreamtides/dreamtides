@@ -20,7 +20,7 @@ pub enum LegalActions {
 #[derive(Debug, Clone)]
 pub struct StandardLegalActions {
     pub primary: PrimaryLegalAction,
-    pub play_card_from_hand: CardSet<HandCardId>,
+    pub play_card_from_hand: Vec<HandCardId>,
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
@@ -36,7 +36,7 @@ impl LegalActions {
             BattleAction::Debug(..) => true,
             BattleAction::PlayCardFromHand(hand_card_id) => {
                 if let LegalActions::Standard { actions } = self {
-                    actions.play_card_from_hand.contains(hand_card_id)
+                    actions.play_card_from_hand.contains(&hand_card_id)
                 } else {
                     false
                 }
@@ -156,7 +156,7 @@ impl LegalActions {
                 }
 
                 for card_id in actions.play_card_from_hand.iter() {
-                    result.push(BattleAction::PlayCardFromHand(card_id));
+                    result.push(BattleAction::PlayCardFromHand(*card_id));
                 }
 
                 result
@@ -210,7 +210,7 @@ impl LegalActions {
                         .play_card_from_hand
                         .iter()
                         .nth(hand_card_index)
-                        .map(BattleAction::PlayCardFromHand)
+                        .map(|card_id| BattleAction::PlayCardFromHand(*card_id))
                 }
             }
 

@@ -21,12 +21,8 @@ pub enum FastOnly {
 ///
 /// This does *not* check whether it is legal to play cards in the larger
 /// current battle state, e.g. whether it is the player's turn.
-pub fn from_hand(
-    battle: &BattleState,
-    player: PlayerName,
-    fast_only: FastOnly,
-) -> CardSet<HandCardId> {
-    let mut legal_cards = CardSet::default();
+pub fn from_hand(battle: &BattleState, player: PlayerName, fast_only: FastOnly) -> Vec<HandCardId> {
+    let mut legal_cards = Vec::new();
     for card_id in battle.cards.hand(player) {
         if fast_only == FastOnly::Yes && !card_properties::is_fast(battle, card_id) {
             continue;
@@ -48,7 +44,7 @@ pub fn from_hand(
             continue;
         }
 
-        legal_cards.insert(card_id);
+        legal_cards.push(card_id);
     }
 
     legal_cards
