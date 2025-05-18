@@ -262,6 +262,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     println!("\nGame over after {} turns in {:.2?}!", turns, elapsed);
                     println!("Winner: AI {}", winner_ai);
                 }
+                print_match_summary(
+                    &results,
+                    args.matches,
+                    &args.player_one_ai,
+                    &args.player_two_ai,
+                );
             }
             MatchOutcome::Draw(turns, elapsed) => {
                 results.timed_out += 1;
@@ -273,6 +279,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 } else {
                     println!("\nMatch ended in a draw after {} turns in {:.2?}!", turns, elapsed);
                 }
+                print_match_summary(
+                    &results,
+                    args.matches,
+                    &args.player_one_ai,
+                    &args.player_two_ai,
+                );
             }
         }
     }
@@ -329,4 +341,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     Ok(())
+}
+
+fn print_match_summary(
+    results: &MatchResult,
+    total_matches: usize,
+    player_one_ai: &str,
+    player_two_ai: &str,
+) {
+    let completed = total_matches - results.timed_out;
+    if completed > 0 {
+        println!(
+            "Progress: P1:{} P2:{} {}:{} {}:{}",
+            results.player_one_wins,
+            results.player_two_wins,
+            player_one_ai,
+            results.ai_one_wins,
+            player_two_ai,
+            results.ai_two_wins,
+        );
+    }
 }
