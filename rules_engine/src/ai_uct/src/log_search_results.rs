@@ -73,10 +73,14 @@ fn graph_for_logging(graph: &SearchGraph, root: NodeIndex) -> Graph<String, Stri
                     existing
                 } else {
                     let total_reward = graph[target].total_reward.0;
-                    let formatted_reward = format!("{}@{:.1}", match graph[target].player {
-                        PlayerName::One => "P1",
-                        PlayerName::Two => "P2",
-                    },total_reward);
+                    let formatted_reward = format!(
+                        "{}@{:.1}",
+                        match graph[target].player {
+                            PlayerName::One => "P1",
+                            PlayerName::Two => "P2",
+                        },
+                        total_reward
+                    );
                     let new_node = new_graph.add_node(formatted_reward);
                     node_map.insert(target, new_node);
                     next_level.push(target);

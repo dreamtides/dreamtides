@@ -8,7 +8,11 @@ use crate::uct_tree::SearchGraph;
 
 /// Returns the sub-tree of the tree based at `root` which goes through the
 /// edge tagged with the provided `action`.
-pub fn extract(graph: &SearchGraph, root: NodeIndex, action: BattleAction) -> SearchGraph {
+pub fn extract(
+    graph: &SearchGraph,
+    root: NodeIndex,
+    action: BattleAction,
+) -> (SearchGraph, NodeIndex) {
     let Some(edge) = graph.edges(root).find(|e| e.weight().action == action) else {
         panic!("Child not found");
     };
@@ -27,19 +31,24 @@ pub fn extract(graph: &SearchGraph, root: NodeIndex, action: BattleAction) -> Se
                 }
             }
             DfsEvent::TreeEdge(source, target) => {
-                // Get the corresponding nodes in the new graph
+                // Ensure both nodes exist in the node_map
+                node_map.entry(source).or_insert_with(|| new_graph.add_node(graph[source].clone()));
+
+                node_map.entry(target).or_insert_with(|| new_graph.add_node(graph[target].clone()));
+
+                // Now we can safely get the corresponding nodes in the new graph
                 let new_source = *node_map.get(&source).unwrap();
                 let new_target = *node_map.get(&target).unwrap();
 
                 // Find the edge in the original graph
                 if let Some(edge_ref) = graph.find_edge(source, target) {
                     // Add the edge with its weight to the new graph
-                    new_graph.add_edge(new_source, new_target, graph[edge_ref].clone());
+                    new_graph.add_edge(new_source, new_target, graph[edge_ref]);
                 }
             }
             _ => {}
         }
     });
 
-    new_graph
+    (new_graph, new_root)
 }

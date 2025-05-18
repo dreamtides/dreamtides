@@ -71,17 +71,15 @@ pub fn search(
         back_propagate_rewards(graph, player, node, reward);
     }
 
+    let legal = legal_actions::compute(initial_battle, player);
+    let action = best_child(graph, root, &legal, SelectionMode::RewardOnly).action;
     info!("Halting monte carlo search after {} iterations", config.max_iterations);
+
     if initial_battle.tracing.is_some() {
         log_search_results::log_results(graph, root);
     }
 
-    let legal = legal_actions::compute(initial_battle, player);
-    UctSearchResult {
-        action: best_child(graph, root, &legal, SelectionMode::RewardOnly).action,
-        next_graph: SearchGraph::default(),
-        next_root: NodeIndex::default(),
-    }
+    UctSearchResult { action, next_graph: SearchGraph::default(), next_root: NodeIndex::default() }
 }
 
 /// Equivalent to [search] for use where there is no previous search graph
