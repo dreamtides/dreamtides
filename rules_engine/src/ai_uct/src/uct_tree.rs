@@ -7,7 +7,7 @@ use petgraph::Graph;
 /// Tree data structure to store monte carlo search results.
 ///
 /// I've tried this with other representations such as the 'ego-tree' crate and
-/// other graph representations in 'petgraph' like GraphMap, but none of them
+/// other graph data structures in 'petgraph' like GraphMap, but none of them
 /// have notably better performance.
 pub type SearchGraph = Graph<SearchNode, SearchEdge>;
 
@@ -37,22 +37,6 @@ pub struct SearchNode {
 pub struct GraphWithRoot {
     pub graph: SearchGraph,
     pub root: NodeIndex,
-}
-
-#[derive(Debug, Clone)]
-pub struct UctSearchResult {
-    /// Action the agent wants to take
-    pub action: BattleAction,
-
-    /// Graph with information to reuse for future searches.
-    ///
-    /// Outbound edges correspond to possible actions in the game state after
-    /// applying `action`.
-    ///
-    /// Note that the returned graph will not be usable for a search as-is if
-    /// the next player to act is not the agent. A subgraph will need to be
-    /// extracted once it is again the agent's turn.
-    pub next_graph: Option<GraphWithRoot>,
 }
 
 /// Operation mode for child scoring.

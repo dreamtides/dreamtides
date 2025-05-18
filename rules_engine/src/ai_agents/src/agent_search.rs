@@ -8,7 +8,7 @@ use ai_monte_carlo::monte_carlo::{MonteCarloAlgorithm, RandomPlayoutEvaluator};
 use ai_monte_carlo::uct1::Uct1;
 use ai_tree_search::iterative_deepening_search::IterativeDeepeningSearch;
 use ai_uct::uct_config::UctConfig;
-use ai_uct::uct_search;
+use ai_uct::{persistent_tree, uct_search};
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
@@ -51,8 +51,13 @@ pub fn select_action(battle: &BattleState, player: PlayerName, game_ai: &GameAI)
     let action = subscriber::with_default(forest_subscriber, || {
         select_action_unchecked(battle, player, game_ai)
     });
-    info!("Agent selected action in {:.3} seconds", start_time.elapsed().as_secs_f64());
+    info!("Agent selected action {:?} in {:.3} seconds", action, start_time.elapsed().as_secs_f64());
     action
+}
+
+/// Invoked whenever the main [BattleState] is updated with an action.
+pub fn on_battle_action_performed(action: BattleAction) {
+    persistent_tree::on_action_performed(action);
 }
 
 /// Selects an action for the given player using the given AI agent, without
@@ -74,12 +79,22 @@ pub fn select_action_unchecked(
             uct1_action(battle, 1000, Some(*max_iterations))
         }
         GameAI::NewUct(max_iterations) => {
-            uct_search::search_from_empty(battle, player, &UctConfig {
+            let config = UctConfig {
                 max_iterations: *max_iterations,
                 randomize_every_n_iterations: 100,
+                persist_tree_between_searches: false,
                 ..Default::default()
-            })
-            .action
+            };
+            uct_search::search_from_empty(battle, player, &config)
+        }
+        GameAI::UctPersistent(max_iterations) => {
+            let config = UctConfig {
+                max_iterations: *max_iterations,
+                randomize_every_n_iterations: 100,
+                persist_tree_between_searches: true,
+                ..Default::default()
+            };
+            uct_search::search_from_saved(battle, player, &config)
         }
     }
 }

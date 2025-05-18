@@ -15,9 +15,9 @@ use petgraph::Direction;
 use tracing::info;
 use tracing_macros::panic_with;
 
-use crate::log_search_results;
 use crate::uct_config::UctConfig;
-use crate::uct_tree::{SearchEdge, SearchGraph, SearchNode, SelectionMode, UctSearchResult};
+use crate::uct_tree::{SearchEdge, SearchGraph, SearchNode, SelectionMode};
+use crate::{log_search_results, persistent_tree};
 
 /// Monte Carlo search algorithm.
 ///
@@ -58,7 +58,7 @@ pub fn search(
     config: &UctConfig,
     graph: &mut SearchGraph,
     root: NodeIndex,
-) -> UctSearchResult {
+) -> BattleAction {
     for i in 0..config.max_iterations {
         let mut battle = if !config.omniscient && i % config.randomize_every_n_iterations == 0 {
             player_state::randomize_battle_player(initial_battle, player.opponent())
@@ -73,13 +73,17 @@ pub fn search(
 
     let legal = legal_actions::compute(initial_battle, player);
     let action = best_child(graph, root, &legal, SelectionMode::RewardOnly).action;
-    info!("Halting monte carlo search after {} iterations", config.max_iterations);
+    info!("Picked action {:?} for {:?} after {} iterations", action, player, config.max_iterations);
 
     if initial_battle.tracing.is_some() {
         log_search_results::log_results(graph, root);
     }
 
-    UctSearchResult { action, next_graph: None }
+    if config.persist_tree_between_searches {
+        persistent_tree::on_search_completed(graph, root);
+    }
+
+    action
 }
 
 /// Equivalent to [search] for use where there is no previous search graph
@@ -88,7 +92,13 @@ pub fn search_from_empty(
     initial_battle: &BattleState,
     player: PlayerName,
     config: &UctConfig,
-) -> UctSearchResult {
+) -> BattleAction {
+    if config.persist_tree_between_searches {
+        if let Some(saved) = persistent_tree::get_search_graph() {
+            return search(initial_battle, player, config, &mut saved.graph.clone(), saved.root);
+        }
+    }
+
     let mut graph = SearchGraph::default();
     let root = graph.add_node(SearchNode {
         player,
@@ -97,6 +107,19 @@ pub fn search_from_empty(
         tried: Vec::new(),
     });
     search(initial_battle, player, config, &mut graph, root)
+}
+
+/// Equivalent to [search] using a previously saved search graph.
+pub fn search_from_saved(
+    initial_battle: &BattleState,
+    player: PlayerName,
+    config: &UctConfig,
+) -> BattleAction {
+    if let Some(saved) = persistent_tree::get_search_graph() {
+        search(initial_battle, player, config, &mut saved.graph.clone(), saved.root)
+    } else {
+        search_from_empty(initial_battle, player, config)
+    }
 }
 
 /// Returns a descendant node to evaluate next for the provided parent node.

@@ -158,6 +158,7 @@ fn run_match(
 
                 debug!("Player {:?} executing action: {:?}", player, action);
                 apply_battle_action::execute(&mut battle, player, action);
+                agent_search::on_battle_action_performed(action);
                 debug!("Action completed");
             } else {
                 panic!("No player to act, but game not over.");

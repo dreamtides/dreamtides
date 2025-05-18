@@ -1,16 +1,55 @@
 use std::collections::HashMap;
+use std::sync::{Mutex, OnceLock};
 
 use battle_state::actions::battle_actions::BattleAction;
 use petgraph::prelude::NodeIndex;
 use petgraph::visit::{self, DfsEvent, EdgeRef};
+use tracing::debug;
 
 use crate::uct_tree::{GraphWithRoot, SearchGraph};
 
+static SEARCH_GRAPH: OnceLock<Mutex<Option<GraphWithRoot>>> = OnceLock::new();
+
+pub fn get_search_graph() -> Option<GraphWithRoot> {
+    SEARCH_GRAPH
+        .get_or_init(|| Mutex::new(None))
+        .lock()
+        .unwrap()
+        .clone()
+}
+
+pub fn on_action_performed(action: BattleAction) {
+    let mut guard = SEARCH_GRAPH.get_or_init(|| Mutex::new(None)).lock().unwrap();
+    if let Some(graph_with_root) = guard.as_ref() {
+        debug!(?action, "Extracting subtree for action");
+        match extract_subtree(&graph_with_root.graph, graph_with_root.root, action) {
+            Some(subtree) => {
+                *guard = Some(subtree);
+            }
+            None => {
+                debug!("Invalidating search graph");
+                *guard = None;
+            }
+        }
+    } else {
+        debug!(?action, "No active graph, ignoring action")
+    }
+}
+
+pub fn on_search_completed(graph: &mut SearchGraph, root: NodeIndex) {
+    debug!("Search completed, storing graph");
+    let new_graph = graph.clone();
+    let with_root = GraphWithRoot { graph: new_graph, root };
+    *SEARCH_GRAPH.get_or_init(|| Mutex::new(None)).lock().unwrap() = Some(with_root);
+}
+
 /// Returns the sub-tree of the tree based at `root` which goes through the
 /// edge tagged with the provided `action`.
-pub fn extract(graph: &SearchGraph, root: NodeIndex, action: BattleAction) -> GraphWithRoot {
+/// Returns None if no child with the specified action is found.
+fn extract_subtree(graph: &SearchGraph, root: NodeIndex, action: BattleAction) -> Option<GraphWithRoot> {
     let Some(edge) = graph.edges(root).find(|e| e.weight().action == action) else {
-        panic!("Child not found");
+        debug!("Child not found: {action:?}, invalidating search graph");
+        return None;
     };
     let target = edge.target();
     let mut new_graph = SearchGraph::new();
@@ -46,5 +85,5 @@ pub fn extract(graph: &SearchGraph, root: NodeIndex, action: BattleAction) -> Gr
         }
     });
 
-    GraphWithRoot { graph: new_graph, root: new_root }
+    Some(GraphWithRoot { graph: new_graph, root: new_root })
 }

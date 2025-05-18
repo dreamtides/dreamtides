@@ -31,6 +31,7 @@ pub fn execute(
     loop {
         battle_trace!("Executing battle action", battle, current_action);
         apply_battle_action::execute(battle, current_player, current_action);
+        agent_search::on_battle_action_performed(current_action);
 
         let Some(next_player) = legal_actions::next_to_act(battle) else {
             battle_trace!("Rendering updates for game over", battle);

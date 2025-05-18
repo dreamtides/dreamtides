@@ -15,7 +15,7 @@ pub fn create_and_start(user_id: UserId, battle_id: BattleId) -> BattleState {
         battle_id,
         rand::rng().next_u64(),
         PlayerType::User(user_id),
-        PlayerType::Agent(GameAI::NewUct(100_000)),
+        PlayerType::Agent(GameAI::UctPersistent(100_000)),
     )
 }
 
