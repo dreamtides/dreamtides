@@ -27,21 +27,27 @@ pub struct SearchNode {
     pub tried: Vec<BattleAction>,
 }
 
+/// A search graph with its root node
+#[derive(Debug, Clone)]
+pub struct GraphWithRoot {
+    pub graph: SearchGraph,
+    pub root: NodeIndex,
+}
+
 #[derive(Debug, Clone)]
 pub struct UctSearchResult {
     /// Action the agent wants to take
     pub action: BattleAction,
 
     /// Graph with information to reuse for future searches.
-    pub next_graph: SearchGraph,
-
-    /// Root node of the returned graph, with outbound edges corresponding to
-    /// possible actions in the game state after applying `action`.
+    /// 
+    /// Outbound edges correspond to possible actions in the game state after
+    /// applying `action`.
     ///
     /// Note that the returned graph will not be usable for a search as-is if
     /// the next player to act is not the agent. A subgraph will need to be
     /// extracted once it is again the agent's turn.
-    pub next_root: NodeIndex,
+    pub next_graph: Option<GraphWithRoot>,
 }
 
 /// Operation mode for child scoring.

@@ -4,7 +4,7 @@ use battle_state::actions::battle_actions::BattleAction;
 use petgraph::prelude::NodeIndex;
 use petgraph::visit::{self, DfsEvent, EdgeRef};
 
-use crate::uct_tree::SearchGraph;
+use crate::uct_tree::{GraphWithRoot, SearchGraph};
 
 /// Returns the sub-tree of the tree based at `root` which goes through the
 /// edge tagged with the provided `action`.
@@ -12,7 +12,7 @@ pub fn extract(
     graph: &SearchGraph,
     root: NodeIndex,
     action: BattleAction,
-) -> (SearchGraph, NodeIndex) {
+) -> GraphWithRoot {
     let Some(edge) = graph.edges(root).find(|e| e.weight().action == action) else {
         panic!("Child not found");
     };
@@ -50,5 +50,5 @@ pub fn extract(
         }
     });
 
-    (new_graph, new_root)
+    GraphWithRoot { graph: new_graph, root: new_root }
 }

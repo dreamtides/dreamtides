@@ -79,7 +79,7 @@ pub fn search(
         log_search_results::log_results(graph, root);
     }
 
-    UctSearchResult { action, next_graph: SearchGraph::default(), next_root: NodeIndex::default() }
+    UctSearchResult { action, next_graph: None }
 }
 
 /// Equivalent to [search] for use where there is no previous search graph
