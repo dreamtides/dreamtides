@@ -174,3 +174,6 @@ card-images:
 
 resize-images:
     ./client/scripts/resize.py --input client/Assets/ThirdParty/GameAssets/SourceImages
+
+graphviz:
+    dot -Tpng rules_engine/search_graph.dot -o rules_engine/search_graph.png && open rules_engine/search_graph.png

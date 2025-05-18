@@ -15,6 +15,7 @@ use petgraph::Direction;
 use tracing::info;
 use tracing_macros::panic_with;
 
+use crate::log_search_results;
 use crate::uct_config::UctConfig;
 use crate::uct_tree::{SearchEdge, SearchGraph, SearchNode, SelectionMode, UctSearchResult};
 
@@ -71,7 +72,9 @@ pub fn search(
     }
 
     info!("Halting monte carlo search after {} iterations", config.max_iterations);
-    log_results(graph, root);
+    if initial_battle.tracing.is_some() {
+        log_search_results::log_results(graph, root);
+    }
 
     let legal = legal_actions::compute(initial_battle, player);
     UctSearchResult {
@@ -312,6 +315,3 @@ fn child_score(
     };
     exploitation + (exploration_bias * exploration)
 }
-
-/// Logs search results & best available actions.
-fn log_results(_graph: &SearchGraph, _node: NodeIndex) {}

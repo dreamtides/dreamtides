@@ -119,8 +119,6 @@ fn write_event_to_log_file(event: &BattleTraceEvent) {
 }
 
 fn write_json_to_log_file(json_str: &str) {
-    eprintln!("Writing JSON to log file");
-
     let log_path = match get_log_file_path() {
         Ok(path) => path,
         Err(e) => {
@@ -132,7 +130,6 @@ fn write_json_to_log_file(json_str: &str) {
     if !log_path.exists() {
         match File::create(&log_path) {
             Ok(mut file) => {
-                eprintln!("Writing event to new log file");
                 if let Err(e) = file.write_all(format!("[\n{}\n]", json_str).as_bytes()) {
                     error!("Failed to write to dreamtides.json: {}", e);
                 }
@@ -142,7 +139,6 @@ fn write_json_to_log_file(json_str: &str) {
         return;
     }
 
-    eprintln!("Opening log file {:?}", log_path);
     match OpenOptions::new().read(true).write(true).open(&log_path) {
         Ok(mut file) => match file.metadata() {
             Ok(metadata) => {

@@ -6,3 +6,5 @@
 .vscode
 .idea
 log.json
+search_graph.dot
+search_graph.png

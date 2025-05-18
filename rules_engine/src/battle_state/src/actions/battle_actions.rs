@@ -87,3 +87,48 @@ pub enum CardBrowserType {
     UserStatus,
     EnemyStatus,
 }
+
+impl BattleAction {
+    /// Format a battle action as a short name for display.
+    ///
+    /// For example, "Play Card From Hand(HandCardId(20))" becomes "PCFH20"
+    pub fn battle_action_string(&self) -> String {
+        match self {
+            BattleAction::Debug(..) => "DEBUG".to_string(),
+            BattleAction::PlayCardFromHand(hand_card_id) => format!("PCFH{:?}", hand_card_id.0 .0),
+            BattleAction::PassPriority => "PP".to_string(),
+            BattleAction::EndTurn => "ET".to_string(),
+            BattleAction::StartNextTurn => "SNT".to_string(),
+            BattleAction::SelectCharacterTarget(character_id) => {
+                format!("SCT{:?}", character_id.0 .0)
+            }
+            BattleAction::SelectStackCardTarget(stack_card_id) => {
+                format!("SSCT{:?}", stack_card_id.0 .0)
+            }
+            BattleAction::SelectPromptChoice(index) => format!("SPC{:?}", index),
+            BattleAction::SelectEnergyAdditionalCost(energy) => format!("SEAC{}", energy.0),
+            BattleAction::SetSelectedEnergyAdditionalCost(energy) => format!("SSEAC{}", energy.0),
+            BattleAction::SelectCardOrder(order) => {
+                let target = match order.target {
+                    CardOrderSelectionTarget::Deck => "D",
+                    CardOrderSelectionTarget::Void => "V",
+                };
+                format!("SCO{}{}{}", target, order.card_id.0, order.position)
+            }
+            BattleAction::BrowseCards(browser_type) => {
+                let type_abbr = match browser_type {
+                    CardBrowserType::UserDeck => "UD",
+                    CardBrowserType::EnemyDeck => "ED",
+                    CardBrowserType::UserVoid => "UV",
+                    CardBrowserType::EnemyVoid => "EV",
+                    CardBrowserType::UserStatus => "US",
+                    CardBrowserType::EnemyStatus => "ES",
+                };
+                format!("BC{}", type_abbr)
+            }
+            BattleAction::CloseCardBrowser => "CCB".to_string(),
+            BattleAction::ToggleOrderSelectorVisibility => "TOSV".to_string(),
+            BattleAction::SubmitMulligan => "SM".to_string(),
+        }
+    }
+}
