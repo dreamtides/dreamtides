@@ -8,11 +8,7 @@ use crate::uct_tree::{GraphWithRoot, SearchGraph};
 
 /// Returns the sub-tree of the tree based at `root` which goes through the
 /// edge tagged with the provided `action`.
-pub fn extract(
-    graph: &SearchGraph,
-    root: NodeIndex,
-    action: BattleAction,
-) -> GraphWithRoot {
+pub fn extract(graph: &SearchGraph, root: NodeIndex, action: BattleAction) -> GraphWithRoot {
     let Some(edge) = graph.edges(root).find(|e| e.weight().action == action) else {
         panic!("Child not found");
     };
