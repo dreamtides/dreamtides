@@ -12,4 +12,6 @@ pub enum GameAI {
     Uct1MaxIterations(u32),
     NewUct(u32),
     UctPersistent(u32),
+    ParallelUct(u32),
+    ParallelPersistentUct(u32),
 }

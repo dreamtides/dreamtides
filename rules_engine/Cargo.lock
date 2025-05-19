@@ -61,6 +61,7 @@ dependencies = [
  "battle_state",
  "core_data",
  "logging",
+ "ordered-float",
  "rand",
  "tracing",
  "tracing-subscriber",
@@ -150,6 +151,7 @@ dependencies = [
  "rand_xoshiro",
  "rayon",
  "tracing",
+ "tracing-subscriber",
  "tracing_macros",
 ]
 

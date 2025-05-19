@@ -161,7 +161,7 @@ samply-benchmark *args='':
     echo "Found benchmark binaries" $ALL_BENCHMARKS
     BENCHMARK=`echo ./rules_engine/target/release/deps/benchmarks-*([1])`
     echo "Running" $BENCHMARK
-    samply record $BENCHMARK --bench --profile-time 5 "$@"
+    samply record $BENCHMARK --bench --profile-time 10 "$@"
 
 @nim *args='':
     cargo run --manifest-path rules_engine/Cargo.toml --bin run_nim -- $@
