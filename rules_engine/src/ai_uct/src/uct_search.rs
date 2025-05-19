@@ -86,42 +86,6 @@ pub fn search(
     action
 }
 
-/// Equivalent to [search] for use where there is no previous search graph
-/// available.
-pub fn search_from_empty(
-    initial_battle: &BattleState,
-    player: PlayerName,
-    config: &UctConfig,
-) -> BattleAction {
-    if config.persist_tree_between_searches {
-        if let Some(saved) = persistent_tree::get_search_graph() {
-            return search(initial_battle, player, config, &mut saved.graph.clone(), saved.root);
-        }
-    }
-
-    let mut graph = SearchGraph::default();
-    let root = graph.add_node(SearchNode {
-        player,
-        total_reward: OrderedFloat(0.0),
-        visit_count: 0,
-        tried: Vec::new(),
-    });
-    search(initial_battle, player, config, &mut graph, root)
-}
-
-/// Equivalent to [search] using a previously saved search graph.
-pub fn search_from_saved(
-    initial_battle: &BattleState,
-    player: PlayerName,
-    config: &UctConfig,
-) -> BattleAction {
-    if let Some(saved) = persistent_tree::get_search_graph() {
-        search(initial_battle, player, config, &mut saved.graph.clone(), saved.root)
-    } else {
-        search_from_empty(initial_battle, player, config)
-    }
-}
-
 /// Returns a descendant node to evaluate next for the provided parent node.
 ///
 /// This 'tree policy' function returns either:

@@ -2,20 +2,51 @@ use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
 
 use battle_state::actions::battle_actions::BattleAction;
+use battle_state::battle::battle_state::BattleState;
+use core_data::types::PlayerName;
+use ordered_float::OrderedFloat;
 use petgraph::prelude::NodeIndex;
 use petgraph::visit::{self, DfsEvent, EdgeRef};
 use tracing::debug;
 
-use crate::uct_tree::{GraphWithRoot, SearchGraph};
+use crate::uct_config::UctConfig;
+use crate::uct_search;
+use crate::uct_tree::{GraphWithRoot, SearchGraph, SearchNode};
 
 static SEARCH_GRAPH: OnceLock<Mutex<Option<GraphWithRoot>>> = OnceLock::new();
 
-pub fn get_search_graph() -> Option<GraphWithRoot> {
-    SEARCH_GRAPH
-        .get_or_init(|| Mutex::new(None))
-        .lock()
-        .unwrap()
-        .clone()
+/// Equivalent to [search] for use where there is no previous search graph
+/// available.
+pub fn search_from_empty(
+    initial_battle: &BattleState,
+    player: PlayerName,
+    config: &UctConfig,
+) -> BattleAction {
+    let mut graph = SearchGraph::default();
+    let root = graph.add_node(SearchNode {
+        player,
+        total_reward: OrderedFloat(0.0),
+        visit_count: 0,
+        tried: Vec::new(),
+    });
+    uct_search::search(initial_battle, player, config, &mut graph, root)
+}
+
+/// Equivalent to [search] using a previously saved search graph.
+pub fn search_from_saved(
+    initial_battle: &BattleState,
+    player: PlayerName,
+    config: &UctConfig,
+) -> BattleAction {
+    if let Some(saved) = get_search_graph() {
+        uct_search::search(initial_battle, player, config, &mut saved.graph.clone(), saved.root)
+    } else {
+        search_from_empty(initial_battle, player, config)
+    }
+}
+
+fn get_search_graph() -> Option<GraphWithRoot> {
+    SEARCH_GRAPH.get_or_init(|| Mutex::new(None)).lock().unwrap().clone()
 }
 
 pub fn on_action_performed(action: BattleAction) {
@@ -46,7 +77,11 @@ pub fn on_search_completed(graph: &mut SearchGraph, root: NodeIndex) {
 /// Returns the sub-tree of the tree based at `root` which goes through the
 /// edge tagged with the provided `action`.
 /// Returns None if no child with the specified action is found.
-fn extract_subtree(graph: &SearchGraph, root: NodeIndex, action: BattleAction) -> Option<GraphWithRoot> {
+fn extract_subtree(
+    graph: &SearchGraph,
+    root: NodeIndex,
+    action: BattleAction,
+) -> Option<GraphWithRoot> {
     let Some(edge) = graph.edges(root).find(|e| e.weight().action == action) else {
         debug!("Child not found: {action:?}, invalidating search graph");
         return None;

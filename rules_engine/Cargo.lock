@@ -148,6 +148,7 @@ dependencies = [
  "petgraph 0.8.1",
  "rand",
  "rand_xoshiro",
+ "rayon",
  "tracing",
  "tracing_macros",
 ]
