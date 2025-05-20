@@ -1,7 +1,6 @@
 use battle_state::actions::battle_actions::BattleAction;
 use core_data::types::PlayerName;
 use ordered_float::OrderedFloat;
-use petgraph::prelude::NodeIndex;
 use petgraph::Graph;
 
 /// Tree data structure to store monte carlo search results.
@@ -30,13 +29,6 @@ pub struct SearchNode {
     /// Vec has generally outperformed various set & bitset data structures
     /// here.
     pub tried: Vec<BattleAction>,
-}
-
-/// A search graph with its root node
-#[derive(Debug, Clone)]
-pub struct GraphWithRoot {
-    pub graph: SearchGraph,
-    pub root: NodeIndex,
 }
 
 /// Operation mode for child scoring.

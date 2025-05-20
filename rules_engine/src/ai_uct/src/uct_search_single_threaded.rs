@@ -15,9 +15,9 @@ use petgraph::Direction;
 use tracing::info;
 use tracing_macros::panic_with;
 
+use crate::log_search_results;
 use crate::uct_config::UctConfig;
 use crate::uct_tree::{SearchEdge, SearchGraph, SearchNode, SelectionMode};
-use crate::{log_search_results, persistent_tree};
 
 /// Monte Carlo search algorithm.
 ///
@@ -77,10 +77,6 @@ pub fn search(
 
     if initial_battle.tracing.is_some() {
         log_search_results::log_results(graph, root);
-    }
-
-    if config.persist_tree_between_searches {
-        persistent_tree::on_search_completed(graph, root);
     }
 
     action
