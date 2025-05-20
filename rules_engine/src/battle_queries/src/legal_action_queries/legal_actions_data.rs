@@ -4,7 +4,7 @@ use battle_state::battle_cards::card_set::CardSet;
 use core_data::numerics::Energy;
 use fastrand;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum LegalActions {
     NoActionsGameOver,
     NoActionsOpponentPrompt,
@@ -17,7 +17,7 @@ pub enum LegalActions {
     SelectEnergyValuePrompt { minimum: Energy, maximum: Energy },
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct StandardLegalActions {
     pub primary: PrimaryLegalAction,
     pub play_card_from_hand: Vec<HandCardId>,

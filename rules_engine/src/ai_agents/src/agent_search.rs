@@ -9,6 +9,7 @@ use ai_monte_carlo::uct1::Uct1;
 use ai_tree_search::iterative_deepening_search::IterativeDeepeningSearch;
 use ai_uct::uct_config::UctConfig;
 use ai_uct::{persistent_tree, uct_search, uct_search_single_threaded};
+use battle_mutations::player_mutations::player_state;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
@@ -69,10 +70,11 @@ pub fn on_battle_action_performed(action: BattleAction) {
 ///
 /// Mostly intended for use in benchmarking agents.
 pub fn select_action_unchecked(
-    battle: &BattleState,
+    initial_battle: &BattleState,
     player: PlayerName,
     game_ai: &GameAI,
 ) -> BattleAction {
+    let battle = &player_state::randomize_battle_player(initial_battle, player.opponent());
     match game_ai {
         GameAI::AlwaysPanic => panic!("Always panic agent called for an action"),
         GameAI::FirstAvailableAction => first_available_action(battle, player),
@@ -104,6 +106,15 @@ pub fn select_action_unchecked(
             let config = UctConfig {
                 max_iterations: *max_iterations,
                 randomize_every_n_iterations: 100,
+                persist_tree_between_searches: false,
+                ..Default::default()
+            };
+            uct_search::search_from_empty(battle, player, &config)
+        }
+        GameAI::ParallelUctRandomize(max_iterations) => {
+            let config = UctConfig {
+                max_iterations: *max_iterations,
+                randomize_every_n_iterations: 1,
                 persist_tree_between_searches: false,
                 ..Default::default()
             };

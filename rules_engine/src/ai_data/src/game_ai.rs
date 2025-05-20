@@ -13,5 +13,6 @@ pub enum GameAI {
     NewUct(u32),
     UctPersistent(u32),
     ParallelUct(u32),
+    ParallelUctRandomize(u32),
     ParallelPersistentUct(u32),
 }
