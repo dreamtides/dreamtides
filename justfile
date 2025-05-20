@@ -153,6 +153,10 @@ build-release-with-debug:
 samply: build-release-with-debug
     samply record ./rules_engine/target/release-with-debug/client
 
+samply-matchup *args='':
+    cargo build --manifest-path rules_engine/Cargo.toml --bin run_matchup  --profile=release-with-debug
+    samply record ./rules_engine/target/release-with-debug/run_matchup -- "$@"
+
 samply-benchmark *args='':
     #!/bin/zsh
     rm ./rules_engine/target/release/deps/benchmarks-*
