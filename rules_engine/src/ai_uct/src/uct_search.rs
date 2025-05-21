@@ -60,118 +60,35 @@ pub fn search(
     player: PlayerName,
     config: &UctConfig,
 ) -> BattleAction {
-    let legal = legal_actions::compute(initial_battle, player).all();
-    if legal.is_empty() {
-        panic_with!("No legal actions available for parallel search", initial_battle, player);
-    }
-
-    let search_results = legal
-        .par_iter()
-        .map(|action| search_single_action(action, initial_battle, player, config))
-        .collect::<Vec<_>>();
-
-    let best_result = search_results
-        .iter()
-        .max_by_key(|result| result.reward)
-        .expect("Should have at least one search result");
-    let action = best_result.action;
-    info!("Picked action {:?} for {:?}", action, player);
-
-    if initial_battle.tracing.is_some() {
-        log_search_results::log_results(&best_result.graph, best_result.root);
-    }
-
-    // I've experimented with persisting the search graph between calls, and it
-    // does perform better, but the performance overhead & complexity impact
-    // don't currently seem worth it.
-    //
-    // See cdec92ac91672b0d13e24869f43326bb3aaeee4c
-
-    action
-}
-
-struct ActionSearchResult {
-    action: BattleAction,
-    reward: OrderedFloat<f64>,
-    graph: SearchGraph,
-    root: NodeIndex,
-}
-
-/// Runs a monte carlo search over a single proposed [BattleAction].
-///
-/// We run this operation once per available legal action, distributing the
-/// search across available parallel threads.
-fn search_single_action(
-    action: &BattleAction,
-    initial_battle: &BattleState,
-    player: PlayerName,
-    config: &UctConfig,
-) -> ActionSearchResult {
-    let subscriber = tracing_subscriber::registry().with(EnvFilter::new("warn"));
-    tracing::subscriber::with_default(subscriber, || {
-        let mut graph = SearchGraph::default();
-        let root = graph.add_node(SearchNode {
-            player,
-            total_reward: OrderedFloat(0.0),
-            visit_count: 0,
-            tried: Vec::new(),
-        });
-
-        let mut battle = initial_battle.logical_clone();
-        apply_battle_action::execute(&mut battle, player, *action);
-
-        for _ in 0..config.max_iterations_per_action {
-            // I've tested doing this randomization less frequently, but it
-            // does fairly significantly reduce win-rate.
-            battle = player_state::randomize_battle_player(&battle, player.opponent());
-            let target = next_evaluation_target(&mut battle, &mut graph, root);
-            let reward = evaluate(&mut battle, player);
-            back_propagate_rewards(&mut graph, player, target, reward);
-        }
-
-        let visit_count = graph[root].visit_count;
-        let normalized_reward = if visit_count == 0 {
-            OrderedFloat(0.0)
-        } else {
-            graph[root].total_reward / f64::from(visit_count)
-        };
-
-        // println!(
-        //     ">>> Action {:?} has total reward {} and visit count {} after {}
-        // iterations",     action,
-        //     action_graph[node].total_reward,
-        //     action_graph[node].visit_count,
-        //     config.max_iterations_per_action
-        // );
-        ActionSearchResult { action: *action, graph, root, reward: normalized_reward }
-    })
-}
-
-/// Adds a new top-level action edge to the search graph.
-///
-/// This is used as part of parallel search in order to produce different
-/// sub-graphs for each search thread.
-fn add_top_level_action(
-    graph: &mut SearchGraph,
-    root: NodeIndex,
-    action: BattleAction,
-    player: PlayerName,
-) -> NodeIndex {
-    for edge in graph.edges(root) {
-        if edge.weight().action == action {
-            return edge.target();
-        }
-    }
-
-    graph[root].tried.push(action);
-    let child = graph.add_node(SearchNode {
+    let mut graph = SearchGraph::default();
+    let root = graph.add_node(SearchNode {
         player,
         total_reward: OrderedFloat(0.0),
         visit_count: 0,
         tried: Vec::new(),
     });
-    graph.add_edge(root, child, SearchEdge { action });
-    child
+    let legal = legal_actions::compute(initial_battle, player);
+    let iterations = config.max_iterations_per_action * legal.len() as u32;
+    for i in 0..iterations {
+        let mut battle = if i % 100 == 0 {
+            player_state::randomize_battle_player(initial_battle, player.opponent())
+        } else {
+            initial_battle.logical_clone()
+        };
+
+        let node = next_evaluation_target(&mut battle, &mut graph, root);
+        let reward = evaluate(&mut battle, player);
+        back_propagate_rewards(&mut graph, player, node, reward);
+    }
+
+    let action = best_child(&graph, root, &legal, SelectionMode::RewardOnly).action;
+    info!("Picked action {:?} for {:?} after {} iterations", action, player, iterations);
+
+    if initial_battle.tracing.is_some() {
+        log_search_results::log_results(&graph, root);
+    }
+
+    action
 }
 
 /// Returns a descendant node to evaluate next for the provided parent node.
