@@ -184,3 +184,4 @@ graphviz:
 
 enforce-benchmarks:
     ./rules_engine/scripts/benchmark.py uct_single_threaded/uct_single_threaded --maximum-time-ms 6
+    ./rules_engine/scripts/benchmark.py uct_50k_action/uct_50k_action --maximum-time-ms 800

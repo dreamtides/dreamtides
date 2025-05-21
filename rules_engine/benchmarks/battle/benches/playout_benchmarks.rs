@@ -141,7 +141,7 @@ pub fn uct_1k_action(c: &mut Criterion) {
 
 pub fn uct_50k_action(c: &mut Criterion) {
     let mut group = c.benchmark_group("uct_50k_action");
-    group.significance_level(0.01).measurement_time(Duration::from_secs(100));
+    group.significance_level(0.01).sample_size(100);
     let error_subscriber = tracing_subscriber::fmt().with_max_level(Level::ERROR).finish();
     subscriber::with_default(error_subscriber, || {
         group.bench_function("uct_50k_action", |b| {
