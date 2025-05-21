@@ -24,9 +24,6 @@ use crate::uct_tree::{SearchEdge, SearchGraph, SearchNode, SelectionMode};
 /// provided `graph` and `root` should correspond to a search graph rooted at
 /// this state, i.e. one where the agent's possible actions form outgoing edges.
 ///
-/// Returns a [UctSearchResult] with an action to perform as well as graph data
-/// to reuse in future searches.
-///
 /// Monte carlo tree search operates over a tree of game state nodes
 /// connected by game actions. The search follows these three steps
 /// repeatedly:

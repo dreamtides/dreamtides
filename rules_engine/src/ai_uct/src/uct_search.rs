@@ -15,8 +15,6 @@ use petgraph::Direction;
 use rayon::prelude::*;
 use tracing::info;
 use tracing_macros::panic_with;
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::EnvFilter;
 
 use crate::log_search_results;
 use crate::uct_config::UctConfig;
@@ -27,9 +25,6 @@ use crate::uct_tree::{SearchEdge, SearchGraph, SearchNode, SelectionMode};
 /// Searches for an action for `player` to take in the given `battle` state. The
 /// provided `graph` and `root` should correspond to a search graph rooted at
 /// this state, i.e. one where the agent's possible actions form outgoing edges.
-///
-/// Returns a [UctSearchResult] with an action to perform as well as graph data
-/// to reuse in future searches.
 ///
 /// Monte carlo tree search operates over a tree of game state nodes
 /// connected by game actions. The search follows these three steps
@@ -60,35 +55,70 @@ pub fn search(
     player: PlayerName,
     config: &UctConfig,
 ) -> BattleAction {
-    let mut graph = SearchGraph::default();
-    let root = graph.add_node(SearchNode {
-        player,
-        total_reward: OrderedFloat(0.0),
-        visit_count: 0,
-        tried: Vec::new(),
-    });
-    let legal = legal_actions::compute(initial_battle, player);
-    let iterations = config.max_iterations_per_action * legal.len() as u32;
-    for i in 0..iterations {
-        let mut battle = if i % 100 == 0 {
-            player_state::randomize_battle_player(initial_battle, player.opponent())
+    let legal = legal_actions::compute(initial_battle, player).all();
+    let action_results: Vec<_> = legal
+        .par_iter()
+        .map(|&action| {
+            let mut graph = SearchGraph::default();
+            let root = graph.add_node(SearchNode {
+                player,
+                total_reward: OrderedFloat(0.0),
+                visit_count: 0,
+                tried: Vec::new(),
+            });
+
+            for _ in 0..config.max_iterations_per_action {
+                // Use a different random state every time. Doing this less
+                // frequently does improve performance, but also pretty
+                // consistently reduces play skill.
+                let mut battle =
+                    player_state::randomize_battle_player(initial_battle, player.opponent());
+
+                apply_battle_action::execute(&mut battle, player, action);
+
+                let node = next_evaluation_target(&mut battle, &mut graph, root);
+                let reward = evaluate(&mut battle, player);
+                back_propagate_rewards(&mut graph, player, node, reward);
+            }
+
+            let total_reward = graph[root].total_reward;
+            let visit_count = graph[root].visit_count;
+            ActionSearchResult { action, graph, root, total_reward, visit_count }
+        })
+        .collect();
+
+    let Some(best_result) = action_results.iter().max_by_key(|result| {
+        if result.visit_count == 0 {
+            OrderedFloat(-f64::INFINITY)
         } else {
-            initial_battle.logical_clone()
-        };
+            OrderedFloat(result.total_reward.0 / result.visit_count as f64)
+        }
+    }) else {
+        panic_with!("No legal actions available", initial_battle, player);
+    };
 
-        let node = next_evaluation_target(&mut battle, &mut graph, root);
-        let reward = evaluate(&mut battle, player);
-        back_propagate_rewards(&mut graph, player, node, reward);
-    }
+    let action = best_result.action;
+    let total_iterations = config.max_iterations_per_action * legal.len() as u32;
 
-    let action = best_child(&graph, root, &legal, SelectionMode::RewardOnly).action;
-    info!("Picked action {:?} for {:?} after {} iterations", action, player, iterations);
+    info!("Picked action {:?} for {:?} after {} iterations", action, player, total_iterations);
 
     if initial_battle.tracing.is_some() {
-        log_search_results::log_results(&graph, root);
+        log_search_results::log_results(&best_result.graph, best_result.root);
     }
 
+    // I've experimented with persisting the search tree to reuse in future
+    // searches, and it does improve win rates, but the complexity/performance
+    // costs seem to not be worth it.
+
     action
+}
+
+struct ActionSearchResult {
+    action: BattleAction,
+    graph: SearchGraph,
+    root: NodeIndex,
+    total_reward: OrderedFloat<f64>,
+    visit_count: u32,
 }
 
 /// Returns a descendant node to evaluate next for the provided parent node.
