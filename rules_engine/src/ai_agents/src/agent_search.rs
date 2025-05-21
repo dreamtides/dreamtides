@@ -15,10 +15,8 @@ use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use core_data::types::PlayerName;
 use rand::seq::IndexedRandom;
-use tracing::{info, subscriber};
+use tracing::info;
 use tracing_macros::panic_with;
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::EnvFilter;
 
 /// Selects an action for the given player using the given AI agent.
 pub fn select_action(battle: &BattleState, player: PlayerName, game_ai: &GameAI) -> BattleAction {
@@ -34,24 +32,8 @@ pub fn select_action(battle: &BattleState, player: PlayerName, game_ai: &GameAI)
         return legal_actions.all()[0];
     }
 
-    let filter = EnvFilter::new(
-        "warn,\
-        ai_agents=debug,\
-        ai_core=debug,\
-        ai_data=debug,\
-        ai_game_integration_old=debug,\
-        ai_monte_carlo=debug,\
-        ai_testing=debug,\
-        ai_tree_search=debug,\
-        ai_uct=debug",
-    );
-    let forest_subscriber =
-        tracing_subscriber::registry().with(logging::create_forest_layer(filter));
-
     let start_time = Instant::now();
-    let action = subscriber::with_default(forest_subscriber, || {
-        select_action_unchecked(battle, player, game_ai, true)
-    });
+    let action = select_action_unchecked(battle, player, game_ai, true);
     info!(
         "Agent selected action {:?} in {:.3} seconds",
         action,
