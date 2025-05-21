@@ -302,6 +302,9 @@ fn evaluate(battle: &mut BattleState, maximizing_player: PlayerName) -> OrderedF
             panic_with!("No legal actions available", battle, player);
         };
         apply_battle_action::execute(battle, player, action);
+
+        // I've tried aborting early here and using heuristics to evaluate the
+        // battle state, but this has substantially worse win rates.
     }
 
     let BattleStatus::GameOver { winner } = battle.status else {
