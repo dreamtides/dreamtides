@@ -1,5 +1,5 @@
 use std::io::{self, Write};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use ai_agents::agent_search;
 use battle_mutations::actions::apply_battle_action;
@@ -57,8 +57,40 @@ struct MatchResult {
     ai_one_wins: usize,
     ai_two_wins: usize,
     total_turns: usize,
-    total_elapsed: std::time::Duration,
+    total_elapsed: Duration,
     timed_out: usize,
+    ai_one_timing: AgentTimingStats,
+    ai_two_timing: AgentTimingStats,
+}
+
+#[derive(Clone, Copy, Debug, Default)]
+struct AgentTimingStats {
+    total: Duration,
+    max: Duration,
+    count: usize,
+}
+
+impl AgentTimingStats {
+    fn record(&mut self, elapsed: Duration) {
+        self.total += elapsed;
+        self.count += 1;
+        if elapsed > self.max {
+            self.max = elapsed;
+        }
+    }
+
+    fn avg(&self) -> Option<Duration> {
+        if self.count > 0 {
+            Some(self.total / self.count as u32)
+        } else {
+            None
+        }
+    }
+}
+
+struct MatchActionStats {
+    ai_one: AgentTimingStats,
+    ai_two: AgentTimingStats,
 }
 
 #[derive(Debug)]
@@ -73,7 +105,7 @@ fn run_match(
     seed: u64,
     verbosity: Verbosity,
     swap_positions: bool,
-) -> MatchOutcome {
+) -> (MatchOutcome, MatchActionStats) {
     let ai_one_parsed = from_str(ai_one).unwrap();
     let ai_two_parsed = from_str(ai_two).unwrap();
 
@@ -117,6 +149,8 @@ fn run_match(
 
     let start_time = Instant::now();
     let mut turn_count = 0;
+    let mut ai_one_stats = AgentTimingStats::default();
+    let mut ai_two_stats = AgentTimingStats::default();
 
     subscriber::with_default(subscriber, || {
         while !matches!(battle.status, BattleStatus::GameOver { .. }) {
@@ -135,12 +169,21 @@ fn run_match(
                 };
 
                 let legal_actions = legal_actions::compute(&battle, player);
+                let action_start = Instant::now();
                 let action = if legal_actions.len() == 1 {
                     legal_actions.all()[0]
                 } else {
                     agent_search::select_action_unchecked(&battle, player, &player_ai, false)
                 };
-
+                let action_time = action_start.elapsed();
+                match (player, swap_positions) {
+                    (PlayerName::One, false) | (PlayerName::Two, true) => {
+                        ai_one_stats.record(action_time)
+                    }
+                    (PlayerName::Two, false) | (PlayerName::One, true) => {
+                        ai_two_stats.record(action_time)
+                    }
+                }
                 match verbosity {
                     Verbosity::None => {}
                     Verbosity::OneLine => {
@@ -155,7 +198,6 @@ fn run_match(
                         );
                     }
                 }
-
                 debug!("Player {:?} executing action: {:?}", player, action);
                 apply_battle_action::execute(&mut battle, player, action);
                 debug!("Action completed");
@@ -170,11 +212,11 @@ fn run_match(
     }
 
     let elapsed = start_time.elapsed();
-
+    let stats = MatchActionStats { ai_one: ai_one_stats, ai_two: ai_two_stats };
     match battle.status {
-        BattleStatus::GameOver { winner: None } => MatchOutcome::Draw(turn_count, elapsed),
+        BattleStatus::GameOver { winner: None } => (MatchOutcome::Draw(turn_count, elapsed), stats),
         BattleStatus::GameOver { winner: Some(winner) } => {
-            MatchOutcome::Winner(winner, turn_count, elapsed)
+            (MatchOutcome::Winner(winner, turn_count, elapsed), stats)
         }
         _ => panic!("Game ended without a winner"),
     }
@@ -193,8 +235,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ai_one_wins: 0,
         ai_two_wins: 0,
         total_turns: 0,
-        total_elapsed: std::time::Duration::default(),
+        total_elapsed: Duration::default(),
         timed_out: 0,
+        ai_one_timing: AgentTimingStats::default(),
+        ai_two_timing: AgentTimingStats::default(),
     };
 
     if args.matches > 1 {
@@ -215,7 +259,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             io::stdout().flush().unwrap();
         }
 
-        let outcome = run_match(
+        let (outcome, stats) = run_match(
             &args.player_one_ai,
             &args.player_two_ai,
             args.seed,
@@ -223,6 +267,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             swap_positions,
         );
 
+        results.ai_one_timing.total += stats.ai_one.total;
+        results.ai_one_timing.count += stats.ai_one.count;
+        if stats.ai_one.max > results.ai_one_timing.max {
+            results.ai_one_timing.max = stats.ai_one.max;
+        }
+        results.ai_two_timing.total += stats.ai_two.total;
+        results.ai_two_timing.count += stats.ai_two.count;
+        if stats.ai_two.max > results.ai_two_timing.max {
+            results.ai_two_timing.max = stats.ai_two.max;
+        }
         match outcome {
             MatchOutcome::Winner(winner, turns, elapsed) => {
                 match (winner, swap_positions) {
@@ -246,7 +300,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 results.total_turns += turns;
                 results.total_elapsed += elapsed;
-
                 let winner_ai = if (winner == PlayerName::One && !swap_positions)
                     || (winner == PlayerName::Two && swap_positions)
                 {
@@ -336,6 +389,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 results.ai_two_wins,
                 (results.ai_two_wins as f64 / (args.matches - results.timed_out) as f64) * 100.0
             );
+
+            if results.ai_one_timing.count > 0 {
+                println!(
+                    "  {} avg action time: {:.2?}, max: {:.2?}",
+                    args.player_one_ai,
+                    results.ai_one_timing.avg().unwrap(),
+                    results.ai_one_timing.max
+                );
+            }
+            if results.ai_two_timing.count > 0 {
+                println!(
+                    "  {} avg action time: {:.2?}, max: {:.2?}",
+                    args.player_two_ai,
+                    results.ai_two_timing.avg().unwrap(),
+                    results.ai_two_timing.max
+                );
+            }
         }
     }
 
