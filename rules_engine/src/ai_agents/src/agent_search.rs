@@ -50,7 +50,7 @@ pub fn select_action(battle: &BattleState, player: PlayerName, game_ai: &GameAI)
 
     let start_time = Instant::now();
     let action = subscriber::with_default(forest_subscriber, || {
-        select_action_unchecked(battle, player, game_ai)
+        select_action_unchecked(battle, player, game_ai, true)
     });
     info!(
         "Agent selected action {:?} in {:.3} seconds",
@@ -68,6 +68,7 @@ pub fn select_action_unchecked(
     initial_battle: &BattleState,
     player: PlayerName,
     game_ai: &GameAI,
+    log_results: bool,
 ) -> BattleAction {
     let battle = &player_state::randomize_battle_player(initial_battle, player.opponent());
     match game_ai {
@@ -82,12 +83,12 @@ pub fn select_action_unchecked(
         GameAI::Uct1(max_iterations) => {
             let config =
                 UctConfig { max_iterations_per_action: *max_iterations, single_threaded: false };
-            uct_search::search(battle, player, &config)
+            uct_search::search(battle, player, &config, log_results)
         }
         GameAI::Uct1SingleThreaded(max_iterations) => {
             let config =
                 UctConfig { max_iterations_per_action: *max_iterations, single_threaded: true };
-            uct_search::search(battle, player, &config)
+            uct_search::search(battle, player, &config, log_results)
         }
     }
 }

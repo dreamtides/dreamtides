@@ -86,6 +86,7 @@ pub fn uct1_first_action(c: &mut Criterion) {
                         &battle,
                         PlayerName::One,
                         &GameAI::OldUct1MaxIterations(1000),
+                        false,
                     ))
                 },
                 BatchSize::SmallInput,
@@ -107,6 +108,7 @@ pub fn uct_single_threaded(c: &mut Criterion) {
                         &battle,
                         PlayerName::One,
                         &GameAI::Uct1SingleThreaded(100),
+                        false,
                     ))
                 },
                 BatchSize::SmallInput,
@@ -128,6 +130,7 @@ pub fn uct_1k_action(c: &mut Criterion) {
                         &battle,
                         PlayerName::One,
                         &GameAI::Uct1(1000),
+                        false,
                     ))
                 },
                 BatchSize::SmallInput,
@@ -149,6 +152,7 @@ pub fn uct_50k_action(c: &mut Criterion) {
                         &battle,
                         PlayerName::One,
                         &GameAI::Uct1(50_000),
+                        false,
                     ))
                 },
                 BatchSize::SmallInput,

@@ -138,7 +138,7 @@ fn run_match(
                 let action = if legal_actions.len() == 1 {
                     legal_actions.all()[0]
                 } else {
-                    agent_search::select_action_unchecked(&battle, player, &player_ai)
+                    agent_search::select_action_unchecked(&battle, player, &player_ai, false)
                 };
 
                 match verbosity {

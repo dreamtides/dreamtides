@@ -56,6 +56,7 @@ pub fn search(
     initial_battle: &BattleState,
     player: PlayerName,
     config: &UctConfig,
+    log_results: bool,
 ) -> BattleAction {
     let legal = legal_actions::compute(initial_battle, player).all();
     let action_results: Vec<_> = legal
@@ -106,9 +107,8 @@ pub fn search(
     let action = best_result.action;
     let total_iterations = config.max_iterations_per_action * legal.len() as u32;
 
-    info!("Picked action {:?} for {:?} after {} iterations", action, player, total_iterations);
-
-    if initial_battle.tracing.is_some() {
+    if log_results {
+        info!("Picked action {:?} for {:?} after {} iterations", action, player, total_iterations);
         log_search_results::log_results(&best_result.graph, best_result.root);
     }
 
