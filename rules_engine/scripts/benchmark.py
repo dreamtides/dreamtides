@@ -8,65 +8,79 @@ import sys
 import tempfile
 
 
-# Mapping of benchmark names to their maximum allowed runtimes in nanoseconds
-MAX_ALLOWED_TIMES = {
-    "random_playout/random_playout": 50_000_000,  # 50ms
-    "uct1_first_action/uct1_first_action": 30_000_000,  # 30ms
-    "uct_1k_action/uct_1k_action": 20_000_000,  # 20ms
-    "uct_50k_action/uct_50k_action": 500_000_000,  # 500ms
-    "uct_single_threaded/uct_single_threaded": 1_000_000,  # 800ms
-    "parse_abilities/parse_abilities": 10_000_000,  # 10ms
-}
+# ANSI color codes
+class Colors:
+    GREEN = '\033[92m'
+    RED = '\033[91m'
+    RESET = '\033[0m'
 
 
-def run_benchmark(benchmark_name):
+def print_colored(text, color):
+    """Print text in the specified color."""
+    print(f"{color}{text}{Colors.RESET}")
+
+
+def get_project_root():
+    """Get the project root directory based on the script's location."""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.dirname(script_dir)  # Go up one level from scripts/
+
+
+def run_benchmark(benchmark_name, max_time_ms):
     """Runs the specified benchmark using cargo criterion and checks the results."""
-    if benchmark_name not in MAX_ALLOWED_TIMES:
-        print(f"Error: Unknown benchmark '{benchmark_name}'")
-        print(f"Known benchmarks: {', '.join(MAX_ALLOWED_TIMES.keys())}")
-        return 1
-
-    max_allowed_time = MAX_ALLOWED_TIMES[benchmark_name]
+    max_allowed_time = max_time_ms * 1_000_000  # Convert ms to ns
+    
+    # Change to project root directory
+    project_root = get_project_root()
+    os.chdir(project_root)
     
     # Create temporary file for JSON output
     with tempfile.NamedTemporaryFile(delete=False) as temp_file:
         temp_file_path = temp_file.name
 
     try:
-        # Run the benchmark, redirecting stdout to the temp file
         cmd = ["cargo", "criterion", benchmark_name, "--message-format=json"]
-        process = subprocess.run(
-            cmd, 
+        process = subprocess.Popen(
+            cmd,
             stdout=open(temp_file_path, "w"),
             stderr=subprocess.PIPE,
             text=True,
+            bufsize=1,  # Line buffered
+            universal_newlines=True
         )
         
-        # Print stderr output to console, regardless of success or failure of the command
-        if process.stderr:
-            print(process.stderr, file=sys.stderr, end="")
-
+        # Stream stderr output in real-time
+        while True:
+            line = process.stderr.readline()
+            if not line and process.poll() is not None:
+                break
+            if line:
+                print(line, file=sys.stderr, end="")
+        
+        # Get the final return code
+        return_code = process.wait()
+        
         # Check if the cargo criterion command failed
-        if process.returncode != 0:
-            print(f"Error: 'cargo criterion {benchmark_name}' failed with exit code {process.returncode}.", file=sys.stderr)
-            return 1 # Indicate failure
+        if return_code != 0:
+            print_colored(f"Error: 'cargo criterion {benchmark_name}' failed with exit code {return_code}.", Colors.RED)
+            return 1  # Indicate failure
         
         # Parse the JSON output to get the benchmark results
         benchmark_time = parse_benchmark_results(temp_file_path, benchmark_name)
         
         # Check if the benchmark time exceeds the maximum allowed time
         if benchmark_time is None:
-            print(f"Error: Could not find benchmark results for '{benchmark_name}'")
+            print_colored(f"Error: Could not find benchmark results for '{benchmark_name}'", Colors.RED)
             return 1
             
         if benchmark_time > max_allowed_time:
-            print(f"ERROR: Benchmark '{benchmark_name}' exceeded maximum allowed time!")
+            print_colored(f"ERROR: Benchmark '{benchmark_name}' exceeded maximum allowed time!", Colors.RED)
             print(f"  Actual time:   {benchmark_time:,} ns ({benchmark_time/1_000_000:.2f} ms)")
             print(f"  Maximum time:  {max_allowed_time:,} ns ({max_allowed_time/1_000_000:.2f} ms)")
             print(f"  Difference:    {benchmark_time - max_allowed_time:,} ns ({(benchmark_time - max_allowed_time)/1_000_000:.2f} ms)")
             return 1
         else:
-            print(f"SUCCESS: Benchmark '{benchmark_name}' completed within allowed time")
+            print_colored(f"SUCCESS: Benchmark '{benchmark_name}' completed within allowed time", Colors.GREEN)
             print(f"  Actual time:   {benchmark_time:,} ns ({benchmark_time/1_000_000:.2f} ms)")
             print(f"  Maximum time:  {max_allowed_time:,} ns ({max_allowed_time/1_000_000:.2f} ms)")
             return 0
@@ -123,9 +137,11 @@ def parse_benchmark_results(json_file_path, benchmark_name):
 def main():
     parser = argparse.ArgumentParser(description="Run and check Rust benchmarks.")
     parser.add_argument("benchmark", help="Name of the benchmark to run")
+    parser.add_argument("--maximum-time-ms", type=int, required=True,
+                      help="Maximum allowed time for the benchmark in milliseconds")
     args = parser.parse_args()
     
-    return run_benchmark(args.benchmark)
+    return run_benchmark(args.benchmark, args.maximum_time_ms)
 
 
 if __name__ == "__main__":
