@@ -16,7 +16,6 @@ use tracing::info;
 use tracing_macros::panic_with;
 
 use crate::log_search_results;
-use crate::uct_config::UctConfig;
 use crate::uct_tree::{SearchEdge, SearchGraph, SearchNode, SelectionMode};
 
 /// Monte Carlo search algorithm.
@@ -55,12 +54,12 @@ use crate::uct_tree::{SearchEdge, SearchGraph, SearchNode, SelectionMode};
 pub fn search(
     initial_battle: &BattleState,
     player: PlayerName,
-    config: &UctConfig,
+    max_iterations: u32,
     graph: &mut SearchGraph,
     root: NodeIndex,
 ) -> BattleAction {
-    for i in 0..config.max_iterations {
-        let mut battle = if !config.omniscient && i % config.randomize_every_n_iterations == 0 {
+    for i in 0..max_iterations {
+        let mut battle = if i % 100 == 0 {
             player_state::randomize_battle_player(initial_battle, player.opponent())
         } else {
             initial_battle.logical_clone()
@@ -73,7 +72,7 @@ pub fn search(
 
     let legal = legal_actions::compute(initial_battle, player);
     let action = best_child(graph, root, &legal, SelectionMode::RewardOnly).action;
-    info!("Picked action {:?} for {:?} after {} iterations", action, player, config.max_iterations);
+    info!("Picked action {:?} for {:?} after {} iterations", action, player, max_iterations);
 
     if initial_battle.tracing.is_some() {
         log_search_results::log_results(graph, root);
@@ -87,7 +86,7 @@ pub fn search(
 pub fn search_from_empty(
     initial_battle: &BattleState,
     player: PlayerName,
-    config: &UctConfig,
+    max_iterations: u32,
 ) -> BattleAction {
     let mut graph = SearchGraph::default();
     let root = graph.add_node(SearchNode {
@@ -96,7 +95,7 @@ pub fn search_from_empty(
         visit_count: 0,
         tried: Vec::new(),
     });
-    search(initial_battle, player, config, &mut graph, root)
+    search(initial_battle, player, max_iterations, &mut graph, root)
 }
 
 /// Returns a descendant node to evaluate next for the provided parent node.

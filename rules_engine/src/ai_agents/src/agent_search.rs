@@ -75,33 +75,16 @@ pub fn select_action_unchecked(
         GameAI::FirstAvailableAction => first_available_action(battle, player),
         GameAI::RandomAction => random_action(battle, player),
         GameAI::IterativeDeepening => iterative_deepening_action(battle),
-        GameAI::Uct1 => uct1_action(battle, 10, None),
-        GameAI::Uct1MaxIterations(max_iterations) => {
+        GameAI::OldUct1 => uct1_action(battle, 10, None),
+        GameAI::OldUct1MaxIterations(max_iterations) => {
             uct1_action(battle, 1000, Some(*max_iterations))
         }
-        GameAI::NewUct(max_iterations) => {
-            let config = UctConfig {
-                max_iterations: *max_iterations,
-                randomize_every_n_iterations: 100,
-                ..Default::default()
-            };
-            uct_search_single_threaded::search_from_empty(battle, player, &config)
+        GameAI::Uct1(max_iterations) => {
+            let config = UctConfig { max_iterations_per_action: *max_iterations };
+            uct_search::search(battle, player, &config)
         }
-        GameAI::ParallelUct(max_iterations) => {
-            let config = UctConfig {
-                max_iterations: *max_iterations,
-                randomize_every_n_iterations: 100,
-                ..Default::default()
-            };
-            uct_search::search_from_empty(battle, player, &config)
-        }
-        GameAI::ParallelUctRandomize(max_iterations) => {
-            let config = UctConfig {
-                max_iterations: *max_iterations,
-                randomize_every_n_iterations: 1,
-                ..Default::default()
-            };
-            uct_search::search_from_empty(battle, player, &config)
+        GameAI::Uct1SingleThreaded(max_iterations) => {
+            uct_search_single_threaded::search_from_empty(battle, player, *max_iterations)
         }
     }
 }

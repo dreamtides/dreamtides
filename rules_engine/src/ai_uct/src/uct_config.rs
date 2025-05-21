@@ -1,23 +1,11 @@
 #[derive(Debug, Clone)]
 pub struct UctConfig {
-    pub max_iterations: u32,
-
-    /// How frequently to randomize the battle state being tested in order to
-    /// consider different possible scenarios (opponent cards in hand etc).
+    /// How many iterations of the monte carlo algorithm to run for each
+    /// possible action under consideration.
     ///
-    /// Lower values will slightly increase search time, but may cause the agent
-    /// to play better.
-    pub randomize_every_n_iterations: u32,
-
-    /// Whether the agent has perfect knowledge of all hidden game information.
-    ///
-    /// Causes `randomize_every_n_iterations` to be ignored, since no
-    /// randomization is ever required.
-    pub omniscient: bool,
-}
-
-impl Default for UctConfig {
-    fn default() -> Self {
-        Self { max_iterations: 10_000, randomize_every_n_iterations: 100, omniscient: false }
-    }
+    /// Doing it this way (instead of a total max number of iterations) means
+    /// the agent will 'think harder' when more actions are available and more
+    /// effectively utilize a larger number of CPU threads. I think this is a
+    /// good tradeoff.
+    pub max_iterations_per_action: u32,
 }

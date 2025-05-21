@@ -8,9 +8,8 @@ pub enum GameAI {
     FirstAvailableAction,
     RandomAction,
     IterativeDeepening,
-    Uct1,
-    Uct1MaxIterations(u32),
-    NewUct(u32),
-    ParallelUct(u32),
-    ParallelUctRandomize(u32),
+    OldUct1,
+    OldUct1MaxIterations(u32),
+    Uct1(u32),
+    Uct1SingleThreaded(u32),
 }

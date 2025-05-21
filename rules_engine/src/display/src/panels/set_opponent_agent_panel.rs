@@ -60,16 +60,24 @@ impl Component for SetOpponentAgentPanel<'_> {
                                 .build(),
                         )
                         .child(
-                            SetAgentCell::builder().agent(GameAI::Uct1MaxIterations(1000)).build(),
+                            SetAgentCell::builder()
+                                .agent(GameAI::OldUct1MaxIterations(1000))
+                                .build(),
                         )
                         .child(
-                            SetAgentCell::builder().agent(GameAI::Uct1MaxIterations(5000)).build(),
+                            SetAgentCell::builder()
+                                .agent(GameAI::OldUct1MaxIterations(5000))
+                                .build(),
                         )
                         .child(
-                            SetAgentCell::builder().agent(GameAI::Uct1MaxIterations(10000)).build(),
+                            SetAgentCell::builder()
+                                .agent(GameAI::OldUct1MaxIterations(10000))
+                                .build(),
                         )
                         .child(
-                            SetAgentCell::builder().agent(GameAI::Uct1MaxIterations(50000)).build(),
+                            SetAgentCell::builder()
+                                .agent(GameAI::OldUct1MaxIterations(50000))
+                                .build(),
                         )
                         .child(SetAgentCell::builder().agent(GameAI::IterativeDeepening).build())
                         .child(SetAgentCell::builder().agent(GameAI::RandomAction).build())

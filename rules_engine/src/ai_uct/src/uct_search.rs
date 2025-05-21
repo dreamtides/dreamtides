@@ -59,8 +59,6 @@ pub fn search(
     initial_battle: &BattleState,
     player: PlayerName,
     config: &UctConfig,
-    graph: &mut SearchGraph,
-    root: NodeIndex,
 ) -> BattleAction {
     let legal = legal_actions::compute(initial_battle, player).all();
     if legal.is_empty() {
@@ -69,7 +67,7 @@ pub fn search(
 
     let search_results = legal
         .par_iter()
-        .map(|action| search_single_action(action, initial_battle, player, config, graph, root))
+        .map(|action| search_single_action(action, initial_battle, player, config))
         .collect::<Vec<_>>();
 
     let best_result = search_results
@@ -77,13 +75,10 @@ pub fn search(
         .max_by_key(|result| result.reward)
         .expect("Should have at least one search result");
     let action = best_result.action;
-    info!(
-        "Picked action {:?} for {:?} after {} local iterations",
-        action, player, best_result.iteration_count
-    );
+    info!("Picked action {:?} for {:?}", action, player);
 
     if initial_battle.tracing.is_some() {
-        log_search_results::log_results(&best_result.graph, root);
+        log_search_results::log_results(&best_result.graph, best_result.root);
     }
 
     // I've experimented with persisting the search graph between calls, and it
@@ -95,26 +90,11 @@ pub fn search(
     action
 }
 
-pub fn search_from_empty(
-    initial_battle: &BattleState,
-    player: PlayerName,
-    config: &UctConfig,
-) -> BattleAction {
-    let mut graph = SearchGraph::default();
-    let root = graph.add_node(SearchNode {
-        player,
-        total_reward: OrderedFloat(0.0),
-        visit_count: 0,
-        tried: Vec::new(),
-    });
-    search(initial_battle, player, config, &mut graph, root)
-}
-
 struct ActionSearchResult {
     action: BattleAction,
-    graph: SearchGraph,
-    iteration_count: u32,
     reward: OrderedFloat<f64>,
+    graph: SearchGraph,
+    root: NodeIndex,
 }
 
 /// Runs a monte carlo search over a single proposed [BattleAction].
@@ -126,45 +106,44 @@ fn search_single_action(
     initial_battle: &BattleState,
     player: PlayerName,
     config: &UctConfig,
-    graph: &SearchGraph,
-    root: NodeIndex,
 ) -> ActionSearchResult {
     let subscriber = tracing_subscriber::registry().with(EnvFilter::new("warn"));
     tracing::subscriber::with_default(subscriber, || {
-        let mut action_graph = graph.clone();
-        let action_root = root;
+        let mut graph = SearchGraph::default();
+        let root = graph.add_node(SearchNode {
+            player,
+            total_reward: OrderedFloat(0.0),
+            visit_count: 0,
+            tried: Vec::new(),
+        });
+
         let mut battle = initial_battle.logical_clone();
         apply_battle_action::execute(&mut battle, player, *action);
-        let node = add_top_level_action(&mut action_graph, action_root, *action, player);
 
-        let iterations_per_action = config.max_iterations
-            / legal_actions::compute(initial_battle, player).all().len() as u32;
-        for i in 0..iterations_per_action {
-            let mut battle_clone =
-                if !config.omniscient && i % config.randomize_every_n_iterations == 0 {
-                    player_state::randomize_battle_player(&battle, player.opponent())
-                } else {
-                    battle.logical_clone()
-                };
-
-            let target = next_evaluation_target(&mut battle_clone, &mut action_graph, node);
-            let reward = evaluate(&mut battle_clone, player);
-            back_propagate_rewards(&mut action_graph, player, target, reward);
+        for _ in 0..config.max_iterations_per_action {
+            // I've tested doing this randomization less frequently, but it
+            // does fairly significantly reduce win-rate.
+            battle = player_state::randomize_battle_player(&battle, player.opponent());
+            let target = next_evaluation_target(&mut battle, &mut graph, root);
+            let reward = evaluate(&mut battle, player);
+            back_propagate_rewards(&mut graph, player, target, reward);
         }
 
-        let visit_count = action_graph[node].visit_count;
+        let visit_count = graph[root].visit_count;
         let normalized_reward = if visit_count == 0 {
             OrderedFloat(0.0)
         } else {
-            action_graph[node].total_reward / f64::from(visit_count)
+            graph[root].total_reward / f64::from(visit_count)
         };
 
-        ActionSearchResult {
-            action: *action,
-            graph: action_graph,
-            iteration_count: iterations_per_action,
-            reward: normalized_reward,
-        }
+        // println!(
+        //     ">>> Action {:?} has total reward {} and visit count {} after {}
+        // iterations",     action,
+        //     action_graph[node].total_reward,
+        //     action_graph[node].visit_count,
+        //     config.max_iterations_per_action
+        // );
+        ActionSearchResult { action: *action, graph, root, reward: normalized_reward }
     })
 }
 

@@ -84,7 +84,7 @@ pub fn uct1_first_action(c: &mut Criterion) {
                     criterion::black_box(agent_search::select_action_unchecked(
                         &battle,
                         PlayerName::One,
-                        &GameAI::Uct1MaxIterations(1000),
+                        &GameAI::OldUct1MaxIterations(1000),
                     ))
                 },
                 BatchSize::SmallInput,
@@ -105,7 +105,7 @@ pub fn uct_1k_action(c: &mut Criterion) {
                     criterion::black_box(agent_search::select_action_unchecked(
                         &battle,
                         PlayerName::One,
-                        &GameAI::NewUct(1000),
+                        &GameAI::Uct1(1000),
                     ))
                 },
                 BatchSize::SmallInput,
@@ -126,7 +126,7 @@ pub fn uct_100k_action(c: &mut Criterion) {
                     criterion::black_box(agent_search::select_action_unchecked(
                         &battle,
                         PlayerName::One,
-                        &GameAI::NewUct(100_000),
+                        &GameAI::Uct1(50_000),
                     ))
                 },
                 BatchSize::SmallInput,
