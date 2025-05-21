@@ -15,6 +15,8 @@ use petgraph::Direction;
 use rayon::prelude::*;
 use tracing::info;
 use tracing_macros::panic_with;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::EnvFilter;
 
 use crate::log_search_results;
 use crate::uct_config::UctConfig;
@@ -59,31 +61,34 @@ pub fn search(
     let action_results: Vec<_> = legal
         .par_iter()
         .map(|&action| {
-            let mut graph = SearchGraph::default();
-            let root = graph.add_node(SearchNode {
-                player,
-                total_reward: OrderedFloat(0.0),
-                visit_count: 0,
-                tried: Vec::new(),
-            });
+            let subscriber = tracing_subscriber::registry().with(EnvFilter::new("warn"));
+            tracing::subscriber::with_default(subscriber, || {
+                let mut graph = SearchGraph::default();
+                let root = graph.add_node(SearchNode {
+                    player,
+                    total_reward: OrderedFloat(0.0),
+                    visit_count: 0,
+                    tried: Vec::new(),
+                });
 
-            for _ in 0..config.max_iterations_per_action {
-                // Use a different random state every time. Doing this less
-                // frequently does improve performance, but also pretty
-                // consistently reduces play skill.
-                let mut battle =
-                    player_state::randomize_battle_player(initial_battle, player.opponent());
+                for _ in 0..config.max_iterations_per_action {
+                    // Use a different random state every time. Doing this less
+                    // frequently does improve performance, but also pretty
+                    // consistently reduces play skill.
+                    let mut battle =
+                        player_state::randomize_battle_player(initial_battle, player.opponent());
 
-                apply_battle_action::execute(&mut battle, player, action);
+                    apply_battle_action::execute(&mut battle, player, action);
 
-                let node = next_evaluation_target(&mut battle, &mut graph, root);
-                let reward = evaluate(&mut battle, player);
-                back_propagate_rewards(&mut graph, player, node, reward);
-            }
+                    let node = next_evaluation_target(&mut battle, &mut graph, root);
+                    let reward = evaluate(&mut battle, player);
+                    back_propagate_rewards(&mut graph, player, node, reward);
+                }
 
-            let total_reward = graph[root].total_reward;
-            let visit_count = graph[root].visit_count;
-            ActionSearchResult { action, graph, root, total_reward, visit_count }
+                let total_reward = graph[root].total_reward;
+                let visit_count = graph[root].visit_count;
+                ActionSearchResult { action, graph, root, total_reward, visit_count }
+            })
         })
         .collect();
 
