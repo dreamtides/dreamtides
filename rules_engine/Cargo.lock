@@ -365,6 +365,27 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
 
 [[package]]
+name = "battle_benchmarks"
+version = "0.0.0"
+dependencies = [
+ "ai_agents",
+ "ai_data",
+ "battle_mutations",
+ "battle_queries",
+ "battle_state",
+ "core_data",
+ "criterion",
+ "game_creation",
+ "parser",
+ "rand",
+ "rand_xoshiro",
+ "tracing",
+ "tracing-subscriber",
+ "tracing_macros",
+ "uuid",
+]
+
+[[package]]
 name = "battle_mutations"
 version = "0.0.0"
 dependencies = [
@@ -412,27 +433,6 @@ dependencies = [
  "slotmap",
  "strum",
  "strum_macros",
- "uuid",
-]
-
-[[package]]
-name = "benchmarks"
-version = "0.0.0"
-dependencies = [
- "ai_agents",
- "ai_data",
- "battle_mutations",
- "battle_queries",
- "battle_state",
- "core_data",
- "criterion",
- "game_creation",
- "parser",
- "rand",
- "rand_xoshiro",
- "tracing",
- "tracing-subscriber",
- "tracing_macros",
  "uuid",
 ]
 
@@ -1561,6 +1561,27 @@ dependencies = [
  "battle_state",
  "chumsky",
  "core_data",
+]
+
+[[package]]
+name = "parser_benchmarks"
+version = "0.0.0"
+dependencies = [
+ "ai_agents",
+ "ai_data",
+ "battle_mutations",
+ "battle_queries",
+ "battle_state",
+ "core_data",
+ "criterion",
+ "game_creation",
+ "parser",
+ "rand",
+ "rand_xoshiro",
+ "tracing",
+ "tracing-subscriber",
+ "tracing_macros",
+ "uuid",
 ]
 
 [[package]]

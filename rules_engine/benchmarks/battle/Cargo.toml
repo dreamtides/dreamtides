@@ -1,0 +1,30 @@
+[package]
+name = "battle_benchmarks"
+version = "0.0.0"
+edition = "2021"
+
+[[bench]]
+name = "battle_benchmarks"
+harness = false
+test = false
+doctest = false
+
+[dependencies]
+ai_agents = { path = "../../src/ai_agents" }
+ai_data = { path = "../../src/ai_data" }
+battle_mutations = { path = "../../src/battle_mutations" }
+battle_queries = { path = "../../src/battle_queries" }
+battle_state = { path = "../../src/battle_state" }
+core_data = { path = "../../src/core_data" }
+game_creation = { path = "../../src/game_creation" }
+parser = { path = "../../src/parser" }
+tracing_macros = { path = "../../src/tracing_macros" }
+
+rand = "0.9"
+rand_xoshiro = "0.7"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3.17", features = ["env-filter", "serde"] }
+uuid = { version = "1", features = ["serde", "v4"] }
+
+[dev-dependencies]
+criterion = { version = "0.5.1", features = ["html_reports"] }
