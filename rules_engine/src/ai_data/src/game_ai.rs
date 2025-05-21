@@ -7,9 +7,6 @@ pub enum GameAI {
     AlwaysPanic,
     FirstAvailableAction,
     RandomAction,
-    IterativeDeepening,
-    OldUct1,
-    OldUct1MaxIterations(u32),
     Uct1(u32),
     Uct1SingleThreaded(u32),
     // I've tested more traditional tree search algorithms like Minimax/Alpha

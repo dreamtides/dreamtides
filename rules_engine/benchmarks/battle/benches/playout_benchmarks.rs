@@ -85,7 +85,7 @@ pub fn uct1_first_action(c: &mut Criterion) {
                     criterion::black_box(agent_search::select_action_unchecked(
                         &battle,
                         PlayerName::One,
-                        &GameAI::OldUct1MaxIterations(1000),
+                        &GameAI::Uct1(1000),
                         false,
                     ))
                 },

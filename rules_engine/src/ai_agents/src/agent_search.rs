@@ -1,12 +1,6 @@
 use std::time::Instant;
 
-use ai_core::agent::{Agent, AgentConfig, AgentData};
 use ai_data::game_ai::GameAI;
-use ai_game_integration::evaluators::WinLossEvaluator;
-use ai_game_integration::game_state_node_integration::AgentBattleState;
-use ai_monte_carlo::monte_carlo::{MonteCarloAlgorithm, RandomPlayoutEvaluator};
-use ai_monte_carlo::uct1::Uct1;
-use ai_tree_search::iterative_deepening_search::IterativeDeepeningSearch;
 use ai_uct::uct_config::UctConfig;
 use ai_uct::uct_search;
 use battle_mutations::player_mutations::player_state;
@@ -57,11 +51,6 @@ pub fn select_action_unchecked(
         GameAI::AlwaysPanic => panic!("Always panic agent called for an action"),
         GameAI::FirstAvailableAction => first_available_action(battle, player),
         GameAI::RandomAction => random_action(battle, player),
-        GameAI::IterativeDeepening => iterative_deepening_action(battle),
-        GameAI::OldUct1 => uct1_action(battle, 10, None),
-        GameAI::OldUct1MaxIterations(max_iterations) => {
-            uct1_action(battle, 1000, Some(*max_iterations))
-        }
         GameAI::Uct1(max_iterations) => {
             let config =
                 UctConfig { max_iterations_per_action: *max_iterations, single_threaded: false };
@@ -83,21 +72,4 @@ fn first_available_action(battle: &BattleState, player: PlayerName) -> BattleAct
 fn random_action(battle: &BattleState, player: PlayerName) -> BattleAction {
     let actions = legal_actions::compute(battle, player).all();
     *actions.choose(&mut rand::rng()).unwrap()
-}
-
-fn iterative_deepening_action(battle: &BattleState) -> BattleAction {
-    let agent =
-        AgentData::omniscient("IterativeDeepening", IterativeDeepeningSearch, WinLossEvaluator);
-    agent.pick_action(AgentConfig::with_deadline(1), &AgentBattleState { state: battle.clone() })
-}
-
-fn uct1_action(battle: &BattleState, deadline: u64, max_iterations: Option<u32>) -> BattleAction {
-    let agent = AgentData::omniscient(
-        "UCT1",
-        MonteCarloAlgorithm { child_score_algorithm: Uct1 {}, max_iterations },
-        RandomPlayoutEvaluator {},
-    );
-    agent.pick_action(AgentConfig::with_deadline(deadline), &AgentBattleState {
-        state: battle.clone(),
-    })
 }
