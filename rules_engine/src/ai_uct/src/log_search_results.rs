@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
 
+use battle_state::actions::battle_actions::BattleAction;
 use core_data::types::PlayerName;
 use petgraph::dot::Dot;
 use petgraph::prelude::NodeIndex;
@@ -17,9 +18,9 @@ use crate::uct_tree::SearchGraph;
 /// Creates a simplified graph with nodes showing only the total reward values
 /// formatted to 1 decimal place, and edges showing the battle actions.
 /// The graph is limited to nodes within 3 edges of the root.
-pub fn log_results(graph: &SearchGraph, root: NodeIndex) {
+pub fn log_results(graph: &SearchGraph, root: NodeIndex, action_taken: BattleAction) {
     // Create a simplified graph for logging
-    let logging_graph = graph_for_logging(graph, root);
+    let logging_graph = graph_for_logging(graph, root, action_taken);
     let dot = Dot::with_config(&logging_graph, &[]);
     let Ok(output_path) = get_dot_file_path() else {
         error!("Failed to create dot file path");
@@ -39,13 +40,17 @@ pub fn log_results(graph: &SearchGraph, root: NodeIndex) {
     }
 }
 
-fn graph_for_logging(graph: &SearchGraph, root: NodeIndex) -> Graph<String, String> {
+fn graph_for_logging(
+    graph: &SearchGraph,
+    root: NodeIndex,
+    action_taken: BattleAction,
+) -> Graph<String, String> {
     let mut new_graph = Graph::<String, String>::new();
     let mut node_map = HashMap::new();
     let mut depth_map = HashMap::new();
 
     let total_reward = graph[root].total_reward.0;
-    let formatted_reward = format!("{:.1}", total_reward);
+    let formatted_reward = format!("{}@{:.1}", action_taken.battle_action_string(), total_reward);
     let new_root = new_graph.add_node(formatted_reward);
     node_map.insert(root, new_root);
     depth_map.insert(root, 0);

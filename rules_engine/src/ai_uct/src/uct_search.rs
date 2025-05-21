@@ -109,7 +109,7 @@ pub fn search(
 
     if log_results {
         info!("Picked action {:?} for {:?} after {} iterations", action, player, total_iterations);
-        log_search_results::log_results(&best_result.graph, best_result.root);
+        log_search_results::log_results(&best_result.graph, best_result.root, action);
     }
 
     // I've experimented with persisting the search tree to reuse in future
