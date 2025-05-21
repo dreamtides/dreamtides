@@ -8,4 +8,9 @@ pub struct UctConfig {
     /// effectively utilize a larger number of CPU threads. I think this is a
     /// good tradeoff.
     pub max_iterations_per_action: u32,
+
+    /// Force all search logic onto one thread.
+    ///
+    /// Used for benchmarking.
+    pub single_threaded: bool,
 }

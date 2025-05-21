@@ -31,7 +31,8 @@ criterion_group!(
     random_playout,
     uct1_first_action,
     uct_1k_action,
-    uct_100k_action
+    uct_50k_action,
+    uct_single_threaded
 );
 
 pub fn random_playout(c: &mut Criterion) {
@@ -93,6 +94,27 @@ pub fn uct1_first_action(c: &mut Criterion) {
     });
 }
 
+pub fn uct_single_threaded(c: &mut Criterion) {
+    let mut group = c.benchmark_group("uct_single_threaded");
+    group.significance_level(0.01).sample_size(500).measurement_time(Duration::from_secs(10));
+    let error_subscriber = tracing_subscriber::fmt().with_max_level(Level::ERROR).finish();
+    subscriber::with_default(error_subscriber, || {
+        group.bench_function("uct_single_threaded", |b| {
+            b.iter_batched(
+                benchmark_battle,
+                |battle| {
+                    criterion::black_box(agent_search::select_action_unchecked(
+                        &battle,
+                        PlayerName::One,
+                        &GameAI::Uct1SingleThreaded(100),
+                    ))
+                },
+                BatchSize::SmallInput,
+            );
+        });
+    });
+}
+
 pub fn uct_1k_action(c: &mut Criterion) {
     let mut group = c.benchmark_group("uct_1k_action");
     group.significance_level(0.01).sample_size(500).measurement_time(Duration::from_secs(15));
@@ -114,12 +136,12 @@ pub fn uct_1k_action(c: &mut Criterion) {
     });
 }
 
-pub fn uct_100k_action(c: &mut Criterion) {
-    let mut group = c.benchmark_group("uct_100k_action");
+pub fn uct_50k_action(c: &mut Criterion) {
+    let mut group = c.benchmark_group("uct_50k_action");
     group.significance_level(0.01).measurement_time(Duration::from_secs(100));
     let error_subscriber = tracing_subscriber::fmt().with_max_level(Level::ERROR).finish();
     subscriber::with_default(error_subscriber, || {
-        group.bench_function("uct_100k_action", |b| {
+        group.bench_function("uct_50k_action", |b| {
             b.iter_batched(
                 benchmark_battle,
                 |battle| {

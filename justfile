@@ -157,13 +157,13 @@ samply-matchup *args='':
     cargo build --manifest-path rules_engine/Cargo.toml --bin run_matchup  --profile=release-with-debug
     samply record ./rules_engine/target/release-with-debug/run_matchup -- "$@"
 
-samply-benchmark *args='':
+samply-battle-benchmark *args='':
     #!/bin/zsh
-    rm ./rules_engine/target/release/deps/benchmarks-*
+    rm ./rules_engine/target/release/deps/battle_benchmarks-*
     cargo criterion --manifest-path rules_engine/Cargo.toml --no-run
-    ALL_BENCHMARKS=`echo ./rules_engine/target/release/deps/benchmarks-*`
+    ALL_BENCHMARKS=`echo ./rules_engine/target/release/deps/battle_benchmarks-*`
     echo "Found benchmark binaries" $ALL_BENCHMARKS
-    BENCHMARK=`echo ./rules_engine/target/release/deps/benchmarks-*([1])`
+    BENCHMARK=`echo ./rules_engine/target/release/deps/battle_benchmarks-*([1])`
     echo "Running" $BENCHMARK
     samply record $BENCHMARK --bench --profile-time 10 "$@"
 

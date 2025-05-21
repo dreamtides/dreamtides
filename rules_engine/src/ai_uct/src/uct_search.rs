@@ -60,6 +60,7 @@ pub fn search(
     let legal = legal_actions::compute(initial_battle, player).all();
     let action_results: Vec<_> = legal
         .par_iter()
+        .with_min_len(if config.single_threaded { usize::MAX } else { 1 })
         .map(|&action| {
             let subscriber = tracing_subscriber::registry().with(EnvFilter::new("warn"));
             tracing::subscriber::with_default(subscriber, || {

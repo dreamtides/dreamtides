@@ -8,7 +8,7 @@ use ai_monte_carlo::monte_carlo::{MonteCarloAlgorithm, RandomPlayoutEvaluator};
 use ai_monte_carlo::uct1::Uct1;
 use ai_tree_search::iterative_deepening_search::IterativeDeepeningSearch;
 use ai_uct::uct_config::UctConfig;
-use ai_uct::{uct_search, uct_search_single_threaded};
+use ai_uct::uct_search;
 use battle_mutations::player_mutations::player_state;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
@@ -80,11 +80,14 @@ pub fn select_action_unchecked(
             uct1_action(battle, 1000, Some(*max_iterations))
         }
         GameAI::Uct1(max_iterations) => {
-            let config = UctConfig { max_iterations_per_action: *max_iterations };
+            let config =
+                UctConfig { max_iterations_per_action: *max_iterations, single_threaded: false };
             uct_search::search(battle, player, &config)
         }
         GameAI::Uct1SingleThreaded(max_iterations) => {
-            uct_search_single_threaded::search_from_empty(battle, player, *max_iterations)
+            let config =
+                UctConfig { max_iterations_per_action: *max_iterations, single_threaded: true };
+            uct_search::search(battle, player, &config)
         }
     }
 }
