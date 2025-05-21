@@ -1,6 +1,6 @@
 set positional-arguments
 
-code-review: check-format build clippy test check-docs unity-tests
+code-review: check-format build clippy test check-docs enforce-benchmarks unity-tests
 
 check:
     cargo check --manifest-path rules_engine/Cargo.toml --workspace --all-targets --all-features
@@ -181,3 +181,6 @@ resize-images:
 
 graphviz:
     dot -Tpng rules_engine/search_graph.dot -o rules_engine/search_graph.png && open rules_engine/search_graph.png
+
+enforce-benchmarks:
+    ./rules_engine/scripts/benchmark.py uct_single_threaded/uct_single_threaded --maximum-time-ms 6
