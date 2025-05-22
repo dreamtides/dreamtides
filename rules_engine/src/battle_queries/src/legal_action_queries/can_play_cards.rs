@@ -1,10 +1,11 @@
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::HandCardId;
+use battle_state::battle::card_id::{CardIdType, HandCardId};
 use battle_state::battle_cards::ability_list::CanPlayRestriction;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 
 use crate::battle_card_queries::card_properties;
+use crate::legal_action_queries::{has_legal_additional_costs, has_legal_targets};
 
 /// Whether only cards with the `fast` property should be returned.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -39,7 +40,15 @@ pub fn from_hand(battle: &BattleState, player: PlayerName, fast_only: FastOnly) 
         let meets = match battle.cards.can_play_restriction(card_id) {
             Some(restriction) => meets_restriction(battle, player, restriction, cost),
             None => {
-                panic!("No can play restriction found for card {:?}", battle.cards.name(card_id));
+                // No fast version of the 'can play' restriction, check all card
+                // abilities.
+                has_legal_targets::for_event(battle, player, card_id.card_id())
+                    && has_legal_additional_costs::for_event(
+                        battle,
+                        player,
+                        card_id.card_id(),
+                        cost,
+                    )
             }
         };
 
