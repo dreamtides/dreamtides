@@ -1,4 +1,3 @@
-use ability_data::ability::Ability;
 use ability_data::effect::Effect;
 use ability_data::standard_effect::StandardEffect;
 use battle_queries::battle_card_queries::card_abilities;
@@ -15,18 +14,16 @@ use tracing_macros::battle_trace;
 /// Adds a prompt to the `battle` for targets required to play the `card_id`
 /// card.
 pub fn execute(battle: &mut BattleState, player: PlayerName, card_id: StackCardId) {
-    for (ability_id, ability) in card_abilities::query(battle, card_id) {
-        if let Ability::Event(event) = ability {
-            let source = EffectSource::Event {
-                controller: player,
-                stack_card_id: card_id,
-                ability_number: *ability_id,
-            };
-            if let Some(prompt_data) = targeting_prompt(battle, player, source, &event.effect) {
-                battle_trace!("Adding target prompt", battle, prompt_data);
-                battle.prompt = Some(prompt_data);
-                return;
-            }
+    for (ability_id, ability) in &card_abilities::query(battle, card_id).event_abilities {
+        let source = EffectSource::Event {
+            controller: player,
+            stack_card_id: card_id,
+            ability_number: *ability_id,
+        };
+        if let Some(prompt_data) = targeting_prompt(battle, player, source, &ability.effect) {
+            battle_trace!("Adding target prompt", battle, prompt_data);
+            battle.prompt = Some(prompt_data);
+            return;
         }
     }
 }

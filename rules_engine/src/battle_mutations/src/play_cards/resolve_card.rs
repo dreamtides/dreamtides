@@ -1,4 +1,3 @@
-use ability_data::ability::Ability;
 use battle_queries::battle_card_queries::{card_abilities, card_properties};
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_cards::stack_card_state::StackCardState;
@@ -64,14 +63,12 @@ fn resolve_card(battle: &mut BattleState, card: &StackCardState) {
 }
 
 fn apply_event_effects(battle: &mut BattleState, card: &StackCardState) {
-    for (ability_number, ability) in card_abilities::query(battle, card.id) {
-        if let Ability::Event(event) = ability {
-            let event_source = EffectSource::Event {
-                controller: card.controller,
-                stack_card_id: card.id,
-                ability_number: *ability_number,
-            };
-            apply_effect::execute(battle, event_source, &event.effect, &card.targets);
-        }
+    for (ability_number, ability) in &card_abilities::query(battle, card.id).event_abilities {
+        let event_source = EffectSource::Event {
+            controller: card.controller,
+            stack_card_id: card.id,
+            ability_number: *ability_number,
+        };
+        apply_effect::execute(battle, event_source, &ability.effect, &card.targets);
     }
 }

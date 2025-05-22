@@ -128,6 +128,7 @@ fn debug_card_state(
     current_zone: Zone,
     card_id: CardId,
 ) -> DebugCardState {
+    let ability_list = card_abilities::query(battle, card_id);
     DebugCardState {
         id: format!("{:?}", card_id),
         controller: format!("{:?}", controller),
@@ -138,9 +139,25 @@ fn debug_card_state(
             cost: format!("{:?}", card_properties::cost(battle, card_id)),
             is_fast: format!("{:?}", card_properties::is_fast(battle, card_id)),
         },
-        abilities: card_abilities::query(battle, card_id)
+        abilities: ability_list
+            .event_abilities
             .iter()
             .map(|(_, ability)| format!("{:?}", ability))
+            .chain(
+                ability_list.static_abilities.iter().map(|(_, ability)| format!("{:?}", ability)),
+            )
+            .chain(
+                ability_list
+                    .activated_abilities
+                    .iter()
+                    .map(|(_, ability)| format!("{:?}", ability)),
+            )
+            .chain(
+                ability_list
+                    .triggered_abilities
+                    .iter()
+                    .map(|(_, ability)| format!("{:?}", ability)),
+            )
             .collect(),
         stack_state: debug_stack_card_state(battle.cards.stack_card(StackCardId(card_id))),
     }
