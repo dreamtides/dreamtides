@@ -10,6 +10,7 @@ use crate::battle::card_id::{
     BanishedCardId, CardId, CardIdType, CharacterId, DeckCardId, HandCardId, StackCardId,
     VoidCardId,
 };
+use crate::battle_cards::ability_list::CanPlayRestriction;
 use crate::battle_cards::card_set::CardSet;
 use crate::battle_cards::character_state::CharacterState;
 use crate::battle_cards::stack_card_state::{
@@ -48,10 +49,17 @@ pub type CharacterMap = BTreeMap<CharacterId, CharacterState>;
 /// No significant differences between SmallVec and Vec here.
 pub type StackCards = Vec<StackCardState>;
 
+/// A card to create in a player's deck.
+pub struct CreatedCard {
+    pub name: CardName,
+    pub can_play_restriction: Option<CanPlayRestriction>,
+}
+
 #[derive(Clone, Debug, Default)]
 pub struct AllCards {
     card_names: Vec<CardName>,
     card_object_ids: Vec<ObjectId>,
+    can_play_restrictions: Vec<Option<CanPlayRestriction>>,
     battlefield: PlayerMap<CardSet<CharacterId>>,
     battlefield_state: PlayerMap<CharacterMap>,
     void: PlayerMap<CardSet<VoidCardId>>,
@@ -76,6 +84,13 @@ impl AllCards {
     /// Panics if no card with this ID exists.
     pub fn object_id(&self, id: impl CardIdType) -> ObjectId {
         self.card_object_ids[id.card_id().0]
+    }
+
+    /// Returns the [CanPlayRestriction] of a card if it has one.
+    ///
+    /// Panics if no card with this ID exists.
+    pub fn can_play_restriction(&self, id: impl CardIdType) -> Option<CanPlayRestriction> {
+        self.can_play_restrictions[id.card_id().0]
     }
 
     /// Returns the spark value of a character.
@@ -159,10 +174,11 @@ impl AllCards {
     }
 
     /// Creates a set of cards with the indicated names in a player's deck.
-    pub fn create_cards_in_deck(&mut self, owner: PlayerName, cards: Vec<CardName>) {
+    pub fn create_cards_in_deck(&mut self, owner: PlayerName, cards: Vec<CreatedCard>) {
         for name in cards {
             let id = self.card_names.len();
-            self.card_names.push(name);
+            self.card_names.push(name.name);
+            self.can_play_restrictions.push(name.can_play_restriction);
             let object_id = self.new_object_id();
             self.card_object_ids.push(object_id);
             self.decks.player_mut(owner).insert(DeckCardId(CardId(id)));

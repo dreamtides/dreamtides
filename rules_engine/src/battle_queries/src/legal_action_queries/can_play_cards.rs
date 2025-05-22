@@ -4,7 +4,7 @@ use battle_state::battle_cards::ability_list::CanPlayRestriction;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 
-use crate::battle_card_queries::{card_abilities, card_properties};
+use crate::battle_card_queries::card_properties;
 
 /// Whether only cards with the `fast` property should be returned.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -36,7 +36,7 @@ pub fn from_hand(battle: &BattleState, player: PlayerName, fast_only: FastOnly) 
             continue;
         }
 
-        let meets = match card_abilities::query(battle, card_id).can_play_restriction {
+        let meets = match battle.cards.can_play_restriction(card_id) {
             Some(restriction) => meets_restriction(battle, player, restriction, cost),
             None => {
                 panic!("No can play restriction found for card {:?}", battle.cards.name(card_id));

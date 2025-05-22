@@ -3,6 +3,7 @@ use std::time::Duration;
 use ai_agents::agent_search;
 use ai_data::game_ai::GameAI;
 use battle_mutations::actions::apply_battle_action;
+use battle_mutations::card_mutations::deck;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::all_cards::AllCards;
@@ -430,10 +431,24 @@ fn benchmark_battle() -> BattleState {
         history: None,
     };
 
-    for spec in &card_specs {
-        assert_eq!(battle.cards.all_cards().count(), spec.id, "Card ID mismatch during creation");
-        battle.cards.create_cards_in_deck(spec.owner, vec![spec.name]);
-    }
+    deck::add_cards(
+        &mut battle,
+        PlayerName::One,
+        card_specs
+            .iter()
+            .filter(|spec| spec.owner == PlayerName::One)
+            .map(|spec| spec.name)
+            .collect(),
+    );
+    deck::add_cards(
+        &mut battle,
+        PlayerName::Two,
+        card_specs
+            .iter()
+            .filter(|spec| spec.owner == PlayerName::Two)
+            .map(|spec| spec.name)
+            .collect(),
+    );
 
     for spec in &card_specs {
         let card_id = CardId(spec.id);

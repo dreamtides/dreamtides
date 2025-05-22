@@ -1,7 +1,10 @@
+use battle_queries::battle_card_queries::card_abilities;
+use battle_state::battle::all_cards::CreatedCard;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{DeckCardId, HandCardId};
 use battle_state::battle_cards::card_set::CardSet;
 use battle_state::core::effect_source::EffectSource;
+use core_data::identifiers::CardName;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use rand::seq::IteratorRandom;
@@ -42,6 +45,20 @@ pub fn draw_cards(battle: &mut BattleState, source: EffectSource, player: Player
     for _ in 0..count {
         draw_card(battle, source, player);
     }
+}
+
+/// Adds a list of cards by name to a player's deck
+pub fn add_cards(battle: &mut BattleState, player: PlayerName, cards: Vec<CardName>) {
+    battle.cards.create_cards_in_deck(
+        player,
+        cards
+            .into_iter()
+            .map(|name| CreatedCard {
+                name,
+                can_play_restriction: card_abilities::query_by_name(name).can_play_restriction,
+            })
+            .collect(),
+    );
 }
 
 /// Returns a random element from the given set.
