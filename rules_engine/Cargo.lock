@@ -302,7 +302,6 @@ dependencies = [
  "core_data",
  "criterion",
  "game_creation",
- "parser",
  "rand",
  "rand_xoshiro",
  "tracing",

@@ -182,6 +182,12 @@ resize-images:
 graphviz:
     dot -Tpng rules_engine/search_graph.dot -o rules_engine/search_graph.png && open rules_engine/search_graph.png
 
+bench-single:
+    cargo criterion --manifest-path rules_engine/Cargo.toml -p battle_benchmarks -- uct_single_threaded/uct_single_threaded
+
+bench-50:
+    cargo criterion --manifest-path rules_engine/Cargo.toml -p battle_benchmarks -- uct_50k_action/uct_50k_action
+
 enforce-benchmarks:
     ./rules_engine/scripts/benchmark.py uct_single_threaded/uct_single_threaded --maximum-time-ms 6
     ./rules_engine/scripts/benchmark.py uct_50k_action/uct_50k_action --maximum-time-ms 800
