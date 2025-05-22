@@ -27,14 +27,7 @@ use tracing::{subscriber, Level};
 use tracing_macros::write_tracing_event;
 use uuid::Uuid;
 
-criterion_group!(
-    playout_benchmarks,
-    random_playout,
-    uct1_first_action,
-    uct_1k_action,
-    uct_50k_action,
-    uct_single_threaded
-);
+criterion_group!(playout_benchmarks, random_playout, ai_full, ai_single_threaded);
 
 pub fn random_playout(c: &mut Criterion) {
     write_tracing_event::clear_log_file();
@@ -63,52 +56,19 @@ pub fn random_playout(c: &mut Criterion) {
     });
 }
 
-pub fn uct1_first_action(c: &mut Criterion) {
-    let mut group = c.benchmark_group("uct1_first_action");
-    group
-        .significance_level(0.01)
-        .sample_size(500)
-        .noise_threshold(0.03)
-        .measurement_time(Duration::from_secs(15));
+pub fn ai_single_threaded(c: &mut Criterion) {
+    let mut group = c.benchmark_group("ai_single_threaded");
+    group.significance_level(0.01).measurement_time(Duration::from_secs(10));
     let error_subscriber = tracing_subscriber::fmt().with_max_level(Level::ERROR).finish();
     subscriber::with_default(error_subscriber, || {
-        group.bench_function("uct1_first_action", |b| {
-            b.iter_batched(
-                || {
-                    new_test_battle::create_and_start(
-                        BattleId(Uuid::new_v4()),
-                        3141592653589793,
-                        PlayerType::Agent(GameAI::AlwaysPanic),
-                        PlayerType::Agent(GameAI::AlwaysPanic),
-                    )
-                },
-                |battle| {
-                    criterion::black_box(agent_search::select_action_unchecked(
-                        &battle,
-                        PlayerName::One,
-                        &GameAI::Uct1(1000),
-                        false,
-                    ))
-                },
-                BatchSize::SmallInput,
-            );
-        });
-    });
-}
-
-pub fn uct_single_threaded(c: &mut Criterion) {
-    let mut group = c.benchmark_group("uct_single_threaded");
-    group.significance_level(0.01).sample_size(500).measurement_time(Duration::from_secs(10));
-    let error_subscriber = tracing_subscriber::fmt().with_max_level(Level::ERROR).finish();
-    subscriber::with_default(error_subscriber, || {
-        group.bench_function("uct_single_threaded", |b| {
+        group.bench_function("ai_single_threaded", |b| {
             b.iter_batched(
                 benchmark_battle,
                 |battle| {
                     criterion::black_box(agent_search::select_action_unchecked(
                         &battle,
                         PlayerName::One,
-                        &GameAI::Uct1SingleThreaded(100),
+                        &GameAI::Uct1SingleThreaded(1000),
                         false,
                     ))
                 },
@@ -118,34 +78,12 @@ pub fn uct_single_threaded(c: &mut Criterion) {
     });
 }
 
-pub fn uct_1k_action(c: &mut Criterion) {
-    let mut group = c.benchmark_group("uct_1k_action");
-    group.significance_level(0.01).sample_size(500).measurement_time(Duration::from_secs(15));
-    let error_subscriber = tracing_subscriber::fmt().with_max_level(Level::ERROR).finish();
-    subscriber::with_default(error_subscriber, || {
-        group.bench_function("uct_1k_action", |b| {
-            b.iter_batched(
-                benchmark_battle,
-                |battle| {
-                    criterion::black_box(agent_search::select_action_unchecked(
-                        &battle,
-                        PlayerName::One,
-                        &GameAI::Uct1(1000),
-                        false,
-                    ))
-                },
-                BatchSize::SmallInput,
-            );
-        });
-    });
-}
-
-pub fn uct_50k_action(c: &mut Criterion) {
-    let mut group = c.benchmark_group("uct_50k_action");
+pub fn ai_full(c: &mut Criterion) {
+    let mut group = c.benchmark_group("ai_full");
     group.significance_level(0.01).sample_size(100);
     let error_subscriber = tracing_subscriber::fmt().with_max_level(Level::ERROR).finish();
     subscriber::with_default(error_subscriber, || {
-        group.bench_function("uct_50k_action", |b| {
+        group.bench_function("ai_full", |b| {
             b.iter_batched(
                 benchmark_battle,
                 |battle| {

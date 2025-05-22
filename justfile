@@ -183,11 +183,11 @@ graphviz:
     dot -Tpng rules_engine/search_graph.dot -o rules_engine/search_graph.png && open rules_engine/search_graph.png
 
 bench-single:
-    cargo criterion --manifest-path rules_engine/Cargo.toml -p battle_benchmarks -- uct_single_threaded/uct_single_threaded
+    cargo criterion --manifest-path rules_engine/Cargo.toml -p battle_benchmarks -- ai_single_threaded/ai_single_threaded
 
-bench-50:
-    cargo criterion --manifest-path rules_engine/Cargo.toml -p battle_benchmarks -- uct_50k_action/uct_50k_action
+bench-full:
+    cargo criterion --manifest-path rules_engine/Cargo.toml -p battle_benchmarks -- ai_full/ai_full
 
 enforce-benchmarks:
-    ./rules_engine/scripts/benchmark.py uct_single_threaded/uct_single_threaded --maximum-time-ms 6
-    ./rules_engine/scripts/benchmark.py uct_50k_action/uct_50k_action --maximum-time-ms 800
+    ./rules_engine/scripts/benchmark.py ai_single_threaded/ai_single_threaded --maximum-time-ms 60
+    ./rules_engine/scripts/benchmark.py ai_full/ai_full --maximum-time-ms 800
