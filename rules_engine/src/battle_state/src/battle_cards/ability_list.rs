@@ -27,11 +27,11 @@ pub struct AbilityList {
     pub can_play_restriction: Option<CanPlayRestriction>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum CanPlayRestriction {
     Unrestricted,
     EnemyCharacter,
     EnemyStackCard,
-    CardTypeOnStack(CardType),
+    EnemyStackCardOfType(CardType),
     AdditionalEnergyAvailable(Energy),
 }

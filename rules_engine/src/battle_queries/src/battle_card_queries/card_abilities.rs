@@ -8,9 +8,12 @@ use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardIdType;
-use battle_state::battle_cards::ability_list::AbilityList;
+use battle_state::battle_cards::ability_list::{AbilityList, CanPlayRestriction};
+use core_data::card_types::CardType;
 use core_data::identifiers::{AbilityNumber, CardName};
 use core_data::numerics::Energy;
+
+use crate::card_ability_queries::effect_predicates;
 
 static MINSTREL_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 static IMMOLATE_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
@@ -92,5 +95,97 @@ fn build_ability_list(abilities: Vec<(AbilityNumber, Ability)>) -> AbilityList {
         }
     }
 
+    ability_list.can_play_restriction = merge_can_play_restrictions(vec![
+        compute_event_target_restriction(&ability_list),
+        compute_event_additional_cost_restriction(&ability_list),
+    ]);
+
     ability_list
+}
+
+fn merge_can_play_restrictions(
+    restrictions: Vec<Option<CanPlayRestriction>>,
+) -> Option<CanPlayRestriction> {
+    if restrictions.iter().any(|r| r.is_none()) {
+        return None;
+    }
+
+    let specific_restrictions: Vec<CanPlayRestriction> = restrictions
+        .into_iter()
+        .flatten()
+        .filter(|r| !matches!(r, CanPlayRestriction::Unrestricted))
+        .collect();
+
+    match &specific_restrictions[..] {
+        [] => Some(CanPlayRestriction::Unrestricted),
+        [restriction] => Some(*restriction),
+        [..] => None,
+    }
+}
+
+fn compute_event_target_restriction(list: &AbilityList) -> Option<CanPlayRestriction> {
+    let predicates: Vec<&Predicate> = list
+        .event_abilities
+        .iter()
+        .flat_map(|(_, ability)| match &ability.effect {
+            Effect::Effect(effect) => vec![
+                effect_predicates::get_character_target_predicate(effect),
+                effect_predicates::get_stack_target_predicate(effect),
+            ],
+            Effect::WithOptions(options) => vec![
+                effect_predicates::get_character_target_predicate(&options.effect),
+                effect_predicates::get_stack_target_predicate(&options.effect),
+            ],
+            Effect::List(effects) => effects
+                .iter()
+                .flat_map(|effect| {
+                    vec![
+                        effect_predicates::get_character_target_predicate(&effect.effect),
+                        effect_predicates::get_stack_target_predicate(&effect.effect),
+                    ]
+                })
+                .collect(),
+        })
+        .flatten()
+        .collect();
+
+    let predicate = match predicates[..] {
+        [] => {
+            return Some(CanPlayRestriction::Unrestricted);
+        }
+        [predicate] => predicate,
+        [..] => {
+            return None;
+        }
+    };
+
+    match predicate {
+        Predicate::Enemy(CardPredicate::Character) => Some(CanPlayRestriction::EnemyCharacter),
+        Predicate::Enemy(CardPredicate::Dream) => Some(CanPlayRestriction::EnemyStackCard),
+        Predicate::Enemy(CardPredicate::Event) => {
+            Some(CanPlayRestriction::EnemyStackCardOfType(CardType::Event))
+        }
+        _ => None,
+    }
+}
+
+fn compute_event_additional_cost_restriction(list: &AbilityList) -> Option<CanPlayRestriction> {
+    let costs: Vec<&Cost> = list
+        .event_abilities
+        .iter()
+        .filter_map(|(_, ability)| ability.additional_cost.as_ref())
+        .collect();
+
+    let cost = match costs[..] {
+        [] => return Some(CanPlayRestriction::Unrestricted),
+        [cost] => cost,
+        _ => return None,
+    };
+
+    match cost {
+        Cost::SpendOneOrMoreEnergy => {
+            Some(CanPlayRestriction::AdditionalEnergyAvailable(Energy(1)))
+        }
+        _ => None,
+    }
 }

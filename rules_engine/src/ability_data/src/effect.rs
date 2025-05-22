@@ -26,6 +26,10 @@ pub struct EffectWithOptions {
 
     /// A cost to apply this effect, if any. Usually written as "You may pay
     /// {cost} to perform {effect}" on activated or triggered ability cards.
+    ///
+    /// This is used for costs that apply on resolution of the effect. It is
+    /// *not* used for additional costs to play event cards, which are paid
+    /// before placing the card on the stack.
     pub cost: Option<Cost>,
 
     /// Indicates an effect set which occurs only if some condition is met,

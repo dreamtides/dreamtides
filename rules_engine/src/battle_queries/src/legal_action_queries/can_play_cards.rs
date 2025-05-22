@@ -1,11 +1,10 @@
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::HandCardId;
-use core_data::card_types::CardType;
-use core_data::identifiers::CardName;
+use battle_state::battle_cards::ability_list::CanPlayRestriction;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 
-use crate::battle_card_queries::card_properties;
+use crate::battle_card_queries::{card_abilities, card_properties};
 
 /// Whether only cards with the `fast` property should be returned.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -37,42 +36,42 @@ pub fn from_hand(battle: &BattleState, player: PlayerName, fast_only: FastOnly) 
             continue;
         }
 
-        if !has_legal_targets(battle, player, battle.cards.name(card_id)) {
-            continue;
-        }
+        let meets = match card_abilities::query(battle, card_id).can_play_restriction {
+            Some(restriction) => meets_restriction(battle, player, restriction, cost),
+            None => {
+                panic!("No can play restriction found for card {:?}", battle.cards.name(card_id));
+            }
+        };
 
-        if !has_legal_additional_costs(battle, player, battle.cards.name(card_id), cost) {
-            continue;
+        if meets {
+            legal_cards.push(card_id);
         }
-
-        legal_cards.push(card_id);
     }
 
     legal_cards
 }
 
-fn has_legal_targets(battle: &BattleState, controller: PlayerName, card: CardName) -> bool {
-    match card {
-        CardName::MinstrelOfFallingLight => true,
-        CardName::Immolate => !battle.cards.battlefield(controller.opponent()).is_empty(),
-        CardName::RippleOfDefiance => battle
+fn meets_restriction(
+    battle: &BattleState,
+    controller: PlayerName,
+    restriction: CanPlayRestriction,
+    energy_cost: Energy,
+) -> bool {
+    match restriction {
+        CanPlayRestriction::Unrestricted => true,
+        CanPlayRestriction::EnemyCharacter => {
+            !battle.cards.battlefield(controller.opponent()).is_empty()
+        }
+        CanPlayRestriction::EnemyStackCard => {
+            !battle.cards.stack_set(controller.opponent()).is_empty()
+        }
+        CanPlayRestriction::EnemyStackCardOfType(card_type) => battle
             .cards
             .stack_set(controller.opponent())
             .iter()
-            .any(|id| card_properties::card_type(battle, id) == CardType::Event),
-        CardName::Abolish => !battle.cards.stack_set(controller.opponent()).is_empty(),
-        CardName::Dreamscatter => true,
-    }
-}
-
-fn has_legal_additional_costs(
-    battle: &BattleState,
-    controller: PlayerName,
-    card: CardName,
-    paid: Energy,
-) -> bool {
-    match card {
-        CardName::Dreamscatter => battle.players.player(controller).current_energy > paid,
-        _ => true,
+            .any(|id| card_properties::card_type(battle, id) == card_type),
+        CanPlayRestriction::AdditionalEnergyAvailable(required_energy) => {
+            battle.players.player(controller).current_energy - energy_cost >= required_energy
+        }
     }
 }
