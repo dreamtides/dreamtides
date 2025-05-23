@@ -9,7 +9,6 @@ use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{
     PromptChoice, PromptChoiceLabel, PromptConfiguration, PromptContext, PromptData, PromptType,
 };
-use core_data::numerics::Energy;
 
 use crate::card_mutations::negate;
 use crate::effects::targeting;
@@ -27,9 +26,8 @@ pub fn execute(
             player: source.controller().opponent(),
             prompt_type: PromptType::Choose {
                 choices: vec![
-                    // TODO: Build cost label
                     PromptChoice {
-                        label: PromptChoiceLabel::PayEnergy(Energy(2)),
+                        label: costs::pay_cost_label(cost),
                         effect: Effect::Effect(StandardEffect::OpponentPaysCost {
                             cost: cost.clone(),
                         }),
