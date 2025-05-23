@@ -13,7 +13,7 @@ pub struct ResponseBuilder {
     /// Commands to be executed as part of the response.
     commands: CommandSequence,
 
-    /// Whether this is the last update for the animation sequence
+    /// Whether this is an intermediate update for animation purposes.
     for_animation: bool,
 }
 
@@ -24,6 +24,19 @@ impl ResponseBuilder {
 
     pub fn push(&mut self, command: Command) {
         self.commands.groups.push(ParallelCommandGroup { commands: vec![command] });
+    }
+
+    /// Appends all of the groups from a [CommandSequence] to the response.
+    pub fn extend(&mut self, commands: CommandSequence) {
+        self.commands.groups.extend(commands.groups);
+    }
+
+    /// Optional equivalent of [Self::extend].
+    pub fn extend_optional(&mut self, commands: Option<CommandSequence>) {
+        if let Some(commands) = commands {
+            eprintln!(">>>>>>> Extending commands: {:?}", commands);
+            self.extend(commands);
+        }
     }
 
     pub fn should_animate(&self) -> bool {

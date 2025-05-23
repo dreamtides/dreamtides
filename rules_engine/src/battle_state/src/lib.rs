@@ -1,3 +1,5 @@
+#![feature(let_chains)]
+
 pub mod actions;
 pub mod battle;
 pub mod battle_cards;

@@ -2,6 +2,7 @@ use ability_data::effect::Effect;
 use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use battle_queries::battle_player_queries::quantity_expression;
+use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardIdType;
 use battle_state::battle_cards::stack_card_state::StackCardTargets;
@@ -43,6 +44,18 @@ fn apply_standard_effect(
     targets: &Option<StackCardTargets>,
 ) {
     battle_trace!("Applying effect", battle, source, effect, targets);
+    battle.push_animation_optional(|| {
+        if let Some(targets) = targets
+            && let Some(source_id) = source.card_id()
+        {
+            Some(BattleAnimation::ApplyEffectToTargets {
+                source: source_id,
+                targets: targets.clone(),
+            })
+        } else {
+            None
+        }
+    });
 
     match effect {
         StandardEffect::DrawCardsForEach { count, for_each } => {

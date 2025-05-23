@@ -113,6 +113,15 @@ impl BattleState {
         }
     }
 
+    /// Optional version of [Self::push_animation].
+    pub fn push_animation_optional(&mut self, update: impl FnOnce() -> Option<BattleAnimation>) {
+        if self.animations.is_some()
+            && let Some(animation) = update()
+        {
+            self.push_animation(|| animation);
+        }
+    }
+
     /// Adds a new action to the history of this battle.
     pub fn push_history_action(&mut self, player: PlayerName, action: BattleAction) {
         if let Some(history) = &mut self.history {

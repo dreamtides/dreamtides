@@ -769,6 +769,7 @@ dependencies = [
  "ability_data",
  "action_data",
  "ai_data",
+ "asset_paths",
  "battle_queries",
  "battle_state",
  "bon",

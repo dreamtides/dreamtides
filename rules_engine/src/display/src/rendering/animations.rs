@@ -7,11 +7,12 @@ use display_data::command::{
 };
 
 use crate::core::response_builder::ResponseBuilder;
+use crate::rendering::target_projectile_effects;
 
 pub fn render(
     builder: &mut ResponseBuilder,
     animation: &BattleAnimation,
-    _snapshot: &BattleState,
+    snapshot: &BattleState,
     final_state: &BattleState,
 ) {
     match animation {
@@ -51,5 +52,9 @@ pub fn render(
             }
         }
         BattleAnimation::SelectStackCardTargets { .. } => {}
+        BattleAnimation::ApplyEffectToTargets { source, targets } => {
+            eprintln!(">>>>>>> Applying effect to targets: {:?}", targets);
+            builder.extend_optional(target_projectile_effects::effect(snapshot, *source, targets));
+        }
     }
 }

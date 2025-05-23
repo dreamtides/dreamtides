@@ -77,7 +77,7 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
         ),
         cards,
         interface: interface_view(builder, battle),
-        arrows: current_arrows(battle),
+        arrows: current_arrows(builder, battle),
         preview: battle_preview(builder, battle),
     }
 }
@@ -105,7 +105,11 @@ fn player_view(battle: &BattleState, name: PlayerName, player: &BattlePlayerStat
     }
 }
 
-fn current_arrows(battle: &BattleState) -> Vec<DisplayArrow> {
+fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<DisplayArrow> {
+    if builder.is_for_animation() {
+        return vec![];
+    }
+
     battle
         .cards
         .all_cards_on_stack()
