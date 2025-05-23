@@ -13,13 +13,13 @@ use core_data::display_types::{
     AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
 };
 use core_data::identifiers::BattleId;
-use core_data::numerics::{Energy, Spark};
+use core_data::numerics::{Energy, Points, Spark};
 use display_data::battle_view::{BattleView, ButtonView, CardOrderSelectorView, DisplayPlayer};
 use display_data::card_view::CardView;
 use display_data::command::{
-    Command, CommandSequence, DisplayDreamwellActivationCommand, DisplayEffectCommand,
-    DisplayJudgmentCommand, DissolveCardCommand, FireProjectileCommand, GameMessageType,
-    GameObjectId, ParallelCommandGroup, UpdateBattleCommand,
+    ArrowStyle, Command, CommandSequence, DisplayArrow, DisplayDreamwellActivationCommand,
+    DisplayEffectCommand, DisplayJudgmentCommand, DissolveCardCommand, FireProjectileCommand,
+    GameMessageType, GameObjectId, ParallelCommandGroup, UpdateBattleCommand,
 };
 use display_data::object_position::{Position, StackType};
 use display_data::request_data::{
@@ -446,14 +446,12 @@ fn respond_to_enemy_card(battle: &mut BattleView, commands: &mut Vec<Command>) {
             Position::OnStack(StackType::TargetingUserBattlefield),
             sorting_key,
         );
+        battle.arrows = vec![DisplayArrow {
+            source: GameObjectId::CardId(card_id),
+            target: GameObjectId::CardId(target_id),
+            color: ArrowStyle::Red,
+        }];
         commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
-        // commands.push(Command::DisplayArrows(DisplayArrowsCommand {
-        //     arrows: vec![DisplayArrow {
-        //         source: GameObjectId::CardId(card_id),
-        //         target: GameObjectId::CardId(target_id),
-        //         color: ArrowStyle::Red,
-        //     }],
-        // }));
     }
 }
 
@@ -473,7 +471,7 @@ fn trigger_user_judgment_phase(battle: &mut BattleView, commands: &mut Vec<Comma
         Command::DisplayGameMessage(GameMessageType::YourTurn),
         Command::DisplayJudgment(DisplayJudgmentCommand {
             player: DisplayPlayer::User,
-            new_score: None,
+            new_score: Some(Points(10)),
         }),
         Command::DisplayDreamwellActivation(DisplayDreamwellActivationCommand {
             card_id: dreamwell_card_id,

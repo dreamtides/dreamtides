@@ -1,7 +1,8 @@
 use core_data::numerics::{Energy, Points};
 use core_data::types::PlayerName;
 
-use crate::battle::card_id::{CardId, HandCardId};
+use crate::battle::card_id::{CardId, HandCardId, StackCardId};
+use crate::battle_cards::stack_card_state::StackCardTargets;
 
 /// Records events during rules engine execution for display as game animations.
 #[derive(Clone, Debug)]
@@ -22,5 +23,10 @@ pub enum BattleAnimation {
     PlayCardFromHand {
         player: PlayerName,
         card_id: HandCardId,
+    },
+    SelectStackCardTargets {
+        player: PlayerName,
+        source_id: StackCardId,
+        targets: StackCardTargets,
     },
 }

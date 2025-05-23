@@ -40,5 +40,6 @@ pub fn render(builder: &mut ResponseBuilder, animation: &BattleAnimation, _snaps
                 builder.push(Command::Wait(Milliseconds::new(1500)));
             }
         }
+        BattleAnimation::SelectStackCardTargets { .. } => {}
     }
 }

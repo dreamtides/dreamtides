@@ -39,10 +39,10 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
             turn::start_turn(battle, battle.turn.active_player.opponent());
         }
         BattleAction::SelectCharacterTarget(character_id) => {
-            select_stack_card_target::character(battle, character_id);
+            select_stack_card_target::character(battle, player, character_id);
         }
         BattleAction::SelectStackCardTarget(stack_card_id) => {
-            select_stack_card_target::on_stack(battle, stack_card_id);
+            select_stack_card_target::on_stack(battle, player, stack_card_id);
         }
         BattleAction::SelectPromptChoice(choice_index) => {
             select_choice_prompt_at_index::select(battle, choice_index);

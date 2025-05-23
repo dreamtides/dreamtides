@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _pieceSize: 0.3
-  _pieceFadeDistance: 0.4
+  _pieceFadeDistance: 0.3
   _headPrefab: {fileID: 1047237291554972, guid: 54906e8377663c64384ec02c430495dd, type: 3}
   _piecePrefab: {fileID: 1648654368789128, guid: ab82086137c07244abcfb06ec0e02ce9, type: 3}
   _source: {fileID: 0}
