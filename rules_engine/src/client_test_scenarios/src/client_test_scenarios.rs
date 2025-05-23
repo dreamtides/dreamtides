@@ -247,6 +247,7 @@ fn select_card(card_id: CardId) -> CommandSequence {
                     ),
                     color: display_color::BLUE_500,
                     dissolve_speed: None,
+                    sound: None,
                 })],
             },
             ParallelCommandGroup {
@@ -262,6 +263,7 @@ fn select_card(card_id: CardId) -> CommandSequence {
                         material: MaterialAddress::new("Assets/Content/Dissolves/Dissolve15.mat".to_string()),
                         color: display_color::BLUE_500,
                         dissolve_speed: None,
+                        sound: None,
                     }),
                 ],
             },

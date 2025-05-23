@@ -787,6 +787,7 @@ version = "0.0.0"
 dependencies = [
  "action_data",
  "battle_state",
+ "bon",
  "core_data",
  "masonry",
  "schemars",

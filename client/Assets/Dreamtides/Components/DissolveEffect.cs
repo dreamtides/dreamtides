@@ -17,10 +17,18 @@ namespace Dreamtides.Components
     float _clipValue = 0;
     bool _reverse = false;
     float _speed = 1f;
+    Registry? _registry;
+    AudioClipAddress? _sound;
+    bool _soundPlayed = false;
+
     public IEnumerator StartDissolve(Registry registry, DissolveCardCommand command)
     {
       _reverse = command.Reverse;
       _speed = (float)(command.DissolveSpeed ?? 1f);
+      _registry = registry;
+      _sound = command.Sound;
+      _soundPlayed = false;
+
       if (!_reverse)
       {
         _originalMaterial = _target.material;
@@ -63,6 +71,16 @@ namespace Dreamtides.Components
         _target.material,
         AdvancedDissolveProperties.Cutout.Standard.Property.Clip,
         _clipValue);
+
+      if (!_soundPlayed && _sound != null && _registry != null)
+      {
+        var halfwayReached = _reverse ? _clipValue <= 0.5f : _clipValue >= 0.5f;
+        if (halfwayReached)
+        {
+          _registry.SoundService.Play(_sound);
+          _soundPlayed = true;
+        }
+      }
 
       if (_clipValue >= 1 || _clipValue <= 0)
       {

@@ -318,6 +318,12 @@ namespace Dreamtides.Schema
         public bool Reverse { get; set; }
 
         /// <summary>
+        /// Sound to play
+        /// </summary>
+        [JsonProperty("sound")]
+        public AudioClipAddress Sound { get; set; }
+
+        /// <summary>
         /// The card to dissolve.
         ///
         /// Once a card is dissolved, it will be invisible until a reverse dissolve is applied to it.

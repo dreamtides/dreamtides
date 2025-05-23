@@ -1,4 +1,5 @@
 use battle_state::battle::card_id::CardId;
+use bon::Builder;
 use core_data::display_color::DisplayColor;
 use core_data::display_types::{
     AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
@@ -96,7 +97,7 @@ impl UpdateBattleCommand {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Builder)]
 #[serde(rename_all = "camelCase")]
 pub struct FireProjectileCommand {
     // The source to fire the projectile from.
@@ -129,13 +130,14 @@ pub struct FireProjectileCommand {
 
     // If true, the target will be hidden after being hit during the
     // 'wait_duration' and before jumping to 'jump_to_position'.
+    #[builder(default)]
     pub hide_on_hit: bool,
 
     // Position for the target to jump to after being hit.
     pub jump_to_position: Option<ObjectPosition>,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Builder)]
 #[serde(rename_all = "camelCase")]
 pub struct DissolveCardCommand {
     /// The card to dissolve.
@@ -144,17 +146,20 @@ pub struct DissolveCardCommand {
     /// is applied to it.
     pub target: CardId,
 
-    /// If true, dissolve will be played backwards to "create" the card.
-    pub reverse: bool,
-
     /// The material to use for the dissolve effect.
     pub material: MaterialAddress,
+
+    /// If true, dissolve will be played backwards to "create" the card.
+    pub reverse: bool,
 
     /// The color to use for the dissolve effect.
     pub color: DisplayColor,
 
     /// The speed multiplier of the dissolve effect. Defaults to 1.
     pub dissolve_speed: Option<f64>,
+
+    /// Sound to play
+    pub sound: Option<AudioClipAddress>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

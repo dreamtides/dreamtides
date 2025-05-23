@@ -1,4 +1,4 @@
-use asset_paths::{dissolve_material, hovl_projectile};
+use asset_paths::{dissolve_material, hovl_projectile, wow_sound};
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType};
 use battle_state::battle_cards::stack_card_state::StackCardTargets;
@@ -18,35 +18,35 @@ pub fn apply(
 ) -> Option<()> {
     match battle.cards.card(source_id).name {
         CardName::Immolate => {
-            builder.push(Command::FireProjectile(FireProjectileCommand {
-                source_id: GameObjectId::CardId(source_id),
-                target_id: target_id(targets)?,
-                projectile: hovl_projectile::address(1, "Projectile 3 black fire"),
-                travel_duration: None,
-                fire_sound: None,
-                impact_sound: None,
-                additional_hit: None,
-                additional_hit_delay: None,
-                wait_duration: None,
-                hide_on_hit: false,
-                jump_to_position: None,
-            }));
-
-            builder.push(Command::DissolveCard(DissolveCardCommand {
-                target: target_card_id(targets)?,
-                reverse: false,
-                material: dissolve_material::material(15),
-                color: display_color::ORANGE_500,
-                dissolve_speed: None,
-            }));
-
-            builder.run_with_next_battle_view(Command::DissolveCard(DissolveCardCommand {
-                target: target_card_id(targets)?,
-                reverse: true,
-                material: dissolve_material::material(15),
-                color: display_color::ORANGE_500,
-                dissolve_speed: None,
-            }));
+            builder.push(Command::FireProjectile(
+                FireProjectileCommand::builder()
+                    .source_id(GameObjectId::CardId(source_id))
+                    .target_id(target_id(targets)?)
+                    .projectile(hovl_projectile::address(1, "Projectile 3 black fire"))
+                    .fire_sound(wow_sound::rpg_magic(
+                        3,
+                        "Fire Magic/RPG3_FireMagicArrow_Projectile01",
+                    ))
+                    .impact_sound(wow_sound::rpg_magic(3, "Fire Magic/RPG3_FireMagic_Impact01"))
+                    .build(),
+            ));
+            builder.push(Command::DissolveCard(
+                DissolveCardCommand::builder()
+                    .target(target_card_id(targets)?)
+                    .material(dissolve_material::material(15))
+                    .color(display_color::ORANGE_500)
+                    .reverse(false)
+                    .build(),
+            ));
+            builder.run_with_next_battle_view(Command::DissolveCard(
+                DissolveCardCommand::builder()
+                    .target(target_card_id(targets)?)
+                    .material(dissolve_material::material(15))
+                    .color(display_color::ORANGE_500)
+                    .reverse(true)
+                    .sound(wow_sound::rpg_magic(3, "Fire Magic/RPG3_FireMagicBall_LightImpact03"))
+                    .build(),
+            ));
         }
         _ => {}
     }

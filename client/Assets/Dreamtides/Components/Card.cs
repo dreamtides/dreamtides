@@ -121,6 +121,7 @@ namespace Dreamtides.Components
     {
       _isDissolved = true;
       ToggleActiveElements();
+
       yield return StartCoroutine(_cardImageDissolve.StartDissolve(_registry, command));
 
       if (command.Reverse)
