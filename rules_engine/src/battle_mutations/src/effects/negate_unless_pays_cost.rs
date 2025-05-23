@@ -18,7 +18,7 @@ use crate::prompt_mutations::prompts;
 pub fn execute(
     battle: &mut BattleState,
     source: EffectSource,
-    targets: &StackCardTargets,
+    targets: &Option<StackCardTargets>,
     cost: &Cost,
 ) {
     if costs::can_pay(battle, source.controller().opponent(), cost) {

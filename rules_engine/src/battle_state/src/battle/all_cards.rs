@@ -13,9 +13,7 @@ use crate::battle::card_id::{
 use crate::battle_cards::ability_list::CanPlayRestriction;
 use crate::battle_cards::card_set::CardSet;
 use crate::battle_cards::character_state::CharacterState;
-use crate::battle_cards::stack_card_state::{
-    StackCardAdditionalCostsPaid, StackCardState, StackCardTargets,
-};
+use crate::battle_cards::stack_card_state::{StackCardAdditionalCostsPaid, StackCardState};
 use crate::battle_cards::zone::Zone;
 use crate::battle_player::player_map::PlayerMap;
 
@@ -257,7 +255,7 @@ impl AllCards {
                 self.stack.push(StackCardState {
                     id: StackCardId(card_id),
                     controller,
-                    targets: StackCardTargets::None,
+                    targets: None,
                     additional_costs_paid: StackCardAdditionalCostsPaid::None,
                 });
             }

@@ -18,7 +18,7 @@ pub fn execute(
     battle: &mut BattleState,
     source: EffectSource,
     effect: &Effect,
-    targets: &StackCardTargets,
+    targets: &Option<StackCardTargets>,
 ) {
     if !targets_are_valid(battle, source.controller(), targets) {
         return;
@@ -40,7 +40,7 @@ fn apply_standard_effect(
     battle: &mut BattleState,
     source: EffectSource,
     effect: &StandardEffect,
-    targets: &StackCardTargets,
+    targets: &Option<StackCardTargets>,
 ) {
     battle_trace!("Applying effect", battle, source, effect, targets);
 
@@ -66,19 +66,18 @@ fn apply_standard_effect(
 fn targets_are_valid(
     battle: &BattleState,
     controller: PlayerName,
-    targets: &StackCardTargets,
+    targets: &Option<StackCardTargets>,
 ) -> bool {
-    // TODO: Get correct target player
     match targets {
-        StackCardTargets::Character(character_id) => battle.cards.contains_card(
+        Some(StackCardTargets::Character(character_id)) => battle.cards.contains_card(
             controller.opponent(),
             character_id.card_id(),
             Zone::Battlefield,
         ),
-        StackCardTargets::StackCard(stack_card_id) => {
+        Some(StackCardTargets::StackCard(stack_card_id)) => {
             battle.cards.contains_card(controller.opponent(), stack_card_id.card_id(), Zone::Stack)
         }
-        StackCardTargets::None => true,
+        None => true,
     }
 }
 
@@ -92,13 +91,13 @@ fn draw_cards_for_each(
     deck::draw_cards(battle, source, source.controller(), count * matching);
 }
 
-fn dissolve(battle: &mut BattleState, source: EffectSource, targets: &StackCardTargets) {
+fn dissolve(battle: &mut BattleState, source: EffectSource, targets: &Option<StackCardTargets>) {
     let id = targeting::character_id(battle, targets);
     // TODO: Get controller for dissolve target
     dissolve::execute(battle, source, source.controller().opponent(), id);
 }
 
-fn negate(battle: &mut BattleState, source: EffectSource, targets: &StackCardTargets) {
+fn negate(battle: &mut BattleState, source: EffectSource, targets: &Option<StackCardTargets>) {
     let id = targeting::stack_card_id(battle, targets);
     // TODO: Get controller for negate target
     negate::execute(battle, source, source.controller().opponent(), id);

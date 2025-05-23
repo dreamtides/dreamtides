@@ -60,7 +60,7 @@ pub struct PromptChoice {
     pub effect: Effect,
 
     /// Optionally, targets to apply the effect to.
-    pub targets: StackCardTargets,
+    pub targets: Option<StackCardTargets>,
 }
 
 #[derive(Debug, Clone, Copy)]

@@ -8,7 +8,7 @@ pub fn character(battle: &mut BattleState, character_id: CharacterId) {
     let Some(stack_card) = battle.cards.top_of_stack_mut() else {
         panic_with!("No active stack", battle);
     };
-    stack_card.targets = StackCardTargets::Character(character_id);
+    stack_card.targets = Some(StackCardTargets::Character(character_id));
     battle.prompt = None;
 }
 
@@ -17,6 +17,6 @@ pub fn on_stack(battle: &mut BattleState, stack_card_id: StackCardId) {
     let Some(stack_card) = battle.cards.top_of_stack_mut() else {
         panic_with!("No active stack", battle);
     };
-    stack_card.targets = StackCardTargets::StackCard(stack_card_id);
+    stack_card.targets = Some(StackCardTargets::StackCard(stack_card_id));
     battle.prompt = None;
 }
