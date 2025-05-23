@@ -8,13 +8,17 @@ use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
+use battle_state::battle::card_id::CardIdType;
+use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use battle_state::battle_player::battle_player_state::BattlePlayerState;
 use battle_state::prompt_types::prompt_data::{PromptChoiceLabel, PromptType};
 use core_data::display_color;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use display_data::battle_view::{BattleView, ButtonView, InterfaceView, PlayerView};
-use display_data::command::{Command, GameMessageType, UpdateBattleCommand};
+use display_data::command::{
+    ArrowStyle, Command, DisplayArrow, GameMessageType, GameObjectId, UpdateBattleCommand,
+};
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify};
 use masonry::flex_style::FlexStyle;
 use tracing_macros::panic_with;
@@ -71,6 +75,7 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
         ),
         cards,
         interface: interface_view(builder, battle),
+        arrows: current_arrows(battle),
     }
 }
 
@@ -95,6 +100,28 @@ fn player_view(battle: &BattleState, name: PlayerName, player: &BattlePlayerStat
         produced_energy: player.produced_energy,
         total_spark: player_properties::spark_total(battle, name),
     }
+}
+
+fn current_arrows(battle: &BattleState) -> Vec<DisplayArrow> {
+    battle
+        .cards
+        .all_cards_on_stack()
+        .iter()
+        .filter_map(|stack_card| {
+            stack_card.targets.as_ref().map(|targets| {
+                let source = GameObjectId::CardId(stack_card.id.card_id());
+                let (target, color) = match targets {
+                    StackCardTargets::Character(character_id) => {
+                        (GameObjectId::CardId(character_id.card_id()), ArrowStyle::Red)
+                    }
+                    StackCardTargets::StackCard(stack_card_id) => {
+                        (GameObjectId::CardId(stack_card_id.card_id()), ArrowStyle::Blue)
+                    }
+                };
+                DisplayArrow { source, target, color }
+            })
+        })
+        .collect()
 }
 
 fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> InterfaceView {

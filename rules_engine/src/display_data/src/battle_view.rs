@@ -7,6 +7,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::card_view::{CardPreviewView, CardView};
+use crate::command::DisplayArrow;
 
 /// Represents the visual state of an ongoing dream battle
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -26,6 +27,9 @@ pub struct BattleView {
 
     /// UI to display to the player.
     pub interface: InterfaceView,
+
+    /// Arrows to display between cards
+    pub arrows: Vec<DisplayArrow>,
 }
 
 /// Preview of a potential future state of a battle, shown e.g. in response to a

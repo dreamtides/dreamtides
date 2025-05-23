@@ -52,6 +52,7 @@ MonoBehaviour:
   _source: {fileID: 0}
   _target: {fileID: 0}
   _radiusMultiplier: 10
+  _sortingGroup: {fileID: 4398724434938230037}
 --- !u!210 &4398724434938230037
 SortingGroup:
   m_ObjectHideFlags: 0
@@ -61,6 +62,6 @@ SortingGroup:
   m_GameObject: {fileID: 687746106814423704}
   m_Enabled: 1
   m_SortingLayerID: -1815889713
-  m_SortingLayer: 2
+  m_SortingLayer: 3
   m_SortingOrder: 0
   m_SortAtRoot: 0

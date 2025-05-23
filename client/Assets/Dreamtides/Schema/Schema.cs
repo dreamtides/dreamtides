@@ -131,50 +131,11 @@ namespace Dreamtides.Schema
         [JsonProperty("displayDreamwellActivation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayDreamwellActivationCommand DisplayDreamwellActivation { get; set; }
 
-        [JsonProperty("displayArrows", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayArrowsCommand DisplayArrows { get; set; }
-
         [JsonProperty("displayEnemyMessage", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayEnemyMessageCommand DisplayEnemyMessage { get; set; }
 
         [JsonProperty("toggleThinkingIndicator", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public ToggleThinkingIndicatorCommand ToggleThinkingIndicator { get; set; }
-    }
-
-    public partial class DisplayArrowsCommand
-    {
-        [JsonProperty("arrows", Required = Required.Always)]
-        public List<DisplayArrow> Arrows { get; set; }
-    }
-
-    public partial class DisplayArrow
-    {
-        [JsonProperty("color", Required = Required.Always)]
-        public ArrowStyle Color { get; set; }
-
-        [JsonProperty("source", Required = Required.Always)]
-        public GameObjectId Source { get; set; }
-
-        [JsonProperty("target", Required = Required.Always)]
-        public GameObjectId Target { get; set; }
-    }
-
-    /// <summary>
-    /// The target to display the effect on.
-    /// </summary>
-    public partial class GameObjectId
-    {
-        [JsonProperty("cardId", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? CardId { get; set; }
-
-        [JsonProperty("deck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? Deck { get; set; }
-
-        [JsonProperty("void", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? Void { get; set; }
-
-        [JsonProperty("avatar", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? Avatar { get; set; }
     }
 
     public partial class DisplayDreamwellActivationCommand
@@ -286,6 +247,24 @@ namespace Dreamtides.Schema
     {
         [JsonProperty("audioClip", Required = Required.Always)]
         public string AudioClip { get; set; }
+    }
+
+    /// <summary>
+    /// The target to display the effect on.
+    /// </summary>
+    public partial class GameObjectId
+    {
+        [JsonProperty("cardId", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? CardId { get; set; }
+
+        [JsonProperty("deck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPlayer? Deck { get; set; }
+
+        [JsonProperty("void", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPlayer? Void { get; set; }
+
+        [JsonProperty("avatar", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPlayer? Avatar { get; set; }
     }
 
     public partial class DisplayEnemyMessageCommand
@@ -1487,6 +1466,12 @@ namespace Dreamtides.Schema
     public partial class BattleView
     {
         /// <summary>
+        /// Arrows to display between cards
+        /// </summary>
+        [JsonProperty("arrows", Required = Required.Always)]
+        public List<DisplayArrow> Arrows { get; set; }
+
+        /// <summary>
         /// Visual state of cards in the game
         /// </summary>
         [JsonProperty("cards", Required = Required.Always)]
@@ -1515,6 +1500,18 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("user", Required = Required.Always)]
         public PlayerView User { get; set; }
+    }
+
+    public partial class DisplayArrow
+    {
+        [JsonProperty("color", Required = Required.Always)]
+        public ArrowStyle Color { get; set; }
+
+        [JsonProperty("source", Required = Required.Always)]
+        public GameObjectId Source { get; set; }
+
+        [JsonProperty("target", Required = Required.Always)]
+        public GameObjectId Target { get; set; }
     }
 
     /// <summary>
@@ -1717,8 +1714,6 @@ namespace Dreamtides.Schema
         public Metadata Metadata { get; set; }
     }
 
-    public enum ArrowStyle { Blue, Green, Red };
-
     /// <summary>
     /// Represents a player within the context of the display layer.
     ///
@@ -1845,6 +1840,8 @@ namespace Dreamtides.Schema
 
     public enum SliderDirection { Horizontal, Vertical };
 
+    public enum ArrowStyle { Blue, Green, Red };
+
     /// <summary>
     /// Position category
     ///
@@ -1941,7 +1938,6 @@ namespace Dreamtides.Schema
             DateParseHandling = DateParseHandling.None,
             Converters =
             {
-                ArrowStyleConverter.Singleton,
                 DisplayPlayerConverter.Singleton,
                 GameMessageTypeConverter.Singleton,
                 CardFacingConverter.Singleton,
@@ -1981,56 +1977,11 @@ namespace Dreamtides.Schema
                 ScrollBarVisibilityConverter.Singleton,
                 TouchScrollBehaviorConverter.Singleton,
                 SliderDirectionConverter.Singleton,
+                ArrowStyleConverter.Singleton,
                 GameActionConverter.Singleton,
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
         };
-    }
-
-    internal class ArrowStyleConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(ArrowStyle) || t == typeof(ArrowStyle?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "blue":
-                    return ArrowStyle.Blue;
-                case "green":
-                    return ArrowStyle.Green;
-                case "red":
-                    return ArrowStyle.Red;
-            }
-            throw new Exception("Cannot unmarshal type ArrowStyle");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (ArrowStyle)untypedValue;
-            switch (value)
-            {
-                case ArrowStyle.Blue:
-                    serializer.Serialize(writer, "blue");
-                    return;
-                case ArrowStyle.Green:
-                    serializer.Serialize(writer, "green");
-                    return;
-                case ArrowStyle.Red:
-                    serializer.Serialize(writer, "red");
-                    return;
-            }
-            throw new Exception("Cannot marshal type ArrowStyle");
-        }
-
-        public static readonly ArrowStyleConverter Singleton = new ArrowStyleConverter();
     }
 
     internal class DisplayPlayerConverter : JsonConverter
@@ -4099,6 +4050,52 @@ namespace Dreamtides.Schema
         }
 
         public static readonly SliderDirectionConverter Singleton = new SliderDirectionConverter();
+    }
+
+    internal class ArrowStyleConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(ArrowStyle) || t == typeof(ArrowStyle?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "blue":
+                    return ArrowStyle.Blue;
+                case "green":
+                    return ArrowStyle.Green;
+                case "red":
+                    return ArrowStyle.Red;
+            }
+            throw new Exception("Cannot unmarshal type ArrowStyle");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (ArrowStyle)untypedValue;
+            switch (value)
+            {
+                case ArrowStyle.Blue:
+                    serializer.Serialize(writer, "blue");
+                    return;
+                case ArrowStyle.Green:
+                    serializer.Serialize(writer, "green");
+                    return;
+                case ArrowStyle.Red:
+                    serializer.Serialize(writer, "red");
+                    return;
+            }
+            throw new Exception("Cannot marshal type ArrowStyle");
+        }
+
+        public static readonly ArrowStyleConverter Singleton = new ArrowStyleConverter();
     }
 
     internal class GameActionConverter : JsonConverter

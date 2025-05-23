@@ -67,7 +67,6 @@ pub enum Command {
     DrawUserCards(DrawUserCardsCommand),
     DisplayJudgment(DisplayJudgmentCommand),
     DisplayDreamwellActivation(DisplayDreamwellActivationCommand),
-    DisplayArrows(DisplayArrowsCommand),
     DisplayEnemyMessage(DisplayEnemyMessageCommand),
     ToggleThinkingIndicator(ToggleThinkingIndicatorCommand),
 }
@@ -221,12 +220,6 @@ pub struct DisplayDreamwellActivationCommand {
     /// New energy produced by this player at the start of the turn, if it has
     /// changed.
     pub new_produced_energy: Option<Energy>,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct DisplayArrowsCommand {
-    pub arrows: Vec<DisplayArrow>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

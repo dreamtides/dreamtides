@@ -270,6 +270,9 @@ namespace Dreamtides.Services
           coroutines.Add(StartCoroutine(Registry.LayoutService.UpdateLayout(
               command.UpdateBattle,
               animate ? TweenUtils.Sequence("UpdateLayout") : null)));
+
+          // Must happen after UpdateLayout since cards may be created which are referenced
+          Registry.ArrowService.HandleDisplayArrows(command.UpdateBattle.Battle.Arrows ?? new List<DisplayArrow>());
         }
 
         if (command.Wait != null)
@@ -320,12 +323,6 @@ namespace Dreamtides.Services
         {
           LogUtils.Log("ActionService", "Applying command: DisplayDreamwellActivation");
           coroutines.Add(StartCoroutine(Registry.DreamwellActivationService.HandleDreamwellActivationCommand(command.DisplayDreamwellActivation)));
-        }
-
-        if (command.DisplayArrows != null)
-        {
-          LogUtils.Log("ActionService", "Applying command: DisplayArrows");
-          Registry.ArrowService.HandleDisplayArrowsCommand(command.DisplayArrows);
         }
 
         if (command.DisplayEnemyMessage != null)

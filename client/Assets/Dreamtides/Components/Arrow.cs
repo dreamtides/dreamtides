@@ -1,7 +1,9 @@
 #nullable enable
 
 using System.Collections.Generic;
+using Dreamtides.Utils;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Dreamtides.Components
 {
@@ -14,10 +16,14 @@ namespace Dreamtides.Components
     [SerializeField] Transform _source = null!;
     [SerializeField] Transform _target = null!;
     [SerializeField] float _radiusMultiplier = 1f;
+    [SerializeField] SortingGroup _sortingGroup = null!;
     Transform? _arrow;
 
     readonly List<Transform> _segments = new();
     readonly List<MeshRenderer> _renderers = new();
+
+    Vector3 _sourceOffset = Vector3.zero;
+    Vector3 _targetOffset = Vector3.zero;
 
     public Transform Source
     {
@@ -31,6 +37,18 @@ namespace Dreamtides.Components
       set => _target = value;
     }
 
+    public Vector3 SourceOffset
+    {
+      get => _sourceOffset;
+      set => _sourceOffset = value;
+    }
+
+    public Vector3 TargetOffset
+    {
+      get => _targetOffset;
+      set => _targetOffset = value;
+    }
+
     public GameObject HeadPrefab
     {
       set => _headPrefab = value;
@@ -41,9 +59,14 @@ namespace Dreamtides.Components
       set => _piecePrefab = value;
     }
 
+    public SortingGroup SortingGroup => _sortingGroup;
+
+    Vector3 SourcePosition => Source.position + _sourceOffset;
+    Vector3 TargetPosition => Target.position + _targetOffset;
+
     void Update()
     {
-      var distance = Vector3.Distance(Source.position, Target.position);
+      var distance = Vector3.Distance(SourcePosition, TargetPosition);
       var radius = ((1f / 2f) + distance * distance / 8f) * _radiusMultiplier;
       var diff = radius - 1f;
       var angle = 2f * Mathf.Acos(diff / radius);
@@ -102,8 +125,8 @@ namespace Dreamtides.Components
 
       _arrow!.localPosition = right;
       _arrow.localRotation = Quaternion.FromToRotation(Vector3.up, right - center);
-      transform.position = Source.position;
-      transform.rotation = Quaternion.LookRotation(Target.position - Source.position, Vector3.up);
+      transform.position = SourcePosition;
+      transform.rotation = Quaternion.LookRotation(TargetPosition - SourcePosition, Vector3.up);
     }
   }
 }

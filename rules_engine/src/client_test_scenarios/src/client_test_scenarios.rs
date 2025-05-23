@@ -17,10 +17,9 @@ use core_data::numerics::{Energy, Spark};
 use display_data::battle_view::{BattleView, ButtonView, CardOrderSelectorView, DisplayPlayer};
 use display_data::card_view::CardView;
 use display_data::command::{
-    ArrowStyle, Command, CommandSequence, DisplayArrow, DisplayArrowsCommand,
-    DisplayDreamwellActivationCommand, DisplayEffectCommand, DisplayJudgmentCommand,
-    DissolveCardCommand, FireProjectileCommand, GameMessageType, GameObjectId,
-    ParallelCommandGroup, UpdateBattleCommand,
+    Command, CommandSequence, DisplayDreamwellActivationCommand, DisplayEffectCommand,
+    DisplayJudgmentCommand, DissolveCardCommand, FireProjectileCommand, GameMessageType,
+    GameObjectId, ParallelCommandGroup, UpdateBattleCommand,
 };
 use display_data::object_position::{Position, StackType};
 use display_data::request_data::{
@@ -448,13 +447,13 @@ fn respond_to_enemy_card(battle: &mut BattleView, commands: &mut Vec<Command>) {
             sorting_key,
         );
         commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
-        commands.push(Command::DisplayArrows(DisplayArrowsCommand {
-            arrows: vec![DisplayArrow {
-                source: GameObjectId::CardId(card_id),
-                target: GameObjectId::CardId(target_id),
-                color: ArrowStyle::Red,
-            }],
-        }));
+        // commands.push(Command::DisplayArrows(DisplayArrowsCommand {
+        //     arrows: vec![DisplayArrow {
+        //         source: GameObjectId::CardId(card_id),
+        //         target: GameObjectId::CardId(target_id),
+        //         color: ArrowStyle::Red,
+        //     }],
+        // }));
     }
 }
 
