@@ -17,7 +17,6 @@ namespace Dreamtides.Services
     [SerializeField] int _shakeVibrato = 10;
     [SerializeField] AudioClip _startSound = null!;
     [SerializeField] AudioClip _windUpSound = null!;
-    [SerializeField] AudioClip _noPointsSound = null!;
     [SerializeField] AudioClip _pointsSound = null!;
     [SerializeField] TimedEffect _hitEffectPrefab = null!;
     [SerializeField] Projectile _scorePointsProjectilePrefab = null!;
@@ -26,7 +25,12 @@ namespace Dreamtides.Services
     {
       var sequence = TweenUtils.Sequence("DisplayJudgment");
       var actorIsUser = displayJudgment.Player == DisplayPlayer.User;
-      var actorScoredPoints = displayJudgment.NewScore != null;
+      if (displayJudgment.NewScore == null)
+      {
+        // I used to do an animation when no points were scored, but it's
+        // pretty annoying.
+        yield break;
+      }
       var actorStatusDisplay = actorIsUser ?
           Registry.Layout.UserStatusDisplay :
           Registry.Layout.EnemyStatusDisplay;
@@ -71,42 +75,27 @@ namespace Dreamtides.Services
         var rotation = Quaternion.LookRotation(transform.position - Registry.Layout.MainCamera.transform.position);
         hit.transform.rotation = rotation;
         hit.transform.localScale = 5f * Vector3.one;
-        Registry.SoundService.Play(actorScoredPoints ? _pointsSound : _noPointsSound);
-        if (actorScoredPoints)
+        Registry.SoundService.Play(_pointsSound);
+        var projectile = Registry.AssetPoolService.Create(_scorePointsProjectilePrefab, actorSparkTotal.position);
+        StartCoroutine(projectile.Fire(Registry, actorStatusDisplay.transform, new Milliseconds
         {
-          var projectile = Registry.AssetPoolService.Create(_scorePointsProjectilePrefab, actorSparkTotal.position);
-          StartCoroutine(projectile.Fire(Registry, actorStatusDisplay.transform, new Milliseconds
-          {
-            MillisecondsValue = 500,
-          }, onHit: () =>
-          {
-            actorStatusDisplay.SetScore(displayJudgment.NewScore!.Value, true);
-          }));
-        }
+          MillisecondsValue = 500,
+        }, onHit: () =>
+        {
+          actorStatusDisplay.SetScore(displayJudgment.NewScore!.Value, true);
+        }));
       });
 
       // Add shake effect after collision
-      var shakeActor = actorScoredPoints ? opponentSparkTotal : actorSparkTotal;
+      var shakeActor = opponentSparkTotal;
       sequence.Append(shakeActor.DOShakePosition(_durationMultiplier * 0.1f, _shakeStrength, _shakeVibrato));
 
       // Animate both objects returning to their original positions
       sequence.Append(actorSparkTotal.DOMove(actorOriginalPos, _durationMultiplier * 0.1f));
       sequence.Join(opponentSparkTotal.DOMove(opponentOriginalPos, _durationMultiplier * 0.1f));
 
-      if (!actorScoredPoints)
-      {
-        sequence.AppendCallback(() =>
-        {
-          Registry.SoundService.Play(_startSound);
-        });
-      }
-
       yield return sequence.WaitForCompletion();
-
-      if (actorScoredPoints)
-      {
-        yield return new WaitForSeconds(1f);
-      }
+      yield return new WaitForSeconds(1f);
     }
   }
 }
