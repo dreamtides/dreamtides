@@ -28,12 +28,6 @@ pub trait CardIdType: Hash + Eq + PartialEq + Debug + Ord + Copy {
     fn from_card_id(card_id: CardId) -> Self;
 }
 
-/// An identifier for an object while it is in a given zone. A new zone object
-/// ID is assigned each time a card changes zones, meaning that it can be
-/// used for targeting effects that end when the card changes zones.
-#[derive(Copy, Clone, Default, Debug, Eq, PartialEq, Hash, PartialOrd, Ord)]
-pub struct ObjectId(pub u32);
-
 impl CardIdType for CardId {
     fn card_id(self) -> CardId {
         self

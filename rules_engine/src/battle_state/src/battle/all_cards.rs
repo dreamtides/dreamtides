@@ -3,39 +3,18 @@ use std::collections::BTreeMap;
 use core_data::identifiers::CardName;
 use core_data::numerics::Spark;
 use core_data::types::PlayerName;
-use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
 
 use crate::battle::card_id::{
     BanishedCardId, CardId, CardIdType, CharacterId, DeckCardId, HandCardId, StackCardId,
     VoidCardId,
 };
 use crate::battle_cards::ability_list::CanPlayRestriction;
+use crate::battle_cards::battle_card_state::{BattleCardState, ObjectId};
 use crate::battle_cards::card_set::CardSet;
 use crate::battle_cards::character_state::CharacterState;
 use crate::battle_cards::stack_card_state::{StackCardAdditionalCostsPaid, StackCardState};
 use crate::battle_cards::zone::Zone;
 use crate::battle_player::player_map::PlayerMap;
-
-/// Identifies a card within a zone.
-///
-/// A new ObjectId is assigned each time a card changes zones, meaning that it
-/// can be used for targeting effects that end when the card changes zones.
-#[derive(
-    Copy,
-    Clone,
-    Debug,
-    Default,
-    Eq,
-    PartialEq,
-    Hash,
-    PartialOrd,
-    Ord,
-    Serialize,
-    Deserialize,
-    JsonSchema,
-)]
-pub struct ObjectId(pub usize);
 
 /// A map of characters on the battlefield to their states
 ///
@@ -55,9 +34,7 @@ pub struct CreatedCard {
 
 #[derive(Clone, Debug, Default)]
 pub struct AllCards {
-    card_names: Vec<CardName>,
-    card_object_ids: Vec<ObjectId>,
-    can_play_restrictions: Vec<Option<CanPlayRestriction>>,
+    cards: Vec<BattleCardState>,
     battlefield: PlayerMap<CardSet<CharacterId>>,
     battlefield_state: PlayerMap<CharacterMap>,
     void: PlayerMap<CardSet<VoidCardId>>,
@@ -74,21 +51,21 @@ impl AllCards {
     ///
     /// Panics if no card with this ID exists.
     pub fn name(&self, id: impl CardIdType) -> CardName {
-        self.card_names[id.card_id().0]
+        self.cards[id.card_id().0].name
     }
 
     /// Returns the ObjectId of a card.
     ///
     /// Panics if no card with this ID exists.
     pub fn object_id(&self, id: impl CardIdType) -> ObjectId {
-        self.card_object_ids[id.card_id().0]
+        self.cards[id.card_id().0].object_id
     }
 
     /// Returns the [CanPlayRestriction] of a card if it has one.
     ///
     /// Panics if no card with this ID exists.
     pub fn can_play_restriction(&self, id: impl CardIdType) -> Option<CanPlayRestriction> {
-        self.can_play_restrictions[id.card_id().0]
+        self.cards[id.card_id().0].can_play_restriction
     }
 
     /// Returns the spark value of a character.
@@ -168,17 +145,19 @@ impl AllCards {
 
     /// Returns all currently known Card IDs in an undefined order
     pub fn all_cards(&self) -> impl Iterator<Item = CardId> + '_ {
-        self.card_names.iter().enumerate().map(|(i, _)| CardId(i))
+        self.cards.iter().enumerate().map(|(i, _)| CardId(i))
     }
 
     /// Creates a set of cards with the indicated names in a player's deck.
     pub fn create_cards_in_deck(&mut self, owner: PlayerName, cards: Vec<CreatedCard>) {
         for name in cards {
-            let id = self.card_names.len();
-            self.card_names.push(name.name);
-            self.can_play_restrictions.push(name.can_play_restriction);
+            let id = self.cards.len();
             let object_id = self.new_object_id();
-            self.card_object_ids.push(object_id);
+            self.cards.push(BattleCardState {
+                name: name.name,
+                object_id,
+                can_play_restriction: name.can_play_restriction,
+            });
             self.decks.player_mut(owner).insert(DeckCardId(CardId(id)));
         }
     }
@@ -201,7 +180,7 @@ impl AllCards {
         let id = card_id.card_id();
         self.remove_from_zone(controller, id, from);
         self.add_to_zone(controller, id, to);
-        self.card_object_ids[id.0] = self.new_object_id();
+        self.cards[id.0].object_id = self.new_object_id();
     }
 
     /// Returns true if the indicated card is present in the indicated zone.
@@ -224,7 +203,7 @@ impl AllCards {
     ///
     /// Panics if no card with this ID exists.
     pub fn is_valid_object_id(&self, card_id: impl CardIdType, object_id: ObjectId) -> bool {
-        self.card_object_ids[card_id.card_id().0] == object_id
+        self.cards[card_id.card_id().0].object_id == object_id
     }
 
     fn new_object_id(&mut self) -> ObjectId {
