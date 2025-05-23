@@ -1,5 +1,6 @@
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::card_id::{CardIdType, StackCardId};
 use core_data::display_types::Milliseconds;
 use display_data::command::{
     Command, DisplayDreamwellActivationCommand, DisplayJudgmentCommand, GameMessageType,
@@ -7,7 +8,12 @@ use display_data::command::{
 
 use crate::core::response_builder::ResponseBuilder;
 
-pub fn render(builder: &mut ResponseBuilder, animation: &BattleAnimation, _snapshot: &BattleState) {
+pub fn render(
+    builder: &mut ResponseBuilder,
+    animation: &BattleAnimation,
+    _snapshot: &BattleState,
+    final_state: &BattleState,
+) {
     match animation {
         BattleAnimation::StartTurn { player } => {
             builder.push(Command::DisplayGameMessage(if *player == builder.display_for_player() {
@@ -35,9 +41,13 @@ pub fn render(builder: &mut ResponseBuilder, animation: &BattleAnimation, _snaps
                 new_produced_energy: Some(*new_produced_energy),
             }));
         }
-        BattleAnimation::PlayCardFromHand { player, .. } => {
-            if *player != builder.display_for_player() {
-                builder.push(Command::Wait(Milliseconds::new(1500)));
+        BattleAnimation::PlayCardFromHand { player, card_id } => {
+            if *player != builder.display_for_player()
+                && final_state.cards.stack_card(StackCardId(card_id.card_id())).is_none()
+            {
+                // If the played card is no longer on the stack, insert a pause
+                // so it can be seen.
+                builder.push(Command::Wait(Milliseconds::new(2000)));
             }
         }
         BattleAnimation::SelectStackCardTargets { .. } => {}

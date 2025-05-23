@@ -26,7 +26,7 @@ pub fn render_updates(battle: &BattleState, user_id: UserId) -> CommandSequence 
     if let Some(animations) = &battle.animations {
         for step in &animations.steps {
             battle_rendering::run(&mut builder, &step.snapshot);
-            animations::render(&mut builder, &step.animation, &step.snapshot);
+            animations::render(&mut builder, &step.animation, &step.snapshot, battle);
             if matches!(step.snapshot.status, BattleStatus::GameOver { .. }) {
                 // Ignore future updates when GameOver state is detected
                 break;
