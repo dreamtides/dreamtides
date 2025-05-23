@@ -4,6 +4,7 @@ use std::sync::{LazyLock, Mutex};
 use ai_agents::agent_search;
 use battle_mutations::actions::apply_battle_action;
 use battle_queries::legal_action_queries::legal_actions;
+use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::animation_data::AnimationData;
 use battle_state::battle::battle_state::BattleState;
@@ -39,17 +40,10 @@ pub fn execute(
         };
 
         let legal_actions = legal_actions::compute(battle, next_player);
-        if legal_actions.len() == 1 && legal_actions.contains(BattleAction::PassPriority) {
-            battle_trace!("Automatically executing PassPriority", battle, next_player);
+        if let Some(auto_action) = should_auto_execute_action(&legal_actions) {
+            battle_trace!("Automatically executing action", battle, next_player, auto_action);
             current_player = next_player;
-            current_action = BattleAction::PassPriority;
-            continue;
-        }
-
-        if legal_actions.len() == 1 && legal_actions.contains(BattleAction::StartNextTurn) {
-            battle_trace!("Automatically executing StartNextTurn", battle, next_player);
-            current_player = next_player;
-            current_action = BattleAction::StartNextTurn;
+            current_action = auto_action;
             continue;
         }
 
@@ -84,6 +78,33 @@ pub fn poll(user_id: UserId) -> Option<CommandSequence> {
 pub fn append_update(user_id: UserId, update: CommandSequence) {
     let mut updates = PENDING_UPDATES.lock().unwrap();
     updates.entry(user_id).or_default().push(update);
+}
+
+fn should_auto_execute_action(legal_actions: &LegalActions) -> Option<BattleAction> {
+    if legal_actions.len() == 1 {
+        match legal_actions {
+            LegalActions::Standard { .. } if legal_actions.contains(BattleAction::PassPriority) => {
+                Some(BattleAction::PassPriority)
+            }
+            LegalActions::Standard { .. }
+                if legal_actions.contains(BattleAction::StartNextTurn) =>
+            {
+                Some(BattleAction::StartNextTurn)
+            }
+            LegalActions::SelectPromptChoicePrompt { choice_count: 1 } => {
+                Some(BattleAction::SelectPromptChoice(0))
+            }
+            LegalActions::SelectCharacterPrompt { valid } if valid.len() == 1 => {
+                valid.iter().next().map(BattleAction::SelectCharacterTarget)
+            }
+            LegalActions::SelectStackCardPrompt { valid } if valid.len() == 1 => {
+                valid.iter().next().map(BattleAction::SelectStackCardTarget)
+            }
+            _ => None,
+        }
+    } else {
+        None
+    }
 }
 
 fn render_updates(battle: &BattleState, user_id: UserId) {
