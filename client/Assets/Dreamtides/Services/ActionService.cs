@@ -273,6 +273,12 @@ namespace Dreamtides.Services
 
           // Must happen after UpdateLayout since cards may be created which are referenced
           Registry.ArrowService.HandleDisplayArrows(command.UpdateBattle.Battle.Arrows ?? new List<DisplayArrow>());
+
+          Registry.CardEffectPreviewService.ClearPlayEffectPreview();
+          if (command.UpdateBattle.Battle.Preview != null)
+          {
+            Registry.CardEffectPreviewService.DisplayPlayEffectPreview(command.UpdateBattle.Battle.Preview);
+          }
         }
 
         if (command.Wait != null)

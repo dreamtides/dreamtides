@@ -64,6 +64,7 @@ pub fn create(id: BattleId) -> BattleView {
             ..Default::default()
         },
         arrows: vec![],
+        preview: None,
     }
 }
 

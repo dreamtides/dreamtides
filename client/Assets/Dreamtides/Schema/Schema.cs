@@ -1496,6 +1496,12 @@ namespace Dreamtides.Schema
         public InterfaceView Interface { get; set; }
 
         /// <summary>
+        /// Preview of the next state of the battle, used e.g. when confirming prompt choices.
+        /// </summary>
+        [JsonProperty("preview")]
+        public BattlePreviewView Preview { get; set; }
+
+        /// <summary>
         /// Player who is operating the client
         /// </summary>
         [JsonProperty("user", Required = Required.Always)]

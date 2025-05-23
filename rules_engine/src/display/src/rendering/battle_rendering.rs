@@ -15,7 +15,9 @@ use battle_state::prompt_types::prompt_data::{PromptChoiceLabel, PromptType};
 use core_data::display_color;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
-use display_data::battle_view::{BattleView, ButtonView, InterfaceView, PlayerView};
+use display_data::battle_view::{
+    BattlePreviewView, BattleView, ButtonView, InterfaceView, PlayerPreviewView, PlayerView,
+};
 use display_data::command::{
     ArrowStyle, Command, DisplayArrow, GameMessageType, GameObjectId, UpdateBattleCommand,
 };
@@ -76,6 +78,7 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
         cards,
         interface: interface_view(builder, battle),
         arrows: current_arrows(battle),
+        preview: battle_preview(builder, battle),
     }
 }
 
@@ -274,5 +277,24 @@ fn prompt_choice_label(label: PromptChoiceLabel) -> String {
     match label {
         PromptChoiceLabel::PayEnergy(energy) => format!("Spend {}{}", energy, icon::ENERGY),
         PromptChoiceLabel::Decline => "Decline".to_string(),
+    }
+}
+
+fn battle_preview(builder: &ResponseBuilder, battle: &BattleState) -> Option<BattlePreviewView> {
+    if let Some(prompt) = battle.prompt.as_ref()
+        && prompt.player == builder.display_for_player()
+        && let PromptType::ChooseEnergyValue { current, .. } = &prompt.prompt_type
+    {
+        let player = battle.players.player(builder.display_for_player());
+        let remaining_energy = player.current_energy - *current;
+
+        Some(BattlePreviewView {
+            user: PlayerPreviewView { energy: Some(remaining_energy), ..Default::default() },
+            enemy: PlayerPreviewView::default(),
+            cards: vec![],
+            preview_message: None,
+        })
+    } else {
+        None
     }
 }

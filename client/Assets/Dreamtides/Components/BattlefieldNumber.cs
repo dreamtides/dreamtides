@@ -1,6 +1,7 @@
 #nullable enable
 
 using Dreamtides.Components;
+using Dreamtides.Utils;
 using TMPro;
 using UnityEngine;
 
@@ -17,8 +18,8 @@ namespace Dreamtides
     {
       if (_text.text != text)
       {
-        _text.text = text;
-        if (animate)
+        SetTextInternal(text);
+        if (animate && text != _originalText)
         {
           // Toggle to restart animation if needed
           _onChange.gameObject.SetActive(false);
@@ -29,9 +30,9 @@ namespace Dreamtides
 
     public void SetPreviewText(string text, Color color)
     {
-      _originalText = _text.text;
+      SetOriginalText(_text.text);
       _originalColor = _text.color;
-      _text.text = text;
+      SetTextInternal(text);
       _text.color = color;
     }
 
@@ -39,9 +40,23 @@ namespace Dreamtides
     {
       if (_originalText != null && _originalColor != null)
       {
-        _text.text = _originalText;
+        SetTextInternal(_originalText);
         _text.color = _originalColor;
       }
+    }
+
+    void SetTextInternal(string text)
+    {
+      Errors.CheckNotNull(text);
+      Errors.CheckArgument(text.Length > 0, "text must be non-empty");
+      _text.text = text;
+    }
+
+    void SetOriginalText(string text)
+    {
+      Errors.CheckNotNull(text);
+      Errors.CheckArgument(text.Length > 0, "original text must be non-empty");
+      _originalText = text;
     }
   }
 }

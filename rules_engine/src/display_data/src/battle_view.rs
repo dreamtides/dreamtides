@@ -30,6 +30,10 @@ pub struct BattleView {
 
     /// Arrows to display between cards
     pub arrows: Vec<DisplayArrow>,
+
+    /// Preview of the next state of the battle, used e.g. when confirming
+    /// prompt choices.
+    pub preview: Option<BattlePreviewView>,
 }
 
 /// Preview of a potential future state of a battle, shown e.g. in response to a

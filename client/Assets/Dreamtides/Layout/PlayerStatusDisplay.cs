@@ -10,6 +10,7 @@ namespace Dreamtides.Layout
     [SerializeField] BattlefieldNumber _energy = null!;
     [SerializeField] BattlefieldNumber _score = null!;
     [SerializeField] BattlefieldNumber _totalSpark = null!;
+    long _producedEnergy;
 
     public BattlefieldNumber Energy => _energy;
     public BattlefieldNumber Score => _score;
@@ -24,6 +25,7 @@ namespace Dreamtides.Layout
 
     public void SetEnergy(long currentEnergy, long producedEnergy, bool animate = true)
     {
+      _producedEnergy = producedEnergy;
       _energy.SetText(
           $"{currentEnergy}/{producedEnergy} <color=#00838F><voffset=0.1em>\uf7e4</voffset></color>",
           animate);
@@ -43,7 +45,8 @@ namespace Dreamtides.Layout
     {
       if (preview.Energy != null)
       {
-        string energyText = $"{preview.Energy}/{preview.ProducedEnergy ?? 0} <color=#00838F><voffset=0.1em>\uf7e4</voffset></color>";
+        string energyText = $"{preview.Energy}/{preview.ProducedEnergy ?? _producedEnergy} " +
+          "<color=#00838F><voffset=0.1em>\uf7e4</voffset></color>";
         Energy.SetPreviewText(energyText, previewTextColor);
       }
 
