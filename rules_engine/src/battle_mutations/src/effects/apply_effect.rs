@@ -93,12 +93,10 @@ fn draw_cards_for_each(
 
 fn dissolve(battle: &mut BattleState, source: EffectSource, targets: &Option<StackCardTargets>) {
     let id = targeting::character_id(battle, targets);
-    // TODO: Get controller for dissolve target
-    dissolve::execute(battle, source, source.controller().opponent(), id);
+    dissolve::execute(battle, source, id);
 }
 
 fn negate(battle: &mut BattleState, source: EffectSource, targets: &Option<StackCardTargets>) {
     let id = targeting::stack_card_id(battle, targets);
-    // TODO: Get controller for negate target
-    negate::execute(battle, source, source.controller().opponent(), id);
+    negate::execute(battle, source, id);
 }

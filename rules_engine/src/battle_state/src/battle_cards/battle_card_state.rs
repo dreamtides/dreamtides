@@ -1,4 +1,5 @@
 use core_data::identifiers::CardName;
+use core_data::types::PlayerName;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -28,6 +29,7 @@ pub struct ObjectId(pub usize);
 #[derive(Clone, Debug)]
 pub struct BattleCardState {
     pub name: CardName,
+    pub owner: PlayerName,
     pub object_id: ObjectId,
 
     /// Restriction on playing this card, as a performance optimization.

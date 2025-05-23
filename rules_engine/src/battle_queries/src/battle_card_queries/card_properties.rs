@@ -15,6 +15,11 @@ pub fn cost(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
     }
 }
 
+/// Returns the player who currently controls a given card.
+pub fn controller(battle: &BattleState, card_id: impl CardIdType) -> PlayerName {
+    battle.cards.card(card_id).owner
+}
+
 pub fn spark(battle: &BattleState, controller: PlayerName, id: CharacterId) -> Option<Spark> {
     battle.cards.spark(controller, id)
 }

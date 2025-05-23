@@ -46,12 +46,6 @@ pub fn execute(
             configuration: PromptConfiguration { ..Default::default() },
         });
     } else {
-        // TODO: Get controller for target
-        negate::execute(
-            battle,
-            source,
-            source.controller().opponent(),
-            targeting::stack_card_id(battle, targets),
-        );
+        negate::execute(battle, source, targeting::stack_card_id(battle, targets));
     }
 }

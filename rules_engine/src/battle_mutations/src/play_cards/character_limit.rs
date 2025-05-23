@@ -37,7 +37,7 @@ pub fn apply(battle: &mut BattleState, source: EffectSource, player: PlayerName)
         .min_by_key(|(&id, state)| (state.spark, card_properties::cost(battle, id)))?;
 
     let spark_value = battle.cards.spark(player, *target_id)?;
-    abandon::apply(battle, source, player, *target_id);
+    abandon::apply(battle, source, *target_id);
     battle.players.player_mut(player).spark_bonus += spark_value;
     Some(())
 }

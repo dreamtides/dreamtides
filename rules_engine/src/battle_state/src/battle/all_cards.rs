@@ -141,6 +141,7 @@ impl AllCards {
             let object_id = self.new_object_id();
             self.cards.push(BattleCardState {
                 name: name.name,
+                owner,
                 object_id,
                 can_play_restriction: name.can_play_restriction,
             });
