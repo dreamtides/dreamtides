@@ -182,6 +182,9 @@ resize-images:
 graphviz:
     dot -Tpng rules_engine/search_graph.dot -o rules_engine/search_graph.png && open rules_engine/search_graph.png
 
+bench-evaluate:
+    cargo criterion --manifest-path rules_engine/Cargo.toml -p battle_benchmarks -- ai_evaluate/ai_evaluate
+
 bench-single:
     cargo criterion --manifest-path rules_engine/Cargo.toml -p battle_benchmarks -- ai_single_threaded/ai_single_threaded
 

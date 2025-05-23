@@ -12,6 +12,7 @@ doctest = false
 [dependencies]
 ai_agents = { path = "../../src/ai_agents" }
 ai_data = { path = "../../src/ai_data" }
+ai_uct = { path = "../../src/ai_uct" }
 battle_mutations = { path = "../../src/battle_mutations" }
 battle_queries = { path = "../../src/battle_queries" }
 battle_state = { path = "../../src/battle_state" }

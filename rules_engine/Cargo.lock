@@ -296,6 +296,7 @@ version = "0.0.0"
 dependencies = [
  "ai_agents",
  "ai_data",
+ "ai_uct",
  "battle_mutations",
  "battle_queries",
  "battle_state",

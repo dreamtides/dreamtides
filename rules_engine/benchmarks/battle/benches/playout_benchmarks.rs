@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use ai_agents::agent_search;
 use ai_data::game_ai::GameAI;
+use ai_uct::uct_search;
 use battle_mutations::actions::apply_battle_action;
 use battle_mutations::card_mutations::deck;
 use battle_queries::legal_action_queries::legal_actions;
@@ -27,7 +28,7 @@ use tracing::{subscriber, Level};
 use tracing_macros::write_tracing_event;
 use uuid::Uuid;
 
-criterion_group!(playout_benchmarks, random_playout, ai_full, ai_single_threaded);
+criterion_group!(playout_benchmarks, random_playout, ai_full, ai_single_threaded, ai_evaluate);
 
 pub fn random_playout(c: &mut Criterion) {
     write_tracing_event::clear_log_file();
@@ -50,6 +51,26 @@ pub fn random_playout(c: &mut Criterion) {
                     )
                 },
                 |mut battle| run_battle_until_completion(&mut battle),
+                BatchSize::SmallInput,
+            );
+        });
+    });
+}
+
+pub fn ai_evaluate(c: &mut Criterion) {
+    let mut group = c.benchmark_group("ai_evaluate");
+    group.measurement_time(Duration::from_secs(10));
+    let error_subscriber = tracing_subscriber::fmt().with_max_level(Level::ERROR).finish();
+    subscriber::with_default(error_subscriber, || {
+        group.bench_function("ai_evaluate", |b| {
+            b.iter_batched(
+                benchmark_battle,
+                |mut battle| {
+                    criterion::black_box(uct_search::evaluate_for_benchmarking(
+                        &mut battle,
+                        PlayerName::One,
+                    ))
+                },
                 BatchSize::SmallInput,
             );
         });
