@@ -4,5 +4,6 @@ pub mod close_button_component;
 pub mod component;
 pub mod icon;
 pub mod panel_component;
+pub mod scroll_view_component;
 pub mod text_component;
 pub mod typography;

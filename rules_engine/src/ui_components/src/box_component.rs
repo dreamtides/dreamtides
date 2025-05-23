@@ -1,4 +1,5 @@
 use action_data::game_action_data::GameAction;
+use masonry::flex_enums::FlexDirection;
 use masonry::flex_node::{EventHandlers, FlexNode};
 use masonry::flex_style::FlexStyle;
 
@@ -109,7 +110,7 @@ impl BoxComponentBuilder<Named> {
         // Default flex direction to Row.
         let style = match self.style {
             Some(mut style) if style.flex_direction.is_none() => {
-                style.flex_direction = Some(masonry::flex_enums::FlexDirection::Row);
+                style.flex_direction = Some(FlexDirection::Row);
                 Some(style)
             }
             other => other,

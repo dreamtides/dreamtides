@@ -10,6 +10,7 @@ use ui_components::box_component::BoxComponent;
 use ui_components::button_component::ButtonComponent;
 use ui_components::component::Component;
 use ui_components::panel_component::PanelComponent;
+use ui_components::scroll_view_component::ScrollViewComponent;
 use ui_components::text_component::TextComponent;
 use ui_components::typography::Typography;
 
@@ -25,47 +26,63 @@ impl Component for SetOpponentAgentPanel<'_> {
             PanelComponent::builder()
                 .title("Set Opponent Agent")
                 .content(
-                    BoxComponent::builder()
-                        .name("Opponent Agent Options")
-                        .style(
-                            FlexStyle::builder()
-                                .align_items(FlexAlign::Stretch)
-                                .flex_direction(FlexDirection::Column)
-                                .flex_grow(1)
-                                .justify_content(FlexJustify::FlexStart)
-                                .max_width(300)
-                                .padding((8, 8, 8, 8))
-                                .build(),
-                        )
+                    ScrollViewComponent::builder()
                         .child(
                             BoxComponent::builder()
-                                .name("Current Agent Display")
+                                .name("Opponent Agent Options")
                                 .style(
                                     FlexStyle::builder()
-                                        .align_items(FlexAlign::Center)
-                                        .justify_content(FlexJustify::Center)
-                                        .margin((0, 0, 12, 0))
-                                        .width(200)
+                                        .align_items(FlexAlign::Stretch)
+                                        .flex_direction(FlexDirection::Column)
+                                        .flex_grow(1)
+                                        .justify_content(FlexJustify::FlexStart)
+                                        .max_width(300)
+                                        .padding((8, 8, 8, 8))
                                         .build(),
                                 )
                                 .child(
-                                    TextComponent::builder()
-                                        .text(format!(
-                                            "Current agent: {:?}",
-                                            self.get_opponent_agent()
-                                        ))
-                                        .typography(Typography::Body2)
+                                    BoxComponent::builder()
+                                        .name("Current Agent Display")
+                                        .style(
+                                            FlexStyle::builder()
+                                                .align_items(FlexAlign::Center)
+                                                .justify_content(FlexJustify::Center)
+                                                .margin((0, 0, 12, 0))
+                                                .width(200)
+                                                .build(),
+                                        )
+                                        .child(
+                                            TextComponent::builder()
+                                                .text(format!(
+                                                    "Current agent: {:?}",
+                                                    self.get_opponent_agent()
+                                                ))
+                                                .typography(Typography::Body2)
+                                                .build(),
+                                        )
+                                        .build(),
+                                )
+                                .child(SetAgentCell::builder().agent(GameAI::MonteCarlo(5)).build())
+                                .child(
+                                    SetAgentCell::builder().agent(GameAI::MonteCarlo(10)).build(),
+                                )
+                                .child(
+                                    SetAgentCell::builder().agent(GameAI::MonteCarlo(50)).build(),
+                                )
+                                .child(
+                                    SetAgentCell::builder().agent(GameAI::MonteCarlo(100)).build(),
+                                )
+                                .child(
+                                    SetAgentCell::builder().agent(GameAI::MonteCarlo(500)).build(),
+                                )
+                                .child(SetAgentCell::builder().agent(GameAI::RandomAction).build())
+                                .child(
+                                    SetAgentCell::builder()
+                                        .agent(GameAI::FirstAvailableAction)
                                         .build(),
                                 )
                                 .build(),
                         )
-                        .child(SetAgentCell::builder().agent(GameAI::MonteCarlo(5)).build())
-                        .child(SetAgentCell::builder().agent(GameAI::MonteCarlo(10)).build())
-                        .child(SetAgentCell::builder().agent(GameAI::MonteCarlo(50)).build())
-                        .child(SetAgentCell::builder().agent(GameAI::MonteCarlo(100)).build())
-                        .child(SetAgentCell::builder().agent(GameAI::MonteCarlo(500)).build())
-                        .child(SetAgentCell::builder().agent(GameAI::RandomAction).build())
-                        .child(SetAgentCell::builder().agent(GameAI::FirstAvailableAction).build())
                         .build(),
                 )
                 .build(),

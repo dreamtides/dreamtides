@@ -24,7 +24,7 @@ impl<T: Component> Component for PanelComponent<T> {
                 .name(self.title)
                 .style(
                     FlexStyle::builder()
-                        .align_items(FlexAlign::Center)
+                        .align_items(FlexAlign::Stretch)
                         .background_image(poneti_ui::window_background())
                         // These slice offsets rely on large "pixels per unit"
                         // values in Unity, e.g. 2048 pixels per unit in this
