@@ -24,10 +24,12 @@ use crate::battle_cards::ability_list::CanPlayRestriction;
 )]
 pub struct ObjectId(pub usize);
 
-/// Core state data for a card
+/// Core state data for a card within a battle.
 #[derive(Clone, Debug)]
 pub struct BattleCardState {
     pub name: CardName,
     pub object_id: ObjectId,
+
+    /// Restriction on playing this card, as a performance optimization.
     pub can_play_restriction: Option<CanPlayRestriction>,
 }

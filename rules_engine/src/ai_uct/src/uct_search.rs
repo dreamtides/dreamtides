@@ -314,7 +314,7 @@ fn evaluate(battle: &mut BattleState, maximizing_player: PlayerName) -> OrderedF
     OrderedFloat(reward)
 }
 
-/// Public version of [evaluate] for use in benchmark tests.
+/// Public version of `evaluate` for use in benchmark tests.
 pub fn evaluate_for_benchmarking(
     battle: &mut BattleState,
     maximizing_player: PlayerName,

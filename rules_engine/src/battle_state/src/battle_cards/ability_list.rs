@@ -18,15 +18,16 @@ pub struct AbilityList {
     pub triggered_abilities: Vec<(AbilityNumber, TriggeredAbility)>,
 
     /// A field indicating restrictions on playing this card.
-    ///
-    /// This is a performance optimization because determining card play
-    /// legality is very expensive. If a value is present here, it means that
-    /// that we do not need to examine the the card's abilities to determine
-    /// whether it can be played -- it is sufficient to look at this restriction
-    /// in addition to standard things like whether its energy cost can be paid.
     pub can_play_restriction: Option<CanPlayRestriction>,
 }
 
+/// A restriction on playing a card.
+///
+/// This is a performance optimization because determining card play
+/// legality is very expensive. If a value is present here, it means that
+/// that we do not need to examine the the card's abilities to determine
+/// whether it can be played -- it is sufficient to look at this restriction
+/// in addition to standard things like whether its energy cost can be paid.
 #[derive(Debug, Clone, Copy)]
 pub enum CanPlayRestriction {
     Unrestricted,
