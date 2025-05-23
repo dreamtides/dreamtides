@@ -29,8 +29,8 @@ pub enum BattleAnimation {
         source_id: StackCardId,
         targets: StackCardTargets,
     },
-    ApplyEffectToTargets {
+    ApplyEffect {
         source: CardId,
-        targets: StackCardTargets,
+        targets: Option<StackCardTargets>,
     },
 }

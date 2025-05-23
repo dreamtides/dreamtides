@@ -76,6 +76,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3e328934534644e36a123a55b90d9e27
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Cast01.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 42596b33fedcf4378968d264c18fa1cf
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       25 orange explosion.prefab
@@ -152,13 +157,18 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 828951a51d69a418d9de14a1a4ea193b
-    m_Address: Assets/ThirdParty/Hovl Studio/Magic circles/Prefabs/Magic circle 1
-      Variant.prefab
+    m_Address: Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Magic circle
+      1.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 842bc1afcaaa54976b0388ce94072089
     m_Address: Assets/Content/Dissolves/Dissolve9.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 85e69e1655c6647528a3d1e0d543ca14
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagic_Impact01.wav
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -208,6 +218,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9a1d967a68c914caa8d10bffdd08c309
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicArrow_Projectile01.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9d1c9c13fabca4a2baeeb891ae2a9411
     m_Address: Assets/Content/Dissolves/Dissolve3.mat
     m_ReadOnly: 0
@@ -236,6 +251,16 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a0bafbee5724a40238f262a7c30953b1
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Wind Magic/RPG3_WindMagic_Cast01.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a3eb8078f5d814871a5fc7c83b6bafac
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Impact03.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b166252c36cbe434d96d7add83bd5bcf
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       9 water.prefab
@@ -253,6 +278,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bec8bfd8887b0453bae427720379d2cb
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicBall_LightImpact03.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: bfe2934aca22b4c3a9b247ae6213a533
     m_Address: Assets/Content/Dissolves/Dissolve2.mat
     m_ReadOnly: 0
@@ -260,6 +290,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d12c6290ea0814236bb71ca2f4e160c2
     m_Address: Assets/Content/Dissolves/Dissolve8.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d53cabada7fc1478fb807c0f3cd10075
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Wind Magic/RPG3_WindMagic_Impact01.wav
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

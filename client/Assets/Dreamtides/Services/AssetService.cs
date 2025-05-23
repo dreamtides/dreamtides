@@ -28,7 +28,7 @@ namespace Dreamtides.Services
     {
       GetEffectPrefab(new EffectAddress
       {
-        Effect = "Assets/ThirdParty/Hovl Studio/Magic circles/Prefabs/Magic circle 1 Variant.prefab"
+        Effect = "Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Magic circle 1.prefab"
       });
     }
 

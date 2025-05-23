@@ -7,7 +7,7 @@ use display_data::command::{
 };
 
 use crate::core::response_builder::ResponseBuilder;
-use crate::rendering::target_projectile_effects;
+use crate::rendering::apply_card_fx;
 
 pub fn render(
     builder: &mut ResponseBuilder,
@@ -52,8 +52,8 @@ pub fn render(
             }
         }
         BattleAnimation::SelectStackCardTargets { .. } => {}
-        BattleAnimation::ApplyEffectToTargets { source, targets } => {
-            target_projectile_effects::apply(builder, snapshot, *source, targets);
+        BattleAnimation::ApplyEffect { source, targets } => {
+            apply_card_fx::apply(builder, snapshot, *source, targets);
         }
     }
 }

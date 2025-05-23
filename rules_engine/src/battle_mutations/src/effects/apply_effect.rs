@@ -45,16 +45,10 @@ fn apply_standard_effect(
 ) {
     battle_trace!("Applying effect", battle, source, effect, targets);
     battle.push_animation_optional(|| {
-        if let Some(targets) = targets
-            && let Some(source_id) = source.card_id()
-        {
-            Some(BattleAnimation::ApplyEffectToTargets {
-                source: source_id,
-                targets: targets.clone(),
-            })
-        } else {
-            None
-        }
+        source.card_id().map(|source_id| BattleAnimation::ApplyEffect {
+            source: source_id,
+            targets: targets.clone(),
+        })
     });
 
     match effect {

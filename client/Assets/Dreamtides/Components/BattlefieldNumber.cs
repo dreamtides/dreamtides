@@ -38,7 +38,7 @@ namespace Dreamtides
 
     public void ClearPreviewText()
     {
-      if (_originalText != null && _originalColor != null)
+      if (_originalText != null && _originalText.Length > 0 && _originalColor != null)
       {
         SetTextInternal(_originalText);
         _text.color = _originalColor;
