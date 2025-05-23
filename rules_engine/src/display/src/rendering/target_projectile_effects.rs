@@ -48,6 +48,28 @@ pub fn apply(
                     .build(),
             ));
         }
+        CardName::Abolish => {
+            builder.push(Command::FireProjectile(
+                FireProjectileCommand::builder()
+                    .source_id(GameObjectId::CardId(source_id))
+                    .target_id(target_id(targets)?)
+                    .projectile(hovl_projectile::address(1, "Projectile 6 blue fire"))
+                    .fire_sound(wow_sound::rpg_magic(3, "Wind Magic/RPG3_WindMagic_Cast01"))
+                    .impact_sound(wow_sound::rpg_magic(3, "Wind Magic/RPG3_WindMagic_Impact01"))
+                    .build(),
+            ));
+        }
+        CardName::RippleOfDefiance => {
+            builder.push(Command::FireProjectile(
+                FireProjectileCommand::builder()
+                    .source_id(GameObjectId::CardId(source_id))
+                    .target_id(target_id(targets)?)
+                    .projectile(hovl_projectile::address(1, "Projectile 10 blue laser"))
+                    .fire_sound(wow_sound::rpg_magic(3, "Water Magic/RPG3_WaterMagic_Cast01"))
+                    .impact_sound(wow_sound::rpg_magic(3, "Water Magic/RPG3_WaterMagic_Impact03"))
+                    .build(),
+            ));
+        }
         _ => {}
     }
 

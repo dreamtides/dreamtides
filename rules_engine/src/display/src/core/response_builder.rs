@@ -38,7 +38,7 @@ impl ResponseBuilder {
     pub fn push_battle_view(&mut self, view: BattleView) {
         let mut commands =
             vec![Command::UpdateBattle(UpdateBattleCommand { battle: view, update_sound: None })];
-        commands.extend(self.pending_commands.drain(..));
+        commands.append(&mut self.pending_commands);
         self.commands.groups.push(ParallelCommandGroup { commands });
     }
 
