@@ -222,6 +222,13 @@ impl AllCards {
         }
     }
 
+    /// Returns true if the indicated card has the indicated object ID.
+    ///
+    /// Panics if no card with this ID exists.
+    pub fn is_valid_object_id(&self, card_id: impl CardIdType, object_id: ObjectId) -> bool {
+        self.card_object_ids[card_id.card_id().0] == object_id
+    }
+
     fn new_object_id(&mut self) -> ObjectId {
         let result = self.next_object_id;
         self.next_object_id = ObjectId(result.0 + 1);
