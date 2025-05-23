@@ -53,8 +53,7 @@ pub fn render(
         }
         BattleAnimation::SelectStackCardTargets { .. } => {}
         BattleAnimation::ApplyEffectToTargets { source, targets } => {
-            eprintln!(">>>>>>> Applying effect to targets: {:?}", targets);
-            builder.extend_optional(target_projectile_effects::effect(snapshot, *source, targets));
+            target_projectile_effects::apply(builder, snapshot, *source, targets);
         }
     }
 }

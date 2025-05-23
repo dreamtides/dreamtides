@@ -18,9 +18,7 @@ use core_data::types::PlayerName;
 use display_data::battle_view::{
     BattlePreviewView, BattleView, ButtonView, InterfaceView, PlayerPreviewView, PlayerView,
 };
-use display_data::command::{
-    ArrowStyle, Command, DisplayArrow, GameMessageType, GameObjectId, UpdateBattleCommand,
-};
+use display_data::command::{ArrowStyle, Command, DisplayArrow, GameMessageType, GameObjectId};
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify};
 use masonry::flex_style::FlexStyle;
 use tracing_macros::panic_with;
@@ -35,10 +33,7 @@ static CURRENT_PANEL_ADDRESS: LazyLock<Mutex<Option<PanelAddress>>> =
     LazyLock::new(|| Mutex::new(None));
 
 pub fn run(builder: &mut ResponseBuilder, battle: &BattleState) {
-    builder.push(Command::UpdateBattle(UpdateBattleCommand {
-        battle: battle_view(builder, battle),
-        update_sound: None,
-    }));
+    builder.push_battle_view(battle_view(builder, battle));
 
     if let BattleStatus::GameOver { winner } = battle.status {
         builder.push(Command::DisplayGameMessage(

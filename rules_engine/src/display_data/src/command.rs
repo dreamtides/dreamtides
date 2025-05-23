@@ -33,6 +33,10 @@ impl CommandSequence {
         }
     }
 
+    pub fn from_vecs(vecs: Vec<Vec<Command>>) -> Self {
+        Self { groups: vecs.into_iter().map(|c| ParallelCommandGroup { commands: c }).collect() }
+    }
+
     pub fn parallel(commands: Vec<Command>) -> Self {
         Self { groups: vec![ParallelCommandGroup { commands }] }
     }
