@@ -59,10 +59,11 @@ impl Component for SetOpponentAgentPanel<'_> {
                                 )
                                 .build(),
                         )
-                        .child(SetAgentCell::builder().agent(GameAI::Uct1(1000)).build())
-                        .child(SetAgentCell::builder().agent(GameAI::Uct1(5000)).build())
-                        .child(SetAgentCell::builder().agent(GameAI::Uct1(10000)).build())
-                        .child(SetAgentCell::builder().agent(GameAI::Uct1(50000)).build())
+                        .child(SetAgentCell::builder().agent(GameAI::MonteCarlo(5)).build())
+                        .child(SetAgentCell::builder().agent(GameAI::MonteCarlo(10)).build())
+                        .child(SetAgentCell::builder().agent(GameAI::MonteCarlo(50)).build())
+                        .child(SetAgentCell::builder().agent(GameAI::MonteCarlo(100)).build())
+                        .child(SetAgentCell::builder().agent(GameAI::MonteCarlo(500)).build())
                         .child(SetAgentCell::builder().agent(GameAI::RandomAction).build())
                         .child(SetAgentCell::builder().agent(GameAI::FirstAvailableAction).build())
                         .build(),

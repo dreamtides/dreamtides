@@ -89,7 +89,7 @@ pub fn ai_single_threaded(c: &mut Criterion) {
                     criterion::black_box(agent_search::select_action_unchecked(
                         &battle,
                         PlayerName::One,
-                        &GameAI::Uct1SingleThreaded(1000),
+                        &GameAI::MonteCarloSingleThreaded(1),
                         false,
                     ))
                 },
@@ -111,7 +111,7 @@ pub fn ai_full(c: &mut Criterion) {
                     criterion::black_box(agent_search::select_action_unchecked(
                         &battle,
                         PlayerName::One,
-                        &GameAI::Uct1(50_000),
+                        &GameAI::MonteCarlo(50),
                         false,
                     ))
                 },

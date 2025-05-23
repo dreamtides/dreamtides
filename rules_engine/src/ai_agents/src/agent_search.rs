@@ -51,14 +51,18 @@ pub fn select_action_unchecked(
         GameAI::AlwaysPanic => panic!("Always panic agent called for an action"),
         GameAI::FirstAvailableAction => first_available_action(battle, player),
         GameAI::RandomAction => random_action(battle, player),
-        GameAI::Uct1(max_iterations) => {
-            let config =
-                UctConfig { max_iterations_per_action: *max_iterations, single_threaded: false };
+        GameAI::MonteCarlo(thousands_of_iterations) => {
+            let config = UctConfig {
+                max_iterations_per_action: *thousands_of_iterations * 1000,
+                single_threaded: false,
+            };
             uct_search::search(battle, player, &config, log_results)
         }
-        GameAI::Uct1SingleThreaded(max_iterations) => {
-            let config =
-                UctConfig { max_iterations_per_action: *max_iterations, single_threaded: true };
+        GameAI::MonteCarloSingleThreaded(thousands_of_iterations) => {
+            let config = UctConfig {
+                max_iterations_per_action: *thousands_of_iterations * 1000,
+                single_threaded: true,
+            };
             uct_search::search(battle, player, &config, log_results)
         }
     }

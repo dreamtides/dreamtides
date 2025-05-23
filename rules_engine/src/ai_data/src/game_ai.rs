@@ -7,8 +7,8 @@ pub enum GameAI {
     AlwaysPanic,
     FirstAvailableAction,
     RandomAction,
-    Uct1(u32),
-    Uct1SingleThreaded(u32),
+    MonteCarlo(u32),
+    MonteCarloSingleThreaded(u32),
     // I've tested more traditional tree search algorithms like Minimax/Alpha
     // Beta pruning, but they've been very convincingly defeated by Monte Carlo
     // techniques.

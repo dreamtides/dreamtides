@@ -763,8 +763,11 @@ namespace Dreamtides.Schema
 
     public partial class GameAiClass
     {
-        [JsonProperty("uct1MaxIterations", Required = Required.Always)]
-        public long Uct1MaxIterations { get; set; }
+        [JsonProperty("monteCarlo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? MonteCarlo { get; set; }
+
+        [JsonProperty("monteCarloSingleThreaded", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? MonteCarloSingleThreaded { get; set; }
     }
 
     /// <summary>
@@ -1797,7 +1800,7 @@ namespace Dreamtides.Schema
 
     public enum DebugActionEnum { ApplyTestScenarioAction, RestartBattle };
 
-    public enum GameAiEnum { AlwaysPanic, FirstAvailableAction, IterativeDeepening, RandomAction, Uct1 };
+    public enum GameAiEnum { AlwaysPanic, FirstAvailableAction, RandomAction };
 
     /// <summary>
     /// Identifies a window on screen containing UI elements
@@ -2877,12 +2880,8 @@ namespace Dreamtides.Schema
                             return new GameAi { Enum = GameAiEnum.AlwaysPanic };
                         case "firstAvailableAction":
                             return new GameAi { Enum = GameAiEnum.FirstAvailableAction };
-                        case "iterativeDeepening":
-                            return new GameAi { Enum = GameAiEnum.IterativeDeepening };
                         case "randomAction":
                             return new GameAi { Enum = GameAiEnum.RandomAction };
-                        case "uct1":
-                            return new GameAi { Enum = GameAiEnum.Uct1 };
                     }
                     break;
                 case JsonToken.StartObject:
@@ -2905,14 +2904,8 @@ namespace Dreamtides.Schema
                     case GameAiEnum.FirstAvailableAction:
                         serializer.Serialize(writer, "firstAvailableAction");
                         return;
-                    case GameAiEnum.IterativeDeepening:
-                        serializer.Serialize(writer, "iterativeDeepening");
-                        return;
                     case GameAiEnum.RandomAction:
                         serializer.Serialize(writer, "randomAction");
-                        return;
-                    case GameAiEnum.Uct1:
-                        serializer.Serialize(writer, "uct1");
                         return;
                 }
             }
@@ -2941,12 +2934,8 @@ namespace Dreamtides.Schema
                     return GameAiEnum.AlwaysPanic;
                 case "firstAvailableAction":
                     return GameAiEnum.FirstAvailableAction;
-                case "iterativeDeepening":
-                    return GameAiEnum.IterativeDeepening;
                 case "randomAction":
                     return GameAiEnum.RandomAction;
-                case "uct1":
-                    return GameAiEnum.Uct1;
             }
             throw new Exception("Cannot unmarshal type GameAiEnum");
         }
@@ -2967,14 +2956,8 @@ namespace Dreamtides.Schema
                 case GameAiEnum.FirstAvailableAction:
                     serializer.Serialize(writer, "firstAvailableAction");
                     return;
-                case GameAiEnum.IterativeDeepening:
-                    serializer.Serialize(writer, "iterativeDeepening");
-                    return;
                 case GameAiEnum.RandomAction:
                     serializer.Serialize(writer, "randomAction");
-                    return;
-                case GameAiEnum.Uct1:
-                    serializer.Serialize(writer, "uct1");
                     return;
             }
             throw new Exception("Cannot marshal type GameAiEnum");
