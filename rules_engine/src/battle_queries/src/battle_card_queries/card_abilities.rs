@@ -22,7 +22,7 @@ static ABOLISH_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 static DREAMSCATTER_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static AbilityList {
-    query_by_name(battle.cards.name(card_id))
+    query_by_name(battle.cards.card(card_id).name)
 }
 
 pub fn query_by_name(name: CardName) -> &'static AbilityList {

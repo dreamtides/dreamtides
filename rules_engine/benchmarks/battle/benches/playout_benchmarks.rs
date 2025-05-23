@@ -417,7 +417,7 @@ fn benchmark_battle() -> BattleState {
 
         if spec.zone == Zone::Battlefield {
             let character_id = CharacterId(card_id);
-            let card_name = battle.cards.name(character_id);
+            let card_name = battle.cards.card(character_id).name;
             if card_name == CardName::MinstrelOfFallingLight {
                 if let Some(char_state) =
                     battle.cards.battlefield_state_mut(spec.owner).get_mut(&character_id)

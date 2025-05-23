@@ -47,25 +47,11 @@ pub struct AllCards {
 }
 
 impl AllCards {
-    /// Returns the name of a card.
+    /// Returns the state of a card.
     ///
     /// Panics if no card with this ID exists.
-    pub fn name(&self, id: impl CardIdType) -> CardName {
-        self.cards[id.card_id().0].name
-    }
-
-    /// Returns the ObjectId of a card.
-    ///
-    /// Panics if no card with this ID exists.
-    pub fn object_id(&self, id: impl CardIdType) -> ObjectId {
-        self.cards[id.card_id().0].object_id
-    }
-
-    /// Returns the [CanPlayRestriction] of a card if it has one.
-    ///
-    /// Panics if no card with this ID exists.
-    pub fn can_play_restriction(&self, id: impl CardIdType) -> Option<CanPlayRestriction> {
-        self.cards[id.card_id().0].can_play_restriction
+    pub fn card(&self, id: impl CardIdType) -> &BattleCardState {
+        &self.cards[id.card_id().0]
     }
 
     /// Returns the spark value of a character.

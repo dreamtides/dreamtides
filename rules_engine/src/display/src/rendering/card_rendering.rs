@@ -86,7 +86,7 @@ fn selection_action(legal_actions: &LegalActions, card_id: CardId) -> Option<Gam
 }
 
 fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
-    match battle.cards.name(card_id) {
+    match battle.cards.card(card_id).name {
         CardName::MinstrelOfFallingLight => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
@@ -106,7 +106,7 @@ fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
 }
 
 fn card_name(battle: &BattleState, card_id: CardId) -> String {
-    match battle.cards.name(card_id) {
+    match battle.cards.card(card_id).name {
         CardName::MinstrelOfFallingLight => "Minstrel of Falling Light".to_string(),
         CardName::Immolate => "Immolate".to_string(),
         CardName::RippleOfDefiance => "Ripple of Defiance".to_string(),
@@ -132,7 +132,7 @@ fn card_type(battle: &BattleState, card_id: CardId) -> String {
 }
 
 fn rules_text(battle: &BattleState, card_id: CardId) -> String {
-    match battle.cards.name(card_id) {
+    match battle.cards.card(card_id).name {
         CardName::MinstrelOfFallingLight => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
         CardName::Immolate => "Dissolve an enemy character.".to_string(),
         CardName::RippleOfDefiance => {

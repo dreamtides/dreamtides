@@ -37,7 +37,7 @@ pub fn from_hand(battle: &BattleState, player: PlayerName, fast_only: FastOnly) 
             continue;
         }
 
-        let meets = match battle.cards.can_play_restriction(card_id) {
+        let meets = match battle.cards.card(card_id).can_play_restriction {
             Some(restriction) => meets_restriction(battle, player, restriction, cost),
             None => {
                 // No fast version of the 'can play' restriction, check all card

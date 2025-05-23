@@ -52,7 +52,7 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
         .map(|id| {
             card_rendering::card_view(
                 builder,
-                &CardViewContext::Battle(battle, battle.cards.name(id), id),
+                &CardViewContext::Battle(battle, battle.cards.card(id).name, id),
             )
         })
         .collect::<Vec<_>>();

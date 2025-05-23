@@ -26,7 +26,7 @@ pub fn calculate(
 }
 
 pub fn for_card(battle: &BattleState, card_id: CardId, position: Position) -> ObjectPosition {
-    let object_id = battle.cards.object_id(card_id);
+    let object_id = battle.cards.card(card_id).object_id;
     ObjectPosition { position, sorting_key: object_id.0 as u32, sorting_sub_key: 0 }
 }
 
