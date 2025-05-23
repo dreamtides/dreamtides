@@ -766,6 +766,7 @@ dependencies = [
 name = "display"
 version = "0.0.0"
 dependencies = [
+ "ability_data",
  "action_data",
  "ai_data",
  "battle_queries",
