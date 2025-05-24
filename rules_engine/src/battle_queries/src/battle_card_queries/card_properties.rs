@@ -5,6 +5,17 @@ use core_data::identifiers::CardName;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::PlayerName;
 
+/// Returns the display name for a card
+pub fn display_name(card_name: CardName) -> String {
+    match card_name {
+        CardName::MinstrelOfFallingLight => "Minstrel of Falling Light".to_string(),
+        CardName::Immolate => "Immolate".to_string(),
+        CardName::RippleOfDefiance => "Ripple of Defiance".to_string(),
+        CardName::Abolish => "Abolish".to_string(),
+        CardName::Dreamscatter => "Dreamscatter".to_string(),
+    }
+}
+
 pub fn cost(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
     match battle.cards.card(card_id).name {
         CardName::MinstrelOfFallingLight => Some(Energy(2)),

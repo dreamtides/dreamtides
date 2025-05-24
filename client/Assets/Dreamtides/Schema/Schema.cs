@@ -718,6 +718,8 @@ namespace Dreamtides.Schema
     /// Draw a card
     ///
     /// Set the energy of the player
+    ///
+    /// Add a specific card to hand
     /// </summary>
     public partial class DebugBattleAction
     {
@@ -726,6 +728,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("setEnergy", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public List<SetEnergy> SetEnergy { get; set; }
+
+        [JsonProperty("addCardToHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public List<Name> AddCardToHand { get; set; }
     }
 
     public partial class SelectCardOrder
@@ -1803,6 +1808,11 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Identifies a player in an ongoing battle.
     /// </summary>
+    public enum Name { Abolish, Dreamscatter, Immolate, MinstrelOfFallingLight, One, RippleOfDefiance, Two };
+
+    /// <summary>
+    /// Identifies a player in an ongoing battle.
+    /// </summary>
     public enum PlayerName { One, Two };
 
     public enum DebugActionEnum { ApplyTestScenarioAction, RestartBattle };
@@ -1812,7 +1822,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Identifies a window on screen containing UI elements
     /// </summary>
-    public enum PanelAddress { Developer, SetOpponentAgent };
+    public enum PanelAddress { AddCardToHand, Developer, SetOpponentAgent };
 
     public enum FlexAlign { Auto, Center, FlexEnd, FlexStart, Stretch };
 
@@ -1961,6 +1971,7 @@ namespace Dreamtides.Schema
                 ActionUnionConverter.Singleton,
                 BattleActionConverter.Singleton,
                 CardBrowserTypeConverter.Singleton,
+                NameConverter.Singleton,
                 PlayerNameConverter.Singleton,
                 SetEnergyConverter.Singleton,
                 BattleActionEnumConverter.Singleton,
@@ -2620,6 +2631,72 @@ namespace Dreamtides.Schema
         public static readonly CardBrowserTypeConverter Singleton = new CardBrowserTypeConverter();
     }
 
+    internal class NameConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(Name) || t == typeof(Name?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "Abolish":
+                    return Name.Abolish;
+                case "Dreamscatter":
+                    return Name.Dreamscatter;
+                case "Immolate":
+                    return Name.Immolate;
+                case "MinstrelOfFallingLight":
+                    return Name.MinstrelOfFallingLight;
+                case "RippleOfDefiance":
+                    return Name.RippleOfDefiance;
+                case "one":
+                    return Name.One;
+                case "two":
+                    return Name.Two;
+            }
+            throw new Exception("Cannot unmarshal type Name");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (Name)untypedValue;
+            switch (value)
+            {
+                case Name.Abolish:
+                    serializer.Serialize(writer, "Abolish");
+                    return;
+                case Name.Dreamscatter:
+                    serializer.Serialize(writer, "Dreamscatter");
+                    return;
+                case Name.Immolate:
+                    serializer.Serialize(writer, "Immolate");
+                    return;
+                case Name.MinstrelOfFallingLight:
+                    serializer.Serialize(writer, "MinstrelOfFallingLight");
+                    return;
+                case Name.RippleOfDefiance:
+                    serializer.Serialize(writer, "RippleOfDefiance");
+                    return;
+                case Name.One:
+                    serializer.Serialize(writer, "one");
+                    return;
+                case Name.Two:
+                    serializer.Serialize(writer, "two");
+                    return;
+            }
+            throw new Exception("Cannot marshal type Name");
+        }
+
+        public static readonly NameConverter Singleton = new NameConverter();
+    }
+
     internal class PlayerNameConverter : JsonConverter
     {
         public override bool CanConvert(Type t) => t == typeof(PlayerName) || t == typeof(PlayerName?);
@@ -2980,6 +3057,8 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
+                case "addCardToHand":
+                    return PanelAddress.AddCardToHand;
                 case "developer":
                     return PanelAddress.Developer;
                 case "setOpponentAgent":
@@ -2998,6 +3077,9 @@ namespace Dreamtides.Schema
             var value = (PanelAddress)untypedValue;
             switch (value)
             {
+                case PanelAddress.AddCardToHand:
+                    serializer.Serialize(writer, "addCardToHand");
+                    return;
                 case PanelAddress.Developer:
                     serializer.Serialize(writer, "developer");
                     return;

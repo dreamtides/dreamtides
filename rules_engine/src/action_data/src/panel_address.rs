@@ -7,4 +7,5 @@ use serde::{Deserialize, Serialize};
 pub enum PanelAddress {
     Developer,
     SetOpponentAgent,
+    AddCardToHand,
 }

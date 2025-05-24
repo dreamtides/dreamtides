@@ -1,3 +1,4 @@
+use core_data::identifiers::CardName;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use schemars::JsonSchema;
@@ -54,6 +55,8 @@ pub enum DebugBattleAction {
     DrawCard(PlayerName),
     /// Set the energy of the player
     SetEnergy(PlayerName, Energy),
+    /// Add a specific card to hand
+    AddCardToHand(PlayerName, CardName),
 }
 
 #[derive(

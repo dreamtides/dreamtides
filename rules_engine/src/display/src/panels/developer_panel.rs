@@ -43,6 +43,12 @@ impl Component for DeveloperPanel {
                         )
                         .child(
                             DebugButton::builder()
+                                .label("Add Card to Hand")
+                                .action(GameAction::OpenPanel(PanelAddress::AddCardToHand))
+                                .build(),
+                        )
+                        .child(
+                            DebugButton::builder()
                                 .label("Draw Card")
                                 .action(BattleAction::Debug(DebugBattleAction::DrawCard(
                                     self.user_player,

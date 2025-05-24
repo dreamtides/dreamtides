@@ -106,13 +106,7 @@ fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
 }
 
 fn card_name(battle: &BattleState, card_id: CardId) -> String {
-    match battle.cards.card(card_id).name {
-        CardName::MinstrelOfFallingLight => "Minstrel of Falling Light".to_string(),
-        CardName::Immolate => "Immolate".to_string(),
-        CardName::RippleOfDefiance => "Ripple of Defiance".to_string(),
-        CardName::Abolish => "Abolish".to_string(),
-        CardName::Dreamscatter => "Dreamscatter".to_string(),
-    }
+    card_properties::display_name(battle.cards.card(card_id).name)
 }
 
 fn card_type(battle: &BattleState, card_id: CardId) -> String {
