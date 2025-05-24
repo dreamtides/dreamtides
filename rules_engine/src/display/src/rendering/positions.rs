@@ -7,6 +7,7 @@ use core_data::types::PlayerName;
 use display_data::object_position::{ObjectPosition, Position, StackType};
 
 use crate::core::response_builder::ResponseBuilder;
+use crate::rendering::position_overrides;
 
 pub fn calculate(
     builder: &ResponseBuilder,
@@ -24,7 +25,7 @@ pub fn calculate(
         Zone::Banished => Position::InBanished(player),
     };
 
-    for_card(battle, card_id, position)
+    for_card(battle, card_id, position_overrides::position(battle, card_id, position))
 }
 
 pub fn for_card(battle: &BattleState, card_id: CardId, position: Position) -> ObjectPosition {

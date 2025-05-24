@@ -58,7 +58,6 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
             };
             *current = n;
         }
-        BattleAction::BrowseCards(_) => {}
         _ => {
             todo!("Implement {:?}", action);
         }
@@ -72,8 +71,6 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
 fn should_record_in_history(action: BattleAction) -> bool {
     !matches!(
         action,
-        BattleAction::BrowseCards(..)
-            | BattleAction::CloseCardBrowser
             | BattleAction::ToggleOrderSelectorVisibility
     )
 }

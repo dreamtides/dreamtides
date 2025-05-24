@@ -92,8 +92,6 @@ impl LegalActions {
                 }
             }
             BattleAction::SelectCardOrder(..) => false,
-            BattleAction::BrowseCards(..) => todo!("Implement this"),
-            BattleAction::CloseCardBrowser => true,
             BattleAction::ToggleOrderSelectorVisibility => true,
             BattleAction::SubmitMulligan => todo!("Implement this"),
         }

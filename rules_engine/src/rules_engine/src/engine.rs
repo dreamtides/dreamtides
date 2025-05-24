@@ -11,6 +11,7 @@ use battle_state::battle_player::battle_player_state::PlayerType;
 use core_data::identifiers::{BattleId, QuestId, UserId};
 use database::save_file::SaveFile;
 use database::sqlite_database::{self, Database};
+use display::display_actions::apply_battle_display_action;
 use display::rendering::{battle_rendering, renderer};
 use display_data::command::CommandSequence;
 use display_data::request_data::{ConnectRequest, ConnectResponse, PerformActionRequest};
@@ -69,12 +70,12 @@ fn connect_internal(request: &ConnectRequest) -> CommandSequence {
     match load_battle_from_database(&database, user_id) {
         Ok(LoadBattleResult::ExistingBattle(battle, quest_id)) => {
             if is_user_in_battle(&battle, user_id) {
-                renderer::connect(&battle, user_id)
+                renderer::connect(&battle, user_id, false)
             } else {
                 handle_user_not_in_battle(user_id, battle, quest_id, &database, None)
             }
         }
-        Ok(LoadBattleResult::NewBattle(battle)) => renderer::connect(&battle, user_id),
+        Ok(LoadBattleResult::NewBattle(battle)) => renderer::connect(&battle, user_id, false),
         Err(error) => error_message::display_error_message(None, error),
     }
 }
@@ -97,7 +98,7 @@ fn connect_for_multiplayer(
                 Some((battle, quest_id)) => {
                     // Check if the connecting user is already in the battle
                     if is_user_in_battle(&battle, user_id) {
-                        return renderer::connect(&battle, user_id);
+                        return renderer::connect(&battle, user_id, false);
                     }
 
                     // If not in the battle, try to join by replacing an AI player
@@ -199,7 +200,7 @@ fn handle_user_not_in_battle(
 
     let save_user_id = vs_opponent.unwrap_or(user_id);
     match save_battle_to_database(database, save_user_id, quest_id, &battle) {
-        Ok(_) => renderer::connect(&battle, user_id),
+        Ok(_) => renderer::connect(&battle, user_id, false),
         Err(error) => error_message::display_error_message(None, error),
     }
 }
@@ -266,11 +267,21 @@ fn handle_request_action(
         GameAction::DebugAction(action) => {
             let player = renderer::player_name_for_user(&*battle, user_id);
             debug_actions::execute(battle, user_id, player, action);
-            handle_battle_action::append_update(user_id, renderer::connect(&*battle, user_id));
+            handle_battle_action::append_update(
+                user_id,
+                renderer::connect(&*battle, user_id, true),
+            );
         }
         GameAction::BattleAction(action) => {
             let player = renderer::player_name_for_user(&*battle, user_id);
             handle_battle_action::execute(battle, user_id, player, action);
+        }
+        GameAction::BattleDisplayAction(action) => {
+            apply_battle_display_action::execute(action);
+            handle_battle_action::append_update(
+                user_id,
+                renderer::connect(&*battle, user_id, true),
+            );
         }
         GameAction::Undo(player) => {
             let Some((undone_battle, _)) = deserialize_save_file::undo(&save, player) else {
@@ -283,15 +294,24 @@ fn handle_request_action(
             };
 
             *battle = undone_battle;
-            handle_battle_action::append_update(user_id, renderer::connect(&*battle, user_id));
+            handle_battle_action::append_update(
+                user_id,
+                renderer::connect(&*battle, user_id, true),
+            );
         }
         GameAction::OpenPanel(address) => {
             battle_rendering::open_panel(address);
-            handle_battle_action::append_update(user_id, renderer::connect(&*battle, user_id));
+            handle_battle_action::append_update(
+                user_id,
+                renderer::connect(&*battle, user_id, true),
+            );
         }
         GameAction::CloseCurrentPanel => {
             battle_rendering::close_current_panel();
-            handle_battle_action::append_update(user_id, renderer::connect(&*battle, user_id));
+            handle_battle_action::append_update(
+                user_id,
+                renderer::connect(&*battle, user_id, true),
+            );
         }
     };
 }

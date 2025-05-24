@@ -22,4 +22,6 @@ tracing_macros = { path = "../tracing_macros" }
 ui_components = { path = "../ui_components" }
 
 bon = "3"
+schemars = "0.8"
+serde = { version = "1", features = ["derive"] }
 tracing = "0.1"

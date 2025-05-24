@@ -15,9 +15,9 @@ public class CloseBrowserButton : MonoBehaviour
     {
       GameActionClass = new()
       {
-        BattleAction = new()
+        BattleDisplayAction = new()
         {
-          Enum = BattleActionEnum.CloseCardBrowser
+          Enum = BattleDisplayActionEnum.CloseCardBrowser
         }
       }
     };

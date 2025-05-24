@@ -5,6 +5,7 @@ use core_data::types::PlayerName;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use crate::battle_display_action::BattleDisplayAction;
 use crate::debug_action_data::DebugAction;
 use crate::panel_address::PanelAddress;
 
@@ -14,6 +15,7 @@ use crate::panel_address::PanelAddress;
 pub enum GameAction {
     DebugAction(DebugAction),
     BattleAction(BattleAction),
+    BattleDisplayAction(BattleDisplayAction),
     Undo(PlayerName),
     OpenPanel(PanelAddress),
     CloseCurrentPanel,
@@ -24,6 +26,7 @@ impl Debug for GameAction {
         match self {
             GameAction::DebugAction(action) => write!(f, "{:?}", action),
             GameAction::BattleAction(action) => write!(f, "{:?}", action),
+            GameAction::BattleDisplayAction(action) => write!(f, "{:?}", action),
             GameAction::Undo(player) => write!(f, "Undo({:?})", player),
             GameAction::OpenPanel(panel) => write!(f, "{:?}", panel),
             GameAction::CloseCurrentPanel => write!(f, "CloseCurrentPanel"),

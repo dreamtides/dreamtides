@@ -776,6 +776,8 @@ dependencies = [
  "core_data",
  "display_data",
  "masonry",
+ "schemars",
+ "serde",
  "tracing",
  "tracing_macros",
  "ui_components",

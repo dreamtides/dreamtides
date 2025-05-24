@@ -26,9 +26,9 @@ namespace Dreamtides.Components
       {
         GameActionClass = new()
         {
-          BattleAction = new()
+          BattleDisplayAction = new()
           {
-            BattleActionClass = new()
+            BattleDisplayActionClass = new()
             {
               BrowseCards = _type
             }

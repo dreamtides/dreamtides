@@ -658,6 +658,9 @@ namespace Dreamtides.Schema
         [JsonProperty("battleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public BattleAction? BattleAction { get; set; }
 
+        [JsonProperty("battleDisplayAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public BattleDisplayAction? BattleDisplayAction { get; set; }
+
         [JsonProperty("undo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayerName? Undo { get; set; }
 
@@ -681,8 +684,6 @@ namespace Dreamtides.Schema
     /// Sets the selected amount of energy to pay as an additional cost to play a card.
     ///
     /// Sets the position of a card in a card order selector.
-    ///
-    /// Show cards in a zone
     /// </summary>
     public partial class BattleActionClass
     {
@@ -709,9 +710,6 @@ namespace Dreamtides.Schema
 
         [JsonProperty("selectCardOrder", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SelectCardOrder SelectCardOrder { get; set; }
-
-        [JsonProperty("browseCards", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public CardBrowserType? BrowseCards { get; set; }
     }
 
     /// <summary>
@@ -743,6 +741,12 @@ namespace Dreamtides.Schema
 
         [JsonProperty("target", Required = Required.Always)]
         public CardOrderSelectionTarget Target { get; set; }
+    }
+
+    public partial class BattleDisplayActionClass
+    {
+        [JsonProperty("browseCards", Required = Required.Always)]
+        public CardBrowserType BrowseCards { get; set; }
     }
 
     public partial class DebugActionClass
@@ -1700,6 +1704,9 @@ namespace Dreamtides.Schema
         [JsonProperty("battleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public BattleAction? BattleAction { get; set; }
 
+        [JsonProperty("battleDisplayAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public BattleDisplayAction? BattleDisplayAction { get; set; }
+
         [JsonProperty("undo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayerName? Undo { get; set; }
 
@@ -1795,15 +1802,11 @@ namespace Dreamtides.Schema
     ///
     /// Start your next turn after the opponent takes the `EndTurn` action.
     ///
-    /// Close the card browser
-    ///
     /// Toggle the visibility of the card order selector
     ///
     /// Confirm the selected cards to mulligan
     /// </summary>
-    public enum BattleActionEnum { CloseCardBrowser, EndTurn, PassPriority, StartNextTurn, SubmitMulligan, ToggleOrderSelectorVisibility };
-
-    public enum CardBrowserType { EnemyDeck, EnemyStatus, EnemyVoid, UserDeck, UserStatus, UserVoid };
+    public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitMulligan, ToggleOrderSelectorVisibility };
 
     /// <summary>
     /// Identifies a player in an ongoing battle.
@@ -1814,6 +1817,10 @@ namespace Dreamtides.Schema
     /// Identifies a player in an ongoing battle.
     /// </summary>
     public enum PlayerName { One, Two };
+
+    public enum BattleDisplayActionEnum { CloseCardBrowser };
+
+    public enum CardBrowserType { EnemyDeck, EnemyStatus, EnemyVoid, UserDeck, UserStatus, UserVoid };
 
     public enum DebugActionEnum { ApplyTestScenarioAction, RestartBattle };
 
@@ -1899,6 +1906,15 @@ namespace Dreamtides.Schema
         public static implicit operator BattleAction(BattleActionEnum Enum) => new BattleAction { Enum = Enum };
     }
 
+    public partial struct BattleDisplayAction
+    {
+        public BattleDisplayActionClass BattleDisplayActionClass;
+        public BattleDisplayActionEnum? Enum;
+
+        public static implicit operator BattleDisplayAction(BattleDisplayActionClass BattleDisplayActionClass) => new BattleDisplayAction { BattleDisplayActionClass = BattleDisplayActionClass };
+        public static implicit operator BattleDisplayAction(BattleDisplayActionEnum Enum) => new BattleDisplayAction { Enum = Enum };
+    }
+
     public partial struct GameAi
     {
         public GameAiEnum? Enum;
@@ -1970,11 +1986,13 @@ namespace Dreamtides.Schema
                 CardPrefabConverter.Singleton,
                 ActionUnionConverter.Singleton,
                 BattleActionConverter.Singleton,
-                CardBrowserTypeConverter.Singleton,
                 NameConverter.Singleton,
                 PlayerNameConverter.Singleton,
                 SetEnergyConverter.Singleton,
                 BattleActionEnumConverter.Singleton,
+                BattleDisplayActionConverter.Singleton,
+                CardBrowserTypeConverter.Singleton,
+                BattleDisplayActionEnumConverter.Singleton,
                 DebugActionConverter.Singleton,
                 GameAiConverter.Singleton,
                 GameAiEnumConverter.Singleton,
@@ -2511,8 +2529,6 @@ namespace Dreamtides.Schema
                     var stringValue = serializer.Deserialize<string>(reader);
                     switch (stringValue)
                     {
-                        case "closeCardBrowser":
-                            return new BattleAction { Enum = BattleActionEnum.CloseCardBrowser };
                         case "endTurn":
                             return new BattleAction { Enum = BattleActionEnum.EndTurn };
                         case "passPriority":
@@ -2539,9 +2555,6 @@ namespace Dreamtides.Schema
             {
                 switch (value.Enum)
                 {
-                    case BattleActionEnum.CloseCardBrowser:
-                        serializer.Serialize(writer, "closeCardBrowser");
-                        return;
                     case BattleActionEnum.EndTurn:
                         serializer.Serialize(writer, "endTurn");
                         return;
@@ -2568,67 +2581,6 @@ namespace Dreamtides.Schema
         }
 
         public static readonly BattleActionConverter Singleton = new BattleActionConverter();
-    }
-
-    internal class CardBrowserTypeConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(CardBrowserType) || t == typeof(CardBrowserType?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "enemyDeck":
-                    return CardBrowserType.EnemyDeck;
-                case "enemyStatus":
-                    return CardBrowserType.EnemyStatus;
-                case "enemyVoid":
-                    return CardBrowserType.EnemyVoid;
-                case "userDeck":
-                    return CardBrowserType.UserDeck;
-                case "userStatus":
-                    return CardBrowserType.UserStatus;
-                case "userVoid":
-                    return CardBrowserType.UserVoid;
-            }
-            throw new Exception("Cannot unmarshal type CardBrowserType");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (CardBrowserType)untypedValue;
-            switch (value)
-            {
-                case CardBrowserType.EnemyDeck:
-                    serializer.Serialize(writer, "enemyDeck");
-                    return;
-                case CardBrowserType.EnemyStatus:
-                    serializer.Serialize(writer, "enemyStatus");
-                    return;
-                case CardBrowserType.EnemyVoid:
-                    serializer.Serialize(writer, "enemyVoid");
-                    return;
-                case CardBrowserType.UserDeck:
-                    serializer.Serialize(writer, "userDeck");
-                    return;
-                case CardBrowserType.UserStatus:
-                    serializer.Serialize(writer, "userStatus");
-                    return;
-                case CardBrowserType.UserVoid:
-                    serializer.Serialize(writer, "userVoid");
-                    return;
-            }
-            throw new Exception("Cannot marshal type CardBrowserType");
-        }
-
-        public static readonly CardBrowserTypeConverter Singleton = new CardBrowserTypeConverter();
     }
 
     internal class NameConverter : JsonConverter
@@ -2800,8 +2752,6 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "closeCardBrowser":
-                    return BattleActionEnum.CloseCardBrowser;
                 case "endTurn":
                     return BattleActionEnum.EndTurn;
                 case "passPriority":
@@ -2826,9 +2776,6 @@ namespace Dreamtides.Schema
             var value = (BattleActionEnum)untypedValue;
             switch (value)
             {
-                case BattleActionEnum.CloseCardBrowser:
-                    serializer.Serialize(writer, "closeCardBrowser");
-                    return;
                 case BattleActionEnum.EndTurn:
                     serializer.Serialize(writer, "endTurn");
                     return;
@@ -2849,6 +2796,146 @@ namespace Dreamtides.Schema
         }
 
         public static readonly BattleActionEnumConverter Singleton = new BattleActionEnumConverter();
+    }
+
+    internal class BattleDisplayActionConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(BattleDisplayAction) || t == typeof(BattleDisplayAction?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            switch (reader.TokenType)
+            {
+                case JsonToken.String:
+                case JsonToken.Date:
+                    var stringValue = serializer.Deserialize<string>(reader);
+                    if (stringValue == "closeCardBrowser")
+                    {
+                        return new BattleDisplayAction { Enum = BattleDisplayActionEnum.CloseCardBrowser };
+                    }
+                    break;
+                case JsonToken.StartObject:
+                    var objectValue = serializer.Deserialize<BattleDisplayActionClass>(reader);
+                    return new BattleDisplayAction { BattleDisplayActionClass = objectValue };
+            }
+            throw new Exception("Cannot unmarshal type BattleDisplayAction");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            var value = (BattleDisplayAction)untypedValue;
+            if (value.Enum != null)
+            {
+                if (value.Enum == BattleDisplayActionEnum.CloseCardBrowser)
+                {
+                    serializer.Serialize(writer, "closeCardBrowser");
+                    return;
+                }
+            }
+            if (value.BattleDisplayActionClass != null)
+            {
+                serializer.Serialize(writer, value.BattleDisplayActionClass);
+                return;
+            }
+            throw new Exception("Cannot marshal type BattleDisplayAction");
+        }
+
+        public static readonly BattleDisplayActionConverter Singleton = new BattleDisplayActionConverter();
+    }
+
+    internal class CardBrowserTypeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(CardBrowserType) || t == typeof(CardBrowserType?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "enemyDeck":
+                    return CardBrowserType.EnemyDeck;
+                case "enemyStatus":
+                    return CardBrowserType.EnemyStatus;
+                case "enemyVoid":
+                    return CardBrowserType.EnemyVoid;
+                case "userDeck":
+                    return CardBrowserType.UserDeck;
+                case "userStatus":
+                    return CardBrowserType.UserStatus;
+                case "userVoid":
+                    return CardBrowserType.UserVoid;
+            }
+            throw new Exception("Cannot unmarshal type CardBrowserType");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (CardBrowserType)untypedValue;
+            switch (value)
+            {
+                case CardBrowserType.EnemyDeck:
+                    serializer.Serialize(writer, "enemyDeck");
+                    return;
+                case CardBrowserType.EnemyStatus:
+                    serializer.Serialize(writer, "enemyStatus");
+                    return;
+                case CardBrowserType.EnemyVoid:
+                    serializer.Serialize(writer, "enemyVoid");
+                    return;
+                case CardBrowserType.UserDeck:
+                    serializer.Serialize(writer, "userDeck");
+                    return;
+                case CardBrowserType.UserStatus:
+                    serializer.Serialize(writer, "userStatus");
+                    return;
+                case CardBrowserType.UserVoid:
+                    serializer.Serialize(writer, "userVoid");
+                    return;
+            }
+            throw new Exception("Cannot marshal type CardBrowserType");
+        }
+
+        public static readonly CardBrowserTypeConverter Singleton = new CardBrowserTypeConverter();
+    }
+
+    internal class BattleDisplayActionEnumConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(BattleDisplayActionEnum) || t == typeof(BattleDisplayActionEnum?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            if (value == "closeCardBrowser")
+            {
+                return BattleDisplayActionEnum.CloseCardBrowser;
+            }
+            throw new Exception("Cannot unmarshal type BattleDisplayActionEnum");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (BattleDisplayActionEnum)untypedValue;
+            if (value == BattleDisplayActionEnum.CloseCardBrowser)
+            {
+                serializer.Serialize(writer, "closeCardBrowser");
+                return;
+            }
+            throw new Exception("Cannot marshal type BattleDisplayActionEnum");
+        }
+
+        public static readonly BattleDisplayActionEnumConverter Singleton = new BattleDisplayActionEnumConverter();
     }
 
     internal class DebugActionConverter : JsonConverter

@@ -71,8 +71,8 @@ fn perform_battle_action(
 ) -> PerformActionResponse {
     let commands = match action {
         BattleAction::PlayCardFromHand(id) => play_card(id.card_id(), scenario),
-        BattleAction::BrowseCards(card_browser) => browse_cards(card_browser),
-        BattleAction::CloseCardBrowser => close_card_browser(),
+        // BattleAction::BrowseCards(card_browser) => browse_cards(card_browser),
+        // BattleAction::CloseCardBrowser => close_card_browser(),
         BattleAction::SelectCharacterTarget(id) => select_card(id.card_id()),
         BattleAction::SelectCardOrder(select_order) => select_card_order(select_order),
         _ => {

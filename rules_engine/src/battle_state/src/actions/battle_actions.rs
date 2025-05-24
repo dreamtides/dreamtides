@@ -36,10 +36,6 @@ pub enum BattleAction {
     SetSelectedEnergyAdditionalCost(Energy),
     /// Sets the position of a card in a card order selector.
     SelectCardOrder(SelectCardOrder),
-    /// Show cards in a zone
-    BrowseCards(CardBrowserType),
-    /// Close the card browser
-    CloseCardBrowser,
     /// Toggle the visibility of the card order selector
     ToggleOrderSelectorVisibility,
     /// Confirm the selected cards to mulligan
@@ -118,18 +114,6 @@ impl BattleAction {
                 };
                 format!("SCO{}{}{}", target, order.card_id.0, order.position)
             }
-            BattleAction::BrowseCards(browser_type) => {
-                let type_abbr = match browser_type {
-                    CardBrowserType::UserDeck => "UD",
-                    CardBrowserType::EnemyDeck => "ED",
-                    CardBrowserType::UserVoid => "UV",
-                    CardBrowserType::EnemyVoid => "EV",
-                    CardBrowserType::UserStatus => "US",
-                    CardBrowserType::EnemyStatus => "ES",
-                };
-                format!("BC{}", type_abbr)
-            }
-            BattleAction::CloseCardBrowser => "CCB".to_string(),
             BattleAction::ToggleOrderSelectorVisibility => "TOSV".to_string(),
             BattleAction::SubmitMulligan => "SM".to_string(),
         }
