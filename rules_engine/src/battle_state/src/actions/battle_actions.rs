@@ -74,19 +74,6 @@ pub enum CardOrderSelectionTarget {
     Void,
 }
 
-#[derive(
-    Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
-)]
-#[serde(rename_all = "camelCase")]
-pub enum CardBrowserType {
-    UserDeck,
-    EnemyDeck,
-    UserVoid,
-    EnemyVoid,
-    UserStatus,
-    EnemyStatus,
-}
-
 impl BattleAction {
     /// Format a battle action as a short name for display.
     ///

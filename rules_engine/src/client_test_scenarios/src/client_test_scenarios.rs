@@ -2,10 +2,11 @@ pub mod basic_scene;
 
 use std::sync::{LazyLock, Mutex};
 
+use action_data::battle_display_action::{BattleDisplayAction, CardBrowserType};
 use action_data::debug_action_data::DebugAction;
 use action_data::game_action_data::GameAction;
 use battle_state::actions::battle_actions::{
-    BattleAction, CardBrowserType, CardOrderSelectionTarget, SelectCardOrder,
+    BattleAction, CardOrderSelectionTarget, SelectCardOrder,
 };
 use battle_state::battle::card_id::{CardId, CardIdType, CharacterId};
 use core_data::display_color::{self, DisplayColor};
@@ -57,6 +58,9 @@ pub fn perform_action(request: &PerformActionRequest, scenario: &str) -> Perform
         GameAction::DebugAction(action) => {
             perform_debug_action(*action, request.metadata, scenario)
         }
+        GameAction::BattleDisplayAction(action) => {
+            perform_battle_display_action(*action, request.metadata, scenario)
+        }
         _ => PerformActionResponse {
             metadata: request.metadata,
             commands: CommandSequence::default(),
@@ -78,6 +82,19 @@ fn perform_battle_action(
         _ => {
             panic!("Not implemented: {:?}", action);
         }
+    };
+
+    PerformActionResponse { metadata, commands }
+}
+
+fn perform_battle_display_action(
+    action: BattleDisplayAction,
+    metadata: Metadata,
+    _scenario: &str,
+) -> PerformActionResponse {
+    let commands = match action {
+        BattleDisplayAction::BrowseCards(card_browser) => browse_cards(card_browser),
+        BattleDisplayAction::CloseCardBrowser => close_card_browser(),
     };
 
     PerformActionResponse { metadata, commands }

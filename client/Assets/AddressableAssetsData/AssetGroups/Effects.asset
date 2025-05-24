@@ -273,6 +273,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bde1923b918eb4ce18c47e6984d2eb73
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Light Magic/RPG3_LightMagicEpic_HealingWing_P1.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: be471abb721854affa08b63a93ad7f62
     m_Address: Assets/Content/Dissolves/Dissolve15.mat
     m_ReadOnly: 0
@@ -331,6 +336,11 @@ MonoBehaviour:
   - m_GUID: f418df008951e412e8828c20204c0709
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       21 red arrow.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f43f296ef70014c57a0662ca22909846
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Plasma Magic/RPG3_PlasmaMagicEpic_Buff01.wav
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
