@@ -5,7 +5,7 @@ use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use core_data::display_color;
 use core_data::display_types::Milliseconds;
 use core_data::identifiers::CardName;
-use display_data::battle_view::DisplayPlayer;
+use core_data::types::PlayerName;
 use display_data::command::{
     Command, DisplayEffectCommand, DissolveCardCommand, FireProjectileCommand, GameObjectId,
 };
@@ -18,6 +18,7 @@ use crate::core::response_builder::ResponseBuilder;
 pub fn apply(
     builder: &mut ResponseBuilder,
     battle: &BattleState,
+    controller: PlayerName,
     source_id: CardId,
     targets: &Option<StackCardTargets>,
 ) -> Option<()> {
@@ -80,7 +81,7 @@ pub fn apply(
 
         CardName::Dreamscatter => {
             builder.push(Command::DisplayEffect(DisplayEffectCommand {
-                target: GameObjectId::Deck(DisplayPlayer::User),
+                target: GameObjectId::Deck(builder.to_display_player(controller)),
                 effect: hovl::magic_circle("1"),
                 duration: Milliseconds::new(500),
                 scale: FlexVector3::new(5.0, 5.0, 5.0),

@@ -46,6 +46,7 @@ fn apply_standard_effect(
     battle_trace!("Applying effect", battle, source, effect, targets);
     battle.push_animation_optional(|| {
         source.card_id().map(|source_id| BattleAnimation::ApplyEffect {
+            controller: source.controller(),
             source: source_id,
             targets: targets.clone(),
         })

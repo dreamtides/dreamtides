@@ -53,8 +53,8 @@ pub fn render(
             }
         }
         BattleAnimation::SelectStackCardTargets { .. } => {}
-        BattleAnimation::ApplyEffect { source, targets } => {
-            apply_card_fx::apply(builder, snapshot, *source, targets);
+        BattleAnimation::ApplyEffect { controller, source, targets } => {
+            apply_card_fx::apply(builder, snapshot, *controller, *source, targets);
         }
         BattleAnimation::MakeChoice { player, choice } => {
             if *player != builder.display_for_player() {

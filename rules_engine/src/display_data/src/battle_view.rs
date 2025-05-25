@@ -124,6 +124,9 @@ pub struct PlayerView {
 
     /// Total spark for this player
     pub total_spark: Spark,
+
+    /// Is it currently this player's turn?
+    pub is_current_turn: bool,
 }
 
 /// Preview of a potential future state of a player

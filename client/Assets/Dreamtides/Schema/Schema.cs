@@ -1557,6 +1557,12 @@ namespace Dreamtides.Schema
         public long Energy { get; set; }
 
         /// <summary>
+        /// Is it currently this player's turn?
+        /// </summary>
+        [JsonProperty("isCurrentTurn", Required = Required.Always)]
+        public bool IsCurrentTurn { get; set; }
+
+        /// <summary>
         /// Energy produced by this player at the start of the current turn
         /// </summary>
         [JsonProperty("producedEnergy", Required = Required.Always)]

@@ -96,6 +96,7 @@ fn player_view(battle: &BattleState, name: PlayerName, player: &BattlePlayerStat
         energy: player.current_energy,
         produced_energy: player.produced_energy,
         total_spark: player_properties::spark_total(battle, name),
+        is_current_turn: battle.turn.active_player == name,
     }
 }
 

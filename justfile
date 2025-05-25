@@ -20,6 +20,9 @@ release:
 watch:
     cargo watch -C rules_engine -x "run --bin dev_server" --ignore dreamtides.json
 
+watch-release:
+    cargo watch -C rules_engine -x "run --release --bin dev_server" --ignore dreamtides.json
+
 test:
     cargo test --manifest-path rules_engine/Cargo.toml
 

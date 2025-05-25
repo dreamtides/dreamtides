@@ -31,6 +31,7 @@ pub enum BattleAnimation {
         targets: StackCardTargets,
     },
     ApplyEffect {
+        controller: PlayerName,
         source: CardId,
         targets: Option<StackCardTargets>,
     },

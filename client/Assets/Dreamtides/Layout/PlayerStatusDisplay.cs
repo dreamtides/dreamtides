@@ -10,6 +10,7 @@ namespace Dreamtides.Layout
     [SerializeField] BattlefieldNumber _energy = null!;
     [SerializeField] BattlefieldNumber _score = null!;
     [SerializeField] BattlefieldNumber _totalSpark = null!;
+    [SerializeField] GameObject _turnIndicator = null!;
     long _producedEnergy;
 
     public BattlefieldNumber Energy => _energy;
@@ -21,6 +22,7 @@ namespace Dreamtides.Layout
       SetEnergy(playerView.Energy, playerView.ProducedEnergy, animate);
       SetTotalSpark(playerView.TotalSpark, animate);
       SetScore(playerView.Score, animate);
+      _turnIndicator.SetActive(playerView.IsCurrentTurn);
     }
 
     public void SetEnergy(long currentEnergy, long producedEnergy, bool animate = true)
