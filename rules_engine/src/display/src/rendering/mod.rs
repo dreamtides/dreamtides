@@ -4,6 +4,7 @@ pub mod battle_rendering;
 pub mod card_display_state;
 pub mod card_rendering;
 pub mod labels;
+pub mod outcome_simulation;
 pub mod position_overrides;
 pub mod positions;
 pub mod renderer;

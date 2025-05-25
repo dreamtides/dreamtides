@@ -13,6 +13,7 @@ ability_data = { path = "../ability_data" }
 action_data = { path = "../action_data" }
 ai_data = { path = "../ai_data" }
 asset_paths = { path = "../asset_paths" }
+battle_mutations = { path = "../battle_mutations" }
 battle_queries = { path = "../battle_queries" }
 battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }

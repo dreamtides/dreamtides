@@ -13,7 +13,7 @@ use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use battle_state::battle_player::battle_player_state::BattlePlayerState;
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::display_color;
-use core_data::numerics::{Energy, Points};
+use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use display_data::battle_view::{
     BattlePreviewView, BattleView, ButtonView, InterfaceView, PlayerPreviewView, PlayerView,
@@ -26,7 +26,7 @@ use tracing_macros::panic_with;
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
 use crate::panels::panel_rendering;
-use crate::rendering::{card_rendering, labels};
+use crate::rendering::{card_rendering, labels, outcome_simulation};
 
 static CURRENT_PANEL_ADDRESS: LazyLock<Mutex<Option<PanelAddress>>> =
     LazyLock::new(|| Mutex::new(None));
@@ -97,7 +97,7 @@ fn player_view(battle: &BattleState, name: PlayerName, player: &BattlePlayerStat
         produced_energy: player.produced_energy,
         total_spark: player_properties::spark_total(battle, name),
         is_current_turn: battle.turn.active_player == name,
-        is_victory_imminent: player.points >= Points(15),
+        is_victory_imminent: outcome_simulation::is_victory_imminent_for_player(battle, name),
     }
 }
 
