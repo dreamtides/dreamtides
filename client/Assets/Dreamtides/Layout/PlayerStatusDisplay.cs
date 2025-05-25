@@ -11,18 +11,34 @@ namespace Dreamtides.Layout
     [SerializeField] BattlefieldNumber _score = null!;
     [SerializeField] BattlefieldNumber _totalSpark = null!;
     [SerializeField] GameObject _turnIndicator = null!;
+    [SerializeField] Material _imminentVictorySparkBackgroundMaterial = null!;
+    [SerializeField] GameObject _imminentVictoryIndicator = null!;
+
     long _producedEnergy;
+    Renderer _sparkBackgroundRenderer = null!;
+    Material _sparkBackgroundMaterial = null!;
 
     public BattlefieldNumber Energy => _energy;
     public BattlefieldNumber Score => _score;
     public BattlefieldNumber TotalSpark => _totalSpark;
 
+    protected override void OnStart()
+    {
+      _sparkBackgroundRenderer = _totalSpark.GetComponent<Renderer>();
+      _sparkBackgroundMaterial = _sparkBackgroundRenderer.material;
+    }
+
     public void UpdatePlayerView(PlayerView playerView, bool animate)
     {
+      Debug.Log($"UpdatePlayerView: {playerView.IsVictoryImminent}");
       SetEnergy(playerView.Energy, playerView.ProducedEnergy, animate);
       SetTotalSpark(playerView.TotalSpark, animate);
       SetScore(playerView.Score, animate);
       _turnIndicator.SetActive(playerView.IsCurrentTurn);
+      _sparkBackgroundRenderer.material = playerView.IsVictoryImminent ?
+          _imminentVictorySparkBackgroundMaterial :
+          _sparkBackgroundMaterial;
+      _imminentVictoryIndicator.SetActive(playerView.IsVictoryImminent);
     }
 
     public void SetEnergy(long currentEnergy, long producedEnergy, bool animate = true)

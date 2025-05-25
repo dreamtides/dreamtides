@@ -127,6 +127,9 @@ pub struct PlayerView {
 
     /// Is it currently this player's turn?
     pub is_current_turn: bool,
+
+    /// Will this player win the game in their next judgment phase?
+    pub is_victory_imminent: bool,
 }
 
 /// Preview of a potential future state of a player

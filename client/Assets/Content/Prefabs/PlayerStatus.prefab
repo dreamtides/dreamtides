@@ -248,6 +248,8 @@ MonoBehaviour:
   _energy: {fileID: 2558500935868125653}
   _score: {fileID: 6102077444113359776}
   _totalSpark: {fileID: 0}
+  _turnIndicator: {fileID: 0}
+  _imminentVictorySparkBackgroundMaterial: {fileID: 2100000, guid: bb3208b07971a417f90e7df1a8eca741, type: 2}
 --- !u!1 &2198335393119608428
 GameObject:
   m_ObjectHideFlags: 0

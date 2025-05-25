@@ -1563,6 +1563,12 @@ namespace Dreamtides.Schema
         public bool IsCurrentTurn { get; set; }
 
         /// <summary>
+        /// Will this player win the game in their next judgment phase?
+        /// </summary>
+        [JsonProperty("isVictoryImminent", Required = Required.Always)]
+        public bool IsVictoryImminent { get; set; }
+
+        /// <summary>
         /// Energy produced by this player at the start of the current turn
         /// </summary>
         [JsonProperty("producedEnergy", Required = Required.Always)]

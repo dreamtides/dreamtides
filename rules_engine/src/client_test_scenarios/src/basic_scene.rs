@@ -30,6 +30,7 @@ pub fn create(id: BattleId) -> BattleView {
             produced_energy: Energy(2),
             total_spark: Spark(0),
             is_current_turn: true,
+            is_victory_imminent: false,
         },
         enemy: PlayerView {
             score: Points(0),
@@ -38,6 +39,7 @@ pub fn create(id: BattleId) -> BattleView {
             produced_energy: Energy(2),
             total_spark: Spark(0),
             is_current_turn: false,
+            is_victory_imminent: false,
         },
         cards: [
             cards_in_position(Position::InHand(DisplayPlayer::User), 5, 5),

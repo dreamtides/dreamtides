@@ -13,7 +13,7 @@ use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use battle_state::battle_player::battle_player_state::BattlePlayerState;
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::display_color;
-use core_data::numerics::Energy;
+use core_data::numerics::{Energy, Points};
 use core_data::types::PlayerName;
 use display_data::battle_view::{
     BattlePreviewView, BattleView, ButtonView, InterfaceView, PlayerPreviewView, PlayerView,
@@ -97,6 +97,7 @@ fn player_view(battle: &BattleState, name: PlayerName, player: &BattlePlayerStat
         produced_energy: player.produced_energy,
         total_spark: player_properties::spark_total(battle, name),
         is_current_turn: battle.turn.active_player == name,
+        is_victory_imminent: player.points >= Points(15),
     }
 }
 
