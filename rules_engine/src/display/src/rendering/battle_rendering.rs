@@ -11,7 +11,7 @@ use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::card_id::CardIdType;
 use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use battle_state::battle_player::battle_player_state::BattlePlayerState;
-use battle_state::prompt_types::prompt_data::{PromptChoiceLabel, PromptType};
+use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::display_color;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
@@ -22,12 +22,11 @@ use display_data::command::{ArrowStyle, Command, DisplayArrow, GameMessageType, 
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify};
 use masonry::flex_style::FlexStyle;
 use tracing_macros::panic_with;
-use ui_components::icon;
 
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
 use crate::panels::panel_rendering;
-use crate::rendering::card_rendering;
+use crate::rendering::{card_rendering, labels};
 
 static CURRENT_PANEL_ADDRESS: LazyLock<Mutex<Option<PanelAddress>>> =
     LazyLock::new(|| Mutex::new(None));
@@ -167,7 +166,7 @@ fn primary_action_button(
             panic_with!("Expected prompt for SelectPromptChoice action", battle);
         };
         return Some(ButtonView {
-            label: prompt_choice_label(choices[0].label),
+            label: labels::choice_label(choices[0].label),
             action: Some(BattleAction::SelectPromptChoice(0).into()),
         });
     }
@@ -212,7 +211,7 @@ fn secondary_action_button(
         && choices.len() > 1
     {
         Some(ButtonView {
-            label: prompt_choice_label(choices[1].label),
+            label: labels::choice_label(choices[1].label),
             action: Some(BattleAction::SelectPromptChoice(1).into()),
         })
     } else {
@@ -270,13 +269,6 @@ fn decrement_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<B
     }
 
     None
-}
-
-fn prompt_choice_label(label: PromptChoiceLabel) -> String {
-    match label {
-        PromptChoiceLabel::PayEnergy(energy) => format!("Spend {}{}", energy, icon::ENERGY),
-        PromptChoiceLabel::Decline => "Decline".to_string(),
-    }
 }
 
 fn battle_preview(builder: &ResponseBuilder, battle: &BattleState) -> Option<BattlePreviewView> {

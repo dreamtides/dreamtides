@@ -45,7 +45,7 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
             select_stack_card_target::on_stack(battle, player, stack_card_id);
         }
         BattleAction::SelectPromptChoice(choice_index) => {
-            select_choice_prompt_at_index::select(battle, choice_index);
+            select_choice_prompt_at_index::select(battle, player, choice_index);
         }
         BattleAction::SelectEnergyAdditionalCost(cost) => {
             select_additional_costs::energy_cost(battle, player, cost);

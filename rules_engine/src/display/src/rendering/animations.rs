@@ -3,11 +3,12 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardIdType, StackCardId};
 use core_data::display_types::Milliseconds;
 use display_data::command::{
-    Command, DisplayDreamwellActivationCommand, DisplayJudgmentCommand, GameMessageType,
+    Command, DisplayDreamwellActivationCommand, DisplayEnemyMessageCommand, DisplayJudgmentCommand,
+    GameMessageType,
 };
 
 use crate::core::response_builder::ResponseBuilder;
-use crate::rendering::apply_card_fx;
+use crate::rendering::{apply_card_fx, labels};
 
 pub fn render(
     builder: &mut ResponseBuilder,
@@ -54,6 +55,14 @@ pub fn render(
         BattleAnimation::SelectStackCardTargets { .. } => {}
         BattleAnimation::ApplyEffect { source, targets } => {
             apply_card_fx::apply(builder, snapshot, *source, targets);
+        }
+        BattleAnimation::MakeChoice { player, choice } => {
+            if *player != builder.display_for_player() {
+                builder.push(Command::DisplayEnemyMessage(DisplayEnemyMessageCommand {
+                    message: labels::choice_label(*choice),
+                    show_duration: Milliseconds::new(2000),
+                }));
+            }
         }
     }
 }
