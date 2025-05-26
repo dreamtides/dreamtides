@@ -1,5 +1,6 @@
 use std::sync::{LazyLock, Mutex};
 
+use action_data::battle_display_action::BattleDisplayAction;
 use action_data::game_action_data::GameAction;
 use action_data::panel_address::PanelAddress;
 use battle_queries::battle_player_queries::player_properties;
@@ -25,6 +26,7 @@ use tracing_macros::panic_with;
 
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
+use crate::display_actions::display_state;
 use crate::panels::panel_rendering;
 use crate::rendering::{card_rendering, labels, outcome_simulation};
 
@@ -33,6 +35,7 @@ static CURRENT_PANEL_ADDRESS: LazyLock<Mutex<Option<PanelAddress>>> =
 
 pub fn run(builder: &mut ResponseBuilder, battle: &BattleState) {
     builder.push_battle_view(battle_view(builder, battle));
+    update_display_state(battle);
 
     if let BattleStatus::GameOver { winner } = battle.status {
         builder.push(Command::DisplayGameMessage(
@@ -87,6 +90,18 @@ pub fn open_panel(address: PanelAddress) {
 pub fn close_current_panel() {
     let mut current_panel_address = CURRENT_PANEL_ADDRESS.lock().unwrap();
     *current_panel_address = None;
+}
+
+fn update_display_state(battle: &BattleState) {
+    // Clear energy selection when no energy prompt is active
+    if battle
+        .prompt
+        .as_ref()
+        .map(|p| &p.prompt_type)
+        .is_none_or(|pt| !matches!(pt, PromptType::ChooseEnergyValue { .. }))
+    {
+        display_state::clear_selected_energy_additional_cost();
+    }
 }
 
 fn player_view(battle: &BattleState, name: PlayerName, player: &BattlePlayerState) -> PlayerView {
@@ -175,13 +190,15 @@ fn primary_action_button(
 
     if let Some(prompt) = battle.prompt.as_ref()
         && prompt.player == builder.act_for_player()
-        && let PromptType::ChooseEnergyValue { current, .. } = &prompt.prompt_type
-        && legal_actions.contains(BattleAction::SelectEnergyAdditionalCost(*current))
+        && let PromptType::ChooseEnergyValue { minimum, .. } = &prompt.prompt_type
     {
-        return Some(ButtonView {
-            label: format!("Spend {}\u{f7e4}", current),
-            action: Some(BattleAction::SelectEnergyAdditionalCost(*current).into()),
-        });
+        let current = display_state::get_selected_energy_additional_cost().unwrap_or(*minimum);
+        if legal_actions.contains(BattleAction::SelectEnergyAdditionalCost(current)) {
+            return Some(ButtonView {
+                label: format!("Spend {}\u{f7e4}", current),
+                action: Some(BattleAction::SelectEnergyAdditionalCost(current).into()),
+            });
+        }
     }
 
     if legal_actions.contains(BattleAction::PassPriority) {
@@ -240,12 +257,16 @@ pub fn create_flex_style() -> FlexStyle {
 fn increment_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<ButtonView> {
     if let Some(prompt) = battle.prompt.as_ref()
         && prompt.player == builder.act_for_player()
-        && let PromptType::ChooseEnergyValue { current, maximum, .. } = &prompt.prompt_type
+        && let PromptType::ChooseEnergyValue { minimum, maximum } = &prompt.prompt_type
     {
+        let current = display_state::get_selected_energy_additional_cost().unwrap_or(*minimum);
         return Some(ButtonView {
             label: "+1\u{f7e4}".to_string(),
-            action: if *current + Energy(1) <= *maximum {
-                Some(BattleAction::SetSelectedEnergyAdditionalCost(*current + Energy(1)).into())
+            action: if current + Energy(1) <= *maximum {
+                Some(
+                    BattleDisplayAction::SetSelectedEnergyAdditionalCost(current + Energy(1))
+                        .into(),
+                )
             } else {
                 None
             },
@@ -258,12 +279,16 @@ fn increment_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<B
 fn decrement_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<ButtonView> {
     if let Some(prompt) = battle.prompt.as_ref()
         && prompt.player == builder.act_for_player()
-        && let PromptType::ChooseEnergyValue { current, minimum, .. } = &prompt.prompt_type
+        && let PromptType::ChooseEnergyValue { minimum, .. } = &prompt.prompt_type
     {
+        let current = display_state::get_selected_energy_additional_cost().unwrap_or(*minimum);
         return Some(ButtonView {
             label: "-1\u{f7e4}".to_string(),
-            action: if *current > Energy(0) && *current - Energy(1) >= *minimum {
-                Some(BattleAction::SetSelectedEnergyAdditionalCost(*current - Energy(1)).into())
+            action: if current > Energy(0) && current - Energy(1) >= *minimum {
+                Some(
+                    BattleDisplayAction::SetSelectedEnergyAdditionalCost(current - Energy(1))
+                        .into(),
+                )
             } else {
                 None
             },
@@ -276,10 +301,11 @@ fn decrement_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<B
 fn battle_preview(builder: &ResponseBuilder, battle: &BattleState) -> Option<BattlePreviewView> {
     if let Some(prompt) = battle.prompt.as_ref()
         && prompt.player == builder.display_for_player()
-        && let PromptType::ChooseEnergyValue { current, .. } = &prompt.prompt_type
+        && let PromptType::ChooseEnergyValue { minimum, .. } = &prompt.prompt_type
     {
+        let current = display_state::get_selected_energy_additional_cost().unwrap_or(*minimum);
         let player = battle.players.player(builder.display_for_player());
-        let remaining_energy = player.current_energy - *current;
+        let remaining_energy = player.current_energy - current;
 
         Some(BattlePreviewView {
             user: PlayerPreviewView { energy: Some(remaining_energy), ..Default::default() },

@@ -38,11 +38,7 @@ fn create_prompt_for_cost(
         Cost::SpendOneOrMoreEnergy => {
             let energy = battle.players.player(player).current_energy;
             (
-                PromptType::ChooseEnergyValue {
-                    minimum: Energy(1),
-                    current: Energy(1),
-                    maximum: energy,
-                },
+                PromptType::ChooseEnergyValue { minimum: Energy(1), maximum: energy },
                 PromptContext::PickAmountOfEnergyToSpend,
             )
         }

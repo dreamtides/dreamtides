@@ -83,8 +83,7 @@ impl LegalActions {
                     false
                 }
             }
-            BattleAction::SelectEnergyAdditionalCost(energy)
-            | BattleAction::SetSelectedEnergyAdditionalCost(energy) => {
+            BattleAction::SelectEnergyAdditionalCost(energy) => {
                 if let LegalActions::SelectEnergyValuePrompt { minimum, maximum } = self {
                     energy >= *minimum && energy <= *maximum
                 } else {

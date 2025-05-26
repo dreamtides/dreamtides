@@ -39,3 +39,9 @@ impl From<BattleAction> for GameAction {
         GameAction::BattleAction(action)
     }
 }
+
+impl From<BattleDisplayAction> for GameAction {
+    fn from(action: BattleDisplayAction) -> Self {
+        GameAction::BattleDisplayAction(action)
+    }
+}

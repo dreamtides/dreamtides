@@ -681,8 +681,6 @@ namespace Dreamtides.Schema
     ///
     /// Pick an amount of energy to pay as an additional cost to play a card.
     ///
-    /// Sets the selected amount of energy to pay as an additional cost to play a card.
-    ///
     /// Sets the position of a card in a card order selector.
     /// </summary>
     public partial class BattleActionClass
@@ -704,9 +702,6 @@ namespace Dreamtides.Schema
 
         [JsonProperty("selectEnergyAdditionalCost", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectEnergyAdditionalCost { get; set; }
-
-        [JsonProperty("setSelectedEnergyAdditionalCost", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? SetSelectedEnergyAdditionalCost { get; set; }
 
         [JsonProperty("selectCardOrder", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SelectCardOrder SelectCardOrder { get; set; }
@@ -743,10 +738,16 @@ namespace Dreamtides.Schema
         public CardOrderSelectionTarget Target { get; set; }
     }
 
+    /// <summary>
+    /// Sets the selected amount of energy to pay as an additional cost to play a card.
+    /// </summary>
     public partial class BattleDisplayActionClass
     {
-        [JsonProperty("browseCards", Required = Required.Always)]
-        public CardBrowserType BrowseCards { get; set; }
+        [JsonProperty("browseCards", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public CardBrowserType? BrowseCards { get; set; }
+
+        [JsonProperty("setSelectedEnergyAdditionalCost", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SetSelectedEnergyAdditionalCost { get; set; }
     }
 
     public partial class DebugActionClass

@@ -1,3 +1,4 @@
+use core_data::numerics::Energy;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -6,6 +7,10 @@ use serde::{Deserialize, Serialize};
 pub enum BattleDisplayAction {
     BrowseCards(CardBrowserType),
     CloseCardBrowser,
+
+    /// Sets the selected amount of energy to pay as an additional cost to play
+    /// a card.
+    SetSelectedEnergyAdditionalCost(Energy),
 }
 
 #[derive(

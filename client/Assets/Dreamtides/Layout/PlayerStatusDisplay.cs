@@ -30,7 +30,6 @@ namespace Dreamtides.Layout
 
     public void UpdatePlayerView(PlayerView playerView, bool animate)
     {
-      Debug.Log($"UpdatePlayerView: {playerView.IsVictoryImminent}");
       SetEnergy(playerView.Energy, playerView.ProducedEnergy, animate);
       SetTotalSpark(playerView.TotalSpark, animate);
       SetScore(playerView.Score, animate);

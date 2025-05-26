@@ -95,6 +95,7 @@ fn perform_battle_display_action(
     let commands = match action {
         BattleDisplayAction::BrowseCards(card_browser) => browse_cards(card_browser),
         BattleDisplayAction::CloseCardBrowser => close_card_browser(),
+        _ => todo!("Not implemented: {:?}", action),
     };
 
     PerformActionResponse { metadata, commands }

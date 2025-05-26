@@ -1,7 +1,6 @@
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
 use tracing::instrument;
 use tracing_macros::{battle_trace, panic_with};
@@ -49,14 +48,6 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
         }
         BattleAction::SelectEnergyAdditionalCost(cost) => {
             select_additional_costs::energy_cost(battle, player, cost);
-        }
-        BattleAction::SetSelectedEnergyAdditionalCost(n) => {
-            let Some(PromptType::ChooseEnergyValue { current, .. }) =
-                battle.prompt.as_mut().map(|p| &mut p.prompt_type)
-            else {
-                panic_with!("Expected a ChooseNumber prompt", battle);
-            };
-            *current = n;
         }
         _ => {
             todo!("Implement {:?}", action);

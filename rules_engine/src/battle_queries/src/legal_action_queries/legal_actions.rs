@@ -31,7 +31,7 @@ pub fn compute(battle: &BattleState, player: PlayerName) -> LegalActions {
             PromptType::Choose { choices } => {
                 LegalActions::SelectPromptChoicePrompt { choice_count: choices.len() }
             }
-            PromptType::ChooseEnergyValue { minimum, maximum, .. } => {
+            PromptType::ChooseEnergyValue { minimum, maximum } => {
                 LegalActions::SelectEnergyValuePrompt { minimum: *minimum, maximum: *maximum }
             }
         };

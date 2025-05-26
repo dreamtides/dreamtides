@@ -31,9 +31,6 @@ pub enum BattleAction {
     SelectPromptChoice(usize),
     /// Pick an amount of energy to pay as an additional cost to play a card.
     SelectEnergyAdditionalCost(Energy),
-    /// Sets the selected amount of energy to pay as an additional cost to play
-    /// a card.
-    SetSelectedEnergyAdditionalCost(Energy),
     /// Sets the position of a card in a card order selector.
     SelectCardOrder(SelectCardOrder),
     /// Toggle the visibility of the card order selector
@@ -93,7 +90,6 @@ impl BattleAction {
             }
             BattleAction::SelectPromptChoice(index) => format!("SPC{:?}", index),
             BattleAction::SelectEnergyAdditionalCost(energy) => format!("SEAC{}", energy.0),
-            BattleAction::SetSelectedEnergyAdditionalCost(energy) => format!("SSEAC{}", energy.0),
             BattleAction::SelectCardOrder(order) => {
                 let target = match order.target {
                     CardOrderSelectionTarget::Deck => "D",

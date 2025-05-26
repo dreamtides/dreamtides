@@ -34,7 +34,7 @@ pub enum PromptType {
     ChooseCharacter { valid: CardSet<CharacterId> },
     ChooseStackCard { valid: CardSet<StackCardId> },
     Choose { choices: Vec<PromptChoice> },
-    ChooseEnergyValue { minimum: Energy, current: Energy, maximum: Energy },
+    ChooseEnergyValue { minimum: Energy, maximum: Energy },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

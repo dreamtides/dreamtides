@@ -216,12 +216,8 @@ fn format_prompt_choices(prompt: &PromptType) -> Vec<String> {
         PromptType::Choose { choices } => {
             choices.iter().map(|choice| format!("{:?}", choice)).collect()
         }
-        PromptType::ChooseEnergyValue { minimum, current, maximum } => {
-            vec![
-                format!("min {}", minimum),
-                format!("current {}", current),
-                format!("max {}", maximum),
-            ]
+        PromptType::ChooseEnergyValue { minimum, maximum } => {
+            vec![format!("min {}", minimum), format!("max {}", maximum)]
         }
     }
 }
