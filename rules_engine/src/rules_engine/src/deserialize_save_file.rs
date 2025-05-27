@@ -1,4 +1,5 @@
 use battle_mutations::actions::apply_battle_action;
+use battle_queries::legal_action_queries::legal_actions;
 use battle_state::battle::battle_state::BattleState;
 use core_data::identifiers::QuestId;
 use core_data::types::PlayerName;
@@ -7,6 +8,8 @@ use game_creation::new_battle;
 use tracing::{info, subscriber};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::EnvFilter;
+
+use crate::handle_battle_action::should_auto_execute_action;
 
 /// Returns a deserialized [BattleState] for the battle in this save
 /// file, if one is present.
@@ -41,24 +44,14 @@ fn get_battle_impl(file: &SaveFile, undo: Option<PlayerName>) -> Option<(BattleS
                     file.player_types.two.clone(),
                 );
 
-                // Find the last action by the undo player if specified
-                let replay_limit = match undo {
-                    Some(player) => file
-                        .actions
-                        .iter()
-                        .enumerate()
-                        .filter(|(_, action)| action.player == player)
-                        .map(|(index, _)| index)
-                        .last(),
-                    None => None,
-                };
-
-                for (index, history_action) in file.actions.iter().enumerate() {
-                    // Skip the last action by the undo player
-                    if replay_limit == Some(index) {
-                        break;
+                let mut last_non_auto_battle = None;
+                for history_action in file.actions.iter() {
+                    let is_undo_player = undo == Some(history_action.player);
+                    let legal = legal_actions::compute(&battle, history_action.player);
+                    let auto = should_auto_execute_action(&legal);
+                    if is_undo_player && auto != Some(history_action.action) {
+                        last_non_auto_battle = Some((battle.clone(), quest_id));
                     }
-
                     apply_battle_action::execute(
                         &mut battle,
                         history_action.player,
@@ -66,7 +59,11 @@ fn get_battle_impl(file: &SaveFile, undo: Option<PlayerName>) -> Option<(BattleS
                     );
                 }
 
-                Some((battle, quest_id))
+                if undo.is_some() {
+                    last_non_auto_battle
+                } else {
+                    Some((battle, quest_id))
+                }
             })
         }
     }

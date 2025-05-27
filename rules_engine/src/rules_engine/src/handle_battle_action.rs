@@ -80,7 +80,7 @@ pub fn append_update(user_id: UserId, update: CommandSequence) {
     updates.entry(user_id).or_default().push(update);
 }
 
-fn should_auto_execute_action(legal_actions: &LegalActions) -> Option<BattleAction> {
+pub fn should_auto_execute_action(legal_actions: &LegalActions) -> Option<BattleAction> {
     if legal_actions.len() == 1 {
         match legal_actions {
             LegalActions::Standard { .. } if legal_actions.contains(BattleAction::PassPriority) => {
