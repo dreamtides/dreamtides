@@ -1,6 +1,5 @@
 use action_data::panel_address::PanelAddress;
 use battle_state::battle::battle_state::BattleState;
-use masonry::flex_node::FlexNode;
 use ui_components::component::Component;
 
 use crate::core::response_builder::ResponseBuilder;
@@ -13,20 +12,22 @@ pub fn render_panel(
     address: PanelAddress,
     builder: &ResponseBuilder,
     battle: &BattleState,
-) -> Option<FlexNode> {
+) -> Box<dyn Component> {
     match address {
         PanelAddress::Developer => {
-            DeveloperPanel::builder().user_player(builder.display_for_player()).build().flex_node()
+            Box::new(DeveloperPanel::builder().user_player(builder.display_for_player()).build())
         }
-        PanelAddress::SetOpponentAgent => SetOpponentAgentPanel::builder()
-            .user_player(builder.display_for_player())
-            .battle(battle)
-            .build()
-            .flex_node(),
-        PanelAddress::AddCardToHand => AddCardToHandPanel::builder()
-            .user_player(builder.display_for_player())
-            .battle(battle)
-            .build()
-            .flex_node(),
+        PanelAddress::SetOpponentAgent => Box::new(
+            SetOpponentAgentPanel::builder()
+                .user_player(builder.display_for_player())
+                .battle(battle)
+                .build(),
+        ),
+        PanelAddress::AddCardToHand => Box::new(
+            AddCardToHandPanel::builder()
+                .user_player(builder.display_for_player())
+                .battle(battle)
+                .build(),
+        ),
     }
 }

@@ -10,6 +10,7 @@ use masonry::flex_style::{FlexStyle, TextShadow};
 pub enum Typography {
     StackTrace,
     ButtonLabel,
+    InterfaceMessage,
     Body2,
 }
 
@@ -19,7 +20,7 @@ pub fn apply(typography: &Typography, style: &mut FlexStyle) {
         Typography::StackTrace => {
             TypographyOptions::builder().color(display_color::WHITE).font_size(6).build()
         }
-        Typography::ButtonLabel => {
+        Typography::ButtonLabel | Typography::InterfaceMessage => {
             TypographyOptions::builder().color(display_color::WHITE).font_size(8).build()
         }
         Typography::Body2 => {

@@ -13,22 +13,22 @@ use battle_state::battle::card_id::CardIdType;
 use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use battle_state::battle_player::battle_player_state::BattlePlayerState;
 use battle_state::prompt_types::prompt_data::PromptType;
-use core_data::display_color;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use display_data::battle_view::{
     BattlePreviewView, BattleView, ButtonView, InterfaceView, PlayerPreviewView, PlayerView,
 };
 use display_data::command::{ArrowStyle, Command, DisplayArrow, GameMessageType, GameObjectId};
-use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify};
-use masonry::flex_style::FlexStyle;
+use masonry::flex_node::FlexNode;
 use tracing_macros::panic_with;
+use ui_components::component::Component;
 
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
-use crate::display_actions::display_state;
+use crate::display_actions::{display_state, outcome_simulation};
 use crate::panels::panel_rendering;
-use crate::rendering::{card_rendering, labels, outcome_simulation};
+use crate::rendering::interface_message::{AnchorPosition, InterfaceMessage};
+use crate::rendering::{card_rendering, labels};
 
 static CURRENT_PANEL_ADDRESS: LazyLock<Mutex<Option<PanelAddress>>> =
     LazyLock::new(|| Mutex::new(None));
@@ -148,8 +148,9 @@ fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> InterfaceV
     }
 
     let current_panel_address = *CURRENT_PANEL_ADDRESS.lock().unwrap();
-    let screen_overlay = current_panel_address
+    let panel = current_panel_address
         .and_then(|address| panel_rendering::render_panel(address, builder, battle));
+    let screen_overlay = screen_overlay_stack(vec![interface_message(), panel]);
     let legal_actions = legal_actions::compute(battle, builder.act_for_player());
 
     InterfaceView {
@@ -238,22 +239,6 @@ fn secondary_action_button(
     }
 }
 
-pub fn create_flex_style() -> FlexStyle {
-    FlexStyle::builder()
-        .padding((8, 12))
-        .margin(4)
-        .flex_direction(FlexDirection::Row)
-        .flex_basis(12)
-        .flex_grow(1)
-        .flex_shrink(1)
-        .align_items(FlexAlign::Center)
-        .justify_content(FlexJustify::Center)
-        .border_radius(4)
-        .border_width(1)
-        .border_color(display_color::RED_100)
-        .build()
-}
-
 fn increment_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<ButtonView> {
     if let Some(prompt) = battle.prompt.as_ref()
         && prompt.player == builder.act_for_player()
@@ -295,6 +280,18 @@ fn decrement_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<B
         });
     }
 
+    None
+}
+
+fn interface_message() -> Option<FlexNode> {
+    InterfaceMessage::builder()
+        .text("Hello, world")
+        .anchor_position(AnchorPosition::Top)
+        .build()
+        .flex_node()
+}
+
+fn screen_overlay_stack(items: Vec<Option<FlexNode>>) -> Option<FlexNode> {
     None
 }
 
