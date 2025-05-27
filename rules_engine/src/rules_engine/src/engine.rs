@@ -12,7 +12,7 @@ use core_data::identifiers::{BattleId, QuestId, UserId};
 use database::save_file::SaveFile;
 use database::sqlite_database::{self, Database};
 use display::display_actions::apply_battle_display_action;
-use display::rendering::{battle_rendering, renderer};
+use display::rendering::{interface_rendering, renderer};
 use display_data::command::CommandSequence;
 use display_data::request_data::{ConnectRequest, ConnectResponse, PerformActionRequest};
 use game_creation::new_battle;
@@ -300,14 +300,14 @@ fn handle_request_action(
             );
         }
         GameAction::OpenPanel(address) => {
-            battle_rendering::open_panel(address);
+            interface_rendering::open_panel(address);
             handle_battle_action::append_update(
                 user_id,
                 renderer::connect(&*battle, user_id, true),
             );
         }
         GameAction::CloseCurrentPanel => {
-            battle_rendering::close_current_panel();
+            interface_rendering::close_current_panel();
             handle_battle_action::append_update(
                 user_id,
                 renderer::connect(&*battle, user_id, true),
