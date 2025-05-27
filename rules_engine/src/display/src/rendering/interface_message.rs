@@ -1,6 +1,6 @@
 use bon::Builder;
 use core_data::display_color;
-use masonry::dimension::FlexInsets;
+use masonry::dimension::{FlexInsets, Percent};
 use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition, TextAlign};
 use masonry::flex_style::FlexStyle;
 use ui_components::box_component::BoxComponent;
@@ -47,7 +47,7 @@ impl Component for InterfaceMessage {
                                 .background_color(display_color::BLACK_ALPHA_95)
                                 .border_radius(4)
                                 .padding(4)
-                                .max_width(200)
+                                .max_width(Percent(80))
                                 .align_items(FlexAlign::Center)
                                 .justify_content(FlexJustify::Center)
                                 .build(),
@@ -55,7 +55,7 @@ impl Component for InterfaceMessage {
                         .child(
                             TextComponent::builder()
                                 .text(self.text)
-                                .typography(Typography::ButtonLabel)
+                                .typography(Typography::InterfaceMessage)
                                 .text_align(TextAlign::MiddleCenter)
                                 .build(),
                         )

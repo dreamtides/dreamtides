@@ -109,3 +109,14 @@ pub struct FlexInsets {
     #[builder(into)]
     pub left: Option<Dimension>,
 }
+
+impl FlexInsets {
+    pub fn all(value: i32) -> Self {
+        Self {
+            top: Some(value.into()),
+            right: Some(value.into()),
+            bottom: Some(value.into()),
+            left: Some(value.into()),
+        }
+    }
+}

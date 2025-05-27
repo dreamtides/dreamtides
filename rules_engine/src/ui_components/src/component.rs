@@ -1,5 +1,7 @@
 use masonry::flex_node::FlexNode;
 
+use crate::wrapper::{self, WrapperComponent};
+
 /// A component is any reusable piece of UI.
 ///
 /// Typically this is a struct that has one or more properties settable via a
@@ -10,8 +12,17 @@ use masonry::flex_node::FlexNode;
 pub trait Component: Clone {
     fn render(self) -> Option<impl Component>;
 
+    /// Renders this component to a [FlexNode].
     fn flex_node(&self) -> Option<FlexNode> {
         self.clone().render().and_then(|c| c.flex_node())
+    }
+
+    /// Erases the type of this component.
+    ///
+    /// If you want to interact with a set of components in a generic way, you
+    /// can wrap() them to provide a uniform static type for all components.
+    fn wrap(self) -> Option<WrapperComponent> {
+        wrapper::wrap(self)
     }
 }
 

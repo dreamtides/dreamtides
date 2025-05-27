@@ -19,9 +19,13 @@ use display_data::battle_view::{
     BattlePreviewView, BattleView, ButtonView, InterfaceView, PlayerPreviewView, PlayerView,
 };
 use display_data::command::{ArrowStyle, Command, DisplayArrow, GameMessageType, GameObjectId};
-use masonry::flex_node::FlexNode;
+use masonry::dimension::FlexInsets;
+use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition};
+use masonry::flex_style::FlexStyle;
 use tracing_macros::panic_with;
+use ui_components::box_component::BoxComponent;
 use ui_components::component::Component;
+use ui_components::icon;
 
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
@@ -148,9 +152,23 @@ fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> InterfaceV
     }
 
     let current_panel_address = *CURRENT_PANEL_ADDRESS.lock().unwrap();
-    let panel = current_panel_address
-        .map(|address| panel_rendering::render_panel(address, builder, battle));
-    let screen_overlay = screen_overlay_stack(vec![interface_message(), panel]);
+    let screen_overlay = BoxComponent::builder()
+        .name("Screen Overlay")
+        .style(
+            FlexStyle::builder()
+                .position(FlexPosition::Absolute)
+                .inset(FlexInsets::all(0))
+                .align_items(FlexAlign::Center)
+                .justify_content(FlexJustify::Center)
+                .build(),
+        )
+        .child(interface_message())
+        .child(
+            current_panel_address
+                .map(|address| panel_rendering::render_panel(address, builder, battle)),
+        )
+        .build()
+        .flex_node();
     let legal_actions = legal_actions::compute(battle, builder.act_for_player());
 
     InterfaceView {
@@ -283,16 +301,11 @@ fn decrement_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<B
     None
 }
 
-fn interface_message() -> Option<FlexNode> {
+fn interface_message() -> impl Component {
     InterfaceMessage::builder()
-        .text("Hello, world")
+        .text(format!("Note: cards drawn in excess of 10 become {} instead.", icon::ENERGY))
         .anchor_position(AnchorPosition::Top)
         .build()
-        .flex_node()
-}
-
-fn screen_overlay_stack(items: Vec<Option<FlexNode>>) -> Option<FlexNode> {
-    None
 }
 
 fn battle_preview(builder: &ResponseBuilder, battle: &BattleState) -> Option<BattlePreviewView> {
