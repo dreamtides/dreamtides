@@ -1,6 +1,8 @@
 use action_data::panel_address::PanelAddress;
 use battle_state::battle::battle_state::BattleState;
+use ui_components::box_component::BoxComponent;
 use ui_components::component::Component;
+use ui_components::wrapper;
 
 use crate::core::response_builder::ResponseBuilder;
 use crate::panels::add_card_to_hand_panel::AddCardToHandPanel;
@@ -12,18 +14,18 @@ pub fn render_panel(
     address: PanelAddress,
     builder: &ResponseBuilder,
     battle: &BattleState,
-) -> Box<dyn Component> {
+) -> impl Component {
     match address {
-        PanelAddress::Developer => {
-            Box::new(DeveloperPanel::builder().user_player(builder.display_for_player()).build())
-        }
-        PanelAddress::SetOpponentAgent => Box::new(
+        PanelAddress::Developer => wrapper::wrap(
+            DeveloperPanel::builder().user_player(builder.display_for_player()).build(),
+        ),
+        PanelAddress::SetOpponentAgent => wrapper::wrap(
             SetOpponentAgentPanel::builder()
                 .user_player(builder.display_for_player())
                 .battle(battle)
                 .build(),
         ),
-        PanelAddress::AddCardToHand => Box::new(
+        PanelAddress::AddCardToHand => wrapper::wrap(
             AddCardToHandPanel::builder()
                 .user_player(builder.display_for_player())
                 .battle(battle)

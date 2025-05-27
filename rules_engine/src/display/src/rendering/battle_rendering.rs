@@ -149,7 +149,7 @@ fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> InterfaceV
 
     let current_panel_address = *CURRENT_PANEL_ADDRESS.lock().unwrap();
     let panel = current_panel_address
-        .and_then(|address| panel_rendering::render_panel(address, builder, battle));
+        .map(|address| panel_rendering::render_panel(address, builder, battle));
     let screen_overlay = screen_overlay_stack(vec![interface_message(), panel]);
     let legal_actions = legal_actions::compute(battle, builder.act_for_player());
 
