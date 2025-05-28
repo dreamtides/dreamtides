@@ -13,6 +13,12 @@ pub fn execute(action: BattleDisplayAction) {
         BattleDisplayAction::SetSelectedEnergyAdditionalCost(energy) => {
             set_selected_energy_additional_cost(energy);
         }
+        BattleDisplayAction::OpenPanel(address) => {
+            display_state::set_current_panel_address(Some(address));
+        }
+        BattleDisplayAction::CloseCurrentPanel => {
+            display_state::set_current_panel_address(None);
+        }
     }
 }
 

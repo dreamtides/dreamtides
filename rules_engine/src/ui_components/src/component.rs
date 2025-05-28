@@ -34,6 +34,14 @@ impl<T: Component> Component for Option<T> {
             None
         }
     }
+
+    fn flex_node(&self) -> Option<FlexNode> {
+        if let Some(c) = self {
+            c.flex_node()
+        } else {
+            None
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -41,6 +49,6 @@ pub struct NodeComponent;
 
 impl Component for NodeComponent {
     fn render(self) -> Option<impl Component> {
-        Some(self)
+        None::<NodeComponent>
     }
 }

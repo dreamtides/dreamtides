@@ -25,7 +25,7 @@ pub struct Named(pub String);
 
 pub struct BoxComponentBuilder<T> {
     name: T,
-    children: Vec<FlexNode>,
+    pub children: Vec<FlexNode>,
     event_handlers: Option<EventHandlers>,
     style: Option<FlexStyle>,
     hover_style: Option<FlexStyle>,

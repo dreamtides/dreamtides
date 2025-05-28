@@ -663,9 +663,6 @@ namespace Dreamtides.Schema
 
         [JsonProperty("undo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayerName? Undo { get; set; }
-
-        [JsonProperty("openPanel", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PanelAddress? OpenPanel { get; set; }
     }
 
     /// <summary>
@@ -740,6 +737,8 @@ namespace Dreamtides.Schema
 
     /// <summary>
     /// Sets the selected amount of energy to pay as an additional cost to play a card.
+    ///
+    /// Opens a panel based on its address.
     /// </summary>
     public partial class BattleDisplayActionClass
     {
@@ -748,6 +747,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("setSelectedEnergyAdditionalCost", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SetSelectedEnergyAdditionalCost { get; set; }
+
+        [JsonProperty("openPanel", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PanelAddress? OpenPanel { get; set; }
     }
 
     public partial class DebugActionClass
@@ -1722,9 +1724,6 @@ namespace Dreamtides.Schema
 
         [JsonProperty("undo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayerName? Undo { get; set; }
-
-        [JsonProperty("openPanel", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PanelAddress? OpenPanel { get; set; }
     }
 
     public partial class PerformActionResponse
@@ -1805,7 +1804,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum CardPrefab { Character, Dreamsign, Dreamwell, Enemy, Event, Token };
 
-    public enum GameActionEnum { CloseCurrentPanel };
+    public enum GameActionEnum { NoOp };
 
     /// <summary>
     /// Pass on taking actions in response to a card being played by the opponent, thus causing
@@ -1831,18 +1830,21 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum PlayerName { One, Two };
 
-    public enum BattleDisplayActionEnum { CloseCardBrowser };
+    /// <summary>
+    /// Closes the currently open panel.
+    /// </summary>
+    public enum BattleDisplayActionEnum { CloseCardBrowser, CloseCurrentPanel };
 
     public enum CardBrowserType { EnemyDeck, EnemyStatus, EnemyVoid, UserDeck, UserStatus, UserVoid };
-
-    public enum DebugActionEnum { ApplyTestScenarioAction, RestartBattle };
-
-    public enum GameAiEnum { AlwaysPanic, FirstAvailableAction, RandomAction };
 
     /// <summary>
     /// Identifies a window on screen containing UI elements
     /// </summary>
     public enum PanelAddress { AddCardToHand, Developer, SetOpponentAgent };
+
+    public enum DebugActionEnum { ApplyTestScenarioAction, RestartBattle };
+
+    public enum GameAiEnum { AlwaysPanic, FirstAvailableAction, RandomAction };
 
     public enum FlexAlign { Auto, Center, FlexEnd, FlexStart, Stretch };
 
@@ -2005,12 +2007,12 @@ namespace Dreamtides.Schema
                 BattleActionEnumConverter.Singleton,
                 BattleDisplayActionConverter.Singleton,
                 CardBrowserTypeConverter.Singleton,
+                PanelAddressConverter.Singleton,
                 BattleDisplayActionEnumConverter.Singleton,
                 DebugActionConverter.Singleton,
                 GameAiConverter.Singleton,
                 GameAiEnumConverter.Singleton,
                 DebugActionEnumConverter.Singleton,
-                PanelAddressConverter.Singleton,
                 GameActionEnumConverter.Singleton,
                 FlexAlignConverter.Singleton,
                 DimensionUnitConverter.Singleton,
@@ -2490,9 +2492,9 @@ namespace Dreamtides.Schema
                 case JsonToken.String:
                 case JsonToken.Date:
                     var stringValue = serializer.Deserialize<string>(reader);
-                    if (stringValue == "closeCurrentPanel")
+                    if (stringValue == "noOp")
                     {
-                        return new ActionUnion { Enum = GameActionEnum.CloseCurrentPanel };
+                        return new ActionUnion { Enum = GameActionEnum.NoOp };
                     }
                     break;
                 case JsonToken.StartObject:
@@ -2512,9 +2514,9 @@ namespace Dreamtides.Schema
             }
             if (value.Enum != null)
             {
-                if (value.Enum == GameActionEnum.CloseCurrentPanel)
+                if (value.Enum == GameActionEnum.NoOp)
                 {
-                    serializer.Serialize(writer, "closeCurrentPanel");
+                    serializer.Serialize(writer, "noOp");
                     return;
                 }
             }
@@ -2822,9 +2824,12 @@ namespace Dreamtides.Schema
                 case JsonToken.String:
                 case JsonToken.Date:
                     var stringValue = serializer.Deserialize<string>(reader);
-                    if (stringValue == "closeCardBrowser")
+                    switch (stringValue)
                     {
-                        return new BattleDisplayAction { Enum = BattleDisplayActionEnum.CloseCardBrowser };
+                        case "closeCardBrowser":
+                            return new BattleDisplayAction { Enum = BattleDisplayActionEnum.CloseCardBrowser };
+                        case "closeCurrentPanel":
+                            return new BattleDisplayAction { Enum = BattleDisplayActionEnum.CloseCurrentPanel };
                     }
                     break;
                 case JsonToken.StartObject:
@@ -2839,10 +2844,14 @@ namespace Dreamtides.Schema
             var value = (BattleDisplayAction)untypedValue;
             if (value.Enum != null)
             {
-                if (value.Enum == BattleDisplayActionEnum.CloseCardBrowser)
+                switch (value.Enum)
                 {
-                    serializer.Serialize(writer, "closeCardBrowser");
-                    return;
+                    case BattleDisplayActionEnum.CloseCardBrowser:
+                        serializer.Serialize(writer, "closeCardBrowser");
+                        return;
+                    case BattleDisplayActionEnum.CloseCurrentPanel:
+                        serializer.Serialize(writer, "closeCurrentPanel");
+                        return;
                 }
             }
             if (value.BattleDisplayActionClass != null)
@@ -2917,6 +2926,52 @@ namespace Dreamtides.Schema
         public static readonly CardBrowserTypeConverter Singleton = new CardBrowserTypeConverter();
     }
 
+    internal class PanelAddressConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(PanelAddress) || t == typeof(PanelAddress?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "addCardToHand":
+                    return PanelAddress.AddCardToHand;
+                case "developer":
+                    return PanelAddress.Developer;
+                case "setOpponentAgent":
+                    return PanelAddress.SetOpponentAgent;
+            }
+            throw new Exception("Cannot unmarshal type PanelAddress");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (PanelAddress)untypedValue;
+            switch (value)
+            {
+                case PanelAddress.AddCardToHand:
+                    serializer.Serialize(writer, "addCardToHand");
+                    return;
+                case PanelAddress.Developer:
+                    serializer.Serialize(writer, "developer");
+                    return;
+                case PanelAddress.SetOpponentAgent:
+                    serializer.Serialize(writer, "setOpponentAgent");
+                    return;
+            }
+            throw new Exception("Cannot marshal type PanelAddress");
+        }
+
+        public static readonly PanelAddressConverter Singleton = new PanelAddressConverter();
+    }
+
     internal class BattleDisplayActionEnumConverter : JsonConverter
     {
         public override bool CanConvert(Type t) => t == typeof(BattleDisplayActionEnum) || t == typeof(BattleDisplayActionEnum?);
@@ -2925,9 +2980,12 @@ namespace Dreamtides.Schema
         {
             if (reader.TokenType == JsonToken.Null) return null;
             var value = serializer.Deserialize<string>(reader);
-            if (value == "closeCardBrowser")
+            switch (value)
             {
-                return BattleDisplayActionEnum.CloseCardBrowser;
+                case "closeCardBrowser":
+                    return BattleDisplayActionEnum.CloseCardBrowser;
+                case "closeCurrentPanel":
+                    return BattleDisplayActionEnum.CloseCurrentPanel;
             }
             throw new Exception("Cannot unmarshal type BattleDisplayActionEnum");
         }
@@ -2940,10 +2998,14 @@ namespace Dreamtides.Schema
                 return;
             }
             var value = (BattleDisplayActionEnum)untypedValue;
-            if (value == BattleDisplayActionEnum.CloseCardBrowser)
+            switch (value)
             {
-                serializer.Serialize(writer, "closeCardBrowser");
-                return;
+                case BattleDisplayActionEnum.CloseCardBrowser:
+                    serializer.Serialize(writer, "closeCardBrowser");
+                    return;
+                case BattleDisplayActionEnum.CloseCurrentPanel:
+                    serializer.Serialize(writer, "closeCurrentPanel");
+                    return;
             }
             throw new Exception("Cannot marshal type BattleDisplayActionEnum");
         }
@@ -3147,52 +3209,6 @@ namespace Dreamtides.Schema
         public static readonly DebugActionEnumConverter Singleton = new DebugActionEnumConverter();
     }
 
-    internal class PanelAddressConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(PanelAddress) || t == typeof(PanelAddress?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "addCardToHand":
-                    return PanelAddress.AddCardToHand;
-                case "developer":
-                    return PanelAddress.Developer;
-                case "setOpponentAgent":
-                    return PanelAddress.SetOpponentAgent;
-            }
-            throw new Exception("Cannot unmarshal type PanelAddress");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (PanelAddress)untypedValue;
-            switch (value)
-            {
-                case PanelAddress.AddCardToHand:
-                    serializer.Serialize(writer, "addCardToHand");
-                    return;
-                case PanelAddress.Developer:
-                    serializer.Serialize(writer, "developer");
-                    return;
-                case PanelAddress.SetOpponentAgent:
-                    serializer.Serialize(writer, "setOpponentAgent");
-                    return;
-            }
-            throw new Exception("Cannot marshal type PanelAddress");
-        }
-
-        public static readonly PanelAddressConverter Singleton = new PanelAddressConverter();
-    }
-
     internal class GameActionEnumConverter : JsonConverter
     {
         public override bool CanConvert(Type t) => t == typeof(GameActionEnum) || t == typeof(GameActionEnum?);
@@ -3201,9 +3217,9 @@ namespace Dreamtides.Schema
         {
             if (reader.TokenType == JsonToken.Null) return null;
             var value = serializer.Deserialize<string>(reader);
-            if (value == "closeCurrentPanel")
+            if (value == "noOp")
             {
-                return GameActionEnum.CloseCurrentPanel;
+                return GameActionEnum.NoOp;
             }
             throw new Exception("Cannot unmarshal type GameActionEnum");
         }
@@ -3216,9 +3232,9 @@ namespace Dreamtides.Schema
                 return;
             }
             var value = (GameActionEnum)untypedValue;
-            if (value == GameActionEnum.CloseCurrentPanel)
+            if (value == GameActionEnum.NoOp)
             {
-                serializer.Serialize(writer, "closeCurrentPanel");
+                serializer.Serialize(writer, "noOp");
                 return;
             }
             throw new Exception("Cannot marshal type GameActionEnum");
@@ -4303,9 +4319,9 @@ namespace Dreamtides.Schema
                 case JsonToken.String:
                 case JsonToken.Date:
                     var stringValue = serializer.Deserialize<string>(reader);
-                    if (stringValue == "closeCurrentPanel")
+                    if (stringValue == "noOp")
                     {
-                        return new GameAction { Enum = GameActionEnum.CloseCurrentPanel };
+                        return new GameAction { Enum = GameActionEnum.NoOp };
                     }
                     break;
                 case JsonToken.StartObject:
@@ -4320,9 +4336,9 @@ namespace Dreamtides.Schema
             var value = (GameAction)untypedValue;
             if (value.Enum != null)
             {
-                if (value.Enum == GameActionEnum.CloseCurrentPanel)
+                if (value.Enum == GameActionEnum.NoOp)
                 {
-                    serializer.Serialize(writer, "closeCurrentPanel");
+                    serializer.Serialize(writer, "noOp");
                     return;
                 }
             }

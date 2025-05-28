@@ -1,3 +1,4 @@
+use action_data::battle_display_action::BattleDisplayAction;
 use action_data::debug_action_data::DebugAction;
 use action_data::game_action_data::GameAction;
 use action_data::panel_address::PanelAddress;
@@ -38,13 +39,17 @@ impl Component for DeveloperPanel {
                         .child(
                             DebugButton::builder()
                                 .label("Set AI")
-                                .action(GameAction::OpenPanel(PanelAddress::SetOpponentAgent))
+                                .action(GameAction::BattleDisplayAction(
+                                    BattleDisplayAction::OpenPanel(PanelAddress::SetOpponentAgent),
+                                ))
                                 .build(),
                         )
                         .child(
                             DebugButton::builder()
                                 .label("Add Card to Hand")
-                                .action(GameAction::OpenPanel(PanelAddress::AddCardToHand))
+                                .action(GameAction::BattleDisplayAction(
+                                    BattleDisplayAction::OpenPanel(PanelAddress::AddCardToHand),
+                                ))
                                 .build(),
                         )
                         .child(

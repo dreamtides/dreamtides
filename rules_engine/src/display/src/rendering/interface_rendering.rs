@@ -1,5 +1,3 @@
-use std::sync::{LazyLock, Mutex};
-
 use action_data::battle_display_action::BattleDisplayAction;
 use action_data::game_action_data::GameAction;
 use action_data::panel_address::PanelAddress;
@@ -24,17 +22,14 @@ use crate::panels::panel_rendering;
 use crate::rendering::interface_message::{AnchorPosition, InterfaceMessage};
 use crate::rendering::labels;
 
-static CURRENT_PANEL_ADDRESS: LazyLock<Mutex<Option<PanelAddress>>> =
-    LazyLock::new(|| Mutex::new(None));
-
 pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> InterfaceView {
     if builder.is_for_animation() {
         return InterfaceView::default();
     }
 
-    let current_panel_address = *CURRENT_PANEL_ADDRESS.lock().unwrap();
-    let screen_overlay = BoxComponent::builder()
-        .name("Screen Overlay")
+    let current_panel_address = display_state::get_current_panel_address();
+    let overlay_builder = BoxComponent::builder()
+        .name("Interface Overlay")
         .style(
             FlexStyle::builder()
                 .position(FlexPosition::Absolute)
@@ -47,13 +42,13 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
         .child(
             current_panel_address
                 .map(|address| panel_rendering::render_panel(address, builder, battle)),
-        )
-        .build()
-        .flex_node();
+        );
+
+    let overlay = overlay_builder.build().flex_node();
     let legal_actions = legal_actions::compute(battle, builder.act_for_player());
 
     InterfaceView {
-        screen_overlay,
+        screen_overlay: overlay,
         primary_action_button: primary_action_button(builder, battle, &legal_actions),
         primary_action_show_on_idle_duration: None,
         secondary_action_button: secondary_action_button(battle, &legal_actions),
@@ -61,7 +56,7 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
         decrement_button: decrement_button(builder, battle),
         dev_button: Some(ButtonView {
             label: "\u{f0ad} Dev".to_string(),
-            action: Some(GameAction::OpenPanel(PanelAddress::Developer)),
+            action: Some(BattleDisplayAction::OpenPanel(PanelAddress::Developer).into()),
         }),
         undo_button: Some(ButtonView {
             label: "\u{f0e2}".to_string(),
@@ -70,19 +65,6 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
         card_order_selector: None,
         bottom_right_button: None,
     }
-}
-
-/// Opens a panel based on its [PanelAddress], replacing any
-/// previously-displayed panel.
-pub fn open_panel(address: PanelAddress) {
-    let mut current_panel_address = CURRENT_PANEL_ADDRESS.lock().unwrap();
-    *current_panel_address = Some(address);
-}
-
-/// Closes the currently-displayed panel.
-pub fn close_current_panel() {
-    let mut current_panel_address = CURRENT_PANEL_ADDRESS.lock().unwrap();
-    *current_panel_address = None;
 }
 
 fn primary_action_button(

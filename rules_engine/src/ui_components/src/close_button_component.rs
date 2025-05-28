@@ -1,3 +1,4 @@
+use action_data::battle_display_action::BattleDisplayAction;
 use action_data::game_action_data::GameAction;
 use asset_paths::poneti_ui;
 use core_data::display_color;
@@ -39,7 +40,7 @@ impl Component for CloseButtonComponent {
                         .scale(FlexScale::new(0.97))
                         .build(),
                 )
-                .on_click(GameAction::CloseCurrentPanel)
+                .on_click(GameAction::BattleDisplayAction(BattleDisplayAction::CloseCurrentPanel))
                 .child(
                     TextComponent::builder()
                         .text("\u{f00d}")

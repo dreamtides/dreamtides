@@ -2,6 +2,8 @@ use core_data::numerics::Energy;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use crate::panel_address::PanelAddress;
+
 #[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum BattleDisplayAction {
@@ -11,6 +13,12 @@ pub enum BattleDisplayAction {
     /// Sets the selected amount of energy to pay as an additional cost to play
     /// a card.
     SetSelectedEnergyAdditionalCost(Energy),
+
+    /// Opens a panel based on its address.
+    OpenPanel(PanelAddress),
+
+    /// Closes the currently open panel.
+    CloseCurrentPanel,
 }
 
 #[derive(

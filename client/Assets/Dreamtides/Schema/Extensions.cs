@@ -29,7 +29,6 @@ namespace Dreamtides.Schema
           BattleAction = ActionClass?.BattleAction,
           BattleDisplayAction = ActionClass?.BattleDisplayAction,
           Undo = ActionClass?.Undo,
-          OpenPanel = ActionClass?.OpenPanel,
         }
       };
     }

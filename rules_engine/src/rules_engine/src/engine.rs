@@ -12,7 +12,7 @@ use core_data::identifiers::{BattleId, QuestId, UserId};
 use database::save_file::SaveFile;
 use database::sqlite_database::{self, Database};
 use display::display_actions::apply_battle_display_action;
-use display::rendering::{interface_rendering, renderer};
+use display::rendering::renderer;
 use display_data::command::CommandSequence;
 use display_data::request_data::{ConnectRequest, ConnectResponse, PerformActionRequest};
 use game_creation::new_battle;
@@ -264,6 +264,7 @@ fn handle_request_action(
     battle: &mut BattleState,
 ) {
     match request.action {
+        GameAction::NoOp => {}
         GameAction::DebugAction(action) => {
             let player = renderer::player_name_for_user(&*battle, user_id);
             debug_actions::execute(battle, user_id, player, action);
@@ -294,20 +295,6 @@ fn handle_request_action(
             };
 
             *battle = undone_battle;
-            handle_battle_action::append_update(
-                user_id,
-                renderer::connect(&*battle, user_id, true),
-            );
-        }
-        GameAction::OpenPanel(address) => {
-            interface_rendering::open_panel(address);
-            handle_battle_action::append_update(
-                user_id,
-                renderer::connect(&*battle, user_id, true),
-            );
-        }
-        GameAction::CloseCurrentPanel => {
-            interface_rendering::close_current_panel();
             handle_battle_action::append_update(
                 user_id,
                 renderer::connect(&*battle, user_id, true),
