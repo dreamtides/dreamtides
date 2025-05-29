@@ -92,14 +92,15 @@ namespace Dreamtides.Masonry
     {
       element.name = node.Name;
 
-      ApplyStyle(registry, element, node.Style);
+      var nodeStyle = node.Style;
+      ApplyStyle(registry, element, nodeStyle);
 
       if (element is INodeCallbacks callbacks)
       {
         if (node.HoverStyle != null)
         {
           var hoverStyle = new FlexStyle();
-          hoverStyle = Mason.MergeStyles(hoverStyle, node.Style);
+          hoverStyle = Mason.MergeStyles(hoverStyle, nodeStyle);
           hoverStyle = Mason.MergeStyles(hoverStyle, node.OnAttachStyle);
           hoverStyle = Mason.MergeStyles(hoverStyle, node.HoverStyle);
 
@@ -123,7 +124,7 @@ namespace Dreamtides.Masonry
         if (node.PressedStyle != null)
         {
           var pressedStyle = new FlexStyle();
-          pressedStyle = Mason.MergeStyles(pressedStyle, node.Style);
+          pressedStyle = Mason.MergeStyles(pressedStyle, nodeStyle);
           pressedStyle = Mason.MergeStyles(pressedStyle, node.OnAttachStyle);
           pressedStyle = Mason.MergeStyles(pressedStyle, node.PressedStyle);
 
@@ -139,13 +140,13 @@ namespace Dreamtides.Masonry
           callbacks.SetCallback(Callbacks.Event.MouseUp, () =>
           {
             var style = new FlexStyle();
-            style = Mason.MergeStyles(style, node.Style);
+            style = Mason.MergeStyles(style, nodeStyle);
             style = Mason.MergeStyles(style, node.OnAttachStyle);
 
             if (node.HoverStyle != null)
             {
               style = new FlexStyle();
-              style = Mason.MergeStyles(style, node.Style);
+              style = Mason.MergeStyles(style, nodeStyle);
               style = Mason.MergeStyles(style, node.OnAttachStyle);
               style = Mason.MergeStyles(style, node.HoverStyle);
             }
@@ -171,7 +172,7 @@ namespace Dreamtides.Masonry
         if (node.OnAttachStyle != null)
         {
           var attachStyle = new FlexStyle();
-          attachStyle = Mason.MergeStyles(attachStyle, node.Style);
+          attachStyle = Mason.MergeStyles(attachStyle, nodeStyle);
           attachStyle = Mason.MergeStyles(attachStyle, node.OnAttachStyle);
 
           if (element.panel != null)
@@ -186,6 +187,14 @@ namespace Dreamtides.Masonry
               {
                 ApplyStyle(registry, element, attachStyle);
               });
+            });
+          }
+
+          if (node.OnAttachStyleDuration != null)
+          {
+            TweenUtils.ExecuteAfter(node.OnAttachStyleDuration.MillisecondsValue / 1000f, () =>
+            {
+              ApplyStyle(registry, element, nodeStyle);
             });
           }
         }

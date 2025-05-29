@@ -911,8 +911,19 @@ namespace Dreamtides.Schema
         [JsonProperty("nodeType")]
         public NodeType NodeType { get; set; }
 
+        /// <summary>
+        /// Style to apply to the element when it is first attached to a panel.
+        /// </summary>
         [JsonProperty("onAttachStyle")]
         public FlexStyle OnAttachStyle { get; set; }
+
+        /// <summary>
+        /// How long to keep the `on_attach_style` applied.
+        ///
+        /// If not specified, the style will be applied indefinitely.
+        /// </summary>
+        [JsonProperty("onAttachStyleDuration")]
+        public Milliseconds OnAttachStyleDuration { get; set; }
 
         [JsonProperty("pressedStyle")]
         public FlexStyle PressedStyle { get; set; }

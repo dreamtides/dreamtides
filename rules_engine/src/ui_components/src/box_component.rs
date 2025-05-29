@@ -1,4 +1,5 @@
 use action_data::game_action_data::GameAction;
+use core_data::display_types::Milliseconds;
 use masonry::flex_enums::FlexDirection;
 use masonry::flex_node::{EventHandlers, FlexNode};
 use masonry::flex_style::FlexStyle;
@@ -31,6 +32,7 @@ pub struct BoxComponentBuilder<T> {
     hover_style: Option<FlexStyle>,
     pressed_style: Option<FlexStyle>,
     on_attach_style: Option<FlexStyle>,
+    on_attach_style_duration: Option<Milliseconds>,
 }
 
 impl BoxComponent {
@@ -43,6 +45,7 @@ impl BoxComponent {
             hover_style: None,
             pressed_style: None,
             on_attach_style: None,
+            on_attach_style_duration: None,
         }
     }
 }
@@ -57,6 +60,7 @@ impl BoxComponentBuilder<Unnamed> {
             hover_style: self.hover_style,
             pressed_style: self.pressed_style,
             on_attach_style: self.on_attach_style,
+            on_attach_style_duration: self.on_attach_style_duration,
         }
     }
 }
@@ -103,6 +107,11 @@ impl BoxComponentBuilder<Named> {
         self.on_attach_style = Some(on_attach_style);
         self
     }
+
+    pub fn on_attach_style_duration(mut self, duration: Milliseconds) -> Self {
+        self.on_attach_style_duration = Some(duration);
+        self
+    }
 }
 
 impl BoxComponentBuilder<Named> {
@@ -125,6 +134,7 @@ impl BoxComponentBuilder<Named> {
             hover_style: self.hover_style,
             pressed_style: self.pressed_style,
             on_attach_style: self.on_attach_style,
+            on_attach_style_duration: self.on_attach_style_duration,
         })
     }
 }

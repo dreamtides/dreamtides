@@ -1,4 +1,5 @@
 use action_data::game_action_data::GameAction;
+use core_data::display_types::Milliseconds;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -14,7 +15,14 @@ pub struct FlexNode {
     pub style: Option<FlexStyle>,
     pub hover_style: Option<FlexStyle>,
     pub pressed_style: Option<FlexStyle>,
+
+    /// Style to apply to the element when it is first attached to a panel.
     pub on_attach_style: Option<FlexStyle>,
+
+    /// How long to keep the `on_attach_style` applied.
+    ///
+    /// If not specified, the style will be applied indefinitely.
+    pub on_attach_style_duration: Option<Milliseconds>,
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]

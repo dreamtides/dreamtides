@@ -1,5 +1,6 @@
 use bon::Builder;
 use core_data::display_color;
+use core_data::display_types::Milliseconds;
 use masonry::dimension::{FlexInsets, Percent};
 use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition, TextAlign};
 use masonry::flex_style::FlexStyle;
@@ -37,8 +38,19 @@ impl Component for InterfaceMessage {
                         .inset(inset)
                         .align_items(FlexAlign::Center)
                         .justify_content(FlexJustify::Center)
+                        .opacity(0)
+                        .transition_durations(vec![Milliseconds::new(300)])
+                        .transition_properties(vec!["opacity".to_string()])
                         .build(),
                 )
+                .on_attach_style(
+                    FlexStyle::builder()
+                        .opacity(1)
+                        .transition_durations(vec![Milliseconds::new(300)])
+                        .transition_properties(vec!["opacity".to_string()])
+                        .build(),
+                )
+                .on_attach_style_duration(Milliseconds::new(5000))
                 .child(
                     BoxComponent::builder()
                         .name("Interface Message")
