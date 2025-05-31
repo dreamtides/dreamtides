@@ -9,7 +9,7 @@ use tracing_macros::panic_with;
 /// Serializes a [BattleState] to a [SaveFile] for a given [UserId] and
 /// [QuestId].
 pub fn battle(user_id: UserId, quest_id: QuestId, battle: &BattleState) -> SaveFile {
-    let Some(history) = battle.history.as_ref() else {
+    let Some(history) = battle.action_history.as_ref() else {
         panic_with!("Expected battle with history for serialization", battle);
     };
     SaveFile::V1(SaveFileV1 {

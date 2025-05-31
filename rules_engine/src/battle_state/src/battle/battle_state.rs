@@ -10,6 +10,7 @@ use crate::battle::battle_history::BattleHistory;
 use crate::battle::battle_status::BattleStatus;
 use crate::battle::battle_turn_phase::BattleTurnPhase;
 use crate::battle::turn_data::TurnData;
+use crate::battle::turn_history::TurnHistory;
 use crate::battle_player::battle_player_state::BattlePlayerState;
 use crate::battle_player::player_map::PlayerMap;
 use crate::battle_trace::battle_tracing::BattleTracing;
@@ -60,7 +61,10 @@ pub struct BattleState {
     /// History of actions and events during this battle.
     ///
     /// Can be None if history tracking is disabled, e.g. during AI simulation.
-    pub history: Option<BattleHistory>,
+    pub action_history: Option<BattleHistory>,
+
+    /// History of actions and events during the current turn.
+    pub turn_history: TurnHistory,
 }
 
 impl BattleState {
@@ -82,7 +86,8 @@ impl BattleState {
             prompt: self.prompt.clone(),
             animations: None,
             tracing: None,
-            history: None,
+            action_history: None,
+            turn_history: self.turn_history.clone(),
         }
     }
 
@@ -107,7 +112,8 @@ impl BattleState {
                 prompt: self.prompt.clone(),
                 animations: None,
                 tracing: None,
-                history: None,
+                action_history: None,
+                turn_history: self.turn_history.clone(),
             };
             animations.steps.push(AnimationStep { snapshot, animation: update() });
         }
@@ -124,7 +130,7 @@ impl BattleState {
 
     /// Adds a new action to the history of this battle.
     pub fn push_history_action(&mut self, player: PlayerName, action: BattleAction) {
-        if let Some(history) = &mut self.history {
+        if let Some(history) = &mut self.action_history {
             history.push_action(player, action);
         }
     }

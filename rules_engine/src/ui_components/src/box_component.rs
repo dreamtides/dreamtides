@@ -103,13 +103,21 @@ impl BoxComponentBuilder<Named> {
         self
     }
 
-    pub fn on_attach_style(mut self, on_attach_style: FlexStyle) -> Self {
-        self.on_attach_style = Some(on_attach_style);
+    pub fn on_attach_style(self, on_attach_style: FlexStyle) -> Self {
+        self.maybe_on_attach_style(Some(on_attach_style))
+    }
+
+    pub fn maybe_on_attach_style(mut self, on_attach_style: Option<FlexStyle>) -> Self {
+        self.on_attach_style = on_attach_style;
         self
     }
 
-    pub fn on_attach_style_duration(mut self, duration: Milliseconds) -> Self {
-        self.on_attach_style_duration = Some(duration);
+    pub fn on_attach_style_duration(self, duration: Milliseconds) -> Self {
+        self.maybe_on_attach_style_duration(Some(duration))
+    }
+
+    pub fn maybe_on_attach_style_duration(mut self, duration: Option<Milliseconds>) -> Self {
+        self.on_attach_style_duration = duration;
         self
     }
 }

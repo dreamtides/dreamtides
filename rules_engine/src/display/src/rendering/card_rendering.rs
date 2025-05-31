@@ -16,6 +16,7 @@ use display_data::card_view::{
 
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
+use crate::display_actions::outcome_simulation;
 use crate::rendering::positions::ControllerAndZone;
 use crate::rendering::{card_display_state, positions};
 
@@ -64,7 +65,20 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
         },
         supplemental_card_info: None,
         is_fast: false,
-        actions: CardActions { can_play, on_click: selection_action, ..Default::default() },
+        actions: CardActions {
+            can_play,
+            on_click: selection_action,
+            play_effect_preview: if can_play {
+                outcome_simulation::action_effect_preview(
+                    battle,
+                    builder.act_for_player(),
+                    BattleAction::PlayCardFromHand(HandCardId(card_id)),
+                )
+            } else {
+                None
+            },
+            ..Default::default()
+        },
         effects: CardEffects::default(),
     }
 }

@@ -30,6 +30,6 @@ pub fn create_and_start_with_options(
     let mut battle = new_test_battle::create_and_start(battle_id, seed, player_one, player_two);
     battle.animations = Some(AnimationData::default());
     battle.tracing = Some(BattleTracing::default());
-    battle.history = Some(BattleHistory::default());
+    battle.action_history = Some(BattleHistory::default());
     battle
 }

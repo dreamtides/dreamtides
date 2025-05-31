@@ -14,12 +14,10 @@ use masonry::flex_style::FlexStyle;
 use tracing_macros::panic_with;
 use ui_components::box_component::BoxComponent;
 use ui_components::component::Component;
-use ui_components::icon;
 
 use crate::core::response_builder::ResponseBuilder;
 use crate::display_actions::display_state;
 use crate::panels::panel_rendering;
-use crate::rendering::interface_message::{AnchorPosition, InterfaceMessage};
 use crate::rendering::labels;
 
 pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> InterfaceView {
@@ -38,7 +36,6 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
                 .justify_content(FlexJustify::Center)
                 .build(),
         )
-        .child(interface_message())
         .child(
             current_panel_address
                 .map(|address| panel_rendering::render_panel(address, builder, battle)),
@@ -175,11 +172,4 @@ fn decrement_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<B
     }
 
     None
-}
-
-fn interface_message() -> impl Component {
-    InterfaceMessage::builder()
-        .text(format!("Note: cards drawn in excess of 10 become {} instead.", icon::ENERGY))
-        .anchor_position(AnchorPosition::Top)
-        .build()
 }

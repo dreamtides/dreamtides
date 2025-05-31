@@ -30,6 +30,8 @@ pub fn draw_card(
         // If a player exceeds the hand size limit, they instead gain 1
         // energy for each card they would have drawn.
         energy::gain(battle, player, source, Energy(1));
+        let p = battle.turn_history.current_action_history.player_mut(player);
+        p.hand_size_limit_exceeded = true;
         return None;
     }
 

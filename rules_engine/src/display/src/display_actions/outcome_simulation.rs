@@ -5,7 +5,12 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use core_data::types::PlayerName;
+use display_data::battle_view::{BattlePreviewView, PlayerPreviewView};
 use tracing_macros::panic_with;
+use ui_components::component::Component;
+use ui_components::icon;
+
+use crate::rendering::interface_message::{AnchorPosition, InterfaceMessage};
 
 /// Returns true if it is the opponent's turn and `player` will win the game
 /// in their next judgment phase.
@@ -43,4 +48,36 @@ pub fn is_victory_imminent_for_player(battle: &BattleState, player: PlayerName) 
     apply_battle_action::execute(&mut simulation, player, BattleAction::StartNextTurn);
 
     matches!(simulation.status, BattleStatus::GameOver { winner: Some(winner) } if winner == player)
+}
+
+/// Returns a preview of the battle state based on simulating the effect of
+/// playing the given card.
+///
+/// Returns None if no changes are detected between the simulated state and the
+/// current state.
+pub fn action_effect_preview(
+    battle: &BattleState,
+    player: PlayerName,
+    action: BattleAction,
+) -> Option<BattlePreviewView> {
+    let mut simulation = battle.logical_clone();
+    apply_battle_action::execute(&mut simulation, player, action);
+    if simulation.turn_history.current_action_history.player(player).hand_size_limit_exceeded {
+        return Some(BattlePreviewView {
+            user: PlayerPreviewView::default(),
+            enemy: PlayerPreviewView::default(),
+            cards: vec![],
+            preview_message: hand_size_limit_exceeded_message().flex_node(),
+        });
+    }
+
+    None
+}
+
+fn hand_size_limit_exceeded_message() -> impl Component {
+    InterfaceMessage::builder()
+        .text(format!("Note: cards drawn in excess of 10 become {} instead.", icon::ENERGY))
+        .anchor_position(AnchorPosition::Top)
+        .temporary(false)
+        .build()
 }

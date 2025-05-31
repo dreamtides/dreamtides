@@ -21,6 +21,8 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
         }
     }
 
+    battle.turn_history.clear_current_action_history();
+
     match action {
         BattleAction::Debug(debug_action) => {
             apply_debug_battle_action::execute(battle, player, debug_action);

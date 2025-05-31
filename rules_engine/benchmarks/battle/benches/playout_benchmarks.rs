@@ -13,6 +13,7 @@ use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::battle::card_id::{CardId, CharacterId, HandCardId};
 use battle_state::battle::turn_data::TurnData;
+use battle_state::battle::turn_history::TurnHistory;
 use battle_state::battle_cards::zone::Zone;
 use battle_state::battle_player::battle_player_state::{BattlePlayerState, PlayerType};
 use battle_state::battle_player::player_map::PlayerMap;
@@ -387,7 +388,8 @@ fn benchmark_battle() -> BattleState {
         prompt: None,
         animations: None,
         tracing: None,
-        history: None,
+        action_history: None,
+        turn_history: TurnHistory::default(),
     };
 
     deck::add_cards(

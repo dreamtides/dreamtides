@@ -20,6 +20,7 @@ pub struct InterfaceMessage {
     #[builder(into)]
     pub text: String,
     pub anchor_position: AnchorPosition,
+    pub temporary: bool,
 }
 
 impl Component for InterfaceMessage {
@@ -38,19 +39,25 @@ impl Component for InterfaceMessage {
                         .inset(inset)
                         .align_items(FlexAlign::Center)
                         .justify_content(FlexJustify::Center)
-                        .opacity(0)
-                        .transition_durations(vec![Milliseconds::new(300)])
-                        .transition_properties(vec!["opacity".to_string()])
+                        .opacity(if self.temporary { 0 } else { 1 })
+                        .transition_durations(
+                            self.temporary
+                                .then(|| vec![Milliseconds::new(300)])
+                                .unwrap_or_default(),
+                        )
+                        .transition_properties(
+                            self.temporary.then(|| vec!["opacity".to_string()]).unwrap_or_default(),
+                        )
                         .build(),
                 )
-                .on_attach_style(
+                .maybe_on_attach_style(self.temporary.then(|| {
                     FlexStyle::builder()
                         .opacity(1)
                         .transition_durations(vec![Milliseconds::new(300)])
                         .transition_properties(vec!["opacity".to_string()])
-                        .build(),
-                )
-                .on_attach_style_duration(Milliseconds::new(5000))
+                        .build()
+                }))
+                .maybe_on_attach_style_duration(self.temporary.then(|| Milliseconds::new(5000)))
                 .child(
                     BoxComponent::builder()
                         .name("Interface Message")

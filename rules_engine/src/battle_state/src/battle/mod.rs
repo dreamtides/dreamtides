@@ -7,3 +7,4 @@ pub mod battle_status;
 pub mod battle_turn_phase;
 pub mod card_id;
 pub mod turn_data;
+pub mod turn_history;
