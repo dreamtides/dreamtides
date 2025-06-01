@@ -4,12 +4,14 @@ use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
+use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
 use display_data::battle_view::{BattlePreviewView, PlayerPreviewView};
 use tracing_macros::panic_with;
 use ui_components::component::Component;
 use ui_components::icon;
 
+use crate::display_actions::display_state;
 use crate::rendering::interface_message::{AnchorPosition, InterfaceMessage};
 
 /// Returns true if it is the opponent's turn and `player` will win the game
@@ -52,9 +54,6 @@ pub fn is_victory_imminent_for_player(battle: &BattleState, player: PlayerName) 
 
 /// Returns a preview of the battle state based on simulating the effect of
 /// playing the given card.
-///
-/// Returns None if no changes are detected between the simulated state and the
-/// current state.
 pub fn action_effect_preview(
     battle: &BattleState,
     player: PlayerName,
@@ -62,16 +61,55 @@ pub fn action_effect_preview(
 ) -> Option<BattlePreviewView> {
     let mut simulation = battle.logical_clone();
     apply_battle_action::execute(&mut simulation, player, action);
-    if simulation.turn_history.current_action_history.player(player).hand_size_limit_exceeded {
-        return Some(BattlePreviewView {
-            user: PlayerPreviewView::default(),
-            enemy: PlayerPreviewView::default(),
-            cards: vec![],
-            preview_message: hand_size_limit_exceeded_message().flex_node(),
-        });
+    let opponent = player.opponent();
+    let legal_actions_for_opponent = legal_actions::compute(&simulation, opponent);
+    if legal_actions_for_opponent.contains(BattleAction::PassPriority) {
+        apply_battle_action::execute(&mut simulation, opponent, BattleAction::PassPriority);
     }
 
-    None
+    let simulated_player_state = simulation.players.player(player);
+
+    let mut user_preview = PlayerPreviewView::default();
+    // Always show user energy in the preview, even if it didn't change.
+    user_preview.energy = Some(simulated_player_state.current_energy);
+
+    let mut preview_message = None;
+    if simulation.turn_history.current_action_history.player(player).hand_size_limit_exceeded {
+        preview_message = hand_size_limit_exceeded_message().flex_node();
+    }
+
+    Some(BattlePreviewView {
+        user: user_preview,
+        enemy: PlayerPreviewView::default(),
+        cards: vec![],
+        preview_message,
+    })
+}
+
+/// Returns a unified preview of the battle state based on the current prompt
+/// and selected display state.
+///
+/// This function handles different types of prompts and simulates their effects
+/// to provide a preview of the resulting battle state.
+pub fn current_prompt_battle_preview(
+    battle: &BattleState,
+    player: PlayerName,
+) -> Option<BattlePreviewView> {
+    if let Some(prompt) = battle.prompt.as_ref()
+        && prompt.player == player
+    {
+        match &prompt.prompt_type {
+            PromptType::ChooseEnergyValue { minimum, .. } => {
+                let selected_energy =
+                    display_state::get_selected_energy_additional_cost().unwrap_or(*minimum);
+                let action = BattleAction::SelectEnergyAdditionalCost(selected_energy);
+                action_effect_preview(battle, player, action)
+            }
+            _ => None,
+        }
+    } else {
+        None
+    }
 }
 
 fn hand_size_limit_exceeded_message() -> impl Component {

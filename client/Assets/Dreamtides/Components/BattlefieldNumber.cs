@@ -11,14 +11,22 @@ namespace Dreamtides
   {
     [SerializeField] TextMeshPro _text = null!;
     [SerializeField] TimedEffect _onChange = null!;
-    string? _originalText;
-    Color _originalColor;
+    [SerializeField] string? _originalText;
+    [SerializeField] Color _originalColor;
+    [SerializeField] bool _activePreview;
+
+    void Start()
+    {
+      _originalText = _text.text;
+      _originalColor = _text.color;
+    }
 
     public void SetText(string text, bool animate)
     {
       if (_text.text != text)
       {
         SetTextInternal(text);
+        SetOriginalText(_text.text);
         if (animate && text != _originalText)
         {
           // Toggle to restart animation if needed
@@ -30,19 +38,22 @@ namespace Dreamtides
 
     public void SetPreviewText(string text, Color color)
     {
-      SetOriginalText(_text.text);
+      if (_activePreview)
+      {
+        ClearPreviewText();
+      }
+
       _originalColor = _text.color;
       SetTextInternal(text);
       _text.color = color;
+      _activePreview = true;
     }
 
     public void ClearPreviewText()
     {
-      if (_originalText != null && _originalText.Length > 0 && _originalColor != null)
-      {
-        SetTextInternal(_originalText);
-        _text.color = _originalColor;
-      }
+      SetTextInternal(Errors.CheckNotNull(_originalText));
+      _text.color = _originalColor;
+      _activePreview = false;
     }
 
     void SetTextInternal(string text)

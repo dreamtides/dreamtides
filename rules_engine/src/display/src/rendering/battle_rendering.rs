@@ -6,7 +6,7 @@ use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use battle_state::battle_player::battle_player_state::BattlePlayerState;
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
-use display_data::battle_view::{BattlePreviewView, BattleView, PlayerPreviewView, PlayerView};
+use display_data::battle_view::{BattlePreviewView, BattleView, PlayerView};
 use display_data::command::{ArrowStyle, Command, DisplayArrow, GameMessageType, GameObjectId};
 
 use crate::core::card_view_context::CardViewContext;
@@ -111,21 +111,5 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
 }
 
 fn battle_preview(builder: &ResponseBuilder, battle: &BattleState) -> Option<BattlePreviewView> {
-    if let Some(prompt) = battle.prompt.as_ref()
-        && prompt.player == builder.display_for_player()
-        && let PromptType::ChooseEnergyValue { minimum, .. } = &prompt.prompt_type
-    {
-        let current = display_state::get_selected_energy_additional_cost().unwrap_or(*minimum);
-        let player = battle.players.player(builder.display_for_player());
-        let remaining_energy = player.current_energy - current;
-
-        Some(BattlePreviewView {
-            user: PlayerPreviewView { energy: Some(remaining_energy), ..Default::default() },
-            enemy: PlayerPreviewView::default(),
-            cards: vec![],
-            preview_message: None,
-        })
-    } else {
-        None
-    }
+    outcome_simulation::current_prompt_battle_preview(battle, builder.display_for_player())
 }
