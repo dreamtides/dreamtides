@@ -253,7 +253,8 @@ namespace Dreamtides.Services
       {
         if (command.UpdateBattle != null)
         {
-          LogUtils.Log("ActionService", "Applying command: UpdateBattle");
+          var hasBattlePreview = command.UpdateBattle.Battle.Preview != null;
+          LogUtils.Log("ActionService", $"Applying command: UpdateBattle, hasBattlePreview: {hasBattlePreview}");
           Registry.Layout.UserStatusDisplay.UpdatePlayerView(command.UpdateBattle.Battle.User, animate);
           Registry.Layout.EnemyStatusDisplay.UpdatePlayerView(command.UpdateBattle.Battle.Enemy, animate);
           Registry.DocumentService.RenderScreenOverlay(command.UpdateBattle.Battle.Interface?.ScreenOverlay);
@@ -274,10 +275,10 @@ namespace Dreamtides.Services
           // Must happen after UpdateLayout since cards may be created which are referenced
           Registry.ArrowService.HandleDisplayArrows(command.UpdateBattle.Battle.Arrows ?? new List<DisplayArrow>());
 
-          Registry.CardEffectPreviewService.ClearPlayEffectPreview();
+          // Registry.CardEffectPreviewService.ClearBattlePreview();
           if (command.UpdateBattle.Battle.Preview != null)
           {
-            Registry.CardEffectPreviewService.DisplayPlayEffectPreview(command.UpdateBattle.Battle.Preview);
+            Registry.CardEffectPreviewService.DisplayBattlePreview(command.UpdateBattle.Battle.Preview);
           }
         }
 

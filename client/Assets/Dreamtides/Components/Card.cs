@@ -375,7 +375,7 @@ namespace Dreamtides.Components
         _registry.CardService.ClearInfoZoom();
         if (CardView.Revealed?.Actions.PlayEffectPreview is { } playEffectPreview && !_isDraggingForOrdering)
         {
-          _registry.CardEffectPreviewService.DisplayPlayEffectPreview(playEffectPreview);
+          _registry.CardEffectPreviewService.DisplayBattlePreview(playEffectPreview);
         }
         _draggedToClearThreshold = true;
       }
@@ -385,7 +385,6 @@ namespace Dreamtides.Components
     {
       _registry.SoundService.PlayCardSound();
       _registry.CardService.ClearInfoZoom();
-      _registry.CardEffectPreviewService.ClearPlayEffectPreview();
       _registry.CardService.IsPointerDownOnCard = false;
 
       if (CardView.Revealed?.Actions?.OnClick is { } onClick && isSameObject && (Time.time - _lastMouseDownTime < 1f))
@@ -417,6 +416,7 @@ namespace Dreamtides.Components
       }
       else if (ShouldReturnToPreviousParentOnRelease())
       {
+        _registry.CardEffectPreviewService.ClearBattlePreview();
         _registry.LayoutService.AddToParent(this);
         _registry.LayoutService.RunAnimations(() =>
         {

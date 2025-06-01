@@ -11539,6 +11539,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1435083753}
     m_Modifications:
+    - target: {fileID: 3066241887815503722, guid: b30ec3ff71deb4574b7370cd7ad256ae, type: 3}
+      propertyPath: m_Name
+      value: UserEnergy
+      objectReference: {fileID: 0}
     - target: {fileID: 3122923682392363659, guid: b30ec3ff71deb4574b7370cd7ad256ae, type: 3}
       propertyPath: m_LocalPosition.x
       value: -4
@@ -11606,6 +11610,10 @@ PrefabInstance:
     - target: {fileID: 4531389370955580456, guid: b30ec3ff71deb4574b7370cd7ad256ae, type: 3}
       propertyPath: m_Name
       value: UserStatus
+      objectReference: {fileID: 0}
+    - target: {fileID: 7051598207919991685, guid: b30ec3ff71deb4574b7370cd7ad256ae, type: 3}
+      propertyPath: m_Name
+      value: UserScore
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -12670,6 +12678,10 @@ PrefabInstance:
       propertyPath: m_SortingLayerID
       value: 1517910463
       objectReference: {fileID: 0}
+    - target: {fileID: 3066241887815503722, guid: b30ec3ff71deb4574b7370cd7ad256ae, type: 3}
+      propertyPath: m_Name
+      value: EnemyEnergy
+      objectReference: {fileID: 0}
     - target: {fileID: 3122923682392363659, guid: b30ec3ff71deb4574b7370cd7ad256ae, type: 3}
       propertyPath: m_LocalPosition.x
       value: 6.5
@@ -12745,6 +12757,10 @@ PrefabInstance:
     - target: {fileID: 4531389370955580456, guid: b30ec3ff71deb4574b7370cd7ad256ae, type: 3}
       propertyPath: m_Name
       value: EnemyStatus
+      objectReference: {fileID: 0}
+    - target: {fileID: 7051598207919991685, guid: b30ec3ff71deb4574b7370cd7ad256ae, type: 3}
+      propertyPath: m_Name
+      value: EnemyScore
       objectReference: {fileID: 0}
     - target: {fileID: 8936401286995516769, guid: b30ec3ff71deb4574b7370cd7ad256ae, type: 3}
       propertyPath: m_LocalPosition.x

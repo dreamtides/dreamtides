@@ -10,17 +10,17 @@ namespace Dreamtides.Services
     BattlePreviewView? _current;
     Color _previewTextColor = new Color(0.7f, 0.92f, 0.95f);
 
-    public void DisplayPlayEffectPreview(BattlePreviewView preview)
+    public void DisplayBattlePreview(BattlePreviewView preview)
     {
       if (_current != preview)
       {
-        ClearPlayEffectPreview();
+        ClearBattlePreview();
         _current = preview;
         ApplyPreview();
       }
     }
 
-    public void ClearPlayEffectPreview()
+    public void ClearBattlePreview()
     {
       if (_current != null)
       {

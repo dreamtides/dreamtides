@@ -12,21 +12,22 @@ namespace Dreamtides
     [SerializeField] TextMeshPro _text = null!;
     [SerializeField] TimedEffect _onChange = null!;
     [SerializeField] string? _originalText;
-    [SerializeField] Color _originalColor;
+    [SerializeField] Color _originalColor = Color.white;
     [SerializeField] bool _activePreview;
 
     void Start()
     {
-      _originalText = _text.text;
       _originalColor = _text.color;
     }
 
     public void SetText(string text, bool animate)
     {
-      if (_text.text != text)
+      Log($"SetText: {text}");
+      SetOriginalText(text);
+
+      if (_text.text != text && !_activePreview)
       {
         SetTextInternal(text);
-        SetOriginalText(_text.text);
         if (animate && text != _originalText)
         {
           // Toggle to restart animation if needed
@@ -38,12 +39,7 @@ namespace Dreamtides
 
     public void SetPreviewText(string text, Color color)
     {
-      if (_activePreview)
-      {
-        ClearPreviewText();
-      }
-
-      _originalColor = _text.color;
+      Log($"SetPreviewText: {text}");
       SetTextInternal(text);
       _text.color = color;
       _activePreview = true;
@@ -51,6 +47,7 @@ namespace Dreamtides
 
     public void ClearPreviewText()
     {
+      Log($"ClearPreviewText: restoring to {_originalText}");
       SetTextInternal(Errors.CheckNotNull(_originalText));
       _text.color = _originalColor;
       _activePreview = false;
@@ -65,9 +62,18 @@ namespace Dreamtides
 
     void SetOriginalText(string text)
     {
+      Log($"SetOriginalText: {text}");
       Errors.CheckNotNull(text);
       Errors.CheckArgument(text.Length > 0, "original text must be non-empty");
       _originalText = text;
+    }
+
+    void Log(string message)
+    {
+      if (name == "UserScore")
+      {
+        Debug.Log(message);
+      }
     }
   }
 }
