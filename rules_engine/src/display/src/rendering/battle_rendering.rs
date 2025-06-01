@@ -6,7 +6,7 @@ use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use battle_state::battle_player::battle_player_state::BattlePlayerState;
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
-use display_data::battle_view::{BattleView, PlayerView};
+use display_data::battle_view::{BattlePreviewState, BattleView, PlayerView};
 use display_data::command::{ArrowStyle, Command, DisplayArrow, GameMessageType, GameObjectId};
 
 use crate::core::card_view_context::CardViewContext;
@@ -57,9 +57,11 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
         interface: interface_rendering::interface_view(builder, battle),
         arrows: current_arrows(builder, battle),
         preview: if builder.is_for_animation() {
-            None
+            BattlePreviewState::Pending
         } else {
             outcome_simulation::current_prompt_battle_preview(battle, builder.display_for_player())
+                .map(BattlePreviewState::Active)
+                .unwrap_or(BattlePreviewState::None)
         },
     }
 }

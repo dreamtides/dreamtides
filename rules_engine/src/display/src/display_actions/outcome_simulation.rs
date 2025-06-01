@@ -58,7 +58,7 @@ pub fn action_effect_preview(
     battle: &BattleState,
     player: PlayerName,
     action: BattleAction,
-) -> Option<BattlePreviewView> {
+) -> BattlePreviewView {
     let mut simulation = battle.logical_clone();
     apply_battle_action::execute(&mut simulation, player, action);
     let opponent = player.opponent();
@@ -69,21 +69,24 @@ pub fn action_effect_preview(
 
     let simulated_player_state = simulation.players.player(player);
 
-    let mut user_preview = PlayerPreviewView::default();
-    // Always show user energy in the preview, even if it didn't change.
-    user_preview.energy = Some(simulated_player_state.current_energy);
+    let user_preview = PlayerPreviewView {
+        // Always show user energy in the preview, even if it didn't change,
+        // since it usually changes and it's confusing to suddenly not see it.
+        energy: Some(simulated_player_state.current_energy),
+        ..Default::default()
+    };
 
     let mut preview_message = None;
     if simulation.turn_history.current_action_history.player(player).hand_size_limit_exceeded {
         preview_message = hand_size_limit_exceeded_message().flex_node();
     }
 
-    Some(BattlePreviewView {
+    BattlePreviewView {
         user: user_preview,
         enemy: PlayerPreviewView::default(),
         cards: vec![],
         preview_message,
-    })
+    }
 }
 
 /// Returns a unified preview of the battle state based on the current prompt
@@ -103,7 +106,7 @@ pub fn current_prompt_battle_preview(
                 let selected_energy =
                     display_state::get_selected_energy_additional_cost().unwrap_or(*minimum);
                 let action = BattleAction::SelectEnergyAdditionalCost(selected_energy);
-                action_effect_preview(battle, player, action)
+                Some(action_effect_preview(battle, player, action))
             }
             _ => None,
         }

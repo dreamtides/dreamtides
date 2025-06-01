@@ -69,11 +69,11 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
             can_play,
             on_click: selection_action,
             play_effect_preview: if can_play {
-                outcome_simulation::action_effect_preview(
+                Some(outcome_simulation::action_effect_preview(
                     battle,
                     builder.act_for_player(),
                     BattleAction::PlayCardFromHand(HandCardId(card_id)),
-                )
+                ))
             } else {
                 None
             },

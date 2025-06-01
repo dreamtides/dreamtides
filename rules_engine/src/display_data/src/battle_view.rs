@@ -33,7 +33,23 @@ pub struct BattleView {
 
     /// Preview of the next state of the battle, used e.g. when confirming
     /// prompt choices.
-    pub preview: Option<BattlePreviewView>,
+    pub preview: BattlePreviewState,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum BattlePreviewState {
+    /// No preview is currently active. Clear any existing preview.
+    None,
+
+    /// Unknown battle preview state during animation
+    ///
+    /// Used to not remove the existing preview to avoid the interface jumping
+    /// around between states.
+    Pending,
+
+    /// Active battle preview, e.g. when a prompt is active.
+    Active(BattlePreviewView),
 }
 
 /// Preview of a potential future state of a battle, shown e.g. in response to a

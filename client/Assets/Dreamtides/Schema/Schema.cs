@@ -1527,8 +1527,8 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Preview of the next state of the battle, used e.g. when confirming prompt choices.
         /// </summary>
-        [JsonProperty("preview")]
-        public BattlePreviewView Preview { get; set; }
+        [JsonProperty("preview", Required = Required.Always)]
+        public BattlePreviewState Preview { get; set; }
 
         /// <summary>
         /// Player who is operating the client
@@ -1701,6 +1701,15 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("includeVoid", Required = Required.Always)]
         public bool IncludeVoid { get; set; }
+    }
+
+    /// <summary>
+    /// Active battle preview, e.g. when a prompt is active.
+    /// </summary>
+    public partial class BattlePreviewStateClass
+    {
+        [JsonProperty("active", Required = Required.Always)]
+        public BattlePreviewView Active { get; set; }
     }
 
     public partial class PerformActionRequest
@@ -1898,6 +1907,16 @@ namespace Dreamtides.Schema
     public enum ArrowStyle { Blue, Green, Red };
 
     /// <summary>
+    /// No preview is currently active. Clear any existing preview.
+    ///
+    /// Unknown battle preview state during animation
+    ///
+    /// Used to not remove the existing preview to avoid the interface jumping around between
+    /// states.
+    /// </summary>
+    public enum BattlePreviewStateEnum { None, Pending };
+
+    /// <summary>
     /// Position category
     ///
     /// Possible types of display positions
@@ -1973,6 +1992,18 @@ namespace Dreamtides.Schema
     }
 
     /// <summary>
+    /// Preview of the next state of the battle, used e.g. when confirming prompt choices.
+    /// </summary>
+    public partial struct BattlePreviewState
+    {
+        public BattlePreviewStateClass BattlePreviewStateClass;
+        public BattlePreviewStateEnum? Enum;
+
+        public static implicit operator BattlePreviewState(BattlePreviewStateClass BattlePreviewStateClass) => new BattlePreviewState { BattlePreviewStateClass = BattlePreviewStateClass };
+        public static implicit operator BattlePreviewState(BattlePreviewStateEnum Enum) => new BattlePreviewState { Enum = Enum };
+    }
+
+    /// <summary>
     /// All possible user interface actions
     /// </summary>
     public partial struct GameAction
@@ -2045,6 +2076,8 @@ namespace Dreamtides.Schema
                 TouchScrollBehaviorConverter.Singleton,
                 SliderDirectionConverter.Singleton,
                 ArrowStyleConverter.Singleton,
+                BattlePreviewStateConverter.Singleton,
+                BattlePreviewStateEnumConverter.Singleton,
                 GameActionConverter.Singleton,
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
@@ -4317,6 +4350,99 @@ namespace Dreamtides.Schema
         }
 
         public static readonly ArrowStyleConverter Singleton = new ArrowStyleConverter();
+    }
+
+    internal class BattlePreviewStateConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(BattlePreviewState) || t == typeof(BattlePreviewState?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            switch (reader.TokenType)
+            {
+                case JsonToken.String:
+                case JsonToken.Date:
+                    var stringValue = serializer.Deserialize<string>(reader);
+                    switch (stringValue)
+                    {
+                        case "none":
+                            return new BattlePreviewState { Enum = BattlePreviewStateEnum.None };
+                        case "pending":
+                            return new BattlePreviewState { Enum = BattlePreviewStateEnum.Pending };
+                    }
+                    break;
+                case JsonToken.StartObject:
+                    var objectValue = serializer.Deserialize<BattlePreviewStateClass>(reader);
+                    return new BattlePreviewState { BattlePreviewStateClass = objectValue };
+            }
+            throw new Exception("Cannot unmarshal type BattlePreviewState");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            var value = (BattlePreviewState)untypedValue;
+            if (value.Enum != null)
+            {
+                switch (value.Enum)
+                {
+                    case BattlePreviewStateEnum.None:
+                        serializer.Serialize(writer, "none");
+                        return;
+                    case BattlePreviewStateEnum.Pending:
+                        serializer.Serialize(writer, "pending");
+                        return;
+                }
+            }
+            if (value.BattlePreviewStateClass != null)
+            {
+                serializer.Serialize(writer, value.BattlePreviewStateClass);
+                return;
+            }
+            throw new Exception("Cannot marshal type BattlePreviewState");
+        }
+
+        public static readonly BattlePreviewStateConverter Singleton = new BattlePreviewStateConverter();
+    }
+
+    internal class BattlePreviewStateEnumConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(BattlePreviewStateEnum) || t == typeof(BattlePreviewStateEnum?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "none":
+                    return BattlePreviewStateEnum.None;
+                case "pending":
+                    return BattlePreviewStateEnum.Pending;
+            }
+            throw new Exception("Cannot unmarshal type BattlePreviewStateEnum");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (BattlePreviewStateEnum)untypedValue;
+            switch (value)
+            {
+                case BattlePreviewStateEnum.None:
+                    serializer.Serialize(writer, "none");
+                    return;
+                case BattlePreviewStateEnum.Pending:
+                    serializer.Serialize(writer, "pending");
+                    return;
+            }
+            throw new Exception("Cannot marshal type BattlePreviewStateEnum");
+        }
+
+        public static readonly BattlePreviewStateEnumConverter Singleton = new BattlePreviewStateEnumConverter();
     }
 
     internal class GameActionConverter : JsonConverter

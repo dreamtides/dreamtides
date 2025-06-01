@@ -7,8 +7,8 @@ use core_data::identifiers::BattleId;
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::CardFacing;
 use display_data::battle_view::{
-    BattlePreviewView, BattleView, ButtonView, DisplayPlayer, InterfaceView, PlayerPreviewView,
-    PlayerView,
+    BattlePreviewState, BattlePreviewView, BattleView, ButtonView, DisplayPlayer, InterfaceView,
+    PlayerPreviewView, PlayerView,
 };
 use display_data::card_view::{
     CardActions, CardEffects, CardPrefab, CardPreviewView, CardView, DisplayImage, RevealedCardView,
@@ -68,7 +68,7 @@ pub fn create(id: BattleId) -> BattleView {
             ..Default::default()
         },
         arrows: vec![],
-        preview: None,
+        preview: BattlePreviewState::None,
     }
 }
 
