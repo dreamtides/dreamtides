@@ -1,3 +1,5 @@
+use crate::battle::card_id::CharacterId;
+use crate::battle_cards::card_set::CardSet;
 use crate::battle_player::player_map::PlayerMap;
 
 /// Tracks history of actions and events during a turn
@@ -18,4 +20,8 @@ impl TurnHistory {
 pub struct CurrentActionHistory {
     /// Whether the hand size limit was exceeded while resolving the action.
     pub hand_size_limit_exceeded: bool,
+
+    /// IDs of the characters that were abandoned due to the character limit
+    /// while resolving this action.
+    pub character_limit_characters_abandoned: CardSet<CharacterId>,
 }

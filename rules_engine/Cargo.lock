@@ -554,6 +554,7 @@ dependencies = [
  "core_data",
  "display_data",
  "masonry",
+ "ui_components",
  "uuid",
 ]
 

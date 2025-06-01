@@ -15,5 +15,6 @@ battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 display_data = { path = "../display_data" }
 masonry = { path = "../masonry" }
+ui_components = { path = "../ui_components" }
 
 uuid = { version = "1", features = ["serde", "v4"] }

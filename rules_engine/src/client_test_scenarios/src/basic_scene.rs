@@ -19,6 +19,7 @@ use masonry::dimension::{Dimension, DimensionGroup, DimensionUnit, FlexInsets};
 use masonry::flex_enums::{FlexPosition, TextAlign, WhiteSpace};
 use masonry::flex_node::{FlexNode, NodeType, TextNode};
 use masonry::flex_style::FlexStyle;
+use ui_components::icon;
 
 pub fn create(id: BattleId) -> BattleView {
     BattleView {
@@ -130,7 +131,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
                     cards: vec![
                         CardPreviewView {
                             card_id: CardId(539),
-                            battlefield_icon: Some("\u{f06a}".to_string()),
+                            battlefield_icon: Some(icon::WARNING.to_string()),
                             battlefield_icon_color: Some(display_color::RED_900),
                             ..Default::default()
                         }

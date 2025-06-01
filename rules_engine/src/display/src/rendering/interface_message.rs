@@ -2,7 +2,7 @@ use bon::Builder;
 use core_data::display_color;
 use core_data::display_types::Milliseconds;
 use masonry::dimension::{FlexInsets, Percent};
-use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition, TextAlign};
+use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition, TextAlign, WhiteSpace};
 use masonry::flex_style::FlexStyle;
 use ui_components::box_component::BoxComponent;
 use ui_components::component::Component;
@@ -76,6 +76,7 @@ impl Component for InterfaceMessage {
                                 .text(self.text)
                                 .typography(Typography::InterfaceMessage)
                                 .text_align(TextAlign::MiddleCenter)
+                                .white_space(WhiteSpace::Normal)
                                 .build(),
                         )
                         .build(),

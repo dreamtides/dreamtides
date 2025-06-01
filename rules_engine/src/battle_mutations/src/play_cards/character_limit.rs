@@ -10,9 +10,8 @@ const CHARACTER_LIMIT: usize = 8;
 /// Applies the character limit, if necessary, for a player.
 ///
 /// If a character resolves in excess of the limit, one of the controller's
-/// other characters is abandoned. This operation happens after the new
-/// character is in play and causes triggers to fire, but before any other game
-/// action can be taken.
+/// other characters is abandoned. This operation happens before the new
+/// character enters play.
 ///
 /// The abandoned character is selected based on the following ranking:
 ///
@@ -21,7 +20,8 @@ const CHARACTER_LIMIT: usize = 8;
 /// - The lowest-spark character with a triggered ability
 /// - The lowest-spark character with an activated ability
 ///
-/// Ties are broken by selecting the lowest-cost character.
+/// Ties are broken by selecting the lowest-cost character, and then by internal
+/// card ID.
 ///
 /// The current spark value of the abandoned character is permanently granted to
 /// its controller as a 'spark bonus'.
@@ -35,6 +35,13 @@ pub fn apply(battle: &mut BattleState, source: EffectSource, player: PlayerName)
         .battlefield_state(player)
         .iter()
         .min_by_key(|(&id, state)| (state.spark, card_properties::cost(battle, id)))?;
+
+    battle
+        .turn_history
+        .current_action_history
+        .player_mut(player)
+        .character_limit_characters_abandoned
+        .insert(*target_id);
 
     let spark_value = battle.cards.spark(player, *target_id)?;
     abandon::apply(battle, source, *target_id);

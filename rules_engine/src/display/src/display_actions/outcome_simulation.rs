@@ -4,9 +4,12 @@ use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
+use battle_state::battle::card_id::CardIdType;
 use battle_state::prompt_types::prompt_data::PromptType;
+use core_data::display_color;
 use core_data::types::PlayerName;
 use display_data::battle_view::{BattlePreviewView, PlayerPreviewView};
+use display_data::card_view::CardPreviewView;
 use tracing_macros::panic_with;
 use ui_components::component::Component;
 use ui_components::icon;
@@ -77,14 +80,44 @@ pub fn action_effect_preview(
     };
 
     let mut preview_message = None;
+    let mut cards = vec![];
+
     if simulation.turn_history.current_action_history.player(player).hand_size_limit_exceeded {
         preview_message = hand_size_limit_exceeded_message().flex_node();
+    }
+
+    if !simulation
+        .turn_history
+        .current_action_history
+        .player(player)
+        .character_limit_characters_abandoned
+        .is_empty()
+    {
+        if preview_message.is_some() {
+            preview_message = combined_limit_messages().flex_node();
+        } else {
+            preview_message = character_limit_message().flex_node();
+        }
+
+        for character_id in &simulation
+            .turn_history
+            .current_action_history
+            .player(player)
+            .character_limit_characters_abandoned
+        {
+            cards.push(CardPreviewView {
+                card_id: character_id.card_id(),
+                battlefield_icon: Some(icon::WARNING.to_string()),
+                battlefield_icon_color: Some(display_color::RED_900),
+                ..Default::default()
+            });
+        }
     }
 
     BattlePreviewView {
         user: user_preview,
         enemy: PlayerPreviewView::default(),
-        cards: vec![],
+        cards,
         preview_message,
     }
 }
@@ -117,7 +150,23 @@ pub fn current_prompt_battle_preview(
 
 fn hand_size_limit_exceeded_message() -> impl Component {
     InterfaceMessage::builder()
-        .text(format!("Note: cards drawn in excess of 10 become {} instead.", icon::ENERGY))
+        .text(format!("Note: Cards drawn in excess of 10 become {} instead.", icon::ENERGY))
+        .anchor_position(AnchorPosition::Top)
+        .temporary(false)
+        .build()
+}
+
+fn character_limit_message() -> impl Component {
+    InterfaceMessage::builder()
+        .text("Character limit exceeded: A character will be abandoned, with its spark permanently added to your total.")
+        .anchor_position(AnchorPosition::Top)
+        .temporary(false)
+        .build()
+}
+
+fn combined_limit_messages() -> impl Component {
+    InterfaceMessage::builder()
+        .text(format!("Character limit exceeded: A character will be abandoned. Cards drawn in excess of 10 become {} instead.", icon::ENERGY))
         .anchor_position(AnchorPosition::Top)
         .temporary(false)
         .build()
