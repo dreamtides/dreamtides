@@ -25,6 +25,10 @@ pub enum BattleAnimation {
         player: PlayerName,
         card_id: HandCardId,
     },
+    DrawCards {
+        player: PlayerName,
+        cards: Vec<HandCardId>,
+    },
     SelectStackCardTargets {
         player: PlayerName,
         source_id: StackCardId,

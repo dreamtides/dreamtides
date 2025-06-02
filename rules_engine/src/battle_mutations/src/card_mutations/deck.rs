@@ -1,7 +1,9 @@
 use battle_queries::battle_card_queries::card_abilities;
 use battle_state::battle::all_cards::CreatedCard;
+use battle_state::battle::animation_data::AnimationStep;
+use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{DeckCardId, HandCardId};
+use battle_state::battle::card_id::{CardIdType, DeckCardId, HandCardId};
 use battle_state::battle_cards::card_set::CardSet;
 use battle_state::core::effect_source::EffectSource;
 use core_data::identifiers::CardName;
@@ -26,26 +28,53 @@ pub fn draw_card(
     source: EffectSource,
     player: PlayerName,
 ) -> Option<HandCardId> {
-    if battle.cards.hand(player).len() >= HAND_SIZE_LIMIT {
-        // If a player exceeds the hand size limit, they instead gain 1
-        // energy for each card they would have drawn.
-        energy::gain(battle, player, source, Energy(1));
-        let p = battle.turn_history.current_action_history.player_mut(player);
-        p.hand_size_limit_exceeded = true;
-        return None;
-    }
-
-    let Some(id) = random_element(battle.cards.deck(player), &mut battle.rng) else {
-        create_test_deck::add(battle, player);
-        return draw_card(battle, source, player);
-    };
-    Some(move_card::from_deck_to_hand(battle, source, player, id))
+    draw_card_internal(battle, source, player, true)
 }
 
 /// Draw a number of cards from `player`'s deck and put them into their hand.
 pub fn draw_cards(battle: &mut BattleState, source: EffectSource, player: PlayerName, count: u32) {
+    if battle.animations.is_some() {
+        draw_cards_with_animation(battle, source, player, count);
+    } else {
+        draw_cards_internal(battle, source, player, count);
+    }
+}
+
+/// Internal implementation of draw_cards without animation support.
+fn draw_cards_internal(
+    battle: &mut BattleState,
+    source: EffectSource,
+    player: PlayerName,
+    count: u32,
+) {
     for _ in 0..count {
-        draw_card(battle, source, player);
+        draw_card_internal(battle, source, player, false);
+    }
+}
+
+/// Implementation of draw_cards with animation support.
+fn draw_cards_with_animation(
+    battle: &mut BattleState,
+    source: EffectSource,
+    player: PlayerName,
+    count: u32,
+) {
+    let pre_draw_snapshot = battle.logical_clone();
+    let mut drawn_cards = Vec::new();
+
+    for _ in 0..count {
+        if let Some(card_id) = draw_card_internal(battle, source, player, false) {
+            drawn_cards.push(card_id);
+        }
+    }
+
+    if !drawn_cards.is_empty()
+        && let Some(animations) = &mut battle.animations
+    {
+        animations.steps.push(AnimationStep {
+            snapshot: pre_draw_snapshot,
+            animation: BattleAnimation::DrawCards { player, cards: drawn_cards },
+        });
     }
 }
 
@@ -61,6 +90,34 @@ pub fn add_cards(battle: &mut BattleState, player: PlayerName, cards: Vec<CardNa
             })
             .collect(),
     );
+}
+
+fn draw_card_internal(
+    battle: &mut BattleState,
+    source: EffectSource,
+    player: PlayerName,
+    with_animation: bool,
+) -> Option<HandCardId> {
+    if battle.cards.hand(player).len() >= HAND_SIZE_LIMIT {
+        // If a player exceeds the hand size limit, they instead gain 1
+        // energy for each card they would have drawn.
+        energy::gain(battle, player, source, Energy(1));
+        let p = battle.turn_history.current_action_history.player_mut(player);
+        p.hand_size_limit_exceeded = true;
+        return None;
+    }
+
+    let Some(id) = random_element(battle.cards.deck(player), &mut battle.rng) else {
+        create_test_deck::add(battle, player);
+        return draw_card_internal(battle, source, player, with_animation);
+    };
+    if with_animation {
+        battle.push_animation(|| BattleAnimation::DrawCards {
+            player,
+            cards: vec![HandCardId(id.card_id())],
+        });
+    }
+    Some(move_card::from_deck_to_hand(battle, source, player, id))
 }
 
 /// Returns a random element from the given set.

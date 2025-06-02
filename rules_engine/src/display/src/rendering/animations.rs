@@ -4,11 +4,12 @@ use battle_state::battle::card_id::{CardIdType, StackCardId};
 use core_data::display_types::Milliseconds;
 use display_data::command::{
     Command, DisplayDreamwellActivationCommand, DisplayEnemyMessageCommand, DisplayJudgmentCommand,
-    GameMessageType,
+    DrawUserCardsCommand, GameMessageType,
 };
 
+use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
-use crate::rendering::{apply_card_fx, labels};
+use crate::rendering::{apply_card_fx, card_rendering, labels};
 
 pub fn render(
     builder: &mut ResponseBuilder,
@@ -50,6 +51,29 @@ pub fn render(
                 // If the played card is no longer on the stack, insert a pause
                 // so it can be seen.
                 builder.push(Command::Wait(Milliseconds::new(2000)));
+            }
+        }
+        BattleAnimation::DrawCards { player, cards } => {
+            if *player == builder.display_for_player() && !cards.is_empty() {
+                let card_views = cards
+                    .iter()
+                    .map(|&card_id| {
+                        card_rendering::card_view(
+                            builder,
+                            &CardViewContext::Battle(
+                                final_state,
+                                final_state.cards.card(card_id.card_id()).name,
+                                card_id.card_id(),
+                            ),
+                        )
+                    })
+                    .collect();
+
+                builder.push(Command::DrawUserCards(DrawUserCardsCommand {
+                    cards: card_views,
+                    stagger_interval: Milliseconds::new(500),
+                    pause_duration: Milliseconds::new(300),
+                }));
             }
         }
         BattleAnimation::SelectStackCardTargets { .. } => {}
