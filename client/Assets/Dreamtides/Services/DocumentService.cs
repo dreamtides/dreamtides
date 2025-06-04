@@ -16,6 +16,8 @@ namespace Dreamtides.Services
     IMasonElement _infoZoom = null!;
     IMasonElement _screenOverlay = null!;
 
+    public FlexNode? CurrentScreenOverlayNode { get; private set; }
+
     public VisualElement RootVisualElement => _document.rootVisualElement;
 
     protected override void OnInitialize(TestConfiguration? testConfiguration)
@@ -75,6 +77,7 @@ namespace Dreamtides.Services
 
     public void RenderScreenOverlay(FlexNode? node)
     {
+      CurrentScreenOverlayNode = node;
       Reconcile(ref _screenOverlay, node ?? new FlexNode());
     }
 
