@@ -781,6 +781,7 @@ dependencies = [
  "schemars",
  "serde",
  "tracing",
+ "tracing-subscriber",
  "tracing_macros",
  "ui_components",
 ]

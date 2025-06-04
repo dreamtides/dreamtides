@@ -11,6 +11,8 @@ use core_data::types::PlayerName;
 use display_data::battle_view::{BattlePreviewView, PlayerPreviewView};
 use display_data::card_view::CardPreviewView;
 use tracing_macros::panic_with;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::EnvFilter;
 use ui_components::component::Component;
 use ui_components::icon;
 
@@ -63,12 +65,15 @@ pub fn action_effect_preview(
     action: BattleAction,
 ) -> BattlePreviewView {
     let mut simulation = battle.logical_clone();
-    apply_battle_action::execute(&mut simulation, player, action);
-    let opponent = player.opponent();
-    let legal_actions_for_opponent = legal_actions::compute(&simulation, opponent);
-    if legal_actions_for_opponent.contains(BattleAction::PassPriority) {
-        apply_battle_action::execute(&mut simulation, opponent, BattleAction::PassPriority);
-    }
+    let subscriber = tracing_subscriber::registry().with(EnvFilter::new("warn"));
+    tracing::subscriber::with_default(subscriber, || {
+        apply_battle_action::execute(&mut simulation, player, action);
+        let opponent = player.opponent();
+        let legal_actions_for_opponent = legal_actions::compute(&simulation, opponent);
+        if legal_actions_for_opponent.contains(BattleAction::PassPriority) {
+            apply_battle_action::execute(&mut simulation, opponent, BattleAction::PassPriority);
+        }
+    });
 
     let simulated_player_state = simulation.players.player(player);
 
