@@ -52,10 +52,14 @@ fn apply_standard_effect(
         StandardEffect::DrawCardsForEach { count, for_each } => {
             draw_cards_for_each(battle, source, *count, for_each)
         }
-        StandardEffect::DissolveCharacter { .. } => dissolve(battle, source, targets),
-        StandardEffect::Negate { .. } => negate(battle, source, targets),
+        StandardEffect::DissolveCharacter { .. } => {
+            dissolve(battle, source, targets);
+        }
+        StandardEffect::Negate { .. } => {
+            negate(battle, source, targets);
+        }
         StandardEffect::NegateUnlessPaysCost { cost, .. } => {
-            negate_unless_pays_cost::execute(battle, source, targets, cost)
+            negate_unless_pays_cost::execute(battle, source, targets, cost);
         }
         StandardEffect::OpponentPaysCost { cost } => {
             pay_cost::execute(battle, source, source.controller().opponent(), cost)
@@ -77,12 +81,22 @@ fn draw_cards_for_each(
     deck::draw_cards(battle, source, source.controller(), count * matching);
 }
 
-fn dissolve(battle: &mut BattleState, source: EffectSource, targets: Option<&StackCardTargets>) {
-    let id = targeting::character_id(battle, targets);
+fn dissolve(
+    battle: &mut BattleState,
+    source: EffectSource,
+    targets: Option<&StackCardTargets>,
+) -> Option<()> {
+    let id = targeting::character_id(targets)?;
     dissolve::execute(battle, source, id);
+    Some(())
 }
 
-fn negate(battle: &mut BattleState, source: EffectSource, targets: Option<&StackCardTargets>) {
-    let id = targeting::stack_card_id(battle, targets);
+fn negate(
+    battle: &mut BattleState,
+    source: EffectSource,
+    targets: Option<&StackCardTargets>,
+) -> Option<()> {
+    let id = targeting::stack_card_id(targets)?;
     negate::execute(battle, source, id);
+    Some(())
 }

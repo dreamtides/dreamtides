@@ -20,7 +20,7 @@ pub fn execute(
     source: EffectSource,
     targets: Option<&StackCardTargets>,
     cost: &Cost,
-) {
+) -> Option<()> {
     if costs::can_pay(battle, source.controller().opponent(), cost) {
         prompts::set(battle, PromptData {
             source,
@@ -42,11 +42,12 @@ pub fn execute(
                 ],
             },
             context: PromptContext::ApplyNegativeEffectChoice(
-                targeting::stack_card_id(battle, targets).card_id(),
+                targeting::stack_card_id(targets)?.card_id(),
             ),
             configuration: PromptConfiguration { ..Default::default() },
         });
     } else {
-        negate::execute(battle, source, targeting::stack_card_id(battle, targets));
+        negate::execute(battle, source, targeting::stack_card_id(targets)?);
     }
+    Some(())
 }
