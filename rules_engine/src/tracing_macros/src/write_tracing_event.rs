@@ -14,7 +14,7 @@ use chrono::{DateTime, Local};
 use display_data::command::CommandSequence;
 use serde::Serialize;
 use serde_json;
-use tracing::error;
+use tracing::{debug, error};
 
 pub fn write_battle_event(
     battle: &mut BattleState,
@@ -78,6 +78,15 @@ pub fn write_commands(
     message: &'static str,
     sequence: &CommandSequence,
 ) {
+    let command_names: Vec<String> = sequence
+        .groups
+        .iter()
+        .flat_map(|group| &group.commands)
+        .map(|command| format!("{:?}", command.kind()))
+        .collect();
+
+    debug!("Writing commands: [{}]", command_names.join(", "));
+
     let snapshot = battle.filter(|b| b.tracing.is_some()).map(debug_battle_snapshot::capture);
     let timestamp = format_current_time();
     let event = CommandTraceEvent {

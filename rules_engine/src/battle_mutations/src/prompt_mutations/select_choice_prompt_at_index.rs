@@ -22,7 +22,7 @@ pub fn select(battle: &mut BattleState, player: PlayerName, choice_index: usize)
         panic_with!("Invalid choice index", battle, choice_index);
     };
     let label = choice.label;
+    battle.push_animation(|| BattleAnimation::MakeChoice { player, choice: label });
     apply_effect::execute(battle, source, &choice.effect, &choice.targets.clone());
     battle.prompt = None;
-    battle.push_animation(|| BattleAnimation::MakeChoice { player, choice: label });
 }

@@ -8,6 +8,7 @@ use core_data::numerics::{Energy, Points};
 use masonry::flex_style::FlexVector3;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use strum::EnumDiscriminants;
 
 use crate::battle_view::{BattleView, DisplayPlayer};
 use crate::card_view::CardView;
@@ -60,8 +61,9 @@ pub struct ParallelCommandGroup {
 }
 
 /// Represents an animated update to the visual state of the game.
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, EnumDiscriminants)]
 #[serde(rename_all = "camelCase")]
+#[strum_discriminants()]
 pub enum Command {
     UpdateBattle(UpdateBattleCommand),
     Wait(Milliseconds),
@@ -74,6 +76,12 @@ pub enum Command {
     DisplayDreamwellActivation(DisplayDreamwellActivationCommand),
     DisplayEnemyMessage(DisplayEnemyMessageCommand),
     ToggleThinkingIndicator(ToggleThinkingIndicatorCommand),
+}
+
+impl Command {
+    pub fn kind(&self) -> CommandDiscriminants {
+        self.into()
+    }
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

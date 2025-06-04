@@ -46,13 +46,19 @@ pub fn is_victory_imminent_for_player(battle: &BattleState, player: PlayerName) 
         panic_with!("Opponent cannot end their turn", battle, opponent);
     }
 
-    apply_battle_action::execute(&mut simulation, opponent, BattleAction::EndTurn);
+    let subscriber = tracing_subscriber::registry().with(EnvFilter::new("warn"));
+    tracing::subscriber::with_default(subscriber, || {
+        apply_battle_action::execute(&mut simulation, opponent, BattleAction::EndTurn);
+    });
 
     let legal_actions = legal_actions::compute(&simulation, player);
     if !legal_actions.contains(BattleAction::StartNextTurn) {
         panic_with!("Player cannot start their turn", battle, opponent);
     }
-    apply_battle_action::execute(&mut simulation, player, BattleAction::StartNextTurn);
+    let subscriber = tracing_subscriber::registry().with(EnvFilter::new("warn"));
+    tracing::subscriber::with_default(subscriber, || {
+        apply_battle_action::execute(&mut simulation, player, BattleAction::StartNextTurn);
+    });
 
     matches!(simulation.status, BattleStatus::GameOver { winner: Some(winner) } if winner == player)
 }
