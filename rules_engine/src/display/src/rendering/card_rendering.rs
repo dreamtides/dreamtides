@@ -1,5 +1,5 @@
 use action_data::game_action_data::GameAction;
-use battle_queries::battle_card_queries::card_properties;
+use battle_queries::battle_card_queries::{card_properties, stack_card_queries};
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
 use battle_state::actions::battle_actions::BattleAction;
@@ -194,9 +194,7 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
             icon: icon::CHEVRON_UP.to_string(),
             color: display_color::GREEN_500,
         });
-    } else if let Some(stack_card) = battle.cards.stack_card(StackCardId(card_id))
-        && let Some(targets) = &stack_card.targets
-    {
+    } else if let Some(targets) = stack_card_queries::targets(battle, card_id) {
         // This card is currently on the stack with targets.
         match targets {
             StackCardTargets::Character(target_character_id, _) => {

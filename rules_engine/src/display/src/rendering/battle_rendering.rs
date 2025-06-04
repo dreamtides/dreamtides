@@ -1,3 +1,4 @@
+use battle_queries::battle_card_queries::stack_card_queries;
 use battle_queries::battle_player_queries::player_properties;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
@@ -100,7 +101,7 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
         .all_cards_on_stack()
         .iter()
         .filter_map(|stack_card| {
-            stack_card.targets.as_ref().map(|targets| {
+            stack_card_queries::targets(battle, stack_card.id).map(|targets| {
                 let source = GameObjectId::CardId(stack_card.id.card_id());
                 let (target, color) = match targets {
                     StackCardTargets::Character(character_id, _) => {
