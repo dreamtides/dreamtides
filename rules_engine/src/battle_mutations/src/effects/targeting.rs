@@ -6,7 +6,7 @@ use tracing_macros::panic_with;
 /// Returns the [CharacterId] for a [StackCardTargets::Character] target.
 ///
 /// Panics if the target is not a character.
-pub fn character_id(battle: &mut BattleState, targets: &Option<StackCardTargets>) -> CharacterId {
+pub fn character_id(battle: &mut BattleState, targets: Option<&StackCardTargets>) -> CharacterId {
     match targets {
         Some(StackCardTargets::Character(character_id, ..)) => *character_id,
         _ => {
@@ -18,7 +18,7 @@ pub fn character_id(battle: &mut BattleState, targets: &Option<StackCardTargets>
 /// Returns the [StackCardId] for a [StackCardTargets::StackCard] target.
 ///
 /// Panics if the target is not a stack card.
-pub fn stack_card_id(battle: &BattleState, targets: &Option<StackCardTargets>) -> StackCardId {
+pub fn stack_card_id(battle: &BattleState, targets: Option<&StackCardTargets>) -> StackCardId {
     match targets {
         Some(StackCardTargets::StackCard(stack_card_id, ..)) => *stack_card_id,
         _ => {

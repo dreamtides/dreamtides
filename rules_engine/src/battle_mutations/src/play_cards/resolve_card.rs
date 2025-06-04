@@ -69,6 +69,6 @@ fn apply_event_effects(battle: &mut BattleState, card: &StackCardState) {
             stack_card_id: card.id,
             ability_number: *ability_number,
         };
-        apply_effect::execute(battle, event_source, &ability.effect, &card.targets);
+        apply_effect::execute(battle, event_source, &ability.effect, card.targets.as_ref());
     }
 }

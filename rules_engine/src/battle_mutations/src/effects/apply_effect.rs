@@ -1,10 +1,10 @@
 use ability_data::effect::Effect;
 use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
+use battle_queries::battle_card_queries::stack_card_queries;
 use battle_queries::battle_player_queries::quantity_expression;
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::CardIdType;
 use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use battle_state::core::effect_source::EffectSource;
 use tracing_macros::battle_trace;
@@ -17,12 +17,9 @@ pub fn execute(
     battle: &mut BattleState,
     source: EffectSource,
     effect: &Effect,
-    targets: &Option<StackCardTargets>,
+    requested_targets: Option<&StackCardTargets>,
 ) {
-    if !targets_are_valid(battle, targets) {
-        return;
-    }
-
+    let targets = stack_card_queries::validate_targets(battle, requested_targets);
     match effect {
         Effect::Effect(standard) => apply_standard_effect(battle, source, standard, targets),
         _ => todo!("Implement this"),
@@ -39,14 +36,14 @@ fn apply_standard_effect(
     battle: &mut BattleState,
     source: EffectSource,
     effect: &StandardEffect,
-    targets: &Option<StackCardTargets>,
+    targets: Option<&StackCardTargets>,
 ) {
     battle_trace!("Applying effect", battle, source, effect, targets);
     battle.push_animation_optional(|| {
         source.card_id().map(|source_id| BattleAnimation::ApplyEffect {
             controller: source.controller(),
             source: source_id,
-            targets: targets.clone(),
+            targets: targets.cloned(),
             effect: effect.clone(),
         })
     });
@@ -70,18 +67,6 @@ fn apply_standard_effect(
     }
 }
 
-fn targets_are_valid(battle: &BattleState, targets: &Option<StackCardTargets>) -> bool {
-    match targets {
-        Some(StackCardTargets::Character(character_id, object_id)) => {
-            battle.cards.is_valid_object_id(character_id.card_id(), *object_id)
-        }
-        Some(StackCardTargets::StackCard(stack_card_id, object_id)) => {
-            battle.cards.is_valid_object_id(stack_card_id.card_id(), *object_id)
-        }
-        None => true,
-    }
-}
-
 fn draw_cards_for_each(
     battle: &mut BattleState,
     source: EffectSource,
@@ -92,12 +77,12 @@ fn draw_cards_for_each(
     deck::draw_cards(battle, source, source.controller(), count * matching);
 }
 
-fn dissolve(battle: &mut BattleState, source: EffectSource, targets: &Option<StackCardTargets>) {
+fn dissolve(battle: &mut BattleState, source: EffectSource, targets: Option<&StackCardTargets>) {
     let id = targeting::character_id(battle, targets);
     dissolve::execute(battle, source, id);
 }
 
-fn negate(battle: &mut BattleState, source: EffectSource, targets: &Option<StackCardTargets>) {
+fn negate(battle: &mut BattleState, source: EffectSource, targets: Option<&StackCardTargets>) {
     let id = targeting::stack_card_id(battle, targets);
     negate::execute(battle, source, id);
 }

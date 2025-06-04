@@ -18,7 +18,7 @@ use crate::prompt_mutations::prompts;
 pub fn execute(
     battle: &mut BattleState,
     source: EffectSource,
-    targets: &Option<StackCardTargets>,
+    targets: Option<&StackCardTargets>,
     cost: &Cost,
 ) {
     if costs::can_pay(battle, source.controller().opponent(), cost) {
@@ -32,12 +32,12 @@ pub fn execute(
                         effect: Effect::Effect(StandardEffect::OpponentPaysCost {
                             cost: cost.clone(),
                         }),
-                        targets: targets.clone(),
+                        targets: targets.cloned(),
                     },
                     PromptChoice {
                         label: PromptChoiceLabel::Decline,
                         effect: Effect::Effect(StandardEffect::Negate { target: Predicate::It }),
-                        targets: targets.clone(),
+                        targets: targets.cloned(),
                     },
                 ],
             },
