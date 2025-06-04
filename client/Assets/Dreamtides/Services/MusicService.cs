@@ -11,10 +11,9 @@ namespace Dreamtides.Services
   {
     [SerializeField] List<AudioClip> _tracks = null!;
     [SerializeField] float _crossFadeDuration = 2f;
-
-    List<int> _shuffledIndices = new();
-    int _currentTrackIndex = -1;
-    Coroutine? _trackMonitorCoroutine;
+    [SerializeField] List<int> _shuffledIndices = new();
+    [SerializeField] int _currentTrackIndex = -1;
+    bool _isTransitioning = false;
 
     protected override void OnInitialize(TestConfiguration? testConfiguration)
     {
@@ -58,12 +57,21 @@ namespace Dreamtides.Services
 
       var nextTrack = _tracks[_shuffledIndices[_currentTrackIndex]];
       StartCoroutine(CrossfadeToTrack(nextTrack));
+    }
 
-      if (_trackMonitorCoroutine != null)
+    void Update()
+    {
+      if (!_isTransitioning && Registry.Layout.MusicAudioSource.clip != null)
       {
-        StopCoroutine(_trackMonitorCoroutine);
+        var shouldTransition = !Registry.Layout.MusicAudioSource.isPlaying ||
+          Registry.Layout.MusicAudioSource.time >= Registry.Layout.MusicAudioSource.clip.length - _crossFadeDuration;
+
+        if (shouldTransition)
+        {
+          _isTransitioning = true;
+          PlayNextTrack();
+        }
       }
-      _trackMonitorCoroutine = StartCoroutine(MonitorTrackCompletion());
     }
 
     IEnumerator CrossfadeToTrack(AudioClip nextTrack)
@@ -71,7 +79,6 @@ namespace Dreamtides.Services
       float startVolume = Registry.Layout.MusicAudioSource.volume;
       float elapsed = 0;
 
-      // Fade out current track if playing
       while (elapsed < _crossFadeDuration && Registry.Layout.MusicAudioSource.isPlaying)
       {
         elapsed += Time.deltaTime;
@@ -79,28 +86,18 @@ namespace Dreamtides.Services
         yield return null;
       }
 
-      // Switch to new track
       Registry.Layout.MusicAudioSource.clip = nextTrack;
       Registry.Layout.MusicAudioSource.Play();
       elapsed = 0;
 
-      // Fade in new track
       while (elapsed < _crossFadeDuration)
       {
         elapsed += Time.deltaTime;
         Registry.Layout.MusicAudioSource.volume = Mathf.Lerp(0, startVolume, elapsed / _crossFadeDuration);
         yield return null;
       }
-    }
 
-    IEnumerator MonitorTrackCompletion()
-    {
-      yield return new WaitUntil(() =>
-        !Registry.Layout.MusicAudioSource.isPlaying ||
-        (Registry.Layout.MusicAudioSource.clip &&
-        Registry.Layout.MusicAudioSource.time >= Registry.Layout.MusicAudioSource.clip.length - _crossFadeDuration));
-
-      PlayNextTrack();
+      _isTransitioning = false;
     }
   }
 }
