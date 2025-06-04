@@ -7,7 +7,9 @@ use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType, CharacterId, HandCardId, StackCardId};
-use battle_state::battle_cards::stack_card_state::StackCardTargets;
+use battle_state::battle_cards::stack_card_state::{
+    StackCardAdditionalCostsPaid, StackCardTargets,
+};
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::card_types::CardType;
 use core_data::display_color;
@@ -147,7 +149,7 @@ fn card_type(battle: &BattleState, card_id: CardId) -> String {
 }
 
 fn rules_text(battle: &BattleState, card_id: CardId) -> String {
-    match battle.cards.card(card_id).name {
+    let base_text = match battle.cards.card(card_id).name {
         CardName::MinstrelOfFallingLight => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
         CardName::Immolate => "Dissolve an enemy character.".to_string(),
         CardName::RippleOfDefiance => {
@@ -157,7 +159,16 @@ fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         CardName::Dreamscatter => {
             "Pay one or more \u{f7e4}: Draw a card for each \u{f7e4} spent.".to_string()
         }
+    };
+
+    if battle.cards.card(card_id).name == CardName::Dreamscatter
+        && let Some(stack_card) = battle.cards.stack_card(StackCardId(card_id))
+        && let StackCardAdditionalCostsPaid::Energy(energy) = &stack_card.additional_costs_paid
+    {
+        return format!("{} <b><color=\"blue\">({}\u{f7e4} paid)</color></b>", base_text, energy.0);
     }
+
+    base_text
 }
 
 fn build_info_zoom_data(battle: &BattleState, card_id: CardId) -> Option<InfoZoomData> {
