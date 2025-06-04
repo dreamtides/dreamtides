@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use action_data::game_action_data::GameAction;
 use battle_queries::battle_card_queries::{card_properties, stack_card_queries};
 use battle_queries::legal_action_queries::legal_actions;
@@ -6,7 +8,7 @@ use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType, CharacterId, HandCardId, StackCardId};
 use battle_state::battle_cards::stack_card_state::StackCardTargets;
-use battle_state::prompt_types::prompt_data::PromptContext;
+use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::card_types::CardType;
 use core_data::display_color;
 use core_data::display_types::SpriteAddress;
@@ -169,43 +171,46 @@ fn build_info_zoom_data(battle: &BattleState, card_id: CardId) -> Option<InfoZoo
 }
 
 fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIcon> {
-    let mut icons = Vec::new();
+    let mut icons = HashMap::new();
 
     if let Some(prompt) = &battle.prompt
-        && let Some(source_id) = prompt.source.card_id()
-        && source_id == card_id
-        && let PromptContext::ApplyNegativeEffectChoice(target_id) = &prompt.context
+        && prompt.source.card_id() == Some(card_id)
+        && let PromptType::Choose { choices } = &prompt.prompt_type
     {
-        // This card is the source of a prompt to apply a negative effect to
-        // another card.
-        icons.push(InfoZoomIcon {
-            card_id: *target_id,
-            icon: icon::CHEVRON_UP.to_string(),
-            color: display_color::RED_500,
-        });
-    } else if let Some(prompt) = &battle.prompt
-        && let Some(source_id) = prompt.source.card_id()
-        && source_id == card_id
-        && let PromptContext::ApplyNegativeEffectChoice(target_id) = &prompt.context
-    {
-        // Prompt to apply a positive effect
-        icons.push(InfoZoomIcon {
-            card_id: *target_id,
-            icon: icon::CHEVRON_UP.to_string(),
-            color: display_color::GREEN_500,
-        });
-    } else if let Some(targets) = stack_card_queries::targets(battle, card_id) {
+        // This card is currently the source of a choice prompt, check for
+        // effect targets.
+        for choice in choices {
+            if let Some(targets) = &choice.targets {
+                let target_card_id = match targets {
+                    StackCardTargets::Character(target_character_id, _) => {
+                        target_character_id.card_id()
+                    }
+                    StackCardTargets::StackCard(target_stack_card_id, _) => {
+                        target_stack_card_id.card_id()
+                    }
+                };
+
+                icons.insert(target_card_id, InfoZoomIcon {
+                    card_id: target_card_id,
+                    icon: icon::CHEVRON_UP.to_string(),
+                    color: display_color::RED_500,
+                });
+            }
+        }
+    }
+
+    if let Some(targets) = stack_card_queries::targets(battle, card_id) {
         // This card is currently on the stack with targets.
         match targets {
             StackCardTargets::Character(target_character_id, _) => {
-                icons.push(InfoZoomIcon {
+                icons.insert(target_character_id.card_id(), InfoZoomIcon {
                     card_id: target_character_id.card_id(),
                     icon: icon::CHEVRON_UP.to_string(),
                     color: display_color::RED_500,
                 });
             }
             StackCardTargets::StackCard(target_stack_card_id, _) => {
-                icons.push(InfoZoomIcon {
+                icons.insert(target_stack_card_id.card_id(), InfoZoomIcon {
                     card_id: target_stack_card_id.card_id(),
                     icon: icon::CHEVRON_UP.to_string(),
                     color: display_color::RED_500,
@@ -217,12 +222,12 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
         && stack_card_queries::validate_targets(battle, stack_card.targets.as_ref()).is_none()
     {
         // This card is currently on the stack with invalid targets.
-        icons.push(InfoZoomIcon {
+        icons.insert(card_id, InfoZoomIcon {
             card_id,
             icon: icon::XMARK.to_string(),
             color: display_color::RED_500,
         });
     }
 
-    icons
+    icons.into_values().collect()
 }
