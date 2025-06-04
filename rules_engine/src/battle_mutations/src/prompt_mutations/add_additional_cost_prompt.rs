@@ -3,7 +3,6 @@ use battle_queries::battle_card_queries::card_abilities;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::StackCardId;
 use battle_state::core::effect_source::EffectSource;
-use battle_state::prompt_types::prompt_context::PromptContext;
 use battle_state::prompt_types::prompt_data::{PromptConfiguration, PromptData, PromptType};
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
@@ -33,13 +32,10 @@ fn create_prompt_for_cost(
     source: EffectSource,
     cost: &Cost,
 ) -> PromptData {
-    let (prompt, context) = match cost {
+    let prompt = match cost {
         Cost::SpendOneOrMoreEnergy => {
             let energy = battle.players.player(player).current_energy;
-            (
-                PromptType::ChooseEnergyValue { minimum: Energy(1), maximum: energy },
-                PromptContext::PickAdditionalEnergyCost,
-            )
+            PromptType::ChooseEnergyValue { minimum: Energy(1), maximum: energy }
         }
         _ => todo!("Implement additional cost prompt for {:?}", cost),
     };
@@ -49,6 +45,5 @@ fn create_prompt_for_cost(
         prompt_type: prompt,
         source,
         configuration: PromptConfiguration { optional: false },
-        context,
     }
 }

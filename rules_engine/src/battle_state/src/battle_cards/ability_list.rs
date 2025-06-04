@@ -26,6 +26,20 @@ pub struct AbilityList {
 pub struct AbilityData<T> {
     pub ability_number: AbilityNumber,
     pub ability: T,
+    pub configuration: AbilityConfiguration,
+}
+
+/// Configuration options for an ability.
+#[derive(Debug, Clone, Default)]
+pub struct AbilityConfiguration {
+    /// Label to display when selecting a target for this ability.
+    pub targeting_prompt: Option<String>,
+
+    /// Label to display when selecting a choice for this ability.
+    pub choice_prompt: Option<String>,
+
+    /// Label to display when selecting an additional cost for this ability.
+    pub additional_cost_prompt: Option<String>,
 }
 
 /// A restriction on playing a card.

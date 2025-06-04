@@ -8,7 +8,9 @@ use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardIdType;
-use battle_state::battle_cards::ability_list::{AbilityData, AbilityList, CanPlayRestriction};
+use battle_state::battle_cards::ability_list::{
+    AbilityConfiguration, AbilityData, AbilityList, CanPlayRestriction,
+};
 use core_data::card_types::CardType;
 use core_data::identifiers::{AbilityNumber, CardName};
 use core_data::numerics::Energy;
@@ -39,6 +41,10 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                         target: Predicate::Enemy(CardPredicate::Character),
                     }),
                 }),
+                AbilityConfiguration {
+                    targeting_prompt: Some("Select target character.".to_string()),
+                    ..Default::default()
+                },
             )])
         }),
         CardName::RippleOfDefiance => RIPPLE_ABILITIES.get_or_init(|| {
@@ -51,6 +57,13 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                         cost: Cost::Energy(Energy(2)),
                     }),
                 }),
+                AbilityConfiguration {
+                    targeting_prompt: Some("Select target event.".to_string()),
+                    choice_prompt: Some(
+                        "Pay 2\u{f7e4} to prevent this card from being negated?".to_string(),
+                    ),
+                    ..Default::default()
+                },
             )])
         }),
         CardName::Abolish => ABOLISH_ABILITIES.get_or_init(|| {
@@ -62,6 +75,10 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                         target: Predicate::Enemy(CardPredicate::Dream),
                     }),
                 }),
+                AbilityConfiguration {
+                    targeting_prompt: Some("Select target card.".to_string()),
+                    ..Default::default()
+                },
             )])
         }),
         CardName::Dreamscatter => DREAMSCATTER_ABILITIES.get_or_init(|| {
@@ -74,35 +91,49 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                         for_each: QuantityExpression::ForEachEnergySpentOnThisCard,
                     }),
                 }),
+                AbilityConfiguration {
+                    additional_cost_prompt: Some("Pay one or more \u{f7e4}.".to_string()),
+                    ..Default::default()
+                },
             )])
         }),
     }
 }
 
-fn build_ability_list(abilities: Vec<(AbilityNumber, Ability)>) -> AbilityList {
+fn build_ability_list(
+    abilities: Vec<(AbilityNumber, Ability, AbilityConfiguration)>,
+) -> AbilityList {
     let mut ability_list = AbilityList::default();
 
-    for (ability_number, ability) in abilities {
+    for (ability_number, ability, configuration) in abilities {
         match ability {
             Ability::Event(event_ability) => {
-                ability_list
-                    .event_abilities
-                    .push(AbilityData { ability_number, ability: event_ability.clone() });
+                ability_list.event_abilities.push(AbilityData {
+                    ability_number,
+                    ability: event_ability.clone(),
+                    configuration,
+                });
             }
             Ability::Static(static_ability) => {
-                ability_list
-                    .static_abilities
-                    .push(AbilityData { ability_number, ability: static_ability.clone() });
+                ability_list.static_abilities.push(AbilityData {
+                    ability_number,
+                    ability: static_ability.clone(),
+                    configuration,
+                });
             }
             Ability::Activated(activated_ability) => {
-                ability_list
-                    .activated_abilities
-                    .push(AbilityData { ability_number, ability: activated_ability.clone() });
+                ability_list.activated_abilities.push(AbilityData {
+                    ability_number,
+                    ability: activated_ability.clone(),
+                    configuration,
+                });
             }
             Ability::Triggered(triggered_ability) => {
-                ability_list
-                    .triggered_abilities
-                    .push(AbilityData { ability_number, ability: triggered_ability.clone() });
+                ability_list.triggered_abilities.push(AbilityData {
+                    ability_number,
+                    ability: triggered_ability.clone(),
+                    configuration,
+                });
             }
         }
     }

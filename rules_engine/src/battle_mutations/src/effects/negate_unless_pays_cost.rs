@@ -6,7 +6,6 @@ use battle_queries::battle_player_queries::costs;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use battle_state::core::effect_source::EffectSource;
-use battle_state::prompt_types::prompt_context::PromptContext;
 use battle_state::prompt_types::prompt_data::{
     PromptChoice, PromptChoiceLabel, PromptConfiguration, PromptData, PromptType,
 };
@@ -41,7 +40,6 @@ pub fn execute(
                     },
                 ],
             },
-            context: PromptContext::PayCostToPreventNegation,
             configuration: PromptConfiguration { ..Default::default() },
         });
     } else {

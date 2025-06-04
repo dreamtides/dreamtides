@@ -7,7 +7,6 @@ use crate::battle::card_id::{CharacterId, StackCardId};
 use crate::battle_cards::card_set::CardSet;
 use crate::battle_cards::stack_card_state::StackCardTargets;
 use crate::core::effect_source::EffectSource;
-use crate::prompt_types::prompt_context::PromptContext;
 
 /// Data for a prompt to be displayed to a player.
 #[derive(Debug, Clone)]
@@ -20,10 +19,6 @@ pub struct PromptData {
 
     /// Prompt to display.
     pub prompt_type: PromptType,
-
-    /// Why is this prompt being shown? Controls UI displayed to communicate to
-    /// the player what is happening.
-    pub context: PromptContext,
 
     /// Configuration options for the prompt.
     pub configuration: PromptConfiguration,

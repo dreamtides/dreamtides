@@ -183,7 +183,6 @@ fn debug_prompt_data(prompt: &Option<PromptData>) -> DebugPromptData {
             prompt_kind: String::new(),
             choices: Vec::new(),
             configuration: String::new(),
-            context: String::new(),
         };
     };
 
@@ -193,7 +192,6 @@ fn debug_prompt_data(prompt: &Option<PromptData>) -> DebugPromptData {
         prompt_kind: format!("{:?}", prompt_data.prompt_type.discriminant()),
         choices: format_prompt_choices(&prompt_data.prompt_type),
         configuration: format!("{:?}", prompt_data.configuration),
-        context: format!("{:?}", prompt_data.context),
     }
 }
 

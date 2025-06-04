@@ -7,5 +7,4 @@ pub struct DebugPromptData {
     pub prompt_kind: String,
     pub choices: Vec<String>,
     pub configuration: String,
-    pub context: String,
 }

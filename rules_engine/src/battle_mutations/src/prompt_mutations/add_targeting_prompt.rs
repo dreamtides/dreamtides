@@ -5,7 +5,6 @@ use battle_queries::card_ability_queries::effect_predicates;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::StackCardId;
 use battle_state::core::effect_source::EffectSource;
-use battle_state::prompt_types::prompt_context::PromptContext;
 use battle_state::prompt_types::prompt_data::{PromptConfiguration, PromptData, PromptType};
 use core_data::types::PlayerName;
 use tracing_macros::battle_trace;
@@ -84,7 +83,6 @@ fn standard_effect_targeting_prompt(
             source,
             player,
             prompt_type: PromptType::ChooseCharacter { valid },
-            context: get_prompt_context(effect),
             configuration: PromptConfiguration { optional },
         })
     } else if let Some(target_predicate) = effect_predicates::get_stack_target_predicate(effect) {
@@ -97,23 +95,9 @@ fn standard_effect_targeting_prompt(
             source,
             player,
             prompt_type: PromptType::ChooseStackCard { valid },
-            context: get_prompt_context(effect),
             configuration: PromptConfiguration { optional },
         })
     } else {
         None
-    }
-}
-
-/// Determines whether an effect is positive or negative for the target.
-fn get_prompt_context(effect: &StandardEffect) -> PromptContext {
-    match effect {
-        StandardEffect::DissolveCharacter { .. } | StandardEffect::BanishCharacter { .. } => {
-            PromptContext::SelectTargetCharacter
-        }
-        StandardEffect::Negate { .. } | StandardEffect::NegateUnlessPaysCost { .. } => {
-            PromptContext::SelectTargetStackCard
-        }
-        _ => todo!("Implement prompt context for {:?}", effect),
     }
 }
