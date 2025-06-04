@@ -22,7 +22,11 @@ use crate::rendering::labels;
 
 pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> InterfaceView {
     if builder.is_for_animation() {
-        return InterfaceView::default();
+        return InterfaceView {
+            dev_button: Some(ButtonView { label: "\u{f0ad} Dev".to_string(), action: None }),
+            undo_button: Some(ButtonView { label: "\u{f0e2}".to_string(), action: None }),
+            ..Default::default()
+        };
     }
 
     let current_panel_address = display_state::get_current_panel_address();
@@ -69,7 +73,9 @@ fn primary_action_button(
     battle: &BattleState,
     legal_actions: &LegalActions,
 ) -> Option<ButtonView> {
+    println!("rendering primary action button");
     if legal_actions.contains(BattleAction::SelectPromptChoice(0)) {
+        println!("can select prompt choice");
         let Some(PromptType::Choose { choices }) = battle.prompt.as_ref().map(|p| &p.prompt_type)
         else {
             panic_with!("Expected prompt for SelectPromptChoice action", battle);
@@ -109,6 +115,7 @@ fn primary_action_button(
             action: Some(BattleAction::StartNextTurn.into()),
         })
     } else {
+        println!("no legal primary action button");
         None
     }
 }
@@ -117,10 +124,12 @@ fn secondary_action_button(
     battle: &BattleState,
     legal_actions: &LegalActions,
 ) -> Option<ButtonView> {
+    println!("rendering secondary action button");
     if legal_actions.contains(BattleAction::SelectPromptChoice(1))
         && let Some(PromptType::Choose { choices }) = battle.prompt.as_ref().map(|p| &p.prompt_type)
         && choices.len() > 1
     {
+        println!("can select prompt choice 1");
         Some(ButtonView {
             label: labels::choice_label(choices[1].label),
             action: Some(BattleAction::SelectPromptChoice(1).into()),

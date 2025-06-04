@@ -34,6 +34,7 @@ namespace Dreamtides.Buttons
     ButtonView? _pendingView;
     bool _isVisible = false;
     private bool _isAnimating = false;
+    Sequence? _hideSequence;
 
     private readonly Color _enabledColor = Color.white;
     private readonly Color _disabledColor = new Color(0.7f, 0.7f, 0.7f); // Gray
@@ -104,9 +105,10 @@ namespace Dreamtides.Buttons
           _text.text = view.Label;
           _action = view.Action?.ToGameAction();
           UpdateButtonColors();
-          if (!_isVisible)
+          if (_hideSequence != null)
           {
-            DOTween.Kill("ButtonHideAnimation");
+            _hideSequence.Kill();
+            _hideSequence = null;
             _background.transform.localScale = _originalBackgroundLocalScale;
             _text.transform.localScale = _originalTextLocalScale;
             _background.gameObject.SetActive(true);
@@ -124,11 +126,11 @@ namespace Dreamtides.Buttons
         if (_isVisible)
         {
           _isAnimating = true;
-          var hideSequence = TweenUtils.Sequence("ButtonHideAnimation");
-          hideSequence.Join(_background.transform.DOScale(Vector3.zero, _fadeDuration));
-          hideSequence.Join(_text.transform.DOScale(Vector3.zero, _fadeDuration));
+          _hideSequence = TweenUtils.Sequence("ButtonHideAnimation");
+          _hideSequence.Join(_background.transform.DOScale(Vector3.zero, _fadeDuration));
+          _hideSequence.Join(_text.transform.DOScale(Vector3.zero, _fadeDuration));
 
-          hideSequence.OnComplete(() =>
+          _hideSequence.OnComplete(() =>
           {
             _background.gameObject.SetActive(false);
             _text.gameObject.SetActive(false);
