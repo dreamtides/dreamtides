@@ -212,6 +212,16 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
                 });
             }
         }
+    } else if let Some(stack_card) = battle.cards.stack_card(StackCardId(card_id))
+        && stack_card.targets.is_some()
+        && stack_card_queries::validate_targets(battle, stack_card.targets.as_ref()).is_none()
+    {
+        // This card is currently on the stack with invalid targets.
+        icons.push(InfoZoomIcon {
+            card_id,
+            icon: icon::XMARK.to_string(),
+            color: display_color::RED_500,
+        });
     }
 
     icons
