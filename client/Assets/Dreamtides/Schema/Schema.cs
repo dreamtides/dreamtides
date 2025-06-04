@@ -572,6 +572,12 @@ namespace Dreamtides.Schema
         public DisplayImage Image { get; set; }
 
         /// <summary>
+        /// Data providing supplemental information about this card on long press/hover.
+        /// </summary>
+        [JsonProperty("infoZoomData")]
+        public InfoZoomData InfoZoomData { get; set; }
+
+        /// <summary>
         /// True if this card can be played during the opponent's turn
         /// </summary>
         [JsonProperty("isFast", Required = Required.Always)]
@@ -606,12 +612,6 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("spark")]
         public long? Spark { get; set; }
-
-        /// <summary>
-        /// Additional help text about this card, describing its abilities.
-        /// </summary>
-        [JsonProperty("supplementalCardInfo")]
-        public FlexNode SupplementalCardInfo { get; set; }
     }
 
     /// <summary>
@@ -1428,6 +1428,33 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("address", Required = Required.Always)]
         public SpriteAddress Address { get; set; }
+    }
+
+    public partial class InfoZoomData
+    {
+        /// <summary>
+        /// Icons to display on other cards during info zoom, e.g. indicating targets.
+        /// </summary>
+        [JsonProperty("icons", Required = Required.Always)]
+        public List<InfoZoomIcon> Icons { get; set; }
+
+        /// <summary>
+        /// Additional help text about this card, describing its abilities.
+        /// </summary>
+        [JsonProperty("supplementalCardInfo")]
+        public FlexNode SupplementalCardInfo { get; set; }
+    }
+
+    public partial class InfoZoomIcon
+    {
+        [JsonProperty("cardId", Required = Required.Always)]
+        public long CardId { get; set; }
+
+        [JsonProperty("color", Required = Required.Always)]
+        public DisplayColor Color { get; set; }
+
+        [JsonProperty("icon", Required = Required.Always)]
+        public string Icon { get; set; }
     }
 
     public partial class FireProjectileCommand

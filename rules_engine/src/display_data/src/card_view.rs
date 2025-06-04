@@ -94,9 +94,6 @@ pub struct RevealedCardView {
     /// Outline color of this card
     pub outline_color: Option<DisplayColor>,
 
-    /// Additional help text about this card, describing its abilities.
-    pub supplemental_card_info: Option<FlexNode>,
-
     /// True if this card can be played during the opponent's turn
     pub is_fast: bool,
 
@@ -105,6 +102,10 @@ pub struct RevealedCardView {
 
     /// Special effects to display for this card
     pub effects: CardEffects,
+
+    /// Data providing supplemental information about this card on long
+    /// press/hover.
+    pub info_zoom_data: Option<InfoZoomData>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -138,6 +139,25 @@ pub struct CardActions {
 pub struct CardEffects {
     /// Projectile to display as a trail behind this card.
     pub card_trail: Option<ProjectileAddress>,
+}
+
+#[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct InfoZoomData {
+    /// Additional help text about this card, describing its abilities.
+    pub supplemental_card_info: Option<FlexNode>,
+
+    /// Icons to display on other cards during info zoom, e.g. indicating
+    /// targets.
+    pub icons: Vec<InfoZoomIcon>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct InfoZoomIcon {
+    pub card_id: CardId,
+    pub icon: String,
+    pub color: DisplayColor,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]

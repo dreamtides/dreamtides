@@ -11,7 +11,8 @@ use display_data::battle_view::{
     PlayerPreviewView, PlayerView,
 };
 use display_data::card_view::{
-    CardActions, CardEffects, CardPrefab, CardPreviewView, CardView, DisplayImage, RevealedCardView,
+    CardActions, CardEffects, CardPrefab, CardPreviewView, CardView, DisplayImage, InfoZoomData,
+    RevealedCardView,
 };
 use display_data::object_position::{ObjectPosition, Position};
 use masonry::borders::BorderRadius;
@@ -118,7 +119,10 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
             produced: None,
             spark: Some(Spark(4)),
             card_type: "Ancient".to_string(),
-            supplemental_card_info: flex_node("<b>Materialize</b>: A character entering play."),
+            info_zoom_data: Some(InfoZoomData {
+                supplemental_card_info: flex_node("<b>Materialize</b>: A character entering play."),
+                ..Default::default()
+            }),
             is_fast: false,
             actions: CardActions {
                 can_play: position == Position::InHand(DisplayPlayer::User),
@@ -168,9 +172,12 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
             produced: None,
             spark: None,
             card_type: "Event".to_string(),
-            supplemental_card_info: flex_node(
-                "<b>Discover</b>: Pick one of 4 cards with different types to put into your hand.",
-            ),
+            info_zoom_data: Some(InfoZoomData {
+                supplemental_card_info: flex_node(
+                    "<b>Discover</b>: Pick one of 4 cards with different types to put into your hand.",
+                ),
+                ..Default::default()
+            }),
             is_fast: false,
             actions: CardActions {
                 can_play: position == Position::InHand(DisplayPlayer::User),
@@ -209,8 +216,12 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
             produced: None,
             spark: Some(Spark(0)),
             card_type: "Tinkerer".to_string(),
-            supplemental_card_info: flex_node(
-                "<b>Judgment</b>: Triggers at the start of your turn."),
+            info_zoom_data: Some(InfoZoomData {
+                supplemental_card_info: flex_node(
+                    "<b>Judgment</b>: Triggers at the start of your turn.",
+                ),
+                ..Default::default()
+            }),
             is_fast: false,
             actions: CardActions {
                 can_play: position == Position::InHand(DisplayPlayer::User),
@@ -250,7 +261,7 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
             produced: None,
             spark: Some(Spark(0)),
             card_type: "Trooper".to_string(),
-            supplemental_card_info: None,
+            info_zoom_data: None,
             is_fast: false,
             actions: CardActions {
                 can_play: position == Position::InHand(DisplayPlayer::User),
@@ -285,9 +296,12 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
             produced: None,
             spark: None,
             card_type: "Event".to_string(),
-            supplemental_card_info: flex_node(
-                "<b>Reclaim</b>: You may play this card from your void, then banish it.",
-            ),
+            info_zoom_data: Some(InfoZoomData {
+                supplemental_card_info: flex_node(
+                    "<b>Reclaim</b>: You may play this card from your void, then banish it.",
+                ),
+                ..Default::default()
+            }),
             is_fast: false,
             actions: CardActions {
                 can_play: position == Position::InHand(DisplayPlayer::User),
@@ -320,9 +334,12 @@ fn enemy_card(position: Position, sorting_key: u32) -> CardView {
             produced: None,
             spark: None,
             card_type: "Enemy".to_string(),
-            supplemental_card_info: flex_node(
-                "<b>Judgment</b>: Triggers at the start of enemy's turn.",
-            ),
+            info_zoom_data: Some(InfoZoomData {
+                supplemental_card_info: flex_node(
+                    "<b>Judgment</b>: Triggers at the start of enemy's turn.",
+                ),
+                ..Default::default()
+            }),
             is_fast: false,
             actions: CardActions::default(),
             effects: CardEffects::default(),
@@ -353,9 +370,12 @@ fn dreamsign_card(position: Position, sorting_key: u32) -> CardView {
             produced: None,
             spark: None,
             card_type: "Dreamsign".to_string(),
-            supplemental_card_info: flex_node(
-                "<b>Judgment</b>: Triggers at the start of enemy's turn.",
-            ),
+            info_zoom_data: Some(InfoZoomData {
+                supplemental_card_info: flex_node(
+                    "<b>Judgment</b>: Triggers at the start of enemy's turn.",
+                ),
+                ..Default::default()
+            }),
             is_fast: false,
             actions: CardActions::default(),
             effects: CardEffects::default(),
@@ -385,7 +405,7 @@ fn dreamwell_card(position: Position, sorting_key: u32) -> CardView {
             produced: Some(Energy(2)),
             spark: None,
             card_type: "Dreamwell".to_string(),
-            supplemental_card_info: None,
+            info_zoom_data: None,
             is_fast: false,
             actions: CardActions::default(),
             effects: CardEffects::default(),
@@ -417,7 +437,7 @@ fn game_modifier_card(position: Position, sorting_key: u32) -> CardView {
             produced: None,
             spark: None,
             card_type: "Game Modifier".to_string(),
-            supplemental_card_info: None,
+            info_zoom_data: None,
             is_fast: false,
             actions: CardActions::default(),
             effects: CardEffects::default(),

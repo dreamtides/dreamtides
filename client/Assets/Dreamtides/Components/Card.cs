@@ -57,7 +57,6 @@ namespace Dreamtides.Components
     bool _isDissolved = false;
     bool _draggedToClearThreshold = false;
     bool _draggedToPlayThreshold = false;
-    public CardView CardView => Errors.CheckNotNull(_cardView);
     GameObject? _cardTrail;
     float _distanceDragged;
     float _hoverStartTime;
@@ -65,6 +64,8 @@ namespace Dreamtides.Components
     bool _longHoverFired;
     Vector3 _positionBeforeHover;
     Tween? _hoverMoveTween;
+
+    public CardView CardView => Errors.CheckNotNull(_cardView);
 
     public string Id => CardView.ClientId();
 
@@ -196,6 +197,31 @@ namespace Dreamtides.Components
       result.Parent = null;
       result.GameContext = GameContext.InfoZoom;
       return result;
+    }
+
+    /// <summary>
+    /// Sets the info zoom icon for this card, or clears the icon if the
+    /// parameter is null.
+    /// </summary>
+    public void SetInfoZoomIcon(InfoZoomIcon? icon)
+    {
+      if (icon == null)
+      {
+        _battlefieldCardInfoZoomIcons.gameObject.SetActive(false);
+        _spriteCardInfoZoomIcons.gameObject.SetActive(false);
+      }
+      else if (GameContext.IsBattlefieldContext())
+      {
+        _battlefieldCardInfoZoomIcons.SetText(icon.Icon, MasonRenderer.ToUnityColor(icon.Color));
+        _battlefieldCardInfoZoomIcons.gameObject.SetActive(true);
+        _spriteCardInfoZoomIcons.gameObject.SetActive(false);
+      }
+      else
+      {
+        _spriteCardInfoZoomIcons.SetText(icon.Icon, MasonRenderer.ToUnityColor(icon.Color));
+        _spriteCardInfoZoomIcons.gameObject.SetActive(true);
+        _battlefieldCardInfoZoomIcons.gameObject.SetActive(false);
+      }
     }
 
     void Update()

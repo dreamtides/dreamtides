@@ -4,15 +4,18 @@ use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CardId, CharacterId, HandCardId, StackCardId};
+use battle_state::battle::card_id::{CardId, CardIdType, CharacterId, HandCardId, StackCardId};
+use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use core_data::card_types::CardType;
 use core_data::display_color;
 use core_data::display_types::SpriteAddress;
 use core_data::identifiers::CardName;
 use core_data::types::CardFacing;
 use display_data::card_view::{
-    CardActions, CardEffects, CardPrefab, CardView, DisplayImage, RevealedCardView,
+    CardActions, CardEffects, CardPrefab, CardView, DisplayImage, InfoZoomData, InfoZoomIcon,
+    RevealedCardView,
 };
+use ui_components::icon;
 
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
@@ -63,7 +66,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
             _ if selection_action.is_some() => Some(display_color::RED_500),
             _ => None,
         },
-        supplemental_card_info: None,
+        info_zoom_data: build_info_zoom_data(battle, card_id),
         is_fast: false,
         actions: CardActions {
             can_play,
@@ -151,4 +154,41 @@ fn rules_text(battle: &BattleState, card_id: CardId) -> String {
             "Pay one or more \u{f7e4}: Draw a card for each \u{f7e4} spent.".to_string()
         }
     }
+}
+
+fn build_info_zoom_data(battle: &BattleState, card_id: CardId) -> Option<InfoZoomData> {
+    let targeting_icons = get_targeting_icons(battle, card_id);
+
+    if targeting_icons.is_empty() {
+        None
+    } else {
+        Some(InfoZoomData { supplemental_card_info: None, icons: targeting_icons })
+    }
+}
+
+fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIcon> {
+    let mut icons = Vec::new();
+
+    if let Some(stack_card) = battle.cards.stack_card(StackCardId(card_id))
+        && let Some(targets) = &stack_card.targets
+    {
+        match targets {
+            StackCardTargets::Character(target_character_id) => {
+                icons.push(InfoZoomIcon {
+                    card_id: target_character_id.card_id(),
+                    icon: icon::CHEVRON_UP.to_string(),
+                    color: display_color::RED_500,
+                });
+            }
+            StackCardTargets::StackCard(target_stack_card_id) => {
+                icons.push(InfoZoomIcon {
+                    card_id: target_stack_card_id.card_id(),
+                    icon: icon::CHEVRON_UP.to_string(),
+                    color: display_color::RED_500,
+                });
+            }
+        }
+    }
+
+    icons
 }

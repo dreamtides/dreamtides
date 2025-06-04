@@ -1,6 +1,7 @@
 #nullable enable
 
 using System.Collections;
+using System.Collections.Generic;
 using DG.Tweening;
 using Dreamtides.Components;
 using Dreamtides.Layout;
@@ -16,6 +17,7 @@ namespace Dreamtides.Services
     Card? _currentInfoZoom;
     bool _hidCloseButton;
     bool _infoZoomDisabled;
+    List<Card> _cardsWithInfoZoomIcons = new();
 
     public bool IsPointerDownOnCard { get; set; } = false;
 
@@ -80,7 +82,6 @@ namespace Dreamtides.Services
 
       var shouldShowOnLeft = Registry.InputService.PointerPosition().x > Screen.width / 2.0;
 
-      // Close button overlaps infozoom
       if (!shouldShowOnLeft)
       {
         _hidCloseButton = Registry.Layout.Browser.SetCloseButtonVisible(false);
@@ -98,7 +99,17 @@ namespace Dreamtides.Services
       _currentInfoZoom.transform.localScale = Vector3.one;
       _currentInfoZoom.transform.forward = anchor.forward;
 
-      if (_currentInfoZoom.CardView.Revealed?.SupplementalCardInfo is { } info)
+      if (_currentInfoZoom.CardView.Revealed?.InfoZoomData?.Icons is { } icons)
+      {
+        foreach (var icon in icons)
+        {
+          var targetCard = Registry.LayoutService.GetCard(icon.CardId);
+          targetCard.SetInfoZoomIcon(icon);
+          _cardsWithInfoZoomIcons.Add(targetCard);
+        }
+      }
+
+      if (_currentInfoZoom.CardView.Revealed?.InfoZoomData?.SupplementalCardInfo is { } info)
       {
         var infoAnchor = shouldShowOnLeft ?
             Registry.Layout.SupplementalCardInfoLeft : Registry.Layout.SupplementalCardInfoRight;
@@ -141,6 +152,12 @@ namespace Dreamtides.Services
         Registry.Layout.Browser.SetCloseButtonVisible(true);
         _hidCloseButton = false;
       }
+
+      foreach (var card in _cardsWithInfoZoomIcons)
+      {
+        card.SetInfoZoomIcon(null);
+      }
+      _cardsWithInfoZoomIcons.Clear();
 
       if (_currentInfoZoom)
       {
