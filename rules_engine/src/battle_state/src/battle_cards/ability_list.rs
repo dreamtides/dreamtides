@@ -12,13 +12,20 @@ use core_data::numerics::Energy;
 /// information to improve search performance.
 #[derive(Debug, Clone, Default)]
 pub struct AbilityList {
-    pub event_abilities: Vec<(AbilityNumber, EventAbility)>,
-    pub static_abilities: Vec<(AbilityNumber, StaticAbility)>,
-    pub activated_abilities: Vec<(AbilityNumber, ActivatedAbility)>,
-    pub triggered_abilities: Vec<(AbilityNumber, TriggeredAbility)>,
+    pub event_abilities: Vec<AbilityData<EventAbility>>,
+    pub static_abilities: Vec<AbilityData<StaticAbility>>,
+    pub activated_abilities: Vec<AbilityData<ActivatedAbility>>,
+    pub triggered_abilities: Vec<AbilityData<TriggeredAbility>>,
 
     /// A field indicating restrictions on playing this card.
     pub can_play_restriction: Option<CanPlayRestriction>,
+}
+
+/// Wrapper around an ability which stores additional metadata.
+#[derive(Debug, Clone)]
+pub struct AbilityData<T> {
+    pub ability_number: AbilityNumber,
+    pub ability: T,
 }
 
 /// A restriction on playing a card.

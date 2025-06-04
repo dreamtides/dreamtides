@@ -5,22 +5,21 @@ use battle_queries::card_ability_queries::effect_predicates;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::StackCardId;
 use battle_state::core::effect_source::EffectSource;
-use battle_state::prompt_types::prompt_data::{
-    PromptConfiguration, PromptContext, PromptData, PromptType,
-};
+use battle_state::prompt_types::prompt_context::PromptContext;
+use battle_state::prompt_types::prompt_data::{PromptConfiguration, PromptData, PromptType};
 use core_data::types::PlayerName;
 use tracing_macros::battle_trace;
 
 /// Adds a prompt to the `battle` for targets required to play the `card_id`
 /// card.
 pub fn execute(battle: &mut BattleState, player: PlayerName, card_id: StackCardId) {
-    for (ability_id, ability) in &card_abilities::query(battle, card_id).event_abilities {
+    for data in &card_abilities::query(battle, card_id).event_abilities {
         let source = EffectSource::Event {
             controller: player,
             stack_card_id: card_id,
-            ability_number: *ability_id,
+            ability_number: data.ability_number,
         };
-        if let Some(prompt_data) = targeting_prompt(battle, player, source, &ability.effect) {
+        if let Some(prompt_data) = targeting_prompt(battle, player, source, &data.ability.effect) {
             battle_trace!("Adding target prompt", battle, prompt_data);
             battle.prompt = Some(prompt_data);
             return;
@@ -109,16 +108,12 @@ fn standard_effect_targeting_prompt(
 /// Determines whether an effect is positive or negative for the target.
 fn get_prompt_context(effect: &StandardEffect) -> PromptContext {
     match effect {
-        StandardEffect::DissolveCharacter { .. }
-        | StandardEffect::DissolveCharactersCount { .. }
-        | StandardEffect::DissolveCharactersQuantity { .. }
-        | StandardEffect::BanishCharacter { .. }
-        | StandardEffect::BanishCharacterUntilLeavesPlay { .. }
-        | StandardEffect::BanishUntilNextMain { .. }
-        | StandardEffect::BanishCollection { .. }
-        | StandardEffect::Negate { .. }
-        | StandardEffect::PutOnTopOfEnemyDeck { .. }
-        | StandardEffect::AbandonAtEndOfTurn { .. } => PromptContext::SelectTargetForNegativeEffect,
-        _ => PromptContext::SelectTargetForPositiveEffect,
+        StandardEffect::DissolveCharacter { .. } | StandardEffect::BanishCharacter { .. } => {
+            PromptContext::SelectTargetCharacter
+        }
+        StandardEffect::Negate { .. } | StandardEffect::NegateUnlessPaysCost { .. } => {
+            PromptContext::SelectTargetStackCard
+        }
+        _ => todo!("Implement prompt context for {:?}", effect),
     }
 }

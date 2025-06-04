@@ -11,14 +11,14 @@ use crate::card_ability_queries::effect_predicates;
 /// Returns true if the given card has legal targets for its event abilities, or
 /// if this card does not require targets.
 pub fn for_event(battle: &BattleState, controller: PlayerName, card_id: CardId) -> bool {
-    for (ability_number, ability) in &card_abilities::query(battle, card_id).event_abilities {
+    for data in &card_abilities::query(battle, card_id).event_abilities {
         let source = EffectSource::Event {
             controller,
             stack_card_id: StackCardId(card_id),
-            ability_number: *ability_number,
+            ability_number: data.ability_number,
         };
 
-        if !has_legal_targets_for_effect(battle, source, &ability.effect) {
+        if !has_legal_targets_for_effect(battle, source, &data.ability.effect) {
             return false;
         }
     }

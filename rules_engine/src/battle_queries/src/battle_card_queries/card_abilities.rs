@@ -8,7 +8,7 @@ use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardIdType;
-use battle_state::battle_cards::ability_list::{AbilityList, CanPlayRestriction};
+use battle_state::battle_cards::ability_list::{AbilityData, AbilityList, CanPlayRestriction};
 use core_data::card_types::CardType;
 use core_data::identifiers::{AbilityNumber, CardName};
 use core_data::numerics::Energy;
@@ -85,16 +85,24 @@ fn build_ability_list(abilities: Vec<(AbilityNumber, Ability)>) -> AbilityList {
     for (ability_number, ability) in abilities {
         match ability {
             Ability::Event(event_ability) => {
-                ability_list.event_abilities.push((ability_number, event_ability.clone()));
+                ability_list
+                    .event_abilities
+                    .push(AbilityData { ability_number, ability: event_ability.clone() });
             }
             Ability::Static(static_ability) => {
-                ability_list.static_abilities.push((ability_number, static_ability.clone()));
+                ability_list
+                    .static_abilities
+                    .push(AbilityData { ability_number, ability: static_ability.clone() });
             }
             Ability::Activated(activated_ability) => {
-                ability_list.activated_abilities.push((ability_number, activated_ability.clone()));
+                ability_list
+                    .activated_abilities
+                    .push(AbilityData { ability_number, ability: activated_ability.clone() });
             }
             Ability::Triggered(triggered_ability) => {
-                ability_list.triggered_abilities.push((ability_number, triggered_ability.clone()));
+                ability_list
+                    .triggered_abilities
+                    .push(AbilityData { ability_number, ability: triggered_ability.clone() });
             }
         }
     }
@@ -131,7 +139,7 @@ fn compute_event_target_restriction(list: &AbilityList) -> Option<CanPlayRestric
     let predicates: Vec<&Predicate> = list
         .event_abilities
         .iter()
-        .flat_map(|(_, ability)| match &ability.effect {
+        .flat_map(|data| match &data.ability.effect {
             Effect::Effect(effect) => vec![
                 effect_predicates::get_character_target_predicate(effect),
                 effect_predicates::get_stack_target_predicate(effect),
@@ -174,11 +182,8 @@ fn compute_event_target_restriction(list: &AbilityList) -> Option<CanPlayRestric
 }
 
 fn compute_event_additional_cost_restriction(list: &AbilityList) -> Option<CanPlayRestriction> {
-    let costs: Vec<&Cost> = list
-        .event_abilities
-        .iter()
-        .filter_map(|(_, ability)| ability.additional_cost.as_ref())
-        .collect();
+    let costs: Vec<&Cost> =
+        list.event_abilities.iter().filter_map(|a| a.ability.additional_cost.as_ref()).collect();
 
     let cost = match costs[..] {
         [] => return Some(CanPlayRestriction::Unrestricted),

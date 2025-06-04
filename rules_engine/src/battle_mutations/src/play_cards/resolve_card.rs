@@ -63,12 +63,12 @@ fn resolve_card(battle: &mut BattleState, card: &StackCardState) {
 }
 
 fn apply_event_effects(battle: &mut BattleState, card: &StackCardState) {
-    for (ability_number, ability) in &card_abilities::query(battle, card.id).event_abilities {
+    for data in &card_abilities::query(battle, card.id).event_abilities {
         let event_source = EffectSource::Event {
             controller: card.controller,
             stack_card_id: card.id,
-            ability_number: *ability_number,
+            ability_number: data.ability_number,
         };
-        apply_effect::execute(battle, event_source, &ability.effect, card.targets.as_ref());
+        apply_effect::execute(battle, event_source, &data.ability.effect, card.targets.as_ref());
     }
 }

@@ -3,10 +3,11 @@ use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use strum_macros::EnumDiscriminants;
 
-use crate::battle::card_id::{CardId, CharacterId, StackCardId};
+use crate::battle::card_id::{CharacterId, StackCardId};
 use crate::battle_cards::card_set::CardSet;
 use crate::battle_cards::stack_card_state::StackCardTargets;
 use crate::core::effect_source::EffectSource;
+use crate::prompt_types::prompt_context::PromptContext;
 
 /// Data for a prompt to be displayed to a player.
 #[derive(Debug, Clone)]
@@ -35,20 +36,6 @@ pub enum PromptType {
     ChooseStackCard { valid: CardSet<StackCardId> },
     Choose { choices: Vec<PromptChoice> },
     ChooseEnergyValue { minimum: Energy, maximum: Energy },
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum PromptContext {
-    // A choice about which cards to target for an effect
-    SelectTargetForNegativeEffect,
-    SelectTargetForPositiveEffect,
-
-    // A choice about whether to apply an effect to a given card
-    ApplyNegativeEffectChoice(CardId),
-    ApplyPositiveEffectChoice(CardId),
-
-    // Pick energy additional costs while playing a card
-    PickAmountOfEnergyToSpend,
 }
 
 #[derive(Debug, Clone, Copy, Default)]

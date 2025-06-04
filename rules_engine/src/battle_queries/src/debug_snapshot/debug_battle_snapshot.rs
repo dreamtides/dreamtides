@@ -142,21 +142,13 @@ fn debug_card_state(
         abilities: ability_list
             .event_abilities
             .iter()
-            .map(|(_, ability)| format!("{:?}", ability))
+            .map(|data| format!("{:?}", data.ability))
+            .chain(ability_list.static_abilities.iter().map(|data| format!("{:?}", data.ability)))
             .chain(
-                ability_list.static_abilities.iter().map(|(_, ability)| format!("{:?}", ability)),
+                ability_list.activated_abilities.iter().map(|data| format!("{:?}", data.ability)),
             )
             .chain(
-                ability_list
-                    .activated_abilities
-                    .iter()
-                    .map(|(_, ability)| format!("{:?}", ability)),
-            )
-            .chain(
-                ability_list
-                    .triggered_abilities
-                    .iter()
-                    .map(|(_, ability)| format!("{:?}", ability)),
+                ability_list.triggered_abilities.iter().map(|data| format!("{:?}", data.ability)),
             )
             .collect(),
         stack_state: debug_stack_card_state(battle.cards.stack_card(StackCardId(card_id))),

@@ -11,12 +11,12 @@ use crate::battle_card_queries::card_abilities;
 /// event abilities after paying the energy cost value `paid`, or if this
 /// card does not require additional cost choices.
 pub fn for_event(battle: &BattleState, player: PlayerName, card_id: CardId, paid: Energy) -> bool {
-    for (ability_number, ability) in &card_abilities::query(battle, card_id).event_abilities {
-        if let Some(additional_cost) = ability.additional_cost.as_ref() {
+    for data in &card_abilities::query(battle, card_id).event_abilities {
+        if let Some(additional_cost) = data.ability.additional_cost.as_ref() {
             let source = EffectSource::Event {
                 controller: player,
                 stack_card_id: StackCardId(card_id),
-                ability_number: *ability_number,
+                ability_number: data.ability_number,
             };
             if !has_legal_additional_cost_choices(battle, source, additional_cost, paid) {
                 return false;
