@@ -42,6 +42,8 @@ namespace Dreamtides.Components
     [SerializeField] internal Transform _cardTrailPosition = null!;
     [SerializeField] internal GameObject _battlefieldIconContainer = null!;
     [SerializeField] internal TextMeshPro _battlefieldIcon = null!;
+    [SerializeField] internal InfoZoomIcons _spriteCardInfoZoomIcons = null!;
+    [SerializeField] internal InfoZoomIcons _battlefieldCardInfoZoomIcons = null!;
 
     bool _isRevealed = false;
     Registry _registry = null!;
