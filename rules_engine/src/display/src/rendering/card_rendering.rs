@@ -59,7 +59,8 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
         name: card_name(battle, card_id),
         cost: card_properties::cost(battle, card_id),
         produced: None,
-        spark: card_properties::spark(battle, controller, CharacterId(card_id)),
+        spark: card_properties::spark(battle, controller, CharacterId(card_id))
+            .or_else(|| card_properties::base_spark(battle, card_id)),
         card_type: card_type(battle, card_id),
         rules_text: rules_text(battle, card_id),
         outline_color: match () {
