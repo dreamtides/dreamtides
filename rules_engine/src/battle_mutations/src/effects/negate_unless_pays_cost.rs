@@ -4,6 +4,7 @@ use ability_data::predicate::Predicate;
 use ability_data::standard_effect::StandardEffect;
 use battle_queries::battle_player_queries::costs;
 use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::card_id::CardIdType;
 use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{
@@ -40,7 +41,9 @@ pub fn execute(
                     },
                 ],
             },
-            context: PromptContext::TargetNegativeEffect,
+            context: PromptContext::ApplyNegativeEffectChoice(
+                targeting::stack_card_id(battle, targets).card_id(),
+            ),
             configuration: PromptConfiguration { ..Default::default() },
         });
     } else {

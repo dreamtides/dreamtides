@@ -6,6 +6,7 @@ use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType, CharacterId, HandCardId, StackCardId};
 use battle_state::battle_cards::stack_card_state::StackCardTargets;
+use battle_state::prompt_types::prompt_data::PromptContext;
 use core_data::card_types::CardType;
 use core_data::display_color;
 use core_data::display_types::SpriteAddress;
@@ -169,9 +170,33 @@ fn build_info_zoom_data(battle: &BattleState, card_id: CardId) -> Option<InfoZoo
 fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIcon> {
     let mut icons = Vec::new();
 
-    if let Some(stack_card) = battle.cards.stack_card(StackCardId(card_id))
+    if let Some(prompt) = &battle.prompt
+        && let Some(source_id) = prompt.source.card_id()
+        && source_id == card_id
+        && let PromptContext::ApplyNegativeEffectChoice(target_id) = &prompt.context
+    {
+        // This card is the source of a prompt to apply a negative effect to
+        // another card.
+        icons.push(InfoZoomIcon {
+            card_id: *target_id,
+            icon: icon::CHEVRON_UP.to_string(),
+            color: display_color::RED_500,
+        });
+    } else if let Some(prompt) = &battle.prompt
+        && let Some(source_id) = prompt.source.card_id()
+        && source_id == card_id
+        && let PromptContext::ApplyNegativeEffectChoice(target_id) = &prompt.context
+    {
+        // Prompt to apply a positive effect
+        icons.push(InfoZoomIcon {
+            card_id: *target_id,
+            icon: icon::CHEVRON_UP.to_string(),
+            color: display_color::GREEN_500,
+        });
+    } else if let Some(stack_card) = battle.cards.stack_card(StackCardId(card_id))
         && let Some(targets) = &stack_card.targets
     {
+        // This card is currently on the stack with targets.
         match targets {
             StackCardTargets::Character(target_character_id) => {
                 icons.push(InfoZoomIcon {

@@ -118,7 +118,7 @@ fn get_prompt_context(effect: &StandardEffect) -> PromptContext {
         | StandardEffect::BanishCollection { .. }
         | StandardEffect::Negate { .. }
         | StandardEffect::PutOnTopOfEnemyDeck { .. }
-        | StandardEffect::AbandonAtEndOfTurn { .. } => PromptContext::TargetNegativeEffect,
-        _ => PromptContext::TargetPositiveEffect,
+        | StandardEffect::AbandonAtEndOfTurn { .. } => PromptContext::SelectTargetForNegativeEffect,
+        _ => PromptContext::SelectTargetForPositiveEffect,
     }
 }
