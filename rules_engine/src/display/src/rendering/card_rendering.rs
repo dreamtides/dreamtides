@@ -199,14 +199,14 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
     {
         // This card is currently on the stack with targets.
         match targets {
-            StackCardTargets::Character(target_character_id) => {
+            StackCardTargets::Character(target_character_id, _) => {
                 icons.push(InfoZoomIcon {
                     card_id: target_character_id.card_id(),
                     icon: icon::CHEVRON_UP.to_string(),
                     color: display_color::RED_500,
                 });
             }
-            StackCardTargets::StackCard(target_stack_card_id) => {
+            StackCardTargets::StackCard(target_stack_card_id, _) => {
                 icons.push(InfoZoomIcon {
                     card_id: target_stack_card_id.card_id(),
                     icon: icon::CHEVRON_UP.to_string(),

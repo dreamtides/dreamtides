@@ -106,8 +106,8 @@ fn target_id(targets: &Option<StackCardTargets>) -> Option<GameObjectId> {
 
 fn target_card_id(targets: &Option<StackCardTargets>) -> Option<CardId> {
     match targets {
-        Some(StackCardTargets::Character(character_id)) => Some(character_id.card_id()),
-        Some(StackCardTargets::StackCard(stack_card_id)) => Some(stack_card_id.card_id()),
+        Some(StackCardTargets::Character(character_id, _)) => Some(character_id.card_id()),
+        Some(StackCardTargets::StackCard(stack_card_id, _)) => Some(stack_card_id.card_id()),
         _ => None,
     }
 }

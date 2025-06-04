@@ -103,10 +103,10 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
             stack_card.targets.as_ref().map(|targets| {
                 let source = GameObjectId::CardId(stack_card.id.card_id());
                 let (target, color) = match targets {
-                    StackCardTargets::Character(character_id) => {
+                    StackCardTargets::Character(character_id, _) => {
                         (GameObjectId::CardId(character_id.card_id()), ArrowStyle::Red)
                     }
-                    StackCardTargets::StackCard(stack_card_id) => {
+                    StackCardTargets::StackCard(stack_card_id, _) => {
                         (GameObjectId::CardId(stack_card_id.card_id()), ArrowStyle::Blue)
                     }
                 };

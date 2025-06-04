@@ -75,7 +75,7 @@ fn current_stack_type(builder: &ResponseBuilder, battle: &BattleState) -> StackT
     let mut targeting_enemy_battlefield = false;
 
     for stack_card in battle.cards.all_cards_on_stack() {
-        if let Some(StackCardTargets::Character(character_id)) = &stack_card.targets {
+        if let Some(StackCardTargets::Character(character_id, _)) = &stack_card.targets {
             if battle.cards.contains_card(display_player, character_id.card_id(), Zone::Battlefield)
             {
                 targeting_user_battlefield = true;

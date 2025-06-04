@@ -8,7 +8,7 @@ use tracing_macros::panic_with;
 /// Panics if the target is not a character.
 pub fn character_id(battle: &mut BattleState, targets: &Option<StackCardTargets>) -> CharacterId {
     match targets {
-        Some(StackCardTargets::Character(character_id)) => *character_id,
+        Some(StackCardTargets::Character(character_id, ..)) => *character_id,
         _ => {
             panic_with!("Card targets should be a character", battle, targets)
         }
@@ -20,7 +20,7 @@ pub fn character_id(battle: &mut BattleState, targets: &Option<StackCardTargets>
 /// Panics if the target is not a stack card.
 pub fn stack_card_id(battle: &BattleState, targets: &Option<StackCardTargets>) -> StackCardId {
     match targets {
-        Some(StackCardTargets::StackCard(stack_card_id)) => *stack_card_id,
+        Some(StackCardTargets::StackCard(stack_card_id, ..)) => *stack_card_id,
         _ => {
             panic_with!("Card targets should be a stack card", battle, targets)
         }
