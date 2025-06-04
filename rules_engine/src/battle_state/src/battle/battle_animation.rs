@@ -1,3 +1,4 @@
+use ability_data::standard_effect::StandardEffect;
 use core_data::numerics::{Energy, Points};
 use core_data::types::PlayerName;
 
@@ -38,6 +39,7 @@ pub enum BattleAnimation {
         controller: PlayerName,
         source: CardId,
         targets: Option<StackCardTargets>,
+        effect: StandardEffect,
     },
     MakeChoice {
         player: PlayerName,

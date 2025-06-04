@@ -1,3 +1,4 @@
+use ability_data::standard_effect::StandardEffect;
 use asset_paths::{dissolve_material, hovl, wow_sound};
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType};
@@ -20,6 +21,7 @@ pub fn apply(
     battle: &BattleState,
     controller: PlayerName,
     source_id: CardId,
+    effect: &StandardEffect,
     targets: &Option<StackCardTargets>,
 ) -> Option<()> {
     match battle.cards.card(source_id).name {
@@ -67,7 +69,7 @@ pub fn apply(
             ));
         }
 
-        CardName::RippleOfDefiance => {
+        CardName::RippleOfDefiance if matches!(effect, StandardEffect::Negate { .. }) => {
             builder.push(Command::FireProjectile(
                 FireProjectileCommand::builder()
                     .source_id(GameObjectId::CardId(source_id))

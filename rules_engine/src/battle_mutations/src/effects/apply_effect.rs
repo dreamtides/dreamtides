@@ -49,6 +49,7 @@ fn apply_standard_effect(
             controller: source.controller(),
             source: source_id,
             targets: targets.clone(),
+            effect: effect.clone(),
         })
     });
 
