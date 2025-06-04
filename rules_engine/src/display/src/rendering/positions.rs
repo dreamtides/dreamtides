@@ -26,7 +26,7 @@ pub fn calculate(
         Zone::Banished => Position::InBanished(player),
     };
 
-    for_card(battle, card_id, position_overrides::position(battle, card_id, position))
+    for_card(battle, card_id, position_overrides::position(builder, battle, card_id, position))
 }
 
 pub fn for_card(battle: &BattleState, card_id: CardId, position: Position) -> ObjectPosition {
@@ -70,7 +70,7 @@ pub fn controller_and_zone(battle: &BattleState, card_id: CardId) -> ControllerA
     }
 }
 
-fn current_stack_type(builder: &ResponseBuilder, battle: &BattleState) -> StackType {
+pub fn current_stack_type(builder: &ResponseBuilder, battle: &BattleState) -> StackType {
     let display_player = builder.display_for_player();
     let mut targeting_user_battlefield = false;
     let mut targeting_enemy_battlefield = false;
