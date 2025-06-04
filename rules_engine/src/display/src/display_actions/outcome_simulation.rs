@@ -1,15 +1,20 @@
+use std::collections::HashMap;
+
 use battle_mutations::actions::apply_battle_action;
+use battle_queries::battle_card_queries::card_properties;
+use battle_queries::battle_player_queries::player_properties;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
-use battle_state::battle::card_id::CardIdType;
+use battle_state::battle::card_id::{CardId, CardIdType, CharacterId};
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::display_color;
 use core_data::types::PlayerName;
 use display_data::battle_view::{BattlePreviewView, PlayerPreviewView};
 use display_data::card_view::CardPreviewView;
+use masonry::flex_node::FlexNode;
 use tracing_macros::panic_with;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::EnvFilter;
@@ -81,56 +86,114 @@ pub fn action_effect_preview(
         }
     });
 
-    let simulated_player_state = simulation.players.player(player);
+    let simulated_user_state = simulation.players.player(player);
+    let simulated_enemy_state = simulation.players.player(player.opponent());
+    let original_user_state = battle.players.player(player);
+    let original_enemy_state = battle.players.player(player.opponent());
 
     let user_preview = PlayerPreviewView {
+        score: (simulated_user_state.points != original_user_state.points)
+            .then_some(simulated_user_state.points),
         // Always show user energy in the preview, even if it didn't change,
         // since it usually changes and it's confusing to suddenly not see it.
-        energy: Some(simulated_player_state.current_energy),
-        ..Default::default()
+        energy: Some(simulated_user_state.current_energy),
+        produced_energy: (simulated_user_state.produced_energy
+            != original_user_state.produced_energy)
+            .then_some(simulated_user_state.produced_energy),
+        total_spark: {
+            let simulated_spark = player_properties::spark_total(&simulation, player);
+            let original_spark = player_properties::spark_total(battle, player);
+            (simulated_spark != original_spark).then_some(simulated_spark)
+        },
     };
 
-    let mut preview_message = None;
-    let mut cards = vec![];
+    let enemy_preview = PlayerPreviewView {
+        score: (simulated_enemy_state.points != original_enemy_state.points)
+            .then_some(simulated_enemy_state.points),
+        energy: (simulated_enemy_state.current_energy != original_enemy_state.current_energy)
+            .then_some(simulated_enemy_state.current_energy),
+        produced_energy: (simulated_enemy_state.produced_energy
+            != original_enemy_state.produced_energy)
+            .then_some(simulated_enemy_state.produced_energy),
+        total_spark: {
+            let simulated_spark = player_properties::spark_total(&simulation, player.opponent());
+            let original_spark = player_properties::spark_total(battle, player.opponent());
+            (simulated_spark != original_spark).then_some(simulated_spark)
+        },
+    };
 
-    if simulation.turn_history.current_action_history.player(player).hand_size_limit_exceeded {
-        preview_message = hand_size_limit_exceeded_message().flex_node();
-    }
+    let preview_message = get_preview_message(&simulation, player);
+    let cards = get_preview_cards(battle, &simulation, player);
 
-    if !simulation
+    BattlePreviewView { user: user_preview, enemy: enemy_preview, cards, preview_message }
+}
+
+fn get_preview_message(simulation: &BattleState, player: PlayerName) -> Option<FlexNode> {
+    let hand_size_exceeded =
+        simulation.turn_history.current_action_history.player(player).hand_size_limit_exceeded;
+    let character_limit_exceeded = !simulation
         .turn_history
         .current_action_history
         .player(player)
         .character_limit_characters_abandoned
-        .is_empty()
+        .is_empty();
+
+    match (hand_size_exceeded, character_limit_exceeded) {
+        (true, true) => combined_limit_messages().flex_node(),
+        (true, false) => hand_size_limit_exceeded_message().flex_node(),
+        (false, true) => character_limit_message().flex_node(),
+        (false, false) => None,
+    }
+}
+
+fn get_preview_cards(
+    battle: &BattleState,
+    simulation: &BattleState,
+    player: PlayerName,
+) -> Vec<CardPreviewView> {
+    let mut card_previews: HashMap<CardId, CardPreviewView> = HashMap::new();
+
+    for character_id in &simulation
+        .turn_history
+        .current_action_history
+        .player(player)
+        .character_limit_characters_abandoned
     {
-        if preview_message.is_some() {
-            preview_message = combined_limit_messages().flex_node();
-        } else {
-            preview_message = character_limit_message().flex_node();
-        }
+        let card_id = character_id.card_id();
+        card_previews
+            .entry(card_id)
+            .or_insert_with(|| CardPreviewView { card_id, ..Default::default() })
+            .battlefield_icon = Some(icon::WARNING.to_string());
+        card_previews.get_mut(&card_id).unwrap().battlefield_icon_color =
+            Some(display_color::RED_900);
+    }
 
-        for character_id in &simulation
-            .turn_history
-            .current_action_history
-            .player(player)
-            .character_limit_characters_abandoned
-        {
-            cards.push(CardPreviewView {
-                card_id: character_id.card_id(),
-                battlefield_icon: Some(icon::WARNING.to_string()),
-                battlefield_icon_color: Some(display_color::RED_900),
-                ..Default::default()
-            });
+    for card_id in battle.cards.all_cards() {
+        let original_cost = card_properties::cost(battle, card_id);
+        let simulated_cost = card_properties::cost(simulation, card_id);
+        let cost_changed = original_cost != simulated_cost;
+
+        let controller = card_properties::controller(battle, card_id);
+        let character_id = CharacterId(card_id);
+        let original_spark = card_properties::spark(battle, controller, character_id);
+        let simulated_spark = card_properties::spark(simulation, controller, character_id);
+        let spark_changed = original_spark != simulated_spark;
+
+        if cost_changed || spark_changed {
+            let preview = card_previews
+                .entry(card_id)
+                .or_insert_with(|| CardPreviewView { card_id, ..Default::default() });
+
+            if cost_changed {
+                preview.cost = simulated_cost;
+            }
+            if spark_changed {
+                preview.spark = simulated_spark;
+            }
         }
     }
 
-    BattlePreviewView {
-        user: user_preview,
-        enemy: PlayerPreviewView::default(),
-        cards,
-        preview_message,
-    }
+    card_previews.into_values().collect()
 }
 
 /// Returns a unified preview of the battle state based on the current prompt
