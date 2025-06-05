@@ -20,12 +20,14 @@ use display_data::card_view::{
     CardActions, CardEffects, CardPrefab, CardView, DisplayImage, InfoZoomData, InfoZoomIcon,
     RevealedCardView,
 };
+use ui_components::component::Component;
 use ui_components::icon;
 
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
 use crate::display_actions::outcome_simulation;
 use crate::rendering::positions::ControllerAndZone;
+use crate::rendering::supplemental_card_info::SupplementalCardInfo;
 use crate::rendering::{card_display_state, positions};
 
 pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardView {
@@ -153,7 +155,7 @@ fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         CardName::MinstrelOfFallingLight => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
         CardName::Immolate => "Dissolve an enemy character.".to_string(),
         CardName::RippleOfDefiance => {
-            "Negate an enemy event unless they pay 2\u{f7e4}.".to_string()
+            "Negate an enemy event unless the enemy pays 2\u{f7e4}.".to_string()
         }
         CardName::Abolish => "Negate an enemy card".to_string(),
         CardName::Dreamscatter => {
@@ -171,13 +173,28 @@ fn rules_text(battle: &BattleState, card_id: CardId) -> String {
     base_text
 }
 
+fn supplemental_card_info(battle: &BattleState, card_id: CardId) -> Option<String> {
+    match battle.cards.card(card_id).name {
+        CardName::Immolate => Some("<b>Dissolve:</b> Send a character to the void".to_string()),
+        CardName::RippleOfDefiance => Some(
+            "<b>Negate:</b> Send a card to the void in response to it being played".to_string(),
+        ),
+        CardName::Abolish => Some(
+            "<b>Negate:</b> Send a card to the void in response to it being played".to_string(),
+        ),
+        _ => None,
+    }
+}
+
 fn build_info_zoom_data(battle: &BattleState, card_id: CardId) -> Option<InfoZoomData> {
     let targeting_icons = get_targeting_icons(battle, card_id);
+    let supplemental_info = supplemental_card_info(battle, card_id)
+        .and_then(|text| SupplementalCardInfo::builder().text(text).build().render()?.flex_node());
 
-    if targeting_icons.is_empty() {
+    if targeting_icons.is_empty() && supplemental_info.is_none() {
         None
     } else {
-        Some(InfoZoomData { supplemental_card_info: None, icons: targeting_icons })
+        Some(InfoZoomData { supplemental_card_info: supplemental_info, icons: targeting_icons })
     }
 }
 

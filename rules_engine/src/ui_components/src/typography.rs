@@ -11,6 +11,7 @@ pub enum Typography {
     StackTrace,
     ButtonLabel,
     InterfaceMessage,
+    SupplementalCardInfo,
     Body2,
 }
 
@@ -24,6 +25,9 @@ pub fn apply(typography: &Typography, style: &mut FlexStyle) {
             TypographyOptions::builder().color(display_color::WHITE).font_size(8).build()
         }
         Typography::InterfaceMessage => {
+            TypographyOptions::builder().color(display_color::WHITE).font_size(10).build()
+        }
+        Typography::SupplementalCardInfo => {
             TypographyOptions::builder().color(display_color::WHITE).font_size(10).build()
         }
         Typography::Body2 => {
