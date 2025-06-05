@@ -123,7 +123,7 @@ namespace Dreamtides.Services
 
     void HandleDisplayableHover()
     {
-      if (InputProvider.IsPointerPressed() || Application.isMobilePlatform)
+      if (InputProvider.IsPointerPressed() || UnityEngine.Device.Application.isMobilePlatform)
       {
         return;
       }
