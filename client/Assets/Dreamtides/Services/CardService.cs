@@ -129,11 +129,15 @@ namespace Dreamtides.Services
             AlignItems = FlexAlign.FlexStart,
             Inset = shouldShowOnLeft ? new FlexInsets()
             {
-              Left = Mason.Px(Registry.DocumentService.ScreenPxToElementPx(screenPosition.x)),
+              Left = forCardInHand ?
+                  Mason.Px(8) :
+                  Mason.Px(Registry.DocumentService.ScreenPxToElementPx(screenPosition.x)),
               Top = Mason.Px(Registry.DocumentService.ScreenPxToElementPx(Screen.height - screenPosition.y)),
             } : new FlexInsets()
             {
-              Right = Mason.Px(Registry.DocumentService.ScreenPxToElementPx(Screen.width - screenPosition.x)),
+              Right = forCardInHand ?
+                  Mason.Px(8) :
+                  Mason.Px(Registry.DocumentService.ScreenPxToElementPx(Screen.width - screenPosition.x)),
               Top = Mason.Px(Registry.DocumentService.ScreenPxToElementPx(Screen.height - screenPosition.y)),
             },
           },
