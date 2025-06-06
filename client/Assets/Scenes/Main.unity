@@ -5756,6 +5756,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 3e8c87ccfe673b344a5201ed0bffbdc5, type: 3}
   - {fileID: 8300000, guid: e5697e2df8308de43a4f7a2e64f683b5, type: 3}
   - {fileID: 8300000, guid: 7f897e0b185079a48accdd823aa1c7dd, type: 3}
+  _drawCardSounds:
+  - {fileID: 8300000, guid: 4b2c781330c4d31489a9afc958f2b010, type: 3}
   _yourTurnSound: {fileID: 8300000, guid: 36f9d65f4ab694e76bae1660c6c1b39c, type: 3}
   _enemyTurnSound: {fileID: 8300000, guid: 3fbac946a22afca4a89f23aa096eb3cc, type: 3}
   _victorySound: {fileID: 8300000, guid: 1b0a47b1c0ffb49c7b33f40bcae7fbe8, type: 3}

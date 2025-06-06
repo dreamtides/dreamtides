@@ -51,6 +51,7 @@ namespace Dreamtides.Services
         card.Parent.RemoveIfPresent(card);
       }
 
+      Registry.SoundService.PlayDrawCardSound();
       var sequence = TweenUtils.Sequence("DrawUserCard");
       var moveDuration = 0.3f;
       card.Render(Registry, cardView, sequence);

@@ -14,10 +14,12 @@ namespace Dreamtides.Services
     [SerializeField] List<AudioClip> _impactProjectileSounds = null!;
     [SerializeField] List<AudioClip> _whooshSounds = null!;
     [SerializeField] List<AudioClip> _clickSounds = null!;
+    [SerializeField] List<AudioClip> _drawCardSounds = null!;
     [SerializeField] AudioClip _yourTurnSound = null!;
     [SerializeField] AudioClip _enemyTurnSound = null!;
     [SerializeField] AudioClip _victorySound = null!;
     [SerializeField] AudioClip _defeatSound = null!;
+
 
     protected override void OnInitialize(TestConfiguration? testConfiguration)
     {
@@ -60,6 +62,11 @@ namespace Dreamtides.Services
     public void PlayClickSound()
     {
       PlayRandom(_clickSounds);
+    }
+
+    public void PlayDrawCardSound()
+    {
+      PlayRandom(_drawCardSounds);
     }
 
     public void PlayMessageSound(GameMessageType messageType)
