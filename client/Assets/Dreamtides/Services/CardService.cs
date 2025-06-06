@@ -71,7 +71,7 @@ namespace Dreamtides.Services
     /// <summary>
     /// Displays a large format version of the provided card in the info zoom.
     /// </summary>
-    public void DisplayInfoZoom(Card card)
+    public void DisplayInfoZoom(Card card, bool forCardInHand)
     {
       if ((_currentInfoZoom && card.Id == _currentInfoZoom.Id) || _infoZoomDisabled)
       {
@@ -87,19 +87,23 @@ namespace Dreamtides.Services
         _hidCloseButton = Registry.Layout.Browser.SetCloseButtonVisible(false);
       }
 
-      _currentInfoZoom = card.CloneForInfoZoom();
-      if (_currentInfoZoom.SortingGroup)
+      if (!forCardInHand)
       {
-        _currentInfoZoom.SortingGroup.sortingLayerID = GameContext.InfoZoom.SortingLayerId();
+        // Cards in hand jump to a large size in-place, we don't show a copy of them.
+        _currentInfoZoom = card.CloneForInfoZoom();
+        if (_currentInfoZoom.SortingGroup)
+        {
+          _currentInfoZoom.SortingGroup.sortingLayerID = GameContext.InfoZoom.SortingLayerId();
+        }
+
+        var anchor = shouldShowOnLeft ? Registry.Layout.InfoZoomLeft : Registry.Layout.InfoZoomRight;
+        _currentInfoZoom.transform.SetParent(anchor);
+        _currentInfoZoom.transform.localPosition = Vector3.zero;
+        _currentInfoZoom.transform.localScale = Vector3.one;
+        _currentInfoZoom.transform.forward = anchor.forward;
       }
 
-      var anchor = shouldShowOnLeft ? Registry.Layout.InfoZoomLeft : Registry.Layout.InfoZoomRight;
-      _currentInfoZoom.transform.SetParent(anchor);
-      _currentInfoZoom.transform.localPosition = Vector3.zero;
-      _currentInfoZoom.transform.localScale = Vector3.one;
-      _currentInfoZoom.transform.forward = anchor.forward;
-
-      if (_currentInfoZoom.CardView.Revealed?.InfoZoomData?.Icons is { } icons)
+      if (card.CardView.Revealed?.InfoZoomData?.Icons is { } icons)
       {
         foreach (var icon in icons)
         {
@@ -109,7 +113,7 @@ namespace Dreamtides.Services
         }
       }
 
-      if (_currentInfoZoom.CardView.Revealed?.InfoZoomData?.SupplementalCardInfo is { } info)
+      if (card.CardView.Revealed?.InfoZoomData?.SupplementalCardInfo is { } info)
       {
         var infoAnchor = shouldShowOnLeft ?
             Registry.Layout.SupplementalCardInfoLeft : Registry.Layout.SupplementalCardInfoRight;

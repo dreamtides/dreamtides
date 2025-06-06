@@ -337,10 +337,11 @@ namespace Dreamtides.Components
         // Jump to large size when in hand
         transform.position = HandCardJumpPosition();
         transform.rotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0);
+        _registry.CardService.DisplayInfoZoom(this, forCardInHand: true);
       }
       else if (_registry.CapabilitiesService.CanInfoZoom(GameContext) && !_draggedToClearThreshold)
       {
-        _registry.CardService.DisplayInfoZoom(this);
+        _registry.CardService.DisplayInfoZoom(this, forCardInHand: false);
       }
 
       if (CanPlay() || CanSelectOrder())
@@ -491,9 +492,9 @@ namespace Dreamtides.Components
 
     public override void MouseHover()
     {
-      if (Time.time - _hoverStartTime > 0.3f && _hoveringForInfoZoom && !_longHoverFired)
+      if (Time.time - _hoverStartTime > 0.5f && _hoveringForInfoZoom && !_longHoverFired)
       {
-        _registry.CardService.DisplayInfoZoom(this);
+        _registry.CardService.DisplayInfoZoom(this, forCardInHand: false);
         _longHoverFired = true;
       }
     }
