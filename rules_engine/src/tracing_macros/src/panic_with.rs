@@ -55,7 +55,15 @@ macro_rules! panic_with {
             $message.to_string(),
             values
         );
-        panic!("Error: {}", $message);
+
+        let panic_message = format!("Error: {}{}", $message, {
+            let mut parts = Vec::new();
+            $(
+                parts.push(format!(", {}: {:?}", stringify!($key), $key));
+            )*
+            parts.join("")
+        });
+        panic!("{}", panic_message);
     }};
     ($message:expr, $battle:expr, $($key:ident = $value:expr),* $(,)?) => {{
         tracing::error!(message = %$message, $($key = ?$value),*);
@@ -72,6 +80,14 @@ macro_rules! panic_with {
             $message.to_string(),
             values
         );
-        panic!("Error: {}", $message);
+
+        let panic_message = format!("Error: {}{}", $message, {
+            let mut parts = Vec::new();
+            $(
+                parts.push(format!(", {}: {:?}", stringify!($key), $value));
+            )*
+            parts.join("")
+        });
+        panic!("{}", panic_message);
     }};
 }
