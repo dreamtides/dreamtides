@@ -7,6 +7,7 @@ use std::path::PathBuf;
 use std::time::SystemTime;
 
 use battle_queries::debug_snapshot::debug_battle_snapshot;
+use battle_state::battle::animation_data::AnimationData;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_trace::battle_tracing::BattleTraceEvent;
 use battle_state::debug::debug_battle_state::DebugBattleState;
@@ -71,6 +72,38 @@ struct CommandTraceEvent {
     pub snapshot: Option<DebugBattleState>,
     pub sequence: CommandSequence,
     pub timestamp: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct AnimationTraceEvent {
+    pub m: String,
+    pub snapshot: DebugBattleState,
+    pub step_names: Vec<String>,
+    pub timestamp: String,
+}
+
+pub fn write_animations(battle: &BattleState, message: &'static str, animations: &AnimationData) {
+    let animation_names: Vec<String> = animations
+        .steps
+        .iter()
+        .map(|step| format!("{:?}", step.animation.discriminant()))
+        .collect();
+
+    debug!("Playing animations: [{}]", animation_names.join(", "));
+
+    let snapshot = debug_battle_snapshot::capture(battle);
+    let timestamp = format_current_time();
+    let event = AnimationTraceEvent {
+        m: message.to_string(),
+        snapshot,
+        step_names: animation_names,
+        timestamp,
+    };
+    match serde_json::to_string_pretty(&event) {
+        Ok(json) => write_json_to_log_file(&json),
+        Err(e) => error!("Failed to serialize CommandSequence: {}", e),
+    }
 }
 
 pub fn write_commands(

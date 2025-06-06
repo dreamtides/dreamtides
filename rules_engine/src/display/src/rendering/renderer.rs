@@ -4,7 +4,7 @@ use battle_state::battle_player::battle_player_state::PlayerType;
 use core_data::identifiers::UserId;
 use core_data::types::PlayerName;
 use display_data::command::CommandSequence;
-use tracing_macros::panic_with;
+use tracing_macros::{panic_with, write_tracing_event};
 
 use crate::core::response_builder::ResponseBuilder;
 use crate::rendering::{animations, battle_rendering};
@@ -24,8 +24,11 @@ pub fn render_updates(battle: &BattleState, user_id: UserId) -> CommandSequence 
     let mut builder = ResponseBuilder::new(player_name_for_user(battle, user_id), true);
     builder.set_for_animation(true);
     if let Some(animations) = &battle.animations {
+        if !animations.steps.is_empty() {
+            write_tracing_event::write_animations(battle, "Rendering animations", animations);
+        }
         for step in &animations.steps {
-            battle_rendering::run(&mut builder, &step.snapshot);
+            // battle_rendering::run(&mut builder, &step.snapshot);
             animations::render(&mut builder, step.source, &step.animation, &step.snapshot, battle);
             if matches!(step.snapshot.status, BattleStatus::GameOver { .. }) {
                 // Ignore future updates when GameOver state is detected

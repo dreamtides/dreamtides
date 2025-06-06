@@ -13,6 +13,8 @@ use crate::prompt_mutations::{add_additional_cost_prompt, add_targeting_prompt};
 /// card requires targets or choices, a prompt will be displayed.
 pub fn execute(battle: &mut BattleState, player: PlayerName, card_id: HandCardId) {
     let source = EffectSource::Player { controller: player };
+    battle.push_animation(source, || BattleAnimation::PlayCardFromHand { player, card_id });
+
     if let Some(cost) = card_properties::cost(battle, card_id) {
         energy::spend(battle, player, source, cost);
     }
@@ -20,7 +22,6 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, card_id: HandCardId
 
     // Opponent gets priority when a card is played
     battle.stack_priority = Some(player.opponent());
-    battle.push_animation(source, || BattleAnimation::PlayCardFromHand { player, card_id });
     add_targeting_prompt::execute(battle, player, stack_card_id);
     add_additional_cost_prompt::execute(battle, player, stack_card_id);
 }

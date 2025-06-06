@@ -14,6 +14,7 @@ use display_data::command::{
 use masonry::flex_style::FlexVector3;
 
 use crate::core::response_builder::ResponseBuilder;
+use crate::rendering::animations;
 
 /// Apply visual & sound effects for a specific card's ability.
 pub fn apply_effect(
@@ -28,6 +29,7 @@ pub fn apply_effect(
     let target_id = find_target_id(animation);
     match battle.cards.card(source_id).name {
         CardName::Immolate if effect_name == "Dissolve" => {
+            animations::push_snapshot(builder, battle);
             builder.push(Command::FireProjectile(
                 FireProjectileCommand::builder()
                     .source_id(GameObjectId::CardId(source_id))
@@ -60,6 +62,7 @@ pub fn apply_effect(
         }
 
         CardName::Abolish if effect_name == "Negate" => {
+            animations::push_snapshot(builder, battle);
             builder.push(Command::FireProjectile(
                 FireProjectileCommand::builder()
                     .source_id(GameObjectId::CardId(source_id))
@@ -72,6 +75,7 @@ pub fn apply_effect(
         }
 
         CardName::RippleOfDefiance if effect_name == "Negate" => {
+            animations::push_snapshot(builder, battle);
             builder.push(Command::FireProjectile(
                 FireProjectileCommand::builder()
                     .source_id(GameObjectId::CardId(source_id))
@@ -84,6 +88,7 @@ pub fn apply_effect(
         }
 
         CardName::Dreamscatter if effect_name == "DrawCards" => {
+            animations::push_snapshot(builder, battle);
             builder.push(Command::DisplayEffect(DisplayEffectCommand {
                 target: GameObjectId::Deck(builder.to_display_player(controller)),
                 effect: hovl::magic_circle("1"),
@@ -97,6 +102,7 @@ pub fn apply_effect(
         }
 
         CardName::MinstrelOfFallingLight if effect_name == "ResolveCharacter" => {
+            animations::push_snapshot(builder, battle);
             builder.push(Command::PlayAudioClip(PlayAudioClipCommand {
                 sound: AudioClipAddress::new("Assets/ThirdParty/Cafofo/Magic Spells Sound Effects V2.0/General Spell/Positive Effect 10.wav"),
                 pause_duration: Milliseconds::new(0),

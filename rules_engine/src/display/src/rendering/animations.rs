@@ -2,15 +2,15 @@ use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardIdType, StackCardId};
 use battle_state::core::effect_source::EffectSource;
-use core_data::display_types::Milliseconds;
+use core_data::display_types::{AudioClipAddress, Milliseconds};
 use display_data::command::{
     Command, DisplayDreamwellActivationCommand, DisplayEnemyMessageCommand, DisplayJudgmentCommand,
-    DrawUserCardsCommand, GameMessageType,
+    DrawUserCardsCommand, GameMessageType, PlayAudioClipCommand,
 };
 
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
-use crate::rendering::{apply_card_fx, card_rendering, labels};
+use crate::rendering::{apply_card_fx, battle_rendering, card_rendering, labels};
 
 pub fn render(
     builder: &mut ResponseBuilder,
@@ -21,6 +21,7 @@ pub fn render(
 ) {
     match animation {
         BattleAnimation::StartTurn { player } => {
+            push_snapshot(builder, snapshot);
             builder.push(Command::DisplayGameMessage(if *player == builder.display_for_player() {
                 GameMessageType::YourTurn
             } else {
@@ -29,6 +30,7 @@ pub fn render(
         }
 
         BattleAnimation::Judgment { player, new_score } => {
+            push_snapshot(builder, snapshot);
             builder.push(Command::DisplayJudgment(DisplayJudgmentCommand {
                 player: builder.to_display_player(*player),
                 new_score: *new_score,
@@ -41,6 +43,7 @@ pub fn render(
             new_energy,
             new_produced_energy,
         } => {
+            push_snapshot(builder, snapshot);
             builder.push(Command::DisplayDreamwellActivation(DisplayDreamwellActivationCommand {
                 player: builder.to_display_player(*player),
                 card_id: *dreamwell_card_id,
@@ -50,17 +53,23 @@ pub fn render(
         }
 
         BattleAnimation::PlayCardFromHand { player, card_id } => {
-            if *player != builder.display_for_player()
-                && final_state.cards.stack_card(StackCardId(card_id.card_id())).is_none()
-            {
-                // If the played card is no longer on the stack, insert a pause
-                // so it can be seen.
-                builder.push(Command::Wait(Milliseconds::new(2000)));
+            if *player != builder.display_for_player() {
+                builder.push(Command::PlayAudioClip(PlayAudioClipCommand {
+                    sound: AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Generic_SubtleWhoosh02.wav"),
+                    pause_duration: Milliseconds::new(0),
+                }));
+
+                if final_state.cards.stack_card(StackCardId(card_id.card_id())).is_none() {
+                    // If the played card is no longer on the stack, insert a pause
+                    // so it can be seen.
+                    builder.push(Command::Wait(Milliseconds::new(2000)));
+                }
             }
         }
 
         BattleAnimation::DrawCards { player, cards } => {
             if *player == builder.display_for_player() && !cards.is_empty() {
+                push_snapshot(builder, snapshot);
                 let card_views = cards
                     .iter()
                     .map(|&card_id| {
@@ -85,6 +94,7 @@ pub fn render(
 
         BattleAnimation::MakeChoice { player, choice } => {
             if *player != builder.display_for_player() {
+                push_snapshot(builder, snapshot);
                 builder.push(Command::DisplayEnemyMessage(DisplayEnemyMessageCommand {
                     message: labels::choice_label(*choice),
                     show_duration: Milliseconds::new(2000),
@@ -93,8 +103,17 @@ pub fn render(
             }
         }
 
+        BattleAnimation::SelectStackCardTargets { .. } => {
+            push_snapshot(builder, snapshot);
+        }
+
         _ => {}
     }
 
     apply_card_fx::apply_effect(builder, source, animation, snapshot);
+}
+
+/// Appends a command to update the battle view to the current state.
+pub fn push_snapshot(builder: &mut ResponseBuilder, snapshot: &BattleState) {
+    builder.push_battle_view(battle_rendering::battle_view(builder, snapshot));
 }
