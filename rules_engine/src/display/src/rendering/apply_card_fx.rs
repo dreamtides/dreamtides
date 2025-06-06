@@ -102,15 +102,11 @@ pub fn apply_effect(
 
 /// Visual & sound effects for the "ResolveCharacter" animation.
 pub fn resolve_character(builder: &mut ResponseBuilder, battle: &BattleState, card_id: CardId) {
-    match battle.cards.card(card_id).name {
-        CardName::MinstrelOfFallingLight => {
-            builder.push(Command::PlayAudioClip(PlayAudioClipCommand {
-                sound: AudioClipAddress::new("Assets/ThirdParty/Cafofo/Magic Spells Sound Effects V2.0/General Spell/Positive Effect 10.wav"),
-                pause_duration: Milliseconds::new(0),
-            }));
-        }
-
-        _ => {}
+    if battle.cards.card(card_id).name == CardName::MinstrelOfFallingLight {
+        builder.push(Command::PlayAudioClip(PlayAudioClipCommand {
+            sound: AudioClipAddress::new("Assets/ThirdParty/Cafofo/Magic Spells Sound Effects V2.0/General Spell/Positive Effect 10.wav"),
+            pause_duration: Milliseconds::new(0),
+        }));
     }
 }
 
