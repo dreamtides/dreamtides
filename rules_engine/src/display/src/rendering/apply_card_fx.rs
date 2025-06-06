@@ -1,12 +1,12 @@
-use ability_data::standard_effect::StandardEffect;
 use asset_paths::{dissolve_material, hovl, wow_sound};
+use battle_queries::battle_card_queries::card_properties;
+use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType};
-use battle_state::battle_cards::stack_card_state::StackCardTargets;
+use battle_state::core::effect_source::EffectSource;
 use core_data::display_color;
 use core_data::display_types::{AudioClipAddress, Milliseconds};
 use core_data::identifiers::CardName;
-use core_data::types::PlayerName;
 use display_data::command::{
     Command, DisplayEffectCommand, DissolveCardCommand, FireProjectileCommand, GameObjectId,
     PlayAudioClipCommand,
@@ -15,21 +15,23 @@ use masonry::flex_style::FlexVector3;
 
 use crate::core::response_builder::ResponseBuilder;
 
-/// Visual & sound effects for the "ApplyEffect" animation.
+/// Apply visual & sound effects for a specific card's ability.
 pub fn apply_effect(
     builder: &mut ResponseBuilder,
+    source: EffectSource,
+    animation: &BattleAnimation,
     battle: &BattleState,
-    controller: PlayerName,
-    source_id: CardId,
-    effect: &StandardEffect,
-    targets: &Option<StackCardTargets>,
 ) -> Option<()> {
+    let source_id = source.card_id()?;
+    let controller = card_properties::controller(battle, source_id);
+    let effect_name = animation.discriminant().to_string();
+    let target_id = find_target_id(animation);
     match battle.cards.card(source_id).name {
-        CardName::Immolate => {
+        CardName::Immolate if effect_name == "Dissolve" => {
             builder.push(Command::FireProjectile(
                 FireProjectileCommand::builder()
                     .source_id(GameObjectId::CardId(source_id))
-                    .target_id(target_id(targets)?)
+                    .target_id(GameObjectId::CardId(target_id?))
                     .projectile(hovl::projectile(1, "Projectile 3 black fire"))
                     .fire_sound(wow_sound::rpg_magic(
                         3,
@@ -40,7 +42,7 @@ pub fn apply_effect(
             ));
             builder.push(Command::DissolveCard(
                 DissolveCardCommand::builder()
-                    .target(target_card_id(targets)?)
+                    .target(target_id?)
                     .material(dissolve_material::material(15))
                     .color(display_color::ORANGE_500)
                     .reverse(false)
@@ -48,7 +50,7 @@ pub fn apply_effect(
             ));
             builder.run_with_next_battle_view(Command::DissolveCard(
                 DissolveCardCommand::builder()
-                    .target(target_card_id(targets)?)
+                    .target(target_id?)
                     .material(dissolve_material::material(15))
                     .color(display_color::ORANGE_500)
                     .reverse(true)
@@ -57,11 +59,11 @@ pub fn apply_effect(
             ));
         }
 
-        CardName::Abolish => {
+        CardName::Abolish if effect_name == "Negate" => {
             builder.push(Command::FireProjectile(
                 FireProjectileCommand::builder()
                     .source_id(GameObjectId::CardId(source_id))
-                    .target_id(target_id(targets)?)
+                    .target_id(GameObjectId::CardId(target_id?))
                     .projectile(hovl::projectile(1, "Projectile 6 blue fire"))
                     .fire_sound(wow_sound::rpg_magic(3, "Wind Magic/RPG3_WindMagic_Cast01"))
                     .impact_sound(wow_sound::rpg_magic(3, "Wind Magic/RPG3_WindMagic_Impact01"))
@@ -69,11 +71,11 @@ pub fn apply_effect(
             ));
         }
 
-        CardName::RippleOfDefiance if matches!(effect, StandardEffect::Negate { .. }) => {
+        CardName::RippleOfDefiance if effect_name == "Negate" => {
             builder.push(Command::FireProjectile(
                 FireProjectileCommand::builder()
                     .source_id(GameObjectId::CardId(source_id))
-                    .target_id(target_id(targets)?)
+                    .target_id(GameObjectId::CardId(target_id?))
                     .projectile(hovl::projectile(1, "Projectile 10 blue laser"))
                     .fire_sound(wow_sound::rpg_magic(3, "Water Magic/RPG3_WaterMagic_Cast01"))
                     .impact_sound(wow_sound::rpg_magic(3, "Water Magic/RPG3_WaterMagic_Impact03"))
@@ -81,7 +83,7 @@ pub fn apply_effect(
             ));
         }
 
-        CardName::Dreamscatter => {
+        CardName::Dreamscatter if effect_name == "DrawCards" => {
             builder.push(Command::DisplayEffect(DisplayEffectCommand {
                 target: GameObjectId::Deck(builder.to_display_player(controller)),
                 effect: hovl::magic_circle("1"),
@@ -94,30 +96,24 @@ pub fn apply_effect(
             }));
         }
 
+        CardName::MinstrelOfFallingLight if effect_name == "ResolveCharacter" => {
+            builder.push(Command::PlayAudioClip(PlayAudioClipCommand {
+                sound: AudioClipAddress::new("Assets/ThirdParty/Cafofo/Magic Spells Sound Effects V2.0/General Spell/Positive Effect 10.wav"),
+                pause_duration: Milliseconds::new(0),
+            }));
+        }
+
         _ => {}
     }
 
     Some(())
 }
 
-/// Visual & sound effects for the "ResolveCharacter" animation.
-pub fn resolve_character(builder: &mut ResponseBuilder, battle: &BattleState, card_id: CardId) {
-    if battle.cards.card(card_id).name == CardName::MinstrelOfFallingLight {
-        builder.push(Command::PlayAudioClip(PlayAudioClipCommand {
-            sound: AudioClipAddress::new("Assets/ThirdParty/Cafofo/Magic Spells Sound Effects V2.0/General Spell/Positive Effect 10.wav"),
-            pause_duration: Milliseconds::new(0),
-        }));
-    }
-}
-
-fn target_id(targets: &Option<StackCardTargets>) -> Option<GameObjectId> {
-    Some(GameObjectId::CardId(target_card_id(targets)?))
-}
-
-fn target_card_id(targets: &Option<StackCardTargets>) -> Option<CardId> {
-    match targets {
-        Some(StackCardTargets::Character(character_id, _)) => Some(character_id.card_id()),
-        Some(StackCardTargets::StackCard(stack_card_id, _)) => Some(stack_card_id.card_id()),
+/// Returns the target ID for a given animation, if it has one.
+fn find_target_id(animation: &BattleAnimation) -> Option<CardId> {
+    match animation {
+        BattleAnimation::Negate { target_id } => Some(target_id.card_id()),
+        BattleAnimation::Dissolve { target_id } => Some(target_id.card_id()),
         _ => None,
     }
 }

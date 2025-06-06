@@ -72,6 +72,7 @@ fn draw_cards_with_animation(
         && let Some(animations) = &mut battle.animations
     {
         animations.steps.push(AnimationStep {
+            source,
             snapshot: pre_draw_snapshot,
             animation: BattleAnimation::DrawCards { player, cards: drawn_cards },
         });
@@ -112,7 +113,7 @@ fn draw_card_internal(
         return draw_card_internal(battle, source, player, with_animation);
     };
     if with_animation {
-        battle.push_animation(|| BattleAnimation::DrawCards {
+        battle.push_animation(source, || BattleAnimation::DrawCards {
             player,
             cards: vec![HandCardId(id.card_id())],
         });

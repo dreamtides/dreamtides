@@ -20,7 +20,7 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, card_id: HandCardId
 
     // Opponent gets priority when a card is played
     battle.stack_priority = Some(player.opponent());
-    battle.push_animation(|| BattleAnimation::PlayCardFromHand { player, card_id });
+    battle.push_animation(source, || BattleAnimation::PlayCardFromHand { player, card_id });
     add_targeting_prompt::execute(battle, player, stack_card_id);
     add_additional_cost_prompt::execute(battle, player, stack_card_id);
 }

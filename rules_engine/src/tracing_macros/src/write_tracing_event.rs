@@ -82,7 +82,7 @@ pub fn write_commands(
         .groups
         .iter()
         .flat_map(|group| &group.commands)
-        .map(|command| format!("{:?}", command.kind()))
+        .map(|command| format!("{:?}", command.discriminant()))
         .collect();
 
     debug!("Writing commands: [{}]", command_names.join(", "));

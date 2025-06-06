@@ -1,5 +1,6 @@
 use core_data::numerics::{Energy, Points, Spark};
 use serde::{Deserialize, Serialize};
+use strum::{Display, EnumDiscriminants};
 
 use crate::collection_expression::CollectionExpression;
 use crate::cost::Cost;
@@ -10,8 +11,9 @@ use crate::triggered_ability::TriggeredAbility;
 /// Effects are the primary way in which cards modify the game state. This can
 /// be as part of the resolution of an event card, or via the effect text of a
 /// triggered or activated ability on a character card.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, EnumDiscriminants)]
 #[serde(rename_all = "camelCase")]
+#[strum_discriminants(derive(Display))]
 pub enum StandardEffect {
     AbandonAndGainEnergyForSpark { target: Predicate, energy_per_spark: Energy },
     AbandonAtEndOfTurn { target: Predicate },
@@ -84,4 +86,10 @@ pub enum StandardEffect {
     ThenMaterializeIt,
     TriggerJudgmentAbility { matching: Predicate, collection: CollectionExpression },
     YouWinTheGame,
+}
+
+impl StandardEffect {
+    pub fn discriminant(&self) -> StandardEffectDiscriminants {
+        self.into()
+    }
 }

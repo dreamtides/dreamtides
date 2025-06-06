@@ -1,6 +1,7 @@
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardIdType, StackCardId};
+use battle_state::core::effect_source::EffectSource;
 use core_data::display_types::Milliseconds;
 use display_data::command::{
     Command, DisplayDreamwellActivationCommand, DisplayEnemyMessageCommand, DisplayJudgmentCommand,
@@ -13,6 +14,7 @@ use crate::rendering::{apply_card_fx, card_rendering, labels};
 
 pub fn render(
     builder: &mut ResponseBuilder,
+    source: EffectSource,
     animation: &BattleAnimation,
     snapshot: &BattleState,
     final_state: &BattleState,
@@ -25,12 +27,14 @@ pub fn render(
                 GameMessageType::EnemyTurn
             }));
         }
+
         BattleAnimation::Judgment { player, new_score } => {
             builder.push(Command::DisplayJudgment(DisplayJudgmentCommand {
                 player: builder.to_display_player(*player),
                 new_score: *new_score,
             }));
         }
+
         BattleAnimation::DreamwellActivation {
             player,
             dreamwell_card_id,
@@ -44,6 +48,7 @@ pub fn render(
                 new_produced_energy: Some(*new_produced_energy),
             }));
         }
+
         BattleAnimation::PlayCardFromHand { player, card_id } => {
             if *player != builder.display_for_player()
                 && final_state.cards.stack_card(StackCardId(card_id.card_id())).is_none()
@@ -53,6 +58,7 @@ pub fn render(
                 builder.push(Command::Wait(Milliseconds::new(2000)));
             }
         }
+
         BattleAnimation::DrawCards { player, cards } => {
             if *player == builder.display_for_player() && !cards.is_empty() {
                 let card_views = cards
@@ -76,10 +82,7 @@ pub fn render(
                 }));
             }
         }
-        BattleAnimation::SelectStackCardTargets { .. } => {}
-        BattleAnimation::ApplyEffect { controller, source, targets, effect } => {
-            apply_card_fx::apply_effect(builder, snapshot, *controller, *source, effect, targets);
-        }
+
         BattleAnimation::MakeChoice { player, choice } => {
             if *player != builder.display_for_player() {
                 builder.push(Command::DisplayEnemyMessage(DisplayEnemyMessageCommand {
@@ -89,8 +92,9 @@ pub fn render(
                 builder.push(Command::Wait(Milliseconds::new(1000)));
             }
         }
-        BattleAnimation::ResolveCharacter { card_id } => {
-            apply_card_fx::resolve_character(builder, snapshot, *card_id);
-        }
+
+        _ => {}
     }
+
+    apply_card_fx::apply_effect(builder, source, animation, snapshot);
 }

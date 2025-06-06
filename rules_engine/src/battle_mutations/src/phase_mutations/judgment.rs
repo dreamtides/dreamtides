@@ -17,9 +17,12 @@ pub fn run(battle: &mut BattleState, player: PlayerName, source: EffectSource) {
 
     if spark > opponent_spark {
         let points = Points((spark - opponent_spark).0);
-        battle.push_animation(|| BattleAnimation::Judgment { player, new_score: Some(points) });
+        battle.push_animation(source, || BattleAnimation::Judgment {
+            player,
+            new_score: Some(points),
+        });
         points::gain(battle, player, source, points);
     } else {
-        battle.push_animation(|| BattleAnimation::Judgment { player, new_score: None });
+        battle.push_animation(source, || BattleAnimation::Judgment { player, new_score: None });
     }
 }

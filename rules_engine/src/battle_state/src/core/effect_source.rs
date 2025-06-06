@@ -18,6 +18,9 @@ pub enum EffectSource {
     /// Effect caused by an ability of a card on the stack
     Event { controller: PlayerName, stack_card_id: StackCardId, ability_number: AbilityNumber },
 
+    /// Effect caused by a character on the battlefield
+    Character { controller: PlayerName, character_id: CharacterId },
+
     /// Effect caused by an activated ability of a character on the battlefield
     Activated { controller: PlayerName, character_id: CharacterId, ability_number: AbilityNumber },
 
@@ -32,6 +35,7 @@ impl EffectSource {
             EffectSource::Game { controller } => *controller,
             EffectSource::Player { controller } => *controller,
             EffectSource::Event { controller, .. } => *controller,
+            EffectSource::Character { controller, .. } => *controller,
             EffectSource::Activated { controller, .. } => *controller,
             EffectSource::Triggered { controller, .. } => *controller,
         }
@@ -41,6 +45,7 @@ impl EffectSource {
     pub fn card_id(&self) -> Option<CardId> {
         match self {
             EffectSource::Event { stack_card_id: card, .. } => Some(card.card_id()),
+            EffectSource::Character { character_id: card, .. } => Some(card.card_id()),
             EffectSource::Activated { character_id: card, .. } => Some(card.card_id()),
             EffectSource::Triggered { character_id: card, .. } => Some(card.card_id()),
             _ => None,

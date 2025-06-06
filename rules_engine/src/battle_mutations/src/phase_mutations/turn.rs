@@ -31,7 +31,7 @@ pub fn start_turn(battle: &mut BattleState, player: PlayerName) {
     }
 
     let source = EffectSource::Game { controller: player };
-    battle.push_animation(|| BattleAnimation::StartTurn { player });
+    battle.push_animation(source, || BattleAnimation::StartTurn { player });
     judgment::run(battle, battle.turn.active_player, source);
     dreamwell::activate(battle, battle.turn.active_player, source);
     battle.phase = BattleTurnPhase::Draw;

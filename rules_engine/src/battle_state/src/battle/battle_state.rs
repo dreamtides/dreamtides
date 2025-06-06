@@ -14,6 +14,7 @@ use crate::battle::turn_history::TurnHistory;
 use crate::battle_player::battle_player_state::BattlePlayerState;
 use crate::battle_player::player_map::PlayerMap;
 use crate::battle_trace::battle_tracing::BattleTracing;
+use crate::core::effect_source::EffectSource;
 use crate::prompt_types::prompt_data::PromptData;
 
 #[derive(Clone, Debug)]
@@ -97,7 +98,11 @@ impl BattleState {
     /// This takes a function instead of a [BattleAnimation]. If you need to do
     /// any computation to determine the animation values, put it within the
     /// function so it won't run when animations are not being tracked.
-    pub fn push_animation(&mut self, update: impl FnOnce() -> BattleAnimation) {
+    pub fn push_animation(
+        &mut self,
+        source: EffectSource,
+        update: impl FnOnce() -> BattleAnimation,
+    ) {
         if let Some(animations) = &mut self.animations {
             let snapshot = Self {
                 id: self.id,
@@ -115,16 +120,7 @@ impl BattleState {
                 action_history: None,
                 turn_history: self.turn_history.clone(),
             };
-            animations.steps.push(AnimationStep { snapshot, animation: update() });
-        }
-    }
-
-    /// Optional version of [Self::push_animation].
-    pub fn push_animation_optional(&mut self, update: impl FnOnce() -> Option<BattleAnimation>) {
-        if self.animations.is_some()
-            && let Some(animation) = update()
-        {
-            self.push_animation(|| animation);
+            animations.steps.push(AnimationStep { source, snapshot, animation: update() });
         }
     }
 

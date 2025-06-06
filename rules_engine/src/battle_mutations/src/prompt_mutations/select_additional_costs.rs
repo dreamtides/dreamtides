@@ -19,7 +19,7 @@ pub fn energy_cost(battle: &mut BattleState, player: PlayerName, cost: Energy) {
 
     stack_card.additional_costs_paid = StackCardAdditionalCostsPaid::Energy(cost);
     battle_trace!("Paying additional cost", battle, player, cost);
-    battle.push_animation(|| BattleAnimation::MakeChoice {
+    battle.push_animation(source, || BattleAnimation::MakeChoice {
         player,
         choice: PromptChoiceLabel::PayEnergy(cost),
     });

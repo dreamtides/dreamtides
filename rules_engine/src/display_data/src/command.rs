@@ -80,7 +80,7 @@ pub enum Command {
 }
 
 impl Command {
-    pub fn kind(&self) -> CommandDiscriminants {
+    pub fn discriminant(&self) -> CommandDiscriminants {
         self.into()
     }
 }

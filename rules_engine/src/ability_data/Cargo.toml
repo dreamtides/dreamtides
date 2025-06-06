@@ -13,3 +13,4 @@ core_data = { path = "../core_data" }
 
 schemars = "0.8"
 serde = { version = "1", features = ["derive"] }
+strum = "0.27"
