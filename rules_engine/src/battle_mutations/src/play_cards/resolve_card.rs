@@ -1,5 +1,7 @@
 use battle_queries::battle_card_queries::{card_abilities, card_properties};
+use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::card_id::CardIdType;
 use battle_state::battle_cards::stack_card_state::StackCardState;
 use battle_state::core::effect_source::EffectSource;
 use core_data::card_types::CardType;
@@ -57,6 +59,7 @@ fn resolve_card(battle: &mut BattleState, card: &StackCardState) {
         apply_event_effects(battle, card);
         move_card::from_stack_to_void(battle, source, card.controller, card.id);
     } else {
+        battle.push_animation(|| BattleAnimation::ResolveCharacter { card_id: card.id.card_id() });
         character_limit::apply(battle, source, card.controller);
         move_card::from_stack_to_battlefield(battle, source, card.controller, card.id);
     }

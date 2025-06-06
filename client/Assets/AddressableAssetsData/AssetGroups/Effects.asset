@@ -93,6 +93,12 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 51d8f7fd07199b64a9d3cd8102d9eb01
+    m_Address: Assets/ThirdParty/Cafofo/Magic Spells Sound Effects V2.0/General Spell/Positive
+      Effect 10.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 53ae895634a174dd7b8cab0225e9db66
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       16 fire.prefab

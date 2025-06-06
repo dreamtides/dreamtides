@@ -71,6 +71,7 @@ pub enum Command {
     DissolveCard(DissolveCardCommand),
     DisplayGameMessage(GameMessageType),
     DisplayEffect(DisplayEffectCommand),
+    PlayAudioClip(PlayAudioClipCommand),
     DrawUserCards(DrawUserCardsCommand),
     DisplayJudgment(DisplayJudgmentCommand),
     DisplayDreamwellActivation(DisplayDreamwellActivationCommand),
@@ -187,6 +188,16 @@ pub struct DisplayEffectCommand {
 
     /// Sound to play along with effect
     pub sound: Option<AudioClipAddress>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct PlayAudioClipCommand {
+    /// Sound to play
+    pub sound: AudioClipAddress,
+
+    /// How long to pause before continuing with animations.
+    pub pause_duration: Milliseconds,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

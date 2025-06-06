@@ -344,6 +344,16 @@ namespace Dreamtides.Services
           LogUtils.Log("ActionService", "Applying command: ToggleThinkingIndicator");
           Registry.Layout.ThinkingIndicator.SetActive(command.ToggleThinkingIndicator.Show);
         }
+
+        if (command.PlayAudioClip != null)
+        {
+          LogUtils.Log("ActionService", "Applying command: PlayAudioClip");
+          Registry.SoundService.Play(command.PlayAudioClip.Sound);
+          if (command.PlayAudioClip.PauseDuration.MillisecondsValue > 0)
+          {
+            coroutines.Add(StartCoroutine(Wait(command.PlayAudioClip.PauseDuration)));
+          }
+        }
       }
 
       foreach (var coroutine in coroutines)

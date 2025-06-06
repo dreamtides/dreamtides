@@ -78,7 +78,7 @@ pub fn render(
         }
         BattleAnimation::SelectStackCardTargets { .. } => {}
         BattleAnimation::ApplyEffect { controller, source, targets, effect } => {
-            apply_card_fx::apply(builder, snapshot, *controller, *source, effect, targets);
+            apply_card_fx::apply_effect(builder, snapshot, *controller, *source, effect, targets);
         }
         BattleAnimation::MakeChoice { player, choice } => {
             if *player != builder.display_for_player() {
@@ -87,6 +87,9 @@ pub fn render(
                     show_duration: Milliseconds::new(2000),
                 }));
             }
+        }
+        BattleAnimation::ResolveCharacter { card_id } => {
+            apply_card_fx::resolve_character(builder, snapshot, *card_id);
         }
     }
 }

@@ -45,4 +45,7 @@ pub enum BattleAnimation {
         player: PlayerName,
         choice: PromptChoiceLabel,
     },
+    ResolveCharacter {
+        card_id: CardId,
+    },
 }

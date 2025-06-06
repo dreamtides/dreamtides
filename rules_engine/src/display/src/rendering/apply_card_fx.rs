@@ -4,19 +4,19 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType};
 use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use core_data::display_color;
-use core_data::display_types::Milliseconds;
+use core_data::display_types::{AudioClipAddress, Milliseconds};
 use core_data::identifiers::CardName;
 use core_data::types::PlayerName;
 use display_data::command::{
     Command, DisplayEffectCommand, DissolveCardCommand, FireProjectileCommand, GameObjectId,
+    PlayAudioClipCommand,
 };
 use masonry::flex_style::FlexVector3;
 
 use crate::core::response_builder::ResponseBuilder;
 
-/// Displays card effects to a target during effect resolution by adding
-/// commands directly to the response builder.
-pub fn apply(
+/// Visual & sound effects for the "ApplyEffect" animation.
+pub fn apply_effect(
     builder: &mut ResponseBuilder,
     battle: &BattleState,
     controller: PlayerName,
@@ -98,6 +98,20 @@ pub fn apply(
     }
 
     Some(())
+}
+
+/// Visual & sound effects for the "ResolveCharacter" animation.
+pub fn resolve_character(builder: &mut ResponseBuilder, battle: &BattleState, card_id: CardId) {
+    match battle.cards.card(card_id).name {
+        CardName::MinstrelOfFallingLight => {
+            builder.push(Command::PlayAudioClip(PlayAudioClipCommand {
+                sound: AudioClipAddress::new("Assets/ThirdParty/Cafofo/Magic Spells Sound Effects V2.0/General Spell/Positive Effect 10.wav"),
+                pause_duration: Milliseconds::new(0),
+            }));
+        }
+
+        _ => {}
+    }
 }
 
 fn target_id(targets: &Option<StackCardTargets>) -> Option<GameObjectId> {

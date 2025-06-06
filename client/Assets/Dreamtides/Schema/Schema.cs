@@ -122,6 +122,9 @@ namespace Dreamtides.Schema
         [JsonProperty("displayEffect", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayEffectCommand DisplayEffect { get; set; }
 
+        [JsonProperty("playAudioClip", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PlayAudioClipCommand PlayAudioClip { get; set; }
+
         [JsonProperty("drawUserCards", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DrawUserCardsCommand DrawUserCards { get; set; }
 
@@ -207,6 +210,8 @@ namespace Dreamtides.Schema
     /// <summary>
     /// How long to wait before continuing with animations.
     ///
+    /// How long to pause before continuing with animations.
+    ///
     /// Time to display each card before moving it to hand.
     ///
     /// Should be less than stagger_interval for best results.
@@ -243,6 +248,9 @@ namespace Dreamtides.Schema
         public double Z { get; set; }
     }
 
+    /// <summary>
+    /// Sound to play
+    /// </summary>
     public partial class AudioClipAddress
     {
         [JsonProperty("audioClip", Required = Required.Always)]
@@ -1491,6 +1499,21 @@ namespace Dreamtides.Schema
 
         [JsonProperty("waitDuration")]
         public Milliseconds WaitDuration { get; set; }
+    }
+
+    public partial class PlayAudioClipCommand
+    {
+        /// <summary>
+        /// How long to pause before continuing with animations.
+        /// </summary>
+        [JsonProperty("pauseDuration", Required = Required.Always)]
+        public Milliseconds PauseDuration { get; set; }
+
+        /// <summary>
+        /// Sound to play
+        /// </summary>
+        [JsonProperty("sound", Required = Required.Always)]
+        public AudioClipAddress Sound { get; set; }
     }
 
     public partial class ToggleThinkingIndicatorCommand
