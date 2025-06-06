@@ -49,6 +49,7 @@ fn tag_parser(event: &Event) -> Option<Tag> {
         _ if target.contains("battle_mutations_old") => '💻',
         _ if target.contains("rules_engine") => '🌐',
         _ if target.contains("ai") => '🤖',
+        _ if target.contains("tracing_macros") => '🟢',
         _ => match level {
             Level::TRACE => '📍',
             Level::DEBUG => '📝',

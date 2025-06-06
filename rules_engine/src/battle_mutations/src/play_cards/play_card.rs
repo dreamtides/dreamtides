@@ -24,4 +24,5 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, card_id: HandCardId
     battle.stack_priority = Some(player.opponent());
     add_targeting_prompt::execute(battle, player, stack_card_id);
     add_additional_cost_prompt::execute(battle, player, stack_card_id);
+    battle.push_animation(source, || BattleAnimation::PlayedCardFromHand { player, card_id });
 }

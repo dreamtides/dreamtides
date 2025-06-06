@@ -218,7 +218,8 @@ namespace Dreamtides.Services
       var count = commands.Groups.Sum(group => group.Commands.Count);
       if (count > 1)
       {
-        LogUtils.Log("ActionService", $"Applying {count} commands");
+        var commandNames = GetCommandNames(commands);
+        LogUtils.Log("ActionService", $"Applying {count} commands: [{commandNames}]");
       }
 
       foreach (var group in commands.Groups)
@@ -253,6 +254,8 @@ namespace Dreamtides.Services
       {
         if (command.UpdateBattle != null)
         {
+          LogUtils.Log("ActionService", "Applying command: UpdateBattle");
+
           Registry.Layout.UserStatusDisplay.UpdatePlayerView(command.UpdateBattle.Battle.User, animate);
           Registry.Layout.EnemyStatusDisplay.UpdatePlayerView(command.UpdateBattle.Battle.Enemy, animate);
           Registry.DocumentService.RenderScreenOverlay(command.UpdateBattle.Battle.Interface?.ScreenOverlay);
@@ -365,6 +368,32 @@ namespace Dreamtides.Services
     IEnumerator Wait(Milliseconds milliseconds)
     {
       yield return new WaitForSeconds(milliseconds.ToSeconds());
+    }
+
+    private string GetCommandNames(CommandSequence commands)
+    {
+      var commandNames = new List<string>();
+
+      foreach (var group in commands.Groups)
+      {
+        foreach (var command in group.Commands)
+        {
+          if (command.UpdateBattle != null) commandNames.Add("UpdateBattle");
+          if (command.Wait != null) commandNames.Add("Wait");
+          if (command.FireProjectile != null) commandNames.Add("FireProjectile");
+          if (command.DissolveCard != null) commandNames.Add("DissolveCard");
+          if (command.DisplayGameMessage != null) commandNames.Add("DisplayGameMessage");
+          if (command.DisplayEffect != null) commandNames.Add("DisplayEffect");
+          if (command.DrawUserCards != null) commandNames.Add("DrawUserCards");
+          if (command.DisplayJudgment != null) commandNames.Add("DisplayJudgment");
+          if (command.DisplayDreamwellActivation != null) commandNames.Add("DisplayDreamwellActivation");
+          if (command.DisplayEnemyMessage != null) commandNames.Add("DisplayEnemyMessage");
+          if (command.ToggleThinkingIndicator != null) commandNames.Add("ToggleThinkingIndicator");
+          if (command.PlayAudioClip != null) commandNames.Add("PlayAudioClip");
+        }
+      }
+
+      return string.Join(", ", commandNames);
     }
   }
 }

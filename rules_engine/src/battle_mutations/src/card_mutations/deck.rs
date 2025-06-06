@@ -59,6 +59,10 @@ fn draw_cards_with_animation(
     player: PlayerName,
     count: u32,
 ) {
+    if battle.cards.deck(player).len() < count as usize {
+        create_test_deck::add(battle, player);
+    }
+
     let pre_draw_snapshot = battle.logical_clone();
     let mut drawn_cards = Vec::new();
 

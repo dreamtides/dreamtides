@@ -52,18 +52,23 @@ pub fn render(
             }));
         }
 
-        BattleAnimation::PlayCardFromHand { player, card_id } => {
+        BattleAnimation::PlayCardFromHand { player, .. } => {
             if *player != builder.display_for_player() {
                 builder.push(Command::PlayAudioClip(PlayAudioClipCommand {
-                    sound: AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Generic_SubtleWhoosh02.wav"),
+                    sound: AudioClipAddress::new("Assets/ThirdParty/Cafofo/Magic Spells Sound Effects V2.0/General Spell/Magic Whoosh 4.wav"),
                     pause_duration: Milliseconds::new(0),
                 }));
+            }
+        }
 
-                if final_state.cards.stack_card(StackCardId(card_id.card_id())).is_none() {
-                    // If the played card is no longer on the stack, insert a pause
-                    // so it can be seen.
-                    builder.push(Command::Wait(Milliseconds::new(2000)));
-                }
+        BattleAnimation::PlayedCardFromHand { player, card_id } => {
+            if *player != builder.display_for_player()
+                && final_state.cards.stack_card(StackCardId(card_id.card_id())).is_none()
+            {
+                // If the played card is no longer on the stack, insert a pause
+                // so it can be seen.
+                push_snapshot(builder, snapshot);
+                builder.push(Command::Wait(Milliseconds::new(2000)));
             }
         }
 
@@ -95,6 +100,10 @@ pub fn render(
         BattleAnimation::MakeChoice { player, choice } => {
             if *player != builder.display_for_player() {
                 push_snapshot(builder, snapshot);
+                builder.push(Command::PlayAudioClip(PlayAudioClipCommand {
+                    sound: AudioClipAddress::new("Assets/ThirdParty/Cafofo/Magic Spells Sound Effects V2.0/General Spell/Cast 12.wav"),
+                    pause_duration: Milliseconds::new(0),
+                }));
                 builder.push(Command::DisplayEnemyMessage(DisplayEnemyMessageCommand {
                     message: labels::choice_label(*choice),
                     show_duration: Milliseconds::new(2000),
