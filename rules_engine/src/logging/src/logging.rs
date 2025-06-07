@@ -1,6 +1,7 @@
 use std::env;
 use std::fs::File;
 use std::path::PathBuf;
+use std::sync::Once;
 
 use battle_state::battle::battle_state::RequestContext;
 use tracing::{Event, Level};
@@ -9,6 +10,16 @@ use tracing_forest::{ForestLayer, PrettyPrinter, Tag};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::{EnvFilter, Layer};
+
+static INIT: Once = Once::new();
+
+/// Initializes global logging behavior for the 'tracing' crate if it hasn't
+/// already been initialized.
+pub fn maybe_initialize(request_context: &RequestContext) {
+    INIT.call_once(|| {
+        initialize(request_context);
+    });
+}
 
 /// Initializes global logging behavior for the 'tracing' crate.
 pub fn initialize(request_context: &RequestContext) {

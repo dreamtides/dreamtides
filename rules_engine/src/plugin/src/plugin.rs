@@ -41,12 +41,14 @@ unsafe fn connect_impl(
     let request_data = std::slice::from_raw_parts(request, request_length as usize);
     let deserialized_request = serde_json::from_slice::<ConnectRequest>(request_data)?;
     println!("connect: {:?}", deserialized_request.metadata.user_id);
-    let scene = engine::connect(&deserialized_request, RequestContext {
+    let context = RequestContext {
         logging_options: LoggingOptions {
             log_directory: Some(PathBuf::from(&deserialized_request.persistent_data_path)),
             log_ai_search_diagram: false,
         },
-    });
+    };
+    logging::maybe_initialize(&context);
+    let scene = engine::connect(&deserialized_request, context);
     let json = serde_json::to_string(&scene)?;
     let json_bytes = json.as_bytes();
 

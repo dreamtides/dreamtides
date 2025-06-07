@@ -1522,6 +1522,7 @@ dependencies = [
  "battle_state",
  "core_data",
  "display_data",
+ "logging",
  "rules_engine",
  "serde",
  "serde_json",
