@@ -56,7 +56,6 @@ pub fn search(
     initial_battle: &BattleState,
     player: PlayerName,
     config: &UctConfig,
-    log_results: bool,
 ) -> BattleAction {
     let legal = legal_actions::compute(initial_battle, player).all();
     let action_results: Vec<_> = legal
@@ -106,15 +105,16 @@ pub fn search(
 
     let action = best_result.action;
     let total_iterations = config.max_iterations_per_action * legal.len() as u32;
+    let num_threads = rayon::current_num_threads();
 
-    if log_results && initial_battle.request_context.developer_mode {
-        info!("Picked action {:?} for {:?} after {} iterations", action, player, total_iterations);
-        log_search_results::log_results(&best_result.graph, best_result.root, action);
+    info!(?total_iterations, ?action, ?num_threads, "Picked AI action");
+    if initial_battle.request_context.logging_options.log_ai_search_diagram {
+        log_search_results::log_results_diagram(&best_result.graph, best_result.root, action);
     }
 
     // I've experimented with persisting the search tree to reuse in future
-    // searches, and it does improve win rates, but the complexity/performance
-    // costs seem to not be worth it.
+    // searches, and it does improve win rates somewhat, but the
+    // complexity/performance costs seem to not be worth it.
 
     action
 }

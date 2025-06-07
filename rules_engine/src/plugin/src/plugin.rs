@@ -1,9 +1,10 @@
 #![allow(clippy::missing_safety_doc)] // You only live once, that's the motto - Drake
 
 use std::panic::{self, UnwindSafe};
+use std::path::PathBuf;
 
 use anyhow::Result;
-use battle_state::battle::battle_state::RequestContext;
+use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
 use display_data::command::CommandSequence;
 use display_data::request_data::{
     ConnectRequest, PerformActionRequest, PerformActionResponse, PollRequest, PollResponse,
@@ -40,7 +41,12 @@ unsafe fn connect_impl(
     let request_data = std::slice::from_raw_parts(request, request_length as usize);
     let deserialized_request = serde_json::from_slice::<ConnectRequest>(request_data)?;
     println!("connect: {:?}", deserialized_request.metadata.user_id);
-    let scene = engine::connect(&deserialized_request, RequestContext { developer_mode: false });
+    let scene = engine::connect(&deserialized_request, RequestContext {
+        logging_options: LoggingOptions {
+            log_directory: Some(PathBuf::from(&deserialized_request.persistent_data_path)),
+            log_ai_search_diagram: false,
+        },
+    });
     let json = serde_json::to_string(&scene)?;
     let json_bytes = json.as_bytes();
 
@@ -133,7 +139,7 @@ unsafe fn poll_impl(
     let request_data = std::slice::from_raw_parts(request, request_length as usize);
     let deserialized_request = serde_json::from_slice::<PollRequest>(request_data)?;
     let metadata = deserialized_request.metadata;
-    let commands = engine::poll(metadata.user_id, RequestContext { developer_mode: false });
+    let commands = engine::poll(metadata.user_id);
     let response_data = PollResponse { metadata, commands };
     let json = serde_json::to_string(&response_data)?;
     let json_bytes = json.as_bytes();

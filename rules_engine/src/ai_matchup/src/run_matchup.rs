@@ -4,7 +4,7 @@ use std::time::{Duration, Instant};
 use ai_agents::agent_search;
 use battle_mutations::actions::apply_battle_action;
 use battle_queries::legal_action_queries::legal_actions;
-use battle_state::battle::battle_state::RequestContext;
+use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle_player::battle_player_state::PlayerType;
 use clap::{Parser, ValueEnum};
@@ -150,7 +150,7 @@ fn run_match(
         seed,
         battle_ai_one,
         battle_ai_two,
-        RequestContext { developer_mode: false },
+        RequestContext { logging_options: LoggingOptions::default() },
     );
 
     let start_time = Instant::now();
@@ -179,7 +179,7 @@ fn run_match(
                 let action = if legal_actions.len() == 1 {
                     legal_actions.all()[0]
                 } else {
-                    agent_search::select_action_unchecked(&battle, player, &player_ai, false)
+                    agent_search::select_action_unchecked(&battle, player, &player_ai)
                 };
                 let action_time = action_start.elapsed();
                 match (player, swap_positions) {

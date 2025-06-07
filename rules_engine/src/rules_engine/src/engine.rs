@@ -39,14 +39,14 @@ pub fn connect(request: &ConnectRequest, request_context: RequestContext) -> Con
     ConnectResponse { metadata, commands }
 }
 
-pub fn poll(user_id: UserId, request_context: RequestContext) -> Option<CommandSequence> {
-    if let Some(commands) = handle_battle_action::poll(user_id) {
+pub fn poll(user_id: UserId) -> Option<CommandSequence> {
+    if let Some(update) = handle_battle_action::poll(user_id) {
         write_tracing_event::write_commands(
             "Returning async command sequence",
-            &commands,
-            &request_context,
+            &update.commands,
+            &update.context,
         );
-        return Some(commands);
+        return Some(update.commands);
     }
     None
 }
@@ -58,7 +58,7 @@ pub fn perform_action(request: PerformActionRequest) {
 fn connect_internal(request: &ConnectRequest, request_context: RequestContext) -> CommandSequence {
     let user_id = request.metadata.user_id;
     let persistent_data_path = &request.persistent_data_path;
-    write_tracing_event::clear_log_file();
+    write_tracing_event::clear_log_file(&request_context);
 
     let database = match initialize_database(persistent_data_path) {
         Ok(db) => db,
@@ -276,6 +276,7 @@ fn handle_request_action(
             debug_actions::execute(battle, user_id, player, action);
             handle_battle_action::append_update(
                 user_id,
+                battle.request_context.clone(),
                 renderer::connect(&*battle, user_id, true),
             );
         }
@@ -287,6 +288,7 @@ fn handle_request_action(
             apply_battle_display_action::execute(action);
             handle_battle_action::append_update(
                 user_id,
+                battle.request_context.clone(),
                 renderer::connect(&*battle, user_id, true),
             );
         }
@@ -303,6 +305,7 @@ fn handle_request_action(
             *battle = undone_battle;
             handle_battle_action::append_update(
                 user_id,
+                battle.request_context.clone(),
                 renderer::connect(&*battle, user_id, true),
             );
         }
@@ -312,6 +315,9 @@ fn handle_request_action(
 pub fn show_error_message(user_id: UserId, battle: Option<&BattleState>, error_message: String) {
     handle_battle_action::append_update(
         user_id,
+        battle
+            .map(|b| b.request_context.clone())
+            .unwrap_or(RequestContext { logging_options: Default::default() }),
         error_message::display_error_message(battle, error_message),
     )
 }

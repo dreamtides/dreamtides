@@ -2,6 +2,7 @@ use std::env;
 use std::fs::File;
 use std::path::PathBuf;
 
+use battle_state::battle::battle_state::RequestContext;
 use tracing::{Event, Level};
 use tracing_error::ErrorLayer;
 use tracing_forest::{ForestLayer, PrettyPrinter, Tag};
@@ -10,23 +11,31 @@ use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::{EnvFilter, Layer};
 
 /// Initializes global logging behavior for the 'tracing' crate.
-pub fn initialize() {
+pub fn initialize(request_context: &RequestContext) {
     let env_filter =
         if let Ok(v) = env::var("RUST_LOG") { EnvFilter::new(v) } else { EnvFilter::new("debug") };
     let forest_layer = create_forest_layer(env_filter);
-    let log_path = PathBuf::from("..").join("dreamtides.log");
-    let log_file = File::create(log_path).expect("Error creating log file");
-    let file_subscriber = tracing_subscriber::fmt::layer()
-        .with_file(true)
-        .with_line_number(true)
-        .with_writer(log_file)
-        .with_target(false)
-        .with_ansi(false)
-        .with_filter(EnvFilter::new("debug"));
+
+    let file_subscriber =
+        if let Some(log_directory) = request_context.logging_options.log_directory.as_ref() {
+            let log_path = log_directory.join("dreamtides.log");
+            let log_file = File::create(log_path).expect("Error creating tracing log file");
+            Some(
+                tracing_subscriber::fmt::layer()
+                    .with_file(true)
+                    .with_line_number(true)
+                    .with_writer(log_file)
+                    .with_target(false)
+                    .with_ansi(false)
+                    .with_filter(EnvFilter::new("debug")),
+            )
+        } else {
+            None
+        };
 
     tracing_subscriber::registry()
         .with(forest_layer)
-        .with(file_subscriber)
+        .with(Some(file_subscriber))
         .with(ErrorLayer::default())
         .init();
 }
@@ -37,6 +46,22 @@ where
     S: tracing::Subscriber + for<'a> tracing_subscriber::registry::LookupSpan<'a>,
 {
     ForestLayer::new(PrettyPrinter::new(), tag_parser).with_filter(env_filter)
+}
+
+/// Returns the path to the developer mode log file directory.
+pub fn get_developer_mode_log_directory() -> Result<PathBuf, String> {
+    let manifest_dir = env!("CARGO_MANIFEST_DIR");
+    // Go up two levels from tracing_macros crate to workspace root
+    let manifest_path = PathBuf::from(manifest_dir);
+    let parent = manifest_path
+        .parent()
+        .ok_or_else(|| "Failed to find parent directory of manifest".to_string())?;
+    let workspace_root =
+        parent.parent().ok_or_else(|| "Failed to find workspace root directory".to_string())?;
+    let project_root = workspace_root
+        .parent()
+        .ok_or_else(|| "Failed to find project root directory".to_string())?;
+    Ok(project_root.to_path_buf())
 }
 
 fn tag_parser(event: &Event) -> Option<Tag> {

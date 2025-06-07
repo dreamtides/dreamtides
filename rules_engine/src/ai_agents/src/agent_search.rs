@@ -27,7 +27,7 @@ pub fn select_action(battle: &BattleState, player: PlayerName, game_ai: &GameAI)
     }
 
     let start_time = Instant::now();
-    let action = select_action_unchecked(battle, player, game_ai, true);
+    let action = select_action_unchecked(battle, player, game_ai);
     info!(
         "Agent selected action {:?} in {:.3} seconds",
         action,
@@ -44,7 +44,6 @@ pub fn select_action_unchecked(
     initial_battle: &BattleState,
     player: PlayerName,
     game_ai: &GameAI,
-    log_results: bool,
 ) -> BattleAction {
     let battle = &player_state::randomize_battle_player(initial_battle, player.opponent());
     match game_ai {
@@ -56,14 +55,14 @@ pub fn select_action_unchecked(
                 max_iterations_per_action: *thousands_of_iterations * 1000,
                 single_threaded: false,
             };
-            uct_search::search(battle, player, &config, log_results)
+            uct_search::search(battle, player, &config)
         }
         GameAI::MonteCarloSingleThreaded(thousands_of_iterations) => {
             let config = UctConfig {
                 max_iterations_per_action: *thousands_of_iterations * 1000,
                 single_threaded: true,
             };
-            uct_search::search(battle, player, &config, log_results)
+            uct_search::search(battle, player, &config)
         }
     }
 }

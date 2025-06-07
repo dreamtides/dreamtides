@@ -8,7 +8,7 @@ use battle_mutations::card_mutations::deck;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::all_cards::AllCards;
-use battle_state::battle::battle_state::{BattleState, RequestContext};
+use battle_state::battle::battle_state::{BattleState, LoggingOptions, RequestContext};
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::battle::card_id::{CardId, CharacterId, HandCardId};
@@ -26,13 +26,11 @@ use rand::seq::IteratorRandom;
 use rand::SeedableRng;
 use rand_xoshiro::Xoshiro256PlusPlus;
 use tracing::{subscriber, Level};
-use tracing_macros::write_tracing_event;
 use uuid::Uuid;
 
 criterion_group!(playout_benchmarks, random_playout, ai_full, ai_single_threaded, ai_evaluate);
 
 pub fn random_playout(c: &mut Criterion) {
-    write_tracing_event::clear_log_file();
     let mut group = c.benchmark_group("random_playout");
     group
         .significance_level(0.01)
@@ -49,7 +47,7 @@ pub fn random_playout(c: &mut Criterion) {
                         3141592653589793,
                         PlayerType::Agent(GameAI::RandomAction),
                         PlayerType::Agent(GameAI::RandomAction),
-                        RequestContext { developer_mode: false },
+                        RequestContext { logging_options: LoggingOptions::default() },
                     )
                 },
                 |mut battle| run_battle_until_completion(&mut battle),
@@ -92,7 +90,6 @@ pub fn ai_single_threaded(c: &mut Criterion) {
                         &battle,
                         PlayerName::One,
                         &GameAI::MonteCarloSingleThreaded(1),
-                        false,
                     ))
                 },
                 BatchSize::SmallInput,
@@ -114,7 +111,6 @@ pub fn ai_full(c: &mut Criterion) {
                         &battle,
                         PlayerName::One,
                         &GameAI::MonteCarlo(50),
-                        false,
                     ))
                 },
                 BatchSize::SmallInput,
@@ -391,7 +387,7 @@ fn benchmark_battle() -> BattleState {
         tracing: None,
         action_history: None,
         turn_history: TurnHistory::default(),
-        request_context: RequestContext { developer_mode: false },
+        request_context: RequestContext { logging_options: LoggingOptions::default() },
     };
 
     deck::add_cards(

@@ -18,7 +18,7 @@ use crate::uct_tree::SearchGraph;
 /// Creates a simplified graph with nodes showing only the total reward values
 /// formatted to 1 decimal place, and edges showing the battle actions.
 /// The graph is limited to nodes within 3 edges of the root.
-pub fn log_results(graph: &SearchGraph, root: NodeIndex, action_taken: BattleAction) {
+pub fn log_results_diagram(graph: &SearchGraph, root: NodeIndex, action_taken: BattleAction) {
     // Create a simplified graph for logging
     let logging_graph = graph_for_logging(graph, root, action_taken);
     let dot = Dot::with_config(&logging_graph, &[]);

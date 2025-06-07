@@ -4,7 +4,7 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Json, Router};
-use battle_state::battle::battle_state::RequestContext;
+use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
 use display_data::command::CommandSequence;
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse, PollRequest,
@@ -61,7 +61,19 @@ async fn connect(body: String) -> AppResult<Json<ConnectResponse>> {
         Ok(Json(client_test_scenarios::connect(&req, scenario)))
     } else {
         info!(?user_id, "Got connect request");
-        Ok(Json(engine::connect(&req, RequestContext { developer_mode: true })))
+        let log_directory = match logging::get_developer_mode_log_directory() {
+            Ok(directory) => directory,
+            Err(e) => {
+                error!(error.message = %e, "Failed to get log directory");
+                return Err(AppError::Internal(e.to_string()));
+            }
+        };
+        Ok(Json(engine::connect(&req, RequestContext {
+            logging_options: LoggingOptions {
+                log_directory: Some(log_directory),
+                log_ai_search_diagram: true,
+            },
+        })))
     }
 }
 
@@ -87,13 +99,24 @@ async fn perform_action(body: String) -> AppResult<Json<PerformActionResponse>> 
 async fn poll(body: String) -> AppResult<Json<PollResponse>> {
     let req: PollRequest = parse_json(&body)?;
     let user_id = req.metadata.user_id;
-    let commands = engine::poll(user_id, RequestContext { developer_mode: true });
+    let commands = engine::poll(user_id);
     Ok(Json(PollResponse { metadata: req.metadata, commands }))
 }
 
 #[tokio::main]
 async fn main() {
-    logging::initialize();
+    let log_directory = match logging::get_developer_mode_log_directory() {
+        Ok(directory) => directory,
+        Err(e) => {
+            panic!("Failed to get log directory: {}", e);
+        }
+    };
+    logging::initialize(&RequestContext {
+        logging_options: LoggingOptions {
+            log_directory: Some(log_directory),
+            log_ai_search_diagram: true,
+        },
+    });
     info!("Starting server on port 26598");
 
     let app = Router::new()

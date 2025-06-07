@@ -25,7 +25,7 @@ pub fn display_error_message(
             let id = BattleId(Uuid::new_v4());
             let dummy_battle =
                 new_battle::create_and_start(UserId::default(), id, RequestContext {
-                    developer_mode: false,
+                    logging_options: Default::default(),
                 });
             display_error_message_with_battle(&dummy_battle, message)
         }

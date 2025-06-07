@@ -26,7 +26,7 @@ pub struct ConnectRequest {
     pub persistent_data_path: String,
 
     /// If specified, treats this as a multiplayer game using the save file
-    /// provided in this ID and adds this use as a player in the battle.
+    /// provided in this ID and adds this user as a player in the battle.
     pub vs_opponent: Option<UserId>,
 
     pub test_scenario: Option<String>,
