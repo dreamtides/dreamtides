@@ -24,6 +24,7 @@ pub fn battle(user_id: UserId, quest_id: QuestId, battle: &BattleState) -> SaveF
                     two: battle.players.two.player_type.clone(),
                 },
                 actions: history.actions.clone(),
+                request_context: battle.request_context.clone(),
             }),
         }),
     })

@@ -8,7 +8,7 @@ use std::time::SystemTime;
 
 use battle_queries::debug_snapshot::debug_battle_snapshot;
 use battle_state::battle::animation_data::AnimationData;
-use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle_trace::battle_tracing::BattleTraceEvent;
 use battle_state::debug::debug_battle_state::DebugBattleState;
 use chrono::{DateTime, Local};
@@ -32,7 +32,7 @@ pub fn write_battle_event(
         let timestamp = format_current_time();
         let event = BattleTraceEvent { m: message, vs: values_string, values, snapshot, timestamp };
 
-        write_event_to_log_file(&event);
+        write_event_to_log_file(&event, &battle.request_context);
 
         if tracing.turn != battle.turn.turn_id {
             tracing.turn = battle.turn.turn_id;
@@ -62,7 +62,7 @@ pub fn write_panic_snapshot(
         timestamp,
     };
 
-    write_event_to_log_file(&event);
+    write_event_to_log_file(&event, &battle.request_context);
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -101,15 +101,15 @@ pub fn write_animations(battle: &BattleState, message: &'static str, animations:
         timestamp,
     };
     match serde_json::to_string_pretty(&event) {
-        Ok(json) => write_json_to_log_file(&json),
+        Ok(json) => write_json_to_log_file(&json, &battle.request_context),
         Err(e) => error!("Failed to serialize CommandSequence: {}", e),
     }
 }
 
 pub fn write_commands(
-    battle: Option<&BattleState>,
     message: &'static str,
     sequence: &CommandSequence,
+    request_context: &RequestContext,
 ) {
     let command_names: Vec<String> = sequence
         .groups
@@ -120,16 +120,15 @@ pub fn write_commands(
 
     debug!("Writing commands: [{}]", command_names.join(", "));
 
-    let snapshot = battle.filter(|b| b.tracing.is_some()).map(debug_battle_snapshot::capture);
     let timestamp = format_current_time();
     let event = CommandTraceEvent {
         m: message.to_string(),
-        snapshot,
+        snapshot: None,
         sequence: sequence.clone(),
         timestamp,
     };
     match serde_json::to_string_pretty(&event) {
-        Ok(json) => write_json_to_log_file(&json),
+        Ok(json) => write_json_to_log_file(&json, request_context),
         Err(e) => error!("Failed to serialize CommandSequence: {}", e),
     }
 }
@@ -153,14 +152,18 @@ pub fn clear_log_file() {
     }
 }
 
-fn write_event_to_log_file(event: &BattleTraceEvent) {
+fn write_event_to_log_file(event: &BattleTraceEvent, request_context: &RequestContext) {
     match serde_json::to_string_pretty(event) {
-        Ok(json) => write_json_to_log_file(&json),
+        Ok(json) => write_json_to_log_file(&json, request_context),
         Err(e) => error!("Failed to serialize event: {}", e),
     }
 }
 
-fn write_json_to_log_file(json_str: &str) {
+fn write_json_to_log_file(json_str: &str, request_context: &RequestContext) {
+    if !request_context.developer_mode {
+        return;
+    }
+
     let log_path = match get_log_file_path() {
         Ok(path) => path,
         Err(e) => {

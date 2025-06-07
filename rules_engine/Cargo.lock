@@ -751,6 +751,7 @@ version = "0.0.0"
 dependencies = [
  "axum",
  "axum-macros",
+ "battle_state",
  "client_test_scenarios",
  "core_data",
  "display_data",
@@ -1517,6 +1518,7 @@ name = "plugin"
 version = "0.0.0"
 dependencies = [
  "anyhow",
+ "battle_state",
  "core_data",
  "display_data",
  "rules_engine",

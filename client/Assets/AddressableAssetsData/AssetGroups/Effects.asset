@@ -87,6 +87,12 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 49fd8aff48c25fd4cb356b437fb752a3
+    m_Address: Assets/ThirdParty/Cafofo/Magic Spells Sound Effects V2.0/General Spell/Magic
+      Whoosh 4.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 4e99097ea89ae442e8c5ade0bab4ba82
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       18 nova orange.prefab
@@ -229,6 +235,12 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9c1aee3bcc1e0431a97b0c28e41e60e3
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic
+      Magic and Impacts/RPG3_Generic_SubtleWhoosh02.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9d1c9c13fabca4a2baeeb891ae2a9411
     m_Address: Assets/Content/Dissolves/Dissolve3.mat
     m_ReadOnly: 0
@@ -321,6 +333,12 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e27ffb73783582d4db2f0f006e0aaee6
+    m_Address: Assets/ThirdParty/Cafofo/Magic Spells Sound Effects V2.0/General Spell/Cast
+      12.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e46e89594c1b24d50939d221c4c6ec69
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       6 blue fire.prefab
@@ -347,6 +365,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f43f296ef70014c57a0662ca22909846
     m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Plasma Magic/RPG3_PlasmaMagicEpic_Buff01.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f81e1efcfddfc4189871f260d3194537
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic
+      Magic and Impacts/RPG3_Magic_LowWhoosh01.wav
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

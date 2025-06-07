@@ -4,6 +4,7 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Json, Router};
+use battle_state::battle::battle_state::RequestContext;
 use display_data::command::CommandSequence;
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse, PollRequest,
@@ -60,7 +61,7 @@ async fn connect(body: String) -> AppResult<Json<ConnectResponse>> {
         Ok(Json(client_test_scenarios::connect(&req, scenario)))
     } else {
         info!(?user_id, "Got connect request");
-        Ok(Json(engine::connect(&req)))
+        Ok(Json(engine::connect(&req, RequestContext { developer_mode: true })))
     }
 }
 
@@ -86,7 +87,7 @@ async fn perform_action(body: String) -> AppResult<Json<PerformActionResponse>> 
 async fn poll(body: String) -> AppResult<Json<PollResponse>> {
     let req: PollRequest = parse_json(&body)?;
     let user_id = req.metadata.user_id;
-    let commands = engine::poll(user_id);
+    let commands = engine::poll(user_id, RequestContext { developer_mode: true });
     Ok(Json(PollResponse { metadata: req.metadata, commands }))
 }
 

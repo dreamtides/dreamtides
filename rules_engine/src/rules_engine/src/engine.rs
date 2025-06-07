@@ -6,7 +6,7 @@ use std::path::PathBuf;
 use action_data::game_action_data::GameAction;
 use backtrace::Backtrace;
 use battle_state::battle::animation_data::AnimationData;
-use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle_player::battle_player_state::PlayerType;
 use core_data::identifiers::{BattleId, QuestId, UserId};
 use database::save_file::SaveFile;
@@ -29,9 +29,9 @@ thread_local! {
     static PANIC_INFO: RefCell<Option<(String, String, Backtrace)>> = const { RefCell::new(None) };
 }
 
-pub fn connect(request: &ConnectRequest) -> ConnectResponse {
+pub fn connect(request: &ConnectRequest, request_context: RequestContext) -> ConnectResponse {
     let metadata = request.metadata;
-    let result = catch_panic(|| connect_internal(request));
+    let result = catch_panic(|| connect_internal(request, request_context));
     let commands = match result {
         Ok(commands) => commands,
         Err(error) => error_message::display_error_message(None, error),
@@ -39,9 +39,13 @@ pub fn connect(request: &ConnectRequest) -> ConnectResponse {
     ConnectResponse { metadata, commands }
 }
 
-pub fn poll(user_id: UserId) -> Option<CommandSequence> {
+pub fn poll(user_id: UserId, request_context: RequestContext) -> Option<CommandSequence> {
     if let Some(commands) = handle_battle_action::poll(user_id) {
-        write_tracing_event::write_commands(None, "Returning async command sequence", &commands);
+        write_tracing_event::write_commands(
+            "Returning async command sequence",
+            &commands,
+            &request_context,
+        );
         return Some(commands);
     }
     None
@@ -51,7 +55,7 @@ pub fn perform_action(request: PerformActionRequest) {
     task::spawn_blocking(move || perform_action_internal(&request));
 }
 
-fn connect_internal(request: &ConnectRequest) -> CommandSequence {
+fn connect_internal(request: &ConnectRequest, request_context: RequestContext) -> CommandSequence {
     let user_id = request.metadata.user_id;
     let persistent_data_path = &request.persistent_data_path;
     write_tracing_event::clear_log_file();
@@ -67,7 +71,7 @@ fn connect_internal(request: &ConnectRequest) -> CommandSequence {
     }
 
     info!(?user_id, "Loading battle from database");
-    match load_battle_from_database(&database, user_id) {
+    match load_battle_from_database(&database, user_id, request_context) {
         Ok(LoadBattleResult::ExistingBattle(battle, quest_id)) => {
             if is_user_in_battle(&battle, user_id) {
                 renderer::connect(&battle, user_id, false)
@@ -136,6 +140,7 @@ fn initialize_database(persistent_data_path: &str) -> Result<Database, String> {
 fn load_battle_from_database(
     database: &Database,
     user_id: UserId,
+    request_context: RequestContext,
 ) -> Result<LoadBattleResult, String> {
     match database.fetch_save(user_id) {
         Ok(Some(save_file)) => match crate::deserialize_save_file::battle(&save_file) {
@@ -145,7 +150,8 @@ fn load_battle_from_database(
         Ok(None) => {
             // No save file exists, create a new battle
             info!(?user_id, "No save file found, creating new battle");
-            let new_battle = new_battle::create_and_start(user_id, BattleId(Uuid::new_v4()));
+            let new_battle =
+                new_battle::create_and_start(user_id, BattleId(Uuid::new_v4()), request_context);
 
             // Save new battle to database
             let quest_id = QuestId(Uuid::new_v4());

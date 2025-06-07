@@ -8,7 +8,7 @@ use battle_mutations::card_mutations::deck;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::all_cards::AllCards;
-use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::battle::card_id::{CardId, CharacterId, HandCardId};
@@ -49,6 +49,7 @@ pub fn random_playout(c: &mut Criterion) {
                         3141592653589793,
                         PlayerType::Agent(GameAI::RandomAction),
                         PlayerType::Agent(GameAI::RandomAction),
+                        RequestContext { developer_mode: false },
                     )
                 },
                 |mut battle| run_battle_until_completion(&mut battle),
@@ -390,6 +391,7 @@ fn benchmark_battle() -> BattleState {
         tracing: None,
         action_history: None,
         turn_history: TurnHistory::default(),
+        request_context: RequestContext { developer_mode: false },
     };
 
     deck::add_cards(

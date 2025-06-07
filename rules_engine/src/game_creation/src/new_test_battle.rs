@@ -1,7 +1,7 @@
 use battle_mutations::card_mutations::{create_test_deck, deck};
 use battle_mutations::phase_mutations::turn;
 use battle_state::battle::all_cards::AllCards;
-use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::battle::turn_data::TurnData;
@@ -21,6 +21,7 @@ pub fn create_and_start(
     seed: u64,
     user: PlayerType,
     enemy: PlayerType,
+    request_context: RequestContext,
 ) -> BattleState {
     let mut battle = BattleState {
         id,
@@ -52,6 +53,7 @@ pub fn create_and_start(
         tracing: None,
         action_history: None,
         turn_history: TurnHistory::default(),
+        request_context,
     };
 
     create_test_deck::add(&mut battle, PlayerName::One);

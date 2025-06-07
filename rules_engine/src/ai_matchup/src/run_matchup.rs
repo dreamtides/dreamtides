@@ -4,6 +4,7 @@ use std::time::{Duration, Instant};
 use ai_agents::agent_search;
 use battle_mutations::actions::apply_battle_action;
 use battle_queries::legal_action_queries::legal_actions;
+use battle_state::battle::battle_state::RequestContext;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle_player::battle_player_state::PlayerType;
 use clap::{Parser, ValueEnum};
@@ -144,8 +145,13 @@ fn run_match(
     }
 
     let battle_id = BattleId(Uuid::new_v4());
-    let mut battle =
-        new_test_battle::create_and_start(battle_id, seed, battle_ai_one, battle_ai_two);
+    let mut battle = new_test_battle::create_and_start(
+        battle_id,
+        seed,
+        battle_ai_one,
+        battle_ai_two,
+        RequestContext { developer_mode: false },
+    );
 
     let start_time = Instant::now();
     let mut turn_count = 0;

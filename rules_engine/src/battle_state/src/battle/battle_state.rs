@@ -1,6 +1,7 @@
 use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
 use rand_xoshiro::Xoshiro256PlusPlus;
+use serde::{Deserialize, Serialize};
 
 use crate::actions::battle_actions::BattleAction;
 use crate::battle::all_cards::AllCards;
@@ -16,6 +17,13 @@ use crate::battle_player::player_map::PlayerMap;
 use crate::battle_trace::battle_tracing::BattleTracing;
 use crate::core::effect_source::EffectSource;
 use crate::prompt_types::prompt_data::PromptData;
+
+/// Information about why & how we are currently running the rules engine.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct RequestContext {
+    /// True if we are connecting via the development server.
+    pub developer_mode: bool,
+}
 
 #[derive(Clone, Debug)]
 pub struct BattleState {
@@ -66,6 +74,9 @@ pub struct BattleState {
 
     /// History of actions and events during the current turn.
     pub turn_history: TurnHistory,
+
+    /// Information about why & how we are currently running the rules engine.
+    pub request_context: RequestContext,
 }
 
 impl BattleState {
@@ -89,6 +100,7 @@ impl BattleState {
             tracing: None,
             action_history: None,
             turn_history: self.turn_history.clone(),
+            request_context: self.request_context.clone(),
         }
     }
 
@@ -119,6 +131,7 @@ impl BattleState {
                 tracing: None,
                 action_history: None,
                 turn_history: self.turn_history.clone(),
+                request_context: self.request_context.clone(),
             };
             animations.steps.push(AnimationStep { source, snapshot, animation: update() });
         }

@@ -1,4 +1,4 @@
-use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::battle_state::{BattleState, RequestContext};
 use core_data::identifiers::{BattleId, UserId};
 use core_data::types::PlayerName;
 use display::core::response_builder::ResponseBuilder;
@@ -23,7 +23,10 @@ pub fn display_error_message(
         Some(existing_battle) => display_error_message_with_battle(existing_battle, message),
         None => {
             let id = BattleId(Uuid::new_v4());
-            let dummy_battle = new_battle::create_and_start(UserId::default(), id);
+            let dummy_battle =
+                new_battle::create_and_start(UserId::default(), id, RequestContext {
+                    developer_mode: false,
+                });
             display_error_message_with_battle(&dummy_battle, message)
         }
     }

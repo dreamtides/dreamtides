@@ -42,6 +42,7 @@ fn get_battle_impl(file: &SaveFile, undo: Option<PlayerName>) -> Option<(BattleS
                     file.seed,
                     file.player_types.one.clone(),
                     file.player_types.two.clone(),
+                    file.request_context.clone(),
                 );
 
                 let mut last_non_auto_battle = None;

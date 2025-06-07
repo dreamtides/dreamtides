@@ -15,7 +15,11 @@ pub fn execute(
     match action {
         DebugAction::ApplyTestScenarioAction => {}
         DebugAction::RestartBattle => {
-            *battle = new_battle::create_and_start(initiated_by, BattleId(Uuid::new_v4()));
+            *battle = new_battle::create_and_start(
+                initiated_by,
+                BattleId(Uuid::new_v4()),
+                battle.request_context.clone(),
+            );
         }
         DebugAction::SetOpponentAgent(ai) => {
             battle.players.player_mut(user_player.opponent()).player_type = PlayerType::Agent(ai);

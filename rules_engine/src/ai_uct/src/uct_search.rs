@@ -107,7 +107,7 @@ pub fn search(
     let action = best_result.action;
     let total_iterations = config.max_iterations_per_action * legal.len() as u32;
 
-    if log_results {
+    if log_results && initial_battle.request_context.developer_mode {
         info!("Picked action {:?} for {:?} after {} iterations", action, player, total_iterations);
         log_search_results::log_results(&best_result.graph, best_result.root, action);
     }

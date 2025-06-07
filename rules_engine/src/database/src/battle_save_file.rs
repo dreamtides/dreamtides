@@ -1,4 +1,5 @@
 use battle_state::battle::battle_history::BattleHistoryAction;
+use battle_state::battle::battle_state::RequestContext;
 use battle_state::battle_player::battle_player_state::PlayerType;
 use battle_state::battle_player::player_map::PlayerMap;
 use core_data::identifiers::BattleId;
@@ -11,4 +12,5 @@ pub struct BattleSaveFile {
     pub seed: u64,
     pub player_types: PlayerMap<PlayerType>,
     pub actions: Vec<BattleHistoryAction>,
+    pub request_context: RequestContext,
 }
