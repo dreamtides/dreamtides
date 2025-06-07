@@ -4,6 +4,7 @@ use std::io::Write;
 use std::path::PathBuf;
 
 use battle_state::actions::battle_actions::BattleAction;
+use battle_state::battle::battle_state::RequestContext;
 use core_data::types::PlayerName;
 use petgraph::dot::Dot;
 use petgraph::prelude::NodeIndex;
@@ -18,11 +19,16 @@ use crate::uct_tree::SearchGraph;
 /// Creates a simplified graph with nodes showing only the total reward values
 /// formatted to 1 decimal place, and edges showing the battle actions.
 /// The graph is limited to nodes within 3 edges of the root.
-pub fn log_results_diagram(graph: &SearchGraph, root: NodeIndex, action_taken: BattleAction) {
+pub fn log_results_diagram(
+    graph: &SearchGraph,
+    root: NodeIndex,
+    action_taken: BattleAction,
+    request_context: &RequestContext,
+) {
     // Create a simplified graph for logging
     let logging_graph = graph_for_logging(graph, root, action_taken);
     let dot = Dot::with_config(&logging_graph, &[]);
-    let Ok(output_path) = get_dot_file_path() else {
+    let Ok(output_path) = get_dot_file_path(request_context) else {
         error!("Failed to create dot file path");
         return;
     };
@@ -108,13 +114,9 @@ fn graph_for_logging(
     new_graph
 }
 
-fn get_dot_file_path() -> Result<PathBuf, String> {
-    let manifest_dir = env!("CARGO_MANIFEST_DIR");
-    let manifest_path = PathBuf::from(manifest_dir);
-    let parent = manifest_path
-        .parent()
-        .ok_or_else(|| "Failed to find parent directory of manifest".to_string())?;
-    let workspace_root =
-        parent.parent().ok_or_else(|| "Failed to find workspace root directory".to_string())?;
-    Ok(workspace_root.join("search_graph.dot"))
+fn get_dot_file_path(request_context: &RequestContext) -> Result<PathBuf, String> {
+    match &request_context.logging_options.log_directory {
+        Some(log_dir) => Ok(log_dir.join("search_graph.dot")),
+        None => Err("No log directory specified in RequestContext".to_string()),
+    }
 }

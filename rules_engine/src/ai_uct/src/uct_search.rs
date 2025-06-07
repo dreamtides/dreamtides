@@ -109,7 +109,12 @@ pub fn search(
 
     info!(?total_iterations, ?action, ?num_threads, "Picked AI action");
     if initial_battle.request_context.logging_options.log_ai_search_diagram {
-        log_search_results::log_results_diagram(&best_result.graph, best_result.root, action);
+        log_search_results::log_results_diagram(
+            &best_result.graph,
+            best_result.root,
+            action,
+            &initial_battle.request_context,
+        );
     }
 
     // I've experimented with persisting the search tree to reuse in future
