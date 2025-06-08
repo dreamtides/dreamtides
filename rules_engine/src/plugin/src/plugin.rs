@@ -6,11 +6,12 @@ use std::sync::LazyLock;
 
 use anyhow::Result;
 use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
+use display_data::client_log_request::ClientLogRequest;
 use display_data::command::CommandSequence;
 use display_data::request_data::{
     ConnectRequest, PerformActionRequest, PerformActionResponse, PollRequest, PollResponse,
 };
-use rules_engine::engine;
+use rules_engine::{client_logging, engine};
 use tokio::runtime::Runtime;
 
 static TOKIO_RUNTIME: LazyLock<Runtime> =
@@ -156,6 +157,24 @@ unsafe fn poll_impl(
     let out = std::slice::from_raw_parts_mut(response, response_length as usize);
     out[..json_bytes.len()].copy_from_slice(json_bytes);
     Ok(json_bytes.len() as i32)
+}
+
+/// Logs events from the client.
+///
+/// `request` should be a buffer including the json serialization of a
+/// `ClientLogRequest` message of `request_length` bytes.
+///
+/// Returns 0 on success, or -1 on error.
+#[no_mangle]
+pub unsafe extern "C" fn dreamtides_log(request: *const u8, request_length: i32) -> i32 {
+    error_boundary(|| log_impl(request, request_length))
+}
+
+unsafe fn log_impl(request: *const u8, request_length: i32) -> Result<i32> {
+    let request_data = std::slice::from_raw_parts(request, request_length as usize);
+    let deserialized_request = serde_json::from_slice::<ClientLogRequest>(request_data)?;
+    client_logging::log_client_events(deserialized_request);
+    Ok(0)
 }
 
 unsafe fn error_boundary(function: impl FnOnce() -> Result<i32> + UnwindSafe) -> i32 {

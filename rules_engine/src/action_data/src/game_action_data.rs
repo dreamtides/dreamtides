@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::battle_display_action::BattleDisplayAction;
 use crate::debug_action_data::DebugAction;
+
 /// All possible user interface actions
 #[derive(Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]

@@ -1,3 +1,4 @@
+pub mod client_logging;
 pub mod debug_actions;
 pub mod deserialize_save_file;
 pub mod engine;
