@@ -7,7 +7,7 @@ use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::animation_data::AnimationData;
-use battle_state::battle::battle_state::{BattleState, RequestContext};
+use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_player::battle_player_state::PlayerType;
 use core_data::identifiers::UserId;
 use core_data::types::PlayerName;
@@ -16,13 +16,24 @@ use display_data::command::CommandSequence;
 use tracing::instrument;
 use tracing_macros::battle_trace;
 
-pub struct PendingUpdate {
-    pub context: RequestContext,
-    pub commands: CommandSequence,
+static PENDING_UPDATES: LazyLock<Mutex<HashMap<UserId, Vec<CommandSequence>>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+pub fn poll(user_id: UserId) -> Option<CommandSequence> {
+    let mut updates = PENDING_UPDATES.lock().unwrap();
+    if let Some(user_updates) = updates.get_mut(&user_id) {
+        if !user_updates.is_empty() {
+            return Some(user_updates.remove(0));
+        }
+    }
+    None
 }
 
-static PENDING_UPDATES: LazyLock<Mutex<HashMap<UserId, Vec<PendingUpdate>>>> =
-    LazyLock::new(|| Mutex::new(HashMap::new()));
+/// Appends an update to the pending updates for a user.
+pub fn append_update(user_id: UserId, update: CommandSequence) {
+    let mut updates = PENDING_UPDATES.lock().unwrap();
+    updates.entry(user_id).or_default().push(update);
+}
 
 #[instrument(name = "handle_battle_action", level = "debug", skip(battle))]
 pub fn execute(
@@ -69,22 +80,6 @@ pub fn execute(
     }
 }
 
-pub fn poll(user_id: UserId) -> Option<PendingUpdate> {
-    let mut updates = PENDING_UPDATES.lock().unwrap();
-    if let Some(user_updates) = updates.get_mut(&user_id) {
-        if !user_updates.is_empty() {
-            return Some(user_updates.remove(0));
-        }
-    }
-    None
-}
-
-/// Appends an update to the pending updates for a user.
-pub fn append_update(user_id: UserId, context: RequestContext, update: CommandSequence) {
-    let mut updates = PENDING_UPDATES.lock().unwrap();
-    updates.entry(user_id).or_default().push(PendingUpdate { context, commands: update });
-}
-
 pub fn should_auto_execute_action(legal_actions: &LegalActions) -> Option<BattleAction> {
     if legal_actions.len() == 1 {
         match legal_actions {
@@ -116,18 +111,12 @@ fn render_updates(battle: &BattleState, user_id: UserId) {
     let player_name = renderer::player_name_for_user(battle, user_id);
     let player_updates = renderer::render_updates(battle, user_id);
     let mut updates = PENDING_UPDATES.lock().unwrap();
-    updates
-        .entry(user_id)
-        .or_default()
-        .push(PendingUpdate { context: battle.request_context.clone(), commands: player_updates });
+    updates.entry(user_id).or_default().push(player_updates);
 
     if let PlayerType::User(opponent_id) =
         &battle.players.player(player_name.opponent()).player_type
     {
         let opponent_updates = renderer::render_updates(battle, *opponent_id);
-        updates.entry(*opponent_id).or_default().push(PendingUpdate {
-            context: battle.request_context.clone(),
-            commands: opponent_updates,
-        });
+        updates.entry(*opponent_id).or_default().push(opponent_updates);
     }
 }

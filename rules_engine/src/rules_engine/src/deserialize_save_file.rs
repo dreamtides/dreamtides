@@ -1,6 +1,6 @@
 use battle_mutations::actions::apply_battle_action;
 use battle_queries::legal_action_queries::legal_actions;
-use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::battle_state::{BattleState, RequestContext};
 use core_data::identifiers::QuestId;
 use core_data::types::PlayerName;
 use database::save_file::SaveFile;
@@ -13,8 +13,8 @@ use crate::handle_battle_action::should_auto_execute_action;
 
 /// Returns a deserialized [BattleState] for the battle in this save
 /// file, if one is present.
-pub fn battle(file: &SaveFile) -> Option<(BattleState, QuestId)> {
-    get_battle_impl(file, None)
+pub fn battle(file: &SaveFile, request_context: RequestContext) -> Option<(BattleState, QuestId)> {
+    get_battle_impl(file, None, request_context)
 }
 
 /// Returns a deserialized [BattleState] for an 'undo' operation on the battle
@@ -22,11 +22,19 @@ pub fn battle(file: &SaveFile) -> Option<(BattleState, QuestId)> {
 ///
 /// We advance the battle state to one which is immediately before the named
 /// player's last battle action.
-pub fn undo(file: &SaveFile, player: PlayerName) -> Option<(BattleState, QuestId)> {
-    get_battle_impl(file, Some(player))
+pub fn undo(
+    file: &SaveFile,
+    player: PlayerName,
+    request_context: RequestContext,
+) -> Option<(BattleState, QuestId)> {
+    get_battle_impl(file, Some(player), request_context)
 }
 
-fn get_battle_impl(file: &SaveFile, undo: Option<PlayerName>) -> Option<(BattleState, QuestId)> {
+fn get_battle_impl(
+    file: &SaveFile,
+    undo: Option<PlayerName>,
+    request_context: RequestContext,
+) -> Option<(BattleState, QuestId)> {
     match file {
         SaveFile::V1(v1) => {
             info!("Replaying battle history to construct state");
@@ -42,7 +50,7 @@ fn get_battle_impl(file: &SaveFile, undo: Option<PlayerName>) -> Option<(BattleS
                     file.seed,
                     file.player_types.one.clone(),
                     file.player_types.two.clone(),
-                    file.request_context.clone(),
+                    request_context,
                 );
 
                 let mut last_non_auto_battle = None;

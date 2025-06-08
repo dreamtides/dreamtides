@@ -1,7 +1,9 @@
 use std::cell::RefCell;
+use std::collections::HashMap;
 use std::fmt::Write;
 use std::panic::{self};
 use std::path::PathBuf;
+use std::sync::{LazyLock, Mutex};
 use std::time::Instant;
 
 use action_data::game_action_data::GameAction;
@@ -31,8 +33,15 @@ thread_local! {
     static LAST_PERFORM_ACTION_TIME: RefCell<Option<Instant>> = const { RefCell::new(None) };
 }
 
+static REQUEST_CONTEXTS: LazyLock<Mutex<HashMap<UserId, RequestContext>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
 pub fn connect(request: &ConnectRequest, request_context: RequestContext) -> ConnectResponse {
     let metadata = request.metadata;
+    let user_id = metadata.user_id;
+
+    store_request_context(user_id, request_context.clone());
+
     let result = catch_panic(|| connect_internal(request, request_context));
     let commands = match result {
         Ok(commands) => commands,
@@ -42,7 +51,10 @@ pub fn connect(request: &ConnectRequest, request_context: RequestContext) -> Con
 }
 
 pub fn poll(user_id: UserId) -> Option<CommandSequence> {
-    if let Some(update) = handle_battle_action::poll(user_id) {
+    if let Some(commands) = handle_battle_action::poll(user_id) {
+        let context = get_request_context(user_id)
+            .unwrap_or(RequestContext { logging_options: Default::default() });
+
         let elapsed_msg = LAST_PERFORM_ACTION_TIME.with(|time| {
             if let Some(start_time) = *time.borrow() {
                 format!(" {:.2}s", start_time.elapsed().as_secs_f64())
@@ -51,8 +63,8 @@ pub fn poll(user_id: UserId) -> Option<CommandSequence> {
             }
         });
 
-        write_tracing_event::write_commands(elapsed_msg, &update.commands, &update.context);
-        return Some(update.commands);
+        write_tracing_event::write_commands(elapsed_msg, &commands, &context);
+        return Some(commands);
     }
     None
 }
@@ -76,7 +88,7 @@ fn connect_internal(request: &ConnectRequest, request_context: RequestContext) -
 
     // Check if this is a multiplayer connection request
     if let Some(vs_opponent) = request.vs_opponent {
-        return connect_for_multiplayer(&database, user_id, vs_opponent);
+        return connect_for_multiplayer(&database, user_id, vs_opponent, request_context);
     }
 
     info!(?user_id, "Loading battle from database");
@@ -101,13 +113,14 @@ fn connect_for_multiplayer(
     database: &Database,
     user_id: UserId,
     vs_opponent: UserId,
+    request_context: RequestContext,
 ) -> CommandSequence {
     info!(?user_id, ?vs_opponent, "Loading multiplayer battle from opponent's database");
 
     // Load opponent's save file
     match database.fetch_save(vs_opponent) {
         Ok(Some(save_file)) => {
-            match deserialize_save_file::battle(&save_file) {
+            match deserialize_save_file::battle(&save_file, request_context) {
                 Some((battle, quest_id)) => {
                     // Check if the connecting user is already in the battle
                     if is_user_in_battle(&battle, user_id) {
@@ -152,7 +165,7 @@ fn load_battle_from_database(
     request_context: RequestContext,
 ) -> Result<LoadBattleResult, String> {
     match database.fetch_save(user_id) {
-        Ok(Some(save_file)) => match crate::deserialize_save_file::battle(&save_file) {
+        Ok(Some(save_file)) => match deserialize_save_file::battle(&save_file, request_context) {
             Some((battle, quest_id)) => Ok(LoadBattleResult::ExistingBattle(battle, quest_id)),
             None => Err("No battle in save file".to_string()),
         },
@@ -251,7 +264,10 @@ fn perform_action_internal(request: &PerformActionRequest) {
             return;
         };
 
-        let Some((mut battle, quest_id)) = deserialize_save_file::battle(&save) else {
+        let request_context = get_request_context(user_id)
+            .unwrap_or(RequestContext { logging_options: Default::default() });
+        let Some((mut battle, quest_id)) = deserialize_save_file::battle(&save, request_context)
+        else {
             show_error_message(user_id, None, "No battle found".to_string());
             return;
         };
@@ -285,7 +301,6 @@ fn handle_request_action(
             debug_actions::execute(battle, user_id, player, action);
             handle_battle_action::append_update(
                 user_id,
-                battle.request_context.clone(),
                 renderer::connect(&*battle, user_id, true),
             );
         }
@@ -297,12 +312,15 @@ fn handle_request_action(
             apply_battle_display_action::execute(action);
             handle_battle_action::append_update(
                 user_id,
-                battle.request_context.clone(),
                 renderer::connect(&*battle, user_id, true),
             );
         }
         GameAction::Undo(player) => {
-            let Some((undone_battle, _)) = deserialize_save_file::undo(&save, player) else {
+            let request_context = get_request_context(user_id)
+                .unwrap_or(RequestContext { logging_options: Default::default() });
+            let Some((undone_battle, _)) =
+                deserialize_save_file::undo(&save, player, request_context)
+            else {
                 show_error_message(
                     user_id,
                     None,
@@ -314,7 +332,6 @@ fn handle_request_action(
             *battle = undone_battle;
             handle_battle_action::append_update(
                 user_id,
-                battle.request_context.clone(),
                 renderer::connect(&*battle, user_id, true),
             );
         }
@@ -324,9 +341,6 @@ fn handle_request_action(
 pub fn show_error_message(user_id: UserId, battle: Option<&BattleState>, error_message: String) {
     handle_battle_action::append_update(
         user_id,
-        battle
-            .map(|b| b.request_context.clone())
-            .unwrap_or(RequestContext { logging_options: Default::default() }),
         error_message::display_error_message(battle, error_message),
     )
 }
@@ -418,4 +432,14 @@ fn filter_backtrace(backtrace: &str) -> String {
     }
 
     result
+}
+
+fn store_request_context(user_id: UserId, context: RequestContext) {
+    let mut contexts = REQUEST_CONTEXTS.lock().unwrap();
+    contexts.insert(user_id, context);
+}
+
+fn get_request_context(user_id: UserId) -> Option<RequestContext> {
+    let contexts = REQUEST_CONTEXTS.lock().unwrap();
+    contexts.get(&user_id).cloned()
 }
