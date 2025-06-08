@@ -28,6 +28,7 @@ namespace Dreamtides.Services
     string? _testScenario;
     Queue<CommandBatch> _commandQueue = new Queue<CommandBatch>();
     bool _isProcessingCommands = false;
+    float? _lastPerformActionTime;
 
     bool IsTestOpponentClient => Application.dataPath.Contains("test_client");
 
@@ -98,7 +99,19 @@ namespace Dreamtides.Services
             Metadata = _metadata!
           };
           var response = Plugin.Poll(request);
-          StartCoroutine(ApplyCommands(response.Commands, animate: true));
+          if (response.Commands?.Groups.Count > 0)
+          {
+            if (_lastPerformActionTime.HasValue)
+            {
+              var elapsedTime = Time.time - _lastPerformActionTime.Value;
+              LogUtils.Log("ActionService", $"Poll response received {elapsedTime:F2}s after last PerformAction");
+            }
+            else
+            {
+              LogUtils.Log("ActionService", "Poll response received, unknown time since last PerformAction");
+            }
+            StartCoroutine(ApplyCommands(response.Commands, animate: true));
+          }
         }
       }
     }
@@ -111,6 +124,7 @@ namespace Dreamtides.Services
       }
 
       LogUtils.Log("ActionService", $"Performing action: {action}");
+      _lastPerformActionTime = Time.time;
 
       var request = new PerformActionRequest
       {
@@ -125,7 +139,10 @@ namespace Dreamtides.Services
       }
       else
       {
+        var startTime = Time.time;
         var response = Plugin.PerformAction(request);
+        var elapsedTime = Time.time - startTime;
+        LogUtils.Log("ActionService", $"PerformAction response received in {elapsedTime:F2}s");
         StartCoroutine(ApplyCommands(response.Commands, animate: true));
       }
     }
@@ -154,7 +171,15 @@ namespace Dreamtides.Services
         request,
         "poll",
         UnityWebRequest.kHttpVerbGET,
-        response => ApplyCommands(response.Commands, animate: true)
+        response =>
+        {
+          if (response.Commands?.Groups.Count > 0 && _lastPerformActionTime.HasValue)
+          {
+            var elapsedTime = Time.time - _lastPerformActionTime.Value;
+            LogUtils.Log("ActionService", $"Dev server poll response received {elapsedTime:F2}s after last PerformAction");
+          }
+          return ApplyCommands(response.Commands, animate: true);
+        }
       );
     }
 
