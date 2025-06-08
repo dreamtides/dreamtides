@@ -82,19 +82,19 @@ struct AnimationTraceEvent {
     pub timestamp: String,
 }
 
-pub fn write_animations(battle: &BattleState, message: &'static str, animations: &AnimationData) {
+pub fn write_animations(battle: &BattleState, animations: &AnimationData) {
     let animation_names: Vec<String> = animations
         .steps
         .iter()
         .map(|step| format!("{:?}", step.animation.discriminant()))
         .collect();
-
-    debug!("Playing animations: [{}]", animation_names.join(", "));
+    let names = format!("[{}]", animation_names.join(", "));
+    debug!(?names, "Playing animations");
 
     let snapshot = debug_battle_snapshot::capture(battle);
     let timestamp = format_current_time();
     let event = AnimationTraceEvent {
-        m: message.to_string(),
+        m: format!("Playing animations: {}", names),
         snapshot,
         step_names: animation_names,
         timestamp,
@@ -106,7 +106,7 @@ pub fn write_animations(battle: &BattleState, message: &'static str, animations:
 }
 
 pub fn write_commands(
-    message: &'static str,
+    elapsed_time: String,
     sequence: &CommandSequence,
     request_context: &RequestContext,
 ) {
@@ -116,12 +116,12 @@ pub fn write_commands(
         .flat_map(|group| &group.commands)
         .map(|command| format!("{:?}", command.discriminant()))
         .collect();
-
-    debug!("Writing commands: [{}]", command_names.join(", "));
+    let names = format!("[{}]", command_names.join(", "));
+    debug!(?names, ?elapsed_time, "Writing commands");
 
     let timestamp = format_current_time();
     let event = CommandTraceEvent {
-        m: message.to_string(),
+        m: format!("Writing commands: {}, elapsed: {}", names, elapsed_time),
         snapshot: None,
         sequence: sequence.clone(),
         timestamp,

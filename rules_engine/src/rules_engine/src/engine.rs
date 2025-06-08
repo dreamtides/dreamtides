@@ -2,6 +2,7 @@ use std::cell::RefCell;
 use std::fmt::Write;
 use std::panic::{self};
 use std::path::PathBuf;
+use std::time::Instant;
 
 use action_data::game_action_data::GameAction;
 use backtrace::Backtrace;
@@ -27,6 +28,7 @@ use crate::{
 
 thread_local! {
     static PANIC_INFO: RefCell<Option<(String, String, Backtrace)>> = const { RefCell::new(None) };
+    static LAST_PERFORM_ACTION_TIME: RefCell<Option<Instant>> = const { RefCell::new(None) };
 }
 
 pub fn connect(request: &ConnectRequest, request_context: RequestContext) -> ConnectResponse {
@@ -41,17 +43,24 @@ pub fn connect(request: &ConnectRequest, request_context: RequestContext) -> Con
 
 pub fn poll(user_id: UserId) -> Option<CommandSequence> {
     if let Some(update) = handle_battle_action::poll(user_id) {
-        write_tracing_event::write_commands(
-            "Returning async command sequence",
-            &update.commands,
-            &update.context,
-        );
+        let elapsed_msg = LAST_PERFORM_ACTION_TIME.with(|time| {
+            if let Some(start_time) = *time.borrow() {
+                format!(" {:.2}s", start_time.elapsed().as_secs_f64())
+            } else {
+                "unknown".to_string()
+            }
+        });
+
+        write_tracing_event::write_commands(elapsed_msg, &update.commands, &update.context);
         return Some(update.commands);
     }
     None
 }
 
 pub fn perform_action(request: PerformActionRequest) {
+    LAST_PERFORM_ACTION_TIME.with(|time| {
+        *time.borrow_mut() = Some(Instant::now());
+    });
     task::spawn_blocking(move || perform_action_internal(&request));
 }
 

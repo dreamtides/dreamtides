@@ -15,60 +15,6 @@ use tracing_subscriber::{EnvFilter, Layer};
 
 static INIT: Once = Once::new();
 
-/// A `MakeWriter` implementation that creates writers for both stdout and a
-/// file. This allows tracing-forest to write formatted logs to multiple
-/// destinations simultaneously.
-#[derive(Clone)]
-struct DualMakeWriter {
-    file: Arc<Mutex<File>>,
-}
-
-impl DualMakeWriter {
-    fn new(file: File) -> Self {
-        Self { file: Arc::new(Mutex::new(file)) }
-    }
-}
-
-impl<'a> MakeWriter<'a> for DualMakeWriter {
-    type Writer = DualWriter;
-
-    fn make_writer(&'a self) -> Self::Writer {
-        DualWriter { file: self.file.clone() }
-    }
-}
-
-/// A writer that writes to both stdout and a file simultaneously.
-struct DualWriter {
-    file: Arc<Mutex<File>>,
-}
-
-impl Write for DualWriter {
-    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
-        // Write to stdout first
-        let bytes_written = io::stdout().write(buf)?;
-        io::stdout().flush()?;
-
-        // Then write to file - we don't want file errors to break stdout logging
-        if let Ok(mut file) = self.file.lock() {
-            // Ignore file write errors to ensure stdout logging continues
-            let _ = file.write_all(buf);
-            let _ = file.flush();
-        }
-
-        Ok(bytes_written)
-    }
-
-    fn flush(&mut self) -> io::Result<()> {
-        io::stdout().flush()?;
-
-        if let Ok(mut file) = self.file.lock() {
-            let _ = file.flush();
-        }
-
-        Ok(())
-    }
-}
-
 /// Initializes global logging behavior for the 'tracing' crate if it hasn't
 /// already been initialized.
 pub fn maybe_initialize(request_context: &RequestContext) {
@@ -148,4 +94,57 @@ fn tag_parser(event: &Event) -> Option<Tag> {
     };
 
     Some(Tag::builder().level(level).icon(icon).prefix(target).suffix("rs").build())
+}
+
+/// A `MakeWriter` implementation that creates writers for both stdout and a
+/// file. This allows tracing-forest to write formatted logs to multiple
+/// destinations simultaneously.
+#[derive(Clone)]
+struct DualMakeWriter {
+    file: Arc<Mutex<File>>,
+}
+
+impl DualMakeWriter {
+    fn new(file: File) -> Self {
+        Self { file: Arc::new(Mutex::new(file)) }
+    }
+}
+
+impl<'a> MakeWriter<'a> for DualMakeWriter {
+    type Writer = DualWriter;
+
+    fn make_writer(&'a self) -> Self::Writer {
+        DualWriter { file: self.file.clone() }
+    }
+}
+
+/// A writer that writes to both stdout and a file simultaneously.
+struct DualWriter {
+    file: Arc<Mutex<File>>,
+}
+
+impl Write for DualWriter {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        // Write to stdout first
+        let bytes_written = io::stdout().write(buf)?;
+        io::stdout().flush()?;
+
+        if let Ok(mut file) = self.file.lock() {
+            // Ignore file write errors to ensure stdout logging continues
+            let _ = file.write_all(buf);
+            let _ = file.flush();
+        }
+
+        Ok(bytes_written)
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        io::stdout().flush()?;
+
+        if let Ok(mut file) = self.file.lock() {
+            let _ = file.flush();
+        }
+
+        Ok(())
+    }
 }

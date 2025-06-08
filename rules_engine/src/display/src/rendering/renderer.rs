@@ -25,7 +25,7 @@ pub fn render_updates(battle: &BattleState, user_id: UserId) -> CommandSequence 
     builder.set_for_animation(true);
     if let Some(animations) = &battle.animations {
         if !animations.steps.is_empty() {
-            write_tracing_event::write_animations(battle, "Rendering animations", animations);
+            write_tracing_event::write_animations(battle, animations);
         }
         for step in &animations.steps {
             // battle_rendering::run(&mut builder, &step.snapshot);
