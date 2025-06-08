@@ -5,6 +5,7 @@ use std::sync::Once;
 
 use battle_state::battle::battle_state::RequestContext;
 use tracing::{Event, Level};
+use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
 use tracing_error::ErrorLayer;
 use tracing_forest::{ForestLayer, PrettyPrinter, Tag};
 use tracing_subscriber::layer::SubscriberExt;
@@ -32,12 +33,7 @@ pub fn initialize(request_context: &RequestContext) {
             let log_path = log_directory.join("dreamtides.log");
             let log_file = File::create(log_path).expect("Error creating tracing log file");
             Some(
-                tracing_subscriber::fmt::layer()
-                    .with_file(true)
-                    .with_line_number(true)
-                    .with_writer(log_file)
-                    .with_target(false)
-                    .with_ansi(false)
+                BunyanFormattingLayer::new("dreamcaller".into(), log_file)
                     .with_filter(EnvFilter::new("debug")),
             )
         } else {
@@ -46,7 +42,8 @@ pub fn initialize(request_context: &RequestContext) {
 
     tracing_subscriber::registry()
         .with(forest_layer)
-        .with(Some(file_subscriber))
+        .with(JsonStorageLayer)
+        .with(file_subscriber)
         .with(ErrorLayer::default())
         .init();
 }
