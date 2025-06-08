@@ -81,6 +81,9 @@ impl Component for SetOpponentAgentPanel<'_> {
                                         .agent(GameAI::FirstAvailableAction)
                                         .build(),
                                 )
+                                .child(
+                                    SetAgentCell::builder().agent(GameAI::WaitFiveSeconds).build(),
+                                )
                                 .build(),
                         )
                         .build(),

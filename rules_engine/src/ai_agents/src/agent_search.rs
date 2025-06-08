@@ -1,4 +1,5 @@
-use std::time::Instant;
+use std::thread;
+use std::time::{Duration, Instant};
 
 use ai_data::game_ai::GameAI;
 use ai_uct::uct_config::UctConfig;
@@ -63,6 +64,10 @@ pub fn select_action_unchecked(
                 single_threaded: true,
             };
             uct_search::search(battle, player, &config)
+        }
+        GameAI::WaitFiveSeconds => {
+            thread::sleep(Duration::from_secs(5));
+            first_available_action(battle, player)
         }
     }
 }

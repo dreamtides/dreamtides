@@ -9,7 +9,9 @@ pub enum GameAI {
     RandomAction,
     MonteCarlo(u32),
     MonteCarloSingleThreaded(u32),
-    // I've tested more traditional tree search algorithms like Minimax/Alpha
-    // Beta pruning, but they've been very convincingly defeated by Monte Carlo
-    // techniques.
+    WaitFiveSeconds,
 }
+
+// I've tested more traditional tree search algorithms like Minimax/Alpha
+// Beta pruning, but they've been very convincingly defeated by Monte Carlo
+// techniques.

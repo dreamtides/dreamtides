@@ -57,7 +57,7 @@ namespace Dreamtides.Schema
 
         /// <summary>
         /// If specified, treats this as a multiplayer game using the save file provided in this ID
-        /// and adds this use as a player in the battle.
+        /// and adds this user as a player in the battle.
         /// </summary>
         [JsonProperty("vsOpponent")]
         public Guid? VsOpponent { get; set; }
@@ -1914,7 +1914,7 @@ namespace Dreamtides.Schema
 
     public enum DebugActionEnum { ApplyTestScenarioAction, RestartBattle };
 
-    public enum GameAiEnum { AlwaysPanic, FirstAvailableAction, RandomAction };
+    public enum GameAiEnum { AlwaysPanic, FirstAvailableAction, RandomAction, WaitFiveSeconds };
 
     public enum FlexAlign { Auto, Center, FlexEnd, FlexStart, Stretch };
 
@@ -3178,6 +3178,8 @@ namespace Dreamtides.Schema
                             return new GameAi { Enum = GameAiEnum.FirstAvailableAction };
                         case "randomAction":
                             return new GameAi { Enum = GameAiEnum.RandomAction };
+                        case "waitFiveSeconds":
+                            return new GameAi { Enum = GameAiEnum.WaitFiveSeconds };
                     }
                     break;
                 case JsonToken.StartObject:
@@ -3202,6 +3204,9 @@ namespace Dreamtides.Schema
                         return;
                     case GameAiEnum.RandomAction:
                         serializer.Serialize(writer, "randomAction");
+                        return;
+                    case GameAiEnum.WaitFiveSeconds:
+                        serializer.Serialize(writer, "waitFiveSeconds");
                         return;
                 }
             }
@@ -3232,6 +3237,8 @@ namespace Dreamtides.Schema
                     return GameAiEnum.FirstAvailableAction;
                 case "randomAction":
                     return GameAiEnum.RandomAction;
+                case "waitFiveSeconds":
+                    return GameAiEnum.WaitFiveSeconds;
             }
             throw new Exception("Cannot unmarshal type GameAiEnum");
         }
@@ -3254,6 +3261,9 @@ namespace Dreamtides.Schema
                     return;
                 case GameAiEnum.RandomAction:
                     serializer.Serialize(writer, "randomAction");
+                    return;
+                case GameAiEnum.WaitFiveSeconds:
+                    serializer.Serialize(writer, "waitFiveSeconds");
                     return;
             }
             throw new Exception("Cannot marshal type GameAiEnum");
