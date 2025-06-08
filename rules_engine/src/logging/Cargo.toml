@@ -14,7 +14,6 @@ battle_state = { path = "../battle_state" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tracing = "0.1"
-tracing-bunyan-formatter = "0.3"
 tracing-error = "0.2"
 tracing-forest = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
