@@ -145,7 +145,7 @@ pub fn clear_log_file(request_context: &RequestContext) {
 
     if log_path.exists() {
         if let Err(e) = fs::remove_file(&log_path) {
-            error!("Failed to clear dreamtides.json: {}", e);
+            error!(?log_path, "Failed to remove dreamtides.json: {}", e);
         }
     }
 }
@@ -164,12 +164,11 @@ fn write_json_to_log_file(json_str: &str, request_context: &RequestContext) {
 
     if !log_path.exists() {
         match File::create(&log_path) {
-            Ok(mut file) => {
-                if let Err(e) = file.write_all(format!("[\n{}\n]", json_str).as_bytes()) {
-                    error!("Failed to write to dreamtides.json: {}", e);
-                }
-            }
-            Err(e) => error!("Failed to create dreamtides.json: {}", e),
+            Ok(mut file) => match file.write_all(format!("[\n{}\n]", json_str).as_bytes()) {
+                Ok(_) => debug!(?log_path, "Created dreamtides.json"),
+                Err(e) => error!(?log_path, "Failed to write to dreamtides.json: {}", e),
+            },
+            Err(e) => error!(?log_path, "Failed to create dreamtides.json: {}", e),
         }
         return;
     }
@@ -196,7 +195,7 @@ fn write_json_to_log_file(json_str: &str, request_context: &RequestContext) {
                         }
 
                         if let Err(e) = file.write_all(format!(",\n{}\n]", json_str).as_bytes()) {
-                            error!("Failed to append to dreamtides.json: {}", e);
+                            error!(?log_path, "Failed to append to dreamtides.json: {}", e);
                         }
                         return;
                     }
@@ -205,7 +204,7 @@ fn write_json_to_log_file(json_str: &str, request_context: &RequestContext) {
             }
             Err(_) => reset_file(&mut file, json_str),
         },
-        Err(e) => error!("Failed to open dreamtides.json for appending: {}", e),
+        Err(e) => error!(?log_path, "Failed to open dreamtides.json for appending: {}", e),
     }
 }
 
