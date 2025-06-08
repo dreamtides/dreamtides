@@ -5,12 +5,13 @@ use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Json, Router};
 use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
+use display_data::client_log_request::ClientLogRequest;
 use display_data::command::CommandSequence;
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse, PollRequest,
     PollResponse,
 };
-use rules_engine::engine;
+use rules_engine::{client_logging, engine};
 use serde::de::DeserializeOwned;
 use tracing::{error, info, info_span};
 
@@ -103,6 +104,12 @@ async fn poll(body: String) -> AppResult<Json<PollResponse>> {
     Ok(Json(PollResponse { metadata: req.metadata, commands }))
 }
 
+async fn log(body: String) -> AppResult<StatusCode> {
+    let req: ClientLogRequest = parse_json(&body)?;
+    client_logging::log_client_events(req);
+    Ok(StatusCode::OK)
+}
+
 #[tokio::main]
 async fn main() {
     let log_directory = match logging::get_developer_mode_log_directory() {
@@ -122,7 +129,8 @@ async fn main() {
     let app = Router::new()
         .route("/connect", get(connect))
         .route("/perform_action", post(perform_action))
-        .route("/poll", get(poll));
+        .route("/poll", get(poll))
+        .route("/log", post(log));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:26598").await.unwrap_or_else(|e| {
         error!(error.message = %e, "Failed to bind to port 26598");

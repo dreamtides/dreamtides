@@ -75,6 +75,9 @@ namespace Dreamtides.Services
     [SerializeField] TestHelperService? _testHelperService;
     public TestHelperService TestHelperService => Check(_testHelperService);
 
+    [SerializeField] LoggingService? _loggingService;
+    public LoggingService LoggingService => Check(_loggingService);
+
     [SerializeField] ControlledButton? _bottomRightButton;
     public ControlledButton BottomRightButton => Check(_bottomRightButton);
 

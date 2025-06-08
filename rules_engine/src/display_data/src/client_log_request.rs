@@ -24,3 +24,9 @@ pub enum LogType {
     Info,
     Debug,
 }
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct ClientLogResponse {
+    pub success: bool,
+}

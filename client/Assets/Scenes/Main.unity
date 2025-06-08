@@ -5596,6 +5596,7 @@ GameObject:
   - component: {fileID: 613451869}
   - component: {fileID: 613451870}
   - component: {fileID: 613451871}
+  - component: {fileID: 613451872}
   m_Layer: 0
   m_Name: Registry
   m_TagString: Untagged
@@ -5669,6 +5670,7 @@ MonoBehaviour:
   _arrowService: {fileID: 613451869}
   _cardEffectPreviewService: {fileID: 613451870}
   _testHelperService: {fileID: 613451871}
+  _loggingService: {fileID: 613451872}
   _bottomRightButton: {fileID: 262976513}
 --- !u!114 &613451855
 MonoBehaviour:
@@ -5933,6 +5935,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2cd9fcc2e2cf94919b546182d42f181e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &613451872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 613451850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccb70b4d40f8e474b90da640f58dd889, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &625589745

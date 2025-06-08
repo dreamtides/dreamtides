@@ -3,6 +3,7 @@ use core_data::identifiers::{BattleId, UserId};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use crate::client_log_request::{ClientLogRequest, ClientLogResponse};
 use crate::command::CommandSequence;
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -81,4 +82,6 @@ pub struct SchemaTypes {
     pub perform_action_response: PerformActionResponse,
     pub poll_request: PollRequest,
     pub poll_response: PollResponse,
+    pub client_log_request: ClientLogRequest,
+    pub client_log_response: ClientLogResponse,
 }

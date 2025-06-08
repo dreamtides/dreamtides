@@ -1,6 +1,5 @@
 #nullable enable
 
-using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using Dreamtides.Schema;
@@ -50,6 +49,13 @@ static class Plugin
         return Errors.CheckNotNull(deserialized, "Error deserializing poll response");
     }
 
+    public static void Log(ClientLogRequest request)
+    {
+        var serialized = JsonConvert.SerializeObject(request, Converter.Settings);
+        var encoded = Encoding.UTF8.GetBytes(serialized);
+        Errors.CheckNonNegative(dreamtides_log(encoded, encoded.Length));
+    }
+
 #if !UNITY_EDITOR && (UNITY_IOS || UNITY_WEBGL)
     [DllImport("__Internal")]
 #else
@@ -82,4 +88,14 @@ static class Plugin
       int requestLength,
       [Out] byte[] response,
       int responseLength);
+
+#if !UNITY_EDITOR && (UNITY_IOS || UNITY_WEBGL)
+    [DllImport("__Internal")]
+#else
+    [DllImport("plugin")]
+#endif
+    public static extern int dreamtides_log(
+      byte[] request,
+      int requestLength
+    );
 }

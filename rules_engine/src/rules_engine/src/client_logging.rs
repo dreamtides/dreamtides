@@ -28,7 +28,7 @@ fn log_entry(entry: &LogEntry) {
             }
         }
         LogEntry::EventSpan { name, entries } => {
-            let span = tracing::span!(tracing::Level::INFO, "{}", name);
+            let span = tracing::span!(tracing::Level::INFO, "client_span", name);
             let _guard = span.enter();
 
             for nested_entry in entries {

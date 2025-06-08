@@ -104,11 +104,12 @@ namespace Dreamtides.Services
             if (_lastPerformActionTime.HasValue)
             {
               var elapsedTime = Time.time - _lastPerformActionTime.Value;
-              LogUtils.Log("ActionService", $"Poll response received {elapsedTime:F2}s after last PerformAction");
+              Registry.LoggingService.LogInfo("ActionService", "Poll response received",
+                ("elapsedTime", $"{elapsedTime:F2}s"));
             }
             else
             {
-              LogUtils.Log("ActionService", "Poll response received, unknown time since last PerformAction");
+              Registry.LoggingService.LogInfo("ActionService", "Poll response received, unknown time since last PerformAction");
             }
             StartCoroutine(ApplyCommands(response.Commands, animate: true));
           }
@@ -123,7 +124,9 @@ namespace Dreamtides.Services
         return;
       }
 
-      LogUtils.Log("ActionService", $"Performing action: {action}");
+      Registry.LoggingService.StartSpan("PerformAction");
+      Registry.LoggingService.LogInfo("ActionService", "Performing action",
+        ("actionType", action.ToString() ?? "null"));
       _lastPerformActionTime = Time.time;
 
       var request = new PerformActionRequest
@@ -142,8 +145,25 @@ namespace Dreamtides.Services
         var startTime = Time.time;
         var response = Plugin.PerformAction(request);
         var elapsedTime = Time.time - startTime;
-        LogUtils.Log("ActionService", $"PerformAction response received in {elapsedTime:F2}s");
+        Registry.LoggingService.LogInfo("ActionService", "PerformAction response received",
+          ("elapsedTime", $"{elapsedTime:F2}s"));
+        Registry.LoggingService.EndSpan("PerformAction");
         StartCoroutine(ApplyCommands(response.Commands, animate: true));
+      }
+    }
+
+    /// <summary>
+    /// Log a client message to the server.
+    /// </summary>
+    public void Log(ClientLogRequest request)
+    {
+      if (Application.isEditor)
+      {
+        StartCoroutine(DevServerLogAsync(request));
+      }
+      else
+      {
+        Plugin.Log(request);
       }
     }
 
@@ -176,7 +196,8 @@ namespace Dreamtides.Services
           if (response.Commands?.Groups.Count > 0 && _lastPerformActionTime.HasValue)
           {
             var elapsedTime = Time.time - _lastPerformActionTime.Value;
-            LogUtils.Log("ActionService", $"Dev server poll response received {elapsedTime:F2}s after last PerformAction");
+            Registry.LoggingService.LogInfo("ActionService", "Dev server poll response received",
+              ("elapsedTime", $"{elapsedTime:F2}s"));
           }
           return ApplyCommands(response.Commands, animate: true);
         }
@@ -189,7 +210,26 @@ namespace Dreamtides.Services
         request,
         "perform_action",
         UnityWebRequest.kHttpVerbPOST,
-        response => ApplyCommands(response.Commands, animate: true));
+        response =>
+        {
+          Registry.LoggingService.LogInfo("ActionService", "Dev server PerformAction response received");
+          Registry.LoggingService.EndSpan("PerformAction");
+          return ApplyCommands(response.Commands, animate: true);
+        });
+    }
+
+    private IEnumerator DevServerLogAsync(ClientLogRequest request)
+    {
+      return SendDevServerRequest<ClientLogRequest, ClientLogResponse>(
+        request,
+        "log",
+        UnityWebRequest.kHttpVerbPOST,
+        response => Break());
+    }
+
+    IEnumerator Break()
+    {
+      yield break;
     }
 
     private IEnumerator SendDevServerRequest<TRequest, TResponse>(
@@ -233,18 +273,21 @@ namespace Dreamtides.Services
 
       if (_isProcessingCommands)
       {
-        LogUtils.Log("ActionService", "Queueing commands for later processing");
+        Registry.LoggingService.LogInfo("ActionService", "Queueing commands for later processing",
+          ("queueSize", _commandQueue.Count.ToString()));
         _commandQueue.Enqueue(new CommandBatch { Commands = commands, Animate = animate });
         yield break;
       }
 
       _isProcessingCommands = true;
+      Registry.LoggingService.StartSpan("ApplyCommands");
 
       var count = commands.Groups.Sum(group => group.Commands.Count);
       if (count > 1)
       {
         var commandNames = GetCommandNames(commands);
-        LogUtils.Log("ActionService", $"Applying {count} commands: [{commandNames}]");
+        Registry.LoggingService.LogInfo("ActionService", "Applying commands",
+          ("commandCount", count.ToString()), ("commandNames", commandNames));
       }
 
       foreach (var group in commands.Groups)
@@ -258,11 +301,13 @@ namespace Dreamtides.Services
         Connected = true;
       }
 
+      Registry.LoggingService.EndSpan("ApplyCommands");
       _isProcessingCommands = false;
 
       if (_commandQueue.Count > 0)
       {
-        LogUtils.Log("ActionService", $"Processing {_commandQueue.Count} queued command sequences");
+        Registry.LoggingService.LogInfo("ActionService", "Processing queued command sequences",
+          ("queueCount", _commandQueue.Count.ToString()));
         var nextBatch = _commandQueue.Dequeue();
         StartCoroutine(ApplyCommands(nextBatch.Commands, nextBatch.Animate));
       }
@@ -272,14 +317,15 @@ namespace Dreamtides.Services
     {
       if (group.Commands.Count > 1)
       {
-        LogUtils.Log("ActionService", $"Applying group with {group.Commands.Count} commands");
+        Registry.LoggingService.LogInfo("ActionService", "Applying command group",
+          ("commandCount", group.Commands.Count.ToString()));
       }
       var coroutines = new List<Coroutine>();
       foreach (var command in group.Commands)
       {
         if (command.UpdateBattle != null)
         {
-          LogUtils.Log("ActionService", "Applying command: UpdateBattle");
+          Registry.LoggingService.LogInfo("ActionService", "Applying command: UpdateBattle");
 
           Registry.Layout.UserStatusDisplay.UpdatePlayerView(command.UpdateBattle.Battle.User, animate);
           Registry.Layout.EnemyStatusDisplay.UpdatePlayerView(command.UpdateBattle.Battle.Enemy, animate);
@@ -313,69 +359,73 @@ namespace Dreamtides.Services
 
         if (command.Wait != null)
         {
-          LogUtils.Log("ActionService", "Applying command: Wait");
+          Registry.LoggingService.LogInfo("ActionService", "Applying command: Wait",
+            ("duration", $"{command.Wait.MillisecondsValue}ms"));
           coroutines.Add(StartCoroutine(Wait(command.Wait)));
         }
 
         if (command.FireProjectile != null)
         {
-          LogUtils.Log("ActionService", "Applying command: FireProjectile");
+          Registry.LoggingService.LogInfo("ActionService", "Applying command: FireProjectile");
           coroutines.Add(StartCoroutine(
             Registry.EffectService.HandleFireProjectileCommand(command.FireProjectile)));
         }
 
         if (command.DissolveCard != null)
         {
-          LogUtils.Log("ActionService", "Applying command: DissolveCard");
+          Registry.LoggingService.LogInfo("ActionService", "Applying command: DissolveCard");
           coroutines.Add(StartCoroutine(
             Registry.EffectService.HandleDissolveCommand(command.DissolveCard)));
         }
 
         if (command.DisplayGameMessage != null)
         {
-          LogUtils.Log("ActionService", "Applying command: DisplayGameMessage");
+          Registry.LoggingService.LogInfo("ActionService", "Applying command: DisplayGameMessage",
+            ("messageType", command.DisplayGameMessage.Value.ToString()));
           coroutines.Add(StartCoroutine(Registry.Layout.GameMessage.Show(command.DisplayGameMessage.Value)));
         }
 
         if (command.DisplayEffect != null)
         {
-          LogUtils.Log("ActionService", "Applying command: DisplayEffect");
+          Registry.LoggingService.LogInfo("ActionService", "Applying command: DisplayEffect");
           coroutines.Add(StartCoroutine(Registry.EffectService.HandleDisplayEffectCommand(command.DisplayEffect)));
         }
 
         if (command.DrawUserCards != null)
         {
-          LogUtils.Log("ActionService", "Applying command: DrawUserCards");
+          Registry.LoggingService.LogInfo("ActionService", "Applying command: DrawUserCards",
+            ("cardCount", command.DrawUserCards.Cards.Count.ToString()));
           coroutines.Add(StartCoroutine(Registry.CardService.HandleDrawUserCards(command.DrawUserCards)));
         }
 
         if (command.DisplayJudgment != null)
         {
-          LogUtils.Log("ActionService", "Applying command: DisplayJudgment");
+          Registry.LoggingService.LogInfo("ActionService", "Applying command: DisplayJudgment");
           coroutines.Add(StartCoroutine(Registry.JudgmentService.HandleDisplayJudgmentCommand(command.DisplayJudgment)));
         }
 
         if (command.DisplayDreamwellActivation != null)
         {
-          LogUtils.Log("ActionService", "Applying command: DisplayDreamwellActivation");
+          Registry.LoggingService.LogInfo("ActionService", "Applying command: DisplayDreamwellActivation");
           coroutines.Add(StartCoroutine(Registry.DreamwellActivationService.HandleDreamwellActivationCommand(command.DisplayDreamwellActivation)));
         }
 
         if (command.DisplayEnemyMessage != null)
         {
-          LogUtils.Log("ActionService", "Applying command: DisplayEnemyMessage");
+          Registry.LoggingService.LogInfo("ActionService", "Applying command: DisplayEnemyMessage");
           Registry.Layout.EnemyMessage.Show(command.DisplayEnemyMessage);
         }
 
         if (command.ToggleThinkingIndicator != null)
         {
-          LogUtils.Log("ActionService", "Applying command: ToggleThinkingIndicator");
+          Registry.LoggingService.LogInfo("ActionService", "Applying command: ToggleThinkingIndicator",
+            ("show", command.ToggleThinkingIndicator.Show.ToString()));
           Registry.Layout.ThinkingIndicator.SetActive(command.ToggleThinkingIndicator.Show);
         }
 
         if (command.PlayAudioClip != null)
         {
-          LogUtils.Log("ActionService", "Applying command: PlayAudioClip");
+          Registry.LoggingService.LogInfo("ActionService", "Applying command: PlayAudioClip");
           Registry.SoundService.Play(command.PlayAudioClip.Sound);
           if (command.PlayAudioClip.PauseDuration.MillisecondsValue > 0)
           {

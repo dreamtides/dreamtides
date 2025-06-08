@@ -17,6 +17,12 @@ namespace Dreamtides.Schema
 
     public partial class SchemaTypes
     {
+        [JsonProperty("clientLogRequest", Required = Required.Always)]
+        public ClientLogRequest ClientLogRequest { get; set; }
+
+        [JsonProperty("clientLogResponse", Required = Required.Always)]
+        public ClientLogResponse ClientLogResponse { get; set; }
+
         [JsonProperty("connectRequest", Required = Required.Always)]
         public ConnectRequest ConnectRequest { get; set; }
 
@@ -34,6 +40,48 @@ namespace Dreamtides.Schema
 
         [JsonProperty("pollResponse", Required = Required.Always)]
         public PollResponse PollResponse { get; set; }
+    }
+
+    public partial class ClientLogRequest
+    {
+        [JsonProperty("entry", Required = Required.Always)]
+        public LogEntry Entry { get; set; }
+    }
+
+    public partial class EventSpan
+    {
+        [JsonProperty("entries", Required = Required.Always)]
+        public List<LogEntry> Entries { get; set; }
+
+        [JsonProperty("name", Required = Required.Always)]
+        public string Name { get; set; }
+    }
+
+    public partial class LogEntry
+    {
+        [JsonProperty("event", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public Event Event { get; set; }
+
+        [JsonProperty("eventSpan", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public EventSpan EventSpan { get; set; }
+    }
+
+    public partial class Event
+    {
+        [JsonProperty("arguments", Required = Required.Always)]
+        public Dictionary<string, string> Arguments { get; set; }
+
+        [JsonProperty("log_type", Required = Required.Always)]
+        public LogType LogType { get; set; }
+
+        [JsonProperty("message", Required = Required.Always)]
+        public string Message { get; set; }
+    }
+
+    public partial class ClientLogResponse
+    {
+        [JsonProperty("success", Required = Required.Always)]
+        public bool Success { get; set; }
     }
 
     public partial class ConnectRequest
@@ -1820,6 +1868,8 @@ namespace Dreamtides.Schema
         public Metadata Metadata { get; set; }
     }
 
+    public enum LogType { Debug, Error, Info, Warning };
+
     /// <summary>
     /// Represents a player within the context of the display layer.
     ///
@@ -2083,6 +2133,7 @@ namespace Dreamtides.Schema
             DateParseHandling = DateParseHandling.None,
             Converters =
             {
+                LogTypeConverter.Singleton,
                 DisplayPlayerConverter.Singleton,
                 GameMessageTypeConverter.Singleton,
                 CardFacingConverter.Singleton,
@@ -2132,6 +2183,57 @@ namespace Dreamtides.Schema
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
         };
+    }
+
+    internal class LogTypeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(LogType) || t == typeof(LogType?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "debug":
+                    return LogType.Debug;
+                case "error":
+                    return LogType.Error;
+                case "info":
+                    return LogType.Info;
+                case "warning":
+                    return LogType.Warning;
+            }
+            throw new Exception("Cannot unmarshal type LogType");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (LogType)untypedValue;
+            switch (value)
+            {
+                case LogType.Debug:
+                    serializer.Serialize(writer, "debug");
+                    return;
+                case LogType.Error:
+                    serializer.Serialize(writer, "error");
+                    return;
+                case LogType.Info:
+                    serializer.Serialize(writer, "info");
+                    return;
+                case LogType.Warning:
+                    serializer.Serialize(writer, "warning");
+                    return;
+            }
+            throw new Exception("Cannot marshal type LogType");
+        }
+
+        public static readonly LogTypeConverter Singleton = new LogTypeConverter();
     }
 
     internal class DisplayPlayerConverter : JsonConverter
