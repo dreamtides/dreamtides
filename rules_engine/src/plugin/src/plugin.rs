@@ -2,6 +2,7 @@
 
 use std::panic::{self, UnwindSafe};
 use std::path::PathBuf;
+use std::sync::LazyLock;
 
 use anyhow::Result;
 use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
@@ -10,6 +11,10 @@ use display_data::request_data::{
     ConnectRequest, PerformActionRequest, PerformActionResponse, PollRequest, PollResponse,
 };
 use rules_engine::engine;
+use tokio::runtime::Runtime;
+
+static TOKIO_RUNTIME: LazyLock<Runtime> =
+    LazyLock::new(|| Runtime::new().expect("Failed to create tokio runtime"));
 
 /// Synchronize the state of an ongoing game, downloading a full description of
 /// the game state.
@@ -91,14 +96,12 @@ unsafe fn perform_impl(
     let deserialized_request = serde_json::from_slice::<PerformActionRequest>(request_data)?;
     let metadata = deserialized_request.metadata;
 
-    #[tokio::main]
-    async fn run_action(request: PerformActionRequest) {
-        engine::perform_action(request);
-    }
+    TOKIO_RUNTIME.spawn(async move {
+        engine::perform_action(deserialized_request);
+    });
 
-    run_action(deserialized_request);
-
-    // Currently we do not return any commands from the perform action call.
+    // Currently we do not return any commands from the perform action call, but
+    // maybe one day we will as an optimization.
     let empty_commands = PerformActionResponse { metadata, commands: CommandSequence::default() };
     let json = serde_json::to_string(&empty_commands)?;
     let json_bytes = json.as_bytes();
