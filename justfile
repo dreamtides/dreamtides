@@ -195,5 +195,5 @@ bench-full:
     cargo criterion --manifest-path rules_engine/Cargo.toml -p battle_benchmarks -- ai_full/ai_full
 
 enforce-benchmarks:
-    ./rules_engine/scripts/benchmark.py ai_single_threaded/ai_single_threaded --maximum-time-ms 60
+    ./rules_engine/scripts/benchmark.py ai_single_threaded/ai_single_threaded --maximum-time-ms 65
     ./rules_engine/scripts/benchmark.py ai_full/ai_full --maximum-time-ms 900

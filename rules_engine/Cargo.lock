@@ -1762,6 +1762,7 @@ dependencies = [
  "game_creation",
  "logging",
  "masonry",
+ "serde_json",
  "tokio",
  "tracing",
  "tracing-subscriber",

@@ -9,8 +9,14 @@ namespace Dreamtides.Services
 {
     public class LoggingService : Service
     {
-        private readonly Dictionary<string, List<LogEntry>> _activeSpans = new();
-        private readonly Dictionary<string, float> _lastLogTimes = new();
+        private class ActiveSpan
+        {
+            public LogSpanName Name { get; set; }
+            public List<LogEntry> Entries { get; set; } = new();
+            public float LastLogTime { get; set; }
+        }
+
+        private readonly Stack<ActiveSpan> _spanStack = new();
         private readonly List<LogEntry> _bufferedLogs = new();
         private float? _lastBufferedLogTime;
         private const float SPAN_TIMEOUT_SECONDS = 10f;
@@ -23,23 +29,20 @@ namespace Dreamtides.Services
         private void Update()
         {
             var currentTime = Time.time;
-            var spansToClose = new List<string>();
 
-            foreach (var kvp in _lastLogTimes)
+            if (_spanStack.Count > 0)
             {
-                var spanName = kvp.Key;
-                var lastLogTime = kvp.Value;
-
-                if (currentTime - lastLogTime > SPAN_TIMEOUT_SECONDS)
+                var oldestSpan = _spanStack.First();
+                if (currentTime - oldestSpan.LastLogTime > SPAN_TIMEOUT_SECONDS)
                 {
-                    spansToClose.Add(spanName);
+                    LogWarning($"Log span stack timed out, force closing all spans");
+                    while (_spanStack.Count > 0)
+                    {
+                        var span = _spanStack.Pop();
+                        LogWarning($"Force closing span '{span.Name}'");
+                    }
+                    FlushSpanStack();
                 }
-            }
-
-            foreach (var spanName in spansToClose)
-            {
-                LogWarning($"Log span '{spanName}' was not properly closed, auto-closing after timeout");
-                EndSpan(spanName);
             }
 
             if (_lastBufferedLogTime.HasValue &&
@@ -50,13 +53,14 @@ namespace Dreamtides.Services
             }
         }
 
-        public void StartSpan(string name)
+        public void StartSpan(LogSpanName name)
         {
-            if (!_activeSpans.ContainsKey(name))
+            var span = new ActiveSpan
             {
-                _activeSpans[name] = new List<LogEntry>();
-                _lastLogTimes[name] = Time.time;
-            }
+                Name = name,
+                LastLogTime = Time.time
+            };
+            _spanStack.Push(span);
         }
 
         public void Log(string message)
@@ -199,29 +203,105 @@ namespace Dreamtides.Services
             AddLogEntry(Schema.LogType.Warning, message, arguments);
         }
 
-        public void EndSpan(string name)
+        public void EndSpan(LogSpanName name)
         {
-            if (_activeSpans.TryGetValue(name, out var entries))
-            {
-                _activeSpans.Remove(name);
-                _lastLogTimes.Remove(name);
+            if (_spanStack.Count == 0) return;
 
-                var logEntry = new LogEntry
+            var spansToClose = new List<ActiveSpan>();
+            var found = false;
+
+            while (_spanStack.Count > 0)
+            {
+                var span = _spanStack.Pop();
+                spansToClose.Add(span);
+
+                if (span.Name == name)
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                LogError($"EndSpan called with '{name}' but span was not found in stack");
+                foreach (var span in spansToClose.AsEnumerable().Reverse())
+                {
+                    _spanStack.Push(span);
+                }
+                return;
+            }
+
+            var rootSpanEntry = BuildNestedSpanStructure(spansToClose);
+
+            if (_spanStack.Count > 0)
+            {
+                var parentSpan = _spanStack.Peek();
+                parentSpan.Entries.Add(rootSpanEntry);
+                parentSpan.LastLogTime = Time.time;
+            }
+            else
+            {
+                var request = new ClientLogRequest
+                {
+                    Entry = rootSpanEntry
+                };
+                Registry.ActionService.Log(request);
+            }
+        }
+
+        private LogEntry BuildNestedSpanStructure(List<ActiveSpan> spans)
+        {
+            if (spans.Count == 1)
+            {
+                return new LogEntry
                 {
                     EventSpan = new EventSpan
                     {
-                        Name = name,
-                        Entries = entries
+                        Name = spans[0].Name,
+                        Entries = spans[0].Entries
                     }
                 };
-
-                var request = new ClientLogRequest
-                {
-                    Entry = logEntry
-                };
-
-                Registry.ActionService.Log(request);
             }
+
+            var rootSpan = spans[spans.Count - 1];
+            var childSpans = spans.Take(spans.Count - 1).ToList();
+
+            var childSpanEntry = BuildNestedSpanStructure(childSpans);
+            rootSpan.Entries.Add(childSpanEntry);
+
+            return new LogEntry
+            {
+                EventSpan = new EventSpan
+                {
+                    Name = rootSpan.Name,
+                    Entries = rootSpan.Entries
+                }
+            };
+        }
+
+        private void FlushSpanStack()
+        {
+            if (_spanStack.Count == 0) return;
+
+            var rootSpan = _spanStack.First();
+            _spanStack.Clear();
+
+            var logEntry = new LogEntry
+            {
+                EventSpan = new EventSpan
+                {
+                    Name = rootSpan.Name,
+                    Entries = rootSpan.Entries
+                }
+            };
+
+            var request = new ClientLogRequest
+            {
+                Entry = logEntry
+            };
+
+            Registry.ActionService.Log(request);
         }
 
         private void FlushBufferedLogs()
@@ -232,7 +312,7 @@ namespace Dreamtides.Services
             {
                 EventSpan = new EventSpan
                 {
-                    Name = "BufferedLogs",
+                    Name = LogSpanName.Untagged,
                     Entries = new List<LogEntry>(_bufferedLogs)
                 }
             };
@@ -250,29 +330,39 @@ namespace Dreamtides.Services
 
         private void AddLogEntry(Schema.LogType logType, string message, Dictionary<string, string> arguments)
         {
+            var formattedMessage = FormatMessageWithArguments(message, arguments);
+
             var entry = new LogEntry
             {
                 Event = new Schema.Event
                 {
                     LogType = logType,
-                    Message = message,
-                    Arguments = arguments
+                    Message = formattedMessage
                 }
             };
 
-            if (_activeSpans.Count > 0)
+            if (_spanStack.Count > 0)
             {
-                foreach (var spanName in _activeSpans.Keys.ToList())
-                {
-                    _activeSpans[spanName].Add(entry);
-                    _lastLogTimes[spanName] = Time.time;
-                }
+                var currentSpan = _spanStack.Peek();
+                currentSpan.Entries.Add(entry);
+                currentSpan.LastLogTime = Time.time;
             }
             else
             {
                 _bufferedLogs.Add(entry);
                 _lastBufferedLogTime = Time.time;
             }
+        }
+
+        private static string FormatMessageWithArguments(string message, Dictionary<string, string> arguments)
+        {
+            if (arguments.Count == 0)
+            {
+                return message;
+            }
+
+            var formattedArguments = arguments.Select(kvp => $"{kvp.Key}: {kvp.Value}");
+            return $"{message} | {string.Join(" | ", formattedArguments)}";
         }
 
         private void OnUnityLogMessageReceived(string condition, string _stackTrace, UnityEngine.LogType type)

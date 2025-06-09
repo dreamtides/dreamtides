@@ -54,7 +54,7 @@ namespace Dreamtides.Schema
         public List<LogEntry> Entries { get; set; }
 
         [JsonProperty("name", Required = Required.Always)]
-        public string Name { get; set; }
+        public LogSpanName Name { get; set; }
     }
 
     public partial class LogEntry
@@ -68,9 +68,6 @@ namespace Dreamtides.Schema
 
     public partial class Event
     {
-        [JsonProperty("arguments", Required = Required.Always)]
-        public Dictionary<string, string> Arguments { get; set; }
-
         [JsonProperty("log_type", Required = Required.Always)]
         public LogType LogType { get; set; }
 
@@ -1868,6 +1865,8 @@ namespace Dreamtides.Schema
         public Metadata Metadata { get; set; }
     }
 
+    public enum LogSpanName { ApplyCommandGroup, ApplyCommands, Connect, PerformAction, Poll, Untagged, UpdateBattleLayout };
+
     public enum LogType { Debug, Error, Info, Warning };
 
     /// <summary>
@@ -2134,6 +2133,7 @@ namespace Dreamtides.Schema
             Converters =
             {
                 LogTypeConverter.Singleton,
+                LogSpanNameConverter.Singleton,
                 DisplayPlayerConverter.Singleton,
                 GameMessageTypeConverter.Singleton,
                 CardFacingConverter.Singleton,
@@ -2234,6 +2234,72 @@ namespace Dreamtides.Schema
         }
 
         public static readonly LogTypeConverter Singleton = new LogTypeConverter();
+    }
+
+    internal class LogSpanNameConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(LogSpanName) || t == typeof(LogSpanName?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "applyCommandGroup":
+                    return LogSpanName.ApplyCommandGroup;
+                case "applyCommands":
+                    return LogSpanName.ApplyCommands;
+                case "connect":
+                    return LogSpanName.Connect;
+                case "performAction":
+                    return LogSpanName.PerformAction;
+                case "poll":
+                    return LogSpanName.Poll;
+                case "untagged":
+                    return LogSpanName.Untagged;
+                case "updateBattleLayout":
+                    return LogSpanName.UpdateBattleLayout;
+            }
+            throw new Exception("Cannot unmarshal type LogSpanName");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (LogSpanName)untypedValue;
+            switch (value)
+            {
+                case LogSpanName.ApplyCommandGroup:
+                    serializer.Serialize(writer, "applyCommandGroup");
+                    return;
+                case LogSpanName.ApplyCommands:
+                    serializer.Serialize(writer, "applyCommands");
+                    return;
+                case LogSpanName.Connect:
+                    serializer.Serialize(writer, "connect");
+                    return;
+                case LogSpanName.PerformAction:
+                    serializer.Serialize(writer, "performAction");
+                    return;
+                case LogSpanName.Poll:
+                    serializer.Serialize(writer, "poll");
+                    return;
+                case LogSpanName.Untagged:
+                    serializer.Serialize(writer, "untagged");
+                    return;
+                case LogSpanName.UpdateBattleLayout:
+                    serializer.Serialize(writer, "updateBattleLayout");
+                    return;
+            }
+            throw new Exception("Cannot marshal type LogSpanName");
+        }
+
+        public static readonly LogSpanNameConverter Singleton = new LogSpanNameConverter();
     }
 
     internal class DisplayPlayerConverter : JsonConverter

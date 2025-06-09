@@ -1,5 +1,3 @@
-use std::collections::BTreeMap;
-
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -12,8 +10,8 @@ pub struct ClientLogRequest {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum LogEntry {
-    Event { log_type: LogType, message: String, arguments: BTreeMap<String, String> },
-    EventSpan { name: String, entries: Vec<LogEntry> },
+    Event { log_type: LogType, message: String },
+    EventSpan { name: LogSpanName, entries: Vec<LogEntry> },
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -23,6 +21,18 @@ pub enum LogType {
     Error,
     Info,
     Debug,
+}
+
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum LogSpanName {
+    Untagged,
+    Connect,
+    PerformAction,
+    Poll,
+    ApplyCommands,
+    ApplyCommandGroup,
+    UpdateBattleLayout,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
