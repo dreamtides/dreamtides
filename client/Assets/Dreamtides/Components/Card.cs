@@ -514,6 +514,7 @@ namespace Dreamtides.Components
         _cardBack.gameObject.SetActive(true);
         _cardFront.gameObject.SetActive(false);
         _battlefieldCardFront.gameObject.SetActive(false);
+        _cardFrame.gameObject.SetActive(false);
       }
       else if (_isDissolved)
       {
@@ -534,6 +535,7 @@ namespace Dreamtides.Components
             GameContext != GameContext.DiscardPile && CardView.Revealed?.Spark != null);
         _cardCollider.center = Vector3.zero;
         _cardCollider.size = new Vector3(2.5f, 3f, 0.1f);
+        _cardFrame.gameObject.SetActive(false);
       }
       else
       {
@@ -543,6 +545,7 @@ namespace Dreamtides.Components
         _sparkBackground.gameObject.SetActive(CardView.Revealed?.Spark != null);
         _cardCollider.center = new Vector3(0, -0.5f, 0);
         _cardCollider.size = new Vector3(2.5f, 4f, 0.1f);
+        _cardFrame.gameObject.SetActive(true);
       }
     }
 
