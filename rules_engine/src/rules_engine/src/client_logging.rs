@@ -34,7 +34,7 @@ fn log_entry(entry: &LogEntry) {
                     tracing::span!(tracing::Level::DEBUG, "connect")
                 }
                 LogSpanName::PerformAction => {
-                    tracing::span!(tracing::Level::DEBUG, "perform_action")
+                    tracing::span!(tracing::Level::DEBUG, "perform_client_action")
                 }
                 LogSpanName::Poll => {
                     tracing::span!(tracing::Level::DEBUG, "poll")

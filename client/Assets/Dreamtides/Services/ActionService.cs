@@ -135,7 +135,7 @@ namespace Dreamtides.Services
 
       Registry.LoggingService.StartSpan(LogSpanName.PerformAction);
       Registry.LoggingService.Log("ActionService", "Performing action",
-        ("actionType", action.ToString() ?? "null"));
+        ("actionType", GameActionHelper.GetActionName(action.Value)));
       _lastPerformActionTime = Time.time;
 
       var request = new PerformActionRequest

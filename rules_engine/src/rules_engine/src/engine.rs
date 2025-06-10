@@ -20,7 +20,7 @@ use display_data::command::CommandSequence;
 use display_data::request_data::{ConnectRequest, ConnectResponse, PerformActionRequest};
 use game_creation::new_battle;
 use tokio::task;
-use tracing::{debug, error, info};
+use tracing::{debug, error, info, Level};
 use tracing_macros::{battle_trace, write_tracing_event};
 use uuid::Uuid;
 
@@ -241,6 +241,8 @@ fn save_battle_to_database(
 }
 
 fn perform_action_internal(request: &PerformActionRequest) {
+    let span = tracing::span!(Level::DEBUG, "perform_action");
+    let _enter = span.enter();
     let metadata = request.metadata;
     let user_id = metadata.user_id;
     let result = catch_panic(|| {
