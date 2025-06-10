@@ -14,7 +14,7 @@ use core_data::types::PlayerName;
 use display::rendering::renderer;
 use display_data::command::CommandSequence;
 use tracing::instrument;
-use tracing_macros::battle_trace;
+use tracing_macros::{battle_trace, write_tracing_event};
 
 static PENDING_UPDATES: LazyLock<Mutex<HashMap<UserId, Vec<CommandSequence>>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
@@ -31,6 +31,7 @@ pub fn poll(user_id: UserId) -> Option<CommandSequence> {
 
 /// Appends an update to the pending updates for a user.
 pub fn append_update(user_id: UserId, update: CommandSequence) {
+    write_tracing_event::write_commands(&update, &context);
     let mut updates = PENDING_UPDATES.lock().unwrap();
     updates.entry(user_id).or_default().push(update);
 }

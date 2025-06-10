@@ -154,7 +154,7 @@ namespace Dreamtides.Services
         var startTime = Time.time;
         var response = Plugin.PerformAction(request);
         var elapsedTime = Time.time - startTime;
-        Registry.LoggingService.Log("ActionService", "PerformAction response received",
+        Registry.LoggingService.Log("ActionService", "PerformAction completed",
           ("elapsedTime", $"{elapsedTime:F2}s"));
         StartCoroutine(ApplyCommands(response.Commands, animate: true, onComplete: () =>
         {
@@ -180,13 +180,9 @@ namespace Dreamtides.Services
 
     private IEnumerator DevServerConnectAsync(ConnectRequest request, bool reconnect)
     {
-      if (reconnect)
+      if (!reconnect)
       {
-        Debug.Log("Reconnecting...");
-      }
-      else
-      {
-        Debug.Log("Connecting...");
+        Registry.LoggingService.Log("ActionService", "Connecting...");
       }
 
       yield return SendDevServerRequest<ConnectRequest, ConnectResponse>(
@@ -211,7 +207,7 @@ namespace Dreamtides.Services
           {
             Registry.LoggingService.StartSpan(LogSpanName.Poll);
             var elapsedTime = Time.time - _lastPerformActionTime ?? 0;
-            Registry.LoggingService.Log("ActionService", "Dev server poll response received",
+            Registry.LoggingService.Log("ActionService", "Poll response received",
               ("elapsedTime", $"{elapsedTime:F2}s"));
 
             return ApplyCommands(response.Commands, animate: true, onComplete: () =>
@@ -235,7 +231,7 @@ namespace Dreamtides.Services
         UnityWebRequest.kHttpVerbPOST,
         response =>
         {
-          Registry.LoggingService.Log("ActionService", "Dev server PerformAction response received");
+          Registry.LoggingService.Log("ActionService", "PerformAction completed");
           return ApplyCommands(response.Commands, animate: true, () =>
           {
             Registry.LoggingService.EndSpan(LogSpanName.PerformAction);
@@ -313,7 +309,7 @@ namespace Dreamtides.Services
       {
         var commandNames = GetCommandNames(commands);
         Registry.LoggingService.Log("ActionService", "Applying commands",
-          ("commandCount", count.ToString()), ("commandNames", commandNames));
+          ("commandNames", commandNames));
       }
 
       foreach (var group in commands.Groups)

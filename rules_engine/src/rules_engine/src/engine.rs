@@ -20,7 +20,7 @@ use display_data::command::CommandSequence;
 use display_data::request_data::{ConnectRequest, ConnectResponse, PerformActionRequest};
 use game_creation::new_battle;
 use tokio::task;
-use tracing::{error, info};
+use tracing::{debug, error, info};
 use tracing_macros::{battle_trace, write_tracing_event};
 use uuid::Uuid;
 
@@ -63,7 +63,7 @@ pub fn poll(user_id: UserId) -> Option<CommandSequence> {
             }
         });
 
-        write_tracing_event::write_commands(elapsed_msg, &commands, &context);
+        debug!(?elapsed_time, "Returning poll response");
         return Some(commands);
     }
     None

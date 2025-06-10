@@ -37,7 +37,7 @@ fn apply_standard_effect(
     effect: &StandardEffect,
     targets: Option<&StackCardTargets>,
 ) {
-    battle_trace!("Applying effect", battle, source, effect, targets);
+    battle_trace!("Applying effect", battle, effect, targets);
     match effect {
         StandardEffect::DrawCardsForEach { count, for_each } => {
             draw_cards_for_each(battle, source, *count, for_each)

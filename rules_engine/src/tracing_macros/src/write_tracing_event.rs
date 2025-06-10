@@ -105,11 +105,7 @@ pub fn write_animations(battle: &BattleState, animations: &AnimationData) {
     }
 }
 
-pub fn write_commands(
-    elapsed_time: String,
-    sequence: &CommandSequence,
-    request_context: &RequestContext,
-) {
+pub fn write_commands(sequence: &CommandSequence, request_context: &RequestContext) {
     let command_names: Vec<String> = sequence
         .groups
         .iter()
@@ -117,11 +113,11 @@ pub fn write_commands(
         .map(|command| format!("{:?}", command.discriminant()))
         .collect();
     let names = format!("[{}]", command_names.join(", "));
-    debug!(?names, ?elapsed_time, "Writing commands");
+    debug!(?names, "Writing commands");
 
     let timestamp = format_current_time();
     let event = CommandTraceEvent {
-        m: format!("Writing commands: {}, elapsed: {}", names, elapsed_time),
+        m: format!("Writing commands: {}", names),
         snapshot: None,
         sequence: sequence.clone(),
         timestamp,

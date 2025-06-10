@@ -24,6 +24,9 @@ fn log_entry(entry: &LogEntry) {
         },
         LogEntry::EventSpan { name, entries } => {
             let span = match name {
+                _ if entries.is_empty() => {
+                    return;
+                }
                 LogSpanName::Untagged => {
                     tracing::span!(tracing::Level::DEBUG, "client_span")
                 }

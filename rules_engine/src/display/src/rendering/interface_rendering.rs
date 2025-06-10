@@ -91,7 +91,6 @@ fn render_prompt_message(
         None => get_generic_prompt_message(&prompt.prompt_type),
     };
 
-    println!("prompt message: {}", message);
     Some(
         InterfaceMessage::builder()
             .text(message)

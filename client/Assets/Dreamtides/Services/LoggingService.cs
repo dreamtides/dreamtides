@@ -70,8 +70,7 @@ namespace Dreamtides.Services
 
         public void Log(string className, string message)
         {
-            var arguments = new Dictionary<string, string> { ["source"] = className };
-            AddLogEntry(Schema.LogType.Debug, message, arguments);
+            AddLogEntry(Schema.LogType.Debug, message, new Dictionary<string, string>(), className);
         }
 
         public void Log(string message, Dictionary<string, string> arguments)
@@ -81,8 +80,7 @@ namespace Dreamtides.Services
 
         public void Log(string className, string message, Dictionary<string, string> arguments)
         {
-            var combinedArguments = new Dictionary<string, string>(arguments) { ["source"] = className };
-            AddLogEntry(Schema.LogType.Debug, message, combinedArguments);
+            AddLogEntry(Schema.LogType.Debug, message, arguments, className);
         }
 
         public void Log(string message, params (string key, string value)[] keyValuePairs)
@@ -94,8 +92,7 @@ namespace Dreamtides.Services
         public void Log(string className, string message, params (string key, string value)[] keyValuePairs)
         {
             var arguments = keyValuePairs.ToDictionary(kvp => kvp.key, kvp => kvp.value);
-            arguments["source"] = className;
-            AddLogEntry(Schema.LogType.Debug, message, arguments);
+            AddLogEntry(Schema.LogType.Debug, message, arguments, className);
         }
 
         public void LogInfo(string message)
@@ -105,8 +102,7 @@ namespace Dreamtides.Services
 
         public void LogInfo(string className, string message)
         {
-            var arguments = new Dictionary<string, string> { ["source"] = className };
-            AddLogEntry(Schema.LogType.Info, message, arguments);
+            AddLogEntry(Schema.LogType.Info, message, new Dictionary<string, string>(), className);
         }
 
         public void LogInfo(string message, Dictionary<string, string> arguments)
@@ -116,8 +112,7 @@ namespace Dreamtides.Services
 
         public void LogInfo(string className, string message, Dictionary<string, string> arguments)
         {
-            var combinedArguments = new Dictionary<string, string>(arguments) { ["source"] = className };
-            AddLogEntry(Schema.LogType.Info, message, combinedArguments);
+            AddLogEntry(Schema.LogType.Info, message, arguments, className);
         }
 
         public void LogInfo(string message, params (string key, string value)[] keyValuePairs)
@@ -129,8 +124,7 @@ namespace Dreamtides.Services
         public void LogInfo(string className, string message, params (string key, string value)[] keyValuePairs)
         {
             var arguments = keyValuePairs.ToDictionary(kvp => kvp.key, kvp => kvp.value);
-            arguments["source"] = className;
-            AddLogEntry(Schema.LogType.Info, message, arguments);
+            AddLogEntry(Schema.LogType.Info, message, arguments, className);
         }
 
         public void LogError(string message)
@@ -140,8 +134,7 @@ namespace Dreamtides.Services
 
         public void LogError(string className, string message)
         {
-            var arguments = new Dictionary<string, string> { ["source"] = className };
-            AddLogEntry(Schema.LogType.Error, message, arguments);
+            AddLogEntry(Schema.LogType.Error, message, new Dictionary<string, string>(), className);
         }
 
         public void LogError(string message, Dictionary<string, string> arguments)
@@ -151,8 +144,7 @@ namespace Dreamtides.Services
 
         public void LogError(string className, string message, Dictionary<string, string> arguments)
         {
-            var combinedArguments = new Dictionary<string, string>(arguments) { ["source"] = className };
-            AddLogEntry(Schema.LogType.Error, message, combinedArguments);
+            AddLogEntry(Schema.LogType.Error, message, arguments, className);
         }
 
         public void LogError(string message, params (string key, string value)[] keyValuePairs)
@@ -164,8 +156,7 @@ namespace Dreamtides.Services
         public void LogError(string className, string message, params (string key, string value)[] keyValuePairs)
         {
             var arguments = keyValuePairs.ToDictionary(kvp => kvp.key, kvp => kvp.value);
-            arguments["source"] = className;
-            AddLogEntry(Schema.LogType.Error, message, arguments);
+            AddLogEntry(Schema.LogType.Error, message, arguments, className);
         }
 
         public void LogWarning(string message)
@@ -175,8 +166,7 @@ namespace Dreamtides.Services
 
         public void LogWarning(string className, string message)
         {
-            var arguments = new Dictionary<string, string> { ["source"] = className };
-            AddLogEntry(Schema.LogType.Warning, message, arguments);
+            AddLogEntry(Schema.LogType.Warning, message, new Dictionary<string, string>(), className);
         }
 
         public void LogWarning(string message, Dictionary<string, string> arguments)
@@ -186,8 +176,7 @@ namespace Dreamtides.Services
 
         public void LogWarning(string className, string message, Dictionary<string, string> arguments)
         {
-            var combinedArguments = new Dictionary<string, string>(arguments) { ["source"] = className };
-            AddLogEntry(Schema.LogType.Warning, message, combinedArguments);
+            AddLogEntry(Schema.LogType.Warning, message, arguments, className);
         }
 
         public void LogWarning(string message, params (string key, string value)[] keyValuePairs)
@@ -199,8 +188,7 @@ namespace Dreamtides.Services
         public void LogWarning(string className, string message, params (string key, string value)[] keyValuePairs)
         {
             var arguments = keyValuePairs.ToDictionary(kvp => kvp.key, kvp => kvp.value);
-            arguments["source"] = className;
-            AddLogEntry(Schema.LogType.Warning, message, arguments);
+            AddLogEntry(Schema.LogType.Warning, message, arguments, className);
         }
 
         public void EndSpan(LogSpanName name)
@@ -328,9 +316,9 @@ namespace Dreamtides.Services
             _lastBufferedLogTime = null;
         }
 
-        private void AddLogEntry(Schema.LogType logType, string message, Dictionary<string, string> arguments)
+        private void AddLogEntry(Schema.LogType logType, string message, Dictionary<string, string> arguments, string? source = null)
         {
-            var formattedMessage = FormatMessageWithArguments(message, arguments);
+            var formattedMessage = FormatMessageWithArguments(message, arguments, source);
 
             var entry = new LogEntry
             {
@@ -354,15 +342,17 @@ namespace Dreamtides.Services
             }
         }
 
-        private static string FormatMessageWithArguments(string message, Dictionary<string, string> arguments)
+        private static string FormatMessageWithArguments(string message, Dictionary<string, string> arguments, string? source = null)
         {
+            var baseMessage = source != null ? $"[{source}]: {message}" : message;
+
             if (arguments.Count == 0)
             {
-                return message;
+                return baseMessage;
             }
 
             var formattedArguments = arguments.Select(kvp => $"{kvp.Key}: {kvp.Value}");
-            return $"{message} | {string.Join(" | ", formattedArguments)}";
+            return $"{baseMessage} | {string.Join(" | ", formattedArguments)}";
         }
 
         private void OnUnityLogMessageReceived(string condition, string _stackTrace, UnityEngine.LogType type)

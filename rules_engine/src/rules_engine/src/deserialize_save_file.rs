@@ -5,7 +5,7 @@ use core_data::identifiers::QuestId;
 use core_data::types::PlayerName;
 use database::save_file::SaveFile;
 use game_creation::new_battle;
-use tracing::{info, subscriber};
+use tracing::{debug, subscriber};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::EnvFilter;
 
@@ -37,7 +37,7 @@ fn get_battle_impl(
 ) -> Option<(BattleState, QuestId)> {
     match file {
         SaveFile::V1(v1) => {
-            info!("Replaying battle history to construct state");
+            debug!("Replaying battle history to construct state");
             let filter = EnvFilter::new("warn");
             let forest_subscriber =
                 tracing_subscriber::registry().with(logging::create_forest_layer(filter));

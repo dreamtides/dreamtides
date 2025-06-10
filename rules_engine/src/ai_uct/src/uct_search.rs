@@ -13,7 +13,7 @@ use petgraph::prelude::NodeIndex;
 use petgraph::visit::EdgeRef;
 use petgraph::Direction;
 use rayon::prelude::*;
-use tracing::info;
+use tracing::debug;
 use tracing_macros::panic_with;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::EnvFilter;
@@ -107,7 +107,7 @@ pub fn search(
     let total_iterations = config.max_iterations_per_action * legal.len() as u32;
     let num_threads = rayon::current_num_threads();
 
-    info!(?total_iterations, ?action, ?num_threads, "Picked AI action");
+    debug!(?total_iterations, ?action, ?num_threads, "Picked AI action");
     if initial_battle.request_context.logging_options.log_ai_search_diagram {
         log_search_results::log_results_diagram(
             &best_result.graph,

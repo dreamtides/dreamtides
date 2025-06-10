@@ -10,7 +10,7 @@ use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use core_data::types::PlayerName;
 use rand::seq::IndexedRandom;
-use tracing::info;
+use tracing::debug;
 use tracing_macros::panic_with;
 
 /// Selects an action for the given player using the given AI agent.
@@ -23,13 +23,13 @@ pub fn select_action(battle: &BattleState, player: PlayerName, game_ai: &GameAI)
     }
 
     if legal_actions.len() == 1 {
-        info!("Automatically selecting action {:?}", legal_actions.all()[0]);
+        debug!("Automatically selecting action {:?}", legal_actions.all()[0]);
         return legal_actions.all()[0];
     }
 
     let start_time = Instant::now();
     let action = select_action_unchecked(battle, player, game_ai);
-    info!(
+    debug!(
         "Agent selected action {:?} in {:.3} seconds",
         action,
         start_time.elapsed().as_secs_f64()

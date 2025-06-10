@@ -7,7 +7,7 @@ use std::sync::OnceLock;
 use core_data::identifiers::UserId;
 use rusqlite::{Connection, Error, OptionalExtension};
 use serde_json::{self, ser};
-use tracing::info;
+use tracing::debug;
 
 use crate::save_file::SaveFile;
 
@@ -98,7 +98,7 @@ pub struct Database {
 impl Database {
     pub fn new(directory: PathBuf) -> Result<Self, DatabaseError> {
         let path = directory.join("saves.sqlite");
-        info!(?path, "Opening new database connection");
+        debug!(?path, "Opening new database connection");
         let connection =
             Connection::open(path).map_err(|e| to_database_error(e, "opening connection"))?;
 
@@ -121,7 +121,7 @@ impl Database {
 
     /// Fetches a save file from the database by user ID.
     pub fn fetch_save(&self, user_id: UserId) -> Result<Option<SaveFile>, DatabaseError> {
-        info!(?user_id, "Fetching save file");
+        debug!(?user_id, "Fetching save file");
         let data: Option<Vec<u8>> = self
             .connection
             .query_row("SELECT data FROM saves WHERE id = ?1", [&user_id.0], |row| row.get(0))
@@ -145,7 +145,7 @@ impl Database {
     /// Writes a save file to the database.
     pub fn write_save(&self, save: SaveFile) -> Result<(), DatabaseError> {
         let save_id = save.id();
-        info!(?save_id, "Writing save file to database");
+        debug!(?save_id, "Writing save file to database");
         let data = ser::to_vec(&save).map_err(|e| {
             DatabaseError(format!("Error serializing save file {:?}: {:?}", save_id, e))
         })?;
