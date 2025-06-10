@@ -19,11 +19,11 @@ use crate::rendering::animations;
 /// Apply visual & sound effects for a specific card's ability.
 pub fn apply_effect(
     builder: &mut ResponseBuilder,
-    source: EffectSource,
+    effect_source: EffectSource,
     animation: &BattleAnimation,
     battle: &BattleState,
 ) -> Option<()> {
-    let source_id = source.card_id()?;
+    let source_id = effect_source.card_id()?;
     let controller = card_properties::controller(battle, source_id);
     let effect_name = animation.discriminant().to_string();
     let target_id = find_target_id(animation);

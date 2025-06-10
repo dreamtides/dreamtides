@@ -19,6 +19,8 @@ pub fn render(
     snapshot: &BattleState,
     final_state: &BattleState,
 ) {
+    apply_card_fx::apply_effect(builder, source, animation, snapshot);
+
     match animation {
         BattleAnimation::StartTurn { player } => {
             push_snapshot(builder, snapshot);
@@ -118,8 +120,6 @@ pub fn render(
 
         _ => {}
     }
-
-    apply_card_fx::apply_effect(builder, source, animation, snapshot);
 }
 
 /// Appends a command to update the battle view to the current state.
