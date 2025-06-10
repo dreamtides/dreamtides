@@ -92,7 +92,7 @@ namespace Dreamtides.Services
         yield return sequence.WaitForCompletion();
       }
 
-      Registry.LoggingService.EndSpan(LogSpanName.UpdateBattleLayout);
+      Registry.LoggingService.Log("LayoutService", "UpdateLayout complete");
     }
 
     public Card GetCard(long id) =>

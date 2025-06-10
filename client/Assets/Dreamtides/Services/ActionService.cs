@@ -349,7 +349,6 @@ namespace Dreamtides.Services
       {
         if (command.UpdateBattle != null)
         {
-          Registry.LoggingService.StartSpan(LogSpanName.UpdateBattleLayout);
           Registry.LoggingService.Log("ActionService", "Applying command: UpdateBattle");
           Registry.Layout.UserStatusDisplay.UpdatePlayerView(command.UpdateBattle.Battle.User, animate);
           Registry.Layout.EnemyStatusDisplay.UpdatePlayerView(command.UpdateBattle.Battle.Enemy, animate);

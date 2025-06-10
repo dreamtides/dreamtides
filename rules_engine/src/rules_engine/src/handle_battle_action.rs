@@ -7,7 +7,7 @@ use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::animation_data::AnimationData;
-use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle_player::battle_player_state::PlayerType;
 use core_data::identifiers::UserId;
 use core_data::types::PlayerName;
@@ -29,9 +29,8 @@ pub fn poll(user_id: UserId) -> Option<CommandSequence> {
     None
 }
 
-/// Appends an update to the pending updates for a user.
-pub fn append_update(user_id: UserId, update: CommandSequence) {
-    write_tracing_event::write_commands(&update, &context);
+pub fn append_update(user_id: UserId, update: CommandSequence, context: &RequestContext) {
+    write_tracing_event::write_commands(&update, context);
     let mut updates = PENDING_UPDATES.lock().unwrap();
     updates.entry(user_id).or_default().push(update);
 }
@@ -42,6 +41,7 @@ pub fn execute(
     initiated_by: UserId,
     player: PlayerName,
     action: BattleAction,
+    context: &RequestContext,
 ) {
     let mut current_player = player;
     let mut current_action = action;
@@ -52,7 +52,7 @@ pub fn execute(
 
         let Some(next_player) = legal_actions::next_to_act(battle) else {
             battle_trace!("Rendering updates for game over", battle);
-            render_updates(battle, initiated_by);
+            render_updates(battle, initiated_by, context);
             return;
         };
 
@@ -66,7 +66,7 @@ pub fn execute(
 
         if let PlayerType::Agent(agent) = battle.players.player(next_player).player_type.clone() {
             battle_trace!("Rendering updates for AI player turn", battle);
-            render_updates(battle, initiated_by);
+            render_updates(battle, initiated_by, context);
             battle.animations = Some(AnimationData::default());
 
             battle_trace!("Selecting action for AI player", battle);
@@ -74,7 +74,7 @@ pub fn execute(
             current_player = next_player;
         } else {
             battle_trace!("Rendering updates for human player turn", battle);
-            render_updates(battle, initiated_by);
+            render_updates(battle, initiated_by, context);
             battle.animations = Some(AnimationData::default());
             return;
         }
@@ -108,16 +108,15 @@ pub fn should_auto_execute_action(legal_actions: &LegalActions) -> Option<Battle
     }
 }
 
-fn render_updates(battle: &BattleState, user_id: UserId) {
+fn render_updates(battle: &BattleState, user_id: UserId, context: &RequestContext) {
     let player_name = renderer::player_name_for_user(battle, user_id);
     let player_updates = renderer::render_updates(battle, user_id);
-    let mut updates = PENDING_UPDATES.lock().unwrap();
-    updates.entry(user_id).or_default().push(player_updates);
+    append_update(user_id, player_updates, context);
 
     if let PlayerType::User(opponent_id) =
         &battle.players.player(player_name.opponent()).player_type
     {
         let opponent_updates = renderer::render_updates(battle, *opponent_id);
-        updates.entry(*opponent_id).or_default().push(opponent_updates);
+        append_update(*opponent_id, opponent_updates, context);
     }
 }

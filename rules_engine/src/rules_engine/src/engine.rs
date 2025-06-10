@@ -52,9 +52,6 @@ pub fn connect(request: &ConnectRequest, request_context: RequestContext) -> Con
 
 pub fn poll(user_id: UserId) -> Option<CommandSequence> {
     if let Some(commands) = handle_battle_action::poll(user_id) {
-        let context = get_request_context(user_id)
-            .unwrap_or(RequestContext { logging_options: Default::default() });
-
         let elapsed_msg = LAST_PERFORM_ACTION_TIME.with(|time| {
             if let Some(start_time) = *time.borrow() {
                 format!(" {:.2}s", start_time.elapsed().as_secs_f64())
@@ -63,7 +60,7 @@ pub fn poll(user_id: UserId) -> Option<CommandSequence> {
             }
         });
 
-        debug!(?elapsed_time, "Returning poll response");
+        debug!(?elapsed_msg, "Returning poll response");
         return Some(commands);
     }
     None
@@ -294,6 +291,9 @@ fn handle_request_action(
     save: SaveFile,
     battle: &mut BattleState,
 ) {
+    let request_context = get_request_context(user_id)
+        .unwrap_or(RequestContext { logging_options: Default::default() });
+
     match request.action {
         GameAction::NoOp => {}
         GameAction::DebugAction(action) => {
@@ -302,24 +302,24 @@ fn handle_request_action(
             handle_battle_action::append_update(
                 user_id,
                 renderer::connect(&*battle, user_id, true),
+                &request_context,
             );
         }
         GameAction::BattleAction(action) => {
             let player = renderer::player_name_for_user(&*battle, user_id);
-            handle_battle_action::execute(battle, user_id, player, action);
+            handle_battle_action::execute(battle, user_id, player, action, &request_context);
         }
         GameAction::BattleDisplayAction(action) => {
             apply_battle_display_action::execute(action);
             handle_battle_action::append_update(
                 user_id,
                 renderer::connect(&*battle, user_id, true),
+                &request_context,
             );
         }
         GameAction::Undo(player) => {
-            let request_context = get_request_context(user_id)
-                .unwrap_or(RequestContext { logging_options: Default::default() });
             let Some((undone_battle, _)) =
-                deserialize_save_file::undo(&save, player, request_context)
+                deserialize_save_file::undo(&save, player, request_context.clone())
             else {
                 show_error_message(
                     user_id,
@@ -333,15 +333,19 @@ fn handle_request_action(
             handle_battle_action::append_update(
                 user_id,
                 renderer::connect(&*battle, user_id, true),
+                &request_context,
             );
         }
     };
 }
 
 pub fn show_error_message(user_id: UserId, battle: Option<&BattleState>, error_message: String) {
+    let request_context = get_request_context(user_id)
+        .unwrap_or(RequestContext { logging_options: Default::default() });
     handle_battle_action::append_update(
         user_id,
         error_message::display_error_message(battle, error_message),
+        &request_context,
     )
 }
 

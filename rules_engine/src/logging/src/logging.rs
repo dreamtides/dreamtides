@@ -94,7 +94,9 @@ fn tag_parser(event: &Event) -> Option<Tag> {
         _ => '💡',
     };
 
-    Some(Tag::builder().level(level).icon(icon).prefix(target).suffix("rs").build())
+    let (prefix, suffix) =
+        if target.contains("client_logging") { ("", "") } else { (target, "rs") };
+    Some(Tag::builder().level(level).icon(icon).prefix(prefix).suffix(suffix).build())
 }
 
 /// A `MakeWriter` implementation that creates writers for both stdout and a
