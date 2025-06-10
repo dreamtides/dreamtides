@@ -62,8 +62,6 @@ namespace Dreamtides.Components
     float _hoverStartTime;
     bool _hoveringForInfoZoom;
     bool _longHoverFired;
-    Vector3 _positionBeforeHover;
-    Tween? _hoverMoveTween;
 
     public CardView CardView => Errors.CheckNotNull(_cardView);
 

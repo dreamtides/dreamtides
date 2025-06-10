@@ -55,6 +55,7 @@ namespace Dreamtides.Services
       var sequence = TweenUtils.Sequence("DrawUserCard");
       var moveDuration = 0.3f;
       card.Render(Registry, cardView, sequence);
+      card.GameContext = GameContext.DrawnCards;
       sequence.Insert(
         0,
         card.transform.DOMove(
