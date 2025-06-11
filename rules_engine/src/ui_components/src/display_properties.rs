@@ -22,12 +22,23 @@ impl Default for DisplayProperties {
 static USER_DISPLAY_PROPERTIES: LazyLock<Mutex<HashMap<UserId, DisplayProperties>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
+static MOST_RECENT_DISPLAY_PROPERTIES: LazyLock<Mutex<Option<DisplayProperties>>> =
+    LazyLock::new(|| Mutex::new(None));
+
 pub fn store_display_properties(user_id: UserId, properties: DisplayProperties) {
     let mut display_props = USER_DISPLAY_PROPERTIES.lock().unwrap();
-    display_props.insert(user_id, properties);
+    display_props.insert(user_id, properties.clone());
+
+    let mut recent_props = MOST_RECENT_DISPLAY_PROPERTIES.lock().unwrap();
+    *recent_props = Some(properties);
 }
 
-pub fn get_display_properties(user_id: UserId) -> DisplayProperties {
+pub fn get_display_properties() -> DisplayProperties {
+    let recent_props = MOST_RECENT_DISPLAY_PROPERTIES.lock().unwrap();
+    recent_props.clone().unwrap_or_default()
+}
+
+pub fn get_display_properties_for_user(user_id: UserId) -> DisplayProperties {
     let display_props = USER_DISPLAY_PROPERTIES.lock().unwrap();
     display_props.get(&user_id).cloned().unwrap_or_default()
 }
