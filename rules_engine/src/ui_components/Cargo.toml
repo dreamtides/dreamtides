@@ -15,3 +15,5 @@ core_data = { path = "../core_data" }
 masonry = { path = "../masonry" }
 
 bon = "3"
+schemars = "0.8"
+serde = { version = "1", features = ["derive"] }

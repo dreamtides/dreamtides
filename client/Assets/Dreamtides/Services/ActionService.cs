@@ -54,7 +54,8 @@ namespace Dreamtides.Services
         Metadata = _metadata,
         PersistentDataPath = Application.persistentDataPath,
         VsOpponent = IsTestOpponentClient ? _userGuid : null,
-        TestScenario = _testScenario
+        TestScenario = _testScenario,
+        DisplayProperties = GetDisplayProperties()
       };
       Registry.LoggingService.StartSpan(LogSpanName.Connect);
 
@@ -84,6 +85,7 @@ namespace Dreamtides.Services
             Metadata = _metadata!,
             PersistentDataPath = Application.persistentDataPath,
             VsOpponent = IsTestOpponentClient ? _userGuid : null,
+            DisplayProperties = GetDisplayProperties()
           }, reconnect: true));
           _lastConnectAttemptTime = now;
         }
@@ -194,6 +196,13 @@ namespace Dreamtides.Services
           Registry.LoggingService.EndSpan(LogSpanName.Connect);
         }));
     }
+
+    private DisplayProperties GetDisplayProperties() => new()
+    {
+      IsMobileDevice = UnityEngine.Device.Application.isMobilePlatform,
+      ScreenHeight = Screen.height,
+      ScreenWidth = Screen.width
+    };
 
     private IEnumerator DevServerPollAsync(PollRequest request)
     {

@@ -83,6 +83,12 @@ namespace Dreamtides.Schema
 
     public partial class ConnectRequest
     {
+        /// <summary>
+        /// Display properties from the client (screen dimensions, mobile device flag, etc.)
+        /// </summary>
+        [JsonProperty("displayProperties")]
+        public DisplayProperties DisplayProperties { get; set; }
+
         [JsonProperty("metadata", Required = Required.Always)]
         public Metadata Metadata { get; set; }
 
@@ -106,6 +112,18 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("vsOpponent")]
         public Guid? VsOpponent { get; set; }
+    }
+
+    public partial class DisplayProperties
+    {
+        [JsonProperty("isMobileDevice", Required = Required.Always)]
+        public bool IsMobileDevice { get; set; }
+
+        [JsonProperty("screenHeight", Required = Required.Always)]
+        public long ScreenHeight { get; set; }
+
+        [JsonProperty("screenWidth", Required = Required.Always)]
+        public long ScreenWidth { get; set; }
     }
 
     public partial class Metadata

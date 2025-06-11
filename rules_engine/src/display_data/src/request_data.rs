@@ -2,6 +2,7 @@ use action_data::game_action_data::GameAction;
 use core_data::identifiers::{BattleId, UserId};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use ui_components::display_properties::DisplayProperties;
 
 use crate::client_log_request::{ClientLogRequest, ClientLogResponse};
 use crate::command::CommandSequence;
@@ -31,6 +32,10 @@ pub struct ConnectRequest {
     pub vs_opponent: Option<UserId>,
 
     pub test_scenario: Option<String>,
+
+    /// Display properties from the client (screen dimensions, mobile device
+    /// flag, etc.)
+    pub display_properties: Option<DisplayProperties>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

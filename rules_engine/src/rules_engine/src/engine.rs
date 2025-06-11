@@ -22,6 +22,7 @@ use game_creation::new_battle;
 use tokio::task;
 use tracing::{debug, error, info, Level};
 use tracing_macros::{battle_trace, write_tracing_event};
+use ui_components::display_properties;
 use uuid::Uuid;
 
 use crate::{
@@ -77,6 +78,10 @@ fn connect_internal(request: &ConnectRequest, request_context: RequestContext) -
     let user_id = request.metadata.user_id;
     let persistent_data_path = &request.persistent_data_path;
     write_tracing_event::clear_log_file(&request_context);
+
+    if let Some(ref display_props) = request.display_properties {
+        display_properties::store_display_properties(user_id, display_props.clone());
+    }
 
     let database = match initialize_database(persistent_data_path) {
         Ok(db) => db,

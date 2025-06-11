@@ -13,6 +13,7 @@ action_data = { path = "../action_data" }
 battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 masonry = { path = "../masonry" }
+ui_components = { path = "../ui_components" }
 
 bon = "3"
 schemars = "0.8"
