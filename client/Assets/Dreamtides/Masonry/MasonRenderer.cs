@@ -300,10 +300,14 @@ namespace Dreamtides.Masonry
       DimensionUnit.ViewportHeight => new Length(
         registry.DocumentService.ScreenPxToElementPx(
           (float)dimension.Value / 100 * Screen.safeArea.height)),
-      DimensionUnit.SafeAreaTop => new Length((float)(registry.DocumentService.GetSafeArea().Top.Value * dimension.Value)),
-      DimensionUnit.SafeAreaRight => new Length((float)(registry.DocumentService.GetSafeArea().Right.Value * dimension.Value)),
-      DimensionUnit.SafeAreaBottom => new Length((float)(registry.DocumentService.GetSafeArea().Bottom.Value * dimension.Value)),
-      DimensionUnit.SafeAreaLeft => new Length((float)(registry.DocumentService.GetSafeArea().Left.Value * dimension.Value)),
+      DimensionUnit.SafeAreaTopInset => new Length((float)(registry.DocumentService.GetSafeArea().Top.Value +
+          dimension.Value)),
+      DimensionUnit.SafeAreaRightInset => new Length((float)(registry.DocumentService.GetSafeArea().Right.Value +
+          dimension.Value)),
+      DimensionUnit.SafeAreaBottomInset => new Length((float)(registry.DocumentService.GetSafeArea().Bottom.Value +
+          dimension.Value)),
+      DimensionUnit.SafeAreaLeftInset => new Length((float)(registry.DocumentService.GetSafeArea().Left.Value +
+          dimension.Value)),
       _ => throw Errors.UnknownEnumValue(dimension.Unit)
     };
 

@@ -1985,7 +1985,7 @@ namespace Dreamtides.Schema
 
     public enum FlexAlign { Auto, Center, FlexEnd, FlexStart, Stretch };
 
-    public enum DimensionUnit { Percentage, Pixels, SafeAreaBottom, SafeAreaLeft, SafeAreaRight, SafeAreaTop, ViewportHeight, ViewportWidth };
+    public enum DimensionUnit { Percentage, Pixels, SafeAreaBottomInset, SafeAreaLeftInset, SafeAreaRightInset, SafeAreaTopInset, ViewportHeight, ViewportWidth };
 
     public enum FlexDisplayStyle { Flex, None };
 
@@ -3603,14 +3603,14 @@ namespace Dreamtides.Schema
                     return DimensionUnit.Percentage;
                 case "pixels":
                     return DimensionUnit.Pixels;
-                case "safeAreaBottom":
-                    return DimensionUnit.SafeAreaBottom;
-                case "safeAreaLeft":
-                    return DimensionUnit.SafeAreaLeft;
-                case "safeAreaRight":
-                    return DimensionUnit.SafeAreaRight;
-                case "safeAreaTop":
-                    return DimensionUnit.SafeAreaTop;
+                case "safeAreaBottomInset":
+                    return DimensionUnit.SafeAreaBottomInset;
+                case "safeAreaLeftInset":
+                    return DimensionUnit.SafeAreaLeftInset;
+                case "safeAreaRightInset":
+                    return DimensionUnit.SafeAreaRightInset;
+                case "safeAreaTopInset":
+                    return DimensionUnit.SafeAreaTopInset;
                 case "viewportHeight":
                     return DimensionUnit.ViewportHeight;
                 case "viewportWidth":
@@ -3635,17 +3635,17 @@ namespace Dreamtides.Schema
                 case DimensionUnit.Pixels:
                     serializer.Serialize(writer, "pixels");
                     return;
-                case DimensionUnit.SafeAreaBottom:
-                    serializer.Serialize(writer, "safeAreaBottom");
+                case DimensionUnit.SafeAreaBottomInset:
+                    serializer.Serialize(writer, "safeAreaBottomInset");
                     return;
-                case DimensionUnit.SafeAreaLeft:
-                    serializer.Serialize(writer, "safeAreaLeft");
+                case DimensionUnit.SafeAreaLeftInset:
+                    serializer.Serialize(writer, "safeAreaLeftInset");
                     return;
-                case DimensionUnit.SafeAreaRight:
-                    serializer.Serialize(writer, "safeAreaRight");
+                case DimensionUnit.SafeAreaRightInset:
+                    serializer.Serialize(writer, "safeAreaRightInset");
                     return;
-                case DimensionUnit.SafeAreaTop:
-                    serializer.Serialize(writer, "safeAreaTop");
+                case DimensionUnit.SafeAreaTopInset:
+                    serializer.Serialize(writer, "safeAreaTopInset");
                     return;
                 case DimensionUnit.ViewportHeight:
                     serializer.Serialize(writer, "viewportHeight");

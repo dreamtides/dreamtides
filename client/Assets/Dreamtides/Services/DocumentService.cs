@@ -103,7 +103,11 @@ namespace Dreamtides.Services
         new Vector2(Screen.width - Screen.safeArea.xMax, Screen.safeArea.yMin)
       );
 
-      return Mason.GroupPx(safeLeftTop.x, safeLeftTop.y, safeRightBottom.x, safeRightBottom.y);
+      return Mason.GroupPx(
+          top: safeLeftTop.y,
+          right: safeRightBottom.x,
+          bottom: safeRightBottom.y,
+          left: safeLeftTop.x);
     }
 
     void AddChild(string elementName, out IMasonElement element)

@@ -9,10 +9,10 @@ pub enum DimensionUnit {
     Percentage,
     ViewportWidth,
     ViewportHeight,
-    SafeAreaTop,
-    SafeAreaRight,
-    SafeAreaBottom,
-    SafeAreaLeft,
+    SafeAreaTopInset,
+    SafeAreaRightInset,
+    SafeAreaBottomInset,
+    SafeAreaLeftInset,
 }
 
 pub struct Percent(pub i32);
@@ -117,6 +117,42 @@ impl FlexInsets {
             right: Some(value.into()),
             bottom: Some(value.into()),
             left: Some(value.into()),
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema, Builder)]
+#[serde(rename_all = "camelCase")]
+pub struct SafeAreaInsets {
+    #[builder(into)]
+    pub top: Option<i32>,
+    #[builder(into)]
+    pub right: Option<i32>,
+    #[builder(into)]
+    pub bottom: Option<i32>,
+    #[builder(into)]
+    pub left: Option<i32>,
+}
+
+impl From<SafeAreaInsets> for FlexInsets {
+    fn from(value: SafeAreaInsets) -> Self {
+        Self {
+            top: value.top.map(|value| Dimension {
+                unit: DimensionUnit::SafeAreaTopInset,
+                value: value as f32,
+            }),
+            right: value.right.map(|value| Dimension {
+                unit: DimensionUnit::SafeAreaRightInset,
+                value: value as f32,
+            }),
+            bottom: value.bottom.map(|value| Dimension {
+                unit: DimensionUnit::SafeAreaBottomInset,
+                value: value as f32,
+            }),
+            left: value.left.map(|value| Dimension {
+                unit: DimensionUnit::SafeAreaLeftInset,
+                value: value as f32,
+            }),
         }
     }
 }

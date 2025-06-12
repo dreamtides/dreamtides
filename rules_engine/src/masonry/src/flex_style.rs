@@ -164,6 +164,7 @@ pub struct FlexStyle {
     pub border_radius: Option<BorderRadius>,
     #[builder(into)]
     pub border_width: Option<BorderWidth>,
+    #[builder(into)]
     pub inset: Option<FlexInsets>,
     pub color: Option<DisplayColor>,
     pub display: Option<FlexDisplayStyle>,

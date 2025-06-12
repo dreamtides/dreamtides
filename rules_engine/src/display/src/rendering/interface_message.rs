@@ -1,7 +1,7 @@
 use bon::Builder;
 use core_data::display_color;
 use core_data::display_types::Milliseconds;
-use masonry::dimension::{FlexInsets, Percent};
+use masonry::dimension::{Percent, SafeAreaInsets};
 use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition, TextAlign, WhiteSpace};
 use masonry::flex_style::FlexStyle;
 use ui_components::box_component::BoxComponent;
@@ -26,8 +26,8 @@ pub struct InterfaceMessage {
 impl Component for InterfaceMessage {
     fn render(self) -> Option<impl Component> {
         let inset = match self.anchor_position {
-            AnchorPosition::Top => FlexInsets::builder().top(8).left(8).right(8).build(),
-            AnchorPosition::Bottom => FlexInsets::builder().bottom(8).left(8).right(8).build(),
+            AnchorPosition::Top => SafeAreaInsets::builder().top(8).left(8).right(8).build(),
+            AnchorPosition::Bottom => SafeAreaInsets::builder().bottom(8).left(8).right(8).build(),
         };
 
         Some(

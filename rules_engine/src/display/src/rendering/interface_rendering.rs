@@ -35,7 +35,7 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
     }
 
     let current_panel_address = display_state::get_current_panel_address();
-    let mut overlay_builder = BoxComponent::builder()
+    let overlay_builder = BoxComponent::builder()
         .name("Interface Overlay")
         .style(
             FlexStyle::builder()
@@ -45,14 +45,11 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
                 .justify_content(FlexJustify::Center)
                 .build(),
         )
+        .child(render_prompt_message(builder, battle))
         .child(
             current_panel_address
                 .map(|address| panel_rendering::render_panel(address, builder, battle)),
         );
-
-    if let Some(prompt_message) = render_prompt_message(builder, battle) {
-        overlay_builder = overlay_builder.child(Some(prompt_message));
-    }
 
     let overlay = overlay_builder.build().flex_node();
     let legal_actions = legal_actions::compute(battle, builder.act_for_player());

@@ -1,6 +1,6 @@
 use asset_paths::poneti_ui;
 use bon::Builder;
-use masonry::dimension::FlexInsets;
+use masonry::dimension::{FlexInsets, SafeAreaInsets};
 use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition};
 use masonry::flex_style::FlexStyle;
 
@@ -30,7 +30,9 @@ impl<T: Component> Component for PanelComponent<T> {
                         // values in Unity, e.g. 2048 pixels per unit in this
                         // case. I don't really know why.
                         .image_slice(500)
-                        .inset(FlexInsets::builder().top(36).bottom(12).left(8).right(8).build())
+                        .inset(
+                            SafeAreaInsets::builder().top(12).bottom(12).left(8).right(8).build(),
+                        )
                         .justify_content(FlexJustify::Center)
                         .padding((32, 12, 12, 12))
                         .position(FlexPosition::Absolute)
