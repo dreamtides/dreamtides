@@ -48,7 +48,7 @@ impl Component for SetOpponentAgentPanel<'_> {
                                                 .align_items(FlexAlign::Center)
                                                 .justify_content(FlexJustify::Center)
                                                 .margin((0, 0, 12, 0))
-                                                .width(200)
+                                                .max_width(200)
                                                 .build(),
                                         )
                                         .child(
