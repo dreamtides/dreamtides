@@ -35,7 +35,6 @@ impl Component for ViewLogsPanel {
                                         .flex_direction(FlexDirection::Column)
                                         .flex_grow(1)
                                         .justify_content(FlexJustify::FlexStart)
-                                        .padding((8, 8, 8, 8))
                                         .build(),
                                 )
                                 .child(
