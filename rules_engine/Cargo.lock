@@ -779,6 +779,7 @@ dependencies = [
  "bon",
  "core_data",
  "display_data",
+ "logging",
  "masonry",
  "schemars",
  "serde",

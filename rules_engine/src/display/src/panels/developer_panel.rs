@@ -75,6 +75,14 @@ impl Component for DeveloperPanel {
                                 .action(DebugAction::RestartBattle)
                                 .build(),
                         )
+                        .child(
+                            DebugButton::builder()
+                                .label("View Logs")
+                                .action(GameAction::BattleDisplayAction(
+                                    BattleDisplayAction::OpenPanel(PanelAddress::ViewLogs),
+                                ))
+                                .build(),
+                        )
                         .build(),
                 )
                 .build(),

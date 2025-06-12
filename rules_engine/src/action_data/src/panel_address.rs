@@ -8,4 +8,5 @@ pub enum PanelAddress {
     Developer,
     SetOpponentAgent,
     AddCardToHand,
+    ViewLogs,
 }

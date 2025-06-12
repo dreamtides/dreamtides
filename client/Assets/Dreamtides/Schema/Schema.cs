@@ -1977,7 +1977,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Identifies a window on screen containing UI elements
     /// </summary>
-    public enum PanelAddress { AddCardToHand, Developer, SetOpponentAgent };
+    public enum PanelAddress { AddCardToHand, Developer, SetOpponentAgent, ViewLogs };
 
     public enum DebugActionEnum { ApplyTestScenarioAction, RestartBattle };
 
@@ -3222,6 +3222,8 @@ namespace Dreamtides.Schema
                     return PanelAddress.Developer;
                 case "setOpponentAgent":
                     return PanelAddress.SetOpponentAgent;
+                case "viewLogs":
+                    return PanelAddress.ViewLogs;
             }
             throw new Exception("Cannot unmarshal type PanelAddress");
         }
@@ -3244,6 +3246,9 @@ namespace Dreamtides.Schema
                     return;
                 case PanelAddress.SetOpponentAgent:
                     serializer.Serialize(writer, "setOpponentAgent");
+                    return;
+                case PanelAddress.ViewLogs:
+                    serializer.Serialize(writer, "viewLogs");
                     return;
             }
             throw new Exception("Cannot marshal type PanelAddress");
