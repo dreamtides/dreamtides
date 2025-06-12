@@ -18,6 +18,8 @@ namespace Dreamtides.Services
 
     public bool IsLandscape => _isLandscape;
 
+    public bool IsMobileDevice => UnityEngine.Device.Application.isMobilePlatform;
+
     public GameLayout Layout =>
         IsLandscape ? Check(_landscapeLayout) : Check(_portraitLayout);
 

@@ -18,6 +18,7 @@ namespace Dreamtides.Services
     bool _hidCloseButton;
     bool _infoZoomDisabled;
     List<Card> _cardsWithInfoZoomIcons = new();
+    Coroutine? _delayedIconClearCoroutine;
 
     public bool IsPointerDownOnCard { get; set; } = false;
 
@@ -80,7 +81,12 @@ namespace Dreamtides.Services
         return;
       }
 
-      ClearInfoZoom();
+      if (_delayedIconClearCoroutine != null)
+      {
+        StopCoroutine(_delayedIconClearCoroutine);
+        _delayedIconClearCoroutine = null;
+        ClearInfoZoomIcons();
+      }
 
       var shouldShowOnLeft = Registry.InputService.PointerPosition().x > Screen.width / 2.0;
 
@@ -163,11 +169,21 @@ namespace Dreamtides.Services
         _hidCloseButton = false;
       }
 
-      foreach (var card in _cardsWithInfoZoomIcons)
+      if (Registry.IsMobileDevice && _cardsWithInfoZoomIcons.Count > 0)
       {
-        card.SetInfoZoomIcon(null);
+        if (_delayedIconClearCoroutine != null)
+        {
+          StopCoroutine(_delayedIconClearCoroutine);
+        }
+
+        // On mobile, we delay clearing the info zoom icons because they will
+        // frequently be covered by the InfoZoom itself.
+        _delayedIconClearCoroutine = StartCoroutine(DelayedClearInfoZoomIcons());
       }
-      _cardsWithInfoZoomIcons.Clear();
+      else
+      {
+        ClearInfoZoomIcons();
+      }
 
       if (_currentInfoZoom)
       {
@@ -178,6 +194,22 @@ namespace Dreamtides.Services
         Destroy(_currentInfoZoom.gameObject);
       }
       _currentInfoZoom = null;
+    }
+
+    IEnumerator DelayedClearInfoZoomIcons()
+    {
+      yield return new WaitForSeconds(0.5f);
+      ClearInfoZoomIcons();
+      _delayedIconClearCoroutine = null;
+    }
+
+    void ClearInfoZoomIcons()
+    {
+      foreach (var card in _cardsWithInfoZoomIcons)
+      {
+        card.SetInfoZoomIcon(null);
+      }
+      _cardsWithInfoZoomIcons.Clear();
     }
   }
 }
