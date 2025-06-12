@@ -250,6 +250,7 @@ MonoBehaviour:
   _totalSpark: {fileID: 0}
   _turnIndicator: {fileID: 0}
   _imminentVictorySparkBackgroundMaterial: {fileID: 2100000, guid: bb3208b07971a417f90e7df1a8eca741, type: 2}
+  _imminentVictoryIndicator: {fileID: 0}
 --- !u!1 &2198335393119608428
 GameObject:
   m_ObjectHideFlags: 0
@@ -298,6 +299,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _text: {fileID: 1333769693611860609}
   _onChange: {fileID: 4374682115499130161}
+  _originalText: 
+  _originalColor: {r: 1, g: 1, b: 1, a: 1}
+  _activePreview: 0
 --- !u!1 &3703317080756202020
 GameObject:
   m_ObjectHideFlags: 0
@@ -631,6 +635,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _text: {fileID: 7623551084639512203}
   _onChange: {fileID: 1078308742277194495}
+  _originalText: 
+  _originalColor: {r: 1, g: 1, b: 1, a: 1}
+  _activePreview: 0
 --- !u!1 &6379394715224565860
 GameObject:
   m_ObjectHideFlags: 0
