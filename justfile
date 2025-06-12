@@ -69,7 +69,7 @@ toolchains := "toolchains/llvm/prebuilt"
 
 # Required for Android build:
 android_linker := join(android_ndk, toolchains, llvm_toolchain, "bin", "aarch64-linux-android29-clang")
-target_ar := join(android_ndk, toolchains, llvm_toolchain, "bin", "aarch64-linux-android-ar")
+target_ar := join(android_ndk, toolchains, llvm_toolchain, "bin", "llvm-ar")
 
 android-plugin:
     #!/usr/bin/env bash
