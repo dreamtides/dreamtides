@@ -1,4 +1,4 @@
-use masonry::flex_node::{FlexNode, NodeType, ScrollViewNode};
+use masonry::flex_node::{FlexNode, NodeType, ScrollBarVisibility, ScrollViewNode};
 use masonry::flex_style::FlexStyle;
 
 use crate::component::{Component, NodeComponent};
@@ -40,6 +40,8 @@ impl ScrollViewComponentBuilder {
         ScrollViewComponent(FlexNode {
             name: Some("ScrollView".to_string()),
             node_type: Some(NodeType::ScrollViewNode(Box::new(ScrollViewNode {
+                horizontal_scroll_bar_visibility: Some(ScrollBarVisibility::Hidden),
+                vertical_scroll_bar_visibility: Some(ScrollBarVisibility::Hidden),
                 ..Default::default()
             }))),
             children,
