@@ -1841,6 +1841,8 @@ MonoBehaviour:
   _objects: []
   _debugUpdateContinuously: 0
   _offset: 1
+  _shrinkOffset: 0.75
+  _shrinkOffsetThreshold: 4
   _stackRight: 0
 --- !u!1 &163676054
 GameObject:
@@ -2053,10 +2055,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2503505221225705953, guid: b992c98e36e9249c29d2096bad657241, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b992c98e36e9249c29d2096bad657241, type: 3}
 --- !u!4 &179667402 stripped
 Transform:
@@ -3082,6 +3081,8 @@ MonoBehaviour:
   _objects: []
   _debugUpdateContinuously: 0
   _offset: 1.5
+  _shrinkOffset: 0.75
+  _shrinkOffsetThreshold: 8
   _stackRight: 1
 --- !u!1 &330585543
 GameObject:
@@ -3593,13 +3594,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2259028208598664077, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
       insertIndex: -1
       addedObject: {fileID: 284289074}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5489959574787516681, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 616976891888088465, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
 --- !u!114 &368858824 stripped
 MonoBehaviour:
@@ -4361,6 +4356,8 @@ MonoBehaviour:
   _objects: []
   _debugUpdateContinuously: 0
   _offset: 1.5
+  _shrinkOffset: 0.75
+  _shrinkOffsetThreshold: 8
   _stackRight: 1
 --- !u!1 &449699474
 GameObject:
@@ -4524,13 +4521,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2259028208598664077, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1598918813}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5489959574787516681, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 616976891888088465, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
 --- !u!114 &450118501 stripped
 MonoBehaviour:
@@ -4676,6 +4667,8 @@ MonoBehaviour:
   _objects: []
   _debugUpdateContinuously: 0
   _offset: 1.5
+  _shrinkOffset: 0.75
+  _shrinkOffsetThreshold: 4
   _stackRight: 0
 --- !u!1 &466137856
 GameObject:
@@ -4792,6 +4785,8 @@ MonoBehaviour:
   _objects: []
   _debugUpdateContinuously: 0
   _offset: 1.5
+  _shrinkOffset: 0.75
+  _shrinkOffsetThreshold: 4
   _stackRight: 0
 --- !u!1 &482914635
 GameObject:
@@ -7144,6 +7139,8 @@ MonoBehaviour:
   _objects: []
   _debugUpdateContinuously: 0
   _offset: 1.5
+  _shrinkOffset: 0.75
+  _shrinkOffsetThreshold: 8
   _stackRight: 1
 --- !u!1 &760589603
 GameObject:
@@ -7210,6 +7207,8 @@ MonoBehaviour:
   _objects: []
   _debugUpdateContinuously: 0
   _offset: 1
+  _shrinkOffset: 0.75
+  _shrinkOffsetThreshold: 8
   _stackRight: 1
 --- !u!1 &761815411
 GameObject:
@@ -10653,10 +10652,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2503505221225705953, guid: b992c98e36e9249c29d2096bad657241, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b992c98e36e9249c29d2096bad657241, type: 3}
 --- !u!4 &1162900712 stripped
 Transform:
@@ -14700,6 +14696,8 @@ MonoBehaviour:
   _objects: []
   _debugUpdateContinuously: 0
   _offset: 1.5
+  _shrinkOffset: 0.75
+  _shrinkOffsetThreshold: 4
   _stackRight: 0
 --- !u!1 &1714488540
 GameObject:
@@ -17188,10 +17186,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3323081537010266081, guid: dfd7f2c7c8cdc4f678480f45b4b16f1b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dfd7f2c7c8cdc4f678480f45b4b16f1b, type: 3}
 --- !u!114 &2423837261359150459 stripped
 MonoBehaviour:
