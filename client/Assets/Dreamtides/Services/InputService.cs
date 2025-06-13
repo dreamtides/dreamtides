@@ -96,7 +96,7 @@ namespace Dreamtides.Services
           new Vector3(tapScreenPosition.x, tapScreenPosition.y, screenZ));
     }
 
-    void Update()
+    protected override void OnUpdate()
     {
       HandleDisplayableClickAndDrag();
       HandleDisplayableHover();

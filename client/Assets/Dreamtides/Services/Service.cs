@@ -18,5 +18,15 @@ namespace Dreamtides.Services
     }
 
     protected virtual void OnInitialize(TestConfiguration? testConfiguration) { }
+
+    public void Update()
+    {
+      if (_registry != null)
+      {
+        OnUpdate();
+      }
+    }
+
+    protected virtual void OnUpdate() { }
   }
 }

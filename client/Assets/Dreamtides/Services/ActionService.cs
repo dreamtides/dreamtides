@@ -73,7 +73,7 @@ namespace Dreamtides.Services
       }
     }
 
-    void Update()
+    protected override void OnUpdate()
     {
       if (_devModeAutoConnect)
       {

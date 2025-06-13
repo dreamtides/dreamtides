@@ -26,7 +26,7 @@ namespace Dreamtides.Services
             Application.logMessageReceived += OnUnityLogMessageReceived;
         }
 
-        private void Update()
+        protected override void OnUpdate()
         {
             var currentTime = Time.time;
 

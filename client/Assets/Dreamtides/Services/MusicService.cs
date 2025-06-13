@@ -59,7 +59,7 @@ namespace Dreamtides.Services
       StartCoroutine(CrossfadeToTrack(nextTrack));
     }
 
-    void Update()
+    protected override void OnUpdate()
     {
       if (!_isTransitioning && Registry.Layout.MusicAudioSource.clip != null)
       {

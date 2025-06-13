@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Collections;
 using Dreamtides.Buttons;
 using Dreamtides.Layout;
 using Dreamtides.Utils;
@@ -93,16 +94,29 @@ namespace Dreamtides.Services
 
       if (testConfiguration != null)
       {
+        // Screen resolution is not correct on Awake() frame in tests because of
+        // the hacks we are using to set it, so we delay the Awake() call.
         Debug.Log($"Running test scenario: {testConfiguration.TestScenario}");
+        StartCoroutine(DelayedAwake(testConfiguration));
       }
       else
       {
         Debug.Log($"Starting Dreamtides");
+        RunAwake(testConfiguration);
       }
+    }
 
-      Application.targetFrameRate = UnityEngine.Device.Application.platform == RuntimePlatform.Android ? 30 : 60;
+    IEnumerator DelayedAwake(TestConfiguration testConfiguration)
+    {
+      yield return new WaitForSeconds(0.1f);
+      RunAwake(testConfiguration);
+    }
 
-      _isLandscape = Screen.width > Screen.height;
+    void RunAwake(TestConfiguration? testConfiguration)
+    {
+      var width = UnityEngine.Device.Screen.width;
+      var height = UnityEngine.Device.Screen.height;
+      _isLandscape = width > height;
       if (_isLandscape)
       {
         Check(_portraitLayout).gameObject.SetActive(false);
@@ -113,6 +127,8 @@ namespace Dreamtides.Services
         Check(_portraitLayout).gameObject.SetActive(true);
         Check(_landscapeLayout).gameObject.SetActive(false);
       }
+
+      Application.targetFrameRate = UnityEngine.Device.Application.platform == RuntimePlatform.Android ? 30 : 60;
 
       foreach (var service in GetComponentsInChildren<Service>())
       {
