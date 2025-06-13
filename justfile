@@ -96,7 +96,17 @@ mac-plugin:
     mkdir -p {{plugin_out}}/OSX/
     mv plugin.bundle {{plugin_out}}/OSX/
 
-plugins: ios-plugin android-plugin mac-plugin
+target_windows := "x86_64-pc-windows-gnu"
+
+# You may need to install mingw, e.g. via brew install mingw-w64
+# Note that the plugin name cannot conflict with any .asmdef file
+windows-plugin:
+    # Note that you cannot use IL2CPP when cross-compiling for windows
+    cargo build --manifest-path rules_engine/Cargo.toml --release -p plugin --target {{target_windows}}
+    mkdir -p {{plugin_out}}/Windows/
+    cp rules_engine/target/{{target_windows}}/release/plugin.dll {{plugin_out}}/Windows/
+
+plugins: ios-plugin android-plugin mac-plugin windows-plugin
 
 clippy:
   cargo clippy --manifest-path rules_engine/Cargo.toml --workspace -- -D warnings -D clippy::all
