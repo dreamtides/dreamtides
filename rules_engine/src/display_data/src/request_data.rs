@@ -3,6 +3,7 @@ use core_data::identifiers::{BattleId, UserId};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use ui_components::display_properties::DisplayProperties;
+use uuid::Uuid;
 
 use crate::client_log_request::{ClientLogRequest, ClientLogResponse};
 use crate::command::CommandSequence;
@@ -12,6 +13,7 @@ use crate::command::CommandSequence;
 pub struct Metadata {
     pub user_id: UserId,
     pub battle_id: Option<BattleId>,
+    pub request_id: Option<Uuid>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

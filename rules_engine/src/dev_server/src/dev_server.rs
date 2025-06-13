@@ -100,8 +100,11 @@ async fn perform_action(body: String) -> AppResult<Json<PerformActionResponse>> 
 async fn poll(body: String) -> AppResult<Json<PollResponse>> {
     let req: PollRequest = parse_json(&body)?;
     let user_id = req.metadata.user_id;
-    let commands = engine::poll(user_id);
-    Ok(Json(PollResponse { metadata: req.metadata, commands }))
+
+    match engine::poll(user_id) {
+        Some(response) => Ok(Json(response)),
+        None => Ok(Json(PollResponse { metadata: req.metadata, commands: None })),
+    }
 }
 
 async fn log(body: String) -> AppResult<StatusCode> {

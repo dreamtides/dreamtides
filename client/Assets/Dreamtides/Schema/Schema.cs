@@ -131,6 +131,9 @@ namespace Dreamtides.Schema
         [JsonProperty("battleId")]
         public Guid? BattleId { get; set; }
 
+        [JsonProperty("requestId")]
+        public Guid? RequestId { get; set; }
+
         [JsonProperty("userId", Required = Required.Always)]
         public Guid UserId { get; set; }
     }

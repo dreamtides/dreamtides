@@ -15,11 +15,14 @@ use display::rendering::renderer;
 use display_data::command::CommandSequence;
 use tracing::instrument;
 use tracing_macros::{battle_trace, write_tracing_event};
+use uuid::Uuid;
 
-static PENDING_UPDATES: LazyLock<Mutex<HashMap<UserId, Vec<CommandSequence>>>> =
+use crate::engine::PollResult;
+
+static PENDING_UPDATES: LazyLock<Mutex<HashMap<UserId, Vec<PollResult>>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
-pub fn poll(user_id: UserId) -> Option<CommandSequence> {
+pub fn poll(user_id: UserId) -> Option<PollResult> {
     let mut updates = PENDING_UPDATES.lock().unwrap();
     if let Some(user_updates) = updates.get_mut(&user_id) {
         if !user_updates.is_empty() {
@@ -29,30 +32,36 @@ pub fn poll(user_id: UserId) -> Option<CommandSequence> {
     None
 }
 
-pub fn append_update(user_id: UserId, update: CommandSequence, context: &RequestContext) {
+pub fn append_update(
+    user_id: UserId,
+    update: CommandSequence,
+    context: &RequestContext,
+    request_id: Option<Uuid>,
+) {
     write_tracing_event::write_commands(&update, context);
     let mut updates = PENDING_UPDATES.lock().unwrap();
-    updates.entry(user_id).or_default().push(update);
+    updates.entry(user_id).or_default().push(PollResult { commands: update, request_id });
 }
 
-#[instrument(name = "handle_battle_action", level = "debug", skip(battle))]
+#[instrument(name = "handle_battle_action", level = "debug", skip(battle, context))]
 pub fn execute(
     battle: &mut BattleState,
     initiated_by: UserId,
     player: PlayerName,
     action: BattleAction,
     context: &RequestContext,
+    request_id: Option<Uuid>,
 ) {
     let mut current_player = player;
     let mut current_action = action;
 
     loop {
-        battle_trace!("Executing battle action", battle, current_action);
+        battle_trace!("Executing battle action", battle, current_action, request_id);
         apply_battle_action::execute(battle, current_player, current_action);
 
         let Some(next_player) = legal_actions::next_to_act(battle) else {
             battle_trace!("Rendering updates for game over", battle);
-            render_updates(battle, initiated_by, context);
+            render_updates(battle, initiated_by, context, request_id);
             return;
         };
 
@@ -66,7 +75,7 @@ pub fn execute(
 
         if let PlayerType::Agent(agent) = battle.players.player(next_player).player_type.clone() {
             battle_trace!("Rendering updates for AI player turn", battle);
-            render_updates(battle, initiated_by, context);
+            render_updates(battle, initiated_by, context, request_id);
             battle.animations = Some(AnimationData::default());
 
             battle_trace!("Selecting action for AI player", battle);
@@ -74,7 +83,7 @@ pub fn execute(
             current_player = next_player;
         } else {
             battle_trace!("Rendering updates for human player turn", battle);
-            render_updates(battle, initiated_by, context);
+            render_updates(battle, initiated_by, context, request_id);
             battle.animations = Some(AnimationData::default());
             return;
         }
@@ -108,15 +117,20 @@ pub fn should_auto_execute_action(legal_actions: &LegalActions) -> Option<Battle
     }
 }
 
-fn render_updates(battle: &BattleState, user_id: UserId, context: &RequestContext) {
+fn render_updates(
+    battle: &BattleState,
+    user_id: UserId,
+    context: &RequestContext,
+    request_id: Option<Uuid>,
+) {
     let player_name = renderer::player_name_for_user(battle, user_id);
     let player_updates = renderer::render_updates(battle, user_id);
-    append_update(user_id, player_updates, context);
+    append_update(user_id, player_updates, context, request_id);
 
     if let PlayerType::User(opponent_id) =
         &battle.players.player(player_name.opponent()).player_type
     {
         let opponent_updates = renderer::render_updates(battle, *opponent_id);
-        append_update(*opponent_id, opponent_updates, context);
+        append_update(*opponent_id, opponent_updates, context, request_id);
     }
 }

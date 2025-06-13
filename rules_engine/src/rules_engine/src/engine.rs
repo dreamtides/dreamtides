@@ -17,7 +17,9 @@ use database::sqlite_database::{self, Database};
 use display::display_actions::apply_battle_display_action;
 use display::rendering::renderer;
 use display_data::command::CommandSequence;
-use display_data::request_data::{ConnectRequest, ConnectResponse, PerformActionRequest};
+use display_data::request_data::{
+    ConnectRequest, ConnectResponse, Metadata, PerformActionRequest, PollResponse,
+};
 use game_creation::new_battle;
 use tokio::task;
 use tracing::{debug, error, info, Level};
@@ -37,6 +39,12 @@ thread_local! {
 static REQUEST_CONTEXTS: LazyLock<Mutex<HashMap<UserId, RequestContext>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
+#[derive(Debug, Clone)]
+pub struct PollResult {
+    pub commands: CommandSequence,
+    pub request_id: Option<Uuid>,
+}
+
 pub fn connect(request: &ConnectRequest, request_context: RequestContext) -> ConnectResponse {
     let metadata = request.metadata;
     let user_id = metadata.user_id;
@@ -51,8 +59,8 @@ pub fn connect(request: &ConnectRequest, request_context: RequestContext) -> Con
     ConnectResponse { metadata, commands }
 }
 
-pub fn poll(user_id: UserId) -> Option<CommandSequence> {
-    if let Some(commands) = handle_battle_action::poll(user_id) {
+pub fn poll(user_id: UserId) -> Option<PollResponse> {
+    if let Some(poll_result) = handle_battle_action::poll(user_id) {
         let elapsed_msg = LAST_PERFORM_ACTION_TIME.with(|time| {
             if let Some(start_time) = *time.borrow() {
                 format!(" {:.2}s", start_time.elapsed().as_secs_f64())
@@ -61,8 +69,13 @@ pub fn poll(user_id: UserId) -> Option<CommandSequence> {
             }
         });
 
-        debug!(?elapsed_msg, "Returning poll response");
-        return Some(commands);
+        let request_id = poll_result.request_id;
+        debug!(?elapsed_msg, ?request_id, "Returning poll response");
+
+        return Some(PollResponse {
+            metadata: Metadata { user_id, battle_id: None, request_id },
+            commands: Some(poll_result.commands),
+        });
     }
     None
 }
@@ -246,10 +259,12 @@ fn save_battle_to_database(
 }
 
 fn perform_action_internal(request: &PerformActionRequest) {
-    let span = tracing::span!(Level::DEBUG, "perform_action");
-    let _enter = span.enter();
     let metadata = request.metadata;
     let user_id = metadata.user_id;
+    let request_id = metadata.request_id;
+    let span = tracing::span!(Level::DEBUG, "perform_action", ?request_id);
+    let _enter = span.enter();
+
     let result = catch_panic(|| {
         let Ok(database) = sqlite_database::get() else {
             show_error_message(user_id, None, "No database found".to_string());
@@ -277,7 +292,7 @@ fn perform_action_internal(request: &PerformActionRequest) {
         };
 
         battle.animations = Some(AnimationData::default());
-        handle_request_action(request, user_id, save, &mut battle);
+        handle_request_action(request, user_id, save, &mut battle, request_id);
 
         // Always save to the save_user_id (either opponent or user)
         if let Err(error) =
@@ -297,6 +312,7 @@ fn handle_request_action(
     user_id: UserId,
     save: SaveFile,
     battle: &mut BattleState,
+    request_id: Option<Uuid>,
 ) {
     let request_context = get_request_context(user_id)
         .unwrap_or(RequestContext { logging_options: Default::default() });
@@ -310,11 +326,19 @@ fn handle_request_action(
                 user_id,
                 renderer::connect(&*battle, user_id, true),
                 &request_context,
+                request_id,
             );
         }
         GameAction::BattleAction(action) => {
             let player = renderer::player_name_for_user(&*battle, user_id);
-            handle_battle_action::execute(battle, user_id, player, action, &request_context);
+            handle_battle_action::execute(
+                battle,
+                user_id,
+                player,
+                action,
+                &request_context,
+                request_id,
+            );
         }
         GameAction::BattleDisplayAction(action) => {
             apply_battle_display_action::execute(action);
@@ -322,6 +346,7 @@ fn handle_request_action(
                 user_id,
                 renderer::connect(&*battle, user_id, true),
                 &request_context,
+                request_id,
             );
         }
         GameAction::Undo(player) => {
@@ -341,6 +366,7 @@ fn handle_request_action(
                 user_id,
                 renderer::connect(&*battle, user_id, true),
                 &request_context,
+                request_id,
             );
         }
     };
@@ -353,6 +379,7 @@ pub fn show_error_message(user_id: UserId, battle: Option<&BattleState>, error_m
         user_id,
         error_message::display_error_message(battle, error_message),
         &request_context,
+        None,
     )
 }
 

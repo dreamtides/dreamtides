@@ -144,9 +144,13 @@ unsafe fn poll_impl(
 ) -> Result<i32> {
     let request_data = std::slice::from_raw_parts(request, request_length as usize);
     let deserialized_request = serde_json::from_slice::<PollRequest>(request_data)?;
-    let metadata = deserialized_request.metadata;
-    let commands = engine::poll(metadata.user_id);
-    let response_data = PollResponse { metadata, commands };
+    let user_id = deserialized_request.metadata.user_id;
+
+    let response_data = match engine::poll(user_id) {
+        Some(response) => response,
+        None => PollResponse { metadata: deserialized_request.metadata, commands: None },
+    };
+
     let json = serde_json::to_string(&response_data)?;
     let json_bytes = json.as_bytes();
 

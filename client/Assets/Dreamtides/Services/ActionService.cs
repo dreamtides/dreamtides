@@ -135,17 +135,24 @@ namespace Dreamtides.Services
         return;
       }
 
+      var requestId = Guid.NewGuid();
       Registry.LoggingService.StartSpan(LogSpanName.PerformAction);
       Registry.LoggingService.Log("ActionService", "Performing action",
-        ("actionType", GameActionHelper.GetActionName(action.Value)));
+        ("actionType", GameActionHelper.GetActionName(action.Value)),
+        ("requestId", requestId.ToString()));
       _lastPerformActionTime = Time.time;
 
       var request = new PerformActionRequest
       {
-        Metadata = _metadata,
+        Metadata = new Metadata
+        {
+          UserId = Errors.CheckNotNull(_metadata).UserId,
+          BattleId = Errors.CheckNotNull(_metadata).BattleId,
+          RequestId = requestId
+        },
         Action = action.Value,
         VsOpponent = IsTestOpponentClient ? _userGuid : null,
-        TestScenario = _testScenario
+        TestScenario = _testScenario,
       };
       if (Application.isEditor)
       {
@@ -217,7 +224,8 @@ namespace Dreamtides.Services
             Registry.LoggingService.StartSpan(LogSpanName.Poll);
             var elapsedTime = Time.time - _lastPerformActionTime ?? 0;
             Registry.LoggingService.Log("ActionService", "Poll response received",
-              ("elapsedTime", $"{elapsedTime:F2}s"));
+              ("elapsedTime", $"{elapsedTime:F2}s"),
+              ("requestId", response.Metadata.RequestId.ToString()));
 
             return ApplyCommands(response.Commands, animate: true, onComplete: () =>
             {

@@ -802,6 +802,7 @@ dependencies = [
  "serde",
  "strum",
  "ui_components",
+ "uuid",
 ]
 
 [[package]]
