@@ -100,7 +100,7 @@ namespace Dreamtides.Services
         Debug.Log($"Starting Dreamtides");
       }
 
-      Application.targetFrameRate = 60;
+      Application.targetFrameRate = UnityEngine.Device.Application.platform == RuntimePlatform.Android ? 30 : 60;
 
       _isLandscape = Screen.width > Screen.height;
       if (_isLandscape)
