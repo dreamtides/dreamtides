@@ -2,6 +2,7 @@ use masonry::flex_node::{FlexNode, NodeType, ScrollBarVisibility, ScrollViewNode
 use masonry::flex_style::FlexStyle;
 
 use crate::component::{Component, NodeComponent};
+use crate::display_properties;
 
 #[derive(Clone)]
 pub struct ScrollViewComponent(pub FlexNode);
@@ -41,7 +42,13 @@ impl ScrollViewComponentBuilder {
             name: Some("ScrollView".to_string()),
             node_type: Some(NodeType::ScrollViewNode(Box::new(ScrollViewNode {
                 horizontal_scroll_bar_visibility: Some(ScrollBarVisibility::Hidden),
-                vertical_scroll_bar_visibility: Some(ScrollBarVisibility::Hidden),
+                vertical_scroll_bar_visibility: if display_properties::get_display_properties()
+                    .is_mobile_device
+                {
+                    Some(ScrollBarVisibility::Hidden)
+                } else {
+                    None
+                },
                 ..Default::default()
             }))),
             children,
