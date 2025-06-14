@@ -10,7 +10,7 @@ use petgraph::dot::Dot;
 use petgraph::prelude::NodeIndex;
 use petgraph::visit::EdgeRef;
 use petgraph::Graph;
-use tracing::{debug, error};
+use tracing::{debug, error, instrument};
 
 use crate::uct_tree::SearchGraph;
 
@@ -19,6 +19,12 @@ use crate::uct_tree::SearchGraph;
 /// Creates a simplified graph with nodes showing only the total reward values
 /// formatted to 1 decimal place, and edges showing the battle actions.
 /// The graph is limited to nodes within 3 edges of the root.
+
+#[instrument(
+    name = "log_results_diagram",
+    level = "debug",
+    skip(graph, root, action_taken, request_context)
+)]
 pub fn log_results_diagram(
     graph: &SearchGraph,
     root: NodeIndex,

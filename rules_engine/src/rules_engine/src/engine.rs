@@ -33,7 +33,7 @@ use crate::{
 
 thread_local! {
     static PANIC_INFO: RefCell<Option<(String, String, Backtrace)>> = const { RefCell::new(None) };
-    static LAST_PERFORM_ACTION_TIME: RefCell<Option<Instant>> = const { RefCell::new(None) };
+    static REQUEST_TIMESTAMPS: RefCell<HashMap<Option<Uuid>, Instant>> = RefCell::new(HashMap::new());
 }
 
 static REQUEST_CONTEXTS: LazyLock<Mutex<HashMap<UserId, RequestContext>>> =
@@ -61,15 +61,25 @@ pub fn connect(request: &ConnectRequest, request_context: RequestContext) -> Con
 
 pub fn poll(user_id: UserId) -> Option<PollResponse> {
     if let Some(poll_result) = handle_battle_action::poll(user_id) {
-        let elapsed_msg = LAST_PERFORM_ACTION_TIME.with(|time| {
-            if let Some(start_time) = *time.borrow() {
-                format!(" {:.2}s", start_time.elapsed().as_secs_f64())
+        let request_id = poll_result.request_id;
+        let elapsed_msg = REQUEST_TIMESTAMPS.with(|timestamps| {
+            let mut timestamps_mut = timestamps.borrow_mut();
+
+            // Clean up old entries (older than 5 minutes)
+            let now = Instant::now();
+            timestamps_mut
+                .retain(|_, &mut timestamp| now.duration_since(timestamp).as_secs() < 300);
+
+            if let Some(start_time) = timestamps_mut.get(&request_id) {
+                format!("{}ms", start_time.elapsed().as_millis())
+            } else if request_id.is_some() {
+                error!(?request_id, "Unrecognized request ID in poll response");
+                format!("[unknown request ID: {:?}]", request_id)
             } else {
-                "unknown".to_string()
+                "[empty request ID]".to_string()
             }
         });
 
-        let request_id = poll_result.request_id;
         debug!(?elapsed_msg, ?request_id, "Returning poll response");
 
         return Some(PollResponse {
@@ -81,8 +91,9 @@ pub fn poll(user_id: UserId) -> Option<PollResponse> {
 }
 
 pub fn perform_action(request: PerformActionRequest) {
-    LAST_PERFORM_ACTION_TIME.with(|time| {
-        *time.borrow_mut() = Some(Instant::now());
+    let request_id = request.metadata.request_id;
+    REQUEST_TIMESTAMPS.with(|timestamps| {
+        timestamps.borrow_mut().insert(request_id, Instant::now());
     });
     task::spawn_blocking(move || perform_action_internal(&request));
 }

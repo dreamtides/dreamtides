@@ -268,18 +268,19 @@ namespace Dreamtides.Services
       {
         var requestId = response.Metadata.RequestId.Value;
         var elapsedTime = Time.time - _requestStartTimes[requestId];
+        var elapsedTimeMs = (int)(elapsedTime * 1000);
         _loggedRequestIds.Add(requestId);
 
-        if (elapsedTime > 0.1f)
+        if (elapsedTimeMs > 100)
         {
           Registry.LoggingService.LogWarning("ActionService", "Poll response received (WARNING: Slow response)",
-            ("elapsedTime", $"{elapsedTime:F2}s"),
+            ("elapsedTime", $"{elapsedTimeMs}ms"),
             ("requestId", requestId.ToString()));
         }
         else
         {
           Registry.LoggingService.Log("ActionService", "Poll response received",
-            ("elapsedTime", $"{elapsedTime:F2}s"),
+            ("elapsedTime", $"{elapsedTimeMs}ms"),
             ("requestId", requestId.ToString()));
         }
 

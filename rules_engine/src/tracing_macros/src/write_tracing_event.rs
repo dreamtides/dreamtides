@@ -16,6 +16,7 @@ use serde::Serialize;
 use serde_json;
 use tracing::{debug, error, instrument};
 
+#[instrument(name = "write_battle_event", level = "debug", skip(battle, message, values))]
 pub fn write_battle_event(
     battle: &mut BattleState,
     message: String,
@@ -82,6 +83,7 @@ struct AnimationTraceEvent {
     pub timestamp: String,
 }
 
+#[instrument(name = "write_animations", level = "debug", skip(battle, animations))]
 pub fn write_animations(battle: &BattleState, animations: &AnimationData) {
     let animation_names: Vec<String> = animations
         .steps
