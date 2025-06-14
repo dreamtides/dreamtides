@@ -53,6 +53,8 @@ fn get_battle_impl(
                     file.player_types.two.clone(),
                     request_context,
                 );
+                battle.tracing = None;
+                battle.animations = None;
 
                 let mut last_non_auto_battle = None;
                 for history_action in file.actions.iter() {
