@@ -30,6 +30,8 @@ namespace Dreamtides.Services
     Queue<CommandBatch> _commandQueue = new Queue<CommandBatch>();
     bool _isProcessingCommands = false;
     float? _lastPerformActionTime;
+    Dictionary<Guid, float> _requestStartTimes = new Dictionary<Guid, float>();
+    HashSet<Guid> _loggedRequestIds = new HashSet<Guid>();
 
     bool IsTestOpponentClient => Application.dataPath.Contains("test_client");
 
@@ -109,16 +111,7 @@ namespace Dreamtides.Services
           if (response.Commands?.Groups.Count > 0)
           {
             Registry.LoggingService.StartSpan(LogSpanName.Poll);
-            if (_lastPerformActionTime.HasValue)
-            {
-              var elapsedTime = Time.time - _lastPerformActionTime.Value;
-              Registry.LoggingService.Log("ActionService", "Poll response received",
-                ("elapsedTime", $"{elapsedTime:F2}s"));
-            }
-            else
-            {
-              Registry.LoggingService.Log("ActionService", "Poll response received, unknown time since last PerformAction");
-            }
+            LogPollResponseTiming(response);
             StartCoroutine(ApplyCommands(response.Commands, animate: true, onComplete: () =>
             {
               Registry.LoggingService.EndSpan(LogSpanName.Poll);
@@ -141,6 +134,7 @@ namespace Dreamtides.Services
         ("actionType", GameActionHelper.GetActionName(action.Value)),
         ("requestId", requestId.ToString()));
       _lastPerformActionTime = Time.time;
+      _requestStartTimes[requestId] = Time.time;
 
       var request = new PerformActionRequest
       {
@@ -222,11 +216,7 @@ namespace Dreamtides.Services
           if (response.Commands?.Groups.Count > 0)
           {
             Registry.LoggingService.StartSpan(LogSpanName.Poll);
-            var elapsedTime = Time.time - _lastPerformActionTime ?? 0;
-            Registry.LoggingService.Log("ActionService", "Poll response received",
-              ("elapsedTime", $"{elapsedTime:F2}s"),
-              ("requestId", response.Metadata.RequestId.ToString()));
-
+            LogPollResponseTiming(response);
             return ApplyCommands(response.Commands, animate: true, onComplete: () =>
             {
               Registry.LoggingService.EndSpan(LogSpanName.Poll);
@@ -268,6 +258,33 @@ namespace Dreamtides.Services
     IEnumerator Break()
     {
       yield break;
+    }
+
+    private void LogPollResponseTiming(PollResponse response)
+    {
+      if (response.Metadata?.RequestId != null &&
+        _requestStartTimes.ContainsKey(response.Metadata.RequestId.Value) &&
+        !_loggedRequestIds.Contains(response.Metadata.RequestId.Value))
+      {
+        var requestId = response.Metadata.RequestId.Value;
+        var elapsedTime = Time.time - _requestStartTimes[requestId];
+        _loggedRequestIds.Add(requestId);
+
+        if (elapsedTime > 0.1f)
+        {
+          Registry.LoggingService.LogWarning("ActionService", "Poll response received (WARNING: Slow response)",
+            ("elapsedTime", $"{elapsedTime:F2}s"),
+            ("requestId", requestId.ToString()));
+        }
+        else
+        {
+          Registry.LoggingService.Log("ActionService", "Poll response received",
+            ("elapsedTime", $"{elapsedTime:F2}s"),
+            ("requestId", requestId.ToString()));
+        }
+
+        _requestStartTimes.Remove(requestId);
+      }
     }
 
     private IEnumerator SendDevServerRequest<TRequest, TResponse>(
