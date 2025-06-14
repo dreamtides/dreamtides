@@ -5,7 +5,7 @@ use core_data::identifiers::QuestId;
 use core_data::types::PlayerName;
 use database::save_file::SaveFile;
 use game_creation::new_battle;
-use tracing::{debug, subscriber};
+use tracing::{debug, instrument, subscriber};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::EnvFilter;
 
@@ -13,6 +13,7 @@ use crate::handle_battle_action::should_auto_execute_action;
 
 /// Returns a deserialized [BattleState] for the battle in this save
 /// file, if one is present.
+#[instrument(name = "deserialize_save_file", level = "debug", skip(file, request_context))]
 pub fn battle(file: &SaveFile, request_context: RequestContext) -> Option<(BattleState, QuestId)> {
     get_battle_impl(file, None, request_context)
 }

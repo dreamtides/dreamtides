@@ -91,8 +91,6 @@ namespace Dreamtides.Services
         // there is no duration.
         yield return sequence.WaitForCompletion();
       }
-
-      Registry.LoggingService.Log("LayoutService", "UpdateLayout complete");
     }
 
     public Card GetCard(long id) =>

@@ -7,7 +7,7 @@ use std::sync::OnceLock;
 use core_data::identifiers::UserId;
 use rusqlite::{Connection, Error, OptionalExtension};
 use serde_json::{self, ser};
-use tracing::debug;
+use tracing::{debug, instrument};
 
 use crate::save_file::SaveFile;
 
@@ -53,6 +53,7 @@ pub fn initialize(path: PathBuf) -> Result<Database, DatabaseError> {
 /// This creates a new thread-local connection if one has not previously been
 /// created. It uses the database path set in `initialize` and returns an error
 /// if initialization has not happened yet.
+#[instrument(name = "get_sqlite_database", level = "debug")]
 pub fn get() -> Result<Database, DatabaseError> {
     DATABASE.with(|cell| {
         if let Some(db) = cell.get() {
@@ -120,6 +121,7 @@ impl Database {
     }
 
     /// Fetches a save file from the database by user ID.
+    #[instrument(name = "fetch_save_file", level = "debug", skip(self))]
     pub fn fetch_save(&self, user_id: UserId) -> Result<Option<SaveFile>, DatabaseError> {
         debug!(?user_id, "Fetching save file");
         let data: Option<Vec<u8>> = self
@@ -143,6 +145,7 @@ impl Database {
     }
 
     /// Writes a save file to the database.
+    #[instrument(name = "write_save_file", level = "debug", skip(self, save))]
     pub fn write_save(&self, save: SaveFile) -> Result<(), DatabaseError> {
         let save_id = save.id();
         debug!(?save_id, "Writing save file to database");

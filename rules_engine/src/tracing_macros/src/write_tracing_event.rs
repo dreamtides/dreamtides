@@ -14,7 +14,7 @@ use chrono::{DateTime, Local};
 use display_data::command::CommandSequence;
 use serde::Serialize;
 use serde_json;
-use tracing::{debug, error};
+use tracing::{debug, error, instrument};
 
 pub fn write_battle_event(
     battle: &mut BattleState,
@@ -105,6 +105,7 @@ pub fn write_animations(battle: &BattleState, animations: &AnimationData) {
     }
 }
 
+#[instrument(name = "write_commands", level = "debug", skip(sequence, request_context))]
 pub fn write_commands(sequence: &CommandSequence, request_context: &RequestContext) {
     let command_names: Vec<String> = sequence
         .groups
