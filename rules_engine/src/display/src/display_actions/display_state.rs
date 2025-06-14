@@ -50,6 +50,6 @@ pub fn set_current_panel_address(address: Option<PanelAddress>) {
 
 /// Gets the current panel address.
 pub fn get_current_panel_address() -> Option<PanelAddress> {
-    let r = DISPLAY_STATE.lock().unwrap().current_panel_address;
+    let r = DISPLAY_STATE.lock().unwrap().current_panel_address.clone();
     r
 }

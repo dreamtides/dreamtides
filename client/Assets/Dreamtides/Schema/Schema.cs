@@ -826,6 +826,12 @@ namespace Dreamtides.Schema
         public PanelAddress? OpenPanel { get; set; }
     }
 
+    public partial class PanelAddressClass
+    {
+        [JsonProperty("viewLogs", Required = Required.AllowNull)]
+        public string ViewLogs { get; set; }
+    }
+
     public partial class DebugActionClass
     {
         [JsonProperty("setOpponentAgent", Required = Required.Always)]
@@ -1977,10 +1983,7 @@ namespace Dreamtides.Schema
 
     public enum CardBrowserType { EnemyDeck, EnemyStatus, EnemyVoid, UserDeck, UserStatus, UserVoid };
 
-    /// <summary>
-    /// Identifies a window on screen containing UI elements
-    /// </summary>
-    public enum PanelAddress { AddCardToHand, Developer, SetOpponentAgent, ViewLogs };
+    public enum PanelAddressEnum { AddCardToHand, Developer, SetOpponentAgent };
 
     public enum DebugActionEnum { ApplyTestScenarioAction, RestartBattle };
 
@@ -2069,6 +2072,18 @@ namespace Dreamtides.Schema
 
         public static implicit operator BattleAction(BattleActionClass BattleActionClass) => new BattleAction { BattleActionClass = BattleActionClass };
         public static implicit operator BattleAction(BattleActionEnum Enum) => new BattleAction { Enum = Enum };
+    }
+
+    /// <summary>
+    /// Identifies a window on screen containing UI elements
+    /// </summary>
+    public partial struct PanelAddress
+    {
+        public PanelAddressEnum? Enum;
+        public PanelAddressClass PanelAddressClass;
+
+        public static implicit operator PanelAddress(PanelAddressEnum Enum) => new PanelAddress { Enum = Enum };
+        public static implicit operator PanelAddress(PanelAddressClass PanelAddressClass) => new PanelAddress { PanelAddressClass = PanelAddressClass };
     }
 
     public partial struct BattleDisplayAction
@@ -2172,6 +2187,7 @@ namespace Dreamtides.Schema
                 BattleDisplayActionConverter.Singleton,
                 CardBrowserTypeConverter.Singleton,
                 PanelAddressConverter.Singleton,
+                PanelAddressEnumConverter.Singleton,
                 BattleDisplayActionEnumConverter.Singleton,
                 DebugActionConverter.Singleton,
                 GameAiConverter.Singleton,
@@ -3215,20 +3231,75 @@ namespace Dreamtides.Schema
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
+            switch (reader.TokenType)
+            {
+                case JsonToken.String:
+                case JsonToken.Date:
+                    var stringValue = serializer.Deserialize<string>(reader);
+                    switch (stringValue)
+                    {
+                        case "addCardToHand":
+                            return new PanelAddress { Enum = PanelAddressEnum.AddCardToHand };
+                        case "developer":
+                            return new PanelAddress { Enum = PanelAddressEnum.Developer };
+                        case "setOpponentAgent":
+                            return new PanelAddress { Enum = PanelAddressEnum.SetOpponentAgent };
+                    }
+                    break;
+                case JsonToken.StartObject:
+                    var objectValue = serializer.Deserialize<PanelAddressClass>(reader);
+                    return new PanelAddress { PanelAddressClass = objectValue };
+            }
+            throw new Exception("Cannot unmarshal type PanelAddress");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            var value = (PanelAddress)untypedValue;
+            if (value.Enum != null)
+            {
+                switch (value.Enum)
+                {
+                    case PanelAddressEnum.AddCardToHand:
+                        serializer.Serialize(writer, "addCardToHand");
+                        return;
+                    case PanelAddressEnum.Developer:
+                        serializer.Serialize(writer, "developer");
+                        return;
+                    case PanelAddressEnum.SetOpponentAgent:
+                        serializer.Serialize(writer, "setOpponentAgent");
+                        return;
+                }
+            }
+            if (value.PanelAddressClass != null)
+            {
+                serializer.Serialize(writer, value.PanelAddressClass);
+                return;
+            }
+            throw new Exception("Cannot marshal type PanelAddress");
+        }
+
+        public static readonly PanelAddressConverter Singleton = new PanelAddressConverter();
+    }
+
+    internal class PanelAddressEnumConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(PanelAddressEnum) || t == typeof(PanelAddressEnum?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
             if (reader.TokenType == JsonToken.Null) return null;
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
                 case "addCardToHand":
-                    return PanelAddress.AddCardToHand;
+                    return PanelAddressEnum.AddCardToHand;
                 case "developer":
-                    return PanelAddress.Developer;
+                    return PanelAddressEnum.Developer;
                 case "setOpponentAgent":
-                    return PanelAddress.SetOpponentAgent;
-                case "viewLogs":
-                    return PanelAddress.ViewLogs;
+                    return PanelAddressEnum.SetOpponentAgent;
             }
-            throw new Exception("Cannot unmarshal type PanelAddress");
+            throw new Exception("Cannot unmarshal type PanelAddressEnum");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -3238,26 +3309,23 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (PanelAddress)untypedValue;
+            var value = (PanelAddressEnum)untypedValue;
             switch (value)
             {
-                case PanelAddress.AddCardToHand:
+                case PanelAddressEnum.AddCardToHand:
                     serializer.Serialize(writer, "addCardToHand");
                     return;
-                case PanelAddress.Developer:
+                case PanelAddressEnum.Developer:
                     serializer.Serialize(writer, "developer");
                     return;
-                case PanelAddress.SetOpponentAgent:
+                case PanelAddressEnum.SetOpponentAgent:
                     serializer.Serialize(writer, "setOpponentAgent");
                     return;
-                case PanelAddress.ViewLogs:
-                    serializer.Serialize(writer, "viewLogs");
-                    return;
             }
-            throw new Exception("Cannot marshal type PanelAddress");
+            throw new Exception("Cannot marshal type PanelAddressEnum");
         }
 
-        public static readonly PanelAddressConverter Singleton = new PanelAddressConverter();
+        public static readonly PanelAddressEnumConverter Singleton = new PanelAddressEnumConverter();
     }
 
     internal class BattleDisplayActionEnumConverter : JsonConverter

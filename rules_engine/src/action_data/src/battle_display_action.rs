@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::panel_address::PanelAddress;
 
-#[derive(Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
+#[derive(Debug, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum BattleDisplayAction {
     BrowseCards(CardBrowserType),

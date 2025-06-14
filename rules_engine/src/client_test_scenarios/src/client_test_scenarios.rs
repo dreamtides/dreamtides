@@ -59,7 +59,7 @@ pub fn perform_action(request: &PerformActionRequest, scenario: &str) -> Perform
             perform_debug_action(*action, request.metadata, scenario)
         }
         GameAction::BattleDisplayAction(action) => {
-            perform_battle_display_action(*action, request.metadata, scenario)
+            perform_battle_display_action(action.clone(), request.metadata, scenario)
         }
         _ => PerformActionResponse {
             metadata: request.metadata,

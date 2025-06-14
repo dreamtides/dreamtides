@@ -13,6 +13,9 @@ use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::{EnvFilter, Layer};
 
+pub const LOG_FILTER_EMOJIS: &[&str] =
+    &["🚨", "🚧", "🔎", "💻", "🌐", "📏", "🤖", "🟢", "📍", "📝", "💡"];
+
 static INIT: Once = Once::new();
 
 /// Initializes global logging behavior for the 'tracing' crate if it hasn't

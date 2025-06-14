@@ -28,8 +28,9 @@ pub fn render_panel(
             .battle(battle)
             .build()
             .wrap(),
-        PanelAddress::ViewLogs => ViewLogsPanel::builder()
+        PanelAddress::ViewLogs(filter) => ViewLogsPanel::builder()
             .maybe_log_directory(battle.request_context.logging_options.log_directory.clone())
+            .maybe_filter(filter)
             .build()
             .wrap(),
     }

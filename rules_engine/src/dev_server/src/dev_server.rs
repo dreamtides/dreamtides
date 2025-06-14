@@ -82,7 +82,7 @@ async fn perform_action(body: String) -> AppResult<Json<PerformActionResponse>> 
     println!();
 
     let req: PerformActionRequest = parse_json(&body)?;
-    let action = req.action;
+    let action = req.action.clone();
     let user_id = req.metadata.user_id;
 
     let _span = info_span!("perform_action", ?action);

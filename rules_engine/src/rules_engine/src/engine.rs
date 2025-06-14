@@ -317,11 +317,11 @@ fn handle_request_action(
     let request_context = get_request_context(user_id)
         .unwrap_or(RequestContext { logging_options: Default::default() });
 
-    match request.action {
+    match &request.action {
         GameAction::NoOp => {}
         GameAction::DebugAction(action) => {
             let player = renderer::player_name_for_user(&*battle, user_id);
-            debug_actions::execute(battle, user_id, player, action);
+            debug_actions::execute(battle, user_id, player, *action);
             handle_battle_action::append_update(
                 user_id,
                 renderer::connect(&*battle, user_id, true),
@@ -335,13 +335,13 @@ fn handle_request_action(
                 battle,
                 user_id,
                 player,
-                action,
+                *action,
                 &request_context,
                 request_id,
             );
         }
         GameAction::BattleDisplayAction(action) => {
-            apply_battle_display_action::execute(action);
+            apply_battle_display_action::execute(action.clone());
             handle_battle_action::append_update(
                 user_id,
                 renderer::connect(&*battle, user_id, true),
@@ -351,7 +351,7 @@ fn handle_request_action(
         }
         GameAction::Undo(player) => {
             let Some((undone_battle, _)) =
-                deserialize_save_file::undo(&save, player, request_context.clone())
+                deserialize_save_file::undo(&save, *player, request_context.clone())
             else {
                 show_error_message(
                     user_id,

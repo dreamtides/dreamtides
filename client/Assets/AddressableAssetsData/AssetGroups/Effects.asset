@@ -235,6 +235,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9b47781dd3c86401c9f6277f636cd335
+    m_Address: Assets/ThirdParty/Fonts/Roboto/Roboto-VariableFont_wdth,wght.ttf
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9c1aee3bcc1e0431a97b0c28e41e60e3
     m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic
       Magic and Impacts/RPG3_Generic_SubtleWhoosh02.wav
