@@ -128,7 +128,7 @@ namespace Dreamtides.Services
         Check(_landscapeLayout).gameObject.SetActive(false);
       }
 
-      Application.targetFrameRate = UnityEngine.Device.Application.platform == RuntimePlatform.Android ? 30 : 60;
+      Application.targetFrameRate = 60;
 
       foreach (var service in GetComponentsInChildren<Service>())
       {

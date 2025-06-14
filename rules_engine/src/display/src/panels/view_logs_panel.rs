@@ -7,7 +7,9 @@ use action_data::game_action_data::GameAction;
 use action_data::panel_address::PanelAddress;
 use bon::Builder;
 use logging::LOG_FILTER_EMOJIS;
-use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify, FlexWrap, TextAlign, WhiteSpace};
+use masonry::flex_enums::{
+    FlexAlign, FlexDirection, FlexJustify, FlexVisibility, FlexWrap, TextAlign, WhiteSpace,
+};
 use masonry::flex_style::FlexStyle;
 use ui_components::box_component::BoxComponent;
 use ui_components::button_component::ButtonComponent;
@@ -139,6 +141,7 @@ impl Component for LogFilterButtons {
                     .flex_direction(FlexDirection::Row)
                     .justify_content(FlexJustify::Center)
                     .wrap(FlexWrap::NoWrap)
+                    .overflow(FlexVisibility::Hidden)
                     .padding((8, 8, 8, 8))
                     .build(),
             )
