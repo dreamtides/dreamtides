@@ -13,8 +13,6 @@ namespace Dreamtides.Services
   {
     [SerializeField] Studio _studioPrefab = null!;
     [SerializeField] Transform _studioPosition = null!;
-    [SerializeField] GameObject _testSubjectPrefab = null!;
-    [SerializeField] MeshRenderer _testQuad = null!;
 
     private Dictionary<int, CaptureSession> _activeSessions = new();
 
@@ -24,12 +22,6 @@ namespace Dreamtides.Services
       public GameObject Subject = null!;
       public RenderTexture RenderTexture = null!;
       public int OutputInstanceId;
-    }
-
-    IEnumerator Start()
-    {
-      yield return new WaitForSeconds(1.0f);
-      CaptureSubject(_testSubjectPrefab, _testQuad);
     }
 
     /// <summary>

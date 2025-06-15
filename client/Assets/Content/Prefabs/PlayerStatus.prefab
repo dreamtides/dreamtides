@@ -251,6 +251,9 @@ MonoBehaviour:
   _turnIndicator: {fileID: 0}
   _imminentVictorySparkBackgroundMaterial: {fileID: 2100000, guid: bb3208b07971a417f90e7df1a8eca741, type: 2}
   _imminentVictoryIndicator: {fileID: 0}
+  _characterImage: {fileID: 3517697758460983304}
+  _testCharacterPrefab: {fileID: 0}
+  _registry: {fileID: 0}
 --- !u!1 &2198335393119608428
 GameObject:
   m_ObjectHideFlags: 0
@@ -984,7 +987,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9f038462c7f6c437a90adbbbf7e6d0b4, type: 2}
+  - {fileID: 2100000, guid: ec67f1c93821c44578adddf36ff94989, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

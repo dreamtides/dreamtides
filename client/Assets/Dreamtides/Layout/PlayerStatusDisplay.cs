@@ -1,6 +1,7 @@
 #nullable enable
 
 using Dreamtides.Schema;
+using Dreamtides.Services;
 using UnityEngine;
 
 namespace Dreamtides.Layout
@@ -13,6 +14,9 @@ namespace Dreamtides.Layout
     [SerializeField] GameObject _turnIndicator = null!;
     [SerializeField] Material _imminentVictorySparkBackgroundMaterial = null!;
     [SerializeField] GameObject _imminentVictoryIndicator = null!;
+    [SerializeField] MeshRenderer _characterImage = null!;
+    [SerializeField] GameObject _testCharacterPrefab = null!;
+    [SerializeField] Registry _registry = null!;
 
     long _producedEnergy;
     Renderer _sparkBackgroundRenderer = null!;
@@ -26,6 +30,7 @@ namespace Dreamtides.Layout
     {
       _sparkBackgroundRenderer = _totalSpark.GetComponent<Renderer>();
       _sparkBackgroundMaterial = _sparkBackgroundRenderer.material;
+      _registry.StudioService.CaptureSubject(_testCharacterPrefab, _characterImage);
     }
 
     public void UpdatePlayerView(PlayerView playerView, bool animate)
