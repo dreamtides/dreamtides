@@ -81,6 +81,9 @@ namespace Dreamtides.Services
     [SerializeField] LoggingService? _loggingService;
     public LoggingService LoggingService => Check(_loggingService);
 
+    [SerializeField] StudioService? _studioService;
+    public StudioService StudioService => Check(_studioService);
+
     [SerializeField] ControlledButton? _bottomRightButton;
     public ControlledButton BottomRightButton => Check(_bottomRightButton);
 
