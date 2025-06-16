@@ -3532,18 +3532,6 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: -5317669338628401487, guid: 6349f93bbba7f4920b91936b35c34e5b, type: 2}
-    - target: {fileID: 2890979179986655714, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2890979179986655714, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2890979179986655714, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1.5
-      objectReference: {fileID: 0}
     - target: {fileID: 3380541676553837138, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -4442,7 +4430,7 @@ PrefabInstance:
     - target: {fileID: 734237173889095592, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
       propertyPath: _testCharacterPrefab
       value: 
-      objectReference: {fileID: 3475607173303233728, guid: df0309b15ee124a2195650b753f5af78, type: 3}
+      objectReference: {fileID: 8533857090665073136, guid: e950c1c058ff841a0a9c518750b7e462, type: 3}
     - target: {fileID: 734237173889095592, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
       propertyPath: _imminentVictoryIndicator
       value: 
