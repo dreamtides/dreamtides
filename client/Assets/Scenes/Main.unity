@@ -3455,7 +3455,7 @@ PrefabInstance:
     - target: {fileID: 734237173889095592, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
       propertyPath: _testCharacterPrefab
       value: 
-      objectReference: {fileID: 3475607173303233728, guid: df0309b15ee124a2195650b753f5af78, type: 3}
+      objectReference: {fileID: 5153713506999347724, guid: e950c1c058ff841a0a9c518750b7e462, type: 3}
     - target: {fileID: 734237173889095592, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
       propertyPath: _imminentVictoryIndicator
       value: 
@@ -4430,7 +4430,7 @@ PrefabInstance:
     - target: {fileID: 734237173889095592, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
       propertyPath: _testCharacterPrefab
       value: 
-      objectReference: {fileID: 8533857090665073136, guid: e950c1c058ff841a0a9c518750b7e462, type: 3}
+      objectReference: {fileID: 5264708943679805588, guid: 3d997db3b2cf2417886d80723edcaa5d, type: 3}
     - target: {fileID: 734237173889095592, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
       propertyPath: _imminentVictoryIndicator
       value: 
@@ -11780,7 +11780,7 @@ PrefabInstance:
     - target: {fileID: 4485581333597341358, guid: b30ec3ff71deb4574b7370cd7ad256ae, type: 3}
       propertyPath: _testCharacterPrefab
       value: 
-      objectReference: {fileID: 8533857090665073136, guid: e950c1c058ff841a0a9c518750b7e462, type: 3}
+      objectReference: {fileID: 5264708943679805588, guid: 3d997db3b2cf2417886d80723edcaa5d, type: 3}
     - target: {fileID: 4485581333597341358, guid: b30ec3ff71deb4574b7370cd7ad256ae, type: 3}
       propertyPath: _imminentVictoryIndicator
       value: 
@@ -12923,7 +12923,7 @@ PrefabInstance:
     - target: {fileID: 4485581333597341358, guid: b30ec3ff71deb4574b7370cd7ad256ae, type: 3}
       propertyPath: _testCharacterPrefab
       value: 
-      objectReference: {fileID: 3475607173303233728, guid: df0309b15ee124a2195650b753f5af78, type: 3}
+      objectReference: {fileID: 5153713506999347724, guid: e950c1c058ff841a0a9c518750b7e462, type: 3}
     - target: {fileID: 4485581333597341358, guid: b30ec3ff71deb4574b7370cd7ad256ae, type: 3}
       propertyPath: _imminentVictoryIndicator
       value: 
