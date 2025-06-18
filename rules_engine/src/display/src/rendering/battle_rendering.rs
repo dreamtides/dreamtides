@@ -13,7 +13,7 @@ use crate::core::adapter;
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
 use crate::display_actions::{display_state, outcome_simulation};
-use crate::rendering::{card_rendering, interface_rendering};
+use crate::rendering::{card_rendering, identity_card_rendering, interface_rendering};
 
 pub fn run(builder: &mut ResponseBuilder, battle: &BattleState) {
     builder.push_battle_view(battle_view(builder, battle));
@@ -31,7 +31,7 @@ pub fn run(builder: &mut ResponseBuilder, battle: &BattleState) {
 }
 
 pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleView {
-    let cards = battle
+    let mut cards = battle
         .cards
         .all_cards()
         .map(|id| {
@@ -42,16 +42,16 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
         })
         .collect::<Vec<_>>();
 
-    // cards.push(identity_card_rendering::identity_card_view(
-    //     builder,
-    //     battle,
-    //     builder.display_for_player(),
-    // ));
-    // cards.push(identity_card_rendering::identity_card_view(
-    //     builder,
-    //     battle,
-    //     builder.display_for_player().opponent(),
-    // ));
+    cards.push(identity_card_rendering::identity_card_view(
+        builder,
+        battle,
+        builder.display_for_player(),
+    ));
+    cards.push(identity_card_rendering::identity_card_view(
+        builder,
+        battle,
+        builder.display_for_player().opponent(),
+    ));
 
     BattleView {
         id: battle.id,

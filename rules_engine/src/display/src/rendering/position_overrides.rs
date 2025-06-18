@@ -21,11 +21,17 @@ pub fn position(
         return Position::OnStack(positions::current_stack_type(builder, battle));
     }
 
+    for_browser(position)
+}
+
+/// Returns the position for a card in the browser, if it is the current
+/// browser.
+pub fn for_browser(position: Position) -> Position {
     if let Some(browser_source) = apply_battle_display_action::current_browser_source()
         && position == browser_source
     {
-        return Position::Browser;
+        Position::Browser
+    } else {
+        position
     }
-
-    position
 }

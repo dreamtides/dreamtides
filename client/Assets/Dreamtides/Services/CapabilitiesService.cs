@@ -28,6 +28,7 @@ namespace Dreamtides.Services
       switch (gameContext)
       {
         case GameContext.Browser:
+          return Registry.Layout.Browser.Objects.Count > 1 || Registry.Layout.CardOrderSelector.Objects.Count > 1;
         case GameContext.BrowserOverlay:
         case GameContext.Dragging:
           return true;

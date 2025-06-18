@@ -1,41 +1,55 @@
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::CardId;
 use core_data::display_types::PrefabAddress;
 use core_data::types::{CardFacing, PlayerName};
+use display_data::battle_view::DisplayPlayer;
 use display_data::card_view::{
     CardActions, CardEffects, CardPrefab, CardView, DisplayImage, RevealedCardView,
 };
 use display_data::object_position::{ObjectPosition, Position};
 
-use crate::core::adapter;
 use crate::core::response_builder::ResponseBuilder;
+use crate::rendering::position_overrides;
 
 pub fn identity_card_view(
     builder: &ResponseBuilder,
     _battle: &BattleState,
     player: PlayerName,
 ) -> CardView {
-    let card_id = CardId(if player == builder.display_for_player() { 1000000 } else { 1000001 });
-
+    let name = builder.to_display_player(player);
+    let position = Position::InPlayerStatus(name);
     CardView {
-        id: adapter::client_card_id(card_id),
+        id: format!("{:?}", name),
         position: ObjectPosition {
-            position: Position::Browser,
+            position: position_overrides::for_browser(position),
             sorting_key: 0,
             sorting_sub_key: 0,
         },
         revealed: Some(RevealedCardView {
-            image: DisplayImage::Prefab(PrefabAddress::new(
-                "Assets/Content/Characters/PirateCaptain/PirateCaptain.prefab",
-            )),
-            name: "Blackbeard\n<size=75%>Cunning Navigator</size>".to_string(),
+            image: DisplayImage::Prefab(PrefabAddress::new(match name {
+                DisplayPlayer::User => {
+                    "Assets/Content/Characters/PirateCaptain/PirateCaptain.prefab"
+                }
+                DisplayPlayer::Enemy => "Assets/Content/Characters/WarriorKing/WarriorKing.prefab",
+            })),
+            name: match name {
+                DisplayPlayer::User => "Blackbeard\n<size=75%>Cunning Navigator</size>".to_string(),
+                DisplayPlayer::Enemy => {
+                    "The Black Knight\n<size=75%>Malignant Usurper</size>".to_string()
+                }
+            },
             cost: None,
             produced: None,
             spark: None,
             card_type: "Identity".to_string(),
-            rules_text:
-                "At the end of your turn, if you played no characters this turn, draw a card."
-                    .to_string(),
+            rules_text: match name {
+                DisplayPlayer::User => {
+                    "At the end of your turn, if you played no characters this turn, draw a card."
+                        .to_string()
+                }
+                DisplayPlayer::Enemy => {
+                    "Whenever you discard your second card in a turn, draw a card.".to_string()
+                }
+            },
             outline_color: None,
             is_fast: false,
             actions: CardActions::default(),
