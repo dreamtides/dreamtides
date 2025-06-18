@@ -1,8 +1,6 @@
 /target
 
 /client_docs
-.windsurfrules
-.cursorrules
 .vscode
 .idea
 log.json

@@ -1,10 +1,5 @@
-use std::fmt;
-
-use schemars::gen::SchemaGenerator;
-use schemars::schema::{InstanceType, Schema, SchemaObject};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use slotmap::{new_key_type, Key, KeyData};
 use uuid::Uuid;
 
 /// Identifies a human player of the game.
@@ -59,52 +54,6 @@ pub enum CardName {
     RippleOfDefiance,
     Abolish,
     Dreamscatter,
-}
-
-new_key_type! {
-    /// Identifies a card or card-like object such as:
-    ///
-    /// - A normal card
-    /// - A copy of a card on the stack
-    /// - A token or copy of a card in play
-    pub struct CardIdent;
-}
-
-impl fmt::Display for CardIdent {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}", self.0)
-    }
-}
-
-impl JsonSchema for CardIdent {
-    fn schema_name() -> String {
-        "CardId".to_string()
-    }
-
-    fn json_schema(gen: &mut SchemaGenerator) -> Schema {
-        let mut schema =
-            SchemaObject { instance_type: Some(InstanceType::Object.into()), ..Default::default() };
-        let obj = schema.object();
-        obj.required.insert("idx".to_owned());
-        obj.required.insert("version".to_owned());
-        obj.properties.insert("idx".to_owned(), <u32>::json_schema(gen));
-        obj.properties.insert("version".to_owned(), <u32>::json_schema(gen));
-        schema.into()
-    }
-}
-
-impl CardIdent {
-    /// Converts an opaque number received from [Self::to_int] into a card
-    /// id
-    pub fn from_int(value: u64) -> Self {
-        KeyData::from_ffi(value).into()
-    }
-
-    /// Returns an opaque number which can later be converted back into a card
-    /// id
-    pub fn to_int(&self) -> u64 {
-        self.data().as_ffi()
-    }
 }
 
 /// Identifies an ability of a card.
