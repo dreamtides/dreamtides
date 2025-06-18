@@ -19,6 +19,7 @@ namespace Dreamtides.Services
     [SerializeField] Card _eventCardPrefab = null!;
     [SerializeField] Card _tokenPrefab = null!;
     [SerializeField] Card _dreamwellPrefab = null!;
+    [SerializeField] Card _identityCardPrefab = null!;
     [SerializeField] Card _enemyPrefab = null!;
     [SerializeField] Card _dreamsignPrefab = null!;
 
@@ -53,6 +54,7 @@ namespace Dreamtides.Services
             CardPrefab.Enemy => ComponentUtils.Instantiate(_enemyPrefab),
             CardPrefab.Dreamsign => ComponentUtils.Instantiate(_dreamsignPrefab),
             CardPrefab.Event => ComponentUtils.Instantiate(_eventCardPrefab),
+            CardPrefab.Identity => ComponentUtils.Instantiate(_identityCardPrefab),
             _ => ComponentUtils.Instantiate(_cardPrefab)
           };
           if (cardView.CreatePosition != null)

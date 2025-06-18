@@ -1,7 +1,7 @@
 use action_data::game_action_data::GameAction;
 use battle_state::battle::card_id::CardId;
 use core_data::display_color::DisplayColor;
-use core_data::display_types::{AudioClipAddress, ProjectileAddress, SpriteAddress};
+use core_data::display_types::{AudioClipAddress, PrefabAddress, ProjectileAddress, SpriteAddress};
 use core_data::numerics::{Energy, Spark};
 use core_data::types::CardFacing;
 use masonry::flex_node::FlexNode;
@@ -110,9 +110,9 @@ pub struct RevealedCardView {
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct DisplayImage {
-    /// Image texture address for this card
-    pub address: SpriteAddress,
+pub enum DisplayImage {
+    Sprite(SpriteAddress),
+    Prefab(PrefabAddress),
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
@@ -165,6 +165,7 @@ pub struct InfoZoomIcon {
 pub enum CardPrefab {
     Character,
     Event,
+    Identity,
     Token,
     Dreamwell,
     Enemy,

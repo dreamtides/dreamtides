@@ -61,7 +61,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
     let ControllerAndZone { controller, .. } = positions::controller_and_zone(battle, card_id);
 
     RevealedCardView {
-        image: DisplayImage { address: card_image(battle, card_id) },
+        image: DisplayImage::Sprite(card_image(battle, card_id)),
         name: card_name(battle, card_id),
         cost: card_properties::cost(battle, card_id),
         produced: None,

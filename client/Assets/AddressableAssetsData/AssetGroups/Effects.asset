@@ -76,6 +76,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3d997db3b2cf2417886d80723edcaa5d
+    m_Address: Assets/Content/Characters/PirateCaptain/PirateCaptain.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3e328934534644e36a123a55b90d9e27
     m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Cast01.wav
     m_ReadOnly: 0

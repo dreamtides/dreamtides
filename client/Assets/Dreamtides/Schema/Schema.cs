@@ -1216,9 +1216,6 @@ namespace Dreamtides.Schema
         public FlexWrap? Wrap { get; set; }
     }
 
-    /// <summary>
-    /// Image texture address for this card
-    /// </summary>
     public partial class SpriteAddress
     {
         [JsonProperty("sprite", Required = Required.Always)]
@@ -1503,11 +1500,17 @@ namespace Dreamtides.Schema
     /// </summary>
     public partial class DisplayImage
     {
-        /// <summary>
-        /// Image texture address for this card
-        /// </summary>
-        [JsonProperty("address", Required = Required.Always)]
-        public SpriteAddress Address { get; set; }
+        [JsonProperty("sprite", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public SpriteAddress Sprite { get; set; }
+
+        [JsonProperty("prefab", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PrefabAddress Prefab { get; set; }
+    }
+
+    public partial class PrefabAddress
+    {
+        [JsonProperty("prefab", Required = Required.Always)]
+        public string Prefab { get; set; }
     }
 
     public partial class InfoZoomData
@@ -1948,7 +1951,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Represents the general category of card being displayed.
     /// </summary>
-    public enum CardPrefab { Character, Dreamsign, Dreamwell, Enemy, Event, Token };
+    public enum CardPrefab { Character, Dreamsign, Dreamwell, Enemy, Event, Identity, Token };
 
     public enum GameActionEnum { NoOp };
 
@@ -2737,6 +2740,8 @@ namespace Dreamtides.Schema
                     return CardPrefab.Enemy;
                 case "event":
                     return CardPrefab.Event;
+                case "identity":
+                    return CardPrefab.Identity;
                 case "token":
                     return CardPrefab.Token;
             }
@@ -2767,6 +2772,9 @@ namespace Dreamtides.Schema
                     return;
                 case CardPrefab.Event:
                     serializer.Serialize(writer, "event");
+                    return;
+                case CardPrefab.Identity:
+                    serializer.Serialize(writer, "identity");
                     return;
                 case CardPrefab.Token:
                     serializer.Serialize(writer, "token");

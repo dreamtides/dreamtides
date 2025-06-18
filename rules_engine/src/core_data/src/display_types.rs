@@ -76,6 +76,18 @@ impl SpriteAddress {
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
+pub struct PrefabAddress {
+    pub prefab: String,
+}
+
+impl PrefabAddress {
+    pub fn new(prefab: impl Into<String>) -> Self {
+        Self { prefab: prefab.into() }
+    }
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct MaterialAddress {
     pub material: String,
 }

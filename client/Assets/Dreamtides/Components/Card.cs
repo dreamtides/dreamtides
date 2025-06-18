@@ -277,9 +277,19 @@ namespace Dreamtides.Components
       _battlefieldSparkText.text = revealed.Spark?.ToString();
       _typeText.text = revealed.CardType;
 
-      if (_cardImage is SpriteRenderer spriteRenderer)
+      if (_cardImage is SpriteRenderer spriteRenderer && revealed.Image.Sprite != null)
       {
-        spriteRenderer.sprite = _registry.AssetService.GetSprite(revealed.Image.Address);
+        spriteRenderer.sprite = _registry.AssetService.GetSprite(revealed.Image.Sprite);
+      }
+      else if (_cardImage is MeshRenderer meshRenderer && revealed.Image.Prefab != null)
+      {
+        var prefab = _registry.AssetService.GetPrefab(revealed.Image.Prefab);
+        _registry.StudioService.EndCapture(meshRenderer);
+        _registry.StudioService.CaptureSubject(prefab, meshRenderer, far: true);
+      }
+      else
+      {
+        _registry.LoggingService.LogError($"Card has no valid image", ("id", Id));
       }
 
       _outline.material.SetInt("_Seed", UnityEngine.Random.Range(0, 9999));

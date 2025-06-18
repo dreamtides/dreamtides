@@ -109,9 +109,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
             sorting_sub_key: 0,
         },
         revealed: revealed.then_some(RevealedCardView {
-            image: DisplayImage {
-                address: SpriteAddress::new("Assets/ThirdParty/GameAssets/CardImages/Standard/2521694543.png"),
-            },
+            image: DisplayImage::Sprite(SpriteAddress::new("Assets/ThirdParty/GameAssets/CardImages/Standard/2521694543.png")),
             name: "Titan of Forgotten Echoes".to_string(),
             rules_text: "When you \u{f0a3} materialize your second character in a turn, return this character from your void to play.".to_string(),
             outline_color: (position == Position::InHand(DisplayPlayer::User)).then_some(display_color::GREEN),
@@ -160,11 +158,9 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
         id: CardId(sorting_key as usize),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: revealed.then_some(RevealedCardView {
-            image: DisplayImage {
-                address: SpriteAddress::new(
-                    "Assets/ThirdParty/GameAssets/CardImages/Standard/1633431262.png",
-                ),
-            },
+            image: DisplayImage::Sprite(SpriteAddress::new(
+                "Assets/ThirdParty/GameAssets/CardImages/Standard/1633431262.png",
+            )),
             name: "Beacon of Tomorrow".to_string(),
             rules_text: "Discover a card with cost (2).".to_string(),
             outline_color: (position == Position::InHand(DisplayPlayer::User)).then_some(display_color::GREEN),
@@ -204,11 +200,9 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
             sorting_sub_key: 0,
         },
         revealed: revealed.then_some(RevealedCardView {
-            image: DisplayImage {
-                address: SpriteAddress::new(
-                    "Assets/ThirdParty/GameAssets/CardImages/Standard/2269064817.png",
-                ),
-            },
+            image: DisplayImage::Sprite(SpriteAddress::new(
+                "Assets/ThirdParty/GameAssets/CardImages/Standard/2269064817.png",
+            )),
             name: "Scrap Reclaimer".to_string(),
             rules_text: "Judgment: Return this character from your void to your hand. Born from rust and resilience.".to_string(),
             outline_color: (position == Position::InHand(DisplayPlayer::User)).then_some(display_color::GREEN),
@@ -247,11 +241,9 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
         id: CardId(sorting_key as usize),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: revealed.then_some(RevealedCardView {
-            image: DisplayImage {
-                address: SpriteAddress::new(
-                    "Assets/ThirdParty/GameAssets/CardImages/Standard/2269064809.png",
-                ),
-            },
+            image: DisplayImage::Sprite(SpriteAddress::new(
+                "Assets/ThirdParty/GameAssets/CardImages/Standard/2269064809.png",
+            )),
             name: "Evacuation Enforcer".to_string(),
             rules_text: "> Draw 2 cards. Discard 3 cards.\nPromises under a stormy sky."
                 .to_string(),
@@ -283,11 +275,9 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
         id: CardId(sorting_key as usize),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: revealed.then_some(RevealedCardView {
-            image: DisplayImage {
-                address: SpriteAddress::new(
-                    "Assets/ThirdParty/GameAssets/CardImages/Standard/2027158310.png",
-                ),
-            },
+            image: DisplayImage::Sprite(SpriteAddress::new(
+                "Assets/ThirdParty/GameAssets/CardImages/Standard/2027158310.png",
+            )),
             name: "Moonlit Voyage".to_string(),
             rules_text: "Draw 2 cards. Discard 2 cards.\nReclaim".to_string(),
             outline_color: (position == Position::InHand(DisplayPlayer::User))
@@ -322,11 +312,9 @@ fn enemy_card(position: Position, sorting_key: u32) -> CardView {
         id: CardId(sorting_key as usize),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: Some(RevealedCardView {
-            image: DisplayImage {
-                address: SpriteAddress::new(
-                    "Assets/ThirdParty/GameAssets/CardImages/Enemy/Korrak.png",
-                ),
-            },
+            image: DisplayImage::Sprite(SpriteAddress::new(
+                "Assets/ThirdParty/GameAssets/CardImages/Enemy/Korrak.png",
+            )),
             name: "<size=200%>Korrak</size>\nHellfire Sovereign".to_string(),
             rules_text: ">Judgment: A character you control gains +2 spark.".to_string(),
             outline_color: None,
@@ -357,11 +345,9 @@ fn dreamsign_card(position: Position, sorting_key: u32) -> CardView {
         id: CardId(sorting_key as usize),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: Some(RevealedCardView {
-            image: DisplayImage {
-                address: SpriteAddress::new(
-                    "Assets/ThirdParty/GameAssets/CardImages/Dreamsign/DragonEgg.png",
-                ),
-            },
+            image: DisplayImage::Sprite(SpriteAddress::new(
+                "Assets/ThirdParty/GameAssets/CardImages/Dreamsign/DragonEgg.png",
+            )),
             name: "Dragon Egg".to_string(),
             rules_text: ">Judgment: If you control 3 characters with the same type, draw a card."
                 .to_string(),
@@ -393,11 +379,9 @@ fn dreamwell_card(position: Position, sorting_key: u32) -> CardView {
         id: CardId(sorting_key as usize),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: Some(RevealedCardView {
-            image: DisplayImage {
-                address: SpriteAddress::new(
-                    "Assets/ThirdParty/GameAssets/CardImages/Dreamwell/1963305268.png",
-                ),
-            },
+            image: DisplayImage::Sprite(SpriteAddress::new(
+                "Assets/ThirdParty/GameAssets/CardImages/Dreamwell/1963305268.png",
+            )),
             name: "Rising Dawn".to_string(),
             rules_text: "Draw a card.".to_string(),
             outline_color: None,
@@ -424,11 +408,9 @@ fn game_modifier_card(position: Position, sorting_key: u32) -> CardView {
         id: CardId(sorting_key as usize),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: revealed.then_some(RevealedCardView {
-            image: DisplayImage {
-                address: SpriteAddress::new(
-                    "Assets/ThirdParty/GameAssets/CardImages/Standard/2027158310.png",
-                ),
-            },
+            image: DisplayImage::Sprite(SpriteAddress::new(
+                "Assets/ThirdParty/GameAssets/CardImages/Standard/2027158310.png",
+            )),
             name: "Celestial Reverie".to_string(),
             rules_text: "Until end of turn, whenever you play a character, draw a card. "
                 .to_string(),
