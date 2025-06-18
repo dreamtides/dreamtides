@@ -73,6 +73,15 @@ namespace Dreamtides.Services
       }
     }
 
+    public GameObject? GetSubject(StudioType type)
+    {
+      if (_activeSessions.TryGetValue(type, out var session))
+      {
+        return session.Subject;
+      }
+      return null;
+    }
+
     private IEnumerator PlayAnimationSequence(CaptureSession session, PlayStudioAnimationCommand command)
     {
       var animator = session.Subject.GetComponent<Animator>();

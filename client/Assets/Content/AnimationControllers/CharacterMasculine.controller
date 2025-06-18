@@ -834,7 +834,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: IDL_Look_R_Masc
+  m_Name: IDL_Look_R
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
