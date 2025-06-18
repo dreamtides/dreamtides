@@ -17,6 +17,7 @@ namespace Dreamtides.Layout
     [SerializeField] MeshRenderer _characterImage = null!;
     [SerializeField] GameObject _testCharacterPrefab = null!;
     [SerializeField] Registry _registry = null!;
+    [SerializeField] StudioType _studioType;
 
     long _producedEnergy;
     Renderer _sparkBackgroundRenderer = null!;
@@ -30,7 +31,7 @@ namespace Dreamtides.Layout
     {
       _sparkBackgroundRenderer = _totalSpark.GetComponent<Renderer>();
       _sparkBackgroundMaterial = _sparkBackgroundRenderer.material;
-      _registry.StudioService.CaptureSubject(_testCharacterPrefab, _characterImage);
+      _registry.StudioService.CaptureSubject(_studioType, _testCharacterPrefab, _characterImage);
     }
 
     public void UpdatePlayerView(PlayerView playerView, bool animate)

@@ -205,6 +205,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("toggleThinkingIndicator", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public ToggleThinkingIndicatorCommand ToggleThinkingIndicator { get; set; }
+
+        [JsonProperty("playStudioAnimation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PlayStudioAnimationCommand PlayStudioAnimation { get; set; }
     }
 
     public partial class DisplayDreamwellActivationCommand
@@ -1508,7 +1511,16 @@ namespace Dreamtides.Schema
         public SpriteAddress Sprite { get; set; }
 
         [JsonProperty("prefab", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPrefabImage Prefab { get; set; }
+    }
+
+    public partial class DisplayPrefabImage
+    {
+        [JsonProperty("prefab", Required = Required.Always)]
         public PrefabAddress Prefab { get; set; }
+
+        [JsonProperty("studioType", Required = Required.Always)]
+        public StudioType StudioType { get; set; }
     }
 
     public partial class PrefabAddress
@@ -1593,6 +1605,21 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("sound", Required = Required.Always)]
         public AudioClipAddress Sound { get; set; }
+    }
+
+    public partial class PlayStudioAnimationCommand
+    {
+        [JsonProperty("animation", Required = Required.Always)]
+        public StudioAnimation Animation { get; set; }
+
+        [JsonProperty("studioType", Required = Required.Always)]
+        public StudioType StudioType { get; set; }
+    }
+
+    public partial class StudioAnimation
+    {
+        [JsonProperty("name", Required = Required.Always)]
+        public string Name { get; set; }
     }
 
     public partial class ToggleThinkingIndicatorCommand
@@ -2034,6 +2061,8 @@ namespace Dreamtides.Schema
 
     public enum SliderDirection { Horizontal, Vertical };
 
+    public enum StudioType { EnemyIdentityCard, EnemyStatus, UserIdentityCard, UserStatus };
+
     public enum ArrowStyle { Blue, Green, Red };
 
     /// <summary>
@@ -2220,6 +2249,7 @@ namespace Dreamtides.Schema
                 ScrollBarVisibilityConverter.Singleton,
                 TouchScrollBehaviorConverter.Singleton,
                 SliderDirectionConverter.Singleton,
+                StudioTypeConverter.Singleton,
                 ArrowStyleConverter.Singleton,
                 BattlePreviewStateConverter.Singleton,
                 BattlePreviewStateEnumConverter.Singleton,
@@ -4638,6 +4668,57 @@ namespace Dreamtides.Schema
         }
 
         public static readonly SliderDirectionConverter Singleton = new SliderDirectionConverter();
+    }
+
+    internal class StudioTypeConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(StudioType) || t == typeof(StudioType?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "enemyIdentityCard":
+                    return StudioType.EnemyIdentityCard;
+                case "enemyStatus":
+                    return StudioType.EnemyStatus;
+                case "userIdentityCard":
+                    return StudioType.UserIdentityCard;
+                case "userStatus":
+                    return StudioType.UserStatus;
+            }
+            throw new Exception("Cannot unmarshal type StudioType");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (StudioType)untypedValue;
+            switch (value)
+            {
+                case StudioType.EnemyIdentityCard:
+                    serializer.Serialize(writer, "enemyIdentityCard");
+                    return;
+                case StudioType.EnemyStatus:
+                    serializer.Serialize(writer, "enemyStatus");
+                    return;
+                case StudioType.UserIdentityCard:
+                    serializer.Serialize(writer, "userIdentityCard");
+                    return;
+                case StudioType.UserStatus:
+                    serializer.Serialize(writer, "userStatus");
+                    return;
+            }
+            throw new Exception("Cannot marshal type StudioType");
+        }
+
+        public static readonly StudioTypeConverter Singleton = new StudioTypeConverter();
     }
 
     internal class ArrowStyleConverter : JsonConverter

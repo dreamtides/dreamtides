@@ -3445,6 +3445,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 613451854}
     - target: {fileID: 734237173889095592, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
+      propertyPath: _studioType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 734237173889095592, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
       propertyPath: _totalSpark
       value: 
       objectReference: {fileID: 179667403}
@@ -4419,6 +4423,10 @@ PrefabInstance:
       propertyPath: _registry
       value: 
       objectReference: {fileID: 613451854}
+    - target: {fileID: 734237173889095592, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
+      propertyPath: _studioType
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 734237173889095592, guid: 7c4a0f0b030f84dea976f4b76a6b7388, type: 3}
       propertyPath: _totalSpark
       value: 
@@ -11763,6 +11771,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 613451854}
     - target: {fileID: 4485581333597341358, guid: b30ec3ff71deb4574b7370cd7ad256ae, type: 3}
+      propertyPath: _studioType
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4485581333597341358, guid: b30ec3ff71deb4574b7370cd7ad256ae, type: 3}
       propertyPath: _totalSpark
       value: 
       objectReference: {fileID: 1916378398}
@@ -12905,6 +12917,10 @@ PrefabInstance:
       propertyPath: _registry
       value: 
       objectReference: {fileID: 613451854}
+    - target: {fileID: 4485581333597341358, guid: b30ec3ff71deb4574b7370cd7ad256ae, type: 3}
+      propertyPath: _studioType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4485581333597341358, guid: b30ec3ff71deb4574b7370cd7ad256ae, type: 3}
       propertyPath: _totalSpark
       value: 

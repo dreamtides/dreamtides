@@ -490,6 +490,12 @@ namespace Dreamtides.Services
             coroutines.Add(StartCoroutine(Wait(command.PlayAudioClip.PauseDuration)));
           }
         }
+
+        if (command.PlayStudioAnimation != null)
+        {
+          Registry.LoggingService.Log("ActionService", "Applying command: PlayStudioAnimation");
+          Registry.StudioService.PlayStudioAnimation(command.PlayStudioAnimation);
+        }
       }
 
       foreach (var coroutine in coroutines)

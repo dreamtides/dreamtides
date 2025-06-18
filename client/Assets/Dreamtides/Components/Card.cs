@@ -283,9 +283,9 @@ namespace Dreamtides.Components
       }
       else if (_cardImage is MeshRenderer meshRenderer && revealed.Image.Prefab != null)
       {
-        var prefab = _registry.AssetService.GetPrefab(revealed.Image.Prefab);
-        _registry.StudioService.EndCapture(meshRenderer);
-        _registry.StudioService.CaptureSubject(prefab, meshRenderer, far: true);
+        var prefab = _registry.AssetService.GetPrefab(revealed.Image.Prefab.Prefab);
+        _registry.StudioService.EndCapture(revealed.Image.Prefab.StudioType);
+        _registry.StudioService.CaptureSubject(revealed.Image.Prefab.StudioType, prefab, meshRenderer, far: true);
       }
       else
       {

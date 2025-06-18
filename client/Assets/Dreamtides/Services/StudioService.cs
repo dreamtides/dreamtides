@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Dreamtides.Components;
+using Dreamtides.Schema;
 using Dreamtides.Utils;
 using UnityEngine;
 
@@ -14,21 +15,21 @@ namespace Dreamtides.Services
     [SerializeField] Studio _studioPrefab = null!;
     [SerializeField] Transform _studioPosition = null!;
 
-    private Dictionary<int, CaptureSession> _activeSessions = new();
+    private Dictionary<StudioType, CaptureSession> _activeSessions = new();
 
     private class CaptureSession
     {
       public Studio Studio = null!;
       public GameObject Subject = null!;
       public RenderTexture RenderTexture = null!;
-      public int OutputInstanceId;
+      public StudioType StudioType;
     }
 
     /// <summary>
     /// Captures a live image of a subject prefab and displays it on a
     /// RenderTexture on the provided MeshRenderer.
     /// </summary>
-    public void CaptureSubject(GameObject prefab, Renderer output, bool far = false)
+    public void CaptureSubject(StudioType type, GameObject prefab, Renderer output, bool far = false)
     {
       var studio = ComponentUtils.Instantiate(_studioPrefab);
       var studioPosition = FindStudioPosition();
@@ -45,26 +46,32 @@ namespace Dreamtides.Services
 
       output.material.mainTexture = renderTexture;
 
-      var outputInstanceId = output.GetInstanceID();
       var session = new CaptureSession
       {
         Studio = studio,
         Subject = instance,
         RenderTexture = renderTexture,
-        OutputInstanceId = outputInstanceId
+        StudioType = type
       };
 
-      _activeSessions[outputInstanceId] = session;
+      _activeSessions[type] = session;
+    }
+
+    public void PlayStudioAnimation(PlayStudioAnimationCommand command)
+    {
+      if (_activeSessions.TryGetValue(command.StudioType, out var session))
+      {
+        var animator = session.Subject.GetComponent<Animator>();
+        animator.Play(command.Animation.Name);
+      }
     }
 
     /// <summary>
     /// Ends a capture session for a MeshRenderer based on its instance ID.
     /// </summary>
-    public void EndCapture(Renderer output)
+    public void EndCapture(StudioType type)
     {
-      var outputInstanceId = output.GetInstanceID();
-
-      if (_activeSessions.TryGetValue(outputInstanceId, out var session))
+      if (_activeSessions.TryGetValue(type, out var session))
       {
         if (session.Studio != null)
         {
@@ -82,7 +89,7 @@ namespace Dreamtides.Services
           Destroy(session.RenderTexture);
         }
 
-        _activeSessions.Remove(outputInstanceId);
+        _activeSessions.Remove(type);
       }
     }
 

@@ -2,6 +2,7 @@ use bon::Builder;
 use core_data::display_color::DisplayColor;
 use core_data::display_types::{
     AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
+    StudioAnimation,
 };
 use core_data::numerics::{Energy, Points};
 use masonry::flex_style::FlexVector3;
@@ -76,6 +77,7 @@ pub enum Command {
     DisplayDreamwellActivation(DisplayDreamwellActivationCommand),
     DisplayEnemyMessage(DisplayEnemyMessageCommand),
     ToggleThinkingIndicator(ToggleThinkingIndicatorCommand),
+    PlayStudioAnimation(PlayStudioAnimationCommand),
 }
 
 impl Command {
@@ -276,6 +278,22 @@ pub struct DisplayEnemyMessageCommand {
 #[serde(rename_all = "camelCase")]
 pub struct ToggleThinkingIndicatorCommand {
     pub show: bool,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct PlayStudioAnimationCommand {
+    pub studio_type: StudioType,
+    pub animation: StudioAnimation,
+}
+
+#[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum StudioType {
+    UserStatus,
+    EnemyStatus,
+    UserIdentityCard,
+    EnemyIdentityCard,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

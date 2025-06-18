@@ -125,3 +125,15 @@ impl Milliseconds {
         Self { milliseconds_value: (seconds * 1000.0) as u32 }
     }
 }
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct StudioAnimation {
+    pub name: String,
+}
+
+impl StudioAnimation {
+    pub fn new(name: impl Into<String>) -> Self {
+        Self { name: name.into() }
+    }
+}

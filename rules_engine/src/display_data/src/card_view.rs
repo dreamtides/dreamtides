@@ -9,6 +9,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::battle_view::BattlePreviewView;
+use crate::command::StudioType;
 use crate::object_position::ObjectPosition;
 
 pub type ClientCardId = String;
@@ -115,7 +116,14 @@ pub struct RevealedCardView {
 #[serde(rename_all = "camelCase")]
 pub enum DisplayImage {
     Sprite(SpriteAddress),
-    Prefab(PrefabAddress),
+    Prefab(DisplayPrefabImage),
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct DisplayPrefabImage {
+    pub prefab: PrefabAddress,
+    pub studio_type: StudioType,
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]

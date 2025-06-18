@@ -3,8 +3,10 @@ use core_data::display_types::PrefabAddress;
 use core_data::types::{CardFacing, PlayerName};
 use display_data::battle_view::DisplayPlayer;
 use display_data::card_view::{
-    CardActions, CardEffects, CardPrefab, CardView, DisplayImage, RevealedCardView,
+    CardActions, CardEffects, CardPrefab, CardView, DisplayImage, DisplayPrefabImage,
+    RevealedCardView,
 };
+use display_data::command::StudioType;
 use display_data::object_position::{ObjectPosition, Position};
 
 use crate::core::response_builder::ResponseBuilder;
@@ -25,12 +27,20 @@ pub fn identity_card_view(
             sorting_sub_key: 0,
         },
         revealed: Some(RevealedCardView {
-            image: DisplayImage::Prefab(PrefabAddress::new(match name {
-                DisplayPlayer::User => {
-                    "Assets/Content/Characters/PirateCaptain/PirateCaptain.prefab"
-                }
-                DisplayPlayer::Enemy => "Assets/Content/Characters/WarriorKing/WarriorKing.prefab",
-            })),
+            image: DisplayImage::Prefab(DisplayPrefabImage {
+                prefab: PrefabAddress::new(match name {
+                    DisplayPlayer::User => {
+                        "Assets/Content/Characters/PirateCaptain/PirateCaptain.prefab"
+                    }
+                    DisplayPlayer::Enemy => {
+                        "Assets/Content/Characters/WarriorKing/WarriorKing.prefab"
+                    }
+                }),
+                studio_type: match name {
+                    DisplayPlayer::User => StudioType::UserIdentityCard,
+                    DisplayPlayer::Enemy => StudioType::EnemyIdentityCard,
+                },
+            }),
             name: match name {
                 DisplayPlayer::User => "Blackbeard\n<size=75%>Cunning Navigator</size>".to_string(),
                 DisplayPlayer::Enemy => {
