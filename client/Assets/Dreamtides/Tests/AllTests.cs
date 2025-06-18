@@ -90,7 +90,7 @@ namespace Dreamtides.Tests
         registry = r;
       });
 
-      var card = GameObject.Find("Moonlit Voyage [9]").GetComponent<Card>();
+      var card = GameObject.Find("[9] Moonlit Voyage").GetComponent<Card>();
 
       ComponentAssertions.AssertCountIs(registry.Layout.UserBattlefield, 7);
       ComponentAssertions.AssertCountIs(registry.Layout.UserHand, 5);
@@ -121,7 +121,7 @@ namespace Dreamtides.Tests
         registry = r;
       });
 
-      var card = GameObject.Find("Beacon of Tomorrow [6]").GetComponent<Card>();
+      var card = GameObject.Find("[6] Beacon of Tomorrow").GetComponent<Card>();
 
       ComponentAssertions.AssertCountIs(registry.Layout.UserBattlefield, 7);
       ComponentAssertions.AssertCountIs(registry.Layout.UserHand, 5);
@@ -176,7 +176,7 @@ namespace Dreamtides.Tests
         registry = r;
       });
 
-      var card = GameObject.Find("Scrap Reclaimer [7]").GetComponent<Card>();
+      var card = GameObject.Find("[7] Scrap Reclaimer").GetComponent<Card>();
       ComponentAssertions.AssertCountIs(registry.Layout.UserVoid, 10);
 
       yield return TestDragInputProvider.DragTo(
@@ -229,7 +229,7 @@ namespace Dreamtides.Tests
       yield return TestClickInputProvider.ClickOn(registry, registry.Layout.PrimaryActionButton);
       yield return TestUtil.WaitForCount(registry, registry.Layout.TargetingUserStack, 1);
 
-      var card = GameObject.Find("Beacon of Tomorrow [6]").GetComponent<Card>();
+      var card = GameObject.Find("[6] Beacon of Tomorrow").GetComponent<Card>();
       foreach (var enemy in registry.Layout.EnemyBattlefield.Objects)
       {
         var enemyCard = ComponentUtils.Get<Card>(enemy);

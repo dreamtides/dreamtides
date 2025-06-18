@@ -23,6 +23,7 @@ use display_data::card_view::{
 use ui_components::component::Component;
 use ui_components::icon;
 
+use crate::core::adapter;
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
 use crate::display_actions::outcome_simulation;
@@ -32,7 +33,7 @@ use crate::rendering::{card_display_state, positions};
 
 pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardView {
     CardView {
-        id: context.card_id(),
+        id: adapter::client_card_id(context.card_id()),
         position: positions::calculate(builder, context.battle(), context.card_id()),
         revealed: card_display_state::is_revealed_to(
             context.battle(),
@@ -56,7 +57,9 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
     let battle = context.battle();
     let card_id = context.card_id();
     let legal_actions = legal_actions::compute(battle, builder.act_for_player());
-    let can_play = legal_actions.contains(BattleAction::PlayCardFromHand(HandCardId(card_id)));
+    let play = BattleAction::PlayCardFromHand(HandCardId(card_id));
+    let play_action = legal_actions.contains(play).then_some(GameAction::BattleAction(play));
+    let can_play = play_action.is_some();
     let selection_action = selection_action(&legal_actions, card_id);
     let ControllerAndZone { controller, .. } = positions::controller_and_zone(battle, card_id);
 
@@ -77,7 +80,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
         info_zoom_data: build_info_zoom_data(battle, card_id),
         is_fast: false,
         actions: CardActions {
-            can_play,
+            can_play: play_action,
             on_click: selection_action,
             play_effect_preview: if can_play {
                 Some(outcome_simulation::action_effect_preview(
@@ -219,7 +222,7 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
                 };
 
                 icons.insert(target_card_id, InfoZoomIcon {
-                    card_id: target_card_id,
+                    card_id: adapter::client_card_id(target_card_id),
                     icon: icon::CHEVRON_UP.to_string(),
                     color: display_color::RED_500,
                 });
@@ -232,14 +235,14 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
         match targets {
             StackCardTargets::Character(target_character_id, _) => {
                 icons.insert(target_character_id.card_id(), InfoZoomIcon {
-                    card_id: target_character_id.card_id(),
+                    card_id: adapter::client_card_id(target_character_id.card_id()),
                     icon: icon::CHEVRON_UP.to_string(),
                     color: display_color::RED_500,
                 });
             }
             StackCardTargets::StackCard(target_stack_card_id, _) => {
                 icons.insert(target_stack_card_id.card_id(), InfoZoomIcon {
-                    card_id: target_stack_card_id.card_id(),
+                    card_id: adapter::client_card_id(target_stack_card_id.card_id()),
                     icon: icon::CHEVRON_UP.to_string(),
                     color: display_color::RED_500,
                 });
@@ -251,7 +254,7 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
     {
         // This card is currently on the stack with invalid targets.
         icons.insert(card_id, InfoZoomIcon {
-            card_id,
+            card_id: adapter::client_card_id(card_id),
             icon: icon::XMARK.to_string(),
             color: display_color::RED_500,
         });

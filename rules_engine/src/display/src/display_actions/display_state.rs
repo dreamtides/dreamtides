@@ -25,7 +25,7 @@ pub fn set_card_browser_source(source: Option<Position>) {
 
 /// Gets the current card browser source.
 pub fn get_card_browser_source() -> Option<Position> {
-    DISPLAY_STATE.lock().unwrap().card_browser_source
+    DISPLAY_STATE.lock().unwrap().card_browser_source.clone()
 }
 
 /// Updates the selected energy additional cost in the display state.

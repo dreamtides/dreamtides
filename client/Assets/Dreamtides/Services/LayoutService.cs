@@ -95,8 +95,7 @@ namespace Dreamtides.Services
       }
     }
 
-    public Card GetCard(long id) =>
-        Errors.CheckNotNull(Cards[id.ToString()]);
+    public Card GetCard(string id) => Errors.CheckNotNull(Cards[id]);
 
     /// <summary>
     /// Returns the game object for the given game object id.

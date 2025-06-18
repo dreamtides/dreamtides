@@ -21,6 +21,7 @@ use tracing_subscriber::EnvFilter;
 use ui_components::component::Component;
 use ui_components::icon;
 
+use crate::core::adapter;
 use crate::display_actions::display_state;
 use crate::rendering::interface_message::{AnchorPosition, InterfaceMessage};
 
@@ -162,7 +163,10 @@ fn get_preview_cards(
         let card_id = character_id.card_id();
         card_previews
             .entry(card_id)
-            .or_insert_with(|| CardPreviewView { card_id, ..Default::default() })
+            .or_insert_with(|| CardPreviewView {
+                card_id: adapter::client_card_id(card_id),
+                ..Default::default()
+            })
             .battlefield_icon = Some(icon::WARNING.to_string());
         card_previews.get_mut(&card_id).unwrap().battlefield_icon_color =
             Some(display_color::RED_900);
@@ -180,9 +184,10 @@ fn get_preview_cards(
         let spark_changed = original_spark != simulated_spark;
 
         if cost_changed || spark_changed {
-            let preview = card_previews
-                .entry(card_id)
-                .or_insert_with(|| CardPreviewView { card_id, ..Default::default() });
+            let preview = card_previews.entry(card_id).or_insert_with(|| CardPreviewView {
+                card_id: adapter::client_card_id(card_id),
+                ..Default::default()
+            });
 
             if cost_changed {
                 preview.cost = simulated_cost;

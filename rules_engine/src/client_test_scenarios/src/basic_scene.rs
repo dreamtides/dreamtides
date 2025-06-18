@@ -1,6 +1,7 @@
 use action_data::debug_action_data::DebugAction;
 use action_data::game_action_data::GameAction;
-use battle_state::battle::card_id::CardId;
+use battle_state::actions::battle_actions::BattleAction;
+use battle_state::battle::card_id::{CardId, HandCardId};
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::{AudioClipAddress, SpriteAddress};
 use core_data::identifiers::BattleId;
@@ -75,20 +76,20 @@ pub fn create(id: BattleId) -> BattleView {
 }
 
 fn cards_in_position(position: Position, start_key: u32, count: u32) -> Vec<CardView> {
-    (0..count).map(|i| card_view(position, start_key + i)).collect()
+    (0..count).map(|i| card_view(position.clone(), start_key + i)).collect()
 }
 
 pub fn card_view(position: Position, sorting_key: u32) -> CardView {
     let mut card = if sorting_key % 5 == 0 {
-        card1(position, sorting_key)
+        card1(position.clone(), sorting_key)
     } else if sorting_key % 5 == 1 {
-        card2(position, sorting_key)
+        card2(position.clone(), sorting_key)
     } else if sorting_key % 5 == 2 {
-        card3(position, sorting_key)
+        card3(position.clone(), sorting_key)
     } else if sorting_key % 5 == 3 {
-        card4(position, sorting_key)
+        card4(position.clone(), sorting_key)
     } else {
-        card5(position, sorting_key)
+        card5(position.clone(), sorting_key)
     };
 
     if position == Position::InHand(DisplayPlayer::Enemy) {
@@ -99,12 +100,22 @@ pub fn card_view(position: Position, sorting_key: u32) -> CardView {
     card
 }
 
+fn play_action(can_play: bool, sorting_key: u32) -> Option<GameAction> {
+    if can_play {
+        Some(GameAction::BattleAction(BattleAction::PlayCardFromHand(HandCardId(CardId(
+            sorting_key as usize,
+        )))))
+    } else {
+        None
+    }
+}
+
 fn card1(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardId(sorting_key as usize),
+        id: sorting_key.to_string(),
         position: ObjectPosition {
-            position,
+            position: position.clone(),
             sorting_key,
             sorting_sub_key: 0,
         },
@@ -123,7 +134,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
             }),
             is_fast: false,
             actions: CardActions {
-                can_play: position == Position::InHand(DisplayPlayer::User),
+                can_play: play_action(position == Position::InHand(DisplayPlayer::User), sorting_key),
                 play_effect_preview: Some(BattlePreviewView {
                     preview_message: Some(character_limit_message()),
                     user: PlayerPreviewView {
@@ -132,7 +143,7 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
                     },
                     cards: vec![
                         CardPreviewView {
-                            card_id: CardId(539),
+                            card_id: "539".to_string(),
                             battlefield_icon: Some(icon::WARNING.to_string()),
                             battlefield_icon_color: Some(display_color::RED_900),
                             ..Default::default()
@@ -155,8 +166,8 @@ fn card1(position: Position, sorting_key: u32) -> CardView {
 fn card2(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardId(sorting_key as usize),
-        position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
+        id: sorting_key.to_string(),
+        position: ObjectPosition { position: position.clone(), sorting_key, sorting_sub_key: 0 },
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage::Sprite(SpriteAddress::new(
                 "Assets/ThirdParty/GameAssets/CardImages/Standard/1633431262.png",
@@ -176,7 +187,7 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
             }),
             is_fast: false,
             actions: CardActions {
-                can_play: position == Position::InHand(DisplayPlayer::User),
+                can_play: play_action(position == Position::InHand(DisplayPlayer::User), sorting_key),
                 on_play_sound: Some(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Electric Magic/RPG3_ElectricMagic_Cast01.wav")),
                 ..Default::default()
             },
@@ -193,9 +204,9 @@ fn card2(position: Position, sorting_key: u32) -> CardView {
 fn card3(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardId(sorting_key as usize),
+        id: sorting_key.to_string(),
         position: ObjectPosition {
-            position,
+            position: position.clone(),
             sorting_key,
             sorting_sub_key: 0,
         },
@@ -218,7 +229,7 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
             }),
             is_fast: false,
             actions: CardActions {
-                can_play: position == Position::InHand(DisplayPlayer::User),
+                can_play: play_action(position == Position::InHand(DisplayPlayer::User), sorting_key),
                 play_effect_preview: Some(BattlePreviewView {
                     preview_message: Some(hand_size_limit_message()),
                     ..Default::default()
@@ -238,8 +249,8 @@ fn card3(position: Position, sorting_key: u32) -> CardView {
 fn card4(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardId(sorting_key as usize),
-        position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
+        id: sorting_key.to_string(),
+        position: ObjectPosition { position: position.clone(), sorting_key, sorting_sub_key: 0 },
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage::Sprite(SpriteAddress::new(
                 "Assets/ThirdParty/GameAssets/CardImages/Standard/2269064809.png",
@@ -256,7 +267,10 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
             info_zoom_data: None,
             is_fast: false,
             actions: CardActions {
-                can_play: position == Position::InHand(DisplayPlayer::User),
+                can_play: play_action(
+                    position == Position::InHand(DisplayPlayer::User),
+                    sorting_key,
+                ),
                 ..Default::default()
             },
             effects: CardEffects::default(),
@@ -272,8 +286,8 @@ fn card4(position: Position, sorting_key: u32) -> CardView {
 fn card5(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardId(sorting_key as usize),
-        position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
+        id: sorting_key.to_string(),
+        position: ObjectPosition { position: position.clone(), sorting_key, sorting_sub_key: 0 },
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage::Sprite(SpriteAddress::new(
                 "Assets/ThirdParty/GameAssets/CardImages/Standard/2027158310.png",
@@ -294,7 +308,10 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
             }),
             is_fast: false,
             actions: CardActions {
-                can_play: position == Position::InHand(DisplayPlayer::User),
+                can_play: play_action(
+                    position == Position::InHand(DisplayPlayer::User),
+                    sorting_key,
+                ),
                 ..Default::default()
             },
             effects: CardEffects::default(),
@@ -309,7 +326,7 @@ fn card5(position: Position, sorting_key: u32) -> CardView {
 
 fn enemy_card(position: Position, sorting_key: u32) -> CardView {
     CardView {
-        id: CardId(sorting_key as usize),
+        id: sorting_key.to_string(),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: Some(RevealedCardView {
             image: DisplayImage::Sprite(SpriteAddress::new(
@@ -342,7 +359,7 @@ fn enemy_card(position: Position, sorting_key: u32) -> CardView {
 
 fn dreamsign_card(position: Position, sorting_key: u32) -> CardView {
     CardView {
-        id: CardId(sorting_key as usize),
+        id: sorting_key.to_string(),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: Some(RevealedCardView {
             image: DisplayImage::Sprite(SpriteAddress::new(
@@ -376,7 +393,7 @@ fn dreamsign_card(position: Position, sorting_key: u32) -> CardView {
 
 fn dreamwell_card(position: Position, sorting_key: u32) -> CardView {
     CardView {
-        id: CardId(sorting_key as usize),
+        id: sorting_key.to_string(),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: Some(RevealedCardView {
             image: DisplayImage::Sprite(SpriteAddress::new(
@@ -405,7 +422,7 @@ fn dreamwell_card(position: Position, sorting_key: u32) -> CardView {
 fn game_modifier_card(position: Position, sorting_key: u32) -> CardView {
     let revealed = !matches!(position, Position::InDeck(_));
     CardView {
-        id: CardId(sorting_key as usize),
+        id: sorting_key.to_string(),
         position: ObjectPosition { position, sorting_key, sorting_sub_key: 0 },
         revealed: revealed.then_some(RevealedCardView {
             image: DisplayImage::Sprite(SpriteAddress::new(

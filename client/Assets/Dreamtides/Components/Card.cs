@@ -447,7 +447,8 @@ namespace Dreamtides.Components
               BattleActionClass = new()
               {
                 SelectCardOrder =
-                  _registry.Layout.CardOrderSelector.SelectCardOrderWithinDisplay(transform, CardView.Id),
+                  _registry.Layout.CardOrderSelector.SelectCardOrderWithinDisplay(transform,
+                    Errors.CheckNotNull(CardView.Revealed?.Actions?.CanSelectOrder)),
               }
             }
           }
@@ -475,21 +476,8 @@ namespace Dreamtides.Components
         {
           _registry.SoundService.PlayWhooshSound();
         }
-        var action = new GameAction
-        {
-          GameActionClass = new()
-          {
-            BattleAction = new()
-            {
-              BattleActionClass = new()
-              {
-                PlayCardFromHand = CardView.Id
-              }
-            }
-          }
-        };
-
-        _registry.ActionService.PerformAction(action);
+        _registry.ActionService.PerformAction(
+          Errors.CheckNotNull(CardView.Revealed?.Actions?.CanPlay?.ToGameAction()));
       }
     }
 
@@ -592,7 +580,8 @@ namespace Dreamtides.Components
 
     bool ShouldReturnToPreviousParentOnRelease()
     {
-      if (CardView.Revealed?.Actions.CanPlay != true && CardView.Revealed?.Actions.CanSelectOrder != true)
+      if (CardView.Revealed?.Actions.CanPlay.HasValue != true &&
+          CardView.Revealed?.Actions.CanSelectOrder.HasValue != true)
       {
         return true;
       }
@@ -602,10 +591,12 @@ namespace Dreamtides.Components
       return zDistance < 1f;
     }
 
-    bool CanPlay() => CardView.Revealed?.Actions.CanPlay == true &&
+    bool CanPlay() => CardView.Revealed?.Actions.CanPlay is { } canPlay &&
+      !canPlay.IsNull &&
       _registry.CapabilitiesService.CanPlayCards() &&
       GameContext == GameContext.Hand;
 
-    bool CanSelectOrder() => CardView.Revealed?.Actions.CanSelectOrder == true && GameContext == GameContext.Browser;
+    bool CanSelectOrder() => CardView.Revealed?.Actions.CanSelectOrder.HasValue == true &&
+      GameContext == GameContext.Browser;
   }
 }

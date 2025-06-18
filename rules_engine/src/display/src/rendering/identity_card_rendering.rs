@@ -7,6 +7,7 @@ use display_data::card_view::{
 };
 use display_data::object_position::{ObjectPosition, Position};
 
+use crate::core::adapter;
 use crate::core::response_builder::ResponseBuilder;
 
 pub fn identity_card_view(
@@ -17,7 +18,7 @@ pub fn identity_card_view(
     let card_id = CardId(if player == builder.display_for_player() { 1000000 } else { 1000001 });
 
     CardView {
-        id: card_id,
+        id: adapter::client_card_id(card_id),
         position: ObjectPosition {
             position: Position::Browser,
             sorting_key: 0,

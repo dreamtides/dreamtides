@@ -2,18 +2,18 @@ use battle_queries::battle_card_queries::stack_card_queries;
 use battle_queries::battle_player_queries::player_properties;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
-use battle_state::battle::card_id::CardIdType;
 use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use battle_state::battle_player::battle_player_state::BattlePlayerState;
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
 use display_data::battle_view::{BattlePreviewState, BattleView, PlayerView};
-use display_data::command::{ArrowStyle, Command, DisplayArrow, GameMessageType, GameObjectId};
+use display_data::command::{ArrowStyle, Command, DisplayArrow, GameMessageType};
 
+use crate::core::adapter;
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
 use crate::display_actions::{display_state, outcome_simulation};
-use crate::rendering::{card_rendering, identity_card_rendering, interface_rendering};
+use crate::rendering::{card_rendering, interface_rendering};
 
 pub fn run(builder: &mut ResponseBuilder, battle: &BattleState) {
     builder.push_battle_view(battle_view(builder, battle));
@@ -31,7 +31,7 @@ pub fn run(builder: &mut ResponseBuilder, battle: &BattleState) {
 }
 
 pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleView {
-    let mut cards = battle
+    let cards = battle
         .cards
         .all_cards()
         .map(|id| {
@@ -42,11 +42,11 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
         })
         .collect::<Vec<_>>();
 
-    cards.push(identity_card_rendering::identity_card_view(
-        builder,
-        battle,
-        builder.display_for_player(),
-    ));
+    // cards.push(identity_card_rendering::identity_card_view(
+    //     builder,
+    //     battle,
+    //     builder.display_for_player(),
+    // ));
     // cards.push(identity_card_rendering::identity_card_view(
     //     builder,
     //     battle,
@@ -113,13 +113,13 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
         .iter()
         .filter_map(|stack_card| {
             stack_card_queries::targets(battle, stack_card.id).map(|targets| {
-                let source = GameObjectId::CardId(stack_card.id.card_id());
+                let source = adapter::card_game_object_id(stack_card.id);
                 let (target, color) = match targets {
                     StackCardTargets::Character(character_id, _) => {
-                        (GameObjectId::CardId(character_id.card_id()), ArrowStyle::Red)
+                        (adapter::card_game_object_id(*character_id), ArrowStyle::Red)
                     }
                     StackCardTargets::StackCard(stack_card_id, _) => {
-                        (GameObjectId::CardId(stack_card_id.card_id()), ArrowStyle::Blue)
+                        (adapter::card_game_object_id(*stack_card_id), ArrowStyle::Blue)
                     }
                 };
                 DisplayArrow { source, target, color }

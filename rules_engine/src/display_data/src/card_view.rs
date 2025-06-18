@@ -11,12 +11,14 @@ use serde::{Deserialize, Serialize};
 use crate::battle_view::BattlePreviewView;
 use crate::object_position::ObjectPosition;
 
+pub type ClientCardId = String;
+
 /// Represents the visual state of a card or ability in a game
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct CardView {
     /// Identifier for this card
-    pub id: CardId,
+    pub id: ClientCardId,
 
     /// Position of this card in the UI
     pub position: ObjectPosition,
@@ -51,7 +53,8 @@ pub struct CardView {
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct CardPreviewView {
-    pub card_id: CardId,
+    /// Identifier for this card
+    pub card_id: ClientCardId,
 
     /// New cost value for this card
     pub cost: Option<Energy>,
@@ -118,11 +121,13 @@ pub enum DisplayImage {
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct CardActions {
-    /// True if this card can currently be played from hand.
-    pub can_play: bool,
+    /// If this card can currently be played from hand, an action to invoke when
+    /// played.
+    pub can_play: Option<GameAction>,
 
-    /// True if this card can currently be dragged within a Card Order Selector.
-    pub can_select_order: bool,
+    /// If this card can currently be dragged within a Card Order Selector, the
+    /// card ID to use when selecting order.
+    pub can_select_order: Option<CardId>,
 
     /// Sound to play when this card is played.
     pub on_play_sound: Option<AudioClipAddress>,
@@ -155,7 +160,7 @@ pub struct InfoZoomData {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct InfoZoomIcon {
-    pub card_id: CardId,
+    pub card_id: ClientCardId,
     pub icon: String,
     pub color: DisplayColor,
 }

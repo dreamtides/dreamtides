@@ -1,9 +1,9 @@
 use battle_state::actions::battle_actions::CardOrderSelectionTarget;
-use battle_state::battle::card_id::CardId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::battle_view::DisplayPlayer;
+use crate::card_view::ClientCardId;
 
 /// Represents the position of some object in the UI
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
@@ -25,7 +25,7 @@ impl Default for ObjectPosition {
 
 /// Possible types of display positions
 #[derive(
-    Copy, Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Ord, PartialOrd, JsonSchema,
+    Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Ord, PartialOrd, JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
 pub enum Position {
@@ -91,7 +91,7 @@ pub enum Position {
     DreamwellActivation,
 
     /// Object is hidden within a card
-    HiddenWithinCard(CardId),
+    HiddenWithinCard(ClientCardId),
 
     /// Object describes a game modifier or ongoing game effect
     GameModifier,

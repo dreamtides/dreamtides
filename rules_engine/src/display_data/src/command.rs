@@ -1,4 +1,3 @@
-use battle_state::battle::card_id::CardId;
 use bon::Builder;
 use core_data::display_color::DisplayColor;
 use core_data::display_types::{
@@ -11,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use strum::EnumDiscriminants;
 
 use crate::battle_view::{BattleView, DisplayPlayer};
-use crate::card_view::CardView;
+use crate::card_view::{CardView, ClientCardId};
 use crate::object_position::ObjectPosition;
 
 /// A list of [ParallelCommandGroup]s to execute sequentially.
@@ -153,7 +152,7 @@ pub struct DissolveCardCommand {
     ///
     /// Once a card is dissolved, it will be invisible until a reverse dissolve
     /// is applied to it.
-    pub target: CardId,
+    pub target: ClientCardId,
 
     /// The material to use for the dissolve effect.
     pub material: MaterialAddress,
@@ -240,7 +239,7 @@ pub struct DisplayDreamwellActivationCommand {
     /// should be kept in the DreamwellActivation position for the next
     /// update. Otherwise it's typical to return the card to the Dreamwell
     /// position.
-    pub card_id: CardId,
+    pub card_id: ClientCardId,
 
     /// New energy available to this player, if it has changed.
     pub new_energy: Option<Energy>,
@@ -282,7 +281,7 @@ pub struct ToggleThinkingIndicatorCommand {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum GameObjectId {
-    CardId(CardId),
+    CardId(ClientCardId),
     Deck(DisplayPlayer),
     Void(DisplayPlayer),
     Avatar(DisplayPlayer),

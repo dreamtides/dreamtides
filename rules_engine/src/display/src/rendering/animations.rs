@@ -8,6 +8,7 @@ use display_data::command::{
     DrawUserCardsCommand, GameMessageType, PlayAudioClipCommand,
 };
 
+use crate::core::adapter;
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
 use crate::rendering::{apply_card_fx, battle_rendering, card_rendering, labels};
@@ -48,7 +49,7 @@ pub fn render(
             push_snapshot(builder, snapshot);
             builder.push(Command::DisplayDreamwellActivation(DisplayDreamwellActivationCommand {
                 player: builder.to_display_player(*player),
-                card_id: *dreamwell_card_id,
+                card_id: adapter::client_card_id(*dreamwell_card_id),
                 new_energy: Some(*new_energy),
                 new_produced_energy: Some(*new_produced_energy),
             }));

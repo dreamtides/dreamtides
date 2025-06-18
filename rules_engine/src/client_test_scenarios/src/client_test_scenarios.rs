@@ -16,7 +16,7 @@ use core_data::display_types::{
 use core_data::identifiers::BattleId;
 use core_data::numerics::{Energy, Points, Spark};
 use display_data::battle_view::{BattleView, ButtonView, CardOrderSelectorView, DisplayPlayer};
-use display_data::card_view::CardView;
+use display_data::card_view::{CardView, ClientCardId};
 use display_data::command::{
     ArrowStyle, Command, CommandSequence, DisplayArrow, DisplayDreamwellActivationCommand,
     DisplayEffectCommand, DisplayJudgmentCommand, DissolveCardCommand, FireProjectileCommand,
@@ -74,10 +74,10 @@ fn perform_battle_action(
     scenario: &str,
 ) -> PerformActionResponse {
     let commands = match action {
-        BattleAction::PlayCardFromHand(id) => play_card(id.card_id(), scenario),
+        BattleAction::PlayCardFromHand(id) => play_card(id.card_id().0.to_string(), scenario),
         // BattleAction::BrowseCards(card_browser) => browse_cards(card_browser),
         // BattleAction::CloseCardBrowser => close_card_browser(),
-        BattleAction::SelectCharacterTarget(id) => select_card(id.card_id()),
+        BattleAction::SelectCharacterTarget(id) => select_card(id.card_id().0.to_string()),
         BattleAction::SelectCardOrder(select_order) => select_card_order(select_order),
         _ => {
             panic!("Not implemented: {:?}", action);
@@ -116,7 +116,7 @@ fn perform_debug_action(
     PerformActionResponse { metadata, commands }
 }
 
-fn play_card(card_id: CardId, scenario: &str) -> CommandSequence {
+fn play_card(card_id: ClientCardId, scenario: &str) -> CommandSequence {
     let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
     let Some((card_index, _)) = battle.cards.iter().enumerate().find(|(_, c)| c.id == card_id)
     else {
@@ -161,7 +161,7 @@ fn browse_cards(card_browser: CardBrowserType) -> CommandSequence {
     };
 
     // Store the source position for later use when closing browser
-    *CARD_BROWSER_SOURCE.lock().unwrap() = Some(source_position);
+    *CARD_BROWSER_SOURCE.lock().unwrap() = Some(source_position.clone());
 
     for card in battle.cards.iter_mut() {
         if card.position.position == source_position {
@@ -176,12 +176,12 @@ fn browse_cards(card_browser: CardBrowserType) -> CommandSequence {
 
 fn close_card_browser() -> CommandSequence {
     let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
-    let source_position = *CARD_BROWSER_SOURCE.lock().unwrap();
+    let source_position = CARD_BROWSER_SOURCE.lock().unwrap().clone();
 
     if let Some(position) = source_position {
         for card in battle.cards.iter_mut() {
             if card.position.position == Position::Browser {
-                card.position.position = position;
+                card.position.position = position.clone();
             }
         }
     }
@@ -192,7 +192,7 @@ fn close_card_browser() -> CommandSequence {
     CommandSequence::sequential(vec![Command::UpdateBattle(UpdateBattleCommand::new(battle))])
 }
 
-fn select_card(card_id: CardId) -> CommandSequence {
+fn select_card(card_id: ClientCardId) -> CommandSequence {
     let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
 
     let cards_to_move: Vec<(usize, u32)> = battle
@@ -213,7 +213,7 @@ fn select_card(card_id: CardId) -> CommandSequence {
         .iter()
         .find_map(|card| {
             if matches!(card.position.position, Position::OnStack(_)) {
-                Some(card.id)
+                Some(card.id.clone())
             } else {
                 None
             }
@@ -241,7 +241,7 @@ fn select_card(card_id: CardId) -> CommandSequence {
 
     let fire_projectile = Command::FireProjectile(FireProjectileCommand {
         source_id: GameObjectId::CardId(source_card_id),
-        target_id: GameObjectId::CardId(card_id),
+        target_id: GameObjectId::CardId(card_id.clone()),
         projectile: ProjectileAddress { projectile: "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 2 electro.prefab".to_string() },
         travel_duration: None,
         fire_sound: Some(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Electric Magic/RPG3_ElectricMagic_Cast02.wav")),
@@ -258,7 +258,7 @@ fn select_card(card_id: CardId) -> CommandSequence {
             ParallelCommandGroup { commands: vec![fire_projectile] },
             ParallelCommandGroup {
                 commands: vec![Command::DissolveCard(DissolveCardCommand {
-                    target: card_id,
+                    target: card_id.clone(),
                     reverse: false,
                     material: MaterialAddress::new(
                         "Assets/Content/Dissolves/Dissolve15.mat".to_string(),
@@ -276,7 +276,7 @@ fn select_card(card_id: CardId) -> CommandSequence {
                             "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Generic_SubtleWhoosh04.wav")),
                     }),
                     Command::DissolveCard(DissolveCardCommand {
-                        target: card_id,
+                        target: card_id.clone(),
                         reverse: true,
                         material: MaterialAddress::new("Assets/Content/Dissolves/Dissolve15.mat".to_string()),
                         color: display_color::BLUE_500,
@@ -290,7 +290,7 @@ fn select_card(card_id: CardId) -> CommandSequence {
     }
 }
 
-fn play_card_with_targets(battle: &mut BattleView, card_id: CardId, stack: StackType) {
+fn play_card_with_targets(battle: &mut BattleView, card_id: ClientCardId, stack: StackType) {
     let Some((card_index, card)) = battle.cards.iter().enumerate().find(|(_, c)| c.id == card_id)
     else {
         panic!("Card not found: {:?}", card_id);
@@ -315,9 +315,10 @@ fn play_card_with_targets(battle: &mut BattleView, card_id: CardId, stack: Stack
     for card in battle.cards.iter_mut() {
         if matches!(card.position.position, Position::OnBattlefield(DisplayPlayer::Enemy)) {
             if let Some(revealed) = &mut card.revealed {
-                revealed.actions.on_click = Some(GameAction::BattleAction(
-                    BattleAction::SelectCharacterTarget(CharacterId(card.id)),
-                ));
+                revealed.actions.on_click =
+                    Some(GameAction::BattleAction(BattleAction::SelectCharacterTarget(
+                        CharacterId(CardId(card.id.parse().unwrap())),
+                    )));
                 revealed.outline_color = Some(display_color::RED_500);
             }
         }
@@ -327,7 +328,7 @@ fn play_card_with_targets(battle: &mut BattleView, card_id: CardId, stack: Stack
 fn play_card_with_order_selector(
     battle: &mut BattleView,
     commands: &mut Vec<Command>,
-    card_id: CardId,
+    card_id: ClientCardId,
 ) {
     let Some((card_index, card)) = battle.cards.iter().enumerate().find(|(_, c)| c.id == card_id)
     else {
@@ -373,7 +374,8 @@ fn play_card_with_order_selector(
             if card.id == c1_view.id || card.id == c2_view.id {
                 card.position.position =
                     Position::CardOrderSelector(CardOrderSelectionTarget::Deck);
-                card.revealed.as_mut().unwrap().actions.can_select_order = true;
+                card.revealed.as_mut().unwrap().actions.can_select_order =
+                    Some(CardId(card.id.parse().unwrap()));
             }
         }
     }
@@ -391,18 +393,20 @@ fn play_card_with_order_selector(
 
 fn select_card_order(select_order: SelectCardOrder) -> CommandSequence {
     let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
-    if let Some(card_index) = battle.cards.iter().position(|card| card.id == select_order.card_id) {
+    if let Some(card_index) =
+        battle.cards.iter().position(|card| card.id == select_order.card_id.0.to_string())
+    {
         battle.cards[card_index].position.position =
             Position::CardOrderSelector(select_order.target);
     }
 
-    let mut selector_cards: Vec<(usize, CardId, u32)> = battle
+    let mut selector_cards: Vec<(usize, ClientCardId, u32)> = battle
         .cards
         .iter()
         .enumerate()
         .filter_map(|(idx, card)| {
             if card.position.position == Position::CardOrderSelector(select_order.target) {
-                Some((idx, card.id, card.position.sorting_key))
+                Some((idx, card.id.clone(), card.position.sorting_key))
             } else {
                 None
             }
@@ -412,11 +416,11 @@ fn select_card_order(select_order: SelectCardOrder) -> CommandSequence {
     selector_cards.sort_by_key(|(_, _, key)| *key);
 
     if let Some(selected_idx) =
-        selector_cards.iter().position(|(_, id, _)| *id == select_order.card_id)
+        selector_cards.iter().position(|(_, id, _)| *id == select_order.card_id.0.to_string())
     {
         let (card_index, _, _) = selector_cards.remove(selected_idx);
         let new_position = select_order.position.min(selector_cards.len());
-        selector_cards.insert(new_position, (card_index, select_order.card_id, 0));
+        selector_cards.insert(new_position, (card_index, select_order.card_id.0.to_string(), 0));
         for (i, (idx, _, _)) in selector_cards.iter().enumerate() {
             battle.cards[*idx].position.position = Position::CardOrderSelector(select_order.target);
             battle.cards[*idx].position.sorting_key = i as u32;
@@ -451,13 +455,13 @@ fn respond_to_enemy_card(battle: &mut BattleView, commands: &mut Vec<Command>) {
         .find(|(_, c)| matches!(c.position.position, Position::InHand(DisplayPlayer::Enemy)))
     {
         let sorting_key = card.position.sorting_key;
-        let card_id = card.id;
+        let card_id = card.id.clone();
         let target_id = battle
             .cards
             .iter()
             .find(|c| matches!(c.position.position, Position::OnBattlefield(DisplayPlayer::User)))
-            .map(|c| c.id)
-            .unwrap_or(card_id); // Fallback to the card's own ID if no target found
+            .map(|c| c.id.clone())
+            .unwrap_or(card_id.clone()); // Fallback to the card's own ID if no target found
         battle.cards[card_index] =
             basic_scene::card_view(Position::OnStack(StackType::Default), sorting_key);
         commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
@@ -467,7 +471,7 @@ fn respond_to_enemy_card(battle: &mut BattleView, commands: &mut Vec<Command>) {
             sorting_key,
         );
         battle.arrows = vec![DisplayArrow {
-            source: GameObjectId::CardId(card_id),
+            source: GameObjectId::CardId(card_id.clone()),
             target: GameObjectId::CardId(target_id),
             color: ArrowStyle::Red,
         }];
@@ -484,8 +488,8 @@ fn trigger_user_judgment_phase(battle: &mut BattleView, commands: &mut Vec<Comma
         .cards
         .iter()
         .find(|card| matches!(card.position.position, Position::InDreamwell(DisplayPlayer::User)))
-        .map(|card| card.id)
-        .unwrap_or(battle.cards[0].id);
+        .map(|card| card.id.clone())
+        .unwrap_or(battle.cards[0].id.clone());
 
     commands.extend(vec![
         Command::DisplayGameMessage(GameMessageType::YourTurn),
@@ -553,7 +557,7 @@ fn draw_card(battle: &mut BattleView) -> Option<CardView> {
         .iter()
         .find(|c| matches!(c.position.position, Position::InDeck(DisplayPlayer::User)))
     {
-        let card_id = deck_card.id;
+        let card_id = deck_card.id.clone();
         let sorting_key = deck_card.position.sorting_key;
         battle.user.total_spark += Spark(11);
         if let Some(card_index) = battle.cards.iter().position(|c| c.id == card_id) {
@@ -574,7 +578,7 @@ fn draw_card(battle: &mut BattleView) -> Option<CardView> {
 fn set_can_play_to_false(battle: &mut BattleView) {
     for card in battle.cards.iter_mut() {
         if let Some(revealed) = card.revealed.as_mut() {
-            revealed.actions.can_play = false;
+            revealed.actions.can_play = None;
             revealed.outline_color = None;
         }
     }

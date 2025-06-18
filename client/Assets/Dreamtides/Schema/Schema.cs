@@ -219,7 +219,7 @@ namespace Dreamtides.Schema
         /// the card to the Dreamwell position.
         /// </summary>
         [JsonProperty("cardId", Required = Required.Always)]
-        public long CardId { get; set; }
+        public string CardId { get; set; }
 
         /// <summary>
         /// New energy available to this player, if it has changed.
@@ -329,7 +329,7 @@ namespace Dreamtides.Schema
     public partial class GameObjectId
     {
         [JsonProperty("cardId", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? CardId { get; set; }
+        public string CardId { get; set; }
 
         [JsonProperty("deck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? Deck { get; set; }
@@ -403,7 +403,7 @@ namespace Dreamtides.Schema
         /// Once a card is dissolved, it will be invisible until a reverse dissolve is applied to it.
         /// </summary>
         [JsonProperty("target", Required = Required.Always)]
-        public long Target { get; set; }
+        public string Target { get; set; }
     }
 
     /// <summary>
@@ -490,7 +490,7 @@ namespace Dreamtides.Schema
         /// Identifier for this card
         /// </summary>
         [JsonProperty("id", Required = Required.Always)]
-        public long Id { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// Position of this card in the UI
@@ -607,7 +607,7 @@ namespace Dreamtides.Schema
         public DisplayPlayer? InDreamwell { get; set; }
 
         [JsonProperty("hiddenWithinCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? HiddenWithinCard { get; set; }
+        public string HiddenWithinCard { get; set; }
     }
 
     /// <summary>
@@ -694,16 +694,17 @@ namespace Dreamtides.Schema
     public partial class CardActions
     {
         /// <summary>
-        /// True if this card can currently be played from hand.
+        /// If this card can currently be played from hand, an action to invoke when played.
         /// </summary>
-        [JsonProperty("canPlay", Required = Required.Always)]
-        public bool CanPlay { get; set; }
+        [JsonProperty("canPlay")]
+        public ActionUnion? CanPlay { get; set; }
 
         /// <summary>
-        /// True if this card can currently be dragged within a Card Order Selector.
+        /// If this card can currently be dragged within a Card Order Selector, the card ID to use
+        /// when selecting order.
         /// </summary>
-        [JsonProperty("canSelectOrder", Required = Required.Always)]
-        public bool CanSelectOrder { get; set; }
+        [JsonProperty("canSelectOrder")]
+        public long? CanSelectOrder { get; set; }
 
         /// <summary>
         /// Action to perform when this card is clicked.
@@ -883,8 +884,11 @@ namespace Dreamtides.Schema
         [JsonProperty("battlefieldIconColor")]
         public DisplayColor BattlefieldIconColor { get; set; }
 
+        /// <summary>
+        /// Identifier for this card
+        /// </summary>
         [JsonProperty("cardId", Required = Required.Always)]
-        public long CardId { get; set; }
+        public string CardId { get; set; }
 
         /// <summary>
         /// New cost value for this card
@@ -1531,7 +1535,7 @@ namespace Dreamtides.Schema
     public partial class InfoZoomIcon
     {
         [JsonProperty("cardId", Required = Required.Always)]
-        public long CardId { get; set; }
+        public string CardId { get; set; }
 
         [JsonProperty("color", Required = Required.Always)]
         public DisplayColor Color { get; set; }

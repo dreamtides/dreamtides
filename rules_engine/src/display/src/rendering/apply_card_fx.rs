@@ -13,6 +13,7 @@ use display_data::command::{
 };
 use masonry::flex_style::FlexVector3;
 
+use crate::core::adapter;
 use crate::core::response_builder::ResponseBuilder;
 use crate::rendering::animations;
 
@@ -32,8 +33,8 @@ pub fn apply_effect(
             animations::push_snapshot(builder, battle);
             builder.push(Command::FireProjectile(
                 FireProjectileCommand::builder()
-                    .source_id(GameObjectId::CardId(source_id))
-                    .target_id(GameObjectId::CardId(target_id?))
+                    .source_id(adapter::card_game_object_id(source_id))
+                    .target_id(adapter::card_game_object_id(target_id?))
                     .projectile(hovl::projectile(1, "Projectile 3 black fire"))
                     .fire_sound(wow_sound::rpg_magic(
                         3,
@@ -44,7 +45,7 @@ pub fn apply_effect(
             ));
             builder.push(Command::DissolveCard(
                 DissolveCardCommand::builder()
-                    .target(target_id?)
+                    .target(adapter::client_card_id(target_id?))
                     .material(dissolve_material::material(15))
                     .color(display_color::ORANGE_500)
                     .reverse(false)
@@ -52,7 +53,7 @@ pub fn apply_effect(
             ));
             builder.run_with_next_battle_view(Command::DissolveCard(
                 DissolveCardCommand::builder()
-                    .target(target_id?)
+                    .target(adapter::client_card_id(target_id?))
                     .material(dissolve_material::material(15))
                     .color(display_color::ORANGE_500)
                     .reverse(true)
@@ -65,8 +66,8 @@ pub fn apply_effect(
             animations::push_snapshot(builder, battle);
             builder.push(Command::FireProjectile(
                 FireProjectileCommand::builder()
-                    .source_id(GameObjectId::CardId(source_id))
-                    .target_id(GameObjectId::CardId(target_id?))
+                    .source_id(adapter::card_game_object_id(source_id))
+                    .target_id(adapter::card_game_object_id(target_id?))
                     .projectile(hovl::projectile(1, "Projectile 6 blue fire"))
                     .fire_sound(wow_sound::rpg_magic(3, "Wind Magic/RPG3_WindMagic_Cast01"))
                     .impact_sound(wow_sound::rpg_magic(3, "Wind Magic/RPG3_WindMagic_Impact01"))
@@ -78,8 +79,8 @@ pub fn apply_effect(
             animations::push_snapshot(builder, battle);
             builder.push(Command::FireProjectile(
                 FireProjectileCommand::builder()
-                    .source_id(GameObjectId::CardId(source_id))
-                    .target_id(GameObjectId::CardId(target_id?))
+                    .source_id(adapter::card_game_object_id(source_id))
+                    .target_id(adapter::card_game_object_id(target_id?))
                     .projectile(hovl::projectile(1, "Projectile 10 blue laser"))
                     .fire_sound(wow_sound::rpg_magic(3, "Water Magic/RPG3_WaterMagic_Cast01"))
                     .impact_sound(wow_sound::rpg_magic(3, "Water Magic/RPG3_WaterMagic_Impact03"))
