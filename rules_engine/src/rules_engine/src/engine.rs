@@ -38,9 +38,6 @@ thread_local! {
 static REQUEST_TIMESTAMPS: LazyLock<Mutex<HashMap<Option<Uuid>, Instant>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
-static REQUEST_CONTEXTS: LazyLock<Mutex<HashMap<UserId, RequestContext>>> =
-    LazyLock::new(|| Mutex::new(HashMap::new()));
-
 #[derive(Debug, Clone)]
 pub struct PollResult {
     pub commands: CommandSequence,
@@ -55,7 +52,7 @@ pub fn connect(
     let metadata = request.metadata;
     let user_id = metadata.user_id;
 
-    store_request_context(user_id, request_context.clone());
+    provider.store_request_context(user_id, request_context.clone());
 
     let result = catch_panic(|| connect_internal(provider, request, request_context));
     let commands = match result {
@@ -299,7 +296,8 @@ fn perform_action_internal(provider: impl StateProvider, request: &PerformAction
             return;
         };
 
-        let request_context = get_request_context(user_id)
+        let request_context = provider
+            .get_request_context(user_id)
             .unwrap_or(RequestContext { logging_options: Default::default() });
         let Some((mut battle, quest_id)) = deserialize_save_file::battle(&save, request_context)
         else {
@@ -308,7 +306,7 @@ fn perform_action_internal(provider: impl StateProvider, request: &PerformAction
         };
 
         battle.animations = Some(AnimationData::default());
-        handle_request_action(request, user_id, save, &mut battle, request_id);
+        handle_request_action(&provider, request, user_id, save, &mut battle, request_id);
 
         // Always save to the save_user_id (either opponent or user)
         if let Err(error) =
@@ -324,13 +322,15 @@ fn perform_action_internal(provider: impl StateProvider, request: &PerformAction
 }
 
 fn handle_request_action(
+    provider: &impl StateProvider,
     request: &PerformActionRequest,
     user_id: UserId,
     save: SaveFile,
     battle: &mut BattleState,
     request_id: Option<Uuid>,
 ) {
-    let request_context = get_request_context(user_id)
+    let request_context = provider
+        .get_request_context(user_id)
         .unwrap_or(RequestContext { logging_options: Default::default() });
 
     match &request.action {
@@ -392,7 +392,9 @@ fn handle_request_action(
 }
 
 pub fn show_error_message(user_id: UserId, battle: Option<&BattleState>, error_message: String) {
-    let request_context = get_request_context(user_id)
+    let provider = crate::state_provider::DefaultStateProvider;
+    let request_context = provider
+        .get_request_context(user_id)
         .unwrap_or(RequestContext { logging_options: Default::default() });
     handle_battle_action::append_update(
         user_id,
@@ -489,14 +491,4 @@ fn filter_backtrace(backtrace: &str) -> String {
     }
 
     result
-}
-
-fn store_request_context(user_id: UserId, context: RequestContext) {
-    let mut contexts = REQUEST_CONTEXTS.lock().unwrap();
-    contexts.insert(user_id, context);
-}
-
-fn get_request_context(user_id: UserId) -> Option<RequestContext> {
-    let contexts = REQUEST_CONTEXTS.lock().unwrap();
-    contexts.get(&user_id).cloned()
 }
