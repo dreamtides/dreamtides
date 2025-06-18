@@ -17,6 +17,8 @@ pub struct ButtonComponent {
     #[builder(into)]
     pub action: GameAction,
     pub flex_grow: Option<FlexGrow>,
+    #[builder(default)]
+    pub is_primary: bool,
 }
 
 impl Component for ButtonComponent {
@@ -27,7 +29,11 @@ impl Component for ButtonComponent {
                 .style(
                     FlexStyle::builder()
                         .align_items(FlexAlign::Center)
-                        .background_image(poneti_ui::primary_button_background())
+                        .background_image(if self.is_primary {
+                            poneti_ui::primary_button_background()
+                        } else {
+                            poneti_ui::secondary_button_background()
+                        })
                         .flex_grow(self.flex_grow.unwrap_or_default())
                         .flex_shrink(0)
                         .height(20)

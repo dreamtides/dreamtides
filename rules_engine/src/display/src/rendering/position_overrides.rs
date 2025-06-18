@@ -3,7 +3,7 @@ use battle_state::battle::card_id::CardId;
 use display_data::object_position::Position;
 
 use crate::core::response_builder::ResponseBuilder;
-use crate::display_actions::apply_battle_display_action;
+use crate::display_actions::{apply_battle_display_action, display_state};
 use crate::rendering::positions;
 
 /// Returns an alternate position for a card based on display logic, e.g.
@@ -14,13 +14,15 @@ pub fn position(
     card_id: CardId,
     position: Position,
 ) -> Position {
-    if let Some(prompt) = &battle.prompt
+    let mut position = if let Some(prompt) = &battle.prompt
         && let Some(source_card_id) = prompt.source.card_id()
         && source_card_id == card_id
     {
-        return Position::OnStack(positions::current_stack_type(builder, battle));
-    }
-
+        Position::OnStack(positions::current_stack_type(builder, battle))
+    } else {
+        position
+    };
+    position = for_hidden_stack(position);
     for_browser(position)
 }
 
@@ -31,6 +33,15 @@ pub fn for_browser(position: Position) -> Position {
         && position == browser_source
     {
         Position::Browser
+    } else {
+        position
+    }
+}
+
+/// Returns the position for a card if the stack is hidden.
+fn for_hidden_stack(position: Position) -> Position {
+    if display_state::is_stack_hidden() && matches!(position, Position::OnStack(_)) {
+        Position::OnScreenStorage
     } else {
         position
     }

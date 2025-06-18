@@ -13,6 +13,8 @@ pub struct DisplayState {
     pub selected_energy_additional_cost: Option<Energy>,
     /// The currently open panel, if any.
     pub current_panel_address: Option<PanelAddress>,
+    /// Whether the stack is currently hidden.
+    pub stack_hidden: bool,
 }
 
 static DISPLAY_STATE: LazyLock<Mutex<DisplayState>> =
@@ -50,6 +52,15 @@ pub fn set_current_panel_address(address: Option<PanelAddress>) {
 
 /// Gets the current panel address.
 pub fn get_current_panel_address() -> Option<PanelAddress> {
-    let r = DISPLAY_STATE.lock().unwrap().current_panel_address.clone();
-    r
+    DISPLAY_STATE.lock().unwrap().current_panel_address.clone()
+}
+
+/// Updates whether the stack is hidden.
+pub fn set_stack_hidden(hidden: bool) {
+    DISPLAY_STATE.lock().unwrap().stack_hidden = hidden;
+}
+
+/// Gets whether the stack is currently hidden.
+pub fn is_stack_hidden() -> bool {
+    DISPLAY_STATE.lock().unwrap().stack_hidden
 }

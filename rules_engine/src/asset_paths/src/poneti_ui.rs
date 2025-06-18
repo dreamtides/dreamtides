@@ -12,6 +12,12 @@ pub fn primary_button_background() -> SpriteAddress {
     )
 }
 
+pub fn secondary_button_background() -> SpriteAddress {
+    SpriteAddress::new(
+        "Assets/ThirdParty/Poneti/ClassicFantasyRPG_UI/ARTWORKS/UIelements/Buttons/Medium/Button_Gray.png",
+    )
+}
+
 pub fn close_button_background() -> SpriteAddress {
     SpriteAddress::new(
         "Assets/ThirdParty/Poneti/ClassicFantasyRPG_UI/ARTWORKS/UIelements/Buttons/Square/Button_RED_s.png",

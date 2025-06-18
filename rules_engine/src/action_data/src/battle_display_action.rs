@@ -19,6 +19,9 @@ pub enum BattleDisplayAction {
 
     /// Closes the currently open panel.
     CloseCurrentPanel,
+
+    /// Toggles the visibility of the stack.
+    ToggleStackVisibility,
 }
 
 #[derive(

@@ -12,12 +12,14 @@ use battle_state::prompt_types::prompt_data::{PromptData, PromptType};
 use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
 use display_data::battle_view::{ButtonView, InterfaceView};
-use masonry::dimension::FlexInsets;
+use masonry::dimension::{FlexInsets, SafeAreaInsets};
 use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition};
 use masonry::flex_style::FlexStyle;
 use tracing_macros::panic_with;
 use ui_components::box_component::BoxComponent;
+use ui_components::button_component::ButtonComponent;
 use ui_components::component::Component;
+use ui_components::icon;
 
 use crate::core::response_builder::ResponseBuilder;
 use crate::display_actions::display_state;
@@ -46,6 +48,7 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
                 .build(),
         )
         .child(render_prompt_message(builder, battle))
+        .child(render_hide_stack_button(builder, battle))
         .child(
             current_panel_address
                 .map(|address| panel_rendering::render_panel(address, builder, battle)),
@@ -260,4 +263,39 @@ fn decrement_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<B
     }
 
     None
+}
+
+fn render_hide_stack_button(
+    builder: &ResponseBuilder,
+    battle: &BattleState,
+) -> Option<impl Component> {
+    if builder.is_for_animation() || !battle.cards.has_stack() {
+        return None;
+    }
+
+    let label = if display_state::is_stack_hidden() {
+        icon::EYE.to_string()
+    } else {
+        icon::EYE_SLASH.to_string()
+    };
+
+    Some(
+        BoxComponent::builder()
+            .name("Hide Stack Button Container")
+            .style(
+                FlexStyle::builder()
+                    .position(FlexPosition::Absolute)
+                    .inset(SafeAreaInsets::builder().bottom(8).right(8).build())
+                    .build(),
+            )
+            .child(
+                ButtonComponent::builder()
+                    .label(label)
+                    .action(GameAction::BattleDisplayAction(
+                        BattleDisplayAction::ToggleStackVisibility,
+                    ))
+                    .build(),
+            )
+            .build(),
+    )
 }

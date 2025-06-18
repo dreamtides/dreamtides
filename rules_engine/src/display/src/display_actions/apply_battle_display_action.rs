@@ -28,6 +28,9 @@ pub fn execute(action: BattleDisplayAction, player: PlayerName) -> CommandSequen
         BattleDisplayAction::CloseCurrentPanel => {
             display_state::set_current_panel_address(None);
         }
+        BattleDisplayAction::ToggleStackVisibility => {
+            toggle_stack_visibility();
+        }
     }
 
     builder.commands()
@@ -74,4 +77,9 @@ fn set_selected_energy_additional_cost(energy: Energy) {
 /// it's browsing.
 pub fn current_browser_source() -> Option<Position> {
     display_state::get_card_browser_source()
+}
+
+/// Toggles the visibility of the stack.
+fn toggle_stack_visibility() {
+    display_state::set_stack_hidden(!display_state::is_stack_hidden());
 }

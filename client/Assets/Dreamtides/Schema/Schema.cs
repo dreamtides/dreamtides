@@ -2018,8 +2018,10 @@ namespace Dreamtides.Schema
 
     /// <summary>
     /// Closes the currently open panel.
+    ///
+    /// Toggles the visibility of the stack.
     /// </summary>
-    public enum BattleDisplayActionEnum { CloseCardBrowser, CloseCurrentPanel };
+    public enum BattleDisplayActionEnum { CloseCardBrowser, CloseCurrentPanel, ToggleStackVisibility };
 
     public enum CardBrowserType { EnemyDeck, EnemyStatus, EnemyVoid, UserDeck, UserStatus, UserVoid };
 
@@ -3177,6 +3179,8 @@ namespace Dreamtides.Schema
                             return new BattleDisplayAction { Enum = BattleDisplayActionEnum.CloseCardBrowser };
                         case "closeCurrentPanel":
                             return new BattleDisplayAction { Enum = BattleDisplayActionEnum.CloseCurrentPanel };
+                        case "toggleStackVisibility":
+                            return new BattleDisplayAction { Enum = BattleDisplayActionEnum.ToggleStackVisibility };
                     }
                     break;
                 case JsonToken.StartObject:
@@ -3198,6 +3202,9 @@ namespace Dreamtides.Schema
                         return;
                     case BattleDisplayActionEnum.CloseCurrentPanel:
                         serializer.Serialize(writer, "closeCurrentPanel");
+                        return;
+                    case BattleDisplayActionEnum.ToggleStackVisibility:
+                        serializer.Serialize(writer, "toggleStackVisibility");
                         return;
                 }
             }
@@ -3390,6 +3397,8 @@ namespace Dreamtides.Schema
                     return BattleDisplayActionEnum.CloseCardBrowser;
                 case "closeCurrentPanel":
                     return BattleDisplayActionEnum.CloseCurrentPanel;
+                case "toggleStackVisibility":
+                    return BattleDisplayActionEnum.ToggleStackVisibility;
             }
             throw new Exception("Cannot unmarshal type BattleDisplayActionEnum");
         }
@@ -3409,6 +3418,9 @@ namespace Dreamtides.Schema
                     return;
                 case BattleDisplayActionEnum.CloseCurrentPanel:
                     serializer.Serialize(writer, "closeCurrentPanel");
+                    return;
+                case BattleDisplayActionEnum.ToggleStackVisibility:
+                    serializer.Serialize(writer, "toggleStackVisibility");
                     return;
             }
             throw new Exception("Cannot marshal type BattleDisplayActionEnum");
