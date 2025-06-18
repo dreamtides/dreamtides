@@ -28,7 +28,7 @@ namespace Dreamtides.Services
     /// Captures a live image of a subject prefab and displays it on a
     /// RenderTexture on the provided MeshRenderer.
     /// </summary>
-    public void CaptureSubject(GameObject prefab, MeshRenderer output)
+    public void CaptureSubject(GameObject prefab, Renderer output, bool far = false)
     {
       var studio = ComponentUtils.Instantiate(_studioPrefab);
       var studioPosition = FindStudioPosition();
@@ -39,7 +39,7 @@ namespace Dreamtides.Services
       studio.StudioCamera.targetTexture = renderTexture;
 
       var instance = Instantiate(prefab);
-      instance.transform.SetParent(studio.SubjectPosition);
+      instance.transform.SetParent(far ? studio.FarSubjectPosition : studio.SubjectPosition);
       instance.transform.localPosition = Vector3.zero;
       instance.transform.localRotation = Quaternion.identity;
 
@@ -60,7 +60,7 @@ namespace Dreamtides.Services
     /// <summary>
     /// Ends a capture session for a MeshRenderer based on its instance ID.
     /// </summary>
-    public void EndCapture(MeshRenderer output)
+    public void EndCapture(Renderer output)
     {
       var outputInstanceId = output.GetInstanceID();
 

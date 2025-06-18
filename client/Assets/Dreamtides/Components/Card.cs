@@ -23,7 +23,7 @@ namespace Dreamtides.Components
     [SerializeField] internal TextMeshPro _rulesText = null!;
     [SerializeField] internal TextMeshPro _typeText = null!;
     [SerializeField] internal Renderer _cardFrame = null!;
-    [SerializeField] internal SpriteRenderer _cardImage = null!;
+    [SerializeField] internal Renderer _cardImage = null!;
     [SerializeField] internal SpriteRenderer _battlefieldCardImage = null!;
     [SerializeField] internal DissolveEffect _cardImageDissolve = null!;
     [SerializeField] internal BoxCollider _cardCollider = null!;
@@ -46,7 +46,7 @@ namespace Dreamtides.Components
     [SerializeField] internal InfoZoomIcons _battlefieldCardInfoZoomIcons = null!;
 
     bool _isRevealed = false;
-    Registry _registry = null!;
+    internal Registry _registry = null!;
     CardView _cardView = null!;
     float _dragStartScreenZ;
     Vector3 _dragStartPosition;
@@ -276,8 +276,12 @@ namespace Dreamtides.Components
       _sparkText.text = revealed.Spark?.ToString();
       _battlefieldSparkText.text = revealed.Spark?.ToString();
       _typeText.text = revealed.CardType;
-      _cardImage.sprite = _registry.AssetService.GetSprite(revealed.Image.Address);
-      _battlefieldCardImage.sprite = _registry.AssetService.GetSprite(revealed.Image.Address);
+
+      if (_cardImage is SpriteRenderer spriteRenderer)
+      {
+        spriteRenderer.sprite = _registry.AssetService.GetSprite(revealed.Image.Address);
+      }
+
       _outline.material.SetInt("_Seed", UnityEngine.Random.Range(0, 9999));
       if (revealed.OutlineColor == null)
       {
