@@ -103,7 +103,7 @@ async fn poll(body: String) -> AppResult<Json<PollResponse>> {
     let req: PollRequest = parse_json(&body)?;
     let user_id = req.metadata.user_id;
 
-    match engine::poll(user_id) {
+    match engine::poll(DefaultStateProvider, user_id) {
         Some(response) => Ok(Json(response)),
         None => Ok(Json(PollResponse { metadata: req.metadata, commands: None })),
     }

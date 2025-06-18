@@ -1,8 +1,6 @@
 use std::cell::RefCell;
-use std::collections::HashMap;
 use std::fmt::Write;
 use std::panic::{self};
-use std::sync::{LazyLock, Mutex};
 use std::time::Instant;
 
 use action_data::game_action_data::GameAction;
@@ -35,9 +33,6 @@ thread_local! {
     static PANIC_INFO: RefCell<Option<(String, String, Backtrace)>> = const { RefCell::new(None) };
 }
 
-static REQUEST_TIMESTAMPS: LazyLock<Mutex<HashMap<Option<Uuid>, Instant>>> =
-    LazyLock::new(|| Mutex::new(HashMap::new()));
-
 #[derive(Debug, Clone)]
 pub struct PollResult {
     pub commands: CommandSequence,
@@ -62,25 +57,14 @@ pub fn connect(
     ConnectResponse { metadata, commands }
 }
 
-pub fn poll(user_id: UserId) -> Option<PollResponse> {
+pub fn poll(provider: impl StateProvider, user_id: UserId) -> Option<PollResponse> {
     if let Some(poll_result) = handle_battle_action::poll(user_id) {
         let request_id = poll_result.request_id;
-        let elapsed_msg = if let Ok(mut timestamps) = REQUEST_TIMESTAMPS.lock() {
-            // Clean up old entries (older than 5 minutes)
-            let now = Instant::now();
-            timestamps.retain(|_, &mut timestamp| now.duration_since(timestamp).as_secs() < 300);
+        let elapsed_msg = provider.get_elapsed_time_message(request_id);
 
-            if let Some(start_time) = timestamps.get(&request_id) {
-                format!("{}ms", start_time.elapsed().as_millis())
-            } else if request_id.is_some() {
-                error!(?request_id, "Unrecognized request ID in poll response");
-                format!("[unknown request ID: {:?}]", request_id)
-            } else {
-                "[empty request ID]".to_string()
-            }
-        } else {
-            "[mutex lock failed]".to_string()
-        };
+        if request_id.is_some() && elapsed_msg.contains("unknown request ID") {
+            error!(?request_id, "Unrecognized request ID in poll response");
+        }
 
         debug!(?elapsed_msg, ?request_id, "Returning poll response");
 
@@ -94,9 +78,7 @@ pub fn poll(user_id: UserId) -> Option<PollResponse> {
 
 pub fn perform_action(provider: impl StateProvider + 'static, request: PerformActionRequest) {
     let request_id = request.metadata.request_id;
-    if let Ok(mut timestamps) = REQUEST_TIMESTAMPS.lock() {
-        timestamps.insert(request_id, Instant::now());
-    }
+    provider.store_request_timestamp(request_id, Instant::now());
     task::spawn_blocking(move || perform_action_internal(provider, &request));
 }
 
