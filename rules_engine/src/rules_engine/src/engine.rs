@@ -2,7 +2,6 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt::Write;
 use std::panic::{self};
-use std::path::PathBuf;
 use std::sync::{LazyLock, Mutex};
 use std::time::Instant;
 
@@ -12,8 +11,8 @@ use battle_state::battle::animation_data::AnimationData;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle_player::battle_player_state::PlayerType;
 use core_data::identifiers::{BattleId, QuestId, UserId};
+use database::database::Database;
 use database::save_file::SaveFile;
-use database::sqlite_database::{self, Database};
 use display::display_actions::apply_battle_display_action;
 use display::rendering::renderer;
 use display_data::command::CommandSequence;
@@ -27,6 +26,7 @@ use tracing_macros::{battle_trace, write_tracing_event};
 use ui_components::display_properties;
 use uuid::Uuid;
 
+use crate::state_provider::StateProvider;
 use crate::{
     debug_actions, deserialize_save_file, error_message, handle_battle_action, serialize_save_file,
 };
@@ -47,13 +47,17 @@ pub struct PollResult {
     pub request_id: Option<Uuid>,
 }
 
-pub fn connect(request: &ConnectRequest, request_context: RequestContext) -> ConnectResponse {
+pub fn connect(
+    provider: impl StateProvider,
+    request: &ConnectRequest,
+    request_context: RequestContext,
+) -> ConnectResponse {
     let metadata = request.metadata;
     let user_id = metadata.user_id;
 
     store_request_context(user_id, request_context.clone());
 
-    let result = catch_panic(|| connect_internal(request, request_context));
+    let result = catch_panic(|| connect_internal(provider, request, request_context));
     let commands = match result {
         Ok(commands) => commands,
         Err(error) => error_message::display_error_message(None, error),
@@ -91,15 +95,19 @@ pub fn poll(user_id: UserId) -> Option<PollResponse> {
     None
 }
 
-pub fn perform_action(request: PerformActionRequest) {
+pub fn perform_action(provider: impl StateProvider + 'static, request: PerformActionRequest) {
     let request_id = request.metadata.request_id;
     if let Ok(mut timestamps) = REQUEST_TIMESTAMPS.lock() {
         timestamps.insert(request_id, Instant::now());
     }
-    task::spawn_blocking(move || perform_action_internal(&request));
+    task::spawn_blocking(move || perform_action_internal(provider, &request));
 }
 
-fn connect_internal(request: &ConnectRequest, request_context: RequestContext) -> CommandSequence {
+fn connect_internal(
+    provider: impl StateProvider,
+    request: &ConnectRequest,
+    request_context: RequestContext,
+) -> CommandSequence {
     let user_id = request.metadata.user_id;
     let persistent_data_path = &request.persistent_data_path;
     write_tracing_event::clear_log_file(&request_context);
@@ -108,9 +116,9 @@ fn connect_internal(request: &ConnectRequest, request_context: RequestContext) -
         display_properties::store_display_properties(user_id, display_props.clone());
     }
 
-    let database = match initialize_database(persistent_data_path) {
+    let database = match provider.initialize_database(persistent_data_path) {
         Ok(db) => db,
-        Err(error) => return error_message::display_error_message(None, error),
+        Err(error) => return error_message::display_error_message(None, error.to_string()),
     };
 
     // Check if this is a multiplayer connection request
@@ -137,7 +145,7 @@ fn connect_internal(request: &ConnectRequest, request_context: RequestContext) -
 /// Instead of loading the requesting user's save file, this loads the
 /// opponent's save file and joins the battle if possible.
 fn connect_for_multiplayer(
-    database: &Database,
+    database: &impl Database,
     user_id: UserId,
     vs_opponent: UserId,
     request_context: RequestContext,
@@ -182,12 +190,8 @@ enum LoadBattleResult {
     NewBattle(BattleState),
 }
 
-fn initialize_database(persistent_data_path: &str) -> Result<Database, String> {
-    sqlite_database::initialize(PathBuf::from(persistent_data_path)).map_err(|e| e.to_string())
-}
-
 fn load_battle_from_database(
-    database: &Database,
+    database: &impl Database,
     user_id: UserId,
     request_context: RequestContext,
 ) -> Result<LoadBattleResult, String> {
@@ -225,7 +229,7 @@ fn handle_user_not_in_battle(
     user_id: UserId,
     mut battle: BattleState,
     quest_id: QuestId,
-    database: &Database,
+    database: &impl Database,
     vs_opponent: Option<UserId>,
 ) -> CommandSequence {
     battle_trace!("User is not a player in this battle", &mut battle, user_id);
@@ -261,7 +265,7 @@ fn handle_user_not_in_battle(
 }
 
 fn save_battle_to_database(
-    database: &Database,
+    database: &impl Database,
     user_id: UserId,
     quest_id: QuestId,
     battle: &BattleState,
@@ -270,7 +274,7 @@ fn save_battle_to_database(
     database.write_save(save_file).map_err(|e| e.to_string())
 }
 
-fn perform_action_internal(request: &PerformActionRequest) {
+fn perform_action_internal(provider: impl StateProvider, request: &PerformActionRequest) {
     let metadata = request.metadata;
     let user_id = metadata.user_id;
     let request_id = metadata.request_id;
@@ -278,7 +282,7 @@ fn perform_action_internal(request: &PerformActionRequest) {
     let _enter = span.enter();
 
     let result = catch_panic(|| {
-        let Ok(database) = sqlite_database::get() else {
+        let Ok(database) = provider.get_database() else {
             show_error_message(user_id, None, "No database found".to_string());
             return;
         };

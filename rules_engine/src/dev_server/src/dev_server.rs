@@ -11,6 +11,7 @@ use display_data::request_data::{
     ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse, PollRequest,
     PollResponse,
 };
+use rules_engine::state_provider::DefaultStateProvider;
 use rules_engine::{client_logging, engine};
 use serde::de::DeserializeOwned;
 use tracing::{error, info, info_span};
@@ -69,7 +70,7 @@ async fn connect(body: String) -> AppResult<Json<ConnectResponse>> {
                 return Err(AppError::Internal(e.to_string()));
             }
         };
-        Ok(Json(engine::connect(&req, RequestContext {
+        Ok(Json(engine::connect(DefaultStateProvider, &req, RequestContext {
             logging_options: LoggingOptions {
                 log_directory: Some(log_directory),
                 log_ai_search_diagram: true,
@@ -93,7 +94,7 @@ async fn perform_action(body: String) -> AppResult<Json<PerformActionResponse>> 
     } else {
         info!(?action, ?user_id, ?request_id, "Got perform action request");
         let metadata = req.metadata;
-        engine::perform_action(req);
+        engine::perform_action(DefaultStateProvider, req);
         Ok(Json(PerformActionResponse { metadata, commands: CommandSequence::default() }))
     }
 }

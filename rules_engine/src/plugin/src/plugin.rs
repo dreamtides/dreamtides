@@ -11,6 +11,7 @@ use display_data::command::CommandSequence;
 use display_data::request_data::{
     ConnectRequest, PerformActionRequest, PerformActionResponse, PollRequest, PollResponse,
 };
+use rules_engine::state_provider::DefaultStateProvider;
 use rules_engine::{client_logging, engine};
 use tokio::runtime::Runtime;
 
@@ -54,7 +55,7 @@ unsafe fn connect_impl(
         },
     };
     logging::maybe_initialize(&context);
-    let scene = engine::connect(&deserialized_request, context);
+    let scene = engine::connect(DefaultStateProvider, &deserialized_request, context);
     let json = serde_json::to_string(&scene)?;
     let json_bytes = json.as_bytes();
 
@@ -98,7 +99,7 @@ unsafe fn perform_impl(
     let metadata = deserialized_request.metadata;
 
     TOKIO_RUNTIME.spawn(async move {
-        engine::perform_action(deserialized_request);
+        engine::perform_action(DefaultStateProvider, deserialized_request);
     });
 
     // Currently we do not return any commands from the perform action call, but
