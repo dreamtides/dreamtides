@@ -1,5 +1,5 @@
 use action_data::battle_display_action::{BattleDisplayAction, CardBrowserType};
-use core_data::display_types::{Milliseconds, StudioAnimation};
+use core_data::display_types::StudioAnimation;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use display_data::battle_view::DisplayPlayer;
@@ -42,24 +42,18 @@ fn browse_cards(card_browser: CardBrowserType, builder: &mut ResponseBuilder) {
         CardBrowserType::UserStatus => {
             builder.push(Command::PlayStudioAnimation(PlayStudioAnimationCommand {
                 studio_type: StudioType::UserIdentityCard,
-                animation: StudioAnimation::new("IDL_ArmsFolded_Casual_Enter"),
-            }));
-            builder.push(Command::Wait(Milliseconds::new(1700)));
-            builder.push(Command::PlayStudioAnimation(PlayStudioAnimationCommand {
-                studio_type: StudioType::UserIdentityCard,
+                enter_animation: Some(StudioAnimation::new("IDL_ArmsFolded_Casual_Enter")),
                 animation: StudioAnimation::new("IDL_ArmsFolded_Casual_Loop"),
+                exit_animation: Some(StudioAnimation::new("IDL_ArmsFolded_Casual_Exit")),
             }));
             Position::InPlayerStatus(DisplayPlayer::User)
         }
         CardBrowserType::EnemyStatus => {
             builder.push(Command::PlayStudioAnimation(PlayStudioAnimationCommand {
                 studio_type: StudioType::EnemyIdentityCard,
-                animation: StudioAnimation::new("IDL_ArmsFolded_Casual_Enter"),
-            }));
-            builder.push(Command::Wait(Milliseconds::new(1700)));
-            builder.push(Command::PlayStudioAnimation(PlayStudioAnimationCommand {
-                studio_type: StudioType::UserIdentityCard,
+                enter_animation: Some(StudioAnimation::new("IDL_ArmsFolded_Casual_Enter")),
                 animation: StudioAnimation::new("IDL_ArmsFolded_Casual_Loop"),
+                exit_animation: Some(StudioAnimation::new("IDL_ArmsFolded_Casual_Exit")),
             }));
             Position::InPlayerStatus(DisplayPlayer::Enemy)
         }

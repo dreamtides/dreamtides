@@ -284,7 +284,9 @@ pub struct ToggleThinkingIndicatorCommand {
 #[serde(rename_all = "camelCase")]
 pub struct PlayStudioAnimationCommand {
     pub studio_type: StudioType,
+    pub enter_animation: Option<StudioAnimation>,
     pub animation: StudioAnimation,
+    pub exit_animation: Option<StudioAnimation>,
 }
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema)]

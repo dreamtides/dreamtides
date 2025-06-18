@@ -1612,6 +1612,12 @@ namespace Dreamtides.Schema
         [JsonProperty("animation", Required = Required.Always)]
         public StudioAnimation Animation { get; set; }
 
+        [JsonProperty("enterAnimation")]
+        public StudioAnimation EnterAnimation { get; set; }
+
+        [JsonProperty("exitAnimation")]
+        public StudioAnimation ExitAnimation { get; set; }
+
         [JsonProperty("studioType", Required = Required.Always)]
         public StudioType StudioType { get; set; }
     }

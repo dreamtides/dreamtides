@@ -23,6 +23,9 @@ namespace Dreamtides.Services
       public GameObject Subject = null!;
       public RenderTexture RenderTexture = null!;
       public StudioType StudioType;
+      public string? CurrentPrimaryAnimation;
+      public StudioAnimation? CurrentExitAnimation;
+      public Coroutine? AnimationSequence;
     }
 
     /// <summary>
@@ -61,9 +64,39 @@ namespace Dreamtides.Services
     {
       if (_activeSessions.TryGetValue(command.StudioType, out var session))
       {
-        var animator = session.Subject.GetComponent<Animator>();
-        animator.Play(command.Animation.Name);
+        if (session.AnimationSequence != null)
+        {
+          StopCoroutine(session.AnimationSequence);
+        }
+
+        session.AnimationSequence = StartCoroutine(PlayAnimationSequence(session, command));
       }
+    }
+
+    private IEnumerator PlayAnimationSequence(CaptureSession session, PlayStudioAnimationCommand command)
+    {
+      var animator = session.Subject.GetComponent<Animator>();
+
+      if (session.CurrentPrimaryAnimation != null && session.CurrentExitAnimation != null)
+      {
+        animator.Play(session.CurrentExitAnimation.Name);
+        yield return new WaitForEndOfFrame();
+        var exitAnimationLength = animator.GetCurrentAnimatorStateInfo(0).length;
+        yield return new WaitForSeconds(exitAnimationLength);
+      }
+
+      if (command.EnterAnimation != null)
+      {
+        animator.Play(command.EnterAnimation.Name);
+        yield return new WaitForEndOfFrame();
+        var enterAnimationLength = animator.GetCurrentAnimatorStateInfo(0).length;
+        yield return new WaitForSeconds(enterAnimationLength);
+      }
+
+      animator.Play(command.Animation.Name);
+      session.CurrentPrimaryAnimation = command.Animation.Name;
+      session.CurrentExitAnimation = command.ExitAnimation;
+      session.AnimationSequence = null;
     }
 
     /// <summary>
@@ -73,6 +106,11 @@ namespace Dreamtides.Services
     {
       if (_activeSessions.TryGetValue(type, out var session))
       {
+        if (session.AnimationSequence != null)
+        {
+          StopCoroutine(session.AnimationSequence);
+        }
+
         if (session.Studio != null)
         {
           Destroy(session.Studio.gameObject);
