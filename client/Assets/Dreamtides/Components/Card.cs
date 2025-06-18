@@ -71,10 +71,10 @@ namespace Dreamtides.Components
 
     public void Render(Registry registry, CardView view, Sequence? sequence = null)
     {
-      var name = view.Revealed?.Name ?? "Hidden Card";
+      var name = view.Revealed?.Name.Replace("\n", " ") ?? "Hidden Card";
       _registry = registry;
       _cardView = view;
-      gameObject.name = $"{name} [{Id}]";
+      gameObject.name = $"[{Id}] {name}";
 
       if (view.Revealed != null)
       {

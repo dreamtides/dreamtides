@@ -301,7 +301,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4220822472325800156, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: m_Name
-      value: CharacterCard
+      value: IdentityCard
       objectReference: {fileID: 0}
     - target: {fileID: 4735529314863193521, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: m_IsActive
@@ -368,6 +368,14 @@ PrefabInstance:
     - target: {fileID: 9119093439582104047, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 9119093439582104047, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
+      propertyPath: m_VerticalAlignment
+      value: 1024
+      objectReference: {fileID: 0}
+    - target: {fileID: 9119093439582104047, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
