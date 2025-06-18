@@ -760,6 +760,7 @@ dependencies = [
  "rules_engine",
  "serde",
  "serde_json",
+ "test_utils",
  "tokio",
  "tower",
  "tracing",
@@ -2059,6 +2060,33 @@ name = "sync_wrapper"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0bf256ce5efdfa370213c1dabab5935a12e49f2c58d15e9eac2870d3b4f27263"
+
+[[package]]
+name = "test_utils"
+version = "0.0.0"
+dependencies = [
+ "ability_data",
+ "action_data",
+ "ai_data",
+ "asset_paths",
+ "battle_mutations",
+ "battle_queries",
+ "battle_state",
+ "bon",
+ "core_data",
+ "database",
+ "display_data",
+ "logging",
+ "masonry",
+ "rules_engine",
+ "schemars",
+ "serde",
+ "tracing",
+ "tracing-subscriber",
+ "tracing_macros",
+ "ui_components",
+ "uuid",
+]
 
 [[package]]
 name = "tests"

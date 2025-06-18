@@ -18,6 +18,7 @@ display_data = { path = "../display_data" }
 logging = { path = "../logging" }
 plugin = { path = "../plugin" }
 rules_engine = { path = "../rules_engine" }
+test_utils = { path = "../test_utils" }
 
 axum = { version = "0.8", features = ["macros"] }
 axum-macros = "0.5"

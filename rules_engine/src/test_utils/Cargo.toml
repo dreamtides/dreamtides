@@ -1,0 +1,33 @@
+[package]
+name = "test_utils"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+test = false
+doctest = false
+bench = false
+
+[dependencies]
+ability_data = { path = "../ability_data" }
+action_data = { path = "../action_data" }
+ai_data = { path = "../ai_data" }
+asset_paths = { path = "../asset_paths" }
+battle_mutations = { path = "../battle_mutations" }
+battle_queries = { path = "../battle_queries" }
+battle_state = { path = "../battle_state" }
+core_data = { path = "../core_data" }
+database = { path = "../database" }
+display_data = { path = "../display_data" }
+logging = { path = "../logging" }
+masonry = { path = "../masonry" }
+rules_engine = { path = "../rules_engine" }
+tracing_macros = { path = "../tracing_macros" }
+ui_components = { path = "../ui_components" }
+
+bon = "3"
+schemars = "0.8"
+serde = { version = "1", features = ["derive"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+uuid = "1"
