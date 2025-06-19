@@ -4,6 +4,7 @@ use std::panic::{self};
 use std::time::Instant;
 
 use action_data::game_action_data::GameAction;
+use ai_data::game_ai::GameAI;
 use backtrace::Backtrace;
 use battle_state::battle::animation_data::AnimationData;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
@@ -15,9 +16,11 @@ use display::display_actions::apply_battle_display_action;
 use display::rendering::renderer;
 use display_data::command::CommandSequence;
 use display_data::request_data::{
-    ConnectRequest, ConnectResponse, Metadata, PerformActionRequest, PollResponse, PollResponseType,
+    ConnectRequest, ConnectResponse, DebugConfiguration, Metadata, PerformActionRequest,
+    PollResponse, PollResponseType,
 };
 use game_creation::new_battle;
+use rand::RngCore;
 use tokio::task;
 use tracing::{debug, error, info, Level};
 use tracing_macros::{battle_trace, write_tracing_event};
@@ -114,7 +117,12 @@ fn connect_internal(
     }
 
     info!(?user_id, "Loading battle from database");
-    match load_battle_from_database(&database, user_id, request_context) {
+    match load_battle_from_database(
+        &database,
+        user_id,
+        request_context,
+        request.debug_configuration.as_ref(),
+    ) {
         Ok(LoadBattleResult::ExistingBattle(battle, quest_id)) => {
             if is_user_in_battle(&battle, user_id) {
                 renderer::connect(&battle, user_id, false)
@@ -181,6 +189,7 @@ fn load_battle_from_database(
     database: &impl Database,
     user_id: UserId,
     request_context: RequestContext,
+    debug_configuration: Option<&DebugConfiguration>,
 ) -> Result<LoadBattleResult, String> {
     match database.fetch_save(user_id) {
         Ok(Some(save_file)) => match deserialize_save_file::battle(&save_file, request_context) {
@@ -190,8 +199,20 @@ fn load_battle_from_database(
         Ok(None) => {
             // No save file exists, create a new battle
             info!(?user_id, "No save file found, creating new battle");
-            let new_battle =
-                new_battle::create_and_start(user_id, BattleId(Uuid::new_v4()), request_context);
+            let battle_id = BattleId(Uuid::new_v4());
+
+            let configuration = debug_configuration.cloned().unwrap_or_default();
+            let seed = configuration.seed.unwrap_or_else(|| rand::rng().next_u64());
+            let enemy_agent =
+                configuration.enemy_agent.as_ref().cloned().unwrap_or(GameAI::MonteCarlo(50));
+
+            let new_battle = new_battle::create_and_start_with_options(
+                battle_id,
+                seed,
+                PlayerType::User(user_id),
+                PlayerType::Agent(enemy_agent),
+                request_context,
+            );
 
             // Save new battle to database
             let quest_id = QuestId(Uuid::new_v4());

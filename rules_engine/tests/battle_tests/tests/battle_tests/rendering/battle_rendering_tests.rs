@@ -15,16 +15,9 @@ fn test_connect() {
 }
 
 #[test]
-fn test_perform_action_blocking_completes() {
+fn test_perform_action_completes() {
     let mut s = TestBattle::new().connect();
     assert_eq!(s.client.last_game_message, None);
-    s.perform_action_blocking(BattleAction::EndTurn);
-    assert_eq!(s.client.last_game_message, Some(GameMessageType::EnemyTurn));
-}
-
-#[tokio::test]
-async fn test_perform_action_completes() {
-    let mut s = TestBattle::new().connect();
-    s.perform_action(BattleAction::EndTurn).await;
+    s.perform_action(BattleAction::EndTurn);
     assert_eq!(s.client.last_game_message, Some(GameMessageType::EnemyTurn));
 }

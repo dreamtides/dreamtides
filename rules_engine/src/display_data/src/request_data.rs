@@ -45,7 +45,7 @@ pub struct ConnectRequest {
     pub debug_configuration: Option<DebugConfiguration>,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct DebugConfiguration {
     /// If specified, the enemy will be an AI agent with the given GameAI
