@@ -28,6 +28,7 @@ impl TestBattle {
             session: TestSession {
                 state_provider: TestStateProvider::default(),
                 user_id: UserId(Uuid::new_v4()),
+                enemy_id: UserId(Uuid::new_v4()),
                 battle_id: Some(BattleId(Uuid::new_v4())),
                 client: TestClient::default(),
             },

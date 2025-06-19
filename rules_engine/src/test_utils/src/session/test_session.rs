@@ -1,6 +1,6 @@
 use action_data::game_action_data::GameAction;
-use ai_data::game_ai::GameAI;
 use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
+use battle_state::battle_player::battle_player_state::PlayerType;
 use core_data::identifiers::{BattleId, UserId};
 use display_data::request_data::{
     ConnectRequest, DebugConfiguration, Metadata, PerformActionRequest,
@@ -13,6 +13,7 @@ use crate::provider::test_state_provider::TestStateProvider;
 pub struct TestSession {
     pub state_provider: TestStateProvider,
     pub user_id: UserId,
+    pub enemy_id: UserId,
     pub battle_id: Option<BattleId>,
     pub client: TestClient,
 }
@@ -29,7 +30,7 @@ impl TestSession {
                 test_scenario: None,
                 display_properties: None,
                 debug_configuration: Some(DebugConfiguration {
-                    enemy_agent: Some(GameAI::FirstAvailableAction),
+                    enemy: Some(PlayerType::User(self.enemy_id)),
                     seed: Some(314159265358979323),
                 }),
             },

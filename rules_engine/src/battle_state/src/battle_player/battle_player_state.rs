@@ -1,6 +1,7 @@
 use ai_data::game_ai::GameAI;
 use core_data::identifiers::UserId;
 use core_data::numerics::{Energy, Points, Spark};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 /// Represents the state of a player within a battle.
@@ -26,7 +27,7 @@ pub struct BattlePlayerState {
     pub spark_bonus: Spark,
 }
 
-#[derive(Debug, Clone, Serialize, Eq, PartialEq, Hash, Deserialize)]
+#[derive(Debug, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum PlayerType {
     User(UserId),

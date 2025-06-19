@@ -226,14 +226,17 @@ fn load_battle_from_database(
 
             let configuration = debug_configuration.cloned().unwrap_or_default();
             let seed = configuration.seed.unwrap_or_else(|| rand::rng().next_u64());
-            let enemy_agent =
-                configuration.enemy_agent.as_ref().cloned().unwrap_or(GameAI::MonteCarlo(50));
+            let enemy = configuration
+                .enemy
+                .as_ref()
+                .cloned()
+                .unwrap_or(PlayerType::Agent(GameAI::MonteCarlo(50)));
 
             let new_battle = new_battle::create_and_start_with_options(
                 battle_id,
                 seed,
                 PlayerType::User(user_id),
-                PlayerType::Agent(enemy_agent),
+                enemy,
                 request_context,
             );
 

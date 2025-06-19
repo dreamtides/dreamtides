@@ -15,7 +15,7 @@ fn test_connect() {
 }
 
 #[test]
-fn test_perform_action_completes() {
+fn test_end_turn() {
     let mut s = TestBattle::new().connect();
     assert_eq!(s.client.last_game_message, None);
     s.perform_action(BattleAction::EndTurn);
