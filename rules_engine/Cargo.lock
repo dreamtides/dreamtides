@@ -367,6 +367,8 @@ dependencies = [
 name = "battle_tests"
 version = "0.0.0"
 dependencies = [
+ "action_data",
+ "battle_state",
  "display_data",
  "test_utils",
  "tokio",

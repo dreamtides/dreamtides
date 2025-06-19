@@ -34,6 +34,10 @@ pub struct TestClient {
 }
 
 impl TestClient {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     pub fn apply_commands(&mut self, commands: CommandSequence) {
         for group in commands.groups {
             for command in group.commands {

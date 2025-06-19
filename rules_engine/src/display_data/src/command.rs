@@ -307,7 +307,7 @@ pub enum GameObjectId {
     Avatar(DisplayPlayer),
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Eq, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub enum GameMessageType {
     YourTurn,

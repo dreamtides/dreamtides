@@ -4,6 +4,8 @@ version = "0.0.0"
 edition = "2021"
 
 [dependencies]
+action_data = { path = "../../src/action_data" }
+battle_state = { path = "../../src/battle_state" }
 display_data = { path = "../../src/display_data" }
 test_utils = { path = "../../src/test_utils" }
 
