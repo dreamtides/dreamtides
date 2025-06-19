@@ -7,7 +7,7 @@ pub fn parse(text: &str) -> Vec<Ability> {
     let (result, errs) = ability_parser::parse(&input).into_output_errors();
 
     if !errs.is_empty() {
-        errs.into_iter().for_each(|e| {
+        for e in errs {
             Report::build(ReportKind::Error, (), e.span().start)
                 .with_message(e.to_string())
                 .with_label(
@@ -17,8 +17,8 @@ pub fn parse(text: &str) -> Vec<Ability> {
                 )
                 .finish()
                 .eprint(Source::from(text))
-                .unwrap()
-        });
+                .unwrap();
+        }
         panic!("Error parsing input!");
     }
 

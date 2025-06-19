@@ -140,10 +140,7 @@ impl TestClient {
 
     /// Check if the game has ended
     pub fn is_game_over(&self) -> bool {
-        matches!(
-            self.last_game_message,
-            Some(GameMessageType::Victory) | Some(GameMessageType::Defeat)
-        )
+        matches!(self.last_game_message, Some(GameMessageType::Victory | GameMessageType::Defeat))
     }
 
     /// Check if the user won

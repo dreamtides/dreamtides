@@ -40,7 +40,7 @@ fn apply_standard_effect(
     battle_trace!("Applying effect", battle, effect, targets);
     match effect {
         StandardEffect::DrawCardsForEach { count, for_each } => {
-            draw_cards_for_each(battle, source, *count, for_each)
+            draw_cards_for_each(battle, source, *count, for_each);
         }
         StandardEffect::DissolveCharacter { .. } => {
             dissolve(battle, source, targets);
@@ -52,10 +52,10 @@ fn apply_standard_effect(
             negate_unless_pays_cost::execute(battle, source, targets, cost);
         }
         StandardEffect::OpponentPaysCost { cost } => {
-            pay_cost::execute(battle, source, source.controller().opponent(), cost)
+            pay_cost::execute(battle, source, source.controller().opponent(), cost);
         }
         StandardEffect::PayCost { cost } => {
-            pay_cost::execute(battle, source, source.controller(), cost)
+            pay_cost::execute(battle, source, source.controller(), cost);
         }
         _ => todo!("Implement {:?}", effect),
     }

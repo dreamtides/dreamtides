@@ -48,7 +48,6 @@ unsafe fn connect_impl(
 ) -> Result<i32> {
     let request_data = std::slice::from_raw_parts(request, request_length as usize);
     let deserialized_request = serde_json::from_slice::<ConnectRequest>(request_data)?;
-    println!("connect: {:?}", deserialized_request.metadata.user_id);
     let context = RequestContext {
         logging_options: LoggingOptions {
             log_directory: Some(PathBuf::from(&deserialized_request.persistent_data_path)),
@@ -187,6 +186,7 @@ unsafe fn log_impl(request: *const u8, request_length: i32) -> Result<i32> {
     Ok(0)
 }
 
+#[expect(clippy::print_stderr)]
 unsafe fn error_boundary(function: impl FnOnce() -> Result<i32> + UnwindSafe) -> i32 {
     panic::catch_unwind(|| match function() {
         Ok(i) => i,

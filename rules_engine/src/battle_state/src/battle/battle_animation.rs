@@ -54,9 +54,3 @@ pub enum BattleAnimation {
         target_id: CharacterId,
     },
 }
-
-impl BattleAnimation {
-    pub fn discriminant(&self) -> BattleAnimationDiscriminants {
-        self.into()
-    }
-}

@@ -80,12 +80,6 @@ pub enum Command {
     PlayStudioAnimation(PlayStudioAnimationCommand),
 }
 
-impl Command {
-    pub fn discriminant(&self) -> CommandDiscriminants {
-        self.into()
-    }
-}
-
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateBattleCommand {

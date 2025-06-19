@@ -1,6 +1,6 @@
 use std::cell::RefCell;
 use std::fmt::Write;
-use std::panic::{self};
+use std::panic;
 use std::time::Instant;
 
 use action_data::game_action_data::GameAction;
@@ -439,7 +439,7 @@ pub fn show_error_message(user_id: UserId, battle: Option<&BattleState>, error_m
         &request_context,
         None,
         PollResponseType::Final,
-    )
+    );
 }
 
 fn catch_panic<F, T>(function: F) -> Result<T, String>

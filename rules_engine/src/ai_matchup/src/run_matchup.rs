@@ -184,10 +184,10 @@ fn run_match(
                 let action_time = action_start.elapsed();
                 match (player, swap_positions) {
                     (PlayerName::One, false) | (PlayerName::Two, true) => {
-                        ai_one_stats.record(action_time)
+                        ai_one_stats.record(action_time);
                     }
                     (PlayerName::Two, false) | (PlayerName::One, true) => {
-                        ai_two_stats.record(action_time)
+                        ai_two_stats.record(action_time);
                     }
                 }
                 match verbosity {

@@ -14,6 +14,7 @@ use chrono::{DateTime, Local};
 use display_data::command::CommandSequence;
 use serde::Serialize;
 use serde_json;
+use strum::IntoDiscriminant;
 use tracing::{debug, error, instrument};
 
 #[instrument(name = "write_battle_event", level = "debug", skip(battle, message, values))]

@@ -21,7 +21,7 @@ fn parse_expression(input: &str, line_num: Option<usize>) -> Option<String> {
         ron::ser::to_string_pretty(output, ron::ser::PrettyConfig::default().struct_names(true))
             .ok()
     } else {
-        errs.into_iter().for_each(|e| {
+        for e in errs {
             let mut report =
                 Report::build(ReportKind::Error, (), e.span().start).with_message(e.to_string());
 
@@ -37,8 +37,8 @@ fn parse_expression(input: &str, line_num: Option<usize>) -> Option<String> {
                 )
                 .finish()
                 .eprint(Source::from(&input))
-                .unwrap()
-        });
+                .unwrap();
+        }
         None
     }
 }

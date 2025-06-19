@@ -62,7 +62,7 @@ pub fn create(id: BattleId) -> BattleView {
             vec![game_modifier_card(Position::GameModifier, 742)],
         ]
         .concat()
-        .to_vec(),
+        .clone(),
         interface: InterfaceView {
             primary_action_button: Some(ButtonView {
                 label: "End Turn".to_string(),

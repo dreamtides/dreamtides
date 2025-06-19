@@ -16,7 +16,7 @@ pub fn execute(action: BattleDisplayAction, player: PlayerName) -> CommandSequen
 
     match action {
         BattleDisplayAction::BrowseCards(card_browser_type) => {
-            browse_cards(card_browser_type, &mut builder)
+            browse_cards(card_browser_type, &mut builder);
         }
         BattleDisplayAction::CloseCardBrowser => close_card_browser(),
         BattleDisplayAction::SetSelectedEnergyAdditionalCost(energy) => {
