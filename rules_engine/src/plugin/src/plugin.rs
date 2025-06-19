@@ -10,6 +10,7 @@ use display_data::client_log_request::ClientLogRequest;
 use display_data::command::CommandSequence;
 use display_data::request_data::{
     ConnectRequest, PerformActionRequest, PerformActionResponse, PollRequest, PollResponse,
+    PollResponseType,
 };
 use rules_engine::state_provider::DefaultStateProvider;
 use rules_engine::{client_logging, engine};
@@ -149,7 +150,11 @@ unsafe fn poll_impl(
 
     let response_data = match engine::poll(DefaultStateProvider, user_id) {
         Some(response) => response,
-        None => PollResponse { metadata: deserialized_request.metadata, commands: None },
+        None => PollResponse {
+            metadata: deserialized_request.metadata,
+            commands: None,
+            response_type: PollResponseType::Final,
+        },
     };
 
     let json = serde_json::to_string(&response_data)?;

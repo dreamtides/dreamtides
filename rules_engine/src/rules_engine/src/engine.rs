@@ -15,7 +15,7 @@ use display::display_actions::apply_battle_display_action;
 use display::rendering::renderer;
 use display_data::command::CommandSequence;
 use display_data::request_data::{
-    ConnectRequest, ConnectResponse, Metadata, PerformActionRequest, PollResponse,
+    ConnectRequest, ConnectResponse, Metadata, PerformActionRequest, PollResponse, PollResponseType,
 };
 use game_creation::new_battle;
 use tokio::task;
@@ -37,6 +37,7 @@ thread_local! {
 pub struct PollResult {
     pub commands: CommandSequence,
     pub request_id: Option<Uuid>,
+    pub response_type: PollResponseType,
 }
 
 /// Connects to the rules engine and returns commands to execute.
@@ -73,6 +74,7 @@ pub fn poll(provider: impl StateProvider, user_id: UserId) -> Option<PollRespons
         return Some(PollResponse {
             metadata: Metadata { user_id, battle_id: None, request_id },
             commands: Some(poll_result.commands),
+            response_type: poll_result.response_type,
         });
     }
     None
@@ -331,6 +333,7 @@ fn handle_request_action(
                 renderer::connect(&*battle, user_id, true),
                 &request_context,
                 request_id,
+                PollResponseType::Final,
             );
         }
         GameAction::BattleAction(action) => {
@@ -354,6 +357,7 @@ fn handle_request_action(
                 connect_commands,
                 &request_context,
                 request_id,
+                PollResponseType::Final,
             );
         }
         GameAction::Undo(player) => {
@@ -374,6 +378,7 @@ fn handle_request_action(
                 renderer::connect(&*battle, user_id, true),
                 &request_context,
                 request_id,
+                PollResponseType::Final,
             );
         }
     };
@@ -389,6 +394,7 @@ pub fn show_error_message(user_id: UserId, battle: Option<&BattleState>, error_m
         error_message::display_error_message(battle, error_message),
         &request_context,
         None,
+        PollResponseType::Final,
     )
 }
 

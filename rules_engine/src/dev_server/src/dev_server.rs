@@ -9,7 +9,7 @@ use display_data::client_log_request::ClientLogRequest;
 use display_data::command::CommandSequence;
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, PerformActionRequest, PerformActionResponse, PollRequest,
-    PollResponse,
+    PollResponse, PollResponseType,
 };
 use rules_engine::state_provider::DefaultStateProvider;
 use rules_engine::{client_logging, engine};
@@ -105,7 +105,11 @@ async fn poll(body: String) -> AppResult<Json<PollResponse>> {
 
     match engine::poll(DefaultStateProvider, user_id) {
         Some(response) => Ok(Json(response)),
-        None => Ok(Json(PollResponse { metadata: req.metadata, commands: None })),
+        None => Ok(Json(PollResponse {
+            metadata: req.metadata,
+            commands: None,
+            response_type: PollResponseType::Final,
+        })),
     }
 }
 

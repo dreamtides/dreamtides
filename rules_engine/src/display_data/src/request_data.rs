@@ -73,11 +73,19 @@ pub struct PollRequest {
     pub metadata: Metadata,
 }
 
+#[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum PollResponseType {
+    Incremental,
+    Final,
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct PollResponse {
     pub metadata: Metadata,
     pub commands: Option<CommandSequence>,
+    pub response_type: PollResponseType,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

@@ -6,3 +6,5 @@ edition = "2021"
 [dependencies]
 display_data = { path = "../../src/display_data" }
 test_utils = { path = "../../src/test_utils" }
+
+tokio = { version = "1", features = ["full"] }
