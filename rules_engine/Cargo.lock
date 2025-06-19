@@ -806,6 +806,7 @@ name = "display_data"
 version = "0.0.0"
 dependencies = [
  "action_data",
+ "ai_data",
  "battle_state",
  "bon",
  "core_data",

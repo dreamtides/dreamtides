@@ -1,3 +1,4 @@
+use std::thread;
 use std::time::Duration;
 
 use action_data::game_action_data::GameAction;
@@ -62,6 +63,40 @@ impl TestSession {
 
         loop {
             time::sleep(Duration::from_millis(10)).await;
+
+            if let Some(response) = engine::poll(self.state_provider.clone(), self.user_id) {
+                if let Some(battle_id) = response.metadata.battle_id {
+                    self.battle_id = Some(battle_id);
+                }
+
+                if let Some(commands) = response.commands {
+                    self.client.apply_commands(commands);
+                }
+
+                if matches!(response.response_type, PollResponseType::Final) {
+                    break;
+                }
+            }
+        }
+    }
+
+    pub fn perform_action_blocking(&mut self, action: impl Into<GameAction>) {
+        let action = action.into();
+
+        let runtime = tokio::runtime::Runtime::new().unwrap();
+        let _guard = runtime.enter();
+
+        let request = PerformActionRequest {
+            metadata: self.metadata(),
+            action,
+            vs_opponent: None,
+            test_scenario: None,
+        };
+
+        engine::perform_action(self.state_provider.clone(), request);
+
+        loop {
+            thread::sleep(Duration::from_millis(10));
 
             if let Some(response) = engine::poll(self.state_provider.clone(), self.user_id) {
                 if let Some(battle_id) = response.metadata.battle_id {

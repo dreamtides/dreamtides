@@ -14,6 +14,14 @@ fn test_connect() {
     assert_eq!(s.client.cards.stack_cards().len(), 0);
 }
 
+#[test]
+fn test_perform_action_blocking_completes() {
+    let mut s = TestBattle::new().connect();
+    assert_eq!(s.client.last_game_message, None);
+    s.perform_action_blocking(BattleAction::EndTurn);
+    assert_eq!(s.client.last_game_message, Some(GameMessageType::EnemyTurn));
+}
+
 #[tokio::test]
 async fn test_perform_action_completes() {
     let mut s = TestBattle::new().connect();

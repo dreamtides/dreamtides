@@ -1,4 +1,5 @@
 use action_data::game_action_data::GameAction;
+use ai_data::game_ai::GameAI;
 use core_data::identifiers::{BattleId, UserId};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -38,6 +39,22 @@ pub struct ConnectRequest {
     /// Display properties from the client (screen dimensions, mobile device
     /// flag, etc.)
     pub display_properties: Option<DisplayProperties>,
+
+    /// If specified, the battle will be created with the given debug
+    /// configuration.
+    pub debug_configuration: Option<DebugConfiguration>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct DebugConfiguration {
+    /// If specified, the enemy will be an AI agent with the given GameAI
+    /// specification.
+    pub enemy_agent: Option<GameAI>,
+
+    /// If specified, the battle will be seeded with the given value. Otherwise
+    /// a random seed will be used.
+    pub seed: Option<u64>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
