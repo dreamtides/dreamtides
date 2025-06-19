@@ -87,9 +87,3 @@ pub enum StandardEffect {
     TriggerJudgmentAbility { matching: Predicate, collection: CollectionExpression },
     YouWinTheGame,
 }
-
-impl StandardEffect {
-    pub fn discriminant(&self) -> StandardEffectDiscriminants {
-        self.into()
-    }
-}
