@@ -2,6 +2,9 @@
 name = "parser_cli"
 version = "0.0.0"
 edition = "2021"
+[lints]
+workspace = true
+
 
 [[bin]]
 name = "parser_cli"

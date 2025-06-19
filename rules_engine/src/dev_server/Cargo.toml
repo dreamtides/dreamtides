@@ -2,6 +2,9 @@
 name = "dev_server"
 version = "0.0.0"
 edition = "2021"
+[lints]
+workspace = true
+
 
 [[bin]]
 name = "dev_server"

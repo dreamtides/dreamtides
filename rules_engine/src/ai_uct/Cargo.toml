@@ -3,6 +3,9 @@ name = "ai_uct"
 version = "0.0.0"
 license = "Apache-2.0"
 edition = "2021"
+[lints]
+workspace = true
+
 
 [lib]
 doctest = false

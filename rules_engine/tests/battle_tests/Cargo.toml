@@ -2,6 +2,9 @@
 name = "battle_tests"
 version = "0.0.0"
 edition = "2021"
+[lints]
+workspace = true
+
 
 [dependencies]
 action_data = { path = "../../src/action_data" }

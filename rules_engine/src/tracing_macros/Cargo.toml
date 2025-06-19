@@ -2,6 +2,9 @@
 name = "tracing_macros"
 version = "0.0.0"
 edition = "2021"
+[lints]
+workspace = true
+
 
 [lib]
 doctest = false

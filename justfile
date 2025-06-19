@@ -1,6 +1,6 @@
 set positional-arguments
 
-code-review: check-format build clippy test check-docs enforce-benchmarks unity-tests
+code-review: check-format build workspace-lints clippy test check-docs enforce-benchmarks unity-tests
 
 check:
     cargo check --manifest-path rules_engine/Cargo.toml --workspace --all-targets --all-features
@@ -28,6 +28,9 @@ test:
 
 doc:
     cargo doc --manifest-path rules_engine/Cargo.toml
+
+workspace-lints:
+    cargo workspace-lints rules_engine/Cargo.toml
 
 schema:
     cargo run --manifest-path rules_engine/Cargo.toml --bin "schema_generator" > schema.json

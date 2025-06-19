@@ -2,6 +2,9 @@
 name = "parser_benchmarks"
 version = "0.0.0"
 edition = "2021"
+[lints]
+workspace = true
+
 
 [[bench]]
 name = "parser_benchmarks"

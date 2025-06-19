@@ -3,6 +3,9 @@ name = "run_matchup"
 version = "0.0.0"
 license = "Apache-2.0"
 edition = "2021"
+[lints]
+workspace = true
+
 
 [[bin]]
 name = "run_matchup"
