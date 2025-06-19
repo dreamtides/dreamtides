@@ -90,6 +90,41 @@ pub fn from_deck_to_hand(
     HandCardId(card_id.card_id())
 }
 
+/// Moves a card from the 'controller' player's deck to their battlefield.
+///
+/// Panics if this card is not found in the deck.
+pub fn from_deck_to_battlefield(
+    battle: &mut BattleState,
+    source: EffectSource,
+    controller: PlayerName,
+    card_id: DeckCardId,
+) -> CharacterId {
+    to_destination_zone(
+        battle,
+        source,
+        controller,
+        card_id.card_id(),
+        Zone::Deck,
+        Zone::Battlefield,
+    );
+    let id = CharacterId(card_id.card_id());
+    write_character_state(battle, controller, id);
+    id
+}
+
+/// Moves a card from the 'controller' player's deck to their void.
+///
+/// Panics if this card is not found in the deck.
+pub fn from_deck_to_void(
+    battle: &mut BattleState,
+    source: EffectSource,
+    controller: PlayerName,
+    card_id: DeckCardId,
+) -> VoidCardId {
+    to_destination_zone(battle, source, controller, card_id.card_id(), Zone::Deck, Zone::Void);
+    VoidCardId(card_id.card_id())
+}
+
 /// Moves a card from the 'old' zone to the 'new' zone.
 ///
 /// Panics if this card is not found in the 'old' zone.

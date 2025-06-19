@@ -23,5 +23,26 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
             let new_card_id = DeckCardId(CardId(card_count));
             move_card::from_deck_to_hand(battle, source, player_name, new_card_id);
         }
+        DebugBattleAction::SetPoints(player_name, points) => {
+            battle.players.player_mut(player_name).points = points;
+        }
+        DebugBattleAction::SetProducedEnergy(player_name, energy) => {
+            battle.players.player_mut(player_name).produced_energy = energy;
+        }
+        DebugBattleAction::SetSparkBonus(player_name, spark) => {
+            battle.players.player_mut(player_name).spark_bonus = spark;
+        }
+        DebugBattleAction::AddCardToBattlefield(player_name, card_name) => {
+            let card_count = battle.cards.all_cards().count();
+            deck::add_cards(battle, player_name, vec![card_name]);
+            let new_card_id = DeckCardId(CardId(card_count));
+            move_card::from_deck_to_battlefield(battle, source, player_name, new_card_id);
+        }
+        DebugBattleAction::AddCardToVoid(player_name, card_name) => {
+            let card_count = battle.cards.all_cards().count();
+            deck::add_cards(battle, player_name, vec![card_name]);
+            let new_card_id = DeckCardId(CardId(card_count));
+            move_card::from_deck_to_void(battle, source, player_name, new_card_id);
+        }
     }
 }
