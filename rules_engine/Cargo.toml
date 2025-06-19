@@ -3,7 +3,7 @@ members = ["benchmarks/*", "src/*", "tests/*"]
 resolver = "2"
 
 [workspace.lints.clippy]
-absolute_paths = "allow"
+absolute_paths = "deny"
 
 [profile.release]
 strip = false
