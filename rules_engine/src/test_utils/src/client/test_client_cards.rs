@@ -40,17 +40,22 @@ impl TestClientCards {
         self.cards_at_position(&Position::OnBattlefield(DisplayPlayer::Enemy))
     }
 
+    /// Get all cards in the user's void
+    pub fn user_void(&self) -> Vec<&TestClientCard> {
+        self.cards_at_position(&Position::InVoid(DisplayPlayer::User))
+    }
+
+    /// Get all cards in the enemy's void
+    pub fn enemy_void(&self) -> Vec<&TestClientCard> {
+        self.cards_at_position(&Position::InVoid(DisplayPlayer::Enemy))
+    }
+
     /// Get all cards on the stack
     pub fn stack_cards(&self) -> Vec<&TestClientCard> {
         self.card_map
             .values()
             .filter(|card| matches!(&card.view.position.position, Position::OnStack(_)))
             .collect()
-    }
-
-    /// Get all revealed cards
-    pub fn revealed_cards(&self) -> Vec<&TestClientCard> {
-        self.card_map.values().filter(|card| card.view.revealed.is_some()).collect()
     }
 
     /// Get a card by its ID

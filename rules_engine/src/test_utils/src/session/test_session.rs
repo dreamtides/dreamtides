@@ -28,12 +28,10 @@ impl TestSession {
             self.request_context(),
         );
 
-        // Update battle_id if it was assigned
         if let Some(battle_id) = response.metadata.battle_id {
             self.battle_id = Some(battle_id);
         }
 
-        // Apply commands to the client
         self.client.apply_commands(response.commands);
     }
 
