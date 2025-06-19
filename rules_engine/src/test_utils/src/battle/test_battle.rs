@@ -30,7 +30,7 @@ impl TestBattle {
     }
 
     /// Connects to the rules engine, returning the session struct.
-    pub fn connect(self) -> TestSession {
+    pub fn connect(mut self) -> TestSession {
         self.session.connect();
         self.session
     }

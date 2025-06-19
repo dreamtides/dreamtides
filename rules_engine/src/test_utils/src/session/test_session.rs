@@ -1,6 +1,5 @@
 use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
 use core_data::identifiers::{BattleId, UserId};
-use display_data::command::CommandSequence;
 use display_data::request_data::{ConnectRequest, Metadata};
 use rules_engine::engine;
 
@@ -15,9 +14,9 @@ pub struct TestSession {
 }
 
 impl TestSession {
-    /// Connects to the rules engine, returning the commands to execute.
-    pub fn connect(&self) -> CommandSequence {
-        engine::connect(
+    /// Connects to the rules engine and applies the commands to the client.
+    pub fn connect(&mut self) {
+        let response = engine::connect(
             self.state_provider.clone(),
             &ConnectRequest {
                 metadata: self.metadata(),
@@ -27,8 +26,15 @@ impl TestSession {
                 display_properties: None,
             },
             self.request_context(),
-        )
-        .commands
+        );
+
+        // Update battle_id if it was assigned
+        if let Some(battle_id) = response.metadata.battle_id {
+            self.battle_id = Some(battle_id);
+        }
+
+        // Apply commands to the client
+        self.client.apply_commands(response.commands);
     }
 
     fn metadata(&self) -> Metadata {
