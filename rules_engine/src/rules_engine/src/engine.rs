@@ -93,6 +93,29 @@ pub fn perform_action(provider: impl StateProvider + 'static, request: PerformAc
     task::spawn_blocking(move || perform_action_internal(provider, &request));
 }
 
+/// Performs a game action synchronously and blocks until completion.
+///
+/// This is designed for test scenarios where the overhead of async execution
+/// is not desired. It executes the action immediately and waits for the final
+/// result before returning.
+pub fn perform_action_blocking(
+    provider: impl StateProvider,
+    request: PerformActionRequest,
+) -> Vec<PollResult> {
+    let user_id = request.metadata.user_id;
+    perform_action_internal(provider, &request);
+
+    let mut results = Vec::new();
+    while let Some(poll_result) = handle_battle_action::poll(user_id) {
+        results.push(poll_result.clone());
+        if matches!(poll_result.response_type, PollResponseType::Final) {
+            break;
+        }
+    }
+
+    results
+}
+
 fn connect_internal(
     provider: impl StateProvider,
     request: &ConnectRequest,
