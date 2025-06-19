@@ -10,7 +10,7 @@ use database::database::{Database, DatabaseError};
 use database::sqlite_database::{self, SqliteDatabase};
 use uuid::Uuid;
 
-/// Trait for injecting dependencies into rules engine code.
+/// Trait for injecting stateful dependencies into rules engine code.
 pub trait StateProvider: RefUnwindSafe + UnwindSafe + Send + Sync {
     type DatabaseImpl: Database;
 

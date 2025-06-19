@@ -39,6 +39,7 @@ pub struct PollResult {
     pub request_id: Option<Uuid>,
 }
 
+/// Connects to the rules engine and returns commands to execute.
 pub fn connect(
     provider: impl StateProvider,
     request: &ConnectRequest,
@@ -57,6 +58,7 @@ pub fn connect(
     ConnectResponse { metadata, commands }
 }
 
+/// Polls for the result of a game action.
 pub fn poll(provider: impl StateProvider, user_id: UserId) -> Option<PollResponse> {
     if let Some(poll_result) = handle_battle_action::poll(user_id) {
         let request_id = poll_result.request_id;
@@ -76,6 +78,10 @@ pub fn poll(provider: impl StateProvider, user_id: UserId) -> Option<PollRespons
     None
 }
 
+/// Performs a game action on another thread.
+///
+/// Returns immediately after spawning the processing thread. Results will be
+/// available via [poll] after the action is complete.
 pub fn perform_action(provider: impl StateProvider + 'static, request: PerformActionRequest) {
     let request_id = request.metadata.request_id;
     provider.store_request_timestamp(request_id, Instant::now());
