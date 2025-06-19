@@ -1,6 +1,5 @@
 use insta::assert_ron_snapshot;
-
-use crate::parser::test_utils::parse;
+use parser_tests::test_utils::parse;
 
 #[test]
 fn test_gains_spark_until_main_phase_for_each_warrior() {

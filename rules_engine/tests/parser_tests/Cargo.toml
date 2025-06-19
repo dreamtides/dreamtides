@@ -1,11 +1,11 @@
 [package]
-name = "tests"
+name = "parser_tests"
 version = "0.0.0"
 edition = "2021"
 
 [dependencies]
-ability_data = { path = "../src/ability_data" }
-parser = { path = "../src/parser" }
+ability_data = { path = "../../src/ability_data" }
+parser = { path = "../../src/parser" }
 
 ariadne = "0.2"
 
