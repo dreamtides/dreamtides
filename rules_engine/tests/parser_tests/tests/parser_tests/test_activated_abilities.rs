@@ -1,5 +1,5 @@
 use insta::assert_ron_snapshot;
-use parser_tests::test_utils::parse;
+use parser_tests::parser_test_utils::parse;
 
 #[test]
 fn test_banish_from_void_dissolve_enemy_character() {
