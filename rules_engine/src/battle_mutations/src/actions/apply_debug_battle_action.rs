@@ -1,6 +1,6 @@
 use battle_state::actions::battle_actions::DebugBattleAction;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CardId, DeckCardId};
+use battle_state::battle::card_id::{CardId, DeckCardId, HandCardId};
 use battle_state::core::effect_source::EffectSource;
 use core_data::types::PlayerName;
 use tracing_macros::battle_trace;
@@ -43,6 +43,12 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
             deck::add_cards(battle, player_name, vec![card_name]);
             let new_card_id = DeckCardId(CardId(card_count));
             move_card::from_deck_to_void(battle, source, player_name, new_card_id);
+        }
+        DebugBattleAction::MoveHandToDeck(player_name) => {
+            let hand_cards: Vec<HandCardId> = battle.cards.hand(player_name).iter().collect();
+            for card_id in hand_cards {
+                move_card::from_hand_to_deck(battle, source, player_name, card_id);
+            }
         }
     }
 }

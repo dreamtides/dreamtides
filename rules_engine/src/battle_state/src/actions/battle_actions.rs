@@ -60,6 +60,8 @@ pub enum DebugBattleAction {
     AddCardToBattlefield(PlayerName, CardName),
     /// Add a specific card to void
     AddCardToVoid(PlayerName, CardName),
+    /// Move all cards from hand to deck
+    MoveHandToDeck(PlayerName),
 }
 
 #[derive(

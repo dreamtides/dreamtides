@@ -90,6 +90,19 @@ pub fn from_deck_to_hand(
     HandCardId(card_id.card_id())
 }
 
+/// Moves a card from the 'controller' player's hand to their deck.
+///
+/// Panics if this card is not found in the hand.
+pub fn from_hand_to_deck(
+    battle: &mut BattleState,
+    source: EffectSource,
+    controller: PlayerName,
+    card_id: HandCardId,
+) -> DeckCardId {
+    to_destination_zone(battle, source, controller, card_id.card_id(), Zone::Hand, Zone::Deck);
+    DeckCardId(card_id.card_id())
+}
+
 /// Moves a card from the 'controller' player's deck to their battlefield.
 ///
 /// Panics if this card is not found in the deck.

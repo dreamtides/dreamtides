@@ -43,6 +43,7 @@ impl TestBattle {
     /// Applies debug commands to populate the current battle state.
     pub fn connect(mut self) -> TestSession {
         self.session.connect();
+        self.move_all_hands_to_deck();
         self.apply_test_player_configuration();
         self.session
     }
@@ -52,6 +53,15 @@ impl TestBattle {
         let opponent_config = self.opponent.clone();
         self.apply_player_configuration(PlayerName::One, &user_config);
         self.apply_player_configuration(PlayerName::Two, &opponent_config);
+    }
+
+    fn move_all_hands_to_deck(&mut self) {
+        self.session.perform_action(BattleAction::Debug(DebugBattleAction::MoveHandToDeck(
+            PlayerName::One,
+        )));
+        self.session.perform_action(BattleAction::Debug(DebugBattleAction::MoveHandToDeck(
+            PlayerName::Two,
+        )));
     }
 
     fn apply_player_configuration(&mut self, player: PlayerName, config: &TestPlayer) {
