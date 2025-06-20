@@ -1,5 +1,6 @@
 use battle_queries::battle_card_queries::card_properties;
-use battle_state::actions::battle_actions::{BattleAction, DebugBattleAction};
+use battle_state::actions::battle_actions::BattleAction;
+use battle_state::actions::debug_battle_action::DebugBattleAction;
 use battle_state::battle::battle_state::BattleState;
 use bon::Builder;
 use core_data::identifiers::CardName;

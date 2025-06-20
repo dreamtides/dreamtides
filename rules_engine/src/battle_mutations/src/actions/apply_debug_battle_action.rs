@@ -1,4 +1,4 @@
-use battle_state::actions::battle_actions::DebugBattleAction;
+use battle_state::actions::debug_battle_action::DebugBattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, DeckCardId, HandCardId};
 use battle_state::core::effect_source::EffectSource;

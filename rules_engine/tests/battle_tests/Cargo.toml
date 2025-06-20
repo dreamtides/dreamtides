@@ -10,6 +10,7 @@ workspace = true
 [dependencies]
 action_data = { path = "../../src/action_data" }
 battle_state = { path = "../../src/battle_state" }
+core_data = { path = "../../src/core_data" }
 display_data = { path = "../../src/display_data" }
 test_utils = { path = "../../src/test_utils" }
 

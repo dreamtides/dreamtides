@@ -1,4 +1,5 @@
-use battle_state::actions::battle_actions::{BattleAction, DebugBattleAction};
+use battle_state::actions::battle_actions::BattleAction;
+use battle_state::actions::debug_battle_action::DebugBattleAction;
 use core_data::identifiers::{BattleId, UserId};
 use core_data::types::PlayerName;
 use uuid::Uuid;
@@ -11,19 +12,19 @@ use crate::session::test_session::TestSession;
 pub struct TestBattle {
     pub session: TestSession,
     pub user: TestPlayer,
-    pub opponent: TestPlayer,
+    pub enemy: TestPlayer,
 }
 
 impl Default for TestBattle {
     fn default() -> Self {
-        Self::new()
+        Self::builder()
     }
 }
 
 impl TestBattle {
     /// Creates a new battle with a random user ID and battle ID, playing as
     /// player one.
-    pub fn new() -> Self {
+    pub fn builder() -> Self {
         Self {
             session: TestSession {
                 state_provider: TestStateProvider::default(),
@@ -34,8 +35,20 @@ impl TestBattle {
                 enemy_client: TestClient::default(),
             },
             user: TestPlayer::default(),
-            opponent: TestPlayer::default(),
+            enemy: TestPlayer::default(),
         }
+    }
+
+    /// Sets the user player to the provided player.
+    pub fn user(mut self, user: TestPlayer) -> Self {
+        self.user = user;
+        self
+    }
+
+    /// Sets the enemy player to the provided player.
+    pub fn enemy(mut self, enemy: TestPlayer) -> Self {
+        self.enemy = enemy;
+        self
     }
 
     /// Connects to the rules engine, returning the session struct.
@@ -50,7 +63,7 @@ impl TestBattle {
 
     fn apply_test_player_configuration(&mut self) {
         let user_config = self.user.clone();
-        let opponent_config = self.opponent.clone();
+        let opponent_config = self.enemy.clone();
         self.apply_player_configuration(PlayerName::One, &user_config);
         self.apply_player_configuration(PlayerName::Two, &opponent_config);
     }

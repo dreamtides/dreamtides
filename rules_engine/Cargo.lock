@@ -369,6 +369,7 @@ version = "0.0.0"
 dependencies = [
  "action_data",
  "battle_state",
+ "core_data",
  "display_data",
  "test_utils",
  "tokio",
