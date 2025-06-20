@@ -1,6 +1,6 @@
 use battle_state::actions::battle_actions::BattleAction;
 use core_data::identifiers::CardName;
-use core_data::numerics::{Energy, Spark};
+use core_data::numerics::{Energy, Points, Spark};
 use display_data::command::GameMessageType;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
@@ -64,6 +64,30 @@ fn test_play_character_increase_spark() {
     assert_eq!(s.client.user.energy(), Some(Energy(97)), "energy spent");
     assert_eq!(s.client.user.total_spark(), Some(Spark(5)), "spark increased");
     assert_eq!(s.client.cards.user_battlefield().len(), 1, "character materialized");
+    assert_clients_identical(&s);
+}
+
+#[test]
+fn test_play_character_score_points() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+    s.create_and_play(CardName::MinstrelOfFallingLight);
+    s.perform_action(BattleAction::EndTurn);
+    assert_eq!(s.client.user.score(), Some(Points(0)), "score unchanged");
+    s.perform_enemy_action(BattleAction::EndTurn);
+    assert_eq!(s.client.user.score(), Some(Points(5)), "score increased");
+    assert_clients_identical(&s);
+}
+
+#[test]
+fn test_play_character_win_battle() {
+    let mut s =
+        TestBattle::builder().user(TestPlayer::builder().energy(99).points(20).build()).connect();
+    s.create_and_play(CardName::MinstrelOfFallingLight);
+    s.perform_action(BattleAction::EndTurn);
+    s.perform_enemy_action(BattleAction::EndTurn);
+    assert_eq!(s.client.user.score(), Some(Points(25)), "score increased");
+    assert_eq!(s.client.last_game_message, Some(GameMessageType::Victory), "victory message");
+    assert_eq!(s.enemy_client.last_game_message, Some(GameMessageType::Defeat), "defeat message");
     assert_clients_identical(&s);
 }
 
