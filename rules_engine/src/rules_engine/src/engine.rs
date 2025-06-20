@@ -43,6 +43,12 @@ pub struct PollResult {
     pub response_type: PollResponseType,
 }
 
+#[derive(Debug, Clone)]
+pub struct PerformActionBlockingResult {
+    pub user_poll_results: Vec<PollResult>,
+    pub enemy_poll_results: Vec<PollResult>,
+}
+
 /// Connects to the rules engine and returns commands to execute.
 pub fn connect(
     provider: impl StateProvider,
@@ -54,7 +60,10 @@ pub fn connect(
 
     provider.store_request_context(user_id, request_context.clone());
 
-    let result = catch_panic(|| connect_internal(provider, request, request_context));
+    let provider_clone = provider.clone();
+    let result = catch_panic_conditionally(&provider, || {
+        connect_internal(provider_clone, request, request_context)
+    });
     let commands = match result {
         Ok(commands) => commands,
         Err(error) => error_message::display_error_message(None, error),
@@ -101,19 +110,35 @@ pub fn perform_action(provider: impl StateProvider + 'static, request: PerformAc
 pub fn perform_action_blocking(
     provider: impl StateProvider,
     request: PerformActionRequest,
-) -> Vec<PollResult> {
+    enemy_id: Option<UserId>,
+) -> PerformActionBlockingResult {
     let user_id = request.metadata.user_id;
+
     perform_action_internal(provider, &request);
 
-    let mut results = Vec::new();
+    let mut user_results = Vec::new();
+    let mut enemy_results = Vec::new();
+
     while let Some(poll_result) = handle_battle_action::poll(user_id) {
-        results.push(poll_result.clone());
+        user_results.push(poll_result.clone());
         if matches!(poll_result.response_type, PollResponseType::Final) {
             break;
         }
     }
 
-    results
+    if let Some(enemy_user_id) = enemy_id {
+        while let Some(poll_result) = handle_battle_action::poll(enemy_user_id) {
+            enemy_results.push(poll_result.clone());
+            if matches!(poll_result.response_type, PollResponseType::Final) {
+                break;
+            }
+        }
+    }
+
+    PerformActionBlockingResult {
+        user_poll_results: user_results,
+        enemy_poll_results: enemy_results,
+    }
 }
 
 fn connect_internal(
@@ -315,46 +340,52 @@ fn perform_action_internal(provider: impl StateProvider, request: &PerformAction
     let span = tracing::span!(Level::DEBUG, "perform_action", ?request_id);
     let _enter = span.enter();
 
-    let result = catch_panic(|| {
-        let Ok(database) = provider.get_database() else {
-            show_error_message(user_id, None, "No database found".to_string());
+    let provider_clone = provider.clone();
+    let result = catch_panic_conditionally(&provider, || {
+        let Ok(database) = provider_clone.get_database() else {
+            show_error_message(&provider_clone, user_id, None, "No database found".to_string());
             return;
         };
 
-        // Use vs_opponent's save file if specified, otherwise use the user's save file
-        let save_user_id = request.vs_opponent.unwrap_or(user_id);
-        let Ok(Some(save)) = database.fetch_save(save_user_id) else {
-            let error_msg = if request.vs_opponent.is_some() {
-                format!("No save file found for opponent ID: {:?}", save_user_id)
+        // Use specific save file if requested, otherwise use the user's save
+        // file
+        let save_file_id = request.save_file_id.unwrap_or(user_id);
+        let Ok(Some(save)) = database.fetch_save(save_file_id) else {
+            let error_msg = if request.save_file_id.is_some() {
+                format!("No save file found for ID: {:?}", save_file_id)
             } else {
                 "No save file found".to_string()
             };
-            show_error_message(user_id, None, error_msg);
+            show_error_message(&provider_clone, user_id, None, error_msg);
             return;
         };
 
-        let request_context = provider
+        let request_context = provider_clone
             .get_request_context(user_id)
             .unwrap_or(RequestContext { logging_options: Default::default() });
         let Some((mut battle, quest_id)) = deserialize_save_file::battle(&save, request_context)
         else {
-            show_error_message(user_id, None, "No battle found".to_string());
+            show_error_message(&provider_clone, user_id, None, "No battle found".to_string());
             return;
         };
 
         battle.animations = Some(AnimationData::default());
-        handle_request_action(&provider, request, user_id, save, &mut battle, request_id);
+        handle_request_action(&provider_clone, request, user_id, save, &mut battle, request_id);
 
-        // Always save to the save_user_id (either opponent or user)
         if let Err(error) =
-            database.write_save(serialize_save_file::battle(save_user_id, quest_id, &battle))
+            database.write_save(serialize_save_file::battle(save_file_id, quest_id, &battle))
         {
-            show_error_message(user_id, Some(&battle), format!("Failed to save battle: {}", error));
+            show_error_message(
+                &provider_clone,
+                user_id,
+                Some(&battle),
+                format!("Failed to save battle: {}", error),
+            );
         }
     });
 
     if let Err(error) = result {
-        show_error_message(user_id, None, error);
+        show_error_message(&provider, user_id, None, error);
     }
 }
 
@@ -412,6 +443,7 @@ fn handle_request_action(
                 deserialize_save_file::undo(&save, *player, request_context.clone())
             else {
                 show_error_message(
+                    provider,
                     user_id,
                     None,
                     "Failed to undo: Battle state not found.".to_string(),
@@ -431,8 +463,16 @@ fn handle_request_action(
     };
 }
 
-pub fn show_error_message(user_id: UserId, battle: Option<&BattleState>, error_message: String) {
-    let provider = crate::state_provider::DefaultStateProvider;
+pub fn show_error_message(
+    provider: &impl StateProvider,
+    user_id: UserId,
+    battle: Option<&BattleState>,
+    error_message: String,
+) {
+    if provider.should_panic_on_error() {
+        panic!("Error in test: {}", error_message);
+    }
+
     let request_context = provider
         .get_request_context(user_id)
         .unwrap_or(RequestContext { logging_options: Default::default() });
@@ -509,6 +549,21 @@ where
             error!("Captured panic: {}", error_message);
             Err(error_message)
         }
+    }
+}
+
+/// Conditionally catches panics based on the state provider.
+/// In test mode (when provider.should_panic_on_error() returns true), panics
+/// are propagated. Otherwise, panics are caught and converted to error
+/// messages.
+fn catch_panic_conditionally<F, T>(provider: &impl StateProvider, function: F) -> Result<T, String>
+where
+    F: FnOnce() -> T + panic::UnwindSafe,
+{
+    if provider.should_panic_on_error() {
+        Ok(function())
+    } else {
+        catch_panic(function)
     }
 }
 

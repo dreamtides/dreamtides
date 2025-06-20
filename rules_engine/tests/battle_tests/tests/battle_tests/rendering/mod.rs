@@ -1,1 +1,1 @@
-mod battle_rendering_tests;
+mod test_battle_rendering;

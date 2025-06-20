@@ -11,7 +11,7 @@ use database::sqlite_database::{self, SqliteDatabase};
 use uuid::Uuid;
 
 /// Trait for injecting stateful dependencies into rules engine code.
-pub trait StateProvider: RefUnwindSafe + UnwindSafe + Send + Sync {
+pub trait StateProvider: Clone + RefUnwindSafe + UnwindSafe + Send + Sync {
     type DatabaseImpl: Database;
 
     /// Initializes the database at the given path.
@@ -32,6 +32,12 @@ pub trait StateProvider: RefUnwindSafe + UnwindSafe + Send + Sync {
     /// Retrieves and formats the elapsed time for a request, cleaning up old
     /// entries.
     fn get_elapsed_time_message(&self, request_id: Option<Uuid>) -> String;
+
+    /// Returns true if errors should panic the current test, used in test
+    /// environments.
+    fn should_panic_on_error(&self) -> bool {
+        false
+    }
 }
 
 static REQUEST_CONTEXTS: LazyLock<Mutex<HashMap<UserId, RequestContext>>> =
@@ -40,6 +46,7 @@ static REQUEST_CONTEXTS: LazyLock<Mutex<HashMap<UserId, RequestContext>>> =
 static REQUEST_TIMESTAMPS: LazyLock<Mutex<HashMap<Option<Uuid>, Instant>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
+#[derive(Clone)]
 pub struct DefaultStateProvider;
 
 impl StateProvider for DefaultStateProvider {

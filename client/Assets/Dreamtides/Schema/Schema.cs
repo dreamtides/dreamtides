@@ -123,10 +123,10 @@ namespace Dreamtides.Schema
     public partial class DebugConfiguration
     {
         /// <summary>
-        /// If specified, the enemy will be an AI agent with the given GameAI specification.
+        /// If specified, the enemy will be this player type.
         /// </summary>
-        [JsonProperty("enemyAgent")]
-        public EnemyAgentUnion? EnemyAgent { get; set; }
+        [JsonProperty("enemy")]
+        public PlayerType Enemy { get; set; }
 
         /// <summary>
         /// If specified, the battle will be seeded with the given value. Otherwise a random seed
@@ -136,7 +136,16 @@ namespace Dreamtides.Schema
         public long? Seed { get; set; }
     }
 
-    public partial class EnemyAgentClass
+    public partial class PlayerType
+    {
+        [JsonProperty("user", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public Guid? User { get; set; }
+
+        [JsonProperty("agent", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public GameAi? Agent { get; set; }
+    }
+
+    public partial class GameAiClass
     {
         [JsonProperty("monteCarlo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? MonteCarlo { get; set; }
@@ -818,7 +827,17 @@ namespace Dreamtides.Schema
     ///
     /// Set the energy of the player
     ///
+    /// Set the points total of the player
+    ///
+    /// Set the produced energy of the player
+    ///
+    /// Set the spark bonus of the player
+    ///
     /// Add a specific card to hand
+    ///
+    /// Add a specific card to battlefield
+    ///
+    /// Add a specific card to void
     /// </summary>
     public partial class DebugBattleAction
     {
@@ -826,10 +845,25 @@ namespace Dreamtides.Schema
         public PlayerName? DrawCard { get; set; }
 
         [JsonProperty("setEnergy", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<SetEnergy> SetEnergy { get; set; }
+        public List<Set> SetEnergy { get; set; }
+
+        [JsonProperty("setPoints", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public List<Set> SetPoints { get; set; }
+
+        [JsonProperty("setProducedEnergy", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public List<Set> SetProducedEnergy { get; set; }
+
+        [JsonProperty("setSparkBonus", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public List<Set> SetSparkBonus { get; set; }
 
         [JsonProperty("addCardToHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public List<Name> AddCardToHand { get; set; }
+
+        [JsonProperty("addCardToBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public List<Name> AddCardToBattlefield { get; set; }
+
+        [JsonProperty("addCardToVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public List<Name> AddCardToVoid { get; set; }
     }
 
     public partial class SelectCardOrder
@@ -871,15 +905,6 @@ namespace Dreamtides.Schema
     {
         [JsonProperty("setOpponentAgent", Required = Required.Always)]
         public GameAi SetOpponentAgent { get; set; }
-    }
-
-    public partial class GameAiClass
-    {
-        [JsonProperty("monteCarlo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? MonteCarlo { get; set; }
-
-        [JsonProperty("monteCarloSingleThreaded", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? MonteCarloSingleThreaded { get; set; }
     }
 
     /// <summary>
@@ -1970,7 +1995,7 @@ namespace Dreamtides.Schema
 
     public enum LogType { Debug, Error, Info, Warning };
 
-    public enum EnemyAgentEnum { AlwaysPanic, FirstAvailableAction, RandomAction, WaitFiveSeconds };
+    public enum GameAiEnum { AlwaysPanic, FirstAvailableAction, RandomAction, WaitFiveSeconds };
 
     /// <summary>
     /// Represents a player within the context of the display layer.
@@ -2119,17 +2144,13 @@ namespace Dreamtides.Schema
 
     public enum PollResponseType { Final, Incremental };
 
-    /// <summary>
-    /// If specified, the enemy will be an AI agent with the given GameAI specification.
-    /// </summary>
-    public partial struct EnemyAgentUnion
+    public partial struct GameAi
     {
-        public EnemyAgentClass EnemyAgentClass;
-        public EnemyAgentEnum? Enum;
+        public GameAiEnum? Enum;
+        public GameAiClass GameAiClass;
 
-        public static implicit operator EnemyAgentUnion(EnemyAgentClass EnemyAgentClass) => new EnemyAgentUnion { EnemyAgentClass = EnemyAgentClass };
-        public static implicit operator EnemyAgentUnion(EnemyAgentEnum Enum) => new EnemyAgentUnion { Enum = Enum };
-        public bool IsNull => EnemyAgentClass == null && Enum == null;
+        public static implicit operator GameAi(GameAiEnum Enum) => new GameAi { Enum = Enum };
+        public static implicit operator GameAi(GameAiClass GameAiClass) => new GameAi { GameAiClass = GameAiClass };
     }
 
     /// <summary>
@@ -2146,13 +2167,13 @@ namespace Dreamtides.Schema
         public static implicit operator Position(PositionClass PositionClass) => new Position { PositionClass = PositionClass };
     }
 
-    public partial struct SetEnergy
+    public partial struct Set
     {
         public PlayerName? Enum;
         public long? Integer;
 
-        public static implicit operator SetEnergy(PlayerName Enum) => new SetEnergy { Enum = Enum };
-        public static implicit operator SetEnergy(long Integer) => new SetEnergy { Integer = Integer };
+        public static implicit operator Set(PlayerName Enum) => new Set { Enum = Enum };
+        public static implicit operator Set(long Integer) => new Set { Integer = Integer };
     }
 
     /// <summary>
@@ -2186,15 +2207,6 @@ namespace Dreamtides.Schema
 
         public static implicit operator BattleDisplayAction(BattleDisplayActionClass BattleDisplayActionClass) => new BattleDisplayAction { BattleDisplayActionClass = BattleDisplayActionClass };
         public static implicit operator BattleDisplayAction(BattleDisplayActionEnum Enum) => new BattleDisplayAction { Enum = Enum };
-    }
-
-    public partial struct GameAi
-    {
-        public EnemyAgentEnum? Enum;
-        public GameAiClass GameAiClass;
-
-        public static implicit operator GameAi(EnemyAgentEnum Enum) => new GameAi { Enum = Enum };
-        public static implicit operator GameAi(GameAiClass GameAiClass) => new GameAi { GameAiClass = GameAiClass };
     }
 
     /// <summary>
@@ -2263,8 +2275,8 @@ namespace Dreamtides.Schema
             {
                 LogTypeConverter.Singleton,
                 LogSpanNameConverter.Singleton,
-                EnemyAgentUnionConverter.Singleton,
-                EnemyAgentEnumConverter.Singleton,
+                GameAiConverter.Singleton,
+                GameAiEnumConverter.Singleton,
                 DisplayPlayerConverter.Singleton,
                 GameMessageTypeConverter.Singleton,
                 CardFacingConverter.Singleton,
@@ -2277,7 +2289,7 @@ namespace Dreamtides.Schema
                 BattleActionConverter.Singleton,
                 NameConverter.Singleton,
                 PlayerNameConverter.Singleton,
-                SetEnergyConverter.Singleton,
+                SetConverter.Singleton,
                 BattleActionEnumConverter.Singleton,
                 BattleDisplayActionConverter.Singleton,
                 CardBrowserTypeConverter.Singleton,
@@ -2285,7 +2297,6 @@ namespace Dreamtides.Schema
                 PanelAddressEnumConverter.Singleton,
                 BattleDisplayActionEnumConverter.Singleton,
                 DebugActionConverter.Singleton,
-                GameAiConverter.Singleton,
                 DebugActionEnumConverter.Singleton,
                 GameActionEnumConverter.Singleton,
                 FlexAlignConverter.Singleton,
@@ -2435,78 +2446,71 @@ namespace Dreamtides.Schema
         public static readonly LogSpanNameConverter Singleton = new LogSpanNameConverter();
     }
 
-    internal class EnemyAgentUnionConverter : JsonConverter
+    internal class GameAiConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(EnemyAgentUnion) || t == typeof(EnemyAgentUnion?);
+        public override bool CanConvert(Type t) => t == typeof(GameAi) || t == typeof(GameAi?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
             switch (reader.TokenType)
             {
-                case JsonToken.Null:
-                    return new EnemyAgentUnion { };
                 case JsonToken.String:
                 case JsonToken.Date:
                     var stringValue = serializer.Deserialize<string>(reader);
                     switch (stringValue)
                     {
                         case "alwaysPanic":
-                            return new EnemyAgentUnion { Enum = EnemyAgentEnum.AlwaysPanic };
+                            return new GameAi { Enum = GameAiEnum.AlwaysPanic };
                         case "firstAvailableAction":
-                            return new EnemyAgentUnion { Enum = EnemyAgentEnum.FirstAvailableAction };
+                            return new GameAi { Enum = GameAiEnum.FirstAvailableAction };
                         case "randomAction":
-                            return new EnemyAgentUnion { Enum = EnemyAgentEnum.RandomAction };
+                            return new GameAi { Enum = GameAiEnum.RandomAction };
                         case "waitFiveSeconds":
-                            return new EnemyAgentUnion { Enum = EnemyAgentEnum.WaitFiveSeconds };
+                            return new GameAi { Enum = GameAiEnum.WaitFiveSeconds };
                     }
                     break;
                 case JsonToken.StartObject:
-                    var objectValue = serializer.Deserialize<EnemyAgentClass>(reader);
-                    return new EnemyAgentUnion { EnemyAgentClass = objectValue };
+                    var objectValue = serializer.Deserialize<GameAiClass>(reader);
+                    return new GameAi { GameAiClass = objectValue };
             }
-            throw new Exception("Cannot unmarshal type EnemyAgentUnion");
+            throw new Exception("Cannot unmarshal type GameAi");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
         {
-            var value = (EnemyAgentUnion)untypedValue;
-            if (value.IsNull)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
+            var value = (GameAi)untypedValue;
             if (value.Enum != null)
             {
                 switch (value.Enum)
                 {
-                    case EnemyAgentEnum.AlwaysPanic:
+                    case GameAiEnum.AlwaysPanic:
                         serializer.Serialize(writer, "alwaysPanic");
                         return;
-                    case EnemyAgentEnum.FirstAvailableAction:
+                    case GameAiEnum.FirstAvailableAction:
                         serializer.Serialize(writer, "firstAvailableAction");
                         return;
-                    case EnemyAgentEnum.RandomAction:
+                    case GameAiEnum.RandomAction:
                         serializer.Serialize(writer, "randomAction");
                         return;
-                    case EnemyAgentEnum.WaitFiveSeconds:
+                    case GameAiEnum.WaitFiveSeconds:
                         serializer.Serialize(writer, "waitFiveSeconds");
                         return;
                 }
             }
-            if (value.EnemyAgentClass != null)
+            if (value.GameAiClass != null)
             {
-                serializer.Serialize(writer, value.EnemyAgentClass);
+                serializer.Serialize(writer, value.GameAiClass);
                 return;
             }
-            throw new Exception("Cannot marshal type EnemyAgentUnion");
+            throw new Exception("Cannot marshal type GameAi");
         }
 
-        public static readonly EnemyAgentUnionConverter Singleton = new EnemyAgentUnionConverter();
+        public static readonly GameAiConverter Singleton = new GameAiConverter();
     }
 
-    internal class EnemyAgentEnumConverter : JsonConverter
+    internal class GameAiEnumConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(EnemyAgentEnum) || t == typeof(EnemyAgentEnum?);
+        public override bool CanConvert(Type t) => t == typeof(GameAiEnum) || t == typeof(GameAiEnum?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -2515,15 +2519,15 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "alwaysPanic":
-                    return EnemyAgentEnum.AlwaysPanic;
+                    return GameAiEnum.AlwaysPanic;
                 case "firstAvailableAction":
-                    return EnemyAgentEnum.FirstAvailableAction;
+                    return GameAiEnum.FirstAvailableAction;
                 case "randomAction":
-                    return EnemyAgentEnum.RandomAction;
+                    return GameAiEnum.RandomAction;
                 case "waitFiveSeconds":
-                    return EnemyAgentEnum.WaitFiveSeconds;
+                    return GameAiEnum.WaitFiveSeconds;
             }
-            throw new Exception("Cannot unmarshal type EnemyAgentEnum");
+            throw new Exception("Cannot unmarshal type GameAiEnum");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -2533,26 +2537,26 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (EnemyAgentEnum)untypedValue;
+            var value = (GameAiEnum)untypedValue;
             switch (value)
             {
-                case EnemyAgentEnum.AlwaysPanic:
+                case GameAiEnum.AlwaysPanic:
                     serializer.Serialize(writer, "alwaysPanic");
                     return;
-                case EnemyAgentEnum.FirstAvailableAction:
+                case GameAiEnum.FirstAvailableAction:
                     serializer.Serialize(writer, "firstAvailableAction");
                     return;
-                case EnemyAgentEnum.RandomAction:
+                case GameAiEnum.RandomAction:
                     serializer.Serialize(writer, "randomAction");
                     return;
-                case EnemyAgentEnum.WaitFiveSeconds:
+                case GameAiEnum.WaitFiveSeconds:
                     serializer.Serialize(writer, "waitFiveSeconds");
                     return;
             }
-            throw new Exception("Cannot marshal type EnemyAgentEnum");
+            throw new Exception("Cannot marshal type GameAiEnum");
         }
 
-        public static readonly EnemyAgentEnumConverter Singleton = new EnemyAgentEnumConverter();
+        public static readonly GameAiEnumConverter Singleton = new GameAiEnumConverter();
     }
 
     internal class DisplayPlayerConverter : JsonConverter
@@ -3225,9 +3229,9 @@ namespace Dreamtides.Schema
         public static readonly PlayerNameConverter Singleton = new PlayerNameConverter();
     }
 
-    internal class SetEnergyConverter : JsonConverter
+    internal class SetConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(SetEnergy) || t == typeof(SetEnergy?);
+        public override bool CanConvert(Type t) => t == typeof(Set) || t == typeof(Set?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -3235,25 +3239,25 @@ namespace Dreamtides.Schema
             {
                 case JsonToken.Integer:
                     var integerValue = serializer.Deserialize<long>(reader);
-                    return new SetEnergy { Integer = integerValue };
+                    return new Set { Integer = integerValue };
                 case JsonToken.String:
                 case JsonToken.Date:
                     var stringValue = serializer.Deserialize<string>(reader);
                     switch (stringValue)
                     {
                         case "one":
-                            return new SetEnergy { Enum = PlayerName.One };
+                            return new Set { Enum = PlayerName.One };
                         case "two":
-                            return new SetEnergy { Enum = PlayerName.Two };
+                            return new Set { Enum = PlayerName.Two };
                     }
                     break;
             }
-            throw new Exception("Cannot unmarshal type SetEnergy");
+            throw new Exception("Cannot unmarshal type Set");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
         {
-            var value = (SetEnergy)untypedValue;
+            var value = (Set)untypedValue;
             if (value.Integer != null)
             {
                 serializer.Serialize(writer, value.Integer.Value);
@@ -3271,10 +3275,10 @@ namespace Dreamtides.Schema
                         return;
                 }
             }
-            throw new Exception("Cannot marshal type SetEnergy");
+            throw new Exception("Cannot marshal type Set");
         }
 
-        public static readonly SetEnergyConverter Singleton = new SetEnergyConverter();
+        public static readonly SetConverter Singleton = new SetConverter();
     }
 
     internal class BattleActionEnumConverter : JsonConverter
@@ -3650,68 +3654,6 @@ namespace Dreamtides.Schema
         }
 
         public static readonly DebugActionConverter Singleton = new DebugActionConverter();
-    }
-
-    internal class GameAiConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(GameAi) || t == typeof(GameAi?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            switch (reader.TokenType)
-            {
-                case JsonToken.String:
-                case JsonToken.Date:
-                    var stringValue = serializer.Deserialize<string>(reader);
-                    switch (stringValue)
-                    {
-                        case "alwaysPanic":
-                            return new GameAi { Enum = EnemyAgentEnum.AlwaysPanic };
-                        case "firstAvailableAction":
-                            return new GameAi { Enum = EnemyAgentEnum.FirstAvailableAction };
-                        case "randomAction":
-                            return new GameAi { Enum = EnemyAgentEnum.RandomAction };
-                        case "waitFiveSeconds":
-                            return new GameAi { Enum = EnemyAgentEnum.WaitFiveSeconds };
-                    }
-                    break;
-                case JsonToken.StartObject:
-                    var objectValue = serializer.Deserialize<GameAiClass>(reader);
-                    return new GameAi { GameAiClass = objectValue };
-            }
-            throw new Exception("Cannot unmarshal type GameAi");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            var value = (GameAi)untypedValue;
-            if (value.Enum != null)
-            {
-                switch (value.Enum)
-                {
-                    case EnemyAgentEnum.AlwaysPanic:
-                        serializer.Serialize(writer, "alwaysPanic");
-                        return;
-                    case EnemyAgentEnum.FirstAvailableAction:
-                        serializer.Serialize(writer, "firstAvailableAction");
-                        return;
-                    case EnemyAgentEnum.RandomAction:
-                        serializer.Serialize(writer, "randomAction");
-                        return;
-                    case EnemyAgentEnum.WaitFiveSeconds:
-                        serializer.Serialize(writer, "waitFiveSeconds");
-                        return;
-                }
-            }
-            if (value.GameAiClass != null)
-            {
-                serializer.Serialize(writer, value.GameAiClass);
-                return;
-            }
-            throw new Exception("Cannot marshal type GameAi");
-        }
-
-        public static readonly GameAiConverter Singleton = new GameAiConverter();
     }
 
     internal class DebugActionEnumConverter : JsonConverter

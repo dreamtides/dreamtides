@@ -43,14 +43,19 @@ impl StateProvider for TestStateProvider {
     type DatabaseImpl = TestDatabase;
 
     fn initialize_database(&self, path: &str) -> Result<Self::DatabaseImpl, DatabaseError> {
-        let db = TestDatabase::new();
         let mut databases = self
             .inner
             .databases
             .lock()
             .map_err(|e| DatabaseError(format!("Failed to acquire lock: {}", e)))?;
-        databases.insert(path.to_string(), db.clone());
-        Ok(db)
+
+        if let Some(existing_db) = databases.get(path) {
+            Ok(existing_db.clone())
+        } else {
+            let db = TestDatabase::new();
+            databases.insert(path.to_string(), db.clone());
+            Ok(databases.get(path).unwrap().clone())
+        }
     }
 
     fn get_database(&self) -> Result<Self::DatabaseImpl, DatabaseError> {
@@ -101,5 +106,9 @@ impl StateProvider for TestStateProvider {
         } else {
             "[mutex lock failed]".to_string()
         }
+    }
+
+    fn should_panic_on_error(&self) -> bool {
+        true
     }
 }

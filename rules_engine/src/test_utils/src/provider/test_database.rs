@@ -28,6 +28,7 @@ impl Database for TestDatabase {
             .storage
             .read()
             .map_err(|e| DatabaseError(format!("Failed to acquire read lock: {}", e)))?;
+
         Ok(storage.get(&user_id).cloned())
     }
 

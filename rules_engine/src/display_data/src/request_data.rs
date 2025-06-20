@@ -71,7 +71,7 @@ pub struct PerformActionRequest {
 
     /// If specified, treats this as a multiplayer game using the save file
     /// provided in this ID instead of reading the user's own save file.
-    pub vs_opponent: Option<UserId>,
+    pub save_file_id: Option<UserId>,
 
     pub test_scenario: Option<String>,
 }
