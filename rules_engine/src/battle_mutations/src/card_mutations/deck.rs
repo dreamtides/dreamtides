@@ -33,51 +33,34 @@ pub fn draw_card(
 
 /// Draw a number of cards from `player`'s deck and put them into their hand.
 pub fn draw_cards(battle: &mut BattleState, source: EffectSource, player: PlayerName, count: u32) {
-    if battle.animations.is_some() {
-        draw_cards_with_animation(battle, source, player, count);
+    let should_animate = battle.animations.is_some();
+    let pre_draw_snapshot = if should_animate {
+        let mut snapshot = battle.logical_clone();
+        if snapshot.cards.deck(player).len() < count as usize {
+            create_test_deck::add(&mut snapshot, player);
+        }
+        Some(snapshot)
     } else {
-        draw_cards_internal(battle, source, player, count);
-    }
-}
+        None
+    };
 
-/// Internal implementation of draw_cards without animation support.
-fn draw_cards_internal(
-    battle: &mut BattleState,
-    source: EffectSource,
-    player: PlayerName,
-    count: u32,
-) {
-    for _ in 0..count {
-        draw_card_internal(battle, source, player, false);
-    }
-}
-
-/// Implementation of draw_cards with animation support.
-fn draw_cards_with_animation(
-    battle: &mut BattleState,
-    source: EffectSource,
-    player: PlayerName,
-    count: u32,
-) {
-    if battle.cards.deck(player).len() < count as usize {
-        create_test_deck::add(battle, player);
-    }
-
-    let pre_draw_snapshot = battle.logical_clone();
     let mut drawn_cards = Vec::new();
-
     for _ in 0..count {
         if let Some(card_id) = draw_card_internal(battle, source, player, false) {
-            drawn_cards.push(card_id);
+            if should_animate {
+                drawn_cards.push(card_id);
+            }
         }
     }
 
-    if !drawn_cards.is_empty()
+    if should_animate
+        && !drawn_cards.is_empty()
         && let Some(animations) = &mut battle.animations
+        && let Some(snapshot) = pre_draw_snapshot
     {
         animations.steps.push(AnimationStep {
             source,
-            snapshot: pre_draw_snapshot,
+            snapshot,
             animation: BattleAnimation::DrawCards { player, cards: drawn_cards },
         });
     }
