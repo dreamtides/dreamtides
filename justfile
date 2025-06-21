@@ -210,3 +210,6 @@ bench-full:
 enforce-benchmarks:
     ./rules_engine/scripts/benchmark.py ai_single_threaded/ai_single_threaded --maximum-time-ms 65
     ./rules_engine/scripts/benchmark.py ai_full/ai_full --maximum-time-ms 900
+
+symlinks:
+     ./rules_engine/scripts/symlinks.py -d ~/Documents/dttmp rules_engine/target client/Library
