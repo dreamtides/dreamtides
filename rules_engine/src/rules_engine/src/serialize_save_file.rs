@@ -4,7 +4,7 @@ use core_data::identifiers::{QuestId, UserId};
 use database::battle_save_file::BattleSaveFile;
 use database::quest_save_file::QuestSaveFile;
 use database::save_file::{SaveFile, SaveFileV1};
-use tracing_macros::panic_with;
+use battle_queries::panic_with;
 
 /// Serializes a [BattleState] to a [SaveFile] for a given [UserId] and
 /// [QuestId].

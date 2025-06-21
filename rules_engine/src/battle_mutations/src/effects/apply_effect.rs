@@ -6,7 +6,7 @@ use battle_queries::battle_player_queries::quantity_expression;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use battle_state::core::effect_source::EffectSource;
-use tracing_macros::battle_trace;
+use battle_queries::battle_trace;
 
 use crate::card_mutations::{deck, negate};
 use crate::character_mutations::dissolve;

@@ -5,7 +5,7 @@ use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::core::effect_source::EffectSource;
 use core_data::numerics::TurnId;
 use core_data::types::PlayerName;
-use tracing_macros::battle_trace;
+use battle_queries::battle_trace;
 
 use crate::card_mutations::deck;
 use crate::phase_mutations::{dreamwell, judgment};

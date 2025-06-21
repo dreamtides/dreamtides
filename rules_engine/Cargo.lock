@@ -62,7 +62,6 @@ dependencies = [
  "rand",
  "tracing",
  "tracing-subscriber",
- "tracing_macros",
 ]
 
 [[package]]
@@ -90,7 +89,6 @@ dependencies = [
  "rayon",
  "tracing",
  "tracing-subscriber",
- "tracing_macros",
 ]
 
 [[package]]
@@ -308,7 +306,6 @@ dependencies = [
  "rand_xoshiro",
  "tracing",
  "tracing-subscriber",
- "tracing_macros",
  "uuid",
 ]
 
@@ -324,7 +321,6 @@ dependencies = [
  "rand",
  "rand_xoshiro",
  "tracing",
- "tracing_macros",
 ]
 
 [[package]]
@@ -334,9 +330,13 @@ dependencies = [
  "ability_data",
  "battle_state",
  "bit-set",
+ "chrono",
  "core_data",
+ "display_data",
  "fastrand",
  "rand",
+ "serde",
+ "serde_json",
  "strum",
  "strum_macros",
  "tracing",
@@ -801,7 +801,6 @@ dependencies = [
  "strum",
  "tracing",
  "tracing-subscriber",
- "tracing_macros",
  "ui_components",
 ]
 
@@ -1456,7 +1455,6 @@ dependencies = [
  "rand_xoshiro",
  "tracing",
  "tracing-subscriber",
- "tracing_macros",
  "uuid",
 ]
 
@@ -1797,7 +1795,6 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
- "tracing_macros",
  "ui_components",
  "uuid",
 ]
@@ -1820,7 +1817,6 @@ dependencies = [
  "serde_json",
  "tracing",
  "tracing-subscriber",
- "tracing_macros",
  "uuid",
 ]
 
@@ -2111,7 +2107,6 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
- "tracing_macros",
  "ui_components",
  "uuid",
 ]
@@ -2296,26 +2291,6 @@ dependencies = [
  "tracing",
  "tracing-core",
  "tracing-log",
-]
-
-[[package]]
-name = "tracing_macros"
-version = "0.0.0"
-dependencies = [
- "battle_queries",
- "battle_state",
- "chrono",
- "core_data",
- "display_data",
- "rand_xoshiro",
- "serde",
- "serde_json",
- "strum",
- "tracing",
- "tracing-error",
- "tracing-forest",
- "tracing-subscriber",
- "uuid",
 ]
 
 [[package]]

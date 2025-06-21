@@ -21,7 +21,6 @@ battle_queries = { path = "../../src/battle_queries" }
 battle_state = { path = "../../src/battle_state" }
 core_data = { path = "../../src/core_data" }
 game_creation = { path = "../../src/game_creation" }
-tracing_macros = { path = "../../src/tracing_macros" }
 
 rand = "0.9"
 rand_xoshiro = "0.7"

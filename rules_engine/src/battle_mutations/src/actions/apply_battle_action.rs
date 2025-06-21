@@ -3,7 +3,7 @@ use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use core_data::types::PlayerName;
 use tracing::instrument;
-use tracing_macros::{battle_trace, panic_with};
+use battle_queries::{battle_trace, panic_with};
 
 use crate::actions::apply_debug_battle_action;
 use crate::phase_mutations::turn;

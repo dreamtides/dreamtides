@@ -1,6 +1,2 @@
-pub mod assert_that;
-pub mod battle_trace;
-pub mod panic_with;
-pub mod write_tracing_event;
-
-pub use write_tracing_event::{write_battle_event, write_panic_snapshot};
+// Macros have been moved to battle_queries crate
+// This crate is kept for backward compatibility

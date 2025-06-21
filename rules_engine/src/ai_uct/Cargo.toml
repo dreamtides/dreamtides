@@ -16,7 +16,6 @@ battle_state = { path = "../battle_state", version = "0.0.0" }
 battle_mutations = { path = "../battle_mutations", version = "0.0.0" }
 battle_queries = { path = "../battle_queries", version = "0.0.0" }
 core_data = { path = "../core_data", version = "0.0.0" }
-tracing_macros = { path = "../tracing_macros", version = "0.0.0" }
 
 ego-tree = "0.10"
 ordered-float = "5"

@@ -15,7 +15,7 @@ use display_data::battle_view::{ButtonView, InterfaceView};
 use masonry::dimension::{FlexInsets, SafeAreaInsets};
 use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition};
 use masonry::flex_style::FlexStyle;
-use tracing_macros::panic_with;
+use battle_queries::panic_with;
 use ui_components::box_component::BoxComponent;
 use ui_components::button_component::ButtonComponent;
 use ui_components::component::Component;

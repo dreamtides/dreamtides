@@ -187,6 +187,7 @@ Contains query functions for reading and analyzing battle state without mutation
 - **legal_action_queries/can_play_cards.rs** - Determines which cards can be played from hand based on costs and restrictions
 - **debug_snapshot/debug_battle_snapshot.rs** - Creates human-readable debug representations of complete battle state
 - **battle_player_queries/costs.rs** - Cost validation system with `can_pay()` for checking if players can afford actions
+- **macros/** - Debugging and logging macros including `battle_trace!`, `assert_that!`, and `panic_with!` for tracing game state and errors
 
 ### src/battle_mutations
 
@@ -227,14 +228,6 @@ Contains text parsing system that converts human-readable card rules text into s
 - **card_predicate_parser.rs** - Parses card targeting and filtering expressions like "enemy character" or "character with cost $3 or less"
 - **cost_parser.rs** - Parses ability costs including energy costs, discarding cards, and abandoning characters
 - **parser_utils.rs** - Utility functions for common parsing patterns including `phrase()`, `numeric()`, and `text_number()`
-
-### src/tracing_macros
-
-Contains debugging and logging macros that integrate with the battle system for tracing game state and errors:
-
-- **battle_trace.rs** - `battle_trace!` macro for recording debug events in battle history and emitting trace events during gameplay
-- **assert_that.rs** and **panic_with.rs** - `assert_that!` and `panic_with!` macros for invariant checking and error handling with automatic battle state capture
-- **write_tracing_event.rs** - Functions for writing structured trace events to JSON log files including battle snapshots and command sequences
 
 
 ## Rules Engine Entry Points

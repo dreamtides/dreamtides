@@ -7,7 +7,7 @@ use battle_state::battle::card_id::StackCardId;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{PromptConfiguration, PromptData, PromptType};
 use core_data::types::PlayerName;
-use tracing_macros::battle_trace;
+use battle_queries::battle_trace;
 
 /// Adds a prompt to the `battle` for targets required to play the `card_id`
 /// card.

@@ -5,7 +5,6 @@ use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::PathBuf;
 use std::time::SystemTime;
 
-use battle_queries::debug_snapshot::debug_battle_snapshot;
 use battle_state::battle::animation_data::AnimationData;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle_trace::battle_tracing::BattleTraceEvent;
@@ -16,6 +15,8 @@ use serde::Serialize;
 use serde_json;
 use strum::IntoDiscriminant;
 use tracing::{debug, error, instrument};
+
+use crate::debug_snapshot::debug_battle_snapshot;
 
 #[instrument(name = "write_battle_event", level = "debug", skip(battle, message, values))]
 pub fn write_battle_event(

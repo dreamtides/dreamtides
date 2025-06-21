@@ -2,7 +2,7 @@ use ability_data::cost::Cost;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::core::effect_source::EffectSource;
 use core_data::types::PlayerName;
-use tracing_macros::battle_trace;
+use battle_queries::battle_trace;
 
 use crate::player_mutations::energy;
 

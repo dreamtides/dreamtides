@@ -7,7 +7,7 @@ use battle_state::battle_cards::character_state::CharacterState;
 use battle_state::battle_cards::zone::Zone;
 use battle_state::core::effect_source::EffectSource;
 use core_data::types::PlayerName;
-use tracing_macros::{assert_that, panic_with};
+use battle_queries::{assert_that, panic_with};
 
 /// Moves a card from the 'controller' player's hand to the stack.
 ///

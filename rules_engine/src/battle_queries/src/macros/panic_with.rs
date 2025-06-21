@@ -32,7 +32,7 @@ macro_rules! panic_with {
     ($message:expr, $battle:expr) => {{
         tracing::error!($message);
         eprintln!("Error: {}", $message);
-        $crate::write_panic_snapshot(
+        $crate::macros::write_panic_snapshot(
             $battle,
             $message.to_string(),
             std::collections::BTreeMap::new())
@@ -50,7 +50,7 @@ macro_rules! panic_with {
             values.insert(stringify!($key).to_string(), format!("{:?}", $key));
         )*
 
-        $crate::write_panic_snapshot(
+        $crate::macros::write_panic_snapshot(
             $battle,
             $message.to_string(),
             values
@@ -75,7 +75,7 @@ macro_rules! panic_with {
             values.insert(stringify!($key).to_string(), format!("{:?}", $value));
         )*
 
-        $crate::write_panic_snapshot(
+        $crate::macros::write_panic_snapshot(
             $battle,
             $message.to_string(),
             values

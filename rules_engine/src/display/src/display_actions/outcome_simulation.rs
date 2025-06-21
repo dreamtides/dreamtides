@@ -15,7 +15,7 @@ use core_data::types::PlayerName;
 use display_data::battle_view::{BattlePreviewView, PlayerPreviewView};
 use display_data::card_view::CardPreviewView;
 use masonry::flex_node::FlexNode;
-use tracing_macros::panic_with;
+use battle_queries::panic_with;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::EnvFilter;
 use ui_components::component::Component;

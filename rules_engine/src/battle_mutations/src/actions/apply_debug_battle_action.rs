@@ -3,7 +3,7 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, DeckCardId, HandCardId};
 use battle_state::core::effect_source::EffectSource;
 use core_data::types::PlayerName;
-use tracing_macros::battle_trace;
+use battle_queries::battle_trace;
 
 use crate::card_mutations::{deck, move_card};
 

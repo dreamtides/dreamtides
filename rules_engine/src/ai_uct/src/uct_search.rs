@@ -14,7 +14,7 @@ use petgraph::visit::EdgeRef;
 use petgraph::Direction;
 use rayon::prelude::*;
 use tracing::debug;
-use tracing_macros::panic_with;
+use battle_queries::panic_with;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::EnvFilter;
 

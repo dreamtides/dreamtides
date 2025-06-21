@@ -19,7 +19,6 @@ battle_queries = { path = "../battle_queries" }
 battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 logging = { path = "../logging" }
-tracing_macros = { path = "../tracing_macros" }
 
 ordered-float = "5"
 rand = "0.9"

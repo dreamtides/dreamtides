@@ -25,7 +25,6 @@ display_data = { path = "../display_data" }
 game_creation = { path = "../game_creation" }
 logging = { path = "../logging" }
 masonry = { path = "../masonry" }
-tracing_macros = { path = "../tracing_macros" }
 ui_components = { path = "../ui_components" }
 
 backtrace = "0.3"

@@ -20,7 +20,6 @@ battle_mutations = { path = "../battle_mutations" }
 battle_queries = { path = "../battle_queries" }
 core_data = { path = "../core_data" }
 game_creation = { path = "../game_creation" }
-tracing_macros = { path = "../tracing_macros" }
 
 clap = { version = "4", features = ["derive"] }
 rand = "0.9"

@@ -25,7 +25,6 @@ display_data = { path = "../display_data" }
 logging = { path = "../logging" }
 masonry = { path = "../masonry" }
 rules_engine = { path = "../rules_engine" }
-tracing_macros = { path = "../tracing_macros" }
 ui_components = { path = "../ui_components" }
 
 bon = "3"

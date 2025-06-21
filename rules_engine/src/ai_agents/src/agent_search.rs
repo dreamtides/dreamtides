@@ -11,7 +11,7 @@ use battle_state::battle::battle_state::BattleState;
 use core_data::types::PlayerName;
 use rand::seq::IndexedRandom;
 use tracing::debug;
-use tracing_macros::panic_with;
+use battle_queries::panic_with;
 
 /// Selects an action for the given player using the given AI agent.
 pub fn select_action(battle: &BattleState, player: PlayerName, game_ai: &GameAI) -> BattleAction {

@@ -6,7 +6,7 @@ use battle_state::battle_cards::stack_card_state::StackCardState;
 use battle_state::core::effect_source::EffectSource;
 use core_data::card_types::CardType;
 use core_data::types::PlayerName;
-use tracing_macros::{assert_that, battle_trace, panic_with};
+use battle_queries::{assert_that, battle_trace, panic_with};
 
 use crate::card_mutations::move_card;
 use crate::effects::apply_effect;

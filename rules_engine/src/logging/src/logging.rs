@@ -85,12 +85,12 @@ fn tag_parser(event: &Event) -> Option<Tag> {
     let icon = match (level, target) {
         (Level::ERROR, _) => '🚨',
         (Level::WARN, _) => '🚧',
+        (_, target) if target.contains("macros") => '🟢',
         (_, target) if target.contains("battle_queries") => '🔎',
         (_, target) if target.contains("battle_mutations") => '💻',
         (_, target) if target.contains("client_logging") => '🌐',
         (_, target) if target.contains("rules_engine") => '📏',
         (_, target) if target.contains("ai") => '🤖',
-        (_, target) if target.contains("tracing_macros") => '🟢',
         (Level::TRACE, _) => '📍',
         (Level::DEBUG, _) => '📝',
         _ => '💡',

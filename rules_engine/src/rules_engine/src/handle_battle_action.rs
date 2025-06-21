@@ -3,8 +3,10 @@ use std::sync::{LazyLock, Mutex};
 
 use ai_agents::agent_search;
 use battle_mutations::actions::apply_battle_action;
+use battle_queries::battle_trace;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
+use battle_queries::macros::write_tracing_event;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::animation_data::AnimationData;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
@@ -15,7 +17,6 @@ use display::rendering::renderer;
 use display_data::command::CommandSequence;
 use display_data::request_data::PollResponseType;
 use tracing::instrument;
-use tracing_macros::{battle_trace, write_tracing_event};
 use uuid::Uuid;
 
 use crate::engine::PollResult;

@@ -6,6 +6,8 @@ use std::time::Instant;
 use action_data::game_action_data::GameAction;
 use ai_data::game_ai::GameAI;
 use backtrace::Backtrace;
+use battle_queries::battle_trace;
+use battle_queries::macros::write_tracing_event;
 use battle_state::battle::animation_data::AnimationData;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle_player::battle_player_state::PlayerType;
@@ -23,7 +25,6 @@ use game_creation::new_battle;
 use rand::RngCore;
 use tokio::task;
 use tracing::{debug, error, info, warn, Level};
-use tracing_macros::{battle_trace, write_tracing_event};
 use ui_components::display_properties;
 use uuid::Uuid;
 

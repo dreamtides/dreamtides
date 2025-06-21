@@ -2,7 +2,7 @@ use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
-use tracing_macros::{battle_trace, panic_with};
+use battle_queries::{battle_trace, panic_with};
 
 use crate::effects::apply_effect;
 

@@ -6,7 +6,7 @@ use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{PromptConfiguration, PromptData, PromptType};
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
-use tracing_macros::battle_trace;
+use battle_queries::battle_trace;
 
 /// Adds a prompt for the controller of the `card_id` card to pay additional
 /// costs for this card, if any.
