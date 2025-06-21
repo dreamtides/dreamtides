@@ -6,12 +6,12 @@ use ai_uct::uct_config::UctConfig;
 use ai_uct::uct_search;
 use battle_mutations::player_mutations::player_state;
 use battle_queries::legal_action_queries::legal_actions;
+use battle_queries::panic_with;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use core_data::types::PlayerName;
 use rand::seq::IndexedRandom;
 use tracing::debug;
-use battle_queries::panic_with;
 
 /// Selects an action for the given player using the given AI agent.
 pub fn select_action(battle: &BattleState, player: PlayerName, game_ai: &GameAI) -> BattleAction {

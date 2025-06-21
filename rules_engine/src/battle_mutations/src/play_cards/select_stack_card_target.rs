@@ -1,10 +1,10 @@
+use battle_queries::panic_with;
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CharacterId, StackCardId};
 use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use battle_state::core::effect_source::EffectSource;
 use core_data::types::PlayerName;
-use battle_queries::panic_with;
 
 /// Selects a character as the target of a card on the stack.
 pub fn character(battle: &mut BattleState, player: PlayerName, character_id: CharacterId) {

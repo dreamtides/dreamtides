@@ -1,12 +1,12 @@
 use ability_data::cost::Cost;
 use battle_queries::battle_card_queries::card_abilities;
+use battle_queries::battle_trace;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::StackCardId;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{PromptConfiguration, PromptData, PromptType};
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
-use battle_queries::battle_trace;
 
 /// Adds a prompt for the controller of the `card_id` card to pay additional
 /// costs for this card, if any.

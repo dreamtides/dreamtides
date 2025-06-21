@@ -1,4 +1,5 @@
 use battle_queries::battle_card_queries::{card_abilities, card_properties};
+use battle_queries::{assert_that, battle_trace, panic_with};
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardIdType, CharacterId};
@@ -6,7 +7,6 @@ use battle_state::battle_cards::stack_card_state::StackCardState;
 use battle_state::core::effect_source::EffectSource;
 use core_data::card_types::CardType;
 use core_data::types::PlayerName;
-use battle_queries::{assert_that, battle_trace, panic_with};
 
 use crate::card_mutations::move_card;
 use crate::effects::apply_effect;

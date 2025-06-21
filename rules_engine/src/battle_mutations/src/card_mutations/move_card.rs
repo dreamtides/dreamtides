@@ -1,4 +1,5 @@
 use battle_queries::battle_card_queries::card_properties;
+use battle_queries::{assert_that, panic_with};
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{
     CardIdType, CharacterId, DeckCardId, HandCardId, StackCardId, VoidCardId,
@@ -7,7 +8,6 @@ use battle_state::battle_cards::character_state::CharacterState;
 use battle_state::battle_cards::zone::Zone;
 use battle_state::core::effect_source::EffectSource;
 use core_data::types::PlayerName;
-use battle_queries::{assert_that, panic_with};
 
 /// Moves a card from the 'controller' player's hand to the stack.
 ///

@@ -4,6 +4,7 @@ use battle_mutations::actions::apply_battle_action;
 use battle_mutations::player_mutations::player_state;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
+use battle_queries::panic_with;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
@@ -14,7 +15,6 @@ use petgraph::visit::EdgeRef;
 use petgraph::Direction;
 use rayon::prelude::*;
 use tracing::debug;
-use battle_queries::panic_with;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::EnvFilter;
 

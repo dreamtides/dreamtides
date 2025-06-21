@@ -3,10 +3,10 @@ use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
 use battle_queries::battle_card_queries::stack_card_queries;
 use battle_queries::battle_player_queries::quantity_expression;
+use battle_queries::battle_trace;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use battle_state::core::effect_source::EffectSource;
-use battle_queries::battle_trace;
 
 use crate::card_mutations::{deck, negate};
 use crate::character_mutations::dissolve;
