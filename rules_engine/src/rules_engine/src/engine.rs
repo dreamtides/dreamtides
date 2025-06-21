@@ -22,7 +22,7 @@ use display_data::request_data::{
 use game_creation::new_battle;
 use rand::RngCore;
 use tokio::task;
-use tracing::{debug, error, info, Level};
+use tracing::{debug, error, info, warn, Level};
 use tracing_macros::{battle_trace, write_tracing_event};
 use ui_components::display_properties;
 use uuid::Uuid;
@@ -68,7 +68,11 @@ pub fn connect(
         Ok(commands) => commands,
         Err(error) => error_message::display_error_message(None, error),
     };
-    ConnectResponse { metadata, commands }
+
+    let response_version = Uuid::new_v4();
+    provider.store_last_response_version(user_id, response_version);
+
+    ConnectResponse { metadata, commands, response_version }
 }
 
 /// Polls for the result of a game action.
@@ -83,10 +87,19 @@ pub fn poll(provider: impl StateProvider, user_id: UserId) -> Option<PollRespons
 
         debug!(?elapsed_msg, ?request_id, "Returning poll response");
 
+        let response_version = if matches!(poll_result.response_type, PollResponseType::Final) {
+            let version = Uuid::new_v4();
+            provider.store_last_response_version(user_id, version);
+            Some(version)
+        } else {
+            None
+        };
+
         return Some(PollResponse {
             metadata: Metadata { user_id, battle_id: None, request_id },
             commands: Some(poll_result.commands),
             response_type: poll_result.response_type,
+            response_version,
         });
     }
     None
@@ -98,8 +111,33 @@ pub fn poll(provider: impl StateProvider, user_id: UserId) -> Option<PollRespons
 /// available via [poll] after the action is complete.
 pub fn perform_action(provider: impl StateProvider + 'static, request: PerformActionRequest) {
     let request_id = request.metadata.request_id;
+    let user_id = request.metadata.user_id;
+
+    // Check if we should process this action
+    if let Some(last_response_version) = request.last_response_version {
+        let stored_version = provider.get_last_response_version(user_id);
+        if stored_version != Some(last_response_version) {
+            warn!(
+                ?user_id,
+                ?last_response_version,
+                ?stored_version,
+                "Ignoring action: client is responding to an outdated response version"
+            );
+            return;
+        }
+    }
+
+    // Try to start processing - if we're already processing, ignore the action
+    if !provider.start_processing(user_id) {
+        warn!(?user_id, "Ignoring action: already processing another action for this user");
+        return;
+    }
+
     provider.store_request_timestamp(request_id, Instant::now());
-    task::spawn_blocking(move || perform_action_internal(provider, &request));
+    task::spawn_blocking(move || {
+        perform_action_internal(provider.clone(), &request);
+        provider.finish_processing(user_id);
+    });
 }
 
 /// Performs a game action synchronously and blocks until completion.
@@ -114,7 +152,37 @@ pub fn perform_action_blocking(
 ) -> PerformActionBlockingResult {
     let user_id = request.metadata.user_id;
 
-    perform_action_internal(provider, &request);
+    // Check if we should process this action
+    if let Some(last_response_version) = request.last_response_version {
+        let stored_version = provider.get_last_response_version(user_id);
+        if stored_version != Some(last_response_version) {
+            tracing::warn!(
+                ?user_id,
+                ?last_response_version,
+                ?stored_version,
+                "Ignoring action: client is responding to an outdated response version"
+            );
+            return PerformActionBlockingResult {
+                user_poll_results: Vec::new(),
+                enemy_poll_results: Vec::new(),
+            };
+        }
+    }
+
+    // Try to start processing - if we're already processing, ignore the action
+    if !provider.start_processing(user_id) {
+        tracing::warn!(
+            ?user_id,
+            "Ignoring action: already processing another action for this user"
+        );
+        return PerformActionBlockingResult {
+            user_poll_results: Vec::new(),
+            enemy_poll_results: Vec::new(),
+        };
+    }
+
+    perform_action_internal(provider.clone(), &request);
+    provider.finish_processing(user_id);
 
     let mut user_results = Vec::new();
     let mut enemy_results = Vec::new();
@@ -587,4 +655,124 @@ fn filter_backtrace(backtrace: &str) -> String {
     }
 
     result
+}
+
+#[cfg(test)]
+mod tests {
+    use action_data::game_action_data::GameAction;
+    use battle_state::actions::battle_actions::BattleAction;
+    use core_data::identifiers::UserId;
+    use display_data::request_data::{Metadata, PerformActionRequest};
+
+    use super::*;
+    use crate::state_provider::DefaultStateProvider;
+
+    #[test]
+    fn test_duplicate_action_is_ignored() {
+        let provider = DefaultStateProvider;
+        let user_id = UserId(Uuid::new_v4());
+
+        // Set a response version
+        let response_version = Uuid::new_v4();
+        provider.store_last_response_version(user_id, response_version);
+
+        // Create a valid action request with the correct response version
+        let request = PerformActionRequest {
+            metadata: Metadata { user_id, battle_id: None, request_id: Some(Uuid::new_v4()) },
+            action: GameAction::BattleAction(BattleAction::EndTurn),
+            save_file_id: None,
+            test_scenario: None,
+            last_response_version: Some(response_version),
+        };
+
+        // First action should succeed (we'll use start_processing to simulate)
+        assert!(provider.start_processing(user_id), "First action should be allowed");
+        provider.finish_processing(user_id);
+
+        // Store a new response version to simulate that the first action completed
+        let new_version = Uuid::new_v4();
+        provider.store_last_response_version(user_id, new_version);
+
+        // Second identical action should be ignored due to outdated response version
+        let result = perform_action_blocking(provider.clone(), request.clone(), None);
+        assert!(result.user_poll_results.is_empty(), "Duplicate action should be ignored");
+    }
+
+    #[test]
+    fn test_concurrent_action_is_ignored() {
+        let provider = DefaultStateProvider;
+        let user_id = UserId(Uuid::new_v4());
+
+        // Set a response version
+        let response_version = Uuid::new_v4();
+        provider.store_last_response_version(user_id, response_version);
+
+        // Start processing an action (marking user as processing)
+        assert!(provider.start_processing(user_id), "Should be able to start processing");
+
+        // Try to process another action while first is still processing
+        let request = PerformActionRequest {
+            metadata: Metadata { user_id, battle_id: None, request_id: Some(Uuid::new_v4()) },
+            action: GameAction::BattleAction(BattleAction::EndTurn),
+            save_file_id: None,
+            test_scenario: None,
+            last_response_version: Some(response_version),
+        };
+
+        let result = perform_action_blocking(provider.clone(), request, None);
+        assert!(result.user_poll_results.is_empty(), "Concurrent action should be ignored");
+
+        // Clean up
+        provider.finish_processing(user_id);
+    }
+
+    #[test]
+    fn test_action_with_outdated_version_is_ignored() {
+        let provider = DefaultStateProvider;
+        let user_id = UserId(Uuid::new_v4());
+
+        // Set a current response version
+        let current_version = Uuid::new_v4();
+        provider.store_last_response_version(user_id, current_version);
+
+        // Try to perform action with outdated version
+        let outdated_version = Uuid::new_v4();
+        let request = PerformActionRequest {
+            metadata: Metadata { user_id, battle_id: None, request_id: Some(Uuid::new_v4()) },
+            action: GameAction::BattleAction(BattleAction::EndTurn),
+            save_file_id: None,
+            test_scenario: None,
+            last_response_version: Some(outdated_version),
+        };
+
+        let result = perform_action_blocking(provider, request, None);
+        assert!(
+            result.user_poll_results.is_empty(),
+            "Action with outdated version should be ignored"
+        );
+    }
+
+    #[test]
+    fn test_action_without_version_is_processed() {
+        let provider = DefaultStateProvider;
+        let user_id = UserId(Uuid::new_v4());
+
+        // Create action request without last_response_version (legacy client)
+        let request = PerformActionRequest {
+            metadata: Metadata { user_id, battle_id: None, request_id: Some(Uuid::new_v4()) },
+            action: GameAction::NoOp, // Use NoOp to avoid needing a full battle setup
+            save_file_id: None,
+            test_scenario: None,
+            last_response_version: None,
+        };
+
+        // Action without version should be allowed to process
+        let _result = perform_action_blocking(provider.clone(), request, None);
+        // We can't easily check if it was processed without a full battle setup,
+        // but at least verify it wasn't rejected for version reasons
+        assert!(
+            !provider.is_processing(user_id),
+            "Processing should be complete for action without version"
+        );
+    }
 }

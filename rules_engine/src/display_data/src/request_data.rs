@@ -61,6 +61,7 @@ pub struct DebugConfiguration {
 pub struct ConnectResponse {
     pub metadata: Metadata,
     pub commands: CommandSequence,
+    pub response_version: Uuid,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -74,6 +75,10 @@ pub struct PerformActionRequest {
     pub save_file_id: Option<UserId>,
 
     pub test_scenario: Option<String>,
+
+    /// The version of the last response the client received, used to prevent
+    /// duplicate actions.
+    pub last_response_version: Option<Uuid>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -102,6 +107,7 @@ pub struct PollResponse {
     pub metadata: Metadata,
     pub commands: Option<CommandSequence>,
     pub response_type: PollResponseType,
+    pub response_version: Option<Uuid>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

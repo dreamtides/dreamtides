@@ -33,6 +33,21 @@ pub trait StateProvider: Clone + RefUnwindSafe + UnwindSafe + Send + Sync {
     /// entries.
     fn get_elapsed_time_message(&self, request_id: Option<Uuid>) -> String;
 
+    /// Stores the last response version sent to a user.
+    fn store_last_response_version(&self, user_id: UserId, version: Uuid);
+
+    /// Gets the last response version sent to a user.
+    fn get_last_response_version(&self, user_id: UserId) -> Option<Uuid>;
+
+    /// Marks that we're starting to process a request for a user.
+    fn start_processing(&self, user_id: UserId) -> bool;
+
+    /// Marks that we've finished processing a request for a user.
+    fn finish_processing(&self, user_id: UserId);
+
+    /// Returns true if we're currently processing a request for a user.
+    fn is_processing(&self, user_id: UserId) -> bool;
+
     /// Returns true if errors should panic the current test, used in test
     /// environments.
     fn should_panic_on_error(&self) -> bool {
@@ -44,6 +59,12 @@ static REQUEST_CONTEXTS: LazyLock<Mutex<HashMap<UserId, RequestContext>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 static REQUEST_TIMESTAMPS: LazyLock<Mutex<HashMap<Option<Uuid>, Instant>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+static LAST_RESPONSE_VERSIONS: LazyLock<Mutex<HashMap<UserId, Uuid>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+static PROCESSING_USERS: LazyLock<Mutex<HashMap<UserId, bool>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 #[derive(Clone)]
@@ -90,5 +111,35 @@ impl StateProvider for DefaultStateProvider {
         } else {
             "[mutex lock failed]".to_string()
         }
+    }
+
+    fn store_last_response_version(&self, user_id: UserId, version: Uuid) {
+        let mut versions = LAST_RESPONSE_VERSIONS.lock().unwrap();
+        versions.insert(user_id, version);
+    }
+
+    fn get_last_response_version(&self, user_id: UserId) -> Option<Uuid> {
+        let versions = LAST_RESPONSE_VERSIONS.lock().unwrap();
+        versions.get(&user_id).copied()
+    }
+
+    fn start_processing(&self, user_id: UserId) -> bool {
+        let mut processing = PROCESSING_USERS.lock().unwrap();
+        if processing.get(&user_id).copied().unwrap_or(false) {
+            false
+        } else {
+            processing.insert(user_id, true);
+            true
+        }
+    }
+
+    fn finish_processing(&self, user_id: UserId) {
+        let mut processing = PROCESSING_USERS.lock().unwrap();
+        processing.insert(user_id, false);
+    }
+
+    fn is_processing(&self, user_id: UserId) -> bool {
+        let processing = PROCESSING_USERS.lock().unwrap();
+        processing.get(&user_id).copied().unwrap_or(false)
     }
 }

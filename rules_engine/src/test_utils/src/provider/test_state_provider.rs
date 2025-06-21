@@ -19,6 +19,8 @@ struct TestStateProviderInner {
     databases: Mutex<HashMap<String, TestDatabase>>,
     request_contexts: Mutex<HashMap<UserId, RequestContext>>,
     request_timestamps: Mutex<HashMap<Option<Uuid>, Instant>>,
+    last_response_versions: Mutex<HashMap<UserId, Uuid>>,
+    processing_users: Mutex<HashMap<UserId, bool>>,
 }
 
 impl TestStateProvider {
@@ -28,6 +30,8 @@ impl TestStateProvider {
                 databases: Mutex::new(HashMap::new()),
                 request_contexts: Mutex::new(HashMap::new()),
                 request_timestamps: Mutex::new(HashMap::new()),
+                last_response_versions: Mutex::new(HashMap::new()),
+                processing_users: Mutex::new(HashMap::new()),
             }),
         }
     }
@@ -105,6 +109,47 @@ impl StateProvider for TestStateProvider {
             }
         } else {
             "[mutex lock failed]".to_string()
+        }
+    }
+
+    fn store_last_response_version(&self, user_id: UserId, version: Uuid) {
+        if let Ok(mut versions) = self.inner.last_response_versions.lock() {
+            versions.insert(user_id, version);
+        }
+    }
+
+    fn get_last_response_version(&self, user_id: UserId) -> Option<Uuid> {
+        if let Ok(versions) = self.inner.last_response_versions.lock() {
+            versions.get(&user_id).copied()
+        } else {
+            None
+        }
+    }
+
+    fn start_processing(&self, user_id: UserId) -> bool {
+        if let Ok(mut processing) = self.inner.processing_users.lock() {
+            if processing.get(&user_id).copied().unwrap_or(false) {
+                false
+            } else {
+                processing.insert(user_id, true);
+                true
+            }
+        } else {
+            false
+        }
+    }
+
+    fn finish_processing(&self, user_id: UserId) {
+        if let Ok(mut processing) = self.inner.processing_users.lock() {
+            processing.insert(user_id, false);
+        }
+    }
+
+    fn is_processing(&self, user_id: UserId) -> bool {
+        if let Ok(processing) = self.inner.processing_users.lock() {
+            processing.get(&user_id).copied().unwrap_or(false)
+        } else {
+            false
         }
     }
 

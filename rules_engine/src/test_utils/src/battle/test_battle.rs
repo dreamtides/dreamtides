@@ -1,12 +1,10 @@
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
-use core_data::identifiers::{BattleId, UserId};
+use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
 use uuid::Uuid;
 
 use crate::battle::test_player::TestPlayer;
-use crate::client::test_client::TestClient;
-use crate::provider::test_state_provider::TestStateProvider;
 use crate::session::test_session::TestSession;
 
 pub struct TestBattle {
@@ -25,18 +23,9 @@ impl TestBattle {
     /// Creates a new battle with a random user ID and battle ID, playing as
     /// player one.
     pub fn builder() -> Self {
-        Self {
-            session: TestSession {
-                state_provider: TestStateProvider::default(),
-                user_id: UserId(Uuid::new_v4()),
-                enemy_id: UserId(Uuid::new_v4()),
-                battle_id: Some(BattleId(Uuid::new_v4())),
-                client: TestClient::default(),
-                enemy_client: TestClient::default(),
-            },
-            user: TestPlayer::default(),
-            enemy: TestPlayer::default(),
-        }
+        let mut session = TestSession::new();
+        session.battle_id = Some(BattleId(Uuid::new_v4()));
+        Self { session, user: TestPlayer::default(), enemy: TestPlayer::default() }
     }
 
     /// Sets the user player to the provided player.

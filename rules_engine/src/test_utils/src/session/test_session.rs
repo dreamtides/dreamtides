@@ -3,9 +3,10 @@ use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
 use battle_state::battle_player::battle_player_state::PlayerType;
 use core_data::identifiers::{BattleId, UserId};
 use display_data::request_data::{
-    ConnectRequest, DebugConfiguration, Metadata, PerformActionRequest,
+    ConnectRequest, ConnectResponse, DebugConfiguration, Metadata, PerformActionRequest,
 };
 use rules_engine::engine;
+use uuid::Uuid;
 
 use crate::client::test_client::TestClient;
 use crate::provider::test_state_provider::TestStateProvider;
@@ -17,11 +18,26 @@ pub struct TestSession {
     pub battle_id: Option<BattleId>,
     pub client: TestClient,
     pub enemy_client: TestClient,
+    pub last_user_response_version: Option<Uuid>,
+    pub last_enemy_response_version: Option<Uuid>,
 }
 
 impl TestSession {
+    pub fn new() -> Self {
+        Self {
+            state_provider: TestStateProvider::new(),
+            user_id: UserId(Uuid::new_v4()),
+            enemy_id: UserId(Uuid::new_v4()),
+            battle_id: None,
+            client: TestClient::default(),
+            enemy_client: TestClient::default(),
+            last_user_response_version: None,
+            last_enemy_response_version: None,
+        }
+    }
+
     /// Connects to the rules engine and applies the commands to the client.
-    pub fn connect(&mut self) {
+    pub fn connect(&mut self) -> ConnectResponse {
         let response = engine::connect(
             self.state_provider.clone(),
             &ConnectRequest {
@@ -42,7 +58,8 @@ impl TestSession {
             self.battle_id = Some(battle_id);
         }
 
-        self.client.apply_commands(response.commands);
+        self.last_user_response_version = Some(response.response_version);
+        self.client.apply_commands(response.commands.clone());
 
         let enemy_response = engine::connect(
             self.state_provider.clone(),
@@ -57,7 +74,10 @@ impl TestSession {
             self.request_context(),
         );
 
+        self.last_enemy_response_version = Some(enemy_response.response_version);
         self.enemy_client.apply_commands(enemy_response.commands);
+
+        response
     }
 
     /// Performs a Game Action.
@@ -66,12 +86,24 @@ impl TestSession {
     /// synchronously. It blocks until the action has been fully executed and
     /// returns after applying all commands to the client.
     pub fn perform_action(&mut self, action: impl Into<GameAction>) {
-        self.perform_action_as_player(action, self.metadata(), self.user_id, self.enemy_id);
+        self.perform_action_as_player(
+            action,
+            self.metadata(),
+            self.user_id,
+            self.enemy_id,
+            self.last_user_response_version,
+        );
     }
 
     /// Performs a Game Action as the enemy player.
     pub fn perform_enemy_action(&mut self, action: impl Into<GameAction>) {
-        self.perform_action_as_player(action, self.enemy_metadata(), self.user_id, self.user_id);
+        self.perform_action_as_player(
+            action,
+            self.enemy_metadata(),
+            self.user_id,
+            self.user_id,
+            self.last_enemy_response_version,
+        );
     }
 
     fn perform_action_as_player(
@@ -80,6 +112,7 @@ impl TestSession {
         metadata: Metadata,
         save_file_id: UserId,
         opponent_id: UserId,
+        last_response_version: Option<Uuid>,
     ) {
         let action = action.into();
 
@@ -88,6 +121,7 @@ impl TestSession {
             action,
             save_file_id: Some(save_file_id),
             test_scenario: None,
+            last_response_version,
         };
 
         let result = engine::perform_action_blocking(

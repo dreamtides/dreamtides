@@ -153,6 +153,7 @@ unsafe fn poll_impl(
             metadata: deserialized_request.metadata,
             commands: None,
             response_type: PollResponseType::Final,
+            response_version: None,
         },
     };
 

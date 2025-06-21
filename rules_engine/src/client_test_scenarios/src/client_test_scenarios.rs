@@ -47,6 +47,7 @@ pub fn connect(request: &ConnectRequest, _scenario: &str) -> ConnectResponse {
         commands: CommandSequence::from_command(Command::UpdateBattle(UpdateBattleCommand::new(
             battle,
         ))),
+        response_version: Uuid::new_v4(),
     }
 }
 

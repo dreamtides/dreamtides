@@ -185,6 +185,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("metadata", Required = Required.Always)]
         public Metadata Metadata { get; set; }
+
+        [JsonProperty("responseVersion", Required = Required.Always)]
+        public Guid ResponseVersion { get; set; }
     }
 
     /// <summary>
@@ -838,6 +841,8 @@ namespace Dreamtides.Schema
     /// Add a specific card to battlefield
     ///
     /// Add a specific card to void
+    ///
+    /// Move all cards from hand to deck
     /// </summary>
     public partial class DebugBattleAction
     {
@@ -864,6 +869,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("addCardToVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public List<Name> AddCardToVoid { get; set; }
+
+        [JsonProperty("moveHandToDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public PlayerName? MoveHandToDeck { get; set; }
     }
 
     public partial class SelectCardOrder
@@ -1935,18 +1943,24 @@ namespace Dreamtides.Schema
         [JsonProperty("action", Required = Required.Always)]
         public GameAction Action { get; set; }
 
+        /// <summary>
+        /// The version of the last response the client received, used to prevent duplicate actions.
+        /// </summary>
+        [JsonProperty("lastResponseVersion")]
+        public Guid? LastResponseVersion { get; set; }
+
         [JsonProperty("metadata", Required = Required.Always)]
         public Metadata Metadata { get; set; }
-
-        [JsonProperty("testScenario")]
-        public string TestScenario { get; set; }
 
         /// <summary>
         /// If specified, treats this as a multiplayer game using the save file provided in this ID
         /// instead of reading the user's own save file.
         /// </summary>
-        [JsonProperty("vsOpponent")]
-        public Guid? VsOpponent { get; set; }
+        [JsonProperty("saveFileId")]
+        public Guid? SaveFileId { get; set; }
+
+        [JsonProperty("testScenario")]
+        public string TestScenario { get; set; }
     }
 
     public partial class GameActionClass
@@ -1989,6 +2003,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("responseType", Required = Required.Always)]
         public PollResponseType ResponseType { get; set; }
+
+        [JsonProperty("responseVersion")]
+        public Guid? ResponseVersion { get; set; }
     }
 
     public enum LogSpanName { ApplyCommandGroup, ApplyCommands, Connect, PerformAction, Poll, Untagged, UpdateBattleLayout };
