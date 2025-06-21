@@ -1,8 +1,8 @@
 use battle_queries::battle_card_queries::card_properties;
-use battle_queries::{assert_that, panic_with};
+use battle_queries::panic_with;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{
-    CardIdType, CharacterId, DeckCardId, HandCardId, StackCardId, VoidCardId,
+    CardId, CardIdType, CharacterId, DeckCardId, HandCardId, StackCardId, VoidCardId,
 };
 use battle_state::battle_cards::character_state::CharacterState;
 use battle_state::battle_cards::zone::Zone;
@@ -149,20 +149,32 @@ pub fn to_destination_zone(
     old: Zone,
     new: Zone,
 ) {
-    assert_that!(
-        battle.cards.contains_card(controller, id.card_id(), old),
-        "Card not found",
-        battle,
-        id,
-        old,
-        new
-    );
-    battle.cards.move_card(controller, id.card_id(), old, new);
+    let card_id = id.card_id();
+    if !battle.cards.contains_card(controller, card_id, old) {
+        panic_card_not_found(battle, controller, card_id, old, new);
+    }
+    battle.cards.move_card(controller, card_id, old, new);
 }
 
 fn write_character_state(battle: &mut BattleState, controller: PlayerName, id: CharacterId) {
     let Some(spark) = card_properties::base_spark(battle, id) else {
-        panic_with!("Character has no base spark value", battle, id);
+        panic_no_base_spark(battle, id);
     };
     battle.cards.battlefield_state_mut(controller).insert(id, CharacterState { spark });
+}
+
+#[cold]
+fn panic_card_not_found(
+    battle: &BattleState,
+    controller: PlayerName,
+    id: CardId,
+    old: Zone,
+    new: Zone,
+) -> ! {
+    panic_with!("Card not found", battle, controller, id, old, new);
+}
+
+#[cold]
+fn panic_no_base_spark(battle: &BattleState, id: CharacterId) -> ! {
+    panic_with!("Character has no base spark value", battle, id);
 }
