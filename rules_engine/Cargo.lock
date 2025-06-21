@@ -371,8 +371,10 @@ dependencies = [
  "battle_state",
  "core_data",
  "display_data",
+ "rules_engine",
  "test_utils",
  "tokio",
+ "uuid",
 ]
 
 [[package]]

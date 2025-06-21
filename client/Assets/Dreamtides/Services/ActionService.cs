@@ -29,9 +29,9 @@ namespace Dreamtides.Services
     string? _testScenario;
     Queue<CommandBatch> _commandQueue = new Queue<CommandBatch>();
     bool _isProcessingCommands = false;
-    float? _lastPerformActionTime;
     Dictionary<Guid, float> _requestStartTimes = new Dictionary<Guid, float>();
     HashSet<Guid> _loggedRequestIds = new HashSet<Guid>();
+    Guid? _lastResponseVersion;
 
     bool IsTestOpponentClient => Application.dataPath.Contains("test_client");
 
@@ -71,6 +71,10 @@ namespace Dreamtides.Services
         StartCoroutine(ApplyCommands(response.Commands, animate: false, onComplete: () =>
         {
           Registry.LoggingService.EndSpan(LogSpanName.Connect);
+          if (response.ResponseVersion != null)
+          {
+            _lastResponseVersion = response.ResponseVersion;
+          }
         }));
       }
     }
@@ -115,6 +119,10 @@ namespace Dreamtides.Services
             StartCoroutine(ApplyCommands(response.Commands, animate: true, onComplete: () =>
             {
               Registry.LoggingService.EndSpan(LogSpanName.Poll);
+              if (response.ResponseVersion != null)
+              {
+                _lastResponseVersion = response.ResponseVersion;
+              }
             }));
           }
         }
@@ -133,7 +141,6 @@ namespace Dreamtides.Services
       Registry.LoggingService.Log("ActionService", "Performing action",
         ("actionType", GameActionHelper.GetActionName(action.Value)),
         ("requestId", requestId.ToString()));
-      _lastPerformActionTime = Time.time;
       _requestStartTimes[requestId] = Time.time;
 
       var request = new PerformActionRequest
@@ -145,7 +152,8 @@ namespace Dreamtides.Services
           RequestId = requestId
         },
         Action = action.Value,
-        VsOpponent = IsTestOpponentClient ? _userGuid : null,
+        LastResponseVersion = _lastResponseVersion,
+        SaveFileId = IsTestOpponentClient ? _userGuid : null,
         TestScenario = _testScenario,
       };
       if (Application.isEditor)
@@ -192,10 +200,17 @@ namespace Dreamtides.Services
         request,
         "connect",
         UnityWebRequest.kHttpVerbGET,
-        response => ApplyCommands(response.Commands, animate: false, onComplete: () =>
+        response =>
         {
-          Registry.LoggingService.EndSpan(LogSpanName.Connect);
-        }));
+          return ApplyCommands(response.Commands, animate: false, onComplete: () =>
+          {
+            Registry.LoggingService.EndSpan(LogSpanName.Connect);
+            if (response.ResponseVersion != null)
+            {
+              _lastResponseVersion = response.ResponseVersion;
+            }
+          });
+        });
     }
 
     private DisplayProperties GetDisplayProperties() => new()
@@ -220,6 +235,10 @@ namespace Dreamtides.Services
             return ApplyCommands(response.Commands, animate: true, onComplete: () =>
             {
               Registry.LoggingService.EndSpan(LogSpanName.Poll);
+              if (response.ResponseVersion != null)
+              {
+                _lastResponseVersion = response.ResponseVersion;
+              }
             });
           }
           else
