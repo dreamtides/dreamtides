@@ -84,6 +84,14 @@ impl Component for DeveloperPanel {
                                 ))
                                 .build(),
                         )
+                        .child(
+                            DebugButton::builder()
+                                .label("Deck->1")
+                                .action(BattleAction::Debug(
+                                    DebugBattleAction::SetCardsRemainingInDeck(self.user_player, 1),
+                                ))
+                                .build(),
+                        )
                         .build(),
                 )
                 .build(),

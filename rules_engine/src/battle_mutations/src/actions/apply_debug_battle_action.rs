@@ -50,5 +50,15 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
                 move_card::from_hand_to_deck(battle, source, player_name, card_id);
             }
         }
+        DebugBattleAction::SetCardsRemainingInDeck(player_name, target_count) => {
+            let deck_cards: Vec<DeckCardId> = battle.cards.deck(player_name).iter().collect();
+            let current_count = deck_cards.len();
+            if current_count > target_count {
+                let cards_to_move = current_count - target_count;
+                for card_id in deck_cards.into_iter().take(cards_to_move) {
+                    move_card::from_deck_to_void(battle, source, player_name, card_id);
+                }
+            }
+        }
     }
 }

@@ -27,4 +27,7 @@ pub enum DebugBattleAction {
     AddCardToVoid(PlayerName, CardName),
     /// Move all cards from hand to deck
     MoveHandToDeck(PlayerName),
+    /// Set the number of cards remaining in a player's deck. All other cards
+    /// are moved to the void.
+    SetCardsRemainingInDeck(PlayerName, usize),
 }

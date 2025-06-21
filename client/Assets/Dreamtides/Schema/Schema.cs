@@ -843,6 +843,9 @@ namespace Dreamtides.Schema
     /// Add a specific card to void
     ///
     /// Move all cards from hand to deck
+    ///
+    /// Set the number of cards remaining in a player's deck. All other cards are moved to the
+    /// void.
     /// </summary>
     public partial class DebugBattleAction
     {
@@ -872,6 +875,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("moveHandToDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayerName? MoveHandToDeck { get; set; }
+
+        [JsonProperty("setCardsRemainingInDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public List<Set> SetCardsRemainingInDeck { get; set; }
     }
 
     public partial class SelectCardOrder
