@@ -1,27 +1,34 @@
-Please begin every response with "Sure!". Please follow all of the "code style"
-rules below at all times.
+Please follow all of the "code style" and "validating changes" rules below at
+all times.
 
 
 # CODE STYLE:
 
 
-1. Avoid creating new variables via "let" statements, just write code inline.
-2. DO NOT add inline comments to code ever, but do not delete existing comments.
-3. DO NOT fully-qualify names in generated code ever
-4. Always use imports to modules, never fully-qualify names and never use direct function names:
+- Avoid creating new variables via "let" statements, just write code inline.
+- DO NOT add inline comments to code ever, but do not delete existing comments.
+- DO NOT fully-qualify names in generated code ever
+- Always use imports to modules, never fully-qualify names and never use direct function names:
   - WRONG: crate::zone_mutations::move_card::to_destination_zone()
   - WRONG: to_destination_zone()
   - WRONG: battle_state::battle_cards::zone::Zone::Battlefield
   - CORRECT: Zone::Battlefield
   - CORRECT: move_card::to_destination_zone()
-5. Never use unwrap(), expect() or Result. Use the assert_that! and
-   panic_with! macros if needed.
-6. Public functions and types go at the TOP of the file, then private ones.
-7. After completing work, please run "cargo clippy" to validate changes
-8. After completing work, if you change any structs in display_data, please
-   run the "just schema" command.
-9. After completing work, review the code structure in .currsorrules for
-   correctness and suggest any needed additions or changes.
+- Never use unwrap(), expect() or Result. Use the assert_that! and
+  panic_with! macros if needed.
+- Public functions and types go at the TOP of the file, then private ones.
+- Don't add "pub use" for anything.
+
+
+# VALIDATING CHANGES
+
+
+- After completing work, please run "cargo clippy" to validate changes
+- After completing work, if you change any structs in display_data, please
+  run the "just schema" command.
+- After completing work, review the code structure in .currsorrules for
+  correctness and suggest any needed additions or changes.
+- Don't print a lengthy summary of changes, one sentence is fine.
 
 
 # PROJECT CONTEXT
