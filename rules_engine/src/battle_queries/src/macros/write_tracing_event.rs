@@ -69,6 +69,49 @@ pub fn write_panic_snapshot(
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct DeserializationPanicEvent {
+    pub m: String,
+    pub snapshot: DebugBattleState,
+    pub panic_action_index: usize,
+    pub total_actions: usize,
+    pub panic_info: String,
+    pub action_history: Vec<serde_json::Value>,
+    pub panic_details: serde_json::Map<String, serde_json::Value>,
+    pub timestamp: String,
+}
+
+pub fn write_deserialization_panic(
+    battle: &BattleState,
+    panic_action_index: usize,
+    total_actions: usize,
+    panic_info: String,
+    action_history: Vec<serde_json::Value>,
+    panic_details: serde_json::Map<String, serde_json::Value>,
+) {
+    let snapshot = debug_battle_snapshot::capture(battle);
+    let timestamp = format_current_time();
+    let event = DeserializationPanicEvent {
+        m: format!(
+            "PANIC: Deserialization panic at action {} of {}",
+            panic_action_index, total_actions
+        ),
+        snapshot,
+        panic_action_index,
+        total_actions,
+        panic_info,
+        action_history,
+        panic_details,
+        timestamp,
+    };
+
+    match serde_json::to_string_pretty(&event) {
+        Ok(json) => write_json_to_log_file(&json, &battle.request_context),
+        Err(e) => error!("Failed to serialize DeserializationPanicEvent: {}", e),
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 struct CommandTraceEvent {
     pub m: String,
     pub snapshot: Option<DebugBattleState>,

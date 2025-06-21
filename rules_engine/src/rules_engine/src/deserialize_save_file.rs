@@ -1,15 +1,30 @@
+use std::panic::{self, AssertUnwindSafe};
+
 use battle_mutations::actions::apply_battle_action;
 use battle_queries::legal_action_queries::legal_actions;
+use battle_queries::macros::write_tracing_event;
+use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
+use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use core_data::identifiers::QuestId;
 use core_data::types::PlayerName;
 use database::save_file::SaveFile;
 use game_creation::new_battle;
-use tracing::{debug, instrument, subscriber};
+use serde_json;
+use tracing::{debug, error, instrument, subscriber};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::EnvFilter;
 
 use crate::handle_battle_action::should_auto_execute_action;
+
+#[derive(Debug, Clone)]
+struct DeserializationAction {
+    player: PlayerName,
+    action: BattleAction,
+    action_index: usize,
+    turn_id: u32,
+    phase: BattleTurnPhase,
+}
 
 /// Returns a deserialized [BattleState] for the battle in this save
 /// file, if one is present.
@@ -53,22 +68,46 @@ fn get_battle_impl(
                     file.player_types.two.clone(),
                     request_context,
                 );
-                battle.tracing = None;
                 battle.animations = None;
 
                 let mut last_non_auto_battle = None;
-                for history_action in file.actions.iter() {
+                let mut actions = Vec::new();
+                for (action_index, history_action) in file.actions.iter().enumerate() {
                     let is_undo_player = undo == Some(history_action.player);
                     let legal = legal_actions::compute(&battle, history_action.player);
                     let auto = should_auto_execute_action(&legal);
                     if is_undo_player && auto != Some(history_action.action) {
                         last_non_auto_battle = Some((battle.clone(), quest_id));
                     }
-                    apply_battle_action::execute(
-                        &mut battle,
-                        history_action.player,
-                        history_action.action,
-                    );
+
+                    actions.push(DeserializationAction {
+                        player: history_action.player,
+                        action: history_action.action,
+                        action_index,
+                        turn_id: battle.turn.turn_id.0,
+                        phase: battle.phase,
+                    });
+
+                    let battle_clone = battle.clone();
+                    let result = panic::catch_unwind(AssertUnwindSafe(|| {
+                        apply_battle_action::execute(
+                            &mut battle,
+                            history_action.player,
+                            history_action.action,
+                        );
+                    }));
+
+                    if let Err(panic_info) = result {
+                        error!("Panic during deserialization at action {}", action_index);
+
+                        write_deserialization_panic_trace(
+                            &battle_clone,
+                            &actions,
+                            action_index,
+                            &format!("{:?}", panic_info),
+                        );
+                        panic::resume_unwind(panic_info);
+                    }
                 }
 
                 if undo.is_some() {
@@ -79,4 +118,44 @@ fn get_battle_impl(
             })
         }
     }
+}
+
+fn write_deserialization_panic_trace(
+    battle: &BattleState,
+    actions: &[DeserializationAction],
+    panic_action_index: usize,
+    panic_info: &str,
+) {
+    let action_history: Vec<serde_json::Value> = actions
+        .iter()
+        .map(|a| {
+            serde_json::json!({
+                "index": a.action_index,
+                "player": format!("{:?}", a.player),
+                "action": format!("{:?}", a.action),
+                "turnId": a.turn_id,
+                "phase": format!("{:?}", a.phase)
+            })
+        })
+        .collect();
+
+    let mut panic_details = serde_json::Map::new();
+    if let Some(action) = actions.get(panic_action_index) {
+        panic_details
+            .insert("panic_player".to_string(), serde_json::json!(format!("{:?}", action.player)));
+        panic_details
+            .insert("panic_action".to_string(), serde_json::json!(format!("{:?}", action.action)));
+        panic_details.insert("panic_turn".to_string(), serde_json::json!(action.turn_id));
+        panic_details
+            .insert("panic_phase".to_string(), serde_json::json!(format!("{:?}", action.phase)));
+    }
+
+    write_tracing_event::write_deserialization_panic(
+        battle,
+        panic_action_index,
+        actions.len(),
+        panic_info.to_string(),
+        action_history,
+        panic_details,
+    );
 }
