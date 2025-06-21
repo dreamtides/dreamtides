@@ -22,6 +22,12 @@ pub struct TestSession {
     pub last_enemy_response_version: Option<Uuid>,
 }
 
+impl Default for TestSession {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TestSession {
     pub fn new() -> Self {
         Self {

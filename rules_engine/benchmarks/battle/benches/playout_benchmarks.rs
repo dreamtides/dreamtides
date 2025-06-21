@@ -445,7 +445,7 @@ fn benchmark_battle() -> BattleState {
         BattleAction::PlayCardFromHand(HandCardId(CardId(17))),
     ];
 
-    let legal_actions_vec: Vec<BattleAction> = legal.all().to_vec();
+    let legal_actions_vec: Vec<BattleAction> = legal.all().clone();
     assert_eq!(
         legal_actions_vec.len(),
         expected_actions.len(),

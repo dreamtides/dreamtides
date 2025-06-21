@@ -35,6 +35,7 @@ namespace Dreamtides.Buttons
     bool _isVisible = false;
     private bool _isAnimating = false;
     Sequence? _hideSequence;
+    float _lastClickTime = -1f;
 
     private readonly Color _enabledColor = Color.white;
     private readonly Color _disabledColor = new Color(0.7f, 0.7f, 0.7f); // Gray
@@ -210,8 +211,13 @@ namespace Dreamtides.Buttons
       _currentAnimation.InsertCallback(_animationDuration, () => _background.material = _originalMaterial);
       if (isSameObject)
       {
-        _registry.SoundService.Play(_onClickSound);
-        _registry.ActionService.PerformAction(_action);
+        var currentTime = Time.time;
+        if (currentTime - _lastClickTime >= 0.5f)
+        {
+          _lastClickTime = currentTime;
+          _registry.SoundService.Play(_onClickSound);
+          _registry.ActionService.PerformAction(_action);
+        }
       }
     }
 

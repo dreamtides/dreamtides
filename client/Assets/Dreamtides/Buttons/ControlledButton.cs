@@ -16,6 +16,7 @@ namespace Dreamtides.Buttons
     [SerializeField] bool _showing;
     [SerializeField] TextMeshProUGUI _text = null!;
     ButtonView? _view;
+    float _lastClickTime = -1f;
 
     public CanvasGroup CanvasGroup => _canvasGroup;
 
@@ -23,7 +24,12 @@ namespace Dreamtides.Buttons
     {
       if (_view?.Action != null)
       {
-        _registry.ActionService.PerformAction(_view.Action?.ToGameAction());
+        var currentTime = Time.time;
+        if (currentTime - _lastClickTime >= 0.5f)
+        {
+          _lastClickTime = currentTime;
+          _registry.ActionService.PerformAction(_view.Action?.ToGameAction());
+        }
       }
     }
 
