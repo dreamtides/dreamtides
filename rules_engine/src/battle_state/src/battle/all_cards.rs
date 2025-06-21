@@ -47,11 +47,12 @@ pub struct AllCards {
 }
 
 impl AllCards {
-    /// Returns the state of a card.
+    /// Returns the state of a card without bounds checking.
     ///
-    /// Panics if no card with this ID exists.
-    pub fn card(&self, id: impl CardIdType) -> &BattleCardState {
-        &self.cards[id.card_id().0]
+    /// Always use `card::get` in battle_queries instead of this funciton.
+    #[inline(always)]
+    pub unsafe fn get_card_unchecked(&self, id: CardId) -> &BattleCardState {
+        &self.cards.get_unchecked(id.0)
     }
 
     /// Returns the spark value of a character.
@@ -191,6 +192,12 @@ impl AllCards {
     /// Panics if no card with this ID exists.
     pub fn is_valid_object_id(&self, card_id: impl CardIdType, object_id: ObjectId) -> bool {
         self.cards[card_id.card_id().0].object_id == object_id
+    }
+
+    /// Returns true if the indicated card ID is valid.
+    #[inline(always)]
+    pub fn is_valid_card_id(&self, card_id: CardId) -> bool {
+        card_id.0 < self.cards.len()
     }
 
     fn new_object_id(&mut self) -> ObjectId {

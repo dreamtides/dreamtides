@@ -1,4 +1,4 @@
-use battle_queries::battle_card_queries::stack_card_queries;
+use battle_queries::battle_card_queries::{card, stack_card_queries};
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType};
 use battle_state::battle_cards::stack_card_state::StackCardTargets;
@@ -30,7 +30,7 @@ pub fn calculate(
 }
 
 pub fn for_card(battle: &BattleState, card_id: CardId, position: Position) -> ObjectPosition {
-    let object_id = battle.cards.card(card_id).object_id;
+    let object_id = card::get(battle, card_id).object_id;
     ObjectPosition { position, sorting_key: object_id.0 as u32, sorting_sub_key: 0 }
 }
 

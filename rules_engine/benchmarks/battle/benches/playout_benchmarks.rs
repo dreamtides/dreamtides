@@ -5,6 +5,7 @@ use ai_data::game_ai::GameAI;
 use ai_uct::uct_search;
 use battle_mutations::actions::apply_battle_action;
 use battle_mutations::card_mutations::deck;
+use battle_queries::battle_card_queries::card;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::all_cards::AllCards;
@@ -417,7 +418,7 @@ fn benchmark_battle() -> BattleState {
 
         if spec.zone == Zone::Battlefield {
             let character_id = CharacterId(card_id);
-            let card_name = battle.cards.card(character_id).name;
+            let card_name = card::get(&battle, character_id).name;
             if card_name == CardName::MinstrelOfFallingLight {
                 if let Some(char_state) =
                     battle.cards.battlefield_state_mut(spec.owner).get_mut(&character_id)

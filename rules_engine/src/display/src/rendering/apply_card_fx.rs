@@ -1,5 +1,5 @@
 use asset_paths::{dissolve_material, hovl, wow_sound};
-use battle_queries::battle_card_queries::card_properties;
+use battle_queries::battle_card_queries::{card, card_properties};
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType};
@@ -29,7 +29,7 @@ pub fn apply_effect(
     let controller = card_properties::controller(battle, source_id);
     let effect_name = animation.discriminant().to_string();
     let target_id = find_target_id(animation);
-    match battle.cards.card(source_id).name {
+    match card::get(battle, source_id).name {
         CardName::Immolate if effect_name == "Dissolve" => {
             animations::push_snapshot(builder, battle);
             builder.push(Command::FireProjectile(

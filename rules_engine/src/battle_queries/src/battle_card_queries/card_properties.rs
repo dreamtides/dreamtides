@@ -5,6 +5,8 @@ use core_data::identifiers::CardName;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::PlayerName;
 
+use crate::battle_card_queries::card;
+
 /// Returns the display name for a card
 pub fn display_name(card_name: CardName) -> String {
     match card_name {
@@ -17,7 +19,7 @@ pub fn display_name(card_name: CardName) -> String {
 }
 
 pub fn cost(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
-    match battle.cards.card(card_id).name {
+    match card::get(battle, card_id).name {
         CardName::MinstrelOfFallingLight => Some(Energy(2)),
         CardName::Immolate => Some(Energy(2)),
         CardName::RippleOfDefiance => Some(Energy(1)),
@@ -28,7 +30,7 @@ pub fn cost(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
 
 /// Returns the player who currently controls a given card.
 pub fn controller(battle: &BattleState, card_id: impl CardIdType) -> PlayerName {
-    battle.cards.card(card_id).owner
+    card::get(battle, card_id).owner
 }
 
 pub fn spark(battle: &BattleState, controller: PlayerName, id: CharacterId) -> Option<Spark> {
@@ -36,14 +38,14 @@ pub fn spark(battle: &BattleState, controller: PlayerName, id: CharacterId) -> O
 }
 
 pub fn base_spark(battle: &BattleState, card_id: impl CardIdType) -> Option<Spark> {
-    match battle.cards.card(card_id).name {
+    match card::get(battle, card_id).name {
         CardName::MinstrelOfFallingLight => Some(Spark(5)),
         _ => None,
     }
 }
 
 pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
-    match battle.cards.card(card_id).name {
+    match card::get(battle, card_id).name {
         CardName::MinstrelOfFallingLight => CardType::Character(CharacterType::Musician),
         CardName::Immolate => CardType::Event,
         CardName::RippleOfDefiance => CardType::Event,
@@ -53,7 +55,7 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
 }
 
 pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
-    match battle.cards.card(card_id).name {
+    match card::get(battle, card_id).name {
         CardName::MinstrelOfFallingLight => false,
         CardName::Immolate => true,
         CardName::RippleOfDefiance => true,

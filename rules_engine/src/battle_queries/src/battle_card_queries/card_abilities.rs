@@ -15,6 +15,7 @@ use core_data::card_types::CardType;
 use core_data::identifiers::{AbilityNumber, CardName};
 use core_data::numerics::Energy;
 
+use crate::battle_card_queries::card;
 use crate::card_ability_queries::effect_predicates;
 
 static MINSTREL_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
@@ -24,7 +25,7 @@ static ABOLISH_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 static DREAMSCATTER_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static AbilityList {
-    query_by_name(battle.cards.card(card_id).name)
+    query_by_name(card::get(battle, card_id).name)
 }
 
 pub fn query_by_name(name: CardName) -> &'static AbilityList {

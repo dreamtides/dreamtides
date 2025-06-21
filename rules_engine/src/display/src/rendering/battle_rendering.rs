@@ -1,4 +1,4 @@
-use battle_queries::battle_card_queries::stack_card_queries;
+use battle_queries::battle_card_queries::{card, stack_card_queries};
 use battle_queries::battle_player_queries::player_properties;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
@@ -37,7 +37,7 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
         .map(|id| {
             card_rendering::card_view(
                 builder,
-                &CardViewContext::Battle(battle, battle.cards.card(id).name, id),
+                &CardViewContext::Battle(battle, card::get(battle, id).name, id),
             )
         })
         .collect::<Vec<_>>();

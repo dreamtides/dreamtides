@@ -1,3 +1,4 @@
+use battle_queries::battle_card_queries::card;
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardIdType, StackCardId};
@@ -85,7 +86,7 @@ pub fn render(
                             builder,
                             &CardViewContext::Battle(
                                 final_state,
-                                final_state.cards.card(card_id.card_id()).name,
+                                card::get(final_state, card_id).name,
                                 card_id.card_id(),
                             ),
                         )

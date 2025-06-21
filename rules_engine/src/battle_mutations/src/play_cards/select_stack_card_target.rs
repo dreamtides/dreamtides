@@ -1,3 +1,4 @@
+use battle_queries::battle_card_queries::card;
 use battle_queries::panic_with;
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
@@ -8,7 +9,7 @@ use core_data::types::PlayerName;
 
 /// Selects a character as the target of a card on the stack.
 pub fn character(battle: &mut BattleState, player: PlayerName, character_id: CharacterId) {
-    let object_id = battle.cards.card(character_id).object_id;
+    let object_id = card::get(battle, character_id).object_id;
     let Some(stack_card) = battle.cards.top_of_stack_mut() else {
         panic_with!("No active stack", battle);
     };
@@ -25,7 +26,7 @@ pub fn character(battle: &mut BattleState, player: PlayerName, character_id: Cha
 
 /// Selects a card on the stack as a target of another card on the stack.
 pub fn on_stack(battle: &mut BattleState, player: PlayerName, stack_card_id: StackCardId) {
-    let object_id = battle.cards.card(stack_card_id).object_id;
+    let object_id = card::get(battle, stack_card_id).object_id;
     let Some(stack_card) = battle.cards.top_of_stack_mut() else {
         panic_with!("No active stack", battle);
     };

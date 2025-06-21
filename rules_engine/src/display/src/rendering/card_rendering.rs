@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use action_data::game_action_data::GameAction;
-use battle_queries::battle_card_queries::{card_properties, stack_card_queries};
+use battle_queries::battle_card_queries::{card, card_properties, stack_card_queries};
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
 use battle_state::actions::battle_actions::BattleAction;
@@ -114,7 +114,7 @@ fn selection_action(legal_actions: &LegalActions, card_id: CardId) -> Option<Gam
 }
 
 fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
-    match battle.cards.card(card_id).name {
+    match card::get(battle, card_id).name {
         CardName::MinstrelOfFallingLight => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
@@ -134,7 +134,7 @@ fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
 }
 
 fn card_name(battle: &BattleState, card_id: CardId) -> String {
-    card_properties::display_name(battle.cards.card(card_id).name)
+    card_properties::display_name(card::get(battle, card_id).name)
 }
 
 fn card_type(battle: &BattleState, card_id: CardId) -> String {
@@ -154,7 +154,7 @@ fn card_type(battle: &BattleState, card_id: CardId) -> String {
 }
 
 fn rules_text(battle: &BattleState, card_id: CardId) -> String {
-    let base_text = match battle.cards.card(card_id).name {
+    let base_text = match card::get(battle, card_id).name {
         CardName::MinstrelOfFallingLight => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
         CardName::Immolate => "Dissolve an enemy character.".to_string(),
         CardName::RippleOfDefiance => {
@@ -166,7 +166,7 @@ fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         }
     };
 
-    if battle.cards.card(card_id).name == CardName::Dreamscatter
+    if card::get(battle, card_id).name == CardName::Dreamscatter
         && let Some(stack_card) = battle.cards.stack_card(StackCardId(card_id))
         && let StackCardAdditionalCostsPaid::Energy(energy) = &stack_card.additional_costs_paid
     {
@@ -177,7 +177,7 @@ fn rules_text(battle: &BattleState, card_id: CardId) -> String {
 }
 
 fn supplemental_card_info(battle: &BattleState, card_id: CardId) -> Option<String> {
-    match battle.cards.card(card_id).name {
+    match card::get(battle, card_id).name {
         CardName::Immolate => Some("<b>Dissolve:</b> Send a character to the void".to_string()),
         CardName::RippleOfDefiance => Some(
             "<b>Negate:</b> Send a card to the void in response to it being played".to_string(),
