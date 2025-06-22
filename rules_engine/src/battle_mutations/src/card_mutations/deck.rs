@@ -1,4 +1,5 @@
 use battle_queries::battle_card_queries::card_abilities;
+use battle_queries::battle_trace;
 use battle_state::battle::all_cards::CreatedCard;
 use battle_state::battle::animation_data::AnimationStep;
 use battle_state::battle::battle_animation::BattleAnimation;
@@ -36,7 +37,10 @@ pub fn draw_cards(battle: &mut BattleState, source: EffectSource, player: Player
     let should_animate = battle.animations.is_some();
     let pre_draw_snapshot = if should_animate {
         let mut snapshot = battle.logical_clone();
-        if snapshot.cards.deck(player).len() < count as usize {
+        while snapshot.cards.deck(player).len() < count as usize {
+            // Make sure the cards to be drawn are present in the deck. This
+            // won't necessarily happen in exactly the same order, but we just
+            // need them to visually be somewhere in the deck.
             create_test_deck::add(&mut snapshot, player);
         }
         Some(snapshot)
@@ -89,6 +93,7 @@ fn draw_card_internal(
     if battle.cards.hand(player).len() >= HAND_SIZE_LIMIT {
         // If a player exceeds the hand size limit, they instead gain 1
         // energy for each card they would have drawn.
+        battle_trace!("Hand size limit exceeded", battle, player);
         energy::gain(battle, player, source, Energy(1));
         let p = battle.turn_history.current_action_history.player_mut(player);
         p.hand_size_limit_exceeded = true;
@@ -96,6 +101,7 @@ fn draw_card_internal(
     }
 
     let Some(id) = random_element(battle.cards.deck(player), &mut battle.rng) else {
+        battle_trace!("Creating new test deck", battle, player);
         create_test_deck::add(battle, player);
         return draw_card_internal(battle, source, player, with_animation);
     };
