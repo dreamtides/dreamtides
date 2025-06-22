@@ -1,17 +1,20 @@
 use std::panic::{self, AssertUnwindSafe};
 
 use battle_mutations::actions::apply_battle_action;
+use battle_queries::battle_trace;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::macros::write_tracing_event;
 use battle_state::actions::battle_actions::BattleAction;
+use battle_state::battle::animation_data::AnimationData;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
+use battle_state::battle_trace::battle_tracing::BattleTracing;
 use core_data::identifiers::QuestId;
 use core_data::types::PlayerName;
 use database::save_file::SaveFile;
 use game_creation::new_battle;
 use serde_json;
-use tracing::{debug, error, instrument, subscriber};
+use tracing::{error, instrument, subscriber};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::EnvFilter;
 
@@ -53,12 +56,11 @@ fn get_battle_impl(
 ) -> Option<(BattleState, QuestId)> {
     match file {
         SaveFile::V1(v1) => {
-            debug!("Replaying battle history to construct state");
             let filter = EnvFilter::new("warn");
             let forest_subscriber =
                 tracing_subscriber::registry().with(logging::create_forest_layer(filter));
 
-            subscriber::with_default(forest_subscriber, || {
+            let mut result = subscriber::with_default(forest_subscriber, || {
                 let quest_id = v1.quest.as_ref()?.id;
                 let file = v1.quest.as_ref()?.battle.as_ref()?;
                 let mut battle = new_battle::create_and_start_with_options(
@@ -69,6 +71,7 @@ fn get_battle_impl(
                     request_context,
                 );
                 battle.animations = None;
+                battle.tracing = None;
 
                 let mut last_non_auto_battle = None;
                 let mut actions = Vec::new();
@@ -115,7 +118,19 @@ fn get_battle_impl(
                 } else {
                     Some((battle, quest_id))
                 }
-            })
+            });
+
+            if let Some((battle, _)) = &mut result {
+                battle.tracing = Some(BattleTracing::default());
+                battle.animations = Some(AnimationData::default());
+                if undo.is_some() {
+                    battle_trace!("Completed undo operation", battle);
+                } else {
+                    battle_trace!("Completed battle replay", battle);
+                }
+            }
+
+            result
         }
     }
 }

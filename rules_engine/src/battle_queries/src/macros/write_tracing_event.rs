@@ -14,11 +14,10 @@ use display_data::command::CommandSequence;
 use serde::Serialize;
 use serde_json;
 use strum::IntoDiscriminant;
-use tracing::{debug, error, instrument};
+use tracing::{debug, error};
 
 use crate::debug_snapshot::debug_battle_snapshot;
 
-#[instrument(name = "write_battle_event", level = "debug", skip(battle, message, values))]
 pub fn write_battle_event(
     battle: &mut BattleState,
     message: String,
@@ -128,7 +127,6 @@ struct AnimationTraceEvent {
     pub timestamp: String,
 }
 
-#[instrument(name = "write_animations", level = "debug", skip(battle, animations))]
 pub fn write_animations(battle: &BattleState, animations: &AnimationData) {
     let animation_names: Vec<String> = animations
         .steps
@@ -152,7 +150,6 @@ pub fn write_animations(battle: &BattleState, animations: &AnimationData) {
     }
 }
 
-#[instrument(name = "write_commands", level = "debug", skip(sequence, request_context))]
 pub fn write_commands(sequence: &CommandSequence, request_context: &RequestContext) {
     let command_names: Vec<String> = sequence
         .groups
