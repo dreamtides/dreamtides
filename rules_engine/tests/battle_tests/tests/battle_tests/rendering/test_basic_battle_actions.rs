@@ -91,6 +91,24 @@ fn test_play_character_win_battle() {
     assert_clients_identical(&s);
 }
 
+#[test]
+fn test_energy_increment_at_turn_start() {
+    let mut s = TestBattle::builder().connect();
+    assert_eq!(s.client.user.energy(), Some(Energy(2)), "initial energy");
+    assert_eq!(s.client.user.produced_energy(), Some(Energy(2)), "initial produced energy");
+
+    s.perform_action(BattleAction::EndTurn);
+    s.perform_enemy_action(BattleAction::EndTurn);
+
+    assert_eq!(s.client.user.energy(), Some(Energy(3)), "energy incremented by 1 more");
+    assert_eq!(
+        s.client.user.produced_energy(),
+        Some(Energy(3)),
+        "produced energy incremented by 1 more"
+    );
+    assert_clients_identical(&s);
+}
+
 fn assert_clients_identical(s: &TestSession) {
     assert_eq!(
         s.client.cards.user_hand().len(),
