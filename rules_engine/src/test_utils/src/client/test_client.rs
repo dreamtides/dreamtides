@@ -1,3 +1,4 @@
+use action_data::game_action_data::GameAction;
 use core_data::display_types::AudioClipAddress;
 use core_data::identifiers::BattleId;
 use display_data::battle_view::{BattlePreviewState, ButtonView, DisplayPlayer, InterfaceView};
@@ -161,5 +162,65 @@ impl TestClient {
     /// Check if any overlay is currently shown
     pub fn has_screen_overlay(&self) -> bool {
         self.interface.as_ref().and_then(|i| i.screen_overlay.as_ref()).is_some()
+    }
+
+    /// Get all legal actions currently available in the interface
+    pub fn legal_actions(&self) -> Vec<GameAction> {
+        let mut actions = Vec::new();
+
+        // Collect actions from interface buttons
+        if let Some(interface) = &self.interface {
+            if let Some(button) = &interface.primary_action_button {
+                if let Some(action) = &button.action {
+                    actions.push(action.clone());
+                }
+            }
+            if let Some(button) = &interface.secondary_action_button {
+                if let Some(action) = &button.action {
+                    actions.push(action.clone());
+                }
+            }
+            if let Some(button) = &interface.increment_button {
+                if let Some(action) = &button.action {
+                    actions.push(action.clone());
+                }
+            }
+            if let Some(button) = &interface.decrement_button {
+                if let Some(action) = &button.action {
+                    actions.push(action.clone());
+                }
+            }
+            if let Some(button) = &interface.dev_button {
+                if let Some(action) = &button.action {
+                    actions.push(action.clone());
+                }
+            }
+            if let Some(button) = &interface.undo_button {
+                if let Some(action) = &button.action {
+                    actions.push(action.clone());
+                }
+            }
+            if let Some(button) = &interface.bottom_right_button {
+                if let Some(action) = &button.action {
+                    actions.push(action.clone());
+                }
+            }
+        }
+
+        // Collect actions from cards (sorted by card ID for deterministic order)
+        let mut cards: Vec<_> = self.cards.card_map.values().collect();
+        cards.sort_by_key(|card| &card.id);
+        for card in cards {
+            if let Some(revealed) = &card.view.revealed {
+                if let Some(action) = &revealed.actions.can_play {
+                    actions.push(action.clone());
+                }
+                if let Some(action) = &revealed.actions.on_click {
+                    actions.push(action.clone());
+                }
+            }
+        }
+
+        actions
     }
 }

@@ -40,6 +40,12 @@ impl TestBattle {
         self
     }
 
+    /// Sets the seed for deterministic random number generation.
+    pub fn seed(mut self, seed: u64) -> Self {
+        self.session.seed = Some(seed);
+        self
+    }
+
     /// Connects to the rules engine, returning the session struct.
     ///
     /// Applies debug commands to populate the current battle state.

@@ -22,6 +22,7 @@ pub struct TestSession {
     pub enemy_client: TestClient,
     pub last_user_response_version: Option<Uuid>,
     pub last_enemy_response_version: Option<Uuid>,
+    pub seed: Option<u64>,
 }
 
 impl Default for TestSession {
@@ -41,6 +42,7 @@ impl TestSession {
             enemy_client: TestClient::default(),
             last_user_response_version: None,
             last_enemy_response_version: None,
+            seed: None,
         }
     }
 
@@ -49,6 +51,12 @@ impl TestSession {
             DisplayPlayer::User => &self.user_client,
             DisplayPlayer::Enemy => &self.enemy_client,
         }
+    }
+
+    /// Set the seed for deterministic random number generation
+    pub fn with_seed(mut self, seed: u64) -> Self {
+        self.seed = Some(seed);
+        self
     }
 
     /// Connects to the rules engine and applies the commands to the client.
@@ -63,7 +71,7 @@ impl TestSession {
                 display_properties: None,
                 debug_configuration: Some(DebugConfiguration {
                     enemy: Some(PlayerType::User(self.enemy_id)),
-                    seed: Some(314159265358979323),
+                    seed: self.seed.or(Some(314159265358979323)),
                 }),
             },
             self.request_context(),

@@ -15,5 +15,12 @@ display_data = { path = "../../src/display_data" }
 rules_engine = { path = "../../src/rules_engine" }
 test_utils = { path = "../../src/test_utils" }
 
+clap = { version = "4", features = ["derive"] }
+proptest = "1"
+rand = "0.9"
 tokio = { version = "1", features = ["full"] }
 uuid = { version = "1", features = ["serde", "v4"] }
+
+[[bin]]
+name = "test_determinism"
+path = "src/bin/test_determinism.rs"

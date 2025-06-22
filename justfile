@@ -216,5 +216,8 @@ enforce-benchmarks:
 symlinks:
      ./rules_engine/scripts/symlinks.py -d ~/Documents/dttmp rules_engine/target client/Library
 
+test-determinism *args='':
+    cargo run --manifest-path rules_engine/Cargo.toml --release --bin test_determinism -- $@
+
 commit *args='':
     git add -A && git commit -a -m "$@"
