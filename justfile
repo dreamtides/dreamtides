@@ -213,3 +213,6 @@ enforce-benchmarks:
 
 symlinks:
      ./rules_engine/scripts/symlinks.py -d ~/Documents/dttmp rules_engine/target client/Library
+
+commit *args='':
+    git add -A && git commit -a -m "$@"

@@ -78,6 +78,7 @@ pub fn search(
                     // consistently reduces play skill.
                     let mut battle =
                         player_state::randomize_battle_player(initial_battle, player.opponent());
+                    battle.request_context.logging_options.enable_action_legality_check = false;
 
                     apply_battle_action::execute(&mut battle, player, action);
 
@@ -179,6 +180,7 @@ fn next_evaluation_target(
             // All actions from this node have been tried, recursively search
             // the best candidate
             let best = best_child(graph, node, &actions, SelectionMode::Exploration);
+            battle.request_context.logging_options.enable_action_legality_check = false;
             apply_battle_action::execute(battle, player, best.action);
             node = best.node;
         }
@@ -208,6 +210,7 @@ fn add_child(
     parent: NodeIndex,
     action: BattleAction,
 ) -> NodeIndex {
+    battle.request_context.logging_options.enable_action_legality_check = false;
     graph[parent].tried.push(action);
     apply_battle_action::execute(battle, player, action);
     let child = graph.add_node(SearchNode {
@@ -306,6 +309,7 @@ fn evaluate(battle: &mut BattleState, maximizing_player: PlayerName) -> OrderedF
         let Some(action) = legal_actions::compute(battle, player).random_action() else {
             panic_with!("No legal actions available", battle, player);
         };
+        battle.request_context.logging_options.enable_action_legality_check = false;
         apply_battle_action::execute(battle, player, action);
 
         // I've tried aborting early here and using heuristics to evaluate the

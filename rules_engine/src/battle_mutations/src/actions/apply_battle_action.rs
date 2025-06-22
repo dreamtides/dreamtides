@@ -13,7 +13,7 @@ use crate::prompt_mutations::{select_additional_costs, select_choice_prompt_at_i
 #[instrument(name = "apply_battle_action", level = "debug", skip(battle))]
 pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleAction) {
     battle_trace!("Executing action", battle, player, action);
-    if battle.tracing.is_some() {
+    if battle.request_context.logging_options.enable_action_legality_check {
         let legal_actions = legal_actions::compute(battle, player);
 
         if !legal_actions.contains(action) {

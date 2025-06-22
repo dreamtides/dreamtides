@@ -81,7 +81,7 @@ pub struct RequestContext {
     pub logging_options: LoggingOptions,
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct LoggingOptions {
     /// If specified, the directory to write logs to.
@@ -89,6 +89,19 @@ pub struct LoggingOptions {
 
     /// If true, log AI search diagrams in graphviz format to the log directory.
     pub log_ai_search_diagram: bool,
+
+    /// If true, perform action legality checks before executing actions.
+    pub enable_action_legality_check: bool,
+}
+
+impl Default for LoggingOptions {
+    fn default() -> Self {
+        Self {
+            log_directory: None,
+            log_ai_search_diagram: false,
+            enable_action_legality_check: true,
+        }
+    }
 }
 
 impl BattleState {

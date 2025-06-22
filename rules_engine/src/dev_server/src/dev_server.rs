@@ -74,6 +74,7 @@ async fn connect(body: String) -> AppResult<Json<ConnectResponse>> {
             logging_options: LoggingOptions {
                 log_directory: Some(log_directory),
                 log_ai_search_diagram: true,
+                enable_action_legality_check: true,
             },
         })))
     }
@@ -132,6 +133,7 @@ async fn main() {
         logging_options: LoggingOptions {
             log_directory: Some(log_directory),
             log_ai_search_diagram: true,
+            enable_action_legality_check: true,
         },
     });
     info!("Starting server on port 26598");
