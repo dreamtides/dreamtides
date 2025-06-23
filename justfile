@@ -221,3 +221,6 @@ test-determinism *args='':
 
 commit *args='':
     git add -A && git commit -a -m "$@"
+
+pull:
+    git pull
