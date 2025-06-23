@@ -45,6 +45,9 @@ pub trait TestSessionBattleExtension {
     /// Returns the ID of the newly played card.
     fn create_and_play(&mut self, card: impl Into<TestPlayCard>) -> ClientCardId;
 
+    /// Adds a card to a player's hand via debug actions, returning its card id.
+    fn add_to_hand(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId;
+
     /// Adds a card to a player's battlefield via debug actions, returning its
     /// card id. This does not play the card or spend energy etc.
     fn add_to_battlefield(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId;
@@ -54,25 +57,8 @@ impl TestSessionBattleExtension for TestSession {
     fn create_and_play(&mut self, card: impl Into<TestPlayCard>) -> ClientCardId {
         let card = card.into();
         let player = card.player();
-        let existing_hand_ids: HashSet<String> =
-            self.client(player).cards.user_hand().iter().map(|c| c.id.clone()).collect();
 
-        self.perform_player_action(
-            player,
-            GameAction::BattleAction(BattleAction::Debug(DebugBattleAction::AddCardToHand(
-                self.to_player_name(player),
-                card.name,
-            ))),
-        );
-
-        let new_card_id = self
-            .client(player)
-            .cards
-            .user_hand()
-            .iter()
-            .find(|c| !existing_hand_ids.contains(&c.id))
-            .map(|c| c.id.clone())
-            .expect("Failed to find newly added card in hand");
+        let new_card_id = self.add_to_hand(player, card.name);
 
         let play_action = self
             .client(player)
@@ -107,6 +93,27 @@ impl TestSessionBattleExtension for TestSession {
         }
 
         new_card_id
+    }
+
+    fn add_to_hand(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId {
+        let existing_hand_ids: HashSet<String> =
+            self.client(player).cards.user_hand().iter().map(|c| c.id.clone()).collect();
+
+        self.perform_player_action(
+            player,
+            GameAction::BattleAction(BattleAction::Debug(DebugBattleAction::AddCardToHand(
+                self.to_player_name(player),
+                card,
+            ))),
+        );
+
+        self.client(player)
+            .cards
+            .user_hand()
+            .iter()
+            .find(|c| !existing_hand_ids.contains(&c.id))
+            .map(|c| c.id.clone())
+            .expect("Failed to find newly added card in hand")
     }
 
     fn add_to_battlefield(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId {

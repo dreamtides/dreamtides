@@ -160,7 +160,16 @@ fn test_play_card_with_target() {
 }
 
 #[test]
-fn test_negate_card_on_stack() {}
+fn test_negate_card_on_stack() {
+    let mut s = TestBattle::builder().connect();
+    s.perform_user_action(BattleAction::EndTurn);
+    s.create_and_play(
+        TestPlayCard::builder()
+            .name(CardName::MinstrelOfFallingLight)
+            .as_player(DisplayPlayer::Enemy)
+            .build(),
+    );
+}
 
 fn assert_clients_identical(s: &TestSession) {
     assert_eq!(
