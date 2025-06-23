@@ -107,17 +107,16 @@ fn test_play_character_win_battle() {
 
 #[test]
 fn test_energy_increment_at_turn_start() {
-    let mut s = TestBattle::builder().connect();
-    assert_eq!(s.user_client.user.energy(), Some(Energy(2)), "initial energy");
-    assert_eq!(s.user_client.user.produced_energy(), Some(Energy(2)), "initial produced energy");
-
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(0).produced_energy(0).build())
+        .connect();
     s.perform_user_action(BattleAction::EndTurn);
     s.perform_enemy_action(BattleAction::EndTurn);
 
-    assert_eq!(s.user_client.user.energy(), Some(Energy(3)), "energy incremented by 1 more");
+    assert_eq!(s.user_client.user.energy(), Some(Energy(1)), "energy incremented by 1 more");
     assert_eq!(
         s.user_client.user.produced_energy(),
-        Some(Energy(3)),
+        Some(Energy(1)),
         "produced energy incremented by 1 more"
     );
     assert_clients_identical(&s);
@@ -125,10 +124,7 @@ fn test_energy_increment_at_turn_start() {
 
 #[test]
 fn test_create_and_play() {
-    let mut s = TestBattle::builder()
-        .user(TestPlayer::builder().energy(99).build())
-        .enemy(TestPlayer::builder().energy(99).build())
-        .connect();
+    let mut s = TestBattle::builder().connect();
     s.add_to_battlefield(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
     s.create_and_play(TestPlayCard::builder().name(CardName::MinstrelOfFallingLight).build());
 }
@@ -148,6 +144,7 @@ fn test_play_card_with_target() {
     );
     assert_eq!(s.user_client.cards.enemy_void().len(), 0, "enemy void empty");
     assert_eq!(s.user_client.cards.user_void().len(), 0, "user void empty");
+    assert_eq!(s.user_client.user.energy(), Some(Energy(99)), "initial energy");
 
     s.create_and_play(TestPlayCard::builder().name(CardName::Immolate).target(target_id).build());
 
@@ -161,6 +158,9 @@ fn test_play_card_with_target() {
 
     assert_clients_identical(&s);
 }
+
+#[test]
+fn test_negate_card_on_stack() {}
 
 fn assert_clients_identical(s: &TestSession) {
     assert_eq!(

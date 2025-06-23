@@ -22,6 +22,13 @@ impl Default for TestBattle {
 impl TestBattle {
     /// Creates a new battle with a random user ID and battle ID, playing as
     /// player one.
+    ///
+    /// By default, this will create a battle state where:
+    ///
+    ///   - It is the user's turn
+    ///   - Both players have 99 energy
+    ///   - Both players have 99 produced energy
+    ///   - Neither player has cards in hand
     pub fn builder() -> Self {
         let mut session = TestSession::new();
         session.battle_id = Some(BattleId(Uuid::new_v4()));
@@ -46,7 +53,8 @@ impl TestBattle {
         self
     }
 
-    /// Connects to the rules engine, returning the session struct.
+    /// Connects to the rules engine, returning the session struct. Moves all
+    /// player hands into their decks.
     ///
     /// Applies debug commands to populate the current battle state.
     pub fn connect(mut self) -> TestSession {
@@ -73,25 +81,20 @@ impl TestBattle {
     }
 
     fn apply_player_configuration(&mut self, player: PlayerName, config: &TestPlayer) {
-        if let Some(points) = config.points {
-            self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::SetPoints(
-                player, points,
-            )));
-        }
-        if let Some(energy) = config.energy {
-            self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::SetEnergy(
-                player, energy,
-            )));
-        }
-        if let Some(produced_energy) = config.produced_energy {
-            self.session.perform_user_action(BattleAction::Debug(
-                DebugBattleAction::SetProducedEnergy(player, produced_energy),
-            ));
-        }
-        if let Some(spark_bonus) = config.spark_bonus {
-            self.session.perform_user_action(BattleAction::Debug(
-                DebugBattleAction::SetSparkBonus(player, spark_bonus),
-            ));
-        }
+        self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::SetPoints(
+            player,
+            config.points,
+        )));
+        self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::SetEnergy(
+            player,
+            config.energy,
+        )));
+        self.session.perform_user_action(BattleAction::Debug(
+            DebugBattleAction::SetProducedEnergy(player, config.produced_energy),
+        ));
+        self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::SetSparkBonus(
+            player,
+            config.spark_bonus,
+        )));
     }
 }

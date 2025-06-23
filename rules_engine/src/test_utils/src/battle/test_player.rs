@@ -1,14 +1,29 @@
 use bon::Builder;
 use core_data::numerics::{Energy, Points, Spark};
 
-#[derive(Default, Builder, Clone)]
+#[derive(Builder, Clone)]
 pub struct TestPlayer {
     #[builder(into)]
-    pub points: Option<Points>,
+    #[builder(default = 0)]
+    pub points: Points,
     #[builder(into)]
-    pub energy: Option<Energy>,
+    #[builder(default = 99)]
+    pub energy: Energy,
     #[builder(into)]
-    pub produced_energy: Option<Energy>,
+    #[builder(default = 99)]
+    pub produced_energy: Energy,
     #[builder(into)]
-    pub spark_bonus: Option<Spark>,
+    #[builder(default = 0)]
+    pub spark_bonus: Spark,
+}
+
+impl Default for TestPlayer {
+    fn default() -> Self {
+        Self {
+            points: Points(0),
+            energy: Energy(99),
+            produced_energy: Energy(99),
+            spark_bonus: Spark(0),
+        }
+    }
 }
