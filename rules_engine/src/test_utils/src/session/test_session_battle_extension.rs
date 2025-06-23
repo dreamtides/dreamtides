@@ -90,8 +90,19 @@ impl TestSessionBattleExtension for TestSession {
                 .cards
                 .get(&target)
                 .and_then(|card| card.view.revealed.as_ref())
-                .and_then(|revealed| revealed.actions.on_click.clone())
-                .expect("Target card has no on_click action");
+                .and_then(|revealed| revealed.actions.on_click.clone());
+
+            if target_action.is_none() {
+                let battlefield_count = self.client(player).cards.user_battlefield().len();
+                if battlefield_count == 1 {
+                    panic!(
+                        "Target card has no on_click action and there is only one card on the \
+                         battlefield. The target might have been automatically selected."
+                    );
+                }
+            }
+
+            let target_action = target_action.expect("Target card has no on_click action");
             self.perform_player_action(player, target_action);
         }
 

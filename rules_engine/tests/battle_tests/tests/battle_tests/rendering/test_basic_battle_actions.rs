@@ -133,6 +133,35 @@ fn test_create_and_play() {
     s.create_and_play(TestPlayCard::builder().name(CardName::MinstrelOfFallingLight).build());
 }
 
+#[test]
+fn test_play_card_with_target() {
+    let mut s = TestBattle::builder().connect();
+    // Note that if a single target is present then no prompt for targeting is
+    // shown.
+    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
+    s.add_to_battlefield(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
+
+    assert_eq!(
+        s.user_client.cards.enemy_battlefield().len(),
+        2,
+        "two characters on enemy battlefield"
+    );
+    assert_eq!(s.user_client.cards.enemy_void().len(), 0, "enemy void empty");
+    assert_eq!(s.user_client.cards.user_void().len(), 0, "user void empty");
+
+    s.create_and_play(TestPlayCard::builder().name(CardName::Immolate).target(target_id).build());
+
+    assert_eq!(
+        s.user_client.cards.enemy_battlefield().len(),
+        1,
+        "one character remaining on enemy battlefield"
+    );
+    assert_eq!(s.user_client.cards.enemy_void().len(), 1, "destroyed character in enemy void");
+    assert_eq!(s.user_client.cards.user_void().len(), 1, "immolate event in user void");
+
+    assert_clients_identical(&s);
+}
+
 fn assert_clients_identical(s: &TestSession) {
     assert_eq!(
         s.user_client.cards.user_hand().len(),
