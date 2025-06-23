@@ -125,21 +125,12 @@ impl TestSession {
 
     /// Performs a Game Action as a specific player.
     ///
-    /// See [Self::perform_action].
+    /// See [Self::perform_user_action].
     pub fn perform_player_action(&mut self, player: DisplayPlayer, action: impl Into<GameAction>) {
-        self.perform_action_internal(
-            action,
-            match player {
-                DisplayPlayer::User => self.metadata(),
-                DisplayPlayer::Enemy => self.enemy_metadata(),
-            },
-            self.user_id,
-            self.enemy_id,
-            match player {
-                DisplayPlayer::User => self.last_user_response_version,
-                DisplayPlayer::Enemy => self.last_enemy_response_version,
-            },
-        );
+        match player {
+            DisplayPlayer::User => self.perform_user_action(action),
+            DisplayPlayer::Enemy => self.perform_enemy_action(action),
+        }
     }
 
     /// Converts a DisplayPlayer to a PlayerName.

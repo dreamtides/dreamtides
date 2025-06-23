@@ -452,6 +452,7 @@ fn handle_request_action(
         GameAction::DebugAction(action) => {
             let player = renderer::player_name_for_user(&*battle, user_id);
             debug_actions::execute(battle, user_id, player, *action);
+
             handle_battle_action::append_update(
                 user_id,
                 renderer::connect(&*battle, user_id, true),
@@ -459,6 +460,19 @@ fn handle_request_action(
                 request_id,
                 PollResponseType::Final,
             );
+
+            // Also send updates to the opponent if they're a human player
+            if let PlayerType::User(opponent_id) =
+                &battle.players.player(player.opponent()).player_type
+            {
+                handle_battle_action::append_update(
+                    *opponent_id,
+                    renderer::connect(&*battle, *opponent_id, true),
+                    &request_context,
+                    request_id,
+                    PollResponseType::Final,
+                );
+            }
         }
         GameAction::BattleAction(action) => {
             let player = renderer::player_name_for_user(&*battle, user_id);

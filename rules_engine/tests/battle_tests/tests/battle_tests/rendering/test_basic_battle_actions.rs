@@ -130,7 +130,7 @@ fn test_create_and_play() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
     s.add_to_battlefield(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
-    s.create_and_play(CardName::MinstrelOfFallingLight);
+    s.create_and_play(TestPlayCard::builder().name(CardName::MinstrelOfFallingLight).build());
 }
 
 fn assert_clients_identical(s: &TestSession) {
