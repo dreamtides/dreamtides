@@ -12,6 +12,7 @@ use battle_state::battle::animation_data::AnimationData;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle_player::battle_player_state::PlayerType;
 use core_data::identifiers::{BattleId, QuestId, UserId};
+use core_data::types::PlayerName;
 use database::database::Database;
 use database::save_file::SaveFile;
 use display::display_actions::apply_battle_display_action;
@@ -435,6 +436,32 @@ fn perform_action_internal(provider: impl StateProvider, request: &PerformAction
     true
 }
 
+fn send_updates_to_user_and_opponent(
+    battle: &BattleState,
+    user_id: UserId,
+    player: PlayerName,
+    request_context: &RequestContext,
+    request_id: Option<Uuid>,
+) {
+    handle_battle_action::append_update(
+        user_id,
+        renderer::connect(battle, user_id, true),
+        request_context,
+        request_id,
+        PollResponseType::Final,
+    );
+
+    if let PlayerType::User(opponent_id) = &battle.players.player(player.opponent()).player_type {
+        handle_battle_action::append_update(
+            *opponent_id,
+            renderer::connect(battle, *opponent_id, true),
+            request_context,
+            request_id,
+            PollResponseType::Final,
+        );
+    }
+}
+
 fn handle_request_action(
     provider: &impl StateProvider,
     request: &PerformActionRequest,
@@ -453,26 +480,13 @@ fn handle_request_action(
             let player = renderer::player_name_for_user(&*battle, user_id);
             debug_actions::execute(battle, user_id, player, *action);
 
-            handle_battle_action::append_update(
+            send_updates_to_user_and_opponent(
+                battle,
                 user_id,
-                renderer::connect(&*battle, user_id, true),
+                player,
                 &request_context,
                 request_id,
-                PollResponseType::Final,
             );
-
-            // Also send updates to the opponent if they're a human player
-            if let PlayerType::User(opponent_id) =
-                &battle.players.player(player.opponent()).player_type
-            {
-                handle_battle_action::append_update(
-                    *opponent_id,
-                    renderer::connect(&*battle, *opponent_id, true),
-                    &request_context,
-                    request_id,
-                    PollResponseType::Final,
-                );
-            }
         }
         GameAction::BattleAction(action) => {
             let player = renderer::player_name_for_user(&*battle, user_id);
@@ -512,12 +526,13 @@ fn handle_request_action(
             };
 
             *battle = undone_battle;
-            handle_battle_action::append_update(
+            let player_name = renderer::player_name_for_user(&*battle, user_id);
+            send_updates_to_user_and_opponent(
+                battle,
                 user_id,
-                renderer::connect(&*battle, user_id, true),
+                player_name,
                 &request_context,
                 request_id,
-                PollResponseType::Final,
             );
         }
     };

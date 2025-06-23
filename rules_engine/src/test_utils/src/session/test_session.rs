@@ -112,7 +112,7 @@ impl TestSession {
 
     /// Performs a Game Action as the enemy player.
     ///
-    /// See [Self::perform_action].
+    /// See [Self::perform_user_action].
     pub fn perform_enemy_action(&mut self, action: impl Into<GameAction>) {
         self.perform_action_internal(
             action,
