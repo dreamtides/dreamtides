@@ -1,5 +1,6 @@
 use battle_queries::battle_card_queries::{card, stack_card_queries};
 use battle_queries::battle_player_queries::player_properties;
+use battle_queries::legal_action_queries::legal_actions;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle_cards::stack_card_state::StackCardTargets;
@@ -93,7 +94,7 @@ fn update_display_state(battle: &BattleState) {
 fn player_view(battle: &BattleState, name: PlayerName, player: &BattlePlayerState) -> PlayerView {
     PlayerView {
         score: player.points,
-        can_act: true,
+        can_act: legal_actions::next_to_act(battle) == Some(name),
         energy: player.current_energy,
         produced_energy: player.produced_energy,
         total_spark: player_properties::spark_total(battle, name),

@@ -45,12 +45,31 @@ pub trait TestSessionBattleExtension {
     /// Returns the ID of the newly played card.
     fn create_and_play(&mut self, card: impl Into<TestPlayCard>) -> ClientCardId;
 
+    /// Plays a card from a player's hand via the standard play card action.
+    ///
+    /// Panics if the server returns an error for playing this card or if it
+    /// cannot currently be played (e.g. due to insufficient energy).
+    fn play_card_from_hand(&mut self, player: DisplayPlayer, card_id: &ClientCardId);
+
+    /// Selects a card as a target via its 'on_click' action.
+    ///
+    /// Panics if the server returns an error for selecting this target or if
+    /// the target is not valid for the card.
+    fn select_target(&mut self, player: DisplayPlayer, target_id: &ClientCardId);
+
     /// Adds a card to a player's hand via debug actions, returning its card id.
     fn add_to_hand(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId;
 
     /// Adds a card to a player's battlefield via debug actions, returning its
     /// card id. This does not play the card or spend energy etc.
     fn add_to_battlefield(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId;
+
+    /// Takes the "end turn" action as the named `player`. Moves all cards from
+    /// the opponent player's hand to their deck via debug actions.
+    ///
+    /// Intended to help bypass the effects of the opponent player drawing a
+    /// card for their turn.
+    fn end_turn_remove_opponent_hand(&mut self, player: DisplayPlayer);
 }
 
 impl TestSessionBattleExtension for TestSession {
@@ -59,40 +78,47 @@ impl TestSessionBattleExtension for TestSession {
         let player = card.player();
 
         let new_card_id = self.add_to_hand(player, card.name);
+        self.play_card_from_hand(player, &new_card_id);
 
+        if let Some(target) = card.target {
+            self.select_target(player, &target);
+        }
+
+        new_card_id
+    }
+
+    fn play_card_from_hand(&mut self, player: DisplayPlayer, card_id: &ClientCardId) {
         let play_action = self
             .client(player)
             .cards
-            .get(&new_card_id)
+            .get(card_id)
             .and_then(|card| card.view.revealed.as_ref())
             .and_then(|revealed| revealed.actions.can_play.clone())
             .expect("Card cannot be played from hand");
 
         self.perform_player_action(player, play_action);
+    }
 
-        if let Some(target) = card.target {
-            let target_action = self
-                .client(player)
-                .cards
-                .get(&target)
-                .and_then(|card| card.view.revealed.as_ref())
-                .and_then(|revealed| revealed.actions.on_click.clone());
+    fn select_target(&mut self, player: DisplayPlayer, target_id: &ClientCardId) {
+        let target_action = self
+            .client(player)
+            .cards
+            .get(target_id)
+            .and_then(|card| card.view.revealed.as_ref())
+            .and_then(|revealed| revealed.actions.on_click.clone());
 
-            if target_action.is_none() {
-                let battlefield_count = self.client(player).cards.user_battlefield().len();
-                if battlefield_count == 1 {
-                    panic!(
-                        "Target card has no on_click action and there is only one card on the \
-                         battlefield. The target might have been automatically selected."
-                    );
-                }
+        if target_action.is_none() {
+            let battlefield_count = self.client(player).cards.user_battlefield().len();
+            if battlefield_count == 1 {
+                panic!(
+                    "Target card has no on_click action and there is only one card on the \
+                     battlefield. The target might have been automatically selected."
+                );
             }
-
-            let target_action = target_action.expect("Target card has no on_click action");
-            self.perform_player_action(player, target_action);
         }
 
-        new_card_id
+        let target_action = target_action.expect("Target card has no on_click action");
+        self.perform_player_action(player, target_action);
     }
 
     fn add_to_hand(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId {
@@ -135,5 +161,19 @@ impl TestSessionBattleExtension for TestSession {
             .find(|c| !existing_battlefield_ids.contains(&c.id))
             .map(|c| c.id.clone())
             .expect("Failed to find newly added card on battlefield")
+    }
+
+    fn end_turn_remove_opponent_hand(&mut self, player: DisplayPlayer) {
+        let opponent = match player {
+            DisplayPlayer::User => DisplayPlayer::Enemy,
+            DisplayPlayer::Enemy => DisplayPlayer::User,
+        };
+
+        self.perform_player_action(player, GameAction::BattleAction(BattleAction::EndTurn));
+
+        self.perform_player_action(
+            player,
+            DebugBattleAction::MoveHandToDeck(self.to_player_name(opponent)),
+        );
     }
 }

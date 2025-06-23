@@ -162,13 +162,35 @@ fn test_play_card_with_target() {
 #[test]
 fn test_negate_card_on_stack() {
     let mut s = TestBattle::builder().connect();
-    s.perform_user_action(BattleAction::EndTurn);
-    s.create_and_play(
+    // Must be in hand already to not auto-resolve enemy action.
+    let negate_id = s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+    let enemy_character_id = s.create_and_play(
         TestPlayCard::builder()
             .name(CardName::MinstrelOfFallingLight)
             .as_player(DisplayPlayer::Enemy)
             .build(),
     );
+
+    assert!(
+        s.user_client.cards.stack_cards().contains(&enemy_character_id),
+        "enemy character on stack"
+    );
+    assert!(!s.user_client.enemy.can_act(), "enemy cannot act");
+    assert!(s.user_client.user.can_act(), "user can act");
+    s.play_card_from_hand(DisplayPlayer::User, &negate_id);
+    assert_eq!(s.user_client.cards.user_hand().len(), 0, "card removed from hand");
+    assert_eq!(
+        s.user_client.cards.enemy_battlefield().len(),
+        0,
+        "card not present on enemy battlefield"
+    );
+    assert!(
+        s.user_client.cards.enemy_void().contains(&enemy_character_id),
+        "enemy character in void"
+    );
+    assert!(s.user_client.cards.user_void().contains(&negate_id), "negate in user void");
+    assert_clients_identical(&s);
 }
 
 fn assert_clients_identical(s: &TestSession) {

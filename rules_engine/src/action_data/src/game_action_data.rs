@@ -1,6 +1,7 @@
 use std::fmt::{self, Debug, Formatter};
 
 use battle_state::actions::battle_actions::BattleAction;
+use battle_state::actions::debug_battle_action::DebugBattleAction;
 use core_data::types::PlayerName;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -40,5 +41,11 @@ impl From<BattleAction> for GameAction {
 impl From<BattleDisplayAction> for GameAction {
     fn from(action: BattleDisplayAction) -> Self {
         GameAction::BattleDisplayAction(action)
+    }
+}
+
+impl From<DebugBattleAction> for GameAction {
+    fn from(action: DebugBattleAction) -> Self {
+        GameAction::BattleAction(BattleAction::Debug(action))
     }
 }
