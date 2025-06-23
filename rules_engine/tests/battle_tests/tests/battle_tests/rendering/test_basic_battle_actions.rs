@@ -130,7 +130,7 @@ fn test_create_and_play() {
 }
 
 #[test]
-fn test_play_card_with_target() {
+fn test_play_card_dissolve_target() {
     let mut s = TestBattle::builder().connect();
     // Note that if a single target is present then no prompt for targeting is
     // shown.
@@ -153,8 +153,8 @@ fn test_play_card_with_target() {
         1,
         "one character remaining on enemy battlefield"
     );
-    assert_eq!(s.user_client.cards.enemy_void().len(), 1, "destroyed character in enemy void");
-    assert_eq!(s.user_client.cards.user_void().len(), 1, "immolate event in user void");
+    assert_eq!(s.user_client.cards.enemy_void().len(), 1, "dissolve character in enemy void");
+    assert_eq!(s.user_client.cards.user_void().len(), 1, "event in user void");
 
     assert_clients_identical(&s);
 }
@@ -190,6 +190,95 @@ fn test_negate_card_on_stack() {
         "enemy character in void"
     );
     assert!(s.user_client.cards.user_void().contains(&negate_id), "negate in user void");
+    assert_clients_identical(&s);
+}
+
+#[test]
+fn test_stack_back_and_forth_with_targeting() {
+    let mut s = TestBattle::builder().connect();
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+
+    let user_abolish1 = s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
+    let user_abolish2 = s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
+    let _user_abolish3 = s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
+    let enemy_abolish1 = s.add_to_hand(DisplayPlayer::Enemy, CardName::Abolish);
+    let enemy_abolish2 = s.add_to_hand(DisplayPlayer::Enemy, CardName::Abolish);
+    let _enemy_abolish3 = s.add_to_hand(DisplayPlayer::Enemy, CardName::Abolish);
+
+    let enemy_character = s.create_and_play(
+        TestPlayCard::builder()
+            .name(CardName::MinstrelOfFallingLight)
+            .as_player(DisplayPlayer::Enemy)
+            .build(),
+    );
+
+    assert!(
+        s.user_client.cards.stack_cards().contains(&enemy_character),
+        "enemy character on stack"
+    );
+    assert_eq!(s.user_client.cards.stack_cards().len(), 1, "one card on stack");
+    assert!(s.user_client.user.can_act(), "user can act");
+
+    s.play_card_from_hand(DisplayPlayer::User, &user_abolish1);
+    assert!(s.user_client.cards.stack_cards().contains(&user_abolish1), "abolish on stack");
+    assert_eq!(s.user_client.cards.stack_cards().len(), 2, "two cards on stack");
+    assert!(s.user_client.enemy.can_act(), "enemy can act after abolish");
+
+    s.play_card_from_hand(DisplayPlayer::Enemy, &enemy_abolish1);
+    assert!(s.user_client.cards.stack_cards().contains(&enemy_abolish1), "enemy abolish on stack");
+    assert_eq!(s.user_client.cards.stack_cards().len(), 3, "three cards on stack");
+    assert!(s.user_client.user.can_act(), "user can act again");
+
+    s.play_card_from_hand(DisplayPlayer::User, &user_abolish2);
+    s.select_target(DisplayPlayer::User, &enemy_abolish1);
+    assert!(
+        s.user_client.cards.stack_cards().contains(&user_abolish2),
+        "second user abolish on stack"
+    );
+    assert_eq!(s.user_client.cards.stack_cards().len(), 4, "four cards on stack");
+    assert!(s.user_client.enemy.can_act(), "enemy can act again");
+
+    s.play_card_from_hand(DisplayPlayer::Enemy, &enemy_abolish2);
+    s.select_target(DisplayPlayer::Enemy, &user_abolish2);
+    assert!(
+        s.user_client.cards.stack_cards().contains(&enemy_abolish2),
+        "second enemy abolish on stack"
+    );
+    assert_eq!(s.user_client.cards.stack_cards().len(), 5, "five cards on stack");
+
+    s.perform_user_action(BattleAction::PassPriority);
+
+    assert!(s.user_client.enemy.can_act(), "enemy can act after their card resolves");
+    assert!(
+        s.user_client.cards.enemy_void().contains(&enemy_abolish2),
+        "enemy abolish2 resolved to void"
+    );
+    assert!(
+        s.user_client.cards.user_void().contains(&user_abolish2),
+        "user abolish2 negated to void"
+    );
+    assert_eq!(s.user_client.cards.stack_cards().len(), 3, "three cards after two resolve");
+
+    s.perform_enemy_action(BattleAction::PassPriority);
+
+    s.user_client.cards.stack_cards().print_ids();
+    s.user_client.cards.user_void().print_ids();
+    s.user_client.cards.enemy_void().print_ids();
+    s.user_client.cards.enemy_battlefield().print_ids();
+
+    assert!(
+        s.user_client.cards.enemy_void().contains(&enemy_abolish1),
+        "enemy abolish1 resolved to void"
+    );
+    assert!(
+        s.user_client.cards.user_void().contains(&user_abolish1),
+        "user abolish1 negated to void"
+    );
+    assert!(
+        s.user_client.cards.enemy_battlefield().contains(&enemy_character),
+        "enemy character resolved on battlefield"
+    );
+
     assert_clients_identical(&s);
 }
 

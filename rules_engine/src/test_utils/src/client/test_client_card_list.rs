@@ -7,7 +7,10 @@ pub struct TestClientCardList<'a> {
 }
 
 impl<'a> TestClientCardList<'a> {
-    pub fn new(cards: Vec<&'a TestClientCard>) -> Self {
+    pub fn new(mut cards: Vec<&'a TestClientCard>) -> Self {
+        cards.sort_by_key(|card| {
+            (card.view.position.sorting_key, card.view.position.sorting_sub_key)
+        });
         Self { cards }
     }
 
@@ -30,5 +33,26 @@ impl<'a> TestClientCardList<'a> {
 
     pub fn get(&self, index: usize) -> Option<&&'a TestClientCard> {
         self.cards.get(index)
+    }
+
+    /// Prints the IDs of the cards in the list to stdout, separated by commas.
+    pub fn print_ids(&self) {
+        println!(
+            ">>>>> [{}]",
+            self.cards.iter().map(|card| card.id.to_string()).collect::<Vec<_>>().join(", ")
+        );
+    }
+
+    /// Prints the names of the cards in the list to stdout, separated by
+    /// commas.
+    pub fn print_names(&self) {
+        println!(
+            ">>>>> [{}]",
+            self.cards
+                .iter()
+                .map(|card| card.view.revealed.as_ref().unwrap().name.to_string())
+                .collect::<Vec<_>>()
+                .join(", ")
+        );
     }
 }
