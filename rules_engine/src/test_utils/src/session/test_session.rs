@@ -2,6 +2,8 @@ use action_data::game_action_data::GameAction;
 use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
 use battle_state::battle_player::battle_player_state::PlayerType;
 use core_data::identifiers::{BattleId, UserId};
+use core_data::types::PlayerName;
+use display_data::battle_view::DisplayPlayer;
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, DebugConfiguration, Metadata, PerformActionRequest,
 };
@@ -16,7 +18,7 @@ pub struct TestSession {
     pub user_id: UserId,
     pub enemy_id: UserId,
     pub battle_id: Option<BattleId>,
-    pub client: TestClient,
+    pub user_client: TestClient,
     pub enemy_client: TestClient,
     pub last_user_response_version: Option<Uuid>,
     pub last_enemy_response_version: Option<Uuid>,
@@ -35,10 +37,17 @@ impl TestSession {
             user_id: UserId(Uuid::new_v4()),
             enemy_id: UserId(Uuid::new_v4()),
             battle_id: None,
-            client: TestClient::default(),
+            user_client: TestClient::default(),
             enemy_client: TestClient::default(),
             last_user_response_version: None,
             last_enemy_response_version: None,
+        }
+    }
+
+    pub fn client(&self, name: DisplayPlayer) -> &TestClient {
+        match name {
+            DisplayPlayer::User => &self.user_client,
+            DisplayPlayer::Enemy => &self.enemy_client,
         }
     }
 
@@ -65,7 +74,7 @@ impl TestSession {
         }
 
         self.last_user_response_version = Some(response.response_version);
-        self.client.apply_commands(response.commands.clone());
+        self.user_client.apply_commands(response.commands.clone());
 
         let enemy_response = engine::connect(
             self.state_provider.clone(),
@@ -86,13 +95,13 @@ impl TestSession {
         response
     }
 
-    /// Performs a Game Action.
+    /// Performs a Game Action as the user player.
     ///
     /// This function will call the rules engine to execute the provided action
     /// synchronously. It blocks until the action has been fully executed and
     /// returns after applying all commands to the client.
-    pub fn perform_action(&mut self, action: impl Into<GameAction>) {
-        self.perform_action_as_player(
+    pub fn perform_user_action(&mut self, action: impl Into<GameAction>) {
+        self.perform_action_internal(
             action,
             self.metadata(),
             self.user_id,
@@ -102,8 +111,10 @@ impl TestSession {
     }
 
     /// Performs a Game Action as the enemy player.
+    ///
+    /// See [Self::perform_action].
     pub fn perform_enemy_action(&mut self, action: impl Into<GameAction>) {
-        self.perform_action_as_player(
+        self.perform_action_internal(
             action,
             self.enemy_metadata(),
             self.user_id,
@@ -112,7 +123,34 @@ impl TestSession {
         );
     }
 
-    fn perform_action_as_player(
+    /// Performs a Game Action as a specific player.
+    ///
+    /// See [Self::perform_action].
+    pub fn perform_player_action(&mut self, player: DisplayPlayer, action: impl Into<GameAction>) {
+        self.perform_action_internal(
+            action,
+            match player {
+                DisplayPlayer::User => self.metadata(),
+                DisplayPlayer::Enemy => self.enemy_metadata(),
+            },
+            self.user_id,
+            self.enemy_id,
+            match player {
+                DisplayPlayer::User => self.last_user_response_version,
+                DisplayPlayer::Enemy => self.last_enemy_response_version,
+            },
+        );
+    }
+
+    /// Converts a DisplayPlayer to a PlayerName.
+    pub fn to_player_name(&self, player: DisplayPlayer) -> PlayerName {
+        match player {
+            DisplayPlayer::User => PlayerName::One,
+            DisplayPlayer::Enemy => PlayerName::Two,
+        }
+    }
+
+    fn perform_action_internal(
         &mut self,
         action: impl Into<GameAction>,
         metadata: Metadata,
@@ -138,7 +176,7 @@ impl TestSession {
 
         for poll_result in result.user_poll_results {
             if metadata.user_id == self.user_id {
-                self.client.apply_commands(poll_result.commands);
+                self.user_client.apply_commands(poll_result.commands);
             } else {
                 self.enemy_client.apply_commands(poll_result.commands);
             }
@@ -146,7 +184,7 @@ impl TestSession {
 
         for poll_result in result.enemy_poll_results {
             if opponent_id == self.user_id {
-                self.client.apply_commands(poll_result.commands);
+                self.user_client.apply_commands(poll_result.commands);
             } else {
                 self.enemy_client.apply_commands(poll_result.commands);
             }

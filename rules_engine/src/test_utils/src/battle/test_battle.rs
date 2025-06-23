@@ -58,49 +58,34 @@ impl TestBattle {
     }
 
     fn move_all_hands_to_deck(&mut self) {
-        self.session.perform_action(BattleAction::Debug(DebugBattleAction::MoveHandToDeck(
+        self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::MoveHandToDeck(
             PlayerName::One,
         )));
-        self.session.perform_action(BattleAction::Debug(DebugBattleAction::MoveHandToDeck(
+        self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::MoveHandToDeck(
             PlayerName::Two,
         )));
     }
 
     fn apply_player_configuration(&mut self, player: PlayerName, config: &TestPlayer) {
         if let Some(points) = config.points {
-            self.session
-                .perform_action(BattleAction::Debug(DebugBattleAction::SetPoints(player, points)));
+            self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::SetPoints(
+                player, points,
+            )));
         }
         if let Some(energy) = config.energy {
-            self.session
-                .perform_action(BattleAction::Debug(DebugBattleAction::SetEnergy(player, energy)));
+            self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::SetEnergy(
+                player, energy,
+            )));
         }
         if let Some(produced_energy) = config.produced_energy {
-            self.session.perform_action(BattleAction::Debug(DebugBattleAction::SetProducedEnergy(
-                player,
-                produced_energy,
-            )));
-        }
-        if let Some(spark_bonus) = config.spark_bonus {
-            self.session.perform_action(BattleAction::Debug(DebugBattleAction::SetSparkBonus(
-                player,
-                spark_bonus,
-            )));
-        }
-        for card_name in &config.hand {
-            self.session.perform_action(BattleAction::Debug(DebugBattleAction::AddCardToHand(
-                player, *card_name,
-            )));
-        }
-        for card_name in &config.battlefield {
-            self.session.perform_action(BattleAction::Debug(
-                DebugBattleAction::AddCardToBattlefield(player, *card_name),
+            self.session.perform_user_action(BattleAction::Debug(
+                DebugBattleAction::SetProducedEnergy(player, produced_energy),
             ));
         }
-        for card_name in &config.void {
-            self.session.perform_action(BattleAction::Debug(DebugBattleAction::AddCardToVoid(
-                player, *card_name,
-            )));
+        if let Some(spark_bonus) = config.spark_bonus {
+            self.session.perform_user_action(BattleAction::Debug(
+                DebugBattleAction::SetSparkBonus(player, spark_bonus),
+            ));
         }
     }
 }
