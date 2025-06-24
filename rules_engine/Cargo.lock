@@ -2153,7 +2153,7 @@ dependencies = [
 
 [[package]]
 name = "state_provider"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "action_data",
  "core_data",

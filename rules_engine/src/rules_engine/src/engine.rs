@@ -53,7 +53,7 @@ pub struct PerformActionBlockingResult {
 
 /// Connects to the rules engine and returns commands to execute.
 pub fn connect(
-    provider: impl StateProvider,
+    provider: impl StateProvider + 'static,
     request: &ConnectRequest,
     request_context: RequestContext,
 ) -> ConnectResponse {
@@ -165,7 +165,7 @@ pub fn perform_action_blocking(
 }
 
 fn connect_internal(
-    provider: impl StateProvider,
+    provider: impl StateProvider + 'static,
     request: &ConnectRequest,
     request_context: RequestContext,
 ) -> CommandSequence {
@@ -184,7 +184,13 @@ fn connect_internal(
 
     // Check if this is a multiplayer connection request
     if let Some(vs_opponent) = request.vs_opponent {
-        return connect_for_multiplayer(&database, user_id, vs_opponent, request_context);
+        return connect_for_multiplayer(
+            provider.clone(),
+            &database,
+            user_id,
+            vs_opponent,
+            request_context,
+        );
     }
 
     info!(?user_id, "Loading battle from database");
@@ -196,12 +202,21 @@ fn connect_internal(
     ) {
         Ok(LoadBattleResult::ExistingBattle(battle, quest_id)) => {
             if is_user_in_battle(&battle, user_id) {
-                renderer::connect(&battle, user_id, false)
+                renderer::connect(&battle, user_id, provider.clone(), false)
             } else {
-                handle_user_not_in_battle(user_id, battle, quest_id, &database, None)
+                handle_user_not_in_battle(
+                    provider.clone(),
+                    user_id,
+                    battle,
+                    quest_id,
+                    &database,
+                    None,
+                )
             }
         }
-        Ok(LoadBattleResult::NewBattle(battle)) => renderer::connect(&battle, user_id, false),
+        Ok(LoadBattleResult::NewBattle(battle)) => {
+            renderer::connect(&battle, user_id, provider.clone(), false)
+        }
         Err(error) => error_message::display_error_message(None, error),
     }
 }
@@ -211,6 +226,7 @@ fn connect_internal(
 /// Instead of loading the requesting user's save file, this loads the
 /// opponent's save file and joins the battle if possible.
 fn connect_for_multiplayer(
+    provider: impl StateProvider + 'static,
     database: &impl Database,
     user_id: UserId,
     vs_opponent: UserId,
@@ -225,11 +241,12 @@ fn connect_for_multiplayer(
                 Some((battle, quest_id)) => {
                     // Check if the connecting user is already in the battle
                     if is_user_in_battle(&battle, user_id) {
-                        return renderer::connect(&battle, user_id, false);
+                        return renderer::connect(&battle, user_id, provider.clone(), false);
                     }
 
                     // If not in the battle, try to join by replacing an AI player
                     handle_user_not_in_battle(
+                        provider.clone(),
                         user_id,
                         battle,
                         quest_id,
@@ -308,6 +325,7 @@ fn is_user_in_battle(battle: &BattleState, user_id: UserId) -> bool {
 }
 
 fn handle_user_not_in_battle(
+    provider: impl StateProvider + 'static,
     user_id: UserId,
     mut battle: BattleState,
     quest_id: QuestId,
@@ -341,7 +359,7 @@ fn handle_user_not_in_battle(
 
     let save_user_id = vs_opponent.unwrap_or(user_id);
     match save_battle_to_database(database, save_user_id, quest_id, &battle) {
-        Ok(_) => renderer::connect(&battle, user_id, false),
+        Ok(_) => renderer::connect(&battle, user_id, provider, false),
         Err(error) => error_message::display_error_message(None, error),
     }
 }
@@ -450,7 +468,7 @@ fn send_updates_to_user_and_opponent(
     handle_battle_action::append_update(
         provider.clone(),
         user_id,
-        renderer::connect(battle, user_id, true),
+        renderer::connect(battle, user_id, provider.clone(), true),
         request_context,
         request_id,
         PollResponseType::Final,
@@ -460,7 +478,7 @@ fn send_updates_to_user_and_opponent(
         handle_battle_action::append_update(
             provider.clone(),
             *opponent_id,
-            renderer::connect(battle, *opponent_id, true),
+            renderer::connect(battle, *opponent_id, provider.clone(), true),
             request_context,
             request_id,
             PollResponseType::Final,
@@ -515,8 +533,7 @@ fn handle_request_action(
                 player,
                 user_id,
             );
-            let mut connect_commands =
-                renderer::connect_with_provider(&*battle, user_id, provider.clone(), true);
+            let mut connect_commands = renderer::connect(&*battle, user_id, provider.clone(), true);
             connect_commands.groups.extend(display_commands.groups);
             handle_battle_action::append_update(
                 provider.clone(),

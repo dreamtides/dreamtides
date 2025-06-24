@@ -13,15 +13,7 @@ use crate::rendering::{animations, battle_rendering};
 
 /// Returns a [CommandSequence] which fully describe the current state of the
 /// provided game
-pub fn connect(battle: &BattleState, user_id: UserId, animate: bool) -> CommandSequence {
-    let mut builder = ResponseBuilder::new(player_name_for_user(battle, user_id), animate);
-    battle_rendering::run(&mut builder, battle);
-    builder.commands()
-}
-
-/// Returns a [CommandSequence] which fully describe the current state of the
-/// provided game with a state provider for display state management
-pub fn connect_with_provider(
+pub fn connect(
     battle: &BattleState,
     user_id: UserId,
     provider: impl StateProvider + 'static,
