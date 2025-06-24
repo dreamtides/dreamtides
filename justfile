@@ -224,3 +224,6 @@ commit *args='':
 
 pull:
     git pull
+
+coverage:
+    cargo tarpaulin --manifest-path rules_engine/Cargo.toml --out Html
