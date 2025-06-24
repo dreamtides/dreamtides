@@ -1,7 +1,9 @@
 use action_data::game_action_data::GameAction;
 use core_data::display_types::AudioClipAddress;
 use core_data::identifiers::BattleId;
-use display_data::battle_view::{BattlePreviewState, ButtonView, DisplayPlayer, InterfaceView};
+use display_data::battle_view::{
+    BattlePreviewState, BattlePreviewView, ButtonView, DisplayPlayer, InterfaceView,
+};
 use display_data::card_view::CardView;
 use display_data::command::{
     Command, CommandSequence, DisplayArrow, GameMessageType, UpdateBattleCommand,
@@ -240,5 +242,16 @@ impl TestClient {
         }
 
         actions
+    }
+
+    /// Get the active battle preview
+    ///
+    /// Panics if no preview is active.
+    pub fn active_battle_preview(&self) -> &BattlePreviewView {
+        if let Some(BattlePreviewState::Active(preview)) = &self.preview {
+            preview
+        } else {
+            panic!("No active battle preview");
+        }
     }
 }

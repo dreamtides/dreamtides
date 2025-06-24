@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use core_data::numerics::Energy;
-use display_data::battle_view::DisplayPlayer;
+use display_data::battle_view::{BattlePreviewView, DisplayPlayer};
 use display_data::card_view::{CardView, ClientCardId, RevealedCardView};
 use display_data::object_position::Position;
 
@@ -93,6 +93,13 @@ impl TestClientCards {
             panic!("Card not found: {}", id);
         };
         revealed
+    }
+
+    pub fn get_play_effect_preview(&self, id: &ClientCardId) -> &BattlePreviewView {
+        let Some(revealed) = &self.get(id).view.revealed else {
+            panic!("Card not found: {}", id);
+        };
+        revealed.actions.play_effect_preview.as_ref().expect("Card has no play effect preview")
     }
 
     /// Get the cost of a card.

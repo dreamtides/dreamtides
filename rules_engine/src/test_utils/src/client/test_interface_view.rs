@@ -125,7 +125,7 @@ impl TestInterfaceView {
 }
 
 /// Recursively extract all text content from a FlexNode and its children
-fn extract_text_from_node(node: &FlexNode) -> String {
+pub fn extract_text_from_node(node: &FlexNode) -> String {
     let mut texts = Vec::new();
     collect_text_recursive(node, &mut texts);
     texts.join(" ")
