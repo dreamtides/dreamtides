@@ -6,6 +6,10 @@ edition = "2021"
 [lints]
 workspace = true
 
+[lib]
+test = false
+doctest = false
+bench = false
 
 [dependencies]
 action_data = { path = "../../src/action_data" }

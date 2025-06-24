@@ -3,6 +3,11 @@ name = "state_provider"
 version = "0.0.0"
 edition = "2021"
 
+[lib]
+test = false
+doctest = false
+bench = false
+
 [dependencies]
 action_data = { path = "../action_data" }
 core_data = { path = "../core_data" }

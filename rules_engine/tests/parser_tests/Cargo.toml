@@ -2,9 +2,14 @@
 name = "parser_tests"
 version = "0.0.0"
 edition = "2021"
+
 [lints]
 workspace = true
 
+[lib]
+test = false
+doctest = false
+bench = false
 
 [dependencies]
 ability_data = { path = "../../src/ability_data" }
