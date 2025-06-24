@@ -32,3 +32,31 @@ fn negate_unless_pays_cost() {
         "enemy should have spent 2 more energy"
     );
 }
+
+#[test]
+fn negate_unless_pays_cost_decline() {
+    let mut s = TestBattle::builder().connect();
+    let negate_id = s.add_to_hand(DisplayPlayer::User, CardName::RippleOfDefiance);
+    s.add_to_battlefield(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+
+    let initial_enemy_energy = s.client.enemy.energy();
+
+    let event_id = s.create_and_play(
+        TestPlayCard::builder().name(CardName::Immolate).as_player(DisplayPlayer::Enemy).build(),
+    );
+    let event_cost = s.client.cards.get_cost(&event_id);
+    s.play_card_from_hand(DisplayPlayer::User, &negate_id);
+    s.click_secondary_button(DisplayPlayer::Enemy, "Decline");
+    assert!(s.client.cards.stack_cards().is_empty(), "stack should be empty after cards resolve");
+    assert_eq!(
+        s.client.cards.user_battlefield().len(),
+        1,
+        "character should not be dissolved by Immolate"
+    );
+    assert_eq!(
+        s.client.enemy.energy(),
+        initial_enemy_energy - event_cost,
+        "enemy should have only spent the original event cost"
+    );
+}
