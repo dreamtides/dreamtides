@@ -169,3 +169,44 @@ fn resolve_negate_with_removed_target() {
     );
     assert_eq!(s.user_client.cards.stack_cards().len(), 0, "stack is empty");
 }
+
+#[test]
+fn resolve_dissolve_with_removed_target() {
+    let mut s = TestBattle::builder().connect();
+    let dissolve1 = s.add_to_hand(DisplayPlayer::User, CardName::Immolate);
+    let dissolve2 = s.add_to_hand(DisplayPlayer::User, CardName::Immolate);
+    let _extra = s.add_to_hand(DisplayPlayer::User, CardName::Dreamscatter);
+    let draw = s.add_to_hand(DisplayPlayer::Enemy, CardName::Dreamscatter);
+    let _extra2 = s.add_to_hand(DisplayPlayer::Enemy, CardName::Dreamscatter);
+
+    let character = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
+    s.play_card_from_hand(DisplayPlayer::User, &dissolve1);
+    s.play_card_from_hand(DisplayPlayer::Enemy, &draw);
+    s.click_primary_button(DisplayPlayer::Enemy, "Spend");
+    s.play_card_from_hand(DisplayPlayer::User, &dissolve2);
+
+    assert_eq!(s.user_client.cards.stack_cards().len(), 3, "three cards on stack");
+    assert!(s.user_client.opponent.can_act(), "enemy has priority");
+
+    s.perform_enemy_action(BattleAction::PassPriority);
+
+    assert!(s.user_client.me.can_act(), "user has priority after dissolve 2 resolves");
+    assert_eq!(s.user_client.cards.stack_cards().len(), 2, "two cards on stack");
+    assert!(s.user_client.cards.user_void().contains(&dissolve2), "dissolve 2 resolved to void");
+    assert!(s.user_client.cards.enemy_void().contains(&character), "character dissolved to void");
+
+    s.perform_user_action(BattleAction::PassPriority);
+
+    // Even though the last remaining card on the stack has no valid targets, it
+    // remains on the stack and the enemy player is allowed to respond to it.
+    // The rules engine doesn't currently "know" this card will do nothing.
+
+    assert!(s.user_client.opponent.can_act(), "enemy has priority after draw resolves");
+    assert_eq!(s.user_client.cards.stack_cards().len(), 1, "one card on stack");
+    assert!(s.user_client.cards.enemy_void().contains(&draw), "draw resolved to void");
+
+    s.perform_enemy_action(BattleAction::PassPriority);
+
+    assert!(s.user_client.cards.user_void().contains(&dissolve1), "dissolve 1 resolved to void");
+    assert_eq!(s.user_client.cards.stack_cards().len(), 0, "stack is empty");
+}
