@@ -1,7 +1,7 @@
-mod test_basic_battle_actions;
-pub mod test_basic_uct_search;
-pub mod test_battle_limits;
-mod test_duplicate_action_prevention;
+mod basic_battle_actions_test;
+pub mod basic_uct_search_test;
+pub mod battle_limits_test;
+mod duplicate_action_prevention_test;
+mod stack_interaction_test;
 mod test_helpers;
-mod test_stack_interaction;
-pub mod test_turn_sequence;
+pub mod turn_sequence_test;

@@ -5,9 +5,9 @@ use test_utils::battle::test_battle::TestBattle;
 use test_utils::session::test_session_prelude::*;
 
 #[test]
-fn negate_unless_pays_cost() {
+fn prevent_unless_pays_cost() {
     let mut s = TestBattle::builder().connect();
-    let negate_id = s.add_to_hand(DisplayPlayer::User, CardName::RippleOfDefiance);
+    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::RippleOfDefiance);
     s.add_to_battlefield(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
@@ -15,7 +15,7 @@ fn negate_unless_pays_cost() {
 
     let event_id = s.create_and_play(DisplayPlayer::Enemy, CardName::Immolate);
     let event_cost = s.user_client.cards.get_cost(&event_id);
-    s.play_card_from_hand(DisplayPlayer::User, &negate_id);
+    s.play_card_from_hand(DisplayPlayer::User, &prevent_id);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
     assert!(
         s.user_client.cards.stack_cards().is_empty(),
@@ -34,9 +34,9 @@ fn negate_unless_pays_cost() {
 }
 
 #[test]
-fn negate_unless_pays_cost_decline() {
+fn prevent_unless_pays_cost_decline() {
     let mut s = TestBattle::builder().connect();
-    let negate_id = s.add_to_hand(DisplayPlayer::User, CardName::RippleOfDefiance);
+    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::RippleOfDefiance);
     s.add_to_battlefield(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
@@ -44,7 +44,7 @@ fn negate_unless_pays_cost_decline() {
 
     let event_id = s.create_and_play(DisplayPlayer::Enemy, CardName::Immolate);
     let event_cost = s.user_client.cards.get_cost(&event_id);
-    s.play_card_from_hand(DisplayPlayer::User, &negate_id);
+    s.play_card_from_hand(DisplayPlayer::User, &prevent_id);
     s.click_secondary_button(DisplayPlayer::Enemy, "Decline");
     assert!(
         s.user_client.cards.stack_cards().is_empty(),

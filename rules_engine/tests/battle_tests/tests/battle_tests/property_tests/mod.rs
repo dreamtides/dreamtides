@@ -1,1 +1,1 @@
-pub mod test_battle_deterministic;
+pub mod battle_deterministism_test;
