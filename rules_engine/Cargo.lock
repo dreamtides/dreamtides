@@ -368,6 +368,7 @@ name = "battle_tests"
 version = "0.0.0"
 dependencies = [
  "action_data",
+ "ai_data",
  "battle_state",
  "clap",
  "core_data",

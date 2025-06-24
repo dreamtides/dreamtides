@@ -61,6 +61,11 @@ impl TestSession {
 
     /// Connects to the rules engine and applies the commands to the client.
     pub fn connect(&mut self) -> ConnectResponse {
+        self.connect_with_opponent(Some(PlayerType::User(self.enemy_id)))
+    }
+
+    /// Connects to the rules engine with a specific opponent configuration.
+    pub fn connect_with_opponent(&mut self, opponent: Option<PlayerType>) -> ConnectResponse {
         let response = engine::connect(
             self.state_provider.clone(),
             &ConnectRequest {
@@ -70,7 +75,7 @@ impl TestSession {
                 test_scenario: None,
                 display_properties: None,
                 debug_configuration: Some(DebugConfiguration {
-                    enemy: Some(PlayerType::User(self.enemy_id)),
+                    enemy: opponent.clone(),
                     seed: self.seed.or(Some(314159265358979323)),
                 }),
             },
@@ -84,21 +89,24 @@ impl TestSession {
         self.last_user_response_version = Some(response.response_version);
         self.user_client.apply_commands(response.commands.clone());
 
-        let enemy_response = engine::connect(
-            self.state_provider.clone(),
-            &ConnectRequest {
-                metadata: self.enemy_metadata(),
-                persistent_data_path: "".to_string(),
-                vs_opponent: Some(self.user_id),
-                test_scenario: None,
-                display_properties: None,
-                debug_configuration: None,
-            },
-            self.request_context(),
-        );
+        // If opponent is not a user, don't try to connect as them
+        if let Some(PlayerType::User(_enemy_id)) = opponent {
+            let enemy_response = engine::connect(
+                self.state_provider.clone(),
+                &ConnectRequest {
+                    metadata: self.enemy_metadata(),
+                    persistent_data_path: "".to_string(),
+                    vs_opponent: Some(self.user_id),
+                    test_scenario: None,
+                    display_properties: None,
+                    debug_configuration: None,
+                },
+                self.request_context(),
+            );
 
-        self.last_enemy_response_version = Some(enemy_response.response_version);
-        self.enemy_client.apply_commands(enemy_response.commands);
+            self.last_enemy_response_version = Some(enemy_response.response_version);
+            self.enemy_client.apply_commands(enemy_response.commands);
+        }
 
         response
     }

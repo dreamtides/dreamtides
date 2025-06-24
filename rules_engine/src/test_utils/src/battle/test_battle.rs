@@ -1,5 +1,7 @@
+use ai_data::game_ai::GameAI;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
+use battle_state::battle_player::battle_player_state::PlayerType;
 use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
 use uuid::Uuid;
@@ -11,6 +13,7 @@ pub struct TestBattle {
     pub session: TestSession,
     pub user: TestPlayer,
     pub enemy: TestPlayer,
+    pub enemy_agent: Option<GameAI>,
 }
 
 impl Default for TestBattle {
@@ -32,7 +35,12 @@ impl TestBattle {
     pub fn builder() -> Self {
         let mut session = TestSession::new();
         session.battle_id = Some(BattleId(Uuid::new_v4()));
-        Self { session, user: TestPlayer::default(), enemy: TestPlayer::default() }
+        Self {
+            session,
+            user: TestPlayer::default(),
+            enemy: TestPlayer::default(),
+            enemy_agent: None,
+        }
     }
 
     /// Sets the user player to the provided player.
@@ -47,6 +55,12 @@ impl TestBattle {
         self
     }
 
+    /// Sets the enemy to be an AI agent instead of a human player.
+    pub fn enemy_agent(mut self, agent: GameAI) -> Self {
+        self.enemy_agent = Some(agent);
+        self
+    }
+
     /// Sets the seed for deterministic random number generation.
     pub fn seed(mut self, seed: u64) -> Self {
         self.session.seed = Some(seed);
@@ -58,7 +72,11 @@ impl TestBattle {
     ///
     /// Applies debug commands to populate the current battle state.
     pub fn connect(mut self) -> TestSession {
-        self.session.connect();
+        let opponent = self
+            .enemy_agent
+            .map(PlayerType::Agent)
+            .or(Some(PlayerType::User(self.session.enemy_id)));
+        self.session.connect_with_opponent(opponent);
         self.move_all_hands_to_deck();
         self.apply_test_player_configuration();
         self.session
