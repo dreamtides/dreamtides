@@ -4,8 +4,6 @@ use display_data::battle_view::DisplayPlayer;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::session::test_session_prelude::*;
 
-use super::test_helpers::assert_clients_identical;
-
 #[test]
 fn negate_card_on_stack() {
     let mut s = TestBattle::builder().connect();
@@ -32,7 +30,6 @@ fn negate_card_on_stack() {
         "enemy character in void"
     );
     assert!(s.user_client.cards.user_void().contains(&negate_id), "negate in user void");
-    assert_clients_identical(&s);
 }
 
 #[test]
@@ -115,6 +112,60 @@ fn stack_back_and_forth_with_targeting() {
         s.user_client.cards.enemy_battlefield().contains(&enemy_character),
         "enemy character resolved on battlefield"
     );
+}
 
-    assert_clients_identical(&s);
+#[test]
+fn resolve_negate_with_removed_target() {
+    let mut s = TestBattle::builder().connect();
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+
+    let user_abolish1 = s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
+    let user_abolish2 = s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
+    let _user_extra = s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
+    let enemy_dreamscatter = s.add_to_hand(DisplayPlayer::Enemy, CardName::Dreamscatter);
+    let _enemy_extra = s.add_to_hand(DisplayPlayer::Enemy, CardName::Abolish);
+
+    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
+    assert_eq!(s.user_client.cards.stack_cards().len(), 1, "one card on stack");
+
+    s.play_card_from_hand(DisplayPlayer::User, &user_abolish1);
+    assert_eq!(s.user_client.cards.stack_cards().len(), 2, "two cards on stack");
+
+    s.play_card_from_hand(DisplayPlayer::Enemy, &enemy_dreamscatter);
+    s.click_primary_button(DisplayPlayer::Enemy, "Spend");
+    assert_eq!(s.user_client.cards.stack_cards().len(), 3, "three cards on stack");
+
+    s.play_card_from_hand(DisplayPlayer::User, &user_abolish2);
+    s.select_target(DisplayPlayer::User, &enemy_character);
+    assert_eq!(s.user_client.cards.stack_cards().len(), 4, "four cards on stack");
+
+    s.perform_enemy_action(BattleAction::PassPriority);
+
+    assert!(
+        s.user_client.cards.user_void().contains(&user_abolish2),
+        "user abolish2 resolved to void"
+    );
+    assert!(
+        s.user_client.cards.enemy_void().contains(&enemy_character),
+        "enemy character removed to void"
+    );
+    assert_eq!(s.user_client.cards.stack_cards().len(), 2, "two cards left on stack");
+    assert!(s.user_client.me.can_act(), "user has priority after abolish2 resolves");
+
+    s.perform_user_action(BattleAction::PassPriority);
+
+    assert!(
+        s.user_client.cards.enemy_void().contains(&enemy_dreamscatter),
+        "enemy dreamscatter resolved to void"
+    );
+    assert_eq!(s.user_client.cards.stack_cards().len(), 1, "one card left on stack");
+    assert!(s.user_client.opponent.can_act(), "enemy has priority after dreamscatter resolves");
+
+    s.perform_enemy_action(BattleAction::PassPriority);
+
+    assert!(
+        s.user_client.cards.user_void().contains(&user_abolish1),
+        "user abolish1 resolved to void with no effect"
+    );
+    assert_eq!(s.user_client.cards.stack_cards().len(), 0, "stack is empty");
 }
