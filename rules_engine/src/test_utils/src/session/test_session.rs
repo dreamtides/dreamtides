@@ -4,6 +4,7 @@ use battle_state::battle_player::battle_player_state::PlayerType;
 use core_data::identifiers::{BattleId, UserId};
 use core_data::types::PlayerName;
 use display_data::battle_view::DisplayPlayer;
+use display_data::command::CommandSequence;
 use display_data::request_data::{
     ConnectRequest, ConnectResponse, DebugConfiguration, Metadata, PerformActionRequest,
 };
@@ -23,6 +24,7 @@ pub struct TestSession {
     pub last_user_response_version: Option<Uuid>,
     pub last_enemy_response_version: Option<Uuid>,
     pub seed: Option<u64>,
+    pub last_commands: Option<CommandSequence>,
 }
 
 impl Default for TestSession {
@@ -43,6 +45,7 @@ impl TestSession {
             last_user_response_version: None,
             last_enemy_response_version: None,
             seed: None,
+            last_commands: None,
         }
     }
 
@@ -181,7 +184,10 @@ impl TestSession {
             Some(opponent_id),
         );
 
+        let mut all_commands = CommandSequence::default();
+
         for poll_result in result.user_poll_results {
+            all_commands.groups.extend(poll_result.commands.groups.clone());
             if metadata.user_id == self.user_id {
                 self.user_client.apply_commands(poll_result.commands);
             } else {
@@ -190,12 +196,15 @@ impl TestSession {
         }
 
         for poll_result in result.enemy_poll_results {
+            all_commands.groups.extend(poll_result.commands.groups.clone());
             if opponent_id == self.user_id {
                 self.user_client.apply_commands(poll_result.commands);
             } else {
                 self.enemy_client.apply_commands(poll_result.commands);
             }
         }
+
+        self.last_commands = Some(all_commands);
     }
 
     fn metadata(&self) -> Metadata {

@@ -292,7 +292,7 @@ pub enum StudioType {
     EnemyIdentityCard,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Eq, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub enum GameObjectId {
     CardId(ClientCardId),
