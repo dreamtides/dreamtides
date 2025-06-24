@@ -60,9 +60,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 }),
                 AbilityConfiguration {
                     targeting_prompt: Some("Select target event.".to_string()),
-                    choice_prompt: Some(
-                        "Pay 2\u{f7e4} to prevent this card from being negated?".to_string(),
-                    ),
+                    choice_prompt: Some("Pay 2\u{f7e4} to resolve this card?".to_string()),
                     ..Default::default()
                 },
             )])
