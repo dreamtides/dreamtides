@@ -8,7 +8,7 @@ use battle_state::battle::battle_state::RequestContext;
 use core_data::identifiers::UserId;
 use database::database::{Database, DatabaseError};
 use database::sqlite_database::{self, SqliteDatabase};
-use state_provider::{DisplayState, StateProvider as DisplayStateProvider};
+use state_provider::display_state_provider::{DisplayState, DisplayStateProvider};
 use uuid::Uuid;
 
 use crate::engine::PollResult;

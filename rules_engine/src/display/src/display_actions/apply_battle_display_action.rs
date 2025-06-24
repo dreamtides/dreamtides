@@ -6,7 +6,7 @@ use core_data::types::PlayerName;
 use display_data::battle_view::DisplayPlayer;
 use display_data::command::{Command, CommandSequence, PlayStudioAnimationCommand, StudioType};
 use display_data::object_position::Position;
-use state_provider::StateProvider;
+use state_provider::display_state_provider::DisplayStateProvider;
 
 use crate::core::response_builder::ResponseBuilder;
 use crate::display_actions::display_state;
@@ -14,7 +14,7 @@ use crate::display_actions::display_state;
 /// Modifies the display state of a battle and returns commands in response to
 /// the action.
 pub fn execute(
-    provider: impl StateProvider + 'static,
+    provider: impl DisplayStateProvider + 'static,
     action: BattleDisplayAction,
     player: PlayerName,
     user_id: UserId,

@@ -6,7 +6,7 @@ use battle_state::battle_player::battle_player_state::PlayerType;
 use core_data::identifiers::UserId;
 use core_data::types::PlayerName;
 use display_data::command::CommandSequence;
-use state_provider::StateProvider;
+use state_provider::display_state_provider::DisplayStateProvider;
 
 use crate::core::response_builder::ResponseBuilder;
 use crate::rendering::{animations, battle_rendering};
@@ -16,7 +16,7 @@ use crate::rendering::{animations, battle_rendering};
 pub fn connect(
     battle: &BattleState,
     user_id: UserId,
-    provider: impl StateProvider + 'static,
+    provider: impl DisplayStateProvider + 'static,
     animate: bool,
 ) -> CommandSequence {
     let mut builder = ResponseBuilder::with_state_provider(

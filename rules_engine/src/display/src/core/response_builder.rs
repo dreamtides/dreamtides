@@ -4,7 +4,7 @@ use core_data::identifiers::UserId;
 use core_data::types::PlayerName;
 use display_data::battle_view::{BattleView, DisplayPlayer};
 use display_data::command::{Command, CommandSequence, ParallelCommandGroup, UpdateBattleCommand};
-use state_provider::{DisplayState, StateProvider};
+use state_provider::display_state_provider::{DisplayState, DisplayStateProvider};
 
 /// Primary builder used to render game state.
 pub struct ResponseBuilder {
@@ -15,7 +15,7 @@ pub struct ResponseBuilder {
     user_id: Option<UserId>,
 
     /// State provider for managing display state
-    provider: Option<Arc<dyn StateProvider>>,
+    provider: Option<Arc<dyn DisplayStateProvider>>,
 
     /// Whether to animate the commands.
     animate: bool,
@@ -46,7 +46,7 @@ impl ResponseBuilder {
     pub fn with_state_provider(
         player: PlayerName,
         user_id: UserId,
-        provider: impl StateProvider + 'static,
+        provider: impl DisplayStateProvider + 'static,
         animate: bool,
     ) -> Self {
         Self {
