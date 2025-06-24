@@ -82,3 +82,34 @@ fn immolate_with_multiple_targets() {
     assert!(s.user_client.cards.enemy_void().contains(&target1_id), "correct target dissolved");
     assert!(s.user_client.cards.enemy_battlefield().contains(&target2_id), "other target remains");
 }
+
+#[test]
+fn immolate_dissolve_card_command() {
+    let mut s = TestBattle::builder().connect();
+    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
+
+    s.create_and_play(DisplayPlayer::User, CardName::Immolate);
+
+    let commands = s.last_commands.as_ref().expect("No commands found");
+
+    let dissolve_card_cmd = commands.groups.iter().flat_map(|group| &group.commands).find_map(
+        |command| match command {
+            Command::DissolveCard(cmd) => Some(cmd),
+            _ => None,
+        },
+    );
+
+    assert!(
+        dissolve_card_cmd.is_some(),
+        "dissolve card command should be present when Immolate resolves"
+    );
+
+    let dissolve_card = dissolve_card_cmd.unwrap();
+
+    assert_eq!(
+        dissolve_card.target, target_id,
+        "dissolve card command should target the correct character"
+    );
+
+    assert!(s.user_client.cards.enemy_void().contains(&target_id), "target dissolved to void");
+}
