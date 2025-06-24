@@ -14,27 +14,27 @@ fn play_fast_card_during_enemy_end_step() {
     s.add_to_hand(DisplayPlayer::User, CardName::Dreamscatter);
     s.add_to_battlefield(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
 
-    assert_eq!(s.client.cards.enemy_battlefield().len(), 1, "enemy has one character");
-    assert!(s.client.user.can_act(), "user can act on their turn");
+    assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "enemy has one character");
+    assert!(s.user_client.me.can_act(), "user can act on their turn");
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    assert!(s.client.enemy.can_act(), "enemy can act on their turn");
-    assert!(!s.client.user.can_act(), "user cannot act during enemy turn");
+    assert!(s.user_client.opponent.can_act(), "enemy can act on their turn");
+    assert!(!s.user_client.me.can_act(), "user cannot act during enemy turn");
 
     s.perform_enemy_action(BattleAction::EndTurn);
 
-    assert!(!s.client.enemy.can_act(), "enemy cannot act after ending turn");
-    assert!(s.client.user.can_act(), "user can act during enemy end step");
+    assert!(!s.user_client.opponent.can_act(), "enemy cannot act after ending turn");
+    assert!(s.user_client.me.can_act(), "user can act during enemy end step");
 
     s.play_card_from_hand(DisplayPlayer::User, &immolate_id);
 
-    assert_eq!(s.client.cards.enemy_battlefield().len(), 0, "character dissolved");
-    assert_eq!(s.client.cards.enemy_void().len(), 1, "character in enemy void");
-    assert_eq!(s.client.cards.user_void().len(), 1, "immolate in user void");
+    assert_eq!(s.user_client.cards.enemy_battlefield().len(), 0, "character dissolved");
+    assert_eq!(s.user_client.cards.enemy_void().len(), 1, "character in enemy void");
+    assert_eq!(s.user_client.cards.user_void().len(), 1, "immolate in user void");
 
     s.perform_user_action(BattleAction::StartNextTurn);
 
-    assert!(s.client.user.can_act(), "user can act on their new turn");
-    assert!(!s.client.enemy.can_act(), "enemy cannot act during user turn");
+    assert!(s.user_client.me.can_act(), "user can act on their new turn");
+    assert!(!s.user_client.opponent.can_act(), "enemy cannot act during user turn");
 }

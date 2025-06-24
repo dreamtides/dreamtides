@@ -8,12 +8,12 @@ use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_battle_extension::TestPlayCard;
 use test_utils::session::test_session_prelude::*;
 
-use super::test_helpers::assert_clients_identical;
+use crate::battle_tests::basic_tests::test_helpers;
 
 #[test]
 fn connect() {
     let s = TestBattle::builder().connect();
-    assert_clients_identical(&s);
+    test_helpers::assert_clients_identical(&s);
     assert_eq!(s.user_client.cards.user_hand().len(), 0, "user hand empty");
     assert_eq!(s.user_client.cards.enemy_hand().len(), 0, "enemy hand empty");
     assert_eq!(s.user_client.cards.user_void().len(), 0, "user void empty");
@@ -33,7 +33,7 @@ fn end_turn() {
         Some(GameMessageType::EnemyTurn),
         "enemy turn message"
     );
-    assert_clients_identical(&s);
+    test_helpers::assert_clients_identical(&s);
 }
 
 #[test]
@@ -66,7 +66,7 @@ fn turn_cycle() {
     );
     assert_eq!(s.user_client.cards.user_hand().len(), 1, "user drew card");
     assert_eq!(s.user_client.cards.enemy_hand().len(), 1, "enemy drew card");
-    assert_clients_identical(&s);
+    test_helpers::assert_clients_identical(&s);
 }
 
 #[test]
@@ -79,7 +79,7 @@ fn play_character_increase_spark() {
     assert_eq!(s.user_client.me.energy(), Energy(97), "energy spent");
     assert_eq!(s.user_client.me.total_spark(), Spark(5), "spark increased");
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "character materialized");
-    assert_clients_identical(&s);
+    test_helpers::assert_clients_identical(&s);
 }
 
 #[test]
@@ -90,7 +90,7 @@ fn play_character_score_points() {
     assert_eq!(s.user_client.me.score(), Points(0), "score unchanged");
     s.perform_enemy_action(BattleAction::EndTurn);
     assert_eq!(s.user_client.me.score(), Points(5), "score increased");
-    assert_clients_identical(&s);
+    test_helpers::assert_clients_identical(&s);
 }
 
 #[test]
@@ -103,7 +103,7 @@ fn play_character_win_battle() {
     assert_eq!(s.user_client.me.score(), Points(25), "score increased");
     assert_eq!(s.user_client.last_game_message, Some(GameMessageType::Victory), "victory message");
     assert_eq!(s.enemy_client.last_game_message, Some(GameMessageType::Defeat), "defeat message");
-    assert_clients_identical(&s);
+    test_helpers::assert_clients_identical(&s);
 }
 
 #[test]
@@ -120,7 +120,7 @@ fn energy_increment_at_turn_start() {
         Energy(1),
         "produced energy incremented by 1 more"
     );
-    assert_clients_identical(&s);
+    test_helpers::assert_clients_identical(&s);
 }
 
 #[test]
@@ -160,5 +160,5 @@ fn play_card_dissolve_target() {
     assert_eq!(s.user_client.cards.enemy_void().len(), 1, "dissolve character in enemy void");
     assert_eq!(s.user_client.cards.user_void().len(), 1, "event in user void");
 
-    assert_clients_identical(&s);
+    test_helpers::assert_clients_identical(&s);
 }
