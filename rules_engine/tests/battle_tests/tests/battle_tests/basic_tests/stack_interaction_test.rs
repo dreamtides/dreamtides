@@ -7,19 +7,6 @@ use test_utils::battle::test_battle::TestBattle;
 use test_utils::session::test_session::TestSession;
 use test_utils::session::test_session_prelude::*;
 
-fn assert_arrow_between_cards(
-    s: &TestSession,
-    source_card_id: &ClientCardId,
-    target_card_id: &ClientCardId,
-) {
-    let arrow_exists = s.user_client.arrows.iter().any(|arrow| {
-        matches!(&arrow.source, GameObjectId::CardId(id) if id == source_card_id)
-            && matches!(&arrow.target, GameObjectId::CardId(id) if id == target_card_id)
-    });
-
-    assert!(arrow_exists, "Expected arrow from {} to {}", source_card_id, target_card_id);
-}
-
 #[test]
 fn negate_card_on_stack() {
     let mut s = TestBattle::builder().connect();
@@ -101,6 +88,11 @@ fn stack_back_and_forth_with_targeting() {
     assert_arrow_between_cards(&s, &user_abolish2, &enemy_abolish1);
     assert_arrow_between_cards(&s, &enemy_abolish2, &user_abolish2);
 
+    assert_info_zoom_targeting(&s, &user_abolish1, &enemy_character);
+    assert_info_zoom_targeting(&s, &enemy_abolish1, &user_abolish1);
+    assert_info_zoom_targeting(&s, &user_abolish2, &enemy_abolish1);
+    assert_info_zoom_targeting(&s, &enemy_abolish2, &user_abolish2);
+
     s.perform_user_action(BattleAction::PassPriority);
 
     assert!(s.user_client.opponent.can_act(), "enemy can act after their card resolves");
@@ -116,6 +108,9 @@ fn stack_back_and_forth_with_targeting() {
 
     assert_arrow_between_cards(&s, &user_abolish1, &enemy_character);
     assert_arrow_between_cards(&s, &enemy_abolish1, &user_abolish1);
+
+    assert_info_zoom_targeting(&s, &user_abolish1, &enemy_character);
+    assert_info_zoom_targeting(&s, &enemy_abolish1, &user_abolish1);
 
     s.perform_enemy_action(BattleAction::PassPriority);
 
@@ -165,6 +160,9 @@ fn resolve_negate_with_removed_target() {
 
     assert_arrow_between_cards(&s, &user_abolish1, &enemy_character);
     assert_arrow_between_cards(&s, &user_abolish2, &enemy_character);
+
+    assert_info_zoom_targeting(&s, &user_abolish1, &enemy_character);
+    assert_info_zoom_targeting(&s, &user_abolish2, &enemy_character);
 
     s.perform_enemy_action(BattleAction::PassPriority);
 
@@ -218,6 +216,9 @@ fn resolve_dissolve_with_removed_target() {
     assert_arrow_between_cards(&s, &dissolve1, &character);
     assert_arrow_between_cards(&s, &dissolve2, &character);
 
+    assert_info_zoom_targeting(&s, &dissolve1, &character);
+    assert_info_zoom_targeting(&s, &dissolve2, &character);
+
     s.perform_enemy_action(BattleAction::PassPriority);
 
     assert!(s.user_client.me.can_act(), "user has priority after dissolve 2 resolves");
@@ -235,4 +236,44 @@ fn resolve_dissolve_with_removed_target() {
 
     assert!(s.user_client.cards.user_void().contains(&dissolve1), "dissolve 1 resolved to void");
     assert_eq!(s.user_client.cards.stack_cards().len(), 0, "stack is empty");
+}
+
+fn assert_arrow_between_cards(
+    s: &TestSession,
+    source_card_id: &ClientCardId,
+    target_card_id: &ClientCardId,
+) {
+    let arrow_exists = s.user_client.arrows.iter().any(|arrow| {
+        matches!(&arrow.source, GameObjectId::CardId(id) if id == source_card_id)
+            && matches!(&arrow.target, GameObjectId::CardId(id) if id == target_card_id)
+    });
+
+    assert!(arrow_exists, "Expected arrow from {} to {}", source_card_id, target_card_id);
+}
+
+fn assert_info_zoom_targeting(
+    s: &TestSession,
+    source_card_id: &ClientCardId,
+    target_card_id: &ClientCardId,
+) {
+    let source_card = s
+        .user_client
+        .cards
+        .card_map
+        .get(source_card_id)
+        .unwrap_or_else(|| panic!("Source card {} not found", source_card_id));
+
+    let has_targeting = source_card
+        .view
+        .revealed
+        .as_ref()
+        .and_then(|revealed| revealed.info_zoom_data.as_ref())
+        .map(|info_zoom| info_zoom.icons.iter().any(|icon| &icon.card_id == target_card_id))
+        .unwrap_or(false);
+
+    assert!(
+        has_targeting,
+        "Expected info zoom targeting from {} to {}",
+        source_card_id, target_card_id
+    );
 }
