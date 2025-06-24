@@ -15,9 +15,9 @@ use crate::client::test_client_player::TestClientPlayer;
 pub struct TestClient {
     pub cards: TestClientCards,
     /// A player's view of *their own* player state.
-    pub user: TestClientPlayer,
+    pub me: TestClientPlayer,
     /// A player's view of *their opponent's* player state.
-    pub enemy: TestClientPlayer,
+    pub opponent: TestClientPlayer,
     /// Current battle ID
     pub battle_id: Option<BattleId>,
     /// Current interface state (buttons, overlays, etc.)
@@ -61,12 +61,12 @@ impl TestClient {
                         if let Some(new_score) = judgment.new_score {
                             match judgment.player {
                                 DisplayPlayer::User => {
-                                    if let Some(ref mut view) = self.user.view {
+                                    if let Some(ref mut view) = self.me.view {
                                         view.score = new_score;
                                     }
                                 }
                                 DisplayPlayer::Enemy => {
-                                    if let Some(ref mut view) = self.enemy.view {
+                                    if let Some(ref mut view) = self.opponent.view {
                                         view.score = new_score;
                                     }
                                 }
@@ -75,7 +75,7 @@ impl TestClient {
                     }
                     Command::DisplayDreamwellActivation(activation) => match activation.player {
                         DisplayPlayer::User => {
-                            if let Some(ref mut view) = self.user.view {
+                            if let Some(ref mut view) = self.me.view {
                                 if let Some(energy) = activation.new_energy {
                                     view.energy = energy;
                                 }
@@ -85,7 +85,7 @@ impl TestClient {
                             }
                         }
                         DisplayPlayer::Enemy => {
-                            if let Some(ref mut view) = self.enemy.view {
+                            if let Some(ref mut view) = self.opponent.view {
                                 if let Some(energy) = activation.new_energy {
                                     view.energy = energy;
                                 }
@@ -108,8 +108,8 @@ impl TestClient {
 
         self.battle_id = Some(battle.id);
 
-        self.user.view = Some(battle.user);
-        self.enemy.view = Some(battle.enemy);
+        self.me.view = Some(battle.user);
+        self.opponent.view = Some(battle.enemy);
 
         self.cards.card_map.clear();
         for card in battle.cards {

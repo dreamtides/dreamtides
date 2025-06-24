@@ -11,20 +11,23 @@ fn negate_unless_pays_cost() {
     s.add_to_battlefield(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    let initial_enemy_energy = s.client.enemy.energy();
+    let initial_enemy_energy = s.user_client.opponent.energy();
 
     let event_id = s.create_and_play(DisplayPlayer::Enemy, CardName::Immolate);
-    let event_cost = s.client.cards.get_cost(&event_id);
+    let event_cost = s.user_client.cards.get_cost(&event_id);
     s.play_card_from_hand(DisplayPlayer::User, &negate_id);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
-    assert!(s.client.cards.stack_cards().is_empty(), "stack should be empty after cards resolve");
+    assert!(
+        s.user_client.cards.stack_cards().is_empty(),
+        "stack should be empty after cards resolve"
+    );
     assert_eq!(
-        s.client.cards.user_battlefield().len(),
+        s.user_client.cards.user_battlefield().len(),
         0,
         "character should be dissolved by Immolate"
     );
     assert_eq!(
-        s.client.enemy.energy(),
+        s.user_client.opponent.energy(),
         initial_enemy_energy - Energy(2) - event_cost,
         "enemy should have spent 2 more energy"
     );
@@ -37,20 +40,23 @@ fn negate_unless_pays_cost_decline() {
     s.add_to_battlefield(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    let initial_enemy_energy = s.client.enemy.energy();
+    let initial_enemy_energy = s.user_client.opponent.energy();
 
     let event_id = s.create_and_play(DisplayPlayer::Enemy, CardName::Immolate);
-    let event_cost = s.client.cards.get_cost(&event_id);
+    let event_cost = s.user_client.cards.get_cost(&event_id);
     s.play_card_from_hand(DisplayPlayer::User, &negate_id);
     s.click_secondary_button(DisplayPlayer::Enemy, "Decline");
-    assert!(s.client.cards.stack_cards().is_empty(), "stack should be empty after cards resolve");
+    assert!(
+        s.user_client.cards.stack_cards().is_empty(),
+        "stack should be empty after cards resolve"
+    );
     assert_eq!(
-        s.client.cards.user_battlefield().len(),
+        s.user_client.cards.user_battlefield().len(),
         1,
         "character should not be dissolved by Immolate"
     );
     assert_eq!(
-        s.client.enemy.energy(),
+        s.user_client.opponent.energy(),
         initial_enemy_energy - event_cost,
         "enemy should have only spent the original event cost"
     );
