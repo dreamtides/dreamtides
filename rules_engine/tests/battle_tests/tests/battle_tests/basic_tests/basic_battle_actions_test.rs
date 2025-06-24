@@ -199,3 +199,64 @@ fn cards_in_hand_properties() {
 
     test_helpers::assert_clients_identical(&s);
 }
+
+#[test]
+fn card_order_preserved_when_adding_new_cards() {
+    let mut s = TestBattle::builder().connect();
+
+    let first_hand_card = s.add_to_hand(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+    let second_hand_card = s.add_to_hand(DisplayPlayer::User, CardName::Immolate);
+    let third_hand_card = s.add_to_hand(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+
+    let initial_hand_order: Vec<_> =
+        s.user_client.cards.user_hand().iter().map(|c| c.id.clone()).collect();
+    assert_eq!(initial_hand_order.len(), 3, "initial hand has 3 cards");
+    assert_eq!(initial_hand_order[0], first_hand_card, "first card in correct position");
+    assert_eq!(initial_hand_order[1], second_hand_card, "second card in correct position");
+    assert_eq!(initial_hand_order[2], third_hand_card, "third card in correct position");
+
+    let first_battlefield_char =
+        s.add_to_battlefield(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+    let second_battlefield_char =
+        s.add_to_battlefield(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+
+    let initial_battlefield_order: Vec<_> =
+        s.user_client.cards.user_battlefield().iter().map(|c| c.id.clone()).collect();
+    assert_eq!(initial_battlefield_order.len(), 2, "initial battlefield has 2 characters");
+    assert_eq!(
+        initial_battlefield_order[0], first_battlefield_char,
+        "first character in correct position"
+    );
+    assert_eq!(
+        initial_battlefield_order[1], second_battlefield_char,
+        "second character in correct position"
+    );
+
+    let new_hand_card = s.add_to_hand(DisplayPlayer::User, CardName::Immolate);
+
+    let final_hand_order: Vec<_> =
+        s.user_client.cards.user_hand().iter().map(|c| c.id.clone()).collect();
+    assert_eq!(final_hand_order.len(), 4, "final hand has 4 cards");
+    assert_eq!(final_hand_order[0], first_hand_card, "first original card still in position 0");
+    assert_eq!(final_hand_order[1], second_hand_card, "second original card still in position 1");
+    assert_eq!(final_hand_order[2], third_hand_card, "third original card still in position 2");
+    assert_eq!(final_hand_order[3], new_hand_card, "new card added at end");
+
+    let new_battlefield_char =
+        s.add_to_battlefield(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+
+    let final_battlefield_order: Vec<_> =
+        s.user_client.cards.user_battlefield().iter().map(|c| c.id.clone()).collect();
+    assert_eq!(final_battlefield_order.len(), 3, "final battlefield has 3 characters");
+    assert_eq!(
+        final_battlefield_order[0], first_battlefield_char,
+        "first original character still in position 0"
+    );
+    assert_eq!(
+        final_battlefield_order[1], second_battlefield_char,
+        "second original character still in position 1"
+    );
+    assert_eq!(final_battlefield_order[2], new_battlefield_char, "new character added at end");
+
+    test_helpers::assert_clients_identical(&s);
+}
