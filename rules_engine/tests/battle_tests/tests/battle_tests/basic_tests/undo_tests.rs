@@ -95,6 +95,33 @@ fn undo_with_card_on_stack() {
 }
 
 #[test]
+fn undo_does_not_include_display_actions() {
+    let mut s = TestBattle::builder().connect();
+    let user_card = s.create_and_play(DisplayPlayer::User, CardName::Dreamscatter);
+    s.add_to_hand(DisplayPlayer::Enemy, CardName::Dreamscatter);
+    s.click_increment_button(DisplayPlayer::User);
+    s.click_increment_button(DisplayPlayer::User);
+    s.click_primary_button(DisplayPlayer::User, "Spend");
+    assert!(s.user_client.cards.stack_cards().contains(&user_card), "user card on stack");
+    assert_eq!(s.user_client.cards.stack_cards().len(), 1, "one card on stack");
+    assert_eq!(s.user_client.cards.user_hand().len(), 0, "card not in hand");
+
+    s.perform_user_action(GameAction::Undo(PlayerName::One));
+
+    assert!(s.has_primary_button(DisplayPlayer::User, "Spend"), "spend button is present again");
+
+    s.perform_user_action(GameAction::Undo(PlayerName::One));
+
+    assert!(
+        !s.user_client.cards.stack_cards().contains(&user_card),
+        "user card removed from stack"
+    );
+    assert_eq!(s.user_client.cards.stack_cards().len(), 0, "stack empty");
+    assert_eq!(s.user_client.cards.user_hand().len(), 1, "user card back in hand");
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
 fn undo_restores_points_and_spark() {
     let mut s =
         TestBattle::builder().user(TestPlayer::builder().energy(10).points(5).build()).connect();
