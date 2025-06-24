@@ -802,6 +802,7 @@ dependencies = [
  "masonry",
  "schemars",
  "serde",
+ "state_provider",
  "strum",
  "tracing",
  "tracing-subscriber",
@@ -1877,6 +1878,7 @@ dependencies = [
  "masonry",
  "rand 0.9.0",
  "serde_json",
+ "state_provider",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -2150,6 +2152,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "state_provider"
+version = "0.1.0"
+dependencies = [
+ "action_data",
+ "core_data",
+ "display_data",
+]
+
+[[package]]
 name = "strsim"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2221,12 +2232,14 @@ dependencies = [
  "bon",
  "core_data",
  "database",
+ "display",
  "display_data",
  "logging",
  "masonry",
  "rules_engine",
  "schemars",
  "serde",
+ "state_provider",
  "tokio",
  "tracing",
  "tracing-subscriber",

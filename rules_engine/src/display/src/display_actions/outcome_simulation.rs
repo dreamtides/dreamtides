@@ -22,6 +22,7 @@ use ui_components::component::Component;
 use ui_components::icon;
 
 use crate::core::adapter;
+use crate::core::response_builder::ResponseBuilder;
 use crate::display_actions::display_state;
 use crate::rendering::interface_message::{AnchorPosition, InterfaceMessage};
 
@@ -207,6 +208,7 @@ fn get_preview_cards(
 /// This function handles different types of prompts and simulates their effects
 /// to provide a preview of the resulting battle state.
 pub fn current_prompt_battle_preview(
+    builder: &ResponseBuilder,
     battle: &BattleState,
     player: PlayerName,
 ) -> Option<BattlePreviewView> {
@@ -216,7 +218,7 @@ pub fn current_prompt_battle_preview(
         match &prompt.prompt_type {
             PromptType::ChooseEnergyValue { minimum, .. } => {
                 let selected_energy =
-                    display_state::get_selected_energy_additional_cost().unwrap_or(*minimum);
+                    display_state::get_selected_energy_additional_cost(builder).unwrap_or(*minimum);
                 let action = BattleAction::SelectEnergyAdditionalCost(selected_energy);
                 Some(action_effect_preview(battle, player, action))
             }

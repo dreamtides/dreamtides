@@ -1,0 +1,12 @@
+[package]
+name = "state_provider"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+action_data = { path = "../action_data" }
+core_data = { path = "../core_data" }
+display_data = { path = "../display_data" }
+
+[lints]
+workspace = true

@@ -8,12 +8,15 @@ use battle_state::battle::battle_state::RequestContext;
 use core_data::identifiers::UserId;
 use database::database::{Database, DatabaseError};
 use database::sqlite_database::{self, SqliteDatabase};
+use state_provider::{DisplayState, StateProvider as DisplayStateProvider};
 use uuid::Uuid;
 
 use crate::engine::PollResult;
 
 /// Trait for injecting stateful dependencies into rules engine code.
-pub trait StateProvider: Clone + RefUnwindSafe + UnwindSafe + Send + Sync {
+pub trait StateProvider:
+    Clone + RefUnwindSafe + UnwindSafe + Send + Sync + DisplayStateProvider
+{
     type DatabaseImpl: Database;
 
     /// Initializes the database at the given path.
@@ -77,6 +80,9 @@ static PROCESSING_USERS: LazyLock<Mutex<HashMap<UserId, bool>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 static PENDING_UPDATES: LazyLock<Mutex<HashMap<UserId, Vec<PollResult>>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+static DISPLAY_STATES: LazyLock<Mutex<HashMap<UserId, DisplayState>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 #[derive(Clone)]
@@ -168,5 +174,17 @@ impl StateProvider for DefaultStateProvider {
             }
         }
         None
+    }
+}
+
+impl DisplayStateProvider for DefaultStateProvider {
+    fn get_display_state(&self, user_id: UserId) -> DisplayState {
+        let states = DISPLAY_STATES.lock().unwrap();
+        states.get(&user_id).cloned().unwrap_or_default()
+    }
+
+    fn set_display_state(&self, user_id: UserId, state: DisplayState) {
+        let mut states = DISPLAY_STATES.lock().unwrap();
+        states.insert(user_id, state);
     }
 }

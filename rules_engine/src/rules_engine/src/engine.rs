@@ -509,8 +509,14 @@ fn handle_request_action(
         }
         GameAction::BattleDisplayAction(action) => {
             let player = renderer::player_name_for_user(&*battle, user_id);
-            let display_commands = apply_battle_display_action::execute(action.clone(), player);
-            let mut connect_commands = renderer::connect(&*battle, user_id, true);
+            let display_commands = apply_battle_display_action::execute(
+                provider.clone(),
+                action.clone(),
+                player,
+                user_id,
+            );
+            let mut connect_commands =
+                renderer::connect_with_provider(&*battle, user_id, provider.clone(), true);
             connect_commands.groups.extend(display_commands.groups);
             handle_battle_action::append_update(
                 provider.clone(),

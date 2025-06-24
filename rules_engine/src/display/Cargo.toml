@@ -23,6 +23,7 @@ core_data = { path = "../core_data" }
 display_data = { path = "../display_data" }
 logging = { path = "../logging" }
 masonry = { path = "../masonry" }
+state_provider = { path = "../state_provider" }
 ui_components = { path = "../ui_components" }
 
 bon = "3"

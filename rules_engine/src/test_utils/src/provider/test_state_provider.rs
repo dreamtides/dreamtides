@@ -7,6 +7,7 @@ use core_data::identifiers::UserId;
 use database::database::DatabaseError;
 use rules_engine::engine::PollResult;
 use rules_engine::state_provider::StateProvider;
+use state_provider::{DisplayState, StateProvider as DisplayStateProvider};
 use uuid::Uuid;
 
 use super::test_database::TestDatabase;
@@ -23,6 +24,7 @@ struct TestStateProviderInner {
     last_response_versions: Mutex<HashMap<UserId, Uuid>>,
     processing_users: Mutex<HashMap<UserId, bool>>,
     pending_updates: Mutex<HashMap<UserId, Vec<PollResult>>>,
+    display_states: Mutex<HashMap<UserId, DisplayState>>,
 }
 
 impl TestStateProvider {
@@ -35,6 +37,7 @@ impl TestStateProvider {
                 last_response_versions: Mutex::new(HashMap::new()),
                 processing_users: Mutex::new(HashMap::new()),
                 pending_updates: Mutex::new(HashMap::new()),
+                display_states: Mutex::new(HashMap::new()),
             }),
         }
     }
@@ -175,5 +178,21 @@ impl StateProvider for TestStateProvider {
             }
         }
         None
+    }
+}
+
+impl DisplayStateProvider for TestStateProvider {
+    fn get_display_state(&self, user_id: UserId) -> DisplayState {
+        if let Ok(states) = self.inner.display_states.lock() {
+            states.get(&user_id).cloned().unwrap_or_default()
+        } else {
+            DisplayState::default()
+        }
+    }
+
+    fn set_display_state(&self, user_id: UserId, state: DisplayState) {
+        if let Ok(mut states) = self.inner.display_states.lock() {
+            states.insert(user_id, state);
+        }
     }
 }

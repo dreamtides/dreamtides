@@ -18,7 +18,7 @@ use crate::rendering::{card_rendering, identity_card_rendering, interface_render
 
 pub fn run(builder: &mut ResponseBuilder, battle: &BattleState) {
     builder.push_battle_view(battle_view(builder, battle));
-    update_display_state(battle);
+    update_display_state(builder, battle);
 
     if let BattleStatus::GameOver { winner } = battle.status {
         builder.push(Command::DisplayGameMessage(
@@ -72,22 +72,25 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
         preview: if builder.is_for_animation() {
             BattlePreviewState::Pending
         } else {
-            outcome_simulation::current_prompt_battle_preview(battle, builder.display_for_player())
-                .map(BattlePreviewState::Active)
-                .unwrap_or(BattlePreviewState::None)
+            outcome_simulation::current_prompt_battle_preview(
+                builder,
+                battle,
+                builder.display_for_player(),
+            )
+            .map(BattlePreviewState::Active)
+            .unwrap_or(BattlePreviewState::None)
         },
     }
 }
 
-fn update_display_state(battle: &BattleState) {
-    // Clear energy selection when no energy prompt is active
+fn update_display_state(builder: &ResponseBuilder, battle: &BattleState) {
     if battle
         .prompt
         .as_ref()
         .map(|p| &p.prompt_type)
         .is_none_or(|pt| !matches!(pt, PromptType::ChooseEnergyValue { .. }))
     {
-        display_state::clear_selected_energy_additional_cost();
+        display_state::clear_selected_energy_additional_cost(builder);
     }
 }
 

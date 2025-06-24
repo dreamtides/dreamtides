@@ -36,7 +36,7 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
         };
     }
 
-    let current_panel_address = display_state::get_current_panel_address();
+    let current_panel_address = display_state::get_current_panel_address(builder);
     let overlay_builder = BoxComponent::builder()
         .name("Interface Overlay")
         .style(
@@ -175,7 +175,8 @@ fn primary_action_button(
         && prompt.player == builder.act_for_player()
         && let PromptType::ChooseEnergyValue { minimum, .. } = &prompt.prompt_type
     {
-        let current = display_state::get_selected_energy_additional_cost().unwrap_or(*minimum);
+        let current =
+            display_state::get_selected_energy_additional_cost(builder).unwrap_or(*minimum);
         if legal_actions.contains(BattleAction::SelectEnergyAdditionalCost(current)) {
             return Some(ButtonView {
                 label: format!("Spend {}\u{f7e4}", current),
@@ -226,7 +227,8 @@ fn increment_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<B
         && prompt.player == builder.act_for_player()
         && let PromptType::ChooseEnergyValue { minimum, maximum } = &prompt.prompt_type
     {
-        let current = display_state::get_selected_energy_additional_cost().unwrap_or(*minimum);
+        let current =
+            display_state::get_selected_energy_additional_cost(builder).unwrap_or(*minimum);
         return Some(ButtonView {
             label: "+1\u{f7e4}".to_string(),
             action: if current + Energy(1) <= *maximum {
@@ -248,7 +250,8 @@ fn decrement_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<B
         && prompt.player == builder.act_for_player()
         && let PromptType::ChooseEnergyValue { minimum, .. } = &prompt.prompt_type
     {
-        let current = display_state::get_selected_energy_additional_cost().unwrap_or(*minimum);
+        let current =
+            display_state::get_selected_energy_additional_cost(builder).unwrap_or(*minimum);
         return Some(ButtonView {
             label: "-1\u{f7e4}".to_string(),
             action: if current > Energy(0) && current - Energy(1) >= *minimum {
@@ -273,7 +276,7 @@ fn render_hide_stack_button(
         return None;
     }
 
-    let label = if display_state::is_stack_hidden() {
+    let label = if display_state::is_stack_hidden(builder) {
         icon::EYE.to_string()
     } else {
         icon::EYE_SLASH.to_string()

@@ -1,11 +1,21 @@
+use std::sync::Arc;
+
+use core_data::identifiers::UserId;
 use core_data::types::PlayerName;
 use display_data::battle_view::{BattleView, DisplayPlayer};
 use display_data::command::{Command, CommandSequence, ParallelCommandGroup, UpdateBattleCommand};
+use state_provider::{DisplayState, StateProvider};
 
 /// Primary builder used to render game state.
 pub struct ResponseBuilder {
     /// Player for whom we are rendering
     player: PlayerName,
+
+    /// User ID for whom we are rendering
+    user_id: Option<UserId>,
+
+    /// State provider for managing display state
+    provider: Option<Arc<dyn StateProvider>>,
 
     /// Whether to animate the commands.
     animate: bool,
@@ -24,6 +34,25 @@ impl ResponseBuilder {
     pub fn new(player: PlayerName, animate: bool) -> Self {
         Self {
             player,
+            user_id: None,
+            provider: None,
+            animate,
+            commands: CommandSequence::default(),
+            for_animation: false,
+            pending_commands: Vec::new(),
+        }
+    }
+
+    pub fn with_state_provider(
+        player: PlayerName,
+        user_id: UserId,
+        provider: impl StateProvider + 'static,
+        animate: bool,
+    ) -> Self {
+        Self {
+            player,
+            user_id: Some(user_id),
+            provider: Some(Arc::new(provider)),
             animate,
             commands: CommandSequence::default(),
             for_animation: false,
@@ -90,5 +119,28 @@ impl ResponseBuilder {
         } else {
             DisplayPlayer::Enemy
         }
+    }
+
+    pub fn get_display_state(&self) -> DisplayState {
+        if let (Some(provider), Some(user_id)) = (&self.provider, &self.user_id) {
+            provider.get_display_state(*user_id)
+        } else {
+            DisplayState::default()
+        }
+    }
+
+    pub fn set_display_state(&self, state: DisplayState) {
+        if let (Some(provider), Some(user_id)) = (&self.provider, &self.user_id) {
+            provider.set_display_state(*user_id, state);
+        }
+    }
+
+    pub fn update_display_state<F>(&self, update_fn: F)
+    where
+        F: FnOnce(&mut DisplayState),
+    {
+        let mut state = self.get_display_state();
+        update_fn(&mut state);
+        self.set_display_state(state);
     }
 }

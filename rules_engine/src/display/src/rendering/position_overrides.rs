@@ -22,14 +22,14 @@ pub fn position(
     } else {
         position
     };
-    position = for_hidden_stack(position);
-    for_browser(position)
+    position = for_hidden_stack(builder, position);
+    for_browser(builder, position)
 }
 
 /// Returns the position for a card in the browser, if it is the current
 /// browser.
-pub fn for_browser(position: Position) -> Position {
-    if let Some(browser_source) = apply_battle_display_action::current_browser_source()
+pub fn for_browser(builder: &ResponseBuilder, position: Position) -> Position {
+    if let Some(browser_source) = apply_battle_display_action::current_browser_source(builder)
         && position == browser_source
     {
         Position::Browser
@@ -39,8 +39,8 @@ pub fn for_browser(position: Position) -> Position {
 }
 
 /// Returns the position for a card if the stack is hidden.
-fn for_hidden_stack(position: Position) -> Position {
-    if display_state::is_stack_hidden() && matches!(position, Position::OnStack(_)) {
+fn for_hidden_stack(builder: &ResponseBuilder, position: Position) -> Position {
+    if display_state::is_stack_hidden(builder) && matches!(position, Position::OnStack(_)) {
         Position::OnScreenStorage
     } else {
         position

@@ -16,7 +16,13 @@ fn draw_card_for_each_energy_spent() {
     assert_eq!(
         s.user_client.me.energy(),
         starting_energy - cost - Energy(3),
-        "user should have spent 3 energy"
+        "user should have spent 3 energy but has {} energy",
+        s.user_client.me.energy()
     );
-    assert_eq!(s.user_client.cards.user_hand().len(), 3, "user should have drawn 3 cards");
+    assert_eq!(
+        s.user_client.cards.user_hand().len(),
+        3,
+        "user should have drawn 3 cards but has {} cards",
+        s.user_client.cards.user_hand().len()
+    );
 }

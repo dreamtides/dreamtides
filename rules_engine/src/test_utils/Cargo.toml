@@ -21,10 +21,12 @@ battle_queries = { path = "../battle_queries" }
 battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 database = { path = "../database" }
+display = { path = "../display" }
 display_data = { path = "../display_data" }
 logging = { path = "../logging" }
 masonry = { path = "../masonry" }
 rules_engine = { path = "../rules_engine" }
+state_provider = { path = "../state_provider" }
 ui_components = { path = "../ui_components" }
 
 bon = "3"
