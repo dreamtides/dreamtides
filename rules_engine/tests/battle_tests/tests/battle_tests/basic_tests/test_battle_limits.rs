@@ -3,6 +3,7 @@ use core_data::identifiers::CardName;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use display_data::battle_view::DisplayPlayer;
+use display_data::command::GameMessageType;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::session::test_session_prelude::*;
 
@@ -93,5 +94,26 @@ fn draw_more_cards_than_deck_size_replenishes_deck() {
         deck_size_after > deck_size_before,
         "Deck should have been replenished with new cards, but has {} cards",
         deck_size_after
+    );
+}
+
+#[test]
+fn turn_limit_exceeded_ends_battle_in_draw() {
+    let mut s = TestBattle::builder().connect();
+
+    for _ in 0..25 {
+        s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+        s.end_turn_remove_opponent_hand(DisplayPlayer::Enemy);
+    }
+
+    assert!(
+        s.user_client.last_game_message == Some(GameMessageType::Defeat),
+        "User should see defeat message in a draw, but got {:?}",
+        s.user_client.last_game_message
+    );
+    assert!(
+        s.enemy_client.last_game_message == Some(GameMessageType::Defeat),
+        "Enemy should see defeat message in a draw, but got {:?}",
+        s.enemy_client.last_game_message
     );
 }
