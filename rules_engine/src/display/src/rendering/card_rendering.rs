@@ -156,11 +156,11 @@ fn card_type(battle: &BattleState, card_id: CardId) -> String {
 fn rules_text(battle: &BattleState, card_id: CardId) -> String {
     let base_text = match card::get(battle, card_id).name {
         CardName::MinstrelOfFallingLight => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
-        CardName::Immolate => "Dissolve an enemy character.".to_string(),
+        CardName::Immolate => "<b>Dissolve</b> an enemy character.".to_string(),
         CardName::RippleOfDefiance => {
-            "Negate an enemy event unless the enemy pays 2\u{f7e4}.".to_string()
+            "<b>Prevent</b> an enemy event unless the enemy pays 2\u{f7e4}.".to_string()
         }
-        CardName::Abolish => "Negate an enemy card".to_string(),
+        CardName::Abolish => "<b>Prevent</b> an enemy card.".to_string(),
         CardName::Dreamscatter => {
             "Pay one or more \u{f7e4}: Draw a card for each \u{f7e4} spent.".to_string()
         }
@@ -180,10 +180,10 @@ fn supplemental_card_info(battle: &BattleState, card_id: CardId) -> Option<Strin
     match card::get(battle, card_id).name {
         CardName::Immolate => Some("<b>Dissolve:</b> Send a character to the void".to_string()),
         CardName::RippleOfDefiance => Some(
-            "<b>Negate:</b> Send a card to the void in response to it being played".to_string(),
+            "<b>Prevent:</b> Send a card to the void in response to it being played".to_string(),
         ),
         CardName::Abolish => Some(
-            "<b>Negate:</b> Send a card to the void in response to it being played".to_string(),
+            "<b>Prevent:</b> Send a card to the void in response to it being played".to_string(),
         ),
         _ => None,
     }

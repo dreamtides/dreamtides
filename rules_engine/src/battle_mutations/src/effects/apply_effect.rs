@@ -8,9 +8,9 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_cards::stack_card_state::StackCardTargets;
 use battle_state::core::effect_source::EffectSource;
 
-use crate::card_mutations::{deck, negate};
+use crate::card_mutations::{deck, prevent};
 use crate::character_mutations::dissolve;
-use crate::effects::{negate_unless_pays_cost, pay_cost, targeting};
+use crate::effects::{pay_cost, prevent_unless_pays_cost, targeting};
 
 pub fn execute(
     battle: &mut BattleState,
@@ -45,11 +45,11 @@ fn apply_standard_effect(
         StandardEffect::DissolveCharacter { .. } => {
             dissolve(battle, source, targets);
         }
-        StandardEffect::Negate { .. } => {
-            negate(battle, source, targets);
+        StandardEffect::Prevent { .. } => {
+            prevent(battle, source, targets);
         }
-        StandardEffect::NegateUnlessPaysCost { cost, .. } => {
-            negate_unless_pays_cost::execute(battle, source, targets, cost);
+        StandardEffect::PreventUnlessPaysCost { cost, .. } => {
+            prevent_unless_pays_cost::execute(battle, source, targets, cost);
         }
         StandardEffect::OpponentPaysCost { cost } => {
             pay_cost::execute(battle, source, source.controller().opponent(), cost);
@@ -78,12 +78,12 @@ fn dissolve(
     Some(())
 }
 
-fn negate(
+fn prevent(
     battle: &mut BattleState,
     source: EffectSource,
     targets: Option<&StackCardTargets>,
 ) -> Option<()> {
     let id = targeting::stack_card_id(targets)?;
-    negate::execute(battle, source, id);
+    prevent::execute(battle, source, id);
     Some(())
 }

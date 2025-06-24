@@ -120,7 +120,7 @@ pub fn apply_effect(
 /// Returns the target ID for a given animation, if it has one.
 fn find_target_id(animation: &BattleAnimation) -> Option<CardId> {
     match animation {
-        BattleAnimation::Negate { target_id } => Some(target_id.card_id()),
+        BattleAnimation::Prevent { target_id } => Some(target_id.card_id()),
         BattleAnimation::Dissolve { target_id } => Some(target_id.card_id()),
         _ => None,
     }
