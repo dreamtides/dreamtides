@@ -20,11 +20,12 @@ use tracing::instrument;
 use uuid::Uuid;
 
 use crate::engine::PollResult;
+use crate::state_provider::StateProvider;
 
 static PENDING_UPDATES: LazyLock<Mutex<HashMap<UserId, Vec<PollResult>>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
-pub fn poll(user_id: UserId) -> Option<PollResult> {
+pub fn poll(_provider: impl StateProvider + 'static, user_id: UserId) -> Option<PollResult> {
     let mut updates = PENDING_UPDATES.lock().unwrap();
     if let Some(user_updates) = updates.get_mut(&user_id) {
         if !user_updates.is_empty() {
@@ -35,6 +36,7 @@ pub fn poll(user_id: UserId) -> Option<PollResult> {
 }
 
 pub fn append_update(
+    _provider: impl StateProvider + 'static,
     user_id: UserId,
     update: CommandSequence,
     context: &RequestContext,
@@ -50,8 +52,9 @@ pub fn append_update(
     });
 }
 
-#[instrument(name = "handle_battle_action", level = "debug", skip(battle, context))]
+#[instrument(name = "handle_battle_action", level = "debug", skip(provider, battle, context))]
 pub fn execute(
+    provider: impl StateProvider + 'static,
     battle: &mut BattleState,
     initiated_by: UserId,
     player: PlayerName,
@@ -68,7 +71,14 @@ pub fn execute(
 
         let Some(next_player) = legal_actions::next_to_act(battle) else {
             battle_trace!("Rendering updates for game over", battle);
-            render_updates(battle, initiated_by, context, request_id, PollResponseType::Final);
+            render_updates(
+                provider.clone(),
+                battle,
+                initiated_by,
+                context,
+                request_id,
+                PollResponseType::Final,
+            );
             return;
         };
 
@@ -83,6 +93,7 @@ pub fn execute(
         if let PlayerType::Agent(agent) = battle.players.player(next_player).player_type.clone() {
             battle_trace!("Rendering updates for AI player turn", battle);
             render_updates(
+                provider.clone(),
                 battle,
                 initiated_by,
                 context,
@@ -96,7 +107,14 @@ pub fn execute(
             current_player = next_player;
         } else {
             battle_trace!("Rendering updates for human player turn", battle);
-            render_updates(battle, initiated_by, context, request_id, PollResponseType::Final);
+            render_updates(
+                provider.clone(),
+                battle,
+                initiated_by,
+                context,
+                request_id,
+                PollResponseType::Final,
+            );
             battle.animations = Some(AnimationData::default());
             return;
         }
@@ -131,6 +149,7 @@ pub fn should_auto_execute_action(legal_actions: &LegalActions) -> Option<Battle
 }
 
 fn render_updates(
+    provider: impl StateProvider + 'static,
     battle: &BattleState,
     user_id: UserId,
     context: &RequestContext,
@@ -139,12 +158,12 @@ fn render_updates(
 ) {
     let player_name = renderer::player_name_for_user(battle, user_id);
     let player_updates = renderer::render_updates(battle, user_id);
-    append_update(user_id, player_updates, context, request_id, response_type);
+    append_update(provider.clone(), user_id, player_updates, context, request_id, response_type);
 
     if let PlayerType::User(opponent_id) =
         &battle.players.player(player_name.opponent()).player_type
     {
         let opponent_updates = renderer::render_updates(battle, *opponent_id);
-        append_update(*opponent_id, opponent_updates, context, request_id, response_type);
+        append_update(provider, *opponent_id, opponent_updates, context, request_id, response_type);
     }
 }

@@ -78,8 +78,8 @@ pub fn connect(
 }
 
 /// Polls for the result of a game action.
-pub fn poll(provider: impl StateProvider, user_id: UserId) -> Option<PollResponse> {
-    if let Some(poll_result) = handle_battle_action::poll(user_id) {
+pub fn poll(provider: impl StateProvider + 'static, user_id: UserId) -> Option<PollResponse> {
+    if let Some(poll_result) = handle_battle_action::poll(provider.clone(), user_id) {
         let request_id = poll_result.request_id;
         let elapsed_msg = provider.get_elapsed_time_message(request_id);
 
@@ -128,7 +128,7 @@ pub fn perform_action(provider: impl StateProvider + 'static, request: PerformAc
 /// is not desired. It executes the action immediately and waits for the final
 /// result before returning.
 pub fn perform_action_blocking(
-    provider: impl StateProvider,
+    provider: impl StateProvider + 'static,
     request: PerformActionRequest,
     enemy_id: Option<UserId>,
 ) -> PerformActionBlockingResult {
@@ -142,7 +142,7 @@ pub fn perform_action_blocking(
     let mut user_results = Vec::new();
     let mut enemy_results = Vec::new();
 
-    while let Some(poll_result) = handle_battle_action::poll(user_id) {
+    while let Some(poll_result) = handle_battle_action::poll(provider.clone(), user_id) {
         user_results.push(poll_result.clone());
         if matches!(poll_result.response_type, PollResponseType::Final) {
             break;
@@ -150,7 +150,7 @@ pub fn perform_action_blocking(
     }
 
     if let Some(enemy_user_id) = enemy_id {
-        while let Some(poll_result) = handle_battle_action::poll(enemy_user_id) {
+        while let Some(poll_result) = handle_battle_action::poll(provider.clone(), enemy_user_id) {
             enemy_results.push(poll_result.clone());
             if matches!(poll_result.response_type, PollResponseType::Final) {
                 break;
@@ -356,7 +356,10 @@ fn save_battle_to_database(
     database.write_save(save_file).map_err(|e| e.to_string())
 }
 
-fn perform_action_internal(provider: impl StateProvider, request: &PerformActionRequest) -> bool {
+fn perform_action_internal(
+    provider: impl StateProvider + 'static,
+    request: &PerformActionRequest,
+) -> bool {
     let metadata = request.metadata;
     let user_id = metadata.user_id;
     let request_id = metadata.request_id;
@@ -385,10 +388,10 @@ fn perform_action_internal(provider: impl StateProvider, request: &PerformAction
         tracing::span!(Level::DEBUG, "perform_action", ?request_id, ?request.last_response_version);
     let _enter = span.enter();
 
-    let provider_clone = provider.clone();
+    let provider = provider.clone();
     let result = catch_panic_conditionally(&provider, || {
-        let Ok(database) = provider_clone.get_database() else {
-            show_error_message(&provider_clone, user_id, None, "No database found".to_string());
+        let Ok(database) = provider.get_database() else {
+            show_error_message(provider.clone(), user_id, None, "No database found".to_string());
             return;
         };
 
@@ -401,27 +404,27 @@ fn perform_action_internal(provider: impl StateProvider, request: &PerformAction
             } else {
                 "No save file found".to_string()
             };
-            show_error_message(&provider_clone, user_id, None, error_msg);
+            show_error_message(provider.clone(), user_id, None, error_msg);
             return;
         };
 
-        let request_context = provider_clone
+        let request_context = provider
             .get_request_context(user_id)
             .unwrap_or(RequestContext { logging_options: Default::default() });
         let Some((mut battle, quest_id)) = deserialize_save_file::battle(&save, request_context)
         else {
-            show_error_message(&provider_clone, user_id, None, "No battle found".to_string());
+            show_error_message(provider.clone(), user_id, None, "No battle found".to_string());
             return;
         };
 
         battle.animations = Some(AnimationData::default());
-        handle_request_action(&provider_clone, request, user_id, save, &mut battle, request_id);
+        handle_request_action(provider.clone(), request, user_id, save, &mut battle, request_id);
 
         if let Err(error) =
             database.write_save(serialize_save_file::battle(save_file_id, quest_id, &battle))
         {
             show_error_message(
-                &provider_clone,
+                provider.clone(),
                 user_id,
                 Some(&battle),
                 format!("Failed to save battle: {}", error),
@@ -430,13 +433,14 @@ fn perform_action_internal(provider: impl StateProvider, request: &PerformAction
     });
 
     if let Err(error) = result {
-        show_error_message(&provider, user_id, None, error);
+        show_error_message(provider.clone(), user_id, None, error);
     }
 
     true
 }
 
 fn send_updates_to_user_and_opponent(
+    provider: impl StateProvider + 'static,
     battle: &BattleState,
     user_id: UserId,
     player: PlayerName,
@@ -444,6 +448,7 @@ fn send_updates_to_user_and_opponent(
     request_id: Option<Uuid>,
 ) {
     handle_battle_action::append_update(
+        provider.clone(),
         user_id,
         renderer::connect(battle, user_id, true),
         request_context,
@@ -453,6 +458,7 @@ fn send_updates_to_user_and_opponent(
 
     if let PlayerType::User(opponent_id) = &battle.players.player(player.opponent()).player_type {
         handle_battle_action::append_update(
+            provider.clone(),
             *opponent_id,
             renderer::connect(battle, *opponent_id, true),
             request_context,
@@ -463,7 +469,7 @@ fn send_updates_to_user_and_opponent(
 }
 
 fn handle_request_action(
-    provider: &impl StateProvider,
+    provider: impl StateProvider + 'static,
     request: &PerformActionRequest,
     user_id: UserId,
     save: SaveFile,
@@ -481,6 +487,7 @@ fn handle_request_action(
             debug_actions::execute(battle, user_id, player, *action);
 
             send_updates_to_user_and_opponent(
+                provider.clone(),
                 battle,
                 user_id,
                 player,
@@ -491,6 +498,7 @@ fn handle_request_action(
         GameAction::BattleAction(action) => {
             let player = renderer::player_name_for_user(&*battle, user_id);
             handle_battle_action::execute(
+                provider.clone(),
                 battle,
                 user_id,
                 player,
@@ -505,6 +513,7 @@ fn handle_request_action(
             let mut connect_commands = renderer::connect(&*battle, user_id, true);
             connect_commands.groups.extend(display_commands.groups);
             handle_battle_action::append_update(
+                provider.clone(),
                 user_id,
                 connect_commands,
                 &request_context,
@@ -517,7 +526,7 @@ fn handle_request_action(
                 deserialize_save_file::undo(&save, *player, request_context.clone())
             else {
                 show_error_message(
-                    provider,
+                    provider.clone(),
                     user_id,
                     None,
                     "Failed to undo: Battle state not found.".to_string(),
@@ -528,6 +537,7 @@ fn handle_request_action(
             *battle = undone_battle;
             let player_name = renderer::player_name_for_user(&*battle, user_id);
             send_updates_to_user_and_opponent(
+                provider.clone(),
                 battle,
                 user_id,
                 player_name,
@@ -539,7 +549,7 @@ fn handle_request_action(
 }
 
 pub fn show_error_message(
-    provider: &impl StateProvider,
+    provider: impl StateProvider + 'static,
     user_id: UserId,
     battle: Option<&BattleState>,
     error_message: String,
@@ -552,6 +562,7 @@ pub fn show_error_message(
         .get_request_context(user_id)
         .unwrap_or(RequestContext { logging_options: Default::default() });
     handle_battle_action::append_update(
+        provider.clone(),
         user_id,
         error_message::display_error_message(battle, error_message),
         &request_context,
