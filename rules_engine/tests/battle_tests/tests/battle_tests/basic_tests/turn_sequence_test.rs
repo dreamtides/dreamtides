@@ -1,7 +1,10 @@
 use battle_state::actions::battle_actions::BattleAction;
 use core_data::identifiers::CardName;
+use core_data::numerics::{Points, Spark};
 use display_data::battle_view::DisplayPlayer;
+use display_data::command::Command;
 use test_utils::battle::test_battle::TestBattle;
+use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_prelude::*;
 
 #[test]
@@ -72,5 +75,95 @@ fn play_fast_card_during_enemy_end_step() {
     assert!(
         !s.user_client.opponent.is_current_turn(),
         "enemy should have is_current_turn=false during user's new turn"
+    );
+}
+
+#[test]
+fn judgment_command_fired_when_user_score_changes() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    let _character_id = s.create_and_play(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+
+    assert_eq!(s.user_client.me.total_spark(), Spark(5), "user has spark from character");
+    assert_eq!(s.user_client.me.score(), Points(0), "user starts with no points");
+
+    s.perform_user_action(BattleAction::EndTurn);
+    s.perform_enemy_action(BattleAction::EndTurn);
+
+    assert_eq!(s.user_client.me.score(), Points(5), "user gained points from judgment");
+
+    let commands = s.last_commands.as_ref().expect("No commands found");
+
+    let judgment_commands: Vec<_> = commands
+        .groups
+        .iter()
+        .flat_map(|group| &group.commands)
+        .filter_map(|command| match command {
+            Command::DisplayJudgment(cmd) => Some(cmd),
+            _ => None,
+        })
+        .collect();
+
+    assert!(
+        !judgment_commands.is_empty(),
+        "DisplayJudgment command should be present when user score changes"
+    );
+
+    let user_judgment = judgment_commands.iter().find(|cmd| cmd.player == DisplayPlayer::User);
+    assert!(
+        user_judgment.is_some(),
+        "DisplayJudgment command should be present for user. Found commands for: {:?}",
+        judgment_commands.iter().map(|cmd| cmd.player).collect::<Vec<_>>()
+    );
+
+    let judgment_command = user_judgment.unwrap();
+    assert_eq!(
+        judgment_command.new_score,
+        Some(Points(5)),
+        "judgment command should show the new score of 5 points"
+    );
+}
+
+#[test]
+fn judgment_command_fired_when_no_score_change() {
+    let mut s = TestBattle::builder().connect();
+
+    assert_eq!(s.user_client.me.total_spark(), Spark(0), "user has no spark");
+    assert_eq!(s.user_client.opponent.total_spark(), Spark(0), "enemy has no spark");
+    assert_eq!(s.user_client.me.score(), Points(0), "user starts with no points");
+
+    s.perform_user_action(BattleAction::EndTurn);
+    s.perform_enemy_action(BattleAction::EndTurn);
+
+    assert_eq!(s.user_client.me.score(), Points(0), "user score unchanged");
+
+    let commands = s.last_commands.as_ref().expect("No commands found");
+
+    let judgment_commands: Vec<_> = commands
+        .groups
+        .iter()
+        .flat_map(|group| &group.commands)
+        .filter_map(|command| match command {
+            Command::DisplayJudgment(cmd) => Some(cmd),
+            _ => None,
+        })
+        .collect();
+
+    assert!(
+        !judgment_commands.is_empty(),
+        "DisplayJudgment command should still be present even when no score change"
+    );
+
+    let user_judgment = judgment_commands.iter().find(|cmd| cmd.player == DisplayPlayer::User);
+    assert!(
+        user_judgment.is_some(),
+        "DisplayJudgment command should be present for user. Found commands for: {:?}",
+        judgment_commands.iter().map(|cmd| cmd.player).collect::<Vec<_>>()
+    );
+
+    let judgment_command = user_judgment.unwrap();
+    assert_eq!(
+        judgment_command.new_score, None,
+        "judgment command should show no new score when score doesn't change"
     );
 }
