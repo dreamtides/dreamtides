@@ -5,7 +5,7 @@ use battle_state::actions::battle_actions::BattleAction;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
 use bon::Builder;
 use core_data::identifiers::CardName;
-use display_data::battle_view::DisplayPlayer;
+use display_data::battle_view::{ButtonView, DisplayPlayer};
 use display_data::card_view::ClientCardId;
 
 use crate::session::test_session::TestSession;
@@ -77,6 +77,34 @@ pub trait TestSessionBattleExtension {
     /// Panics if the server returns an error for clicking this button, if the
     /// label does not match, or if the button is disabled or not present.
     fn click_primary_button(&mut self, player: DisplayPlayer, containing: impl Into<String>);
+
+    /// Clicks the secondary button for the named `player` containing the given
+    /// `label`.
+    ///
+    /// Panics if the server returns an error for clicking this button, if the
+    /// label does not match, or if the button is disabled or not present.
+    fn click_secondary_button(&mut self, player: DisplayPlayer, containing: impl Into<String>);
+}
+
+fn click_button(
+    session: &mut TestSession,
+    player: DisplayPlayer,
+    button: Option<ButtonView>,
+    button_name: &str,
+    containing: &str,
+) {
+    let button = button.unwrap_or_else(|| panic!("No {} present", button_name));
+
+    if !button.label.contains(containing) {
+        panic!(
+            "{} label mismatch: expected '{}' to contain '{}'",
+            button_name, button.label, containing
+        );
+    }
+
+    let action = button.action.unwrap_or_else(|| panic!("{} is disabled", button_name));
+
+    session.perform_player_action(player, action);
 }
 
 impl TestSessionBattleExtension for TestSession {
@@ -190,18 +218,22 @@ impl TestSessionBattleExtension for TestSession {
             .as_ref()
             .expect("No interface present")
             .primary_action_button
+            .clone();
+
+        click_button(self, player, primary_button, "primary action button", &containing);
+    }
+
+    fn click_secondary_button(&mut self, player: DisplayPlayer, containing: impl Into<String>) {
+        let containing = containing.into();
+
+        let secondary_button = self
+            .client(player)
+            .interface
             .as_ref()
-            .expect("No primary action button present");
+            .expect("No interface present")
+            .secondary_action_button
+            .clone();
 
-        if !primary_button.label.contains(&containing) {
-            panic!(
-                "Primary button label mismatch: expected '{}' to contain '{}'",
-                primary_button.label, containing
-            );
-        }
-
-        let action = primary_button.action.clone().expect("Primary button is disabled");
-
-        self.perform_player_action(player, action);
+        click_button(self, player, secondary_button, "secondary action button", &containing);
     }
 }
