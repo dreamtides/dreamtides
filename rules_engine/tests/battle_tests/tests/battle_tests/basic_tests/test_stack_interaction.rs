@@ -1,8 +1,24 @@
 use battle_state::actions::battle_actions::BattleAction;
 use core_data::identifiers::CardName;
 use display_data::battle_view::DisplayPlayer;
+use display_data::card_view::ClientCardId;
+use display_data::command::GameObjectId;
 use test_utils::battle::test_battle::TestBattle;
+use test_utils::session::test_session::TestSession;
 use test_utils::session::test_session_prelude::*;
+
+fn assert_arrow_between_cards(
+    s: &TestSession,
+    source_card_id: &ClientCardId,
+    target_card_id: &ClientCardId,
+) {
+    let arrow_exists = s.user_client.arrows.iter().any(|arrow| {
+        matches!(&arrow.source, GameObjectId::CardId(id) if id == source_card_id)
+            && matches!(&arrow.target, GameObjectId::CardId(id) if id == target_card_id)
+    });
+
+    assert!(arrow_exists, "Expected arrow from {} to {}", source_card_id, target_card_id);
+}
 
 #[test]
 fn negate_card_on_stack() {
@@ -80,6 +96,11 @@ fn stack_back_and_forth_with_targeting() {
     );
     assert_eq!(s.user_client.cards.stack_cards().len(), 5, "five cards on stack");
 
+    assert_arrow_between_cards(&s, &user_abolish1, &enemy_character);
+    assert_arrow_between_cards(&s, &enemy_abolish1, &user_abolish1);
+    assert_arrow_between_cards(&s, &user_abolish2, &enemy_abolish1);
+    assert_arrow_between_cards(&s, &enemy_abolish2, &user_abolish2);
+
     s.perform_user_action(BattleAction::PassPriority);
 
     assert!(s.user_client.opponent.can_act(), "enemy can act after their card resolves");
@@ -92,6 +113,9 @@ fn stack_back_and_forth_with_targeting() {
         "user abolish2 negated to void"
     );
     assert_eq!(s.user_client.cards.stack_cards().len(), 3, "three cards after two resolve");
+
+    assert_arrow_between_cards(&s, &user_abolish1, &enemy_character);
+    assert_arrow_between_cards(&s, &enemy_abolish1, &user_abolish1);
 
     s.perform_enemy_action(BattleAction::PassPriority);
 
@@ -138,6 +162,9 @@ fn resolve_negate_with_removed_target() {
     s.play_card_from_hand(DisplayPlayer::User, &user_abolish2);
     s.select_target(DisplayPlayer::User, &enemy_character);
     assert_eq!(s.user_client.cards.stack_cards().len(), 4, "four cards on stack");
+
+    assert_arrow_between_cards(&s, &user_abolish1, &enemy_character);
+    assert_arrow_between_cards(&s, &user_abolish2, &enemy_character);
 
     s.perform_enemy_action(BattleAction::PassPriority);
 
@@ -188,6 +215,9 @@ fn resolve_dissolve_with_removed_target() {
     assert_eq!(s.user_client.cards.stack_cards().len(), 3, "three cards on stack");
     assert!(s.user_client.opponent.can_act(), "enemy has priority");
 
+    assert_arrow_between_cards(&s, &dissolve1, &character);
+    assert_arrow_between_cards(&s, &dissolve2, &character);
+
     s.perform_enemy_action(BattleAction::PassPriority);
 
     assert!(s.user_client.me.can_act(), "user has priority after dissolve 2 resolves");
@@ -196,10 +226,6 @@ fn resolve_dissolve_with_removed_target() {
     assert!(s.user_client.cards.enemy_void().contains(&character), "character dissolved to void");
 
     s.perform_user_action(BattleAction::PassPriority);
-
-    // Even though the last remaining card on the stack has no valid targets, it
-    // remains on the stack and the enemy player is allowed to respond to it.
-    // The rules engine doesn't currently "know" this card will do nothing.
 
     assert!(s.user_client.opponent.can_act(), "enemy has priority after draw resolves");
     assert_eq!(s.user_client.cards.stack_cards().len(), 1, "one card on stack");
