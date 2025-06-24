@@ -177,6 +177,9 @@ fn resolve_negate_with_removed_target() {
     assert_eq!(s.user_client.cards.stack_cards().len(), 2, "two cards left on stack");
     assert!(s.user_client.me.can_act(), "user has priority after abolish2 resolves");
 
+    assert_no_arrow_between_cards(&s, &user_abolish1, &enemy_character);
+    assert_no_info_zoom_targeting(&s, &user_abolish1, &enemy_character);
+
     s.perform_user_action(BattleAction::PassPriority);
 
     assert!(
@@ -226,6 +229,9 @@ fn resolve_dissolve_with_removed_target() {
     assert!(s.user_client.cards.user_void().contains(&dissolve2), "dissolve 2 resolved to void");
     assert!(s.user_client.cards.enemy_void().contains(&character), "character dissolved to void");
 
+    assert_no_arrow_between_cards(&s, &dissolve1, &character);
+    assert_no_info_zoom_targeting(&s, &dissolve1, &character);
+
     s.perform_user_action(BattleAction::PassPriority);
 
     assert!(s.user_client.opponent.can_act(), "enemy has priority after draw resolves");
@@ -274,6 +280,46 @@ fn assert_info_zoom_targeting(
     assert!(
         has_targeting,
         "Expected info zoom targeting from {} to {}",
+        source_card_id, target_card_id
+    );
+}
+
+fn assert_no_arrow_between_cards(
+    s: &TestSession,
+    source_card_id: &ClientCardId,
+    target_card_id: &ClientCardId,
+) {
+    let arrow_exists = s.user_client.arrows.iter().any(|arrow| {
+        matches!(&arrow.source, GameObjectId::CardId(id) if id == source_card_id)
+            && matches!(&arrow.target, GameObjectId::CardId(id) if id == target_card_id)
+    });
+
+    assert!(!arrow_exists, "Expected no arrow from {} to {}", source_card_id, target_card_id);
+}
+
+fn assert_no_info_zoom_targeting(
+    s: &TestSession,
+    source_card_id: &ClientCardId,
+    target_card_id: &ClientCardId,
+) {
+    let source_card = s
+        .user_client
+        .cards
+        .card_map
+        .get(source_card_id)
+        .unwrap_or_else(|| panic!("Source card {} not found", source_card_id));
+
+    let has_targeting = source_card
+        .view
+        .revealed
+        .as_ref()
+        .and_then(|revealed| revealed.info_zoom_data.as_ref())
+        .map(|info_zoom| info_zoom.icons.iter().any(|icon| &icon.card_id == target_card_id))
+        .unwrap_or(false);
+
+    assert!(
+        !has_targeting,
+        "Expected no info zoom targeting from {} to {}",
         source_card_id, target_card_id
     );
 }
