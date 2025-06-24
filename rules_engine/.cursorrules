@@ -28,7 +28,7 @@ all times.
   run the "just schema" command.
 - After completing work, review the code structure in .currsorrules for
   correctness and suggest any needed additions or changes.
-- Don't print a lengthy summary of changes, one sentence is fine.
+- Do not print a summary of changes after completing work.
 
 
 # PROJECT CONTEXT

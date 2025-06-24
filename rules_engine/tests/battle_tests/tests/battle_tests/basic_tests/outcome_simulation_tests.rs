@@ -1,5 +1,5 @@
 use core_data::identifiers::CardName;
-use core_data::numerics::Energy;
+use core_data::numerics::{Energy, Spark};
 use display_data::battle_view::DisplayPlayer;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
@@ -128,5 +128,20 @@ fn event_card_energy_prompt_shows_preview_with_incremental_changes() {
         preview_energy,
         initial_energy - card_cost - Energy(2),
         "preview should update with incremented energy spend"
+    );
+}
+
+#[test]
+fn character_play_effect_preview_shows_spark_increase() {
+    let mut s = TestBattle::builder().connect();
+    let initial_spark = s.user_client.me.total_spark();
+    let char_id = s.add_to_hand(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+
+    let preview = s.user_client.cards.get_play_effect_preview(&char_id);
+    let preview_spark = preview.user.total_spark.expect("preview should show user total spark");
+    assert_eq!(
+        preview_spark,
+        initial_spark + Spark(5),
+        "play effect preview should show spark increase for minstrel character"
     );
 }
