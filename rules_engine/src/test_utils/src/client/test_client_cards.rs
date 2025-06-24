@@ -58,6 +58,16 @@ impl TestClientCards {
         self.cards_at_position(&Position::InVoid(DisplayPlayer::Enemy))
     }
 
+    /// Get all cards in the user's deck
+    pub fn user_deck(&self) -> TestClientCardList {
+        self.cards_at_position(&Position::InDeck(DisplayPlayer::User))
+    }
+
+    /// Get all cards in the enemy's deck
+    pub fn enemy_deck(&self) -> TestClientCardList {
+        self.cards_at_position(&Position::InDeck(DisplayPlayer::Enemy))
+    }
+
     /// Get all cards on the stack
     pub fn stack_cards(&self) -> TestClientCardList {
         let cards = self

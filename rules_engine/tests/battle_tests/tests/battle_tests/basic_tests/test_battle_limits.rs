@@ -1,5 +1,7 @@
+use battle_state::actions::debug_battle_action::DebugBattleAction;
 use core_data::identifiers::CardName;
 use core_data::numerics::Energy;
+use core_data::types::PlayerName;
 use display_data::battle_view::DisplayPlayer;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::session::test_session_prelude::*;
@@ -61,5 +63,35 @@ fn character_limit_exceeded_abandons_character() {
         s.user_client.cards.user_void().len(),
         initial_void + 1,
         "User void should have increased by 1"
+    );
+}
+
+#[test]
+fn draw_more_cards_than_deck_size_replenishes_deck() {
+    let mut s = TestBattle::builder().connect();
+
+    s.perform_user_action(DebugBattleAction::SetCardsRemainingInDeck(PlayerName::One, 2));
+    let deck_size_before = s.user_client.cards.user_deck().len();
+    assert_eq!(deck_size_before, 2, "User deck should have 2 cards");
+    let initial_hand_size = s.user_client.cards.user_hand().len();
+    s.create_and_play(DisplayPlayer::User, CardName::Dreamscatter);
+    s.click_increment_button(DisplayPlayer::User);
+    s.click_increment_button(DisplayPlayer::User);
+    s.click_increment_button(DisplayPlayer::User);
+    s.click_primary_button(DisplayPlayer::User, "Spend");
+
+    let final_hand_size = s.user_client.cards.user_hand().len();
+    assert!(
+        final_hand_size > initial_hand_size,
+        "User should have drawn cards, initial: {}, final: {}",
+        initial_hand_size,
+        final_hand_size
+    );
+
+    let deck_size_after = s.user_client.cards.user_deck().len();
+    assert!(
+        deck_size_after > deck_size_before,
+        "Deck should have been replenished with new cards, but has {} cards",
+        deck_size_after
     );
 }
