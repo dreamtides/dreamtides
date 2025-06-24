@@ -129,7 +129,12 @@ impl TestClient {
         }
     }
 
-    /// Get the primary action button if available
+    /// Get the current interface state
+    pub fn interface(&self) -> &InterfaceView {
+        self.interface.as_ref().expect("No interface present")
+    }
+
+    /// Get the primary action button
     pub fn primary_action_button(&self) -> &ButtonView {
         self.interface
             .as_ref()
@@ -139,7 +144,7 @@ impl TestClient {
             .expect("No primary action button present")
     }
 
-    /// Get the secondary action button if available
+    /// Get the secondary action button
     pub fn secondary_action_button(&self) -> &ButtonView {
         self.interface
             .as_ref()

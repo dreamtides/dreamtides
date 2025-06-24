@@ -2,7 +2,6 @@ use core_data::identifiers::CardName;
 use core_data::numerics::Energy;
 use display_data::battle_view::DisplayPlayer;
 use test_utils::battle::test_battle::TestBattle;
-use test_utils::session::test_session_battle_extension::TestPlayCard;
 use test_utils::session::test_session_prelude::*;
 
 #[test]
@@ -14,9 +13,7 @@ fn negate_unless_pays_cost() {
 
     let initial_enemy_energy = s.client.enemy.energy();
 
-    let event_id = s.create_and_play(
-        TestPlayCard::builder().name(CardName::Immolate).as_player(DisplayPlayer::Enemy).build(),
-    );
+    let event_id = s.create_and_play(DisplayPlayer::Enemy, CardName::Immolate);
     let event_cost = s.client.cards.get_cost(&event_id);
     s.play_card_from_hand(DisplayPlayer::User, &negate_id);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
@@ -42,9 +39,7 @@ fn negate_unless_pays_cost_decline() {
 
     let initial_enemy_energy = s.client.enemy.energy();
 
-    let event_id = s.create_and_play(
-        TestPlayCard::builder().name(CardName::Immolate).as_player(DisplayPlayer::Enemy).build(),
-    );
+    let event_id = s.create_and_play(DisplayPlayer::Enemy, CardName::Immolate);
     let event_cost = s.client.cards.get_cost(&event_id);
     s.play_card_from_hand(DisplayPlayer::User, &negate_id);
     s.click_secondary_button(DisplayPlayer::Enemy, "Decline");

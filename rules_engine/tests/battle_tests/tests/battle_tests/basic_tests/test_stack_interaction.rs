@@ -2,7 +2,6 @@ use battle_state::actions::battle_actions::BattleAction;
 use core_data::identifiers::CardName;
 use display_data::battle_view::DisplayPlayer;
 use test_utils::battle::test_battle::TestBattle;
-use test_utils::session::test_session_battle_extension::TestPlayCard;
 use test_utils::session::test_session_prelude::*;
 
 use super::test_helpers::assert_clients_identical;
@@ -12,12 +11,8 @@ fn negate_card_on_stack() {
     let mut s = TestBattle::builder().connect();
     let negate_id = s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
-    let enemy_character_id = s.create_and_play(
-        TestPlayCard::builder()
-            .name(CardName::MinstrelOfFallingLight)
-            .as_player(DisplayPlayer::Enemy)
-            .build(),
-    );
+    let enemy_character_id =
+        s.create_and_play(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
 
     assert!(s.client.cards.stack_cards().contains(&enemy_character_id), "enemy character on stack");
     assert!(!s.client.enemy.can_act(), "enemy cannot act");
@@ -46,12 +41,7 @@ fn stack_back_and_forth_with_targeting() {
     let enemy_abolish2 = s.add_to_hand(DisplayPlayer::Enemy, CardName::Abolish);
     let _enemy_abolish3 = s.add_to_hand(DisplayPlayer::Enemy, CardName::Abolish);
 
-    let enemy_character = s.create_and_play(
-        TestPlayCard::builder()
-            .name(CardName::MinstrelOfFallingLight)
-            .as_player(DisplayPlayer::Enemy)
-            .build(),
-    );
+    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
 
     assert!(s.client.cards.stack_cards().contains(&enemy_character), "enemy character on stack");
     assert_eq!(s.client.cards.stack_cards().len(), 1, "one card on stack");

@@ -15,19 +15,11 @@ pub struct TestPlayCard {
     pub name: CardName,
     #[builder(into)]
     pub target: Option<ClientCardId>,
-    #[builder(into)]
-    pub as_player: Option<DisplayPlayer>,
 }
 
 impl From<CardName> for TestPlayCard {
     fn from(name: CardName) -> Self {
-        Self { name, target: None, as_player: None }
-    }
-}
-
-impl TestPlayCard {
-    pub fn player(&self) -> DisplayPlayer {
-        self.as_player.unwrap_or(DisplayPlayer::User)
+        Self { name, target: None }
     }
 }
 
@@ -43,7 +35,11 @@ pub trait TestSessionBattleExtension {
     /// cannot currently be played (e.g. due to insufficient energy).
     ///
     /// Returns the ID of the newly played card.
-    fn create_and_play(&mut self, card: impl Into<TestPlayCard>) -> ClientCardId;
+    fn create_and_play(
+        &mut self,
+        player: DisplayPlayer,
+        card: impl Into<TestPlayCard>,
+    ) -> ClientCardId;
 
     /// Plays a card from a player's hand via the standard play card action.
     ///
@@ -84,33 +80,27 @@ pub trait TestSessionBattleExtension {
     /// Panics if the server returns an error for clicking this button, if the
     /// label does not match, or if the button is disabled or not present.
     fn click_secondary_button(&mut self, player: DisplayPlayer, containing: impl Into<String>);
-}
 
-fn click_button(
-    session: &mut TestSession,
-    player: DisplayPlayer,
-    button: Option<ButtonView>,
-    button_name: &str,
-    containing: &str,
-) {
-    let button = button.unwrap_or_else(|| panic!("No {} present", button_name));
+    /// Clicks the increment button for the named `player`.
+    ///
+    /// Panics if the server returns an error for clicking this button or if the
+    /// button is disabled or not present.
+    fn click_increment_button(&mut self, player: DisplayPlayer);
 
-    if !button.label.contains(containing) {
-        panic!(
-            "{} label mismatch: expected '{}' to contain '{}'",
-            button_name, button.label, containing
-        );
-    }
-
-    let action = button.action.unwrap_or_else(|| panic!("{} is disabled", button_name));
-
-    session.perform_player_action(player, action);
+    /// Clicks the decrement button for the named `player`.
+    ///
+    /// Panics if the server returns an error for clicking this button or if the
+    /// button is disabled or not present.
+    fn click_decrement_button(&mut self, player: DisplayPlayer);
 }
 
 impl TestSessionBattleExtension for TestSession {
-    fn create_and_play(&mut self, card: impl Into<TestPlayCard>) -> ClientCardId {
+    fn create_and_play(
+        &mut self,
+        player: DisplayPlayer,
+        card: impl Into<TestPlayCard>,
+    ) -> ClientCardId {
         let card = card.into();
-        let player = card.player();
 
         let new_card_id = self.add_to_hand(player, card.name);
         self.play_card_from_hand(player, &new_card_id);
@@ -211,29 +201,44 @@ impl TestSessionBattleExtension for TestSession {
 
     fn click_primary_button(&mut self, player: DisplayPlayer, containing: impl Into<String>) {
         let containing = containing.into();
-
-        let primary_button = self
-            .client(player)
-            .interface
-            .as_ref()
-            .expect("No interface present")
-            .primary_action_button
-            .clone();
-
+        let primary_button = self.client(player).interface().primary_action_button.clone();
         click_button(self, player, primary_button, "primary action button", &containing);
     }
 
     fn click_secondary_button(&mut self, player: DisplayPlayer, containing: impl Into<String>) {
         let containing = containing.into();
-
-        let secondary_button = self
-            .client(player)
-            .interface
-            .as_ref()
-            .expect("No interface present")
-            .secondary_action_button
-            .clone();
-
+        let secondary_button = self.client(player).interface().secondary_action_button.clone();
         click_button(self, player, secondary_button, "secondary action button", &containing);
     }
+
+    fn click_increment_button(&mut self, player: DisplayPlayer) {
+        let increment_button = self.client(player).interface().increment_button.clone();
+        click_button(self, player, increment_button, "increment button", "");
+    }
+
+    fn click_decrement_button(&mut self, player: DisplayPlayer) {
+        let decrement_button = self.client(player).interface().increment_button.clone();
+        click_button(self, player, decrement_button, "decrement button", "");
+    }
+}
+
+fn click_button(
+    session: &mut TestSession,
+    player: DisplayPlayer,
+    button: Option<ButtonView>,
+    button_name: &str,
+    containing: &str,
+) {
+    let button = button.unwrap_or_else(|| panic!("No {} present", button_name));
+
+    if !button.label.contains(containing) {
+        panic!(
+            "{} label mismatch: expected '{}' to contain '{}'",
+            button_name, button.label, containing
+        );
+    }
+
+    let action = button.action.unwrap_or_else(|| panic!("{} is disabled", button_name));
+
+    session.perform_player_action(player, action);
 }

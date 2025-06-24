@@ -63,7 +63,7 @@ fn play_character_increase_spark() {
     assert_eq!(s.client.user.energy(), Energy(99), "initial energy");
     assert_eq!(s.client.user.total_spark(), Spark(0), "initial spark");
     assert_eq!(s.client.cards.user_battlefield().len(), 0, "battlefield empty");
-    s.create_and_play(CardName::MinstrelOfFallingLight);
+    s.create_and_play(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
     assert_eq!(s.client.user.energy(), Energy(97), "energy spent");
     assert_eq!(s.client.user.total_spark(), Spark(5), "spark increased");
     assert_eq!(s.client.cards.user_battlefield().len(), 1, "character materialized");
@@ -73,7 +73,7 @@ fn play_character_increase_spark() {
 #[test]
 fn play_character_score_points() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
-    s.create_and_play(CardName::MinstrelOfFallingLight);
+    s.create_and_play(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
     s.perform_user_action(BattleAction::EndTurn);
     assert_eq!(s.client.user.score(), Points(0), "score unchanged");
     s.perform_enemy_action(BattleAction::EndTurn);
@@ -85,7 +85,7 @@ fn play_character_score_points() {
 fn play_character_win_battle() {
     let mut s =
         TestBattle::builder().user(TestPlayer::builder().energy(99).points(20).build()).connect();
-    s.create_and_play(CardName::MinstrelOfFallingLight);
+    s.create_and_play(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
     s.perform_user_action(BattleAction::EndTurn);
     s.perform_enemy_action(BattleAction::EndTurn);
     assert_eq!(s.client.user.score(), Points(25), "score increased");
@@ -111,7 +111,7 @@ fn energy_increment_at_turn_start() {
 fn create_and_play() {
     let mut s = TestBattle::builder().connect();
     s.add_to_battlefield(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
-    s.create_and_play(TestPlayCard::builder().name(CardName::MinstrelOfFallingLight).build());
+    s.create_and_play(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
     test_helpers::assert_clients_identical(&s);
 }
 
@@ -128,7 +128,10 @@ fn play_card_dissolve_target() {
     assert_eq!(s.client.cards.user_void().len(), 0, "user void empty");
     assert_eq!(s.client.user.energy(), Energy(99), "initial energy");
 
-    s.create_and_play(TestPlayCard::builder().name(CardName::Immolate).target(target_id).build());
+    s.create_and_play(
+        DisplayPlayer::User,
+        TestPlayCard::builder().name(CardName::Immolate).target(target_id).build(),
+    );
 
     assert_eq!(
         s.client.cards.enemy_battlefield().len(),
