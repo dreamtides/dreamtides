@@ -2,6 +2,7 @@ use core_data::identifiers::CardName;
 use core_data::numerics::Energy;
 use display_data::battle_view::DisplayPlayer;
 use display_data::command::{Command, GameObjectId};
+use display_data::object_position::Position;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::session::test_session_prelude::*;
 
@@ -133,5 +134,45 @@ fn ripple_of_defiance_fire_projectile_only_on_decline() {
         fire_projectile.target_id,
         GameObjectId::CardId(event_id2),
         "fire projectile target should be the event being prevented"
+    );
+}
+
+#[test]
+fn ripple_of_defiance_stays_on_stack_during_prompt() {
+    let mut s = TestBattle::builder().connect();
+    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::RippleOfDefiance);
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+
+    s.create_and_play(DisplayPlayer::Enemy, CardName::Dreamscatter);
+    s.click_primary_button(DisplayPlayer::Enemy, "Spend");
+
+    s.play_card_from_hand(DisplayPlayer::User, &prevent_id);
+
+    let card_view = s
+        .user_client
+        .cards
+        .card_map
+        .get(&prevent_id)
+        .expect("Ripple of Defiance card should exist");
+
+    assert!(
+        matches!(card_view.view.position.position, Position::OnStack(_)),
+        "Ripple of Defiance should be on stack during prompt, but was at position: {:?}",
+        card_view.view.position.position
+    );
+
+    s.click_secondary_button(DisplayPlayer::Enemy, "Decline");
+
+    let card_view_after_decline = s
+        .user_client
+        .cards
+        .card_map
+        .get(&prevent_id)
+        .expect("Ripple of Defiance card should exist");
+
+    assert!(
+        !matches!(card_view_after_decline.view.position.position, Position::OnStack(_)),
+        "Ripple of Defiance should no longer be on stack after prompt resolves, but was at position: {:?}",
+        card_view_after_decline.view.position.position
     );
 }
