@@ -63,7 +63,7 @@ pub fn apply_effect(
             ));
         }
 
-        CardName::Abolish if effect_name == "Negate" => {
+        CardName::Abolish if effect_name == "Prevent" => {
             animations::push_snapshot(builder, battle);
             builder.push(Command::FireProjectile(
                 FireProjectileCommand::builder()
@@ -76,7 +76,7 @@ pub fn apply_effect(
             ));
         }
 
-        CardName::RippleOfDefiance if effect_name == "Negate" => {
+        CardName::RippleOfDefiance if effect_name == "Prevent" => {
             animations::push_snapshot(builder, battle);
             builder.push(Command::FireProjectile(
                 FireProjectileCommand::builder()
