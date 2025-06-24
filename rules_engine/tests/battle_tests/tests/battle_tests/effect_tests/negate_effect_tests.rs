@@ -1,0 +1,34 @@
+use core_data::identifiers::CardName;
+use core_data::numerics::Energy;
+use display_data::battle_view::DisplayPlayer;
+use test_utils::battle::test_battle::TestBattle;
+use test_utils::session::test_session_battle_extension::TestPlayCard;
+use test_utils::session::test_session_prelude::*;
+
+#[test]
+fn negate_unless_pays_cost() {
+    let mut s = TestBattle::builder().connect();
+    let negate_id = s.add_to_hand(DisplayPlayer::User, CardName::RippleOfDefiance);
+    s.add_to_battlefield(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+
+    let initial_enemy_energy = s.client.enemy.energy();
+
+    let event_id = s.create_and_play(
+        TestPlayCard::builder().name(CardName::Immolate).as_player(DisplayPlayer::Enemy).build(),
+    );
+    let event_cost = s.client.cards.get_cost(&event_id);
+    s.play_card_from_hand(DisplayPlayer::User, &negate_id);
+    s.click_primary_button(DisplayPlayer::Enemy, "Spend");
+    assert!(s.client.cards.stack_cards().is_empty(), "stack should be empty after cards resolve");
+    assert_eq!(
+        s.client.cards.user_battlefield().len(),
+        0,
+        "character should be dissolved by Immolate"
+    );
+    assert_eq!(
+        s.client.enemy.energy(),
+        initial_enemy_energy - Energy(2) - event_cost,
+        "enemy should have spent 2 more energy"
+    );
+}

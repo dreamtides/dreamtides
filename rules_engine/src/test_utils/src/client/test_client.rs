@@ -130,13 +130,23 @@ impl TestClient {
     }
 
     /// Get the primary action button if available
-    pub fn primary_action_button(&self) -> Option<&ButtonView> {
-        self.interface.as_ref()?.primary_action_button.as_ref()
+    pub fn primary_action_button(&self) -> &ButtonView {
+        self.interface
+            .as_ref()
+            .expect("No interface present")
+            .primary_action_button
+            .as_ref()
+            .expect("No primary action button present")
     }
 
     /// Get the secondary action button if available
-    pub fn secondary_action_button(&self) -> Option<&ButtonView> {
-        self.interface.as_ref()?.secondary_action_button.as_ref()
+    pub fn secondary_action_button(&self) -> &ButtonView {
+        self.interface
+            .as_ref()
+            .expect("No interface present")
+            .secondary_action_button
+            .as_ref()
+            .expect("No secondary action button present")
     }
 
     /// Check if the game has ended

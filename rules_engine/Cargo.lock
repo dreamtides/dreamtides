@@ -377,6 +377,7 @@ dependencies = [
  "rules_engine",
  "test_utils",
  "tokio",
+ "ui_components",
  "uuid",
 ]
 

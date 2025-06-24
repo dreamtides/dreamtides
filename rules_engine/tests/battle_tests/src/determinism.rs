@@ -26,12 +26,12 @@ pub fn run_determinism_test(
         let mut legal_actions_history = Vec::new();
 
         for _ in 0..actions_per_run {
-            let is_user_turn = session.user_client.user.can_act();
+            let is_user_turn = session.client.user.can_act();
             let is_enemy_turn = session.enemy_client.user.can_act();
 
             // Get legal actions from the appropriate client
             let all_legal_actions = if is_user_turn {
-                session.user_client.legal_actions()
+                session.client.legal_actions()
             } else if is_enemy_turn {
                 session.enemy_client.legal_actions()
             } else {
@@ -70,7 +70,7 @@ pub fn run_determinism_test(
                 session.perform_enemy_action(action);
             }
 
-            if session.user_client.is_game_over() {
+            if session.client.is_game_over() {
                 break;
             }
         }

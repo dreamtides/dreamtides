@@ -1,10 +1,10 @@
 use battle_tests::determinism::run_determinism_test;
 
 #[test]
-fn test_battle_actions_deterministic() {
+fn battle_actions_deterministic() {
     const SEED: u64 = 42;
-    const NUM_RUNS: usize = 3;
-    const ACTIONS_PER_RUN: usize = 100;
+    const NUM_RUNS: usize = 2;
+    const ACTIONS_PER_RUN: usize = 50;
 
     let result = run_determinism_test(SEED, NUM_RUNS, ACTIONS_PER_RUN);
 

@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
+use core_data::numerics::Energy;
 use display_data::battle_view::DisplayPlayer;
-use display_data::card_view::{CardView, ClientCardId};
+use display_data::card_view::{CardView, ClientCardId, RevealedCardView};
 use display_data::object_position::Position;
 
 use crate::client::test_client_card_list::TestClientCardList;
@@ -67,8 +68,27 @@ impl TestClientCards {
         TestClientCardList::new(cards)
     }
 
-    /// Get a card by its ID
-    pub fn get(&self, id: &ClientCardId) -> Option<&TestClientCard> {
-        self.card_map.get(id)
+    /// Get a card by its ID.
+    ///
+    /// Panics if the card is not found.
+    pub fn get(&self, id: &ClientCardId) -> &TestClientCard {
+        self.card_map.get(id).unwrap_or_else(|| panic!("Card not found: {}", id))
+    }
+
+    /// Get the revealed card view for a card.
+    ///
+    /// Panics if the card is not found or is not revealed.
+    pub fn get_revealed(&self, id: &ClientCardId) -> &RevealedCardView {
+        let Some(revealed) = &self.get(id).view.revealed else {
+            panic!("Card not found: {}", id);
+        };
+        revealed
+    }
+
+    /// Get the cost of a card.
+    ///
+    /// Panics if the card is not found or has no cost.
+    pub fn get_cost(&self, id: &ClientCardId) -> Energy {
+        self.get_revealed(id).cost.expect("Card has no cost")
     }
 }

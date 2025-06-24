@@ -70,6 +70,13 @@ pub trait TestSessionBattleExtension {
     /// Intended to help bypass the effects of the opponent player drawing a
     /// card for their turn.
     fn end_turn_remove_opponent_hand(&mut self, player: DisplayPlayer);
+
+    /// Clicks the primary button for the named `player` containing the given
+    /// `label`.
+    ///
+    /// Panics if the server returns an error for clicking this button, if the
+    /// label does not match, or if the button is disabled or not present.
+    fn click_primary_button(&mut self, player: DisplayPlayer, containing: impl Into<String>);
 }
 
 impl TestSessionBattleExtension for TestSession {
@@ -91,21 +98,18 @@ impl TestSessionBattleExtension for TestSession {
         let play_action = self
             .client(player)
             .cards
-            .get(card_id)
-            .and_then(|card| card.view.revealed.as_ref())
-            .and_then(|revealed| revealed.actions.can_play.clone())
+            .get_revealed(card_id)
+            .actions
+            .can_play
+            .clone()
             .expect("Card cannot be played from hand");
 
         self.perform_player_action(player, play_action);
     }
 
     fn select_target(&mut self, player: DisplayPlayer, target_id: &ClientCardId) {
-        let target_action = self
-            .client(player)
-            .cards
-            .get(target_id)
-            .and_then(|card| card.view.revealed.as_ref())
-            .and_then(|revealed| revealed.actions.on_click.clone());
+        let target_action =
+            self.client(player).cards.get_revealed(target_id).actions.on_click.clone();
 
         if target_action.is_none() {
             let battlefield_count = self.client(player).cards.user_battlefield().len();
@@ -175,5 +179,29 @@ impl TestSessionBattleExtension for TestSession {
             player,
             DebugBattleAction::MoveHandToDeck(self.to_player_name(opponent)),
         );
+    }
+
+    fn click_primary_button(&mut self, player: DisplayPlayer, containing: impl Into<String>) {
+        let containing = containing.into();
+
+        let primary_button = self
+            .client(player)
+            .interface
+            .as_ref()
+            .expect("No interface present")
+            .primary_action_button
+            .as_ref()
+            .expect("No primary action button present");
+
+        if !primary_button.label.contains(&containing) {
+            panic!(
+                "Primary button label mismatch: expected '{}' to contain '{}'",
+                primary_button.label, containing
+            );
+        }
+
+        let action = primary_button.action.clone().expect("Primary button is disabled");
+
+        self.perform_player_action(player, action);
     }
 }

@@ -8,7 +8,7 @@ use rules_engine::state_provider::{DefaultStateProvider, StateProvider};
 use uuid::Uuid;
 
 #[test]
-fn test_duplicate_action_is_ignored() {
+fn duplicate_action_is_ignored() {
     let provider = DefaultStateProvider;
     let user_id = UserId(Uuid::new_v4());
 
@@ -39,7 +39,7 @@ fn test_duplicate_action_is_ignored() {
 }
 
 #[test]
-fn test_concurrent_action_is_ignored() {
+fn concurrent_action_is_ignored() {
     let provider = DefaultStateProvider;
     let user_id = UserId(Uuid::new_v4());
 
@@ -67,7 +67,7 @@ fn test_concurrent_action_is_ignored() {
 }
 
 #[test]
-fn test_action_with_outdated_version_is_ignored() {
+fn action_with_outdated_version_is_ignored() {
     let provider = DefaultStateProvider;
     let user_id = UserId(Uuid::new_v4());
 
@@ -97,7 +97,7 @@ fn test_action_with_outdated_version_is_ignored() {
 }
 
 #[test]
-fn test_action_without_version_is_processed() {
+fn action_without_version_is_processed() {
     let provider = DefaultStateProvider;
     let user_id = UserId(Uuid::new_v4());
 
@@ -121,7 +121,7 @@ fn test_action_without_version_is_processed() {
 }
 
 #[test]
-fn test_response_version_tracking_in_poll() {
+fn response_version_tracking_in_poll() {
     let provider = DefaultStateProvider;
     let user_id = UserId(Uuid::new_v4());
 
@@ -169,7 +169,7 @@ fn test_response_version_tracking_in_poll() {
 }
 
 #[test]
-fn test_finish_processing_not_called_on_concurrent_rejection() {
+fn finish_processing_not_called_on_concurrent_rejection() {
     let provider = DefaultStateProvider;
     let user_id = UserId(Uuid::new_v4());
 
@@ -204,7 +204,7 @@ fn test_finish_processing_not_called_on_concurrent_rejection() {
 }
 
 #[test]
-fn test_finish_processing_not_called_on_version_rejection() {
+fn finish_processing_not_called_on_version_rejection() {
     let provider = DefaultStateProvider;
     let user_id = UserId(Uuid::new_v4());
 

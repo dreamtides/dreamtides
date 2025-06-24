@@ -18,7 +18,7 @@ pub struct TestSession {
     pub user_id: UserId,
     pub enemy_id: UserId,
     pub battle_id: Option<BattleId>,
-    pub user_client: TestClient,
+    pub client: TestClient,
     pub enemy_client: TestClient,
     pub last_user_response_version: Option<Uuid>,
     pub last_enemy_response_version: Option<Uuid>,
@@ -38,7 +38,7 @@ impl TestSession {
             user_id: UserId(Uuid::new_v4()),
             enemy_id: UserId(Uuid::new_v4()),
             battle_id: None,
-            user_client: TestClient::default(),
+            client: TestClient::default(),
             enemy_client: TestClient::default(),
             last_user_response_version: None,
             last_enemy_response_version: None,
@@ -48,7 +48,7 @@ impl TestSession {
 
     pub fn client(&self, name: DisplayPlayer) -> &TestClient {
         match name {
-            DisplayPlayer::User => &self.user_client,
+            DisplayPlayer::User => &self.client,
             DisplayPlayer::Enemy => &self.enemy_client,
         }
     }
@@ -82,7 +82,7 @@ impl TestSession {
         }
 
         self.last_user_response_version = Some(response.response_version);
-        self.user_client.apply_commands(response.commands.clone());
+        self.client.apply_commands(response.commands.clone());
 
         let enemy_response = engine::connect(
             self.state_provider.clone(),
@@ -175,7 +175,7 @@ impl TestSession {
 
         for poll_result in result.user_poll_results {
             if metadata.user_id == self.user_id {
-                self.user_client.apply_commands(poll_result.commands);
+                self.client.apply_commands(poll_result.commands);
             } else {
                 self.enemy_client.apply_commands(poll_result.commands);
             }
@@ -183,7 +183,7 @@ impl TestSession {
 
         for poll_result in result.enemy_poll_results {
             if opponent_id == self.user_id {
-                self.user_client.apply_commands(poll_result.commands);
+                self.client.apply_commands(poll_result.commands);
             } else {
                 self.enemy_client.apply_commands(poll_result.commands);
             }
