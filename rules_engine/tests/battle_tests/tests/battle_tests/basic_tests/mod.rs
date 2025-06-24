@@ -4,6 +4,7 @@ mod battle_display_action_tests;
 mod battle_limits_test;
 mod duplicate_action_prevention_test;
 mod enemy_message_tests;
+mod outcome_simulation_tests;
 mod stack_interaction_test;
 mod test_helpers;
 mod turn_sequence_test;
