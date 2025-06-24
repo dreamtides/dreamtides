@@ -54,9 +54,6 @@ fn apply_standard_effect(
         StandardEffect::OpponentPaysCost { cost } => {
             pay_cost::execute(battle, source, source.controller().opponent(), cost);
         }
-        StandardEffect::PayCost { cost } => {
-            pay_cost::execute(battle, source, source.controller(), cost);
-        }
         _ => todo!("Implement {:?}", effect),
     }
 }
