@@ -1,6 +1,3 @@
-use std::collections::HashMap;
-use std::sync::{LazyLock, Mutex};
-
 use ai_agents::agent_search;
 use battle_mutations::actions::apply_battle_action;
 use battle_queries::battle_trace;
@@ -22,21 +19,12 @@ use uuid::Uuid;
 use crate::engine::PollResult;
 use crate::state_provider::StateProvider;
 
-static PENDING_UPDATES: LazyLock<Mutex<HashMap<UserId, Vec<PollResult>>>> =
-    LazyLock::new(|| Mutex::new(HashMap::new()));
-
-pub fn poll(_provider: impl StateProvider + 'static, user_id: UserId) -> Option<PollResult> {
-    let mut updates = PENDING_UPDATES.lock().unwrap();
-    if let Some(user_updates) = updates.get_mut(&user_id) {
-        if !user_updates.is_empty() {
-            return Some(user_updates.remove(0));
-        }
-    }
-    None
+pub fn poll(provider: impl StateProvider + 'static, user_id: UserId) -> Option<PollResult> {
+    provider.take_next_poll_result(user_id)
 }
 
 pub fn append_update(
-    _provider: impl StateProvider + 'static,
+    provider: impl StateProvider + 'static,
     user_id: UserId,
     update: CommandSequence,
     context: &RequestContext,
@@ -44,8 +32,7 @@ pub fn append_update(
     response_type: PollResponseType,
 ) {
     write_tracing_event::write_commands(&update, context);
-    let mut updates = PENDING_UPDATES.lock().unwrap();
-    updates.entry(user_id).or_default().push(PollResult {
+    provider.append_poll_result(user_id, PollResult {
         commands: update,
         request_id,
         response_type,

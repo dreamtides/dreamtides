@@ -5,6 +5,7 @@ use std::time::Instant;
 use battle_state::battle::battle_state::RequestContext;
 use core_data::identifiers::UserId;
 use database::database::DatabaseError;
+use rules_engine::engine::PollResult;
 use rules_engine::state_provider::StateProvider;
 use uuid::Uuid;
 
@@ -21,6 +22,7 @@ struct TestStateProviderInner {
     request_timestamps: Mutex<HashMap<Option<Uuid>, Instant>>,
     last_response_versions: Mutex<HashMap<UserId, Uuid>>,
     processing_users: Mutex<HashMap<UserId, bool>>,
+    pending_updates: Mutex<HashMap<UserId, Vec<PollResult>>>,
 }
 
 impl TestStateProvider {
@@ -32,6 +34,7 @@ impl TestStateProvider {
                 request_timestamps: Mutex::new(HashMap::new()),
                 last_response_versions: Mutex::new(HashMap::new()),
                 processing_users: Mutex::new(HashMap::new()),
+                pending_updates: Mutex::new(HashMap::new()),
             }),
         }
     }
@@ -155,5 +158,22 @@ impl StateProvider for TestStateProvider {
 
     fn should_panic_on_error(&self) -> bool {
         true
+    }
+
+    fn append_poll_result(&self, user_id: UserId, result: PollResult) {
+        if let Ok(mut updates) = self.inner.pending_updates.lock() {
+            updates.entry(user_id).or_default().push(result);
+        }
+    }
+
+    fn take_next_poll_result(&self, user_id: UserId) -> Option<PollResult> {
+        if let Ok(mut updates) = self.inner.pending_updates.lock() {
+            if let Some(user_updates) = updates.get_mut(&user_id) {
+                if !user_updates.is_empty() {
+                    return Some(user_updates.remove(0));
+                }
+            }
+        }
+        None
     }
 }

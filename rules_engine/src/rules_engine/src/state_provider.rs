@@ -10,6 +10,8 @@ use database::database::{Database, DatabaseError};
 use database::sqlite_database::{self, SqliteDatabase};
 use uuid::Uuid;
 
+use crate::engine::PollResult;
+
 /// Trait for injecting stateful dependencies into rules engine code.
 pub trait StateProvider: Clone + RefUnwindSafe + UnwindSafe + Send + Sync {
     type DatabaseImpl: Database;
@@ -48,6 +50,13 @@ pub trait StateProvider: Clone + RefUnwindSafe + UnwindSafe + Send + Sync {
     /// Returns true if we're currently processing a request for a user.
     fn is_processing(&self, user_id: UserId) -> bool;
 
+    /// Appends a poll result for the given user.
+    fn append_poll_result(&self, user_id: UserId, result: PollResult);
+
+    /// Takes the next poll result for the given user, removing it from the
+    /// queue.
+    fn take_next_poll_result(&self, user_id: UserId) -> Option<PollResult>;
+
     /// Returns true if errors should panic the current test, used in test
     /// environments.
     fn should_panic_on_error(&self) -> bool {
@@ -65,6 +74,9 @@ static LAST_RESPONSE_VERSIONS: LazyLock<Mutex<HashMap<UserId, Uuid>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 static PROCESSING_USERS: LazyLock<Mutex<HashMap<UserId, bool>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+static PENDING_UPDATES: LazyLock<Mutex<HashMap<UserId, Vec<PollResult>>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 #[derive(Clone)]
@@ -141,5 +153,20 @@ impl StateProvider for DefaultStateProvider {
     fn is_processing(&self, user_id: UserId) -> bool {
         let processing = PROCESSING_USERS.lock().unwrap();
         processing.get(&user_id).copied().unwrap_or(false)
+    }
+
+    fn append_poll_result(&self, user_id: UserId, result: PollResult) {
+        let mut updates = PENDING_UPDATES.lock().unwrap();
+        updates.entry(user_id).or_default().push(result);
+    }
+
+    fn take_next_poll_result(&self, user_id: UserId) -> Option<PollResult> {
+        let mut updates = PENDING_UPDATES.lock().unwrap();
+        if let Some(user_updates) = updates.get_mut(&user_id) {
+            if !user_updates.is_empty() {
+                return Some(user_updates.remove(0));
+            }
+        }
+        None
     }
 }
