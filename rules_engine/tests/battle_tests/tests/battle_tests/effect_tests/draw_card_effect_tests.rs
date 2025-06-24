@@ -5,6 +5,7 @@ use display_data::command::Command;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_prelude::*;
+use ui_components::icon;
 
 #[test]
 fn draw_card_for_each_energy_spent() {
@@ -166,5 +167,29 @@ fn battle_preview_shows_energy_changes_for_incremental_spending() {
         s.user_client.cards.user_hand().len(),
         2,
         "user should have drawn 2 cards for 2 additional energy spent"
+    );
+}
+
+#[test]
+fn dreamscatter_rules_text_shows_energy_spent_on_stack() {
+    let mut s = TestBattle::builder().connect();
+    s.add_to_hand(DisplayPlayer::Enemy, CardName::Abolish);
+
+    let dreamscatter_id = s.create_and_play(DisplayPlayer::User, CardName::Dreamscatter);
+    s.click_increment_button(DisplayPlayer::User);
+    s.click_increment_button(DisplayPlayer::User);
+    s.click_primary_button(DisplayPlayer::User, "Spend");
+
+    assert!(
+        s.user_client.cards.stack_cards().contains(&dreamscatter_id),
+        "Dreamscatter should be on the stack"
+    );
+
+    let rules_text = s.user_client.cards.get_revealed(&dreamscatter_id).rules_text.clone();
+
+    assert!(
+        rules_text.contains(&format!("(3{} paid)", icon::ENERGY)),
+        "Rules text should show 3 energy paid in parentheses, but got: '{}'",
+        rules_text
     );
 }
