@@ -9,6 +9,7 @@ use display_data::command::{
 
 use crate::client::test_client_cards::{TestClientCard, TestClientCards};
 use crate::client::test_client_player::TestClientPlayer;
+use crate::client::test_interface_view::TestInterfaceView;
 
 /// Represents a user client connected to a test game
 #[derive(Default)]
@@ -21,7 +22,7 @@ pub struct TestClient {
     /// Current battle ID
     pub battle_id: Option<BattleId>,
     /// Current interface state (buttons, overlays, etc.)
-    pub interface: Option<InterfaceView>,
+    pub interface: TestInterfaceView,
     /// Current arrows displayed between cards
     pub arrows: Vec<DisplayArrow>,
     /// Current battle preview state
@@ -118,7 +119,7 @@ impl TestClient {
                 .insert(card.id.clone(), TestClientCard { id: card.id.clone(), view: card });
         }
 
-        self.interface = Some(battle.interface);
+        self.interface = TestInterfaceView::new(Some(battle.interface));
 
         self.arrows = battle.arrows;
 
@@ -131,12 +132,13 @@ impl TestClient {
 
     /// Get the current interface state
     pub fn interface(&self) -> &InterfaceView {
-        self.interface.as_ref().expect("No interface present")
+        self.interface.view.as_ref().expect("No interface present")
     }
 
     /// Get the primary action button
     pub fn primary_action_button(&self) -> &ButtonView {
         self.interface
+            .view
             .as_ref()
             .expect("No interface present")
             .primary_action_button
@@ -147,6 +149,7 @@ impl TestClient {
     /// Get the secondary action button
     pub fn secondary_action_button(&self) -> &ButtonView {
         self.interface
+            .view
             .as_ref()
             .expect("No interface present")
             .secondary_action_button
@@ -176,7 +179,7 @@ impl TestClient {
 
     /// Check if any overlay is currently shown
     pub fn has_screen_overlay(&self) -> bool {
-        self.interface.as_ref().and_then(|i| i.screen_overlay.as_ref()).is_some()
+        self.interface.view.as_ref().and_then(|i| i.screen_overlay.as_ref()).is_some()
     }
 
     /// Get all legal actions currently available in the interface
@@ -184,7 +187,7 @@ impl TestClient {
         let mut actions = Vec::new();
 
         // Collect actions from interface buttons
-        if let Some(interface) = &self.interface {
+        if let Some(interface) = &self.interface.view {
             if let Some(button) = &interface.primary_action_button {
                 if let Some(action) = &button.action {
                     actions.push(action.clone());
