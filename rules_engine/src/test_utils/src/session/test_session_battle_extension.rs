@@ -3,18 +3,26 @@ use std::collections::HashSet;
 use action_data::game_action_data::GameAction;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
-use bon::Builder;
 use core_data::identifiers::CardName;
 use display_data::battle_view::{ButtonView, DisplayPlayer};
 use display_data::card_view::ClientCardId;
 
 use crate::session::test_session::TestSession;
 
-#[derive(Builder)]
 pub struct TestPlayCard {
     pub name: CardName,
-    #[builder(into)]
     pub target: Option<ClientCardId>,
+}
+
+impl TestPlayCard {
+    pub fn new(name: CardName) -> Self {
+        Self { name, target: None }
+    }
+
+    pub fn target(mut self, target: &ClientCardId) -> Self {
+        self.target = Some(target.clone());
+        self
+    }
 }
 
 impl From<CardName> for TestPlayCard {
@@ -73,6 +81,12 @@ pub trait TestSessionBattleExtension {
     /// Panics if the server returns an error for clicking this button, if the
     /// label does not match, or if the button is disabled or not present.
     fn click_primary_button(&mut self, player: DisplayPlayer, containing: impl Into<String>);
+
+    /// Checks if the primary button for the named `player` contains the given
+    /// `label`.
+    ///
+    /// Returns true if the button is present and enabled, false otherwise.
+    fn has_primary_button(&mut self, player: DisplayPlayer, containing: impl Into<String>) -> bool;
 
     /// Clicks the secondary button for the named `player` containing the given
     /// `label`.
@@ -203,6 +217,12 @@ impl TestSessionBattleExtension for TestSession {
         let containing = containing.into();
         let primary_button = self.client(player).interface().primary_action_button.clone();
         click_button(self, player, primary_button, "primary action button", &containing);
+    }
+
+    fn has_primary_button(&mut self, player: DisplayPlayer, containing: impl Into<String>) -> bool {
+        let containing = containing.into();
+        let primary_button = self.client(player).interface().primary_action_button.clone();
+        primary_button.map(|b| b.label.contains(&containing)).unwrap_or(false)
     }
 
     fn click_secondary_button(&mut self, player: DisplayPlayer, containing: impl Into<String>) {

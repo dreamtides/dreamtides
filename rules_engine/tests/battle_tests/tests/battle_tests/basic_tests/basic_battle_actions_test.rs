@@ -149,7 +149,7 @@ fn play_card_dissolve_target() {
 
     s.create_and_play(
         DisplayPlayer::User,
-        TestPlayCard::builder().name(CardName::Immolate).target(target_id).build(),
+        TestPlayCard::new(CardName::Immolate).target(&target_id),
     );
 
     assert_eq!(
