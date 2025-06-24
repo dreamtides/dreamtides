@@ -2,6 +2,7 @@ use battle_state::actions::battle_actions::BattleAction;
 use core_data::identifiers::CardName;
 use core_data::numerics::{Energy, Points, Spark};
 use display_data::battle_view::DisplayPlayer;
+use display_data::card_view::CardPrefab;
 use display_data::command::GameMessageType;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
@@ -159,6 +160,42 @@ fn play_card_dissolve_target() {
     );
     assert_eq!(s.user_client.cards.enemy_void().len(), 1, "dissolve character in enemy void");
     assert_eq!(s.user_client.cards.user_void().len(), 1, "event in user void");
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn cards_in_hand_properties() {
+    let mut s = TestBattle::builder().connect();
+
+    let character_id = s.add_to_hand(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+    let event_id = s.add_to_hand(DisplayPlayer::User, CardName::Immolate);
+
+    assert_eq!(s.user_client.cards.user_hand().len(), 2, "user has 2 cards in hand");
+
+    let character_card = s.user_client.cards.get(&character_id);
+    let event_card = s.user_client.cards.get(&event_id);
+
+    assert_eq!(s.user_client.cards.get_cost(&character_id), Energy(2), "minstrel character cost");
+    assert_eq!(s.user_client.cards.get_cost(&event_id), Energy(2), "immolate event cost");
+
+    let character_revealed = s.user_client.cards.get_revealed(&character_id);
+    let event_revealed = s.user_client.cards.get_revealed(&event_id);
+
+    assert_eq!(character_revealed.spark, Some(Spark(5)), "minstrel character spark");
+    assert_eq!(character_revealed.name, "Minstrel of Falling Light", "character name");
+    assert_eq!(character_revealed.card_type, "Musician", "character type");
+
+    assert_eq!(event_revealed.spark, None, "event card should have no spark");
+    assert_eq!(event_revealed.name, "Immolate", "event name");
+    assert_eq!(event_revealed.card_type, "\u{f0e7} Event", "event type");
+
+    assert_eq!(character_card.view.prefab, CardPrefab::Character, "character uses character frame");
+    assert_eq!(
+        event_card.view.prefab,
+        CardPrefab::Character,
+        "event currently uses character frame"
+    );
 
     test_helpers::assert_clients_identical(&s);
 }
