@@ -82,12 +82,6 @@ pub trait TestSessionBattleExtension {
     /// label does not match, or if the button is disabled or not present.
     fn click_primary_button(&mut self, player: DisplayPlayer, containing: impl Into<String>);
 
-    /// Checks if the primary button for the named `player` contains the given
-    /// `label`.
-    ///
-    /// Returns true if the button is present and enabled, false otherwise.
-    fn has_primary_button(&mut self, player: DisplayPlayer, containing: impl Into<String>) -> bool;
-
     /// Clicks the secondary button for the named `player` containing the given
     /// `label`.
     ///
@@ -217,12 +211,6 @@ impl TestSessionBattleExtension for TestSession {
         let containing = containing.into();
         let primary_button = self.client(player).interface().primary_action_button.clone();
         click_button(self, player, primary_button, "primary action button", &containing);
-    }
-
-    fn has_primary_button(&mut self, player: DisplayPlayer, containing: impl Into<String>) -> bool {
-        let containing = containing.into();
-        let primary_button = self.client(player).interface().primary_action_button.clone();
-        primary_button.map(|b| b.label.contains(&containing)).unwrap_or(false)
     }
 
     fn click_secondary_button(&mut self, player: DisplayPlayer, containing: impl Into<String>) {

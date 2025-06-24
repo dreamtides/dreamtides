@@ -81,7 +81,10 @@ fn undo_with_card_on_stack() {
 
     s.perform_user_action(GameAction::Undo(PlayerName::One));
 
-    assert!(s.has_primary_button(DisplayPlayer::User, "Spend"), "spend button is present again");
+    assert!(
+        s.user_client.interface.primary_action_button_contains("Spend"),
+        "spend button is present again"
+    );
 
     s.perform_user_action(GameAction::Undo(PlayerName::One));
 
@@ -108,7 +111,10 @@ fn undo_does_not_include_display_actions() {
 
     s.perform_user_action(GameAction::Undo(PlayerName::One));
 
-    assert!(s.has_primary_button(DisplayPlayer::User, "Spend"), "spend button is present again");
+    assert!(
+        s.user_client.interface.primary_action_button_contains("Spend"),
+        "spend button is present again"
+    );
 
     s.perform_user_action(GameAction::Undo(PlayerName::One));
 
