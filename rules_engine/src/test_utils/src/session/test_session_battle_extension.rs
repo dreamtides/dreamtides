@@ -217,7 +217,7 @@ impl TestSessionBattleExtension for TestSession {
     }
 
     fn click_decrement_button(&mut self, player: DisplayPlayer) {
-        let decrement_button = self.client(player).interface().increment_button.clone();
+        let decrement_button = self.client(player).interface().decrement_button.clone();
         click_button(self, player, decrement_button, "decrement button", "");
     }
 }
