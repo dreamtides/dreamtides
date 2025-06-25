@@ -35,7 +35,7 @@ namespace Dreamtides.Services
 
     bool IsTestOpponentClient => Application.dataPath.Contains("test_client");
 
-    bool UseDevServer => false;
+    bool UseDevServer => Application.isEditor && !IsTestOpponentClient;
 
     public bool Connected { get; private set; }
 

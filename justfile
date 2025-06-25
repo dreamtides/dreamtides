@@ -142,7 +142,7 @@ check-format:
 check-docs:
     RUSTDOCFLAGS="-D rustdoc::broken-intra-doc-links -D rustdoc::private-intra-doc-links -D rustdoc::bare-urls" cargo doc --manifest-path rules_engine/Cargo.toml --all
 
-unity-tests:
+unity-tests: mac-plugin
     ./client/scripts/test.py
 
 outdated:
