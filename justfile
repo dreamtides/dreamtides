@@ -227,3 +227,14 @@ pull:
 
 coverage:
     cargo tarpaulin --manifest-path rules_engine/Cargo.toml --out Html
+
+rsync-review:
+    rsync --delete --stats --copy-links -avqr ./rules_engine ~/dreamtides_tests/
+    rsync --delete --stats --copy-links -avqr ./client ~/dreamtides_tests/
+    cp justfile ~/dreamtides_tests/
+
+code-review-rsync: rsync-review
+    cd ~/dreamtides_tests && just code-review
+
+unity-test-rsync: rsync-review
+    cd ~/dreamtides_tests && just unity-tests

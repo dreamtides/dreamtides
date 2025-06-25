@@ -117,54 +117,6 @@ def print_detailed_failures(results_path):
     except FileNotFoundError:
         print("Test results file not found")
 
-def check_rsync_available():
-    try:
-        subprocess.run(["rsync", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-        return True
-    except (subprocess.SubprocessError, FileNotFoundError):
-        return False
-
-def sync_project_to_temp(project_root):
-    home_dir = Path.home()
-    final_project_path = home_dir / "unity_tests/test_client"
-
-    temp_parent = Path(home_dir / "unity_tests")
-    temp_parent.mkdir(parents=True, exist_ok=True)
-
-    print(f"Syncing project to {final_project_path}...")
-
-    source_path = str(project_root) + "/"
-    rsync_cmd = [
-        "rsync",
-        "--delete",
-        "--stats",
-        "--copy-links",
-        "-avqr",
-        source_path,
-        str(final_project_path)
-    ]
-
-    print(rsync_cmd)
-
-    try:
-        subprocess.run(
-            rsync_cmd,
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
-        )
-        print("Sync completed successfully to", final_project_path)
-
-        return str(final_project_path)
-    except subprocess.CalledProcessError as e:
-        print(f"Error syncing project: {e}")
-        print(f"stderr: {e.stderr}")
-        sys.exit(1)
-    except (shutil.Error, OSError) as e:
-        print(f"Error moving project directory: {e}")
-        sys.exit(1)
-
 def read_previous_run_time(test_output_dir):
     run_time_file = test_output_dir / "run_time.txt"
     if run_time_file.exists():
@@ -220,19 +172,8 @@ def monitor_log_file(log_file_path, estimated_time, start_time):
         time.sleep(0.1)
 
 def main():
-    parser = argparse.ArgumentParser(description="Run Unity tests or sync project files.")
-    parser.add_argument("--sync-only", action="store_true", help="Only sync project files without running tests")
-    args = parser.parse_args()
-
-    if args.sync_only:
-        print("Running in sync-only mode...")
-    else:
-        print("Starting Unity tests...")
-
-    if not check_rsync_available():
-        print("Error: rsync binary not found on the system")
-        print("Please install rsync before running tests")
-        sys.exit(1)
+    argparse.ArgumentParser(description="Run Unity tests.") 
+    print("Starting Unity tests...")
 
     script_dir = Path(__file__).parent
     project_root = script_dir.parent
@@ -240,29 +181,23 @@ def main():
 
     previous_run_time = 300  # Default to 5 minutes
 
-    if not args.sync_only:
-        previous_run_time = read_previous_run_time(test_output_dir)
-        if previous_run_time:
-            print(f"Previous test run took {format_time(previous_run_time)}")
+    previous_run_time = read_previous_run_time(test_output_dir) 
+    if previous_run_time:
+        print(f"Previous test run took {format_time(previous_run_time)}")
 
-        if test_output_dir.exists():
-            shutil.rmtree(test_output_dir)
-        test_output_dir.mkdir(exist_ok=True)
-
-    project_path = sync_project_to_temp(project_root)
-
-    if args.sync_only:
-        print("Project sync completed. Exiting without running tests.")
-        sys.exit(0)
+    if test_output_dir.exists():
+        shutil.rmtree(test_output_dir)
+    test_output_dir.mkdir(exist_ok=True)
 
     unity_path = get_unity_path()
     test_results = str(test_output_dir / "results.xml")
     log_file = str(test_output_dir / "logs.txt")
+    project_path = Path.home() / "dreamtides_tests/client"
 
     unity_args = [
         "-runTests",
         "-batchmode",
-        f"-projectPath", project_path,
+        f"-projectPath", str(project_path),
         f"-testResults", test_results,
         "-testPlatform", "PlayMode",
         f"-logFile", log_file
