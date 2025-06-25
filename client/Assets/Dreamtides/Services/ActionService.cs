@@ -35,6 +35,8 @@ namespace Dreamtides.Services
 
     bool IsTestOpponentClient => Application.dataPath.Contains("test_client");
 
+    bool UseDevServer => false;
+
     public bool Connected { get; private set; }
 
     protected override void OnInitialize(TestConfiguration? testConfiguration)
@@ -61,7 +63,7 @@ namespace Dreamtides.Services
       };
       Registry.LoggingService.StartSpan(LogSpanName.Connect);
 
-      if (Application.isEditor)
+      if (UseDevServer)
       {
         StartCoroutine(DevServerConnectAsync(request, reconnect: false));
       }
@@ -98,7 +100,7 @@ namespace Dreamtides.Services
       }
       else if (_metadata != null)
       {
-        if (Application.isEditor)
+        if (UseDevServer)
         {
           StartCoroutine(DevServerPollAsync(new PollRequest
           {
@@ -156,7 +158,7 @@ namespace Dreamtides.Services
         SaveFileId = IsTestOpponentClient ? _userGuid : null,
         TestScenario = _testScenario,
       };
-      if (Application.isEditor)
+      if (UseDevServer)
       {
         StartCoroutine(PerformDevServerActionAsync(request));
       }
@@ -179,7 +181,7 @@ namespace Dreamtides.Services
     /// </summary>
     public void Log(ClientLogRequest request)
     {
-      if (Application.isEditor)
+      if (UseDevServer)
       {
         StartCoroutine(DevServerLogAsync(request));
       }
