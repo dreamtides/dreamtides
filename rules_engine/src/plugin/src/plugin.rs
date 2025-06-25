@@ -56,7 +56,13 @@ unsafe fn connect_impl(
         },
     };
     logging::maybe_initialize(&context);
-    let scene = engine::connect(DefaultStateProvider, &deserialized_request, context);
+
+    let scene = if let Some(scenario) = deserialized_request.test_scenario.as_ref() {
+        client_test_scenarios::connect(&deserialized_request, scenario)
+    } else {
+        engine::connect(DefaultStateProvider, &deserialized_request, context)
+    };
+
     let json = serde_json::to_string(&scene)?;
     let json_bytes = json.as_bytes();
 
@@ -99,14 +105,19 @@ unsafe fn perform_impl(
     let deserialized_request = serde_json::from_slice::<PerformActionRequest>(request_data)?;
     let metadata = deserialized_request.metadata;
 
-    TOKIO_RUNTIME.spawn(async move {
-        engine::perform_action(DefaultStateProvider, deserialized_request);
-    });
+    let response_data = if let Some(scenario) = deserialized_request.test_scenario.as_ref() {
+        client_test_scenarios::perform_action(&deserialized_request, scenario)
+    } else {
+        TOKIO_RUNTIME.spawn(async move {
+            engine::perform_action(DefaultStateProvider, deserialized_request);
+        });
 
-    // Currently we do not return any commands from the perform action call, but
-    // maybe one day we will as an optimization.
-    let empty_commands = PerformActionResponse { metadata, commands: CommandSequence::default() };
-    let json = serde_json::to_string(&empty_commands)?;
+        // Currently we do not return any commands from the perform action call, but
+        // maybe one day we will as an optimization.
+        PerformActionResponse { metadata, commands: CommandSequence::default() }
+    };
+
+    let json = serde_json::to_string(&response_data)?;
     let json_bytes = json.as_bytes();
 
     if json_bytes.len() > response_length as usize {

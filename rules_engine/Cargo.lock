@@ -1570,6 +1570,7 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "battle_state",
+ "client_test_scenarios",
  "core_data",
  "display_data",
  "logging",
