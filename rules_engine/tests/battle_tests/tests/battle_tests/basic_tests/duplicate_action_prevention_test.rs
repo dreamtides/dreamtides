@@ -4,7 +4,7 @@ use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
 use core_data::identifiers::UserId;
 use display_data::request_data::{ConnectRequest, Metadata, PerformActionRequest};
 use rules_engine::engine;
-use rules_engine::state_provider::{DefaultStateProvider, StateProvider};
+use state_provider::state_provider::{DefaultStateProvider, StateProvider};
 use uuid::Uuid;
 
 #[test]

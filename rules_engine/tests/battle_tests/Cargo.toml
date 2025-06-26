@@ -18,6 +18,7 @@ battle_state = { path = "../../src/battle_state" }
 core_data = { path = "../../src/core_data" }
 display_data = { path = "../../src/display_data" }
 rules_engine = { path = "../../src/rules_engine" }
+state_provider = { path = "../../src/state_provider" }
 test_utils = { path = "../../src/test_utils" }
 ui_components = { path = "../../src/ui_components" }
 

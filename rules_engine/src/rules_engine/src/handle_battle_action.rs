@@ -13,11 +13,9 @@ use core_data::types::PlayerName;
 use display::rendering::renderer;
 use display_data::command::CommandSequence;
 use display_data::request_data::PollResponseType;
+use state_provider::state_provider::{PollResult, StateProvider};
 use tracing::instrument;
 use uuid::Uuid;
-
-use crate::engine::PollResult;
-use crate::state_provider::StateProvider;
 
 pub fn poll(provider: impl StateProvider + 'static, user_id: UserId) -> Option<PollResult> {
     provider.take_next_poll_result(user_id)

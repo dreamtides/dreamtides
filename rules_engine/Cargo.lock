@@ -376,6 +376,7 @@ dependencies = [
  "proptest",
  "rand 0.9.0",
  "rules_engine",
+ "state_provider",
  "test_utils",
  "tokio",
  "ui_components",
@@ -2158,8 +2159,11 @@ name = "state_provider"
 version = "0.0.0"
 dependencies = [
  "action_data",
+ "battle_state",
  "core_data",
+ "database",
  "display_data",
+ "uuid",
 ]
 
 [[package]]

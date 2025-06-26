@@ -5,9 +5,8 @@ use std::time::Instant;
 use battle_state::battle::battle_state::RequestContext;
 use core_data::identifiers::UserId;
 use database::database::DatabaseError;
-use rules_engine::engine::PollResult;
-use rules_engine::state_provider::StateProvider;
 use state_provider::display_state_provider::{DisplayState, DisplayStateProvider};
+use state_provider::state_provider::{PollResult, StateProvider};
 use uuid::Uuid;
 
 use super::test_database::TestDatabase;

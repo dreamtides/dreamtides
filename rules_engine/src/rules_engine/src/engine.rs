@@ -24,25 +24,18 @@ use display_data::request_data::{
 };
 use game_creation::new_battle;
 use rand::RngCore;
+use state_provider::state_provider::{DefaultStateProvider, PollResult, StateProvider};
 use tokio::task;
 use tracing::{debug, error, info, warn, Level};
 use ui_components::display_properties;
 use uuid::Uuid;
 
-use crate::state_provider::{DefaultStateProvider, StateProvider};
 use crate::{
     debug_actions, deserialize_save_file, error_message, handle_battle_action, serialize_save_file,
 };
 
 thread_local! {
     static PANIC_INFO: RefCell<Option<(String, String, Backtrace)>> = const { RefCell::new(None) };
-}
-
-#[derive(Debug, Clone)]
-pub struct PollResult {
-    pub commands: CommandSequence,
-    pub request_id: Option<Uuid>,
-    pub response_type: PollResponseType,
 }
 
 #[derive(Debug, Clone)]

@@ -10,8 +10,11 @@ bench = false
 
 [dependencies]
 action_data = { path = "../action_data" }
+battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
+database = { path = "../database" }
 display_data = { path = "../display_data" }
+uuid = "1.0"
 
 [lints]
 workspace = true
