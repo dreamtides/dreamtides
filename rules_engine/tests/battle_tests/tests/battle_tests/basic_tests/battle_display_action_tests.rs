@@ -102,7 +102,7 @@ fn close_card_browser_returns_cards_to_void() {
 fn browse_user_deck_moves_cards_to_browser() {
     let mut s = TestBattle::builder().connect();
 
-    assert!(s.user_client.cards.user_deck().len() > 0, "user deck should have cards");
+    assert!(!s.user_client.cards.user_deck().is_empty(), "user deck should have cards");
     let original_deck_count = s.user_client.cards.user_deck().len();
     assert_eq!(
         s.user_client.cards.cards_at_position(&Position::Browser).len(),
@@ -124,7 +124,7 @@ fn browse_user_deck_moves_cards_to_browser() {
 fn browse_enemy_deck_moves_cards_to_browser() {
     let mut s = TestBattle::builder().connect();
 
-    assert!(s.user_client.cards.enemy_deck().len() > 0, "enemy deck should have cards");
+    assert!(!s.user_client.cards.enemy_deck().is_empty(), "enemy deck should have cards");
     let original_deck_count = s.user_client.cards.enemy_deck().len();
     assert_eq!(
         s.user_client.cards.cards_at_position(&Position::Browser).len(),

@@ -135,9 +135,10 @@ fn response_version_tracking_in_poll() {
         debug_configuration: None,
     };
 
-    let connect_response = engine::connect(provider.clone(), &connect_request, RequestContext {
-        logging_options: LoggingOptions::default(),
-    });
+    let connect_response =
+        engine::connect_with_provider(provider.clone(), &connect_request, RequestContext {
+            logging_options: LoggingOptions::default(),
+        });
 
     let initial_version = connect_response.response_version;
 

@@ -29,7 +29,7 @@ use tracing::{debug, error, info, warn, Level};
 use ui_components::display_properties;
 use uuid::Uuid;
 
-use crate::state_provider::StateProvider;
+use crate::state_provider::{DefaultStateProvider, StateProvider};
 use crate::{
     debug_actions, deserialize_save_file, error_message, handle_battle_action, serialize_save_file,
 };
@@ -51,8 +51,14 @@ pub struct PerformActionBlockingResult {
     pub enemy_poll_results: Vec<PollResult>,
 }
 
-/// Connects to the rules engine and returns commands to execute.
-pub fn connect(
+/// Connects to the rules engine.
+pub fn connect(request: &ConnectRequest, request_context: RequestContext) -> ConnectResponse {
+    connect_with_provider(DefaultStateProvider, request, request_context)
+}
+
+/// Connects to the rules engine with the specified [StateProvider] and returns
+/// commands to execute.
+pub fn connect_with_provider(
     provider: impl StateProvider + 'static,
     request: &ConnectRequest,
     request_context: RequestContext,
@@ -78,7 +84,15 @@ pub fn connect(
 }
 
 /// Polls for the result of a game action.
-pub fn poll(provider: impl StateProvider + 'static, user_id: UserId) -> Option<PollResponse> {
+pub fn poll(user_id: UserId) -> Option<PollResponse> {
+    poll_with_provider(DefaultStateProvider, user_id)
+}
+
+/// Polls for the result of a game action with the specified [StateProvider] .
+pub fn poll_with_provider(
+    provider: impl StateProvider + 'static,
+    user_id: UserId,
+) -> Option<PollResponse> {
     if let Some(poll_result) = handle_battle_action::poll(provider.clone(), user_id) {
         let request_id = poll_result.request_id;
         let elapsed_msg = provider.get_elapsed_time_message(request_id);
@@ -110,7 +124,8 @@ pub fn poll(provider: impl StateProvider + 'static, user_id: UserId) -> Option<P
 ///
 /// Returns immediately after spawning the processing thread. Results will be
 /// available via [poll] after the action is complete.
-pub fn perform_action(provider: impl StateProvider + 'static, request: PerformActionRequest) {
+pub fn perform_action(request: PerformActionRequest) {
+    let provider = DefaultStateProvider;
     let request_id = request.metadata.request_id;
     let user_id = request.metadata.user_id;
 

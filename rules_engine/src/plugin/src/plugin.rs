@@ -12,7 +12,6 @@ use display_data::request_data::{
     ConnectRequest, PerformActionRequest, PerformActionResponse, PollRequest, PollResponse,
     PollResponseType,
 };
-use rules_engine::state_provider::DefaultStateProvider;
 use rules_engine::{client_logging, engine};
 use tokio::runtime::Runtime;
 
@@ -60,7 +59,7 @@ unsafe fn connect_impl(
     let scene = if let Some(scenario) = deserialized_request.test_scenario.as_ref() {
         client_test_scenarios::connect(&deserialized_request, scenario)
     } else {
-        engine::connect(DefaultStateProvider, &deserialized_request, context)
+        engine::connect(&deserialized_request, context)
     };
 
     let json = serde_json::to_string(&scene)?;
@@ -109,7 +108,7 @@ unsafe fn perform_impl(
         client_test_scenarios::perform_action(&deserialized_request, scenario)
     } else {
         TOKIO_RUNTIME.spawn(async move {
-            engine::perform_action(DefaultStateProvider, deserialized_request);
+            engine::perform_action(deserialized_request);
         });
 
         // Currently we do not return any commands from the perform action call, but
@@ -159,7 +158,7 @@ unsafe fn poll_impl(
     let deserialized_request = serde_json::from_slice::<PollRequest>(request_data)?;
     let user_id = deserialized_request.metadata.user_id;
 
-    let response_data = match engine::poll(DefaultStateProvider, user_id) {
+    let response_data = match engine::poll(user_id) {
         Some(response) => response,
         None => PollResponse {
             metadata: deserialized_request.metadata,

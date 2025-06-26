@@ -36,7 +36,7 @@ fn hand_size_limit_exceeded_shows_interface_message() {
     let preview = s.user_client.active_battle_preview();
     let message = preview.preview_message.as_ref().expect("preview should show message");
     assert!(
-        test_interface_view::extract_text_from_node(&message)
+        test_interface_view::extract_text_from_node(message)
             .contains("Note: Cards drawn in excess"),
         "preview should show message when hand size limit will be exceeded"
     );
@@ -54,7 +54,7 @@ fn character_limit_exceeded_shows_interface_message() {
     let preview = s.user_client.cards.get_play_effect_preview(&char_id);
     let message = preview.preview_message.as_ref().expect("preview should show message");
     assert!(
-        test_interface_view::extract_text_from_node(&message).contains("Character limit exceeded"),
+        test_interface_view::extract_text_from_node(message).contains("Character limit exceeded"),
         "preview should show message when character limit will be exceeded"
     );
 }
@@ -77,7 +77,7 @@ fn both_limits_exceeded_shows_combined_interface_message() {
 
     let preview = s.user_client.active_battle_preview();
     let message = preview.preview_message.as_ref().expect("preview should show message");
-    let message_text = test_interface_view::extract_text_from_node(&message);
+    let message_text = test_interface_view::extract_text_from_node(message);
     assert!(
         message_text.contains("Character limit exceeded")
             || message_text.contains("Cards drawn in excess"),

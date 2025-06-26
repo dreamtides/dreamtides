@@ -69,7 +69,7 @@ impl TestSession {
 
     /// Connects to the rules engine with a specific opponent configuration.
     pub fn connect_with_opponent(&mut self, opponent: Option<PlayerType>) -> ConnectResponse {
-        let response = engine::connect(
+        let response = engine::connect_with_provider(
             self.state_provider.clone(),
             &ConnectRequest {
                 metadata: self.metadata(),
@@ -93,8 +93,8 @@ impl TestSession {
         self.user_client.apply_commands(response.commands.clone());
 
         // If opponent is not a user, don't try to connect as them
-        if let Some(PlayerType::User(_enemy_id)) = opponent {
-            let enemy_response = engine::connect(
+        if let Some(PlayerType::User(_)) = opponent {
+            let enemy_response = engine::connect_with_provider(
                 self.state_provider.clone(),
                 &ConnectRequest {
                     metadata: self.enemy_metadata(),
