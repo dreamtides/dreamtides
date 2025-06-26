@@ -18,7 +18,12 @@ fn duplicate_action_is_ignored() {
 
     // Create a valid action request with the correct response version
     let request = PerformActionRequest {
-        metadata: Metadata { user_id, battle_id: None, request_id: Some(Uuid::new_v4()) },
+        metadata: Metadata {
+            user_id,
+            battle_id: None,
+            request_id: Some(Uuid::new_v4()),
+            integration_test_id: None,
+        },
         action: GameAction::BattleAction(BattleAction::EndTurn),
         save_file_id: None,
         test_scenario: None,
@@ -52,7 +57,12 @@ fn concurrent_action_is_ignored() {
 
     // Try to process another action while first is still processing
     let request = PerformActionRequest {
-        metadata: Metadata { user_id, battle_id: None, request_id: Some(Uuid::new_v4()) },
+        metadata: Metadata {
+            user_id,
+            battle_id: None,
+            request_id: Some(Uuid::new_v4()),
+            integration_test_id: None,
+        },
         action: GameAction::BattleAction(BattleAction::EndTurn),
         save_file_id: None,
         test_scenario: None,
@@ -78,7 +88,12 @@ fn action_with_outdated_version_is_ignored() {
     // Try to perform action with outdated version
     let outdated_version = Uuid::new_v4();
     let request = PerformActionRequest {
-        metadata: Metadata { user_id, battle_id: None, request_id: Some(Uuid::new_v4()) },
+        metadata: Metadata {
+            user_id,
+            battle_id: None,
+            request_id: Some(Uuid::new_v4()),
+            integration_test_id: None,
+        },
         action: GameAction::BattleAction(BattleAction::EndTurn),
         save_file_id: None,
         test_scenario: None,
@@ -103,7 +118,12 @@ fn action_without_version_is_processed() {
 
     // Create action request without last_response_version (legacy client)
     let request = PerformActionRequest {
-        metadata: Metadata { user_id, battle_id: None, request_id: Some(Uuid::new_v4()) },
+        metadata: Metadata {
+            user_id,
+            battle_id: None,
+            request_id: Some(Uuid::new_v4()),
+            integration_test_id: None,
+        },
         action: GameAction::NoOp, // Use NoOp to avoid needing a full battle setup
         save_file_id: None,
         test_scenario: None,
@@ -127,7 +147,12 @@ fn response_version_tracking_in_poll() {
 
     // Connect and get initial response version
     let connect_request = ConnectRequest {
-        metadata: Metadata { user_id, battle_id: None, request_id: None },
+        metadata: Metadata {
+            user_id,
+            battle_id: None,
+            request_id: None,
+            integration_test_id: None,
+        },
         persistent_data_path: "/tmp/test".to_string(),
         vs_opponent: None,
         test_scenario: None,
@@ -155,6 +180,7 @@ fn response_version_tracking_in_poll() {
             user_id,
             battle_id: connect_response.metadata.battle_id,
             request_id: Some(Uuid::new_v4()),
+            integration_test_id: None,
         },
         action: GameAction::NoOp,
         save_file_id: None,
@@ -183,7 +209,12 @@ fn finish_processing_not_called_on_concurrent_rejection() {
 
     // Try to process another action while first is still processing
     let request = PerformActionRequest {
-        metadata: Metadata { user_id, battle_id: None, request_id: Some(Uuid::new_v4()) },
+        metadata: Metadata {
+            user_id,
+            battle_id: None,
+            request_id: Some(Uuid::new_v4()),
+            integration_test_id: None,
+        },
         action: GameAction::BattleAction(BattleAction::EndTurn),
         save_file_id: None,
         test_scenario: None,
@@ -216,7 +247,12 @@ fn finish_processing_not_called_on_version_rejection() {
     // Try to perform action with outdated version
     let outdated_version = Uuid::new_v4();
     let request = PerformActionRequest {
-        metadata: Metadata { user_id, battle_id: None, request_id: Some(Uuid::new_v4()) },
+        metadata: Metadata {
+            user_id,
+            battle_id: None,
+            request_id: Some(Uuid::new_v4()),
+            integration_test_id: None,
+        },
         action: GameAction::BattleAction(BattleAction::EndTurn),
         save_file_id: None,
         test_scenario: None,

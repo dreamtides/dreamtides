@@ -158,7 +158,7 @@ unsafe fn poll_impl(
     let deserialized_request = serde_json::from_slice::<PollRequest>(request_data)?;
     let user_id = deserialized_request.metadata.user_id;
 
-    let response_data = match engine::poll(user_id) {
+    let response_data = match engine::poll(user_id, deserialized_request.metadata) {
         Some(response) => response,
         None => PollResponse {
             metadata: deserialized_request.metadata,

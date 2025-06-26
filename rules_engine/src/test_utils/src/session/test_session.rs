@@ -208,11 +208,21 @@ impl TestSession {
     }
 
     fn metadata(&self) -> Metadata {
-        Metadata { user_id: self.user_id, battle_id: self.battle_id, request_id: None }
+        Metadata {
+            user_id: self.user_id,
+            battle_id: self.battle_id,
+            request_id: None,
+            integration_test_id: None,
+        }
     }
 
     fn enemy_metadata(&self) -> Metadata {
-        Metadata { user_id: self.enemy_id, battle_id: self.battle_id, request_id: None }
+        Metadata {
+            user_id: self.enemy_id,
+            battle_id: self.battle_id,
+            request_id: None,
+            integration_test_id: None,
+        }
     }
 
     fn request_context(&self) -> RequestContext {

@@ -84,14 +84,15 @@ pub fn connect_with_provider(
 }
 
 /// Polls for the result of a game action.
-pub fn poll(user_id: UserId) -> Option<PollResponse> {
-    poll_with_provider(DefaultStateProvider, user_id)
+pub fn poll(user_id: UserId, metadata: Metadata) -> Option<PollResponse> {
+    poll_with_provider(DefaultStateProvider, user_id, metadata)
 }
 
 /// Polls for the result of a game action with the specified [StateProvider] .
 pub fn poll_with_provider(
     provider: impl StateProvider + 'static,
     user_id: UserId,
+    metadata: Metadata,
 ) -> Option<PollResponse> {
     if let Some(poll_result) = handle_battle_action::poll(provider.clone(), user_id) {
         let request_id = poll_result.request_id;
@@ -111,7 +112,7 @@ pub fn poll_with_provider(
 
         debug!(?elapsed_msg, ?request_id, ?response_version, "Returning poll response");
         return Some(PollResponse {
-            metadata: Metadata { user_id, battle_id: None, request_id },
+            metadata: Metadata { user_id, request_id, ..metadata },
             commands: Some(poll_result.commands),
             response_type: poll_result.response_type,
             response_version,

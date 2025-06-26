@@ -12,9 +12,18 @@ use crate::command::CommandSequence;
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Metadata {
+    /// ID of the user making the request.
     pub user_id: UserId,
+
+    /// ID of the current battle.
     pub battle_id: Option<BattleId>,
+
+    /// Identifies the request from the client.
     pub request_id: Option<Uuid>,
+
+    /// If specified, the request is part of an integration test with the given
+    /// ID. State will not be persisted.
+    pub integration_test_id: Option<Uuid>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
