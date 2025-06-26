@@ -9,10 +9,10 @@ use display_data::request_data::{
     ConnectRequest, ConnectResponse, DebugConfiguration, Metadata, PerformActionRequest,
 };
 use rules_engine::engine;
+use state_provider::test_state_provider::TestStateProvider;
 use uuid::Uuid;
 
 use crate::client::test_client::TestClient;
-use crate::provider::test_state_provider::TestStateProvider;
 
 pub struct TestSession {
     pub state_provider: TestStateProvider,
