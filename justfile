@@ -232,9 +232,10 @@ rsync-review:
     rsync --delete --stats --copy-links -avqr ./rules_engine ~/dreamtides_tests/
     rsync --delete --stats --copy-links -avqr ./client ~/dreamtides_tests/
     cp justfile ~/dreamtides_tests/
+    echo $'\a'
 
 code-review-rsync: rsync-review
-    cd ~/dreamtides_tests && just code-review
+    cd ~/dreamtides_tests && just code-review || say "review failed"
 
 unity-test-rsync: rsync-review
     cd ~/dreamtides_tests && just unity-tests
