@@ -237,7 +237,7 @@ rsync-review:
     echo $'\a'
 
 code-review-rsync: rsync-review
-    cd ~/dreamtides_tests && just code-review || osascript -e 'display dialog "Review failed" with icon stop'
+    cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; exit 1)
 
 unity-test-rsync: rsync-review
     cd ~/dreamtides_tests && just unity-tests
