@@ -1,6 +1,8 @@
 use std::cell::RefCell;
+use std::collections::HashMap;
 use std::fmt::Write;
 use std::panic;
+use std::sync::{LazyLock, Mutex};
 use std::time::Instant;
 
 use action_data::game_action_data::GameAction;
@@ -25,6 +27,7 @@ use display_data::request_data::{
 use game_creation::new_battle;
 use rand::RngCore;
 use state_provider::state_provider::{DefaultStateProvider, PollResult, StateProvider};
+use state_provider::test_state_provider::TestStateProvider;
 use tokio::task;
 use tracing::{debug, error, info, warn, Level};
 use ui_components::display_properties;
@@ -38,6 +41,9 @@ thread_local! {
     static PANIC_INFO: RefCell<Option<(String, String, Backtrace)>> = const { RefCell::new(None) };
 }
 
+static TEST_STATE_PROVIDERS: LazyLock<Mutex<HashMap<Uuid, TestStateProvider>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
 #[derive(Debug, Clone)]
 pub struct PerformActionBlockingResult {
     pub user_poll_results: Vec<PollResult>,
@@ -46,7 +52,12 @@ pub struct PerformActionBlockingResult {
 
 /// Connects to the rules engine.
 pub fn connect(request: &ConnectRequest, request_context: RequestContext) -> ConnectResponse {
-    connect_with_provider(DefaultStateProvider, request, request_context)
+    if let Some(integration_test_id) = request.metadata.integration_test_id {
+        let provider = get_test_state_provider(integration_test_id);
+        connect_with_provider(provider, request, request_context)
+    } else {
+        connect_with_provider(DefaultStateProvider, request, request_context)
+    }
 }
 
 /// Connects to the rules engine with the specified [StateProvider] and returns
@@ -78,7 +89,12 @@ pub fn connect_with_provider(
 
 /// Polls for the result of a game action.
 pub fn poll(user_id: UserId, metadata: Metadata) -> Option<PollResponse> {
-    poll_with_provider(DefaultStateProvider, user_id, metadata)
+    if let Some(integration_test_id) = metadata.integration_test_id {
+        let provider = get_test_state_provider(integration_test_id);
+        poll_with_provider(provider, user_id, metadata)
+    } else {
+        poll_with_provider(DefaultStateProvider, user_id, metadata)
+    }
 }
 
 /// Polls for the result of a game action with the specified [StateProvider] .
@@ -119,16 +135,25 @@ pub fn poll_with_provider(
 /// Returns immediately after spawning the processing thread. Results will be
 /// available via [poll] after the action is complete.
 pub fn perform_action(request: PerformActionRequest) {
-    let provider = DefaultStateProvider;
     let request_id = request.metadata.request_id;
     let user_id = request.metadata.user_id;
 
-    provider.store_request_timestamp(request_id, Instant::now());
-    task::spawn_blocking(move || {
-        if perform_action_internal(provider.clone(), &request) {
-            provider.finish_processing(user_id);
-        }
-    });
+    if let Some(integration_test_id) = request.metadata.integration_test_id {
+        let provider = get_test_state_provider(integration_test_id);
+        task::spawn_blocking(move || {
+            if perform_action_internal(provider.clone(), &request) {
+                provider.finish_processing(user_id);
+            }
+        });
+    } else {
+        let provider = DefaultStateProvider;
+        provider.store_request_timestamp(request_id, Instant::now());
+        task::spawn_blocking(move || {
+            if perform_action_internal(provider.clone(), &request) {
+                provider.finish_processing(user_id);
+            }
+        });
+    }
 }
 
 /// Performs a game action synchronously and blocks until completion.
@@ -580,7 +605,15 @@ fn handle_request_action(
     };
 }
 
-pub fn show_error_message(
+/// Gets or creates a TestStateProvider for the given integration test ID.
+/// This ensures that all requests for the same integration test use the same
+/// provider instance.
+fn get_test_state_provider(integration_test_id: Uuid) -> TestStateProvider {
+    let mut providers = TEST_STATE_PROVIDERS.lock().unwrap();
+    providers.entry(integration_test_id).or_default().clone()
+}
+
+fn show_error_message(
     provider: impl StateProvider + 'static,
     user_id: UserId,
     battle: Option<&BattleState>,
