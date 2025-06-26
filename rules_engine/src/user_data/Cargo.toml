@@ -16,5 +16,5 @@ battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 quest_data = { path = "../quest_data" }
 
-schemars = "0.8"
+schemars = { workspace = true }
 serde = { version = "1", features = ["derive"] }

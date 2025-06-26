@@ -30,7 +30,7 @@ state_provider = { path = "../state_provider" }
 ui_components = { path = "../ui_components" }
 
 bon = "3"
-schemars = "0.8"
+schemars = { workspace = true }
 serde = { version = "1", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1"

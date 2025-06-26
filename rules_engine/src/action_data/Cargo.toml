@@ -16,5 +16,5 @@ ai_data = { path = "../ai_data" }
 battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 
-schemars = "0.8"
+schemars = { workspace = true }
 serde = { version = "1", features = ["derive"] }

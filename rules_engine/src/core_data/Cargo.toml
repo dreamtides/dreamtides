@@ -14,7 +14,7 @@ bench = false
 [dependencies]
 derive_more = { version = "1", features = ["full"] }
 enumset = { version = "1", features = ["serde"] }
-schemars = { version = "0.8", features = ["uuid1"] }
+schemars = { workspace = true }
 serde = { version = "1", features = ["derive"] }
 slotmap = { version = "1", features = ["serde"] }
 strum = { version = "0.27", features = ["derive"] }

@@ -22,7 +22,7 @@ enum-iterator = "2"
 enumset = { version = "1", features = ["serde"] }
 rand = "0.9"
 rand_xoshiro = "0.7"
-schemars = "0.8"
+schemars = { workspace = true }
 serde = { version = "1", features = ["derive"] }
 slotmap = "1"
 strum = "0.27"

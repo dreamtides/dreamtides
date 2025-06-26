@@ -2,6 +2,9 @@
 members = ["benchmarks/*", "src/*", "tests/*"]
 resolver = "2"
 
+[workspace.dependencies]
+schemars = { version = "1", features = ["uuid1"] }
+
 [workspace.lints.clippy]
 #redundant_test_prefix = "deny"
 #return_and_then = "deny"
