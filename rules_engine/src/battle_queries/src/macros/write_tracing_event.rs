@@ -27,7 +27,7 @@ pub fn write_battle_event(
 
     if let Some(tracing) = &mut battle.tracing {
         let values_string = values.iter().fold(String::new(), |mut acc, (k, v)| {
-            let _ = write!(acc, "{}: {}, ", k, v);
+            let _ = write!(acc, "{k}: {v}, ");
             acc
         });
         let timestamp = format_current_time();
@@ -51,12 +51,12 @@ pub fn write_panic_snapshot(
 ) {
     let snapshot = debug_battle_snapshot::capture(battle);
     let values_string = values.iter().fold(String::new(), |mut acc, (k, v)| {
-        let _ = write!(acc, "{}: {}, ", k, v);
+        let _ = write!(acc, "{k}: {v}, ");
         acc
     });
     let timestamp = format_current_time();
     let event = BattleTraceEvent {
-        m: format!("PANIC: {}", message),
+        m: format!("PANIC: {message}"),
         vs: values_string,
         values,
         snapshot,
@@ -91,8 +91,7 @@ pub fn write_deserialization_panic(
     let timestamp = format_current_time();
     let event = DeserializationPanicEvent {
         m: format!(
-            "PANIC: Deserialization panic at action {} of {}",
-            panic_action_index, total_actions
+            "PANIC: Deserialization panic at action {panic_action_index} of {total_actions}"
         ),
         snapshot,
         panic_action_index,
@@ -139,7 +138,7 @@ pub fn write_animations(battle: &BattleState, animations: &AnimationData) {
     let snapshot = debug_battle_snapshot::capture(battle);
     let timestamp = format_current_time();
     let event = AnimationTraceEvent {
-        m: format!("Playing animations: {}", names),
+        m: format!("Playing animations: {names}"),
         snapshot,
         step_names: animation_names,
         timestamp,
@@ -162,7 +161,7 @@ pub fn write_commands(sequence: &CommandSequence, request_context: &RequestConte
 
     let timestamp = format_current_time();
     let event = CommandTraceEvent {
-        m: format!("Writing commands: {}", names),
+        m: format!("Writing commands: {names}"),
         snapshot: None,
         sequence: sequence.clone(),
         timestamp,
@@ -205,7 +204,7 @@ fn write_json_to_log_file(json_str: &str, request_context: &RequestContext) {
 
     if !log_path.exists() {
         match File::create(&log_path) {
-            Ok(mut file) => match file.write_all(format!("[\n{}\n]", json_str).as_bytes()) {
+            Ok(mut file) => match file.write_all(format!("[\n{json_str}\n]").as_bytes()) {
                 Ok(_) => debug!(?log_path, "Created dreamtides.json"),
                 Err(e) => error!(?log_path, "Failed to write to dreamtides.json: {}", e),
             },
@@ -235,7 +234,7 @@ fn write_json_to_log_file(json_str: &str, request_context: &RequestContext) {
                             return;
                         }
 
-                        if let Err(e) = file.write_all(format!(",\n{}\n]", json_str).as_bytes()) {
+                        if let Err(e) = file.write_all(format!(",\n{json_str}\n]").as_bytes()) {
                             error!(?log_path, "Failed to append to dreamtides.json: {}", e);
                         }
                         return;
@@ -260,7 +259,7 @@ fn reset_file(file: &mut File, json_str: &str) {
         return;
     }
 
-    if let Err(e) = file.write_all(format!("[\n{}\n]", json_str).as_bytes()) {
+    if let Err(e) = file.write_all(format!("[\n{json_str}\n]").as_bytes()) {
         error!("Failed to write to dreamtides.json: {}", e);
     }
 }

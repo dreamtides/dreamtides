@@ -237,7 +237,7 @@ fn click_button(
     button_name: &str,
     containing: &str,
 ) {
-    let button = button.unwrap_or_else(|| panic!("No {} present", button_name));
+    let button = button.unwrap_or_else(|| panic!("No {button_name} present"));
 
     if !button.label.contains(containing) {
         panic!(
@@ -246,7 +246,7 @@ fn click_button(
         );
     }
 
-    let action = button.action.unwrap_or_else(|| panic!("{} is disabled", button_name));
+    let action = button.action.unwrap_or_else(|| panic!("{button_name} is disabled"));
 
     session.perform_player_action(player, action);
 }

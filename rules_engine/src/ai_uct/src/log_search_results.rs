@@ -40,7 +40,7 @@ pub fn log_results_diagram(
     };
     match File::create(&output_path) {
         Ok(mut file) => {
-            if let Err(e) = file.write_all(format!("{:?}", dot).as_bytes()) {
+            if let Err(e) = file.write_all(format!("{dot:?}").as_bytes()) {
                 error!("Failed to write to dot file: {}", e);
             } else {
                 debug!("Search graph written to {}", output_path.display());

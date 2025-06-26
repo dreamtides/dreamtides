@@ -271,7 +271,7 @@ fn connect_for_multiplayer(
         }
         Ok(None) => error_message::display_error_message(
             None,
-            format!("No save file found for opponent ID: {:?}", vs_opponent),
+            format!("No save file found for opponent ID: {vs_opponent:?}"),
         ),
         Err(error) => error_message::display_error_message(None, error.to_string()),
     }
@@ -427,7 +427,7 @@ fn perform_action_internal(
         let save_file_id = request.save_file_id.unwrap_or(user_id);
         let Ok(Some(save)) = database.fetch_save(save_file_id) else {
             let error_msg = if request.save_file_id.is_some() {
-                format!("No save file found for ID: {:?}", save_file_id)
+                format!("No save file found for ID: {save_file_id:?}")
             } else {
                 "No save file found".to_string()
             };
@@ -454,7 +454,7 @@ fn perform_action_internal(
                 provider.clone(),
                 user_id,
                 Some(&battle),
-                format!("Failed to save battle: {}", error),
+                format!("Failed to save battle: {error}"),
             );
         }
     });
@@ -587,7 +587,7 @@ pub fn show_error_message(
     error_message: String,
 ) {
     if provider.should_panic_on_error() {
-        panic!("Error in test: {}", error_message);
+        panic!("Error in test: {error_message}");
     }
 
     let request_context = provider
@@ -620,7 +620,7 @@ where
             None => "unknown location".to_string(),
         };
 
-        let panic_msg = format!("{}", panic_info);
+        let panic_msg = format!("{panic_info}");
         let backtrace = Backtrace::new();
 
         PANIC_INFO.with(|info| {
@@ -647,15 +647,14 @@ where
 
             let mut error_message = PANIC_INFO.with(|info| {
                 if let Some((location, info, backtrace)) = &*info.borrow() {
-                    let backtrace_str = format!("{:?}", backtrace);
+                    let backtrace_str = format!("{backtrace:?}");
                     let filtered_backtrace = filter_backtrace(&backtrace_str);
 
                     format!(
-                        "Error: {} at {}\n\nError details for developers:\n{}\n{}",
-                        panic_msg, location, info, filtered_backtrace
+                        "Error: {panic_msg} at {location}\n\nError details for developers:\n{info}\n{filtered_backtrace}"
                     )
                 } else {
-                    format!("Error: {}\n\nNo backtrace available", panic_msg)
+                    format!("Error: {panic_msg}\n\nNo backtrace available")
                 }
             });
 
@@ -700,7 +699,7 @@ fn filter_backtrace(backtrace: &str) -> String {
 
     for line in backtrace.lines() {
         if !skip.iter().any(|s| line.contains(s)) {
-            writeln!(result, "{}", line).ok();
+            writeln!(result, "{line}").ok();
         }
     }
 

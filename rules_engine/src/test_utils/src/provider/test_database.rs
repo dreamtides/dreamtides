@@ -27,7 +27,7 @@ impl Database for TestDatabase {
         let storage = self
             .storage
             .read()
-            .map_err(|e| DatabaseError(format!("Failed to acquire read lock: {}", e)))?;
+            .map_err(|e| DatabaseError(format!("Failed to acquire read lock: {e}")))?;
 
         Ok(storage.get(&user_id).cloned())
     }
@@ -36,7 +36,7 @@ impl Database for TestDatabase {
         let mut storage = self
             .storage
             .write()
-            .map_err(|e| DatabaseError(format!("Failed to acquire write lock: {}", e)))?;
+            .map_err(|e| DatabaseError(format!("Failed to acquire write lock: {e}")))?;
         storage.insert(save.id(), save);
         Ok(())
     }

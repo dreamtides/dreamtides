@@ -74,7 +74,7 @@ impl BattleAction {
             BattleAction::SelectStackCardTarget(stack_card_id) => {
                 format!("SSCT{:?}", stack_card_id.0 .0)
             }
-            BattleAction::SelectPromptChoice(index) => format!("SPC{:?}", index),
+            BattleAction::SelectPromptChoice(index) => format!("SPC{index:?}"),
             BattleAction::SelectEnergyAdditionalCost(energy) => format!("SEAC{}", energy.0),
             BattleAction::SelectCardOrder(order) => {
                 let target = match order.target {

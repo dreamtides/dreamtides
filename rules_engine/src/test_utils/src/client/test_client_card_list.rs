@@ -27,7 +27,7 @@ impl<'a> TestClientCardList<'a> {
         self.cards.is_empty()
     }
 
-    pub fn iter(&self) -> std::slice::Iter<&'a TestClientCard> {
+    pub fn iter(&self) -> std::slice::Iter<'_, &'a TestClientCard> {
         self.cards.iter()
     }
 

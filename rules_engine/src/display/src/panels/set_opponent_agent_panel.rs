@@ -96,8 +96,8 @@ impl Component for SetOpponentAgentPanel<'_> {
 impl SetOpponentAgentPanel<'_> {
     fn get_opponent_agent(&self) -> String {
         match self.battle.players.player(self.user_player.opponent()).player_type {
-            PlayerType::User(id) => format!("User: {:?}", id),
-            PlayerType::Agent(agent) => format!("{:?}", agent),
+            PlayerType::User(id) => format!("User: {id:?}"),
+            PlayerType::Agent(agent) => format!("{agent:?}"),
         }
     }
 }

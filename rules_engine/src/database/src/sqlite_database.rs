@@ -26,8 +26,7 @@ pub fn initialize(path: PathBuf) -> Result<SqliteDatabase, DatabaseError> {
         if let Some(existing_path) = DATABASE_PATH.get() {
             if existing_path != &path {
                 return Err(DatabaseError(format!(
-                    "Database already initialized with a different path: {:?}",
-                    existing_path
+                    "Database already initialized with a different path: {existing_path:?}"
                 )));
             }
         }
@@ -127,14 +126,13 @@ impl Database for SqliteDatabase {
             .connection
             .query_row("SELECT data FROM saves WHERE id = ?1", [&user_id.0], |row| row.get(0))
             .optional()
-            .map_err(|e| to_database_error(e, &format!("querying save for user {:?}", user_id)))?;
+            .map_err(|e| to_database_error(e, &format!("querying save for user {user_id:?}")))?;
 
         match data {
             Some(bytes) => {
                 let save = serde_json::from_slice(&bytes).map_err(|e| {
                     DatabaseError(format!(
-                        "Error deserializing save file for user {:?}: {:?}",
-                        user_id, e
+                        "Error deserializing save file for user {user_id:?}: {e:?}"
                     ))
                 })?;
                 Ok(Some(save))
@@ -148,7 +146,7 @@ impl Database for SqliteDatabase {
         let save_id = save.id();
         debug!(?save_id, "Writing save file to database");
         let data = ser::to_vec(&save).map_err(|e| {
-            DatabaseError(format!("Error serializing save file {:?}: {:?}", save_id, e))
+            DatabaseError(format!("Error serializing save file {save_id:?}: {e:?}"))
         })?;
 
         self.connection
@@ -158,7 +156,7 @@ impl Database for SqliteDatabase {
                 ON CONFLICT(id) DO UPDATE SET data = ?2",
                 (&save.id().0, &data),
             )
-            .map_err(|e| to_database_error(e, &format!("writing save file {:?}", save_id)))?;
+            .map_err(|e| to_database_error(e, &format!("writing save file {save_id:?}")))?;
 
         Ok(())
     }
@@ -168,5 +166,5 @@ impl Database for SqliteDatabase {
 ///
 /// The context parameter provides information about where the error occurred.
 fn to_database_error(error: Error, context: &str) -> DatabaseError {
-    DatabaseError(format!("Database Error ({}): {}", context, error))
+    DatabaseError(format!("Database Error ({context}): {error}"))
 }

@@ -132,13 +132,11 @@ fn run_match(
         Verbosity::OneLine | Verbosity::Actions | Verbosity::Verbose => {
             if swap_positions {
                 println!(
-                    "Running matchup between {} (P2) and {} (P1) with seed {}",
-                    ai_one, ai_two, seed
+                    "Running matchup between {ai_one} (P2) and {ai_two} (P1) with seed {seed}"
                 );
             } else {
                 println!(
-                    "Running matchup between {} (P1) and {} (P2) with seed {}",
-                    ai_one, ai_two, seed
+                    "Running matchup between {ai_one} (P1) and {ai_two} (P2) with seed {seed}"
                 );
             }
         }
@@ -194,14 +192,11 @@ fn run_match(
                     Verbosity::None => {}
                     Verbosity::OneLine => {
                         print!("\r\x1B[2K");
-                        print!("AI {} takes action: {:?} in turn {}", player_ai_json, action, turn);
+                        print!("AI {player_ai_json} takes action: {action:?} in turn {turn}");
                         io::stdout().flush().unwrap();
                     }
                     Verbosity::Actions | Verbosity::Verbose => {
-                        println!(
-                            "AI {} takes action: {:?} in turn {}",
-                            player_ai_json, action, turn
-                        );
+                        println!("AI {player_ai_json} takes action: {action:?} in turn {turn}");
                     }
                 }
                 debug!("Player {:?} executing action: {:?}", player, action);
@@ -315,10 +310,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 };
 
                 if args.matches > 1 {
-                    println!("Winner: {}, Turns: {}, Time: {:.2?}", winner_ai, turns, elapsed);
+                    println!("Winner: {winner_ai}, Turns: {turns}, Time: {elapsed:.2?}");
                 } else {
-                    println!("\nGame over after {} turns in {:.2?}!", turns, elapsed);
-                    println!("Winner: AI {}", winner_ai);
+                    println!("\nGame over after {turns} turns in {elapsed:.2?}!");
+                    println!("Winner: AI {winner_ai}");
                 }
                 print_match_summary(
                     &results,
@@ -333,9 +328,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 results.total_elapsed += elapsed;
 
                 if args.matches > 1 {
-                    println!("Draw after {} turns, Time: {:.2?}", turns, elapsed);
+                    println!("Draw after {turns} turns, Time: {elapsed:.2?}");
                 } else {
-                    println!("\nMatch ended in a draw after {} turns in {:.2?}!", turns, elapsed);
+                    println!("\nMatch ended in a draw after {turns} turns in {elapsed:.2?}!");
                 }
                 print_match_summary(
                     &results,

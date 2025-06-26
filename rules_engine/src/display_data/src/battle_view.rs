@@ -49,7 +49,7 @@ pub enum BattlePreviewState {
     Pending,
 
     /// Active battle preview, e.g. when a prompt is active.
-    Active(BattlePreviewView),
+    Active(Box<BattlePreviewView>),
 }
 
 /// Preview of a potential future state of a battle, shown e.g. in response to a

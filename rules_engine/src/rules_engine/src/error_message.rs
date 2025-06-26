@@ -36,7 +36,10 @@ fn display_error_message_with_battle(battle: &BattleState, message: String) -> C
     let mut builder = ResponseBuilder::new(PlayerName::One, false);
     let mut view = battle_rendering::battle_view(&builder, battle);
     view.interface.screen_overlay = render_message(message).flex_node();
-    builder.push(Command::UpdateBattle(UpdateBattleCommand { battle: view, update_sound: None }));
+    builder.push(Command::UpdateBattle(Box::new(UpdateBattleCommand {
+        battle: view,
+        update_sound: None,
+    })));
     builder.commands()
 }
 

@@ -46,7 +46,7 @@ impl TestClient {
         for group in commands.groups {
             for command in group.commands {
                 match command {
-                    Command::UpdateBattle(update) => self.handle_update_battle(update),
+                    Command::UpdateBattle(update) => self.handle_update_battle(*update),
                     Command::Wait(_) => {}
                     Command::FireProjectile(_) => {}
                     Command::DissolveCard(_) => {}

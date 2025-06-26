@@ -95,7 +95,7 @@ impl ViewLogsPanel {
                     self.apply_filter(content)
                 }
             }
-            Err(err) => format!("Error reading log file: {}", err),
+            Err(err) => format!("Error reading log file: {err}"),
         }
     }
 

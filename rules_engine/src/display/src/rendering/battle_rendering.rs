@@ -77,7 +77,7 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
                 battle,
                 builder.display_for_player(),
             )
-            .map(BattlePreviewState::Active)
+            .map(|preview| BattlePreviewState::Active(Box::new(preview)))
             .unwrap_or(BattlePreviewState::None)
         },
     }

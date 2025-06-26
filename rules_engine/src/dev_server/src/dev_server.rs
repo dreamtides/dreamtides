@@ -24,8 +24,8 @@ pub enum AppError {
 impl fmt::Display for AppError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            AppError::BadRequest(msg) => write!(f, "Bad request: {}", msg),
-            AppError::Internal(msg) => write!(f, "Internal error: {}", msg),
+            AppError::BadRequest(msg) => write!(f, "Bad request: {msg}"),
+            AppError::Internal(msg) => write!(f, "Internal error: {msg}"),
         }
     }
 }
@@ -47,7 +47,7 @@ type AppResult<T> = Result<T, AppError>;
 fn parse_json<T: DeserializeOwned>(json_str: &str) -> AppResult<T> {
     serde_json::from_str(json_str).map_err(|e| {
         error!(input = %json_str, error = %e, "JSON parsing error");
-        AppError::BadRequest(format!("Invalid JSON: {}\nInput: {}", e, json_str))
+        AppError::BadRequest(format!("Invalid JSON: {e}\nInput: {json_str}"))
     })
 }
 
@@ -125,7 +125,7 @@ async fn main() {
     let log_directory = match logging::get_developer_mode_log_directory() {
         Ok(directory) => directory,
         Err(e) => {
-            panic!("Failed to get log directory: {}", e);
+            panic!("Failed to get log directory: {e}");
         }
     };
     logging::initialize(&RequestContext {
@@ -145,12 +145,12 @@ async fn main() {
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:26598").await.unwrap_or_else(|e| {
         error!(error.message = %e, "Failed to bind to port 26598");
-        panic!("Server initialization failed: {}", e);
+        panic!("Server initialization failed: {e}");
     });
 
     info!("Server running on http://0.0.0.0:26598");
     axum::serve(listener, app).await.unwrap_or_else(|e| {
         error!(error.message = %e, "Server error");
-        panic!("Server error: {}", e);
+        panic!("Server error: {e}");
     });
 }

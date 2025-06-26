@@ -147,7 +147,7 @@ fn card_type(battle: &BattleState, card_id: CardId) -> String {
     };
 
     if card_properties::is_fast(battle, card_id) {
-        format!("\u{f0e7} {}", result)
+        format!("\u{f0e7} {result}")
     } else {
         result
     }

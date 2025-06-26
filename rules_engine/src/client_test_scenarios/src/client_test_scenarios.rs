@@ -44,8 +44,8 @@ pub fn connect(request: &ConnectRequest, _scenario: &str) -> ConnectResponse {
     *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
     ConnectResponse {
         metadata: request.metadata,
-        commands: CommandSequence::from_command(Command::UpdateBattle(UpdateBattleCommand::new(
-            battle,
+        commands: CommandSequence::from_command(Command::UpdateBattle(Box::new(
+            UpdateBattleCommand::new(battle),
         ))),
         response_version: Uuid::new_v4(),
     }
@@ -81,7 +81,7 @@ fn perform_battle_action(
         BattleAction::SelectCharacterTarget(id) => select_card(id.card_id().0.to_string()),
         BattleAction::SelectCardOrder(select_order) => select_card_order(select_order),
         _ => {
-            panic!("Not implemented: {:?}", action);
+            panic!("Not implemented: {action:?}");
         }
     };
 
@@ -110,7 +110,7 @@ fn perform_debug_action(
     let commands = match action {
         DebugAction::ApplyTestScenarioAction => apply_test_scenario_action(scenario),
         _ => {
-            panic!("Not implemented: {:?}", action);
+            panic!("Not implemented: {action:?}");
         }
     };
 
@@ -121,7 +121,7 @@ fn play_card(card_id: ClientCardId, scenario: &str) -> CommandSequence {
     let mut battle = CURRENT_BATTLE.lock().unwrap().clone().unwrap();
     let Some((card_index, _)) = battle.cards.iter().enumerate().find(|(_, c)| c.id == card_id)
     else {
-        panic!("Card not found: {:?}", card_id);
+        panic!("Card not found: {card_id:?}");
     };
     let mut commands = Vec::new();
 
@@ -140,11 +140,11 @@ fn play_card(card_id: ClientCardId, scenario: &str) -> CommandSequence {
             play_card_with_targets(&mut battle, card_id, StackType::TargetingBothBattlefields);
         }
         _ => {
-            panic!("Scenario not implemented: {:?}", scenario);
+            panic!("Scenario not implemented: {scenario:?}");
         }
     }
 
-    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+    commands.push(Command::UpdateBattle(Box::new(UpdateBattleCommand::new(battle.clone()))));
     *CURRENT_BATTLE.lock().unwrap() = Some(battle);
     CommandSequence::sequential(commands)
 }
@@ -172,7 +172,9 @@ fn browse_cards(card_browser: CardBrowserType) -> CommandSequence {
 
     *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
 
-    CommandSequence::sequential(vec![Command::UpdateBattle(UpdateBattleCommand::new(battle))])
+    CommandSequence::sequential(vec![Command::UpdateBattle(Box::new(UpdateBattleCommand::new(
+        battle,
+    )))])
 }
 
 fn close_card_browser() -> CommandSequence {
@@ -190,7 +192,9 @@ fn close_card_browser() -> CommandSequence {
     *CARD_BROWSER_SOURCE.lock().unwrap() = None;
     *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
 
-    CommandSequence::sequential(vec![Command::UpdateBattle(UpdateBattleCommand::new(battle))])
+    CommandSequence::sequential(vec![Command::UpdateBattle(Box::new(UpdateBattleCommand::new(
+        battle,
+    )))])
 }
 
 fn select_card(card_id: ClientCardId) -> CommandSequence {
@@ -271,11 +275,11 @@ fn select_card(card_id: ClientCardId) -> CommandSequence {
             },
             ParallelCommandGroup {
                 commands: vec![
-                    Command::UpdateBattle(UpdateBattleCommand {
+                    Command::UpdateBattle(Box::new(UpdateBattleCommand {
                         battle,
                         update_sound: Some(AudioClipAddress::new(
                             "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Generic_SubtleWhoosh04.wav")),
-                    }),
+                    })),
                     Command::DissolveCard(DissolveCardCommand {
                         target: card_id.clone(),
                         reverse: true,
@@ -294,7 +298,7 @@ fn select_card(card_id: ClientCardId) -> CommandSequence {
 fn play_card_with_targets(battle: &mut BattleView, card_id: ClientCardId, stack: StackType) {
     let Some((card_index, card)) = battle.cards.iter().enumerate().find(|(_, c)| c.id == card_id)
     else {
-        panic!("Card not found: {:?}", card_id);
+        panic!("Card not found: {card_id:?}");
     };
     let sorting_key = card.position.sorting_key;
     battle.cards[card_index] = basic_scene::card_view(Position::OnStack(stack), sorting_key);
@@ -333,13 +337,13 @@ fn play_card_with_order_selector(
 ) {
     let Some((card_index, card)) = battle.cards.iter().enumerate().find(|(_, c)| c.id == card_id)
     else {
-        panic!("Card not found: {:?}", card_id);
+        panic!("Card not found: {card_id:?}");
     };
     let sorting_key = card.position.sorting_key;
     battle.cards[card_index] =
         basic_scene::card_view(Position::OnStack(StackType::Default), sorting_key);
     battle.cards[card_index].position.sorting_key = 500;
-    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+    commands.push(Command::UpdateBattle(Box::new(UpdateBattleCommand::new(battle.clone()))));
 
     commands.push(Command::DisplayEffect(DisplayEffectCommand {
         target: GameObjectId::CardId(card_id),
@@ -355,11 +359,11 @@ fn play_card_with_order_selector(
     battle.cards[card_index] =
         basic_scene::card_view(Position::InVoid(DisplayPlayer::User), sorting_key);
     commands.push(Command::UpdateBattle(
-        UpdateBattleCommand::new(battle.clone()).with_update_sound(
+        Box::new(UpdateBattleCommand::new(battle.clone()).with_update_sound(
             AudioClipAddress::new(
                 "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Magic2_Projectiles02.wav",
             ),
-        ),
+        )),
     ));
     let c1 = draw_card(battle);
     let c2 = draw_card(battle);
@@ -388,8 +392,8 @@ fn play_card_with_order_selector(
     });
 
     *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
-    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())
-        .with_update_sound(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Electric Magic/RPG3_ElectricMagic_Cast02.wav"))));
+    commands.push(Command::UpdateBattle(Box::new(UpdateBattleCommand::new(battle.clone())
+        .with_update_sound(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Electric Magic/RPG3_ElectricMagic_Cast02.wav")))));
 }
 
 fn select_card_order(select_order: SelectCardOrder) -> CommandSequence {
@@ -430,7 +434,9 @@ fn select_card_order(select_order: SelectCardOrder) -> CommandSequence {
 
     *CURRENT_BATTLE.lock().unwrap() = Some(battle.clone());
 
-    CommandSequence::sequential(vec![Command::UpdateBattle(UpdateBattleCommand::new(battle))])
+    CommandSequence::sequential(vec![Command::UpdateBattle(Box::new(UpdateBattleCommand::new(
+        battle,
+    )))])
 }
 
 fn apply_test_scenario_action(scenario: &str) -> CommandSequence {
@@ -440,10 +446,10 @@ fn apply_test_scenario_action(scenario: &str) -> CommandSequence {
         "user_judgment_phase" => trigger_user_judgment_phase(&mut battle, &mut commands),
         "respond_to_enemy_card" => respond_to_enemy_card(&mut battle, &mut commands),
         _ => {
-            panic!("Scenario not implemented: {:?}", scenario);
+            panic!("Scenario not implemented: {scenario:?}");
         }
     }
-    commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+    commands.push(Command::UpdateBattle(Box::new(UpdateBattleCommand::new(battle.clone()))));
     *CURRENT_BATTLE.lock().unwrap() = Some(battle);
     CommandSequence::sequential(commands)
 }
@@ -465,7 +471,7 @@ fn respond_to_enemy_card(battle: &mut BattleView, commands: &mut Vec<Command>) {
             .unwrap_or(card_id.clone()); // Fallback to the card's own ID if no target found
         battle.cards[card_index] =
             basic_scene::card_view(Position::OnStack(StackType::Default), sorting_key);
-        commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+        commands.push(Command::UpdateBattle(Box::new(UpdateBattleCommand::new(battle.clone()))));
         commands.push(Command::Wait(Milliseconds::new(500)));
         battle.cards[card_index] = basic_scene::card_view(
             Position::OnStack(StackType::TargetingUserBattlefield),
@@ -476,7 +482,7 @@ fn respond_to_enemy_card(battle: &mut BattleView, commands: &mut Vec<Command>) {
             target: GameObjectId::CardId(target_id),
             color: ArrowStyle::Red,
         }];
-        commands.push(Command::UpdateBattle(UpdateBattleCommand::new(battle.clone())));
+        commands.push(Command::UpdateBattle(Box::new(UpdateBattleCommand::new(battle.clone()))));
     }
 }
 

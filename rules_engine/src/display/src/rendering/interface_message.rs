@@ -40,14 +40,16 @@ impl Component for InterfaceMessage {
                         .align_items(FlexAlign::Center)
                         .justify_content(FlexJustify::Center)
                         .opacity(if self.temporary { 0 } else { 1 })
-                        .transition_durations(
-                            self.temporary
-                                .then(|| vec![Milliseconds::new(300)])
-                                .unwrap_or_default(),
-                        )
-                        .transition_properties(
-                            self.temporary.then(|| vec!["opacity".to_string()]).unwrap_or_default(),
-                        )
+                        .transition_durations(if self.temporary {
+                            vec![Milliseconds::new(300)]
+                        } else {
+                            vec![]
+                        })
+                        .transition_properties(if self.temporary {
+                            vec!["opacity".to_string()]
+                        } else {
+                            vec![]
+                        })
                         .build(),
                 )
                 .maybe_on_attach_style(self.temporary.then(|| {

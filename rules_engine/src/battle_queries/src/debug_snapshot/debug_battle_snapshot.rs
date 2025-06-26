@@ -34,7 +34,7 @@ pub fn capture(state: &BattleState) -> DebugBattleState {
 
 fn debug_player_state(name: PlayerName, state: &BattlePlayerState) -> DebugBattlePlayerState {
     DebugBattlePlayerState {
-        name: format!("{:?}", name),
+        name: format!("{name:?}"),
         points: format!("{:?}", state.points),
         current_energy: format!("{:?}", state.current_energy),
         produced_energy: format!("{:?}", state.produced_energy),
@@ -130,9 +130,9 @@ fn debug_card_state(
 ) -> DebugCardState {
     let ability_list = card_abilities::query(battle, card_id);
     DebugCardState {
-        id: format!("{:?}", card_id),
-        controller: format!("{:?}", controller),
-        current_zone: format!("{:?}", current_zone),
+        id: format!("{card_id:?}"),
+        controller: format!("{controller:?}"),
+        current_zone: format!("{current_zone:?}"),
         properties: DebugCardProperties {
             card_type: format!("{:?}", card_properties::card_type(battle, card_id)),
             spark: format!("{:?}", battle.cards.spark(controller, CharacterId(card_id))),
@@ -197,14 +197,10 @@ fn debug_prompt_data(prompt: &Option<PromptData>) -> DebugPromptData {
 
 fn format_prompt_choices(prompt: &PromptType) -> Vec<String> {
     match prompt {
-        PromptType::ChooseCharacter { valid } => {
-            valid.iter().map(|id| format!("{:?}", id)).collect()
-        }
-        PromptType::ChooseStackCard { valid } => {
-            valid.iter().map(|id| format!("{:?}", id)).collect()
-        }
+        PromptType::ChooseCharacter { valid } => valid.iter().map(|id| format!("{id:?}")).collect(),
+        PromptType::ChooseStackCard { valid } => valid.iter().map(|id| format!("{id:?}")).collect(),
         PromptType::Choose { choices } => {
-            choices.iter().map(|choice| format!("{:?}", choice)).collect()
+            choices.iter().map(|choice| format!("{choice:?}")).collect()
         }
         PromptType::ChooseEnergyValue { minimum, maximum } => {
             vec![format!("min {}", minimum), format!("max {}", maximum)]

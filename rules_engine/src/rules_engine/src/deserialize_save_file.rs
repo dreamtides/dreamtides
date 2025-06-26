@@ -107,7 +107,7 @@ fn get_battle_impl(
                             &battle_clone,
                             &actions,
                             action_index,
-                            &format!("{:?}", panic_info),
+                            &format!("{panic_info:?}"),
                         );
                         panic::resume_unwind(panic_info);
                     }

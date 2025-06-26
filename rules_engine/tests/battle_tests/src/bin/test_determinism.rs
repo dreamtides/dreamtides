@@ -38,7 +38,7 @@ fn main() {
     } else {
         println!("✗ Failed!");
         if let Some(error) = result.error_message {
-            println!("  Error: {}", error);
+            println!("  Error: {error}");
         }
         println!("  Executed {} actions before failure", result.actions_executed);
         std::process::exit(1);

@@ -20,7 +20,7 @@ pub fn identity_card_view(
     let name = builder.to_display_player(player);
     let position = Position::InPlayerStatus(name);
     CardView {
-        id: format!("{:?}", name),
+        id: format!("{name:?}"),
         position: ObjectPosition {
             position: position_overrides::for_browser(builder, position),
             sorting_key: 0,

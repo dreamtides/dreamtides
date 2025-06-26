@@ -26,7 +26,7 @@ fn parse_expression(input: &str, line_num: Option<usize>) -> Option<String> {
                 Report::build(ReportKind::Error, (), e.span().start).with_message(e.to_string());
 
             if let Some(line) = line_num {
-                report = report.with_note(format!("Error in line {}", line));
+                report = report.with_note(format!("Error in line {line}"));
             }
 
             report
@@ -64,7 +64,7 @@ fn main() {
         println!("[{}]", results.join(",\n"));
     } else if let Some(expr) = args.expression {
         if let Some(result) = parse_expression(&expr, None) {
-            println!("{}", result);
+            println!("{result}");
         }
     } else {
         println!("No expression or file provided");

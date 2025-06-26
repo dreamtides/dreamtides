@@ -24,10 +24,10 @@ impl Debug for GameAction {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
             GameAction::NoOp => write!(f, "NoOp"),
-            GameAction::DebugAction(action) => write!(f, "{:?}", action),
-            GameAction::BattleAction(action) => write!(f, "{:?}", action),
-            GameAction::BattleDisplayAction(action) => write!(f, "{:?}", action),
-            GameAction::Undo(player) => write!(f, "Undo({:?})", player),
+            GameAction::DebugAction(action) => write!(f, "{action:?}"),
+            GameAction::BattleAction(action) => write!(f, "{action:?}"),
+            GameAction::BattleDisplayAction(action) => write!(f, "{action:?}"),
+            GameAction::Undo(player) => write!(f, "Undo({player:?})"),
         }
     }
 }

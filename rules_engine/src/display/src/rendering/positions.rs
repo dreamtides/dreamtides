@@ -66,7 +66,7 @@ pub fn controller_and_zone(battle: &BattleState, card_id: CardId) -> ControllerA
                 return ControllerAndZone { controller: stack_card.controller, zone: Zone::Stack };
             }
         }
-        panic!("Card not found in any zone: {:?}", card_id)
+        panic!("Card not found in any zone: {card_id:?}")
     }
 }
 

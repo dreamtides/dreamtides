@@ -56,7 +56,7 @@ impl StateProvider for TestStateProvider {
             .inner
             .databases
             .lock()
-            .map_err(|e| DatabaseError(format!("Failed to acquire lock: {}", e)))?;
+            .map_err(|e| DatabaseError(format!("Failed to acquire lock: {e}")))?;
 
         if let Some(existing_db) = databases.get(path) {
             Ok(existing_db.clone())
@@ -72,7 +72,7 @@ impl StateProvider for TestStateProvider {
             .inner
             .databases
             .lock()
-            .map_err(|e| DatabaseError(format!("Failed to acquire lock: {}", e)))?;
+            .map_err(|e| DatabaseError(format!("Failed to acquire lock: {e}")))?;
         databases
             .values()
             .next()
@@ -108,7 +108,7 @@ impl StateProvider for TestStateProvider {
             if let Some(start_time) = timestamps.get(&request_id) {
                 format!("{}ms", start_time.elapsed().as_millis())
             } else if request_id.is_some() {
-                format!("[unknown request ID: {:?}]", request_id)
+                format!("[unknown request ID: {request_id:?}]")
             } else {
                 "[empty request ID]".to_string()
             }

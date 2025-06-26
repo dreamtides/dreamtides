@@ -10,7 +10,7 @@ use crate::{
 /// Vec<[Ability]> data structure.
 ///
 /// The provided text must be all lowercase.
-pub fn parse(text: &str) -> ParseResult<Vec<Ability>, Rich<char>> {
+pub fn parse(text: &str) -> ParseResult<Vec<Ability>, Rich<'_, char>> {
     parser().parse(text)
 }
 

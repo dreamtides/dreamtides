@@ -112,7 +112,7 @@ impl StateProvider for DefaultStateProvider {
             if let Some(start_time) = timestamps.get(&request_id) {
                 format!("{}ms", start_time.elapsed().as_millis())
             } else if request_id.is_some() {
-                format!("[unknown request ID: {:?}]", request_id)
+                format!("[unknown request ID: {request_id:?}]")
             } else {
                 "[empty request ID]".to_string()
             }

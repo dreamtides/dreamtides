@@ -104,8 +104,7 @@ pub fn run_determinism_test(
                     actions_executed: action_idx,
                     success: false,
                     error_message: Some(format!(
-                        "Run {} action {} was for different player",
-                        run, action_idx
+                        "Run {run} action {action_idx} was for different player"
                     )),
                 };
             }
@@ -116,20 +115,18 @@ pub fn run_determinism_test(
                     actions_executed: action_idx,
                     success: false,
                     error_message: Some(format!(
-                        "Run {} action {} chose different index ({} vs {})",
-                        run, action_idx, idx0, idx_n
+                        "Run {run} action {action_idx} chose different index ({idx0} vs {idx_n})"
                     )),
                 };
             }
 
-            if format!("{:?}", action0) != format!("{:?}", action_n) {
+            if format!("{action0:?}") != format!("{action_n:?}") {
                 return DeterminismTestResult {
                     num_runs,
                     actions_executed: action_idx,
                     success: false,
                     error_message: Some(format!(
-                        "Run {} action {} produced different action",
-                        run, action_idx
+                        "Run {run} action {action_idx} produced different action"
                     )),
                 };
             }
@@ -141,8 +138,7 @@ pub fn run_determinism_test(
                 actions_executed: action_sequences[0].len(),
                 success: false,
                 error_message: Some(format!(
-                    "Run {} produced different legal action history length",
-                    run
+                    "Run {run} produced different legal action history length"
                 )),
             };
         }
@@ -155,10 +151,7 @@ pub fn run_determinism_test(
                     num_runs,
                     actions_executed: step,
                     success: false,
-                    error_message: Some(format!(
-                        "Run {} step {} was for different player",
-                        run, step
-                    )),
+                    error_message: Some(format!("Run {run} step {step} was for different player")),
                 };
             }
 
@@ -178,14 +171,13 @@ pub fn run_determinism_test(
             }
 
             for (i, (action0, action_n)) in legal0.iter().zip(legal_n.iter()).enumerate() {
-                if format!("{:?}", action0) != format!("{:?}", action_n) {
+                if format!("{action0:?}") != format!("{action_n:?}") {
                     return DeterminismTestResult {
                         num_runs,
                         actions_executed: step,
                         success: false,
                         error_message: Some(format!(
-                            "Run {} step {} legal action {} differs",
-                            run, step, i
+                            "Run {run} step {step} legal action {i} differs"
                         )),
                     };
                 }

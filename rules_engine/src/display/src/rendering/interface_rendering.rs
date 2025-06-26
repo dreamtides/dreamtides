@@ -179,7 +179,7 @@ fn primary_action_button(
             display_state::get_selected_energy_additional_cost(builder).unwrap_or(*minimum);
         if legal_actions.contains(BattleAction::SelectEnergyAdditionalCost(current)) {
             return Some(ButtonView {
-                label: format!("Spend {}\u{f7e4}", current),
+                label: format!("Spend {current}\u{f7e4}"),
                 action: Some(BattleAction::SelectEnergyAdditionalCost(current).into()),
             });
         }
