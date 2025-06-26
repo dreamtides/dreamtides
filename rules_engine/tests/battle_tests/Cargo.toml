@@ -22,11 +22,11 @@ state_provider = { path = "../../src/state_provider" }
 test_utils = { path = "../../src/test_utils" }
 ui_components = { path = "../../src/ui_components" }
 
-clap = { version = "4", features = ["derive"] }
-proptest = "1"
-rand = "0.9"
-tokio = { version = "1", features = ["full"] }
-uuid = { version = "1", features = ["serde", "v4"] }
+clap = { workspace = true }
+proptest = { workspace = true }
+rand = { workspace = true }
+tokio = { workspace = true }
+uuid = { workspace = true }
 
 [[bin]]
 name = "test_determinism"

@@ -18,4 +18,4 @@ parser = { path = "../../src/parser" }
 ariadne = "0.2"
 
 [dev-dependencies]
-insta = { version = "1.42", features = ["ron"] }
+insta = { workspace = true }

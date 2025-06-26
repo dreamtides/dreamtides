@@ -17,4 +17,4 @@ core_data = { path = "../core_data" }
 quest_data = { path = "../quest_data" }
 
 schemars = { workspace = true }
-serde = { version = "1", features = ["derive"] }
+serde = { workspace = true }

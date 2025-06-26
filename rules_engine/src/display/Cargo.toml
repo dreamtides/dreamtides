@@ -26,9 +26,9 @@ masonry = { path = "../masonry" }
 state_provider = { path = "../state_provider" }
 ui_components = { path = "../ui_components" }
 
-bon = "3"
+bon = { workspace = true }
 schemars = { workspace = true }
-serde = { version = "1", features = ["derive"] }
-strum = "0.27"
-tracing = "0.1"
-tracing-subscriber = "0.3"
+serde = { workspace = true }
+strum = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }

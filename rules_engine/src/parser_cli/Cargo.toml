@@ -15,6 +15,6 @@ bench = false
 [dependencies]
 parser = { path = "../parser" }
 
-ariadne = "0.2"
-clap = { version = "4.5", features = ["derive"] }
-ron = "0.8"
+ariadne = { workspace = true }
+clap = { workspace = true }
+ron = { workspace = true }

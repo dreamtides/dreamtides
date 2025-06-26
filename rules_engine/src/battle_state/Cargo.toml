@@ -16,15 +16,14 @@ ability_data = { path = "../ability_data" }
 ai_data = { path = "../ai_data" }
 core_data = { path = "../core_data" }
 
-bit-set = "0.8"
-bit-vec = "0.8"
-enum-iterator = "2"
-enumset = { version = "1", features = ["serde"] }
-rand = "0.9"
-rand_xoshiro = "0.7"
+bit-set = { workspace = true }
+bit-vec = { workspace = true }
+enum-iterator = { workspace = true }
+enumset = { workspace = true }
+rand = { workspace = true }
+rand_xoshiro = { workspace = true }
 schemars = { workspace = true }
-serde = { version = "1", features = ["derive"] }
-slotmap = "1"
-strum = "0.27"
-strum_macros = "0.27"
-uuid = "1"
+serde = { workspace = true }
+strum = { workspace = true }
+strum_macros = { workspace = true }
+uuid = { workspace = true }

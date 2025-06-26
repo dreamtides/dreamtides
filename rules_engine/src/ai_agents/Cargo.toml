@@ -20,7 +20,7 @@ battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 logging = { path = "../logging" }
 
-ordered-float = "5"
-rand = "0.9"
-tracing = "0.1"
-tracing-subscriber = "0.3"
+ordered-float = { workspace = true }
+rand = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }

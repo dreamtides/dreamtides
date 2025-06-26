@@ -21,11 +21,11 @@ battle_queries = { path = "../battle_queries" }
 core_data = { path = "../core_data" }
 game_creation = { path = "../game_creation" }
 
-clap = { version = "4", features = ["derive"] }
-rand = "0.9"
-rand_xoshiro = "0.7"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-tracing = "0.1"
-tracing-subscriber = "0.3"
-uuid = "1"
+clap = { workspace = true }
+rand = { workspace = true }
+rand_xoshiro = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+uuid = { workspace = true }

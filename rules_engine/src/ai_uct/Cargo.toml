@@ -17,11 +17,11 @@ battle_mutations = { path = "../battle_mutations", version = "0.0.0" }
 battle_queries = { path = "../battle_queries", version = "0.0.0" }
 core_data = { path = "../core_data", version = "0.0.0" }
 
-ego-tree = "0.10"
-ordered-float = "5"
-petgraph = "0.8"
-rand = "0.9"
-rand_xoshiro = "0.7"
-rayon = "1"
-tracing = "0.1"
-tracing-subscriber = "0.3"
+ego-tree = { workspace = true }
+ordered-float = { workspace = true }
+petgraph = { workspace = true }
+rand = { workspace = true }
+rand_xoshiro = { workspace = true }
+rayon = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }

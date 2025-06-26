@@ -15,6 +15,6 @@ bench = false
 action_data = { path = "../action_data" }
 core_data = { path = "../core_data" }
 
-bon = "3"
+bon = { workspace = true }
 schemars = { workspace = true }
-serde = { version = "1", features = ["derive"] }
+serde = { workspace = true }

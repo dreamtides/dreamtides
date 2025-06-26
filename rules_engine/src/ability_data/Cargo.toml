@@ -15,5 +15,5 @@ bench = false
 core_data = { path = "../core_data" }
 
 schemars = { workspace = true }
-serde = { version = "1", features = ["derive"] }
-strum = "0.27"
+serde = { workspace = true }
+strum = { workspace = true }

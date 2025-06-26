@@ -22,11 +22,11 @@ battle_state = { path = "../../src/battle_state" }
 core_data = { path = "../../src/core_data" }
 game_creation = { path = "../../src/game_creation" }
 
-rand = "0.9"
-rand_xoshiro = "0.7"
-tracing = "0.1"
-tracing-subscriber = { version = "0.3.17", features = ["env-filter", "serde"] }
-uuid = { version = "1", features = ["serde", "v4"] }
+rand = { workspace = true }
+rand_xoshiro = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+uuid = { workspace = true }
 
 [dev-dependencies]
-criterion = { version = "0.5.1", features = ["html_reports"] }
+criterion = { workspace = true }

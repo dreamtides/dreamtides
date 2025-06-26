@@ -16,4 +16,4 @@ battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 ability_data = { path = "../ability_data" }
 
-chumsky = "0.10"
+chumsky = { workspace = true }

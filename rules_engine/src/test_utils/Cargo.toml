@@ -29,10 +29,10 @@ rules_engine = { path = "../rules_engine" }
 state_provider = { path = "../state_provider" }
 ui_components = { path = "../ui_components" }
 
-bon = "3"
+bon = { workspace = true }
 schemars = { workspace = true }
-serde = { version = "1", features = ["derive"] }
-tokio = { version = "1", features = ["full"] }
-tracing = "0.1"
-tracing-subscriber = "0.3"
-uuid = "1"
+serde = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+uuid = { workspace = true }

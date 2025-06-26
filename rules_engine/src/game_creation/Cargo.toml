@@ -18,6 +18,6 @@ battle_mutations = { path = "../battle_mutations" }
 battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 
-rand = "0.9"
-rand_xoshiro = "0.7"
-uuid = { version = "1", features = ["serde", "v4"] }
+rand = { workspace = true }
+rand_xoshiro = { workspace = true }
+uuid = { workspace = true }
