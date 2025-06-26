@@ -230,12 +230,14 @@ coverage:
 
 rsync-review:
     rsync --delete --stats --copy-links -avqr ./rules_engine ~/dreamtides_tests/
+    echo $'\a'
     rsync --delete --stats --copy-links -avqr ./client ~/dreamtides_tests/
+    echo $'\a'
     cp justfile ~/dreamtides_tests/
     echo $'\a'
 
 code-review-rsync: rsync-review
-    cd ~/dreamtides_tests && just code-review || say "review failed"
+    cd ~/dreamtides_tests && just code-review || osascript -e 'display dialog "Review failed" with icon stop'
 
 unity-test-rsync: rsync-review
     cd ~/dreamtides_tests && just unity-tests
