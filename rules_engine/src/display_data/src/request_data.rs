@@ -9,6 +9,9 @@ use uuid::Uuid;
 use crate::client_log_request::{ClientLogRequest, ClientLogResponse};
 use crate::command::CommandSequence;
 
+pub type RequestId = Uuid;
+pub type IntegrationTestId = Uuid;
+
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct Metadata {
@@ -19,11 +22,11 @@ pub struct Metadata {
     pub battle_id: Option<BattleId>,
 
     /// Identifies the request from the client.
-    pub request_id: Option<Uuid>,
+    pub request_id: Option<RequestId>,
 
     /// If specified, the request is part of an integration test with the given
     /// ID. State will not be persisted.
-    pub integration_test_id: Option<Uuid>,
+    pub integration_test_id: Option<IntegrationTestId>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
