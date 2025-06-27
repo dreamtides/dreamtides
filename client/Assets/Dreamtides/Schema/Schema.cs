@@ -84,13 +84,15 @@ namespace Dreamtides.Schema
     public partial class ConnectRequest
     {
         /// <summary>
-        /// If specified, the battle will be created with the given debug configuration.
+        /// If specified, the battle will be created with the given debug
+        /// configuration.
         /// </summary>
         [JsonProperty("debugConfiguration")]
         public DebugConfiguration DebugConfiguration { get; set; }
 
         /// <summary>
-        /// Display properties from the client (screen dimensions, mobile device flag, etc.)
+        /// Display properties from the client (screen dimensions, mobile device
+        /// flag, etc.)
         /// </summary>
         [JsonProperty("displayProperties")]
         public DisplayProperties DisplayProperties { get; set; }
@@ -101,10 +103,10 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Contains the path to a persistent data directory.
         ///
-        /// When you build the Unity application, a GUID is generated that is based on the Bundle
-        /// Identifier. This GUID is part of persistentDataPath. If you keep the same Bundle
-        /// Identifier in future versions, the application keeps accessing the same location on every
-        /// update.
+        /// When you build the Unity application, a GUID is generated that is based
+        /// on the Bundle Identifier. This GUID is part of persistentDataPath. If
+        /// you keep the same Bundle Identifier in future versions, the application
+        /// keeps accessing the same location on every update.
         /// </summary>
         [JsonProperty("persistentDataPath", Required = Required.Always)]
         public string PersistentDataPath { get; set; }
@@ -113,8 +115,8 @@ namespace Dreamtides.Schema
         public string TestScenario { get; set; }
 
         /// <summary>
-        /// If specified, treats this as a multiplayer game using the save file provided in this ID
-        /// and adds this user as a player in the battle.
+        /// If specified, treats this as a multiplayer game using the save file
+        /// provided in this ID and adds this user as a player in the battle.
         /// </summary>
         [JsonProperty("vsOpponent")]
         public Guid? VsOpponent { get; set; }
@@ -129,8 +131,8 @@ namespace Dreamtides.Schema
         public PlayerType Enemy { get; set; }
 
         /// <summary>
-        /// If specified, the battle will be seeded with the given value. Otherwise a random seed
-        /// will be used.
+        /// If specified, the battle will be seeded with the given value. Otherwise
+        /// a random seed will be used.
         /// </summary>
         [JsonProperty("seed")]
         public long? Seed { get; set; }
@@ -175,8 +177,8 @@ namespace Dreamtides.Schema
         public Guid? BattleId { get; set; }
 
         /// <summary>
-        /// If specified, the request is part of an integration test with the given ID. State will
-        /// not be persisted.
+        /// If specified, the request is part of an integration test with the given
+        /// ID. State will not be persisted.
         /// </summary>
         [JsonProperty("integrationTestId")]
         public Guid? IntegrationTestId { get; set; }
@@ -272,13 +274,15 @@ namespace Dreamtides.Schema
     public partial class DisplayDreamwellActivationCommand
     {
         /// <summary>
-        /// The card to display an activation for. This card will be moved from its current position
-        /// (assumed to be the 'Dreamwell' position) to the DreamwellActivation position, and an
-        /// update to the player's produced energy value will be displayed.
+        /// The card to display an activation for. This card will be moved from its
+        /// current position (assumed to be the 'Dreamwell' position) to the
+        /// DreamwellActivation position, and an update to the player's produced
+        /// energy value will be displayed.
         ///
-        /// If there are triggered events as a result of this activation, the card should be kept in
-        /// the DreamwellActivation position for the next update. Otherwise it's typical to return
-        /// the card to the Dreamwell position.
+        /// If there are triggered events as a result of this activation, the card
+        /// should be kept in the DreamwellActivation position for the next
+        /// update. Otherwise it's typical to return the card to the Dreamwell
+        /// position.
         /// </summary>
         [JsonProperty("cardId", Required = Required.Always)]
         public string CardId { get; set; }
@@ -290,7 +294,8 @@ namespace Dreamtides.Schema
         public long? NewEnergy { get; set; }
 
         /// <summary>
-        /// New energy produced by this player at the start of the turn, if it has changed.
+        /// New energy produced by this player at the start of the turn, if it has
+        /// changed.
         /// </summary>
         [JsonProperty("newProducedEnergy")]
         public long? NewProducedEnergy { get; set; }
@@ -462,14 +467,16 @@ namespace Dreamtides.Schema
         /// <summary>
         /// The card to dissolve.
         ///
-        /// Once a card is dissolved, it will be invisible until a reverse dissolve is applied to it.
+        /// Once a card is dissolved, it will be invisible until a reverse dissolve
+        /// is applied to it.
         /// </summary>
         [JsonProperty("target", Required = Required.Always)]
         public string Target { get; set; }
     }
 
     /// <summary>
-    /// Represents a color with the given RGBA values represented as floats in the 0-1 range.
+    /// Represents a color with the given RGBA values represented as floats in the
+    /// 0-1 range.
     ///
     /// The color to use for the dissolve effect.
     /// </summary>
@@ -534,8 +541,8 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Optionally, a position at which to create this card.
         ///
-        /// If this card does not already exist, it will be created at this position before being
-        /// animated to [Self::position].
+        /// If this card does not already exist, it will be created at this position
+        /// before being animated to [Self::position].
         /// </summary>
         [JsonProperty("createPosition")]
         public ObjectPosition CreatePosition { get; set; }
@@ -543,7 +550,8 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Optionally, a position at which to destroy this card.
         ///
-        /// If provided, the card will be animated to this position before being destroyed.
+        /// If provided, the card will be animated to this position before being
+        /// destroyed.
         /// </summary>
         [JsonProperty("destroyPosition")]
         public ObjectPosition DestroyPosition { get; set; }
@@ -567,8 +575,8 @@ namespace Dreamtides.Schema
         public CardPrefab Prefab { get; set; }
 
         /// <summary>
-        /// If this card is revealed to the viewer, contains information on the revealed face of the
-        /// card.
+        /// If this card is revealed to the viewer, contains information on the
+        /// revealed face of the card.
         /// </summary>
         [JsonProperty("revealed")]
         public RevealedCardView Revealed { get; set; }
@@ -609,11 +617,12 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Object is on the stack, typically used by cards which were just played.
     ///
-    /// There are four types of stacks. By default, cards display at a large display size,
-    /// blocking the view of the battlefield. However, if any cards are present on the stack
-    /// which target a character on the battlefield, the cards are displayed at a smaller size in
-    /// order to enable viewing & selecting targets appropriately, based on the set of cards
-    /// which are current or eligible targets.
+    /// There are four types of stacks. By default, cards display at a large
+    /// display size, blocking the view of the battlefield. However, if any
+    /// cards are present on the stack which target a character on the
+    /// battlefield, the cards are displayed at a smaller size in order to
+    /// enable viewing & selecting targets appropriately, based on the set of
+    /// cards which are current or eligible targets.
     ///
     /// Object is in a player's hand
     ///
@@ -629,8 +638,8 @@ namespace Dreamtides.Schema
     ///
     /// Object is in a player's status zone
     ///
-    /// Object is being displayed in a selector to determine the order of cards, e.g. when
-    /// resolving the "forsee" effect.
+    /// Object is being displayed in a selector to determine the order of cards,
+    /// e.g. when resolving the "forsee" effect.
     ///
     /// Object is in the dreamwell for a player (usually off-screen).
     ///
@@ -708,7 +717,8 @@ namespace Dreamtides.Schema
         public DisplayImage Image { get; set; }
 
         /// <summary>
-        /// Data providing supplemental information about this card on long press/hover.
+        /// Data providing supplemental information about this card on long
+        /// press/hover.
         /// </summary>
         [JsonProperty("infoZoomData")]
         public InfoZoomData InfoZoomData { get; set; }
@@ -756,14 +766,15 @@ namespace Dreamtides.Schema
     public partial class CardActions
     {
         /// <summary>
-        /// If this card can currently be played from hand, an action to invoke when played.
+        /// If this card can currently be played from hand, an action to invoke when
+        /// played.
         /// </summary>
         [JsonProperty("canPlay")]
         public ActionUnion? CanPlay { get; set; }
 
         /// <summary>
-        /// If this card can currently be dragged within a Card Order Selector, the card ID to use
-        /// when selecting order.
+        /// If this card can currently be dragged within a Card Order Selector, the
+        /// card ID to use when selecting order.
         /// </summary>
         [JsonProperty("canSelectOrder")]
         public long? CanSelectOrder { get; set; }
@@ -860,8 +871,8 @@ namespace Dreamtides.Schema
     ///
     /// Move all cards from hand to deck
     ///
-    /// Set the number of cards remaining in a player's deck. All other cards are moved to the
-    /// void.
+    /// Set the number of cards remaining in a player's deck. All other cards
+    /// are moved to the void.
     /// </summary>
     public partial class DebugBattleAction
     {
@@ -909,7 +920,8 @@ namespace Dreamtides.Schema
     }
 
     /// <summary>
-    /// Sets the selected amount of energy to pay as an additional cost to play a card.
+    /// Sets the selected amount of energy to pay as an additional cost to play
+    /// a card.
     ///
     /// Opens a panel based on its address.
     /// </summary>
@@ -941,8 +953,8 @@ namespace Dreamtides.Schema
     }
 
     /// <summary>
-    /// Preview of a potential future state of a battle, shown e.g. in response to a card being
-    /// selected to be played.
+    /// Preview of a potential future state of a battle, shown e.g. in response to a
+    /// card being selected to be played.
     /// </summary>
     public partial class BattlePreviewView
     {
@@ -1621,7 +1633,8 @@ namespace Dreamtides.Schema
     public partial class InfoZoomData
     {
         /// <summary>
-        /// Icons to display on other cards during info zoom, e.g. indicating targets.
+        /// Icons to display on other cards during info zoom, e.g. indicating
+        /// targets.
         /// </summary>
         [JsonProperty("icons", Required = Required.Always)]
         public List<InfoZoomIcon> Icons { get; set; }
@@ -1776,7 +1789,8 @@ namespace Dreamtides.Schema
         public InterfaceView Interface { get; set; }
 
         /// <summary>
-        /// Preview of the next state of the battle, used e.g. when confirming prompt choices.
+        /// Preview of the next state of the battle, used e.g. when confirming
+        /// prompt choices.
         /// </summary>
         [JsonProperty("preview", Required = Required.Always)]
         public BattlePreviewState Preview { get; set; }
@@ -1890,16 +1904,16 @@ namespace Dreamtides.Schema
         public ButtonView IncrementButton { get; set; }
 
         /// <summary>
-        /// Primary action button, used for confirming selections and ending the turn. None indicates
-        /// no button should be shown.
+        /// Primary action button, used for confirming selections and ending the
+        /// turn. None indicates no button should be shown.
         /// </summary>
         [JsonProperty("primaryActionButton")]
         public ButtonView PrimaryActionButton { get; set; }
 
         /// <summary>
-        /// If provided, when the primary action button is not visible, the button will wait for this
-        /// duration after the last "update" before appearing. If this is None the button will
-        /// display immediately.
+        /// If provided, when the primary action button is not visible, the button
+        /// will wait for this duration after the last "update" before appearing. If
+        /// this is None the button will display immediately.
         /// </summary>
         [JsonProperty("primaryActionShowOnIdleDuration")]
         public Milliseconds PrimaryActionShowOnIdleDuration { get; set; }
@@ -1929,8 +1943,8 @@ namespace Dreamtides.Schema
     public partial class ButtonView
     {
         /// <summary>
-        /// Action to perform when the button is clicked. If None is provided, the button will appear
-        /// disabled.
+        /// Action to perform when the button is clicked. If None is provided, the
+        /// button will appear disabled.
         /// </summary>
         [JsonProperty("action")]
         public ActionUnion? Action { get; set; }
@@ -1969,7 +1983,8 @@ namespace Dreamtides.Schema
         public GameAction Action { get; set; }
 
         /// <summary>
-        /// The version of the last response the client received, used to prevent duplicate actions.
+        /// The version of the last response the client received, used to prevent
+        /// duplicate actions.
         /// </summary>
         [JsonProperty("lastResponseVersion")]
         public Guid? LastResponseVersion { get; set; }
@@ -1978,8 +1993,8 @@ namespace Dreamtides.Schema
         public Metadata Metadata { get; set; }
 
         /// <summary>
-        /// If specified, treats this as a multiplayer game using the save file provided in this ID
-        /// instead of reading the user's own save file.
+        /// If specified, treats this as a multiplayer game using the save file
+        /// provided in this ID instead of reading the user's own save file.
         /// </summary>
         [JsonProperty("saveFileId")]
         public Guid? SaveFileId { get; set; }
@@ -2042,8 +2057,8 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Represents a player within the context of the display layer.
     ///
-    /// The "viewer" is always the player operating the game client, this may correspond to
-    /// either of the actual players in the game.
+    /// The "viewer" is always the player operating the game client, this may
+    /// correspond to either of the actual players in the game.
     ///
     /// The player to display the judgment animation for.
     ///
@@ -2061,26 +2076,28 @@ namespace Dreamtides.Schema
     public enum CardFacing { FaceDown, FaceUp };
 
     /// <summary>
-    /// Object position used in interface elements like the deck viewer which don't rely on game
-    /// positioning.
+    /// Object position used in interface elements like the deck viewer which
+    /// don't rely on game positioning.
     ///
     /// Object is not visible.
     ///
-    /// Position for cards to be shown to the user immediately after they're drawn.
+    /// Position for cards to be shown to the user immediately after they're
+    /// drawn.
     ///
-    /// Object is being displayed in a card browser, e.g. to select from a list of cards while
-    /// searching
+    /// Object is being displayed in a card browser, e.g. to select from a list
+    /// of cards while searching
     ///
-    /// Object is in a temporary holding space for cards in hand while resolving some other 'play
-    /// card' ability.
+    /// Object is in a temporary holding space for cards in hand while resolving
+    /// some other 'play card' ability.
     ///
-    /// Object is in a position to display itself as part of a dreamwell activation.
+    /// Object is in a position to display itself as part of a dreamwell
+    /// activation.
     ///
     /// Object describes a game modifier or ongoing game effect
     ///
-    /// Object is in the on-screen storage area, used to hold objects at a small size when
-    /// they're not being focused on, e.g. when the user hides a card browser to get a better
-    /// view of the battlefield.
+    /// Object is in the on-screen storage area, used to hold objects at a small
+    /// size when they're not being focused on, e.g. when the user hides a
+    /// card browser to get a better view of the battlefield.
     /// </summary>
     public enum PositionEnum { Browser, Default, Drawn, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnScreenStorage };
 
@@ -2096,8 +2113,8 @@ namespace Dreamtides.Schema
     public enum GameActionEnum { NoOp };
 
     /// <summary>
-    /// Pass on taking actions in response to a card being played by the opponent, thus causing
-    /// the stack to be resolved.
+    /// Pass on taking actions in response to a card being played by the
+    /// opponent, thus causing the stack to be resolved.
     ///
     /// End your turn
     ///
@@ -2179,8 +2196,8 @@ namespace Dreamtides.Schema
     ///
     /// Unknown battle preview state during animation
     ///
-    /// Used to not remove the existing preview to avoid the interface jumping around between
-    /// states.
+    /// Used to not remove the existing preview to avoid the interface jumping
+    /// around between states.
     /// </summary>
     public enum BattlePreviewStateEnum { None, Pending };
 
@@ -2274,7 +2291,8 @@ namespace Dreamtides.Schema
     }
 
     /// <summary>
-    /// Preview of the next state of the battle, used e.g. when confirming prompt choices.
+    /// Preview of the next state of the battle, used e.g. when confirming
+    /// prompt choices.
     /// </summary>
     public partial struct BattlePreviewState
     {
