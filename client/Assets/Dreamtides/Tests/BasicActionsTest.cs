@@ -21,7 +21,7 @@ namespace Dreamtides.Tests
     [UnityTest]
     public IEnumerator TestBasicLayout()
     {
-
+      yield break;
     }
   }
 }
