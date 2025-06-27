@@ -54,6 +54,7 @@ namespace Dreamtides.Services
       _metadata = new Metadata
       {
         UserId = IsTestClient ? _testOpponentGuid : _userGuid,
+        IntegrationTestId = _integrationTestId,
       };
       var request = new ConnectRequest
       {
@@ -105,14 +106,14 @@ namespace Dreamtides.Services
         {
           StartCoroutine(DevServerPollAsync(new PollRequest
           {
-            Metadata = _metadata!
+            Metadata = Errors.CheckNotNull(_metadata)
           }));
         }
         else
         {
           var request = new PollRequest
           {
-            Metadata = _metadata!
+            Metadata = Errors.CheckNotNull(_metadata)
           };
           var response = Plugin.Poll(request);
           if (response.Commands?.Groups.Count > 0)
@@ -152,7 +153,8 @@ namespace Dreamtides.Services
         {
           UserId = Errors.CheckNotNull(_metadata).UserId,
           BattleId = Errors.CheckNotNull(_metadata).BattleId,
-          RequestId = requestId
+          RequestId = requestId,
+          IntegrationTestId = _integrationTestId,
         },
         Action = action.Value,
         LastResponseVersion = _lastResponseVersion,
