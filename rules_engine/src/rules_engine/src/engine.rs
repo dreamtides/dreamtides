@@ -536,7 +536,15 @@ fn handle_request_action(
         GameAction::NoOp => {}
         GameAction::DebugAction(action) => {
             let player = renderer::player_name_for_user(&*battle, user_id);
-            debug_actions::execute(battle, user_id, player, *action);
+            debug_actions::execute(
+                provider.clone(),
+                battle,
+                user_id,
+                player,
+                action.clone(),
+                &request_context,
+                request_id,
+            );
 
             send_updates_to_user_and_opponent(
                 provider.clone(),

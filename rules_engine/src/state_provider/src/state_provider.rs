@@ -9,7 +9,7 @@ use core_data::identifiers::UserId;
 use database::database::{Database, DatabaseError};
 use database::sqlite_database::{self, SqliteDatabase};
 use display_data::command::CommandSequence;
-use display_data::request_data::PollResponseType;
+use display_data::request_data::{PollResponseType, RequestId};
 use uuid::Uuid;
 
 use crate::display_state_provider::{DisplayState, DisplayStateProvider};
@@ -17,7 +17,7 @@ use crate::display_state_provider::{DisplayState, DisplayStateProvider};
 #[derive(Debug, Clone)]
 pub struct PollResult {
     pub commands: CommandSequence,
-    pub request_id: Option<Uuid>,
+    pub request_id: Option<RequestId>,
     pub response_type: PollResponseType,
 }
 
