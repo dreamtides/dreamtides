@@ -27,6 +27,7 @@ namespace Dreamtides.Services
     float _lastConnectAttemptTime;
     Metadata? _metadata;
     string? _testScenario;
+    Guid? _integrationTestId;
     Queue<CommandBatch> _commandQueue = new Queue<CommandBatch>();
     bool _isProcessingCommands = false;
     Dictionary<Guid, float> _requestStartTimes = new Dictionary<Guid, float>();
@@ -43,6 +44,7 @@ namespace Dreamtides.Services
     {
       Connected = false;
       _testScenario = testConfiguration?.TestScenario;
+      _integrationTestId = testConfiguration?.IntegrationTestId;
       StartCoroutine(InitializeAsync());
     }
 
@@ -51,13 +53,12 @@ namespace Dreamtides.Services
       yield return new WaitForEndOfFrame();
       _metadata = new Metadata
       {
-        UserId = IsTestClient ? _testOpponentGuid : _userGuid
+        UserId = IsTestClient ? _testOpponentGuid : _userGuid,
       };
       var request = new ConnectRequest
       {
         Metadata = _metadata,
         PersistentDataPath = Application.persistentDataPath,
-        VsOpponent = IsTestClient ? _userGuid : null,
         TestScenario = _testScenario,
         DisplayProperties = GetDisplayProperties()
       };

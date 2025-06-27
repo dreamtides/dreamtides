@@ -20,6 +20,7 @@ namespace Dreamtides.Tests
       GameViewUtils.SetGameViewResolution(resolution);
       SceneManager.LoadScene("Assets/Scenes/Main.unity", LoadSceneMode.Single);
       yield return WaitForSceneLoad();
+      yield return new WaitForSeconds(0.1f);
       var registry = ComponentUtils.Get<Registry>(GameObject.Find("Registry"));
       Assert.IsNotNull(registry);
       Assert.AreEqual(GameViewUtils.GetResolution(resolution), new Vector2(Screen.width, Screen.height),
