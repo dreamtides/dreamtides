@@ -1,9 +1,9 @@
 use ability_data::predicate::Predicate;
-use chumsky::prelude::*;
 use chumsky::Parser;
+use chumsky::prelude::*;
 
 use crate::card_predicate_parser;
-use crate::parser_utils::{a_or_an, phrase, ErrorType};
+use crate::parser_utils::{ErrorType, a_or_an, phrase};
 
 /// Parser for expressions describing the target selected for an effect, for
 /// example in "Dissolve an enemy character".

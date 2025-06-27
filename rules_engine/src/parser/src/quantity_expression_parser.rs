@@ -1,8 +1,8 @@
 use ability_data::quantity_expression_data::QuantityExpression;
-use chumsky::prelude::*;
 use chumsky::Parser;
+use chumsky::prelude::*;
 
-use crate::parser_utils::{phrase, ErrorType};
+use crate::parser_utils::{ErrorType, phrase};
 use crate::{card_predicate_parser, determiner_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, QuantityExpression, ErrorType<'a>> {

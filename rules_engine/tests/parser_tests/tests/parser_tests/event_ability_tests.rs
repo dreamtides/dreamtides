@@ -3,7 +3,9 @@ use parser_tests::parser_test_utils::parse;
 
 #[test]
 fn test_gains_spark_until_main_phase_for_each_warrior() {
-    let result = parse("A character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control.");
+    let result = parse(
+        "A character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control.",
+    );
     assert_ron_snapshot!(
     result,
     @r###"
@@ -23,7 +25,9 @@ fn test_gains_spark_until_main_phase_for_each_warrior() {
 
 #[test]
 fn test_dissolve_character_with_cost_compared_to_warriors() {
-    let result = parse("Dissolve an enemy character with cost less than or equal to the number of {cardtype: warriors} you control.");
+    let result = parse(
+        "Dissolve an enemy character with cost less than or equal to the number of {cardtype: warriors} you control.",
+    );
     assert_ron_snapshot!(
         result,
         @r###"

@@ -89,7 +89,9 @@ fn test_negate_enemy_dream() {
 
 #[test]
 fn test_spend_all_energy_draw_discard() {
-    let result = parse("Spend all your remaining energy. Draw X cards then discard X cards, where X is the energy spent this way.");
+    let result = parse(
+        "Spend all your remaining energy. Draw X cards then discard X cards, where X is the energy spent this way.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       event(EventAbility(
@@ -132,7 +134,9 @@ fn test_negate_and_put_on_top() {
 
 #[test]
 fn test_discard_card_from_enemy_hand() {
-    let result = parse("Look at the enemy's hand. Choose a card with cost $3 or less from it. The enemy discards that card.");
+    let result = parse(
+        "Look at the enemy's hand. Choose a card with cost $3 or less from it. The enemy discards that card.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       event(EventAbility(
@@ -151,7 +155,9 @@ fn test_discard_card_from_enemy_hand() {
 
 #[test]
 fn test_each_matching_gains_spark_for_each() {
-    let result = parse("Each {cardtype: spirit animal} you control gains +X spark, where X is the number of {cardtype: spirit animals} you control.");
+    let result = parse(
+        "Each {cardtype: spirit animal} you control gains +X spark, where X is the number of {cardtype: spirit animals} you control.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       event(EventAbility(
@@ -168,7 +174,9 @@ fn test_each_matching_gains_spark_for_each() {
 
 #[test]
 fn test_return_all_but_one_draw_for_each() {
-    let result = parse("Return all but one character you control to hand. Draw a card for each character returned.");
+    let result = parse(
+        "Return all but one character you control to hand. Draw a card for each character returned.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       event(EventAbility(
@@ -582,7 +590,9 @@ fn test_enemy_gains_points_equal_to_its_spark() {
 
 #[test]
 fn test_materialize_character_from_void() {
-    let result = parse("Whenever you play a {cardtype: warrior}, you may materialize a character with cost $3 or less from your void.");
+    let result = parse(
+        "Whenever you play a {cardtype: warrior}, you may materialize a character with cost $3 or less from your void.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       triggered(TriggeredAbility(
@@ -936,7 +946,9 @@ fn test_shuffle_hand_and_deck_and_draw() {
 
 #[test]
 fn test_dissolve_characters_quantity() {
-    let result = parse("Dissolve an enemy character with cost less than or equal to the number of cards in your void.");
+    let result = parse(
+        "Dissolve an enemy character with cost less than or equal to the number of cards in your void.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       event(EventAbility(
@@ -1038,7 +1050,9 @@ fn test_spark_becomes() {
 
 #[test]
 fn test_discard_card_from_enemy_hand_then_they_draw() {
-    let result = parse("Look at the enemy's hand. You may choose a card from it. The enemy discards that card and then draws a card.");
+    let result = parse(
+        "Look at the enemy's hand. You may choose a card from it. The enemy discards that card and then draws a card.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       event(EventAbility(
@@ -1105,7 +1119,9 @@ fn test_materialize_character_at_end_of_turn() {
 
 #[test]
 fn test_spend_all_energy_dissolve_enemy() {
-    let result = parse("Spend all your remaining energy. Dissolve an enemy character with spark less than or equal to the energy spent this way.");
+    let result = parse(
+        "Spend all your remaining energy. Dissolve an enemy character with spark less than or equal to the energy spent this way.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       event(EventAbility(
@@ -1196,7 +1212,9 @@ fn test_put_cards_from_void_on_top_of_deck() {
     ]
     "###);
 
-    let result = parse("$immediate $fastMultiActivated Abandon another character: You may put a character from your void on top of your deck.");
+    let result = parse(
+        "$immediate $fastMultiActivated Abandon another character: You may put a character from your void on top of your deck.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       activated(ActivatedAbility(
@@ -1224,7 +1242,9 @@ fn test_put_cards_from_void_on_top_of_deck() {
 
 #[test]
 fn test_materialize_silent_copy() {
-    let result = parse("$materialized: Materialize a {kw: silent} copy of this character for each dream you have played this turn.");
+    let result = parse(
+        "$materialized: Materialize a {kw: silent} copy of this character for each dream you have played this turn.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       triggered(TriggeredAbility(

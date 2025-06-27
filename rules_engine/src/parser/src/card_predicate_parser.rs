@@ -1,10 +1,10 @@
 use ability_data::predicate::{CardPredicate, Operator};
-use chumsky::prelude::choice;
 use chumsky::Parser;
+use chumsky::prelude::choice;
 use core_data::card_types::CharacterType;
 use core_data::numerics::{Energy, Spark};
 
-use crate::parser_utils::{a_or_an, numeric, phrase, ErrorType};
+use crate::parser_utils::{ErrorType, a_or_an, numeric, phrase};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     choice((
@@ -66,8 +66,8 @@ fn character_with_spark<'a>() -> impl Parser<'a, &'a str, CardPredicate, ErrorTy
         .map(|(spark, operator)| CardPredicate::CharacterWithSpark(spark, operator))
 }
 
-fn character_with_cost_compared_to_controlled<'a>(
-) -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
+fn character_with_cost_compared_to_controlled<'a>()
+-> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     non_recursive_predicate()
         .then_ignore(phrase("with cost"))
         .then(choice((
@@ -89,8 +89,8 @@ fn character_with_cost_compared_to_controlled<'a>(
         })
 }
 
-fn character_with_cost_compared_to_abandoned<'a>(
-) -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
+fn character_with_cost_compared_to_abandoned<'a>()
+-> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     non_recursive_predicate()
         .then_ignore(phrase("with cost"))
         .then(choice((
@@ -107,15 +107,15 @@ fn character_with_cost_compared_to_abandoned<'a>(
         })
 }
 
-fn character_with_materialized_ability<'a>(
-) -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
+fn character_with_materialized_ability<'a>()
+-> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     character()
         .ignore_then(phrase("with a $materialized ability"))
         .to(CardPredicate::CharacterWithMaterializedAbility)
 }
 
-fn character_with_multi_activated_ability<'a>(
-) -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
+fn character_with_multi_activated_ability<'a>()
+-> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     character()
         .ignore_then(phrase("with a $multiactivated ability"))
         .to(CardPredicate::CharacterWithMultiActivatedAbility)
@@ -142,8 +142,8 @@ fn character<'a>() -> impl Parser<'a, &'a str, &'a str, ErrorType<'a>> {
     choice((phrase("characters"), phrase("character")))
 }
 
-fn character_with_spark_compared_to_abandoned_this_turn<'a>(
-) -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
+fn character_with_spark_compared_to_abandoned_this_turn<'a>()
+-> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     non_recursive_predicate()
         .then_ignore(phrase("with spark x"))
         .then(choice((
@@ -159,8 +159,8 @@ fn character_with_spark_compared_to_abandoned_this_turn<'a>(
         })
 }
 
-fn character_with_spark_compared_to_abandoned<'a>(
-) -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
+fn character_with_spark_compared_to_abandoned<'a>()
+-> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     non_recursive_predicate()
         .then_ignore(phrase("with spark"))
         .then(choice((

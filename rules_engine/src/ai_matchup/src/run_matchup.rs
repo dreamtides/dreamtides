@@ -81,11 +81,7 @@ impl AgentTimingStats {
     }
 
     fn avg(&self) -> Option<Duration> {
-        if self.count > 0 {
-            Some(self.total / self.count as u32)
-        } else {
-            None
-        }
+        if self.count > 0 { Some(self.total / self.count as u32) } else { None }
     }
 }
 

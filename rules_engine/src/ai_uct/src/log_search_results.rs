@@ -6,10 +6,10 @@ use std::path::PathBuf;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::RequestContext;
 use core_data::types::PlayerName;
+use petgraph::Graph;
 use petgraph::dot::Dot;
 use petgraph::prelude::NodeIndex;
 use petgraph::visit::EdgeRef;
-use petgraph::Graph;
 use tracing::{debug, error, instrument};
 
 use crate::uct_tree::SearchGraph;

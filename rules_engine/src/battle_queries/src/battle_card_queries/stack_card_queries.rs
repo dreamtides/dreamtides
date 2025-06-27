@@ -14,11 +14,7 @@ pub fn validate_targets<'a>(
     battle: &BattleState,
     targets: Option<&'a StackCardTargets>,
 ) -> Option<&'a StackCardTargets> {
-    if targets_are_valid(battle, targets) {
-        targets
-    } else {
-        None
-    }
+    if targets_are_valid(battle, targets) { targets } else { None }
 }
 
 fn targets_are_valid(battle: &BattleState, targets: Option<&StackCardTargets>) -> bool {

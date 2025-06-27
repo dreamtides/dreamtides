@@ -29,7 +29,7 @@ use rand::RngCore;
 use state_provider::state_provider::{DefaultStateProvider, PollResult, StateProvider};
 use state_provider::test_state_provider::TestStateProvider;
 use tokio::task;
-use tracing::{debug, error, info, warn, Level};
+use tracing::{Level, debug, error, info, warn};
 use ui_components::display_properties;
 use uuid::Uuid;
 
@@ -718,11 +718,7 @@ fn catch_panic_conditionally<F, T>(provider: &impl StateProvider, function: F) -
 where
     F: FnOnce() -> T + panic::UnwindSafe,
 {
-    if provider.should_panic_on_error() {
-        Ok(function())
-    } else {
-        catch_panic(function)
-    }
+    if provider.should_panic_on_error() { Ok(function()) } else { catch_panic(function) }
 }
 
 fn filter_backtrace(backtrace: &str) -> String {

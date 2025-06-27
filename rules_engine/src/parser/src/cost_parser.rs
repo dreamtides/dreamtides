@@ -1,10 +1,10 @@
 use ability_data::cost::Cost;
 use ability_data::predicate::Predicate;
-use chumsky::prelude::*;
 use chumsky::Parser;
+use chumsky::prelude::*;
 use core_data::numerics::Energy;
 
-use crate::parser_utils::{count, number, numeric, phrase, ErrorType};
+use crate::parser_utils::{ErrorType, count, number, numeric, phrase};
 use crate::{card_predicate_parser, collection_expression_parser, determiner_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {

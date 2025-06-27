@@ -29,14 +29,14 @@ static TOKIO_RUNTIME: LazyLock<Runtime> =
 ///
 /// Returns the number of bytes written to the `response` buffer, or -1 on
 /// error.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn dreamtides_connect(
     request: *const u8,
     request_length: i32,
     response: *mut u8,
     response_length: i32,
 ) -> i32 {
-    error_boundary(|| connect_impl(request, request_length, response, response_length))
+    unsafe { error_boundary(|| connect_impl(request, request_length, response, response_length)) }
 }
 
 unsafe fn connect_impl(
@@ -45,7 +45,7 @@ unsafe fn connect_impl(
     response: *mut u8,
     response_length: i32,
 ) -> Result<i32> {
-    let request_data = std::slice::from_raw_parts(request, request_length as usize);
+    let request_data = unsafe { std::slice::from_raw_parts(request, request_length as usize) };
     let deserialized_request = serde_json::from_slice::<ConnectRequest>(request_data)?;
     let context = RequestContext {
         logging_options: LoggingOptions {
@@ -69,7 +69,7 @@ unsafe fn connect_impl(
         return Err(anyhow::anyhow!("Response buffer too small"));
     }
 
-    let out = std::slice::from_raw_parts_mut(response, response_length as usize);
+    let out = unsafe { std::slice::from_raw_parts_mut(response, response_length as usize) };
     out[..json_bytes.len()].copy_from_slice(json_bytes);
     Ok(json_bytes.len() as i32)
 }
@@ -84,14 +84,14 @@ unsafe fn connect_impl(
 ///
 /// Returns the number of bytes written to the `response` buffer, or -1 on
 /// error.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn dreamtides_perform_action(
     request: *const u8,
     request_length: i32,
     response: *mut u8,
     response_length: i32,
 ) -> i32 {
-    error_boundary(|| perform_impl(request, request_length, response, response_length))
+    unsafe { error_boundary(|| perform_impl(request, request_length, response, response_length)) }
 }
 
 unsafe fn perform_impl(
@@ -100,7 +100,7 @@ unsafe fn perform_impl(
     response: *mut u8,
     response_length: i32,
 ) -> Result<i32> {
-    let request_data = std::slice::from_raw_parts(request, request_length as usize);
+    let request_data = unsafe { std::slice::from_raw_parts(request, request_length as usize) };
     let deserialized_request = serde_json::from_slice::<PerformActionRequest>(request_data)?;
     let metadata = deserialized_request.metadata;
 
@@ -123,7 +123,7 @@ unsafe fn perform_impl(
         return Err(anyhow::anyhow!("Response buffer too small"));
     }
 
-    let out = std::slice::from_raw_parts_mut(response, response_length as usize);
+    let out = unsafe { std::slice::from_raw_parts_mut(response, response_length as usize) };
     out[..json_bytes.len()].copy_from_slice(json_bytes);
     Ok(json_bytes.len() as i32)
 }
@@ -138,14 +138,14 @@ unsafe fn perform_impl(
 ///
 /// Returns the number of bytes written to the `response` buffer, or -1 on
 /// error.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn dreamtides_poll(
     request: *const u8,
     request_length: i32,
     response: *mut u8,
     response_length: i32,
 ) -> i32 {
-    error_boundary(|| poll_impl(request, request_length, response, response_length))
+    unsafe { error_boundary(|| poll_impl(request, request_length, response, response_length)) }
 }
 
 unsafe fn poll_impl(
@@ -154,7 +154,7 @@ unsafe fn poll_impl(
     response: *mut u8,
     response_length: i32,
 ) -> Result<i32> {
-    let request_data = std::slice::from_raw_parts(request, request_length as usize);
+    let request_data = unsafe { std::slice::from_raw_parts(request, request_length as usize) };
     let deserialized_request = serde_json::from_slice::<PollRequest>(request_data)?;
     let user_id = deserialized_request.metadata.user_id;
 
@@ -175,7 +175,7 @@ unsafe fn poll_impl(
         return Err(anyhow::anyhow!("Response buffer too small"));
     }
 
-    let out = std::slice::from_raw_parts_mut(response, response_length as usize);
+    let out = unsafe { std::slice::from_raw_parts_mut(response, response_length as usize) };
     out[..json_bytes.len()].copy_from_slice(json_bytes);
     Ok(json_bytes.len() as i32)
 }
@@ -186,13 +186,13 @@ unsafe fn poll_impl(
 /// `ClientLogRequest` message of `request_length` bytes.
 ///
 /// Returns 0 on success, or -1 on error.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn dreamtides_log(request: *const u8, request_length: i32) -> i32 {
-    error_boundary(|| log_impl(request, request_length))
+    unsafe { error_boundary(|| log_impl(request, request_length)) }
 }
 
 unsafe fn log_impl(request: *const u8, request_length: i32) -> Result<i32> {
-    let request_data = std::slice::from_raw_parts(request, request_length as usize);
+    let request_data = unsafe { std::slice::from_raw_parts(request, request_length as usize) };
     let deserialized_request = serde_json::from_slice::<ClientLogRequest>(request_data)?;
     client_logging::log_client_events(deserialized_request);
     Ok(0)

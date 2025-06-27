@@ -1,10 +1,10 @@
 use ability_data::condition::Condition;
 use ability_data::predicate::Predicate;
-use chumsky::prelude::*;
 use chumsky::Parser;
+use chumsky::prelude::*;
 
 use crate::card_predicate_parser;
-use crate::parser_utils::{a_or_an, count, number, numeric, phrase, ErrorType};
+use crate::parser_utils::{ErrorType, a_or_an, count, number, numeric, phrase};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, Condition, ErrorType<'a>> {
     choice((

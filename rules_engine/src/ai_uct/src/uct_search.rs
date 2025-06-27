@@ -10,13 +10,13 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use core_data::types::PlayerName;
 use ordered_float::OrderedFloat;
+use petgraph::Direction;
 use petgraph::prelude::NodeIndex;
 use petgraph::visit::EdgeRef;
-use petgraph::Direction;
 use rayon::prelude::*;
 use tracing::debug;
-use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::EnvFilter;
+use tracing_subscriber::layer::SubscriberExt;
 
 use crate::log_search_results;
 use crate::uct_config::UctConfig;

@@ -28,19 +28,11 @@ pub trait Component: Clone {
 
 impl<T: Component> Component for Option<T> {
     fn render(self) -> Option<impl Component> {
-        if let Some(c) = self {
-            c.render()
-        } else {
-            None
-        }
+        if let Some(c) = self { c.render() } else { None }
     }
 
     fn flex_node(&self) -> Option<FlexNode> {
-        if let Some(c) = self {
-            c.flex_node()
-        } else {
-            None
-        }
+        if let Some(c) = self { c.flex_node() } else { None }
     }
 }
 

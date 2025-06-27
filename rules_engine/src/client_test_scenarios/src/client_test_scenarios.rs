@@ -278,12 +278,15 @@ fn select_card(card_id: ClientCardId) -> CommandSequence {
                     Command::UpdateBattle(Box::new(UpdateBattleCommand {
                         battle,
                         update_sound: Some(AudioClipAddress::new(
-                            "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Generic_SubtleWhoosh04.wav")),
+                            "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Generic_SubtleWhoosh04.wav",
+                        )),
                     })),
                     Command::DissolveCard(DissolveCardCommand {
                         target: card_id.clone(),
                         reverse: true,
-                        material: MaterialAddress::new("Assets/Content/Dissolves/Dissolve15.mat".to_string()),
+                        material: MaterialAddress::new(
+                            "Assets/Content/Dissolves/Dissolve15.mat".to_string(),
+                        ),
                         color: display_color::BLUE_500,
                         dissolve_speed: None,
                         sound: None,

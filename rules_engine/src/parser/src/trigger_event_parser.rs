@@ -3,7 +3,7 @@ use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
 use chumsky::prelude::choice;
 use chumsky::{IterParser, Parser};
 
-use crate::parser_utils::{ordinal_number, phrase, ErrorType};
+use crate::parser_utils::{ErrorType, ordinal_number, phrase};
 use crate::{card_predicate_parser, determiner_parser};
 
 pub fn event_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {

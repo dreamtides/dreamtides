@@ -1,8 +1,8 @@
 use ability_data::activated_ability::{ActivatedAbility, ActivatedAbilityOptions};
-use chumsky::prelude::*;
 use chumsky::Parser;
+use chumsky::prelude::*;
 
-use crate::parser_utils::{phrase, ErrorType};
+use crate::parser_utils::{ErrorType, phrase};
 use crate::{cost_parser, effect_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, ActivatedAbility, ErrorType<'a>> {

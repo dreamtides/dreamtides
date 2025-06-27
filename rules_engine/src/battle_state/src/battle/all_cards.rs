@@ -54,7 +54,7 @@ impl AllCards {
     /// because it performs bounds checking via [Self::is_valid_card_id].
     #[inline(always)]
     pub unsafe fn get_card_unchecked(&self, id: CardId) -> &BattleCardState {
-        self.cards.get_unchecked(id.0)
+        unsafe { self.cards.get_unchecked(id.0) }
     }
 
     /// Returns the spark value of a character.

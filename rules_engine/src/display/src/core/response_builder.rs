@@ -116,11 +116,7 @@ impl ResponseBuilder {
     }
 
     pub fn to_display_player(&self, player: PlayerName) -> DisplayPlayer {
-        if self.player == player {
-            DisplayPlayer::User
-        } else {
-            DisplayPlayer::Enemy
-        }
+        if self.player == player { DisplayPlayer::User } else { DisplayPlayer::Enemy }
     }
 
     pub fn get_display_state(&self) -> DisplayState {

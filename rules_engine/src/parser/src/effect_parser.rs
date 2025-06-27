@@ -1,9 +1,9 @@
 use ability_data::ability::EventAbility;
 use ability_data::effect::{Effect, EffectWithOptions};
-use chumsky::prelude::*;
 use chumsky::Parser;
+use chumsky::prelude::*;
 
-use crate::parser_utils::{phrase, ErrorType};
+use crate::parser_utils::{ErrorType, phrase};
 use crate::{condition_parser, cost_parser, standard_effect_parser};
 
 pub fn event<'a>() -> impl Parser<'a, &'a str, EventAbility, ErrorType<'a>> {

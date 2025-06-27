@@ -21,12 +21,12 @@ use battle_state::battle_player::player_map::PlayerMap;
 use core_data::identifiers::{BattleId, CardName};
 use core_data::numerics::{Energy, Points, Spark, TurnId};
 use core_data::types::PlayerName;
-use criterion::{criterion_group, BatchSize, Criterion};
+use criterion::{BatchSize, Criterion, criterion_group};
 use game_creation::new_test_battle;
-use rand::seq::IteratorRandom;
 use rand::SeedableRng;
+use rand::seq::IteratorRandom;
 use rand_xoshiro::Xoshiro256PlusPlus;
-use tracing::{subscriber, Level};
+use tracing::{Level, subscriber};
 use uuid::Uuid;
 
 criterion_group!(playout_benchmarks, random_playout, ai_full, ai_single_threaded, ai_evaluate);

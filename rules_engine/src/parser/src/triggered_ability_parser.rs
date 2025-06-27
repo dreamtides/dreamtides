@@ -1,8 +1,8 @@
 use ability_data::triggered_ability::{TriggeredAbility, TriggeredAbilityOptions};
-use chumsky::prelude::*;
 use chumsky::Parser;
+use chumsky::prelude::*;
 
-use crate::parser_utils::{phrase, ErrorType};
+use crate::parser_utils::{ErrorType, phrase};
 use crate::{effect_parser, trigger_event_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, TriggeredAbility, ErrorType<'a>> {

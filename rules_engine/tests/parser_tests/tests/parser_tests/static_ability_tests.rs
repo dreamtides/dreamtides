@@ -36,7 +36,9 @@ fn test_once_per_turn_play_2_or_less_from_void() {
 
 #[test]
 fn test_play_from_void_by_banishing() {
-    let result = parse("You may play this character from your void for $2 by banishing another card from your void.");
+    let result = parse(
+        "You may play this character from your void for $2 by banishing another card from your void.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       static(StaticAbility(playFromVoid(PlayFromVoid(
@@ -183,7 +185,9 @@ fn test_abandon_characters_cost() {
 
 #[test]
 fn test_play_from_void_with_void_count() {
-    let result = parse("If you have 8 or more cards in your void, you may play this character from your void for $0 by banishing all other cards from your void.");
+    let result = parse(
+        "If you have 8 or more cards in your void, you may play this character from your void for $0 by banishing all other cards from your void.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       static(WithOptions(StaticAbilityWithOptions(
@@ -219,7 +223,9 @@ fn test_play_for_alternate_cost() {
 
 #[test]
 fn test_play_for_alternate_cost_with_if_you_do() {
-    let result = parse("You may play this character for $0 by abandoning a character. If you do, abandon this character at end of turn.");
+    let result = parse(
+        "You may play this character for $0 by abandoning a character. If you do, abandon this character at end of turn.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       static(StaticAbility(playForAlternateCost(AlternateCost(
@@ -235,7 +241,9 @@ fn test_play_for_alternate_cost_with_if_you_do() {
 
 #[test]
 fn test_play_if_character_dissolved() {
-    let result = parse("If a character you controlled dissolved this turn, you may play this character from your void for $1.");
+    let result = parse(
+        "If a character you controlled dissolved this turn, you may play this character from your void for $1.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       static(WithOptions(StaticAbilityWithOptions(
@@ -254,7 +262,9 @@ fn test_play_if_character_dissolved() {
 
 #[test]
 fn test_reclaim_with_draw_discard() {
-    let result = parse("Draw 2 cards. Discard 2 cards.$br{kw: Reclaim}. {reminder: (you may play this dream from your void, then banish it.)}");
+    let result = parse(
+        "Draw 2 cards. Discard 2 cards.$br{kw: Reclaim}. {reminder: (you may play this dream from your void, then banish it.)}",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       event(EventAbility(
@@ -342,7 +352,9 @@ fn test_characters_in_hand_have_fast() {
 
 #[test]
 fn test_if_you_have_drawn_two_or_more() {
-    let result = parse("If you have drawn 2 or more cards this turn, you may play this character from your void for $1.");
+    let result = parse(
+        "If you have drawn 2 or more cards this turn, you may play this character from your void for $1.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       static(WithOptions(StaticAbilityWithOptions(
@@ -375,7 +387,9 @@ fn test_judgment_triggers_when_materialized() {
 
 #[test]
 fn test_play_for_alternate_cost_with_condition() {
-    let result = parse("If you have 8 or more cards in your void, you may play this event for $0 by banishing all cards from your void.");
+    let result = parse(
+        "If you have 8 or more cards in your void, you may play this event for $0 by banishing all cards from your void.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       static(WithOptions(StaticAbilityWithOptions(
@@ -394,7 +408,9 @@ fn test_play_for_alternate_cost_with_condition() {
 
 #[test]
 fn test_look_at_top_card_and_play() {
-    let result = parse("You may look at the top card of your deck.$brYou may play characters from the top of your deck.");
+    let result = parse(
+        "You may look at the top card of your deck.$brYou may play characters from the top of your deck.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       static(StaticAbility(youMayLookAtTopCardOfYourDeck)),

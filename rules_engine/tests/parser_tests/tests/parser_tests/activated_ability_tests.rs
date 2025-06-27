@@ -3,7 +3,9 @@ use parser_tests::parser_test_utils::parse;
 
 #[test]
 fn test_banish_from_void_dissolve_enemy_character() {
-    let result = parse("$activated Banish 3 cards from your void: Dissolve an enemy character with cost $2 or less.");
+    let result = parse(
+        "$activated Banish 3 cards from your void: Dissolve an enemy character with cost $2 or less.",
+    );
     assert_ron_snapshot!(
         result,
         @r###"
@@ -28,7 +30,9 @@ fn test_banish_from_void_dissolve_enemy_character() {
 
 #[test]
 fn test_fast_activated_grant_aegis() {
-    let result = parse("$fastActivated: Another character you control gains {kw: aegis} this turn. {reminder: (it cannot be affected by the enemy)} {flavor: She stands where others would fall.}");
+    let result = parse(
+        "$fastActivated: Another character you control gains {kw: aegis} this turn. {reminder: (it cannot be affected by the enemy)} {flavor: She stands where others would fall.}",
+    );
     assert_ron_snapshot!(
         result,
         @r###"
@@ -51,7 +55,9 @@ fn test_fast_activated_grant_aegis() {
 
 #[test]
 fn test_activated_spark_equal_to_warriors() {
-    let result = parse("$fastActivated $2: Another character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control.");
+    let result = parse(
+        "$fastActivated $2: Another character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       activated(ActivatedAbility(
@@ -189,7 +195,9 @@ fn test_multiple_costs_abandon_this() {
 
 #[test]
 fn test_activated_discover_and_then_materialize() {
-    let result = parse("$activated Abandon a {cardtype: warrior}: {kw: Discover} a {cardtype: warrior} with cost $1 higher than the abandoned character and materialize it.");
+    let result = parse(
+        "$activated Abandon a {cardtype: warrior}: {kw: Discover} a {cardtype: warrior} with cost $1 higher than the abandoned character and materialize it.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       activated(ActivatedAbility(
@@ -306,7 +314,9 @@ fn test_immediate_activated_banish_materialize() {
 
 #[test]
 fn test_immediate_multi_activated() {
-    let result = parse("$immediate $multiActivated Abandon another character: Put the top 2 cards of your deck into your void.");
+    let result = parse(
+        "$immediate $multiActivated Abandon another character: Put the top 2 cards of your deck into your void.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       activated(ActivatedAbility(

@@ -15,8 +15,8 @@ use database::save_file::SaveFile;
 use game_creation::new_battle;
 use serde_json;
 use tracing::{error, instrument, subscriber};
-use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::EnvFilter;
+use tracing_subscriber::layer::SubscriberExt;
 
 use crate::handle_battle_action::should_auto_execute_action;
 
@@ -113,11 +113,7 @@ fn get_battle_impl(
                     }
                 }
 
-                if undo.is_some() {
-                    last_non_auto_battle
-                } else {
-                    Some((battle, quest_id))
-                }
+                if undo.is_some() { last_non_auto_battle } else { Some((battle, quest_id)) }
             });
 
             if let Some((battle, _)) = &mut result {

@@ -2,9 +2,9 @@ use std::fs;
 use std::path::Path;
 use std::time::Duration;
 
-use criterion::{criterion_group, BatchSize, Criterion};
+use criterion::{BatchSize, Criterion, criterion_group};
 use parser::ability_parser;
-use tracing::{subscriber, Level};
+use tracing::{Level, subscriber};
 
 criterion_group!(parser_benchmarks, parse_abilities);
 

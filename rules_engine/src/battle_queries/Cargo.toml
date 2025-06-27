@@ -1,7 +1,8 @@
 [package]
 name = "battle_queries"
 version = "0.0.0"
-edition = "2021"
+edition = "2024"
+
 [lints]
 workspace = true
 

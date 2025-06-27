@@ -34,7 +34,7 @@ pub fn apply(battle: &mut BattleState, source: EffectSource, player: PlayerName)
         .cards
         .battlefield_state(player)
         .iter()
-        .min_by_key(|(&id, state)| (state.spark, card_properties::cost(battle, id)))?;
+        .min_by_key(|(id, state)| (state.spark, card_properties::cost(battle, **id)))?;
 
     battle
         .turn_history

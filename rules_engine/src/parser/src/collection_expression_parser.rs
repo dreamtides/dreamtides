@@ -1,8 +1,8 @@
 use ability_data::collection_expression::CollectionExpression;
-use chumsky::primitive::choice;
 use chumsky::Parser;
+use chumsky::primitive::choice;
 
-use crate::parser_utils::{phrase, text_number, ErrorType};
+use crate::parser_utils::{ErrorType, phrase, text_number};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, CollectionExpression, ErrorType<'a>> {
     choice((

@@ -1,7 +1,7 @@
 use ability_data::ability::Ability;
 use chumsky::prelude::*;
 
-use crate::parser_utils::{phrase, ErrorType};
+use crate::parser_utils::{ErrorType, phrase};
 use crate::{
     activated_ability_parser, effect_parser, static_ability_parser, triggered_ability_parser,
 };

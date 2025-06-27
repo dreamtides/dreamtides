@@ -64,15 +64,15 @@ impl BattleAction {
     pub fn battle_action_string(&self) -> String {
         match self {
             BattleAction::Debug(..) => "DEBUG".to_string(),
-            BattleAction::PlayCardFromHand(hand_card_id) => format!("PCFH{:?}", hand_card_id.0 .0),
+            BattleAction::PlayCardFromHand(hand_card_id) => format!("PCFH{:?}", hand_card_id.0.0),
             BattleAction::PassPriority => "PP".to_string(),
             BattleAction::EndTurn => "ET".to_string(),
             BattleAction::StartNextTurn => "SNT".to_string(),
             BattleAction::SelectCharacterTarget(character_id) => {
-                format!("SCT{:?}", character_id.0 .0)
+                format!("SCT{:?}", character_id.0.0)
             }
             BattleAction::SelectStackCardTarget(stack_card_id) => {
-                format!("SSCT{:?}", stack_card_id.0 .0)
+                format!("SSCT{:?}", stack_card_id.0.0)
             }
             BattleAction::SelectPromptChoice(index) => format!("SPC{index:?}"),
             BattleAction::SelectEnergyAdditionalCost(energy) => format!("SEAC{}", energy.0),

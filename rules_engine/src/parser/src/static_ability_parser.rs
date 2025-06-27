@@ -4,11 +4,11 @@ use ability_data::predicate::CardPredicate;
 use ability_data::static_ability::{
     AlternateCost, PlayFromVoid, StandardStaticAbility, StaticAbility, StaticAbilityWithOptions,
 };
-use chumsky::prelude::*;
 use chumsky::Parser;
+use chumsky::prelude::*;
 use core_data::numerics::{Energy, Spark};
 
-use crate::parser_utils::{numeric, phrase, this, ErrorType};
+use crate::parser_utils::{ErrorType, numeric, phrase, this};
 use crate::{
     card_predicate_parser, condition_parser, cost_parser, determiner_parser,
     quantity_expression_parser, standard_effect_parser,
@@ -57,8 +57,8 @@ fn standard<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'
     .boxed()
 }
 
-fn once_per_turn_play_from_void<'a>(
-) -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
+fn once_per_turn_play_from_void<'a>()
+-> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     phrase("once per turn, you may play a")
         .ignore_then(card_predicate_parser::parser())
         .then_ignore(phrase("from your void"))
@@ -76,8 +76,8 @@ fn enemy_added_cost_to_play<'a>() -> impl Parser<'a, &'a str, StandardStaticAbil
         })
 }
 
-fn disable_enemy_materialized_abilities<'a>(
-) -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
+fn disable_enemy_materialized_abilities<'a>()
+-> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     let enemy_characters = choice((phrase("the enemy's characters"), phrase("enemy characters")));
     phrase("disable the \"$materialized\" abilities of")
         .ignore_then(enemy_characters)
@@ -94,8 +94,8 @@ fn other_spark_bonus<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, Er
         })
 }
 
-fn your_characters_spark_bonus<'a>(
-) -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
+fn your_characters_spark_bonus<'a>()
+-> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     card_predicate_parser::parser().then(numeric("you control have +", Spark, "spark")).map(
         |(predicate, spark)| StandardStaticAbility::SparkBonusYourCharacters {
             matching: predicate,
@@ -173,21 +173,21 @@ fn reclaim<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a
         .map(|n| StandardStaticAbility::Reclaim { cost: n.map(Cost::Energy) })
 }
 
-fn spark_equal_to_predicate_count<'a>(
-) -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
+fn spark_equal_to_predicate_count<'a>()
+-> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     phrase("this character's spark is equal to the number of")
         .ignore_then(determiner_parser::counted_parser())
         .map(|predicate| StandardStaticAbility::SparkEqualToPredicateCount { predicate })
 }
 
-fn characters_in_hand_have_fast<'a>(
-) -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
+fn characters_in_hand_have_fast<'a>()
+-> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     phrase("characters in your hand have '$fast'")
         .to(StandardStaticAbility::CharactersInHandHaveFast)
 }
 
-fn judgment_triggers_when_materialized<'a>(
-) -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
+fn judgment_triggers_when_materialized<'a>()
+-> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     phrase("the '$judgment' ability of")
         .ignore_then(determiner_parser::counted_parser())
         .then_ignore(phrase("triggers when you materialize them"))
@@ -211,8 +211,8 @@ fn play_only_from_void<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, 
         .to(StandardStaticAbility::PlayOnlyFromVoid)
 }
 
-fn cards_in_your_void_have_reclaim<'a>(
-) -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
+fn cards_in_your_void_have_reclaim<'a>()
+-> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
     phrase("cards in your void have {kw: reclaim}").map(|_| {
         StandardStaticAbility::CardsInYourVoidHaveReclaim { matching: CardPredicate::Card }
     })

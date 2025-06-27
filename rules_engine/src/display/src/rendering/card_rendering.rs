@@ -146,11 +146,7 @@ fn card_type(battle: &BattleState, card_id: CardId) -> String {
         CardType::Dreamwell => "Dreamwell".to_string(),
     };
 
-    if card_properties::is_fast(battle, card_id) {
-        format!("\u{f0e7} {result}")
-    } else {
-        result
-    }
+    if card_properties::is_fast(battle, card_id) { format!("\u{f0e7} {result}") } else { result }
 }
 
 fn rules_text(battle: &BattleState, card_id: CardId) -> String {
