@@ -10,6 +10,10 @@ using System.Linq;
 using System;
 using UnityEngine.SceneManagement;
 using Dreamtides.Layout;
+using UnityEngine.UIElements;
+using Dreamtides.Schema;
+using System.Collections.Generic;
+using NUnit.Framework.Constraints;
 
 #nullable enable
 
@@ -21,7 +25,7 @@ namespace Dreamtides.Tests
     Registry? _registry;
     protected Registry Registry => Errors.CheckNotNull(_registry);
 
-    protected IEnumerator Connect(GameViewResolution resolution)
+    protected IEnumerator Connect(GameViewResolution resolution = GameViewResolution.Resolution16x9)
     {
       Registry.TestConfiguration = new TestConfiguration(Guid.NewGuid());
       GameViewUtils.SetGameViewResolution(resolution);
@@ -35,6 +39,17 @@ namespace Dreamtides.Tests
       yield return new WaitUntil(() => registry.ActionService.Connected);
       yield return registry.TestHelperService.WaitForIdle();
       _registry = registry;
+    }
+
+    /// <summary>
+    /// Performs an action and waits for the response to be received.
+    /// </summary>
+    protected IEnumerator PerformAction(GameAction action)
+    {
+      var requestId = Guid.NewGuid();
+      Registry.ActionService.PerformAction(action, requestId);
+      yield return new WaitUntil(() => Registry.ActionService.LastResponseReceived == requestId);
+      yield return Registry.TestHelperService.WaitForIdle();
     }
 
     protected IEnumerator EndTest()
@@ -56,6 +71,100 @@ namespace Dreamtides.Tests
       {
         yield return null;
       }
+    }
+
+    protected void AssertEmpty(ObjectLayout objectLayout)
+    {
+      Assert.That(objectLayout.Objects.Count, Is.EqualTo(0));
+    }
+
+    protected void AssertNotEmpty(ObjectLayout objectLayout)
+    {
+      Assert.That(objectLayout.Objects.Count, Is.GreaterThan(0));
+    }
+
+    protected void AssertCountIs(ObjectLayout objectLayout, int count, string? message = null)
+    {
+      Assert.That(objectLayout.Objects.Count, Is.EqualTo(count), message);
+    }
+
+    protected void AssertActive(Component component, string? message = null)
+    {
+      Assert.That(component.gameObject.activeSelf, Is.True, $"{message}. Component is not active");
+      Assert.That(component.gameObject.activeInHierarchy, Is.True, $"{message}. Component is not active in hierarchy");
+      if (component is MonoBehaviour monoBehaviour)
+      {
+        Assert.That(monoBehaviour.enabled, Is.True, $"{message}. Component is not enabled");
+      }
+    }
+
+    protected void AssertLayoutContains(ObjectLayout objectLayout, Displayable displayable, string? message = null)
+    {
+      Assert.That(objectLayout.Objects.Any(obj => obj.GetComponent<Displayable>() == displayable),
+          Is.True,
+          $"{message}. {displayable.name} not found in layout {objectLayout.name}");
+    }
+
+    protected void AssertBoxColliderIsOnScreen(BoxCollider collider, string? message = null)
+    {
+      var bounds = collider.bounds;
+      var corners = new Vector3[8];
+
+      corners[0] = new Vector3(bounds.min.x, bounds.min.y, bounds.min.z);
+      corners[1] = new Vector3(bounds.min.x, bounds.min.y, bounds.max.z);
+      corners[2] = new Vector3(bounds.min.x, bounds.max.y, bounds.min.z);
+      corners[3] = new Vector3(bounds.min.x, bounds.max.y, bounds.max.z);
+      corners[4] = new Vector3(bounds.max.x, bounds.min.y, bounds.min.z);
+      corners[5] = new Vector3(bounds.max.x, bounds.min.y, bounds.max.z);
+      corners[6] = new Vector3(bounds.max.x, bounds.max.y, bounds.min.z);
+      corners[7] = new Vector3(bounds.max.x, bounds.max.y, bounds.max.z);
+
+      foreach (var corner in corners)
+      {
+        var viewportPos = Registry.Layout.MainCamera.WorldToViewportPoint(corner);
+
+        var errorMessage = message ?? $"BoxCollider corner at {corner} is outside viewport: {viewportPos}";
+
+        Assert.That(viewportPos.z > 0, errorMessage);
+        Assert.That(viewportPos.x >= 0 && viewportPos.x <= 1, errorMessage);
+        Assert.That(viewportPos.y >= 0 && viewportPos.y <= 1, errorMessage);
+      }
+    }
+
+    protected void AssertSpriteIsOnScreen(SpriteRenderer sprite, string message)
+    {
+      // Assert.That(sprite.isVisible, $"{message}: Sprite is not visible");
+      var bounds = sprite.bounds;
+      var corners = new Vector3[4]
+      {
+        new Vector3(bounds.min.x, bounds.min.y, bounds.center.z),
+        new Vector3(bounds.max.x, bounds.min.y, bounds.center.z),
+        new Vector3(bounds.max.x, bounds.max.y, bounds.center.z),
+        new Vector3(bounds.min.x, bounds.max.y, bounds.center.z)
+      };
+
+      foreach (var corner in corners)
+      {
+        var viewportPos = Registry.Layout.MainCamera.WorldToViewportPoint(corner);
+        Assert.That(viewportPos.x >= -0.01f && viewportPos.x <= 1.01f &&
+                    viewportPos.y >= -0.01f && viewportPos.y <= 1.01f &&
+                    viewportPos.z >= -0.01f,
+                    $"{message}: Corner at world position {corner} is outside viewport: {viewportPos}");
+      }
+    }
+
+    protected void AssertTextIsInInterface(string text, string message)
+    {
+      var root = Registry.DocumentService.RootVisualElement;
+      var textElements = root.Query<TextElement>().ToList();
+      var found = textElements.Any(element => element.text.Contains(text));
+      Assert.That(found, Is.True, $"{message}: Text '{text}' not found in any text elements");
+    }
+
+    protected BoxCollider GetBoxCollider(Component component)
+    {
+      return Errors.CheckNotNull(component.GetComponentInChildren<BoxCollider>(),
+          $"No BoxCollider found on {component.gameObject}");
     }
   }
 }

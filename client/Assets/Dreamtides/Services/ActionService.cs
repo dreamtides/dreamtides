@@ -40,6 +40,12 @@ namespace Dreamtides.Services
 
     public bool Connected { get; private set; }
 
+    /// <summary>
+    /// Returns the Request ID of the last request for which a 'final' poll
+    /// response was received.
+    /// </summary>
+    public Guid? LastResponseReceived { get; private set; }
+
     protected override void OnInitialize(TestConfiguration? testConfiguration)
     {
       Connected = false;
@@ -116,31 +122,19 @@ namespace Dreamtides.Services
             Metadata = Errors.CheckNotNull(_metadata)
           };
           var response = Plugin.Poll(request);
-          if (response.Commands?.Groups.Count > 0)
-          {
-            Registry.LoggingService.StartSpan(LogSpanName.Poll);
-            LogPollResponseTiming(response);
-            StartCoroutine(ApplyCommands(response.Commands, animate: true, onComplete: () =>
-            {
-              Registry.LoggingService.EndSpan(LogSpanName.Poll);
-              if (response.ResponseVersion != null)
-              {
-                _lastResponseVersion = response.ResponseVersion;
-              }
-            }));
-          }
+          StartCoroutine(HandlePollResponse(response));
         }
       }
     }
 
-    public void PerformAction(GameAction? action)
+    public void PerformAction(GameAction? action, Guid? requestIdentifier = null)
     {
       if (action == null)
       {
         return;
       }
 
-      var requestId = Guid.NewGuid();
+      var requestId = requestIdentifier ?? Guid.NewGuid();
       Registry.LoggingService.StartSpan(LogSpanName.PerformAction);
       Registry.LoggingService.Log("ActionService", "Performing action",
         ("actionType", GameActionHelper.GetActionName(action.Value)),
@@ -225,6 +219,28 @@ namespace Dreamtides.Services
       ScreenWidth = Screen.width
     };
 
+    private IEnumerator HandlePollResponse(PollResponse response)
+    {
+      if (response.Metadata?.RequestId != null && response.ResponseType == PollResponseType.Final)
+      {
+        LastResponseReceived = response.Metadata.RequestId;
+      }
+
+      if (response.Commands?.Groups.Count > 0)
+      {
+        Registry.LoggingService.StartSpan(LogSpanName.Poll);
+        LogPollResponseTiming(response);
+        yield return ApplyCommands(response.Commands, animate: true, onComplete: () =>
+        {
+          Registry.LoggingService.EndSpan(LogSpanName.Poll);
+          if (response.ResponseVersion != null)
+          {
+            _lastResponseVersion = response.ResponseVersion;
+          }
+        });
+      }
+    }
+
     private IEnumerator DevServerPollAsync(PollRequest request)
     {
       yield return SendDevServerRequest<PollRequest, PollResponse>(
@@ -233,23 +249,7 @@ namespace Dreamtides.Services
         UnityWebRequest.kHttpVerbGET,
         response =>
         {
-          if (response.Commands?.Groups.Count > 0)
-          {
-            Registry.LoggingService.StartSpan(LogSpanName.Poll);
-            LogPollResponseTiming(response);
-            return ApplyCommands(response.Commands, animate: true, onComplete: () =>
-            {
-              Registry.LoggingService.EndSpan(LogSpanName.Poll);
-              if (response.ResponseVersion != null)
-              {
-                _lastResponseVersion = response.ResponseVersion;
-              }
-            });
-          }
-          else
-          {
-            return Break();
-          }
+          return HandlePollResponse(response);
         }
       );
     }
