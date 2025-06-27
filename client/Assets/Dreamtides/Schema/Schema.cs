@@ -45,19 +45,19 @@ namespace Dreamtides.Schema
     public partial class ClientLogRequest
     {
         [JsonProperty("entry", Required = Required.Always)]
-        public Entry Entry { get; set; }
+        public LogEntry Entry { get; set; }
     }
 
     public partial class EventSpan
     {
         [JsonProperty("entries", Required = Required.Always)]
-        public List<Entry> Entries { get; set; }
+        public List<LogEntry> Entries { get; set; }
 
         [JsonProperty("name", Required = Required.Always)]
-        public Name Name { get; set; }
+        public LogSpanName Name { get; set; }
     }
 
-    public partial class Entry
+    public partial class LogEntry
     {
         [JsonProperty("event", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public Event Event { get; set; }
@@ -84,18 +84,16 @@ namespace Dreamtides.Schema
     public partial class ConnectRequest
     {
         /// <summary>
-        /// If specified, the battle will be created with the given debug
-        /// configuration.
+        /// If specified, the battle will be created with the given debug configuration.
         /// </summary>
         [JsonProperty("debugConfiguration")]
-        public DebugConfigurationClass DebugConfiguration { get; set; }
+        public DebugConfiguration DebugConfiguration { get; set; }
 
         /// <summary>
-        /// Display properties from the client (screen dimensions, mobile device
-        /// flag, etc.)
+        /// Display properties from the client (screen dimensions, mobile device flag, etc.)
         /// </summary>
         [JsonProperty("displayProperties")]
-        public DisplayPropertiesClass DisplayProperties { get; set; }
+        public DisplayProperties DisplayProperties { get; set; }
 
         [JsonProperty("metadata", Required = Required.Always)]
         public Metadata Metadata { get; set; }
@@ -103,10 +101,10 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Contains the path to a persistent data directory.
         ///
-        /// When you build the Unity application, a GUID is generated that is based
-        /// on the Bundle Identifier. This GUID is part of persistentDataPath. If
-        /// you keep the same Bundle Identifier in future versions, the application
-        /// keeps accessing the same location on every update.
+        /// When you build the Unity application, a GUID is generated that is based on the Bundle
+        /// Identifier. This GUID is part of persistentDataPath. If you keep the same Bundle
+        /// Identifier in future versions, the application keeps accessing the same location on every
+        /// update.
         /// </summary>
         [JsonProperty("persistentDataPath", Required = Required.Always)]
         public string PersistentDataPath { get; set; }
@@ -115,39 +113,39 @@ namespace Dreamtides.Schema
         public string TestScenario { get; set; }
 
         /// <summary>
-        /// If specified, treats this as a multiplayer game using the save file
-        /// provided in this ID and adds this user as a player in the battle.
+        /// If specified, treats this as a multiplayer game using the save file provided in this ID
+        /// and adds this user as a player in the battle.
         /// </summary>
         [JsonProperty("vsOpponent")]
         public Guid? VsOpponent { get; set; }
     }
 
-    public partial class DebugConfigurationClass
+    public partial class DebugConfiguration
     {
         /// <summary>
         /// If specified, the enemy will be this player type.
         /// </summary>
         [JsonProperty("enemy")]
-        public EnemyClass Enemy { get; set; }
+        public PlayerType Enemy { get; set; }
 
         /// <summary>
-        /// If specified, the battle will be seeded with the given value. Otherwise
-        /// a random seed will be used.
+        /// If specified, the battle will be seeded with the given value. Otherwise a random seed
+        /// will be used.
         /// </summary>
         [JsonProperty("seed")]
         public long? Seed { get; set; }
     }
 
-    public partial class EnemyClass
+    public partial class PlayerType
     {
         [JsonProperty("user", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public Guid? User { get; set; }
 
         [JsonProperty("agent", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public Agent? Agent { get; set; }
+        public GameAi? Agent { get; set; }
     }
 
-    public partial class AgentClass
+    public partial class GameAiClass
     {
         [JsonProperty("monteCarlo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? MonteCarlo { get; set; }
@@ -156,7 +154,7 @@ namespace Dreamtides.Schema
         public long? MonteCarloSingleThreaded { get; set; }
     }
 
-    public partial class DisplayPropertiesClass
+    public partial class DisplayProperties
     {
         [JsonProperty("isMobileDevice", Required = Required.Always)]
         public bool IsMobileDevice { get; set; }
@@ -177,8 +175,8 @@ namespace Dreamtides.Schema
         public Guid? BattleId { get; set; }
 
         /// <summary>
-        /// If specified, the request is part of an integration test with the given
-        /// ID. State will not be persisted.
+        /// If specified, the request is part of an integration test with the given ID. State will
+        /// not be persisted.
         /// </summary>
         [JsonProperty("integrationTestId")]
         public Guid? IntegrationTestId { get; set; }
@@ -199,7 +197,7 @@ namespace Dreamtides.Schema
     public partial class ConnectResponse
     {
         [JsonProperty("commands", Required = Required.Always)]
-        public Commands Commands { get; set; }
+        public CommandSequence Commands { get; set; }
 
         [JsonProperty("metadata", Required = Required.Always)]
         public Metadata Metadata { get; set; }
@@ -211,78 +209,76 @@ namespace Dreamtides.Schema
     /// <summary>
     /// A list of [ParallelCommandGroup]s to execute sequentially.
     /// </summary>
-    public partial class Commands
+    public partial class CommandSequence
     {
         [JsonProperty("groups", Required = Required.Always)]
-        public List<GroupElement> Groups { get; set; }
+        public List<ParallelCommandGroup> Groups { get; set; }
     }
 
     /// <summary>
     /// A set of [Command]s to execute simultaneously.
     /// </summary>
-    public partial class GroupElement
+    public partial class ParallelCommandGroup
     {
         [JsonProperty("commands", Required = Required.Always)]
-        public List<CommandElement> Commands { get; set; }
+        public List<Command> Commands { get; set; }
     }
 
     /// <summary>
     /// Represents an animated update to the visual state of the game.
     /// </summary>
-    public partial class CommandElement
+    public partial class Command
     {
         [JsonProperty("updateBattle", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public UpdateBattle UpdateBattle { get; set; }
+        public UpdateBattleCommand UpdateBattle { get; set; }
 
         [JsonProperty("wait", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public WaitElement Wait { get; set; }
+        public Milliseconds Wait { get; set; }
 
         [JsonProperty("fireProjectile", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public FireProjectile FireProjectile { get; set; }
+        public FireProjectileCommand FireProjectile { get; set; }
 
         [JsonProperty("dissolveCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DissolveCard DissolveCard { get; set; }
+        public DissolveCardCommand DissolveCard { get; set; }
 
         [JsonProperty("displayGameMessage", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayGameMessage? DisplayGameMessage { get; set; }
+        public GameMessageType? DisplayGameMessage { get; set; }
 
         [JsonProperty("displayEffect", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayEffect DisplayEffect { get; set; }
+        public DisplayEffectCommand DisplayEffect { get; set; }
 
         [JsonProperty("playAudioClip", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayAudioClip PlayAudioClip { get; set; }
+        public PlayAudioClipCommand PlayAudioClip { get; set; }
 
         [JsonProperty("drawUserCards", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DrawUserCards DrawUserCards { get; set; }
+        public DrawUserCardsCommand DrawUserCards { get; set; }
 
         [JsonProperty("displayJudgment", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayJudgment DisplayJudgment { get; set; }
+        public DisplayJudgmentCommand DisplayJudgment { get; set; }
 
         [JsonProperty("displayDreamwellActivation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayDreamwellActivation DisplayDreamwellActivation { get; set; }
+        public DisplayDreamwellActivationCommand DisplayDreamwellActivation { get; set; }
 
         [JsonProperty("displayEnemyMessage", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayEnemyMessage DisplayEnemyMessage { get; set; }
+        public DisplayEnemyMessageCommand DisplayEnemyMessage { get; set; }
 
         [JsonProperty("toggleThinkingIndicator", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public ToggleThinkingIndicator ToggleThinkingIndicator { get; set; }
+        public ToggleThinkingIndicatorCommand ToggleThinkingIndicator { get; set; }
 
         [JsonProperty("playStudioAnimation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayStudioAnimation PlayStudioAnimation { get; set; }
+        public PlayStudioAnimationCommand PlayStudioAnimation { get; set; }
     }
 
-    public partial class DisplayDreamwellActivation
+    public partial class DisplayDreamwellActivationCommand
     {
         /// <summary>
-        /// The card to display an activation for. This card will be moved from its
-        /// current position (assumed to be the 'Dreamwell' position) to the
-        /// DreamwellActivation position, and an update to the player's produced
-        /// energy value will be displayed.
+        /// The card to display an activation for. This card will be moved from its current position
+        /// (assumed to be the 'Dreamwell' position) to the DreamwellActivation position, and an
+        /// update to the player's produced energy value will be displayed.
         ///
-        /// If there are triggered events as a result of this activation, the card
-        /// should be kept in the DreamwellActivation position for the next
-        /// update. Otherwise it's typical to return the card to the Dreamwell
-        /// position.
+        /// If there are triggered events as a result of this activation, the card should be kept in
+        /// the DreamwellActivation position for the next update. Otherwise it's typical to return
+        /// the card to the Dreamwell position.
         /// </summary>
         [JsonProperty("cardId", Required = Required.Always)]
         public string CardId { get; set; }
@@ -294,8 +290,7 @@ namespace Dreamtides.Schema
         public long? NewEnergy { get; set; }
 
         /// <summary>
-        /// New energy produced by this player at the start of the turn, if it has
-        /// changed.
+        /// New energy produced by this player at the start of the turn, if it has changed.
         /// </summary>
         [JsonProperty("newProducedEnergy")]
         public long? NewProducedEnergy { get; set; }
@@ -304,40 +299,40 @@ namespace Dreamtides.Schema
         /// The player to display the dreamwell activation for.
         /// </summary>
         [JsonProperty("player", Required = Required.Always)]
-        public Deck Player { get; set; }
+        public DisplayPlayer Player { get; set; }
     }
 
-    public partial class DisplayEffect
+    public partial class DisplayEffectCommand
     {
         /// <summary>
         /// How long to wait before continuing with animations.
         /// </summary>
         [JsonProperty("duration", Required = Required.Always)]
-        public WaitElement Duration { get; set; }
+        public Milliseconds Duration { get; set; }
 
         /// <summary>
         /// The effect to display.
         /// </summary>
         [JsonProperty("effect", Required = Required.Always)]
-        public EffectClass Effect { get; set; }
+        public EffectAddress Effect { get; set; }
 
         /// <summary>
         /// Local scale to apply to this effect
         /// </summary>
         [JsonProperty("scale", Required = Required.Always)]
-        public Amount Scale { get; set; }
+        public FlexVector3 Scale { get; set; }
 
         /// <summary>
         /// Sound to play along with effect
         /// </summary>
         [JsonProperty("sound")]
-        public SoundClass Sound { get; set; }
+        public AudioClipAddress Sound { get; set; }
 
         /// <summary>
         /// The target to display the effect on.
         /// </summary>
         [JsonProperty("target", Required = Required.Always)]
-        public Source Target { get; set; }
+        public GameObjectId Target { get; set; }
     }
 
     /// <summary>
@@ -351,7 +346,7 @@ namespace Dreamtides.Schema
     ///
     /// Time to wait between drawing subsequent cards.
     /// </summary>
-    public partial class WaitElement
+    public partial class Milliseconds
     {
         [JsonProperty("millisecondsValue", Required = Required.Always)]
         public long MillisecondsValue { get; set; }
@@ -360,7 +355,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// The effect to display.
     /// </summary>
-    public partial class EffectClass
+    public partial class EffectAddress
     {
         [JsonProperty("effect", Required = Required.Always)]
         public string Effect { get; set; }
@@ -369,7 +364,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Local scale to apply to this effect
     /// </summary>
-    public partial class Amount
+    public partial class FlexVector3
     {
         [JsonProperty("x", Required = Required.Always)]
         public double X { get; set; }
@@ -384,7 +379,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Sound to play
     /// </summary>
-    public partial class SoundClass
+    public partial class AudioClipAddress
     {
         [JsonProperty("audioClip", Required = Required.Always)]
         public string AudioClip { get; set; }
@@ -393,31 +388,31 @@ namespace Dreamtides.Schema
     /// <summary>
     /// The target to display the effect on.
     /// </summary>
-    public partial class Source
+    public partial class GameObjectId
     {
         [JsonProperty("cardId", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public string CardId { get; set; }
 
         [JsonProperty("deck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public Deck? Deck { get; set; }
+        public DisplayPlayer? Deck { get; set; }
 
         [JsonProperty("void", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public Deck? Void { get; set; }
+        public DisplayPlayer? Void { get; set; }
 
         [JsonProperty("avatar", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public Deck? Avatar { get; set; }
+        public DisplayPlayer? Avatar { get; set; }
     }
 
-    public partial class DisplayEnemyMessage
+    public partial class DisplayEnemyMessageCommand
     {
         [JsonProperty("message", Required = Required.Always)]
         public string Message { get; set; }
 
         [JsonProperty("showDuration", Required = Required.Always)]
-        public WaitElement ShowDuration { get; set; }
+        public Milliseconds ShowDuration { get; set; }
     }
 
-    public partial class DisplayJudgment
+    public partial class DisplayJudgmentCommand
     {
         /// <summary>
         /// The new score for the player, if it has changed.
@@ -429,16 +424,16 @@ namespace Dreamtides.Schema
         /// The player to display the judgment animation for.
         /// </summary>
         [JsonProperty("player", Required = Required.Always)]
-        public Deck Player { get; set; }
+        public DisplayPlayer Player { get; set; }
     }
 
-    public partial class DissolveCard
+    public partial class DissolveCardCommand
     {
         /// <summary>
         /// The color to use for the dissolve effect.
         /// </summary>
         [JsonProperty("color", Required = Required.Always)]
-        public ColorClass Color { get; set; }
+        public DisplayColor Color { get; set; }
 
         /// <summary>
         /// The speed multiplier of the dissolve effect. Defaults to 1.
@@ -450,7 +445,7 @@ namespace Dreamtides.Schema
         /// The material to use for the dissolve effect.
         /// </summary>
         [JsonProperty("material", Required = Required.Always)]
-        public Material Material { get; set; }
+        public MaterialAddress Material { get; set; }
 
         /// <summary>
         /// If true, dissolve will be played backwards to "create" the card.
@@ -462,25 +457,23 @@ namespace Dreamtides.Schema
         /// Sound to play
         /// </summary>
         [JsonProperty("sound")]
-        public SoundClass Sound { get; set; }
+        public AudioClipAddress Sound { get; set; }
 
         /// <summary>
         /// The card to dissolve.
         ///
-        /// Once a card is dissolved, it will be invisible until a reverse dissolve
-        /// is applied to it.
+        /// Once a card is dissolved, it will be invisible until a reverse dissolve is applied to it.
         /// </summary>
         [JsonProperty("target", Required = Required.Always)]
         public string Target { get; set; }
     }
 
     /// <summary>
-    /// Represents a color with the given RGBA values represented as floats in the
-    /// 0-1 range.
+    /// Represents a color with the given RGBA values represented as floats in the 0-1 range.
     ///
     /// The color to use for the dissolve effect.
     /// </summary>
-    public partial class ColorClass
+    public partial class DisplayColor
     {
         [JsonProperty("alpha", Required = Required.Always)]
         public double Alpha { get; set; }
@@ -498,19 +491,19 @@ namespace Dreamtides.Schema
     /// <summary>
     /// The material to use for the dissolve effect.
     /// </summary>
-    public partial class Material
+    public partial class MaterialAddress
     {
         [JsonProperty("material", Required = Required.Always)]
-        public string MaterialMaterial { get; set; }
+        public string Material { get; set; }
     }
 
-    public partial class DrawUserCards
+    public partial class DrawUserCardsCommand
     {
         /// <summary>
         /// Cards to draw. Must already be present in user deck.
         /// </summary>
         [JsonProperty("cards", Required = Required.Always)]
-        public List<DrawUserCardsCard> Cards { get; set; }
+        public List<CardView> Cards { get; set; }
 
         /// <summary>
         /// Time to display each card before moving it to hand.
@@ -518,19 +511,19 @@ namespace Dreamtides.Schema
         /// Should be less than stagger_interval for best results.
         /// </summary>
         [JsonProperty("pauseDuration", Required = Required.Always)]
-        public WaitElement PauseDuration { get; set; }
+        public Milliseconds PauseDuration { get; set; }
 
         /// <summary>
         /// Time to wait between drawing subsequent cards.
         /// </summary>
         [JsonProperty("staggerInterval", Required = Required.Always)]
-        public WaitElement StaggerInterval { get; set; }
+        public Milliseconds StaggerInterval { get; set; }
     }
 
     /// <summary>
     /// Represents the visual state of a card or ability in a game
     /// </summary>
-    public partial class DrawUserCardsCard
+    public partial class CardView
     {
         /// <summary>
         /// Face up/face down state for this card
@@ -541,20 +534,19 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Optionally, a position at which to create this card.
         ///
-        /// If this card does not already exist, it will be created at this position
-        /// before being animated to [Self::position].
+        /// If this card does not already exist, it will be created at this position before being
+        /// animated to [Self::position].
         /// </summary>
         [JsonProperty("createPosition")]
-        public JumpToPositionClass CreatePosition { get; set; }
+        public ObjectPosition CreatePosition { get; set; }
 
         /// <summary>
         /// Optionally, a position at which to destroy this card.
         ///
-        /// If provided, the card will be animated to this position before being
-        /// destroyed.
+        /// If provided, the card will be animated to this position before being destroyed.
         /// </summary>
         [JsonProperty("destroyPosition")]
-        public JumpToPositionClass DestroyPosition { get; set; }
+        public ObjectPosition DestroyPosition { get; set; }
 
         /// <summary>
         /// Identifier for this card
@@ -566,20 +558,20 @@ namespace Dreamtides.Schema
         /// Position of this card in the UI
         /// </summary>
         [JsonProperty("position", Required = Required.Always)]
-        public JumpToPositionClass Position { get; set; }
+        public ObjectPosition Position { get; set; }
 
         /// <summary>
         /// Represents the general category of card being displayed.
         /// </summary>
         [JsonProperty("prefab", Required = Required.Always)]
-        public PrefabEnum Prefab { get; set; }
+        public CardPrefab Prefab { get; set; }
 
         /// <summary>
-        /// If this card is revealed to the viewer, contains information on the
-        /// revealed face of the card.
+        /// If this card is revealed to the viewer, contains information on the revealed face of the
+        /// card.
         /// </summary>
         [JsonProperty("revealed")]
-        public RevealedClass Revealed { get; set; }
+        public RevealedCardView Revealed { get; set; }
 
         /// <summary>
         /// True if this card is in a hidden zone but known to one or more opponents
@@ -593,7 +585,7 @@ namespace Dreamtides.Schema
     ///
     /// Position of this card in the UI
     /// </summary>
-    public partial class JumpToPositionClass
+    public partial class ObjectPosition
     {
         /// <summary>
         /// Position category
@@ -617,12 +609,11 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Object is on the stack, typically used by cards which were just played.
     ///
-    /// There are four types of stacks. By default, cards display at a large
-    /// display size, blocking the view of the battlefield. However, if any
-    /// cards are present on the stack which target a character on the
-    /// battlefield, the cards are displayed at a smaller size in order to
-    /// enable viewing & selecting targets appropriately, based on the set of
-    /// cards which are current or eligible targets.
+    /// There are four types of stacks. By default, cards display at a large display size,
+    /// blocking the view of the battlefield. However, if any cards are present on the stack
+    /// which target a character on the battlefield, the cards are displayed at a smaller size in
+    /// order to enable viewing & selecting targets appropriately, based on the set of cards
+    /// which are current or eligible targets.
     ///
     /// Object is in a player's hand
     ///
@@ -638,44 +629,44 @@ namespace Dreamtides.Schema
     ///
     /// Object is in a player's status zone
     ///
-    /// Object is being displayed in a selector to determine the order of cards,
-    /// e.g. when resolving the "forsee" effect.
+    /// Object is being displayed in a selector to determine the order of cards, e.g. when
+    /// resolving the "forsee" effect.
     ///
     /// Object is in the dreamwell for a player (usually off-screen).
     ///
     /// Object is hidden within a card
     /// </summary>
-    public partial class PositionPositionClass
+    public partial class PositionClass
     {
         [JsonProperty("onStack", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public OnStack? OnStack { get; set; }
+        public StackType? OnStack { get; set; }
 
         [JsonProperty("inHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public Deck? InHand { get; set; }
+        public DisplayPlayer? InHand { get; set; }
 
         [JsonProperty("onTopOfDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public Deck? OnTopOfDeck { get; set; }
+        public DisplayPlayer? OnTopOfDeck { get; set; }
 
         [JsonProperty("inDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public Deck? InDeck { get; set; }
+        public DisplayPlayer? InDeck { get; set; }
 
         [JsonProperty("inVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public Deck? InVoid { get; set; }
+        public DisplayPlayer? InVoid { get; set; }
 
         [JsonProperty("inBanished", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public Deck? InBanished { get; set; }
+        public DisplayPlayer? InBanished { get; set; }
 
         [JsonProperty("onBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public Deck? OnBattlefield { get; set; }
+        public DisplayPlayer? OnBattlefield { get; set; }
 
         [JsonProperty("inPlayerStatus", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public Deck? InPlayerStatus { get; set; }
+        public DisplayPlayer? InPlayerStatus { get; set; }
 
         [JsonProperty("cardOrderSelector", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public CardOrderSelector? CardOrderSelector { get; set; }
+        public CardOrderSelectionTarget? CardOrderSelector { get; set; }
 
         [JsonProperty("inDreamwell", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public Deck? InDreamwell { get; set; }
+        public DisplayPlayer? InDreamwell { get; set; }
 
         [JsonProperty("hiddenWithinCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public string HiddenWithinCard { get; set; }
@@ -684,13 +675,13 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Visual state of a revealed card
     /// </summary>
-    public partial class RevealedClass
+    public partial class RevealedCardView
     {
         /// <summary>
         /// Actions available for this card
         /// </summary>
         [JsonProperty("actions", Required = Required.Always)]
-        public Actions Actions { get; set; }
+        public CardActions Actions { get; set; }
 
         /// <summary>
         /// Type or subtype of this card
@@ -708,20 +699,19 @@ namespace Dreamtides.Schema
         /// Special effects to display for this card
         /// </summary>
         [JsonProperty("effects", Required = Required.Always)]
-        public Effects Effects { get; set; }
+        public CardEffects Effects { get; set; }
 
         /// <summary>
         /// Image for this card
         /// </summary>
         [JsonProperty("image", Required = Required.Always)]
-        public Image Image { get; set; }
+        public DisplayImage Image { get; set; }
 
         /// <summary>
-        /// Data providing supplemental information about this card on long
-        /// press/hover.
+        /// Data providing supplemental information about this card on long press/hover.
         /// </summary>
         [JsonProperty("infoZoomData")]
-        public InfoZoomDataClass InfoZoomData { get; set; }
+        public InfoZoomData InfoZoomData { get; set; }
 
         /// <summary>
         /// True if this card can be played during the opponent's turn
@@ -739,7 +729,7 @@ namespace Dreamtides.Schema
         /// Outline color of this card
         /// </summary>
         [JsonProperty("outlineColor")]
-        public ColorClass OutlineColor { get; set; }
+        public DisplayColor OutlineColor { get; set; }
 
         /// <summary>
         /// Energy produced by this card
@@ -763,18 +753,17 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Actions available for this card
     /// </summary>
-    public partial class Actions
+    public partial class CardActions
     {
         /// <summary>
-        /// If this card can currently be played from hand, an action to invoke when
-        /// played.
+        /// If this card can currently be played from hand, an action to invoke when played.
         /// </summary>
         [JsonProperty("canPlay")]
-        public CanPlay? CanPlay { get; set; }
+        public ActionUnion? CanPlay { get; set; }
 
         /// <summary>
-        /// If this card can currently be dragged within a Card Order Selector, the
-        /// card ID to use when selecting order.
+        /// If this card can currently be dragged within a Card Order Selector, the card ID to use
+        /// when selecting order.
         /// </summary>
         [JsonProperty("canSelectOrder")]
         public long? CanSelectOrder { get; set; }
@@ -783,22 +772,22 @@ namespace Dreamtides.Schema
         /// Action to perform when this card is clicked.
         /// </summary>
         [JsonProperty("onClick")]
-        public CanPlay? OnClick { get; set; }
+        public ActionUnion? OnClick { get; set; }
 
         /// <summary>
         /// Sound to play when this card is played.
         /// </summary>
         [JsonProperty("onPlaySound")]
-        public SoundClass OnPlaySound { get; set; }
+        public AudioClipAddress OnPlaySound { get; set; }
 
         /// <summary>
         /// Preview of the battle state after this card is played.
         /// </summary>
         [JsonProperty("playEffectPreview")]
-        public ActiveClass PlayEffectPreview { get; set; }
+        public BattlePreviewView PlayEffectPreview { get; set; }
     }
 
-    public partial class CanPlayClass
+    public partial class ActionClass
     {
         [JsonProperty("debugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DebugAction? DebugAction { get; set; }
@@ -810,7 +799,7 @@ namespace Dreamtides.Schema
         public BattleDisplayAction? BattleDisplayAction { get; set; }
 
         [JsonProperty("undo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DrawCard? Undo { get; set; }
+        public PlayerName? Undo { get; set; }
     }
 
     /// <summary>
@@ -831,7 +820,7 @@ namespace Dreamtides.Schema
     public partial class BattleActionClass
     {
         [JsonProperty("debug", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DebugElement Debug { get; set; }
+        public DebugBattleAction Debug { get; set; }
 
         [JsonProperty("playCardFromHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? PlayCardFromHand { get; set; }
@@ -871,40 +860,40 @@ namespace Dreamtides.Schema
     ///
     /// Move all cards from hand to deck
     ///
-    /// Set the number of cards remaining in a player's deck. All other cards
-    /// are moved to the void.
+    /// Set the number of cards remaining in a player's deck. All other cards are moved to the
+    /// void.
     /// </summary>
-    public partial class DebugElement
+    public partial class DebugBattleAction
     {
         [JsonProperty("drawCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DrawCard? DrawCard { get; set; }
+        public PlayerName? DrawCard { get; set; }
 
         [JsonProperty("setEnergy", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<object> SetEnergy { get; set; }
+        public List<Set> SetEnergy { get; set; }
 
         [JsonProperty("setPoints", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<object> SetPoints { get; set; }
+        public List<Set> SetPoints { get; set; }
 
         [JsonProperty("setProducedEnergy", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<object> SetProducedEnergy { get; set; }
+        public List<Set> SetProducedEnergy { get; set; }
 
         [JsonProperty("setSparkBonus", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<object> SetSparkBonus { get; set; }
+        public List<Set> SetSparkBonus { get; set; }
 
         [JsonProperty("addCardToHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<object> AddCardToHand { get; set; }
+        public List<Name> AddCardToHand { get; set; }
 
         [JsonProperty("addCardToBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<object> AddCardToBattlefield { get; set; }
+        public List<Name> AddCardToBattlefield { get; set; }
 
         [JsonProperty("addCardToVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<object> AddCardToVoid { get; set; }
+        public List<Name> AddCardToVoid { get; set; }
 
         [JsonProperty("moveHandToDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DrawCard? MoveHandToDeck { get; set; }
+        public PlayerName? MoveHandToDeck { get; set; }
 
         [JsonProperty("setCardsRemainingInDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<object> SetCardsRemainingInDeck { get; set; }
+        public List<Set> SetCardsRemainingInDeck { get; set; }
     }
 
     public partial class SelectCardOrder
@@ -916,28 +905,27 @@ namespace Dreamtides.Schema
         public long Position { get; set; }
 
         [JsonProperty("target", Required = Required.Always)]
-        public CardOrderSelector Target { get; set; }
+        public CardOrderSelectionTarget Target { get; set; }
     }
 
     /// <summary>
-    /// Sets the selected amount of energy to pay as an additional cost to play
-    /// a card.
+    /// Sets the selected amount of energy to pay as an additional cost to play a card.
     ///
     /// Opens a panel based on its address.
     /// </summary>
     public partial class BattleDisplayActionClass
     {
         [JsonProperty("browseCards", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public BrowseCards? BrowseCards { get; set; }
+        public CardBrowserType? BrowseCards { get; set; }
 
         [JsonProperty("setSelectedEnergyAdditionalCost", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SetSelectedEnergyAdditionalCost { get; set; }
 
         [JsonProperty("openPanel", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public OpenPanel? OpenPanel { get; set; }
+        public PanelAddress? OpenPanel { get; set; }
     }
 
-    public partial class OpenPanelClass
+    public partial class PanelAddressClass
     {
         [JsonProperty("viewLogs", Required = Required.AllowNull)]
         public string ViewLogs { get; set; }
@@ -946,35 +934,35 @@ namespace Dreamtides.Schema
     public partial class DebugActionClass
     {
         [JsonProperty("setOpponentAgent", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public Agent? SetOpponentAgent { get; set; }
+        public GameAi? SetOpponentAgent { get; set; }
 
         [JsonProperty("applyActionList", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<DebugElement> ApplyActionList { get; set; }
+        public List<DebugBattleAction> ApplyActionList { get; set; }
     }
 
     /// <summary>
-    /// Preview of a potential future state of a battle, shown e.g. in response to a
-    /// card being selected to be played.
+    /// Preview of a potential future state of a battle, shown e.g. in response to a card being
+    /// selected to be played.
     /// </summary>
-    public partial class ActiveClass
+    public partial class BattlePreviewView
     {
         [JsonProperty("cards", Required = Required.Always)]
-        public List<ActiveCard> Cards { get; set; }
+        public List<CardPreviewView> Cards { get; set; }
 
         [JsonProperty("enemy", Required = Required.Always)]
-        public ActiveEnemy Enemy { get; set; }
+        public PlayerPreviewView Enemy { get; set; }
 
         [JsonProperty("previewMessage")]
-        public ScreenOverlayElement PreviewMessage { get; set; }
+        public FlexNode PreviewMessage { get; set; }
 
         [JsonProperty("user", Required = Required.Always)]
-        public ActiveEnemy User { get; set; }
+        public PlayerPreviewView User { get; set; }
     }
 
     /// <summary>
     /// Preview of a potential future state of a card.
     /// </summary>
-    public partial class ActiveCard
+    public partial class CardPreviewView
     {
         /// <summary>
         /// Icon to display over this card on the battlefield
@@ -986,7 +974,7 @@ namespace Dreamtides.Schema
         /// Color of the battlefield icon
         /// </summary>
         [JsonProperty("battlefieldIconColor")]
-        public ColorClass BattlefieldIconColor { get; set; }
+        public DisplayColor BattlefieldIconColor { get; set; }
 
         /// <summary>
         /// Identifier for this card
@@ -1010,7 +998,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Preview of a potential future state of a player
     /// </summary>
-    public partial class ActiveEnemy
+    public partial class PlayerPreviewView
     {
         /// <summary>
         /// New energy available to this player
@@ -1040,7 +1028,7 @@ namespace Dreamtides.Schema
     public partial class DraggableNode
     {
         [JsonProperty("customDragIndicator")]
-        public ScreenOverlayElement CustomDragIndicator { get; set; }
+        public FlexNode CustomDragIndicator { get; set; }
 
         [JsonProperty("dropTargetIdentifiers", Required = Required.Always)]
         public List<string> DropTargetIdentifiers { get; set; }
@@ -1052,22 +1040,22 @@ namespace Dreamtides.Schema
         public long? HorizontalDragStartDistance { get; set; }
 
         [JsonProperty("onDragDetected")]
-        public CanPlay? OnDragDetected { get; set; }
+        public ActionUnion? OnDragDetected { get; set; }
 
         [JsonProperty("onDrop")]
-        public CanPlay? OnDrop { get; set; }
+        public ActionUnion? OnDrop { get; set; }
 
         [JsonProperty("overTargetIndicator")]
-        public ScreenOverlayElement OverTargetIndicator { get; set; }
+        public FlexNode OverTargetIndicator { get; set; }
 
         [JsonProperty("removeOriginal")]
         public bool? RemoveOriginal { get; set; }
     }
 
-    public partial class NodeTypeClass
+    public partial class NodeType
     {
         [JsonProperty("text", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public Text Text { get; set; }
+        public TextNode Text { get; set; }
 
         [JsonProperty("scrollViewNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public ScrollViewNode ScrollViewNode { get; set; }
@@ -1082,28 +1070,28 @@ namespace Dreamtides.Schema
         public SliderNode SliderNode { get; set; }
     }
 
-    public partial class ScreenOverlayElement
+    public partial class FlexNode
     {
         [JsonProperty("children", Required = Required.Always)]
-        public List<ScreenOverlayElement> Children { get; set; }
+        public List<FlexNode> Children { get; set; }
 
         [JsonProperty("eventHandlers")]
-        public EventHandlersClass EventHandlers { get; set; }
+        public EventHandlers EventHandlers { get; set; }
 
         [JsonProperty("hoverStyle")]
-        public HoverStyleClass HoverStyle { get; set; }
+        public FlexStyle HoverStyle { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }
 
         [JsonProperty("nodeType")]
-        public NodeTypeClass NodeType { get; set; }
+        public NodeType NodeType { get; set; }
 
         /// <summary>
         /// Style to apply to the element when it is first attached to a panel.
         /// </summary>
         [JsonProperty("onAttachStyle")]
-        public HoverStyleClass OnAttachStyle { get; set; }
+        public FlexStyle OnAttachStyle { get; set; }
 
         /// <summary>
         /// How long to keep the `on_attach_style` applied.
@@ -1111,13 +1099,13 @@ namespace Dreamtides.Schema
         /// If not specified, the style will be applied indefinitely.
         /// </summary>
         [JsonProperty("onAttachStyleDuration")]
-        public WaitElement OnAttachStyleDuration { get; set; }
+        public Milliseconds OnAttachStyleDuration { get; set; }
 
         [JsonProperty("pressedStyle")]
-        public HoverStyleClass PressedStyle { get; set; }
+        public FlexStyle PressedStyle { get; set; }
 
         [JsonProperty("style")]
-        public HoverStyleClass Style { get; set; }
+        public FlexStyle Style { get; set; }
     }
 
     public partial class ScrollViewNode
@@ -1129,10 +1117,10 @@ namespace Dreamtides.Schema
         public double? HorizontalPageSize { get; set; }
 
         [JsonProperty("horizontalScrollBar")]
-        public HorizontalScrollBarClass HorizontalScrollBar { get; set; }
+        public ScrollBar HorizontalScrollBar { get; set; }
 
         [JsonProperty("horizontalScrollBarVisibility")]
-        public HorizontalScrollBarVisibilityEnum? HorizontalScrollBarVisibility { get; set; }
+        public ScrollBarVisibility? HorizontalScrollBarVisibility { get; set; }
 
         [JsonProperty("mouseWheelScrollSize")]
         public double? MouseWheelScrollSize { get; set; }
@@ -1141,64 +1129,64 @@ namespace Dreamtides.Schema
         public double? ScrollDecelerationRate { get; set; }
 
         [JsonProperty("touchScrollBehavior")]
-        public TouchScrollBehaviorEnum? TouchScrollBehavior { get; set; }
+        public TouchScrollBehavior? TouchScrollBehavior { get; set; }
 
         [JsonProperty("verticalPageSize")]
         public double? VerticalPageSize { get; set; }
 
         [JsonProperty("verticalScrollBar")]
-        public HorizontalScrollBarClass VerticalScrollBar { get; set; }
+        public ScrollBar VerticalScrollBar { get; set; }
 
         [JsonProperty("verticalScrollBarVisibility")]
-        public HorizontalScrollBarVisibilityEnum? VerticalScrollBarVisibility { get; set; }
+        public ScrollBarVisibility? VerticalScrollBarVisibility { get; set; }
     }
 
-    public partial class HorizontalScrollBarClass
+    public partial class ScrollBar
     {
         [JsonProperty("style")]
-        public HoverStyleClass Style { get; set; }
+        public FlexStyle Style { get; set; }
     }
 
-    public partial class HoverStyleClass
+    public partial class FlexStyle
     {
         [JsonProperty("alignContent")]
-        public AlignContentEnum? AlignContent { get; set; }
+        public FlexAlign? AlignContent { get; set; }
 
         [JsonProperty("alignItems")]
-        public AlignContentEnum? AlignItems { get; set; }
+        public FlexAlign? AlignItems { get; set; }
 
         [JsonProperty("alignSelf")]
-        public AlignContentEnum? AlignSelf { get; set; }
+        public FlexAlign? AlignSelf { get; set; }
 
         [JsonProperty("backgroundColor")]
-        public ColorClass BackgroundColor { get; set; }
+        public DisplayColor BackgroundColor { get; set; }
 
         [JsonProperty("backgroundImage")]
-        public SpriteClass BackgroundImage { get; set; }
+        public SpriteAddress BackgroundImage { get; set; }
 
         [JsonProperty("backgroundImageTintColor")]
-        public ColorClass BackgroundImageTintColor { get; set; }
+        public DisplayColor BackgroundImageTintColor { get; set; }
 
         [JsonProperty("borderColor")]
-        public BorderColorClass BorderColor { get; set; }
+        public BorderColor BorderColor { get; set; }
 
         [JsonProperty("borderRadius")]
-        public BorderRadiusClass BorderRadius { get; set; }
+        public BorderRadius BorderRadius { get; set; }
 
         [JsonProperty("borderWidth")]
-        public BorderWidthClass BorderWidth { get; set; }
+        public BorderWidth BorderWidth { get; set; }
 
         [JsonProperty("color")]
-        public ColorClass Color { get; set; }
+        public DisplayColor Color { get; set; }
 
         [JsonProperty("display")]
-        public DisplayEnum? Display { get; set; }
+        public FlexDisplayStyle? Display { get; set; }
 
         [JsonProperty("flexBasis")]
-        public BottomLeft FlexBasis { get; set; }
+        public Dimension FlexBasis { get; set; }
 
         [JsonProperty("flexDirection")]
-        public FlexDirectionEnum? FlexDirection { get; set; }
+        public FlexDirection? FlexDirection { get; set; }
 
         [JsonProperty("flexGrow")]
         public double? FlexGrow { get; set; }
@@ -1207,169 +1195,169 @@ namespace Dreamtides.Schema
         public double? FlexShrink { get; set; }
 
         [JsonProperty("font")]
-        public FontClass Font { get; set; }
+        public FontAddress Font { get; set; }
 
         [JsonProperty("fontSize")]
-        public BottomLeft FontSize { get; set; }
+        public Dimension FontSize { get; set; }
 
         [JsonProperty("fontStyle")]
-        public FontStyleEnum? FontStyle { get; set; }
+        public FontStyle? FontStyle { get; set; }
 
         [JsonProperty("height")]
-        public BottomLeft Height { get; set; }
+        public Dimension Height { get; set; }
 
         [JsonProperty("imageSlice")]
-        public ImageSliceClass ImageSlice { get; set; }
+        public ImageSlice ImageSlice { get; set; }
 
         [JsonProperty("inset")]
-        public InsetClass Inset { get; set; }
+        public FlexInsets Inset { get; set; }
 
         [JsonProperty("justifyContent")]
-        public JustifyContentEnum? JustifyContent { get; set; }
+        public FlexJustify? JustifyContent { get; set; }
 
         [JsonProperty("letterSpacing")]
-        public BottomLeft LetterSpacing { get; set; }
+        public Dimension LetterSpacing { get; set; }
 
         [JsonProperty("margin")]
-        public MarginClass Margin { get; set; }
+        public DimensionGroup Margin { get; set; }
 
         [JsonProperty("maxHeight")]
-        public BottomLeft MaxHeight { get; set; }
+        public Dimension MaxHeight { get; set; }
 
         [JsonProperty("maxWidth")]
-        public BottomLeft MaxWidth { get; set; }
+        public Dimension MaxWidth { get; set; }
 
         [JsonProperty("minHeight")]
-        public BottomLeft MinHeight { get; set; }
+        public Dimension MinHeight { get; set; }
 
         [JsonProperty("minWidth")]
-        public BottomLeft MinWidth { get; set; }
+        public Dimension MinWidth { get; set; }
 
         [JsonProperty("opacity")]
         public double? Opacity { get; set; }
 
         [JsonProperty("overflow")]
-        public OverflowEnum? Overflow { get; set; }
+        public FlexVisibility? Overflow { get; set; }
 
         [JsonProperty("overflowClipBox")]
-        public OverflowClipBoxEnum? OverflowClipBox { get; set; }
+        public OverflowClipBox? OverflowClipBox { get; set; }
 
         [JsonProperty("padding")]
-        public MarginClass Padding { get; set; }
+        public DimensionGroup Padding { get; set; }
 
         [JsonProperty("paragraphSpacing")]
-        public BottomLeft ParagraphSpacing { get; set; }
+        public Dimension ParagraphSpacing { get; set; }
 
         [JsonProperty("pickingMode")]
-        public PickingModeEnum? PickingMode { get; set; }
+        public FlexPickingMode? PickingMode { get; set; }
 
         [JsonProperty("position")]
-        public HoverStylePosition? Position { get; set; }
+        public FlexPosition? Position { get; set; }
 
         [JsonProperty("rotate")]
-        public RotateClass Rotate { get; set; }
+        public FlexRotate Rotate { get; set; }
 
         [JsonProperty("scale")]
-        public ScaleClass Scale { get; set; }
+        public FlexScale Scale { get; set; }
 
         [JsonProperty("textAlign")]
-        public TextAlignEnum? TextAlign { get; set; }
+        public TextAlign? TextAlign { get; set; }
 
         [JsonProperty("textOutlineColor")]
-        public ColorClass TextOutlineColor { get; set; }
+        public DisplayColor TextOutlineColor { get; set; }
 
         [JsonProperty("textOutlineWidth")]
         public double? TextOutlineWidth { get; set; }
 
         [JsonProperty("textOverflow")]
-        public TextOverflowEnum? TextOverflow { get; set; }
+        public TextOverflow? TextOverflow { get; set; }
 
         [JsonProperty("textOverflowPosition")]
-        public TextOverflowPositionEnum? TextOverflowPosition { get; set; }
+        public TextOverflowPosition? TextOverflowPosition { get; set; }
 
         [JsonProperty("textShadow")]
-        public TextShadowClass TextShadow { get; set; }
+        public TextShadow TextShadow { get; set; }
 
         [JsonProperty("transformOrigin")]
-        public TransformOriginClass TransformOrigin { get; set; }
+        public FlexTranslate TransformOrigin { get; set; }
 
         [JsonProperty("transitionDelays", Required = Required.Always)]
-        public List<WaitElement> TransitionDelays { get; set; }
+        public List<Milliseconds> TransitionDelays { get; set; }
 
         [JsonProperty("transitionDurations", Required = Required.Always)]
-        public List<WaitElement> TransitionDurations { get; set; }
+        public List<Milliseconds> TransitionDurations { get; set; }
 
         [JsonProperty("transitionEasingModes", Required = Required.Always)]
-        public List<TransitionEasingModeElement> TransitionEasingModes { get; set; }
+        public List<EasingMode> TransitionEasingModes { get; set; }
 
         [JsonProperty("transitionProperties", Required = Required.Always)]
         public List<string> TransitionProperties { get; set; }
 
         [JsonProperty("translate")]
-        public TransformOriginClass Translate { get; set; }
+        public FlexTranslate Translate { get; set; }
 
         [JsonProperty("visibility")]
-        public OverflowEnum? Visibility { get; set; }
+        public FlexVisibility? Visibility { get; set; }
 
         [JsonProperty("whiteSpace")]
-        public WhiteSpaceEnum? WhiteSpace { get; set; }
+        public WhiteSpace? WhiteSpace { get; set; }
 
         [JsonProperty("width")]
-        public BottomLeft Width { get; set; }
+        public Dimension Width { get; set; }
 
         [JsonProperty("wordSpacing")]
-        public BottomLeft WordSpacing { get; set; }
+        public Dimension WordSpacing { get; set; }
 
         [JsonProperty("wrap")]
-        public WrapEnum? Wrap { get; set; }
+        public FlexWrap? Wrap { get; set; }
     }
 
-    public partial class SpriteClass
+    public partial class SpriteAddress
     {
         [JsonProperty("sprite", Required = Required.Always)]
         public string Sprite { get; set; }
     }
 
-    public partial class BorderColorClass
+    public partial class BorderColor
     {
         [JsonProperty("bottom", Required = Required.Always)]
-        public ColorClass Bottom { get; set; }
+        public DisplayColor Bottom { get; set; }
 
         [JsonProperty("left", Required = Required.Always)]
-        public ColorClass Left { get; set; }
+        public DisplayColor Left { get; set; }
 
         [JsonProperty("right", Required = Required.Always)]
-        public ColorClass Right { get; set; }
+        public DisplayColor Right { get; set; }
 
         [JsonProperty("top", Required = Required.Always)]
-        public ColorClass Top { get; set; }
+        public DisplayColor Top { get; set; }
     }
 
-    public partial class BorderRadiusClass
+    public partial class BorderRadius
     {
         [JsonProperty("bottomLeft", Required = Required.Always)]
-        public BottomLeft BottomLeft { get; set; }
+        public Dimension BottomLeft { get; set; }
 
         [JsonProperty("bottomRight", Required = Required.Always)]
-        public BottomLeft BottomRight { get; set; }
+        public Dimension BottomRight { get; set; }
 
         [JsonProperty("topLeft", Required = Required.Always)]
-        public BottomLeft TopLeft { get; set; }
+        public Dimension TopLeft { get; set; }
 
         [JsonProperty("topRight", Required = Required.Always)]
-        public BottomLeft TopRight { get; set; }
+        public Dimension TopRight { get; set; }
     }
 
-    public partial class BottomLeft
+    public partial class Dimension
     {
         [JsonProperty("unit", Required = Required.Always)]
-        public Unit Unit { get; set; }
+        public DimensionUnit Unit { get; set; }
 
         [JsonProperty("value", Required = Required.Always)]
         public double Value { get; set; }
     }
 
-    public partial class BorderWidthClass
+    public partial class BorderWidth
     {
         [JsonProperty("bottom", Required = Required.Always)]
         public double Bottom { get; set; }
@@ -1384,13 +1372,13 @@ namespace Dreamtides.Schema
         public double Top { get; set; }
     }
 
-    public partial class FontClass
+    public partial class FontAddress
     {
         [JsonProperty("font", Required = Required.Always)]
         public string Font { get; set; }
     }
 
-    public partial class ImageSliceClass
+    public partial class ImageSlice
     {
         [JsonProperty("bottom", Required = Required.Always)]
         public long Bottom { get; set; }
@@ -1405,61 +1393,61 @@ namespace Dreamtides.Schema
         public long Top { get; set; }
     }
 
-    public partial class InsetClass
+    public partial class FlexInsets
     {
         [JsonProperty("bottom")]
-        public BottomLeft Bottom { get; set; }
+        public Dimension Bottom { get; set; }
 
         [JsonProperty("left")]
-        public BottomLeft Left { get; set; }
+        public Dimension Left { get; set; }
 
         [JsonProperty("right")]
-        public BottomLeft Right { get; set; }
+        public Dimension Right { get; set; }
 
         [JsonProperty("top")]
-        public BottomLeft Top { get; set; }
+        public Dimension Top { get; set; }
     }
 
-    public partial class MarginClass
+    public partial class DimensionGroup
     {
         [JsonProperty("bottom", Required = Required.Always)]
-        public BottomLeft Bottom { get; set; }
+        public Dimension Bottom { get; set; }
 
         [JsonProperty("left", Required = Required.Always)]
-        public BottomLeft Left { get; set; }
+        public Dimension Left { get; set; }
 
         [JsonProperty("right", Required = Required.Always)]
-        public BottomLeft Right { get; set; }
+        public Dimension Right { get; set; }
 
         [JsonProperty("top", Required = Required.Always)]
-        public BottomLeft Top { get; set; }
+        public Dimension Top { get; set; }
     }
 
-    public partial class RotateClass
+    public partial class FlexRotate
     {
         [JsonProperty("degrees", Required = Required.Always)]
         public double Degrees { get; set; }
     }
 
-    public partial class ScaleClass
+    public partial class FlexScale
     {
         [JsonProperty("amount", Required = Required.Always)]
-        public Amount Amount { get; set; }
+        public FlexVector3 Amount { get; set; }
     }
 
-    public partial class TextShadowClass
+    public partial class TextShadow
     {
         [JsonProperty("blurRadius", Required = Required.Always)]
         public double BlurRadius { get; set; }
 
         [JsonProperty("color", Required = Required.Always)]
-        public ColorClass Color { get; set; }
+        public DisplayColor Color { get; set; }
 
         [JsonProperty("offset", Required = Required.Always)]
-        public Offset Offset { get; set; }
+        public FlexVector2 Offset { get; set; }
     }
 
-    public partial class Offset
+    public partial class FlexVector2
     {
         [JsonProperty("x", Required = Required.Always)]
         public double X { get; set; }
@@ -1468,13 +1456,13 @@ namespace Dreamtides.Schema
         public double Y { get; set; }
     }
 
-    public partial class TransformOriginClass
+    public partial class FlexTranslate
     {
         [JsonProperty("x", Required = Required.Always)]
-        public BottomLeft X { get; set; }
+        public Dimension X { get; set; }
 
         [JsonProperty("y", Required = Required.Always)]
-        public BottomLeft Y { get; set; }
+        public Dimension Y { get; set; }
 
         [JsonProperty("z", Required = Required.Always)]
         public double Z { get; set; }
@@ -1483,16 +1471,16 @@ namespace Dreamtides.Schema
     public partial class SliderNode
     {
         [JsonProperty("direction")]
-        public DirectionEnum? Direction { get; set; }
+        public SliderDirection? Direction { get; set; }
 
         [JsonProperty("dragContainerStyle")]
-        public HoverStyleClass DragContainerStyle { get; set; }
+        public FlexStyle DragContainerStyle { get; set; }
 
         [JsonProperty("draggerBorderStyle")]
-        public HoverStyleClass DraggerBorderStyle { get; set; }
+        public FlexStyle DraggerBorderStyle { get; set; }
 
         [JsonProperty("draggerStyle")]
-        public HoverStyleClass DraggerStyle { get; set; }
+        public FlexStyle DraggerStyle { get; set; }
 
         [JsonProperty("highValue")]
         public double? HighValue { get; set; }
@@ -1507,7 +1495,7 @@ namespace Dreamtides.Schema
         public string Label { get; set; }
 
         [JsonProperty("labelStyle")]
-        public HoverStyleClass LabelStyle { get; set; }
+        public FlexStyle LabelStyle { get; set; }
 
         [JsonProperty("lowValue")]
         public double? LowValue { get; set; }
@@ -1522,10 +1510,10 @@ namespace Dreamtides.Schema
         public bool? ShowInputField { get; set; }
 
         [JsonProperty("trackerStyle")]
-        public HoverStyleClass TrackerStyle { get; set; }
+        public FlexStyle TrackerStyle { get; set; }
     }
 
-    public partial class Text
+    public partial class TextNode
     {
         [JsonProperty("label", Required = Required.Always)]
         public string Label { get; set; }
@@ -1561,43 +1549,43 @@ namespace Dreamtides.Schema
         public bool? TripleClickSelectsLine { get; set; }
     }
 
-    public partial class EventHandlersClass
+    public partial class EventHandlers
     {
         [JsonProperty("onClick")]
-        public CanPlay? OnClick { get; set; }
+        public ActionUnion? OnClick { get; set; }
 
         [JsonProperty("onFieldChanged")]
-        public CanPlay? OnFieldChanged { get; set; }
+        public ActionUnion? OnFieldChanged { get; set; }
 
         [JsonProperty("onLongPress")]
-        public CanPlay? OnLongPress { get; set; }
+        public ActionUnion? OnLongPress { get; set; }
 
         [JsonProperty("onMouseDown")]
-        public CanPlay? OnMouseDown { get; set; }
+        public ActionUnion? OnMouseDown { get; set; }
 
         [JsonProperty("onMouseEnter")]
-        public CanPlay? OnMouseEnter { get; set; }
+        public ActionUnion? OnMouseEnter { get; set; }
 
         [JsonProperty("onMouseLeave")]
-        public CanPlay? OnMouseLeave { get; set; }
+        public ActionUnion? OnMouseLeave { get; set; }
 
         [JsonProperty("onMouseUp")]
-        public CanPlay? OnMouseUp { get; set; }
+        public ActionUnion? OnMouseUp { get; set; }
     }
 
     /// <summary>
     /// Special effects to display for this card
     /// </summary>
-    public partial class Effects
+    public partial class CardEffects
     {
         /// <summary>
         /// Projectile to display as a trail behind this card.
         /// </summary>
         [JsonProperty("cardTrail")]
-        public ProjectileClass CardTrail { get; set; }
+        public ProjectileAddress CardTrail { get; set; }
     }
 
-    public partial class ProjectileClass
+    public partial class ProjectileAddress
     {
         [JsonProperty("projectile", Required = Required.Always)]
         public string Projectile { get; set; }
@@ -1606,149 +1594,148 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Image for this card
     /// </summary>
-    public partial class Image
+    public partial class DisplayImage
     {
         [JsonProperty("sprite", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public SpriteClass Sprite { get; set; }
+        public SpriteAddress Sprite { get; set; }
 
         [JsonProperty("prefab", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public ImagePrefab Prefab { get; set; }
+        public DisplayPrefabImage Prefab { get; set; }
     }
 
-    public partial class ImagePrefab
+    public partial class DisplayPrefabImage
     {
         [JsonProperty("prefab", Required = Required.Always)]
-        public PrefabPrefab Prefab { get; set; }
+        public PrefabAddress Prefab { get; set; }
 
         [JsonProperty("studioType", Required = Required.Always)]
         public StudioType StudioType { get; set; }
     }
 
-    public partial class PrefabPrefab
+    public partial class PrefabAddress
     {
         [JsonProperty("prefab", Required = Required.Always)]
         public string Prefab { get; set; }
     }
 
-    public partial class InfoZoomDataClass
+    public partial class InfoZoomData
     {
         /// <summary>
-        /// Icons to display on other cards during info zoom, e.g. indicating
-        /// targets.
+        /// Icons to display on other cards during info zoom, e.g. indicating targets.
         /// </summary>
         [JsonProperty("icons", Required = Required.Always)]
-        public List<IconElement> Icons { get; set; }
+        public List<InfoZoomIcon> Icons { get; set; }
 
         /// <summary>
         /// Additional help text about this card, describing its abilities.
         /// </summary>
         [JsonProperty("supplementalCardInfo")]
-        public ScreenOverlayElement SupplementalCardInfo { get; set; }
+        public FlexNode SupplementalCardInfo { get; set; }
     }
 
-    public partial class IconElement
+    public partial class InfoZoomIcon
     {
         [JsonProperty("cardId", Required = Required.Always)]
         public string CardId { get; set; }
 
         [JsonProperty("color", Required = Required.Always)]
-        public ColorClass Color { get; set; }
+        public DisplayColor Color { get; set; }
 
         [JsonProperty("icon", Required = Required.Always)]
         public string Icon { get; set; }
     }
 
-    public partial class FireProjectile
+    public partial class FireProjectileCommand
     {
         [JsonProperty("additionalHit")]
-        public EffectClass AdditionalHit { get; set; }
+        public EffectAddress AdditionalHit { get; set; }
 
         [JsonProperty("additionalHitDelay")]
-        public WaitElement AdditionalHitDelay { get; set; }
+        public Milliseconds AdditionalHitDelay { get; set; }
 
         [JsonProperty("fireSound")]
-        public SoundClass FireSound { get; set; }
+        public AudioClipAddress FireSound { get; set; }
 
         [JsonProperty("hideOnHit", Required = Required.Always)]
         public bool HideOnHit { get; set; }
 
         [JsonProperty("impactSound")]
-        public SoundClass ImpactSound { get; set; }
+        public AudioClipAddress ImpactSound { get; set; }
 
         [JsonProperty("jumpToPosition")]
-        public JumpToPositionClass JumpToPosition { get; set; }
+        public ObjectPosition JumpToPosition { get; set; }
 
         [JsonProperty("projectile", Required = Required.Always)]
-        public ProjectileClass Projectile { get; set; }
+        public ProjectileAddress Projectile { get; set; }
 
         [JsonProperty("sourceId", Required = Required.Always)]
-        public Source SourceId { get; set; }
+        public GameObjectId SourceId { get; set; }
 
         [JsonProperty("targetId", Required = Required.Always)]
-        public Source TargetId { get; set; }
+        public GameObjectId TargetId { get; set; }
 
         [JsonProperty("travelDuration")]
-        public WaitElement TravelDuration { get; set; }
+        public Milliseconds TravelDuration { get; set; }
 
         [JsonProperty("waitDuration")]
-        public WaitElement WaitDuration { get; set; }
+        public Milliseconds WaitDuration { get; set; }
     }
 
-    public partial class PlayAudioClip
+    public partial class PlayAudioClipCommand
     {
         /// <summary>
         /// How long to pause before continuing with animations.
         /// </summary>
         [JsonProperty("pauseDuration", Required = Required.Always)]
-        public WaitElement PauseDuration { get; set; }
+        public Milliseconds PauseDuration { get; set; }
 
         /// <summary>
         /// Sound to play
         /// </summary>
         [JsonProperty("sound", Required = Required.Always)]
-        public SoundClass Sound { get; set; }
+        public AudioClipAddress Sound { get; set; }
     }
 
-    public partial class PlayStudioAnimation
+    public partial class PlayStudioAnimationCommand
     {
         [JsonProperty("animation", Required = Required.Always)]
-        public Animation Animation { get; set; }
+        public StudioAnimation Animation { get; set; }
 
         [JsonProperty("enterAnimation")]
-        public Animation EnterAnimation { get; set; }
+        public StudioAnimation EnterAnimation { get; set; }
 
         [JsonProperty("exitAnimation")]
-        public Animation ExitAnimation { get; set; }
+        public StudioAnimation ExitAnimation { get; set; }
 
         [JsonProperty("studioType", Required = Required.Always)]
         public StudioType StudioType { get; set; }
     }
 
-    public partial class Animation
+    public partial class StudioAnimation
     {
         [JsonProperty("name", Required = Required.Always)]
         public string Name { get; set; }
     }
 
-    public partial class ToggleThinkingIndicator
+    public partial class ToggleThinkingIndicatorCommand
     {
         [JsonProperty("show", Required = Required.Always)]
         public bool Show { get; set; }
     }
 
-    public partial class UpdateBattle
+    public partial class UpdateBattleCommand
     {
         /// <summary>
         /// The battle to update.
         /// </summary>
         [JsonProperty("battle", Required = Required.Always)]
-        public Battle Battle { get; set; }
+        public BattleView Battle { get; set; }
 
         /// <summary>
         /// Sound to play when the battle is updated.
         /// </summary>
         [JsonProperty("updateSound")]
-        public SoundClass UpdateSound { get; set; }
+        public AudioClipAddress UpdateSound { get; set; }
     }
 
     /// <summary>
@@ -1756,25 +1743,25 @@ namespace Dreamtides.Schema
     ///
     /// Represents the visual state of an ongoing dream battle
     /// </summary>
-    public partial class Battle
+    public partial class BattleView
     {
         /// <summary>
         /// Arrows to display between cards
         /// </summary>
         [JsonProperty("arrows", Required = Required.Always)]
-        public List<ArrowElement> Arrows { get; set; }
+        public List<DisplayArrow> Arrows { get; set; }
 
         /// <summary>
         /// Visual state of cards in the game
         /// </summary>
         [JsonProperty("cards", Required = Required.Always)]
-        public List<DrawUserCardsCard> Cards { get; set; }
+        public List<CardView> Cards { get; set; }
 
         /// <summary>
         /// Opponent of user
         /// </summary>
         [JsonProperty("enemy", Required = Required.Always)]
-        public BattleEnemy Enemy { get; set; }
+        public PlayerView Enemy { get; set; }
 
         /// <summary>
         /// Unique identifier for this dream battle
@@ -1786,32 +1773,31 @@ namespace Dreamtides.Schema
         /// UI to display to the player.
         /// </summary>
         [JsonProperty("interface", Required = Required.Always)]
-        public Interface Interface { get; set; }
+        public InterfaceView Interface { get; set; }
 
         /// <summary>
-        /// Preview of the next state of the battle, used e.g. when confirming
-        /// prompt choices.
+        /// Preview of the next state of the battle, used e.g. when confirming prompt choices.
         /// </summary>
         [JsonProperty("preview", Required = Required.Always)]
-        public Preview Preview { get; set; }
+        public BattlePreviewState Preview { get; set; }
 
         /// <summary>
         /// Player who is operating the client
         /// </summary>
         [JsonProperty("user", Required = Required.Always)]
-        public BattleEnemy User { get; set; }
+        public PlayerView User { get; set; }
     }
 
-    public partial class ArrowElement
+    public partial class DisplayArrow
     {
         [JsonProperty("color", Required = Required.Always)]
-        public Color Color { get; set; }
+        public ArrowStyle Color { get; set; }
 
         [JsonProperty("source", Required = Required.Always)]
-        public Source Source { get; set; }
+        public GameObjectId Source { get; set; }
 
         [JsonProperty("target", Required = Required.Always)]
-        public Source Target { get; set; }
+        public GameObjectId Target { get; set; }
     }
 
     /// <summary>
@@ -1821,7 +1807,7 @@ namespace Dreamtides.Schema
     ///
     /// Player who is operating the client
     /// </summary>
-    public partial class BattleEnemy
+    public partial class PlayerView
     {
         /// <summary>
         /// Can this player currently take a game action?
@@ -1871,89 +1857,89 @@ namespace Dreamtides.Schema
     ///
     /// User interaction options
     /// </summary>
-    public partial class Interface
+    public partial class InterfaceView
     {
         /// <summary>
         /// Button most often used for toggling the visibility of card browsers.
         /// </summary>
         [JsonProperty("bottomRightButton")]
-        public BottomRightButtonClass BottomRightButton { get; set; }
+        public ButtonView BottomRightButton { get; set; }
 
         /// <summary>
         /// Options for display of the card order selector
         /// </summary>
         [JsonProperty("cardOrderSelector")]
-        public CardOrderSelectorClass CardOrderSelector { get; set; }
+        public CardOrderSelectorView CardOrderSelector { get; set; }
 
         /// <summary>
         /// Button to decrement the number shown in a number prompt.
         /// </summary>
         [JsonProperty("decrementButton")]
-        public BottomRightButtonClass DecrementButton { get; set; }
+        public ButtonView DecrementButton { get; set; }
 
         /// <summary>
         /// Button to toggle the display of the developer panel
         /// </summary>
         [JsonProperty("devButton")]
-        public BottomRightButtonClass DevButton { get; set; }
+        public ButtonView DevButton { get; set; }
 
         /// <summary>
         /// Button to increment the number shown in a number prompt.
         /// </summary>
         [JsonProperty("incrementButton")]
-        public BottomRightButtonClass IncrementButton { get; set; }
+        public ButtonView IncrementButton { get; set; }
 
         /// <summary>
-        /// Primary action button, used for confirming selections and ending the
-        /// turn. None indicates no button should be shown.
+        /// Primary action button, used for confirming selections and ending the turn. None indicates
+        /// no button should be shown.
         /// </summary>
         [JsonProperty("primaryActionButton")]
-        public BottomRightButtonClass PrimaryActionButton { get; set; }
+        public ButtonView PrimaryActionButton { get; set; }
 
         /// <summary>
-        /// If provided, when the primary action button is not visible, the button
-        /// will wait for this duration after the last "update" before appearing. If
-        /// this is None the button will display immediately.
+        /// If provided, when the primary action button is not visible, the button will wait for this
+        /// duration after the last "update" before appearing. If this is None the button will
+        /// display immediately.
         /// </summary>
         [JsonProperty("primaryActionShowOnIdleDuration")]
-        public WaitElement PrimaryActionShowOnIdleDuration { get; set; }
+        public Milliseconds PrimaryActionShowOnIdleDuration { get; set; }
 
         /// <summary>
         /// Content to display on top of all other game UI.
         /// </summary>
         [JsonProperty("screenOverlay")]
-        public ScreenOverlayElement ScreenOverlay { get; set; }
+        public FlexNode ScreenOverlay { get; set; }
 
         /// <summary>
         /// Secondary action button, used for alternative choice options.
         /// </summary>
         [JsonProperty("secondaryActionButton")]
-        public BottomRightButtonClass SecondaryActionButton { get; set; }
+        public ButtonView SecondaryActionButton { get; set; }
 
         /// <summary>
         /// Button to perform an undo operation
         /// </summary>
         [JsonProperty("undoButton")]
-        public BottomRightButtonClass UndoButton { get; set; }
+        public ButtonView UndoButton { get; set; }
     }
 
     /// <summary>
     /// Button to perform some game action
     /// </summary>
-    public partial class BottomRightButtonClass
+    public partial class ButtonView
     {
         /// <summary>
-        /// Action to perform when the button is clicked. If None is provided, the
-        /// button will appear disabled.
+        /// Action to perform when the button is clicked. If None is provided, the button will appear
+        /// disabled.
         /// </summary>
         [JsonProperty("action")]
-        public CanPlay? Action { get; set; }
+        public ActionUnion? Action { get; set; }
 
         [JsonProperty("label", Required = Required.Always)]
         public string Label { get; set; }
     }
 
-    public partial class CardOrderSelectorClass
+    public partial class CardOrderSelectorView
     {
         /// <summary>
         /// Include the user's deck as a card drop target
@@ -1971,20 +1957,19 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Active battle preview, e.g. when a prompt is active.
     /// </summary>
-    public partial class PreviewClass
+    public partial class BattlePreviewStateClass
     {
         [JsonProperty("active", Required = Required.Always)]
-        public ActiveClass Active { get; set; }
+        public BattlePreviewView Active { get; set; }
     }
 
     public partial class PerformActionRequest
     {
         [JsonProperty("action", Required = Required.Always)]
-        public ActionUnion Action { get; set; }
+        public GameAction Action { get; set; }
 
         /// <summary>
-        /// The version of the last response the client received, used to prevent
-        /// duplicate actions.
+        /// The version of the last response the client received, used to prevent duplicate actions.
         /// </summary>
         [JsonProperty("lastResponseVersion")]
         public Guid? LastResponseVersion { get; set; }
@@ -1993,8 +1978,8 @@ namespace Dreamtides.Schema
         public Metadata Metadata { get; set; }
 
         /// <summary>
-        /// If specified, treats this as a multiplayer game using the save file
-        /// provided in this ID instead of reading the user's own save file.
+        /// If specified, treats this as a multiplayer game using the save file provided in this ID
+        /// instead of reading the user's own save file.
         /// </summary>
         [JsonProperty("saveFileId")]
         public Guid? SaveFileId { get; set; }
@@ -2003,7 +1988,7 @@ namespace Dreamtides.Schema
         public string TestScenario { get; set; }
     }
 
-    public partial class PurpleSchema
+    public partial class GameActionClass
     {
         [JsonProperty("debugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DebugAction? DebugAction { get; set; }
@@ -2015,13 +2000,13 @@ namespace Dreamtides.Schema
         public BattleDisplayAction? BattleDisplayAction { get; set; }
 
         [JsonProperty("undo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DrawCard? Undo { get; set; }
+        public PlayerName? Undo { get; set; }
     }
 
     public partial class PerformActionResponse
     {
         [JsonProperty("commands", Required = Required.Always)]
-        public Commands Commands { get; set; }
+        public CommandSequence Commands { get; set; }
 
         [JsonProperty("metadata", Required = Required.Always)]
         public Metadata Metadata { get; set; }
@@ -2036,37 +2021,37 @@ namespace Dreamtides.Schema
     public partial class PollResponse
     {
         [JsonProperty("commands")]
-        public Commands Commands { get; set; }
+        public CommandSequence Commands { get; set; }
 
         [JsonProperty("metadata", Required = Required.Always)]
         public Metadata Metadata { get; set; }
 
         [JsonProperty("responseType", Required = Required.Always)]
-        public ResponseType ResponseType { get; set; }
+        public PollResponseType ResponseType { get; set; }
 
         [JsonProperty("responseVersion")]
         public Guid? ResponseVersion { get; set; }
     }
 
-    public enum Name { ApplyCommandGroup, ApplyCommands, Connect, PerformAction, Poll, Untagged, UpdateBattleLayout };
+    public enum LogSpanName { ApplyCommandGroup, ApplyCommands, Connect, PerformAction, Poll, Untagged, UpdateBattleLayout };
 
     public enum LogType { Debug, Error, Info, Warning };
 
-    public enum AgentEnum { AlwaysPanic, FirstAvailableAction, RandomAction, WaitFiveSeconds };
+    public enum GameAiEnum { AlwaysPanic, FirstAvailableAction, RandomAction, WaitFiveSeconds };
 
     /// <summary>
     /// Represents a player within the context of the display layer.
     ///
-    /// The "viewer" is always the player operating the game client, this may
-    /// correspond to either of the actual players in the game.
+    /// The "viewer" is always the player operating the game client, this may correspond to
+    /// either of the actual players in the game.
     ///
     /// The player to display the judgment animation for.
     ///
     /// The player to display the dreamwell activation for.
     /// </summary>
-    public enum Deck { Enemy, User };
+    public enum DisplayPlayer { Enemy, User };
 
-    public enum DisplayGameMessage { Defeat, EnemyTurn, Victory, YourTurn };
+    public enum GameMessageType { Defeat, EnemyTurn, Victory, YourTurn };
 
     /// <summary>
     /// Face up/face down state for this card
@@ -2076,45 +2061,43 @@ namespace Dreamtides.Schema
     public enum CardFacing { FaceDown, FaceUp };
 
     /// <summary>
-    /// Object position used in interface elements like the deck viewer which
-    /// don't rely on game positioning.
+    /// Object position used in interface elements like the deck viewer which don't rely on game
+    /// positioning.
     ///
     /// Object is not visible.
     ///
-    /// Position for cards to be shown to the user immediately after they're
-    /// drawn.
+    /// Position for cards to be shown to the user immediately after they're drawn.
     ///
-    /// Object is being displayed in a card browser, e.g. to select from a list
-    /// of cards while searching
+    /// Object is being displayed in a card browser, e.g. to select from a list of cards while
+    /// searching
     ///
-    /// Object is in a temporary holding space for cards in hand while resolving
-    /// some other 'play card' ability.
+    /// Object is in a temporary holding space for cards in hand while resolving some other 'play
+    /// card' ability.
     ///
-    /// Object is in a position to display itself as part of a dreamwell
-    /// activation.
+    /// Object is in a position to display itself as part of a dreamwell activation.
     ///
     /// Object describes a game modifier or ongoing game effect
     ///
-    /// Object is in the on-screen storage area, used to hold objects at a small
-    /// size when they're not being focused on, e.g. when the user hides a
-    /// card browser to get a better view of the battlefield.
+    /// Object is in the on-screen storage area, used to hold objects at a small size when
+    /// they're not being focused on, e.g. when the user hides a card browser to get a better
+    /// view of the battlefield.
     /// </summary>
-    public enum PositionPositionEnum { Browser, Default, Drawn, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnScreenStorage };
+    public enum PositionEnum { Browser, Default, Drawn, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnScreenStorage };
 
-    public enum CardOrderSelector { Deck, Void };
+    public enum CardOrderSelectionTarget { Deck, Void };
 
-    public enum OnStack { Default, TargetingBothBattlefields, TargetingEnemyBattlefield, TargetingUserBattlefield };
+    public enum StackType { Default, TargetingBothBattlefields, TargetingEnemyBattlefield, TargetingUserBattlefield };
 
     /// <summary>
     /// Represents the general category of card being displayed.
     /// </summary>
-    public enum PrefabEnum { Character, Dreamsign, Dreamwell, Enemy, Event, Identity, Token };
+    public enum CardPrefab { Character, Dreamsign, Dreamwell, Enemy, Event, Identity, Token };
 
-    public enum ActionEnum { NoOp };
+    public enum GameActionEnum { NoOp };
 
     /// <summary>
-    /// Pass on taking actions in response to a card being played by the
-    /// opponent, thus causing the stack to be resolved.
+    /// Pass on taking actions in response to a card being played by the opponent, thus causing
+    /// the stack to be resolved.
     ///
     /// End your turn
     ///
@@ -2129,7 +2112,12 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Identifies a player in an ongoing battle.
     /// </summary>
-    public enum DrawCard { One, Two };
+    public enum Name { Abolish, Dreamscatter, Immolate, MinstrelOfFallingLight, One, RippleOfDefiance, Two };
+
+    /// <summary>
+    /// Identifies a player in an ongoing battle.
+    /// </summary>
+    public enum PlayerName { One, Two };
 
     /// <summary>
     /// Closes the currently open panel.
@@ -2138,73 +2126,73 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum BattleDisplayActionEnum { CloseCardBrowser, CloseCurrentPanel, ToggleStackVisibility };
 
-    public enum BrowseCards { EnemyDeck, EnemyStatus, EnemyVoid, UserDeck, UserStatus, UserVoid };
+    public enum CardBrowserType { EnemyDeck, EnemyStatus, EnemyVoid, UserDeck, UserStatus, UserVoid };
 
-    public enum OpenPanelEnum { AddCardToHand, Developer, SetOpponentAgent };
+    public enum PanelAddressEnum { AddCardToHand, Developer, SetOpponentAgent };
 
     public enum DebugActionEnum { ApplyTestScenarioAction, RestartBattle };
 
-    public enum AlignContentEnum { Auto, Center, FlexEnd, FlexStart, Stretch };
+    public enum FlexAlign { Auto, Center, FlexEnd, FlexStart, Stretch };
 
-    public enum Unit { Percentage, Pixels, SafeAreaBottomInset, SafeAreaLeftInset, SafeAreaRightInset, SafeAreaTopInset, ViewportHeight, ViewportWidth };
+    public enum DimensionUnit { Percentage, Pixels, SafeAreaBottomInset, SafeAreaLeftInset, SafeAreaRightInset, SafeAreaTopInset, ViewportHeight, ViewportWidth };
 
-    public enum DisplayEnum { Flex, None };
+    public enum FlexDisplayStyle { Flex, None };
 
-    public enum FlexDirectionEnum { Column, ColumnReverse, Row, RowReverse };
+    public enum FlexDirection { Column, ColumnReverse, Row, RowReverse };
 
-    public enum FontStyleEnum { Bold, BoldAndItalic, Italic, Normal };
+    public enum FontStyle { Bold, BoldAndItalic, Italic, Normal };
 
-    public enum JustifyContentEnum { Center, FlexEnd, FlexStart, SpaceAround, SpaceBetween };
+    public enum FlexJustify { Center, FlexEnd, FlexStart, SpaceAround, SpaceBetween };
 
-    public enum OverflowEnum { Hidden, Visible };
+    public enum FlexVisibility { Hidden, Visible };
 
-    public enum OverflowClipBoxEnum { ContentBox, PaddingBox };
+    public enum OverflowClipBox { ContentBox, PaddingBox };
 
-    public enum PickingModeEnum { Ignore, Position };
+    public enum FlexPickingMode { Ignore, Position };
 
-    public enum HoverStylePosition { Absolute, Relative };
+    public enum FlexPosition { Absolute, Relative };
 
-    public enum TextAlignEnum { LowerCenter, LowerLeft, LowerRight, MiddleCenter, MiddleLeft, MiddleRight, UpperCenter, UpperLeft, UpperRight };
+    public enum TextAlign { LowerCenter, LowerLeft, LowerRight, MiddleCenter, MiddleLeft, MiddleRight, UpperCenter, UpperLeft, UpperRight };
 
-    public enum TextOverflowEnum { Clip, Ellipsis };
+    public enum TextOverflow { Clip, Ellipsis };
 
-    public enum TextOverflowPositionEnum { End, Middle, Start };
+    public enum TextOverflowPosition { End, Middle, Start };
 
-    public enum TransitionEasingModeElement { Ease, EaseIn, EaseInBack, EaseInBounce, EaseInCirc, EaseInCubic, EaseInElastic, EaseInOut, EaseInOutBack, EaseInOutBounce, EaseInOutCirc, EaseInOutCubic, EaseInOutElastic, EaseInOutSine, EaseInSine, EaseOut, EaseOutBack, EaseOutBounce, EaseOutCirc, EaseOutCubic, EaseOutElastic, EaseOutSine, Linear };
+    public enum EasingMode { Ease, EaseIn, EaseInBack, EaseInBounce, EaseInCirc, EaseInCubic, EaseInElastic, EaseInOut, EaseInOutBack, EaseInOutBounce, EaseInOutCirc, EaseInOutCubic, EaseInOutElastic, EaseInOutSine, EaseInSine, EaseOut, EaseOutBack, EaseOutBounce, EaseOutCirc, EaseOutCubic, EaseOutElastic, EaseOutSine, Linear };
 
-    public enum WhiteSpaceEnum { NoWrap, Normal };
+    public enum WhiteSpace { NoWrap, Normal };
 
-    public enum WrapEnum { NoWrap, Wrap, WrapReverse };
+    public enum FlexWrap { NoWrap, Wrap, WrapReverse };
 
-    public enum HorizontalScrollBarVisibilityEnum { AlwaysVisible, Auto, Hidden };
+    public enum ScrollBarVisibility { AlwaysVisible, Auto, Hidden };
 
-    public enum TouchScrollBehaviorEnum { Clamped, Elastic, Unrestricted };
+    public enum TouchScrollBehavior { Clamped, Elastic, Unrestricted };
 
-    public enum DirectionEnum { Horizontal, Vertical };
+    public enum SliderDirection { Horizontal, Vertical };
 
     public enum StudioType { EnemyIdentityCard, EnemyStatus, UserIdentityCard, UserStatus };
 
-    public enum Color { Blue, Green, Red };
+    public enum ArrowStyle { Blue, Green, Red };
 
     /// <summary>
     /// No preview is currently active. Clear any existing preview.
     ///
     /// Unknown battle preview state during animation
     ///
-    /// Used to not remove the existing preview to avoid the interface jumping
-    /// around between states.
+    /// Used to not remove the existing preview to avoid the interface jumping around between
+    /// states.
     /// </summary>
-    public enum PreviewEnum { None, Pending };
+    public enum BattlePreviewStateEnum { None, Pending };
 
-    public enum ResponseType { Final, Incremental };
+    public enum PollResponseType { Final, Incremental };
 
-    public partial struct Agent
+    public partial struct GameAi
     {
-        public AgentClass AgentClass;
-        public AgentEnum? Enum;
+        public GameAiEnum? Enum;
+        public GameAiClass GameAiClass;
 
-        public static implicit operator Agent(AgentClass AgentClass) => new Agent { AgentClass = AgentClass };
-        public static implicit operator Agent(AgentEnum Enum) => new Agent { Enum = Enum };
+        public static implicit operator GameAi(GameAiEnum Enum) => new GameAi { Enum = Enum };
+        public static implicit operator GameAi(GameAiClass GameAiClass) => new GameAi { GameAiClass = GameAiClass };
     }
 
     /// <summary>
@@ -2214,11 +2202,20 @@ namespace Dreamtides.Schema
     /// </summary>
     public partial struct Position
     {
-        public PositionPositionEnum? Enum;
-        public PositionPositionClass PositionPositionClass;
+        public PositionEnum? Enum;
+        public PositionClass PositionClass;
 
-        public static implicit operator Position(PositionPositionEnum Enum) => new Position { Enum = Enum };
-        public static implicit operator Position(PositionPositionClass PositionPositionClass) => new Position { PositionPositionClass = PositionPositionClass };
+        public static implicit operator Position(PositionEnum Enum) => new Position { Enum = Enum };
+        public static implicit operator Position(PositionClass PositionClass) => new Position { PositionClass = PositionClass };
+    }
+
+    public partial struct Set
+    {
+        public PlayerName? Enum;
+        public long? Integer;
+
+        public static implicit operator Set(PlayerName Enum) => new Set { Enum = Enum };
+        public static implicit operator Set(long Integer) => new Set { Integer = Integer };
     }
 
     /// <summary>
@@ -2236,13 +2233,13 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Identifies a window on screen containing UI elements
     /// </summary>
-    public partial struct OpenPanel
+    public partial struct PanelAddress
     {
-        public OpenPanelEnum? Enum;
-        public OpenPanelClass OpenPanelClass;
+        public PanelAddressEnum? Enum;
+        public PanelAddressClass PanelAddressClass;
 
-        public static implicit operator OpenPanel(OpenPanelEnum Enum) => new OpenPanel { Enum = Enum };
-        public static implicit operator OpenPanel(OpenPanelClass OpenPanelClass) => new OpenPanel { OpenPanelClass = OpenPanelClass };
+        public static implicit operator PanelAddress(PanelAddressEnum Enum) => new PanelAddress { Enum = Enum };
+        public static implicit operator PanelAddress(PanelAddressClass PanelAddressClass) => new PanelAddress { PanelAddressClass = PanelAddressClass };
     }
 
     public partial struct BattleDisplayAction
@@ -2266,39 +2263,38 @@ namespace Dreamtides.Schema
         public static implicit operator DebugAction(DebugActionEnum Enum) => new DebugAction { Enum = Enum };
     }
 
-    public partial struct CanPlay
+    public partial struct ActionUnion
     {
-        public CanPlayClass CanPlayClass;
-        public ActionEnum? Enum;
+        public ActionClass ActionClass;
+        public GameActionEnum? Enum;
 
-        public static implicit operator CanPlay(CanPlayClass CanPlayClass) => new CanPlay { CanPlayClass = CanPlayClass };
-        public static implicit operator CanPlay(ActionEnum Enum) => new CanPlay { Enum = Enum };
-        public bool IsNull => CanPlayClass == null && Enum == null;
+        public static implicit operator ActionUnion(ActionClass ActionClass) => new ActionUnion { ActionClass = ActionClass };
+        public static implicit operator ActionUnion(GameActionEnum Enum) => new ActionUnion { Enum = Enum };
+        public bool IsNull => ActionClass == null && Enum == null;
     }
 
     /// <summary>
-    /// Preview of the next state of the battle, used e.g. when confirming
-    /// prompt choices.
+    /// Preview of the next state of the battle, used e.g. when confirming prompt choices.
     /// </summary>
-    public partial struct Preview
+    public partial struct BattlePreviewState
     {
-        public PreviewEnum? Enum;
-        public PreviewClass PreviewClass;
+        public BattlePreviewStateClass BattlePreviewStateClass;
+        public BattlePreviewStateEnum? Enum;
 
-        public static implicit operator Preview(PreviewEnum Enum) => new Preview { Enum = Enum };
-        public static implicit operator Preview(PreviewClass PreviewClass) => new Preview { PreviewClass = PreviewClass };
+        public static implicit operator BattlePreviewState(BattlePreviewStateClass BattlePreviewStateClass) => new BattlePreviewState { BattlePreviewStateClass = BattlePreviewStateClass };
+        public static implicit operator BattlePreviewState(BattlePreviewStateEnum Enum) => new BattlePreviewState { Enum = Enum };
     }
 
     /// <summary>
     /// All possible user interface actions
     /// </summary>
-    public partial struct ActionUnion
+    public partial struct GameAction
     {
-        public ActionEnum? Enum;
-        public PurpleSchema PurpleSchema;
+        public GameActionEnum? Enum;
+        public GameActionClass GameActionClass;
 
-        public static implicit operator ActionUnion(ActionEnum Enum) => new ActionUnion { Enum = Enum };
-        public static implicit operator ActionUnion(PurpleSchema PurpleSchema) => new ActionUnion { PurpleSchema = PurpleSchema };
+        public static implicit operator GameAction(GameActionEnum Enum) => new GameAction { Enum = Enum };
+        public static implicit operator GameAction(GameActionClass GameActionClass) => new GameAction { GameActionClass = GameActionClass };
     }
 
     public partial class SchemaTypes
@@ -2320,54 +2316,56 @@ namespace Dreamtides.Schema
             Converters =
             {
                 LogTypeConverter.Singleton,
-                NameConverter.Singleton,
-                AgentConverter.Singleton,
-                AgentEnumConverter.Singleton,
-                DeckConverter.Singleton,
-                DisplayGameMessageConverter.Singleton,
+                LogSpanNameConverter.Singleton,
+                GameAiConverter.Singleton,
+                GameAiEnumConverter.Singleton,
+                DisplayPlayerConverter.Singleton,
+                GameMessageTypeConverter.Singleton,
                 CardFacingConverter.Singleton,
                 PositionConverter.Singleton,
-                CardOrderSelectorConverter.Singleton,
-                OnStackConverter.Singleton,
-                PositionPositionEnumConverter.Singleton,
-                PrefabEnumConverter.Singleton,
-                CanPlayConverter.Singleton,
+                CardOrderSelectionTargetConverter.Singleton,
+                StackTypeConverter.Singleton,
+                PositionEnumConverter.Singleton,
+                CardPrefabConverter.Singleton,
+                ActionUnionConverter.Singleton,
                 BattleActionConverter.Singleton,
-                DrawCardConverter.Singleton,
+                NameConverter.Singleton,
+                PlayerNameConverter.Singleton,
+                SetConverter.Singleton,
                 BattleActionEnumConverter.Singleton,
                 BattleDisplayActionConverter.Singleton,
-                BrowseCardsConverter.Singleton,
-                OpenPanelConverter.Singleton,
-                OpenPanelEnumConverter.Singleton,
+                CardBrowserTypeConverter.Singleton,
+                PanelAddressConverter.Singleton,
+                PanelAddressEnumConverter.Singleton,
                 BattleDisplayActionEnumConverter.Singleton,
                 DebugActionConverter.Singleton,
                 DebugActionEnumConverter.Singleton,
-                ActionEnumConverter.Singleton,
-                AlignContentEnumConverter.Singleton,
-                UnitConverter.Singleton,
-                DisplayEnumConverter.Singleton,
-                FlexDirectionEnumConverter.Singleton,
-                FontStyleEnumConverter.Singleton,
-                JustifyContentEnumConverter.Singleton,
-                OverflowEnumConverter.Singleton,
-                OverflowClipBoxEnumConverter.Singleton,
-                PickingModeEnumConverter.Singleton,
-                HoverStylePositionConverter.Singleton,
-                TextAlignEnumConverter.Singleton,
-                TextOverflowEnumConverter.Singleton,
-                TextOverflowPositionEnumConverter.Singleton,
-                TransitionEasingModeElementConverter.Singleton,
-                WhiteSpaceEnumConverter.Singleton,
-                WrapEnumConverter.Singleton,
-                HorizontalScrollBarVisibilityEnumConverter.Singleton,
-                TouchScrollBehaviorEnumConverter.Singleton,
-                DirectionEnumConverter.Singleton,
+                GameActionEnumConverter.Singleton,
+                FlexAlignConverter.Singleton,
+                DimensionUnitConverter.Singleton,
+                FlexDisplayStyleConverter.Singleton,
+                FlexDirectionConverter.Singleton,
+                FontStyleConverter.Singleton,
+                FlexJustifyConverter.Singleton,
+                FlexVisibilityConverter.Singleton,
+                OverflowClipBoxConverter.Singleton,
+                FlexPickingModeConverter.Singleton,
+                FlexPositionConverter.Singleton,
+                TextAlignConverter.Singleton,
+                TextOverflowConverter.Singleton,
+                TextOverflowPositionConverter.Singleton,
+                EasingModeConverter.Singleton,
+                WhiteSpaceConverter.Singleton,
+                FlexWrapConverter.Singleton,
+                ScrollBarVisibilityConverter.Singleton,
+                TouchScrollBehaviorConverter.Singleton,
+                SliderDirectionConverter.Singleton,
                 StudioTypeConverter.Singleton,
-                ColorConverter.Singleton,
-                PreviewConverter.Singleton,
-                PreviewEnumConverter.Singleton,
-                ActionUnionConverter.Singleton,
-                ResponseTypeConverter.Singleton,
+                ArrowStyleConverter.Singleton,
+                BattlePreviewStateConverter.Singleton,
+                BattlePreviewStateEnumConverter.Singleton,
+                GameActionConverter.Singleton,
+                PollResponseTypeConverter.Singleton,
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
         };
@@ -2424,9 +2422,9 @@ namespace Dreamtides.Schema
         public static readonly LogTypeConverter Singleton = new LogTypeConverter();
     }
 
-    internal class NameConverter : JsonConverter
+    internal class LogSpanNameConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(Name) || t == typeof(Name?);
+        public override bool CanConvert(Type t) => t == typeof(LogSpanName) || t == typeof(LogSpanName?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -2435,21 +2433,21 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "applyCommandGroup":
-                    return Name.ApplyCommandGroup;
+                    return LogSpanName.ApplyCommandGroup;
                 case "applyCommands":
-                    return Name.ApplyCommands;
+                    return LogSpanName.ApplyCommands;
                 case "connect":
-                    return Name.Connect;
+                    return LogSpanName.Connect;
                 case "performAction":
-                    return Name.PerformAction;
+                    return LogSpanName.PerformAction;
                 case "poll":
-                    return Name.Poll;
+                    return LogSpanName.Poll;
                 case "untagged":
-                    return Name.Untagged;
+                    return LogSpanName.Untagged;
                 case "updateBattleLayout":
-                    return Name.UpdateBattleLayout;
+                    return LogSpanName.UpdateBattleLayout;
             }
-            throw new Exception("Cannot unmarshal type Name");
+            throw new Exception("Cannot unmarshal type LogSpanName");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -2459,40 +2457,40 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (Name)untypedValue;
+            var value = (LogSpanName)untypedValue;
             switch (value)
             {
-                case Name.ApplyCommandGroup:
+                case LogSpanName.ApplyCommandGroup:
                     serializer.Serialize(writer, "applyCommandGroup");
                     return;
-                case Name.ApplyCommands:
+                case LogSpanName.ApplyCommands:
                     serializer.Serialize(writer, "applyCommands");
                     return;
-                case Name.Connect:
+                case LogSpanName.Connect:
                     serializer.Serialize(writer, "connect");
                     return;
-                case Name.PerformAction:
+                case LogSpanName.PerformAction:
                     serializer.Serialize(writer, "performAction");
                     return;
-                case Name.Poll:
+                case LogSpanName.Poll:
                     serializer.Serialize(writer, "poll");
                     return;
-                case Name.Untagged:
+                case LogSpanName.Untagged:
                     serializer.Serialize(writer, "untagged");
                     return;
-                case Name.UpdateBattleLayout:
+                case LogSpanName.UpdateBattleLayout:
                     serializer.Serialize(writer, "updateBattleLayout");
                     return;
             }
-            throw new Exception("Cannot marshal type Name");
+            throw new Exception("Cannot marshal type LogSpanName");
         }
 
-        public static readonly NameConverter Singleton = new NameConverter();
+        public static readonly LogSpanNameConverter Singleton = new LogSpanNameConverter();
     }
 
-    internal class AgentConverter : JsonConverter
+    internal class GameAiConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(Agent) || t == typeof(Agent?);
+        public override bool CanConvert(Type t) => t == typeof(GameAi) || t == typeof(GameAi?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -2504,57 +2502,57 @@ namespace Dreamtides.Schema
                     switch (stringValue)
                     {
                         case "alwaysPanic":
-                            return new Agent { Enum = AgentEnum.AlwaysPanic };
+                            return new GameAi { Enum = GameAiEnum.AlwaysPanic };
                         case "firstAvailableAction":
-                            return new Agent { Enum = AgentEnum.FirstAvailableAction };
+                            return new GameAi { Enum = GameAiEnum.FirstAvailableAction };
                         case "randomAction":
-                            return new Agent { Enum = AgentEnum.RandomAction };
+                            return new GameAi { Enum = GameAiEnum.RandomAction };
                         case "waitFiveSeconds":
-                            return new Agent { Enum = AgentEnum.WaitFiveSeconds };
+                            return new GameAi { Enum = GameAiEnum.WaitFiveSeconds };
                     }
                     break;
                 case JsonToken.StartObject:
-                    var objectValue = serializer.Deserialize<AgentClass>(reader);
-                    return new Agent { AgentClass = objectValue };
+                    var objectValue = serializer.Deserialize<GameAiClass>(reader);
+                    return new GameAi { GameAiClass = objectValue };
             }
-            throw new Exception("Cannot unmarshal type Agent");
+            throw new Exception("Cannot unmarshal type GameAi");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
         {
-            var value = (Agent)untypedValue;
+            var value = (GameAi)untypedValue;
             if (value.Enum != null)
             {
                 switch (value.Enum)
                 {
-                    case AgentEnum.AlwaysPanic:
+                    case GameAiEnum.AlwaysPanic:
                         serializer.Serialize(writer, "alwaysPanic");
                         return;
-                    case AgentEnum.FirstAvailableAction:
+                    case GameAiEnum.FirstAvailableAction:
                         serializer.Serialize(writer, "firstAvailableAction");
                         return;
-                    case AgentEnum.RandomAction:
+                    case GameAiEnum.RandomAction:
                         serializer.Serialize(writer, "randomAction");
                         return;
-                    case AgentEnum.WaitFiveSeconds:
+                    case GameAiEnum.WaitFiveSeconds:
                         serializer.Serialize(writer, "waitFiveSeconds");
                         return;
                 }
             }
-            if (value.AgentClass != null)
+            if (value.GameAiClass != null)
             {
-                serializer.Serialize(writer, value.AgentClass);
+                serializer.Serialize(writer, value.GameAiClass);
                 return;
             }
-            throw new Exception("Cannot marshal type Agent");
+            throw new Exception("Cannot marshal type GameAi");
         }
 
-        public static readonly AgentConverter Singleton = new AgentConverter();
+        public static readonly GameAiConverter Singleton = new GameAiConverter();
     }
 
-    internal class AgentEnumConverter : JsonConverter
+    internal class GameAiEnumConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(AgentEnum) || t == typeof(AgentEnum?);
+        public override bool CanConvert(Type t) => t == typeof(GameAiEnum) || t == typeof(GameAiEnum?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -2563,15 +2561,15 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "alwaysPanic":
-                    return AgentEnum.AlwaysPanic;
+                    return GameAiEnum.AlwaysPanic;
                 case "firstAvailableAction":
-                    return AgentEnum.FirstAvailableAction;
+                    return GameAiEnum.FirstAvailableAction;
                 case "randomAction":
-                    return AgentEnum.RandomAction;
+                    return GameAiEnum.RandomAction;
                 case "waitFiveSeconds":
-                    return AgentEnum.WaitFiveSeconds;
+                    return GameAiEnum.WaitFiveSeconds;
             }
-            throw new Exception("Cannot unmarshal type AgentEnum");
+            throw new Exception("Cannot unmarshal type GameAiEnum");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -2581,31 +2579,31 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (AgentEnum)untypedValue;
+            var value = (GameAiEnum)untypedValue;
             switch (value)
             {
-                case AgentEnum.AlwaysPanic:
+                case GameAiEnum.AlwaysPanic:
                     serializer.Serialize(writer, "alwaysPanic");
                     return;
-                case AgentEnum.FirstAvailableAction:
+                case GameAiEnum.FirstAvailableAction:
                     serializer.Serialize(writer, "firstAvailableAction");
                     return;
-                case AgentEnum.RandomAction:
+                case GameAiEnum.RandomAction:
                     serializer.Serialize(writer, "randomAction");
                     return;
-                case AgentEnum.WaitFiveSeconds:
+                case GameAiEnum.WaitFiveSeconds:
                     serializer.Serialize(writer, "waitFiveSeconds");
                     return;
             }
-            throw new Exception("Cannot marshal type AgentEnum");
+            throw new Exception("Cannot marshal type GameAiEnum");
         }
 
-        public static readonly AgentEnumConverter Singleton = new AgentEnumConverter();
+        public static readonly GameAiEnumConverter Singleton = new GameAiEnumConverter();
     }
 
-    internal class DeckConverter : JsonConverter
+    internal class DisplayPlayerConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(Deck) || t == typeof(Deck?);
+        public override bool CanConvert(Type t) => t == typeof(DisplayPlayer) || t == typeof(DisplayPlayer?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -2614,11 +2612,11 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "Enemy":
-                    return Deck.Enemy;
+                    return DisplayPlayer.Enemy;
                 case "User":
-                    return Deck.User;
+                    return DisplayPlayer.User;
             }
-            throw new Exception("Cannot unmarshal type Deck");
+            throw new Exception("Cannot unmarshal type DisplayPlayer");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -2628,25 +2626,25 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (Deck)untypedValue;
+            var value = (DisplayPlayer)untypedValue;
             switch (value)
             {
-                case Deck.Enemy:
+                case DisplayPlayer.Enemy:
                     serializer.Serialize(writer, "Enemy");
                     return;
-                case Deck.User:
+                case DisplayPlayer.User:
                     serializer.Serialize(writer, "User");
                     return;
             }
-            throw new Exception("Cannot marshal type Deck");
+            throw new Exception("Cannot marshal type DisplayPlayer");
         }
 
-        public static readonly DeckConverter Singleton = new DeckConverter();
+        public static readonly DisplayPlayerConverter Singleton = new DisplayPlayerConverter();
     }
 
-    internal class DisplayGameMessageConverter : JsonConverter
+    internal class GameMessageTypeConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(DisplayGameMessage) || t == typeof(DisplayGameMessage?);
+        public override bool CanConvert(Type t) => t == typeof(GameMessageType) || t == typeof(GameMessageType?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -2655,15 +2653,15 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "defeat":
-                    return DisplayGameMessage.Defeat;
+                    return GameMessageType.Defeat;
                 case "enemyTurn":
-                    return DisplayGameMessage.EnemyTurn;
+                    return GameMessageType.EnemyTurn;
                 case "victory":
-                    return DisplayGameMessage.Victory;
+                    return GameMessageType.Victory;
                 case "yourTurn":
-                    return DisplayGameMessage.YourTurn;
+                    return GameMessageType.YourTurn;
             }
-            throw new Exception("Cannot unmarshal type DisplayGameMessage");
+            throw new Exception("Cannot unmarshal type GameMessageType");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -2673,26 +2671,26 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (DisplayGameMessage)untypedValue;
+            var value = (GameMessageType)untypedValue;
             switch (value)
             {
-                case DisplayGameMessage.Defeat:
+                case GameMessageType.Defeat:
                     serializer.Serialize(writer, "defeat");
                     return;
-                case DisplayGameMessage.EnemyTurn:
+                case GameMessageType.EnemyTurn:
                     serializer.Serialize(writer, "enemyTurn");
                     return;
-                case DisplayGameMessage.Victory:
+                case GameMessageType.Victory:
                     serializer.Serialize(writer, "victory");
                     return;
-                case DisplayGameMessage.YourTurn:
+                case GameMessageType.YourTurn:
                     serializer.Serialize(writer, "yourTurn");
                     return;
             }
-            throw new Exception("Cannot marshal type DisplayGameMessage");
+            throw new Exception("Cannot marshal type GameMessageType");
         }
 
-        public static readonly DisplayGameMessageConverter Singleton = new DisplayGameMessageConverter();
+        public static readonly GameMessageTypeConverter Singleton = new GameMessageTypeConverter();
     }
 
     internal class CardFacingConverter : JsonConverter
@@ -2750,26 +2748,26 @@ namespace Dreamtides.Schema
                     switch (stringValue)
                     {
                         case "browser":
-                            return new Position { Enum = PositionPositionEnum.Browser };
+                            return new Position { Enum = PositionEnum.Browser };
                         case "default":
-                            return new Position { Enum = PositionPositionEnum.Default };
+                            return new Position { Enum = PositionEnum.Default };
                         case "drawn":
-                            return new Position { Enum = PositionPositionEnum.Drawn };
+                            return new Position { Enum = PositionEnum.Drawn };
                         case "dreamwellActivation":
-                            return new Position { Enum = PositionPositionEnum.DreamwellActivation };
+                            return new Position { Enum = PositionEnum.DreamwellActivation };
                         case "gameModifier":
-                            return new Position { Enum = PositionPositionEnum.GameModifier };
+                            return new Position { Enum = PositionEnum.GameModifier };
                         case "handStorage":
-                            return new Position { Enum = PositionPositionEnum.HandStorage };
+                            return new Position { Enum = PositionEnum.HandStorage };
                         case "offscreen":
-                            return new Position { Enum = PositionPositionEnum.Offscreen };
+                            return new Position { Enum = PositionEnum.Offscreen };
                         case "onScreenStorage":
-                            return new Position { Enum = PositionPositionEnum.OnScreenStorage };
+                            return new Position { Enum = PositionEnum.OnScreenStorage };
                     }
                     break;
                 case JsonToken.StartObject:
-                    var objectValue = serializer.Deserialize<PositionPositionClass>(reader);
-                    return new Position { PositionPositionClass = objectValue };
+                    var objectValue = serializer.Deserialize<PositionClass>(reader);
+                    return new Position { PositionClass = objectValue };
             }
             throw new Exception("Cannot unmarshal type Position");
         }
@@ -2781,35 +2779,35 @@ namespace Dreamtides.Schema
             {
                 switch (value.Enum)
                 {
-                    case PositionPositionEnum.Browser:
+                    case PositionEnum.Browser:
                         serializer.Serialize(writer, "browser");
                         return;
-                    case PositionPositionEnum.Default:
+                    case PositionEnum.Default:
                         serializer.Serialize(writer, "default");
                         return;
-                    case PositionPositionEnum.Drawn:
+                    case PositionEnum.Drawn:
                         serializer.Serialize(writer, "drawn");
                         return;
-                    case PositionPositionEnum.DreamwellActivation:
+                    case PositionEnum.DreamwellActivation:
                         serializer.Serialize(writer, "dreamwellActivation");
                         return;
-                    case PositionPositionEnum.GameModifier:
+                    case PositionEnum.GameModifier:
                         serializer.Serialize(writer, "gameModifier");
                         return;
-                    case PositionPositionEnum.HandStorage:
+                    case PositionEnum.HandStorage:
                         serializer.Serialize(writer, "handStorage");
                         return;
-                    case PositionPositionEnum.Offscreen:
+                    case PositionEnum.Offscreen:
                         serializer.Serialize(writer, "offscreen");
                         return;
-                    case PositionPositionEnum.OnScreenStorage:
+                    case PositionEnum.OnScreenStorage:
                         serializer.Serialize(writer, "onScreenStorage");
                         return;
                 }
             }
-            if (value.PositionPositionClass != null)
+            if (value.PositionClass != null)
             {
-                serializer.Serialize(writer, value.PositionPositionClass);
+                serializer.Serialize(writer, value.PositionClass);
                 return;
             }
             throw new Exception("Cannot marshal type Position");
@@ -2818,9 +2816,9 @@ namespace Dreamtides.Schema
         public static readonly PositionConverter Singleton = new PositionConverter();
     }
 
-    internal class CardOrderSelectorConverter : JsonConverter
+    internal class CardOrderSelectionTargetConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(CardOrderSelector) || t == typeof(CardOrderSelector?);
+        public override bool CanConvert(Type t) => t == typeof(CardOrderSelectionTarget) || t == typeof(CardOrderSelectionTarget?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -2829,11 +2827,11 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "deck":
-                    return CardOrderSelector.Deck;
+                    return CardOrderSelectionTarget.Deck;
                 case "void":
-                    return CardOrderSelector.Void;
+                    return CardOrderSelectionTarget.Void;
             }
-            throw new Exception("Cannot unmarshal type CardOrderSelector");
+            throw new Exception("Cannot unmarshal type CardOrderSelectionTarget");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -2843,25 +2841,25 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (CardOrderSelector)untypedValue;
+            var value = (CardOrderSelectionTarget)untypedValue;
             switch (value)
             {
-                case CardOrderSelector.Deck:
+                case CardOrderSelectionTarget.Deck:
                     serializer.Serialize(writer, "deck");
                     return;
-                case CardOrderSelector.Void:
+                case CardOrderSelectionTarget.Void:
                     serializer.Serialize(writer, "void");
                     return;
             }
-            throw new Exception("Cannot marshal type CardOrderSelector");
+            throw new Exception("Cannot marshal type CardOrderSelectionTarget");
         }
 
-        public static readonly CardOrderSelectorConverter Singleton = new CardOrderSelectorConverter();
+        public static readonly CardOrderSelectionTargetConverter Singleton = new CardOrderSelectionTargetConverter();
     }
 
-    internal class OnStackConverter : JsonConverter
+    internal class StackTypeConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(OnStack) || t == typeof(OnStack?);
+        public override bool CanConvert(Type t) => t == typeof(StackType) || t == typeof(StackType?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -2870,15 +2868,15 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "default":
-                    return OnStack.Default;
+                    return StackType.Default;
                 case "targetingBothBattlefields":
-                    return OnStack.TargetingBothBattlefields;
+                    return StackType.TargetingBothBattlefields;
                 case "targetingEnemyBattlefield":
-                    return OnStack.TargetingEnemyBattlefield;
+                    return StackType.TargetingEnemyBattlefield;
                 case "targetingUserBattlefield":
-                    return OnStack.TargetingUserBattlefield;
+                    return StackType.TargetingUserBattlefield;
             }
-            throw new Exception("Cannot unmarshal type OnStack");
+            throw new Exception("Cannot unmarshal type StackType");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -2888,31 +2886,31 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (OnStack)untypedValue;
+            var value = (StackType)untypedValue;
             switch (value)
             {
-                case OnStack.Default:
+                case StackType.Default:
                     serializer.Serialize(writer, "default");
                     return;
-                case OnStack.TargetingBothBattlefields:
+                case StackType.TargetingBothBattlefields:
                     serializer.Serialize(writer, "targetingBothBattlefields");
                     return;
-                case OnStack.TargetingEnemyBattlefield:
+                case StackType.TargetingEnemyBattlefield:
                     serializer.Serialize(writer, "targetingEnemyBattlefield");
                     return;
-                case OnStack.TargetingUserBattlefield:
+                case StackType.TargetingUserBattlefield:
                     serializer.Serialize(writer, "targetingUserBattlefield");
                     return;
             }
-            throw new Exception("Cannot marshal type OnStack");
+            throw new Exception("Cannot marshal type StackType");
         }
 
-        public static readonly OnStackConverter Singleton = new OnStackConverter();
+        public static readonly StackTypeConverter Singleton = new StackTypeConverter();
     }
 
-    internal class PositionPositionEnumConverter : JsonConverter
+    internal class PositionEnumConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(PositionPositionEnum) || t == typeof(PositionPositionEnum?);
+        public override bool CanConvert(Type t) => t == typeof(PositionEnum) || t == typeof(PositionEnum?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -2921,23 +2919,23 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "browser":
-                    return PositionPositionEnum.Browser;
+                    return PositionEnum.Browser;
                 case "default":
-                    return PositionPositionEnum.Default;
+                    return PositionEnum.Default;
                 case "drawn":
-                    return PositionPositionEnum.Drawn;
+                    return PositionEnum.Drawn;
                 case "dreamwellActivation":
-                    return PositionPositionEnum.DreamwellActivation;
+                    return PositionEnum.DreamwellActivation;
                 case "gameModifier":
-                    return PositionPositionEnum.GameModifier;
+                    return PositionEnum.GameModifier;
                 case "handStorage":
-                    return PositionPositionEnum.HandStorage;
+                    return PositionEnum.HandStorage;
                 case "offscreen":
-                    return PositionPositionEnum.Offscreen;
+                    return PositionEnum.Offscreen;
                 case "onScreenStorage":
-                    return PositionPositionEnum.OnScreenStorage;
+                    return PositionEnum.OnScreenStorage;
             }
-            throw new Exception("Cannot unmarshal type PositionPositionEnum");
+            throw new Exception("Cannot unmarshal type PositionEnum");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -2947,43 +2945,43 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (PositionPositionEnum)untypedValue;
+            var value = (PositionEnum)untypedValue;
             switch (value)
             {
-                case PositionPositionEnum.Browser:
+                case PositionEnum.Browser:
                     serializer.Serialize(writer, "browser");
                     return;
-                case PositionPositionEnum.Default:
+                case PositionEnum.Default:
                     serializer.Serialize(writer, "default");
                     return;
-                case PositionPositionEnum.Drawn:
+                case PositionEnum.Drawn:
                     serializer.Serialize(writer, "drawn");
                     return;
-                case PositionPositionEnum.DreamwellActivation:
+                case PositionEnum.DreamwellActivation:
                     serializer.Serialize(writer, "dreamwellActivation");
                     return;
-                case PositionPositionEnum.GameModifier:
+                case PositionEnum.GameModifier:
                     serializer.Serialize(writer, "gameModifier");
                     return;
-                case PositionPositionEnum.HandStorage:
+                case PositionEnum.HandStorage:
                     serializer.Serialize(writer, "handStorage");
                     return;
-                case PositionPositionEnum.Offscreen:
+                case PositionEnum.Offscreen:
                     serializer.Serialize(writer, "offscreen");
                     return;
-                case PositionPositionEnum.OnScreenStorage:
+                case PositionEnum.OnScreenStorage:
                     serializer.Serialize(writer, "onScreenStorage");
                     return;
             }
-            throw new Exception("Cannot marshal type PositionPositionEnum");
+            throw new Exception("Cannot marshal type PositionEnum");
         }
 
-        public static readonly PositionPositionEnumConverter Singleton = new PositionPositionEnumConverter();
+        public static readonly PositionEnumConverter Singleton = new PositionEnumConverter();
     }
 
-    internal class PrefabEnumConverter : JsonConverter
+    internal class CardPrefabConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(PrefabEnum) || t == typeof(PrefabEnum?);
+        public override bool CanConvert(Type t) => t == typeof(CardPrefab) || t == typeof(CardPrefab?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -2992,21 +2990,21 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "character":
-                    return PrefabEnum.Character;
+                    return CardPrefab.Character;
                 case "dreamsign":
-                    return PrefabEnum.Dreamsign;
+                    return CardPrefab.Dreamsign;
                 case "dreamwell":
-                    return PrefabEnum.Dreamwell;
+                    return CardPrefab.Dreamwell;
                 case "enemy":
-                    return PrefabEnum.Enemy;
+                    return CardPrefab.Enemy;
                 case "event":
-                    return PrefabEnum.Event;
+                    return CardPrefab.Event;
                 case "identity":
-                    return PrefabEnum.Identity;
+                    return CardPrefab.Identity;
                 case "token":
-                    return PrefabEnum.Token;
+                    return CardPrefab.Token;
             }
-            throw new Exception("Cannot unmarshal type PrefabEnum");
+            throw new Exception("Cannot unmarshal type CardPrefab");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -3016,65 +3014,65 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (PrefabEnum)untypedValue;
+            var value = (CardPrefab)untypedValue;
             switch (value)
             {
-                case PrefabEnum.Character:
+                case CardPrefab.Character:
                     serializer.Serialize(writer, "character");
                     return;
-                case PrefabEnum.Dreamsign:
+                case CardPrefab.Dreamsign:
                     serializer.Serialize(writer, "dreamsign");
                     return;
-                case PrefabEnum.Dreamwell:
+                case CardPrefab.Dreamwell:
                     serializer.Serialize(writer, "dreamwell");
                     return;
-                case PrefabEnum.Enemy:
+                case CardPrefab.Enemy:
                     serializer.Serialize(writer, "enemy");
                     return;
-                case PrefabEnum.Event:
+                case CardPrefab.Event:
                     serializer.Serialize(writer, "event");
                     return;
-                case PrefabEnum.Identity:
+                case CardPrefab.Identity:
                     serializer.Serialize(writer, "identity");
                     return;
-                case PrefabEnum.Token:
+                case CardPrefab.Token:
                     serializer.Serialize(writer, "token");
                     return;
             }
-            throw new Exception("Cannot marshal type PrefabEnum");
+            throw new Exception("Cannot marshal type CardPrefab");
         }
 
-        public static readonly PrefabEnumConverter Singleton = new PrefabEnumConverter();
+        public static readonly CardPrefabConverter Singleton = new CardPrefabConverter();
     }
 
-    internal class CanPlayConverter : JsonConverter
+    internal class ActionUnionConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(CanPlay) || t == typeof(CanPlay?);
+        public override bool CanConvert(Type t) => t == typeof(ActionUnion) || t == typeof(ActionUnion?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
             switch (reader.TokenType)
             {
                 case JsonToken.Null:
-                    return new CanPlay { };
+                    return new ActionUnion { };
                 case JsonToken.String:
                 case JsonToken.Date:
                     var stringValue = serializer.Deserialize<string>(reader);
                     if (stringValue == "noOp")
                     {
-                        return new CanPlay { Enum = ActionEnum.NoOp };
+                        return new ActionUnion { Enum = GameActionEnum.NoOp };
                     }
                     break;
                 case JsonToken.StartObject:
-                    var objectValue = serializer.Deserialize<CanPlayClass>(reader);
-                    return new CanPlay { CanPlayClass = objectValue };
+                    var objectValue = serializer.Deserialize<ActionClass>(reader);
+                    return new ActionUnion { ActionClass = objectValue };
             }
-            throw new Exception("Cannot unmarshal type CanPlay");
+            throw new Exception("Cannot unmarshal type ActionUnion");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
         {
-            var value = (CanPlay)untypedValue;
+            var value = (ActionUnion)untypedValue;
             if (value.IsNull)
             {
                 serializer.Serialize(writer, null);
@@ -3082,21 +3080,21 @@ namespace Dreamtides.Schema
             }
             if (value.Enum != null)
             {
-                if (value.Enum == ActionEnum.NoOp)
+                if (value.Enum == GameActionEnum.NoOp)
                 {
                     serializer.Serialize(writer, "noOp");
                     return;
                 }
             }
-            if (value.CanPlayClass != null)
+            if (value.ActionClass != null)
             {
-                serializer.Serialize(writer, value.CanPlayClass);
+                serializer.Serialize(writer, value.ActionClass);
                 return;
             }
-            throw new Exception("Cannot marshal type CanPlay");
+            throw new Exception("Cannot marshal type ActionUnion");
         }
 
-        public static readonly CanPlayConverter Singleton = new CanPlayConverter();
+        public static readonly ActionUnionConverter Singleton = new ActionUnionConverter();
     }
 
     internal class BattleActionConverter : JsonConverter
@@ -3166,9 +3164,9 @@ namespace Dreamtides.Schema
         public static readonly BattleActionConverter Singleton = new BattleActionConverter();
     }
 
-    internal class DrawCardConverter : JsonConverter
+    internal class NameConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(DrawCard) || t == typeof(DrawCard?);
+        public override bool CanConvert(Type t) => t == typeof(Name) || t == typeof(Name?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -3176,12 +3174,22 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
+                case "Abolish":
+                    return Name.Abolish;
+                case "Dreamscatter":
+                    return Name.Dreamscatter;
+                case "Immolate":
+                    return Name.Immolate;
+                case "MinstrelOfFallingLight":
+                    return Name.MinstrelOfFallingLight;
+                case "RippleOfDefiance":
+                    return Name.RippleOfDefiance;
                 case "one":
-                    return DrawCard.One;
+                    return Name.One;
                 case "two":
-                    return DrawCard.Two;
+                    return Name.Two;
             }
-            throw new Exception("Cannot unmarshal type DrawCard");
+            throw new Exception("Cannot unmarshal type Name");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -3191,20 +3199,128 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (DrawCard)untypedValue;
+            var value = (Name)untypedValue;
             switch (value)
             {
-                case DrawCard.One:
+                case Name.Abolish:
+                    serializer.Serialize(writer, "Abolish");
+                    return;
+                case Name.Dreamscatter:
+                    serializer.Serialize(writer, "Dreamscatter");
+                    return;
+                case Name.Immolate:
+                    serializer.Serialize(writer, "Immolate");
+                    return;
+                case Name.MinstrelOfFallingLight:
+                    serializer.Serialize(writer, "MinstrelOfFallingLight");
+                    return;
+                case Name.RippleOfDefiance:
+                    serializer.Serialize(writer, "RippleOfDefiance");
+                    return;
+                case Name.One:
                     serializer.Serialize(writer, "one");
                     return;
-                case DrawCard.Two:
+                case Name.Two:
                     serializer.Serialize(writer, "two");
                     return;
             }
-            throw new Exception("Cannot marshal type DrawCard");
+            throw new Exception("Cannot marshal type Name");
         }
 
-        public static readonly DrawCardConverter Singleton = new DrawCardConverter();
+        public static readonly NameConverter Singleton = new NameConverter();
+    }
+
+    internal class PlayerNameConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(PlayerName) || t == typeof(PlayerName?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "one":
+                    return PlayerName.One;
+                case "two":
+                    return PlayerName.Two;
+            }
+            throw new Exception("Cannot unmarshal type PlayerName");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (PlayerName)untypedValue;
+            switch (value)
+            {
+                case PlayerName.One:
+                    serializer.Serialize(writer, "one");
+                    return;
+                case PlayerName.Two:
+                    serializer.Serialize(writer, "two");
+                    return;
+            }
+            throw new Exception("Cannot marshal type PlayerName");
+        }
+
+        public static readonly PlayerNameConverter Singleton = new PlayerNameConverter();
+    }
+
+    internal class SetConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(Set) || t == typeof(Set?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            switch (reader.TokenType)
+            {
+                case JsonToken.Integer:
+                    var integerValue = serializer.Deserialize<long>(reader);
+                    return new Set { Integer = integerValue };
+                case JsonToken.String:
+                case JsonToken.Date:
+                    var stringValue = serializer.Deserialize<string>(reader);
+                    switch (stringValue)
+                    {
+                        case "one":
+                            return new Set { Enum = PlayerName.One };
+                        case "two":
+                            return new Set { Enum = PlayerName.Two };
+                    }
+                    break;
+            }
+            throw new Exception("Cannot unmarshal type Set");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            var value = (Set)untypedValue;
+            if (value.Integer != null)
+            {
+                serializer.Serialize(writer, value.Integer.Value);
+                return;
+            }
+            if (value.Enum != null)
+            {
+                switch (value.Enum)
+                {
+                    case PlayerName.One:
+                        serializer.Serialize(writer, "one");
+                        return;
+                    case PlayerName.Two:
+                        serializer.Serialize(writer, "two");
+                        return;
+                }
+            }
+            throw new Exception("Cannot marshal type Set");
+        }
+
+        public static readonly SetConverter Singleton = new SetConverter();
     }
 
     internal class BattleActionEnumConverter : JsonConverter
@@ -3320,9 +3436,9 @@ namespace Dreamtides.Schema
         public static readonly BattleDisplayActionConverter Singleton = new BattleDisplayActionConverter();
     }
 
-    internal class BrowseCardsConverter : JsonConverter
+    internal class CardBrowserTypeConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(BrowseCards) || t == typeof(BrowseCards?);
+        public override bool CanConvert(Type t) => t == typeof(CardBrowserType) || t == typeof(CardBrowserType?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -3331,19 +3447,19 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "enemyDeck":
-                    return BrowseCards.EnemyDeck;
+                    return CardBrowserType.EnemyDeck;
                 case "enemyStatus":
-                    return BrowseCards.EnemyStatus;
+                    return CardBrowserType.EnemyStatus;
                 case "enemyVoid":
-                    return BrowseCards.EnemyVoid;
+                    return CardBrowserType.EnemyVoid;
                 case "userDeck":
-                    return BrowseCards.UserDeck;
+                    return CardBrowserType.UserDeck;
                 case "userStatus":
-                    return BrowseCards.UserStatus;
+                    return CardBrowserType.UserStatus;
                 case "userVoid":
-                    return BrowseCards.UserVoid;
+                    return CardBrowserType.UserVoid;
             }
-            throw new Exception("Cannot unmarshal type BrowseCards");
+            throw new Exception("Cannot unmarshal type CardBrowserType");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -3353,37 +3469,37 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (BrowseCards)untypedValue;
+            var value = (CardBrowserType)untypedValue;
             switch (value)
             {
-                case BrowseCards.EnemyDeck:
+                case CardBrowserType.EnemyDeck:
                     serializer.Serialize(writer, "enemyDeck");
                     return;
-                case BrowseCards.EnemyStatus:
+                case CardBrowserType.EnemyStatus:
                     serializer.Serialize(writer, "enemyStatus");
                     return;
-                case BrowseCards.EnemyVoid:
+                case CardBrowserType.EnemyVoid:
                     serializer.Serialize(writer, "enemyVoid");
                     return;
-                case BrowseCards.UserDeck:
+                case CardBrowserType.UserDeck:
                     serializer.Serialize(writer, "userDeck");
                     return;
-                case BrowseCards.UserStatus:
+                case CardBrowserType.UserStatus:
                     serializer.Serialize(writer, "userStatus");
                     return;
-                case BrowseCards.UserVoid:
+                case CardBrowserType.UserVoid:
                     serializer.Serialize(writer, "userVoid");
                     return;
             }
-            throw new Exception("Cannot marshal type BrowseCards");
+            throw new Exception("Cannot marshal type CardBrowserType");
         }
 
-        public static readonly BrowseCardsConverter Singleton = new BrowseCardsConverter();
+        public static readonly CardBrowserTypeConverter Singleton = new CardBrowserTypeConverter();
     }
 
-    internal class OpenPanelConverter : JsonConverter
+    internal class PanelAddressConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(OpenPanel) || t == typeof(OpenPanel?);
+        public override bool CanConvert(Type t) => t == typeof(PanelAddress) || t == typeof(PanelAddress?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -3395,52 +3511,52 @@ namespace Dreamtides.Schema
                     switch (stringValue)
                     {
                         case "addCardToHand":
-                            return new OpenPanel { Enum = OpenPanelEnum.AddCardToHand };
+                            return new PanelAddress { Enum = PanelAddressEnum.AddCardToHand };
                         case "developer":
-                            return new OpenPanel { Enum = OpenPanelEnum.Developer };
+                            return new PanelAddress { Enum = PanelAddressEnum.Developer };
                         case "setOpponentAgent":
-                            return new OpenPanel { Enum = OpenPanelEnum.SetOpponentAgent };
+                            return new PanelAddress { Enum = PanelAddressEnum.SetOpponentAgent };
                     }
                     break;
                 case JsonToken.StartObject:
-                    var objectValue = serializer.Deserialize<OpenPanelClass>(reader);
-                    return new OpenPanel { OpenPanelClass = objectValue };
+                    var objectValue = serializer.Deserialize<PanelAddressClass>(reader);
+                    return new PanelAddress { PanelAddressClass = objectValue };
             }
-            throw new Exception("Cannot unmarshal type OpenPanel");
+            throw new Exception("Cannot unmarshal type PanelAddress");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
         {
-            var value = (OpenPanel)untypedValue;
+            var value = (PanelAddress)untypedValue;
             if (value.Enum != null)
             {
                 switch (value.Enum)
                 {
-                    case OpenPanelEnum.AddCardToHand:
+                    case PanelAddressEnum.AddCardToHand:
                         serializer.Serialize(writer, "addCardToHand");
                         return;
-                    case OpenPanelEnum.Developer:
+                    case PanelAddressEnum.Developer:
                         serializer.Serialize(writer, "developer");
                         return;
-                    case OpenPanelEnum.SetOpponentAgent:
+                    case PanelAddressEnum.SetOpponentAgent:
                         serializer.Serialize(writer, "setOpponentAgent");
                         return;
                 }
             }
-            if (value.OpenPanelClass != null)
+            if (value.PanelAddressClass != null)
             {
-                serializer.Serialize(writer, value.OpenPanelClass);
+                serializer.Serialize(writer, value.PanelAddressClass);
                 return;
             }
-            throw new Exception("Cannot marshal type OpenPanel");
+            throw new Exception("Cannot marshal type PanelAddress");
         }
 
-        public static readonly OpenPanelConverter Singleton = new OpenPanelConverter();
+        public static readonly PanelAddressConverter Singleton = new PanelAddressConverter();
     }
 
-    internal class OpenPanelEnumConverter : JsonConverter
+    internal class PanelAddressEnumConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(OpenPanelEnum) || t == typeof(OpenPanelEnum?);
+        public override bool CanConvert(Type t) => t == typeof(PanelAddressEnum) || t == typeof(PanelAddressEnum?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -3449,13 +3565,13 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "addCardToHand":
-                    return OpenPanelEnum.AddCardToHand;
+                    return PanelAddressEnum.AddCardToHand;
                 case "developer":
-                    return OpenPanelEnum.Developer;
+                    return PanelAddressEnum.Developer;
                 case "setOpponentAgent":
-                    return OpenPanelEnum.SetOpponentAgent;
+                    return PanelAddressEnum.SetOpponentAgent;
             }
-            throw new Exception("Cannot unmarshal type OpenPanelEnum");
+            throw new Exception("Cannot unmarshal type PanelAddressEnum");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -3465,23 +3581,23 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (OpenPanelEnum)untypedValue;
+            var value = (PanelAddressEnum)untypedValue;
             switch (value)
             {
-                case OpenPanelEnum.AddCardToHand:
+                case PanelAddressEnum.AddCardToHand:
                     serializer.Serialize(writer, "addCardToHand");
                     return;
-                case OpenPanelEnum.Developer:
+                case PanelAddressEnum.Developer:
                     serializer.Serialize(writer, "developer");
                     return;
-                case OpenPanelEnum.SetOpponentAgent:
+                case PanelAddressEnum.SetOpponentAgent:
                     serializer.Serialize(writer, "setOpponentAgent");
                     return;
             }
-            throw new Exception("Cannot marshal type OpenPanelEnum");
+            throw new Exception("Cannot marshal type PanelAddressEnum");
         }
 
-        public static readonly OpenPanelEnumConverter Singleton = new OpenPanelEnumConverter();
+        public static readonly PanelAddressEnumConverter Singleton = new PanelAddressEnumConverter();
     }
 
     internal class BattleDisplayActionEnumConverter : JsonConverter
@@ -3623,9 +3739,9 @@ namespace Dreamtides.Schema
         public static readonly DebugActionEnumConverter Singleton = new DebugActionEnumConverter();
     }
 
-    internal class ActionEnumConverter : JsonConverter
+    internal class GameActionEnumConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(ActionEnum) || t == typeof(ActionEnum?);
+        public override bool CanConvert(Type t) => t == typeof(GameActionEnum) || t == typeof(GameActionEnum?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -3633,9 +3749,9 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             if (value == "noOp")
             {
-                return ActionEnum.NoOp;
+                return GameActionEnum.NoOp;
             }
-            throw new Exception("Cannot unmarshal type ActionEnum");
+            throw new Exception("Cannot unmarshal type GameActionEnum");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -3645,21 +3761,21 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (ActionEnum)untypedValue;
-            if (value == ActionEnum.NoOp)
+            var value = (GameActionEnum)untypedValue;
+            if (value == GameActionEnum.NoOp)
             {
                 serializer.Serialize(writer, "noOp");
                 return;
             }
-            throw new Exception("Cannot marshal type ActionEnum");
+            throw new Exception("Cannot marshal type GameActionEnum");
         }
 
-        public static readonly ActionEnumConverter Singleton = new ActionEnumConverter();
+        public static readonly GameActionEnumConverter Singleton = new GameActionEnumConverter();
     }
 
-    internal class AlignContentEnumConverter : JsonConverter
+    internal class FlexAlignConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(AlignContentEnum) || t == typeof(AlignContentEnum?);
+        public override bool CanConvert(Type t) => t == typeof(FlexAlign) || t == typeof(FlexAlign?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -3668,17 +3784,17 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "auto":
-                    return AlignContentEnum.Auto;
+                    return FlexAlign.Auto;
                 case "center":
-                    return AlignContentEnum.Center;
+                    return FlexAlign.Center;
                 case "flexEnd":
-                    return AlignContentEnum.FlexEnd;
+                    return FlexAlign.FlexEnd;
                 case "flexStart":
-                    return AlignContentEnum.FlexStart;
+                    return FlexAlign.FlexStart;
                 case "stretch":
-                    return AlignContentEnum.Stretch;
+                    return FlexAlign.Stretch;
             }
-            throw new Exception("Cannot unmarshal type AlignContentEnum");
+            throw new Exception("Cannot unmarshal type FlexAlign");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -3688,34 +3804,34 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (AlignContentEnum)untypedValue;
+            var value = (FlexAlign)untypedValue;
             switch (value)
             {
-                case AlignContentEnum.Auto:
+                case FlexAlign.Auto:
                     serializer.Serialize(writer, "auto");
                     return;
-                case AlignContentEnum.Center:
+                case FlexAlign.Center:
                     serializer.Serialize(writer, "center");
                     return;
-                case AlignContentEnum.FlexEnd:
+                case FlexAlign.FlexEnd:
                     serializer.Serialize(writer, "flexEnd");
                     return;
-                case AlignContentEnum.FlexStart:
+                case FlexAlign.FlexStart:
                     serializer.Serialize(writer, "flexStart");
                     return;
-                case AlignContentEnum.Stretch:
+                case FlexAlign.Stretch:
                     serializer.Serialize(writer, "stretch");
                     return;
             }
-            throw new Exception("Cannot marshal type AlignContentEnum");
+            throw new Exception("Cannot marshal type FlexAlign");
         }
 
-        public static readonly AlignContentEnumConverter Singleton = new AlignContentEnumConverter();
+        public static readonly FlexAlignConverter Singleton = new FlexAlignConverter();
     }
 
-    internal class UnitConverter : JsonConverter
+    internal class DimensionUnitConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(Unit) || t == typeof(Unit?);
+        public override bool CanConvert(Type t) => t == typeof(DimensionUnit) || t == typeof(DimensionUnit?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -3724,23 +3840,23 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "percentage":
-                    return Unit.Percentage;
+                    return DimensionUnit.Percentage;
                 case "pixels":
-                    return Unit.Pixels;
+                    return DimensionUnit.Pixels;
                 case "safeAreaBottomInset":
-                    return Unit.SafeAreaBottomInset;
+                    return DimensionUnit.SafeAreaBottomInset;
                 case "safeAreaLeftInset":
-                    return Unit.SafeAreaLeftInset;
+                    return DimensionUnit.SafeAreaLeftInset;
                 case "safeAreaRightInset":
-                    return Unit.SafeAreaRightInset;
+                    return DimensionUnit.SafeAreaRightInset;
                 case "safeAreaTopInset":
-                    return Unit.SafeAreaTopInset;
+                    return DimensionUnit.SafeAreaTopInset;
                 case "viewportHeight":
-                    return Unit.ViewportHeight;
+                    return DimensionUnit.ViewportHeight;
                 case "viewportWidth":
-                    return Unit.ViewportWidth;
+                    return DimensionUnit.ViewportWidth;
             }
-            throw new Exception("Cannot unmarshal type Unit");
+            throw new Exception("Cannot unmarshal type DimensionUnit");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -3750,43 +3866,43 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (Unit)untypedValue;
+            var value = (DimensionUnit)untypedValue;
             switch (value)
             {
-                case Unit.Percentage:
+                case DimensionUnit.Percentage:
                     serializer.Serialize(writer, "percentage");
                     return;
-                case Unit.Pixels:
+                case DimensionUnit.Pixels:
                     serializer.Serialize(writer, "pixels");
                     return;
-                case Unit.SafeAreaBottomInset:
+                case DimensionUnit.SafeAreaBottomInset:
                     serializer.Serialize(writer, "safeAreaBottomInset");
                     return;
-                case Unit.SafeAreaLeftInset:
+                case DimensionUnit.SafeAreaLeftInset:
                     serializer.Serialize(writer, "safeAreaLeftInset");
                     return;
-                case Unit.SafeAreaRightInset:
+                case DimensionUnit.SafeAreaRightInset:
                     serializer.Serialize(writer, "safeAreaRightInset");
                     return;
-                case Unit.SafeAreaTopInset:
+                case DimensionUnit.SafeAreaTopInset:
                     serializer.Serialize(writer, "safeAreaTopInset");
                     return;
-                case Unit.ViewportHeight:
+                case DimensionUnit.ViewportHeight:
                     serializer.Serialize(writer, "viewportHeight");
                     return;
-                case Unit.ViewportWidth:
+                case DimensionUnit.ViewportWidth:
                     serializer.Serialize(writer, "viewportWidth");
                     return;
             }
-            throw new Exception("Cannot marshal type Unit");
+            throw new Exception("Cannot marshal type DimensionUnit");
         }
 
-        public static readonly UnitConverter Singleton = new UnitConverter();
+        public static readonly DimensionUnitConverter Singleton = new DimensionUnitConverter();
     }
 
-    internal class DisplayEnumConverter : JsonConverter
+    internal class FlexDisplayStyleConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(DisplayEnum) || t == typeof(DisplayEnum?);
+        public override bool CanConvert(Type t) => t == typeof(FlexDisplayStyle) || t == typeof(FlexDisplayStyle?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -3795,11 +3911,11 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "flex":
-                    return DisplayEnum.Flex;
+                    return FlexDisplayStyle.Flex;
                 case "none":
-                    return DisplayEnum.None;
+                    return FlexDisplayStyle.None;
             }
-            throw new Exception("Cannot unmarshal type DisplayEnum");
+            throw new Exception("Cannot unmarshal type FlexDisplayStyle");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -3809,25 +3925,25 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (DisplayEnum)untypedValue;
+            var value = (FlexDisplayStyle)untypedValue;
             switch (value)
             {
-                case DisplayEnum.Flex:
+                case FlexDisplayStyle.Flex:
                     serializer.Serialize(writer, "flex");
                     return;
-                case DisplayEnum.None:
+                case FlexDisplayStyle.None:
                     serializer.Serialize(writer, "none");
                     return;
             }
-            throw new Exception("Cannot marshal type DisplayEnum");
+            throw new Exception("Cannot marshal type FlexDisplayStyle");
         }
 
-        public static readonly DisplayEnumConverter Singleton = new DisplayEnumConverter();
+        public static readonly FlexDisplayStyleConverter Singleton = new FlexDisplayStyleConverter();
     }
 
-    internal class FlexDirectionEnumConverter : JsonConverter
+    internal class FlexDirectionConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(FlexDirectionEnum) || t == typeof(FlexDirectionEnum?);
+        public override bool CanConvert(Type t) => t == typeof(FlexDirection) || t == typeof(FlexDirection?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -3836,15 +3952,15 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "column":
-                    return FlexDirectionEnum.Column;
+                    return FlexDirection.Column;
                 case "columnReverse":
-                    return FlexDirectionEnum.ColumnReverse;
+                    return FlexDirection.ColumnReverse;
                 case "row":
-                    return FlexDirectionEnum.Row;
+                    return FlexDirection.Row;
                 case "rowReverse":
-                    return FlexDirectionEnum.RowReverse;
+                    return FlexDirection.RowReverse;
             }
-            throw new Exception("Cannot unmarshal type FlexDirectionEnum");
+            throw new Exception("Cannot unmarshal type FlexDirection");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -3854,31 +3970,31 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (FlexDirectionEnum)untypedValue;
+            var value = (FlexDirection)untypedValue;
             switch (value)
             {
-                case FlexDirectionEnum.Column:
+                case FlexDirection.Column:
                     serializer.Serialize(writer, "column");
                     return;
-                case FlexDirectionEnum.ColumnReverse:
+                case FlexDirection.ColumnReverse:
                     serializer.Serialize(writer, "columnReverse");
                     return;
-                case FlexDirectionEnum.Row:
+                case FlexDirection.Row:
                     serializer.Serialize(writer, "row");
                     return;
-                case FlexDirectionEnum.RowReverse:
+                case FlexDirection.RowReverse:
                     serializer.Serialize(writer, "rowReverse");
                     return;
             }
-            throw new Exception("Cannot marshal type FlexDirectionEnum");
+            throw new Exception("Cannot marshal type FlexDirection");
         }
 
-        public static readonly FlexDirectionEnumConverter Singleton = new FlexDirectionEnumConverter();
+        public static readonly FlexDirectionConverter Singleton = new FlexDirectionConverter();
     }
 
-    internal class FontStyleEnumConverter : JsonConverter
+    internal class FontStyleConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(FontStyleEnum) || t == typeof(FontStyleEnum?);
+        public override bool CanConvert(Type t) => t == typeof(FontStyle) || t == typeof(FontStyle?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -3887,15 +4003,15 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "bold":
-                    return FontStyleEnum.Bold;
+                    return FontStyle.Bold;
                 case "boldAndItalic":
-                    return FontStyleEnum.BoldAndItalic;
+                    return FontStyle.BoldAndItalic;
                 case "italic":
-                    return FontStyleEnum.Italic;
+                    return FontStyle.Italic;
                 case "normal":
-                    return FontStyleEnum.Normal;
+                    return FontStyle.Normal;
             }
-            throw new Exception("Cannot unmarshal type FontStyleEnum");
+            throw new Exception("Cannot unmarshal type FontStyle");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -3905,31 +4021,31 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (FontStyleEnum)untypedValue;
+            var value = (FontStyle)untypedValue;
             switch (value)
             {
-                case FontStyleEnum.Bold:
+                case FontStyle.Bold:
                     serializer.Serialize(writer, "bold");
                     return;
-                case FontStyleEnum.BoldAndItalic:
+                case FontStyle.BoldAndItalic:
                     serializer.Serialize(writer, "boldAndItalic");
                     return;
-                case FontStyleEnum.Italic:
+                case FontStyle.Italic:
                     serializer.Serialize(writer, "italic");
                     return;
-                case FontStyleEnum.Normal:
+                case FontStyle.Normal:
                     serializer.Serialize(writer, "normal");
                     return;
             }
-            throw new Exception("Cannot marshal type FontStyleEnum");
+            throw new Exception("Cannot marshal type FontStyle");
         }
 
-        public static readonly FontStyleEnumConverter Singleton = new FontStyleEnumConverter();
+        public static readonly FontStyleConverter Singleton = new FontStyleConverter();
     }
 
-    internal class JustifyContentEnumConverter : JsonConverter
+    internal class FlexJustifyConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(JustifyContentEnum) || t == typeof(JustifyContentEnum?);
+        public override bool CanConvert(Type t) => t == typeof(FlexJustify) || t == typeof(FlexJustify?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -3938,17 +4054,17 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "center":
-                    return JustifyContentEnum.Center;
+                    return FlexJustify.Center;
                 case "flexEnd":
-                    return JustifyContentEnum.FlexEnd;
+                    return FlexJustify.FlexEnd;
                 case "flexStart":
-                    return JustifyContentEnum.FlexStart;
+                    return FlexJustify.FlexStart;
                 case "spaceAround":
-                    return JustifyContentEnum.SpaceAround;
+                    return FlexJustify.SpaceAround;
                 case "spaceBetween":
-                    return JustifyContentEnum.SpaceBetween;
+                    return FlexJustify.SpaceBetween;
             }
-            throw new Exception("Cannot unmarshal type JustifyContentEnum");
+            throw new Exception("Cannot unmarshal type FlexJustify");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -3958,34 +4074,34 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (JustifyContentEnum)untypedValue;
+            var value = (FlexJustify)untypedValue;
             switch (value)
             {
-                case JustifyContentEnum.Center:
+                case FlexJustify.Center:
                     serializer.Serialize(writer, "center");
                     return;
-                case JustifyContentEnum.FlexEnd:
+                case FlexJustify.FlexEnd:
                     serializer.Serialize(writer, "flexEnd");
                     return;
-                case JustifyContentEnum.FlexStart:
+                case FlexJustify.FlexStart:
                     serializer.Serialize(writer, "flexStart");
                     return;
-                case JustifyContentEnum.SpaceAround:
+                case FlexJustify.SpaceAround:
                     serializer.Serialize(writer, "spaceAround");
                     return;
-                case JustifyContentEnum.SpaceBetween:
+                case FlexJustify.SpaceBetween:
                     serializer.Serialize(writer, "spaceBetween");
                     return;
             }
-            throw new Exception("Cannot marshal type JustifyContentEnum");
+            throw new Exception("Cannot marshal type FlexJustify");
         }
 
-        public static readonly JustifyContentEnumConverter Singleton = new JustifyContentEnumConverter();
+        public static readonly FlexJustifyConverter Singleton = new FlexJustifyConverter();
     }
 
-    internal class OverflowEnumConverter : JsonConverter
+    internal class FlexVisibilityConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(OverflowEnum) || t == typeof(OverflowEnum?);
+        public override bool CanConvert(Type t) => t == typeof(FlexVisibility) || t == typeof(FlexVisibility?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -3994,11 +4110,11 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "hidden":
-                    return OverflowEnum.Hidden;
+                    return FlexVisibility.Hidden;
                 case "visible":
-                    return OverflowEnum.Visible;
+                    return FlexVisibility.Visible;
             }
-            throw new Exception("Cannot unmarshal type OverflowEnum");
+            throw new Exception("Cannot unmarshal type FlexVisibility");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -4008,25 +4124,25 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (OverflowEnum)untypedValue;
+            var value = (FlexVisibility)untypedValue;
             switch (value)
             {
-                case OverflowEnum.Hidden:
+                case FlexVisibility.Hidden:
                     serializer.Serialize(writer, "hidden");
                     return;
-                case OverflowEnum.Visible:
+                case FlexVisibility.Visible:
                     serializer.Serialize(writer, "visible");
                     return;
             }
-            throw new Exception("Cannot marshal type OverflowEnum");
+            throw new Exception("Cannot marshal type FlexVisibility");
         }
 
-        public static readonly OverflowEnumConverter Singleton = new OverflowEnumConverter();
+        public static readonly FlexVisibilityConverter Singleton = new FlexVisibilityConverter();
     }
 
-    internal class OverflowClipBoxEnumConverter : JsonConverter
+    internal class OverflowClipBoxConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(OverflowClipBoxEnum) || t == typeof(OverflowClipBoxEnum?);
+        public override bool CanConvert(Type t) => t == typeof(OverflowClipBox) || t == typeof(OverflowClipBox?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -4035,11 +4151,11 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "contentBox":
-                    return OverflowClipBoxEnum.ContentBox;
+                    return OverflowClipBox.ContentBox;
                 case "paddingBox":
-                    return OverflowClipBoxEnum.PaddingBox;
+                    return OverflowClipBox.PaddingBox;
             }
-            throw new Exception("Cannot unmarshal type OverflowClipBoxEnum");
+            throw new Exception("Cannot unmarshal type OverflowClipBox");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -4049,25 +4165,25 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (OverflowClipBoxEnum)untypedValue;
+            var value = (OverflowClipBox)untypedValue;
             switch (value)
             {
-                case OverflowClipBoxEnum.ContentBox:
+                case OverflowClipBox.ContentBox:
                     serializer.Serialize(writer, "contentBox");
                     return;
-                case OverflowClipBoxEnum.PaddingBox:
+                case OverflowClipBox.PaddingBox:
                     serializer.Serialize(writer, "paddingBox");
                     return;
             }
-            throw new Exception("Cannot marshal type OverflowClipBoxEnum");
+            throw new Exception("Cannot marshal type OverflowClipBox");
         }
 
-        public static readonly OverflowClipBoxEnumConverter Singleton = new OverflowClipBoxEnumConverter();
+        public static readonly OverflowClipBoxConverter Singleton = new OverflowClipBoxConverter();
     }
 
-    internal class PickingModeEnumConverter : JsonConverter
+    internal class FlexPickingModeConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(PickingModeEnum) || t == typeof(PickingModeEnum?);
+        public override bool CanConvert(Type t) => t == typeof(FlexPickingMode) || t == typeof(FlexPickingMode?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -4076,11 +4192,11 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "ignore":
-                    return PickingModeEnum.Ignore;
+                    return FlexPickingMode.Ignore;
                 case "position":
-                    return PickingModeEnum.Position;
+                    return FlexPickingMode.Position;
             }
-            throw new Exception("Cannot unmarshal type PickingModeEnum");
+            throw new Exception("Cannot unmarshal type FlexPickingMode");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -4090,25 +4206,25 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (PickingModeEnum)untypedValue;
+            var value = (FlexPickingMode)untypedValue;
             switch (value)
             {
-                case PickingModeEnum.Ignore:
+                case FlexPickingMode.Ignore:
                     serializer.Serialize(writer, "ignore");
                     return;
-                case PickingModeEnum.Position:
+                case FlexPickingMode.Position:
                     serializer.Serialize(writer, "position");
                     return;
             }
-            throw new Exception("Cannot marshal type PickingModeEnum");
+            throw new Exception("Cannot marshal type FlexPickingMode");
         }
 
-        public static readonly PickingModeEnumConverter Singleton = new PickingModeEnumConverter();
+        public static readonly FlexPickingModeConverter Singleton = new FlexPickingModeConverter();
     }
 
-    internal class HoverStylePositionConverter : JsonConverter
+    internal class FlexPositionConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(HoverStylePosition) || t == typeof(HoverStylePosition?);
+        public override bool CanConvert(Type t) => t == typeof(FlexPosition) || t == typeof(FlexPosition?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -4117,11 +4233,11 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "absolute":
-                    return HoverStylePosition.Absolute;
+                    return FlexPosition.Absolute;
                 case "relative":
-                    return HoverStylePosition.Relative;
+                    return FlexPosition.Relative;
             }
-            throw new Exception("Cannot unmarshal type HoverStylePosition");
+            throw new Exception("Cannot unmarshal type FlexPosition");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -4131,25 +4247,25 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (HoverStylePosition)untypedValue;
+            var value = (FlexPosition)untypedValue;
             switch (value)
             {
-                case HoverStylePosition.Absolute:
+                case FlexPosition.Absolute:
                     serializer.Serialize(writer, "absolute");
                     return;
-                case HoverStylePosition.Relative:
+                case FlexPosition.Relative:
                     serializer.Serialize(writer, "relative");
                     return;
             }
-            throw new Exception("Cannot marshal type HoverStylePosition");
+            throw new Exception("Cannot marshal type FlexPosition");
         }
 
-        public static readonly HoverStylePositionConverter Singleton = new HoverStylePositionConverter();
+        public static readonly FlexPositionConverter Singleton = new FlexPositionConverter();
     }
 
-    internal class TextAlignEnumConverter : JsonConverter
+    internal class TextAlignConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(TextAlignEnum) || t == typeof(TextAlignEnum?);
+        public override bool CanConvert(Type t) => t == typeof(TextAlign) || t == typeof(TextAlign?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -4158,25 +4274,25 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "lowerCenter":
-                    return TextAlignEnum.LowerCenter;
+                    return TextAlign.LowerCenter;
                 case "lowerLeft":
-                    return TextAlignEnum.LowerLeft;
+                    return TextAlign.LowerLeft;
                 case "lowerRight":
-                    return TextAlignEnum.LowerRight;
+                    return TextAlign.LowerRight;
                 case "middleCenter":
-                    return TextAlignEnum.MiddleCenter;
+                    return TextAlign.MiddleCenter;
                 case "middleLeft":
-                    return TextAlignEnum.MiddleLeft;
+                    return TextAlign.MiddleLeft;
                 case "middleRight":
-                    return TextAlignEnum.MiddleRight;
+                    return TextAlign.MiddleRight;
                 case "upperCenter":
-                    return TextAlignEnum.UpperCenter;
+                    return TextAlign.UpperCenter;
                 case "upperLeft":
-                    return TextAlignEnum.UpperLeft;
+                    return TextAlign.UpperLeft;
                 case "upperRight":
-                    return TextAlignEnum.UpperRight;
+                    return TextAlign.UpperRight;
             }
-            throw new Exception("Cannot unmarshal type TextAlignEnum");
+            throw new Exception("Cannot unmarshal type TextAlign");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -4186,46 +4302,46 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (TextAlignEnum)untypedValue;
+            var value = (TextAlign)untypedValue;
             switch (value)
             {
-                case TextAlignEnum.LowerCenter:
+                case TextAlign.LowerCenter:
                     serializer.Serialize(writer, "lowerCenter");
                     return;
-                case TextAlignEnum.LowerLeft:
+                case TextAlign.LowerLeft:
                     serializer.Serialize(writer, "lowerLeft");
                     return;
-                case TextAlignEnum.LowerRight:
+                case TextAlign.LowerRight:
                     serializer.Serialize(writer, "lowerRight");
                     return;
-                case TextAlignEnum.MiddleCenter:
+                case TextAlign.MiddleCenter:
                     serializer.Serialize(writer, "middleCenter");
                     return;
-                case TextAlignEnum.MiddleLeft:
+                case TextAlign.MiddleLeft:
                     serializer.Serialize(writer, "middleLeft");
                     return;
-                case TextAlignEnum.MiddleRight:
+                case TextAlign.MiddleRight:
                     serializer.Serialize(writer, "middleRight");
                     return;
-                case TextAlignEnum.UpperCenter:
+                case TextAlign.UpperCenter:
                     serializer.Serialize(writer, "upperCenter");
                     return;
-                case TextAlignEnum.UpperLeft:
+                case TextAlign.UpperLeft:
                     serializer.Serialize(writer, "upperLeft");
                     return;
-                case TextAlignEnum.UpperRight:
+                case TextAlign.UpperRight:
                     serializer.Serialize(writer, "upperRight");
                     return;
             }
-            throw new Exception("Cannot marshal type TextAlignEnum");
+            throw new Exception("Cannot marshal type TextAlign");
         }
 
-        public static readonly TextAlignEnumConverter Singleton = new TextAlignEnumConverter();
+        public static readonly TextAlignConverter Singleton = new TextAlignConverter();
     }
 
-    internal class TextOverflowEnumConverter : JsonConverter
+    internal class TextOverflowConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(TextOverflowEnum) || t == typeof(TextOverflowEnum?);
+        public override bool CanConvert(Type t) => t == typeof(TextOverflow) || t == typeof(TextOverflow?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -4234,11 +4350,11 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "clip":
-                    return TextOverflowEnum.Clip;
+                    return TextOverflow.Clip;
                 case "ellipsis":
-                    return TextOverflowEnum.Ellipsis;
+                    return TextOverflow.Ellipsis;
             }
-            throw new Exception("Cannot unmarshal type TextOverflowEnum");
+            throw new Exception("Cannot unmarshal type TextOverflow");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -4248,25 +4364,25 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (TextOverflowEnum)untypedValue;
+            var value = (TextOverflow)untypedValue;
             switch (value)
             {
-                case TextOverflowEnum.Clip:
+                case TextOverflow.Clip:
                     serializer.Serialize(writer, "clip");
                     return;
-                case TextOverflowEnum.Ellipsis:
+                case TextOverflow.Ellipsis:
                     serializer.Serialize(writer, "ellipsis");
                     return;
             }
-            throw new Exception("Cannot marshal type TextOverflowEnum");
+            throw new Exception("Cannot marshal type TextOverflow");
         }
 
-        public static readonly TextOverflowEnumConverter Singleton = new TextOverflowEnumConverter();
+        public static readonly TextOverflowConverter Singleton = new TextOverflowConverter();
     }
 
-    internal class TextOverflowPositionEnumConverter : JsonConverter
+    internal class TextOverflowPositionConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(TextOverflowPositionEnum) || t == typeof(TextOverflowPositionEnum?);
+        public override bool CanConvert(Type t) => t == typeof(TextOverflowPosition) || t == typeof(TextOverflowPosition?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -4275,13 +4391,13 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "end":
-                    return TextOverflowPositionEnum.End;
+                    return TextOverflowPosition.End;
                 case "middle":
-                    return TextOverflowPositionEnum.Middle;
+                    return TextOverflowPosition.Middle;
                 case "start":
-                    return TextOverflowPositionEnum.Start;
+                    return TextOverflowPosition.Start;
             }
-            throw new Exception("Cannot unmarshal type TextOverflowPositionEnum");
+            throw new Exception("Cannot unmarshal type TextOverflowPosition");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -4291,28 +4407,28 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (TextOverflowPositionEnum)untypedValue;
+            var value = (TextOverflowPosition)untypedValue;
             switch (value)
             {
-                case TextOverflowPositionEnum.End:
+                case TextOverflowPosition.End:
                     serializer.Serialize(writer, "end");
                     return;
-                case TextOverflowPositionEnum.Middle:
+                case TextOverflowPosition.Middle:
                     serializer.Serialize(writer, "middle");
                     return;
-                case TextOverflowPositionEnum.Start:
+                case TextOverflowPosition.Start:
                     serializer.Serialize(writer, "start");
                     return;
             }
-            throw new Exception("Cannot marshal type TextOverflowPositionEnum");
+            throw new Exception("Cannot marshal type TextOverflowPosition");
         }
 
-        public static readonly TextOverflowPositionEnumConverter Singleton = new TextOverflowPositionEnumConverter();
+        public static readonly TextOverflowPositionConverter Singleton = new TextOverflowPositionConverter();
     }
 
-    internal class TransitionEasingModeElementConverter : JsonConverter
+    internal class EasingModeConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(TransitionEasingModeElement) || t == typeof(TransitionEasingModeElement?);
+        public override bool CanConvert(Type t) => t == typeof(EasingMode) || t == typeof(EasingMode?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -4321,53 +4437,53 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "ease":
-                    return TransitionEasingModeElement.Ease;
+                    return EasingMode.Ease;
                 case "easeIn":
-                    return TransitionEasingModeElement.EaseIn;
+                    return EasingMode.EaseIn;
                 case "easeInBack":
-                    return TransitionEasingModeElement.EaseInBack;
+                    return EasingMode.EaseInBack;
                 case "easeInBounce":
-                    return TransitionEasingModeElement.EaseInBounce;
+                    return EasingMode.EaseInBounce;
                 case "easeInCirc":
-                    return TransitionEasingModeElement.EaseInCirc;
+                    return EasingMode.EaseInCirc;
                 case "easeInCubic":
-                    return TransitionEasingModeElement.EaseInCubic;
+                    return EasingMode.EaseInCubic;
                 case "easeInElastic":
-                    return TransitionEasingModeElement.EaseInElastic;
+                    return EasingMode.EaseInElastic;
                 case "easeInOut":
-                    return TransitionEasingModeElement.EaseInOut;
+                    return EasingMode.EaseInOut;
                 case "easeInOutBack":
-                    return TransitionEasingModeElement.EaseInOutBack;
+                    return EasingMode.EaseInOutBack;
                 case "easeInOutBounce":
-                    return TransitionEasingModeElement.EaseInOutBounce;
+                    return EasingMode.EaseInOutBounce;
                 case "easeInOutCirc":
-                    return TransitionEasingModeElement.EaseInOutCirc;
+                    return EasingMode.EaseInOutCirc;
                 case "easeInOutCubic":
-                    return TransitionEasingModeElement.EaseInOutCubic;
+                    return EasingMode.EaseInOutCubic;
                 case "easeInOutElastic":
-                    return TransitionEasingModeElement.EaseInOutElastic;
+                    return EasingMode.EaseInOutElastic;
                 case "easeInOutSine":
-                    return TransitionEasingModeElement.EaseInOutSine;
+                    return EasingMode.EaseInOutSine;
                 case "easeInSine":
-                    return TransitionEasingModeElement.EaseInSine;
+                    return EasingMode.EaseInSine;
                 case "easeOut":
-                    return TransitionEasingModeElement.EaseOut;
+                    return EasingMode.EaseOut;
                 case "easeOutBack":
-                    return TransitionEasingModeElement.EaseOutBack;
+                    return EasingMode.EaseOutBack;
                 case "easeOutBounce":
-                    return TransitionEasingModeElement.EaseOutBounce;
+                    return EasingMode.EaseOutBounce;
                 case "easeOutCirc":
-                    return TransitionEasingModeElement.EaseOutCirc;
+                    return EasingMode.EaseOutCirc;
                 case "easeOutCubic":
-                    return TransitionEasingModeElement.EaseOutCubic;
+                    return EasingMode.EaseOutCubic;
                 case "easeOutElastic":
-                    return TransitionEasingModeElement.EaseOutElastic;
+                    return EasingMode.EaseOutElastic;
                 case "easeOutSine":
-                    return TransitionEasingModeElement.EaseOutSine;
+                    return EasingMode.EaseOutSine;
                 case "linear":
-                    return TransitionEasingModeElement.Linear;
+                    return EasingMode.Linear;
             }
-            throw new Exception("Cannot unmarshal type TransitionEasingModeElement");
+            throw new Exception("Cannot unmarshal type EasingMode");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -4377,88 +4493,88 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (TransitionEasingModeElement)untypedValue;
+            var value = (EasingMode)untypedValue;
             switch (value)
             {
-                case TransitionEasingModeElement.Ease:
+                case EasingMode.Ease:
                     serializer.Serialize(writer, "ease");
                     return;
-                case TransitionEasingModeElement.EaseIn:
+                case EasingMode.EaseIn:
                     serializer.Serialize(writer, "easeIn");
                     return;
-                case TransitionEasingModeElement.EaseInBack:
+                case EasingMode.EaseInBack:
                     serializer.Serialize(writer, "easeInBack");
                     return;
-                case TransitionEasingModeElement.EaseInBounce:
+                case EasingMode.EaseInBounce:
                     serializer.Serialize(writer, "easeInBounce");
                     return;
-                case TransitionEasingModeElement.EaseInCirc:
+                case EasingMode.EaseInCirc:
                     serializer.Serialize(writer, "easeInCirc");
                     return;
-                case TransitionEasingModeElement.EaseInCubic:
+                case EasingMode.EaseInCubic:
                     serializer.Serialize(writer, "easeInCubic");
                     return;
-                case TransitionEasingModeElement.EaseInElastic:
+                case EasingMode.EaseInElastic:
                     serializer.Serialize(writer, "easeInElastic");
                     return;
-                case TransitionEasingModeElement.EaseInOut:
+                case EasingMode.EaseInOut:
                     serializer.Serialize(writer, "easeInOut");
                     return;
-                case TransitionEasingModeElement.EaseInOutBack:
+                case EasingMode.EaseInOutBack:
                     serializer.Serialize(writer, "easeInOutBack");
                     return;
-                case TransitionEasingModeElement.EaseInOutBounce:
+                case EasingMode.EaseInOutBounce:
                     serializer.Serialize(writer, "easeInOutBounce");
                     return;
-                case TransitionEasingModeElement.EaseInOutCirc:
+                case EasingMode.EaseInOutCirc:
                     serializer.Serialize(writer, "easeInOutCirc");
                     return;
-                case TransitionEasingModeElement.EaseInOutCubic:
+                case EasingMode.EaseInOutCubic:
                     serializer.Serialize(writer, "easeInOutCubic");
                     return;
-                case TransitionEasingModeElement.EaseInOutElastic:
+                case EasingMode.EaseInOutElastic:
                     serializer.Serialize(writer, "easeInOutElastic");
                     return;
-                case TransitionEasingModeElement.EaseInOutSine:
+                case EasingMode.EaseInOutSine:
                     serializer.Serialize(writer, "easeInOutSine");
                     return;
-                case TransitionEasingModeElement.EaseInSine:
+                case EasingMode.EaseInSine:
                     serializer.Serialize(writer, "easeInSine");
                     return;
-                case TransitionEasingModeElement.EaseOut:
+                case EasingMode.EaseOut:
                     serializer.Serialize(writer, "easeOut");
                     return;
-                case TransitionEasingModeElement.EaseOutBack:
+                case EasingMode.EaseOutBack:
                     serializer.Serialize(writer, "easeOutBack");
                     return;
-                case TransitionEasingModeElement.EaseOutBounce:
+                case EasingMode.EaseOutBounce:
                     serializer.Serialize(writer, "easeOutBounce");
                     return;
-                case TransitionEasingModeElement.EaseOutCirc:
+                case EasingMode.EaseOutCirc:
                     serializer.Serialize(writer, "easeOutCirc");
                     return;
-                case TransitionEasingModeElement.EaseOutCubic:
+                case EasingMode.EaseOutCubic:
                     serializer.Serialize(writer, "easeOutCubic");
                     return;
-                case TransitionEasingModeElement.EaseOutElastic:
+                case EasingMode.EaseOutElastic:
                     serializer.Serialize(writer, "easeOutElastic");
                     return;
-                case TransitionEasingModeElement.EaseOutSine:
+                case EasingMode.EaseOutSine:
                     serializer.Serialize(writer, "easeOutSine");
                     return;
-                case TransitionEasingModeElement.Linear:
+                case EasingMode.Linear:
                     serializer.Serialize(writer, "linear");
                     return;
             }
-            throw new Exception("Cannot marshal type TransitionEasingModeElement");
+            throw new Exception("Cannot marshal type EasingMode");
         }
 
-        public static readonly TransitionEasingModeElementConverter Singleton = new TransitionEasingModeElementConverter();
+        public static readonly EasingModeConverter Singleton = new EasingModeConverter();
     }
 
-    internal class WhiteSpaceEnumConverter : JsonConverter
+    internal class WhiteSpaceConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(WhiteSpaceEnum) || t == typeof(WhiteSpaceEnum?);
+        public override bool CanConvert(Type t) => t == typeof(WhiteSpace) || t == typeof(WhiteSpace?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -4467,11 +4583,11 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "noWrap":
-                    return WhiteSpaceEnum.NoWrap;
+                    return WhiteSpace.NoWrap;
                 case "normal":
-                    return WhiteSpaceEnum.Normal;
+                    return WhiteSpace.Normal;
             }
-            throw new Exception("Cannot unmarshal type WhiteSpaceEnum");
+            throw new Exception("Cannot unmarshal type WhiteSpace");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -4481,25 +4597,25 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (WhiteSpaceEnum)untypedValue;
+            var value = (WhiteSpace)untypedValue;
             switch (value)
             {
-                case WhiteSpaceEnum.NoWrap:
+                case WhiteSpace.NoWrap:
                     serializer.Serialize(writer, "noWrap");
                     return;
-                case WhiteSpaceEnum.Normal:
+                case WhiteSpace.Normal:
                     serializer.Serialize(writer, "normal");
                     return;
             }
-            throw new Exception("Cannot marshal type WhiteSpaceEnum");
+            throw new Exception("Cannot marshal type WhiteSpace");
         }
 
-        public static readonly WhiteSpaceEnumConverter Singleton = new WhiteSpaceEnumConverter();
+        public static readonly WhiteSpaceConverter Singleton = new WhiteSpaceConverter();
     }
 
-    internal class WrapEnumConverter : JsonConverter
+    internal class FlexWrapConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(WrapEnum) || t == typeof(WrapEnum?);
+        public override bool CanConvert(Type t) => t == typeof(FlexWrap) || t == typeof(FlexWrap?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -4508,13 +4624,13 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "noWrap":
-                    return WrapEnum.NoWrap;
+                    return FlexWrap.NoWrap;
                 case "wrap":
-                    return WrapEnum.Wrap;
+                    return FlexWrap.Wrap;
                 case "wrapReverse":
-                    return WrapEnum.WrapReverse;
+                    return FlexWrap.WrapReverse;
             }
-            throw new Exception("Cannot unmarshal type WrapEnum");
+            throw new Exception("Cannot unmarshal type FlexWrap");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -4524,28 +4640,28 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (WrapEnum)untypedValue;
+            var value = (FlexWrap)untypedValue;
             switch (value)
             {
-                case WrapEnum.NoWrap:
+                case FlexWrap.NoWrap:
                     serializer.Serialize(writer, "noWrap");
                     return;
-                case WrapEnum.Wrap:
+                case FlexWrap.Wrap:
                     serializer.Serialize(writer, "wrap");
                     return;
-                case WrapEnum.WrapReverse:
+                case FlexWrap.WrapReverse:
                     serializer.Serialize(writer, "wrapReverse");
                     return;
             }
-            throw new Exception("Cannot marshal type WrapEnum");
+            throw new Exception("Cannot marshal type FlexWrap");
         }
 
-        public static readonly WrapEnumConverter Singleton = new WrapEnumConverter();
+        public static readonly FlexWrapConverter Singleton = new FlexWrapConverter();
     }
 
-    internal class HorizontalScrollBarVisibilityEnumConverter : JsonConverter
+    internal class ScrollBarVisibilityConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(HorizontalScrollBarVisibilityEnum) || t == typeof(HorizontalScrollBarVisibilityEnum?);
+        public override bool CanConvert(Type t) => t == typeof(ScrollBarVisibility) || t == typeof(ScrollBarVisibility?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -4554,13 +4670,13 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "alwaysVisible":
-                    return HorizontalScrollBarVisibilityEnum.AlwaysVisible;
+                    return ScrollBarVisibility.AlwaysVisible;
                 case "auto":
-                    return HorizontalScrollBarVisibilityEnum.Auto;
+                    return ScrollBarVisibility.Auto;
                 case "hidden":
-                    return HorizontalScrollBarVisibilityEnum.Hidden;
+                    return ScrollBarVisibility.Hidden;
             }
-            throw new Exception("Cannot unmarshal type HorizontalScrollBarVisibilityEnum");
+            throw new Exception("Cannot unmarshal type ScrollBarVisibility");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -4570,28 +4686,28 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (HorizontalScrollBarVisibilityEnum)untypedValue;
+            var value = (ScrollBarVisibility)untypedValue;
             switch (value)
             {
-                case HorizontalScrollBarVisibilityEnum.AlwaysVisible:
+                case ScrollBarVisibility.AlwaysVisible:
                     serializer.Serialize(writer, "alwaysVisible");
                     return;
-                case HorizontalScrollBarVisibilityEnum.Auto:
+                case ScrollBarVisibility.Auto:
                     serializer.Serialize(writer, "auto");
                     return;
-                case HorizontalScrollBarVisibilityEnum.Hidden:
+                case ScrollBarVisibility.Hidden:
                     serializer.Serialize(writer, "hidden");
                     return;
             }
-            throw new Exception("Cannot marshal type HorizontalScrollBarVisibilityEnum");
+            throw new Exception("Cannot marshal type ScrollBarVisibility");
         }
 
-        public static readonly HorizontalScrollBarVisibilityEnumConverter Singleton = new HorizontalScrollBarVisibilityEnumConverter();
+        public static readonly ScrollBarVisibilityConverter Singleton = new ScrollBarVisibilityConverter();
     }
 
-    internal class TouchScrollBehaviorEnumConverter : JsonConverter
+    internal class TouchScrollBehaviorConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(TouchScrollBehaviorEnum) || t == typeof(TouchScrollBehaviorEnum?);
+        public override bool CanConvert(Type t) => t == typeof(TouchScrollBehavior) || t == typeof(TouchScrollBehavior?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -4600,13 +4716,13 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "clamped":
-                    return TouchScrollBehaviorEnum.Clamped;
+                    return TouchScrollBehavior.Clamped;
                 case "elastic":
-                    return TouchScrollBehaviorEnum.Elastic;
+                    return TouchScrollBehavior.Elastic;
                 case "unrestricted":
-                    return TouchScrollBehaviorEnum.Unrestricted;
+                    return TouchScrollBehavior.Unrestricted;
             }
-            throw new Exception("Cannot unmarshal type TouchScrollBehaviorEnum");
+            throw new Exception("Cannot unmarshal type TouchScrollBehavior");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -4616,28 +4732,28 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (TouchScrollBehaviorEnum)untypedValue;
+            var value = (TouchScrollBehavior)untypedValue;
             switch (value)
             {
-                case TouchScrollBehaviorEnum.Clamped:
+                case TouchScrollBehavior.Clamped:
                     serializer.Serialize(writer, "clamped");
                     return;
-                case TouchScrollBehaviorEnum.Elastic:
+                case TouchScrollBehavior.Elastic:
                     serializer.Serialize(writer, "elastic");
                     return;
-                case TouchScrollBehaviorEnum.Unrestricted:
+                case TouchScrollBehavior.Unrestricted:
                     serializer.Serialize(writer, "unrestricted");
                     return;
             }
-            throw new Exception("Cannot marshal type TouchScrollBehaviorEnum");
+            throw new Exception("Cannot marshal type TouchScrollBehavior");
         }
 
-        public static readonly TouchScrollBehaviorEnumConverter Singleton = new TouchScrollBehaviorEnumConverter();
+        public static readonly TouchScrollBehaviorConverter Singleton = new TouchScrollBehaviorConverter();
     }
 
-    internal class DirectionEnumConverter : JsonConverter
+    internal class SliderDirectionConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(DirectionEnum) || t == typeof(DirectionEnum?);
+        public override bool CanConvert(Type t) => t == typeof(SliderDirection) || t == typeof(SliderDirection?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -4646,11 +4762,11 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "horizontal":
-                    return DirectionEnum.Horizontal;
+                    return SliderDirection.Horizontal;
                 case "vertical":
-                    return DirectionEnum.Vertical;
+                    return SliderDirection.Vertical;
             }
-            throw new Exception("Cannot unmarshal type DirectionEnum");
+            throw new Exception("Cannot unmarshal type SliderDirection");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -4660,20 +4776,20 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (DirectionEnum)untypedValue;
+            var value = (SliderDirection)untypedValue;
             switch (value)
             {
-                case DirectionEnum.Horizontal:
+                case SliderDirection.Horizontal:
                     serializer.Serialize(writer, "horizontal");
                     return;
-                case DirectionEnum.Vertical:
+                case SliderDirection.Vertical:
                     serializer.Serialize(writer, "vertical");
                     return;
             }
-            throw new Exception("Cannot marshal type DirectionEnum");
+            throw new Exception("Cannot marshal type SliderDirection");
         }
 
-        public static readonly DirectionEnumConverter Singleton = new DirectionEnumConverter();
+        public static readonly SliderDirectionConverter Singleton = new SliderDirectionConverter();
     }
 
     internal class StudioTypeConverter : JsonConverter
@@ -4727,9 +4843,9 @@ namespace Dreamtides.Schema
         public static readonly StudioTypeConverter Singleton = new StudioTypeConverter();
     }
 
-    internal class ColorConverter : JsonConverter
+    internal class ArrowStyleConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(Color) || t == typeof(Color?);
+        public override bool CanConvert(Type t) => t == typeof(ArrowStyle) || t == typeof(ArrowStyle?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -4738,13 +4854,13 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "blue":
-                    return Color.Blue;
+                    return ArrowStyle.Blue;
                 case "green":
-                    return Color.Green;
+                    return ArrowStyle.Green;
                 case "red":
-                    return Color.Red;
+                    return ArrowStyle.Red;
             }
-            throw new Exception("Cannot unmarshal type Color");
+            throw new Exception("Cannot unmarshal type ArrowStyle");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -4754,28 +4870,28 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (Color)untypedValue;
+            var value = (ArrowStyle)untypedValue;
             switch (value)
             {
-                case Color.Blue:
+                case ArrowStyle.Blue:
                     serializer.Serialize(writer, "blue");
                     return;
-                case Color.Green:
+                case ArrowStyle.Green:
                     serializer.Serialize(writer, "green");
                     return;
-                case Color.Red:
+                case ArrowStyle.Red:
                     serializer.Serialize(writer, "red");
                     return;
             }
-            throw new Exception("Cannot marshal type Color");
+            throw new Exception("Cannot marshal type ArrowStyle");
         }
 
-        public static readonly ColorConverter Singleton = new ColorConverter();
+        public static readonly ArrowStyleConverter Singleton = new ArrowStyleConverter();
     }
 
-    internal class PreviewConverter : JsonConverter
+    internal class BattlePreviewStateConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(Preview) || t == typeof(Preview?);
+        public override bool CanConvert(Type t) => t == typeof(BattlePreviewState) || t == typeof(BattlePreviewState?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -4787,47 +4903,47 @@ namespace Dreamtides.Schema
                     switch (stringValue)
                     {
                         case "none":
-                            return new Preview { Enum = PreviewEnum.None };
+                            return new BattlePreviewState { Enum = BattlePreviewStateEnum.None };
                         case "pending":
-                            return new Preview { Enum = PreviewEnum.Pending };
+                            return new BattlePreviewState { Enum = BattlePreviewStateEnum.Pending };
                     }
                     break;
                 case JsonToken.StartObject:
-                    var objectValue = serializer.Deserialize<PreviewClass>(reader);
-                    return new Preview { PreviewClass = objectValue };
+                    var objectValue = serializer.Deserialize<BattlePreviewStateClass>(reader);
+                    return new BattlePreviewState { BattlePreviewStateClass = objectValue };
             }
-            throw new Exception("Cannot unmarshal type Preview");
+            throw new Exception("Cannot unmarshal type BattlePreviewState");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
         {
-            var value = (Preview)untypedValue;
+            var value = (BattlePreviewState)untypedValue;
             if (value.Enum != null)
             {
                 switch (value.Enum)
                 {
-                    case PreviewEnum.None:
+                    case BattlePreviewStateEnum.None:
                         serializer.Serialize(writer, "none");
                         return;
-                    case PreviewEnum.Pending:
+                    case BattlePreviewStateEnum.Pending:
                         serializer.Serialize(writer, "pending");
                         return;
                 }
             }
-            if (value.PreviewClass != null)
+            if (value.BattlePreviewStateClass != null)
             {
-                serializer.Serialize(writer, value.PreviewClass);
+                serializer.Serialize(writer, value.BattlePreviewStateClass);
                 return;
             }
-            throw new Exception("Cannot marshal type Preview");
+            throw new Exception("Cannot marshal type BattlePreviewState");
         }
 
-        public static readonly PreviewConverter Singleton = new PreviewConverter();
+        public static readonly BattlePreviewStateConverter Singleton = new BattlePreviewStateConverter();
     }
 
-    internal class PreviewEnumConverter : JsonConverter
+    internal class BattlePreviewStateEnumConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(PreviewEnum) || t == typeof(PreviewEnum?);
+        public override bool CanConvert(Type t) => t == typeof(BattlePreviewStateEnum) || t == typeof(BattlePreviewStateEnum?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -4836,11 +4952,11 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "none":
-                    return PreviewEnum.None;
+                    return BattlePreviewStateEnum.None;
                 case "pending":
-                    return PreviewEnum.Pending;
+                    return BattlePreviewStateEnum.Pending;
             }
-            throw new Exception("Cannot unmarshal type PreviewEnum");
+            throw new Exception("Cannot unmarshal type BattlePreviewStateEnum");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -4850,25 +4966,25 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (PreviewEnum)untypedValue;
+            var value = (BattlePreviewStateEnum)untypedValue;
             switch (value)
             {
-                case PreviewEnum.None:
+                case BattlePreviewStateEnum.None:
                     serializer.Serialize(writer, "none");
                     return;
-                case PreviewEnum.Pending:
+                case BattlePreviewStateEnum.Pending:
                     serializer.Serialize(writer, "pending");
                     return;
             }
-            throw new Exception("Cannot marshal type PreviewEnum");
+            throw new Exception("Cannot marshal type BattlePreviewStateEnum");
         }
 
-        public static readonly PreviewEnumConverter Singleton = new PreviewEnumConverter();
+        public static readonly BattlePreviewStateEnumConverter Singleton = new BattlePreviewStateEnumConverter();
     }
 
-    internal class ActionUnionConverter : JsonConverter
+    internal class GameActionConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(ActionUnion) || t == typeof(ActionUnion?);
+        public override bool CanConvert(Type t) => t == typeof(GameAction) || t == typeof(GameAction?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -4879,41 +4995,41 @@ namespace Dreamtides.Schema
                     var stringValue = serializer.Deserialize<string>(reader);
                     if (stringValue == "noOp")
                     {
-                        return new ActionUnion { Enum = ActionEnum.NoOp };
+                        return new GameAction { Enum = GameActionEnum.NoOp };
                     }
                     break;
                 case JsonToken.StartObject:
-                    var objectValue = serializer.Deserialize<PurpleSchema>(reader);
-                    return new ActionUnion { PurpleSchema = objectValue };
+                    var objectValue = serializer.Deserialize<GameActionClass>(reader);
+                    return new GameAction { GameActionClass = objectValue };
             }
-            throw new Exception("Cannot unmarshal type ActionUnion");
+            throw new Exception("Cannot unmarshal type GameAction");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
         {
-            var value = (ActionUnion)untypedValue;
+            var value = (GameAction)untypedValue;
             if (value.Enum != null)
             {
-                if (value.Enum == ActionEnum.NoOp)
+                if (value.Enum == GameActionEnum.NoOp)
                 {
                     serializer.Serialize(writer, "noOp");
                     return;
                 }
             }
-            if (value.PurpleSchema != null)
+            if (value.GameActionClass != null)
             {
-                serializer.Serialize(writer, value.PurpleSchema);
+                serializer.Serialize(writer, value.GameActionClass);
                 return;
             }
-            throw new Exception("Cannot marshal type ActionUnion");
+            throw new Exception("Cannot marshal type GameAction");
         }
 
-        public static readonly ActionUnionConverter Singleton = new ActionUnionConverter();
+        public static readonly GameActionConverter Singleton = new GameActionConverter();
     }
 
-    internal class ResponseTypeConverter : JsonConverter
+    internal class PollResponseTypeConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(ResponseType) || t == typeof(ResponseType?);
+        public override bool CanConvert(Type t) => t == typeof(PollResponseType) || t == typeof(PollResponseType?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -4922,11 +5038,11 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "final":
-                    return ResponseType.Final;
+                    return PollResponseType.Final;
                 case "incremental":
-                    return ResponseType.Incremental;
+                    return PollResponseType.Incremental;
             }
-            throw new Exception("Cannot unmarshal type ResponseType");
+            throw new Exception("Cannot unmarshal type PollResponseType");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -4936,19 +5052,19 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (ResponseType)untypedValue;
+            var value = (PollResponseType)untypedValue;
             switch (value)
             {
-                case ResponseType.Final:
+                case PollResponseType.Final:
                     serializer.Serialize(writer, "final");
                     return;
-                case ResponseType.Incremental:
+                case PollResponseType.Incremental:
                     serializer.Serialize(writer, "incremental");
                     return;
             }
-            throw new Exception("Cannot marshal type ResponseType");
+            throw new Exception("Cannot marshal type PollResponseType");
         }
 
-        public static readonly ResponseTypeConverter Singleton = new ResponseTypeConverter();
+        public static readonly PollResponseTypeConverter Singleton = new PollResponseTypeConverter();
     }
 }
