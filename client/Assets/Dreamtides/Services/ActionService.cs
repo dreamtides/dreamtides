@@ -22,7 +22,6 @@ namespace Dreamtides.Services
     }
 
     readonly Guid _userGuid = Guid.Parse("d2da9785-f20e-4879-bed5-35b2e1926faf");
-    readonly Guid _testOpponentGuid = Guid.Parse("25e89dde-37d7-464b-8a1c-f985102ca029");
     bool _devModeAutoConnect;
     float _lastConnectAttemptTime;
     Metadata? _metadata;
@@ -34,9 +33,7 @@ namespace Dreamtides.Services
     HashSet<Guid> _loggedRequestIds = new HashSet<Guid>();
     Guid? _lastResponseVersion;
 
-    bool IsTestClient => Application.dataPath.Contains("dreamtides_tests");
-
-    bool UseDevServer => Application.isEditor && !IsTestClient;
+    bool UseDevServer => Application.isEditor && !Application.dataPath.Contains("dreamtides_tests");
 
     public bool Connected { get; private set; }
 
@@ -59,7 +56,7 @@ namespace Dreamtides.Services
       yield return new WaitForEndOfFrame();
       _metadata = new Metadata
       {
-        UserId = IsTestClient ? _testOpponentGuid : _userGuid,
+        UserId = _userGuid,
         IntegrationTestId = _integrationTestId,
       };
       var request = new ConnectRequest
@@ -100,7 +97,6 @@ namespace Dreamtides.Services
           {
             Metadata = _metadata!,
             PersistentDataPath = Application.persistentDataPath,
-            VsOpponent = IsTestClient ? _userGuid : null,
             DisplayProperties = GetDisplayProperties()
           }, reconnect: true));
           _lastConnectAttemptTime = now;
@@ -152,7 +148,6 @@ namespace Dreamtides.Services
         },
         Action = action.Value,
         LastResponseVersion = _lastResponseVersion,
-        SaveFileId = IsTestClient ? _userGuid : null,
         TestScenario = _testScenario,
       };
       if (UseDevServer)

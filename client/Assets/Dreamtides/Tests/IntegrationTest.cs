@@ -12,8 +12,7 @@ using UnityEngine.SceneManagement;
 using Dreamtides.Layout;
 using UnityEngine.UIElements;
 using Dreamtides.Schema;
-using System.Collections.Generic;
-using NUnit.Framework.Constraints;
+using System.Runtime.CompilerServices;
 
 #nullable enable
 
@@ -25,7 +24,9 @@ namespace Dreamtides.Tests
     Registry? _registry;
     protected Registry Registry => Errors.CheckNotNull(_registry);
 
-    protected IEnumerator Connect(GameViewResolution resolution = GameViewResolution.Resolution16x9)
+    protected IEnumerator Connect(
+      [CallerMemberName] string? testName = null,
+      GameViewResolution resolution = GameViewResolution.Resolution16x9)
     {
       Registry.TestConfiguration = new TestConfiguration(Guid.NewGuid());
       GameViewUtils.SetGameViewResolution(resolution);
@@ -39,6 +40,7 @@ namespace Dreamtides.Tests
       yield return new WaitUntil(() => registry.ActionService.Connected);
       yield return registry.TestHelperService.WaitForIdle();
       _registry = registry;
+      Debug.Log($"{testName} started successfully");
     }
 
     /// <summary>

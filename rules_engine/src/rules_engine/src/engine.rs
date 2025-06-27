@@ -53,6 +53,7 @@ pub struct PerformActionBlockingResult {
 /// Connects to the rules engine.
 pub fn connect(request: &ConnectRequest, request_context: RequestContext) -> ConnectResponse {
     if let Some(integration_test_id) = request.metadata.integration_test_id {
+        debug!(?integration_test_id, "Connecting to integration test");
         let provider = get_test_state_provider(integration_test_id);
         connect_with_provider(provider, request, request_context)
     } else {
@@ -139,6 +140,7 @@ pub fn perform_action(request: PerformActionRequest) {
     let user_id = request.metadata.user_id;
 
     if let Some(integration_test_id) = request.metadata.integration_test_id {
+        debug!(?integration_test_id, "Performing action for integration test");
         let provider = get_test_state_provider(integration_test_id);
         provider.store_request_timestamp(request_id, Instant::now());
         task::spawn_blocking(move || {
