@@ -140,6 +140,7 @@ pub fn perform_action(request: PerformActionRequest) {
 
     if let Some(integration_test_id) = request.metadata.integration_test_id {
         let provider = get_test_state_provider(integration_test_id);
+        provider.store_request_timestamp(request_id, Instant::now());
         task::spawn_blocking(move || {
             if perform_action_internal(provider.clone(), &request) {
                 provider.finish_processing(user_id);

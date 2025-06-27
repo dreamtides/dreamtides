@@ -8,6 +8,7 @@ using Dreamtides.Schema;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using UnityEngine;
 
 namespace Dreamtides.Tests
 {
@@ -31,6 +32,8 @@ namespace Dreamtides.Tests
 
       foreach (var displayable in Registry.Layout.UserHand.Objects)
       {
+        // With 5 cards in hand, all of them should be visible on screen. Beyond
+        // this point we switch to scroll bars in some UI configurations.
         var card = ComponentUtils.Get<Card>(displayable);
         AssertSpriteIsOnScreen(card._costBackground, $"Energy Cost of {card.Id}");
       }
@@ -45,9 +48,9 @@ namespace Dreamtides.Tests
     ///
     /// <remarks>
     /// This includes:
-    /// - 10 cards in each player's hand.
+    /// - 5 cards in each player's hand.
     /// - 8 cards on each player's battlefield.
-    /// - 10 cards in each player's void.
+    /// - 5 cards in each player's void.
     /// </remarks>
     static GameAction SetupFullLayoutAction()
     {
@@ -59,15 +62,32 @@ namespace Dreamtides.Tests
           {
             DebugActionClass = new DebugActionClass
             {
-              ApplyActionList = AddCardsToHand(DisplayPlayer.User, 10)
-                .Concat(AddCardsToHand(DisplayPlayer.Enemy, 10))
-                .Concat(AddCardsToBattlefield(DisplayPlayer.User, 8))
-                .Concat(AddCardsToBattlefield(DisplayPlayer.Enemy, 8))
-                .Concat(AddCardsToVoid(DisplayPlayer.User, 10))
-                .Concat(AddCardsToVoid(DisplayPlayer.Enemy, 10))
-                .ToList()
+              ApplyActionList =
+                RemovePlayerHands()
+                  .Concat(AddCardsToHand(DisplayPlayer.User, 5))
+                  .Concat(AddCardsToHand(DisplayPlayer.Enemy, 5))
+                  .Concat(AddCardsToBattlefield(DisplayPlayer.User, 8))
+                  .Concat(AddCardsToBattlefield(DisplayPlayer.Enemy, 8))
+                  .Concat(AddCardsToVoid(DisplayPlayer.User, 5))
+                  .Concat(AddCardsToVoid(DisplayPlayer.Enemy, 5))
+                  .ToList()
             }
           }
+        }
+      };
+    }
+
+    static List<DebugBattleAction> RemovePlayerHands()
+    {
+      return new List<DebugBattleAction>
+      {
+        new DebugBattleAction
+        {
+          MoveHandToDeck = new MoveHandToDeck { Player = PlayerName.One }
+        },
+        new DebugBattleAction
+        {
+          MoveHandToDeck = new MoveHandToDeck { Player = PlayerName.Two }
         }
       };
     }
