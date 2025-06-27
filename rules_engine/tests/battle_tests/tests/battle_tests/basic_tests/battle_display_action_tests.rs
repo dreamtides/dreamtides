@@ -11,11 +11,14 @@ use test_utils::session::test_session_prelude::*;
 fn browse_user_void_moves_cards_to_browser() {
     let mut s = TestBattle::builder().connect();
 
-    s.perform_user_action(DebugBattleAction::AddCardToVoid(
-        PlayerName::One,
-        CardName::MinstrelOfFallingLight,
-    ));
-    s.perform_user_action(DebugBattleAction::AddCardToVoid(PlayerName::One, CardName::Immolate));
+    s.perform_user_action(DebugBattleAction::AddCardToVoid {
+        player: PlayerName::One,
+        card: CardName::MinstrelOfFallingLight,
+    });
+    s.perform_user_action(DebugBattleAction::AddCardToVoid {
+        player: PlayerName::One,
+        card: CardName::Immolate,
+    });
 
     assert_eq!(s.user_client.cards.user_void().len(), 2, "user void should have 2 cards");
     assert_eq!(
@@ -38,11 +41,14 @@ fn browse_user_void_moves_cards_to_browser() {
 fn browse_enemy_void_moves_cards_to_browser() {
     let mut s = TestBattle::builder().connect();
 
-    s.perform_user_action(DebugBattleAction::AddCardToVoid(
-        PlayerName::Two,
-        CardName::MinstrelOfFallingLight,
-    ));
-    s.perform_user_action(DebugBattleAction::AddCardToVoid(PlayerName::Two, CardName::Immolate));
+    s.perform_user_action(DebugBattleAction::AddCardToVoid {
+        player: PlayerName::Two,
+        card: CardName::MinstrelOfFallingLight,
+    });
+    s.perform_user_action(DebugBattleAction::AddCardToVoid {
+        player: PlayerName::Two,
+        card: CardName::Immolate,
+    });
 
     assert_eq!(s.user_client.cards.enemy_void().len(), 2, "enemy void should have 2 cards");
     assert_eq!(
@@ -65,11 +71,14 @@ fn browse_enemy_void_moves_cards_to_browser() {
 fn close_card_browser_returns_cards_to_void() {
     let mut s = TestBattle::builder().connect();
 
-    s.perform_user_action(DebugBattleAction::AddCardToVoid(
-        PlayerName::One,
-        CardName::MinstrelOfFallingLight,
-    ));
-    s.perform_user_action(DebugBattleAction::AddCardToVoid(PlayerName::One, CardName::Immolate));
+    s.perform_user_action(DebugBattleAction::AddCardToVoid {
+        player: PlayerName::One,
+        card: CardName::MinstrelOfFallingLight,
+    });
+    s.perform_user_action(DebugBattleAction::AddCardToVoid {
+        player: PlayerName::One,
+        card: CardName::Immolate,
+    });
 
     s.perform_user_action(BattleDisplayAction::BrowseCards(CardBrowserType::UserVoid));
 
@@ -179,10 +188,10 @@ fn close_browser_returns_deck_cards() {
 fn browse_multiple_sources_sequentially() {
     let mut s = TestBattle::builder().connect();
 
-    s.perform_user_action(DebugBattleAction::AddCardToVoid(
-        PlayerName::One,
-        CardName::MinstrelOfFallingLight,
-    ));
+    s.perform_user_action(DebugBattleAction::AddCardToVoid {
+        player: PlayerName::One,
+        card: CardName::MinstrelOfFallingLight,
+    });
 
     s.perform_user_action(BattleDisplayAction::BrowseCards(CardBrowserType::UserVoid));
 

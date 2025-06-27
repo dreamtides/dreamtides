@@ -71,7 +71,10 @@ fn character_limit_exceeded_abandons_character() {
 fn draw_more_cards_than_deck_size_replenishes_deck() {
     let mut s = TestBattle::builder().connect();
 
-    s.perform_user_action(DebugBattleAction::SetCardsRemainingInDeck(PlayerName::One, 2));
+    s.perform_user_action(DebugBattleAction::SetCardsRemainingInDeck {
+        player: PlayerName::One,
+        cards: 2,
+    });
     let deck_size_before = s.user_client.cards.user_deck().len();
     assert_eq!(deck_size_before, 2, "User deck should have 2 cards");
     let initial_hand_size = s.user_client.cards.user_hand().len();

@@ -157,10 +157,10 @@ impl TestSessionBattleExtension for TestSession {
 
         self.perform_player_action(
             player,
-            GameAction::BattleAction(BattleAction::Debug(DebugBattleAction::AddCardToHand(
-                self.to_player_name(player),
+            GameAction::BattleAction(BattleAction::Debug(DebugBattleAction::AddCardToHand {
+                player: self.to_player_name(player),
                 card,
-            ))),
+            })),
         );
 
         self.client(player)
@@ -178,10 +178,10 @@ impl TestSessionBattleExtension for TestSession {
 
         self.perform_player_action(
             player,
-            BattleAction::Debug(DebugBattleAction::AddCardToBattlefield(
-                self.to_player_name(player),
+            BattleAction::Debug(DebugBattleAction::AddCardToBattlefield {
+                player: self.to_player_name(player),
                 card,
-            )),
+            }),
         );
 
         self.client(player)
@@ -201,10 +201,9 @@ impl TestSessionBattleExtension for TestSession {
 
         self.perform_player_action(player, GameAction::BattleAction(BattleAction::EndTurn));
 
-        self.perform_player_action(
-            player,
-            DebugBattleAction::MoveHandToDeck(self.to_player_name(opponent)),
-        );
+        self.perform_player_action(player, DebugBattleAction::MoveHandToDeck {
+            player: self.to_player_name(opponent),
+        });
     }
 
     fn click_primary_button(&mut self, player: DisplayPlayer, containing: impl Into<String>) {

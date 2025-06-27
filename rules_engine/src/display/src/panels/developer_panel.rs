@@ -56,18 +56,18 @@ impl Component for DeveloperPanel {
                         .child(
                             DebugButton::builder()
                                 .label("Draw Card")
-                                .action(BattleAction::Debug(DebugBattleAction::DrawCard(
-                                    self.user_player,
-                                )))
+                                .action(BattleAction::Debug(DebugBattleAction::DrawCard {
+                                    player: self.user_player,
+                                }))
                                 .build(),
                         )
                         .child(
                             DebugButton::builder()
                                 .label(format!("99 {}", icon::ENERGY))
-                                .action(BattleAction::Debug(DebugBattleAction::SetEnergy(
-                                    self.user_player,
-                                    Energy(99),
-                                )))
+                                .action(BattleAction::Debug(DebugBattleAction::SetEnergy {
+                                    player: self.user_player,
+                                    energy: Energy(99),
+                                }))
                                 .build(),
                         )
                         .child(
@@ -88,7 +88,10 @@ impl Component for DeveloperPanel {
                             DebugButton::builder()
                                 .label("Deck->1")
                                 .action(BattleAction::Debug(
-                                    DebugBattleAction::SetCardsRemainingInDeck(self.user_player, 1),
+                                    DebugBattleAction::SetCardsRemainingInDeck {
+                                        player: self.user_player,
+                                        cards: 1,
+                                    },
                                 ))
                                 .build(),
                         )

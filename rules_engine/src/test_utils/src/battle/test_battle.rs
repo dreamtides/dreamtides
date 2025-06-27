@@ -90,29 +90,29 @@ impl TestBattle {
     }
 
     fn move_all_hands_to_deck(&mut self) {
-        self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::MoveHandToDeck(
-            PlayerName::One,
-        )));
-        self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::MoveHandToDeck(
-            PlayerName::Two,
-        )));
+        self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::MoveHandToDeck {
+            player: PlayerName::One,
+        }));
+        self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::MoveHandToDeck {
+            player: PlayerName::Two,
+        }));
     }
 
     fn apply_player_configuration(&mut self, player: PlayerName, config: &TestPlayer) {
-        self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::SetPoints(
+        self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::SetPoints {
             player,
-            config.points,
-        )));
-        self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::SetEnergy(
+            points: config.points,
+        }));
+        self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::SetEnergy {
             player,
-            config.energy,
-        )));
+            energy: config.energy,
+        }));
         self.session.perform_user_action(BattleAction::Debug(
-            DebugBattleAction::SetProducedEnergy(player, config.produced_energy),
+            DebugBattleAction::SetProducedEnergy { player, energy: config.produced_energy },
         ));
-        self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::SetSparkBonus(
+        self.session.perform_user_action(BattleAction::Debug(DebugBattleAction::SetSparkBonus {
             player,
-            config.spark_bonus,
-        )));
+            spark: config.spark_bonus,
+        }));
     }
 }

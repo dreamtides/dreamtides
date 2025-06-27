@@ -10,24 +10,24 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "camelCase")]
 pub enum DebugBattleAction {
     /// Draw a card
-    DrawCard(PlayerName),
+    DrawCard { player: PlayerName },
     /// Set the energy of the player
-    SetEnergy(PlayerName, Energy),
+    SetEnergy { player: PlayerName, energy: Energy },
     /// Set the points total of the player
-    SetPoints(PlayerName, Points),
+    SetPoints { player: PlayerName, points: Points },
     /// Set the produced energy of the player
-    SetProducedEnergy(PlayerName, Energy),
+    SetProducedEnergy { player: PlayerName, energy: Energy },
     /// Set the spark bonus of the player
-    SetSparkBonus(PlayerName, Spark),
+    SetSparkBonus { player: PlayerName, spark: Spark },
     /// Add a specific card to hand
-    AddCardToHand(PlayerName, CardName),
+    AddCardToHand { player: PlayerName, card: CardName },
     /// Add a specific card to battlefield
-    AddCardToBattlefield(PlayerName, CardName),
+    AddCardToBattlefield { player: PlayerName, card: CardName },
     /// Add a specific card to void
-    AddCardToVoid(PlayerName, CardName),
+    AddCardToVoid { player: PlayerName, card: CardName },
     /// Move all cards from hand to deck
-    MoveHandToDeck(PlayerName),
+    MoveHandToDeck { player: PlayerName },
     /// Set the number of cards remaining in a player's deck. All other cards
     /// are moved to the void.
-    SetCardsRemainingInDeck(PlayerName, usize),
+    SetCardsRemainingInDeck { player: PlayerName, cards: usize },
 }

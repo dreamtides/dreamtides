@@ -86,18 +86,18 @@ namespace Dreamtides.Tests
     {
       var name = player switch
       {
-        DisplayPlayer.User => Name.MinstrelOfFallingLight,
-        DisplayPlayer.Enemy => Name.MinstrelOfFallingLight,
+        DisplayPlayer.User => PlayerName.One,
+        DisplayPlayer.Enemy => PlayerName.Two,
         _ => throw new IndexOutOfRangeException("Invalid player")
       };
 
       return new DebugBattleAction
       {
-        AddCardToHand = new List<Name>
-          {
-            name,
-            Name.MinstrelOfFallingLight,
-          }
+        AddCardToHand = new AddCardToHand
+        {
+          Card = CardName.MinstrelOfFallingLight,
+          Player = name,
+        }
       };
     }
 
@@ -115,18 +115,18 @@ namespace Dreamtides.Tests
     {
       var name = player switch
       {
-        DisplayPlayer.User => Name.MinstrelOfFallingLight,
-        DisplayPlayer.Enemy => Name.MinstrelOfFallingLight,
+        DisplayPlayer.User => PlayerName.One,
+        DisplayPlayer.Enemy => PlayerName.Two,
         _ => throw new IndexOutOfRangeException("Invalid player")
       };
 
       return new DebugBattleAction
       {
-        AddCardToBattlefield = new List<Name>
-          {
-            name,
-            Name.MinstrelOfFallingLight,
-          }
+        AddCardToBattlefield = new AddCardToBattlefield
+        {
+          Card = CardName.MinstrelOfFallingLight,
+          Player = name,
+        }
       };
     }
 
@@ -144,18 +144,18 @@ namespace Dreamtides.Tests
     {
       var name = player switch
       {
-        DisplayPlayer.User => Name.MinstrelOfFallingLight,
-        DisplayPlayer.Enemy => Name.MinstrelOfFallingLight,
+        DisplayPlayer.User => PlayerName.One,
+        DisplayPlayer.Enemy => PlayerName.Two,
         _ => throw new IndexOutOfRangeException("Invalid player")
       };
 
       return new DebugBattleAction
       {
-        AddCardToVoid = new List<Name>
-          {
-            name,
-            Name.MinstrelOfFallingLight,
-          }
+        AddCardToVoid = new AddCardToVoid
+        {
+          Card = CardName.MinstrelOfFallingLight,
+          Player = name,
+        }
       };
     }
   }

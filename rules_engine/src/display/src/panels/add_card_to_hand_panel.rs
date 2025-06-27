@@ -129,10 +129,10 @@ impl Component for AddCardCell {
                 .child(
                     ButtonComponent::builder()
                         .label("Add")
-                        .action(BattleAction::Debug(DebugBattleAction::AddCardToHand(
-                            self.user_player,
-                            self.card,
-                        )))
+                        .action(BattleAction::Debug(DebugBattleAction::AddCardToHand {
+                            player: self.user_player,
+                            card: self.card,
+                        }))
                         .build(),
                 )
                 .build(),

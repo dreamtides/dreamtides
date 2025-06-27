@@ -877,34 +877,118 @@ namespace Dreamtides.Schema
     public partial class DebugBattleAction
     {
         [JsonProperty("drawCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? DrawCard { get; set; }
+        public DrawCard DrawCard { get; set; }
 
         [JsonProperty("setEnergy", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<Set> SetEnergy { get; set; }
+        public SetEnergy SetEnergy { get; set; }
 
         [JsonProperty("setPoints", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<Set> SetPoints { get; set; }
+        public SetPoints SetPoints { get; set; }
 
         [JsonProperty("setProducedEnergy", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<Set> SetProducedEnergy { get; set; }
+        public SetProducedEnergy SetProducedEnergy { get; set; }
 
         [JsonProperty("setSparkBonus", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<Set> SetSparkBonus { get; set; }
+        public SetSparkBonus SetSparkBonus { get; set; }
 
         [JsonProperty("addCardToHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<Name> AddCardToHand { get; set; }
+        public AddCardToHand AddCardToHand { get; set; }
 
         [JsonProperty("addCardToBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<Name> AddCardToBattlefield { get; set; }
+        public AddCardToBattlefield AddCardToBattlefield { get; set; }
 
         [JsonProperty("addCardToVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<Name> AddCardToVoid { get; set; }
+        public AddCardToVoid AddCardToVoid { get; set; }
 
         [JsonProperty("moveHandToDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public PlayerName? MoveHandToDeck { get; set; }
+        public MoveHandToDeck MoveHandToDeck { get; set; }
 
         [JsonProperty("setCardsRemainingInDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<Set> SetCardsRemainingInDeck { get; set; }
+        public SetCardsRemainingInDeck SetCardsRemainingInDeck { get; set; }
+    }
+
+    public partial class AddCardToBattlefield
+    {
+        [JsonProperty("card", Required = Required.Always)]
+        public CardName Card { get; set; }
+
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+    }
+
+    public partial class AddCardToHand
+    {
+        [JsonProperty("card", Required = Required.Always)]
+        public CardName Card { get; set; }
+
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+    }
+
+    public partial class AddCardToVoid
+    {
+        [JsonProperty("card", Required = Required.Always)]
+        public CardName Card { get; set; }
+
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+    }
+
+    public partial class DrawCard
+    {
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+    }
+
+    public partial class MoveHandToDeck
+    {
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+    }
+
+    public partial class SetCardsRemainingInDeck
+    {
+        [JsonProperty("cards", Required = Required.Always)]
+        public long Cards { get; set; }
+
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+    }
+
+    public partial class SetEnergy
+    {
+        [JsonProperty("energy", Required = Required.Always)]
+        public long Energy { get; set; }
+
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+    }
+
+    public partial class SetPoints
+    {
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+
+        [JsonProperty("points", Required = Required.Always)]
+        public long Points { get; set; }
+    }
+
+    public partial class SetProducedEnergy
+    {
+        [JsonProperty("energy", Required = Required.Always)]
+        public long Energy { get; set; }
+
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+    }
+
+    public partial class SetSparkBonus
+    {
+        [JsonProperty("player", Required = Required.Always)]
+        public PlayerName Player { get; set; }
+
+        [JsonProperty("spark", Required = Required.Always)]
+        public long Spark { get; set; }
     }
 
     public partial class SelectCardOrder
@@ -2126,10 +2210,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitMulligan, ToggleOrderSelectorVisibility };
 
-    /// <summary>
-    /// Identifies a player in an ongoing battle.
-    /// </summary>
-    public enum Name { Abolish, Dreamscatter, Immolate, MinstrelOfFallingLight, One, RippleOfDefiance, Two };
+    public enum CardName { Abolish, Dreamscatter, Immolate, MinstrelOfFallingLight, RippleOfDefiance };
 
     /// <summary>
     /// Identifies a player in an ongoing battle.
@@ -2224,15 +2305,6 @@ namespace Dreamtides.Schema
 
         public static implicit operator Position(PositionEnum Enum) => new Position { Enum = Enum };
         public static implicit operator Position(PositionClass PositionClass) => new Position { PositionClass = PositionClass };
-    }
-
-    public partial struct Set
-    {
-        public PlayerName? Enum;
-        public long? Integer;
-
-        public static implicit operator Set(PlayerName Enum) => new Set { Enum = Enum };
-        public static implicit operator Set(long Integer) => new Set { Integer = Integer };
     }
 
     /// <summary>
@@ -2347,9 +2419,8 @@ namespace Dreamtides.Schema
                 CardPrefabConverter.Singleton,
                 ActionUnionConverter.Singleton,
                 BattleActionConverter.Singleton,
-                NameConverter.Singleton,
+                CardNameConverter.Singleton,
                 PlayerNameConverter.Singleton,
-                SetConverter.Singleton,
                 BattleActionEnumConverter.Singleton,
                 BattleDisplayActionConverter.Singleton,
                 CardBrowserTypeConverter.Singleton,
@@ -3182,9 +3253,9 @@ namespace Dreamtides.Schema
         public static readonly BattleActionConverter Singleton = new BattleActionConverter();
     }
 
-    internal class NameConverter : JsonConverter
+    internal class CardNameConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(Name) || t == typeof(Name?);
+        public override bool CanConvert(Type t) => t == typeof(CardName) || t == typeof(CardName?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -3193,21 +3264,17 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case "Abolish":
-                    return Name.Abolish;
+                    return CardName.Abolish;
                 case "Dreamscatter":
-                    return Name.Dreamscatter;
+                    return CardName.Dreamscatter;
                 case "Immolate":
-                    return Name.Immolate;
+                    return CardName.Immolate;
                 case "MinstrelOfFallingLight":
-                    return Name.MinstrelOfFallingLight;
+                    return CardName.MinstrelOfFallingLight;
                 case "RippleOfDefiance":
-                    return Name.RippleOfDefiance;
-                case "one":
-                    return Name.One;
-                case "two":
-                    return Name.Two;
+                    return CardName.RippleOfDefiance;
             }
-            throw new Exception("Cannot unmarshal type Name");
+            throw new Exception("Cannot unmarshal type CardName");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -3217,35 +3284,29 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (Name)untypedValue;
+            var value = (CardName)untypedValue;
             switch (value)
             {
-                case Name.Abolish:
+                case CardName.Abolish:
                     serializer.Serialize(writer, "Abolish");
                     return;
-                case Name.Dreamscatter:
+                case CardName.Dreamscatter:
                     serializer.Serialize(writer, "Dreamscatter");
                     return;
-                case Name.Immolate:
+                case CardName.Immolate:
                     serializer.Serialize(writer, "Immolate");
                     return;
-                case Name.MinstrelOfFallingLight:
+                case CardName.MinstrelOfFallingLight:
                     serializer.Serialize(writer, "MinstrelOfFallingLight");
                     return;
-                case Name.RippleOfDefiance:
+                case CardName.RippleOfDefiance:
                     serializer.Serialize(writer, "RippleOfDefiance");
                     return;
-                case Name.One:
-                    serializer.Serialize(writer, "one");
-                    return;
-                case Name.Two:
-                    serializer.Serialize(writer, "two");
-                    return;
             }
-            throw new Exception("Cannot marshal type Name");
+            throw new Exception("Cannot marshal type CardName");
         }
 
-        public static readonly NameConverter Singleton = new NameConverter();
+        public static readonly CardNameConverter Singleton = new CardNameConverter();
     }
 
     internal class PlayerNameConverter : JsonConverter
@@ -3287,58 +3348,6 @@ namespace Dreamtides.Schema
         }
 
         public static readonly PlayerNameConverter Singleton = new PlayerNameConverter();
-    }
-
-    internal class SetConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(Set) || t == typeof(Set?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            switch (reader.TokenType)
-            {
-                case JsonToken.Integer:
-                    var integerValue = serializer.Deserialize<long>(reader);
-                    return new Set { Integer = integerValue };
-                case JsonToken.String:
-                case JsonToken.Date:
-                    var stringValue = serializer.Deserialize<string>(reader);
-                    switch (stringValue)
-                    {
-                        case "one":
-                            return new Set { Enum = PlayerName.One };
-                        case "two":
-                            return new Set { Enum = PlayerName.Two };
-                    }
-                    break;
-            }
-            throw new Exception("Cannot unmarshal type Set");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            var value = (Set)untypedValue;
-            if (value.Integer != null)
-            {
-                serializer.Serialize(writer, value.Integer.Value);
-                return;
-            }
-            if (value.Enum != null)
-            {
-                switch (value.Enum)
-                {
-                    case PlayerName.One:
-                        serializer.Serialize(writer, "one");
-                        return;
-                    case PlayerName.Two:
-                        serializer.Serialize(writer, "two");
-                        return;
-                }
-            }
-            throw new Exception("Cannot marshal type Set");
-        }
-
-        public static readonly SetConverter Singleton = new SetConverter();
     }
 
     internal class BattleActionEnumConverter : JsonConverter

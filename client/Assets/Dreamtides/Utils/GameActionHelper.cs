@@ -123,22 +123,7 @@ namespace Dreamtides.Utils
 
         private static string GetDebugBattleActionName(DebugBattleAction debugBattleAction)
         {
-            if (debugBattleAction.DrawCard.HasValue)
-            {
-                return "DrawCard";
-            }
-
-            if (debugBattleAction.SetEnergy != null && debugBattleAction.SetEnergy.Count > 0)
-            {
-                return "SetEnergy";
-            }
-
-            if (debugBattleAction.AddCardToHand != null && debugBattleAction.AddCardToHand.Count > 0)
-            {
-                return "AddCardToHand";
-            }
-
-            return "UnknownDebugBattleAction";
+            return "DebugBattleAction";
         }
 
         private static string GetBattleDisplayActionName(BattleDisplayAction battleDisplayAction)
