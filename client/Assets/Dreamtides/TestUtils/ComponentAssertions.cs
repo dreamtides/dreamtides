@@ -8,7 +8,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Dreamtides.Tests
+namespace Dreamtides.TestUtils
 {
   public static class ComponentAssertions
   {

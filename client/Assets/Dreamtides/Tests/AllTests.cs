@@ -7,6 +7,7 @@ using Dreamtides.Components;
 using Dreamtides.UnityInternal;
 using UnityEngine;
 using System.Linq;
+using Dreamtides.TestUtils;
 
 namespace Dreamtides.Tests
 {

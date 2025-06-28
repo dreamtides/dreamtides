@@ -1,5 +1,5 @@
 {
-    "name": "Dreamtides.Tests",
+    "name": "Dreamtides.TestUtils",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
@@ -7,8 +7,7 @@
         "UnityEditor.TestRunner",
         "Dreamtides",
         "DreamtidesEditor",
-        "Unity.InternalAPIEditorBridge.020",
-        "Dreamtides.TestUtils"
+        "Unity.InternalAPIEditorBridge.020"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

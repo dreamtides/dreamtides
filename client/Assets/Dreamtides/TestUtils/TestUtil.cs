@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 
-namespace Dreamtides.Tests
+namespace Dreamtides.TestUtils
 {
   public static class TestUtil
   {

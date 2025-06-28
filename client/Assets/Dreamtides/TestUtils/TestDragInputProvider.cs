@@ -5,7 +5,7 @@ using Dreamtides.Layout;
 using Dreamtides.Services;
 using UnityEngine;
 
-namespace Dreamtides.Tests
+namespace Dreamtides.TestUtils
 {
   public class TestDragInputProvider : IInputProvider
   {

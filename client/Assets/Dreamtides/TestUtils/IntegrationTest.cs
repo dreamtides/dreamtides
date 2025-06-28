@@ -16,7 +16,7 @@ using System.Runtime.CompilerServices;
 
 #nullable enable
 
-namespace Dreamtides.Tests
+namespace Dreamtides.TestUtils
 {
   public abstract class IntegrationTest
   {

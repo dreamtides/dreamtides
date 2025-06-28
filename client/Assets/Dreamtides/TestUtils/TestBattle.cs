@@ -2,7 +2,7 @@ using Dreamtides.Schema;
 using System.Collections.Generic;
 using System;
 
-namespace Dreamtides.Tests
+namespace Dreamtides.TestUtils
 {
   /// <summary>
   /// A builder with helper methods for adding cards to a test battle.
