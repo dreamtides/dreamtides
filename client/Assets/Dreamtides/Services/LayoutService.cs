@@ -25,6 +25,10 @@ namespace Dreamtides.Services
 
     Dictionary<string, Card> Cards { get; } = new();
 
+    public Card GetCard(string id) => Errors.CheckNotNull(Cards[id]);
+
+    public IEnumerable<string> GetCardIds() => Cards.Keys;
+
     public IEnumerator UpdateLayout(UpdateBattleCommand command, Sequence? sequence = null)
     {
       var view = command.Battle;
@@ -94,8 +98,6 @@ namespace Dreamtides.Services
         yield return sequence.WaitForCompletion();
       }
     }
-
-    public Card GetCard(string id) => Errors.CheckNotNull(Cards[id]);
 
     /// <summary>
     /// Returns the game object for the given game object id.

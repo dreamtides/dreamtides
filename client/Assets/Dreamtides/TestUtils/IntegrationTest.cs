@@ -24,6 +24,9 @@ namespace Dreamtides.TestUtils
     Registry? _registry;
     protected Registry Registry => Errors.CheckNotNull(_registry);
 
+    string? _cardId;
+    protected string CurrentCardId => Errors.CheckNotNull(_cardId, "CardId not set");
+
     protected IEnumerator Connect(
       [CallerMemberName] string? testName = null,
       GameViewResolution resolution = GameViewResolution.Resolution16x9)
@@ -54,12 +57,44 @@ namespace Dreamtides.TestUtils
       yield return Registry.TestHelperService.WaitForIdle();
     }
 
+    /// <summary>
+    /// Performs an action that adds a new card to the battle and populates its
+    /// ID in the "CurrentCardId" field.
+    /// </summary>
+    /// <remarks>
+    /// This operates by storing the current set of CardIds owned by the
+    /// LayoutService before performing the action, and then identifying the
+    /// newly added item. Throws an exception if no new card is found after
+    /// performing the action or if more than one new card is found.
+    /// </remarks>
+    protected IEnumerator PerformAddCardAction(GameAction action)
+    {
+      var existingCardIds = Registry.LayoutService.GetCardIds().ToHashSet();
+      yield return PerformAction(action);
+      var newCardIds = Registry.LayoutService.GetCardIds().Except(existingCardIds).ToList();
+
+      if (newCardIds.Count == 0)
+      {
+        throw new InvalidOperationException("No new card was added after performing the action");
+      }
+
+      if (newCardIds.Count > 1)
+      {
+        throw new InvalidOperationException("Multiple new cards were added after performing the action :" +
+            $"{string.Join(", ", newCardIds)}");
+      }
+
+      _cardId = newCardIds[0];
+    }
+
     protected IEnumerator EndTest()
     {
       Registry.TestConfiguration = null;
       yield return Registry.TestHelperService.WaitForIdle();
       yield return new WaitForSeconds(0.5f);
     }
+
+    protected IEnumerator WaitForIdle() => Registry.TestHelperService.WaitForIdle();
 
     protected IEnumerator WaitForCount(ObjectLayout layout, int count)
     {

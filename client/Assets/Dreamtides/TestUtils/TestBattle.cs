@@ -75,7 +75,7 @@ namespace Dreamtides.TestUtils
       return this;
     }
 
-    public TestBattle AddCardToHand(DisplayPlayer player)
+    public TestBattle AddCardToHand(DisplayPlayer player, CardName cardName = CardName.MinstrelOfFallingLight)
     {
       var name = player switch
       {
