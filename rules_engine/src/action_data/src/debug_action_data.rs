@@ -1,4 +1,5 @@
 use ai_data::game_ai::GameAI;
+use battle_state::actions::battle_actions::BattleAction;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -13,6 +14,7 @@ pub enum DebugAction {
     RestartBattle,
     SetOpponentAgent(GameAI),
     ApplyActionList(Vec<DebugBattleAction>),
+    PerformOpponentAction(BattleAction),
 }
 
 impl From<DebugAction> for GameAction {

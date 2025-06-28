@@ -1,9 +1,7 @@
 using System.Collections;
 using NUnit.Framework;
-using UnityEngine.TestTools;
 using Dreamtides.Services;
 using Dreamtides.Utils;
-using Dreamtides.Components;
 using Dreamtides.UnityInternal;
 using UnityEngine;
 using System.Linq;
@@ -170,7 +168,6 @@ namespace Dreamtides.TestUtils
 
     protected void AssertSpriteIsOnScreen(SpriteRenderer sprite, string message)
     {
-      // Assert.That(sprite.isVisible, $"{message}: Sprite is not visible");
       var bounds = sprite.bounds;
       var corners = new Vector3[4]
       {
@@ -196,6 +193,12 @@ namespace Dreamtides.TestUtils
       var textElements = root.Query<TextElement>().ToList();
       var found = textElements.Any(element => element.text.Contains(text));
       Assert.That(found, Is.True, $"{message}: Text '{text}' not found in any text elements");
+    }
+
+    protected void AssertPrimaryButtonContainsText(string text)
+    {
+      var primaryButton = Registry.Layout.PrimaryActionButton;
+      Assert.That(primaryButton._text.text, Is.EqualTo(text), $"Primary button text is not '{text}'");
     }
 
     protected BoxCollider GetBoxCollider(Component component)

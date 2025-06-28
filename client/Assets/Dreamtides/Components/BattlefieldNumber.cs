@@ -1,19 +1,21 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
 using Dreamtides.Components;
 using Dreamtides.Utils;
 using TMPro;
 using UnityEngine;
 
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 namespace Dreamtides
 {
   public class BattlefieldNumber : MonoBehaviour
   {
-    [SerializeField] TextMeshPro _text = null!;
-    [SerializeField] TimedEffect _onChange = null!;
-    [SerializeField] string? _originalText;
-    [SerializeField] Color _originalColor = Color.white;
-    [SerializeField] bool _activePreview;
+    [SerializeField] internal TextMeshPro _text = null!;
+    [SerializeField] internal TimedEffect _onChange = null!;
+    [SerializeField] internal string? _originalText;
+    [SerializeField] internal Color _originalColor = Color.white;
+    [SerializeField] internal bool _activePreview;
 
     void Start()
     {

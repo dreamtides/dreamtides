@@ -31,6 +31,7 @@ namespace Dreamtides.Tests
         .AddCardsToBattlefield(DisplayPlayer.User, 7)
         .Build()
       );
+
       yield return PerformAddCardAction(TestBattle.New()
         .AddCardToHand(DisplayPlayer.User, CardName.MinstrelOfFallingLight)
         .Build()
@@ -64,6 +65,7 @@ namespace Dreamtides.Tests
         .AddCardsToBattlefield(DisplayPlayer.Enemy, 8)
         .Build()
       );
+
       yield return PerformAddCardAction(TestBattle.New()
         .AddCardToHand(DisplayPlayer.User, CardName.Immolate)
         .Build()

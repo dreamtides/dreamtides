@@ -8,7 +8,8 @@
         "Dreamtides",
         "DreamtidesEditor",
         "Unity.InternalAPIEditorBridge.020",
-        "Dreamtides.TestUtils"
+        "Dreamtides.TestUtils",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

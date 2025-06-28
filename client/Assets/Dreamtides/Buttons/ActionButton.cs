@@ -7,20 +7,22 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using Dreamtides.Schema;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("Dreamtides.TestUtils")]
 namespace Dreamtides.Buttons
 {
   public sealed class ActionButton : Displayable
   {
-    [SerializeField] Registry _registry = null!;
-    [SerializeField] SpriteRenderer _background = null!;
-    [SerializeField] TextMeshPro _text = null!;
-    [SerializeField] Material _onPressedMaterial = null!;
-    [SerializeField] float _animationDuration = 0.1f;
-    [SerializeField] float _moveDistance = 1f;
-    [SerializeField] AudioClip _onClickSound = null!;
-    [SerializeField] float _fadeDuration = 0.1f;
-    [SerializeField] Collider _collider = null!;
+    [SerializeField] internal Registry _registry = null!;
+    [SerializeField] internal SpriteRenderer _background = null!;
+    [SerializeField] internal TextMeshPro _text = null!;
+    [SerializeField] internal Material _onPressedMaterial = null!;
+    [SerializeField] internal float _animationDuration = 0.1f;
+    [SerializeField] internal float _moveDistance = 1f;
+    [SerializeField] internal AudioClip _onClickSound = null!;
+    [SerializeField] internal float _fadeDuration = 0.1f;
+    [SerializeField] internal Collider _collider = null!;
 
     Vector3 _originalPosition;
     Color _originalColor;

@@ -40,5 +40,8 @@ pub fn execute(
                 }
             });
         }
+        DebugAction::PerformOpponentAction(action) => {
+            apply_battle_action::execute(battle, user_player.opponent(), action);
+        }
     }
 }

@@ -95,16 +95,19 @@ namespace Dreamtides.TestUtils
       return this;
     }
 
-    public TestBattle AddCardsToBattlefield(DisplayPlayer player, int count)
+    public TestBattle AddCardsToBattlefield(
+      DisplayPlayer player,
+      int count,
+      CardName cardName = CardName.MinstrelOfFallingLight)
     {
       for (var i = 0; i < count; i++)
       {
-        AddCardToBattlefield(player);
+        AddCardToBattlefield(player, cardName);
       }
       return this;
     }
 
-    public TestBattle AddCardToBattlefield(DisplayPlayer player)
+    public TestBattle AddCardToBattlefield(DisplayPlayer player, CardName cardName = CardName.MinstrelOfFallingLight)
     {
       var name = player switch
       {
@@ -117,7 +120,7 @@ namespace Dreamtides.TestUtils
       {
         AddCardToBattlefield = new AddCardToBattlefield
         {
-          Card = CardName.MinstrelOfFallingLight,
+          Card = cardName,
           Player = name,
         }
       });
