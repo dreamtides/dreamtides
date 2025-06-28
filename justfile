@@ -228,16 +228,16 @@ pull:
 coverage:
     cargo tarpaulin --manifest-path rules_engine/Cargo.toml --out Html
 
-rsync-review:
-    rsync --delete --stats --copy-links -avqr ./rules_engine ~/dreamtides_tests/
+rsync-for-review:
+    rsync --delete --stats --copy-links -avqr --exclude='rules_engine/target' ./rules_engine ~/dreamtides_tests/
     echo $'\a'
-    rsync --delete --stats --copy-links -avqr ./client ~/dreamtides_tests/
+    rsync --delete --stats --copy-links -avqr --exclude='client/Library' --exclude='client/Assets/ThirdParty' ./client ~/dreamtides_tests/
     echo $'\a'
     cp justfile ~/dreamtides_tests/
     echo $'\a'
 
-code-review-rsync: rsync-review
+code-review-rsync: rsync-for-review
     cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; exit 1)
 
-unity-test-rsync: rsync-review
+unity-test-rsync: rsync-for-review
     cd ~/dreamtides_tests && just unity-tests
