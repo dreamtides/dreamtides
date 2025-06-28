@@ -231,7 +231,7 @@ coverage:
 rsync-for-review:
     rsync --delete --stats --copy-links -avqr --exclude='rules_engine/target' ./rules_engine ~/dreamtides_tests/
     echo $'\a'
-    rsync --delete --stats --copy-links -avqr --exclude='client/Library' --exclude='client/Assets/ThirdParty' ./client ~/dreamtides_tests/
+    rsync --delete --stats --copy-links -avqr --exclude='client/Library' --exclude='client/test_output' --exclude='client/Assets/ThirdParty' ./client ~/dreamtides_tests/
     echo $'\a'
     cp justfile ~/dreamtides_tests/
     echo $'\a'
