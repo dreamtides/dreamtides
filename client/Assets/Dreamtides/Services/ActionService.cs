@@ -27,6 +27,7 @@ namespace Dreamtides.Services
     Metadata? _metadata;
     string? _testScenario;
     Guid? _integrationTestId;
+    Guid? _integrationTestEnemyId;
     Queue<CommandBatch> _commandQueue = new Queue<CommandBatch>();
     bool _isProcessingCommands = false;
     Dictionary<Guid, float> _requestStartTimes = new Dictionary<Guid, float>();
@@ -48,6 +49,7 @@ namespace Dreamtides.Services
       Connected = false;
       _testScenario = testConfiguration?.TestScenario;
       _integrationTestId = testConfiguration?.IntegrationTestId;
+      _integrationTestEnemyId = Guid.NewGuid();
       StartCoroutine(InitializeAsync());
     }
 
@@ -59,13 +61,7 @@ namespace Dreamtides.Services
         UserId = _userGuid,
         IntegrationTestId = _integrationTestId,
       };
-      var request = new ConnectRequest
-      {
-        Metadata = _metadata,
-        PersistentDataPath = Application.persistentDataPath,
-        TestScenario = _testScenario,
-        DisplayProperties = GetDisplayProperties()
-      };
+      var request = CreateConnectRequest();
       Registry.LoggingService.StartSpan(LogSpanName.Connect);
 
       if (UseDevServer)
@@ -93,12 +89,7 @@ namespace Dreamtides.Services
         var now = Time.time;
         if (now - _lastConnectAttemptTime > 0.5f)
         {
-          StartCoroutine(DevServerConnectAsync(new ConnectRequest
-          {
-            Metadata = _metadata!,
-            PersistentDataPath = Application.persistentDataPath,
-            DisplayProperties = GetDisplayProperties()
-          }, reconnect: true));
+          StartCoroutine(DevServerConnectAsync(CreateConnectRequest(isReconnect: true), reconnect: true));
           _lastConnectAttemptTime = now;
         }
       }
@@ -213,6 +204,25 @@ namespace Dreamtides.Services
       ScreenHeight = Screen.height,
       ScreenWidth = Screen.width
     };
+
+    private ConnectRequest CreateConnectRequest(bool isReconnect = false)
+    {
+      return new ConnectRequest
+      {
+        Metadata = Errors.CheckNotNull(_metadata),
+        PersistentDataPath = Application.persistentDataPath,
+        TestScenario = isReconnect ? null : _testScenario,
+        DisplayProperties = GetDisplayProperties(),
+        DebugConfiguration = _integrationTestEnemyId == null ? null : new DebugConfiguration
+        {
+          Enemy = new PlayerType
+          {
+            User = _integrationTestEnemyId,
+          },
+          Seed = 1234567890,
+        }
+      };
+    }
 
     private IEnumerator HandlePollResponse(PollResponse response)
     {
