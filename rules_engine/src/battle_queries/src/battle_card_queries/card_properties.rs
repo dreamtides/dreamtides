@@ -15,6 +15,7 @@ pub fn display_name(card_name: CardName) -> String {
         CardName::RippleOfDefiance => "Ripple of Defiance".to_string(),
         CardName::Abolish => "Abolish".to_string(),
         CardName::Dreamscatter => "Dreamscatter".to_string(),
+        CardName::TestDrawOne => "Test Draw One".to_string(),
     }
 }
 
@@ -25,6 +26,7 @@ pub fn cost(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
         CardName::RippleOfDefiance => Some(Energy(1)),
         CardName::Abolish => Some(Energy(2)),
         CardName::Dreamscatter => Some(Energy(1)),
+        CardName::TestDrawOne => Some(Energy(0)),
     }
 }
 
@@ -51,6 +53,7 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
         CardName::RippleOfDefiance => CardType::Event,
         CardName::Abolish => CardType::Event,
         CardName::Dreamscatter => CardType::Event,
+        CardName::TestDrawOne => CardType::Event,
     }
 }
 
@@ -61,5 +64,6 @@ pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
         CardName::RippleOfDefiance => true,
         CardName::Abolish => true,
         CardName::Dreamscatter => true,
+        CardName::TestDrawOne => true,
     }
 }

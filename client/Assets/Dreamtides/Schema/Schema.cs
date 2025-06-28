@@ -1034,6 +1034,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("applyActionList", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public List<DebugBattleAction> ApplyActionList { get; set; }
+
+        [JsonProperty("performOpponentAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public BattleAction? PerformOpponentAction { get; set; }
     }
 
     /// <summary>
@@ -2210,7 +2213,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitMulligan, ToggleOrderSelectorVisibility };
 
-    public enum CardName { Abolish, Dreamscatter, Immolate, MinstrelOfFallingLight, RippleOfDefiance };
+    public enum CardName { Abolish, Dreamscatter, Immolate, MinstrelOfFallingLight, RippleOfDefiance, TestDrawOne };
 
     /// <summary>
     /// Identifies a player in an ongoing battle.
@@ -3273,6 +3276,8 @@ namespace Dreamtides.Schema
                     return CardName.MinstrelOfFallingLight;
                 case "RippleOfDefiance":
                     return CardName.RippleOfDefiance;
+                case "TestDrawOne":
+                    return CardName.TestDrawOne;
             }
             throw new Exception("Cannot unmarshal type CardName");
         }
@@ -3301,6 +3306,9 @@ namespace Dreamtides.Schema
                     return;
                 case CardName.RippleOfDefiance:
                     serializer.Serialize(writer, "RippleOfDefiance");
+                    return;
+                case CardName.TestDrawOne:
+                    serializer.Serialize(writer, "TestDrawOne");
                     return;
             }
             throw new Exception("Cannot marshal type CardName");

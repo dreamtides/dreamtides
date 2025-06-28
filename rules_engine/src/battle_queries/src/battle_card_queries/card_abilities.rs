@@ -23,6 +23,7 @@ static IMMOLATE_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 static RIPPLE_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 static ABOLISH_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 static DREAMSCATTER_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
+static TEST_DRAW_ONE_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static AbilityList {
     query_by_name(card::get(battle, card_id).name)
@@ -94,6 +95,16 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                     additional_cost_prompt: Some("Pay one or more \u{f7e4}.".to_string()),
                     ..Default::default()
                 },
+            )])
+        }),
+        CardName::TestDrawOne => TEST_DRAW_ONE_ABILITIES.get_or_init(|| {
+            build_ability_list(vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
+                }),
+                AbilityConfiguration { ..Default::default() },
             )])
         }),
     }

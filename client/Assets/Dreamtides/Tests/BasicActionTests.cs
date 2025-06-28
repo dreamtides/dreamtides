@@ -111,5 +111,25 @@ namespace Dreamtides.Tests
 
       yield return EndTest();
     }
+
+    [UnityTest]
+    public IEnumerator TestSelectCardOnStackPrevent()
+    {
+      yield return Connect();
+      yield return PerformAction(TestBattle.New().RemovePlayerHands().Build());
+
+      yield return PerformAddCardAction(TestBattle.New()
+        .AddCardToHand(DisplayPlayer.User, CardName.Abolish)
+        .Build()
+      );
+      var userPreventId = CurrentCardId;
+      yield return PerformAddCardAction(TestBattle.New()
+        .AddCardToHand(DisplayPlayer.Enemy, CardName.Dreamscatter)
+        .Build()
+      );
+      var enemyCardId = CurrentCardId;
+
+
+    }
   }
 }

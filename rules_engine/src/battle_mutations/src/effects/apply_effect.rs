@@ -39,6 +39,9 @@ fn apply_standard_effect(
 ) {
     battle_trace!("Applying effect", battle, effect, targets);
     match effect {
+        StandardEffect::DrawCards { count } => {
+            deck::draw_cards(battle, source, source.controller(), *count);
+        }
         StandardEffect::DrawCardsForEach { count, for_each } => {
             draw_cards_for_each(battle, source, *count, for_each);
         }

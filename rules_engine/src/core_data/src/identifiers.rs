@@ -54,6 +54,7 @@ pub enum CardName {
     RippleOfDefiance,
     Abolish,
     Dreamscatter,
+    TestDrawOne,
 }
 
 /// Identifies an ability of a card.

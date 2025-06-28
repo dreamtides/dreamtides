@@ -130,6 +130,9 @@ fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
         CardName::Dreamscatter => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
+        CardName::TestDrawOne => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
+        ),
     }
 }
 
@@ -160,6 +163,7 @@ fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         CardName::Dreamscatter => {
             "Pay one or more \u{f7e4}: Draw a card for each \u{f7e4} spent.".to_string()
         }
+        CardName::TestDrawOne => "Draw a card.".to_string(),
     };
 
     if card::get(battle, card_id).name == CardName::Dreamscatter

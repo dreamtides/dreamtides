@@ -93,6 +93,12 @@ impl Component for AddCardToHandPanel<'_> {
                                         .user_player(self.user_player)
                                         .build(),
                                 )
+                                .child(
+                                    AddCardCell::builder()
+                                        .card(CardName::TestDrawOne)
+                                        .user_player(self.user_player)
+                                        .build(),
+                                )
                                 .build(),
                         )
                         .build(),
