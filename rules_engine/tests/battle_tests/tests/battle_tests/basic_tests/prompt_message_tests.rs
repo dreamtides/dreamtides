@@ -11,7 +11,7 @@ fn immolate_targeting_prompt_with_multiple_targets() {
     s.create_and_play(DisplayPlayer::User, CardName::Immolate);
 
     assert!(
-        s.user_client.interface.screen_overlay_contains("Select target character"),
+        s.user_client.interface.screen_overlay_contains("Select an enemy character"),
         "Immolate should show targeting prompt when multiple enemy characters are present"
     );
 }

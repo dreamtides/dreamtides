@@ -88,7 +88,7 @@ namespace Dreamtides.TestUtils
       {
         AddCardToHand = new AddCardToHand
         {
-          Card = CardName.MinstrelOfFallingLight,
+          Card = cardName,
           Player = name,
         }
       });
