@@ -21,12 +21,13 @@ namespace Dreamtides.Services
       return false;
     }
 
-    public IEnumerator WaitForIdle()
+    public IEnumerator WaitForIdle(float timeoutSeconds)
     {
       var epsilon = 0.1f;
       var waitTime = 1.0f;
       var lastPositions = new Dictionary<MonoBehaviour, Vector3>();
       var timer = 0.0f;
+      var totalTimer = 0.0f;
       movementHistory.Clear();
 
       void TrackObjects<T>() where T : MonoBehaviour
@@ -99,6 +100,11 @@ namespace Dreamtides.Services
 
       while (timer < waitTime)
       {
+        if (totalTimer >= timeoutSeconds)
+        {
+          throw new System.TimeoutException($"WaitForIdle exceeded timeout of {timeoutSeconds} seconds");
+        }
+
         var hasMovement = false;
 
         hasMovement |= CheckMovement<Displayable>();
@@ -115,6 +121,7 @@ namespace Dreamtides.Services
           timer += Time.deltaTime;
         }
 
+        totalTimer += Time.deltaTime;
         yield return new WaitForEndOfFrame();
       }
     }

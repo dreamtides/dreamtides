@@ -19,7 +19,7 @@ namespace Dreamtides.TestUtils
       var screenPosition = registry.Layout.MainCamera.WorldToScreenPoint(target.transform.position);
       registry.InputService.InputProvider = new TestClickInputProvider(target, screenPosition);
       yield return new WaitForSeconds(0.2f);
-      yield return registry.TestHelperService.WaitForIdle();
+      yield return registry.TestHelperService.WaitForIdle(IntegrationTest.TimeoutSeconds);
     }
 
     public TestClickInputProvider(Displayable target, Vector2 screenPosition)

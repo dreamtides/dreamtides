@@ -101,7 +101,7 @@ namespace Dreamtides.Tests
         card,
         registry.Layout.DefaultStack);
       yield return new WaitUntil(() => registry.Layout.UserBattlefield.Objects.Count == 8);
-      yield return registry.TestHelperService.WaitForIdle();
+      yield return registry.TestHelperService.WaitForIdle(5.0f);
 
       ComponentAssertions.AssertCountIs(registry.Layout.UserHand, 4);
       ComponentAssertions.AssertSpriteIsOnScreen(registry,

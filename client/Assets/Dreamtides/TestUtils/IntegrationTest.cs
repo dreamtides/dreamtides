@@ -18,6 +18,8 @@ namespace Dreamtides.TestUtils
 {
   public abstract class IntegrationTest
   {
+    public const float TimeoutSeconds = 5.0f;
+
     Registry? _registry;
     protected Registry Registry => Errors.CheckNotNull(_registry);
 
@@ -37,8 +39,10 @@ namespace Dreamtides.TestUtils
       Assert.IsNotNull(registry);
       Assert.AreEqual(GameViewUtils.GetResolution(resolution), new Vector2(Screen.width, Screen.height),
           $"Resolution {resolution} not set");
-      yield return new WaitUntil(() => registry.ActionService.Connected);
-      yield return registry.TestHelperService.WaitForIdle();
+      yield return new WaitUntil(() => registry.ActionService.Connected,
+        TimeSpan.FromSeconds(TimeoutSeconds),
+        () => throw new TimeoutException("Timeout waiting for registry.ActionService.Connected"));
+      yield return registry.TestHelperService.WaitForIdle(TimeoutSeconds);
       _registry = registry;
       Debug.Log($"{testName} started successfully");
     }
@@ -50,8 +54,10 @@ namespace Dreamtides.TestUtils
     {
       var requestId = Guid.NewGuid();
       Registry.ActionService.PerformAction(action, requestId);
-      yield return new WaitUntil(() => Registry.ActionService.LastResponseReceived == requestId);
-      yield return Registry.TestHelperService.WaitForIdle();
+      yield return new WaitUntil(() => Registry.ActionService.LastResponseReceived == requestId,
+        TimeSpan.FromSeconds(TimeoutSeconds),
+        () => throw new TimeoutException("Timeout waiting for ActionService.LastResponseReceived == requestId"));
+      yield return Registry.TestHelperService.WaitForIdle(TimeoutSeconds);
     }
 
     /// <summary>
@@ -107,24 +113,25 @@ namespace Dreamtides.TestUtils
     protected IEnumerator EndTest()
     {
       Registry.TestConfiguration = null;
-      yield return Registry.TestHelperService.WaitForIdle();
+      yield return Registry.TestHelperService.WaitForIdle(TimeoutSeconds);
       yield return new WaitForSeconds(0.5f);
     }
 
-    protected IEnumerator WaitForIdle() => Registry.TestHelperService.WaitForIdle();
+    protected IEnumerator WaitForIdle() => Registry.TestHelperService.WaitForIdle(TimeoutSeconds);
 
     protected IEnumerator WaitForCount(ObjectLayout layout, int count)
     {
-      yield return new WaitUntil(() => layout.Objects.Count == count);
-      yield return Registry.TestHelperService.WaitForIdle();
+      yield return new WaitUntil(() => layout.Objects.Count == count,
+        TimeSpan.FromSeconds(TimeoutSeconds),
+        () => throw new TimeoutException($"Timeout waiting for layout.Objects.Count == {count}"));
+      yield return Registry.TestHelperService.WaitForIdle(TimeoutSeconds);
     }
 
     protected IEnumerator WaitForSceneLoad()
     {
-      while (SceneManager.GetActiveScene().buildIndex > 0)
-      {
-        yield return null;
-      }
+      yield return new WaitUntil(() => SceneManager.GetActiveScene().buildIndex == 0,
+        TimeSpan.FromSeconds(TimeoutSeconds),
+        () => throw new TimeoutException("Timeout waiting for scene to load (buildIndex == 0)"));
     }
 
     protected void AssertEmpty(ObjectLayout objectLayout)

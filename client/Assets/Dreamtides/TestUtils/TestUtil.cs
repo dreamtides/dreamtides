@@ -27,7 +27,7 @@ namespace Dreamtides.TestUtils
           $"Resolution {resolution} not set");
 
       yield return new WaitUntil(() => registry.ActionService.Connected);
-      yield return registry.TestHelperService.WaitForIdle();
+      yield return registry.TestHelperService.WaitForIdle(5.0f);
 
       action(registry);
     }
@@ -35,13 +35,13 @@ namespace Dreamtides.TestUtils
     public static IEnumerator WaitForCount(Registry registry, ObjectLayout layout, int count)
     {
       yield return new WaitUntil(() => layout.Objects.Count == count);
-      yield return registry.TestHelperService.WaitForIdle();
+      yield return registry.TestHelperService.WaitForIdle(5.0f);
     }
 
     public static IEnumerator TearDownScenario(Registry registry)
     {
       Registry.TestConfiguration = null;
-      yield return registry.TestHelperService.WaitForIdle();
+      yield return registry.TestHelperService.WaitForIdle(5.0f);
       yield return new WaitForSeconds(0.5f);
     }
 
