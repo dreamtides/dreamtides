@@ -7,11 +7,29 @@ using Dreamtides.Services;
 using Dreamtides.Utils;
 using Dreamtides.Components;
 using Dreamtides.TestUtils;
+using Dreamtides.UnityInternal;
 
 namespace Dreamtides.Tests
 {
   public class BasicLayoutTests : IntegrationTest
   {
+    public static readonly GameViewResolution[] AllResolutions = new GameViewResolution[]
+    {
+      GameViewResolution.Resolution16x9,
+      GameViewResolution.Resolution16x10,
+      GameViewResolution.Resolution21x9,
+      GameViewResolution.Resolution4x3,
+      GameViewResolution.Resolution5x4,
+      GameViewResolution.Resolution32x9,
+      GameViewResolution.ResolutionIPhone12,
+      GameViewResolution.ResolutionIPhoneSE,
+      GameViewResolution.ResolutionIPadPro12,
+      GameViewResolution.ResolutionIPodTouch6,
+      GameViewResolution.ResolutionSamsungNote20,
+      GameViewResolution.ResolutionSamsungZFold2,
+      GameViewResolution.ResolutionPixel5,
+    };
+
     [TearDown]
     public void TearDown()
     {
@@ -19,9 +37,9 @@ namespace Dreamtides.Tests
     }
 
     [UnityTest]
-    public IEnumerator TestBasicLayout()
+    public IEnumerator TestBasicLayout([ValueSource("AllResolutions")] GameViewResolution resolution)
     {
-      yield return Connect();
+      yield return Connect(resolution: resolution);
       yield return PerformAction(TestBattle.New().FullLayout().Build());
       AssertBoxColliderIsOnScreen(GetBoxCollider(Registry.Layout.UserDeck), "User deck is not on screen");
       AssertBoxColliderIsOnScreen(GetBoxCollider(Registry.Layout.EnemyDeck), "Enemy deck is not on screen");
