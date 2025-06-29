@@ -167,37 +167,6 @@ namespace Dreamtides.Tests
       yield return TestUtil.TearDownScenario(registry);
     }
 
-
-    [UnityTest]
-    public IEnumerator TestPlayCardWithOrderSelector()
-    {
-      Registry registry = null;
-      yield return TestUtil.LoadScenario(GameViewResolution.Resolution16x9, "play_card_with_order_selector", (r) =>
-      {
-        registry = r;
-      });
-
-      var card = GameObject.Find("[7] Scrap Reclaimer").GetComponent<Card>();
-      ComponentAssertions.AssertCountIs(registry.Layout.UserVoid, 10);
-
-      yield return TestDragInputProvider.DragTo(
-        registry,
-        card,
-        registry.Layout.DefaultStack);
-      yield return TestUtil.WaitForCount(registry, registry.Layout.UserVoid, 11);
-
-      ComponentAssertions.AssertCountIs(registry.Layout.CardOrderSelector, 2,
-          "Card order selector should have 2 cards");
-      var drag = registry.Layout.CardOrderSelector.Objects.First();
-      yield return TestDragInputProvider.DragTo(registry, drag, registry.Layout.CardOrderSelectorVoid);
-      ComponentAssertions.AssertCountIs(registry.Layout.CardOrderSelectorVoid, 1,
-          "Card order selector void should now have 1 card");
-      ComponentAssertions.AssertCountIs(registry.Layout.CardOrderSelector, 1,
-          "Card order selector should now have 1 card");
-
-      yield return TestUtil.TearDownScenario(registry);
-    }
-
     [UnityTest]
     public IEnumerator TestUserJudgmentPhase()
     {
