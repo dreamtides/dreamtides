@@ -59,9 +59,6 @@ TagManager:
   - name: DiscardPile
     uniqueID: 2887456905
     locked: 0
-  - name: PrimaryActionButton
-    uniqueID: 4174185377
-    locked: 0
   - name: GameModifiers
     uniqueID: 3951544605
     locked: 0
@@ -91,6 +88,9 @@ TagManager:
     locked: 0
   - name: Browser
     uniqueID: 3077926559
+    locked: 0
+  - name: PrimaryActionButton
+    uniqueID: 4174185377
     locked: 0
   - name: Effects
     uniqueID: 270103837
