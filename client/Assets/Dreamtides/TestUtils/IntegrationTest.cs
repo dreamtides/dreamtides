@@ -18,7 +18,6 @@ namespace Dreamtides.TestUtils
 {
   public abstract class IntegrationTest
   {
-
     Registry? _registry;
     protected Registry Registry => Errors.CheckNotNull(_registry);
 
@@ -53,6 +52,26 @@ namespace Dreamtides.TestUtils
       Registry.ActionService.PerformAction(action, requestId);
       yield return new WaitUntil(() => Registry.ActionService.LastResponseReceived == requestId);
       yield return Registry.TestHelperService.WaitForIdle();
+    }
+
+    /// <summary>
+    /// Performs an action as the opponent player.
+    /// </summary>
+    protected IEnumerator PerformOpponentAction(BattleAction action)
+    {
+      return PerformAction(new GameAction
+      {
+        GameActionClass = new GameActionClass
+        {
+          DebugAction = new DebugAction
+          {
+            DebugActionClass = new DebugActionClass
+            {
+              PerformOpponentAction = action,
+            },
+          },
+        },
+      });
     }
 
     /// <summary>

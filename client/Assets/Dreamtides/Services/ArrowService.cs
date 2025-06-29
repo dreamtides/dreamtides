@@ -1,11 +1,13 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Dreamtides.Components;
 using Dreamtides.Schema;
 using Dreamtides.Utils;
 using UnityEngine;
 
+[assembly: InternalsVisibleTo("Dreamtides.Tests")]
 namespace Dreamtides.Services
 {
   public class ArrowService : Service
@@ -13,7 +15,7 @@ namespace Dreamtides.Services
     [SerializeField] Arrow _redArrowPrefab = null!;
     [SerializeField] Arrow _greenArrowPrefab = null!;
     [SerializeField] Arrow _blueArrowPrefab = null!;
-    readonly List<Arrow> _arrows = new();
+    internal readonly List<Arrow> _arrows = new();
 
     public void HandleDisplayArrows(List<DisplayArrow> arrows)
     {

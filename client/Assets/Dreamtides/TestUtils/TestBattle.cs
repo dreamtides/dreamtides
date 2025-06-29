@@ -66,6 +66,26 @@ namespace Dreamtides.TestUtils
       return this;
     }
 
+    public TestBattle SetEnergy(DisplayPlayer player, int energy)
+    {
+      var name = GetPlayerName(player);
+      _actions.Add(new DebugBattleAction
+      {
+        SetEnergy = new SetEnergy { Player = name, Energy = energy }
+      });
+      return this;
+    }
+
+    public TestBattle SetPoints(DisplayPlayer player, int points)
+    {
+      var name = GetPlayerName(player);
+      _actions.Add(new DebugBattleAction
+      {
+        SetPoints = new SetPoints { Player = name, Points = points }
+      });
+      return this;
+    }
+
     public TestBattle AddCardsToHand(DisplayPlayer player, int count)
     {
       for (var i = 0; i < count; i++)
@@ -77,13 +97,7 @@ namespace Dreamtides.TestUtils
 
     public TestBattle AddCardToHand(DisplayPlayer player, CardName cardName = CardName.MinstrelOfFallingLight)
     {
-      var name = player switch
-      {
-        DisplayPlayer.User => PlayerName.One,
-        DisplayPlayer.Enemy => PlayerName.Two,
-        _ => throw new IndexOutOfRangeException("Invalid player")
-      };
-
+      var name = GetPlayerName(player);
       _actions.Add(new DebugBattleAction
       {
         AddCardToHand = new AddCardToHand
@@ -109,13 +123,7 @@ namespace Dreamtides.TestUtils
 
     public TestBattle AddCardToBattlefield(DisplayPlayer player, CardName cardName = CardName.MinstrelOfFallingLight)
     {
-      var name = player switch
-      {
-        DisplayPlayer.User => PlayerName.One,
-        DisplayPlayer.Enemy => PlayerName.Two,
-        _ => throw new IndexOutOfRangeException("Invalid player")
-      };
-
+      var name = GetPlayerName(player);
       _actions.Add(new DebugBattleAction
       {
         AddCardToBattlefield = new AddCardToBattlefield
@@ -138,13 +146,7 @@ namespace Dreamtides.TestUtils
 
     public TestBattle AddCardToVoid(DisplayPlayer player)
     {
-      var name = player switch
-      {
-        DisplayPlayer.User => PlayerName.One,
-        DisplayPlayer.Enemy => PlayerName.Two,
-        _ => throw new IndexOutOfRangeException("Invalid player")
-      };
-
+      var name = GetPlayerName(player);
       _actions.Add(new DebugBattleAction
       {
         AddCardToVoid = new AddCardToVoid
@@ -154,6 +156,16 @@ namespace Dreamtides.TestUtils
         }
       });
       return this;
+    }
+
+    static PlayerName GetPlayerName(DisplayPlayer player)
+    {
+      return player switch
+      {
+        DisplayPlayer.User => PlayerName.One,
+        DisplayPlayer.Enemy => PlayerName.Two,
+        _ => throw new IndexOutOfRangeException("Invalid player")
+      };
     }
   }
 }
