@@ -26,7 +26,6 @@ fn duplicate_action_is_ignored() {
         },
         action: GameAction::BattleAction(BattleAction::EndTurn),
         save_file_id: None,
-        test_scenario: None,
         last_response_version: Some(response_version),
     };
 
@@ -65,7 +64,6 @@ fn concurrent_action_is_ignored() {
         },
         action: GameAction::BattleAction(BattleAction::EndTurn),
         save_file_id: None,
-        test_scenario: None,
         last_response_version: Some(response_version),
     };
 
@@ -96,7 +94,6 @@ fn action_with_outdated_version_is_ignored() {
         },
         action: GameAction::BattleAction(BattleAction::EndTurn),
         save_file_id: None,
-        test_scenario: None,
         last_response_version: Some(outdated_version),
     };
 
@@ -126,7 +123,6 @@ fn action_without_version_is_processed() {
         },
         action: GameAction::NoOp, // Use NoOp to avoid needing a full battle setup
         save_file_id: None,
-        test_scenario: None,
         last_response_version: None,
     };
 
@@ -155,7 +151,6 @@ fn response_version_tracking_in_poll() {
         },
         persistent_data_path: "/tmp/test".to_string(),
         vs_opponent: None,
-        test_scenario: None,
         display_properties: None,
         debug_configuration: None,
     };
@@ -184,7 +179,6 @@ fn response_version_tracking_in_poll() {
         },
         action: GameAction::NoOp,
         save_file_id: None,
-        test_scenario: None,
         last_response_version: Some(initial_version),
     };
 
@@ -217,7 +211,6 @@ fn finish_processing_not_called_on_concurrent_rejection() {
         },
         action: GameAction::BattleAction(BattleAction::EndTurn),
         save_file_id: None,
-        test_scenario: None,
         last_response_version: Some(response_version),
     };
 
@@ -255,7 +248,6 @@ fn finish_processing_not_called_on_version_rejection() {
         },
         action: GameAction::BattleAction(BattleAction::EndTurn),
         save_file_id: None,
-        test_scenario: None,
         last_response_version: Some(outdated_version),
     };
 

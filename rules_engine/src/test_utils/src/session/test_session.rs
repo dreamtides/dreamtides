@@ -75,7 +75,6 @@ impl TestSession {
                 metadata: self.metadata(),
                 persistent_data_path: "".to_string(),
                 vs_opponent: None,
-                test_scenario: None,
                 display_properties: None,
                 debug_configuration: Some(DebugConfiguration {
                     enemy: opponent.clone(),
@@ -100,7 +99,6 @@ impl TestSession {
                     metadata: self.enemy_metadata(),
                     persistent_data_path: "".to_string(),
                     vs_opponent: Some(self.user_id),
-                    test_scenario: None,
                     display_properties: None,
                     debug_configuration: None,
                 },
@@ -174,7 +172,6 @@ impl TestSession {
             metadata,
             action,
             save_file_id: Some(save_file_id),
-            test_scenario: None,
             last_response_version,
         };
 

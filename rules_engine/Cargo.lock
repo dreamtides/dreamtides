@@ -566,19 +566,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f46ad14479a25103f283c0f10005961cf086d8dc42205bb44c46ac563475dca6"
 
 [[package]]
-name = "client_test_scenarios"
-version = "0.0.0"
-dependencies = [
- "action_data",
- "battle_state",
- "core_data",
- "display_data",
- "masonry",
- "ui_components",
- "uuid",
-]
-
-[[package]]
 name = "colorchoice"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -770,7 +757,6 @@ dependencies = [
  "axum",
  "axum-macros",
  "battle_state",
- "client_test_scenarios",
  "core_data",
  "display_data",
  "logging",
@@ -1569,7 +1555,6 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "battle_state",
- "client_test_scenarios",
  "core_data",
  "display_data",
  "logging",

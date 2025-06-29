@@ -25,7 +25,6 @@ namespace Dreamtides.Services
     bool _devModeAutoConnect;
     float _lastConnectAttemptTime;
     Metadata? _metadata;
-    string? _testScenario;
     Guid? _integrationTestId;
     Guid? _integrationTestEnemyId;
     Queue<CommandBatch> _commandQueue = new Queue<CommandBatch>();
@@ -47,7 +46,6 @@ namespace Dreamtides.Services
     protected override void OnInitialize(TestConfiguration? testConfiguration)
     {
       Connected = false;
-      _testScenario = testConfiguration?.TestScenario;
       _integrationTestId = testConfiguration?.IntegrationTestId;
       _integrationTestEnemyId = Guid.NewGuid();
       StartCoroutine(InitializeAsync());
@@ -89,7 +87,7 @@ namespace Dreamtides.Services
         var now = Time.time;
         if (now - _lastConnectAttemptTime > 0.5f)
         {
-          StartCoroutine(DevServerConnectAsync(CreateConnectRequest(isReconnect: true), reconnect: true));
+          StartCoroutine(DevServerConnectAsync(CreateConnectRequest(), reconnect: true));
           _lastConnectAttemptTime = now;
         }
       }
@@ -139,7 +137,6 @@ namespace Dreamtides.Services
         },
         Action = action.Value,
         LastResponseVersion = _lastResponseVersion,
-        TestScenario = _testScenario,
       };
       if (UseDevServer)
       {
@@ -205,13 +202,12 @@ namespace Dreamtides.Services
       ScreenWidth = Screen.width
     };
 
-    private ConnectRequest CreateConnectRequest(bool isReconnect = false)
+    private ConnectRequest CreateConnectRequest()
     {
       return new ConnectRequest
       {
         Metadata = Errors.CheckNotNull(_metadata),
         PersistentDataPath = Application.persistentDataPath,
-        TestScenario = isReconnect ? null : _testScenario,
         DisplayProperties = GetDisplayProperties(),
         DebugConfiguration = _integrationTestEnemyId == null ? null : new DebugConfiguration
         {

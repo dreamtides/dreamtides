@@ -15,7 +15,6 @@ bench = false
 
 [dependencies]
 battle_state = { path = "../battle_state" }
-client_test_scenarios = { path = "../client_test_scenarios" }
 core_data = { path = "../core_data" }
 display_data = { path = "../display_data" }
 logging = { path = "../logging" }

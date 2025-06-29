@@ -111,9 +111,6 @@ namespace Dreamtides.Schema
         [JsonProperty("persistentDataPath", Required = Required.Always)]
         public string PersistentDataPath { get; set; }
 
-        [JsonProperty("testScenario")]
-        public string TestScenario { get; set; }
-
         /// <summary>
         /// If specified, treats this as a multiplayer game using the save file
         /// provided in this ID and adds this user as a player in the battle.
@@ -2085,9 +2082,6 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("saveFileId")]
         public Guid? SaveFileId { get; set; }
-
-        [JsonProperty("testScenario")]
-        public string TestScenario { get; set; }
     }
 
     public partial class GameActionClass

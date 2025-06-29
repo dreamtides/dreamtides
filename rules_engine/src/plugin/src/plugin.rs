@@ -56,12 +56,7 @@ unsafe fn connect_impl(
     };
     logging::maybe_initialize(&context);
 
-    let scene = if let Some(scenario) = deserialized_request.test_scenario.as_ref() {
-        client_test_scenarios::connect(&deserialized_request, scenario)
-    } else {
-        engine::connect(&deserialized_request, context)
-    };
-
+    let scene = engine::connect(&deserialized_request, context);
     let json = serde_json::to_string(&scene)?;
     let json_bytes = json.as_bytes();
 
@@ -104,9 +99,7 @@ unsafe fn perform_impl(
     let deserialized_request = serde_json::from_slice::<PerformActionRequest>(request_data)?;
     let metadata = deserialized_request.metadata;
 
-    let response_data = if let Some(scenario) = deserialized_request.test_scenario.as_ref() {
-        client_test_scenarios::perform_action(&deserialized_request, scenario)
-    } else {
+    let response_data = {
         TOKIO_RUNTIME.spawn(async move {
             engine::perform_action(deserialized_request);
         });

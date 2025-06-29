@@ -46,8 +46,6 @@ pub struct ConnectRequest {
     /// provided in this ID and adds this user as a player in the battle.
     pub vs_opponent: Option<UserId>,
 
-    pub test_scenario: Option<String>,
-
     /// Display properties from the client (screen dimensions, mobile device
     /// flag, etc.)
     pub display_properties: Option<DisplayProperties>,
@@ -85,8 +83,6 @@ pub struct PerformActionRequest {
     /// If specified, treats this as a multiplayer game using the save file
     /// provided in this ID instead of reading the user's own save file.
     pub save_file_id: Option<UserId>,
-
-    pub test_scenario: Option<String>,
 
     /// The version of the last response the client received, used to prevent
     /// duplicate actions.

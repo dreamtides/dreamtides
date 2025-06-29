@@ -12,7 +12,6 @@ namespace Dreamtides.Services
   {
     public static TestConfiguration? TestConfiguration { get; set; }
 
-    [SerializeField] string? _debugTestScenarioOverride;
     [SerializeField] GameLayout? _portraitLayout;
     [SerializeField] GameLayout? _landscapeLayout;
     bool _isLandscape = false;
@@ -90,16 +89,12 @@ namespace Dreamtides.Services
     void Awake()
     {
       var testConfiguration = TestConfiguration;
-      if (!string.IsNullOrEmpty(_debugTestScenarioOverride))
-      {
-        testConfiguration = new TestConfiguration(_debugTestScenarioOverride);
-      }
 
       if (testConfiguration != null)
       {
         // Screen resolution is not correct on Awake() frame in tests because of
         // the hacks we are using to set it, so we delay the Awake() call.
-        Debug.Log($"Running test scenario: {testConfiguration.TestScenario}");
+        Debug.Log($"Starting integration test {testConfiguration.IntegrationTestId}");
         StartCoroutine(DelayedAwake(testConfiguration));
       }
       else

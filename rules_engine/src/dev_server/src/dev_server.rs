@@ -57,26 +57,21 @@ async fn connect(body: String) -> AppResult<Json<ConnectResponse>> {
     let req: ConnectRequest = parse_json(&body)?;
     let user_id = req.metadata.user_id;
 
-    if let Some(scenario) = req.test_scenario.as_ref() {
-        info!(?user_id, ?scenario, "Got connect request");
-        Ok(Json(client_test_scenarios::connect(&req, scenario)))
-    } else {
-        info!(?user_id, "Got connect request");
-        let log_directory = match logging::get_developer_mode_log_directory() {
-            Ok(directory) => directory,
-            Err(e) => {
-                error!(error.message = %e, "Failed to get log directory");
-                return Err(AppError::Internal(e.to_string()));
-            }
-        };
-        Ok(Json(engine::connect(&req, RequestContext {
-            logging_options: LoggingOptions {
-                log_directory: Some(log_directory),
-                log_ai_search_diagram: true,
-                enable_action_legality_check: true,
-            },
-        })))
-    }
+    info!(?user_id, "Got connect request");
+    let log_directory = match logging::get_developer_mode_log_directory() {
+        Ok(directory) => directory,
+        Err(e) => {
+            error!(error.message = %e, "Failed to get log directory");
+            return Err(AppError::Internal(e.to_string()));
+        }
+    };
+    Ok(Json(engine::connect(&req, RequestContext {
+        logging_options: LoggingOptions {
+            log_directory: Some(log_directory),
+            log_ai_search_diagram: true,
+            enable_action_legality_check: true,
+        },
+    })))
 }
 
 async fn perform_action(body: String) -> AppResult<Json<PerformActionResponse>> {
@@ -88,15 +83,10 @@ async fn perform_action(body: String) -> AppResult<Json<PerformActionResponse>> 
     let request_id = req.metadata.request_id;
 
     let _span = info_span!("perform_dev_server_action", ?action, ?request_id);
-    if let Some(scenario) = req.test_scenario.as_ref() {
-        info!(?action, ?scenario, ?user_id, "Got perform action request");
-        Ok(Json(client_test_scenarios::perform_action(&req, scenario)))
-    } else {
-        info!(?action, ?user_id, ?request_id, "Got perform action request");
-        let metadata = req.metadata;
-        engine::perform_action(req);
-        Ok(Json(PerformActionResponse { metadata, commands: CommandSequence::default() }))
-    }
+    info!(?action, ?user_id, ?request_id, "Got perform action request");
+    let metadata = req.metadata;
+    engine::perform_action(req);
+    Ok(Json(PerformActionResponse { metadata, commands: CommandSequence::default() }))
 }
 
 async fn poll(body: String) -> AppResult<Json<PollResponse>> {
