@@ -193,19 +193,11 @@ namespace Dreamtides.Tests
       yield return WaitForCount(Registry.Layout.DefaultStack, 5);
       foreach (var displayable in Registry.Layout.DefaultStack.Objects)
       {
-        // At least the energy cost of each card should be visible.
         var card = ComponentUtils.Get<Card>(displayable);
         AssertSpriteIsOnScreen(card._costBackground, $"Energy Cost of {card.Id}");
       }
 
-      Assert.That(Registry.ArrowService._arrows.Count, Is.EqualTo(1), "One arrow should be visible");
-      var arrow = Registry.ArrowService._arrows[0];
-      Assert.That(arrow.Source.gameObject,
-        Is.EqualTo(userPrevent1.gameObject),
-        "Arrow should originate from userPrevent1");
-      Assert.That(arrow.Target.gameObject,
-        Is.EqualTo(Registry.LayoutService.GetCard(enemyCard1).gameObject),
-        "Arrow should target enemyCard1");
+      AssertArrowBetween(userPrevent1, Registry.LayoutService.GetCard(enemyCard1), "userPrevent1 should target enemyCard1");
 
       yield return TestClickInputProvider.ClickOn(Registry, Registry.LayoutService.GetCard(enemyCard2));
       yield return WaitForCount(Registry.Layout.DefaultStack, 0);
@@ -215,6 +207,49 @@ namespace Dreamtides.Tests
       AssertCountIs(Registry.Layout.UserBattlefield, 1);
 
       yield return EndTest();
+    }
+
+    [UnityTest]
+    public IEnumerator TestSelectTargetsOnBattlefieldRespond()
+    {
+      yield return Connect(resolution: GameViewResolution.ResolutionIPhoneSE);
+      yield return PerformAction(TestBattle.New()
+        .RemovePlayerHands()
+        .SetEnergy(DisplayPlayer.User, 99)
+        .SetEnergy(DisplayPlayer.Enemy, 99)
+        .AddCardToHand(DisplayPlayer.Enemy, CardName.TestDrawOne)
+        .AddCardsToBattlefield(DisplayPlayer.Enemy, 8)
+        .Build()
+      );
+      yield return PerformAddCardAction(TestBattle.New()
+        .AddCardToHand(DisplayPlayer.User, CardName.Immolate)
+        .Build()
+      );
+      var userDissolve = Registry.LayoutService.GetCard(CurrentCardId);
+
+      yield return TestDragInputProvider.DragTo(
+        Registry,
+        userDissolve,
+        Registry.Layout.DefaultStack);
+      yield return WaitForCount(Registry.Layout.TargetingEnemyStack, 1);
+      var target = Registry.Layout.EnemyBattlefield.Objects.Last().GetComponent<Card>();
+      yield return TestClickInputProvider.ClickOn(Registry, target);
+
+      AssertArrowBetween(userDissolve, target, "userDissolve should target the selected enemy");
+
+      yield return EndTest();
+    }
+
+    private void AssertArrowBetween(Component source, Component target, string message)
+    {
+      Assert.That(Registry.ArrowService._arrows.Count, Is.EqualTo(1), "One arrow should be visible");
+      var arrow = Registry.ArrowService._arrows[0];
+      Assert.That(arrow.Source.gameObject,
+        Is.EqualTo(source.gameObject),
+        $"Arrow should originate from {source.name}");
+      Assert.That(arrow.Target.gameObject,
+        Is.EqualTo(target.gameObject),
+        $"Arrow should target {target.name}. {message}");
     }
   }
 }

@@ -207,7 +207,7 @@ namespace Dreamtides.Tests
         registry = r;
       });
 
-      yield return TestClickInputProvider.ClickOn(registry, registry.Layout.PrimaryActionButton);
+      yield return TestClickInputProvider.ClickOn(registry, registry.Layout.PrimaryActionButton, 30.0f);
       Assert.That(registry.TestHelperService.DidObjectMove(registry.Layout.UserStatusDisplay.TotalSpark),
           Is.True,
           "User spark should have moved");
