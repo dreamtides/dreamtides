@@ -222,6 +222,13 @@ namespace Dreamtides.TestUtils
       AssertIsTopmost(sprite, message, ignoredObjects);
     }
 
+    protected void AssertPrimaryActionButtonIsVisible()
+    {
+      AssertIsVisible(Registry.Layout.PrimaryActionButton._background,
+        "Primary action button should be visible",
+        Registry.Layout.PrimaryActionButton._text.gameObject);
+    }
+
     protected void AssertIsTopmost(Renderer sprite, string message, params GameObject[] ignoredObjects)
     {
       var spriteBounds = sprite.bounds;

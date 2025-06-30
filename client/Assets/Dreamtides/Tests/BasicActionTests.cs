@@ -161,6 +161,7 @@ namespace Dreamtides.Tests
         characterCard,
         Registry.Layout.DefaultStack);
       yield return WaitForCount(Registry.Layout.DefaultStack, 1);
+      AssertPrimaryActionButtonIsVisible();
 
       yield return PerformOpponentAction(new BattleAction
       {
@@ -170,12 +171,14 @@ namespace Dreamtides.Tests
         },
       });
       yield return WaitForCount(Registry.Layout.DefaultStack, 2);
+      AssertPrimaryActionButtonIsVisible();
 
       yield return TestDragInputProvider.DragTo(
         Registry,
         userPrevent1,
         Registry.Layout.DefaultStack);
       yield return WaitForCount(Registry.Layout.DefaultStack, 3);
+      AssertPrimaryActionButtonIsVisible();
 
       yield return PerformOpponentAction(new BattleAction
       {
@@ -185,9 +188,7 @@ namespace Dreamtides.Tests
         },
       });
       yield return WaitForCount(Registry.Layout.DefaultStack, 4);
-      AssertIsVisible(Registry.Layout.PrimaryActionButton._background,
-        "Primary action button should be visible",
-        Registry.Layout.PrimaryActionButton._text.gameObject);
+      AssertPrimaryActionButtonIsVisible();
 
       yield return TestDragInputProvider.DragTo(
         Registry,
@@ -200,6 +201,7 @@ namespace Dreamtides.Tests
         AssertIsVisible(card._costBackground, $"Energy Cost of {card.Id}");
       }
 
+      AssertPrimaryActionButtonIsVisible();
       AssertArrowBetween(userPrevent1, Registry.LayoutService.GetCard(enemyCard1), "userPrevent1 should target enemyCard1");
 
       yield return TestClickInputProvider.ClickOn(Registry, Registry.LayoutService.GetCard(enemyCard2));
