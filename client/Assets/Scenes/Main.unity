@@ -2125,7 +2125,7 @@ MonoBehaviour:
   _registry: {fileID: 613451854}
   _rectTransform: {fileID: 128110240}
   _distanceFromCamera: 12
-  _xCoordinateOnly: 1
+  _xCoordinateOnly: 0
   _toUpdate: {fileID: 449699476}
   _xOffset: 0
 --- !u!1 &205680165
@@ -14602,7 +14602,7 @@ MonoBehaviour:
   _registry: {fileID: 613451854}
   _rectTransform: {fileID: 1171943659}
   _distanceFromCamera: 12
-  _xCoordinateOnly: 1
+  _xCoordinateOnly: 0
   _toUpdate: {fileID: 449699476}
   _xOffset: 0
 --- !u!1 &1665816864
