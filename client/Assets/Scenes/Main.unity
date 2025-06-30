@@ -5687,7 +5687,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fd7d91a98e924a9eab8bcda02414680, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _debugTestScenarioOverride: 
   _portraitLayout: {fileID: 1302820461}
   _landscapeLayout: {fileID: 1435083754}
   _layoutService: {fileID: 613451853}
@@ -7480,7 +7479,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1624649563
-  m_SortingLayer: 16
+  m_SortingLayer: 15
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 0, g: 0, b: 0, a: 1}
@@ -17282,6 +17281,14 @@ PrefabInstance:
       value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 2237605953007087113, guid: dfd7f2c7c8cdc4f678480f45b4b16f1b, type: 3}
+      propertyPath: m_SortingLayer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2237605953007087113, guid: dfd7f2c7c8cdc4f678480f45b4b16f1b, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -1815889713
+      objectReference: {fileID: 0}
+    - target: {fileID: 2237605953007087113, guid: dfd7f2c7c8cdc4f678480f45b4b16f1b, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 1142588320}
@@ -17383,15 +17390,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7793508034924389278, guid: dfd7f2c7c8cdc4f678480f45b4b16f1b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3
+      value: 0.28
       objectReference: {fileID: 0}
     - target: {fileID: 7793508034924389278, guid: dfd7f2c7c8cdc4f678480f45b4b16f1b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 10
+      value: 13.01
       objectReference: {fileID: 0}
     - target: {fileID: 7793508034924389278, guid: dfd7f2c7c8cdc4f678480f45b4b16f1b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -24.18
+      value: -18.86
       objectReference: {fileID: 0}
     - target: {fileID: 7793508034924389278, guid: dfd7f2c7c8cdc4f678480f45b4b16f1b, type: 3}
       propertyPath: m_LocalRotation.w

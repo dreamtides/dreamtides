@@ -11,6 +11,8 @@ using Dreamtides.Layout;
 using UnityEngine.UIElements;
 using Dreamtides.Schema;
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
+using UnityEngine.Rendering;
 
 #nullable enable
 
@@ -192,7 +194,12 @@ namespace Dreamtides.TestUtils
       }
     }
 
-    protected void AssertSpriteIsOnScreen(SpriteRenderer sprite, string message)
+    /// <summary>
+    /// Asserts that all four corners of a 'renderer' are visible on the screen
+    /// and that a ray fired through the center of the renderer hits no other
+    /// higher objects.
+    /// </summary>
+    protected void AssertIsVisible(Renderer sprite, string message, params GameObject[] ignoredObjects)
     {
       var bounds = sprite.bounds;
       var corners = new Vector3[4]
@@ -210,6 +217,90 @@ namespace Dreamtides.TestUtils
                     viewportPos.y >= -0.01f && viewportPos.y <= 1.01f &&
                     viewportPos.z >= -0.01f,
                     $"{message}: Corner at world position {corner} is outside viewport: {viewportPos}");
+      }
+
+      AssertIsTopmost(sprite, message, ignoredObjects);
+    }
+
+    protected void AssertIsTopmost(Renderer sprite, string message, params GameObject[] ignoredObjects)
+    {
+      var spriteBounds = sprite.bounds;
+      var spriteCenter = spriteBounds.center;
+
+      var screenPoint = Registry.Layout.MainCamera.WorldToScreenPoint(spriteCenter);
+      var ray = Registry.Layout.MainCamera.ScreenPointToRay(screenPoint);
+
+      var hits = Physics.RaycastAll(ray);
+
+      var spriteSortingGroup = sprite.GetComponentInParent<SortingGroup>();
+      var spriteSortingLayer = spriteSortingGroup ? spriteSortingGroup.sortingLayerID : sprite.sortingLayerID;
+      var spriteSortingOrder = spriteSortingGroup ? spriteSortingGroup.sortingOrder : sprite.sortingOrder;
+      var spriteSortingLayerValue = SortingLayer.GetLayerValueFromID(spriteSortingLayer);
+
+      foreach (var hit in hits)
+      {
+        var sortingGroup = hit.collider.gameObject.GetComponentInChildren<SortingGroup>(true);
+
+        if (sortingGroup != null)
+        {
+          if (sprite.transform.IsChildOf(sortingGroup.transform) || sortingGroup == spriteSortingGroup)
+          {
+            continue;
+          }
+
+          if (ignoredObjects.Any(ignored => sortingGroup.transform.IsChildOf(ignored.transform) || sortingGroup.gameObject == ignored))
+          {
+            continue;
+          }
+
+          var groupSortingLayerValue = SortingLayer.GetLayerValueFromID(sortingGroup.sortingLayerID);
+
+          if (groupSortingLayerValue > spriteSortingLayerValue)
+          {
+            var parent = sortingGroup.transform.parent != null ? $" of {sortingGroup.transform.parent.name}" : "";
+            Assert.Fail($"{message}: SortingGroup '{sortingGroup.name}'{parent} has a higher sorting layer " +
+                        $"(layer: {SortingLayer.IDToName(sortingGroup.sortingLayerID)}, value: {groupSortingLayerValue}) " +
+                        $"than sprite '{sprite.name}' (layer: {SortingLayer.IDToName(spriteSortingLayer)}, value: {spriteSortingLayerValue})");
+          }
+
+          if (groupSortingLayerValue == spriteSortingLayerValue && sortingGroup.sortingOrder > spriteSortingOrder)
+          {
+            var parent = sortingGroup.transform.parent != null ? $" of {sortingGroup.transform.parent.name}" : "";
+            Assert.Fail($"{message}: SortingGroup '{sortingGroup.name}'{parent} has the same sorting layer " +
+                        $"but higher sorting order ({sortingGroup.sortingOrder}) than sprite '{sprite.name}' ({spriteSortingOrder})");
+          }
+        }
+        else
+        {
+          var renderers = hit.collider.gameObject.GetComponentsInChildren<Renderer>(true);
+
+          foreach (var renderer in renderers)
+          {
+            if (renderer == sprite) continue;
+
+            if (ignoredObjects.Any(ignored => renderer.transform.IsChildOf(ignored.transform) || renderer.gameObject == ignored))
+            {
+              continue;
+            }
+
+            var rendererSortingLayerValue = SortingLayer.GetLayerValueFromID(renderer.sortingLayerID);
+
+            if (rendererSortingLayerValue > spriteSortingLayerValue)
+            {
+              var parent = renderer.transform.parent != null ? $" of {renderer.transform.parent.name}" : "";
+              Assert.Fail($"{message}: Renderer '{renderer.name}'{parent} has a higher sorting layer " +
+                          $"(layer: {SortingLayer.IDToName(renderer.sortingLayerID)}, value: {rendererSortingLayerValue}) " +
+                          $"than sprite '{sprite.name}' (layer: {SortingLayer.IDToName(spriteSortingLayer)}, value: {spriteSortingLayerValue})");
+            }
+
+            if (rendererSortingLayerValue == spriteSortingLayerValue && renderer.sortingOrder > spriteSortingOrder)
+            {
+              var parent = renderer.transform.parent != null ? $" of {renderer.transform.parent.name}" : "";
+              Assert.Fail($"{message}: Renderer '{renderer.name}'{parent} has the same sorting layer " +
+                          $"but higher sorting order ({renderer.sortingOrder}) than sprite '{sprite.name}' ({spriteSortingOrder})");
+            }
+          }
+        }
       }
     }
 

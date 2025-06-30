@@ -55,7 +55,7 @@ namespace Dreamtides.Tests
       yield return WaitForCount(Registry.Layout.UserBattlefield, 8);
 
       AssertCountIs(Registry.Layout.UserHand, 4);
-      AssertSpriteIsOnScreen(card._battlefieldCardImage, $"Battlefield card image should be visible");
+      AssertIsVisible(card._battlefieldCardImage, $"Battlefield card image should be visible");
       AssertActive(card._battlefieldCardFront, "Battlefield card front should be active");
       AssertActive(card._battlefieldCardImage, "Battlefield card image should be active");
       Assert.That(card._cardImage.isVisible, Is.False, $"Card image should not be visible");
@@ -185,6 +185,9 @@ namespace Dreamtides.Tests
         },
       });
       yield return WaitForCount(Registry.Layout.DefaultStack, 4);
+      AssertIsVisible(Registry.Layout.PrimaryActionButton._background,
+        "Primary action button should be visible",
+        Registry.Layout.PrimaryActionButton._text.gameObject);
 
       yield return TestDragInputProvider.DragTo(
         Registry,
@@ -194,7 +197,7 @@ namespace Dreamtides.Tests
       foreach (var displayable in Registry.Layout.DefaultStack.Objects)
       {
         var card = ComponentUtils.Get<Card>(displayable);
-        AssertSpriteIsOnScreen(card._costBackground, $"Energy Cost of {card.Id}");
+        AssertIsVisible(card._costBackground, $"Energy Cost of {card.Id}");
       }
 
       AssertArrowBetween(userPrevent1, Registry.LayoutService.GetCard(enemyCard1), "userPrevent1 should target enemyCard1");
