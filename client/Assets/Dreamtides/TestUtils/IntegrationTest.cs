@@ -226,24 +226,32 @@ namespace Dreamtides.TestUtils
     {
       var spriteBounds = sprite.bounds;
       var spriteCenter = spriteBounds.center;
+      var colliderParent = sprite.GetComponentInParent<Collider>();
+      var ofParent = colliderParent ? $" of {colliderParent.gameObject.name}" : "";
 
       var screenPoint = Registry.Layout.MainCamera.WorldToScreenPoint(spriteCenter);
       var ray = Registry.Layout.MainCamera.ScreenPointToRay(screenPoint);
 
       var hits = Physics.RaycastAll(ray);
 
-      var spriteSortingGroup = sprite.GetComponentInParent<SortingGroup>();
-      var spriteSortingLayer = spriteSortingGroup ? spriteSortingGroup.sortingLayerID : sprite.sortingLayerID;
-      var spriteSortingOrder = spriteSortingGroup ? spriteSortingGroup.sortingOrder : sprite.sortingOrder;
+      var sortingGroupParent = sprite.GetComponentInParent<SortingGroup>();
+      var spriteSortingLayer = sortingGroupParent ? sortingGroupParent.sortingLayerID : sprite.sortingLayerID;
+      var spriteSortingOrder = sortingGroupParent ? sortingGroupParent.sortingOrder : sprite.sortingOrder;
       var spriteSortingLayerValue = SortingLayer.GetLayerValueFromID(spriteSortingLayer);
 
       foreach (var hit in hits)
       {
+        if (hit.collider == colliderParent)
+        {
+          // Ignore hits from this sprite's own collider.
+          continue;
+        }
+
         var sortingGroup = hit.collider.gameObject.GetComponentInChildren<SortingGroup>(true);
 
         if (sortingGroup != null)
         {
-          if (sprite.transform.IsChildOf(sortingGroup.transform) || sortingGroup == spriteSortingGroup)
+          if (sprite.transform.IsChildOf(sortingGroup.transform) || sortingGroup == sortingGroupParent)
           {
             continue;
           }
@@ -260,14 +268,14 @@ namespace Dreamtides.TestUtils
             var parent = sortingGroup.transform.parent != null ? $" of {sortingGroup.transform.parent.name}" : "";
             Assert.Fail($"{message}: SortingGroup '{sortingGroup.name}'{parent} has a higher sorting layer " +
                         $"(layer: {SortingLayer.IDToName(sortingGroup.sortingLayerID)}, value: {groupSortingLayerValue}) " +
-                        $"than sprite '{sprite.name}' (layer: {SortingLayer.IDToName(spriteSortingLayer)}, value: {spriteSortingLayerValue})");
+                        $"than sprite '{sprite.name}'{ofParent} (layer: {SortingLayer.IDToName(spriteSortingLayer)}, value: {spriteSortingLayerValue})");
           }
 
           if (groupSortingLayerValue == spriteSortingLayerValue && sortingGroup.sortingOrder > spriteSortingOrder)
           {
             var parent = sortingGroup.transform.parent != null ? $" of {sortingGroup.transform.parent.name}" : "";
             Assert.Fail($"{message}: SortingGroup '{sortingGroup.name}'{parent} has the same sorting layer " +
-                        $"but higher sorting order ({sortingGroup.sortingOrder}) than sprite '{sprite.name}' ({spriteSortingOrder})");
+                        $"but higher sorting order ({sortingGroup.sortingOrder}) than sprite '{sprite.name}{ofParent}' ({spriteSortingOrder})");
           }
         }
         else
@@ -290,14 +298,14 @@ namespace Dreamtides.TestUtils
               var parent = renderer.transform.parent != null ? $" of {renderer.transform.parent.name}" : "";
               Assert.Fail($"{message}: Renderer '{renderer.name}'{parent} has a higher sorting layer " +
                           $"(layer: {SortingLayer.IDToName(renderer.sortingLayerID)}, value: {rendererSortingLayerValue}) " +
-                          $"than sprite '{sprite.name}' (layer: {SortingLayer.IDToName(spriteSortingLayer)}, value: {spriteSortingLayerValue})");
+                          $"than sprite '{sprite.name}{ofParent}' (layer: {SortingLayer.IDToName(spriteSortingLayer)}, value: {spriteSortingLayerValue})");
             }
 
             if (rendererSortingLayerValue == spriteSortingLayerValue && renderer.sortingOrder > spriteSortingOrder)
             {
               var parent = renderer.transform.parent != null ? $" of {renderer.transform.parent.name}" : "";
               Assert.Fail($"{message}: Renderer '{renderer.name}'{parent} has the same sorting layer " +
-                          $"but higher sorting order ({renderer.sortingOrder}) than sprite '{sprite.name}' ({spriteSortingOrder})");
+                          $"but higher sorting order ({renderer.sortingOrder}) than sprite '{sprite.name}{ofParent}' ({spriteSortingOrder})");
             }
           }
         }
