@@ -49,7 +49,7 @@ namespace Dreamtides.Layout
       }
     }
 
-    protected override Vector3 CalculateObjectPosition(int index, int count)
+    public override Vector3 CalculateObjectPosition(int index, int count)
     {
       return new Vector3(
         transform.position.x + ScrolledOffset(index, count, _scrollAmount),

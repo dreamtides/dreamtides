@@ -14,7 +14,7 @@ namespace Dreamtides.Layout
     [SerializeField] float _itemHeight;
     [SerializeField] int _rowCount;
 
-    protected override Vector3 CalculateObjectPosition(int index, int count) =>
+    public override Vector3 CalculateObjectPosition(int index, int count) =>
       transform.position + new Vector3(
         CalculateXOffset(index, count),
         0.5f,

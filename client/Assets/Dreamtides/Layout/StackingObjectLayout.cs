@@ -11,7 +11,7 @@ namespace Dreamtides.Layout
     [SerializeField] int _shrinkOffsetThreshold;
     [SerializeField] bool _stackRight;
 
-    protected override Vector3 CalculateObjectPosition(int index, int count)
+    public override Vector3 CalculateObjectPosition(int index, int count)
     {
       var xOffset = _stackRight
           ? index * GetOffset(count)

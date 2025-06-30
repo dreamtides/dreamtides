@@ -86,6 +86,9 @@ namespace Dreamtides.Services
     [SerializeField] ControlledButton? _bottomRightButton;
     public ControlledButton BottomRightButton => Check(_bottomRightButton);
 
+    [SerializeField] UserHandHoverService? _userHandHoverService;
+    public UserHandHoverService UserHandHoverService => Check(_userHandHoverService);
+
     void Awake()
     {
       var testConfiguration = TestConfiguration;

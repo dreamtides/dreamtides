@@ -11,7 +11,7 @@ namespace Dreamtides.Layout
     [SerializeField] float _cardSize;
     [SerializeField] bool _vertical;
 
-    protected override Vector3 CalculateObjectPosition(int index, int count)
+    public override Vector3 CalculateObjectPosition(int index, int count)
     {
       var offset = CalculateOffset(_width, _initialSpacing, _cardSize, index, count);
       return transform.position + (_vertical ? new Vector3(0, 0, offset) : new Vector3(offset, 0, 0));

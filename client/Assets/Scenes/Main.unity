@@ -5673,6 +5673,7 @@ GameObject:
   - component: {fileID: 613451871}
   - component: {fileID: 613451872}
   - component: {fileID: 613451873}
+  - component: {fileID: 613451874}
   m_Layer: 0
   m_Name: Registry
   m_TagString: Untagged
@@ -5749,6 +5750,7 @@ MonoBehaviour:
   _loggingService: {fileID: 613451872}
   _studioService: {fileID: 613451873}
   _bottomRightButton: {fileID: 262976513}
+  _userHandHoverService: {fileID: 613451874}
 --- !u!114 &613451855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6040,6 +6042,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _studioPrefab: {fileID: 3004385273427193110, guid: 419bd7659e4c4447c9a8c4552bdb433c, type: 3}
   _studioPosition: {fileID: 1680153716}
+--- !u!114 &613451874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 613451850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c833961ca7d654f71a4791488b15a832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &625589745
 PrefabInstance:
   m_ObjectHideFlags: 0

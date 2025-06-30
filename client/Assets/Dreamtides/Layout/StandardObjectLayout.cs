@@ -97,7 +97,7 @@ namespace Dreamtides.Layout
     ///
     /// Note that this may be invoked with index=0, count=0 to compute initial
     /// object positions.
-    protected abstract Vector3 CalculateObjectPosition(int index, int count);
+    public abstract Vector3 CalculateObjectPosition(int index, int count);
 
     /// <summary>
     /// Calculates the rotation of the object at the given index in the layout.

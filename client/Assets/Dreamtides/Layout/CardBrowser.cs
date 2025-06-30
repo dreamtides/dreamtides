@@ -56,7 +56,7 @@ namespace Dreamtides.Layout
       return true;
     }
 
-    protected override Vector3 CalculateObjectPosition(int index, int count)
+    public override Vector3 CalculateObjectPosition(int index, int count)
     {
       if (count == 1)
       {

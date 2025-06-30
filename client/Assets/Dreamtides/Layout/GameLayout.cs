@@ -18,8 +18,8 @@ namespace Dreamtides.Layout
     [SerializeField] AudioSource? _musicAudioSource;
     public AudioSource MusicAudioSource => Check(_musicAudioSource);
 
-    [SerializeField] ObjectLayout? _userHand;
-    public ObjectLayout UserHand => Check(_userHand);
+    [SerializeField] UserHandLayout? _userHand;
+    public UserHandLayout UserHand => Check(_userHand);
 
     [SerializeField] ObjectLayout? _enemyHand;
     public ObjectLayout EnemyHand => Check(_enemyHand);

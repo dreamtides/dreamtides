@@ -18,7 +18,7 @@ namespace Dreamtides.Layout
 
     public CardOrderSelectorView? View { get; set; }
 
-    protected override Vector3 CalculateObjectPosition(int index, int count)
+    public override Vector3 CalculateObjectPosition(int index, int count)
     {
       var offset = CenteredObjectLayout.CalculateOffset(TotalWidth(), _initialSpacing, _cardWidth, index, count);
       return _leftEdge.position + new Vector3(offset + _initialOffset, 0, 0);

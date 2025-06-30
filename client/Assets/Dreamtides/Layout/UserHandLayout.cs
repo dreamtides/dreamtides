@@ -1,7 +1,10 @@
 #nullable enable
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
+using Dreamtides.Components;
 using UnityEngine;
 
 namespace Dreamtides.Layout
@@ -58,6 +61,27 @@ namespace Dreamtides.Layout
       _layout2.ApplyLayout(sequence);
       _scrollableHand.ApplyLayout(sequence);
       SetSortingKeys();
+    }
+
+    public Vector3 CalculateObjectPosition(Card card)
+    {
+      if (_layout1.Objects.Contains(card))
+      {
+        return _layout1.CalculateObjectPosition(
+          _layout1.Objects.ToList().IndexOf(card), _layout1.Objects.Count);
+      }
+      else if (_layout2.Objects.Contains(card))
+      {
+        return _layout2.CalculateObjectPosition(
+          _layout2.Objects.ToList().IndexOf(card), _layout2.Objects.Count);
+      }
+      else if (_scrollableHand.Objects.Contains(card))
+      {
+        return _scrollableHand.CalculateObjectPosition(
+          _scrollableHand.Objects.ToList().IndexOf(card), _scrollableHand.Objects.Count);
+      }
+
+      throw new Exception($"Card {card.Id} not found in hand");
     }
 
     public override void ApplyTargetTransform(Displayable target, Sequence? sequence = null)

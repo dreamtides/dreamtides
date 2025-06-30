@@ -18,7 +18,7 @@ namespace Dreamtides.Layout
     [SerializeField] float _objectScale;
     [SerializeField] float _yRotation;
 
-    protected override Vector3 CalculateObjectPosition(int index, int count)
+    public override Vector3 CalculateObjectPosition(int index, int count)
     {
       var curvePosition = CalculateCurvePosition(index, count);
       var bezier = CalculateBezierPosition(curvePosition);

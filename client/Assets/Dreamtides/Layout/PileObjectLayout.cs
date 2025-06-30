@@ -8,7 +8,7 @@ namespace Dreamtides.Layout
   {
     [SerializeField] float _singleElementY = 0.5f;
 
-    protected override Vector3 CalculateObjectPosition(int index, int count) =>
+    public override Vector3 CalculateObjectPosition(int index, int count) =>
       new(
         transform.position.x,
         transform.position.y + Mathf.Lerp(0f, 1f, YPosition(index, count)),

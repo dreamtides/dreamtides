@@ -488,6 +488,10 @@ namespace Dreamtides.Components
         _hoverStartTime = Time.time;
         _hoveringForInfoZoom = true;
       }
+      else if (GameContext == GameContext.Hand)
+      {
+        _registry.UserHandHoverService.StartHover(Id);
+      }
     }
 
     public override void MouseHover()
@@ -506,6 +510,10 @@ namespace Dreamtides.Components
         _registry.CardService.ClearInfoZoom();
         _hoveringForInfoZoom = false;
         _longHoverFired = false;
+      }
+      else if (GameContext == GameContext.Hand)
+      {
+        _registry.UserHandHoverService.EndHover(Id);
       }
     }
 
