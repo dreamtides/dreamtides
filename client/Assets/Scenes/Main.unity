@@ -1256,6 +1256,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7203582438934972765, guid: dfd7f2c7c8cdc4f678480f45b4b16f1b, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: b3e3114b0c96a4ad8879f804cdc4630b, type: 3}
     - target: {fileID: 7221571978816977333, guid: dfd7f2c7c8cdc4f678480f45b4b16f1b, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.5
@@ -6055,6 +6059,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _hoverDistance: 1.5
+  _animateUpDuration: 0.1
+  _animateDownDuration: 0.3
+  _recoveryCheckInterval: 0.1
 --- !u!1001 &625589745
 PrefabInstance:
   m_ObjectHideFlags: 0
