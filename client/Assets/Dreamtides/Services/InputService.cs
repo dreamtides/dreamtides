@@ -40,6 +40,10 @@ namespace Dreamtides.Services
       _tapPositionAction = InputSystem.actions.FindAction("TapPosition");
     }
 
+    // Note: In the Unity 6 editor, there is a bug where this will sometimes start
+    // returning 'false' if you toggle the game window to device simulator mode.
+    // The only reliable way to prevent this is to always use a separate Unity
+    // window for device simulation.
     public bool IsPointerPressed() => _clickAction.IsPressed();
 
     public Displayable? ObjectAtPointerPosition()

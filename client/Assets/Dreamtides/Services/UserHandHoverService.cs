@@ -231,6 +231,7 @@ namespace Dreamtides.Services
         {
           state.AnimationProgress = 1f;
           state.CurrentTween = null;
+          Registry.CardService.DisplayInfoZoom(state.Card, forCardInHand: true);
         });
     }
 
@@ -245,6 +246,7 @@ namespace Dreamtides.Services
         state.CurrentTween.Kill();
       }
 
+      Registry.CardService.ClearInfoZoom();
       if (state.Card.GameContext == GameContext.Hovering)
       {
         state.Card.GameContext = GameContext.Hand;
