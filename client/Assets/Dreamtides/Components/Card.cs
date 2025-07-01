@@ -353,6 +353,14 @@ namespace Dreamtides.Components
         transform.rotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0);
         _registry.CardService.DisplayInfoZoom(this, forCardInHand: true);
       }
+      else if (!_registry.IsMobileDevice &&
+        GameContext == GameContext.Hand &&
+        !_registry.CapabilitiesService.AnyBrowserOpen())
+      {
+        transform.position = DesktopHandCardJumpPosition();
+        transform.rotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0);
+        _registry.CardService.DisplayInfoZoom(this, forCardInHand: true);
+      }
       else if (_registry.CapabilitiesService.CanInfoZoom(GameContext) && !_draggedToClearThreshold)
       {
         _registry.CardService.DisplayInfoZoom(this, forCardInHand: false);
@@ -568,6 +576,15 @@ namespace Dreamtides.Components
       target.y = Mathf.Clamp(target.y, 20f, 25f);
       target.z = Mathf.Clamp(target.z, -25f, -20f);
       return target;
+    }
+
+    Vector3 DesktopHandCardJumpPosition()
+    {
+      var horizontalPosition = Mathf.Clamp01((transform.position.x - 8f) / 14f);
+      return transform.position + Vector3.Lerp(
+        new Vector3(2f, 6f, 2.5f),
+        new Vector3(-2f, 6f, 2.5f),
+        horizontalPosition);
     }
 
     bool ShouldReturnToPreviousParentOnRelease()
