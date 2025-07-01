@@ -33,7 +33,6 @@ namespace Dreamtides.Services
         case GameContext.Dragging:
           return true;
         case GameContext.Battlefield:
-        case GameContext.Hand:
         case GameContext.Stack:
         case GameContext.GameModifiers:
           return !AnyBrowserOpen();
