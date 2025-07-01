@@ -55,7 +55,7 @@ namespace Dreamtides.Tests
       yield return WaitForCount(Registry.Layout.UserBattlefield, 8);
 
       AssertCountIs(Registry.Layout.UserHand, 4);
-      AssertIsVisible(card._battlefieldCardImage, $"Battlefield card image should be visible");
+      AssertIsOnscreen(card._battlefieldCardImage, $"Battlefield card image should be visible");
       AssertActive(card._battlefieldCardFront, "Battlefield card front should be active");
       AssertActive(card._battlefieldCardImage, "Battlefield card image should be active");
       Assert.That(card._cardImage.isVisible, Is.False, $"Card image should not be visible");
@@ -198,7 +198,7 @@ namespace Dreamtides.Tests
       foreach (var displayable in Registry.Layout.DefaultStack.Objects)
       {
         var card = ComponentUtils.Get<Card>(displayable);
-        AssertIsVisible(card._costBackground, $"Energy Cost of {card.Id}");
+        AssertIsOnscreen(card._costBackground, $"Energy Cost of {card.Id}");
       }
 
       AssertPrimaryActionButtonIsVisible();

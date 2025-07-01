@@ -196,10 +196,8 @@ namespace Dreamtides.TestUtils
 
     /// <summary>
     /// Asserts that all four corners of a 'renderer' are visible on the screen
-    /// and that a ray fired through the center of the renderer hits no other
-    /// higher objects.
     /// </summary>
-    protected void AssertIsVisible(Renderer sprite, string message, params GameObject[] ignoredObjects)
+    protected void AssertIsOnscreen(Renderer sprite, string message, params GameObject[] ignoredObjects)
     {
       var bounds = sprite.bounds;
       var corners = new Vector3[4]
@@ -218,17 +216,22 @@ namespace Dreamtides.TestUtils
                     viewportPos.z >= -0.01f,
                     $"{message}: Corner at world position {corner} is outside viewport: {viewportPos}");
       }
-
-      AssertIsTopmost(sprite, message, ignoredObjects);
     }
 
     protected void AssertPrimaryActionButtonIsVisible()
     {
-      AssertIsVisible(Registry.Layout.PrimaryActionButton._background,
+      AssertIsOnscreen(Registry.Layout.PrimaryActionButton._background,
         "Primary action button should be visible",
+        Registry.Layout.PrimaryActionButton._text.gameObject);
+      AssertIsTopmost(Registry.Layout.PrimaryActionButton._background,
+        "Primary action button should be topmost",
         Registry.Layout.PrimaryActionButton._text.gameObject);
     }
 
+    /// <summary>
+    /// Asserts that a ray fired through the center of the renderer hits no other
+    /// higher objects.
+    /// </summary>
     protected void AssertIsTopmost(Renderer sprite, string message, params GameObject[] ignoredObjects)
     {
       var spriteBounds = sprite.bounds;
