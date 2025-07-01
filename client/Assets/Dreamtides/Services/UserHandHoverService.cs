@@ -209,7 +209,10 @@ namespace Dreamtides.Services
     {
       if (state.CurrentTween != null)
       {
-        state.Card.GameContext = GameContext.Hand;
+        if (state.Card.GameContext == GameContext.Hovering)
+        {
+          state.Card.GameContext = GameContext.Hand;
+        }
         state.CurrentTween.Kill();
       }
 
@@ -235,11 +238,17 @@ namespace Dreamtides.Services
     {
       if (state.CurrentTween != null)
       {
-        state.Card.GameContext = GameContext.Hand;
+        if (state.Card.GameContext == GameContext.Hovering)
+        {
+          state.Card.GameContext = GameContext.Hand;
+        }
         state.CurrentTween.Kill();
       }
 
-      state.Card.GameContext = GameContext.Hand;
+      if (state.Card.GameContext == GameContext.Hovering)
+      {
+        state.Card.GameContext = GameContext.Hand;
+      }
       state.CurrentTween = DOTween.Sequence()
         .Append(state.Card.transform.DOMove(state.OriginalPosition, _animateDownDuration).SetEase(Ease.OutCubic))
         .Join(state.Card.transform.DORotateQuaternion(state.OriginalRotation, _animateDownDuration).SetEase(Ease.OutCubic))
@@ -281,7 +290,10 @@ namespace Dreamtides.Services
 
         if (!userHand.Objects.Contains(state.Card))
         {
-          state.Card.GameContext = GameContext.Hand;
+          if (state.Card.GameContext == GameContext.Hovering)
+          {
+            state.Card.GameContext = GameContext.Hand;
+          }
           state.CurrentTween?.Kill();
           toRemove.Add(kvp.Key);
           continue;
@@ -338,12 +350,7 @@ namespace Dreamtides.Services
       {
         if (displayable is Card card && card.GameContext == GameContext.Hovering)
         {
-          var shouldBeHovering = false;
-
-          if (_isActive && card == _currentHoveredCard)
-          {
-            shouldBeHovering = true;
-          }
+          var shouldBeHovering = _isActive && card == _currentHoveredCard;
 
           if (!shouldBeHovering)
           {
