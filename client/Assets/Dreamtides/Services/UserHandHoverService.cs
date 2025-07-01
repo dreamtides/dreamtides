@@ -180,27 +180,11 @@ namespace Dreamtides.Services
 
     Vector3 CalculateJumpPosition(Card card, Vector3 targetPosition)
     {
-      if (Registry.IsLandscape)
-      {
-        var horizontalPosition = Mathf.Clamp01((targetPosition.x - 8f) / 14f);
-        return targetPosition + Vector3.Lerp(
-          new Vector3(2f, 6f, 2.5f),
-          new Vector3(-2f, 6f, 2.5f),
-          horizontalPosition);
-      }
-      else
-      {
-        var screenZ = Registry.Layout.MainCamera.WorldToScreenPoint(targetPosition).z;
-        var worldPosition = Registry.InputService.WorldPointerPosition(screenZ);
-        var offset = targetPosition - worldPosition;
-        var result = targetPosition + new Vector3(0, 3, Mathf.Max(1.75f, 3.25f - offset.z));
-        result.x = Mathf.Clamp(result.x,
-            Registry.Layout.InfoZoomLeft.position.x,
-            Registry.Layout.InfoZoomRight.position.x);
-        result.y = Mathf.Clamp(result.y, 20f, 25f);
-        result.z = Mathf.Clamp(result.z, -25f, -20f);
-        return result;
-      }
+      var horizontalPosition = Mathf.Clamp01((targetPosition.x - 8f) / 14f);
+      return targetPosition + Vector3.Lerp(
+        new Vector3(2f, 4.0f, 1.5f),
+        new Vector3(-2f, 4.0f, 1.5f),
+        horizontalPosition);
     }
 
     void AnimateCardToJump(CardAnimationState state)
