@@ -360,7 +360,7 @@ namespace Dreamtides.Components
 
       if (CanPlay() || CanSelectOrder())
       {
-        _isDraggingFromHand = GameContext == GameContext.Hand;
+        _isDraggingFromHand = GameContext == GameContext.Hand || GameContext == GameContext.Hovering;
         _isDraggingForOrdering = CanSelectOrder();
         _registry.SoundService.PlayCardSound();
         GameContext = GameContext.Dragging;
@@ -485,7 +485,9 @@ namespace Dreamtides.Components
 
     public override void MouseHoverStart()
     {
-      if (_registry.CapabilitiesService.CanInfoZoom(GameContext) && GameContext != GameContext.Hand)
+      if (_registry.CapabilitiesService.CanInfoZoom(GameContext) &&
+        GameContext != GameContext.Hand &&
+        GameContext != GameContext.Hovering)
       {
         _hoverStartTime = Time.time;
         _hoveringForInfoZoom = true;
@@ -584,7 +586,7 @@ namespace Dreamtides.Components
     bool CanPlay() => CardView.Revealed?.Actions.CanPlay is { } canPlay &&
       !canPlay.IsNull &&
       _registry.CapabilitiesService.CanPlayCards() &&
-      GameContext == GameContext.Hand;
+      (GameContext == GameContext.Hand || GameContext == GameContext.Hovering);
 
     bool CanSelectOrder() => CardView.Revealed?.Actions.CanSelectOrder.HasValue == true &&
       GameContext == GameContext.Browser;

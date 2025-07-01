@@ -27,11 +27,12 @@ namespace Dreamtides.Services
       public float AnimationProgress { get; set; }
     }
 
-    [SerializeField] float _hoverDistance = 0.05f;
+    [SerializeField] float _hoverDistance = 2f;
+    [SerializeField] float _animateUpDuration = 0.1f;
+    [SerializeField] float _animateDownDuration = 0.3f;
     bool _isActive;
     Card? _currentHoveredCard;
     readonly Dictionary<string, CardAnimationState> _animationStates = new();
-    const float AnimationDuration = 0.1f;
 
     protected override void OnInitialize(TestConfiguration? testConfiguration)
     {
@@ -200,13 +201,13 @@ namespace Dreamtides.Services
       state.CurrentTween?.Kill();
 
       state.CurrentTween = DOTween.Sequence()
-        .Append(state.Card.transform.DOMove(state.JumpPosition, AnimationDuration).SetEase(Ease.OutCubic))
-        .Join(state.Card.transform.DORotateQuaternion(state.JumpRotation, AnimationDuration).SetEase(Ease.OutCubic))
+        .Append(state.Card.transform.DOMove(state.JumpPosition, _animateUpDuration).SetEase(Ease.OutCubic))
+        .Join(state.Card.transform.DORotateQuaternion(state.JumpRotation, _animateUpDuration).SetEase(Ease.OutCubic))
         .OnUpdate(() =>
         {
           if (state.IsAnimatingToJump)
           {
-            state.AnimationProgress = Mathf.Clamp01(state.AnimationProgress + Time.deltaTime / AnimationDuration);
+            state.AnimationProgress = Mathf.Clamp01(state.AnimationProgress + Time.deltaTime / _animateUpDuration);
           }
         })
         .OnComplete(() =>
@@ -221,13 +222,13 @@ namespace Dreamtides.Services
       state.CurrentTween?.Kill();
 
       state.CurrentTween = DOTween.Sequence()
-        .Append(state.Card.transform.DOMove(state.OriginalPosition, AnimationDuration).SetEase(Ease.OutCubic))
-        .Join(state.Card.transform.DORotateQuaternion(state.OriginalRotation, AnimationDuration).SetEase(Ease.OutCubic))
+        .Append(state.Card.transform.DOMove(state.OriginalPosition, _animateDownDuration).SetEase(Ease.OutCubic))
+        .Join(state.Card.transform.DORotateQuaternion(state.OriginalRotation, _animateDownDuration).SetEase(Ease.OutCubic))
         .OnUpdate(() =>
         {
           if (!state.IsAnimatingToJump)
           {
-            state.AnimationProgress = Mathf.Clamp01(state.AnimationProgress - Time.deltaTime / AnimationDuration);
+            state.AnimationProgress = Mathf.Clamp01(state.AnimationProgress - Time.deltaTime / _animateDownDuration);
           }
         })
         .OnComplete(() =>
