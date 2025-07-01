@@ -5950,6 +5950,7 @@ GameObject:
   - component: {fileID: 613451872}
   - component: {fileID: 613451873}
   - component: {fileID: 613451874}
+  - component: {fileID: 613451875}
   m_Layer: 0
   m_Name: Registry
   m_TagString: Untagged
@@ -6027,6 +6028,7 @@ MonoBehaviour:
   _studioService: {fileID: 613451873}
   _bottomRightButton: {fileID: 262976513}
   _userHandHoverService: {fileID: 613451874}
+  _idleReconnectService: {fileID: 613451875}
 --- !u!114 &613451855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6335,6 +6337,18 @@ MonoBehaviour:
   _animateDownDuration: 0.3
   _recoveryCheckInterval: 0.1
   _debounceTime: 0.3
+--- !u!114 &613451875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 613451850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df5b7ddbbc7a2493da6c0fed9fb347a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &625589745
 PrefabInstance:
   m_ObjectHideFlags: 0

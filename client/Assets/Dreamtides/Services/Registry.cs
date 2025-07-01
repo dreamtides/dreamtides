@@ -89,6 +89,9 @@ namespace Dreamtides.Services
     [SerializeField] UserHandHoverService? _userHandHoverService;
     public UserHandHoverService UserHandHoverService => Check(_userHandHoverService);
 
+    [SerializeField] IdleReconnectService? _idleReconnectService;
+    public IdleReconnectService IdleReconnectService => Check(_idleReconnectService);
+
     void Awake()
     {
       var testConfiguration = TestConfiguration;

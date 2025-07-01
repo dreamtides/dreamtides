@@ -24,6 +24,7 @@ namespace Dreamtides.Services
     readonly Guid _userGuid = Guid.Parse("d2da9785-f20e-4879-bed5-35b2e1926faf");
     bool _devModeAutoConnect;
     float _lastConnectAttemptTime;
+    float _lastActionTime;
     Metadata? _metadata;
     Guid? _integrationTestId;
     Guid? _integrationTestEnemyId;
@@ -37,6 +38,10 @@ namespace Dreamtides.Services
 
     public bool Connected { get; private set; }
 
+    public float LastActionTime => _lastActionTime;
+
+    public bool IsProcessingCommands => _isProcessingCommands;
+
     /// <summary>
     /// Returns the Request ID of the last request for which a 'final' poll
     /// response was received.
@@ -46,6 +51,7 @@ namespace Dreamtides.Services
     protected override void OnInitialize(TestConfiguration? testConfiguration)
     {
       Connected = false;
+      _lastActionTime = Time.time;
       _integrationTestId = testConfiguration?.IntegrationTestId;
       _integrationTestEnemyId = Guid.NewGuid();
       StartCoroutine(InitializeAsync());
@@ -59,25 +65,7 @@ namespace Dreamtides.Services
         UserId = _userGuid,
         IntegrationTestId = _integrationTestId,
       };
-      var request = CreateConnectRequest();
-      Registry.LoggingService.StartSpan(LogSpanName.Connect);
-
-      if (UseDevServer)
-      {
-        StartCoroutine(DevServerConnectAsync(request, reconnect: false));
-      }
-      else
-      {
-        var response = Plugin.Connect(request);
-        StartCoroutine(ApplyCommands(response.Commands, animate: false, onComplete: () =>
-        {
-          Registry.LoggingService.EndSpan(LogSpanName.Connect);
-          if (response.ResponseVersion != null)
-          {
-            _lastResponseVersion = response.ResponseVersion;
-          }
-        }));
-      }
+      yield return PerformConnect(isReconnect: false, startLoggingSpan: true);
     }
 
     protected override void OnUpdate()
@@ -119,6 +107,7 @@ namespace Dreamtides.Services
         return;
       }
 
+      _lastActionTime = Time.time;
       var requestId = requestIdentifier ?? Guid.NewGuid();
       Registry.LoggingService.StartSpan(LogSpanName.PerformAction);
       Registry.LoggingService.Log("ActionService", "Performing action",
@@ -168,6 +157,46 @@ namespace Dreamtides.Services
       else
       {
         Plugin.Log(request);
+      }
+    }
+
+    public void TriggerReconnect()
+    {
+      if (_metadata == null) return;
+
+      Debug.Log("Triggering idle reconnect");
+      Registry.LoggingService.Log("ActionService", "Triggering idle reconnect");
+      StartCoroutine(PerformConnect(isReconnect: true, startLoggingSpan: false));
+    }
+
+    private IEnumerator PerformConnect(bool isReconnect, bool startLoggingSpan = false)
+    {
+      if (_metadata == null) yield break;
+
+      var request = CreateConnectRequest();
+      if (startLoggingSpan)
+      {
+        Registry.LoggingService.StartSpan(LogSpanName.Connect);
+      }
+
+      if (UseDevServer)
+      {
+        yield return DevServerConnectAsync(request, isReconnect);
+      }
+      else
+      {
+        var response = Plugin.Connect(request);
+        yield return ApplyCommands(response.Commands, animate: false, onComplete: () =>
+        {
+          if (startLoggingSpan)
+          {
+            Registry.LoggingService.EndSpan(LogSpanName.Connect);
+          }
+          if (response.ResponseVersion != null)
+          {
+            _lastResponseVersion = response.ResponseVersion;
+          }
+        });
       }
     }
 
