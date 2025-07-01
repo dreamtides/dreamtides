@@ -30,9 +30,11 @@ namespace Dreamtides.Services
     [SerializeField] float _hoverDistance = 2f;
     [SerializeField] float _animateUpDuration = 0.1f;
     [SerializeField] float _animateDownDuration = 0.3f;
+    [SerializeField] float _recoveryCheckInterval = 0.1f;
     bool _isActive;
     Card? _currentHoveredCard;
     readonly Dictionary<string, CardAnimationState> _animationStates = new();
+    float _lastRecoveryCheck;
 
     protected override void OnInitialize(TestConfiguration? testConfiguration)
     {
@@ -71,6 +73,7 @@ namespace Dreamtides.Services
 
       if (!_isActive)
       {
+        PerformRecoveryCheck();
         return;
       }
 
@@ -106,6 +109,7 @@ namespace Dreamtides.Services
       }
 
       UpdateAllAnimations();
+      PerformRecoveryCheck();
     }
 
     bool ShouldActivateHover()
@@ -312,6 +316,59 @@ namespace Dreamtides.Services
       foreach (var key in toRemove)
       {
         _animationStates.Remove(key);
+      }
+    }
+
+    void PerformRecoveryCheck()
+    {
+      if (Time.time - _lastRecoveryCheck < _recoveryCheckInterval)
+      {
+        return;
+      }
+
+      _lastRecoveryCheck = Time.time;
+
+      var userHand = Registry.Layout.UserHand;
+      if (userHand.Objects.Count == 0)
+      {
+        return;
+      }
+
+      foreach (var displayable in userHand.Objects)
+      {
+        if (displayable is Card card && card.GameContext == GameContext.Hovering)
+        {
+          var shouldBeHovering = false;
+
+          if (_isActive && card == _currentHoveredCard)
+          {
+            shouldBeHovering = true;
+          }
+
+          if (!shouldBeHovering)
+          {
+            card.GameContext = GameContext.Hand;
+
+            if (_animationStates.TryGetValue(card.Id, out var state))
+            {
+              state.IsAnimatingToJump = false;
+              AnimateCardToOriginal(state);
+            }
+            else
+            {
+              var targetPosition = userHand.CalculateObjectPosition(card);
+              var currentPos = card.transform.position;
+
+              if (Vector3.Distance(currentPos, targetPosition) > 0.1f)
+              {
+                var newState = CreateAnimationState(card);
+                newState.IsAnimatingToJump = false;
+                _animationStates[card.Id] = newState;
+                AnimateCardToOriginal(newState);
+              }
+            }
+          }
+        }
       }
     }
   }
