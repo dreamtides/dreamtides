@@ -40,6 +40,11 @@ namespace Dreamtides.Services
 
     protected override void OnUpdate()
     {
+      if (Registry.IsMobileDevice)
+      {
+        return;
+      }
+
       if (Registry.InputService.InputProvider.IsPointerPressed())
       {
         if (_isActive)
@@ -198,8 +203,13 @@ namespace Dreamtides.Services
 
     void AnimateCardToJump(CardAnimationState state)
     {
-      state.CurrentTween?.Kill();
+      if (state.CurrentTween != null)
+      {
+        state.Card.GameContext = GameContext.Hand;
+        state.CurrentTween.Kill();
+      }
 
+      state.Card.GameContext = GameContext.Hovering;
       state.CurrentTween = DOTween.Sequence()
         .Append(state.Card.transform.DOMove(state.JumpPosition, _animateUpDuration).SetEase(Ease.OutCubic))
         .Join(state.Card.transform.DORotateQuaternion(state.JumpRotation, _animateUpDuration).SetEase(Ease.OutCubic))
@@ -219,8 +229,13 @@ namespace Dreamtides.Services
 
     void AnimateCardToOriginal(CardAnimationState state)
     {
-      state.CurrentTween?.Kill();
+      if (state.CurrentTween != null)
+      {
+        state.Card.GameContext = GameContext.Hand;
+        state.CurrentTween.Kill();
+      }
 
+      state.Card.GameContext = GameContext.Hand;
       state.CurrentTween = DOTween.Sequence()
         .Append(state.Card.transform.DOMove(state.OriginalPosition, _animateDownDuration).SetEase(Ease.OutCubic))
         .Join(state.Card.transform.DORotateQuaternion(state.OriginalRotation, _animateDownDuration).SetEase(Ease.OutCubic))
@@ -262,6 +277,7 @@ namespace Dreamtides.Services
 
         if (!userHand.Objects.Contains(state.Card))
         {
+          state.Card.GameContext = GameContext.Hand;
           state.CurrentTween?.Kill();
           toRemove.Add(kvp.Key);
           continue;
