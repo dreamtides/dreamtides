@@ -24,7 +24,7 @@ namespace Dreamtides.Layout
       return _leftEdge.position + new Vector3(offset + _initialOffset, 0, 0);
     }
 
-    protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
+    public override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
 
     /// <summary>
     /// Returns the index position within the selector which most closely maps

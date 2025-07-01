@@ -14,9 +14,9 @@ namespace Dreamtides.Layout
         transform.position.y + Mathf.Lerp(0f, 1f, YPosition(index, count)),
         transform.position.z);
 
-    protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
+    public override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
 
-    protected override float? CalculateObjectScale(int index, int count) => transform.localScale.x;
+    public override float? CalculateObjectScale(int index, int count) => transform.localScale.x;
 
     float YPosition(int index, int count) => count switch
     {

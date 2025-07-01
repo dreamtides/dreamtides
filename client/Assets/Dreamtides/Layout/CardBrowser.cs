@@ -69,7 +69,7 @@ namespace Dreamtides.Layout
         _leftEdge.position.z);
     }
 
-    protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
+    public override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
 
     protected override void OnUpdate()
     {

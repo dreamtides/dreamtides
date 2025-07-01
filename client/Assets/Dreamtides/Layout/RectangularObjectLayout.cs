@@ -20,7 +20,7 @@ namespace Dreamtides.Layout
         0.5f,
         CalculateZOffset(index, count));
 
-    protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
+    public override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
 
     float CalculateXOffset(int index, int count)
     {

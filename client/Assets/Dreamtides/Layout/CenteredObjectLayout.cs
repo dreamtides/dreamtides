@@ -17,9 +17,9 @@ namespace Dreamtides.Layout
       return transform.position + (_vertical ? new Vector3(0, 0, offset) : new Vector3(offset, 0, 0));
     }
 
-    protected override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
+    public override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
 
-    protected override float? CalculateObjectScale(int index, int count) => transform.localScale.x;
+    public override float? CalculateObjectScale(int index, int count) => transform.localScale.x;
 
     public static float CalculateOffset(
       float width,

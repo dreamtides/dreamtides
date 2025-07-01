@@ -109,7 +109,7 @@ namespace Dreamtides.Layout
     ///
     /// Note that this may be invoked with index=0, count=0 to compute initial
     /// object rotations.
-    protected virtual Vector3? CalculateObjectRotation(int index, int count) => null;
+    public virtual Vector3? CalculateObjectRotation(int index, int count) => null;
 
     /// <summary>
     /// Calculates the scale of the object at the given index in the layout.
@@ -117,7 +117,7 @@ namespace Dreamtides.Layout
     ///
     /// Note that this may be invoked with index=0, count=0 to compute initial
     /// object scales.
-    protected virtual float? CalculateObjectScale(int index, int count) => null;
+    public virtual float? CalculateObjectScale(int index, int count) => null;
 
     /// <summary>
     /// Calculates the sorting order of the object at the given index in the layout.

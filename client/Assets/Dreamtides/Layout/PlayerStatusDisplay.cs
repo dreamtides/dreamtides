@@ -94,8 +94,8 @@ namespace Dreamtides.Layout
 
     public override Vector3 CalculateObjectPosition(int index, int count) => transform.position;
 
-    protected override Vector3? CalculateObjectRotation(int index, int count) => new(90, 0, 0);
+    public override Vector3? CalculateObjectRotation(int index, int count) => new(90, 0, 0);
 
-    protected override float? CalculateObjectScale(int index, int count) => 0;
+    public override float? CalculateObjectScale(int index, int count) => 0;
   }
 }

@@ -26,7 +26,7 @@ namespace Dreamtides.Layout
       return bezier;
     }
 
-    protected override Vector3? CalculateObjectRotation(int index, int count)
+    public override Vector3? CalculateObjectRotation(int index, int count)
     {
       var curvePosition = CalculateCurvePosition(index, count);
       return new Vector3(
@@ -35,7 +35,7 @@ namespace Dreamtides.Layout
           z: _zRotationAddition + _zRotationMultiplier * CalculateZRotation(curvePosition));
     }
 
-    protected override float? CalculateObjectScale(int index, int count) => _objectScale == 0.0 ? null : _objectScale;
+    public override float? CalculateObjectScale(int index, int count) => _objectScale == 0.0 ? null : _objectScale;
 
     float CalculateCurvePosition(int cardIndex, int cardCount)
     {

@@ -83,6 +83,27 @@ namespace Dreamtides.Layout
       return null;
     }
 
+    public Vector3? CalculateObjectRotation(Card card)
+    {
+      if (_layout1.Objects.Contains(card))
+      {
+        return _layout1.CalculateObjectRotation(
+          _layout1.Objects.ToList().IndexOf(card), _layout1.Objects.Count);
+      }
+      else if (_layout2.Objects.Contains(card))
+      {
+        return _layout2.CalculateObjectRotation(
+          _layout2.Objects.ToList().IndexOf(card), _layout2.Objects.Count);
+      }
+      else if (_scrollableHand.Objects.Contains(card))
+      {
+        return _scrollableHand.CalculateObjectRotation(
+          _scrollableHand.Objects.ToList().IndexOf(card), _scrollableHand.Objects.Count);
+      }
+
+      return null;
+    }
+
     public override void ApplyTargetTransform(Displayable target, Sequence? sequence = null)
     {
       if (Objects.Count <= _useSecondLayoutAfter)

@@ -18,7 +18,6 @@ namespace Dreamtides.Services
     class CardAnimationState
     {
       public Card Card { get; set; } = null!;
-      public Quaternion OriginalRotation { get; set; }
       public Vector3 JumpPosition { get; set; }
       public Quaternion JumpRotation { get; set; }
       public Tween? CurrentTween { get; set; }
@@ -192,7 +191,6 @@ namespace Dreamtides.Services
       return new CardAnimationState
       {
         Card = card,
-        OriginalRotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0),
         JumpPosition = jumpPosition.Value,
         JumpRotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0),
         CurrentTween = null,
@@ -269,7 +267,8 @@ namespace Dreamtides.Services
       }
 
       var originalPosition = Registry.Layout.UserHand.CalculateObjectPosition(state.Card);
-      if (originalPosition == null)
+      var originalRotation = Registry.Layout.UserHand.CalculateObjectRotation(state.Card);
+      if (originalPosition == null || originalRotation == null)
       {
         Registry.CardService.ClearInfoZoom();
         if (state.Card.GameContext == GameContext.Hovering)
@@ -288,7 +287,9 @@ namespace Dreamtides.Services
       state.Card.ExcludeFromLayout = false;
       state.CurrentTween = DOTween.Sequence()
         .Append(state.Card.transform.DOMove(originalPosition.Value, _animateDownDuration).SetEase(Ease.OutCubic))
-        .Join(state.Card.transform.DORotateQuaternion(state.OriginalRotation, _animateDownDuration).SetEase(Ease.OutCubic))
+        .Join(state.Card.transform.DORotateQuaternion(Quaternion.Euler(originalRotation.Value), _animateDownDuration)
+          .SetEase(Ease.OutCubic)
+        )
         .OnUpdate(() =>
         {
           if (!state.IsAnimatingToJump)
