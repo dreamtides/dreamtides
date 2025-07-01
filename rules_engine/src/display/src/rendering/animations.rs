@@ -72,7 +72,7 @@ pub fn render(
                 // If the played card is no longer on the stack, insert a pause
                 // so it can be seen.
                 push_snapshot(builder, snapshot);
-                builder.push(Command::Wait(Milliseconds::new(2000)));
+                builder.push(Command::Wait(Milliseconds::new(1000)));
             }
         }
 
