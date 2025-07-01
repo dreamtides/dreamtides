@@ -63,7 +63,7 @@ namespace Dreamtides.Layout
       SetSortingKeys();
     }
 
-    public Vector3 CalculateObjectPosition(Card card)
+    public Vector3? CalculateObjectPosition(Card card)
     {
       if (_layout1.Objects.Contains(card))
       {
@@ -81,7 +81,7 @@ namespace Dreamtides.Layout
           _scrollableHand.Objects.ToList().IndexOf(card), _scrollableHand.Objects.Count);
       }
 
-      throw new Exception($"Card {card.Id} not found in hand");
+      return null;
     }
 
     public override void ApplyTargetTransform(Displayable target, Sequence? sequence = null)

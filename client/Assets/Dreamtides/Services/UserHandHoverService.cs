@@ -93,7 +93,12 @@ namespace Dreamtides.Services
         if (displayable is Card card)
         {
           var targetPosition = userHand.CalculateObjectPosition(card);
-          var screenTargetPosition = Registry.Layout.MainCamera.WorldToScreenPoint(targetPosition);
+          if (targetPosition == null)
+          {
+            continue;
+          }
+
+          var screenTargetPosition = Registry.Layout.MainCamera.WorldToScreenPoint(targetPosition.Value);
           var distance = Vector2.Distance(pointerPosition, new Vector2(screenTargetPosition.x, screenTargetPosition.y));
 
           if (distance < closestDistance)
@@ -126,9 +131,14 @@ namespace Dreamtides.Services
         if (displayable is Card card)
         {
           var targetPosition = userHand.CalculateObjectPosition(card);
-          var screenZ = Registry.Layout.MainCamera.WorldToScreenPoint(targetPosition).z;
+          if (targetPosition == null)
+          {
+            continue;
+          }
+
+          var screenZ = Registry.Layout.MainCamera.WorldToScreenPoint(targetPosition.Value).z;
           var worldPointerPosition = Registry.InputService.WorldPointerPosition(screenZ);
-          var distance = Vector3.Distance(worldPointerPosition, targetPosition);
+          var distance = Vector3.Distance(worldPointerPosition, targetPosition.Value);
 
           if (distance <= _hoverDistance)
           {
@@ -154,7 +164,12 @@ namespace Dreamtides.Services
       {
         if (!_animationStates.TryGetValue(newCard.Id, out var state))
         {
-          state = CreateAnimationState(newCard);
+          var newState = CreateAnimationState(newCard);
+          if (newState == null)
+          {
+            return;
+          }
+          state = newState;
           _animationStates[newCard.Id] = state;
         }
 
@@ -166,10 +181,15 @@ namespace Dreamtides.Services
       }
     }
 
-    CardAnimationState CreateAnimationState(Card card)
+    CardAnimationState? CreateAnimationState(Card card)
     {
       var targetPosition = Registry.Layout.UserHand.CalculateObjectPosition(card);
-      var jumpPosition = CalculateJumpPosition(card, targetPosition);
+      if (targetPosition == null)
+      {
+        return null;
+      }
+
+      var jumpPosition = CalculateJumpPosition(card, targetPosition.Value);
 
       return new CardAnimationState
       {
@@ -206,7 +226,11 @@ namespace Dreamtides.Services
       }
 
       var targetPosition = Registry.Layout.UserHand.CalculateObjectPosition(state.Card);
-      state.JumpPosition = CalculateJumpPosition(state.Card, targetPosition);
+      if (targetPosition == null)
+      {
+        return;
+      }
+      state.JumpPosition = CalculateJumpPosition(state.Card, targetPosition.Value);
 
       state.Card.GameContext = GameContext.Hovering;
       state.Card.ExcludeFromLayout = true;
@@ -241,6 +265,16 @@ namespace Dreamtides.Services
       }
 
       var originalPosition = Registry.Layout.UserHand.CalculateObjectPosition(state.Card);
+      if (originalPosition == null)
+      {
+        Registry.CardService.ClearInfoZoom();
+        if (state.Card.GameContext == GameContext.Hovering)
+        {
+          state.Card.GameContext = GameContext.Hand;
+        }
+        state.Card.ExcludeFromLayout = false;
+        return;
+      }
 
       Registry.CardService.ClearInfoZoom();
       if (state.Card.GameContext == GameContext.Hovering)
@@ -249,7 +283,7 @@ namespace Dreamtides.Services
       }
       state.Card.ExcludeFromLayout = false;
       state.CurrentTween = DOTween.Sequence()
-        .Append(state.Card.transform.DOMove(originalPosition, _animateDownDuration).SetEase(Ease.OutCubic))
+        .Append(state.Card.transform.DOMove(originalPosition.Value, _animateDownDuration).SetEase(Ease.OutCubic))
         .Join(state.Card.transform.DORotateQuaternion(state.OriginalRotation, _animateDownDuration).SetEase(Ease.OutCubic))
         .OnUpdate(() =>
         {
@@ -307,7 +341,12 @@ namespace Dreamtides.Services
             state.JumpPosition :
             userHand.CalculateObjectPosition(state.Card);
 
-          if (Vector3.Distance(currentPos, targetPos) > 0.01f)
+          if (targetPos == null)
+          {
+            continue;
+          }
+
+          if (Vector3.Distance(currentPos, targetPos.Value) > 0.01f)
           {
             if (state.IsAnimatingToJump)
             {
@@ -360,14 +399,27 @@ namespace Dreamtides.Services
             else
             {
               var targetPosition = userHand.CalculateObjectPosition(card);
+              if (targetPosition == null)
+              {
+                card.ExcludeFromLayout = false;
+                continue;
+              }
+
               var currentPos = card.transform.position;
 
-              if (Vector3.Distance(currentPos, targetPosition) > 0.1f)
+              if (Vector3.Distance(currentPos, targetPosition.Value) > 0.1f)
               {
                 var newState = CreateAnimationState(card);
-                newState.IsAnimatingToJump = false;
-                _animationStates[card.Id] = newState;
-                AnimateCardToOriginal(newState);
+                if (newState != null)
+                {
+                  newState.IsAnimatingToJump = false;
+                  _animationStates[card.Id] = newState;
+                  AnimateCardToOriginal(newState);
+                }
+                else
+                {
+                  card.ExcludeFromLayout = false;
+                }
               }
               else
               {
