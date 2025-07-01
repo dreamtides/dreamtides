@@ -142,13 +142,13 @@ fn render_updates(
     response_type: PollResponseType,
 ) {
     let player_name = renderer::player_name_for_user(battle, user_id);
-    let player_updates = renderer::render_updates(battle, user_id);
+    let player_updates = renderer::render_updates(battle, user_id, provider.clone());
     append_update(provider.clone(), user_id, player_updates, context, request_id, response_type);
 
     if let PlayerType::User(opponent_id) =
         &battle.players.player(player_name.opponent()).player_type
     {
-        let opponent_updates = renderer::render_updates(battle, *opponent_id);
+        let opponent_updates = renderer::render_updates(battle, *opponent_id, provider.clone());
         append_update(provider, *opponent_id, opponent_updates, context, request_id, response_type);
     }
 }

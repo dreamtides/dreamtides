@@ -32,8 +32,17 @@ pub fn connect(
 /// Returns a series of commands which contain animations for recent changes to
 /// game states, followed by a snapshot of the current game state in the same
 /// manner as returned by [connect].
-pub fn render_updates(battle: &BattleState, user_id: UserId) -> CommandSequence {
-    let mut builder = ResponseBuilder::new(player_name_for_user(battle, user_id), true);
+pub fn render_updates(
+    battle: &BattleState,
+    user_id: UserId,
+    provider: impl DisplayStateProvider + 'static,
+) -> CommandSequence {
+    let mut builder = ResponseBuilder::with_state_provider(
+        player_name_for_user(battle, user_id),
+        user_id,
+        provider,
+        true,
+    );
     builder.set_for_animation(true);
     if let Some(animations) = &battle.animations {
         if !animations.steps.is_empty() {
