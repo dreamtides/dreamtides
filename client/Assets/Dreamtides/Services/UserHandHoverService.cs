@@ -18,7 +18,6 @@ namespace Dreamtides.Services
     class CardAnimationState
     {
       public Card Card { get; set; } = null!;
-      public Vector3 OriginalPosition { get; set; }
       public Quaternion OriginalRotation { get; set; }
       public Vector3 JumpPosition { get; set; }
       public Quaternion JumpRotation { get; set; }
@@ -170,7 +169,6 @@ namespace Dreamtides.Services
       return new CardAnimationState
       {
         Card = card,
-        OriginalPosition = targetPosition,
         OriginalRotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0),
         JumpPosition = jumpPosition,
         JumpRotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0),
@@ -216,6 +214,9 @@ namespace Dreamtides.Services
         state.CurrentTween.Kill();
       }
 
+      var targetPosition = Registry.Layout.UserHand.CalculateObjectPosition(state.Card);
+      state.JumpPosition = CalculateJumpPosition(state.Card, targetPosition);
+
       state.Card.GameContext = GameContext.Hovering;
       state.CurrentTween = DOTween.Sequence()
         .Append(state.Card.transform.DOMove(state.JumpPosition, _animateUpDuration).SetEase(Ease.OutCubic))
@@ -246,13 +247,15 @@ namespace Dreamtides.Services
         state.CurrentTween.Kill();
       }
 
+      var originalPosition = Registry.Layout.UserHand.CalculateObjectPosition(state.Card);
+
       Registry.CardService.ClearInfoZoom();
       if (state.Card.GameContext == GameContext.Hovering)
       {
         state.Card.GameContext = GameContext.Hand;
       }
       state.CurrentTween = DOTween.Sequence()
-        .Append(state.Card.transform.DOMove(state.OriginalPosition, _animateDownDuration).SetEase(Ease.OutCubic))
+        .Append(state.Card.transform.DOMove(originalPosition, _animateDownDuration).SetEase(Ease.OutCubic))
         .Join(state.Card.transform.DORotateQuaternion(state.OriginalRotation, _animateDownDuration).SetEase(Ease.OutCubic))
         .OnUpdate(() =>
         {
@@ -301,27 +304,22 @@ namespace Dreamtides.Services
           continue;
         }
 
-        var newTargetPosition = userHand.CalculateObjectPosition(state.Card);
-        if (Vector3.Distance(newTargetPosition, state.OriginalPosition) > 0.01f)
+        if (state.CurrentTween == null || !state.CurrentTween.IsActive())
         {
-          state.OriginalPosition = newTargetPosition;
-          state.JumpPosition = CalculateJumpPosition(state.Card, newTargetPosition);
+          var currentPos = state.Card.transform.position;
+          var targetPos = state.IsAnimatingToJump ?
+            state.JumpPosition :
+            userHand.CalculateObjectPosition(state.Card);
 
-          if (state.CurrentTween == null || !state.CurrentTween.IsActive())
+          if (Vector3.Distance(currentPos, targetPos) > 0.01f)
           {
-            var currentPos = state.Card.transform.position;
-            var targetPos = state.IsAnimatingToJump ? state.JumpPosition : state.OriginalPosition;
-
-            if (Vector3.Distance(currentPos, targetPos) > 0.01f)
+            if (state.IsAnimatingToJump)
             {
-              if (state.IsAnimatingToJump)
-              {
-                AnimateCardToJump(state);
-              }
-              else
-              {
-                AnimateCardToOriginal(state);
-              }
+              AnimateCardToJump(state);
+            }
+            else
+            {
+              AnimateCardToOriginal(state);
             }
           }
         }
