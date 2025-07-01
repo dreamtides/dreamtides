@@ -241,7 +241,7 @@ namespace Dreamtides.Services
       {
         state.Card.GameContext = GameContext.Hand;
       }
-      state.Card.ExcludeFromLayout = true;
+      state.Card.ExcludeFromLayout = false;
       state.CurrentTween = DOTween.Sequence()
         .Append(state.Card.transform.DOMove(originalPosition, _animateDownDuration).SetEase(Ease.OutCubic))
         .Join(state.Card.transform.DORotateQuaternion(state.OriginalRotation, _animateDownDuration).SetEase(Ease.OutCubic))
@@ -256,7 +256,6 @@ namespace Dreamtides.Services
         {
           state.AnimationProgress = 0f;
           state.CurrentTween = null;
-          state.Card.ExcludeFromLayout = false;
           if (!state.IsAnimatingToJump)
           {
             _animationStates.Remove(state.Card.Id);
