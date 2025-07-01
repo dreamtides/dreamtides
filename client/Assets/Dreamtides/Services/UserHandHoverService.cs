@@ -27,45 +27,40 @@ namespace Dreamtides.Services
       public float AnimationProgress { get; set; }
     }
 
+    [SerializeField] float _hoverDistance = 0.05f;
     bool _isActive;
     Card? _currentHoveredCard;
     readonly Dictionary<string, CardAnimationState> _animationStates = new();
-    readonly HashSet<string> _hoveredCardIds = new();
     const float AnimationDuration = 0.1f;
-    float? _hoverEndTime = null;
 
     protected override void OnInitialize(TestConfiguration? testConfiguration)
     {
     }
 
-    public void StartHover(string cardId)
-    {
-      Debug.Log($"StartHover count: {_hoveredCardIds.Count}");
-      _hoverEndTime = null;
-      _hoveredCardIds.Add(cardId);
-      _isActive = true;
-    }
-
-    public void EndHover(string cardId)
-    {
-      Debug.Log($"EndHover count: {_hoveredCardIds.Count}");
-      _hoveredCardIds.Remove(cardId);
-      if (_hoveredCardIds.Count == 0)
-      {
-        _hoverEndTime = Time.time;
-      }
-    }
-
     protected override void OnUpdate()
     {
-      if (_hoverEndTime != null && Time.time - _hoverEndTime > 0.3f)
+      if (Registry.InputService.InputProvider.IsPointerPressed())
       {
-        Debug.Log("Ending hand hover");
+        if (_isActive)
+        {
+          UpdateAllAnimations();
+        }
+        return;
+      }
+
+      var shouldBeActive = ShouldActivateHover();
+
+      if (shouldBeActive && !_isActive)
+      {
+        _isActive = true;
+      }
+      else if (!shouldBeActive && _isActive)
+      {
         _isActive = false;
         AnimateAllCardsToOriginal();
         _currentHoveredCard = null;
         _animationStates.Clear();
-        _hoverEndTime = null;
+        return;
       }
 
       if (!_isActive)
@@ -105,6 +100,33 @@ namespace Dreamtides.Services
       }
 
       UpdateAllAnimations();
+    }
+
+    bool ShouldActivateHover()
+    {
+      var userHand = Registry.Layout.UserHand;
+      if (userHand.Objects.Count == 0)
+      {
+        return false;
+      }
+
+      foreach (var displayable in userHand.Objects)
+      {
+        if (displayable is Card card)
+        {
+          var targetPosition = userHand.CalculateObjectPosition(card);
+          var screenZ = Registry.Layout.MainCamera.WorldToScreenPoint(targetPosition).z;
+          var worldPointerPosition = Registry.InputService.WorldPointerPosition(screenZ);
+          var distance = Vector3.Distance(worldPointerPosition, targetPosition);
+
+          if (distance <= _hoverDistance)
+          {
+            return true;
+          }
+        }
+      }
+
+      return false;
     }
 
     void TransitionToNewCard(Card? newCard)
@@ -230,7 +252,7 @@ namespace Dreamtides.Services
 
     void UpdateAllAnimations()
     {
-      var userHand = Registry.Layout.UserHand as UserHandLayout;
+      var userHand = Registry.Layout.UserHand;
       var toRemove = new List<string>();
 
       foreach (var kvp in _animationStates)

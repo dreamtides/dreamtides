@@ -6054,6 +6054,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c833961ca7d654f71a4791488b15a832, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _hoverDistance: 1.5
 --- !u!1001 &625589745
 PrefabInstance:
   m_ObjectHideFlags: 0

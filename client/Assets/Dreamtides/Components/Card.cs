@@ -344,10 +344,12 @@ namespace Dreamtides.Components
       _distanceDragged = 0;
       _registry.CardService.IsPointerDownOnCard = true;
 
-      if (GameContext == GameContext.Hand && !_registry.CapabilitiesService.AnyBrowserOpen())
+      if (_registry.IsMobileDevice &&
+        GameContext == GameContext.Hand &&
+        !_registry.CapabilitiesService.AnyBrowserOpen())
       {
         // Jump to large size when in hand
-        transform.position = HandCardJumpPosition();
+        transform.position = MobileHandCardJumpPosition();
         transform.rotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0);
         _registry.CardService.DisplayInfoZoom(this, forCardInHand: true);
       }
@@ -488,10 +490,6 @@ namespace Dreamtides.Components
         _hoverStartTime = Time.time;
         _hoveringForInfoZoom = true;
       }
-      else if (GameContext == GameContext.Hand)
-      {
-        _registry.UserHandHoverService.StartHover(Id);
-      }
     }
 
     public override void MouseHover()
@@ -510,10 +508,6 @@ namespace Dreamtides.Components
         _registry.CardService.ClearInfoZoom();
         _hoveringForInfoZoom = false;
         _longHoverFired = false;
-      }
-      else if (GameContext == GameContext.Hand)
-      {
-        _registry.UserHandHoverService.EndHover(Id);
       }
     }
 
@@ -559,31 +553,19 @@ namespace Dreamtides.Components
       }
     }
 
-    Vector3 HandCardJumpPosition()
+    Vector3 MobileHandCardJumpPosition()
     {
-      if (_registry.IsLandscape)
-      {
-        // Bias slightly towards screen center
-        var horizontalPosition = Mathf.Clamp01((transform.position.x - 8f) / 14f);
-        return transform.position + Vector3.Lerp(
-          new Vector3(2f, 6f, 2.5f),
-          new Vector3(-2f, 6f, 2.5f),
-          horizontalPosition);
-      }
-      else
-      {
-        // Keep card above user's finger on mobile so they can read it.
-        var screenZ = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
-        var worldPosition = _registry.InputService.WorldPointerPosition(screenZ);
-        var offset = gameObject.transform.position - worldPosition;
-        var target = transform.position + new Vector3(0, 3, Mathf.Max(1.75f, 3.25f - offset.z));
-        target.x = Mathf.Clamp(target.x,
-            _registry.Layout.InfoZoomLeft.position.x,
-            _registry.Layout.InfoZoomRight.position.x);
-        target.y = Mathf.Clamp(target.y, 20f, 25f);
-        target.z = Mathf.Clamp(target.z, -25f, -20f);
-        return target;
-      }
+      // Keep card above user's finger on mobile so they can read it.
+      var screenZ = Camera.main.WorldToScreenPoint(gameObject.transform.position).z;
+      var worldPosition = _registry.InputService.WorldPointerPosition(screenZ);
+      var offset = gameObject.transform.position - worldPosition;
+      var target = transform.position + new Vector3(0, 3, Mathf.Max(1.75f, 3.25f - offset.z));
+      target.x = Mathf.Clamp(target.x,
+          _registry.Layout.InfoZoomLeft.position.x,
+          _registry.Layout.InfoZoomRight.position.x);
+      target.y = Mathf.Clamp(target.y, 20f, 25f);
+      target.z = Mathf.Clamp(target.z, -25f, -20f);
+      return target;
     }
 
     bool ShouldReturnToPreviousParentOnRelease()

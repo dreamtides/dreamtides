@@ -89,6 +89,8 @@ namespace Dreamtides.Services
 
     public Vector2 PointerPosition() => InputProvider.PointerPosition();
 
+    public bool IsPointerPressed() => InputProvider.IsPointerPressed();
+
     public Vector3 WorldPointerPosition(float screenZ)
     {
       var tapScreenPosition = InputProvider.PointerPosition();
