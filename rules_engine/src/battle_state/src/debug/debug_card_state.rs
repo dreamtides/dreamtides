@@ -3,6 +3,7 @@ use serde::Serialize;
 #[derive(Debug, Clone, Serialize)]
 pub struct DebugCardState {
     pub id: String,
+    pub object_id: String,
     pub controller: String,
     pub current_zone: String,
     pub properties: DebugCardProperties,

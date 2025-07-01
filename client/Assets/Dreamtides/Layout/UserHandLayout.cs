@@ -60,7 +60,6 @@ namespace Dreamtides.Layout
       _layout1.ApplyLayout(sequence);
       _layout2.ApplyLayout(sequence);
       _scrollableHand.ApplyLayout(sequence);
-      SetSortingKeys();
     }
 
     public Vector3? CalculateObjectPosition(Card card)
@@ -98,7 +97,6 @@ namespace Dreamtides.Layout
       {
         _scrollableHand.ApplyTargetTransform(target, sequence);
       }
-      SetSortingKeys();
     }
 
     public override void RemoveIfPresent(Displayable? displayable)
@@ -115,17 +113,6 @@ namespace Dreamtides.Layout
       RebalanceLayouts();
     }
 
-    void SetSortingKeys()
-    {
-      for (var i = 0; i < Objects.Count; ++i)
-      {
-        var obj = Objects[i];
-        if (obj.SortingGroup)
-        {
-          obj.SortingGroup.sortingOrder = i;
-        }
-      }
-    }
 
     void RebalanceLayouts()
     {

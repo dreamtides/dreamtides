@@ -55,6 +55,7 @@ namespace Dreamtides.Services
       Registry.SoundService.PlayDrawCardSound();
       var sequence = TweenUtils.Sequence("DrawUserCard");
       var moveDuration = 0.3f;
+      card.SortingKey = (int)cardView.Position.SortingKey;
       card.Render(Registry, cardView, sequence);
       card.GameContext = GameContext.DrawnCards;
       sequence.Insert(
