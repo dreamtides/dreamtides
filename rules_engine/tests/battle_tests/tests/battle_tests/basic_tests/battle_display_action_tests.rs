@@ -368,3 +368,44 @@ fn toggle_stack_visibility_during_complex_targeting() {
     );
     assert!(s.user_client.me.can_act(), "user should still be able to act with stack visible");
 }
+
+#[test]
+fn other_game_actions_unhide_stack() {
+    let mut s = TestBattle::builder().connect();
+    s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
+
+    assert!(
+        s.user_client.cards.stack_cards().contains(&enemy_character),
+        "enemy character should be on stack"
+    );
+    assert_eq!(
+        s.user_client.cards.cards_at_position(&Position::OnScreenStorage).len(),
+        0,
+        "on screen storage should be empty initially"
+    );
+
+    s.perform_user_action(BattleDisplayAction::ToggleStackVisibility);
+
+    assert_eq!(s.user_client.cards.stack_cards().len(), 0, "stack should appear empty when hidden");
+    assert!(
+        s.user_client
+            .cards
+            .cards_at_position(&Position::OnScreenStorage)
+            .contains(&enemy_character),
+        "enemy character should be in on screen storage when stack is hidden"
+    );
+
+    s.perform_user_action(BattleDisplayAction::BrowseCards(CardBrowserType::UserVoid));
+
+    assert!(
+        s.user_client.cards.stack_cards().contains(&enemy_character),
+        "enemy character should be back on stack after performing other action"
+    );
+    assert_eq!(
+        s.user_client.cards.cards_at_position(&Position::OnScreenStorage).len(),
+        0,
+        "on screen storage should be empty after performing other action"
+    );
+}
