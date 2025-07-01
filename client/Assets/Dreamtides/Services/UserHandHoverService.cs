@@ -183,19 +183,17 @@ namespace Dreamtides.Services
 
     CardAnimationState? CreateAnimationState(Card card)
     {
-      var targetPosition = Registry.Layout.UserHand.CalculateObjectPosition(card);
-      if (targetPosition == null)
+      var jumpPosition = CalculateJumpPosition(card);
+      if (jumpPosition == null)
       {
         return null;
       }
-
-      var jumpPosition = CalculateJumpPosition(card, targetPosition.Value);
 
       return new CardAnimationState
       {
         Card = card,
         OriginalRotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0),
-        JumpPosition = jumpPosition,
+        JumpPosition = jumpPosition.Value,
         JumpRotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0),
         CurrentTween = null,
         IsAnimatingToJump = false,
@@ -204,10 +202,16 @@ namespace Dreamtides.Services
       };
     }
 
-    Vector3 CalculateJumpPosition(Card card, Vector3 targetPosition)
+    public Vector3? CalculateJumpPosition(Card card)
     {
-      var horizontalPosition = Mathf.Clamp01((targetPosition.x - 8f) / 14f);
-      return targetPosition + Vector3.Lerp(
+      var targetPosition = Registry.Layout.UserHand.CalculateObjectPosition(card);
+      if (targetPosition == null)
+      {
+        return null;
+      }
+
+      var horizontalPosition = Mathf.Clamp01((targetPosition.Value.x - 8f) / 14f);
+      return targetPosition.Value + Vector3.Lerp(
         new Vector3(2f, 4.0f, 1.5f),
         new Vector3(-2f, 4.0f, 1.5f),
         horizontalPosition);
@@ -225,12 +229,12 @@ namespace Dreamtides.Services
         state.CurrentTween.Kill();
       }
 
-      var targetPosition = Registry.Layout.UserHand.CalculateObjectPosition(state.Card);
-      if (targetPosition == null)
+      var jumpPosition = CalculateJumpPosition(state.Card);
+      if (jumpPosition == null)
       {
         return;
       }
-      state.JumpPosition = CalculateJumpPosition(state.Card, targetPosition.Value);
+      state.JumpPosition = jumpPosition.Value;
 
       state.Card.GameContext = GameContext.Hovering;
       state.Card.ExcludeFromLayout = true;
