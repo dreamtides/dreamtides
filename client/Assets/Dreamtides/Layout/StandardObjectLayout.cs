@@ -41,7 +41,11 @@ namespace Dreamtides.Layout
         _objects.Add(displayable);
       }
 
-      displayable.GameContext = GameContext;
+      if (!displayable.ExcludeFromLayout)
+      {
+        displayable.GameContext = GameContext;
+      }
+
       SortObjects();
     }
 
