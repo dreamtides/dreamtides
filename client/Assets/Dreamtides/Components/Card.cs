@@ -512,7 +512,7 @@ namespace Dreamtides.Components
 
     public override void MouseHover()
     {
-      if (Time.time - _hoverStartTime > 0.5f && _hoveringForInfoZoom && !_longHoverFired)
+      if (Time.time - _hoverStartTime > 0.15f && _hoveringForInfoZoom && !_longHoverFired)
       {
         _registry.CardService.DisplayInfoZoom(this, forCardInHand: false);
         _longHoverFired = true;
