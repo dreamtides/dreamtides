@@ -24,12 +24,14 @@ namespace Dreamtides.Services
       public Tween? CurrentTween { get; set; }
       public bool IsAnimatingToJump { get; set; }
       public float AnimationProgress { get; set; }
+      public float LastAnimationEndTime { get; set; }
     }
 
     [SerializeField] float _hoverDistance = 2f;
     [SerializeField] float _animateUpDuration = 0.1f;
     [SerializeField] float _animateDownDuration = 0.3f;
     [SerializeField] float _recoveryCheckInterval = 0.1f;
+    [SerializeField] float _debounceTime = 0.3f;
     bool _isActive;
     Card? _currentHoveredCard;
     readonly Dictionary<string, CardAnimationState> _animationStates = new();
@@ -156,8 +158,11 @@ namespace Dreamtides.Services
           _animationStates[newCard.Id] = state;
         }
 
-        state.IsAnimatingToJump = true;
-        AnimateCardToJump(state);
+        if (Time.time - state.LastAnimationEndTime >= _debounceTime)
+        {
+          state.IsAnimatingToJump = true;
+          AnimateCardToJump(state);
+        }
       }
     }
 
@@ -174,7 +179,8 @@ namespace Dreamtides.Services
         JumpRotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0),
         CurrentTween = null,
         IsAnimatingToJump = false,
-        AnimationProgress = 0f
+        AnimationProgress = 0f,
+        LastAnimationEndTime = 0f
       };
     }
 
@@ -256,6 +262,7 @@ namespace Dreamtides.Services
         {
           state.AnimationProgress = 0f;
           state.CurrentTween = null;
+          state.LastAnimationEndTime = Time.time;
           if (!state.IsAnimatingToJump)
           {
             _animationStates.Remove(state.Card.Id);
