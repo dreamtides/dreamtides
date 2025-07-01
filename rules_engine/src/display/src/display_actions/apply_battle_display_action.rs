@@ -1,4 +1,5 @@
 use action_data::battle_display_action::{BattleDisplayAction, CardBrowserType};
+use action_data::game_action_data::GameAction;
 use core_data::display_types::StudioAnimation;
 use core_data::identifiers::UserId;
 use core_data::numerics::Energy;
@@ -41,6 +42,21 @@ pub fn execute(
     }
 
     builder.commands()
+}
+
+/// Invoked whenever a game action is performed in order to update display
+/// state.
+pub fn on_action_performed(
+    provider: impl DisplayStateProvider + 'static,
+    action: &GameAction,
+    user_id: UserId,
+) {
+    if action != &GameAction::BattleDisplayAction(BattleDisplayAction::ToggleStackVisibility) {
+        // Stop hiding stack on any other action received.
+        let mut state = provider.get_display_state(user_id);
+        state.stack_hidden = false;
+        provider.set_display_state(user_id, state);
+    }
 }
 
 fn browse_cards(card_browser: CardBrowserType, builder: &mut ResponseBuilder) {

@@ -534,6 +534,7 @@ fn handle_request_action(
     let request_context = provider
         .get_request_context(user_id)
         .unwrap_or(RequestContext { logging_options: Default::default() });
+    apply_battle_display_action::on_action_performed(provider.clone(), &request.action, user_id);
 
     match &request.action {
         GameAction::NoOp => {}
