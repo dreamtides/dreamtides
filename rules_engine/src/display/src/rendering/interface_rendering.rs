@@ -16,7 +16,7 @@ use display_data::battle_view::{ButtonView, InterfaceView};
 use masonry::dimension::{FlexInsets, SafeAreaInsets};
 use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition};
 use masonry::flex_style::FlexStyle;
-use ui_components::box_component::BoxComponent;
+use ui_components::box_component::{BoxComponent, BoxComponentBuilder, Named};
 use ui_components::button_component::ButtonComponent;
 use ui_components::component::Component;
 use ui_components::icon;
@@ -28,25 +28,23 @@ use crate::rendering::interface_message::{AnchorPosition, InterfaceMessage};
 use crate::rendering::labels;
 
 pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> InterfaceView {
+    let current_panel_address = display_state::get_current_panel_address(builder);
+
     if builder.is_for_animation() {
+        let overlay_builder = overlay_builder().child(
+            current_panel_address
+                .map(|address| panel_rendering::render_panel(address, builder, battle)),
+        );
+
         return InterfaceView {
+            screen_overlay: overlay_builder.build().flex_node(),
             dev_button: Some(ButtonView { label: "\u{f0ad} Dev".to_string(), action: None }),
             undo_button: Some(ButtonView { label: "\u{f0e2}".to_string(), action: None }),
             ..Default::default()
         };
     }
 
-    let current_panel_address = display_state::get_current_panel_address(builder);
-    let overlay_builder = BoxComponent::builder()
-        .name("Interface Overlay")
-        .style(
-            FlexStyle::builder()
-                .position(FlexPosition::Absolute)
-                .inset(FlexInsets::all(0))
-                .align_items(FlexAlign::Center)
-                .justify_content(FlexJustify::Center)
-                .build(),
-        )
+    let overlay_builder = overlay_builder()
         .child(render_prompt_message(builder, battle))
         .child(render_hide_stack_button(builder, battle))
         .child(
@@ -266,6 +264,17 @@ fn decrement_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<B
     }
 
     None
+}
+
+fn overlay_builder() -> BoxComponentBuilder<Named> {
+    BoxComponent::builder().name("Interface Overlay").style(
+        FlexStyle::builder()
+            .position(FlexPosition::Absolute)
+            .inset(FlexInsets::all(0))
+            .align_items(FlexAlign::Center)
+            .justify_content(FlexJustify::Center)
+            .build(),
+    )
 }
 
 fn render_hide_stack_button(
