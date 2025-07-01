@@ -139,6 +139,11 @@ namespace Dreamtides.Layout
       Sequence? sequence = null,
       bool applyToChildren = true)
     {
+      if (displayable.ExcludeFromLayout)
+      {
+        return;
+      }
+
       const float duration = TweenUtils.MoveAnimationDurationSeconds;
       var position = CalculateObjectPosition(index, count);
       var rotation = CalculateObjectRotation(index, count);

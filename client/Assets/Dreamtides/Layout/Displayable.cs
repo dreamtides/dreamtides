@@ -14,6 +14,11 @@ namespace Dreamtides.Layout
     [SerializeField] GameContext _internalGameContext;
     ObjectLayout? _parent;
 
+    /// <summary>
+    /// If true, this object will not be modified by the layout system.
+    /// </summary>
+    public bool ExcludeFromLayout { get; set; }
+
     /// <summary>Order items within a sorting layer.</summary>
     public int SortingKey
     {

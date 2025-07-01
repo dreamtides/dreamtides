@@ -211,6 +211,7 @@ namespace Dreamtides.Services
         {
           state.Card.GameContext = GameContext.Hand;
         }
+        state.Card.ExcludeFromLayout = false;
         state.CurrentTween.Kill();
       }
 
@@ -218,6 +219,7 @@ namespace Dreamtides.Services
       state.JumpPosition = CalculateJumpPosition(state.Card, targetPosition);
 
       state.Card.GameContext = GameContext.Hovering;
+      state.Card.ExcludeFromLayout = true;
       state.CurrentTween = DOTween.Sequence()
         .Append(state.Card.transform.DOMove(state.JumpPosition, _animateUpDuration).SetEase(Ease.OutCubic))
         .Join(state.Card.transform.DORotateQuaternion(state.JumpRotation, _animateUpDuration).SetEase(Ease.OutCubic))
@@ -244,6 +246,7 @@ namespace Dreamtides.Services
         {
           state.Card.GameContext = GameContext.Hand;
         }
+        state.Card.ExcludeFromLayout = false;
         state.CurrentTween.Kill();
       }
 
@@ -254,6 +257,7 @@ namespace Dreamtides.Services
       {
         state.Card.GameContext = GameContext.Hand;
       }
+      state.Card.ExcludeFromLayout = true;
       state.CurrentTween = DOTween.Sequence()
         .Append(state.Card.transform.DOMove(originalPosition, _animateDownDuration).SetEase(Ease.OutCubic))
         .Join(state.Card.transform.DORotateQuaternion(state.OriginalRotation, _animateDownDuration).SetEase(Ease.OutCubic))
@@ -268,6 +272,7 @@ namespace Dreamtides.Services
         {
           state.AnimationProgress = 0f;
           state.CurrentTween = null;
+          state.Card.ExcludeFromLayout = false;
           if (!state.IsAnimatingToJump)
           {
             _animationStates.Remove(state.Card.Id);
@@ -299,6 +304,7 @@ namespace Dreamtides.Services
           {
             state.Card.GameContext = GameContext.Hand;
           }
+          state.Card.ExcludeFromLayout = false;
           state.CurrentTween?.Kill();
           toRemove.Add(kvp.Key);
           continue;
@@ -372,6 +378,10 @@ namespace Dreamtides.Services
                 newState.IsAnimatingToJump = false;
                 _animationStates[card.Id] = newState;
                 AnimateCardToOriginal(newState);
+              }
+              else
+              {
+                card.ExcludeFromLayout = false;
               }
             }
           }
