@@ -8,6 +8,7 @@ using TMPro;
 using UnityEngine;
 using Dreamtides.Schema;
 using System.Runtime.CompilerServices;
+using UnityEngine.Serialization;
 
 [assembly: InternalsVisibleTo("Dreamtides.TestUtils")]
 namespace Dreamtides.Buttons
@@ -17,7 +18,8 @@ namespace Dreamtides.Buttons
     [SerializeField] internal Registry _registry = null!;
     [SerializeField] internal SpriteRenderer _background = null!;
     [SerializeField] internal TextMeshPro _text = null!;
-    [SerializeField] internal Material _onPressedMaterial = null!;
+    [FormerlySerializedAs("_onPressedMaterial")]
+    [SerializeField] internal Material _noOutlineMaterial = null!;
     [SerializeField] internal float _animationDuration = 0.1f;
     [SerializeField] internal float _moveDistance = 1f;
     [SerializeField] internal AudioClip _onClickSound = null!;
@@ -45,6 +47,7 @@ namespace Dreamtides.Buttons
     protected override void OnStart()
     {
       SaveCurrentValues();
+      _originalMaterial = _background.material;
       _collider.enabled = _isVisible;
       UpdateButtonColors();
     }
@@ -67,6 +70,7 @@ namespace Dreamtides.Buttons
       var targetColor = _action != null ? _enabledColor : _disabledColor;
       _text.color = targetColor;
       _background.color = targetColor;
+      _background.material = _action != null ? _originalMaterial : _noOutlineMaterial;
     }
 
     public void SetView(ButtonView? view, Milliseconds? showOnIdleDuration = null)
@@ -199,7 +203,6 @@ namespace Dreamtides.Buttons
       _currentAnimation = TweenUtils.Sequence("ButtonPressAnimation");
       _currentAnimation.Insert(0, transform.DOMove(targetPosition, _animationDuration));
       _currentAnimation.Insert(0, _background.DOColor(new Color(0.8f, 0.8f, 0.8f), _animationDuration));
-      _background.material = _onPressedMaterial;
     }
 
     public override void MouseUp(bool isSameObject)
@@ -210,7 +213,6 @@ namespace Dreamtides.Buttons
       _currentAnimation = TweenUtils.Sequence("ButtonReleaseAnimation");
       _currentAnimation.Insert(0, transform.DOMove(_originalPosition, _animationDuration));
       _currentAnimation.Insert(0, _background.DOColor(_originalColor, _animationDuration));
-      _currentAnimation.InsertCallback(_animationDuration, () => _background.material = _originalMaterial);
       if (isSameObject)
       {
         var currentTime = Time.time;
@@ -227,7 +229,6 @@ namespace Dreamtides.Buttons
     {
       _originalPosition = transform.position;
       _originalColor = _background.color;
-      _originalMaterial = _background.material;
       _originalBackgroundLocalScale = _background.transform.localScale;
       _originalTextLocalScale = _text.transform.localScale;
     }
