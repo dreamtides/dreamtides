@@ -18,11 +18,11 @@ use core_data::numerics::Energy;
 use crate::battle_card_queries::card;
 use crate::card_ability_queries::effect_predicates;
 
-static MINSTREL_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
-static IMMOLATE_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
-static RIPPLE_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
-static ABOLISH_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
-static DREAMSCATTER_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
+static CHARACTER_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
+static TEST_DISSOLVE_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
+static TEST_COUNTERSPELL_UNLESS_PAY: OnceLock<AbilityList> = OnceLock::new();
+static COUNTERSPELL_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
+static ENERGY_PROMPT_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 static TEST_DRAW_ONE_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static AbilityList {
@@ -31,10 +31,10 @@ pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static Ability
 
 pub fn query_by_name(name: CardName) -> &'static AbilityList {
     match name {
-        CardName::MinstrelOfFallingLight => {
-            MINSTREL_ABILITIES.get_or_init(|| build_ability_list(vec![]))
+        CardName::TestVanillaCharacter => {
+            CHARACTER_ABILITIES.get_or_init(|| build_ability_list(vec![]))
         }
-        CardName::Immolate => IMMOLATE_ABILITIES.get_or_init(|| {
+        CardName::TestDissolve => TEST_DISSOLVE_ABILITIES.get_or_init(|| {
             build_ability_list(vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
@@ -49,7 +49,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 },
             )])
         }),
-        CardName::RippleOfDefiance => RIPPLE_ABILITIES.get_or_init(|| {
+        CardName::TestCounterspellUnlessPays => TEST_COUNTERSPELL_UNLESS_PAY.get_or_init(|| {
             build_ability_list(vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
@@ -66,7 +66,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 },
             )])
         }),
-        CardName::Abolish => ABOLISH_ABILITIES.get_or_init(|| {
+        CardName::TestCounterspell => COUNTERSPELL_ABILITIES.get_or_init(|| {
             build_ability_list(vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
@@ -81,7 +81,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 },
             )])
         }),
-        CardName::Dreamscatter => DREAMSCATTER_ABILITIES.get_or_init(|| {
+        CardName::TestVariableEnergyDraw => ENERGY_PROMPT_ABILITIES.get_or_init(|| {
             build_ability_list(vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {

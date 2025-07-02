@@ -49,11 +49,11 @@ pub struct CardIdentity(pub Uuid);
     Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
 )]
 pub enum CardName {
-    MinstrelOfFallingLight,
-    Immolate,
-    RippleOfDefiance,
-    Abolish,
-    Dreamscatter,
+    TestVanillaCharacter,
+    TestDissolve,
+    TestCounterspellUnlessPays,
+    TestCounterspell,
+    TestVariableEnergyDraw,
     TestDrawOne,
 }
 

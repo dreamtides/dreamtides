@@ -76,7 +76,7 @@ fn play_character_increase_spark() {
     assert_eq!(s.user_client.me.energy(), Energy(99), "initial energy");
     assert_eq!(s.user_client.me.total_spark(), Spark(0), "initial spark");
     assert_eq!(s.user_client.cards.user_battlefield().len(), 0, "battlefield empty");
-    s.create_and_play(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
     assert_eq!(s.user_client.me.energy(), Energy(97), "energy spent");
     assert_eq!(s.user_client.me.total_spark(), Spark(5), "spark increased");
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "character materialized");
@@ -86,7 +86,7 @@ fn play_character_increase_spark() {
 #[test]
 fn play_character_score_points() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
-    s.create_and_play(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
     s.perform_user_action(BattleAction::EndTurn);
     assert_eq!(s.user_client.me.score(), Points(0), "score unchanged");
     s.perform_enemy_action(BattleAction::EndTurn);
@@ -98,7 +98,7 @@ fn play_character_score_points() {
 fn play_character_win_battle() {
     let mut s =
         TestBattle::builder().user(TestPlayer::builder().energy(99).points(20).build()).connect();
-    s.create_and_play(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
     s.perform_user_action(BattleAction::EndTurn);
     s.perform_enemy_action(BattleAction::EndTurn);
     assert_eq!(s.user_client.me.score(), Points(25), "score increased");
@@ -127,8 +127,8 @@ fn energy_increment_at_turn_start() {
 #[test]
 fn create_and_play() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_battlefield(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
-    s.create_and_play(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+    s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
 }
 
 #[test]
@@ -136,8 +136,8 @@ fn play_card_dissolve_target() {
     let mut s = TestBattle::builder().connect();
     // Note that if a single target is present then no prompt for targeting is
     // shown.
-    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
-    s.add_to_battlefield(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
+    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
 
     assert_eq!(
         s.user_client.cards.enemy_battlefield().len(),
@@ -150,7 +150,7 @@ fn play_card_dissolve_target() {
 
     s.create_and_play(
         DisplayPlayer::User,
-        TestPlayCard::new(CardName::Immolate).target(&target_id),
+        TestPlayCard::new(CardName::TestDissolve).target(&target_id),
     );
 
     assert_eq!(
@@ -168,26 +168,26 @@ fn play_card_dissolve_target() {
 fn cards_in_hand_properties() {
     let mut s = TestBattle::builder().connect();
 
-    let character_id = s.add_to_hand(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
-    let event_id = s.add_to_hand(DisplayPlayer::User, CardName::Immolate);
+    let character_id = s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let event_id = s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
 
     assert_eq!(s.user_client.cards.user_hand().len(), 2, "user has 2 cards in hand");
 
     let character_card = s.user_client.cards.get(&character_id);
     let event_card = s.user_client.cards.get(&event_id);
 
-    assert_eq!(s.user_client.cards.get_cost(&character_id), Energy(2), "minstrel character cost");
-    assert_eq!(s.user_client.cards.get_cost(&event_id), Energy(2), "immolate event cost");
+    assert_eq!(s.user_client.cards.get_cost(&character_id), Energy(2), "test character cost");
+    assert_eq!(s.user_client.cards.get_cost(&event_id), Energy(2), "test dissolve event cost");
 
     let character_revealed = s.user_client.cards.get_revealed(&character_id);
     let event_revealed = s.user_client.cards.get_revealed(&event_id);
 
-    assert_eq!(character_revealed.spark, Some(Spark(5)), "minstrel character spark");
-    assert_eq!(character_revealed.name, "Minstrel of Falling Light", "character name");
+    assert_eq!(character_revealed.spark, Some(Spark(5)), "test character spark");
+    assert_eq!(character_revealed.name, "Test Character", "character name");
     assert_eq!(character_revealed.card_type, "Musician", "character type");
 
     assert_eq!(event_revealed.spark, None, "event card should have no spark");
-    assert_eq!(event_revealed.name, "Immolate", "event name");
+    assert_eq!(event_revealed.name, "Test Dissolve", "event name");
     assert_eq!(event_revealed.card_type, "\u{f0e7} Event", "event type");
 
     assert_eq!(character_card.view.prefab, CardPrefab::Character, "character uses character frame");
@@ -200,9 +200,9 @@ fn cards_in_hand_properties() {
 fn card_order_preserved_when_adding_new_cards() {
     let mut s = TestBattle::builder().connect();
 
-    let first_hand_card = s.add_to_hand(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
-    let second_hand_card = s.add_to_hand(DisplayPlayer::User, CardName::Immolate);
-    let third_hand_card = s.add_to_hand(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+    let first_hand_card = s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let second_hand_card = s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
+    let third_hand_card = s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
 
     let initial_hand_order: Vec<_> =
         s.user_client.cards.user_hand().iter().map(|c| c.id.clone()).collect();
@@ -212,9 +212,9 @@ fn card_order_preserved_when_adding_new_cards() {
     assert_eq!(initial_hand_order[2], third_hand_card, "third card in correct position");
 
     let first_battlefield_char =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
     let second_battlefield_char =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
 
     let initial_battlefield_order: Vec<_> =
         s.user_client.cards.user_battlefield().iter().map(|c| c.id.clone()).collect();
@@ -228,7 +228,7 @@ fn card_order_preserved_when_adding_new_cards() {
         "second character in correct position"
     );
 
-    let new_hand_card = s.add_to_hand(DisplayPlayer::User, CardName::Immolate);
+    let new_hand_card = s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
 
     let final_hand_order: Vec<_> =
         s.user_client.cards.user_hand().iter().map(|c| c.id.clone()).collect();
@@ -239,7 +239,7 @@ fn card_order_preserved_when_adding_new_cards() {
     assert_eq!(final_hand_order[3], new_hand_card, "new card added at end");
 
     let new_battlefield_char =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
 
     let final_battlefield_order: Vec<_> =
         s.user_client.cards.user_battlefield().iter().map(|c| c.id.clone()).collect();

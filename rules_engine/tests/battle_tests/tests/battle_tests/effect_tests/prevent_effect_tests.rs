@@ -9,13 +9,13 @@ use test_utils::session::test_session_prelude::*;
 #[test]
 fn prevent_unless_pays_cost() {
     let mut s = TestBattle::builder().connect();
-    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::RippleOfDefiance);
-    s.add_to_battlefield(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
+    s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
     let initial_enemy_energy = s.user_client.opponent.energy();
 
-    let event_id = s.create_and_play(DisplayPlayer::Enemy, CardName::Immolate);
+    let event_id = s.create_and_play(DisplayPlayer::Enemy, CardName::TestDissolve);
     let event_cost = s.user_client.cards.get_cost(&event_id);
     s.play_card_from_hand(DisplayPlayer::User, &prevent_id);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
@@ -26,7 +26,7 @@ fn prevent_unless_pays_cost() {
     assert_eq!(
         s.user_client.cards.user_battlefield().len(),
         0,
-        "character should be dissolved by Immolate"
+        "character should be dissolved by Test Dissolve"
     );
     assert_eq!(
         s.user_client.opponent.energy(),
@@ -38,13 +38,13 @@ fn prevent_unless_pays_cost() {
 #[test]
 fn prevent_unless_pays_cost_decline() {
     let mut s = TestBattle::builder().connect();
-    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::RippleOfDefiance);
-    s.add_to_battlefield(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
+    s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
     let initial_enemy_energy = s.user_client.opponent.energy();
 
-    let event_id = s.create_and_play(DisplayPlayer::Enemy, CardName::Immolate);
+    let event_id = s.create_and_play(DisplayPlayer::Enemy, CardName::TestDissolve);
     let event_cost = s.user_client.cards.get_cost(&event_id);
     s.play_card_from_hand(DisplayPlayer::User, &prevent_id);
     s.click_secondary_button(DisplayPlayer::Enemy, "Decline");
@@ -55,7 +55,7 @@ fn prevent_unless_pays_cost_decline() {
     assert_eq!(
         s.user_client.cards.user_battlefield().len(),
         1,
-        "character should not be dissolved by Immolate"
+        "character should not be dissolved by Test Dissolve"
     );
     assert_eq!(
         s.user_client.opponent.energy(),
@@ -65,12 +65,12 @@ fn prevent_unless_pays_cost_decline() {
 }
 
 #[test]
-fn ripple_of_defiance_fire_projectile_only_on_decline() {
+fn test_counterspell_unless_pays_fire_projectile_only_on_decline() {
     let mut s = TestBattle::builder().connect();
-    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::RippleOfDefiance);
+    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    s.create_and_play(DisplayPlayer::Enemy, CardName::Dreamscatter);
+    s.create_and_play(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
 
     s.play_card_from_hand(DisplayPlayer::User, &prevent_id);
@@ -85,7 +85,7 @@ fn ripple_of_defiance_fire_projectile_only_on_decline() {
         );
     assert!(
         fire_projectile_after_resolve.is_none(),
-        "no fire projectile command should occur when Ripple of Defiance resolves"
+        "no fire projectile command should occur when Test Counterspell Unless Pays resolves"
     );
 
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
@@ -105,8 +105,8 @@ fn ripple_of_defiance_fire_projectile_only_on_decline() {
 
     let mut s2 = TestBattle::builder().connect();
     s2.end_turn_remove_opponent_hand(DisplayPlayer::User);
-    let prevent_id2 = s2.add_to_hand(DisplayPlayer::User, CardName::RippleOfDefiance);
-    let event_id2 = s2.create_and_play(DisplayPlayer::Enemy, CardName::Dreamscatter);
+    let prevent_id2 = s2.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
+    let event_id2 = s2.create_and_play(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
     s2.click_primary_button(DisplayPlayer::Enemy, "Spend");
     s2.play_card_from_hand(DisplayPlayer::User, &prevent_id2);
     s2.click_secondary_button(DisplayPlayer::Enemy, "Decline");
@@ -128,7 +128,7 @@ fn ripple_of_defiance_fire_projectile_only_on_decline() {
     assert_eq!(
         fire_projectile.source_id,
         GameObjectId::CardId(prevent_id2),
-        "fire projectile source should be the Ripple of Defiance card"
+        "fire projectile source should be the Test Counterspell Unless Pays card"
     );
     assert_eq!(
         fire_projectile.target_id,
@@ -138,12 +138,12 @@ fn ripple_of_defiance_fire_projectile_only_on_decline() {
 }
 
 #[test]
-fn ripple_of_defiance_stays_on_stack_during_prompt() {
+fn test_counterspell_unless_pays_stays_on_stack_during_prompt() {
     let mut s = TestBattle::builder().connect();
-    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::RippleOfDefiance);
+    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    s.create_and_play(DisplayPlayer::Enemy, CardName::Dreamscatter);
+    s.create_and_play(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
 
     s.play_card_from_hand(DisplayPlayer::User, &prevent_id);
@@ -153,11 +153,11 @@ fn ripple_of_defiance_stays_on_stack_during_prompt() {
         .cards
         .card_map
         .get(&prevent_id)
-        .expect("Ripple of Defiance card should exist");
+        .expect("Test Counterspell Unless Pays card should exist");
 
     assert!(
         matches!(card_view.view.position.position, Position::OnStack(_)),
-        "Ripple of Defiance should be on stack during prompt, but was at position: {:?}",
+        "Test Counterspell Unless Pays should be on stack during prompt, but was at position: {:?}",
         card_view.view.position.position
     );
 
@@ -168,11 +168,11 @@ fn ripple_of_defiance_stays_on_stack_during_prompt() {
         .cards
         .card_map
         .get(&prevent_id)
-        .expect("Ripple of Defiance card should exist");
+        .expect("Test Counterspell Unless Pays card should exist");
 
     assert!(
         !matches!(card_view_after_decline.view.position.position, Position::OnStack(_)),
-        "Ripple of Defiance should no longer be on stack after prompt resolves, but was at position: {:?}",
+        "Test Counterspell Unless Pays should no longer be on stack after prompt resolves, but was at position: {:?}",
         card_view_after_decline.view.position.position
     );
 }

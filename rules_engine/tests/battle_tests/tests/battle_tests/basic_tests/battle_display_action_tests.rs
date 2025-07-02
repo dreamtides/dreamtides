@@ -13,11 +13,11 @@ fn browse_user_void_moves_cards_to_browser() {
 
     s.perform_user_action(DebugBattleAction::AddCardToVoid {
         player: PlayerName::One,
-        card: CardName::MinstrelOfFallingLight,
+        card: CardName::TestVanillaCharacter,
     });
     s.perform_user_action(DebugBattleAction::AddCardToVoid {
         player: PlayerName::One,
-        card: CardName::Immolate,
+        card: CardName::TestDissolve,
     });
 
     assert_eq!(s.user_client.cards.user_void().len(), 2, "user void should have 2 cards");
@@ -43,11 +43,11 @@ fn browse_enemy_void_moves_cards_to_browser() {
 
     s.perform_user_action(DebugBattleAction::AddCardToVoid {
         player: PlayerName::Two,
-        card: CardName::MinstrelOfFallingLight,
+        card: CardName::TestVanillaCharacter,
     });
     s.perform_user_action(DebugBattleAction::AddCardToVoid {
         player: PlayerName::Two,
-        card: CardName::Immolate,
+        card: CardName::TestDissolve,
     });
 
     assert_eq!(s.user_client.cards.enemy_void().len(), 2, "enemy void should have 2 cards");
@@ -73,11 +73,11 @@ fn close_card_browser_returns_cards_to_void() {
 
     s.perform_user_action(DebugBattleAction::AddCardToVoid {
         player: PlayerName::One,
-        card: CardName::MinstrelOfFallingLight,
+        card: CardName::TestVanillaCharacter,
     });
     s.perform_user_action(DebugBattleAction::AddCardToVoid {
         player: PlayerName::One,
-        card: CardName::Immolate,
+        card: CardName::TestDissolve,
     });
 
     s.perform_user_action(BattleDisplayAction::BrowseCards(CardBrowserType::UserVoid));
@@ -190,7 +190,7 @@ fn browse_multiple_sources_sequentially() {
 
     s.perform_user_action(DebugBattleAction::AddCardToVoid {
         player: PlayerName::One,
-        card: CardName::MinstrelOfFallingLight,
+        card: CardName::TestVanillaCharacter,
     });
 
     s.perform_user_action(BattleDisplayAction::BrowseCards(CardBrowserType::UserVoid));
@@ -251,9 +251,9 @@ fn browse_multiple_sources_sequentially() {
 #[test]
 fn toggle_stack_visibility_hides_and_shows_cards() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
+    s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
-    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
+    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
 
     assert!(
         s.user_client.cards.stack_cards().contains(&enemy_character),
@@ -292,9 +292,9 @@ fn toggle_stack_visibility_hides_and_shows_cards() {
 #[test]
 fn toggle_stack_visibility_before_passing_priority() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
+    s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
-    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
+    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
 
     assert!(s.user_client.me.can_act(), "user should be able to act");
     assert!(
@@ -326,13 +326,13 @@ fn toggle_stack_visibility_before_passing_priority() {
 #[test]
 fn toggle_stack_visibility_during_complex_targeting() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
+    s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    let user_abolish1 = s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
-    let enemy_abolish1 = s.add_to_hand(DisplayPlayer::Enemy, CardName::Abolish);
+    let user_counterspell1 = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
+    let enemy_counterspell1 = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestCounterspell);
 
-    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
+    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
 
     assert!(
         s.user_client.cards.stack_cards().contains(&enemy_character),
@@ -341,10 +341,10 @@ fn toggle_stack_visibility_during_complex_targeting() {
     assert_eq!(s.user_client.cards.stack_cards().len(), 1, "one card on stack");
     assert!(s.user_client.me.can_act(), "user can act");
 
-    s.play_card_from_hand(DisplayPlayer::User, &user_abolish1);
+    s.play_card_from_hand(DisplayPlayer::User, &user_counterspell1);
     assert_eq!(s.user_client.cards.stack_cards().len(), 2, "two cards on stack");
 
-    s.play_card_from_hand(DisplayPlayer::Enemy, &enemy_abolish1);
+    s.play_card_from_hand(DisplayPlayer::Enemy, &enemy_counterspell1);
     assert_eq!(s.user_client.cards.stack_cards().len(), 3, "three cards on stack");
     assert!(s.user_client.me.can_act(), "user can act again");
 
@@ -372,9 +372,9 @@ fn toggle_stack_visibility_during_complex_targeting() {
 #[test]
 fn other_game_actions_unhide_stack() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
+    s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
-    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
+    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
 
     assert!(
         s.user_client.cards.stack_cards().contains(&enemy_character),

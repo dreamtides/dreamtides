@@ -11,11 +11,11 @@ use test_utils::session::test_session_prelude::*;
 fn play_fast_card_during_enemy_end_step() {
     let mut s = TestBattle::builder().connect();
 
-    let immolate_id = s.add_to_hand(DisplayPlayer::User, CardName::Immolate);
+    let dissolve_id = s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
     // Add another fast card to hand to prevent the next user turn from
     // automatically starting.
-    s.add_to_hand(DisplayPlayer::User, CardName::Dreamscatter);
-    s.add_to_battlefield(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
+    s.add_to_hand(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
+    s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
 
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "enemy has one character");
     assert!(s.user_client.me.can_act(), "user can act on their turn");
@@ -57,11 +57,11 @@ fn play_fast_card_during_enemy_end_step() {
         "enemy should have is_current_turn=true during their end step"
     );
 
-    s.play_card_from_hand(DisplayPlayer::User, &immolate_id);
+    s.play_card_from_hand(DisplayPlayer::User, &dissolve_id);
 
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 0, "character dissolved");
     assert_eq!(s.user_client.cards.enemy_void().len(), 1, "character in enemy void");
-    assert_eq!(s.user_client.cards.user_void().len(), 1, "immolate in user void");
+    assert_eq!(s.user_client.cards.user_void().len(), 1, "test dissolve in user void");
 
     s.perform_user_action(BattleAction::StartNextTurn);
 
@@ -82,7 +82,7 @@ fn play_fast_card_during_enemy_end_step() {
 fn judgment_command_fired_when_user_score_changes() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
-    let _character_id = s.create_and_play(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+    let _character_id = s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
 
     assert_eq!(s.user_client.me.total_spark(), Spark(5), "user has spark from character");
     assert_eq!(s.user_client.me.score(), Points(0), "user starts with no points");
@@ -173,7 +173,7 @@ fn judgment_command_shows_total_score_not_points_gained() {
     let mut s =
         TestBattle::builder().user(TestPlayer::builder().energy(99).points(10).build()).connect();
 
-    let _character_id = s.create_and_play(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+    let _character_id = s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
 
     assert_eq!(s.user_client.me.total_spark(), Spark(5), "user has spark from character");
     assert_eq!(s.user_client.me.score(), Points(10), "user starts with 10 points");

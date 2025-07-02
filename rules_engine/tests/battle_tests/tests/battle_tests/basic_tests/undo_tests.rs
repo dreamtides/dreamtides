@@ -20,7 +20,7 @@ fn undo_play_character_card() {
     assert_eq!(s.user_client.cards.user_battlefield().len(), 0, "battlefield empty");
     assert_eq!(s.user_client.cards.user_hand().len(), 0, "hand empty");
 
-    let card_id = s.add_to_hand(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+    let card_id = s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
     s.play_card_from_hand(DisplayPlayer::User, &card_id);
 
     assert_eq!(s.user_client.me.energy(), Energy(8), "energy spent");
@@ -40,15 +40,18 @@ fn undo_play_character_card() {
 #[test]
 fn undo_play_event_card() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(10).build()).connect();
-    let target = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
-    s.add_to_battlefield(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
+    let target = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
 
     assert_eq!(s.user_client.me.energy(), Energy(10), "initial energy");
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 2, "enemy has characters");
     assert_eq!(s.user_client.cards.enemy_void().len(), 0, "enemy void empty");
     assert_eq!(s.user_client.cards.user_void().len(), 0, "user void empty");
 
-    s.create_and_play(DisplayPlayer::User, TestPlayCard::new(CardName::Immolate).target(&target));
+    s.create_and_play(
+        DisplayPlayer::User,
+        TestPlayCard::new(CardName::TestDissolve).target(&target),
+    );
 
     assert_eq!(s.user_client.me.energy(), Energy(8), "energy spent");
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "character dissolved");
@@ -72,8 +75,8 @@ fn undo_play_event_card() {
 #[test]
 fn undo_with_card_on_stack() {
     let mut s = TestBattle::builder().connect();
-    let user_card = s.create_and_play(DisplayPlayer::User, CardName::Dreamscatter);
-    s.add_to_hand(DisplayPlayer::Enemy, CardName::Dreamscatter);
+    let user_card = s.create_and_play(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
+    s.add_to_hand(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
     s.click_primary_button(DisplayPlayer::User, "Spend");
     assert!(s.user_client.cards.stack_cards().contains(&user_card), "user card on stack");
     assert_eq!(s.user_client.cards.stack_cards().len(), 1, "one card on stack");
@@ -100,8 +103,8 @@ fn undo_with_card_on_stack() {
 #[test]
 fn undo_does_not_include_display_actions() {
     let mut s = TestBattle::builder().connect();
-    let user_card = s.create_and_play(DisplayPlayer::User, CardName::Dreamscatter);
-    s.add_to_hand(DisplayPlayer::Enemy, CardName::Dreamscatter);
+    let user_card = s.create_and_play(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
+    s.add_to_hand(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
     s.click_increment_button(DisplayPlayer::User);
     s.click_increment_button(DisplayPlayer::User);
     s.click_primary_button(DisplayPlayer::User, "Spend");
@@ -132,7 +135,7 @@ fn undo_restores_points_and_spark() {
     let mut s =
         TestBattle::builder().user(TestPlayer::builder().energy(10).points(5).build()).connect();
 
-    s.create_and_play(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
     s.perform_user_action(BattleAction::EndTurn);
     s.perform_enemy_action(BattleAction::EndTurn);
 

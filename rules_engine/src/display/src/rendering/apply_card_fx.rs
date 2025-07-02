@@ -30,7 +30,7 @@ pub fn apply_effect(
     let effect_name = animation.discriminant().to_string();
     let target_id = find_target_id(animation);
     match card::get(battle, source_id).name {
-        CardName::Immolate if effect_name == "Dissolve" => {
+        CardName::TestDissolve if effect_name == "Dissolve" => {
             animations::push_snapshot(builder, battle);
             builder.push(Command::FireProjectile(
                 FireProjectileCommand::builder()
@@ -63,7 +63,7 @@ pub fn apply_effect(
             ));
         }
 
-        CardName::Abolish if effect_name == "Prevent" => {
+        CardName::TestCounterspell if effect_name == "Prevent" => {
             animations::push_snapshot(builder, battle);
             builder.push(Command::FireProjectile(
                 FireProjectileCommand::builder()
@@ -76,7 +76,7 @@ pub fn apply_effect(
             ));
         }
 
-        CardName::RippleOfDefiance if effect_name == "Prevent" => {
+        CardName::TestCounterspellUnlessPays if effect_name == "Prevent" => {
             animations::push_snapshot(builder, battle);
             builder.push(Command::FireProjectile(
                 FireProjectileCommand::builder()
@@ -89,7 +89,7 @@ pub fn apply_effect(
             ));
         }
 
-        CardName::Dreamscatter if effect_name == "DrawCards" => {
+        CardName::TestVariableEnergyDraw if effect_name == "DrawCards" => {
             animations::push_snapshot(builder, battle);
             builder.push(Command::DisplayEffect(DisplayEffectCommand {
                 target: GameObjectId::Deck(builder.to_display_player(controller)),
@@ -103,7 +103,7 @@ pub fn apply_effect(
             }));
         }
 
-        CardName::MinstrelOfFallingLight if effect_name == "ResolveCharacter" => {
+        CardName::TestVanillaCharacter if effect_name == "ResolveCharacter" => {
             animations::push_snapshot(builder, battle);
             builder.push(Command::PlayAudioClip(PlayAudioClipCommand {
                 sound: AudioClipAddress::new("Assets/ThirdParty/Cafofo/Magic Spells Sound Effects V2.0/General Spell/Positive Effect 10.wav"),

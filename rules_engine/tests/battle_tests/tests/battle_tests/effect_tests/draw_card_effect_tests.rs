@@ -11,7 +11,7 @@ use ui_components::icon;
 fn draw_card_for_each_energy_spent() {
     let mut s = TestBattle::builder().connect();
     let starting_energy = s.user_client.me.energy();
-    let id = s.create_and_play(DisplayPlayer::User, CardName::Dreamscatter);
+    let id = s.create_and_play(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
     let cost = s.user_client.cards.get_cost(&id);
     s.click_increment_button(DisplayPlayer::User);
     s.click_increment_button(DisplayPlayer::User);
@@ -33,7 +33,7 @@ fn draw_card_for_each_energy_spent() {
 #[test]
 fn draw_card_animation_command() {
     let mut s = TestBattle::builder().connect();
-    s.create_and_play(DisplayPlayer::User, CardName::Dreamscatter);
+    s.create_and_play(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
     s.click_increment_button(DisplayPlayer::User);
     s.click_primary_button(DisplayPlayer::User, "Spend");
 
@@ -63,7 +63,7 @@ fn draw_card_animation_command() {
 #[test]
 fn draw_multiple_cards_animation() {
     let mut s = TestBattle::builder().connect();
-    s.create_and_play(DisplayPlayer::User, CardName::Dreamscatter);
+    s.create_and_play(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
     s.click_increment_button(DisplayPlayer::User);
     s.click_increment_button(DisplayPlayer::User);
     s.click_increment_button(DisplayPlayer::User);
@@ -100,7 +100,7 @@ fn draw_multiple_cards_animation() {
 fn battle_preview_shows_energy_changes_for_incremental_spending() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(10).build()).connect();
     let starting_energy = s.user_client.me.energy();
-    let id = s.create_and_play(DisplayPlayer::User, CardName::Dreamscatter);
+    let id = s.create_and_play(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
     let card_cost = s.user_client.cards.get_cost(&id);
 
     assert!(
@@ -171,21 +171,21 @@ fn battle_preview_shows_energy_changes_for_incremental_spending() {
 }
 
 #[test]
-fn dreamscatter_rules_text_shows_energy_spent_on_stack() {
+fn energy_prompt_rules_text_shows_energy_spent_on_stack() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_hand(DisplayPlayer::Enemy, CardName::Abolish);
+    s.add_to_hand(DisplayPlayer::Enemy, CardName::TestCounterspell);
 
-    let dreamscatter_id = s.create_and_play(DisplayPlayer::User, CardName::Dreamscatter);
+    let energy_prompt_id = s.create_and_play(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
     s.click_increment_button(DisplayPlayer::User);
     s.click_increment_button(DisplayPlayer::User);
     s.click_primary_button(DisplayPlayer::User, "Spend");
 
     assert!(
-        s.user_client.cards.stack_cards().contains(&dreamscatter_id),
-        "Dreamscatter should be on the stack"
+        s.user_client.cards.stack_cards().contains(&energy_prompt_id),
+        "Energy prompt should be on the stack"
     );
 
-    let rules_text = s.user_client.cards.get_revealed(&dreamscatter_id).rules_text.clone();
+    let rules_text = s.user_client.cards.get_revealed(&energy_prompt_id).rules_text.clone();
 
     assert!(
         rules_text.contains(&format!("(3{} paid)", icon::ENERGY)),

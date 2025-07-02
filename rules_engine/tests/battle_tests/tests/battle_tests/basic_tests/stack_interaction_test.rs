@@ -10,10 +10,10 @@ use test_utils::session::test_session_prelude::*;
 #[test]
 fn negate_card_on_stack() {
     let mut s = TestBattle::builder().connect();
-    let negate_id = s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
+    let negate_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
     let enemy_character_id =
-        s.create_and_play(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
+        s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
 
     assert!(
         s.user_client.cards.stack_cards().contains(&enemy_character_id),
@@ -40,14 +40,14 @@ fn stack_back_and_forth_with_targeting() {
     let mut s = TestBattle::builder().connect();
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    let user_abolish1 = s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
-    let user_abolish2 = s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
-    let _user_abolish3 = s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
-    let enemy_abolish1 = s.add_to_hand(DisplayPlayer::Enemy, CardName::Abolish);
-    let enemy_abolish2 = s.add_to_hand(DisplayPlayer::Enemy, CardName::Abolish);
-    let _enemy_abolish3 = s.add_to_hand(DisplayPlayer::Enemy, CardName::Abolish);
+    let user_counterspell1 = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
+    let user_counterspell2 = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
+    let _user_counterspell3 = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
+    let enemy_counterspell1 = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestCounterspell);
+    let enemy_counterspell2 = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestCounterspell);
+    let _enemy_counterspell3 = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestCounterspell);
 
-    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
+    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
 
     assert!(
         s.user_client.cards.stack_cards().contains(&enemy_character),
@@ -56,61 +56,67 @@ fn stack_back_and_forth_with_targeting() {
     assert_eq!(s.user_client.cards.stack_cards().len(), 1, "one card on stack");
     assert!(s.user_client.me.can_act(), "user can act");
 
-    s.play_card_from_hand(DisplayPlayer::User, &user_abolish1);
-    assert!(s.user_client.cards.stack_cards().contains(&user_abolish1), "abolish on stack");
+    s.play_card_from_hand(DisplayPlayer::User, &user_counterspell1);
+    assert!(
+        s.user_client.cards.stack_cards().contains(&user_counterspell1),
+        "counterspell on stack"
+    );
     assert_eq!(s.user_client.cards.stack_cards().len(), 2, "two cards on stack");
-    assert!(s.user_client.opponent.can_act(), "enemy can act after abolish");
+    assert!(s.user_client.opponent.can_act(), "enemy can act after counterspell");
 
-    s.play_card_from_hand(DisplayPlayer::Enemy, &enemy_abolish1);
-    assert!(s.user_client.cards.stack_cards().contains(&enemy_abolish1), "enemy abolish on stack");
+    s.play_card_from_hand(DisplayPlayer::Enemy, &enemy_counterspell1);
+    assert!(
+        s.user_client.cards.stack_cards().contains(&enemy_counterspell1),
+        "enemy counterspell on stack"
+    );
     assert_eq!(s.user_client.cards.stack_cards().len(), 3, "three cards on stack");
     assert!(s.user_client.me.can_act(), "user can act again");
 
-    s.play_card_from_hand(DisplayPlayer::User, &user_abolish2);
-    s.select_target(DisplayPlayer::User, &enemy_abolish1);
+    s.play_card_from_hand(DisplayPlayer::User, &user_counterspell2);
+    s.select_target(DisplayPlayer::User, &enemy_counterspell1);
     assert!(
-        s.user_client.cards.stack_cards().contains(&user_abolish2),
-        "second user abolish on stack"
+        s.user_client.cards.stack_cards().contains(&user_counterspell2),
+        "second user counterspell on stack"
     );
     assert_eq!(s.user_client.cards.stack_cards().len(), 4, "four cards on stack");
     assert!(s.user_client.opponent.can_act(), "enemy can act again");
 
-    s.play_card_from_hand(DisplayPlayer::Enemy, &enemy_abolish2);
-    s.select_target(DisplayPlayer::Enemy, &user_abolish2);
+    s.play_card_from_hand(DisplayPlayer::Enemy, &enemy_counterspell2);
+    s.select_target(DisplayPlayer::Enemy, &user_counterspell2);
     assert!(
-        s.user_client.cards.stack_cards().contains(&enemy_abolish2),
-        "second enemy abolish on stack"
+        s.user_client.cards.stack_cards().contains(&enemy_counterspell2),
+        "second enemy counterspell on stack"
     );
     assert_eq!(s.user_client.cards.stack_cards().len(), 5, "five cards on stack");
 
-    assert_arrow_between_cards(&s, &user_abolish1, &enemy_character);
-    assert_arrow_between_cards(&s, &enemy_abolish1, &user_abolish1);
-    assert_arrow_between_cards(&s, &user_abolish2, &enemy_abolish1);
-    assert_arrow_between_cards(&s, &enemy_abolish2, &user_abolish2);
+    assert_arrow_between_cards(&s, &user_counterspell1, &enemy_character);
+    assert_arrow_between_cards(&s, &enemy_counterspell1, &user_counterspell1);
+    assert_arrow_between_cards(&s, &user_counterspell2, &enemy_counterspell1);
+    assert_arrow_between_cards(&s, &enemy_counterspell2, &user_counterspell2);
 
-    assert_info_zoom_targeting(&s, &user_abolish1, &enemy_character);
-    assert_info_zoom_targeting(&s, &enemy_abolish1, &user_abolish1);
-    assert_info_zoom_targeting(&s, &user_abolish2, &enemy_abolish1);
-    assert_info_zoom_targeting(&s, &enemy_abolish2, &user_abolish2);
+    assert_info_zoom_targeting(&s, &user_counterspell1, &enemy_character);
+    assert_info_zoom_targeting(&s, &enemy_counterspell1, &user_counterspell1);
+    assert_info_zoom_targeting(&s, &user_counterspell2, &enemy_counterspell1);
+    assert_info_zoom_targeting(&s, &enemy_counterspell2, &user_counterspell2);
 
     s.perform_user_action(BattleAction::PassPriority);
 
     assert!(s.user_client.opponent.can_act(), "enemy can act after their card resolves");
     assert!(
-        s.user_client.cards.enemy_void().contains(&enemy_abolish2),
-        "enemy abolish2 resolved to void"
+        s.user_client.cards.enemy_void().contains(&enemy_counterspell2),
+        "enemy counterspell2 resolved to void"
     );
     assert!(
-        s.user_client.cards.user_void().contains(&user_abolish2),
-        "user abolish2 negated to void"
+        s.user_client.cards.user_void().contains(&user_counterspell2),
+        "user counterspell2 negated to void"
     );
     assert_eq!(s.user_client.cards.stack_cards().len(), 3, "three cards after two resolve");
 
-    assert_arrow_between_cards(&s, &user_abolish1, &enemy_character);
-    assert_arrow_between_cards(&s, &enemy_abolish1, &user_abolish1);
+    assert_arrow_between_cards(&s, &user_counterspell1, &enemy_character);
+    assert_arrow_between_cards(&s, &enemy_counterspell1, &user_counterspell1);
 
-    assert_info_zoom_targeting(&s, &user_abolish1, &enemy_character);
-    assert_info_zoom_targeting(&s, &enemy_abolish1, &user_abolish1);
+    assert_info_zoom_targeting(&s, &user_counterspell1, &enemy_character);
+    assert_info_zoom_targeting(&s, &enemy_counterspell1, &user_counterspell1);
 
     s.perform_enemy_action(BattleAction::PassPriority);
 
@@ -120,12 +126,12 @@ fn stack_back_and_forth_with_targeting() {
     s.user_client.cards.enemy_battlefield().print_ids();
 
     assert!(
-        s.user_client.cards.enemy_void().contains(&enemy_abolish1),
-        "enemy abolish1 resolved to void"
+        s.user_client.cards.enemy_void().contains(&enemy_counterspell1),
+        "enemy counterspell1 resolved to void"
     );
     assert!(
-        s.user_client.cards.user_void().contains(&user_abolish1),
-        "user abolish1 negated to void"
+        s.user_client.cards.user_void().contains(&user_counterspell1),
+        "user counterspell1 negated to void"
     );
     assert!(
         s.user_client.cards.enemy_battlefield().contains(&enemy_character),
@@ -138,62 +144,62 @@ fn resolve_negate_with_removed_target() {
     let mut s = TestBattle::builder().connect();
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    let user_abolish1 = s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
-    let user_abolish2 = s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
-    let _user_extra = s.add_to_hand(DisplayPlayer::User, CardName::Abolish);
-    let enemy_dreamscatter = s.add_to_hand(DisplayPlayer::Enemy, CardName::Dreamscatter);
-    let _enemy_extra = s.add_to_hand(DisplayPlayer::Enemy, CardName::Abolish);
+    let user_counterspell1 = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
+    let user_counterspell2 = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
+    let _user_extra = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
+    let enemy_variable = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
+    let _enemy_extra = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestCounterspell);
 
-    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
+    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
     assert_eq!(s.user_client.cards.stack_cards().len(), 1, "one card on stack");
 
-    s.play_card_from_hand(DisplayPlayer::User, &user_abolish1);
+    s.play_card_from_hand(DisplayPlayer::User, &user_counterspell1);
     assert_eq!(s.user_client.cards.stack_cards().len(), 2, "two cards on stack");
 
-    s.play_card_from_hand(DisplayPlayer::Enemy, &enemy_dreamscatter);
+    s.play_card_from_hand(DisplayPlayer::Enemy, &enemy_variable);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
     assert_eq!(s.user_client.cards.stack_cards().len(), 3, "three cards on stack");
 
-    s.play_card_from_hand(DisplayPlayer::User, &user_abolish2);
+    s.play_card_from_hand(DisplayPlayer::User, &user_counterspell2);
     s.select_target(DisplayPlayer::User, &enemy_character);
     assert_eq!(s.user_client.cards.stack_cards().len(), 4, "four cards on stack");
 
-    assert_arrow_between_cards(&s, &user_abolish1, &enemy_character);
-    assert_arrow_between_cards(&s, &user_abolish2, &enemy_character);
+    assert_arrow_between_cards(&s, &user_counterspell1, &enemy_character);
+    assert_arrow_between_cards(&s, &user_counterspell2, &enemy_character);
 
-    assert_info_zoom_targeting(&s, &user_abolish1, &enemy_character);
-    assert_info_zoom_targeting(&s, &user_abolish2, &enemy_character);
+    assert_info_zoom_targeting(&s, &user_counterspell1, &enemy_character);
+    assert_info_zoom_targeting(&s, &user_counterspell2, &enemy_character);
 
     s.perform_enemy_action(BattleAction::PassPriority);
 
     assert!(
-        s.user_client.cards.user_void().contains(&user_abolish2),
-        "user abolish2 resolved to void"
+        s.user_client.cards.user_void().contains(&user_counterspell2),
+        "user counterspell2 resolved to void"
     );
     assert!(
         s.user_client.cards.enemy_void().contains(&enemy_character),
         "enemy character removed to void"
     );
     assert_eq!(s.user_client.cards.stack_cards().len(), 2, "two cards left on stack");
-    assert!(s.user_client.me.can_act(), "user has priority after abolish2 resolves");
+    assert!(s.user_client.me.can_act(), "user has priority after counterspell2 resolves");
 
-    assert_no_arrow_between_cards(&s, &user_abolish1, &enemy_character);
-    assert_no_info_zoom_targeting(&s, &user_abolish1, &enemy_character);
+    assert_no_arrow_between_cards(&s, &user_counterspell1, &enemy_character);
+    assert_no_info_zoom_targeting(&s, &user_counterspell1, &enemy_character);
 
     s.perform_user_action(BattleAction::PassPriority);
 
     assert!(
-        s.user_client.cards.enemy_void().contains(&enemy_dreamscatter),
-        "enemy dreamscatter resolved to void"
+        s.user_client.cards.enemy_void().contains(&enemy_variable),
+        "enemy fast card resolved to void"
     );
     assert_eq!(s.user_client.cards.stack_cards().len(), 1, "one card left on stack");
-    assert!(s.user_client.opponent.can_act(), "enemy has priority after dreamscatter resolves");
+    assert!(s.user_client.opponent.can_act(), "enemy has priority after enemy fast card resolves");
 
     s.perform_enemy_action(BattleAction::PassPriority);
 
     assert!(
-        s.user_client.cards.user_void().contains(&user_abolish1),
-        "user abolish1 resolved to void with no effect"
+        s.user_client.cards.user_void().contains(&user_counterspell1),
+        "user counterspell1 resolved to void with no effect"
     );
     assert_eq!(s.user_client.cards.stack_cards().len(), 0, "stack is empty");
 }
@@ -201,13 +207,13 @@ fn resolve_negate_with_removed_target() {
 #[test]
 fn resolve_dissolve_with_removed_target() {
     let mut s = TestBattle::builder().connect();
-    let dissolve1 = s.add_to_hand(DisplayPlayer::User, CardName::Immolate);
-    let dissolve2 = s.add_to_hand(DisplayPlayer::User, CardName::Immolate);
-    let _extra = s.add_to_hand(DisplayPlayer::User, CardName::Dreamscatter);
-    let draw = s.add_to_hand(DisplayPlayer::Enemy, CardName::Dreamscatter);
-    let _extra2 = s.add_to_hand(DisplayPlayer::Enemy, CardName::Dreamscatter);
+    let dissolve1 = s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
+    let dissolve2 = s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
+    let _extra = s.add_to_hand(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
+    let draw = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
+    let _extra2 = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
 
-    let character = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::MinstrelOfFallingLight);
+    let character = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
     s.play_card_from_hand(DisplayPlayer::User, &dissolve1);
     s.play_card_from_hand(DisplayPlayer::Enemy, &draw);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");

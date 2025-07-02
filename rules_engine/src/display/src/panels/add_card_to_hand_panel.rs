@@ -65,31 +65,31 @@ impl Component for AddCardToHandPanel<'_> {
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::MinstrelOfFallingLight)
+                                        .card(CardName::TestVanillaCharacter)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::Immolate)
+                                        .card(CardName::TestDissolve)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::RippleOfDefiance)
+                                        .card(CardName::TestCounterspellUnlessPays)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::Abolish)
+                                        .card(CardName::TestCounterspell)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::Dreamscatter)
+                                        .card(CardName::TestVariableEnergyDraw)
                                         .user_player(self.user_player)
                                         .build(),
                                 )

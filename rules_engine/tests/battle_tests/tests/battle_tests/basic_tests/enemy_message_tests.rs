@@ -5,11 +5,11 @@ use test_utils::battle::test_battle::TestBattle;
 use test_utils::session::test_session_prelude::*;
 
 #[test]
-fn enemy_message_displayed_when_spending_energy_on_dreamscatter() {
+fn enemy_message_displayed_when_spending_energy_on_energy_prompt() {
     let mut s = TestBattle::builder().connect();
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    s.create_and_play(DisplayPlayer::Enemy, CardName::Dreamscatter);
+    s.create_and_play(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
     s.click_increment_button(DisplayPlayer::Enemy);
     s.click_increment_button(DisplayPlayer::Enemy);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
@@ -37,13 +37,13 @@ fn enemy_message_displayed_when_spending_energy_on_dreamscatter() {
 }
 
 #[test]
-fn enemy_message_displayed_when_declining_to_pay_for_ripple_of_defiance() {
+fn enemy_message_displayed_when_declining_to_pay_for_counterspell_unless_pays() {
     let mut s = TestBattle::builder().connect();
-    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::RippleOfDefiance);
-    s.add_to_battlefield(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
+    s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    s.create_and_play(DisplayPlayer::Enemy, CardName::Immolate);
+    s.create_and_play(DisplayPlayer::Enemy, CardName::TestDissolve);
     s.play_card_from_hand(DisplayPlayer::User, &prevent_id);
     s.click_secondary_button(DisplayPlayer::Enemy, "Decline");
 
@@ -69,13 +69,13 @@ fn enemy_message_displayed_when_declining_to_pay_for_ripple_of_defiance() {
 }
 
 #[test]
-fn enemy_message_displayed_when_paying_for_ripple_of_defiance() {
+fn enemy_message_displayed_when_paying_for_counterspell_unless_pays() {
     let mut s = TestBattle::builder().connect();
-    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::RippleOfDefiance);
-    s.add_to_battlefield(DisplayPlayer::User, CardName::MinstrelOfFallingLight);
+    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
+    s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    s.create_and_play(DisplayPlayer::Enemy, CardName::Immolate);
+    s.create_and_play(DisplayPlayer::Enemy, CardName::TestDissolve);
     s.play_card_from_hand(DisplayPlayer::User, &prevent_id);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
 
@@ -102,11 +102,11 @@ fn enemy_message_displayed_when_paying_for_ripple_of_defiance() {
 }
 
 #[test]
-fn enemy_message_displayed_when_spending_minimum_energy_on_dreamscatter() {
+fn enemy_message_displayed_when_spending_minimum_energy_on_energy_prompt() {
     let mut s = TestBattle::builder().connect();
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    s.create_and_play(DisplayPlayer::Enemy, CardName::Dreamscatter);
+    s.create_and_play(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
 
     let commands = s.last_commands.as_ref().expect("No commands found");

@@ -12,23 +12,23 @@ fn create_cards() -> Vec<CardName> {
     let mut cards = Vec::new();
 
     for _ in 0..6 {
-        cards.push(CardName::MinstrelOfFallingLight);
+        cards.push(CardName::TestVanillaCharacter);
     }
 
     for _ in 0..3 {
-        cards.push(CardName::Immolate);
+        cards.push(CardName::TestDissolve);
     }
 
     for _ in 0..3 {
-        cards.push(CardName::Abolish);
+        cards.push(CardName::TestCounterspell);
     }
 
     for _ in 0..3 {
-        cards.push(CardName::RippleOfDefiance);
+        cards.push(CardName::TestCounterspellUnlessPays);
     }
 
     for _ in 0..3 {
-        cards.push(CardName::Dreamscatter);
+        cards.push(CardName::TestVariableEnergyDraw);
     }
 
     cards

@@ -122,19 +122,19 @@ fn selection_action(legal_actions: &LegalActions, card_id: CardId) -> Option<Gam
 
 fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
     match card::get(battle, card_id).name {
-        CardName::MinstrelOfFallingLight => SpriteAddress::new(
+        CardName::TestVanillaCharacter => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
-        CardName::Immolate => SpriteAddress::new(
+        CardName::TestDissolve => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png",
         ),
-        CardName::RippleOfDefiance => SpriteAddress::new(
+        CardName::TestCounterspellUnlessPays => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_2123360837.png",
         ),
-        CardName::Abolish => SpriteAddress::new(
+        CardName::TestCounterspell => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1282908322.png",
         ),
-        CardName::Dreamscatter => SpriteAddress::new(
+        CardName::TestVariableEnergyDraw => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
         CardName::TestDrawOne => SpriteAddress::new(
@@ -161,19 +161,19 @@ fn card_type(battle: &BattleState, card_id: CardId) -> String {
 
 fn rules_text(battle: &BattleState, card_id: CardId) -> String {
     let base_text = match card::get(battle, card_id).name {
-        CardName::MinstrelOfFallingLight => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
-        CardName::Immolate => "<b>Dissolve</b> an enemy character.".to_string(),
-        CardName::RippleOfDefiance => {
+        CardName::TestVanillaCharacter => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
+        CardName::TestDissolve => "<b>Dissolve</b> an enemy character.".to_string(),
+        CardName::TestCounterspellUnlessPays => {
             "<b>Prevent</b> an enemy event unless the enemy pays 2\u{f7e4}.".to_string()
         }
-        CardName::Abolish => "<b>Prevent</b> an enemy card.".to_string(),
-        CardName::Dreamscatter => {
+        CardName::TestCounterspell => "<b>Prevent</b> an enemy card.".to_string(),
+        CardName::TestVariableEnergyDraw => {
             "Pay one or more \u{f7e4}: Draw a card for each \u{f7e4} spent.".to_string()
         }
         CardName::TestDrawOne => "Draw a card.".to_string(),
     };
 
-    if card::get(battle, card_id).name == CardName::Dreamscatter
+    if card::get(battle, card_id).name == CardName::TestVariableEnergyDraw
         && let Some(stack_card) = battle.cards.stack_card(StackCardId(card_id))
         && let StackCardAdditionalCostsPaid::Energy(energy) = &stack_card.additional_costs_paid
     {
@@ -185,11 +185,11 @@ fn rules_text(battle: &BattleState, card_id: CardId) -> String {
 
 fn supplemental_card_info(battle: &BattleState, card_id: CardId) -> Option<String> {
     match card::get(battle, card_id).name {
-        CardName::Immolate => Some("<b>Dissolve:</b> Send a character to the void".to_string()),
-        CardName::RippleOfDefiance => Some(
+        CardName::TestDissolve => Some("<b>Dissolve:</b> Send a character to the void".to_string()),
+        CardName::TestCounterspellUnlessPays => Some(
             "<b>Prevent:</b> Send a card to the void in response to it being played".to_string(),
         ),
-        CardName::Abolish => Some(
+        CardName::TestCounterspell => Some(
             "<b>Prevent:</b> Send a card to the void in response to it being played".to_string(),
         ),
         _ => None,
