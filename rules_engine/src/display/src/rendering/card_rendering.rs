@@ -32,6 +32,7 @@ use crate::rendering::supplemental_card_info::SupplementalCardInfo;
 use crate::rendering::{card_display_state, positions};
 
 pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardView {
+    let battle = context.battle();
     CardView {
         id: adapter::client_card_id(context.card_id()),
         position: positions::calculate(builder, context.battle(), context.card_id()),
@@ -49,7 +50,13 @@ pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardVi
         card_facing: CardFacing::FaceUp,
         create_position: None,
         destroy_position: None,
-        prefab: CardPrefab::Character,
+        prefab: match card_properties::card_type(battle, context.card_id()) {
+            CardType::Character(_) => CardPrefab::Character,
+            CardType::Event => CardPrefab::Event,
+            CardType::Dreamsign => CardPrefab::Dreamsign,
+            CardType::Enemy => CardPrefab::Enemy,
+            CardType::Dreamwell => CardPrefab::Dreamwell,
+        },
     }
 }
 

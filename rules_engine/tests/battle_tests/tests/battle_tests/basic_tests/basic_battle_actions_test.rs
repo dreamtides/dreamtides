@@ -191,11 +191,7 @@ fn cards_in_hand_properties() {
     assert_eq!(event_revealed.card_type, "\u{f0e7} Event", "event type");
 
     assert_eq!(character_card.view.prefab, CardPrefab::Character, "character uses character frame");
-    assert_eq!(
-        event_card.view.prefab,
-        CardPrefab::Character,
-        "event currently uses character frame"
-    );
+    assert_eq!(event_card.view.prefab, CardPrefab::Event, "event uses event frame");
 
     test_helpers::assert_clients_identical(&s);
 }
