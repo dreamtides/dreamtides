@@ -13,6 +13,7 @@ using Dreamtides.Schema;
 using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using UnityEngine.Rendering;
+using System.IO;
 
 #nullable enable
 
@@ -208,14 +209,44 @@ namespace Dreamtides.TestUtils
         new Vector3(bounds.min.x, bounds.max.y, bounds.center.z)
       };
 
+      var isOnscreen = true;
+      var failureReason = "";
+
       foreach (var corner in corners)
       {
         var viewportPos = Registry.Layout.MainCamera.WorldToViewportPoint(corner);
-        Assert.That(viewportPos.x >= -0.01f && viewportPos.x <= 1.01f &&
-                    viewportPos.y >= -0.01f && viewportPos.y <= 1.01f &&
-                    viewportPos.z >= -0.01f,
-                    $"{message}: Corner at world position {corner} is outside viewport: {viewportPos}");
+
+        if (!(viewportPos.x >= -0.01f && viewportPos.x <= 1.01f &&
+              viewportPos.y >= -0.01f && viewportPos.y <= 1.01f &&
+              viewportPos.z >= -0.01f))
+        {
+          isOnscreen = false;
+          failureReason = $"Corner at world position {corner} is outside viewport: {viewportPos}";
+          break;
+        }
       }
+
+      if (!isOnscreen)
+      {
+        var screenshotPath = CaptureScreenshot($"AssertIsOnscreen_Failure_{DateTime.Now:yyyyMMdd_HHmmss}");
+        Debug.Log($"Screenshot captured at: {screenshotPath}");
+        Assert.Fail($"{message}: {screenshotPath}\n{failureReason}");
+      }
+    }
+
+    private string CaptureScreenshot(string filename)
+    {
+      var directory = Path.Combine(Application.persistentDataPath, "Screenshots");
+
+      if (!Directory.Exists(directory))
+      {
+        Directory.CreateDirectory(directory);
+      }
+
+      var fullPath = Path.Combine(directory, $"{filename}.png");
+      ScreenCapture.CaptureScreenshot(fullPath);
+
+      return fullPath;
     }
 
     protected void AssertPrimaryActionButtonIsVisible()
