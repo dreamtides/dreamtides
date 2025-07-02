@@ -63,7 +63,7 @@ pub fn apply_effect(
             ));
         }
 
-        CardName::TestCounterspell if effect_name == "Prevent" => {
+        CardName::TestCounterspell if effect_name == "Counterspell" => {
             animations::push_snapshot(builder, battle);
             builder.push(Command::FireProjectile(
                 FireProjectileCommand::builder()
@@ -76,7 +76,7 @@ pub fn apply_effect(
             ));
         }
 
-        CardName::TestCounterspellUnlessPays if effect_name == "Prevent" => {
+        CardName::TestCounterspellUnlessPays if effect_name == "Counterspell" => {
             animations::push_snapshot(builder, battle);
             builder.push(Command::FireProjectile(
                 FireProjectileCommand::builder()
@@ -120,7 +120,7 @@ pub fn apply_effect(
 /// Returns the target ID for a given animation, if it has one.
 fn find_target_id(animation: &BattleAnimation) -> Option<CardId> {
     match animation {
-        BattleAnimation::Prevent { target_id } => Some(target_id.card_id()),
+        BattleAnimation::Counterspell { target_id } => Some(target_id.card_id()),
         BattleAnimation::Dissolve { target_id } => Some(target_id.card_id()),
         _ => None,
     }

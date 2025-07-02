@@ -40,7 +40,7 @@ namespace Dreamtides.Tests
       );
 
       yield return PerformAddCardAction(TestBattle.New()
-        .AddCardToHand(DisplayPlayer.User, CardName.MinstrelOfFallingLight)
+        .AddCardToHand(DisplayPlayer.User, CardName.TestVanillaCharacter)
         .Build()
       );
 
@@ -74,7 +74,7 @@ namespace Dreamtides.Tests
       );
 
       yield return PerformAddCardAction(TestBattle.New()
-        .AddCardToHand(DisplayPlayer.User, CardName.Immolate)
+        .AddCardToHand(DisplayPlayer.User, CardName.TestDissolve)
         .Build()
       );
 
@@ -131,17 +131,17 @@ namespace Dreamtides.Tests
       );
 
       yield return PerformAddCardAction(TestBattle.New()
-         .AddCardToHand(DisplayPlayer.User, CardName.MinstrelOfFallingLight)
+         .AddCardToHand(DisplayPlayer.User, CardName.TestVanillaCharacter)
          .Build()
        );
       var characterCard = Registry.LayoutService.GetCard(CurrentCardId);
       yield return PerformAddCardAction(TestBattle.New()
-        .AddCardToHand(DisplayPlayer.User, CardName.Abolish)
+        .AddCardToHand(DisplayPlayer.User, CardName.TestCounterspell)
         .Build()
       );
       var userPrevent1 = Registry.LayoutService.GetCard(CurrentCardId);
       yield return PerformAddCardAction(TestBattle.New()
-        .AddCardToHand(DisplayPlayer.User, CardName.Abolish)
+        .AddCardToHand(DisplayPlayer.User, CardName.TestCounterspell)
         .Build()
       );
       var userPrevent2 = Registry.LayoutService.GetCard(CurrentCardId);
@@ -227,7 +227,7 @@ namespace Dreamtides.Tests
         .Build()
       );
       yield return PerformAddCardAction(TestBattle.New()
-        .AddCardToHand(DisplayPlayer.User, CardName.Immolate)
+        .AddCardToHand(DisplayPlayer.User, CardName.TestDissolve)
         .Build()
       );
       var userDissolve = Registry.LayoutService.GetCard(CurrentCardId);

@@ -7,9 +7,9 @@ use test_utils::battle::test_battle::TestBattle;
 use test_utils::session::test_session_prelude::*;
 
 #[test]
-fn prevent_unless_pays_cost() {
+fn counterspell_unless_pays_cost() {
     let mut s = TestBattle::builder().connect();
-    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
+    let counterspell_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
     s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
@@ -17,7 +17,7 @@ fn prevent_unless_pays_cost() {
 
     let event_id = s.create_and_play(DisplayPlayer::Enemy, CardName::TestDissolve);
     let event_cost = s.user_client.cards.get_cost(&event_id);
-    s.play_card_from_hand(DisplayPlayer::User, &prevent_id);
+    s.play_card_from_hand(DisplayPlayer::User, &counterspell_id);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
     assert!(
         s.user_client.cards.stack_cards().is_empty(),
@@ -36,9 +36,9 @@ fn prevent_unless_pays_cost() {
 }
 
 #[test]
-fn prevent_unless_pays_cost_decline() {
+fn counterspell_unless_pays_cost_decline() {
     let mut s = TestBattle::builder().connect();
-    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
+    let counterspell_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
     s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
@@ -46,7 +46,7 @@ fn prevent_unless_pays_cost_decline() {
 
     let event_id = s.create_and_play(DisplayPlayer::Enemy, CardName::TestDissolve);
     let event_cost = s.user_client.cards.get_cost(&event_id);
-    s.play_card_from_hand(DisplayPlayer::User, &prevent_id);
+    s.play_card_from_hand(DisplayPlayer::User, &counterspell_id);
     s.click_secondary_button(DisplayPlayer::Enemy, "Decline");
     assert!(
         s.user_client.cards.stack_cards().is_empty(),
@@ -67,13 +67,13 @@ fn prevent_unless_pays_cost_decline() {
 #[test]
 fn test_counterspell_unless_pays_fire_projectile_only_on_decline() {
     let mut s = TestBattle::builder().connect();
-    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
+    let counterspell_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
     s.create_and_play(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
 
-    s.play_card_from_hand(DisplayPlayer::User, &prevent_id);
+    s.play_card_from_hand(DisplayPlayer::User, &counterspell_id);
 
     let commands_after_resolve = s.last_commands.as_ref().expect("No commands found");
     let fire_projectile_after_resolve =
@@ -105,10 +105,11 @@ fn test_counterspell_unless_pays_fire_projectile_only_on_decline() {
 
     let mut s2 = TestBattle::builder().connect();
     s2.end_turn_remove_opponent_hand(DisplayPlayer::User);
-    let prevent_id2 = s2.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
+    let counterspell_id2 =
+        s2.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
     let event_id2 = s2.create_and_play(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
     s2.click_primary_button(DisplayPlayer::Enemy, "Spend");
-    s2.play_card_from_hand(DisplayPlayer::User, &prevent_id2);
+    s2.play_card_from_hand(DisplayPlayer::User, &counterspell_id2);
     s2.click_secondary_button(DisplayPlayer::Enemy, "Decline");
 
     let commands_after_decline = s2.last_commands.as_ref().expect("No commands found");
@@ -127,32 +128,32 @@ fn test_counterspell_unless_pays_fire_projectile_only_on_decline() {
     let fire_projectile = fire_projectile_after_decline.unwrap();
     assert_eq!(
         fire_projectile.source_id,
-        GameObjectId::CardId(prevent_id2),
+        GameObjectId::CardId(counterspell_id2),
         "fire projectile source should be the Test Counterspell Unless Pays card"
     );
     assert_eq!(
         fire_projectile.target_id,
         GameObjectId::CardId(event_id2),
-        "fire projectile target should be the event being prevented"
+        "fire projectile target should be the event being counterspelled"
     );
 }
 
 #[test]
 fn test_counterspell_unless_pays_stays_on_stack_during_prompt() {
     let mut s = TestBattle::builder().connect();
-    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
+    let counterspell_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
     s.create_and_play(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
 
-    s.play_card_from_hand(DisplayPlayer::User, &prevent_id);
+    s.play_card_from_hand(DisplayPlayer::User, &counterspell_id);
 
     let card_view = s
         .user_client
         .cards
         .card_map
-        .get(&prevent_id)
+        .get(&counterspell_id)
         .expect("Test Counterspell Unless Pays card should exist");
 
     assert!(
@@ -167,7 +168,7 @@ fn test_counterspell_unless_pays_stays_on_stack_during_prompt() {
         .user_client
         .cards
         .card_map
-        .get(&prevent_id)
+        .get(&counterspell_id)
         .expect("Test Counterspell Unless Pays card should exist");
 
     assert!(

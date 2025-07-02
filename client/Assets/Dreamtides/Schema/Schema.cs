@@ -2207,7 +2207,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitMulligan, ToggleOrderSelectorVisibility };
 
-    public enum CardName { Abolish, Dreamscatter, Immolate, MinstrelOfFallingLight, RippleOfDefiance, TestDrawOne };
+    public enum CardName { TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestVanillaCharacter, TestVariableEnergyDraw };
 
     /// <summary>
     /// Identifies a player in an ongoing battle.
@@ -3260,18 +3260,18 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "Abolish":
-                    return CardName.Abolish;
-                case "Dreamscatter":
-                    return CardName.Dreamscatter;
-                case "Immolate":
-                    return CardName.Immolate;
-                case "MinstrelOfFallingLight":
-                    return CardName.MinstrelOfFallingLight;
-                case "RippleOfDefiance":
-                    return CardName.RippleOfDefiance;
+                case "TestCounterspell":
+                    return CardName.TestCounterspell;
+                case "TestCounterspellUnlessPays":
+                    return CardName.TestCounterspellUnlessPays;
+                case "TestDissolve":
+                    return CardName.TestDissolve;
                 case "TestDrawOne":
                     return CardName.TestDrawOne;
+                case "TestVanillaCharacter":
+                    return CardName.TestVanillaCharacter;
+                case "TestVariableEnergyDraw":
+                    return CardName.TestVariableEnergyDraw;
             }
             throw new Exception("Cannot unmarshal type CardName");
         }
@@ -3286,23 +3286,23 @@ namespace Dreamtides.Schema
             var value = (CardName)untypedValue;
             switch (value)
             {
-                case CardName.Abolish:
-                    serializer.Serialize(writer, "Abolish");
+                case CardName.TestCounterspell:
+                    serializer.Serialize(writer, "TestCounterspell");
                     return;
-                case CardName.Dreamscatter:
-                    serializer.Serialize(writer, "Dreamscatter");
+                case CardName.TestCounterspellUnlessPays:
+                    serializer.Serialize(writer, "TestCounterspellUnlessPays");
                     return;
-                case CardName.Immolate:
-                    serializer.Serialize(writer, "Immolate");
-                    return;
-                case CardName.MinstrelOfFallingLight:
-                    serializer.Serialize(writer, "MinstrelOfFallingLight");
-                    return;
-                case CardName.RippleOfDefiance:
-                    serializer.Serialize(writer, "RippleOfDefiance");
+                case CardName.TestDissolve:
+                    serializer.Serialize(writer, "TestDissolve");
                     return;
                 case CardName.TestDrawOne:
                     serializer.Serialize(writer, "TestDrawOne");
+                    return;
+                case CardName.TestVanillaCharacter:
+                    serializer.Serialize(writer, "TestVanillaCharacter");
+                    return;
+                case CardName.TestVariableEnergyDraw:
+                    serializer.Serialize(writer, "TestVariableEnergyDraw");
                     return;
             }
             throw new Exception("Cannot marshal type CardName");

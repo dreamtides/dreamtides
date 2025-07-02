@@ -39,12 +39,12 @@ fn enemy_message_displayed_when_spending_energy_on_energy_prompt() {
 #[test]
 fn enemy_message_displayed_when_declining_to_pay_for_counterspell_unless_pays() {
     let mut s = TestBattle::builder().connect();
-    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
+    let counterspell_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
     s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
     s.create_and_play(DisplayPlayer::Enemy, CardName::TestDissolve);
-    s.play_card_from_hand(DisplayPlayer::User, &prevent_id);
+    s.play_card_from_hand(DisplayPlayer::User, &counterspell_id);
     s.click_secondary_button(DisplayPlayer::Enemy, "Decline");
 
     let commands = s.last_commands.as_ref().expect("No commands found");
@@ -71,12 +71,12 @@ fn enemy_message_displayed_when_declining_to_pay_for_counterspell_unless_pays() 
 #[test]
 fn enemy_message_displayed_when_paying_for_counterspell_unless_pays() {
     let mut s = TestBattle::builder().connect();
-    let prevent_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
+    let counterspell_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
     s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
     s.create_and_play(DisplayPlayer::Enemy, CardName::TestDissolve);
-    s.play_card_from_hand(DisplayPlayer::User, &prevent_id);
+    s.play_card_from_hand(DisplayPlayer::User, &counterspell_id);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
 
     let commands = s.last_commands.as_ref().expect("No commands found");
@@ -90,13 +90,13 @@ fn enemy_message_displayed_when_paying_for_counterspell_unless_pays() {
 
     assert!(
         enemy_message_cmd.is_some(),
-        "enemy message command should be present when enemy pays for prevention"
+        "enemy message command should be present when enemy pays for counterspell"
     );
 
     let message_command = enemy_message_cmd.unwrap();
     assert!(
         message_command.message.contains("Spend") && message_command.message.contains("2"),
-        "enemy message should show spending 2 energy to pay for prevention, got: '{}'",
+        "enemy message should show spending 2 energy to pay for counterspell, got: '{}'",
         message_command.message
     );
 }

@@ -74,8 +74,8 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
 /// Extracts a stack target predicate from a standard effect, if any.
 pub fn get_stack_target_predicate(effect: &StandardEffect) -> Option<&Predicate> {
     match effect {
-        StandardEffect::Prevent { target, .. } => Some(target),
-        StandardEffect::PreventUnlessPaysCost { target, .. } => Some(target),
+        StandardEffect::Counterspell { target, .. } => Some(target),
+        StandardEffect::CounterspellUnlessPaysCost { target, .. } => Some(target),
         _ => None,
     }
 }

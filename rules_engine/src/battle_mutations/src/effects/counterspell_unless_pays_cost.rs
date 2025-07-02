@@ -10,7 +10,7 @@ use battle_state::prompt_types::prompt_data::{
     PromptChoice, PromptChoiceLabel, PromptConfiguration, PromptData, PromptType,
 };
 
-use crate::card_mutations::prevent;
+use crate::card_mutations::counterspell;
 use crate::effects::targeting;
 use crate::prompt_mutations::prompts;
 
@@ -35,7 +35,9 @@ pub fn execute(
                     },
                     PromptChoice {
                         label: PromptChoiceLabel::Decline,
-                        effect: Effect::Effect(StandardEffect::Prevent { target: Predicate::It }),
+                        effect: Effect::Effect(StandardEffect::Counterspell {
+                            target: Predicate::It,
+                        }),
                         targets: targets.cloned(),
                     },
                 ],
@@ -43,7 +45,7 @@ pub fn execute(
             configuration: PromptConfiguration { ..Default::default() },
         });
     } else {
-        prevent::execute(battle, source, targeting::stack_card_id(targets)?);
+        counterspell::execute(battle, source, targeting::stack_card_id(targets)?);
     }
     Some(())
 }

@@ -287,13 +287,13 @@ fn negate_unless_pays_cost<'a>() -> impl Parser<'a, &'a str, StandardEffect, Err
         .ignore_then(determiner_parser::target_parser())
         .then_ignore(phrase("unless they"))
         .then(cost_parser::their_cost())
-        .map(|(target, cost)| StandardEffect::PreventUnlessPaysCost { target, cost })
+        .map(|(target, cost)| StandardEffect::CounterspellUnlessPaysCost { target, cost })
 }
 
 fn negate<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("negate")
         .ignore_then(determiner_parser::target_parser())
-        .map(|target| StandardEffect::Prevent { target })
+        .map(|target| StandardEffect::Counterspell { target })
 }
 
 fn discard_card_from_enemy_hand<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {

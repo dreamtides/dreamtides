@@ -7,11 +7,11 @@ use battle_state::core::effect_source::EffectSource;
 
 use crate::card_mutations::move_card;
 
-/// Prevents a card on the stack, moving it to the void.
+/// Prevents a card on the stack from resolving, moving it to the void.
 ///
 /// Returns the [VoidCardId] for the card in its new zone.
 pub fn execute(battle: &mut BattleState, source: EffectSource, id: StackCardId) -> VoidCardId {
-    battle_trace!("Preventing card", battle, id);
-    battle.push_animation(source, || BattleAnimation::Prevent { target_id: id });
+    battle_trace!("Counterspelling card", battle, id);
+    battle.push_animation(source, || BattleAnimation::Counterspell { target_id: id });
     move_card::from_stack_to_void(battle, source, card_properties::controller(battle, id), id)
 }

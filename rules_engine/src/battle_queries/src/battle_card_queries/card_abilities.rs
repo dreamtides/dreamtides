@@ -54,7 +54,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
-                    effect: Effect::Effect(StandardEffect::PreventUnlessPaysCost {
+                    effect: Effect::Effect(StandardEffect::CounterspellUnlessPaysCost {
                         target: Predicate::Enemy(CardPredicate::Event),
                         cost: Cost::Energy(Energy(2)),
                     }),
@@ -71,7 +71,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
-                    effect: Effect::Effect(StandardEffect::Prevent {
+                    effect: Effect::Effect(StandardEffect::Counterspell {
                         target: Predicate::Enemy(CardPredicate::Dream),
                     }),
                 }),

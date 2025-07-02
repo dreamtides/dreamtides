@@ -95,7 +95,7 @@ namespace Dreamtides.TestUtils
       return this;
     }
 
-    public TestBattle AddCardToHand(DisplayPlayer player, CardName cardName = CardName.MinstrelOfFallingLight)
+    public TestBattle AddCardToHand(DisplayPlayer player, CardName cardName = CardName.TestVanillaCharacter)
     {
       var name = GetPlayerName(player);
       _actions.Add(new DebugBattleAction
@@ -112,7 +112,7 @@ namespace Dreamtides.TestUtils
     public TestBattle AddCardsToBattlefield(
       DisplayPlayer player,
       int count,
-      CardName cardName = CardName.MinstrelOfFallingLight)
+      CardName cardName = CardName.TestVanillaCharacter)
     {
       for (var i = 0; i < count; i++)
       {
@@ -121,7 +121,7 @@ namespace Dreamtides.TestUtils
       return this;
     }
 
-    public TestBattle AddCardToBattlefield(DisplayPlayer player, CardName cardName = CardName.MinstrelOfFallingLight)
+    public TestBattle AddCardToBattlefield(DisplayPlayer player, CardName cardName = CardName.TestVanillaCharacter)
     {
       var name = GetPlayerName(player);
       _actions.Add(new DebugBattleAction
@@ -151,7 +151,7 @@ namespace Dreamtides.TestUtils
       {
         AddCardToVoid = new AddCardToVoid
         {
-          Card = CardName.MinstrelOfFallingLight,
+          Card = CardName.TestVanillaCharacter,
           Player = name,
         }
       });

@@ -47,7 +47,7 @@ pub enum BattleAnimation {
     ResolveCharacter {
         character_id: CharacterId,
     },
-    Prevent {
+    Counterspell {
         target_id: StackCardId,
     },
     Dissolve {

@@ -79,7 +79,7 @@ fn test_negate_enemy_dream() {
     [
       event(EventAbility(
         additional_cost: None,
-        effect: effect(prevent(
+        effect: effect(counterspell(
           target: enemy(dream),
         )),
       )),
@@ -111,7 +111,7 @@ fn test_negate_and_put_on_top() {
         additional_cost: None,
         effect: list([
           EffectWithOptions(
-            effect: prevent(
+            effect: counterspell(
               target: enemy(dream),
             ),
             optional: false,
@@ -1398,7 +1398,7 @@ fn test_negate_unless_pays_cost() {
     [
       event(EventAbility(
         additional_cost: None,
-        effect: effect(preventUnlessPaysCost(
+        effect: effect(counterspellUnlessPaysCost(
           target: enemy(event),
           cost: energy(Energy(2)),
         )),
