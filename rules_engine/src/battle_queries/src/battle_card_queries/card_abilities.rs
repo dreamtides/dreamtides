@@ -6,6 +6,8 @@ use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
+use ability_data::trigger_event::{PlayerTurn, TriggerEvent};
+use ability_data::triggered_ability::TriggeredAbility;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardIdType;
 use battle_state::battle_cards::ability_list::{
@@ -13,7 +15,7 @@ use battle_state::battle_cards::ability_list::{
 };
 use core_data::card_types::CardType;
 use core_data::identifiers::{AbilityNumber, CardName};
-use core_data::numerics::Energy;
+use core_data::numerics::{Energy, Spark};
 
 use crate::battle_card_queries::card;
 use crate::card_ability_queries::effect_predicates;
@@ -24,6 +26,7 @@ static TEST_COUNTERSPELL_UNLESS_PAY: OnceLock<AbilityList> = OnceLock::new();
 static COUNTERSPELL_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 static ENERGY_PROMPT_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 static TEST_DRAW_ONE_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
+static TEST_TRIGGER_GAIN_SPARK: OnceLock<AbilityList> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static AbilityList {
     query_by_name(card::get(battle, card_id).name)
@@ -107,6 +110,25 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 AbilityConfiguration { ..Default::default() },
             )])
         }),
+        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
+            TEST_TRIGGER_GAIN_SPARK.get_or_init(|| {
+                build_ability_list(vec![(
+                    AbilityNumber(0),
+                    Ability::Triggered(TriggeredAbility {
+                        trigger: TriggerEvent::PlayDuringTurn(
+                            Predicate::Your(CardPredicate::Card),
+                            PlayerTurn::EnemyTurn,
+                        ),
+                        effect: Effect::Effect(StandardEffect::GainsSpark {
+                            target: Predicate::This,
+                            gains: Spark(2),
+                        }),
+                        options: None,
+                    }),
+                    AbilityConfiguration::default(),
+                )])
+            })
+        }
     }
 }
 

@@ -16,6 +16,7 @@ pub fn display_name(card_name: CardName) -> String {
         CardName::TestCounterspell => "Test Counterspell".to_string(),
         CardName::TestVariableEnergyDraw => "Test Variable Energy Draw".to_string(),
         CardName::TestDrawOne => "Test Draw One".to_string(),
+        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => "Test Gain Trigger".to_string(),
     }
 }
 
@@ -27,6 +28,7 @@ pub fn cost(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
         CardName::TestCounterspell => Some(Energy(2)),
         CardName::TestVariableEnergyDraw => Some(Energy(1)),
         CardName::TestDrawOne => Some(Energy(0)),
+        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => Some(Energy(2)),
     }
 }
 
@@ -42,6 +44,7 @@ pub fn spark(battle: &BattleState, controller: PlayerName, id: CharacterId) -> O
 pub fn base_spark(battle: &BattleState, card_id: impl CardIdType) -> Option<Spark> {
     match card::get(battle, card_id).name {
         CardName::TestVanillaCharacter => Some(Spark(5)),
+        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => Some(Spark(5)),
         _ => None,
     }
 }
@@ -54,6 +57,9 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
         CardName::TestCounterspell => CardType::Event,
         CardName::TestVariableEnergyDraw => CardType::Event,
         CardName::TestDrawOne => CardType::Event,
+        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
+            CardType::Character(CharacterType::Visitor)
+        }
     }
 }
 
@@ -65,5 +71,6 @@ pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
         CardName::TestCounterspell => true,
         CardName::TestVariableEnergyDraw => true,
         CardName::TestDrawOne => true,
+        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => true,
     }
 }

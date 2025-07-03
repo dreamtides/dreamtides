@@ -55,6 +55,7 @@ pub enum CardName {
     TestCounterspell,
     TestVariableEnergyDraw,
     TestDrawOne,
+    TestTriggerGainSparkOnPlayCardEnemyTurn,
 }
 
 /// Identifies an ability of a card.

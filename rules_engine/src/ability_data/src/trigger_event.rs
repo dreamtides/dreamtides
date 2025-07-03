@@ -18,6 +18,7 @@ pub enum TriggerEvent {
     Materialize(Predicate),
     MaterializeNthThisTurn(Predicate, u32),
     Play(Predicate),
+    PlayDuringTurn(Predicate, PlayerTurn),
     PlayFromHand(Predicate),
 }
 
@@ -27,4 +28,11 @@ pub enum TriggerKeyword {
     Materialized,
     Judgment,
     Dissolved,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum PlayerTurn {
+    YourTurn,
+    EnemyTurn,
 }

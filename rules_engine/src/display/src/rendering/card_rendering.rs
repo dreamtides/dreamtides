@@ -140,6 +140,9 @@ fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
         CardName::TestDrawOne => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
+        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
+        ),
     }
 }
 
@@ -171,6 +174,9 @@ fn rules_text(battle: &BattleState, card_id: CardId) -> String {
             "Pay one or more \u{f7e4}: Draw a card for each \u{f7e4} spent.".to_string()
         }
         CardName::TestDrawOne => "Draw a card.".to_string(),
+        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
+            "Whenever you play a card during the enemy's turn, this character gains +2 spark.".to_string()
+        }
     };
 
     if card::get(battle, card_id).name == CardName::TestVariableEnergyDraw
