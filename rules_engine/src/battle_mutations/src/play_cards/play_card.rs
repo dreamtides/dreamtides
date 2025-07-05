@@ -3,6 +3,7 @@ use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::HandCardId;
 use battle_state::core::effect_source::EffectSource;
+use battle_state::triggers::trigger::Trigger;
 use core_data::types::PlayerName;
 
 use crate::card_mutations::move_card;
@@ -24,5 +25,6 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, card_id: HandCardId
     battle.stack_priority = Some(player.opponent());
     add_targeting_prompt::execute(battle, player, stack_card_id);
     add_additional_cost_prompt::execute(battle, player, stack_card_id);
+    battle.triggers.push(source, Trigger::PlayedCardFromHand(stack_card_id));
     battle.push_animation(source, || BattleAnimation::PlayedCardFromHand { player, card_id });
 }

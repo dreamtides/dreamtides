@@ -19,6 +19,7 @@ use crate::battle_player::player_map::PlayerMap;
 use crate::battle_trace::battle_tracing::BattleTracing;
 use crate::core::effect_source::EffectSource;
 use crate::prompt_types::prompt_data::PromptData;
+use crate::triggers::trigger_state::TriggerState;
 
 #[derive(Clone, Debug)]
 pub struct BattleState {
@@ -54,6 +55,9 @@ pub struct BattleState {
     /// Only one prompt may be active at a time. It is an error to attempt to
     /// display another prompt while a choice is pending.
     pub prompt: Option<PromptData>,
+
+    /// State of the trigger system.
+    pub triggers: TriggerState,
 
     /// Animation tracker for this battle. If this is None it means we are not
     /// currently rendering for display.
@@ -121,6 +125,7 @@ impl BattleState {
             seed: self.seed,
             rng: self.rng.clone(),
             prompt: self.prompt.clone(),
+            triggers: self.triggers.clone(),
             animations: None,
             tracing: None,
             action_history: None,
@@ -152,6 +157,7 @@ impl BattleState {
                 seed: self.seed,
                 rng: self.rng.clone(),
                 prompt: self.prompt.clone(),
+                triggers: self.triggers.clone(),
                 animations: None,
                 tracing: None,
                 action_history: None,

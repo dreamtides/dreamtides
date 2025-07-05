@@ -9,6 +9,7 @@ use battle_state::battle::turn_history::TurnHistory;
 use battle_state::battle_player::battle_player_state::{BattlePlayerState, PlayerType};
 use battle_state::battle_player::player_map::PlayerMap;
 use battle_state::core::effect_source::EffectSource;
+use battle_state::triggers::trigger_state::TriggerState;
 use core_data::identifiers::BattleId;
 use core_data::numerics::{Energy, Points, Spark, TurnId};
 use core_data::types::PlayerName;
@@ -50,6 +51,7 @@ pub fn create_and_start(
         rng: Xoshiro256PlusPlus::seed_from_u64(seed),
         animations: None,
         prompt: None,
+        triggers: TriggerState::default(),
         tracing: None,
         action_history: None,
         turn_history: TurnHistory::default(),

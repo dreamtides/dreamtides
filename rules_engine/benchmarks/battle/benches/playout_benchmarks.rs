@@ -18,6 +18,7 @@ use battle_state::battle::turn_history::TurnHistory;
 use battle_state::battle_cards::zone::Zone;
 use battle_state::battle_player::battle_player_state::{BattlePlayerState, PlayerType};
 use battle_state::battle_player::player_map::PlayerMap;
+use battle_state::triggers::trigger_state::TriggerState;
 use core_data::identifiers::{BattleId, CardName};
 use core_data::numerics::{Energy, Points, Spark, TurnId};
 use core_data::types::PlayerName;
@@ -384,6 +385,7 @@ fn benchmark_battle() -> BattleState {
         seed,
         rng: Xoshiro256PlusPlus::seed_from_u64(seed),
         prompt: None,
+        triggers: TriggerState::default(),
         animations: None,
         tracing: None,
         action_history: None,

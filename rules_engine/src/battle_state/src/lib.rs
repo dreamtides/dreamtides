@@ -6,3 +6,4 @@ pub mod battle_trace;
 pub mod core;
 pub mod debug;
 pub mod prompt_types;
+pub mod triggers;
