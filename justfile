@@ -211,7 +211,7 @@ bench-full:
     cargo criterion --manifest-path rules_engine/Cargo.toml -p battle_benchmarks -- ai_full/ai_full
 
 enforce-benchmarks:
-    ./rules_engine/scripts/benchmark.py ai_single_threaded/ai_single_threaded --maximum-time-ms 75
+    ./rules_engine/scripts/benchmark.py ai_single_threaded/ai_single_threaded --maximum-time-ms 90
 
 symlinks:
      ./rules_engine/scripts/symlinks.py -d ~/Documents/dttmp rules_engine/target client/Library

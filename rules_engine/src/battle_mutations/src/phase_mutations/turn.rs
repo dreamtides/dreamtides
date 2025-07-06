@@ -4,6 +4,7 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::core::effect_source::EffectSource;
+use battle_state::triggers::trigger::Trigger;
 use core_data::numerics::TurnId;
 use core_data::types::PlayerName;
 
@@ -20,6 +21,9 @@ pub fn to_ending_phase(battle: &mut BattleState) {
 
 /// Start a turn for `player`.
 pub fn start_turn(battle: &mut BattleState, player: PlayerName) {
+    let source = EffectSource::Game { controller: player };
+
+    battle.triggers.push(source, Trigger::EndOfTurn(player.opponent()));
     battle_trace!("Starting turn for", battle, player);
     battle.turn.active_player = player;
     battle.turn.turn_id += TurnId(1);
@@ -30,7 +34,6 @@ pub fn start_turn(battle: &mut BattleState, player: PlayerName) {
         return;
     }
 
-    let source = EffectSource::Game { controller: player };
     battle.push_animation(source, || BattleAnimation::StartTurn { player });
     judgment::run(battle, battle.turn.active_player, source);
     dreamwell::activate(battle, battle.turn.active_player, source);

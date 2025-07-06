@@ -3,6 +3,7 @@ use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::core::effect_source::EffectSource;
+use battle_state::triggers::trigger::Trigger;
 use core_data::numerics::Points;
 use core_data::types::PlayerName;
 
@@ -26,4 +27,6 @@ pub fn run(battle: &mut BattleState, player: PlayerName, source: EffectSource) {
     } else {
         battle.push_animation(source, || BattleAnimation::Judgment { player, new_score: None });
     }
+
+    battle.triggers.push(source, Trigger::Judgment(player));
 }

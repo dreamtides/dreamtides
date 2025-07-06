@@ -7,6 +7,7 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardIdType, DeckCardId, HandCardId};
 use battle_state::battle_cards::card_set::CardSet;
 use battle_state::core::effect_source::EffectSource;
+use battle_state::triggers::trigger::Trigger;
 use core_data::identifiers::CardName;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
@@ -103,6 +104,7 @@ fn draw_card_internal(
     let Some(id) = random_element(battle.cards.deck(player), &mut battle.rng) else {
         battle_trace!("Creating new test deck", battle, player);
         create_test_deck::add(battle, player);
+        battle.triggers.push(source, Trigger::DrewAllCardsInCopyOfDeck(player));
         return draw_card_internal(battle, source, player, with_animation);
     };
     if with_animation {

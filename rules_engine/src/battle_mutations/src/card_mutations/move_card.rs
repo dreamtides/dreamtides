@@ -7,6 +7,7 @@ use battle_state::battle::card_id::{
 use battle_state::battle_cards::character_state::CharacterState;
 use battle_state::battle_cards::zone::Zone;
 use battle_state::core::effect_source::EffectSource;
+use battle_state::triggers::trigger::Trigger;
 use core_data::types::PlayerName;
 
 /// Moves a card from the 'controller' player's hand to the stack.
@@ -141,7 +142,7 @@ pub fn from_deck_to_void(
 /// Panics if this card is not found in the 'old' zone.
 pub fn to_destination_zone(
     battle: &mut BattleState,
-    _source: EffectSource,
+    source: EffectSource,
     controller: PlayerName,
     id: impl CardIdType,
     old: Zone,
@@ -168,6 +169,7 @@ pub fn to_destination_zone(
             battle.triggers.listeners.add_listener(trigger, card_id);
         }
         write_character_state(battle, controller, CharacterId(card_id));
+        battle.triggers.push(source, Trigger::Materialized(CharacterId(card_id)));
     }
 }
 
