@@ -20,6 +20,7 @@ display_data = { path = "../display_data" }
 
 bit-set = { workspace = true }
 chrono = { workspace = true }
+enumset = { workspace = true }
 fastrand = { workspace = true }
 rand = { workspace = true }
 serde = { workspace = true }

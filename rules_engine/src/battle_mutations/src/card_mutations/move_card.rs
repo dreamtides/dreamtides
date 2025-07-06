@@ -1,4 +1,4 @@
-use battle_queries::battle_card_queries::card_properties;
+use battle_queries::battle_card_queries::{card_abilities, card_properties};
 use battle_queries::panic_with;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{
@@ -120,9 +120,7 @@ pub fn from_deck_to_battlefield(
         Zone::Deck,
         Zone::Battlefield,
     );
-    let id = CharacterId(card_id.card_id());
-    write_character_state(battle, controller, id);
-    id
+    CharacterId(card_id.card_id())
 }
 
 /// Moves a card from the 'controller' player's deck to their void.
@@ -153,7 +151,24 @@ pub fn to_destination_zone(
     if !battle.cards.contains_card(controller, card_id, old) {
         panic_card_not_found(battle, controller, card_id, old, new);
     }
+
+    if old == Zone::Battlefield {
+        let triggers = card_abilities::query(battle, card_id).battlefield_triggers;
+        for trigger in triggers {
+            battle.triggers.listeners.remove_listener(trigger, card_id);
+        }
+        battle.cards.battlefield_state_mut(controller).remove(&CharacterId(card_id));
+    }
+
     battle.cards.move_card(controller, card_id, old, new);
+
+    if new == Zone::Battlefield {
+        let triggers = card_abilities::query(battle, card_id).battlefield_triggers;
+        for trigger in triggers {
+            battle.triggers.listeners.add_listener(trigger, card_id);
+        }
+        write_character_state(battle, controller, CharacterId(card_id));
+    }
 }
 
 fn write_character_state(battle: &mut BattleState, controller: PlayerName, id: CharacterId) {

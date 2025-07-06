@@ -5,6 +5,9 @@ use ability_data::triggered_ability::TriggeredAbility;
 use core_data::card_types::CardType;
 use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
+use enumset::EnumSet;
+
+use crate::triggers::trigger::TriggerName;
 
 /// Abilities of a card which can be applied during a battle.
 ///
@@ -19,6 +22,9 @@ pub struct AbilityList {
 
     /// A field indicating restrictions on playing this card.
     pub can_play_restriction: Option<CanPlayRestriction>,
+
+    /// Triggers which can fire when this card is on the battlefield.
+    pub battlefield_triggers: EnumSet<TriggerName>,
 }
 
 /// Wrapper around an ability which stores additional metadata.

@@ -333,6 +333,7 @@ dependencies = [
  "chrono",
  "core_data",
  "display_data",
+ "enumset",
  "fastrand",
  "rand 0.9.0",
  "serde",

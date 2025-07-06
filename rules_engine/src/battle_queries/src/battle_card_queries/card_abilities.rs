@@ -13,9 +13,11 @@ use battle_state::battle::card_id::CardIdType;
 use battle_state::battle_cards::ability_list::{
     AbilityConfiguration, AbilityData, AbilityList, CanPlayRestriction,
 };
+use battle_state::triggers::trigger::TriggerName;
 use core_data::card_types::CardType;
 use core_data::identifiers::{AbilityNumber, CardName};
 use core_data::numerics::{Energy, Spark};
+use enumset::EnumSet;
 
 use crate::battle_card_queries::card;
 use crate::card_ability_queries::effect_predicates;
@@ -174,7 +176,7 @@ fn build_ability_list(
         compute_event_target_restriction(&ability_list),
         compute_event_additional_cost_restriction(&ability_list),
     ]);
-
+    ability_list.battlefield_triggers = battlefield_triggers(&ability_list);
     ability_list
 }
 
@@ -259,5 +261,24 @@ fn compute_event_additional_cost_restriction(list: &AbilityList) -> Option<CanPl
             Some(CanPlayRestriction::AdditionalEnergyAvailable(Energy(1)))
         }
         _ => None,
+    }
+}
+
+fn battlefield_triggers(list: &AbilityList) -> EnumSet<TriggerName> {
+    let mut triggers = EnumSet::new();
+
+    for ability in list.triggered_abilities.iter() {
+        triggers.insert(trigger_name(&ability.ability.trigger));
+    }
+
+    triggers
+}
+
+fn trigger_name(event: &TriggerEvent) -> TriggerName {
+    match event {
+        TriggerEvent::Play(..) => TriggerName::PlayedCardFromHand,
+        TriggerEvent::PlayDuringTurn(..) => TriggerName::PlayedCardFromHand,
+        TriggerEvent::PlayFromHand(..) => TriggerName::PlayedCardFromHand,
+        _ => todo!("Implement trigger name for {:?}", event),
     }
 }

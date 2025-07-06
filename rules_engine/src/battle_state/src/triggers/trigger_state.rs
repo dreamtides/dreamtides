@@ -13,12 +13,12 @@ use crate::triggers::trigger_listeners::TriggerListeners;
 #[derive(Debug, Clone, Default)]
 pub struct TriggerState {
     pub listeners: TriggerListeners,
-    pub events: Vec<TriggeredEvent>,
+    pub events: Vec<TriggerForListener>,
 }
 
 /// A record of a trigger event for a specific listener.
 #[derive(Debug, Clone)]
-pub struct TriggeredEvent {
+pub struct TriggerForListener {
     pub source: EffectSource,
     pub listener: CardId,
     pub trigger: Trigger,
@@ -27,12 +27,12 @@ pub struct TriggeredEvent {
 impl TriggerState {
     /// Records a new trigger event.
     ///
-    /// For each card currently listening for this trigger, a [TriggeredEvent]
-    /// will be recorded.
+    /// For each card currently listening for this trigger, a
+    /// [TriggerForListener] will be recorded.
     pub fn push(&mut self, source: EffectSource, trigger: Trigger) {
-        if !self.listeners.listeners(trigger).is_empty() {
-            for listener in self.listeners.listeners(trigger) {
-                self.events.push(TriggeredEvent { source, listener, trigger });
+        if !self.listeners.listeners(trigger.name()).is_empty() {
+            for listener in self.listeners.listeners(trigger.name()) {
+                self.events.push(TriggerForListener { source, listener, trigger });
             }
         }
     }
