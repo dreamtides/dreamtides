@@ -128,3 +128,53 @@ fn triggered_ability_does_not_trigger_on_enemy_materialization() {
 
     test_helpers::assert_clients_identical(&s);
 }
+
+#[test]
+fn triggered_ability_multiple_trigger_characters() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    let first_trigger_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
+    );
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
+
+    let first_initial_spark = s.user_client.cards.get_revealed(&first_trigger_character_id).spark;
+    assert_eq!(first_initial_spark, Some(Spark(5)), "first trigger character has base spark");
+
+    let second_trigger_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
+    );
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 2, "two characters on battlefield");
+
+    let first_after_second = s.user_client.cards.get_revealed(&first_trigger_character_id).spark;
+    let second_initial_spark = s.user_client.cards.get_revealed(&second_trigger_character_id).spark;
+    assert_eq!(
+        first_after_second,
+        Some(Spark(6)),
+        "first trigger character gained +1 spark when second was materialized"
+    );
+    assert_eq!(second_initial_spark, Some(Spark(5)), "second trigger character has base spark");
+
+    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 3, "three characters on battlefield");
+
+    let first_final_spark = s.user_client.cards.get_revealed(&first_trigger_character_id).spark;
+    let second_final_spark = s.user_client.cards.get_revealed(&second_trigger_character_id).spark;
+    assert_eq!(
+        first_final_spark,
+        Some(Spark(7)),
+        "first trigger character gained another +1 spark when third character was materialized"
+    );
+    assert_eq!(
+        second_final_spark,
+        Some(Spark(6)),
+        "second trigger character gained +1 spark when third character was materialized"
+    );
+
+    test_helpers::assert_clients_identical(&s);
+}

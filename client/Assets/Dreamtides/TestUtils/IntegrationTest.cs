@@ -44,7 +44,12 @@ namespace Dreamtides.TestUtils
           $"Resolution {resolution} not set");
       yield return new WaitUntil(() => registry.ActionService.Connected,
         TimeSpan.FromSeconds(TimeoutSeconds),
-        () => throw new TimeoutException("Timeout waiting for registry.ActionService.Connected"));
+        () =>
+        {
+          var screenshotPath = CaptureScreenshot($"Connect_Timeout_{DateTime.Now:yyyyMMdd_HHmmss}");
+          Debug.Log($"Screenshot captured at: {screenshotPath}");
+          throw new TimeoutException($"Timeout waiting for registry.ActionService.Connected: {screenshotPath}");
+        });
       yield return registry.TestHelperService.WaitForIdle(TimeoutSeconds);
       _registry = registry;
       Debug.Log($"{testName} started successfully");
@@ -59,7 +64,12 @@ namespace Dreamtides.TestUtils
       Registry.ActionService.PerformAction(action, requestId);
       yield return new WaitUntil(() => Registry.ActionService.LastResponseReceived == requestId,
         TimeSpan.FromSeconds(TimeoutSeconds),
-        () => throw new TimeoutException("Timeout waiting for ActionService.LastResponseReceived == requestId"));
+        () =>
+        {
+          var screenshotPath = CaptureScreenshot($"PerformAction_Timeout_{DateTime.Now:yyyyMMdd_HHmmss}");
+          Debug.Log($"Screenshot captured at: {screenshotPath}");
+          throw new TimeoutException($"Timeout waiting for ActionService.LastResponseReceived == requestId: {screenshotPath}");
+        });
       yield return Registry.TestHelperService.WaitForIdle(TimeoutSeconds);
     }
 
@@ -126,7 +136,12 @@ namespace Dreamtides.TestUtils
     {
       yield return new WaitUntil(() => layout.Objects.Count == count,
         TimeSpan.FromSeconds(TimeoutSeconds),
-        () => throw new TimeoutException($"Timeout waiting for layout.Objects.Count == {count}"));
+        () =>
+        {
+          var screenshotPath = CaptureScreenshot($"WaitForCount_Timeout_{DateTime.Now:yyyyMMdd_HHmmss}");
+          Debug.Log($"Screenshot captured at: {screenshotPath}");
+          throw new TimeoutException($"Timeout waiting for layout.Objects.Count == {count}: {screenshotPath}");
+        });
       yield return Registry.TestHelperService.WaitForIdle(TimeoutSeconds);
     }
 
@@ -134,7 +149,12 @@ namespace Dreamtides.TestUtils
     {
       yield return new WaitUntil(() => SceneManager.GetActiveScene().buildIndex == 0,
         TimeSpan.FromSeconds(TimeoutSeconds),
-        () => throw new TimeoutException("Timeout waiting for scene to load (buildIndex == 0)"));
+        () =>
+        {
+          var screenshotPath = CaptureScreenshot($"WaitForSceneLoad_Timeout_{DateTime.Now:yyyyMMdd_HHmmss}");
+          Debug.Log($"Screenshot captured at: {screenshotPath}");
+          throw new TimeoutException($"Timeout waiting for scene to load (buildIndex == 0): {screenshotPath}");
+        });
     }
 
     protected void AssertEmpty(ObjectLayout objectLayout)
