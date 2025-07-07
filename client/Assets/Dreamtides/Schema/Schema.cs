@@ -2207,7 +2207,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitMulligan, ToggleOrderSelectorVisibility };
 
-    public enum CardName { TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestTriggerGainSparkOnPlayCardEnemyTurn, TestVanillaCharacter, TestVariableEnergyDraw };
+    public enum CardName { TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
 
     /// <summary>
     /// Identifies a player in an ongoing battle.
@@ -3270,6 +3270,8 @@ namespace Dreamtides.Schema
                     return CardName.TestDrawOne;
                 case "TestTriggerGainSparkOnPlayCardEnemyTurn":
                     return CardName.TestTriggerGainSparkOnPlayCardEnemyTurn;
+                case "TestTriggerGainSparkWhenMaterializeAnotherCharacter":
+                    return CardName.TestTriggerGainSparkWhenMaterializeAnotherCharacter;
                 case "TestVanillaCharacter":
                     return CardName.TestVanillaCharacter;
                 case "TestVariableEnergyDraw":
@@ -3302,6 +3304,9 @@ namespace Dreamtides.Schema
                     return;
                 case CardName.TestTriggerGainSparkOnPlayCardEnemyTurn:
                     serializer.Serialize(writer, "TestTriggerGainSparkOnPlayCardEnemyTurn");
+                    return;
+                case CardName.TestTriggerGainSparkWhenMaterializeAnotherCharacter:
+                    serializer.Serialize(writer, "TestTriggerGainSparkWhenMaterializeAnotherCharacter");
                     return;
                 case CardName.TestVanillaCharacter:
                     serializer.Serialize(writer, "TestVanillaCharacter");

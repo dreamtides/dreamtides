@@ -288,17 +288,18 @@ fn battlefield_triggers(list: &AbilityList) -> EnumSet<TriggerName> {
     let mut triggers = EnumSet::new();
 
     for ability in list.triggered_abilities.iter() {
-        triggers.insert(trigger_name(&ability.ability.trigger));
+        triggers.insert(watch_for_trigger(&ability.ability.trigger));
     }
 
     triggers
 }
 
-fn trigger_name(event: &TriggerEvent) -> TriggerName {
+fn watch_for_trigger(event: &TriggerEvent) -> TriggerName {
     match event {
+        TriggerEvent::Materialize(..) => TriggerName::Materialized,
         TriggerEvent::Play(..) => TriggerName::PlayedCardFromHand,
         TriggerEvent::PlayDuringTurn(..) => TriggerName::PlayedCardFromHand,
         TriggerEvent::PlayFromHand(..) => TriggerName::PlayedCardFromHand,
-        _ => todo!("Implement trigger name for {:?}", event),
+        _ => todo!("Implement watch_for_trigger() for {:?}", event),
     }
 }

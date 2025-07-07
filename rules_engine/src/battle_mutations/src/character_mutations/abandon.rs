@@ -7,6 +7,8 @@ use battle_state::triggers::trigger::Trigger;
 use crate::character_mutations::dissolve;
 
 /// Dissolves a character, moving it to the void.
+///
+/// Panics if the character is not on the battlefield.
 pub fn apply(battle: &mut BattleState, source: EffectSource, id: CharacterId) -> VoidCardId {
     battle_trace!("Abandoning character", battle, id);
     let id = dissolve::execute(battle, source, id);
