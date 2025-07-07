@@ -386,6 +386,7 @@ fn benchmark_battle() -> BattleState {
         rng: Xoshiro256PlusPlus::seed_from_u64(seed),
         prompt: None,
         triggers: TriggerState::default(),
+        activated_abilities: PlayerMap::default(),
         animations: None,
         tracing: None,
         action_history: None,

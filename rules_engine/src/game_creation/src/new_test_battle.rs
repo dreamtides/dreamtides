@@ -52,6 +52,7 @@ pub fn create_and_start(
         animations: None,
         prompt: None,
         triggers: TriggerState::default(),
+        activated_abilities: PlayerMap::default(),
         tracing: None,
         action_history: None,
         turn_history: TurnHistory::default(),
