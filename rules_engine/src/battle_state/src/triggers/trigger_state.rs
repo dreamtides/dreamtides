@@ -8,8 +8,11 @@ use crate::triggers::trigger_listeners::TriggerListeners;
 /// This struct keeps track of 1) cards currently listening for a trigger and 2)
 /// triggers which have fired. Each time a battle action finishes resolving,
 /// *IF* there are currently no active player prompts, all triggers recorded are
-/// resolved in the order in which they were recorded. Order of listeners being
-/// invoked within a single event is arbitrary (currently in CardID order).
+/// resolved in the order in which they were recorded. Triggers are also fired
+/// at the end of each player's turn.
+///
+/// Order of listeners being invoked within a single event is arbitrary
+/// (currently in CardID order).
 #[derive(Debug, Clone, Default)]
 pub struct TriggerState {
     pub listeners: TriggerListeners,
