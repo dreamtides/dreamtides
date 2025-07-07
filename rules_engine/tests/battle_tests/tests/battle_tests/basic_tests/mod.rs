@@ -8,5 +8,6 @@ mod outcome_simulation_tests;
 mod prompt_message_tests;
 mod stack_interaction_test;
 mod test_helpers;
+mod triggered_ability_tests;
 mod turn_sequence_test;
 mod undo_tests;

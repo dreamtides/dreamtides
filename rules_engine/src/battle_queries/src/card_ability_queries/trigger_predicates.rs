@@ -36,7 +36,7 @@ pub fn trigger_matches(
             matches_card_predicate(battle, card_predicate, trigger_card_id)
         }
         Predicate::Another(card_predicate) => {
-            let card_controller = card_properties::controller(battle, owning_card_id);
+            let card_controller = card_properties::controller(battle, trigger_card_id);
             if card_controller != owning_card_controller {
                 return false;
             }
@@ -46,7 +46,7 @@ pub fn trigger_matches(
             matches_card_predicate(battle, card_predicate, trigger_card_id)
         }
         Predicate::Your(card_predicate) => {
-            let card_controller = card_properties::controller(battle, owning_card_id);
+            let card_controller = card_properties::controller(battle, trigger_card_id);
             if card_controller != owning_card_controller {
                 return false;
             }
