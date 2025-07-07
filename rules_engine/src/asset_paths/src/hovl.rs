@@ -11,3 +11,7 @@ pub fn magic_circle(name: &'static str) -> EffectAddress {
         "Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Magic circle {name}.prefab"
     ))
 }
+
+pub fn gain_spark() -> EffectAddress {
+    EffectAddress::new("Assets/ThirdParty/Hovl Studio/Magic hits/Dreamtides/Hit 15.prefab")
+}

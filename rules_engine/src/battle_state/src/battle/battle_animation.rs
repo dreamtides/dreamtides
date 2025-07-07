@@ -1,5 +1,5 @@
 use core_data::identifiers::AbilityNumber;
-use core_data::numerics::{Energy, Points};
+use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::PlayerName;
 use strum::{Display, EnumDiscriminants};
 
@@ -26,6 +26,10 @@ pub enum BattleAnimation {
         dreamwell_card_id: CardId,
         new_energy: Energy,
         new_produced_energy: Energy,
+    },
+    GainSpark {
+        character_id: CharacterId,
+        spark: Spark,
     },
     Judgment {
         player: PlayerName,
