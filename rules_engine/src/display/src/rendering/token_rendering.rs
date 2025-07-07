@@ -2,7 +2,7 @@ use battle_state::battle::battle_animation::TriggerAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardIdType;
 use bon::Builder;
-use core_data::display_types::SpriteAddress;
+use core_data::display_types::{AudioClipAddress, SpriteAddress};
 use core_data::numerics::{Energy, Spark};
 use core_data::types::CardFacing;
 use display_data::card_view::{
@@ -46,6 +46,7 @@ pub fn trigger_card_view(
                 sorting_key: 0,
                 sorting_sub_key: 0,
             })
+            .create_sound(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/UI, Pads, Enchantments and Misc/RPG3_Enchantment_Subtle01v2.wav"))
             .build(),
     )
 }
@@ -64,6 +65,7 @@ struct TokenCardView {
     destroy_position: Option<ObjectPosition>,
     #[builder(default)]
     is_fast: bool,
+    create_sound: Option<AudioClipAddress>,
 }
 
 fn token_card_view(view: TokenCardView) -> CardView {
@@ -88,6 +90,7 @@ fn token_card_view(view: TokenCardView) -> CardView {
         card_facing: CardFacing::FaceUp,
         backless: true,
         create_position: view.create_position,
+        create_sound: view.create_sound,
         destroy_position: view.destroy_position,
         prefab: CardPrefab::Token,
     }

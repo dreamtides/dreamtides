@@ -26,12 +26,12 @@ pub fn execute_if_no_active_prompt(battle: &mut BattleState) {
     let mut trigger_animations = Vec::new();
 
     loop {
-        if should_animate {
-            set_displayed_active_triggers(battle, &mut trigger_animations);
-        }
-
         if battle.prompt.is_some() {
             break;
+        }
+
+        if should_animate {
+            set_displayed_active_triggers(battle, &mut trigger_animations);
         }
 
         let Some(trigger_for_listener) = battle.triggers.events.pop_front() else {
@@ -66,10 +66,8 @@ pub fn execute_if_no_active_prompt(battle: &mut BattleState) {
         }
     }
 
-    if should_animate {
-        battle.push_animation(EffectSource::Game { controller: battle.turn.active_player }, || {
-            BattleAnimation::SetActiveTriggers { triggers: vec![] }
-        });
+    if should_animate && battle.prompt.is_none() {
+        set_displayed_active_triggers(battle, &mut trigger_animations);
     }
 }
 

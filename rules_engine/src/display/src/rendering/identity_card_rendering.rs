@@ -70,6 +70,7 @@ pub fn identity_card_view(
         card_facing: CardFacing::FaceUp,
         backless: true,
         create_position: None,
+        create_sound: None,
         destroy_position: None,
         prefab: CardPrefab::Identity,
     }

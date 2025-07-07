@@ -61,6 +61,7 @@ namespace Dreamtides.Services
             CardPrefab.Identity => ComponentUtils.Instantiate(_identityCardPrefab),
             _ => ComponentUtils.Instantiate(_cardPrefab)
           };
+
           if (cardView.CreatePosition != null)
           {
             LayoutForPosition(cardView.CreatePosition).ApplyTargetTransform(card);
@@ -69,6 +70,12 @@ namespace Dreamtides.Services
           {
             layout.ApplyTargetTransform(card);
           }
+
+          if (cardView.CreateSound != null)
+          {
+            Registry.SoundService.Play(cardView.CreateSound);
+          }
+
           Cards[cardId] = card;
         }
 

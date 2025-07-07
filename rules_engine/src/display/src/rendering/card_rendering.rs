@@ -48,6 +48,7 @@ pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardVi
         card_facing: CardFacing::FaceUp,
         backless: false,
         create_position: None,
+        create_sound: None,
         destroy_position: None,
         prefab: match card_properties::card_type(battle, context.card_id()) {
             CardType::Character(_) => CardPrefab::Character,

@@ -172,6 +172,12 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7fb20dfcee2ff45359928e363bd7e426
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/UI, Pads,
+      Enchantments and Misc/RPG3_Enchantment_Subtle01v2.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7fc9741cb085f4296abdc85f4299cf3a
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       8 dagger.prefab

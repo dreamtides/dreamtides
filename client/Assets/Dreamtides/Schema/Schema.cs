@@ -552,6 +552,12 @@ namespace Dreamtides.Schema
         public ObjectPosition CreatePosition { get; set; }
 
         /// <summary>
+        /// Optionally, a sound to play when this card is created.
+        /// </summary>
+        [JsonProperty("createSound")]
+        public AudioClipAddress CreateSound { get; set; }
+
+        /// <summary>
         /// Optionally, a position at which to destroy this card.
         ///
         /// If provided, the card will be animated to this position before being

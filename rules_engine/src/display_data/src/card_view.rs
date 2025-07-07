@@ -44,6 +44,9 @@ pub struct CardView {
     /// before being animated to [Self::position].
     pub create_position: Option<ObjectPosition>,
 
+    /// Optionally, a sound to play when this card is created.
+    pub create_sound: Option<AudioClipAddress>,
+
     /// Optionally, a position at which to destroy this card.
     ///
     /// If provided, the card will be animated to this position before being
