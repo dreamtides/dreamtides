@@ -27,9 +27,6 @@ pub enum BattleAnimation {
         new_energy: Energy,
         new_produced_energy: Energy,
     },
-    FireTriggers {
-        triggers: Vec<TriggerAnimation>,
-    },
     Judgment {
         player: PlayerName,
         new_score: Option<Points>,
@@ -54,12 +51,19 @@ pub enum BattleAnimation {
         source_id: StackCardId,
         targets: EffectTargets,
     },
+    SetActiveTriggers {
+        triggers: Vec<TriggerAnimation>,
+    },
     StartTurn {
         player: PlayerName,
     },
 }
 
-#[derive(Clone, Debug)]
+/// A trigger which is currently awaiting resolution.
+///
+/// The display layer keeps track of the set of currently active triggers and
+/// displays them visually while other effects are animating.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct TriggerAnimation {
     pub controller: PlayerName,
     pub character_id: CharacterId,

@@ -4,7 +4,6 @@ use ability_data::triggered_ability::TriggeredAbility;
 use battle_queries::battle_card_queries::{card, card_abilities, card_properties};
 use battle_queries::card_ability_queries::{effect_predicates, trigger_queries};
 use battle_queries::panic_with;
-use battle_state::battle::animation_data::AnimationStep;
 use battle_state::battle::battle_animation::{BattleAnimation, TriggerAnimation};
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CharacterId;
@@ -24,8 +23,6 @@ use crate::effects::apply_effect::{self, EffectWasApplied};
 /// execution.
 pub fn execute_if_no_active_prompt(battle: &mut BattleState) {
     let should_animate = battle.animations.is_some();
-    let pre_trigger_animation_snapshot =
-        if should_animate { Some(battle.logical_clone()) } else { None };
     let mut trigger_animations = Vec::new();
 
     loop {
@@ -36,6 +33,10 @@ pub fn execute_if_no_active_prompt(battle: &mut BattleState) {
         let Some(trigger_for_listener) = battle.triggers.events.pop_front() else {
             break;
         };
+
+        if should_animate {
+            set_displayed_active_triggers(battle, &mut trigger_animations);
+        }
 
         let controller = card_properties::controller(battle, trigger_for_listener.listener);
         let Some(character_id) =
@@ -54,37 +55,63 @@ pub fn execute_if_no_active_prompt(battle: &mut BattleState) {
                 controller,
                 trigger_for_listener.listener,
             ) {
-                let result = fire_triggered_ability(
+                fire_triggered_ability(
                     battle,
                     trigger_for_listener.trigger,
                     ability_data,
                     controller,
                     character_id,
                 );
-
-                if should_animate && result == Some(EffectWasApplied) {
-                    trigger_animations.push(TriggerAnimation {
-                        controller,
-                        character_id,
-                        ability_number: ability_data.ability_number,
-                    });
-                }
             }
         }
     }
 
-    if should_animate
-        && !trigger_animations.is_empty()
-        && let Some(animations) = &mut battle.animations
-        && let Some(snapshot) = pre_trigger_animation_snapshot
-    {
-        let source = EffectSource::Game { controller: battle.turn.active_player };
-        animations.steps.push(AnimationStep {
-            source,
-            snapshot,
-            animation: BattleAnimation::FireTriggers { triggers: trigger_animations },
+    if should_animate {
+        battle.push_animation(EffectSource::Game { controller: battle.turn.active_player }, || {
+            BattleAnimation::SetActiveTriggers { triggers: vec![] }
         });
     }
+}
+
+/// Sets the active trigger display state for all valid triggers in
+/// [BattleState] and adds them to `previous`.
+///
+/// The animation is skipped if the set of active triggers is the same as
+/// `previous`.
+#[cold]
+fn set_displayed_active_triggers(battle: &mut BattleState, previous: &mut Vec<TriggerAnimation>) {
+    let mut trigger_animations = Vec::new();
+    for trigger_for_listener in &battle.triggers.events {
+        let controller = card_properties::controller(battle, trigger_for_listener.listener);
+        let Some(character_id) =
+            battle.cards.to_character_id(controller, trigger_for_listener.listener)
+        else {
+            continue;
+        };
+        for ability_data in &card_abilities::query(battle, character_id).triggered_abilities {
+            if trigger_queries::matches(
+                battle,
+                trigger_for_listener.trigger,
+                &ability_data.ability.trigger,
+                controller,
+                trigger_for_listener.listener,
+            ) {
+                trigger_animations.push(TriggerAnimation {
+                    controller,
+                    character_id,
+                    ability_number: ability_data.ability_number,
+                });
+            }
+        }
+    }
+
+    if trigger_animations != *previous {
+        battle.push_animation(EffectSource::Game { controller: battle.turn.active_player }, || {
+            BattleAnimation::SetActiveTriggers { triggers: trigger_animations.clone() }
+        });
+    }
+
+    *previous = trigger_animations;
 }
 
 /// Fires a triggered ability for the given [BattleState].
