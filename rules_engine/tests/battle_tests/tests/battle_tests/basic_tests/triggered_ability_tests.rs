@@ -291,3 +291,253 @@ fn triggered_ability_display_effect_command_applied_to_spark_gaining_character()
 
     test_helpers::assert_clients_identical(&s);
 }
+
+#[test]
+fn triggered_ability_gain_spark_on_play_card_enemy_turn() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    let trigger_character_id =
+        s.create_and_play(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
+
+    let initial_spark = s.user_client.cards.get_revealed(&trigger_character_id).spark;
+    assert_eq!(initial_spark, Some(Spark(5)), "trigger character has base spark");
+
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+
+    let user_counterspell = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
+    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    assert!(
+        s.user_client.cards.stack_cards().contains(&enemy_character),
+        "enemy character on stack"
+    );
+    assert!(s.user_client.me.can_act(), "user can act during enemy turn");
+
+    s.play_card_from_hand(DisplayPlayer::User, &user_counterspell);
+
+    let final_spark = s.user_client.cards.get_revealed(&trigger_character_id).spark;
+    assert_eq!(final_spark, Some(Spark(7)), "trigger character gained +2 spark");
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn triggered_ability_gain_spark_multiple_cards_enemy_turn() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    let trigger_character_id =
+        s.create_and_play(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
+
+    let initial_spark = s.user_client.cards.get_revealed(&trigger_character_id).spark;
+    assert_eq!(initial_spark, Some(Spark(5)), "trigger character has base spark");
+
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+
+    let user_draw1 = s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
+    let user_draw2 = s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
+    s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    s.play_card_from_hand(DisplayPlayer::User, &user_draw1);
+
+    let first_trigger_spark = s.user_client.cards.get_revealed(&trigger_character_id).spark;
+    assert_eq!(
+        first_trigger_spark,
+        Some(Spark(7)),
+        "trigger character gained +2 spark after first card"
+    );
+
+    s.play_card_from_hand(DisplayPlayer::User, &user_draw2);
+
+    let final_spark = s.user_client.cards.get_revealed(&trigger_character_id).spark;
+    assert_eq!(
+        final_spark,
+        Some(Spark(9)),
+        "trigger character gained +2 spark again after second card"
+    );
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn triggered_ability_does_not_trigger_during_user_turn() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    let trigger_character_id =
+        s.create_and_play(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
+
+    let initial_spark = s.user_client.cards.get_revealed(&trigger_character_id).spark;
+    assert_eq!(initial_spark, Some(Spark(5)), "trigger character has base spark");
+
+    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 2, "two characters on battlefield");
+
+    let final_spark = s.user_client.cards.get_revealed(&trigger_character_id).spark;
+    assert_eq!(
+        final_spark,
+        Some(Spark(5)),
+        "trigger character does not gain spark during user turn"
+    );
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn triggered_ability_does_not_trigger_when_enemy_plays_cards() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    let trigger_character_id =
+        s.create_and_play(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
+
+    let initial_spark = s.user_client.cards.get_revealed(&trigger_character_id).spark;
+    assert_eq!(initial_spark, Some(Spark(5)), "trigger character has base spark");
+
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+
+    s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    assert_eq!(
+        s.user_client.cards.enemy_battlefield().len(),
+        1,
+        "one enemy character on battlefield"
+    );
+
+    let final_spark = s.user_client.cards.get_revealed(&trigger_character_id).spark;
+    assert_eq!(
+        final_spark,
+        Some(Spark(5)),
+        "trigger character does not gain spark when enemy plays cards"
+    );
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn triggered_ability_multiple_trigger_characters_enemy_turn() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    let first_trigger_character_id =
+        s.create_and_play(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+
+    let second_trigger_character_id =
+        s.create_and_play(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 2, "two characters on battlefield");
+
+    let first_initial_spark = s.user_client.cards.get_revealed(&first_trigger_character_id).spark;
+    let second_initial_spark = s.user_client.cards.get_revealed(&second_trigger_character_id).spark;
+    assert_eq!(first_initial_spark, Some(Spark(5)), "first trigger character has base spark");
+    assert_eq!(second_initial_spark, Some(Spark(5)), "second trigger character has base spark");
+
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+
+    let user_counterspell = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
+    let _enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    s.play_card_from_hand(DisplayPlayer::User, &user_counterspell);
+
+    let first_final_spark = s.user_client.cards.get_revealed(&first_trigger_character_id).spark;
+    let second_final_spark = s.user_client.cards.get_revealed(&second_trigger_character_id).spark;
+    assert_eq!(first_final_spark, Some(Spark(7)), "first trigger character gained +2 spark");
+    assert_eq!(second_final_spark, Some(Spark(7)), "second trigger character gained +2 spark");
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn triggered_ability_triggers_on_different_card_types_enemy_turn() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    let trigger_character_id =
+        s.create_and_play(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
+
+    let initial_spark = s.user_client.cards.get_revealed(&trigger_character_id).spark;
+    assert_eq!(initial_spark, Some(Spark(5)), "trigger character has base spark");
+
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+
+    let user_fast_character =
+        s.add_to_hand(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+    let user_draw = s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
+    let _enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    s.play_card_from_hand(DisplayPlayer::User, &user_fast_character);
+
+    let after_character_spark = s.user_client.cards.get_revealed(&trigger_character_id).spark;
+    assert_eq!(
+        after_character_spark,
+        Some(Spark(7)),
+        "trigger character gained +2 spark after playing fast character"
+    );
+
+    s.play_card_from_hand(DisplayPlayer::User, &user_draw);
+
+    let final_spark = s.user_client.cards.get_revealed(&trigger_character_id).spark;
+    assert_eq!(
+        final_spark,
+        Some(Spark(9)),
+        "trigger character gained +2 spark again after playing event"
+    );
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn triggered_ability_triggers_on_fast_character_enemy_turn() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    let trigger_character_id =
+        s.create_and_play(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
+
+    let initial_spark = s.user_client.cards.get_revealed(&trigger_character_id).spark;
+    assert_eq!(initial_spark, Some(Spark(5)), "trigger character has base spark");
+
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+
+    let user_fast_character =
+        s.add_to_hand(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+    let _enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    s.play_card_from_hand(DisplayPlayer::User, &user_fast_character);
+
+    let final_spark = s.user_client.cards.get_revealed(&trigger_character_id).spark;
+    assert_eq!(
+        final_spark,
+        Some(Spark(7)),
+        "trigger character gained +2 spark after playing fast character"
+    );
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 2, "two characters on battlefield");
+
+    test_helpers::assert_clients_identical(&s);
+}
