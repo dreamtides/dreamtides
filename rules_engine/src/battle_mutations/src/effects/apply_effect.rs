@@ -7,8 +7,9 @@ use battle_queries::battle_trace;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_cards::stack_card_state::EffectTargets;
 use battle_state::core::effect_source::EffectSource;
+use core_data::numerics::Spark;
 
-use crate::card_mutations::{counterspell, deck};
+use crate::card_mutations::{counterspell, deck, spark};
 use crate::character_mutations::dissolve;
 use crate::effects::{counterspell_unless_pays_cost, pay_cost, targeting};
 
@@ -64,11 +65,24 @@ fn apply_standard_effect(
         StandardEffect::DissolveCharacter { .. } => {
             dissolve(battle, source, targets);
         }
+        StandardEffect::GainsSpark { gains, .. } => {
+            gains_spark(battle, source, targets, *gains);
+        }
         StandardEffect::OpponentPaysCost { cost } => {
             pay_cost::execute(battle, source, source.controller().opponent(), cost);
         }
         _ => todo!("Implement {:?}", effect),
     }
+}
+
+fn counterspell(
+    battle: &mut BattleState,
+    source: EffectSource,
+    targets: Option<&EffectTargets>,
+) -> Option<()> {
+    let id = targeting::stack_card_id(targets)?;
+    counterspell::execute(battle, source, id);
+    Some(())
 }
 
 fn draw_cards_for_each(
@@ -91,12 +105,13 @@ fn dissolve(
     Some(())
 }
 
-fn counterspell(
+fn gains_spark(
     battle: &mut BattleState,
     source: EffectSource,
     targets: Option<&EffectTargets>,
+    gains: Spark,
 ) -> Option<()> {
-    let id = targeting::stack_card_id(targets)?;
-    counterspell::execute(battle, source, id);
+    let id = targeting::character_id(targets)?;
+    spark::gain(battle, source, id, gains);
     Some(())
 }
