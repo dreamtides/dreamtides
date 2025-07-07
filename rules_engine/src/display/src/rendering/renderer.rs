@@ -49,7 +49,6 @@ pub fn render_updates(
             write_tracing_event::write_animations(battle, animations);
         }
         for step in &animations.steps {
-            // battle_rendering::run(&mut builder, &step.snapshot);
             animations::render(&mut builder, step.source, &step.animation, &step.snapshot, battle);
             if matches!(step.snapshot.status, BattleStatus::GameOver { .. }) {
                 // Ignore future updates when GameOver state is detected

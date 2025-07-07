@@ -1,3 +1,4 @@
+use core_data::identifiers::AbilityNumber;
 use core_data::numerics::{Energy, Points};
 use core_data::types::PlayerName;
 use strum::{Display, EnumDiscriminants};
@@ -10,18 +11,32 @@ use crate::prompt_types::prompt_data::PromptChoiceLabel;
 #[derive(Clone, Debug, EnumDiscriminants)]
 #[strum_discriminants(derive(Display))]
 pub enum BattleAnimation {
-    StartTurn {
-        player: PlayerName,
+    Counterspell {
+        target_id: StackCardId,
     },
-    Judgment {
+    Dissolve {
+        target_id: CharacterId,
+    },
+    DrawCards {
         player: PlayerName,
-        new_score: Option<Points>,
+        cards: Vec<HandCardId>,
     },
     DreamwellActivation {
         player: PlayerName,
         dreamwell_card_id: CardId,
         new_energy: Energy,
         new_produced_energy: Energy,
+    },
+    FireTriggers {
+        triggers: Vec<TriggerAnimation>,
+    },
+    Judgment {
+        player: PlayerName,
+        new_score: Option<Points>,
+    },
+    MakeChoice {
+        player: PlayerName,
+        choice: PromptChoiceLabel,
     },
     PlayCardFromHand {
         player: PlayerName,
@@ -31,26 +46,22 @@ pub enum BattleAnimation {
         player: PlayerName,
         card_id: HandCardId,
     },
-    DrawCards {
-        player: PlayerName,
-        cards: Vec<HandCardId>,
+    ResolveCharacter {
+        character_id: CharacterId,
     },
     SelectStackCardTargets {
         player: PlayerName,
         source_id: StackCardId,
         targets: EffectTargets,
     },
-    MakeChoice {
+    StartTurn {
         player: PlayerName,
-        choice: PromptChoiceLabel,
     },
-    ResolveCharacter {
-        character_id: CharacterId,
-    },
-    Counterspell {
-        target_id: StackCardId,
-    },
-    Dissolve {
-        target_id: CharacterId,
-    },
+}
+
+#[derive(Clone, Debug)]
+pub struct TriggerAnimation {
+    pub controller: PlayerName,
+    pub character_id: CharacterId,
+    pub ability_number: AbilityNumber,
 }

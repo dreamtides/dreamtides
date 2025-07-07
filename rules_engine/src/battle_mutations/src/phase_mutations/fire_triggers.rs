@@ -4,6 +4,8 @@ use ability_data::triggered_ability::TriggeredAbility;
 use battle_queries::battle_card_queries::{card, card_abilities, card_properties};
 use battle_queries::card_ability_queries::{effect_predicates, trigger_queries};
 use battle_queries::panic_with;
+use battle_state::battle::animation_data::AnimationStep;
+use battle_state::battle::battle_animation::{BattleAnimation, TriggerAnimation};
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CharacterId;
 use battle_state::battle_cards::ability_list::AbilityData;
@@ -12,7 +14,7 @@ use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger::Trigger;
 use core_data::types::PlayerName;
 
-use crate::effects::apply_effect;
+use crate::effects::apply_effect::{self, EffectWasApplied};
 
 /// Fires all recorded triggers for the given [BattleState] while no prompt is
 /// active.
@@ -21,6 +23,11 @@ use crate::effects::apply_effect;
 /// triggers are resolved, including new triggers that may be added during
 /// execution.
 pub fn execute_if_no_active_prompt(battle: &mut BattleState) {
+    let should_animate = battle.animations.is_some();
+    let pre_trigger_animation_snapshot =
+        if should_animate { Some(battle.logical_clone()) } else { None };
+    let mut trigger_animations = Vec::new();
+
     loop {
         if battle.prompt.is_some() {
             break;
@@ -47,25 +54,49 @@ pub fn execute_if_no_active_prompt(battle: &mut BattleState) {
                 controller,
                 trigger_for_listener.listener,
             ) {
-                fire_triggered_ability(
+                let result = fire_triggered_ability(
                     battle,
                     trigger_for_listener.trigger,
                     ability_data,
                     controller,
                     character_id,
                 );
+
+                if should_animate && result == Some(EffectWasApplied) {
+                    trigger_animations.push(TriggerAnimation {
+                        controller,
+                        character_id,
+                        ability_number: ability_data.ability_number,
+                    });
+                }
             }
         }
     }
+
+    if should_animate
+        && !trigger_animations.is_empty()
+        && let Some(animations) = &mut battle.animations
+        && let Some(snapshot) = pre_trigger_animation_snapshot
+    {
+        let source = EffectSource::Game { controller: battle.turn.active_player };
+        animations.steps.push(AnimationStep {
+            source,
+            snapshot,
+            animation: BattleAnimation::FireTriggers { triggers: trigger_animations },
+        });
+    }
 }
 
+/// Fires a triggered ability for the given [BattleState].
+///
+/// Returns true if an effect
 fn fire_triggered_ability(
     battle: &mut BattleState,
     trigger: Trigger,
     ability_data: &AbilityData<TriggeredAbility>,
     controller: PlayerName,
     controlling_character: CharacterId,
-) {
+) -> Option<EffectWasApplied> {
     let source = EffectSource::Triggered {
         controller,
         character_id: controlling_character,
@@ -76,7 +107,7 @@ fn fire_triggered_ability(
     };
 
     let targets = trigger_targets(battle, trigger, effect, controller, controlling_character);
-    apply_effect::execute(battle, source, &ability_data.ability.effect, targets.as_ref());
+    apply_effect::execute(battle, source, &ability_data.ability.effect, targets.as_ref())
 }
 
 fn trigger_targets(

@@ -9,7 +9,7 @@ use core_data::numerics::TurnId;
 use core_data::types::PlayerName;
 
 use crate::card_mutations::deck;
-use crate::phase_mutations::{dreamwell, judgment};
+use crate::phase_mutations::{dreamwell, fire_triggers, judgment};
 
 /// End the current player's turn.
 ///
@@ -24,6 +24,8 @@ pub fn start_turn(battle: &mut BattleState, player: PlayerName) {
     let source = EffectSource::Game { controller: player };
 
     battle.triggers.push(source, Trigger::EndOfTurn(player.opponent()));
+    fire_triggers::execute_if_no_active_prompt(battle);
+
     battle_trace!("Starting turn for", battle, player);
     battle.turn.active_player = player;
     battle.turn.turn_id += TurnId(1);

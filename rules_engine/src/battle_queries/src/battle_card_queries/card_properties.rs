@@ -48,6 +48,7 @@ pub fn spark(battle: &BattleState, controller: PlayerName, id: CharacterId) -> O
 pub fn base_spark(battle: &BattleState, card_id: impl CardIdType) -> Option<Spark> {
     match card::get(battle, card_id).name {
         CardName::TestVanillaCharacter => Some(Spark(5)),
+        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => Some(Spark(5)),
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => Some(Spark(5)),
         _ => None,
     }
