@@ -56,7 +56,7 @@ pub enum CardPredicate {
     Card,
     Character,
     Event,
-    Dream,
+    CardOnStack,
     CharacterType(CharacterType),
     NotCharacterType(CharacterType),
     CharacterWithSpark(Spark, Operator<Spark>),

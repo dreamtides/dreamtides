@@ -77,7 +77,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 Ability::Event(EventAbility {
                     additional_cost: None,
                     effect: Effect::Effect(StandardEffect::Counterspell {
-                        target: Predicate::Enemy(CardPredicate::Dream),
+                        target: Predicate::Enemy(CardPredicate::CardOnStack),
                     }),
                 }),
                 AbilityConfiguration {
@@ -238,7 +238,7 @@ fn compute_event_target_restriction(list: &AbilityList) -> Option<CanPlayRestric
 
     match predicate {
         Predicate::Enemy(CardPredicate::Character) => Some(CanPlayRestriction::EnemyCharacter),
-        Predicate::Enemy(CardPredicate::Dream) => Some(CanPlayRestriction::EnemyStackCard),
+        Predicate::Enemy(CardPredicate::CardOnStack) => Some(CanPlayRestriction::EnemyStackCard),
         Predicate::Enemy(CardPredicate::Event) => {
             Some(CanPlayRestriction::EnemyStackCardOfType(CardType::Event))
         }

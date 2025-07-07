@@ -80,7 +80,7 @@ fn test_negate_enemy_dream() {
       event(EventAbility(
         additional_cost: None,
         effect: effect(counterspell(
-          target: enemy(dream),
+          target: enemy(cardOnStack),
         )),
       )),
     ]
@@ -112,7 +112,7 @@ fn test_negate_and_put_on_top() {
         effect: list([
           EffectWithOptions(
             effect: counterspell(
-              target: enemy(dream),
+              target: enemy(cardOnStack),
             ),
             optional: false,
             cost: None,
@@ -727,7 +727,7 @@ fn test_gain_points_for_each() {
         additional_cost: None,
         effect: effect(gainPointsForEach(
           gain: Points(1),
-          for_count: playedThisTurn(dream),
+          for_count: playedThisTurn(cardOnStack),
         )),
       )),
     ]
@@ -743,7 +743,7 @@ fn test_draw_cards_for_each() {
         additional_cost: None,
         effect: effect(drawCardsForEach(
           count: 1,
-          for_each: playedThisTurn(dream),
+          for_each: playedThisTurn(cardOnStack),
         )),
       )),
     ]
@@ -853,7 +853,7 @@ fn test_gains_spark_for_quantity() {
         effect: effect(gainsSparkForQuantity(
           target: your(character),
           gains: Spark(1),
-          for_quantity: playedThisTurn(dream),
+          for_quantity: playedThisTurn(cardOnStack),
         )),
       )),
     ]
@@ -1254,7 +1254,7 @@ fn test_materialize_silent_copy() {
         effect: effect(materializeSilentCopy(
           target: this,
           count: 1,
-          quantity: playedThisTurn(dream),
+          quantity: playedThisTurn(cardOnStack),
         )),
         options: None,
       )),
