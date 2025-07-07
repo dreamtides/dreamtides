@@ -11,6 +11,9 @@ namespace Dreamtides.Services
   public class TestHelperService : Service
   {
     private Dictionary<MonoBehaviour, List<Vector3>> movementHistory = new();
+    private HashSet<Displayable> lastKnownDisplayables = new();
+    private HashSet<string> displayablesSeenDuringIdle = new();
+    private bool isTrackingDisplayables = false;
 
     public bool DidObjectMove(MonoBehaviour obj)
     {
@@ -19,6 +22,49 @@ namespace Dreamtides.Services
         return positions.Count > 1;
       }
       return false;
+    }
+
+    /// <summary>
+    /// Returns the unity object names of all Displayable objects that were *not* present in
+    /// the scene on the last call to WaitForIdle() but are now present in the scene.
+    /// </summary>
+    public List<string> CreatedDisplayables()
+    {
+      var result = new List<string>();
+
+      if (isTrackingDisplayables)
+      {
+        var currentDisplayables = FindObjectsByType<Displayable>(FindObjectsSortMode.None);
+
+        foreach (var displayable in currentDisplayables)
+        {
+          if (!lastKnownDisplayables.Contains(displayable))
+          {
+            result.Add(displayable.name);
+          }
+        }
+
+        result.AddRange(displayablesSeenDuringIdle);
+      }
+
+      return result;
+    }
+
+    /// <summary>
+    /// Start tracking displayables for later comparison in
+    /// CreatedTemporaryDisplayables().
+    /// </summary>
+    public void StartTrackingDisplayables()
+    {
+      lastKnownDisplayables.Clear();
+      displayablesSeenDuringIdle.Clear();
+      isTrackingDisplayables = true;
+
+      var currentDisplayables = FindObjectsByType<Displayable>(FindObjectsSortMode.None);
+      foreach (var displayable in currentDisplayables)
+      {
+        lastKnownDisplayables.Add(displayable);
+      }
     }
 
     public IEnumerator WaitForIdle(float timeoutSeconds)
@@ -111,6 +157,18 @@ namespace Dreamtides.Services
         hasMovement |= CheckMovement<BattlefieldNumber>();
         hasMovement |= CheckMovement<Projectile>();
         hasMovement |= CheckMovement<TimedEffect>();
+
+        if (isTrackingDisplayables)
+        {
+          var currentDisplayables = FindObjectsByType<Displayable>(FindObjectsSortMode.None);
+          foreach (var displayable in currentDisplayables)
+          {
+            if (!lastKnownDisplayables.Contains(displayable))
+            {
+              displayablesSeenDuringIdle.Add(displayable.name);
+            }
+          }
+        }
 
         if (hasMovement)
         {

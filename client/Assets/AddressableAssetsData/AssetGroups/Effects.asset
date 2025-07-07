@@ -71,6 +71,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 37be39df8d3d548ee90ab1886819355d
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Light Magic/RPG3_LightMagic_Buff01.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 38311384ca0854adfbc4d44a2fc1f62d
     m_Address: Assets/Content/Dissolves/Dissolve1.mat
     m_ReadOnly: 0
