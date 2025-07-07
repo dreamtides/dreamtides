@@ -24,7 +24,8 @@ pub struct TestSession {
     pub last_user_response_version: Option<Uuid>,
     pub last_enemy_response_version: Option<Uuid>,
     pub seed: Option<u64>,
-    pub last_commands: Option<CommandSequence>,
+    pub last_user_commands: Option<CommandSequence>,
+    pub last_enemy_commands: Option<CommandSequence>,
 }
 
 impl Default for TestSession {
@@ -45,7 +46,8 @@ impl TestSession {
             last_user_response_version: None,
             last_enemy_response_version: None,
             seed: None,
-            last_commands: None,
+            last_user_commands: None,
+            last_enemy_commands: None,
         }
     }
 
@@ -181,27 +183,31 @@ impl TestSession {
             Some(opponent_id),
         );
 
-        let mut all_commands = CommandSequence::default();
+        let mut user_commands = CommandSequence::default();
+        let mut enemy_commands = CommandSequence::default();
 
         for poll_result in result.user_poll_results {
-            all_commands.groups.extend(poll_result.commands.groups.clone());
             if metadata.user_id == self.user_id {
+                user_commands.groups.extend(poll_result.commands.groups.clone());
                 self.user_client.apply_commands(poll_result.commands);
             } else {
+                enemy_commands.groups.extend(poll_result.commands.groups.clone());
                 self.enemy_client.apply_commands(poll_result.commands);
             }
         }
 
         for poll_result in result.enemy_poll_results {
-            all_commands.groups.extend(poll_result.commands.groups.clone());
             if opponent_id == self.user_id {
+                user_commands.groups.extend(poll_result.commands.groups.clone());
                 self.user_client.apply_commands(poll_result.commands);
             } else {
+                enemy_commands.groups.extend(poll_result.commands.groups.clone());
                 self.enemy_client.apply_commands(poll_result.commands);
             }
         }
 
-        self.last_commands = Some(all_commands);
+        self.last_user_commands = Some(user_commands);
+        self.last_enemy_commands = Some(enemy_commands);
     }
 
     fn metadata(&self) -> Metadata {

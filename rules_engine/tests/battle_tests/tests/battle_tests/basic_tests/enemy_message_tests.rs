@@ -14,7 +14,7 @@ fn enemy_message_displayed_when_spending_energy_on_energy_prompt() {
     s.click_increment_button(DisplayPlayer::Enemy);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
 
-    let commands = s.last_commands.as_ref().expect("No commands found");
+    let commands = s.last_user_commands.as_ref().expect("No commands found");
 
     let enemy_message_cmd = commands.groups.iter().flat_map(|group| &group.commands).find_map(
         |command| match command {
@@ -47,7 +47,7 @@ fn enemy_message_displayed_when_declining_to_pay_for_counterspell_unless_pays() 
     s.play_card_from_hand(DisplayPlayer::User, &counterspell_id);
     s.click_secondary_button(DisplayPlayer::Enemy, "Decline");
 
-    let commands = s.last_commands.as_ref().expect("No commands found");
+    let commands = s.last_user_commands.as_ref().expect("No commands found");
 
     let enemy_message_cmd = commands.groups.iter().flat_map(|group| &group.commands).find_map(
         |command| match command {
@@ -79,7 +79,7 @@ fn enemy_message_displayed_when_paying_for_counterspell_unless_pays() {
     s.play_card_from_hand(DisplayPlayer::User, &counterspell_id);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
 
-    let commands = s.last_commands.as_ref().expect("No commands found");
+    let commands = s.last_user_commands.as_ref().expect("No commands found");
 
     let enemy_message_cmd = commands.groups.iter().flat_map(|group| &group.commands).find_map(
         |command| match command {
@@ -109,7 +109,7 @@ fn enemy_message_displayed_when_spending_minimum_energy_on_energy_prompt() {
     s.create_and_play(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
 
-    let commands = s.last_commands.as_ref().expect("No commands found");
+    let commands = s.last_user_commands.as_ref().expect("No commands found");
 
     let enemy_message_cmd = commands.groups.iter().flat_map(|group| &group.commands).find_map(
         |command| match command {

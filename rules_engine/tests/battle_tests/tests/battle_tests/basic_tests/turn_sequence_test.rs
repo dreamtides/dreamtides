@@ -92,7 +92,7 @@ fn judgment_command_fired_when_user_score_changes() {
 
     assert_eq!(s.user_client.me.score(), Points(5), "user gained points from judgment");
 
-    let commands = s.last_commands.as_ref().expect("No commands found");
+    let commands = s.last_user_commands.as_ref().expect("No commands found");
 
     let judgment_commands: Vec<_> = commands
         .groups
@@ -137,7 +137,7 @@ fn judgment_command_fired_when_no_score_change() {
 
     assert_eq!(s.user_client.me.score(), Points(0), "user score unchanged");
 
-    let commands = s.last_commands.as_ref().expect("No commands found");
+    let commands = s.last_user_commands.as_ref().expect("No commands found");
 
     let judgment_commands: Vec<_> = commands
         .groups
@@ -183,7 +183,7 @@ fn judgment_command_shows_total_score_not_points_gained() {
 
     assert_eq!(s.user_client.me.score(), Points(15), "user gained 5 points from judgment");
 
-    let commands = s.last_commands.as_ref().expect("No commands found");
+    let commands = s.last_user_commands.as_ref().expect("No commands found");
 
     let judgment_commands: Vec<_> = commands
         .groups

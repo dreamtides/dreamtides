@@ -31,10 +31,11 @@ fn dissolve_fire_projectile_command() {
 
     let test_dissolve_id = s.create_and_play(DisplayPlayer::User, CardName::TestDissolve);
 
-    let fire_projectile_commands = s.find_all_commands(|command| match command {
-        Command::FireProjectile(cmd) => Some(cmd),
-        _ => None,
-    });
+    let fire_projectile_commands =
+        s.find_all_commands(DisplayPlayer::User, |command| match command {
+            Command::FireProjectile(cmd) => Some(cmd),
+            _ => None,
+        });
 
     assert!(
         !fire_projectile_commands.is_empty(),
@@ -92,7 +93,7 @@ fn dissolve_card_command() {
 
     s.create_and_play(DisplayPlayer::User, CardName::TestDissolve);
 
-    let dissolve_commands = s.find_all_commands(|command| match command {
+    let dissolve_commands = s.find_all_commands(DisplayPlayer::User, |command| match command {
         Command::DissolveCard(cmd) => Some(cmd),
         _ => None,
     });

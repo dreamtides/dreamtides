@@ -75,7 +75,7 @@ fn test_counterspell_unless_pays_fire_projectile_only_on_decline() {
 
     s.play_card_from_hand(DisplayPlayer::User, &counterspell_id);
 
-    let commands_after_resolve = s.last_commands.as_ref().expect("No commands found");
+    let commands_after_resolve = s.last_user_commands.as_ref().expect("No commands found");
     let fire_projectile_after_resolve =
         commands_after_resolve.groups.iter().flat_map(|group| &group.commands).find_map(
             |command| match command {
@@ -90,7 +90,7 @@ fn test_counterspell_unless_pays_fire_projectile_only_on_decline() {
 
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
 
-    let commands_after_spend = s.last_commands.as_ref().expect("No commands found");
+    let commands_after_spend = s.last_user_commands.as_ref().expect("No commands found");
     let fire_projectile_after_spend =
         commands_after_spend.groups.iter().flat_map(|group| &group.commands).find_map(|command| {
             match command {
@@ -112,7 +112,7 @@ fn test_counterspell_unless_pays_fire_projectile_only_on_decline() {
     s2.play_card_from_hand(DisplayPlayer::User, &counterspell_id2);
     s2.click_secondary_button(DisplayPlayer::Enemy, "Decline");
 
-    let commands_after_decline = s2.last_commands.as_ref().expect("No commands found");
+    let commands_after_decline = s2.last_user_commands.as_ref().expect("No commands found");
     let fire_projectile_after_decline =
         commands_after_decline.groups.iter().flat_map(|group| &group.commands).find_map(
             |command| match command {

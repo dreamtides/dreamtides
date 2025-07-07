@@ -1,7 +1,7 @@
-mod ability_formatting_tests;
-mod activated_ability_tests;
-mod effect_formatting_tests;
-mod effect_tests;
-mod event_ability_tests;
-mod static_ability_tests;
-mod triggered_ability_tests;
+mod ability_formatting_parsing_tests;
+mod activated_ability_parsing_tests;
+mod effect_formatting_parsing_tests;
+mod effect_parsing_tests;
+mod event_ability_parsing_tests;
+mod static_ability_parsing_tests;
+mod triggered_ability_parsing_tests;

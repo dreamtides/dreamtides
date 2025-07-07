@@ -37,7 +37,7 @@ fn draw_card_animation_command() {
     s.click_increment_button(DisplayPlayer::User);
     s.click_primary_button(DisplayPlayer::User, "Spend");
 
-    let commands = s.last_commands.as_ref().expect("No commands found");
+    let commands = s.last_user_commands.as_ref().expect("No commands found");
 
     let draw_cards_cmd = commands.groups.iter().flat_map(|group| &group.commands).find_map(
         |command| match command {
@@ -69,7 +69,7 @@ fn draw_multiple_cards_animation() {
     s.click_increment_button(DisplayPlayer::User);
     s.click_primary_button(DisplayPlayer::User, "Spend");
 
-    let commands = s.last_commands.as_ref().expect("No commands found");
+    let commands = s.last_user_commands.as_ref().expect("No commands found");
 
     let draw_cards_cmd = commands.groups.iter().flat_map(|group| &group.commands).find_map(
         |command| match command {

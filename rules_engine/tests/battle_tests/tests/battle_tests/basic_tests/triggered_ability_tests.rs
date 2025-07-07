@@ -2,7 +2,7 @@ use core_data::identifiers::CardName;
 use core_data::numerics::Spark;
 use display_data::battle_view::DisplayPlayer;
 use display_data::card_view::{CardPrefab, CardView};
-use display_data::command::Command;
+use display_data::command::{Command, GameObjectId};
 use display_data::object_position::Position;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
@@ -200,7 +200,7 @@ fn triggered_ability_token_cards_appear_and_disappear_on_stack() {
     s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
 
     let token_cards: Vec<&CardView> = s
-        .find_all_commands(|command| {
+        .find_all_commands(DisplayPlayer::User, |command| {
             if let Command::UpdateBattle(update_cmd) = command { Some(update_cmd) } else { None }
         })
         .iter()
@@ -246,6 +246,48 @@ fn triggered_ability_token_cards_appear_and_disappear_on_stack() {
         .count();
 
     assert_eq!(final_token_cards, 0, "No token cards should remain visible in final state");
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn triggered_ability_display_effect_command_applied_to_spark_gaining_character() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    let trigger_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
+    );
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
+
+    let initial_spark = s.user_client.cards.get_revealed(&trigger_character_id).spark;
+    assert_eq!(initial_spark, Some(Spark(5)), "trigger character has base spark");
+
+    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
+
+    let display_effect_command = s.find_command(DisplayPlayer::User, |command| {
+        if let Command::DisplayEffect(display_effect) = command {
+            if display_effect.target == GameObjectId::CardId(trigger_character_id.clone()) {
+                Some(display_effect)
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    });
+
+    assert_eq!(
+        display_effect_command.target,
+        GameObjectId::CardId(trigger_character_id.clone()),
+        "DisplayEffect command should target the character gaining spark"
+    );
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 2, "two characters on battlefield");
+
+    let final_spark = s.user_client.cards.get_revealed(&trigger_character_id).spark;
+    assert_eq!(final_spark, Some(Spark(6)), "trigger character gained +1 spark");
 
     test_helpers::assert_clients_identical(&s);
 }

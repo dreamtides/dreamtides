@@ -102,16 +102,24 @@ pub trait TestSessionBattleExtension {
     /// button is disabled or not present.
     fn click_decrement_button(&mut self, player: DisplayPlayer);
 
-    /// Finds a command of the specified type in the last command sequence.
+    /// Finds a command of the specified type for a specific player.
     ///
-    /// Returns the command if found, panics if not found.
-    fn find_command<T>(&self, command_extractor: impl Fn(&Command) -> Option<&T>) -> &T;
+    /// Returns the command if found, panics if not found or if multiple
+    /// commands are found.
+    fn find_command<T>(
+        &self,
+        player: DisplayPlayer,
+        command_extractor: impl Fn(&Command) -> Option<&T>,
+    ) -> &T;
 
-    /// Finds all commands of the specified type in the last command sequence.
+    /// Finds all commands of the specified type for a specific player.
     ///
-    /// Returns a vector of all matching commands. The vector may be empty if no
-    /// matches are found.
-    fn find_all_commands<T>(&self, command_extractor: impl Fn(&Command) -> Option<&T>) -> Vec<&T>;
+    /// Returns a vector of all matching commands.
+    fn find_all_commands<T>(
+        &self,
+        player: DisplayPlayer,
+        command_extractor: impl Fn(&Command) -> Option<&T>,
+    ) -> Vec<&T>;
 }
 
 impl TestSessionBattleExtension for TestSession {
@@ -240,8 +248,17 @@ impl TestSessionBattleExtension for TestSession {
         click_button(self, player, decrement_button, "decrement button", "");
     }
 
-    fn find_command<T>(&self, command_extractor: impl Fn(&Command) -> Option<&T>) -> &T {
-        let commands = self.last_commands.as_ref().expect("No commands found");
+    fn find_command<T>(
+        &self,
+        player: DisplayPlayer,
+        command_extractor: impl Fn(&Command) -> Option<&T>,
+    ) -> &T {
+        let commands = match player {
+            DisplayPlayer::User => self.last_user_commands.as_ref(),
+            DisplayPlayer::Enemy => self.last_enemy_commands.as_ref(),
+        };
+
+        let commands = commands.expect("No commands found for player");
 
         let mut matching_commands: Vec<&T> = commands
             .groups
@@ -251,14 +268,23 @@ impl TestSessionBattleExtension for TestSession {
             .collect();
 
         match matching_commands.len() {
-            0 => panic!("Command not found in last commands"),
+            0 => panic!("Player command not found in last commands"),
             1 => matching_commands.remove(0),
-            count => panic!("Found {count} matching commands, expected exactly 1"),
+            count => panic!("Found {count} matching player commands, expected exactly 1"),
         }
     }
 
-    fn find_all_commands<T>(&self, command_extractor: impl Fn(&Command) -> Option<&T>) -> Vec<&T> {
-        let commands = self.last_commands.as_ref().expect("No commands found");
+    fn find_all_commands<T>(
+        &self,
+        player: DisplayPlayer,
+        command_extractor: impl Fn(&Command) -> Option<&T>,
+    ) -> Vec<&T> {
+        let commands = match player {
+            DisplayPlayer::User => self.last_user_commands.as_ref(),
+            DisplayPlayer::Enemy => self.last_enemy_commands.as_ref(),
+        };
+
+        let commands = commands.expect("No commands found for player");
 
         commands
             .groups
