@@ -12,6 +12,16 @@ use crate::card_mutations::{counterspell, deck};
 use crate::character_mutations::dissolve;
 use crate::effects::{counterspell_unless_pays_cost, pay_cost, targeting};
 
+/// Applies an effect to the given [BattleState]. If the effect requires a
+/// target, it can be provided via `requested_targets`. Targeted effects with no
+/// targets or invalid targets will be ignored.
+///
+/// # Arguments
+///
+/// * `battle` - The current battle state.
+/// * `source` - The source of the effect.
+/// * `effect` - The effect to apply.
+/// * `requested_targets` - The targets for the effect.
 pub fn execute(
     battle: &mut BattleState,
     source: EffectSource,

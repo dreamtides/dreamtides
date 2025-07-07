@@ -6,7 +6,7 @@ use core_data::types::PlayerName;
 use tracing::instrument;
 
 use crate::actions::apply_debug_battle_action;
-use crate::phase_mutations::turn;
+use crate::phase_mutations::{fire_triggers, turn};
 use crate::play_cards::{play_card, resolve_card, select_stack_card_target};
 use crate::prompt_mutations::{select_additional_costs, select_choice_prompt_at_index};
 
@@ -55,6 +55,8 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
             todo!("Implement {:?}", action);
         }
     }
+
+    fire_triggers::execute_if_no_active_prompt(battle);
 
     if should_record_in_history(action) {
         battle.push_history_action(player, action);

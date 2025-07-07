@@ -196,6 +196,16 @@ impl AllCards {
         self.cards[card_id.card_id().0].object_id == object_id
     }
 
+    /// Returns the character ID for a card, if it is currently a character.
+    pub fn to_character_id(
+        &self,
+        controller: PlayerName,
+        card_id: impl CardIdType,
+    ) -> Option<CharacterId> {
+        let result = CharacterId(card_id.card_id());
+        if self.battlefield(controller).contains(result) { Some(result) } else { None }
+    }
+
     /// Returns true if the indicated card ID is valid.
     #[inline(always)]
     pub fn is_valid_card_id(&self, card_id: CardId) -> bool {

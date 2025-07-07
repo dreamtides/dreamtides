@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use crate::battle::card_id::CardId;
 use crate::core::effect_source::EffectSource;
 use crate::triggers::trigger::Trigger;
@@ -9,14 +11,15 @@ use crate::triggers::trigger_listeners::TriggerListeners;
 /// triggers which have fired. Each time a battle action finishes resolving,
 /// *IF* there are currently no active player prompts, all triggers recorded are
 /// resolved in the order in which they were recorded. Triggers are also fired
-/// at the end of each player's turn.
+/// at the end of each player's turn. Triggers fire in first-in-first-out
+/// (queue) order.
 ///
 /// Order of listeners being invoked within a single event is arbitrary
 /// (currently in CardID order).
 #[derive(Debug, Clone, Default)]
 pub struct TriggerState {
     pub listeners: TriggerListeners,
-    pub events: Vec<TriggerForListener>,
+    pub events: VecDeque<TriggerForListener>,
 }
 
 /// A record of a trigger event for a specific listener.
@@ -35,7 +38,7 @@ impl TriggerState {
     pub fn push(&mut self, source: EffectSource, trigger: Trigger) {
         if !self.listeners.listeners(trigger.name()).is_empty() {
             for listener in self.listeners.listeners(trigger.name()) {
-                self.events.push(TriggerForListener { source, listener, trigger });
+                self.events.push_back(TriggerForListener { source, listener, trigger });
             }
         }
     }
