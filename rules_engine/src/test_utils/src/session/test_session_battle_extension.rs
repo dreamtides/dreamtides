@@ -6,6 +6,7 @@ use battle_state::actions::debug_battle_action::DebugBattleAction;
 use core_data::identifiers::CardName;
 use display_data::battle_view::{ButtonView, DisplayPlayer};
 use display_data::card_view::ClientCardId;
+use display_data::command::Command;
 
 use crate::session::test_session::TestSession;
 
@@ -100,6 +101,17 @@ pub trait TestSessionBattleExtension {
     /// Panics if the server returns an error for clicking this button or if the
     /// button is disabled or not present.
     fn click_decrement_button(&mut self, player: DisplayPlayer);
+
+    /// Finds a command of the specified type in the last command sequence.
+    ///
+    /// Returns the command if found, panics if not found.
+    fn find_command<T>(&self, command_extractor: impl Fn(&Command) -> Option<&T>) -> &T;
+
+    /// Finds all commands of the specified type in the last command sequence.
+    ///
+    /// Returns a vector of all matching commands. The vector may be empty if no
+    /// matches are found.
+    fn find_all_commands<T>(&self, command_extractor: impl Fn(&Command) -> Option<&T>) -> Vec<&T>;
 }
 
 impl TestSessionBattleExtension for TestSession {
@@ -226,6 +238,34 @@ impl TestSessionBattleExtension for TestSession {
     fn click_decrement_button(&mut self, player: DisplayPlayer) {
         let decrement_button = self.client(player).interface().decrement_button.clone();
         click_button(self, player, decrement_button, "decrement button", "");
+    }
+
+    fn find_command<T>(&self, command_extractor: impl Fn(&Command) -> Option<&T>) -> &T {
+        let commands = self.last_commands.as_ref().expect("No commands found");
+
+        let mut matching_commands: Vec<&T> = commands
+            .groups
+            .iter()
+            .flat_map(|group| &group.commands)
+            .filter_map(command_extractor)
+            .collect();
+
+        match matching_commands.len() {
+            0 => panic!("Command not found in last commands"),
+            1 => matching_commands.remove(0),
+            count => panic!("Found {count} matching commands, expected exactly 1"),
+        }
+    }
+
+    fn find_all_commands<T>(&self, command_extractor: impl Fn(&Command) -> Option<&T>) -> Vec<&T> {
+        let commands = self.last_commands.as_ref().expect("No commands found");
+
+        commands
+            .groups
+            .iter()
+            .flat_map(|group| &group.commands)
+            .filter_map(command_extractor)
+            .collect()
     }
 }
 

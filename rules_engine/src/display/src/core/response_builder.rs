@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use battle_state::battle::battle_animation::TriggerAnimation;
 use core_data::identifiers::UserId;
 use core_data::types::PlayerName;
 use display_data::battle_view::{BattleView, DisplayPlayer};
@@ -28,6 +29,9 @@ pub struct ResponseBuilder {
 
     /// Commands to run in parallel with the next battle view update.
     pending_commands: Vec<Command>,
+
+    /// Triggers which are currently active.
+    active_triggers: Vec<TriggerAnimation>,
 }
 
 impl ResponseBuilder {
@@ -40,6 +44,7 @@ impl ResponseBuilder {
             commands: CommandSequence::default(),
             for_animation: false,
             pending_commands: Vec::new(),
+            active_triggers: Vec::new(),
         }
     }
 
@@ -57,6 +62,7 @@ impl ResponseBuilder {
             commands: CommandSequence::default(),
             for_animation: false,
             pending_commands: Vec::new(),
+            active_triggers: Vec::new(),
         }
     }
 
@@ -140,5 +146,13 @@ impl ResponseBuilder {
         let mut state = self.get_display_state();
         update_fn(&mut state);
         self.set_display_state(state);
+    }
+
+    pub fn set_active_triggers(&mut self, triggers: Vec<TriggerAnimation>) {
+        self.active_triggers = triggers;
+    }
+
+    pub fn active_triggers(&self) -> &[TriggerAnimation] {
+        &self.active_triggers
     }
 }

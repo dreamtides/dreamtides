@@ -120,6 +120,11 @@ pub fn render(
             push_snapshot(builder, snapshot);
         }
 
+        BattleAnimation::SetActiveTriggers { triggers } => {
+            builder.set_active_triggers(triggers.clone());
+            push_snapshot(builder, snapshot);
+        }
+
         _ => {}
     }
 }

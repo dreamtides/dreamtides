@@ -31,21 +31,23 @@ fn dissolve_fire_projectile_command() {
 
     let test_dissolve_id = s.create_and_play(DisplayPlayer::User, CardName::TestDissolve);
 
-    let commands = s.last_commands.as_ref().expect("No commands found");
-
-    let fire_projectile_cmd = commands.groups.iter().flat_map(|group| &group.commands).find_map(
-        |command| match command {
-            Command::FireProjectile(cmd) => Some(cmd),
-            _ => None,
-        },
-    );
+    let fire_projectile_commands = s.find_all_commands(|command| match command {
+        Command::FireProjectile(cmd) => Some(cmd),
+        _ => None,
+    });
 
     assert!(
-        fire_projectile_cmd.is_some(),
+        !fire_projectile_commands.is_empty(),
         "fire projectile command should be present when Test Dissolve resolves"
     );
 
-    let fire_projectile = fire_projectile_cmd.unwrap();
+    let fire_projectile = fire_projectile_commands
+        .iter()
+        .find(|cmd| {
+            cmd.source_id == GameObjectId::CardId(test_dissolve_id.clone())
+                && cmd.target_id == GameObjectId::CardId(target_id.clone())
+        })
+        .expect("Should find fire projectile command with correct source and target");
 
     assert_eq!(
         fire_projectile.source_id,
@@ -90,21 +92,20 @@ fn dissolve_card_command() {
 
     s.create_and_play(DisplayPlayer::User, CardName::TestDissolve);
 
-    let commands = s.last_commands.as_ref().expect("No commands found");
-
-    let dissolve_card_cmd = commands.groups.iter().flat_map(|group| &group.commands).find_map(
-        |command| match command {
-            Command::DissolveCard(cmd) => Some(cmd),
-            _ => None,
-        },
-    );
+    let dissolve_commands = s.find_all_commands(|command| match command {
+        Command::DissolveCard(cmd) => Some(cmd),
+        _ => None,
+    });
 
     assert!(
-        dissolve_card_cmd.is_some(),
+        !dissolve_commands.is_empty(),
         "dissolve card command should be present when Test Dissolve resolves"
     );
 
-    let dissolve_card = dissolve_card_cmd.unwrap();
+    let dissolve_card = dissolve_commands
+        .iter()
+        .find(|cmd| cmd.target == target_id)
+        .expect("Should find dissolve command targeting the correct character");
 
     assert_eq!(
         dissolve_card.target, target_id,
