@@ -40,7 +40,13 @@ pub fn matching_cards_on_stack(
 
 /// Returns true if a standard effect requires a target to resolve.
 pub fn has_targets(effect: &StandardEffect) -> bool {
-    get_character_target_predicate(effect).is_some() || get_stack_target_predicate(effect).is_some()
+    get_target_predicate(effect).is_some()
+}
+
+/// Returns the targeting predicate required to resolve a standard effect, if
+/// any.
+pub fn get_target_predicate(effect: &StandardEffect) -> Option<&Predicate> {
+    get_character_target_predicate(effect).or_else(|| get_stack_target_predicate(effect))
 }
 
 /// Extracts a character target predicate from a standard effect, if any.

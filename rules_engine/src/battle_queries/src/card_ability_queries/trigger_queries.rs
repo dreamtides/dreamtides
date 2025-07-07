@@ -4,7 +4,7 @@ use battle_state::battle::card_id::{CardId, CardIdType};
 use battle_state::triggers::trigger::Trigger;
 use core_data::types::PlayerName;
 
-use crate::card_ability_queries::predicate_matches;
+use crate::card_ability_queries::trigger_predicates;
 
 /// Returns true if the predicates in a [TriggerEvent] match for the given
 /// [Trigger] and thus the trigger should fire.
@@ -27,7 +27,7 @@ pub fn matches(
 ) -> bool {
     match event {
         TriggerEvent::Abandon(predicate) => match trigger {
-            Trigger::Abandonded(card_id) => predicate_matches::trigger_matches(
+            Trigger::Abandonded(card_id) => trigger_predicates::trigger_matches(
                 battle,
                 predicate,
                 card_id,
@@ -37,7 +37,7 @@ pub fn matches(
             _ => false,
         },
         TriggerEvent::Banished(predicate) => match trigger {
-            Trigger::Banished(card_id) => predicate_matches::trigger_matches(
+            Trigger::Banished(card_id) => trigger_predicates::trigger_matches(
                 battle,
                 predicate,
                 card_id,
@@ -47,7 +47,7 @@ pub fn matches(
             _ => false,
         },
         TriggerEvent::Discard(predicate) => match trigger {
-            Trigger::Discarded(card_id) => predicate_matches::trigger_matches(
+            Trigger::Discarded(card_id) => trigger_predicates::trigger_matches(
                 battle,
                 predicate,
                 card_id,
@@ -57,7 +57,7 @@ pub fn matches(
             _ => false,
         },
         TriggerEvent::Dissolved(predicate) => match trigger {
-            Trigger::Dissolved(card_id) => predicate_matches::trigger_matches(
+            Trigger::Dissolved(card_id) => trigger_predicates::trigger_matches(
                 battle,
                 predicate,
                 card_id,
@@ -82,7 +82,7 @@ pub fn matches(
             matches_keyword(trigger, keyword, owning_card_controller, owning_card_id)
         }),
         TriggerEvent::Materialize(predicate) => match trigger {
-            Trigger::Materialized(card_id) => predicate_matches::trigger_matches(
+            Trigger::Materialized(card_id) => trigger_predicates::trigger_matches(
                 battle,
                 predicate,
                 card_id,
@@ -95,7 +95,7 @@ pub fn matches(
             todo!("Implement MaterializeNthThisTurn")
         }
         TriggerEvent::Play(predicate) => match trigger {
-            Trigger::PlayedCardFromHand(card_id) => predicate_matches::trigger_matches(
+            Trigger::PlayedCardFromHand(card_id) => trigger_predicates::trigger_matches(
                 battle,
                 predicate,
                 card_id,
@@ -111,7 +111,7 @@ pub fn matches(
                     PlayerTurn::EnemyTurn => battle.turn.active_player != owning_card_controller,
                 };
                 turn_matches
-                    && predicate_matches::trigger_matches(
+                    && trigger_predicates::trigger_matches(
                         battle,
                         predicate,
                         card_id,
@@ -122,7 +122,7 @@ pub fn matches(
             _ => false,
         },
         TriggerEvent::PlayFromHand(predicate) => match trigger {
-            Trigger::PlayedCardFromHand(card_id) => predicate_matches::trigger_matches(
+            Trigger::PlayedCardFromHand(card_id) => trigger_predicates::trigger_matches(
                 battle,
                 predicate,
                 card_id,
@@ -131,6 +131,23 @@ pub fn matches(
             ),
             _ => false,
         },
+    }
+}
+
+/// Returns the card ID of the card that triggered the given [Trigger], if
+/// any.
+pub fn triggering_card_id(trigger: Trigger) -> Option<CardId> {
+    match trigger {
+        Trigger::Abandonded(card_id) => Some(card_id.card_id()),
+        Trigger::Banished(card_id) => Some(card_id.card_id()),
+        Trigger::Discarded(card_id) => Some(card_id.card_id()),
+        Trigger::Dissolved(card_id) => Some(card_id.card_id()),
+        Trigger::DrewAllCardsInCopyOfDeck(..) => None,
+        Trigger::EndOfTurn(..) => None,
+        Trigger::GainedEnergy(..) => None,
+        Trigger::Judgment(..) => None,
+        Trigger::Materialized(card_id) => Some(card_id.card_id()),
+        Trigger::PlayedCardFromHand(card_id) => Some(card_id.card_id()),
     }
 }
 

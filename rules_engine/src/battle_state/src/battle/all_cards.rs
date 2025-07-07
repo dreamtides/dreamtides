@@ -206,6 +206,16 @@ impl AllCards {
         if self.battlefield(controller).contains(result) { Some(result) } else { None }
     }
 
+    /// Returns the stack card ID for a card, if it is currently on the stack.
+    pub fn to_stack_card_id(
+        &self,
+        controller: PlayerName,
+        card_id: impl CardIdType,
+    ) -> Option<StackCardId> {
+        let result = StackCardId(card_id.card_id());
+        if self.stack_set(controller).contains(result) { Some(result) } else { None }
+    }
+
     /// Returns true if the indicated card ID is valid.
     #[inline(always)]
     pub fn is_valid_card_id(&self, card_id: CardId) -> bool {

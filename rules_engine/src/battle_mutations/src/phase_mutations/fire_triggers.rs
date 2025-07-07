@@ -1,7 +1,16 @@
-use battle_queries::battle_card_queries::{card_abilities, card_properties};
-use battle_queries::card_ability_queries::trigger_queries;
+use ability_data::effect::Effect;
+use ability_data::predicate::Predicate;
+use ability_data::triggered_ability::TriggeredAbility;
+use battle_queries::battle_card_queries::{card, card_abilities, card_properties};
+use battle_queries::card_ability_queries::{effect_predicates, trigger_queries};
+use battle_queries::panic_with;
 use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::card_id::CharacterId;
+use battle_state::battle_cards::ability_list::AbilityData;
+use battle_state::battle_cards::stack_card_state::EffectTargets;
 use battle_state::core::effect_source::EffectSource;
+use battle_state::triggers::trigger::Trigger;
+use core_data::types::PlayerName;
 
 use crate::effects::apply_effect;
 
@@ -17,12 +26,14 @@ pub fn execute_if_no_active_prompt(battle: &mut BattleState) {
             break;
         }
 
-        let Some(trigger) = battle.triggers.events.pop_front() else {
+        let Some(trigger_for_listener) = battle.triggers.events.pop_front() else {
             break;
         };
 
-        let controller = card_properties::controller(battle, trigger.listener);
-        let Some(character_id) = battle.cards.to_character_id(controller, trigger.listener) else {
+        let controller = card_properties::controller(battle, trigger_for_listener.listener);
+        let Some(character_id) =
+            battle.cards.to_character_id(controller, trigger_for_listener.listener)
+        else {
             // Skip triggers for cards that are not currently on the
             // battlefield.
             continue;
@@ -31,18 +42,100 @@ pub fn execute_if_no_active_prompt(battle: &mut BattleState) {
         for ability_data in &card_abilities::query(battle, character_id).triggered_abilities {
             if trigger_queries::matches(
                 battle,
-                trigger.trigger,
+                trigger_for_listener.trigger,
                 &ability_data.ability.trigger,
                 controller,
-                trigger.listener,
+                trigger_for_listener.listener,
             ) {
-                let source = EffectSource::Triggered {
+                fire_triggered_ability(
+                    battle,
+                    trigger_for_listener.trigger,
+                    ability_data,
                     controller,
                     character_id,
-                    ability_number: ability_data.ability_number,
-                };
-                apply_effect::execute(battle, source, &ability_data.ability.effect, None);
+                );
             }
         }
     }
+}
+
+fn fire_triggered_ability(
+    battle: &mut BattleState,
+    trigger: Trigger,
+    ability_data: &AbilityData<TriggeredAbility>,
+    controller: PlayerName,
+    controlling_character: CharacterId,
+) {
+    let source = EffectSource::Triggered {
+        controller,
+        character_id: controlling_character,
+        ability_number: ability_data.ability_number,
+    };
+    let Effect::Effect(effect) = &ability_data.ability.effect else {
+        todo!("Implement non-standard triggered effects")
+    };
+
+    let targets = trigger_targets(battle, trigger, effect, controller, controlling_character);
+    apply_effect::execute(battle, source, &ability_data.ability.effect, targets.as_ref());
+}
+
+fn trigger_targets(
+    battle: &BattleState,
+    trigger: Trigger,
+    effect: &ability_data::standard_effect::StandardEffect,
+    controller: PlayerName,
+    controlling_character: CharacterId,
+) -> Option<EffectTargets> {
+    let mut targets = None;
+
+    if let Some(predicate) = effect_predicates::get_character_target_predicate(effect) {
+        match predicate {
+            Predicate::This => {
+                targets = Some(EffectTargets::Character(
+                    controlling_character,
+                    card::get(battle, controlling_character).object_id,
+                ));
+            }
+            Predicate::That => {
+                let Some(triggering_card_id) = trigger_queries::triggering_card_id(trigger) else {
+                    panic_with!("Expected a triggering card ID", battle);
+                };
+                let Some(target_character_id) =
+                    battle.cards.to_character_id(controller, triggering_card_id)
+                else {
+                    // Skip triggers targeting cards that are not currently on
+                    // the battlefield.
+                    return None;
+                };
+                targets = Some(EffectTargets::Character(
+                    target_character_id,
+                    card::get(battle, target_character_id).object_id,
+                ));
+            }
+            _ => todo!("Implement trigger target selection for {:?}", predicate),
+        }
+    }
+
+    if let Some(predicate) = effect_predicates::get_stack_target_predicate(effect) {
+        match predicate {
+            Predicate::That => {
+                let Some(triggering_card_id) = trigger_queries::triggering_card_id(trigger) else {
+                    panic_with!("Expected a triggering card ID", battle);
+                };
+                let Some(target_stack_card_id) =
+                    battle.cards.to_stack_card_id(controller, triggering_card_id)
+                else {
+                    // Skip triggers targeting cards that are not currently on the stack.
+                    return None;
+                };
+                targets = Some(EffectTargets::StackCard(
+                    target_stack_card_id,
+                    card::get(battle, target_stack_card_id).object_id,
+                ));
+            }
+            _ => todo!("Implement trigger stack target selection for {:?}", predicate),
+        }
+    }
+
+    targets
 }
