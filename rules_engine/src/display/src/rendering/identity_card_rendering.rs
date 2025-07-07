@@ -68,6 +68,7 @@ pub fn identity_card_view(
         }),
         revealed_to_opponents: true,
         card_facing: CardFacing::FaceUp,
+        backless: true,
         create_position: None,
         destroy_position: None,
         prefab: CardPrefab::Identity,

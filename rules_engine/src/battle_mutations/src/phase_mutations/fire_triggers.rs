@@ -26,6 +26,10 @@ pub fn execute_if_no_active_prompt(battle: &mut BattleState) {
     let mut trigger_animations = Vec::new();
 
     loop {
+        if should_animate {
+            set_displayed_active_triggers(battle, &mut trigger_animations);
+        }
+
         if battle.prompt.is_some() {
             break;
         }
@@ -33,10 +37,6 @@ pub fn execute_if_no_active_prompt(battle: &mut BattleState) {
         let Some(trigger_for_listener) = battle.triggers.events.pop_front() else {
             break;
         };
-
-        if should_animate {
-            set_displayed_active_triggers(battle, &mut trigger_animations);
-        }
 
         let controller = card_properties::controller(battle, trigger_for_listener.listener);
         let Some(character_id) =

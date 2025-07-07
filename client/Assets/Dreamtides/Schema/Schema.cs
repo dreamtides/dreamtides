@@ -530,6 +530,13 @@ namespace Dreamtides.Schema
     public partial class CardView
     {
         /// <summary>
+        /// True if this card is initially revealed and thus should not play the
+        /// 'flip' animation from its back side.
+        /// </summary>
+        [JsonProperty("backless", Required = Required.Always)]
+        public bool Backless { get; set; }
+
+        /// <summary>
         /// Face up/face down state for this card
         /// </summary>
         [JsonProperty("cardFacing", Required = Required.Always)]

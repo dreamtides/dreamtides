@@ -46,6 +46,7 @@ pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardVi
             builder.display_for_player().opponent(),
         ),
         card_facing: CardFacing::FaceUp,
+        backless: false,
         create_position: None,
         destroy_position: None,
         prefab: match card_properties::card_type(battle, context.card_id()) {
@@ -118,7 +119,7 @@ fn selection_action(legal_actions: &LegalActions, card_id: CardId) -> Option<Gam
     None
 }
 
-fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
+pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
     match card::get(battle, card_id).name {
         CardName::TestVanillaCharacter => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
@@ -147,7 +148,7 @@ fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
     }
 }
 
-fn card_name(battle: &BattleState, card_id: CardId) -> String {
+pub fn card_name(battle: &BattleState, card_id: CardId) -> String {
     card_properties::display_name(card::get(battle, card_id).name)
 }
 
@@ -163,7 +164,7 @@ fn card_type(battle: &BattleState, card_id: CardId) -> String {
     if card_properties::is_fast(battle, card_id) { format!("\u{f0e7} {result}") } else { result }
 }
 
-fn rules_text(battle: &BattleState, card_id: CardId) -> String {
+pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
     let base_text = match card::get(battle, card_id).name {
         CardName::TestVanillaCharacter => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
         CardName::TestDissolve => "<b>Dissolve</b> an enemy character.".to_string(),

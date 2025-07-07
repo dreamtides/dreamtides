@@ -78,7 +78,7 @@ namespace Dreamtides.Components
 
       if (view.Revealed != null)
       {
-        if (_isRevealed)
+        if (_isRevealed || view.Backless)
         {
           RenderCardView();
         }
@@ -89,7 +89,7 @@ namespace Dreamtides.Components
       }
       else
       {
-        if (_isRevealed)
+        if (_isRevealed && !view.Backless)
         {
           Flip(_cardBack, _cardFront, sequence, RenderCardView);
         }

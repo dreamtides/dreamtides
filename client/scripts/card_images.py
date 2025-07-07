@@ -5,7 +5,6 @@ Usage:
 """
 
 import os
-import glob
 import subprocess
 import argparse
 import tempfile

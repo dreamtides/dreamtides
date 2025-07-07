@@ -123,6 +123,9 @@ pub fn render(
         BattleAnimation::SetActiveTriggers { triggers } => {
             builder.set_active_triggers(triggers.clone());
             push_snapshot(builder, snapshot);
+            if !triggers.is_empty() {
+                builder.push(Command::Wait(Milliseconds::new(300)));
+            }
         }
 
         _ => {}

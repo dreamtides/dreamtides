@@ -34,6 +34,10 @@ pub struct CardView {
     /// Face up/face down state for this card
     pub card_facing: CardFacing,
 
+    /// True if this card is initially revealed and thus should not play the
+    /// 'flip' animation from its back side.
+    pub backless: bool,
+
     /// Optionally, a position at which to create this card.
     ///
     /// If this card does not already exist, it will be created at this position

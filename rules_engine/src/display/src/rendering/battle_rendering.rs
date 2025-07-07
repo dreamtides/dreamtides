@@ -14,7 +14,9 @@ use crate::core::adapter;
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
 use crate::display_actions::{display_state, outcome_simulation};
-use crate::rendering::{card_rendering, identity_card_rendering, interface_rendering};
+use crate::rendering::{
+    card_rendering, identity_card_rendering, interface_rendering, token_rendering,
+};
 
 pub fn run(builder: &mut ResponseBuilder, battle: &BattleState) {
     builder.push_battle_view(battle_view(builder, battle));
@@ -41,6 +43,9 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
                 &CardViewContext::Battle(battle, card::get(battle, id).name, id),
             )
         })
+        .chain(builder.active_triggers().iter().enumerate().map(|(index, trigger)| {
+            token_rendering::trigger_card_view(builder, battle, index, trigger)
+        }))
         .collect::<Vec<_>>();
 
     cards.push(identity_card_rendering::identity_card_view(

@@ -222,6 +222,13 @@ impl AllCards {
         card_id.0 < self.cards.len()
     }
 
+    /// Returns the next object ID to use for a card in the display layer. This
+    /// is intended to render purely visual cards like triggered abilities on
+    /// top of all 'real' cards.
+    pub fn next_object_id_for_display(&self) -> ObjectId {
+        self.next_object_id
+    }
+
     fn new_object_id(&mut self) -> ObjectId {
         let result = self.next_object_id;
         self.next_object_id = ObjectId(result.0 + 1);
