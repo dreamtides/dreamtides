@@ -236,6 +236,14 @@ rsync-for-review:
     cp justfile ~/dreamtides_tests/
     echo $'\a'
 
+rsync-third-party:
+    rsync --delete --stats --copy-links -avqr --exclude='rules_engine/target' ./rules_engine ~/dreamtides_tests/
+    echo $'\a'
+    rsync --delete --stats --copy-links -avqr --exclude='client/Library' --exclude='client/test_output' ./client ~/dreamtides_tests/
+    echo $'\a'
+    cp justfile ~/dreamtides_tests/
+    echo $'\a'
+
 code-review-rsync: rsync-for-review
     cd ~/dreamtides_tests && just code-review || (osascript -e 'display dialog "Review failed" with icon stop'; exit 1)
 
