@@ -541,3 +541,94 @@ fn triggered_ability_triggers_on_fast_character_enemy_turn() {
 
     test_helpers::assert_clients_identical(&s);
 }
+
+#[test]
+fn triggered_ability_enemy_turn_token_cards_and_display_effect() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    let trigger_character_id =
+        s.create_and_play(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
+    assert_eq!(s.user_client.cards.stack_cards().len(), 0, "no cards on stack initially");
+
+    let initial_spark = s.user_client.cards.get_revealed(&trigger_character_id).spark;
+    assert_eq!(initial_spark, Some(Spark(5)), "trigger character has base spark");
+
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+
+    let user_counterspell = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
+    let _enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    s.play_card_from_hand(DisplayPlayer::User, &user_counterspell);
+
+    // Check for token cards appearing during triggered ability resolution
+    let token_cards: Vec<&CardView> = s
+        .find_all_commands(DisplayPlayer::User, |command| {
+            if let Command::UpdateBattle(update_cmd) = command { Some(update_cmd) } else { None }
+        })
+        .iter()
+        .flat_map(|update_cmd| &update_cmd.battle.cards)
+        .filter(|card| card.prefab == CardPrefab::Token)
+        .collect();
+
+    assert!(
+        !token_cards.is_empty(),
+        "Token cards should appear during triggered ability resolution"
+    );
+
+    for token_card in &token_cards {
+        if let Some(create_pos) = &token_card.create_position {
+            assert_eq!(
+                create_pos.position,
+                Position::HiddenWithinCard(trigger_character_id.clone()),
+                "Token card create position should be hidden within the triggering character"
+            );
+        }
+
+        if let Some(destroy_pos) = &token_card.destroy_position {
+            assert_eq!(
+                destroy_pos.position,
+                Position::HiddenWithinCard(trigger_character_id.clone()),
+                "Token card destroy position should be hidden within the triggering character"
+            );
+        }
+    }
+
+    // Check for DisplayEffect command targeting the character gaining spark
+    let display_effect_command = s.find_command(DisplayPlayer::User, |command| {
+        if let Command::DisplayEffect(display_effect) = command {
+            if display_effect.target == GameObjectId::CardId(trigger_character_id.clone()) {
+                Some(display_effect)
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    });
+
+    assert_eq!(
+        display_effect_command.target,
+        GameObjectId::CardId(trigger_character_id.clone()),
+        "DisplayEffect command should target the character gaining spark"
+    );
+
+    let final_spark = s.user_client.cards.get_revealed(&trigger_character_id).spark;
+    assert_eq!(final_spark, Some(Spark(7)), "trigger character gained +2 spark");
+
+    let final_token_cards = s
+        .user_client
+        .cards
+        .card_map
+        .values()
+        .filter(|card| card.view.prefab == CardPrefab::Token)
+        .count();
+
+    assert_eq!(final_token_cards, 0, "No token cards should remain visible in final state");
+
+    test_helpers::assert_clients_identical(&s);
+}
