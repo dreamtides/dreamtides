@@ -434,6 +434,8 @@ namespace Dreamtides.Services
           ("commandCount", group.Commands.Count.ToString()));
       }
       var coroutines = new List<Coroutine>();
+
+      Registry.CardEffectPreviewService.ClearBattlePreview();
       foreach (var command in group.Commands)
       {
         if (command.UpdateBattle != null)
