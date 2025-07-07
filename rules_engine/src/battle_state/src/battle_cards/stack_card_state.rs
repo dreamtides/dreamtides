@@ -8,12 +8,12 @@ use crate::battle_cards::battle_card_state::ObjectId;
 pub struct StackCardState {
     pub id: StackCardId,
     pub controller: PlayerName,
-    pub targets: Option<StackCardTargets>,
+    pub targets: Option<EffectTargets>,
     pub additional_costs_paid: StackCardAdditionalCostsPaid,
 }
 
 #[derive(Clone, Debug)]
-pub enum StackCardTargets {
+pub enum EffectTargets {
     Character(CharacterId, ObjectId),
     StackCard(StackCardId, ObjectId),
 }

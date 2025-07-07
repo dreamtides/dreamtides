@@ -7,9 +7,7 @@ use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType, CharacterId, HandCardId, StackCardId};
-use battle_state::battle_cards::stack_card_state::{
-    StackCardAdditionalCostsPaid, StackCardTargets,
-};
+use battle_state::battle_cards::stack_card_state::{EffectTargets, StackCardAdditionalCostsPaid};
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::card_types::CardType;
 use core_data::display_color;
@@ -140,6 +138,9 @@ fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
         CardName::TestDrawOne => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
+        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
+        ),
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
@@ -174,6 +175,9 @@ fn rules_text(battle: &BattleState, card_id: CardId) -> String {
             "Pay one or more \u{f7e4}: Draw a card for each \u{f7e4} spent.".to_string()
         }
         CardName::TestDrawOne => "Draw a card.".to_string(),
+        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => {
+            "Whenever you materialize another character, this character gains +1 spark.".to_string()
+        }
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
             "Whenever you play a card during the enemy's turn, this character gains +2 spark.".to_string()
         }
@@ -226,10 +230,10 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
         for choice in choices {
             if let Some(targets) = &choice.targets {
                 let target_card_id = match targets {
-                    StackCardTargets::Character(target_character_id, _) => {
+                    EffectTargets::Character(target_character_id, _) => {
                         target_character_id.card_id()
                     }
-                    StackCardTargets::StackCard(target_stack_card_id, _) => {
+                    EffectTargets::StackCard(target_stack_card_id, _) => {
                         target_stack_card_id.card_id()
                     }
                 };
@@ -243,17 +247,17 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
         }
     }
 
-    if let Some(targets) = stack_card_queries::targets(battle, card_id) {
+    if let Some(targets) = stack_card_queries::displayed_targets(battle, card_id) {
         // This card is currently on the stack with targets.
         match targets {
-            StackCardTargets::Character(target_character_id, _) => {
+            EffectTargets::Character(target_character_id, _) => {
                 icons.insert(target_character_id.card_id(), InfoZoomIcon {
                     card_id: adapter::client_card_id(target_character_id.card_id()),
                     icon: icon::CHEVRON_UP.to_string(),
                     color: display_color::RED_500,
                 });
             }
-            StackCardTargets::StackCard(target_stack_card_id, _) => {
+            EffectTargets::StackCard(target_stack_card_id, _) => {
                 icons.insert(target_stack_card_id.card_id(), InfoZoomIcon {
                     card_id: adapter::client_card_id(target_stack_card_id.card_id()),
                     icon: icon::CHEVRON_UP.to_string(),

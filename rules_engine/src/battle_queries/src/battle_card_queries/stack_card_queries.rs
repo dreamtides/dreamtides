@@ -1,28 +1,28 @@
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardIdType, StackCardId};
-use battle_state::battle_cards::stack_card_state::StackCardTargets;
+use battle_state::battle_cards::stack_card_state::EffectTargets;
 
-/// Returns the current valid stack targets for a card, if any.
-pub fn targets(battle: &BattleState, card: impl CardIdType) -> Option<&StackCardTargets> {
+/// Returns the current valid targets to display for a card, if any.
+pub fn displayed_targets(battle: &BattleState, card: impl CardIdType) -> Option<&EffectTargets> {
     let stack_card = battle.cards.stack_card(StackCardId(card.card_id()))?;
     validate_targets(battle, stack_card.targets.as_ref())
 }
 
-/// Returns the provided [StackCardTargets] if they are all valid, or otherwise
+/// Returns the provided [EffectTargets] if they are all valid, or otherwise
 /// None.
 pub fn validate_targets<'a>(
     battle: &BattleState,
-    targets: Option<&'a StackCardTargets>,
-) -> Option<&'a StackCardTargets> {
+    targets: Option<&'a EffectTargets>,
+) -> Option<&'a EffectTargets> {
     if targets_are_valid(battle, targets) { targets } else { None }
 }
 
-fn targets_are_valid(battle: &BattleState, targets: Option<&StackCardTargets>) -> bool {
+fn targets_are_valid(battle: &BattleState, targets: Option<&EffectTargets>) -> bool {
     match targets {
-        Some(StackCardTargets::Character(character_id, object_id)) => {
+        Some(EffectTargets::Character(character_id, object_id)) => {
             battle.cards.is_valid_object_id(character_id.card_id(), *object_id)
         }
-        Some(StackCardTargets::StackCard(stack_card_id, object_id)) => {
+        Some(EffectTargets::StackCard(stack_card_id, object_id)) => {
             battle.cards.is_valid_object_id(stack_card_id.card_id(), *object_id)
         }
         None => true,

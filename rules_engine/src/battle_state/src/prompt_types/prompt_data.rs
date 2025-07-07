@@ -5,7 +5,7 @@ use strum_macros::EnumDiscriminants;
 
 use crate::battle::card_id::{CharacterId, StackCardId};
 use crate::battle_cards::card_set::CardSet;
-use crate::battle_cards::stack_card_state::StackCardTargets;
+use crate::battle_cards::stack_card_state::EffectTargets;
 use crate::core::effect_source::EffectSource;
 
 /// Data for a prompt to be displayed to a player.
@@ -49,7 +49,7 @@ pub struct PromptChoice {
     pub effect: Effect,
 
     /// Optionally, targets to apply the effect to.
-    pub targets: Option<StackCardTargets>,
+    pub targets: Option<EffectTargets>,
 }
 
 #[derive(Debug, Clone, Copy)]

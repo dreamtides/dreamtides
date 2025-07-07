@@ -28,7 +28,9 @@ static TEST_COUNTERSPELL_UNLESS_PAY: OnceLock<AbilityList> = OnceLock::new();
 static COUNTERSPELL_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 static ENERGY_PROMPT_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 static TEST_DRAW_ONE_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
-static TEST_TRIGGER_GAIN_SPARK: OnceLock<AbilityList> = OnceLock::new();
+static TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER: OnceLock<AbilityList> =
+    OnceLock::new();
+static TEST_TRIGGER_GAIN_SPARK_PLAY_OPPONENT_TURN: OnceLock<AbilityList> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static AbilityList {
     query_by_name(card::get(battle, card_id).name)
@@ -112,8 +114,26 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 AbilityConfiguration { ..Default::default() },
             )])
         }),
+        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => {
+            TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER.get_or_init(|| {
+                build_ability_list(vec![(
+                    AbilityNumber(0),
+                    Ability::Triggered(TriggeredAbility {
+                        trigger: TriggerEvent::Materialize(Predicate::Another(
+                            CardPredicate::Character,
+                        )),
+                        effect: Effect::Effect(StandardEffect::GainsSpark {
+                            target: Predicate::This,
+                            gains: Spark(1),
+                        }),
+                        options: None,
+                    }),
+                    AbilityConfiguration::default(),
+                )])
+            })
+        }
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
-            TEST_TRIGGER_GAIN_SPARK.get_or_init(|| {
+            TEST_TRIGGER_GAIN_SPARK_PLAY_OPPONENT_TURN.get_or_init(|| {
                 build_ability_list(vec![(
                     AbilityNumber(0),
                     Ability::Triggered(TriggeredAbility {

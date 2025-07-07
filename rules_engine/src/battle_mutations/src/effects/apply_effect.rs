@@ -5,7 +5,7 @@ use battle_queries::battle_card_queries::stack_card_queries;
 use battle_queries::battle_player_queries::quantity_expression;
 use battle_queries::battle_trace;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle_cards::stack_card_state::StackCardTargets;
+use battle_state::battle_cards::stack_card_state::EffectTargets;
 use battle_state::core::effect_source::EffectSource;
 
 use crate::card_mutations::{counterspell, deck};
@@ -26,7 +26,7 @@ pub fn execute(
     battle: &mut BattleState,
     source: EffectSource,
     effect: &Effect,
-    requested_targets: Option<&StackCardTargets>,
+    requested_targets: Option<&EffectTargets>,
 ) {
     let targets = stack_card_queries::validate_targets(battle, requested_targets);
     match effect {
@@ -45,7 +45,7 @@ fn apply_standard_effect(
     battle: &mut BattleState,
     source: EffectSource,
     effect: &StandardEffect,
-    targets: Option<&StackCardTargets>,
+    targets: Option<&EffectTargets>,
 ) {
     battle_trace!("Applying effect", battle, effect, targets);
     match effect {
@@ -84,7 +84,7 @@ fn draw_cards_for_each(
 fn dissolve(
     battle: &mut BattleState,
     source: EffectSource,
-    targets: Option<&StackCardTargets>,
+    targets: Option<&EffectTargets>,
 ) -> Option<()> {
     let id = targeting::character_id(targets)?;
     dissolve::execute(battle, source, id);
@@ -94,7 +94,7 @@ fn dissolve(
 fn counterspell(
     battle: &mut BattleState,
     source: EffectSource,
-    targets: Option<&StackCardTargets>,
+    targets: Option<&EffectTargets>,
 ) -> Option<()> {
     let id = targeting::stack_card_id(targets)?;
     counterspell::execute(battle, source, id);

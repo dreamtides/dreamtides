@@ -3,7 +3,7 @@ use battle_queries::battle_player_queries::player_properties;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
-use battle_state::battle_cards::stack_card_state::StackCardTargets;
+use battle_state::battle_cards::stack_card_state::EffectTargets;
 use battle_state::battle_player::battle_player_state::BattlePlayerState;
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
@@ -116,13 +116,13 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
         .all_cards_on_stack()
         .iter()
         .filter_map(|stack_card| {
-            stack_card_queries::targets(battle, stack_card.id).map(|targets| {
+            stack_card_queries::displayed_targets(battle, stack_card.id).map(|targets| {
                 let source = adapter::card_game_object_id(stack_card.id);
                 let (target, color) = match targets {
-                    StackCardTargets::Character(character_id, _) => {
+                    EffectTargets::Character(character_id, _) => {
                         (adapter::card_game_object_id(*character_id), ArrowStyle::Red)
                     }
-                    StackCardTargets::StackCard(stack_card_id, _) => {
+                    EffectTargets::StackCard(stack_card_id, _) => {
                         (adapter::card_game_object_id(*stack_card_id), ArrowStyle::Blue)
                     }
                 };
