@@ -60,7 +60,7 @@ pub struct BattleState {
     /// State of the trigger system.
     pub triggers: TriggerState,
 
-    /// State of activated abilities in this battle.
+    /// State of activated abilities for players in this battle.
     pub activated_abilities: PlayerMap<ActivatedAbilityState>,
 
     /// Animation tracker for this battle. If this is None it means we are not

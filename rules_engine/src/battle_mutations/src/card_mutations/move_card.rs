@@ -40,9 +40,7 @@ pub fn from_stack_to_battlefield(
         Zone::Stack,
         Zone::Battlefield,
     );
-    let id = CharacterId(card_id.card_id());
-    write_character_state(battle, controller, id);
-    id
+    CharacterId(card_id.card_id())
 }
 
 /// Moves a card from the stack to the 'controller' player's void.
@@ -154,30 +152,40 @@ pub fn to_destination_zone(
     }
 
     if old == Zone::Battlefield {
-        let triggers = card_abilities::query(battle, card_id).battlefield_triggers;
-        for trigger in triggers {
-            battle.triggers.listeners.remove_listener(trigger, card_id);
-        }
-        battle.cards.battlefield_state_mut(controller).remove(&CharacterId(card_id));
+        on_leave_battlefield(battle, controller, card_id);
     }
 
     battle.cards.move_card(controller, card_id, old, new);
 
     if new == Zone::Battlefield {
-        let triggers = card_abilities::query(battle, card_id).battlefield_triggers;
-        for trigger in triggers {
-            battle.triggers.listeners.add_listener(trigger, card_id);
-        }
-        write_character_state(battle, controller, CharacterId(card_id));
-        battle.triggers.push(source, Trigger::Materialized(CharacterId(card_id)));
+        on_enter_battlefield(battle, source, controller, card_id);
     }
 }
 
-fn write_character_state(battle: &mut BattleState, controller: PlayerName, id: CharacterId) {
+fn on_leave_battlefield(battle: &mut BattleState, controller: PlayerName, card_id: CardId) {
+    let triggers = card_abilities::query(battle, card_id).battlefield_triggers;
+    for trigger in triggers {
+        battle.triggers.listeners.remove_listener(trigger, card_id);
+    }
+    battle.cards.battlefield_state_mut(controller).remove(&CharacterId(card_id));
+}
+
+fn on_enter_battlefield(
+    battle: &mut BattleState,
+    source: EffectSource,
+    controller: PlayerName,
+    card_id: CardId,
+) {
+    let triggers = card_abilities::query(battle, card_id).battlefield_triggers;
+    for trigger in triggers {
+        battle.triggers.listeners.add_listener(trigger, card_id);
+    }
+    let id = CharacterId(card_id);
     let Some(spark) = card_properties::base_spark(battle, id) else {
         panic_no_base_spark(battle, id);
     };
     battle.cards.battlefield_state_mut(controller).insert(id, CharacterState { spark });
+    battle.triggers.push(source, Trigger::Materialized(id));
 }
 
 #[cold]
