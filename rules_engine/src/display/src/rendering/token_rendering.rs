@@ -153,7 +153,7 @@ fn activated_ability_card_view(
 
     token_card_view(
         TokenCardView::builder()
-            .id(format!("A{:?}/{:?}", character_card_id.0, ability.ability_number.0))
+            .id(adapter::stack_item_client_card_id(ability))
             .position(position_override.unwrap_or_else(|| ObjectPosition {
                 position: Position::InHand(DisplayPlayer::User),
                 sorting_key: card::get(battle, character_card_id).object_id.0 as u32,

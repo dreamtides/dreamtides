@@ -145,11 +145,11 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
 
     battle
         .cards
-        .all_cards_on_stack()
+        .all_items_on_stack()
         .iter()
-        .filter_map(|stack_card| {
-            stack_card_queries::displayed_targets(battle, stack_card.id).map(|targets| {
-                let source = adapter::card_game_object_id(stack_card.id);
+        .filter_map(|stack_item| {
+            stack_card_queries::displayed_targets(battle, stack_item.id).map(|targets| {
+                let source = adapter::stack_item_game_object_id(stack_item.id);
                 let (target, color) = match targets {
                     EffectTargets::Character(character_id, _) => {
                         (adapter::card_game_object_id(*character_id), ArrowStyle::Red)

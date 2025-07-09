@@ -2,8 +2,8 @@ use battle_queries::battle_card_queries::{card_abilities, card_properties};
 use battle_queries::{assert_that, battle_trace, panic_with};
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CardIdType, CharacterId};
-use battle_state::battle_cards::stack_card_state::StackCardState;
+use battle_state::battle::card_id::{ActivatedAbilityId, CardIdType, CharacterId, StackCardId};
+use battle_state::battle_cards::stack_card_state::{StackItemId, StackItemState};
 use battle_state::core::effect_source::EffectSource;
 use core_data::card_types::CardType;
 use core_data::types::PlayerName;
@@ -45,35 +45,52 @@ pub fn pass_priority(battle: &mut BattleState, player: PlayerName) {
         panic_with!("No cards on stack", battle);
     };
 
-    resolve_card(battle, &stack_card);
+    resolve_stack_item(battle, &stack_card);
 
     // After a card resolves, its controller receives priority (if the stack is
     // not empty)
     battle.stack_priority = battle.cards.has_stack().then_some(stack_card.controller);
 }
 
-fn resolve_card(battle: &mut BattleState, card: &StackCardState) {
-    battle_trace!("Resolving card", battle, card_id = card.id);
-    if card_properties::card_type(battle, card.id) == CardType::Event {
-        let source = EffectSource::Game { controller: card.controller };
-        apply_event_effects(battle, card);
-        move_card::from_stack_to_void(battle, source, card.controller, card.id);
-    } else {
-        let character_id = CharacterId(card.id.card_id());
-        let source = EffectSource::Character { controller: card.controller, character_id };
-        battle.push_animation(source, || BattleAnimation::ResolveCharacter { character_id });
-        character_limit::apply(battle, source, card.controller);
-        move_card::from_stack_to_battlefield(battle, source, card.controller, card.id);
+fn resolve_stack_item(battle: &mut BattleState, item: &StackItemState) {
+    match item.id {
+        StackItemId::Card(card_id) => resolve_stack_card(battle, item, card_id),
+        StackItemId::ActivatedAbility(ability_id) => {
+            resolve_activated_ability(battle, item, ability_id)
+        }
     }
 }
 
-fn apply_event_effects(battle: &mut BattleState, card: &StackCardState) {
-    for data in &card_abilities::query(battle, card.id).event_abilities {
+fn resolve_stack_card(battle: &mut BattleState, item: &StackItemState, card_id: StackCardId) {
+    battle_trace!("Resolving card", battle, card_id = card_id);
+    if card_properties::card_type(battle, card_id) == CardType::Event {
+        let source = EffectSource::Game { controller: item.controller };
+        apply_event_effects(battle, item, card_id);
+        move_card::from_stack_to_void(battle, source, item.controller, card_id);
+    } else {
+        let character_id = CharacterId(card_id.card_id());
+        let source = EffectSource::Character { controller: item.controller, character_id };
+        battle.push_animation(source, || BattleAnimation::ResolveCharacter { character_id });
+        character_limit::apply(battle, source, item.controller);
+        move_card::from_stack_to_battlefield(battle, source, item.controller, card_id);
+    }
+}
+
+fn apply_event_effects(battle: &mut BattleState, item: &StackItemState, card_id: StackCardId) {
+    for data in &card_abilities::query(battle, card_id).event_abilities {
         let event_source = EffectSource::Event {
-            controller: card.controller,
-            stack_card_id: card.id,
+            controller: item.controller,
+            stack_card_id: card_id,
             ability_number: data.ability_number,
         };
-        apply_effect::execute(battle, event_source, &data.ability.effect, card.targets.as_ref());
+        apply_effect::execute(battle, event_source, &data.ability.effect, item.targets.as_ref());
     }
+}
+
+fn resolve_activated_ability(
+    battle: &mut BattleState,
+    item: &StackItemState,
+    ability_id: ActivatedAbilityId,
+) {
+    todo!()
 }

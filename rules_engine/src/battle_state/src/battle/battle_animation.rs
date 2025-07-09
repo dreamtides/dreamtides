@@ -4,7 +4,7 @@ use core_data::types::PlayerName;
 use strum::{Display, EnumDiscriminants};
 
 use crate::battle::card_id::{ActivatedAbilityId, CardId, CharacterId, HandCardId, StackCardId};
-use crate::battle_cards::stack_card_state::EffectTargets;
+use crate::battle_cards::stack_card_state::{EffectTargets, StackItemId};
 use crate::prompt_types::prompt_data::PromptChoiceLabel;
 
 /// Records events during rules engine execution for display as game animations.
@@ -56,7 +56,7 @@ pub enum BattleAnimation {
     },
     SelectStackCardTargets {
         player: PlayerName,
-        source_id: StackCardId,
+        source_id: StackItemId,
         targets: EffectTargets,
     },
     SetActiveTriggers {

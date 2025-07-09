@@ -12,7 +12,9 @@ use crate::battle_cards::ability_list::CanPlayRestriction;
 use crate::battle_cards::battle_card_state::{BattleCardState, ObjectId};
 use crate::battle_cards::card_set::CardSet;
 use crate::battle_cards::character_state::CharacterState;
-use crate::battle_cards::stack_card_state::{StackCardAdditionalCostsPaid, StackCardState};
+use crate::battle_cards::stack_card_state::{
+    StackCardAdditionalCostsPaid, StackItemId, StackItemState, StackItems,
+};
 use crate::battle_cards::zone::Zone;
 use crate::battle_player::player_map::PlayerMap;
 
@@ -20,11 +22,6 @@ use crate::battle_player::player_map::PlayerMap;
 ///
 /// No significant differences between BTreeMap and SmallMap here.
 pub type CharacterMap = BTreeMap<CharacterId, CharacterState>;
-
-/// A vector of cards on the stack
-///
-/// No significant differences between SmallVec and Vec here.
-pub type StackCards = Vec<StackCardState>;
 
 /// A card to create in a player's deck.
 pub struct CreatedCard {
@@ -40,8 +37,8 @@ pub struct AllCards {
     void: PlayerMap<CardSet<VoidCardId>>,
     hands: PlayerMap<CardSet<HandCardId>>,
     decks: PlayerMap<CardSet<DeckCardId>>,
-    stack: StackCards,
-    stack_set: PlayerMap<CardSet<StackCardId>>,
+    stack: StackItems,
+    stack_card_set: PlayerMap<CardSet<StackCardId>>,
     banished: PlayerMap<CardSet<BanishedCardId>>,
     next_object_id: ObjectId,
 }
@@ -102,29 +99,30 @@ impl AllCards {
         !self.stack.is_empty()
     }
 
-    /// Returns the state of a card on the stack, if any.
-    pub fn stack_card(&self, id: StackCardId) -> Option<&StackCardState> {
-        self.stack.iter().rev().find(|card| card.id == id)
+    /// Returns the state of an item on the stack, if any.
+    pub fn stack_item(&self, id: impl Into<StackItemId>) -> Option<&StackItemState> {
+        let id = id.into();
+        self.stack.iter().rev().find(|&item| item.id == id)
     }
 
-    /// Returns the top card on the stack, if any.
-    pub fn top_of_stack(&self) -> Option<&StackCardState> {
+    /// Returns the top item on the stack, if any.
+    pub fn top_of_stack(&self) -> Option<&StackItemState> {
         self.stack.last()
     }
 
     /// Mutable equivalent to [Self::top_of_stack].
-    pub fn top_of_stack_mut(&mut self) -> Option<&mut StackCardState> {
+    pub fn top_of_stack_mut(&mut self) -> Option<&mut StackItemState> {
         self.stack.last_mut()
     }
 
     /// Returns all cards currently on the stack.
-    pub fn all_cards_on_stack(&self) -> &StackCards {
+    pub fn all_items_on_stack(&self) -> &StackItems {
         &self.stack
     }
 
     /// Returns the set of cards on the stack for a given player.
     pub fn stack_set(&self, player: PlayerName) -> &CardSet<StackCardId> {
-        self.stack_set.player(player)
+        self.stack_card_set.player(player)
     }
 
     /// Returns the set of banished cards for a given player.
@@ -183,7 +181,7 @@ impl AllCards {
             Zone::Deck => self.decks.player(controller).contains(DeckCardId(CardId(card_id.0))),
             Zone::Hand => self.hands.player(controller).contains(HandCardId(CardId(card_id.0))),
             Zone::Stack => {
-                self.stack_set.player(controller).contains(StackCardId(CardId(card_id.0)))
+                self.stack_card_set.player(controller).contains(StackCardId(CardId(card_id.0)))
             }
             Zone::Void => self.void.player(controller).contains(VoidCardId(CardId(card_id.0))),
         }
@@ -253,9 +251,9 @@ impl AllCards {
                 self.hands.player_mut(controller).insert(HandCardId(card_id));
             }
             Zone::Stack => {
-                self.stack_set.player_mut(controller).insert(StackCardId(card_id));
-                self.stack.push(StackCardState {
-                    id: StackCardId(card_id),
+                self.stack_card_set.player_mut(controller).insert(StackCardId(card_id));
+                self.stack.push(StackItemState {
+                    id: StackItemId::Card(StackCardId(card_id)),
                     controller,
                     targets: None,
                     additional_costs_paid: StackCardAdditionalCostsPaid::None,
@@ -283,13 +281,13 @@ impl AllCards {
                 self.hands.player_mut(controller).remove(HandCardId(card_id));
             }
             Zone::Stack => {
-                self.stack_set.player_mut(controller).remove(StackCardId(card_id));
+                self.stack_card_set.player_mut(controller).remove(StackCardId(card_id));
                 if let Some((i, _)) = self
                     .stack
                     .iter()
                     .enumerate()
                     .rev()
-                    .find(|(_, stack_card)| StackCardId(card_id) == stack_card.id)
+                    .find(|(_, item)| item.id == StackItemId::Card(StackCardId(card_id)))
                 {
                     self.stack.remove(i);
                 }

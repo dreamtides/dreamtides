@@ -210,7 +210,7 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
     };
 
     if card::get(battle, card_id).name == CardName::TestVariableEnergyDraw
-        && let Some(stack_card) = battle.cards.stack_card(StackCardId(card_id))
+        && let Some(stack_card) = battle.cards.stack_item(StackCardId(card_id))
         && let StackCardAdditionalCostsPaid::Energy(energy) = &stack_card.additional_costs_paid
     {
         return format!("{} <b><color=\"blue\">({}\u{f7e4} paid)</color></b>", base_text, energy.0);
@@ -273,7 +273,7 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
         }
     }
 
-    if let Some(targets) = stack_card_queries::displayed_targets(battle, card_id) {
+    if let Some(targets) = stack_card_queries::displayed_targets(battle, StackCardId(card_id)) {
         // This card is currently on the stack with targets.
         match targets {
             EffectTargets::Character(target_character_id, _) => {
@@ -291,7 +291,7 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
                 });
             }
         }
-    } else if let Some(stack_card) = battle.cards.stack_card(StackCardId(card_id))
+    } else if let Some(stack_card) = battle.cards.stack_item(StackCardId(card_id))
         && stack_card.targets.is_some()
         && stack_card_queries::validate_targets(battle, stack_card.targets.as_ref()).is_none()
     {

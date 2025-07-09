@@ -1,10 +1,14 @@
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CardIdType, StackCardId};
-use battle_state::battle_cards::stack_card_state::EffectTargets;
+use battle_state::battle::card_id::CardIdType;
+use battle_state::battle_cards::stack_card_state::{EffectTargets, StackItemId};
 
-/// Returns the current valid targets to display for a card, if any.
-pub fn displayed_targets(battle: &BattleState, card: impl CardIdType) -> Option<&EffectTargets> {
-    let stack_card = battle.cards.stack_card(StackCardId(card.card_id()))?;
+/// Returns the current valid targets to display for an item on the stack, if
+/// any.
+pub fn displayed_targets(
+    battle: &BattleState,
+    item: impl Into<StackItemId>,
+) -> Option<&EffectTargets> {
+    let stack_card = battle.cards.stack_item(item)?;
     validate_targets(battle, stack_card.targets.as_ref())
 }
 

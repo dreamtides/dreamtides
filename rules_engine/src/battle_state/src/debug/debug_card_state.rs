@@ -8,7 +8,7 @@ pub struct DebugCardState {
     pub current_zone: String,
     pub properties: DebugCardProperties,
     pub abilities: Vec<String>,
-    pub stack_state: DebugStackCardState,
+    pub stack_state: DebugStackItemState,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -20,7 +20,7 @@ pub struct DebugCardProperties {
 }
 
 #[derive(Debug, Clone, Serialize)]
-pub struct DebugStackCardState {
+pub struct DebugStackItemState {
     pub has_stack_card_state: bool,
     pub id: String,
     pub controller: String,

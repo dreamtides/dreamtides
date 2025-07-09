@@ -1,13 +1,13 @@
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType, CharacterId, StackCardId};
-use battle_state::battle_cards::stack_card_state::StackCardState;
+use battle_state::battle_cards::stack_card_state::{StackItemId, StackItemState};
 use battle_state::battle_cards::zone::Zone;
 use battle_state::battle_player::battle_player_state::BattlePlayerState;
 use battle_state::debug::debug_all_cards::DebugAllCards;
 use battle_state::debug::debug_battle_player_state::DebugBattlePlayerState;
 use battle_state::debug::debug_battle_state::DebugBattleState;
 use battle_state::debug::debug_card_state::{
-    DebugCardProperties, DebugCardState, DebugStackCardState,
+    DebugCardProperties, DebugCardState, DebugStackItemState,
 };
 use battle_state::debug::debug_prompt_data::DebugPromptData;
 use battle_state::prompt_types::prompt_data::{PromptData, PromptType};
@@ -92,12 +92,7 @@ fn debug_all_cards(battle: &BattleState) -> DebugAllCards {
             PlayerName::Two,
             battle.cards.deck(PlayerName::Two).iter().map(|c| c.card_id()),
         ),
-        stack: debug_zone(
-            battle,
-            Zone::Stack,
-            PlayerName::One,
-            battle.cards.all_cards_on_stack().iter().map(|state| state.id.card_id()),
-        ),
+        stack: debug_stack_items(battle.cards.all_items_on_stack()),
         p1_banished: debug_zone(
             battle,
             Zone::Banished,
@@ -120,6 +115,10 @@ fn debug_zone(
     contents: impl Iterator<Item = CardId>,
 ) -> Vec<DebugCardState> {
     contents.map(|card_id| debug_card_state(battle, player, zone, card_id)).collect()
+}
+
+fn debug_stack_items(items: &[StackItemState]) -> Vec<DebugStackItemState> {
+    items.iter().map(|item| debug_stack_item_state(Some(item))).collect()
 }
 
 fn debug_card_state(
@@ -152,13 +151,15 @@ fn debug_card_state(
                 ability_list.triggered_abilities.iter().map(|data| format!("{:?}", data.ability)),
             )
             .collect(),
-        stack_state: debug_stack_card_state(battle.cards.stack_card(StackCardId(card_id))),
+        stack_state: debug_stack_item_state(
+            battle.cards.stack_item(StackItemId::Card(StackCardId(card_id))),
+        ),
     }
 }
 
-fn debug_stack_card_state(state: Option<&StackCardState>) -> DebugStackCardState {
+fn debug_stack_item_state(state: Option<&StackItemState>) -> DebugStackItemState {
     let Some(state) = state else {
-        return DebugStackCardState {
+        return DebugStackItemState {
             has_stack_card_state: false,
             id: String::new(),
             controller: String::new(),
@@ -167,7 +168,7 @@ fn debug_stack_card_state(state: Option<&StackCardState>) -> DebugStackCardState
         };
     };
 
-    DebugStackCardState {
+    DebugStackItemState {
         has_stack_card_state: true,
         id: format!("{:?}", state.id),
         controller: format!("{:?}", state.controller),

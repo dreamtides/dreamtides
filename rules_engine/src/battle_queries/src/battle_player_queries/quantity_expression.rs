@@ -11,8 +11,8 @@ pub fn count(battle: &BattleState, source: EffectSource, expression: &QuantityEx
     match expression {
         QuantityExpression::ForEachEnergySpentOnThisCard => {
             if let EffectSource::Event { stack_card_id, .. } = source
-                && let Some(card) = battle.cards.stack_card(stack_card_id)
-                && let StackCardAdditionalCostsPaid::Energy(energy) = card.additional_costs_paid
+                && let Some(item) = battle.cards.stack_item(stack_card_id)
+                && let StackCardAdditionalCostsPaid::Energy(energy) = item.additional_costs_paid
             {
                 energy.0
             } else {

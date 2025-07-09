@@ -1,7 +1,7 @@
 use battle_queries::battle_card_queries::{card, stack_card_queries};
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType};
-use battle_state::battle_cards::stack_card_state::EffectTargets;
+use battle_state::battle_cards::stack_card_state::{EffectTargets, StackItemId};
 use battle_state::battle_cards::zone::Zone;
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
@@ -61,8 +61,10 @@ pub fn controller_and_zone(battle: &BattleState, card_id: CardId) -> ControllerA
     } else if battle.cards.contains_card(PlayerName::Two, card_id, Zone::Banished) {
         ControllerAndZone { controller: PlayerName::Two, zone: Zone::Banished }
     } else {
-        for stack_card in battle.cards.all_cards_on_stack() {
-            if stack_card.id.0 == card_id {
+        for stack_card in battle.cards.all_items_on_stack() {
+            if let StackItemId::Card(stack_card_id) = stack_card.id
+                && stack_card_id.card_id() == card_id
+            {
                 return ControllerAndZone { controller: stack_card.controller, zone: Zone::Stack };
             }
         }
@@ -75,7 +77,7 @@ pub fn current_stack_type(builder: &ResponseBuilder, battle: &BattleState) -> St
     let mut targeting_user_battlefield = false;
     let mut targeting_enemy_battlefield = false;
 
-    for stack_card in battle.cards.all_cards_on_stack() {
+    for stack_card in battle.cards.all_items_on_stack() {
         if let Some(EffectTargets::Character(character_id, _)) =
             stack_card_queries::displayed_targets(battle, stack_card.id)
         {

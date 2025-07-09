@@ -125,7 +125,7 @@ pub fn render(
 
         BattleAnimation::PlayedCardFromHand { player, card_id } => {
             if *player != builder.display_for_player()
-                && final_state.cards.stack_card(StackCardId(card_id.card_id())).is_none()
+                && final_state.cards.stack_item(StackCardId(card_id.card_id())).is_none()
             {
                 // If the played card is no longer on the stack, insert a pause
                 // so it can be seen.
