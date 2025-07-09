@@ -123,6 +123,9 @@ namespace Dreamtides.TestUtils
       _cardId = newCardIds[0];
     }
 
+    /// <summary>
+    /// Ends the test.
+    /// </summary>
     protected IEnumerator EndTest()
     {
       Registry.TestConfiguration = null;
@@ -130,8 +133,15 @@ namespace Dreamtides.TestUtils
       yield return new WaitForSeconds(0.5f);
     }
 
+    /// <summary>
+    /// Waits for the test to be idle.
+    /// </summary>
     protected IEnumerator WaitForIdle() => Registry.TestHelperService.WaitForIdle(TimeoutSeconds);
 
+    /// <summary>
+    /// Waits for the number of objects in the layout to be equal to the
+    /// specified count.
+    /// </summary>
     protected IEnumerator WaitForCount(ObjectLayout layout, int count)
     {
       yield return new WaitUntil(() => layout.Objects.Count == count,
@@ -145,6 +155,9 @@ namespace Dreamtides.TestUtils
       yield return Registry.TestHelperService.WaitForIdle(TimeoutSeconds);
     }
 
+    /// <summary>
+    /// Waits for the scene to load.
+    /// </summary>
     protected IEnumerator WaitForSceneLoad()
     {
       yield return new WaitUntil(() => SceneManager.GetActiveScene().buildIndex == 0,

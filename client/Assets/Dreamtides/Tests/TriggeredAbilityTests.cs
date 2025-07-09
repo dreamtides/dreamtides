@@ -5,19 +5,12 @@ using NUnit.Framework;
 using UnityEngine.TestTools;
 using Dreamtides.Services;
 using Dreamtides.TestUtils;
-using Dreamtides.UnityInternal;
 using Dreamtides.Schema;
 
 namespace Dreamtides.Tests
 {
   public class TriggeredAbilityTests : IntegrationTest
   {
-    public static readonly GameViewResolution[] MobileAndDesktop = new GameViewResolution[]
-    {
-      GameViewResolution.Resolution16x9,
-      GameViewResolution.ResolutionIPhone12,
-    };
-
     [TearDown]
     public void TearDown()
     {
