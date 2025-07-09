@@ -27,14 +27,23 @@ namespace Dreamtides.Services
     float _lastActionTime;
     Metadata? _metadata;
     Guid? _integrationTestId;
-    Guid? _integrationTestEnemyId;
+    Guid? _enemyId;
     Queue<CommandBatch> _commandQueue = new Queue<CommandBatch>();
     bool _isProcessingCommands = false;
     Dictionary<Guid, float> _requestStartTimes = new Dictionary<Guid, float>();
     HashSet<Guid> _loggedRequestIds = new HashSet<Guid>();
     Guid? _lastResponseVersion;
 
-    bool UseDevServer => Application.isEditor && !Application.dataPath.Contains("dreamtides_tests");
+    // If we've manually opened the test client outside an integration test,
+    // attempt to play in multiplayer mode.
+    bool IsEnemyTestClient => _integrationTestId == null && Application.dataPath.Contains("dreamtides_tests");
+
+    // Use the dev server if we're in editor and either:
+    // - We're not running an integration test
+    // - We're running an integration test from the main Unity editor.
+    bool UseDevServer => Application.isEditor && (
+      _integrationTestId == null ||
+      !Application.dataPath.Contains("dreamtides_tests"));
 
     public bool Connected { get; private set; }
 
@@ -53,7 +62,7 @@ namespace Dreamtides.Services
       Connected = false;
       _lastActionTime = Time.time;
       _integrationTestId = testConfiguration?.IntegrationTestId;
-      _integrationTestEnemyId = Guid.NewGuid();
+      _enemyId = Guid.NewGuid();
       StartCoroutine(InitializeAsync());
     }
 
@@ -62,7 +71,7 @@ namespace Dreamtides.Services
       yield return new WaitForEndOfFrame();
       _metadata = new Metadata
       {
-        UserId = _userGuid,
+        UserId = IsEnemyTestClient ? Errors.CheckNotNull(_enemyId) : _userGuid,
         IntegrationTestId = _integrationTestId,
       };
       yield return PerformConnect(isReconnect: false, startLoggingSpan: true);
@@ -238,11 +247,12 @@ namespace Dreamtides.Services
         Metadata = Errors.CheckNotNull(_metadata),
         PersistentDataPath = Application.persistentDataPath,
         DisplayProperties = GetDisplayProperties(),
-        DebugConfiguration = _integrationTestEnemyId == null ? null : new DebugConfiguration
+        VsOpponent = IsEnemyTestClient ? _userGuid : null,
+        DebugConfiguration = _enemyId == null ? null : new DebugConfiguration
         {
           Enemy = new PlayerType
           {
-            User = _integrationTestEnemyId,
+            User = _enemyId,
           },
           Seed = 1234567890,
         }
