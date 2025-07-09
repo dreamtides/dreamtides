@@ -382,7 +382,14 @@ namespace Dreamtides.Services
 
       if (position.PositionClass.HiddenWithinCard is { } cardId)
       {
-        return GetCard(cardId).ContainedObjects;
+        if (Cards.ContainsKey(cardId))
+        {
+          return GetCard(cardId).ContainedObjects;
+        }
+        else
+        {
+          return Registry.Layout.Offscreen;
+        }
       }
 
       if (position.PositionClass.CardOrderSelector is { } cardOrderSelectorTarget)
