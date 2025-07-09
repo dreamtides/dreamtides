@@ -46,6 +46,16 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
         .chain(builder.active_triggers().iter().enumerate().map(|(index, trigger)| {
             token_rendering::trigger_card_view(builder, battle, index, trigger)
         }))
+        .chain(
+            battle
+                .activated_abilities
+                .player(builder.display_for_player())
+                .characters
+                .iter()
+                .flat_map(|character_id| {
+                    token_rendering::all_activated_abilities(builder, battle, character_id)
+                }),
+        )
         .collect::<Vec<_>>();
 
     cards.push(identity_card_rendering::identity_card_view(

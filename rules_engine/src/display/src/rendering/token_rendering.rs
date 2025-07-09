@@ -5,7 +5,7 @@ use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_animation::TriggerAnimation;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{ActivatedAbilityId, CardIdType};
+use battle_state::battle::card_id::{ActivatedAbilityId, CardIdType, CharacterId};
 use bon::Builder;
 use core_data::display_color;
 use core_data::display_types::{AudioClipAddress, SpriteAddress};
@@ -57,6 +57,24 @@ pub fn trigger_card_view(
             .create_sound(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/UI, Pads, Enchantments and Misc/RPG3_Enchantment_Subtle01v2.wav"))
             .build(),
     )
+}
+
+/// Returns a list of all activated ability views for a character.
+pub fn all_activated_abilities(
+    builder: &ResponseBuilder,
+    battle: &BattleState,
+    character_id: CharacterId,
+) -> Vec<CardView> {
+    let abilities = card_abilities::query(battle, character_id);
+    abilities
+        .activated_abilities
+        .iter()
+        .map(|ability| {
+            let ability_id =
+                ActivatedAbilityId { character_id, ability_number: ability.ability_number };
+            activated_ability_card_view(builder, battle, ability_id)
+        })
+        .collect()
 }
 
 pub fn activated_ability_card_view(
