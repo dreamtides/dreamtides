@@ -135,6 +135,7 @@ namespace Dreamtides.Services
         },
         Action = action.Value,
         LastResponseVersion = _lastResponseVersion,
+        SaveFileId = IsEnemyTestClient ? _userGuid : null,
       };
       if (UseDevServer)
       {

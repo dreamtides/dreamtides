@@ -228,9 +228,10 @@ fn connect_internal(
             vs_opponent,
             request_context,
         );
+    } else {
+        info!(?user_id, "Loading battle from database");
     }
 
-    info!(?user_id, "Loading battle from database");
     match load_battle_from_database(
         &database,
         user_id,
@@ -369,9 +370,8 @@ fn handle_user_not_in_battle(
     database: &impl Database,
     vs_opponent: Option<UserId>,
 ) -> CommandSequence {
-    battle_trace!("User is not a player in this battle", &mut battle, user_id);
+    battle_trace!("User is not a player in this battle, attempting to join", &mut battle, user_id);
 
-    // Check if both players are already human users (but not this user)
     let both_human_players =
         match (&battle.players.one.player_type, &battle.players.two.player_type) {
             (PlayerType::User(id1), PlayerType::User(id2)) => *id1 != user_id && *id2 != user_id,
@@ -379,14 +379,10 @@ fn handle_user_not_in_battle(
         };
 
     if both_human_players {
-        return error_message::display_error_message(
-            Some(&battle),
-            "Cannot join battle: both players are already human users".to_string(),
-        );
-    }
-
-    // Replace the first non-human player with this user
-    if !matches!(battle.players.one.player_type, PlayerType::User(_)) {
+        warn!(?user_id, "Both players are human users, replacing player two with user");
+        battle.players.two.player_type = PlayerType::User(user_id);
+    } else if !matches!(battle.players.one.player_type, PlayerType::User(_)) {
+        // Replace the first non-human player with this user
         info!(?user_id, "Replacing player one with user");
         battle.players.one.player_type = PlayerType::User(user_id);
     } else if !matches!(battle.players.two.player_type, PlayerType::User(_)) {
@@ -446,7 +442,12 @@ fn perform_action_internal(
     let provider = provider.clone();
     let result = catch_panic_conditionally(&provider, || {
         let Ok(database) = provider.get_database() else {
-            show_error_message(provider.clone(), user_id, None, "No database found".to_string());
+            show_error_message(
+                provider.clone(),
+                user_id,
+                None,
+                format!("No database found for user_id: {user_id:?}"),
+            );
             return;
         };
 
@@ -455,9 +456,9 @@ fn perform_action_internal(
         let save_file_id = request.save_file_id.unwrap_or(user_id);
         let Ok(Some(save)) = database.fetch_save(save_file_id) else {
             let error_msg = if request.save_file_id.is_some() {
-                format!("No save file found for ID: {save_file_id:?}")
+                format!("No save file found for request.save_file_id: {save_file_id:?}")
             } else {
-                "No save file found".to_string()
+                format!("No save file found for user_id: {user_id:?}")
             };
             show_error_message(provider.clone(), user_id, None, error_msg);
             return;
@@ -468,7 +469,12 @@ fn perform_action_internal(
             .unwrap_or(RequestContext { logging_options: Default::default() });
         let Some((mut battle, quest_id)) = deserialize_save_file::battle(&save, request_context)
         else {
-            show_error_message(provider.clone(), user_id, None, "No battle found".to_string());
+            show_error_message(
+                provider.clone(),
+                user_id,
+                None,
+                format!("No battle found for save_file_id: {save_file_id:?}"),
+            );
             return;
         };
 
@@ -623,6 +629,8 @@ fn show_error_message(
     battle: Option<&BattleState>,
     error_message: String,
 ) {
+    error!("Error in engine: {error_message}");
+
     if provider.should_panic_on_error() {
         panic!("Error in test: {error_message}");
     }
