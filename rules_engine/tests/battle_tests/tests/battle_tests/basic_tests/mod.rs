@@ -1,3 +1,4 @@
+mod activated_ability_tests;
 mod basic_battle_actions_test;
 mod basic_uct_search_test;
 mod battle_display_action_tests;

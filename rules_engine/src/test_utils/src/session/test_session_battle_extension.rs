@@ -69,6 +69,13 @@ pub trait TestSessionBattleExtension {
     /// card id. This does not play the card or spend energy etc.
     fn add_to_battlefield(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId;
 
+    fn activate_ability(
+        &mut self,
+        player: DisplayPlayer,
+        character_id: &ClientCardId,
+        ability_number: usize,
+    );
+
     /// Takes the "end turn" action as the named `player`. Moves all cards from
     /// the opponent player's hand to their deck via debug actions.
     ///
@@ -211,6 +218,16 @@ impl TestSessionBattleExtension for TestSession {
             .find(|c| !existing_battlefield_ids.contains(&c.id))
             .map(|c| c.id.clone())
             .expect("Failed to find newly added card on battlefield")
+    }
+
+    fn activate_ability(
+        &mut self,
+        player: DisplayPlayer,
+        character_id: &ClientCardId,
+        ability_number: usize,
+    ) {
+        let token_card_id = format!("A{character_id}/{ability_number}");
+        self.play_card_from_hand(player, &token_card_id);
     }
 
     fn end_turn_remove_opponent_hand(&mut self, player: DisplayPlayer) {
