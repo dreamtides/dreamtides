@@ -69,6 +69,11 @@ pub trait TestSessionBattleExtension {
     /// card id. This does not play the card or spend energy etc.
     fn add_to_battlefield(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId;
 
+    /// Activates an ability of a character via the standard play card action.
+    ///
+    /// Panics if the server returns an error for activating this ability or if
+    /// the ability cannot currently be activated (e.g. due to insufficient
+    /// energy).
     fn activate_ability(
         &mut self,
         player: DisplayPlayer,
