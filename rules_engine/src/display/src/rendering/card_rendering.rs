@@ -164,6 +164,9 @@ pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
         CardName::TestDualActivatedAbilityCharacter => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
+        CardName::TestForeseeOne => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
+        ),
     }
 }
 
@@ -219,6 +222,9 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         CardName::TestDualActivatedAbilityCharacter => {
             "1\u{f7e4} -> Draw a card.\n2\u{f7e4} -> Draw 2 cards.".to_string()
         }
+        CardName::TestForeseeOne => {
+            "<b>Foresee</b> 1.".to_string()
+        }
     };
 
     if card::get(battle, card_id).name == CardName::TestVariableEnergyDraw
@@ -239,6 +245,10 @@ fn supplemental_card_info(battle: &BattleState, card_id: CardId) -> Option<Strin
         ),
         CardName::TestCounterspell => Some(
             "<b>Prevent:</b> Send a card to the void in response to it being played".to_string(),
+        ),
+        CardName::TestForeseeOne => Some(
+            "<b>Foresee 1:</b> Look at the top card of your deck. You may put it into your void."
+                .to_string(),
         ),
         _ => None,
     }

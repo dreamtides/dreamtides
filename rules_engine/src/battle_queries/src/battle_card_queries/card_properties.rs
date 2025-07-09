@@ -28,6 +28,7 @@ pub fn display_name(card_name: CardName) -> String {
         }
         CardName::TestActivatedAbilityDissolveCharacter => "Dissolve Character".to_string(),
         CardName::TestDualActivatedAbilityCharacter => "Dual Abilities".to_string(),
+        CardName::TestForeseeOne => "Foresee 1".to_string(),
     }
 }
 
@@ -47,6 +48,7 @@ pub fn cost(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
         CardName::TestFastMultiActivatedAbilityDrawCardCharacter => Some(Energy(0)),
         CardName::TestActivatedAbilityDissolveCharacter => Some(Energy(3)),
         CardName::TestDualActivatedAbilityCharacter => Some(Energy(4)),
+        CardName::TestForeseeOne => Some(Energy(1)),
     }
 }
 
@@ -102,6 +104,7 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
         }
         CardName::TestActivatedAbilityDissolveCharacter => CardType::Character(CharacterType::Mage),
         CardName::TestDualActivatedAbilityCharacter => CardType::Character(CharacterType::Ancient),
+        CardName::TestForeseeOne => CardType::Event,
     }
 }
 
@@ -121,5 +124,6 @@ pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
         CardName::TestFastMultiActivatedAbilityDrawCardCharacter => false,
         CardName::TestActivatedAbilityDissolveCharacter => false,
         CardName::TestDualActivatedAbilityCharacter => false,
+        CardName::TestForeseeOne => true,
     }
 }

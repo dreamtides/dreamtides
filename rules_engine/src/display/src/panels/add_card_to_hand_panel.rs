@@ -71,6 +71,12 @@ impl Component for AddCardToHandPanel<'_> {
                                 )
                                 .child(
                                     AddCardCell::builder()
+                                        .card(CardName::TestForeseeOne)
+                                        .user_player(self.user_player)
+                                        .build(),
+                                )
+                                .child(
+                                    AddCardCell::builder()
                                         .card(CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter)
                                         .user_player(self.user_player)
                                         .build(),
