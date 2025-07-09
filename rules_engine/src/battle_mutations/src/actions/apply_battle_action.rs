@@ -31,8 +31,8 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
         BattleAction::PlayCardFromHand(card_id) => {
             play_card::execute(battle, player, card_id);
         }
-        BattleAction::ActivateAbility { character_id, ability_number } => {
-            activate_ability::execute(battle, player, character_id, ability_number);
+        BattleAction::ActivateAbility(activated_ability_id) => {
+            activate_ability::execute(battle, player, activated_ability_id);
         }
         BattleAction::PassPriority => {
             resolve_card::pass_priority(battle, player);

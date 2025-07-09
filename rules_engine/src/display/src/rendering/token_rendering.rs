@@ -1,16 +1,17 @@
+use ability_data::cost::Cost;
 use action_data::game_action_data::GameAction;
 use battle_queries::battle_card_queries::{card, card_abilities};
 use battle_queries::legal_action_queries::legal_actions;
-use battle_queries::legal_action_queries::legal_actions_data::ActivatableAbility;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_animation::TriggerAnimation;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::CardIdType;
+use battle_state::battle::card_id::{ActivatedAbilityId, CardIdType};
 use bon::Builder;
 use core_data::display_color;
 use core_data::display_types::{AudioClipAddress, SpriteAddress};
 use core_data::numerics::{Energy, Spark};
 use core_data::types::CardFacing;
+use display_data::battle_view::DisplayPlayer;
 use display_data::card_view::{
     CardActions, CardEffects, CardPrefab, CardView, ClientCardId, DisplayImage, RevealedCardView,
 };
@@ -61,7 +62,7 @@ pub fn trigger_card_view(
 pub fn activated_ability_card_view(
     builder: &ResponseBuilder,
     battle: &BattleState,
-    ability: &ActivatableAbility,
+    ability: ActivatedAbilityId,
 ) -> CardView {
     let character_card_id = ability.character_id.card_id();
     let abilities = card_abilities::query(battle, character_card_id);
@@ -72,14 +73,10 @@ pub fn activated_ability_card_view(
         .find(|data| data.ability_number == ability.ability_number)
         .expect("Ability not found");
 
-    let action = BattleAction::ActivateAbility {
-        character_id: ability.character_id,
-        ability_number: ability.ability_number,
-    };
-
+    let action = BattleAction::ActivateAbility(ability);
     let activate_action = Some(GameAction::BattleAction(action));
     let cost = ability_data.ability.costs.iter().find_map(|cost| match cost {
-        ability_data::cost::Cost::Energy(energy) => Some(*energy),
+        Cost::Energy(energy) => Some(*energy),
         _ => None,
     });
 
@@ -89,14 +86,11 @@ pub fn activated_ability_card_view(
     let legal_actions = legal_actions::compute(battle, builder.act_for_player());
     let is_legal_action = legal_actions.contains(action);
 
-    let character_controller = positions::controller_and_zone(battle, character_card_id).controller;
-    let display_player = builder.to_display_player(character_controller);
-
     token_card_view(
         TokenCardView::builder()
             .id(format!("A{:?}/{:?}", character_card_id.0, ability.ability_number.0))
             .position(ObjectPosition {
-                position: Position::InHand(display_player),
+                position: Position::InHand(DisplayPlayer::User),
                 sorting_key: card::get(battle, character_card_id).object_id.0 as u32,
                 sorting_sub_key: 0,
             })

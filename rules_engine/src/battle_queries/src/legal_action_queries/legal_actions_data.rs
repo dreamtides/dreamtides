@@ -1,7 +1,6 @@
 use battle_state::actions::battle_actions::BattleAction;
-use battle_state::battle::card_id::{CharacterId, HandCardId, StackCardId};
+use battle_state::battle::card_id::{ActivatedAbilityId, CharacterId, HandCardId, StackCardId};
 use battle_state::battle_cards::card_set::CardSet;
-use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
 use fastrand;
 
@@ -22,13 +21,7 @@ pub enum LegalActions {
 pub struct StandardLegalActions {
     pub primary: PrimaryLegalAction,
     pub play_card_from_hand: Vec<HandCardId>,
-    pub activate_abilities: Vec<ActivatableAbility>,
-}
-
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct ActivatableAbility {
-    pub character_id: CharacterId,
-    pub ability_number: AbilityNumber,
+    pub activate_abilities: Vec<ActivatedAbilityId>,
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
@@ -49,12 +42,9 @@ impl LegalActions {
                     false
                 }
             }
-            BattleAction::ActivateAbility { character_id, ability_number } => {
+            BattleAction::ActivateAbility(activated_ability_id) => {
                 if let LegalActions::Standard { actions } = self {
-                    actions.activate_abilities.iter().any(|ability| {
-                        ability.character_id == character_id
-                            && ability.ability_number == ability_number
-                    })
+                    actions.activate_abilities.contains(&activated_ability_id)
                 } else {
                     false
                 }
@@ -190,16 +180,10 @@ impl LegalActions {
                             standard_actions
                                 .activate_abilities
                                 .iter()
-                                .find(|ability| {
-                                    !actions.contains(&BattleAction::ActivateAbility {
-                                        character_id: ability.character_id,
-                                        ability_number: ability.ability_number,
-                                    })
+                                .find(|&&ability| {
+                                    !actions.contains(&BattleAction::ActivateAbility(ability))
                                 })
-                                .map(|ability| BattleAction::ActivateAbility {
-                                    character_id: ability.character_id,
-                                    ability_number: ability.ability_number,
-                                })
+                                .map(|&ability| BattleAction::ActivateAbility(ability))
                         }
                     }
                 }
@@ -246,10 +230,7 @@ impl LegalActions {
                 }
 
                 for ability in actions.activate_abilities.iter() {
-                    result.push(BattleAction::ActivateAbility {
-                        character_id: ability.character_id,
-                        ability_number: ability.ability_number,
-                    });
+                    result.push(BattleAction::ActivateAbility(*ability));
                 }
 
                 result
@@ -306,12 +287,10 @@ impl LegalActions {
                             .map(|card_id| BattleAction::PlayCardFromHand(*card_id))
                     } else {
                         let ability_index = remaining_index - actions.play_card_from_hand.len();
-                        actions.activate_abilities.get(ability_index).map(|ability| {
-                            BattleAction::ActivateAbility {
-                                character_id: ability.character_id,
-                                ability_number: ability.ability_number,
-                            }
-                        })
+                        actions
+                            .activate_abilities
+                            .get(ability_index)
+                            .map(|&ability| BattleAction::ActivateAbility(ability))
                     }
                 }
             }

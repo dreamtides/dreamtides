@@ -2,7 +2,7 @@ use core_data::identifiers::AbilityNumber;
 use core_data::types::PlayerName;
 use serde::{Deserialize, Serialize};
 
-use crate::battle::card_id::{CardId, CardIdType, CharacterId, StackCardId};
+use crate::battle::card_id::{ActivatedAbilityId, CardId, CardIdType, CharacterId, StackCardId};
 
 /// Describes the source of some mutation or query.
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, Serialize, Deserialize)]
@@ -22,7 +22,7 @@ pub enum EffectSource {
     Character { controller: PlayerName, character_id: CharacterId },
 
     /// Effect caused by an activated ability of a character on the battlefield
-    Activated { controller: PlayerName, character_id: CharacterId, ability_number: AbilityNumber },
+    Activated { controller: PlayerName, activated_ability_id: ActivatedAbilityId },
 
     /// Effect caused by a triggered ability of a character on the battlefield
     Triggered { controller: PlayerName, character_id: CharacterId, ability_number: AbilityNumber },
@@ -46,7 +46,9 @@ impl EffectSource {
         match self {
             EffectSource::Event { stack_card_id: card, .. } => Some(card.card_id()),
             EffectSource::Character { character_id: card, .. } => Some(card.card_id()),
-            EffectSource::Activated { character_id: card, .. } => Some(card.card_id()),
+            EffectSource::Activated { activated_ability_id, .. } => {
+                Some(activated_ability_id.character_id.card_id())
+            }
             EffectSource::Triggered { character_id: card, .. } => Some(card.card_id()),
             _ => None,
         }

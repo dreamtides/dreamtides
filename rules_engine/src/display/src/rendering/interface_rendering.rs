@@ -102,8 +102,8 @@ fn get_prompt_message_from_source(battle: &BattleState, prompt: &PromptData) -> 
     let card_id = prompt.source.card_id()?;
     let ability_number = match prompt.source {
         EffectSource::Event { ability_number, .. }
-        | EffectSource::Activated { ability_number, .. }
         | EffectSource::Triggered { ability_number, .. } => ability_number,
+        EffectSource::Activated { activated_ability_id, .. } => activated_ability_id.ability_number,
         _ => return None,
     };
 

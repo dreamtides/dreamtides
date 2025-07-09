@@ -1,6 +1,7 @@
 use std::fmt::{self, Debug};
 use std::hash::Hash;
 
+use core_data::identifiers::AbilityNumber;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -39,6 +40,7 @@ impl CardIdType for CardId {
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct CharacterId(pub CardId);
 
 impl CardIdType for CharacterId {
@@ -61,6 +63,16 @@ impl fmt::Debug for CharacterId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Display::fmt(self, f)
     }
+}
+
+/// Identifies an activated ability of a character.
+#[derive(
+    Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ActivatedAbilityId {
+    pub character_id: CharacterId,
+    pub ability_number: AbilityNumber,
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema)]

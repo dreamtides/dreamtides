@@ -849,7 +849,7 @@ namespace Dreamtides.Schema
         public long? PlayCardFromHand { get; set; }
 
         [JsonProperty("activateAbility", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public ActivateAbility ActivateAbility { get; set; }
+        public ActivatedAbilityId ActivateAbility { get; set; }
 
         [JsonProperty("selectCharacterTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectCharacterTarget { get; set; }
@@ -867,12 +867,15 @@ namespace Dreamtides.Schema
         public SelectCardOrder SelectCardOrder { get; set; }
     }
 
-    public partial class ActivateAbility
+    /// <summary>
+    /// Identifies an activated ability of a character.
+    /// </summary>
+    public partial class ActivatedAbilityId
     {
-        [JsonProperty("ability_number", Required = Required.Always)]
+        [JsonProperty("abilityNumber", Required = Required.Always)]
         public long AbilityNumber { get; set; }
 
-        [JsonProperty("character_id", Required = Required.Always)]
+        [JsonProperty("characterId", Required = Required.Always)]
         public long CharacterId { get; set; }
     }
 

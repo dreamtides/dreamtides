@@ -1,10 +1,9 @@
-use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::actions::debug_battle_action::DebugBattleAction;
-use crate::battle::card_id::{CardId, CharacterId, HandCardId, StackCardId};
+use crate::battle::card_id::{ActivatedAbilityId, CardId, CharacterId, HandCardId, StackCardId};
 
 /// An action that can be performed in a battle
 #[derive(
@@ -17,7 +16,7 @@ pub enum BattleAction {
     /// Play a card in the user's hand.
     PlayCardFromHand(HandCardId),
     /// Activate a character's ability.
-    ActivateAbility { character_id: CharacterId, ability_number: AbilityNumber },
+    ActivateAbility(ActivatedAbilityId),
     /// Pass on taking actions in response to a card being played by the
     /// opponent, thus causing the stack to be resolved.
     PassPriority,
@@ -68,8 +67,11 @@ impl BattleAction {
         match self {
             BattleAction::Debug(..) => "DEBUG".to_string(),
             BattleAction::PlayCardFromHand(hand_card_id) => format!("PCFH{:?}", hand_card_id.0.0),
-            BattleAction::ActivateAbility { character_id, ability_number } => {
-                format!("AA{:?}{:?}", character_id.0.0, ability_number.0)
+            BattleAction::ActivateAbility(activated_ability_id) => {
+                format!(
+                    "AA{:?}{:?}",
+                    activated_ability_id.character_id.0.0, activated_ability_id.ability_number.0
+                )
             }
             BattleAction::PassPriority => "PP".to_string(),
             BattleAction::EndTurn => "ET".to_string(),
