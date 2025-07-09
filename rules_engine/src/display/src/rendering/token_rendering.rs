@@ -34,7 +34,7 @@ pub fn trigger_card_view(
             .id(format!("T{:?}/{:?}", trigger.character_id.card_id().0, trigger.ability_number))
             .position(ObjectPosition {
                 position: Position::OnStack(current_stack),
-                sorting_key: (battle.cards.next_object_id_for_display().0 + index) as u32,
+                sorting_key: (battle.cards.next_object_id_for_display().0 + index + 5) as u32,
                 sorting_sub_key: 0,
             })
             .image(card_rendering::card_image(battle, trigger.character_id.card_id()))
@@ -102,15 +102,32 @@ pub fn all_user_character_activated_abilities(
                 return None;
             }
 
-            Some(activated_ability_card_view(builder, battle, ability_id))
+            Some(activated_ability_card_view(builder, battle, ability_id, None))
         })
         .collect()
+}
+
+pub fn enemy_activated_ability_card_view(
+    builder: &ResponseBuilder,
+    battle: &BattleState,
+    index: usize,
+    ability: ActivatedAbilityId,
+) -> CardView {
+    let current_stack = positions::current_stack_type(builder, battle);
+    let stack_position = ObjectPosition {
+        position: Position::OnStack(current_stack),
+        sorting_key: (battle.cards.next_object_id_for_display().0 + index) as u32,
+        sorting_sub_key: 0,
+    };
+
+    activated_ability_card_view(builder, battle, ability, Some(stack_position))
 }
 
 fn activated_ability_card_view(
     builder: &ResponseBuilder,
     battle: &BattleState,
     ability: ActivatedAbilityId,
+    position_override: Option<ObjectPosition>,
 ) -> CardView {
     let character_card_id = ability.character_id.card_id();
     let abilities = card_abilities::query(battle, character_card_id);
@@ -137,11 +154,11 @@ fn activated_ability_card_view(
     token_card_view(
         TokenCardView::builder()
             .id(format!("A{:?}/{:?}", character_card_id.0, ability.ability_number.0))
-            .position(ObjectPosition {
+            .position(position_override.unwrap_or_else(|| ObjectPosition {
                 position: Position::InHand(DisplayPlayer::User),
                 sorting_key: card::get(battle, character_card_id).object_id.0 as u32,
                 sorting_sub_key: 0,
-            })
+            }))
             .image(card_rendering::card_image(battle, character_card_id))
             .name(ability_name)
             .maybe_cost(cost)

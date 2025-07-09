@@ -61,6 +61,20 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
         ),
     );
 
+    if let Some(currently_activating_ability) = builder.currently_activating_ability()
+        && currently_activating_ability.player == builder.display_for_player().opponent()
+        && builder.is_for_animation()
+    {
+        // Show opponent's activated ability on the stack during incremental
+        // animations.
+        cards.push(token_rendering::enemy_activated_ability_card_view(
+            builder,
+            battle,
+            1,
+            currently_activating_ability.activated_ability_id,
+        ));
+    }
+
     cards.push(identity_card_rendering::identity_card_view(
         builder,
         battle,
