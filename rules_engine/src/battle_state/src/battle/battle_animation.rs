@@ -11,7 +11,7 @@ use crate::prompt_types::prompt_data::PromptChoiceLabel;
 #[derive(Clone, Debug, EnumDiscriminants)]
 #[strum_discriminants(derive(Display))]
 pub enum BattleAnimation {
-    ActivateAbility {
+    ActivatedAbility {
         player: PlayerName,
         activated_ability_id: ActivatedAbilityId,
     },

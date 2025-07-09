@@ -5,8 +5,8 @@ use core_data::numerics::Spark;
 use core_data::types::PlayerName;
 
 use crate::battle::card_id::{
-    BanishedCardId, CardId, CardIdType, CharacterId, DeckCardId, HandCardId, StackCardId,
-    VoidCardId,
+    ActivatedAbilityId, BanishedCardId, CardId, CardIdType, CharacterId, DeckCardId, HandCardId,
+    StackCardId, VoidCardId,
 };
 use crate::battle_cards::ability_list::CanPlayRestriction;
 use crate::battle_cards::battle_card_state::{BattleCardState, ObjectId};
@@ -41,6 +41,7 @@ pub struct AllCards {
     stack_card_set: PlayerMap<CardSet<StackCardId>>,
     banished: PlayerMap<CardSet<BanishedCardId>>,
     next_object_id: ObjectId,
+    activated_ability_object_ids: BTreeMap<ActivatedAbilityId, ObjectId>,
 }
 
 impl AllCards {
@@ -225,6 +226,48 @@ impl AllCards {
     /// top of all 'real' cards.
     pub fn next_object_id_for_display(&self) -> ObjectId {
         self.next_object_id
+    }
+
+    /// Returns the object ID for an activated ability, if it is currently on
+    /// the stack.
+    pub fn activated_ability_object_id(
+        &self,
+        activated_ability_id: ActivatedAbilityId,
+    ) -> Option<ObjectId> {
+        self.activated_ability_object_ids.get(&activated_ability_id).copied()
+    }
+
+    /// Puts an activated ability on the stack.
+    pub fn add_activated_ability_to_stack(
+        &mut self,
+        controller: PlayerName,
+        activated_ability_id: ActivatedAbilityId,
+    ) {
+        let object_id = self.new_object_id();
+        self.stack.push(StackItemState {
+            id: StackItemId::ActivatedAbility(activated_ability_id),
+            controller,
+            targets: None,
+            additional_costs_paid: StackCardAdditionalCostsPaid::None,
+        });
+        self.activated_ability_object_ids.insert(activated_ability_id, object_id);
+    }
+
+    /// Removes an activated ability from the stack.
+    pub fn remove_activated_ability_from_stack(
+        &mut self,
+        activated_ability_id: ActivatedAbilityId,
+    ) {
+        if let Some((i, _)) = self
+            .stack
+            .iter()
+            .enumerate()
+            .rev()
+            .find(|(_, item)| item.id == StackItemId::ActivatedAbility(activated_ability_id))
+        {
+            self.stack.remove(i);
+        }
+        self.activated_ability_object_ids.remove(&activated_ability_id);
     }
 
     fn new_object_id(&mut self) -> ObjectId {

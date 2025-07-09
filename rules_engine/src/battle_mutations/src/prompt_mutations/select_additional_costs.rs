@@ -13,11 +13,11 @@ pub fn energy_cost(battle: &mut BattleState, player: PlayerName, cost: Energy) {
         panic_with!("No active prompt for applying additional cost", battle, cost);
     };
 
-    let Some(stack_card) = battle.cards.top_of_stack_mut() else {
+    let Some(stack_item) = battle.cards.top_of_stack_mut() else {
         panic_with!("No active stack for applying additional cost", battle, cost);
     };
 
-    stack_card.additional_costs_paid = StackCardAdditionalCostsPaid::Energy(cost);
+    stack_item.additional_costs_paid = StackCardAdditionalCostsPaid::Energy(cost);
     battle_trace!("Paying additional cost", battle, player, cost);
     battle.push_animation(source, || BattleAnimation::MakeChoice {
         player,

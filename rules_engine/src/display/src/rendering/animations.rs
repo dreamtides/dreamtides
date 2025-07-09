@@ -14,7 +14,7 @@ use masonry::flex_style::FlexVector3;
 
 use crate::core::adapter;
 use crate::core::card_view_context::CardViewContext;
-use crate::core::response_builder::{CurrentlyActivatingAbility, ResponseBuilder};
+use crate::core::response_builder::ResponseBuilder;
 use crate::rendering::{apply_card_fx, battle_rendering, card_rendering, labels};
 
 pub fn render(
@@ -27,12 +27,7 @@ pub fn render(
     apply_card_fx::apply_effect(builder, source, animation, snapshot);
 
     match animation {
-        BattleAnimation::ActivateAbility { player, activated_ability_id } => {
-            builder.set_currently_activating_ability(CurrentlyActivatingAbility {
-                player: *player,
-                activated_ability_id: *activated_ability_id,
-            });
-
+        BattleAnimation::ActivatedAbility { player, .. } => {
             if *player != builder.display_for_player() {
                 // Pause so the opponent can see the ability being activated.
                 push_snapshot(builder, snapshot);

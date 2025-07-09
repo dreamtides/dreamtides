@@ -33,9 +33,6 @@ pub struct ResponseBuilder {
 
     /// Triggers which are currently active.
     active_triggers: Vec<TriggerAnimation>,
-
-    /// Ability which is currently being activated.
-    currently_activating_ability: Option<CurrentlyActivatingAbility>,
 }
 
 #[derive(Clone, Debug, Copy)]
@@ -55,7 +52,6 @@ impl ResponseBuilder {
             for_animation: false,
             pending_commands: Vec::new(),
             active_triggers: Vec::new(),
-            currently_activating_ability: None,
         }
     }
 
@@ -74,7 +70,6 @@ impl ResponseBuilder {
             for_animation: false,
             pending_commands: Vec::new(),
             active_triggers: Vec::new(),
-            currently_activating_ability: None,
         }
     }
 
@@ -166,16 +161,5 @@ impl ResponseBuilder {
 
     pub fn active_triggers(&self) -> &[TriggerAnimation] {
         &self.active_triggers
-    }
-
-    pub fn set_currently_activating_ability(
-        &mut self,
-        currently_activating_ability: CurrentlyActivatingAbility,
-    ) {
-        self.currently_activating_ability = Some(currently_activating_ability);
-    }
-
-    pub fn currently_activating_ability(&self) -> Option<CurrentlyActivatingAbility> {
-        self.currently_activating_ability
     }
 }

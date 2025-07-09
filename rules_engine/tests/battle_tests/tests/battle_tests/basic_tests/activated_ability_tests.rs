@@ -1,3 +1,4 @@
+use battle_state::actions::battle_actions::BattleAction;
 use core_data::identifiers::CardName;
 use core_data::numerics::{Energy, Spark};
 use display_data::battle_view::DisplayPlayer;
@@ -25,11 +26,15 @@ fn activate_ability_basic_draw_card() {
 
     s.activate_ability(DisplayPlayer::User, &character_id, 0);
 
-    let hand_cards_after: Vec<String> =
-        s.user_client.cards.user_hand().iter().map(|c| c.id.clone()).collect();
-    assert_eq!(s.user_client.cards.user_hand().len(), 1, "hand should still have one card");
-    assert_ne!(hand_cards_after[0], token_card_id, "token card should be replaced by drawn card");
+    // After activation, energy is spent immediately and ability resolves due to
+    // auto-execution
     assert_eq!(s.user_client.me.energy(), Energy(98), "energy spent on activation");
+    assert_eq!(
+        s.user_client.cards.user_hand().len(),
+        1,
+        "activated ability token removed from hand and card drawn"
+    );
+    assert_eq!(s.user_client.cards.stack_cards().len(), 0, "stack empty after auto-resolution");
 }
 
 #[test]
@@ -280,4 +285,152 @@ fn activate_ability_enemy_perspective_token_card_on_stack() {
         .count();
 
     assert_eq!(final_token_cards, 0, "No token cards should remain visible in final state");
+}
+
+#[test]
+fn activate_ability_goes_on_stack_requires_priority_passing() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    // Add character with activated ability to user's battlefield
+    let character_id =
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCardCharacter);
+
+    // Give enemy a fast card so they have multiple legal actions when user
+    // activates ability
+    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+
+    assert_eq!(s.user_client.cards.user_hand().len(), 1, "activated ability token in hand");
+    assert_eq!(s.user_client.cards.stack_cards().len(), 0, "no cards on stack initially");
+
+    // Activate the ability
+    s.activate_ability(DisplayPlayer::User, &character_id, 0);
+
+    // Verify the ability is now on the stack (doesn't auto-resolve because enemy
+    // has other actions)
+    assert_eq!(s.user_client.cards.stack_cards().len(), 1, "activated ability should be on stack");
+
+    let stack_cards: Vec<&_> = s.user_client.cards.stack_cards().iter().map(|c| &c.view).collect();
+    assert_eq!(stack_cards.len(), 1, "one item on stack");
+
+    let stack_ability = &stack_cards[0];
+    assert!(
+        stack_ability.revealed.as_ref().unwrap().name.contains("Ability"),
+        "stack item should be the activated ability"
+    );
+
+    // Verify opponent has priority (can act)
+    assert!(!s.user_client.me.can_act(), "user should not have priority after activating ability");
+
+    // Verify the ability hasn't resolved yet (hand count unchanged)
+    assert_eq!(
+        s.user_client.cards.user_hand().len(),
+        0,
+        "activated ability token should be gone from hand"
+    );
+
+    // Enemy passes priority to resolve the ability
+    s.perform_enemy_action(BattleAction::PassPriority);
+
+    // Now the ability should have resolved
+    assert_eq!(
+        s.user_client.cards.stack_cards().len(),
+        0,
+        "stack should be empty after resolution"
+    );
+    assert_eq!(s.user_client.cards.user_hand().len(), 1, "should have drawn a card from ability");
+    assert_eq!(s.user_client.me.energy(), Energy(98), "energy should be spent");
+}
+
+#[test]
+fn activate_ability_can_be_responded_to_with_fast_cards() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    // Add character with activated ability to user's battlefield
+    let user_character_id =
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCardCharacter);
+
+    // Add fast activated ability character to enemy's battlefield
+    let enemy_character_id = s.add_to_battlefield(
+        DisplayPlayer::Enemy,
+        CardName::TestFastActivatedAbilityDrawCardCharacter,
+    );
+
+    // Give both players additional cards so they have multiple legal actions
+    let _user_fast_card = s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
+    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+
+    // User activates their ability
+    s.activate_ability(DisplayPlayer::User, &user_character_id, 0);
+
+    // Verify user ability is on stack
+    assert_eq!(s.user_client.cards.stack_cards().len(), 1, "user ability on stack");
+
+    // Enemy can respond with their fast ability since they have priority
+    assert!(!s.user_client.me.can_act(), "user doesn't have priority");
+
+    // Switch perspective to enemy to activate their fast ability
+    s.activate_ability(DisplayPlayer::Enemy, &enemy_character_id, 0);
+
+    // Now both abilities should be on stack
+    assert_eq!(s.user_client.cards.stack_cards().len(), 2, "both abilities on stack");
+
+    // Enemy ability should resolve first (top of stack)
+    s.perform_user_action(BattleAction::PassPriority);
+    assert_eq!(s.user_client.cards.stack_cards().len(), 1, "enemy ability resolved");
+
+    // Then user ability resolves
+    s.perform_enemy_action(BattleAction::PassPriority);
+    assert_eq!(s.user_client.cards.stack_cards().len(), 0, "both abilities resolved");
+
+    // Both players should have drawn cards
+    assert_eq!(s.user_client.cards.user_hand().len(), 2, "user drew from their ability");
+}
+
+#[test]
+fn activate_ability_fast_can_respond_during_enemy_turn() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    // Add fast activated ability character to user's battlefield
+    let user_character_id = s.add_to_battlefield(
+        DisplayPlayer::User,
+        CardName::TestFastActivatedAbilityDrawCardCharacter,
+    );
+
+    // End user turn
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+
+    // Give both players an additional fast card for multiple legal actions
+    let _user_fast_card = s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
+    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+
+    // Enemy plays a card
+    let enemy_card = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    // Verify enemy card is on stack and user can act (has priority to respond)
+    assert!(s.user_client.cards.stack_cards().contains(&enemy_card), "enemy card on stack");
+    assert!(s.user_client.me.can_act(), "user can respond during enemy turn");
+
+    // User responds with fast activated ability
+    s.activate_ability(DisplayPlayer::User, &user_character_id, 0);
+
+    // Both items should be on stack
+    assert_eq!(s.user_client.cards.stack_cards().len(), 2, "both card and ability on stack");
+
+    // User ability resolves first (top of stack)
+    s.perform_enemy_action(BattleAction::PassPriority);
+    assert_eq!(s.user_client.cards.stack_cards().len(), 1, "user ability resolved");
+    assert_eq!(s.user_client.cards.user_hand().len(), 2, "user drew card and has counterspell");
+
+    // Enemy card resolves second
+    s.perform_user_action(BattleAction::PassPriority);
+    assert_eq!(s.user_client.cards.stack_cards().len(), 0, "enemy card resolved");
 }

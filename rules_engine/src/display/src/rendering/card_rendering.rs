@@ -210,8 +210,8 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
     };
 
     if card::get(battle, card_id).name == CardName::TestVariableEnergyDraw
-        && let Some(stack_card) = battle.cards.stack_item(StackCardId(card_id))
-        && let StackCardAdditionalCostsPaid::Energy(energy) = &stack_card.additional_costs_paid
+        && let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))
+        && let StackCardAdditionalCostsPaid::Energy(energy) = &stack_item.additional_costs_paid
     {
         return format!("{} <b><color=\"blue\">({}\u{f7e4} paid)</color></b>", base_text, energy.0);
     }

@@ -3,7 +3,7 @@ use battle_queries::battle_player_queries::player_properties;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
-use battle_state::battle_cards::stack_card_state::EffectTargets;
+use battle_state::battle_cards::stack_card_state::{EffectTargets, StackItemId};
 use battle_state::battle_player::battle_player_state::BattlePlayerState;
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
@@ -45,6 +45,15 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
         })
         .collect::<Vec<_>>();
 
+    // Add activated abilities that are currently on the stack
+    for stack_item in battle.cards.all_items_on_stack().iter() {
+        if let StackItemId::ActivatedAbility(ability_id) = stack_item.id {
+            cards.push(token_rendering::activated_ability_card_view_on_stack(
+                builder, battle, ability_id,
+            ));
+        }
+    }
+
     cards.extend(builder.active_triggers().iter().enumerate().map(|(index, trigger)| {
         token_rendering::trigger_card_view(builder, battle, index, trigger)
     }));
@@ -60,20 +69,6 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
             },
         ),
     );
-
-    if let Some(currently_activating_ability) = builder.currently_activating_ability()
-        && currently_activating_ability.player == builder.display_for_player().opponent()
-        && builder.is_for_animation()
-    {
-        // Show opponent's activated ability on the stack during incremental
-        // animations.
-        cards.push(token_rendering::enemy_activated_ability_card_view(
-            builder,
-            battle,
-            1,
-            currently_activating_ability.activated_ability_id,
-        ));
-    }
 
     cards.push(identity_card_rendering::identity_card_view(
         builder,

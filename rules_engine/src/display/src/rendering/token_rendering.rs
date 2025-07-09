@@ -6,6 +6,7 @@ use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_animation::TriggerAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{ActivatedAbilityId, CardIdType, CharacterId};
+use battle_state::battle_cards::stack_card_state::StackItemId;
 use bon::Builder;
 use core_data::display_color;
 use core_data::display_types::{AudioClipAddress, SpriteAddress};
@@ -59,7 +60,8 @@ pub fn trigger_card_view(
     )
 }
 
-/// Returns a list of all activated ability views for a character.
+/// Returns a list of all activated ability views for a character to display in
+/// the player's hand.
 pub fn all_user_character_activated_abilities(
     builder: &ResponseBuilder,
     battle: &BattleState,
@@ -90,15 +92,20 @@ pub fn all_user_character_activated_abilities(
                 return None;
             }
 
-            // If a multi-use ability is currently being activated, don't show
-            // it during incremental animations so the ability "goes away" when
-            // used and then comes back at the end. This just looks nicer than
-            // having it immediately return to hand.
-            if let Some(currently_activating_ability) = builder.currently_activating_ability()
-                && is_multi
-                && currently_activating_ability.activated_ability_id == ability_id
-                && builder.is_for_animation()
-            {
+            // If the ability is currently on the stack, don't show it in hand
+            // (it will be displayed on the stack instead)
+            let is_on_stack = battle
+                .cards
+                .all_items_on_stack()
+                .iter()
+                .any(|stack_item| {
+                    matches!(
+                        stack_item.id,
+                        StackItemId::ActivatedAbility(stack_ability_id) if stack_ability_id == ability_id
+                    )
+                });
+
+            if is_on_stack {
                 return None;
             }
 
@@ -107,16 +114,17 @@ pub fn all_user_character_activated_abilities(
         .collect()
 }
 
-pub fn enemy_activated_ability_card_view(
+/// Returns a card view for an activated ability that is currently on the
+/// stack.
+pub fn activated_ability_card_view_on_stack(
     builder: &ResponseBuilder,
     battle: &BattleState,
-    index: usize,
     ability: ActivatedAbilityId,
 ) -> CardView {
     let current_stack = positions::current_stack_type(builder, battle);
     let stack_position = ObjectPosition {
         position: Position::OnStack(current_stack),
-        sorting_key: (battle.cards.next_object_id_for_display().0 + index) as u32,
+        sorting_key: battle.cards.activated_ability_object_id(ability).unwrap_or_default().0 as u32,
         sorting_sub_key: 0,
     };
 

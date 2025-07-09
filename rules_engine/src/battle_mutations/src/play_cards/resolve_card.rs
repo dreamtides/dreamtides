@@ -41,22 +41,22 @@ pub fn pass_priority(battle: &mut BattleState, player: PlayerName) {
         player
     );
 
-    let Some(stack_card) = battle.cards.top_of_stack().cloned() else {
-        panic_with!("No cards on stack", battle);
+    let Some(stack_item) = battle.cards.top_of_stack().cloned() else {
+        panic_with!("No items on stack", battle);
     };
 
-    resolve_stack_item(battle, &stack_card);
+    resolve_stack_item(battle, &stack_item);
 
     // After a card resolves, its controller receives priority (if the stack is
     // not empty)
-    battle.stack_priority = battle.cards.has_stack().then_some(stack_card.controller);
+    battle.stack_priority = battle.cards.has_stack().then_some(stack_item.controller);
 }
 
 fn resolve_stack_item(battle: &mut BattleState, item: &StackItemState) {
     match item.id {
         StackItemId::Card(card_id) => resolve_stack_card(battle, item, card_id),
         StackItemId::ActivatedAbility(ability_id) => {
-            resolve_activated_ability(battle, item, ability_id)
+            resolve_activated_ability(battle, item, ability_id);
         }
     }
 }
@@ -92,5 +92,19 @@ fn resolve_activated_ability(
     item: &StackItemState,
     ability_id: ActivatedAbilityId,
 ) {
-    todo!()
+    battle_trace!("Resolving activated ability", battle, ability_id);
+    let abilities = card_abilities::query(battle, ability_id.character_id);
+    let Some(ability_data) = abilities
+        .activated_abilities
+        .iter()
+        .find(|data| data.ability_number == ability_id.ability_number)
+    else {
+        panic_with!("Activated ability not found during resolution", battle, ability_id);
+    };
+
+    let source =
+        EffectSource::Activated { controller: item.controller, activated_ability_id: ability_id };
+    apply_effect::execute(battle, source, &ability_data.ability.effect, item.targets.as_ref());
+
+    battle.cards.remove_activated_ability_from_stack(ability_id);
 }

@@ -6,9 +6,11 @@ use battle_state::battle::card_id::ActivatedAbilityId;
 use battle_state::core::effect_source::EffectSource;
 use core_data::types::PlayerName;
 
-use crate::effects::{apply_effect, pay_cost};
+use crate::effects::pay_cost;
+use crate::prompt_mutations::add_targeting_prompt;
 
-/// Activates an ability of a character on the battlefield.
+/// Activates an ability of a character on the battlefield by putting it on the
+/// stack.
 pub fn execute(
     battle: &mut BattleState,
     player: PlayerName,
@@ -16,10 +18,6 @@ pub fn execute(
 ) {
     battle_trace!("Activating ability", battle, player, activated_ability_id);
     let source = EffectSource::Activated { controller: player, activated_ability_id };
-    battle.push_animation(source, || BattleAnimation::ActivateAbility {
-        player,
-        activated_ability_id,
-    });
 
     let abilities = card_abilities::query(battle, activated_ability_id.character_id);
     let Some(ability_data) = abilities
@@ -40,5 +38,13 @@ pub fn execute(
         pay_cost::execute(battle, source, player, cost);
     }
 
-    apply_effect::execute(battle, source, &ability_data.ability.effect, None);
+    battle.cards.add_activated_ability_to_stack(player, activated_ability_id);
+
+    battle.stack_priority = Some(player.opponent());
+    add_targeting_prompt::execute_for_activated_ability(battle, player, activated_ability_id);
+
+    battle.push_animation(source, || BattleAnimation::ActivatedAbility {
+        player,
+        activated_ability_id,
+    });
 }

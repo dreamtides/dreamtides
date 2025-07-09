@@ -4,7 +4,7 @@ use battle_queries::battle_card_queries::card_abilities;
 use battle_queries::battle_trace;
 use battle_queries::card_ability_queries::effect_predicates;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::StackCardId;
+use battle_state::battle::card_id::{ActivatedAbilityId, StackCardId};
 use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{PromptConfiguration, PromptData, PromptType};
 use core_data::types::PlayerName;
@@ -22,6 +22,28 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, card_id: StackCardI
             battle_trace!("Adding target prompt", battle, prompt_data);
             battle.prompt = Some(prompt_data);
             return;
+        }
+    }
+}
+
+/// Adds a prompt to the `battle` for targets required for an activated ability.
+pub fn execute_for_activated_ability(
+    battle: &mut BattleState,
+    player: PlayerName,
+    activated_ability_id: ActivatedAbilityId,
+) {
+    let abilities = card_abilities::query(battle, activated_ability_id.character_id);
+    if let Some(ability_data) = abilities
+        .activated_abilities
+        .iter()
+        .find(|data| data.ability_number == activated_ability_id.ability_number)
+    {
+        let source = EffectSource::Activated { controller: player, activated_ability_id };
+        if let Some(prompt_data) =
+            targeting_prompt(battle, player, source, &ability_data.ability.effect)
+        {
+            battle_trace!("Adding target prompt for activated ability", battle, prompt_data);
+            battle.prompt = Some(prompt_data);
         }
     }
 }

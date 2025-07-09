@@ -8,8 +8,8 @@ pub fn displayed_targets(
     battle: &BattleState,
     item: impl Into<StackItemId>,
 ) -> Option<&EffectTargets> {
-    let stack_card = battle.cards.stack_item(item)?;
-    validate_targets(battle, stack_card.targets.as_ref())
+    let stack_item = battle.cards.stack_item(item)?;
+    validate_targets(battle, stack_item.targets.as_ref())
 }
 
 /// Returns the provided [EffectTargets] if they are all valid, or otherwise
