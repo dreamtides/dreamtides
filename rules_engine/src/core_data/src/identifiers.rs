@@ -62,6 +62,7 @@ pub enum CardName {
     TestFastActivatedAbilityDrawCardCharacter,
     TestFastMultiActivatedAbilityDrawCardCharacter,
     TestActivatedAbilityDissolveCharacter,
+    TestDualActivatedAbilityCharacter,
 }
 
 /// Identifies an ability of a card.

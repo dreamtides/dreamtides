@@ -27,6 +27,7 @@ pub fn display_name(card_name: CardName) -> String {
             "Fast Multi Activated".to_string()
         }
         CardName::TestActivatedAbilityDissolveCharacter => "Dissolve Character".to_string(),
+        CardName::TestDualActivatedAbilityCharacter => "Dual Abilities".to_string(),
     }
 }
 
@@ -45,6 +46,7 @@ pub fn cost(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
         CardName::TestFastActivatedAbilityDrawCardCharacter => Some(Energy(0)),
         CardName::TestFastMultiActivatedAbilityDrawCardCharacter => Some(Energy(0)),
         CardName::TestActivatedAbilityDissolveCharacter => Some(Energy(3)),
+        CardName::TestDualActivatedAbilityCharacter => Some(Energy(4)),
     }
 }
 
@@ -67,6 +69,7 @@ pub fn base_spark(battle: &BattleState, card_id: impl CardIdType) -> Option<Spar
         CardName::TestFastActivatedAbilityDrawCardCharacter => Some(Spark(3)),
         CardName::TestFastMultiActivatedAbilityDrawCardCharacter => Some(Spark(3)),
         CardName::TestActivatedAbilityDissolveCharacter => Some(Spark(4)),
+        CardName::TestDualActivatedAbilityCharacter => Some(Spark(3)),
         _ => None,
     }
 }
@@ -98,6 +101,7 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
             CardType::Character(CharacterType::Warrior)
         }
         CardName::TestActivatedAbilityDissolveCharacter => CardType::Character(CharacterType::Mage),
+        CardName::TestDualActivatedAbilityCharacter => CardType::Character(CharacterType::Ancient),
     }
 }
 
@@ -116,5 +120,6 @@ pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
         CardName::TestFastActivatedAbilityDrawCardCharacter => false,
         CardName::TestFastMultiActivatedAbilityDrawCardCharacter => false,
         CardName::TestActivatedAbilityDissolveCharacter => false,
+        CardName::TestDualActivatedAbilityCharacter => false,
     }
 }

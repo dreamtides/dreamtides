@@ -536,3 +536,173 @@ fn activate_ability_with_targeting_works_on_stack() {
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 0, "target dissolved");
     assert!(s.user_client.cards.enemy_void().contains(&target_id), "target dissolved to void");
 }
+
+#[test]
+fn dual_activated_abilities_each_usable_once_per_turn() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    let character_id =
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestDualActivatedAbilityCharacter);
+
+    assert_eq!(s.user_client.cards.user_hand().len(), 2, "two activated ability tokens in hand");
+    assert_eq!(s.user_client.me.energy(), Energy(99), "initial energy");
+
+    let token1_id = format!("A{character_id}/0");
+    let token2_id = format!("A{character_id}/1");
+
+    assert!(
+        s.user_client.cards.card_map.contains_key(&token1_id),
+        "first activated ability token should be in hand"
+    );
+    assert!(
+        s.user_client.cards.card_map.contains_key(&token2_id),
+        "second activated ability token should be in hand"
+    );
+
+    s.activate_ability(DisplayPlayer::User, &character_id, 0);
+    assert_eq!(s.user_client.cards.user_hand().len(), 2, "drew card from first ability");
+    assert_eq!(s.user_client.me.energy(), Energy(98), "energy spent on first ability");
+
+    let initial_spark = s.user_client.cards.get_revealed(&character_id).spark;
+
+    s.activate_ability(DisplayPlayer::User, &character_id, 1);
+    assert_eq!(
+        s.user_client.cards.user_hand().len(),
+        3,
+        "hand size increased by draw 2 cards ability"
+    );
+    assert_eq!(s.user_client.me.energy(), Energy(96), "energy spent on second ability");
+
+    let final_spark = s.user_client.cards.get_revealed(&character_id).spark;
+    assert_eq!(final_spark, initial_spark, "character spark unchanged by card draw ability");
+
+    let token1_after = s.user_client.cards.card_map.get(&token1_id);
+    let token2_after = s.user_client.cards.card_map.get(&token2_id);
+
+    assert!(token1_after.is_none(), "first ability token should be used and not available");
+    assert!(token2_after.is_none(), "second ability token should be used and not available");
+}
+
+#[test]
+fn dual_activated_abilities_regenerate_next_turn() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    let character_id =
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestDualActivatedAbilityCharacter);
+
+    s.activate_ability(DisplayPlayer::User, &character_id, 0);
+    s.activate_ability(DisplayPlayer::User, &character_id, 1);
+
+    assert_eq!(
+        s.user_client.cards.user_hand().len(),
+        3,
+        "drawn cards remain in hand (1 + 2 cards)"
+    );
+
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+    s.end_turn_remove_opponent_hand(DisplayPlayer::Enemy);
+
+    assert_eq!(
+        s.user_client.cards.user_hand().len(),
+        2,
+        "only tokens regenerated (drawn cards don't persist through turns)"
+    );
+
+    let token1_id = format!("A{character_id}/0");
+    let token2_id = format!("A{character_id}/1");
+
+    assert!(
+        s.user_client.cards.card_map.contains_key(&token1_id),
+        "first activated ability token should be regenerated"
+    );
+    assert!(
+        s.user_client.cards.card_map.contains_key(&token2_id),
+        "second activated ability token should be regenerated"
+    );
+
+    s.activate_ability(DisplayPlayer::User, &character_id, 0);
+    s.activate_ability(DisplayPlayer::User, &character_id, 1);
+
+    assert_eq!(s.user_client.me.energy(), Energy(97), "energy after using abilities in new turn");
+}
+
+#[test]
+fn dual_activated_abilities_independent_usage() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    let character_id =
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestDualActivatedAbilityCharacter);
+
+    s.activate_ability(DisplayPlayer::User, &character_id, 1);
+    assert_eq!(s.user_client.me.energy(), Energy(97), "energy spent on second ability only");
+
+    let token1_id = format!("A{character_id}/0");
+    let token2_id = format!("A{character_id}/1");
+
+    assert!(
+        s.user_client.cards.card_map.contains_key(&token1_id),
+        "first ability token should still be available"
+    );
+    assert!(
+        s.user_client.cards.card_map.get(&token2_id).is_none(),
+        "second ability token should be used"
+    );
+
+    s.activate_ability(DisplayPlayer::User, &character_id, 0);
+    assert_eq!(s.user_client.me.energy(), Energy(96), "energy spent on first ability");
+
+    assert!(
+        s.user_client.cards.card_map.get(&token1_id).is_none(),
+        "first ability token should now be used"
+    );
+}
+
+#[test]
+fn dual_activated_abilities_different_effects() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    let character_id =
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestDualActivatedAbilityCharacter);
+
+    let initial_hand_size = s.user_client.cards.user_hand().len();
+
+    s.activate_ability(DisplayPlayer::User, &character_id, 0);
+    assert_eq!(
+        s.user_client.cards.user_hand().len(),
+        initial_hand_size,
+        "hand size increased by draw 1 card (token removed, card added)"
+    );
+
+    s.activate_ability(DisplayPlayer::User, &character_id, 1);
+    assert_eq!(
+        s.user_client.cards.user_hand().len(),
+        initial_hand_size + 1,
+        "hand size increased by 1 net (token removed, 2 cards added)"
+    );
+
+    let final_energy = s.user_client.me.energy();
+    assert_eq!(final_energy, Energy(96), "spent 3 energy total (1 + 2)");
+}
+
+#[test]
+fn dual_activated_abilities_different_costs() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(4).build()).connect();
+
+    let character_id =
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestDualActivatedAbilityCharacter);
+
+    s.activate_ability(DisplayPlayer::User, &character_id, 0);
+    assert_eq!(s.user_client.me.energy(), Energy(3), "spent 1 energy on first ability");
+
+    s.activate_ability(DisplayPlayer::User, &character_id, 1);
+    assert_eq!(s.user_client.me.energy(), Energy(1), "spent 2 energy on second ability");
+
+    let token1_id = format!("A{character_id}/0");
+    let token2_id = format!("A{character_id}/1");
+
+    assert!(s.user_client.cards.card_map.get(&token1_id).is_none(), "first ability used");
+    assert!(s.user_client.cards.card_map.get(&token2_id).is_none(), "second ability used");
+}

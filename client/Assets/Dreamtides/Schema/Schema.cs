@@ -2237,7 +2237,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitMulligan, ToggleOrderSelectorVisibility };
 
-    public enum CardName { TestActivatedAbilityDrawCardCharacter, TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestMultiActivatedAbilityDrawCardCharacter, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
+    public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCardCharacter, TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestMultiActivatedAbilityDrawCardCharacter, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
 
     /// <summary>
     /// Identifies a player in an ongoing battle.
@@ -3290,6 +3290,8 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
+                case "TestActivatedAbilityDissolveCharacter":
+                    return CardName.TestActivatedAbilityDissolveCharacter;
                 case "TestActivatedAbilityDrawCardCharacter":
                     return CardName.TestActivatedAbilityDrawCardCharacter;
                 case "TestCounterspell":
@@ -3300,6 +3302,8 @@ namespace Dreamtides.Schema
                     return CardName.TestDissolve;
                 case "TestDrawOne":
                     return CardName.TestDrawOne;
+                case "TestDualActivatedAbilityCharacter":
+                    return CardName.TestDualActivatedAbilityCharacter;
                 case "TestFastActivatedAbilityDrawCardCharacter":
                     return CardName.TestFastActivatedAbilityDrawCardCharacter;
                 case "TestFastMultiActivatedAbilityDrawCardCharacter":
@@ -3328,6 +3332,9 @@ namespace Dreamtides.Schema
             var value = (CardName)untypedValue;
             switch (value)
             {
+                case CardName.TestActivatedAbilityDissolveCharacter:
+                    serializer.Serialize(writer, "TestActivatedAbilityDissolveCharacter");
+                    return;
                 case CardName.TestActivatedAbilityDrawCardCharacter:
                     serializer.Serialize(writer, "TestActivatedAbilityDrawCardCharacter");
                     return;
@@ -3342,6 +3349,9 @@ namespace Dreamtides.Schema
                     return;
                 case CardName.TestDrawOne:
                     serializer.Serialize(writer, "TestDrawOne");
+                    return;
+                case CardName.TestDualActivatedAbilityCharacter:
+                    serializer.Serialize(writer, "TestDualActivatedAbilityCharacter");
                     return;
                 case CardName.TestFastActivatedAbilityDrawCardCharacter:
                     serializer.Serialize(writer, "TestFastActivatedAbilityDrawCardCharacter");
