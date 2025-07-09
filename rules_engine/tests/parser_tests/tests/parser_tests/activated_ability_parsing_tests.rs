@@ -44,7 +44,6 @@ fn test_fast_activated_grant_aegis() {
         )),
         options: Some(ActivatedAbilityOptions(
           isFast: true,
-          isImmediate: false,
           isMulti: false,
         )),
       )),
@@ -71,7 +70,6 @@ fn test_activated_spark_equal_to_warriors() {
         )),
         options: Some(ActivatedAbilityOptions(
           isFast: true,
-          isImmediate: false,
           isMulti: false,
         )),
       )),
@@ -95,7 +93,6 @@ fn test_multi_activated_draw() {
         )),
         options: Some(ActivatedAbilityOptions(
           isFast: false,
-          isImmediate: false,
           isMulti: true,
         )),
       )),
@@ -141,7 +138,6 @@ fn test_activated_ability_multiple_costs() {
         )),
         options: Some(ActivatedAbilityOptions(
           isFast: false,
-          isImmediate: false,
           isMulti: true,
         )),
       )),
@@ -274,9 +270,8 @@ fn test_discard_warriors_gain_energy() {
 }
 
 #[test]
-fn test_immediate_activated_banish_materialize() {
-    let result =
-        parse("$immediate $activated: Banish another character you control, then materialize it.");
+fn test_activated_banish_materialize() {
+    let result = parse("$activated: Banish another character you control, then materialize it.");
     assert_ron_snapshot!(
         result,
         @r###"
@@ -301,11 +296,7 @@ fn test_immediate_activated_banish_materialize() {
             condition: None,
           ),
         ]),
-        options: Some(ActivatedAbilityOptions(
-          isFast: false,
-          isImmediate: true,
-          isMulti: false,
-        )),
+        options: None,
       )),
     ]
     "###
@@ -315,7 +306,7 @@ fn test_immediate_activated_banish_materialize() {
 #[test]
 fn test_immediate_multi_activated() {
     let result = parse(
-        "$immediate $multiActivated Abandon another character: Put the top 2 cards of your deck into your void.",
+        "$multiActivated Abandon another character: Put the top 2 cards of your deck into your void.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -328,7 +319,6 @@ fn test_immediate_multi_activated() {
         )),
         options: Some(ActivatedAbilityOptions(
           isFast: false,
-          isImmediate: true,
           isMulti: true,
         )),
       )),

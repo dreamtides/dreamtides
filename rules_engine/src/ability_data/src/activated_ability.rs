@@ -25,10 +25,6 @@ pub struct ActivatedAbilityOptions {
     /// True if this ability can be activated in response to enemy game actions.
     pub is_fast: bool,
 
-    /// True if this ability can be used on the turn in which its controlling
-    /// character was played.
-    pub is_immediate: bool,
-
     /// True if this ability can be used multiple times per turn.
     pub is_multi: bool,
 }

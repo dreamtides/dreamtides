@@ -366,7 +366,6 @@ fn test_multi_activated_dissolve_with_abandoned_spark() {
         )),
         options: Some(ActivatedAbilityOptions(
           isFast: false,
-          isImmediate: false,
           isMulti: true,
         )),
       )),
@@ -1171,7 +1170,6 @@ fn test_materialize_copy_character() {
         )),
         options: Some(ActivatedAbilityOptions(
           isFast: false,
-          isImmediate: false,
           isMulti: true,
         )),
       )),
@@ -1213,7 +1211,7 @@ fn test_put_cards_from_void_on_top_of_deck() {
     "###);
 
     let result = parse(
-        "$immediate $fastMultiActivated Abandon another character: You may put a character from your void on top of your deck.",
+        "$fastMultiActivated Abandon another character: You may put a character from your void on top of your deck.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -1232,7 +1230,6 @@ fn test_put_cards_from_void_on_top_of_deck() {
         )),
         options: Some(ActivatedAbilityOptions(
           isFast: true,
-          isImmediate: true,
           isMulti: true,
         )),
       )),
