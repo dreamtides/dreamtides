@@ -197,6 +197,7 @@ fn build_ability_list(
         compute_event_additional_cost_restriction(&ability_list),
     ]);
     ability_list.battlefield_triggers = battlefield_triggers(&ability_list);
+    ability_list.has_battlefield_activated_abilities = !ability_list.activated_abilities.is_empty();
     ability_list
 }
 

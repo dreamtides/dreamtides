@@ -25,6 +25,10 @@ pub struct AbilityList {
 
     /// Triggers which can fire when this card is on the battlefield.
     pub battlefield_triggers: EnumSet<TriggerName>,
+
+    /// Indicates whether this card has activated abilities that can be used on
+    /// the battlefield.
+    pub has_battlefield_activated_abilities: bool,
 }
 
 /// Wrapper around an ability which stores additional metadata.

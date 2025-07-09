@@ -163,10 +163,16 @@ pub fn to_destination_zone(
 }
 
 fn on_leave_battlefield(battle: &mut BattleState, controller: PlayerName, card_id: CardId) {
-    let triggers = card_abilities::query(battle, card_id).battlefield_triggers;
+    let ability_list = card_abilities::query(battle, card_id);
+    let triggers = ability_list.battlefield_triggers;
     for trigger in triggers {
         battle.triggers.listeners.remove_listener(trigger, card_id);
     }
+
+    if ability_list.has_battlefield_activated_abilities {
+        battle.activated_abilities.player_mut(controller).characters.remove(CharacterId(card_id));
+    }
+
     battle.cards.battlefield_state_mut(controller).remove(&CharacterId(card_id));
 }
 
@@ -176,15 +182,22 @@ fn on_enter_battlefield(
     controller: PlayerName,
     card_id: CardId,
 ) {
-    let triggers = card_abilities::query(battle, card_id).battlefield_triggers;
+    let ability_list = card_abilities::query(battle, card_id);
+    let triggers = ability_list.battlefield_triggers;
     for trigger in triggers {
         battle.triggers.listeners.add_listener(trigger, card_id);
     }
+
     let id = CharacterId(card_id);
     let Some(spark) = card_properties::base_spark(battle, id) else {
         panic_no_base_spark(battle, id);
     };
     battle.cards.battlefield_state_mut(controller).insert(id, CharacterState { spark });
+
+    if ability_list.has_battlefield_activated_abilities {
+        battle.activated_abilities.player_mut(controller).characters.insert(id);
+    }
+
     battle.triggers.push(source, Trigger::Materialized(id));
 }
 
