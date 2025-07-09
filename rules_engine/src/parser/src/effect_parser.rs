@@ -41,7 +41,7 @@ fn optional_effect<'a>() -> impl Parser<'a, &'a str, EffectWithOptions, ErrorTyp
         .map(|(maybe_cost, game_effect)| EffectWithOptions {
             effect: game_effect,
             optional: true,
-            cost: maybe_cost,
+            trigger_cost: maybe_cost,
             condition: None,
         })
 }

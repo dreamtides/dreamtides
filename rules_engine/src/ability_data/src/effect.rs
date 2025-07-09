@@ -25,21 +25,21 @@ pub struct EffectWithOptions {
     pub optional: bool,
 
     /// A cost to apply this effect, if any. Usually written as "You may pay
-    /// {cost} to perform {effect}" on activated or triggered ability cards.
+    /// {cost} to perform {effect}" on triggered abilities.
     ///
     /// This is used for costs that apply on resolution of the effect. It is
     /// *not* used for additional costs to play event cards, which are paid
     /// before placing the card on the stack.
-    pub cost: Option<Cost>,
+    pub trigger_cost: Option<Cost>,
 
-    /// Indicates an effect set which occurs only if some condition is met,
+    /// Indicates an effect which occurs only if some condition is met,
     /// usually phrased as "If {condition}, {effect}"
     pub condition: Option<Condition>,
 }
 
 impl EffectWithOptions {
     pub fn new(effect: StandardEffect) -> Self {
-        Self { effect, optional: false, cost: None, condition: None }
+        Self { effect, optional: false, trigger_cost: None, condition: None }
     }
 
     pub fn with_condition(&self, condition: Condition) -> Self {
@@ -49,7 +49,7 @@ impl EffectWithOptions {
     }
 
     pub fn to_effect(self) -> Effect {
-        if !self.optional && self.condition.is_none() && self.cost.is_none() {
+        if !self.optional && self.condition.is_none() && self.trigger_cost.is_none() {
             Effect::Effect(self.effect)
         } else {
             Effect::WithOptions(self)
