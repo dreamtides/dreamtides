@@ -13,8 +13,8 @@ pub struct ActivatedAbilityState {
     /// considered here.
     pub characters: CardSet<CharacterId>,
 
-    /// Activated abilities which have been activated this turn.
+    /// Activated abilities which have been activated this turn cycle.
     ///
     /// Used for tracking once-per-turn abilities.
-    pub activated_this_turn: BTreeSet<ActivatedAbilityId>,
+    pub activated_this_turn_cycle: BTreeSet<ActivatedAbilityId>,
 }

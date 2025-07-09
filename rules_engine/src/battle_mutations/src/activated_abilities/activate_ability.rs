@@ -26,6 +26,12 @@ pub fn execute(
 
     let source = EffectSource::Activated { controller: player, activated_ability_id };
 
+    battle
+        .activated_abilities
+        .player_mut(player)
+        .activated_this_turn_cycle
+        .insert(activated_ability_id);
+
     for cost in &ability_data.ability.costs {
         pay_cost::execute(battle, source, player, cost);
     }

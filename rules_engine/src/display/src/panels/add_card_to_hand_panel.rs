@@ -77,7 +77,25 @@ impl Component for AddCardToHandPanel<'_> {
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestActivatedAbilityCharacter)
+                                        .card(CardName::TestActivatedAbilityDrawCardCharacter)
+                                        .user_player(self.user_player)
+                                        .build(),
+                                )
+                                .child(
+                                    AddCardCell::builder()
+                                        .card(CardName::TestMultiActivatedAbilityDrawCardCharacter)
+                                        .user_player(self.user_player)
+                                        .build(),
+                                )
+                                .child(
+                                    AddCardCell::builder()
+                                        .card(CardName::TestFastActivatedAbilityDrawCardCharacter)
+                                        .user_player(self.user_player)
+                                        .build(),
+                                )
+                                .child(
+                                    AddCardCell::builder()
+                                        .card(CardName::TestFastMultiActivatedAbilityDrawCardCharacter)
                                         .user_player(self.user_player)
                                         .build(),
                                 )

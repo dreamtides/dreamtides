@@ -146,7 +146,16 @@ pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
-        CardName::TestActivatedAbilityCharacter => SpriteAddress::new(
+        CardName::TestActivatedAbilityDrawCardCharacter => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
+        ),
+        CardName::TestMultiActivatedAbilityDrawCardCharacter => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
+        ),
+        CardName::TestFastActivatedAbilityDrawCardCharacter => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
+        ),
+        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
     }
@@ -186,8 +195,17 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
             "Whenever you play a card during the enemy's turn, this character gains +2 spark.".to_string()
         }
-        CardName::TestActivatedAbilityCharacter => {
-            "1\u{f7e4}: Draw a card.".to_string()
+        CardName::TestActivatedAbilityDrawCardCharacter => {
+            "1\u{f7e4} -> Draw a card.".to_string()
+        }
+        CardName::TestMultiActivatedAbilityDrawCardCharacter => {
+            "[multi] 1\u{f7e4} -> Draw a card.".to_string()
+        }
+        CardName::TestFastActivatedAbilityDrawCardCharacter => {
+            "[fast] 1\u{f7e4} -> Draw a card.".to_string()
+        }
+        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => {
+            "[fast][multi] 1\u{f7e4} -> Draw a card.".to_string()
         }
     };
 

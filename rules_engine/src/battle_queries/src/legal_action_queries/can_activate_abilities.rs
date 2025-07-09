@@ -23,13 +23,9 @@ pub fn for_player(
         let abilities = card_abilities::query(battle, character_id);
 
         for ability_data in &abilities.activated_abilities {
+            let options = ability_data.ability.options.as_ref();
             if fast_only == FastOnly::Yes {
-                let is_fast = ability_data
-                    .ability
-                    .options
-                    .as_ref()
-                    .map(|options| options.is_fast)
-                    .unwrap_or(false);
+                let is_fast = options.map(|options| options.is_fast).unwrap_or(false);
                 if !is_fast {
                     continue;
                 }
@@ -37,13 +33,25 @@ pub fn for_player(
 
             let can_pay_all_costs =
                 ability_data.ability.costs.iter().all(|cost| costs::can_pay(battle, player, cost));
-
-            if can_pay_all_costs {
-                activatable_abilities.push(ActivatedAbilityId {
-                    character_id,
-                    ability_number: ability_data.ability_number,
-                });
+            if !can_pay_all_costs {
+                continue;
             }
+
+            let activated_ability_id =
+                ActivatedAbilityId { character_id, ability_number: ability_data.ability_number };
+            let is_multi = options.map(|options| options.is_multi).unwrap_or(false);
+
+            if !is_multi
+                && battle
+                    .activated_abilities
+                    .player(player)
+                    .activated_this_turn_cycle
+                    .contains(&activated_ability_id)
+            {
+                continue;
+            }
+
+            activatable_abilities.push(activated_ability_id);
         }
     }
 

@@ -66,13 +66,31 @@ pub fn all_activated_abilities(
     character_id: CharacterId,
 ) -> Vec<CardView> {
     let abilities = card_abilities::query(battle, character_id);
+    let player = builder.act_for_player();
+
     abilities
         .activated_abilities
         .iter()
-        .map(|ability| {
+        .filter_map(|ability| {
             let ability_id =
                 ActivatedAbilityId { character_id, ability_number: ability.ability_number };
-            activated_ability_card_view(builder, battle, ability_id)
+
+            let options = ability.ability.options.as_ref();
+            let is_multi = options.map(|options| options.is_multi).unwrap_or(false);
+
+            // If the ability is not multi-use, and has already been activated this turn
+            // cycle, don't show it.
+            if !is_multi
+                && battle
+                    .activated_abilities
+                    .player(player)
+                    .activated_this_turn_cycle
+                    .contains(&ability_id)
+            {
+                return None;
+            }
+
+            Some(activated_ability_card_view(builder, battle, ability_id))
         })
         .collect()
 }
@@ -117,6 +135,16 @@ pub fn activated_ability_card_view(
             .maybe_cost(cost)
             .maybe_card_type(Some("Activated Ability".to_string()))
             .rules_text(card_rendering::rules_text(battle, character_card_id))
+            .create_position(ObjectPosition {
+                position: Position::HiddenWithinCard(adapter::client_card_id(character_card_id)),
+                sorting_key: 0,
+                sorting_sub_key: 0,
+            })
+            .destroy_position(ObjectPosition {
+                position: Position::HiddenWithinCard(adapter::client_card_id(character_card_id)),
+                sorting_key: 0,
+                sorting_sub_key: 0,
+            })
             .actions(CardActions {
                 can_play: if is_legal_action { activate_action } else { None },
                 play_effect_preview: if is_legal_action {

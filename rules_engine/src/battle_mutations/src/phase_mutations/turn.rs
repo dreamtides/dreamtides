@@ -27,6 +27,7 @@ pub fn start_turn(battle: &mut BattleState, player: PlayerName) {
     fire_triggers::execute_if_no_active_prompt(battle);
 
     battle_trace!("Starting turn for", battle, player);
+    battle.activated_abilities.player_mut(player).activated_this_turn_cycle.clear();
     battle.turn.active_player = player;
     battle.turn.turn_id += TurnId(1);
     if battle.turn.turn_id > TurnId(50) {
