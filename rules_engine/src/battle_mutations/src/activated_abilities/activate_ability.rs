@@ -1,5 +1,6 @@
 use battle_queries::battle_card_queries::card_abilities;
 use battle_queries::{battle_trace, panic_with};
+use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::ActivatedAbilityId;
 use battle_state::core::effect_source::EffectSource;
@@ -14,6 +15,11 @@ pub fn execute(
     activated_ability_id: ActivatedAbilityId,
 ) {
     battle_trace!("Activating ability", battle, player, activated_ability_id);
+    let source = EffectSource::Activated { controller: player, activated_ability_id };
+    battle.push_animation(source, || BattleAnimation::ActivateAbility {
+        player,
+        activated_ability_id,
+    });
 
     let abilities = card_abilities::query(battle, activated_ability_id.character_id);
     let Some(ability_data) = abilities
@@ -23,8 +29,6 @@ pub fn execute(
     else {
         panic_with!("Activated ability not found", battle, activated_ability_id);
     };
-
-    let source = EffectSource::Activated { controller: player, activated_ability_id };
 
     battle
         .activated_abilities

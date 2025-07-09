@@ -51,7 +51,13 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
 
     cards.extend(
         battle.activated_abilities.player(builder.display_for_player()).characters.iter().flat_map(
-            |character_id| token_rendering::all_activated_abilities(builder, battle, character_id),
+            |character_id| {
+                token_rendering::all_user_character_activated_abilities(
+                    builder,
+                    battle,
+                    character_id,
+                )
+            },
         ),
     );
 

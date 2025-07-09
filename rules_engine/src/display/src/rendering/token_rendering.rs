@@ -60,7 +60,7 @@ pub fn trigger_card_view(
 }
 
 /// Returns a list of all activated ability views for a character.
-pub fn all_activated_abilities(
+pub fn all_user_character_activated_abilities(
     builder: &ResponseBuilder,
     battle: &BattleState,
     character_id: CharacterId,
@@ -78,8 +78,8 @@ pub fn all_activated_abilities(
             let options = ability.ability.options.as_ref();
             let is_multi = options.map(|options| options.is_multi).unwrap_or(false);
 
-            // If the ability is not multi-use, and has already been activated this turn
-            // cycle, don't show it.
+            // If the ability is not multi-use and has already been activated
+            // this turn cycle, don't show it.
             if !is_multi
                 && battle
                     .activated_abilities
@@ -90,12 +90,24 @@ pub fn all_activated_abilities(
                 return None;
             }
 
+            // If a multi-use ability is currently being activated, don't show
+            // it during incremental animations so the ability "goes away" when
+            // used and then comes back at the end. This just looks nicer than
+            // having it immediately return to hand.
+            if let Some(currently_activating_ability) = builder.currently_activating_ability()
+                && is_multi
+                && currently_activating_ability.activated_ability_id == ability_id
+                && builder.is_for_animation()
+            {
+                return None;
+            }
+
             Some(activated_ability_card_view(builder, battle, ability_id))
         })
         .collect()
 }
 
-pub fn activated_ability_card_view(
+fn activated_ability_card_view(
     builder: &ResponseBuilder,
     battle: &BattleState,
     ability: ActivatedAbilityId,

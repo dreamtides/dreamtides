@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use battle_state::battle::battle_animation::TriggerAnimation;
+use battle_state::battle::card_id::ActivatedAbilityId;
 use core_data::identifiers::UserId;
 use core_data::types::PlayerName;
 use display_data::battle_view::{BattleView, DisplayPlayer};
@@ -32,6 +33,15 @@ pub struct ResponseBuilder {
 
     /// Triggers which are currently active.
     active_triggers: Vec<TriggerAnimation>,
+
+    /// Ability which is currently being activated.
+    currently_activating_ability: Option<CurrentlyActivatingAbility>,
+}
+
+#[derive(Clone, Debug, Copy)]
+pub struct CurrentlyActivatingAbility {
+    pub player: PlayerName,
+    pub activated_ability_id: ActivatedAbilityId,
 }
 
 impl ResponseBuilder {
@@ -45,6 +55,7 @@ impl ResponseBuilder {
             for_animation: false,
             pending_commands: Vec::new(),
             active_triggers: Vec::new(),
+            currently_activating_ability: None,
         }
     }
 
@@ -63,6 +74,7 @@ impl ResponseBuilder {
             for_animation: false,
             pending_commands: Vec::new(),
             active_triggers: Vec::new(),
+            currently_activating_ability: None,
         }
     }
 
@@ -154,5 +166,16 @@ impl ResponseBuilder {
 
     pub fn active_triggers(&self) -> &[TriggerAnimation] {
         &self.active_triggers
+    }
+
+    pub fn set_currently_activating_ability(
+        &mut self,
+        currently_activating_ability: CurrentlyActivatingAbility,
+    ) {
+        self.currently_activating_ability = Some(currently_activating_ability);
+    }
+
+    pub fn currently_activating_ability(&self) -> Option<CurrentlyActivatingAbility> {
+        self.currently_activating_ability
     }
 }

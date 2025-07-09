@@ -3,7 +3,7 @@ use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::PlayerName;
 use strum::{Display, EnumDiscriminants};
 
-use crate::battle::card_id::{CardId, CharacterId, HandCardId, StackCardId};
+use crate::battle::card_id::{ActivatedAbilityId, CardId, CharacterId, HandCardId, StackCardId};
 use crate::battle_cards::stack_card_state::EffectTargets;
 use crate::prompt_types::prompt_data::PromptChoiceLabel;
 
@@ -11,6 +11,10 @@ use crate::prompt_types::prompt_data::PromptChoiceLabel;
 #[derive(Clone, Debug, EnumDiscriminants)]
 #[strum_discriminants(derive(Display))]
 pub enum BattleAnimation {
+    ActivateAbility {
+        player: PlayerName,
+        activated_ability_id: ActivatedAbilityId,
+    },
     Counterspell {
         target_id: StackCardId,
     },
