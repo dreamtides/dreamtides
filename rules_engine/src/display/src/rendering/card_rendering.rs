@@ -158,6 +158,9 @@ pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
         CardName::TestFastMultiActivatedAbilityDrawCardCharacter => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
+        CardName::TestActivatedAbilityDissolveCharacter => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
+        ),
     }
 }
 
@@ -206,6 +209,9 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         }
         CardName::TestFastMultiActivatedAbilityDrawCardCharacter => {
             "[fast][multi] 1\u{f7e4} -> Draw a card.".to_string()
+        }
+        CardName::TestActivatedAbilityDissolveCharacter => {
+            "2\u{f7e4} -> <b>Dissolve</b> an enemy character.".to_string()
         }
     };
 

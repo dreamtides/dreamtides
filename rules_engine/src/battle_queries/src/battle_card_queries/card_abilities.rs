@@ -37,6 +37,7 @@ static TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: OnceLock<AbilityList> =
 static TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: OnceLock<AbilityList> = OnceLock::new();
 static TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: OnceLock<AbilityList> =
     OnceLock::new();
+static TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER: OnceLock<AbilityList> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static AbilityList {
     query_by_name(card::get(battle, card_id).name)
@@ -205,6 +206,24 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                         options: Some(ActivatedAbilityOptions { is_multi: true, is_fast: true }),
                     }),
                     AbilityConfiguration::default(),
+                )])
+            })
+        }
+        CardName::TestActivatedAbilityDissolveCharacter => {
+            TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER.get_or_init(|| {
+                build_ability_list(vec![(
+                    AbilityNumber(0),
+                    Ability::Activated(ActivatedAbility {
+                        costs: vec![Cost::Energy(Energy(2))],
+                        effect: Effect::Effect(StandardEffect::DissolveCharacter {
+                            target: Predicate::Enemy(CardPredicate::Character),
+                        }),
+                        options: None,
+                    }),
+                    AbilityConfiguration {
+                        targeting_prompt: Some("Select an enemy character.".to_string()),
+                        ..Default::default()
+                    },
                 )])
             })
         }

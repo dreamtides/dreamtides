@@ -434,3 +434,105 @@ fn activate_ability_fast_can_respond_during_enemy_turn() {
     s.perform_user_action(BattleAction::PassPriority);
     assert_eq!(s.user_client.cards.stack_cards().len(), 0, "enemy card resolved");
 }
+
+#[test]
+fn activate_ability_with_targeting_dissolve_enemy_character() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    let dissolve_character_id =
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDissolveCharacter);
+    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    // Give enemy an additional card so they have multiple legal actions
+    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+
+    assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "enemy character on battlefield");
+    assert_eq!(s.user_client.cards.enemy_void().len(), 0, "enemy void empty");
+    assert_eq!(s.user_client.me.energy(), Energy(99), "initial energy");
+
+    s.activate_ability(DisplayPlayer::User, &dissolve_character_id, 0);
+
+    // Ability should go on stack with target auto-selected (only one target)
+    assert_eq!(s.user_client.cards.stack_cards().len(), 1, "activated ability on stack");
+    assert_eq!(s.user_client.me.energy(), Energy(97), "energy spent on activation");
+
+    // Enemy passes priority to resolve the ability
+    s.perform_enemy_action(BattleAction::PassPriority);
+
+    // Check that the dissolve effect worked
+    assert_eq!(s.user_client.cards.enemy_battlefield().len(), 0, "enemy character dissolved");
+    assert_eq!(s.user_client.cards.enemy_void().len(), 1, "enemy character in void");
+    assert_eq!(s.user_client.cards.stack_cards().len(), 0, "stack empty after resolution");
+    assert!(
+        s.user_client.cards.enemy_void().contains(&target_id),
+        "target character in enemy void"
+    );
+}
+
+#[test]
+fn activate_ability_with_targeting_multiple_targets() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    let dissolve_character_id =
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDissolveCharacter);
+    let target1_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let target2_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    // Give enemy an additional card so they have multiple legal actions
+    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+
+    assert_eq!(
+        s.user_client.cards.enemy_battlefield().len(),
+        2,
+        "two enemy characters on battlefield"
+    );
+
+    s.activate_ability(DisplayPlayer::User, &dissolve_character_id, 0);
+    s.select_target(DisplayPlayer::User, &target1_id);
+
+    // Enemy passes priority to resolve the ability
+    s.perform_enemy_action(BattleAction::PassPriority);
+
+    assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "one enemy character remains");
+    assert_eq!(s.user_client.cards.enemy_void().len(), 1, "one enemy character dissolved");
+    assert!(s.user_client.cards.enemy_void().contains(&target1_id), "correct target dissolved");
+    assert!(s.user_client.cards.enemy_battlefield().contains(&target2_id), "other target remains");
+}
+
+#[test]
+fn activate_ability_with_targeting_works_on_stack() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    let dissolve_character_id =
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDissolveCharacter);
+    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    // Give enemy an additional card so they have multiple legal actions
+    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+
+    assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "enemy character on battlefield");
+    assert_eq!(s.user_client.cards.stack_cards().len(), 0, "stack empty initially");
+
+    s.activate_ability(DisplayPlayer::User, &dissolve_character_id, 0);
+
+    // Ability should be on stack waiting for resolution
+    assert_eq!(s.user_client.cards.stack_cards().len(), 1, "activated ability on stack");
+    assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "target still on battlefield");
+
+    // Enemy passes priority to resolve the ability
+    s.perform_enemy_action(BattleAction::PassPriority);
+
+    // Now the effect should have resolved
+    assert_eq!(s.user_client.cards.stack_cards().len(), 0, "stack empty after resolution");
+    assert_eq!(s.user_client.cards.enemy_battlefield().len(), 0, "target dissolved");
+    assert!(s.user_client.cards.enemy_void().contains(&target_id), "target dissolved to void");
+}
