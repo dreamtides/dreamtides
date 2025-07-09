@@ -33,17 +33,17 @@ namespace Dreamtides.Services
       {
         if (i < command.Cards.Count - 1)
         {
-          StartCoroutine(DrawUserCard(command, i));
+          StartCoroutine(DrawUserCard(command, i, isLastCard: false));
           yield return new WaitForSeconds(command.StaggerInterval.ToSeconds());
         }
         else
         {
-          yield return DrawUserCard(command, i);
+          yield return DrawUserCard(command, i, isLastCard: true);
         }
       }
     }
 
-    IEnumerator DrawUserCard(DrawUserCardsCommand command, int index)
+    IEnumerator DrawUserCard(DrawUserCardsCommand command, int index, bool isLastCard)
     {
       var cardView = command.Cards[index];
       var card = Registry.LayoutService.GetCard(cardView.Id);
@@ -69,7 +69,11 @@ namespace Dreamtides.Services
       yield return new WaitForSeconds(moveDuration + command.PauseDuration.ToSeconds());
 
       Registry.Layout.UserHand.Add(card);
-      Registry.Layout.UserHand.ApplyLayout(TweenUtils.Sequence("DrawUserCardMoveToHand"));
+      if (!isLastCard)
+      {
+        // Running this on the last card will conflict with LayoutService.ApplyLayout.
+        Registry.Layout.UserHand.ApplyLayout(TweenUtils.Sequence("DrawUserCardMoveToHand"));
+      }
     }
 
     /// <summary>
