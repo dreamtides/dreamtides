@@ -80,7 +80,7 @@ fn test_abandon_and_gain_energy_for_spark() {
               energy_per_spark: Energy(1),
             ),
             optional: false,
-            cost: None,
+            triggerCost: None,
             condition: None,
           ),
           EffectWithOptions(
@@ -88,7 +88,7 @@ fn test_abandon_and_gain_energy_for_spark() {
               count: 1,
             ),
             optional: false,
-            cost: None,
+            triggerCost: None,
             condition: None,
           ),
         ]),

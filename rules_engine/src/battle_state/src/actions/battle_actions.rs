@@ -1,3 +1,4 @@
+use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -15,6 +16,8 @@ pub enum BattleAction {
     Debug(DebugBattleAction),
     /// Play a card in the user's hand.
     PlayCardFromHand(HandCardId),
+    /// Activate a character's ability.
+    ActivateAbility { character_id: CharacterId, ability_number: AbilityNumber },
     /// Pass on taking actions in response to a card being played by the
     /// opponent, thus causing the stack to be resolved.
     PassPriority,
@@ -65,6 +68,9 @@ impl BattleAction {
         match self {
             BattleAction::Debug(..) => "DEBUG".to_string(),
             BattleAction::PlayCardFromHand(hand_card_id) => format!("PCFH{:?}", hand_card_id.0.0),
+            BattleAction::ActivateAbility { character_id, ability_number } => {
+                format!("AA{:?}{:?}", character_id.0.0, ability_number.0)
+            }
             BattleAction::PassPriority => "PP".to_string(),
             BattleAction::EndTurn => "ET".to_string(),
             BattleAction::StartNextTurn => "SNT".to_string(),

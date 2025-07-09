@@ -1,0 +1,51 @@
+use battle_state::battle::battle_state::BattleState;
+use core_data::types::PlayerName;
+
+use crate::battle_card_queries::card_abilities;
+use crate::battle_player_queries::costs;
+use crate::legal_action_queries::can_play_cards::FastOnly;
+use crate::legal_action_queries::legal_actions_data::ActivatableAbility;
+
+/// Returns the set of abilities that are activatable by a player based on their
+/// own internal state & costs. If `fast_only` is set, only abilities with the
+/// `fast` property are returned.
+///
+/// This does *not* check whether it is legal to activate abilities in the
+/// larger current battle state, e.g. whether it is the player's turn.
+pub fn for_player(
+    battle: &BattleState,
+    player: PlayerName,
+    fast_only: FastOnly,
+) -> Vec<ActivatableAbility> {
+    let mut activatable_abilities = Vec::new();
+
+    for character_id in battle.activated_abilities.player(player).characters.iter() {
+        let abilities = card_abilities::query(battle, character_id);
+
+        for ability_data in &abilities.activated_abilities {
+            if fast_only == FastOnly::Yes {
+                let is_fast = ability_data
+                    .ability
+                    .options
+                    .as_ref()
+                    .map(|options| options.is_fast)
+                    .unwrap_or(false);
+                if !is_fast {
+                    continue;
+                }
+            }
+
+            let can_pay_all_costs =
+                ability_data.ability.costs.iter().all(|cost| costs::can_pay(battle, player, cost));
+
+            if can_pay_all_costs {
+                activatable_abilities.push(ActivatableAbility {
+                    character_id,
+                    ability_number: ability_data.ability_number,
+                });
+            }
+        }
+    }
+
+    activatable_abilities
+}

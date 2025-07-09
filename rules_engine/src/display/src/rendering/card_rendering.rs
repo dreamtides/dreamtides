@@ -146,6 +146,9 @@ pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
+        CardName::TestActivatedAbilityCharacter => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
+        ),
     }
 }
 
@@ -182,6 +185,9 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         }
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
             "Whenever you play a card during the enemy's turn, this character gains +2 spark.".to_string()
+        }
+        CardName::TestActivatedAbilityCharacter => {
+            "1\u{f7e4}: Draw a card.".to_string()
         }
     };
 

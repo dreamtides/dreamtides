@@ -828,6 +828,8 @@ namespace Dreamtides.Schema
     ///
     /// Play a card in the user's hand.
     ///
+    /// Activate a character's ability.
+    ///
     /// Select a character as a target
     ///
     /// Select a card on the stack as a target
@@ -846,6 +848,9 @@ namespace Dreamtides.Schema
         [JsonProperty("playCardFromHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? PlayCardFromHand { get; set; }
 
+        [JsonProperty("activateAbility", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public ActivateAbility ActivateAbility { get; set; }
+
         [JsonProperty("selectCharacterTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectCharacterTarget { get; set; }
 
@@ -860,6 +865,15 @@ namespace Dreamtides.Schema
 
         [JsonProperty("selectCardOrder", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SelectCardOrder SelectCardOrder { get; set; }
+    }
+
+    public partial class ActivateAbility
+    {
+        [JsonProperty("ability_number", Required = Required.Always)]
+        public long AbilityNumber { get; set; }
+
+        [JsonProperty("character_id", Required = Required.Always)]
+        public long CharacterId { get; set; }
     }
 
     /// <summary>
@@ -2220,7 +2234,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitMulligan, ToggleOrderSelectorVisibility };
 
-    public enum CardName { TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
+    public enum CardName { TestActivatedAbilityCharacter, TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
 
     /// <summary>
     /// Identifies a player in an ongoing battle.
@@ -3273,6 +3287,8 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
+                case "TestActivatedAbilityCharacter":
+                    return CardName.TestActivatedAbilityCharacter;
                 case "TestCounterspell":
                     return CardName.TestCounterspell;
                 case "TestCounterspellUnlessPays":
@@ -3303,6 +3319,9 @@ namespace Dreamtides.Schema
             var value = (CardName)untypedValue;
             switch (value)
             {
+                case CardName.TestActivatedAbilityCharacter:
+                    serializer.Serialize(writer, "TestActivatedAbilityCharacter");
+                    return;
                 case CardName.TestCounterspell:
                     serializer.Serialize(writer, "TestCounterspell");
                     return;

@@ -57,6 +57,7 @@ pub enum CardName {
     TestDrawOne,
     TestTriggerGainSparkWhenMaterializeAnotherCharacter,
     TestTriggerGainSparkOnPlayCardEnemyTurn,
+    TestActivatedAbilityCharacter,
 }
 
 /// Identifies an ability of a card.

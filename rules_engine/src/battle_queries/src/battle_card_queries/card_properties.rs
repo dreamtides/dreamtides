@@ -20,6 +20,7 @@ pub fn display_name(card_name: CardName) -> String {
             "Materialize Gain Spark".to_string()
         }
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => "Play Enemy Gain Spark".to_string(),
+        CardName::TestActivatedAbilityCharacter => "Activated Character".to_string(),
     }
 }
 
@@ -33,6 +34,7 @@ pub fn cost(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
         CardName::TestDrawOne => Some(Energy(0)),
         CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => Some(Energy(0)),
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => Some(Energy(2)),
+        CardName::TestActivatedAbilityCharacter => Some(Energy(0)),
     }
 }
 
@@ -50,6 +52,7 @@ pub fn base_spark(battle: &BattleState, card_id: impl CardIdType) -> Option<Spar
         CardName::TestVanillaCharacter => Some(Spark(5)),
         CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => Some(Spark(5)),
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => Some(Spark(5)),
+        CardName::TestActivatedAbilityCharacter => Some(Spark(3)),
         _ => None,
     }
 }
@@ -68,6 +71,7 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
             CardType::Character(CharacterType::Visitor)
         }
+        CardName::TestActivatedAbilityCharacter => CardType::Character(CharacterType::Warrior),
     }
 }
 
@@ -81,5 +85,6 @@ pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
         CardName::TestDrawOne => true,
         CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => false,
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => true,
+        CardName::TestActivatedAbilityCharacter => false,
     }
 }

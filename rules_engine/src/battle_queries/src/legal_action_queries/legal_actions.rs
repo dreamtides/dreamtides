@@ -4,6 +4,7 @@ use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
 
+use crate::legal_action_queries::can_activate_abilities;
 use crate::legal_action_queries::can_play_cards::{self, FastOnly};
 use crate::legal_action_queries::legal_actions_data::{
     LegalActions, PrimaryLegalAction, StandardLegalActions,
@@ -103,5 +104,6 @@ fn standard_legal_actions(
     StandardLegalActions {
         primary,
         play_card_from_hand: can_play_cards::from_hand(battle, player, fast_only),
+        activate_abilities: can_activate_abilities::for_player(battle, player, fast_only),
     }
 }

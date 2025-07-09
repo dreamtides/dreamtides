@@ -1,4 +1,5 @@
 pub mod actions;
+pub mod activated_abilities;
 pub mod card_mutations;
 pub mod character_mutations;
 pub mod effects;

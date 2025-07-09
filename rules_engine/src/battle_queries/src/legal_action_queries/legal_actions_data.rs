@@ -1,6 +1,7 @@
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::card_id::{CharacterId, HandCardId, StackCardId};
 use battle_state::battle_cards::card_set::CardSet;
+use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
 use fastrand;
 
@@ -21,6 +22,13 @@ pub enum LegalActions {
 pub struct StandardLegalActions {
     pub primary: PrimaryLegalAction,
     pub play_card_from_hand: Vec<HandCardId>,
+    pub activate_abilities: Vec<ActivatableAbility>,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct ActivatableAbility {
+    pub character_id: CharacterId,
+    pub ability_number: AbilityNumber,
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
@@ -37,6 +45,16 @@ impl LegalActions {
             BattleAction::PlayCardFromHand(hand_card_id) => {
                 if let LegalActions::Standard { actions } = self {
                     actions.play_card_from_hand.contains(&hand_card_id)
+                } else {
+                    false
+                }
+            }
+            BattleAction::ActivateAbility { character_id, ability_number } => {
+                if let LegalActions::Standard { actions } = self {
+                    actions.activate_abilities.iter().any(|ability| {
+                        ability.character_id == character_id
+                            && ability.ability_number == ability_number
+                    })
                 } else {
                     false
                 }
@@ -120,7 +138,8 @@ impl LegalActions {
             LegalActions::Standard { actions } => {
                 let primary_count = 1;
                 let play_cards_count = actions.play_card_from_hand.len();
-                primary_count + play_cards_count
+                let ability_count = actions.activate_abilities.len();
+                primary_count + play_cards_count + ability_count
             }
 
             LegalActions::SelectCharacterPrompt { valid } => valid.len(),
@@ -160,13 +179,29 @@ impl LegalActions {
                     {
                         Some(BattleAction::StartNextTurn)
                     }
-                    _ => standard_actions
-                        .play_card_from_hand
-                        .iter()
-                        .find(|&&card_id| {
-                            !actions.contains(&BattleAction::PlayCardFromHand(card_id))
-                        })
-                        .map(|card_id| BattleAction::PlayCardFromHand(*card_id)),
+                    _ => {
+                        if let Some(card_id) =
+                            standard_actions.play_card_from_hand.iter().find(|&&card_id| {
+                                !actions.contains(&BattleAction::PlayCardFromHand(card_id))
+                            })
+                        {
+                            Some(BattleAction::PlayCardFromHand(*card_id))
+                        } else {
+                            standard_actions
+                                .activate_abilities
+                                .iter()
+                                .find(|ability| {
+                                    !actions.contains(&BattleAction::ActivateAbility {
+                                        character_id: ability.character_id,
+                                        ability_number: ability.ability_number,
+                                    })
+                                })
+                                .map(|ability| BattleAction::ActivateAbility {
+                                    character_id: ability.character_id,
+                                    ability_number: ability.ability_number,
+                                })
+                        }
+                    }
                 }
             }
 
@@ -208,6 +243,13 @@ impl LegalActions {
 
                 for card_id in actions.play_card_from_hand.iter() {
                     result.push(BattleAction::PlayCardFromHand(*card_id));
+                }
+
+                for ability in actions.activate_abilities.iter() {
+                    result.push(BattleAction::ActivateAbility {
+                        character_id: ability.character_id,
+                        ability_number: ability.ability_number,
+                    });
                 }
 
                 result
@@ -256,11 +298,21 @@ impl LegalActions {
                         PrimaryLegalAction::StartNextTurn => BattleAction::StartNextTurn,
                     })
                 } else {
-                    let hand_card_index = index - 1;
-                    actions
-                        .play_card_from_hand
-                        .get(hand_card_index)
-                        .map(|card_id| BattleAction::PlayCardFromHand(*card_id))
+                    let remaining_index = index - 1;
+                    if remaining_index < actions.play_card_from_hand.len() {
+                        actions
+                            .play_card_from_hand
+                            .get(remaining_index)
+                            .map(|card_id| BattleAction::PlayCardFromHand(*card_id))
+                    } else {
+                        let ability_index = remaining_index - actions.play_card_from_hand.len();
+                        actions.activate_abilities.get(ability_index).map(|ability| {
+                            BattleAction::ActivateAbility {
+                                character_id: ability.character_id,
+                                ability_number: ability.ability_number,
+                            }
+                        })
+                    }
                 }
             }
 

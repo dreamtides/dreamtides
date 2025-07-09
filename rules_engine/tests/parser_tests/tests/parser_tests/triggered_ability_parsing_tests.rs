@@ -125,7 +125,7 @@ fn test_multiple_keyword_trigger_conditional() {
             gains: Energy(1),
           ),
           optional: false,
-          cost: None,
+          triggerCost: None,
           condition: Some(predicateCount(
             count: 2,
             predicate: another(characterType(warrior)),
@@ -223,7 +223,7 @@ fn test_once_per_turn_multiple_effects() {
               gains: Energy(1),
             ),
             optional: false,
-            cost: None,
+            triggerCost: None,
             condition: None,
           ),
           EffectWithOptions(
@@ -231,7 +231,7 @@ fn test_once_per_turn_multiple_effects() {
               amount: Spark(2),
             ),
             optional: false,
-            cost: None,
+            triggerCost: None,
             condition: None,
           ),
         ]),

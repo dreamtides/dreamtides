@@ -1,7 +1,13 @@
+use action_data::game_action_data::GameAction;
+use battle_queries::battle_card_queries::{card, card_abilities};
+use battle_queries::legal_action_queries::legal_actions;
+use battle_queries::legal_action_queries::legal_actions_data::ActivatableAbility;
+use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_animation::TriggerAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardIdType;
 use bon::Builder;
+use core_data::display_color;
 use core_data::display_types::{AudioClipAddress, SpriteAddress};
 use core_data::numerics::{Energy, Spark};
 use core_data::types::CardFacing;
@@ -12,6 +18,7 @@ use display_data::object_position::{ObjectPosition, Position};
 
 use crate::core::adapter;
 use crate::core::response_builder::ResponseBuilder;
+use crate::display_actions::outcome_simulation;
 use crate::rendering::{card_rendering, positions};
 
 pub fn trigger_card_view(
@@ -51,6 +58,74 @@ pub fn trigger_card_view(
     )
 }
 
+pub fn activated_ability_card_view(
+    builder: &ResponseBuilder,
+    battle: &BattleState,
+    ability: &ActivatableAbility,
+) -> CardView {
+    let character_card_id = ability.character_id.card_id();
+    let abilities = card_abilities::query(battle, character_card_id);
+
+    let ability_data = abilities
+        .activated_abilities
+        .iter()
+        .find(|data| data.ability_number == ability.ability_number)
+        .expect("Ability not found");
+
+    let action = BattleAction::ActivateAbility {
+        character_id: ability.character_id,
+        ability_number: ability.ability_number,
+    };
+
+    let activate_action = Some(GameAction::BattleAction(action));
+    let cost = ability_data.ability.costs.iter().find_map(|cost| match cost {
+        ability_data::cost::Cost::Energy(energy) => Some(*energy),
+        _ => None,
+    });
+
+    let character_name = card_rendering::card_name(battle, character_card_id);
+    let ability_name = format!("{character_name} Ability");
+
+    let legal_actions = legal_actions::compute(battle, builder.act_for_player());
+    let is_legal_action = legal_actions.contains(action);
+
+    let character_controller = positions::controller_and_zone(battle, character_card_id).controller;
+    let display_player = builder.to_display_player(character_controller);
+
+    token_card_view(
+        TokenCardView::builder()
+            .id(format!("A{:?}/{:?}", character_card_id.0, ability.ability_number.0))
+            .position(ObjectPosition {
+                position: Position::InHand(display_player),
+                sorting_key: card::get(battle, character_card_id).object_id.0 as u32,
+                sorting_sub_key: 0,
+            })
+            .image(card_rendering::card_image(battle, character_card_id))
+            .name(ability_name)
+            .maybe_cost(cost)
+            .maybe_card_type(Some("Activated Ability".to_string()))
+            .rules_text(card_rendering::rules_text(battle, character_card_id))
+            .actions(CardActions {
+                can_play: if is_legal_action { activate_action } else { None },
+                play_effect_preview: if is_legal_action {
+                    Some(outcome_simulation::action_effect_preview(
+                        battle,
+                        builder.act_for_player(),
+                        action,
+                    ))
+                } else {
+                    None
+                },
+                ..Default::default()
+            })
+            .maybe_outline_color(if is_legal_action { Some(display_color::GREEN) } else { None })
+            .is_fast(
+                ability_data.ability.options.as_ref().map(|opts| opts.is_fast).unwrap_or(false),
+            )
+            .build(),
+    )
+}
+
 #[derive(Builder)]
 struct TokenCardView {
     id: ClientCardId,
@@ -66,6 +141,9 @@ struct TokenCardView {
     #[builder(default)]
     is_fast: bool,
     create_sound: Option<AudioClipAddress>,
+    #[builder(default)]
+    actions: CardActions,
+    outline_color: Option<core_data::display_color::DisplayColor>,
 }
 
 fn token_card_view(view: TokenCardView) -> CardView {
@@ -80,9 +158,9 @@ fn token_card_view(view: TokenCardView) -> CardView {
             spark: view.spark,
             card_type: view.card_type.unwrap_or_default(),
             rules_text: view.rules_text,
-            outline_color: None,
+            outline_color: view.outline_color,
             is_fast: view.is_fast,
-            actions: CardActions::default(),
+            actions: view.actions,
             effects: CardEffects::default(),
             info_zoom_data: None,
         }),

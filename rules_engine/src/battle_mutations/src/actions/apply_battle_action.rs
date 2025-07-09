@@ -6,6 +6,7 @@ use core_data::types::PlayerName;
 use tracing::instrument;
 
 use crate::actions::apply_debug_battle_action;
+use crate::activated_abilities::activate_ability;
 use crate::phase_mutations::{fire_triggers, turn};
 use crate::play_cards::{play_card, resolve_card, select_stack_card_target};
 use crate::prompt_mutations::{select_additional_costs, select_choice_prompt_at_index};
@@ -29,6 +30,9 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
         }
         BattleAction::PlayCardFromHand(card_id) => {
             play_card::execute(battle, player, card_id);
+        }
+        BattleAction::ActivateAbility { character_id, ability_number } => {
+            activate_ability::execute(battle, player, character_id, ability_number);
         }
         BattleAction::PassPriority => {
             resolve_card::pass_priority(battle, player);

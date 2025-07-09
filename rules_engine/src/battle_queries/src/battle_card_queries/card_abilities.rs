@@ -1,6 +1,7 @@
 use std::sync::OnceLock;
 
 use ability_data::ability::{Ability, EventAbility};
+use ability_data::activated_ability::ActivatedAbility;
 use ability_data::cost::Cost;
 use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
@@ -31,6 +32,7 @@ static TEST_DRAW_ONE_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 static TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER: OnceLock<AbilityList> =
     OnceLock::new();
 static TEST_TRIGGER_GAIN_SPARK_PLAY_OPPONENT_TURN: OnceLock<AbilityList> = OnceLock::new();
+static TEST_ACTIVATED_ABILITY_CHARACTER: OnceLock<AbilityList> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static AbilityList {
     query_by_name(card::get(battle, card_id).name)
@@ -145,6 +147,19 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                             target: Predicate::This,
                             gains: Spark(2),
                         }),
+                        options: None,
+                    }),
+                    AbilityConfiguration::default(),
+                )])
+            })
+        }
+        CardName::TestActivatedAbilityCharacter => {
+            TEST_ACTIVATED_ABILITY_CHARACTER.get_or_init(|| {
+                build_ability_list(vec![(
+                    AbilityNumber(0),
+                    Ability::Activated(ActivatedAbility {
+                        costs: vec![Cost::Energy(Energy(1))],
+                        effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
                         options: None,
                     }),
                     AbilityConfiguration::default(),

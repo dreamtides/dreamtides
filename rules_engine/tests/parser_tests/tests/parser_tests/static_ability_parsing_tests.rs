@@ -275,7 +275,7 @@ fn test_reclaim_with_draw_discard() {
               count: 2,
             ),
             optional: false,
-            cost: None,
+            triggerCost: None,
             condition: None,
           ),
           EffectWithOptions(
@@ -283,7 +283,7 @@ fn test_reclaim_with_draw_discard() {
               cost: discardCards(card, 2),
             ),
             optional: false,
-            cost: None,
+            triggerCost: None,
             condition: None,
           ),
         ]),
