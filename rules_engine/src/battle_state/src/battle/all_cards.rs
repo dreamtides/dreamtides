@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, VecDeque};
 
 use core_data::identifiers::CardName;
 use core_data::numerics::Spark;
@@ -37,6 +37,7 @@ pub struct AllCards {
     void: PlayerMap<CardSet<VoidCardId>>,
     hands: PlayerMap<CardSet<HandCardId>>,
     decks: PlayerMap<CardSet<DeckCardId>>,
+    tops_of_decks: PlayerMap<VecDeque<DeckCardId>>,
     stack: StackItems,
     stack_card_set: PlayerMap<CardSet<StackCardId>>,
     banished: PlayerMap<CardSet<BanishedCardId>>,
@@ -131,6 +132,31 @@ impl AllCards {
         self.banished.player(player)
     }
 
+    /// Returns the top of deck cards for a given player.
+    ///
+    /// The front (index 0) of the deque is the top card of the deck.
+    pub fn top_of_deck(&self, player: PlayerName) -> &VecDeque<DeckCardId> {
+        self.tops_of_decks.player(player)
+    }
+
+    /// Mutable equivalent to [Self::top_of_deck].
+    pub fn top_of_deck_mut(&mut self, player: PlayerName) -> &mut VecDeque<DeckCardId> {
+        self.tops_of_decks.player_mut(player)
+    }
+
+    /// Moves a card from deck to the top of the deck for a given player.
+    ///
+    /// Returns true if the card was found and moved.
+    pub fn move_card_to_top_of_deck(&mut self, player: PlayerName, card_id: DeckCardId) -> bool {
+        if self.decks.player(player).contains(card_id) {
+            self.decks.player_mut(player).remove(card_id);
+            self.tops_of_decks.player_mut(player).push_back(card_id);
+            true
+        } else {
+            false
+        }
+    }
+
     /// Returns all currently known Card IDs in an undefined order
     pub fn all_cards(&self) -> impl Iterator<Item = CardId> + '_ {
         self.cards.iter().enumerate().map(|(i, _)| CardId(i))
@@ -179,7 +205,13 @@ impl AllCards {
                 self.banished.player(controller).contains(BanishedCardId(CardId(card_id.0)))
             }
             Zone::Battlefield => self.battlefield.player(controller).contains(CharacterId(card_id)),
-            Zone::Deck => self.decks.player(controller).contains(DeckCardId(CardId(card_id.0))),
+            Zone::Deck => {
+                self.decks.player(controller).contains(DeckCardId(CardId(card_id.0)))
+                    || self
+                        .tops_of_decks
+                        .player(controller)
+                        .contains(&DeckCardId(CardId(card_id.0)))
+            }
             Zone::Hand => self.hands.player(controller).contains(HandCardId(CardId(card_id.0))),
             Zone::Stack => {
                 self.stack_card_set.player(controller).contains(StackCardId(CardId(card_id.0)))
@@ -319,6 +351,10 @@ impl AllCards {
             }
             Zone::Deck => {
                 self.decks.player_mut(controller).remove(DeckCardId(card_id));
+                let tops = self.tops_of_decks.player_mut(controller);
+                if let Some(pos) = tops.iter().position(|&id| id == DeckCardId(card_id)) {
+                    tops.remove(pos);
+                }
             }
             Zone::Hand => {
                 self.hands.player_mut(controller).remove(HandCardId(card_id));

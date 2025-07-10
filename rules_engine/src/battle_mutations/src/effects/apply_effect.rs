@@ -71,6 +71,7 @@ fn apply_standard_effect(
             draw_cards_for_each(battle, source, *count, for_each)
         }
         StandardEffect::DissolveCharacter { .. } => dissolve(battle, source, targets),
+        StandardEffect::Foresee { count } => foresee(battle, source, targets, *count),
         StandardEffect::GainsSpark { gains, .. } => gains_spark(battle, source, targets, *gains),
         StandardEffect::OpponentPaysCost { cost } => opponent_pays_cost(battle, source, cost),
         _ => todo!("Implement {:?}", effect),
@@ -125,6 +126,15 @@ fn dissolve(
     let id = targeting::character_id(targets)?;
     dissolve::execute(battle, source, id);
     Some(EffectWasApplied)
+}
+
+fn foresee(
+    _battle: &mut BattleState,
+    _source: EffectSource,
+    _targets: Option<&EffectTargets>,
+    _count: u32,
+) -> Option<EffectWasApplied> {
+    todo!()
 }
 
 fn gains_spark(

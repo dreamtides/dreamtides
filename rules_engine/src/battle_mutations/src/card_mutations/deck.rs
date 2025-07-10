@@ -1,5 +1,5 @@
 use battle_queries::battle_card_queries::card_abilities;
-use battle_queries::battle_trace;
+use battle_queries::{battle_trace, panic_with};
 use battle_state::battle::all_cards::CreatedCard;
 use battle_state::battle::animation_data::AnimationStep;
 use battle_state::battle::battle_animation::BattleAnimation;
@@ -85,6 +85,36 @@ pub fn add_cards(battle: &mut BattleState, player: PlayerName, cards: Vec<CardNa
     );
 }
 
+/// Ensures that at least `count` cards are known at the top of a player's deck.
+///
+/// Any new cards that are required are picked randomly from the deck and
+/// inserted below the existing known cards at the top of the deck.
+/// Returns exactly `count` cards from the top of the deck.
+pub fn realize_top_of_deck(
+    battle: &mut BattleState,
+    player: PlayerName,
+    count: u32,
+) -> Vec<DeckCardId> {
+    let current_top_count = battle.cards.top_of_deck(player).len() as u32;
+    let needed_cards = count.saturating_sub(current_top_count);
+
+    for _ in 0..needed_cards {
+        if let Some(card_id) = random_element(battle.cards.deck(player), &mut battle.rng) {
+            battle.cards.move_card_to_top_of_deck(player, card_id);
+        } else {
+            battle_trace!("Creating new test deck for realize_top_of_deck", battle, player);
+            create_test_deck::add(battle, player);
+            if let Some(card_id) = random_element(battle.cards.deck(player), &mut battle.rng) {
+                battle.cards.move_card_to_top_of_deck(player, card_id);
+            } else {
+                panic_with!("Failed to find card after creating new test deck", battle, player);
+            }
+        }
+    }
+
+    battle.cards.top_of_deck(player).iter().take(count as usize).copied().collect()
+}
+
 fn draw_card_internal(
     battle: &mut BattleState,
     source: EffectSource,
@@ -101,12 +131,17 @@ fn draw_card_internal(
         return None;
     }
 
-    let Some(id) = random_element(battle.cards.deck(player), &mut battle.rng) else {
+    let id = if let Some(top_card) = battle.cards.top_of_deck_mut(player).pop_front() {
+        top_card
+    } else if let Some(random_card) = random_element(battle.cards.deck(player), &mut battle.rng) {
+        random_card
+    } else {
         battle_trace!("Creating new test deck", battle, player);
         create_test_deck::add(battle, player);
         battle.triggers.push(source, Trigger::DrewAllCardsInCopyOfDeck(player));
         return draw_card_internal(battle, source, player, with_animation);
     };
+
     if with_animation {
         battle.push_animation(source, || BattleAnimation::DrawCards {
             player,
