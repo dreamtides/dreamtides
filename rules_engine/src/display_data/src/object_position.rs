@@ -1,4 +1,4 @@
-use battle_state::actions::battle_actions::CardOrderSelectionTarget;
+use battle_state::actions::battle_actions::CardOrderSelectionTargetDiscriminants;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -77,7 +77,7 @@ pub enum Position {
 
     /// Object is being displayed in a selector to determine the order of cards,
     /// e.g. when resolving the "forsee" effect.
-    CardOrderSelector(CardOrderSelectionTarget),
+    CardOrderSelector(CardOrderSelectionTargetDiscriminants),
 
     /// Object is in a temporary holding space for cards in hand while resolving
     /// some other 'play card' ability.

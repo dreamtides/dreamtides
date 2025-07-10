@@ -682,7 +682,7 @@ namespace Dreamtides.Schema
         public DisplayPlayer? InPlayerStatus { get; set; }
 
         [JsonProperty("cardOrderSelector", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public CardOrderSelectionTarget? CardOrderSelector { get; set; }
+        public CardOrderSelectionTargetDiscriminants? CardOrderSelector { get; set; }
 
         [JsonProperty("inDreamwell", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? InDreamwell { get; set; }
@@ -1023,11 +1023,14 @@ namespace Dreamtides.Schema
         [JsonProperty("cardId", Required = Required.Always)]
         public long CardId { get; set; }
 
-        [JsonProperty("position", Required = Required.Always)]
-        public long Position { get; set; }
-
         [JsonProperty("target", Required = Required.Always)]
         public CardOrderSelectionTarget Target { get; set; }
+    }
+
+    public partial class CardOrderSelectionTargetClass
+    {
+        [JsonProperty("deck", Required = Required.Always)]
+        public long Deck { get; set; }
     }
 
     /// <summary>
@@ -2212,7 +2215,10 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum PositionEnum { Browser, Default, Drawn, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnScreenStorage };
 
-    public enum CardOrderSelectionTarget { Deck, Void };
+    /// <summary>
+    /// Auto-generated discriminant enum variants
+    /// </summary>
+    public enum CardOrderSelectionTargetDiscriminants { Deck, Void };
 
     public enum StackType { Default, TargetingBothBattlefields, TargetingEnemyBattlefield, TargetingUserBattlefield };
 
@@ -2246,6 +2252,8 @@ namespace Dreamtides.Schema
     /// Identifies a player in an ongoing battle.
     /// </summary>
     public enum PlayerName { One, Two };
+
+    public enum CardOrderSelectionTargetEnum { Void };
 
     /// <summary>
     /// Closes the currently open panel.
@@ -2335,6 +2343,15 @@ namespace Dreamtides.Schema
 
         public static implicit operator Position(PositionEnum Enum) => new Position { Enum = Enum };
         public static implicit operator Position(PositionClass PositionClass) => new Position { PositionClass = PositionClass };
+    }
+
+    public partial struct CardOrderSelectionTarget
+    {
+        public CardOrderSelectionTargetClass CardOrderSelectionTargetClass;
+        public CardOrderSelectionTargetEnum? Enum;
+
+        public static implicit operator CardOrderSelectionTarget(CardOrderSelectionTargetClass CardOrderSelectionTargetClass) => new CardOrderSelectionTarget { CardOrderSelectionTargetClass = CardOrderSelectionTargetClass };
+        public static implicit operator CardOrderSelectionTarget(CardOrderSelectionTargetEnum Enum) => new CardOrderSelectionTarget { Enum = Enum };
     }
 
     /// <summary>
@@ -2443,7 +2460,7 @@ namespace Dreamtides.Schema
                 GameMessageTypeConverter.Singleton,
                 CardFacingConverter.Singleton,
                 PositionConverter.Singleton,
-                CardOrderSelectionTargetConverter.Singleton,
+                CardOrderSelectionTargetDiscriminantsConverter.Singleton,
                 StackTypeConverter.Singleton,
                 PositionEnumConverter.Singleton,
                 CardPrefabConverter.Singleton,
@@ -2451,6 +2468,8 @@ namespace Dreamtides.Schema
                 BattleActionConverter.Singleton,
                 CardNameConverter.Singleton,
                 PlayerNameConverter.Singleton,
+                CardOrderSelectionTargetConverter.Singleton,
+                CardOrderSelectionTargetEnumConverter.Singleton,
                 BattleActionEnumConverter.Singleton,
                 BattleDisplayActionConverter.Singleton,
                 CardBrowserTypeConverter.Singleton,
@@ -2935,9 +2954,9 @@ namespace Dreamtides.Schema
         public static readonly PositionConverter Singleton = new PositionConverter();
     }
 
-    internal class CardOrderSelectionTargetConverter : JsonConverter
+    internal class CardOrderSelectionTargetDiscriminantsConverter : JsonConverter
     {
-        public override bool CanConvert(Type t) => t == typeof(CardOrderSelectionTarget) || t == typeof(CardOrderSelectionTarget?);
+        public override bool CanConvert(Type t) => t == typeof(CardOrderSelectionTargetDiscriminants) || t == typeof(CardOrderSelectionTargetDiscriminants?);
 
         public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
         {
@@ -2945,12 +2964,12 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "deck":
-                    return CardOrderSelectionTarget.Deck;
-                case "void":
-                    return CardOrderSelectionTarget.Void;
+                case "Deck":
+                    return CardOrderSelectionTargetDiscriminants.Deck;
+                case "Void":
+                    return CardOrderSelectionTargetDiscriminants.Void;
             }
-            throw new Exception("Cannot unmarshal type CardOrderSelectionTarget");
+            throw new Exception("Cannot unmarshal type CardOrderSelectionTargetDiscriminants");
         }
 
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
@@ -2960,20 +2979,20 @@ namespace Dreamtides.Schema
                 serializer.Serialize(writer, null);
                 return;
             }
-            var value = (CardOrderSelectionTarget)untypedValue;
+            var value = (CardOrderSelectionTargetDiscriminants)untypedValue;
             switch (value)
             {
-                case CardOrderSelectionTarget.Deck:
-                    serializer.Serialize(writer, "deck");
+                case CardOrderSelectionTargetDiscriminants.Deck:
+                    serializer.Serialize(writer, "Deck");
                     return;
-                case CardOrderSelectionTarget.Void:
-                    serializer.Serialize(writer, "void");
+                case CardOrderSelectionTargetDiscriminants.Void:
+                    serializer.Serialize(writer, "Void");
                     return;
             }
-            throw new Exception("Cannot marshal type CardOrderSelectionTarget");
+            throw new Exception("Cannot marshal type CardOrderSelectionTargetDiscriminants");
         }
 
-        public static readonly CardOrderSelectionTargetConverter Singleton = new CardOrderSelectionTargetConverter();
+        public static readonly CardOrderSelectionTargetDiscriminantsConverter Singleton = new CardOrderSelectionTargetDiscriminantsConverter();
     }
 
     internal class StackTypeConverter : JsonConverter
@@ -3433,6 +3452,85 @@ namespace Dreamtides.Schema
         }
 
         public static readonly PlayerNameConverter Singleton = new PlayerNameConverter();
+    }
+
+    internal class CardOrderSelectionTargetConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(CardOrderSelectionTarget) || t == typeof(CardOrderSelectionTarget?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            switch (reader.TokenType)
+            {
+                case JsonToken.String:
+                case JsonToken.Date:
+                    var stringValue = serializer.Deserialize<string>(reader);
+                    if (stringValue == "void")
+                    {
+                        return new CardOrderSelectionTarget { Enum = CardOrderSelectionTargetEnum.Void };
+                    }
+                    break;
+                case JsonToken.StartObject:
+                    var objectValue = serializer.Deserialize<CardOrderSelectionTargetClass>(reader);
+                    return new CardOrderSelectionTarget { CardOrderSelectionTargetClass = objectValue };
+            }
+            throw new Exception("Cannot unmarshal type CardOrderSelectionTarget");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            var value = (CardOrderSelectionTarget)untypedValue;
+            if (value.Enum != null)
+            {
+                if (value.Enum == CardOrderSelectionTargetEnum.Void)
+                {
+                    serializer.Serialize(writer, "void");
+                    return;
+                }
+            }
+            if (value.CardOrderSelectionTargetClass != null)
+            {
+                serializer.Serialize(writer, value.CardOrderSelectionTargetClass);
+                return;
+            }
+            throw new Exception("Cannot marshal type CardOrderSelectionTarget");
+        }
+
+        public static readonly CardOrderSelectionTargetConverter Singleton = new CardOrderSelectionTargetConverter();
+    }
+
+    internal class CardOrderSelectionTargetEnumConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(CardOrderSelectionTargetEnum) || t == typeof(CardOrderSelectionTargetEnum?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            if (value == "void")
+            {
+                return CardOrderSelectionTargetEnum.Void;
+            }
+            throw new Exception("Cannot unmarshal type CardOrderSelectionTargetEnum");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (CardOrderSelectionTargetEnum)untypedValue;
+            if (value == CardOrderSelectionTargetEnum.Void)
+            {
+                serializer.Serialize(writer, "void");
+                return;
+            }
+            throw new Exception("Cannot marshal type CardOrderSelectionTargetEnum");
+        }
+
+        public static readonly CardOrderSelectionTargetEnumConverter Singleton = new CardOrderSelectionTargetEnumConverter();
     }
 
     internal class BattleActionEnumConverter : JsonConverter

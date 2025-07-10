@@ -1,10 +1,11 @@
 use core_data::numerics::Energy;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use strum::EnumDiscriminants;
 
 use crate::actions::debug_battle_action::DebugBattleAction;
 use crate::battle::card_id::{
-    ActivatedAbilityId, CardIdType, CharacterId, DeckCardId, HandCardId, StackCardId,
+    ActivatedAbilityId, CharacterId, DeckCardId, HandCardId, StackCardId,
 };
 
 /// An action that can be performed in a battle
@@ -50,17 +51,28 @@ pub enum BattleAction {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeckCardSelectedOrder {
-    pub target: CardOrderSelectionTarget,
     pub card_id: DeckCardId,
-    pub position: usize,
+    pub target: CardOrderSelectionTarget,
 }
 
 #[derive(
-    Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
+    Debug,
+    Copy,
+    Clone,
+    Serialize,
+    Eq,
+    PartialEq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Deserialize,
+    JsonSchema,
+    EnumDiscriminants,
 )]
 #[serde(rename_all = "camelCase")]
+#[strum_discriminants(derive(Hash, Serialize, Deserialize, Ord, PartialOrd, JsonSchema))]
 pub enum CardOrderSelectionTarget {
-    Deck,
+    Deck(usize),
     Void,
 }
 
@@ -91,10 +103,10 @@ impl BattleAction {
             BattleAction::SelectEnergyAdditionalCost(energy) => format!("SEAC{}", energy.0),
             BattleAction::SelectOrderForDeckCard(order) => {
                 let target = match order.target {
-                    CardOrderSelectionTarget::Deck => "D",
-                    CardOrderSelectionTarget::Void => "V",
+                    CardOrderSelectionTarget::Deck(position) => format!("D{position}"),
+                    CardOrderSelectionTarget::Void => "V".to_string(),
                 };
-                format!("SCO{}{}{}", target, order.card_id.card_id().0, order.position)
+                format!("SCO{}{:?}", target, order.card_id.0.0)
             }
             BattleAction::SubmitDeckCardOrder => "SDCO".to_string(),
             BattleAction::ToggleOrderSelectorVisibility => "TOSV".to_string(),

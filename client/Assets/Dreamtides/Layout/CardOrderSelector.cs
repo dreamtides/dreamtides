@@ -39,8 +39,7 @@ namespace Dreamtides.Layout
         return new DeckCardSelectedOrder
         {
           CardId = cardId,
-          Position = _cardOrderSelectorVoid.Objects.Count,
-          Target = CardOrderSelectionTarget.Void,
+          Target = new CardOrderSelectionTarget { Enum = CardOrderSelectionTargetEnum.Void },
         };
       }
 
@@ -49,8 +48,13 @@ namespace Dreamtides.Layout
         return new DeckCardSelectedOrder
         {
           CardId = cardId,
-          Position = 0,
-          Target = CardOrderSelectionTarget.Deck,
+          Target = new CardOrderSelectionTarget
+          {
+            CardOrderSelectionTargetClass = new CardOrderSelectionTargetClass
+            {
+              Deck = 0,
+            }
+          },
         };
       }
 
@@ -59,8 +63,13 @@ namespace Dreamtides.Layout
         return new DeckCardSelectedOrder
         {
           CardId = cardId,
-          Position = 0,
-          Target = CardOrderSelectionTarget.Deck,
+          Target = new CardOrderSelectionTarget
+          {
+            CardOrderSelectionTargetClass = new CardOrderSelectionTargetClass
+            {
+              Deck = 0,
+            }
+          },
         };
       }
 
@@ -69,8 +78,13 @@ namespace Dreamtides.Layout
         return new DeckCardSelectedOrder
         {
           CardId = cardId,
-          Position = Objects.Count,
-          Target = CardOrderSelectionTarget.Deck,
+          Target = new CardOrderSelectionTarget
+          {
+            CardOrderSelectionTargetClass = new CardOrderSelectionTargetClass
+            {
+              Deck = Objects.Count,
+            }
+          },
         };
       }
 
@@ -84,8 +98,13 @@ namespace Dreamtides.Layout
           return new DeckCardSelectedOrder
           {
             CardId = cardId,
-            Position = (targetPosition - currentPosition < nextPosition - targetPosition) ? i + 1 : i + 2,
-            Target = CardOrderSelectionTarget.Deck,
+            Target = new CardOrderSelectionTarget
+            {
+              CardOrderSelectionTargetClass = new CardOrderSelectionTargetClass
+              {
+                Deck = (targetPosition - currentPosition < nextPosition - targetPosition) ? i + 1 : i + 2,
+              }
+            },
           };
         }
       }
@@ -93,8 +112,13 @@ namespace Dreamtides.Layout
       return new DeckCardSelectedOrder
       {
         CardId = cardId,
-        Position = 0,
-        Target = CardOrderSelectionTarget.Deck,
+        Target = new CardOrderSelectionTarget
+        {
+          CardOrderSelectionTargetClass = new CardOrderSelectionTargetClass
+          {
+            Deck = 0,
+          }
+        },
       };
     }
 

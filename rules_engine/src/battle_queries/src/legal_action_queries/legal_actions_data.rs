@@ -254,9 +254,8 @@ impl LegalActions {
                 {
                     for position in 0..=current.deck.len() {
                         let action = BattleAction::SelectOrderForDeckCard(DeckCardSelectedOrder {
-                            target: CardOrderSelectionTarget::Deck,
+                            target: CardOrderSelectionTarget::Deck(position),
                             card_id: *next_card,
-                            position,
                         });
                         if !actions.contains(&action) {
                             return Some(action);
@@ -266,7 +265,6 @@ impl LegalActions {
                     let action = BattleAction::SelectOrderForDeckCard(DeckCardSelectedOrder {
                         target: CardOrderSelectionTarget::Void,
                         card_id: *next_card,
-                        position: 0,
                     });
                     if !actions.contains(&action) {
                         return Some(action);
@@ -329,16 +327,14 @@ impl LegalActions {
                 {
                     for position in 0..=current.deck.len() {
                         result.push(BattleAction::SelectOrderForDeckCard(DeckCardSelectedOrder {
-                            target: CardOrderSelectionTarget::Deck,
+                            target: CardOrderSelectionTarget::Deck(position),
                             card_id: *next_card,
-                            position,
                         }));
                     }
 
                     result.push(BattleAction::SelectOrderForDeckCard(DeckCardSelectedOrder {
                         target: CardOrderSelectionTarget::Void,
                         card_id: *next_card,
-                        position: 0,
                     }));
                 }
 
@@ -449,8 +445,8 @@ impl LegalActions {
             }
 
             match order.target {
-                CardOrderSelectionTarget::Deck => order.position <= current.deck.len(),
-                CardOrderSelectionTarget::Void => order.position == 0,
+                CardOrderSelectionTarget::Deck(position) => position <= current.deck.len(),
+                CardOrderSelectionTarget::Void => true,
             }
         } else {
             false
@@ -467,8 +463,8 @@ impl LegalActions {
         }
 
         match order.target {
-            CardOrderSelectionTarget::Deck => order.position <= current.deck.len(),
-            CardOrderSelectionTarget::Void => order.position == 0,
+            CardOrderSelectionTarget::Deck(position) => position <= current.deck.len(),
+            CardOrderSelectionTarget::Void => true,
         }
     }
 }

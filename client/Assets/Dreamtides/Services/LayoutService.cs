@@ -396,8 +396,8 @@ namespace Dreamtides.Services
       {
         return cardOrderSelectorTarget switch
         {
-          CardOrderSelectionTarget.Deck => Registry.Layout.CardOrderSelector,
-          CardOrderSelectionTarget.Void => Registry.Layout.CardOrderSelectorVoid,
+          CardOrderSelectionTargetDiscriminants.Deck => Registry.Layout.CardOrderSelector,
+          CardOrderSelectionTargetDiscriminants.Void => Registry.Layout.CardOrderSelectorVoid,
           _ => throw Errors.UnknownEnumValue(cardOrderSelectorTarget),
         };
       }
