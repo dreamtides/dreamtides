@@ -107,9 +107,9 @@ namespace Dreamtides.Utils
                     return "SelectEnergyAdditionalCost";
                 }
 
-                if (actionClass.SelectCardOrder != null)
+                if (actionClass.SelectOrderForDeckCard != null)
                 {
-                    return "SelectCardOrder";
+                    return "DeckCardSelectedOrder";
                 }
 
                 if (actionClass.Debug != null)

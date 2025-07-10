@@ -2,6 +2,7 @@ use ability_data::cost::Cost;
 use action_data::game_action_data::GameAction;
 use battle_queries::battle_card_queries::{card, card_abilities};
 use battle_queries::legal_action_queries::legal_actions;
+use battle_queries::legal_action_queries::legal_actions_data::ForPlayer;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_animation::TriggerAnimation;
 use battle_state::battle::battle_state::BattleState;
@@ -157,7 +158,7 @@ fn activated_ability_card_view(
     let ability_name = format!("{character_name} Ability");
 
     let legal_actions = legal_actions::compute(battle, builder.act_for_player());
-    let is_legal_action = legal_actions.contains(action);
+    let is_legal_action = legal_actions.contains(action, ForPlayer::Human);
 
     token_card_view(
         TokenCardView::builder()

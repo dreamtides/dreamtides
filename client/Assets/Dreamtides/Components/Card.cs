@@ -464,7 +464,7 @@ namespace Dreamtides.Components
             {
               BattleActionClass = new()
               {
-                SelectCardOrder =
+                SelectOrderForDeckCard =
                   _registry.Layout.CardOrderSelector.SelectCardOrderWithinDisplay(transform,
                     Errors.CheckNotNull(CardView.Revealed?.Actions?.CanSelectOrder)),
               }

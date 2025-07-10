@@ -3,7 +3,7 @@ use action_data::game_action_data::GameAction;
 use action_data::panel_address::PanelAddress;
 use battle_queries::battle_card_queries::card_abilities;
 use battle_queries::legal_action_queries::legal_actions;
-use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
+use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalActions};
 use battle_queries::panic_with;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
@@ -116,6 +116,7 @@ fn get_prompt_message_from_source(battle: &BattleState, prompt: &PromptData) -> 
         }
         PromptType::Choose { .. } => config.choice_prompt.clone(),
         PromptType::ChooseEnergyValue { .. } => config.additional_cost_prompt.clone(),
+        PromptType::SelectDeckCardOrder { .. } => None,
     }
 }
 
@@ -150,6 +151,7 @@ fn get_generic_prompt_message(prompt_type: &PromptType) -> String {
         PromptType::ChooseStackCard { .. } => "Select a card".to_string(),
         PromptType::Choose { .. } => "Select an option".to_string(),
         PromptType::ChooseEnergyValue { .. } => "Choose energy amount".to_string(),
+        PromptType::SelectDeckCardOrder { .. } => "Select card order".to_string(),
     }
 }
 
@@ -158,7 +160,7 @@ fn primary_action_button(
     battle: &BattleState,
     legal_actions: &LegalActions,
 ) -> Option<ButtonView> {
-    if legal_actions.contains(BattleAction::SelectPromptChoice(0)) {
+    if legal_actions.contains(BattleAction::SelectPromptChoice(0), ForPlayer::Human) {
         let Some(PromptType::Choose { choices }) = battle.prompt.as_ref().map(|p| &p.prompt_type)
         else {
             panic_with!("Expected prompt for SelectPromptChoice action", battle);
@@ -175,7 +177,9 @@ fn primary_action_button(
     {
         let current =
             display_state::get_selected_energy_additional_cost(builder).unwrap_or(*minimum);
-        if legal_actions.contains(BattleAction::SelectEnergyAdditionalCost(current)) {
+        if legal_actions
+            .contains(BattleAction::SelectEnergyAdditionalCost(current), ForPlayer::Human)
+        {
             return Some(ButtonView {
                 label: format!("Spend {current}\u{f7e4}"),
                 action: Some(BattleAction::SelectEnergyAdditionalCost(current).into()),
@@ -183,17 +187,17 @@ fn primary_action_button(
         }
     }
 
-    if legal_actions.contains(BattleAction::PassPriority) {
+    if legal_actions.contains(BattleAction::PassPriority, ForPlayer::Human) {
         Some(ButtonView {
             label: "Resolve".to_string(),
             action: Some(BattleAction::PassPriority.into()),
         })
-    } else if legal_actions.contains(BattleAction::EndTurn) {
+    } else if legal_actions.contains(BattleAction::EndTurn, ForPlayer::Human) {
         Some(ButtonView {
             label: "End Turn".to_string(),
             action: Some(BattleAction::EndTurn.into()),
         })
-    } else if legal_actions.contains(BattleAction::StartNextTurn) {
+    } else if legal_actions.contains(BattleAction::StartNextTurn, ForPlayer::Human) {
         Some(ButtonView {
             label: "Next Turn".to_string(),
             action: Some(BattleAction::StartNextTurn.into()),
@@ -207,7 +211,7 @@ fn secondary_action_button(
     battle: &BattleState,
     legal_actions: &LegalActions,
 ) -> Option<ButtonView> {
-    if legal_actions.contains(BattleAction::SelectPromptChoice(1))
+    if legal_actions.contains(BattleAction::SelectPromptChoice(1), ForPlayer::Human)
         && let Some(PromptType::Choose { choices }) = battle.prompt.as_ref().map(|p| &p.prompt_type)
         && choices.len() > 1
     {

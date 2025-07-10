@@ -3,7 +3,7 @@ use std::f64::consts;
 use battle_mutations::actions::apply_battle_action;
 use battle_mutations::player_mutations::player_state;
 use battle_queries::legal_action_queries::legal_actions;
-use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
+use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalActions};
 use battle_queries::panic_with;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
@@ -246,7 +246,7 @@ fn best_child(
 
     graph
         .edges(from_node)
-        .filter(|e| legal.contains(e.weight().action))
+        .filter(|e| legal.contains(e.weight().action, ForPlayer::Agent))
         .max_by_key(|edge| {
             let target = edge.target();
             child_score(

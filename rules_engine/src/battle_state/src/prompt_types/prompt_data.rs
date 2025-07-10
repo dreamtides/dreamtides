@@ -3,7 +3,7 @@ use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use strum_macros::EnumDiscriminants;
 
-use crate::battle::card_id::{CharacterId, StackCardId};
+use crate::battle::card_id::{CharacterId, DeckCardId, StackCardId};
 use crate::battle_cards::card_set::CardSet;
 use crate::battle_cards::stack_card_state::EffectTargets;
 use crate::core::effect_source::EffectSource;
@@ -31,6 +31,24 @@ pub enum PromptType {
     ChooseStackCard { valid: CardSet<StackCardId> },
     Choose { choices: Vec<PromptChoice> },
     ChooseEnergyValue { minimum: Energy, maximum: Energy },
+    SelectDeckCardOrder { prompt: SelectDeckCardOrderPrompt },
+}
+
+/// State for a prompt to select a deck card order.
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct SelectDeckCardOrderPrompt {
+    /// Initial list of cards we are considering for ordering.
+    pub initial: Vec<DeckCardId>,
+
+    /// Cards which have had a `SelectOrderForDeckCard` action performed on
+    /// them. Used by the AI to prevent loops.
+    pub moved: CardSet<DeckCardId>,
+
+    /// Cards currently in the deck position, in the selected order.
+    pub deck: Vec<DeckCardId>,
+
+    /// Cards currently in the void position, unordered.
+    pub void: CardSet<DeckCardId>,
 }
 
 #[derive(Debug, Clone, Copy, Default)]

@@ -1,6 +1,9 @@
-use battle_state::actions::battle_actions::BattleAction;
+use battle_state::actions::battle_actions::{
+    BattleAction, CardOrderSelectionTarget, DeckCardSelectedOrder,
+};
 use battle_state::battle::card_id::{ActivatedAbilityId, CharacterId, HandCardId, StackCardId};
 use battle_state::battle_cards::card_set::CardSet;
+use battle_state::prompt_types::prompt_data::SelectDeckCardOrderPrompt;
 use core_data::numerics::Energy;
 use fastrand;
 
@@ -15,6 +18,7 @@ pub enum LegalActions {
     SelectStackCardPrompt { valid: CardSet<StackCardId> },
     SelectPromptChoicePrompt { choice_count: usize },
     SelectEnergyValuePrompt { minimum: Energy, maximum: Energy },
+    SelectDeckCardOrder { current: SelectDeckCardOrderPrompt },
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -31,8 +35,13 @@ pub enum PrimaryLegalAction {
     StartNextTurn,
 }
 
+pub enum ForPlayer {
+    Agent,
+    Human,
+}
+
 impl LegalActions {
-    pub fn contains(&self, action: BattleAction) -> bool {
+    pub fn contains(&self, action: BattleAction, for_player: ForPlayer) -> bool {
         match action {
             BattleAction::Debug(..) => true,
             BattleAction::PlayCardFromHand(hand_card_id) => {
@@ -98,7 +107,23 @@ impl LegalActions {
                     false
                 }
             }
-            BattleAction::SelectCardOrder(..) => false,
+            BattleAction::SelectOrderForDeckCard(order) => {
+                if let LegalActions::SelectDeckCardOrder { current } = self {
+                    match for_player {
+                        ForPlayer::Agent => {
+                            self.contains_deck_card_order_for_agent(current, &order)
+                        }
+                        ForPlayer::Human => {
+                            self.contains_deck_card_order_for_human(current, &order)
+                        }
+                    }
+                } else {
+                    false
+                }
+            }
+            BattleAction::SubmitDeckCardOrder => {
+                matches!(self, LegalActions::SelectDeckCardOrder { .. })
+            }
             BattleAction::ToggleOrderSelectorVisibility => true,
             BattleAction::SubmitMulligan => todo!("Implement this"),
         }
@@ -115,6 +140,7 @@ impl LegalActions {
             LegalActions::SelectStackCardPrompt { valid } => valid.is_empty(),
             LegalActions::SelectPromptChoicePrompt { choice_count } => *choice_count == 0,
             LegalActions::SelectEnergyValuePrompt { minimum, maximum } => maximum < minimum,
+            LegalActions::SelectDeckCardOrder { .. } => false,
         }
     }
 
@@ -140,6 +166,17 @@ impl LegalActions {
                     (maximum.0 - minimum.0 + 1) as usize
                 } else {
                     0
+                }
+            }
+            LegalActions::SelectDeckCardOrder { current } => {
+                let has_next_card =
+                    current.initial.iter().any(|card_id| !current.moved.contains(*card_id));
+                if has_next_card {
+                    1 + // SubmitDeckCardOrder action
+                    (current.deck.len() + 1) + // Deck positions: 0..=deck.len() (can place at end)
+                    1 // Void position 0 (void is unordered)
+                } else {
+                    1 // Only SubmitDeckCardOrder when no cards left to move
                 }
             }
         }
@@ -206,6 +243,38 @@ impl LegalActions {
             LegalActions::SelectEnergyValuePrompt { minimum, maximum } => (minimum.0..=maximum.0)
                 .find(|&e| !actions.contains(&BattleAction::SelectEnergyAdditionalCost(Energy(e))))
                 .map(|e| BattleAction::SelectEnergyAdditionalCost(Energy(e))),
+
+            LegalActions::SelectDeckCardOrder { current } => {
+                if !actions.contains(&BattleAction::SubmitDeckCardOrder) {
+                    return Some(BattleAction::SubmitDeckCardOrder);
+                }
+
+                if let Some(next_card) =
+                    current.initial.iter().find(|card_id| !current.moved.contains(**card_id))
+                {
+                    for position in 0..=current.deck.len() {
+                        let action = BattleAction::SelectOrderForDeckCard(DeckCardSelectedOrder {
+                            target: CardOrderSelectionTarget::Deck,
+                            card_id: *next_card,
+                            position,
+                        });
+                        if !actions.contains(&action) {
+                            return Some(action);
+                        }
+                    }
+
+                    let action = BattleAction::SelectOrderForDeckCard(DeckCardSelectedOrder {
+                        target: CardOrderSelectionTarget::Void,
+                        card_id: *next_card,
+                        position: 0,
+                    });
+                    if !actions.contains(&action) {
+                        return Some(action);
+                    }
+                }
+
+                None
+            }
         }
     }
 
@@ -251,6 +320,30 @@ impl LegalActions {
             LegalActions::SelectEnergyValuePrompt { minimum, maximum } => (minimum.0..=maximum.0)
                 .map(|e| BattleAction::SelectEnergyAdditionalCost(Energy(e)))
                 .collect::<Vec<_>>(),
+
+            LegalActions::SelectDeckCardOrder { current } => {
+                let mut result = vec![BattleAction::SubmitDeckCardOrder];
+
+                if let Some(next_card) =
+                    current.initial.iter().find(|card_id| !current.moved.contains(**card_id))
+                {
+                    for position in 0..=current.deck.len() {
+                        result.push(BattleAction::SelectOrderForDeckCard(DeckCardSelectedOrder {
+                            target: CardOrderSelectionTarget::Deck,
+                            card_id: *next_card,
+                            position,
+                        }));
+                    }
+
+                    result.push(BattleAction::SelectOrderForDeckCard(DeckCardSelectedOrder {
+                        target: CardOrderSelectionTarget::Void,
+                        card_id: *next_card,
+                        position: 0,
+                    }));
+                }
+
+                result
+            }
         }
     }
 
@@ -330,6 +423,52 @@ impl LegalActions {
                     None
                 }
             }
+
+            LegalActions::SelectDeckCardOrder { .. } => {
+                let all_actions = self.all();
+                if all_actions.is_empty() {
+                    None
+                } else {
+                    let index = fastrand::usize(..all_actions.len());
+                    Some(all_actions[index])
+                }
+            }
+        }
+    }
+
+    fn contains_deck_card_order_for_agent(
+        &self,
+        current: &SelectDeckCardOrderPrompt,
+        order: &DeckCardSelectedOrder,
+    ) -> bool {
+        if let Some(next_card) =
+            current.initial.iter().find(|card_id| !current.moved.contains(**card_id))
+        {
+            if order.card_id != *next_card {
+                return false;
+            }
+
+            match order.target {
+                CardOrderSelectionTarget::Deck => order.position <= current.deck.len(),
+                CardOrderSelectionTarget::Void => order.position == 0,
+            }
+        } else {
+            false
+        }
+    }
+
+    fn contains_deck_card_order_for_human(
+        &self,
+        current: &SelectDeckCardOrderPrompt,
+        order: &DeckCardSelectedOrder,
+    ) -> bool {
+        if !current.initial.contains(&order.card_id) {
+            return false;
+        }
+
+        match order.target {
+            CardOrderSelectionTarget::Deck => order.position <= current.deck.len(),
+            CardOrderSelectionTarget::Void => order.position == 0,
         }
     }
 }

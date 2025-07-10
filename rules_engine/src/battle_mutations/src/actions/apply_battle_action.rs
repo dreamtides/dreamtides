@@ -1,4 +1,5 @@
 use battle_queries::legal_action_queries::legal_actions;
+use battle_queries::legal_action_queries::legal_actions_data::ForPlayer;
 use battle_queries::{battle_trace, panic_with};
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
@@ -17,7 +18,7 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
     if battle.request_context.logging_options.enable_action_legality_check {
         let legal_actions = legal_actions::compute(battle, player);
 
-        if !legal_actions.contains(action) {
+        if !legal_actions.contains(action, ForPlayer::Human) {
             panic_with!("Action is not legal", battle, action);
         }
     }

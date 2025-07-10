@@ -4,6 +4,7 @@ use battle_mutations::actions::apply_battle_action;
 use battle_queries::battle_card_queries::card_properties;
 use battle_queries::battle_player_queries::player_properties;
 use battle_queries::legal_action_queries::legal_actions;
+use battle_queries::legal_action_queries::legal_actions_data::ForPlayer;
 use battle_queries::panic_with;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
@@ -49,7 +50,7 @@ pub fn is_victory_imminent_for_player(battle: &BattleState, player: PlayerName) 
 
     let opponent = player.opponent();
     let legal_actions = legal_actions::compute(&simulation, opponent);
-    if !legal_actions.contains(BattleAction::EndTurn) {
+    if !legal_actions.contains(BattleAction::EndTurn, ForPlayer::Human) {
         panic_with!("Opponent cannot end their turn", battle, opponent);
     }
 
@@ -59,7 +60,7 @@ pub fn is_victory_imminent_for_player(battle: &BattleState, player: PlayerName) 
     });
 
     let legal_actions = legal_actions::compute(&simulation, player);
-    if !legal_actions.contains(BattleAction::StartNextTurn) {
+    if !legal_actions.contains(BattleAction::StartNextTurn, ForPlayer::Human) {
         panic_with!("Player cannot start their turn", battle, opponent);
     }
     let subscriber = tracing_subscriber::registry().with(EnvFilter::new("warn"));
@@ -83,7 +84,7 @@ pub fn action_effect_preview(
         apply_battle_action::execute(&mut simulation, player, action);
         let opponent = player.opponent();
         let legal_actions_for_opponent = legal_actions::compute(&simulation, opponent);
-        if legal_actions_for_opponent.contains(BattleAction::PassPriority) {
+        if legal_actions_for_opponent.contains(BattleAction::PassPriority, ForPlayer::Human) {
             apply_battle_action::execute(&mut simulation, opponent, BattleAction::PassPriority);
         }
     });

@@ -2,7 +2,7 @@ use ai_agents::agent_search;
 use battle_mutations::actions::apply_battle_action;
 use battle_queries::battle_trace;
 use battle_queries::legal_action_queries::legal_actions;
-use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
+use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalActions};
 use battle_queries::macros::write_tracing_event;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::animation_data::AnimationData;
@@ -109,11 +109,13 @@ pub fn execute(
 pub fn should_auto_execute_action(legal_actions: &LegalActions) -> Option<BattleAction> {
     if legal_actions.len() == 1 {
         match legal_actions {
-            LegalActions::Standard { .. } if legal_actions.contains(BattleAction::PassPriority) => {
+            LegalActions::Standard { .. }
+                if legal_actions.contains(BattleAction::PassPriority, ForPlayer::Human) =>
+            {
                 Some(BattleAction::PassPriority)
             }
             LegalActions::Standard { .. }
-                if legal_actions.contains(BattleAction::StartNextTurn) =>
+                if legal_actions.contains(BattleAction::StartNextTurn, ForPlayer::Human) =>
             {
                 Some(BattleAction::StartNextTurn)
             }

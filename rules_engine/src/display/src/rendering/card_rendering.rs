@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use action_data::game_action_data::GameAction;
 use battle_queries::battle_card_queries::{card, card_properties, stack_card_queries};
 use battle_queries::legal_action_queries::legal_actions;
-use battle_queries::legal_action_queries::legal_actions_data::LegalActions;
+use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalActions};
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType, CharacterId, HandCardId, StackCardId};
@@ -65,7 +65,8 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
     let card_id = context.card_id();
     let legal_actions = legal_actions::compute(battle, builder.act_for_player());
     let play = BattleAction::PlayCardFromHand(HandCardId(card_id));
-    let play_action = legal_actions.contains(play).then_some(GameAction::BattleAction(play));
+    let play_action =
+        legal_actions.contains(play, ForPlayer::Human).then_some(GameAction::BattleAction(play));
     let can_play = play_action.is_some();
     let selection_action = selection_action(&legal_actions, card_id);
     let ControllerAndZone { controller, .. } = positions::controller_and_zone(battle, card_id);
@@ -105,13 +106,17 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
 }
 
 fn selection_action(legal_actions: &LegalActions, card_id: CardId) -> Option<GameAction> {
-    if legal_actions.contains(BattleAction::SelectCharacterTarget(CharacterId(card_id))) {
+    if legal_actions
+        .contains(BattleAction::SelectCharacterTarget(CharacterId(card_id)), ForPlayer::Human)
+    {
         return Some(GameAction::BattleAction(BattleAction::SelectCharacterTarget(CharacterId(
             card_id,
         ))));
     }
 
-    if legal_actions.contains(BattleAction::SelectStackCardTarget(StackCardId(card_id))) {
+    if legal_actions
+        .contains(BattleAction::SelectStackCardTarget(StackCardId(card_id)), ForPlayer::Human)
+    {
         return Some(GameAction::BattleAction(BattleAction::SelectStackCardTarget(StackCardId(
             card_id,
         ))));

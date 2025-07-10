@@ -863,8 +863,8 @@ namespace Dreamtides.Schema
         [JsonProperty("selectEnergyAdditionalCost", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectEnergyAdditionalCost { get; set; }
 
-        [JsonProperty("selectCardOrder", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public SelectCardOrder SelectCardOrder { get; set; }
+        [JsonProperty("selectOrderForDeckCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DeckCardSelectedOrder SelectOrderForDeckCard { get; set; }
     }
 
     /// <summary>
@@ -1018,7 +1018,7 @@ namespace Dreamtides.Schema
         public long Spark { get; set; }
     }
 
-    public partial class SelectCardOrder
+    public partial class DeckCardSelectedOrder
     {
         [JsonProperty("cardId", Required = Required.Always)]
         public long CardId { get; set; }
@@ -2231,11 +2231,14 @@ namespace Dreamtides.Schema
     ///
     /// Start your next turn after the opponent takes the `EndTurn` action.
     ///
+    /// Submit the selected deck card order configuration in the current
+    /// ordering prompt.
+    ///
     /// Toggle the visibility of the card order selector
     ///
     /// Confirm the selected cards to mulligan
     /// </summary>
-    public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitMulligan, ToggleOrderSelectorVisibility };
+    public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitDeckCardOrder, SubmitMulligan, ToggleOrderSelectorVisibility };
 
     public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCardCharacter, TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestMultiActivatedAbilityDrawCardCharacter, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
 
@@ -3232,6 +3235,8 @@ namespace Dreamtides.Schema
                             return new BattleAction { Enum = BattleActionEnum.PassPriority };
                         case "startNextTurn":
                             return new BattleAction { Enum = BattleActionEnum.StartNextTurn };
+                        case "submitDeckCardOrder":
+                            return new BattleAction { Enum = BattleActionEnum.SubmitDeckCardOrder };
                         case "submitMulligan":
                             return new BattleAction { Enum = BattleActionEnum.SubmitMulligan };
                         case "toggleOrderSelectorVisibility":
@@ -3260,6 +3265,9 @@ namespace Dreamtides.Schema
                         return;
                     case BattleActionEnum.StartNextTurn:
                         serializer.Serialize(writer, "startNextTurn");
+                        return;
+                    case BattleActionEnum.SubmitDeckCardOrder:
+                        serializer.Serialize(writer, "submitDeckCardOrder");
                         return;
                     case BattleActionEnum.SubmitMulligan:
                         serializer.Serialize(writer, "submitMulligan");
@@ -3443,6 +3451,8 @@ namespace Dreamtides.Schema
                     return BattleActionEnum.PassPriority;
                 case "startNextTurn":
                     return BattleActionEnum.StartNextTurn;
+                case "submitDeckCardOrder":
+                    return BattleActionEnum.SubmitDeckCardOrder;
                 case "submitMulligan":
                     return BattleActionEnum.SubmitMulligan;
                 case "toggleOrderSelectorVisibility":
@@ -3469,6 +3479,9 @@ namespace Dreamtides.Schema
                     return;
                 case BattleActionEnum.StartNextTurn:
                     serializer.Serialize(writer, "startNextTurn");
+                    return;
+                case BattleActionEnum.SubmitDeckCardOrder:
+                    serializer.Serialize(writer, "submitDeckCardOrder");
                     return;
                 case BattleActionEnum.SubmitMulligan:
                     serializer.Serialize(writer, "submitMulligan");

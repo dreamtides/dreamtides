@@ -3,7 +3,9 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::actions::debug_battle_action::DebugBattleAction;
-use crate::battle::card_id::{ActivatedAbilityId, CardId, CharacterId, HandCardId, StackCardId};
+use crate::battle::card_id::{
+    ActivatedAbilityId, CardIdType, CharacterId, DeckCardId, HandCardId, StackCardId,
+};
 
 /// An action that can be performed in a battle
 #[derive(
@@ -33,7 +35,10 @@ pub enum BattleAction {
     /// Pick an amount of energy to pay as an additional cost to play a card.
     SelectEnergyAdditionalCost(Energy),
     /// Sets the position of a card in a card order selector.
-    SelectCardOrder(SelectCardOrder),
+    SelectOrderForDeckCard(DeckCardSelectedOrder),
+    /// Submit the selected deck card order configuration in the current
+    /// ordering prompt.
+    SubmitDeckCardOrder,
     /// Toggle the visibility of the card order selector
     ToggleOrderSelectorVisibility,
     /// Confirm the selected cards to mulligan
@@ -44,9 +49,9 @@ pub enum BattleAction {
     Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
 )]
 #[serde(rename_all = "camelCase")]
-pub struct SelectCardOrder {
+pub struct DeckCardSelectedOrder {
     pub target: CardOrderSelectionTarget,
-    pub card_id: CardId,
+    pub card_id: DeckCardId,
     pub position: usize,
 }
 
@@ -84,13 +89,14 @@ impl BattleAction {
             }
             BattleAction::SelectPromptChoice(index) => format!("SPC{index:?}"),
             BattleAction::SelectEnergyAdditionalCost(energy) => format!("SEAC{}", energy.0),
-            BattleAction::SelectCardOrder(order) => {
+            BattleAction::SelectOrderForDeckCard(order) => {
                 let target = match order.target {
                     CardOrderSelectionTarget::Deck => "D",
                     CardOrderSelectionTarget::Void => "V",
                 };
-                format!("SCO{}{}{}", target, order.card_id.0, order.position)
+                format!("SCO{}{}{}", target, order.card_id.card_id().0, order.position)
             }
+            BattleAction::SubmitDeckCardOrder => "SDCO".to_string(),
             BattleAction::ToggleOrderSelectorVisibility => "TOSV".to_string(),
             BattleAction::SubmitMulligan => "SM".to_string(),
         }

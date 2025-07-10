@@ -30,13 +30,13 @@ namespace Dreamtides.Layout
     /// Returns the index position within the selector which most closely maps
     /// to the position of the given Transform.
     /// </summary>
-    public SelectCardOrder SelectCardOrderWithinDisplay(Transform t, long cardId)
+    public DeckCardSelectedOrder SelectCardOrderWithinDisplay(Transform t, long cardId)
     {
       var targetPosition = t.position.x;
 
       if (targetPosition > _cardOrderSelectorVoid.transform.position.x - _cardWidth)
       {
-        return new SelectCardOrder
+        return new DeckCardSelectedOrder
         {
           CardId = cardId,
           Position = _cardOrderSelectorVoid.Objects.Count,
@@ -46,7 +46,7 @@ namespace Dreamtides.Layout
 
       if (Objects.Count == 0)
       {
-        return new SelectCardOrder
+        return new DeckCardSelectedOrder
         {
           CardId = cardId,
           Position = 0,
@@ -56,7 +56,7 @@ namespace Dreamtides.Layout
 
       if (targetPosition < Objects[0].transform.position.x)
       {
-        return new SelectCardOrder
+        return new DeckCardSelectedOrder
         {
           CardId = cardId,
           Position = 0,
@@ -66,7 +66,7 @@ namespace Dreamtides.Layout
 
       if (targetPosition > Objects[Objects.Count - 1].transform.position.x)
       {
-        return new SelectCardOrder
+        return new DeckCardSelectedOrder
         {
           CardId = cardId,
           Position = Objects.Count,
@@ -81,7 +81,7 @@ namespace Dreamtides.Layout
 
         if (targetPosition >= currentPosition && targetPosition <= nextPosition)
         {
-          return new SelectCardOrder
+          return new DeckCardSelectedOrder
           {
             CardId = cardId,
             Position = (targetPosition - currentPosition < nextPosition - targetPosition) ? i + 1 : i + 2,
@@ -90,7 +90,7 @@ namespace Dreamtides.Layout
         }
       }
 
-      return new SelectCardOrder
+      return new DeckCardSelectedOrder
       {
         CardId = cardId,
         Position = 0,
