@@ -26,7 +26,8 @@ pub fn calculate(
         Zone::Banished => Position::InBanished(player),
     };
 
-    for_card(battle, card_id, position_overrides::position(builder, battle, card_id, position))
+    let base_object_position = for_card(battle, card_id, position);
+    position_overrides::object_position(builder, battle, card_id, base_object_position)
 }
 
 pub fn for_card(battle: &BattleState, card_id: CardId, position: Position) -> ObjectPosition {
