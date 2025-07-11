@@ -19,8 +19,8 @@ namespace Dreamtides.Layout
 
     public override void Show(Registry registry, Sequence? sequence)
     {
-      _scrollbar.value = 0;
-      _scrollAmount = 0;
+      _scrollbar.value = 1;
+      _scrollAmount = 1;
 
       base.Show(registry, sequence);
     }
