@@ -56,6 +56,16 @@ impl AllCards {
         unsafe { self.cards.get_unchecked(id.0) }
     }
 
+    /// Mutable equivalent to [Self::get_card_unchecked]
+    ///
+    /// # Safety
+    /// Always use `card::get_mut` in battle_mutations instead of this function,
+    /// because it performs bounds checking via [Self::is_valid_card_id].
+    #[inline(always)]
+    pub unsafe fn get_card_unchecked_mut(&mut self, id: CardId) -> &mut BattleCardState {
+        unsafe { self.cards.get_unchecked_mut(id.0) }
+    }
+
     /// Returns the spark value of a character.
     ///
     /// Returns None if this character is not present on the battlefield.
@@ -174,6 +184,7 @@ impl AllCards {
                 name: name.name,
                 owner,
                 object_id,
+                revealed_to_player_override: PlayerMap::default(),
                 can_play_restriction: name.can_play_restriction,
             });
             self.decks.player_mut(owner).insert(DeckCardId(CardId(id)));
@@ -198,7 +209,11 @@ impl AllCards {
         let id = card_id.card_id();
         self.remove_from_zone(controller, id, from);
         self.add_to_zone(controller, id, to);
-        self.cards[id.0].object_id = self.new_object_id();
+
+        let new_object_id = self.new_object_id();
+        let state = &mut self.cards[id.0];
+        state.object_id = new_object_id;
+        state.revealed_to_player_override = PlayerMap::default();
     }
 
     /// Returns true if the indicated card is present in the indicated zone.

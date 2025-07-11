@@ -1,4 +1,4 @@
-use battle_queries::battle_card_queries::card_abilities;
+use battle_queries::battle_card_queries::{card, card_abilities};
 use battle_queries::{battle_trace, panic_with};
 use battle_state::battle::all_cards::CreatedCard;
 use battle_state::battle::animation_data::AnimationStep;
@@ -87,8 +87,12 @@ pub fn add_cards(battle: &mut BattleState, player: PlayerName, cards: Vec<CardNa
 
 /// Ensures that at least `count` cards are known at the top of a player's deck.
 ///
+/// Adds a `revealed_to_player_override` to the cards to indicate that they are
+/// revealed to their owner while in the deck.
+///
 /// Any new cards that are required are picked randomly from the deck and
-/// inserted below the existing known cards at the top of the deck.
+/// inserted below any existing known cards at the top of the deck.
+///
 /// Returns exactly `count` cards from the top of the deck.
 pub fn realize_top_of_deck(
     battle: &mut BattleState,
@@ -112,7 +116,12 @@ pub fn realize_top_of_deck(
         }
     }
 
-    battle.cards.top_of_deck(player).iter().take(count as usize).copied().collect()
+    let result =
+        battle.cards.top_of_deck(player).iter().take(count as usize).copied().collect::<Vec<_>>();
+    for card_id in &result {
+        *card::get_mut(battle, *card_id).revealed_to_player_override.player_mut(player) = true;
+    }
+    result
 }
 
 fn draw_card_internal(
