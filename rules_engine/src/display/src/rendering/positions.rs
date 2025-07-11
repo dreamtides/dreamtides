@@ -32,7 +32,7 @@ pub fn calculate(
 
 pub fn for_card(battle: &BattleState, card_id: CardId, position: Position) -> ObjectPosition {
     let object_id = card::get(battle, card_id).object_id;
-    ObjectPosition { position, sorting_key: object_id.0 as u32, sorting_sub_key: 0 }
+    ObjectPosition { position, sorting_key: object_id.0 as u32 }
 }
 
 pub struct ControllerAndZone {

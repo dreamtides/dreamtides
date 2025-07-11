@@ -28,15 +28,10 @@ pub fn object_position(
     let object_position = for_card_order_browser(battle, card_id, ObjectPosition {
         position,
         sorting_key: base_object_position.sorting_key,
-        sorting_sub_key: 0,
     });
     let position = for_browser(builder, object_position.position);
 
-    ObjectPosition {
-        position,
-        sorting_key: object_position.sorting_key,
-        sorting_sub_key: object_position.sorting_sub_key,
-    }
+    ObjectPosition { position, sorting_key: object_position.sorting_key }
 }
 
 /// Returns the position for a card in the browser, if it is the current
@@ -93,7 +88,6 @@ fn for_card_order_browser(
                         CardOrderSelectionTargetDiscriminants::Void,
                     ),
                     sorting_key: base_object_position.sorting_key,
-                    sorting_sub_key: 0,
                 };
             } else if let Some(position_in_deck) =
                 deck_prompt.deck.iter().position(|&id| id == deck_card_id)
@@ -103,7 +97,6 @@ fn for_card_order_browser(
                         CardOrderSelectionTargetDiscriminants::Deck,
                     ),
                     sorting_key: position_in_deck as u32,
-                    sorting_sub_key: 0,
                 };
             } else {
                 return ObjectPosition {
@@ -111,7 +104,6 @@ fn for_card_order_browser(
                         CardOrderSelectionTargetDiscriminants::Deck,
                     ),
                     sorting_key: base_object_position.sorting_key,
-                    sorting_sub_key: 0,
                 };
             }
         }

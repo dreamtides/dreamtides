@@ -13,13 +13,11 @@ pub struct ObjectPosition {
     pub position: Position,
     /// Sorting key, determines order within the position
     pub sorting_key: u32,
-    /// Sub-key, used to break ties in sorting
-    pub sorting_sub_key: u32,
 }
 
 impl Default for ObjectPosition {
     fn default() -> Self {
-        Self { position: Position::Default, sorting_key: 0, sorting_sub_key: 0 }
+        Self { position: Position::Default, sorting_key: 0 }
     }
 }
 

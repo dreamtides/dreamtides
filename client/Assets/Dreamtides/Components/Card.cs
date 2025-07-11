@@ -292,6 +292,11 @@ namespace Dreamtides.Components
         _registry.LoggingService.LogError($"Card has no valid image", ("id", Id));
       }
 
+      if (revealed.Image.Sprite is { } sprite)
+      {
+        _battlefieldCardImage.sprite = _registry.AssetService.GetSprite(sprite);
+      }
+
       _outline.material.SetInt("_Seed", UnityEngine.Random.Range(0, 9999));
       if (revealed.OutlineColor == null)
       {

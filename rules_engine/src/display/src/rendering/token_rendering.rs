@@ -37,7 +37,6 @@ pub fn trigger_card_view(
             .position(ObjectPosition {
                 position: Position::OnStack(current_stack),
                 sorting_key: (battle.cards.next_object_id_for_display().0 + index + 5) as u32,
-                sorting_sub_key: 0,
             })
             .image(card_rendering::card_image(battle, trigger.character_id.card_id()))
             .name(card_rendering::card_name(battle, trigger.character_id.card_id()))
@@ -47,14 +46,12 @@ pub fn trigger_card_view(
                     trigger.character_id.card_id(),
                 )),
                 sorting_key: 0,
-                sorting_sub_key: 0,
             })
             .destroy_position(ObjectPosition {
                 position: Position::HiddenWithinCard(adapter::client_card_id(
                     trigger.character_id.card_id(),
                 )),
                 sorting_key: 0,
-                sorting_sub_key: 0,
             })
             .create_sound(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/UI, Pads, Enchantments and Misc/RPG3_Enchantment_Subtle01v2.wav"))
             .build(),
@@ -126,7 +123,6 @@ pub fn activated_ability_card_view_on_stack(
     let stack_position = ObjectPosition {
         position: Position::OnStack(current_stack),
         sorting_key: battle.cards.activated_ability_object_id(ability).unwrap_or_default().0 as u32,
-        sorting_sub_key: 0,
     };
 
     activated_ability_card_view(builder, battle, ability, Some(stack_position))
@@ -166,7 +162,6 @@ fn activated_ability_card_view(
             .position(position_override.unwrap_or_else(|| ObjectPosition {
                 position: Position::InHand(DisplayPlayer::User),
                 sorting_key: card::get(battle, character_card_id).object_id.0 as u32,
-                sorting_sub_key: 0,
             }))
             .image(card_rendering::card_image(battle, character_card_id))
             .name(ability_name)
@@ -176,12 +171,10 @@ fn activated_ability_card_view(
             .create_position(ObjectPosition {
                 position: Position::HiddenWithinCard(adapter::client_card_id(character_card_id)),
                 sorting_key: 0,
-                sorting_sub_key: 0,
             })
             .destroy_position(ObjectPosition {
                 position: Position::HiddenWithinCard(adapter::client_card_id(character_card_id)),
                 sorting_key: 0,
-                sorting_sub_key: 0,
             })
             .actions(CardActions {
                 can_play: if is_legal_action { activate_action } else { None },

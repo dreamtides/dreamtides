@@ -24,7 +24,6 @@ pub fn identity_card_view(
         position: ObjectPosition {
             position: position_overrides::for_browser(builder, position),
             sorting_key: 0,
-            sorting_sub_key: 0,
         },
         revealed: Some(RevealedCardView {
             image: DisplayImage::Prefab(DisplayPrefabImage {

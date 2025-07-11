@@ -8,9 +8,7 @@ pub struct TestClientCardList<'a> {
 
 impl<'a> TestClientCardList<'a> {
     pub fn new(mut cards: Vec<&'a TestClientCard>) -> Self {
-        cards.sort_by_key(|card| {
-            (card.view.position.sorting_key, card.view.position.sorting_sub_key)
-        });
+        cards.sort_by_key(|card| card.view.position.sorting_key);
         Self { cards }
     }
 

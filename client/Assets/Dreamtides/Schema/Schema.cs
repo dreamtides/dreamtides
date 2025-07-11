@@ -616,12 +616,6 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("sortingKey", Required = Required.Always)]
         public long SortingKey { get; set; }
-
-        /// <summary>
-        /// Sub-key, used to break ties in sorting
-        /// </summary>
-        [JsonProperty("sortingSubKey", Required = Required.Always)]
-        public long SortingSubKey { get; set; }
     }
 
     /// <summary>
