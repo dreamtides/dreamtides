@@ -36,7 +36,7 @@ pub struct AllCards {
     battlefield_state: PlayerMap<CharacterMap>,
     void: PlayerMap<CardSet<VoidCardId>>,
     hands: PlayerMap<CardSet<HandCardId>>,
-    decks: PlayerMap<CardSet<DeckCardId>>,
+    shuffled_into_decks: PlayerMap<CardSet<DeckCardId>>,
     tops_of_decks: PlayerMap<Vec<DeckCardId>>,
     stack: StackItems,
     stack_card_set: PlayerMap<CardSet<StackCardId>>,
@@ -81,9 +81,31 @@ impl AllCards {
         self.hands.player(player)
     }
 
-    /// Returns the set of cards in a player's deck.
-    pub fn deck(&self, player: PlayerName) -> &CardSet<DeckCardId> {
-        self.decks.player(player)
+    /// Returns the set of cards shuffled into a player's deck.
+    pub fn shuffled_into_deck(&self, player: PlayerName) -> &CardSet<DeckCardId> {
+        self.shuffled_into_decks.player(player)
+    }
+
+    /// Returns the top of deck cards for a given player.
+    ///
+    /// The last element of the vector is the topmost card of the deck.
+    pub fn top_of_deck(&self, player: PlayerName) -> &Vec<DeckCardId> {
+        self.tops_of_decks.player(player)
+    }
+
+    /// Mutable equivalent to [Self::top_of_deck].
+    ///
+    /// The last element of the vector is the topmost card of the deck.
+    pub fn top_of_deck_mut(&mut self, player: PlayerName) -> &mut Vec<DeckCardId> {
+        self.tops_of_decks.player_mut(player)
+    }
+
+    /// Returns all cards in a player's deck.
+    pub fn all_deck_cards(&self, player: PlayerName) -> impl Iterator<Item = DeckCardId> + '_ {
+        self.shuffled_into_decks
+            .player(player)
+            .iter()
+            .chain(self.tops_of_decks.player(player).iter().copied())
     }
 
     /// Returns the set of characters on the battlefield for a given player
@@ -142,27 +164,13 @@ impl AllCards {
         self.banished.player(player)
     }
 
-    /// Returns the top of deck cards for a given player.
-    ///
-    /// The last element of the vector is the topmost card of the deck.
-    pub fn top_of_deck(&self, player: PlayerName) -> &Vec<DeckCardId> {
-        self.tops_of_decks.player(player)
-    }
-
-    /// Mutable equivalent to [Self::top_of_deck].
-    ///
-    /// The last element of the vector is the topmost card of the deck.
-    pub fn top_of_deck_mut(&mut self, player: PlayerName) -> &mut Vec<DeckCardId> {
-        self.tops_of_decks.player_mut(player)
-    }
-
     /// Moves a card from deck to the topmost position in the deck for a given
     /// player.
     ///
     /// Returns true if the card was found and moved.
     pub fn move_card_to_top_of_deck(&mut self, player: PlayerName, card_id: DeckCardId) -> bool {
-        if self.decks.player(player).contains(card_id) {
-            self.decks.player_mut(player).remove(card_id);
+        if self.shuffled_into_decks.player(player).contains(card_id) {
+            self.shuffled_into_decks.player_mut(player).remove(card_id);
             self.tops_of_decks.player_mut(player).push(card_id);
             true
         } else {
@@ -187,7 +195,7 @@ impl AllCards {
                 revealed_to_player_override: PlayerMap::default(),
                 can_play_restriction: name.can_play_restriction,
             });
-            self.decks.player_mut(owner).insert(DeckCardId(CardId(id)));
+            self.shuffled_into_decks.player_mut(owner).insert(DeckCardId(CardId(id)));
         }
     }
 
@@ -224,7 +232,7 @@ impl AllCards {
             }
             Zone::Battlefield => self.battlefield.player(controller).contains(CharacterId(card_id)),
             Zone::Deck => {
-                self.decks.player(controller).contains(DeckCardId(CardId(card_id.0)))
+                self.shuffled_into_decks.player(controller).contains(DeckCardId(CardId(card_id.0)))
                     || self
                         .tops_of_decks
                         .player(controller)
@@ -340,7 +348,7 @@ impl AllCards {
                     .insert(CharacterId(card_id), CharacterState::default());
             }
             Zone::Deck => {
-                self.decks.player_mut(controller).insert(DeckCardId(card_id));
+                self.shuffled_into_decks.player_mut(controller).insert(DeckCardId(card_id));
             }
             Zone::Hand => {
                 self.hands.player_mut(controller).insert(HandCardId(card_id));
@@ -370,7 +378,7 @@ impl AllCards {
                 self.battlefield_state.player_mut(controller).remove(&CharacterId(card_id));
             }
             Zone::Deck => {
-                self.decks.player_mut(controller).remove(DeckCardId(card_id));
+                self.shuffled_into_decks.player_mut(controller).remove(DeckCardId(card_id));
                 let tops = self.tops_of_decks.player_mut(controller);
                 if let Some(pos) = tops.iter().position(|&id| id == DeckCardId(card_id)) {
                     tops.remove(pos);

@@ -80,17 +80,29 @@ fn debug_all_cards(battle: &BattleState) -> DebugAllCards {
             PlayerName::Two,
             battle.cards.hand(PlayerName::Two).iter().map(|c| c.card_id()),
         ),
-        p1_deck: debug_zone(
+        p1_shuffled_into_deck: debug_zone(
             battle,
             Zone::Deck,
             PlayerName::One,
-            battle.cards.deck(PlayerName::One).iter().map(|c| c.card_id()),
+            battle.cards.shuffled_into_deck(PlayerName::One).iter().map(|c| c.card_id()),
         ),
-        p2_deck: debug_zone(
+        p2_shuffled_into_deck: debug_zone(
             battle,
             Zone::Deck,
             PlayerName::Two,
-            battle.cards.deck(PlayerName::Two).iter().map(|c| c.card_id()),
+            battle.cards.shuffled_into_deck(PlayerName::Two).iter().map(|c| c.card_id()),
+        ),
+        p1_top_of_deck: debug_zone(
+            battle,
+            Zone::Deck,
+            PlayerName::One,
+            battle.cards.top_of_deck(PlayerName::One).iter().map(|c| c.card_id()),
+        ),
+        p2_top_of_deck: debug_zone(
+            battle,
+            Zone::Deck,
+            PlayerName::Two,
+            battle.cards.top_of_deck(PlayerName::Two).iter().map(|c| c.card_id()),
         ),
         stack: debug_stack_items(battle.cards.all_items_on_stack()),
         p1_banished: debug_zone(

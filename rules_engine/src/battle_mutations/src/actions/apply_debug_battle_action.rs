@@ -51,7 +51,7 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
             }
         }
         DebugBattleAction::SetCardsRemainingInDeck { player: player_name, cards: target_count } => {
-            let deck_cards: Vec<DeckCardId> = battle.cards.deck(player_name).iter().collect();
+            let deck_cards: Vec<DeckCardId> = battle.cards.all_deck_cards(player_name).collect();
             let current_count = deck_cards.len();
             if current_count > target_count {
                 let cards_to_move = current_count - target_count;

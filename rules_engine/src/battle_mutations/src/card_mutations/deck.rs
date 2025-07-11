@@ -38,7 +38,7 @@ pub fn draw_cards(battle: &mut BattleState, source: EffectSource, player: Player
     let should_animate = battle.animations.is_some();
     let pre_draw_snapshot = if should_animate {
         let mut snapshot = battle.logical_clone();
-        while snapshot.cards.deck(player).len() < count as usize {
+        while snapshot.cards.all_deck_cards(player).count() < count as usize {
             // Make sure the cards to be drawn are present in the deck. This
             // won't necessarily happen in exactly the same order, but we just
             // need them to visually be somewhere in the deck.
@@ -58,6 +58,7 @@ pub fn draw_cards(battle: &mut BattleState, source: EffectSource, player: Player
         }
     }
 
+    battle_trace!("Drew cards", battle, player, drawn_cards);
     if should_animate
         && !drawn_cards.is_empty()
         && let Some(animations) = &mut battle.animations
@@ -103,12 +104,16 @@ pub fn realize_top_of_deck(
     let needed_cards = count.saturating_sub(current_top_count);
 
     for _ in 0..needed_cards {
-        if let Some(card_id) = random_element(battle.cards.deck(player), &mut battle.rng) {
+        if let Some(card_id) =
+            random_element(battle.cards.shuffled_into_deck(player), &mut battle.rng)
+        {
             battle.cards.move_card_to_top_of_deck(player, card_id);
         } else {
             battle_trace!("Creating new test deck for realize_top_of_deck", battle, player);
             create_test_deck::add(battle, player);
-            if let Some(card_id) = random_element(battle.cards.deck(player), &mut battle.rng) {
+            if let Some(card_id) =
+                random_element(battle.cards.shuffled_into_deck(player), &mut battle.rng)
+            {
                 battle.cards.move_card_to_top_of_deck(player, card_id);
             } else {
                 panic_with!("Failed to find card after creating new test deck", battle, player);
@@ -140,9 +145,11 @@ fn draw_card_internal(
         return None;
     }
 
-    let id = if let Some(top_card) = battle.cards.top_of_deck_mut(player).pop() {
-        top_card
-    } else if let Some(random_card) = random_element(battle.cards.deck(player), &mut battle.rng) {
+    let id = if let Some(top_card) = battle.cards.top_of_deck_mut(player).last() {
+        *top_card
+    } else if let Some(random_card) =
+        random_element(battle.cards.shuffled_into_deck(player), &mut battle.rng)
+    {
         random_card
     } else {
         battle_trace!("Creating new test deck", battle, player);
@@ -152,11 +159,13 @@ fn draw_card_internal(
     };
 
     if with_animation {
+        battle_trace!("Drawing card", battle, player, id);
         battle.push_animation(source, || BattleAnimation::DrawCards {
             player,
             cards: vec![HandCardId(id.card_id())],
         });
     }
+
     Some(move_card::from_deck_to_hand(battle, source, player, id))
 }
 

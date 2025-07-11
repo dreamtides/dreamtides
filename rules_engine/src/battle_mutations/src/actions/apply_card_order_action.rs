@@ -58,7 +58,6 @@ pub fn execute_submit_deck_card_order(battle: &mut BattleState, player: PlayerNa
 
     let void = &deck_order_prompt.void;
     let deck = &deck_order_prompt.deck;
-
     battle_trace!("Submitting deck card order", battle, player, void, deck);
 
     for card_id in void {
@@ -70,4 +69,6 @@ pub fn execute_submit_deck_card_order(battle: &mut BattleState, player: PlayerNa
     for card_id in deck {
         top_of_deck.push(*card_id);
     }
+
+    battle_trace!("Deck card order submitted", battle, player, void, deck);
 }
