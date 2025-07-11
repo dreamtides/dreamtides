@@ -1,8 +1,11 @@
 use std::collections::HashSet;
 
 use action_data::game_action_data::GameAction;
-use battle_state::actions::battle_actions::BattleAction;
+use battle_state::actions::battle_actions::{
+    BattleAction, CardOrderSelectionTarget, DeckCardSelectedOrder,
+};
 use battle_state::actions::debug_battle_action::DebugBattleAction;
+use battle_state::battle::card_id::DeckCardId;
 use core_data::identifiers::CardName;
 use display_data::battle_view::{ButtonView, DisplayPlayer};
 use display_data::card_view::ClientCardId;
@@ -113,6 +116,20 @@ pub trait TestSessionBattleExtension {
     /// Panics if the server returns an error for clicking this button or if the
     /// button is disabled or not present.
     fn click_decrement_button(&mut self, player: DisplayPlayer);
+
+    /// Selects the order for a card in the Card Order Selector Browser.
+    ///
+    /// Used during Foresee effects to place cards either back on the deck at
+    /// a specific position or into the void.
+    ///
+    /// Panics if the server returns an error for this action or if the card
+    /// cannot be ordered.
+    fn select_card_order(
+        &mut self,
+        player: DisplayPlayer,
+        card_id: &ClientCardId,
+        target: CardOrderSelectionTarget,
+    );
 
     /// Finds a command of the specified type for a specific player.
     ///
@@ -268,6 +285,26 @@ impl TestSessionBattleExtension for TestSession {
     fn click_decrement_button(&mut self, player: DisplayPlayer) {
         let decrement_button = self.client(player).interface().decrement_button.clone();
         click_button(self, player, decrement_button, "decrement button", "");
+    }
+
+    fn select_card_order(
+        &mut self,
+        player: DisplayPlayer,
+        card_id: &ClientCardId,
+        target: CardOrderSelectionTarget,
+    ) {
+        let can_select_order = self
+            .client(player)
+            .cards
+            .get_revealed(card_id)
+            .actions
+            .can_select_order
+            .expect("Card cannot be selected for ordering");
+
+        let deck_card_id = DeckCardId(can_select_order);
+        let order = DeckCardSelectedOrder { card_id: deck_card_id, target };
+
+        self.perform_player_action(player, BattleAction::SelectOrderForDeckCard(order));
     }
 
     fn find_command<T>(
