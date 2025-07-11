@@ -2,7 +2,7 @@ use battle_state::actions::battle_actions::CardOrderSelectionTargetDiscriminants
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, DeckCardId};
 use battle_state::prompt_types::prompt_data::PromptType;
-use display_data::object_position::{ObjectPosition, Position};
+use display_data::object_position::{ObjectPosition, Position, StackType};
 
 use crate::core::response_builder::ResponseBuilder;
 use crate::display_actions::{apply_battle_display_action, display_state};
@@ -17,14 +17,14 @@ pub fn object_position(
     base_object_position: ObjectPosition,
 ) -> ObjectPosition {
     let position = if let Some(prompt) = &battle.prompt
-        && let Some(source_card_id) = prompt.source.card_id()
-        && source_card_id == card_id
+        && prompt.source.card_id() == Some(card_id)
     {
         Position::OnStack(positions::current_stack_type(builder, battle))
     } else {
         base_object_position.position
     };
     let position = for_hidden_stack(builder, position);
+    let position = for_stack_during_prompt(battle, position);
     let object_position = for_card_order_browser(battle, card_id, ObjectPosition {
         position,
         sorting_key: base_object_position.sorting_key,
@@ -46,6 +46,21 @@ pub fn for_browser(builder: &ResponseBuilder, position: Position) -> Position {
         && position == browser_source
     {
         Position::Browser
+    } else {
+        position
+    }
+}
+
+/// Returns the position for a card if the stack is being displayed during a
+/// prompt.
+fn for_stack_during_prompt(battle: &BattleState, position: Position) -> Position {
+    // Minimize the stack during the "select deck card order" prompt since it's
+    // visually distracting.
+    if let Some(prompt) = &battle.prompt
+        && let PromptType::SelectDeckCardOrder { .. } = &prompt.prompt_type
+        && matches!(position, Position::OnStack(_))
+    {
+        Position::OnStack(StackType::TargetingBothBattlefields)
     } else {
         position
     }

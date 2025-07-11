@@ -44,8 +44,6 @@ pub fn execute_select_order_for_deck_card(
 }
 
 pub fn execute_submit_deck_card_order(battle: &mut BattleState, player: PlayerName) {
-    battle_trace!("Submitting deck card order", battle, player);
-
     let Some(prompt) = battle.prompt.take() else {
         panic_with!("No prompt found", battle, player);
     };
@@ -58,13 +56,18 @@ pub fn execute_submit_deck_card_order(battle: &mut BattleState, player: PlayerNa
         panic_with!("Prompt type mismatch", battle, player);
     };
 
-    for card_id in &deck_order_prompt.void {
+    let void = &deck_order_prompt.void;
+    let deck = &deck_order_prompt.deck;
+
+    battle_trace!("Submitting deck card order", battle, player, void, deck);
+
+    for card_id in void {
         move_card::from_deck_to_void(battle, prompt.source, player, card_id);
     }
 
     let top_of_deck = battle.cards.top_of_deck_mut(player);
-    top_of_deck.retain(|&card_id| !deck_order_prompt.deck.contains(&card_id));
-    for card_id in &deck_order_prompt.deck {
+    top_of_deck.retain(|&card_id| !deck.contains(&card_id));
+    for card_id in deck {
         top_of_deck.push(*card_id);
     }
 }

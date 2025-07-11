@@ -79,7 +79,10 @@ fn get_battle_impl(
                     let is_undo_player = undo == Some(history_action.player);
                     let legal = legal_actions::compute(&battle, history_action.player);
                     let auto = should_auto_execute_action(&legal);
-                    if is_undo_player && auto != Some(history_action.action) {
+                    if is_undo_player
+                        && auto != Some(history_action.action)
+                        && !should_skip_action_for_undo(history_action.action)
+                    {
                         last_non_auto_battle = Some((battle.clone(), quest_id));
                     }
 
@@ -129,6 +132,11 @@ fn get_battle_impl(
             result
         }
     }
+}
+
+/// Returns true if the action should be skipped for an undo operation.
+fn should_skip_action_for_undo(action: BattleAction) -> bool {
+    matches!(action, BattleAction::SelectOrderForDeckCard(_))
 }
 
 fn write_deserialization_panic_trace(

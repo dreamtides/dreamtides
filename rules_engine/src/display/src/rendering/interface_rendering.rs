@@ -151,7 +151,7 @@ fn get_generic_prompt_message(prompt_type: &PromptType) -> String {
         PromptType::ChooseStackCard { .. } => "Select a card".to_string(),
         PromptType::Choose { .. } => "Select an option".to_string(),
         PromptType::ChooseEnergyValue { .. } => "Choose energy amount".to_string(),
-        PromptType::SelectDeckCardOrder { .. } => "Select card order".to_string(),
+        PromptType::SelectDeckCardOrder { .. } => "Select card position".to_string(),
     }
 }
 

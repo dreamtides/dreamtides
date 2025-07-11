@@ -75,8 +75,5 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
 }
 
 fn should_record_in_history(action: BattleAction) -> bool {
-    !matches!(
-        action,
-        BattleAction::ToggleOrderSelectorVisibility | BattleAction::SelectOrderForDeckCard(_)
-    )
+    !matches!(action, BattleAction::ToggleOrderSelectorVisibility)
 }

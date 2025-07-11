@@ -1,17 +1,23 @@
-use std::iter;
 use std::marker::PhantomData;
+use std::{fmt, iter};
 
 use bit_set::BitSet;
 
 use crate::battle::card_id::{CardId, CardIdType};
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct CardSet<T> {
     // - BitSet<usize> does around 2% better in our benchmarks than BitSet<u32>
     // - FixedBitSet generally seems to perform the same or worse.
     // - BTreeSet is around 8% slower than BitSet
     set: BitSet<usize>,
     _marker: PhantomData<T>,
+}
+
+impl<T: CardIdType> fmt::Debug for CardSet<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "CardSet({:?})", self.set)
+    }
 }
 
 impl<T: CardIdType> Default for CardSet<T> {
