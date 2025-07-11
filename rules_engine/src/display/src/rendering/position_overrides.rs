@@ -2,6 +2,7 @@ use battle_state::actions::battle_actions::CardOrderSelectionTargetDiscriminants
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, DeckCardId};
 use battle_state::prompt_types::prompt_data::PromptType;
+use core_data::types::PlayerName;
 use display_data::object_position::{ObjectPosition, Position, StackType};
 
 use crate::core::response_builder::ResponseBuilder;
@@ -78,15 +79,13 @@ fn for_top_of_deck(
 ) -> ObjectPosition {
     if matches!(base_object_position.position, Position::InDeck(_)) {
         let deck_card_id = DeckCardId(card_id);
-
-        for player in [core_data::types::PlayerName::One, core_data::types::PlayerName::Two] {
+        for player in [PlayerName::One, PlayerName::Two] {
             let top_of_deck_list = battle.cards.top_of_deck(player);
-
-            if top_of_deck_list.contains(&deck_card_id) {
-                let next_display_id = battle.cards.next_object_id_for_display();
+            if let Some(position) = top_of_deck_list.iter().position(|&id| id == deck_card_id) {
+                let next_display_id = battle.cards.next_object_id_for_display().0 as u32;
                 return ObjectPosition {
                     position: base_object_position.position,
-                    sorting_key: next_display_id.0 as u32,
+                    sorting_key: next_display_id + position as u32,
                 };
             }
         }

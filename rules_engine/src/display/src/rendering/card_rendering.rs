@@ -177,6 +177,9 @@ pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
         CardName::TestForeseeOne => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
+        CardName::TestForeseeTwo => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
+        ),
     }
 }
 
@@ -234,6 +237,9 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         }
         CardName::TestForeseeOne => {
             "<b>Foresee</b> 1.".to_string()
+        }
+        CardName::TestForeseeTwo => {
+            "<b>Foresee</b> 2.".to_string()
         }
     };
 

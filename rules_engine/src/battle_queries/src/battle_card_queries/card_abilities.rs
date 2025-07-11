@@ -40,6 +40,7 @@ static TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: OnceLock<AbilityLi
 static TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER: OnceLock<AbilityList> = OnceLock::new();
 static TEST_DUAL_ACTIVATED_ABILITY_CHARACTER: OnceLock<AbilityList> = OnceLock::new();
 static TEST_FORESEE_1: OnceLock<AbilityList> = OnceLock::new();
+static TEST_FORESEE_2: OnceLock<AbilityList> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static AbilityList {
     query_by_name(card::get(battle, card_id).name)
@@ -258,6 +259,16 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 Ability::Event(EventAbility {
                     additional_cost: None,
                     effect: Effect::Effect(StandardEffect::Foresee { count: 1 }),
+                }),
+                AbilityConfiguration::default(),
+            )])
+        }),
+        CardName::TestForeseeTwo => TEST_FORESEE_2.get_or_init(|| {
+            build_ability_list(vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::Foresee { count: 2 }),
                 }),
                 AbilityConfiguration::default(),
             )])

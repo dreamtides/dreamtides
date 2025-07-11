@@ -630,8 +630,6 @@ namespace Dreamtides.Schema
     ///
     /// Object is in a player's hand
     ///
-    /// Object is on top of a player's deck
-    ///
     /// Object is shuffled into a player's deck
     ///
     /// Object is in a player's void
@@ -656,9 +654,6 @@ namespace Dreamtides.Schema
 
         [JsonProperty("inHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? InHand { get; set; }
-
-        [JsonProperty("onTopOfDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayPlayer? OnTopOfDeck { get; set; }
 
         [JsonProperty("inDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? InDeck { get; set; }
@@ -2240,7 +2235,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitDeckCardOrder, SubmitMulligan, ToggleOrderSelectorVisibility };
 
-    public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCardCharacter, TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestMultiActivatedAbilityDrawCardCharacter, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
+    public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCardCharacter, TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestForeseeTwo, TestMultiActivatedAbilityDrawCardCharacter, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
 
     /// <summary>
     /// Identifies a player in an ongoing battle.
@@ -3331,6 +3326,8 @@ namespace Dreamtides.Schema
                     return CardName.TestFastMultiActivatedAbilityDrawCardCharacter;
                 case "TestForeseeOne":
                     return CardName.TestForeseeOne;
+                case "TestForeseeTwo":
+                    return CardName.TestForeseeTwo;
                 case "TestMultiActivatedAbilityDrawCardCharacter":
                     return CardName.TestMultiActivatedAbilityDrawCardCharacter;
                 case "TestTriggerGainSparkOnPlayCardEnemyTurn":
@@ -3384,6 +3381,9 @@ namespace Dreamtides.Schema
                     return;
                 case CardName.TestForeseeOne:
                     serializer.Serialize(writer, "TestForeseeOne");
+                    return;
+                case CardName.TestForeseeTwo:
+                    serializer.Serialize(writer, "TestForeseeTwo");
                     return;
                 case CardName.TestMultiActivatedAbilityDrawCardCharacter:
                     serializer.Serialize(writer, "TestMultiActivatedAbilityDrawCardCharacter");
