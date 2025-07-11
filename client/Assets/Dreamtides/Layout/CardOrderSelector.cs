@@ -138,12 +138,12 @@ namespace Dreamtides.Layout
 
     protected override void OnHideStart()
     {
-      if (View?.IncludeDeck == true)
+      if (_deckImage.activeSelf)
       {
         TweenUtils.FadeOutSprite(_deckImage.GetComponent<SpriteRenderer>());
       }
 
-      if (View?.IncludeVoid == true)
+      if (_voidImage.activeSelf)
       {
         TweenUtils.FadeOutSprite(_voidImage.GetComponent<SpriteRenderer>());
       }
