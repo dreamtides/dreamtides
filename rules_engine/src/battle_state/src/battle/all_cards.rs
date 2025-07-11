@@ -322,7 +322,9 @@ impl AllCards {
 
     fn new_object_id(&mut self) -> ObjectId {
         let result = self.next_object_id;
-        self.next_object_id = ObjectId(result.0 + 1);
+        // Hopefully we won't have more than 18,446,744,073,709,551,615 active
+        // cards at once.
+        self.next_object_id = ObjectId(result.0.wrapping_add(1));
         result
     }
 
