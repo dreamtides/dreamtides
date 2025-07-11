@@ -51,9 +51,6 @@ pub enum Position {
     /// Object is in a player's hand
     InHand(DisplayPlayer),
 
-    /// Object is on top of a player's deck
-    OnTopOfDeck(DisplayPlayer),
-
     /// Object is shuffled into a player's deck
     InDeck(DisplayPlayer),
 

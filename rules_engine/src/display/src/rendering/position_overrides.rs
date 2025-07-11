@@ -25,12 +25,12 @@ pub fn object_position(
     };
     let position = for_hidden_stack(builder, position);
     let position = for_stack_during_prompt(battle, position);
-    let object_position = for_card_order_browser(battle, card_id, ObjectPosition {
+    let object_position = for_top_of_deck(battle, card_id, ObjectPosition {
         position,
         sorting_key: base_object_position.sorting_key,
     });
+    let object_position = for_card_order_browser(battle, card_id, object_position);
     let position = for_browser(builder, object_position.position);
-
     ObjectPosition { position, sorting_key: object_position.sorting_key }
 }
 
@@ -68,6 +68,31 @@ fn for_hidden_stack(builder: &ResponseBuilder, position: Position) -> Position {
     } else {
         position
     }
+}
+
+/// Returns the position and sorting key for a card if it is on top of deck.
+fn for_top_of_deck(
+    battle: &BattleState,
+    card_id: CardId,
+    base_object_position: ObjectPosition,
+) -> ObjectPosition {
+    if matches!(base_object_position.position, Position::InDeck(_)) {
+        let deck_card_id = DeckCardId(card_id);
+
+        for player in [core_data::types::PlayerName::One, core_data::types::PlayerName::Two] {
+            let top_of_deck_list = battle.cards.top_of_deck(player);
+
+            if top_of_deck_list.contains(&deck_card_id) {
+                let next_display_id = battle.cards.next_object_id_for_display();
+                return ObjectPosition {
+                    position: base_object_position.position,
+                    sorting_key: next_display_id.0 as u32,
+                };
+            }
+        }
+    }
+
+    base_object_position
 }
 
 /// Returns the position for a card in the card order browser, if it is being
