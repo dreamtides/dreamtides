@@ -1,5 +1,7 @@
+use battle_state::actions::battle_actions::CardOrderSelectionTargetDiscriminants;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::CardId;
+use battle_state::battle::card_id::{CardId, DeckCardId};
+use battle_state::prompt_types::prompt_data::PromptType;
 use display_data::object_position::Position;
 
 use crate::core::response_builder::ResponseBuilder;
@@ -23,6 +25,7 @@ pub fn position(
         position
     };
     position = for_hidden_stack(builder, position);
+    position = for_card_order_browser(battle, card_id, position);
     for_browser(builder, position)
 }
 
@@ -45,4 +48,22 @@ fn for_hidden_stack(builder: &ResponseBuilder, position: Position) -> Position {
     } else {
         position
     }
+}
+
+/// Returns the position for a card in the card order browser, if it is being
+/// ordered.
+fn for_card_order_browser(battle: &BattleState, card_id: CardId, position: Position) -> Position {
+    if let Some(prompt) = &battle.prompt
+        && let PromptType::SelectDeckCardOrder { prompt: deck_prompt } = &prompt.prompt_type
+    {
+        let deck_card_id = DeckCardId(card_id);
+        if deck_prompt.initial.contains(&deck_card_id) {
+            if deck_prompt.void.contains(deck_card_id) {
+                return Position::CardOrderSelector(CardOrderSelectionTargetDiscriminants::Void);
+            } else {
+                return Position::CardOrderSelector(CardOrderSelectionTargetDiscriminants::Deck);
+            }
+        }
+    }
+    position
 }

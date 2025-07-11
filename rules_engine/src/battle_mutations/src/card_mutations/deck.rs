@@ -131,7 +131,7 @@ fn draw_card_internal(
         return None;
     }
 
-    let id = if let Some(top_card) = battle.cards.top_of_deck_mut(player).pop_front() {
+    let id = if let Some(top_card) = battle.cards.top_of_deck_mut(player).pop() {
         top_card
     } else if let Some(random_card) = random_element(battle.cards.deck(player), &mut battle.rng) {
         random_card

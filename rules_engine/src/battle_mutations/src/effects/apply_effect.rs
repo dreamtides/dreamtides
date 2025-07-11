@@ -6,14 +6,19 @@ use battle_queries::battle_card_queries::stack_card_queries;
 use battle_queries::battle_player_queries::quantity_expression;
 use battle_queries::battle_trace;
 use battle_state::battle::battle_state::BattleState;
+use battle_state::battle_cards::card_set::CardSet;
 use battle_state::battle_cards::stack_card_state::EffectTargets;
 use battle_state::core::effect_source::EffectSource;
+use battle_state::prompt_types::prompt_data::{
+    PromptConfiguration, PromptData, PromptType, SelectDeckCardOrderPrompt,
+};
 use core_data::numerics::Spark;
 use core_data::types::PlayerName;
 
 use crate::card_mutations::{counterspell, deck, spark};
 use crate::character_mutations::dissolve;
 use crate::effects::{counterspell_unless_pays_cost, pay_cost, targeting};
+use crate::prompt_mutations::prompts;
 
 /// Marker struct indicating that an effect was applied to the battle state.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -129,12 +134,33 @@ fn dissolve(
 }
 
 fn foresee(
-    _battle: &mut BattleState,
-    _source: EffectSource,
+    battle: &mut BattleState,
+    source: EffectSource,
     _targets: Option<&EffectTargets>,
-    _count: u32,
+    count: u32,
 ) -> Option<EffectWasApplied> {
-    todo!()
+    let player = source.controller();
+    let cards = deck::realize_top_of_deck(battle, player, count);
+
+    if !cards.is_empty() {
+        let prompt = SelectDeckCardOrderPrompt {
+            initial: cards.clone(),
+            moved: CardSet::new(),
+            deck: cards,
+            void: CardSet::new(),
+        };
+
+        prompts::set(battle, PromptData {
+            source,
+            player,
+            prompt_type: PromptType::SelectDeckCardOrder { prompt },
+            configuration: PromptConfiguration::default(),
+        });
+
+        Some(EffectWasApplied)
+    } else {
+        None
+    }
 }
 
 fn gains_spark(

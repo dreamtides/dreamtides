@@ -12,7 +12,7 @@ use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{PromptData, PromptType};
 use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
-use display_data::battle_view::{ButtonView, InterfaceView};
+use display_data::battle_view::{ButtonView, CardOrderSelectorView, InterfaceView};
 use masonry::dimension::{FlexInsets, SafeAreaInsets};
 use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition};
 use masonry::flex_style::FlexStyle;
@@ -70,7 +70,7 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
             label: "\u{f0e2}".to_string(),
             action: Some(GameAction::Undo(builder.act_for_player())),
         }),
-        card_order_selector: None,
+        card_order_selector: card_order_selector_view(battle),
         bottom_right_button: None,
     }
 }
@@ -187,7 +187,12 @@ fn primary_action_button(
         }
     }
 
-    if legal_actions.contains(BattleAction::PassPriority, ForPlayer::Human) {
+    if legal_actions.contains(BattleAction::SubmitDeckCardOrder, ForPlayer::Human) {
+        Some(ButtonView {
+            label: "Submit".to_string(),
+            action: Some(BattleAction::SubmitDeckCardOrder.into()),
+        })
+    } else if legal_actions.contains(BattleAction::PassPriority, ForPlayer::Human) {
         Some(ButtonView {
             label: "Resolve".to_string(),
             action: Some(BattleAction::PassPriority.into()),
@@ -314,4 +319,14 @@ fn render_hide_stack_button(
             )
             .build(),
     )
+}
+
+fn card_order_selector_view(battle: &BattleState) -> Option<CardOrderSelectorView> {
+    if let Some(prompt) = &battle.prompt
+        && let PromptType::SelectDeckCardOrder { .. } = &prompt.prompt_type
+    {
+        Some(CardOrderSelectorView { include_deck: true, include_void: true })
+    } else {
+        None
+    }
 }

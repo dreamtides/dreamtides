@@ -89,6 +89,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
         is_fast: false,
         actions: CardActions {
             can_play: play_action,
+            can_select_order: can_select_order_action(&legal_actions, card_id),
             on_click: selection_action,
             play_effect_preview: if can_play {
                 Some(outcome_simulation::action_effect_preview(
@@ -123,6 +124,10 @@ fn selection_action(legal_actions: &LegalActions, card_id: CardId) -> Option<Gam
     }
 
     None
+}
+
+fn can_select_order_action(legal_actions: &LegalActions, card_id: CardId) -> Option<CardId> {
+    if let LegalActions::SelectDeckCardOrder { .. } = legal_actions { Some(card_id) } else { None }
 }
 
 pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {

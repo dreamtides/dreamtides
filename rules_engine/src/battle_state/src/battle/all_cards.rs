@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, VecDeque};
+use std::collections::BTreeMap;
 
 use core_data::identifiers::CardName;
 use core_data::numerics::Spark;
@@ -37,7 +37,7 @@ pub struct AllCards {
     void: PlayerMap<CardSet<VoidCardId>>,
     hands: PlayerMap<CardSet<HandCardId>>,
     decks: PlayerMap<CardSet<DeckCardId>>,
-    tops_of_decks: PlayerMap<VecDeque<DeckCardId>>,
+    tops_of_decks: PlayerMap<Vec<DeckCardId>>,
     stack: StackItems,
     stack_card_set: PlayerMap<CardSet<StackCardId>>,
     banished: PlayerMap<CardSet<BanishedCardId>>,
@@ -134,23 +134,26 @@ impl AllCards {
 
     /// Returns the top of deck cards for a given player.
     ///
-    /// The front (index 0) of the deque is the top card of the deck.
-    pub fn top_of_deck(&self, player: PlayerName) -> &VecDeque<DeckCardId> {
+    /// The last element of the vector is the topmost card of the deck.
+    pub fn top_of_deck(&self, player: PlayerName) -> &Vec<DeckCardId> {
         self.tops_of_decks.player(player)
     }
 
     /// Mutable equivalent to [Self::top_of_deck].
-    pub fn top_of_deck_mut(&mut self, player: PlayerName) -> &mut VecDeque<DeckCardId> {
+    ///
+    /// The last element of the vector is the topmost card of the deck.
+    pub fn top_of_deck_mut(&mut self, player: PlayerName) -> &mut Vec<DeckCardId> {
         self.tops_of_decks.player_mut(player)
     }
 
-    /// Moves a card from deck to the top of the deck for a given player.
+    /// Moves a card from deck to the topmost position in the deck for a given
+    /// player.
     ///
     /// Returns true if the card was found and moved.
     pub fn move_card_to_top_of_deck(&mut self, player: PlayerName, card_id: DeckCardId) -> bool {
         if self.decks.player(player).contains(card_id) {
             self.decks.player_mut(player).remove(card_id);
-            self.tops_of_decks.player_mut(player).push_back(card_id);
+            self.tops_of_decks.player_mut(player).push(card_id);
             true
         } else {
             false

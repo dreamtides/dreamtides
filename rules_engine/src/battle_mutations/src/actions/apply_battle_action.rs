@@ -6,7 +6,7 @@ use battle_state::battle::battle_state::BattleState;
 use core_data::types::PlayerName;
 use tracing::instrument;
 
-use crate::actions::apply_debug_battle_action;
+use crate::actions::{apply_card_order_action, apply_debug_battle_action};
 use crate::activated_abilities::apply_activate_ability;
 use crate::phase_mutations::{fire_triggers, turn};
 use crate::play_cards::{play_card, resolve_card, select_stack_card_target};
@@ -56,6 +56,12 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
         BattleAction::SelectEnergyAdditionalCost(cost) => {
             select_additional_costs::energy_cost(battle, player, cost);
         }
+        BattleAction::SelectOrderForDeckCard(order) => {
+            apply_card_order_action::execute_select_order_for_deck_card(battle, player, order);
+        }
+        BattleAction::SubmitDeckCardOrder => {
+            apply_card_order_action::execute_submit_deck_card_order(battle, player);
+        }
         _ => {
             todo!("Implement {:?}", action);
         }
@@ -71,6 +77,6 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
 fn should_record_in_history(action: BattleAction) -> bool {
     !matches!(
         action,
-            | BattleAction::ToggleOrderSelectorVisibility
+        BattleAction::ToggleOrderSelectorVisibility | BattleAction::SelectOrderForDeckCard(_)
     )
 }
