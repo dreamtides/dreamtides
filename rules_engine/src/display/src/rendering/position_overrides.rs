@@ -25,11 +25,18 @@ pub fn object_position(
         base_object_position.position
     };
     let position = for_hidden_stack(builder, position);
-    let (position, sorting_key, sorting_sub_key) =
-        for_card_order_browser(battle, card_id, position, base_object_position.sorting_key);
-    let position = for_browser(builder, position);
+    let object_position = for_card_order_browser(battle, card_id, ObjectPosition {
+        position,
+        sorting_key: base_object_position.sorting_key,
+        sorting_sub_key: 0,
+    });
+    let position = for_browser(builder, object_position.position);
 
-    ObjectPosition { position, sorting_key, sorting_sub_key }
+    ObjectPosition {
+        position,
+        sorting_key: object_position.sorting_key,
+        sorting_sub_key: object_position.sorting_sub_key,
+    }
 }
 
 /// Returns the position for a card in the browser, if it is the current
@@ -58,36 +65,41 @@ fn for_hidden_stack(builder: &ResponseBuilder, position: Position) -> Position {
 fn for_card_order_browser(
     battle: &BattleState,
     card_id: CardId,
-    position: Position,
-    base_sorting_key: u32,
-) -> (Position, u32, u32) {
+    base_object_position: ObjectPosition,
+) -> ObjectPosition {
     if let Some(prompt) = &battle.prompt
         && let PromptType::SelectDeckCardOrder { prompt: deck_prompt } = &prompt.prompt_type
     {
         let deck_card_id = DeckCardId(card_id);
         if deck_prompt.initial.contains(&deck_card_id) {
             if deck_prompt.void.contains(deck_card_id) {
-                return (
-                    Position::CardOrderSelector(CardOrderSelectionTargetDiscriminants::Void),
-                    base_sorting_key,
-                    0,
-                );
+                return ObjectPosition {
+                    position: Position::CardOrderSelector(
+                        CardOrderSelectionTargetDiscriminants::Void,
+                    ),
+                    sorting_key: base_object_position.sorting_key,
+                    sorting_sub_key: 0,
+                };
             } else if let Some(position_in_deck) =
                 deck_prompt.deck.iter().position(|&id| id == deck_card_id)
             {
-                return (
-                    Position::CardOrderSelector(CardOrderSelectionTargetDiscriminants::Deck),
-                    position_in_deck as u32,
-                    0,
-                );
+                return ObjectPosition {
+                    position: Position::CardOrderSelector(
+                        CardOrderSelectionTargetDiscriminants::Deck,
+                    ),
+                    sorting_key: position_in_deck as u32,
+                    sorting_sub_key: 0,
+                };
             } else {
-                return (
-                    Position::CardOrderSelector(CardOrderSelectionTargetDiscriminants::Deck),
-                    base_sorting_key,
-                    0,
-                );
+                return ObjectPosition {
+                    position: Position::CardOrderSelector(
+                        CardOrderSelectionTargetDiscriminants::Deck,
+                    ),
+                    sorting_key: base_object_position.sorting_key,
+                    sorting_sub_key: 0,
+                };
             }
         }
     }
-    (position, base_sorting_key, 0)
+    base_object_position
 }
