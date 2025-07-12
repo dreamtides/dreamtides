@@ -18,6 +18,7 @@ battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 
 bit-set = { workspace = true }
+either = { workspace = true }
 rand = { workspace = true }
 rand_xoshiro = { workspace = true }
 tracing = { workspace = true }

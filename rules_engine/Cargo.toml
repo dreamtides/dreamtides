@@ -16,6 +16,7 @@ chumsky = "0.10"
 clap = { version = "4", features = ["derive"] }
 criterion = { version = "0.5.1", features = ["html_reports"] }
 ego-tree = "0.10"
+either = "1"
 enum-iterator = "2"
 enumset = { version = "1", features = ["serde"] }
 fastrand = "2"

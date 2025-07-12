@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use battle_mutations::card_mutations::{create_test_deck, deck};
 use battle_mutations::phase_mutations::turn;
 use battle_state::battle::all_cards::AllCards;
@@ -53,6 +55,7 @@ pub fn create_and_start(
         prompt: None,
         triggers: TriggerState::default(),
         activated_abilities: PlayerMap::default(),
+        pending_effects: VecDeque::new(),
         tracing: None,
         action_history: None,
         turn_history: TurnHistory::default(),

@@ -77,14 +77,13 @@ fn resolve_stack_card(battle: &mut BattleState, item: &StackItemState, card_id: 
 }
 
 fn apply_event_effects(battle: &mut BattleState, item: &StackItemState, card_id: StackCardId) {
-    for data in &card_abilities::query(battle, card_id).event_abilities {
-        let event_source = EffectSource::Event {
-            controller: item.controller,
-            stack_card_id: card_id,
-            ability_number: data.ability_number,
-        };
-        apply_effect::execute(battle, event_source, &data.ability.effect, item.targets.as_ref());
-    }
+    apply_effect::execute_event_abilities(
+        battle,
+        item.controller,
+        card_id,
+        &card_abilities::query(battle, card_id).event_abilities,
+        item.targets.as_ref(),
+    );
 }
 
 fn resolve_activated_ability(

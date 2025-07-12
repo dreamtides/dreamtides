@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::time::Duration;
 
 use ai_agents::agent_search;
@@ -387,6 +388,7 @@ fn benchmark_battle() -> BattleState {
         prompt: None,
         triggers: TriggerState::default(),
         activated_abilities: PlayerMap::default(),
+        pending_effects: VecDeque::new(),
         animations: None,
         tracing: None,
         action_history: None,

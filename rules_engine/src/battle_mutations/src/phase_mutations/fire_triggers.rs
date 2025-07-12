@@ -6,6 +6,7 @@ use battle_queries::card_ability_queries::{effect_predicates, trigger_queries};
 use battle_queries::panic_with;
 use battle_state::battle::battle_animation::{BattleAnimation, TriggerAnimation};
 use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::card_id::CharacterId;
 use battle_state::battle_cards::ability_list::AbilityData;
 use battle_state::battle_cards::stack_card_state::EffectTargets;
@@ -13,7 +14,7 @@ use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger::Trigger;
 use core_data::types::PlayerName;
 
-use crate::effects::apply_effect::{self, EffectWasApplied};
+use crate::effects::apply_effect;
 
 /// Fires all recorded triggers for the given [BattleState] while no prompt is
 /// active.
@@ -27,6 +28,10 @@ pub fn execute_if_no_active_prompt(battle: &mut BattleState) {
 
     loop {
         if battle.prompt.is_some() {
+            break;
+        }
+
+        if matches!(battle.status, BattleStatus::GameOver { .. }) {
             break;
         }
 
@@ -121,7 +126,7 @@ fn fire_triggered_ability(
     ability_data: &AbilityData<TriggeredAbility>,
     controller: PlayerName,
     controlling_character: CharacterId,
-) -> Option<EffectWasApplied> {
+) {
     let source = EffectSource::Triggered {
         controller,
         character_id: controlling_character,
@@ -132,7 +137,7 @@ fn fire_triggered_ability(
     };
 
     let targets = trigger_targets(battle, trigger, effect, controller, controlling_character);
-    apply_effect::execute(battle, source, &ability_data.ability.effect, targets.as_ref())
+    apply_effect::execute(battle, source, &ability_data.ability.effect, targets.as_ref());
 }
 
 fn trigger_targets(

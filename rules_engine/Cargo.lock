@@ -318,6 +318,7 @@ dependencies = [
  "battle_state",
  "bit-set",
  "core_data",
+ "either",
  "rand 0.9.0",
  "rand_xoshiro",
  "tracing",
