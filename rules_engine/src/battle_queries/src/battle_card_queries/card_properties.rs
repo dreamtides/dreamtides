@@ -30,6 +30,7 @@ pub fn display_name(card_name: CardName) -> String {
         CardName::TestDualActivatedAbilityCharacter => "Dual Abilities".to_string(),
         CardName::TestForeseeOne => "Foresee 1".to_string(),
         CardName::TestForeseeTwo => "Foresee 2".to_string(),
+        CardName::TestForeseeOneDrawACard => "Foresee 1 Draw 1".to_string(),
     }
 }
 
@@ -51,6 +52,7 @@ pub fn cost(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
         CardName::TestDualActivatedAbilityCharacter => Some(Energy(4)),
         CardName::TestForeseeOne => Some(Energy(1)),
         CardName::TestForeseeTwo => Some(Energy(1)),
+        CardName::TestForeseeOneDrawACard => Some(Energy(1)),
     }
 }
 
@@ -108,6 +110,7 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
         CardName::TestDualActivatedAbilityCharacter => CardType::Character(CharacterType::Ancient),
         CardName::TestForeseeOne => CardType::Event,
         CardName::TestForeseeTwo => CardType::Event,
+        CardName::TestForeseeOneDrawACard => CardType::Event,
     }
 }
 
@@ -129,5 +132,6 @@ pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
         CardName::TestDualActivatedAbilityCharacter => false,
         CardName::TestForeseeOne => true,
         CardName::TestForeseeTwo => true,
+        CardName::TestForeseeOneDrawACard => true,
     }
 }

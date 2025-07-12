@@ -3,7 +3,7 @@ use std::sync::OnceLock;
 use ability_data::ability::{Ability, EventAbility};
 use ability_data::activated_ability::{ActivatedAbility, ActivatedAbilityOptions};
 use ability_data::cost::Cost;
-use ability_data::effect::Effect;
+use ability_data::effect::{Effect, EffectWithOptions};
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
@@ -41,6 +41,7 @@ static TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER: OnceLock<AbilityList> = OnceLo
 static TEST_DUAL_ACTIVATED_ABILITY_CHARACTER: OnceLock<AbilityList> = OnceLock::new();
 static TEST_FORESEE_1: OnceLock<AbilityList> = OnceLock::new();
 static TEST_FORESEE_2: OnceLock<AbilityList> = OnceLock::new();
+static TEST_FORESEE_1_DRAW_A_CARD: OnceLock<AbilityList> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static AbilityList {
     query_by_name(card::get(battle, card_id).name)
@@ -269,6 +270,19 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 Ability::Event(EventAbility {
                     additional_cost: None,
                     effect: Effect::Effect(StandardEffect::Foresee { count: 2 }),
+                }),
+                AbilityConfiguration::default(),
+            )])
+        }),
+        CardName::TestForeseeOneDrawACard => TEST_FORESEE_1_DRAW_A_CARD.get_or_init(|| {
+            build_ability_list(vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::List(vec![
+                        EffectWithOptions::new(StandardEffect::Foresee { count: 1 }),
+                        EffectWithOptions::new(StandardEffect::DrawCards { count: 1 }),
+                    ]),
                 }),
                 AbilityConfiguration::default(),
             )])

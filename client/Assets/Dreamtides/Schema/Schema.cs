@@ -2235,7 +2235,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitDeckCardOrder, SubmitMulligan, ToggleOrderSelectorVisibility };
 
-    public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCardCharacter, TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestForeseeTwo, TestMultiActivatedAbilityDrawCardCharacter, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
+    public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCardCharacter, TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestForeseeOneDrawACard, TestForeseeTwo, TestMultiActivatedAbilityDrawCardCharacter, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
 
     /// <summary>
     /// Identifies a player in an ongoing battle.
@@ -3326,6 +3326,8 @@ namespace Dreamtides.Schema
                     return CardName.TestFastMultiActivatedAbilityDrawCardCharacter;
                 case "TestForeseeOne":
                     return CardName.TestForeseeOne;
+                case "TestForeseeOneDrawACard":
+                    return CardName.TestForeseeOneDrawACard;
                 case "TestForeseeTwo":
                     return CardName.TestForeseeTwo;
                 case "TestMultiActivatedAbilityDrawCardCharacter":
@@ -3381,6 +3383,9 @@ namespace Dreamtides.Schema
                     return;
                 case CardName.TestForeseeOne:
                     serializer.Serialize(writer, "TestForeseeOne");
+                    return;
+                case CardName.TestForeseeOneDrawACard:
+                    serializer.Serialize(writer, "TestForeseeOneDrawACard");
                     return;
                 case CardName.TestForeseeTwo:
                     serializer.Serialize(writer, "TestForeseeTwo");

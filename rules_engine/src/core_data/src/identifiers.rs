@@ -65,6 +65,7 @@ pub enum CardName {
     TestDualActivatedAbilityCharacter,
     TestForeseeOne,
     TestForeseeTwo,
+    TestForeseeOneDrawACard,
 }
 
 /// Identifies an ability of a card.

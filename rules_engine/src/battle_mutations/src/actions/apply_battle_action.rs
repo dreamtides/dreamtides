@@ -8,6 +8,7 @@ use tracing::instrument;
 
 use crate::actions::{apply_card_order_action, apply_debug_battle_action};
 use crate::activated_abilities::apply_activate_ability;
+use crate::effects::apply_effect;
 use crate::phase_mutations::{fire_triggers, turn};
 use crate::play_cards::{play_card, resolve_card, select_stack_card_target};
 use crate::prompt_mutations::{select_additional_costs, select_choice_prompt_at_index};
@@ -66,6 +67,8 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
             todo!("Implement {:?}", action);
         }
     }
+
+    apply_effect::execute_pending_effects_if_no_active_prompt(battle);
 
     fire_triggers::execute_if_no_active_prompt(battle);
 

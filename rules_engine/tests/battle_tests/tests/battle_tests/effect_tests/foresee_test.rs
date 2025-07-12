@@ -467,3 +467,140 @@ fn foresee_two_with_only_one_card_in_deck() {
         "The second card at position 1 should be in hand after drawing"
     );
 }
+
+#[test]
+fn foresee_one_draw_a_card_keep_card_on_deck() {
+    let mut s = TestBattle::builder().connect();
+    s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
+
+    s.create_and_play(DisplayPlayer::User, CardName::TestForeseeOneDrawACard);
+
+    assert!(
+        s.user_client.interface().card_order_selector.is_some(),
+        "Card order selector should be displayed"
+    );
+
+    let cards_in_browser: Vec<_> = s
+        .user_client
+        .cards
+        .card_map
+        .values()
+        .filter(|card| matches!(card.view.position.position, Position::CardOrderSelector(_)))
+        .collect();
+
+    assert_eq!(cards_in_browser.len(), 1, "Should have exactly 1 card in browser");
+
+    let card_id = cards_in_browser[0].id.clone();
+
+    s.select_card_order(DisplayPlayer::User, &card_id, CardOrderSelectionTarget::Deck(0));
+    s.click_primary_button(DisplayPlayer::User, "Submit");
+
+    assert!(
+        s.user_client.interface().card_order_selector.is_none(),
+        "Card order selector should be hidden after submission"
+    );
+
+    assert!(
+        s.user_client.cards.user_hand().contains(&card_id),
+        "The card we placed on deck should now be in hand after automatic draw"
+    );
+}
+
+#[test]
+fn foresee_one_draw_a_card_put_card_in_void() {
+    let mut s = TestBattle::builder().connect();
+    s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
+
+    let initial_hand_count = s.user_client.cards.user_hand().len();
+
+    s.create_and_play(DisplayPlayer::User, CardName::TestForeseeOneDrawACard);
+
+    let cards_in_browser: Vec<_> = s
+        .user_client
+        .cards
+        .card_map
+        .values()
+        .filter(|card| matches!(card.view.position.position, Position::CardOrderSelector(_)))
+        .collect();
+
+    assert_eq!(cards_in_browser.len(), 1, "Should have exactly 1 card in browser");
+
+    let card_id = cards_in_browser[0].id.clone();
+
+    s.select_card_order(DisplayPlayer::User, &card_id, CardOrderSelectionTarget::Void);
+    s.click_primary_button(DisplayPlayer::User, "Submit");
+
+    assert!(
+        s.user_client.cards.user_void().contains(&card_id),
+        "The card we placed in void should now be in the void"
+    );
+
+    assert!(
+        !s.user_client.cards.user_hand().contains(&card_id),
+        "The voided card should not be in hand"
+    );
+
+    assert_eq!(
+        s.user_client.cards.user_hand().len(),
+        initial_hand_count + 1,
+        "Should have drawn a new card, increasing hand size by 1"
+    );
+}
+
+#[test]
+fn foresee_one_draw_a_card_with_empty_deck() {
+    let mut s = TestBattle::builder().connect();
+
+    s.perform_user_action(DebugBattleAction::SetCardsRemainingInDeck {
+        player: PlayerName::One,
+        cards: 0,
+    });
+
+    assert_eq!(s.user_client.cards.user_deck().len(), 0, "User deck should be empty");
+
+    let initial_hand_count = s.user_client.cards.user_hand().len();
+
+    s.create_and_play(DisplayPlayer::User, CardName::TestForeseeOneDrawACard);
+
+    assert!(
+        s.user_client.interface().card_order_selector.is_some(),
+        "Card order selector should be displayed even when deck is empty"
+    );
+
+    let cards_in_browser: Vec<_> = s
+        .user_client
+        .cards
+        .card_map
+        .values()
+        .filter(|card| matches!(card.view.position.position, Position::CardOrderSelector(_)))
+        .collect();
+
+    assert_eq!(
+        cards_in_browser.len(),
+        1,
+        "Should have 1 card in browser even when deck starts empty"
+    );
+
+    let card_id = cards_in_browser[0].id.clone();
+
+    s.select_card_order(DisplayPlayer::User, &card_id, CardOrderSelectionTarget::Deck(0));
+    s.click_primary_button(DisplayPlayer::User, "Submit");
+
+    assert!(
+        s.user_client.interface().card_order_selector.is_none(),
+        "Card order selector should be hidden after submission"
+    );
+
+    assert!(
+        s.user_client.cards.user_hand().contains(&card_id),
+        "The card should be in hand after being placed on deck and drawn"
+    );
+
+    assert_eq!(
+        s.user_client.cards.user_hand().len(),
+        initial_hand_count + 1,
+        "Should have drawn exactly 1 card, increasing hand size by 1"
+    );
+}
