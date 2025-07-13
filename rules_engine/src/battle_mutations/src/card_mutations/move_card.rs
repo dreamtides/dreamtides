@@ -168,10 +168,18 @@ pub fn to_destination_zone(
         on_leave_battlefield(battle, controller, card_id);
     }
 
+    if old == Zone::Void {
+        on_leave_void(battle, controller, card_id);
+    }
+
     battle.cards.move_card(controller, card_id, old, new);
 
     if new == Zone::Battlefield {
         on_enter_battlefield(battle, source, controller, card_id);
+    }
+
+    if new == Zone::Void {
+        on_enter_void(battle, controller, card_id);
     }
 }
 
@@ -212,6 +220,28 @@ fn on_enter_battlefield(
     }
 
     battle.triggers.push(source, Trigger::Materialized(id));
+}
+
+fn on_enter_void(battle: &mut BattleState, controller: PlayerName, card_id: CardId) {
+    let ability_list = card_abilities::query(battle, card_id);
+    if ability_list.has_play_from_void_ability {
+        battle
+            .static_abilities
+            .player_mut(controller)
+            .has_play_from_void_ability
+            .insert(VoidCardId(card_id));
+    }
+}
+
+fn on_leave_void(battle: &mut BattleState, controller: PlayerName, card_id: CardId) {
+    let ability_list = card_abilities::query(battle, card_id);
+    if ability_list.has_play_from_void_ability {
+        battle
+            .static_abilities
+            .player_mut(controller)
+            .has_play_from_void_ability
+            .remove(VoidCardId(card_id));
+    }
 }
 
 #[cold]

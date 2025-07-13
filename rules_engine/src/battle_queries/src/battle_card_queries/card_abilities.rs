@@ -7,6 +7,7 @@ use ability_data::effect::{Effect, EffectWithOptions};
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
+use ability_data::static_ability::{PlayFromVoid, StandardStaticAbility, StaticAbility};
 use ability_data::trigger_event::{PlayerTurn, TriggerEvent};
 use ability_data::triggered_ability::TriggeredAbility;
 use battle_state::battle::battle_state::BattleState;
@@ -42,6 +43,7 @@ static TEST_DUAL_ACTIVATED_ABILITY_CHARACTER: OnceLock<AbilityList> = OnceLock::
 static TEST_FORESEE_1: OnceLock<AbilityList> = OnceLock::new();
 static TEST_FORESEE_2: OnceLock<AbilityList> = OnceLock::new();
 static TEST_FORESEE_1_DRAW_A_CARD: OnceLock<AbilityList> = OnceLock::new();
+static TEST_DRAW_ONE_RECLAIM: OnceLock<AbilityList> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static AbilityList {
     query_by_name(card::get(battle, card_id).name)
@@ -287,6 +289,25 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 AbilityConfiguration::default(),
             )])
         }),
+        CardName::TestDrawOneReclaim => TEST_DRAW_ONE_RECLAIM.get_or_init(|| {
+            build_ability_list(vec![
+                (
+                    AbilityNumber(0),
+                    Ability::Event(EventAbility {
+                        additional_cost: None,
+                        effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
+                    }),
+                    AbilityConfiguration::default(),
+                ),
+                (
+                    AbilityNumber(1),
+                    Ability::Static(StaticAbility::StaticAbility(StandardStaticAbility::Reclaim {
+                        cost: Some(Cost::Energy(Energy(1))),
+                    })),
+                    AbilityConfiguration::default(),
+                ),
+            ])
+        }),
     }
 }
 
@@ -334,6 +355,8 @@ fn build_ability_list(
     ]);
     ability_list.battlefield_triggers = battlefield_triggers(&ability_list);
     ability_list.has_battlefield_activated_abilities = !ability_list.activated_abilities.is_empty();
+    ability_list.has_play_from_void_ability = has_play_from_void_ability(&ability_list);
+
     ability_list
 }
 
@@ -439,4 +462,28 @@ fn watch_for_trigger(event: &TriggerEvent) -> TriggerName {
         TriggerEvent::PlayFromHand(..) => TriggerName::PlayedCardFromHand,
         _ => todo!("Implement watch_for_trigger() for {:?}", event),
     }
+}
+
+fn has_play_from_void_ability(list: &AbilityList) -> bool {
+    for ability in list.static_abilities.iter() {
+        let ability = match &ability.ability {
+            StaticAbility::StaticAbility(ability) => ability,
+            StaticAbility::WithOptions(ability) => &ability.ability,
+        };
+
+        match ability {
+            StandardStaticAbility::PlayFromVoid(PlayFromVoid { .. }) => {
+                return true;
+            }
+            StandardStaticAbility::PlayOnlyFromVoid => {
+                return true;
+            }
+            StandardStaticAbility::Reclaim { .. } => {
+                return true;
+            }
+            _ => {}
+        }
+    }
+
+    false
 }

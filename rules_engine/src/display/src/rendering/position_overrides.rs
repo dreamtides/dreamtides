@@ -1,8 +1,11 @@
-use battle_state::actions::battle_actions::CardOrderSelectionTargetDiscriminants;
+use battle_queries::legal_action_queries::legal_actions;
+use battle_queries::legal_action_queries::legal_actions_data::ForPlayer;
+use battle_state::actions::battle_actions::{BattleAction, CardOrderSelectionTargetDiscriminants};
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CardId, DeckCardId};
+use battle_state::battle::card_id::{CardId, DeckCardId, VoidCardId};
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
+use display_data::battle_view::DisplayPlayer;
 use display_data::object_position::{ObjectPosition, Position, StackType};
 
 use crate::core::response_builder::ResponseBuilder;
@@ -26,6 +29,7 @@ pub fn object_position(
     };
     let position = for_hidden_stack(builder, position);
     let position = for_stack_during_prompt(battle, position);
+    let position = for_playable_void_cards(builder, battle, card_id, position);
     let object_position = for_top_of_deck(battle, card_id, ObjectPosition {
         position,
         sorting_key: base_object_position.sorting_key,
@@ -69,6 +73,24 @@ fn for_hidden_stack(builder: &ResponseBuilder, position: Position) -> Position {
     } else {
         position
     }
+}
+
+/// Returns the position for a void card if it can be played, moving it to hand
+/// position.
+fn for_playable_void_cards(
+    builder: &ResponseBuilder,
+    battle: &BattleState,
+    card_id: CardId,
+    position: Position,
+) -> Position {
+    if matches!(position, Position::InVoid(DisplayPlayer::User)) {
+        let void_card_id = VoidCardId(card_id);
+        let legal_actions = legal_actions::compute(battle, builder.display_for_player());
+        if legal_actions.contains(BattleAction::PlayCardFromVoid(void_card_id), ForPlayer::Human) {
+            return Position::InHand(DisplayPlayer::User);
+        }
+    }
+    position
 }
 
 /// Returns the position and sorting key for a card if it is on top of deck.

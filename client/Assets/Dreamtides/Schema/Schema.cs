@@ -2240,7 +2240,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitDeckCardOrder, SubmitMulligan, ToggleOrderSelectorVisibility };
 
-    public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCardCharacter, TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestForeseeOneDrawACard, TestForeseeTwo, TestMultiActivatedAbilityDrawCardCharacter, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
+    public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCardCharacter, TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDrawOneReclaim, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestForeseeOneDrawACard, TestForeseeTwo, TestMultiActivatedAbilityDrawCardCharacter, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
 
     /// <summary>
     /// Identifies a player in an ongoing battle.
@@ -3323,6 +3323,8 @@ namespace Dreamtides.Schema
                     return CardName.TestDissolve;
                 case "TestDrawOne":
                     return CardName.TestDrawOne;
+                case "TestDrawOneReclaim":
+                    return CardName.TestDrawOneReclaim;
                 case "TestDualActivatedAbilityCharacter":
                     return CardName.TestDualActivatedAbilityCharacter;
                 case "TestFastActivatedAbilityDrawCardCharacter":
@@ -3376,6 +3378,9 @@ namespace Dreamtides.Schema
                     return;
                 case CardName.TestDrawOne:
                     serializer.Serialize(writer, "TestDrawOne");
+                    return;
+                case CardName.TestDrawOneReclaim:
+                    serializer.Serialize(writer, "TestDrawOneReclaim");
                     return;
                 case CardName.TestDualActivatedAbilityCharacter:
                     serializer.Serialize(writer, "TestDualActivatedAbilityCharacter");

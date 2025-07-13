@@ -66,6 +66,7 @@ pub enum CardName {
     TestForeseeOne,
     TestForeseeTwo,
     TestForeseeOneDrawACard,
+    TestDrawOneReclaim,
 }
 
 /// Identifies an ability of a card.
