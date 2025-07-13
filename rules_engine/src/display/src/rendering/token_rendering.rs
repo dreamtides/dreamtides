@@ -1,12 +1,12 @@
 use ability_data::cost::Cost;
 use action_data::game_action_data::GameAction;
-use battle_queries::battle_card_queries::{card, card_abilities};
+use battle_queries::battle_card_queries::{card, card_abilities, card_properties};
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::ForPlayer;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_animation::TriggerAnimation;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{ActivatedAbilityId, CardIdType, CharacterId};
+use battle_state::battle::card_id::{ActivatedAbilityId, CardIdType, CharacterId, VoidCardId};
 use battle_state::battle_cards::stack_card_state::StackItemId;
 use bon::Builder;
 use core_data::display_color;
@@ -215,6 +215,73 @@ struct TokenCardView {
     #[builder(default)]
     actions: CardActions,
     outline_color: Option<core_data::display_color::DisplayColor>,
+}
+
+/// Returns a list of all void card tokens for a player to display in
+/// their hand.
+pub fn all_user_void_card_tokens(builder: &ResponseBuilder, battle: &BattleState) -> Vec<CardView> {
+    let player = builder.display_for_player();
+    let legal_actions = legal_actions::compute(battle, builder.act_for_player());
+
+    battle
+        .cards
+        .void(player)
+        .iter()
+        .filter_map(|void_card_id| {
+            if legal_actions
+                .contains(BattleAction::PlayCardFromVoid(void_card_id), ForPlayer::Human)
+            {
+                Some(void_card_token_view(builder, battle, void_card_id))
+            } else {
+                None
+            }
+        })
+        .collect()
+}
+
+fn void_card_token_view(
+    builder: &ResponseBuilder,
+    battle: &BattleState,
+    void_card_id: VoidCardId,
+) -> CardView {
+    let card_id = void_card_id.card_id();
+    let action = BattleAction::PlayCardFromVoid(void_card_id);
+    let play_action = Some(GameAction::BattleAction(action));
+
+    token_card_view(
+        TokenCardView::builder()
+            .id(adapter::void_card_token_client_id(void_card_id))
+            .position(ObjectPosition {
+                position: Position::InHand(DisplayPlayer::User),
+                sorting_key: card::get(battle, card_id).object_id.0 as u32,
+            })
+            .image(card_rendering::card_image(battle, card_id))
+            .name(card_rendering::card_name(battle, card_id))
+            .maybe_cost(card_properties::energy_cost(battle, card_id))
+            .maybe_spark(card_properties::base_spark(battle, card_id))
+            .maybe_card_type(Some("Void Card".to_string()))
+            .rules_text(card_rendering::rules_text(battle, card_id))
+            .create_position(ObjectPosition {
+                position: Position::InVoid(DisplayPlayer::User),
+                sorting_key: 0,
+            })
+            .destroy_position(ObjectPosition {
+                position: Position::InVoid(DisplayPlayer::User),
+                sorting_key: 0,
+            })
+            .actions(CardActions {
+                can_play: play_action,
+                play_effect_preview: Some(outcome_simulation::action_effect_preview(
+                    battle,
+                    builder.act_for_player(),
+                    action,
+                )),
+                ..Default::default()
+            })
+            .maybe_outline_color(Some(display_color::GREEN))
+            .is_fast(card_properties::is_fast(battle, card_id))
+            .build(),
+    )
 }
 
 fn token_card_view(view: TokenCardView) -> CardView {

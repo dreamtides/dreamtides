@@ -70,6 +70,8 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
         ),
     );
 
+    cards.extend(token_rendering::all_user_void_card_tokens(builder, battle));
+
     cards.push(identity_card_rendering::identity_card_view(
         builder,
         battle,

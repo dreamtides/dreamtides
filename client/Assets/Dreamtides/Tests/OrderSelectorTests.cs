@@ -6,8 +6,6 @@ using UnityEngine.TestTools;
 using Dreamtides.Services;
 using Dreamtides.TestUtils;
 using Dreamtides.Schema;
-using Dreamtides.Components;
-using Dreamtides.Utils;
 
 namespace Dreamtides.Tests
 {
