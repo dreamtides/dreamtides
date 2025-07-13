@@ -23,6 +23,19 @@ pub fn from_hand_to_stack(
     StackCardId(card_id.card_id())
 }
 
+/// Moves a card from the 'controller' player's void to the stack.
+///
+/// Panics if this card is not found in void.
+pub fn from_void_to_stack(
+    battle: &mut BattleState,
+    source: EffectSource,
+    controller: PlayerName,
+    card_id: VoidCardId,
+) -> StackCardId {
+    to_destination_zone(battle, source, controller, card_id.card_id(), Zone::Void, Zone::Stack);
+    StackCardId(card_id.card_id())
+}
+
 /// Moves a card from the stack to the 'controller' player's battlefield.
 ///
 /// Panics if this card is not found on the stack.

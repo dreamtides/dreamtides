@@ -14,6 +14,7 @@ impl<T: Default> Default for PlayerMap<T> {
 }
 
 impl<T> PlayerMap<T> {
+    #[inline(always)]
     pub fn player(&self, player: PlayerName) -> &T {
         match player {
             PlayerName::One => &self.one,
@@ -21,6 +22,7 @@ impl<T> PlayerMap<T> {
         }
     }
 
+    #[inline(always)]
     pub fn player_mut(&mut self, player: PlayerName) -> &mut T {
         match player {
             PlayerName::One => &mut self.one,

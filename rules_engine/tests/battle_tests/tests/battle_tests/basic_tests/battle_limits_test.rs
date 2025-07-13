@@ -87,16 +87,13 @@ fn draw_more_cards_than_deck_size_replenishes_deck() {
     let final_hand_size = s.user_client.cards.user_hand().len();
     assert!(
         final_hand_size > initial_hand_size,
-        "User should have drawn cards, initial: {}, final: {}",
-        initial_hand_size,
-        final_hand_size
+        "User should have drawn cards, initial: {initial_hand_size}, final: {final_hand_size}"
     );
 
     let deck_size_after = s.user_client.cards.user_deck().len();
     assert!(
         deck_size_after > deck_size_before,
-        "Deck should have been replenished with new cards, but has {} cards",
-        deck_size_after
+        "Deck should have been replenished with new cards, but has {deck_size_after} cards"
     );
 }
 

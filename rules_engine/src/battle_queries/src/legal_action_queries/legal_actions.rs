@@ -107,6 +107,20 @@ fn standard_legal_actions(
     StandardLegalActions {
         primary,
         play_card_from_hand: can_play_cards::from_hand(battle, player, fast_only),
-        activate_abilities: can_activate_abilities::for_player(battle, player, fast_only),
+        play_card_from_void: if battle
+            .static_abilities
+            .player(player)
+            .has_play_from_void_ability
+            .is_empty()
+        {
+            vec![]
+        } else {
+            can_play_cards::from_void(battle, player, fast_only)
+        },
+        activate_abilities: if battle.activated_abilities.player(player).characters.is_empty() {
+            vec![]
+        } else {
+            can_activate_abilities::for_player(battle, player, fast_only)
+        },
     }
 }

@@ -260,7 +260,7 @@ fn assert_arrow_between_cards(
             && matches!(&arrow.target, GameObjectId::CardId(id) if id == target_card_id)
     });
 
-    assert!(arrow_exists, "Expected arrow from {} to {}", source_card_id, target_card_id);
+    assert!(arrow_exists, "Expected arrow from {source_card_id} to {target_card_id}");
 }
 
 fn assert_info_zoom_targeting(
@@ -273,7 +273,7 @@ fn assert_info_zoom_targeting(
         .cards
         .card_map
         .get(source_card_id)
-        .unwrap_or_else(|| panic!("Source card {} not found", source_card_id));
+        .unwrap_or_else(|| panic!("Source card {source_card_id} not found"));
 
     let has_targeting = source_card
         .view
@@ -285,8 +285,7 @@ fn assert_info_zoom_targeting(
 
     assert!(
         has_targeting,
-        "Expected info zoom targeting from {} to {}",
-        source_card_id, target_card_id
+        "Expected info zoom targeting from {source_card_id} to {target_card_id}"
     );
 }
 
@@ -300,7 +299,7 @@ fn assert_no_arrow_between_cards(
             && matches!(&arrow.target, GameObjectId::CardId(id) if id == target_card_id)
     });
 
-    assert!(!arrow_exists, "Expected no arrow from {} to {}", source_card_id, target_card_id);
+    assert!(!arrow_exists, "Expected no arrow from {source_card_id} to {target_card_id}");
 }
 
 fn assert_no_info_zoom_targeting(
@@ -313,7 +312,7 @@ fn assert_no_info_zoom_targeting(
         .cards
         .card_map
         .get(source_card_id)
-        .unwrap_or_else(|| panic!("Source card {} not found", source_card_id));
+        .unwrap_or_else(|| panic!("Source card {source_card_id} not found"));
 
     let has_targeting = source_card
         .view
@@ -325,7 +324,6 @@ fn assert_no_info_zoom_targeting(
 
     assert!(
         !has_targeting,
-        "Expected no info zoom targeting from {} to {}",
-        source_card_id, target_card_id
+        "Expected no info zoom targeting from {source_card_id} to {target_card_id}"
     );
 }

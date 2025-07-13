@@ -31,7 +31,10 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
             apply_debug_battle_action::execute(battle, player, debug_action);
         }
         BattleAction::PlayCardFromHand(card_id) => {
-            play_card::execute(battle, player, card_id);
+            play_card::from_hand(battle, player, card_id);
+        }
+        BattleAction::PlayCardFromVoid(card_id) => {
+            play_card::from_void(battle, player, card_id);
         }
         BattleAction::ActivateAbility(activated_ability_id) => {
             apply_activate_ability::execute(battle, player, activated_ability_id);

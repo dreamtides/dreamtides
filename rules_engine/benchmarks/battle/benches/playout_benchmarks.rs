@@ -388,6 +388,7 @@ fn benchmark_battle() -> BattleState {
         prompt: None,
         triggers: TriggerState::default(),
         activated_abilities: PlayerMap::default(),
+        static_abilities: PlayerMap::default(),
         pending_effects: VecDeque::new(),
         animations: None,
         tracing: None,
@@ -461,17 +462,14 @@ fn benchmark_battle() -> BattleState {
     for action in &expected_actions {
         assert!(
             legal_actions_vec.contains(action),
-            "Expected action {:?} not found in legal actions {:?}",
-            action,
-            legal_actions_vec
+            "Expected action {action:?} not found in legal actions {legal_actions_vec:?}"
         );
     }
 
     for action in &legal_actions_vec {
         assert!(
             expected_actions.contains(action),
-            "Unexpected action {:?} found in legal actions",
-            action
+            "Unexpected action {action:?} found in legal actions"
         );
     }
 

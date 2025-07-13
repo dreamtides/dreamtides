@@ -15,6 +15,7 @@ pub struct TriggerListeners {
     pub judgment: CardSet<CardId>,
     pub materialized: CardSet<CardId>,
     pub played_card_from_hand: CardSet<CardId>,
+    pub played_card_from_void: CardSet<CardId>,
 }
 
 impl TriggerListeners {
@@ -31,6 +32,7 @@ impl TriggerListeners {
             TriggerName::Judgment => &self.judgment,
             TriggerName::Materialized => &self.materialized,
             TriggerName::PlayedCardFromHand => &self.played_card_from_hand,
+            TriggerName::PlayedCardFromVoid => &self.played_card_from_void,
         }
     }
 
@@ -48,6 +50,7 @@ impl TriggerListeners {
             TriggerName::Judgment => &mut self.judgment,
             TriggerName::Materialized => &mut self.materialized,
             TriggerName::PlayedCardFromHand => &mut self.played_card_from_hand,
+            TriggerName::PlayedCardFromVoid => &mut self.played_card_from_void,
         }
     }
 

@@ -29,6 +29,10 @@ pub struct AbilityList {
     /// Indicates whether this card has activated abilities that can be used on
     /// the battlefield.
     pub has_battlefield_activated_abilities: bool,
+
+    /// Indicates whether this card has static abilities which may let it be
+    /// played from the void.
+    pub has_play_from_void_ability: bool,
 }
 
 /// Wrapper around an ability which stores additional metadata.

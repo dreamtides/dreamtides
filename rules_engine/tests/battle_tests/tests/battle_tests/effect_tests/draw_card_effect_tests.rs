@@ -189,7 +189,6 @@ fn energy_prompt_rules_text_shows_energy_spent_on_stack() {
 
     assert!(
         rules_text.contains(&format!("(3{} paid)", icon::ENERGY)),
-        "Rules text should show 3 energy paid in parentheses, but got: '{}'",
-        rules_text
+        "Rules text should show 3 energy paid in parentheses, but got: '{rules_text}'"
     );
 }

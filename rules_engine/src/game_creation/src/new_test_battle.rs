@@ -55,6 +55,7 @@ pub fn create_and_start(
         prompt: None,
         triggers: TriggerState::default(),
         activated_abilities: PlayerMap::default(),
+        static_abilities: PlayerMap::default(),
         pending_effects: VecDeque::new(),
         tracing: None,
         action_history: None,

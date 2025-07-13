@@ -175,8 +175,8 @@ fn get_preview_cards(
     }
 
     for card_id in battle.cards.all_cards() {
-        let original_cost = card_properties::cost(battle, card_id);
-        let simulated_cost = card_properties::cost(simulation, card_id);
+        let original_cost = card_properties::energy_cost(battle, card_id);
+        let simulated_cost = card_properties::energy_cost(simulation, card_id);
         let cost_changed = original_cost != simulated_cost;
 
         let controller = card_properties::controller(battle, card_id);

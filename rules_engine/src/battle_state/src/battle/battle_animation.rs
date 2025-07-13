@@ -5,6 +5,7 @@ use strum::{Display, EnumDiscriminants};
 
 use crate::battle::card_id::{ActivatedAbilityId, CardId, CharacterId, HandCardId, StackCardId};
 use crate::battle_cards::stack_card_state::{EffectTargets, StackItemId};
+use crate::battle_cards::zone::Zone;
 use crate::prompt_types::prompt_data::PromptChoiceLabel;
 
 /// Records events during rules engine execution for display as game animations.
@@ -43,13 +44,15 @@ pub enum BattleAnimation {
         player: PlayerName,
         choice: PromptChoiceLabel,
     },
-    PlayCardFromHand {
+    PlayCard {
         player: PlayerName,
-        card_id: HandCardId,
+        card_id: CardId,
+        from_zone: Zone,
     },
-    PlayedCardFromHand {
+    PlayedCard {
         player: PlayerName,
-        card_id: HandCardId,
+        card_id: CardId,
+        from_zone: Zone,
     },
     ResolveCharacter {
         character_id: CharacterId,

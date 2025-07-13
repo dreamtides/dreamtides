@@ -109,7 +109,7 @@ pub fn render(
             }
         }
 
-        BattleAnimation::PlayCardFromHand { player, .. } => {
+        BattleAnimation::PlayCard { player, .. } => {
             if *player != builder.display_for_player() {
                 builder.push(Command::PlayAudioClip(PlayAudioClipCommand {
                     sound: AudioClipAddress::new("Assets/ThirdParty/Cafofo/Magic Spells Sound Effects V2.0/General Spell/Magic Whoosh 4.wav"),
@@ -118,7 +118,7 @@ pub fn render(
             }
         }
 
-        BattleAnimation::PlayedCardFromHand { player, card_id } => {
+        BattleAnimation::PlayedCard { player, card_id, .. } => {
             if *player != builder.display_for_player()
                 && final_state.cards.stack_item(StackCardId(card_id.card_id())).is_none()
             {

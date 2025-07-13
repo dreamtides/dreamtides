@@ -102,10 +102,31 @@ pub fn matches(
                 owning_card_controller,
                 owning_card_id,
             ),
+            Trigger::PlayedCardFromVoid(card_id) => trigger_predicates::trigger_matches(
+                battle,
+                predicate,
+                card_id,
+                owning_card_controller,
+                owning_card_id,
+            ),
             _ => false,
         },
         TriggerEvent::PlayDuringTurn(predicate, player_turn) => match trigger {
             Trigger::PlayedCardFromHand(card_id) => {
+                let turn_matches = match player_turn {
+                    PlayerTurn::YourTurn => battle.turn.active_player == owning_card_controller,
+                    PlayerTurn::EnemyTurn => battle.turn.active_player != owning_card_controller,
+                };
+                turn_matches
+                    && trigger_predicates::trigger_matches(
+                        battle,
+                        predicate,
+                        card_id,
+                        owning_card_controller,
+                        owning_card_id,
+                    )
+            }
+            Trigger::PlayedCardFromVoid(card_id) => {
                 let turn_matches = match player_turn {
                     PlayerTurn::YourTurn => battle.turn.active_player == owning_card_controller,
                     PlayerTurn::EnemyTurn => battle.turn.active_player != owning_card_controller,
@@ -148,6 +169,7 @@ pub fn triggering_card_id(trigger: Trigger) -> Option<CardId> {
         Trigger::Judgment(..) => None,
         Trigger::Materialized(card_id) => Some(card_id.card_id()),
         Trigger::PlayedCardFromHand(card_id) => Some(card_id.card_id()),
+        Trigger::PlayedCardFromVoid(card_id) => Some(card_id.card_id()),
     }
 }
 

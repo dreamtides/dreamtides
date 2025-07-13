@@ -817,6 +817,8 @@ namespace Dreamtides.Schema
     ///
     /// Play a card in the user's hand.
     ///
+    /// Play a card in the user's void.
+    ///
     /// Activate a character's ability.
     ///
     /// Select a character as a target
@@ -836,6 +838,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("playCardFromHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? PlayCardFromHand { get; set; }
+
+        [JsonProperty("playCardFromVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? PlayCardFromVoid { get; set; }
 
         [JsonProperty("activateAbility", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public ActivatedAbilityId ActivateAbility { get; set; }

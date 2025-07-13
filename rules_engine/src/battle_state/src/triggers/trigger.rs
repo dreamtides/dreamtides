@@ -17,6 +17,7 @@ pub enum Trigger {
     Judgment(PlayerName),
     Materialized(CharacterId),
     PlayedCardFromHand(StackCardId),
+    PlayedCardFromVoid(StackCardId),
 }
 
 #[derive(EnumSetType, Debug)]
@@ -31,6 +32,7 @@ pub enum TriggerName {
     Judgment,
     Materialized,
     PlayedCardFromHand,
+    PlayedCardFromVoid,
 }
 
 impl Trigger {
@@ -47,6 +49,7 @@ impl Trigger {
             Trigger::Judgment(..) => TriggerName::Judgment,
             Trigger::Materialized(..) => TriggerName::Materialized,
             Trigger::PlayedCardFromHand(..) => TriggerName::PlayedCardFromHand,
+            Trigger::PlayedCardFromVoid(..) => TriggerName::PlayedCardFromVoid,
         }
     }
 }

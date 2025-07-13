@@ -1,7 +1,9 @@
 use battle_state::actions::battle_actions::{
     BattleAction, CardOrderSelectionTarget, DeckCardSelectedOrder,
 };
-use battle_state::battle::card_id::{ActivatedAbilityId, CharacterId, HandCardId, StackCardId};
+use battle_state::battle::card_id::{
+    ActivatedAbilityId, CharacterId, HandCardId, StackCardId, VoidCardId,
+};
 use battle_state::battle_cards::card_set::CardSet;
 use battle_state::prompt_types::prompt_data::SelectDeckCardOrderPrompt;
 use core_data::numerics::Energy;
@@ -25,6 +27,7 @@ pub enum LegalActions {
 pub struct StandardLegalActions {
     pub primary: PrimaryLegalAction,
     pub play_card_from_hand: Vec<HandCardId>,
+    pub play_card_from_void: Vec<VoidCardId>,
     pub activate_abilities: Vec<ActivatedAbilityId>,
 }
 
@@ -47,6 +50,13 @@ impl LegalActions {
             BattleAction::PlayCardFromHand(hand_card_id) => {
                 if let LegalActions::Standard { actions } = self {
                     actions.play_card_from_hand.contains(&hand_card_id)
+                } else {
+                    false
+                }
+            }
+            BattleAction::PlayCardFromVoid(void_card_id) => {
+                if let LegalActions::Standard { actions } = self {
+                    actions.play_card_from_void.contains(&void_card_id)
                 } else {
                     false
                 }
@@ -154,8 +164,9 @@ impl LegalActions {
             LegalActions::Standard { actions } => {
                 let primary_count = 1;
                 let play_cards_count = actions.play_card_from_hand.len();
+                let play_void_cards_count = actions.play_card_from_void.len();
                 let ability_count = actions.activate_abilities.len();
-                primary_count + play_cards_count + ability_count
+                primary_count + play_cards_count + play_void_cards_count + ability_count
             }
 
             LegalActions::SelectCharacterPrompt { valid } => valid.len(),
@@ -213,6 +224,12 @@ impl LegalActions {
                             })
                         {
                             Some(BattleAction::PlayCardFromHand(*card_id))
+                        } else if let Some(card_id) =
+                            standard_actions.play_card_from_void.iter().find(|&&card_id| {
+                                !actions.contains(&BattleAction::PlayCardFromVoid(card_id))
+                            })
+                        {
+                            Some(BattleAction::PlayCardFromVoid(*card_id))
                         } else {
                             standard_actions
                                 .activate_abilities
@@ -296,6 +313,10 @@ impl LegalActions {
                     result.push(BattleAction::PlayCardFromHand(*card_id));
                 }
 
+                for card_id in actions.play_card_from_void.iter() {
+                    result.push(BattleAction::PlayCardFromVoid(*card_id));
+                }
+
                 for ability in actions.activate_abilities.iter() {
                     result.push(BattleAction::ActivateAbility(*ability));
                 }
@@ -375,11 +396,19 @@ impl LegalActions {
                             .get(remaining_index)
                             .map(|card_id| BattleAction::PlayCardFromHand(*card_id))
                     } else {
-                        let ability_index = remaining_index - actions.play_card_from_hand.len();
-                        actions
-                            .activate_abilities
-                            .get(ability_index)
-                            .map(|&ability| BattleAction::ActivateAbility(ability))
+                        let void_index = remaining_index - actions.play_card_from_hand.len();
+                        if void_index < actions.play_card_from_void.len() {
+                            actions
+                                .play_card_from_void
+                                .get(void_index)
+                                .map(|card_id| BattleAction::PlayCardFromVoid(*card_id))
+                        } else {
+                            let ability_index = void_index - actions.play_card_from_void.len();
+                            actions
+                                .activate_abilities
+                                .get(ability_index)
+                                .map(|&ability| BattleAction::ActivateAbility(ability))
+                        }
                     }
                 }
             }

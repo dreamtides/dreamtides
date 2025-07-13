@@ -81,8 +81,7 @@ fn both_limits_exceeded_shows_combined_interface_message() {
     assert!(
         message_text.contains("Character limit exceeded")
             || message_text.contains("Cards drawn in excess"),
-        "preview should show message when both limits will be exceeded, got: {}",
-        message_text
+        "preview should show message when both limits will be exceeded, got: {message_text}"
     );
 }
 #[test]
