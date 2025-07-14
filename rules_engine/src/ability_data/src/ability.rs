@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::activated_ability::ActivatedAbility;
 use crate::cost::Cost;
 use crate::effect::Effect;
+use crate::named_ability::NamedAbility;
 use crate::static_ability::StaticAbility;
 use crate::triggered_ability::TriggeredAbility;
 
@@ -31,6 +32,10 @@ pub enum Ability {
     /// event occurs, typically while its card is in play. Indicated in card
     /// text by "When", "Whenever", "At", or by a trigger keyword.
     Triggered(TriggeredAbility),
+
+    /// A named ability is a special keyword which is expanded to one or more
+    /// other abilities.
+    Named(NamedAbility),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

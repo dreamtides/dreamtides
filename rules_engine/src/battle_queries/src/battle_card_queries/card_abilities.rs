@@ -4,10 +4,11 @@ use ability_data::ability::{Ability, EventAbility};
 use ability_data::activated_ability::{ActivatedAbility, ActivatedAbilityOptions};
 use ability_data::cost::Cost;
 use ability_data::effect::{Effect, EffectWithOptions};
+use ability_data::named_ability::NamedAbility;
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
-use ability_data::static_ability::{PlayFromVoid, StandardStaticAbility, StaticAbility};
+use ability_data::static_ability::{PlayFromVoid, StandardStaticAbility};
 use ability_data::trigger_event::{PlayerTurn, TriggerEvent};
 use ability_data::triggered_ability::TriggeredAbility;
 use battle_state::battle::battle_state::BattleState;
@@ -21,7 +22,7 @@ use core_data::identifiers::{AbilityNumber, CardName};
 use core_data::numerics::{Energy, Spark};
 use enumset::EnumSet;
 
-use crate::battle_card_queries::card;
+use crate::battle_card_queries::{build_named_abilities, card};
 use crate::card_ability_queries::effect_predicates;
 
 static CHARACTER_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
@@ -51,11 +52,10 @@ pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static Ability
 
 pub fn query_by_name(name: CardName) -> &'static AbilityList {
     match name {
-        CardName::TestVanillaCharacter => {
-            CHARACTER_ABILITIES.get_or_init(|| build_ability_list(vec![]))
-        }
+        CardName::TestVanillaCharacter => CHARACTER_ABILITIES
+            .get_or_init(|| build_ability_list(CardName::TestVanillaCharacter, vec![])),
         CardName::TestDissolve => TEST_DISSOLVE_ABILITIES.get_or_init(|| {
-            build_ability_list(vec![(
+            build_ability_list(CardName::TestDissolve, vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
@@ -70,7 +70,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
             )])
         }),
         CardName::TestCounterspellUnlessPays => TEST_COUNTERSPELL_UNLESS_PAY.get_or_init(|| {
-            build_ability_list(vec![(
+            build_ability_list(CardName::TestCounterspellUnlessPays, vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
@@ -87,7 +87,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
             )])
         }),
         CardName::TestCounterspell => COUNTERSPELL_ABILITIES.get_or_init(|| {
-            build_ability_list(vec![(
+            build_ability_list(CardName::TestCounterspell, vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
@@ -102,7 +102,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
             )])
         }),
         CardName::TestVariableEnergyDraw => ENERGY_PROMPT_ABILITIES.get_or_init(|| {
-            build_ability_list(vec![(
+            build_ability_list(CardName::TestVariableEnergyDraw, vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: Some(Cost::SpendOneOrMoreEnergy),
@@ -118,7 +118,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
             )])
         }),
         CardName::TestDrawOne => TEST_DRAW_ONE_ABILITIES.get_or_init(|| {
-            build_ability_list(vec![(
+            build_ability_list(CardName::TestDrawOne, vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
@@ -129,25 +129,28 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
         }),
         CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => {
             TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER.get_or_init(|| {
-                build_ability_list(vec![(
-                    AbilityNumber(0),
-                    Ability::Triggered(TriggeredAbility {
-                        trigger: TriggerEvent::Materialize(Predicate::Another(
-                            CardPredicate::Character,
-                        )),
-                        effect: Effect::Effect(StandardEffect::GainsSpark {
-                            target: Predicate::This,
-                            gains: Spark(1),
+                build_ability_list(
+                    CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
+                    vec![(
+                        AbilityNumber(0),
+                        Ability::Triggered(TriggeredAbility {
+                            trigger: TriggerEvent::Materialize(Predicate::Another(
+                                CardPredicate::Character,
+                            )),
+                            effect: Effect::Effect(StandardEffect::GainsSpark {
+                                target: Predicate::This,
+                                gains: Spark(1),
+                            }),
+                            options: None,
                         }),
-                        options: None,
-                    }),
-                    AbilityConfiguration::default(),
-                )])
+                        AbilityConfiguration::default(),
+                    )],
+                )
             })
         }
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
             TEST_TRIGGER_GAIN_SPARK_PLAY_OPPONENT_TURN.get_or_init(|| {
-                build_ability_list(vec![(
+                build_ability_list(CardName::TestTriggerGainSparkOnPlayCardEnemyTurn, vec![(
                     AbilityNumber(0),
                     Ability::Triggered(TriggeredAbility {
                         trigger: TriggerEvent::PlayDuringTurn(
@@ -166,7 +169,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
         }
         CardName::TestActivatedAbilityDrawCardCharacter => TEST_ACTIVATED_ABILITY_CHARACTER
             .get_or_init(|| {
-                build_ability_list(vec![(
+                build_ability_list(CardName::TestActivatedAbilityDrawCardCharacter, vec![(
                     AbilityNumber(0),
                     Ability::Activated(ActivatedAbility {
                         costs: vec![Cost::Energy(Energy(1))],
@@ -178,7 +181,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
             }),
         CardName::TestMultiActivatedAbilityDrawCardCharacter => {
             TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER.get_or_init(|| {
-                build_ability_list(vec![(
+                build_ability_list(CardName::TestMultiActivatedAbilityDrawCardCharacter, vec![(
                     AbilityNumber(0),
                     Ability::Activated(ActivatedAbility {
                         costs: vec![Cost::Energy(Energy(1))],
@@ -191,7 +194,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
         }
         CardName::TestFastActivatedAbilityDrawCardCharacter => {
             TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER.get_or_init(|| {
-                build_ability_list(vec![(
+                build_ability_list(CardName::TestFastActivatedAbilityDrawCardCharacter, vec![(
                     AbilityNumber(0),
                     Ability::Activated(ActivatedAbility {
                         costs: vec![Cost::Energy(Energy(1))],
@@ -204,20 +207,25 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
         }
         CardName::TestFastMultiActivatedAbilityDrawCardCharacter => {
             TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER.get_or_init(|| {
-                build_ability_list(vec![(
-                    AbilityNumber(0),
-                    Ability::Activated(ActivatedAbility {
-                        costs: vec![Cost::Energy(Energy(1))],
-                        effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
-                        options: Some(ActivatedAbilityOptions { is_multi: true, is_fast: true }),
-                    }),
-                    AbilityConfiguration::default(),
-                )])
+                build_ability_list(CardName::TestFastMultiActivatedAbilityDrawCardCharacter, vec![
+                    (
+                        AbilityNumber(0),
+                        Ability::Activated(ActivatedAbility {
+                            costs: vec![Cost::Energy(Energy(1))],
+                            effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
+                            options: Some(ActivatedAbilityOptions {
+                                is_multi: true,
+                                is_fast: true,
+                            }),
+                        }),
+                        AbilityConfiguration::default(),
+                    ),
+                ])
             })
         }
         CardName::TestActivatedAbilityDissolveCharacter => {
             TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER.get_or_init(|| {
-                build_ability_list(vec![(
+                build_ability_list(CardName::TestActivatedAbilityDissolveCharacter, vec![(
                     AbilityNumber(0),
                     Ability::Activated(ActivatedAbility {
                         costs: vec![Cost::Energy(Energy(2))],
@@ -235,7 +243,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
         }
         CardName::TestDualActivatedAbilityCharacter => TEST_DUAL_ACTIVATED_ABILITY_CHARACTER
             .get_or_init(|| {
-                build_ability_list(vec![
+                build_ability_list(CardName::TestDualActivatedAbilityCharacter, vec![
                     (
                         AbilityNumber(0),
                         Ability::Activated(ActivatedAbility {
@@ -257,7 +265,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 ])
             }),
         CardName::TestForeseeOne => TEST_FORESEE_1.get_or_init(|| {
-            build_ability_list(vec![(
+            build_ability_list(CardName::TestForeseeOne, vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
@@ -267,7 +275,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
             )])
         }),
         CardName::TestForeseeTwo => TEST_FORESEE_2.get_or_init(|| {
-            build_ability_list(vec![(
+            build_ability_list(CardName::TestForeseeTwo, vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
@@ -277,7 +285,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
             )])
         }),
         CardName::TestForeseeOneDrawACard => TEST_FORESEE_1_DRAW_A_CARD.get_or_init(|| {
-            build_ability_list(vec![(
+            build_ability_list(CardName::TestForeseeOneDrawACard, vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
@@ -290,7 +298,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
             )])
         }),
         CardName::TestDrawOneReclaim => TEST_DRAW_ONE_RECLAIM.get_or_init(|| {
-            build_ability_list(vec![
+            build_ability_list(CardName::TestDrawOneReclaim, vec![
                 (
                     AbilityNumber(0),
                     Ability::Event(EventAbility {
@@ -301,9 +309,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 ),
                 (
                     AbilityNumber(1),
-                    Ability::Static(StaticAbility::StaticAbility(StandardStaticAbility::Reclaim {
-                        cost: Some(Cost::Energy(Energy(1))),
-                    })),
+                    Ability::Named(NamedAbility::Reclaim(Some(Energy(1)))),
                     AbilityConfiguration::default(),
                 ),
             ])
@@ -312,6 +318,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
 }
 
 fn build_ability_list(
+    card_name: CardName,
     abilities: Vec<(AbilityNumber, Ability, AbilityConfiguration)>,
 ) -> AbilityList {
     let mut ability_list = AbilityList::default();
@@ -346,6 +353,14 @@ fn build_ability_list(
                     configuration,
                 });
             }
+            Ability::Named(named_ability) => {
+                build_named_abilities::build(
+                    card_name,
+                    &mut ability_list,
+                    named_ability,
+                    ability_number,
+                );
+            }
         }
     }
 
@@ -354,6 +369,7 @@ fn build_ability_list(
         compute_event_additional_cost_restriction(&ability_list),
     ]);
     ability_list.battlefield_triggers = battlefield_triggers(&ability_list);
+    ability_list.stack_triggers = stack_triggers(&ability_list);
     ability_list.has_battlefield_activated_abilities = !ability_list.activated_abilities.is_empty();
     ability_list.has_play_from_void_ability = has_play_from_void_ability(&ability_list);
 
@@ -448,13 +464,13 @@ fn battlefield_triggers(list: &AbilityList) -> EnumSet<TriggerName> {
     let mut triggers = EnumSet::new();
 
     for ability in list.triggered_abilities.iter() {
-        triggers.insert(watch_for_trigger(&ability.ability.trigger));
+        triggers.insert(watch_for_battlefield_trigger(&ability.ability.trigger));
     }
 
     triggers
 }
 
-fn watch_for_trigger(event: &TriggerEvent) -> TriggerName {
+fn watch_for_battlefield_trigger(event: &TriggerEvent) -> TriggerName {
     match event {
         TriggerEvent::Materialize(..) => TriggerName::Materialized,
         TriggerEvent::Play(..) => TriggerName::PlayedCardFromHand,
@@ -464,21 +480,26 @@ fn watch_for_trigger(event: &TriggerEvent) -> TriggerName {
     }
 }
 
+fn stack_triggers(list: &AbilityList) -> EnumSet<TriggerName> {
+    let mut triggers = EnumSet::new();
+
+    for ability_data in &list.static_abilities {
+        if let StandardStaticAbility::PlayFromVoid { .. } =
+            ability_data.ability.standard_static_ability()
+        {
+            triggers.insert(TriggerName::PlayedCardFromVoid);
+        }
+    }
+    triggers
+}
+
 fn has_play_from_void_ability(list: &AbilityList) -> bool {
     for ability in list.static_abilities.iter() {
-        let ability = match &ability.ability {
-            StaticAbility::StaticAbility(ability) => ability,
-            StaticAbility::WithOptions(ability) => &ability.ability,
-        };
-
-        match ability {
+        match ability.ability.standard_static_ability() {
             StandardStaticAbility::PlayFromVoid(PlayFromVoid { .. }) => {
                 return true;
             }
             StandardStaticAbility::PlayOnlyFromVoid => {
-                return true;
-            }
-            StandardStaticAbility::Reclaim { .. } => {
                 return true;
             }
             _ => {}

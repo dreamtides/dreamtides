@@ -261,41 +261,6 @@ fn test_play_if_character_dissolved() {
 }
 
 #[test]
-fn test_reclaim_with_draw_discard() {
-    let result = parse(
-        "Draw 2 cards. Discard 2 cards.$br{kw: Reclaim}. {reminder: (you may play this dream from your void, then banish it.)}",
-    );
-    assert_ron_snapshot!(result, @r###"
-    [
-      event(EventAbility(
-        additional_cost: None,
-        effect: list([
-          EffectWithOptions(
-            effect: drawCards(
-              count: 2,
-            ),
-            optional: false,
-            triggerCost: None,
-            condition: None,
-          ),
-          EffectWithOptions(
-            effect: payCost(
-              cost: discardCards(card, 2),
-            ),
-            optional: false,
-            triggerCost: None,
-            condition: None,
-          ),
-        ]),
-      )),
-      static(StaticAbility(reclaim(
-        cost: None,
-      ))),
-    ]
-    "###);
-}
-
-#[test]
 fn test_alternate_cost_with_condition() {
     let result = parse("If you have discarded a card this turn, this character costs $1.");
     assert_ron_snapshot!(result, @r###"
@@ -416,27 +381,6 @@ fn test_look_at_top_card_and_play() {
       static(StaticAbility(youMayLookAtTopCardOfYourDeck)),
       static(StaticAbility(youMayPlayFromTopOfDeck(
         matching: character,
-      ))),
-    ]
-    "###);
-}
-
-#[test]
-fn test_reclaim_costs() {
-    let result = parse("{kw: Reclaim}.");
-    assert_ron_snapshot!(result, @r###"
-    [
-      static(StaticAbility(reclaim(
-        cost: None,
-      ))),
-    ]
-    "###);
-
-    let result = parse("{kw: Reclaim} $2.");
-    assert_ron_snapshot!(result, @r###"
-    [
-      static(StaticAbility(reclaim(
-        cost: Some(energy(Energy(2))),
       ))),
     ]
     "###);

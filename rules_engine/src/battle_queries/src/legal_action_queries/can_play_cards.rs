@@ -1,4 +1,4 @@
-use ability_data::static_ability::{StandardStaticAbility, StaticAbility};
+use ability_data::static_ability::StandardStaticAbility;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardIdType, HandCardId, VoidCardId};
 use battle_state::battle_cards::ability_list::CanPlayRestriction;
@@ -84,10 +84,11 @@ fn can_play_from_void_for_energy_cost(battle: &BattleState, card_id: VoidCardId)
         .static_abilities
         .iter()
         .filter_map(|ability_data| {
-            can_play_from_void_with_static_ability(battle, card_id, match &ability_data.ability {
-                StaticAbility::StaticAbility(standard) => standard,
-                StaticAbility::WithOptions(options) => &options.ability,
-            })
+            can_play_from_void_with_static_ability(
+                battle,
+                card_id,
+                ability_data.ability.standard_static_ability(),
+            )
         })
         .min()
 }
@@ -100,12 +101,11 @@ fn can_play_from_void_with_static_ability(
     ability: &StandardStaticAbility,
 ) -> Option<Energy> {
     match ability {
-        StandardStaticAbility::PlayFromVoid(_) => todo!("Implement PlayFromVoid"),
-        StandardStaticAbility::PlayOnlyFromVoid => todo!("Implement PlayOnlyFromVoid"),
-        StandardStaticAbility::Reclaim { cost } => match cost {
-            Some(cost) => cost.energy_cost(),
+        StandardStaticAbility::PlayFromVoid(play) => match play.energy_cost {
+            Some(energy_cost) => Some(energy_cost),
             None => card_properties::energy_cost(battle, card_id),
         },
+        StandardStaticAbility::PlayOnlyFromVoid => card_properties::energy_cost(battle, card_id),
         _ => None,
     }
 }

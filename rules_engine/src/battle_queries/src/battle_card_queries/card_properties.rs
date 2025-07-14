@@ -36,7 +36,11 @@ pub fn display_name(card_name: CardName) -> String {
 }
 
 pub fn energy_cost(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
-    match card::get(battle, card_id).name {
+    base_energy_cost(card::get(battle, card_id).name)
+}
+
+pub fn base_energy_cost(card_name: CardName) -> Option<Energy> {
+    match card_name {
         CardName::TestVanillaCharacter => Some(Energy(2)),
         CardName::TestDissolve => Some(Energy(2)),
         CardName::TestCounterspellUnlessPays => Some(Energy(1)),

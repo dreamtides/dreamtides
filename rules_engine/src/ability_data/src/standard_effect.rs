@@ -23,6 +23,7 @@ pub enum StandardEffect {
     BanishCollection { target: Predicate, count: CollectionExpression },
     BanishEnemyVoid,
     BanishUntilNextMain { target: Predicate },
+    BanishWhenLeavesPlay { target: Predicate },
     CardsInVoidGainReclaimThisTurn { count: CollectionExpression, predicate: CardPredicate },
     Copy { target: Predicate },
     CopyNextPlayed { matching: Predicate, times: Option<u32> },

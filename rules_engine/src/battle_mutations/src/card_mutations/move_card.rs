@@ -151,7 +151,7 @@ pub fn from_deck_to_void(
 /// Moves a card from the 'old' zone to the 'new' zone.
 ///
 /// Panics if this card is not found in the 'old' zone.
-pub fn to_destination_zone(
+fn to_destination_zone(
     battle: &mut BattleState,
     source: EffectSource,
     controller: PlayerName,
@@ -164,37 +164,21 @@ pub fn to_destination_zone(
         panic_card_not_found(battle, controller, card_id, old, new);
     }
 
-    if old == Zone::Battlefield {
-        on_leave_battlefield(battle, controller, card_id);
-    }
-
-    if old == Zone::Void {
-        on_leave_void(battle, controller, card_id);
+    match old {
+        Zone::Stack => on_leave_stack(battle, card_id),
+        Zone::Battlefield => on_leave_battlefield(battle, controller, card_id),
+        Zone::Void => on_leave_void(battle, controller, card_id),
+        _ => {}
     }
 
     battle.cards.move_card(controller, card_id, old, new);
 
-    if new == Zone::Battlefield {
-        on_enter_battlefield(battle, source, controller, card_id);
+    match new {
+        Zone::Stack => on_enter_stack(battle, card_id),
+        Zone::Battlefield => on_enter_battlefield(battle, source, controller, card_id),
+        Zone::Void => on_enter_void(battle, controller, card_id),
+        _ => {}
     }
-
-    if new == Zone::Void {
-        on_enter_void(battle, controller, card_id);
-    }
-}
-
-fn on_leave_battlefield(battle: &mut BattleState, controller: PlayerName, card_id: CardId) {
-    let ability_list = card_abilities::query(battle, card_id);
-    let triggers = ability_list.battlefield_triggers;
-    for trigger in triggers {
-        battle.triggers.listeners.remove_listener(trigger, card_id);
-    }
-
-    if ability_list.has_battlefield_activated_abilities {
-        battle.activated_abilities.player_mut(controller).characters.remove(CharacterId(card_id));
-    }
-
-    battle.cards.battlefield_state_mut(controller).remove(&CharacterId(card_id));
 }
 
 fn on_enter_battlefield(
@@ -222,6 +206,20 @@ fn on_enter_battlefield(
     battle.triggers.push(source, Trigger::Materialized(id));
 }
 
+fn on_leave_battlefield(battle: &mut BattleState, controller: PlayerName, card_id: CardId) {
+    let ability_list = card_abilities::query(battle, card_id);
+    let triggers = ability_list.battlefield_triggers;
+    for trigger in triggers {
+        battle.triggers.listeners.remove_listener(trigger, card_id);
+    }
+
+    if ability_list.has_battlefield_activated_abilities {
+        battle.activated_abilities.player_mut(controller).characters.remove(CharacterId(card_id));
+    }
+
+    battle.cards.battlefield_state_mut(controller).remove(&CharacterId(card_id));
+}
+
 fn on_enter_void(battle: &mut BattleState, controller: PlayerName, card_id: CardId) {
     let ability_list = card_abilities::query(battle, card_id);
     if ability_list.has_play_from_void_ability {
@@ -241,6 +239,22 @@ fn on_leave_void(battle: &mut BattleState, controller: PlayerName, card_id: Card
             .player_mut(controller)
             .has_play_from_void_ability
             .remove(VoidCardId(card_id));
+    }
+}
+
+fn on_enter_stack(battle: &mut BattleState, card_id: CardId) {
+    let ability_list = card_abilities::query(battle, card_id);
+    let triggers = ability_list.stack_triggers;
+    for trigger in triggers {
+        battle.triggers.listeners.add_listener(trigger, card_id);
+    }
+}
+
+fn on_leave_stack(battle: &mut BattleState, card_id: CardId) {
+    let ability_list = card_abilities::query(battle, card_id);
+    let triggers = ability_list.stack_triggers;
+    for trigger in triggers {
+        battle.triggers.listeners.remove_listener(trigger, card_id);
     }
 }
 

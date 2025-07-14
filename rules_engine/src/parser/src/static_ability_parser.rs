@@ -1,4 +1,3 @@
-use ability_data::cost::Cost;
 use ability_data::effect::Effect;
 use ability_data::predicate::CardPredicate;
 use ability_data::static_ability::{
@@ -47,7 +46,6 @@ fn standard<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'
         simple_alternate_cost(),
         play_for_alternate_cost(),
         play_only_from_void(),
-        reclaim(),
         spark_equal_to_predicate_count(),
         characters_in_hand_have_fast(),
         judgment_triggers_when_materialized(),
@@ -165,12 +163,6 @@ fn simple_alternate_cost<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility
             if_you_do: None,
         })
     })
-}
-
-fn reclaim<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, ErrorType<'a>> {
-    phrase("{kw: reclaim}")
-        .ignore_then(numeric("$", Energy, "").or_not())
-        .map(|n| StandardStaticAbility::Reclaim { cost: n.map(Cost::Energy) })
 }
 
 fn spark_equal_to_predicate_count<'a>()

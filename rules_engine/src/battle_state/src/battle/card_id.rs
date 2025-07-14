@@ -39,6 +39,16 @@ impl CardIdType for CardId {
     }
 }
 
+/// Identifies an ability of a card.
+#[derive(
+    Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
+pub struct AbilityId {
+    pub card_id: CardId,
+    pub ability_number: AbilityNumber,
+}
+
 #[derive(Copy, Clone, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct CharacterId(pub CardId);

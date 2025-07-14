@@ -16,6 +16,15 @@ pub enum StaticAbility {
     WithOptions(StaticAbilityWithOptions),
 }
 
+impl StaticAbility {
+    pub fn standard_static_ability(&self) -> &StandardStaticAbility {
+        match self {
+            StaticAbility::StaticAbility(ability) => ability,
+            StaticAbility::WithOptions(ability) => &ability.ability,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StaticAbilityWithOptions {
     pub ability: StandardStaticAbility,
@@ -39,7 +48,6 @@ pub enum StandardStaticAbility {
     PlayForAlternateCost(AlternateCost),
     PlayFromVoid(PlayFromVoid),
     PlayOnlyFromVoid,
-    Reclaim { cost: Option<Cost> },
     SparkBonusYourCharacters { matching: CardPredicate, added_spark: Spark },
     SparkBonusOtherCharacters { matching: CardPredicate, added_spark: Spark },
     SparkEqualToPredicateCount { predicate: Predicate },
@@ -52,8 +60,17 @@ pub enum StandardStaticAbility {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlayFromVoid {
+    /// The energy cost of playing this card from the void.
+    ///
+    /// If not provided, the card may be played from the void for its normal
+    /// listed energy cost.
     pub energy_cost: Option<Energy>,
+
+    /// An additional cost to play this card from the void.
     pub additional_cost: Option<Cost>,
+
+    /// An effect to apply if the card is played from the void using this
+    /// static ability.
     pub if_you_do: Option<Effect>,
 }
 

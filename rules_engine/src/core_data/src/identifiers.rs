@@ -69,7 +69,7 @@ pub enum CardName {
     TestDrawOneReclaim,
 }
 
-/// Identifies an ability of a card.
+/// Number of an ability within a card.
 #[derive(
     Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
 )]
