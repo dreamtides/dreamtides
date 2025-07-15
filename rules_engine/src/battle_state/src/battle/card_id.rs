@@ -63,6 +63,12 @@ impl CardIdType for CharacterId {
     }
 }
 
+impl From<CharacterId> for CardId {
+    fn from(value: CharacterId) -> Self {
+        value.0
+    }
+}
+
 impl fmt::Display for CharacterId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "C{:?}", self.0)
@@ -95,6 +101,12 @@ impl CardIdType for VoidCardId {
 
     fn from_card_id(card_id: CardId) -> Self {
         Self(card_id)
+    }
+}
+
+impl From<VoidCardId> for CardId {
+    fn from(value: VoidCardId) -> Self {
+        value.0
     }
 }
 
@@ -148,6 +160,12 @@ impl CardIdType for HandCardId {
     }
 }
 
+impl From<HandCardId> for CardId {
+    fn from(value: HandCardId) -> Self {
+        value.0
+    }
+}
+
 impl fmt::Display for HandCardId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "H{:?}", self.0)
@@ -185,6 +203,12 @@ impl fmt::Debug for StackCardId {
     }
 }
 
+impl From<StackCardId> for CardId {
+    fn from(value: StackCardId) -> Self {
+        value.0
+    }
+}
+
 #[derive(Copy, Clone, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema)]
 pub struct BanishedCardId(pub CardId);
 
@@ -207,5 +231,11 @@ impl fmt::Display for BanishedCardId {
 impl fmt::Debug for BanishedCardId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Display::fmt(self, f)
+    }
+}
+
+impl From<BanishedCardId> for CardId {
+    fn from(value: BanishedCardId) -> Self {
+        value.0
     }
 }

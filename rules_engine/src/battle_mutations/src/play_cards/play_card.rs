@@ -1,7 +1,7 @@
 use battle_queries::battle_card_queries::card_properties;
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CardIdType, HandCardId, VoidCardId};
+use battle_state::battle::card_id::{AbilityId, CardIdType, HandCardId, VoidCardId};
 use battle_state::battle_cards::zone::Zone;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger::Trigger;
@@ -40,7 +40,12 @@ pub fn from_hand(battle: &mut BattleState, player: PlayerName, card_id: HandCard
 
 /// Plays a card from the void to the stack as `player` by paying its costs. If
 /// the card requires targets or choices, a prompt will be displayed.
-pub fn from_void(battle: &mut BattleState, player: PlayerName, card_id: VoidCardId) {
+pub fn from_void(
+    battle: &mut BattleState,
+    player: PlayerName,
+    card_id: VoidCardId,
+    _via_ability: AbilityId,
+) {
     let source = EffectSource::Player { controller: player };
     battle.push_animation(source, || BattleAnimation::PlayCard {
         player,

@@ -33,8 +33,8 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
         BattleAction::PlayCardFromHand(card_id) => {
             play_card::from_hand(battle, player, card_id);
         }
-        BattleAction::PlayCardFromVoid(card_id) => {
-            play_card::from_void(battle, player, card_id);
+        BattleAction::PlayCardFromVoid(card_id, ability_id) => {
+            play_card::from_void(battle, player, card_id, ability_id);
         }
         BattleAction::ActivateAbility(activated_ability_id) => {
             apply_activate_ability::execute(battle, player, activated_ability_id);

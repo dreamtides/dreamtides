@@ -5,7 +5,7 @@ use strum::EnumDiscriminants;
 
 use crate::actions::debug_battle_action::DebugBattleAction;
 use crate::battle::card_id::{
-    ActivatedAbilityId, CharacterId, DeckCardId, HandCardId, StackCardId, VoidCardId,
+    AbilityId, ActivatedAbilityId, CharacterId, DeckCardId, HandCardId, StackCardId, VoidCardId,
 };
 
 /// An action that can be performed in a battle
@@ -18,8 +18,8 @@ pub enum BattleAction {
     Debug(DebugBattleAction),
     /// Play a card in the user's hand.
     PlayCardFromHand(HandCardId),
-    /// Play a card in the user's void.
-    PlayCardFromVoid(VoidCardId),
+    /// Play a card in the user's void using the given ability.
+    PlayCardFromVoid(VoidCardId, AbilityId),
     /// Activate a character's ability.
     ActivateAbility(ActivatedAbilityId),
     /// Pass on taking actions in response to a card being played by the
@@ -86,12 +86,12 @@ impl BattleAction {
         match self {
             BattleAction::Debug(..) => "DEBUG".to_string(),
             BattleAction::PlayCardFromHand(hand_card_id) => format!("PCFH{:?}", hand_card_id.0.0),
-            BattleAction::PlayCardFromVoid(void_card_id) => {
-                format!("PCFV{:?}", void_card_id.0.0)
+            BattleAction::PlayCardFromVoid(void_card_id, ability_id) => {
+                format!("PCFV{:?}_{:?}", void_card_id.0.0, ability_id.ability_number.0)
             }
             BattleAction::ActivateAbility(activated_ability_id) => {
                 format!(
-                    "AA{:?}{:?}",
+                    "AA{:?}_{:?}",
                     activated_ability_id.character_id.0.0, activated_ability_id.ability_number.0
                 )
             }

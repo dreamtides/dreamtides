@@ -6,9 +6,7 @@ use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalActions};
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{
-    CardId, CardIdType, CharacterId, HandCardId, StackCardId, VoidCardId,
-};
+use battle_state::battle::card_id::{CardId, CardIdType, CharacterId, HandCardId, StackCardId};
 use battle_state::battle_cards::stack_card_state::{EffectTargets, StackCardAdditionalCostsPaid};
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::card_types::CardType;
@@ -68,16 +66,8 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
     let legal_actions = legal_actions::compute(battle, builder.act_for_player());
 
     let play_from_hand = BattleAction::PlayCardFromHand(HandCardId(card_id));
-    let play_from_void = BattleAction::PlayCardFromVoid(VoidCardId(card_id));
     let can_play_from_hand = legal_actions.contains(play_from_hand, ForPlayer::Human);
-    let can_play_from_void = legal_actions.contains(play_from_void, ForPlayer::Human);
-    let play_action = if can_play_from_hand {
-        Some(play_from_hand)
-    } else if can_play_from_void {
-        Some(play_from_void)
-    } else {
-        None
-    };
+    let play_action = can_play_from_hand.then_some(play_from_hand);
 
     let can_play = play_action.is_some();
     let selection_action = selection_action(&legal_actions, card_id);
