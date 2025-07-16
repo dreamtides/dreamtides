@@ -1,13 +1,12 @@
 use ability_data::effect::Effect;
-use battle_queries::assert_that;
-use battle_queries::card_ability_queries::effect_predicates;
+use battle_queries::battle_card_queries::automatic_effect_targets::{self, AutomaticEffectTargets};
 use battle_state::battle::battle_state::{BattleState, PendingEffect, PendingEffectIndex};
 use battle_state::battle::card_id::CardId;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::OnSelected;
 
 use crate::effects::apply_effect;
-use crate::prompt_mutations::add_targeting_prompt;
+use crate::prompt_mutations::targeting_prompt;
 
 /// Applies an effect to the [BattleState], prompting for effect targets if
 /// required.
@@ -26,24 +25,31 @@ pub fn execute(
     effect: &Effect,
     that_card: Option<CardId>,
 ) {
-    if effect_predicates::has_any_targets(effect) {
-        let pending_effect_index = PendingEffectIndex(battle.pending_effects.len());
-        let mut prompts = add_targeting_prompt::targeting_prompts(
-            battle,
-            source.controller(),
-            source,
-            effect,
-            that_card,
-            OnSelected::AddPendingEffectTarget(pending_effect_index),
-        );
-        assert_that!(!prompts.is_empty(), "Expected prompts for effect", battle);
-        battle.prompts.append(&mut prompts);
-        battle.pending_effects.push_back(PendingEffect {
-            source,
-            effect: effect.clone(),
-            requested_targets: None,
-        });
-    } else {
-        apply_effect::execute(battle, source, effect, None);
+    let automatic_targets = automatic_effect_targets::query(battle, source, effect, that_card);
+    match automatic_targets {
+        AutomaticEffectTargets::RequiresPrompt => {
+            let pending_effect_index = PendingEffectIndex(battle.pending_effects.len());
+            let mut prompts = targeting_prompt::targeting_prompts(
+                battle,
+                source.controller(),
+                source,
+                effect,
+                that_card,
+                OnSelected::AddPendingEffectTarget(pending_effect_index),
+            );
+            if prompts.is_empty() {
+                apply_effect::execute(battle, source, effect, None);
+            } else {
+                battle.prompts.append(&mut prompts);
+                battle.pending_effects.push_back(PendingEffect {
+                    source,
+                    effect: effect.clone(),
+                    requested_targets: None,
+                });
+            }
+        }
+        AutomaticEffectTargets::Targets(targets) => {
+            apply_effect::execute(battle, source, effect, targets.as_ref());
+        }
     }
 }

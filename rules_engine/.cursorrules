@@ -6,7 +6,8 @@ all times.
 
 
 - Avoid creating new variables via "let" statements, just write code inline.
-- DO NOT add inline comments to code ever, but do not delete existing comments.
+- DO NOT add inline comments to code
+- DO NOT delete existing inline comments
 - DO NOT fully-qualify names in generated code ever
 - Always use imports to modules, never fully-qualify names and never use direct function names:
   - WRONG: crate::zone_mutations::move_card::to_destination_zone()

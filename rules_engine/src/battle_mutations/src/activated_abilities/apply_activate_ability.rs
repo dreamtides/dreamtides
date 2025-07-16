@@ -7,7 +7,7 @@ use battle_state::core::effect_source::EffectSource;
 use core_data::types::PlayerName;
 
 use crate::effects::pay_cost;
-use crate::prompt_mutations::add_targeting_prompt;
+use crate::prompt_mutations::targeting_prompt;
 
 /// Activates an ability of a character on the battlefield by putting it on the
 /// stack.
@@ -41,7 +41,7 @@ pub fn execute(
     battle.cards.add_activated_ability_to_stack(player, activated_ability_id);
 
     battle.stack_priority = Some(player.opponent());
-    add_targeting_prompt::execute_for_activated_ability(battle, player, activated_ability_id);
+    targeting_prompt::execute_for_activated_ability(battle, player, activated_ability_id);
 
     battle.push_animation(source, || BattleAnimation::ActivatedAbility {
         player,

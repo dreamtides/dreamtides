@@ -5,7 +5,6 @@ use battle_queries::battle_card_queries::card_properties;
 use battle_queries::battle_player_queries::player_properties;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::ForPlayer;
-use battle_queries::panic_with;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
@@ -17,6 +16,7 @@ use core_data::types::PlayerName;
 use display_data::battle_view::{BattlePreviewView, PlayerPreviewView};
 use display_data::card_view::CardPreviewView;
 use masonry::flex_node::FlexNode;
+use tracing::error;
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::layer::SubscriberExt;
 use ui_components::component::Component;
@@ -51,7 +51,8 @@ pub fn is_victory_imminent_for_player(battle: &BattleState, player: PlayerName) 
     let opponent = player.opponent();
     let legal_actions = legal_actions::compute(&simulation, opponent);
     if !legal_actions.contains(BattleAction::EndTurn, ForPlayer::Human) {
-        panic_with!("Opponent cannot end their turn", battle, opponent);
+        error!(?opponent, "Opponent cannot end their turn");
+        return false;
     }
 
     let subscriber = tracing_subscriber::registry().with(EnvFilter::new("warn"));
@@ -59,9 +60,12 @@ pub fn is_victory_imminent_for_player(battle: &BattleState, player: PlayerName) 
         apply_battle_action::execute(&mut simulation, opponent, BattleAction::EndTurn);
     });
 
+    simulation.prompts.clear();
+    simulation.stack_priority = None;
     let legal_actions = legal_actions::compute(&simulation, player);
     if !legal_actions.contains(BattleAction::StartNextTurn, ForPlayer::Human) {
-        panic_with!("Player cannot start their turn", battle, opponent);
+        error!(?player, "Player cannot start their turn");
+        return false;
     }
     let subscriber = tracing_subscriber::registry().with(EnvFilter::new("warn"));
     tracing::subscriber::with_default(subscriber, || {

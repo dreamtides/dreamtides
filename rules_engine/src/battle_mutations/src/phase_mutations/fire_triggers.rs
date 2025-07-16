@@ -1,21 +1,16 @@
-use ability_data::effect::Effect;
-use ability_data::predicate::Predicate;
-use ability_data::standard_effect::StandardEffect;
 use ability_data::triggered_ability::TriggeredAbility;
-use battle_queries::battle_card_queries::{card, card_abilities, card_properties};
-use battle_queries::card_ability_queries::{effect_predicates, trigger_queries};
-use battle_queries::panic_with;
+use battle_queries::battle_card_queries::{card_abilities, card_properties};
+use battle_queries::card_ability_queries::trigger_queries;
 use battle_state::battle::battle_animation::{BattleAnimation, TriggerAnimation};
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::card_id::CharacterId;
 use battle_state::battle_cards::ability_list::AbilityData;
-use battle_state::battle_cards::stack_card_state::{EffectTargets, StandardEffectTarget};
 use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger::Trigger;
 use core_data::types::PlayerName;
 
-use crate::effects::apply_effect;
+use crate::effects::apply_effect_prompt_for_targets;
 
 /// Fires all recorded triggers for the given [BattleState] while no prompt is
 /// active.
@@ -73,6 +68,8 @@ pub fn execute_if_no_active_prompt(battle: &mut BattleState) {
     }
 
     if should_animate && battle.prompts.is_empty() {
+        // TODO: Handle updating active triggers when resolving a prompt pending
+        // effect
         set_displayed_active_triggers(battle, &mut trigger_animations);
     }
 }
@@ -133,71 +130,12 @@ fn fire_triggered_ability(
         character_id: controlling_character,
         ability_number: ability_data.ability_number,
     };
-    let Effect::Effect(effect) = &ability_data.ability.effect else {
-        todo!("Implement non-standard triggered effects")
-    };
 
-    let targets = trigger_targets(battle, trigger, effect, controller, controlling_character);
-    apply_effect::execute(battle, source, &ability_data.ability.effect, targets.as_ref());
-}
-
-fn trigger_targets(
-    battle: &BattleState,
-    trigger: Trigger,
-    effect: &StandardEffect,
-    controller: PlayerName,
-    controlling_character: CharacterId,
-) -> Option<EffectTargets> {
-    let mut targets = None;
-
-    if let Some(predicate) = effect_predicates::get_character_target_predicate(effect) {
-        match predicate {
-            Predicate::This => {
-                targets = Some(EffectTargets::Standard(StandardEffectTarget::Character(
-                    controlling_character,
-                    card::get(battle, controlling_character).object_id,
-                )));
-            }
-            Predicate::That => {
-                let Some(triggering_card_id) = trigger_queries::triggering_card_id(trigger) else {
-                    panic_with!("Expected a triggering card ID", battle);
-                };
-                let Some(target_character_id) =
-                    battle.cards.to_character_id(controller, triggering_card_id)
-                else {
-                    // Skip triggers targeting cards that are not currently on
-                    // the battlefield.
-                    return None;
-                };
-                targets = Some(EffectTargets::Standard(StandardEffectTarget::Character(
-                    target_character_id,
-                    card::get(battle, target_character_id).object_id,
-                )));
-            }
-            _ => todo!("Implement trigger target selection for {:?}", predicate),
-        }
-    }
-
-    if let Some(predicate) = effect_predicates::get_stack_target_predicate(effect) {
-        match predicate {
-            Predicate::That => {
-                let Some(triggering_card_id) = trigger_queries::triggering_card_id(trigger) else {
-                    panic_with!("Expected a triggering card ID", battle);
-                };
-                let Some(target_stack_card_id) =
-                    battle.cards.to_stack_card_id(controller, triggering_card_id)
-                else {
-                    // Skip triggers targeting cards that are not currently on the stack.
-                    return None;
-                };
-                targets = Some(EffectTargets::Standard(StandardEffectTarget::StackCard(
-                    target_stack_card_id,
-                    card::get(battle, target_stack_card_id).object_id,
-                )));
-            }
-            _ => todo!("Implement trigger stack target selection for {:?}", predicate),
-        }
-    }
-
-    targets
+    let that_card = trigger_queries::triggering_card_id(trigger);
+    apply_effect_prompt_for_targets::execute(
+        battle,
+        source,
+        &ability_data.ability.effect,
+        that_card,
+    );
 }
