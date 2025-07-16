@@ -10,7 +10,7 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::card_id::CharacterId;
 use battle_state::battle_cards::ability_list::AbilityData;
-use battle_state::battle_cards::stack_card_state::EffectTargets;
+use battle_state::battle_cards::stack_card_state::{EffectTargets, SingleEffectTarget};
 use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger::Trigger;
 use core_data::types::PlayerName;
@@ -153,10 +153,10 @@ fn trigger_targets(
     if let Some(predicate) = effect_predicates::get_character_target_predicate(effect) {
         match predicate {
             Predicate::This => {
-                targets = Some(EffectTargets::Character(
+                targets = Some(EffectTargets::Single(SingleEffectTarget::Character(
                     controlling_character,
                     card::get(battle, controlling_character).object_id,
-                ));
+                )));
             }
             Predicate::That => {
                 let Some(triggering_card_id) = trigger_queries::triggering_card_id(trigger) else {
@@ -169,10 +169,10 @@ fn trigger_targets(
                     // the battlefield.
                     return None;
                 };
-                targets = Some(EffectTargets::Character(
+                targets = Some(EffectTargets::Single(SingleEffectTarget::Character(
                     target_character_id,
                     card::get(battle, target_character_id).object_id,
-                ));
+                )));
             }
             _ => todo!("Implement trigger target selection for {:?}", predicate),
         }
@@ -190,10 +190,10 @@ fn trigger_targets(
                     // Skip triggers targeting cards that are not currently on the stack.
                     return None;
                 };
-                targets = Some(EffectTargets::StackCard(
+                targets = Some(EffectTargets::Single(SingleEffectTarget::StackCard(
                     target_stack_card_id,
                     card::get(battle, target_stack_card_id).object_id,
-                ));
+                )));
             }
             _ => todo!("Implement trigger stack target selection for {:?}", predicate),
         }

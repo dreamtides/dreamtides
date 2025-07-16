@@ -7,7 +7,9 @@ use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalA
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType, CharacterId, HandCardId, StackCardId};
-use battle_state::battle_cards::stack_card_state::{EffectTargets, StackCardAdditionalCostsPaid};
+use battle_state::battle_cards::stack_card_state::{
+    EffectTargets, SingleEffectTarget, StackCardAdditionalCostsPaid,
+};
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::card_types::CardType;
 use core_data::display_color;
@@ -301,51 +303,73 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
         && prompt.source.card_id() == Some(card_id)
         && let PromptType::Choose { choices } = &prompt.prompt_type
     {
-        // This card is currently the source of a choice prompt, check for
-        // effect targets.
         for choice in choices {
             if let Some(targets) = &choice.targets {
-                let target_card_id = match targets {
-                    EffectTargets::Character(target_character_id, _) => {
-                        target_character_id.card_id()
+                let target_card_ids = match targets {
+                    EffectTargets::Single(SingleEffectTarget::Character(
+                        target_character_id,
+                        _,
+                    )) => {
+                        vec![target_character_id.card_id()]
                     }
-                    EffectTargets::StackCard(target_stack_card_id, _) => {
-                        target_stack_card_id.card_id()
+                    EffectTargets::Single(SingleEffectTarget::StackCard(
+                        target_stack_card_id,
+                        _,
+                    )) => {
+                        vec![target_stack_card_id.card_id()]
                     }
+                    EffectTargets::List(target_list) => target_list
+                        .iter()
+                        .map(|target| match target {
+                            SingleEffectTarget::Character(character_id, _) => {
+                                character_id.card_id()
+                            }
+                            SingleEffectTarget::StackCard(stack_card_id, _) => {
+                                stack_card_id.card_id()
+                            }
+                        })
+                        .collect(),
                 };
 
-                icons.insert(target_card_id, InfoZoomIcon {
-                    card_id: adapter::client_card_id(target_card_id),
-                    icon: icon::CHEVRON_UP.to_string(),
-                    color: display_color::RED_500,
-                });
+                for target_card_id in target_card_ids {
+                    icons.insert(target_card_id, InfoZoomIcon {
+                        card_id: adapter::client_card_id(target_card_id),
+                        icon: icon::CHEVRON_UP.to_string(),
+                        color: display_color::RED_500,
+                    });
+                }
             }
         }
     }
 
     if let Some(targets) = stack_card_queries::displayed_targets(battle, StackCardId(card_id)) {
-        // This card is currently on the stack with targets.
-        match targets {
-            EffectTargets::Character(target_character_id, _) => {
-                icons.insert(target_character_id.card_id(), InfoZoomIcon {
-                    card_id: adapter::client_card_id(target_character_id.card_id()),
-                    icon: icon::CHEVRON_UP.to_string(),
-                    color: display_color::RED_500,
-                });
+        let target_card_ids = match targets {
+            EffectTargets::Single(SingleEffectTarget::Character(target_character_id, _)) => {
+                vec![target_character_id.card_id()]
             }
-            EffectTargets::StackCard(target_stack_card_id, _) => {
-                icons.insert(target_stack_card_id.card_id(), InfoZoomIcon {
-                    card_id: adapter::client_card_id(target_stack_card_id.card_id()),
-                    icon: icon::CHEVRON_UP.to_string(),
-                    color: display_color::RED_500,
-                });
+            EffectTargets::Single(SingleEffectTarget::StackCard(target_stack_card_id, _)) => {
+                vec![target_stack_card_id.card_id()]
             }
+            EffectTargets::List(target_list) => target_list
+                .iter()
+                .map(|target| match target {
+                    SingleEffectTarget::Character(character_id, _) => character_id.card_id(),
+                    SingleEffectTarget::StackCard(stack_card_id, _) => stack_card_id.card_id(),
+                })
+                .collect(),
+        };
+
+        for target_card_id in target_card_ids {
+            icons.insert(target_card_id, InfoZoomIcon {
+                card_id: adapter::client_card_id(target_card_id),
+                icon: icon::CHEVRON_UP.to_string(),
+                color: display_color::RED_500,
+            });
         }
     } else if let Some(stack_card) = battle.cards.stack_item(StackCardId(card_id))
         && stack_card.targets.is_some()
-        && stack_card_queries::validate_targets(battle, stack_card.targets.as_ref()).is_none()
+        && stack_card_queries::valid_targets(battle, stack_card.targets.as_ref()).is_none()
     {
-        // This card is currently on the stack with invalid targets.
         icons.insert(card_id, InfoZoomIcon {
             card_id: adapter::client_card_id(card_id),
             icon: icon::XMARK.to_string(),

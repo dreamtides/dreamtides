@@ -37,7 +37,7 @@ pub fn execute_event_abilities(
             execute(battle, source, &ability.ability.effect, requested_targets);
         }
         _ => {
-            let targets = stack_card_queries::validate_targets(battle, requested_targets);
+            let targets = stack_card_queries::valid_targets(battle, requested_targets);
             battle.pending_effects.extend(abilities.iter().flat_map(|ability_data| {
                 let source = EffectSource::Event {
                     controller,
@@ -67,7 +67,7 @@ pub fn execute(
     effect: &Effect,
     requested_targets: Option<&EffectTargets>,
 ) {
-    let targets = stack_card_queries::validate_targets(battle, requested_targets);
+    let targets = stack_card_queries::valid_targets(battle, requested_targets);
     match effect {
         Effect::Effect(standard) => {
             apply_standard_effect::apply(battle, source, standard, targets);

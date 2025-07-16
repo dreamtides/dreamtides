@@ -1,7 +1,9 @@
 use battle_queries::battle_card_queries::{card, stack_card_queries};
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType};
-use battle_state::battle_cards::stack_card_state::{EffectTargets, StackItemId};
+use battle_state::battle_cards::stack_card_state::{
+    EffectTargets, SingleEffectTarget, StackItemId,
+};
 use battle_state::battle_cards::zone::Zone;
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
@@ -79,7 +81,7 @@ pub fn current_stack_type(builder: &ResponseBuilder, battle: &BattleState) -> St
     let mut targeting_enemy_battlefield = false;
 
     for stack_card in battle.cards.all_items_on_stack() {
-        if let Some(EffectTargets::Character(character_id, _)) =
+        if let Some(EffectTargets::Single(SingleEffectTarget::Character(character_id, _))) =
             stack_card_queries::displayed_targets(battle, stack_card.id)
         {
             if battle.cards.contains_card(display_player, character_id.card_id(), Zone::Battlefield)

@@ -68,7 +68,7 @@ pub fn execute_for_activated_ability(
 
 /// Returns a list of prompt data for prompts required to resolve an effect, if
 /// any.
-fn targeting_prompts(
+pub fn targeting_prompts(
     battle: &BattleState,
     player: PlayerName,
     source: EffectSource,

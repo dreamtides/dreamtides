@@ -3,7 +3,9 @@ use battle_queries::battle_player_queries::player_properties;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
-use battle_state::battle_cards::stack_card_state::{EffectTargets, StackItemId};
+use battle_state::battle_cards::stack_card_state::{
+    EffectTargets, SingleEffectTarget, StackItemId,
+};
 use battle_state::battle_player::battle_player_state::BattlePlayerState;
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
@@ -145,17 +147,19 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
         .all_items_on_stack()
         .iter()
         .filter_map(|stack_item| {
-            stack_card_queries::displayed_targets(battle, stack_item.id).map(|targets| {
+            stack_card_queries::displayed_targets(battle, stack_item.id).and_then(|targets| {
                 let source = adapter::stack_item_game_object_id(stack_item.id);
-                let (target, color) = match targets {
-                    EffectTargets::Character(character_id, _) => {
-                        (adapter::card_game_object_id(*character_id), ArrowStyle::Red)
+                match targets {
+                    EffectTargets::Single(SingleEffectTarget::Character(character_id, _)) => {
+                        let target = adapter::card_game_object_id(*character_id);
+                        Some(DisplayArrow { source, target, color: ArrowStyle::Red })
                     }
-                    EffectTargets::StackCard(stack_card_id, _) => {
-                        (adapter::card_game_object_id(*stack_card_id), ArrowStyle::Blue)
+                    EffectTargets::Single(SingleEffectTarget::StackCard(stack_card_id, _)) => {
+                        let target = adapter::card_game_object_id(*stack_card_id);
+                        Some(DisplayArrow { source, target, color: ArrowStyle::Blue })
                     }
-                };
-                DisplayArrow { source, target, color }
+                    EffectTargets::List(_) => None,
+                }
             })
         })
         .collect()
