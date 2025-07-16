@@ -157,7 +157,7 @@ fn to_destination_zone(
     controller: PlayerName,
     id: impl CardIdType,
     old: Zone,
-    new: Zone,
+    mut new: Zone,
 ) {
     let card_id = id.card_id();
     if !battle.cards.contains_card(controller, card_id, old) {
@@ -165,8 +165,8 @@ fn to_destination_zone(
     }
 
     match old {
-        Zone::Stack => on_leave_stack(battle, card_id),
-        Zone::Battlefield => on_leave_battlefield(battle, controller, card_id),
+        Zone::Stack => on_leave_stack(battle, card_id, &mut new),
+        Zone::Battlefield => on_leave_battlefield(battle, controller, card_id, &mut new),
         Zone::Void => on_leave_void(battle, controller, card_id),
         _ => {}
     }
@@ -206,7 +206,12 @@ fn on_enter_battlefield(
     battle.triggers.push(source, Trigger::Materialized(id));
 }
 
-fn on_leave_battlefield(battle: &mut BattleState, controller: PlayerName, card_id: CardId) {
+fn on_leave_battlefield(
+    battle: &mut BattleState,
+    controller: PlayerName,
+    card_id: CardId,
+    new: &mut Zone,
+) {
     let ability_list = card_abilities::query(battle, card_id);
     let triggers = ability_list.battlefield_triggers;
     for trigger in triggers {
@@ -218,15 +223,20 @@ fn on_leave_battlefield(battle: &mut BattleState, controller: PlayerName, card_i
     }
 
     battle.cards.battlefield_state_mut(controller).remove(&CharacterId(card_id));
+
+    if battle.ability_state.banish_when_leaves_play.contains(card_id) {
+        battle.ability_state.banish_when_leaves_play.remove(card_id);
+        *new = Zone::Banished;
+    }
 }
 
 fn on_enter_void(battle: &mut BattleState, controller: PlayerName, card_id: CardId) {
     let ability_list = card_abilities::query(battle, card_id);
     if ability_list.has_play_from_void_ability {
         battle
-            .static_abilities
-            .player_mut(controller)
+            .ability_state
             .has_play_from_void_ability
+            .player_mut(controller)
             .insert(VoidCardId(card_id));
     }
 }
@@ -235,9 +245,9 @@ fn on_leave_void(battle: &mut BattleState, controller: PlayerName, card_id: Card
     let ability_list = card_abilities::query(battle, card_id);
     if ability_list.has_play_from_void_ability {
         battle
-            .static_abilities
-            .player_mut(controller)
+            .ability_state
             .has_play_from_void_ability
+            .player_mut(controller)
             .remove(VoidCardId(card_id));
     }
 }
@@ -250,11 +260,16 @@ fn on_enter_stack(battle: &mut BattleState, card_id: CardId) {
     }
 }
 
-fn on_leave_stack(battle: &mut BattleState, card_id: CardId) {
+fn on_leave_stack(battle: &mut BattleState, card_id: CardId, new: &mut Zone) {
     let ability_list = card_abilities::query(battle, card_id);
     let triggers = ability_list.stack_triggers;
     for trigger in triggers {
         battle.triggers.listeners.remove_listener(trigger, card_id);
+    }
+
+    if *new != Zone::Battlefield && battle.ability_state.banish_when_leaves_play.contains(card_id) {
+        battle.ability_state.banish_when_leaves_play.remove(card_id);
+        *new = Zone::Banished;
     }
 }
 

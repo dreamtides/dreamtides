@@ -76,7 +76,7 @@ pub fn from_void(
 ) -> Vec<CanPlayFromVoid> {
     let mut legal_cards = Vec::new();
 
-    for card_id in battle.static_abilities.player(player).has_play_from_void_ability.iter() {
+    for card_id in battle.ability_state.has_play_from_void_ability.player(player).iter() {
         let Some(from_void_with_cost) = can_play_from_void_for_energy_cost(battle, card_id) else {
             continue;
         };

@@ -31,6 +31,7 @@ pub fn apply(
 ) -> Option<EffectWasApplied> {
     battle_trace!("Applying effect", battle, effect, targets);
     match effect {
+        StandardEffect::BanishWhenLeavesPlay { .. } => banish_when_leaves_play(battle, targets),
         StandardEffect::Counterspell { .. } => counterspell(battle, source, targets),
         StandardEffect::CounterspellUnlessPaysCost { cost, .. } => {
             counterspell_unless_pays_cost::execute(battle, source, targets, cost)
@@ -47,6 +48,15 @@ pub fn apply(
         StandardEffect::OpponentPaysCost { cost } => opponent_pays_cost(battle, source, cost),
         _ => todo!("Implement {:?}", effect),
     }
+}
+
+fn banish_when_leaves_play(
+    battle: &mut BattleState,
+    targets: Option<&EffectTargets>,
+) -> Option<EffectWasApplied> {
+    let id = targeting::stack_or_character_id(targets)?;
+    battle.ability_state.banish_when_leaves_play.insert(id);
+    Some(EffectWasApplied)
 }
 
 fn counterspell(

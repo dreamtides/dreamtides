@@ -9,6 +9,7 @@ using Dreamtides.Components;
 using Dreamtides.Layout;
 using Dreamtides.Schema;
 using Dreamtides.Utils;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Dreamtides.Services
@@ -305,7 +306,7 @@ namespace Dreamtides.Services
 
       if (position.PositionClass == null)
       {
-        throw new InvalidOperationException($"Unknown layout position: ${position.Enum}");
+        throw new InvalidOperationException($"Unknown layout position enum: ${position.Enum}");
       }
 
       if (position.PositionClass.InHand is { } inHand)
@@ -402,8 +403,13 @@ namespace Dreamtides.Services
         };
       }
 
-      throw new InvalidOperationException($"Unknown layout position: ${position.PositionClass}, ${position.Enum}");
+      if (position.PositionClass.InBanished is { } _)
+      {
+        return Registry.Layout.Offscreen;
+      }
+
+      var json = JsonConvert.SerializeObject(position.PositionClass);
+      throw new InvalidOperationException($"Unknown layout position: ${json}");
     }
   }
 }
-

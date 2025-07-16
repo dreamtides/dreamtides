@@ -108,9 +108,9 @@ fn standard_legal_actions(
         primary,
         play_card_from_hand: can_play_cards::from_hand(battle, player, fast_only),
         play_card_from_void: if battle
-            .static_abilities
-            .player(player)
+            .ability_state
             .has_play_from_void_ability
+            .player(player)
             .is_empty()
         {
             vec![]

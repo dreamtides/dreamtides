@@ -16,9 +16,9 @@ use crate::battle::battle_status::BattleStatus;
 use crate::battle::battle_turn_phase::BattleTurnPhase;
 use crate::battle::turn_data::TurnData;
 use crate::battle::turn_history::TurnHistory;
+use crate::battle_cards::ability_state::AbilityState;
 use crate::battle_cards::activated_ability_state::ActivatedAbilityState;
 use crate::battle_cards::stack_card_state::EffectTargets;
-use crate::battle_cards::static_ability_state::StaticAbilityState;
 use crate::battle_player::battle_player_state::BattlePlayerState;
 use crate::battle_player::player_map::PlayerMap;
 use crate::battle_trace::battle_tracing::BattleTracing;
@@ -67,8 +67,8 @@ pub struct BattleState {
     /// State of activated abilities for players in this battle.
     pub activated_abilities: PlayerMap<ActivatedAbilityState>,
 
-    /// State of static abilities for players in this battle.
-    pub static_abilities: PlayerMap<StaticAbilityState>,
+    /// State of abilities in this battle.
+    pub ability_state: AbilityState,
 
     /// Effects that are waiting to be applied.
     pub pending_effects: VecDeque<PendingEffect>,
@@ -154,7 +154,7 @@ impl BattleState {
             prompt: self.prompt.clone(),
             triggers: self.triggers.clone(),
             activated_abilities: self.activated_abilities.clone(),
-            static_abilities: self.static_abilities.clone(),
+            ability_state: self.ability_state.clone(),
             pending_effects: self.pending_effects.clone(),
             animations: None,
             tracing: None,
@@ -189,7 +189,7 @@ impl BattleState {
                 prompt: self.prompt.clone(),
                 triggers: self.triggers.clone(),
                 activated_abilities: self.activated_abilities.clone(),
-                static_abilities: self.static_abilities.clone(),
+                ability_state: self.ability_state.clone(),
                 pending_effects: self.pending_effects.clone(),
                 animations: None,
                 tracing: None,

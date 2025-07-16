@@ -8,6 +8,7 @@ use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::battle::turn_data::TurnData;
 use battle_state::battle::turn_history::TurnHistory;
+use battle_state::battle_cards::ability_state::AbilityState;
 use battle_state::battle_player::battle_player_state::{BattlePlayerState, PlayerType};
 use battle_state::battle_player::player_map::PlayerMap;
 use battle_state::core::effect_source::EffectSource;
@@ -55,7 +56,7 @@ pub fn create_and_start(
         prompt: None,
         triggers: TriggerState::default(),
         activated_abilities: PlayerMap::default(),
-        static_abilities: PlayerMap::default(),
+        ability_state: AbilityState::default(),
         pending_effects: VecDeque::new(),
         tracing: None,
         action_history: None,
