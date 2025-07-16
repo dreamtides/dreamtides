@@ -14,7 +14,7 @@ pub fn character(battle: &mut BattleState, player: PlayerName, character_id: Cha
         panic_with!("No active stack", battle);
     };
     stack_item.targets = Some(EffectTargets::Character(character_id, object_id));
-    battle.prompt = None;
+    battle.prompts.pop_front();
     let source_id = stack_item.id;
     let source = EffectSource::Player { controller: player };
     battle.push_animation(source, || BattleAnimation::SelectStackCardTargets {
@@ -31,7 +31,7 @@ pub fn on_stack(battle: &mut BattleState, player: PlayerName, stack_card_id: Sta
         panic_with!("No active stack", battle);
     };
     stack_item.targets = Some(EffectTargets::StackCard(stack_card_id, object_id));
-    battle.prompt = None;
+    battle.prompts.pop_front();
     let source_id = stack_item.id;
     let source = EffectSource::Player { controller: player };
     battle.push_animation(source, || BattleAnimation::SelectStackCardTargets {

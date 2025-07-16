@@ -114,8 +114,8 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
 
 fn update_display_state(builder: &ResponseBuilder, battle: &BattleState) {
     if battle
-        .prompt
-        .as_ref()
+        .prompts
+        .front()
         .map(|p| &p.prompt_type)
         .is_none_or(|pt| !matches!(pt, PromptType::ChooseEnergyValue { .. }))
     {

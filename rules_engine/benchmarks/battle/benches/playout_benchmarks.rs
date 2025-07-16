@@ -386,7 +386,7 @@ fn benchmark_battle() -> BattleState {
         phase: BattleTurnPhase::Main,
         seed,
         rng: Xoshiro256PlusPlus::seed_from_u64(seed),
-        prompt: None,
+        prompts: VecDeque::new(),
         triggers: TriggerState::default(),
         activated_abilities: PlayerMap::default(),
         ability_state: AbilityState::default(),

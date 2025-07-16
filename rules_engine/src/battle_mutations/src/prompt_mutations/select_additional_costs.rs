@@ -9,9 +9,10 @@ use core_data::types::PlayerName;
 use crate::player_mutations::energy;
 
 pub fn energy_cost(battle: &mut BattleState, player: PlayerName, cost: Energy) {
-    let Some(source) = battle.prompt.as_ref().map(|p| p.source) else {
-        panic_with!("No active prompt for applying additional cost", battle, cost);
+    let Some(prompt) = battle.prompts.pop_front() else {
+        panic_with!("Expected an active prompt", battle);
     };
+    let source = prompt.source;
 
     let Some(stack_item) = battle.cards.top_of_stack_mut() else {
         panic_with!("No active stack for applying additional cost", battle, cost);
@@ -24,5 +25,4 @@ pub fn energy_cost(battle: &mut BattleState, player: PlayerName, cost: Energy) {
         choice: PromptChoiceLabel::PayEnergy(cost),
     });
     energy::spend(battle, player, source, cost);
-    battle.prompt = None;
 }

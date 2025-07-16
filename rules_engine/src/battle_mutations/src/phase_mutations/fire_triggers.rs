@@ -28,7 +28,7 @@ pub fn execute_if_no_active_prompt(battle: &mut BattleState) {
     let mut trigger_animations = Vec::new();
 
     loop {
-        if battle.prompt.is_some() {
+        if !battle.prompts.is_empty() {
             break;
         }
 
@@ -72,7 +72,7 @@ pub fn execute_if_no_active_prompt(battle: &mut BattleState) {
         }
     }
 
-    if should_animate && battle.prompt.is_none() {
+    if should_animate && battle.prompts.is_empty() {
         set_displayed_active_triggers(battle, &mut trigger_animations);
     }
 }

@@ -17,7 +17,7 @@ pub fn compute(battle: &BattleState, player: PlayerName) -> LegalActions {
 
     // If there's an active prompt, the only legal actions are those
     // corresponding to the prompt
-    if let Some(prompt_data) = &battle.prompt {
+    if let Some(prompt_data) = battle.prompts.front() {
         if prompt_data.player != player {
             return LegalActions::NoActionsOpponentPrompt;
         }
@@ -85,7 +85,7 @@ pub fn next_to_act(battle: &BattleState) -> Option<PlayerName> {
         return None;
     }
 
-    if let Some(prompt_data) = &battle.prompt {
+    if let Some(prompt_data) = &battle.prompts.front() {
         return Some(prompt_data.player);
     }
 

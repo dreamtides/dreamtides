@@ -11,20 +11,20 @@ use crate::effects::apply_effect;
 pub fn select(battle: &mut BattleState, player: PlayerName, choice_index: usize) {
     battle_trace!("Applying prompt choice", battle, choice_index);
 
+    let Some(prompt) = battle.prompts.pop_front() else {
+        panic_with!("Expected an active prompt", battle);
+    };
+
     let (source, choice_effect, choice_targets, label) = {
-        let Some(ref prompt) = battle.prompt else {
-            panic_with!("Expected an active prompt", battle);
-        };
         let PromptType::Choose { choices } = &prompt.prompt_type else {
             panic_with!("Expected a Prompt::Choose prompt", battle);
         };
         let Some(choice) = choices.get(choice_index) else {
             panic_with!("Invalid choice index", battle, choice_index);
         };
-        (prompt.source, choice.effect.clone(), choice.targets.clone(), choice.label)
+        (prompt.source, &choice.effect, &choice.targets, choice.label)
     };
 
     battle.push_animation(source, || BattleAnimation::MakeChoice { player, choice: label });
-    apply_effect::execute(battle, source, &choice_effect, choice_targets.as_ref());
-    battle.prompt = None;
+    apply_effect::execute(battle, source, choice_effect, choice_targets.as_ref());
 }

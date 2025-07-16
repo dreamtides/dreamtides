@@ -28,7 +28,7 @@ pub fn capture(state: &BattleState) -> DebugBattleState {
         stack_priority: format!("{:?}", state.stack_priority),
         turn: format!("{:?}", state.turn),
         phase: format!("{:?}", state.phase),
-        prompt: debug_prompt_data(&state.prompt),
+        prompt: debug_prompt_data(state.prompts.front()),
     }
 }
 
@@ -189,7 +189,7 @@ fn debug_stack_item_state(state: Option<&StackItemState>) -> DebugStackItemState
     }
 }
 
-fn debug_prompt_data(prompt: &Option<PromptData>) -> DebugPromptData {
+fn debug_prompt_data(prompt: Option<&PromptData>) -> DebugPromptData {
     let Some(prompt_data) = prompt else {
         return DebugPromptData {
             is_active: false,

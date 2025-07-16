@@ -17,7 +17,7 @@ pub fn object_position(
     card_id: CardId,
     base_object_position: ObjectPosition,
 ) -> ObjectPosition {
-    let position = if let Some(prompt) = &battle.prompt
+    let position = if let Some(prompt) = battle.prompts.front()
         && prompt.source.card_id() == Some(card_id)
     {
         Position::OnStack(positions::current_stack_type(builder, battle))
@@ -52,7 +52,7 @@ pub fn for_browser(builder: &ResponseBuilder, position: Position) -> Position {
 fn for_stack_during_prompt(battle: &BattleState, position: Position) -> Position {
     // Minimize the stack during the "select deck card order" prompt since it's
     // visually distracting.
-    if let Some(prompt) = &battle.prompt
+    if let Some(prompt) = battle.prompts.front()
         && let PromptType::SelectDeckCardOrder { .. } = &prompt.prompt_type
         && matches!(position, Position::OnStack(_))
     {
@@ -101,7 +101,7 @@ fn for_card_order_browser(
     card_id: CardId,
     base_object_position: ObjectPosition,
 ) -> ObjectPosition {
-    if let Some(prompt) = &battle.prompt
+    if let Some(prompt) = battle.prompts.front()
         && let PromptType::SelectDeckCardOrder { prompt: deck_prompt } = &prompt.prompt_type
     {
         let deck_card_id = DeckCardId(card_id);

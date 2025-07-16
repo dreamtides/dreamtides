@@ -53,7 +53,7 @@ pub fn create_and_start(
         seed,
         rng: Xoshiro256PlusPlus::seed_from_u64(seed),
         animations: None,
-        prompt: None,
+        prompts: VecDeque::new(),
         triggers: TriggerState::default(),
         activated_abilities: PlayerMap::default(),
         ability_state: AbilityState::default(),

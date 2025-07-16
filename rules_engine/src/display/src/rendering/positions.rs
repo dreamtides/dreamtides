@@ -95,7 +95,7 @@ pub fn current_stack_type(builder: &ResponseBuilder, battle: &BattleState) -> St
         }
     }
 
-    if let Some(ref prompt) = battle.prompt {
+    if let Some(prompt) = battle.prompts.front() {
         if let PromptType::ChooseCharacter { ref valid } = prompt.prompt_type {
             for character_id in valid.iter() {
                 if battle.cards.contains_card(

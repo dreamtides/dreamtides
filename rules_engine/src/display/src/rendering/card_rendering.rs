@@ -297,7 +297,7 @@ fn build_info_zoom_data(battle: &BattleState, card_id: CardId) -> Option<InfoZoo
 fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIcon> {
     let mut icons = HashMap::new();
 
-    if let Some(prompt) = &battle.prompt
+    if let Some(prompt) = battle.prompts.front()
         && prompt.source.card_id() == Some(card_id)
         && let PromptType::Choose { choices } = &prompt.prompt_type
     {

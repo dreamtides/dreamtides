@@ -13,7 +13,6 @@ use battle_state::prompt_types::prompt_data::{
 use crate::card_mutations::counterspell;
 use crate::effects::apply_effect::EffectWasApplied;
 use crate::effects::targeting;
-use crate::prompt_mutations::prompts;
 
 pub fn execute(
     battle: &mut BattleState,
@@ -22,7 +21,7 @@ pub fn execute(
     cost: &Cost,
 ) -> Option<EffectWasApplied> {
     if costs::can_pay(battle, source.controller().opponent(), cost) {
-        prompts::set(battle, PromptData {
+        battle.prompts.push_back(PromptData {
             source,
             player: source.controller().opponent(),
             prompt_type: PromptType::Choose {

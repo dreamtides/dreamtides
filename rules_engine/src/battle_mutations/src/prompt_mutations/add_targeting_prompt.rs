@@ -20,7 +20,7 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, card_id: StackCardI
         };
         if let Some(prompt_data) = targeting_prompt(battle, player, source, &data.ability.effect) {
             battle_trace!("Adding target prompt", battle, prompt_data);
-            battle.prompt = Some(prompt_data);
+            battle.prompts.push_back(prompt_data);
             return;
         }
     }
@@ -43,7 +43,7 @@ pub fn execute_for_activated_ability(
             targeting_prompt(battle, player, source, &ability_data.ability.effect)
         {
             battle_trace!("Adding target prompt for activated ability", battle, prompt_data);
-            battle.prompt = Some(prompt_data);
+            battle.prompts.push_back(prompt_data);
         }
     }
 }

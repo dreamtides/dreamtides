@@ -55,11 +55,10 @@ pub struct BattleState {
     /// Random number generator for this battle
     pub rng: Xoshiro256PlusPlus,
 
-    /// Prompt to display to a player.
+    /// Queue of prompts to display to players in order to make choices.
     ///
-    /// Only one prompt may be active at a time. It is an error to attempt to
-    /// display another prompt while a choice is pending.
-    pub prompt: Option<PromptData>,
+    /// The first element in the queue (index 0) is the currently-active prompt.
+    pub prompts: VecDeque<PromptData>,
 
     /// State of the trigger system.
     pub triggers: TriggerState,
@@ -151,7 +150,7 @@ impl BattleState {
             phase: self.phase,
             seed: self.seed,
             rng: self.rng.clone(),
-            prompt: self.prompt.clone(),
+            prompts: self.prompts.clone(),
             triggers: self.triggers.clone(),
             activated_abilities: self.activated_abilities.clone(),
             ability_state: self.ability_state.clone(),
@@ -186,7 +185,7 @@ impl BattleState {
                 phase: self.phase,
                 seed: self.seed,
                 rng: self.rng.clone(),
-                prompt: self.prompt.clone(),
+                prompts: self.prompts.clone(),
                 triggers: self.triggers.clone(),
                 activated_abilities: self.activated_abilities.clone(),
                 ability_state: self.ability_state.clone(),

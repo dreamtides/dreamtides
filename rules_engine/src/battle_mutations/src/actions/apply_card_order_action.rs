@@ -13,7 +13,7 @@ pub fn execute_select_order_for_deck_card(
 ) {
     battle_trace!("Selecting order for deck card", battle, order);
 
-    let Some(prompt) = &mut battle.prompt else {
+    let Some(prompt) = battle.prompts.front_mut() else {
         panic_with!("No prompt found", battle, player);
     };
 
@@ -44,7 +44,7 @@ pub fn execute_select_order_for_deck_card(
 }
 
 pub fn execute_submit_deck_card_order(battle: &mut BattleState, player: PlayerName) {
-    let Some(prompt) = battle.prompt.take() else {
+    let Some(prompt) = battle.prompts.pop_front() else {
         panic_with!("No prompt found", battle, player);
     };
 

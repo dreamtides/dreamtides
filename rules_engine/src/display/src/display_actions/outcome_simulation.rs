@@ -44,7 +44,7 @@ pub fn is_victory_imminent_for_player(battle: &BattleState, player: PlayerName) 
     let mut simulation = battle.logical_clone();
 
     // Clear state which might prevent the 'end turn' action from being legal.
-    simulation.prompt = None;
+    simulation.prompts.clear();
     simulation.stack_priority = None;
     simulation.phase = BattleTurnPhase::Main;
 
@@ -213,9 +213,10 @@ pub fn current_prompt_battle_preview(
     battle: &BattleState,
     player: PlayerName,
 ) -> Option<BattlePreviewView> {
-    if let Some(prompt) = battle.prompt.as_ref()
+    if let Some(prompt) = battle.prompts.front()
         && prompt.player == player
     {
+        let prompt = prompt.clone();
         match &prompt.prompt_type {
             PromptType::ChooseEnergyValue { minimum, .. } => {
                 let selected_energy =

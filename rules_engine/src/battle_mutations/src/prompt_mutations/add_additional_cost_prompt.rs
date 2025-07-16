@@ -20,7 +20,7 @@ pub fn execute(battle: &mut BattleState, controller: PlayerName, card_id: StackC
             };
             let prompt_data = create_prompt_for_cost(battle, controller, source, additional_cost);
             battle_trace!("Adding additional cost prompt", battle);
-            battle.prompt = Some(prompt_data);
+            battle.prompts.push_back(prompt_data);
             return;
         }
     }

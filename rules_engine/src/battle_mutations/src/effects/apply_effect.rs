@@ -108,7 +108,7 @@ pub fn execute(
 /// created.
 pub fn execute_pending_effects_if_no_active_prompt(battle: &mut BattleState) {
     loop {
-        if battle.prompt.is_some() {
+        if !battle.prompts.is_empty() {
             return;
         }
 

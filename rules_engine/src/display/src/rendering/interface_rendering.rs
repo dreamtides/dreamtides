@@ -79,7 +79,7 @@ fn render_prompt_message(
     builder: &ResponseBuilder,
     battle: &BattleState,
 ) -> Option<InterfaceMessage> {
-    let prompt = battle.prompt.as_ref()?;
+    let prompt = battle.prompts.front()?;
     if prompt.player != builder.act_for_player() {
         return None;
     }
@@ -161,7 +161,7 @@ fn primary_action_button(
     legal_actions: &LegalActions,
 ) -> Option<ButtonView> {
     if legal_actions.contains(BattleAction::SelectPromptChoice(0), ForPlayer::Human) {
-        let Some(PromptType::Choose { choices }) = battle.prompt.as_ref().map(|p| &p.prompt_type)
+        let Some(PromptType::Choose { choices }) = battle.prompts.front().map(|p| &p.prompt_type)
         else {
             panic_with!("Expected prompt for SelectPromptChoice action", battle);
         };
@@ -171,7 +171,7 @@ fn primary_action_button(
         });
     }
 
-    if let Some(prompt) = battle.prompt.as_ref()
+    if let Some(prompt) = battle.prompts.front()
         && prompt.player == builder.act_for_player()
         && let PromptType::ChooseEnergyValue { minimum, .. } = &prompt.prompt_type
     {
@@ -217,7 +217,7 @@ fn secondary_action_button(
     legal_actions: &LegalActions,
 ) -> Option<ButtonView> {
     if legal_actions.contains(BattleAction::SelectPromptChoice(1), ForPlayer::Human)
-        && let Some(PromptType::Choose { choices }) = battle.prompt.as_ref().map(|p| &p.prompt_type)
+        && let Some(PromptType::Choose { choices }) = battle.prompts.front().map(|p| &p.prompt_type)
         && choices.len() > 1
     {
         Some(ButtonView {
@@ -230,7 +230,7 @@ fn secondary_action_button(
 }
 
 fn increment_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<ButtonView> {
-    if let Some(prompt) = battle.prompt.as_ref()
+    if let Some(prompt) = battle.prompts.front()
         && prompt.player == builder.act_for_player()
         && let PromptType::ChooseEnergyValue { minimum, maximum } = &prompt.prompt_type
     {
@@ -253,7 +253,7 @@ fn increment_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<B
 }
 
 fn decrement_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<ButtonView> {
-    if let Some(prompt) = battle.prompt.as_ref()
+    if let Some(prompt) = battle.prompts.front()
         && prompt.player == builder.act_for_player()
         && let PromptType::ChooseEnergyValue { minimum, .. } = &prompt.prompt_type
     {
@@ -322,7 +322,7 @@ fn render_hide_stack_button(
 }
 
 fn card_order_selector_view(battle: &BattleState) -> Option<CardOrderSelectorView> {
-    if let Some(prompt) = &battle.prompt
+    if let Some(prompt) = battle.prompts.front()
         && let PromptType::SelectDeckCardOrder { .. } = &prompt.prompt_type
     {
         Some(CardOrderSelectorView { include_deck: true, include_void: true })

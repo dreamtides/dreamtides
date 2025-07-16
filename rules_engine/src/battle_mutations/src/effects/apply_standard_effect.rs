@@ -17,7 +17,6 @@ use crate::card_mutations::{counterspell, deck, spark};
 use crate::character_mutations::dissolve;
 use crate::effects::apply_effect::EffectWasApplied;
 use crate::effects::{counterspell_unless_pays_cost, pay_cost, targeting};
-use crate::prompt_mutations::prompts;
 
 /// Applies a [StandardEffect] to the given [BattleState].
 ///
@@ -126,7 +125,7 @@ fn foresee(
             void: CardSet::new(),
         };
 
-        prompts::set(battle, PromptData {
+        battle.prompts.push_back(PromptData {
             source,
             player,
             prompt_type: PromptType::SelectDeckCardOrder { prompt },
