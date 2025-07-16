@@ -1,8 +1,8 @@
 use ability_data::cost::Cost;
 use action_data::game_action_data::GameAction;
 use battle_queries::battle_card_queries::{card, card_abilities, card_properties};
-use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalActions};
+use battle_queries::legal_action_queries::{can_play_cards, legal_actions};
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_animation::TriggerAnimation;
 use battle_state::battle::battle_state::BattleState;
@@ -241,7 +241,11 @@ fn void_card_token_view(
             })
             .image(card_rendering::card_image(battle, card_id))
             .name(card_rendering::card_name(battle, card_id))
-            .maybe_cost(card_properties::energy_cost(battle, card_id))
+            .cost(can_play_cards::play_from_void_energy_cost(
+                battle,
+                VoidCardId(card_id),
+                ability_id,
+            ))
             .maybe_spark(card_properties::base_spark(battle, card_id))
             .rules_text(card_rendering::rules_text(battle, card_id))
             .create_position(ObjectPosition {

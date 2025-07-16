@@ -4,6 +4,7 @@ use ability_data::standard_effect::StandardEffect;
 use ability_data::static_ability::StandardStaticAbility;
 use battle_queries::battle_card_queries::{card, card_abilities, card_properties};
 use battle_queries::card_ability_queries::effect_predicates;
+use battle_queries::legal_action_queries::can_play_cards;
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{
@@ -63,9 +64,13 @@ pub fn from_void(
         from_zone: Zone::Void,
     });
 
-    if let Some(cost) = card_properties::energy_cost(battle, card_id) {
-        energy::spend(battle, player, source, cost);
-    }
+    energy::spend(
+        battle,
+        player,
+        source,
+        can_play_cards::play_from_void_energy_cost(battle, card_id, via_ability),
+    );
+
     let stack_card_id = move_card::from_void_to_stack(battle, source, player, card_id);
 
     battle.stack_priority = Some(player.opponent());

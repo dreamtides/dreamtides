@@ -58,7 +58,7 @@ pub fn base_energy_cost(card_name: CardName) -> Option<Energy> {
         CardName::TestForeseeOne => Some(Energy(1)),
         CardName::TestForeseeTwo => Some(Energy(1)),
         CardName::TestForeseeOneDrawACard => Some(Energy(1)),
-        CardName::TestDrawOneReclaim => Some(Energy(0)),
+        CardName::TestDrawOneReclaim => Some(Energy(2)),
     }
 }
 

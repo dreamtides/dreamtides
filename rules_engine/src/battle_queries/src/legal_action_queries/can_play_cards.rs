@@ -3,13 +3,14 @@ use std::hash::Hash;
 use ability_data::static_ability::StandardStaticAbility;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{AbilityId, CardId, CardIdType, HandCardId, VoidCardId};
-use battle_state::battle_cards::ability_list::CanPlayRestriction;
+use battle_state::battle_cards::ability_list::{AbilityReference, CanPlayRestriction};
 use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 
 use crate::battle_card_queries::{card, card_abilities, card_properties};
 use crate::legal_action_queries::{has_legal_additional_costs, has_legal_targets};
+use crate::panic_with;
 
 /// Whether only cards with the `fast` property should be returned.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -77,7 +78,7 @@ pub fn from_void(
     let mut legal_cards = Vec::new();
 
     for card_id in battle.ability_state.has_play_from_void_ability.player(player).iter() {
-        let Some(from_void_with_cost) = can_play_from_void_for_energy_cost(battle, card_id) else {
+        let Some(from_void_with_cost) = can_play_from_void_energy_cost(battle, card_id) else {
             continue;
         };
 
@@ -104,6 +105,35 @@ pub fn from_void(
     legal_cards
 }
 
+/// Returns the energy cost of playing a card from the void with a given
+/// ability.
+///
+/// Panics if the card cannot be played from the void or has no energy cost.
+pub fn play_from_void_energy_cost(
+    battle: &BattleState,
+    card_id: VoidCardId,
+    ability_id: AbilityId,
+) -> Energy {
+    let ability = card_abilities::ability(battle, ability_id);
+    let cost = if let AbilityReference::Static(static_ability) = ability {
+        can_play_from_void_with_static_ability(
+            battle,
+            card_id,
+            ability_id.ability_number,
+            static_ability.standard_static_ability(),
+        )
+        .map(|cost| cost.cost)
+    } else {
+        None
+    };
+
+    if let Some(cost) = cost {
+        cost
+    } else {
+        panic_with!("Card has no void energy cost", battle, card_id, ability_id);
+    }
+}
+
 /// Cost and ability ID of a card that can be played from the void.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 struct FromVoidWithCost {
@@ -112,10 +142,11 @@ struct FromVoidWithCost {
 }
 
 /// Check if a card can be played from the void, and returns the energy cost
-/// of playing it if it can.
+/// of playing it if it can be. If there are multiple abilities that can be
+/// used to play the card, returns the one with the lowest cost.
 ///
 /// Other costs are handled in the 'meets_restriction' step.
-fn can_play_from_void_for_energy_cost(
+fn can_play_from_void_energy_cost(
     battle: &BattleState,
     card_id: VoidCardId,
 ) -> Option<FromVoidWithCost> {

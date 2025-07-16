@@ -24,7 +24,7 @@ fn reclaim_basic_play_twice_then_banish() {
     assert_eq!(s.user_client.cards.user_void().len(), 1, "card in void after first play");
     assert_eq!(s.user_client.cards.user_banished().len(), 0, "not banished after first play");
     assert!(s.user_client.cards.user_void().contains(&card_id), "reclaim card in void");
-    assert_eq!(s.user_client.me.energy(), Energy(99), "no energy spent (card cost 0)");
+    assert_eq!(s.user_client.me.energy(), Energy(97), "2 energy spent");
 
     let user_hand = s.user_client.cards.user_hand();
     let reclaim_token_cards: Vec<_> =
@@ -37,11 +37,7 @@ fn reclaim_basic_play_twice_then_banish() {
         "token shows card name"
     );
     let token_cost = token_card.view.revealed.as_ref().unwrap().cost;
-    assert_eq!(
-        token_cost,
-        Some(Energy(0)),
-        "token shows actual cost (need to investigate why it's 0, not 1)"
-    );
+    assert_eq!(token_cost, Some(Energy(1)), "token shows reclaim cost");
 
     s.play_card_from_void(DisplayPlayer::User, &card_id);
 
@@ -49,7 +45,7 @@ fn reclaim_basic_play_twice_then_banish() {
     assert_eq!(s.user_client.cards.user_void().len(), 0, "card no longer in void after reclaim");
     assert_eq!(s.user_client.cards.user_banished().len(), 1, "card banished after reclaim");
     assert!(s.user_client.cards.user_banished().contains(&card_id), "reclaim card banished");
-    assert_eq!(s.user_client.me.energy(), Energy(99), "no energy spent since cost is 0");
+    assert_eq!(s.user_client.me.energy(), Energy(96), "1 energy spent");
 }
 
 #[test]
@@ -80,7 +76,6 @@ fn reclaim_multiple_cards_in_void() {
     assert_eq!(s.user_client.cards.user_void().len(), 0, "void empty after both reclaims");
     assert_eq!(s.user_client.cards.user_banished().len(), 2, "both cards banished");
     assert!(s.user_client.cards.user_banished().contains(&card2_id), "second card banished");
-    assert_eq!(s.user_client.me.energy(), Energy(99), "no energy spent since cost is 0");
 }
 
 #[test]
@@ -98,7 +93,7 @@ fn reclaim_token_card_properties() {
     let revealed = token_card.view.revealed.as_ref().unwrap();
 
     assert!(revealed.name.contains("Draw 1 Reclaim"), "token shows original card name");
-    assert_eq!(revealed.cost, Some(Energy(0)), "token shows reclaim cost of 0 energy");
+    assert_eq!(revealed.cost, Some(Energy(1)), "token shows reclaim cost");
     assert!(revealed.rules_text.contains("Draw a card"), "token shows original rules text");
     assert!(revealed.is_fast, "reclaim card is fast");
     assert!(revealed.actions.can_play.is_some(), "token can be played");
@@ -136,7 +131,7 @@ fn reclaim_during_enemy_turn() {
         1,
         "card banished after reclaim during enemy turn"
     );
-    assert_eq!(s.user_client.me.energy(), Energy(99), "no energy spent since cost is 0");
+    assert_eq!(s.user_client.me.energy(), Energy(96), "3 energy spent");
 }
 
 #[test]
@@ -168,7 +163,7 @@ fn reclaim_vs_normal_play_from_hand_cost() {
     let void_card_id = s.add_to_void(DisplayPlayer::User, CardName::TestDrawOneReclaim);
 
     let hand_card = s.user_client.cards.get_revealed(&hand_card_id);
-    assert_eq!(hand_card.cost, Some(Energy(0)), "normal play cost is 0");
+    assert_eq!(hand_card.cost, Some(Energy(2)), "normal play cost is 2");
 
     let user_hand = s.user_client.cards.user_hand();
     let reclaim_token_cards: Vec<_> =
@@ -177,13 +172,13 @@ fn reclaim_vs_normal_play_from_hand_cost() {
     assert_eq!(reclaim_token_cards.len(), 1, "one reclaim token for void card");
     let token_card = &reclaim_token_cards[0];
     let revealed = token_card.view.revealed.as_ref().unwrap();
-    assert_eq!(revealed.cost, Some(Energy(0)), "reclaim cost is 0");
+    assert_eq!(revealed.cost, Some(Energy(1)), "reclaim cost is 1");
 
     s.play_card_from_hand(DisplayPlayer::User, &hand_card_id);
-    assert_eq!(s.user_client.me.energy(), Energy(99), "no energy spent on normal play");
+    assert_eq!(s.user_client.me.energy(), Energy(97), "2 energy spent on normal play");
 
     s.play_card_from_void(DisplayPlayer::User, &void_card_id);
-    assert_eq!(s.user_client.me.energy(), Energy(99), "no energy spent since cost is 0");
+    assert_eq!(s.user_client.me.energy(), Energy(96), "1 energy spent on reclaim");
 }
 
 #[test]
