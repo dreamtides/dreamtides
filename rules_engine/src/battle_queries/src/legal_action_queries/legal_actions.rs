@@ -23,10 +23,10 @@ pub fn compute(battle: &BattleState, player: PlayerName) -> LegalActions {
         }
 
         return match &prompt_data.prompt_type {
-            PromptType::ChooseCharacter { valid } => {
+            PromptType::ChooseCharacter { valid, .. } => {
                 LegalActions::SelectCharacterPrompt { valid: valid.clone() }
             }
-            PromptType::ChooseStackCard { valid } => {
+            PromptType::ChooseStackCard { valid, .. } => {
                 LegalActions::SelectStackCardPrompt { valid: valid.clone() }
             }
             PromptType::Choose { choices } => {

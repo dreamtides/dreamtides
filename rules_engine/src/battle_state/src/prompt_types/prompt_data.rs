@@ -3,10 +3,18 @@ use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use strum_macros::EnumDiscriminants;
 
+use crate::battle::battle_state::PendingEffectId;
 use crate::battle::card_id::{CharacterId, DeckCardId, StackCardId};
 use crate::battle_cards::card_set::CardSet;
-use crate::battle_cards::stack_card_state::EffectTargets;
+use crate::battle_cards::stack_card_state::{EffectTargets, StackItemId};
 use crate::core::effect_source::EffectSource;
+
+/// Describes which object should be updated based on the results of a prompt.
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+pub enum PromptFor {
+    AddingItemToStack(StackItemId),
+    PendingEffect(PendingEffectId),
+}
 
 /// Data for a prompt to be displayed to a player.
 #[derive(Debug, Clone)]
@@ -27,8 +35,8 @@ pub struct PromptData {
 #[derive(Debug, Clone, EnumDiscriminants)]
 #[strum_discriminants()]
 pub enum PromptType {
-    ChooseCharacter { valid: CardSet<CharacterId> },
-    ChooseStackCard { valid: CardSet<StackCardId> },
+    ChooseCharacter { prompt_for: PromptFor, valid: CardSet<CharacterId> },
+    ChooseStackCard { prompt_for: PromptFor, valid: CardSet<StackCardId> },
     Choose { choices: Vec<PromptChoice> },
     ChooseEnergyValue { minimum: Energy, maximum: Energy },
     SelectDeckCardOrder { prompt: SelectDeckCardOrderPrompt },

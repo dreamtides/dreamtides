@@ -10,7 +10,7 @@ use crate::actions::{apply_card_order_action, apply_debug_battle_action};
 use crate::activated_abilities::apply_activate_ability;
 use crate::effects::apply_effect;
 use crate::phase_mutations::{fire_triggers, turn};
-use crate::play_cards::{play_card, resolve_card, select_stack_card_target};
+use crate::play_cards::{play_card, resolve_card, select_target};
 use crate::prompt_mutations::{select_additional_costs, select_choice_prompt_at_index};
 
 #[instrument(name = "apply_battle_action", level = "debug", skip(battle))]
@@ -49,10 +49,10 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
             turn::start_turn(battle, battle.turn.active_player.opponent());
         }
         BattleAction::SelectCharacterTarget(character_id) => {
-            select_stack_card_target::character(battle, player, character_id);
+            select_target::character(battle, player, character_id);
         }
         BattleAction::SelectStackCardTarget(stack_card_id) => {
-            select_stack_card_target::on_stack(battle, player, stack_card_id);
+            select_target::on_stack(battle, player, stack_card_id);
         }
         BattleAction::SelectPromptChoice(choice_index) => {
             select_choice_prompt_at_index::select(battle, player, choice_index);

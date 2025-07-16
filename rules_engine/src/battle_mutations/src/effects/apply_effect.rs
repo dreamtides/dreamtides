@@ -2,7 +2,6 @@ use std::iter;
 
 use ability_data::ability::EventAbility;
 use ability_data::effect::{Effect, EffectWithOptions};
-use battle_queries::assert_that;
 use battle_queries::battle_card_queries::stack_card_queries;
 use battle_state::battle::battle_state::{BattleState, PendingEffect};
 use battle_state::battle::battle_status::BattleStatus;
@@ -38,23 +37,15 @@ pub fn execute_event_abilities(
             execute(battle, source, &ability.ability.effect, requested_targets);
         }
         _ => {
-            assert_that!(
-                battle.pending_effects.is_empty(),
-                "Pending effects must be empty",
-                battle
-            );
             let targets = stack_card_queries::validate_targets(battle, requested_targets);
-            battle.pending_effects = abilities
-                .iter()
-                .flat_map(|ability_data| {
-                    let source = EffectSource::Event {
-                        controller,
-                        stack_card_id,
-                        ability_number: ability_data.ability_number,
-                    };
-                    flatten_effect(source, &ability_data.ability.effect, targets.cloned())
-                })
-                .collect();
+            battle.pending_effects.extend(abilities.iter().flat_map(|ability_data| {
+                let source = EffectSource::Event {
+                    controller,
+                    stack_card_id,
+                    ability_number: ability_data.ability_number,
+                };
+                flatten_effect(source, &ability_data.ability.effect, targets.cloned())
+            }));
             execute_pending_effects_if_no_active_prompt(battle);
         }
     }
@@ -86,19 +77,11 @@ pub fn execute(
             execute_with_options(battle, source, with_options, targets);
         }
         Effect::List(effects) => {
-            assert_that!(
-                battle.pending_effects.is_empty(),
-                "Pending effects must be empty",
-                battle
-            );
-            battle.pending_effects = effects
-                .iter()
-                .map(|effect| PendingEffect {
-                    source,
-                    effect: effect.clone(),
-                    targets: targets.cloned(),
-                })
-                .collect();
+            battle.pending_effects.extend(effects.iter().map(|effect| PendingEffect {
+                source,
+                effect: effect.clone(),
+                targets: targets.cloned(),
+            }));
             execute_pending_effects_if_no_active_prompt(battle);
         }
     };

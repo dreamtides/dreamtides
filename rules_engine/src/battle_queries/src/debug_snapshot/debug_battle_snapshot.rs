@@ -211,8 +211,12 @@ fn debug_prompt_data(prompt: Option<&PromptData>) -> DebugPromptData {
 
 fn format_prompt_choices(prompt: &PromptType) -> Vec<String> {
     match prompt {
-        PromptType::ChooseCharacter { valid } => valid.iter().map(|id| format!("{id:?}")).collect(),
-        PromptType::ChooseStackCard { valid } => valid.iter().map(|id| format!("{id:?}")).collect(),
+        PromptType::ChooseCharacter { valid, .. } => {
+            valid.iter().map(|id| format!("{id:?}")).collect()
+        }
+        PromptType::ChooseStackCard { valid, .. } => {
+            valid.iter().map(|id| format!("{id:?}")).collect()
+        }
         PromptType::Choose { choices } => {
             choices.iter().map(|choice| format!("{choice:?}")).collect()
         }

@@ -283,13 +283,13 @@ impl TestSessionBattleExtension for TestSession {
             .collect();
 
         match matching_tokens.len() {
-            0 => panic!("Could not find reclaim token for void card {card_id}"),
+            0 => panic!("Could not find token for void card {card_id}"),
             1 => {
                 let reclaim_token_id = matching_tokens[0].id.clone();
                 self.play_card_from_hand(player, &reclaim_token_id);
             }
             count => {
-                panic!("Found {count} reclaim tokens for void card {card_id}, expected exactly 1")
+                panic!("Found {count} tokens for void card {card_id}, expected exactly 1")
             }
         }
     }

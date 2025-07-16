@@ -136,7 +136,13 @@ impl AllCards {
     /// Returns the state of an item on the stack, if any.
     pub fn stack_item(&self, id: impl Into<StackItemId>) -> Option<&StackItemState> {
         let id = id.into();
-        self.stack.iter().rev().find(|&item| item.id == id)
+        self.stack.iter().rev().find(|item| item.id == id)
+    }
+
+    /// Mutable equivalent to [Self::stack_item]
+    pub fn stack_item_mut(&mut self, id: impl Into<StackItemId>) -> Option<&mut StackItemState> {
+        let id = id.into();
+        self.stack.iter_mut().rev().find(|item| item.id == id)
     }
 
     /// Returns the top item on the stack, if any.
