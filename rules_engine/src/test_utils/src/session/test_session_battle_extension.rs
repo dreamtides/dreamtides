@@ -274,16 +274,24 @@ impl TestSessionBattleExtension for TestSession {
 
     fn play_card_from_void(&mut self, player: DisplayPlayer, card_id: &ClientCardId) {
         let user_hand = self.client(player).cards.user_hand();
-        let reclaim_token_id = user_hand
+        let matching_tokens: Vec<_> = user_hand
             .iter()
-            .find(|card| {
+            .filter(|card| {
                 card.view.prefab == CardPrefab::Token
                     && card.id.starts_with(&format!("V{card_id}/"))
             })
-            .map(|card| card.id.clone())
-            .expect("Could not find reclaim token for void card");
+            .collect();
 
-        self.play_card_from_hand(player, &reclaim_token_id);
+        match matching_tokens.len() {
+            0 => panic!("Could not find reclaim token for void card {card_id}"),
+            1 => {
+                let reclaim_token_id = matching_tokens[0].id.clone();
+                self.play_card_from_hand(player, &reclaim_token_id);
+            }
+            count => {
+                panic!("Found {count} reclaim tokens for void card {card_id}, expected exactly 1")
+            }
+        }
     }
 
     fn activate_ability(
