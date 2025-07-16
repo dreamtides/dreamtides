@@ -1,23 +1,42 @@
 use ability_data::effect::Effect;
-use battle_state::battle::battle_state::BattleState;
+use battle_queries::card_ability_queries::effect_predicates;
+use battle_state::battle::battle_state::{BattleState, PendingEffectIndex};
 use battle_state::battle::card_id::CardId;
 use battle_state::core::effect_source::EffectSource;
+use battle_state::prompt_types::prompt_data::OnSelected;
+
+use crate::effects::apply_effect;
+use crate::prompt_mutations::add_targeting_prompt;
 
 /// Applies an effect to the [BattleState], prompting for effect targets if
 /// required.
 ///
-/// This is used when resolving triggered effects, prompt effects, 'if you do'
-/// effects, and similar actions which happen on resolution. It is NOT used for
-/// playing cards or activating abilities, which have their targets selected
-/// before adding them to the stack.
+/// This is used when resolving triggered effects, 'if you do' effects, and
+/// similar actions which happen on resolution. It is NOT used for playing cards
+/// or activating abilities, which have their targets selected before adding
+/// them to the stack.
 ///
 /// The predicate "This" will be interpreted by this function as being the card
 /// associated with the provided [EffectSource]. The predicate "That" will be
 /// applied based on the `that_card` parameter to this function.
 pub fn execute(
-    _battle: &mut BattleState,
-    _source: EffectSource,
-    _effect: &Effect,
-    _that_card: Option<CardId>,
+    battle: &mut BattleState,
+    source: EffectSource,
+    effect: &Effect,
+    that_card: Option<CardId>,
 ) {
+    if effect_predicates::has_any_targets(effect) {
+        let pending_effect_index = PendingEffectIndex(battle.pending_effects.len());
+        let mut prompts = add_targeting_prompt::targeting_prompts(
+            battle,
+            source.controller(),
+            source,
+            effect,
+            that_card,
+            OnSelected::AddPendingEffectTarget(pending_effect_index),
+        );
+        battle.prompts.append(&mut prompts);
+    } else {
+        apply_effect::execute(battle, source, effect, None);
+    }
 }

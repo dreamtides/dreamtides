@@ -40,6 +40,19 @@ impl<T: CardIdType> CardSet<T> {
         Self { set: BitSet::default(), _marker: PhantomData }
     }
 
+    /// Returns a set containing the given card ID.
+    pub fn of(id: T) -> Self {
+        let mut set = Self::new();
+        set.insert(id);
+        set
+    }
+
+    /// Returns a set containing the given card ID if it is not `None`, or an
+    /// empty set otherwise.
+    pub fn of_maybe(id: Option<T>) -> Self {
+        if let Some(id) = id { Self::of(id) } else { Self::new() }
+    }
+
     pub fn len(&self) -> usize {
         self.set.len()
     }

@@ -50,9 +50,9 @@ fn has_legal_targets_for_standard_effect(
     effect: &StandardEffect,
 ) -> bool {
     if let Some(predicate) = effect_predicates::get_character_target_predicate(effect) {
-        !effect_predicates::matching_characters(battle, source, predicate).is_empty()
+        !effect_predicates::matching_characters(battle, source, predicate, None).is_empty()
     } else if let Some(predicate) = effect_predicates::get_stack_target_predicate(effect) {
-        !effect_predicates::matching_cards_on_stack(battle, source, predicate).is_empty()
+        !effect_predicates::matching_cards_on_stack(battle, source, predicate, None).is_empty()
     } else {
         true
     }

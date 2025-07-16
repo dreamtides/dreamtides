@@ -1,7 +1,8 @@
+use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CharacterId, StackCardId};
+use battle_state::battle::card_id::{CardId, CharacterId, StackCardId};
 use battle_state::battle_cards::card_set::CardSet;
 use battle_state::core::effect_source::EffectSource;
 use core_data::card_types::CardType;
@@ -13,8 +14,16 @@ pub fn matching_characters(
     battle: &BattleState,
     source: EffectSource,
     predicate: &Predicate,
+    that_card: Option<CardId>,
 ) -> CardSet<CharacterId> {
     match predicate {
+        Predicate::This => CardSet::of_maybe(
+            source.card_id().and_then(|id| battle.cards.to_character_id(source.controller(), id)),
+        ),
+        Predicate::That => CardSet::of_maybe(
+            that_card
+                .and_then(|id| battle.cards.to_character_id(source.controller().opponent(), id)),
+        ),
         Predicate::Enemy(card_predicate) => {
             let battlefield = battle.cards.battlefield(source.controller().opponent()).clone();
             on_battlefield(battle, source, battlefield, card_predicate)
@@ -28,13 +37,30 @@ pub fn matching_cards_on_stack(
     battle: &BattleState,
     source: EffectSource,
     predicate: &Predicate,
+    that_card: Option<CardId>,
 ) -> CardSet<StackCardId> {
     match predicate {
+        Predicate::This => CardSet::of_maybe(
+            source.card_id().and_then(|id| battle.cards.to_stack_card_id(source.controller(), id)),
+        ),
+        Predicate::That => CardSet::of_maybe(
+            that_card
+                .and_then(|id| battle.cards.to_stack_card_id(source.controller().opponent(), id)),
+        ),
         Predicate::Enemy(card_predicate) => {
             let battlefield = battle.cards.stack_set(source.controller().opponent()).clone();
             on_stack(battle, source, battlefield, card_predicate)
         }
         _ => todo!("Implement {:?}", predicate),
+    }
+}
+
+/// Returns true if an effect requires a target to resolve.
+pub fn has_any_targets(effect: &Effect) -> bool {
+    match effect {
+        Effect::Effect(effect) => has_targets(effect),
+        Effect::WithOptions(effect_with_options) => has_targets(&effect_with_options.effect),
+        Effect::List(items) => items.iter().any(|effect| has_targets(&effect.effect)),
     }
 }
 

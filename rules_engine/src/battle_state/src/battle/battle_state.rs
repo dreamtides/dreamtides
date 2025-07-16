@@ -210,4 +210,15 @@ impl BattleState {
             history.push_action(player, action);
         }
     }
+
+    /// Returns the pending effect at the given index, if any.
+    pub fn pending_effect(&self, index: PendingEffectIndex) -> Option<&PendingEffect> {
+        self.pending_effects.get(index.0)
+    }
+
+    /// Returns a mutable reference to the pending effect at the given index, if
+    /// any.
+    pub fn pending_effect_mut(&mut self, index: PendingEffectIndex) -> Option<&mut PendingEffect> {
+        self.pending_effects.get_mut(index.0)
+    }
 }

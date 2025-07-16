@@ -6,7 +6,7 @@ use battle_queries::battle_card_queries::card_abilities;
 use battle_queries::battle_trace;
 use battle_queries::card_ability_queries::effect_predicates;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{ActivatedAbilityId, StackCardId};
+use battle_state::battle::card_id::{ActivatedAbilityId, CardId, StackCardId};
 use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{
     OnSelected, PromptConfiguration, PromptData, PromptType,
@@ -28,6 +28,7 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, card_id: StackCardI
             player,
             source,
             &data.ability.effect,
+            None,
             OnSelected::AddStackTargets(card_id.into()),
         );
 
@@ -56,6 +57,7 @@ pub fn execute_for_activated_ability(
             player,
             source,
             &ability_data.ability.effect,
+            None,
             OnSelected::AddStackTargets(activated_ability_id.into()),
         );
 
@@ -73,6 +75,7 @@ pub fn targeting_prompts(
     player: PlayerName,
     source: EffectSource,
     effect: &Effect,
+    that_card: Option<CardId>,
     on_selected: OnSelected,
 ) -> VecDeque<PromptData> {
     match effect {
@@ -82,6 +85,7 @@ pub fn targeting_prompts(
             source,
             standard_effect,
             false,
+            that_card,
             on_selected,
         )
         .map(|prompt_data| VecDeque::from([prompt_data]))
@@ -92,6 +96,7 @@ pub fn targeting_prompts(
             source,
             &with_options.effect,
             with_options.optional,
+            that_card,
             on_selected,
         )
         .map(|prompt_data| VecDeque::from([prompt_data]))
@@ -105,6 +110,7 @@ pub fn targeting_prompts(
                     source,
                     &effect.effect,
                     effect.optional,
+                    that_card,
                     on_selected,
                 )
             })
@@ -122,10 +128,12 @@ fn standard_effect_targeting_prompt(
     source: EffectSource,
     effect: &StandardEffect,
     optional: bool,
+    that_card: Option<CardId>,
     on_selected: OnSelected,
 ) -> Option<PromptData> {
     if let Some(target_predicate) = effect_predicates::get_character_target_predicate(effect) {
-        let valid = effect_predicates::matching_characters(battle, source, target_predicate);
+        let valid =
+            effect_predicates::matching_characters(battle, source, target_predicate, that_card);
         if valid.is_empty() {
             return None;
         }
@@ -137,7 +145,8 @@ fn standard_effect_targeting_prompt(
             configuration: PromptConfiguration { optional },
         })
     } else if let Some(target_predicate) = effect_predicates::get_stack_target_predicate(effect) {
-        let valid = effect_predicates::matching_cards_on_stack(battle, source, target_predicate);
+        let valid =
+            effect_predicates::matching_cards_on_stack(battle, source, target_predicate, that_card);
         if valid.is_empty() {
             return None;
         }

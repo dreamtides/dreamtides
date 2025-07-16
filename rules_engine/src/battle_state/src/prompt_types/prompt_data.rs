@@ -13,7 +13,7 @@ use crate::core::effect_source::EffectSource;
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum OnSelected {
     AddStackTargets(StackItemId),
-    PendingEffect(PendingEffectIndex),
+    AddPendingEffectTarget(PendingEffectIndex),
 }
 
 /// Data for a prompt to be displayed to a player.

@@ -35,8 +35,15 @@ pub fn character(battle: &mut BattleState, player: PlayerName, character_id: Cha
                 )),
             });
         }
-        OnSelected::PendingEffect(_) => {
-            todo!("Pending effect target selection");
+        OnSelected::AddPendingEffectTarget(pending_effect_index) => {
+            let Some(pending_effect) = battle.pending_effect_mut(pending_effect_index) else {
+                panic_with!("Pending effect not found", battle, pending_effect_index);
+            };
+            let target = StandardEffectTarget::Character(character_id, object_id);
+            match &mut pending_effect.requested_targets {
+                Some(existing_targets) => existing_targets.add(target),
+                None => pending_effect.requested_targets = Some(EffectTargets::Standard(target)),
+            }
         }
     }
 }
@@ -68,8 +75,15 @@ pub fn on_stack(battle: &mut BattleState, player: PlayerName, stack_card_id: Sta
                 )),
             });
         }
-        OnSelected::PendingEffect(_) => {
-            todo!("Pending effect target selection");
+        OnSelected::AddPendingEffectTarget(pending_effect_index) => {
+            let Some(pending_effect) = battle.pending_effect_mut(pending_effect_index) else {
+                panic_with!("Pending effect not found", battle, pending_effect_index);
+            };
+            let target = StandardEffectTarget::StackCard(stack_card_id, object_id);
+            match &mut pending_effect.requested_targets {
+                Some(existing_targets) => existing_targets.add(target),
+                None => pending_effect.requested_targets = Some(EffectTargets::Standard(target)),
+            }
         }
     }
 }
