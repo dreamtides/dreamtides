@@ -93,7 +93,7 @@ pub struct BattleState {
 
 /// A unique identifier for a pending effect.
 #[derive(Clone, Debug, Copy, Eq, PartialEq, Hash)]
-pub struct PendingEffectId(pub usize);
+pub struct PendingEffectIndex(pub usize);
 
 /// Information about effects that are waiting to be applied.
 #[derive(Clone, Debug)]

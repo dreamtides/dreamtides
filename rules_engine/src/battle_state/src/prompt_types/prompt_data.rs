@@ -3,7 +3,7 @@ use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use strum_macros::EnumDiscriminants;
 
-use crate::battle::battle_state::PendingEffectId;
+use crate::battle::battle_state::PendingEffectIndex;
 use crate::battle::card_id::{CharacterId, DeckCardId, StackCardId};
 use crate::battle_cards::card_set::CardSet;
 use crate::battle_cards::stack_card_state::{EffectTargets, StackItemId};
@@ -13,7 +13,7 @@ use crate::core::effect_source::EffectSource;
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum OnSelected {
     AddStackTargets(StackItemId),
-    PendingEffect(PendingEffectId),
+    PendingEffect(PendingEffectIndex),
 }
 
 /// Data for a prompt to be displayed to a player.

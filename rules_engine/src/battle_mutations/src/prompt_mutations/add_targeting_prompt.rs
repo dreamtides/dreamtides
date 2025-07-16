@@ -73,7 +73,7 @@ pub fn targeting_prompts(
     player: PlayerName,
     source: EffectSource,
     effect: &Effect,
-    prompt_for: OnSelected,
+    on_selected: OnSelected,
 ) -> VecDeque<PromptData> {
     match effect {
         Effect::Effect(standard_effect) => standard_effect_targeting_prompt(
@@ -82,7 +82,7 @@ pub fn targeting_prompts(
             source,
             standard_effect,
             false,
-            prompt_for,
+            on_selected,
         )
         .map(|prompt_data| VecDeque::from([prompt_data]))
         .unwrap_or_default(),
@@ -92,7 +92,7 @@ pub fn targeting_prompts(
             source,
             &with_options.effect,
             with_options.optional,
-            prompt_for,
+            on_selected,
         )
         .map(|prompt_data| VecDeque::from([prompt_data]))
         .unwrap_or_default(),
@@ -105,7 +105,7 @@ pub fn targeting_prompts(
                     source,
                     &effect.effect,
                     effect.optional,
-                    prompt_for,
+                    on_selected,
                 )
             })
             .collect(),
