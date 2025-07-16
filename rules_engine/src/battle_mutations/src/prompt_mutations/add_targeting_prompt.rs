@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use ability_data::effect::Effect;
 use ability_data::standard_effect::StandardEffect;
 use battle_queries::battle_card_queries::card_abilities;
@@ -20,16 +22,18 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, card_id: StackCardI
             stack_card_id: card_id,
             ability_number: data.ability_number,
         };
-        if let Some(prompt_data) = targeting_prompt(
+
+        let mut prompts = targeting_prompts(
             battle,
             player,
             source,
             &data.ability.effect,
             PromptFor::AddingItemToStack(card_id.into()),
-        ) {
-            battle_trace!("Adding target prompt", battle, prompt_data);
-            battle.prompts.push_back(prompt_data);
-            return;
+        );
+
+        if !prompts.is_empty() {
+            battle_trace!("Adding target prompt", battle);
+            battle.prompts.append(&mut prompts);
         }
     }
 }
@@ -47,28 +51,30 @@ pub fn execute_for_activated_ability(
         .find(|data| data.ability_number == activated_ability_id.ability_number)
     {
         let source = EffectSource::Activated { controller: player, activated_ability_id };
-        if let Some(prompt_data) = targeting_prompt(
+        let mut prompts = targeting_prompts(
             battle,
             player,
             source,
             &ability_data.ability.effect,
             PromptFor::AddingItemToStack(activated_ability_id.into()),
-        ) {
-            battle_trace!("Adding target prompt for activated ability", battle, prompt_data);
-            battle.prompts.push_back(prompt_data);
+        );
+
+        if !prompts.is_empty() {
+            battle_trace!("Adding target prompt for activated ability", battle);
+            battle.prompts.append(&mut prompts);
         }
     }
 }
 
-/// Creates a prompt data for an effect if it requires target selection.
-/// Returns the prompt data if created, None otherwise.
-fn targeting_prompt(
+/// Returns a list of prompt data for prompts required to resolve an effect, if
+/// any.
+fn targeting_prompts(
     battle: &BattleState,
     player: PlayerName,
     source: EffectSource,
     effect: &Effect,
     prompt_for: PromptFor,
-) -> Option<PromptData> {
+) -> VecDeque<PromptData> {
     match effect {
         Effect::Effect(standard_effect) => standard_effect_targeting_prompt(
             battle,
@@ -77,7 +83,9 @@ fn targeting_prompt(
             standard_effect,
             false,
             prompt_for,
-        ),
+        )
+        .map(|prompt_data| VecDeque::from([prompt_data]))
+        .unwrap_or_default(),
         Effect::WithOptions(with_options) => standard_effect_targeting_prompt(
             battle,
             player,
@@ -85,22 +93,22 @@ fn targeting_prompt(
             &with_options.effect,
             with_options.optional,
             prompt_for,
-        ),
-        Effect::List(effects) => {
-            for effect_with_options in effects {
-                if let Some(prompt_data) = standard_effect_targeting_prompt(
+        )
+        .map(|prompt_data| VecDeque::from([prompt_data]))
+        .unwrap_or_default(),
+        Effect::List(effects) => effects
+            .iter()
+            .filter_map(|effect| {
+                standard_effect_targeting_prompt(
                     battle,
                     player,
                     source,
-                    &effect_with_options.effect,
-                    effect_with_options.optional,
+                    &effect.effect,
+                    effect.optional,
                     prompt_for,
-                ) {
-                    return Some(prompt_data);
-                }
-            }
-            None
-        }
+                )
+            })
+            .collect(),
     }
 }
 
