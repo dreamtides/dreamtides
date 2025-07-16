@@ -17,10 +17,11 @@ use crate::effects::targeting;
 pub fn execute(
     battle: &mut BattleState,
     source: EffectSource,
-    targets: Option<&EffectTargets>,
+    targets: Option<&mut EffectTargets>,
     cost: &Cost,
 ) -> Option<EffectWasApplied> {
     if costs::can_pay(battle, source.controller().opponent(), cost) {
+        let prompt_targets = targets.cloned();
         battle.prompts.push_back(PromptData {
             source,
             player: source.controller().opponent(),
@@ -31,14 +32,14 @@ pub fn execute(
                         effect: Effect::Effect(StandardEffect::OpponentPaysCost {
                             cost: cost.clone(),
                         }),
-                        targets: targets.cloned(),
+                        targets: prompt_targets.clone(),
                     },
                     PromptChoice {
                         label: PromptChoiceLabel::Decline,
                         effect: Effect::Effect(StandardEffect::Counterspell {
                             target: Predicate::It,
                         }),
-                        targets: targets.cloned(),
+                        targets: prompt_targets,
                     },
                 ],
             },

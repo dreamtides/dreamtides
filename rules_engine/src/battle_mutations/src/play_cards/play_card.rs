@@ -11,7 +11,7 @@ use battle_state::battle::card_id::{
     AbilityId, CardId, CardIdType, HandCardId, StackCardId, VoidCardId,
 };
 use battle_state::battle_cards::ability_list::AbilityReference;
-use battle_state::battle_cards::stack_card_state::{EffectTargets, SingleEffectTarget};
+use battle_state::battle_cards::stack_card_state::{EffectTargets, StandardEffectTarget};
 use battle_state::battle_cards::zone::Zone;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger::Trigger;
@@ -177,7 +177,7 @@ fn to_stack_targets(
     controller: PlayerName,
 ) -> Option<EffectTargets> {
     let object_id = card::get(battle, card_id).object_id;
-    Some(EffectTargets::Single(SingleEffectTarget::StackCard(
+    Some(EffectTargets::Standard(StandardEffectTarget::StackCard(
         battle.cards.to_stack_card_id(controller, card_id)?,
         object_id,
     )))

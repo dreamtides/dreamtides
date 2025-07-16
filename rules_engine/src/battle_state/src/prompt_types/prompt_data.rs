@@ -11,8 +11,8 @@ use crate::core::effect_source::EffectSource;
 
 /// Describes which object should be updated based on the results of a prompt.
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
-pub enum PromptFor {
-    AddingItemToStack(StackItemId),
+pub enum OnSelected {
+    AddStackTargets(StackItemId),
     PendingEffect(PendingEffectId),
 }
 
@@ -35,8 +35,8 @@ pub struct PromptData {
 #[derive(Debug, Clone, EnumDiscriminants)]
 #[strum_discriminants()]
 pub enum PromptType {
-    ChooseCharacter { prompt_for: PromptFor, valid: CardSet<CharacterId> },
-    ChooseStackCard { prompt_for: PromptFor, valid: CardSet<StackCardId> },
+    ChooseCharacter { on_selected: OnSelected, valid: CardSet<CharacterId> },
+    ChooseStackCard { on_selected: OnSelected, valid: CardSet<StackCardId> },
     Choose { choices: Vec<PromptChoice> },
     ChooseEnergyValue { minimum: Energy, maximum: Energy },
     SelectDeckCardOrder { prompt: SelectDeckCardOrderPrompt },

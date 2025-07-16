@@ -10,7 +10,7 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::card_id::CharacterId;
 use battle_state::battle_cards::ability_list::AbilityData;
-use battle_state::battle_cards::stack_card_state::{EffectTargets, SingleEffectTarget};
+use battle_state::battle_cards::stack_card_state::{EffectTargets, StandardEffectTarget};
 use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger::Trigger;
 use core_data::types::PlayerName;
@@ -153,7 +153,7 @@ fn trigger_targets(
     if let Some(predicate) = effect_predicates::get_character_target_predicate(effect) {
         match predicate {
             Predicate::This => {
-                targets = Some(EffectTargets::Single(SingleEffectTarget::Character(
+                targets = Some(EffectTargets::Standard(StandardEffectTarget::Character(
                     controlling_character,
                     card::get(battle, controlling_character).object_id,
                 )));
@@ -169,7 +169,7 @@ fn trigger_targets(
                     // the battlefield.
                     return None;
                 };
-                targets = Some(EffectTargets::Single(SingleEffectTarget::Character(
+                targets = Some(EffectTargets::Standard(StandardEffectTarget::Character(
                     target_character_id,
                     card::get(battle, target_character_id).object_id,
                 )));
@@ -190,7 +190,7 @@ fn trigger_targets(
                     // Skip triggers targeting cards that are not currently on the stack.
                     return None;
                 };
-                targets = Some(EffectTargets::Single(SingleEffectTarget::StackCard(
+                targets = Some(EffectTargets::Standard(StandardEffectTarget::StackCard(
                     target_stack_card_id,
                     card::get(battle, target_stack_card_id).object_id,
                 )));

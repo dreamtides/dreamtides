@@ -9,7 +9,7 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{ActivatedAbilityId, StackCardId};
 use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{
-    PromptConfiguration, PromptData, PromptFor, PromptType,
+    OnSelected, PromptConfiguration, PromptData, PromptType,
 };
 use core_data::types::PlayerName;
 
@@ -28,7 +28,7 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, card_id: StackCardI
             player,
             source,
             &data.ability.effect,
-            PromptFor::AddingItemToStack(card_id.into()),
+            OnSelected::AddStackTargets(card_id.into()),
         );
 
         if !prompts.is_empty() {
@@ -56,7 +56,7 @@ pub fn execute_for_activated_ability(
             player,
             source,
             &ability_data.ability.effect,
-            PromptFor::AddingItemToStack(activated_ability_id.into()),
+            OnSelected::AddStackTargets(activated_ability_id.into()),
         );
 
         if !prompts.is_empty() {
@@ -73,7 +73,7 @@ pub fn targeting_prompts(
     player: PlayerName,
     source: EffectSource,
     effect: &Effect,
-    prompt_for: PromptFor,
+    prompt_for: OnSelected,
 ) -> VecDeque<PromptData> {
     match effect {
         Effect::Effect(standard_effect) => standard_effect_targeting_prompt(
@@ -122,7 +122,7 @@ fn standard_effect_targeting_prompt(
     source: EffectSource,
     effect: &StandardEffect,
     optional: bool,
-    prompt_for: PromptFor,
+    on_selected: OnSelected,
 ) -> Option<PromptData> {
     if let Some(target_predicate) = effect_predicates::get_character_target_predicate(effect) {
         let valid = effect_predicates::matching_characters(battle, source, target_predicate);
@@ -133,7 +133,7 @@ fn standard_effect_targeting_prompt(
         Some(PromptData {
             source,
             player,
-            prompt_type: PromptType::ChooseCharacter { prompt_for, valid },
+            prompt_type: PromptType::ChooseCharacter { on_selected, valid },
             configuration: PromptConfiguration { optional },
         })
     } else if let Some(target_predicate) = effect_predicates::get_stack_target_predicate(effect) {
@@ -145,7 +145,7 @@ fn standard_effect_targeting_prompt(
         Some(PromptData {
             source,
             player,
-            prompt_type: PromptType::ChooseStackCard { prompt_for, valid },
+            prompt_type: PromptType::ChooseStackCard { on_selected, valid },
             configuration: PromptConfiguration { optional },
         })
     } else {

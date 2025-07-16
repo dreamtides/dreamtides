@@ -1,8 +1,6 @@
-use std::iter;
-
 use ability_data::ability::EventAbility;
 use ability_data::effect::{Effect, EffectWithOptions};
-use battle_queries::battle_card_queries::stack_card_queries;
+use battle_queries::battle_card_queries::target_queries;
 use battle_state::battle::battle_state::{BattleState, PendingEffect};
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::card_id::StackCardId;
@@ -10,7 +8,6 @@ use battle_state::battle_cards::ability_list::AbilityData;
 use battle_state::battle_cards::stack_card_state::EffectTargets;
 use battle_state::core::effect_source::EffectSource;
 use core_data::types::PlayerName;
-use either::Either;
 
 use crate::effects::apply_standard_effect;
 
@@ -37,14 +34,17 @@ pub fn execute_event_abilities(
             execute(battle, source, &ability.ability.effect, requested_targets);
         }
         _ => {
-            let targets = stack_card_queries::valid_targets(battle, requested_targets);
-            battle.pending_effects.extend(abilities.iter().flat_map(|ability_data| {
+            battle.pending_effects.extend(abilities.iter().map(|ability_data| {
                 let source = EffectSource::Event {
                     controller,
                     stack_card_id,
                     ability_number: ability_data.ability_number,
                 };
-                flatten_effect(source, &ability_data.ability.effect, targets.cloned())
+                PendingEffect {
+                    source,
+                    effect: ability_data.ability.effect.clone(),
+                    requested_targets: requested_targets.cloned(),
+                }
             }));
             execute_pending_effects_if_no_active_prompt(battle);
         }
@@ -67,21 +67,22 @@ pub fn execute(
     effect: &Effect,
     requested_targets: Option<&EffectTargets>,
 ) {
-    let targets = stack_card_queries::valid_targets(battle, requested_targets);
     match effect {
         Effect::Effect(standard) => {
-            apply_standard_effect::apply(battle, source, standard, targets);
+            let mut targets = target_queries::valid_targets(battle, requested_targets);
+            apply_standard_effect::apply(battle, source, standard, targets.as_mut());
             remove_stack_priority_if_empty(battle);
         }
         Effect::WithOptions(with_options) => {
-            execute_with_options(battle, source, with_options, targets);
+            let mut targets = target_queries::valid_targets(battle, requested_targets);
+            execute_with_options(battle, source, with_options, targets.as_mut());
         }
-        Effect::List(effects) => {
-            battle.pending_effects.extend(effects.iter().map(|effect| PendingEffect {
+        Effect::List(_) => {
+            battle.pending_effects.push_back(PendingEffect {
                 source,
                 effect: effect.clone(),
-                targets: targets.cloned(),
-            }));
+                requested_targets: requested_targets.cloned(),
+            });
             execute_pending_effects_if_no_active_prompt(battle);
         }
     };
@@ -103,12 +104,56 @@ pub fn execute_pending_effects_if_no_active_prompt(battle: &mut BattleState) {
             return;
         };
 
-        execute_with_options(
-            battle,
-            pending_effect.source,
-            &pending_effect.effect,
-            pending_effect.targets.as_ref(),
-        );
+        match pending_effect.effect {
+            Effect::Effect(standard) => {
+                let mut targets = target_queries::valid_targets(
+                    battle,
+                    pending_effect.requested_targets.as_ref(),
+                );
+                apply_standard_effect::apply(
+                    battle,
+                    pending_effect.source,
+                    &standard,
+                    targets.as_mut(),
+                );
+                remove_stack_priority_if_empty(battle);
+            }
+            Effect::WithOptions(with_options) => {
+                let mut targets = target_queries::valid_targets(
+                    battle,
+                    pending_effect.requested_targets.as_ref(),
+                );
+                execute_with_options(
+                    battle,
+                    pending_effect.source,
+                    &with_options,
+                    targets.as_mut(),
+                );
+            }
+            Effect::List(mut effect_list) => {
+                if !effect_list.is_empty() {
+                    let first_effect = effect_list.remove(0);
+                    let mut targets = target_queries::valid_targets(
+                        battle,
+                        pending_effect.requested_targets.as_ref(),
+                    );
+                    execute_with_options(
+                        battle,
+                        pending_effect.source,
+                        &first_effect,
+                        targets.as_mut(),
+                    );
+
+                    if !effect_list.is_empty() {
+                        battle.pending_effects.push_front(PendingEffect {
+                            source: pending_effect.source,
+                            effect: Effect::List(effect_list),
+                            requested_targets: pending_effect.requested_targets,
+                        });
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -116,7 +161,7 @@ fn execute_with_options(
     battle: &mut BattleState,
     source: EffectSource,
     with_options: &EffectWithOptions,
-    targets: Option<&EffectTargets>,
+    targets: Option<&mut EffectTargets>,
 ) {
     if with_options.optional {
         todo!("Implement optional effects")
@@ -135,30 +180,5 @@ fn execute_with_options(
 fn remove_stack_priority_if_empty(battle: &mut BattleState) {
     if !battle.cards.has_stack() {
         battle.stack_priority = None;
-    }
-}
-
-/// Flattens an Effect into an iterator of PendingEffect.
-fn flatten_effect(
-    source: EffectSource,
-    effect: &Effect,
-    targets: Option<EffectTargets>,
-) -> impl Iterator<Item = PendingEffect> + '_ {
-    match effect {
-        Effect::Effect(standard_effect) => Either::Left(iter::once(PendingEffect {
-            source,
-            effect: EffectWithOptions::new(standard_effect.clone()),
-            targets: targets.clone(),
-        })),
-        Effect::WithOptions(with_options) => Either::Left(iter::once(PendingEffect {
-            source,
-            effect: with_options.clone(),
-            targets: targets.clone(),
-        })),
-        Effect::List(effects) => Either::Right(effects.iter().map(move |effect| PendingEffect {
-            source,
-            effect: effect.clone(),
-            targets: targets.clone(),
-        })),
     }
 }

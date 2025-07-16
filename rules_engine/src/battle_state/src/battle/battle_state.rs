@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 use std::path::PathBuf;
 
-use ability_data::effect::EffectWithOptions;
+use ability_data::effect::Effect;
 use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
 use rand_xoshiro::Xoshiro256PlusPlus;
@@ -102,10 +102,10 @@ pub struct PendingEffect {
     pub source: EffectSource,
 
     /// Effect that is waiting to be applied.
-    pub effect: EffectWithOptions,
+    pub effect: Effect,
 
     /// Targets that were requested for the effect.
-    pub targets: Option<EffectTargets>,
+    pub requested_targets: Option<EffectTargets>,
 }
 
 /// Information about why & how we are currently running the rules engine.

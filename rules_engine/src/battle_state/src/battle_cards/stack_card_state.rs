@@ -38,18 +38,20 @@ pub struct StackItemState {
 impl StackItemState {
     pub fn append_character_target(&mut self, character_id: CharacterId, object_id: ObjectId) {
         if let Some(targets) = &mut self.targets {
-            targets.add(SingleEffectTarget::Character(character_id, object_id));
+            targets.add(StandardEffectTarget::Character(character_id, object_id));
         } else {
-            self.targets =
-                Some(EffectTargets::Single(SingleEffectTarget::Character(character_id, object_id)));
+            self.targets = Some(EffectTargets::Standard(StandardEffectTarget::Character(
+                character_id,
+                object_id,
+            )));
         }
     }
 
     pub fn append_stack_card_target(&mut self, stack_card_id: StackCardId, object_id: ObjectId) {
         if let Some(targets) = &mut self.targets {
-            targets.add(SingleEffectTarget::StackCard(stack_card_id, object_id));
+            targets.add(StandardEffectTarget::StackCard(stack_card_id, object_id));
         } else {
-            self.targets = Some(EffectTargets::Single(SingleEffectTarget::StackCard(
+            self.targets = Some(EffectTargets::Standard(StandardEffectTarget::StackCard(
                 stack_card_id,
                 object_id,
             )));
@@ -59,24 +61,33 @@ impl StackItemState {
 
 #[derive(Clone, Debug)]
 pub enum EffectTargets {
-    Single(SingleEffectTarget),
-    List(Vec<SingleEffectTarget>),
+    /// A target for a standard effect.
+    Standard(StandardEffectTarget),
+
+    /// Targets for an effect list. An entry of `None` indicates that the
+    /// specified target was provided but is no longer valid on resolution, e.g.
+    /// because a target character has been destroyed.
+    ///
+    /// During effect resolution, we pop targets from the list when required,
+    /// i.e. it is assumed that this order will match the order in which targets
+    /// are required for effects.
+    EffectList(Vec<Option<StandardEffectTarget>>),
 }
 
 #[derive(Clone, Debug)]
-pub enum SingleEffectTarget {
+pub enum StandardEffectTarget {
     Character(CharacterId, ObjectId),
     StackCard(StackCardId, ObjectId),
 }
 
 impl EffectTargets {
-    pub fn add(&mut self, target: SingleEffectTarget) {
+    pub fn add(&mut self, target: StandardEffectTarget) {
         match self {
-            EffectTargets::Single(existing) => {
-                *self = EffectTargets::List(vec![existing.clone(), target]);
+            EffectTargets::Standard(existing) => {
+                *self = EffectTargets::EffectList(vec![Some(existing.clone()), Some(target)]);
             }
-            EffectTargets::List(targets) => {
-                targets.push(target);
+            EffectTargets::EffectList(targets) => {
+                targets.push(Some(target));
             }
         }
     }

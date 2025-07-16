@@ -1,14 +1,14 @@
 use std::collections::HashMap;
 
 use action_data::game_action_data::GameAction;
-use battle_queries::battle_card_queries::{card, card_properties, stack_card_queries};
+use battle_queries::battle_card_queries::{card, card_properties, target_queries};
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalActions};
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType, CharacterId, HandCardId, StackCardId};
 use battle_state::battle_cards::stack_card_state::{
-    EffectTargets, SingleEffectTarget, StackCardAdditionalCostsPaid,
+    EffectTargets, StackCardAdditionalCostsPaid, StandardEffectTarget,
 };
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::card_types::CardType;
@@ -306,27 +306,29 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
         for choice in choices {
             if let Some(targets) = &choice.targets {
                 let target_card_ids = match targets {
-                    EffectTargets::Single(SingleEffectTarget::Character(
+                    EffectTargets::Standard(StandardEffectTarget::Character(
                         target_character_id,
                         _,
                     )) => {
                         vec![target_character_id.card_id()]
                     }
-                    EffectTargets::Single(SingleEffectTarget::StackCard(
+                    EffectTargets::Standard(StandardEffectTarget::StackCard(
                         target_stack_card_id,
                         _,
                     )) => {
                         vec![target_stack_card_id.card_id()]
                     }
-                    EffectTargets::List(target_list) => target_list
+                    EffectTargets::EffectList(target_list) => target_list
                         .iter()
-                        .map(|target| match target {
-                            SingleEffectTarget::Character(character_id, _) => {
-                                character_id.card_id()
-                            }
-                            SingleEffectTarget::StackCard(stack_card_id, _) => {
-                                stack_card_id.card_id()
-                            }
+                        .filter_map(|target_option| {
+                            target_option.as_ref().map(|target| match target {
+                                StandardEffectTarget::Character(character_id, _) => {
+                                    character_id.card_id()
+                                }
+                                StandardEffectTarget::StackCard(stack_card_id, _) => {
+                                    stack_card_id.card_id()
+                                }
+                            })
                         })
                         .collect(),
                 };
@@ -342,19 +344,23 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
         }
     }
 
-    if let Some(targets) = stack_card_queries::displayed_targets(battle, StackCardId(card_id)) {
+    if let Some(targets) = target_queries::displayed_targets(battle, StackCardId(card_id)) {
         let target_card_ids = match targets {
-            EffectTargets::Single(SingleEffectTarget::Character(target_character_id, _)) => {
+            EffectTargets::Standard(StandardEffectTarget::Character(target_character_id, _)) => {
                 vec![target_character_id.card_id()]
             }
-            EffectTargets::Single(SingleEffectTarget::StackCard(target_stack_card_id, _)) => {
+            EffectTargets::Standard(StandardEffectTarget::StackCard(target_stack_card_id, _)) => {
                 vec![target_stack_card_id.card_id()]
             }
-            EffectTargets::List(target_list) => target_list
+            EffectTargets::EffectList(target_list) => target_list
                 .iter()
-                .map(|target| match target {
-                    SingleEffectTarget::Character(character_id, _) => character_id.card_id(),
-                    SingleEffectTarget::StackCard(stack_card_id, _) => stack_card_id.card_id(),
+                .filter_map(|target_option| {
+                    target_option.as_ref().map(|target| match target {
+                        StandardEffectTarget::Character(character_id, _) => character_id.card_id(),
+                        StandardEffectTarget::StackCard(stack_card_id, _) => {
+                            stack_card_id.card_id()
+                        }
+                    })
                 })
                 .collect(),
         };
@@ -368,7 +374,7 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
         }
     } else if let Some(stack_card) = battle.cards.stack_item(StackCardId(card_id))
         && stack_card.targets.is_some()
-        && stack_card_queries::valid_targets(battle, stack_card.targets.as_ref()).is_none()
+        && target_queries::valid_targets(battle, stack_card.targets.as_ref()).is_none()
     {
         icons.insert(card_id, InfoZoomIcon {
             card_id: adapter::client_card_id(card_id),

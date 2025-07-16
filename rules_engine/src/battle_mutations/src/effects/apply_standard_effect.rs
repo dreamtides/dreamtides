@@ -26,7 +26,7 @@ pub fn apply(
     battle: &mut BattleState,
     source: EffectSource,
     effect: &StandardEffect,
-    targets: Option<&EffectTargets>,
+    targets: Option<&mut EffectTargets>,
 ) -> Option<EffectWasApplied> {
     battle_trace!("Applying effect", battle, effect, targets);
     match effect {
@@ -51,7 +51,7 @@ pub fn apply(
 
 fn banish_when_leaves_play(
     battle: &mut BattleState,
-    targets: Option<&EffectTargets>,
+    targets: Option<&mut EffectTargets>,
 ) -> Option<EffectWasApplied> {
     let id = targeting::stack_or_character_id(targets)?;
     battle.ability_state.banish_when_leaves_play.insert(id);
@@ -61,7 +61,7 @@ fn banish_when_leaves_play(
 fn counterspell(
     battle: &mut BattleState,
     source: EffectSource,
-    targets: Option<&EffectTargets>,
+    targets: Option<&mut EffectTargets>,
 ) -> Option<EffectWasApplied> {
     let id = targeting::stack_card_id(targets)?;
     counterspell::execute(battle, source, id);
@@ -101,7 +101,7 @@ fn draw_cards_for_each(
 fn dissolve(
     battle: &mut BattleState,
     source: EffectSource,
-    targets: Option<&EffectTargets>,
+    targets: Option<&mut EffectTargets>,
 ) -> Option<EffectWasApplied> {
     let id = targeting::character_id(targets)?;
     dissolve::execute(battle, source, id);
@@ -111,7 +111,7 @@ fn dissolve(
 fn foresee(
     battle: &mut BattleState,
     source: EffectSource,
-    _targets: Option<&EffectTargets>,
+    _targets: Option<&mut EffectTargets>,
     count: u32,
 ) -> Option<EffectWasApplied> {
     let player = source.controller();
@@ -141,7 +141,7 @@ fn foresee(
 fn gains_spark(
     battle: &mut BattleState,
     source: EffectSource,
-    targets: Option<&EffectTargets>,
+    targets: Option<&mut EffectTargets>,
     gains: Spark,
 ) -> Option<EffectWasApplied> {
     let id = targeting::character_id(targets)?;
