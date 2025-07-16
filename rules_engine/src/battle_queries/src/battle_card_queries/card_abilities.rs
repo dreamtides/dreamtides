@@ -46,6 +46,8 @@ static TEST_FORESEE_1: OnceLock<AbilityList> = OnceLock::new();
 static TEST_FORESEE_2: OnceLock<AbilityList> = OnceLock::new();
 static TEST_FORESEE_1_DRAW_A_CARD: OnceLock<AbilityList> = OnceLock::new();
 static TEST_DRAW_ONE_RECLAIM: OnceLock<AbilityList> = OnceLock::new();
+static TEST_RETURN_VOID_CARD_TO_HAND: OnceLock<AbilityList> = OnceLock::new();
+static TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND: OnceLock<AbilityList> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static AbilityList {
     query_by_name(card::get(battle, card_id).name)
@@ -315,6 +317,33 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 ),
             ])
         }),
+        CardName::TestReturnVoidCardToHand => TEST_RETURN_VOID_CARD_TO_HAND.get_or_init(|| {
+            build_ability_list(CardName::TestReturnVoidCardToHand, vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::ReturnFromYourVoidToHand {
+                        target: Predicate::YourVoid(CardPredicate::Card),
+                    }),
+                }),
+                AbilityConfiguration::default(),
+            )])
+        }),
+        CardName::TestReturnOneOrTwoVoidEventCardsToHand => {
+            TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND.get_or_init(|| {
+                build_ability_list(CardName::TestReturnOneOrTwoVoidEventCardsToHand, vec![(
+                    AbilityNumber(0),
+                    Ability::Event(EventAbility {
+                        additional_cost: None,
+                        effect: Effect::Effect(StandardEffect::ReturnUpToCountForYourVoidToHand {
+                            target: Predicate::YourVoid(CardPredicate::Event),
+                            count: 2,
+                        }),
+                    }),
+                    AbilityConfiguration::default(),
+                )])
+            })
+        }
     }
 }
 

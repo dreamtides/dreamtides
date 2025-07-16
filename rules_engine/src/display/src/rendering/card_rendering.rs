@@ -188,6 +188,12 @@ pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
         CardName::TestDrawOneReclaim => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
+        CardName::TestReturnVoidCardToHand => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
+        ),
+        CardName::TestReturnOneOrTwoVoidEventCardsToHand => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
+        ),
     }
 }
 
@@ -254,6 +260,12 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         }
         CardName::TestDrawOneReclaim => {
             "Draw a card. Reclaim 1\u{f7e4}.".to_string()
+        }
+        CardName::TestReturnVoidCardToHand => {
+            "Return a card from your void to your hand.".to_string()
+        }
+        CardName::TestReturnOneOrTwoVoidEventCardsToHand => {
+            "Return one or two events from your void to your hand.".to_string()
         }
     };
 

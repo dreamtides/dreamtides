@@ -32,6 +32,8 @@ pub fn display_name(card_name: CardName) -> String {
         CardName::TestForeseeTwo => "Foresee 2".to_string(),
         CardName::TestForeseeOneDrawACard => "Foresee 1 Draw 1".to_string(),
         CardName::TestDrawOneReclaim => "Draw 1 Reclaim".to_string(),
+        CardName::TestReturnVoidCardToHand => "Return Void Card".to_string(),
+        CardName::TestReturnOneOrTwoVoidEventCardsToHand => "Return 2 Events".to_string(),
     }
 }
 
@@ -59,6 +61,8 @@ pub fn base_energy_cost(card_name: CardName) -> Option<Energy> {
         CardName::TestForeseeTwo => Some(Energy(1)),
         CardName::TestForeseeOneDrawACard => Some(Energy(1)),
         CardName::TestDrawOneReclaim => Some(Energy(2)),
+        CardName::TestReturnVoidCardToHand => Some(Energy(1)),
+        CardName::TestReturnOneOrTwoVoidEventCardsToHand => Some(Energy(1)),
     }
 }
 
@@ -118,6 +122,8 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
         CardName::TestForeseeTwo => CardType::Event,
         CardName::TestForeseeOneDrawACard => CardType::Event,
         CardName::TestDrawOneReclaim => CardType::Event,
+        CardName::TestReturnVoidCardToHand => CardType::Event,
+        CardName::TestReturnOneOrTwoVoidEventCardsToHand => CardType::Event,
     }
 }
 
@@ -141,5 +147,7 @@ pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
         CardName::TestForeseeTwo => true,
         CardName::TestForeseeOneDrawACard => true,
         CardName::TestDrawOneReclaim => true,
+        CardName::TestReturnVoidCardToHand => true,
+        CardName::TestReturnOneOrTwoVoidEventCardsToHand => false,
     }
 }

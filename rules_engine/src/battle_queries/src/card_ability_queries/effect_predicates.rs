@@ -143,6 +143,7 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
         StandardEffect::ReturnCharactersToHandDrawCardForEach { .. } => None,
         StandardEffect::ReturnFromYourVoidToHand { .. } => None,
         StandardEffect::ReturnFromYourVoidToPlay { .. } => None,
+        StandardEffect::ReturnUpToCountForYourVoidToHand { .. } => None,
         StandardEffect::ShuffleHandAndDeckAndDraw { .. } => None,
         StandardEffect::SparkBecomes { .. } => None,
         StandardEffect::SpendAllEnergyDissolveEnemy => None,

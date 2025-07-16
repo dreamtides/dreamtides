@@ -2252,7 +2252,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitDeckCardOrder, SubmitMulligan, ToggleOrderSelectorVisibility };
 
-    public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCardCharacter, TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDrawOneReclaim, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestForeseeOneDrawACard, TestForeseeTwo, TestMultiActivatedAbilityDrawCardCharacter, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
+    public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCardCharacter, TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDrawOneReclaim, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestForeseeOneDrawACard, TestForeseeTwo, TestMultiActivatedAbilityDrawCardCharacter, TestReturnOneOrTwoVoidEventCardsToHand, TestReturnVoidCardToHand, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
 
     /// <summary>
     /// Identifies a player in an ongoing battle.
@@ -3361,6 +3361,10 @@ namespace Dreamtides.Schema
                     return CardName.TestForeseeTwo;
                 case "TestMultiActivatedAbilityDrawCardCharacter":
                     return CardName.TestMultiActivatedAbilityDrawCardCharacter;
+                case "TestReturnOneOrTwoVoidEventCardsToHand":
+                    return CardName.TestReturnOneOrTwoVoidEventCardsToHand;
+                case "TestReturnVoidCardToHand":
+                    return CardName.TestReturnVoidCardToHand;
                 case "TestTriggerGainSparkOnPlayCardEnemyTurn":
                     return CardName.TestTriggerGainSparkOnPlayCardEnemyTurn;
                 case "TestTriggerGainSparkWhenMaterializeAnotherCharacter":
@@ -3424,6 +3428,12 @@ namespace Dreamtides.Schema
                     return;
                 case CardName.TestMultiActivatedAbilityDrawCardCharacter:
                     serializer.Serialize(writer, "TestMultiActivatedAbilityDrawCardCharacter");
+                    return;
+                case CardName.TestReturnOneOrTwoVoidEventCardsToHand:
+                    serializer.Serialize(writer, "TestReturnOneOrTwoVoidEventCardsToHand");
+                    return;
+                case CardName.TestReturnVoidCardToHand:
+                    serializer.Serialize(writer, "TestReturnVoidCardToHand");
                     return;
                 case CardName.TestTriggerGainSparkOnPlayCardEnemyTurn:
                     serializer.Serialize(writer, "TestTriggerGainSparkOnPlayCardEnemyTurn");
