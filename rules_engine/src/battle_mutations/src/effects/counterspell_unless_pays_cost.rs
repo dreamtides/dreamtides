@@ -17,11 +17,11 @@ use crate::effects::targeting;
 pub fn execute(
     battle: &mut BattleState,
     source: EffectSource,
-    targets: Option<&mut EffectTargets>,
+    targets: &mut Option<EffectTargets>,
     cost: &Cost,
 ) -> Option<EffectWasApplied> {
     if costs::can_pay(battle, source.controller().opponent(), cost) {
-        let prompt_targets = targets.cloned();
+        let prompt_targets = targets.clone();
         battle.prompts.push_back(PromptData {
             source,
             player: source.controller().opponent(),

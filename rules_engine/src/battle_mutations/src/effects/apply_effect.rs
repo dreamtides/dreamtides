@@ -70,12 +70,12 @@ pub fn execute(
     match effect {
         Effect::Effect(standard) => {
             let mut targets = target_queries::valid_targets(battle, requested_targets);
-            apply_standard_effect::apply(battle, source, standard, targets.as_mut());
+            apply_standard_effect::apply(battle, source, standard, &mut targets);
             remove_stack_priority_if_empty(battle);
         }
         Effect::WithOptions(with_options) => {
             let mut targets = target_queries::valid_targets(battle, requested_targets);
-            execute_with_options(battle, source, with_options, targets.as_mut());
+            execute_with_options(battle, source, with_options, &mut targets);
         }
         Effect::List(_) => {
             battle.pending_effects.push_back(PendingEffect {
@@ -114,7 +114,7 @@ pub fn execute_pending_effects_if_no_active_prompt(battle: &mut BattleState) {
                     battle,
                     pending_effect.source,
                     &standard,
-                    targets.as_mut(),
+                    &mut targets,
                 );
                 remove_stack_priority_if_empty(battle);
             }
@@ -123,12 +123,7 @@ pub fn execute_pending_effects_if_no_active_prompt(battle: &mut BattleState) {
                     battle,
                     pending_effect.requested_targets.as_ref(),
                 );
-                execute_with_options(
-                    battle,
-                    pending_effect.source,
-                    &with_options,
-                    targets.as_mut(),
-                );
+                execute_with_options(battle, pending_effect.source, &with_options, &mut targets);
             }
             Effect::List(mut effect_list) => {
                 if !effect_list.is_empty() {
@@ -141,7 +136,7 @@ pub fn execute_pending_effects_if_no_active_prompt(battle: &mut BattleState) {
                         battle,
                         pending_effect.source,
                         &first_effect,
-                        targets.as_mut(),
+                        &mut targets,
                     );
 
                     if !effect_list.is_empty() {
@@ -161,7 +156,7 @@ fn execute_with_options(
     battle: &mut BattleState,
     source: EffectSource,
     with_options: &EffectWithOptions,
-    targets: Option<&mut EffectTargets>,
+    targets: &mut Option<EffectTargets>,
 ) {
     if with_options.optional {
         todo!("Implement optional effects")

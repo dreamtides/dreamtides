@@ -8,6 +8,7 @@ workspace = true
 
 [lib]
 path = "src/logging.rs"
+test = false
 doctest = false
 bench = false
 

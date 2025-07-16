@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 
@@ -64,14 +66,14 @@ pub enum EffectTargets {
     /// A target for a standard effect.
     Standard(StandardEffectTarget),
 
-    /// Targets for an effect list. An entry of `None` indicates that the
+    /// Target queue for an effect list. An entry of `None` indicates that the
     /// specified target was provided but is no longer valid on resolution, e.g.
     /// because a target character has been destroyed.
     ///
     /// During effect resolution, we pop targets from the list when required,
     /// i.e. it is assumed that this order will match the order in which targets
     /// are required for effects.
-    EffectList(Vec<Option<StandardEffectTarget>>),
+    EffectList(VecDeque<Option<StandardEffectTarget>>),
 }
 
 #[derive(Clone, Debug)]
@@ -84,10 +86,13 @@ impl EffectTargets {
     pub fn add(&mut self, target: StandardEffectTarget) {
         match self {
             EffectTargets::Standard(existing) => {
-                *self = EffectTargets::EffectList(vec![Some(existing.clone()), Some(target)]);
+                *self = EffectTargets::EffectList(VecDeque::from([
+                    Some(existing.clone()),
+                    Some(target),
+                ]));
             }
             EffectTargets::EffectList(targets) => {
-                targets.push(Some(target));
+                targets.push_back(Some(target));
             }
         }
     }

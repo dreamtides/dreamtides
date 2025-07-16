@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardIdType;
 use battle_state::battle_cards::stack_card_state::{
@@ -35,14 +37,15 @@ pub fn valid_targets(
             }
         }
         Some(EffectTargets::EffectList(target_list)) => {
-            let cleaned_targets: Vec<Option<StandardEffectTarget>> = target_list
+            let cleaned_targets: VecDeque<Option<StandardEffectTarget>> = target_list
                 .iter()
                 .map(|target_option| {
                     target_option.as_ref().and_then(|target| {
                         if is_target_valid(battle, target) { Some(target.clone()) } else { None }
                     })
                 })
-                .collect();
+                .collect::<Vec<_>>()
+                .into();
             Some(EffectTargets::EffectList(cleaned_targets))
         }
         None => None,
