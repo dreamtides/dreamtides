@@ -58,6 +58,16 @@ impl TestClientCards {
         self.cards_at_position(&Position::InVoid(DisplayPlayer::Enemy))
     }
 
+    /// Get all cards in the user's banished zone
+    pub fn user_banished(&self) -> TestClientCardList<'_> {
+        self.cards_at_position(&Position::InBanished(DisplayPlayer::User))
+    }
+
+    /// Get all cards in the enemy's banished zone
+    pub fn enemy_banished(&self) -> TestClientCardList<'_> {
+        self.cards_at_position(&Position::InBanished(DisplayPlayer::Enemy))
+    }
+
     /// Get all cards in the user's deck
     pub fn user_deck(&self) -> TestClientCardList<'_> {
         self.cards_at_position(&Position::InDeck(DisplayPlayer::User))

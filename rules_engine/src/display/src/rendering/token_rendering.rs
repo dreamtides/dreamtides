@@ -234,7 +234,7 @@ fn void_card_token_view(
 
     token_card_view(
         TokenCardView::builder()
-            .id(adapter::void_card_token_client_id(void_card_id))
+            .id(adapter::void_card_token_client_id(void_card_id, ability_id))
             .position(ObjectPosition {
                 position: Position::InHand(DisplayPlayer::User),
                 sorting_key: card::get(battle, card_id).object_id.0 as u32,

@@ -8,7 +8,7 @@ use battle_state::actions::debug_battle_action::DebugBattleAction;
 use battle_state::battle::card_id::DeckCardId;
 use core_data::identifiers::CardName;
 use display_data::battle_view::{ButtonView, DisplayPlayer};
-use display_data::card_view::ClientCardId;
+use display_data::card_view::{CardPrefab, ClientCardId};
 use display_data::command::Command;
 
 use crate::session::test_session::TestSession;
@@ -71,6 +71,15 @@ pub trait TestSessionBattleExtension {
     /// Adds a card to a player's battlefield via debug actions, returning its
     /// card id. This does not play the card or spend energy etc.
     fn add_to_battlefield(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId;
+
+    /// Adds a card to a player's void via debug actions, returning its card id.
+    fn add_to_void(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId;
+
+    /// Plays a card from a player's void using its reclaim ability.
+    ///
+    /// Panics if the server returns an error for playing this card or if it
+    /// cannot currently be played from void.
+    fn play_card_from_void(&mut self, player: DisplayPlayer, card_id: &ClientCardId);
 
     /// Activates an ability of a character via the standard play card action.
     ///
@@ -240,6 +249,41 @@ impl TestSessionBattleExtension for TestSession {
             .find(|c| !existing_battlefield_ids.contains(&c.id))
             .map(|c| c.id.clone())
             .expect("Failed to find newly added card on battlefield")
+    }
+
+    fn add_to_void(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId {
+        let existing_void_ids: HashSet<String> =
+            self.client(player).cards.user_void().iter().map(|c| c.id.clone()).collect();
+
+        self.perform_player_action(
+            player,
+            BattleAction::Debug(DebugBattleAction::AddCardToVoid {
+                player: self.to_player_name(player),
+                card,
+            }),
+        );
+
+        self.client(player)
+            .cards
+            .user_void()
+            .iter()
+            .find(|c| !existing_void_ids.contains(&c.id))
+            .map(|c| c.id.clone())
+            .expect("Failed to find newly added card in void")
+    }
+
+    fn play_card_from_void(&mut self, player: DisplayPlayer, card_id: &ClientCardId) {
+        let user_hand = self.client(player).cards.user_hand();
+        let reclaim_token_id = user_hand
+            .iter()
+            .find(|card| {
+                card.view.prefab == CardPrefab::Token
+                    && card.id.starts_with(&format!("V{card_id}/"))
+            })
+            .map(|card| card.id.clone())
+            .expect("Could not find reclaim token for void card");
+
+        self.play_card_from_hand(player, &reclaim_token_id);
     }
 
     fn activate_ability(
