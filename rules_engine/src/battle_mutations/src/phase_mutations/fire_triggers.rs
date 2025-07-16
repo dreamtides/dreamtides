@@ -1,5 +1,6 @@
 use ability_data::effect::Effect;
 use ability_data::predicate::Predicate;
+use ability_data::standard_effect::StandardEffect;
 use ability_data::triggered_ability::TriggeredAbility;
 use battle_queries::battle_card_queries::{card, card_abilities, card_properties};
 use battle_queries::card_ability_queries::{effect_predicates, trigger_queries};
@@ -143,7 +144,7 @@ fn fire_triggered_ability(
 fn trigger_targets(
     battle: &BattleState,
     trigger: Trigger,
-    effect: &ability_data::standard_effect::StandardEffect,
+    effect: &StandardEffect,
     controller: PlayerName,
     controlling_character: CharacterId,
 ) -> Option<EffectTargets> {

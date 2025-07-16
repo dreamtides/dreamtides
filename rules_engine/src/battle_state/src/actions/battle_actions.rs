@@ -16,7 +16,7 @@ use crate::battle::card_id::{
 pub enum BattleAction {
     /// Developer action
     Debug(DebugBattleAction),
-    /// Play a card in the user's hand.
+    /// Play a card in the user's hand using the standard play action.
     PlayCardFromHand(HandCardId),
     /// Play a card in the user's void using the given ability.
     PlayCardFromVoid(VoidCardId, AbilityId),

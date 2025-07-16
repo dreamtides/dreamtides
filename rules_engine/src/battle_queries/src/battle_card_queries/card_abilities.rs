@@ -12,9 +12,9 @@ use ability_data::static_ability::{PlayFromVoid, StandardStaticAbility};
 use ability_data::trigger_event::{PlayerTurn, TriggerEvent};
 use ability_data::triggered_ability::TriggeredAbility;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::CardIdType;
+use battle_state::battle::card_id::{AbilityId, CardIdType};
 use battle_state::battle_cards::ability_list::{
-    AbilityConfiguration, AbilityData, AbilityList, CanPlayRestriction,
+    AbilityConfiguration, AbilityData, AbilityList, AbilityReference, CanPlayRestriction,
 };
 use battle_state::triggers::trigger::TriggerName;
 use core_data::card_types::CardType;
@@ -24,6 +24,7 @@ use enumset::EnumSet;
 
 use crate::battle_card_queries::{build_named_abilities, card};
 use crate::card_ability_queries::effect_predicates;
+use crate::panic_with;
 
 static CHARACTER_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 static TEST_DISSOLVE_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
@@ -315,6 +316,40 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
             ])
         }),
     }
+}
+
+/// Returns a reference to an ability based on its ID.
+///
+/// Panics if the ability is not found.
+pub fn ability(battle: &BattleState, ability_id: AbilityId) -> AbilityReference<'static> {
+    let ability_list = query(battle, ability_id.card_id);
+    ability_list
+        .event_abilities
+        .iter()
+        .find(|a| a.ability_number == ability_id.ability_number)
+        .map(|a| AbilityReference::Event(&a.ability))
+        .or_else(|| {
+            ability_list
+                .static_abilities
+                .iter()
+                .find(|a| a.ability_number == ability_id.ability_number)
+                .map(|a| AbilityReference::Static(&a.ability))
+        })
+        .or_else(|| {
+            ability_list
+                .activated_abilities
+                .iter()
+                .find(|a| a.ability_number == ability_id.ability_number)
+                .map(|a| AbilityReference::Activated(&a.ability))
+        })
+        .or_else(|| {
+            ability_list
+                .triggered_abilities
+                .iter()
+                .find(|a| a.ability_number == ability_id.ability_number)
+                .map(|a| AbilityReference::Triggered(&a.ability))
+        })
+        .unwrap_or_else(|| panic_with!("Ability not found", battle, ability_id))
 }
 
 fn build_ability_list(

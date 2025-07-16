@@ -9,6 +9,15 @@ use enumset::EnumSet;
 
 use crate::triggers::trigger::TriggerName;
 
+/// A reference to an ability.
+#[derive(Debug, Clone)]
+pub enum AbilityReference<'a> {
+    Event(&'a EventAbility),
+    Static(&'a StaticAbility),
+    Activated(&'a ActivatedAbility),
+    Triggered(&'a TriggeredAbility),
+}
+
 /// Abilities of a card which can be applied during a battle.
 ///
 /// This is a wrapper around `Ability` which stores some precomputed state

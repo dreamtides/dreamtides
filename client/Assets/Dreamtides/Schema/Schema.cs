@@ -815,7 +815,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Developer action
     ///
-    /// Play a card in the user's hand.
+    /// Play a card in the user's hand using the standard play action.
     ///
     /// Play a card in the user's void using the given ability.
     ///

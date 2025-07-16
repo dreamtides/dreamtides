@@ -57,7 +57,7 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
         StandardEffect::BanishCharacter { target } => Some(target),
         StandardEffect::BanishCharacterUntilLeavesPlay { target, .. } => Some(target),
         StandardEffect::BanishUntilNextMain { target } => Some(target),
-        StandardEffect::BanishWhenLeavesPlay { .. } => None,
+        StandardEffect::BanishWhenLeavesPlay { target } => Some(target),
         StandardEffect::BanishCollection { target, .. } => Some(target),
         StandardEffect::Copy { target } => Some(target),
         StandardEffect::DisableActivatedAbilitiesWhileInPlay { target } => Some(target),
@@ -131,6 +131,8 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
 /// Extracts a stack target predicate from a standard effect, if any.
 pub fn get_stack_target_predicate(effect: &StandardEffect) -> Option<&Predicate> {
     match effect {
+        StandardEffect::AbandonAtEndOfTurn { target } => Some(target),
+        StandardEffect::BanishWhenLeavesPlay { target } => Some(target),
         StandardEffect::Counterspell { target, .. } => Some(target),
         StandardEffect::CounterspellUnlessPaysCost { target, .. } => Some(target),
         _ => None,
