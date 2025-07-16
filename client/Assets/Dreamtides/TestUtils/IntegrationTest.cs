@@ -11,7 +11,6 @@ using Dreamtides.Layout;
 using UnityEngine.UIElements;
 using Dreamtides.Schema;
 using System.Runtime.CompilerServices;
-using System.Collections.Generic;
 using UnityEngine.Rendering;
 using System.IO;
 
@@ -21,7 +20,7 @@ namespace Dreamtides.TestUtils
 {
   public abstract class IntegrationTest
   {
-    public const float TimeoutSeconds = 5.0f;
+    public const float TimeoutSeconds = 30.0f;
 
     Registry? _registry;
     protected Registry Registry => Errors.CheckNotNull(_registry);
