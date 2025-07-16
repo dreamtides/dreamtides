@@ -79,11 +79,9 @@ pub fn get_target_predicate(effect: &StandardEffect) -> Option<&Predicate> {
 pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predicate> {
     match effect {
         StandardEffect::AbandonAndGainEnergyForSpark { target, .. } => Some(target),
-        StandardEffect::AbandonAtEndOfTurn { target } => Some(target),
         StandardEffect::BanishCharacter { target } => Some(target),
         StandardEffect::BanishCharacterUntilLeavesPlay { target, .. } => Some(target),
         StandardEffect::BanishUntilNextMain { target } => Some(target),
-        StandardEffect::BanishWhenLeavesPlay { target } => Some(target),
         StandardEffect::BanishCollection { target, .. } => Some(target),
         StandardEffect::Copy { target } => Some(target),
         StandardEffect::DisableActivatedAbilitiesWhileInPlay { target } => Some(target),
@@ -101,8 +99,10 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
         StandardEffect::PutOnTopOfEnemyDeck { target } => Some(target),
         StandardEffect::ReturnToHand { target } => Some(target),
 
+        StandardEffect::AbandonAtEndOfTurn { .. } => None,
         StandardEffect::BanishCardsFromEnemyVoid { .. } => None,
         StandardEffect::BanishEnemyVoid => None,
+        StandardEffect::BanishWhenLeavesPlay { .. } => None,
         StandardEffect::CardsInVoidGainReclaimThisTurn { .. } => None,
         StandardEffect::CopyNextPlayed { .. } => None,
         StandardEffect::Counterspell { .. } => None,
