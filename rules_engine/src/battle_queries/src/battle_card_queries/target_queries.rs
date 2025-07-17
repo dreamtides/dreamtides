@@ -5,6 +5,7 @@ use battle_state::battle::card_id::CardIdType;
 use battle_state::battle_cards::stack_card_state::{
     EffectTargets, StackItemId, StandardEffectTarget,
 };
+use core_data::types::PlayerName;
 
 /// Gets the targets for a card, if they are valid
 pub fn targets(battle: &BattleState, stack_item_id: StackItemId) -> Option<EffectTargets> {
@@ -59,6 +60,12 @@ fn is_target_valid(battle: &BattleState, target: &StandardEffectTarget) -> bool 
         }
         StandardEffectTarget::StackCard(stack_card_id, object_id) => {
             battle.cards.is_valid_object_id(stack_card_id.card_id(), *object_id)
+        }
+        StandardEffectTarget::VoidCards(void_card_set) => {
+            void_card_set.iter().all(|void_card_id| {
+                battle.cards.void(PlayerName::One).contains(void_card_id)
+                    || battle.cards.void(PlayerName::Two).contains(void_card_id)
+            })
         }
     }
 }

@@ -6,7 +6,9 @@ use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalActions};
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CardId, CardIdType, CharacterId, HandCardId, StackCardId};
+use battle_state::battle::card_id::{
+    CardId, CardIdType, CharacterId, HandCardId, StackCardId, VoidCardId,
+};
 use battle_state::battle_cards::stack_card_state::{
     EffectTargets, StackCardAdditionalCostsPaid, StandardEffectTarget,
 };
@@ -121,6 +123,14 @@ fn selection_action(legal_actions: &LegalActions, card_id: CardId) -> Option<Gam
         .contains(BattleAction::SelectStackCardTarget(StackCardId(card_id)), ForPlayer::Human)
     {
         return Some(GameAction::BattleAction(BattleAction::SelectStackCardTarget(StackCardId(
+            card_id,
+        ))));
+    }
+
+    if legal_actions
+        .contains(BattleAction::SelectVoidCardTarget(VoidCardId(card_id)), ForPlayer::Human)
+    {
+        return Some(GameAction::BattleAction(BattleAction::SelectVoidCardTarget(VoidCardId(
             card_id,
         ))));
     }
@@ -330,17 +340,22 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
                     )) => {
                         vec![target_stack_card_id.card_id()]
                     }
+                    EffectTargets::Standard(StandardEffectTarget::VoidCards(void_cards)) => {
+                        void_cards.iter().map(|id| id.card_id()).collect()
+                    }
                     EffectTargets::EffectList(target_list) => target_list
                         .iter()
-                        .filter_map(|target_option| {
-                            target_option.as_ref().map(|target| match target {
-                                StandardEffectTarget::Character(character_id, _) => {
-                                    character_id.card_id()
-                                }
-                                StandardEffectTarget::StackCard(stack_card_id, _) => {
-                                    stack_card_id.card_id()
-                                }
-                            })
+                        .flat_map(|target_option| match target_option.as_ref() {
+                            Some(StandardEffectTarget::Character(character_id, _)) => {
+                                vec![character_id.card_id()]
+                            }
+                            Some(StandardEffectTarget::StackCard(stack_card_id, _)) => {
+                                vec![stack_card_id.card_id()]
+                            }
+                            Some(StandardEffectTarget::VoidCards(void_cards)) => {
+                                void_cards.iter().map(|id| id.card_id()).collect()
+                            }
+                            None => vec![],
                         })
                         .collect(),
                 };
@@ -364,15 +379,22 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
             EffectTargets::Standard(StandardEffectTarget::StackCard(target_stack_card_id, _)) => {
                 vec![target_stack_card_id.card_id()]
             }
+            EffectTargets::Standard(StandardEffectTarget::VoidCards(void_cards)) => {
+                void_cards.iter().map(|id| id.card_id()).collect()
+            }
             EffectTargets::EffectList(target_list) => target_list
                 .iter()
-                .filter_map(|target_option| {
-                    target_option.as_ref().map(|target| match target {
-                        StandardEffectTarget::Character(character_id, _) => character_id.card_id(),
-                        StandardEffectTarget::StackCard(stack_card_id, _) => {
-                            stack_card_id.card_id()
-                        }
-                    })
+                .flat_map(|target_option| match target_option.as_ref() {
+                    Some(StandardEffectTarget::Character(character_id, _)) => {
+                        vec![character_id.card_id()]
+                    }
+                    Some(StandardEffectTarget::StackCard(stack_card_id, _)) => {
+                        vec![stack_card_id.card_id()]
+                    }
+                    Some(StandardEffectTarget::VoidCards(void_cards)) => {
+                        void_cards.iter().map(|id| id.card_id()).collect()
+                    }
+                    None => vec![],
                 })
                 .collect(),
         };

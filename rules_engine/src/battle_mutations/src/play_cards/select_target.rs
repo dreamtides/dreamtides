@@ -2,7 +2,7 @@ use battle_queries::battle_card_queries::card;
 use battle_queries::panic_with;
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CharacterId, StackCardId};
+use battle_state::battle::card_id::{CharacterId, StackCardId, VoidCardId};
 use battle_state::battle_cards::stack_card_state::{EffectTargets, StandardEffectTarget};
 use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{OnSelected, PromptType};
@@ -80,6 +80,68 @@ pub fn on_stack(battle: &mut BattleState, player: PlayerName, stack_card_id: Sta
                 panic_with!("Pending effect not found", battle, pending_effect_index);
             };
             let target = StandardEffectTarget::StackCard(stack_card_id, object_id);
+            match &mut pending_effect.requested_targets {
+                Some(existing_targets) => existing_targets.add(target),
+                None => pending_effect.requested_targets = Some(EffectTargets::Standard(target)),
+            }
+        }
+    }
+}
+
+/// Toggles a void card in the selected set of a void card prompt
+pub fn void_card(battle: &mut BattleState, _player: PlayerName, void_card_id: VoidCardId) {
+    let Some(prompt) = battle.prompts.front_mut() else {
+        panic_with!("No active prompt", battle);
+    };
+    let PromptType::ChooseVoidCard(void_prompt) = &mut prompt.prompt_type else {
+        panic_with!("Prompt is not a void card choice", battle);
+    };
+
+    if void_prompt.selected.contains(void_card_id) {
+        void_prompt.selected.remove(void_card_id);
+    } else {
+        void_prompt.selected.insert(void_card_id);
+    }
+}
+
+/// Submits the selected void cards as targets
+pub fn submit_void_card_targets(battle: &mut BattleState, player: PlayerName) {
+    let Some(prompt) = battle.prompts.pop_front() else {
+        panic_with!("No active prompt", battle);
+    };
+    let PromptType::ChooseVoidCard(void_prompt) = prompt.prompt_type else {
+        panic_with!("Prompt is not a void card choice", battle);
+    };
+
+    if (void_prompt.selected.len() as u32) < void_prompt.minimum_selection {
+        panic_with!("Not enough void cards selected", battle);
+    }
+
+    match void_prompt.on_selected {
+        OnSelected::AddStackTargets(stack_item_id) => {
+            let Some(stack_item) = battle.cards.stack_item_mut(stack_item_id) else {
+                panic_with!("Stack item not found", battle);
+            };
+            let target = StandardEffectTarget::VoidCards(void_prompt.selected.clone());
+            match &mut stack_item.targets {
+                Some(existing_targets) => existing_targets.add(target),
+                None => stack_item.targets = Some(EffectTargets::Standard(target)),
+            }
+            let source_id = stack_item.id;
+            let source = EffectSource::Player { controller: player };
+            battle.push_animation(source, || BattleAnimation::SelectStackCardTargets {
+                player,
+                source_id,
+                targets: EffectTargets::Standard(StandardEffectTarget::VoidCards(
+                    void_prompt.selected,
+                )),
+            });
+        }
+        OnSelected::AddPendingEffectTarget(pending_effect_index) => {
+            let Some(pending_effect) = battle.pending_effect_mut(pending_effect_index) else {
+                panic_with!("Pending effect not found", battle, pending_effect_index);
+            };
+            let target = StandardEffectTarget::VoidCards(void_prompt.selected);
             match &mut pending_effect.requested_targets {
                 Some(existing_targets) => existing_targets.add(target),
                 None => pending_effect.requested_targets = Some(EffectTargets::Standard(target)),

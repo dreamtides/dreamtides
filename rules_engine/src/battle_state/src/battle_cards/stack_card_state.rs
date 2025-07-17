@@ -3,8 +3,9 @@ use std::collections::VecDeque;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 
-use crate::battle::card_id::{ActivatedAbilityId, CharacterId, StackCardId};
+use crate::battle::card_id::{ActivatedAbilityId, CharacterId, StackCardId, VoidCardId};
 use crate::battle_cards::battle_card_state::ObjectId;
+use crate::battle_cards::card_set::CardSet;
 
 /// A vector of items on the stack
 ///
@@ -76,10 +77,17 @@ pub enum EffectTargets {
     EffectList(VecDeque<Option<StandardEffectTarget>>),
 }
 
+#[derive(Clone, Debug, Copy)]
+pub struct VoidCardTarget {
+    pub id: VoidCardId,
+    pub object_id: ObjectId,
+}
+
 #[derive(Clone, Debug)]
 pub enum StandardEffectTarget {
     Character(CharacterId, ObjectId),
     StackCard(StackCardId, ObjectId),
+    VoidCards(CardSet<VoidCardId>),
 }
 
 impl EffectTargets {

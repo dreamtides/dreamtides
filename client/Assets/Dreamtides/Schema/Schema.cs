@@ -2248,6 +2248,8 @@ namespace Dreamtides.Schema
     ///
     /// Start your next turn after the opponent takes the `EndTurn` action.
     ///
+    /// Submit the selected void card targets
+    ///
     /// Submit the selected deck card order configuration in the current
     /// ordering prompt.
     ///
@@ -2255,7 +2257,7 @@ namespace Dreamtides.Schema
     ///
     /// Confirm the selected cards to mulligan
     /// </summary>
-    public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitDeckCardOrder, SubmitMulligan, ToggleOrderSelectorVisibility };
+    public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitDeckCardOrder, SubmitMulligan, SubmitVoidCardTargets, ToggleOrderSelectorVisibility };
 
     public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCardCharacter, TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDrawOneReclaim, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestForeseeOneDrawACard, TestForeseeTwo, TestMultiActivatedAbilityDrawCardCharacter, TestReturnOneOrTwoVoidEventCardsToHand, TestReturnVoidCardToHand, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
 
@@ -3279,6 +3281,8 @@ namespace Dreamtides.Schema
                             return new BattleAction { Enum = BattleActionEnum.SubmitDeckCardOrder };
                         case "submitMulligan":
                             return new BattleAction { Enum = BattleActionEnum.SubmitMulligan };
+                        case "submitVoidCardTargets":
+                            return new BattleAction { Enum = BattleActionEnum.SubmitVoidCardTargets };
                         case "toggleOrderSelectorVisibility":
                             return new BattleAction { Enum = BattleActionEnum.ToggleOrderSelectorVisibility };
                     }
@@ -3311,6 +3315,9 @@ namespace Dreamtides.Schema
                         return;
                     case BattleActionEnum.SubmitMulligan:
                         serializer.Serialize(writer, "submitMulligan");
+                        return;
+                    case BattleActionEnum.SubmitVoidCardTargets:
+                        serializer.Serialize(writer, "submitVoidCardTargets");
                         return;
                     case BattleActionEnum.ToggleOrderSelectorVisibility:
                         serializer.Serialize(writer, "toggleOrderSelectorVisibility");
@@ -3636,6 +3643,8 @@ namespace Dreamtides.Schema
                     return BattleActionEnum.SubmitDeckCardOrder;
                 case "submitMulligan":
                     return BattleActionEnum.SubmitMulligan;
+                case "submitVoidCardTargets":
+                    return BattleActionEnum.SubmitVoidCardTargets;
                 case "toggleOrderSelectorVisibility":
                     return BattleActionEnum.ToggleOrderSelectorVisibility;
             }
@@ -3666,6 +3675,9 @@ namespace Dreamtides.Schema
                     return;
                 case BattleActionEnum.SubmitMulligan:
                     serializer.Serialize(writer, "submitMulligan");
+                    return;
+                case BattleActionEnum.SubmitVoidCardTargets:
+                    serializer.Serialize(writer, "submitVoidCardTargets");
                     return;
                 case BattleActionEnum.ToggleOrderSelectorVisibility:
                     serializer.Serialize(writer, "toggleOrderSelectorVisibility");

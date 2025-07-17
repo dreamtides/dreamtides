@@ -96,6 +96,10 @@ fn standard_effect_automatic_targets(
         } else {
             None
         }
+    } else if let Some(target_predicate) = effect_predicates::get_void_target_predicate(effect) {
+        let valid =
+            effect_predicates::matching_cards_in_void(battle, source, target_predicate, that_card);
+        if valid.len() == 1 { Some(StandardEffectTarget::VoidCards(valid)) } else { None }
     } else {
         None
     }

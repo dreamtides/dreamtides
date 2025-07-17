@@ -73,6 +73,9 @@ pub fn stack_or_character_id(targets: &mut Option<EffectTargets>) -> Option<Card
                     StandardEffectTarget::Character(character_id, ..) => {
                         Some(character_id.card_id())
                     }
+                    StandardEffectTarget::VoidCards(void_cards) => {
+                        void_cards.iter().next().map(|id| id.card_id())
+                    }
                 }
             } else {
                 if !target_list.is_empty() {

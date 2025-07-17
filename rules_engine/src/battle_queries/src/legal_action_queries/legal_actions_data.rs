@@ -133,6 +133,9 @@ impl LegalActions {
                     false
                 }
             }
+            BattleAction::SubmitVoidCardTargets => {
+                matches!(self, LegalActions::SelectVoidCardPrompt { .. })
+            }
             BattleAction::SelectPromptChoice(index) => {
                 if let LegalActions::SelectPromptChoicePrompt { choice_count } = self {
                     index < *choice_count
@@ -379,7 +382,10 @@ impl LegalActions {
             }
 
             LegalActions::SelectVoidCardPrompt { valid, .. } => {
-                valid.iter().map(BattleAction::SelectVoidCardTarget).collect::<Vec<_>>()
+                let mut result =
+                    valid.iter().map(BattleAction::SelectVoidCardTarget).collect::<Vec<_>>();
+                result.push(BattleAction::SubmitVoidCardTargets);
+                result
             }
 
             LegalActions::SelectPromptChoicePrompt { choice_count } => {
@@ -483,12 +489,13 @@ impl LegalActions {
                 }
             }
 
-            LegalActions::SelectVoidCardPrompt { valid, .. } => {
-                if valid.is_empty() {
+            LegalActions::SelectVoidCardPrompt { .. } => {
+                let all_actions = self.all();
+                if all_actions.is_empty() {
                     None
                 } else {
-                    let index = fastrand::usize(..valid.len());
-                    valid.iter().nth(index).map(BattleAction::SelectVoidCardTarget)
+                    let index = fastrand::usize(..all_actions.len());
+                    Some(all_actions[index])
                 }
             }
 

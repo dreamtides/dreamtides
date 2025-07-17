@@ -54,6 +54,12 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
         BattleAction::SelectStackCardTarget(stack_card_id) => {
             select_target::on_stack(battle, player, stack_card_id);
         }
+        BattleAction::SelectVoidCardTarget(void_card_id) => {
+            select_target::void_card(battle, player, void_card_id);
+        }
+        BattleAction::SubmitVoidCardTargets => {
+            select_target::submit_void_card_targets(battle, player);
+        }
         BattleAction::SelectPromptChoice(choice_index) => {
             select_choice_prompt_at_index::select(battle, player, choice_index);
         }

@@ -188,7 +188,12 @@ fn primary_action_button(
         }
     }
 
-    if legal_actions.contains(BattleAction::SubmitDeckCardOrder, ForPlayer::Human) {
+    if legal_actions.contains(BattleAction::SubmitVoidCardTargets, ForPlayer::Human) {
+        Some(ButtonView {
+            label: "Submit".to_string(),
+            action: Some(BattleAction::SubmitVoidCardTargets.into()),
+        })
+    } else if legal_actions.contains(BattleAction::SubmitDeckCardOrder, ForPlayer::Human) {
         Some(ButtonView {
             label: "Submit".to_string(),
             action: Some(BattleAction::SubmitDeckCardOrder.into()),

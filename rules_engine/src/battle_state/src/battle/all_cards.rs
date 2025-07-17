@@ -279,6 +279,16 @@ impl AllCards {
         if self.stack_set(controller).contains(result) { Some(result) } else { None }
     }
 
+    /// Returns the void card ID for a card, if it is currently in the void.
+    pub fn to_void_card_id(
+        &self,
+        controller: PlayerName,
+        card_id: impl CardIdType,
+    ) -> Option<VoidCardId> {
+        let result = VoidCardId(card_id.card_id());
+        if self.void(controller).contains(result) { Some(result) } else { None }
+    }
+
     /// Returns true if the indicated card ID is valid.
     #[inline(always)]
     pub fn is_valid_card_id(&self, card_id: CardId) -> bool {
