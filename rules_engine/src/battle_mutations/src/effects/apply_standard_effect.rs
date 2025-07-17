@@ -4,6 +4,7 @@ use ability_data::standard_effect::StandardEffect;
 use battle_queries::battle_player_queries::quantity_expression;
 use battle_queries::battle_trace;
 use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::card_id::CardIdType;
 use battle_state::battle_cards::card_set::CardSet;
 use battle_state::battle_cards::stack_card_state::EffectTargets;
 use battle_state::core::effect_source::EffectSource;
@@ -53,8 +54,8 @@ fn banish_when_leaves_play(
     battle: &mut BattleState,
     targets: &mut Option<EffectTargets>,
 ) -> Option<EffectWasApplied> {
-    let id = targeting::stack_or_character_id(targets)?;
-    battle.ability_state.banish_when_leaves_play.insert(id);
+    let id = targeting::stack_card_id(targets)?;
+    battle.ability_state.banish_when_leaves_play.insert(id.card_id());
     Some(EffectWasApplied)
 }
 

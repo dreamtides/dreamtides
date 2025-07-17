@@ -101,6 +101,18 @@ impl Component for AddCardToHandPanel<'_> {
                                 )
                                 .child(
                                     AddCardCell::builder()
+                                        .card(CardName::TestReturnVoidCardToHand)
+                                        .user_player(self.user_player)
+                                        .build(),
+                                )
+                                .child(
+                                    AddCardCell::builder()
+                                        .card(CardName::TestReturnOneOrTwoVoidEventCardsToHand)
+                                        .user_player(self.user_player)
+                                        .build(),
+                                )
+                                .child(
+                                    AddCardCell::builder()
                                         .card(CardName::TestActivatedAbilityDrawCardCharacter)
                                         .user_player(self.user_player)
                                         .build(),

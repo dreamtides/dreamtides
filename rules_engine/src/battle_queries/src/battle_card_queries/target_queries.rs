@@ -1,11 +1,10 @@
-use std::collections::VecDeque;
+use std::collections::{BTreeSet, VecDeque};
 
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardIdType;
 use battle_state::battle_cards::stack_card_state::{
     EffectTargets, StackItemId, StandardEffectTarget,
 };
-use core_data::types::PlayerName;
 
 /// Gets the targets for a card, if they are valid
 pub fn targets(battle: &BattleState, stack_item_id: StackItemId) -> Option<EffectTargets> {
@@ -31,19 +30,13 @@ pub fn valid_targets(
 ) -> Option<EffectTargets> {
     match targets {
         Some(EffectTargets::Standard(target)) => {
-            if is_target_valid(battle, target) {
-                Some(targets.unwrap().clone())
-            } else {
-                None
-            }
+            filter_target(battle, target).map(EffectTargets::Standard)
         }
         Some(EffectTargets::EffectList(target_list)) => {
             let cleaned_targets: VecDeque<Option<StandardEffectTarget>> = target_list
                 .iter()
                 .map(|target_option| {
-                    target_option.as_ref().and_then(|target| {
-                        if is_target_valid(battle, target) { Some(target.clone()) } else { None }
-                    })
+                    target_option.as_ref().and_then(|target| filter_target(battle, target))
                 })
                 .collect::<Vec<_>>()
                 .into();
@@ -53,19 +46,39 @@ pub fn valid_targets(
     }
 }
 
-fn is_target_valid(battle: &BattleState, target: &StandardEffectTarget) -> bool {
+fn filter_target(
+    battle: &BattleState,
+    target: &StandardEffectTarget,
+) -> Option<StandardEffectTarget> {
     match target {
         StandardEffectTarget::Character(character_id, object_id) => {
-            battle.cards.is_valid_object_id(character_id.card_id(), *object_id)
+            if battle.cards.is_valid_object_id(character_id.card_id(), *object_id) {
+                Some(target.clone())
+            } else {
+                None
+            }
         }
         StandardEffectTarget::StackCard(stack_card_id, object_id) => {
-            battle.cards.is_valid_object_id(stack_card_id.card_id(), *object_id)
+            if battle.cards.is_valid_object_id(stack_card_id.card_id(), *object_id) {
+                Some(target.clone())
+            } else {
+                None
+            }
         }
         StandardEffectTarget::VoidCards(void_card_set) => {
-            void_card_set.iter().all(|void_card_id| {
-                battle.cards.void(PlayerName::One).contains(void_card_id.id)
-                    || battle.cards.void(PlayerName::Two).contains(void_card_id.id)
-            })
+            let filtered_cards: BTreeSet<_> = void_card_set
+                .iter()
+                .filter(|void_card_id| {
+                    battle.cards.is_valid_object_id(void_card_id.id, void_card_id.object_id)
+                })
+                .copied()
+                .collect();
+
+            if filtered_cards.is_empty() {
+                None
+            } else {
+                Some(StandardEffectTarget::VoidCards(filtered_cards))
+            }
         }
     }
 }

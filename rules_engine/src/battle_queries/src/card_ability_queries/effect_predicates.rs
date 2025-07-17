@@ -28,6 +28,7 @@ pub fn matching_characters(
             let battlefield = battle.cards.battlefield(source.controller().opponent()).clone();
             on_battlefield(battle, source, battlefield, card_predicate)
         }
+        Predicate::YourVoid(_) | Predicate::EnemyVoid(_) => CardSet::default(),
         _ => todo!("Implement {:?}", predicate),
     }
 }
@@ -51,6 +52,7 @@ pub fn matching_cards_on_stack(
             let battlefield = battle.cards.stack_set(source.controller().opponent()).clone();
             on_stack(battle, source, battlefield, card_predicate)
         }
+        Predicate::YourVoid(_) | Predicate::EnemyVoid(_) => CardSet::default(),
         _ => todo!("Implement {:?}", predicate),
     }
 }
@@ -70,8 +72,13 @@ pub fn matching_cards_in_void(
             that_card
                 .and_then(|id| battle.cards.to_void_card_id(source.controller().opponent(), id)),
         ),
-        Predicate::Your(card_predicate) => {
+        Predicate::Your(_) => CardSet::default(),
+        Predicate::YourVoid(card_predicate) => {
             let void = battle.cards.void(source.controller()).clone();
+            in_void(battle, source, void, card_predicate)
+        }
+        Predicate::EnemyVoid(card_predicate) => {
+            let void = battle.cards.void(source.controller().opponent()).clone();
             in_void(battle, source, void, card_predicate)
         }
         _ => todo!("Implement {:?}", predicate),
