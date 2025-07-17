@@ -4,7 +4,7 @@ use core_data::types::PlayerName;
 use strum_macros::EnumDiscriminants;
 
 use crate::battle::battle_state::PendingEffectIndex;
-use crate::battle::card_id::{CharacterId, DeckCardId, StackCardId};
+use crate::battle::card_id::{CharacterId, DeckCardId, StackCardId, VoidCardId};
 use crate::battle_cards::card_set::CardSet;
 use crate::battle_cards::stack_card_state::{EffectTargets, StackItemId};
 use crate::core::effect_source::EffectSource;
@@ -37,9 +37,19 @@ pub struct PromptData {
 pub enum PromptType {
     ChooseCharacter { on_selected: OnSelected, valid: CardSet<CharacterId> },
     ChooseStackCard { on_selected: OnSelected, valid: CardSet<StackCardId> },
+    ChooseVoidCard(ChooseVoidCardPrompt),
     Choose { choices: Vec<PromptChoice> },
     ChooseEnergyValue { minimum: Energy, maximum: Energy },
     SelectDeckCardOrder { prompt: SelectDeckCardOrderPrompt },
+}
+
+#[derive(Debug, Clone)]
+pub struct ChooseVoidCardPrompt {
+    pub on_selected: OnSelected,
+    pub valid: CardSet<VoidCardId>,
+    pub selected: CardSet<VoidCardId>,
+    pub minimum_selection: u32,
+    pub maximum_selection: u32,
 }
 
 /// State for a prompt to select a deck card order.

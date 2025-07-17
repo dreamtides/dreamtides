@@ -1,7 +1,9 @@
 use battle_state::actions::battle_actions::{
     BattleAction, CardOrderSelectionTarget, DeckCardSelectedOrder,
 };
-use battle_state::battle::card_id::{ActivatedAbilityId, CharacterId, HandCardId, StackCardId};
+use battle_state::battle::card_id::{
+    ActivatedAbilityId, CharacterId, HandCardId, StackCardId, VoidCardId,
+};
 use battle_state::battle_cards::card_set::CardSet;
 use battle_state::prompt_types::prompt_data::SelectDeckCardOrderPrompt;
 use core_data::numerics::Energy;
@@ -15,12 +17,30 @@ pub enum LegalActions {
     NoActionsOpponentPrompt,
     NoActionsOpponentPriority,
     NoActionsInCurrentPhase,
-    Standard { actions: StandardLegalActions },
-    SelectCharacterPrompt { valid: CardSet<CharacterId> },
-    SelectStackCardPrompt { valid: CardSet<StackCardId> },
-    SelectPromptChoicePrompt { choice_count: usize },
-    SelectEnergyValuePrompt { minimum: Energy, maximum: Energy },
-    SelectDeckCardOrder { current: SelectDeckCardOrderPrompt },
+    Standard {
+        actions: StandardLegalActions,
+    },
+    SelectCharacterPrompt {
+        valid: CardSet<CharacterId>,
+    },
+    SelectStackCardPrompt {
+        valid: CardSet<StackCardId>,
+    },
+    SelectVoidCardPrompt {
+        valid: CardSet<VoidCardId>,
+        minimum_selection: u32,
+        maximum_selection: u32,
+    },
+    SelectPromptChoicePrompt {
+        choice_count: usize,
+    },
+    SelectEnergyValuePrompt {
+        minimum: Energy,
+        maximum: Energy,
+    },
+    SelectDeckCardOrder {
+        current: SelectDeckCardOrderPrompt,
+    },
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -106,6 +126,13 @@ impl LegalActions {
                     false
                 }
             }
+            BattleAction::SelectVoidCardTarget(void_card_id) => {
+                if let LegalActions::SelectVoidCardPrompt { valid, .. } = self {
+                    valid.contains(void_card_id)
+                } else {
+                    false
+                }
+            }
             BattleAction::SelectPromptChoice(index) => {
                 if let LegalActions::SelectPromptChoicePrompt { choice_count } = self {
                     index < *choice_count
@@ -151,6 +178,7 @@ impl LegalActions {
             LegalActions::Standard { .. } => false,
             LegalActions::SelectCharacterPrompt { valid } => valid.is_empty(),
             LegalActions::SelectStackCardPrompt { valid } => valid.is_empty(),
+            LegalActions::SelectVoidCardPrompt { valid, .. } => valid.is_empty(),
             LegalActions::SelectPromptChoicePrompt { choice_count } => *choice_count == 0,
             LegalActions::SelectEnergyValuePrompt { minimum, maximum } => maximum < minimum,
             LegalActions::SelectDeckCardOrder { .. } => false,
@@ -174,6 +202,7 @@ impl LegalActions {
 
             LegalActions::SelectCharacterPrompt { valid } => valid.len(),
             LegalActions::SelectStackCardPrompt { valid } => valid.len(),
+            LegalActions::SelectVoidCardPrompt { valid, .. } => valid.len(),
             LegalActions::SelectPromptChoicePrompt { choice_count } => *choice_count,
             LegalActions::SelectEnergyValuePrompt { minimum, maximum } => {
                 if maximum >= minimum {
@@ -262,6 +291,11 @@ impl LegalActions {
                 .find(|id| !actions.contains(&BattleAction::SelectStackCardTarget(*id)))
                 .map(BattleAction::SelectStackCardTarget),
 
+            LegalActions::SelectVoidCardPrompt { valid, .. } => valid
+                .iter()
+                .find(|id| !actions.contains(&BattleAction::SelectVoidCardTarget(*id)))
+                .map(BattleAction::SelectVoidCardTarget),
+
             LegalActions::SelectPromptChoicePrompt { choice_count } => (0..*choice_count)
                 .find(|&i| !actions.contains(&BattleAction::SelectPromptChoice(i)))
                 .map(BattleAction::SelectPromptChoice),
@@ -342,6 +376,10 @@ impl LegalActions {
 
             LegalActions::SelectStackCardPrompt { valid } => {
                 valid.iter().map(BattleAction::SelectStackCardTarget).collect::<Vec<_>>()
+            }
+
+            LegalActions::SelectVoidCardPrompt { valid, .. } => {
+                valid.iter().map(BattleAction::SelectVoidCardTarget).collect::<Vec<_>>()
             }
 
             LegalActions::SelectPromptChoicePrompt { choice_count } => {
@@ -442,6 +480,15 @@ impl LegalActions {
                 } else {
                     let index = fastrand::usize(..valid.len());
                     valid.iter().nth(index).map(BattleAction::SelectStackCardTarget)
+                }
+            }
+
+            LegalActions::SelectVoidCardPrompt { valid, .. } => {
+                if valid.is_empty() {
+                    None
+                } else {
+                    let index = fastrand::usize(..valid.len());
+                    valid.iter().nth(index).map(BattleAction::SelectVoidCardTarget)
                 }
             }
 

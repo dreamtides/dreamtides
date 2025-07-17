@@ -111,9 +111,9 @@ fn get_prompt_message_from_source(battle: &BattleState, prompt: &PromptData) -> 
     let config = find_ability_configuration(abilities, ability_number)?;
 
     match &prompt.prompt_type {
-        PromptType::ChooseCharacter { .. } | PromptType::ChooseStackCard { .. } => {
-            config.targeting_prompt.clone()
-        }
+        PromptType::ChooseCharacter { .. }
+        | PromptType::ChooseStackCard { .. }
+        | PromptType::ChooseVoidCard { .. } => config.targeting_prompt.clone(),
         PromptType::Choose { .. } => config.choice_prompt.clone(),
         PromptType::ChooseEnergyValue { .. } => config.additional_cost_prompt.clone(),
         PromptType::SelectDeckCardOrder { .. } => None,
@@ -149,6 +149,7 @@ fn get_generic_prompt_message(prompt_type: &PromptType) -> String {
     match prompt_type {
         PromptType::ChooseCharacter { .. } => "Choose a character".to_string(),
         PromptType::ChooseStackCard { .. } => "Select a card".to_string(),
+        PromptType::ChooseVoidCard { .. } => "Select a card from your void".to_string(),
         PromptType::Choose { .. } => "Select an option".to_string(),
         PromptType::ChooseEnergyValue { .. } => "Choose energy amount".to_string(),
         PromptType::SelectDeckCardOrder { .. } => "Select card position".to_string(),

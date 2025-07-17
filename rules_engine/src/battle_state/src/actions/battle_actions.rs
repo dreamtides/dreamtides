@@ -33,6 +33,8 @@ pub enum BattleAction {
     SelectCharacterTarget(CharacterId),
     /// Select a card on the stack as a target
     SelectStackCardTarget(StackCardId),
+    /// Select a card in a void as a target
+    SelectVoidCardTarget(VoidCardId),
     /// Select a choice at a given index position in response to a prompt.
     SelectPromptChoice(usize),
     /// Pick an amount of energy to pay as an additional cost to play a card.
@@ -103,6 +105,9 @@ impl BattleAction {
             }
             BattleAction::SelectStackCardTarget(stack_card_id) => {
                 format!("SSCT{:?}", stack_card_id.0.0)
+            }
+            BattleAction::SelectVoidCardTarget(void_card_id) => {
+                format!("SVC{:?}", void_card_id.0.0)
             }
             BattleAction::SelectPromptChoice(index) => format!("SPC{index:?}"),
             BattleAction::SelectEnergyAdditionalCost(energy) => format!("SEAC{}", energy.0),

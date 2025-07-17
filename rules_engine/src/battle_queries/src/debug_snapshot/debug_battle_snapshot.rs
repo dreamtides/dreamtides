@@ -217,6 +217,13 @@ fn format_prompt_choices(prompt: &PromptType) -> Vec<String> {
         PromptType::ChooseStackCard { valid, .. } => {
             valid.iter().map(|id| format!("{id:?}")).collect()
         }
+        PromptType::ChooseVoidCard(prompt) => {
+            vec![
+                format!("valid: {:?}", prompt.valid),
+                format!("minimum_selection: {:?}", prompt.minimum_selection),
+                format!("maximum_selection: {:?}", prompt.maximum_selection),
+            ]
+        }
         PromptType::Choose { choices } => {
             choices.iter().map(|choice| format!("{choice:?}")).collect()
         }

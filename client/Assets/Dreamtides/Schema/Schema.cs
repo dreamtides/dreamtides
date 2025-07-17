@@ -825,6 +825,8 @@ namespace Dreamtides.Schema
     ///
     /// Select a card on the stack as a target
     ///
+    /// Select a card in a void as a target
+    ///
     /// Select a choice at a given index position in response to a prompt.
     ///
     /// Pick an amount of energy to pay as an additional cost to play a card.
@@ -850,6 +852,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("selectStackCardTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectStackCardTarget { get; set; }
+
+        [JsonProperty("selectVoidCardTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SelectVoidCardTarget { get; set; }
 
         [JsonProperty("selectPromptChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectPromptChoice { get; set; }

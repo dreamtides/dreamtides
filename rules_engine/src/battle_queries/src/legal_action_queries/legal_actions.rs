@@ -29,6 +29,11 @@ pub fn compute(battle: &BattleState, player: PlayerName) -> LegalActions {
             PromptType::ChooseStackCard { valid, .. } => {
                 LegalActions::SelectStackCardPrompt { valid: valid.clone() }
             }
+            PromptType::ChooseVoidCard(prompt) => LegalActions::SelectVoidCardPrompt {
+                valid: prompt.valid.clone(),
+                minimum_selection: prompt.minimum_selection,
+                maximum_selection: prompt.maximum_selection,
+            },
             PromptType::Choose { choices } => {
                 LegalActions::SelectPromptChoicePrompt { choice_count: choices.len() }
             }
