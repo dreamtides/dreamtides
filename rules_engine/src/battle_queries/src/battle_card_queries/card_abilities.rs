@@ -468,10 +468,12 @@ fn compute_event_target_restriction(list: &AbilityList) -> Option<CanPlayRestric
             Effect::Effect(effect) => vec![
                 effect_predicates::get_character_target_predicate(effect),
                 effect_predicates::get_stack_target_predicate(effect),
+                effect_predicates::get_void_target_predicate(effect),
             ],
             Effect::WithOptions(options) => vec![
                 effect_predicates::get_character_target_predicate(&options.effect),
                 effect_predicates::get_stack_target_predicate(&options.effect),
+                effect_predicates::get_void_target_predicate(&options.effect),
             ],
             Effect::List(effects) => effects
                 .iter()
@@ -479,6 +481,7 @@ fn compute_event_target_restriction(list: &AbilityList) -> Option<CanPlayRestric
                     vec![
                         effect_predicates::get_character_target_predicate(&effect.effect),
                         effect_predicates::get_stack_target_predicate(&effect.effect),
+                        effect_predicates::get_void_target_predicate(&effect.effect),
                     ]
                 })
                 .collect(),

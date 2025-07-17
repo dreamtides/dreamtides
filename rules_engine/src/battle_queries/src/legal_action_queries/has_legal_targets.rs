@@ -53,6 +53,8 @@ fn has_legal_targets_for_standard_effect(
         !effect_predicates::matching_characters(battle, source, predicate, None).is_empty()
     } else if let Some(predicate) = effect_predicates::get_stack_target_predicate(effect) {
         !effect_predicates::matching_cards_on_stack(battle, source, predicate, None).is_empty()
+    } else if let Some(predicate) = effect_predicates::get_void_target_predicate(effect) {
+        !effect_predicates::matching_cards_in_void(battle, source, predicate, None).is_empty()
     } else {
         true
     }
