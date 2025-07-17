@@ -1,11 +1,10 @@
-use std::collections::VecDeque;
+use std::collections::{BTreeSet, VecDeque};
 
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 
 use crate::battle::card_id::{ActivatedAbilityId, CharacterId, StackCardId, VoidCardId};
 use crate::battle_cards::battle_card_state::ObjectId;
-use crate::battle_cards::card_set::CardSet;
 
 /// A vector of items on the stack
 ///
@@ -77,7 +76,7 @@ pub enum EffectTargets {
     EffectList(VecDeque<Option<StandardEffectTarget>>),
 }
 
-#[derive(Clone, Debug, Copy)]
+#[derive(Clone, Debug, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct VoidCardTarget {
     pub id: VoidCardId,
     pub object_id: ObjectId,
@@ -87,7 +86,7 @@ pub struct VoidCardTarget {
 pub enum StandardEffectTarget {
     Character(CharacterId, ObjectId),
     StackCard(StackCardId, ObjectId),
-    VoidCards(CardSet<VoidCardId>),
+    VoidCards(BTreeSet<VoidCardTarget>),
 }
 
 impl EffectTargets {

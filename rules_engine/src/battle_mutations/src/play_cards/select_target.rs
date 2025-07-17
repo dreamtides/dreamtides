@@ -1,9 +1,13 @@
+use std::collections::BTreeSet;
+
 use battle_queries::battle_card_queries::card;
 use battle_queries::panic_with;
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CharacterId, StackCardId, VoidCardId};
-use battle_state::battle_cards::stack_card_state::{EffectTargets, StandardEffectTarget};
+use battle_state::battle_cards::stack_card_state::{
+    EffectTargets, StandardEffectTarget, VoidCardTarget,
+};
 use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{OnSelected, PromptType};
 use core_data::types::PlayerName;
@@ -117,12 +121,18 @@ pub fn submit_void_card_targets(battle: &mut BattleState, player: PlayerName) {
         panic_with!("Not enough void cards selected", battle);
     }
 
+    let mut void_targets = BTreeSet::new();
+    for void_card_id in void_prompt.selected.iter() {
+        let object_id = card::get(battle, void_card_id).object_id;
+        void_targets.insert(VoidCardTarget { id: void_card_id, object_id });
+    }
+
     match void_prompt.on_selected {
         OnSelected::AddStackTargets(stack_item_id) => {
             let Some(stack_item) = battle.cards.stack_item_mut(stack_item_id) else {
                 panic_with!("Stack item not found", battle);
             };
-            let target = StandardEffectTarget::VoidCards(void_prompt.selected.clone());
+            let target = StandardEffectTarget::VoidCards(void_targets.clone());
             match &mut stack_item.targets {
                 Some(existing_targets) => existing_targets.add(target),
                 None => stack_item.targets = Some(EffectTargets::Standard(target)),
@@ -132,16 +142,14 @@ pub fn submit_void_card_targets(battle: &mut BattleState, player: PlayerName) {
             battle.push_animation(source, || BattleAnimation::SelectStackCardTargets {
                 player,
                 source_id,
-                targets: EffectTargets::Standard(StandardEffectTarget::VoidCards(
-                    void_prompt.selected,
-                )),
+                targets: EffectTargets::Standard(StandardEffectTarget::VoidCards(void_targets)),
             });
         }
         OnSelected::AddPendingEffectTarget(pending_effect_index) => {
             let Some(pending_effect) = battle.pending_effect_mut(pending_effect_index) else {
                 panic_with!("Pending effect not found", battle, pending_effect_index);
             };
-            let target = StandardEffectTarget::VoidCards(void_prompt.selected);
+            let target = StandardEffectTarget::VoidCards(void_targets);
             match &mut pending_effect.requested_targets {
                 Some(existing_targets) => existing_targets.add(target),
                 None => pending_effect.requested_targets = Some(EffectTargets::Standard(target)),

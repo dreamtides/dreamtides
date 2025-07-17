@@ -63,8 +63,8 @@ fn is_target_valid(battle: &BattleState, target: &StandardEffectTarget) -> bool 
         }
         StandardEffectTarget::VoidCards(void_card_set) => {
             void_card_set.iter().all(|void_card_id| {
-                battle.cards.void(PlayerName::One).contains(void_card_id)
-                    || battle.cards.void(PlayerName::Two).contains(void_card_id)
+                battle.cards.void(PlayerName::One).contains(void_card_id.id)
+                    || battle.cards.void(PlayerName::Two).contains(void_card_id.id)
             })
         }
     }

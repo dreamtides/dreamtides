@@ -1,10 +1,12 @@
-use std::collections::VecDeque;
+use std::collections::{BTreeSet, VecDeque};
 
 use ability_data::effect::Effect;
 use ability_data::standard_effect::StandardEffect;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardId;
-use battle_state::battle_cards::stack_card_state::{EffectTargets, StandardEffectTarget};
+use battle_state::battle_cards::stack_card_state::{
+    EffectTargets, StandardEffectTarget, VoidCardTarget,
+};
 use battle_state::core::effect_source::EffectSource;
 
 use crate::battle_card_queries::card;
@@ -99,7 +101,15 @@ fn standard_effect_automatic_targets(
     } else if let Some(target_predicate) = effect_predicates::get_void_target_predicate(effect) {
         let valid =
             effect_predicates::matching_cards_in_void(battle, source, target_predicate, that_card);
-        if valid.len() == 1 { Some(StandardEffectTarget::VoidCards(valid)) } else { None }
+        if valid.len() == 1 {
+            let void_card_id = valid.iter().next().unwrap();
+            let object_id = card::get(battle, void_card_id).object_id;
+            let mut void_targets = BTreeSet::new();
+            void_targets.insert(VoidCardTarget { id: void_card_id, object_id });
+            Some(StandardEffectTarget::VoidCards(void_targets))
+        } else {
+            None
+        }
     } else {
         None
     }

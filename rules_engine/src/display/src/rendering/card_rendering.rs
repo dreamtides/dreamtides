@@ -340,8 +340,8 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
                     )) => {
                         vec![target_stack_card_id.card_id()]
                     }
-                    EffectTargets::Standard(StandardEffectTarget::VoidCards(void_cards)) => {
-                        void_cards.iter().map(|id| id.card_id()).collect()
+                    EffectTargets::Standard(StandardEffectTarget::VoidCards(void_card_targets)) => {
+                        void_card_targets.iter().map(|target| target.id.card_id()).collect()
                     }
                     EffectTargets::EffectList(target_list) => target_list
                         .iter()
@@ -352,8 +352,8 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
                             Some(StandardEffectTarget::StackCard(stack_card_id, _)) => {
                                 vec![stack_card_id.card_id()]
                             }
-                            Some(StandardEffectTarget::VoidCards(void_cards)) => {
-                                void_cards.iter().map(|id| id.card_id()).collect()
+                            Some(StandardEffectTarget::VoidCards(void_card_targets)) => {
+                                void_card_targets.iter().map(|target| target.id.card_id()).collect()
                             }
                             None => vec![],
                         })
@@ -379,8 +379,8 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
             EffectTargets::Standard(StandardEffectTarget::StackCard(target_stack_card_id, _)) => {
                 vec![target_stack_card_id.card_id()]
             }
-            EffectTargets::Standard(StandardEffectTarget::VoidCards(void_cards)) => {
-                void_cards.iter().map(|id| id.card_id()).collect()
+            EffectTargets::Standard(StandardEffectTarget::VoidCards(void_card_targets)) => {
+                void_card_targets.iter().map(|target| target.id.card_id()).collect()
             }
             EffectTargets::EffectList(target_list) => target_list
                 .iter()
@@ -391,8 +391,8 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
                     Some(StandardEffectTarget::StackCard(stack_card_id, _)) => {
                         vec![stack_card_id.card_id()]
                     }
-                    Some(StandardEffectTarget::VoidCards(void_cards)) => {
-                        void_cards.iter().map(|id| id.card_id()).collect()
+                    Some(StandardEffectTarget::VoidCards(void_card_targets)) => {
+                        void_card_targets.iter().map(|target| target.id.card_id()).collect()
                     }
                     None => vec![],
                 })
