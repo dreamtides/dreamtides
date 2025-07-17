@@ -1,4 +1,6 @@
-use battle_state::battle::card_id::{CharacterId, StackCardId};
+use battle_queries::panic_with;
+use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::card_id::{CharacterId, StackCardId, VoidCardId};
 use battle_state::battle_cards::stack_card_state::{EffectTargets, StandardEffectTarget};
 
 /// Returns the [CharacterId] for a set of EffectTargets.
@@ -40,6 +42,47 @@ pub fn stack_card_id(targets: &mut Option<EffectTargets>) -> Option<StackCardId>
                     *targets = Some(EffectTargets::EffectList(target_list));
                 }
                 Some(stack_card_id)
+            } else {
+                if !target_list.is_empty() {
+                    *targets = Some(EffectTargets::EffectList(target_list));
+                }
+                None
+            }
+        }
+        _ => None,
+    }
+}
+
+/// Returns the [VoidCardId] for a set of EffectTargets.
+///
+/// Panics if there is more than 1 void card in the target set.
+/// Returns None if there are no void cards in the target set.
+pub fn void_card_id(
+    battle: &BattleState,
+    targets: &mut Option<EffectTargets>,
+) -> Option<VoidCardId> {
+    match targets.take() {
+        Some(EffectTargets::Standard(StandardEffectTarget::VoidCards(void_cards))) => {
+            let length = void_cards.len();
+            match length {
+                0 => None,
+                1 => Some(void_cards.into_iter().next().unwrap().id),
+                _ => panic_with!("Expected at most 1 void card target", battle, length),
+            }
+        }
+        Some(EffectTargets::EffectList(mut target_list)) => {
+            if let Some(Some(StandardEffectTarget::VoidCards(void_cards))) = target_list.pop_front()
+            {
+                let length = void_cards.len();
+                let result = match length {
+                    0 => None,
+                    1 => Some(void_cards.into_iter().next().unwrap().id),
+                    _ => panic_with!("Expected at most 1 void card target", battle, length),
+                };
+                if !target_list.is_empty() {
+                    *targets = Some(EffectTargets::EffectList(target_list));
+                }
+                result
             } else {
                 if !target_list.is_empty() {
                     *targets = Some(EffectTargets::EffectList(target_list));

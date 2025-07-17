@@ -148,6 +148,19 @@ pub fn from_deck_to_void(
     VoidCardId(card_id.card_id())
 }
 
+/// Moves a card from the 'controller' player's void to their hand.
+///
+/// Panics if this card is not found in the void.
+pub fn from_void_to_hand(
+    battle: &mut BattleState,
+    source: EffectSource,
+    controller: PlayerName,
+    card_id: VoidCardId,
+) -> HandCardId {
+    to_destination_zone(battle, source, controller, card_id.card_id(), Zone::Void, Zone::Hand);
+    HandCardId(card_id.card_id())
+}
+
 /// Moves a card from the 'old' zone to the 'new' zone.
 ///
 /// Panics if this card is not found in the 'old' zone.

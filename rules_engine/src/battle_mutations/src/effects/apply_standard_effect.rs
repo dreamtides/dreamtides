@@ -14,7 +14,7 @@ use battle_state::prompt_types::prompt_data::{
 use core_data::numerics::Spark;
 use core_data::types::PlayerName;
 
-use crate::card_mutations::{counterspell, deck, spark};
+use crate::card_mutations::{counterspell, deck, move_card, spark};
 use crate::character_mutations::dissolve;
 use crate::effects::apply_effect::EffectWasApplied;
 use crate::effects::{counterspell_unless_pays_cost, pay_cost, targeting};
@@ -46,6 +46,9 @@ pub fn apply(
         StandardEffect::Foresee { count } => foresee(battle, source, targets, *count),
         StandardEffect::GainsSpark { gains, .. } => gains_spark(battle, source, targets, *gains),
         StandardEffect::OpponentPaysCost { cost } => opponent_pays_cost(battle, source, cost),
+        StandardEffect::ReturnFromYourVoidToHand { .. } => {
+            return_from_your_void_to_hand(battle, source, targets)
+        }
         _ => todo!("Implement {:?}", effect),
     }
 }
@@ -156,5 +159,15 @@ fn opponent_pays_cost(
     cost: &Cost,
 ) -> Option<EffectWasApplied> {
     pay_cost::execute(battle, source, source.controller().opponent(), cost);
+    Some(EffectWasApplied)
+}
+
+fn return_from_your_void_to_hand(
+    battle: &mut BattleState,
+    source: EffectSource,
+    targets: &mut Option<EffectTargets>,
+) -> Option<EffectWasApplied> {
+    let id = targeting::void_card_id(battle, targets)?;
+    move_card::from_void_to_hand(battle, source, source.controller(), id);
     Some(EffectWasApplied)
 }
