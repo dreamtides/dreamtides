@@ -2008,6 +2008,12 @@ namespace Dreamtides.Schema
         public ButtonView BottomRightButton { get; set; }
 
         /// <summary>
+        /// Options for displaying the card browser
+        /// </summary>
+        [JsonProperty("browser")]
+        public CardBrowserView Browser { get; set; }
+
+        /// <summary>
         /// Options for display of the card order selector
         /// </summary>
         [JsonProperty("cardOrderSelector")]
@@ -2079,6 +2085,17 @@ namespace Dreamtides.Schema
 
         [JsonProperty("label", Required = Required.Always)]
         public string Label { get; set; }
+    }
+
+    public partial class CardBrowserView
+    {
+        /// <summary>
+        /// Action to perform when the close button is clicked.
+        ///
+        /// If None is provided, no close button should be shown.
+        /// </summary>
+        [JsonProperty("closeButton")]
+        public ActionUnion? CloseButton { get; set; }
     }
 
     public partial class CardOrderSelectorView

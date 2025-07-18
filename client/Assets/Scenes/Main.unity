@@ -11428,7 +11428,7 @@ MonoBehaviour:
   _isOpen: 0
   _scrollAmount: 0
   _scrollbar: {fileID: 2133012749}
-  _closeButton: {fileID: 1007991256}
+  _closeButton: {fileID: 1007991259}
   _maxStackOffsetRight: 1
   _singleCardPosition: {fileID: 1956300935}
 --- !u!1 &1170379167
@@ -12717,6 +12717,7 @@ MonoBehaviour:
   _devButton: {fileID: 794038739}
   _enemyMessage: {fileID: 368858825}
   _thinkingIndicator: {fileID: 1469154542}
+  _closeBrowserButton: {fileID: 1007991259}
 --- !u!1 &1305327827
 GameObject:
   m_ObjectHideFlags: 0
@@ -13977,6 +13978,7 @@ MonoBehaviour:
   _devButton: {fileID: 794038739}
   _enemyMessage: {fileID: 1395752109}
   _thinkingIndicator: {fileID: 0}
+  _closeBrowserButton: {fileID: 1097085172}
 --- !u!1 &1445320602
 GameObject:
   m_ObjectHideFlags: 0
@@ -17137,7 +17139,7 @@ MonoBehaviour:
   _isOpen: 0
   _scrollAmount: 0
   _scrollbar: {fileID: 62616640}
-  _closeButton: {fileID: 1097085173}
+  _closeButton: {fileID: 1097085172}
   _maxStackOffsetRight: 1
   _singleCardPosition: {fileID: 1210469376}
 --- !u!114 &1886409222

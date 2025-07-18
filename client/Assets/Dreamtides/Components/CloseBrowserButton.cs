@@ -8,19 +8,38 @@ public class CloseBrowserButton : MonoBehaviour
 {
   [SerializeField] Registry _registry = null!;
 
+  GameAction? _closeAction;
+  public GameAction? CloseAction
+  {
+    set
+    {
+      gameObject.SetActive(value.HasValue);
+      _closeAction = value;
+    }
+  }
+
+  public void SetActiveIfHasAction(bool active)
+  {
+    if (_closeAction.HasValue)
+    {
+      gameObject.SetActive(active);
+    }
+    else
+    {
+      gameObject.SetActive(false);
+    }
+  }
+
   public void OnClick()
   {
     _registry.SoundService.PlayClickSound();
-    var action = new GameAction
+    if (_closeAction.HasValue)
     {
-      GameActionClass = new()
-      {
-        BattleDisplayAction = new()
-        {
-          Enum = BattleDisplayActionEnum.CloseCardBrowser
-        }
-      }
-    };
-    _registry.ActionService.PerformAction(action);
+      _registry.ActionService.PerformAction(_closeAction.Value);
+    }
+    else
+    {
+      _registry.LoggingService.LogError("CloseBrowserButton: No close action set");
+    }
   }
 }

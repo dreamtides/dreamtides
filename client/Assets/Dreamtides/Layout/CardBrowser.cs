@@ -2,6 +2,7 @@
 
 using System.Runtime.CompilerServices;
 using DG.Tweening;
+using Dreamtides.Components;
 using Dreamtides.Services;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,7 +14,7 @@ namespace Dreamtides.Layout
   {
     [SerializeField] internal float _scrollAmount;
     [SerializeField] internal Scrollbar _scrollbar = null!;
-    [SerializeField] internal Button _closeButton = null!;
+    [SerializeField] internal CloseBrowserButton _closeButton = null!;
     [SerializeField] internal float _maxStackOffsetRight = 1f;
     [SerializeField] internal Transform _singleCardPosition = null!;
 
@@ -52,7 +53,7 @@ namespace Dreamtides.Layout
         return false;
       }
 
-      _closeButton.gameObject.SetActive(visible);
+      _closeButton.SetActiveIfHasAction(visible);
       return true;
     }
 

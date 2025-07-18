@@ -138,6 +138,9 @@ namespace Dreamtides.Layout
     [SerializeField] GameObject? _thinkingIndicator;
     public GameObject ThinkingIndicator => Check(_thinkingIndicator);
 
+    [SerializeField] CloseBrowserButton? _closeBrowserButton;
+    public CloseBrowserButton CloseBrowserButton => Check(_closeBrowserButton);
+
     T Check<T>(T? value) where T : Object =>
         Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
   }

@@ -94,11 +94,23 @@ pub struct InterfaceView {
     /// Button to perform an undo operation
     pub undo_button: Option<ButtonView>,
 
+    /// Options for displaying the card browser
+    pub browser: Option<CardBrowserView>,
+
     /// Options for display of the card order selector
     pub card_order_selector: Option<CardOrderSelectorView>,
 
     /// Button most often used for toggling the visibility of card browsers.
     pub bottom_right_button: Option<ButtonView>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct CardBrowserView {
+    /// Action to perform when the close button is clicked.
+    ///
+    /// If None is provided, no close button should be shown.
+    pub close_button: Option<GameAction>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]

@@ -12,7 +12,9 @@ use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{PromptData, PromptType};
 use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
-use display_data::battle_view::{ButtonView, CardOrderSelectorView, InterfaceView};
+use display_data::battle_view::{
+    ButtonView, CardBrowserView, CardOrderSelectorView, InterfaceView,
+};
 use masonry::dimension::{FlexInsets, SafeAreaInsets};
 use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition};
 use masonry::flex_style::FlexStyle;
@@ -70,6 +72,7 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
             label: "\u{f0e2}".to_string(),
             action: Some(GameAction::Undo(builder.act_for_player())),
         }),
+        browser: card_browser_view(builder),
         card_order_selector: card_order_selector_view(battle),
         bottom_right_button: None,
     }
@@ -325,6 +328,18 @@ fn render_hide_stack_button(
             )
             .build(),
     )
+}
+
+fn card_browser_view(builder: &ResponseBuilder) -> Option<CardBrowserView> {
+    if display_state::get_card_browser_source(builder).is_some() {
+        Some(CardBrowserView {
+            close_button: Some(GameAction::BattleDisplayAction(
+                BattleDisplayAction::CloseCardBrowser,
+            )),
+        })
+    } else {
+        None
+    }
 }
 
 fn card_order_selector_view(battle: &BattleState) -> Option<CardOrderSelectorView> {
