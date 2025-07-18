@@ -47,7 +47,11 @@ namespace Dreamtides.Services
     {
       if (Registry.Layout.Browser.Objects.Count > 0)
       {
-        return new HashSet<GameContext> { GameContext.Browser, GameContext.Hand };
+        return new HashSet<GameContext> {
+          GameContext.Browser,
+          GameContext.Hand,
+          GameContext.PrimaryActionButton
+        };
       }
 
       return null;
