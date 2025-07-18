@@ -203,7 +203,7 @@ impl LegalActions {
             LegalActions::Standard { .. } => false,
             LegalActions::SelectCharacterPrompt { valid } => valid.is_empty(),
             LegalActions::SelectStackCardPrompt { valid } => valid.is_empty(),
-            LegalActions::SelectVoidCardPrompt { valid, .. } => valid.is_empty(),
+            LegalActions::SelectVoidCardPrompt { .. } => false,
             LegalActions::SelectPromptChoicePrompt { choice_count } => *choice_count == 0,
             LegalActions::SelectEnergyValuePrompt { minimum, maximum } => maximum < minimum,
             LegalActions::SelectDeckCardOrder { .. } => false,
@@ -227,7 +227,13 @@ impl LegalActions {
 
             LegalActions::SelectCharacterPrompt { valid } => valid.len(),
             LegalActions::SelectStackCardPrompt { valid } => valid.len(),
-            LegalActions::SelectVoidCardPrompt { valid, .. } => valid.len(),
+            LegalActions::SelectVoidCardPrompt { valid, current, maximum_selection } => {
+                if current.len() == *maximum_selection {
+                    1 // SubmitVoidCardTargets, only for AI when at max selection
+                } else {
+                    valid.len()
+                }
+            }
             LegalActions::SelectPromptChoicePrompt { choice_count } => *choice_count,
             LegalActions::SelectEnergyValuePrompt { minimum, maximum } => {
                 if maximum >= minimum {
@@ -316,10 +322,21 @@ impl LegalActions {
                 .find(|id| !actions.contains(&BattleAction::SelectStackCardTarget(*id)))
                 .map(BattleAction::SelectStackCardTarget),
 
-            LegalActions::SelectVoidCardPrompt { valid, .. } => valid
-                .iter()
-                .find(|id| !actions.contains(&BattleAction::SelectVoidCardTarget(*id)))
-                .map(BattleAction::SelectVoidCardTarget),
+            LegalActions::SelectVoidCardPrompt { valid, current, maximum_selection } => {
+                if current.len() == *maximum_selection {
+                    // For now only submit for AI when at max selection
+                    if actions.contains(&BattleAction::SubmitVoidCardTargets) {
+                        None
+                    } else {
+                        Some(BattleAction::SubmitVoidCardTargets)
+                    }
+                } else {
+                    valid
+                        .iter()
+                        .find(|id| !actions.contains(&BattleAction::SelectVoidCardTarget(*id)))
+                        .map(BattleAction::SelectVoidCardTarget)
+                }
+            }
 
             LegalActions::SelectPromptChoicePrompt { choice_count } => (0..*choice_count)
                 .find(|&i| !actions.contains(&BattleAction::SelectPromptChoice(i)))
@@ -403,10 +420,13 @@ impl LegalActions {
                 valid.iter().map(BattleAction::SelectStackCardTarget).collect::<Vec<_>>()
             }
 
-            LegalActions::SelectVoidCardPrompt { valid, .. } => {
+            LegalActions::SelectVoidCardPrompt { valid, current, maximum_selection } => {
                 let mut result =
                     valid.iter().map(BattleAction::SelectVoidCardTarget).collect::<Vec<_>>();
-                result.push(BattleAction::SubmitVoidCardTargets);
+                if current.len() == *maximum_selection {
+                    // For now only submit for AI when at max selection
+                    result.push(BattleAction::SubmitVoidCardTargets);
+                }
                 result
             }
 
