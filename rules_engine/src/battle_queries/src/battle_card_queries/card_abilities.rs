@@ -326,7 +326,10 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                         target: Predicate::YourVoid(CardPredicate::Card),
                     }),
                 }),
-                AbilityConfiguration::default(),
+                AbilityConfiguration {
+                    targeting_prompt: Some("Select a card from your void.".to_string()),
+                    ..Default::default()
+                },
             )])
         }),
         CardName::TestReturnOneOrTwoVoidEventCardsToHand => {
@@ -335,12 +338,17 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                     AbilityNumber(0),
                     Ability::Event(EventAbility {
                         additional_cost: None,
-                        effect: Effect::Effect(StandardEffect::ReturnUpToCountForYourVoidToHand {
+                        effect: Effect::Effect(StandardEffect::ReturnUpToCountFromYourVoidToHand {
                             target: Predicate::YourVoid(CardPredicate::Event),
                             count: 2,
                         }),
                     }),
-                    AbilityConfiguration::default(),
+                    AbilityConfiguration {
+                        targeting_prompt: Some(
+                            "Select one or two events from your void.".to_string(),
+                        ),
+                        ..Default::default()
+                    },
                 )])
             })
         }

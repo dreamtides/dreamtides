@@ -175,7 +175,7 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
         StandardEffect::ReturnCharactersToHandDrawCardForEach { .. } => None,
         StandardEffect::ReturnFromYourVoidToHand { .. } => None,
         StandardEffect::ReturnFromYourVoidToPlay { .. } => None,
-        StandardEffect::ReturnUpToCountForYourVoidToHand { .. } => None,
+        StandardEffect::ReturnUpToCountFromYourVoidToHand { .. } => None,
         StandardEffect::ShuffleHandAndDeckAndDraw { .. } => None,
         StandardEffect::SparkBecomes { .. } => None,
         StandardEffect::SpendAllEnergyDissolveEnemy => None,
@@ -202,7 +202,7 @@ pub fn get_stack_target_predicate(effect: &StandardEffect) -> Option<&Predicate>
 pub fn get_void_target_predicate(effect: &StandardEffect) -> Option<&Predicate> {
     match effect {
         StandardEffect::ReturnFromYourVoidToHand { target } => Some(target),
-        StandardEffect::ReturnUpToCountForYourVoidToHand { target, .. } => Some(target),
+        StandardEffect::ReturnUpToCountFromYourVoidToHand { target, .. } => Some(target),
         _ => None,
     }
 }

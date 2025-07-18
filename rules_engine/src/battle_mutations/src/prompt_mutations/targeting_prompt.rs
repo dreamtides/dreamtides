@@ -167,7 +167,7 @@ fn standard_effect_targeting_prompt(
 
         let maximum_selection = match effect {
             StandardEffect::ReturnFromYourVoidToHand { .. } => 1,
-            StandardEffect::ReturnUpToCountForYourVoidToHand { count, .. } => *count,
+            StandardEffect::ReturnUpToCountFromYourVoidToHand { count, .. } => *count,
             _ => todo!("Implement support for predicate: {target_predicate:?}"),
         };
 

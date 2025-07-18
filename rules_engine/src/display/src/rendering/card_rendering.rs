@@ -76,9 +76,6 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
     let can_play = play_action.is_some();
     let (selection_color, selection_action) =
         outline_and_selection_action(battle, &legal_actions, card_id);
-    if card_id == CardId(39) {
-        println!(">>> Selection action for card 39: {selection_action:?}");
-    }
     let ControllerAndZone { controller, .. } = positions::controller_and_zone(battle, card_id);
 
     RevealedCardView {

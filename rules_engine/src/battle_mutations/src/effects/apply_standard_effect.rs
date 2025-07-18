@@ -49,6 +49,9 @@ pub fn apply(
         StandardEffect::ReturnFromYourVoidToHand { .. } => {
             return_from_your_void_to_hand(battle, source, targets)
         }
+        StandardEffect::ReturnUpToCountFromYourVoidToHand { .. } => {
+            return_up_to_count_from_your_void_to_hand(battle, source, targets)
+        }
         _ => todo!("Implement {:?}", effect),
     }
 }
@@ -169,5 +172,19 @@ fn return_from_your_void_to_hand(
 ) -> Option<EffectWasApplied> {
     let id = targeting::void_card_id(battle, targets)?;
     move_card::from_void_to_hand(battle, source, source.controller(), id);
+    Some(EffectWasApplied)
+}
+
+fn return_up_to_count_from_your_void_to_hand(
+    battle: &mut BattleState,
+    source: EffectSource,
+    targets: &mut Option<EffectTargets>,
+) -> Option<EffectWasApplied> {
+    let void_cards = targeting::void_card_targets(targets)?;
+
+    let controller = source.controller();
+    for void_card_target in void_cards {
+        move_card::from_void_to_hand(battle, source, controller, void_card_target.id);
+    }
     Some(EffectWasApplied)
 }
