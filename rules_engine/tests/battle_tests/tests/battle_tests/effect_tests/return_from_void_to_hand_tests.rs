@@ -11,19 +11,10 @@ fn return_void_card_to_hand_basic() {
 
     s.create_and_play(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
 
-    let cards_in_browser: Vec<_> = s
-        .user_client
-        .cards
-        .card_map
-        .values()
-        .filter(|card| matches!(card.view.position.position, Position::Browser))
-        .collect();
+    let cards_in_browser = s.user_client.cards.browser_cards();
 
     assert!(cards_in_browser.len() >= 1, "Should have at least 1 card in browser");
-    assert!(
-        cards_in_browser.iter().any(|card| card.id == void_card),
-        "Void card should be in browser"
-    );
+    assert!(cards_in_browser.contains(&void_card), "Void card should be in browser");
 
     let void_card_view = s.user_client.cards.get(&void_card);
     assert!(
@@ -32,12 +23,6 @@ fn return_void_card_to_hand_basic() {
     );
 
     s.select_target(DisplayPlayer::User, &void_card);
-
-    assert!(
-        s.user_client.interface().primary_action_button.is_some(),
-        "Submit button should be available"
-    );
-    assert_eq!(s.user_client.interface().primary_action_button.as_ref().unwrap().label, "Submit");
 
     s.click_primary_button(DisplayPlayer::User, "Submit");
 
@@ -137,27 +122,12 @@ fn return_void_card_to_hand_with_multiple_void_cards() {
 
     s.create_and_play(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
 
-    let cards_in_browser: Vec<_> = s
-        .user_client
-        .cards
-        .card_map
-        .values()
-        .filter(|card| matches!(card.view.position.position, Position::Browser))
-        .collect();
+    let cards_in_browser = s.user_client.cards.browser_cards();
 
     assert_eq!(cards_in_browser.len(), 3, "Should have 3 cards in browser");
-    assert!(
-        cards_in_browser.iter().any(|card| card.id == void_card_1),
-        "First void card should be in browser"
-    );
-    assert!(
-        cards_in_browser.iter().any(|card| card.id == void_card_2),
-        "Second void card should be in browser"
-    );
-    assert!(
-        cards_in_browser.iter().any(|card| card.id == void_card_3),
-        "Third void card should be in browser"
-    );
+    assert!(cards_in_browser.contains(&void_card_1), "First void card should be in browser");
+    assert!(cards_in_browser.contains(&void_card_2), "Second void card should be in browser");
+    assert!(cards_in_browser.contains(&void_card_3), "Third void card should be in browser");
 
     s.select_target(DisplayPlayer::User, &void_card_2);
     s.click_primary_button(DisplayPlayer::User, "Submit");
@@ -233,13 +203,7 @@ fn return_void_card_to_hand_browser_closes_after_submit() {
     s.select_target(DisplayPlayer::User, &void_card);
     s.click_primary_button(DisplayPlayer::User, "Submit");
 
-    let cards_in_browser: Vec<_> = s
-        .user_client
-        .cards
-        .card_map
-        .values()
-        .filter(|card| matches!(card.view.position.position, Position::Browser))
-        .collect();
+    let cards_in_browser = s.user_client.cards.browser_cards();
 
     assert_eq!(cards_in_browser.len(), 0, "No cards should be in browser position after submit");
 }

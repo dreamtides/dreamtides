@@ -88,6 +88,11 @@ impl TestClientCards {
         TestClientCardList::new(cards)
     }
 
+    /// Get all cards in the browser
+    pub fn browser_cards(&self) -> TestClientCardList<'_> {
+        self.cards_at_position(&Position::Browser)
+    }
+
     /// Get a card by its ID.
     ///
     /// Panics if the card is not found.
