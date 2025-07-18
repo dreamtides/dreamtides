@@ -14,7 +14,7 @@ use battle_state::battle_cards::stack_card_state::{
 };
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::card_types::CardType;
-use core_data::display_color;
+use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::SpriteAddress;
 use core_data::identifiers::CardName;
 use core_data::types::CardFacing;
@@ -74,7 +74,11 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
     let play_action = can_play_from_hand.then_some(play_from_hand);
 
     let can_play = play_action.is_some();
-    let selection_action = selection_action(&legal_actions, card_id);
+    let (selection_color, selection_action) =
+        outline_and_selection_action(battle, &legal_actions, card_id);
+    if card_id == CardId(39) {
+        println!(">>> Selection action for card 39: {selection_action:?}");
+    }
     let ControllerAndZone { controller, .. } = positions::controller_and_zone(battle, card_id);
 
     RevealedCardView {
@@ -86,9 +90,9 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
             .or_else(|| card_properties::base_spark(battle, card_id)),
         card_type: card_type(battle, card_id),
         rules_text: rules_text(battle, card_id),
-        outline_color: match () {
-            _ if can_play => Some(display_color::GREEN),
-            _ if selection_action.is_some() => Some(display_color::RED_500),
+        outline_color: match selection_color {
+            Some(color) => Some(color),
+            None if can_play => Some(display_color::GREEN),
             _ => None,
         },
         info_zoom_data: build_info_zoom_data(battle, card_id),
@@ -110,32 +114,50 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
     }
 }
 
-fn selection_action(legal_actions: &LegalActions, card_id: CardId) -> Option<GameAction> {
+fn outline_and_selection_action(
+    battle: &BattleState,
+    legal_actions: &LegalActions,
+    card_id: CardId,
+) -> (Option<DisplayColor>, Option<GameAction>) {
     if legal_actions
         .contains(BattleAction::SelectCharacterTarget(CharacterId(card_id)), ForPlayer::Human)
     {
-        return Some(GameAction::BattleAction(BattleAction::SelectCharacterTarget(CharacterId(
-            card_id,
-        ))));
+        return (
+            Some(display_color::RED_500),
+            Some(GameAction::BattleAction(BattleAction::SelectCharacterTarget(CharacterId(
+                card_id,
+            )))),
+        );
     }
 
     if legal_actions
         .contains(BattleAction::SelectStackCardTarget(StackCardId(card_id)), ForPlayer::Human)
     {
-        return Some(GameAction::BattleAction(BattleAction::SelectStackCardTarget(StackCardId(
-            card_id,
-        ))));
+        return (
+            Some(display_color::RED_500),
+            Some(GameAction::BattleAction(BattleAction::SelectStackCardTarget(StackCardId(
+                card_id,
+            )))),
+        );
     }
 
-    if legal_actions
-        .contains(BattleAction::SelectVoidCardTarget(VoidCardId(card_id)), ForPlayer::Human)
+    if let Some(prompt) = battle.prompts.front()
+        && let PromptType::ChooseVoidCard(choose_void_prompt) = &prompt.prompt_type
     {
-        return Some(GameAction::BattleAction(BattleAction::SelectVoidCardTarget(VoidCardId(
-            card_id,
-        ))));
+        let void_card_id = VoidCardId(card_id);
+        let select = BattleAction::SelectVoidCardTarget(void_card_id);
+        let selection_action = legal_actions
+            .contains(select, ForPlayer::Human)
+            .then_some(GameAction::BattleAction(select));
+
+        if choose_void_prompt.selected.contains(void_card_id) {
+            return (Some(display_color::YELLOW_500), selection_action);
+        } else if choose_void_prompt.valid.contains(void_card_id) {
+            return (Some(display_color::WHITE), selection_action);
+        }
     }
 
-    None
+    (None, None)
 }
 
 fn can_select_order_action(legal_actions: &LegalActions, card_id: CardId) -> Option<CardId> {

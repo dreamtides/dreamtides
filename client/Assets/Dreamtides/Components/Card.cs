@@ -224,12 +224,12 @@ namespace Dreamtides.Components
 
     void Update()
     {
-      var outlineContext = GameContext == GameContext.Hand ||
-          GameContext == GameContext.Hovering ||
-          GameContext == GameContext.Stack;
+      // var allowNonBattlefieldOutline = GameContext == GameContext.Hand ||
+      //     GameContext == GameContext.Hovering ||
+      //     GameContext == GameContext.Stack;
       _outline.gameObject.SetActive(CanPlay() ||
           CanSelectOrder() ||
-          (outlineContext && CardView.Revealed?.OutlineColor != null));
+          CardView.Revealed?.OutlineColor != null);
     }
 
     void Flip(Component faceUp, Component faceDown, Sequence? sequence, Action? onFlipped = null)

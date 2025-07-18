@@ -48,7 +48,6 @@ pub struct ChooseVoidCardPrompt {
     pub on_selected: OnSelected,
     pub valid: CardSet<VoidCardId>,
     pub selected: CardSet<VoidCardId>,
-    pub minimum_selection: u32,
     pub maximum_selection: u32,
 }
 

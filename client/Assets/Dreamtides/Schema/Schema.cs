@@ -2253,11 +2253,9 @@ namespace Dreamtides.Schema
     /// Submit the selected deck card order configuration in the current
     /// ordering prompt.
     ///
-    /// Toggle the visibility of the card order selector
-    ///
     /// Confirm the selected cards to mulligan
     /// </summary>
-    public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitDeckCardOrder, SubmitMulligan, SubmitVoidCardTargets, ToggleOrderSelectorVisibility };
+    public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitDeckCardOrder, SubmitMulligan, SubmitVoidCardTargets };
 
     public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCardCharacter, TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDrawOneReclaim, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestForeseeOneDrawACard, TestForeseeTwo, TestMultiActivatedAbilityDrawCardCharacter, TestReturnOneOrTwoVoidEventCardsToHand, TestReturnVoidCardToHand, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
 
@@ -3283,8 +3281,6 @@ namespace Dreamtides.Schema
                             return new BattleAction { Enum = BattleActionEnum.SubmitMulligan };
                         case "submitVoidCardTargets":
                             return new BattleAction { Enum = BattleActionEnum.SubmitVoidCardTargets };
-                        case "toggleOrderSelectorVisibility":
-                            return new BattleAction { Enum = BattleActionEnum.ToggleOrderSelectorVisibility };
                     }
                     break;
                 case JsonToken.StartObject:
@@ -3318,9 +3314,6 @@ namespace Dreamtides.Schema
                         return;
                     case BattleActionEnum.SubmitVoidCardTargets:
                         serializer.Serialize(writer, "submitVoidCardTargets");
-                        return;
-                    case BattleActionEnum.ToggleOrderSelectorVisibility:
-                        serializer.Serialize(writer, "toggleOrderSelectorVisibility");
                         return;
                 }
             }
@@ -3645,8 +3638,6 @@ namespace Dreamtides.Schema
                     return BattleActionEnum.SubmitMulligan;
                 case "submitVoidCardTargets":
                     return BattleActionEnum.SubmitVoidCardTargets;
-                case "toggleOrderSelectorVisibility":
-                    return BattleActionEnum.ToggleOrderSelectorVisibility;
             }
             throw new Exception("Cannot unmarshal type BattleActionEnum");
         }
@@ -3678,9 +3669,6 @@ namespace Dreamtides.Schema
                     return;
                 case BattleActionEnum.SubmitVoidCardTargets:
                     serializer.Serialize(writer, "submitVoidCardTargets");
-                    return;
-                case BattleActionEnum.ToggleOrderSelectorVisibility:
-                    serializer.Serialize(writer, "toggleOrderSelectorVisibility");
                     return;
             }
             throw new Exception("Cannot marshal type BattleActionEnum");

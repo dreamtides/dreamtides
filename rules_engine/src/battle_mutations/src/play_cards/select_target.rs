@@ -1,7 +1,7 @@
 use std::collections::BTreeSet;
 
 use battle_queries::battle_card_queries::card;
-use battle_queries::panic_with;
+use battle_queries::{battle_trace, panic_with};
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CharacterId, StackCardId, VoidCardId};
@@ -50,6 +50,8 @@ pub fn character(battle: &mut BattleState, player: PlayerName, character_id: Cha
             }
         }
     }
+
+    battle_trace!("Selected character target", battle, character_id);
 }
 
 /// Selects a card on the stack as a target of another card or effect
@@ -90,6 +92,8 @@ pub fn on_stack(battle: &mut BattleState, player: PlayerName, stack_card_id: Sta
             }
         }
     }
+
+    battle_trace!("Selected stack card target", battle, stack_card_id);
 }
 
 /// Toggles a void card in the selected set of a void card prompt
@@ -103,8 +107,17 @@ pub fn void_card(battle: &mut BattleState, _player: PlayerName, void_card_id: Vo
 
     if void_prompt.selected.contains(void_card_id) {
         void_prompt.selected.remove(void_card_id);
+        battle_trace!("Removing selected void card target", battle, void_card_id);
     } else {
+        if void_prompt.selected.len() == void_prompt.maximum_selection as usize
+            && void_prompt.maximum_selection == 1
+        {
+            // In single card mode, swap the selected card with the new one immediately
+            void_prompt.selected.clear();
+        }
+
         void_prompt.selected.insert(void_card_id);
+        battle_trace!("Adding void card target", battle, void_card_id);
     }
 }
 
@@ -116,10 +129,6 @@ pub fn submit_void_card_targets(battle: &mut BattleState, player: PlayerName) {
     let PromptType::ChooseVoidCard(void_prompt) = prompt.prompt_type else {
         panic_with!("Prompt is not a void card choice", battle);
     };
-
-    if (void_prompt.selected.len() as u32) < void_prompt.minimum_selection {
-        panic_with!("Not enough void cards selected", battle);
-    }
 
     let mut void_targets = BTreeSet::new();
     for void_card_id in void_prompt.selected.iter() {
@@ -156,4 +165,6 @@ pub fn submit_void_card_targets(battle: &mut BattleState, player: PlayerName) {
             }
         }
     }
+
+    battle_trace!("Submitted void card targets", battle);
 }

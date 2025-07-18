@@ -136,7 +136,10 @@ fn get_battle_impl(
 
 /// Returns true if the action should be skipped for an undo operation.
 fn should_skip_action_for_undo(action: BattleAction) -> bool {
-    matches!(action, BattleAction::SelectOrderForDeckCard(_))
+    matches!(
+        action,
+        BattleAction::SelectOrderForDeckCard(_) | BattleAction::SelectVoidCardTarget(_)
+    )
 }
 
 fn write_deserialization_panic_trace(

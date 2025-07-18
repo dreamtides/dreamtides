@@ -3,8 +3,8 @@ use std::collections::VecDeque;
 use ability_data::effect::Effect;
 use ability_data::standard_effect::StandardEffect;
 use battle_queries::battle_card_queries::card_abilities;
+use battle_queries::battle_trace;
 use battle_queries::card_ability_queries::effect_predicates;
-use battle_queries::{battle_trace, panic_with};
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{ActivatedAbilityId, CardId, StackCardId};
 use battle_state::battle_cards::card_set::CardSet;
@@ -165,10 +165,10 @@ fn standard_effect_targeting_prompt(
             return None;
         }
 
-        let (minimum_selection, maximum_selection) = match effect {
-            StandardEffect::ReturnFromYourVoidToHand { .. } => (1, 1),
-            StandardEffect::ReturnUpToCountForYourVoidToHand { count, .. } => (1, *count),
-            _ => panic_with!("Unexpected void target predicate", battle),
+        let maximum_selection = match effect {
+            StandardEffect::ReturnFromYourVoidToHand { .. } => 1,
+            StandardEffect::ReturnUpToCountForYourVoidToHand { count, .. } => *count,
+            _ => todo!("Implement support for predicate: {target_predicate:?}"),
         };
 
         Some(PromptData {
@@ -178,7 +178,6 @@ fn standard_effect_targeting_prompt(
                 on_selected,
                 valid,
                 selected: CardSet::default(),
-                minimum_selection,
                 maximum_selection,
             }),
             configuration: PromptConfiguration { optional },

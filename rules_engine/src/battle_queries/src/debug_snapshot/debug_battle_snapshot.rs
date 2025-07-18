@@ -220,7 +220,7 @@ fn format_prompt_choices(prompt: &PromptType) -> Vec<String> {
         PromptType::ChooseVoidCard(prompt) => {
             vec![
                 format!("valid: {:?}", prompt.valid),
-                format!("minimum_selection: {:?}", prompt.minimum_selection),
+                format!("selected: {:?}", prompt.selected),
                 format!("maximum_selection: {:?}", prompt.maximum_selection),
             ]
         }

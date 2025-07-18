@@ -72,7 +72,7 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
         BattleAction::SubmitDeckCardOrder => {
             apply_card_order_action::execute_submit_deck_card_order(battle, player);
         }
-        _ => {
+        BattleAction::SubmitMulligan => {
             todo!("Implement {:?}", action);
         }
     }
@@ -81,11 +81,5 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
 
     fire_triggers::execute_if_no_active_prompt(battle);
 
-    if should_record_in_history(action) {
-        battle.push_history_action(player, action);
-    }
-}
-
-fn should_record_in_history(action: BattleAction) -> bool {
-    !matches!(action, BattleAction::ToggleOrderSelectorVisibility)
+    battle.push_history_action(player, action);
 }

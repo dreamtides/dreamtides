@@ -73,7 +73,6 @@ namespace Dreamtides.Utils
                     BattleActionEnum.PassPriority => "PassPriority",
                     BattleActionEnum.StartNextTurn => "StartNextTurn",
                     BattleActionEnum.SubmitMulligan => "SubmitMulligan",
-                    BattleActionEnum.ToggleOrderSelectorVisibility => "ToggleOrderSelectorVisibility",
                     _ => battleAction.Enum.Value.ToString()
                 };
             }

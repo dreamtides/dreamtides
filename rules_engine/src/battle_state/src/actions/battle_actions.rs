@@ -46,8 +46,6 @@ pub enum BattleAction {
     /// Submit the selected deck card order configuration in the current
     /// ordering prompt.
     SubmitDeckCardOrder,
-    /// Toggle the visibility of the card order selector
-    ToggleOrderSelectorVisibility,
     /// Confirm the selected cards to mulligan
     SubmitMulligan,
 }
@@ -122,7 +120,6 @@ impl BattleAction {
                 format!("SCO{}{:?}", target, order.card_id.0.0)
             }
             BattleAction::SubmitDeckCardOrder => "SDCO".to_string(),
-            BattleAction::ToggleOrderSelectorVisibility => "TOSV".to_string(),
             BattleAction::SubmitMulligan => "SM".to_string(),
         }
     }

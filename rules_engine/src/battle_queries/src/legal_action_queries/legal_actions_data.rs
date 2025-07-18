@@ -28,8 +28,8 @@ pub enum LegalActions {
     },
     SelectVoidCardPrompt {
         valid: CardSet<VoidCardId>,
-        minimum_selection: u32,
-        maximum_selection: u32,
+        current: CardSet<VoidCardId>,
+        maximum_selection: usize,
     },
     SelectPromptChoicePrompt {
         choice_count: usize,
@@ -127,14 +127,37 @@ impl LegalActions {
                 }
             }
             BattleAction::SelectVoidCardTarget(void_card_id) => {
-                if let LegalActions::SelectVoidCardPrompt { valid, .. } = self {
-                    valid.contains(void_card_id)
+                if let LegalActions::SelectVoidCardPrompt { valid, current, maximum_selection } =
+                    self
+                {
+                    match for_player {
+                        // Agent cannot remove cards from the selected set
+                        ForPlayer::Agent => {
+                            valid.contains(void_card_id) && current.len() < *maximum_selection
+                        }
+
+                        // In single card mode, always allow toggling
+                        ForPlayer::Human if *maximum_selection == 1 => valid.contains(void_card_id),
+
+                        // In multi-card mode, cannot select another card when
+                        // at max selection
+                        ForPlayer::Human => {
+                            valid.contains(void_card_id)
+                                && (current.len() < *maximum_selection
+                                    || current.contains(void_card_id))
+                        }
+                    }
                 } else {
                     false
                 }
             }
             BattleAction::SubmitVoidCardTargets => {
-                matches!(self, LegalActions::SelectVoidCardPrompt { .. })
+                if let LegalActions::SelectVoidCardPrompt { current, maximum_selection, .. } = self
+                {
+                    !current.is_empty() && current.len() <= *maximum_selection
+                } else {
+                    false
+                }
             }
             BattleAction::SelectPromptChoice(index) => {
                 if let LegalActions::SelectPromptChoicePrompt { choice_count } = self {
@@ -167,7 +190,6 @@ impl LegalActions {
             BattleAction::SubmitDeckCardOrder => {
                 matches!(self, LegalActions::SelectDeckCardOrder { .. })
             }
-            BattleAction::ToggleOrderSelectorVisibility => true,
             BattleAction::SubmitMulligan => todo!("Implement this"),
         }
     }
