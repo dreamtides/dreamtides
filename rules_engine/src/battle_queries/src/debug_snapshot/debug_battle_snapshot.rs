@@ -230,6 +230,9 @@ fn format_prompt_choices(prompt: &PromptType) -> Vec<String> {
         PromptType::ChooseEnergyValue { minimum, maximum } => {
             vec![format!("min {}", minimum), format!("max {}", maximum)]
         }
+        PromptType::ModalEffect(prompt) => {
+            vec![format!("choice_count: {:?}", prompt.choice_count)]
+        }
         PromptType::SelectDeckCardOrder { prompt } => {
             vec![format!("initial: {:?}", prompt.initial), format!("moved: {:?}", prompt.moved)]
         }

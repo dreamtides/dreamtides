@@ -1,6 +1,8 @@
 use ability_data::effect::Effect;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 use strum_macros::EnumDiscriminants;
 
 use crate::battle::battle_state::PendingEffectIndex;
@@ -10,7 +12,10 @@ use crate::battle_cards::stack_card_state::{EffectTargets, StackItemId};
 use crate::core::effect_source::EffectSource;
 
 /// Describes which object should be updated based on the results of a prompt.
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+#[derive(
+    Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
 pub enum OnSelected {
     AddStackTargets(StackItemId),
     AddPendingEffectTarget(PendingEffectIndex),
@@ -40,6 +45,7 @@ pub enum PromptType {
     ChooseVoidCard(ChooseVoidCardPrompt),
     Choose { choices: Vec<PromptChoice> },
     ChooseEnergyValue { minimum: Energy, maximum: Energy },
+    ModalEffect(ModalEffectPrompt),
     SelectDeckCardOrder { prompt: SelectDeckCardOrderPrompt },
 }
 
@@ -49,6 +55,12 @@ pub struct ChooseVoidCardPrompt {
     pub valid: CardSet<VoidCardId>,
     pub selected: CardSet<VoidCardId>,
     pub maximum_selection: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct ModalEffectPrompt {
+    pub on_selected: OnSelected,
+    pub choice_count: usize,
 }
 
 /// State for a prompt to select a deck card order.

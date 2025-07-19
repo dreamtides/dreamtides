@@ -1,4 +1,3 @@
-use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
 use battle_state::battle::battle_state::BattleState;
@@ -82,15 +81,6 @@ pub fn matching_cards_in_void(
             in_void(battle, source, void, card_predicate)
         }
         _ => todo!("Implement {:?}", predicate),
-    }
-}
-
-/// Returns true if an effect requires a target to resolve.
-pub fn has_any_targets(effect: &Effect) -> bool {
-    match effect {
-        Effect::Effect(effect) => has_targets(effect),
-        Effect::WithOptions(effect_with_options) => has_targets(&effect_with_options.effect),
-        Effect::List(items) => items.iter().any(|effect| has_targets(&effect.effect)),
     }
 }
 

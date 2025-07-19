@@ -41,6 +41,9 @@ fn has_legal_targets_for_effect(
         Effect::List(effects) => effects.iter().all(|effect_with_options| {
             has_legal_targets_for_standard_effect(battle, source, &effect_with_options.effect)
         }),
+        Effect::Modal(modal) => {
+            modal.iter().any(|choice| has_legal_targets_for_effect(battle, source, &choice.effect))
+        }
     }
 }
 

@@ -83,6 +83,7 @@ fn apply_event_effects(battle: &mut BattleState, item: &StackItemState, card_id:
         card_id,
         &card_abilities::query(battle, card_id).event_abilities,
         item.targets.as_ref(),
+        item.modal_choice,
     );
 }
 
@@ -103,7 +104,13 @@ fn resolve_activated_ability(
 
     let source =
         EffectSource::Activated { controller: item.controller, activated_ability_id: ability_id };
-    apply_effect::execute(battle, source, &ability_data.ability.effect, item.targets.as_ref());
+    apply_effect::execute(
+        battle,
+        source,
+        &ability_data.ability.effect,
+        item.targets.as_ref(),
+        item.modal_choice,
+    );
 
     battle.cards.remove_activated_ability_from_stack(ability_id);
 }

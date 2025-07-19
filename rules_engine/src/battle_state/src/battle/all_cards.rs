@@ -323,6 +323,7 @@ impl AllCards {
             controller,
             targets: None,
             additional_costs_paid: StackCardAdditionalCostsPaid::None,
+            modal_choice: None,
         });
         self.activated_ability_object_ids.insert(activated_ability_id, object_id);
     }
@@ -376,6 +377,7 @@ impl AllCards {
                     controller,
                     targets: None,
                     additional_costs_paid: StackCardAdditionalCostsPaid::None,
+                    modal_choice: None,
                 });
             }
             Zone::Void => {

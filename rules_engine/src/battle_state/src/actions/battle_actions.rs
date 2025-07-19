@@ -1,3 +1,4 @@
+use ability_data::effect::ModelEffectChoiceIndex;
 use core_data::numerics::Energy;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -7,6 +8,7 @@ use crate::actions::debug_battle_action::DebugBattleAction;
 use crate::battle::card_id::{
     AbilityId, ActivatedAbilityId, CharacterId, DeckCardId, HandCardId, StackCardId, VoidCardId,
 };
+use crate::prompt_types::prompt_data::OnSelected;
 
 /// An action that can be performed in a battle
 #[derive(
@@ -48,6 +50,8 @@ pub enum BattleAction {
     SubmitDeckCardOrder,
     /// Confirm the selected cards to mulligan
     SubmitMulligan,
+    /// Select a modal effect choice for an effect or item on the stack
+    SelectModalEffectChoice(OnSelected, ModelEffectChoiceIndex),
 }
 
 #[derive(
@@ -121,6 +125,9 @@ impl BattleAction {
             }
             BattleAction::SubmitDeckCardOrder => "SDCO".to_string(),
             BattleAction::SubmitMulligan => "SM".to_string(),
+            BattleAction::SelectModalEffectChoice(stack_item_id, modal_choice_index) => {
+                format!("SMEC{:?}_{:?}", stack_item_id, modal_choice_index.0)
+            }
         }
     }
 }

@@ -120,6 +120,7 @@ fn get_prompt_message_from_source(battle: &BattleState, prompt: &PromptData) -> 
         PromptType::Choose { .. } => config.choice_prompt.clone(),
         PromptType::ChooseEnergyValue { .. } => config.additional_cost_prompt.clone(),
         PromptType::SelectDeckCardOrder { .. } => None,
+        PromptType::ModalEffect(_) => None,
     }
 }
 
@@ -156,6 +157,7 @@ fn get_generic_prompt_message(prompt_type: &PromptType) -> String {
         PromptType::Choose { .. } => "Select an option".to_string(),
         PromptType::ChooseEnergyValue { .. } => "Choose energy amount".to_string(),
         PromptType::SelectDeckCardOrder { .. } => "Select card position".to_string(),
+        PromptType::ModalEffect(_) => "Choose a mode".to_string(),
     }
 }
 

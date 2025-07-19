@@ -1,7 +1,10 @@
 use std::collections::{BTreeSet, VecDeque};
 
+use ability_data::effect::ModelEffectChoiceIndex;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 
 use crate::battle::card_id::{ActivatedAbilityId, CharacterId, StackCardId, VoidCardId};
 use crate::battle_cards::battle_card_state::ObjectId;
@@ -11,7 +14,10 @@ use crate::battle_cards::battle_card_state::ObjectId;
 /// No significant performance differences between SmallVec and Vec here.
 pub type StackItems = Vec<StackItemState>;
 
-#[derive(Clone, Debug, Copy, Eq, PartialEq, Hash, PartialOrd, Ord)]
+#[derive(
+    Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
 pub enum StackItemId {
     Card(StackCardId),
     ActivatedAbility(ActivatedAbilityId),
@@ -35,6 +41,7 @@ pub struct StackItemState {
     pub controller: PlayerName,
     pub targets: Option<EffectTargets>,
     pub additional_costs_paid: StackCardAdditionalCostsPaid,
+    pub modal_choice: Option<ModelEffectChoiceIndex>,
 }
 
 impl StackItemState {

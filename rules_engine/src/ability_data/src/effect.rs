@@ -1,3 +1,5 @@
+use core_data::numerics::Energy;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::condition::Condition;
@@ -11,6 +13,29 @@ pub enum Effect {
     Effect(StandardEffect),
     WithOptions(EffectWithOptions),
     List(Vec<EffectWithOptions>),
+    Modal(Vec<ModalEffectChoice>),
+}
+
+/// Identifies a [ModalEffectChoice] in a [Effect::Modal].
+#[derive(
+    Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
+pub struct ModelEffectChoiceIndex(pub usize);
+
+impl ModelEffectChoiceIndex {
+    pub fn value(self) -> usize {
+        self.0
+    }
+}
+
+/// Represents a choice of effect to apply. These are written as a bulleted list
+/// of options with associated costs and the text "Choose One".
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ModalEffectChoice {
+    pub energy_cost: Energy,
+    pub effect: Effect,
 }
 
 /// Provides an effect along with configuration options.

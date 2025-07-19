@@ -40,6 +40,10 @@ pub fn compute(battle: &BattleState, player: PlayerName) -> LegalActions {
             PromptType::ChooseEnergyValue { minimum, maximum } => {
                 LegalActions::SelectEnergyValuePrompt { minimum: *minimum, maximum: *maximum }
             }
+            PromptType::ModalEffect(prompt) => LegalActions::ModalEffectPrompt {
+                on_selected: prompt.on_selected,
+                choice_count: prompt.choice_count,
+            },
             PromptType::SelectDeckCardOrder { prompt } => {
                 LegalActions::SelectDeckCardOrder { current: prompt.clone() }
             }

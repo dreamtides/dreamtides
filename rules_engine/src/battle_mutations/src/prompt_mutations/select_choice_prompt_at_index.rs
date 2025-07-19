@@ -26,5 +26,5 @@ pub fn select(battle: &mut BattleState, player: PlayerName, choice_index: usize)
     };
 
     battle.push_animation(source, || BattleAnimation::MakeChoice { player, choice: label });
-    apply_effect::execute(battle, source, choice_effect, choice_targets.as_ref());
+    apply_effect::execute(battle, source, choice_effect, choice_targets.as_ref(), None);
 }

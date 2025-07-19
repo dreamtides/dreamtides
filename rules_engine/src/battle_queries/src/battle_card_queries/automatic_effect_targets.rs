@@ -69,6 +69,7 @@ pub fn query(
             }
             AutomaticEffectTargets::Targets(Some(EffectTargets::EffectList(target_list)))
         }
+        Effect::Modal(_) => AutomaticEffectTargets::RequiresPrompt,
     }
 }
 

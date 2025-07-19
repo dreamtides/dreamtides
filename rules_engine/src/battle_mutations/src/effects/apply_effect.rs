@@ -1,6 +1,7 @@
 use ability_data::ability::EventAbility;
-use ability_data::effect::{Effect, EffectWithOptions};
+use ability_data::effect::{Effect, EffectWithOptions, ModalEffectChoice, ModelEffectChoiceIndex};
 use battle_queries::battle_card_queries::target_queries;
+use battle_queries::panic_with;
 use battle_state::battle::battle_state::{BattleState, PendingEffect};
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::card_id::StackCardId;
@@ -22,6 +23,7 @@ pub fn execute_event_abilities(
     stack_card_id: StackCardId,
     abilities: &[AbilityData<EventAbility>],
     requested_targets: Option<&EffectTargets>,
+    modal_choice: Option<ModelEffectChoiceIndex>,
 ) {
     match abilities {
         [] => {}
@@ -31,7 +33,7 @@ pub fn execute_event_abilities(
                 stack_card_id,
                 ability_number: ability.ability_number,
             };
-            execute(battle, source, &ability.ability.effect, requested_targets);
+            execute(battle, source, &ability.ability.effect, requested_targets, modal_choice);
         }
         _ => {
             battle.pending_effects.extend(abilities.iter().map(|ability_data| {
@@ -44,6 +46,7 @@ pub fn execute_event_abilities(
                     source,
                     effect: ability_data.ability.effect.clone(),
                     requested_targets: requested_targets.cloned(),
+                    modal_choice,
                 }
             }));
             execute_pending_effects_if_no_active_prompt(battle);
@@ -66,6 +69,7 @@ pub fn execute(
     source: EffectSource,
     effect: &Effect,
     requested_targets: Option<&EffectTargets>,
+    modal_choice: Option<ModelEffectChoiceIndex>,
 ) {
     match effect {
         Effect::Effect(standard) => {
@@ -82,8 +86,16 @@ pub fn execute(
                 source,
                 effect: effect.clone(),
                 requested_targets: requested_targets.cloned(),
+                modal_choice,
             });
             execute_pending_effects_if_no_active_prompt(battle);
+        }
+        Effect::Modal(choices) => {
+            if let Some(modal_choice) = modal_choice {
+                execute_modal_effect(battle, source, choices, requested_targets, modal_choice);
+            } else {
+                panic_with!("Modal effect requires an effect choice", battle);
+            }
         }
     };
 }
@@ -144,12 +156,36 @@ pub fn execute_pending_effects_if_no_active_prompt(battle: &mut BattleState) {
                             source: pending_effect.source,
                             effect: Effect::List(effect_list),
                             requested_targets: pending_effect.requested_targets,
+                            modal_choice: pending_effect.modal_choice,
                         });
                     }
                 }
             }
+            Effect::Modal(choices) => {
+                if let Some(modal_choice) = pending_effect.modal_choice {
+                    execute_modal_effect(
+                        battle,
+                        pending_effect.source,
+                        &choices,
+                        pending_effect.requested_targets.as_ref(),
+                        modal_choice,
+                    );
+                } else {
+                    panic_with!("Modal effect requires an effect choice", battle);
+                }
+            }
         }
     }
+}
+
+fn execute_modal_effect(
+    _battle: &mut BattleState,
+    _source: EffectSource,
+    _effects: &[ModalEffectChoice],
+    _requested_targets: Option<&EffectTargets>,
+    _modal_choice: ModelEffectChoiceIndex,
+) -> Option<EffectWasApplied> {
+    todo!("Implement modal effects")
 }
 
 fn execute_with_options(

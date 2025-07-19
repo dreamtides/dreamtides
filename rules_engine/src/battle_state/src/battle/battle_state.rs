@@ -1,10 +1,11 @@
 use std::collections::VecDeque;
 use std::path::PathBuf;
 
-use ability_data::effect::Effect;
+use ability_data::effect::{Effect, ModelEffectChoiceIndex};
 use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
 use rand_xoshiro::Xoshiro256PlusPlus;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::actions::battle_actions::BattleAction;
@@ -92,7 +93,10 @@ pub struct BattleState {
 }
 
 /// A unique identifier for a pending effect.
-#[derive(Clone, Debug, Copy, Eq, PartialEq, Hash)]
+#[derive(
+    Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
 pub struct PendingEffectIndex(pub usize);
 
 /// Information about effects that are waiting to be applied.
@@ -106,6 +110,9 @@ pub struct PendingEffect {
 
     /// Targets that were requested for the effect.
     pub requested_targets: Option<EffectTargets>,
+
+    /// Choice of modal effect to apply, if any.
+    pub modal_choice: Option<ModelEffectChoiceIndex>,
 }
 
 /// Information about why & how we are currently running the rules engine.

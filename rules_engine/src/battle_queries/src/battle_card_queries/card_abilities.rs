@@ -469,6 +469,10 @@ fn merge_can_play_restrictions(
 }
 
 fn compute_event_target_restriction(list: &AbilityList) -> Option<CanPlayRestriction> {
+    if list.event_abilities.iter().any(|data| matches!(data.ability.effect, Effect::Modal(_))) {
+        return None;
+    }
+
     let predicates: Vec<&Predicate> = list
         .event_abilities
         .iter()
@@ -493,6 +497,7 @@ fn compute_event_target_restriction(list: &AbilityList) -> Option<CanPlayRestric
                     ]
                 })
                 .collect(),
+            Effect::Modal(_) => vec![],
         })
         .flatten()
         .collect();

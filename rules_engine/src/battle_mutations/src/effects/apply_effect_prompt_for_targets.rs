@@ -38,18 +38,19 @@ pub fn execute(
                 OnSelected::AddPendingEffectTarget(pending_effect_index),
             );
             if prompts.is_empty() {
-                apply_effect::execute(battle, source, effect, None);
+                apply_effect::execute(battle, source, effect, None, None);
             } else {
                 battle.prompts.append(&mut prompts);
                 battle.pending_effects.push_back(PendingEffect {
                     source,
                     effect: effect.clone(),
                     requested_targets: None,
+                    modal_choice: None,
                 });
             }
         }
         AutomaticEffectTargets::Targets(targets) => {
-            apply_effect::execute(battle, source, effect, targets.as_ref());
+            apply_effect::execute(battle, source, effect, targets.as_ref(), None);
         }
     }
 }

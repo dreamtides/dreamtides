@@ -10,7 +10,8 @@ use battle_state::battle::card_id::{ActivatedAbilityId, CardId, StackCardId};
 use battle_state::battle_cards::card_set::CardSet;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{
-    ChooseVoidCardPrompt, OnSelected, PromptConfiguration, PromptData, PromptType,
+    ChooseVoidCardPrompt, ModalEffectPrompt, OnSelected, PromptConfiguration, PromptData,
+    PromptType,
 };
 use core_data::types::PlayerName;
 
@@ -116,6 +117,15 @@ pub fn targeting_prompts(
                 )
             })
             .collect(),
+        Effect::Modal(modal) => VecDeque::from([PromptData {
+            source,
+            player,
+            prompt_type: PromptType::ModalEffect(ModalEffectPrompt {
+                on_selected,
+                choice_count: modal.len(),
+            }),
+            configuration: PromptConfiguration { optional: false },
+        }]),
     }
 }
 

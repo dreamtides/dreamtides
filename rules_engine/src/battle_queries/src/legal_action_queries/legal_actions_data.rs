@@ -1,3 +1,4 @@
+use ability_data::effect::ModelEffectChoiceIndex;
 use battle_state::actions::battle_actions::{
     BattleAction, CardOrderSelectionTarget, DeckCardSelectedOrder,
 };
@@ -5,7 +6,7 @@ use battle_state::battle::card_id::{
     ActivatedAbilityId, CharacterId, HandCardId, StackCardId, VoidCardId,
 };
 use battle_state::battle_cards::card_set::CardSet;
-use battle_state::prompt_types::prompt_data::SelectDeckCardOrderPrompt;
+use battle_state::prompt_types::prompt_data::{OnSelected, SelectDeckCardOrderPrompt};
 use core_data::numerics::Energy;
 use fastrand;
 
@@ -40,6 +41,10 @@ pub enum LegalActions {
     },
     SelectDeckCardOrder {
         current: SelectDeckCardOrderPrompt,
+    },
+    ModalEffectPrompt {
+        on_selected: OnSelected,
+        choice_count: usize,
     },
 }
 
@@ -191,6 +196,17 @@ impl LegalActions {
                 matches!(self, LegalActions::SelectDeckCardOrder { .. })
             }
             BattleAction::SubmitMulligan => todo!("Implement this"),
+            BattleAction::SelectModalEffectChoice(on_selected, modal_choice_index) => {
+                if let LegalActions::ModalEffectPrompt {
+                    choice_count,
+                    on_selected: on_selected_prompt,
+                } = self
+                {
+                    modal_choice_index.value() < *choice_count && on_selected == *on_selected_prompt
+                } else {
+                    false
+                }
+            }
         }
     }
 
@@ -207,6 +223,7 @@ impl LegalActions {
             LegalActions::SelectPromptChoicePrompt { choice_count } => *choice_count == 0,
             LegalActions::SelectEnergyValuePrompt { minimum, maximum } => maximum < minimum,
             LegalActions::SelectDeckCardOrder { .. } => false,
+            LegalActions::ModalEffectPrompt { .. } => false,
         }
     }
 
@@ -253,6 +270,7 @@ impl LegalActions {
                     1 // Only SubmitDeckCardOrder when no cards left to move
                 }
             }
+            LegalActions::ModalEffectPrompt { choice_count, .. } => *choice_count,
         }
     }
 
@@ -375,6 +393,17 @@ impl LegalActions {
 
                 None
             }
+
+            LegalActions::ModalEffectPrompt { choice_count, on_selected } => (0..*choice_count)
+                .find(|&i| {
+                    !actions.contains(&BattleAction::SelectModalEffectChoice(
+                        *on_selected,
+                        ModelEffectChoiceIndex(i),
+                    ))
+                })
+                .map(|i| {
+                    BattleAction::SelectModalEffectChoice(*on_selected, ModelEffectChoiceIndex(i))
+                }),
         }
     }
 
@@ -459,6 +488,12 @@ impl LegalActions {
 
                 result
             }
+
+            LegalActions::ModalEffectPrompt { on_selected, choice_count } => (0..*choice_count)
+                .map(|i| {
+                    BattleAction::SelectModalEffectChoice(*on_selected, ModelEffectChoiceIndex(i))
+                })
+                .collect::<Vec<_>>(),
         }
     }
 
@@ -560,6 +595,16 @@ impl LegalActions {
             }
 
             LegalActions::SelectDeckCardOrder { .. } => {
+                let all_actions = self.all();
+                if all_actions.is_empty() {
+                    None
+                } else {
+                    let index = fastrand::usize(..all_actions.len());
+                    Some(all_actions[index])
+                }
+            }
+
+            LegalActions::ModalEffectPrompt { .. } => {
                 let all_actions = self.all();
                 if all_actions.is_empty() {
                     None

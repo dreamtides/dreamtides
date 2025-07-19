@@ -75,6 +75,9 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
         BattleAction::SubmitMulligan => {
             todo!("Implement {:?}", action);
         }
+        BattleAction::SelectModalEffectChoice(_stack_item_id, _modal_choice_index) => {
+            todo!("Implement {:?}", action);
+        }
     }
 
     apply_effect::execute_pending_effects_if_no_active_prompt(battle);
