@@ -10,7 +10,7 @@ use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger::Trigger;
 use core_data::types::PlayerName;
 
-use crate::effects::apply_effect_prompt_for_targets;
+use crate::effects::apply_effect_with_prompt_for_targets;
 
 /// Fires all recorded triggers for the given [BattleState] while no prompt is
 /// active.
@@ -132,10 +132,11 @@ fn fire_triggered_ability(
     };
 
     let that_card = trigger_queries::triggering_card_id(trigger);
-    apply_effect_prompt_for_targets::execute(
+    apply_effect_with_prompt_for_targets::execute(
         battle,
         source,
         &ability_data.ability.effect,
         that_card,
+        None,
     );
 }

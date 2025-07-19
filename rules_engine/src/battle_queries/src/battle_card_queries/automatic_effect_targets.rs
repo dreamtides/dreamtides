@@ -1,6 +1,6 @@
 use std::collections::{BTreeSet, VecDeque};
 
-use ability_data::effect::Effect;
+use ability_data::effect::{Effect, ModelEffectChoiceIndex};
 use ability_data::standard_effect::StandardEffect;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardId;
@@ -27,6 +27,7 @@ pub fn query(
     source: EffectSource,
     effect: &Effect,
     that_card: Option<CardId>,
+    modal_choice: Option<ModelEffectChoiceIndex>,
 ) -> AutomaticEffectTargets {
     match effect {
         Effect::Effect(standard_effect) => {
@@ -69,7 +70,13 @@ pub fn query(
             }
             AutomaticEffectTargets::Targets(Some(EffectTargets::EffectList(target_list)))
         }
-        Effect::Modal(_) => AutomaticEffectTargets::RequiresPrompt,
+        Effect::Modal(modal) => {
+            if let Some(modal_choice) = modal_choice {
+                query(battle, source, &modal[modal_choice.value()].effect, that_card, None)
+            } else {
+                AutomaticEffectTargets::RequiresPrompt
+            }
+        }
     }
 }
 

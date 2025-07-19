@@ -1,12 +1,12 @@
-use ability_data::effect::Effect;
+use ability_data::effect::{Effect, ModelEffectChoiceIndex};
 use battle_queries::battle_card_queries::automatic_effect_targets::{self, AutomaticEffectTargets};
+use battle_queries::card_ability_queries::effect_prompts;
 use battle_state::battle::battle_state::{BattleState, PendingEffect, PendingEffectIndex};
 use battle_state::battle::card_id::CardId;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::OnSelected;
 
 use crate::effects::apply_effect;
-use crate::prompt_mutations::targeting_prompt;
 
 /// Applies an effect to the [BattleState], prompting for effect targets if
 /// required.
@@ -24,18 +24,21 @@ pub fn execute(
     source: EffectSource,
     effect: &Effect,
     that_card: Option<CardId>,
+    modal_choice: Option<ModelEffectChoiceIndex>,
 ) {
-    let automatic_targets = automatic_effect_targets::query(battle, source, effect, that_card);
+    let automatic_targets =
+        automatic_effect_targets::query(battle, source, effect, that_card, modal_choice);
     match automatic_targets {
         AutomaticEffectTargets::RequiresPrompt => {
             let pending_effect_index = PendingEffectIndex(battle.pending_effects.len());
-            let mut prompts = targeting_prompt::targeting_prompts(
+            let mut prompts = effect_prompts::query(
                 battle,
                 source.controller(),
                 source,
                 effect,
                 that_card,
                 OnSelected::AddPendingEffectTarget(pending_effect_index),
+                None,
             );
             if prompts.is_empty() {
                 apply_effect::execute(battle, source, effect, None, None);

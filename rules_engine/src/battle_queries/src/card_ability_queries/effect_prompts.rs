@@ -1,12 +1,9 @@
 use std::collections::VecDeque;
 
-use ability_data::effect::Effect;
+use ability_data::effect::{Effect, ModelEffectChoiceIndex};
 use ability_data::standard_effect::StandardEffect;
-use battle_queries::battle_card_queries::card_abilities;
-use battle_queries::battle_trace;
-use battle_queries::card_ability_queries::effect_predicates;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{ActivatedAbilityId, CardId, StackCardId};
+use battle_state::battle::card_id::CardId;
 use battle_state::battle_cards::card_set::CardSet;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{
@@ -15,70 +12,30 @@ use battle_state::prompt_types::prompt_data::{
 };
 use core_data::types::PlayerName;
 
-/// Adds a prompt to the `battle` for targets required to play the `card_id`
-/// card.
-pub fn execute(battle: &mut BattleState, player: PlayerName, card_id: StackCardId) {
-    for data in &card_abilities::query(battle, card_id).event_abilities {
-        let source = EffectSource::Event {
-            controller: player,
-            stack_card_id: card_id,
-            ability_number: data.ability_number,
-        };
+use crate::card_ability_queries::effect_predicates;
 
-        let mut prompts = targeting_prompts(
-            battle,
-            player,
-            source,
-            &data.ability.effect,
-            None,
-            OnSelected::AddStackTargets(card_id.into()),
-        );
-
-        if !prompts.is_empty() {
-            battle_trace!("Adding target prompt", battle);
-            battle.prompts.append(&mut prompts);
-        }
-    }
-}
-
-/// Adds a prompt to the `battle` for targets required for an activated ability.
-pub fn execute_for_activated_ability(
-    battle: &mut BattleState,
-    player: PlayerName,
-    activated_ability_id: ActivatedAbilityId,
-) {
-    let abilities = card_abilities::query(battle, activated_ability_id.character_id);
-    if let Some(ability_data) = abilities
-        .activated_abilities
-        .iter()
-        .find(|data| data.ability_number == activated_ability_id.ability_number)
-    {
-        let source = EffectSource::Activated { controller: player, activated_ability_id };
-        let mut prompts = targeting_prompts(
-            battle,
-            player,
-            source,
-            &ability_data.ability.effect,
-            None,
-            OnSelected::AddStackTargets(activated_ability_id.into()),
-        );
-
-        if !prompts.is_empty() {
-            battle_trace!("Adding target prompt for activated ability", battle);
-            battle.prompts.append(&mut prompts);
-        }
-    }
-}
-
-/// Returns a list of prompt data for prompts required to resolve an effect, if
+/// Returns a list of [PromptData] for prompts required to resolve an effect, if
 /// any.
-pub fn targeting_prompts(
+///
+/// # Arguments
+///
+/// * `battle` - The current battle state
+/// * `player` - The player who is resolving the effect
+/// * `source` - The source of the effect
+/// * `effect` - The effect to resolve
+/// * `that_card` - The card which should be used to interpret the word "that"
+///   in resolving the effect, e.g. for triggered effects.
+/// * `on_selected` - The action to take when a target is selected
+/// * `modal_choice` - The index of the modal choice to resolve, if one has
+///   already been selected.
+pub fn query(
     battle: &BattleState,
     player: PlayerName,
     source: EffectSource,
     effect: &Effect,
     that_card: Option<CardId>,
     on_selected: OnSelected,
+    modal_choice: Option<ModelEffectChoiceIndex>,
 ) -> VecDeque<PromptData> {
     match effect {
         Effect::Effect(standard_effect) => standard_effect_targeting_prompt(
@@ -117,15 +74,29 @@ pub fn targeting_prompts(
                 )
             })
             .collect(),
-        Effect::Modal(modal) => VecDeque::from([PromptData {
-            source,
-            player,
-            prompt_type: PromptType::ModalEffect(ModalEffectPrompt {
-                on_selected,
-                choice_count: modal.len(),
-            }),
-            configuration: PromptConfiguration { optional: false },
-        }]),
+        Effect::Modal(modal) => {
+            if let Some(choice) = modal_choice {
+                query(
+                    battle,
+                    player,
+                    source,
+                    &modal[choice.value()].effect,
+                    that_card,
+                    on_selected,
+                    None,
+                )
+            } else {
+                VecDeque::from([PromptData {
+                    source,
+                    player,
+                    prompt_type: PromptType::ModalEffect(ModalEffectPrompt {
+                        on_selected,
+                        choice_count: modal.len(),
+                    }),
+                    configuration: PromptConfiguration { optional: false },
+                }])
+            }
+        }
     }
 }
 

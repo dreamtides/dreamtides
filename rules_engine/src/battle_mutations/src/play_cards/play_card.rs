@@ -1,3 +1,4 @@
+use ability_data::effect::ModelEffectChoiceIndex;
 use ability_data::static_ability::StandardStaticAbility;
 use battle_queries::battle_card_queries::{card_abilities, card_properties};
 use battle_queries::legal_action_queries::can_play_cards;
@@ -11,9 +12,9 @@ use battle_state::triggers::trigger::Trigger;
 use core_data::types::PlayerName;
 
 use crate::card_mutations::move_card;
-use crate::effects::apply_effect_prompt_for_targets;
+use crate::effects::apply_effect_with_prompt_for_targets;
 use crate::player_mutations::energy;
-use crate::prompt_mutations::{add_additional_cost_prompt, targeting_prompt};
+use crate::prompt_mutations::{additional_cost_prompts, card_choice_prompts};
 
 /// Plays a card to the stack as `player` by paying its costs. If the
 /// card requires targets or choices, a prompt will be displayed.
@@ -32,14 +33,16 @@ pub fn from_hand(battle: &mut BattleState, player: PlayerName, card_id: HandCard
 
     // Opponent gets priority when a card is played
     battle.stack_priority = Some(player.opponent());
-    targeting_prompt::execute(battle, player, stack_card_id);
-    add_additional_cost_prompt::execute(battle, player, stack_card_id);
+
     battle.push_animation(source, || BattleAnimation::PlayedCard {
         player,
         card_id: stack_card_id.card_id(),
         from_zone: Zone::Stack,
     });
+
     battle.triggers.push(source, Trigger::PlayedCardFromHand(stack_card_id));
+
+    resume_adding_play_card_prompts(battle, player, stack_card_id, None);
 }
 
 /// Plays a card from the void to the stack as `player` by paying its costs. If
@@ -70,14 +73,31 @@ pub fn from_void(
 
     apply_if_you_do_effect(battle, player, stack_card_id, via_ability);
 
-    targeting_prompt::execute(battle, player, stack_card_id);
-    add_additional_cost_prompt::execute(battle, player, stack_card_id);
     battle.push_animation(source, || BattleAnimation::PlayedCard {
         player,
         card_id: stack_card_id.card_id(),
         from_zone: Zone::Stack,
     });
     battle.triggers.push(source, Trigger::PlayedCardFromVoid(stack_card_id));
+
+    resume_adding_play_card_prompts(battle, player, stack_card_id, None);
+}
+
+/// Resumes adding prompts for a card that was played after an initial prompt
+/// has been resolved.
+///
+/// This is used when a card is played which requires more than one sequential
+/// choice.
+pub fn resume_adding_play_card_prompts(
+    battle: &mut BattleState,
+    player: PlayerName,
+    stack_card_id: StackCardId,
+    modal_choice: Option<ModelEffectChoiceIndex>,
+) {
+    card_choice_prompts::add(battle, player, stack_card_id, modal_choice);
+    if battle.prompts.is_empty() {
+        additional_cost_prompts::add(battle, player, stack_card_id);
+    }
 }
 
 fn apply_if_you_do_effect(
@@ -92,11 +112,12 @@ fn apply_if_you_do_effect(
         && let StandardStaticAbility::PlayFromVoid(play) = static_ability.standard_static_ability()
         && let Some(effect) = &play.if_you_do
     {
-        apply_effect_prompt_for_targets::execute(
+        apply_effect_with_prompt_for_targets::execute(
             battle,
             source,
             effect,
             Some(stack_card_id.card_id()),
+            None,
         );
     }
 }

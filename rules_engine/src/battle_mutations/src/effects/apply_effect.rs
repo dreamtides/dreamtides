@@ -179,13 +179,17 @@ pub fn execute_pending_effects_if_no_active_prompt(battle: &mut BattleState) {
 }
 
 fn execute_modal_effect(
-    _battle: &mut BattleState,
-    _source: EffectSource,
-    _effects: &[ModalEffectChoice],
-    _requested_targets: Option<&EffectTargets>,
-    _modal_choice: ModelEffectChoiceIndex,
+    battle: &mut BattleState,
+    source: EffectSource,
+    effects: &[ModalEffectChoice],
+    requested_targets: Option<&EffectTargets>,
+    modal_choice: ModelEffectChoiceIndex,
 ) -> Option<EffectWasApplied> {
-    todo!("Implement modal effects")
+    let Some(choice) = effects.get(modal_choice.value()) else {
+        panic_with!("Modal effect choice out of bounds", battle, modal_choice);
+    };
+    execute(battle, source, &choice.effect, requested_targets, Some(modal_choice));
+    Some(EffectWasApplied)
 }
 
 fn execute_with_options(

@@ -7,10 +7,10 @@ use core_data::types::PlayerName;
 use tracing::instrument;
 
 use crate::actions::{apply_card_order_action, apply_debug_battle_action};
-use crate::activated_abilities::apply_activate_ability;
+use crate::activated_abilities::activate_ability;
 use crate::effects::apply_effect;
 use crate::phase_mutations::{fire_triggers, turn};
-use crate::play_cards::{play_card, resolve_card, select_target};
+use crate::play_cards::{play_card, resolve_card, select_modal_effect_choice, select_target};
 use crate::prompt_mutations::{select_additional_costs, select_choice_prompt_at_index};
 
 #[instrument(name = "apply_battle_action", level = "debug", skip(battle))]
@@ -37,7 +37,7 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
             play_card::from_void(battle, player, card_id, ability_id);
         }
         BattleAction::ActivateAbility(activated_ability_id) => {
-            apply_activate_ability::execute(battle, player, activated_ability_id);
+            activate_ability::execute(battle, player, activated_ability_id);
         }
         BattleAction::PassPriority => {
             resolve_card::pass_priority(battle, player);
@@ -75,8 +75,8 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
         BattleAction::SubmitMulligan => {
             todo!("Implement {:?}", action);
         }
-        BattleAction::SelectModalEffectChoice(_stack_item_id, _modal_choice_index) => {
-            todo!("Implement {:?}", action);
+        BattleAction::SelectModalEffectChoice(on_selected, modal_choice_index) => {
+            select_modal_effect_choice::execute(battle, player, on_selected, modal_choice_index);
         }
     }
 
