@@ -1,6 +1,8 @@
 use core_data::identifiers::CardName;
+use core_data::numerics::Spark;
 use display_data::battle_view::DisplayPlayer;
 use test_utils::battle::test_battle::TestBattle;
+use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_prelude::*;
 
 #[test]
@@ -90,5 +92,64 @@ fn return_to_hand_only_targets_enemy_characters() {
     assert!(
         s.user_client.cards.user_battlefield().contains(&user_character_id),
         "user character untouched"
+    );
+}
+
+#[test]
+fn return_to_hand_resets_spark_from_triggered_abilities() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    // Place a trigger character on user battlefield
+    let trigger_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
+    );
+
+    // Verify base spark
+    let initial_spark = s.user_client.cards.get_revealed(&trigger_character_id).numeric_spark();
+    assert_eq!(initial_spark, Some(Spark(5)), "trigger character has base spark of 5");
+
+    // Materialize another character to trigger the spark gain
+    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
+
+    // Verify spark increased from trigger
+    let increased_spark = s.user_client.cards.get_revealed(&trigger_character_id).numeric_spark();
+    assert_eq!(increased_spark, Some(Spark(6)), "trigger character gained +1 spark from trigger");
+
+    // End user turn and start enemy turn
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+
+    // Enemy returns the character to hand - need to target manually since there are
+    // 2 characters
+    s.create_and_play(DisplayPlayer::Enemy, CardName::TestReturnToHand);
+    s.invoke_click(DisplayPlayer::Enemy, &trigger_character_id);
+
+    // Verify character was returned to user hand
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "only vanilla character remains");
+    assert_eq!(s.user_client.cards.user_hand().len(), 1, "trigger character returned to hand");
+    assert!(
+        s.user_client.cards.user_hand().contains(&trigger_character_id),
+        "trigger character in user hand"
+    );
+
+    // End enemy turn to allow user to re-play
+    s.end_turn_remove_opponent_hand(DisplayPlayer::Enemy);
+
+    // Re-play the character to verify spark reset - use create_and_play to get a
+    // fresh instance
+    let reset_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
+    );
+
+    // Verify spark has reset to base value for newly materialized character
+    let reset_spark = s.user_client.cards.get_revealed(&reset_character_id).numeric_spark();
+    assert_eq!(
+        reset_spark,
+        Some(Spark(5)),
+        "character has base spark value when materialized fresh from hand"
     );
 }
