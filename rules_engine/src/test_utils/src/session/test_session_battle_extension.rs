@@ -63,7 +63,7 @@ pub trait TestSessionBattleExtension {
     ///
     /// Panics if the server returns an error for selecting this target or if
     /// the target is not valid for the card.
-    fn select_target(&mut self, player: DisplayPlayer, target_id: &ClientCardId);
+    fn invoke_click(&mut self, player: DisplayPlayer, target_id: &ClientCardId);
 
     /// Adds a card to a player's hand via debug actions, returning its card id.
     fn add_to_hand(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId;
@@ -172,7 +172,7 @@ impl TestSessionBattleExtension for TestSession {
         self.play_card_from_hand(player, &new_card_id);
 
         if let Some(target) = card.target {
-            self.select_target(player, &target);
+            self.invoke_click(player, &target);
         }
 
         new_card_id
@@ -191,7 +191,7 @@ impl TestSessionBattleExtension for TestSession {
         self.perform_player_action(player, play_action);
     }
 
-    fn select_target(&mut self, player: DisplayPlayer, target_id: &ClientCardId) {
+    fn invoke_click(&mut self, player: DisplayPlayer, target_id: &ClientCardId) {
         let target_action =
             self.client(player).cards.get_revealed(target_id).actions.on_click.clone();
 

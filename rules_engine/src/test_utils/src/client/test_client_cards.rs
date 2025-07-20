@@ -18,6 +18,15 @@ pub struct TestClientCard {
     pub view: CardView,
 }
 
+impl TestClientCard {
+    /// Get the revealed card view for this card.
+    ///
+    /// Panics if the card is not revealed.
+    pub fn revealed(&self) -> &RevealedCardView {
+        self.view.revealed.as_ref().expect("Card is not revealed")
+    }
+}
+
 impl TestClientCards {
     /// Get all cards in a specific position
     pub fn cards_at_position(&self, position: &Position) -> TestClientCardList<'_> {

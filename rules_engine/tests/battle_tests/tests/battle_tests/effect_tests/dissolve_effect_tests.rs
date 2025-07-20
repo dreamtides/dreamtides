@@ -78,7 +78,7 @@ fn dissolve_with_multiple_targets() {
     );
 
     s.create_and_play(DisplayPlayer::User, CardName::TestDissolve);
-    s.select_target(DisplayPlayer::User, &target1_id);
+    s.invoke_click(DisplayPlayer::User, &target1_id);
 
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "one enemy character remains");
     assert_eq!(s.user_client.cards.enemy_void().len(), 1, "one enemy character dissolved");

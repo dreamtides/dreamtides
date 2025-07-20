@@ -18,7 +18,8 @@ pub fn for_event(battle: &BattleState, player: PlayerName, card_id: CardId, paid
                 stack_card_id: StackCardId(card_id),
                 ability_number: data.ability_number,
             };
-            if !has_legal_additional_cost_choices(battle, source, additional_cost, paid) {
+            if !has_legal_additional_cost_choices_for_effect(battle, source, additional_cost, paid)
+            {
                 return false;
             }
         }
@@ -27,15 +28,17 @@ pub fn for_event(battle: &BattleState, player: PlayerName, card_id: CardId, paid
     true
 }
 
-fn has_legal_additional_cost_choices(
+/// Returns true if the given effect has legal additional cost choices for the
+/// given source.
+fn has_legal_additional_cost_choices_for_effect(
     battle: &BattleState,
     source: EffectSource,
     cost: &Cost,
-    paid: Energy,
+    already_paid: Energy,
 ) -> bool {
     match cost {
         Cost::SpendOneOrMoreEnergy => {
-            battle.players.player(source.controller()).current_energy > paid
+            battle.players.player(source.controller()).current_energy > already_paid
         }
         _ => todo!("Implement additional cost choices"),
     }

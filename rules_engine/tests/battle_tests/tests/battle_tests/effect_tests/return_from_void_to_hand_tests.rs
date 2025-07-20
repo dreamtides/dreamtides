@@ -22,7 +22,7 @@ fn return_void_card_to_hand_basic() {
         "Void card should be selectable"
     );
 
-    s.select_target(DisplayPlayer::User, &void_card);
+    s.invoke_click(DisplayPlayer::User, &void_card);
 
     s.click_primary_button(DisplayPlayer::User, "Submit");
 
@@ -46,7 +46,7 @@ fn return_void_card_to_hand_click_to_select() {
         "Void card should have click action"
     );
 
-    s.select_target(DisplayPlayer::User, &void_card);
+    s.invoke_click(DisplayPlayer::User, &void_card);
 
     let void_card_view_after = s.user_client.cards.get(&void_card);
     let outline_color = void_card_view_after.view.revealed.as_ref().unwrap().outline_color;
@@ -60,13 +60,13 @@ fn return_void_card_to_hand_click_twice_to_unselect() {
 
     s.create_and_play(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
 
-    s.select_target(DisplayPlayer::User, &void_card);
+    s.invoke_click(DisplayPlayer::User, &void_card);
     assert!(
         s.user_client.interface().primary_action_button.is_some(),
         "Submit button should be available after selection"
     );
 
-    s.select_target(DisplayPlayer::User, &void_card);
+    s.invoke_click(DisplayPlayer::User, &void_card);
     assert!(
         s.user_client.interface().primary_action_button.is_none(),
         "Submit button should not be available after unselection"
@@ -81,8 +81,8 @@ fn return_void_card_to_hand_select_different_card() {
 
     s.create_and_play(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
 
-    s.select_target(DisplayPlayer::User, &void_card_1);
-    s.select_target(DisplayPlayer::User, &void_card_2);
+    s.invoke_click(DisplayPlayer::User, &void_card_1);
+    s.invoke_click(DisplayPlayer::User, &void_card_2);
 
     s.click_primary_button(DisplayPlayer::User, "Submit");
 
@@ -129,7 +129,7 @@ fn return_void_card_to_hand_with_multiple_void_cards() {
     assert!(cards_in_browser.contains(&void_card_2), "Second void card should be in browser");
     assert!(cards_in_browser.contains(&void_card_3), "Third void card should be in browser");
 
-    s.select_target(DisplayPlayer::User, &void_card_2);
+    s.invoke_click(DisplayPlayer::User, &void_card_2);
     s.click_primary_button(DisplayPlayer::User, "Submit");
 
     assert!(
@@ -200,7 +200,7 @@ fn return_void_card_to_hand_browser_closes_after_submit() {
 
     s.create_and_play(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
 
-    s.select_target(DisplayPlayer::User, &void_card);
+    s.invoke_click(DisplayPlayer::User, &void_card);
     s.click_primary_button(DisplayPlayer::User, "Submit");
 
     let cards_in_browser = s.user_client.cards.browser_cards();

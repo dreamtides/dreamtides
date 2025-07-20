@@ -73,7 +73,7 @@ fn stack_back_and_forth_with_targeting() {
     assert!(s.user_client.me.can_act(), "user can act again");
 
     s.play_card_from_hand(DisplayPlayer::User, &user_counterspell2);
-    s.select_target(DisplayPlayer::User, &enemy_counterspell1);
+    s.invoke_click(DisplayPlayer::User, &enemy_counterspell1);
     assert!(
         s.user_client.cards.stack_cards().contains(&user_counterspell2),
         "second user counterspell on stack"
@@ -82,7 +82,7 @@ fn stack_back_and_forth_with_targeting() {
     assert!(s.user_client.opponent.can_act(), "enemy can act again");
 
     s.play_card_from_hand(DisplayPlayer::Enemy, &enemy_counterspell2);
-    s.select_target(DisplayPlayer::Enemy, &user_counterspell2);
+    s.invoke_click(DisplayPlayer::Enemy, &user_counterspell2);
     assert!(
         s.user_client.cards.stack_cards().contains(&enemy_counterspell2),
         "second enemy counterspell on stack"
@@ -161,7 +161,7 @@ fn resolve_negate_with_removed_target() {
     assert_eq!(s.user_client.cards.stack_cards().len(), 3, "three cards on stack");
 
     s.play_card_from_hand(DisplayPlayer::User, &user_counterspell2);
-    s.select_target(DisplayPlayer::User, &enemy_character);
+    s.invoke_click(DisplayPlayer::User, &enemy_character);
     assert_eq!(s.user_client.cards.stack_cards().len(), 4, "four cards on stack");
 
     assert_arrow_between_cards(&s, &user_counterspell1, &enemy_character);

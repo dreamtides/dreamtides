@@ -26,7 +26,8 @@ pub fn for_event(battle: &BattleState, controller: PlayerName, card_id: CardId) 
     true
 }
 
-fn has_legal_targets_for_effect(
+/// Returns true if the given effect has legal targets for the given source.
+pub fn has_legal_targets_for_effect(
     battle: &BattleState,
     source: EffectSource,
     effect: &Effect,
