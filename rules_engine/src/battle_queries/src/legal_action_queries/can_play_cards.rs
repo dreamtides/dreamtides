@@ -33,15 +33,12 @@ pub fn from_hand(battle: &BattleState, player: PlayerName, fast_only: FastOnly) 
     for card_id in battle.cards.hand(player) {
         // Quick check for energy cost first, since this is the most common
         // reason for a card not being playable.
-        let Some(energy_cost) = card_properties::energy_cost(battle, card_id) else {
-            continue;
-        };
-
-        if fast_only == FastOnly::Yes && !card_properties::is_fast(battle, card_id) {
+        let energy_cost = card_properties::converted_energy_cost(battle, card_id);
+        if energy_cost > battle.players.player(player).current_energy {
             continue;
         }
 
-        if energy_cost > battle.players.player(player).current_energy {
+        if fast_only == FastOnly::Yes && !card_properties::is_fast(battle, card_id) {
             continue;
         }
 
@@ -177,12 +174,14 @@ fn can_play_from_void_with_static_ability(
         StandardStaticAbility::PlayFromVoid(play) => {
             let cost = match play.energy_cost {
                 Some(energy_cost) => energy_cost,
-                None => card_properties::energy_cost(battle, card_id)?,
+                // Cards with no energy cost (e.g. modal cards) are treated as
+                // having a cost of 0
+                None => card_properties::converted_energy_cost(battle, card_id),
             };
             Some(FromVoidWithCost { cost, via_ability_id: ability_id })
         }
         StandardStaticAbility::PlayOnlyFromVoid => {
-            let cost = card_properties::energy_cost(battle, card_id)?;
+            let cost = card_properties::converted_energy_cost(battle, card_id);
             Some(FromVoidWithCost { cost, via_ability_id: ability_id })
         }
         _ => None,

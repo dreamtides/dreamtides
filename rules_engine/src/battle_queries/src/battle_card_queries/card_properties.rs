@@ -38,12 +38,23 @@ pub fn display_name(card_name: CardName) -> String {
     }
 }
 
-pub fn energy_cost(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
+/// Returns the energy cost of a card, or 0 if it has no energy cost.
+///
+/// Cards may not have an energy cost due to their card type (e.g. dreamwell
+/// cards) or may not have a cost due to their ability (e.g. modal cards).
+pub fn converted_energy_cost(battle: &BattleState, card_id: impl CardIdType) -> Energy {
+    base_energy_cost_for_id(battle, card_id).unwrap_or_default()
+}
+
+/// Returns the base energy cost of a card as in [base_energy_cost].
+pub fn base_energy_cost_for_id(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
     base_energy_cost(card::get(battle, card_id).name)
 }
 
-pub fn base_energy_cost(card_name: CardName) -> Option<Energy> {
-    match card_name {
+/// Returns the base energy cost of a card specified in the card definition, or
+/// None if it has no energy cost (e.g. modal cards).
+pub fn base_energy_cost(name: CardName) -> Option<Energy> {
+    match name {
         CardName::TestVanillaCharacter => Some(Energy(2)),
         CardName::TestDissolve => Some(Energy(2)),
         CardName::TestCounterspellUnlessPays => Some(Energy(1)),
@@ -64,7 +75,7 @@ pub fn base_energy_cost(card_name: CardName) -> Option<Energy> {
         CardName::TestDrawOneReclaim => Some(Energy(2)),
         CardName::TestReturnVoidCardToHand => Some(Energy(1)),
         CardName::TestReturnOneOrTwoVoidEventCardsToHand => Some(Energy(1)),
-        CardName::TestModalDrawOneOrDrawTwo => Some(Energy(1)),
+        CardName::TestModalDrawOneOrDrawTwo => None,
     }
 }
 
@@ -77,8 +88,12 @@ pub fn spark(battle: &BattleState, controller: PlayerName, id: CharacterId) -> O
     battle.cards.spark(controller, id)
 }
 
-pub fn base_spark(battle: &BattleState, card_id: impl CardIdType) -> Option<Spark> {
-    match card::get(battle, card_id).name {
+pub fn base_spark_for_id(battle: &BattleState, card_id: impl CardIdType) -> Option<Spark> {
+    base_spark(card::get(battle, card_id).name)
+}
+
+pub fn base_spark(name: CardName) -> Option<Spark> {
+    match name {
         CardName::TestVanillaCharacter => Some(Spark(5)),
         CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => Some(Spark(5)),
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => Some(Spark(5)),

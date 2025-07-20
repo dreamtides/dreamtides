@@ -90,7 +90,7 @@ fn modal_effect_card_view(
         let select_action = BattleAction::SelectModalEffectChoice(index);
         let can_select = legal_actions.contains(select_action, ForPlayer::Human);
 
-        revealed.cost = Some(cost);
+        revealed.cost = Some(cost.to_string());
         revealed.card_type = "Choice".to_string();
         revealed.rules_text = description.to_string();
         revealed.outline_color =

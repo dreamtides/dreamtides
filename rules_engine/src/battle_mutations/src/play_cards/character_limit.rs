@@ -30,11 +30,10 @@ pub fn apply(battle: &mut BattleState, source: EffectSource, player: PlayerName)
         return None;
     }
 
-    let (target_id, _) = battle
-        .cards
-        .battlefield_state(player)
-        .iter()
-        .min_by_key(|(id, state)| (state.spark, card_properties::energy_cost(battle, **id)))?;
+    let (target_id, _) =
+        battle.cards.battlefield_state(player).iter().min_by_key(|(id, state)| {
+            (state.spark, card_properties::converted_energy_cost(battle, **id))
+        })?;
 
     battle
         .turn_history

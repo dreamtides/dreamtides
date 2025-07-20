@@ -13,7 +13,6 @@ use battle_state::battle_cards::stack_card_state::StackItemId;
 use bon::Builder;
 use core_data::display_color;
 use core_data::display_types::{AudioClipAddress, SpriteAddress};
-use core_data::numerics::{Energy, Spark};
 use core_data::types::CardFacing;
 use display_data::battle_view::DisplayPlayer;
 use display_data::card_view::{
@@ -167,7 +166,7 @@ fn activated_ability_card_view(
             }))
             .image(card_rendering::card_image(battle, character_card_id))
             .name(ability_name)
-            .maybe_cost(cost)
+            .maybe_cost(cost.map(|cost| cost.to_string()))
             .maybe_card_type(Some("Activated Ability".to_string()))
             .rules_text(card_rendering::rules_text(battle, character_card_id))
             .create_position(ObjectPosition {
@@ -241,12 +240,13 @@ fn void_card_token_view(
             })
             .image(card_rendering::card_image(battle, card_id))
             .name(card_rendering::card_name(battle, card_id))
-            .cost(can_play_cards::play_from_void_energy_cost(
-                battle,
-                VoidCardId(card_id),
-                ability_id,
-            ))
-            .maybe_spark(card_properties::base_spark(battle, card_id))
+            .cost(
+                can_play_cards::play_from_void_energy_cost(battle, VoidCardId(card_id), ability_id)
+                    .to_string(),
+            )
+            .maybe_spark(
+                card_properties::base_spark_for_id(battle, card_id).map(|spark| spark.to_string()),
+            )
             .rules_text(card_rendering::rules_text(battle, card_id))
             .create_position(ObjectPosition {
                 position: Position::InVoid(DisplayPlayer::User),
@@ -277,8 +277,8 @@ struct TokenCardView {
     position: ObjectPosition,
     image: SpriteAddress,
     name: String,
-    cost: Option<Energy>,
-    spark: Option<Spark>,
+    cost: Option<String>,
+    spark: Option<String>,
     card_type: Option<String>,
     rules_text: String,
     create_position: Option<ObjectPosition>,

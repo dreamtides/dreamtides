@@ -26,9 +26,7 @@ pub fn from_hand(battle: &mut BattleState, player: PlayerName, card_id: HandCard
         from_zone: Zone::Hand,
     });
 
-    if let Some(cost) = card_properties::energy_cost(battle, card_id) {
-        energy::spend(battle, player, source, cost);
-    }
+    energy::spend(battle, player, source, card_properties::converted_energy_cost(battle, card_id));
     let stack_card_id = move_card::from_hand_to_stack(battle, source, player, card_id);
 
     // Opponent gets priority when a card is played

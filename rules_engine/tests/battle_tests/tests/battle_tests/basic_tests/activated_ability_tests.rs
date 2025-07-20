@@ -201,7 +201,7 @@ fn activate_ability_token_card_properties() {
     let token_card = token_card.unwrap();
     let revealed = token_card.view.revealed.as_ref().unwrap();
 
-    assert_eq!(revealed.cost, Some(Energy(1)), "activated ability should show cost");
+    assert_eq!(revealed.cost, Some("1".to_string()), "activated ability should show cost");
     assert!(revealed.name.contains("Activated"), "ability name should contain character name");
     assert!(revealed.actions.can_play.is_some(), "activated ability should be playable");
 }

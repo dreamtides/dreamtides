@@ -2,7 +2,6 @@ use action_data::game_action_data::GameAction;
 use battle_state::battle::card_id::CardId;
 use core_data::display_color::DisplayColor;
 use core_data::display_types::{AudioClipAddress, PrefabAddress, ProjectileAddress, SpriteAddress};
-use core_data::numerics::{Energy, Spark};
 use core_data::types::CardFacing;
 use masonry::flex_node::FlexNode;
 use schemars::JsonSchema;
@@ -65,10 +64,10 @@ pub struct CardPreviewView {
     pub card_id: ClientCardId,
 
     /// New cost value for this card
-    pub cost: Option<Energy>,
+    pub cost: Option<String>,
 
     /// New spark value for this card
-    pub spark: Option<Spark>,
+    pub spark: Option<String>,
 
     /// Icon to display over this card on the battlefield
     pub battlefield_icon: Option<String>,
@@ -88,13 +87,13 @@ pub struct RevealedCardView {
     pub name: String,
 
     /// Cost of this card
-    pub cost: Option<Energy>,
+    pub cost: Option<String>,
 
     /// Energy produced by this card
-    pub produced: Option<Energy>,
+    pub produced: Option<String>,
 
     /// Spark value for this card
-    pub spark: Option<Spark>,
+    pub spark: Option<String>,
 
     /// Type or subtype of this card
     pub card_type: String,

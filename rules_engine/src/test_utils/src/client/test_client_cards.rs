@@ -120,7 +120,7 @@ impl TestClientCards {
     /// Get the cost of a card.
     ///
     /// Panics if the card is not found or has no cost.
-    pub fn get_cost(&self, id: &ClientCardId) -> Energy {
-        self.get_revealed(id).cost.expect("Card has no cost")
+    pub fn get_cost(&self, id: &ClientCardId) -> String {
+        self.get_revealed(id).cost.clone().expect("Card has no cost")
     }
 }
