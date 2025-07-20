@@ -106,13 +106,18 @@ fn modal_effect_descriptions(rules_text: &str) -> Vec<String> {
     let mut descriptions = Vec::new();
     let mut current_pos = 0;
 
-    while let Some(start_tag) = rules_text[current_pos..].find("<li>") {
-        let li_start = current_pos + start_tag + 4;
-        if let Some(end_tag) = rules_text[li_start..].find("</li>") {
-            let li_end = li_start + end_tag;
-            let description = rules_text[li_start..li_end].trim().to_string();
-            descriptions.push(description);
-            current_pos = li_end + 5;
+    while let Some(start_tag) = rules_text[current_pos..].find("<indent") {
+        let indent_start = current_pos + start_tag;
+        if let Some(close_bracket) = rules_text[indent_start..].find(">") {
+            let content_start = indent_start + close_bracket + 1;
+            if let Some(end_tag) = rules_text[content_start..].find("</indent>") {
+                let content_end = content_start + end_tag;
+                let description = rules_text[content_start..content_end].trim().to_string();
+                descriptions.push(description);
+                current_pos = content_end + 8;
+            } else {
+                break;
+            }
         } else {
             break;
         }

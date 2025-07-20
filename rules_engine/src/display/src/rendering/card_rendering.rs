@@ -84,7 +84,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
         cost: if card_properties::base_energy_cost_for_id(battle, card_id).is_some() {
             Some(card_properties::converted_energy_cost(battle, card_id).to_string())
         } else {
-            Some("∗".to_string())
+            Some(format!("<size=50%>{}</size>", icon::NON_NUMERIC))
         },
         produced: None,
         spark: card_properties::spark(battle, controller, CharacterId(card_id))
@@ -305,7 +305,7 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
             "Return one or two events from your void to your hand.".to_string()
         }
         CardName::TestModalDrawOneOrDrawTwo => {
-            "Choose one:<ul><li>Draw 1 card.</li><li>Draw 2 cards.</li></ul>".to_string()
+            "Choose one:\n • <indent=1em>Draw 1 card.</indent>\n • <indent=1em>Draw 2 cards.</indent>".to_string()
         }
     };
 

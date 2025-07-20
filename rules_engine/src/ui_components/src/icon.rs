@@ -4,3 +4,4 @@ pub const CHEVRON_UP: &str = "\u{f077}";
 pub const XMARK: &str = "\u{f00d}";
 pub const EYE_SLASH: &str = "\u{f070}";
 pub const EYE: &str = "\u{f06e}";
+pub const NON_NUMERIC: &str = "\u{f621}";
