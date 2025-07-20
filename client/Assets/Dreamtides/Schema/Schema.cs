@@ -701,7 +701,7 @@ namespace Dreamtides.Schema
         /// Cost of this card
         /// </summary>
         [JsonProperty("cost")]
-        public long? Cost { get; set; }
+        public string Cost { get; set; }
 
         /// <summary>
         /// Special effects to display for this card
@@ -744,7 +744,7 @@ namespace Dreamtides.Schema
         /// Energy produced by this card
         /// </summary>
         [JsonProperty("produced")]
-        public long? Produced { get; set; }
+        public string Produced { get; set; }
 
         /// <summary>
         /// Rules text to display for this car
@@ -756,7 +756,7 @@ namespace Dreamtides.Schema
         /// Spark value for this card
         /// </summary>
         [JsonProperty("spark")]
-        public long? Spark { get; set; }
+        public string Spark { get; set; }
     }
 
     /// <summary>
@@ -1131,13 +1131,13 @@ namespace Dreamtides.Schema
         /// New cost value for this card
         /// </summary>
         [JsonProperty("cost")]
-        public long? Cost { get; set; }
+        public string Cost { get; set; }
 
         /// <summary>
         /// New spark value for this card
         /// </summary>
         [JsonProperty("spark")]
-        public long? Spark { get; set; }
+        public string Spark { get; set; }
     }
 
     /// <summary>

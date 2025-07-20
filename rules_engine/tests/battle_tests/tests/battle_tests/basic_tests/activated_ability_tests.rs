@@ -201,7 +201,7 @@ fn activate_ability_token_card_properties() {
     let token_card = token_card.unwrap();
     let revealed = token_card.view.revealed.as_ref().unwrap();
 
-    assert_eq!(revealed.cost, Some("1".to_string()), "activated ability should show cost");
+    assert_eq!(revealed.numeric_cost(), Some(Energy(1)), "activated ability should show cost");
     assert!(revealed.name.contains("Activated"), "ability name should contain character name");
     assert!(revealed.actions.can_play.is_some(), "activated ability should be playable");
 }
@@ -213,12 +213,12 @@ fn activate_ability_spark_unchanged() {
     let character_id =
         s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCardCharacter);
 
-    let initial_spark = s.user_client.cards.get_revealed(&character_id).spark;
+    let initial_spark = s.user_client.cards.get_revealed(&character_id).numeric_spark();
     assert_eq!(initial_spark, Some(Spark(3)), "character has initial spark");
 
     s.activate_ability(DisplayPlayer::User, &character_id, 0);
 
-    let final_spark = s.user_client.cards.get_revealed(&character_id).spark;
+    let final_spark = s.user_client.cards.get_revealed(&character_id).numeric_spark();
     assert_eq!(final_spark, Some(Spark(3)), "character spark unchanged after activation");
 }
 
@@ -563,7 +563,7 @@ fn dual_activated_abilities_each_usable_once_per_turn() {
     assert_eq!(s.user_client.cards.user_hand().len(), 2, "drew card from first ability");
     assert_eq!(s.user_client.me.energy(), Energy(98), "energy spent on first ability");
 
-    let initial_spark = s.user_client.cards.get_revealed(&character_id).spark;
+    let initial_spark = s.user_client.cards.get_revealed(&character_id).numeric_spark();
 
     s.activate_ability(DisplayPlayer::User, &character_id, 1);
     assert_eq!(
@@ -573,7 +573,7 @@ fn dual_activated_abilities_each_usable_once_per_turn() {
     );
     assert_eq!(s.user_client.me.energy(), Energy(96), "energy spent on second ability");
 
-    let final_spark = s.user_client.cards.get_revealed(&character_id).spark;
+    let final_spark = s.user_client.cards.get_revealed(&character_id).numeric_spark();
     assert_eq!(final_spark, initial_spark, "character spark unchanged by card draw ability");
 
     let token1_after = s.user_client.cards.card_map.get(&token1_id);

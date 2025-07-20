@@ -96,7 +96,7 @@ fn card_preview_shows_cost_changes_from_effects() {
 
     let preview = s.user_client.active_battle_preview();
     let has_card_with_cost_change = preview.cards.iter().any(|card_preview| {
-        card_preview.cost.is_some() && card_preview.cost != Some(original_cost)
+        card_preview.cost.is_some() && card_preview.cost != Some(original_cost.to_string())
     });
 
     assert!(

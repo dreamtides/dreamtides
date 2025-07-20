@@ -136,14 +136,14 @@ namespace Dreamtides.Components
     {
       if (preview.Cost != null)
       {
-        _costText.text = preview.Cost.ToString();
+        _costText.text = preview.Cost;
         _costText.color = textColor;
       }
 
       if (preview.Spark != null)
       {
-        _sparkText.text = preview.Spark.ToString();
-        _battlefieldSparkText.text = preview.Spark.ToString();
+        _sparkText.text = preview.Spark;
+        _battlefieldSparkText.text = preview.Spark;
         _sparkText.color = textColor;
         _battlefieldSparkText.color = textColor;
       }
@@ -158,9 +158,9 @@ namespace Dreamtides.Components
 
     public void ClearPreview()
     {
-      _costText.text = CardView.Revealed?.Cost?.ToString();
-      _sparkText.text = CardView.Revealed?.Spark?.ToString();
-      _battlefieldSparkText.text = CardView.Revealed?.Spark?.ToString();
+      _costText.text = CardView.Revealed?.Cost;
+      _sparkText.text = CardView.Revealed?.Spark;
+      _battlefieldSparkText.text = CardView.Revealed?.Spark;
       _costText.color = Color.white;
       _sparkText.color = Color.white;
       _battlefieldSparkText.color = Color.white;

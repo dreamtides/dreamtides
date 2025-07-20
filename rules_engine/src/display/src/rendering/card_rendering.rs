@@ -84,7 +84,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
         cost: if card_properties::base_energy_cost_for_id(battle, card_id).is_some() {
             Some(card_properties::converted_energy_cost(battle, card_id).to_string())
         } else {
-            Some("✻".to_string())
+            Some("∗".to_string())
         },
         produced: None,
         spark: card_properties::spark(battle, controller, CharacterId(card_id))

@@ -6,6 +6,7 @@ use display_data::card_view::{CardView, ClientCardId, RevealedCardView};
 use display_data::object_position::Position;
 
 use crate::client::test_client_card_list::TestClientCardList;
+use crate::session::test_session_prelude::TestRevealedCardExtension;
 
 #[derive(Default)]
 pub struct TestClientCards {
@@ -119,8 +120,8 @@ impl TestClientCards {
 
     /// Get the cost of a card.
     ///
-    /// Panics if the card is not found or has no cost.
-    pub fn get_cost(&self, id: &ClientCardId) -> String {
-        self.get_revealed(id).cost.clone().expect("Card has no cost")
+    /// Panics if the card has no numeric cost.
+    pub fn get_cost(&self, id: &ClientCardId) -> Energy {
+        self.get_revealed(id).numeric_cost().expect("Card has no numeric cost")
     }
 }
