@@ -1,6 +1,7 @@
 use ability_data::cost::Cost;
 use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
+use battle_queries::battle_card_queries::card_properties;
 use battle_queries::battle_player_queries::quantity_expression;
 use battle_queries::battle_trace;
 use battle_state::battle::battle_state::BattleState;
@@ -52,6 +53,7 @@ pub fn apply(
         StandardEffect::ReturnUpToCountFromYourVoidToHand { .. } => {
             return_up_to_count_from_your_void_to_hand(battle, source, targets)
         }
+        StandardEffect::ReturnToHand { .. } => return_to_hand(battle, source, targets),
         _ => todo!("Implement {:?}", effect),
     }
 }
@@ -186,5 +188,20 @@ fn return_up_to_count_from_your_void_to_hand(
     for void_card_target in void_cards {
         move_card::from_void_to_hand(battle, source, controller, void_card_target.id);
     }
+    Some(EffectWasApplied)
+}
+
+fn return_to_hand(
+    battle: &mut BattleState,
+    source: EffectSource,
+    targets: &mut Option<EffectTargets>,
+) -> Option<EffectWasApplied> {
+    let id = targeting::character_id(targets)?;
+    move_card::from_battlefield_to_hand(
+        battle,
+        source,
+        card_properties::controller(battle, id),
+        id,
+    );
     Some(EffectWasApplied)
 }

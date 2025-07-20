@@ -161,6 +161,26 @@ pub fn from_void_to_hand(
     HandCardId(card_id.card_id())
 }
 
+/// Moves a character from the 'controller' player's battlefield to their hand.
+///
+/// Panics if this character is not found.
+pub fn from_battlefield_to_hand(
+    battle: &mut BattleState,
+    source: EffectSource,
+    controller: PlayerName,
+    card_id: CharacterId,
+) -> HandCardId {
+    to_destination_zone(
+        battle,
+        source,
+        controller,
+        card_id.card_id(),
+        Zone::Battlefield,
+        Zone::Hand,
+    );
+    HandCardId(card_id.card_id())
+}
+
 /// Moves a card from the 'old' zone to the 'new' zone.
 ///
 /// Panics if this card is not found in the 'old' zone.

@@ -234,6 +234,9 @@ pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
         CardName::TestModalDrawOneOrDissolveEnemy => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
+        CardName::TestReturnToHand => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
+        ),
     }
 }
 
@@ -312,6 +315,9 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         }
         CardName::TestModalDrawOneOrDissolveEnemy => {
             "Choose one:\n • <indent=1em>1\u{f7e4}: Draw 1 card.</indent>\n • <indent=1em>2\u{f7e4}: <b>Dissolve</b> an enemy character.</indent>".to_string()
+        }
+        CardName::TestReturnToHand => {
+            "<b>Return</b> an enemy character to its owner's hand.".to_string()
         }
     };
 
