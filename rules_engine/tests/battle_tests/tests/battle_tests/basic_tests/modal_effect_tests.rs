@@ -129,3 +129,132 @@ fn modal_choices_unplayable_with_no_energy() {
         "modal card itself should not be playable"
     );
 }
+
+#[test]
+fn modal_draw_or_dissolve_auto_targets_single_enemy() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+    let enemy_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    assert_eq!(
+        s.user_client.cards.enemy_battlefield().len(),
+        1,
+        "one enemy character on battlefield"
+    );
+    assert_eq!(s.user_client.cards.enemy_void().len(), 0, "enemy void empty");
+    assert_eq!(s.user_client.cards.user_hand().len(), 0, "user hand empty");
+
+    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDissolveEnemy);
+
+    let browser_cards = s.user_client.cards.browser_cards();
+    assert_eq!(browser_cards.len(), 2, "two browser cards displayed for modal choice");
+
+    let dissolve_card_id = browser_cards.cards[1].id.clone();
+    s.invoke_click(DisplayPlayer::User, &dissolve_card_id);
+
+    assert_eq!(s.user_client.cards.enemy_battlefield().len(), 0, "enemy character dissolved");
+    assert_eq!(s.user_client.cards.enemy_void().len(), 1, "enemy character in void");
+    assert!(s.user_client.cards.enemy_void().contains(&enemy_id), "correct enemy dissolved");
+    assert_eq!(s.user_client.cards.user_void().len(), 1, "modal card in user void");
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn modal_draw_or_dissolve_manual_targeting_multiple_enemies() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+    let enemy1_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let enemy2_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    assert_eq!(
+        s.user_client.cards.enemy_battlefield().len(),
+        2,
+        "two enemy characters on battlefield"
+    );
+    assert_eq!(s.user_client.cards.enemy_void().len(), 0, "enemy void empty");
+
+    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDissolveEnemy);
+
+    let browser_cards = s.user_client.cards.browser_cards();
+    assert_eq!(browser_cards.len(), 2, "two browser cards displayed for modal choice");
+
+    let dissolve_card_id = browser_cards.cards[1].id.clone();
+    s.invoke_click(DisplayPlayer::User, &dissolve_card_id);
+
+    s.invoke_click(DisplayPlayer::User, &enemy1_id);
+
+    assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "one enemy character remains");
+    assert_eq!(s.user_client.cards.enemy_void().len(), 1, "one enemy character dissolved");
+    assert!(s.user_client.cards.enemy_void().contains(&enemy1_id), "correct enemy dissolved");
+    assert!(s.user_client.cards.enemy_battlefield().contains(&enemy2_id), "other enemy remains");
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn modal_draw_or_dissolve_draw_option_no_targeting() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+    let enemy_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    assert_eq!(s.user_client.cards.user_hand().len(), 0, "user hand empty");
+    assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "enemy still on battlefield");
+
+    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDissolveEnemy);
+
+    let browser_cards = s.user_client.cards.browser_cards();
+    assert_eq!(browser_cards.len(), 2, "two browser cards displayed for modal choice");
+
+    let draw_card_id = browser_cards.cards[0].id.clone();
+    s.invoke_click(DisplayPlayer::User, &draw_card_id);
+
+    assert_eq!(s.user_client.cards.user_hand().len(), 1, "drew one card");
+    assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "enemy character untouched");
+    assert!(
+        s.user_client.cards.enemy_battlefield().contains(&enemy_id),
+        "enemy still on battlefield"
+    );
+    assert_eq!(s.user_client.cards.browser_cards().len(), 0, "browser cleared");
+    assert_eq!(s.user_client.cards.user_void().len(), 1, "modal card in user void");
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn modal_draw_or_dissolve_costs_and_targeting() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+    s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDissolveEnemy);
+
+    let browser_cards = s.user_client.cards.browser_cards();
+    assert_eq!(browser_cards.len(), 2, "two browser cards displayed for modal choice");
+
+    let draw_card = &browser_cards.cards[0];
+    let dissolve_card = &browser_cards.cards[1];
+
+    assert_eq!(draw_card.revealed().cost, Some("1".to_string()), "draw option costs 1 energy");
+    assert_eq!(
+        dissolve_card.revealed().cost,
+        Some("2".to_string()),
+        "dissolve option costs 2 energy"
+    );
+
+    assert_eq!(draw_card.revealed().card_type, "Choice", "draw option shows Choice type");
+    assert_eq!(dissolve_card.revealed().card_type, "Choice", "dissolve option shows Choice type");
+
+    let draw_rules_text = &draw_card.revealed().rules_text;
+    let dissolve_rules_text = &dissolve_card.revealed().rules_text;
+
+    assert!(
+        draw_rules_text.contains("Draw") || draw_rules_text.contains("draw"),
+        "draw option rules text mentions drawing: {}",
+        draw_rules_text
+    );
+    assert!(
+        dissolve_rules_text.contains("Dissolve") || dissolve_rules_text.contains("dissolve"),
+        "dissolve option rules text mentions dissolving: {}",
+        dissolve_rules_text
+    );
+
+    test_helpers::assert_clients_identical(&s);
+}
