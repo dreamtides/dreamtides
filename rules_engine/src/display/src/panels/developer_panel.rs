@@ -5,6 +5,7 @@ use action_data::panel_address::PanelAddress;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
 use bon::Builder;
+use core_data::identifiers::CardName;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify, FlexWrap};
@@ -59,6 +60,17 @@ impl Component for DeveloperPanel {
                                 .action(BattleAction::Debug(DebugBattleAction::DrawCard {
                                     player: self.user_player,
                                 }))
+                                .build(),
+                        )
+                        .child(
+                            DebugButton::builder()
+                                .label("Enemy Character")
+                                .action(BattleAction::Debug(
+                                    DebugBattleAction::AddCardToBattlefield {
+                                        player: self.user_player.opponent(),
+                                        card: CardName::TestVanillaCharacter,
+                                    },
+                                ))
                                 .build(),
                         )
                         .child(
