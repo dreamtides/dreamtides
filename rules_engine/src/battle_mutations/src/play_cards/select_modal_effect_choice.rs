@@ -2,11 +2,13 @@ use ability_data::effect::ModelEffectChoiceIndex;
 use battle_queries::panic_with;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_cards::stack_card_state::StackItemId;
+use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{OnSelected, PromptType};
 use core_data::types::PlayerName;
 
 use crate::activated_abilities::activate_ability;
 use crate::play_cards::play_card;
+use crate::player_mutations::energy;
 
 pub fn execute(
     battle: &mut BattleState,
@@ -19,6 +21,12 @@ pub fn execute(
     let PromptType::ModalEffect(modal_prompt) = prompt.prompt_type else {
         panic_with!("Prompt is not a modal effect choice", battle);
     };
+    let Some(cost) = modal_prompt.pay_energy.get(modal_choice_index.value()) else {
+        panic_with!("No energy cost for choice", battle);
+    };
+
+    let source = EffectSource::Player { controller: player };
+    energy::spend(battle, player, source, *cost);
 
     match modal_prompt.on_selected {
         OnSelected::AddStackTargets(stack_item_id) => {

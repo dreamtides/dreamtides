@@ -61,6 +61,7 @@ pub struct ChooseVoidCardPrompt {
 pub struct ModalEffectPrompt {
     pub on_selected: OnSelected,
     pub choice_count: usize,
+    pub pay_energy: Vec<Energy>,
 }
 
 /// State for a prompt to select a deck card order.

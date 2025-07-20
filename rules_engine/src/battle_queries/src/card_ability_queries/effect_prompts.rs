@@ -94,6 +94,7 @@ pub fn query(
                     prompt_type: PromptType::ModalEffect(ModalEffectPrompt {
                         on_selected,
                         choice_count: modal.len(),
+                        pay_energy: modal.iter().map(|choice| choice.energy_cost).collect(),
                     }),
                     configuration: PromptConfiguration { optional: false },
                 }])

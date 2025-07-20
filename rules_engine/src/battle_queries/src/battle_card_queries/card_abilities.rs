@@ -364,7 +364,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                             effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
                         },
                         ModalEffectChoice {
-                            energy_cost: Energy(2),
+                            energy_cost: Energy(3),
                             effect: Effect::Effect(StandardEffect::DrawCards { count: 2 }),
                         },
                     ]),

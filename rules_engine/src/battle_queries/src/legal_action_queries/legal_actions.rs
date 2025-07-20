@@ -2,6 +2,7 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::prompt_types::prompt_data::PromptType;
+use bit_set::BitSet;
 use core_data::types::PlayerName;
 
 use crate::legal_action_queries::can_activate_abilities;
@@ -41,7 +42,16 @@ pub fn compute(battle: &BattleState, player: PlayerName) -> LegalActions {
                 LegalActions::SelectEnergyValuePrompt { minimum: *minimum, maximum: *maximum }
             }
             PromptType::ModalEffect(prompt) => {
-                LegalActions::ModalEffectPrompt { choice_count: prompt.choice_count }
+                let player_energy = battle.players.player(player).current_energy;
+                let mut affordable_choices = BitSet::<usize>::default();
+
+                for (i, &energy_cost) in prompt.pay_energy.iter().enumerate() {
+                    if player_energy >= energy_cost {
+                        affordable_choices.insert(i);
+                    }
+                }
+
+                LegalActions::ModalEffectPrompt { affordable_choices }
             }
             PromptType::SelectDeckCardOrder { prompt } => {
                 LegalActions::SelectDeckCardOrder { current: prompt.clone() }

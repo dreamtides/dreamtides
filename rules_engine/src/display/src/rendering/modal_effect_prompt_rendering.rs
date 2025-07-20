@@ -96,7 +96,7 @@ fn modal_effect_card_view(
         revealed.outline_color =
             if can_select { Some(display_color::GREEN) } else { Some(display_color::WHITE) };
         revealed.actions.can_play = None;
-        revealed.actions.on_click = Some(GameAction::BattleAction(select_action));
+        revealed.actions.on_click = can_select.then_some(GameAction::BattleAction(select_action));
     }
 
     base_view
