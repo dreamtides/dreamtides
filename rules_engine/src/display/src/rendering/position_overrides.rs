@@ -17,13 +17,7 @@ pub fn object_position(
     card_id: CardId,
     base_object_position: ObjectPosition,
 ) -> ObjectPosition {
-    let position = if let Some(prompt) = battle.prompts.front()
-        && prompt.source.card_id() == Some(card_id)
-    {
-        Position::OnStack(positions::current_stack_type(builder, battle))
-    } else {
-        base_object_position.position
-    };
+    let position = for_prompt_source(builder, battle, card_id, base_object_position.position);
     let position = for_hidden_stack(builder, position);
     let position = for_stack_during_prompt(battle, position);
     let object_position = for_top_of_deck(battle, card_id, ObjectPosition {
@@ -34,6 +28,24 @@ pub fn object_position(
     let object_position = for_void_card_browser(battle, object_position);
     let position = for_browser(builder, object_position.position);
     ObjectPosition { position, sorting_key: object_position.sorting_key }
+}
+
+/// Returns the position for a card if it is the source of the current prompt.
+fn for_prompt_source(
+    builder: &ResponseBuilder,
+    battle: &BattleState,
+    card_id: CardId,
+    base_position: Position,
+) -> Position {
+    if let Some(prompt) = battle.prompts.front()
+        // Modal effect choices appear in the browser
+        && !matches!(prompt.prompt_type, PromptType::ModalEffect(_))
+        && prompt.source.card_id() == Some(card_id)
+    {
+        Position::OnStack(positions::current_stack_type(builder, battle))
+    } else {
+        base_position
+    }
 }
 
 /// Returns the position for a card in the browser, if it is the current

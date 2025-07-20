@@ -3,7 +3,7 @@ use std::sync::OnceLock;
 use ability_data::ability::{Ability, EventAbility};
 use ability_data::activated_ability::{ActivatedAbility, ActivatedAbilityOptions};
 use ability_data::cost::Cost;
-use ability_data::effect::{Effect, EffectWithOptions};
+use ability_data::effect::{Effect, EffectWithOptions, ModalEffectChoice};
 use ability_data::named_ability::NamedAbility;
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::quantity_expression_data::QuantityExpression;
@@ -48,6 +48,7 @@ static TEST_FORESEE_1_DRAW_A_CARD: OnceLock<AbilityList> = OnceLock::new();
 static TEST_DRAW_ONE_RECLAIM: OnceLock<AbilityList> = OnceLock::new();
 static TEST_RETURN_VOID_CARD_TO_HAND: OnceLock<AbilityList> = OnceLock::new();
 static TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND: OnceLock<AbilityList> = OnceLock::new();
+static TEST_MODAL_DRAW_ONE_OR_DRAW_TWO: OnceLock<AbilityList> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static AbilityList {
     query_by_name(card::get(battle, card_id).name)
@@ -352,6 +353,25 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 )])
             })
         }
+        CardName::TestModalDrawOneOrDrawTwo => TEST_MODAL_DRAW_ONE_OR_DRAW_TWO.get_or_init(|| {
+            build_ability_list(CardName::TestModalDrawOneOrDrawTwo, vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Modal(vec![
+                        ModalEffectChoice {
+                            energy_cost: Energy(1),
+                            effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
+                        },
+                        ModalEffectChoice {
+                            energy_cost: Energy(2),
+                            effect: Effect::Effect(StandardEffect::DrawCards { count: 2 }),
+                        },
+                    ]),
+                }),
+                AbilityConfiguration { ..Default::default() },
+            )])
+        }),
     }
 }
 

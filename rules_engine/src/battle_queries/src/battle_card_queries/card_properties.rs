@@ -34,6 +34,7 @@ pub fn display_name(card_name: CardName) -> String {
         CardName::TestDrawOneReclaim => "Draw 1 Reclaim".to_string(),
         CardName::TestReturnVoidCardToHand => "Return Void Card".to_string(),
         CardName::TestReturnOneOrTwoVoidEventCardsToHand => "Return 2 Events".to_string(),
+        CardName::TestModalDrawOneOrDrawTwo => "Modal Draw".to_string(),
     }
 }
 
@@ -63,6 +64,7 @@ pub fn base_energy_cost(card_name: CardName) -> Option<Energy> {
         CardName::TestDrawOneReclaim => Some(Energy(2)),
         CardName::TestReturnVoidCardToHand => Some(Energy(1)),
         CardName::TestReturnOneOrTwoVoidEventCardsToHand => Some(Energy(1)),
+        CardName::TestModalDrawOneOrDrawTwo => Some(Energy(1)),
     }
 }
 
@@ -124,6 +126,7 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
         CardName::TestDrawOneReclaim => CardType::Event,
         CardName::TestReturnVoidCardToHand => CardType::Event,
         CardName::TestReturnOneOrTwoVoidEventCardsToHand => CardType::Event,
+        CardName::TestModalDrawOneOrDrawTwo => CardType::Event,
     }
 }
 
@@ -149,5 +152,6 @@ pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
         CardName::TestDrawOneReclaim => true,
         CardName::TestReturnVoidCardToHand => true,
         CardName::TestReturnOneOrTwoVoidEventCardsToHand => false,
+        CardName::TestModalDrawOneOrDrawTwo => false,
     }
 }

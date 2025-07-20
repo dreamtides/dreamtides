@@ -868,7 +868,7 @@ namespace Dreamtides.Schema
         public DeckCardSelectedOrder SelectOrderForDeckCard { get; set; }
 
         [JsonProperty("selectModalEffectChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<SelectModalEffectChoiceElement> SelectModalEffectChoice { get; set; }
+        public long? SelectModalEffectChoice { get; set; }
     }
 
     /// <summary>
@@ -1032,24 +1032,6 @@ namespace Dreamtides.Schema
 
         [JsonProperty("cardId", Required = Required.Always)]
         public long CardId { get; set; }
-    }
-
-    public partial class SelectModalEffectChoiceClass
-    {
-        [JsonProperty("addStackTargets", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public StackItemId AddStackTargets { get; set; }
-
-        [JsonProperty("addPendingEffectTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? AddPendingEffectTarget { get; set; }
-    }
-
-    public partial class StackItemId
-    {
-        [JsonProperty("card", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public long? Card { get; set; }
-
-        [JsonProperty("activatedAbility", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public ActivatedAbilityId ActivatedAbility { get; set; }
     }
 
     public partial class DeckCardSelectedOrder
@@ -2297,7 +2279,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitDeckCardOrder, SubmitMulligan, SubmitVoidCardTargets };
 
-    public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCardCharacter, TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDrawOneReclaim, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestForeseeOneDrawACard, TestForeseeTwo, TestMultiActivatedAbilityDrawCardCharacter, TestReturnOneOrTwoVoidEventCardsToHand, TestReturnVoidCardToHand, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
+    public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCardCharacter, TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDrawOneReclaim, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestForeseeOneDrawACard, TestForeseeTwo, TestModalDrawOneOrDrawTwo, TestMultiActivatedAbilityDrawCardCharacter, TestReturnOneOrTwoVoidEventCardsToHand, TestReturnVoidCardToHand, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
 
     /// <summary>
     /// Identifies a player in an ongoing battle.
@@ -2403,15 +2385,6 @@ namespace Dreamtides.Schema
 
         public static implicit operator PlayCardFromVoid(AbilityId AbilityId) => new PlayCardFromVoid { AbilityId = AbilityId };
         public static implicit operator PlayCardFromVoid(long Integer) => new PlayCardFromVoid { Integer = Integer };
-    }
-
-    public partial struct SelectModalEffectChoiceElement
-    {
-        public long? Integer;
-        public SelectModalEffectChoiceClass SelectModalEffectChoiceClass;
-
-        public static implicit operator SelectModalEffectChoiceElement(long Integer) => new SelectModalEffectChoiceElement { Integer = Integer };
-        public static implicit operator SelectModalEffectChoiceElement(SelectModalEffectChoiceClass SelectModalEffectChoiceClass) => new SelectModalEffectChoiceElement { SelectModalEffectChoiceClass = SelectModalEffectChoiceClass };
     }
 
     public partial struct CardOrderSelectionTarget
@@ -2538,7 +2511,6 @@ namespace Dreamtides.Schema
                 CardNameConverter.Singleton,
                 PlayerNameConverter.Singleton,
                 PlayCardFromVoidConverter.Singleton,
-                SelectModalEffectChoiceElementConverter.Singleton,
                 CardOrderSelectionTargetConverter.Singleton,
                 CardOrderSelectionTargetEnumConverter.Singleton,
                 BattleActionEnumConverter.Singleton,
@@ -3414,6 +3386,8 @@ namespace Dreamtides.Schema
                     return CardName.TestForeseeOneDrawACard;
                 case "TestForeseeTwo":
                     return CardName.TestForeseeTwo;
+                case "TestModalDrawOneOrDrawTwo":
+                    return CardName.TestModalDrawOneOrDrawTwo;
                 case "TestMultiActivatedAbilityDrawCardCharacter":
                     return CardName.TestMultiActivatedAbilityDrawCardCharacter;
                 case "TestReturnOneOrTwoVoidEventCardsToHand":
@@ -3480,6 +3454,9 @@ namespace Dreamtides.Schema
                     return;
                 case CardName.TestForeseeTwo:
                     serializer.Serialize(writer, "TestForeseeTwo");
+                    return;
+                case CardName.TestModalDrawOneOrDrawTwo:
+                    serializer.Serialize(writer, "TestModalDrawOneOrDrawTwo");
                     return;
                 case CardName.TestMultiActivatedAbilityDrawCardCharacter:
                     serializer.Serialize(writer, "TestMultiActivatedAbilityDrawCardCharacter");
@@ -3585,43 +3562,6 @@ namespace Dreamtides.Schema
         }
 
         public static readonly PlayCardFromVoidConverter Singleton = new PlayCardFromVoidConverter();
-    }
-
-    internal class SelectModalEffectChoiceElementConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(SelectModalEffectChoiceElement) || t == typeof(SelectModalEffectChoiceElement?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            switch (reader.TokenType)
-            {
-                case JsonToken.Integer:
-                    var integerValue = serializer.Deserialize<long>(reader);
-                    return new SelectModalEffectChoiceElement { Integer = integerValue };
-                case JsonToken.StartObject:
-                    var objectValue = serializer.Deserialize<SelectModalEffectChoiceClass>(reader);
-                    return new SelectModalEffectChoiceElement { SelectModalEffectChoiceClass = objectValue };
-            }
-            throw new Exception("Cannot unmarshal type SelectModalEffectChoiceElement");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            var value = (SelectModalEffectChoiceElement)untypedValue;
-            if (value.Integer != null)
-            {
-                serializer.Serialize(writer, value.Integer.Value);
-                return;
-            }
-            if (value.SelectModalEffectChoiceClass != null)
-            {
-                serializer.Serialize(writer, value.SelectModalEffectChoiceClass);
-                return;
-            }
-            throw new Exception("Cannot marshal type SelectModalEffectChoiceElement");
-        }
-
-        public static readonly SelectModalEffectChoiceElementConverter Singleton = new SelectModalEffectChoiceElementConverter();
     }
 
     internal class CardOrderSelectionTargetConverter : JsonConverter

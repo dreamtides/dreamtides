@@ -69,6 +69,7 @@ pub enum CardName {
     TestDrawOneReclaim,
     TestReturnVoidCardToHand,
     TestReturnOneOrTwoVoidEventCardsToHand,
+    TestModalDrawOneOrDrawTwo,
 }
 
 /// Number of an ability within a card.

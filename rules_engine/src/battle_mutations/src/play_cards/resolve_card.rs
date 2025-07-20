@@ -69,7 +69,7 @@ fn resolve_stack_card(battle: &mut BattleState, item: &StackItemState, card_id: 
         move_card::from_stack_to_void(battle, source, item.controller, card_id);
     } else {
         let character_id = CharacterId(card_id.card_id());
-        let source = EffectSource::Character { controller: item.controller, character_id };
+        let source = EffectSource::Player { controller: item.controller };
         battle.push_animation(source, || BattleAnimation::ResolveCharacter { character_id });
         character_limit::apply(battle, source, item.controller);
         move_card::from_stack_to_battlefield(battle, source, item.controller, card_id);

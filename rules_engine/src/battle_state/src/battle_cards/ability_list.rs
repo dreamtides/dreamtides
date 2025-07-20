@@ -1,5 +1,6 @@
 use ability_data::ability::EventAbility;
 use ability_data::activated_ability::ActivatedAbility;
+use ability_data::effect::Effect;
 use ability_data::static_ability::StaticAbility;
 use ability_data::triggered_ability::TriggeredAbility;
 use core_data::card_types::CardType;
@@ -16,6 +17,19 @@ pub enum AbilityReference<'a> {
     Static(&'a StaticAbility),
     Activated(&'a ActivatedAbility),
     Triggered(&'a TriggeredAbility),
+}
+
+impl AbilityReference<'_> {
+    /// Returns a reference to the primary effect of this ability, if it has
+    /// one.
+    pub fn effect(&self) -> Option<&Effect> {
+        match self {
+            AbilityReference::Event(ability) => Some(&ability.effect),
+            AbilityReference::Static(_) => None,
+            AbilityReference::Activated(ability) => Some(&ability.effect),
+            AbilityReference::Triggered(ability) => Some(&ability.effect),
+        }
+    }
 }
 
 /// Abilities of a card which can be applied during a battle.

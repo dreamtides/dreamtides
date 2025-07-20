@@ -28,6 +28,8 @@ use crate::card_ability_queries::effect_predicates;
 /// * `on_selected` - The action to take when a target is selected
 /// * `modal_choice` - The index of the modal choice to resolve, if one has
 ///   already been selected.
+/// * `ability_number` - The ability number of the ability which created this
+///   effect.
 pub fn query(
     battle: &BattleState,
     player: PlayerName,

@@ -6,7 +6,7 @@ use battle_state::battle::card_id::{
     ActivatedAbilityId, CharacterId, HandCardId, StackCardId, VoidCardId,
 };
 use battle_state::battle_cards::card_set::CardSet;
-use battle_state::prompt_types::prompt_data::{OnSelected, SelectDeckCardOrderPrompt};
+use battle_state::prompt_types::prompt_data::SelectDeckCardOrderPrompt;
 use core_data::numerics::Energy;
 use fastrand;
 
@@ -43,7 +43,6 @@ pub enum LegalActions {
         current: SelectDeckCardOrderPrompt,
     },
     ModalEffectPrompt {
-        on_selected: OnSelected,
         choice_count: usize,
     },
 }
@@ -196,13 +195,9 @@ impl LegalActions {
                 matches!(self, LegalActions::SelectDeckCardOrder { .. })
             }
             BattleAction::SubmitMulligan => todo!("Implement this"),
-            BattleAction::SelectModalEffectChoice(on_selected, modal_choice_index) => {
-                if let LegalActions::ModalEffectPrompt {
-                    choice_count,
-                    on_selected: on_selected_prompt,
-                } = self
-                {
-                    modal_choice_index.value() < *choice_count && on_selected == *on_selected_prompt
+            BattleAction::SelectModalEffectChoice(modal_choice_index) => {
+                if let LegalActions::ModalEffectPrompt { choice_count } = self {
+                    modal_choice_index.value() < *choice_count
                 } else {
                     false
                 }
@@ -394,16 +389,12 @@ impl LegalActions {
                 None
             }
 
-            LegalActions::ModalEffectPrompt { choice_count, on_selected } => (0..*choice_count)
+            LegalActions::ModalEffectPrompt { choice_count } => (0..*choice_count)
                 .find(|&i| {
-                    !actions.contains(&BattleAction::SelectModalEffectChoice(
-                        *on_selected,
-                        ModelEffectChoiceIndex(i),
-                    ))
+                    !actions
+                        .contains(&BattleAction::SelectModalEffectChoice(ModelEffectChoiceIndex(i)))
                 })
-                .map(|i| {
-                    BattleAction::SelectModalEffectChoice(*on_selected, ModelEffectChoiceIndex(i))
-                }),
+                .map(|i| BattleAction::SelectModalEffectChoice(ModelEffectChoiceIndex(i))),
         }
     }
 
@@ -489,10 +480,8 @@ impl LegalActions {
                 result
             }
 
-            LegalActions::ModalEffectPrompt { on_selected, choice_count } => (0..*choice_count)
-                .map(|i| {
-                    BattleAction::SelectModalEffectChoice(*on_selected, ModelEffectChoiceIndex(i))
-                })
+            LegalActions::ModalEffectPrompt { choice_count } => (0..*choice_count)
+                .map(|i| BattleAction::SelectModalEffectChoice(ModelEffectChoiceIndex(i)))
                 .collect::<Vec<_>>(),
         }
     }

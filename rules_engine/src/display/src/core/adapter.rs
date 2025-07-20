@@ -1,3 +1,4 @@
+use ability_data::effect::ModelEffectChoiceIndex;
 use battle_state::battle::card_id::{AbilityId, CardId, CardIdType, VoidCardId};
 use battle_state::battle_cards::stack_card_state::StackItemId;
 use display_data::card_view::ClientCardId;
@@ -27,4 +28,16 @@ pub fn stack_item_game_object_id(item: impl Into<StackItemId>) -> GameObjectId {
 
 pub fn void_card_token_client_id(void_card_id: VoidCardId, ability_id: AbilityId) -> ClientCardId {
     format!("V{}/{}/{}", void_card_id.0.0, ability_id.card_id.0, ability_id.ability_number.0)
+}
+
+pub fn modal_effect_choice_client_id(
+    card_id: CardId,
+    choice_index: ModelEffectChoiceIndex,
+) -> ClientCardId {
+    if choice_index.0 == 0 {
+        // First choice represented by the card itself
+        client_card_id(card_id)
+    } else {
+        format!("M{}/{}", client_card_id(card_id), choice_index.value())
+    }
 }

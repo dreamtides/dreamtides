@@ -138,7 +138,9 @@ fn get_battle_impl(
 fn should_skip_action_for_undo(action: BattleAction) -> bool {
     matches!(
         action,
-        BattleAction::SelectOrderForDeckCard(_) | BattleAction::SelectVoidCardTarget(_)
+        BattleAction::SelectOrderForDeckCard(..)
+            | BattleAction::SelectVoidCardTarget(..)
+            | BattleAction::SelectModalEffectChoice(..)
     )
 }
 

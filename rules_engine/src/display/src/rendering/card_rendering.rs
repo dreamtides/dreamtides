@@ -223,6 +223,9 @@ pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
         CardName::TestReturnOneOrTwoVoidEventCardsToHand => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
+        CardName::TestModalDrawOneOrDrawTwo => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
+        ),
     }
 }
 
@@ -295,6 +298,9 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         }
         CardName::TestReturnOneOrTwoVoidEventCardsToHand => {
             "Return one or two events from your void to your hand.".to_string()
+        }
+        CardName::TestModalDrawOneOrDrawTwo => {
+            "Choose one:<ul><li>Draw 1 card.</li><li>Draw 2 cards.</li></ul>".to_string()
         }
     };
 

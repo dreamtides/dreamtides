@@ -75,8 +75,8 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
         BattleAction::SubmitMulligan => {
             todo!("Implement {:?}", action);
         }
-        BattleAction::SelectModalEffectChoice(on_selected, modal_choice_index) => {
-            select_modal_effect_choice::execute(battle, player, on_selected, modal_choice_index);
+        BattleAction::SelectModalEffectChoice(modal_choice_index) => {
+            select_modal_effect_choice::execute(battle, player, modal_choice_index);
         }
     }
 

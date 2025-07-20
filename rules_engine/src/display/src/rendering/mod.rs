@@ -7,6 +7,7 @@ pub mod identity_card_rendering;
 pub mod interface_message;
 pub mod interface_rendering;
 pub mod labels;
+pub mod modal_effect_prompt_rendering;
 pub mod position_overrides;
 pub mod positions;
 pub mod renderer;
