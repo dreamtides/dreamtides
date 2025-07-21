@@ -37,6 +37,7 @@ pub fn display_name(card_name: CardName) -> String {
         CardName::TestModalDrawOneOrDrawTwo => "Modal Draw".to_string(),
         CardName::TestModalDrawOneOrDissolveEnemy => "Modal Draw & Dissolve".to_string(),
         CardName::TestReturnToHand => "Return to Hand".to_string(),
+        CardName::TestPreventDissolveThisTurn => "Prevent Dissolve".to_string(),
     }
 }
 
@@ -80,6 +81,7 @@ pub fn base_energy_cost(name: CardName) -> Option<Energy> {
         CardName::TestModalDrawOneOrDrawTwo => None,
         CardName::TestModalDrawOneOrDissolveEnemy => None,
         CardName::TestReturnToHand => Some(Energy(1)),
+        CardName::TestPreventDissolveThisTurn => Some(Energy(0)),
     }
 }
 
@@ -148,6 +150,7 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
         CardName::TestModalDrawOneOrDrawTwo => CardType::Event,
         CardName::TestModalDrawOneOrDissolveEnemy => CardType::Event,
         CardName::TestReturnToHand => CardType::Event,
+        CardName::TestPreventDissolveThisTurn => CardType::Event,
     }
 }
 
@@ -176,5 +179,6 @@ pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
         CardName::TestModalDrawOneOrDrawTwo => false,
         CardName::TestModalDrawOneOrDissolveEnemy => true,
         CardName::TestReturnToHand => true,
+        CardName::TestPreventDissolveThisTurn => true,
     }
 }

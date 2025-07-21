@@ -51,6 +51,7 @@ static TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND: OnceLock<AbilityList> = 
 static TEST_MODAL_DRAW_ONE_OR_DRAW_TWO: OnceLock<AbilityList> = OnceLock::new();
 static TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY: OnceLock<AbilityList> = OnceLock::new();
 static TEST_RETURN_TO_HAND: OnceLock<AbilityList> = OnceLock::new();
+static TEST_PREVENT_DISSOLVE_THIS_TURN: OnceLock<AbilityList> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static AbilityList {
     query_by_name(card::get(battle, card_id).name)
@@ -411,6 +412,20 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 },
             )])
         }),
+        CardName::TestPreventDissolveThisTurn => {
+            TEST_PREVENT_DISSOLVE_THIS_TURN.get_or_init(|| {
+                build_ability_list(CardName::TestPreventDissolveThisTurn, vec![(
+                    AbilityNumber(0),
+                    Ability::Event(EventAbility {
+                        additional_cost: None,
+                        effect: Effect::Effect(StandardEffect::PreventDissolveThisTurn {
+                            target: Predicate::Your(CardPredicate::Character),
+                        }),
+                    }),
+                    AbilityConfiguration::default(),
+                )])
+            })
+        }
     }
 }
 

@@ -237,6 +237,9 @@ pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
         CardName::TestReturnToHand => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
+        CardName::TestPreventDissolveThisTurn => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
+        ),
     }
 }
 
@@ -259,11 +262,11 @@ fn card_type(battle: &BattleState, card_id: CardId) -> String {
 pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
     let base_text = match card::get(battle, card_id).name {
         CardName::TestVanillaCharacter => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
-        CardName::TestDissolve => "<b>Dissolve</b> an enemy character.".to_string(),
+        CardName::TestDissolve => "<color=#AA00FF><b>Dissolve</b></color> an enemy character.".to_string(),
         CardName::TestCounterspellUnlessPays => {
-            "<b>Prevent</b> an enemy event unless the enemy pays 2\u{f7e4}.".to_string()
+            "<color=#AA00FF><b>Prevent</b></color> an enemy event unless the enemy pays 2\u{f7e4}.".to_string()
         }
-        CardName::TestCounterspell => "<b>Prevent</b> an enemy card.".to_string(),
+        CardName::TestCounterspell => "<color=#AA00FF><b>Prevent</b></color> an enemy card.".to_string(),
         CardName::TestVariableEnergyDraw => {
             "Pay one or more \u{f7e4}: Draw a card for each \u{f7e4} spent.".to_string()
         }
@@ -318,6 +321,9 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         }
         CardName::TestReturnToHand => {
             "<b>Return</b> an enemy character to its owner's hand.".to_string()
+        }
+        CardName::TestPreventDissolveThisTurn => {
+            "A character you control gains <color=#AA00FF><b>Anchored</b></color> until your next turn.".to_string()
         }
     };
 

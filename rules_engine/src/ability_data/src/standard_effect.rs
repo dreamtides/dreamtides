@@ -72,6 +72,7 @@ pub enum StandardEffect {
     NoEffect,
     OpponentPaysCost { cost: Cost },
     PayCost { cost: Cost },
+    PreventDissolveThisTurn { target: Predicate },
     PutCardsFromVoidOnTopOfDeck { count: u32, matching: CardPredicate },
     PutCardsFromYourDeckIntoVoid { count: u32 },
     PutOnTopOfEnemyDeck { target: Predicate },

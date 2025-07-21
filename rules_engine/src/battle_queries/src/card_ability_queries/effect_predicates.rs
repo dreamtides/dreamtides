@@ -23,6 +23,10 @@ pub fn matching_characters(
             that_card
                 .and_then(|id| battle.cards.to_character_id(source.controller().opponent(), id)),
         ),
+        Predicate::Your(card_predicate) => {
+            let battlefield = battle.cards.battlefield(source.controller()).clone();
+            on_battlefield(battle, source, battlefield, card_predicate)
+        }
         Predicate::Enemy(card_predicate) => {
             let battlefield = battle.cards.battlefield(source.controller().opponent()).clone();
             on_battlefield(battle, source, battlefield, card_predicate)
@@ -47,6 +51,10 @@ pub fn matching_cards_on_stack(
             that_card
                 .and_then(|id| battle.cards.to_stack_card_id(source.controller().opponent(), id)),
         ),
+        Predicate::Your(card_predicate) => {
+            let battlefield = battle.cards.stack_set(source.controller()).clone();
+            on_stack(battle, source, battlefield, card_predicate)
+        }
         Predicate::Enemy(card_predicate) => {
             let battlefield = battle.cards.stack_set(source.controller().opponent()).clone();
             on_stack(battle, source, battlefield, card_predicate)
@@ -118,6 +126,7 @@ pub fn get_character_target_predicate(effect: &StandardEffect) -> Option<&Predic
         StandardEffect::GainsSparkUntilYourNextMainForEach { target, .. } => Some(target),
         StandardEffect::MaterializeCharacterAtEndOfTurn { target } => Some(target),
         StandardEffect::MaterializeSilentCopy { target, .. } => Some(target),
+        StandardEffect::PreventDissolveThisTurn { target } => Some(target),
         StandardEffect::PutOnTopOfEnemyDeck { target } => Some(target),
         StandardEffect::ReturnToHand { target } => Some(target),
 
