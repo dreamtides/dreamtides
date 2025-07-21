@@ -217,8 +217,8 @@ namespace Dreamtides.Services
 
       var horizontalPosition = Mathf.Clamp01((targetPosition.Value.x - 8f) / 14f);
       return targetPosition.Value + Vector3.Lerp(
-        new Vector3(2f, 4.0f, 1.5f),
-        new Vector3(-2f, 4.0f, 1.5f),
+        new Vector3(2f, 5.0f, 2f),
+        new Vector3(-2f, 5.0f, 2f),
         horizontalPosition);
     }
 

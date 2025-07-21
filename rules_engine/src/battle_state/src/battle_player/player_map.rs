@@ -29,4 +29,12 @@ impl<T> PlayerMap<T> {
             PlayerName::Two => &mut self.two,
         }
     }
+
+    #[inline(always)]
+    pub fn insert(&mut self, player: PlayerName, value: T) {
+        match player {
+            PlayerName::One => self.one = value,
+            PlayerName::Two => self.two = value,
+        }
+    }
 }

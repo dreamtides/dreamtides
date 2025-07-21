@@ -264,11 +264,11 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         CardName::TestVanillaCharacter => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
         CardName::TestDissolve => "<color=#AA00FF><b>Dissolve</b></color> an enemy character.".to_string(),
         CardName::TestCounterspellUnlessPays => {
-            "<color=#AA00FF><b>Prevent</b></color> an enemy event unless the enemy pays 2\u{f7e4}.".to_string()
+            "<color=#AA00FF><b>Prevent</b></color> an enemy event unless the enemy pays <color=#00838F><b>2\u{f7e4}</b></color>.".to_string()
         }
         CardName::TestCounterspell => "<color=#AA00FF><b>Prevent</b></color> an enemy card.".to_string(),
         CardName::TestVariableEnergyDraw => {
-            "Pay one or more \u{f7e4}: Draw a card for each \u{f7e4} spent.".to_string()
+            "Pay one or more <color=#00838F>\u{f7e4}</color>: Draw a card for each <color=#00838F>\u{f7e4}</color> spent.".to_string()
         }
         CardName::TestDrawOne => "Draw a card.".to_string(),
         CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => {
@@ -323,7 +323,7 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
             "<b>Return</b> an enemy character to its owner's hand.".to_string()
         }
         CardName::TestPreventDissolveThisTurn => {
-            "A character you control gains <color=#AA00FF><b>Anchored</b></color> until your next turn.".to_string()
+            "A character you control gains <color=#AA00FF><b>anchored</b></color> until the end of your next <color=#304FFE><b>judgment</b></color>.".to_string()
         }
     };
 

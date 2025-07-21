@@ -4375,7 +4375,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -5317669338628401487, guid: 6349f93bbba7f4920b91936b35c34e5b, type: 2}
+  - {fileID: -3765426459031405678, guid: 3107ea52512624628a9fba4538cfdccc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4420,8 +4420,8 @@ MonoBehaviour:
   m_text: Here is some text which wraps to five different lines, which is the maximum
     number of lines of text which are allowed to be displayed on a card.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 6349f93bbba7f4920b91936b35c34e5b, type: 2}
-  m_sharedMaterial: {fileID: -5317669338628401487, guid: 6349f93bbba7f4920b91936b35c34e5b, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 3107ea52512624628a9fba4538cfdccc, type: 2}
+  m_sharedMaterial: {fileID: -3765426459031405678, guid: 3107ea52512624628a9fba4538cfdccc, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4455,7 +4455,7 @@ MonoBehaviour:
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
-  m_characterSpacing: -5
+  m_characterSpacing: 0
   m_wordSpacing: 0
   m_lineSpacing: -10
   m_lineSpacingMax: 0
