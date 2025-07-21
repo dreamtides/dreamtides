@@ -32,16 +32,23 @@ namespace Dreamtides.Services
     [SerializeField] float _recoveryCheckInterval = 0.1f;
     [SerializeField] float _debounceTime = 0.3f;
     bool _isActive;
+    bool _isTest;
     Card? _currentHoveredCard;
     readonly Dictionary<string, CardAnimationState> _animationStates = new();
     float _lastRecoveryCheck;
 
     protected override void OnInitialize(TestConfiguration? testConfiguration)
     {
+      _isTest = testConfiguration != null;
     }
 
     protected override void OnUpdate()
     {
+      if (_isTest)
+      {
+        return;
+      }
+
       if (Registry.IsMobileDevice)
       {
         return;
