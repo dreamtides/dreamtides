@@ -1,4 +1,4 @@
-use battle_queries::battle_card_queries::{card, target_queries};
+use battle_queries::battle_card_queries::{card, valid_target_queries};
 use battle_queries::battle_player_queries::player_properties;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::battle::battle_state::BattleState;
@@ -159,7 +159,7 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
         .all_items_on_stack()
         .iter()
         .filter_map(|stack_item| {
-            target_queries::displayed_targets(battle, stack_item.id).and_then(|targets| {
+            valid_target_queries::displayed_targets(battle, stack_item.id).and_then(|targets| {
                 let source = adapter::stack_item_game_object_id(stack_item.id);
                 match targets {
                     EffectTargets::Standard(StandardEffectTarget::Character(character_id, _)) => {

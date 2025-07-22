@@ -1,4 +1,4 @@
-use battle_queries::battle_card_queries::{card, target_queries};
+use battle_queries::battle_card_queries::{card, valid_target_queries};
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType};
 use battle_state::battle_cards::stack_card_state::{
@@ -82,7 +82,7 @@ pub fn current_stack_type(builder: &ResponseBuilder, battle: &BattleState) -> St
 
     for stack_card in battle.cards.all_items_on_stack() {
         if let Some(EffectTargets::Standard(StandardEffectTarget::Character(character_id, _))) =
-            target_queries::displayed_targets(battle, stack_card.id)
+            valid_target_queries::displayed_targets(battle, stack_card.id)
         {
             if battle.cards.contains_card(display_player, character_id.card_id(), Zone::Battlefield)
             {

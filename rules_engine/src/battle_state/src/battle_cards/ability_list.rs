@@ -61,6 +61,8 @@ pub struct AbilityList {
     pub has_play_from_void_ability: bool,
 }
 
+pub struct AbilityEffectFlags {}
+
 /// Wrapper around an ability which stores additional metadata.
 #[derive(Debug, Clone)]
 pub struct AbilityData<T> {

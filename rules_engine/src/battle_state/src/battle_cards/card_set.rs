@@ -80,4 +80,8 @@ impl<T: CardIdType> CardSet<T> {
     pub fn iter(&self) -> impl Iterator<Item = T> + '_ {
         self.set.iter().map(|i| T::from_card_id(CardId(i)))
     }
+
+    pub fn difference_with(&mut self, other: &Self) {
+        self.set.difference_with(&other.set);
+    }
 }

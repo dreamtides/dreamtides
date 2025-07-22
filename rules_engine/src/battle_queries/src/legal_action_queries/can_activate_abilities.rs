@@ -51,6 +51,8 @@ pub fn for_player(
                 continue;
             }
 
+            // TODO: Check targeting restrictions.
+
             activatable_abilities.push(activated_ability_id);
         }
     }

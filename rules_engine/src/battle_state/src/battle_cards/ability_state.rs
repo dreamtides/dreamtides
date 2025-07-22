@@ -20,8 +20,7 @@ pub struct AbilityState {
     pub until_end_of_turn: UntilEndOfTurn,
 }
 
-/// Stores state for abilities of a player which persist until the end of the
-/// current turn.
+/// Stores state for abilities which persist until the end of the current turn.
 ///
 /// This struct is automatically dropped by the rules engine when a new turn
 /// begins.

@@ -1,6 +1,6 @@
 use ability_data::ability::EventAbility;
 use ability_data::effect::{Effect, EffectWithOptions, ModalEffectChoice, ModelEffectChoiceIndex};
-use battle_queries::battle_card_queries::target_queries;
+use battle_queries::battle_card_queries::valid_target_queries;
 use battle_queries::panic_with;
 use battle_state::battle::battle_state::{BattleState, PendingEffect};
 use battle_state::battle::battle_status::BattleStatus;
@@ -73,12 +73,12 @@ pub fn execute(
 ) {
     match effect {
         Effect::Effect(standard) => {
-            let mut targets = target_queries::valid_targets(battle, requested_targets);
+            let mut targets = valid_target_queries::valid_targets(battle, requested_targets);
             apply_standard_effect::apply(battle, source, standard, &mut targets);
             remove_stack_priority_if_empty(battle);
         }
         Effect::WithOptions(with_options) => {
-            let mut targets = target_queries::valid_targets(battle, requested_targets);
+            let mut targets = valid_target_queries::valid_targets(battle, requested_targets);
             execute_with_options(battle, source, with_options, &mut targets);
         }
         Effect::List(_) => {
@@ -118,7 +118,7 @@ pub fn execute_pending_effects_if_no_active_prompt(battle: &mut BattleState) {
 
         match pending_effect.effect {
             Effect::Effect(standard) => {
-                let mut targets = target_queries::valid_targets(
+                let mut targets = valid_target_queries::valid_targets(
                     battle,
                     pending_effect.requested_targets.as_ref(),
                 );
@@ -131,7 +131,7 @@ pub fn execute_pending_effects_if_no_active_prompt(battle: &mut BattleState) {
                 remove_stack_priority_if_empty(battle);
             }
             Effect::WithOptions(with_options) => {
-                let mut targets = target_queries::valid_targets(
+                let mut targets = valid_target_queries::valid_targets(
                     battle,
                     pending_effect.requested_targets.as_ref(),
                 );
@@ -140,7 +140,7 @@ pub fn execute_pending_effects_if_no_active_prompt(battle: &mut BattleState) {
             Effect::List(mut effect_list) => {
                 if !effect_list.is_empty() {
                     let first_effect = effect_list.remove(0);
-                    let mut targets = target_queries::valid_targets(
+                    let mut targets = valid_target_queries::valid_targets(
                         battle,
                         pending_effect.requested_targets.as_ref(),
                     );

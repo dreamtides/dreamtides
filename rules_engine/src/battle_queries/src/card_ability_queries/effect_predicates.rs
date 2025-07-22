@@ -6,6 +6,17 @@ use battle_state::core::effect_source::EffectSource;
 use core_data::card_types::CardType;
 
 use crate::battle_card_queries::card_properties;
+use crate::card_ability_queries::effect_queries;
+
+/// Flags for querying cards matching a character targeting predicate.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct CharacterTargetingFlags {
+    /// Whether this predicate is for targeting a dissolve effect.
+    ///
+    /// Dissolve effects can be prevented on certain characters, causing those
+    /// targets to be invalid.
+    pub for_dissolve: bool,
+}
 
 /// Returns the set of characters on the battlefield matching this `predicate`.
 pub fn matching_characters(
@@ -13,8 +24,9 @@ pub fn matching_characters(
     source: EffectSource,
     predicate: &Predicate,
     that_card: Option<CardId>,
+    flags: CharacterTargetingFlags,
 ) -> CardSet<CharacterId> {
-    match predicate {
+    let mut result = match predicate {
         Predicate::This => CardSet::of_maybe(
             source.card_id().and_then(|id| battle.cards.to_character_id(source.controller(), id)),
         ),
@@ -32,7 +44,13 @@ pub fn matching_characters(
         }
         Predicate::YourVoid(_) | Predicate::EnemyVoid(_) => CardSet::default(),
         _ => todo!("Implement {:?}", predicate),
+    };
+
+    if flags.for_dissolve {
+        result.difference_with(&effect_queries::prevent_dissolved(battle));
     }
+
+    result
 }
 
 /// Returns the set of cards on the stack matching this `predicate`.

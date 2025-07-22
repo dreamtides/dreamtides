@@ -12,7 +12,7 @@ use battle_state::prompt_types::prompt_data::{
 };
 use core_data::types::PlayerName;
 
-use crate::card_ability_queries::{effect_predicates, target_predicates};
+use crate::card_ability_queries::{effect_predicates, effect_queries, target_predicates};
 
 /// Returns a list of [PromptData] for prompts required to resolve an effect, if
 /// any.
@@ -117,8 +117,13 @@ fn standard_effect_targeting_prompt(
     on_selected: OnSelected,
 ) -> Option<PromptData> {
     if let Some(target_predicate) = target_predicates::get_character_target_predicate(effect) {
-        let valid =
-            effect_predicates::matching_characters(battle, source, target_predicate, that_card);
+        let valid = effect_predicates::matching_characters(
+            battle,
+            source,
+            target_predicate,
+            that_card,
+            effect_queries::character_targeting_flags(effect),
+        );
         if valid.is_empty() {
             return None;
         }

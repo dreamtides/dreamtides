@@ -13,7 +13,7 @@ fn return_void_card_to_hand_basic() {
 
     let cards_in_browser = s.user_client.cards.browser_cards();
 
-    assert!(cards_in_browser.len() >= 1, "Should have at least 1 card in browser");
+    assert!(!cards_in_browser.is_empty(), "Should have at least 1 card in browser");
     assert!(cards_in_browser.contains(&void_card), "Void card should be in browser");
 
     let void_card_view = s.user_client.cards.get(&void_card);
@@ -153,15 +153,7 @@ fn return_void_card_to_hand_with_empty_void() {
     let hand_card = s.add_to_hand(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
 
     assert!(
-        !s.user_client
-            .cards
-            .get(&hand_card)
-            .view
-            .revealed
-            .as_ref()
-            .unwrap()
-            .outline_color
-            .is_some(),
+        s.user_client.cards.get(&hand_card).view.revealed.as_ref().unwrap().outline_color.is_none(),
         "Card should not be playable with empty void"
     );
     assert!(

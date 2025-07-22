@@ -28,13 +28,11 @@ fn modal_effect_displays_browser_cards_with_correct_costs() {
     let rules_text_2 = &card_2.revealed().rules_text;
     assert!(
         rules_text_1.contains("Draw 1") || rules_text_1.contains("draw 1"),
-        "first choice rules text mentions drawing 1 card: {}",
-        rules_text_1
+        "first choice rules text mentions drawing 1 card: {rules_text_1}"
     );
     assert!(
         rules_text_2.contains("Draw 2") || rules_text_2.contains("draw 2"),
-        "second choice rules text mentions drawing 2 cards: {}",
-        rules_text_2
+        "second choice rules text mentions drawing 2 cards: {rules_text_2}"
     );
 
     test_helpers::assert_clients_identical(&s);
@@ -247,13 +245,11 @@ fn modal_draw_or_dissolve_costs_and_targeting() {
 
     assert!(
         draw_rules_text.contains("Draw") || draw_rules_text.contains("draw"),
-        "draw option rules text mentions drawing: {}",
-        draw_rules_text
+        "draw option rules text mentions drawing: {draw_rules_text}"
     );
     assert!(
         dissolve_rules_text.contains("Dissolve") || dissolve_rules_text.contains("dissolve"),
-        "dissolve option rules text mentions dissolving: {}",
-        dissolve_rules_text
+        "dissolve option rules text mentions dissolving: {dissolve_rules_text}"
     );
 
     test_helpers::assert_clients_identical(&s);

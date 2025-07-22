@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use action_data::game_action_data::GameAction;
-use battle_queries::battle_card_queries::{card, card_properties, target_queries};
+use battle_queries::battle_card_queries::{card, card_properties, valid_target_queries};
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalActions};
 use battle_state::actions::battle_actions::BattleAction;
@@ -323,7 +323,7 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
             "<b>Return</b> an enemy character to its owner's hand.".to_string()
         }
         CardName::TestPreventDissolveThisTurn => {
-            "A character you control gains <color=#AA00FF><b>anchored</b></color> until the end of your next <color=#304FFE><b>judgment</b></color>.".to_string()
+            "A character you control gains <color=#AA00FF><b>anchored</b></color> until end of turn.".to_string()
         }
     };
 
@@ -350,6 +350,9 @@ fn supplemental_card_info(battle: &BattleState, card_id: CardId) -> Option<Strin
             "<b>Foresee 1:</b> Look at the top card of your deck. You may put it into your void."
                 .to_string(),
         ),
+        CardName::TestPreventDissolveThisTurn => {
+            Some("<b>Anchored:</b> Cannot be dissolved.".to_string())
+        }
         _ => None,
     }
 }
@@ -419,7 +422,7 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
         }
     }
 
-    if let Some(targets) = target_queries::displayed_targets(battle, StackCardId(card_id)) {
+    if let Some(targets) = valid_target_queries::displayed_targets(battle, StackCardId(card_id)) {
         let target_card_ids = match targets {
             EffectTargets::Standard(StandardEffectTarget::Character(target_character_id, _)) => {
                 vec![target_character_id.card_id()]
@@ -456,7 +459,7 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
         }
     } else if let Some(stack_card) = battle.cards.stack_item(StackCardId(card_id))
         && stack_card.targets.is_some()
-        && target_queries::valid_targets(battle, stack_card.targets.as_ref()).is_none()
+        && valid_target_queries::valid_targets(battle, stack_card.targets.as_ref()).is_none()
     {
         icons.insert(card_id, InfoZoomIcon {
             card_id: adapter::client_card_id(card_id),

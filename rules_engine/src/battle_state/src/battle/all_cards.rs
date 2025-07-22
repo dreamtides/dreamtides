@@ -113,6 +113,11 @@ impl AllCards {
         self.battlefield.player(player)
     }
 
+    /// Returns an iterator over all characters on the battlefield.
+    pub fn all_battlefield_characters(&self) -> impl Iterator<Item = CharacterId> + '_ {
+        self.battlefield.one.iter().chain(self.battlefield.two.iter())
+    }
+
     /// Returns the state of characters on the battlefield for a given player
     pub fn battlefield_state(&self, player: PlayerName) -> &CharacterMap {
         self.battlefield_state.player(player)

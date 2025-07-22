@@ -10,7 +10,7 @@ use battle_state::battle_cards::stack_card_state::{
 use battle_state::core::effect_source::EffectSource;
 
 use crate::battle_card_queries::card;
-use crate::card_ability_queries::{effect_predicates, target_predicates};
+use crate::card_ability_queries::{effect_predicates, effect_queries, target_predicates};
 
 pub enum AutomaticEffectTargets {
     RequiresPrompt,
@@ -87,8 +87,13 @@ fn standard_effect_automatic_targets(
     that_card: Option<CardId>,
 ) -> Option<StandardEffectTarget> {
     if let Some(target_predicate) = target_predicates::get_character_target_predicate(effect) {
-        let valid =
-            effect_predicates::matching_characters(battle, source, target_predicate, that_card);
+        let valid = effect_predicates::matching_characters(
+            battle,
+            source,
+            target_predicate,
+            that_card,
+            effect_queries::character_targeting_flags(effect),
+        );
         if valid.len() == 1 {
             let character_id = valid.iter().next().unwrap();
             let object_id = card::get(battle, character_id).object_id;
