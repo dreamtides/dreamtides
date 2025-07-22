@@ -8,7 +8,7 @@ use battle_state::triggers::trigger::Trigger;
 
 use crate::card_mutations::move_card;
 
-/// Dissolves a character, moving it to the void.
+/// Attempts to dissolves a character, moving it to the void.
 ///
 /// Panics if the character is not on the battlefield.
 pub fn execute(battle: &mut BattleState, source: EffectSource, id: CharacterId) -> VoidCardId {

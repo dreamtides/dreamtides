@@ -1,4 +1,7 @@
+use std::collections::BTreeSet;
+
 use crate::battle::card_id::{CardId, VoidCardId};
+use crate::battle_cards::battle_card_state::ObjectId;
 use crate::battle_cards::card_set::CardSet;
 use crate::battle_player::player_map::PlayerMap;
 
@@ -13,18 +16,17 @@ pub struct AbilityState {
     /// than the stack or battlefield.
     pub banish_when_leaves_play: CardSet<CardId>,
 
-    /// State for abilities of a player which persist until the end of their
-    /// next judgment.
-    pub player_turn: PlayerMap<PlayerTurnState>,
+    /// State for abilities which persist until the end of the current turn.
+    pub until_end_of_turn: UntilEndOfTurn,
 }
 
-/// Stores state for abilities of a player which persist until the end of their
-/// next judgment.
+/// Stores state for abilities of a player which persist until the end of the
+/// current turn.
 ///
-/// This struct is automatically dropped by the rules engine after each
-/// judgement phase.
+/// This struct is automatically dropped by the rules engine when a new turn
+/// begins.
 #[derive(Debug, Clone, Default)]
-pub struct PlayerTurnState {
-    /// Cards which should be prevented from being dissolved.
-    pub prevent_dissolved: CardSet<CardId>,
+pub struct UntilEndOfTurn {
+    /// Cards which should be prevented from being dissolved this turn.
+    pub prevent_dissolved: BTreeSet<ObjectId>,
 }

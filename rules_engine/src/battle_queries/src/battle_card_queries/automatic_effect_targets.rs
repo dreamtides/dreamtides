@@ -10,7 +10,7 @@ use battle_state::battle_cards::stack_card_state::{
 use battle_state::core::effect_source::EffectSource;
 
 use crate::battle_card_queries::card;
-use crate::card_ability_queries::effect_predicates;
+use crate::card_ability_queries::{effect_predicates, target_predicates};
 
 pub enum AutomaticEffectTargets {
     RequiresPrompt,
@@ -35,7 +35,7 @@ pub fn query(
                 standard_effect_automatic_targets(battle, source, standard_effect, that_card)
             {
                 AutomaticEffectTargets::Targets(Some(EffectTargets::Standard(targets)))
-            } else if effect_predicates::has_targets(standard_effect) {
+            } else if target_predicates::has_targets(standard_effect) {
                 AutomaticEffectTargets::RequiresPrompt
             } else {
                 AutomaticEffectTargets::Targets(None)
@@ -46,7 +46,7 @@ pub fn query(
                 standard_effect_automatic_targets(battle, source, &with_options.effect, that_card)
             {
                 AutomaticEffectTargets::Targets(Some(EffectTargets::Standard(targets)))
-            } else if effect_predicates::has_targets(&with_options.effect) {
+            } else if target_predicates::has_targets(&with_options.effect) {
                 AutomaticEffectTargets::RequiresPrompt
             } else {
                 AutomaticEffectTargets::Targets(None)
@@ -62,7 +62,7 @@ pub fn query(
                     that_card,
                 ) {
                     target_list.push_back(Some(targets));
-                } else if effect_predicates::has_targets(&effect_item.effect) {
+                } else if target_predicates::has_targets(&effect_item.effect) {
                     return AutomaticEffectTargets::RequiresPrompt;
                 } else {
                     target_list.push_back(None);
@@ -86,7 +86,7 @@ fn standard_effect_automatic_targets(
     effect: &StandardEffect,
     that_card: Option<CardId>,
 ) -> Option<StandardEffectTarget> {
-    if let Some(target_predicate) = effect_predicates::get_character_target_predicate(effect) {
+    if let Some(target_predicate) = target_predicates::get_character_target_predicate(effect) {
         let valid =
             effect_predicates::matching_characters(battle, source, target_predicate, that_card);
         if valid.len() == 1 {
@@ -96,7 +96,7 @@ fn standard_effect_automatic_targets(
         } else {
             None
         }
-    } else if let Some(target_predicate) = effect_predicates::get_stack_target_predicate(effect) {
+    } else if let Some(target_predicate) = target_predicates::get_stack_target_predicate(effect) {
         let valid =
             effect_predicates::matching_cards_on_stack(battle, source, target_predicate, that_card);
         if valid.len() == 1 {
@@ -106,7 +106,7 @@ fn standard_effect_automatic_targets(
         } else {
             None
         }
-    } else if let Some(target_predicate) = effect_predicates::get_void_target_predicate(effect) {
+    } else if let Some(target_predicate) = target_predicates::get_void_target_predicate(effect) {
         let valid =
             effect_predicates::matching_cards_in_void(battle, source, target_predicate, that_card);
         if valid.len() == 1 {

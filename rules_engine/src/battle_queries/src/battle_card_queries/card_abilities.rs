@@ -23,7 +23,7 @@ use core_data::numerics::{Energy, Spark};
 use enumset::EnumSet;
 
 use crate::battle_card_queries::{build_named_abilities, card};
-use crate::card_ability_queries::effect_predicates;
+use crate::card_ability_queries::target_predicates;
 use crate::panic_with;
 
 static CHARACTER_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
@@ -552,22 +552,22 @@ fn compute_event_target_restriction(list: &AbilityList) -> Option<CanPlayRestric
         .iter()
         .flat_map(|data| match &data.ability.effect {
             Effect::Effect(effect) => vec![
-                effect_predicates::get_character_target_predicate(effect),
-                effect_predicates::get_stack_target_predicate(effect),
-                effect_predicates::get_void_target_predicate(effect),
+                target_predicates::get_character_target_predicate(effect),
+                target_predicates::get_stack_target_predicate(effect),
+                target_predicates::get_void_target_predicate(effect),
             ],
             Effect::WithOptions(options) => vec![
-                effect_predicates::get_character_target_predicate(&options.effect),
-                effect_predicates::get_stack_target_predicate(&options.effect),
-                effect_predicates::get_void_target_predicate(&options.effect),
+                target_predicates::get_character_target_predicate(&options.effect),
+                target_predicates::get_stack_target_predicate(&options.effect),
+                target_predicates::get_void_target_predicate(&options.effect),
             ],
             Effect::List(effects) => effects
                 .iter()
                 .flat_map(|effect| {
                     vec![
-                        effect_predicates::get_character_target_predicate(&effect.effect),
-                        effect_predicates::get_stack_target_predicate(&effect.effect),
-                        effect_predicates::get_void_target_predicate(&effect.effect),
+                        target_predicates::get_character_target_predicate(&effect.effect),
+                        target_predicates::get_stack_target_predicate(&effect.effect),
+                        target_predicates::get_void_target_predicate(&effect.effect),
                     ]
                 })
                 .collect(),

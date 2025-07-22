@@ -12,7 +12,7 @@ use battle_state::prompt_types::prompt_data::{
 };
 use core_data::types::PlayerName;
 
-use crate::card_ability_queries::effect_predicates;
+use crate::card_ability_queries::{effect_predicates, target_predicates};
 
 /// Returns a list of [PromptData] for prompts required to resolve an effect, if
 /// any.
@@ -116,7 +116,7 @@ fn standard_effect_targeting_prompt(
     that_card: Option<CardId>,
     on_selected: OnSelected,
 ) -> Option<PromptData> {
-    if let Some(target_predicate) = effect_predicates::get_character_target_predicate(effect) {
+    if let Some(target_predicate) = target_predicates::get_character_target_predicate(effect) {
         let valid =
             effect_predicates::matching_characters(battle, source, target_predicate, that_card);
         if valid.is_empty() {
@@ -129,7 +129,7 @@ fn standard_effect_targeting_prompt(
             prompt_type: PromptType::ChooseCharacter { on_selected, valid },
             configuration: PromptConfiguration { optional },
         })
-    } else if let Some(target_predicate) = effect_predicates::get_stack_target_predicate(effect) {
+    } else if let Some(target_predicate) = target_predicates::get_stack_target_predicate(effect) {
         let valid =
             effect_predicates::matching_cards_on_stack(battle, source, target_predicate, that_card);
         if valid.is_empty() {
@@ -142,7 +142,7 @@ fn standard_effect_targeting_prompt(
             prompt_type: PromptType::ChooseStackCard { on_selected, valid },
             configuration: PromptConfiguration { optional },
         })
-    } else if let Some(target_predicate) = effect_predicates::get_void_target_predicate(effect) {
+    } else if let Some(target_predicate) = target_predicates::get_void_target_predicate(effect) {
         let valid =
             effect_predicates::matching_cards_in_void(battle, source, target_predicate, that_card);
         if valid.is_empty() {

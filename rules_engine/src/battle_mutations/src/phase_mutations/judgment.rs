@@ -2,7 +2,6 @@ use battle_queries::battle_player_queries::player_properties;
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
-use battle_state::battle_cards::ability_state::PlayerTurnState;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger::Trigger;
 use core_data::numerics::Points;
@@ -28,10 +27,6 @@ pub fn run(battle: &mut BattleState, player: PlayerName, source: EffectSource) {
     } else {
         battle.push_animation(source, || BattleAnimation::Judgment { player, new_score: None });
     }
-
-    // Reset player turn state and complete "until the end of your next judgment"
-    // effects.
-    battle.ability_state.player_turn.insert(player, PlayerTurnState::default());
 
     battle.triggers.push(source, Trigger::Judgment(player));
 }

@@ -3,6 +3,7 @@ use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
+use battle_state::battle_cards::ability_state::UntilEndOfTurn;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger::Trigger;
 use core_data::numerics::TurnId;
@@ -25,6 +26,7 @@ pub fn start_turn(battle: &mut BattleState, player: PlayerName) {
 
     battle.triggers.push(source, Trigger::EndOfTurn(player.opponent()));
     fire_triggers::execute_if_no_active_prompt(battle);
+    battle.ability_state.until_end_of_turn = UntilEndOfTurn::default();
 
     battle_trace!("Starting turn for", battle, player);
     battle.activated_abilities.player_mut(player).activated_this_turn_cycle.clear();
