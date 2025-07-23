@@ -25,6 +25,11 @@ impl TestClientCard {
     pub fn revealed(&self) -> &RevealedCardView {
         self.view.revealed.as_ref().expect("Card is not revealed")
     }
+
+    /// Returns true if the card has an `on_click` action.
+    pub fn has_on_click_action(&self) -> bool {
+        self.revealed().actions.on_click.is_some()
+    }
 }
 
 impl TestClientCards {

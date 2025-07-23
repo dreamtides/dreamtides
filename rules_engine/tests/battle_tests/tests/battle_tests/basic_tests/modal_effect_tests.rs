@@ -48,7 +48,7 @@ fn select_draw_one_effect_costs_one_energy() {
 
     let browser_cards = s.user_client.cards.browser_cards();
     let draw_one_card_id = browser_cards.cards[0].id.clone();
-    s.invoke_click(DisplayPlayer::User, &draw_one_card_id);
+    s.click_card(DisplayPlayer::User, &draw_one_card_id);
 
     assert_eq!(s.user_client.me.energy(), Energy(4), "1 energy spent for Draw 1");
     assert_eq!(s.user_client.cards.user_hand().len(), 1, "drew 1 card");
@@ -68,7 +68,7 @@ fn select_draw_two_effect_costs_three_energy() {
 
     let browser_cards = s.user_client.cards.browser_cards();
     let draw_two_card_id = browser_cards.cards[1].id.clone();
-    s.invoke_click(DisplayPlayer::User, &draw_two_card_id);
+    s.click_card(DisplayPlayer::User, &draw_two_card_id);
 
     assert_eq!(s.user_client.me.energy(), Energy(4), "3 energy spent for Draw 2");
     assert_eq!(s.user_client.cards.user_hand().len(), 2, "drew 2 cards");
@@ -147,7 +147,7 @@ fn modal_draw_or_dissolve_auto_targets_single_enemy() {
     assert_eq!(browser_cards.len(), 2, "two browser cards displayed for modal choice");
 
     let dissolve_card_id = browser_cards.cards[1].id.clone();
-    s.invoke_click(DisplayPlayer::User, &dissolve_card_id);
+    s.click_card(DisplayPlayer::User, &dissolve_card_id);
 
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 0, "enemy character dissolved");
     assert_eq!(s.user_client.cards.enemy_void().len(), 1, "enemy character in void");
@@ -176,9 +176,9 @@ fn modal_draw_or_dissolve_manual_targeting_multiple_enemies() {
     assert_eq!(browser_cards.len(), 2, "two browser cards displayed for modal choice");
 
     let dissolve_card_id = browser_cards.cards[1].id.clone();
-    s.invoke_click(DisplayPlayer::User, &dissolve_card_id);
+    s.click_card(DisplayPlayer::User, &dissolve_card_id);
 
-    s.invoke_click(DisplayPlayer::User, &enemy1_id);
+    s.click_card(DisplayPlayer::User, &enemy1_id);
 
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "one enemy character remains");
     assert_eq!(s.user_client.cards.enemy_void().len(), 1, "one enemy character dissolved");
@@ -202,7 +202,7 @@ fn modal_draw_or_dissolve_draw_option_no_targeting() {
     assert_eq!(browser_cards.len(), 2, "two browser cards displayed for modal choice");
 
     let draw_card_id = browser_cards.cards[0].id.clone();
-    s.invoke_click(DisplayPlayer::User, &draw_card_id);
+    s.click_card(DisplayPlayer::User, &draw_card_id);
 
     assert_eq!(s.user_client.cards.user_hand().len(), 1, "drew one card");
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "enemy character untouched");

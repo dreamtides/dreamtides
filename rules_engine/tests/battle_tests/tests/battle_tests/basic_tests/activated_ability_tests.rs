@@ -494,7 +494,7 @@ fn activate_ability_with_targeting_multiple_targets() {
     );
 
     s.activate_ability(DisplayPlayer::User, &dissolve_character_id, 0);
-    s.invoke_click(DisplayPlayer::User, &target1_id);
+    s.click_card(DisplayPlayer::User, &target1_id);
 
     // Enemy passes priority to resolve the ability
     s.perform_enemy_action(BattleAction::PassPriority);

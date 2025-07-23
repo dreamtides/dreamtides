@@ -16,8 +16,8 @@ fn return_up_to_two_event_cards_basic() {
     assert!(cards_in_browser.contains(&event_card_1), "First event card should be in browser");
     assert!(cards_in_browser.contains(&event_card_2), "Second event card should be in browser");
 
-    s.invoke_click(DisplayPlayer::User, &event_card_1);
-    s.invoke_click(DisplayPlayer::User, &event_card_2);
+    s.click_card(DisplayPlayer::User, &event_card_1);
+    s.click_card(DisplayPlayer::User, &event_card_2);
     s.click_primary_button(DisplayPlayer::User, "Submit");
 
     assert!(
@@ -46,7 +46,7 @@ fn return_up_to_two_event_cards_select_only_one() {
 
     s.create_and_play(DisplayPlayer::User, CardName::TestReturnOneOrTwoVoidEventCardsToHand);
 
-    s.invoke_click(DisplayPlayer::User, &event_card_1);
+    s.click_card(DisplayPlayer::User, &event_card_1);
     s.click_primary_button(DisplayPlayer::User, "Submit");
 
     assert!(
@@ -105,8 +105,8 @@ fn return_up_to_two_event_cards_with_three_event_cards() {
     assert!(cards_in_browser.contains(&event_card_2), "Second event card should be in browser");
     assert!(cards_in_browser.contains(&event_card_3), "Third event card should be in browser");
 
-    s.invoke_click(DisplayPlayer::User, &event_card_1);
-    s.invoke_click(DisplayPlayer::User, &event_card_2);
+    s.click_card(DisplayPlayer::User, &event_card_1);
+    s.click_card(DisplayPlayer::User, &event_card_2);
     s.click_primary_button(DisplayPlayer::User, "Submit");
 
     assert!(
@@ -131,9 +131,9 @@ fn return_up_to_two_event_cards_can_deselect() {
 
     s.create_and_play(DisplayPlayer::User, CardName::TestReturnOneOrTwoVoidEventCardsToHand);
 
-    s.invoke_click(DisplayPlayer::User, &event_card_1);
-    s.invoke_click(DisplayPlayer::User, &event_card_2);
-    s.invoke_click(DisplayPlayer::User, &event_card_1);
+    s.click_card(DisplayPlayer::User, &event_card_1);
+    s.click_card(DisplayPlayer::User, &event_card_2);
+    s.click_card(DisplayPlayer::User, &event_card_1);
 
     s.click_primary_button(DisplayPlayer::User, "Submit");
 
@@ -158,7 +158,7 @@ fn return_up_to_two_event_cards_browser_closes_after_submit() {
 
     s.create_and_play(DisplayPlayer::User, CardName::TestReturnOneOrTwoVoidEventCardsToHand);
 
-    s.invoke_click(DisplayPlayer::User, &event_card);
+    s.click_card(DisplayPlayer::User, &event_card);
     s.click_primary_button(DisplayPlayer::User, "Submit");
 
     let cards_in_browser = s.user_client.cards.browser_cards();

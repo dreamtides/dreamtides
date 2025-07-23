@@ -42,7 +42,7 @@ fn return_to_hand_with_multiple_targets() {
     );
 
     s.create_and_play(DisplayPlayer::User, CardName::TestReturnToHand);
-    s.invoke_click(DisplayPlayer::User, &target1_id);
+    s.click_card(DisplayPlayer::User, &target1_id);
 
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "one enemy character remains");
     assert_eq!(s.user_client.cards.enemy_hand().len(), 1, "one enemy character returned to hand");
@@ -125,7 +125,7 @@ fn return_to_hand_resets_spark_from_triggered_abilities() {
     // Enemy returns the character to hand - need to target manually since there are
     // 2 characters
     s.create_and_play(DisplayPlayer::Enemy, CardName::TestReturnToHand);
-    s.invoke_click(DisplayPlayer::Enemy, &trigger_character_id);
+    s.click_card(DisplayPlayer::Enemy, &trigger_character_id);
 
     // Verify character was returned to user hand
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "only vanilla character remains");
