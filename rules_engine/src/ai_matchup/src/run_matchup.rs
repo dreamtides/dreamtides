@@ -10,7 +10,7 @@ use battle_state::battle_player::battle_player_state::PlayerType;
 use clap::{Parser, ValueEnum};
 use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
-use game_creation::new_test_battle;
+use game_creation::new_test_battle::{self, TestDeckName};
 use serde_json::from_str;
 use tracing::{debug, subscriber};
 use tracing_subscriber::layer::SubscriberExt;
@@ -145,6 +145,7 @@ fn run_match(
         battle_ai_one,
         battle_ai_two,
         RequestContext { logging_options: LoggingOptions::default() },
+        TestDeckName::StartingFive,
     );
 
     let start_time = Instant::now();

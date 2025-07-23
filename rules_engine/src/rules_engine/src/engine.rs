@@ -25,6 +25,7 @@ use display_data::request_data::{
     PollResponse, PollResponseType,
 };
 use game_creation::new_battle;
+use game_creation::new_test_battle::TestDeckName;
 use rand::RngCore;
 use state_provider::state_provider::{DefaultStateProvider, PollResult, StateProvider};
 use state_provider::test_state_provider::TestStateProvider;
@@ -341,6 +342,7 @@ fn load_battle_from_database(
                 PlayerType::User(user_id),
                 enemy,
                 request_context,
+                TestDeckName::StartingFive,
             );
 
             // Save new battle to database

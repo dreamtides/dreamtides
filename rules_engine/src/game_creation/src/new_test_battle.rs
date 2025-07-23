@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap, VecDeque};
 use std::sync::Arc;
 
-use battle_mutations::card_mutations::{battle_deck, create_test_deck};
+use battle_mutations::card_mutations::battle_deck;
 use battle_mutations::phase_mutations::turn;
 use battle_state::battle::all_cards::AllCards;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
@@ -14,7 +14,7 @@ use battle_state::battle_player::battle_player_state::{BattlePlayerState, Player
 use battle_state::battle_player::player_map::PlayerMap;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger_state::TriggerState;
-use core_data::identifiers::{BattleId, QuestId, UserId};
+use core_data::identifiers::{BattleId, CardName, QuestId, UserId};
 use core_data::numerics::{Energy, Essence, Points, Spark, TurnId};
 use core_data::types::PlayerName;
 use quest_state::quest::deck::Deck;
@@ -24,6 +24,11 @@ use rand_xoshiro::Xoshiro256PlusPlus;
 use user_state::user::user_state::UserState;
 use uuid::Uuid;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum TestDeckName {
+    StartingFive,
+}
+
 /// Creates a new test battle between two Agents and starts it.
 pub fn create_and_start(
     id: BattleId,
@@ -31,6 +36,7 @@ pub fn create_and_start(
     user: PlayerType,
     enemy: PlayerType,
     request_context: RequestContext,
+    deck_name: TestDeckName,
 ) -> BattleState {
     let mut battle = BattleState {
         id,
@@ -41,7 +47,7 @@ pub fn create_and_start(
                 spark_bonus: Spark(0),
                 current_energy: Energy(0),
                 produced_energy: Energy(0),
-                quest: Arc::new(create_quest_state()),
+                quest: Arc::new(create_quest_state(deck_name)),
             },
             two: BattlePlayerState {
                 player_type: enemy,
@@ -49,7 +55,7 @@ pub fn create_and_start(
                 spark_bonus: Spark(0),
                 current_energy: Energy(0),
                 produced_energy: Energy(0),
-                quest: Arc::new(create_quest_state()),
+                quest: Arc::new(create_quest_state(deck_name)),
             },
         },
         cards: AllCards::default(),
@@ -71,8 +77,8 @@ pub fn create_and_start(
         request_context,
     };
 
-    create_test_deck::add(&mut battle, PlayerName::One);
-    create_test_deck::add(&mut battle, PlayerName::Two);
+    battle_deck::add_deck_copy(&mut battle, PlayerName::One);
+    battle_deck::add_deck_copy(&mut battle, PlayerName::Two);
 
     battle.status = BattleStatus::Playing;
     battle_deck::draw_cards(
@@ -92,11 +98,25 @@ pub fn create_and_start(
 }
 
 /// Creates a new quest state
-pub fn create_quest_state() -> QuestState {
+pub fn create_quest_state(deck_name: TestDeckName) -> QuestState {
     QuestState {
         id: QuestId(Uuid::new_v4()),
         user: UserState { id: UserId::default() },
-        deck: Deck { cards: BTreeMap::new() },
+        deck: create_test_deck(deck_name),
         essence: Essence(0),
     }
+}
+
+fn create_test_deck(name: TestDeckName) -> Deck {
+    let mut deck_cards = BTreeMap::new();
+    match name {
+        TestDeckName::StartingFive => {
+            deck_cards.insert(CardName::TestVanillaCharacter, 6);
+            deck_cards.insert(CardName::TestDissolve, 3);
+            deck_cards.insert(CardName::TestCounterspell, 3);
+            deck_cards.insert(CardName::TestCounterspellUnlessPays, 3);
+            deck_cards.insert(CardName::TestVariableEnergyDraw, 3);
+        }
+    }
+    Deck { cards: deck_cards }
 }

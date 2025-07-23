@@ -13,6 +13,7 @@ use core_data::identifiers::QuestId;
 use core_data::types::PlayerName;
 use database::save_file::SaveFile;
 use game_creation::new_battle;
+use game_creation::new_test_battle::TestDeckName;
 use serde_json;
 use tracing::{error, instrument, subscriber};
 use tracing_subscriber::EnvFilter;
@@ -69,6 +70,7 @@ fn get_battle_impl(
                     file.player_types.one.clone(),
                     file.player_types.two.clone(),
                     request_context,
+                    TestDeckName::StartingFive,
                 );
                 battle.animations = None;
                 battle.tracing = None;

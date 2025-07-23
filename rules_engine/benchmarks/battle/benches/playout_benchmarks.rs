@@ -5,7 +5,6 @@ use std::time::Duration;
 use ai_agents::agent_search;
 use ai_data::game_ai::GameAI;
 use ai_uct::uct_search;
-use battle_mutations::actions::apply_battle_action;
 use battle_mutations::card_mutations::battle_deck;
 use battle_queries::battle_card_queries::card;
 use battle_queries::legal_action_queries::legal_actions;
@@ -26,41 +25,13 @@ use core_data::identifiers::{BattleId, CardName};
 use core_data::numerics::{Energy, Points, Spark, TurnId};
 use core_data::types::PlayerName;
 use criterion::{BatchSize, Criterion, criterion_group};
-use game_creation::new_test_battle;
+use game_creation::new_test_battle::{self, TestDeckName};
 use rand::SeedableRng;
-use rand::seq::IteratorRandom;
 use rand_xoshiro::Xoshiro256PlusPlus;
 use tracing::{Level, subscriber};
 use uuid::Uuid;
 
-criterion_group!(playout_benchmarks, random_playout, ai_full, ai_single_threaded, ai_evaluate);
-
-pub fn random_playout(c: &mut Criterion) {
-    let mut group = c.benchmark_group("random_playout");
-    group
-        .significance_level(0.01)
-        .sample_size(500)
-        .noise_threshold(0.03)
-        .measurement_time(Duration::from_secs(10));
-    let error_subscriber = tracing_subscriber::fmt().with_max_level(Level::ERROR).finish();
-    subscriber::with_default(error_subscriber, || {
-        group.bench_function("random_playout", |b| {
-            b.iter_batched(
-                || {
-                    new_test_battle::create_and_start(
-                        BattleId(Uuid::new_v4()),
-                        3141592653589793,
-                        PlayerType::Agent(GameAI::RandomAction),
-                        PlayerType::Agent(GameAI::RandomAction),
-                        RequestContext { logging_options: LoggingOptions::default() },
-                    )
-                },
-                |mut battle| run_battle_until_completion(&mut battle),
-                BatchSize::SmallInput,
-            );
-        });
-    });
-}
+criterion_group!(playout_benchmarks, ai_full, ai_single_threaded, ai_evaluate);
 
 pub fn ai_evaluate(c: &mut Criterion) {
     let mut group = c.benchmark_group("ai_evaluate");
@@ -122,14 +93,6 @@ pub fn ai_full(c: &mut Criterion) {
             );
         });
     });
-}
-
-fn run_battle_until_completion(battle: &mut BattleState) {
-    while let Some(player) = legal_actions::next_to_act(battle) {
-        let actions = legal_actions::compute(battle, player).all();
-        let action = *actions.iter().choose(&mut battle.rng).unwrap();
-        apply_battle_action::execute(battle, player, action);
-    }
 }
 
 struct BenchmarkCardSpec {
@@ -372,7 +335,7 @@ fn benchmark_battle() -> BattleState {
                 current_energy: Energy(6),
                 produced_energy: Energy(6),
                 spark_bonus: Spark(0),
-                quest: Arc::new(new_test_battle::create_quest_state()),
+                quest: Arc::new(new_test_battle::create_quest_state(TestDeckName::StartingFive)),
             },
             two: BattlePlayerState {
                 player_type: PlayerType::Agent(GameAI::AlwaysPanic),
@@ -380,7 +343,7 @@ fn benchmark_battle() -> BattleState {
                 current_energy: Energy(5),
                 produced_energy: Energy(5),
                 spark_bonus: Spark(0),
-                quest: Arc::new(new_test_battle::create_quest_state()),
+                quest: Arc::new(new_test_battle::create_quest_state(TestDeckName::StartingFive)),
             },
         },
         status: BattleStatus::Playing,

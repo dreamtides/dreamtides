@@ -39,7 +39,8 @@ pub struct BattleCardState {
     pub object_id: ObjectId,
 
     /// If true, the card is revealed to the indicated player while in its
-    /// current zone.
+    /// current zone. This is not required for the card to be revealed in public
+    /// zones like the battlefield, only to override normal visibility rules.
     ///
     /// This flag is automatically cleared when the card is moved to a new zone.
     pub revealed_to_player_override: PlayerMap<bool>,

@@ -7,7 +7,7 @@ use battle_state::battle_trace::battle_tracing::BattleTracing;
 use core_data::identifiers::{BattleId, UserId};
 use rand::RngCore;
 
-use crate::new_test_battle;
+use crate::new_test_battle::{self, TestDeckName};
 
 /// Creates a new battle and starts it.
 pub fn create_and_start(
@@ -19,8 +19,9 @@ pub fn create_and_start(
         battle_id,
         rand::rng().next_u64(),
         PlayerType::User(user_id),
-        PlayerType::Agent(GameAI::MonteCarlo(50)),
+        PlayerType::Agent(GameAI::MonteCarlo(25)),
         request_context,
+        TestDeckName::StartingFive,
     )
 }
 
@@ -32,9 +33,16 @@ pub fn create_and_start_with_options(
     player_one: PlayerType,
     player_two: PlayerType,
     request_context: RequestContext,
+    deck_name: TestDeckName,
 ) -> BattleState {
-    let mut battle =
-        new_test_battle::create_and_start(battle_id, seed, player_one, player_two, request_context);
+    let mut battle = new_test_battle::create_and_start(
+        battle_id,
+        seed,
+        player_one,
+        player_two,
+        request_context,
+        deck_name,
+    );
     battle.animations = Some(AnimationData::default());
     battle.tracing = Some(BattleTracing::default());
     battle.action_history = Some(BattleHistory::default());

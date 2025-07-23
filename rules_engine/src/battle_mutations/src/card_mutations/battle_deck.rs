@@ -14,7 +14,7 @@ use core_data::types::PlayerName;
 use rand::seq::IteratorRandom;
 use rand_xoshiro::Xoshiro256PlusPlus;
 
-use crate::card_mutations::{create_test_deck, move_card};
+use crate::card_mutations::move_card;
 use crate::player_mutations::energy;
 
 const HAND_SIZE_LIMIT: usize = 10;
@@ -42,7 +42,7 @@ pub fn draw_cards(battle: &mut BattleState, source: EffectSource, player: Player
             // Make sure the cards to be drawn are present in the deck. This
             // won't necessarily happen in exactly the same order, but we just
             // need them to visually be somewhere in the deck.
-            create_test_deck::add(&mut snapshot, player);
+            add_deck_copy(&mut snapshot, player);
         }
         Some(snapshot)
     } else {
@@ -70,6 +70,20 @@ pub fn draw_cards(battle: &mut BattleState, source: EffectSource, player: Player
             animation: BattleAnimation::DrawCards { player, cards: drawn_cards },
         });
     }
+}
+
+/// Adds a copy of a player's quest deck to their battle deck.
+pub fn add_deck_copy(battle: &mut BattleState, player: PlayerName) {
+    let quest = &battle.players.player(player).quest;
+    let deck = &quest.deck;
+    let mut cards = Vec::new();
+    for (name, &count) in &deck.cards {
+        let can_play_restriction = card_abilities::query_by_name(*name).can_play_restriction;
+        for _ in 0..count {
+            cards.push(CreatedCard { name: *name, can_play_restriction });
+        }
+    }
+    battle.cards.create_cards_in_deck(player, cards);
 }
 
 /// Adds a list of cards by name to a player's deck
@@ -109,14 +123,14 @@ pub fn realize_top_of_deck(
         {
             battle.cards.move_card_to_top_of_deck(player, card_id);
         } else {
-            battle_trace!("Creating new test deck for realize_top_of_deck", battle, player);
-            create_test_deck::add(battle, player);
+            battle_trace!("Adding new deck for realize_top_of_deck", battle, player);
+            add_deck_copy(battle, player);
             if let Some(card_id) =
                 random_element(battle.cards.shuffled_into_deck(player), &mut battle.rng)
             {
                 battle.cards.move_card_to_top_of_deck(player, card_id);
             } else {
-                panic_with!("Failed to find card after creating new test deck", battle, player);
+                panic_with!("Failed to find card after adding new deck", battle, player);
             }
         }
     }
@@ -152,8 +166,8 @@ fn draw_card_internal(
     {
         random_card
     } else {
-        battle_trace!("Creating new test deck", battle, player);
-        create_test_deck::add(battle, player);
+        battle_trace!("Adding new deck copy", battle, player);
+        add_deck_copy(battle, player);
         battle.triggers.push(source, Trigger::DrewAllCardsInCopyOfDeck(player));
         return draw_card_internal(battle, source, player, with_animation);
     };
