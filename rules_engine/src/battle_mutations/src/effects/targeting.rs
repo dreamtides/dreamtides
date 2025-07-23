@@ -66,7 +66,7 @@ pub fn void_card_id(
     targets: &mut Option<EffectTargets>,
 ) -> Option<VoidCardId> {
     match targets.take() {
-        Some(EffectTargets::Standard(StandardEffectTarget::VoidCards(void_cards))) => {
+        Some(EffectTargets::Standard(StandardEffectTarget::VoidCardSet(void_cards))) => {
             let length = void_cards.len();
             match length {
                 0 => None,
@@ -75,7 +75,8 @@ pub fn void_card_id(
             }
         }
         Some(EffectTargets::EffectList(mut target_list)) => {
-            if let Some(Some(StandardEffectTarget::VoidCards(void_cards))) = target_list.pop_front()
+            if let Some(Some(StandardEffectTarget::VoidCardSet(void_cards))) =
+                target_list.pop_front()
             {
                 let length = void_cards.len();
                 let result = match length {
@@ -102,11 +103,12 @@ pub fn void_card_id(
 /// if there are no valid targets.
 pub fn void_card_targets(targets: &mut Option<EffectTargets>) -> Option<BTreeSet<VoidCardTarget>> {
     match targets.take() {
-        Some(EffectTargets::Standard(StandardEffectTarget::VoidCards(void_cards))) => {
+        Some(EffectTargets::Standard(StandardEffectTarget::VoidCardSet(void_cards))) => {
             Some(void_cards)
         }
         Some(EffectTargets::EffectList(mut target_list)) => {
-            if let Some(Some(StandardEffectTarget::VoidCards(void_cards))) = target_list.pop_front()
+            if let Some(Some(StandardEffectTarget::VoidCardSet(void_cards))) =
+                target_list.pop_front()
             {
                 if !target_list.is_empty() {
                     *targets = Some(EffectTargets::EffectList(target_list));

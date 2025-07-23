@@ -54,6 +54,9 @@ pub enum BattleAnimation {
         card_id: CardId,
         from_zone: Zone,
     },
+    PreventedEffect {
+        card_id: CardId,
+    },
     ResolveCharacter {
         character_id: CharacterId,
     },

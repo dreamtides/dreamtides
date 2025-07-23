@@ -141,7 +141,7 @@ pub fn submit_void_card_targets(battle: &mut BattleState, player: PlayerName) {
             let Some(stack_item) = battle.cards.stack_item_mut(stack_item_id) else {
                 panic_with!("Stack item not found", battle);
             };
-            let target = StandardEffectTarget::VoidCards(void_targets.clone());
+            let target = StandardEffectTarget::VoidCardSet(void_targets.clone());
             match &mut stack_item.targets {
                 Some(existing_targets) => existing_targets.add(target),
                 None => stack_item.targets = Some(EffectTargets::Standard(target)),
@@ -151,14 +151,14 @@ pub fn submit_void_card_targets(battle: &mut BattleState, player: PlayerName) {
             battle.push_animation(source, || BattleAnimation::SelectStackCardTargets {
                 player,
                 source_id,
-                targets: EffectTargets::Standard(StandardEffectTarget::VoidCards(void_targets)),
+                targets: EffectTargets::Standard(StandardEffectTarget::VoidCardSet(void_targets)),
             });
         }
         OnSelected::AddPendingEffectTarget(pending_effect_index) => {
             let Some(pending_effect) = battle.pending_effect_mut(pending_effect_index) else {
                 panic_with!("Pending effect not found", battle, pending_effect_index);
             };
-            let target = StandardEffectTarget::VoidCards(void_targets);
+            let target = StandardEffectTarget::VoidCardSet(void_targets);
             match &mut pending_effect.requested_targets {
                 Some(existing_targets) => existing_targets.add(target),
                 None => pending_effect.requested_targets = Some(EffectTargets::Standard(target)),

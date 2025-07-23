@@ -119,7 +119,7 @@ fn standard_effect_automatic_targets(
             let object_id = card::get(battle, void_card_id).object_id;
             let mut void_targets = BTreeSet::new();
             void_targets.insert(VoidCardTarget { id: void_card_id, object_id });
-            Some(StandardEffectTarget::VoidCards(void_targets))
+            Some(StandardEffectTarget::VoidCardSet(void_targets))
         } else {
             None
         }

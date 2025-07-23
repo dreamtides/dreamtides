@@ -6,12 +6,6 @@ use battle_state::battle_cards::stack_card_state::{
     EffectTargets, StackItemId, StandardEffectTarget,
 };
 
-/// Gets the targets for a card, if they are valid
-pub fn targets(battle: &BattleState, stack_item_id: StackItemId) -> Option<EffectTargets> {
-    let item = battle.cards.stack_item(stack_item_id)?;
-    valid_targets(battle, item.targets.as_ref())
-}
-
 /// Returns the current valid targets to display for an item on the stack, if
 /// any.
 pub fn displayed_targets(
@@ -24,6 +18,12 @@ pub fn displayed_targets(
 
 /// Returns valid targets from the requested target set removing e.g. target
 /// characters which are no longer in play.
+///
+/// NOTE: Unlike in some other card games, targets in Dreamtides do not become
+/// invalid simply because their predicate no longer matches. A card with the
+/// text "dissolve a character with spark 3 or less" will still be able to
+/// dissolve that character if its spark becomes greater than 3 after the card
+/// is played. Targets *only* become invalid if they change zones.
 pub fn valid_targets(
     battle: &BattleState,
     targets: Option<&EffectTargets>,
@@ -65,7 +65,7 @@ fn filter_target(
                 None
             }
         }
-        StandardEffectTarget::VoidCards(void_card_set) => {
+        StandardEffectTarget::VoidCardSet(void_card_set) => {
             let filtered_cards: BTreeSet<_> = void_card_set
                 .iter()
                 .filter(|void_card_id| {
@@ -77,7 +77,7 @@ fn filter_target(
             if filtered_cards.is_empty() {
                 None
             } else {
-                Some(StandardEffectTarget::VoidCards(filtered_cards))
+                Some(StandardEffectTarget::VoidCardSet(filtered_cards))
             }
         }
     }

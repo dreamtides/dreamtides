@@ -47,7 +47,7 @@ pub fn matching_characters(
     };
 
     if flags.for_dissolve {
-        result.difference_with(&effect_queries::prevent_dissolved(battle));
+        result.difference_with(&effect_queries::prevent_dissolved_set(battle));
     }
 
     result

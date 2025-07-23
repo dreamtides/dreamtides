@@ -1,7 +1,7 @@
 use ability_data::cost::Cost;
 use ability_data::quantity_expression_data::QuantityExpression;
 use ability_data::standard_effect::StandardEffect;
-use battle_queries::battle_card_queries::card_properties;
+use battle_queries::battle_card_queries::{card, card_properties};
 use battle_queries::battle_player_queries::quantity_expression;
 use battle_queries::battle_trace;
 use battle_state::battle::battle_state::BattleState;
@@ -54,6 +54,9 @@ pub fn apply(
             return_up_to_count_from_your_void_to_hand(battle, source, targets)
         }
         StandardEffect::ReturnToHand { .. } => return_to_hand(battle, source, targets),
+        StandardEffect::PreventDissolveThisTurn { .. } => {
+            prevent_dissolve_this_turn(battle, targets)
+        }
         _ => todo!("Implement {:?}", effect),
     }
 }
@@ -164,6 +167,16 @@ fn opponent_pays_cost(
     cost: &Cost,
 ) -> Option<EffectWasApplied> {
     pay_cost::execute(battle, source, source.controller().opponent(), cost);
+    Some(EffectWasApplied)
+}
+
+fn prevent_dissolve_this_turn(
+    battle: &mut BattleState,
+    targets: &mut Option<EffectTargets>,
+) -> Option<EffectWasApplied> {
+    let id = targeting::character_id(targets)?;
+    let object_id = card::get(battle, id).object_id;
+    battle.ability_state.until_end_of_turn.prevent_dissolved.insert(object_id);
     Some(EffectWasApplied)
 }
 

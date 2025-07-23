@@ -75,7 +75,7 @@ pub enum EffectTargets {
 
     /// Target queue for an effect list. An entry of `None` indicates that the
     /// specified target was provided but is no longer valid on resolution, e.g.
-    /// because a target character has been destroyed.
+    /// because a target character has been dissolved.
     ///
     /// During effect resolution, we pop targets from the list when required,
     /// i.e. it is assumed that this order will match the order in which targets
@@ -93,7 +93,7 @@ pub struct VoidCardTarget {
 pub enum StandardEffectTarget {
     Character(CharacterId, ObjectId),
     StackCard(StackCardId, ObjectId),
-    VoidCards(BTreeSet<VoidCardTarget>),
+    VoidCardSet(BTreeSet<VoidCardTarget>),
 }
 
 impl EffectTargets {

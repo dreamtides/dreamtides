@@ -1,6 +1,6 @@
 use ability_data::standard_effect::StandardEffect;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::CharacterId;
+use battle_state::battle::card_id::{CardIdType, CharacterId};
 use battle_state::battle_cards::card_set::CardSet;
 
 use crate::battle_card_queries::card;
@@ -18,7 +18,7 @@ pub fn character_targeting_flags(effect: &StandardEffect) -> CharacterTargetingF
 
 /// Returns the set of [CharacterId]s for characters which cannot currently be
 /// dissolved.
-pub fn prevent_dissolved(battle: &BattleState) -> CardSet<CharacterId> {
+pub fn prevent_dissolved_set(battle: &BattleState) -> CardSet<CharacterId> {
     let mut result = CardSet::default();
     if battle.ability_state.until_end_of_turn.prevent_dissolved.is_empty() {
         return result;
@@ -34,8 +34,14 @@ pub fn prevent_dissolved(battle: &BattleState) -> CardSet<CharacterId> {
     result
 }
 
+/// Returns true if the given character cannot currently be dissolved.
+pub fn should_prevent_dissolve(battle: &BattleState, id: impl CardIdType) -> bool {
+    let object_id = card::get(battle, id).object_id;
+    battle.ability_state.until_end_of_turn.prevent_dissolved.contains(&object_id)
+}
+
 /// Returns true if the given effect is a dissolve effect.
-fn is_dissolve_effect(effect: &StandardEffect) -> bool {
+pub fn is_dissolve_effect(effect: &StandardEffect) -> bool {
     matches!(
         effect,
         StandardEffect::DissolveCharacter { .. }

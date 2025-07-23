@@ -23,7 +23,7 @@ use core_data::numerics::{Energy, Spark};
 use enumset::EnumSet;
 
 use crate::battle_card_queries::{build_named_abilities, card};
-use crate::card_ability_queries::target_predicates;
+use crate::card_ability_queries::{effect_queries, target_predicates};
 use crate::panic_with;
 
 static CHARACTER_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
@@ -547,36 +547,8 @@ fn compute_event_target_restriction(list: &AbilityList) -> Option<CanPlayRestric
         return None;
     }
 
-    let predicates: Vec<&Predicate> = list
-        .event_abilities
-        .iter()
-        .flat_map(|data| match &data.ability.effect {
-            Effect::Effect(effect) => vec![
-                target_predicates::get_character_target_predicate(effect),
-                target_predicates::get_stack_target_predicate(effect),
-                target_predicates::get_void_target_predicate(effect),
-            ],
-            Effect::WithOptions(options) => vec![
-                target_predicates::get_character_target_predicate(&options.effect),
-                target_predicates::get_stack_target_predicate(&options.effect),
-                target_predicates::get_void_target_predicate(&options.effect),
-            ],
-            Effect::List(effects) => effects
-                .iter()
-                .flat_map(|effect| {
-                    vec![
-                        target_predicates::get_character_target_predicate(&effect.effect),
-                        target_predicates::get_stack_target_predicate(&effect.effect),
-                        target_predicates::get_void_target_predicate(&effect.effect),
-                    ]
-                })
-                .collect(),
-            Effect::Modal(_) => vec![],
-        })
-        .flatten()
-        .collect();
-
-    let predicate = match predicates[..] {
+    let predicates = event_effect_predicates(list);
+    let effect_predicate = match &predicates[..] {
         [] => {
             return Some(CanPlayRestriction::Unrestricted);
         }
@@ -586,14 +558,81 @@ fn compute_event_target_restriction(list: &AbilityList) -> Option<CanPlayRestric
         }
     };
 
-    match predicate {
-        Predicate::Enemy(CardPredicate::Character) => Some(CanPlayRestriction::EnemyCharacter),
-        Predicate::Enemy(CardPredicate::CardOnStack) => Some(CanPlayRestriction::EnemyStackCard),
-        Predicate::Enemy(CardPredicate::Event) => {
-            Some(CanPlayRestriction::EnemyStackCardOfType(CardType::Event))
+    if effect_queries::is_dissolve_effect(effect_predicate.effect) {
+        // Dissolve-specific restrictions since we need to check for the
+        // 'prevent dissolve' status.
+        match effect_predicate.predicate {
+            Predicate::Enemy(CardPredicate::Character) => {
+                Some(CanPlayRestriction::DissolveEnemyCharacter)
+            }
+            _ => None,
         }
-        _ => None,
+    } else {
+        match effect_predicate.predicate {
+            Predicate::Enemy(CardPredicate::Character) => Some(CanPlayRestriction::EnemyCharacter),
+            Predicate::Enemy(CardPredicate::CardOnStack) => {
+                Some(CanPlayRestriction::EnemyStackCard)
+            }
+            Predicate::Enemy(CardPredicate::Event) => {
+                Some(CanPlayRestriction::EnemyStackCardOfType(CardType::Event))
+            }
+            _ => None,
+        }
     }
+}
+
+pub struct EventEffectPredicate<'a> {
+    pub effect: &'a StandardEffect,
+    pub predicate: &'a Predicate,
+}
+
+fn event_effect_predicates(list: &AbilityList) -> Vec<EventEffectPredicate> {
+    list.event_abilities
+        .iter()
+        .flat_map(|data| match &data.ability.effect {
+            Effect::Effect(effect) => vec![
+                target_predicates::get_character_target_predicate(effect)
+                    .map(|predicate| EventEffectPredicate { effect, predicate }),
+                target_predicates::get_stack_target_predicate(effect)
+                    .map(|predicate| EventEffectPredicate { effect, predicate }),
+                target_predicates::get_void_target_predicate(effect)
+                    .map(|predicate| EventEffectPredicate { effect, predicate }),
+            ]
+            .into_iter()
+            .flatten()
+            .collect::<Vec<_>>(),
+            Effect::WithOptions(options) => vec![
+                target_predicates::get_character_target_predicate(&options.effect)
+                    .map(|predicate| EventEffectPredicate { effect: &options.effect, predicate }),
+                target_predicates::get_stack_target_predicate(&options.effect)
+                    .map(|predicate| EventEffectPredicate { effect: &options.effect, predicate }),
+                target_predicates::get_void_target_predicate(&options.effect)
+                    .map(|predicate| EventEffectPredicate { effect: &options.effect, predicate }),
+            ]
+            .into_iter()
+            .flatten()
+            .collect::<Vec<_>>(),
+            Effect::List(effects) => effects
+                .iter()
+                .flat_map(|effect| {
+                    vec![
+                        target_predicates::get_character_target_predicate(&effect.effect).map(
+                            |predicate| EventEffectPredicate { effect: &effect.effect, predicate },
+                        ),
+                        target_predicates::get_stack_target_predicate(&effect.effect).map(
+                            |predicate| EventEffectPredicate { effect: &effect.effect, predicate },
+                        ),
+                        target_predicates::get_void_target_predicate(&effect.effect).map(
+                            |predicate| EventEffectPredicate { effect: &effect.effect, predicate },
+                        ),
+                    ]
+                    .into_iter()
+                    .flatten()
+                })
+                .collect(),
+            Effect::Modal(_) => vec![],
+        })
+        .collect()
 }
 
 fn compute_event_additional_cost_restriction(list: &AbilityList) -> Option<CanPlayRestriction> {

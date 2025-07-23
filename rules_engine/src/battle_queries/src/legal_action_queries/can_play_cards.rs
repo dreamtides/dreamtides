@@ -9,6 +9,7 @@ use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 
 use crate::battle_card_queries::{card, card_abilities, card_properties};
+use crate::card_ability_queries::effect_queries;
 use crate::legal_action_queries::{
     has_legal_additional_costs, has_legal_modal_effect_choices, has_legal_targets,
 };
@@ -226,6 +227,10 @@ fn meets_restriction(
         CanPlayRestriction::Unrestricted => true,
         CanPlayRestriction::EnemyCharacter => {
             !battle.cards.battlefield(controller.opponent()).is_empty()
+        }
+        CanPlayRestriction::DissolveEnemyCharacter => {
+            let prevent = effect_queries::prevent_dissolved_set(battle);
+            battle.cards.battlefield(controller.opponent()).iter().any(|c| !prevent.contains(c))
         }
         CanPlayRestriction::EnemyStackCard => {
             !battle.cards.stack_set(controller.opponent()).is_empty()

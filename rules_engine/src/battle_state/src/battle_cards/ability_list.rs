@@ -95,6 +95,7 @@ pub struct AbilityConfiguration {
 pub enum CanPlayRestriction {
     Unrestricted,
     EnemyCharacter,
+    DissolveEnemyCharacter,
     EnemyStackCard,
     EnemyStackCardOfType(CardType),
     AdditionalEnergyAvailable(Energy),

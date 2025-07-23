@@ -170,7 +170,7 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
                         let target = adapter::card_game_object_id(stack_card_id);
                         Some(DisplayArrow { source, target, color: ArrowStyle::Blue })
                     }
-                    EffectTargets::Standard(StandardEffectTarget::VoidCards(_)) => None,
+                    EffectTargets::Standard(StandardEffectTarget::VoidCardSet(_)) => None,
                     EffectTargets::EffectList(_) => None,
                 }
             })
