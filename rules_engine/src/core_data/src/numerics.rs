@@ -95,6 +95,36 @@ pub struct Spark(pub u32);
 #[serde(rename_all = "camelCase")]
 pub struct Points(pub u32);
 
+/// Currency used during quests.
+#[derive(
+    Debug,
+    Display,
+    Default,
+    Copy,
+    Clone,
+    PartialEq,
+    Eq,
+    Ord,
+    PartialOrd,
+    Hash,
+    From,
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Sum,
+    AddAssign,
+    SubAssign,
+    MulAssign,
+    DivAssign,
+    Into,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+)]
+#[serde(rename_all = "camelCase")]
+pub struct Essence(pub u32);
+
 /// Identifies a turn within a game.
 #[derive(
     Debug,

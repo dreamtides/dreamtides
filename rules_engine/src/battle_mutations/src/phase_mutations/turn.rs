@@ -9,7 +9,7 @@ use battle_state::triggers::trigger::Trigger;
 use core_data::numerics::TurnId;
 use core_data::types::PlayerName;
 
-use crate::card_mutations::deck;
+use crate::card_mutations::battle_deck;
 use crate::phase_mutations::{dreamwell, fire_triggers, judgment};
 
 /// End the current player's turn.
@@ -45,7 +45,7 @@ pub fn start_turn(battle: &mut BattleState, player: PlayerName) {
     battle.phase = BattleTurnPhase::Draw;
 
     if battle.turn.turn_id != TurnId(1) {
-        deck::draw_card(battle, source, player);
+        battle_deck::draw_card(battle, source, player);
     }
 
     battle.phase = BattleTurnPhase::Main;

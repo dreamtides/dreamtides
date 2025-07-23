@@ -1,6 +1,9 @@
+use std::sync::Arc;
+
 use ai_data::game_ai::GameAI;
 use core_data::identifiers::UserId;
 use core_data::numerics::{Energy, Points, Spark};
+use quest_state::quest::quest_state::QuestState;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -25,6 +28,9 @@ pub struct BattlePlayerState {
 
     /// Additional spark for this player
     pub spark_bonus: Spark,
+
+    /// The player's quest state.
+    pub quest: Arc<QuestState>,
 }
 
 #[derive(Debug, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]

@@ -1,11 +1,12 @@
 use std::collections::VecDeque;
+use std::sync::Arc;
 use std::time::Duration;
 
 use ai_agents::agent_search;
 use ai_data::game_ai::GameAI;
 use ai_uct::uct_search;
 use battle_mutations::actions::apply_battle_action;
-use battle_mutations::card_mutations::deck;
+use battle_mutations::card_mutations::battle_deck;
 use battle_queries::battle_card_queries::card;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
@@ -371,6 +372,7 @@ fn benchmark_battle() -> BattleState {
                 current_energy: Energy(6),
                 produced_energy: Energy(6),
                 spark_bonus: Spark(0),
+                quest: Arc::new(new_test_battle::create_quest_state()),
             },
             two: BattlePlayerState {
                 player_type: PlayerType::Agent(GameAI::AlwaysPanic),
@@ -378,6 +380,7 @@ fn benchmark_battle() -> BattleState {
                 current_energy: Energy(5),
                 produced_energy: Energy(5),
                 spark_bonus: Spark(0),
+                quest: Arc::new(new_test_battle::create_quest_state()),
             },
         },
         status: BattleStatus::Playing,
@@ -398,7 +401,7 @@ fn benchmark_battle() -> BattleState {
         request_context: RequestContext { logging_options: LoggingOptions::default() },
     };
 
-    deck::add_cards(
+    battle_deck::add_cards(
         &mut battle,
         PlayerName::One,
         card_specs
@@ -407,7 +410,7 @@ fn benchmark_battle() -> BattleState {
             .map(|spec| spec.name)
             .collect(),
     );
-    deck::add_cards(
+    battle_deck::add_cards(
         &mut battle,
         PlayerName::Two,
         card_specs

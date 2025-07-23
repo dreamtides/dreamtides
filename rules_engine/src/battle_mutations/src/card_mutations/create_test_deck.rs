@@ -2,10 +2,10 @@ use battle_state::battle::battle_state::BattleState;
 use core_data::identifiers::CardName;
 use core_data::types::PlayerName;
 
-use crate::card_mutations::deck;
+use crate::card_mutations::battle_deck;
 
 pub fn add(battle: &mut BattleState, player: PlayerName) {
-    deck::add_cards(battle, player, create_cards());
+    battle_deck::add_cards(battle, player, create_cards());
 }
 
 fn create_cards() -> Vec<CardName> {

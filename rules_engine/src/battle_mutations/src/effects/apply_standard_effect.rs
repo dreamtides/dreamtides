@@ -15,7 +15,7 @@ use battle_state::prompt_types::prompt_data::{
 use core_data::numerics::Spark;
 use core_data::types::PlayerName;
 
-use crate::card_mutations::{counterspell, deck, move_card, spark};
+use crate::card_mutations::{battle_deck, counterspell, move_card, spark};
 use crate::character_mutations::dissolve;
 use crate::effects::apply_effect::EffectWasApplied;
 use crate::effects::{counterspell_unless_pays_cost, pay_cost, targeting};
@@ -87,7 +87,7 @@ fn draw_cards(
     count: u32,
 ) -> Option<EffectWasApplied> {
     if count > 0 {
-        deck::draw_cards(battle, source, player, count);
+        battle_deck::draw_cards(battle, source, player, count);
         Some(EffectWasApplied)
     } else {
         None
@@ -103,7 +103,7 @@ fn draw_cards_for_each(
     let matching = quantity_expression::count(battle, source, for_each);
     let quantity = count * matching;
     if quantity > 0 {
-        deck::draw_cards(battle, source, source.controller(), quantity);
+        battle_deck::draw_cards(battle, source, source.controller(), quantity);
         Some(EffectWasApplied)
     } else {
         None
@@ -127,7 +127,7 @@ fn foresee(
     count: u32,
 ) -> Option<EffectWasApplied> {
     let player = source.controller();
-    let cards = deck::realize_top_of_deck(battle, player, count);
+    let cards = battle_deck::realize_top_of_deck(battle, player, count);
 
     if !cards.is_empty() {
         let prompt = SelectDeckCardOrderPrompt {

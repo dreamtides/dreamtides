@@ -17,6 +17,8 @@ ai_data = { path = "../ai_data" }
 battle_mutations = { path = "../battle_mutations" }
 battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
+quest_state = { path = "../quest_state" }
+user_state = { path = "../user_state" }
 
 rand = { workspace = true }
 rand_xoshiro = { workspace = true }

@@ -983,8 +983,10 @@ dependencies = [
  "battle_mutations",
  "battle_state",
  "core_data",
+ "quest_state",
  "rand 0.9.0",
  "rand_xoshiro",
+ "user_state",
  "uuid",
 ]
 

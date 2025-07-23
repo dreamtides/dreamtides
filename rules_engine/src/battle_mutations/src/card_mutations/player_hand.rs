@@ -3,7 +3,7 @@ use battle_state::battle_cards::zone::Zone;
 use battle_state::core::effect_source::EffectSource;
 use core_data::types::PlayerName;
 
-use crate::card_mutations::deck;
+use crate::card_mutations::battle_deck;
 
 /// Randomizes the hand of the provided `player`.
 ///
@@ -17,5 +17,10 @@ pub fn randomize_player_hand(battle: &mut BattleState, player: PlayerName) {
         battle.cards.move_card(player, card_id, Zone::Hand, Zone::Deck);
     }
 
-    deck::draw_cards(battle, EffectSource::Game { controller: player }, player, count as u32);
+    battle_deck::draw_cards(
+        battle,
+        EffectSource::Game { controller: player },
+        player,
+        count as u32,
+    );
 }

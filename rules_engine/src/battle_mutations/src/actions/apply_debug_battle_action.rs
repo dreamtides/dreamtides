@@ -5,14 +5,14 @@ use battle_state::battle::card_id::{CardId, DeckCardId, HandCardId};
 use battle_state::core::effect_source::EffectSource;
 use core_data::types::PlayerName;
 
-use crate::card_mutations::{deck, move_card};
+use crate::card_mutations::{battle_deck, move_card};
 
 pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattleAction) {
     battle_trace!("Executing debug action", battle, player, action);
     let source = EffectSource::Game { controller: player };
     match action {
         DebugBattleAction::DrawCard { player: player_name } => {
-            deck::draw_card(battle, source, player_name);
+            battle_deck::draw_card(battle, source, player_name);
         }
         DebugBattleAction::SetEnergy { player: player_name, energy } => {
             battle.players.player_mut(player_name).current_energy = energy;
@@ -28,19 +28,19 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
         }
         DebugBattleAction::AddCardToHand { player: player_name, card: card_name } => {
             let card_count = battle.cards.all_cards().count();
-            deck::add_cards(battle, player_name, vec![card_name]);
+            battle_deck::add_cards(battle, player_name, vec![card_name]);
             let new_card_id = DeckCardId(CardId(card_count));
             move_card::from_deck_to_hand(battle, source, player_name, new_card_id);
         }
         DebugBattleAction::AddCardToBattlefield { player: player_name, card: card_name } => {
             let card_count = battle.cards.all_cards().count();
-            deck::add_cards(battle, player_name, vec![card_name]);
+            battle_deck::add_cards(battle, player_name, vec![card_name]);
             let new_card_id = DeckCardId(CardId(card_count));
             move_card::from_deck_to_battlefield(battle, source, player_name, new_card_id);
         }
         DebugBattleAction::AddCardToVoid { player: player_name, card: card_name } => {
             let card_count = battle.cards.all_cards().count();
-            deck::add_cards(battle, player_name, vec![card_name]);
+            battle_deck::add_cards(battle, player_name, vec![card_name]);
             let new_card_id = DeckCardId(CardId(card_count));
             move_card::from_deck_to_void(battle, source, player_name, new_card_id);
         }
