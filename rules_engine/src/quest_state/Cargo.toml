@@ -1,5 +1,5 @@
 [package]
-name = "quest_data"
+name = "quest_state"
 version = "0.0.0"
 edition = "2024"
 [lints]
@@ -12,8 +12,8 @@ doctest = false
 bench = false
 
 [dependencies]
-battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
+user_state = { path = "../user_state" }
 
 schemars = { workspace = true }
 serde = { workspace = true }

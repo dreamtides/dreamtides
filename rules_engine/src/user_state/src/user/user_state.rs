@@ -1,5 +1,4 @@
 use core_data::identifiers::UserId;
-use quest_data::quest::quest_data::QuestData;
 
 /// Represents the overall state of a human user.
 ///
@@ -10,5 +9,4 @@ use quest_data::quest::quest_data::QuestData;
 #[derive(Clone, Debug)]
 pub struct UserData {
     pub id: UserId,
-    pub current_quest: Option<QuestData>,
 }

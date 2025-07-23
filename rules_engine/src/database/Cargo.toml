@@ -16,7 +16,6 @@ ai_data = { path = "../ai_data" }
 action_data = { path = "../action_data" }
 battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
-quest_data = { path = "../quest_data" }
 
 rusqlite = { workspace = true }
 serde = { workspace = true }

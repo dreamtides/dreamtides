@@ -99,7 +99,7 @@ pub fn void_card_id(
     }
 }
 
-/// Returns the [BTreeSet<VoidCardTarget>] for a set of EffectTargets, or None
+/// Returns the void card targets for a set of EffectTargets, or None
 /// if there are no valid targets.
 pub fn void_card_targets(targets: &mut Option<EffectTargets>) -> Option<BTreeSet<VoidCardTarget>> {
     match targets.take() {
