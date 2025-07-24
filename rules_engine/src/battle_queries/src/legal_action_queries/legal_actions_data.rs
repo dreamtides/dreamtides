@@ -244,7 +244,7 @@ impl LegalActions {
                 if current.len() == *maximum_selection {
                     1 // SubmitVoidCardTargets, only for AI when at max selection
                 } else {
-                    valid.len()
+                    valid.len() - current.len()
                 }
             }
             LegalActions::SelectPromptChoicePrompt { choice_count } => *choice_count,
@@ -347,7 +347,10 @@ impl LegalActions {
                 } else {
                     valid
                         .iter()
-                        .find(|id| !actions.contains(&BattleAction::SelectVoidCardTarget(*id)))
+                        .find(|id| {
+                            !actions.contains(&BattleAction::SelectVoidCardTarget(*id))
+                                && !current.contains(*id)
+                        })
                         .map(BattleAction::SelectVoidCardTarget)
                 }
             }
@@ -443,13 +446,17 @@ impl LegalActions {
             }
 
             LegalActions::SelectVoidCardPrompt { valid, current, maximum_selection } => {
-                let mut result =
-                    valid.iter().map(BattleAction::SelectVoidCardTarget).collect::<Vec<_>>();
-                if current.len() == *maximum_selection {
-                    // For now only submit for AI when at max selection
-                    result.push(BattleAction::SubmitVoidCardTargets);
+                if current.len() == *maximum_selection || current.len() == valid.len() {
+                    // For now only submit for AI when at max selection or when
+                    // all options are selected
+                    vec![BattleAction::SubmitVoidCardTargets]
+                } else {
+                    valid
+                        .iter()
+                        .filter(|&id| !current.contains(id))
+                        .map(BattleAction::SelectVoidCardTarget)
+                        .collect::<Vec<_>>()
                 }
-                result
             }
 
             LegalActions::SelectPromptChoicePrompt { choice_count } => {
