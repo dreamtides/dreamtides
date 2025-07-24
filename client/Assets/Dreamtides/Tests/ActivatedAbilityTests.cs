@@ -37,9 +37,9 @@ namespace Dreamtides.Tests
         Registry.Layout.DefaultStack);
       yield return WaitForCount(Registry.Layout.UserBattlefield, 1);
       yield return WaitForCount(Registry.Layout.UserHand, 1);
-      Assert.That(Registry.Layout.UserStatusDisplay.Energy._text.text.Contains("50"),
+      Assert.That(Registry.Layout.UserStatusDisplay.Energy._text.text.Contains("48"),
           Is.True,
-          "User energy should be 50");
+          "User energy should be 48");
       var abilityCard = Registry.Layout.UserHand.Objects[0];
       yield return TestDragInputProvider.DragTo(
         Registry,
@@ -50,9 +50,9 @@ namespace Dreamtides.Tests
       var newCardInHand = Registry.Layout.UserHand.Objects[0];
       Assert.That(newCardInHand, Is.Not.EqualTo(abilityCard), "New card should be in hand");
       Assert.That(abilityCard == null, "Ability card should be destroyed");
-      Assert.That(Registry.Layout.UserStatusDisplay.Energy._text.text.Contains("49"),
+      Assert.That(Registry.Layout.UserStatusDisplay.Energy._text.text.Contains("47"),
           Is.True,
-          "User energy should be 49");
+          "User energy should be 47");
 
       yield return EndTest();
     }

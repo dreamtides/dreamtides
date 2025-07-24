@@ -222,7 +222,7 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                     (
                         AbilityNumber(0),
                         Ability::Activated(ActivatedAbility {
-                            costs: vec![Cost::Energy(Energy(1))],
+                            costs: vec![Cost::Energy(Energy(3))],
                             effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
                             options: Some(ActivatedAbilityOptions {
                                 is_multi: true,

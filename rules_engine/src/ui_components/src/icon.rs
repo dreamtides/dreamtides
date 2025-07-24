@@ -5,3 +5,6 @@ pub const XMARK: &str = "\u{f00d}";
 pub const EYE_SLASH: &str = "\u{f070}";
 pub const EYE: &str = "\u{f06e}";
 pub const NON_NUMERIC: &str = "\u{f621}";
+pub const FAST: &str = "\u{f0e7}";
+pub const ACTIVATED: &str = "\u{f105}";
+pub const MULTI_ACTIVATED: &str = "\u{f101}";

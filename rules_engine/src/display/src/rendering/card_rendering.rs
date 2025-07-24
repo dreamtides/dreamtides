@@ -296,7 +296,11 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
             "[fast] 1\u{f7e4} -> Draw a card.".to_string()
         }
         CardName::TestFastMultiActivatedAbilityDrawCardCharacter => {
-            "[fast][multi] 1\u{f7e4} -> Draw a card.".to_string()
+            format!(
+                "{}{} <color=#00838F><b>3\u{f7e4}</b></color>: Draw a card.",
+                icon::FAST,
+                icon::MULTI_ACTIVATED
+            )
         }
         CardName::TestActivatedAbilityDissolveCharacter => {
             "2\u{f7e4} -> <b>Dissolve</b> an enemy character.".to_string()

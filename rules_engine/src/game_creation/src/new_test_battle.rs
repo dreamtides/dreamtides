@@ -121,7 +121,7 @@ fn create_test_deck(name: TestDeckName) -> Deck {
             deck_cards.insert(CardName::TestCounterspellUnlessPays, 2);
             deck_cards.insert(CardName::TestVariableEnergyDraw, 3);
             deck_cards.insert(CardName::TestTriggerGainSparkOnPlayCardEnemyTurn, 4);
-            deck_cards.insert(CardName::TestActivatedAbilityDrawCard, 5);
+            deck_cards.insert(CardName::TestFastMultiActivatedAbilityDrawCardCharacter, 5);
             deck_cards.insert(CardName::TestReturnOneOrTwoVoidEventCardsToHand, 2);
             deck_cards.insert(CardName::TestModalReturnToHandOrDrawTwo, 2);
             deck_cards.insert(CardName::TestPreventDissolveThisTurn, 2);

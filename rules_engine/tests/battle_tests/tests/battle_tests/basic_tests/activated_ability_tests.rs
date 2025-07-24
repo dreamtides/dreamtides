@@ -153,7 +153,7 @@ fn activate_ability_fast_multi_during_enemy_turn() {
     s.activate_ability(DisplayPlayer::User, &character_id, 0);
     assert_eq!(s.user_client.cards.user_hand().len(), 3, "drew second card");
 
-    assert_eq!(s.user_client.me.energy(), Energy(97), "energy spent on two activations");
+    assert_eq!(s.user_client.me.energy(), Energy(93), "energy spent on two activations");
 }
 
 #[test]
