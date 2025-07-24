@@ -115,6 +115,19 @@ fn create_test_deck(name: TestDeckName) -> Deck {
             deck_cards.insert(CardName::TestCounterspellUnlessPays, 3);
             deck_cards.insert(CardName::TestVariableEnergyDraw, 3);
         }
+        TestDeckName::CoreEleven => {
+            deck_cards.insert(CardName::TestDissolve, 3);
+            deck_cards.insert(CardName::TestCounterspell, 3);
+            deck_cards.insert(CardName::TestCounterspellUnlessPays, 2);
+            deck_cards.insert(CardName::TestVariableEnergyDraw, 3);
+            deck_cards.insert(CardName::TestTriggerGainSparkOnPlayCardEnemyTurn, 4);
+            deck_cards.insert(CardName::TestActivatedAbilityDrawCard, 5);
+            deck_cards.insert(CardName::TestReturnOneOrTwoVoidEventCardsToHand, 2);
+            deck_cards.insert(CardName::TestModalReturnToHandOrDrawTwo, 2);
+            deck_cards.insert(CardName::TestPreventDissolveThisTurn, 2);
+            deck_cards.insert(CardName::TestForeseeOneReclaim, 3);
+            deck_cards.insert(CardName::TestCounterspellCharacter, 2);
+        }
     }
     Deck { cards: deck_cards }
 }

@@ -14,7 +14,7 @@ fn activate_ability_basic_draw_card() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCardCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCard);
 
     assert_eq!(s.user_client.cards.user_hand().len(), 1, "activated ability token in hand");
     assert_eq!(s.user_client.me.energy(), Energy(99), "initial energy");
@@ -65,7 +65,7 @@ fn activate_ability_single_use_per_turn_cycle() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCardCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCard);
 
     s.activate_ability(DisplayPlayer::User, &character_id, 0);
     assert_eq!(s.user_client.cards.user_hand().len(), 1, "token used, replaced by drawn card");
@@ -83,7 +83,7 @@ fn activate_ability_insufficient_energy() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(0).build()).connect();
 
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCardCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCard);
 
     let token_card_id = format!("A{character_id}/0");
     let token_card = s.user_client.cards.card_map.get(&token_card_id);
@@ -164,7 +164,7 @@ fn activate_ability_non_fast_not_available_during_enemy_turn() {
         .connect();
 
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCardCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCard);
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
@@ -191,7 +191,7 @@ fn activate_ability_token_card_properties() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCardCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCard);
 
     let token_card_id = format!("A{character_id}/0");
     let token_card = s.user_client.cards.card_map.get(&token_card_id);
@@ -211,7 +211,7 @@ fn activate_ability_spark_unchanged() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCardCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCard);
 
     let initial_spark = s.user_client.cards.get_revealed(&character_id).numeric_spark();
     assert_eq!(initial_spark, Some(Spark(3)), "character has initial spark");
@@ -231,7 +231,7 @@ fn activate_ability_enemy_perspective_token_card_on_stack() {
 
     // Add a character with activated ability to enemy's battlefield
     let enemy_character_id =
-        s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestActivatedAbilityDrawCardCharacter);
+        s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestActivatedAbilityDrawCard);
 
     assert_eq!(s.user_client.cards.stack_cards().len(), 0, "no cards on stack initially");
 
@@ -296,7 +296,7 @@ fn activate_ability_goes_on_stack_requires_priority_passing() {
 
     // Add character with activated ability to user's battlefield
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCardCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCard);
 
     // Give enemy a fast card so they have multiple legal actions when user
     // activates ability
@@ -353,7 +353,7 @@ fn activate_ability_can_be_responded_to_with_fast_cards() {
 
     // Add character with activated ability to user's battlefield
     let user_character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCardCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCard);
 
     // Add fast activated ability character to enemy's battlefield
     let enemy_character_id = s.add_to_battlefield(

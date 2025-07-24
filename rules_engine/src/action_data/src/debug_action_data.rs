@@ -1,6 +1,7 @@
 use ai_data::game_ai::GameAI;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
+use battle_state::battle_player::battle_player_state::TestDeckName;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -12,6 +13,7 @@ use crate::game_action_data::GameAction;
 pub enum DebugAction {
     ApplyTestScenarioAction,
     RestartBattle,
+    RestartBattleWithDecks { one: TestDeckName, two: TestDeckName },
     SetOpponentAgent(GameAI),
     ApplyActionList(Vec<DebugBattleAction>),
     PerformOpponentAction(BattleAction),

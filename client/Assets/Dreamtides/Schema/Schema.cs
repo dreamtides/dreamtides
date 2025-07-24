@@ -1075,6 +1075,9 @@ namespace Dreamtides.Schema
 
     public partial class DebugActionClass
     {
+        [JsonProperty("restartBattleWithDecks", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public RestartBattleWithDecks RestartBattleWithDecks { get; set; }
+
         [JsonProperty("setOpponentAgent", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public GameAi? SetOpponentAgent { get; set; }
 
@@ -1083,6 +1086,15 @@ namespace Dreamtides.Schema
 
         [JsonProperty("performOpponentAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public BattleAction? PerformOpponentAction { get; set; }
+    }
+
+    public partial class RestartBattleWithDecks
+    {
+        [JsonProperty("one", Required = Required.Always)]
+        public TestDeckName One { get; set; }
+
+        [JsonProperty("two", Required = Required.Always)]
+        public TestDeckName Two { get; set; }
     }
 
     /// <summary>
@@ -2279,7 +2291,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitDeckCardOrder, SubmitMulligan, SubmitVoidCardTargets };
 
-    public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCardCharacter, TestCounterspell, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDrawOneReclaim, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestForeseeOneDrawACard, TestForeseeTwo, TestModalDrawOneOrDissolveEnemy, TestModalDrawOneOrDrawTwo, TestMultiActivatedAbilityDrawCardCharacter, TestPreventDissolveThisTurn, TestReturnOneOrTwoVoidEventCardsToHand, TestReturnToHand, TestReturnVoidCardToHand, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
+    public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCard, TestCounterspell, TestCounterspellCharacter, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDrawOneReclaim, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestForeseeOneDrawACard, TestForeseeOneReclaim, TestForeseeTwo, TestModalDrawOneOrDissolveEnemy, TestModalDrawOneOrDrawTwo, TestModalReturnToHandOrDrawTwo, TestMultiActivatedAbilityDrawCardCharacter, TestPreventDissolveThisTurn, TestReturnOneOrTwoVoidEventCardsToHand, TestReturnToHand, TestReturnVoidCardToHand, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestVanillaCharacter, TestVariableEnergyDraw };
 
     /// <summary>
     /// Identifies a player in an ongoing battle.
@@ -2300,6 +2312,8 @@ namespace Dreamtides.Schema
     public enum PanelAddressEnum { AddCardToHand, Developer, SetOpponentAgent };
 
     public enum DebugActionEnum { ApplyTestScenarioAction, RestartBattle };
+
+    public enum TestDeckName { CoreEleven, StartingFive };
 
     public enum FlexAlign { Auto, Center, FlexEnd, FlexStart, Stretch };
 
@@ -2520,6 +2534,7 @@ namespace Dreamtides.Schema
                 PanelAddressEnumConverter.Singleton,
                 BattleDisplayActionEnumConverter.Singleton,
                 DebugActionConverter.Singleton,
+                TestDeckNameConverter.Singleton,
                 DebugActionEnumConverter.Singleton,
                 GameActionEnumConverter.Singleton,
                 FlexAlignConverter.Singleton,
@@ -3362,10 +3377,12 @@ namespace Dreamtides.Schema
             {
                 case "TestActivatedAbilityDissolveCharacter":
                     return CardName.TestActivatedAbilityDissolveCharacter;
-                case "TestActivatedAbilityDrawCardCharacter":
-                    return CardName.TestActivatedAbilityDrawCardCharacter;
+                case "TestActivatedAbilityDrawCard":
+                    return CardName.TestActivatedAbilityDrawCard;
                 case "TestCounterspell":
                     return CardName.TestCounterspell;
+                case "TestCounterspellCharacter":
+                    return CardName.TestCounterspellCharacter;
                 case "TestCounterspellUnlessPays":
                     return CardName.TestCounterspellUnlessPays;
                 case "TestDissolve":
@@ -3384,12 +3401,16 @@ namespace Dreamtides.Schema
                     return CardName.TestForeseeOne;
                 case "TestForeseeOneDrawACard":
                     return CardName.TestForeseeOneDrawACard;
+                case "TestForeseeOneReclaim":
+                    return CardName.TestForeseeOneReclaim;
                 case "TestForeseeTwo":
                     return CardName.TestForeseeTwo;
                 case "TestModalDrawOneOrDissolveEnemy":
                     return CardName.TestModalDrawOneOrDissolveEnemy;
                 case "TestModalDrawOneOrDrawTwo":
                     return CardName.TestModalDrawOneOrDrawTwo;
+                case "TestModalReturnToHandOrDrawTwo":
+                    return CardName.TestModalReturnToHandOrDrawTwo;
                 case "TestMultiActivatedAbilityDrawCardCharacter":
                     return CardName.TestMultiActivatedAbilityDrawCardCharacter;
                 case "TestPreventDissolveThisTurn":
@@ -3425,11 +3446,14 @@ namespace Dreamtides.Schema
                 case CardName.TestActivatedAbilityDissolveCharacter:
                     serializer.Serialize(writer, "TestActivatedAbilityDissolveCharacter");
                     return;
-                case CardName.TestActivatedAbilityDrawCardCharacter:
-                    serializer.Serialize(writer, "TestActivatedAbilityDrawCardCharacter");
+                case CardName.TestActivatedAbilityDrawCard:
+                    serializer.Serialize(writer, "TestActivatedAbilityDrawCard");
                     return;
                 case CardName.TestCounterspell:
                     serializer.Serialize(writer, "TestCounterspell");
+                    return;
+                case CardName.TestCounterspellCharacter:
+                    serializer.Serialize(writer, "TestCounterspellCharacter");
                     return;
                 case CardName.TestCounterspellUnlessPays:
                     serializer.Serialize(writer, "TestCounterspellUnlessPays");
@@ -3458,6 +3482,9 @@ namespace Dreamtides.Schema
                 case CardName.TestForeseeOneDrawACard:
                     serializer.Serialize(writer, "TestForeseeOneDrawACard");
                     return;
+                case CardName.TestForeseeOneReclaim:
+                    serializer.Serialize(writer, "TestForeseeOneReclaim");
+                    return;
                 case CardName.TestForeseeTwo:
                     serializer.Serialize(writer, "TestForeseeTwo");
                     return;
@@ -3466,6 +3493,9 @@ namespace Dreamtides.Schema
                     return;
                 case CardName.TestModalDrawOneOrDrawTwo:
                     serializer.Serialize(writer, "TestModalDrawOneOrDrawTwo");
+                    return;
+                case CardName.TestModalReturnToHandOrDrawTwo:
+                    serializer.Serialize(writer, "TestModalReturnToHandOrDrawTwo");
                     return;
                 case CardName.TestMultiActivatedAbilityDrawCardCharacter:
                     serializer.Serialize(writer, "TestMultiActivatedAbilityDrawCardCharacter");
@@ -4036,6 +4066,47 @@ namespace Dreamtides.Schema
         }
 
         public static readonly DebugActionConverter Singleton = new DebugActionConverter();
+    }
+
+    internal class TestDeckNameConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(TestDeckName) || t == typeof(TestDeckName?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "CoreEleven":
+                    return TestDeckName.CoreEleven;
+                case "StartingFive":
+                    return TestDeckName.StartingFive;
+            }
+            throw new Exception("Cannot unmarshal type TestDeckName");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (TestDeckName)untypedValue;
+            switch (value)
+            {
+                case TestDeckName.CoreEleven:
+                    serializer.Serialize(writer, "CoreEleven");
+                    return;
+                case TestDeckName.StartingFive:
+                    serializer.Serialize(writer, "StartingFive");
+                    return;
+            }
+            throw new Exception("Cannot marshal type TestDeckName");
+        }
+
+        public static readonly TestDeckNameConverter Singleton = new TestDeckNameConverter();
     }
 
     internal class DebugActionEnumConverter : JsonConverter

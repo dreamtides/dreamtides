@@ -52,6 +52,7 @@ pub enum PlayerType {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, JsonSchema)]
 pub enum TestDeckName {
     StartingFive,
+    CoreEleven,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]

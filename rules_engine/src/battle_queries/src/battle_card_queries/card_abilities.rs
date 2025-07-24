@@ -52,6 +52,9 @@ static TEST_MODAL_DRAW_ONE_OR_DRAW_TWO: OnceLock<AbilityList> = OnceLock::new();
 static TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY: OnceLock<AbilityList> = OnceLock::new();
 static TEST_RETURN_TO_HAND: OnceLock<AbilityList> = OnceLock::new();
 static TEST_PREVENT_DISSOLVE_THIS_TURN: OnceLock<AbilityList> = OnceLock::new();
+static TEST_COUNTERSPELL_CHARACTER: OnceLock<AbilityList> = OnceLock::new();
+static TEST_FORESEE_1_RECLAIM: OnceLock<AbilityList> = OnceLock::new();
+static TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO: OnceLock<AbilityList> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static AbilityList {
     query_by_name(card::get(battle, card_id).name)
@@ -174,9 +177,9 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 )])
             })
         }
-        CardName::TestActivatedAbilityDrawCardCharacter => TEST_ACTIVATED_ABILITY_CHARACTER
-            .get_or_init(|| {
-                build_ability_list(CardName::TestActivatedAbilityDrawCardCharacter, vec![(
+        CardName::TestActivatedAbilityDrawCard => {
+            TEST_ACTIVATED_ABILITY_CHARACTER.get_or_init(|| {
+                build_ability_list(CardName::TestActivatedAbilityDrawCard, vec![(
                     AbilityNumber(0),
                     Ability::Activated(ActivatedAbility {
                         costs: vec![Cost::Energy(Energy(1))],
@@ -185,7 +188,8 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                     }),
                     AbilityConfiguration::default(),
                 )])
-            }),
+            })
+        }
         CardName::TestMultiActivatedAbilityDrawCardCharacter => {
             TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER.get_or_init(|| {
                 build_ability_list(CardName::TestMultiActivatedAbilityDrawCardCharacter, vec![(
@@ -426,6 +430,57 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 )])
             })
         }
+        CardName::TestCounterspellCharacter => TEST_COUNTERSPELL_CHARACTER.get_or_init(|| {
+            build_ability_list(CardName::TestCounterspellCharacter, vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::Counterspell {
+                        target: Predicate::Enemy(CardPredicate::Character),
+                    }),
+                }),
+                AbilityConfiguration::default(),
+            )])
+        }),
+        CardName::TestForeseeOneReclaim => TEST_FORESEE_1_RECLAIM.get_or_init(|| {
+            build_ability_list(CardName::TestForeseeOneReclaim, vec![
+                (
+                    AbilityNumber(0),
+                    Ability::Event(EventAbility {
+                        additional_cost: None,
+                        effect: Effect::Effect(StandardEffect::Foresee { count: 1 }),
+                    }),
+                    AbilityConfiguration::default(),
+                ),
+                (
+                    AbilityNumber(1),
+                    Ability::Named(NamedAbility::Reclaim(Some(Energy(3)))),
+                    AbilityConfiguration::default(),
+                ),
+            ])
+        }),
+        CardName::TestModalReturnToHandOrDrawTwo => TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO
+            .get_or_init(|| {
+                build_ability_list(CardName::TestModalReturnToHandOrDrawTwo, vec![(
+                    AbilityNumber(0),
+                    Ability::Event(EventAbility {
+                        additional_cost: None,
+                        effect: Effect::Modal(vec![
+                            ModalEffectChoice {
+                                energy_cost: Energy(2),
+                                effect: Effect::Effect(StandardEffect::ReturnToHand {
+                                    target: Predicate::Enemy(CardPredicate::Character),
+                                }),
+                            },
+                            ModalEffectChoice {
+                                energy_cost: Energy(3),
+                                effect: Effect::Effect(StandardEffect::DrawCards { count: 2 }),
+                            },
+                        ]),
+                    }),
+                    AbilityConfiguration::default(),
+                )])
+            }),
     }
 }
 

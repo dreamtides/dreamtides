@@ -20,7 +20,7 @@ pub fn display_name(card_name: CardName) -> String {
             "Materialize Gain Spark".to_string()
         }
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => "Play Enemy Gain Spark".to_string(),
-        CardName::TestActivatedAbilityDrawCardCharacter => "Activated".to_string(),
+        CardName::TestActivatedAbilityDrawCard => "Activated".to_string(),
         CardName::TestMultiActivatedAbilityDrawCardCharacter => "Multi Activated".to_string(),
         CardName::TestFastActivatedAbilityDrawCardCharacter => "Fast Activated".to_string(),
         CardName::TestFastMultiActivatedAbilityDrawCardCharacter => {
@@ -38,6 +38,9 @@ pub fn display_name(card_name: CardName) -> String {
         CardName::TestModalDrawOneOrDissolveEnemy => "Modal Draw & Dissolve".to_string(),
         CardName::TestReturnToHand => "Return to Hand".to_string(),
         CardName::TestPreventDissolveThisTurn => "Prevent Dissolve".to_string(),
+        CardName::TestForeseeOneReclaim => "Foresee 1 Reclaim".to_string(),
+        CardName::TestModalReturnToHandOrDrawTwo => "Modal Return".to_string(),
+        CardName::TestCounterspellCharacter => "Counterspell Character".to_string(),
     }
 }
 
@@ -62,11 +65,12 @@ pub fn base_energy_cost(name: CardName) -> Option<Energy> {
         CardName::TestDissolve => Some(Energy(2)),
         CardName::TestCounterspellUnlessPays => Some(Energy(1)),
         CardName::TestCounterspell => Some(Energy(2)),
-        CardName::TestVariableEnergyDraw => Some(Energy(1)),
+        CardName::TestCounterspellCharacter => Some(Energy(2)),
+        CardName::TestVariableEnergyDraw => Some(Energy(2)),
         CardName::TestDrawOne => Some(Energy(0)),
         CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => Some(Energy(0)),
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => Some(Energy(2)),
-        CardName::TestActivatedAbilityDrawCardCharacter => Some(Energy(0)),
+        CardName::TestActivatedAbilityDrawCard => Some(Energy(0)),
         CardName::TestMultiActivatedAbilityDrawCardCharacter => Some(Energy(0)),
         CardName::TestFastActivatedAbilityDrawCardCharacter => Some(Energy(0)),
         CardName::TestFastMultiActivatedAbilityDrawCardCharacter => Some(Energy(0)),
@@ -76,10 +80,12 @@ pub fn base_energy_cost(name: CardName) -> Option<Energy> {
         CardName::TestForeseeTwo => Some(Energy(1)),
         CardName::TestForeseeOneDrawACard => Some(Energy(1)),
         CardName::TestDrawOneReclaim => Some(Energy(2)),
+        CardName::TestForeseeOneReclaim => Some(Energy(1)),
         CardName::TestReturnVoidCardToHand => Some(Energy(1)),
         CardName::TestReturnOneOrTwoVoidEventCardsToHand => Some(Energy(1)),
         CardName::TestModalDrawOneOrDrawTwo => None,
         CardName::TestModalDrawOneOrDissolveEnemy => None,
+        CardName::TestModalReturnToHandOrDrawTwo => None,
         CardName::TestReturnToHand => Some(Energy(1)),
         CardName::TestPreventDissolveThisTurn => Some(Energy(0)),
     }
@@ -103,7 +109,7 @@ pub fn base_spark(name: CardName) -> Option<Spark> {
         CardName::TestVanillaCharacter => Some(Spark(5)),
         CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => Some(Spark(5)),
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => Some(Spark(5)),
-        CardName::TestActivatedAbilityDrawCardCharacter => Some(Spark(3)),
+        CardName::TestActivatedAbilityDrawCard => Some(Spark(3)),
         CardName::TestMultiActivatedAbilityDrawCardCharacter => Some(Spark(3)),
         CardName::TestFastActivatedAbilityDrawCardCharacter => Some(Spark(3)),
         CardName::TestFastMultiActivatedAbilityDrawCardCharacter => Some(Spark(3)),
@@ -127,9 +133,7 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
             CardType::Character(CharacterType::Visitor)
         }
-        CardName::TestActivatedAbilityDrawCardCharacter => {
-            CardType::Character(CharacterType::Warrior)
-        }
+        CardName::TestActivatedAbilityDrawCard => CardType::Character(CharacterType::Warrior),
         CardName::TestMultiActivatedAbilityDrawCardCharacter => {
             CardType::Character(CharacterType::Warrior)
         }
@@ -151,6 +155,9 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
         CardName::TestModalDrawOneOrDissolveEnemy => CardType::Event,
         CardName::TestReturnToHand => CardType::Event,
         CardName::TestPreventDissolveThisTurn => CardType::Event,
+        CardName::TestCounterspellCharacter => CardType::Event,
+        CardName::TestForeseeOneReclaim => CardType::Event,
+        CardName::TestModalReturnToHandOrDrawTwo => CardType::Event,
     }
 }
 
@@ -164,7 +171,7 @@ pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
         CardName::TestDrawOne => true,
         CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => false,
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => true,
-        CardName::TestActivatedAbilityDrawCardCharacter => false,
+        CardName::TestActivatedAbilityDrawCard => false,
         CardName::TestMultiActivatedAbilityDrawCardCharacter => false,
         CardName::TestFastActivatedAbilityDrawCardCharacter => false,
         CardName::TestFastMultiActivatedAbilityDrawCardCharacter => false,
@@ -180,5 +187,8 @@ pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
         CardName::TestModalDrawOneOrDissolveEnemy => true,
         CardName::TestReturnToHand => true,
         CardName::TestPreventDissolveThisTurn => true,
+        CardName::TestCounterspellCharacter => true,
+        CardName::TestForeseeOneReclaim => true,
+        CardName::TestModalReturnToHandOrDrawTwo => true,
     }
 }

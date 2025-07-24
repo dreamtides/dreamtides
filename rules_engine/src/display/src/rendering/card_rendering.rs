@@ -192,7 +192,7 @@ pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
-        CardName::TestActivatedAbilityDrawCardCharacter => SpriteAddress::new(
+        CardName::TestActivatedAbilityDrawCard => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
         CardName::TestMultiActivatedAbilityDrawCardCharacter => SpriteAddress::new(
@@ -240,6 +240,15 @@ pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
         CardName::TestPreventDissolveThisTurn => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
+        CardName::TestCounterspellCharacter => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
+        ),
+        CardName::TestForeseeOneReclaim => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
+        ),
+        CardName::TestModalReturnToHandOrDrawTwo => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
+        ),
     }
 }
 
@@ -277,7 +286,7 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
             "Whenever you play a card during the enemy's turn, this character gains +2 spark.".to_string()
         }
-        CardName::TestActivatedAbilityDrawCardCharacter => {
+        CardName::TestActivatedAbilityDrawCard => {
             "1\u{f7e4} -> Draw a card.".to_string()
         }
         CardName::TestMultiActivatedAbilityDrawCardCharacter => {
@@ -324,6 +333,15 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         }
         CardName::TestPreventDissolveThisTurn => {
             "A character you control gains <color=#AA00FF><b>anchored</b></color> until end of turn.".to_string()
+        }
+        CardName::TestCounterspellCharacter => {
+            "<b>Counterspell</b> an enemy character.".to_string()
+        }
+        CardName::TestForeseeOneReclaim => {
+            "<b>Foresee</b> 1. Reclaim 1\u{f7e4}.".to_string()
+        }
+        CardName::TestModalReturnToHandOrDrawTwo => {
+            "Choose one:\n • <indent=1em>1\u{f7e4}: Return an enemy character to its owner's hand.</indent>\n • <indent=1em>2\u{f7e4}: Draw 2 cards.</indent>".to_string()
         }
     };
 
