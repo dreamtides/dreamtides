@@ -305,8 +305,8 @@ fn triggered_ability_gain_spark_on_play_card_enemy_turn() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let trigger_character_id =
-        s.create_and_play(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+    let trigger_character_id = s
+        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
 
@@ -339,8 +339,8 @@ fn triggered_ability_gain_spark_multiple_cards_enemy_turn() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let trigger_character_id =
-        s.create_and_play(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+    let trigger_character_id = s
+        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
 
@@ -379,8 +379,8 @@ fn triggered_ability_gain_spark_multiple_cards_enemy_turn() {
 fn triggered_ability_does_not_trigger_during_user_turn() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
-    let trigger_character_id =
-        s.create_and_play(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+    let trigger_character_id = s
+        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
 
@@ -408,8 +408,8 @@ fn triggered_ability_does_not_trigger_when_enemy_plays_cards() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let trigger_character_id =
-        s.create_and_play(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+    let trigger_character_id = s
+        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
 
@@ -443,11 +443,11 @@ fn triggered_ability_multiple_trigger_characters_enemy_turn() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let first_trigger_character_id =
-        s.create_and_play(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+    let first_trigger_character_id = s
+        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
 
-    let second_trigger_character_id =
-        s.create_and_play(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+    let second_trigger_character_id = s
+        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 2, "two characters on battlefield");
 
@@ -482,8 +482,8 @@ fn triggered_ability_triggers_on_different_card_types_enemy_turn() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let trigger_character_id =
-        s.create_and_play(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+    let trigger_character_id = s
+        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
 
@@ -493,7 +493,7 @@ fn triggered_ability_triggers_on_different_card_types_enemy_turn() {
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
     let user_fast_character =
-        s.add_to_hand(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+        s.add_to_hand(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
     let user_draw = s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
     let _enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
 
@@ -526,8 +526,8 @@ fn triggered_ability_triggers_on_fast_character_enemy_turn() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let trigger_character_id =
-        s.create_and_play(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+    let trigger_character_id = s
+        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
 
@@ -537,7 +537,7 @@ fn triggered_ability_triggers_on_fast_character_enemy_turn() {
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
     let user_fast_character =
-        s.add_to_hand(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+        s.add_to_hand(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
     let _enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
 
     s.play_card_from_hand(DisplayPlayer::User, &user_fast_character);
@@ -561,8 +561,8 @@ fn triggered_ability_enemy_turn_token_cards_and_display_effect() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let trigger_character_id =
-        s.create_and_play(DisplayPlayer::User, CardName::TestTriggerGainSparkOnPlayCardEnemyTurn);
+    let trigger_character_id = s
+        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
     assert_eq!(s.user_client.cards.stack_cards().len(), 0, "no cards on stack initially");

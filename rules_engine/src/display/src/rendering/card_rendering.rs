@@ -192,6 +192,9 @@ pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
+        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
+        ),
         CardName::TestActivatedAbilityDrawCard => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
@@ -284,6 +287,9 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
             "Whenever you materialize another character, this character gains +1 spark.".to_string()
         }
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
+            "Whenever you play a card during the enemy's turn, this character gains +1 spark.".to_string()
+        }
+        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => {
             "Whenever you play a card during the enemy's turn, this character gains +2 spark.".to_string()
         }
         CardName::TestActivatedAbilityDrawCard => {

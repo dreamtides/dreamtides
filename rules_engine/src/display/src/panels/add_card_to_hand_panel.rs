@@ -167,7 +167,7 @@ impl Component for AddCardToHandPanel<'_> {
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestTriggerGainSparkOnPlayCardEnemyTurn)
+                                        .card(CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn)
                                         .user_player(self.user_player)
                                         .build(),
                                 )

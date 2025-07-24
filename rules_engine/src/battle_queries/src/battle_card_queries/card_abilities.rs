@@ -35,6 +35,7 @@ static TEST_DRAW_ONE_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 static TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER: OnceLock<AbilityList> =
     OnceLock::new();
 static TEST_TRIGGER_GAIN_SPARK_PLAY_OPPONENT_TURN: OnceLock<AbilityList> = OnceLock::new();
+static TEST_TRIGGER_GAIN_TWO_SPARK_PLAY_OPPONENT_TURN: OnceLock<AbilityList> = OnceLock::new();
 static TEST_ACTIVATED_ABILITY_CHARACTER: OnceLock<AbilityList> = OnceLock::new();
 static TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: OnceLock<AbilityList> = OnceLock::new();
 static TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: OnceLock<AbilityList> = OnceLock::new();
@@ -161,6 +162,25 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
             TEST_TRIGGER_GAIN_SPARK_PLAY_OPPONENT_TURN.get_or_init(|| {
                 build_ability_list(CardName::TestTriggerGainSparkOnPlayCardEnemyTurn, vec![(
+                    AbilityNumber(0),
+                    Ability::Triggered(TriggeredAbility {
+                        trigger: TriggerEvent::PlayDuringTurn(
+                            Predicate::Your(CardPredicate::Card),
+                            PlayerTurn::EnemyTurn,
+                        ),
+                        effect: Effect::Effect(StandardEffect::GainsSpark {
+                            target: Predicate::This,
+                            gains: Spark(1),
+                        }),
+                        options: None,
+                    }),
+                    AbilityConfiguration::default(),
+                )])
+            })
+        }
+        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => {
+            TEST_TRIGGER_GAIN_TWO_SPARK_PLAY_OPPONENT_TURN.get_or_init(|| {
+                build_ability_list(CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn, vec![(
                     AbilityNumber(0),
                     Ability::Triggered(TriggeredAbility {
                         trigger: TriggerEvent::PlayDuringTurn(

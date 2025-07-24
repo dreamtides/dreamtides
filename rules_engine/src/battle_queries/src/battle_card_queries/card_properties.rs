@@ -19,7 +19,8 @@ pub fn display_name(card_name: CardName) -> String {
         CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => {
             "Materialize Gain Spark".to_string()
         }
-        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => "Play Enemy Gain Spark".to_string(),
+        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => "Enemy Turn Gain Spark".to_string(),
+        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => "Play Enemy Gain Spark".to_string(),
         CardName::TestActivatedAbilityDrawCard => "Activated".to_string(),
         CardName::TestMultiActivatedAbilityDrawCardCharacter => "Multi Activated".to_string(),
         CardName::TestFastActivatedAbilityDrawCardCharacter => "Fast Activated".to_string(),
@@ -70,6 +71,7 @@ pub fn base_energy_cost(name: CardName) -> Option<Energy> {
         CardName::TestDrawOne => Some(Energy(0)),
         CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => Some(Energy(0)),
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => Some(Energy(2)),
+        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => Some(Energy(2)),
         CardName::TestActivatedAbilityDrawCard => Some(Energy(2)),
         CardName::TestMultiActivatedAbilityDrawCardCharacter => Some(Energy(0)),
         CardName::TestFastActivatedAbilityDrawCardCharacter => Some(Energy(0)),
@@ -108,7 +110,8 @@ pub fn base_spark(name: CardName) -> Option<Spark> {
     match name {
         CardName::TestVanillaCharacter => Some(Spark(5)),
         CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => Some(Spark(5)),
-        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => Some(Spark(5)),
+        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => Some(Spark(1)),
+        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => Some(Spark(5)),
         CardName::TestActivatedAbilityDrawCard => Some(Spark(3)),
         CardName::TestMultiActivatedAbilityDrawCardCharacter => Some(Spark(3)),
         CardName::TestFastActivatedAbilityDrawCardCharacter => Some(Spark(3)),
@@ -131,6 +134,9 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
             CardType::Character(CharacterType::Musician)
         }
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
+            CardType::Character(CharacterType::Visitor)
+        }
+        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => {
             CardType::Character(CharacterType::Visitor)
         }
         CardName::TestActivatedAbilityDrawCard => CardType::Character(CharacterType::Warrior),
@@ -171,6 +177,7 @@ pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
         CardName::TestDrawOne => true,
         CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => false,
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => true,
+        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => true,
         CardName::TestActivatedAbilityDrawCard => false,
         CardName::TestMultiActivatedAbilityDrawCardCharacter => false,
         CardName::TestFastActivatedAbilityDrawCardCharacter => false,

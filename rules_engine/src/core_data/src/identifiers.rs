@@ -58,6 +58,7 @@ pub enum CardName {
     TestDrawOne,
     TestTriggerGainSparkWhenMaterializeAnotherCharacter,
     TestTriggerGainSparkOnPlayCardEnemyTurn,
+    TestTriggerGainTwoSparkOnPlayCardEnemyTurn,
     TestActivatedAbilityDrawCard,
     TestMultiActivatedAbilityDrawCardCharacter,
     TestFastActivatedAbilityDrawCardCharacter,
