@@ -12,7 +12,9 @@ use battle_queries::battle_trace;
 use battle_queries::macros::write_tracing_event;
 use battle_state::battle::animation_data::AnimationData;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
-use battle_state::battle_player::battle_player_state::PlayerType;
+use battle_state::battle_player::battle_player_state::{
+    CreateBattlePlayer, PlayerType, TestDeckName,
+};
 use core_data::identifiers::{BattleId, QuestId, UserId};
 use core_data::types::PlayerName;
 use database::database::Database;
@@ -25,7 +27,6 @@ use display_data::request_data::{
     PollResponse, PollResponseType,
 };
 use game_creation::new_battle;
-use game_creation::new_test_battle::TestDeckName;
 use rand::RngCore;
 use state_provider::state_provider::{DefaultStateProvider, PollResult, StateProvider};
 use state_provider::test_state_provider::TestStateProvider;
@@ -334,15 +335,17 @@ fn load_battle_from_database(
                 .enemy
                 .as_ref()
                 .cloned()
-                .unwrap_or(PlayerType::Agent(GameAI::MonteCarlo(50)));
+                .unwrap_or(PlayerType::Agent(GameAI::MonteCarlo(25)));
 
-            let new_battle = new_battle::create_and_start_with_options(
+            let new_battle = new_battle::create_and_start(
                 battle_id,
                 seed,
-                PlayerType::User(user_id),
-                enemy,
+                CreateBattlePlayer {
+                    player_type: PlayerType::User(user_id),
+                    deck_name: TestDeckName::StartingFive,
+                },
+                CreateBattlePlayer { player_type: enemy, deck_name: TestDeckName::StartingFive },
                 request_context,
-                TestDeckName::StartingFive,
             );
 
             // Save new battle to database
@@ -548,7 +551,7 @@ fn handle_request_action(
         GameAction::NoOp => {}
         GameAction::DebugAction(action) => {
             let player = renderer::player_name_for_user(&*battle, user_id);
-            debug_actions::execute(battle, user_id, player, action.clone());
+            debug_actions::execute(battle, player, action.clone());
 
             send_updates_to_user_and_opponent(
                 provider.clone(),

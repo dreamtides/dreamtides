@@ -22,4 +22,5 @@ user_state = { path = "../user_state" }
 
 rand = { workspace = true }
 rand_xoshiro = { workspace = true }
+serde = { workspace = true }
 uuid = { workspace = true }

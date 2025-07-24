@@ -20,8 +20,8 @@ pub fn battle(user_id: UserId, quest_id: QuestId, battle: &BattleState) -> SaveF
                 id: battle.id,
                 seed: battle.seed,
                 player_types: PlayerMap {
-                    one: battle.players.one.player_type.clone(),
-                    two: battle.players.two.player_type.clone(),
+                    one: battle.players.one.as_create_battle_player(),
+                    two: battle.players.two.as_create_battle_player(),
                 },
                 actions: history.actions.clone(),
             }),

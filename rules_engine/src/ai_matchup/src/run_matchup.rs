@@ -6,11 +6,13 @@ use battle_mutations::actions::apply_battle_action;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
 use battle_state::battle::battle_status::BattleStatus;
-use battle_state::battle_player::battle_player_state::PlayerType;
+use battle_state::battle_player::battle_player_state::{
+    CreateBattlePlayer, PlayerType, TestDeckName,
+};
 use clap::{Parser, ValueEnum};
 use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
-use game_creation::new_test_battle::{self, TestDeckName};
+use game_creation::new_test_battle;
 use serde_json::from_str;
 use tracing::{debug, subscriber};
 use tracing_subscriber::layer::SubscriberExt;
@@ -142,10 +144,9 @@ fn run_match(
     let mut battle = new_test_battle::create_and_start(
         battle_id,
         seed,
-        battle_ai_one,
-        battle_ai_two,
+        CreateBattlePlayer { player_type: battle_ai_one, deck_name: TestDeckName::StartingFive },
+        CreateBattlePlayer { player_type: battle_ai_two, deck_name: TestDeckName::StartingFive },
         RequestContext { logging_options: LoggingOptions::default() },
-        TestDeckName::StartingFive,
     );
 
     let start_time = Instant::now();

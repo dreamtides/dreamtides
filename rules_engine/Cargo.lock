@@ -723,6 +723,7 @@ dependencies = [
  "ai_data",
  "battle_state",
  "core_data",
+ "game_creation",
  "rusqlite",
  "serde",
  "serde_json",
@@ -986,6 +987,7 @@ dependencies = [
  "quest_state",
  "rand 0.9.0",
  "rand_xoshiro",
+ "serde",
  "user_state",
  "uuid",
 ]

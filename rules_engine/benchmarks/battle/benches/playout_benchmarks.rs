@@ -18,14 +18,16 @@ use battle_state::battle::turn_data::TurnData;
 use battle_state::battle::turn_history::TurnHistory;
 use battle_state::battle_cards::ability_state::AbilityState;
 use battle_state::battle_cards::zone::Zone;
-use battle_state::battle_player::battle_player_state::{BattlePlayerState, PlayerType};
+use battle_state::battle_player::battle_player_state::{
+    BattlePlayerState, PlayerType, TestDeckName,
+};
 use battle_state::battle_player::player_map::PlayerMap;
 use battle_state::triggers::trigger_state::TriggerState;
 use core_data::identifiers::{BattleId, CardName};
 use core_data::numerics::{Energy, Points, Spark, TurnId};
 use core_data::types::PlayerName;
 use criterion::{BatchSize, Criterion, criterion_group};
-use game_creation::new_test_battle::{self, TestDeckName};
+use game_creation::new_test_battle::{self};
 use rand::SeedableRng;
 use rand_xoshiro::Xoshiro256PlusPlus;
 use tracing::{Level, subscriber};
@@ -335,6 +337,7 @@ fn benchmark_battle() -> BattleState {
                 current_energy: Energy(6),
                 produced_energy: Energy(6),
                 spark_bonus: Spark(0),
+                deck_name: TestDeckName::StartingFive,
                 quest: Arc::new(new_test_battle::create_quest_state(TestDeckName::StartingFive)),
             },
             two: BattlePlayerState {
@@ -343,6 +346,7 @@ fn benchmark_battle() -> BattleState {
                 current_energy: Energy(5),
                 produced_energy: Energy(5),
                 spark_bonus: Spark(0),
+                deck_name: TestDeckName::StartingFive,
                 quest: Arc::new(new_test_battle::create_quest_state(TestDeckName::StartingFive)),
             },
         },

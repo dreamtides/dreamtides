@@ -1,4 +1,7 @@
 use battle_state::battle::battle_state::{BattleState, RequestContext};
+use battle_state::battle_player::battle_player_state::{
+    CreateBattlePlayer, PlayerType, TestDeckName,
+};
 use core_data::identifiers::{BattleId, UserId};
 use core_data::types::PlayerName;
 use display::core::response_builder::ResponseBuilder;
@@ -23,10 +26,19 @@ pub fn display_error_message(
         Some(existing_battle) => display_error_message_with_battle(existing_battle, message),
         None => {
             let id = BattleId(Uuid::new_v4());
-            let dummy_battle =
-                new_battle::create_and_start(UserId::default(), id, RequestContext {
-                    logging_options: Default::default(),
-                });
+            let dummy_battle = new_battle::create_and_start(
+                id,
+                0,
+                CreateBattlePlayer {
+                    player_type: PlayerType::User(UserId::default()),
+                    deck_name: TestDeckName::StartingFive,
+                },
+                CreateBattlePlayer {
+                    player_type: PlayerType::User(UserId::default()),
+                    deck_name: TestDeckName::StartingFive,
+                },
+                RequestContext { logging_options: Default::default() },
+            );
             display_error_message_with_battle(&dummy_battle, message)
         }
     }

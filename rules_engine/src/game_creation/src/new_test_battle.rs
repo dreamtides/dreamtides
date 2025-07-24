@@ -10,7 +10,9 @@ use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::battle::turn_data::TurnData;
 use battle_state::battle::turn_history::TurnHistory;
 use battle_state::battle_cards::ability_state::AbilityState;
-use battle_state::battle_player::battle_player_state::{BattlePlayerState, PlayerType};
+use battle_state::battle_player::battle_player_state::{
+    BattlePlayerState, CreateBattlePlayer, TestDeckName,
+};
 use battle_state::battle_player::player_map::PlayerMap;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger_state::TriggerState;
@@ -24,38 +26,34 @@ use rand_xoshiro::Xoshiro256PlusPlus;
 use user_state::user::user_state::UserState;
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum TestDeckName {
-    StartingFive,
-}
-
 /// Creates a new test battle between two Agents and starts it.
 pub fn create_and_start(
     id: BattleId,
     seed: u64,
-    user: PlayerType,
-    enemy: PlayerType,
+    player_one: CreateBattlePlayer,
+    player_two: CreateBattlePlayer,
     request_context: RequestContext,
-    deck_name: TestDeckName,
 ) -> BattleState {
     let mut battle = BattleState {
         id,
         players: PlayerMap {
             one: BattlePlayerState {
-                player_type: user,
+                player_type: player_one.player_type,
                 points: Points(0),
                 spark_bonus: Spark(0),
                 current_energy: Energy(0),
                 produced_energy: Energy(0),
-                quest: Arc::new(create_quest_state(deck_name)),
+                deck_name: player_one.deck_name,
+                quest: Arc::new(create_quest_state(player_one.deck_name)),
             },
             two: BattlePlayerState {
-                player_type: enemy,
+                player_type: player_two.player_type,
                 points: Points(0),
                 spark_bonus: Spark(0),
                 current_energy: Energy(0),
                 produced_energy: Energy(0),
-                quest: Arc::new(create_quest_state(deck_name)),
+                deck_name: player_two.deck_name,
+                quest: Arc::new(create_quest_state(player_two.deck_name)),
             },
         },
         cards: AllCards::default(),

@@ -13,7 +13,6 @@ use core_data::identifiers::QuestId;
 use core_data::types::PlayerName;
 use database::save_file::SaveFile;
 use game_creation::new_battle;
-use game_creation::new_test_battle::TestDeckName;
 use serde_json;
 use tracing::{error, instrument, subscriber};
 use tracing_subscriber::EnvFilter;
@@ -64,13 +63,12 @@ fn get_battle_impl(
             let mut result = subscriber::with_default(forest_subscriber, || {
                 let quest_id = v1.quest.as_ref()?.id;
                 let file = v1.quest.as_ref()?.battle.as_ref()?;
-                let mut battle = new_battle::create_and_start_with_options(
+                let mut battle = new_battle::create_and_start(
                     file.id,
                     file.seed,
                     file.player_types.one.clone(),
                     file.player_types.two.clone(),
                     request_context,
-                    TestDeckName::StartingFive,
                 );
                 battle.animations = None;
                 battle.tracing = None;

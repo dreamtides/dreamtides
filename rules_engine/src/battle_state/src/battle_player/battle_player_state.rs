@@ -29,8 +29,17 @@ pub struct BattlePlayerState {
     /// Additional spark for this player
     pub spark_bonus: Spark,
 
+    /// The deck name for this player.
+    pub deck_name: TestDeckName,
+
     /// The player's quest state.
     pub quest: Arc<QuestState>,
+}
+
+impl BattlePlayerState {
+    pub fn as_create_battle_player(&self) -> CreateBattlePlayer {
+        CreateBattlePlayer { player_type: self.player_type.clone(), deck_name: self.deck_name }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
@@ -38,4 +47,16 @@ pub struct BattlePlayerState {
 pub enum PlayerType {
     User(UserId),
     Agent(GameAI),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, JsonSchema)]
+pub enum TestDeckName {
+    StartingFive,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateBattlePlayer {
+    pub player_type: PlayerType,
+    pub deck_name: TestDeckName,
 }
