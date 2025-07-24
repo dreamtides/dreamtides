@@ -138,7 +138,9 @@ impl LegalActions {
                     match for_player {
                         // Agent cannot remove cards from the selected set
                         ForPlayer::Agent => {
-                            valid.contains(void_card_id) && current.len() < *maximum_selection
+                            !current.contains(void_card_id)
+                                && valid.contains(void_card_id)
+                                && current.len() < *maximum_selection
                         }
 
                         // In single card mode, always allow toggling
@@ -241,7 +243,7 @@ impl LegalActions {
             LegalActions::SelectCharacterPrompt { valid } => valid.len(),
             LegalActions::SelectStackCardPrompt { valid } => valid.len(),
             LegalActions::SelectVoidCardPrompt { valid, current, maximum_selection } => {
-                if current.len() == *maximum_selection {
+                if current.len() == *maximum_selection || current.len() == valid.len() {
                     1 // SubmitVoidCardTargets, only for AI when at max selection
                 } else {
                     valid.len() - current.len()
@@ -337,7 +339,7 @@ impl LegalActions {
                 .map(BattleAction::SelectStackCardTarget),
 
             LegalActions::SelectVoidCardPrompt { valid, current, maximum_selection } => {
-                if current.len() == *maximum_selection {
+                if current.len() == *maximum_selection || current.len() == valid.len() {
                     // For now only submit for AI when at max selection
                     if actions.contains(&BattleAction::SubmitVoidCardTargets) {
                         None
