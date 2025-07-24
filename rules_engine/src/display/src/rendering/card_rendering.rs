@@ -332,7 +332,7 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
             "<b>Return</b> an enemy character to its owner's hand.".to_string()
         }
         CardName::TestPreventDissolveThisTurn => {
-            "A character you control gains <color=#AA00FF><b>anchored</b></color> until end of turn.".to_string()
+            "An allied character gains <color=#AA00FF><b>anchored</b></color> until end of turn.".to_string()
         }
         CardName::TestCounterspellCharacter => {
             "<b>Counterspell</b> an enemy character.".to_string()
@@ -341,7 +341,7 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
             "<b>Foresee</b> 1. Reclaim 1\u{f7e4}.".to_string()
         }
         CardName::TestModalReturnToHandOrDrawTwo => {
-            "Choose one:\n • <indent=1em>1\u{f7e4}: Return an enemy character to its owner's hand.</indent>\n • <indent=1em>2\u{f7e4}: Draw 2 cards.</indent>".to_string()
+            "Choose one:\n • <indent=1em><color=#00838F><b>2\u{f7e4}</b></color>: Return an enemy character to hand.</indent>\n • <indent=1em><color=#00838F><b>3\u{f7e4}</b></color>: Draw 2 cards.</indent>".to_string()
         }
     };
 

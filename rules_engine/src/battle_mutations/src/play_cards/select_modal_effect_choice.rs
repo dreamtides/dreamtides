@@ -21,12 +21,12 @@ pub fn execute(
     let PromptType::ModalEffect(modal_prompt) = prompt.prompt_type else {
         panic_with!("Prompt is not a modal effect choice", battle);
     };
-    let Some(cost) = modal_prompt.pay_energy.get(modal_choice_index.value()) else {
-        panic_with!("No energy cost for choice", battle);
+    let Some(choice) = modal_prompt.choices.get(modal_choice_index.value()) else {
+        panic_with!("No choice found", battle, modal_choice_index);
     };
 
     let source = EffectSource::Player { controller: player };
-    energy::spend(battle, player, source, *cost);
+    energy::spend(battle, player, source, choice.energy_cost);
 
     match modal_prompt.on_selected {
         OnSelected::AddStackTargets(stack_item_id) => {

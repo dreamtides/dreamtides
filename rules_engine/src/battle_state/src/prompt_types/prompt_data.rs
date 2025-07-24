@@ -1,4 +1,4 @@
-use ability_data::effect::Effect;
+use ability_data::effect::{Effect, ModalEffectChoice};
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use schemars::JsonSchema;
@@ -60,8 +60,7 @@ pub struct ChooseVoidCardPrompt {
 #[derive(Debug, Clone)]
 pub struct ModalEffectPrompt {
     pub on_selected: OnSelected,
-    pub choice_count: usize,
-    pub pay_energy: Vec<Energy>,
+    pub choices: Vec<ModalEffectChoice>,
 }
 
 /// State for a prompt to select a deck card order.

@@ -5,11 +5,11 @@ use battle_state::prompt_types::prompt_data::PromptType;
 use bit_set::BitSet;
 use core_data::types::PlayerName;
 
-use crate::legal_action_queries::can_activate_abilities;
 use crate::legal_action_queries::can_play_cards::{self, FastOnly};
 use crate::legal_action_queries::legal_actions_data::{
     LegalActions, PrimaryLegalAction, StandardLegalActions,
 };
+use crate::legal_action_queries::{can_activate_abilities, legal_modal_effect_choices};
 
 pub fn compute(battle: &BattleState, player: PlayerName) -> LegalActions {
     if matches!(battle.status, BattleStatus::GameOver { .. }) {
@@ -42,16 +42,14 @@ pub fn compute(battle: &BattleState, player: PlayerName) -> LegalActions {
                 LegalActions::SelectEnergyValuePrompt { minimum: *minimum, maximum: *maximum }
             }
             PromptType::ModalEffect(prompt) => {
-                let player_energy = battle.players.player(player).current_energy;
-                let mut affordable_choices = BitSet::<usize>::default();
-
-                for (i, &energy_cost) in prompt.pay_energy.iter().enumerate() {
-                    if player_energy >= energy_cost {
-                        affordable_choices.insert(i);
+                let source = prompt_data.source;
+                let mut valid_choices = BitSet::<usize>::default();
+                for (i, choice) in prompt.choices.iter().enumerate() {
+                    if legal_modal_effect_choices::is_legal_choice(battle, source, player, choice) {
+                        valid_choices.insert(i);
                     }
                 }
-
-                LegalActions::ModalEffectPrompt { affordable_choices }
+                LegalActions::ModalEffectPrompt { valid_choices }
             }
             PromptType::SelectDeckCardOrder { prompt } => {
                 LegalActions::SelectDeckCardOrder { current: prompt.clone() }

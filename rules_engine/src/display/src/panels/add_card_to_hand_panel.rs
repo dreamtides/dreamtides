@@ -89,6 +89,12 @@ impl Component for AddCardToHandPanel<'_> {
                                 )
                                 .child(
                                     AddCardCell::builder()
+                                        .card(CardName::TestForeseeOneReclaim)
+                                        .user_player(self.user_player)
+                                        .build(),
+                                )
+                                .child(
+                                    AddCardCell::builder()
                                         .card(CardName::TestDrawOneReclaim)
                                         .user_player(self.user_player)
                                         .build(),
@@ -102,6 +108,12 @@ impl Component for AddCardToHandPanel<'_> {
                                 .child(
                                     AddCardCell::builder()
                                         .card(CardName::TestModalDrawOneOrDissolveEnemy)
+                                        .user_player(self.user_player)
+                                        .build(),
+                                )
+                                .child(
+                                    AddCardCell::builder()
+                                        .card(CardName::TestModalReturnToHandOrDrawTwo)
                                         .user_player(self.user_player)
                                         .build(),
                                 )

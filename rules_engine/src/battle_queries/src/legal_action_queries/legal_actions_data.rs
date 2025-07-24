@@ -44,7 +44,7 @@ pub enum LegalActions {
         current: SelectDeckCardOrderPrompt,
     },
     ModalEffectPrompt {
-        affordable_choices: BitSet<usize>,
+        valid_choices: BitSet<usize>,
     },
 }
 
@@ -197,8 +197,8 @@ impl LegalActions {
             }
             BattleAction::SubmitMulligan => todo!("Implement this"),
             BattleAction::SelectModalEffectChoice(modal_choice_index) => {
-                if let LegalActions::ModalEffectPrompt { affordable_choices } = self {
-                    affordable_choices.contains(modal_choice_index.value())
+                if let LegalActions::ModalEffectPrompt { valid_choices } = self {
+                    valid_choices.contains(modal_choice_index.value())
                 } else {
                     false
                 }
@@ -219,7 +219,7 @@ impl LegalActions {
             LegalActions::SelectPromptChoicePrompt { choice_count } => *choice_count == 0,
             LegalActions::SelectEnergyValuePrompt { minimum, maximum } => maximum < minimum,
             LegalActions::SelectDeckCardOrder { .. } => false,
-            LegalActions::ModalEffectPrompt { affordable_choices } => affordable_choices.is_empty(),
+            LegalActions::ModalEffectPrompt { valid_choices } => valid_choices.is_empty(),
         }
     }
 
@@ -266,7 +266,7 @@ impl LegalActions {
                     1 // Only SubmitDeckCardOrder when no cards left to move
                 }
             }
-            LegalActions::ModalEffectPrompt { affordable_choices } => affordable_choices.len(),
+            LegalActions::ModalEffectPrompt { valid_choices } => valid_choices.len(),
         }
     }
 
@@ -390,7 +390,7 @@ impl LegalActions {
                 None
             }
 
-            LegalActions::ModalEffectPrompt { affordable_choices } => affordable_choices
+            LegalActions::ModalEffectPrompt { valid_choices } => valid_choices
                 .iter()
                 .find(|&i| {
                     !actions
@@ -482,7 +482,7 @@ impl LegalActions {
                 result
             }
 
-            LegalActions::ModalEffectPrompt { affordable_choices } => affordable_choices
+            LegalActions::ModalEffectPrompt { valid_choices } => valid_choices
                 .iter()
                 .map(|i| BattleAction::SelectModalEffectChoice(ModelEffectChoiceIndex(i)))
                 .collect::<Vec<_>>(),

@@ -9,7 +9,7 @@ use crate::legal_action_queries::has_legal_targets;
 
 /// Returns true if the given card has any legal modal effect choices for its
 /// event abilities.
-pub fn for_event(battle: &BattleState, player: PlayerName, card_id: CardId) -> bool {
+pub fn event_has_legal_choices(battle: &BattleState, player: PlayerName, card_id: CardId) -> bool {
     for data in &card_abilities::query(battle, card_id).event_abilities {
         let source = EffectSource::Event {
             controller: player,
@@ -17,7 +17,7 @@ pub fn for_event(battle: &BattleState, player: PlayerName, card_id: CardId) -> b
             ability_number: data.ability_number,
         };
         if let Effect::Modal(modal) = &data.ability.effect {
-            if !modal.iter().any(|choice| for_modal_effect_choice(battle, source, player, choice)) {
+            if !modal.iter().any(|choice| is_legal_choice(battle, source, player, choice)) {
                 return false;
             }
         }
@@ -26,7 +26,7 @@ pub fn for_event(battle: &BattleState, player: PlayerName, card_id: CardId) -> b
     true
 }
 
-fn for_modal_effect_choice(
+pub fn is_legal_choice(
     battle: &BattleState,
     source: EffectSource,
     player: PlayerName,

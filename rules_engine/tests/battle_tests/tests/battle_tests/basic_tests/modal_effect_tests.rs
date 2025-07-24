@@ -254,3 +254,64 @@ fn modal_draw_or_dissolve_costs_and_targeting() {
 
     test_helpers::assert_clients_identical(&s);
 }
+
+#[test]
+fn modal_dissolve_choice_unavailable_without_targets() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDissolveEnemy);
+
+    let browser_cards = s.user_client.cards.browser_cards();
+    assert_eq!(browser_cards.len(), 2, "two browser cards displayed for modal choice");
+
+    let draw_card = &browser_cards.cards[0];
+    let dissolve_card = &browser_cards.cards[1];
+
+    assert!(draw_card.revealed().actions.on_click.is_some(), "draw option should be clickable");
+    assert!(
+        dissolve_card.revealed().actions.on_click.is_none(),
+        "dissolve option should not be clickable without valid targets"
+    );
+}
+
+#[test]
+fn modal_dissolve_choice_available_with_targets() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+    s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDissolveEnemy);
+
+    let browser_cards = s.user_client.cards.browser_cards();
+    assert_eq!(browser_cards.len(), 2, "two browser cards displayed for modal choice");
+
+    let draw_card = &browser_cards.cards[0];
+    let dissolve_card = &browser_cards.cards[1];
+
+    assert!(draw_card.revealed().actions.on_click.is_some(), "draw option should be clickable");
+    assert!(
+        dissolve_card.revealed().actions.on_click.is_some(),
+        "dissolve option should be clickable with valid targets"
+    );
+}
+
+#[test]
+fn modal_choice_energy_and_target_validation() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(1).build()).connect();
+
+    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDissolveEnemy);
+
+    let browser_cards = s.user_client.cards.browser_cards();
+    assert_eq!(browser_cards.len(), 2, "two browser cards displayed for modal choice");
+
+    let draw_card = &browser_cards.cards[0];
+    let dissolve_card = &browser_cards.cards[1];
+
+    assert!(
+        draw_card.revealed().actions.on_click.is_some(),
+        "draw option should be clickable with 1 energy"
+    );
+    assert!(
+        dissolve_card.revealed().actions.on_click.is_none(),
+        "dissolve option should not be clickable due to insufficient energy AND no targets"
+    );
+}

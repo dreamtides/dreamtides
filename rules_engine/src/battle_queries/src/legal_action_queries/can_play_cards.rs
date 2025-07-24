@@ -11,7 +11,7 @@ use core_data::types::PlayerName;
 use crate::battle_card_queries::{card, card_abilities, card_properties};
 use crate::card_ability_queries::effect_queries;
 use crate::legal_action_queries::{
-    has_legal_additional_costs, has_legal_modal_effect_choices, has_legal_targets,
+    has_legal_additional_costs, has_legal_targets, legal_modal_effect_choices,
 };
 use crate::panic_with;
 
@@ -208,7 +208,11 @@ fn add_if_meets_restriction<TId: Into<CardId> + Copy>(
             // abilities.
             has_legal_targets::for_event(battle, player, card_id.card_id())
                 && has_legal_additional_costs::for_event(battle, player, card_id.card_id(), cost)
-                && has_legal_modal_effect_choices::for_event(battle, player, card_id.card_id())
+                && legal_modal_effect_choices::event_has_legal_choices(
+                    battle,
+                    player,
+                    card_id.card_id(),
+                )
         }
     };
 
