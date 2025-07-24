@@ -5,6 +5,7 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_player::battle_player_state::{CreateBattlePlayer, PlayerType};
 use core_data::types::PlayerName;
 use game_creation::new_battle;
+use rand::RngCore;
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::layer::SubscriberExt;
 
@@ -12,18 +13,20 @@ pub fn execute(battle: &mut BattleState, user_player: PlayerName, action: DebugA
     match action {
         DebugAction::ApplyTestScenarioAction => {}
         DebugAction::RestartBattle => {
+            let seed = rand::rng().next_u64();
             *battle = new_battle::create_and_start(
                 battle.id,
-                battle.seed,
+                seed,
                 battle.players.one.as_create_battle_player(),
                 battle.players.two.as_create_battle_player(),
                 battle.request_context.clone(),
             );
         }
         DebugAction::RestartBattleWithDecks { one, two } => {
+            let seed = rand::rng().next_u64();
             *battle = new_battle::create_and_start(
                 battle.id,
-                battle.seed,
+                seed,
                 CreateBattlePlayer {
                     player_type: battle.players.one.player_type.clone(),
                     deck_name: one,

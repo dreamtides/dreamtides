@@ -4,6 +4,7 @@ use action_data::game_action_data::GameAction;
 use action_data::panel_address::PanelAddress;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
+use battle_state::battle_player::battle_player_state::TestDeckName;
 use bon::Builder;
 use core_data::identifiers::CardName;
 use core_data::numerics::Energy;
@@ -86,6 +87,15 @@ impl Component for DeveloperPanel {
                             DebugButton::builder()
                                 .label("Restart Battle")
                                 .action(DebugAction::RestartBattle)
+                                .build(),
+                        )
+                        .child(
+                            DebugButton::builder()
+                                .label("Core 11")
+                                .action(DebugAction::RestartBattleWithDecks {
+                                    one: TestDeckName::CoreEleven,
+                                    two: TestDeckName::CoreEleven,
+                                })
                                 .build(),
                         )
                         .child(

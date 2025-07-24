@@ -6,7 +6,7 @@ namespace Dreamtides.Services
 {
   public class IdleReconnectService : Service
   {
-    const float IdleTimeoutSeconds = 30.0f;
+    const float IdleTimeoutSeconds = 300.0f;
     bool _hasInitialized = false;
     TestConfiguration? _testConfiguration;
     float _lastReconnectTime = float.NegativeInfinity;

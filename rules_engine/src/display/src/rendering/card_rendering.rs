@@ -273,9 +273,9 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         CardName::TestVanillaCharacter => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
         CardName::TestDissolve => "<color=#AA00FF><b>Dissolve</b></color> an enemy character.".to_string(),
         CardName::TestCounterspellUnlessPays => {
-            "<color=#AA00FF><b>Prevent</b></color> an enemy event unless the enemy pays <color=#00838F><b>2\u{f7e4}</b></color>.".to_string()
+            "<color=#AA00FF><b>Prevent</b></color> a played enemy event unless the enemy pays <color=#00838F><b>2\u{f7e4}</b></color>.".to_string()
         }
-        CardName::TestCounterspell => "<color=#AA00FF><b>Prevent</b></color> an enemy card.".to_string(),
+        CardName::TestCounterspell => "<color=#AA00FF><b>Prevent</b></color> a played enemy card.".to_string(),
         CardName::TestVariableEnergyDraw => {
             "Pay one or more <color=#00838F>\u{f7e4}</color>: Draw a card for each <color=#00838F>\u{f7e4}</color> spent.".to_string()
         }
@@ -335,10 +335,10 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
             "An allied character gains <color=#AA00FF><b>anchored</b></color> until end of turn.".to_string()
         }
         CardName::TestCounterspellCharacter => {
-            "<b>Counterspell</b> an enemy character.".to_string()
+            "<color=#AA00FF><b>Prevent</b></color> a played enemy character.".to_string()
         }
         CardName::TestForeseeOneReclaim => {
-            "<b>Foresee</b> 1. Reclaim 1\u{f7e4}.".to_string()
+            "<color=#AA00FF><b>Foresee 1</b></color>\n\n<color=#AA00FF><b>Reclaim</b></color> <color=#00838F><b>3\u{f7e4}</b></color>".to_string()
         }
         CardName::TestModalReturnToHandOrDrawTwo => {
             "Choose one:\n • <indent=1em><color=#00838F><b>2\u{f7e4}</b></color>: Return an enemy character to hand.</indent>\n • <indent=1em><color=#00838F><b>3\u{f7e4}</b></color>: Draw 2 cards.</indent>".to_string()

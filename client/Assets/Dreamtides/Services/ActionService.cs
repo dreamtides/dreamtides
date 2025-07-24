@@ -62,7 +62,7 @@ namespace Dreamtides.Services
       Connected = false;
       _lastActionTime = Time.time;
       _integrationTestId = testConfiguration?.IntegrationTestId;
-      _enemyId = Guid.NewGuid();
+      _enemyId = testConfiguration == null ? null : Guid.NewGuid();
       StartCoroutine(InitializeAsync());
     }
 
