@@ -2,6 +2,7 @@ pub mod all_cards;
 pub mod animation_data;
 pub mod battle_animation;
 pub mod battle_history;
+pub mod battle_rules_config;
 pub mod battle_state;
 pub mod battle_status;
 pub mod battle_turn_phase;

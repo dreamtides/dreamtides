@@ -4,6 +4,7 @@ use std::sync::Arc;
 use battle_mutations::card_mutations::battle_deck;
 use battle_mutations::phase_mutations::turn;
 use battle_state::battle::all_cards::AllCards;
+use battle_state::battle::battle_rules_config::BattleRulesConfig;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
@@ -36,6 +37,8 @@ pub fn create_and_start(
 ) -> BattleState {
     let mut battle = BattleState {
         id,
+        cards: AllCards::default(),
+        rules_config: BattleRulesConfig { points_to_win: Points(25) },
         players: PlayerMap {
             one: BattlePlayerState {
                 player_type: player_one.player_type,
@@ -56,7 +59,6 @@ pub fn create_and_start(
                 quest: Arc::new(create_quest_state(player_two.deck_name)),
             },
         },
-        cards: AllCards::default(),
         status: BattleStatus::Setup,
         stack_priority: None,
         turn: TurnData { active_player: PlayerName::One, turn_id: TurnId::default() },

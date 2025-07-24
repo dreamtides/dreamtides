@@ -13,6 +13,7 @@ use crate::battle::all_cards::AllCards;
 use crate::battle::animation_data::{AnimationData, AnimationStep};
 use crate::battle::battle_animation::BattleAnimation;
 use crate::battle::battle_history::BattleHistory;
+use crate::battle::battle_rules_config::BattleRulesConfig;
 use crate::battle::battle_status::BattleStatus;
 use crate::battle::battle_turn_phase::BattleTurnPhase;
 use crate::battle::turn_data::TurnData;
@@ -34,6 +35,9 @@ pub struct BattleState {
 
     /// All cards in this battle
     pub cards: AllCards,
+
+    /// Configuration for the rules of this battle
+    pub rules_config: BattleRulesConfig,
 
     /// Player data for all players in this battle
     pub players: PlayerMap<BattlePlayerState>,
@@ -154,6 +158,7 @@ impl BattleState {
         Self {
             id: self.id,
             cards: self.cards.clone(),
+            rules_config: self.rules_config.clone(),
             players: self.players.clone(),
             status: self.status.clone(),
             stack_priority: self.stack_priority,
@@ -189,6 +194,7 @@ impl BattleState {
             let snapshot = Self {
                 id: self.id,
                 cards: self.cards.clone(),
+                rules_config: self.rules_config.clone(),
                 players: self.players.clone(),
                 status: self.status.clone(),
                 stack_priority: self.stack_priority,

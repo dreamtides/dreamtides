@@ -8,7 +8,7 @@ use core_data::types::PlayerName;
 pub fn gain(battle: &mut BattleState, player: PlayerName, _source: EffectSource, amount: Points) {
     let player_state = battle.players.player_mut(player);
     player_state.points += amount;
-    if player_state.points >= Points(25) {
+    if player_state.points >= battle.rules_config.points_to_win {
         battle.status = BattleStatus::GameOver { winner: Some(player) };
     }
 }

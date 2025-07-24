@@ -10,6 +10,7 @@ use battle_queries::battle_card_queries::card;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::all_cards::AllCards;
+use battle_state::battle::battle_rules_config::BattleRulesConfig;
 use battle_state::battle::battle_state::{BattleState, LoggingOptions, RequestContext};
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
@@ -330,6 +331,7 @@ fn benchmark_battle() -> BattleState {
     let mut battle = BattleState {
         id: BattleId(Uuid::new_v4()),
         cards: AllCards::default(),
+        rules_config: BattleRulesConfig { points_to_win: Points(25) },
         players: PlayerMap {
             one: BattlePlayerState {
                 player_type: PlayerType::Agent(GameAI::AlwaysPanic),
