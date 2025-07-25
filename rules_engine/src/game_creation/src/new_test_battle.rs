@@ -38,7 +38,7 @@ pub fn create_and_start(
     let mut battle = BattleState {
         id,
         cards: AllCards::default(),
-        rules_config: BattleRulesConfig { points_to_win: Points(25) },
+        rules_config: BattleRulesConfig { points_to_win: Points(12) },
         players: PlayerMap {
             one: BattlePlayerState {
                 player_type: player_one.player_type,
