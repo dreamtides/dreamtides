@@ -307,7 +307,7 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         }
         CardName::TestFastMultiActivatedAbilityDrawCardCharacter => {
             format!(
-                "{}{} <color=#00838F><b>3\u{f7e4}</b></color>: Draw a card.",
+                "{}<space=\"-0.25px\">{} <color=#00838F><b>3\u{f7e4}</b></color>: Draw a card.",
                 icon::FAST,
                 icon::MULTI_ACTIVATED
             )
@@ -346,13 +346,13 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
             "<b>Return</b> an enemy character to its owner's hand.".to_string()
         }
         CardName::TestPreventDissolveThisTurn => {
-            "An allied character gains <color=#AA00FF><b>anchored</b></color> until end of turn.".to_string()
+            "Give an allied character <color=#AA00FF><b>anchored</b></color> until end of turn.".to_string()
         }
         CardName::TestCounterspellCharacter => {
             "<color=#AA00FF><b>Prevent</b></color> a played enemy character.".to_string()
         }
         CardName::TestForeseeOneReclaim => {
-            "<color=#AA00FF><b>Foresee 1</b></color>\n\n<color=#AA00FF><b>Reclaim</b></color> <color=#00838F><b>3\u{f7e4}</b></color>".to_string()
+            "<line-height=120%><color=#AA00FF><b>Foresee</b></color> 1.\n</line-height><color=#AA00FF><b>Reclaim</b></color> <color=#00838F><b>3\u{f7e4}</b></color>".to_string()
         }
         CardName::TestModalReturnToHandOrDrawTwo => {
             "Choose one:\n • <indent=1em><color=#00838F><b>2\u{f7e4}</b></color>: Return an enemy character to hand.</indent>\n • <indent=1em><color=#00838F><b>3\u{f7e4}</b></color>: Draw 2 cards.</indent>".to_string()

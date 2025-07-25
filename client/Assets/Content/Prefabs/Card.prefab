@@ -4349,8 +4349,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.0517, y: -1.981}
-  m_SizeDelta: {x: 1.7284, y: 0.8558}
+  m_AnchoredPosition: {x: 0.0517, y: -1.9707}
+  m_SizeDelta: {x: 1.7284, y: 0.7556}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &7276334165164446115
 MeshRenderer:
@@ -4375,7 +4375,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -3765426459031405678, guid: 3107ea52512624628a9fba4538cfdccc, type: 2}
+  - {fileID: -3915311513022495659, guid: e7dd9d305ed9f438cbcb40d969ad4634, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4417,11 +4417,12 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Here is some text which wraps to five different lines, which is the maximum
-    number of lines of text which are allowed to be displayed on a card.
+  m_text: Here is some <b>Foresee</b> which wraps to five different lines, which
+    is the maximum number of lines of text which are allowed to be displayed on a
+    card.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 3107ea52512624628a9fba4538cfdccc, type: 2}
-  m_sharedMaterial: {fileID: -3765426459031405678, guid: 3107ea52512624628a9fba4538cfdccc, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: e7dd9d305ed9f438cbcb40d969ad4634, type: 2}
+  m_sharedMaterial: {fileID: -3915311513022495659, guid: e7dd9d305ed9f438cbcb40d969ad4634, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4445,12 +4446,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 1.4
-  m_fontSizeBase: 1.4
+  m_fontSize: 1.25
+  m_fontSizeBase: 1.25
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 1
-  m_fontSizeMax: 1.75
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 1.2
+  m_fontSizeMax: 1.5
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
