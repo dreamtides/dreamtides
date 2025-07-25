@@ -84,7 +84,7 @@ pub fn base_energy_cost(name: CardName) -> Option<Energy> {
         CardName::TestDrawOneReclaim => Some(Energy(2)),
         CardName::TestForeseeOneReclaim => Some(Energy(1)),
         CardName::TestReturnVoidCardToHand => Some(Energy(1)),
-        CardName::TestReturnOneOrTwoVoidEventCardsToHand => Some(Energy(1)),
+        CardName::TestReturnOneOrTwoVoidEventCardsToHand => Some(Energy(4)),
         CardName::TestModalDrawOneOrDrawTwo => None,
         CardName::TestModalDrawOneOrDissolveEnemy => None,
         CardName::TestModalReturnToHandOrDrawTwo => None,

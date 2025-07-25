@@ -14580,7 +14580,7 @@ MonoBehaviour:
   _sortingGroup: {fileID: 0}
   _internalGameContext: 0
   _layout1: {fileID: 1999275438}
-  _layout2: {fileID: 1827703715}
+  _layout2: {fileID: 0}
   _scrollableHand: {fileID: 575951020}
   _useSecondLayoutAfter: 12
   _useBrowserAfter: 12

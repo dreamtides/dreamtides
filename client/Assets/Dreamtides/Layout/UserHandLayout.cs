@@ -12,7 +12,7 @@ namespace Dreamtides.Layout
   public class UserHandLayout : ObjectLayout
   {
     [SerializeField] StandardObjectLayout _layout1 = null!;
-    [SerializeField] StandardObjectLayout _layout2 = null!;
+    [SerializeField] StandardObjectLayout? _layout2;
     [SerializeField] ScrollableUserHandLayout _scrollableHand = null!;
     [SerializeField] int _useSecondLayoutAfter;
     [SerializeField] int _useBrowserAfter;
@@ -23,7 +23,7 @@ namespace Dreamtides.Layout
       {
         var objects = new List<Displayable>();
         objects.AddRange(_layout1.Objects);
-        objects.AddRange(_layout2.Objects);
+        objects.AddRange(_layout2 ? _layout2.Objects : new List<Displayable>());
         objects.AddRange(_scrollableHand.Objects);
         return objects.AsReadOnly();
       }
@@ -37,7 +37,14 @@ namespace Dreamtides.Layout
       }
       else if (Objects.Count <= _useBrowserAfter)
       {
-        _layout2.Add(displayable);
+        if (_layout2)
+        {
+          _layout2.Add(displayable);
+        }
+        else
+        {
+          _scrollableHand.Add(displayable);
+        }
       }
       else
       {
@@ -58,7 +65,10 @@ namespace Dreamtides.Layout
     public override void ApplyLayout(Sequence? sequence = null)
     {
       _layout1.ApplyLayout(sequence);
-      _layout2.ApplyLayout(sequence);
+      if (_layout2)
+      {
+        _layout2.ApplyLayout(sequence);
+      }
       _scrollableHand.ApplyLayout(sequence);
     }
 
@@ -69,7 +79,7 @@ namespace Dreamtides.Layout
         return _layout1.CalculateObjectPosition(
           _layout1.Objects.ToList().IndexOf(card), _layout1.Objects.Count);
       }
-      else if (_layout2.Objects.Contains(card))
+      else if (_layout2 && _layout2.Objects.Contains(card))
       {
         return _layout2.CalculateObjectPosition(
           _layout2.Objects.ToList().IndexOf(card), _layout2.Objects.Count);
@@ -90,7 +100,7 @@ namespace Dreamtides.Layout
         return _layout1.CalculateObjectRotation(
           _layout1.Objects.ToList().IndexOf(card), _layout1.Objects.Count);
       }
-      else if (_layout2.Objects.Contains(card))
+      else if (_layout2 && _layout2.Objects.Contains(card))
       {
         return _layout2.CalculateObjectRotation(
           _layout2.Objects.ToList().IndexOf(card), _layout2.Objects.Count);
@@ -112,7 +122,14 @@ namespace Dreamtides.Layout
       }
       else if (Objects.Count <= _useBrowserAfter)
       {
-        _layout2.ApplyTargetTransform(target, sequence);
+        if (_layout2)
+        {
+          _layout2.ApplyTargetTransform(target, sequence);
+        }
+        else
+        {
+          _scrollableHand.ApplyTargetTransform(target, sequence);
+        }
       }
       else
       {
@@ -128,7 +145,10 @@ namespace Dreamtides.Layout
       }
 
       _layout1.RemoveIfPresent(displayable);
-      _layout2.RemoveIfPresent(displayable);
+      if (_layout2)
+      {
+        _layout2.RemoveIfPresent(displayable);
+      }
       _scrollableHand.RemoveIfPresent(displayable);
 
       RebalanceLayouts();
@@ -148,11 +168,14 @@ namespace Dreamtides.Layout
           _scrollableHand.Add(obj);
         }
 
-        while (_layout2.Objects.Count > 0)
+        if (_layout2)
         {
-          var obj = _layout2.Objects[0];
-          _layout2.RemoveAtIndex(0);
-          _scrollableHand.Add(obj);
+          while (_layout2.Objects.Count > 0)
+          {
+            var obj = _layout2.Objects[0];
+            _layout2.RemoveAtIndex(0);
+            _scrollableHand.Add(obj);
+          }
         }
 
         return;
@@ -176,9 +199,16 @@ namespace Dreamtides.Layout
         var lastIndex = _layout1.Objects.Count - 1;
         var obj = _layout1.Objects[lastIndex];
         _layout1.RemoveAtIndex(lastIndex);
-        _layout2.Add(obj);
+        if (_layout2)
+        {
+          _layout2.Add(obj);
+        }
+        else
+        {
+          _scrollableHand.Add(obj);
+        }
       }
-      while (_layout1.Objects.Count < targetLayout1Size && _layout2.Objects.Count > 0)
+      while (_layout1.Objects.Count < targetLayout1Size && _layout2 && _layout2.Objects.Count > 0)
       {
         // Move from start of layout2 to end of layout1
         var obj = _layout2.Objects[0];
