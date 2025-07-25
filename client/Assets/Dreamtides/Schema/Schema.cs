@@ -2291,7 +2291,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitDeckCardOrder, SubmitMulligan, SubmitVoidCardTargets };
 
-    public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCard, TestCounterspell, TestCounterspellCharacter, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDrawOneReclaim, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestForeseeOneDrawACard, TestForeseeOneReclaim, TestForeseeTwo, TestModalDrawOneOrDissolveEnemy, TestModalDrawOneOrDrawTwo, TestModalReturnToHandOrDrawTwo, TestMultiActivatedAbilityDrawCardCharacter, TestPreventDissolveThisTurn, TestReturnOneOrTwoVoidEventCardsToHand, TestReturnToHand, TestReturnVoidCardToHand, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestTriggerGainTwoSparkOnPlayCardEnemyTurn, TestVanillaCharacter, TestVariableEnergyDraw };
+    public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCard, TestCounterspell, TestCounterspellCharacter, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDrawOneReclaim, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestForeseeOneDrawACard, TestForeseeOneReclaim, TestForeseeTwo, TestModalDrawOneOrDissolveEnemy, TestModalDrawOneOrDrawTwo, TestModalReturnToHandOrDrawTwo, TestMultiActivatedAbilityDrawCardCharacter, TestNamedDissolve, TestPreventDissolveThisTurn, TestReturnOneOrTwoVoidEventCardsToHand, TestReturnToHand, TestReturnVoidCardToHand, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestTriggerGainTwoSparkOnPlayCardEnemyTurn, TestVanillaCharacter, TestVariableEnergyDraw };
 
     /// <summary>
     /// Identifies a player in an ongoing battle.
@@ -3413,6 +3413,8 @@ namespace Dreamtides.Schema
                     return CardName.TestModalReturnToHandOrDrawTwo;
                 case "TestMultiActivatedAbilityDrawCardCharacter":
                     return CardName.TestMultiActivatedAbilityDrawCardCharacter;
+                case "TestNamedDissolve":
+                    return CardName.TestNamedDissolve;
                 case "TestPreventDissolveThisTurn":
                     return CardName.TestPreventDissolveThisTurn;
                 case "TestReturnOneOrTwoVoidEventCardsToHand":
@@ -3501,6 +3503,9 @@ namespace Dreamtides.Schema
                     return;
                 case CardName.TestMultiActivatedAbilityDrawCardCharacter:
                     serializer.Serialize(writer, "TestMultiActivatedAbilityDrawCardCharacter");
+                    return;
+                case CardName.TestNamedDissolve:
+                    serializer.Serialize(writer, "TestNamedDissolve");
                     return;
                 case CardName.TestPreventDissolveThisTurn:
                     serializer.Serialize(writer, "TestPreventDissolveThisTurn");

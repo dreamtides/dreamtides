@@ -51,6 +51,7 @@ pub struct CardIdentity(pub Uuid);
 pub enum CardName {
     TestVanillaCharacter,
     TestDissolve,
+    TestNamedDissolve,
     TestCounterspellUnlessPays,
     TestCounterspell,
     TestCounterspellCharacter,

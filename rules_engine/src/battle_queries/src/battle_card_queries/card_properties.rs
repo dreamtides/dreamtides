@@ -12,20 +12,21 @@ pub fn display_name(card_name: CardName) -> String {
     match card_name {
         CardName::TestVanillaCharacter => "Character".to_string(),
         CardName::TestDissolve => "Dissolve".to_string(),
-        CardName::TestCounterspellUnlessPays => "Counterspell Unless Pays".to_string(),
-        CardName::TestCounterspell => "Counterspell".to_string(),
-        CardName::TestVariableEnergyDraw => "Variable Energy Draw".to_string(),
+        CardName::TestNamedDissolve => "Immolate".to_string(),
+        CardName::TestCounterspellUnlessPays => "Ripple of Defiance".to_string(),
+        CardName::TestCounterspell => "Abolish".to_string(),
+        CardName::TestVariableEnergyDraw => "Dreamscatter".to_string(),
         CardName::TestDrawOne => "Draw One".to_string(),
         CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => {
             "Materialize Gain Spark".to_string()
         }
-        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => "Enemy Turn Gain Spark".to_string(),
+        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => "Sundown Surfer".to_string(),
         CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => "Play Enemy Gain Spark".to_string(),
         CardName::TestActivatedAbilityDrawCard => "Activated".to_string(),
         CardName::TestMultiActivatedAbilityDrawCardCharacter => "Multi Activated".to_string(),
         CardName::TestFastActivatedAbilityDrawCardCharacter => "Fast Activated".to_string(),
         CardName::TestFastMultiActivatedAbilityDrawCardCharacter => {
-            "Fast Multi Activated".to_string()
+            "Minstrel of Falling Light".to_string()
         }
         CardName::TestActivatedAbilityDissolveCharacter => "Dissolve Character".to_string(),
         CardName::TestDualActivatedAbilityCharacter => "Dual Abilities".to_string(),
@@ -34,14 +35,14 @@ pub fn display_name(card_name: CardName) -> String {
         CardName::TestForeseeOneDrawACard => "Foresee 1 Draw 1".to_string(),
         CardName::TestDrawOneReclaim => "Draw 1 Reclaim".to_string(),
         CardName::TestReturnVoidCardToHand => "Return Void Card".to_string(),
-        CardName::TestReturnOneOrTwoVoidEventCardsToHand => "Return 2 Events".to_string(),
+        CardName::TestReturnOneOrTwoVoidEventCardsToHand => "Archive of the Forgotten".to_string(),
         CardName::TestModalDrawOneOrDrawTwo => "Modal Draw".to_string(),
         CardName::TestModalDrawOneOrDissolveEnemy => "Modal Draw & Dissolve".to_string(),
         CardName::TestReturnToHand => "Return to Hand".to_string(),
-        CardName::TestPreventDissolveThisTurn => "Prevent Dissolve".to_string(),
-        CardName::TestForeseeOneReclaim => "Foresee 1 Reclaim".to_string(),
-        CardName::TestModalReturnToHandOrDrawTwo => "Modal Return".to_string(),
-        CardName::TestCounterspellCharacter => "Counterspell Character".to_string(),
+        CardName::TestPreventDissolveThisTurn => "Together Against the Tide".to_string(),
+        CardName::TestForeseeOneReclaim => "Guiding Light".to_string(),
+        CardName::TestModalReturnToHandOrDrawTwo => "Break the Sequence".to_string(),
+        CardName::TestCounterspellCharacter => "Cragfall".to_string(),
     }
 }
 
@@ -64,6 +65,7 @@ pub fn base_energy_cost(name: CardName) -> Option<Energy> {
     match name {
         CardName::TestVanillaCharacter => Some(Energy(2)),
         CardName::TestDissolve => Some(Energy(2)),
+        CardName::TestNamedDissolve => Some(Energy(2)),
         CardName::TestCounterspellUnlessPays => Some(Energy(1)),
         CardName::TestCounterspell => Some(Energy(2)),
         CardName::TestCounterspellCharacter => Some(Energy(2)),
@@ -126,6 +128,7 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
     match card::get(battle, card_id).name {
         CardName::TestVanillaCharacter => CardType::Character(CharacterType::Musician),
         CardName::TestDissolve => CardType::Event,
+        CardName::TestNamedDissolve => CardType::Event,
         CardName::TestCounterspellUnlessPays => CardType::Event,
         CardName::TestCounterspell => CardType::Event,
         CardName::TestVariableEnergyDraw => CardType::Event,
@@ -171,6 +174,7 @@ pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
     match card::get(battle, card_id).name {
         CardName::TestVanillaCharacter => false,
         CardName::TestDissolve => true,
+        CardName::TestNamedDissolve => true,
         CardName::TestCounterspellUnlessPays => true,
         CardName::TestCounterspell => true,
         CardName::TestVariableEnergyDraw => true,

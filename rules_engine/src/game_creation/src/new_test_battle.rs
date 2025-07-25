@@ -118,7 +118,7 @@ fn create_test_deck(name: TestDeckName) -> Deck {
             deck_cards.insert(CardName::TestVariableEnergyDraw, 3);
         }
         TestDeckName::CoreEleven => {
-            deck_cards.insert(CardName::TestDissolve, 3);
+            deck_cards.insert(CardName::TestNamedDissolve, 3);
             deck_cards.insert(CardName::TestCounterspell, 3);
             deck_cards.insert(CardName::TestCounterspellUnlessPays, 2);
             deck_cards.insert(CardName::TestVariableEnergyDraw, 3);

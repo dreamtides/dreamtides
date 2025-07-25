@@ -174,6 +174,9 @@ pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
         CardName::TestDissolve => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png",
         ),
+        CardName::TestNamedDissolve => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png",
+        ),
         CardName::TestCounterspellUnlessPays => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_2123360837.png",
         ),
@@ -190,7 +193,7 @@ pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png",
         ),
         CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
@@ -229,7 +232,7 @@ pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
         CardName::TestReturnOneOrTwoVoidEventCardsToHand => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png",
         ),
         CardName::TestModalDrawOneOrDrawTwo => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
@@ -241,16 +244,16 @@ pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
         CardName::TestPreventDissolveThisTurn => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png",
         ),
         CardName::TestCounterspellCharacter => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png",
         ),
         CardName::TestForeseeOneReclaim => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png",
         ),
         CardName::TestModalReturnToHandOrDrawTwo => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png",
         ),
     }
 }
@@ -275,6 +278,7 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
     let base_text = match card::get(battle, card_id).name {
         CardName::TestVanillaCharacter => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
         CardName::TestDissolve => "<color=#AA00FF><b>Dissolve</b></color> an enemy character.".to_string(),
+        CardName::TestNamedDissolve => "<color=#AA00FF><b>Dissolve</b></color> an enemy character.".to_string(),
         CardName::TestCounterspellUnlessPays => {
             "<color=#AA00FF><b>Prevent</b></color> a played enemy event unless the enemy pays <color=#00838F><b>2\u{f7e4}</b></color>.".to_string()
         }

@@ -27,6 +27,7 @@ use crate::panic_with;
 
 static CHARACTER_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 static TEST_DISSOLVE_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
+static TEST_NAMED_DISSOLVE_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 static TEST_COUNTERSPELL_UNLESS_PAY: OnceLock<AbilityList> = OnceLock::new();
 static COUNTERSPELL_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
 static ENERGY_PROMPT_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
@@ -66,6 +67,21 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
             .get_or_init(|| build_ability_list(CardName::TestVanillaCharacter, vec![])),
         CardName::TestDissolve => TEST_DISSOLVE_ABILITIES.get_or_init(|| {
             build_ability_list(CardName::TestDissolve, vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::DissolveCharacter {
+                        target: Predicate::Enemy(CardPredicate::Character),
+                    }),
+                }),
+                AbilityConfiguration {
+                    targeting_prompt: Some("Select an enemy character.".to_string()),
+                    ..Default::default()
+                },
+            )])
+        }),
+        CardName::TestNamedDissolve => TEST_NAMED_DISSOLVE_ABILITIES.get_or_init(|| {
+            build_ability_list(CardName::TestNamedDissolve, vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
