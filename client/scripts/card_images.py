@@ -2,8 +2,18 @@
 """
 Usage:
   python run.py --input /path/to/input --output /path/to/output [--verbose]
-"""
 
+Input images should be 1000px tall.
+
+Example Usage:
+    ./client/scripts/resize.py \
+        --input client/Assets/ThirdParty/GameAssets/SourceImages
+    ./client/scripts/card_images.py \ 
+        --input client/Assets/ThirdParty/GameAssets/SourceImages \
+        --output client/Assets/ThirdParty/GameAssets/CardImages \
+        -r 45
+"""
+ 
 import os
 import subprocess
 import argparse
@@ -25,7 +35,7 @@ def get_image_dimensions(image_path, verbose=False):
     dimensions = result.stdout.strip().split('x')
     return int(dimensions[0]), int(dimensions[1])
 
-def create_rounded_rectangle_mask(width, height, output_path, corner_radius=15, verbose=False):
+def create_rounded_rectangle_mask(width, height, output_path, corner_radius=45, verbose=False):
     """Create a rounded rectangle mask with the specified dimensions."""
     log(f"Creating rounded rectangle mask with dimensions {width}x{height} and corner radius {corner_radius}", verbose)
     subprocess.run([
@@ -35,7 +45,7 @@ def create_rounded_rectangle_mask(width, height, output_path, corner_radius=15, 
         output_path
     ], check=True)
 
-def process_image(image_file, output_file, corner_radius=15, verbose=False):
+def process_image(image_file, output_file, corner_radius=45, verbose=False):
     """Process a single image file, adding rounded corners and resizing."""
     log(f"Processing: {image_file}", verbose)
     
@@ -87,7 +97,7 @@ def main():
     parser = argparse.ArgumentParser(description='Process images with ImageMagick to create rounded rectangles.')
     parser.add_argument('--input', '-i', required=True, help='Input directory containing JPG files')
     parser.add_argument('--output', '-o', required=True, help='Output directory for processed PNG files')
-    parser.add_argument('--corner-radius', '-r', type=int, default=15, help='Corner radius for rounded rectangle (default: 15)')
+    parser.add_argument('--corner-radius', '-r', type=int, default=45, help='Corner radius for rounded rectangle (default: 45)')
     parser.add_argument('--verbose', '-v', action='store_true', help='Enable verbose logging')
     
     # Parse arguments
