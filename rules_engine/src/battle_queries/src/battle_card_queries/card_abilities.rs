@@ -17,7 +17,6 @@ use battle_state::battle_cards::ability_list::{
     AbilityConfiguration, AbilityData, AbilityList, AbilityReference, CanPlayRestriction,
 };
 use battle_state::triggers::trigger::TriggerName;
-use core_data::card_types::CardType;
 use core_data::identifiers::{AbilityNumber, CardName};
 use core_data::numerics::{Energy, Spark};
 use enumset::EnumSet;
@@ -633,32 +632,53 @@ fn compute_event_target_restriction(list: &AbilityList) -> Option<CanPlayRestric
         }
     };
 
-    if effect_queries::is_dissolve_effect(effect_predicate.effect) {
-        // Dissolve-specific restrictions since we need to check for the
-        // 'prevent dissolve' status.
-        match effect_predicate.predicate {
-            Predicate::Enemy(CardPredicate::Character) => {
-                Some(CanPlayRestriction::DissolveEnemyCharacter)
+    match effect_predicate.predicate_type {
+        PredicateType::Character => {
+            if effect_queries::is_dissolve_effect(effect_predicate.effect) {
+                // Dissolve-specific restrictions since we need to check for the
+                // 'prevent dissolve' status.
+                match effect_predicate.predicate {
+                    Predicate::Enemy(CardPredicate::Character) => {
+                        Some(CanPlayRestriction::DissolveEnemyCharacter)
+                    }
+                    _ => None,
+                }
+            } else {
+                match effect_predicate.predicate {
+                    Predicate::Enemy(CardPredicate::Character) => {
+                        Some(CanPlayRestriction::EnemyCharacterOnBattlefield)
+                    }
+                    _ => None,
+                }
             }
-            _ => None,
         }
-    } else {
-        match effect_predicate.predicate {
-            Predicate::Enemy(CardPredicate::Character) => Some(CanPlayRestriction::EnemyCharacter),
+        PredicateType::Stack => match effect_predicate.predicate {
             Predicate::Enemy(CardPredicate::CardOnStack) => {
-                Some(CanPlayRestriction::EnemyStackCard)
+                Some(CanPlayRestriction::EnemyCardOnStack)
             }
             Predicate::Enemy(CardPredicate::Event) => {
-                Some(CanPlayRestriction::EnemyStackCardOfType(CardType::Event))
+                Some(CanPlayRestriction::EnemyEventCardOnStack)
+            }
+            Predicate::Enemy(CardPredicate::Character) => {
+                Some(CanPlayRestriction::EnemyCharacterCardOnStack)
             }
             _ => None,
-        }
+        },
+        PredicateType::Void => None,
     }
+}
+
+#[derive(Debug, Copy, Clone)]
+pub enum PredicateType {
+    Character,
+    Stack,
+    Void,
 }
 
 pub struct EventEffectPredicate<'a> {
     pub effect: &'a StandardEffect,
     pub predicate: &'a Predicate,
+    pub predicate_type: PredicateType,
 }
 
 fn event_effect_predicates(list: &AbilityList) -> Vec<EventEffectPredicate> {
@@ -666,23 +686,45 @@ fn event_effect_predicates(list: &AbilityList) -> Vec<EventEffectPredicate> {
         .iter()
         .flat_map(|data| match &data.ability.effect {
             Effect::Effect(effect) => vec![
-                target_predicates::get_character_target_predicate(effect)
-                    .map(|predicate| EventEffectPredicate { effect, predicate }),
-                target_predicates::get_stack_target_predicate(effect)
-                    .map(|predicate| EventEffectPredicate { effect, predicate }),
-                target_predicates::get_void_target_predicate(effect)
-                    .map(|predicate| EventEffectPredicate { effect, predicate }),
+                target_predicates::get_character_target_predicate(effect).map(|predicate| {
+                    EventEffectPredicate {
+                        effect,
+                        predicate,
+                        predicate_type: PredicateType::Character,
+                    }
+                }),
+                target_predicates::get_stack_target_predicate(effect).map(|predicate| {
+                    EventEffectPredicate { effect, predicate, predicate_type: PredicateType::Stack }
+                }),
+                target_predicates::get_void_target_predicate(effect).map(|predicate| {
+                    EventEffectPredicate { effect, predicate, predicate_type: PredicateType::Void }
+                }),
             ]
             .into_iter()
             .flatten()
             .collect::<Vec<_>>(),
             Effect::WithOptions(options) => vec![
-                target_predicates::get_character_target_predicate(&options.effect)
-                    .map(|predicate| EventEffectPredicate { effect: &options.effect, predicate }),
-                target_predicates::get_stack_target_predicate(&options.effect)
-                    .map(|predicate| EventEffectPredicate { effect: &options.effect, predicate }),
-                target_predicates::get_void_target_predicate(&options.effect)
-                    .map(|predicate| EventEffectPredicate { effect: &options.effect, predicate }),
+                target_predicates::get_character_target_predicate(&options.effect).map(
+                    |predicate| EventEffectPredicate {
+                        effect: &options.effect,
+                        predicate,
+                        predicate_type: PredicateType::Character,
+                    },
+                ),
+                target_predicates::get_stack_target_predicate(&options.effect).map(|predicate| {
+                    EventEffectPredicate {
+                        effect: &options.effect,
+                        predicate,
+                        predicate_type: PredicateType::Stack,
+                    }
+                }),
+                target_predicates::get_void_target_predicate(&options.effect).map(|predicate| {
+                    EventEffectPredicate {
+                        effect: &options.effect,
+                        predicate,
+                        predicate_type: PredicateType::Void,
+                    }
+                }),
             ]
             .into_iter()
             .flatten()
@@ -692,13 +734,25 @@ fn event_effect_predicates(list: &AbilityList) -> Vec<EventEffectPredicate> {
                 .flat_map(|effect| {
                     vec![
                         target_predicates::get_character_target_predicate(&effect.effect).map(
-                            |predicate| EventEffectPredicate { effect: &effect.effect, predicate },
+                            |predicate| EventEffectPredicate {
+                                effect: &effect.effect,
+                                predicate,
+                                predicate_type: PredicateType::Character,
+                            },
                         ),
                         target_predicates::get_stack_target_predicate(&effect.effect).map(
-                            |predicate| EventEffectPredicate { effect: &effect.effect, predicate },
+                            |predicate| EventEffectPredicate {
+                                effect: &effect.effect,
+                                predicate,
+                                predicate_type: PredicateType::Stack,
+                            },
                         ),
                         target_predicates::get_void_target_predicate(&effect.effect).map(
-                            |predicate| EventEffectPredicate { effect: &effect.effect, predicate },
+                            |predicate| EventEffectPredicate {
+                                effect: &effect.effect,
+                                predicate,
+                                predicate_type: PredicateType::Void,
+                            },
                         ),
                     ]
                     .into_iter()

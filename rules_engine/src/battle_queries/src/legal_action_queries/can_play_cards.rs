@@ -4,6 +4,7 @@ use ability_data::static_ability::StandardStaticAbility;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{AbilityId, CardId, CardIdType, HandCardId, VoidCardId};
 use battle_state::battle_cards::ability_list::{AbilityReference, CanPlayRestriction};
+use core_data::card_types::CardType;
 use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
@@ -229,21 +230,26 @@ fn meets_restriction(
 ) -> bool {
     match restriction {
         CanPlayRestriction::Unrestricted => true,
-        CanPlayRestriction::EnemyCharacter => {
+        CanPlayRestriction::EnemyCharacterOnBattlefield => {
             !battle.cards.battlefield(controller.opponent()).is_empty()
         }
         CanPlayRestriction::DissolveEnemyCharacter => {
             let prevent = effect_queries::prevent_dissolved_set(battle);
             battle.cards.battlefield(controller.opponent()).iter().any(|c| !prevent.contains(c))
         }
-        CanPlayRestriction::EnemyStackCard => {
+        CanPlayRestriction::EnemyCardOnStack => {
             !battle.cards.stack_set(controller.opponent()).is_empty()
         }
-        CanPlayRestriction::EnemyStackCardOfType(card_type) => battle
+        CanPlayRestriction::EnemyEventCardOnStack => battle
             .cards
             .stack_set(controller.opponent())
             .iter()
-            .any(|id| card_properties::card_type(battle, id) == card_type),
+            .any(|id| card_properties::card_type(battle, id) == CardType::Event),
+        CanPlayRestriction::EnemyCharacterCardOnStack => battle
+            .cards
+            .stack_set(controller.opponent())
+            .iter()
+            .any(|id| matches!(card_properties::card_type(battle, id), CardType::Character(_))),
         CanPlayRestriction::AdditionalEnergyAvailable(required_energy) => {
             battle.players.player(controller).current_energy - energy_cost >= required_energy
         }

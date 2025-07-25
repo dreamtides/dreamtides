@@ -3,7 +3,6 @@ use ability_data::activated_ability::ActivatedAbility;
 use ability_data::effect::Effect;
 use ability_data::static_ability::StaticAbility;
 use ability_data::triggered_ability::TriggeredAbility;
-use core_data::card_types::CardType;
 use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
 use enumset::EnumSet;
@@ -94,9 +93,10 @@ pub struct AbilityConfiguration {
 #[derive(Debug, Clone, Copy)]
 pub enum CanPlayRestriction {
     Unrestricted,
-    EnemyCharacter,
+    EnemyCharacterOnBattlefield,
     DissolveEnemyCharacter,
-    EnemyStackCard,
-    EnemyStackCardOfType(CardType),
+    EnemyCardOnStack,
+    EnemyEventCardOnStack,
+    EnemyCharacterCardOnStack,
     AdditionalEnergyAvailable(Energy),
 }

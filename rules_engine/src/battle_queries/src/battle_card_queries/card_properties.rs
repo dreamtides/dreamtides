@@ -89,7 +89,7 @@ pub fn base_energy_cost(name: CardName) -> Option<Energy> {
         CardName::TestModalDrawOneOrDissolveEnemy => None,
         CardName::TestModalReturnToHandOrDrawTwo => None,
         CardName::TestReturnToHand => Some(Energy(1)),
-        CardName::TestPreventDissolveThisTurn => Some(Energy(0)),
+        CardName::TestPreventDissolveThisTurn => Some(Energy(1)),
     }
 }
 
@@ -115,7 +115,7 @@ pub fn base_spark(name: CardName) -> Option<Spark> {
         CardName::TestActivatedAbilityDrawCard => Some(Spark(3)),
         CardName::TestMultiActivatedAbilityDrawCardCharacter => Some(Spark(3)),
         CardName::TestFastActivatedAbilityDrawCardCharacter => Some(Spark(3)),
-        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => Some(Spark(3)),
+        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => Some(Spark(2)),
         CardName::TestActivatedAbilityDissolveCharacter => Some(Spark(4)),
         CardName::TestDualActivatedAbilityCharacter => Some(Spark(3)),
         _ => None,
