@@ -34,10 +34,5 @@ pub fn modal_effect_choice_client_id(
     card_id: CardId,
     choice_index: ModelEffectChoiceIndex,
 ) -> ClientCardId {
-    if choice_index.0 == 0 {
-        // First choice represented by the card itself
-        client_card_id(card_id)
-    } else {
-        format!("M{}/{}", client_card_id(card_id), choice_index.value())
-    }
+    format!("M{}/{}", client_card_id(card_id), choice_index.value())
 }

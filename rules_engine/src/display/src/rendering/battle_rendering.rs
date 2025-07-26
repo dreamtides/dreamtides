@@ -3,12 +3,11 @@ use battle_queries::battle_player_queries::player_properties;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
-use battle_state::battle::card_id::{ActivatedAbilityId, CardId, CardIdType};
 use battle_state::battle_cards::stack_card_state::{
     EffectTargets, StackItemId, StandardEffectTarget,
 };
 use battle_state::battle_player::battle_player_state::BattlePlayerState;
-use battle_state::prompt_types::prompt_data::{OnSelected, PromptType};
+use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
 use display_data::battle_view::{BattlePreviewState, BattleView, PlayerView};
 use display_data::command::{ArrowStyle, Command, DisplayArrow, GameMessageType};
@@ -38,15 +37,9 @@ pub fn run(builder: &mut ResponseBuilder, battle: &BattleState) {
 }
 
 pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleView {
-    let (modal_card_id, modal_activated_ability_id) = current_modal_prompt_source(battle);
-
     let mut cards = battle
         .cards
         .all_cards()
-        .filter(|&id| {
-            // Cards showing a modal effect prompt have custom rendering
-            Some(id) != modal_card_id
-        })
         .map(|id| {
             card_rendering::card_view(
                 builder,
@@ -59,9 +52,7 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
 
     // Add activated abilities that are currently on the stack
     for stack_item in battle.cards.all_items_on_stack().iter() {
-        if let StackItemId::ActivatedAbility(ability_id) = stack_item.id
-            && Some(ability_id) != modal_activated_ability_id
-        {
+        if let StackItemId::ActivatedAbility(ability_id) = stack_item.id {
             cards.push(token_rendering::activated_ability_card_view_on_stack(
                 builder, battle, ability_id,
             ));
@@ -85,6 +76,8 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
     );
 
     cards.extend(token_rendering::all_user_void_card_tokens(builder, battle));
+
+    cards.extend(modal_effect_prompt_rendering::cards(builder, battle));
 
     cards.push(identity_card_rendering::identity_card_view(
         builder,
@@ -176,26 +169,4 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
             })
         })
         .collect()
-}
-
-/// Returns the stack card or activated ability which are currently being used
-/// as the source of a modal choice prompt.
-fn current_modal_prompt_source(
-    battle: &BattleState,
-) -> (Option<CardId>, Option<ActivatedAbilityId>) {
-    let Some(prompt) = battle.prompts.front() else {
-        return (None, None);
-    };
-    match &prompt.prompt_type {
-        PromptType::ModalEffect(modal) => match modal.on_selected {
-            OnSelected::AddStackTargets(stack_item_id) => match stack_item_id {
-                StackItemId::Card(stack_card_id) => (Some(stack_card_id.card_id()), None),
-                StackItemId::ActivatedAbility(activated_ability_id) => {
-                    (None, Some(activated_ability_id))
-                }
-            },
-            OnSelected::AddPendingEffectTarget(_) => (None, None),
-        },
-        _ => (None, None),
-    }
 }

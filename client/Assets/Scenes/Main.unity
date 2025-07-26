@@ -11430,7 +11430,7 @@ MonoBehaviour:
   _scrollbar: {fileID: 2133012749}
   _closeButton: {fileID: 1007991259}
   _maxStackOffsetRight: 1
-  _singleCardPosition: {fileID: 1956300935}
+  _largeCardPosition: {fileID: 1956300935}
 --- !u!1 &1170379167
 GameObject:
   m_ObjectHideFlags: 0
@@ -11706,7 +11706,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1210469376}
   m_Layer: 0
-  m_Name: SingleCardPosition
+  m_Name: LargeCardPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17141,7 +17141,7 @@ MonoBehaviour:
   _scrollbar: {fileID: 62616640}
   _closeButton: {fileID: 1097085172}
   _maxStackOffsetRight: 1
-  _singleCardPosition: {fileID: 1210469376}
+  _largeCardPosition: {fileID: 1210469376}
 --- !u!114 &1886409222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17423,7 +17423,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1956300935}
   m_Layer: 0
-  m_Name: SingleCardPosition
+  m_Name: LargeCardPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

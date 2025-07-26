@@ -21,9 +21,6 @@ fn modal_effect_displays_browser_cards_with_correct_costs() {
     assert_eq!(card_1.revealed().cost, Some("1".to_string()), "first choice shows cost 1");
     assert_eq!(card_2.revealed().cost, Some("3".to_string()), "second choice shows cost 3");
 
-    assert_eq!(card_1.revealed().card_type, "Choice", "first choice shows Choice type");
-    assert_eq!(card_2.revealed().card_type, "Choice", "second choice shows Choice type");
-
     let rules_text_1 = &card_1.revealed().rules_text;
     let rules_text_2 = &card_2.revealed().rules_text;
     assert!(
@@ -236,9 +233,6 @@ fn modal_draw_or_dissolve_costs_and_targeting() {
         Some("2".to_string()),
         "dissolve option costs 2 energy"
     );
-
-    assert_eq!(draw_card.revealed().card_type, "Choice", "draw option shows Choice type");
-    assert_eq!(dissolve_card.revealed().card_type, "Choice", "dissolve option shows Choice type");
 
     let draw_rules_text = &draw_card.revealed().rules_text;
     let dissolve_rules_text = &dissolve_card.revealed().rules_text;

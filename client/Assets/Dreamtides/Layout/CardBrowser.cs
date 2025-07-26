@@ -16,7 +16,7 @@ namespace Dreamtides.Layout
     [SerializeField] internal Scrollbar _scrollbar = null!;
     [SerializeField] internal CloseBrowserButton _closeButton = null!;
     [SerializeField] internal float _maxStackOffsetRight = 1f;
-    [SerializeField] internal Transform _singleCardPosition = null!;
+    [SerializeField] internal Transform _largeCardPosition = null!;
 
     public override void Show(Registry registry, Sequence? sequence)
     {
@@ -61,7 +61,19 @@ namespace Dreamtides.Layout
     {
       if (count == 1)
       {
-        return _singleCardPosition.position;
+        return _largeCardPosition.position;
+      }
+
+      if (count == 2)
+      {
+        if (index == 0)
+        {
+          return _largeCardPosition.position - new Vector3(_cardWidth / 1.5f, 0, 0);
+        }
+        else
+        {
+          return _largeCardPosition.position + new Vector3(_cardWidth / 1.5f, 0, 0);
+        }
       }
 
       return new Vector3(

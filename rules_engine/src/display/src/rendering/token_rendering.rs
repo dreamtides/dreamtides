@@ -11,7 +11,7 @@ use battle_state::battle::card_id::{
 };
 use battle_state::battle_cards::stack_card_state::StackItemId;
 use bon::Builder;
-use core_data::display_color;
+use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::{AudioClipAddress, SpriteAddress};
 use core_data::types::CardFacing;
 use display_data::battle_view::DisplayPlayer;
@@ -271,8 +271,9 @@ fn void_card_token_view(
     )
 }
 
+/// A view for a token card.
 #[derive(Builder)]
-struct TokenCardView {
+pub struct TokenCardView {
     id: ClientCardId,
     position: ObjectPosition,
     image: SpriteAddress,
@@ -288,10 +289,11 @@ struct TokenCardView {
     create_sound: Option<AudioClipAddress>,
     #[builder(default)]
     actions: CardActions,
-    outline_color: Option<core_data::display_color::DisplayColor>,
+    outline_color: Option<DisplayColor>,
 }
 
-fn token_card_view(view: TokenCardView) -> CardView {
+/// Converts a [TokenCardView] to a [CardView].
+pub fn token_card_view(view: TokenCardView) -> CardView {
     CardView {
         id: view.id,
         position: view.position,
