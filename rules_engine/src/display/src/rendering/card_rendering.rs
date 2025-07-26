@@ -252,6 +252,9 @@ pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
         CardName::TestForeseeOneReclaim => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png",
         ),
+        CardName::TestForeseeOneDrawReclaim => SpriteAddress::new(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png",
+        ),
         CardName::TestModalReturnToHandOrDrawTwo => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png",
         ),
@@ -353,6 +356,9 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         }
         CardName::TestForeseeOneReclaim => {
             "<line-height=120%><color=#AA00FF><b>Foresee</b></color> 1.\n</line-height><color=#AA00FF><b>Reclaim</b></color> <color=#00838F><b>3\u{f7e4}</b></color>".to_string()
+        }
+        CardName::TestForeseeOneDrawReclaim => {
+            "<line-height=120%><color=#AA00FF><b>Foresee</b></color> 1. Draw a card.\n</line-height><color=#AA00FF><b>Reclaim</b></color> <color=#00838F><b>4\u{f7e4}</b></color>".to_string()
         }
         CardName::TestModalReturnToHandOrDrawTwo => {
             "Choose one:\n • <indent=1em><color=#00838F><b>2\u{f7e4}</b></color>: Return an enemy character to hand.</indent>\n • <indent=1em><color=#00838F><b>3\u{f7e4}</b></color>: Draw 2 cards.</indent>".to_string()

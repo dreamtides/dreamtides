@@ -40,7 +40,8 @@ pub fn display_name(card_name: CardName) -> String {
         CardName::TestModalDrawOneOrDissolveEnemy => "Modal Draw & Dissolve".to_string(),
         CardName::TestReturnToHand => "Return to Hand".to_string(),
         CardName::TestPreventDissolveThisTurn => "Together Against the Tide".to_string(),
-        CardName::TestForeseeOneReclaim => "Guiding Light".to_string(),
+        CardName::TestForeseeOneReclaim => "Foresee 1 Reclaim".to_string(),
+        CardName::TestForeseeOneDrawReclaim => "Guiding Light".to_string(),
         CardName::TestModalReturnToHandOrDrawTwo => "Break the Sequence".to_string(),
         CardName::TestCounterspellCharacter => "Cragfall".to_string(),
     }
@@ -85,6 +86,7 @@ pub fn base_energy_cost(name: CardName) -> Option<Energy> {
         CardName::TestForeseeOneDrawACard => Some(Energy(1)),
         CardName::TestDrawOneReclaim => Some(Energy(2)),
         CardName::TestForeseeOneReclaim => Some(Energy(1)),
+        CardName::TestForeseeOneDrawReclaim => Some(Energy(1)),
         CardName::TestReturnVoidCardToHand => Some(Energy(1)),
         CardName::TestReturnOneOrTwoVoidEventCardsToHand => Some(Energy(4)),
         CardName::TestModalDrawOneOrDrawTwo => None,
@@ -166,6 +168,7 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
         CardName::TestPreventDissolveThisTurn => CardType::Event,
         CardName::TestCounterspellCharacter => CardType::Event,
         CardName::TestForeseeOneReclaim => CardType::Event,
+        CardName::TestForeseeOneDrawReclaim => CardType::Event,
         CardName::TestModalReturnToHandOrDrawTwo => CardType::Event,
     }
 }
@@ -200,6 +203,7 @@ pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
         CardName::TestPreventDissolveThisTurn => true,
         CardName::TestCounterspellCharacter => true,
         CardName::TestForeseeOneReclaim => true,
+        CardName::TestForeseeOneDrawReclaim => true,
         CardName::TestModalReturnToHandOrDrawTwo => true,
     }
 }

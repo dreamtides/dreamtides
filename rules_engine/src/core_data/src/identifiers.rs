@@ -71,6 +71,7 @@ pub enum CardName {
     TestForeseeOneDrawACard,
     TestDrawOneReclaim,
     TestForeseeOneReclaim,
+    TestForeseeOneDrawReclaim,
     TestReturnVoidCardToHand,
     TestReturnOneOrTwoVoidEventCardsToHand,
     TestModalDrawOneOrDrawTwo,

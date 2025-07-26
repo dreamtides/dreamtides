@@ -55,6 +55,7 @@ static TEST_RETURN_TO_HAND: OnceLock<AbilityList> = OnceLock::new();
 static TEST_PREVENT_DISSOLVE_THIS_TURN: OnceLock<AbilityList> = OnceLock::new();
 static TEST_COUNTERSPELL_CHARACTER: OnceLock<AbilityList> = OnceLock::new();
 static TEST_FORESEE_1_RECLAIM: OnceLock<AbilityList> = OnceLock::new();
+static TEST_FORESEE_1_DRAW_RECLAIM: OnceLock<AbilityList> = OnceLock::new();
 static TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO: OnceLock<AbilityList> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static AbilityList {
@@ -490,6 +491,26 @@ pub fn query_by_name(name: CardName) -> &'static AbilityList {
                 (
                     AbilityNumber(1),
                     Ability::Named(NamedAbility::Reclaim(Some(Energy(3)))),
+                    AbilityConfiguration::default(),
+                ),
+            ])
+        }),
+        CardName::TestForeseeOneDrawReclaim => TEST_FORESEE_1_DRAW_RECLAIM.get_or_init(|| {
+            build_ability_list(CardName::TestForeseeOneDrawReclaim, vec![
+                (
+                    AbilityNumber(0),
+                    Ability::Event(EventAbility {
+                        additional_cost: None,
+                        effect: Effect::List(vec![
+                            EffectWithOptions::new(StandardEffect::Foresee { count: 1 }),
+                            EffectWithOptions::new(StandardEffect::DrawCards { count: 1 }),
+                        ]),
+                    }),
+                    AbilityConfiguration::default(),
+                ),
+                (
+                    AbilityNumber(1),
+                    Ability::Named(NamedAbility::Reclaim(Some(Energy(4)))),
                     AbilityConfiguration::default(),
                 ),
             ])
