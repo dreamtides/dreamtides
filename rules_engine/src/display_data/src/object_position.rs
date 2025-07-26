@@ -95,6 +95,10 @@ pub enum Position {
     /// size when they're not being focused on, e.g. when the user hides a
     /// card browser to get a better view of the battlefield.
     OnScreenStorage,
+
+    /// Object is above the void, used to display void cards which are currently
+    /// being targeted.
+    AboveVoid(DisplayPlayer),
 }
 
 #[derive(

@@ -141,6 +141,12 @@ namespace Dreamtides.Layout
     [SerializeField] CloseBrowserButton? _closeBrowserButton;
     public CloseBrowserButton CloseBrowserButton => Check(_closeBrowserButton);
 
+    [SerializeField] ObjectLayout? _aboveUserVoid;
+    public ObjectLayout AboveUserVoid => Check(_aboveUserVoid);
+
+    [SerializeField] ObjectLayout? _aboveEnemyVoid;
+    public ObjectLayout AboveEnemyVoid => Check(_aboveEnemyVoid);
+
     T Check<T>(T? value) where T : Object =>
         Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
   }

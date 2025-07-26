@@ -167,3 +167,10 @@ fn for_void_card_browser(
     }
     base_object_position
 }
+
+fn for_void_card_targeting(
+    builder: &ResponseBuilder,
+    battle: &BattleState,
+    base_object_position: ObjectPosition,
+) -> ObjectPosition {
+}

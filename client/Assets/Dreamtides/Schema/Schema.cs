@@ -646,6 +646,9 @@ namespace Dreamtides.Schema
     /// Object is in the dreamwell for a player (usually off-screen).
     ///
     /// Object is hidden within a card
+    ///
+    /// Object is above the void, used to display void cards which are currently
+    /// being targeted.
     /// </summary>
     public partial class PositionClass
     {
@@ -678,6 +681,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("hiddenWithinCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public string HiddenWithinCard { get; set; }
+
+        [JsonProperty("aboveVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DisplayPlayer? AboveVoid { get; set; }
     }
 
     /// <summary>

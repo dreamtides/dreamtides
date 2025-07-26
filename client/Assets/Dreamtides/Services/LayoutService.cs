@@ -408,6 +408,16 @@ namespace Dreamtides.Services
         return Registry.Layout.Offscreen;
       }
 
+      if (position.PositionClass.AboveVoid is { } aboveVoid)
+      {
+        return aboveVoid switch
+        {
+          DisplayPlayer.User => Registry.Layout.AboveUserVoid,
+          DisplayPlayer.Enemy => Registry.Layout.AboveEnemyVoid,
+          _ => throw Errors.UnknownEnumValue(aboveVoid),
+        };
+      }
+
       var json = JsonConvert.SerializeObject(position.PositionClass);
       throw new InvalidOperationException($"Unknown layout position: ${json}");
     }
