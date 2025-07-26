@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use ability_data::effect::ModelEffectChoiceIndex;
 use action_data::game_action_data::GameAction;
 use battle_queries::battle_card_queries::{card, card_properties, valid_target_queries};
 use battle_queries::legal_action_queries::legal_actions;
@@ -31,7 +32,7 @@ use crate::core::response_builder::ResponseBuilder;
 use crate::display_actions::outcome_simulation;
 use crate::rendering::positions::ControllerAndZone;
 use crate::rendering::supplemental_card_info::SupplementalCardInfo;
-use crate::rendering::{card_display_state, positions};
+use crate::rendering::{card_display_state, modal_effect_prompt_rendering, positions};
 
 pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardView {
     let battle = context.battle();
@@ -278,7 +279,7 @@ fn card_type(battle: &BattleState, card_id: CardId) -> String {
 }
 
 pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
-    let base_text = match card::get(battle, card_id).name {
+    let mut base_text = match card::get(battle, card_id).name {
         CardName::TestVanillaCharacter => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
         CardName::TestDissolve => "<color=#AA00FF><b>Dissolve</b></color> an enemy character.".to_string(),
         CardName::TestNamedDissolve => "<color=#AA00FF><b>Dissolve</b></color> an enemy character.".to_string(),
@@ -364,6 +365,13 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
             "Choose one:\n • <indent=1em><color=#00838F><b>2\u{f7e4}</b></color>: Return an enemy character to hand.</indent>\n • <indent=1em><color=#00838F><b>3\u{f7e4}</b></color>: Draw 2 cards.</indent>".to_string()
         }
     };
+
+    if let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))
+        && let Some(ModelEffectChoiceIndex(index)) = stack_item.modal_choice
+    {
+        base_text =
+            modal_effect_prompt_rendering::modal_effect_descriptions(&base_text)[index].clone();
+    }
 
     if card::get(battle, card_id).name == CardName::TestVariableEnergyDraw
         && let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))

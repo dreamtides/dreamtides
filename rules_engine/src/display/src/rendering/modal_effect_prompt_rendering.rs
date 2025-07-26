@@ -83,7 +83,9 @@ fn modal_effect_card_view(
     token_rendering::token_card_view(view)
 }
 
-fn modal_effect_descriptions(rules_text: &str) -> Vec<String> {
+/// [String]s for the descriptions of the choices in an active modal effect
+/// prompt, if any.
+pub fn modal_effect_descriptions(rules_text: &str) -> Vec<String> {
     let mut descriptions = Vec::new();
     let mut current_pos = 0;
 
