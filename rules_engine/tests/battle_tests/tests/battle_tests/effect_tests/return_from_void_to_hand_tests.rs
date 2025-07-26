@@ -2,6 +2,7 @@ use core_data::identifiers::CardName;
 use display_data::battle_view::DisplayPlayer;
 use display_data::object_position::Position;
 use test_utils::battle::test_battle::TestBattle;
+use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_prelude::*;
 
 #[test]
@@ -198,4 +199,57 @@ fn return_void_card_to_hand_browser_closes_after_submit() {
     let cards_in_browser = s.user_client.cards.browser_cards();
 
     assert_eq!(cards_in_browser.len(), 0, "No cards should be in browser position after submit");
+}
+
+#[test]
+fn void_card_shows_above_void_position_when_targeted() {
+    let mut s = TestBattle::builder().enemy(TestPlayer::builder().energy(99).build()).connect();
+    let void_card = s.add_to_void(DisplayPlayer::User, CardName::TestVanillaCharacter);
+
+    // Give the enemy a fast card so they can respond and keep the effect on the
+    // stack
+    s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+
+    // Play the return void card effect, which puts it on the stack
+    let return_card = s.add_to_hand(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
+    s.play_card_from_hand(DisplayPlayer::User, &return_card);
+
+    // During target selection, void cards appear in browser
+    let cards_in_browser = s.user_client.cards.browser_cards();
+    assert!(
+        cards_in_browser.contains(&void_card),
+        "Void card should be in browser during selection"
+    );
+
+    // Select the void card as a target and submit
+    s.click_card(DisplayPlayer::User, &void_card);
+    s.click_primary_button(DisplayPlayer::User, "Submit");
+
+    // Now the effect is on the stack with targets set, and the enemy can respond
+    // The void card should be in AboveVoid position while being targeted
+    assert_eq!(
+        s.user_client.cards.cards_at_position(&Position::AboveVoid(DisplayPlayer::User)).len(),
+        1,
+        "Void card should be in AboveVoid position while targeted on stack"
+    );
+
+    let above_void_cards =
+        s.user_client.cards.cards_at_position(&Position::AboveVoid(DisplayPlayer::User));
+    assert!(
+        above_void_cards.contains(&void_card),
+        "The correct void card should be in AboveVoid position"
+    );
+
+    // Verify there's a card on the stack with targets
+    assert!(
+        s.user_client.cards.stack_cards().len() > 0,
+        "There should be a card on the stack with targets set"
+    );
+
+    // Verify the void card is no longer in normal void position
+    assert_eq!(
+        s.user_client.cards.cards_at_position(&Position::InVoid(DisplayPlayer::User)).len(),
+        0,
+        "No cards should be in normal void position while targeted"
+    );
 }

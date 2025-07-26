@@ -1,6 +1,7 @@
 use battle_state::actions::battle_actions::CardOrderSelectionTargetDiscriminants;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CardId, DeckCardId};
+use battle_state::battle::card_id::{CardId, DeckCardId, VoidCardId};
+use battle_state::battle_cards::stack_card_state::{EffectTargets, StandardEffectTarget};
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
 use display_data::object_position::{ObjectPosition, Position, StackType};
@@ -26,6 +27,7 @@ pub fn object_position(
     });
     let object_position = for_card_order_browser(battle, card_id, object_position);
     let object_position = for_void_card_browser(builder, battle, object_position);
+    let object_position = for_void_card_targeting(builder, battle, card_id, object_position);
     let position = for_browser(builder, object_position.position);
     ObjectPosition { position, sorting_key: object_position.sorting_key }
 }
@@ -169,8 +171,44 @@ fn for_void_card_browser(
 }
 
 fn for_void_card_targeting(
-    builder: &ResponseBuilder,
+    _builder: &ResponseBuilder,
     battle: &BattleState,
+    card_id: CardId,
     base_object_position: ObjectPosition,
 ) -> ObjectPosition {
+    if let Position::InVoid(player) = base_object_position.position {
+        let void_card_id = VoidCardId(card_id);
+
+        // Check if this void card is targeted by any item on the stack
+        for stack_item in battle.cards.all_items_on_stack() {
+            if let Some(targets) = &stack_item.targets {
+                if is_void_card_targeted(targets, void_card_id) {
+                    return ObjectPosition {
+                        position: Position::AboveVoid(player),
+                        sorting_key: base_object_position.sorting_key,
+                    };
+                }
+            }
+        }
+    }
+
+    base_object_position
+}
+
+/// Helper function to check if a specific void card is targeted by the given
+/// effect targets
+fn is_void_card_targeted(targets: &EffectTargets, void_card_id: VoidCardId) -> bool {
+    match targets {
+        EffectTargets::Standard(StandardEffectTarget::VoidCardSet(void_card_set)) => {
+            void_card_set.iter().any(|target| target.id == void_card_id)
+        }
+        EffectTargets::EffectList(target_list) => target_list.iter().any(|target_opt| {
+            if let Some(StandardEffectTarget::VoidCardSet(void_card_set)) = target_opt {
+                void_card_set.iter().any(|target| target.id == void_card_id)
+            } else {
+                false
+            }
+        }),
+        EffectTargets::Standard(_) => false,
+    }
 }
