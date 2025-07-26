@@ -62,7 +62,7 @@ namespace Dreamtides.Services
       Connected = false;
       _lastActionTime = Time.time;
       _integrationTestId = testConfiguration?.IntegrationTestId;
-      _enemyId = testConfiguration == null ? null : Guid.NewGuid();
+      _enemyId = Guid.NewGuid();
       StartCoroutine(InitializeAsync());
     }
 
@@ -249,7 +249,7 @@ namespace Dreamtides.Services
         PersistentDataPath = Application.persistentDataPath,
         DisplayProperties = GetDisplayProperties(),
         VsOpponent = IsEnemyTestClient ? _userGuid : null,
-        DebugConfiguration = _enemyId == null ? null : new DebugConfiguration
+        DebugConfiguration = _integrationTestId == null ? null : new DebugConfiguration
         {
           Enemy = new PlayerType
           {
