@@ -112,8 +112,9 @@ fn modal_effect_descriptions(rules_text: &str) -> Vec<String> {
             let content_start = indent_start + close_bracket + 1;
             if let Some(end_tag) = rules_text[content_start..].find("</indent>") {
                 let content_end = content_start + end_tag;
-                let description = rules_text[content_start..content_end].trim().to_string();
-                descriptions.push(description);
+                let raw_description = &rules_text[content_start..content_end];
+                let clean_description = clean_modal_description(raw_description);
+                descriptions.push(clean_description);
                 current_pos = content_end + 8;
             } else {
                 break;
@@ -124,4 +125,30 @@ fn modal_effect_descriptions(rules_text: &str) -> Vec<String> {
     }
 
     descriptions
+}
+
+fn clean_modal_description(raw_description: &str) -> String {
+    let mut result = raw_description.to_string();
+
+    // Remove HTML color and bold tags with cost information
+    // Pattern: <color=#XXXXXX><b>COST</b></color>:
+    while let Some(color_start) = result.find("<color=") {
+        if let Some(color_end) = result[color_start..].find("</color>:") {
+            let full_pattern_end = color_start + color_end + 9; // "</color>:" is 9 chars
+            result.replace_range(color_start..full_pattern_end, "");
+        } else {
+            break;
+        }
+    }
+
+    // Clean up any remaining HTML tags
+    while let Some(tag_start) = result.find('<') {
+        if let Some(tag_end) = result[tag_start..].find('>') {
+            result.replace_range(tag_start..tag_start + tag_end + 1, "");
+        } else {
+            break;
+        }
+    }
+
+    result.trim().to_string()
 }
