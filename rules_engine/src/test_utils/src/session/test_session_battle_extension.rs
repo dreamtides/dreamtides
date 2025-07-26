@@ -277,16 +277,27 @@ impl TestSessionBattleExtension for TestSession {
         let matching_tokens: Vec<_> = user_hand
             .iter()
             .filter(|card| {
-                card.view.prefab == CardPrefab::Token
-                    && card.id.starts_with(&format!("V{card_id}/"))
+                card.view.prefab == CardPrefab::Token && card.id == format!("V{card_id}")
             })
             .collect();
 
         match matching_tokens.len() {
             0 => panic!("Could not find token for void card {card_id}"),
             1 => {
-                let reclaim_token_id = matching_tokens[0].id.clone();
-                self.play_card_from_hand(player, &reclaim_token_id);
+                let token_card = &matching_tokens[0];
+                let can_play = token_card
+                    .view
+                    .revealed
+                    .as_ref()
+                    .map(|revealed| revealed.actions.can_play.is_some())
+                    .unwrap_or(false);
+
+                if !can_play {
+                    panic!("Reclaim token for void card {card_id} cannot be played");
+                }
+
+                let token_id = token_card.id.clone();
+                self.play_card_from_hand(player, &token_id);
             }
             count => {
                 panic!("Found {count} tokens for void card {card_id}, expected exactly 1")

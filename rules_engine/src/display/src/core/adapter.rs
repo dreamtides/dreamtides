@@ -1,5 +1,5 @@
 use ability_data::effect::ModelEffectChoiceIndex;
-use battle_state::battle::card_id::{AbilityId, CardId, CardIdType, VoidCardId};
+use battle_state::battle::card_id::{CardId, CardIdType, VoidCardId};
 use battle_state::battle_cards::stack_card_state::StackItemId;
 use display_data::card_view::ClientCardId;
 use display_data::command::GameObjectId;
@@ -26,8 +26,8 @@ pub fn stack_item_game_object_id(item: impl Into<StackItemId>) -> GameObjectId {
     GameObjectId::CardId(stack_item_client_card_id(item))
 }
 
-pub fn void_card_token_client_id(void_card_id: VoidCardId, ability_id: AbilityId) -> ClientCardId {
-    format!("V{}/{}/{}", void_card_id.0.0, ability_id.card_id.0, ability_id.ability_number.0)
+pub fn void_card_token_client_id(void_card_id: VoidCardId) -> ClientCardId {
+    format!("V{}", void_card_id.0.0)
 }
 
 pub fn modal_effect_choice_client_id(

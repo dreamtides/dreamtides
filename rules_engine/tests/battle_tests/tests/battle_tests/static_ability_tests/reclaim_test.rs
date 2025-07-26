@@ -210,3 +210,32 @@ fn reclaim_mixed_with_other_void_cards() {
         "reclaim card banished"
     );
 }
+
+#[test]
+fn reclaim_token_always_in_hand_even_when_unplayable() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(2).build()).connect();
+
+    let card_id = s.create_and_play(DisplayPlayer::User, CardName::TestDrawOneReclaim);
+    assert_eq!(s.user_client.me.energy(), Energy(0), "2 energy spent on initial play");
+
+    let user_hand = s.user_client.cards.user_hand();
+    let reclaim_token_cards: Vec<_> =
+        user_hand.iter().filter(|card| card.view.prefab == CardPrefab::Token).collect();
+
+    assert_eq!(
+        reclaim_token_cards.len(),
+        1,
+        "reclaim token still in hand despite insufficient energy"
+    );
+    let token_card = &reclaim_token_cards[0];
+    let revealed = token_card.view.revealed.as_ref().unwrap();
+    assert!(revealed.name.contains("Draw 1 Reclaim"), "token shows original card name");
+    assert_eq!(revealed.numeric_cost(), Some(Energy(1)), "token shows reclaim cost");
+    assert!(
+        revealed.actions.can_play.is_none(),
+        "token cannot be played due to insufficient energy"
+    );
+
+    assert_eq!(s.user_client.cards.user_void().len(), 1, "card still in void");
+    assert!(s.user_client.cards.user_void().contains(&card_id), "reclaim card in void");
+}

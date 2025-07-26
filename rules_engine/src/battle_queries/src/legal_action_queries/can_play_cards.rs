@@ -137,17 +137,18 @@ pub fn play_from_void_energy_cost(
 
 /// Cost and ability ID of a card that can be played from the void.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-struct FromVoidWithCost {
+pub struct FromVoidWithCost {
     pub cost: Energy,
     pub via_ability_id: AbilityId,
 }
 
 /// Check if a card can be played from the void, and returns the energy cost
 /// of playing it if it can be. If there are multiple abilities that can be
-/// used to play the card, returns the one with the lowest cost.
+/// used to play the card, returns the one with the lowest cost. This does not
+/// e.g. validate that the player has sufficient energy to pay this cost.
 ///
 /// Other costs are handled in the 'meets_restriction' step.
-fn can_play_from_void_energy_cost(
+pub fn can_play_from_void_energy_cost(
     battle: &BattleState,
     card_id: VoidCardId,
 ) -> Option<FromVoidWithCost> {

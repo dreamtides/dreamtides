@@ -1,14 +1,12 @@
 use ability_data::cost::Cost;
 use action_data::game_action_data::GameAction;
 use battle_queries::battle_card_queries::{card, card_abilities, card_properties};
-use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalActions};
+use battle_queries::legal_action_queries::legal_actions_data::ForPlayer;
 use battle_queries::legal_action_queries::{can_play_cards, legal_actions};
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_animation::TriggerAnimation;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{
-    AbilityId, ActivatedAbilityId, CardIdType, CharacterId, VoidCardId,
-};
+use battle_state::battle::card_id::{ActivatedAbilityId, CardIdType, CharacterId, VoidCardId};
 use battle_state::battle_cards::stack_card_state::StackItemId;
 use bon::Builder;
 use core_data::display_color::{self, DisplayColor};
@@ -19,6 +17,7 @@ use display_data::card_view::{
     CardActions, CardEffects, CardPrefab, CardView, ClientCardId, DisplayImage, RevealedCardView,
 };
 use display_data::object_position::{ObjectPosition, Position};
+use ui_components::icon;
 
 use crate::core::adapter;
 use crate::core::response_builder::ResponseBuilder;
@@ -201,39 +200,33 @@ fn activated_ability_card_view(
 /// Returns a list of all void card tokens for a player to display in
 /// their hand.
 pub fn all_user_void_card_tokens(builder: &ResponseBuilder, battle: &BattleState) -> Vec<CardView> {
-    let legal_actions = legal_actions::compute(battle, builder.act_for_player());
-
-    if let LegalActions::Standard { actions } = legal_actions {
-        actions
-            .play_card_from_void
-            .iter()
-            .map(|can_play_from_void| {
-                void_card_token_view(
-                    builder,
-                    battle,
-                    can_play_from_void.card_id,
-                    can_play_from_void.via_ability_id,
-                )
-            })
-            .collect()
-    } else {
-        vec![]
-    }
+    let void_ability_cards =
+        battle.ability_state.has_play_from_void_ability.player(builder.act_for_player());
+    void_ability_cards
+        .iter()
+        .map(|card_id| void_card_token_view(builder, battle, card_id))
+        .collect()
 }
 
 fn void_card_token_view(
     builder: &ResponseBuilder,
     battle: &BattleState,
     void_card_id: VoidCardId,
-    ability_id: AbilityId,
 ) -> CardView {
     let card_id = void_card_id.card_id();
-    let action = BattleAction::PlayCardFromVoid(void_card_id, ability_id);
-    let play_action = Some(GameAction::BattleAction(action));
+    let from_void_with_cost = can_play_cards::can_play_from_void_energy_cost(battle, void_card_id);
+    let legal_actions = legal_actions::compute(battle, builder.act_for_player());
+    let play_action = if let Some(from_void_with_cost) = from_void_with_cost {
+        let action =
+            BattleAction::PlayCardFromVoid(void_card_id, from_void_with_cost.via_ability_id);
+        if legal_actions.contains(action, ForPlayer::Human) { Some(action) } else { None }
+    } else {
+        None
+    };
 
     token_card_view(
         TokenCardView::builder()
-            .id(adapter::void_card_token_client_id(void_card_id, ability_id))
+            .id(adapter::void_card_token_client_id(void_card_id))
             .position(ObjectPosition {
                 position: Position::InHand(DisplayPlayer::User),
                 sorting_key: card::get(battle, card_id).object_id.0 as u32,
@@ -241,8 +234,9 @@ fn void_card_token_view(
             .image(card_rendering::card_image(battle, card_id))
             .name(card_rendering::card_name(battle, card_id))
             .cost(
-                can_play_cards::play_from_void_energy_cost(battle, VoidCardId(card_id), ability_id)
-                    .to_string(),
+                from_void_with_cost
+                    .map(|cost| cost.cost.to_string())
+                    .unwrap_or_else(|| format!("<size=50%>{}</size>", icon::NON_NUMERIC)),
             )
             .maybe_spark(
                 card_properties::base_spark_for_id(battle, card_id).map(|spark| spark.to_string()),
@@ -257,15 +251,17 @@ fn void_card_token_view(
                 sorting_key: 32768,
             })
             .actions(CardActions {
-                can_play: play_action,
-                play_effect_preview: Some(outcome_simulation::action_effect_preview(
-                    battle,
-                    builder.act_for_player(),
-                    action,
-                )),
+                can_play: play_action.map(GameAction::BattleAction),
+                play_effect_preview: play_action.map(|action| {
+                    outcome_simulation::action_effect_preview(
+                        battle,
+                        builder.act_for_player(),
+                        action,
+                    )
+                }),
                 ..Default::default()
             })
-            .maybe_outline_color(Some(display_color::GREEN))
+            .maybe_outline_color(play_action.map(|_| display_color::GREEN))
             .is_fast(card_properties::is_fast(battle, card_id))
             .build(),
     )
