@@ -3,11 +3,13 @@ use battle_mutations::actions::apply_battle_action;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_player::battle_player_state::{CreateBattlePlayer, PlayerType};
+use core_data::identifiers::UserId;
 use core_data::types::PlayerName;
 use game_creation::new_battle;
 use rand::RngCore;
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::layer::SubscriberExt;
+use uuid::Uuid;
 
 pub fn execute(battle: &mut BattleState, user_player: PlayerName, action: DebugAction) {
     match action {
@@ -40,6 +42,11 @@ pub fn execute(battle: &mut BattleState, user_player: PlayerName, action: DebugA
         }
         DebugAction::SetOpponentAgent(ai) => {
             battle.players.player_mut(user_player.opponent()).player_type = PlayerType::Agent(ai);
+        }
+        DebugAction::SetOpponentAsHuman => {
+            let new_user_id = UserId(Uuid::new_v4());
+            battle.players.player_mut(user_player.opponent()).player_type =
+                PlayerType::User(new_user_id);
         }
         DebugAction::ApplyActionList(actions) => {
             let subscriber = tracing_subscriber::registry().with(EnvFilter::new("warn"));

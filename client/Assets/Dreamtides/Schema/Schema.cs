@@ -2328,7 +2328,7 @@ namespace Dreamtides.Schema
 
     public enum PanelAddressEnum { AddCardToHand, Developer, PlayOpponentCard, SetOpponentAgent };
 
-    public enum DebugActionEnum { ApplyTestScenarioAction, RestartBattle };
+    public enum DebugActionEnum { ApplyTestScenarioAction, RestartBattle, SetOpponentAsHuman };
 
     public enum TestDeckName { CoreEleven, StartingFive };
 
@@ -4075,6 +4075,8 @@ namespace Dreamtides.Schema
                             return new DebugAction { Enum = DebugActionEnum.ApplyTestScenarioAction };
                         case "restartBattle":
                             return new DebugAction { Enum = DebugActionEnum.RestartBattle };
+                        case "setOpponentAsHuman":
+                            return new DebugAction { Enum = DebugActionEnum.SetOpponentAsHuman };
                     }
                     break;
                 case JsonToken.StartObject:
@@ -4096,6 +4098,9 @@ namespace Dreamtides.Schema
                         return;
                     case DebugActionEnum.RestartBattle:
                         serializer.Serialize(writer, "restartBattle");
+                        return;
+                    case DebugActionEnum.SetOpponentAsHuman:
+                        serializer.Serialize(writer, "setOpponentAsHuman");
                         return;
                 }
             }
@@ -4165,6 +4170,8 @@ namespace Dreamtides.Schema
                     return DebugActionEnum.ApplyTestScenarioAction;
                 case "restartBattle":
                     return DebugActionEnum.RestartBattle;
+                case "setOpponentAsHuman":
+                    return DebugActionEnum.SetOpponentAsHuman;
             }
             throw new Exception("Cannot unmarshal type DebugActionEnum");
         }
@@ -4184,6 +4191,9 @@ namespace Dreamtides.Schema
                     return;
                 case DebugActionEnum.RestartBattle:
                     serializer.Serialize(writer, "restartBattle");
+                    return;
+                case DebugActionEnum.SetOpponentAsHuman:
+                    serializer.Serialize(writer, "setOpponentAsHuman");
                     return;
             }
             throw new Exception("Cannot marshal type DebugActionEnum");

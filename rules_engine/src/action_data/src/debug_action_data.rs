@@ -15,6 +15,7 @@ pub enum DebugAction {
     RestartBattle,
     RestartBattleWithDecks { one: TestDeckName, two: TestDeckName },
     SetOpponentAgent(GameAI),
+    SetOpponentAsHuman,
     ApplyActionList(Vec<DebugBattleAction>),
     PerformOpponentAction(BattleAction),
 }

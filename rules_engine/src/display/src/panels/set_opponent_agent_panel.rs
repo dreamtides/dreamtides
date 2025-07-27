@@ -62,6 +62,7 @@ impl Component for SetOpponentAgentPanel<'_> {
                                         )
                                         .build(),
                                 )
+                                .child(SetHumanCell::builder().build())
                                 .child(SetAgentCell::builder().agent(GameAI::MonteCarlo(5)).build())
                                 .child(
                                     SetAgentCell::builder().agent(GameAI::MonteCarlo(10)).build(),
@@ -129,6 +130,38 @@ impl Component for SetAgentCell {
                     ButtonComponent::builder()
                         .label("Select")
                         .action(DebugAction::SetOpponentAgent(self.agent))
+                        .build(),
+                )
+                .build(),
+        )
+    }
+}
+
+#[derive(Clone, Builder)]
+pub struct SetHumanCell {}
+
+impl Component for SetHumanCell {
+    fn render(self) -> Option<impl Component> {
+        Some(
+            BoxComponent::builder()
+                .name("Human Player Cell")
+                .style(
+                    FlexStyle::builder()
+                        .align_items(FlexAlign::Center)
+                        .justify_content(FlexJustify::SpaceBetween)
+                        .margin(6)
+                        .build(),
+                )
+                .child(
+                    TextComponent::builder()
+                        .text("Human Player")
+                        .typography(Typography::Body2)
+                        .build(),
+                )
+                .child(
+                    ButtonComponent::builder()
+                        .label("Select")
+                        .action(DebugAction::SetOpponentAsHuman)
                         .build(),
                 )
                 .build(),
