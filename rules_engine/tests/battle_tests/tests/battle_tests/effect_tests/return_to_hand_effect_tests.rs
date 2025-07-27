@@ -153,3 +153,21 @@ fn return_to_hand_resets_spark_from_triggered_abilities() {
         "character has base spark value when materialized fresh from hand"
     );
 }
+
+#[test]
+fn return_to_hand_revealed_to_opponent() {
+    let mut s = TestBattle::builder().connect();
+    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    s.create_and_play(DisplayPlayer::User, CardName::TestReturnToHand);
+
+    // Verify the card is in the enemy's hand
+    assert!(s.user_client.cards.enemy_hand().contains(&target_id), "Card should be in enemy hand");
+
+    // Verify the card is revealed to the user (opponent of the controller)
+    let card_from_user_perspective = s.user_client.cards.get(&target_id);
+    assert!(
+        card_from_user_perspective.view.revealed.is_some(),
+        "Card should be revealed to the opponent"
+    );
+}

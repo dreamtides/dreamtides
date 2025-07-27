@@ -285,3 +285,24 @@ fn void_card_targeting_creates_green_arrows() {
 
     assert!(green_arrows > 0, "There should be at least one green arrow pointing to the void card");
 }
+
+#[test]
+fn return_void_card_to_hand_revealed_to_opponent() {
+    let mut s = TestBattle::builder().connect();
+    let void_card = s.add_to_void(DisplayPlayer::User, CardName::TestVanillaCharacter);
+
+    s.create_and_play(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
+
+    s.click_card(DisplayPlayer::User, &void_card);
+    s.click_primary_button(DisplayPlayer::User, "Submit");
+
+    // Verify the card is in the user's hand
+    assert!(s.user_client.cards.user_hand().contains(&void_card), "Card should be in user hand");
+
+    // Verify the card is revealed to the enemy (opponent)
+    let card_from_enemy_perspective = s.enemy_client.cards.get(&void_card);
+    assert!(
+        card_from_enemy_perspective.view.revealed.is_some(),
+        "Card should be revealed to the opponent"
+    );
+}

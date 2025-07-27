@@ -1,4 +1,4 @@
-use battle_queries::battle_card_queries::{card_abilities, card_properties};
+use battle_queries::battle_card_queries::{card, card_abilities, card_properties};
 use battle_queries::panic_with;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{
@@ -158,6 +158,11 @@ pub fn from_void_to_hand(
     card_id: VoidCardId,
 ) -> HandCardId {
     to_destination_zone(battle, source, controller, card_id.card_id(), Zone::Void, Zone::Hand);
+
+    // Mark the card as revealed to the opponent
+    let card_state = card::get_mut(battle, card_id.card_id());
+    *card_state.revealed_to_player_override.player_mut(controller.opponent()) = true;
+
     HandCardId(card_id.card_id())
 }
 
@@ -178,6 +183,11 @@ pub fn from_battlefield_to_hand(
         Zone::Battlefield,
         Zone::Hand,
     );
+
+    // Mark the card as revealed to the opponent
+    let card_state = card::get_mut(battle, card_id.card_id());
+    *card_state.revealed_to_player_override.player_mut(controller.opponent()) = true;
+
     HandCardId(card_id.card_id())
 }
 
