@@ -1,5 +1,6 @@
 use core_data::identifiers::CardName;
 use display_data::battle_view::DisplayPlayer;
+use display_data::command::ArrowStyle;
 use display_data::object_position::Position;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
@@ -252,4 +253,35 @@ fn void_card_shows_above_void_position_when_targeted() {
         0,
         "No cards should be in normal void position while targeted"
     );
+}
+
+#[test]
+fn void_card_targeting_creates_green_arrows() {
+    let mut s = TestBattle::builder().enemy(TestPlayer::builder().energy(99).build()).connect();
+    let void_card = s.add_to_void(DisplayPlayer::User, CardName::TestVanillaCharacter);
+
+    // Give the enemy a fast card so they can respond and keep the effect on the
+    // stack
+    s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+
+    // Play the return void card effect, which puts it on the stack
+    let return_card = s.add_to_hand(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
+    s.play_card_from_hand(DisplayPlayer::User, &return_card);
+
+    // Select the void card as a target and submit
+    s.click_card(DisplayPlayer::User, &void_card);
+    s.click_primary_button(DisplayPlayer::User, "Submit");
+
+    // Check that there are arrows displayed
+    assert!(!s.user_client.arrows.is_empty(), "There should be arrows displayed");
+
+    // Verify that there's at least one green arrow (pointing to void card)
+    let green_arrows = s
+        .user_client
+        .arrows
+        .iter()
+        .filter(|arrow| matches!(arrow.color, ArrowStyle::Green))
+        .count();
+
+    assert!(green_arrows > 0, "There should be at least one green arrow pointing to the void card");
 }

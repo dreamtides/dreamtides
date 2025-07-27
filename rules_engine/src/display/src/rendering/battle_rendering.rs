@@ -147,26 +147,66 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
         return vec![];
     }
 
-    battle
-        .cards
-        .all_items_on_stack()
-        .iter()
-        .filter_map(|stack_item| {
-            valid_target_queries::displayed_targets(battle, stack_item.id).and_then(|targets| {
-                let source = adapter::stack_item_game_object_id(stack_item.id);
-                match targets {
-                    EffectTargets::Standard(StandardEffectTarget::Character(character_id, _)) => {
-                        let target = adapter::card_game_object_id(character_id);
-                        Some(DisplayArrow { source, target, color: ArrowStyle::Red })
-                    }
-                    EffectTargets::Standard(StandardEffectTarget::StackCard(stack_card_id, _)) => {
-                        let target = adapter::card_game_object_id(stack_card_id);
-                        Some(DisplayArrow { source, target, color: ArrowStyle::Blue })
-                    }
-                    EffectTargets::Standard(StandardEffectTarget::VoidCardSet(_)) => None,
-                    EffectTargets::EffectList(_) => None,
+    let mut arrows = Vec::new();
+
+    for stack_item in battle.cards.all_items_on_stack().iter() {
+        if let Some(targets) = valid_target_queries::displayed_targets(battle, stack_item.id) {
+            let source = adapter::stack_item_game_object_id(stack_item.id);
+            match targets {
+                EffectTargets::Standard(StandardEffectTarget::Character(character_id, _)) => {
+                    let target = adapter::card_game_object_id(character_id);
+                    arrows.push(DisplayArrow { source, target, color: ArrowStyle::Red });
                 }
-            })
-        })
-        .collect()
+                EffectTargets::Standard(StandardEffectTarget::StackCard(stack_card_id, _)) => {
+                    let target = adapter::card_game_object_id(stack_card_id);
+                    arrows.push(DisplayArrow { source, target, color: ArrowStyle::Blue });
+                }
+                EffectTargets::Standard(StandardEffectTarget::VoidCardSet(void_card_set)) => {
+                    for void_card_target in void_card_set.iter() {
+                        let target = adapter::card_game_object_id(void_card_target.id);
+                        arrows.push(DisplayArrow {
+                            source: source.clone(),
+                            target,
+                            color: ArrowStyle::Green,
+                        });
+                    }
+                }
+                EffectTargets::EffectList(target_list) => {
+                    for target in target_list.iter().flatten() {
+                        match target {
+                            StandardEffectTarget::Character(character_id, _) => {
+                                let target_id = adapter::card_game_object_id(*character_id);
+                                arrows.push(DisplayArrow {
+                                    source: source.clone(),
+                                    target: target_id,
+                                    color: ArrowStyle::Red,
+                                });
+                            }
+                            StandardEffectTarget::StackCard(stack_card_id, _) => {
+                                let target_id = adapter::card_game_object_id(*stack_card_id);
+                                arrows.push(DisplayArrow {
+                                    source: source.clone(),
+                                    target: target_id,
+                                    color: ArrowStyle::Blue,
+                                });
+                            }
+                            StandardEffectTarget::VoidCardSet(void_card_set) => {
+                                for void_card_target in void_card_set.iter() {
+                                    let target_id =
+                                        adapter::card_game_object_id(void_card_target.id);
+                                    arrows.push(DisplayArrow {
+                                        source: source.clone(),
+                                        target: target_id,
+                                        color: ArrowStyle::Green,
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    arrows
 }
