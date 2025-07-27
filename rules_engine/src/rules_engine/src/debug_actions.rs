@@ -1,6 +1,5 @@
 use action_data::debug_action_data::DebugAction;
 use battle_mutations::actions::apply_battle_action;
-use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_player::battle_player_state::{CreateBattlePlayer, PlayerType};

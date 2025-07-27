@@ -910,6 +910,8 @@ namespace Dreamtides.Schema
     ///
     /// Set the number of cards remaining in a player's deck. All other cards
     /// are moved to the void.
+    ///
+    /// Play a card for the opponent, with random prompt choices
     /// </summary>
     public partial class DebugBattleAction
     {
@@ -942,6 +944,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("setCardsRemainingInDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SetCardsRemainingInDeck SetCardsRemainingInDeck { get; set; }
+
+        [JsonProperty("opponentPlayCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public OpponentPlayCard OpponentPlayCard { get; set; }
     }
 
     public partial class AddCardToBattlefield
@@ -981,6 +986,12 @@ namespace Dreamtides.Schema
     {
         [JsonProperty("player", Required = Required.Always)]
         public PlayerName Player { get; set; }
+    }
+
+    public partial class OpponentPlayCard
+    {
+        [JsonProperty("card", Required = Required.Always)]
+        public CardName Card { get; set; }
     }
 
     public partial class SetCardsRemainingInDeck
@@ -2315,7 +2326,7 @@ namespace Dreamtides.Schema
 
     public enum CardBrowserType { EnemyDeck, EnemyStatus, EnemyVoid, UserDeck, UserStatus, UserVoid };
 
-    public enum PanelAddressEnum { AddCardToHand, Developer, SetOpponentAgent };
+    public enum PanelAddressEnum { AddCardToHand, Developer, PlayOpponentCard, SetOpponentAgent };
 
     public enum DebugActionEnum { ApplyTestScenarioAction, RestartBattle };
 
@@ -3905,6 +3916,8 @@ namespace Dreamtides.Schema
                             return new PanelAddress { Enum = PanelAddressEnum.AddCardToHand };
                         case "developer":
                             return new PanelAddress { Enum = PanelAddressEnum.Developer };
+                        case "playOpponentCard":
+                            return new PanelAddress { Enum = PanelAddressEnum.PlayOpponentCard };
                         case "setOpponentAgent":
                             return new PanelAddress { Enum = PanelAddressEnum.SetOpponentAgent };
                     }
@@ -3928,6 +3941,9 @@ namespace Dreamtides.Schema
                         return;
                     case PanelAddressEnum.Developer:
                         serializer.Serialize(writer, "developer");
+                        return;
+                    case PanelAddressEnum.PlayOpponentCard:
+                        serializer.Serialize(writer, "playOpponentCard");
                         return;
                     case PanelAddressEnum.SetOpponentAgent:
                         serializer.Serialize(writer, "setOpponentAgent");
@@ -3959,6 +3975,8 @@ namespace Dreamtides.Schema
                     return PanelAddressEnum.AddCardToHand;
                 case "developer":
                     return PanelAddressEnum.Developer;
+                case "playOpponentCard":
+                    return PanelAddressEnum.PlayOpponentCard;
                 case "setOpponentAgent":
                     return PanelAddressEnum.SetOpponentAgent;
             }
@@ -3980,6 +3998,9 @@ namespace Dreamtides.Schema
                     return;
                 case PanelAddressEnum.Developer:
                     serializer.Serialize(writer, "developer");
+                    return;
+                case PanelAddressEnum.PlayOpponentCard:
+                    serializer.Serialize(writer, "playOpponentCard");
                     return;
                 case PanelAddressEnum.SetOpponentAgent:
                     serializer.Serialize(writer, "setOpponentAgent");

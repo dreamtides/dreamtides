@@ -8,5 +8,6 @@ pub enum PanelAddress {
     Developer,
     SetOpponentAgent,
     AddCardToHand,
+    PlayOpponentCard,
     ViewLogs(Option<String>),
 }

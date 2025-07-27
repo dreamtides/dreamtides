@@ -98,13 +98,21 @@ namespace Dreamtides.Services
     public DimensionGroup GetSafeArea()
     {
       var panel = RootVisualElement.panel;
+      // Need to always use UnityEngine.Device to work properly in device
+      // simulator.
       var safeLeftTop = RuntimePanelUtils.ScreenToPanel(
         panel,
-        new Vector2(Screen.safeArea.xMin, Screen.height - Screen.safeArea.yMax)
+        new Vector2(
+            UnityEngine.Device.Screen.safeArea.xMin,
+            UnityEngine.Device.Screen.height - UnityEngine.Device.Screen.safeArea.yMax
+          )
       );
       var safeRightBottom = RuntimePanelUtils.ScreenToPanel(
         panel,
-        new Vector2(Screen.width - Screen.safeArea.xMax, Screen.safeArea.yMin)
+        new Vector2(
+          UnityEngine.Device.Screen.width - UnityEngine.Device.Screen.safeArea.xMax,
+          UnityEngine.Device.Screen.safeArea.yMin
+        )
       );
 
       return Mason.GroupPx(

@@ -57,6 +57,14 @@ impl Component for DeveloperPanel {
                         )
                         .child(
                             DebugButton::builder()
+                                .label("Play Opponent Card")
+                                .action(GameAction::BattleDisplayAction(
+                                    BattleDisplayAction::OpenPanel(PanelAddress::PlayOpponentCard),
+                                ))
+                                .build(),
+                        )
+                        .child(
+                            DebugButton::builder()
                                 .label("Draw Card")
                                 .action(BattleAction::Debug(DebugBattleAction::DrawCard {
                                     player: self.user_player,

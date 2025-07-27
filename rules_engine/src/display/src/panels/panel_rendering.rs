@@ -5,6 +5,7 @@ use ui_components::component::Component;
 use crate::core::response_builder::ResponseBuilder;
 use crate::panels::add_card_to_hand_panel::AddCardToHandPanel;
 use crate::panels::developer_panel::DeveloperPanel;
+use crate::panels::play_opponent_card_panel::PlayOpponentCardPanel;
 use crate::panels::set_opponent_agent_panel::SetOpponentAgentPanel;
 use crate::panels::view_logs_panel::ViewLogsPanel;
 
@@ -24,6 +25,11 @@ pub fn render_panel(
             .build()
             .wrap(),
         PanelAddress::AddCardToHand => AddCardToHandPanel::builder()
+            .user_player(builder.display_for_player())
+            .battle(battle)
+            .build()
+            .wrap(),
+        PanelAddress::PlayOpponentCard => PlayOpponentCardPanel::builder()
             .user_player(builder.display_for_player())
             .battle(battle)
             .build()
