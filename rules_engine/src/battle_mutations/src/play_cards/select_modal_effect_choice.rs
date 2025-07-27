@@ -1,5 +1,6 @@
 use ability_data::effect::ModelEffectChoiceIndex;
 use battle_queries::panic_with;
+use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_cards::stack_card_state::StackItemId;
 use battle_state::core::effect_source::EffectSource;
@@ -30,6 +31,12 @@ pub fn execute(
 
     match modal_prompt.on_selected {
         OnSelected::AddStackTargets(stack_item_id) => {
+            battle.push_animation(source, || BattleAnimation::SelectModalEffectChoice {
+                player,
+                item_id: stack_item_id,
+                choice_index: modal_choice_index,
+            });
+
             let Some(stack_item) = battle.cards.stack_item_mut(stack_item_id) else {
                 panic_with!("Stack item not found", battle);
             };

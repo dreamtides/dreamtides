@@ -6,7 +6,9 @@ use core_data::types::PlayerName;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::battle::card_id::{ActivatedAbilityId, CharacterId, StackCardId, VoidCardId};
+use crate::battle::card_id::{
+    ActivatedAbilityId, CardId, CardIdType, CharacterId, StackCardId, VoidCardId,
+};
 use crate::battle_cards::battle_card_state::ObjectId;
 
 /// A vector of items on the stack
@@ -32,6 +34,15 @@ impl From<StackCardId> for StackItemId {
 impl From<ActivatedAbilityId> for StackItemId {
     fn from(id: ActivatedAbilityId) -> Self {
         StackItemId::ActivatedAbility(id)
+    }
+}
+
+impl StackItemId {
+    pub fn underlying_card_id(&self) -> CardId {
+        match self {
+            StackItemId::Card(id) => id.card_id(),
+            StackItemId::ActivatedAbility(activated) => activated.character_id.card_id(),
+        }
     }
 }
 

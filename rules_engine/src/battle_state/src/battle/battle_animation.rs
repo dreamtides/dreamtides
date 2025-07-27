@@ -1,3 +1,4 @@
+use ability_data::effect::ModelEffectChoiceIndex;
 use core_data::identifiers::AbilityNumber;
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::PlayerName;
@@ -59,6 +60,11 @@ pub enum BattleAnimation {
     },
     ResolveCharacter {
         character_id: CharacterId,
+    },
+    SelectModalEffectChoice {
+        player: PlayerName,
+        item_id: StackItemId,
+        choice_index: ModelEffectChoiceIndex,
     },
     SelectStackCardTargets {
         player: PlayerName,

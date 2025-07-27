@@ -15,7 +15,9 @@ use masonry::flex_style::FlexVector3;
 use crate::core::adapter;
 use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
-use crate::rendering::{apply_card_fx, battle_rendering, card_rendering, labels};
+use crate::rendering::{
+    apply_card_fx, battle_rendering, card_rendering, labels, modal_effect_prompt_rendering,
+};
 
 pub fn render(
     builder: &mut ResponseBuilder,
@@ -125,6 +127,20 @@ pub fn render(
                 // If the played card is no longer on the stack, insert a pause
                 // so it can be seen.
                 push_snapshot(builder, snapshot);
+                builder.push(Command::Wait(Milliseconds::new(1000)));
+            }
+        }
+
+        BattleAnimation::SelectModalEffectChoice { player, item_id, choice_index } => {
+            if *player != builder.display_for_player() {
+                push_snapshot(builder, snapshot);
+                let descriptions = modal_effect_prompt_rendering::modal_effect_descriptions(
+                    &card_rendering::rules_text(snapshot, item_id.underlying_card_id()),
+                );
+                builder.push(Command::DisplayEnemyMessage(DisplayEnemyMessageCommand {
+                    message: descriptions[choice_index.value()].clone(),
+                    show_duration: Milliseconds::new(2000),
+                }));
                 builder.push(Command::Wait(Milliseconds::new(1000)));
             }
         }
