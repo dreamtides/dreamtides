@@ -27,7 +27,7 @@ pub fn object_position(
     });
     let object_position = for_card_order_browser(battle, card_id, object_position);
     let object_position = for_void_card_browser(builder, battle, object_position);
-    let object_position = for_void_card_targeting(builder, battle, card_id, object_position);
+    let object_position = for_void_card_targeting(battle, card_id, object_position);
     let position = for_browser(builder, object_position.position);
     ObjectPosition { position, sorting_key: object_position.sorting_key }
 }
@@ -160,7 +160,8 @@ fn for_void_card_browser(
     if let Some(prompt) = battle.prompts.front()
         && prompt.player == builder.act_for_player()
         && let PromptType::ChooseVoidCard(_) = &prompt.prompt_type
-        && matches!(base_object_position.position, Position::InVoid(_))
+        && let Position::InVoid(void_player) = base_object_position.position
+        && void_player == builder.to_display_player(prompt.player)
     {
         return ObjectPosition {
             position: Position::Browser,
@@ -171,7 +172,6 @@ fn for_void_card_browser(
 }
 
 fn for_void_card_targeting(
-    _builder: &ResponseBuilder,
     battle: &BattleState,
     card_id: CardId,
     base_object_position: ObjectPosition,

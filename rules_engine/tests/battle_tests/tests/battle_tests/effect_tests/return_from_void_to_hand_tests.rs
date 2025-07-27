@@ -306,3 +306,22 @@ fn return_void_card_to_hand_revealed_to_opponent() {
         "Card should be revealed to the opponent"
     );
 }
+
+#[test]
+fn return_void_card_browser_only_shows_user_cards() {
+    let mut s = TestBattle::builder().connect();
+    let user_void_card = s.add_to_void(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let enemy_void_card = s.add_to_void(DisplayPlayer::Enemy, CardName::TestDissolve);
+
+    s.create_and_play(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
+
+    let cards_in_browser = s.user_client.cards.browser_cards();
+
+    // Should only show the user's void card, not the enemy's
+    assert_eq!(cards_in_browser.len(), 1, "Should have exactly 1 card in browser");
+    assert!(cards_in_browser.contains(&user_void_card), "User void card should be in browser");
+    assert!(
+        !cards_in_browser.contains(&enemy_void_card),
+        "Enemy void card should NOT be in browser"
+    );
+}
