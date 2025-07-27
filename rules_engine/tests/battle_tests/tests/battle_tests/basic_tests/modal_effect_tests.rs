@@ -309,3 +309,19 @@ fn modal_choice_energy_and_target_validation() {
         "dissolve option should not be clickable due to insufficient energy AND no targets"
     );
 }
+
+#[test]
+fn modal_effect_choices_only_visible_to_prompted_player() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    // User plays a modal card that creates a prompt
+    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDrawTwo);
+
+    // Verify the user can see the modal choices
+    let user_browser_cards = s.user_client.cards.browser_cards();
+    assert_eq!(user_browser_cards.len(), 2, "User should see 2 modal choice cards");
+
+    // Verify the enemy (opponent) cannot see the modal choices
+    let enemy_browser_cards = s.enemy_client.cards.browser_cards();
+    assert_eq!(enemy_browser_cards.len(), 0, "Enemy should not see any modal choice cards");
+}

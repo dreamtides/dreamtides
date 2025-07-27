@@ -28,6 +28,9 @@ pub fn cards(builder: &ResponseBuilder, battle: &BattleState) -> Vec<CardView> {
     let Some(card_id) = prompt.source.card_id() else {
         return vec![];
     };
+    if prompt.player != builder.act_for_player() {
+        return vec![];
+    }
 
     let descriptions = modal_effect_descriptions(&card_rendering::rules_text(battle, card_id));
     modal
