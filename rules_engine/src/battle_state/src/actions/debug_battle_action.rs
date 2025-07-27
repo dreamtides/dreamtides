@@ -30,4 +30,6 @@ pub enum DebugBattleAction {
     /// Set the number of cards remaining in a player's deck. All other cards
     /// are moved to the void.
     SetCardsRemainingInDeck { player: PlayerName, cards: usize },
+    /// Play a card for the opponent, with random prompt choices
+    OpponentPlayCard { card: CardName },
 }

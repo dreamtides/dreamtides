@@ -1,10 +1,14 @@
 use battle_queries::battle_trace;
+use battle_queries::legal_action_queries::legal_actions;
+use battle_state::actions::battle_actions::BattleAction;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, DeckCardId, HandCardId};
 use battle_state::core::effect_source::EffectSource;
+use core_data::identifiers::CardName;
 use core_data::types::PlayerName;
 
+use crate::actions::apply_battle_action;
 use crate::card_mutations::{battle_deck, move_card};
 
 pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattleAction) {
@@ -27,10 +31,7 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
             battle.players.player_mut(player_name).spark_bonus = spark;
         }
         DebugBattleAction::AddCardToHand { player: player_name, card: card_name } => {
-            let card_count = battle.cards.all_cards().count();
-            battle_deck::add_cards(battle, player_name, vec![card_name]);
-            let new_card_id = DeckCardId(CardId(card_count));
-            move_card::from_deck_to_hand(battle, source, player_name, new_card_id);
+            add_to_hand(battle, player_name, source, card_name);
         }
         DebugBattleAction::AddCardToBattlefield { player: player_name, card: card_name } => {
             let card_count = battle.cards.all_cards().count();
@@ -60,5 +61,38 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
                 }
             }
         }
+        DebugBattleAction::OpponentPlayCard { card: card_name } => {
+            let card_id = add_to_hand(battle, player.opponent(), source, card_name);
+            apply_battle_action::execute(
+                battle,
+                player.opponent(),
+                BattleAction::PlayCardFromHand(card_id),
+            );
+            make_random_prompt_choices(battle, player.opponent());
+        }
+    }
+}
+
+fn add_to_hand(
+    battle: &mut BattleState,
+    player: PlayerName,
+    source: EffectSource,
+    card_name: CardName,
+) -> HandCardId {
+    let card_count = battle.cards.all_cards().count();
+    battle_deck::add_cards(battle, player, vec![card_name]);
+    let new_card_id = DeckCardId(CardId(card_count));
+    move_card::from_deck_to_hand(battle, source, player, new_card_id)
+}
+
+fn make_random_prompt_choices(battle: &mut BattleState, opponent: PlayerName) {
+    while let Some(current_prompt) = battle.prompts.front()
+        && current_prompt.player == opponent
+    {
+        let legal = legal_actions::compute(battle, current_prompt.player);
+        let Some(random) = legal.random_action() else {
+            break;
+        };
+        apply_battle_action::execute(battle, opponent, random);
     }
 }
