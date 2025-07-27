@@ -234,6 +234,8 @@ namespace Dreamtides.Services
       Registry.Layout.CardOrderSelectorVoid.ApplyLayout(sequence);
       Registry.Layout.GameModifiersDisplay.ApplyLayout(sequence);
       Registry.Layout.OnScreenStorage.ApplyLayout(sequence);
+      Registry.Layout.AboveUserVoid.ApplyLayout(sequence);
+      Registry.Layout.AboveEnemyVoid.ApplyLayout(sequence);
     }
 
     List<Card> PrepareToDelete(Sequence? sequence, HashSet<string> toDelete)

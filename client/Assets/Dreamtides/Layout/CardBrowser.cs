@@ -2,7 +2,6 @@
 
 using System.Runtime.CompilerServices;
 using DG.Tweening;
-using Dreamtides.Components;
 using Dreamtides.Services;
 using UnityEngine;
 using UnityEngine.UI;
