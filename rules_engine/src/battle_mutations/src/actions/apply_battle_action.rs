@@ -24,6 +24,15 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
         }
     }
 
+    execute_internal(battle, player, action);
+
+    battle.push_history_action(player, action);
+}
+
+/// Applies the given action to the battle state.
+///
+/// Does not check legality or add to the action history.
+pub fn execute_internal(battle: &mut BattleState, player: PlayerName, action: BattleAction) {
     battle.turn_history.clear_current_action_history();
 
     match action {
@@ -83,6 +92,4 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
     apply_effect::execute_pending_effects_if_no_active_prompt(battle);
 
     fire_triggers::execute_if_no_active_prompt(battle);
-
-    battle.push_history_action(player, action);
 }

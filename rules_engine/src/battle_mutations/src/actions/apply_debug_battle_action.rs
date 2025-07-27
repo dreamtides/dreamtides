@@ -63,7 +63,7 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
         }
         DebugBattleAction::OpponentPlayCard { card: card_name } => {
             let card_id = add_to_hand(battle, player.opponent(), source, card_name);
-            apply_battle_action::execute(
+            apply_battle_action::execute_internal(
                 battle,
                 player.opponent(),
                 BattleAction::PlayCardFromHand(card_id),
@@ -93,6 +93,6 @@ fn make_random_prompt_choices(battle: &mut BattleState, opponent: PlayerName) {
         let Some(random) = legal.random_action() else {
             break;
         };
-        apply_battle_action::execute(battle, opponent, random);
+        apply_battle_action::execute_internal(battle, opponent, random);
     }
 }
