@@ -17,6 +17,7 @@ pub enum DebugAction {
     SetOpponentAgent(GameAI),
     SetOpponentAsHuman,
     ApplyActionList(Vec<DebugBattleAction>),
+    CloseCurrentPanelApplyAction(DebugBattleAction),
     PerformOpponentAction(BattleAction),
 }
 

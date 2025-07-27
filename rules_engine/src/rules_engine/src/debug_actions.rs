@@ -7,11 +7,18 @@ use core_data::identifiers::UserId;
 use core_data::types::PlayerName;
 use game_creation::new_battle;
 use rand::RngCore;
+use state_provider::state_provider::StateProvider;
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::layer::SubscriberExt;
 use uuid::Uuid;
 
-pub fn execute(battle: &mut BattleState, user_player: PlayerName, action: DebugAction) {
+pub fn execute(
+    provider: impl StateProvider + 'static,
+    battle: &mut BattleState,
+    user_id: UserId,
+    user_player: PlayerName,
+    action: DebugAction,
+) {
     match action {
         DebugAction::ApplyTestScenarioAction => {}
         DebugAction::RestartBattle => {
@@ -59,6 +66,12 @@ pub fn execute(battle: &mut BattleState, user_player: PlayerName, action: DebugA
                     );
                 }
             });
+        }
+        DebugAction::CloseCurrentPanelApplyAction(action) => {
+            let mut display_state = provider.get_display_state(user_id);
+            display_state.current_panel_address = None;
+            provider.set_display_state(user_id, display_state);
+            apply_battle_action::execute(battle, user_player, BattleAction::Debug(action));
         }
         DebugAction::PerformOpponentAction(action) => {
             apply_battle_action::execute(battle, user_player.opponent(), action);

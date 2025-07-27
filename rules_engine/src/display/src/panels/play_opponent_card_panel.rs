@@ -1,5 +1,5 @@
+use action_data::debug_action_data::DebugAction;
 use battle_queries::battle_card_queries::card_properties;
-use battle_state::actions::battle_actions::BattleAction;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
 use battle_state::battle::battle_state::BattleState;
 use bon::Builder;
@@ -53,6 +53,11 @@ impl Component for PlayOpponentCardPanel<'_> {
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
+                                        .card(CardName::TestModalReturnToHandOrDrawTwo)
+                                        .build(),
+                                )
+                                .child(
+                                    PlayOpponentCardCell::builder()
                                         .card(CardName::TestDissolve)
                                         .build(),
                                 )
@@ -101,9 +106,9 @@ impl Component for PlayOpponentCardCell {
                 .child(
                     ButtonComponent::builder()
                         .label("Play")
-                        .action(BattleAction::Debug(DebugBattleAction::OpponentPlayCard {
-                            card: self.card,
-                        }))
+                        .action(DebugAction::CloseCurrentPanelApplyAction(
+                            DebugBattleAction::OpponentPlayCard { card: self.card },
+                        ))
                         .build(),
                 )
                 .build(),

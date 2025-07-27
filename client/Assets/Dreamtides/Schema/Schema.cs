@@ -1101,6 +1101,9 @@ namespace Dreamtides.Schema
         [JsonProperty("applyActionList", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public List<DebugBattleAction> ApplyActionList { get; set; }
 
+        [JsonProperty("closeCurrentPanelApplyAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public DebugBattleAction CloseCurrentPanelApplyAction { get; set; }
+
         [JsonProperty("performOpponentAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public BattleAction? PerformOpponentAction { get; set; }
     }
