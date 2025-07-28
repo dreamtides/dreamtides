@@ -5306,6 +5306,7 @@ MonoBehaviour:
   _leftEdge: {fileID: 418040942}
   _rightEdge: {fileID: 845375159}
   _isOpen: 0
+  _registry: {fileID: 613451854}
   _initialSpacing: -0.5
   _initialOffset: 4.1
   _deckImage: {fileID: 1324142407}
@@ -11593,6 +11594,7 @@ Transform:
   - {fileID: 241295664}
   - {fileID: 951965639}
   - {fileID: 1956300935}
+  - {fileID: 1423505055}
   m_Father: {fileID: 1302820460}
   m_LocalEulerAnglesHint: {x: 75, y: 0, z: 0}
 --- !u!114 &1167298977
@@ -11630,11 +11632,13 @@ MonoBehaviour:
   _leftEdge: {fileID: 241295664}
   _rightEdge: {fileID: 951965639}
   _isOpen: 0
+  _registry: {fileID: 613451854}
   _scrollAmount: 0
   _scrollbar: {fileID: 2133012749}
   _closeButton: {fileID: 1007991259}
   _maxStackOffsetRight: 1
   _largeCardPosition: {fileID: 1956300935}
+  _twoCardsPosition: {fileID: 1423505055}
 --- !u!1 &1170379167
 GameObject:
   m_ObjectHideFlags: 0
@@ -14134,6 +14138,37 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 1, y: 0.6}
+--- !u!1 &1423505054
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1423505055}
+  m_Layer: 0
+  m_Name: TwoCardsPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1423505055
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1423505054}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.5, z: -12.25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1167298976}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1435083752
 GameObject:
   m_ObjectHideFlags: 0
@@ -16647,6 +16682,7 @@ MonoBehaviour:
   _leftEdge: {fileID: 962841404}
   _rightEdge: {fileID: 488176971}
   _isOpen: 0
+  _registry: {fileID: 613451854}
   _initialSpacing: -0.5
   _initialOffset: 4.1
   _deckImage: {fileID: 1141065035}
@@ -17417,11 +17453,13 @@ MonoBehaviour:
   _leftEdge: {fileID: 124367195}
   _rightEdge: {fileID: 565470941}
   _isOpen: 0
+  _registry: {fileID: 613451854}
   _scrollAmount: 0
   _scrollbar: {fileID: 62616640}
   _closeButton: {fileID: 1097085172}
   _maxStackOffsetRight: 1
   _largeCardPosition: {fileID: 1210469376}
+  _twoCardsPosition: {fileID: 1210469376}
 --- !u!114 &1886409222
 MonoBehaviour:
   m_ObjectHideFlags: 0

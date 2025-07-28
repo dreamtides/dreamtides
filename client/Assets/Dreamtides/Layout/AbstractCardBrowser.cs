@@ -2,6 +2,7 @@
 
 using DG.Tweening;
 using Dreamtides.Services;
+using Dreamtides.Utils;
 using UnityEngine;
 
 namespace Dreamtides.Layout
@@ -12,6 +13,9 @@ namespace Dreamtides.Layout
     [SerializeField] protected Transform _leftEdge = null!;
     [SerializeField] protected Transform _rightEdge = null!;
     [SerializeField] protected bool _isOpen = false;
+    [SerializeField] Registry _registry = null!;
+
+    protected Registry Registry => Errors.CheckNotNull(_registry);
 
     public bool IsOpen => _isOpen;
 
