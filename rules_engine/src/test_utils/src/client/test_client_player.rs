@@ -34,7 +34,10 @@ impl TestClientPlayer {
 
     /// Check if it's this player's turn
     pub fn is_current_turn(&self) -> bool {
-        self.view.as_ref().map(|v| v.is_current_turn).expect("Player has no is_current_turn")
+        self.view
+            .as_ref()
+            .map(|v| v.turn_indicator.is_some())
+            .expect("Player has no turn_indicator")
     }
 
     /// Check if this player is about to win

@@ -134,6 +134,16 @@ pub struct ButtonView {
     pub action: Option<GameAction>,
 }
 
+#[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub enum DisplayedTurnIndicator {
+    /// Left indicator, indicates start of turn or main phase
+    Left,
+
+    /// Right indicator, indicates ending phase
+    Right,
+}
+
 /// Represents the visual state of a player in a game
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
@@ -153,8 +163,9 @@ pub struct PlayerView {
     /// Total spark for this player
     pub total_spark: Spark,
 
-    /// Is it currently this player's turn?
-    pub is_current_turn: bool,
+    /// Indicates whether it is this player's turn, and if so, which phase of
+    /// the turn they are in.
+    pub turn_indicator: Option<DisplayedTurnIndicator>,
 
     /// Will this player win the game in their next judgment phase?
     pub is_victory_imminent: bool,

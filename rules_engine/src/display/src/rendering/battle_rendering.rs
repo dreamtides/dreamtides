@@ -3,13 +3,16 @@ use battle_queries::battle_player_queries::player_properties;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
+use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::battle_cards::stack_card_state::{
     EffectTargets, StackItemId, StandardEffectTarget,
 };
 use battle_state::battle_player::battle_player_state::BattlePlayerState;
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
-use display_data::battle_view::{BattlePreviewState, BattleView, PlayerView};
+use display_data::battle_view::{
+    BattlePreviewState, BattleView, DisplayedTurnIndicator, PlayerView,
+};
 use display_data::command::{ArrowStyle, Command, DisplayArrow, GameMessageType};
 
 use crate::core::adapter;
@@ -137,7 +140,15 @@ fn player_view(battle: &BattleState, name: PlayerName, player: &BattlePlayerStat
         energy: player.current_energy,
         produced_energy: player.produced_energy,
         total_spark: player_properties::spark_total(battle, name),
-        is_current_turn: battle.turn.active_player == name,
+        turn_indicator: if battle.turn.active_player == name {
+            if battle.phase == BattleTurnPhase::Ending {
+                Some(DisplayedTurnIndicator::Right)
+            } else {
+                Some(DisplayedTurnIndicator::Left)
+            }
+        } else {
+            None
+        },
         is_victory_imminent: outcome_simulation::is_victory_imminent_for_player(battle, name),
     }
 }

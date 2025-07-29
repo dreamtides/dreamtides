@@ -2001,12 +2001,6 @@ namespace Dreamtides.Schema
         public long Energy { get; set; }
 
         /// <summary>
-        /// Is it currently this player's turn?
-        /// </summary>
-        [JsonProperty("isCurrentTurn", Required = Required.Always)]
-        public bool IsCurrentTurn { get; set; }
-
-        /// <summary>
         /// Will this player win the game in their next judgment phase?
         /// </summary>
         [JsonProperty("isVictoryImminent", Required = Required.Always)]
@@ -2029,6 +2023,13 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("totalSpark", Required = Required.Always)]
         public long TotalSpark { get; set; }
+
+        /// <summary>
+        /// Indicates whether it is this player's turn, and if so, which phase of
+        /// the turn they are in.
+        /// </summary>
+        [JsonProperty("turnIndicator")]
+        public DisplayedTurnIndicator? TurnIndicator { get; set; }
     }
 
     /// <summary>
@@ -2378,6 +2379,13 @@ namespace Dreamtides.Schema
     public enum ArrowStyle { Blue, Green, Red };
 
     /// <summary>
+    /// Left indicator, indicates start of turn or main phase
+    ///
+    /// Right indicator, indicates ending phase
+    /// </summary>
+    public enum DisplayedTurnIndicator { Left, Right };
+
+    /// <summary>
     /// No preview is currently active. Clear any existing preview.
     ///
     /// Unknown battle preview state during animation
@@ -2578,6 +2586,7 @@ namespace Dreamtides.Schema
                 SliderDirectionConverter.Singleton,
                 StudioTypeConverter.Singleton,
                 ArrowStyleConverter.Singleton,
+                DisplayedTurnIndicatorConverter.Singleton,
                 BattlePreviewStateConverter.Singleton,
                 BattlePreviewStateEnumConverter.Singleton,
                 GameActionConverter.Singleton,
@@ -5353,6 +5362,47 @@ namespace Dreamtides.Schema
         }
 
         public static readonly ArrowStyleConverter Singleton = new ArrowStyleConverter();
+    }
+
+    internal class DisplayedTurnIndicatorConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(DisplayedTurnIndicator) || t == typeof(DisplayedTurnIndicator?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "left":
+                    return DisplayedTurnIndicator.Left;
+                case "right":
+                    return DisplayedTurnIndicator.Right;
+            }
+            throw new Exception("Cannot unmarshal type DisplayedTurnIndicator");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (DisplayedTurnIndicator)untypedValue;
+            switch (value)
+            {
+                case DisplayedTurnIndicator.Left:
+                    serializer.Serialize(writer, "left");
+                    return;
+                case DisplayedTurnIndicator.Right:
+                    serializer.Serialize(writer, "right");
+                    return;
+            }
+            throw new Exception("Cannot marshal type DisplayedTurnIndicator");
+        }
+
+        public static readonly DisplayedTurnIndicatorConverter Singleton = new DisplayedTurnIndicatorConverter();
     }
 
     internal class BattlePreviewStateConverter : JsonConverter

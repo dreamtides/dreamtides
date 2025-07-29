@@ -1,7 +1,7 @@
 use battle_state::actions::battle_actions::BattleAction;
 use core_data::identifiers::CardName;
 use core_data::numerics::{Points, Spark};
-use display_data::battle_view::DisplayPlayer;
+use display_data::battle_view::{DisplayPlayer, DisplayedTurnIndicator};
 use display_data::command::Command;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
@@ -212,5 +212,62 @@ fn judgment_command_shows_total_score_not_points_gained() {
         judgment_command.new_score,
         Some(Points(15)),
         "judgment command should show the total new score of 15 points, not just the 5 points gained"
+    );
+}
+
+#[test]
+fn turn_indicator_displays_correct_phase() {
+    let mut s = TestBattle::builder().connect();
+    s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
+    s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+
+    assert_eq!(
+        s.user_client.me.view.as_ref().unwrap().turn_indicator,
+        Some(DisplayedTurnIndicator::Left),
+        "User should have Left indicator during main phase"
+    );
+    assert_eq!(
+        s.user_client.opponent.view.as_ref().unwrap().turn_indicator,
+        None,
+        "Enemy should have no indicator during user's turn"
+    );
+
+    s.click_primary_button(DisplayPlayer::User, "End Turn");
+
+    assert_eq!(
+        s.user_client.me.view.as_ref().unwrap().turn_indicator,
+        Some(DisplayedTurnIndicator::Right),
+        "User should have Right indicator during ending phase"
+    );
+    assert_eq!(
+        s.user_client.opponent.view.as_ref().unwrap().turn_indicator,
+        None,
+        "Enemy should have no indicator during user's turn"
+    );
+
+    s.click_primary_button(DisplayPlayer::Enemy, "Next Turn");
+
+    assert_eq!(
+        s.user_client.me.view.as_ref().unwrap().turn_indicator,
+        None,
+        "User should have no turn indicator during enemy's turn"
+    );
+    assert_eq!(
+        s.user_client.opponent.view.as_ref().unwrap().turn_indicator,
+        Some(DisplayedTurnIndicator::Left),
+        "Enemy should have Left indicator during main phase"
+    );
+
+    s.click_primary_button(DisplayPlayer::Enemy, "End Turn");
+
+    assert_eq!(
+        s.user_client.me.view.as_ref().unwrap().turn_indicator,
+        None,
+        "User should have no turn indicator during enemy's turn"
+    );
+    assert_eq!(
+        s.user_client.opponent.view.as_ref().unwrap().turn_indicator,
+        Some(DisplayedTurnIndicator::Right),
+        "Enemy should have Right indicator during ending phase"
     );
 }

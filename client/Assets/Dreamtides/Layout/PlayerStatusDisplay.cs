@@ -11,7 +11,8 @@ namespace Dreamtides.Layout
     [SerializeField] BattlefieldNumber _energy = null!;
     [SerializeField] BattlefieldNumber _score = null!;
     [SerializeField] BattlefieldNumber _totalSpark = null!;
-    [SerializeField] GameObject _turnIndicator = null!;
+    [SerializeField] GameObject _leftTurnIndicator = null!;
+    [SerializeField] GameObject _rightTurnIndicator = null!;
     [SerializeField] Material _imminentVictorySparkBackgroundMaterial = null!;
     [SerializeField] GameObject _imminentVictoryIndicator = null!;
     [SerializeField] MeshRenderer _characterImage = null!;
@@ -39,7 +40,8 @@ namespace Dreamtides.Layout
       SetEnergy(playerView.Energy, playerView.ProducedEnergy, animate);
       SetTotalSpark(playerView.TotalSpark, animate);
       SetScore(playerView.Score, animate);
-      _turnIndicator.SetActive(playerView.IsCurrentTurn);
+      _leftTurnIndicator.SetActive(playerView.TurnIndicator == DisplayedTurnIndicator.Left);
+      _rightTurnIndicator.SetActive(playerView.TurnIndicator == DisplayedTurnIndicator.Right);
       _sparkBackgroundRenderer.material = playerView.IsVictoryImminent ?
           _imminentVictorySparkBackgroundMaterial :
           _sparkBackgroundMaterial;

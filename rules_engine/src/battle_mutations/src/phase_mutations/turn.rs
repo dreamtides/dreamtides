@@ -31,6 +31,7 @@ pub fn start_turn(battle: &mut BattleState, player: PlayerName) {
     battle_trace!("Starting turn for", battle, player);
     battle.activated_abilities.player_mut(player).activated_this_turn_cycle.clear();
     battle.turn.active_player = player;
+    battle.phase = BattleTurnPhase::Starting;
     battle.turn.turn_id += TurnId(1);
     if battle.turn.turn_id > TurnId(50) {
         // If the battle has lasted more than 50 turns (25 per player), it is a
