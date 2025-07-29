@@ -76,7 +76,6 @@ pub enum Command {
     DisplayJudgment(DisplayJudgmentCommand),
     DisplayDreamwellActivation(DisplayDreamwellActivationCommand),
     DisplayEnemyMessage(DisplayEnemyMessageCommand),
-    ToggleThinkingIndicator(ToggleThinkingIndicatorCommand),
     PlayStudioAnimation(PlayStudioAnimationCommand),
 }
 
@@ -266,12 +265,6 @@ pub enum ArrowStyle {
 pub struct DisplayEnemyMessageCommand {
     pub message: String,
     pub show_duration: Milliseconds,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct ToggleThinkingIndicatorCommand {
-    pub show: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

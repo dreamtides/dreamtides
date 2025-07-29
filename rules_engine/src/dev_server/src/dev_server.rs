@@ -98,7 +98,7 @@ async fn poll(body: String) -> AppResult<Json<PollResponse>> {
         None => Ok(Json(PollResponse {
             metadata: req.metadata,
             commands: None,
-            response_type: PollResponseType::Final,
+            response_type: PollResponseType::None,
             response_version: None,
         })),
     }

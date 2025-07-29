@@ -47,9 +47,21 @@ namespace Dreamtides.Services
 
     public bool Connected { get; private set; }
 
+    /// <summary>
+    /// The time of the last action performed by the user.
+    /// </summary>
     public float LastActionTime => _lastActionTime;
 
+    /// <summary>
+    /// Whether the action service is currently processing rules engine
+    /// commands.
+    /// </summary>
     public bool IsProcessingCommands => _isProcessingCommands;
+
+    /// <summary>
+    /// Whether the last poll response was an 'incremental' response.
+    /// </summary>
+    public bool LastResponseIncremental { get; private set; }
 
     /// <summary>
     /// Returns the Request ID of the last request for which a 'final' poll
@@ -265,6 +277,15 @@ namespace Dreamtides.Services
       if (response.Metadata?.RequestId != null && response.ResponseType == PollResponseType.Final)
       {
         LastResponseReceived = response.Metadata.RequestId;
+      }
+
+      if (response.ResponseType == PollResponseType.Incremental)
+      {
+        LastResponseIncremental = true;
+      }
+      else if (response.ResponseType == PollResponseType.Final)
+      {
+        LastResponseIncremental = false;
       }
 
       if (response.Commands?.Groups.Count > 0)
@@ -543,13 +564,6 @@ namespace Dreamtides.Services
           Registry.Layout.EnemyMessage.Show(command.DisplayEnemyMessage);
         }
 
-        if (command.ToggleThinkingIndicator != null)
-        {
-          Registry.LoggingService.Log("ActionService", "Applying command: ToggleThinkingIndicator",
-            ("show", command.ToggleThinkingIndicator.Show.ToString()));
-          Registry.Layout.ThinkingIndicator.SetActive(command.ToggleThinkingIndicator.Show);
-        }
-
         if (command.PlayAudioClip != null)
         {
           Registry.LoggingService.Log("ActionService", "Applying command: PlayAudioClip");
@@ -596,7 +610,6 @@ namespace Dreamtides.Services
           if (command.DisplayJudgment != null) commandNames.Add("DisplayJudgment");
           if (command.DisplayDreamwellActivation != null) commandNames.Add("DisplayDreamwellActivation");
           if (command.DisplayEnemyMessage != null) commandNames.Add("DisplayEnemyMessage");
-          if (command.ToggleThinkingIndicator != null) commandNames.Add("ToggleThinkingIndicator");
           if (command.PlayAudioClip != null) commandNames.Add("PlayAudioClip");
         }
       }

@@ -261,9 +261,6 @@ namespace Dreamtides.Schema
         [JsonProperty("displayEnemyMessage", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayEnemyMessageCommand DisplayEnemyMessage { get; set; }
 
-        [JsonProperty("toggleThinkingIndicator", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public ToggleThinkingIndicatorCommand ToggleThinkingIndicator { get; set; }
-
         [JsonProperty("playStudioAnimation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayStudioAnimationCommand PlayStudioAnimation { get; set; }
     }
@@ -1895,12 +1892,6 @@ namespace Dreamtides.Schema
         public string Name { get; set; }
     }
 
-    public partial class ToggleThinkingIndicatorCommand
-    {
-        [JsonProperty("show", Required = Required.Always)]
-        public bool Show { get; set; }
-    }
-
     public partial class UpdateBattleCommand
     {
         /// <summary>
@@ -2395,7 +2386,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum BattlePreviewStateEnum { None, Pending };
 
-    public enum PollResponseType { Final, Incremental };
+    public enum PollResponseType { Final, Incremental, None };
 
     public partial struct GameAi
     {
@@ -5557,6 +5548,8 @@ namespace Dreamtides.Schema
                     return PollResponseType.Final;
                 case "incremental":
                     return PollResponseType.Incremental;
+                case "none":
+                    return PollResponseType.None;
             }
             throw new Exception("Cannot unmarshal type PollResponseType");
         }
@@ -5576,6 +5569,9 @@ namespace Dreamtides.Schema
                     return;
                 case PollResponseType.Incremental:
                     serializer.Serialize(writer, "incremental");
+                    return;
+                case PollResponseType.None:
+                    serializer.Serialize(writer, "none");
                     return;
             }
             throw new Exception("Cannot marshal type PollResponseType");

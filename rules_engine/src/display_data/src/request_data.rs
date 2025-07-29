@@ -105,6 +105,7 @@ pub struct PollRequest {
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "camelCase")]
 pub enum PollResponseType {
+    None,
     Incremental,
     Final,
 }

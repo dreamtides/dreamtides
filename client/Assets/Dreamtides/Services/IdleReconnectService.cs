@@ -26,6 +26,9 @@ namespace Dreamtides.Services
         return;
       }
 
+      var thinking = !Registry.ActionService.IsProcessingCommands && Registry.ActionService.LastResponseIncremental;
+      Registry.Layout.ThinkingIndicator.SetActive(thinking);
+
       var currentTime = Time.time;
       var hasActivity = Registry.ActionService.IsProcessingCommands ||
                        Registry.InputService.IsPointerPressed() ||

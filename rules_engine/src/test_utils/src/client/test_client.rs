@@ -99,7 +99,6 @@ impl TestClient {
                         }
                     },
                     Command::DisplayEnemyMessage(_) => {}
-                    Command::ToggleThinkingIndicator(_) => {}
                     Command::PlayStudioAnimation(_) => {}
                 }
             }
