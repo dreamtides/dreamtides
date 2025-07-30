@@ -1,3 +1,4 @@
+use std::cmp;
 use std::f64::consts;
 
 use battle_mutations::actions::apply_battle_action;
@@ -58,6 +59,12 @@ pub fn search(
     config: &UctConfig,
 ) -> BattleAction {
     let legal = legal_actions::compute(initial_battle, player).all();
+    let iterations_per_action = if legal.is_empty() {
+        config.max_iterations_per_action
+    } else {
+        let max_per_action = (config.max_total_iterations as f64 / legal.len() as f64) as u32;
+        cmp::min(max_per_action, config.max_iterations_per_action)
+    };
     let action_results: Vec<_> = legal
         .par_iter()
         .with_min_len(if config.single_threaded { usize::MAX } else { 1 })
@@ -72,7 +79,7 @@ pub fn search(
                     tried: Vec::new(),
                 });
 
-                for _ in 0..config.max_iterations_per_action {
+                for _ in 0..iterations_per_action {
                     // Use a different random state every time. Doing this less
                     // frequently does improve performance, but also pretty
                     // consistently reduces play skill.
@@ -105,7 +112,7 @@ pub fn search(
     };
 
     let action = best_result.action;
-    let total_iterations = config.max_iterations_per_action * legal.len() as u32;
+    let total_iterations = iterations_per_action * legal.len() as u32;
     let num_threads = rayon::current_num_threads();
 
     debug!(?total_iterations, ?action, ?num_threads, "Picked AI action");
