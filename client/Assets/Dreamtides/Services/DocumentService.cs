@@ -1,6 +1,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Linq;
 using Dreamtides.Layout;
 using Dreamtides.Masonry;
 using Dreamtides.Schema;
@@ -27,14 +28,23 @@ namespace Dreamtides.Services
       AddChild("ScreenOverlay", out _screenOverlay);
     }
 
-    public bool IsAnyPanelOpen()
-    {
-      return false;
-    }
-
     public bool IsPointerOverScreenElement()
     {
       return EventSystem.current.IsPointerOverGameObject();
+    }
+
+    public bool MouseOverDocumentElement()
+    {
+      foreach (var node in _screenOverlay.Self.Children())
+      {
+        var pointer = ScreenPositionToElementPosition(Registry.InputService.PointerPosition());
+        if (node.ContainsPoint(pointer))
+        {
+          return true;
+        }
+      }
+
+      return false;
     }
 
     /// <summary>
@@ -57,8 +67,14 @@ namespace Dreamtides.Services
       return null;
     }
 
+    /// <summary>
+    /// Scales a value in screen pixels to a value in element pixels.
+    /// </summary>
     public float ScreenPxToElementPx(float value)
     {
+      /// Dreamtides uses a 'scale with screen size' UI rendering system, with a
+      /// reference resolution of 225x400 (16:9) and the matching mode set to
+      /// 'height'.
       return value * (400f / Screen.height);
     }
 

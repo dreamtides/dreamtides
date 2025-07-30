@@ -91,8 +91,16 @@ namespace Dreamtides.Services
       InputProvider = new UnityInputProvider(Registry);
     }
 
+    /// <summary>
+    /// Returns the current or last-known screen position of the mouse, pointing
+    /// device, or finger contacting the touch screen in screen coordinates.
+    /// </summary>
     public Vector2 PointerPosition() => InputProvider.PointerPosition();
 
+    /// <summary>
+    /// Returns true if the mouse, pointing device, or a finger is currently
+    /// pressed down.
+    /// </summary>
     public bool IsPointerPressed() => InputProvider.IsPointerPressed();
 
     public Vector3 WorldPointerPosition(float screenZ)
@@ -159,8 +167,7 @@ namespace Dreamtides.Services
 
     Displayable? FireClick()
     {
-      if (Registry.DocumentService.IsAnyPanelOpen() ||
-          Registry.DocumentService.IsPointerOverScreenElement())
+      if (Registry.DocumentService.MouseOverDocumentElement())
       {
         return null;
       }

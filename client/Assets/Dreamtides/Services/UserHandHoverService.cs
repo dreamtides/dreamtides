@@ -44,12 +44,11 @@ namespace Dreamtides.Services
 
     protected override void OnUpdate()
     {
-      if (_isTest)
-      {
-        return;
-      }
-
-      if (Registry.IsMobileDevice)
+      if (
+          _isTest ||
+          Registry.IsMobileDevice ||
+          Registry.DocumentService.MouseOverDocumentElement()
+        )
       {
         return;
       }
