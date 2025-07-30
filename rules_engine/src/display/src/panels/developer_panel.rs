@@ -65,6 +65,12 @@ impl Component for DeveloperPanel {
                         )
                         .child(
                             DebugButton::builder()
+                                .label("Opponent Continue")
+                                .action(BattleAction::Debug(DebugBattleAction::OpponentContinue))
+                                .build(),
+                        )
+                        .child(
+                            DebugButton::builder()
                                 .label("Draw Card")
                                 .action(BattleAction::Debug(DebugBattleAction::DrawCard {
                                     player: self.user_player,

@@ -841,7 +841,7 @@ namespace Dreamtides.Schema
     public partial class BattleActionClass
     {
         [JsonProperty("debug", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DebugBattleAction Debug { get; set; }
+        public DebugBattleAction? Debug { get; set; }
 
         [JsonProperty("playCardFromHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? PlayCardFromHand { get; set; }
@@ -908,9 +908,9 @@ namespace Dreamtides.Schema
     /// Set the number of cards remaining in a player's deck. All other cards
     /// are moved to the void.
     ///
-    /// Play a card for the opponent, with random prompt choices
+    /// Play a card for the opponent, with prompt choices
     /// </summary>
-    public partial class DebugBattleAction
+    public partial class DebugBattleActionClass
     {
         [JsonProperty("drawCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DrawCard DrawCard { get; set; }
@@ -1099,7 +1099,7 @@ namespace Dreamtides.Schema
         public List<DebugBattleAction> ApplyActionList { get; set; }
 
         [JsonProperty("closeCurrentPanelApplyAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DebugBattleAction CloseCurrentPanelApplyAction { get; set; }
+        public DebugBattleAction? CloseCurrentPanelApplyAction { get; set; }
 
         [JsonProperty("performOpponentAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public BattleAction? PerformOpponentAction { get; set; }
@@ -2303,6 +2303,11 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitDeckCardOrder, SubmitMulligan, SubmitVoidCardTargets };
 
+    /// <summary>
+    /// Cause the opponent to take a 'continue' legal action
+    /// </summary>
+    public enum DebugBattleActionEnum { OpponentContinue };
+
     public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCard, TestCounterspell, TestCounterspellCharacter, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDrawOneReclaim, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestForeseeOneDrawACard, TestForeseeOneDrawReclaim, TestForeseeOneReclaim, TestForeseeTwo, TestModalDrawOneOrDissolveEnemy, TestModalDrawOneOrDrawTwo, TestModalReturnToHandOrDrawTwo, TestMultiActivatedAbilityDrawCardCharacter, TestNamedDissolve, TestPreventDissolveThisTurn, TestReturnOneOrTwoVoidEventCardsToHand, TestReturnToHand, TestReturnVoidCardToHand, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestTriggerGainTwoSparkOnPlayCardEnemyTurn, TestVanillaCharacter, TestVariableEnergyDraw };
 
     /// <summary>
@@ -2409,6 +2414,15 @@ namespace Dreamtides.Schema
 
         public static implicit operator Position(PositionEnum Enum) => new Position { Enum = Enum };
         public static implicit operator Position(PositionClass PositionClass) => new Position { PositionClass = PositionClass };
+    }
+
+    public partial struct DebugBattleAction
+    {
+        public DebugBattleActionClass DebugBattleActionClass;
+        public DebugBattleActionEnum? Enum;
+
+        public static implicit operator DebugBattleAction(DebugBattleActionClass DebugBattleActionClass) => new DebugBattleAction { DebugBattleActionClass = DebugBattleActionClass };
+        public static implicit operator DebugBattleAction(DebugBattleActionEnum Enum) => new DebugBattleAction { Enum = Enum };
     }
 
     public partial struct PlayCardFromVoid
@@ -2541,8 +2555,10 @@ namespace Dreamtides.Schema
                 CardPrefabConverter.Singleton,
                 ActionUnionConverter.Singleton,
                 BattleActionConverter.Singleton,
+                DebugBattleActionConverter.Singleton,
                 CardNameConverter.Singleton,
                 PlayerNameConverter.Singleton,
+                DebugBattleActionEnumConverter.Singleton,
                 PlayCardFromVoidConverter.Singleton,
                 CardOrderSelectionTargetConverter.Singleton,
                 CardOrderSelectionTargetEnumConverter.Singleton,
@@ -3385,6 +3401,51 @@ namespace Dreamtides.Schema
         public static readonly BattleActionConverter Singleton = new BattleActionConverter();
     }
 
+    internal class DebugBattleActionConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(DebugBattleAction) || t == typeof(DebugBattleAction?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            switch (reader.TokenType)
+            {
+                case JsonToken.String:
+                case JsonToken.Date:
+                    var stringValue = serializer.Deserialize<string>(reader);
+                    if (stringValue == "opponentContinue")
+                    {
+                        return new DebugBattleAction { Enum = DebugBattleActionEnum.OpponentContinue };
+                    }
+                    break;
+                case JsonToken.StartObject:
+                    var objectValue = serializer.Deserialize<DebugBattleActionClass>(reader);
+                    return new DebugBattleAction { DebugBattleActionClass = objectValue };
+            }
+            throw new Exception("Cannot unmarshal type DebugBattleAction");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            var value = (DebugBattleAction)untypedValue;
+            if (value.Enum != null)
+            {
+                if (value.Enum == DebugBattleActionEnum.OpponentContinue)
+                {
+                    serializer.Serialize(writer, "opponentContinue");
+                    return;
+                }
+            }
+            if (value.DebugBattleActionClass != null)
+            {
+                serializer.Serialize(writer, value.DebugBattleActionClass);
+                return;
+            }
+            throw new Exception("Cannot marshal type DebugBattleAction");
+        }
+
+        public static readonly DebugBattleActionConverter Singleton = new DebugBattleActionConverter();
+    }
+
     internal class CardNameConverter : JsonConverter
     {
         public override bool CanConvert(Type t) => t == typeof(CardName) || t == typeof(CardName?);
@@ -3605,6 +3666,40 @@ namespace Dreamtides.Schema
         }
 
         public static readonly PlayerNameConverter Singleton = new PlayerNameConverter();
+    }
+
+    internal class DebugBattleActionEnumConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(DebugBattleActionEnum) || t == typeof(DebugBattleActionEnum?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            if (value == "opponentContinue")
+            {
+                return DebugBattleActionEnum.OpponentContinue;
+            }
+            throw new Exception("Cannot unmarshal type DebugBattleActionEnum");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (DebugBattleActionEnum)untypedValue;
+            if (value == DebugBattleActionEnum.OpponentContinue)
+            {
+                serializer.Serialize(writer, "opponentContinue");
+                return;
+            }
+            throw new Exception("Cannot marshal type DebugBattleActionEnum");
+        }
+
+        public static readonly DebugBattleActionEnumConverter Singleton = new DebugBattleActionEnumConverter();
     }
 
     internal class PlayCardFromVoidConverter : JsonConverter

@@ -57,11 +57,17 @@ namespace Dreamtides.TestUtils
     {
       _actions.Add(new DebugBattleAction
       {
-        MoveHandToDeck = new MoveHandToDeck { Player = PlayerName.One }
+        DebugBattleActionClass = new DebugBattleActionClass
+        {
+          MoveHandToDeck = new MoveHandToDeck { Player = PlayerName.One }
+        }
       });
       _actions.Add(new DebugBattleAction
       {
-        MoveHandToDeck = new MoveHandToDeck { Player = PlayerName.Two }
+        DebugBattleActionClass = new DebugBattleActionClass
+        {
+          MoveHandToDeck = new MoveHandToDeck { Player = PlayerName.Two }
+        }
       });
       return this;
     }
@@ -71,7 +77,10 @@ namespace Dreamtides.TestUtils
       var name = GetPlayerName(player);
       _actions.Add(new DebugBattleAction
       {
-        SetEnergy = new SetEnergy { Player = name, Energy = energy }
+        DebugBattleActionClass = new DebugBattleActionClass
+        {
+          SetEnergy = new SetEnergy { Player = name, Energy = energy }
+        }
       });
       return this;
     }
@@ -81,7 +90,10 @@ namespace Dreamtides.TestUtils
       var name = GetPlayerName(player);
       _actions.Add(new DebugBattleAction
       {
-        SetPoints = new SetPoints { Player = name, Points = points }
+        DebugBattleActionClass = new DebugBattleActionClass
+        {
+          SetPoints = new SetPoints { Player = name, Points = points }
+        }
       });
       return this;
     }
@@ -100,10 +112,13 @@ namespace Dreamtides.TestUtils
       var name = GetPlayerName(player);
       _actions.Add(new DebugBattleAction
       {
-        AddCardToHand = new AddCardToHand
+        DebugBattleActionClass = new DebugBattleActionClass
         {
-          Card = cardName,
-          Player = name,
+          AddCardToHand = new AddCardToHand
+          {
+            Card = cardName,
+            Player = name,
+          }
         }
       });
       return this;
@@ -126,10 +141,13 @@ namespace Dreamtides.TestUtils
       var name = GetPlayerName(player);
       _actions.Add(new DebugBattleAction
       {
-        AddCardToBattlefield = new AddCardToBattlefield
+        DebugBattleActionClass = new DebugBattleActionClass
         {
-          Card = cardName,
-          Player = name,
+          AddCardToBattlefield = new AddCardToBattlefield
+          {
+            Card = cardName,
+            Player = name,
+          }
         }
       });
       return this;
@@ -149,10 +167,13 @@ namespace Dreamtides.TestUtils
       var name = GetPlayerName(player);
       _actions.Add(new DebugBattleAction
       {
-        AddCardToVoid = new AddCardToVoid
+        DebugBattleActionClass = new DebugBattleActionClass
         {
-          Card = CardName.TestVanillaCharacter,
-          Player = name,
+          AddCardToVoid = new AddCardToVoid
+          {
+            Card = CardName.TestVanillaCharacter,
+            Player = name,
+          }
         }
       });
       return this;

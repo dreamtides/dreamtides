@@ -113,16 +113,11 @@ namespace Dreamtides.Utils
 
                 if (actionClass.Debug != null)
                 {
-                    return GetDebugBattleActionName(actionClass.Debug);
+                    return "DebugBattleAction";
                 }
             }
 
             return "UnknownBattleAction";
-        }
-
-        private static string GetDebugBattleActionName(DebugBattleAction debugBattleAction)
-        {
-            return "DebugBattleAction";
         }
 
         private static string GetBattleDisplayActionName(BattleDisplayAction battleDisplayAction)

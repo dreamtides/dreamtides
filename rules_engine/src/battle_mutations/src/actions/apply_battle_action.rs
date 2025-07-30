@@ -24,7 +24,7 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
         }
     }
 
-    execute_internal(battle, player, action);
+    execute_without_tracking_history(battle, player, action);
 
     battle.push_history_action(player, action);
 }
@@ -32,7 +32,11 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: BattleActio
 /// Applies the given action to the battle state.
 ///
 /// Does not check legality or add to the action history.
-pub fn execute_internal(battle: &mut BattleState, player: PlayerName, action: BattleAction) {
+pub fn execute_without_tracking_history(
+    battle: &mut BattleState,
+    player: PlayerName,
+    action: BattleAction,
+) {
     battle.turn_history.clear_current_action_history();
 
     match action {

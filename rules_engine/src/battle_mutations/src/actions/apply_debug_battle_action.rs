@@ -1,5 +1,6 @@
 use battle_queries::battle_trace;
 use battle_queries::legal_action_queries::legal_actions;
+use battle_queries::legal_action_queries::legal_actions_data::{LegalActions, PrimaryLegalAction};
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
 use battle_state::battle::battle_state::BattleState;
@@ -63,12 +64,21 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
         }
         DebugBattleAction::OpponentPlayCard { card: card_name } => {
             let card_id = add_to_hand(battle, player.opponent(), source, card_name);
-            apply_battle_action::execute_internal(
+            apply_battle_action::execute_without_tracking_history(
                 battle,
                 player.opponent(),
                 BattleAction::PlayCardFromHand(card_id),
             );
-            make_random_prompt_choices(battle, player.opponent());
+            make_prompt_choices(battle, player.opponent());
+        }
+        DebugBattleAction::OpponentContinue => {
+            let legal = legal_actions::compute(battle, player.opponent());
+            let action = get_continue_action(&legal);
+            apply_battle_action::execute_without_tracking_history(
+                battle,
+                player.opponent(),
+                action,
+            );
         }
     }
 }
@@ -85,14 +95,26 @@ fn add_to_hand(
     move_card::from_deck_to_hand(battle, source, player, new_card_id)
 }
 
-fn make_random_prompt_choices(battle: &mut BattleState, opponent: PlayerName) {
+fn get_continue_action(actions: &LegalActions) -> BattleAction {
+    let LegalActions::Standard { actions } = actions else {
+        panic!("Expected standard legal actions");
+    };
+    match actions.primary {
+        PrimaryLegalAction::PassPriority => BattleAction::PassPriority,
+        PrimaryLegalAction::EndTurn => BattleAction::EndTurn,
+        PrimaryLegalAction::StartNextTurn => BattleAction::StartNextTurn,
+    }
+}
+
+fn make_prompt_choices(battle: &mut BattleState, opponent: PlayerName) {
     while let Some(current_prompt) = battle.prompts.front()
         && current_prompt.player == opponent
     {
         let legal = legal_actions::compute(battle, current_prompt.player);
-        let Some(random) = legal.random_action() else {
+        let all_actions = legal.all();
+        let Some(random) = all_actions.first() else {
             break;
         };
-        apply_battle_action::execute_internal(battle, opponent, random);
+        apply_battle_action::execute_without_tracking_history(battle, opponent, *random);
     }
 }

@@ -243,7 +243,7 @@ fn void_card_shows_above_void_position_when_targeted() {
 
     // Verify there's a card on the stack with targets
     assert!(
-        s.user_client.cards.stack_cards().len() > 0,
+        !s.user_client.cards.stack_cards().is_empty(),
         "There should be a card on the stack with targets set"
     );
 

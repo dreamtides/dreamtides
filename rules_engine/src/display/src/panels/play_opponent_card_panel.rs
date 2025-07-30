@@ -63,6 +63,11 @@ impl Component for PlayOpponentCardPanel<'_> {
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
+                                        .card(CardName::TestReturnOneOrTwoVoidEventCardsToHand)
+                                        .build(),
+                                )
+                                .child(
+                                    PlayOpponentCardCell::builder()
                                         .card(CardName::TestCounterspell)
                                         .build(),
                                 )
