@@ -1,6 +1,7 @@
 #nullable enable
 
 using Dreamtides.Layout;
+using Dreamtides.Schema;
 
 namespace Dreamtides.Services
 {
@@ -18,7 +19,7 @@ namespace Dreamtides.Services
     /// Can the user currently info zoom a card that exists in the provided
     /// GameContext to display a large format version of the card.
     /// </summary>
-    public bool CanInfoZoom(GameContext gameContext)
+    public bool CanInfoZoom(GameContext gameContext, Position position)
     {
       if (Registry.DocumentService.IsAnyPanelOpen())
       {
@@ -36,6 +37,8 @@ namespace Dreamtides.Services
         case GameContext.Stack:
         case GameContext.GameModifiers:
           return !AnyBrowserOpen();
+        case GameContext.Hand:
+          return position.PositionClass?.InHand == DisplayPlayer.Enemy;
         default:
           return false;
       }

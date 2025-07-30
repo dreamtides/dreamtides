@@ -351,15 +351,18 @@ namespace Dreamtides.Components
 
       if (_registry.IsMobileDevice &&
         GameContext == GameContext.Hand &&
+        CardView.Position.Position.PositionClass?.InHand == DisplayPlayer.User &&
         !_registry.CapabilitiesService.AnyBrowserOpen())
       {
-        // Jump to large size when in hand
+        // Jump to large size when in user hand on mobile
         transform.position = MobileHandCardJumpPosition();
         transform.rotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0);
         _registry.CardService.DisplayInfoZoom(this, forCardInHand: true);
       }
-      else if (!_registry.IsMobileDevice &&
+      else if (
+        !_registry.IsMobileDevice &&
         GameContext == GameContext.Hand &&
+        CardView.Position.Position.PositionClass?.InHand == DisplayPlayer.User &&
         !_registry.CapabilitiesService.AnyBrowserOpen())
       {
         var jumpPosition = _registry.UserHandHoverService.CalculateJumpPosition(this);
@@ -370,7 +373,10 @@ namespace Dreamtides.Components
         }
         _registry.CardService.DisplayInfoZoom(this, forCardInHand: true);
       }
-      else if (_registry.CapabilitiesService.CanInfoZoom(GameContext) && !_draggedToClearThreshold)
+      else if (
+          _registry.CapabilitiesService.CanInfoZoom(GameContext, CardView.Position.Position) &&
+          CardView.Revealed != null &&
+          !_draggedToClearThreshold)
       {
         _registry.CardService.DisplayInfoZoom(this, forCardInHand: false);
       }
@@ -506,8 +512,7 @@ namespace Dreamtides.Components
 
     public override void MouseHoverStart()
     {
-      if (_registry.CapabilitiesService.CanInfoZoom(GameContext) &&
-        GameContext != GameContext.Hand &&
+      if (_registry.CapabilitiesService.CanInfoZoom(GameContext, CardView.Position.Position) &&
         GameContext != GameContext.Hovering)
       {
         _hoverStartTime = Time.time;
