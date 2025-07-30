@@ -706,3 +706,42 @@ fn dual_activated_abilities_different_costs() {
     assert!(s.user_client.cards.card_map.get(&token1_id).is_none(), "first ability used");
     assert!(s.user_client.cards.card_map.get(&token2_id).is_none(), "second ability used");
 }
+
+#[test]
+fn activate_ability_token_not_available_when_already_on_stack() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    let character_id =
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCard);
+
+    s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+
+    assert_eq!(s.user_client.cards.user_hand().len(), 1, "activated ability token in hand");
+
+    let token_card_id = format!("A{character_id}/0");
+    assert!(
+        s.user_client.cards.card_map.contains_key(&token_card_id),
+        "ability token should be in hand initially"
+    );
+
+    s.activate_ability(DisplayPlayer::User, &character_id, 0);
+
+    assert_eq!(s.user_client.cards.stack_cards().len(), 1, "ability is on the stack");
+    assert_eq!(s.user_client.cards.user_hand().len(), 0, "ability token removed from hand");
+
+    let token_card_after_activation = s.user_client.cards.card_map.get(&token_card_id);
+    if let Some(card) = token_card_after_activation {
+        assert!(
+            card.view.revealed.as_ref().unwrap().actions.can_play.is_none(),
+            "ability token should not be playable when ability is already on stack"
+        );
+    }
+
+    s.perform_enemy_action(BattleAction::PassPriority);
+
+    assert_eq!(s.user_client.cards.stack_cards().len(), 0, "ability resolved");
+    assert_eq!(s.user_client.cards.user_hand().len(), 1, "drew card from ability");
+}

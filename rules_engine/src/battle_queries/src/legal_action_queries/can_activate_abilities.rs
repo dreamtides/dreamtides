@@ -51,6 +51,10 @@ pub fn for_player(
                 continue;
             }
 
+            if battle.cards.activated_ability_object_id(activated_ability_id).is_some() {
+                continue;
+            }
+
             // TODO: Check targeting restrictions.
 
             activatable_abilities.push(activated_ability_id);
