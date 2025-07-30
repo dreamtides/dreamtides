@@ -100,7 +100,6 @@ pub struct BattleState {
 #[derive(
     Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub struct PendingEffectIndex(pub usize);
 
 /// Information about effects that are waiting to be applied.
@@ -121,13 +120,11 @@ pub struct PendingEffect {
 
 /// Information about why & how we are currently running the rules engine.
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct RequestContext {
     pub logging_options: LoggingOptions,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct LoggingOptions {
     /// If specified, the directory to write logs to.
     pub log_directory: Option<PathBuf>,

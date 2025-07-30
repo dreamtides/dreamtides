@@ -35,7 +35,6 @@ pub struct StaticAbilityWithOptions {
 
 /// Basic static abilities
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub enum StandardStaticAbility {
     CardsInYourVoidHaveReclaim { matching: CardPredicate },
     CharactersInHandHaveFast,
@@ -58,7 +57,6 @@ pub enum StandardStaticAbility {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct PlayFromVoid {
     /// The energy cost of playing this card from the void.
     ///
@@ -75,7 +73,6 @@ pub struct PlayFromVoid {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct AlternateCost {
     pub energy_cost: Energy,
     pub additional_cost: Option<Cost>,

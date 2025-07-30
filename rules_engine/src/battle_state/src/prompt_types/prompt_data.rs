@@ -15,7 +15,6 @@ use crate::core::effect_source::EffectSource;
 #[derive(
     Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub enum OnSelected {
     AddStackTargets(StackItemId),
     AddPendingEffectTarget(PendingEffectIndex),

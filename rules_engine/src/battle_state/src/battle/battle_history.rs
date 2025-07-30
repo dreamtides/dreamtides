@@ -10,7 +10,6 @@ pub struct BattleHistory {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct BattleHistoryAction {
     pub player: PlayerName,
     pub action: BattleAction,

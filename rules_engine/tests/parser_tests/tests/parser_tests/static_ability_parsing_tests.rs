@@ -8,8 +8,8 @@ fn test_enemy_events_cost_more_to_play() {
     result,
     @r###"
     [
-      static(StaticAbility(enemyCardsCostIncrease(
-        matching: event,
+      Static(StaticAbility(EnemyCardsCostIncrease(
+        matching: Event,
         increase: Energy(1),
       ))),
     ]
@@ -23,10 +23,10 @@ fn test_once_per_turn_play_2_or_less_from_void() {
         parse("Once per turn, you may play a character with cost $2 or less from your void.");
     assert_ron_snapshot!(result, @r###"
     [
-      static(StaticAbility(oncePerTurnPlayFromVoid(
-        matching: cardWithCost(
-          target: character,
-          cost_operator: orLess,
+      Static(StaticAbility(OncePerTurnPlayFromVoid(
+        matching: CardWithCost(
+          target: Character,
+          cost_operator: OrLess,
           cost: Energy(2),
         ),
       ))),
@@ -41,10 +41,10 @@ fn test_play_from_void_by_banishing() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      static(StaticAbility(playFromVoid(PlayFromVoid(
-        energyCost: Some(Energy(2)),
-        additionalCost: Some(banishCardsFromYourVoid(1)),
-        ifYouDo: None,
+      Static(StaticAbility(PlayFromVoid(PlayFromVoid(
+        energy_cost: Some(Energy(2)),
+        additional_cost: Some(BanishCardsFromYourVoid(1)),
+        if_you_do: None,
       )))),
     ]
     "###);
@@ -55,10 +55,10 @@ fn test_play_event_from_void() {
     let result = parse("You may play this event from your void for $0 by abandoning a character.");
     assert_ron_snapshot!(result, @r###"
     [
-      static(StaticAbility(playFromVoid(PlayFromVoid(
-        energyCost: Some(Energy(0)),
-        additionalCost: Some(abandonCharacters(your(character), 1)),
-        ifYouDo: None,
+      Static(StaticAbility(PlayFromVoid(PlayFromVoid(
+        energy_cost: Some(Energy(0)),
+        additional_cost: Some(AbandonCharacters(Your(Character), 1)),
+        if_you_do: None,
       )))),
     ]
     "###);
@@ -71,7 +71,7 @@ fn test_disable_enemy_materialized_abilities() {
         result,
         @r###"
     [
-      static(StaticAbility(disableEnemyMaterializedAbilities)),
+      Static(StaticAbility(DisableEnemyMaterializedAbilities)),
     ]
     "###
     );
@@ -84,7 +84,7 @@ fn test_disable_enemy_materialized_abilities_alternate() {
         result,
         @r###"
     [
-      static(StaticAbility(disableEnemyMaterializedAbilities)),
+      Static(StaticAbility(DisableEnemyMaterializedAbilities)),
     ]
     "###
     );
@@ -97,8 +97,8 @@ fn test_other_warriors_spark_bonus() {
         result,
         @r###"
     [
-      static(StaticAbility(sparkBonusOtherCharacters(
-        matching: characterType(warrior),
+      Static(StaticAbility(SparkBonusOtherCharacters(
+        matching: CharacterType(Warrior),
         added_spark: Spark(1),
       ))),
     ]
@@ -113,7 +113,7 @@ fn test_has_all_character_types() {
         result,
         @r###"
     [
-      static(StaticAbility(hasAllCharacterTypes)),
+      Static(StaticAbility(HasAllCharacterTypes)),
     ]
     "###
     );
@@ -126,8 +126,8 @@ fn test_character_cost_reduction() {
         result,
         @r###"
     [
-      static(StaticAbility(yourCardsCostReduction(
-        matching: character,
+      Static(StaticAbility(YourCardsCostReduction(
+        matching: Character,
         reduction: Energy(2),
       ))),
     ]
@@ -143,9 +143,9 @@ fn test_cost_reduction_for_each_dissolved() {
         result,
         @r###"
     [
-      static(StaticAbility(costReductionForEach(
+      Static(StaticAbility(CostReductionForEach(
         reduction: Energy(1),
-        quantity: dissolvedThisTurn(character),
+        quantity: DissolvedThisTurn(Character),
       ))),
     ]
     "###
@@ -159,8 +159,8 @@ fn test_cost_increase() {
         result,
         @r###"
     [
-      static(StaticAbility(yourCardsCostIncrease(
-        matching: event,
+      Static(StaticAbility(YourCardsCostIncrease(
+        matching: Event,
         reduction: Energy(2),
       ))),
     ]
@@ -174,10 +174,10 @@ fn test_abandon_characters_cost() {
         parse("You may play this character from your void for $0 by abandoning 2 characters.");
     assert_ron_snapshot!(result, @r###"
     [
-      static(StaticAbility(playFromVoid(PlayFromVoid(
-        energyCost: Some(Energy(0)),
-        additionalCost: Some(abandonCharacters(your(character), 2)),
-        ifYouDo: None,
+      Static(StaticAbility(PlayFromVoid(PlayFromVoid(
+        energy_cost: Some(Energy(0)),
+        additional_cost: Some(AbandonCharacters(Your(Character), 2)),
+        if_you_do: None,
       )))),
     ]
     "###);
@@ -190,13 +190,13 @@ fn test_play_from_void_with_void_count() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      static(WithOptions(StaticAbilityWithOptions(
-        ability: playFromVoid(PlayFromVoid(
-          energyCost: Some(Energy(0)),
-          additionalCost: Some(banishAllCardsFromYourVoid),
-          ifYouDo: None,
+      Static(WithOptions(StaticAbilityWithOptions(
+        ability: PlayFromVoid(PlayFromVoid(
+          energy_cost: Some(Energy(0)),
+          additional_cost: Some(BanishAllCardsFromYourVoid),
+          if_you_do: None,
         )),
-        condition: Some(cardsInVoidCount(
+        condition: Some(CardsInVoidCount(
           count: 8,
         )),
       ))),
@@ -210,12 +210,12 @@ fn test_play_for_alternate_cost() {
         parse("You may play this event for $0 by banishing a '$fast' card from your hand.");
     assert_ron_snapshot!(result, @r###"
     [
-      static(StaticAbility(playForAlternateCost(AlternateCost(
-        energyCost: Energy(0),
-        additionalCost: Some(banishFromHand(your(fast(
-          target: card,
+      Static(StaticAbility(PlayForAlternateCost(AlternateCost(
+        energy_cost: Energy(0),
+        additional_cost: Some(BanishFromHand(Your(Fast(
+          target: Card,
         )))),
-        ifYouDo: None,
+        if_you_do: None,
       )))),
     ]
     "###);
@@ -228,11 +228,11 @@ fn test_play_for_alternate_cost_with_if_you_do() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      static(StaticAbility(playForAlternateCost(AlternateCost(
-        energyCost: Energy(0),
-        additionalCost: Some(abandonCharacters(your(character), 1)),
-        ifYouDo: Some(effect(abandonAtEndOfTurn(
-          target: this,
+      Static(StaticAbility(PlayForAlternateCost(AlternateCost(
+        energy_cost: Energy(0),
+        additional_cost: Some(AbandonCharacters(Your(Character), 1)),
+        if_you_do: Some(Effect(AbandonAtEndOfTurn(
+          target: This,
         ))),
       )))),
     ]
@@ -246,14 +246,14 @@ fn test_play_if_character_dissolved() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      static(WithOptions(StaticAbilityWithOptions(
-        ability: playFromVoid(PlayFromVoid(
-          energyCost: Some(Energy(1)),
-          additionalCost: None,
-          ifYouDo: None,
+      Static(WithOptions(StaticAbilityWithOptions(
+        ability: PlayFromVoid(PlayFromVoid(
+          energy_cost: Some(Energy(1)),
+          additional_cost: None,
+          if_you_do: None,
         )),
-        condition: Some(dissolvedThisTurn(
-          predicate: your(character),
+        condition: Some(DissolvedThisTurn(
+          predicate: Your(Character),
         )),
       ))),
     ]
@@ -265,13 +265,13 @@ fn test_alternate_cost_with_condition() {
     let result = parse("If you have discarded a card this turn, this character costs $1.");
     assert_ron_snapshot!(result, @r###"
     [
-      static(WithOptions(StaticAbilityWithOptions(
-        ability: playForAlternateCost(AlternateCost(
-          energyCost: Energy(1),
-          additionalCost: None,
-          ifYouDo: None,
+      Static(WithOptions(StaticAbilityWithOptions(
+        ability: PlayForAlternateCost(AlternateCost(
+          energy_cost: Energy(1),
+          additional_cost: None,
+          if_you_do: None,
         )),
-        condition: Some(cardsDiscardedThisTurn(
+        condition: Some(CardsDiscardedThisTurn(
           count: 1,
         )),
       ))),
@@ -284,8 +284,8 @@ fn test_spark_equal_to_void_count() {
     let result = parse("This character's spark is equal to the number of cards in your void.");
     assert_ron_snapshot!(result, @r###"
     [
-      static(StaticAbility(sparkEqualToPredicateCount(
-        predicate: yourVoid(card),
+      Static(StaticAbility(SparkEqualToPredicateCount(
+        predicate: YourVoid(Card),
       ))),
     ]
     "###);
@@ -296,10 +296,10 @@ fn test_play_for_dreamscape_cost() {
     let result = parse("You may play this event for $0 by abandoning a dreamscape.");
     assert_ron_snapshot!(result, @r###"
     [
-      static(StaticAbility(playForAlternateCost(AlternateCost(
-        energyCost: Energy(0),
-        additionalCost: Some(abandonDreamscapes(1)),
-        ifYouDo: None,
+      Static(StaticAbility(PlayForAlternateCost(AlternateCost(
+        energy_cost: Energy(0),
+        additional_cost: Some(AbandonDreamscapes(1)),
+        if_you_do: None,
       )))),
     ]
     "###);
@@ -310,7 +310,7 @@ fn test_characters_in_hand_have_fast() {
     let result = parse("Characters in your hand have '$fast'.");
     assert_ron_snapshot!(result, @r###"
     [
-      static(StaticAbility(charactersInHandHaveFast)),
+      Static(StaticAbility(CharactersInHandHaveFast)),
     ]
     "###);
 }
@@ -322,13 +322,13 @@ fn test_if_you_have_drawn_two_or_more() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      static(WithOptions(StaticAbilityWithOptions(
-        ability: playFromVoid(PlayFromVoid(
-          energyCost: Some(Energy(1)),
-          additionalCost: None,
-          ifYouDo: None,
+      Static(WithOptions(StaticAbilityWithOptions(
+        ability: PlayFromVoid(PlayFromVoid(
+          energy_cost: Some(Energy(1)),
+          additional_cost: None,
+          if_you_do: None,
         )),
-        condition: Some(cardsDrawnThisTurn(
+        condition: Some(CardsDrawnThisTurn(
           count: 2,
         )),
       ))),
@@ -343,8 +343,8 @@ fn test_judgment_triggers_when_materialized() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      static(StaticAbility(judgmentTriggersWhenMaterialized(
-        predicate: your(character),
+      Static(StaticAbility(JudgmentTriggersWhenMaterialized(
+        predicate: Your(Character),
       ))),
     ]
     "###);
@@ -357,13 +357,13 @@ fn test_play_for_alternate_cost_with_condition() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      static(WithOptions(StaticAbilityWithOptions(
-        ability: playForAlternateCost(AlternateCost(
-          energyCost: Energy(0),
-          additionalCost: Some(banishAllCardsFromYourVoid),
-          ifYouDo: None,
+      Static(WithOptions(StaticAbilityWithOptions(
+        ability: PlayForAlternateCost(AlternateCost(
+          energy_cost: Energy(0),
+          additional_cost: Some(BanishAllCardsFromYourVoid),
+          if_you_do: None,
         )),
-        condition: Some(cardsInVoidCount(
+        condition: Some(CardsInVoidCount(
           count: 8,
         )),
       ))),
@@ -378,9 +378,9 @@ fn test_look_at_top_card_and_play() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      static(StaticAbility(youMayLookAtTopCardOfYourDeck)),
-      static(StaticAbility(youMayPlayFromTopOfDeck(
-        matching: character,
+      Static(StaticAbility(YouMayLookAtTopCardOfYourDeck)),
+      Static(StaticAbility(YouMayPlayFromTopOfDeck(
+        matching: Character,
       ))),
     ]
     "###);
@@ -391,15 +391,15 @@ fn test_you_control_characters() {
     let result = parse("If you control a {cardtype: survivor}, this character costs $1.");
     assert_ron_snapshot!(result, @r###"
     [
-      static(WithOptions(StaticAbilityWithOptions(
-        ability: playForAlternateCost(AlternateCost(
-          energyCost: Energy(1),
-          additionalCost: None,
-          ifYouDo: None,
+      Static(WithOptions(StaticAbilityWithOptions(
+        ability: PlayForAlternateCost(AlternateCost(
+          energy_cost: Energy(1),
+          additional_cost: None,
+          if_you_do: None,
         )),
-        condition: Some(predicateCount(
+        condition: Some(PredicateCount(
           count: 1,
-          predicate: your(characterType(survivor)),
+          predicate: Your(CharacterType(Survivor)),
         )),
       ))),
     ]
@@ -411,10 +411,10 @@ fn test_play_from_void() {
     let result = parse("You may play this character from your void.");
     assert_ron_snapshot!(result, @r###"
     [
-      static(StaticAbility(playFromVoid(PlayFromVoid(
-        energyCost: None,
-        additionalCost: None,
-        ifYouDo: None,
+      Static(StaticAbility(PlayFromVoid(PlayFromVoid(
+        energy_cost: None,
+        additional_cost: None,
+        if_you_do: None,
       )))),
     ]
     "###);
@@ -425,7 +425,7 @@ fn test_play_only_from_void() {
     let result = parse("You may only play this character from your void.");
     assert_ron_snapshot!(result, @r###"
     [
-      static(StaticAbility(playOnlyFromVoid)),
+      Static(StaticAbility(PlayOnlyFromVoid)),
     ]
     "###);
 }
@@ -437,12 +437,12 @@ fn test_this_character_in_your_void() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      static(WithOptions(StaticAbilityWithOptions(
-        ability: sparkBonusYourCharacters(
-          matching: characterType(survivor),
+      Static(WithOptions(StaticAbilityWithOptions(
+        ability: SparkBonusYourCharacters(
+          matching: CharacterType(Survivor),
           added_spark: Spark(1),
         ),
-        condition: Some(thisCharacterIsInYourVoid),
+        condition: Some(ThisCharacterIsInYourVoid),
       ))),
     ]
     "###);
@@ -454,11 +454,11 @@ fn test_cards_in_void_have_reclaim() {
         parse("If you have 8 or more cards in your void, cards in your void have {kw: reclaim}.");
     assert_ron_snapshot!(result, @r###"
     [
-      static(WithOptions(StaticAbilityWithOptions(
-        ability: cardsInYourVoidHaveReclaim(
-          matching: card,
+      Static(WithOptions(StaticAbilityWithOptions(
+        ability: CardsInYourVoidHaveReclaim(
+          matching: Card,
         ),
-        condition: Some(cardsInVoidCount(
+        condition: Some(CardsInVoidCount(
           count: 8,
         )),
       ))),

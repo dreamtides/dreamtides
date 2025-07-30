@@ -19,7 +19,6 @@ pub type StackItems = Vec<StackItemState>;
 #[derive(
     Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub enum StackItemId {
     Card(StackCardId),
     ActivatedAbility(ActivatedAbilityId),

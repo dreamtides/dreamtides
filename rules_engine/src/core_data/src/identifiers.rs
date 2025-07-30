@@ -19,19 +19,16 @@ use uuid::Uuid;
     Deserialize,
     JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub struct UserId(pub Uuid);
 
 #[derive(
     Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub struct BattleId(pub Uuid);
 
 #[derive(
     Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub struct QuestId(pub Uuid);
 
 /// Identifies a named card with given rules text.
@@ -42,7 +39,6 @@ pub struct QuestId(pub Uuid);
 #[derive(
     Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub struct CardIdentity(pub Uuid);
 
 #[derive(
@@ -85,5 +81,4 @@ pub enum CardName {
 #[derive(
     Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub struct AbilityNumber(pub usize);

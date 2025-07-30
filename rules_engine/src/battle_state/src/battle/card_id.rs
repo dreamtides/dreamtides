@@ -43,14 +43,12 @@ impl CardIdType for CardId {
 #[derive(
     Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub struct AbilityId {
     pub card_id: CardId,
     pub ability_number: AbilityNumber,
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct CharacterId(pub CardId);
 
 impl CardIdType for CharacterId {
@@ -85,7 +83,6 @@ impl fmt::Debug for CharacterId {
 #[derive(
     Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub struct ActivatedAbilityId {
     pub character_id: CharacterId,
     pub ability_number: AbilityNumber,

@@ -7,7 +7,6 @@ use crate::card_view::ClientCardId;
 
 /// Represents the position of some object in the UI
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct ObjectPosition {
     /// Position category
     pub position: Position,
@@ -25,7 +24,6 @@ impl Default for ObjectPosition {
 #[derive(
     Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Ord, PartialOrd, JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub enum Position {
     /// Object position used in interface elements like the deck viewer which
     /// don't rely on game positioning.
@@ -104,7 +102,6 @@ pub enum Position {
 #[derive(
     Copy, Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, Ord, PartialOrd, JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub enum StackType {
     Default,
     TargetingUserBattlefield,

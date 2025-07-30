@@ -8,26 +8,26 @@ fn test_multiple_effects() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      activated(ActivatedAbility(
+      Activated(ActivatedAbility(
         costs: [
-          energy(Energy(1)),
+          Energy(Energy(1)),
         ],
-        effect: list([
+        effect: List([
           EffectWithOptions(
-            effect: gainsSpark(
-              target: this,
+            effect: GainsSpark(
+              target: This,
               gains: Spark(1),
             ),
             optional: false,
-            triggerCost: None,
+            trigger_cost: None,
             condition: None,
           ),
           EffectWithOptions(
-            effect: banishCardsFromEnemyVoid(
+            effect: BanishCardsFromEnemyVoid(
               count: 1,
             ),
             optional: true,
-            triggerCost: None,
+            trigger_cost: None,
             condition: None,
           ),
         ]),
@@ -42,23 +42,23 @@ fn test_then_separator() {
     let result = parse("Draw a card, then discard a card.");
     assert_ron_snapshot!(result, @r###"
     [
-      event(EventAbility(
+      Event(EventAbility(
         additional_cost: None,
-        effect: list([
+        effect: List([
           EffectWithOptions(
-            effect: drawCards(
+            effect: DrawCards(
               count: 1,
             ),
             optional: false,
-            triggerCost: None,
+            trigger_cost: None,
             condition: None,
           ),
           EffectWithOptions(
-            effect: payCost(
-              cost: discardCards(card, 1),
+            effect: PayCost(
+              cost: DiscardCards(Card, 1),
             ),
             optional: false,
-            triggerCost: None,
+            trigger_cost: None,
             condition: None,
           ),
         ]),
@@ -74,14 +74,14 @@ fn test_optional_draw() {
         result,
         @r###"
     [
-      event(EventAbility(
+      Event(EventAbility(
         additional_cost: None,
-        effect: withOptions(EffectWithOptions(
-          effect: drawCards(
+        effect: WithOptions(EffectWithOptions(
+          effect: DrawCards(
             count: 1,
           ),
           optional: true,
-          triggerCost: None,
+          trigger_cost: None,
           condition: None,
         )),
       )),
@@ -97,17 +97,17 @@ fn test_conditional_gain_energy() {
         result,
         @r###"
     [
-      event(EventAbility(
+      Event(EventAbility(
         additional_cost: None,
-        effect: withOptions(EffectWithOptions(
-          effect: gainEnergy(
+        effect: WithOptions(EffectWithOptions(
+          effect: GainEnergy(
             gains: Energy(1),
           ),
           optional: false,
-          triggerCost: None,
-          condition: Some(predicateCount(
+          trigger_cost: None,
+          condition: Some(PredicateCount(
             count: 2,
-            predicate: another(characterType(warrior)),
+            predicate: Another(CharacterType(Warrior)),
           )),
         )),
       )),
@@ -123,17 +123,17 @@ fn test_conditional_optional_gain_energy() {
         result,
         @r###"
     [
-      event(EventAbility(
+      Event(EventAbility(
         additional_cost: None,
-        effect: withOptions(EffectWithOptions(
-          effect: gainEnergy(
+        effect: WithOptions(EffectWithOptions(
+          effect: GainEnergy(
             gains: Energy(1),
           ),
           optional: true,
-          triggerCost: None,
-          condition: Some(predicateCount(
+          trigger_cost: None,
+          condition: Some(PredicateCount(
             count: 2,
-            predicate: another(characterType(warrior)),
+            predicate: Another(CharacterType(Warrior)),
           )),
         )),
       )),
@@ -147,17 +147,17 @@ fn test_until_end_of_turn() {
     let result = parse("Until end of turn, whenever you play a character, draw a card.");
     assert_ron_snapshot!(result, @r###"
     [
-      event(EventAbility(
+      Event(EventAbility(
         additional_cost: None,
-        effect: effect(createTriggerUntilEndOfTurn(
+        effect: Effect(CreateTriggerUntilEndOfTurn(
           trigger: TriggeredAbility(
-            trigger: play(your(character)),
-            effect: effect(drawCards(
+            trigger: Play(Your(Character)),
+            effect: Effect(DrawCards(
               count: 1,
             )),
             options: Some(TriggeredAbilityOptions(
-              oncePerTurn: false,
-              untilEndOfTurn: true,
+              once_per_turn: false,
+              until_end_of_turn: true,
             )),
           ),
         )),
@@ -173,14 +173,14 @@ fn test_optional_cost() {
         result,
         @r###"
     [
-      event(EventAbility(
+      Event(EventAbility(
         additional_cost: None,
-        effect: withOptions(EffectWithOptions(
-          effect: returnFromYourVoidToHand(
-            target: this,
+        effect: WithOptions(EffectWithOptions(
+          effect: ReturnFromYourVoidToHand(
+            target: This,
           ),
           optional: true,
-          triggerCost: Some(energy(Energy(1))),
+          trigger_cost: Some(Energy(Energy(1))),
           condition: None,
         )),
       )),
@@ -196,14 +196,14 @@ fn test_optional_cost_banish_enemy() {
         result,
         @r###"
     [
-      activated(ActivatedAbility(
+      Activated(ActivatedAbility(
         costs: [],
-        effect: withOptions(EffectWithOptions(
-          effect: gainEnergy(
+        effect: WithOptions(EffectWithOptions(
+          effect: GainEnergy(
             gains: Energy(1),
           ),
           optional: true,
-          triggerCost: Some(banishCardsFromEnemyVoid(1)),
+          trigger_cost: Some(BanishCardsFromEnemyVoid(1)),
           condition: None,
         )),
         options: None,

@@ -17,28 +17,28 @@ namespace Dreamtides.Schema
 
     public partial class SchemaTypes
     {
-        [JsonProperty("clientLogRequest", Required = Required.Always)]
+        [JsonProperty("client_log_request", Required = Required.Always)]
         public ClientLogRequest ClientLogRequest { get; set; }
 
-        [JsonProperty("clientLogResponse", Required = Required.Always)]
+        [JsonProperty("client_log_response", Required = Required.Always)]
         public ClientLogResponse ClientLogResponse { get; set; }
 
-        [JsonProperty("connectRequest", Required = Required.Always)]
+        [JsonProperty("connect_request", Required = Required.Always)]
         public ConnectRequest ConnectRequest { get; set; }
 
-        [JsonProperty("connectResponse", Required = Required.Always)]
+        [JsonProperty("connect_response", Required = Required.Always)]
         public ConnectResponse ConnectResponse { get; set; }
 
-        [JsonProperty("performActionRequest", Required = Required.Always)]
+        [JsonProperty("perform_action_request", Required = Required.Always)]
         public PerformActionRequest PerformActionRequest { get; set; }
 
-        [JsonProperty("performActionResponse", Required = Required.Always)]
+        [JsonProperty("perform_action_response", Required = Required.Always)]
         public PerformActionResponse PerformActionResponse { get; set; }
 
-        [JsonProperty("pollRequest", Required = Required.Always)]
+        [JsonProperty("poll_request", Required = Required.Always)]
         public PollRequest PollRequest { get; set; }
 
-        [JsonProperty("pollResponse", Required = Required.Always)]
+        [JsonProperty("poll_response", Required = Required.Always)]
         public PollResponse PollResponse { get; set; }
     }
 
@@ -59,10 +59,10 @@ namespace Dreamtides.Schema
 
     public partial class LogEntry
     {
-        [JsonProperty("event", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("Event", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public Event Event { get; set; }
 
-        [JsonProperty("eventSpan", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("EventSpan", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public EventSpan EventSpan { get; set; }
     }
 
@@ -87,14 +87,14 @@ namespace Dreamtides.Schema
         /// If specified, the battle will be created with the given debug
         /// configuration.
         /// </summary>
-        [JsonProperty("debugConfiguration")]
+        [JsonProperty("debug_configuration")]
         public DebugConfiguration DebugConfiguration { get; set; }
 
         /// <summary>
         /// Display properties from the client (screen dimensions, mobile device
         /// flag, etc.)
         /// </summary>
-        [JsonProperty("displayProperties")]
+        [JsonProperty("display_properties")]
         public DisplayProperties DisplayProperties { get; set; }
 
         [JsonProperty("metadata", Required = Required.Always)]
@@ -108,14 +108,14 @@ namespace Dreamtides.Schema
         /// you keep the same Bundle Identifier in future versions, the application
         /// keeps accessing the same location on every update.
         /// </summary>
-        [JsonProperty("persistentDataPath", Required = Required.Always)]
+        [JsonProperty("persistent_data_path", Required = Required.Always)]
         public string PersistentDataPath { get; set; }
 
         /// <summary>
         /// If specified, treats this as a multiplayer game using the save file
         /// provided in this ID and adds this user as a player in the battle.
         /// </summary>
-        [JsonProperty("vsOpponent")]
+        [JsonProperty("vs_opponent")]
         public Guid? VsOpponent { get; set; }
     }
 
@@ -137,31 +137,31 @@ namespace Dreamtides.Schema
 
     public partial class PlayerType
     {
-        [JsonProperty("user", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("User", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public Guid? User { get; set; }
 
-        [JsonProperty("agent", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("Agent", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public GameAi? Agent { get; set; }
     }
 
     public partial class GameAiClass
     {
-        [JsonProperty("monteCarlo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("MonteCarlo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? MonteCarlo { get; set; }
 
-        [JsonProperty("monteCarloSingleThreaded", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("MonteCarloSingleThreaded", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? MonteCarloSingleThreaded { get; set; }
     }
 
     public partial class DisplayProperties
     {
-        [JsonProperty("isMobileDevice", Required = Required.Always)]
+        [JsonProperty("is_mobile_device", Required = Required.Always)]
         public bool IsMobileDevice { get; set; }
 
-        [JsonProperty("screenHeight", Required = Required.Always)]
+        [JsonProperty("screen_height", Required = Required.Always)]
         public long ScreenHeight { get; set; }
 
-        [JsonProperty("screenWidth", Required = Required.Always)]
+        [JsonProperty("screen_width", Required = Required.Always)]
         public long ScreenWidth { get; set; }
     }
 
@@ -170,26 +170,26 @@ namespace Dreamtides.Schema
         /// <summary>
         /// ID of the current battle.
         /// </summary>
-        [JsonProperty("battleId")]
+        [JsonProperty("battle_id")]
         public Guid? BattleId { get; set; }
 
         /// <summary>
         /// If specified, the request is part of an integration test with the given
         /// ID. State will not be persisted.
         /// </summary>
-        [JsonProperty("integrationTestId")]
+        [JsonProperty("integration_test_id")]
         public Guid? IntegrationTestId { get; set; }
 
         /// <summary>
         /// Identifies the request from the client.
         /// </summary>
-        [JsonProperty("requestId")]
+        [JsonProperty("request_id")]
         public Guid? RequestId { get; set; }
 
         /// <summary>
         /// ID of the user making the request.
         /// </summary>
-        [JsonProperty("userId", Required = Required.Always)]
+        [JsonProperty("user_id", Required = Required.Always)]
         public Guid UserId { get; set; }
     }
 
@@ -201,7 +201,7 @@ namespace Dreamtides.Schema
         [JsonProperty("metadata", Required = Required.Always)]
         public Metadata Metadata { get; set; }
 
-        [JsonProperty("responseVersion", Required = Required.Always)]
+        [JsonProperty("response_version", Required = Required.Always)]
         public Guid ResponseVersion { get; set; }
     }
 
@@ -228,40 +228,40 @@ namespace Dreamtides.Schema
     /// </summary>
     public partial class Command
     {
-        [JsonProperty("updateBattle", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("UpdateBattle", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public UpdateBattleCommand UpdateBattle { get; set; }
 
-        [JsonProperty("wait", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("Wait", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public Milliseconds Wait { get; set; }
 
-        [JsonProperty("fireProjectile", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("FireProjectile", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public FireProjectileCommand FireProjectile { get; set; }
 
-        [JsonProperty("dissolveCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("DissolveCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DissolveCardCommand DissolveCard { get; set; }
 
-        [JsonProperty("displayGameMessage", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("DisplayGameMessage", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public GameMessageType? DisplayGameMessage { get; set; }
 
-        [JsonProperty("displayEffect", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("DisplayEffect", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayEffectCommand DisplayEffect { get; set; }
 
-        [JsonProperty("playAudioClip", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("PlayAudioClip", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayAudioClipCommand PlayAudioClip { get; set; }
 
-        [JsonProperty("drawUserCards", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("DrawUserCards", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DrawUserCardsCommand DrawUserCards { get; set; }
 
-        [JsonProperty("displayJudgment", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("DisplayJudgment", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayJudgmentCommand DisplayJudgment { get; set; }
 
-        [JsonProperty("displayDreamwellActivation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("DisplayDreamwellActivation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayDreamwellActivationCommand DisplayDreamwellActivation { get; set; }
 
-        [JsonProperty("displayEnemyMessage", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("DisplayEnemyMessage", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayEnemyMessageCommand DisplayEnemyMessage { get; set; }
 
-        [JsonProperty("playStudioAnimation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("PlayStudioAnimation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayStudioAnimationCommand PlayStudioAnimation { get; set; }
     }
 
@@ -278,20 +278,20 @@ namespace Dreamtides.Schema
         /// update. Otherwise it's typical to return the card to the Dreamwell
         /// position.
         /// </summary>
-        [JsonProperty("cardId", Required = Required.Always)]
+        [JsonProperty("card_id", Required = Required.Always)]
         public string CardId { get; set; }
 
         /// <summary>
         /// New energy available to this player, if it has changed.
         /// </summary>
-        [JsonProperty("newEnergy")]
+        [JsonProperty("new_energy")]
         public long? NewEnergy { get; set; }
 
         /// <summary>
         /// New energy produced by this player at the start of the turn, if it has
         /// changed.
         /// </summary>
-        [JsonProperty("newProducedEnergy")]
+        [JsonProperty("new_produced_energy")]
         public long? NewProducedEnergy { get; set; }
 
         /// <summary>
@@ -347,7 +347,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public partial class Milliseconds
     {
-        [JsonProperty("millisecondsValue", Required = Required.Always)]
+        [JsonProperty("milliseconds_value", Required = Required.Always)]
         public long MillisecondsValue { get; set; }
     }
 
@@ -380,7 +380,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public partial class AudioClipAddress
     {
-        [JsonProperty("audioClip", Required = Required.Always)]
+        [JsonProperty("audio_clip", Required = Required.Always)]
         public string AudioClip { get; set; }
     }
 
@@ -389,16 +389,16 @@ namespace Dreamtides.Schema
     /// </summary>
     public partial class GameObjectId
     {
-        [JsonProperty("cardId", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("CardId", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public string CardId { get; set; }
 
-        [JsonProperty("deck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("Deck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? Deck { get; set; }
 
-        [JsonProperty("void", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("Void", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? Void { get; set; }
 
-        [JsonProperty("avatar", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("Avatar", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? Avatar { get; set; }
     }
 
@@ -407,7 +407,7 @@ namespace Dreamtides.Schema
         [JsonProperty("message", Required = Required.Always)]
         public string Message { get; set; }
 
-        [JsonProperty("showDuration", Required = Required.Always)]
+        [JsonProperty("show_duration", Required = Required.Always)]
         public Milliseconds ShowDuration { get; set; }
     }
 
@@ -416,7 +416,7 @@ namespace Dreamtides.Schema
         /// <summary>
         /// The new score for the player, if it has changed.
         /// </summary>
-        [JsonProperty("newScore")]
+        [JsonProperty("new_score")]
         public long? NewScore { get; set; }
 
         /// <summary>
@@ -437,7 +437,7 @@ namespace Dreamtides.Schema
         /// <summary>
         /// The speed multiplier of the dissolve effect. Defaults to 1.
         /// </summary>
-        [JsonProperty("dissolveSpeed")]
+        [JsonProperty("dissolve_speed")]
         public double? DissolveSpeed { get; set; }
 
         /// <summary>
@@ -511,13 +511,13 @@ namespace Dreamtides.Schema
         ///
         /// Should be less than stagger_interval for best results.
         /// </summary>
-        [JsonProperty("pauseDuration", Required = Required.Always)]
+        [JsonProperty("pause_duration", Required = Required.Always)]
         public Milliseconds PauseDuration { get; set; }
 
         /// <summary>
         /// Time to wait between drawing subsequent cards.
         /// </summary>
-        [JsonProperty("staggerInterval", Required = Required.Always)]
+        [JsonProperty("stagger_interval", Required = Required.Always)]
         public Milliseconds StaggerInterval { get; set; }
     }
 
@@ -536,7 +536,7 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Face up/face down state for this card
         /// </summary>
-        [JsonProperty("cardFacing", Required = Required.Always)]
+        [JsonProperty("card_facing", Required = Required.Always)]
         public CardFacing CardFacing { get; set; }
 
         /// <summary>
@@ -545,13 +545,13 @@ namespace Dreamtides.Schema
         /// If this card does not already exist, it will be created at this position
         /// before being animated to [Self::position].
         /// </summary>
-        [JsonProperty("createPosition")]
+        [JsonProperty("create_position")]
         public ObjectPosition CreatePosition { get; set; }
 
         /// <summary>
         /// Optionally, a sound to play when this card is created.
         /// </summary>
-        [JsonProperty("createSound")]
+        [JsonProperty("create_sound")]
         public AudioClipAddress CreateSound { get; set; }
 
         /// <summary>
@@ -560,7 +560,7 @@ namespace Dreamtides.Schema
         /// If provided, the card will be animated to this position before being
         /// destroyed.
         /// </summary>
-        [JsonProperty("destroyPosition")]
+        [JsonProperty("destroy_position")]
         public ObjectPosition DestroyPosition { get; set; }
 
         /// <summary>
@@ -591,7 +591,7 @@ namespace Dreamtides.Schema
         /// <summary>
         /// True if this card is in a hidden zone but known to one or more opponents
         /// </summary>
-        [JsonProperty("revealedToOpponents", Required = Required.Always)]
+        [JsonProperty("revealed_to_opponents", Required = Required.Always)]
         public bool RevealedToOpponents { get; set; }
     }
 
@@ -611,7 +611,7 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Sorting key, determines order within the position
         /// </summary>
-        [JsonProperty("sortingKey", Required = Required.Always)]
+        [JsonProperty("sorting_key", Required = Required.Always)]
         public long SortingKey { get; set; }
     }
 
@@ -649,37 +649,37 @@ namespace Dreamtides.Schema
     /// </summary>
     public partial class PositionClass
     {
-        [JsonProperty("onStack", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("OnStack", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public StackType? OnStack { get; set; }
 
-        [JsonProperty("inHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("InHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? InHand { get; set; }
 
-        [JsonProperty("inDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("InDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? InDeck { get; set; }
 
-        [JsonProperty("inVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("InVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? InVoid { get; set; }
 
-        [JsonProperty("inBanished", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("InBanished", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? InBanished { get; set; }
 
-        [JsonProperty("onBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("OnBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? OnBattlefield { get; set; }
 
-        [JsonProperty("inPlayerStatus", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("InPlayerStatus", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? InPlayerStatus { get; set; }
 
-        [JsonProperty("cardOrderSelector", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("CardOrderSelector", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardOrderSelectionTargetDiscriminants? CardOrderSelector { get; set; }
 
-        [JsonProperty("inDreamwell", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("InDreamwell", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? InDreamwell { get; set; }
 
-        [JsonProperty("hiddenWithinCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("HiddenWithinCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public string HiddenWithinCard { get; set; }
 
-        [JsonProperty("aboveVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("AboveVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? AboveVoid { get; set; }
     }
 
@@ -697,7 +697,7 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Type or subtype of this card
         /// </summary>
-        [JsonProperty("cardType", Required = Required.Always)]
+        [JsonProperty("card_type", Required = Required.Always)]
         public string CardType { get; set; }
 
         /// <summary>
@@ -722,13 +722,13 @@ namespace Dreamtides.Schema
         /// Data providing supplemental information about this card on long
         /// press/hover.
         /// </summary>
-        [JsonProperty("infoZoomData")]
+        [JsonProperty("info_zoom_data")]
         public InfoZoomData InfoZoomData { get; set; }
 
         /// <summary>
         /// True if this card can be played during the opponent's turn
         /// </summary>
-        [JsonProperty("isFast", Required = Required.Always)]
+        [JsonProperty("is_fast", Required = Required.Always)]
         public bool IsFast { get; set; }
 
         /// <summary>
@@ -740,7 +740,7 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Outline color of this card
         /// </summary>
-        [JsonProperty("outlineColor")]
+        [JsonProperty("outline_color")]
         public DisplayColor OutlineColor { get; set; }
 
         /// <summary>
@@ -752,7 +752,7 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Rules text to display for this car
         /// </summary>
-        [JsonProperty("rulesText", Required = Required.Always)]
+        [JsonProperty("rules_text", Required = Required.Always)]
         public string RulesText { get; set; }
 
         /// <summary>
@@ -771,47 +771,47 @@ namespace Dreamtides.Schema
         /// If this card can currently be played from hand, an action to invoke when
         /// played.
         /// </summary>
-        [JsonProperty("canPlay")]
+        [JsonProperty("can_play")]
         public ActionUnion? CanPlay { get; set; }
 
         /// <summary>
         /// If this card can currently be dragged within a Card Order Selector, the
         /// card ID to use when selecting order.
         /// </summary>
-        [JsonProperty("canSelectOrder")]
+        [JsonProperty("can_select_order")]
         public long? CanSelectOrder { get; set; }
 
         /// <summary>
         /// Action to perform when this card is clicked.
         /// </summary>
-        [JsonProperty("onClick")]
+        [JsonProperty("on_click")]
         public ActionUnion? OnClick { get; set; }
 
         /// <summary>
         /// Sound to play when this card is played.
         /// </summary>
-        [JsonProperty("onPlaySound")]
+        [JsonProperty("on_play_sound")]
         public AudioClipAddress OnPlaySound { get; set; }
 
         /// <summary>
         /// Preview of the battle state after this card is played.
         /// </summary>
-        [JsonProperty("playEffectPreview")]
+        [JsonProperty("play_effect_preview")]
         public BattlePreviewView PlayEffectPreview { get; set; }
     }
 
     public partial class ActionClass
     {
-        [JsonProperty("debugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("DebugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DebugAction? DebugAction { get; set; }
 
-        [JsonProperty("battleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("BattleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public BattleAction? BattleAction { get; set; }
 
-        [JsonProperty("battleDisplayAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("BattleDisplayAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public BattleDisplayAction? BattleDisplayAction { get; set; }
 
-        [JsonProperty("undo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("Undo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayerName? Undo { get; set; }
     }
 
@@ -840,37 +840,37 @@ namespace Dreamtides.Schema
     /// </summary>
     public partial class BattleActionClass
     {
-        [JsonProperty("debug", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("Debug", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DebugBattleAction? Debug { get; set; }
 
-        [JsonProperty("playCardFromHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("PlayCardFromHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? PlayCardFromHand { get; set; }
 
-        [JsonProperty("playCardFromVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("PlayCardFromVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public List<PlayCardFromVoid> PlayCardFromVoid { get; set; }
 
-        [JsonProperty("activateAbility", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("ActivateAbility", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public ActivatedAbilityId ActivateAbility { get; set; }
 
-        [JsonProperty("selectCharacterTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("SelectCharacterTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectCharacterTarget { get; set; }
 
-        [JsonProperty("selectStackCardTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("SelectStackCardTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectStackCardTarget { get; set; }
 
-        [JsonProperty("selectVoidCardTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("SelectVoidCardTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectVoidCardTarget { get; set; }
 
-        [JsonProperty("selectPromptChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("SelectPromptChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectPromptChoice { get; set; }
 
-        [JsonProperty("selectEnergyAdditionalCost", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("SelectEnergyAdditionalCost", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectEnergyAdditionalCost { get; set; }
 
-        [JsonProperty("selectOrderForDeckCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("SelectOrderForDeckCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DeckCardSelectedOrder SelectOrderForDeckCard { get; set; }
 
-        [JsonProperty("selectModalEffectChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("SelectModalEffectChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectModalEffectChoice { get; set; }
     }
 
@@ -879,10 +879,10 @@ namespace Dreamtides.Schema
     /// </summary>
     public partial class ActivatedAbilityId
     {
-        [JsonProperty("abilityNumber", Required = Required.Always)]
+        [JsonProperty("ability_number", Required = Required.Always)]
         public long AbilityNumber { get; set; }
 
-        [JsonProperty("characterId", Required = Required.Always)]
+        [JsonProperty("character_id", Required = Required.Always)]
         public long CharacterId { get; set; }
     }
 
@@ -912,37 +912,37 @@ namespace Dreamtides.Schema
     /// </summary>
     public partial class DebugBattleActionClass
     {
-        [JsonProperty("drawCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("DrawCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DrawCard DrawCard { get; set; }
 
-        [JsonProperty("setEnergy", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("SetEnergy", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SetEnergy SetEnergy { get; set; }
 
-        [JsonProperty("setPoints", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("SetPoints", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SetPoints SetPoints { get; set; }
 
-        [JsonProperty("setProducedEnergy", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("SetProducedEnergy", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SetProducedEnergy SetProducedEnergy { get; set; }
 
-        [JsonProperty("setSparkBonus", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("SetSparkBonus", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SetSparkBonus SetSparkBonus { get; set; }
 
-        [JsonProperty("addCardToHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("AddCardToHand", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public AddCardToHand AddCardToHand { get; set; }
 
-        [JsonProperty("addCardToBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("AddCardToBattlefield", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public AddCardToBattlefield AddCardToBattlefield { get; set; }
 
-        [JsonProperty("addCardToVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("AddCardToVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public AddCardToVoid AddCardToVoid { get; set; }
 
-        [JsonProperty("moveHandToDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("MoveHandToDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public MoveHandToDeck MoveHandToDeck { get; set; }
 
-        [JsonProperty("setCardsRemainingInDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("SetCardsRemainingInDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SetCardsRemainingInDeck SetCardsRemainingInDeck { get; set; }
 
-        [JsonProperty("opponentPlayCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("OpponentPlayCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public OpponentPlayCard OpponentPlayCard { get; set; }
     }
 
@@ -1041,16 +1041,16 @@ namespace Dreamtides.Schema
     /// </summary>
     public partial class AbilityId
     {
-        [JsonProperty("abilityNumber", Required = Required.Always)]
+        [JsonProperty("ability_number", Required = Required.Always)]
         public long AbilityNumber { get; set; }
 
-        [JsonProperty("cardId", Required = Required.Always)]
+        [JsonProperty("card_id", Required = Required.Always)]
         public long CardId { get; set; }
     }
 
     public partial class DeckCardSelectedOrder
     {
-        [JsonProperty("cardId", Required = Required.Always)]
+        [JsonProperty("card_id", Required = Required.Always)]
         public long CardId { get; set; }
 
         [JsonProperty("target", Required = Required.Always)]
@@ -1059,7 +1059,7 @@ namespace Dreamtides.Schema
 
     public partial class CardOrderSelectionTargetClass
     {
-        [JsonProperty("deck", Required = Required.Always)]
+        [JsonProperty("Deck", Required = Required.Always)]
         public long Deck { get; set; }
     }
 
@@ -1071,37 +1071,37 @@ namespace Dreamtides.Schema
     /// </summary>
     public partial class BattleDisplayActionClass
     {
-        [JsonProperty("browseCards", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("BrowseCards", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public CardBrowserType? BrowseCards { get; set; }
 
-        [JsonProperty("setSelectedEnergyAdditionalCost", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("SetSelectedEnergyAdditionalCost", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SetSelectedEnergyAdditionalCost { get; set; }
 
-        [JsonProperty("openPanel", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("OpenPanel", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PanelAddress? OpenPanel { get; set; }
     }
 
     public partial class PanelAddressClass
     {
-        [JsonProperty("viewLogs", Required = Required.AllowNull)]
+        [JsonProperty("ViewLogs", Required = Required.AllowNull)]
         public string ViewLogs { get; set; }
     }
 
     public partial class DebugActionClass
     {
-        [JsonProperty("restartBattleWithDecks", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("RestartBattleWithDecks", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public RestartBattleWithDecks RestartBattleWithDecks { get; set; }
 
-        [JsonProperty("setOpponentAgent", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("SetOpponentAgent", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public GameAi? SetOpponentAgent { get; set; }
 
-        [JsonProperty("applyActionList", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("ApplyActionList", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public List<DebugBattleAction> ApplyActionList { get; set; }
 
-        [JsonProperty("closeCurrentPanelApplyAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("CloseCurrentPanelApplyAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DebugBattleAction? CloseCurrentPanelApplyAction { get; set; }
 
-        [JsonProperty("performOpponentAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("PerformOpponentAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public BattleAction? PerformOpponentAction { get; set; }
     }
 
@@ -1126,7 +1126,7 @@ namespace Dreamtides.Schema
         [JsonProperty("enemy", Required = Required.Always)]
         public PlayerPreviewView Enemy { get; set; }
 
-        [JsonProperty("previewMessage")]
+        [JsonProperty("preview_message")]
         public FlexNode PreviewMessage { get; set; }
 
         [JsonProperty("user", Required = Required.Always)]
@@ -1141,19 +1141,19 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Icon to display over this card on the battlefield
         /// </summary>
-        [JsonProperty("battlefieldIcon")]
+        [JsonProperty("battlefield_icon")]
         public string BattlefieldIcon { get; set; }
 
         /// <summary>
         /// Color of the battlefield icon
         /// </summary>
-        [JsonProperty("battlefieldIconColor")]
+        [JsonProperty("battlefield_icon_color")]
         public DisplayColor BattlefieldIconColor { get; set; }
 
         /// <summary>
         /// Identifier for this card
         /// </summary>
-        [JsonProperty("cardId", Required = Required.Always)]
+        [JsonProperty("card_id", Required = Required.Always)]
         public string CardId { get; set; }
 
         /// <summary>
@@ -1183,7 +1183,7 @@ namespace Dreamtides.Schema
         /// <summary>
         /// New energy produced total
         /// </summary>
-        [JsonProperty("producedEnergy")]
+        [JsonProperty("produced_energy")]
         public long? ProducedEnergy { get; set; }
 
         /// <summary>
@@ -1195,52 +1195,52 @@ namespace Dreamtides.Schema
         /// <summary>
         /// New total spark for this player
         /// </summary>
-        [JsonProperty("totalSpark")]
+        [JsonProperty("total_spark")]
         public long? TotalSpark { get; set; }
     }
 
     public partial class DraggableNode
     {
-        [JsonProperty("customDragIndicator")]
+        [JsonProperty("custom_drag_indicator")]
         public FlexNode CustomDragIndicator { get; set; }
 
-        [JsonProperty("dropTargetIdentifiers", Required = Required.Always)]
+        [JsonProperty("drop_target_identifiers", Required = Required.Always)]
         public List<string> DropTargetIdentifiers { get; set; }
 
-        [JsonProperty("hideIndicatorChildren", Required = Required.Always)]
+        [JsonProperty("hide_indicator_children", Required = Required.Always)]
         public List<string> HideIndicatorChildren { get; set; }
 
-        [JsonProperty("horizontalDragStartDistance")]
+        [JsonProperty("horizontal_drag_start_distance")]
         public long? HorizontalDragStartDistance { get; set; }
 
-        [JsonProperty("onDragDetected")]
+        [JsonProperty("on_drag_detected")]
         public ActionUnion? OnDragDetected { get; set; }
 
-        [JsonProperty("onDrop")]
+        [JsonProperty("on_drop")]
         public ActionUnion? OnDrop { get; set; }
 
-        [JsonProperty("overTargetIndicator")]
+        [JsonProperty("over_target_indicator")]
         public FlexNode OverTargetIndicator { get; set; }
 
-        [JsonProperty("removeOriginal")]
+        [JsonProperty("remove_original")]
         public bool? RemoveOriginal { get; set; }
     }
 
     public partial class NodeType
     {
-        [JsonProperty("text", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("Text", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public TextNode Text { get; set; }
 
-        [JsonProperty("scrollViewNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("ScrollViewNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public ScrollViewNode ScrollViewNode { get; set; }
 
-        [JsonProperty("draggableNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("DraggableNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DraggableNode DraggableNode { get; set; }
 
-        [JsonProperty("textFieldNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("TextFieldNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public TextFieldNode TextFieldNode { get; set; }
 
-        [JsonProperty("sliderNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("SliderNode", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SliderNode SliderNode { get; set; }
     }
 
@@ -1249,22 +1249,22 @@ namespace Dreamtides.Schema
         [JsonProperty("children", Required = Required.Always)]
         public List<FlexNode> Children { get; set; }
 
-        [JsonProperty("eventHandlers")]
+        [JsonProperty("event_handlers")]
         public EventHandlers EventHandlers { get; set; }
 
-        [JsonProperty("hoverStyle")]
+        [JsonProperty("hover_style")]
         public FlexStyle HoverStyle { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("nodeType")]
+        [JsonProperty("node_type")]
         public NodeType NodeType { get; set; }
 
         /// <summary>
         /// Style to apply to the element when it is first attached to a panel.
         /// </summary>
-        [JsonProperty("onAttachStyle")]
+        [JsonProperty("on_attach_style")]
         public FlexStyle OnAttachStyle { get; set; }
 
         /// <summary>
@@ -1272,10 +1272,10 @@ namespace Dreamtides.Schema
         ///
         /// If not specified, the style will be applied indefinitely.
         /// </summary>
-        [JsonProperty("onAttachStyleDuration")]
+        [JsonProperty("on_attach_style_duration")]
         public Milliseconds OnAttachStyleDuration { get; set; }
 
-        [JsonProperty("pressedStyle")]
+        [JsonProperty("pressed_style")]
         public FlexStyle PressedStyle { get; set; }
 
         [JsonProperty("style")]
@@ -1287,31 +1287,31 @@ namespace Dreamtides.Schema
         [JsonProperty("elasticity")]
         public double? Elasticity { get; set; }
 
-        [JsonProperty("horizontalPageSize")]
+        [JsonProperty("horizontal_page_size")]
         public double? HorizontalPageSize { get; set; }
 
-        [JsonProperty("horizontalScrollBar")]
+        [JsonProperty("horizontal_scroll_bar")]
         public ScrollBar HorizontalScrollBar { get; set; }
 
-        [JsonProperty("horizontalScrollBarVisibility")]
+        [JsonProperty("horizontal_scroll_bar_visibility")]
         public ScrollBarVisibility? HorizontalScrollBarVisibility { get; set; }
 
-        [JsonProperty("mouseWheelScrollSize")]
+        [JsonProperty("mouse_wheel_scroll_size")]
         public double? MouseWheelScrollSize { get; set; }
 
-        [JsonProperty("scrollDecelerationRate")]
+        [JsonProperty("scroll_deceleration_rate")]
         public double? ScrollDecelerationRate { get; set; }
 
-        [JsonProperty("touchScrollBehavior")]
+        [JsonProperty("touch_scroll_behavior")]
         public TouchScrollBehavior? TouchScrollBehavior { get; set; }
 
-        [JsonProperty("verticalPageSize")]
+        [JsonProperty("vertical_page_size")]
         public double? VerticalPageSize { get; set; }
 
-        [JsonProperty("verticalScrollBar")]
+        [JsonProperty("vertical_scroll_bar")]
         public ScrollBar VerticalScrollBar { get; set; }
 
-        [JsonProperty("verticalScrollBarVisibility")]
+        [JsonProperty("vertical_scroll_bar_visibility")]
         public ScrollBarVisibility? VerticalScrollBarVisibility { get; set; }
     }
 
@@ -1323,31 +1323,31 @@ namespace Dreamtides.Schema
 
     public partial class FlexStyle
     {
-        [JsonProperty("alignContent")]
+        [JsonProperty("align_content")]
         public FlexAlign? AlignContent { get; set; }
 
-        [JsonProperty("alignItems")]
+        [JsonProperty("align_items")]
         public FlexAlign? AlignItems { get; set; }
 
-        [JsonProperty("alignSelf")]
+        [JsonProperty("align_self")]
         public FlexAlign? AlignSelf { get; set; }
 
-        [JsonProperty("backgroundColor")]
+        [JsonProperty("background_color")]
         public DisplayColor BackgroundColor { get; set; }
 
-        [JsonProperty("backgroundImage")]
+        [JsonProperty("background_image")]
         public SpriteAddress BackgroundImage { get; set; }
 
-        [JsonProperty("backgroundImageTintColor")]
+        [JsonProperty("background_image_tint_color")]
         public DisplayColor BackgroundImageTintColor { get; set; }
 
-        [JsonProperty("borderColor")]
+        [JsonProperty("border_color")]
         public BorderColor BorderColor { get; set; }
 
-        [JsonProperty("borderRadius")]
+        [JsonProperty("border_radius")]
         public BorderRadius BorderRadius { get; set; }
 
-        [JsonProperty("borderWidth")]
+        [JsonProperty("border_width")]
         public BorderWidth BorderWidth { get; set; }
 
         [JsonProperty("color")]
@@ -1356,55 +1356,55 @@ namespace Dreamtides.Schema
         [JsonProperty("display")]
         public FlexDisplayStyle? Display { get; set; }
 
-        [JsonProperty("flexBasis")]
+        [JsonProperty("flex_basis")]
         public Dimension FlexBasis { get; set; }
 
-        [JsonProperty("flexDirection")]
+        [JsonProperty("flex_direction")]
         public FlexDirection? FlexDirection { get; set; }
 
-        [JsonProperty("flexGrow")]
+        [JsonProperty("flex_grow")]
         public double? FlexGrow { get; set; }
 
-        [JsonProperty("flexShrink")]
+        [JsonProperty("flex_shrink")]
         public double? FlexShrink { get; set; }
 
         [JsonProperty("font")]
         public FontAddress Font { get; set; }
 
-        [JsonProperty("fontSize")]
+        [JsonProperty("font_size")]
         public Dimension FontSize { get; set; }
 
-        [JsonProperty("fontStyle")]
+        [JsonProperty("font_style")]
         public FontStyle? FontStyle { get; set; }
 
         [JsonProperty("height")]
         public Dimension Height { get; set; }
 
-        [JsonProperty("imageSlice")]
+        [JsonProperty("image_slice")]
         public ImageSlice ImageSlice { get; set; }
 
         [JsonProperty("inset")]
         public FlexInsets Inset { get; set; }
 
-        [JsonProperty("justifyContent")]
+        [JsonProperty("justify_content")]
         public FlexJustify? JustifyContent { get; set; }
 
-        [JsonProperty("letterSpacing")]
+        [JsonProperty("letter_spacing")]
         public Dimension LetterSpacing { get; set; }
 
         [JsonProperty("margin")]
         public DimensionGroup Margin { get; set; }
 
-        [JsonProperty("maxHeight")]
+        [JsonProperty("max_height")]
         public Dimension MaxHeight { get; set; }
 
-        [JsonProperty("maxWidth")]
+        [JsonProperty("max_width")]
         public Dimension MaxWidth { get; set; }
 
-        [JsonProperty("minHeight")]
+        [JsonProperty("min_height")]
         public Dimension MinHeight { get; set; }
 
-        [JsonProperty("minWidth")]
+        [JsonProperty("min_width")]
         public Dimension MinWidth { get; set; }
 
         [JsonProperty("opacity")]
@@ -1413,16 +1413,16 @@ namespace Dreamtides.Schema
         [JsonProperty("overflow")]
         public FlexVisibility? Overflow { get; set; }
 
-        [JsonProperty("overflowClipBox")]
+        [JsonProperty("overflow_clip_box")]
         public OverflowClipBox? OverflowClipBox { get; set; }
 
         [JsonProperty("padding")]
         public DimensionGroup Padding { get; set; }
 
-        [JsonProperty("paragraphSpacing")]
+        [JsonProperty("paragraph_spacing")]
         public Dimension ParagraphSpacing { get; set; }
 
-        [JsonProperty("pickingMode")]
+        [JsonProperty("picking_mode")]
         public FlexPickingMode? PickingMode { get; set; }
 
         [JsonProperty("position")]
@@ -1434,37 +1434,37 @@ namespace Dreamtides.Schema
         [JsonProperty("scale")]
         public FlexScale Scale { get; set; }
 
-        [JsonProperty("textAlign")]
+        [JsonProperty("text_align")]
         public TextAlign? TextAlign { get; set; }
 
-        [JsonProperty("textOutlineColor")]
+        [JsonProperty("text_outline_color")]
         public DisplayColor TextOutlineColor { get; set; }
 
-        [JsonProperty("textOutlineWidth")]
+        [JsonProperty("text_outline_width")]
         public double? TextOutlineWidth { get; set; }
 
-        [JsonProperty("textOverflow")]
+        [JsonProperty("text_overflow")]
         public TextOverflow? TextOverflow { get; set; }
 
-        [JsonProperty("textOverflowPosition")]
+        [JsonProperty("text_overflow_position")]
         public TextOverflowPosition? TextOverflowPosition { get; set; }
 
-        [JsonProperty("textShadow")]
+        [JsonProperty("text_shadow")]
         public TextShadow TextShadow { get; set; }
 
-        [JsonProperty("transformOrigin")]
+        [JsonProperty("transform_origin")]
         public FlexTranslate TransformOrigin { get; set; }
 
-        [JsonProperty("transitionDelays", Required = Required.Always)]
+        [JsonProperty("transition_delays", Required = Required.Always)]
         public List<Milliseconds> TransitionDelays { get; set; }
 
-        [JsonProperty("transitionDurations", Required = Required.Always)]
+        [JsonProperty("transition_durations", Required = Required.Always)]
         public List<Milliseconds> TransitionDurations { get; set; }
 
-        [JsonProperty("transitionEasingModes", Required = Required.Always)]
+        [JsonProperty("transition_easing_modes", Required = Required.Always)]
         public List<EasingMode> TransitionEasingModes { get; set; }
 
-        [JsonProperty("transitionProperties", Required = Required.Always)]
+        [JsonProperty("transition_properties", Required = Required.Always)]
         public List<string> TransitionProperties { get; set; }
 
         [JsonProperty("translate")]
@@ -1473,13 +1473,13 @@ namespace Dreamtides.Schema
         [JsonProperty("visibility")]
         public FlexVisibility? Visibility { get; set; }
 
-        [JsonProperty("whiteSpace")]
+        [JsonProperty("white_space")]
         public WhiteSpace? WhiteSpace { get; set; }
 
         [JsonProperty("width")]
         public Dimension Width { get; set; }
 
-        [JsonProperty("wordSpacing")]
+        [JsonProperty("word_spacing")]
         public Dimension WordSpacing { get; set; }
 
         [JsonProperty("wrap")]
@@ -1509,16 +1509,16 @@ namespace Dreamtides.Schema
 
     public partial class BorderRadius
     {
-        [JsonProperty("bottomLeft", Required = Required.Always)]
+        [JsonProperty("bottom_left", Required = Required.Always)]
         public Dimension BottomLeft { get; set; }
 
-        [JsonProperty("bottomRight", Required = Required.Always)]
+        [JsonProperty("bottom_right", Required = Required.Always)]
         public Dimension BottomRight { get; set; }
 
-        [JsonProperty("topLeft", Required = Required.Always)]
+        [JsonProperty("top_left", Required = Required.Always)]
         public Dimension TopLeft { get; set; }
 
-        [JsonProperty("topRight", Required = Required.Always)]
+        [JsonProperty("top_right", Required = Required.Always)]
         public Dimension TopRight { get; set; }
     }
 
@@ -1611,7 +1611,7 @@ namespace Dreamtides.Schema
 
     public partial class TextShadow
     {
-        [JsonProperty("blurRadius", Required = Required.Always)]
+        [JsonProperty("blur_radius", Required = Required.Always)]
         public double BlurRadius { get; set; }
 
         [JsonProperty("color", Required = Required.Always)]
@@ -1647,19 +1647,19 @@ namespace Dreamtides.Schema
         [JsonProperty("direction")]
         public SliderDirection? Direction { get; set; }
 
-        [JsonProperty("dragContainerStyle")]
+        [JsonProperty("drag_container_style")]
         public FlexStyle DragContainerStyle { get; set; }
 
-        [JsonProperty("draggerBorderStyle")]
+        [JsonProperty("dragger_border_style")]
         public FlexStyle DraggerBorderStyle { get; set; }
 
-        [JsonProperty("draggerStyle")]
+        [JsonProperty("dragger_style")]
         public FlexStyle DraggerStyle { get; set; }
 
-        [JsonProperty("highValue")]
+        [JsonProperty("high_value")]
         public double? HighValue { get; set; }
 
-        [JsonProperty("initialValue")]
+        [JsonProperty("initial_value")]
         public double? InitialValue { get; set; }
 
         [JsonProperty("inverted")]
@@ -1668,22 +1668,22 @@ namespace Dreamtides.Schema
         [JsonProperty("label")]
         public string Label { get; set; }
 
-        [JsonProperty("labelStyle")]
+        [JsonProperty("label_style")]
         public FlexStyle LabelStyle { get; set; }
 
-        [JsonProperty("lowValue")]
+        [JsonProperty("low_value")]
         public double? LowValue { get; set; }
 
-        [JsonProperty("pageSize")]
+        [JsonProperty("page_size")]
         public double? PageSize { get; set; }
 
-        [JsonProperty("preferenceKey")]
+        [JsonProperty("preference_key")]
         public string PreferenceKey { get; set; }
 
-        [JsonProperty("showInputField")]
+        [JsonProperty("show_input_field")]
         public bool? ShowInputField { get; set; }
 
-        [JsonProperty("trackerStyle")]
+        [JsonProperty("tracker_style")]
         public FlexStyle TrackerStyle { get; set; }
     }
 
@@ -1695,55 +1695,55 @@ namespace Dreamtides.Schema
 
     public partial class TextFieldNode
     {
-        [JsonProperty("doubleClickSelectsWord")]
+        [JsonProperty("double_click_selects_word")]
         public bool? DoubleClickSelectsWord { get; set; }
 
-        [JsonProperty("globalIdentifier")]
+        [JsonProperty("global_identifier")]
         public string GlobalIdentifier { get; set; }
 
-        [JsonProperty("initialText")]
+        [JsonProperty("initial_text")]
         public string InitialText { get; set; }
 
-        [JsonProperty("isPasswordField")]
+        [JsonProperty("is_password_field")]
         public bool? IsPasswordField { get; set; }
 
-        [JsonProperty("isReadOnly")]
+        [JsonProperty("is_read_only")]
         public bool? IsReadOnly { get; set; }
 
-        [JsonProperty("maskCharacter")]
+        [JsonProperty("mask_character")]
         public string MaskCharacter { get; set; }
 
-        [JsonProperty("maxLength")]
+        [JsonProperty("max_length")]
         public long? MaxLength { get; set; }
 
         [JsonProperty("multiline")]
         public bool? Multiline { get; set; }
 
-        [JsonProperty("tripleClickSelectsLine")]
+        [JsonProperty("triple_click_selects_line")]
         public bool? TripleClickSelectsLine { get; set; }
     }
 
     public partial class EventHandlers
     {
-        [JsonProperty("onClick")]
+        [JsonProperty("on_click")]
         public ActionUnion? OnClick { get; set; }
 
-        [JsonProperty("onFieldChanged")]
+        [JsonProperty("on_field_changed")]
         public ActionUnion? OnFieldChanged { get; set; }
 
-        [JsonProperty("onLongPress")]
+        [JsonProperty("on_long_press")]
         public ActionUnion? OnLongPress { get; set; }
 
-        [JsonProperty("onMouseDown")]
+        [JsonProperty("on_mouse_down")]
         public ActionUnion? OnMouseDown { get; set; }
 
-        [JsonProperty("onMouseEnter")]
+        [JsonProperty("on_mouse_enter")]
         public ActionUnion? OnMouseEnter { get; set; }
 
-        [JsonProperty("onMouseLeave")]
+        [JsonProperty("on_mouse_leave")]
         public ActionUnion? OnMouseLeave { get; set; }
 
-        [JsonProperty("onMouseUp")]
+        [JsonProperty("on_mouse_up")]
         public ActionUnion? OnMouseUp { get; set; }
     }
 
@@ -1755,7 +1755,7 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Projectile to display as a trail behind this card.
         /// </summary>
-        [JsonProperty("cardTrail")]
+        [JsonProperty("card_trail")]
         public ProjectileAddress CardTrail { get; set; }
     }
 
@@ -1770,10 +1770,10 @@ namespace Dreamtides.Schema
     /// </summary>
     public partial class DisplayImage
     {
-        [JsonProperty("sprite", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("Sprite", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SpriteAddress Sprite { get; set; }
 
-        [JsonProperty("prefab", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("Prefab", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPrefabImage Prefab { get; set; }
     }
 
@@ -1782,7 +1782,7 @@ namespace Dreamtides.Schema
         [JsonProperty("prefab", Required = Required.Always)]
         public PrefabAddress Prefab { get; set; }
 
-        [JsonProperty("studioType", Required = Required.Always)]
+        [JsonProperty("studio_type", Required = Required.Always)]
         public StudioType StudioType { get; set; }
     }
 
@@ -1804,13 +1804,13 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Additional help text about this card, describing its abilities.
         /// </summary>
-        [JsonProperty("supplementalCardInfo")]
+        [JsonProperty("supplemental_card_info")]
         public FlexNode SupplementalCardInfo { get; set; }
     }
 
     public partial class InfoZoomIcon
     {
-        [JsonProperty("cardId", Required = Required.Always)]
+        [JsonProperty("card_id", Required = Required.Always)]
         public string CardId { get; set; }
 
         [JsonProperty("color", Required = Required.Always)]
@@ -1822,37 +1822,37 @@ namespace Dreamtides.Schema
 
     public partial class FireProjectileCommand
     {
-        [JsonProperty("additionalHit")]
+        [JsonProperty("additional_hit")]
         public EffectAddress AdditionalHit { get; set; }
 
-        [JsonProperty("additionalHitDelay")]
+        [JsonProperty("additional_hit_delay")]
         public Milliseconds AdditionalHitDelay { get; set; }
 
-        [JsonProperty("fireSound")]
+        [JsonProperty("fire_sound")]
         public AudioClipAddress FireSound { get; set; }
 
-        [JsonProperty("hideOnHit", Required = Required.Always)]
+        [JsonProperty("hide_on_hit", Required = Required.Always)]
         public bool HideOnHit { get; set; }
 
-        [JsonProperty("impactSound")]
+        [JsonProperty("impact_sound")]
         public AudioClipAddress ImpactSound { get; set; }
 
-        [JsonProperty("jumpToPosition")]
+        [JsonProperty("jump_to_position")]
         public ObjectPosition JumpToPosition { get; set; }
 
         [JsonProperty("projectile", Required = Required.Always)]
         public ProjectileAddress Projectile { get; set; }
 
-        [JsonProperty("sourceId", Required = Required.Always)]
+        [JsonProperty("source_id", Required = Required.Always)]
         public GameObjectId SourceId { get; set; }
 
-        [JsonProperty("targetId", Required = Required.Always)]
+        [JsonProperty("target_id", Required = Required.Always)]
         public GameObjectId TargetId { get; set; }
 
-        [JsonProperty("travelDuration")]
+        [JsonProperty("travel_duration")]
         public Milliseconds TravelDuration { get; set; }
 
-        [JsonProperty("waitDuration")]
+        [JsonProperty("wait_duration")]
         public Milliseconds WaitDuration { get; set; }
     }
 
@@ -1861,7 +1861,7 @@ namespace Dreamtides.Schema
         /// <summary>
         /// How long to pause before continuing with animations.
         /// </summary>
-        [JsonProperty("pauseDuration", Required = Required.Always)]
+        [JsonProperty("pause_duration", Required = Required.Always)]
         public Milliseconds PauseDuration { get; set; }
 
         /// <summary>
@@ -1876,13 +1876,13 @@ namespace Dreamtides.Schema
         [JsonProperty("animation", Required = Required.Always)]
         public StudioAnimation Animation { get; set; }
 
-        [JsonProperty("enterAnimation")]
+        [JsonProperty("enter_animation")]
         public StudioAnimation EnterAnimation { get; set; }
 
-        [JsonProperty("exitAnimation")]
+        [JsonProperty("exit_animation")]
         public StudioAnimation ExitAnimation { get; set; }
 
-        [JsonProperty("studioType", Required = Required.Always)]
+        [JsonProperty("studio_type", Required = Required.Always)]
         public StudioType StudioType { get; set; }
     }
 
@@ -1903,7 +1903,7 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Sound to play when the battle is updated.
         /// </summary>
-        [JsonProperty("updateSound")]
+        [JsonProperty("update_sound")]
         public AudioClipAddress UpdateSound { get; set; }
     }
 
@@ -1982,7 +1982,7 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Can this player currently take a game action?
         /// </summary>
-        [JsonProperty("canAct", Required = Required.Always)]
+        [JsonProperty("can_act", Required = Required.Always)]
         public bool CanAct { get; set; }
 
         /// <summary>
@@ -1994,13 +1994,13 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Will this player win the game in their next judgment phase?
         /// </summary>
-        [JsonProperty("isVictoryImminent", Required = Required.Always)]
+        [JsonProperty("is_victory_imminent", Required = Required.Always)]
         public bool IsVictoryImminent { get; set; }
 
         /// <summary>
         /// Energy produced by this player at the start of the current turn
         /// </summary>
-        [JsonProperty("producedEnergy", Required = Required.Always)]
+        [JsonProperty("produced_energy", Required = Required.Always)]
         public long ProducedEnergy { get; set; }
 
         /// <summary>
@@ -2012,14 +2012,14 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Total spark for this player
         /// </summary>
-        [JsonProperty("totalSpark", Required = Required.Always)]
+        [JsonProperty("total_spark", Required = Required.Always)]
         public long TotalSpark { get; set; }
 
         /// <summary>
         /// Indicates whether it is this player's turn, and if so, which phase of
         /// the turn they are in.
         /// </summary>
-        [JsonProperty("turnIndicator")]
+        [JsonProperty("turn_indicator")]
         public DisplayedTurnIndicator? TurnIndicator { get; set; }
     }
 
@@ -2033,7 +2033,7 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Button most often used for toggling the visibility of card browsers.
         /// </summary>
-        [JsonProperty("bottomRightButton")]
+        [JsonProperty("bottom_right_button")]
         public ButtonView BottomRightButton { get; set; }
 
         /// <summary>
@@ -2045,32 +2045,32 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Options for display of the card order selector
         /// </summary>
-        [JsonProperty("cardOrderSelector")]
+        [JsonProperty("card_order_selector")]
         public CardOrderSelectorView CardOrderSelector { get; set; }
 
         /// <summary>
         /// Button to decrement the number shown in a number prompt.
         /// </summary>
-        [JsonProperty("decrementButton")]
+        [JsonProperty("decrement_button")]
         public ButtonView DecrementButton { get; set; }
 
         /// <summary>
         /// Button to toggle the display of the developer panel
         /// </summary>
-        [JsonProperty("devButton")]
+        [JsonProperty("dev_button")]
         public ButtonView DevButton { get; set; }
 
         /// <summary>
         /// Button to increment the number shown in a number prompt.
         /// </summary>
-        [JsonProperty("incrementButton")]
+        [JsonProperty("increment_button")]
         public ButtonView IncrementButton { get; set; }
 
         /// <summary>
         /// Primary action button, used for confirming selections and ending the
         /// turn. None indicates no button should be shown.
         /// </summary>
-        [JsonProperty("primaryActionButton")]
+        [JsonProperty("primary_action_button")]
         public ButtonView PrimaryActionButton { get; set; }
 
         /// <summary>
@@ -2078,25 +2078,25 @@ namespace Dreamtides.Schema
         /// will wait for this duration after the last "update" before appearing. If
         /// this is None the button will display immediately.
         /// </summary>
-        [JsonProperty("primaryActionShowOnIdleDuration")]
+        [JsonProperty("primary_action_show_on_idle_duration")]
         public Milliseconds PrimaryActionShowOnIdleDuration { get; set; }
 
         /// <summary>
         /// Content to display on top of all other game UI.
         /// </summary>
-        [JsonProperty("screenOverlay")]
+        [JsonProperty("screen_overlay")]
         public FlexNode ScreenOverlay { get; set; }
 
         /// <summary>
         /// Secondary action button, used for alternative choice options.
         /// </summary>
-        [JsonProperty("secondaryActionButton")]
+        [JsonProperty("secondary_action_button")]
         public ButtonView SecondaryActionButton { get; set; }
 
         /// <summary>
         /// Button to perform an undo operation
         /// </summary>
-        [JsonProperty("undoButton")]
+        [JsonProperty("undo_button")]
         public ButtonView UndoButton { get; set; }
     }
 
@@ -2123,7 +2123,7 @@ namespace Dreamtides.Schema
         ///
         /// If None is provided, no close button should be shown.
         /// </summary>
-        [JsonProperty("closeButton")]
+        [JsonProperty("close_button")]
         public ActionUnion? CloseButton { get; set; }
     }
 
@@ -2132,13 +2132,13 @@ namespace Dreamtides.Schema
         /// <summary>
         /// Include the user's deck as a card drop target
         /// </summary>
-        [JsonProperty("includeDeck", Required = Required.Always)]
+        [JsonProperty("include_deck", Required = Required.Always)]
         public bool IncludeDeck { get; set; }
 
         /// <summary>
         /// Include the user's void as a card drop target
         /// </summary>
-        [JsonProperty("includeVoid", Required = Required.Always)]
+        [JsonProperty("include_void", Required = Required.Always)]
         public bool IncludeVoid { get; set; }
     }
 
@@ -2147,7 +2147,7 @@ namespace Dreamtides.Schema
     /// </summary>
     public partial class BattlePreviewStateClass
     {
-        [JsonProperty("active", Required = Required.Always)]
+        [JsonProperty("Active", Required = Required.Always)]
         public BattlePreviewView Active { get; set; }
     }
 
@@ -2160,7 +2160,7 @@ namespace Dreamtides.Schema
         /// The version of the last response the client received, used to prevent
         /// duplicate actions.
         /// </summary>
-        [JsonProperty("lastResponseVersion")]
+        [JsonProperty("last_response_version")]
         public Guid? LastResponseVersion { get; set; }
 
         [JsonProperty("metadata", Required = Required.Always)]
@@ -2170,22 +2170,22 @@ namespace Dreamtides.Schema
         /// If specified, treats this as a multiplayer game using the save file
         /// provided in this ID instead of reading the user's own save file.
         /// </summary>
-        [JsonProperty("saveFileId")]
+        [JsonProperty("save_file_id")]
         public Guid? SaveFileId { get; set; }
     }
 
     public partial class GameActionClass
     {
-        [JsonProperty("debugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("DebugAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DebugAction? DebugAction { get; set; }
 
-        [JsonProperty("battleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("BattleAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public BattleAction? BattleAction { get; set; }
 
-        [JsonProperty("battleDisplayAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("BattleDisplayAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public BattleDisplayAction? BattleDisplayAction { get; set; }
 
-        [JsonProperty("undo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("Undo", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayerName? Undo { get; set; }
     }
 
@@ -2212,10 +2212,10 @@ namespace Dreamtides.Schema
         [JsonProperty("metadata", Required = Required.Always)]
         public Metadata Metadata { get; set; }
 
-        [JsonProperty("responseType", Required = Required.Always)]
+        [JsonProperty("response_type", Required = Required.Always)]
         public PollResponseType ResponseType { get; set; }
 
-        [JsonProperty("responseVersion")]
+        [JsonProperty("response_version")]
         public Guid? ResponseVersion { get; set; }
     }
 
@@ -2613,13 +2613,13 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "debug":
+                case "Debug":
                     return LogType.Debug;
-                case "error":
+                case "Error":
                     return LogType.Error;
-                case "info":
+                case "Info":
                     return LogType.Info;
-                case "warning":
+                case "Warning":
                     return LogType.Warning;
             }
             throw new Exception("Cannot unmarshal type LogType");
@@ -2636,16 +2636,16 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case LogType.Debug:
-                    serializer.Serialize(writer, "debug");
+                    serializer.Serialize(writer, "Debug");
                     return;
                 case LogType.Error:
-                    serializer.Serialize(writer, "error");
+                    serializer.Serialize(writer, "Error");
                     return;
                 case LogType.Info:
-                    serializer.Serialize(writer, "info");
+                    serializer.Serialize(writer, "Info");
                     return;
                 case LogType.Warning:
-                    serializer.Serialize(writer, "warning");
+                    serializer.Serialize(writer, "Warning");
                     return;
             }
             throw new Exception("Cannot marshal type LogType");
@@ -2664,19 +2664,19 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "applyCommandGroup":
+                case "ApplyCommandGroup":
                     return LogSpanName.ApplyCommandGroup;
-                case "applyCommands":
+                case "ApplyCommands":
                     return LogSpanName.ApplyCommands;
-                case "connect":
+                case "Connect":
                     return LogSpanName.Connect;
-                case "performAction":
+                case "PerformAction":
                     return LogSpanName.PerformAction;
-                case "poll":
+                case "Poll":
                     return LogSpanName.Poll;
-                case "untagged":
+                case "Untagged":
                     return LogSpanName.Untagged;
-                case "updateBattleLayout":
+                case "UpdateBattleLayout":
                     return LogSpanName.UpdateBattleLayout;
             }
             throw new Exception("Cannot unmarshal type LogSpanName");
@@ -2693,25 +2693,25 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case LogSpanName.ApplyCommandGroup:
-                    serializer.Serialize(writer, "applyCommandGroup");
+                    serializer.Serialize(writer, "ApplyCommandGroup");
                     return;
                 case LogSpanName.ApplyCommands:
-                    serializer.Serialize(writer, "applyCommands");
+                    serializer.Serialize(writer, "ApplyCommands");
                     return;
                 case LogSpanName.Connect:
-                    serializer.Serialize(writer, "connect");
+                    serializer.Serialize(writer, "Connect");
                     return;
                 case LogSpanName.PerformAction:
-                    serializer.Serialize(writer, "performAction");
+                    serializer.Serialize(writer, "PerformAction");
                     return;
                 case LogSpanName.Poll:
-                    serializer.Serialize(writer, "poll");
+                    serializer.Serialize(writer, "Poll");
                     return;
                 case LogSpanName.Untagged:
-                    serializer.Serialize(writer, "untagged");
+                    serializer.Serialize(writer, "Untagged");
                     return;
                 case LogSpanName.UpdateBattleLayout:
-                    serializer.Serialize(writer, "updateBattleLayout");
+                    serializer.Serialize(writer, "UpdateBattleLayout");
                     return;
             }
             throw new Exception("Cannot marshal type LogSpanName");
@@ -2733,13 +2733,13 @@ namespace Dreamtides.Schema
                     var stringValue = serializer.Deserialize<string>(reader);
                     switch (stringValue)
                     {
-                        case "alwaysPanic":
+                        case "AlwaysPanic":
                             return new GameAi { Enum = GameAiEnum.AlwaysPanic };
-                        case "firstAvailableAction":
+                        case "FirstAvailableAction":
                             return new GameAi { Enum = GameAiEnum.FirstAvailableAction };
-                        case "randomAction":
+                        case "RandomAction":
                             return new GameAi { Enum = GameAiEnum.RandomAction };
-                        case "waitFiveSeconds":
+                        case "WaitFiveSeconds":
                             return new GameAi { Enum = GameAiEnum.WaitFiveSeconds };
                     }
                     break;
@@ -2758,16 +2758,16 @@ namespace Dreamtides.Schema
                 switch (value.Enum)
                 {
                     case GameAiEnum.AlwaysPanic:
-                        serializer.Serialize(writer, "alwaysPanic");
+                        serializer.Serialize(writer, "AlwaysPanic");
                         return;
                     case GameAiEnum.FirstAvailableAction:
-                        serializer.Serialize(writer, "firstAvailableAction");
+                        serializer.Serialize(writer, "FirstAvailableAction");
                         return;
                     case GameAiEnum.RandomAction:
-                        serializer.Serialize(writer, "randomAction");
+                        serializer.Serialize(writer, "RandomAction");
                         return;
                     case GameAiEnum.WaitFiveSeconds:
-                        serializer.Serialize(writer, "waitFiveSeconds");
+                        serializer.Serialize(writer, "WaitFiveSeconds");
                         return;
                 }
             }
@@ -2792,13 +2792,13 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "alwaysPanic":
+                case "AlwaysPanic":
                     return GameAiEnum.AlwaysPanic;
-                case "firstAvailableAction":
+                case "FirstAvailableAction":
                     return GameAiEnum.FirstAvailableAction;
-                case "randomAction":
+                case "RandomAction":
                     return GameAiEnum.RandomAction;
-                case "waitFiveSeconds":
+                case "WaitFiveSeconds":
                     return GameAiEnum.WaitFiveSeconds;
             }
             throw new Exception("Cannot unmarshal type GameAiEnum");
@@ -2815,16 +2815,16 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case GameAiEnum.AlwaysPanic:
-                    serializer.Serialize(writer, "alwaysPanic");
+                    serializer.Serialize(writer, "AlwaysPanic");
                     return;
                 case GameAiEnum.FirstAvailableAction:
-                    serializer.Serialize(writer, "firstAvailableAction");
+                    serializer.Serialize(writer, "FirstAvailableAction");
                     return;
                 case GameAiEnum.RandomAction:
-                    serializer.Serialize(writer, "randomAction");
+                    serializer.Serialize(writer, "RandomAction");
                     return;
                 case GameAiEnum.WaitFiveSeconds:
-                    serializer.Serialize(writer, "waitFiveSeconds");
+                    serializer.Serialize(writer, "WaitFiveSeconds");
                     return;
             }
             throw new Exception("Cannot marshal type GameAiEnum");
@@ -2884,13 +2884,13 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "defeat":
+                case "Defeat":
                     return GameMessageType.Defeat;
-                case "enemyTurn":
+                case "EnemyTurn":
                     return GameMessageType.EnemyTurn;
-                case "victory":
+                case "Victory":
                     return GameMessageType.Victory;
-                case "yourTurn":
+                case "YourTurn":
                     return GameMessageType.YourTurn;
             }
             throw new Exception("Cannot unmarshal type GameMessageType");
@@ -2907,16 +2907,16 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case GameMessageType.Defeat:
-                    serializer.Serialize(writer, "defeat");
+                    serializer.Serialize(writer, "Defeat");
                     return;
                 case GameMessageType.EnemyTurn:
-                    serializer.Serialize(writer, "enemyTurn");
+                    serializer.Serialize(writer, "EnemyTurn");
                     return;
                 case GameMessageType.Victory:
-                    serializer.Serialize(writer, "victory");
+                    serializer.Serialize(writer, "Victory");
                     return;
                 case GameMessageType.YourTurn:
-                    serializer.Serialize(writer, "yourTurn");
+                    serializer.Serialize(writer, "YourTurn");
                     return;
             }
             throw new Exception("Cannot marshal type GameMessageType");
@@ -2935,9 +2935,9 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "faceDown":
+                case "FaceDown":
                     return CardFacing.FaceDown;
-                case "faceUp":
+                case "FaceUp":
                     return CardFacing.FaceUp;
             }
             throw new Exception("Cannot unmarshal type CardFacing");
@@ -2954,10 +2954,10 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case CardFacing.FaceDown:
-                    serializer.Serialize(writer, "faceDown");
+                    serializer.Serialize(writer, "FaceDown");
                     return;
                 case CardFacing.FaceUp:
-                    serializer.Serialize(writer, "faceUp");
+                    serializer.Serialize(writer, "FaceUp");
                     return;
             }
             throw new Exception("Cannot marshal type CardFacing");
@@ -2979,21 +2979,21 @@ namespace Dreamtides.Schema
                     var stringValue = serializer.Deserialize<string>(reader);
                     switch (stringValue)
                     {
-                        case "browser":
+                        case "Browser":
                             return new Position { Enum = PositionEnum.Browser };
-                        case "default":
+                        case "Default":
                             return new Position { Enum = PositionEnum.Default };
-                        case "drawn":
+                        case "Drawn":
                             return new Position { Enum = PositionEnum.Drawn };
-                        case "dreamwellActivation":
+                        case "DreamwellActivation":
                             return new Position { Enum = PositionEnum.DreamwellActivation };
-                        case "gameModifier":
+                        case "GameModifier":
                             return new Position { Enum = PositionEnum.GameModifier };
-                        case "handStorage":
+                        case "HandStorage":
                             return new Position { Enum = PositionEnum.HandStorage };
-                        case "offscreen":
+                        case "Offscreen":
                             return new Position { Enum = PositionEnum.Offscreen };
-                        case "onScreenStorage":
+                        case "OnScreenStorage":
                             return new Position { Enum = PositionEnum.OnScreenStorage };
                     }
                     break;
@@ -3012,28 +3012,28 @@ namespace Dreamtides.Schema
                 switch (value.Enum)
                 {
                     case PositionEnum.Browser:
-                        serializer.Serialize(writer, "browser");
+                        serializer.Serialize(writer, "Browser");
                         return;
                     case PositionEnum.Default:
-                        serializer.Serialize(writer, "default");
+                        serializer.Serialize(writer, "Default");
                         return;
                     case PositionEnum.Drawn:
-                        serializer.Serialize(writer, "drawn");
+                        serializer.Serialize(writer, "Drawn");
                         return;
                     case PositionEnum.DreamwellActivation:
-                        serializer.Serialize(writer, "dreamwellActivation");
+                        serializer.Serialize(writer, "DreamwellActivation");
                         return;
                     case PositionEnum.GameModifier:
-                        serializer.Serialize(writer, "gameModifier");
+                        serializer.Serialize(writer, "GameModifier");
                         return;
                     case PositionEnum.HandStorage:
-                        serializer.Serialize(writer, "handStorage");
+                        serializer.Serialize(writer, "HandStorage");
                         return;
                     case PositionEnum.Offscreen:
-                        serializer.Serialize(writer, "offscreen");
+                        serializer.Serialize(writer, "Offscreen");
                         return;
                     case PositionEnum.OnScreenStorage:
-                        serializer.Serialize(writer, "onScreenStorage");
+                        serializer.Serialize(writer, "OnScreenStorage");
                         return;
                 }
             }
@@ -3099,13 +3099,13 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "default":
+                case "Default":
                     return StackType.Default;
-                case "targetingBothBattlefields":
+                case "TargetingBothBattlefields":
                     return StackType.TargetingBothBattlefields;
-                case "targetingEnemyBattlefield":
+                case "TargetingEnemyBattlefield":
                     return StackType.TargetingEnemyBattlefield;
-                case "targetingUserBattlefield":
+                case "TargetingUserBattlefield":
                     return StackType.TargetingUserBattlefield;
             }
             throw new Exception("Cannot unmarshal type StackType");
@@ -3122,16 +3122,16 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case StackType.Default:
-                    serializer.Serialize(writer, "default");
+                    serializer.Serialize(writer, "Default");
                     return;
                 case StackType.TargetingBothBattlefields:
-                    serializer.Serialize(writer, "targetingBothBattlefields");
+                    serializer.Serialize(writer, "TargetingBothBattlefields");
                     return;
                 case StackType.TargetingEnemyBattlefield:
-                    serializer.Serialize(writer, "targetingEnemyBattlefield");
+                    serializer.Serialize(writer, "TargetingEnemyBattlefield");
                     return;
                 case StackType.TargetingUserBattlefield:
-                    serializer.Serialize(writer, "targetingUserBattlefield");
+                    serializer.Serialize(writer, "TargetingUserBattlefield");
                     return;
             }
             throw new Exception("Cannot marshal type StackType");
@@ -3150,21 +3150,21 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "browser":
+                case "Browser":
                     return PositionEnum.Browser;
-                case "default":
+                case "Default":
                     return PositionEnum.Default;
-                case "drawn":
+                case "Drawn":
                     return PositionEnum.Drawn;
-                case "dreamwellActivation":
+                case "DreamwellActivation":
                     return PositionEnum.DreamwellActivation;
-                case "gameModifier":
+                case "GameModifier":
                     return PositionEnum.GameModifier;
-                case "handStorage":
+                case "HandStorage":
                     return PositionEnum.HandStorage;
-                case "offscreen":
+                case "Offscreen":
                     return PositionEnum.Offscreen;
-                case "onScreenStorage":
+                case "OnScreenStorage":
                     return PositionEnum.OnScreenStorage;
             }
             throw new Exception("Cannot unmarshal type PositionEnum");
@@ -3181,28 +3181,28 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case PositionEnum.Browser:
-                    serializer.Serialize(writer, "browser");
+                    serializer.Serialize(writer, "Browser");
                     return;
                 case PositionEnum.Default:
-                    serializer.Serialize(writer, "default");
+                    serializer.Serialize(writer, "Default");
                     return;
                 case PositionEnum.Drawn:
-                    serializer.Serialize(writer, "drawn");
+                    serializer.Serialize(writer, "Drawn");
                     return;
                 case PositionEnum.DreamwellActivation:
-                    serializer.Serialize(writer, "dreamwellActivation");
+                    serializer.Serialize(writer, "DreamwellActivation");
                     return;
                 case PositionEnum.GameModifier:
-                    serializer.Serialize(writer, "gameModifier");
+                    serializer.Serialize(writer, "GameModifier");
                     return;
                 case PositionEnum.HandStorage:
-                    serializer.Serialize(writer, "handStorage");
+                    serializer.Serialize(writer, "HandStorage");
                     return;
                 case PositionEnum.Offscreen:
-                    serializer.Serialize(writer, "offscreen");
+                    serializer.Serialize(writer, "Offscreen");
                     return;
                 case PositionEnum.OnScreenStorage:
-                    serializer.Serialize(writer, "onScreenStorage");
+                    serializer.Serialize(writer, "OnScreenStorage");
                     return;
             }
             throw new Exception("Cannot marshal type PositionEnum");
@@ -3221,19 +3221,19 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "character":
+                case "Character":
                     return CardPrefab.Character;
-                case "dreamsign":
+                case "Dreamsign":
                     return CardPrefab.Dreamsign;
-                case "dreamwell":
+                case "Dreamwell":
                     return CardPrefab.Dreamwell;
-                case "enemy":
+                case "Enemy":
                     return CardPrefab.Enemy;
-                case "event":
+                case "Event":
                     return CardPrefab.Event;
-                case "identity":
+                case "Identity":
                     return CardPrefab.Identity;
-                case "token":
+                case "Token":
                     return CardPrefab.Token;
             }
             throw new Exception("Cannot unmarshal type CardPrefab");
@@ -3250,25 +3250,25 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case CardPrefab.Character:
-                    serializer.Serialize(writer, "character");
+                    serializer.Serialize(writer, "Character");
                     return;
                 case CardPrefab.Dreamsign:
-                    serializer.Serialize(writer, "dreamsign");
+                    serializer.Serialize(writer, "Dreamsign");
                     return;
                 case CardPrefab.Dreamwell:
-                    serializer.Serialize(writer, "dreamwell");
+                    serializer.Serialize(writer, "Dreamwell");
                     return;
                 case CardPrefab.Enemy:
-                    serializer.Serialize(writer, "enemy");
+                    serializer.Serialize(writer, "Enemy");
                     return;
                 case CardPrefab.Event:
-                    serializer.Serialize(writer, "event");
+                    serializer.Serialize(writer, "Event");
                     return;
                 case CardPrefab.Identity:
-                    serializer.Serialize(writer, "identity");
+                    serializer.Serialize(writer, "Identity");
                     return;
                 case CardPrefab.Token:
-                    serializer.Serialize(writer, "token");
+                    serializer.Serialize(writer, "Token");
                     return;
             }
             throw new Exception("Cannot marshal type CardPrefab");
@@ -3290,7 +3290,7 @@ namespace Dreamtides.Schema
                 case JsonToken.String:
                 case JsonToken.Date:
                     var stringValue = serializer.Deserialize<string>(reader);
-                    if (stringValue == "noOp")
+                    if (stringValue == "NoOp")
                     {
                         return new ActionUnion { Enum = GameActionEnum.NoOp };
                     }
@@ -3314,7 +3314,7 @@ namespace Dreamtides.Schema
             {
                 if (value.Enum == GameActionEnum.NoOp)
                 {
-                    serializer.Serialize(writer, "noOp");
+                    serializer.Serialize(writer, "NoOp");
                     return;
                 }
             }
@@ -3342,17 +3342,17 @@ namespace Dreamtides.Schema
                     var stringValue = serializer.Deserialize<string>(reader);
                     switch (stringValue)
                     {
-                        case "endTurn":
+                        case "EndTurn":
                             return new BattleAction { Enum = BattleActionEnum.EndTurn };
-                        case "passPriority":
+                        case "PassPriority":
                             return new BattleAction { Enum = BattleActionEnum.PassPriority };
-                        case "startNextTurn":
+                        case "StartNextTurn":
                             return new BattleAction { Enum = BattleActionEnum.StartNextTurn };
-                        case "submitDeckCardOrder":
+                        case "SubmitDeckCardOrder":
                             return new BattleAction { Enum = BattleActionEnum.SubmitDeckCardOrder };
-                        case "submitMulligan":
+                        case "SubmitMulligan":
                             return new BattleAction { Enum = BattleActionEnum.SubmitMulligan };
-                        case "submitVoidCardTargets":
+                        case "SubmitVoidCardTargets":
                             return new BattleAction { Enum = BattleActionEnum.SubmitVoidCardTargets };
                     }
                     break;
@@ -3371,22 +3371,22 @@ namespace Dreamtides.Schema
                 switch (value.Enum)
                 {
                     case BattleActionEnum.EndTurn:
-                        serializer.Serialize(writer, "endTurn");
+                        serializer.Serialize(writer, "EndTurn");
                         return;
                     case BattleActionEnum.PassPriority:
-                        serializer.Serialize(writer, "passPriority");
+                        serializer.Serialize(writer, "PassPriority");
                         return;
                     case BattleActionEnum.StartNextTurn:
-                        serializer.Serialize(writer, "startNextTurn");
+                        serializer.Serialize(writer, "StartNextTurn");
                         return;
                     case BattleActionEnum.SubmitDeckCardOrder:
-                        serializer.Serialize(writer, "submitDeckCardOrder");
+                        serializer.Serialize(writer, "SubmitDeckCardOrder");
                         return;
                     case BattleActionEnum.SubmitMulligan:
-                        serializer.Serialize(writer, "submitMulligan");
+                        serializer.Serialize(writer, "SubmitMulligan");
                         return;
                     case BattleActionEnum.SubmitVoidCardTargets:
-                        serializer.Serialize(writer, "submitVoidCardTargets");
+                        serializer.Serialize(writer, "SubmitVoidCardTargets");
                         return;
                 }
             }
@@ -3412,7 +3412,7 @@ namespace Dreamtides.Schema
                 case JsonToken.String:
                 case JsonToken.Date:
                     var stringValue = serializer.Deserialize<string>(reader);
-                    if (stringValue == "opponentContinue")
+                    if (stringValue == "OpponentContinue")
                     {
                         return new DebugBattleAction { Enum = DebugBattleActionEnum.OpponentContinue };
                     }
@@ -3431,7 +3431,7 @@ namespace Dreamtides.Schema
             {
                 if (value.Enum == DebugBattleActionEnum.OpponentContinue)
                 {
-                    serializer.Serialize(writer, "opponentContinue");
+                    serializer.Serialize(writer, "OpponentContinue");
                     return;
                 }
             }
@@ -3637,9 +3637,9 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "one":
+                case "One":
                     return PlayerName.One;
-                case "two":
+                case "Two":
                     return PlayerName.Two;
             }
             throw new Exception("Cannot unmarshal type PlayerName");
@@ -3656,10 +3656,10 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case PlayerName.One:
-                    serializer.Serialize(writer, "one");
+                    serializer.Serialize(writer, "One");
                     return;
                 case PlayerName.Two:
-                    serializer.Serialize(writer, "two");
+                    serializer.Serialize(writer, "Two");
                     return;
             }
             throw new Exception("Cannot marshal type PlayerName");
@@ -3676,7 +3676,7 @@ namespace Dreamtides.Schema
         {
             if (reader.TokenType == JsonToken.Null) return null;
             var value = serializer.Deserialize<string>(reader);
-            if (value == "opponentContinue")
+            if (value == "OpponentContinue")
             {
                 return DebugBattleActionEnum.OpponentContinue;
             }
@@ -3693,7 +3693,7 @@ namespace Dreamtides.Schema
             var value = (DebugBattleActionEnum)untypedValue;
             if (value == DebugBattleActionEnum.OpponentContinue)
             {
-                serializer.Serialize(writer, "opponentContinue");
+                serializer.Serialize(writer, "OpponentContinue");
                 return;
             }
             throw new Exception("Cannot marshal type DebugBattleActionEnum");
@@ -3750,7 +3750,7 @@ namespace Dreamtides.Schema
                 case JsonToken.String:
                 case JsonToken.Date:
                     var stringValue = serializer.Deserialize<string>(reader);
-                    if (stringValue == "void")
+                    if (stringValue == "Void")
                     {
                         return new CardOrderSelectionTarget { Enum = CardOrderSelectionTargetEnum.Void };
                     }
@@ -3769,7 +3769,7 @@ namespace Dreamtides.Schema
             {
                 if (value.Enum == CardOrderSelectionTargetEnum.Void)
                 {
-                    serializer.Serialize(writer, "void");
+                    serializer.Serialize(writer, "Void");
                     return;
                 }
             }
@@ -3792,7 +3792,7 @@ namespace Dreamtides.Schema
         {
             if (reader.TokenType == JsonToken.Null) return null;
             var value = serializer.Deserialize<string>(reader);
-            if (value == "void")
+            if (value == "Void")
             {
                 return CardOrderSelectionTargetEnum.Void;
             }
@@ -3809,7 +3809,7 @@ namespace Dreamtides.Schema
             var value = (CardOrderSelectionTargetEnum)untypedValue;
             if (value == CardOrderSelectionTargetEnum.Void)
             {
-                serializer.Serialize(writer, "void");
+                serializer.Serialize(writer, "Void");
                 return;
             }
             throw new Exception("Cannot marshal type CardOrderSelectionTargetEnum");
@@ -3828,17 +3828,17 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "endTurn":
+                case "EndTurn":
                     return BattleActionEnum.EndTurn;
-                case "passPriority":
+                case "PassPriority":
                     return BattleActionEnum.PassPriority;
-                case "startNextTurn":
+                case "StartNextTurn":
                     return BattleActionEnum.StartNextTurn;
-                case "submitDeckCardOrder":
+                case "SubmitDeckCardOrder":
                     return BattleActionEnum.SubmitDeckCardOrder;
-                case "submitMulligan":
+                case "SubmitMulligan":
                     return BattleActionEnum.SubmitMulligan;
-                case "submitVoidCardTargets":
+                case "SubmitVoidCardTargets":
                     return BattleActionEnum.SubmitVoidCardTargets;
             }
             throw new Exception("Cannot unmarshal type BattleActionEnum");
@@ -3855,22 +3855,22 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case BattleActionEnum.EndTurn:
-                    serializer.Serialize(writer, "endTurn");
+                    serializer.Serialize(writer, "EndTurn");
                     return;
                 case BattleActionEnum.PassPriority:
-                    serializer.Serialize(writer, "passPriority");
+                    serializer.Serialize(writer, "PassPriority");
                     return;
                 case BattleActionEnum.StartNextTurn:
-                    serializer.Serialize(writer, "startNextTurn");
+                    serializer.Serialize(writer, "StartNextTurn");
                     return;
                 case BattleActionEnum.SubmitDeckCardOrder:
-                    serializer.Serialize(writer, "submitDeckCardOrder");
+                    serializer.Serialize(writer, "SubmitDeckCardOrder");
                     return;
                 case BattleActionEnum.SubmitMulligan:
-                    serializer.Serialize(writer, "submitMulligan");
+                    serializer.Serialize(writer, "SubmitMulligan");
                     return;
                 case BattleActionEnum.SubmitVoidCardTargets:
-                    serializer.Serialize(writer, "submitVoidCardTargets");
+                    serializer.Serialize(writer, "SubmitVoidCardTargets");
                     return;
             }
             throw new Exception("Cannot marshal type BattleActionEnum");
@@ -3892,11 +3892,11 @@ namespace Dreamtides.Schema
                     var stringValue = serializer.Deserialize<string>(reader);
                     switch (stringValue)
                     {
-                        case "closeCardBrowser":
+                        case "CloseCardBrowser":
                             return new BattleDisplayAction { Enum = BattleDisplayActionEnum.CloseCardBrowser };
-                        case "closeCurrentPanel":
+                        case "CloseCurrentPanel":
                             return new BattleDisplayAction { Enum = BattleDisplayActionEnum.CloseCurrentPanel };
-                        case "toggleStackVisibility":
+                        case "ToggleStackVisibility":
                             return new BattleDisplayAction { Enum = BattleDisplayActionEnum.ToggleStackVisibility };
                     }
                     break;
@@ -3915,13 +3915,13 @@ namespace Dreamtides.Schema
                 switch (value.Enum)
                 {
                     case BattleDisplayActionEnum.CloseCardBrowser:
-                        serializer.Serialize(writer, "closeCardBrowser");
+                        serializer.Serialize(writer, "CloseCardBrowser");
                         return;
                     case BattleDisplayActionEnum.CloseCurrentPanel:
-                        serializer.Serialize(writer, "closeCurrentPanel");
+                        serializer.Serialize(writer, "CloseCurrentPanel");
                         return;
                     case BattleDisplayActionEnum.ToggleStackVisibility:
-                        serializer.Serialize(writer, "toggleStackVisibility");
+                        serializer.Serialize(writer, "ToggleStackVisibility");
                         return;
                 }
             }
@@ -3946,17 +3946,17 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "enemyDeck":
+                case "EnemyDeck":
                     return CardBrowserType.EnemyDeck;
-                case "enemyStatus":
+                case "EnemyStatus":
                     return CardBrowserType.EnemyStatus;
-                case "enemyVoid":
+                case "EnemyVoid":
                     return CardBrowserType.EnemyVoid;
-                case "userDeck":
+                case "UserDeck":
                     return CardBrowserType.UserDeck;
-                case "userStatus":
+                case "UserStatus":
                     return CardBrowserType.UserStatus;
-                case "userVoid":
+                case "UserVoid":
                     return CardBrowserType.UserVoid;
             }
             throw new Exception("Cannot unmarshal type CardBrowserType");
@@ -3973,22 +3973,22 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case CardBrowserType.EnemyDeck:
-                    serializer.Serialize(writer, "enemyDeck");
+                    serializer.Serialize(writer, "EnemyDeck");
                     return;
                 case CardBrowserType.EnemyStatus:
-                    serializer.Serialize(writer, "enemyStatus");
+                    serializer.Serialize(writer, "EnemyStatus");
                     return;
                 case CardBrowserType.EnemyVoid:
-                    serializer.Serialize(writer, "enemyVoid");
+                    serializer.Serialize(writer, "EnemyVoid");
                     return;
                 case CardBrowserType.UserDeck:
-                    serializer.Serialize(writer, "userDeck");
+                    serializer.Serialize(writer, "UserDeck");
                     return;
                 case CardBrowserType.UserStatus:
-                    serializer.Serialize(writer, "userStatus");
+                    serializer.Serialize(writer, "UserStatus");
                     return;
                 case CardBrowserType.UserVoid:
-                    serializer.Serialize(writer, "userVoid");
+                    serializer.Serialize(writer, "UserVoid");
                     return;
             }
             throw new Exception("Cannot marshal type CardBrowserType");
@@ -4010,13 +4010,13 @@ namespace Dreamtides.Schema
                     var stringValue = serializer.Deserialize<string>(reader);
                     switch (stringValue)
                     {
-                        case "addCardToHand":
+                        case "AddCardToHand":
                             return new PanelAddress { Enum = PanelAddressEnum.AddCardToHand };
-                        case "developer":
+                        case "Developer":
                             return new PanelAddress { Enum = PanelAddressEnum.Developer };
-                        case "playOpponentCard":
+                        case "PlayOpponentCard":
                             return new PanelAddress { Enum = PanelAddressEnum.PlayOpponentCard };
-                        case "setOpponentAgent":
+                        case "SetOpponentAgent":
                             return new PanelAddress { Enum = PanelAddressEnum.SetOpponentAgent };
                     }
                     break;
@@ -4035,16 +4035,16 @@ namespace Dreamtides.Schema
                 switch (value.Enum)
                 {
                     case PanelAddressEnum.AddCardToHand:
-                        serializer.Serialize(writer, "addCardToHand");
+                        serializer.Serialize(writer, "AddCardToHand");
                         return;
                     case PanelAddressEnum.Developer:
-                        serializer.Serialize(writer, "developer");
+                        serializer.Serialize(writer, "Developer");
                         return;
                     case PanelAddressEnum.PlayOpponentCard:
-                        serializer.Serialize(writer, "playOpponentCard");
+                        serializer.Serialize(writer, "PlayOpponentCard");
                         return;
                     case PanelAddressEnum.SetOpponentAgent:
-                        serializer.Serialize(writer, "setOpponentAgent");
+                        serializer.Serialize(writer, "SetOpponentAgent");
                         return;
                 }
             }
@@ -4069,13 +4069,13 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "addCardToHand":
+                case "AddCardToHand":
                     return PanelAddressEnum.AddCardToHand;
-                case "developer":
+                case "Developer":
                     return PanelAddressEnum.Developer;
-                case "playOpponentCard":
+                case "PlayOpponentCard":
                     return PanelAddressEnum.PlayOpponentCard;
-                case "setOpponentAgent":
+                case "SetOpponentAgent":
                     return PanelAddressEnum.SetOpponentAgent;
             }
             throw new Exception("Cannot unmarshal type PanelAddressEnum");
@@ -4092,16 +4092,16 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case PanelAddressEnum.AddCardToHand:
-                    serializer.Serialize(writer, "addCardToHand");
+                    serializer.Serialize(writer, "AddCardToHand");
                     return;
                 case PanelAddressEnum.Developer:
-                    serializer.Serialize(writer, "developer");
+                    serializer.Serialize(writer, "Developer");
                     return;
                 case PanelAddressEnum.PlayOpponentCard:
-                    serializer.Serialize(writer, "playOpponentCard");
+                    serializer.Serialize(writer, "PlayOpponentCard");
                     return;
                 case PanelAddressEnum.SetOpponentAgent:
-                    serializer.Serialize(writer, "setOpponentAgent");
+                    serializer.Serialize(writer, "SetOpponentAgent");
                     return;
             }
             throw new Exception("Cannot marshal type PanelAddressEnum");
@@ -4120,11 +4120,11 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "closeCardBrowser":
+                case "CloseCardBrowser":
                     return BattleDisplayActionEnum.CloseCardBrowser;
-                case "closeCurrentPanel":
+                case "CloseCurrentPanel":
                     return BattleDisplayActionEnum.CloseCurrentPanel;
-                case "toggleStackVisibility":
+                case "ToggleStackVisibility":
                     return BattleDisplayActionEnum.ToggleStackVisibility;
             }
             throw new Exception("Cannot unmarshal type BattleDisplayActionEnum");
@@ -4141,13 +4141,13 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case BattleDisplayActionEnum.CloseCardBrowser:
-                    serializer.Serialize(writer, "closeCardBrowser");
+                    serializer.Serialize(writer, "CloseCardBrowser");
                     return;
                 case BattleDisplayActionEnum.CloseCurrentPanel:
-                    serializer.Serialize(writer, "closeCurrentPanel");
+                    serializer.Serialize(writer, "CloseCurrentPanel");
                     return;
                 case BattleDisplayActionEnum.ToggleStackVisibility:
-                    serializer.Serialize(writer, "toggleStackVisibility");
+                    serializer.Serialize(writer, "ToggleStackVisibility");
                     return;
             }
             throw new Exception("Cannot marshal type BattleDisplayActionEnum");
@@ -4169,11 +4169,11 @@ namespace Dreamtides.Schema
                     var stringValue = serializer.Deserialize<string>(reader);
                     switch (stringValue)
                     {
-                        case "applyTestScenarioAction":
+                        case "ApplyTestScenarioAction":
                             return new DebugAction { Enum = DebugActionEnum.ApplyTestScenarioAction };
-                        case "restartBattle":
+                        case "RestartBattle":
                             return new DebugAction { Enum = DebugActionEnum.RestartBattle };
-                        case "setOpponentAsHuman":
+                        case "SetOpponentAsHuman":
                             return new DebugAction { Enum = DebugActionEnum.SetOpponentAsHuman };
                     }
                     break;
@@ -4192,13 +4192,13 @@ namespace Dreamtides.Schema
                 switch (value.Enum)
                 {
                     case DebugActionEnum.ApplyTestScenarioAction:
-                        serializer.Serialize(writer, "applyTestScenarioAction");
+                        serializer.Serialize(writer, "ApplyTestScenarioAction");
                         return;
                     case DebugActionEnum.RestartBattle:
-                        serializer.Serialize(writer, "restartBattle");
+                        serializer.Serialize(writer, "RestartBattle");
                         return;
                     case DebugActionEnum.SetOpponentAsHuman:
-                        serializer.Serialize(writer, "setOpponentAsHuman");
+                        serializer.Serialize(writer, "SetOpponentAsHuman");
                         return;
                 }
             }
@@ -4264,11 +4264,11 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "applyTestScenarioAction":
+                case "ApplyTestScenarioAction":
                     return DebugActionEnum.ApplyTestScenarioAction;
-                case "restartBattle":
+                case "RestartBattle":
                     return DebugActionEnum.RestartBattle;
-                case "setOpponentAsHuman":
+                case "SetOpponentAsHuman":
                     return DebugActionEnum.SetOpponentAsHuman;
             }
             throw new Exception("Cannot unmarshal type DebugActionEnum");
@@ -4285,13 +4285,13 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case DebugActionEnum.ApplyTestScenarioAction:
-                    serializer.Serialize(writer, "applyTestScenarioAction");
+                    serializer.Serialize(writer, "ApplyTestScenarioAction");
                     return;
                 case DebugActionEnum.RestartBattle:
-                    serializer.Serialize(writer, "restartBattle");
+                    serializer.Serialize(writer, "RestartBattle");
                     return;
                 case DebugActionEnum.SetOpponentAsHuman:
-                    serializer.Serialize(writer, "setOpponentAsHuman");
+                    serializer.Serialize(writer, "SetOpponentAsHuman");
                     return;
             }
             throw new Exception("Cannot marshal type DebugActionEnum");
@@ -4308,7 +4308,7 @@ namespace Dreamtides.Schema
         {
             if (reader.TokenType == JsonToken.Null) return null;
             var value = serializer.Deserialize<string>(reader);
-            if (value == "noOp")
+            if (value == "NoOp")
             {
                 return GameActionEnum.NoOp;
             }
@@ -4325,7 +4325,7 @@ namespace Dreamtides.Schema
             var value = (GameActionEnum)untypedValue;
             if (value == GameActionEnum.NoOp)
             {
-                serializer.Serialize(writer, "noOp");
+                serializer.Serialize(writer, "NoOp");
                 return;
             }
             throw new Exception("Cannot marshal type GameActionEnum");
@@ -4344,15 +4344,15 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "auto":
+                case "Auto":
                     return FlexAlign.Auto;
-                case "center":
+                case "Center":
                     return FlexAlign.Center;
-                case "flexEnd":
+                case "FlexEnd":
                     return FlexAlign.FlexEnd;
-                case "flexStart":
+                case "FlexStart":
                     return FlexAlign.FlexStart;
-                case "stretch":
+                case "Stretch":
                     return FlexAlign.Stretch;
             }
             throw new Exception("Cannot unmarshal type FlexAlign");
@@ -4369,19 +4369,19 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case FlexAlign.Auto:
-                    serializer.Serialize(writer, "auto");
+                    serializer.Serialize(writer, "Auto");
                     return;
                 case FlexAlign.Center:
-                    serializer.Serialize(writer, "center");
+                    serializer.Serialize(writer, "Center");
                     return;
                 case FlexAlign.FlexEnd:
-                    serializer.Serialize(writer, "flexEnd");
+                    serializer.Serialize(writer, "FlexEnd");
                     return;
                 case FlexAlign.FlexStart:
-                    serializer.Serialize(writer, "flexStart");
+                    serializer.Serialize(writer, "FlexStart");
                     return;
                 case FlexAlign.Stretch:
-                    serializer.Serialize(writer, "stretch");
+                    serializer.Serialize(writer, "Stretch");
                     return;
             }
             throw new Exception("Cannot marshal type FlexAlign");
@@ -4400,21 +4400,21 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "percentage":
+                case "Percentage":
                     return DimensionUnit.Percentage;
-                case "pixels":
+                case "Pixels":
                     return DimensionUnit.Pixels;
-                case "safeAreaBottomInset":
+                case "SafeAreaBottomInset":
                     return DimensionUnit.SafeAreaBottomInset;
-                case "safeAreaLeftInset":
+                case "SafeAreaLeftInset":
                     return DimensionUnit.SafeAreaLeftInset;
-                case "safeAreaRightInset":
+                case "SafeAreaRightInset":
                     return DimensionUnit.SafeAreaRightInset;
-                case "safeAreaTopInset":
+                case "SafeAreaTopInset":
                     return DimensionUnit.SafeAreaTopInset;
-                case "viewportHeight":
+                case "ViewportHeight":
                     return DimensionUnit.ViewportHeight;
-                case "viewportWidth":
+                case "ViewportWidth":
                     return DimensionUnit.ViewportWidth;
             }
             throw new Exception("Cannot unmarshal type DimensionUnit");
@@ -4431,28 +4431,28 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case DimensionUnit.Percentage:
-                    serializer.Serialize(writer, "percentage");
+                    serializer.Serialize(writer, "Percentage");
                     return;
                 case DimensionUnit.Pixels:
-                    serializer.Serialize(writer, "pixels");
+                    serializer.Serialize(writer, "Pixels");
                     return;
                 case DimensionUnit.SafeAreaBottomInset:
-                    serializer.Serialize(writer, "safeAreaBottomInset");
+                    serializer.Serialize(writer, "SafeAreaBottomInset");
                     return;
                 case DimensionUnit.SafeAreaLeftInset:
-                    serializer.Serialize(writer, "safeAreaLeftInset");
+                    serializer.Serialize(writer, "SafeAreaLeftInset");
                     return;
                 case DimensionUnit.SafeAreaRightInset:
-                    serializer.Serialize(writer, "safeAreaRightInset");
+                    serializer.Serialize(writer, "SafeAreaRightInset");
                     return;
                 case DimensionUnit.SafeAreaTopInset:
-                    serializer.Serialize(writer, "safeAreaTopInset");
+                    serializer.Serialize(writer, "SafeAreaTopInset");
                     return;
                 case DimensionUnit.ViewportHeight:
-                    serializer.Serialize(writer, "viewportHeight");
+                    serializer.Serialize(writer, "ViewportHeight");
                     return;
                 case DimensionUnit.ViewportWidth:
-                    serializer.Serialize(writer, "viewportWidth");
+                    serializer.Serialize(writer, "ViewportWidth");
                     return;
             }
             throw new Exception("Cannot marshal type DimensionUnit");
@@ -4471,9 +4471,9 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "flex":
+                case "Flex":
                     return FlexDisplayStyle.Flex;
-                case "none":
+                case "None":
                     return FlexDisplayStyle.None;
             }
             throw new Exception("Cannot unmarshal type FlexDisplayStyle");
@@ -4490,10 +4490,10 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case FlexDisplayStyle.Flex:
-                    serializer.Serialize(writer, "flex");
+                    serializer.Serialize(writer, "Flex");
                     return;
                 case FlexDisplayStyle.None:
-                    serializer.Serialize(writer, "none");
+                    serializer.Serialize(writer, "None");
                     return;
             }
             throw new Exception("Cannot marshal type FlexDisplayStyle");
@@ -4512,13 +4512,13 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "column":
+                case "Column":
                     return FlexDirection.Column;
-                case "columnReverse":
+                case "ColumnReverse":
                     return FlexDirection.ColumnReverse;
-                case "row":
+                case "Row":
                     return FlexDirection.Row;
-                case "rowReverse":
+                case "RowReverse":
                     return FlexDirection.RowReverse;
             }
             throw new Exception("Cannot unmarshal type FlexDirection");
@@ -4535,16 +4535,16 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case FlexDirection.Column:
-                    serializer.Serialize(writer, "column");
+                    serializer.Serialize(writer, "Column");
                     return;
                 case FlexDirection.ColumnReverse:
-                    serializer.Serialize(writer, "columnReverse");
+                    serializer.Serialize(writer, "ColumnReverse");
                     return;
                 case FlexDirection.Row:
-                    serializer.Serialize(writer, "row");
+                    serializer.Serialize(writer, "Row");
                     return;
                 case FlexDirection.RowReverse:
-                    serializer.Serialize(writer, "rowReverse");
+                    serializer.Serialize(writer, "RowReverse");
                     return;
             }
             throw new Exception("Cannot marshal type FlexDirection");
@@ -4563,13 +4563,13 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "bold":
+                case "Bold":
                     return FontStyle.Bold;
-                case "boldAndItalic":
+                case "BoldAndItalic":
                     return FontStyle.BoldAndItalic;
-                case "italic":
+                case "Italic":
                     return FontStyle.Italic;
-                case "normal":
+                case "Normal":
                     return FontStyle.Normal;
             }
             throw new Exception("Cannot unmarshal type FontStyle");
@@ -4586,16 +4586,16 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case FontStyle.Bold:
-                    serializer.Serialize(writer, "bold");
+                    serializer.Serialize(writer, "Bold");
                     return;
                 case FontStyle.BoldAndItalic:
-                    serializer.Serialize(writer, "boldAndItalic");
+                    serializer.Serialize(writer, "BoldAndItalic");
                     return;
                 case FontStyle.Italic:
-                    serializer.Serialize(writer, "italic");
+                    serializer.Serialize(writer, "Italic");
                     return;
                 case FontStyle.Normal:
-                    serializer.Serialize(writer, "normal");
+                    serializer.Serialize(writer, "Normal");
                     return;
             }
             throw new Exception("Cannot marshal type FontStyle");
@@ -4614,15 +4614,15 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "center":
+                case "Center":
                     return FlexJustify.Center;
-                case "flexEnd":
+                case "FlexEnd":
                     return FlexJustify.FlexEnd;
-                case "flexStart":
+                case "FlexStart":
                     return FlexJustify.FlexStart;
-                case "spaceAround":
+                case "SpaceAround":
                     return FlexJustify.SpaceAround;
-                case "spaceBetween":
+                case "SpaceBetween":
                     return FlexJustify.SpaceBetween;
             }
             throw new Exception("Cannot unmarshal type FlexJustify");
@@ -4639,19 +4639,19 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case FlexJustify.Center:
-                    serializer.Serialize(writer, "center");
+                    serializer.Serialize(writer, "Center");
                     return;
                 case FlexJustify.FlexEnd:
-                    serializer.Serialize(writer, "flexEnd");
+                    serializer.Serialize(writer, "FlexEnd");
                     return;
                 case FlexJustify.FlexStart:
-                    serializer.Serialize(writer, "flexStart");
+                    serializer.Serialize(writer, "FlexStart");
                     return;
                 case FlexJustify.SpaceAround:
-                    serializer.Serialize(writer, "spaceAround");
+                    serializer.Serialize(writer, "SpaceAround");
                     return;
                 case FlexJustify.SpaceBetween:
-                    serializer.Serialize(writer, "spaceBetween");
+                    serializer.Serialize(writer, "SpaceBetween");
                     return;
             }
             throw new Exception("Cannot marshal type FlexJustify");
@@ -4670,9 +4670,9 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "hidden":
+                case "Hidden":
                     return FlexVisibility.Hidden;
-                case "visible":
+                case "Visible":
                     return FlexVisibility.Visible;
             }
             throw new Exception("Cannot unmarshal type FlexVisibility");
@@ -4689,10 +4689,10 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case FlexVisibility.Hidden:
-                    serializer.Serialize(writer, "hidden");
+                    serializer.Serialize(writer, "Hidden");
                     return;
                 case FlexVisibility.Visible:
-                    serializer.Serialize(writer, "visible");
+                    serializer.Serialize(writer, "Visible");
                     return;
             }
             throw new Exception("Cannot marshal type FlexVisibility");
@@ -4711,9 +4711,9 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "contentBox":
+                case "ContentBox":
                     return OverflowClipBox.ContentBox;
-                case "paddingBox":
+                case "PaddingBox":
                     return OverflowClipBox.PaddingBox;
             }
             throw new Exception("Cannot unmarshal type OverflowClipBox");
@@ -4730,10 +4730,10 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case OverflowClipBox.ContentBox:
-                    serializer.Serialize(writer, "contentBox");
+                    serializer.Serialize(writer, "ContentBox");
                     return;
                 case OverflowClipBox.PaddingBox:
-                    serializer.Serialize(writer, "paddingBox");
+                    serializer.Serialize(writer, "PaddingBox");
                     return;
             }
             throw new Exception("Cannot marshal type OverflowClipBox");
@@ -4752,9 +4752,9 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "ignore":
+                case "Ignore":
                     return FlexPickingMode.Ignore;
-                case "position":
+                case "Position":
                     return FlexPickingMode.Position;
             }
             throw new Exception("Cannot unmarshal type FlexPickingMode");
@@ -4771,10 +4771,10 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case FlexPickingMode.Ignore:
-                    serializer.Serialize(writer, "ignore");
+                    serializer.Serialize(writer, "Ignore");
                     return;
                 case FlexPickingMode.Position:
-                    serializer.Serialize(writer, "position");
+                    serializer.Serialize(writer, "Position");
                     return;
             }
             throw new Exception("Cannot marshal type FlexPickingMode");
@@ -4793,9 +4793,9 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "absolute":
+                case "Absolute":
                     return FlexPosition.Absolute;
-                case "relative":
+                case "Relative":
                     return FlexPosition.Relative;
             }
             throw new Exception("Cannot unmarshal type FlexPosition");
@@ -4812,10 +4812,10 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case FlexPosition.Absolute:
-                    serializer.Serialize(writer, "absolute");
+                    serializer.Serialize(writer, "Absolute");
                     return;
                 case FlexPosition.Relative:
-                    serializer.Serialize(writer, "relative");
+                    serializer.Serialize(writer, "Relative");
                     return;
             }
             throw new Exception("Cannot marshal type FlexPosition");
@@ -4834,23 +4834,23 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "lowerCenter":
+                case "LowerCenter":
                     return TextAlign.LowerCenter;
-                case "lowerLeft":
+                case "LowerLeft":
                     return TextAlign.LowerLeft;
-                case "lowerRight":
+                case "LowerRight":
                     return TextAlign.LowerRight;
-                case "middleCenter":
+                case "MiddleCenter":
                     return TextAlign.MiddleCenter;
-                case "middleLeft":
+                case "MiddleLeft":
                     return TextAlign.MiddleLeft;
-                case "middleRight":
+                case "MiddleRight":
                     return TextAlign.MiddleRight;
-                case "upperCenter":
+                case "UpperCenter":
                     return TextAlign.UpperCenter;
-                case "upperLeft":
+                case "UpperLeft":
                     return TextAlign.UpperLeft;
-                case "upperRight":
+                case "UpperRight":
                     return TextAlign.UpperRight;
             }
             throw new Exception("Cannot unmarshal type TextAlign");
@@ -4867,31 +4867,31 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case TextAlign.LowerCenter:
-                    serializer.Serialize(writer, "lowerCenter");
+                    serializer.Serialize(writer, "LowerCenter");
                     return;
                 case TextAlign.LowerLeft:
-                    serializer.Serialize(writer, "lowerLeft");
+                    serializer.Serialize(writer, "LowerLeft");
                     return;
                 case TextAlign.LowerRight:
-                    serializer.Serialize(writer, "lowerRight");
+                    serializer.Serialize(writer, "LowerRight");
                     return;
                 case TextAlign.MiddleCenter:
-                    serializer.Serialize(writer, "middleCenter");
+                    serializer.Serialize(writer, "MiddleCenter");
                     return;
                 case TextAlign.MiddleLeft:
-                    serializer.Serialize(writer, "middleLeft");
+                    serializer.Serialize(writer, "MiddleLeft");
                     return;
                 case TextAlign.MiddleRight:
-                    serializer.Serialize(writer, "middleRight");
+                    serializer.Serialize(writer, "MiddleRight");
                     return;
                 case TextAlign.UpperCenter:
-                    serializer.Serialize(writer, "upperCenter");
+                    serializer.Serialize(writer, "UpperCenter");
                     return;
                 case TextAlign.UpperLeft:
-                    serializer.Serialize(writer, "upperLeft");
+                    serializer.Serialize(writer, "UpperLeft");
                     return;
                 case TextAlign.UpperRight:
-                    serializer.Serialize(writer, "upperRight");
+                    serializer.Serialize(writer, "UpperRight");
                     return;
             }
             throw new Exception("Cannot marshal type TextAlign");
@@ -4910,9 +4910,9 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "clip":
+                case "Clip":
                     return TextOverflow.Clip;
-                case "ellipsis":
+                case "Ellipsis":
                     return TextOverflow.Ellipsis;
             }
             throw new Exception("Cannot unmarshal type TextOverflow");
@@ -4929,10 +4929,10 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case TextOverflow.Clip:
-                    serializer.Serialize(writer, "clip");
+                    serializer.Serialize(writer, "Clip");
                     return;
                 case TextOverflow.Ellipsis:
-                    serializer.Serialize(writer, "ellipsis");
+                    serializer.Serialize(writer, "Ellipsis");
                     return;
             }
             throw new Exception("Cannot marshal type TextOverflow");
@@ -4951,11 +4951,11 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "end":
+                case "End":
                     return TextOverflowPosition.End;
-                case "middle":
+                case "Middle":
                     return TextOverflowPosition.Middle;
-                case "start":
+                case "Start":
                     return TextOverflowPosition.Start;
             }
             throw new Exception("Cannot unmarshal type TextOverflowPosition");
@@ -4972,13 +4972,13 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case TextOverflowPosition.End:
-                    serializer.Serialize(writer, "end");
+                    serializer.Serialize(writer, "End");
                     return;
                 case TextOverflowPosition.Middle:
-                    serializer.Serialize(writer, "middle");
+                    serializer.Serialize(writer, "Middle");
                     return;
                 case TextOverflowPosition.Start:
-                    serializer.Serialize(writer, "start");
+                    serializer.Serialize(writer, "Start");
                     return;
             }
             throw new Exception("Cannot marshal type TextOverflowPosition");
@@ -4997,51 +4997,51 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "ease":
+                case "Ease":
                     return EasingMode.Ease;
-                case "easeIn":
+                case "EaseIn":
                     return EasingMode.EaseIn;
-                case "easeInBack":
+                case "EaseInBack":
                     return EasingMode.EaseInBack;
-                case "easeInBounce":
+                case "EaseInBounce":
                     return EasingMode.EaseInBounce;
-                case "easeInCirc":
+                case "EaseInCirc":
                     return EasingMode.EaseInCirc;
-                case "easeInCubic":
+                case "EaseInCubic":
                     return EasingMode.EaseInCubic;
-                case "easeInElastic":
+                case "EaseInElastic":
                     return EasingMode.EaseInElastic;
-                case "easeInOut":
+                case "EaseInOut":
                     return EasingMode.EaseInOut;
-                case "easeInOutBack":
+                case "EaseInOutBack":
                     return EasingMode.EaseInOutBack;
-                case "easeInOutBounce":
+                case "EaseInOutBounce":
                     return EasingMode.EaseInOutBounce;
-                case "easeInOutCirc":
+                case "EaseInOutCirc":
                     return EasingMode.EaseInOutCirc;
-                case "easeInOutCubic":
+                case "EaseInOutCubic":
                     return EasingMode.EaseInOutCubic;
-                case "easeInOutElastic":
+                case "EaseInOutElastic":
                     return EasingMode.EaseInOutElastic;
-                case "easeInOutSine":
+                case "EaseInOutSine":
                     return EasingMode.EaseInOutSine;
-                case "easeInSine":
+                case "EaseInSine":
                     return EasingMode.EaseInSine;
-                case "easeOut":
+                case "EaseOut":
                     return EasingMode.EaseOut;
-                case "easeOutBack":
+                case "EaseOutBack":
                     return EasingMode.EaseOutBack;
-                case "easeOutBounce":
+                case "EaseOutBounce":
                     return EasingMode.EaseOutBounce;
-                case "easeOutCirc":
+                case "EaseOutCirc":
                     return EasingMode.EaseOutCirc;
-                case "easeOutCubic":
+                case "EaseOutCubic":
                     return EasingMode.EaseOutCubic;
-                case "easeOutElastic":
+                case "EaseOutElastic":
                     return EasingMode.EaseOutElastic;
-                case "easeOutSine":
+                case "EaseOutSine":
                     return EasingMode.EaseOutSine;
-                case "linear":
+                case "Linear":
                     return EasingMode.Linear;
             }
             throw new Exception("Cannot unmarshal type EasingMode");
@@ -5058,73 +5058,73 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case EasingMode.Ease:
-                    serializer.Serialize(writer, "ease");
+                    serializer.Serialize(writer, "Ease");
                     return;
                 case EasingMode.EaseIn:
-                    serializer.Serialize(writer, "easeIn");
+                    serializer.Serialize(writer, "EaseIn");
                     return;
                 case EasingMode.EaseInBack:
-                    serializer.Serialize(writer, "easeInBack");
+                    serializer.Serialize(writer, "EaseInBack");
                     return;
                 case EasingMode.EaseInBounce:
-                    serializer.Serialize(writer, "easeInBounce");
+                    serializer.Serialize(writer, "EaseInBounce");
                     return;
                 case EasingMode.EaseInCirc:
-                    serializer.Serialize(writer, "easeInCirc");
+                    serializer.Serialize(writer, "EaseInCirc");
                     return;
                 case EasingMode.EaseInCubic:
-                    serializer.Serialize(writer, "easeInCubic");
+                    serializer.Serialize(writer, "EaseInCubic");
                     return;
                 case EasingMode.EaseInElastic:
-                    serializer.Serialize(writer, "easeInElastic");
+                    serializer.Serialize(writer, "EaseInElastic");
                     return;
                 case EasingMode.EaseInOut:
-                    serializer.Serialize(writer, "easeInOut");
+                    serializer.Serialize(writer, "EaseInOut");
                     return;
                 case EasingMode.EaseInOutBack:
-                    serializer.Serialize(writer, "easeInOutBack");
+                    serializer.Serialize(writer, "EaseInOutBack");
                     return;
                 case EasingMode.EaseInOutBounce:
-                    serializer.Serialize(writer, "easeInOutBounce");
+                    serializer.Serialize(writer, "EaseInOutBounce");
                     return;
                 case EasingMode.EaseInOutCirc:
-                    serializer.Serialize(writer, "easeInOutCirc");
+                    serializer.Serialize(writer, "EaseInOutCirc");
                     return;
                 case EasingMode.EaseInOutCubic:
-                    serializer.Serialize(writer, "easeInOutCubic");
+                    serializer.Serialize(writer, "EaseInOutCubic");
                     return;
                 case EasingMode.EaseInOutElastic:
-                    serializer.Serialize(writer, "easeInOutElastic");
+                    serializer.Serialize(writer, "EaseInOutElastic");
                     return;
                 case EasingMode.EaseInOutSine:
-                    serializer.Serialize(writer, "easeInOutSine");
+                    serializer.Serialize(writer, "EaseInOutSine");
                     return;
                 case EasingMode.EaseInSine:
-                    serializer.Serialize(writer, "easeInSine");
+                    serializer.Serialize(writer, "EaseInSine");
                     return;
                 case EasingMode.EaseOut:
-                    serializer.Serialize(writer, "easeOut");
+                    serializer.Serialize(writer, "EaseOut");
                     return;
                 case EasingMode.EaseOutBack:
-                    serializer.Serialize(writer, "easeOutBack");
+                    serializer.Serialize(writer, "EaseOutBack");
                     return;
                 case EasingMode.EaseOutBounce:
-                    serializer.Serialize(writer, "easeOutBounce");
+                    serializer.Serialize(writer, "EaseOutBounce");
                     return;
                 case EasingMode.EaseOutCirc:
-                    serializer.Serialize(writer, "easeOutCirc");
+                    serializer.Serialize(writer, "EaseOutCirc");
                     return;
                 case EasingMode.EaseOutCubic:
-                    serializer.Serialize(writer, "easeOutCubic");
+                    serializer.Serialize(writer, "EaseOutCubic");
                     return;
                 case EasingMode.EaseOutElastic:
-                    serializer.Serialize(writer, "easeOutElastic");
+                    serializer.Serialize(writer, "EaseOutElastic");
                     return;
                 case EasingMode.EaseOutSine:
-                    serializer.Serialize(writer, "easeOutSine");
+                    serializer.Serialize(writer, "EaseOutSine");
                     return;
                 case EasingMode.Linear:
-                    serializer.Serialize(writer, "linear");
+                    serializer.Serialize(writer, "Linear");
                     return;
             }
             throw new Exception("Cannot marshal type EasingMode");
@@ -5143,9 +5143,9 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "noWrap":
+                case "NoWrap":
                     return WhiteSpace.NoWrap;
-                case "normal":
+                case "Normal":
                     return WhiteSpace.Normal;
             }
             throw new Exception("Cannot unmarshal type WhiteSpace");
@@ -5162,10 +5162,10 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case WhiteSpace.NoWrap:
-                    serializer.Serialize(writer, "noWrap");
+                    serializer.Serialize(writer, "NoWrap");
                     return;
                 case WhiteSpace.Normal:
-                    serializer.Serialize(writer, "normal");
+                    serializer.Serialize(writer, "Normal");
                     return;
             }
             throw new Exception("Cannot marshal type WhiteSpace");
@@ -5184,11 +5184,11 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "noWrap":
+                case "NoWrap":
                     return FlexWrap.NoWrap;
-                case "wrap":
+                case "Wrap":
                     return FlexWrap.Wrap;
-                case "wrapReverse":
+                case "WrapReverse":
                     return FlexWrap.WrapReverse;
             }
             throw new Exception("Cannot unmarshal type FlexWrap");
@@ -5205,13 +5205,13 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case FlexWrap.NoWrap:
-                    serializer.Serialize(writer, "noWrap");
+                    serializer.Serialize(writer, "NoWrap");
                     return;
                 case FlexWrap.Wrap:
-                    serializer.Serialize(writer, "wrap");
+                    serializer.Serialize(writer, "Wrap");
                     return;
                 case FlexWrap.WrapReverse:
-                    serializer.Serialize(writer, "wrapReverse");
+                    serializer.Serialize(writer, "WrapReverse");
                     return;
             }
             throw new Exception("Cannot marshal type FlexWrap");
@@ -5230,11 +5230,11 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "alwaysVisible":
+                case "AlwaysVisible":
                     return ScrollBarVisibility.AlwaysVisible;
-                case "auto":
+                case "Auto":
                     return ScrollBarVisibility.Auto;
-                case "hidden":
+                case "Hidden":
                     return ScrollBarVisibility.Hidden;
             }
             throw new Exception("Cannot unmarshal type ScrollBarVisibility");
@@ -5251,13 +5251,13 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case ScrollBarVisibility.AlwaysVisible:
-                    serializer.Serialize(writer, "alwaysVisible");
+                    serializer.Serialize(writer, "AlwaysVisible");
                     return;
                 case ScrollBarVisibility.Auto:
-                    serializer.Serialize(writer, "auto");
+                    serializer.Serialize(writer, "Auto");
                     return;
                 case ScrollBarVisibility.Hidden:
-                    serializer.Serialize(writer, "hidden");
+                    serializer.Serialize(writer, "Hidden");
                     return;
             }
             throw new Exception("Cannot marshal type ScrollBarVisibility");
@@ -5276,11 +5276,11 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "clamped":
+                case "Clamped":
                     return TouchScrollBehavior.Clamped;
-                case "elastic":
+                case "Elastic":
                     return TouchScrollBehavior.Elastic;
-                case "unrestricted":
+                case "Unrestricted":
                     return TouchScrollBehavior.Unrestricted;
             }
             throw new Exception("Cannot unmarshal type TouchScrollBehavior");
@@ -5297,13 +5297,13 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case TouchScrollBehavior.Clamped:
-                    serializer.Serialize(writer, "clamped");
+                    serializer.Serialize(writer, "Clamped");
                     return;
                 case TouchScrollBehavior.Elastic:
-                    serializer.Serialize(writer, "elastic");
+                    serializer.Serialize(writer, "Elastic");
                     return;
                 case TouchScrollBehavior.Unrestricted:
-                    serializer.Serialize(writer, "unrestricted");
+                    serializer.Serialize(writer, "Unrestricted");
                     return;
             }
             throw new Exception("Cannot marshal type TouchScrollBehavior");
@@ -5322,9 +5322,9 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "horizontal":
+                case "Horizontal":
                     return SliderDirection.Horizontal;
-                case "vertical":
+                case "Vertical":
                     return SliderDirection.Vertical;
             }
             throw new Exception("Cannot unmarshal type SliderDirection");
@@ -5341,10 +5341,10 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case SliderDirection.Horizontal:
-                    serializer.Serialize(writer, "horizontal");
+                    serializer.Serialize(writer, "Horizontal");
                     return;
                 case SliderDirection.Vertical:
-                    serializer.Serialize(writer, "vertical");
+                    serializer.Serialize(writer, "Vertical");
                     return;
             }
             throw new Exception("Cannot marshal type SliderDirection");
@@ -5363,13 +5363,13 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "enemyIdentityCard":
+                case "EnemyIdentityCard":
                     return StudioType.EnemyIdentityCard;
-                case "enemyStatus":
+                case "EnemyStatus":
                     return StudioType.EnemyStatus;
-                case "userIdentityCard":
+                case "UserIdentityCard":
                     return StudioType.UserIdentityCard;
-                case "userStatus":
+                case "UserStatus":
                     return StudioType.UserStatus;
             }
             throw new Exception("Cannot unmarshal type StudioType");
@@ -5386,16 +5386,16 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case StudioType.EnemyIdentityCard:
-                    serializer.Serialize(writer, "enemyIdentityCard");
+                    serializer.Serialize(writer, "EnemyIdentityCard");
                     return;
                 case StudioType.EnemyStatus:
-                    serializer.Serialize(writer, "enemyStatus");
+                    serializer.Serialize(writer, "EnemyStatus");
                     return;
                 case StudioType.UserIdentityCard:
-                    serializer.Serialize(writer, "userIdentityCard");
+                    serializer.Serialize(writer, "UserIdentityCard");
                     return;
                 case StudioType.UserStatus:
-                    serializer.Serialize(writer, "userStatus");
+                    serializer.Serialize(writer, "UserStatus");
                     return;
             }
             throw new Exception("Cannot marshal type StudioType");
@@ -5414,11 +5414,11 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "blue":
+                case "Blue":
                     return ArrowStyle.Blue;
-                case "green":
+                case "Green":
                     return ArrowStyle.Green;
-                case "red":
+                case "Red":
                     return ArrowStyle.Red;
             }
             throw new Exception("Cannot unmarshal type ArrowStyle");
@@ -5435,13 +5435,13 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case ArrowStyle.Blue:
-                    serializer.Serialize(writer, "blue");
+                    serializer.Serialize(writer, "Blue");
                     return;
                 case ArrowStyle.Green:
-                    serializer.Serialize(writer, "green");
+                    serializer.Serialize(writer, "Green");
                     return;
                 case ArrowStyle.Red:
-                    serializer.Serialize(writer, "red");
+                    serializer.Serialize(writer, "Red");
                     return;
             }
             throw new Exception("Cannot marshal type ArrowStyle");
@@ -5460,9 +5460,9 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "left":
+                case "Left":
                     return DisplayedTurnIndicator.Left;
-                case "right":
+                case "Right":
                     return DisplayedTurnIndicator.Right;
             }
             throw new Exception("Cannot unmarshal type DisplayedTurnIndicator");
@@ -5479,10 +5479,10 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case DisplayedTurnIndicator.Left:
-                    serializer.Serialize(writer, "left");
+                    serializer.Serialize(writer, "Left");
                     return;
                 case DisplayedTurnIndicator.Right:
-                    serializer.Serialize(writer, "right");
+                    serializer.Serialize(writer, "Right");
                     return;
             }
             throw new Exception("Cannot marshal type DisplayedTurnIndicator");
@@ -5504,9 +5504,9 @@ namespace Dreamtides.Schema
                     var stringValue = serializer.Deserialize<string>(reader);
                     switch (stringValue)
                     {
-                        case "none":
+                        case "None":
                             return new BattlePreviewState { Enum = BattlePreviewStateEnum.None };
-                        case "pending":
+                        case "Pending":
                             return new BattlePreviewState { Enum = BattlePreviewStateEnum.Pending };
                     }
                     break;
@@ -5525,10 +5525,10 @@ namespace Dreamtides.Schema
                 switch (value.Enum)
                 {
                     case BattlePreviewStateEnum.None:
-                        serializer.Serialize(writer, "none");
+                        serializer.Serialize(writer, "None");
                         return;
                     case BattlePreviewStateEnum.Pending:
-                        serializer.Serialize(writer, "pending");
+                        serializer.Serialize(writer, "Pending");
                         return;
                 }
             }
@@ -5553,9 +5553,9 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "none":
+                case "None":
                     return BattlePreviewStateEnum.None;
-                case "pending":
+                case "Pending":
                     return BattlePreviewStateEnum.Pending;
             }
             throw new Exception("Cannot unmarshal type BattlePreviewStateEnum");
@@ -5572,10 +5572,10 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case BattlePreviewStateEnum.None:
-                    serializer.Serialize(writer, "none");
+                    serializer.Serialize(writer, "None");
                     return;
                 case BattlePreviewStateEnum.Pending:
-                    serializer.Serialize(writer, "pending");
+                    serializer.Serialize(writer, "Pending");
                     return;
             }
             throw new Exception("Cannot marshal type BattlePreviewStateEnum");
@@ -5595,7 +5595,7 @@ namespace Dreamtides.Schema
                 case JsonToken.String:
                 case JsonToken.Date:
                     var stringValue = serializer.Deserialize<string>(reader);
-                    if (stringValue == "noOp")
+                    if (stringValue == "NoOp")
                     {
                         return new GameAction { Enum = GameActionEnum.NoOp };
                     }
@@ -5614,7 +5614,7 @@ namespace Dreamtides.Schema
             {
                 if (value.Enum == GameActionEnum.NoOp)
                 {
-                    serializer.Serialize(writer, "noOp");
+                    serializer.Serialize(writer, "NoOp");
                     return;
                 }
             }
@@ -5639,11 +5639,11 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "final":
+                case "Final":
                     return PollResponseType.Final;
-                case "incremental":
+                case "Incremental":
                     return PollResponseType.Incremental;
-                case "none":
+                case "None":
                     return PollResponseType.None;
             }
             throw new Exception("Cannot unmarshal type PollResponseType");
@@ -5660,13 +5660,13 @@ namespace Dreamtides.Schema
             switch (value)
             {
                 case PollResponseType.Final:
-                    serializer.Serialize(writer, "final");
+                    serializer.Serialize(writer, "Final");
                     return;
                 case PollResponseType.Incremental:
-                    serializer.Serialize(writer, "incremental");
+                    serializer.Serialize(writer, "Incremental");
                     return;
                 case PollResponseType.None:
-                    serializer.Serialize(writer, "none");
+                    serializer.Serialize(writer, "None");
                     return;
             }
             throw new Exception("Cannot marshal type PollResponseType");

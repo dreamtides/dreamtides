@@ -31,7 +31,6 @@ use serde::{Deserialize, Serialize};
     Deserialize,
     JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub struct Energy(pub u32);
 
 /// Represents the 'power' of characters; the primary way in which players earn
@@ -62,7 +61,6 @@ pub struct Energy(pub u32);
     Deserialize,
     JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub struct Spark(pub u32);
 
 /// Victory points. Enable the player to win the game.
@@ -92,7 +90,6 @@ pub struct Spark(pub u32);
     Deserialize,
     JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub struct Points(pub u32);
 
 /// Currency used during quests.
@@ -122,7 +119,6 @@ pub struct Points(pub u32);
     Deserialize,
     JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub struct Essence(pub u32);
 
 /// Identifies a turn within a game.
@@ -152,5 +148,4 @@ pub struct Essence(pub u32);
     Deserialize,
     JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub struct TurnId(pub u32);

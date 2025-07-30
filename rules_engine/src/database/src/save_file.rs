@@ -8,7 +8,6 @@ use crate::quest_save_file::QuestSaveFile;
 /// Terminology Note: If someone has multiple save files, we think of these as
 /// separate "users", even if they are actually the same human.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub enum SaveFile {
     V1(SaveFileV1),
 }
@@ -22,7 +21,6 @@ impl SaveFile {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct SaveFileV1 {
     pub id: UserId,
     pub quest: Option<QuestSaveFile>,

@@ -11,7 +11,6 @@ use crate::triggered_ability::TriggeredAbility;
 /// keyword which maps to text defined by the game rules. Abilities on cards are
 /// evaluated from top to bottom in order to apply their game effects.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub enum Ability {
     /// An event ability happens immediately when an event card is played, and
     /// then the event card is discarded. Character cards cannot have

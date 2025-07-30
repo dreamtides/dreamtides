@@ -9,7 +9,6 @@ use crate::game_action_data::GameAction;
 
 /// Private actions for developer use
 #[derive(Debug, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum DebugAction {
     ApplyTestScenarioAction,
     RestartBattle,

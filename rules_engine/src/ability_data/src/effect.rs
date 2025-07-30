@@ -8,7 +8,6 @@ use crate::standard_effect::StandardEffect;
 
 /// Represents a mutation to the game state.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub enum Effect {
     Effect(StandardEffect),
     WithOptions(EffectWithOptions),
@@ -20,7 +19,6 @@ pub enum Effect {
 #[derive(
     Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub struct ModelEffectChoiceIndex(pub usize);
 
 impl ModelEffectChoiceIndex {
@@ -32,7 +30,6 @@ impl ModelEffectChoiceIndex {
 /// Represents a choice of effect to apply. These are written as a bulleted list
 /// of options with associated costs and the text "Choose One".
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct ModalEffectChoice {
     pub energy_cost: Energy,
     pub effect: Effect,
@@ -40,7 +37,6 @@ pub struct ModalEffectChoice {
 
 /// Provides an effect along with configuration options.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct EffectWithOptions {
     /// Effect to apply
     pub effect: StandardEffect,

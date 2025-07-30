@@ -43,7 +43,6 @@ impl BattlePlayerState {
 }
 
 #[derive(Debug, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum PlayerType {
     User(UserId),
     Agent(GameAI),
@@ -56,7 +55,6 @@ pub enum TestDeckName {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct CreateBattlePlayer {
     pub player_type: PlayerType,
     pub deck_name: TestDeckName,

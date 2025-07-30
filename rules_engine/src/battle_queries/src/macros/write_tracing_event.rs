@@ -67,7 +67,6 @@ pub fn write_panic_snapshot(
 }
 
 #[derive(Debug, Clone, Serialize)]
-#[serde(rename_all = "camelCase")]
 pub struct DeserializationPanicEvent {
     pub m: String,
     pub snapshot: DebugBattleState,
@@ -109,7 +108,6 @@ pub fn write_deserialization_panic(
 }
 
 #[derive(Debug, Clone, Serialize)]
-#[serde(rename_all = "camelCase")]
 struct CommandTraceEvent {
     pub m: String,
     pub snapshot: Option<DebugBattleState>,
@@ -118,7 +116,6 @@ struct CommandTraceEvent {
 }
 
 #[derive(Debug, Clone, Serialize)]
-#[serde(rename_all = "camelCase")]
 struct AnimationTraceEvent {
     pub m: String,
     pub snapshot: DebugBattleState,

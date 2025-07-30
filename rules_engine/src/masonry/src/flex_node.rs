@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 use crate::flex_style::FlexStyle;
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct FlexNode {
     pub name: Option<String>,
     pub node_type: Option<NodeType>,
@@ -26,7 +25,6 @@ pub struct FlexNode {
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum ScrollBarVisibility {
     Auto,
     AlwaysVisible,
@@ -34,7 +32,6 @@ pub enum ScrollBarVisibility {
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum TouchScrollBehavior {
     Unrestricted,
     Elastic,
@@ -42,20 +39,17 @@ pub enum TouchScrollBehavior {
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum SliderDirection {
     Horizontal,
     Vertical,
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct ScrollBar {
     pub style: Option<FlexStyle>,
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct ScrollViewNode {
     pub elasticity: Option<f32>,
     pub horizontal_page_size: Option<f32>,
@@ -70,7 +64,6 @@ pub struct ScrollViewNode {
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct DraggableNode {
     pub drop_target_identifiers: Vec<String>,
     pub over_target_indicator: Option<Box<FlexNode>>,
@@ -83,7 +76,6 @@ pub struct DraggableNode {
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct TextFieldNode {
     pub global_identifier: Option<String>,
     pub initial_text: Option<String>,
@@ -97,7 +89,6 @@ pub struct TextFieldNode {
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct SliderNode {
     pub initial_value: Option<f32>,
     pub label: Option<String>,
@@ -116,13 +107,11 @@ pub struct SliderNode {
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct TextNode {
     pub label: String,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum NodeType {
     Text(TextNode),
     ScrollViewNode(Box<ScrollViewNode>),
@@ -132,7 +121,6 @@ pub enum NodeType {
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct EventHandlers {
     pub on_click: Option<GameAction>,
     pub on_long_press: Option<GameAction>,

@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 use crate::panel_address::PanelAddress;
 
 #[derive(Debug, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum BattleDisplayAction {
     BrowseCards(CardBrowserType),
     CloseCardBrowser,
@@ -27,7 +26,6 @@ pub enum BattleDisplayAction {
 #[derive(
     Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub enum CardBrowserType {
     UserDeck,
     EnemyDeck,

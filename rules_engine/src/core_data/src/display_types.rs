@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 
 /// A URL
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct Url {
     pub url_value: String,
 }
@@ -15,7 +14,6 @@ impl Url {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct ProjectileAddress {
     pub projectile: String,
 }
@@ -27,7 +25,6 @@ impl ProjectileAddress {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct EffectAddress {
     pub effect: String,
 }
@@ -39,7 +36,6 @@ impl EffectAddress {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct AudioClipAddress {
     pub audio_clip: String,
 }
@@ -51,7 +47,6 @@ impl AudioClipAddress {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct TextureAddress {
     pub texture: String,
 }
@@ -63,7 +58,6 @@ impl TextureAddress {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct SpriteAddress {
     pub sprite: String,
 }
@@ -75,7 +69,6 @@ impl SpriteAddress {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct PrefabAddress {
     pub prefab: String,
 }
@@ -87,7 +80,6 @@ impl PrefabAddress {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct MaterialAddress {
     pub material: String,
 }
@@ -99,7 +91,6 @@ impl MaterialAddress {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct FontAddress {
     pub font: String,
 }
@@ -111,7 +102,6 @@ impl FontAddress {
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct Milliseconds {
     pub milliseconds_value: u32,
 }
@@ -127,7 +117,6 @@ impl Milliseconds {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct StudioAnimation {
     pub name: String,
 }

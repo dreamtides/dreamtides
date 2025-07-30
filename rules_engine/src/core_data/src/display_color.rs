@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 /// Represents a color with the given RGBA values represented as floats in the
 /// 0-1 range.
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema, PartialEq)]
-#[serde(rename_all = "camelCase")]
 pub struct DisplayColor {
     pub red: f32,
     pub green: f32,

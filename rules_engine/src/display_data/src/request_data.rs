@@ -13,7 +13,6 @@ pub type RequestId = Uuid;
 pub type IntegrationTestId = Uuid;
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct Metadata {
     /// ID of the user making the request.
     pub user_id: UserId,
@@ -30,7 +29,6 @@ pub struct Metadata {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct ConnectRequest {
     pub metadata: Metadata,
 
@@ -56,7 +54,6 @@ pub struct ConnectRequest {
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct DebugConfiguration {
     /// If specified, the enemy will be this player type.
     pub enemy: Option<PlayerType>,
@@ -67,7 +64,6 @@ pub struct DebugConfiguration {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct ConnectResponse {
     pub metadata: Metadata,
     pub commands: CommandSequence,
@@ -75,7 +71,6 @@ pub struct ConnectResponse {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct PerformActionRequest {
     pub metadata: Metadata,
     pub action: GameAction,
@@ -90,20 +85,17 @@ pub struct PerformActionRequest {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct PerformActionResponse {
     pub metadata: Metadata,
     pub commands: CommandSequence,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct PollRequest {
     pub metadata: Metadata,
 }
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum PollResponseType {
     None,
     Incremental,
@@ -111,7 +103,6 @@ pub enum PollResponseType {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct PollResponse {
     pub metadata: Metadata,
     pub commands: Option<CommandSequence>,
@@ -120,7 +111,6 @@ pub struct PollResponse {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct SchemaTypes {
     pub connect_request: ConnectRequest,
     pub connect_response: ConnectResponse,

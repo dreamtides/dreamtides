@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 /// is used in parsing "Banish up to two other characters you control, then
 /// materialize them."
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub enum CollectionExpression {
     All,
     EachOther,

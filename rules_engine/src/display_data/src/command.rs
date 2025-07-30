@@ -16,7 +16,6 @@ use crate::object_position::ObjectPosition;
 
 /// A list of [ParallelCommandGroup]s to execute sequentially.
 #[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct CommandSequence {
     pub groups: Vec<ParallelCommandGroup>,
 }
@@ -55,14 +54,12 @@ impl CommandSequence {
 
 /// A set of [Command]s to execute simultaneously.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct ParallelCommandGroup {
     pub commands: Vec<Command>,
 }
 
 /// Represents an animated update to the visual state of the game.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, EnumDiscriminants)]
-#[serde(rename_all = "camelCase")]
 #[strum_discriminants()]
 pub enum Command {
     UpdateBattle(Box<UpdateBattleCommand>),
@@ -80,7 +77,6 @@ pub enum Command {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct UpdateBattleCommand {
     /// The battle to update.
     pub battle: BattleView,
@@ -101,7 +97,6 @@ impl UpdateBattleCommand {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Builder)]
-#[serde(rename_all = "camelCase")]
 pub struct FireProjectileCommand {
     // The source to fire the projectile from.
     pub source_id: GameObjectId,
@@ -141,7 +136,6 @@ pub struct FireProjectileCommand {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Builder)]
-#[serde(rename_all = "camelCase")]
 pub struct DissolveCardCommand {
     /// The card to dissolve.
     ///
@@ -166,7 +160,6 @@ pub struct DissolveCardCommand {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct DisplayEffectCommand {
     /// The target to display the effect on.
     pub target: GameObjectId,
@@ -185,7 +178,6 @@ pub struct DisplayEffectCommand {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct PlayAudioClipCommand {
     /// Sound to play
     pub sound: AudioClipAddress,
@@ -195,7 +187,6 @@ pub struct PlayAudioClipCommand {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct DrawUserCardsCommand {
     /// Cards to draw. Must already be present in user deck.
     pub cards: Vec<CardView>,
@@ -210,7 +201,6 @@ pub struct DrawUserCardsCommand {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct DisplayJudgmentCommand {
     /// The player to display the judgment animation for.
     pub player: DisplayPlayer,
@@ -220,7 +210,6 @@ pub struct DisplayJudgmentCommand {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct DisplayDreamwellActivationCommand {
     /// The player to display the dreamwell activation for.
     pub player: DisplayPlayer,
@@ -245,7 +234,6 @@ pub struct DisplayDreamwellActivationCommand {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct DisplayArrow {
     pub source: GameObjectId,
     pub target: GameObjectId,
@@ -253,7 +241,6 @@ pub struct DisplayArrow {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum ArrowStyle {
     Red,
     Blue,
@@ -261,14 +248,12 @@ pub enum ArrowStyle {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct DisplayEnemyMessageCommand {
     pub message: String,
     pub show_duration: Milliseconds,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct PlayStudioAnimationCommand {
     pub studio_type: StudioType,
     pub enter_animation: Option<StudioAnimation>,
@@ -277,7 +262,6 @@ pub struct PlayStudioAnimationCommand {
 }
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum StudioType {
     UserStatus,
     EnemyStatus,
@@ -286,7 +270,6 @@ pub enum StudioType {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Eq, PartialEq)]
-#[serde(rename_all = "camelCase")]
 pub enum GameObjectId {
     CardId(ClientCardId),
     Deck(DisplayPlayer),
@@ -295,7 +278,6 @@ pub enum GameObjectId {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Eq, PartialEq)]
-#[serde(rename_all = "camelCase")]
 pub enum GameMessageType {
     YourTurn,
     EnemyTurn,

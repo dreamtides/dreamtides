@@ -15,7 +15,6 @@ pub type ClientCardId = String;
 
 /// Represents the visual state of a card or ability in a game
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct CardView {
     /// Identifier for this card
     pub id: ClientCardId,
@@ -58,7 +57,6 @@ pub struct CardView {
 
 /// Preview of a potential future state of a card.
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct CardPreviewView {
     /// Identifier for this card
     pub card_id: ClientCardId,
@@ -78,7 +76,6 @@ pub struct CardPreviewView {
 
 /// Visual state of a revealed card
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct RevealedCardView {
     /// Image for this card
     pub image: DisplayImage,
@@ -119,21 +116,18 @@ pub struct RevealedCardView {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum DisplayImage {
     Sprite(SpriteAddress),
     Prefab(DisplayPrefabImage),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct DisplayPrefabImage {
     pub prefab: PrefabAddress,
     pub studio_type: StudioType,
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct CardActions {
     /// If this card can currently be played from hand, an action to invoke when
     /// played.
@@ -154,14 +148,12 @@ pub struct CardActions {
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct CardEffects {
     /// Projectile to display as a trail behind this card.
     pub card_trail: Option<ProjectileAddress>,
 }
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct InfoZoomData {
     /// Additional help text about this card, describing its abilities.
     pub supplemental_card_info: Option<FlexNode>,
@@ -172,7 +164,6 @@ pub struct InfoZoomData {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct InfoZoomIcon {
     pub card_id: ClientCardId,
     pub icon: String,
@@ -180,7 +171,6 @@ pub struct InfoZoomIcon {
 }
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum CardPrefab {
     Character,
     Event,

@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 use strum::Display;
 
 #[derive(Debug, Hash, Serialize, Deserialize, JsonSchema, Copy, Clone, Eq, PartialEq)]
-#[serde(rename_all = "camelCase")]
 pub enum CardType {
     Character(CharacterType),
     Event,
@@ -16,7 +15,6 @@ pub enum CardType {
 #[derive(
     Debug, Hash, Ord, PartialOrd, Serialize, Deserialize, JsonSchema, EnumSetType, Display,
 )]
-#[serde(rename_all = "camelCase")]
 pub enum CharacterType {
     Ancient,
     Child,

@@ -13,14 +13,12 @@ use crate::flex_enums::{
 };
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct FlexVector2 {
     pub x: f32,
     pub y: f32,
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct FlexVector3 {
     pub x: f32,
     pub y: f32,
@@ -38,13 +36,11 @@ impl FlexVector3 {
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct FlexRotate {
     pub degrees: f32,
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema, Builder)]
-#[serde(rename_all = "camelCase")]
 pub struct FlexTranslate {
     #[builder(into)]
     pub x: Dimension,
@@ -55,7 +51,6 @@ pub struct FlexTranslate {
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct FlexScale {
     pub amount: FlexVector3,
 }
@@ -67,7 +62,6 @@ impl FlexScale {
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct TextShadow {
     pub offset: FlexVector2,
     pub blur_radius: f32,
@@ -75,7 +69,6 @@ pub struct TextShadow {
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema, Builder)]
-#[serde(rename_all = "camelCase")]
 pub struct ImageSlice {
     pub top: u32,
     pub right: u32,
@@ -90,7 +83,6 @@ impl From<u32> for ImageSlice {
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum FlexPickingMode {
     Position,
     Ignore,
@@ -142,7 +134,6 @@ impl From<i32> for Opacity {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum ImageScaleMode {
     StretchToFill,
     ScaleAndCrop,
@@ -150,7 +141,6 @@ pub enum ImageScaleMode {
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema, Builder)]
-#[serde(rename_all = "camelCase")]
 pub struct FlexStyle {
     pub align_content: Option<FlexAlign>,
     pub align_items: Option<FlexAlign>,

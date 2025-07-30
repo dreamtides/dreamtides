@@ -7,7 +7,6 @@ use crate::predicate::{CardPredicate, Predicate};
 /// Any action a player must take in order to play a card or activate an
 /// ability, such as paying energy.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub enum Cost {
     AbandonCharacters(Predicate, u32),
     AbandonCharactersCount { target: Predicate, count: CollectionExpression },

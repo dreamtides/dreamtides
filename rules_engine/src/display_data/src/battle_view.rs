@@ -11,7 +11,6 @@ use crate::command::DisplayArrow;
 
 /// Represents the visual state of an ongoing dream battle
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct BattleView {
     /// Unique identifier for this dream battle
     pub id: BattleId,
@@ -37,7 +36,6 @@ pub struct BattleView {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum BattlePreviewState {
     /// No preview is currently active. Clear any existing preview.
     None,
@@ -55,7 +53,6 @@ pub enum BattlePreviewState {
 /// Preview of a potential future state of a battle, shown e.g. in response to a
 /// card being selected to be played.
 #[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct BattlePreviewView {
     pub user: PlayerPreviewView,
     pub enemy: PlayerPreviewView,
@@ -65,7 +62,6 @@ pub struct BattlePreviewView {
 
 /// User interaction options
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct InterfaceView {
     /// Content to display on top of all other game UI.
     pub screen_overlay: Option<FlexNode>,
@@ -105,7 +101,6 @@ pub struct InterfaceView {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct CardBrowserView {
     /// Action to perform when the close button is clicked.
     ///
@@ -114,7 +109,6 @@ pub struct CardBrowserView {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct CardOrderSelectorView {
     /// Include the user's deck as a card drop target
     pub include_deck: bool,
@@ -125,7 +119,6 @@ pub struct CardOrderSelectorView {
 
 /// Button to perform some game action
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct ButtonView {
     pub label: String,
 
@@ -135,7 +128,6 @@ pub struct ButtonView {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum DisplayedTurnIndicator {
     /// Left indicator, indicates start of turn or main phase
     Left,
@@ -146,7 +138,6 @@ pub enum DisplayedTurnIndicator {
 
 /// Represents the visual state of a player in a game
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct PlayerView {
     /// Current score total
     pub score: Points,
@@ -173,7 +164,6 @@ pub struct PlayerView {
 
 /// Preview of a potential future state of a player
 #[derive(Clone, Debug, Default, Eq, PartialEq, Hash, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct PlayerPreviewView {
     /// New score total
     pub score: Option<Points>,

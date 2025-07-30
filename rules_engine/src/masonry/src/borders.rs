@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 use crate::dimension::Dimension;
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct BorderWidth {
     pub top: f32,
     pub right: f32,
@@ -55,7 +54,6 @@ impl From<(i32, i32, i32, i32)> for BorderWidth {
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct BorderColor {
     pub top: DisplayColor,
     pub right: DisplayColor,
@@ -84,7 +82,6 @@ impl From<(DisplayColor, DisplayColor, DisplayColor, DisplayColor)> for BorderCo
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct BorderRadius {
     pub top_left: Dimension,
     pub top_right: Dimension,

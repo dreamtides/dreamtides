@@ -5,7 +5,6 @@ use crate::predicate::Predicate;
 /// Describes possible game events which may cause a triggered ability to
 /// trigger.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub enum TriggerEvent {
     Abandon(Predicate),
     Banished(Predicate),
@@ -23,7 +22,6 @@ pub enum TriggerEvent {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub enum TriggerKeyword {
     Materialized,
     Judgment,
@@ -31,7 +29,6 @@ pub enum TriggerKeyword {
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub enum PlayerTurn {
     YourTurn,
     EnemyTurn,

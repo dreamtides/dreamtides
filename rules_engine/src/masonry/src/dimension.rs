@@ -3,7 +3,6 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum DimensionUnit {
     Pixels,
     Percentage,
@@ -18,7 +17,6 @@ pub enum DimensionUnit {
 pub struct Percent(pub i32);
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct Dimension {
     pub unit: DimensionUnit,
     pub value: f32,
@@ -43,7 +41,6 @@ impl From<Percent> for Dimension {
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "camelCase")]
 pub struct DimensionGroup {
     pub top: Dimension,
     pub right: Dimension,
@@ -98,7 +95,6 @@ impl From<(f32, f32, f32, f32)> for DimensionGroup {
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema, Builder)]
-#[serde(rename_all = "camelCase")]
 pub struct FlexInsets {
     #[builder(into)]
     pub top: Option<Dimension>,
@@ -122,7 +118,6 @@ impl FlexInsets {
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema, Builder)]
-#[serde(rename_all = "camelCase")]
 pub struct SafeAreaInsets {
     #[builder(into)]
     pub top: Option<i32>,

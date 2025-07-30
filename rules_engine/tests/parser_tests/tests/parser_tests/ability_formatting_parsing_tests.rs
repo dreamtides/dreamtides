@@ -8,15 +8,15 @@ fn test_multiple_abilities_with_br() {
         result,
         @r###"
     [
-      event(EventAbility(
+      Event(EventAbility(
         additional_cost: None,
-        effect: effect(drawCards(
+        effect: Effect(DrawCards(
           count: 1,
         )),
       )),
-      event(EventAbility(
+      Event(EventAbility(
         additional_cost: None,
-        effect: effect(gainEnergy(
+        effect: Effect(GainEnergy(
           gains: Energy(2),
         )),
       )),
@@ -30,9 +30,9 @@ fn test_flavor_text() {
     let result = parse("Draw a card. {flavor: Drawing cards is fun.}");
     assert_ron_snapshot!(result, @r###"
     [
-      event(EventAbility(
+      Event(EventAbility(
         additional_cost: None,
-        effect: effect(drawCards(
+        effect: Effect(DrawCards(
           count: 1,
         )),
       )),
@@ -49,16 +49,16 @@ fn test_multiple_abilities_with_flavor() {
         result,
         @r###"
     [
-      event(EventAbility(
+      Event(EventAbility(
         additional_cost: None,
-        effect: effect(drawCards(
+        effect: Effect(DrawCards(
           count: 1,
         )),
       )),
-      event(EventAbility(
+      Event(EventAbility(
         additional_cost: None,
-        effect: effect(payCost(
-          cost: discardCards(card, 1),
+        effect: Effect(PayCost(
+          cost: DiscardCards(Card, 1),
         )),
       )),
     ]
@@ -71,9 +71,9 @@ fn test_reminder_text() {
     let result = parse("Draw a card. {reminder: You get to look at more cards!}");
     assert_ron_snapshot!(result, @r###"
     [
-      event(EventAbility(
+      Event(EventAbility(
         additional_cost: None,
-        effect: effect(drawCards(
+        effect: Effect(DrawCards(
           count: 1,
         )),
       )),
@@ -90,16 +90,16 @@ fn test_multiple_abilities_with_reminder() {
         result,
         @r###"
     [
-      event(EventAbility(
+      Event(EventAbility(
         additional_cost: None,
-        effect: effect(drawCards(
+        effect: Effect(DrawCards(
           count: 1,
         )),
       )),
-      event(EventAbility(
+      Event(EventAbility(
         additional_cost: None,
-        effect: effect(payCost(
-          cost: discardCards(card, 1),
+        effect: Effect(PayCost(
+          cost: DiscardCards(Card, 1),
         )),
       )),
     ]
@@ -116,16 +116,16 @@ fn test_reminder_and_flavor() {
         result,
         @r###"
     [
-      event(EventAbility(
+      Event(EventAbility(
         additional_cost: None,
-        effect: effect(drawCards(
+        effect: Effect(DrawCards(
           count: 1,
         )),
       )),
-      event(EventAbility(
+      Event(EventAbility(
         additional_cost: None,
-        effect: effect(payCost(
-          cost: discardCards(card, 1),
+        effect: Effect(PayCost(
+          cost: DiscardCards(Card, 1),
         )),
       )),
     ]

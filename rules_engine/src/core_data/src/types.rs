@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 #[derive(
     Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub enum CardFacing {
     FaceDown,
     FaceUp,
@@ -14,7 +13,6 @@ pub enum CardFacing {
 
 /// Identifies a player in an ongoing battle.
 #[derive(Debug, Hash, Ord, PartialOrd, Serialize, Deserialize, JsonSchema, EnumSetType)]
-#[serde(rename_all = "camelCase")]
 pub enum PlayerName {
     One,
     Two,

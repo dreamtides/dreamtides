@@ -13,7 +13,6 @@ use crate::battle::card_id::{
 #[derive(
     Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub enum BattleAction {
     /// Developer action
     Debug(DebugBattleAction),
@@ -56,7 +55,6 @@ pub enum BattleAction {
 #[derive(
     Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
 )]
-#[serde(rename_all = "camelCase")]
 pub struct DeckCardSelectedOrder {
     pub card_id: DeckCardId,
     pub target: CardOrderSelectionTarget,
@@ -76,7 +74,6 @@ pub struct DeckCardSelectedOrder {
     JsonSchema,
     EnumDiscriminants,
 )]
-#[serde(rename_all = "camelCase")]
 #[strum_discriminants(derive(Hash, Serialize, Deserialize, Ord, PartialOrd, JsonSchema))]
 pub enum CardOrderSelectionTarget {
     Deck(usize),
