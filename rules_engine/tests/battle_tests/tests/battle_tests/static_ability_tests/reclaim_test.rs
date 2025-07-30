@@ -239,3 +239,25 @@ fn reclaim_token_always_in_hand_even_when_unplayable() {
     assert_eq!(s.user_client.cards.user_void().len(), 1, "card still in void");
     assert!(s.user_client.cards.user_void().contains(&card_id), "reclaim card in void");
 }
+
+#[test]
+fn reclaim_card_shows_reclaimed_in_rules_text_when_on_stack() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+    let card_id = s.create_and_play(DisplayPlayer::User, CardName::TestDrawOneReclaim);
+    s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+    s.play_card_from_void(DisplayPlayer::User, &card_id);
+
+    let stack_cards: Vec<&_> = s.user_client.cards.stack_cards().iter().map(|c| &c.view).collect();
+    assert_eq!(stack_cards.len(), 1, "card is on the stack");
+
+    let stack_card = &stack_cards[0];
+    let revealed = stack_card.revealed.as_ref().unwrap();
+
+    assert!(
+        revealed.rules_text.contains("(Reclaimed)"),
+        "card shows (Reclaimed) in rules text when played from void. Rules text: {}",
+        revealed.rules_text
+    );
+
+    assert!(revealed.rules_text.contains("Draw a card"), "card still shows original rules text");
+}

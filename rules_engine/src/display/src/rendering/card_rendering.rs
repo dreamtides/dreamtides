@@ -380,7 +380,44 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         return format!("{} <b><color=\"blue\">({}\u{f7e4} paid)</color></b>", base_text, energy.0);
     }
 
+    if is_on_stack_from_void(battle, card_id) {
+        return format!("{base_text} <b><color=\"blue\">(Reclaimed)</color></b>");
+    }
+
     base_text
+}
+
+/// Returns true if the the `card_id` is on the stack and was played from the
+/// void.
+fn is_on_stack_from_void(battle: &BattleState, card_id: CardId) -> bool {
+    if battle.cards.stack_item(StackCardId(card_id)).is_none() {
+        return false;
+    }
+
+    battle
+        .action_history
+        .as_ref()
+        .map(|history| {
+            history
+                .actions
+                .iter()
+                .rev()
+                .find_map(|history_action| match &history_action.action {
+                    BattleAction::PlayCardFromVoid(void_card_id, _)
+                        if void_card_id.card_id() == card_id =>
+                    {
+                        Some(true)
+                    }
+                    BattleAction::PlayCardFromHand(hand_card_id)
+                        if hand_card_id.card_id() == card_id =>
+                    {
+                        Some(false)
+                    }
+                    _ => None,
+                })
+                .unwrap_or(false)
+        })
+        .unwrap_or(false)
 }
 
 fn supplemental_card_info(battle: &BattleState, card_id: CardId) -> Option<String> {

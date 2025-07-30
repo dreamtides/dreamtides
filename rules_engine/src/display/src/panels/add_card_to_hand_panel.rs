@@ -143,6 +143,12 @@ impl Component for AddCardToHandPanel<'_> {
                                 )
                                 .child(
                                     AddCardCell::builder()
+                                        .card(CardName::TestForeseeOneDrawReclaim)
+                                        .user_player(self.user_player)
+                                        .build(),
+                                )
+                                .child(
+                                    AddCardCell::builder()
                                         .card(CardName::TestActivatedAbilityDrawCard)
                                         .user_player(self.user_player)
                                         .build(),
