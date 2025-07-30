@@ -63,6 +63,9 @@ pub struct BattlePreviewView {
 /// User interaction options
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct InterfaceView {
+    /// Whether any panels are currently open
+    pub has_open_panels: bool,
+
     /// Content to display on top of all other game UI.
     pub screen_overlay: Option<FlexNode>,
 

@@ -2061,6 +2061,12 @@ namespace Dreamtides.Schema
         public ButtonView DevButton { get; set; }
 
         /// <summary>
+        /// Whether any panels are currently open
+        /// </summary>
+        [JsonProperty("has_open_panels", Required = Required.Always)]
+        public bool HasOpenPanels { get; set; }
+
+        /// <summary>
         /// Button to increment the number shown in a number prompt.
         /// </summary>
         [JsonProperty("increment_button")]

@@ -21,6 +21,8 @@ namespace Dreamtides.Services
 
     public VisualElement RootVisualElement => _document.rootVisualElement;
 
+    public bool HasOpenPanels { get; set; } = false;
+
     protected override void OnInitialize(TestConfiguration? testConfiguration)
     {
       _document.rootVisualElement.Clear();

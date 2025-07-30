@@ -21,7 +21,7 @@ namespace Dreamtides.Services
     /// </summary>
     public bool CanInfoZoom(GameContext gameContext, Position position)
     {
-      if (Registry.DocumentService.MouseOverDocumentElement())
+      if (Registry.DocumentService.MouseOverDocumentElement() || Registry.DocumentService.HasOpenPanels)
       {
         return false;
       }

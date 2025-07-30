@@ -167,7 +167,7 @@ namespace Dreamtides.Services
 
     Displayable? FireClick()
     {
-      if (Registry.DocumentService.MouseOverDocumentElement())
+      if (Registry.DocumentService.MouseOverDocumentElement() || Registry.DocumentService.HasOpenPanels)
       {
         return null;
       }

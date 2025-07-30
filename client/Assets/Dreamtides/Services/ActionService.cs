@@ -491,6 +491,7 @@ namespace Dreamtides.Services
           coroutines.Add(StartCoroutine(Registry.LayoutService.UpdateLayout(
               command.UpdateBattle,
               animate ? TweenUtils.Sequence("UpdateLayout") : null)));
+          Registry.DocumentService.HasOpenPanels = command.UpdateBattle.Battle.Interface?.HasOpenPanels ?? false;
 
           // Must happen after UpdateLayout since cards may be created which are referenced
           Registry.ArrowService.HandleDisplayArrows(command.UpdateBattle.Battle.Arrows ?? new List<DisplayArrow>());

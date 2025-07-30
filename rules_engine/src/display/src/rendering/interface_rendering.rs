@@ -31,6 +31,7 @@ use crate::rendering::labels;
 
 pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> InterfaceView {
     let current_panel_address = display_state::get_current_panel_address(builder);
+    let has_panel = current_panel_address.is_some();
 
     if builder.is_for_animation() {
         let overlay_builder = overlay_builder().child(
@@ -39,6 +40,7 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
         );
 
         return InterfaceView {
+            has_open_panels: has_panel,
             screen_overlay: overlay_builder.build().flex_node(),
             dev_button: Some(ButtonView { label: "\u{f0ad} Dev".to_string(), action: None }),
             undo_button: Some(ButtonView { label: "\u{f0e2}".to_string(), action: None }),
@@ -58,6 +60,7 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
     let legal_actions = legal_actions::compute(battle, builder.act_for_player());
 
     InterfaceView {
+        has_open_panels: has_panel,
         screen_overlay: overlay,
         primary_action_button: primary_action_button(builder, battle, &legal_actions),
         primary_action_show_on_idle_duration: None,

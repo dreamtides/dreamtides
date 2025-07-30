@@ -47,7 +47,8 @@ namespace Dreamtides.Services
       if (
           _isTest ||
           Registry.IsMobileDevice ||
-          Registry.DocumentService.MouseOverDocumentElement()
+          Registry.DocumentService.MouseOverDocumentElement() ||
+          Registry.DocumentService.HasOpenPanels
         )
       {
         return;
