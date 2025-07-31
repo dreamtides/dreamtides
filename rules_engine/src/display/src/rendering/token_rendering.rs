@@ -190,7 +190,11 @@ fn activated_ability_card_view(
                 },
                 ..Default::default()
             })
-            .maybe_outline_color(if is_legal_action { Some(display_color::GREEN) } else { None })
+            .maybe_outline_color(if is_legal_action {
+                Some(display_color::PURPLE_300)
+            } else {
+                None
+            })
             .is_fast(
                 ability_data.ability.options.as_ref().map(|opts| opts.is_fast).unwrap_or(false),
             )
@@ -263,7 +267,7 @@ fn void_card_token_view(
                 }),
                 ..Default::default()
             })
-            .maybe_outline_color(play_action.map(|_| display_color::GREEN))
+            .maybe_outline_color(play_action.map(|_| display_color::PURPLE_300))
             .is_fast(card_properties::is_fast(battle, card_id))
             .maybe_info_zoom_data(build_token_info_zoom_data(battle, card_id))
             .build(),
