@@ -199,7 +199,7 @@ fn return_up_to_count_from_your_void_to_hand(
 
     let controller = source.controller();
     for void_card_target in void_cards {
-        move_card::from_void_to_hand(battle, source, controller, void_card_target.id);
+        move_card::from_void_to_hand(battle, source, controller, void_card_target.card_id);
     }
     Some(EffectWasApplied)
 }

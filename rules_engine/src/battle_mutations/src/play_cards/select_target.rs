@@ -5,9 +5,8 @@ use battle_queries::{battle_trace, panic_with};
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CharacterId, StackCardId, VoidCardId};
-use battle_state::battle_cards::stack_card_state::{
-    EffectTargets, StandardEffectTarget, VoidCardTarget,
-};
+use battle_state::battle_cards::battle_card_state::CardObjectId;
+use battle_state::battle_cards::stack_card_state::{EffectTargets, StandardEffectTarget};
 use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{OnSelected, PromptType};
 use core_data::types::PlayerName;
@@ -33,17 +32,18 @@ pub fn character(battle: &mut BattleState, player: PlayerName, character_id: Cha
             battle.push_animation(source, || BattleAnimation::SelectStackCardTargets {
                 player,
                 source_id,
-                targets: EffectTargets::Standard(StandardEffectTarget::Character(
-                    character_id,
+                targets: EffectTargets::Standard(StandardEffectTarget::Character(CardObjectId {
+                    card_id: character_id,
                     object_id,
-                )),
+                })),
             });
         }
         OnSelected::AddPendingEffectTarget(pending_effect_index) => {
             let Some(pending_effect) = battle.pending_effect_mut(pending_effect_index) else {
                 panic_with!("Pending effect not found", battle, pending_effect_index);
             };
-            let target = StandardEffectTarget::Character(character_id, object_id);
+            let target =
+                StandardEffectTarget::Character(CardObjectId { card_id: character_id, object_id });
             match &mut pending_effect.requested_targets {
                 Some(existing_targets) => existing_targets.add(target),
                 None => pending_effect.requested_targets = Some(EffectTargets::Standard(target)),
@@ -75,17 +75,18 @@ pub fn on_stack(battle: &mut BattleState, player: PlayerName, stack_card_id: Sta
             battle.push_animation(source, || BattleAnimation::SelectStackCardTargets {
                 player,
                 source_id,
-                targets: EffectTargets::Standard(StandardEffectTarget::StackCard(
-                    stack_card_id,
+                targets: EffectTargets::Standard(StandardEffectTarget::StackCard(CardObjectId {
+                    card_id: stack_card_id,
                     object_id,
-                )),
+                })),
             });
         }
         OnSelected::AddPendingEffectTarget(pending_effect_index) => {
             let Some(pending_effect) = battle.pending_effect_mut(pending_effect_index) else {
                 panic_with!("Pending effect not found", battle, pending_effect_index);
             };
-            let target = StandardEffectTarget::StackCard(stack_card_id, object_id);
+            let target =
+                StandardEffectTarget::StackCard(CardObjectId { card_id: stack_card_id, object_id });
             match &mut pending_effect.requested_targets {
                 Some(existing_targets) => existing_targets.add(target),
                 None => pending_effect.requested_targets = Some(EffectTargets::Standard(target)),
@@ -133,7 +134,7 @@ pub fn submit_void_card_targets(battle: &mut BattleState, player: PlayerName) {
     let mut void_targets = BTreeSet::new();
     for void_card_id in void_prompt.selected.iter() {
         let object_id = card::get(battle, void_card_id).object_id;
-        void_targets.insert(VoidCardTarget { id: void_card_id, object_id });
+        void_targets.insert(CardObjectId { card_id: void_card_id, object_id });
     }
 
     match void_prompt.on_selected {

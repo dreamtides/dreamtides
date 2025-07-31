@@ -514,32 +514,29 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
         for choice in choices {
             if let Some(targets) = &choice.targets {
                 let target_card_ids = match targets {
-                    EffectTargets::Standard(StandardEffectTarget::Character(
-                        target_character_id,
-                        _,
-                    )) => {
-                        vec![target_character_id.card_id()]
+                    EffectTargets::Standard(StandardEffectTarget::Character(card_object_id)) => {
+                        vec![card_object_id.card_id.card_id()]
                     }
-                    EffectTargets::Standard(StandardEffectTarget::StackCard(
-                        target_stack_card_id,
-                        _,
-                    )) => {
-                        vec![target_stack_card_id.card_id()]
+                    EffectTargets::Standard(StandardEffectTarget::StackCard(card_object_id)) => {
+                        vec![card_object_id.card_id.card_id()]
                     }
                     EffectTargets::Standard(StandardEffectTarget::VoidCardSet(
                         void_card_targets,
-                    )) => void_card_targets.iter().map(|target| target.id.card_id()).collect(),
+                    )) => void_card_targets.iter().map(|target| target.card_id.card_id()).collect(),
                     EffectTargets::EffectList(target_list) => target_list
                         .iter()
                         .flat_map(|target_option| match target_option.as_ref() {
-                            Some(StandardEffectTarget::Character(character_id, _)) => {
-                                vec![character_id.card_id()]
+                            Some(StandardEffectTarget::Character(card_object_id)) => {
+                                vec![card_object_id.card_id.card_id()]
                             }
-                            Some(StandardEffectTarget::StackCard(stack_card_id, _)) => {
-                                vec![stack_card_id.card_id()]
+                            Some(StandardEffectTarget::StackCard(card_object_id)) => {
+                                vec![card_object_id.card_id.card_id()]
                             }
                             Some(StandardEffectTarget::VoidCardSet(void_card_targets)) => {
-                                void_card_targets.iter().map(|target| target.id.card_id()).collect()
+                                void_card_targets
+                                    .iter()
+                                    .map(|target| target.card_id.card_id())
+                                    .collect()
                             }
                             None => vec![],
                         })
@@ -559,26 +556,26 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
 
     if let Some(targets) = valid_target_queries::displayed_targets(battle, StackCardId(card_id)) {
         let target_card_ids = match targets {
-            EffectTargets::Standard(StandardEffectTarget::Character(target_character_id, _)) => {
-                vec![target_character_id.card_id()]
+            EffectTargets::Standard(StandardEffectTarget::Character(card_object_id)) => {
+                vec![card_object_id.card_id.card_id()]
             }
-            EffectTargets::Standard(StandardEffectTarget::StackCard(target_stack_card_id, _)) => {
-                vec![target_stack_card_id.card_id()]
+            EffectTargets::Standard(StandardEffectTarget::StackCard(card_object_id)) => {
+                vec![card_object_id.card_id.card_id()]
             }
             EffectTargets::Standard(StandardEffectTarget::VoidCardSet(void_card_targets)) => {
-                void_card_targets.iter().map(|target| target.id.card_id()).collect()
+                void_card_targets.iter().map(|target| target.card_id.card_id()).collect()
             }
             EffectTargets::EffectList(target_list) => target_list
                 .iter()
                 .flat_map(|target_option| match target_option.as_ref() {
-                    Some(StandardEffectTarget::Character(character_id, _)) => {
-                        vec![character_id.card_id()]
+                    Some(StandardEffectTarget::Character(card_object_id)) => {
+                        vec![card_object_id.card_id.card_id()]
                     }
-                    Some(StandardEffectTarget::StackCard(stack_card_id, _)) => {
-                        vec![stack_card_id.card_id()]
+                    Some(StandardEffectTarget::StackCard(card_object_id)) => {
+                        vec![card_object_id.card_id.card_id()]
                     }
                     Some(StandardEffectTarget::VoidCardSet(void_card_targets)) => {
-                        void_card_targets.iter().map(|target| target.id.card_id()).collect()
+                        void_card_targets.iter().map(|target| target.card_id.card_id()).collect()
                     }
                     None => vec![],
                 })

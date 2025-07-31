@@ -4,9 +4,8 @@ use ability_data::effect::{Effect, ModelEffectChoiceIndex};
 use ability_data::standard_effect::StandardEffect;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardId;
-use battle_state::battle_cards::stack_card_state::{
-    EffectTargets, StandardEffectTarget, VoidCardTarget,
-};
+use battle_state::battle_cards::battle_card_state::CardObjectId;
+use battle_state::battle_cards::stack_card_state::{EffectTargets, StandardEffectTarget};
 use battle_state::core::effect_source::EffectSource;
 
 use crate::battle_card_queries::card;
@@ -97,7 +96,7 @@ fn standard_effect_automatic_targets(
         if valid.len() == 1 {
             let character_id = valid.iter().next().unwrap();
             let object_id = card::get(battle, character_id).object_id;
-            Some(StandardEffectTarget::Character(character_id, object_id))
+            Some(StandardEffectTarget::Character(CardObjectId { card_id: character_id, object_id }))
         } else {
             None
         }
@@ -107,7 +106,10 @@ fn standard_effect_automatic_targets(
         if valid.len() == 1 {
             let stack_card_id = valid.iter().next().unwrap();
             let object_id = card::get(battle, stack_card_id).object_id;
-            Some(StandardEffectTarget::StackCard(stack_card_id, object_id))
+            Some(StandardEffectTarget::StackCard(CardObjectId {
+                card_id: stack_card_id,
+                object_id,
+            }))
         } else {
             None
         }
@@ -118,7 +120,7 @@ fn standard_effect_automatic_targets(
             let void_card_id = valid.iter().next().unwrap();
             let object_id = card::get(battle, void_card_id).object_id;
             let mut void_targets = BTreeSet::new();
-            void_targets.insert(VoidCardTarget { id: void_card_id, object_id });
+            void_targets.insert(CardObjectId { card_id: void_card_id, object_id });
             Some(StandardEffectTarget::VoidCardSet(void_targets))
         } else {
             None

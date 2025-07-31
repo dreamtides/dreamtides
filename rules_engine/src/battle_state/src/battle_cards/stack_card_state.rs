@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use crate::battle::card_id::{
     ActivatedAbilityId, CardId, CardIdType, CharacterId, StackCardId, VoidCardId,
 };
-use crate::battle_cards::battle_card_state::ObjectId;
+use crate::battle_cards::battle_card_state::{CardObjectId, ObjectId};
 
 /// A vector of items on the stack
 ///
@@ -57,23 +57,31 @@ pub struct StackItemState {
 impl StackItemState {
     pub fn append_character_target(&mut self, character_id: CharacterId, object_id: ObjectId) {
         if let Some(targets) = &mut self.targets {
-            targets.add(StandardEffectTarget::Character(character_id, object_id));
-        } else {
-            self.targets = Some(EffectTargets::Standard(StandardEffectTarget::Character(
-                character_id,
+            targets.add(StandardEffectTarget::Character(CardObjectId {
+                card_id: character_id,
                 object_id,
-            )));
+            }));
+        } else {
+            self.targets =
+                Some(EffectTargets::Standard(StandardEffectTarget::Character(CardObjectId {
+                    card_id: character_id,
+                    object_id,
+                })));
         }
     }
 
     pub fn append_stack_card_target(&mut self, stack_card_id: StackCardId, object_id: ObjectId) {
         if let Some(targets) = &mut self.targets {
-            targets.add(StandardEffectTarget::StackCard(stack_card_id, object_id));
-        } else {
-            self.targets = Some(EffectTargets::Standard(StandardEffectTarget::StackCard(
-                stack_card_id,
+            targets.add(StandardEffectTarget::StackCard(CardObjectId {
+                card_id: stack_card_id,
                 object_id,
-            )));
+            }));
+        } else {
+            self.targets =
+                Some(EffectTargets::Standard(StandardEffectTarget::StackCard(CardObjectId {
+                    card_id: stack_card_id,
+                    object_id,
+                })));
         }
     }
 }
@@ -93,17 +101,11 @@ pub enum EffectTargets {
     EffectList(VecDeque<Option<StandardEffectTarget>>),
 }
 
-#[derive(Clone, Debug, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct VoidCardTarget {
-    pub id: VoidCardId,
-    pub object_id: ObjectId,
-}
-
 #[derive(Clone, Debug)]
 pub enum StandardEffectTarget {
-    Character(CharacterId, ObjectId),
-    StackCard(StackCardId, ObjectId),
-    VoidCardSet(BTreeSet<VoidCardTarget>),
+    Character(CardObjectId<CharacterId>),
+    StackCard(CardObjectId<StackCardId>),
+    VoidCardSet(BTreeSet<CardObjectId<VoidCardId>>),
 }
 
 impl EffectTargets {

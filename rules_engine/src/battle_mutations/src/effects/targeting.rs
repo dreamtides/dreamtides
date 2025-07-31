@@ -3,16 +3,16 @@ use std::collections::BTreeSet;
 use battle_queries::panic_with;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CharacterId, StackCardId, VoidCardId};
-use battle_state::battle_cards::stack_card_state::{
-    EffectTargets, StandardEffectTarget, VoidCardTarget,
-};
+use battle_state::battle_cards::battle_card_state::CardObjectId;
+use battle_state::battle_cards::stack_card_state::{EffectTargets, StandardEffectTarget};
 
 /// Returns the [CharacterId] for a set of EffectTargets.
 pub fn character_id(targets: &mut Option<EffectTargets>) -> Option<CharacterId> {
     match targets.take() {
-        Some(EffectTargets::Standard(StandardEffectTarget::Character(character_id, ..))) => {
-            Some(character_id)
-        }
+        Some(EffectTargets::Standard(StandardEffectTarget::Character(CardObjectId {
+            card_id: character_id,
+            ..
+        }))) => Some(character_id),
         Some(EffectTargets::EffectList(mut target_list)) => {
             if let Some(Some(StandardEffectTarget::Character(character_id, ..))) =
                 target_list.pop_front()
@@ -20,7 +20,7 @@ pub fn character_id(targets: &mut Option<EffectTargets>) -> Option<CharacterId> 
                 if !target_list.is_empty() {
                     *targets = Some(EffectTargets::EffectList(target_list));
                 }
-                Some(character_id)
+                Some(character_id.card_id)
             } else {
                 if !target_list.is_empty() {
                     *targets = Some(EffectTargets::EffectList(target_list));
@@ -36,7 +36,7 @@ pub fn character_id(targets: &mut Option<EffectTargets>) -> Option<CharacterId> 
 pub fn stack_card_id(targets: &mut Option<EffectTargets>) -> Option<StackCardId> {
     match targets.take() {
         Some(EffectTargets::Standard(StandardEffectTarget::StackCard(stack_card_id, ..))) => {
-            Some(stack_card_id)
+            Some(stack_card_id.card_id)
         }
         Some(EffectTargets::EffectList(mut target_list)) => {
             if let Some(Some(StandardEffectTarget::StackCard(stack_card_id, ..))) =
@@ -45,7 +45,7 @@ pub fn stack_card_id(targets: &mut Option<EffectTargets>) -> Option<StackCardId>
                 if !target_list.is_empty() {
                     *targets = Some(EffectTargets::EffectList(target_list));
                 }
-                Some(stack_card_id)
+                Some(stack_card_id.card_id)
             } else {
                 if !target_list.is_empty() {
                     *targets = Some(EffectTargets::EffectList(target_list));
@@ -70,7 +70,7 @@ pub fn void_card_id(
             let length = void_cards.len();
             match length {
                 0 => None,
-                1 => Some(void_cards.into_iter().next().unwrap().id),
+                1 => Some(void_cards.into_iter().next().unwrap().card_id),
                 _ => panic_with!("Expected at most 1 void card target", battle, length),
             }
         }
@@ -81,7 +81,7 @@ pub fn void_card_id(
                 let length = void_cards.len();
                 let result = match length {
                     0 => None,
-                    1 => Some(void_cards.into_iter().next().unwrap().id),
+                    1 => Some(void_cards.into_iter().next().unwrap().card_id),
                     _ => panic_with!("Expected at most 1 void card target", battle, length),
                 };
                 if !target_list.is_empty() {
@@ -101,7 +101,9 @@ pub fn void_card_id(
 
 /// Returns the void card targets for a set of EffectTargets, or None
 /// if there are no valid targets.
-pub fn void_card_targets(targets: &mut Option<EffectTargets>) -> Option<BTreeSet<VoidCardTarget>> {
+pub fn void_card_targets(
+    targets: &mut Option<EffectTargets>,
+) -> Option<BTreeSet<CardObjectId<VoidCardId>>> {
     match targets.take() {
         Some(EffectTargets::Standard(StandardEffectTarget::VoidCardSet(void_cards))) => {
             Some(void_cards)

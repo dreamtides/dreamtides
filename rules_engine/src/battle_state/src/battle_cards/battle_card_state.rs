@@ -26,6 +26,26 @@ use crate::battle_player::player_map::PlayerMap;
 )]
 pub struct ObjectId(pub usize);
 
+/// A card ID paired with an object ID.
+#[derive(
+    Copy,
+    Clone,
+    Debug,
+    Default,
+    Eq,
+    PartialEq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+)]
+pub struct CardObjectId<T> {
+    pub card_id: T,
+    pub object_id: ObjectId,
+}
+
 /// Core state data for a card within a battle.
 #[derive(Clone, Debug)]
 pub struct BattleCardState {

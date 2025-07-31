@@ -2,6 +2,7 @@ use std::collections::{BTreeSet, VecDeque};
 
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardIdType;
+use battle_state::battle_cards::battle_card_state::CardObjectId;
 use battle_state::battle_cards::stack_card_state::{
     EffectTargets, StackItemId, StandardEffectTarget,
 };
@@ -51,14 +52,14 @@ fn filter_target(
     target: &StandardEffectTarget,
 ) -> Option<StandardEffectTarget> {
     match target {
-        StandardEffectTarget::Character(character_id, object_id) => {
+        StandardEffectTarget::Character(CardObjectId { card_id: character_id, object_id }) => {
             if battle.cards.is_valid_object_id(character_id.card_id(), *object_id) {
                 Some(target.clone())
             } else {
                 None
             }
         }
-        StandardEffectTarget::StackCard(stack_card_id, object_id) => {
+        StandardEffectTarget::StackCard(CardObjectId { card_id: stack_card_id, object_id }) => {
             if battle.cards.is_valid_object_id(stack_card_id.card_id(), *object_id) {
                 Some(target.clone())
             } else {
@@ -69,7 +70,7 @@ fn filter_target(
             let filtered_cards: BTreeSet<_> = void_card_set
                 .iter()
                 .filter(|void_card_id| {
-                    battle.cards.is_valid_object_id(void_card_id.id, void_card_id.object_id)
+                    battle.cards.is_valid_object_id(void_card_id.card_id, void_card_id.object_id)
                 })
                 .copied()
                 .collect();

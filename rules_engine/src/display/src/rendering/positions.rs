@@ -81,15 +81,18 @@ pub fn current_stack_type(builder: &ResponseBuilder, battle: &BattleState) -> St
     let mut targeting_enemy_battlefield = false;
 
     for stack_card in battle.cards.all_items_on_stack() {
-        if let Some(EffectTargets::Standard(StandardEffectTarget::Character(character_id, _))) =
+        if let Some(EffectTargets::Standard(StandardEffectTarget::Character(card_object_id))) =
             valid_target_queries::displayed_targets(battle, stack_card.id)
         {
-            if battle.cards.contains_card(display_player, character_id.card_id(), Zone::Battlefield)
-            {
+            if battle.cards.contains_card(
+                display_player,
+                card_object_id.card_id.card_id(),
+                Zone::Battlefield,
+            ) {
                 targeting_user_battlefield = true;
             } else if battle.cards.contains_card(
                 display_player.opponent(),
-                character_id.card_id(),
+                card_object_id.card_id.card_id(),
                 Zone::Battlefield,
             ) {
                 targeting_enemy_battlefield = true;

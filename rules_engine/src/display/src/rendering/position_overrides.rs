@@ -200,11 +200,11 @@ fn for_void_card_targeting(
 fn is_void_card_targeted(targets: &EffectTargets, void_card_id: VoidCardId) -> bool {
     match targets {
         EffectTargets::Standard(StandardEffectTarget::VoidCardSet(void_card_set)) => {
-            void_card_set.iter().any(|target| target.id == void_card_id)
+            void_card_set.iter().any(|target| target.card_id == void_card_id)
         }
         EffectTargets::EffectList(target_list) => target_list.iter().any(|target_opt| {
             if let Some(StandardEffectTarget::VoidCardSet(void_card_set)) = target_opt {
-                void_card_set.iter().any(|target| target.id == void_card_id)
+                void_card_set.iter().any(|target| target.card_id == void_card_id)
             } else {
                 false
             }

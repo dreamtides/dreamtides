@@ -165,18 +165,18 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
         if let Some(targets) = valid_target_queries::displayed_targets(battle, stack_item.id) {
             let source = adapter::stack_item_game_object_id(stack_item.id);
             match targets {
-                EffectTargets::Standard(StandardEffectTarget::Character(character_id, _)) => {
-                    let target = adapter::card_game_object_id(character_id);
-                    let color = character_arrow_color(builder, battle, character_id);
+                EffectTargets::Standard(StandardEffectTarget::Character(card_object_id)) => {
+                    let target = adapter::card_game_object_id(card_object_id.card_id);
+                    let color = character_arrow_color(builder, battle, card_object_id.card_id);
                     arrows.push(DisplayArrow { source, target, color });
                 }
-                EffectTargets::Standard(StandardEffectTarget::StackCard(stack_card_id, _)) => {
-                    let target = adapter::card_game_object_id(stack_card_id);
+                EffectTargets::Standard(StandardEffectTarget::StackCard(card_object_id)) => {
+                    let target = adapter::card_game_object_id(card_object_id.card_id);
                     arrows.push(DisplayArrow { source, target, color: ArrowStyle::Blue });
                 }
                 EffectTargets::Standard(StandardEffectTarget::VoidCardSet(void_card_set)) => {
                     for void_card_target in void_card_set.iter() {
-                        let target = adapter::card_game_object_id(void_card_target.id);
+                        let target = adapter::card_game_object_id(void_card_target.card_id);
                         arrows.push(DisplayArrow {
                             source: source.clone(),
                             target,
@@ -187,17 +187,20 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
                 EffectTargets::EffectList(target_list) => {
                     for target in target_list.iter().flatten() {
                         match target {
-                            StandardEffectTarget::Character(character_id, _) => {
-                                let target_id = adapter::card_game_object_id(*character_id);
-                                let color = character_arrow_color(builder, battle, *character_id);
+                            StandardEffectTarget::Character(card_object_id) => {
+                                let target_id =
+                                    adapter::card_game_object_id(card_object_id.card_id);
+                                let color =
+                                    character_arrow_color(builder, battle, card_object_id.card_id);
                                 arrows.push(DisplayArrow {
                                     source: source.clone(),
                                     target: target_id,
                                     color,
                                 });
                             }
-                            StandardEffectTarget::StackCard(stack_card_id, _) => {
-                                let target_id = adapter::card_game_object_id(*stack_card_id);
+                            StandardEffectTarget::StackCard(card_object_id) => {
+                                let target_id =
+                                    adapter::card_game_object_id(card_object_id.card_id);
                                 arrows.push(DisplayArrow {
                                     source: source.clone(),
                                     target: target_id,
@@ -207,7 +210,7 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
                             StandardEffectTarget::VoidCardSet(void_card_set) => {
                                 for void_card_target in void_card_set.iter() {
                                     let target_id =
-                                        adapter::card_game_object_id(void_card_target.id);
+                                        adapter::card_game_object_id(void_card_target.card_id);
                                     arrows.push(DisplayArrow {
                                         source: source.clone(),
                                         target: target_id,
