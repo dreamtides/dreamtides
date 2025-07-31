@@ -6,7 +6,9 @@ use battle_queries::legal_action_queries::{can_play_cards, legal_actions};
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_animation::TriggerAnimation;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{ActivatedAbilityId, CardIdType, CharacterId, VoidCardId};
+use battle_state::battle::card_id::{
+    ActivatedAbilityId, CardId, CardIdType, CharacterId, VoidCardId,
+};
 use battle_state::battle_cards::stack_card_state::StackItemId;
 use bon::Builder;
 use core_data::display_color::{self, DisplayColor};
@@ -14,7 +16,8 @@ use core_data::display_types::{AudioClipAddress, SpriteAddress};
 use core_data::types::CardFacing;
 use display_data::battle_view::DisplayPlayer;
 use display_data::card_view::{
-    CardActions, CardEffects, CardPrefab, CardView, ClientCardId, DisplayImage, RevealedCardView,
+    CardActions, CardEffects, CardPrefab, CardView, ClientCardId, DisplayImage, InfoZoomData,
+    RevealedCardView,
 };
 use display_data::object_position::{ObjectPosition, Position};
 use ui_components::icon;
@@ -31,29 +34,27 @@ pub fn trigger_card_view(
     trigger: &TriggerAnimation,
 ) -> CardView {
     let current_stack = positions::current_stack_type(builder, battle);
+    let character_card_id = trigger.character_id.card_id();
     token_card_view(
         TokenCardView::builder()
-            .id(format!("T{:?}/{:?}", trigger.character_id.card_id().0, trigger.ability_number))
+            .id(format!("T{:?}/{:?}", character_card_id.0, trigger.ability_number))
             .position(ObjectPosition {
                 position: Position::OnStack(current_stack),
                 sorting_key: (battle.cards.next_object_id_for_display().0 + index + 5) as u32,
             })
-            .image(card_rendering::card_image(battle, trigger.character_id.card_id()))
-            .name(card_rendering::card_name(battle, trigger.character_id.card_id()))
-            .rules_text(card_rendering::rules_text(battle, trigger.character_id.card_id()))
+            .image(card_rendering::card_image(battle, character_card_id))
+            .name(card_rendering::card_name(battle, character_card_id))
+            .rules_text(card_rendering::rules_text(battle, character_card_id))
             .create_position(ObjectPosition {
-                position: Position::HiddenWithinCard(adapter::client_card_id(
-                    trigger.character_id.card_id(),
-                )),
+                position: Position::HiddenWithinCard(adapter::client_card_id(character_card_id)),
                 sorting_key: 0,
             })
             .destroy_position(ObjectPosition {
-                position: Position::HiddenWithinCard(adapter::client_card_id(
-                    trigger.character_id.card_id(),
-                )),
+                position: Position::HiddenWithinCard(adapter::client_card_id(character_card_id)),
                 sorting_key: 0,
             })
             .create_sound(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/UI, Pads, Enchantments and Misc/RPG3_Enchantment_Subtle01v2.wav"))
+            .maybe_info_zoom_data(build_token_info_zoom_data(battle, character_card_id))
             .build(),
     )
 }
@@ -193,6 +194,7 @@ fn activated_ability_card_view(
             .is_fast(
                 ability_data.ability.options.as_ref().map(|opts| opts.is_fast).unwrap_or(false),
             )
+            .maybe_info_zoom_data(build_token_info_zoom_data(battle, character_card_id))
             .build(),
     )
 }
@@ -263,6 +265,7 @@ fn void_card_token_view(
             })
             .maybe_outline_color(play_action.map(|_| display_color::GREEN))
             .is_fast(card_properties::is_fast(battle, card_id))
+            .maybe_info_zoom_data(build_token_info_zoom_data(battle, card_id))
             .build(),
     )
 }
@@ -286,6 +289,7 @@ pub struct TokenCardView {
     #[builder(default)]
     actions: CardActions,
     outline_color: Option<DisplayColor>,
+    info_zoom_data: Option<InfoZoomData>,
 }
 
 /// Converts a [TokenCardView] to a [CardView].
@@ -305,7 +309,7 @@ pub fn token_card_view(view: TokenCardView) -> CardView {
             is_fast: view.is_fast,
             actions: view.actions,
             effects: CardEffects::default(),
-            info_zoom_data: None,
+            info_zoom_data: view.info_zoom_data,
         }),
         revealed_to_opponents: true,
         card_facing: CardFacing::FaceUp,
@@ -315,4 +319,11 @@ pub fn token_card_view(view: TokenCardView) -> CardView {
         destroy_position: view.destroy_position,
         prefab: CardPrefab::Token,
     }
+}
+
+fn build_token_info_zoom_data(
+    battle: &BattleState,
+    parent_card_id: CardId,
+) -> Option<InfoZoomData> {
+    card_rendering::build_info_zoom_data(battle, parent_card_id)
 }

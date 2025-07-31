@@ -455,7 +455,7 @@ fn supplemental_card_info(battle: &BattleState, card_id: CardId) -> Vec<String> 
     }
 }
 
-fn build_info_zoom_data(battle: &BattleState, card_id: CardId) -> Option<InfoZoomData> {
+pub fn build_info_zoom_data(battle: &BattleState, card_id: CardId) -> Option<InfoZoomData> {
     let targeting_icons = get_targeting_icons(battle, card_id);
     let supplemental_texts = supplemental_card_info(battle, card_id);
 
