@@ -23,6 +23,9 @@ use display_data::card_view::{
     CardActions, CardEffects, CardPrefab, CardView, DisplayImage, InfoZoomData, InfoZoomIcon,
     RevealedCardView,
 };
+use masonry::flex_enums::FlexDirection;
+use masonry::flex_style::FlexStyle;
+use ui_components::box_component::BoxComponent;
 use ui_components::component::Component;
 use ui_components::icon;
 
@@ -420,30 +423,63 @@ fn is_on_stack_from_void(battle: &BattleState, card_id: CardId) -> bool {
         .unwrap_or(false)
 }
 
-fn supplemental_card_info(battle: &BattleState, card_id: CardId) -> Option<String> {
+fn supplemental_card_info(battle: &BattleState, card_id: CardId) -> Vec<String> {
     match card::get(battle, card_id).name {
-        CardName::TestDissolve => Some("<b>Dissolve:</b> Send a character to the void".to_string()),
-        CardName::TestCounterspellUnlessPays => Some(
+        CardName::TestDissolve => vec!["<b>Dissolve:</b> Send a character to the void".to_string()],
+        CardName::TestNamedDissolve => {
+            vec!["<b>Dissolve:</b> Send a character to the void".to_string()]
+        }
+        CardName::TestCounterspellUnlessPays => vec![
             "<b>Prevent:</b> Send a card to the void in response to it being played".to_string(),
-        ),
-        CardName::TestCounterspell => Some(
+        ],
+        CardName::TestCounterspell => vec![
             "<b>Prevent:</b> Send a card to the void in response to it being played".to_string(),
-        ),
-        CardName::TestForeseeOne => Some(
+        ],
+        CardName::TestForeseeOne => vec![
             "<b>Foresee 1:</b> Look at the top card of your deck. You may put it into your void."
                 .to_string(),
-        ),
+        ],
         CardName::TestPreventDissolveThisTurn => {
-            Some("<b>Anchored:</b> Cannot be dissolved.".to_string())
+            vec!["<b>Anchored:</b> Cannot be dissolved.".to_string()]
         }
-        _ => None,
+        CardName::TestForeseeOneDrawReclaim => vec![
+            "<b>Foresee 1:</b> Look at the top card of your deck. You may put it into your void."
+                .to_string(),
+            "<b>Reclaim:</b> You may play this card from your void, then banish it.".to_string(),
+        ],
+        CardName::TestCounterspellCharacter => vec![
+            "<b>Prevent:</b> Send a character to the void in response to it being played"
+                .to_string(),
+        ],
+        _ => vec![],
     }
 }
 
 fn build_info_zoom_data(battle: &BattleState, card_id: CardId) -> Option<InfoZoomData> {
     let targeting_icons = get_targeting_icons(battle, card_id);
-    let supplemental_info = supplemental_card_info(battle, card_id)
-        .and_then(|text| SupplementalCardInfo::builder().text(text).build().render()?.flex_node());
+    let supplemental_texts = supplemental_card_info(battle, card_id);
+
+    let supplemental_info = if supplemental_texts.is_empty() {
+        None
+    } else {
+        let supplemental_components: Vec<_> = supplemental_texts
+            .into_iter()
+            .filter_map(|text| {
+                SupplementalCardInfo::builder().text(text).build().render()?.flex_node()
+            })
+            .collect();
+
+        if supplemental_components.is_empty() {
+            None
+        } else {
+            BoxComponent::builder()
+                .name("Supplemental Card Info Column")
+                .style(FlexStyle::builder().flex_direction(FlexDirection::Column).margin(4).build())
+                .children(supplemental_components)
+                .build()
+                .flex_node()
+        }
+    };
 
     if targeting_icons.is_empty() && supplemental_info.is_none() {
         None

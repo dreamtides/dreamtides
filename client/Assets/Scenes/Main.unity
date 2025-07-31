@@ -15719,8 +15719,8 @@ MonoBehaviour:
   _layout1: {fileID: 1999275438}
   _layout2: {fileID: 0}
   _scrollableHand: {fileID: 575951020}
-  _useSecondLayoutAfter: 12
-  _useBrowserAfter: 12
+  _useSecondLayoutAfter: 15
+  _useBrowserAfter: 15
 --- !u!1 &1541877252
 GameObject:
   m_ObjectHideFlags: 0

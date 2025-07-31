@@ -23,6 +23,7 @@ impl Component for SupplementalCardInfo {
                         .background_color(display_color::BLACK_ALPHA_95)
                         .border_radius(2)
                         .padding(4)
+                        .margin(2)
                         .build(),
                 )
                 .child(
