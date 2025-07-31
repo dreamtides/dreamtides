@@ -161,6 +161,12 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7495d3293980d4bc2857e3a434082777
+    m_Address: Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Looping/Magic
+      shield 4 loop.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 75eb8c268a7634eb2a6e02646b0bbaa4
     m_Address: Assets/Content/Dissolves/Dissolve10.mat
     m_ReadOnly: 0

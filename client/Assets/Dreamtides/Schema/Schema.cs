@@ -1757,6 +1757,16 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("card_trail")]
         public ProjectileAddress CardTrail { get; set; }
+
+        /// <summary>
+        /// Ongoing visual effect to display for this card.
+        ///
+        /// If a previous effect with a different address is present, it will be
+        /// destroyed before adding this effect. If an effect with the same address
+        /// is present, this will be ignored.
+        /// </summary>
+        [JsonProperty("looping_effect")]
+        public EffectAddress LoopingEffect { get; set; }
     }
 
     public partial class ProjectileAddress

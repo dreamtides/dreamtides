@@ -164,6 +164,9 @@ internal-clean:
   rm -rf rules_engine/target/release-with-debug
   rm -rf ~/dreamtides_tests/rules_engine/target
 
+clean-test-dir:
+  rm -rf ~/dreamtides_tests/rules_engine/target
+
 clean: internal-clean
 
 build-release-with-debug:

@@ -58,6 +58,8 @@ namespace Dreamtides.Components
     bool _draggedToClearThreshold = false;
     bool _draggedToPlayThreshold = false;
     GameObject? _cardTrail;
+    EffectAddress? _loopingEffectAddress;
+    GameObject? _loopingEffect;
     float _distanceDragged;
     float _hoverStartTime;
     bool _hoveringForInfoZoom;
@@ -322,6 +324,29 @@ namespace Dreamtides.Components
         _cardTrail.transform.SetParent(_cardTrailPosition, worldPositionStays: false);
         _cardTrail.transform.localPosition = Vector3.zero;
         _cardTrail.transform.localRotation = Quaternion.identity;
+      }
+
+      if (revealed.Effects.LoopingEffect != null)
+      {
+        if (_loopingEffectAddress != revealed.Effects.LoopingEffect)
+        {
+          // Update the looping effect if it has changed or not already started.
+          Destroy(_loopingEffect);
+          _loopingEffectAddress = revealed.Effects.LoopingEffect;
+          _loopingEffect = ComponentUtils.Instantiate(
+            _registry.AssetService.GetEffectPrefab(_loopingEffectAddress),
+            Vector3.zero
+          ).gameObject;
+          _loopingEffect.transform.SetParent(transform, worldPositionStays: false);
+          // TODO: Figure out correct rotation for looping effect.
+          _loopingEffect.transform.localEulerAngles = new Vector3(90, 0, 0);
+        }
+      }
+      else
+      {
+        Destroy(_loopingEffect);
+        _loopingEffect = null;
+        _loopingEffectAddress = null;
       }
     }
 

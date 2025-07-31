@@ -20,8 +20,7 @@ use core_data::display_types::SpriteAddress;
 use core_data::identifiers::CardName;
 use core_data::types::CardFacing;
 use display_data::card_view::{
-    CardActions, CardEffects, CardPrefab, CardView, DisplayImage, InfoZoomData, InfoZoomIcon,
-    RevealedCardView,
+    CardActions, CardPrefab, CardView, DisplayImage, InfoZoomData, InfoZoomIcon, RevealedCardView,
 };
 use masonry::flex_enums::FlexDirection;
 use masonry::flex_style::FlexStyle;
@@ -35,7 +34,9 @@ use crate::core::response_builder::ResponseBuilder;
 use crate::display_actions::outcome_simulation;
 use crate::rendering::positions::ControllerAndZone;
 use crate::rendering::supplemental_card_info::SupplementalCardInfo;
-use crate::rendering::{card_display_state, modal_effect_prompt_rendering, positions};
+use crate::rendering::{
+    apply_card_fx, card_display_state, modal_effect_prompt_rendering, positions,
+};
 
 /// Returns the appropriate targeting color based on card ownership
 fn targeting_color(
@@ -130,7 +131,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
             }),
             ..Default::default()
         },
-        effects: CardEffects::default(),
+        effects: apply_card_fx::persistent_card_effects(battle, card_id),
     }
 }
 
