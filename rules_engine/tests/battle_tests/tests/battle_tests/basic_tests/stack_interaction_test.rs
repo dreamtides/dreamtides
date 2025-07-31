@@ -327,3 +327,36 @@ fn assert_no_info_zoom_targeting(
         "Expected no info zoom targeting from {source_card_id} to {target_card_id}"
     );
 }
+
+#[test]
+fn prevent_dissolve_this_turn_shows_green_arrows() {
+    let mut s = TestBattle::builder().connect();
+    let user_character = s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let prevent_dissolve_card =
+        s.add_to_hand(DisplayPlayer::User, CardName::TestPreventDissolveThisTurn);
+
+    // Give opponent a fast card so they can respond, keeping the card on stack
+    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+
+    s.play_card_from_hand(DisplayPlayer::User, &prevent_dissolve_card);
+    // Target is automatically selected since there's only one valid target
+
+    // TestPreventDissolveThisTurn should now be on stack since opponent can respond
+    assert!(
+        s.user_client.cards.stack_cards().contains(&prevent_dissolve_card),
+        "TestPreventDissolveThisTurn card should be on stack"
+    );
+
+    // Verify that the arrow from the prevent dissolve card to user's character is
+    // green
+    let arrow_exists = s.user_client.arrows.iter().any(|arrow| {
+        matches!(&arrow.source, display_data::command::GameObjectId::CardId(id) if id == &prevent_dissolve_card)
+            && matches!(&arrow.target, display_data::command::GameObjectId::CardId(id) if id == &user_character)
+            && matches!(arrow.color, display_data::command::ArrowStyle::Green)
+    });
+
+    assert!(
+        arrow_exists,
+        "Expected green arrow from TestPreventDissolveThisTurn to user's own character"
+    );
+}

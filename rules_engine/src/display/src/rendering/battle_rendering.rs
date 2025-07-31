@@ -1,9 +1,10 @@
-use battle_queries::battle_card_queries::{card, valid_target_queries};
+use battle_queries::battle_card_queries::{card, card_properties, valid_target_queries};
 use battle_queries::battle_player_queries::player_properties;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
+use battle_state::battle::card_id::CharacterId;
 use battle_state::battle_cards::stack_card_state::{
     EffectTargets, StackItemId, StandardEffectTarget,
 };
@@ -166,7 +167,8 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
             match targets {
                 EffectTargets::Standard(StandardEffectTarget::Character(character_id, _)) => {
                     let target = adapter::card_game_object_id(character_id);
-                    arrows.push(DisplayArrow { source, target, color: ArrowStyle::Red });
+                    let color = character_arrow_color(builder, battle, character_id);
+                    arrows.push(DisplayArrow { source, target, color });
                 }
                 EffectTargets::Standard(StandardEffectTarget::StackCard(stack_card_id, _)) => {
                     let target = adapter::card_game_object_id(stack_card_id);
@@ -187,10 +189,11 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
                         match target {
                             StandardEffectTarget::Character(character_id, _) => {
                                 let target_id = adapter::card_game_object_id(*character_id);
+                                let color = character_arrow_color(builder, battle, *character_id);
                                 arrows.push(DisplayArrow {
                                     source: source.clone(),
                                     target: target_id,
-                                    color: ArrowStyle::Red,
+                                    color,
                                 });
                             }
                             StandardEffectTarget::StackCard(stack_card_id, _) => {
@@ -220,4 +223,17 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
     }
 
     arrows
+}
+
+fn character_arrow_color(
+    builder: &ResponseBuilder,
+    battle: &BattleState,
+    character_id: CharacterId,
+) -> ArrowStyle {
+    let character_controller = card_properties::controller(battle, character_id);
+    if character_controller == builder.display_for_player() {
+        ArrowStyle::Green
+    } else {
+        ArrowStyle::Red
+    }
 }
