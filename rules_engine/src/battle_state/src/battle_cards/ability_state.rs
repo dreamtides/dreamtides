@@ -1,7 +1,5 @@
-use std::collections::BTreeSet;
-
-use crate::battle::card_id::{CardId, VoidCardId};
-use crate::battle_cards::battle_card_state::ObjectId;
+use crate::battle::card_id::{CardId, CharacterId, VoidCardId};
+use crate::battle_cards::battle_card_state::CardObjectId;
 use crate::battle_cards::card_set::CardSet;
 use crate::battle_player::player_map::PlayerMap;
 
@@ -26,6 +24,6 @@ pub struct AbilityState {
 /// begins.
 #[derive(Debug, Clone, Default)]
 pub struct UntilEndOfTurn {
-    /// Cards which should be prevented from being dissolved this turn.
-    pub prevent_dissolved: BTreeSet<ObjectId>,
+    /// Characters which should be prevented from being dissolved this turn.
+    pub prevent_dissolved: Vec<CardObjectId<CharacterId>>,
 }

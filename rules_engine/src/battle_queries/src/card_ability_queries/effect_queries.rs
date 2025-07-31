@@ -1,6 +1,6 @@
 use ability_data::standard_effect::StandardEffect;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CardIdType, CharacterId};
+use battle_state::battle::card_id::CharacterId;
 use battle_state::battle_cards::card_set::CardSet;
 
 use crate::battle_card_queries::card;
@@ -24,20 +24,22 @@ pub fn prevent_dissolved_set(battle: &BattleState) -> CardSet<CharacterId> {
         return result;
     }
 
-    battle.cards.all_battlefield_characters().for_each(|id| {
-        let object_id = card::get(battle, id).object_id;
-        if battle.ability_state.until_end_of_turn.prevent_dissolved.contains(&object_id) {
-            result.insert(id);
-        }
-    });
+    for character_id in battle.ability_state.until_end_of_turn.prevent_dissolved.iter() {
+        result.insert(character_id.card_id);
+    }
 
     result
 }
 
 /// Returns true if the given character cannot currently be dissolved.
-pub fn should_prevent_dissolve(battle: &BattleState, id: impl CardIdType) -> bool {
+pub fn should_prevent_dissolve(battle: &BattleState, id: CharacterId) -> bool {
     let object_id = card::get(battle, id).object_id;
-    battle.ability_state.until_end_of_turn.prevent_dissolved.contains(&object_id)
+    battle
+        .ability_state
+        .until_end_of_turn
+        .prevent_dissolved
+        .iter()
+        .any(|card_object_id| card_object_id.object_id == object_id)
 }
 
 /// Returns true if the given effect is a dissolve effect.

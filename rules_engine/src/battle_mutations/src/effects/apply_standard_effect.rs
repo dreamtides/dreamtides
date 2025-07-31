@@ -6,6 +6,7 @@ use battle_queries::battle_player_queries::quantity_expression;
 use battle_queries::battle_trace;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardIdType;
+use battle_state::battle_cards::battle_card_state::CardObjectId;
 use battle_state::battle_cards::card_set::CardSet;
 use battle_state::battle_cards::stack_card_state::EffectTargets;
 use battle_state::core::effect_source::EffectSource;
@@ -176,7 +177,11 @@ fn prevent_dissolve_this_turn(
 ) -> Option<EffectWasApplied> {
     let id = targeting::character_id(targets)?;
     let object_id = card::get(battle, id).object_id;
-    battle.ability_state.until_end_of_turn.prevent_dissolved.insert(object_id);
+    battle
+        .ability_state
+        .until_end_of_turn
+        .prevent_dissolved
+        .push(CardObjectId { card_id: id, object_id });
     Some(EffectWasApplied)
 }
 
