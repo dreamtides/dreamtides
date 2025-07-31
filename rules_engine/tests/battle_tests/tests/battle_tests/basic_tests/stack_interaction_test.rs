@@ -1,4 +1,5 @@
 use battle_state::actions::battle_actions::BattleAction;
+use core_data::display_color;
 use core_data::identifiers::CardName;
 use display_data::battle_view::DisplayPlayer;
 use display_data::card_view::ClientCardId;
@@ -358,5 +359,78 @@ fn prevent_dissolve_this_turn_shows_green_arrows() {
     assert!(
         arrow_exists,
         "Expected green arrow from TestPreventDissolveThisTurn to user's own character"
+    );
+}
+
+#[test]
+fn targeting_outline_colors_green_for_own_red_for_enemy() {
+    let mut s = TestBattle::builder().connect();
+    let user_character1 = s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let user_character2 = s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let enemy_character1 =
+        s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let enemy_character2 =
+        s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    // Give opponent a fast card so they can respond, keeping the card on stack
+    s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+
+    // Play a TestDissolve card which targets characters - this will require user to
+    // choose a target
+    let dissolve_card = s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
+    s.play_card_from_hand(DisplayPlayer::User, &dissolve_card);
+
+    // Check that enemy characters have red outline (hostile targeting)
+    let enemy1_card_view = s.user_client.cards.get(&enemy_character1);
+    let enemy1_outline_color = enemy1_card_view.view.revealed.as_ref().unwrap().outline_color;
+    assert!(enemy1_outline_color.is_some(), "Enemy character should have outline color");
+
+    let enemy2_card_view = s.user_client.cards.get(&enemy_character2);
+    let enemy2_outline_color = enemy2_card_view.view.revealed.as_ref().unwrap().outline_color;
+    assert!(enemy2_outline_color.is_some(), "Enemy character should have outline color");
+
+    // Verify both enemy characters have red outlines
+    assert_eq!(
+        enemy1_outline_color.unwrap(),
+        display_color::RED_500,
+        "Enemy character outline should be RED_500"
+    );
+    assert_eq!(
+        enemy2_outline_color.unwrap(),
+        display_color::RED_500,
+        "Enemy character outline should be RED_500"
+    );
+
+    // Select a target to clear the targeting prompt and let the dissolve resolve
+    s.click_card(DisplayPlayer::User, &enemy_character1);
+
+    // Pass priority and let the dissolve resolve
+    s.perform_enemy_action(battle_state::actions::battle_actions::BattleAction::PassPriority);
+
+    // Now test with TestPreventDissolveThisTurn which targets own characters
+    let prevent_dissolve_card =
+        s.add_to_hand(DisplayPlayer::User, CardName::TestPreventDissolveThisTurn);
+
+    s.play_card_from_hand(DisplayPlayer::User, &prevent_dissolve_card);
+
+    // Check that user's own characters have green outline (friendly targeting)
+    let user1_card_view = s.user_client.cards.get(&user_character1);
+    let user1_outline_color = user1_card_view.view.revealed.as_ref().unwrap().outline_color;
+    assert!(user1_outline_color.is_some(), "User character 1 should have outline color");
+
+    let user2_card_view = s.user_client.cards.get(&user_character2);
+    let user2_outline_color = user2_card_view.view.revealed.as_ref().unwrap().outline_color;
+    assert!(user2_outline_color.is_some(), "User character 2 should have outline color");
+
+    // Verify both user characters have green outlines
+    assert_eq!(
+        user1_outline_color.unwrap(),
+        display_color::GREEN_500,
+        "User character outline should be GREEN_500"
+    );
+    assert_eq!(
+        user2_outline_color.unwrap(),
+        display_color::GREEN_500,
+        "User character outline should be GREEN_500"
     );
 }
