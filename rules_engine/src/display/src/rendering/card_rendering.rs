@@ -37,6 +37,20 @@ use crate::rendering::positions::ControllerAndZone;
 use crate::rendering::supplemental_card_info::SupplementalCardInfo;
 use crate::rendering::{card_display_state, modal_effect_prompt_rendering, positions};
 
+/// Returns the appropriate targeting color based on card ownership
+fn targeting_color(
+    battle: &BattleState,
+    current_player: core_data::types::PlayerName,
+    target_card_id: CardId,
+) -> DisplayColor {
+    let target_controller = card_properties::controller(battle, target_card_id);
+    if target_controller == current_player {
+        display_color::GREEN_500
+    } else {
+        display_color::RED_500
+    }
+}
+
 pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardView {
     let battle = context.battle();
     CardView {
@@ -79,7 +93,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
 
     let can_play = play_action.is_some();
     let (selection_color, selection_action) =
-        outline_and_selection_action(battle, &legal_actions, card_id);
+        outline_and_selection_action(battle, &legal_actions, card_id, builder.act_for_player());
     let ControllerAndZone { controller, .. } = positions::controller_and_zone(battle, card_id);
 
     RevealedCardView {
@@ -124,12 +138,13 @@ fn outline_and_selection_action(
     battle: &BattleState,
     legal_actions: &LegalActions,
     card_id: CardId,
+    current_player: core_data::types::PlayerName,
 ) -> (Option<DisplayColor>, Option<GameAction>) {
     if legal_actions
         .contains(BattleAction::SelectCharacterTarget(CharacterId(card_id)), ForPlayer::Human)
     {
         return (
-            Some(display_color::RED_500),
+            Some(targeting_color(battle, current_player, card_id)),
             Some(GameAction::BattleAction(BattleAction::SelectCharacterTarget(CharacterId(
                 card_id,
             )))),
@@ -140,7 +155,7 @@ fn outline_and_selection_action(
         .contains(BattleAction::SelectStackCardTarget(StackCardId(card_id)), ForPlayer::Human)
     {
         return (
-            Some(display_color::RED_500),
+            Some(targeting_color(battle, current_player, card_id)),
             Some(GameAction::BattleAction(BattleAction::SelectStackCardTarget(StackCardId(
                 card_id,
             )))),
@@ -490,6 +505,7 @@ pub fn build_info_zoom_data(battle: &BattleState, card_id: CardId) -> Option<Inf
 
 fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIcon> {
     let mut icons = HashMap::new();
+    let current_player = card_properties::controller(battle, card_id);
 
     if let Some(prompt) = battle.prompts.front()
         && prompt.source.card_id() == Some(card_id)
@@ -534,7 +550,7 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
                     icons.insert(target_card_id, InfoZoomIcon {
                         card_id: adapter::client_card_id(target_card_id),
                         icon: icon::CHEVRON_UP.to_string(),
-                        color: display_color::RED_500,
+                        color: targeting_color(battle, current_player, target_card_id),
                     });
                 }
             }
@@ -573,7 +589,7 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
             icons.insert(target_card_id, InfoZoomIcon {
                 card_id: adapter::client_card_id(target_card_id),
                 icon: icon::CHEVRON_UP.to_string(),
-                color: display_color::RED_500,
+                color: targeting_color(battle, current_player, target_card_id),
             });
         }
     } else if let Some(stack_card) = battle.cards.stack_item(StackCardId(card_id))
