@@ -257,6 +257,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 99ccc27f64a194ee1abbad1b166ec4a7
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagic_Cast04.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9a1d967a68c914caa8d10bffdd08c309
     m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicArrow_Projectile01.wav
     m_ReadOnly: 0
@@ -313,6 +318,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a7e0e447f656c4df48babbbab6c35392
     m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Light Magic/RPG3_LightMagic_Cast03.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: afac0004d7e9c4ff1a71ff1a0e9aacec
+    m_Address: Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Magic circle
+      9.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -401,6 +412,11 @@ MonoBehaviour:
   - m_GUID: eb27a50f1c1124059882ab5a4f5c7d6f
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       5 red.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: eba998068a4074eecb55f1b2c04f15f2
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Light Magic/RPG3_LightMagic_Buff02.wav
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

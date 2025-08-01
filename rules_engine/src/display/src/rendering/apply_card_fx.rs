@@ -220,6 +220,23 @@ pub fn apply_effect(
             }
         }
 
+        CardName::TestModalReturnToHandOrDrawTwo if effect_name == "DrawCards" => {
+            animations::push_snapshot(builder, battle);
+            builder.push(Command::DisplayEffect(DisplayEffectCommand {
+                target: GameObjectId::Deck(builder.to_display_player(controller)),
+                effect: hovl::magic_circle("9"),
+                duration: Milliseconds::new(500),
+                scale: FlexVector3::new(2.5, 2.5, 2.5),
+                sound: Some(wow_sound::rpg_magic(3, "Fire Magic/RPG3_FireMagic_Cast04")),
+            }));
+
+            builder.push(Command::SetCardTrail(SetCardTrailCommand {
+                card_ids: find_target_ids(animation),
+                trail: hovl::projectile(1, "Projectile 5 red"),
+                duration: Milliseconds::new(1500),
+            }));
+        }
+
         _ => {}
     }
 
@@ -257,6 +274,9 @@ fn find_target_ids(animation: &BattleAnimation) -> Vec<ClientCardId> {
         }
         BattleAnimation::ApplyTargetedEffect { targets, .. } => {
             targets.iter().map(|id| adapter::client_card_id(*id)).collect()
+        }
+        BattleAnimation::DrawCards { cards, .. } => {
+            cards.iter().map(|id| adapter::client_card_id(id.card_id())).collect()
         }
         _ => vec![],
     }
