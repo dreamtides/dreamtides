@@ -20,16 +20,16 @@ namespace Dreamtides.Services
       var target = Registry.LayoutService.GetGameObject(command.Target);
       var effectPosition = target.DisplayEffectPosition;
       var effect = Registry.AssetService.GetEffectPrefab(command.Effect);
+      // TODO: Figure out correct rotation for effects.
 
       if (effectPosition)
       {
         Registry.AssetPoolService.Create(effect, effectPosition.position);
-        effect.transform.forward = effectPosition.forward;
+        effect.transform.localEulerAngles = new Vector3(90, 0, 0);
       }
       else
       {
         Registry.AssetPoolService.Create(effect, target.transform.position);
-        // TODO: Figure out correct rotation for effects.
         effect.transform.localEulerAngles = new Vector3(90, 0, 0);
       }
 
