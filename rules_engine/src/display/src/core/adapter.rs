@@ -22,6 +22,10 @@ pub fn card_game_object_id(id: impl CardIdType) -> GameObjectId {
     GameObjectId::CardId(client_card_id(id.card_id()))
 }
 
+pub fn card_game_object_client_id(id: &ClientCardId) -> GameObjectId {
+    GameObjectId::CardId(id.clone())
+}
+
 pub fn stack_item_game_object_id(item: impl Into<StackItemId>) -> GameObjectId {
     GameObjectId::CardId(stack_item_client_card_id(item))
 }

@@ -60,6 +60,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2a54527b5de0e4fb185db9e9227adeaa
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Plasma Magic/RPG3_PlasmaMagic_Cast01.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2c885be4bc30f46c68107ed76822b2b6
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       11 orange arrow.prefab
@@ -346,6 +351,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: bfe2934aca22b4c3a9b247ae6213a533
     m_Address: Assets/Content/Dissolves/Dissolve2.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ccf902395bea54bedba5e58057d491e2
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Plasma Magic/RPG3_PlasmaMagic_MediumImpact01.wav
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

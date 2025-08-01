@@ -4,10 +4,17 @@ use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::PlayerName;
 use strum::{Display, EnumDiscriminants};
 
-use crate::battle::card_id::{ActivatedAbilityId, CardId, CharacterId, HandCardId, StackCardId};
+use crate::battle::card_id::{ActivatedAbilityId, CardId, CharacterId, HandCardId};
 use crate::battle_cards::stack_card_state::{EffectTargets, StackItemId};
 use crate::battle_cards::zone::Zone;
 use crate::prompt_types::prompt_data::PromptChoiceLabel;
+
+#[derive(Clone, Debug, Copy, PartialEq, Eq, Hash)]
+pub enum TargetedEffectName {
+    Counterspell,
+    Dissolve,
+    ReturnToHand,
+}
 
 /// Records events during rules engine execution for display as game animations.
 #[derive(Clone, Debug, EnumDiscriminants)]
@@ -17,11 +24,9 @@ pub enum BattleAnimation {
         player: PlayerName,
         activated_ability_id: ActivatedAbilityId,
     },
-    Counterspell {
-        target_id: StackCardId,
-    },
-    Dissolve {
-        target_id: CharacterId,
+    ApplyTargetedEffect {
+        effect_name: TargetedEffectName,
+        targets: Vec<CardId>,
     },
     DrawCards {
         player: PlayerName,

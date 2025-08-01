@@ -29,111 +29,129 @@ pub fn apply_effect(
     let source_id = effect_source.card_id()?;
     let controller = card_properties::controller(battle, source_id);
     let effect_name = animation.discriminant().to_string();
-    let target_id = find_target_id(animation);
     match card::get(battle, source_id).name {
-        CardName::TestDissolve if effect_name == "Dissolve" => {
+        CardName::TestDissolve if effect_name == "ApplyTargetedEffect" => {
             animations::push_snapshot(builder, battle);
-            builder.push(Command::FireProjectile(
-                FireProjectileCommand::builder()
-                    .source_id(adapter::card_game_object_id(source_id))
-                    .target_id(adapter::card_game_object_id(target_id?))
-                    .projectile(hovl::projectile(1, "Projectile 3 black fire"))
-                    .fire_sound(wow_sound::rpg_magic(
-                        3,
-                        "Fire Magic/RPG3_FireMagicArrow_Projectile01",
-                    ))
-                    .impact_sound(wow_sound::rpg_magic(3, "Fire Magic/RPG3_FireMagic_Impact01"))
-                    .build(),
-            ));
-            builder.push(Command::DissolveCard(
-                DissolveCardCommand::builder()
-                    .target(adapter::client_card_id(target_id?))
-                    .material(dissolve_material::material(15))
-                    .color(display_color::ORANGE_500)
-                    .reverse(false)
-                    .build(),
-            ));
-            builder.run_with_next_battle_view(Command::DissolveCard(
-                DissolveCardCommand::builder()
-                    .target(adapter::client_card_id(target_id?))
-                    .material(dissolve_material::material(15))
-                    .color(display_color::ORANGE_500)
-                    .reverse(true)
-                    .sound(wow_sound::rpg_magic(3, "Fire Magic/RPG3_FireMagicBall_LightImpact03"))
-                    .build(),
-            ));
+            for target_id in find_target_ids(animation) {
+                builder.push(Command::FireProjectile(
+                    FireProjectileCommand::builder()
+                        .source_id(adapter::card_game_object_id(source_id))
+                        .target_id(adapter::card_game_object_client_id(&target_id))
+                        .projectile(hovl::projectile(1, "Projectile 3 black fire"))
+                        .fire_sound(wow_sound::rpg_magic(
+                            3,
+                            "Fire Magic/RPG3_FireMagicArrow_Projectile01",
+                        ))
+                        .impact_sound(wow_sound::rpg_magic(3, "Fire Magic/RPG3_FireMagic_Impact01"))
+                        .build(),
+                ));
+                builder.push(Command::DissolveCard(
+                    DissolveCardCommand::builder()
+                        .target(target_id.clone())
+                        .material(dissolve_material::material(15))
+                        .color(display_color::ORANGE_500)
+                        .reverse(false)
+                        .build(),
+                ));
+                builder.run_with_next_battle_view(Command::DissolveCard(
+                    DissolveCardCommand::builder()
+                        .target(target_id.clone())
+                        .material(dissolve_material::material(15))
+                        .color(display_color::ORANGE_500)
+                        .reverse(true)
+                        .sound(wow_sound::rpg_magic(
+                            3,
+                            "Fire Magic/RPG3_FireMagicBall_LightImpact03",
+                        ))
+                        .build(),
+                ));
+            }
         }
 
-        CardName::TestNamedDissolve if effect_name == "Dissolve" => {
+        CardName::TestNamedDissolve if effect_name == "ApplyTargetedEffect" => {
             animations::push_snapshot(builder, battle);
-            builder.push(Command::FireProjectile(
-                FireProjectileCommand::builder()
-                    .source_id(adapter::card_game_object_id(source_id))
-                    .target_id(adapter::card_game_object_id(target_id?))
-                    .projectile(hovl::projectile(1, "Projectile 3 black fire"))
-                    .fire_sound(wow_sound::rpg_magic(
-                        3,
-                        "Fire Magic/RPG3_FireMagicArrow_Projectile01",
-                    ))
-                    .impact_sound(wow_sound::rpg_magic(3, "Fire Magic/RPG3_FireMagic_Impact01"))
-                    .build(),
-            ));
-            builder.push(Command::DissolveCard(
-                DissolveCardCommand::builder()
-                    .target(adapter::client_card_id(target_id?))
-                    .material(dissolve_material::material(15))
-                    .color(display_color::ORANGE_500)
-                    .reverse(false)
-                    .build(),
-            ));
-            builder.run_with_next_battle_view(Command::DissolveCard(
-                DissolveCardCommand::builder()
-                    .target(adapter::client_card_id(target_id?))
-                    .material(dissolve_material::material(15))
-                    .color(display_color::ORANGE_500)
-                    .reverse(true)
-                    .sound(wow_sound::rpg_magic(3, "Fire Magic/RPG3_FireMagicBall_LightImpact03"))
-                    .build(),
-            ));
+            for target_id in find_target_ids(animation) {
+                builder.push(Command::FireProjectile(
+                    FireProjectileCommand::builder()
+                        .source_id(adapter::card_game_object_id(source_id))
+                        .target_id(adapter::card_game_object_client_id(&target_id))
+                        .projectile(hovl::projectile(1, "Projectile 3 black fire"))
+                        .fire_sound(wow_sound::rpg_magic(
+                            3,
+                            "Fire Magic/RPG3_FireMagicArrow_Projectile01",
+                        ))
+                        .impact_sound(wow_sound::rpg_magic(3, "Fire Magic/RPG3_FireMagic_Impact01"))
+                        .build(),
+                ));
+                builder.push(Command::DissolveCard(
+                    DissolveCardCommand::builder()
+                        .target(target_id.clone())
+                        .material(dissolve_material::material(15))
+                        .color(display_color::ORANGE_500)
+                        .reverse(false)
+                        .build(),
+                ));
+                builder.run_with_next_battle_view(Command::DissolveCard(
+                    DissolveCardCommand::builder()
+                        .target(target_id.clone())
+                        .material(dissolve_material::material(15))
+                        .color(display_color::ORANGE_500)
+                        .reverse(true)
+                        .sound(wow_sound::rpg_magic(
+                            3,
+                            "Fire Magic/RPG3_FireMagicBall_LightImpact03",
+                        ))
+                        .build(),
+                ));
+            }
         }
 
-        CardName::TestCounterspell if effect_name == "Counterspell" => {
+        CardName::TestCounterspell if effect_name == "ApplyTargetedEffect" => {
             animations::push_snapshot(builder, battle);
-            builder.push(Command::FireProjectile(
-                FireProjectileCommand::builder()
-                    .source_id(adapter::card_game_object_id(source_id))
-                    .target_id(adapter::card_game_object_id(target_id?))
-                    .projectile(hovl::projectile(1, "Projectile 6 blue fire"))
-                    .fire_sound(wow_sound::rpg_magic(3, "Wind Magic/RPG3_WindMagic_Cast01"))
-                    .impact_sound(wow_sound::rpg_magic(3, "Wind Magic/RPG3_WindMagic_Impact01"))
-                    .build(),
-            ));
+            for target_id in find_target_ids(animation) {
+                builder.push(Command::FireProjectile(
+                    FireProjectileCommand::builder()
+                        .source_id(adapter::card_game_object_id(source_id))
+                        .target_id(adapter::card_game_object_client_id(&target_id))
+                        .projectile(hovl::projectile(1, "Projectile 6 blue fire"))
+                        .fire_sound(wow_sound::rpg_magic(3, "Wind Magic/RPG3_WindMagic_Cast01"))
+                        .impact_sound(wow_sound::rpg_magic(3, "Wind Magic/RPG3_WindMagic_Impact01"))
+                        .build(),
+                ));
+            }
         }
 
-        CardName::TestCounterspellCharacter if effect_name == "Counterspell" => {
+        CardName::TestCounterspellCharacter if effect_name == "ApplyTargetedEffect" => {
             animations::push_snapshot(builder, battle);
-            builder.push(Command::FireProjectile(
-                FireProjectileCommand::builder()
-                    .source_id(adapter::card_game_object_id(source_id))
-                    .target_id(adapter::card_game_object_id(target_id?))
-                    .projectile(hovl::projectile(1, "Projectile 6 blue fire"))
-                    .fire_sound(wow_sound::rpg_magic(3, "Wind Magic/RPG3_WindMagic_Cast01"))
-                    .impact_sound(wow_sound::rpg_magic(3, "Wind Magic/RPG3_WindMagic_Impact01"))
-                    .build(),
-            ));
+            for target_id in find_target_ids(animation) {
+                builder.push(Command::FireProjectile(
+                    FireProjectileCommand::builder()
+                        .source_id(adapter::card_game_object_id(source_id))
+                        .target_id(adapter::card_game_object_client_id(&target_id))
+                        .projectile(hovl::projectile(1, "Projectile 6 blue fire"))
+                        .fire_sound(wow_sound::rpg_magic(3, "Wind Magic/RPG3_WindMagic_Cast01"))
+                        .impact_sound(wow_sound::rpg_magic(3, "Wind Magic/RPG3_WindMagic_Impact01"))
+                        .build(),
+                ));
+            }
         }
 
-        CardName::TestCounterspellUnlessPays if effect_name == "Counterspell" => {
+        CardName::TestCounterspellUnlessPays if effect_name == "ApplyTargetedEffect" => {
             animations::push_snapshot(builder, battle);
-            builder.push(Command::FireProjectile(
-                FireProjectileCommand::builder()
-                    .source_id(adapter::card_game_object_id(source_id))
-                    .target_id(adapter::card_game_object_id(target_id?))
-                    .projectile(hovl::projectile(1, "Projectile 10 blue laser"))
-                    .fire_sound(wow_sound::rpg_magic(3, "Water Magic/RPG3_WaterMagic_Cast01"))
-                    .impact_sound(wow_sound::rpg_magic(3, "Water Magic/RPG3_WaterMagic_Impact03"))
-                    .build(),
-            ));
+            for target_id in find_target_ids(animation) {
+                builder.push(Command::FireProjectile(
+                    FireProjectileCommand::builder()
+                        .source_id(adapter::card_game_object_id(source_id))
+                        .target_id(adapter::card_game_object_client_id(&target_id))
+                        .projectile(hovl::projectile(1, "Projectile 10 blue laser"))
+                        .fire_sound(wow_sound::rpg_magic(3, "Water Magic/RPG3_WaterMagic_Cast01"))
+                        .impact_sound(wow_sound::rpg_magic(
+                            3,
+                            "Water Magic/RPG3_WaterMagic_Impact03",
+                        ))
+                        .build(),
+                ));
+            }
         }
 
         CardName::TestVariableEnergyDraw if effect_name == "DrawCards" => {
@@ -184,6 +202,24 @@ pub fn apply_effect(
             }));
         }
 
+        CardName::TestModalReturnToHandOrDrawTwo if effect_name == "ApplyTargetedEffect" => {
+            animations::push_snapshot(builder, battle);
+            for target_id in find_target_ids(animation) {
+                builder.push(Command::FireProjectile(
+                    FireProjectileCommand::builder()
+                        .source_id(adapter::card_game_object_id(source_id))
+                        .target_id(adapter::card_game_object_client_id(&target_id))
+                        .projectile(hovl::projectile(1, "Projectile 5 red"))
+                        .fire_sound(wow_sound::rpg_magic(3, "Plasma Magic/RPG3_PlasmaMagic_Cast01"))
+                        .impact_sound(wow_sound::rpg_magic(
+                            3,
+                            "Plasma Magic/RPG3_PlasmaMagic_MediumImpact01",
+                        ))
+                        .build(),
+                ));
+            }
+        }
+
         _ => {}
     }
 
@@ -214,19 +250,13 @@ fn looping_card_effect(battle: &BattleState, card_id: CardId) -> Option<EffectAd
     None
 }
 
-/// Returns the target ID for a given animation, if it has one.
-fn find_target_id(animation: &BattleAnimation) -> Option<CardId> {
-    match animation {
-        BattleAnimation::Counterspell { target_id } => Some(target_id.card_id()),
-        BattleAnimation::Dissolve { target_id } => Some(target_id.card_id()),
-        _ => None,
-    }
-}
-
 fn find_target_ids(animation: &BattleAnimation) -> Vec<ClientCardId> {
     match animation {
         BattleAnimation::SelectedTargetsForCard { targets, .. } => {
             targets.card_ids().iter().map(|id| adapter::client_card_id(*id)).collect()
+        }
+        BattleAnimation::ApplyTargetedEffect { targets, .. } => {
+            targets.iter().map(|id| adapter::client_card_id(*id)).collect()
         }
         _ => vec![],
     }

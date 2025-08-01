@@ -4,6 +4,7 @@ use ability_data::standard_effect::StandardEffect;
 use battle_queries::battle_card_queries::{card, card_properties};
 use battle_queries::battle_player_queries::quantity_expression;
 use battle_queries::battle_trace;
+use battle_state::battle::battle_animation::{BattleAnimation, TargetedEffectName};
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardIdType;
 use battle_state::battle_cards::battle_card_state::CardObjectId;
@@ -54,7 +55,9 @@ pub fn apply(
         StandardEffect::ReturnUpToCountFromYourVoidToHand { .. } => {
             return_up_to_count_from_your_void_to_hand(battle, source, targets)
         }
-        StandardEffect::ReturnToHand { .. } => return_to_hand(battle, source, targets),
+        StandardEffect::ReturnToHand { .. } => {
+            return_from_battlefield_to_hand(battle, source, targets)
+        }
         StandardEffect::PreventDissolveThisTurn { .. } => {
             prevent_dissolve_this_turn(battle, targets)
         }
@@ -209,12 +212,16 @@ fn return_up_to_count_from_your_void_to_hand(
     Some(EffectWasApplied)
 }
 
-fn return_to_hand(
+fn return_from_battlefield_to_hand(
     battle: &mut BattleState,
     source: EffectSource,
     targets: &mut Option<EffectTargets>,
 ) -> Option<EffectWasApplied> {
     let id = targeting::character_id(targets)?;
+    battle.push_animation(source, || BattleAnimation::ApplyTargetedEffect {
+        effect_name: TargetedEffectName::Dissolve,
+        targets: vec![id.card_id()],
+    });
     move_card::from_battlefield_to_hand(
         battle,
         source,
