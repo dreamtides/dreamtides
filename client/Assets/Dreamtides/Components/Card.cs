@@ -280,7 +280,7 @@ namespace Dreamtides.Components
       }
     }
 
-    public void SetCardTrail(ProjectileAddress trailAddress)
+    public void SetCardTrail(ProjectileAddress trailAddress, float durationSeconds)
     {
       if (_cardTrail)
       {
@@ -292,6 +292,8 @@ namespace Dreamtides.Components
       _cardTrail.transform.SetParent(_cardTrailPosition, worldPositionStays: false);
       _cardTrail.transform.localPosition = Vector3.zero;
       _cardTrail.transform.localRotation = Quaternion.identity;
+      var trailComponent = _cardTrail.AddComponent<CardTrail>();
+      trailComponent.Initialize(durationSeconds);
     }
 
     void RenderRevealedCardView(RevealedCardView revealed)

@@ -180,6 +180,7 @@ pub fn apply_effect(
             builder.push(Command::SetCardTrail(SetCardTrailCommand {
                 card_ids: find_target_ids(animation),
                 trail: ProjectileAddress::new("Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 7 pink.prefab"),
+                duration: Milliseconds::new(500),
             }));
         }
 

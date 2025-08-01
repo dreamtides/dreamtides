@@ -125,7 +125,7 @@ namespace Dreamtides.Services
         var card = Registry.LayoutService.GetCardIfExists(cardId);
         if (card)
         {
-          card.SetCardTrail(command.Trail);
+          card.SetCardTrail(command.Trail, command.Duration.ToSeconds());
         }
       }
     }

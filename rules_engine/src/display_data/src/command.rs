@@ -274,6 +274,7 @@ pub enum StudioType {
 pub struct SetCardTrailCommand {
     pub card_ids: Vec<ClientCardId>,
     pub trail: ProjectileAddress,
+    pub duration: Milliseconds,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Eq, PartialEq)]

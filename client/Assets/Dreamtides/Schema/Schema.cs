@@ -1904,6 +1904,9 @@ namespace Dreamtides.Schema
         [JsonProperty("card_ids", Required = Required.Always)]
         public List<string> CardIds { get; set; }
 
+        [JsonProperty("duration", Required = Required.Always)]
+        public Milliseconds Duration { get; set; }
+
         [JsonProperty("trail", Required = Required.Always)]
         public ProjectileAddress Trail { get; set; }
     }
