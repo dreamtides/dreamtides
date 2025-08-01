@@ -2,15 +2,15 @@ use asset_paths::{dissolve_material, hovl, wow_sound};
 use battle_queries::battle_card_queries::{card, card_properties};
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CardId, CardIdType, CharacterId};
+use battle_state::battle::card_id::{CardId, CardIdType};
 use battle_state::core::effect_source::EffectSource;
 use core_data::display_color;
-use core_data::display_types::{AudioClipAddress, EffectAddress, Milliseconds};
+use core_data::display_types::{AudioClipAddress, EffectAddress, Milliseconds, ProjectileAddress};
 use core_data::identifiers::CardName;
-use display_data::card_view::CardEffects;
+use display_data::card_view::{CardEffects, ClientCardId};
 use display_data::command::{
     Command, DisplayEffectCommand, DissolveCardCommand, FireProjectileCommand, GameObjectId,
-    PlayAudioClipCommand,
+    PlayAudioClipCommand, SetCardTrailCommand,
 };
 use masonry::flex_style::FlexVector3;
 use strum::IntoDiscriminant;
@@ -64,7 +64,53 @@ pub fn apply_effect(
             ));
         }
 
+        CardName::TestNamedDissolve if effect_name == "Dissolve" => {
+            animations::push_snapshot(builder, battle);
+            builder.push(Command::FireProjectile(
+                FireProjectileCommand::builder()
+                    .source_id(adapter::card_game_object_id(source_id))
+                    .target_id(adapter::card_game_object_id(target_id?))
+                    .projectile(hovl::projectile(1, "Projectile 3 black fire"))
+                    .fire_sound(wow_sound::rpg_magic(
+                        3,
+                        "Fire Magic/RPG3_FireMagicArrow_Projectile01",
+                    ))
+                    .impact_sound(wow_sound::rpg_magic(3, "Fire Magic/RPG3_FireMagic_Impact01"))
+                    .build(),
+            ));
+            builder.push(Command::DissolveCard(
+                DissolveCardCommand::builder()
+                    .target(adapter::client_card_id(target_id?))
+                    .material(dissolve_material::material(15))
+                    .color(display_color::ORANGE_500)
+                    .reverse(false)
+                    .build(),
+            ));
+            builder.run_with_next_battle_view(Command::DissolveCard(
+                DissolveCardCommand::builder()
+                    .target(adapter::client_card_id(target_id?))
+                    .material(dissolve_material::material(15))
+                    .color(display_color::ORANGE_500)
+                    .reverse(true)
+                    .sound(wow_sound::rpg_magic(3, "Fire Magic/RPG3_FireMagicBall_LightImpact03"))
+                    .build(),
+            ));
+        }
+
         CardName::TestCounterspell if effect_name == "Counterspell" => {
+            animations::push_snapshot(builder, battle);
+            builder.push(Command::FireProjectile(
+                FireProjectileCommand::builder()
+                    .source_id(adapter::card_game_object_id(source_id))
+                    .target_id(adapter::card_game_object_id(target_id?))
+                    .projectile(hovl::projectile(1, "Projectile 6 blue fire"))
+                    .fire_sound(wow_sound::rpg_magic(3, "Wind Magic/RPG3_WindMagic_Cast01"))
+                    .impact_sound(wow_sound::rpg_magic(3, "Wind Magic/RPG3_WindMagic_Impact01"))
+                    .build(),
+            ));
+        }
+
+        CardName::TestCounterspellCharacter if effect_name == "Counterspell" => {
             animations::push_snapshot(builder, battle);
             builder.push(Command::FireProjectile(
                 FireProjectileCommand::builder()
@@ -112,6 +158,31 @@ pub fn apply_effect(
             }));
         }
 
+        CardName::TestFastMultiActivatedAbilityDrawCardCharacter
+            if effect_name == "ActivatedAbility" =>
+        {
+            animations::push_snapshot(builder, battle);
+            builder.push(Command::DisplayEffect(DisplayEffectCommand {
+                target: adapter::card_game_object_id(source_id),
+                effect: hovl::magic_circle("2"),
+                duration: Milliseconds::new(500),
+                scale: FlexVector3::new(5.0, 5.0, 5.0),
+                sound: Some(AudioClipAddress::new(
+                    "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Light Magic/RPG3_LightMagic_Cast03.wav",
+                )),
+            }));
+        }
+
+        CardName::TestReturnOneOrTwoVoidEventCardsToHand
+            if effect_name == "SelectedTargetsForCard" =>
+        {
+            animations::push_snapshot(builder, battle);
+            builder.push(Command::SetCardTrail(SetCardTrailCommand {
+                card_ids: find_target_ids(animation),
+                trail: ProjectileAddress::new("Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 7 pink.prefab"),
+            }));
+        }
+
         _ => {}
     }
 
@@ -120,17 +191,21 @@ pub fn apply_effect(
 
 /// Returns the persistent visual effects for a given card.
 pub fn persistent_card_effects(battle: &BattleState, card_id: CardId) -> CardEffects {
-    CardEffects { looping_effect: looping_card_effect(battle, card_id), ..CardEffects::default() }
+    CardEffects { looping_effect: looping_card_effect(battle, card_id) }
 }
 
-fn looping_card_effect(battle: &BattleState, card_id: CardId) -> Option<EffectAddress> {
-    if battle
+/// Returns true if the given card has applied the 'anchored' effect.
+pub fn is_anchored(battle: &BattleState, card_id: CardId) -> bool {
+    battle
         .ability_state
         .until_end_of_turn
         .prevent_dissolved
         .iter()
-        .any(|card_object_id| card_object_id.card_id == CharacterId(card_id))
-    {
+        .any(|&cid| cid.card_id.card_id() == card_id)
+}
+
+fn looping_card_effect(battle: &BattleState, card_id: CardId) -> Option<EffectAddress> {
+    if is_anchored(battle, card_id) {
         return Some(EffectAddress::new(
             "Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Looping/Magic shield 4 loop.prefab",
         ));
@@ -144,5 +219,14 @@ fn find_target_id(animation: &BattleAnimation) -> Option<CardId> {
         BattleAnimation::Counterspell { target_id } => Some(target_id.card_id()),
         BattleAnimation::Dissolve { target_id } => Some(target_id.card_id()),
         _ => None,
+    }
+}
+
+fn find_target_ids(animation: &BattleAnimation) -> Vec<ClientCardId> {
+    match animation {
+        BattleAnimation::SelectedTargetsForCard { targets, .. } => {
+            targets.card_ids().iter().map(|id| adapter::client_card_id(*id)).collect()
+        }
+        _ => vec![],
     }
 }

@@ -101,13 +101,6 @@ pub enum EffectTargets {
     EffectList(VecDeque<Option<StandardEffectTarget>>),
 }
 
-#[derive(Clone, Debug)]
-pub enum StandardEffectTarget {
-    Character(CardObjectId<CharacterId>),
-    StackCard(CardObjectId<StackCardId>),
-    VoidCardSet(BTreeSet<CardObjectId<VoidCardId>>),
-}
-
 impl EffectTargets {
     pub fn add(&mut self, target: StandardEffectTarget) {
         match self {
@@ -119,6 +112,37 @@ impl EffectTargets {
             }
             EffectTargets::EffectList(targets) => {
                 targets.push_back(Some(target));
+            }
+        }
+    }
+
+    /// Returns the set of card IDs targeted by this effect.
+    pub fn card_ids(&self) -> Vec<CardId> {
+        match self {
+            EffectTargets::Standard(target) => target.card_ids(),
+            EffectTargets::EffectList(targets) => targets
+                .iter()
+                .filter_map(|target| target.as_ref().map(|target| target.card_ids()))
+                .flatten()
+                .collect(),
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum StandardEffectTarget {
+    Character(CardObjectId<CharacterId>),
+    StackCard(CardObjectId<StackCardId>),
+    VoidCardSet(BTreeSet<CardObjectId<VoidCardId>>),
+}
+
+impl StandardEffectTarget {
+    pub fn card_ids(&self) -> Vec<CardId> {
+        match self {
+            StandardEffectTarget::Character(id) => vec![id.card_id.card_id()],
+            StandardEffectTarget::StackCard(id) => vec![id.card_id.card_id()],
+            StandardEffectTarget::VoidCardSet(ids) => {
+                ids.iter().map(|id| id.card_id.card_id()).collect()
             }
         }
     }

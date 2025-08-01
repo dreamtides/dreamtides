@@ -28,6 +28,8 @@ namespace Dreamtides.Services
 
     public Card GetCard(string id) => Errors.CheckNotNull(Cards[id]);
 
+    public Card? GetCardIfExists(string id) => Cards.TryGetValue(id, out var card) ? card : null;
+
     public IEnumerable<string> GetCardIds() => Cards.Keys;
 
     public IEnumerator UpdateLayout(UpdateBattleCommand command, Sequence? sequence = null)

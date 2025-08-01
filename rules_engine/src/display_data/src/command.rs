@@ -74,6 +74,7 @@ pub enum Command {
     DisplayDreamwellActivation(DisplayDreamwellActivationCommand),
     DisplayEnemyMessage(DisplayEnemyMessageCommand),
     PlayStudioAnimation(PlayStudioAnimationCommand),
+    SetCardTrail(SetCardTrailCommand),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -267,6 +268,12 @@ pub enum StudioType {
     EnemyStatus,
     UserIdentityCard,
     EnemyIdentityCard,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct SetCardTrailCommand {
+    pub card_ids: Vec<ClientCardId>,
+    pub trail: ProjectileAddress,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Eq, PartialEq)]

@@ -145,7 +145,7 @@ pub fn render(
             }
         }
 
-        BattleAnimation::SelectStackCardTargets { .. } => {
+        BattleAnimation::SelectedTargetsForCard { .. } => {
             push_snapshot(builder, snapshot);
         }
 

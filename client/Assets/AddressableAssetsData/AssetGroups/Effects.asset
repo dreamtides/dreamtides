@@ -306,6 +306,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a7e0e447f656c4df48babbbab6c35392
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Light Magic/RPG3_LightMagic_Cast03.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b166252c36cbe434d96d7add83bd5bcf
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       9 water.prefab
@@ -315,6 +320,12 @@ MonoBehaviour:
   - m_GUID: b66b13bfc2f9341d1b74615d72e4e11c
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       22 cute star.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bd83377a551ef467d99dad0119fd7d22
+    m_Address: Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Magic circle
+      2.prefab
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

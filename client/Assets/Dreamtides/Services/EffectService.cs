@@ -29,8 +29,8 @@ namespace Dreamtides.Services
       else
       {
         Registry.AssetPoolService.Create(effect, target.transform.position);
-        var rotation = Quaternion.LookRotation(target.transform.position - Registry.Layout.MainCamera.transform.position);
-        effect.transform.rotation = rotation;
+        // TODO: Figure out correct rotation for effects.
+        effect.transform.localEulerAngles = new Vector3(90, 0, 0);
       }
 
       if (command.Sound != null)
@@ -116,6 +116,18 @@ namespace Dreamtides.Services
     {
       var target = Registry.LayoutService.GetCard(command.Target);
       yield return target.StartDissolve(command);
+    }
+
+    public void HandleSetCardTrailCommand(SetCardTrailCommand command)
+    {
+      foreach (var cardId in command.CardIds)
+      {
+        var card = Registry.LayoutService.GetCardIfExists(cardId);
+        if (card)
+        {
+          card.SetCardTrail(command.Trail);
+        }
+      }
     }
   }
 }

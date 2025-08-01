@@ -7,7 +7,6 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CharacterId, StackCardId, VoidCardId};
 use battle_state::battle_cards::battle_card_state::CardObjectId;
 use battle_state::battle_cards::stack_card_state::{EffectTargets, StandardEffectTarget};
-use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{OnSelected, PromptType};
 use core_data::types::PlayerName;
 
@@ -28,8 +27,8 @@ pub fn character(battle: &mut BattleState, player: PlayerName, character_id: Cha
             };
             stack_item.append_character_target(character_id, object_id);
             let source_id = stack_item.id;
-            let source = EffectSource::Player { controller: player };
-            battle.push_animation(source, || BattleAnimation::SelectStackCardTargets {
+            let source = prompt.source;
+            battle.push_animation(source, || BattleAnimation::SelectedTargetsForCard {
                 player,
                 source_id,
                 targets: EffectTargets::Standard(StandardEffectTarget::Character(CardObjectId {
@@ -71,8 +70,8 @@ pub fn on_stack(battle: &mut BattleState, player: PlayerName, stack_card_id: Sta
             };
             stack_item.append_stack_card_target(stack_card_id, object_id);
             let source_id = stack_item.id;
-            let source = EffectSource::Player { controller: player };
-            battle.push_animation(source, || BattleAnimation::SelectStackCardTargets {
+            let source = prompt.source;
+            battle.push_animation(source, || BattleAnimation::SelectedTargetsForCard {
                 player,
                 source_id,
                 targets: EffectTargets::Standard(StandardEffectTarget::StackCard(CardObjectId {
@@ -148,8 +147,8 @@ pub fn submit_void_card_targets(battle: &mut BattleState, player: PlayerName) {
                 None => stack_item.targets = Some(EffectTargets::Standard(target)),
             }
             let source_id = stack_item.id;
-            let source = EffectSource::Player { controller: player };
-            battle.push_animation(source, || BattleAnimation::SelectStackCardTargets {
+            let source = prompt.source;
+            battle.push_animation(source, || BattleAnimation::SelectedTargetsForCard {
                 player,
                 source_id,
                 targets: EffectTargets::Standard(StandardEffectTarget::VoidCardSet(void_targets)),

@@ -66,7 +66,7 @@ pub enum BattleAnimation {
         item_id: StackItemId,
         choice_index: ModelEffectChoiceIndex,
     },
-    SelectStackCardTargets {
+    SelectedTargetsForCard {
         player: PlayerName,
         source_id: StackItemId,
         targets: EffectTargets,

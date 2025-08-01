@@ -403,6 +403,10 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         return format!("{base_text} <b><color=\"blue\">(Reclaimed)</color></b>");
     }
 
+    if apply_card_fx::is_anchored(battle, card_id) {
+        return format!("{base_text} <b><color=\"blue\">(Anchored)</color></b>");
+    }
+
     base_text
 }
 

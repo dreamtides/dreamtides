@@ -263,6 +263,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("PlayStudioAnimation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayStudioAnimationCommand PlayStudioAnimation { get; set; }
+
+        [JsonProperty("SetCardTrail", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public SetCardTrailCommand SetCardTrail { get; set; }
     }
 
     public partial class DisplayDreamwellActivationCommand
@@ -1753,12 +1756,6 @@ namespace Dreamtides.Schema
     public partial class CardEffects
     {
         /// <summary>
-        /// Projectile to display as a trail behind this card.
-        /// </summary>
-        [JsonProperty("card_trail")]
-        public ProjectileAddress CardTrail { get; set; }
-
-        /// <summary>
         /// Ongoing visual effect to display for this card.
         ///
         /// If a previous effect with a different address is present, it will be
@@ -1767,12 +1764,6 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("looping_effect")]
         public EffectAddress LoopingEffect { get; set; }
-    }
-
-    public partial class ProjectileAddress
-    {
-        [JsonProperty("projectile", Required = Required.Always)]
-        public string Projectile { get; set; }
     }
 
     /// <summary>
@@ -1866,6 +1857,12 @@ namespace Dreamtides.Schema
         public Milliseconds WaitDuration { get; set; }
     }
 
+    public partial class ProjectileAddress
+    {
+        [JsonProperty("projectile", Required = Required.Always)]
+        public string Projectile { get; set; }
+    }
+
     public partial class PlayAudioClipCommand
     {
         /// <summary>
@@ -1900,6 +1897,15 @@ namespace Dreamtides.Schema
     {
         [JsonProperty("name", Required = Required.Always)]
         public string Name { get; set; }
+    }
+
+    public partial class SetCardTrailCommand
+    {
+        [JsonProperty("card_ids", Required = Required.Always)]
+        public List<string> CardIds { get; set; }
+
+        [JsonProperty("trail", Required = Required.Always)]
+        public ProjectileAddress Trail { get; set; }
     }
 
     public partial class UpdateBattleCommand

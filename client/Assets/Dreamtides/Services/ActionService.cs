@@ -580,6 +580,12 @@ namespace Dreamtides.Services
           Registry.LoggingService.Log("ActionService", "Applying command: PlayStudioAnimation");
           Registry.StudioService.PlayStudioAnimation(command.PlayStudioAnimation);
         }
+
+        if (command.SetCardTrail != null)
+        {
+          Registry.LoggingService.Log("ActionService", "Applying command: SetCardTrail");
+          Registry.EffectService.HandleSetCardTrailCommand(command.SetCardTrail);
+        }
       }
 
       foreach (var coroutine in coroutines)

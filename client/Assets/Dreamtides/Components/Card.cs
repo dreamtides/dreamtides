@@ -44,6 +44,8 @@ namespace Dreamtides.Components
     [SerializeField] internal TextMeshPro _battlefieldIcon = null!;
     [SerializeField] internal InfoZoomIcons _spriteCardInfoZoomIcons = null!;
     [SerializeField] internal InfoZoomIcons _battlefieldCardInfoZoomIcons = null!;
+    [SerializeField] internal GameObject? _loopingEffect;
+    [SerializeField] internal GameObject? _cardTrail;
 
     bool _isRevealed = false;
     internal Registry _registry = null!;
@@ -57,9 +59,9 @@ namespace Dreamtides.Components
     bool _isDissolved = false;
     bool _draggedToClearThreshold = false;
     bool _draggedToPlayThreshold = false;
-    GameObject? _cardTrail;
+
     EffectAddress? _loopingEffectAddress;
-    GameObject? _loopingEffect;
+
     float _distanceDragged;
     float _hoverStartTime;
     bool _hoveringForInfoZoom;
@@ -189,6 +191,18 @@ namespace Dreamtides.Components
         result._containedObjects = null;
       }
 
+      if (result._loopingEffect)
+      {
+        Destroy(result._loopingEffect);
+        result._loopingEffect = null;
+      }
+
+      if (result._cardTrail)
+      {
+        Destroy(result._cardTrail);
+        result._cardTrail = null;
+      }
+
       result.gameObject.name = "[IZ]" + gameObject.name;
       result._cardView = CardView;
       result._outline.enabled = false;
@@ -266,6 +280,20 @@ namespace Dreamtides.Components
       }
     }
 
+    public void SetCardTrail(ProjectileAddress trailAddress)
+    {
+      if (_cardTrail)
+      {
+        Destroy(_cardTrail);
+      }
+
+      var trail = _registry.AssetService.GetProjectilePrefab(trailAddress);
+      _cardTrail = Instantiate(trail.gameObject);
+      _cardTrail.transform.SetParent(_cardTrailPosition, worldPositionStays: false);
+      _cardTrail.transform.localPosition = Vector3.zero;
+      _cardTrail.transform.localRotation = Quaternion.identity;
+    }
+
     void RenderRevealedCardView(RevealedCardView revealed)
     {
       _isRevealed = true;
@@ -311,19 +339,6 @@ namespace Dreamtides.Components
         _outline.material.SetColor("_Color", MasonRenderer.ToUnityColor(revealed.OutlineColor));
         _outline.material.SetColor("_HiColor", MasonRenderer.ToUnityColor(revealed.OutlineColor));
         _battlefieldOutline.color = MasonRenderer.ToUnityColor(revealed.OutlineColor);
-      }
-
-      if (_cardTrail)
-      {
-        Destroy(_cardTrail);
-      }
-      if (revealed.Effects.CardTrail != null)
-      {
-        var trail = _registry.AssetService.GetProjectilePrefab(revealed.Effects.CardTrail);
-        _cardTrail = Instantiate(trail.gameObject);
-        _cardTrail.transform.SetParent(_cardTrailPosition, worldPositionStays: false);
-        _cardTrail.transform.localPosition = Vector3.zero;
-        _cardTrail.transform.localRotation = Quaternion.identity;
       }
 
       if (revealed.Effects.LoopingEffect != null)

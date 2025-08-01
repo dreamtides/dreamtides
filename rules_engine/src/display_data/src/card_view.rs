@@ -1,9 +1,7 @@
 use action_data::game_action_data::GameAction;
 use battle_state::battle::card_id::CardId;
 use core_data::display_color::DisplayColor;
-use core_data::display_types::{
-    AudioClipAddress, EffectAddress, PrefabAddress, ProjectileAddress, SpriteAddress,
-};
+use core_data::display_types::{AudioClipAddress, EffectAddress, PrefabAddress, SpriteAddress};
 use core_data::types::CardFacing;
 use masonry::flex_node::FlexNode;
 use schemars::JsonSchema;
@@ -151,9 +149,6 @@ pub struct CardActions {
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct CardEffects {
-    /// Projectile to display as a trail behind this card.
-    pub card_trail: Option<ProjectileAddress>,
-
     /// Ongoing visual effect to display for this card.
     ///
     /// If a previous effect with a different address is present, it will be

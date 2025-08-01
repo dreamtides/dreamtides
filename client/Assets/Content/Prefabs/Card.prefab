@@ -2002,7 +2002,7 @@ Transform:
   m_GameObject: {fileID: 3023780679663560669}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.89, y: 1.17, z: 1}
+  m_LocalPosition: {x: -0.64, y: 0.71, z: 1}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -2665,6 +2665,8 @@ MonoBehaviour:
   _battlefieldIcon: {fileID: 3262726849972903837}
   _spriteCardInfoZoomIcons: {fileID: 6799064037122500752}
   _battlefieldCardInfoZoomIcons: {fileID: 7893135063858599996}
+  _loopingEffect: {fileID: 0}
+  _cardTrail: {fileID: 0}
 --- !u!65 &5680000531262599633
 BoxCollider:
   m_ObjectHideFlags: 0
