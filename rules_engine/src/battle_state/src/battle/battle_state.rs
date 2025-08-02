@@ -20,6 +20,7 @@ use crate::battle::turn_data::TurnData;
 use crate::battle::turn_history::TurnHistory;
 use crate::battle_cards::ability_state::AbilityState;
 use crate::battle_cards::activated_ability_state::ActivatedAbilityState;
+use crate::battle_cards::can_play_cards_data::CanPlayCardsData;
 use crate::battle_cards::stack_card_state::EffectTargets;
 use crate::battle_player::battle_player_state::BattlePlayerState;
 use crate::battle_player::player_map::PlayerMap;
@@ -73,6 +74,9 @@ pub struct BattleState {
 
     /// State of abilities in this battle.
     pub ability_state: AbilityState,
+
+    /// Cached 'can play' data for players in this battle.
+    pub can_play_cards: PlayerMap<CanPlayCardsData>,
 
     /// Effects that are waiting to be applied.
     pub pending_effects: VecDeque<PendingEffect>,
@@ -168,6 +172,7 @@ impl BattleState {
             activated_abilities: self.activated_abilities.clone(),
             ability_state: self.ability_state.clone(),
             pending_effects: self.pending_effects.clone(),
+            can_play_cards: self.can_play_cards.clone(),
             animations: None,
             tracing: None,
             action_history: None,
@@ -204,6 +209,7 @@ impl BattleState {
                 activated_abilities: self.activated_abilities.clone(),
                 ability_state: self.ability_state.clone(),
                 pending_effects: self.pending_effects.clone(),
+                can_play_cards: self.can_play_cards.clone(),
                 animations: None,
                 tracing: None,
                 action_history: None,

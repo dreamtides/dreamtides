@@ -293,6 +293,7 @@ pub fn benchmark_battle() -> BattleState {
         triggers: TriggerState::default(),
         activated_abilities: PlayerMap::default(),
         ability_state: AbilityState::default(),
+        can_play_cards: PlayerMap::default(),
         pending_effects: VecDeque::new(),
         animations: None,
         tracing: None,
