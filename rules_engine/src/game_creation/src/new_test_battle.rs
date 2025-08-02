@@ -71,7 +71,6 @@ pub fn create_and_start(
         activated_abilities: PlayerMap::default(),
         ability_state: AbilityState::default(),
         pending_effects: VecDeque::new(),
-        can_play_cards: PlayerMap::default(),
         tracing: None,
         action_history: None,
         turn_history: TurnHistory::default(),
@@ -119,17 +118,17 @@ fn create_test_deck(name: TestDeckName) -> Deck {
             deck_cards.insert(CardName::TestVariableEnergyDraw, 3);
         }
         TestDeckName::CoreEleven => {
-            deck_cards.insert(CardName::TestNamedDissolve, 4); // invalidate: battlefield changes, prevent dissolve
-            deck_cards.insert(CardName::TestCounterspell, 3); // invalidate: stack changes
-            deck_cards.insert(CardName::TestCounterspellUnlessPays, 2); // invalidate: stack changes
-            deck_cards.insert(CardName::TestVariableEnergyDraw, 3); // invalidate: none
-            deck_cards.insert(CardName::TestTriggerGainSparkOnPlayCardEnemyTurn, 4); // invalidate: none
-            deck_cards.insert(CardName::TestFastMultiActivatedAbilityDrawCardCharacter, 5); // invalidate: none
-            deck_cards.insert(CardName::TestReturnOneOrTwoVoidEventCardsToHand, 2); // invalidate: void changes
-            deck_cards.insert(CardName::TestModalReturnToHandOrDrawTwo, 2); // invalidate: battlefield changes
-            deck_cards.insert(CardName::TestPreventDissolveThisTurn, 2); // invalidate: battlefield
-            deck_cards.insert(CardName::TestForeseeOneDrawReclaim, 3); // invalidate: none
-            deck_cards.insert(CardName::TestCounterspellCharacter, 2); // invalidate: stack changes
+            deck_cards.insert(CardName::TestNamedDissolve, 4);
+            deck_cards.insert(CardName::TestCounterspell, 3);
+            deck_cards.insert(CardName::TestCounterspellUnlessPays, 2);
+            deck_cards.insert(CardName::TestVariableEnergyDraw, 3);
+            deck_cards.insert(CardName::TestTriggerGainSparkOnPlayCardEnemyTurn, 4);
+            deck_cards.insert(CardName::TestFastMultiActivatedAbilityDrawCardCharacter, 5);
+            deck_cards.insert(CardName::TestReturnOneOrTwoVoidEventCardsToHand, 2);
+            deck_cards.insert(CardName::TestModalReturnToHandOrDrawTwo, 2);
+            deck_cards.insert(CardName::TestPreventDissolveThisTurn, 2);
+            deck_cards.insert(CardName::TestForeseeOneDrawReclaim, 3);
+            deck_cards.insert(CardName::TestCounterspellCharacter, 2);
         }
     }
     Deck { cards: deck_cards }

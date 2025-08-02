@@ -7,7 +7,6 @@ use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
 use enumset::EnumSet;
 
-use crate::battle_cards::can_play_cards_data::PlayCardsInvalidationFlag;
 use crate::triggers::trigger::TriggerName;
 
 /// A reference to an ability.
@@ -46,9 +45,6 @@ pub struct AbilityList {
     /// A field indicating restrictions on playing this card.
     pub can_play_restriction: Option<CanPlayRestriction>,
 
-    /// Invalidations which affect whether this card can be played.
-    pub can_play_invalidations: EnumSet<PlayCardsInvalidationFlag>,
-
     /// Triggers which can fire when this card is on the battlefield.
     pub battlefield_triggers: EnumSet<TriggerName>,
 
@@ -63,6 +59,8 @@ pub struct AbilityList {
     /// played from the void.
     pub has_play_from_void_ability: bool,
 }
+
+pub struct AbilityEffectFlags {}
 
 /// Wrapper around an ability which stores additional metadata.
 #[derive(Debug, Clone)]

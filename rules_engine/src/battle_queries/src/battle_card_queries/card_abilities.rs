@@ -16,7 +16,6 @@ use battle_state::battle::card_id::{AbilityId, CardIdType};
 use battle_state::battle_cards::ability_list::{
     AbilityConfiguration, AbilityData, AbilityList, AbilityReference, CanPlayRestriction,
 };
-use battle_state::battle_cards::can_play_cards_data::PlayCardsInvalidationFlag;
 use battle_state::triggers::trigger::TriggerName;
 use core_data::identifiers::{AbilityNumber, CardName};
 use core_data::numerics::{Energy, Spark};
@@ -703,57 +702,6 @@ fn compute_event_target_restriction(list: &AbilityList) -> Option<CanPlayRestric
             _ => None,
         },
         PredicateType::Void => None,
-    }
-}
-
-pub fn can_play_invalidations(card: CardName) -> EnumSet<PlayCardsInvalidationFlag> {
-    let dissolve_invalidations = PlayCardsInvalidationFlag::OpponentBattlefieldChanged
-        | PlayCardsInvalidationFlag::PreventDissolveEffectToggled;
-    match card {
-        CardName::TestVanillaCharacter => EnumSet::new(),
-        CardName::TestDissolve => dissolve_invalidations,
-        CardName::TestNamedDissolve => dissolve_invalidations,
-        CardName::TestCounterspellUnlessPays => {
-            EnumSet::only(PlayCardsInvalidationFlag::StackChanged)
-        }
-        CardName::TestCounterspell => EnumSet::only(PlayCardsInvalidationFlag::StackChanged),
-        CardName::TestCounterspellCharacter => {
-            EnumSet::only(PlayCardsInvalidationFlag::StackChanged)
-        }
-        CardName::TestVariableEnergyDraw => EnumSet::new(),
-        CardName::TestDrawOne => EnumSet::new(),
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => EnumSet::new(),
-        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => EnumSet::new(),
-        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => EnumSet::new(),
-        CardName::TestActivatedAbilityDrawCard => EnumSet::new(),
-        CardName::TestMultiActivatedAbilityDrawCardCharacter => EnumSet::new(),
-        CardName::TestFastActivatedAbilityDrawCardCharacter => EnumSet::new(),
-        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => EnumSet::new(),
-        CardName::TestActivatedAbilityDissolveCharacter => EnumSet::new(),
-        CardName::TestDualActivatedAbilityCharacter => EnumSet::new(),
-        CardName::TestForeseeOne => EnumSet::new(),
-        CardName::TestForeseeTwo => EnumSet::new(),
-        CardName::TestForeseeOneDrawACard => EnumSet::new(),
-        CardName::TestForeseeOneReclaim => EnumSet::new(),
-        CardName::TestForeseeOneDrawReclaim => EnumSet::new(),
-        CardName::TestDrawOneReclaim => EnumSet::new(),
-        CardName::TestReturnVoidCardToHand => {
-            EnumSet::only(PlayCardsInvalidationFlag::OwnerVoidChanged)
-        }
-        CardName::TestReturnOneOrTwoVoidEventCardsToHand => {
-            EnumSet::only(PlayCardsInvalidationFlag::OwnerVoidChanged)
-        }
-        CardName::TestModalDrawOneOrDrawTwo => EnumSet::new(),
-        CardName::TestModalDrawOneOrDissolveEnemy => dissolve_invalidations,
-        CardName::TestModalReturnToHandOrDrawTwo => {
-            EnumSet::only(PlayCardsInvalidationFlag::OpponentBattlefieldChanged)
-        }
-        CardName::TestReturnToHand => {
-            EnumSet::only(PlayCardsInvalidationFlag::OpponentBattlefieldChanged)
-        }
-        CardName::TestPreventDissolveThisTurn => {
-            EnumSet::only(PlayCardsInvalidationFlag::OwnerBattlefieldChanged)
-        }
     }
 }
 
