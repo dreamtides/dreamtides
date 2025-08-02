@@ -12,6 +12,10 @@ harness = false
 test = false
 doctest = false
 
+[[bin]]
+name = "core_11_battle"
+path = "src/core_11_battle.rs"
+
 [dependencies]
 ai_agents = { path = "../../src/ai_agents" }
 ai_data = { path = "../../src/ai_data" }

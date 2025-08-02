@@ -207,8 +207,11 @@ graphviz:
 bench-evaluate:
     cargo criterion --manifest-path rules_engine/Cargo.toml -p battle_benchmarks -- ai_evaluate/ai_evaluate
 
-bench-single:
-    cargo criterion --manifest-path rules_engine/Cargo.toml -p battle_benchmarks -- ai_single_threaded/ai_single_threaded
+bench-s5:
+    cargo criterion --manifest-path rules_engine/Cargo.toml -p battle_benchmarks -- ai_starting_5/ai_starting_5
+
+bench-c11:
+    cargo criterion --manifest-path rules_engine/Cargo.toml -p battle_benchmarks -- ai_core_11/ai_core_11
 
 bench-full:
     cargo criterion --manifest-path rules_engine/Cargo.toml -p battle_benchmarks -- ai_full/ai_full
