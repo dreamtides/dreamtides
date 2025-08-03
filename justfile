@@ -179,6 +179,7 @@ samply-matchup *args='':
     cargo build --manifest-path rules_engine/Cargo.toml --bin run_matchup  --profile=release-with-debug
     samply record ./rules_engine/target/release-with-debug/run_matchup -- "$@"
 
+# Example: just samply-battle-benchmark ai_core_11
 samply-battle-benchmark *args='':
     #!/bin/zsh
     rm ./rules_engine/target/release/deps/battle_benchmarks-*
