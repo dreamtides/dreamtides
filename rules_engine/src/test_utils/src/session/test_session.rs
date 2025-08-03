@@ -1,6 +1,6 @@
 use action_data::game_action_data::GameAction;
 use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
-use battle_state::battle_player::battle_player_state::PlayerType;
+use battle_state::battle_player::battle_player_state::{PlayerType, TestDeckName};
 use core_data::identifiers::{BattleId, UserId};
 use core_data::types::PlayerName;
 use display_data::battle_view::DisplayPlayer;
@@ -81,6 +81,7 @@ impl TestSession {
                 debug_configuration: Some(DebugConfiguration {
                     enemy: opponent.clone(),
                     seed: self.seed.or(Some(314159265358979323)),
+                    deck_override: Some(TestDeckName::Vanilla),
                 }),
             },
             self.request_context(),

@@ -50,6 +50,7 @@ pub enum PlayerType {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, JsonSchema)]
 pub enum TestDeckName {
+    Vanilla,
     StartingFive,
     CoreEleven,
 }

@@ -337,14 +337,12 @@ fn load_battle_from_database(
                 .cloned()
                 .unwrap_or(PlayerType::Agent(GameAI::MonteCarlo(25)));
 
+            let deck_name = configuration.deck_override.unwrap_or(TestDeckName::CoreEleven);
             let new_battle = new_battle::create_and_start(
                 battle_id,
                 seed,
-                CreateBattlePlayer {
-                    player_type: PlayerType::User(user_id),
-                    deck_name: TestDeckName::StartingFive,
-                },
-                CreateBattlePlayer { player_type: enemy, deck_name: TestDeckName::StartingFive },
+                CreateBattlePlayer { player_type: PlayerType::User(user_id), deck_name },
+                CreateBattlePlayer { player_type: enemy, deck_name },
                 request_context,
             );
 

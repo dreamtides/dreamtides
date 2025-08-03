@@ -1,5 +1,5 @@
 use action_data::game_action_data::GameAction;
-use battle_state::battle_player::battle_player_state::PlayerType;
+use battle_state::battle_player::battle_player_state::{PlayerType, TestDeckName};
 use core_data::identifiers::{BattleId, UserId};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -61,6 +61,10 @@ pub struct DebugConfiguration {
     /// If specified, the battle will be seeded with the given value. Otherwise
     /// a random seed will be used.
     pub seed: Option<u64>,
+
+    /// If specified, the battle will be created with the given deck for both
+    /// players.
+    pub deck_override: Option<TestDeckName>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

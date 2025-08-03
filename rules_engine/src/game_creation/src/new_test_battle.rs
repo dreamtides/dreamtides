@@ -110,6 +110,9 @@ pub fn create_quest_state(deck_name: TestDeckName) -> QuestState {
 fn create_test_deck(name: TestDeckName) -> Deck {
     let mut deck_cards = BTreeMap::new();
     match name {
+        TestDeckName::Vanilla => {
+            deck_cards.insert(CardName::TestVanillaCharacter, 30);
+        }
         TestDeckName::StartingFive => {
             deck_cards.insert(CardName::TestVanillaCharacter, 6);
             deck_cards.insert(CardName::TestDissolve, 3);
