@@ -111,6 +111,11 @@ windows-plugin:
     mkdir -p {{plugin_out}}/Windows/
     cp rules_engine/target/{{target_windows}}/release/plugin.dll {{plugin_out}}/Windows/
 
+windows-dev-server:
+    cargo build --manifest-path rules_engine/Cargo.toml --release --bin dev_server --target {{target_windows}}
+    mkdir -p release_builds/
+    cp rules_engine/target/{{target_windows}}/release/dev_server.exe release_builds/
+
 plugins: ios-plugin android-plugin mac-plugin windows-plugin
 
 clippy:
