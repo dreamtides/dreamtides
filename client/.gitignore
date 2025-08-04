@@ -48,6 +48,8 @@ ExportedObj/
 *.pdb
 *.opendb
 
+.vsconfig
+
 .utmp/
 
 # Unity3D generated meta files
