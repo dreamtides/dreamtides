@@ -554,6 +554,7 @@ namespace Dreamtides.Components
     public override void MouseHoverStart()
     {
       if (_registry.CapabilitiesService.CanInfoZoom(GameContext, CardView.Position.Position) &&
+        CardView.Revealed != null &&
         GameContext != GameContext.Hovering)
       {
         _hoverStartTime = Time.time;
