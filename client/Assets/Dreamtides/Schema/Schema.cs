@@ -122,6 +122,13 @@ namespace Dreamtides.Schema
     public partial class DebugConfiguration
     {
         /// <summary>
+        /// If specified, the battle will be created with the given deck for both
+        /// players.
+        /// </summary>
+        [JsonProperty("deck_override")]
+        public TestDeckName? DeckOverride { get; set; }
+
+        /// <summary>
         /// If specified, the enemy will be this player type.
         /// </summary>
         [JsonProperty("enemy")]
@@ -2248,6 +2255,8 @@ namespace Dreamtides.Schema
 
     public enum LogType { Debug, Error, Info, Warning };
 
+    public enum TestDeckName { CoreEleven, StartingFive, Vanilla };
+
     public enum GameAiEnum { AlwaysPanic, FirstAvailableAction, RandomAction, WaitFiveSeconds };
 
     /// <summary>
@@ -2354,8 +2363,6 @@ namespace Dreamtides.Schema
     public enum PanelAddressEnum { AddCardToHand, Developer, PlayOpponentCard, SetOpponentAgent };
 
     public enum DebugActionEnum { ApplyTestScenarioAction, RestartBattle, SetOpponentAsHuman };
-
-    public enum TestDeckName { CoreEleven, StartingFive };
 
     public enum FlexAlign { Auto, Center, FlexEnd, FlexStart, Stretch };
 
@@ -2568,6 +2575,7 @@ namespace Dreamtides.Schema
             {
                 LogTypeConverter.Singleton,
                 LogSpanNameConverter.Singleton,
+                TestDeckNameConverter.Singleton,
                 GameAiConverter.Singleton,
                 GameAiEnumConverter.Singleton,
                 DisplayPlayerConverter.Singleton,
@@ -2594,7 +2602,6 @@ namespace Dreamtides.Schema
                 PanelAddressEnumConverter.Singleton,
                 BattleDisplayActionEnumConverter.Singleton,
                 DebugActionConverter.Singleton,
-                TestDeckNameConverter.Singleton,
                 DebugActionEnumConverter.Singleton,
                 GameActionEnumConverter.Singleton,
                 FlexAlignConverter.Singleton,
@@ -2743,6 +2750,52 @@ namespace Dreamtides.Schema
         }
 
         public static readonly LogSpanNameConverter Singleton = new LogSpanNameConverter();
+    }
+
+    internal class TestDeckNameConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(TestDeckName) || t == typeof(TestDeckName?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "CoreEleven":
+                    return TestDeckName.CoreEleven;
+                case "StartingFive":
+                    return TestDeckName.StartingFive;
+                case "Vanilla":
+                    return TestDeckName.Vanilla;
+            }
+            throw new Exception("Cannot unmarshal type TestDeckName");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (TestDeckName)untypedValue;
+            switch (value)
+            {
+                case TestDeckName.CoreEleven:
+                    serializer.Serialize(writer, "CoreEleven");
+                    return;
+                case TestDeckName.StartingFive:
+                    serializer.Serialize(writer, "StartingFive");
+                    return;
+                case TestDeckName.Vanilla:
+                    serializer.Serialize(writer, "Vanilla");
+                    return;
+            }
+            throw new Exception("Cannot marshal type TestDeckName");
+        }
+
+        public static readonly TestDeckNameConverter Singleton = new TestDeckNameConverter();
     }
 
     internal class GameAiConverter : JsonConverter
@@ -4236,47 +4289,6 @@ namespace Dreamtides.Schema
         }
 
         public static readonly DebugActionConverter Singleton = new DebugActionConverter();
-    }
-
-    internal class TestDeckNameConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(TestDeckName) || t == typeof(TestDeckName?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "CoreEleven":
-                    return TestDeckName.CoreEleven;
-                case "StartingFive":
-                    return TestDeckName.StartingFive;
-            }
-            throw new Exception("Cannot unmarshal type TestDeckName");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (TestDeckName)untypedValue;
-            switch (value)
-            {
-                case TestDeckName.CoreEleven:
-                    serializer.Serialize(writer, "CoreEleven");
-                    return;
-                case TestDeckName.StartingFive:
-                    serializer.Serialize(writer, "StartingFive");
-                    return;
-            }
-            throw new Exception("Cannot marshal type TestDeckName");
-        }
-
-        public static readonly TestDeckNameConverter Singleton = new TestDeckNameConverter();
     }
 
     internal class DebugActionEnumConverter : JsonConverter

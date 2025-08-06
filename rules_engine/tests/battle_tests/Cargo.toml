@@ -31,3 +31,7 @@ uuid = { workspace = true }
 [[bin]]
 name = "test_determinism"
 path = "src/bin/test_determinism.rs"
+
+[[bin]]
+name = "test_payload_size"
+path = "src/bin/test_payload_size.rs"

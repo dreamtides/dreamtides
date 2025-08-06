@@ -7,20 +7,27 @@ use crate::flex_style::FlexStyle;
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct FlexNode {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub node_type: Option<NodeType>,
     pub children: Vec<FlexNode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub event_handlers: Option<EventHandlers>,
     pub style: Option<FlexStyle>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub hover_style: Option<FlexStyle>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub pressed_style: Option<FlexStyle>,
 
     /// Style to apply to the element when it is first attached to a panel.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub on_attach_style: Option<FlexStyle>,
 
     /// How long to keep the `on_attach_style` applied.
     ///
     /// If not specified, the style will be applied indefinitely.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub on_attach_style_duration: Option<Milliseconds>,
 }
 
@@ -122,11 +129,18 @@ pub enum NodeType {
 
 #[derive(Clone, Default, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct EventHandlers {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub on_click: Option<GameAction>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub on_long_press: Option<GameAction>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub on_mouse_enter: Option<GameAction>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub on_mouse_leave: Option<GameAction>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub on_mouse_down: Option<GameAction>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub on_mouse_up: Option<GameAction>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub on_field_changed: Option<GameAction>,
 }

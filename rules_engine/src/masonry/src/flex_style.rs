@@ -142,60 +142,97 @@ pub enum ImageScaleMode {
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema, Builder)]
 pub struct FlexStyle {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub align_content: Option<FlexAlign>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub align_items: Option<FlexAlign>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub align_self: Option<FlexAlign>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub background_color: Option<DisplayColor>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub background_image: Option<SpriteAddress>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub background_image_tint_color: Option<DisplayColor>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub border_color: Option<BorderColor>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub border_radius: Option<BorderRadius>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub border_width: Option<BorderWidth>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub inset: Option<FlexInsets>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<DisplayColor>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub display: Option<FlexDisplayStyle>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub flex_basis: Option<Dimension>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub flex_direction: Option<FlexDirection>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub flex_grow: Option<FlexGrow>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub flex_shrink: Option<FlexShrink>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub wrap: Option<FlexWrap>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub font_size: Option<Dimension>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<Dimension>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub image_slice: Option<ImageSlice>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub justify_content: Option<FlexJustify>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub letter_spacing: Option<Dimension>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub margin: Option<DimensionGroup>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_height: Option<Dimension>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_width: Option<Dimension>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub min_height: Option<Dimension>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub min_width: Option<Dimension>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub opacity: Option<Opacity>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub overflow: Option<FlexVisibility>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub padding: Option<DimensionGroup>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub picking_mode: Option<FlexPickingMode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub position: Option<FlexPosition>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub rotate: Option<FlexRotate>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub scale: Option<FlexScale>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub text_overflow: Option<TextOverflow>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub text_shadow: Option<TextShadow>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub transform_origin: Option<FlexTranslate>,
     #[builder(default)]
     pub transition_delays: Vec<Milliseconds>,
@@ -205,21 +242,34 @@ pub struct FlexStyle {
     pub transition_properties: Vec<String>,
     #[builder(default)]
     pub transition_easing_modes: Vec<EasingMode>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub translate: Option<FlexTranslate>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub font: Option<FontAddress>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub font_style: Option<FontStyle>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub overflow_clip_box: Option<OverflowClipBox>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub paragraph_spacing: Option<Dimension>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub text_align: Option<TextAlign>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub text_outline_color: Option<DisplayColor>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub text_outline_width: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub text_overflow_position: Option<TextOverflowPosition>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub visibility: Option<FlexVisibility>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub white_space: Option<WhiteSpace>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<Dimension>,
     #[builder(into)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub word_spacing: Option<Dimension>,
 }

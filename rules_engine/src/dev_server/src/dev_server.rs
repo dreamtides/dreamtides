@@ -1,4 +1,6 @@
 use std::fmt;
+use std::fs::File;
+use std::io::Write;
 
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
@@ -12,8 +14,9 @@ use display_data::request_data::{
     PollResponse, PollResponseType,
 };
 use rules_engine::{client_logging, engine};
+use serde::Serialize;
 use serde::de::DeserializeOwned;
-use tracing::{error, info, info_span};
+use tracing::{debug, error, info, info_span};
 
 // Custom error type for better error handling
 pub enum AppError {
@@ -51,6 +54,23 @@ fn parse_json<T: DeserializeOwned>(json_str: &str) -> AppResult<T> {
     })
 }
 
+fn check_response_size<T: Serialize + Clone>(response: &T, log_size: bool) -> Json<T> {
+    if let Ok(json_string) = serde_json::to_string(response) {
+        let payload_size = json_string.len();
+        if payload_size > 1_000_000 {
+            let _ = File::create("/tmp/too_large.json")
+                .and_then(|mut f| f.write_all(json_string.as_bytes()));
+            panic!(
+                "Response size ({} bytes) exceeds 1MB limit, wrote JSON to /tmp/too_large.json",
+                json_string.len()
+            );
+        } else if log_size {
+            debug!(?payload_size, "Sending response payload");
+        }
+    }
+    Json(response.clone())
+}
+
 async fn connect(body: String) -> AppResult<Json<ConnectResponse>> {
     println!();
 
@@ -65,13 +85,14 @@ async fn connect(body: String) -> AppResult<Json<ConnectResponse>> {
             return Err(AppError::Internal(e.to_string()));
         }
     };
-    Ok(Json(engine::connect(&req, RequestContext {
+    let response = engine::connect(&req, RequestContext {
         logging_options: LoggingOptions {
             log_directory: Some(log_directory),
             log_ai_search_diagram: true,
             enable_action_legality_check: true,
         },
-    })))
+    });
+    Ok(check_response_size(&response, true))
 }
 
 async fn perform_action(body: String) -> AppResult<Json<PerformActionResponse>> {
@@ -86,22 +107,28 @@ async fn perform_action(body: String) -> AppResult<Json<PerformActionResponse>> 
     info!(?action, ?user_id, ?request_id, "Got perform action request");
     let metadata = req.metadata;
     engine::perform_action(req);
-    Ok(Json(PerformActionResponse { metadata, commands: CommandSequence::default() }))
+    let response = PerformActionResponse { metadata, commands: CommandSequence::default() };
+    Ok(check_response_size(&response, false))
 }
 
 async fn poll(body: String) -> AppResult<Json<PollResponse>> {
     let req: PollRequest = parse_json(&body)?;
     let user_id = req.metadata.user_id;
 
-    match engine::poll(user_id, req.metadata) {
-        Some(response) => Ok(Json(response)),
-        None => Ok(Json(PollResponse {
-            metadata: req.metadata,
-            commands: None,
-            response_type: PollResponseType::None,
-            response_version: None,
-        })),
-    }
+    let response = match engine::poll(user_id, req.metadata) {
+        Some(response) => check_response_size(&response, true),
+        None => check_response_size(
+            &PollResponse {
+                metadata: req.metadata,
+                commands: None,
+                response_type: PollResponseType::None,
+                response_version: None,
+            },
+            false,
+        ),
+    };
+
+    Ok(response)
 }
 
 async fn log(body: String) -> AppResult<StatusCode> {
