@@ -16,6 +16,7 @@ pub enum Trigger {
     GainedEnergy(PlayerName, Energy),
     Judgment(PlayerName),
     Materialized(CharacterId),
+    PlayedCard(StackCardId),
     PlayedCardFromHand(StackCardId),
     PlayedCardFromVoid(StackCardId),
 }
@@ -31,6 +32,7 @@ pub enum TriggerName {
     GainedEnergy,
     Judgment,
     Materialized,
+    PlayedCard,
     PlayedCardFromHand,
     PlayedCardFromVoid,
 }
@@ -48,6 +50,7 @@ impl Trigger {
             Trigger::GainedEnergy(..) => TriggerName::GainedEnergy,
             Trigger::Judgment(..) => TriggerName::Judgment,
             Trigger::Materialized(..) => TriggerName::Materialized,
+            Trigger::PlayedCard(..) => TriggerName::PlayedCard,
             Trigger::PlayedCardFromHand(..) => TriggerName::PlayedCardFromHand,
             Trigger::PlayedCardFromVoid(..) => TriggerName::PlayedCardFromVoid,
         }

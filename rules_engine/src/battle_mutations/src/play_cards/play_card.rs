@@ -38,6 +38,7 @@ pub fn from_hand(battle: &mut BattleState, player: PlayerName, card_id: HandCard
         from_zone: Zone::Stack,
     });
 
+    battle.triggers.push(source, Trigger::PlayedCard(stack_card_id));
     battle.triggers.push(source, Trigger::PlayedCardFromHand(stack_card_id));
 
     resume_adding_play_card_prompts(battle, player, stack_card_id, None);
@@ -76,6 +77,8 @@ pub fn from_void(
         card_id: stack_card_id.card_id(),
         from_zone: Zone::Stack,
     });
+
+    battle.triggers.push(source, Trigger::PlayedCard(stack_card_id));
     battle.triggers.push(source, Trigger::PlayedCardFromVoid(stack_card_id));
 
     resume_adding_play_card_prompts(battle, player, stack_card_id, None);

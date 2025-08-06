@@ -832,8 +832,8 @@ fn battlefield_triggers(list: &AbilityList) -> EnumSet<TriggerName> {
 fn watch_for_battlefield_trigger(event: &TriggerEvent) -> TriggerName {
     match event {
         TriggerEvent::Materialize(..) => TriggerName::Materialized,
-        TriggerEvent::Play(..) => TriggerName::PlayedCardFromHand,
-        TriggerEvent::PlayDuringTurn(..) => TriggerName::PlayedCardFromHand,
+        TriggerEvent::Play(..) => TriggerName::PlayedCard,
+        TriggerEvent::PlayDuringTurn(..) => TriggerName::PlayedCard,
         TriggerEvent::PlayFromHand(..) => TriggerName::PlayedCardFromHand,
         _ => todo!("Implement watch_for_trigger() for {:?}", event),
     }
