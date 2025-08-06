@@ -14,9 +14,13 @@ bench = false
 [dependencies]
 action_data = { path = "../../src/action_data" }
 ai_data = { path = "../../src/ai_data" }
+battle_mutations = { path = "../../src/battle_mutations" }
 battle_state = { path = "../../src/battle_state" }
 core_data = { path = "../../src/core_data" }
+display = { path = "../../src/display"}
 display_data = { path = "../../src/display_data" }
+game_creation = { path = "../../src/game_creation" }
+quest_state = { path = "../../src/quest_state" }
 rules_engine = { path = "../../src/rules_engine" }
 state_provider = { path = "../../src/state_provider" }
 test_utils = { path = "../../src/test_utils" }
@@ -25,6 +29,8 @@ ui_components = { path = "../../src/ui_components" }
 clap = { workspace = true }
 proptest = { workspace = true }
 rand = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
 tokio = { workspace = true }
 uuid = { workspace = true }
 

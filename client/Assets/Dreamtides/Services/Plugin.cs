@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 static class Plugin
 {
-    const int BufferSize = 1_000_000;
+    const int BufferSize = 10_000_000;
 
     public static ConnectResponse Connect(ConnectRequest request)
     {
