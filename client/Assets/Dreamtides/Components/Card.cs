@@ -69,6 +69,8 @@ namespace Dreamtides.Components
 
     public CardView CardView => Errors.CheckNotNull(_cardView);
 
+    public CardView? NullableCardView => _cardView;
+
     public string Id => CardView.ClientId();
 
     public ObjectLayout ContainedObjects => Errors.CheckNotNull(_containedObjects);
@@ -240,9 +242,6 @@ namespace Dreamtides.Components
 
     void Update()
     {
-      // var allowNonBattlefieldOutline = GameContext == GameContext.Hand ||
-      //     GameContext == GameContext.Hovering ||
-      //     GameContext == GameContext.Stack;
       _outline.gameObject.SetActive(CanPlay() ||
           CanSelectOrder() ||
           CardView.Revealed?.OutlineColor != null);
