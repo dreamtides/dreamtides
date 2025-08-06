@@ -10,7 +10,7 @@ use core_data::identifiers::CardName;
 use display_data::card_view::{CardEffects, ClientCardId};
 use display_data::command::{
     Command, DisplayEffectCommand, DissolveCardCommand, FireProjectileCommand, GameObjectId,
-    PlayAudioClipCommand, SetCardTrailCommand,
+    SetCardTrailCommand,
 };
 use masonry::flex_style::FlexVector3;
 use strum::IntoDiscriminant;
@@ -165,14 +165,6 @@ pub fn apply_effect(
                     3,
                     "Light Magic/RPG3_LightMagicEpic_HealingWing_P1",
                 )),
-            }));
-        }
-
-        CardName::TestVanillaCharacter if effect_name == "ResolveCharacter" => {
-            animations::push_snapshot(builder, battle);
-            builder.push(Command::PlayAudioClip(PlayAudioClipCommand {
-                sound: AudioClipAddress::new("Assets/ThirdParty/Cafofo/Magic Spells Sound Effects V2.0/General Spell/Positive Effect 10.wav"),
-                pause_duration: Milliseconds::new(0),
             }));
         }
 

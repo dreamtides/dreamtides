@@ -131,6 +131,14 @@ pub fn render(
             }
         }
 
+        BattleAnimation::ResolveCharacter { .. } => {
+            push_snapshot(builder, snapshot);
+            builder.push(Command::PlayAudioClip(PlayAudioClipCommand {
+                sound: AudioClipAddress::new("Assets/ThirdParty/Cafofo/Magic Spells Sound Effects V2.0/General Spell/Positive Effect 10.wav"),
+                pause_duration: Milliseconds::new(0),
+            }));
+        }
+
         BattleAnimation::SelectModalEffectChoice { player, item_id, choice_index } => {
             if *player != builder.display_for_player() {
                 push_snapshot(builder, snapshot);

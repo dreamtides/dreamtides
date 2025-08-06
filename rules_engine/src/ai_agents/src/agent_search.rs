@@ -54,7 +54,7 @@ pub fn select_action_unchecked(
         GameAI::MonteCarlo(thousands_of_iterations) => {
             let config = UctConfig {
                 max_iterations_per_action: *thousands_of_iterations * 1000,
-                max_total_iterations: 300_000,
+                max_total_iterations: *thousands_of_iterations * 1000 * 6,
                 single_threaded: false,
             };
             uct_search::search(battle, player, &config)
@@ -62,7 +62,7 @@ pub fn select_action_unchecked(
         GameAI::MonteCarloSingleThreaded(thousands_of_iterations) => {
             let config = UctConfig {
                 max_iterations_per_action: *thousands_of_iterations * 1000,
-                max_total_iterations: 300_000,
+                max_total_iterations: *thousands_of_iterations * 1000 * 6,
                 single_threaded: true,
             };
             uct_search::search(battle, player, &config)
