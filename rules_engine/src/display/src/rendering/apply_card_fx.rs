@@ -3,6 +3,7 @@ use battle_queries::battle_card_queries::{card, card_properties};
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType};
+use battle_state::battle_cards::zone::Zone;
 use battle_state::core::effect_source::EffectSource;
 use core_data::display_color;
 use core_data::display_types::{AudioClipAddress, EffectAddress, Milliseconds, ProjectileAddress};
@@ -251,6 +252,11 @@ pub fn is_anchored(battle: &BattleState, card_id: CardId) -> bool {
 }
 
 fn looping_card_effect(battle: &BattleState, card_id: CardId) -> Option<EffectAddress> {
+    let controller = card_properties::controller(battle, card_id);
+    if !battle.cards.contains_card(controller, card_id, Zone::Battlefield) {
+        return None;
+    }
+
     if is_anchored(battle, card_id) {
         return Some(EffectAddress::new(
             "Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Looping/Magic shield 4 loop.prefab",

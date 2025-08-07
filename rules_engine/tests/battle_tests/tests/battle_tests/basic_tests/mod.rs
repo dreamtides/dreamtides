@@ -7,6 +7,7 @@ mod duplicate_action_prevention_test;
 mod enemy_message_tests;
 mod modal_effect_tests;
 mod outcome_simulation_tests;
+mod persistent_card_effect_tests;
 mod prompt_message_tests;
 mod stack_interaction_test;
 mod test_helpers;
