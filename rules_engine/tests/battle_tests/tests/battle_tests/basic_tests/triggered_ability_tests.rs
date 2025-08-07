@@ -644,3 +644,47 @@ fn triggered_ability_enemy_turn_token_cards_and_display_effect() {
 
     test_helpers::assert_clients_identical(&s);
 }
+
+#[test]
+fn triggered_ability_triggers_on_reclaim_during_enemy_turn() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    let trigger_character_id = s
+        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
+
+    let initial_spark = s.user_client.cards.get_revealed(&trigger_character_id).numeric_spark();
+    assert_eq!(initial_spark, Some(Spark(5)), "trigger character has base spark");
+
+    let reclaim_card_id = s.create_and_play(DisplayPlayer::User, CardName::TestDrawOneReclaim);
+
+    assert_eq!(s.user_client.cards.user_void().len(), 1, "reclaim card in void");
+    assert_eq!(s.user_client.cards.user_hand().len(), 2, "drew card plus reclaim token");
+
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+
+    let _enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    assert!(s.user_client.me.can_act(), "user can act during enemy turn with fast reclaim");
+
+    s.play_card_from_void(DisplayPlayer::User, &reclaim_card_id);
+
+    assert_eq!(s.user_client.cards.user_banished().len(), 1, "reclaim card banished after play");
+    assert!(
+        s.user_client.cards.user_banished().contains(&reclaim_card_id),
+        "correct card banished"
+    );
+
+    let final_spark = s.user_client.cards.get_revealed(&trigger_character_id).numeric_spark();
+    assert_eq!(
+        final_spark,
+        Some(Spark(7)),
+        "trigger character gained +2 spark from reclaim during enemy turn"
+    );
+
+    test_helpers::assert_clients_identical(&s);
+}
