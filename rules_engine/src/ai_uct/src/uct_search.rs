@@ -58,14 +58,11 @@ pub fn search(
     player: PlayerName,
     config: &UctConfig,
 ) -> BattleAction {
-    let legal = legal_actions::compute(initial_battle, player).all();
-    let iterations_per_action = if legal.is_empty() {
-        config.max_iterations_per_action
-    } else {
-        let max_per_action = (config.max_total_iterations as f64 / legal.len() as f64) as u32;
-        cmp::min(max_per_action, config.max_iterations_per_action)
-    };
+    let legal = legal_actions::compute(initial_battle, player);
+    let iterations_per_action = iterations_per_action(&legal, config);
+
     let action_results: Vec<_> = legal
+        .all()
         .par_iter()
         .with_min_len(if config.single_threaded { usize::MAX } else { 1 })
         .map(|&action| {
@@ -367,4 +364,25 @@ fn child_score(
         SelectionMode::RewardOnly => 0.0,
     };
     exploitation + (exploration_bias * exploration)
+}
+
+/// Calculates the number of iterations to run per action based on the legal
+/// actions available and configuration parameters.
+///
+/// The calculation prioritizes distributing iterations evenly across available
+/// actions while respecting configured limits. Prompt actions receive fewer
+/// iterations as they require faster response times.
+fn iterations_per_action(legal: &LegalActions, config: &UctConfig) -> u32 {
+    let base_iterations = match legal.len() {
+        0 => config.max_iterations_per_action,
+        action_count => {
+            let distributed_iterations =
+                (config.max_total_iterations as f64 / action_count as f64) as u32;
+            cmp::min(distributed_iterations, config.max_iterations_per_action)
+        }
+    };
+
+    // Search fewer actions for prompts to improve perceived response time,
+    // since these usually happen immediately after another AI search.
+    if legal.is_prompt() { (base_iterations as f64 / 2.0) as u32 } else { base_iterations }
 }

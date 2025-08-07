@@ -46,6 +46,9 @@ thread_local! {
 static TEST_STATE_PROVIDERS: LazyLock<Mutex<HashMap<Uuid, TestStateProvider>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
+static DEFAULT_AI_OPPONENT: LazyLock<PlayerType> =
+    LazyLock::new(|| PlayerType::Agent(GameAI::MonteCarlo(50)));
+
 #[derive(Debug, Clone)]
 pub struct PerformActionBlockingResult {
     pub user_poll_results: Vec<PollResult>,
@@ -331,11 +334,8 @@ fn load_battle_from_database(
 
             let configuration = debug_configuration.cloned().unwrap_or_default();
             let seed = configuration.seed.unwrap_or_else(|| rand::rng().next_u64());
-            let enemy = configuration
-                .enemy
-                .as_ref()
-                .cloned()
-                .unwrap_or(PlayerType::Agent(GameAI::MonteCarlo(25)));
+            let enemy =
+                configuration.enemy.as_ref().cloned().unwrap_or(DEFAULT_AI_OPPONENT.clone());
 
             let deck_name = configuration.deck_override.unwrap_or(TestDeckName::CoreEleven);
             let new_battle = new_battle::create_and_start(

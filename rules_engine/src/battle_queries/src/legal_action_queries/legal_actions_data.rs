@@ -69,6 +69,19 @@ pub enum ForPlayer {
 }
 
 impl LegalActions {
+    pub fn is_prompt(&self) -> bool {
+        matches!(
+            self,
+            LegalActions::SelectCharacterPrompt { .. }
+                | LegalActions::SelectStackCardPrompt { .. }
+                | LegalActions::SelectVoidCardPrompt { .. }
+                | LegalActions::SelectPromptChoicePrompt { .. }
+                | LegalActions::SelectEnergyValuePrompt { .. }
+                | LegalActions::SelectDeckCardOrder { .. }
+                | LegalActions::ModalEffectPrompt { .. }
+        )
+    }
+
     pub fn contains(&self, action: BattleAction, for_player: ForPlayer) -> bool {
         match action {
             BattleAction::Debug(..) => true,
