@@ -330,7 +330,7 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         }
         CardName::TestFastMultiActivatedAbilityDrawCardCharacter => {
             format!(
-                "{}<space=\"-0.25px\">{} <color=#00838F><b>3\u{f7e4}</b></color>: Draw a card.",
+                "{}<space=\"-0.25px\">{} <color=#00838F><b>3\u{f7e4}</b></color><b><size=120%>:</size></b> Draw a card.",
                 icon::FAST,
                 icon::MULTI_ACTIVATED
             )
