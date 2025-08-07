@@ -167,7 +167,12 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
             match targets {
                 EffectTargets::Standard(StandardEffectTarget::Character(card_object_id)) => {
                     let target = adapter::card_game_object_id(card_object_id.card_id);
-                    let color = character_arrow_color(builder, battle, card_object_id.card_id);
+                    let color = character_arrow_color(
+                        builder,
+                        battle,
+                        card_object_id.card_id,
+                        stack_item.controller,
+                    );
                     arrows.push(DisplayArrow { source, target, color });
                 }
                 EffectTargets::Standard(StandardEffectTarget::StackCard(card_object_id)) => {
@@ -190,8 +195,12 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
                             StandardEffectTarget::Character(card_object_id) => {
                                 let target_id =
                                     adapter::card_game_object_id(card_object_id.card_id);
-                                let color =
-                                    character_arrow_color(builder, battle, card_object_id.card_id);
+                                let color = character_arrow_color(
+                                    builder,
+                                    battle,
+                                    card_object_id.card_id,
+                                    stack_item.controller,
+                                );
                                 arrows.push(DisplayArrow {
                                     source: source.clone(),
                                     target: target_id,
@@ -229,14 +238,11 @@ fn current_arrows(builder: &ResponseBuilder, battle: &BattleState) -> Vec<Displa
 }
 
 fn character_arrow_color(
-    builder: &ResponseBuilder,
+    _builder: &ResponseBuilder,
     battle: &BattleState,
     character_id: CharacterId,
+    stack_item_controller: PlayerName,
 ) -> ArrowStyle {
     let character_controller = card_properties::controller(battle, character_id);
-    if character_controller == builder.display_for_player() {
-        ArrowStyle::Green
-    } else {
-        ArrowStyle::Red
-    }
+    if character_controller == stack_item_controller { ArrowStyle::Green } else { ArrowStyle::Red }
 }

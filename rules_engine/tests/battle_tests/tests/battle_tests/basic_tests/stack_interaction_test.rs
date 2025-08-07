@@ -3,7 +3,7 @@ use core_data::display_color;
 use core_data::identifiers::CardName;
 use display_data::battle_view::DisplayPlayer;
 use display_data::card_view::ClientCardId;
-use display_data::command::GameObjectId;
+use display_data::command::{ArrowStyle, GameObjectId};
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::session::test_session::TestSession;
 use test_utils::session::test_session_prelude::*;
@@ -433,4 +433,38 @@ fn targeting_outline_colors_green_for_own_red_for_enemy() {
         display_color::GREEN_500,
         "User character outline should be GREEN_500"
     );
+}
+
+#[test]
+fn arrow_colors_based_on_stack_item_controller_vs_target_controller() {
+    let mut s = TestBattle::builder().connect();
+
+    // Create multiple characters for both players to force manual targeting
+    let _user_character1 =
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let _user_character2 =
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let enemy_character1 =
+        s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let _enemy_character2 =
+        s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+
+    // Give opponent a fast card so they can respond, keeping cards on stack
+    s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+
+    // User plays dissolve targeting enemy character (should be red arrow)
+    let user_dissolve = s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
+    s.play_card_from_hand(DisplayPlayer::User, &user_dissolve);
+
+    // Select a target to create the arrow
+    s.click_card(DisplayPlayer::User, &enemy_character1);
+
+    // Verify red arrow from user's card to enemy character
+    let red_arrow_exists = s.user_client.arrows.iter().any(|arrow| {
+        matches!(&arrow.source, GameObjectId::CardId(id) if id == &user_dissolve)
+            && matches!(&arrow.target, GameObjectId::CardId(id) if id == &enemy_character1)
+            && matches!(arrow.color, ArrowStyle::Red)
+    });
+
+    assert!(red_arrow_exists, "Expected red arrow from user's dissolve to enemy character");
 }
