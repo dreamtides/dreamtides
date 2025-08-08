@@ -112,7 +112,7 @@ namespace Dreamtides.Services
 
     IEnumerator DelayedAwake(TestConfiguration testConfiguration)
     {
-      yield return new WaitForSeconds(0.1f);
+      yield return new WaitForEndOfFrame();
       RunAwake(testConfiguration);
     }
 
