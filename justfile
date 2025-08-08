@@ -133,6 +133,9 @@ parser *args='':
 parser-release *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --release --bin "parser_cli" -- "$@"
 
+tabula *args='':
+  cargo run --manifest-path rules_engine/Cargo.toml --bin "tabula" -- "$@"
+
 insta:
   cd rules_engine && cargo insta review
 

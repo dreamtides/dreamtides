@@ -20,6 +20,8 @@ either = "1"
 enum-iterator = "2"
 enumset = { version = "1", features = ["serde"] }
 fastrand = "2"
+google-sheets4 = "6"
+hyper-util = { version = "0.1", features = ["client-legacy", "tokio"] }
 insta = { version = "1", features = ["ron"] }
 ordered-float = "5"
 petgraph = "0.8"
@@ -41,6 +43,7 @@ tracing-error = "0.2"
 tracing-forest = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 uuid = { version = "1", features = ["serde", "v4"] }
+yup-oauth2 = "12"
 
 [workspace.lints.clippy]
 #redundant_test_prefix = "deny"
