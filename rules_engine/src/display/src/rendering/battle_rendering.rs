@@ -67,6 +67,8 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
         token_rendering::trigger_card_view(builder, battle, index, trigger)
     }));
 
+    let mut token_offset = 100;
+
     cards.extend(
         battle.activated_abilities.player(builder.display_for_player()).characters.iter().flat_map(
             |character_id| {
@@ -74,12 +76,17 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
                     builder,
                     battle,
                     character_id,
+                    &mut token_offset,
                 )
             },
         ),
     );
 
-    cards.extend(token_rendering::all_user_void_card_tokens(builder, battle));
+    cards.extend(token_rendering::all_user_void_card_tokens_with_offset(
+        builder,
+        battle,
+        &mut token_offset,
+    ));
 
     cards.extend(modal_effect_prompt_rendering::cards(builder, battle));
 

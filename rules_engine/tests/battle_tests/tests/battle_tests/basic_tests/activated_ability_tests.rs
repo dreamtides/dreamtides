@@ -745,3 +745,65 @@ fn activate_ability_token_not_available_when_already_on_stack() {
     assert_eq!(s.user_client.cards.stack_cards().len(), 0, "ability resolved");
     assert_eq!(s.user_client.cards.user_hand().len(), 1, "drew card from ability");
 }
+
+#[test]
+fn token_cards_in_hand_have_higher_sorting_keys_than_regular_cards() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    let regular_card_id = s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let second_regular_card_id = s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
+
+    let character_with_ability_id =
+        s.add_to_battlefield(DisplayPlayer::User, CardName::TestDualActivatedAbilityCharacter);
+
+    let regular_card_1 = s.user_client.cards.card_map.get(&regular_card_id).unwrap();
+    let regular_card_2 = s.user_client.cards.card_map.get(&second_regular_card_id).unwrap();
+    let token_1_id = format!("A{character_with_ability_id}/0");
+    let token_2_id = format!("A{character_with_ability_id}/1");
+    let token_1 = s.user_client.cards.card_map.get(&token_1_id).unwrap();
+    let token_2 = s.user_client.cards.card_map.get(&token_2_id).unwrap();
+
+    let regular_sort_key_1 = regular_card_1.view.position.sorting_key;
+    let regular_sort_key_2 = regular_card_2.view.position.sorting_key;
+    let token_sort_key_1 = token_1.view.position.sorting_key;
+    let token_sort_key_2 = token_2.view.position.sorting_key;
+
+    assert!(
+        token_sort_key_1 > regular_sort_key_1,
+        "Token card 1 sorting key ({}) should be higher than regular card 1 ({}) for proper layering",
+        token_sort_key_1,
+        regular_sort_key_1
+    );
+
+    assert!(
+        token_sort_key_1 > regular_sort_key_2,
+        "Token card 1 sorting key ({}) should be higher than regular card 2 ({}) for proper layering",
+        token_sort_key_1,
+        regular_sort_key_2
+    );
+
+    assert!(
+        token_sort_key_2 > regular_sort_key_1,
+        "Token card 2 sorting key ({}) should be higher than regular card 1 ({}) for proper layering",
+        token_sort_key_2,
+        regular_sort_key_1
+    );
+
+    assert!(
+        token_sort_key_2 > regular_sort_key_2,
+        "Token card 2 sorting key ({}) should be higher than regular card 2 ({}) for proper layering",
+        token_sort_key_2,
+        regular_sort_key_2
+    );
+
+    assert_ne!(
+        token_sort_key_1, token_sort_key_2,
+        "Each token should have a unique sorting key ({} vs {})",
+        token_sort_key_1, token_sort_key_2
+    );
+
+    assert!(
+        token_sort_key_1.abs_diff(token_sort_key_2) >= 1,
+        "Token sorting keys should be at least 1 apart for uniqueness"
+    );
+}

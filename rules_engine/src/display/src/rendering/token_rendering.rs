@@ -65,14 +65,17 @@ pub fn all_user_character_activated_abilities(
     builder: &ResponseBuilder,
     battle: &BattleState,
     character_id: CharacterId,
+    token_offset: &mut usize,
 ) -> Vec<CardView> {
     let abilities = card_abilities::query(battle, character_id);
     let player = builder.act_for_player();
+    let base_sorting_key = battle.cards.next_object_id_for_display().0 + *token_offset;
 
-    abilities
+    let result: Vec<CardView> = abilities
         .activated_abilities
         .iter()
-        .filter_map(|ability| {
+        .enumerate()
+        .filter_map(|(index, ability)| {
             let ability_id =
                 ActivatedAbilityId { character_id, ability_number: ability.ability_number };
 
@@ -108,9 +111,19 @@ pub fn all_user_character_activated_abilities(
                 return None;
             }
 
-            Some(activated_ability_card_view(builder, battle, ability_id, None))
+            let hand_sorting_key = (base_sorting_key + index) as u32;
+            Some(activated_ability_card_view(
+                builder,
+                battle,
+                ability_id,
+                None,
+                Some(hand_sorting_key),
+            ))
         })
-        .collect()
+        .collect();
+
+    *token_offset += result.len();
+    result
 }
 
 /// Returns a card view for an activated ability that is currently on the
@@ -126,7 +139,7 @@ pub fn activated_ability_card_view_on_stack(
         sorting_key: battle.cards.activated_ability_object_id(ability).unwrap_or_default().0 as u32,
     };
 
-    activated_ability_card_view(builder, battle, ability, Some(stack_position))
+    activated_ability_card_view(builder, battle, ability, Some(stack_position), None)
 }
 
 fn activated_ability_card_view(
@@ -134,6 +147,7 @@ fn activated_ability_card_view(
     battle: &BattleState,
     ability: ActivatedAbilityId,
     position_override: Option<ObjectPosition>,
+    hand_sorting_key: Option<u32>,
 ) -> CardView {
     let character_card_id = ability.character_id.card_id();
     let abilities = card_abilities::query(battle, character_card_id);
@@ -157,13 +171,21 @@ fn activated_ability_card_view(
     let legal_actions = legal_actions::compute(battle, builder.act_for_player());
     let is_legal_action = legal_actions.contains(action, ForPlayer::Human);
 
+    let position = if let Some(override_position) = position_override {
+        override_position
+    } else if let Some(sorting_key) = hand_sorting_key {
+        ObjectPosition { position: Position::InHand(DisplayPlayer::User), sorting_key }
+    } else {
+        ObjectPosition {
+            position: Position::InHand(DisplayPlayer::User),
+            sorting_key: card::get(battle, character_card_id).object_id.0 as u32,
+        }
+    };
+
     token_card_view(
         TokenCardView::builder()
             .id(adapter::stack_item_client_card_id(ability))
-            .position(position_override.unwrap_or_else(|| ObjectPosition {
-                position: Position::InHand(DisplayPlayer::User),
-                sorting_key: card::get(battle, character_card_id).object_id.0 as u32,
-            }))
+            .position(position)
             .image(card_rendering::card_image(battle, character_card_id))
             .name(ability_name)
             .maybe_cost(cost.map(|cost| cost.to_string()))
@@ -206,18 +228,39 @@ fn activated_ability_card_view(
 /// Returns a list of all void card tokens for a player to display in
 /// their hand.
 pub fn all_user_void_card_tokens(builder: &ResponseBuilder, battle: &BattleState) -> Vec<CardView> {
+    let mut offset = 0;
+    all_user_void_card_tokens_with_offset(builder, battle, &mut offset)
+}
+
+/// Returns a list of all void card tokens for a player to display in
+/// their hand, updating the token offset for coordinated sorting.
+pub fn all_user_void_card_tokens_with_offset(
+    builder: &ResponseBuilder,
+    battle: &BattleState,
+    token_offset: &mut usize,
+) -> Vec<CardView> {
     let void_ability_cards =
         battle.ability_state.has_play_from_void_ability.player(builder.act_for_player());
-    void_ability_cards
+    let base_sorting_key = battle.cards.next_object_id_for_display().0 + *token_offset;
+
+    let result: Vec<CardView> = void_ability_cards
         .iter()
-        .map(|card_id| void_card_token_view(builder, battle, card_id))
-        .collect()
+        .enumerate()
+        .map(|(index, card_id)| {
+            let hand_sorting_key = (base_sorting_key + index) as u32;
+            void_card_token_view(builder, battle, card_id, hand_sorting_key)
+        })
+        .collect();
+
+    *token_offset += result.len();
+    result
 }
 
 fn void_card_token_view(
     builder: &ResponseBuilder,
     battle: &BattleState,
     void_card_id: VoidCardId,
+    hand_sorting_key: u32,
 ) -> CardView {
     let card_id = void_card_id.card_id();
     let from_void_with_cost = can_play_cards::can_play_from_void_energy_cost(battle, void_card_id);
@@ -235,7 +278,7 @@ fn void_card_token_view(
             .id(adapter::void_card_token_client_id(void_card_id))
             .position(ObjectPosition {
                 position: Position::InHand(DisplayPlayer::User),
-                sorting_key: card::get(battle, card_id).object_id.0 as u32,
+                sorting_key: hand_sorting_key,
             })
             .image(card_rendering::card_image(battle, card_id))
             .name(card_rendering::card_name(battle, card_id))
