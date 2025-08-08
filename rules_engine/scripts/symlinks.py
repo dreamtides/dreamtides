@@ -45,8 +45,8 @@ def replace_with_symlink(source_dir, dest_base):
     # If we get here, either it wasn't a symlink or it was pointing to wrong place
     source_path_resolved = source_path.resolve() if source_path.exists() else source_path
     
-    # Create destination base directory if it doesn't exist
-    Path(dest_base).mkdir(parents=True, exist_ok=True)
+    # Create destination directory structure if it doesn't exist
+    dest_path.parent.mkdir(parents=True, exist_ok=True)
     
     # Only copy if source exists (it might have been an incorrect symlink we removed)
     if source_path.exists():
