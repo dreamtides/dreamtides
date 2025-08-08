@@ -20,7 +20,7 @@ namespace Dreamtides.Components
     public IEnumerator Start()
     {
       // Wait for GameCamera field of view changes to stabilize.
-      yield return new WaitForSeconds(0.1f);
+      yield return new WaitForEndOfFrame();
       var screenPoint = TransformUtils.RectTransformToScreenSpace(_rectTransform).center;
       var anchor = _registry.Layout.MainCamera.ScreenToWorldPoint(
           new Vector3(screenPoint.x, screenPoint.y, _distanceFromCamera));
