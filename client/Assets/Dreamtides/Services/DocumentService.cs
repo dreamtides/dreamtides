@@ -16,6 +16,7 @@ namespace Dreamtides.Services
     [SerializeField] UIDocument _document = null!;
     IMasonElement _infoZoom = null!;
     IMasonElement _screenOverlay = null!;
+    IMasonElement _effectPreviewOverlay = null!;
 
     public FlexNode? CurrentScreenOverlayNode { get; private set; }
 
@@ -28,6 +29,7 @@ namespace Dreamtides.Services
       _document.rootVisualElement.Clear();
       AddChild("InfoZoomContainer", out _infoZoom);
       AddChild("ScreenOverlay", out _screenOverlay);
+      AddChild("EffectPreviewOverlay", out _effectPreviewOverlay);
     }
 
     public bool IsPointerOverScreenElement()
@@ -106,6 +108,11 @@ namespace Dreamtides.Services
     public void RenderInfoZoom(FlexNode node)
     {
       Reconcile(ref _infoZoom, node);
+    }
+
+    public void RenderEffectPreview(FlexNode? node)
+    {
+      Reconcile(ref _effectPreviewOverlay, node ?? new FlexNode());
     }
 
     public void ClearInfoZoom()

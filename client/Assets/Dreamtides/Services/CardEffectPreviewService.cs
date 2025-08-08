@@ -9,8 +9,6 @@ namespace Dreamtides.Services
   {
     BattlePreviewView? _current;
     Color _previewTextColor = new Color(0.7f, 0.92f, 0.95f);
-    FlexNode? _previousScreenOverlayNode;
-    bool _renderedScreenOverlay;
 
     public void DisplayBattlePreview(BattlePreviewView preview)
     {
@@ -27,13 +25,7 @@ namespace Dreamtides.Services
       if (_current != null)
       {
         ClearAppliedPreviews();
-
-        if (_renderedScreenOverlay)
-        {
-          Registry.DocumentService.RenderScreenOverlay(_previousScreenOverlayNode);
-          _renderedScreenOverlay = false;
-          _previousScreenOverlayNode = null;
-        }
+        Registry.DocumentService.RenderEffectPreview(null);
       }
       _current = null;
     }
@@ -53,9 +45,7 @@ namespace Dreamtides.Services
 
       if (_current.PreviewMessage != null)
       {
-        _previousScreenOverlayNode = Registry.DocumentService.CurrentScreenOverlayNode;
-        _renderedScreenOverlay = true;
-        Registry.DocumentService.RenderScreenOverlay(_current.PreviewMessage);
+        Registry.DocumentService.RenderEffectPreview(_current.PreviewMessage);
       }
     }
 
