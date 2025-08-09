@@ -1,13 +1,15 @@
+pub mod spreadsheet;
+
 use std::fs::File;
 use std::io::BufReader;
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 use clap::Parser;
 use google_sheets4::Sheets;
-use google_sheets4::api::ValueRange;
 use google_sheets4::yup_oauth2::{ServiceAccountAuthenticator, ServiceAccountKey};
 use hyper_util::client::legacy::Client;
 use hyper_util::rt::TokioExecutor;
+use spreadsheet::Spreadsheet;
 use yup_oauth2::hyper_rustls::HttpsConnectorBuilder;
 
 #[derive(Parser, Debug)]
@@ -17,8 +19,12 @@ pub struct Args {
     key_file: String,
     #[arg(long, value_name = "SPREADSHEET_ID", help = "Google Sheets spreadsheet ID")]
     spreadsheet_id: String,
-    #[arg(long, value_name = "A1_RANGE", help = "Cell range in A1 notation, e.g. Sheet1!A1")]
-    cell_range: String,
+    #[arg(long, value_name = "SHEET", help = "Sheet name within the spreadsheet")]
+    sheet: String,
+    #[arg(long, value_name = "COLUMN", help = "Column name, e.g. A or AB")]
+    column: Option<String>,
+    #[arg(long, value_name = "ROW", help = "Row number starting at 1")]
+    row: Option<u32>,
     #[arg(
         long,
         value_name = "VALUE",
@@ -50,56 +56,58 @@ async fn main() -> Result<()> {
     let client = Client::builder(TokioExecutor::new()).build(https);
 
     let hub = Sheets::new(client, auth);
+    let spreadsheet = Spreadsheet::new(args.spreadsheet_id.clone(), hub);
 
     if let Some(write_value) = args.write_value.as_ref() {
-        let value_range = ValueRange {
-            values: Some(vec![vec![serde_json::Value::String(write_value.clone())]]),
-            ..Default::default()
+        let Some(column) = args.column.as_ref() else {
+            bail!("--column is required when --write-value is provided")
         };
-        let _ = hub
-            .spreadsheets()
-            .values_update(value_range, &args.spreadsheet_id, &args.cell_range)
-            .value_input_option("RAW")
-            .add_scope("https://www.googleapis.com/auth/spreadsheets")
-            .doit()
-            .await
-            .with_context(|| {
-                format!(
-                    "failed to write value to range {} in spreadsheet {}",
-                    args.cell_range, args.spreadsheet_id
-                )
-            })?;
+        let Some(row) = args.row else { bail!("--row is required when --write-value is provided") };
+        spreadsheet.write_cell(&args.sheet, column, row, write_value).await.with_context(|| {
+            format!(
+                "failed to write value to sheet {} in spreadsheet {}",
+                args.sheet, args.spreadsheet_id
+            )
+        })?;
         println!("{write_value}");
         return Ok(());
     }
 
-    let result = hub
-        .spreadsheets()
-        .values_get(&args.spreadsheet_id, &args.cell_range)
-        .add_scope("https://www.googleapis.com/auth/spreadsheets.readonly")
-        .doit()
-        .await
-        .with_context(|| {
-            format!(
-                "failed to read range {} from spreadsheet {}",
-                args.cell_range, args.spreadsheet_id
-            )
-        })?;
-
-    let value_range = result.1;
-    let Some(values) = value_range.values else {
-        println!("No data found in the specified range");
-        return Ok(());
-    };
-    let Some(first_row) = values.first() else {
-        println!("No data found in the specified range");
-        return Ok(());
-    };
-    let Some(first_cell) = first_row.first() else {
-        println!("Cell is empty");
-        return Ok(());
-    };
-    println!("{first_cell}");
+    match (&args.column, args.row) {
+        (Some(column), Some(row)) => {
+            let cell =
+                spreadsheet.read_cell(&args.sheet, column, row).await.with_context(|| {
+                    format!(
+                        "failed to read sheet {} from spreadsheet {}",
+                        args.sheet, args.spreadsheet_id
+                    )
+                })?;
+            match cell {
+                Some(s) if !s.is_empty() => println!("{s}"),
+                _ => println!("Cell is empty"),
+            }
+        }
+        _ => {
+            let table = spreadsheet.read_table(&args.sheet).await.with_context(|| {
+                format!(
+                    "failed to read sheet {} from spreadsheet {}",
+                    args.sheet, args.spreadsheet_id
+                )
+            })?;
+            let max_rows = table.columns.iter().map(|c| c.values.len()).max().unwrap_or(0);
+            let mut rows: Vec<serde_json::Map<String, serde_json::Value>> =
+                Vec::with_capacity(max_rows);
+            for i in 0..max_rows {
+                let mut obj = serde_json::Map::new();
+                for col in table.columns.iter() {
+                    let v = col.values.get(i).map(|sv| sv.data.clone()).unwrap_or_default();
+                    obj.insert(col.name.clone(), serde_json::Value::String(v));
+                }
+                rows.push(obj);
+            }
+            println!("{}", serde_json::to_string_pretty(&rows)?);
+        }
+    }
 
     Ok(())
 }
