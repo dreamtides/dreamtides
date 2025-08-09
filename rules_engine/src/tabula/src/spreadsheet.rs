@@ -1,13 +1,24 @@
 use anyhow::Result;
-use google_sheets4::Sheets;
-use google_sheets4::api::ValueRange;
-use hyper_util::client::legacy::connect::HttpConnector;
-use serde_json::Value;
-use yup_oauth2::hyper_rustls::HttpsConnector;
 
-pub struct Spreadsheet {
-    sheet_id: String,
-    hub: Sheets<HttpsConnector<HttpConnector>>,
+pub trait Spreadsheet {
+    fn read_cell(
+        &self,
+        sheet: &str,
+        column: &str,
+        row: u32,
+    ) -> impl Future<Output = Result<Option<String>>> + Send;
+
+    fn write_cell(
+        &self,
+        sheet: &str,
+        column: &str,
+        row: u32,
+        value: &str,
+    ) -> impl Future<Output = Result<()>> + Send;
+
+    fn read_table(&self, name: &str) -> impl Future<Output = Result<SheetTable>> + Send;
+
+    fn write_table(&self, table: &SheetTable) -> impl Future<Output = Result<()>> + Send;
 }
 
 /// Represents a single sheet in a spreadsheet.
@@ -25,196 +36,4 @@ pub struct SheetColumn {
 /// Represents a single value in a column.
 pub struct SheetValue {
     pub data: String,
-}
-
-impl Spreadsheet {
-    pub fn new(sheet_id: String, hub: Sheets<HttpsConnector<HttpConnector>>) -> Self {
-        Self { sheet_id, hub }
-    }
-
-    pub async fn read_cell(&self, sheet: &str, column: &str, row: u32) -> Result<Option<String>> {
-        let range = format!("{sheet}!{column}{row}");
-        let (_, value_range) = self
-            .hub
-            .spreadsheets()
-            .values_get(&self.sheet_id, &range)
-            .add_scope("https://www.googleapis.com/auth/spreadsheets.readonly")
-            .doit()
-            .await?;
-        let values = value_range.values.unwrap_or_default();
-        let Some(first_row) = values.first() else { return Ok(None) };
-        let Some(first_cell) = first_row.first() else { return Ok(None) };
-        let s = match first_cell {
-            Value::String(s) => s.clone(),
-            Value::Number(n) => n.to_string(),
-            Value::Bool(b) => {
-                if *b {
-                    "TRUE".to_string()
-                } else {
-                    "FALSE".to_string()
-                }
-            }
-            Value::Null => String::new(),
-            other => other.to_string(),
-        };
-        Ok(Some(s))
-    }
-
-    pub async fn write_cell(&self, sheet: &str, column: &str, row: u32, value: &str) -> Result<()> {
-        let range = format!("{sheet}!{column}{row}");
-        let value_range = ValueRange {
-            values: Some(vec![vec![Value::String(value.to_string())]]),
-            ..Default::default()
-        };
-        let _ = self
-            .hub
-            .spreadsheets()
-            .values_update(value_range, &self.sheet_id, &range)
-            .value_input_option("RAW")
-            .add_scope("https://www.googleapis.com/auth/spreadsheets")
-            .doit()
-            .await?;
-        Ok(())
-    }
-
-    /// Reads a table by name from the spreadsheet.
-    pub async fn read_table(&self, name: &str) -> Result<SheetTable> {
-        let meta = self
-            .hub
-            .spreadsheets()
-            .get(&self.sheet_id)
-            .add_scope("https://www.googleapis.com/auth/spreadsheets.readonly")
-            .doit()
-            .await?;
-        let spreadsheet = meta.1;
-        let sheets = spreadsheet.sheets.unwrap_or_default();
-        let mut row_count = 0;
-        let mut col_count = 0;
-        for s in sheets {
-            if let Some(properties) = s.properties {
-                if properties.title.as_deref() == Some(name) {
-                    if let Some(grid) = properties.grid_properties {
-                        row_count = grid.row_count.unwrap_or(0);
-                        col_count = grid.column_count.unwrap_or(0);
-                    }
-                    break;
-                }
-            }
-        }
-        let end_col = number_to_column_letters(if col_count == 0 { 1 } else { col_count as u32 });
-        let end_row = if row_count == 0 { 1 } else { row_count as u32 };
-        let range = format!("{name}!A1:{end_col}{end_row}");
-        let result = self
-            .hub
-            .spreadsheets()
-            .values_get(&self.sheet_id, &range)
-            .add_scope("https://www.googleapis.com/auth/spreadsheets.readonly")
-            .doit()
-            .await?;
-        let value_range = result.1;
-        let values = value_range.values.unwrap_or_default();
-        if values.is_empty() {
-            return Ok(SheetTable { name: name.to_string(), columns: Vec::new() });
-        }
-        let header_cells = values.first().cloned().unwrap_or_default();
-        let headers: Vec<String> = header_cells
-            .into_iter()
-            .map(|v| match v {
-                Value::String(s) => s,
-                Value::Number(n) => n.to_string(),
-                Value::Bool(b) => {
-                    if b {
-                        "true".to_string()
-                    } else {
-                        "false".to_string()
-                    }
-                }
-                Value::Null => String::new(),
-                other => other.to_string(),
-            })
-            .collect();
-        if headers.is_empty() {
-            return Ok(SheetTable { name: name.to_string(), columns: Vec::new() });
-        }
-        let num_columns = headers.len();
-        let mut columns: Vec<SheetColumn> =
-            headers.into_iter().map(|h| SheetColumn { name: h, values: Vec::new() }).collect();
-        for row in values.into_iter().skip(1) {
-            for (col_idx, column) in columns.iter_mut().enumerate().take(num_columns) {
-                let cell = row.get(col_idx).cloned().unwrap_or(Value::Null);
-                let data = match cell {
-                    Value::String(s) => s,
-                    Value::Number(n) => n.to_string(),
-                    Value::Bool(b) => {
-                        if b {
-                            "true".to_string()
-                        } else {
-                            "false".to_string()
-                        }
-                    }
-                    Value::Null => String::new(),
-                    other => other.to_string(),
-                };
-                column.values.push(SheetValue { data });
-            }
-        }
-        Ok(SheetTable { name: name.to_string(), columns })
-    }
-
-    /// Writes a table to the spreadsheet.
-    pub async fn write_table(&self, table: &SheetTable) -> Result<()> {
-        let header: Vec<Value> =
-            table.columns.iter().map(|c| Value::String(c.name.clone())).collect();
-        let max_rows = table.columns.iter().map(|c| c.values.len()).max().unwrap_or(0);
-        let mut rows: Vec<Vec<Value>> = Vec::with_capacity(max_rows + 1);
-        rows.push(header);
-        for row_idx in 0..max_rows {
-            let mut row: Vec<Value> = Vec::with_capacity(table.columns.len());
-            for col in table.columns.iter() {
-                let cell = col.values.get(row_idx).map(|v| v.data.clone()).unwrap_or_default();
-                row.push(Value::String(cell));
-            }
-            rows.push(row);
-        }
-        let end_col = number_to_column_letters(if table.columns.is_empty() {
-            1
-        } else {
-            table.columns.len() as u32
-        });
-        let end_row = if rows.is_empty() { 1 } else { rows.len() as u32 };
-        let range = format!("{}!A1:{}{}", table.name, end_col, end_row);
-        let value_range = ValueRange { values: Some(rows), ..Default::default() };
-        let _ = self
-            .hub
-            .spreadsheets()
-            .values_update(value_range, &self.sheet_id, &range)
-            .value_input_option("RAW")
-            .add_scope("https://www.googleapis.com/auth/spreadsheets")
-            .doit()
-            .await?;
-        Ok(())
-    }
-}
-
-fn number_to_column_letters(mut number: u32) -> String {
-    let mut letters = String::new();
-    if number == 0 {
-        return "A".to_string();
-    }
-    while number > 0 {
-        let mut rem = number % 26;
-        if rem == 0 {
-            rem = 26;
-        }
-        let ch = ((rem - 1) as u8 + b'A') as char;
-        letters.insert(0, ch);
-        let mut reduced = number - rem;
-        let mut quotient = 0;
-        while reduced >= 26 {
-            reduced -= 26;
-            quotient += 1;
-        }
-        number = quotient;
-    }
-    letters
 }

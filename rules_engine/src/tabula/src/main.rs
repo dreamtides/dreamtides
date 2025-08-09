@@ -1,3 +1,4 @@
+pub mod google_sheet;
 pub mod spreadsheet;
 
 use std::fs::File;
@@ -5,12 +6,14 @@ use std::io::BufReader;
 
 use anyhow::{Context, Result, bail};
 use clap::Parser;
+use google_sheet::GoogleSheet;
 use google_sheets4::Sheets;
 use google_sheets4::yup_oauth2::{ServiceAccountAuthenticator, ServiceAccountKey};
 use hyper_util::client::legacy::Client;
 use hyper_util::rt::TokioExecutor;
-use spreadsheet::Spreadsheet;
 use yup_oauth2::hyper_rustls::HttpsConnectorBuilder;
+
+use crate::spreadsheet::Spreadsheet;
 
 #[derive(Parser, Debug)]
 #[command(name = "tabula", version, about = "Google Sheets reader via Service Account")]
@@ -56,7 +59,7 @@ async fn main() -> Result<()> {
     let client = Client::builder(TokioExecutor::new()).build(https);
 
     let hub = Sheets::new(client, auth);
-    let spreadsheet = Spreadsheet::new(args.spreadsheet_id.clone(), hub);
+    let spreadsheet = GoogleSheet::new(args.spreadsheet_id.clone(), hub);
 
     if let Some(write_value) = args.write_value.as_ref() {
         let Some(column) = args.column.as_ref() else {
