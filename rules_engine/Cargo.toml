@@ -24,6 +24,7 @@ google-sheets4 = "6"
 hyper-util = { version = "0.1", features = ["client-legacy", "tokio"] }
 insta = { version = "1", features = ["ron"] }
 ordered-float = "5"
+parking_lot = "0.12"
 petgraph = "0.8"
 proptest = "1"
 rand = "0.9"

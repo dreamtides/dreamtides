@@ -1,0 +1,19 @@
+[package]
+name = "tabula_cli_tests"
+version = "0.0.0"
+edition = "2024"
+
+[lints]
+workspace = true
+
+[lib]
+test = false
+doctest = false
+bench = false
+
+[dependencies]
+tabula_cli = { path = "../../src/tabula_cli" }
+
+anyhow = { workspace = true }
+parking_lot = { workspace = true }
+tokio = { workspace = true }

@@ -1,19 +1,15 @@
-pub mod google_sheet;
-pub mod spreadsheet;
-
 use std::fs::File;
 use std::io::BufReader;
 
 use anyhow::{Context, Result, bail};
 use clap::Parser;
-use google_sheet::GoogleSheet;
 use google_sheets4::Sheets;
 use google_sheets4::yup_oauth2::{ServiceAccountAuthenticator, ServiceAccountKey};
 use hyper_util::client::legacy::Client;
 use hyper_util::rt::TokioExecutor;
+use tabula_cli::google_sheet::GoogleSheet;
+use tabula_cli::spreadsheet::Spreadsheet;
 use yup_oauth2::hyper_rustls::HttpsConnectorBuilder;
-
-use crate::spreadsheet::Spreadsheet;
 
 #[derive(Parser, Debug)]
 #[command(name = "tabula", version, about = "Google Sheets reader via Service Account")]

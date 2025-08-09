@@ -2789,6 +2789,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "tabula_cli_tests"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "parking_lot",
+ "tabula_cli",
+ "tokio",
+]
+
+[[package]]
 name = "tempfile"
 version = "3.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

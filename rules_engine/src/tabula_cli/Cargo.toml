@@ -6,6 +6,11 @@ edition = "2024"
 [lints]
 workspace = true
 
+[lib]
+test = false
+doctest = false
+bench = false
+
 [[bin]]
 name = "tabula_cli"
 test = false
