@@ -770,36 +770,27 @@ fn token_cards_in_hand_have_higher_sorting_keys_than_regular_cards() {
 
     assert!(
         token_sort_key_1 > regular_sort_key_1,
-        "Token card 1 sorting key ({}) should be higher than regular card 1 ({}) for proper layering",
-        token_sort_key_1,
-        regular_sort_key_1
+        "Token card 1 sorting key ({token_sort_key_1}) should be higher than regular card 1 ({regular_sort_key_1}) for proper layering"
     );
 
     assert!(
         token_sort_key_1 > regular_sort_key_2,
-        "Token card 1 sorting key ({}) should be higher than regular card 2 ({}) for proper layering",
-        token_sort_key_1,
-        regular_sort_key_2
+        "Token card 1 sorting key ({token_sort_key_1}) should be higher than regular card 2 ({regular_sort_key_2}) for proper layering"
     );
 
     assert!(
         token_sort_key_2 > regular_sort_key_1,
-        "Token card 2 sorting key ({}) should be higher than regular card 1 ({}) for proper layering",
-        token_sort_key_2,
-        regular_sort_key_1
+        "Token card 2 sorting key ({token_sort_key_2}) should be higher than regular card 1 ({regular_sort_key_1}) for proper layering"
     );
 
     assert!(
         token_sort_key_2 > regular_sort_key_2,
-        "Token card 2 sorting key ({}) should be higher than regular card 2 ({}) for proper layering",
-        token_sort_key_2,
-        regular_sort_key_2
+        "Token card 2 sorting key ({token_sort_key_2}) should be higher than regular card 2 ({regular_sort_key_2}) for proper layering"
     );
 
     assert_ne!(
         token_sort_key_1, token_sort_key_2,
-        "Each token should have a unique sorting key ({} vs {})",
-        token_sort_key_1, token_sort_key_2
+        "Each token should have a unique sorting key ({token_sort_key_1} vs {token_sort_key_2})"
     );
 
     assert!(

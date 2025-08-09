@@ -9,10 +9,8 @@ fn payload_size_under_limit() {
 
     assert!(
         size_bytes < MAX_SIZE_BYTES,
-        "Payload size {} bytes exceeds limit of {} bytes",
-        size_bytes,
-        MAX_SIZE_BYTES
+        "Payload size {size_bytes} bytes exceeds limit of {MAX_SIZE_BYTES} bytes"
     );
 
-    println!("Payload size: {} bytes (under {} byte limit)", size_bytes, MAX_SIZE_BYTES);
+    println!("Payload size: {size_bytes} bytes (under {MAX_SIZE_BYTES} byte limit)");
 }
