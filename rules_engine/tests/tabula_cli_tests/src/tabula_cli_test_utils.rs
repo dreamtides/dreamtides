@@ -1,11 +1,13 @@
 use std::collections::HashMap;
 
 use anyhow::Result;
+use parking_lot::RwLock;
+use serde_json::Value;
 use tabula_cli::spreadsheet::{SheetColumn, SheetTable, SheetValue, Spreadsheet};
 
 #[derive(Default)]
 pub struct FakeSpreadsheet {
-    sheets: parking_lot::RwLock<HashMap<String, Vec<Vec<String>>>>,
+    sheets: RwLock<HashMap<String, Vec<Vec<String>>>>,
 }
 
 impl FakeSpreadsheet {
@@ -14,7 +16,7 @@ impl FakeSpreadsheet {
         let materialized: Vec<Vec<String>> =
             rows.into_iter().map(|r| r.into_iter().map(|s| s.to_string()).collect()).collect();
         map.insert(name.to_string(), materialized);
-        Self { sheets: parking_lot::RwLock::new(map) }
+        Self { sheets: RwLock::new(map) }
     }
 
     fn col_to_index(col: &str) -> usize {
@@ -67,7 +69,7 @@ impl Spreadsheet for FakeSpreadsheet {
         for r in rows.iter().skip(1) {
             for (i, col) in columns.iter_mut().enumerate() {
                 let v = r.get(i).cloned().unwrap_or_default();
-                col.values.push(SheetValue { data: v });
+                col.values.push(SheetValue { data: Value::String(v) });
             }
         }
         Ok(SheetTable { name: name.to_string(), columns })
@@ -81,7 +83,23 @@ impl Spreadsheet for FakeSpreadsheet {
         for i in 0..max_rows {
             let mut r: Vec<String> = Vec::with_capacity(table.columns.len());
             for col in table.columns.iter() {
-                let v = col.values.get(i).map(|sv| sv.data.clone()).unwrap_or_default();
+                let v = col
+                    .values
+                    .get(i)
+                    .map(|sv| match &sv.data {
+                        Value::String(s) => s.clone(),
+                        Value::Number(n) => n.to_string(),
+                        Value::Bool(b) => {
+                            if *b {
+                                "true".to_string()
+                            } else {
+                                "false".to_string()
+                            }
+                        }
+                        Value::Null => String::new(),
+                        other => other.to_string(),
+                    })
+                    .unwrap_or_default();
                 r.push(v);
             }
             rows.push(r);

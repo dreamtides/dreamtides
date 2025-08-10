@@ -107,20 +107,7 @@ impl Spreadsheet for GoogleSheet {
         for row in values.into_iter().skip(1) {
             for (col_idx, column) in columns.iter_mut().enumerate().take(num_columns) {
                 let cell = row.get(col_idx).cloned().unwrap_or(Value::Null);
-                let data = match cell {
-                    Value::String(s) => s,
-                    Value::Number(n) => n.to_string(),
-                    Value::Bool(b) => {
-                        if b {
-                            "true".to_string()
-                        } else {
-                            "false".to_string()
-                        }
-                    }
-                    Value::Null => String::new(),
-                    other => other.to_string(),
-                };
-                column.values.push(SheetValue { data });
+                column.values.push(SheetValue { data: cell });
             }
         }
         Ok(SheetTable { name, columns })
@@ -136,8 +123,8 @@ impl Spreadsheet for GoogleSheet {
         for row_idx in 0..max_rows {
             let mut row: Vec<Value> = Vec::with_capacity(columns.len());
             for col in columns.iter() {
-                let cell = col.values.get(row_idx).map(|v| v.data.clone()).unwrap_or_default();
-                row.push(Value::String(cell));
+                let cell = col.values.get(row_idx).map(|v| v.data.clone()).unwrap_or(Value::Null);
+                row.push(cell);
             }
             rows.push(row);
         }

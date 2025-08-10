@@ -1,4 +1,5 @@
 use anyhow::Result;
+use serde_json::Value;
 
 pub trait Spreadsheet {
     fn read_cell(
@@ -35,5 +36,5 @@ pub struct SheetColumn {
 
 /// Represents a single value in a column.
 pub struct SheetValue {
-    pub data: String,
+    pub data: Value,
 }

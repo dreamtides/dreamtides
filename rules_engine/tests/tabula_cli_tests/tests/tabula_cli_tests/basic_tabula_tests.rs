@@ -1,3 +1,4 @@
+use serde_json::Value;
 use tabula_cli::spreadsheet::{SheetColumn, SheetTable, SheetValue, Spreadsheet};
 use tabula_cli_tests::tabula_cli_test_utils::FakeSpreadsheet;
 
@@ -23,14 +24,14 @@ async fn write_and_read_table() {
         columns: vec![
             SheetColumn {
                 name: "Col1".to_string(),
-                values: vec![SheetValue { data: "x".to_string() }, SheetValue {
-                    data: "y".to_string(),
+                values: vec![SheetValue { data: Value::String("x".to_string()) }, SheetValue {
+                    data: Value::String("y".to_string()),
                 }],
             },
             SheetColumn {
                 name: "Col2".to_string(),
-                values: vec![SheetValue { data: "1".to_string() }, SheetValue {
-                    data: "2".to_string(),
+                values: vec![SheetValue { data: Value::String("1".to_string()) }, SheetValue {
+                    data: Value::String("2".to_string()),
                 }],
             },
         ],
@@ -41,8 +42,8 @@ async fn write_and_read_table() {
     assert_eq!(round.columns.len(), 2);
     assert_eq!(round.columns[0].name, "Col1");
     assert_eq!(round.columns[1].name, "Col2");
-    assert_eq!(round.columns[0].values[1].data, "y");
-    assert_eq!(round.columns[1].values[1].data, "2");
+    assert_eq!(round.columns[0].values[1].data, Value::String("y".to_string()));
+    assert_eq!(round.columns[1].values[1].data, Value::String("2".to_string()));
 }
 
 #[test]

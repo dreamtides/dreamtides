@@ -16,4 +16,6 @@ tabula_cli = { path = "../../src/tabula_cli" }
 
 anyhow = { workspace = true }
 parking_lot = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
 tokio = { workspace = true }

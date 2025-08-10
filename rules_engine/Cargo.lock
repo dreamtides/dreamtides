@@ -2794,6 +2794,8 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "parking_lot",
+ "serde",
+ "serde_json",
  "tabula_cli",
  "tokio",
 ]

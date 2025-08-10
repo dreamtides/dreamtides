@@ -100,7 +100,7 @@ async fn main() -> Result<()> {
                 let mut obj = serde_json::Map::new();
                 for col in table.columns.iter() {
                     let v = col.values.get(i).map(|sv| sv.data.clone()).unwrap_or_default();
-                    obj.insert(col.name.clone(), serde_json::Value::String(v));
+                    obj.insert(col.name.clone(), v);
                 }
                 rows.push(obj);
             }
