@@ -1,6 +1,6 @@
 use anyhow::Result;
 use google_sheets4::Sheets;
-use google_sheets4::api::ValueRange;
+use google_sheets4::api::{Spreadsheet as GSpreadsheet, ValueRange};
 use hyper_util::client::legacy::connect::HttpConnector;
 use serde_json::Value;
 use yup_oauth2::hyper_rustls::HttpsConnector;
@@ -69,48 +69,15 @@ impl Spreadsheet for GoogleSheet {
 
     async fn read_table(&self, name: &str) -> Result<SheetTable> {
         let name = name.to_string();
-        let result = self
+        let (_, value_range) = self
             .hub
             .spreadsheets()
             .values_get(&self.sheet_id, &name)
             .add_scope("https://www.googleapis.com/auth/spreadsheets.readonly")
             .doit()
             .await?;
-        let value_range = result.1;
         let values = value_range.values.unwrap_or_default();
-        if values.is_empty() {
-            return Ok(SheetTable { name, columns: Vec::new() });
-        }
-        let header_cells = values.first().cloned().unwrap_or_default();
-        let headers: Vec<String> = header_cells
-            .into_iter()
-            .map(|v| match v {
-                Value::String(s) => s,
-                Value::Number(n) => n.to_string(),
-                Value::Bool(b) => {
-                    if b {
-                        "true".to_string()
-                    } else {
-                        "false".to_string()
-                    }
-                }
-                Value::Null => String::new(),
-                other => other.to_string(),
-            })
-            .collect();
-        if headers.is_empty() {
-            return Ok(SheetTable { name, columns: Vec::new() });
-        }
-        let num_columns = headers.len();
-        let mut columns: Vec<SheetColumn> =
-            headers.into_iter().map(|h| SheetColumn { name: h, values: Vec::new() }).collect();
-        for row in values.into_iter().skip(1) {
-            for (col_idx, column) in columns.iter_mut().enumerate().take(num_columns) {
-                let cell = row.get(col_idx).cloned().unwrap_or(Value::Null);
-                column.values.push(SheetValue { data: cell });
-            }
-        }
-        Ok(SheetTable { name, columns })
+        Ok(values_to_table(name, values))
     }
 
     async fn write_table(&self, table: &SheetTable) -> Result<()> {
@@ -143,6 +110,100 @@ impl Spreadsheet for GoogleSheet {
             .await?;
         Ok(())
     }
+
+    async fn read_all_tables(&self) -> Result<Vec<SheetTable>> {
+        let (_, spreadsheet): (_, GSpreadsheet) = self
+            .hub
+            .spreadsheets()
+            .get(&self.sheet_id)
+            .include_grid_data(true)
+            .add_scope("https://www.googleapis.com/auth/spreadsheets.readonly")
+            .doit()
+            .await?;
+
+        let mut tables: Vec<SheetTable> = Vec::new();
+        let sheets = spreadsheet.sheets.unwrap_or_default();
+        for sheet in sheets {
+            let name = sheet.properties.and_then(|p| p.title).unwrap_or_default();
+
+            let grid_sets = sheet.data.unwrap_or_default();
+            let mut all_rows: Vec<google_sheets4::api::RowData> = Vec::new();
+            for grid in grid_sets {
+                let mut rows = grid.row_data.unwrap_or_default();
+                if !rows.is_empty() {
+                    all_rows.append(&mut rows);
+                }
+            }
+
+            if all_rows.is_empty() {
+                tables.push(SheetTable { name, columns: Vec::new() });
+                continue;
+            }
+
+            let header_cells = all_rows[0].values.clone().unwrap_or_default();
+            let header_row: Vec<Value> = header_cells
+                .into_iter()
+                .map(|cell| {
+                    if let Some(ev) = cell.effective_value {
+                        if let Some(s) = ev.string_value {
+                            Value::String(s)
+                        } else if let Some(n) = ev.number_value {
+                            Value::String(n.to_string())
+                        } else if let Some(b) = ev.bool_value {
+                            if b {
+                                Value::String("true".to_string())
+                            } else {
+                                Value::String("false".to_string())
+                            }
+                        } else {
+                            Value::String(ev.formula_value.unwrap_or_default())
+                        }
+                    } else {
+                        Value::String(cell.formatted_value.unwrap_or_default())
+                    }
+                })
+                .collect();
+
+            if header_row.is_empty() {
+                tables.push(SheetTable { name, columns: Vec::new() });
+                continue;
+            }
+
+            let mut values: Vec<Vec<Value>> = Vec::new();
+            values.push(header_row);
+            for row in all_rows.into_iter().skip(1) {
+                let cells = row.values.unwrap_or_default();
+                let row_vals: Vec<Value> = cells
+                    .into_iter()
+                    .map(|c| {
+                        if let Some(ev) = c.effective_value {
+                            if let Some(s) = ev.string_value {
+                                Value::String(s)
+                            } else if let Some(n) = ev.number_value {
+                                match serde_json::Number::from_f64(n) {
+                                    Some(num) => Value::Number(num),
+                                    None => Value::Null,
+                                }
+                            } else if let Some(b) = ev.bool_value {
+                                Value::Bool(b)
+                            } else {
+                                Value::Null
+                            }
+                        } else if let Some(fv) = c.formatted_value {
+                            Value::String(fv)
+                        } else {
+                            Value::Null
+                        }
+                    })
+                    .collect();
+                values.push(row_vals);
+            }
+
+            tables.push(values_to_table(name, values));
+        }
+
+        Ok(tables)
+    }
 }
 
 fn number_to_column_letters(mut number: u32) -> String {
@@ -166,4 +227,40 @@ fn number_to_column_letters(mut number: u32) -> String {
         number = quotient;
     }
     letters
+}
+
+fn values_to_table(name: String, values: Vec<Vec<Value>>) -> SheetTable {
+    if values.is_empty() {
+        return SheetTable { name, columns: Vec::new() };
+    }
+    let header_cells = values.first().cloned().unwrap_or_default();
+    let headers: Vec<String> = header_cells
+        .into_iter()
+        .map(|v| match v {
+            Value::String(s) => s,
+            Value::Number(n) => n.to_string(),
+            Value::Bool(b) => {
+                if b {
+                    "true".to_string()
+                } else {
+                    "false".to_string()
+                }
+            }
+            Value::Null => String::new(),
+            other => other.to_string(),
+        })
+        .collect();
+    if headers.is_empty() {
+        return SheetTable { name, columns: Vec::new() };
+    }
+    let num_columns = headers.len();
+    let mut columns: Vec<SheetColumn> =
+        headers.into_iter().map(|h| SheetColumn { name: h, values: Vec::new() }).collect();
+    for row in values.into_iter().skip(1) {
+        for (col_idx, column) in columns.iter_mut().enumerate().take(num_columns) {
+            let cell = row.get(col_idx).cloned().unwrap_or(Value::Null);
+            column.values.push(SheetValue { data: cell });
+        }
+    }
+    SheetTable { name, columns }
 }

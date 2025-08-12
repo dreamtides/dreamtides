@@ -2775,6 +2775,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "tabula"
+version = "0.0.0"
+dependencies = [
+ "ability_data",
+ "core_data",
+ "schemars 1.0.2",
+ "serde",
+ "strum",
+]
+
+[[package]]
 name = "tabula_cli"
 version = "0.0.0"
 dependencies = [

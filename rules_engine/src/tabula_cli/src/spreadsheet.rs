@@ -20,6 +20,8 @@ pub trait Spreadsheet {
     fn read_table(&self, name: &str) -> impl Future<Output = Result<SheetTable>> + Send;
 
     fn write_table(&self, table: &SheetTable) -> impl Future<Output = Result<()>> + Send;
+
+    fn read_all_tables(&self) -> impl Future<Output = Result<Vec<SheetTable>>> + Send;
 }
 
 /// Represents a single sheet in a spreadsheet.

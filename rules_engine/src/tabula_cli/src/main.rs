@@ -19,7 +19,7 @@ pub struct Args {
     #[arg(long, value_name = "SPREADSHEET_ID", help = "Google Sheets spreadsheet ID")]
     spreadsheet_id: String,
     #[arg(long, value_name = "SHEET", help = "Sheet name within the spreadsheet")]
-    sheet: String,
+    sheet: Option<String>,
     #[arg(long, value_name = "COLUMN", help = "Column name, e.g. A or AB")]
     column: Option<String>,
     #[arg(long, value_name = "ROW", help = "Row number starting at 1")]
@@ -30,6 +30,8 @@ pub struct Args {
         help = "If set, writes this value into the cell range instead of reading"
     )]
     write_value: Option<String>,
+    #[arg(long, help = "Print all sheets and values for the given spreadsheet id as pretty JSON")]
+    dump_all: bool,
 }
 
 #[tokio::main]
@@ -62,35 +64,65 @@ async fn main() -> Result<()> {
             bail!("--column is required when --write-value is provided")
         };
         let Some(row) = args.row else { bail!("--row is required when --write-value is provided") };
-        spreadsheet.write_cell(&args.sheet, column, row, write_value).await.with_context(|| {
+        let Some(sheet_name) = args.sheet.as_ref() else {
+            bail!("--sheet is required when --write-value is provided")
+        };
+        spreadsheet.write_cell(sheet_name, column, row, write_value).await.with_context(|| {
             format!(
                 "failed to write value to sheet {} in spreadsheet {}",
-                args.sheet, args.spreadsheet_id
+                sheet_name, args.spreadsheet_id
             )
         })?;
         println!("{write_value}");
         return Ok(());
     }
 
+    if args.dump_all {
+        let tables = spreadsheet.read_all_tables().await.with_context(|| {
+            format!("failed to read all sheets from spreadsheet {}", args.spreadsheet_id)
+        })?;
+        let mut outer = serde_json::Map::new();
+        for table in tables {
+            let max_rows = table.columns.iter().map(|c| c.values.len()).max().unwrap_or(0);
+            let mut rows: Vec<serde_json::Value> = Vec::with_capacity(max_rows);
+            for i in 0..max_rows {
+                let mut obj = serde_json::Map::new();
+                for col in table.columns.iter() {
+                    let v = col.values.get(i).map(|sv| sv.data.clone()).unwrap_or_default();
+                    obj.insert(col.name.clone(), v);
+                }
+                rows.push(serde_json::Value::Object(obj));
+            }
+            outer.insert(table.name, serde_json::Value::Array(rows));
+        }
+        println!("{}", serde_json::to_string_pretty(&serde_json::Value::Object(outer))?);
+        return Ok(());
+    }
+
     match (&args.column, args.row) {
         (Some(column), Some(row)) => {
-            let cell =
-                spreadsheet.read_cell(&args.sheet, column, row).await.with_context(|| {
-                    format!(
-                        "failed to read sheet {} from spreadsheet {}",
-                        args.sheet, args.spreadsheet_id
-                    )
-                })?;
+            let Some(sheet_name) = args.sheet.as_ref() else {
+                bail!("--sheet is required when reading a single cell")
+            };
+            let cell = spreadsheet.read_cell(sheet_name, column, row).await.with_context(|| {
+                format!(
+                    "failed to read sheet {} from spreadsheet {}",
+                    sheet_name, args.spreadsheet_id
+                )
+            })?;
             match cell {
                 Some(s) if !s.is_empty() => println!("{s}"),
                 _ => println!("Cell is empty"),
             }
         }
         _ => {
-            let table = spreadsheet.read_table(&args.sheet).await.with_context(|| {
+            let Some(sheet_name) = args.sheet.as_ref() else {
+                bail!("--sheet is required when reading a table")
+            };
+            let table = spreadsheet.read_table(sheet_name).await.with_context(|| {
                 format!(
                     "failed to read sheet {} from spreadsheet {}",
-                    args.sheet, args.spreadsheet_id
+                    sheet_name, args.spreadsheet_id
                 )
             })?;
             let max_rows = table.columns.iter().map(|c| c.values.len()).max().unwrap_or(0);

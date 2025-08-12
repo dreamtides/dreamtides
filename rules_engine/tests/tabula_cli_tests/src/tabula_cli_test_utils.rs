@@ -108,4 +108,29 @@ impl Spreadsheet for FakeSpreadsheet {
         guard.insert(table.name.clone(), rows);
         Ok(())
     }
+
+    async fn read_all_tables(&self) -> Result<Vec<SheetTable>> {
+        let guard = self.sheets.read();
+        let mut out: Vec<SheetTable> = Vec::with_capacity(guard.len());
+        let mut names: Vec<String> = guard.keys().cloned().collect();
+        names.sort();
+        for name in names {
+            let Some(rows) = guard.get(&name) else { continue };
+            if rows.is_empty() {
+                out.push(SheetTable { name: name.clone(), columns: vec![] });
+                continue;
+            }
+            let headers: Vec<String> = rows[0].clone();
+            let mut columns: Vec<SheetColumn> =
+                headers.into_iter().map(|h| SheetColumn { name: h, values: Vec::new() }).collect();
+            for r in rows.iter().skip(1) {
+                for (i, col) in columns.iter_mut().enumerate() {
+                    let v = r.get(i).cloned().unwrap_or_default();
+                    col.values.push(SheetValue { data: Value::String(v) });
+                }
+            }
+            out.push(SheetTable { name: name.clone(), columns });
+        }
+        Ok(out)
+    }
 }

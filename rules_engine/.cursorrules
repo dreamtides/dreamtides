@@ -15,8 +15,6 @@ all times.
   - WRONG: battle_state::battle_cards::zone::Zone::Battlefield
   - CORRECT: Zone::Battlefield
   - CORRECT: move_card::to_destination_zone()
-- Never use unwrap(), expect() or Result. Use the assert_that! and
-  panic_with! macros if needed.
 - Public functions and types go at the TOP of the file, then private ones.
 - Don't add "pub use" for anything.
 
