@@ -75,7 +75,11 @@ impl LocalizedStrings {
         if !self.bundle_cache.borrow().contains_key(&language) {
             let mut ftl = String::new();
             for row in &self.table.0 {
-                ftl.push_str(&format!("{} = {}\n", row.name, row.english));
+                ftl.push_str(&format!(
+                    "{} = {}\n",
+                    row.name,
+                    normalize_literal(row.english.as_str())
+                ));
             }
             let res = match FluentResource::try_new(ftl) {
                 Ok(r) => Rc::new(r),
@@ -106,6 +110,19 @@ impl LocalizedStrings {
         let mut errors = vec![];
         let out = bundle.format_pattern(pattern, Some(&args), &mut errors).into_owned();
         if errors.is_empty() { out } else { format_error_details(&errors) }
+    }
+}
+
+fn normalize_literal(s: &str) -> String {
+    let trimmed = s.trim();
+    if trimmed.starts_with("\\u[") && trimmed.ends_with("]") && trimmed.len() > 4 {
+        let hex = &trimmed[3..trimmed.len() - 1];
+        match u32::from_str_radix(hex, 16).ok().and_then(std::char::from_u32) {
+            Some(ch) => ch.to_string(),
+            None => s.to_string(),
+        }
+    } else {
+        s.to_string()
     }
 }
 
