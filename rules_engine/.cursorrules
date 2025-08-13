@@ -22,6 +22,8 @@ all times.
 # VALIDATING CHANGES
 
 
+- After completing work, please always run "just fmt" to apply rustfmt
+  formatting rules
 - After completing work, please ALWAYS run "just review" to validate changes
 - After completing work, if you change any structs in display_data, please
   run the "just schema" command.

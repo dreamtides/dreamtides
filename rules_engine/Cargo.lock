@@ -2908,6 +2908,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "tabula_ids"
+version = "0.0.0"
+dependencies = [
+ "uuid",
+]
+
+[[package]]
 name = "tempfile"
 version = "3.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

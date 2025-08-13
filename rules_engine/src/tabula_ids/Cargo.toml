@@ -1,0 +1,15 @@
+[package]
+name = "tabula_ids"
+version = "0.0.0"
+edition = "2024"
+
+[lints]
+workspace = true
+
+[lib]
+test = false
+doctest = false
+bench = false
+
+[dependencies]
+uuid = { workspace = true }

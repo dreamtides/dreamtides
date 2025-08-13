@@ -11,7 +11,7 @@ use hyper_util::rt::TokioExecutor;
 use tabula::localized_string_set::{LanguageId, StringId};
 use tabula_cli::google_sheet::GoogleSheet;
 use tabula_cli::spreadsheet::Spreadsheet;
-use tabula_cli::tabula_sync;
+use tabula_cli::{tabula_codegen, tabula_sync};
 use uuid::uuid;
 use yup_oauth2::hyper_rustls::HttpsConnectorBuilder;
 
@@ -22,6 +22,8 @@ pub struct Args {
     key_file: String,
     #[arg(long, value_name = "SPREADSHEET_ID", help = "Google Sheets spreadsheet ID")]
     spreadsheet_id: String,
+    #[arg(long, value_name = "PATH", help = "Generate string_id.rs at the given path and exit")]
+    generate: Option<String>,
 }
 
 #[tokio::main]
@@ -50,7 +52,11 @@ async fn main() -> Result<()> {
     let spreadsheet = GoogleSheet::new(args.spreadsheet_id, hub);
     let tables = spreadsheet.read_all_tables().await?;
     let tabula = tabula_sync::sync(tables)?;
-    println!("tabula: {tabula:?}");
+
+    if let Some(path) = args.generate.as_deref() {
+        tabula_codegen::generate_string_ids(&tabula, path)?;
+    }
+
     let uuid = uuid!("211e9d51-07ed-4261-88ce-fbfeb3390449");
     let formatted = tabula.strings.format_pattern(
         LanguageId::English,
