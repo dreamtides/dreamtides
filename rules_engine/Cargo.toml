@@ -21,6 +21,8 @@ either = "1"
 enum-iterator = "2"
 enumset = { version = "1", features = ["serde"] }
 fastrand = "2"
+fluent = "0.17"
+fluent-bundle = "0.16"
 google-sheets4 = "6"
 hyper-util = { version = "0.1", features = ["client-legacy", "tokio"] }
 insta = { version = "1", features = ["ron"] }

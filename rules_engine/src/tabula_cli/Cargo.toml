@@ -23,10 +23,13 @@ tabula = { path = "../tabula" }
 anyhow = { workspace = true }
 clap = { workspace = true }
 convert_case = { workspace = true }
+fluent = { workspace = true }
+fluent-bundle = { workspace = true }
 google-sheets4 = { workspace = true }
 hyper-util = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tokio = { workspace = true }
-yup-oauth2 = { workspace = true }
 tracing = { workspace = true }
+uuid = { workspace = true }
+yup-oauth2 = { workspace = true }

@@ -1,27 +1,25 @@
 use std::fmt;
 use std::marker::PhantomData;
-use std::ops::Deref;
 
 use serde::de::{DeserializeOwned, Deserializer, SeqAccess, Visitor};
 use serde::ser::{SerializeSeq, Serializer};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+/// A trait for types that have an ID.
+pub trait HasId<I> {
+    type Id: PartialEq + Copy + fmt::Debug;
+
+    fn id(&self) -> Self::Id;
+}
+
 /// A wrapper around a vector of items that implements Serde's `Serialize` and
 /// `Deserialize` traits allowing for failure. Values that fail to deserialize
 /// are logged and skipped.
 #[derive(Clone, Debug)]
-pub struct Table<T>(pub Vec<T>);
+pub struct Table<I, T>(pub Vec<T>, PhantomData<I>);
 
-impl<T> Deref for Table<T> {
-    type Target = [T];
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl<T> Serialize for Table<T>
+impl<I, T> Serialize for Table<I, T>
 where
     T: Serialize,
 {
@@ -37,7 +35,7 @@ where
     }
 }
 
-impl<'de, T> Deserialize<'de> for Table<T>
+impl<'de, I, T> Deserialize<'de> for Table<I, T>
 where
     T: DeserializeOwned,
 {
@@ -46,15 +44,15 @@ where
     where
         D: Deserializer<'de>,
     {
-        struct TabulaTableVisitor<T> {
-            marker: PhantomData<T>,
+        struct TabulaTableVisitor<I, T> {
+            marker: PhantomData<(I, T)>,
         }
 
-        impl<'de, T> Visitor<'de> for TabulaTableVisitor<T>
+        impl<'de, I, T> Visitor<'de> for TabulaTableVisitor<I, T>
         where
             T: DeserializeOwned,
         {
-            type Value = Table<T>;
+            type Value = Table<I, T>;
 
             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
                 formatter.write_str("a JSON array of table rows")
@@ -69,14 +67,26 @@ where
                     match T::deserialize(v.clone()) {
                         Ok(item) => items.push(item),
                         Err(_) => {
-                            eprintln!("failed to deserialize table row: {v:?}");
+                            eprintln!("failed to deserialize table row, skipping: {v:?}");
                         }
                     }
                 }
-                Ok(Table(items))
+                Ok(Table(items, PhantomData))
             }
         }
 
         deserializer.deserialize_seq(TabulaTableVisitor { marker: PhantomData })
+    }
+}
+
+impl<I, T> Table<I, T> {
+    pub fn get(&self, id: T::Id) -> &T
+    where
+        T: HasId<I>,
+    {
+        self.0
+            .iter()
+            .find(|item| item.id() == id)
+            .unwrap_or_else(|| panic!("item with id {id:?} not found in table"))
     }
 }
