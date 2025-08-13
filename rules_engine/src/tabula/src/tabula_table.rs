@@ -41,6 +41,7 @@ impl<'de, T> Deserialize<'de> for Table<T>
 where
     T: DeserializeOwned,
 {
+    #[expect(clippy::print_stderr)]
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,

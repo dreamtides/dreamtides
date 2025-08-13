@@ -1,6 +1,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use anyhow::Result;
+use convert_case::{Case, Casing};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use serde_json::{Map, Value};
@@ -16,11 +17,11 @@ pub fn sync(sheets: Vec<SheetTable>) -> Result<Tabula> {
         for row in table.rows {
             let mut obj = Map::new();
             for (k, v) in row.values {
-                obj.insert(k, v.data);
+                obj.insert(k.to_case(Case::Snake), v.data);
             }
             rows.push(Value::Object(obj));
         }
-        outer.insert(table.name, Value::Array(rows));
+        outer.insert(table.name.to_case(Case::Snake), Value::Array(rows));
     }
     let tabula: Tabula = serde_json::from_value(Value::Object(outer))?;
     Ok(tabula)
