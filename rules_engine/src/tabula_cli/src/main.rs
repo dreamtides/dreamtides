@@ -52,13 +52,10 @@ async fn main() -> Result<()> {
     let tabula = tabula_sync::sync(tables)?;
     println!("tabula: {tabula:?}");
     let uuid = uuid!("211e9d51-07ed-4261-88ce-fbfeb3390449");
-    let string = tabula.strings.get(StringId(uuid));
-    let formatted = string.format_pattern(
+    let formatted = tabula.strings.format_pattern(
         LanguageId::English,
-        fluent_args!(
-            "energy" => 2,
-            "e" => "E"
-        ),
+        StringId(uuid),
+        fluent_args!("energy" => 2),
     );
     println!("formatted: {formatted}");
 

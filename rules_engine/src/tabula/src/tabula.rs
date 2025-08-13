@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::localized_string_set::{LocalizedStringSet, StringId};
-use crate::tabula_table::Table;
+use crate::localized_string_set::LocalizedStrings;
 
 /// Tabula is a read-only database of game data and rules information.
 ///
@@ -16,5 +15,5 @@ use crate::tabula_table::Table;
 /// the rules engine, which is also handled by the `tabula_cli` tool.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Tabula {
-    pub strings: Table<StringId, LocalizedStringSet>,
+    pub strings: LocalizedStrings,
 }

@@ -80,6 +80,7 @@ where
 }
 
 impl<I, T> Table<I, T> {
+    /// Returns the item with the given ID. Panics if the item is not found.
     pub fn get(&self, id: T::Id) -> &T
     where
         T: HasId<I>,
@@ -88,5 +89,13 @@ impl<I, T> Table<I, T> {
             .iter()
             .find(|item| item.id() == id)
             .unwrap_or_else(|| panic!("item with id {id:?} not found in table"))
+    }
+
+    /// Returns the item with the given ID, if it exists.
+    pub fn get_optional(&self, id: T::Id) -> Option<&T>
+    where
+        T: HasId<I>,
+    {
+        self.0.iter().find(|item| item.id() == id)
     }
 }

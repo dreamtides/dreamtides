@@ -1,7 +1,5 @@
 use std::cell::RefCell;
 use std::collections::BTreeMap;
-use std::collections::btree_map::Entry;
-use std::fmt;
 use std::rc::Rc;
 
 use fluent::FluentBundle;
@@ -9,7 +7,7 @@ use fluent_bundle::{FluentArgs, FluentError, FluentResource};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::tabula_table::HasId;
+use crate::tabula_table::{HasId, Table};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, Eq, PartialEq, Hash)]
 pub struct StringId(pub Uuid);
@@ -19,17 +17,48 @@ pub enum LanguageId {
     English,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Clone, Debug)]
+pub struct LocalizedStrings {
+    pub table: Table<StringId, LocalizedStringSet>,
+    pub bundle_cache: RefCell<BTreeMap<LanguageId, Rc<FluentResource>>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LocalizedStringSet {
     pub id: StringId,
     pub name: String,
     pub description: String,
     pub english: String,
-    #[serde(skip, default)]
-    bundle_cache: RefCell<BTreeMap<LanguageId, Rc<FluentResource>>>,
 }
 
-impl LocalizedStringSet {
+impl HasId<StringId> for LocalizedStringSet {
+    type Id = StringId;
+
+    fn id(&self) -> StringId {
+        self.id
+    }
+}
+
+impl Serialize for LocalizedStrings {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        self.table.serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for LocalizedStrings {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let table = Table::<StringId, LocalizedStringSet>::deserialize(deserializer)?;
+        Ok(LocalizedStrings { table, bundle_cache: RefCell::new(BTreeMap::new()) })
+    }
+}
+
+impl LocalizedStrings {
     /// Formats the localized string for the given language using Fluent. In the
     /// event of an error, a descriptive error code is returned instead.
     ///
@@ -42,22 +71,17 @@ impl LocalizedStringSet {
     /// - ERR6: Fluent Formatting Error: Overriding {kind} id={id}
     /// - ERR7: Fluent Parser Error: {parser_error}
     /// - ERR8: Fluent Resolver Error: {resolver_error}
-    pub fn format_pattern(&self, language: LanguageId, args: FluentArgs) -> String {
-        {
-            let mut cache = self.bundle_cache.borrow_mut();
-            match cache.entry(language) {
-                Entry::Occupied(_) => {}
-                Entry::Vacant(v) => {
-                    let ftl = match language {
-                        LanguageId::English => format!("m = {}", self.english),
-                    };
-                    let res = match FluentResource::try_new(ftl) {
-                        Ok(r) => Rc::new(r),
-                        Err(_) => return "ERR1: Invalid Resource".to_string(),
-                    };
-                    v.insert(res);
-                }
+    pub fn format_pattern(&self, language: LanguageId, id: StringId, args: FluentArgs) -> String {
+        if !self.bundle_cache.borrow().contains_key(&language) {
+            let mut ftl = String::new();
+            for row in &self.table.0 {
+                ftl.push_str(&format!("{} = {}\n", row.name, row.english));
             }
+            let res = match FluentResource::try_new(ftl) {
+                Ok(r) => Rc::new(r),
+                Err(_) => return "ERR1: Invalid Resource".to_string(),
+            };
+            self.bundle_cache.borrow_mut().insert(language, res);
         }
         let res = match self.bundle_cache.borrow().get(&language) {
             Some(r) => r.clone(),
@@ -67,7 +91,11 @@ impl LocalizedStringSet {
         if bundle.add_resource(res.as_ref()).is_err() {
             return "ERR3: Add Resource Failed".to_string();
         }
-        let msg = match bundle.get_message("m") {
+        let key = match self.table.get_optional(id) {
+            Some(row) => row.name.clone(),
+            None => return "ERR4: Missing Message".to_string(),
+        };
+        let msg = match bundle.get_message(&key) {
             Some(m) => m,
             None => return "ERR4: Missing Message".to_string(),
         };
@@ -97,35 +125,4 @@ fn format_error_details(errors: &[FluentError]) -> String {
         }
     }
     if parts.is_empty() { "ERR6: Fluent Formatting Error".to_string() } else { parts.join(" | ") }
-}
-
-impl Clone for LocalizedStringSet {
-    fn clone(&self) -> Self {
-        Self {
-            id: self.id,
-            name: self.name.clone(),
-            description: self.description.clone(),
-            english: self.english.clone(),
-            bundle_cache: RefCell::new(BTreeMap::new()),
-        }
-    }
-}
-
-impl fmt::Debug for LocalizedStringSet {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("LocalizedStringSet")
-            .field("id", &self.id)
-            .field("name", &self.name)
-            .field("description", &self.description)
-            .field("english", &self.english)
-            .finish()
-    }
-}
-
-impl HasId<StringId> for LocalizedStringSet {
-    type Id = StringId;
-
-    fn id(&self) -> StringId {
-        self.id
-    }
 }
