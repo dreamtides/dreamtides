@@ -23,7 +23,13 @@ pub struct Args {
     #[arg(long, value_name = "SPREADSHEET_ID", help = "Google Sheets spreadsheet ID")]
     spreadsheet_id: String,
     #[arg(long, value_name = "PATH", help = "Generate string_id.rs at the given path and exit")]
-    generate: Option<String>,
+    string_ids: Option<String>,
+    #[arg(
+        long,
+        value_name = "PATH",
+        help = "Write Tabula as pretty-printed JSON to the given path"
+    )]
+    write_json: Option<String>,
 }
 
 #[tokio::main]
@@ -31,7 +37,7 @@ async fn main() -> Result<()> {
     let args = Args::parse();
 
     let file = File::open(&args.key_file)
-        .with_context(|| format!("failed to open key file at {}", args.key_file))?;
+        .with_context(|| format!("failed to open key file at {path}", path = args.key_file))?;
     let reader = BufReader::new(file);
     let sa_key: ServiceAccountKey =
         serde_json::from_reader(reader).context("failed to parse service account key JSON")?;
@@ -44,7 +50,7 @@ async fn main() -> Result<()> {
     let builder = HttpsConnectorBuilder::new();
     let builder = builder
         .with_native_roots()
-        .map_err(|e| anyhow::anyhow!("failed to load native TLS roots: {}", e))?;
+        .map_err(|e| anyhow::anyhow!("failed to load native TLS roots: {e}"))?;
     let https = builder.https_or_http().enable_http1().enable_http2().build();
     let client = Client::builder(TokioExecutor::new()).build(https);
 
@@ -53,8 +59,17 @@ async fn main() -> Result<()> {
     let tables = spreadsheet.read_all_tables().await?;
     let tabula = tabula_sync::sync(tables)?;
 
-    if let Some(path) = args.generate.as_deref() {
+    if let Some(path) = args.string_ids.as_deref() {
         tabula_codegen::generate_string_ids(&tabula, path)?;
+    }
+
+    if let Some(path) = args.write_json.as_deref() {
+        serde_json::to_writer_pretty(
+            File::create(path)
+                .with_context(|| format!("failed to create JSON output file at {path}"))?,
+            &tabula,
+        )
+        .context("failed to serialize Tabula to JSON")?;
     }
 
     let uuid = uuid!("211e9d51-07ed-4261-88ce-fbfeb3390449");
