@@ -9,20 +9,33 @@ use uuid::Uuid;
 
 use crate::tabula_table::{HasId, Table};
 
+/// A string identifier.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, Eq, PartialEq, Hash)]
 pub struct StringId(pub Uuid);
 
+/// A localized string with arguments.
+///
+/// Can be rendered to an appropriate target language using
+/// [`LocalizedStrings::format_localized_string`].
+pub struct LocalizedString {
+    pub id: StringId,
+    pub args: FluentArgs<'static>,
+}
+
+/// A language identifier.
 #[derive(Debug, Clone, Copy, Ord, PartialOrd, Eq, PartialEq)]
 pub enum LanguageId {
     English,
 }
 
+/// A collection of localized strings.
 #[derive(Clone, Debug)]
 pub struct LocalizedStrings {
     pub table: Table<StringId, LocalizedStringSet>,
     pub bundle_cache: RefCell<BTreeMap<LanguageId, Rc<FluentResource>>>,
 }
 
+/// A set of localizations for a given string.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LocalizedStringSet {
     pub id: StringId,
@@ -71,7 +84,7 @@ impl LocalizedStrings {
     /// - ERR6: Fluent Formatting Error: Overriding {kind} id={id}
     /// - ERR7: Fluent Parser Error: {parser_error}
     /// - ERR8: Fluent Resolver Error: {resolver_error}
-    pub fn format_pattern(&self, language: LanguageId, id: StringId, args: FluentArgs) -> String {
+    pub fn format_pattern(&self, language: LanguageId, id: StringId, args: &FluentArgs) -> String {
         if !self.bundle_cache.borrow().contains_key(&language) {
             let mut ftl = String::new();
             for row in &self.table.0 {
@@ -108,8 +121,20 @@ impl LocalizedStrings {
             None => return "ERR5: Missing Value".to_string(),
         };
         let mut errors = vec![];
-        let out = bundle.format_pattern(pattern, Some(&args), &mut errors).into_owned();
+        let out = bundle.format_pattern(pattern, Some(args), &mut errors).into_owned();
         if errors.is_empty() { out } else { format_error_details(&errors) }
+    }
+
+    /// Formats the localized string for the given language using Fluent. In the
+    /// event of an error, a descriptive error code is returned instead.
+    ///
+    /// See [`Self::format_pattern`] for more details.
+    pub fn format_localized_string(
+        &self,
+        language: LanguageId,
+        string: &LocalizedString,
+    ) -> String {
+        self.format_pattern(language, string.id, &string.args)
     }
 }
 

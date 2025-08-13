@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::localized_string_set::LocalizedStrings;
+use crate::localized_strings::LocalizedStrings;
 
 /// Tabula is a read-only database of game data and rules information.
 ///
