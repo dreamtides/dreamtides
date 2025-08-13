@@ -28,3 +28,4 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 tokio = { workspace = true }
 yup-oauth2 = { workspace = true }
+tracing = { workspace = true }

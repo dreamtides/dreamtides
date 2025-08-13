@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::localized_string::LocalizedStringSet;
+use crate::tabula_primitives::TabulaInt;
 
 /// Tabula is a read-only database of game data and rules information.
 ///
@@ -16,5 +17,10 @@ use crate::localized_string::LocalizedStringSet;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Tabula {
     pub strings: Vec<LocalizedStringSet>,
-    pub integers: Vec<u32>,
+    pub integers: Vec<MyInteger>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MyInteger {
+    pub value: TabulaInt,
 }

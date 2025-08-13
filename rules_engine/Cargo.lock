@@ -2783,6 +2783,7 @@ dependencies = [
  "schemars 1.0.2",
  "serde",
  "strum",
+ "uuid",
 ]
 
 [[package]]
@@ -2797,6 +2798,7 @@ dependencies = [
  "serde_json",
  "tabula",
  "tokio",
+ "tracing",
  "yup-oauth2 12.1.0",
 ]
 

@@ -1,13 +1,13 @@
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct StringId(pub usize);
-
-#[derive(Debug, Clone, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq)]
-pub struct LanguageCode(pub String);
+pub struct StringId(pub Uuid);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LocalizedStringSet {
     pub id: StringId,
+    pub name: String,
+    pub description: String,
     pub english: String,
 }

@@ -279,6 +279,13 @@ fn values_to_table(name: String, values: Vec<Vec<Value>>) -> SheetTable {
             let cell = row.get(col_idx).cloned().unwrap_or(Value::Null);
             map.insert(key.clone(), SheetValue { data: cell });
         }
+        if map.values().all(|sv| match &sv.data {
+            Value::Null => true,
+            Value::String(s) => s.trim().is_empty(),
+            _ => false,
+        }) {
+            continue;
+        }
         rows_out.push(SheetRow { values: map });
     }
     SheetTable { name, rows: rows_out }

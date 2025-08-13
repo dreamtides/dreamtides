@@ -18,3 +18,4 @@ core_data = { path = "../core_data" }
 schemars = { workspace = true }
 serde = { workspace = true }
 strum = { workspace = true }
+uuid = { workspace = true }
