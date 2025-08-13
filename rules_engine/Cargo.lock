@@ -378,6 +378,7 @@ dependencies = [
  "core_data",
  "enum-iterator",
  "enumset",
+ "fluent",
  "quest_state",
  "rand 0.9.0",
  "rand_xoshiro",
@@ -385,6 +386,7 @@ dependencies = [
  "serde",
  "strum",
  "strum_macros",
+ "tabula_ids",
  "uuid",
 ]
 
@@ -2915,6 +2917,7 @@ dependencies = [
 name = "tabula_ids"
 version = "0.0.0"
 dependencies = [
+ "tabula",
  "uuid",
 ]
 

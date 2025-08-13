@@ -13,15 +13,6 @@ use crate::tabula_table::{HasId, Table};
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, Eq, PartialEq, Hash)]
 pub struct StringId(pub Uuid);
 
-/// A localized string with arguments.
-///
-/// Can be rendered to an appropriate target language using
-/// [`LocalizedStrings::format_localized_string`].
-pub struct LocalizedString {
-    pub id: StringId,
-    pub args: FluentArgs<'static>,
-}
-
 /// A language identifier.
 #[derive(Debug, Clone, Copy, Ord, PartialOrd, Eq, PartialEq)]
 pub enum LanguageId {
@@ -123,18 +114,6 @@ impl LocalizedStrings {
         let mut errors = vec![];
         let out = bundle.format_pattern(pattern, Some(args), &mut errors).into_owned();
         if errors.is_empty() { out } else { format_error_details(&errors) }
-    }
-
-    /// Formats the localized string for the given language using Fluent. In the
-    /// event of an error, a descriptive error code is returned instead.
-    ///
-    /// See [`Self::format_pattern`] for more details.
-    pub fn format_localized_string(
-        &self,
-        language: LanguageId,
-        string: &LocalizedString,
-    ) -> String {
-        self.format_pattern(language, string.id, &string.args)
     }
 }
 

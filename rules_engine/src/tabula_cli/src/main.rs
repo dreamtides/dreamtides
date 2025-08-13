@@ -3,16 +3,13 @@ use std::io::BufReader;
 
 use anyhow::{Context, Result};
 use clap::Parser;
-use fluent::fluent_args;
 use google_sheets4::Sheets;
 use google_sheets4::yup_oauth2::{ServiceAccountAuthenticator, ServiceAccountKey};
 use hyper_util::client::legacy::Client;
 use hyper_util::rt::TokioExecutor;
-use tabula::localized_strings::{LanguageId, LocalizedString, StringId};
 use tabula_cli::google_sheet::GoogleSheet;
 use tabula_cli::spreadsheet::Spreadsheet;
 use tabula_cli::{tabula_codegen, tabula_sync};
-use uuid::uuid;
 use yup_oauth2::hyper_rustls::HttpsConnectorBuilder;
 
 #[derive(Parser, Debug)]
@@ -71,11 +68,6 @@ async fn main() -> Result<()> {
         )
         .context("failed to serialize Tabula to JSON")?;
     }
-
-    let uuid = uuid!("211e9d51-07ed-4261-88ce-fbfeb3390449");
-    let localized = LocalizedString { id: StringId(uuid), args: fluent_args!("energy" => 2) };
-    let formatted = tabula.strings.format_localized_string(LanguageId::English, &localized);
-    println!("formatted: {formatted}");
 
     Ok(())
 }

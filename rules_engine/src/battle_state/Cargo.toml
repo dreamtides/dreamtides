@@ -16,11 +16,13 @@ ability_data = { path = "../ability_data" }
 ai_data = { path = "../ai_data" }
 core_data = { path = "../core_data" }
 quest_state = { path = "../quest_state" }
+tabula_ids = { path = "../tabula_ids" }
 
 bit-set = { workspace = true }
 bit-vec = { workspace = true }
 enum-iterator = { workspace = true }
 enumset = { workspace = true }
+fluent = { workspace = true }
 rand = { workspace = true }
 rand_xoshiro = { workspace = true }
 schemars = { workspace = true }
