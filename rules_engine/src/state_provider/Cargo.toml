@@ -14,7 +14,10 @@ battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 database = { path = "../database" }
 display_data = { path = "../display_data" }
+tabula = { path = "../tabula" }
 
+serde = { workspace = true }
+serde_json = { workspace = true }
 uuid = { workspace = true }
 
 [lints]

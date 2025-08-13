@@ -61,8 +61,8 @@ where
     ForestLayer::new(PrettyPrinter::new(), tag_parser).with_filter(env_filter)
 }
 
-/// Returns the path to the developer mode log file directory.
-pub fn get_developer_mode_log_directory() -> Result<PathBuf, String> {
+/// Returns the path to the developer mode project directory.
+pub fn get_developer_mode_project_directory() -> Result<PathBuf, String> {
     let manifest_dir = env!("CARGO_MANIFEST_DIR");
     let manifest_path = PathBuf::from(manifest_dir);
 

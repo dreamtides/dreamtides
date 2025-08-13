@@ -1,10 +1,13 @@
 use std::collections::HashMap;
+use std::fs::File;
 use std::sync::{Arc, Mutex};
 use std::time::Instant;
 
 use battle_state::battle::battle_state::RequestContext;
 use core_data::identifiers::UserId;
 use database::database::DatabaseError;
+use serde_json;
+use tabula::tabula::Tabula;
 use uuid::Uuid;
 
 use crate::display_state_provider::{DisplayState, DisplayStateProvider};
@@ -24,6 +27,7 @@ struct TestStateProviderInner {
     processing_users: Mutex<HashMap<UserId, bool>>,
     pending_updates: Mutex<HashMap<UserId, Vec<PollResult>>>,
     display_states: Mutex<HashMap<UserId, DisplayState>>,
+    tabula: Mutex<Option<Tabula>>,
 }
 
 impl TestStateProvider {
@@ -37,6 +41,7 @@ impl TestStateProvider {
                 processing_users: Mutex::new(HashMap::new()),
                 pending_updates: Mutex::new(HashMap::new()),
                 display_states: Mutex::new(HashMap::new()),
+                tabula: Mutex::new(None),
             }),
         }
     }
@@ -51,19 +56,38 @@ impl Default for TestStateProvider {
 impl StateProvider for TestStateProvider {
     type DatabaseImpl = TestDatabase;
 
-    fn initialize_database(&self, path: &str) -> Result<Self::DatabaseImpl, DatabaseError> {
+    fn initialize(
+        &self,
+        persistent_data_path: &str,
+        streaming_assets_path: &str,
+    ) -> Result<Self::DatabaseImpl, DatabaseError> {
+        let tabula_path = format!("{streaming_assets_path}/tabula.json");
+        let tabula = File::open(&tabula_path)
+            .ok()
+            .and_then(|file| serde_json::from_reader::<_, Tabula>(file).ok())
+            .or_else(|| {
+                std::fs::File::open("tabula.json")
+                    .ok()
+                    .and_then(|file| serde_json::from_reader::<_, Tabula>(file).ok())
+            })
+            .ok_or(DatabaseError("Failed to load tabula.json".to_string()))?;
+
+        if let Ok(mut guard) = self.inner.tabula.lock() {
+            *guard = Some(tabula);
+        }
+
         let mut databases = self
             .inner
             .databases
             .lock()
             .map_err(|e| DatabaseError(format!("Failed to acquire lock: {e}")))?;
 
-        if let Some(existing_db) = databases.get(path) {
+        if let Some(existing_db) = databases.get(persistent_data_path) {
             Ok(existing_db.clone())
         } else {
             let db = TestDatabase::new();
-            databases.insert(path.to_string(), db.clone());
-            Ok(databases.get(path).unwrap().clone())
+            databases.insert(persistent_data_path.to_string(), db.clone());
+            Ok(databases.get(persistent_data_path).unwrap().clone())
         }
     }
 
@@ -177,6 +201,14 @@ impl StateProvider for TestStateProvider {
             }
         }
         None
+    }
+
+    fn get_tabula(&self) -> Tabula {
+        if let Ok(guard) = self.inner.tabula.lock() {
+            guard.clone().unwrap_or_else(|| panic!("Tabula not initialized"))
+        } else {
+            panic!("Failed to acquire lock")
+        }
     }
 }
 

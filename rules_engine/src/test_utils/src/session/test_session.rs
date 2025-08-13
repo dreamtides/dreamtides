@@ -71,12 +71,20 @@ impl TestSession {
 
     /// Connects to the rules engine with a specific opponent configuration.
     pub fn connect_with_opponent(&mut self, opponent: Option<PlayerType>) -> ConnectResponse {
+        let project_directory = logging::get_developer_mode_project_directory()
+            .expect("Failed to get project directory");
+        let streaming_assets_path = project_directory.join("client/Assets/StreamingAssets");
+
         let response = engine::connect_with_provider(
             self.state_provider.clone(),
             &ConnectRequest {
                 metadata: self.metadata(),
                 persistent_data_path: "".to_string(),
-                streaming_assets_path: "".to_string(),
+                streaming_assets_path: streaming_assets_path
+                    .canonicalize()
+                    .expect("Failed to canonicalize path")
+                    .to_string_lossy()
+                    .to_string(),
                 vs_opponent: None,
                 display_properties: None,
                 debug_configuration: Some(DebugConfiguration {
@@ -102,7 +110,11 @@ impl TestSession {
                 &ConnectRequest {
                     metadata: self.enemy_metadata(),
                     persistent_data_path: "".to_string(),
-                    streaming_assets_path: "".to_string(),
+                    streaming_assets_path: streaming_assets_path
+                        .canonicalize()
+                        .expect("Failed to canonicalize path")
+                        .to_string_lossy()
+                        .to_string(),
                     vs_opponent: Some(self.user_id),
                     display_properties: None,
                     debug_configuration: None,

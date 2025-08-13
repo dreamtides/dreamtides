@@ -78,7 +78,7 @@ async fn connect(body: String) -> AppResult<Json<ConnectResponse>> {
     let user_id = req.metadata.user_id;
 
     info!(?user_id, "Got connect request");
-    let log_directory = match logging::get_developer_mode_log_directory() {
+    let log_directory = match logging::get_developer_mode_project_directory() {
         Ok(directory) => directory,
         Err(e) => {
             error!(error.message = %e, "Failed to get log directory");
@@ -139,7 +139,7 @@ async fn log(body: String) -> AppResult<StatusCode> {
 
 #[tokio::main]
 async fn main() {
-    let log_directory = match logging::get_developer_mode_log_directory() {
+    let log_directory = match logging::get_developer_mode_project_directory() {
         Ok(directory) => directory,
         Err(e) => {
             panic!("Failed to get log directory: {e}");

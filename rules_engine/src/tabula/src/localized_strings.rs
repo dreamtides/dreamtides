@@ -1,6 +1,6 @@
 use std::cell::RefCell;
 use std::collections::BTreeMap;
-use std::rc::Rc;
+use std::sync::Arc;
 
 use fluent::FluentBundle;
 use fluent_bundle::{FluentArgs, FluentError, FluentResource};
@@ -32,7 +32,7 @@ pub enum LanguageId {
 #[derive(Clone, Debug)]
 pub struct LocalizedStrings {
     pub table: Table<StringId, LocalizedStringSet>,
-    pub bundle_cache: RefCell<BTreeMap<LanguageId, Rc<FluentResource>>>,
+    pub bundle_cache: RefCell<BTreeMap<LanguageId, Arc<FluentResource>>>,
 }
 
 /// A set of localizations for a given string.
@@ -95,7 +95,7 @@ impl LocalizedStrings {
                 ));
             }
             let res = match FluentResource::try_new(ftl) {
-                Ok(r) => Rc::new(r),
+                Ok(r) => Arc::new(r),
                 Err(_) => return "ERR1: Invalid Resource".to_string(),
             };
             self.bundle_cache.borrow_mut().insert(language, res);

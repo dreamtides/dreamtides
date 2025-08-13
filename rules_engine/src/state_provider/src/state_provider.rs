@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fs::File;
 use std::panic::{RefUnwindSafe, UnwindSafe};
 use std::path::PathBuf;
 use std::sync::{LazyLock, Mutex};
@@ -10,6 +11,8 @@ use database::database::{Database, DatabaseError};
 use database::sqlite_database::{self, SqliteDatabase};
 use display_data::command::CommandSequence;
 use display_data::request_data::{PollResponseType, RequestId};
+use serde_json;
+use tabula::tabula::Tabula;
 use uuid::Uuid;
 
 use crate::display_state_provider::{DisplayState, DisplayStateProvider};
@@ -26,7 +29,11 @@ pub trait StateProvider:
 {
     type DatabaseImpl: Database;
 
-    fn initialize_database(&self, path: &str) -> Result<Self::DatabaseImpl, DatabaseError>;
+    fn initialize(
+        &self,
+        persistent_data_path: &str,
+        streaming_assets_path: &str,
+    ) -> Result<Self::DatabaseImpl, DatabaseError>;
 
     fn get_database(&self) -> Result<Self::DatabaseImpl, DatabaseError>;
 
@@ -55,6 +62,8 @@ pub trait StateProvider:
     fn should_panic_on_error(&self) -> bool {
         false
     }
+
+    fn get_tabula(&self) -> Tabula;
 }
 
 static REQUEST_CONTEXTS: LazyLock<Mutex<HashMap<UserId, RequestContext>>> =
@@ -75,14 +84,28 @@ static PENDING_UPDATES: LazyLock<Mutex<HashMap<UserId, Vec<PollResult>>>> =
 static DISPLAY_STATES: LazyLock<Mutex<HashMap<UserId, DisplayState>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
+static TABULA_DATA: LazyLock<Mutex<Option<Tabula>>> = LazyLock::new(|| Mutex::new(None));
+
 #[derive(Clone)]
 pub struct DefaultStateProvider;
 
 impl StateProvider for DefaultStateProvider {
     type DatabaseImpl = SqliteDatabase;
 
-    fn initialize_database(&self, path: &str) -> Result<Self::DatabaseImpl, DatabaseError> {
-        sqlite_database::initialize(PathBuf::from(path))
+    fn initialize(
+        &self,
+        persistent_data_path: &str,
+        streaming_assets_path: &str,
+    ) -> Result<Self::DatabaseImpl, DatabaseError> {
+        let db = sqlite_database::initialize(PathBuf::from(persistent_data_path))?;
+        let tabula_path = format!("{streaming_assets_path}/tabula.json");
+        let tabula = File::open(&tabula_path)
+            .ok()
+            .and_then(|file| serde_json::from_reader::<_, Tabula>(file).ok())
+            .ok_or(DatabaseError("Failed to load tabula.json".to_string()))?;
+        let mut guard = TABULA_DATA.lock().unwrap();
+        *guard = Some(tabula);
+        Ok(db)
     }
 
     fn get_database(&self) -> Result<Self::DatabaseImpl, DatabaseError> {
@@ -164,6 +187,11 @@ impl StateProvider for DefaultStateProvider {
             }
         }
         None
+    }
+
+    fn get_tabula(&self) -> Tabula {
+        let guard = TABULA_DATA.lock().unwrap();
+        guard.clone().unwrap_or_else(|| panic!("Tabula not initialized"))
     }
 }
 

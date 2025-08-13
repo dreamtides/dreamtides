@@ -213,13 +213,14 @@ fn connect_internal(
 ) -> CommandSequence {
     let user_id = request.metadata.user_id;
     let persistent_data_path = &request.persistent_data_path;
+    let streaming_assets_path = &request.streaming_assets_path;
     write_tracing_event::clear_log_file(&request_context);
 
     if let Some(ref display_props) = request.display_properties {
         display_properties::store_display_properties(user_id, display_props.clone());
     }
 
-    let database = match provider.initialize_database(persistent_data_path) {
+    let database = match provider.initialize(persistent_data_path, streaming_assets_path) {
         Ok(db) => db,
         Err(error) => return error_message::display_error_message(None, error.to_string()),
     };

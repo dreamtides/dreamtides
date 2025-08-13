@@ -2361,6 +2361,7 @@ dependencies = [
  "rand 0.9.0",
  "serde_json",
  "state_provider",
+ "tabula",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -2794,6 +2795,9 @@ dependencies = [
  "core_data",
  "database",
  "display_data",
+ "serde",
+ "serde_json",
+ "tabula",
  "uuid",
 ]
 
