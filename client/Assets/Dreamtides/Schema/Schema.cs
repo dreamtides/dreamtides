@@ -112,6 +112,18 @@ namespace Dreamtides.Schema
         public string PersistentDataPath { get; set; }
 
         /// <summary>
+        /// Contains the path to the streaming assets directory.
+        ///
+        /// This is used to load assets that are bundled with the game, such as JSON
+        /// data.
+        ///
+        /// NOTE: On Android, this will return a URL and cannot be accessed via
+        /// direct file system APIs.
+        /// </summary>
+        [JsonProperty("streaming_assets_path", Required = Required.Always)]
+        public string StreamingAssetsPath { get; set; }
+
+        /// <summary>
         /// If specified, treats this as a multiplayer game using the save file
         /// provided in this ID and adds this user as a player in the battle.
         /// </summary>

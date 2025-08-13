@@ -40,6 +40,15 @@ pub struct ConnectRequest {
     /// keeps accessing the same location on every update.
     pub persistent_data_path: String,
 
+    /// Contains the path to the streaming assets directory.
+    ///
+    /// This is used to load assets that are bundled with the game, such as JSON
+    /// data.
+    ///
+    /// NOTE: On Android, this will return a URL and cannot be accessed via
+    /// direct file system APIs.
+    pub streaming_assets_path: String,
+
     /// If specified, treats this as a multiplayer game using the save file
     /// provided in this ID and adds this user as a player in the battle.
     pub vs_opponent: Option<UserId>,

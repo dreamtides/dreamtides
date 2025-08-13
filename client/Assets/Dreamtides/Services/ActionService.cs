@@ -259,6 +259,7 @@ namespace Dreamtides.Services
       {
         Metadata = Errors.CheckNotNull(_metadata),
         PersistentDataPath = Application.persistentDataPath,
+        StreamingAssetsPath = Application.streamingAssetsPath,
         DisplayProperties = GetDisplayProperties(),
         VsOpponent = IsEnemyTestClient ? _userGuid : null,
         DebugConfiguration = _integrationTestId == null ? null : new DebugConfiguration

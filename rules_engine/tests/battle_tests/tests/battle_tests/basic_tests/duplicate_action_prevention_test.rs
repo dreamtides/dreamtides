@@ -150,6 +150,7 @@ fn response_version_tracking_in_poll() {
             integration_test_id: None,
         },
         persistent_data_path: "/tmp/test".to_string(),
+        streaming_assets_path: "".to_string(),
         vs_opponent: None,
         display_properties: None,
         debug_configuration: None,

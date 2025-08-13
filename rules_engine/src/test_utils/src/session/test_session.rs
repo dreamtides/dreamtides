@@ -76,6 +76,7 @@ impl TestSession {
             &ConnectRequest {
                 metadata: self.metadata(),
                 persistent_data_path: "".to_string(),
+                streaming_assets_path: "".to_string(),
                 vs_opponent: None,
                 display_properties: None,
                 debug_configuration: Some(DebugConfiguration {
@@ -101,6 +102,7 @@ impl TestSession {
                 &ConnectRequest {
                     metadata: self.enemy_metadata(),
                     persistent_data_path: "".to_string(),
+                    streaming_assets_path: "".to_string(),
                     vs_opponent: Some(self.user_id),
                     display_properties: None,
                     debug_configuration: None,
