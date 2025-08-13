@@ -4,46 +4,26 @@ use anyhow::Result;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use serde_json::{Map, Value};
-use tabula::localized_string::LocalizedStringSet;
-use tabula::tabula::{MyInteger, Tabula};
-use tracing::error;
+use tabula::tabula::Tabula;
 
 use crate::spreadsheet::{SheetRow, SheetTable, SheetValue, Spreadsheet};
 
 /// Builds the canonical [Tabula] data structure from a list of [SheetTable]s.
 pub fn sync(sheets: Vec<SheetTable>) -> Result<Tabula> {
-    let mut strings: Vec<LocalizedStringSet> = Vec::new();
-    let mut integers: Vec<MyInteger> = Vec::new();
+    let mut outer = Map::new();
     for table in sheets {
-        match table.name.as_str() {
-            "strings" => {
-                for row in table.rows {
-                    let mut obj = Map::new();
-                    for (k, v) in row.values {
-                        obj.insert(k, v.data);
-                    }
-                    match serde_json::from_value::<LocalizedStringSet>(Value::Object(obj.clone())) {
-                        Ok(value) => strings.push(value),
-                        Err(_) => error!("Error parsing row: {obj:?}"),
-                    }
-                }
+        let mut rows: Vec<Value> = Vec::with_capacity(table.rows.len());
+        for row in table.rows {
+            let mut obj = Map::new();
+            for (k, v) in row.values {
+                obj.insert(k, v.data);
             }
-            "integers" => {
-                for row in table.rows {
-                    let mut obj = Map::new();
-                    for (k, v) in row.values {
-                        obj.insert(k, v.data);
-                    }
-                    match serde_json::from_value::<MyInteger>(Value::Object(obj.clone())) {
-                        Ok(value) => integers.push(value),
-                        Err(_) => error!("Error parsing row: {obj:?}"),
-                    }
-                }
-            }
-            _ => {}
+            rows.push(Value::Object(obj));
         }
+        outer.insert(table.name, Value::Array(rows));
     }
-    Ok(Tabula { strings, integers })
+    let tabula: Tabula = serde_json::from_value(Value::Object(outer))?;
+    Ok(tabula)
 }
 
 /// Writes a list of structs to a spreadsheet as a table.

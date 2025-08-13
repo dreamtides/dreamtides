@@ -2782,7 +2782,9 @@ dependencies = [
  "core_data",
  "schemars 1.0.2",
  "serde",
+ "serde_json",
  "strum",
+ "tracing",
  "uuid",
 ]
 
