@@ -2795,6 +2795,7 @@ dependencies = [
  "hyper-util",
  "serde",
  "serde_json",
+ "tabula",
  "tokio",
  "yup-oauth2 12.1.0",
 ]

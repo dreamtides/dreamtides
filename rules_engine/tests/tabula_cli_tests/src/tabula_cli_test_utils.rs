@@ -1,9 +1,9 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use anyhow::Result;
 use parking_lot::RwLock;
 use serde_json::Value;
-use tabula_cli::spreadsheet::{SheetColumn, SheetTable, SheetValue, Spreadsheet};
+use tabula_cli::spreadsheet::{SheetRow, SheetTable, SheetValue, Spreadsheet};
 
 #[derive(Default)]
 pub struct FakeSpreadsheet {
@@ -58,49 +58,57 @@ impl Spreadsheet for FakeSpreadsheet {
     async fn read_table(&self, name: &str) -> Result<SheetTable> {
         let guard = self.sheets.read();
         let Some(rows) = guard.get(name) else {
-            return Ok(SheetTable { name: name.to_string(), columns: vec![] });
+            return Ok(SheetTable { name: name.to_string(), rows: vec![] });
         };
         if rows.is_empty() {
-            return Ok(SheetTable { name: name.to_string(), columns: vec![] });
+            return Ok(SheetTable { name: name.to_string(), rows: vec![] });
         }
         let headers: Vec<String> = rows[0].clone();
-        let mut columns: Vec<SheetColumn> =
-            headers.into_iter().map(|h| SheetColumn { name: h, values: Vec::new() }).collect();
+        let mut out_rows: Vec<SheetRow> = Vec::new();
         for r in rows.iter().skip(1) {
-            for (i, col) in columns.iter_mut().enumerate() {
+            let mut map: BTreeMap<String, SheetValue> = BTreeMap::new();
+            for (i, key) in headers.iter().enumerate() {
                 let v = r.get(i).cloned().unwrap_or_default();
-                col.values.push(SheetValue { data: Value::String(v) });
+                map.insert(key.clone(), SheetValue { data: Value::String(v) });
             }
+            out_rows.push(SheetRow { values: map });
         }
-        Ok(SheetTable { name: name.to_string(), columns })
+        Ok(SheetTable { name: name.to_string(), rows: out_rows })
     }
 
     async fn write_table(&self, table: &SheetTable) -> Result<()> {
         let mut rows: Vec<Vec<String>> = Vec::new();
-        let header: Vec<String> = table.columns.iter().map(|c| c.name.clone()).collect();
+        let mut keys: Vec<String> =
+            table.rows.iter().flat_map(|r| r.values.keys().cloned()).collect();
+        keys.sort();
+        keys.dedup();
+        let header: Vec<String> = if keys.is_empty() { vec![String::new()] } else { keys.clone() };
         rows.push(header);
-        let max_rows = table.columns.iter().map(|c| c.values.len()).max().unwrap_or(0);
-        for i in 0..max_rows {
-            let mut r: Vec<String> = Vec::with_capacity(table.columns.len());
-            for col in table.columns.iter() {
-                let v = col
-                    .values
-                    .get(i)
-                    .map(|sv| match &sv.data {
-                        Value::String(s) => s.clone(),
-                        Value::Number(n) => n.to_string(),
-                        Value::Bool(b) => {
-                            if *b {
-                                "true".to_string()
-                            } else {
-                                "false".to_string()
+        for row in table.rows.iter() {
+            let mut r: Vec<String> = Vec::with_capacity(keys.len().max(1));
+            if keys.is_empty() {
+                r.push(String::new());
+            } else {
+                for k in keys.iter() {
+                    let v = row
+                        .values
+                        .get(k)
+                        .map(|sv| match &sv.data {
+                            Value::String(s) => s.clone(),
+                            Value::Number(n) => n.to_string(),
+                            Value::Bool(b) => {
+                                if *b {
+                                    "true".to_string()
+                                } else {
+                                    "false".to_string()
+                                }
                             }
-                        }
-                        Value::Null => String::new(),
-                        other => other.to_string(),
-                    })
-                    .unwrap_or_default();
-                r.push(v);
+                            Value::Null => String::new(),
+                            other => other.to_string(),
+                        })
+                        .unwrap_or_default();
+                    r.push(v);
+                }
             }
             rows.push(r);
         }
@@ -117,19 +125,20 @@ impl Spreadsheet for FakeSpreadsheet {
         for name in names {
             let Some(rows) = guard.get(&name) else { continue };
             if rows.is_empty() {
-                out.push(SheetTable { name: name.clone(), columns: vec![] });
+                out.push(SheetTable { name: name.clone(), rows: vec![] });
                 continue;
             }
             let headers: Vec<String> = rows[0].clone();
-            let mut columns: Vec<SheetColumn> =
-                headers.into_iter().map(|h| SheetColumn { name: h, values: Vec::new() }).collect();
+            let mut out_rows: Vec<SheetRow> = Vec::new();
             for r in rows.iter().skip(1) {
-                for (i, col) in columns.iter_mut().enumerate() {
+                let mut map: BTreeMap<String, SheetValue> = BTreeMap::new();
+                for (i, key) in headers.iter().enumerate() {
                     let v = r.get(i).cloned().unwrap_or_default();
-                    col.values.push(SheetValue { data: Value::String(v) });
+                    map.insert(key.clone(), SheetValue { data: Value::String(v) });
                 }
+                out_rows.push(SheetRow { values: map });
             }
-            out.push(SheetTable { name: name.clone(), columns });
+            out.push(SheetTable { name: name.clone(), rows: out_rows });
         }
         Ok(out)
     }

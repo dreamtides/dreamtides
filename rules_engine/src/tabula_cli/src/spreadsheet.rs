@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use anyhow::Result;
 use serde_json::Value;
 
@@ -24,16 +26,14 @@ pub trait Spreadsheet {
     fn read_all_tables(&self) -> impl Future<Output = Result<Vec<SheetTable>>> + Send;
 }
 
-/// Represents a single sheet in a spreadsheet.
 pub struct SheetTable {
     pub name: String,
-    pub columns: Vec<SheetColumn>,
+    pub rows: Vec<SheetRow>,
 }
 
-/// Represents a single column in a sheet.
-pub struct SheetColumn {
-    pub name: String,
-    pub values: Vec<SheetValue>,
+/// Represents a single row in a sheet.
+pub struct SheetRow {
+    pub values: BTreeMap<String, SheetValue>,
 }
 
 /// Represents a single value in a column.

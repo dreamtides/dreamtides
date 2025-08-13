@@ -83,16 +83,17 @@ async fn main() -> Result<()> {
         })?;
         let mut outer = serde_json::Map::new();
         for table in tables {
-            let max_rows = table.columns.iter().map(|c| c.values.len()).max().unwrap_or(0);
-            let mut rows: Vec<serde_json::Value> = Vec::with_capacity(max_rows);
-            for i in 0..max_rows {
-                let mut obj = serde_json::Map::new();
-                for col in table.columns.iter() {
-                    let v = col.values.get(i).map(|sv| sv.data.clone()).unwrap_or_default();
-                    obj.insert(col.name.clone(), v);
-                }
-                rows.push(serde_json::Value::Object(obj));
-            }
+            let rows: Vec<serde_json::Value> = table
+                .rows
+                .into_iter()
+                .map(|r| {
+                    let mut obj = serde_json::Map::new();
+                    for (k, v) in r.values {
+                        obj.insert(k, v.data);
+                    }
+                    serde_json::Value::Object(obj)
+                })
+                .collect();
             outer.insert(table.name, serde_json::Value::Array(rows));
         }
         println!("{}", serde_json::to_string_pretty(&serde_json::Value::Object(outer))?);
@@ -125,17 +126,17 @@ async fn main() -> Result<()> {
                     sheet_name, args.spreadsheet_id
                 )
             })?;
-            let max_rows = table.columns.iter().map(|c| c.values.len()).max().unwrap_or(0);
-            let mut rows: Vec<serde_json::Map<String, serde_json::Value>> =
-                Vec::with_capacity(max_rows);
-            for i in 0..max_rows {
-                let mut obj = serde_json::Map::new();
-                for col in table.columns.iter() {
-                    let v = col.values.get(i).map(|sv| sv.data.clone()).unwrap_or_default();
-                    obj.insert(col.name.clone(), v);
-                }
-                rows.push(obj);
-            }
+            let rows: Vec<serde_json::Map<String, serde_json::Value>> = table
+                .rows
+                .into_iter()
+                .map(|r| {
+                    let mut obj = serde_json::Map::new();
+                    for (k, v) in r.values {
+                        obj.insert(k, v.data);
+                    }
+                    obj
+                })
+                .collect();
             println!("{}", serde_json::to_string_pretty(&rows)?);
         }
     }

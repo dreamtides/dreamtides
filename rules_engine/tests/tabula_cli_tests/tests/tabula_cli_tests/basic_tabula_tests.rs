@@ -1,5 +1,7 @@
+use std::collections::BTreeMap;
+
 use serde_json::Value;
-use tabula_cli::spreadsheet::{SheetColumn, SheetTable, SheetValue, Spreadsheet};
+use tabula_cli::spreadsheet::{SheetRow, SheetTable, SheetValue, Spreadsheet};
 use tabula_cli_tests::tabula_cli_test_utils::FakeSpreadsheet;
 
 #[tokio::test]
@@ -19,31 +21,24 @@ async fn read_empty_returns_none() {
 
 #[tokio::test]
 async fn write_and_read_table() {
-    let table = SheetTable {
-        name: "SheetT".to_string(),
-        columns: vec![
-            SheetColumn {
-                name: "Col1".to_string(),
-                values: vec![SheetValue { data: Value::String("x".to_string()) }, SheetValue {
-                    data: Value::String("y".to_string()),
-                }],
-            },
-            SheetColumn {
-                name: "Col2".to_string(),
-                values: vec![SheetValue { data: Value::String("1".to_string()) }, SheetValue {
-                    data: Value::String("2".to_string()),
-                }],
-            },
-        ],
+    let table = {
+        let mut row1 = BTreeMap::new();
+        row1.insert("Col1".to_string(), SheetValue { data: Value::String("x".to_string()) });
+        row1.insert("Col2".to_string(), SheetValue { data: Value::String("1".to_string()) });
+        let mut row2 = BTreeMap::new();
+        row2.insert("Col1".to_string(), SheetValue { data: Value::String("y".to_string()) });
+        row2.insert("Col2".to_string(), SheetValue { data: Value::String("2".to_string()) });
+        SheetTable {
+            name: "SheetT".to_string(),
+            rows: vec![SheetRow { values: row1 }, SheetRow { values: row2 }],
+        }
     };
     let fake = FakeSpreadsheet::default();
     fake.write_table(&table).await.unwrap();
     let round = fake.read_table("SheetT").await.unwrap();
-    assert_eq!(round.columns.len(), 2);
-    assert_eq!(round.columns[0].name, "Col1");
-    assert_eq!(round.columns[1].name, "Col2");
-    assert_eq!(round.columns[0].values[1].data, Value::String("y".to_string()));
-    assert_eq!(round.columns[1].values[1].data, Value::String("2".to_string()));
+    assert_eq!(round.rows.len(), 2);
+    assert_eq!(round.rows[1].values.get("Col1").unwrap().data, Value::String("y".to_string()));
+    assert_eq!(round.rows[1].values.get("Col2").unwrap().data, Value::String("2".to_string()));
 }
 
 #[test]

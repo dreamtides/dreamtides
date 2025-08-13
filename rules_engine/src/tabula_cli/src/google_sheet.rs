@@ -1,11 +1,13 @@
+use std::collections::{BTreeMap, BTreeSet};
+
 use anyhow::Result;
 use google_sheets4::Sheets;
-use google_sheets4::api::{Spreadsheet as GSpreadsheet, ValueRange};
+use google_sheets4::api::{RowData, Spreadsheet as GSpreadsheet, ValueRange};
 use hyper_util::client::legacy::connect::HttpConnector;
 use serde_json::Value;
 use yup_oauth2::hyper_rustls::HttpsConnector;
 
-use crate::spreadsheet::{SheetColumn, SheetTable, SheetValue, Spreadsheet};
+use crate::spreadsheet::{SheetRow, SheetTable, SheetValue, Spreadsheet};
 
 pub struct GoogleSheet {
     sheet_id: String,
@@ -82,21 +84,38 @@ impl Spreadsheet for GoogleSheet {
 
     async fn write_table(&self, table: &SheetTable) -> Result<()> {
         let name = table.name.clone();
-        let columns = &table.columns;
-        let header: Vec<Value> = columns.iter().map(|c| Value::String(c.name.clone())).collect();
-        let max_rows = columns.iter().map(|c| c.values.len()).max().unwrap_or(0);
-        let mut rows: Vec<Vec<Value>> = Vec::with_capacity(max_rows + 1);
-        rows.push(header);
-        for row_idx in 0..max_rows {
-            let mut row: Vec<Value> = Vec::with_capacity(columns.len());
-            for col in columns.iter() {
-                let cell = col.values.get(row_idx).map(|v| v.data.clone()).unwrap_or(Value::Null);
-                row.push(cell);
+        let mut keys: BTreeSet<String> = BTreeSet::new();
+        for row in table.rows.iter() {
+            for k in row.values.keys() {
+                keys.insert(k.clone());
             }
-            rows.push(row);
+        }
+        let header_keys: Vec<String> = keys.into_iter().collect();
+        let header: Vec<Value> = if header_keys.is_empty() {
+            vec![Value::Null]
+        } else {
+            header_keys.iter().map(|k| Value::String(k.clone())).collect()
+        };
+        let mut rows: Vec<Vec<Value>> = Vec::new();
+        rows.push(header);
+        for row in table.rows.iter() {
+            let mut out: Vec<Value> = Vec::with_capacity(header_keys.len().max(1));
+            if header_keys.is_empty() {
+                out.push(Value::Null);
+            } else {
+                for k in header_keys.iter() {
+                    let v = row.values.get(k).map(|sv| sv.data.clone()).unwrap_or(Value::Null);
+                    out.push(v);
+                }
+            }
+            rows.push(out);
         }
         let end_col =
-            number_to_column_letters(if columns.is_empty() { 1 } else { columns.len() as u32 });
+            number_to_column_letters(if rows.first().map(|r| r.len()).unwrap_or(0) == 0 {
+                1
+            } else {
+                rows.first().map(|r| r.len() as u32).unwrap_or(1)
+            });
         let end_row = if rows.is_empty() { 1 } else { rows.len() as u32 };
         let range = format!("{name}!A1:{end_col}{end_row}");
         let value_range = ValueRange { values: Some(rows), ..Default::default() };
@@ -127,7 +146,7 @@ impl Spreadsheet for GoogleSheet {
             let name = sheet.properties.and_then(|p| p.title).unwrap_or_default();
 
             let grid_sets = sheet.data.unwrap_or_default();
-            let mut all_rows: Vec<google_sheets4::api::RowData> = Vec::new();
+            let mut all_rows: Vec<RowData> = Vec::new();
             for grid in grid_sets {
                 let mut rows = grid.row_data.unwrap_or_default();
                 if !rows.is_empty() {
@@ -136,7 +155,7 @@ impl Spreadsheet for GoogleSheet {
             }
 
             if all_rows.is_empty() {
-                tables.push(SheetTable { name, columns: Vec::new() });
+                tables.push(SheetTable { name, rows: Vec::new() });
                 continue;
             }
 
@@ -165,7 +184,7 @@ impl Spreadsheet for GoogleSheet {
                 .collect();
 
             if header_row.is_empty() {
-                tables.push(SheetTable { name, columns: Vec::new() });
+                tables.push(SheetTable { name, rows: Vec::new() });
                 continue;
             }
 
@@ -231,7 +250,7 @@ fn number_to_column_letters(mut number: u32) -> String {
 
 fn values_to_table(name: String, values: Vec<Vec<Value>>) -> SheetTable {
     if values.is_empty() {
-        return SheetTable { name, columns: Vec::new() };
+        return SheetTable { name, rows: Vec::new() };
     }
     let header_cells = values.first().cloned().unwrap_or_default();
     let headers: Vec<String> = header_cells
@@ -251,16 +270,16 @@ fn values_to_table(name: String, values: Vec<Vec<Value>>) -> SheetTable {
         })
         .collect();
     if headers.is_empty() {
-        return SheetTable { name, columns: Vec::new() };
+        return SheetTable { name, rows: Vec::new() };
     }
-    let num_columns = headers.len();
-    let mut columns: Vec<SheetColumn> =
-        headers.into_iter().map(|h| SheetColumn { name: h, values: Vec::new() }).collect();
+    let mut rows_out: Vec<SheetRow> = Vec::new();
     for row in values.into_iter().skip(1) {
-        for (col_idx, column) in columns.iter_mut().enumerate().take(num_columns) {
+        let mut map: BTreeMap<String, SheetValue> = BTreeMap::new();
+        for (col_idx, key) in headers.iter().enumerate() {
             let cell = row.get(col_idx).cloned().unwrap_or(Value::Null);
-            column.values.push(SheetValue { data: cell });
+            map.insert(key.clone(), SheetValue { data: cell });
         }
+        rows_out.push(SheetRow { values: map });
     }
-    SheetTable { name, columns }
+    SheetTable { name, rows: rows_out }
 }

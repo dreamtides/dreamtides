@@ -18,6 +18,8 @@ doctest = false
 bench = false
 
 [dependencies]
+tabula = { path = "../tabula" }
+
 anyhow = { workspace = true }
 clap = { workspace = true }
 google-sheets4 = { workspace = true }

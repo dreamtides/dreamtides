@@ -16,4 +16,5 @@ use crate::localized_string::LocalizedStringSet;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Tabula {
     pub strings: Vec<LocalizedStringSet>,
+    pub integers: Vec<u32>,
 }
