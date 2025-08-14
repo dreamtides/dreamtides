@@ -24,9 +24,12 @@ display_data = { path = "../display_data" }
 logging = { path = "../logging" }
 masonry = { path = "../masonry" }
 state_provider = { path = "../state_provider" }
+tabula = { path = "../tabula" }
+tabula_ids = { path = "../tabula_ids" }
 ui_components = { path = "../ui_components" }
 
 bon = { workspace = true }
+fluent = { workspace = true }
 schemars = { workspace = true }
 serde = { workspace = true }
 strum = { workspace = true }

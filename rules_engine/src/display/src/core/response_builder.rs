@@ -6,7 +6,9 @@ use core_data::identifiers::UserId;
 use core_data::types::PlayerName;
 use display_data::battle_view::{BattleView, DisplayPlayer};
 use display_data::command::{Command, CommandSequence, ParallelCommandGroup, UpdateBattleCommand};
+use fluent::FluentArgs;
 use state_provider::display_state_provider::{DisplayState, DisplayStateProvider};
+use tabula::localized_strings::{LanguageId, StringId};
 
 /// Primary builder used to render game state.
 pub struct ResponseBuilder {
@@ -14,10 +16,10 @@ pub struct ResponseBuilder {
     player: PlayerName,
 
     /// User ID for whom we are rendering
-    user_id: Option<UserId>,
+    user_id: UserId,
 
     /// State provider for managing display state
-    provider: Option<Arc<dyn DisplayStateProvider>>,
+    provider: Arc<dyn DisplayStateProvider>,
 
     /// Whether to animate the commands.
     animate: bool,
@@ -42,19 +44,6 @@ pub struct CurrentlyActivatingAbility {
 }
 
 impl ResponseBuilder {
-    pub fn new(player: PlayerName, animate: bool) -> Self {
-        Self {
-            player,
-            user_id: None,
-            provider: None,
-            animate,
-            commands: CommandSequence::default(),
-            for_animation: false,
-            pending_commands: Vec::new(),
-            active_triggers: Vec::new(),
-        }
-    }
-
     pub fn with_state_provider(
         player: PlayerName,
         user_id: UserId,
@@ -63,8 +52,8 @@ impl ResponseBuilder {
     ) -> Self {
         Self {
             player,
-            user_id: Some(user_id),
-            provider: Some(Arc::new(provider)),
+            user_id,
+            provider: Arc::new(provider),
             animate,
             commands: CommandSequence::default(),
             for_animation: false,
@@ -104,6 +93,22 @@ impl ResponseBuilder {
         self.pending_commands.push(command);
     }
 
+    /// Formats a string for display in the currently selected language with the
+    /// given arguments.
+    pub fn string(&self, string_id: StringId, args: FluentArgs) -> String {
+        self.provider.tabula().strings.format_pattern(LanguageId::English, string_id, &args)
+    }
+
+    /// Formats a string for display in the currently language without any
+    /// arguments.
+    pub fn string_id(&self, string_id: StringId) -> String {
+        self.provider.tabula().strings.format_pattern(
+            LanguageId::English,
+            string_id,
+            &FluentArgs::new(),
+        )
+    }
+
     pub fn should_animate(&self) -> bool {
         self.animate
     }
@@ -133,17 +138,11 @@ impl ResponseBuilder {
     }
 
     pub fn get_display_state(&self) -> DisplayState {
-        if let (Some(provider), Some(user_id)) = (&self.provider, &self.user_id) {
-            provider.get_display_state(*user_id)
-        } else {
-            DisplayState::default()
-        }
+        self.provider.get_display_state(self.user_id)
     }
 
     pub fn set_display_state(&self, state: DisplayState) {
-        if let (Some(provider), Some(user_id)) = (&self.provider, &self.user_id) {
-            provider.set_display_state(*user_id, state);
-        }
+        self.provider.set_display_state(self.user_id, state);
     }
 
     pub fn update_display_state<F>(&self, update_fn: F)

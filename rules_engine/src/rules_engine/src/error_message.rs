@@ -9,6 +9,7 @@ use display::rendering::battle_rendering;
 use display_data::command::{Command, CommandSequence, UpdateBattleCommand};
 use game_creation::new_battle;
 use masonry::flex_enums::{TextAlign, WhiteSpace};
+use state_provider::state_provider::DefaultStateProvider;
 use ui_components::component::Component;
 use ui_components::panel_component::PanelComponent;
 use ui_components::text_component::TextComponent;
@@ -45,7 +46,12 @@ pub fn display_error_message(
 }
 
 fn display_error_message_with_battle(battle: &BattleState, message: String) -> CommandSequence {
-    let mut builder = ResponseBuilder::new(PlayerName::One, false);
+    let mut builder = ResponseBuilder::with_state_provider(
+        PlayerName::One,
+        UserId::default(),
+        DefaultStateProvider,
+        false,
+    );
     let mut view = battle_rendering::battle_view(&builder, battle);
     view.interface.screen_overlay = render_message(message).flex_node();
     builder.push(Command::UpdateBattle(Box::new(UpdateBattleCommand {
