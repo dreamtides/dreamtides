@@ -64,7 +64,7 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
         screen_overlay: overlay,
         primary_action_button: primary_action_button(builder, battle, &legal_actions),
         primary_action_show_on_idle_duration: None,
-        secondary_action_button: secondary_action_button(battle, &legal_actions),
+        secondary_action_button: secondary_action_button(builder, battle, &legal_actions),
         increment_button: increment_button(builder, battle),
         decrement_button: decrement_button(builder, battle),
         dev_button: Some(ButtonView {
@@ -175,7 +175,7 @@ fn primary_action_button(
             panic_with!("Expected prompt for SelectPromptChoice action", battle);
         };
         return Some(ButtonView {
-            label: labels::choice_label(choices[0].label),
+            label: labels::choice_label(builder, choices[0].label),
             action: Some(BattleAction::SelectPromptChoice(0).into()),
         });
     }
@@ -227,6 +227,7 @@ fn primary_action_button(
 }
 
 fn secondary_action_button(
+    builder: &ResponseBuilder,
     battle: &BattleState,
     legal_actions: &LegalActions,
 ) -> Option<ButtonView> {
@@ -235,7 +236,7 @@ fn secondary_action_button(
         && choices.len() > 1
     {
         Some(ButtonView {
-            label: labels::choice_label(choices[1].label),
+            label: labels::choice_label(builder, choices[1].label),
             action: Some(BattleAction::SelectPromptChoice(1).into()),
         })
     } else {
