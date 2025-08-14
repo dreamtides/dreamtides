@@ -3,13 +3,27 @@ use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
 use core_data::identifiers::UserId;
 use display_data::request_data::{ConnectRequest, Metadata, PerformActionRequest};
+use logging;
 use rules_engine::engine;
-use state_provider::state_provider::{DefaultStateProvider, StateProvider};
+use state_provider::state_provider::StateProvider;
+use state_provider::test_state_provider::TestStateProvider;
 use uuid::Uuid;
+
+fn streaming_assets_path() -> String {
+    logging::get_developer_mode_project_directory()
+        .expect("Failed to get project directory")
+        .join("client/Assets/StreamingAssets")
+        .canonicalize()
+        .expect("Failed to canonicalize path")
+        .to_string_lossy()
+        .to_string()
+}
 
 #[test]
 fn duplicate_action_is_ignored() {
-    let provider = DefaultStateProvider;
+    let provider = TestStateProvider::new();
+    let streaming_assets_path = streaming_assets_path();
+    let _ = provider.initialize("/tmp/test", &streaming_assets_path);
     let user_id = UserId(Uuid::new_v4());
 
     // Set a response version
@@ -44,7 +58,9 @@ fn duplicate_action_is_ignored() {
 
 #[test]
 fn concurrent_action_is_ignored() {
-    let provider = DefaultStateProvider;
+    let provider = TestStateProvider::new();
+    let streaming_assets_path = streaming_assets_path();
+    let _ = provider.initialize("/tmp/test", &streaming_assets_path);
     let user_id = UserId(Uuid::new_v4());
 
     // Set a response version
@@ -76,7 +92,9 @@ fn concurrent_action_is_ignored() {
 
 #[test]
 fn action_with_outdated_version_is_ignored() {
-    let provider = DefaultStateProvider;
+    let provider = TestStateProvider::new();
+    let streaming_assets_path = streaming_assets_path();
+    let _ = provider.initialize("/tmp/test", &streaming_assets_path);
     let user_id = UserId(Uuid::new_v4());
 
     // Set a current response version
@@ -110,8 +128,26 @@ fn action_with_outdated_version_is_ignored() {
 
 #[test]
 fn action_without_version_is_processed() {
-    let provider = DefaultStateProvider;
+    let provider = TestStateProvider::new();
+    let streaming_assets_path = streaming_assets_path();
+    let _ = provider.initialize("/tmp/test", &streaming_assets_path);
     let user_id = UserId(Uuid::new_v4());
+    let connect_request = ConnectRequest {
+        metadata: Metadata {
+            user_id,
+            battle_id: None,
+            request_id: None,
+            integration_test_id: None,
+        },
+        persistent_data_path: "/tmp/test".to_string(),
+        streaming_assets_path: streaming_assets_path.clone(),
+        vs_opponent: None,
+        display_properties: None,
+        debug_configuration: None,
+    };
+    let _ = engine::connect_with_provider(provider.clone(), &connect_request, RequestContext {
+        logging_options: LoggingOptions::default(),
+    });
 
     // Create action request without last_response_version (legacy client)
     let request = PerformActionRequest {
@@ -138,7 +174,9 @@ fn action_without_version_is_processed() {
 
 #[test]
 fn response_version_tracking_in_poll() {
-    let provider = DefaultStateProvider;
+    let provider = TestStateProvider::new();
+    let streaming_assets_path = streaming_assets_path();
+    let _ = provider.initialize("/tmp/test", &streaming_assets_path);
     let user_id = UserId(Uuid::new_v4());
 
     // Connect and get initial response version
@@ -150,7 +188,7 @@ fn response_version_tracking_in_poll() {
             integration_test_id: None,
         },
         persistent_data_path: "/tmp/test".to_string(),
-        streaming_assets_path: "".to_string(),
+        streaming_assets_path: streaming_assets_path.clone(),
         vs_opponent: None,
         display_properties: None,
         debug_configuration: None,
@@ -192,7 +230,9 @@ fn response_version_tracking_in_poll() {
 
 #[test]
 fn finish_processing_not_called_on_concurrent_rejection() {
-    let provider = DefaultStateProvider;
+    let provider = TestStateProvider::new();
+    let streaming_assets_path = streaming_assets_path();
+    let _ = provider.initialize("/tmp/test", &streaming_assets_path);
     let user_id = UserId(Uuid::new_v4());
 
     // Set a response version
@@ -231,7 +271,9 @@ fn finish_processing_not_called_on_concurrent_rejection() {
 
 #[test]
 fn finish_processing_not_called_on_version_rejection() {
-    let provider = DefaultStateProvider;
+    let provider = TestStateProvider::new();
+    let streaming_assets_path = streaming_assets_path();
+    let _ = provider.initialize("/tmp/test", &streaming_assets_path);
     let user_id = UserId(Uuid::new_v4());
 
     // Set a current response version

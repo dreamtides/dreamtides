@@ -408,6 +408,7 @@ dependencies = [
  "display",
  "display_data",
  "game_creation",
+ "logging",
  "proptest",
  "quest_state",
  "rand 0.9.0",

@@ -196,7 +196,7 @@
       "id": "1231c8b5-de17-4cf3-b45d-f42d62143916",
       "name": "card-rules-text-energy-paid",
       "description": "Addition to card rules text showing how much energy was spent on a card with a variable energy cost",
-      "en_us": "({$energy} paid)"
+      "en_us": "({$energy}{e} paid)"
     },
     {
       "id": "dd5982c1-cfba-4608-a0ce-abf4257fcd5a",

@@ -25,6 +25,7 @@ rules_engine = { path = "../../src/rules_engine" }
 state_provider = { path = "../../src/state_provider" }
 test_utils = { path = "../../src/test_utils" }
 ui_components = { path = "../../src/ui_components" }
+logging = { path = "../../src/logging" }
 
 clap = { workspace = true }
 proptest = { workspace = true }

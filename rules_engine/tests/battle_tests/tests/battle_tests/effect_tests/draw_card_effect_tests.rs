@@ -1,3 +1,4 @@
+use battle_tests::assert_display_string_contains;
 use core_data::identifiers::CardName;
 use core_data::numerics::Energy;
 use display_data::battle_view::{BattlePreviewState, DisplayPlayer};
@@ -186,9 +187,10 @@ fn energy_prompt_rules_text_shows_energy_spent_on_stack() {
     );
 
     let rules_text = s.user_client.cards.get_revealed(&energy_prompt_id).rules_text.clone();
-
-    assert!(
-        rules_text.contains(&format!("(3{} paid)", icon::ENERGY)),
-        "Rules text should show 3 energy paid in parentheses, but got: '{rules_text}'"
+    assert_display_string_contains!(
+        rules_text,
+        format!("(3{} paid)", icon::ENERGY),
+        "Rules text should show 3 energy paid in parentheses, but got: '{}'",
+        rules_text
     );
 }

@@ -13,9 +13,10 @@ use display::rendering::renderer;
 use display_data::request_data::{ConnectResponse, Metadata};
 use game_creation::new_test_battle;
 use quest_state::quest::deck::Deck;
-use serde_json;
+use state_provider::state_provider::StateProvider;
 use state_provider::test_state_provider::TestStateProvider;
 use uuid::Uuid;
+use {logging, serde_json};
 
 pub fn generate_payload_json(pretty: bool) -> String {
     let response = create_500_card_battle_json();
@@ -48,6 +49,8 @@ fn create_500_card_battle_json() -> ConnectResponse {
     add_500_cards(&mut battle);
 
     let provider = TestStateProvider::new();
+    let streaming_assets_path = streaming_assets_path();
+    let _ = provider.initialize("/tmp/test", &streaming_assets_path);
     let commands = renderer::connect(&battle, user_id, provider, false);
 
     ConnectResponse {
@@ -145,4 +148,14 @@ fn create_500_card_core_11_deck() -> Deck {
     );
 
     Deck { cards: deck_cards }
+}
+
+fn streaming_assets_path() -> String {
+    logging::get_developer_mode_project_directory()
+        .expect("Failed to get project directory")
+        .join("client/Assets/StreamingAssets")
+        .canonicalize()
+        .expect("Failed to canonicalize path")
+        .to_string_lossy()
+        .to_string()
 }
