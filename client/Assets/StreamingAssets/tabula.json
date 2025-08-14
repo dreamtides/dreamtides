@@ -4,55 +4,247 @@
       "id": "dbb75f1b-8c25-4c27-a598-7b300f5b5ca4",
       "name": "e",
       "description": "Energy icon",
-      "english": "\\u[f7e4]"
+      "en_us": "\\u[f7e4]"
     },
     {
       "id": "7b21533d-7f49-451c-bfa1-949ab28ed258",
       "name": "f",
       "description": "Fast icon",
-      "english": "\\u[f0e7]"
+      "en_us": "\\u[f0e7]"
     },
     {
       "id": "adc9a41d-fd82-49b5-a099-a9f10a73afad",
       "name": "a",
       "description": "Activated icon",
-      "english": "\\u[f105]"
+      "en_us": "\\u[f105]"
     },
     {
       "id": "121fc3af-6abd-4a90-9197-43c6e18eeca2",
       "name": "ma",
       "description": "Multi-activated icon",
-      "english": "\\u[f101]"
+      "en_us": "\\u[f101]"
+    },
+    {
+      "id": "eeb2bbe9-1952-43fa-9ae6-12512d005829",
+      "name": "bug-icon",
+      "description": "Dev menu icon",
+      "en_us": "\\u[f0ad]"
+    },
+    {
+      "id": "d439176c-7a40-410b-808d-cc2be53116d7",
+      "name": "undo-icon",
+      "description": "Undo button icon",
+      "en_us": "\\u[f0e2]"
+    },
+    {
+      "id": "ad291414-914c-4039-8f8f-8902b752bf74",
+      "name": "eye-icon",
+      "description": "Eye icon",
+      "en_us": "\\u[f06e]"
+    },
+    {
+      "id": "2ca2c1dd-20f7-410b-9f5d-ce313a2d9175",
+      "name": "eye-slash-icon",
+      "description": "Eye icon with slash through it",
+      "en_us": "\\u[f070]"
+    },
+    {
+      "id": "fd603588-7ab8-48c8-93b0-2bf6afc59325",
+      "name": "asterisk-icon",
+      "description": "\"Star of life\" icon used to represent non-numeric costs",
+      "en_us": "\\u[f621]"
     },
     {
       "id": "2e44ee4c-3218-45bf-a29e-0508f853c873",
       "name": "foresee",
       "description": "Foresee keyword ability",
-      "english": "Foresee"
+      "en_us": "Foresee"
     },
     {
       "id": "fb895ce7-1f66-426d-8c29-b19fdeee7828",
       "name": "reclaim",
       "description": "Reclaim keyword ability",
-      "english": "Reclaim"
+      "en_us": "Reclaim"
     },
     {
       "id": "bf189fe0-75e2-4a87-9dca-67dd5f755766",
       "name": "kindle",
       "description": "Kindle keyword ability",
-      "english": "Kindle"
+      "en_us": "Kindle"
+    },
+    {
+      "id": "66edfc8f-483b-4ad0-b37b-c66aa7c4347b",
+      "name": "prompt-choose-character",
+      "description": "Prompt message to target a character",
+      "en_us": "Choose a character"
+    },
+    {
+      "id": "3f16a9f0-c905-4040-b4e3-58eafa3144f2",
+      "name": "prompt-select-card",
+      "description": "Prompt message to pick a card",
+      "en_us": "Select a card"
+    },
+    {
+      "id": "95c481aa-46e6-4e03-ab9f-ae162207cd39",
+      "name": "prompt-select-from-void",
+      "description": "Prompt message to pick a card from your void",
+      "en_us": "Select from your void"
+    },
+    {
+      "id": "02b21277-492f-4a76-9d9e-b71ea88e72ad",
+      "name": "prompt-select-option",
+      "description": "Prompt message to pick a choice among several options",
+      "en_us": "Select an option"
+    },
+    {
+      "id": "165d5300-2f77-4c23-9b36-217902fab895",
+      "name": "prompt-choose-energy-amount",
+      "description": "Prompt message to pick an amount of energy",
+      "en_us": "Choose energy amount"
+    },
+    {
+      "id": "4b770aa5-47e8-4dab-b879-c2d3aaa40ba2",
+      "name": "prompt-select-card-order",
+      "description": "Prompt message to pick card ordering within the deck",
+      "en_us": "Select card position"
+    },
+    {
+      "id": "df13df4b-c876-48ec-aa81-5e25b0c6c9cb",
+      "name": "prompt-pick-mode",
+      "description": "Prompt message to pick a mode of a modal card to play",
+      "en_us": "Choose a mode"
+    },
+    {
+      "id": "e0dd5336-cb19-49f5-ad50-aa3a61823405",
+      "name": "dev-menu-button",
+      "description": "Dev menu button label",
+      "en_us": "{bug-icon} Dev"
     },
     {
       "id": "6095730f-d43c-49cd-a5dc-2781882389ed",
       "name": "decline-prompt-button",
       "description": "Decline to take the action associated with a prompt",
-      "english": "Decline"
+      "en_us": "Decline"
     },
     {
       "id": "211e9d51-07ed-4261-88ce-fbfeb3390449",
       "name": "pay-energy-prompt-button",
       "description": "Choose to pay energy to take a prompt action",
-      "english": "Spend {$energy}{e}"
+      "en_us": "Spend {$energy}{e}"
+    },
+    {
+      "id": "3d41f282-892b-47e6-9e8c-b82ca534ca20",
+      "name": "pay-energy-addtional-cost-button",
+      "description": "Button to confirm the amount of energy to pay as an additional cost",
+      "en_us": "Spend {$energy}{e}"
+    },
+    {
+      "id": "a637975a-fb02-40b1-8dbe-95f278867ef8",
+      "name": "primary-button-submit-void-card-targets",
+      "description": "Button to confirm selection of target cards in the void",
+      "en_us": "Submit"
+    },
+    {
+      "id": "f03ee2d3-e278-40bc-a449-25571d36fa56",
+      "name": "primary-button-submit-deck-card-order",
+      "description": "Button to confirm selection of ordering of cards in deck",
+      "en_us": "Submit"
+    },
+    {
+      "id": "5c8a0769-2507-4082-84c8-5d7fd69855d8",
+      "name": "primary-button-resolve-stack",
+      "description": "Button to resolve the top card of the stack",
+      "en_us": "Resolve"
+    },
+    {
+      "id": "08d4e22b-5eab-4354-9cb5-7ff68c3b5196",
+      "name": "primary-button-end-turn",
+      "description": "Button to end your turn",
+      "en_us": "End Turn"
+    },
+    {
+      "id": "bb1acabc-e74c-44d2-a586-54689f5de23b",
+      "name": "primary-button-start-next-turn",
+      "description": "Button to end the opponent's turn and begin your turn",
+      "en_us": "Next Turn"
+    },
+    {
+      "id": "010f152b-115a-4a52-bae0-3f9961b0990f",
+      "name": "increment-energy-prompt-button",
+      "description": "Button to increment the energy amount in a prompt to pick an energy value",
+      "en_us": "+1{e}"
+    },
+    {
+      "id": "5632f153-07d7-41de-bc85-5864f5578d73",
+      "name": "decrement-energy-prompt-button",
+      "description": "Button to decrement the energy amount in a prompt to pick an energy value",
+      "en_us": "-1{e}"
+    },
+    {
+      "id": "bec6ea4b-55b9-4eb9-8173-9dd4f03eaf05",
+      "name": "hide-stack-button",
+      "description": "Button to hide the stack and view the battlefield",
+      "en_us": "{eye-icon}"
+    },
+    {
+      "id": "e2cbff72-868a-4be2-a13a-37815ce0a5f2",
+      "name": "show-stack-button",
+      "description": "Button to show the stack after hiding it",
+      "en_us": "{eye-slash-icon}"
+    },
+    {
+      "id": "1231c8b5-de17-4cf3-b45d-f42d62143916",
+      "name": "card-rules-text-energy-paid",
+      "description": "Addition to card rules text showing how much energy was spent on a card with a variable energy cost",
+      "en_us": "({$energy} paid)"
+    },
+    {
+      "id": "dd5982c1-cfba-4608-a0ce-abf4257fcd5a",
+      "name": "card-rules-text-reclaimed",
+      "description": "Addition to card rules text showing that a card was played with the \"reclaim\" ability",
+      "en_us": "(Reclaimed)"
+    },
+    {
+      "id": "6d3f9774-49a1-4263-b354-177dd069c329",
+      "name": "card-rules-text-anchored",
+      "description": "Addition to card rules text showing that a card has been \"anchored\"",
+      "en_us": "(Anchored)"
+    },
+    {
+      "id": "76e30436-5446-4b71-8189-439c843184ad",
+      "name": "modal-effect-choice-card-name",
+      "description": "Card name for a card representing a numbered modal effect choice",
+      "en_us": "Choice {$number}"
+    },
+    {
+      "id": "740ba650-6ee0-4fa2-9f6a-7c163454a191",
+      "name": "character-ability-card-name",
+      "description": "Card name for a card representing an ability of a character",
+      "en_us": "{$character_name} Ability"
+    },
+    {
+      "id": "f144ac6d-bd7a-460c-9990-06812c084191",
+      "name": "hand-size-limit-exceeded-warning-message",
+      "description": "Message describing the effects of exceeding the hand size limit",
+      "en_us": "Note: Cards drawn in excess of 10 become {e} instead."
+    },
+    {
+      "id": "9cffdaea-7a9f-4ca0-80af-6c414cb5c4f0",
+      "name": "character-limit-exceeded-warning-message",
+      "description": "Message describing the effects of exceeding the character limit",
+      "en_us": "Character limit exceeded: A character will be abandoned, with its spark permanently added to your total."
+    },
+    {
+      "id": "59bc7390-ee3f-426c-8874-48d56d62d7ea",
+      "name": "combined-limit-warning-message",
+      "description": "Message describing the effects of exceeding both the character limit and the hand size limit",
+      "en_us": "Character limit exceeded: A character will be abandoned. Cards drawn in excess of 10 become {e} instead."
+    },
+    {
+      "id": "a36c2696-4c39-49d5-9c63-3e5b7149cefb",
+      "name": "error-message-panel-title",
+      "description": "Title for a panel displaying an error message",
+      "en_us": "Error"
     }
   ]
 }

@@ -15,7 +15,7 @@ pub struct StringId(pub Uuid);
 /// A language identifier.
 #[derive(Debug, Clone, Copy, Ord, PartialOrd, Eq, PartialEq)]
 pub enum LanguageId {
-    English,
+    EnglishUnitedStates,
 }
 
 /// A collection of localized strings.
@@ -31,7 +31,7 @@ pub struct LocalizedStringSet {
     pub id: StringId,
     pub name: String,
     pub description: String,
-    pub english: String,
+    pub en_us: String,
 }
 
 impl HasId<StringId> for LocalizedStringSet {
@@ -89,7 +89,7 @@ impl LocalizedStrings {
                 ftl.push_str(&format!(
                     "{} = {}\n",
                     row.name,
-                    normalize_literal(row.english.as_str())
+                    normalize_literal(row.en_us.as_str())
                 ));
             }
             let res = match FluentResource::try_new(ftl) {
