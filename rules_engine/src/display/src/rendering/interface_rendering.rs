@@ -15,13 +15,14 @@ use core_data::numerics::Energy;
 use display_data::battle_view::{
     ButtonView, CardBrowserView, CardOrderSelectorView, InterfaceView,
 };
+use fluent::fluent_args;
 use masonry::dimension::{FlexInsets, SafeAreaInsets};
 use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition};
 use masonry::flex_style::FlexStyle;
+use tabula_ids::string_id;
 use ui_components::box_component::{BoxComponent, BoxComponentBuilder, Named};
 use ui_components::button_component::ButtonComponent;
 use ui_components::component::Component;
-use ui_components::icon;
 
 use crate::core::response_builder::ResponseBuilder;
 use crate::display_actions::display_state;
@@ -42,8 +43,14 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
         return InterfaceView {
             has_open_panels: has_panel,
             screen_overlay: overlay_builder.build().flex_node(),
-            dev_button: Some(ButtonView { label: "\u{f0ad} Dev".to_string(), action: None }),
-            undo_button: Some(ButtonView { label: "\u{f0e2}".to_string(), action: None }),
+            dev_button: Some(ButtonView {
+                label: builder.string(string_id::DEV_MENU_BUTTON),
+                action: None,
+            }),
+            undo_button: Some(ButtonView {
+                label: builder.string(string_id::UNDO_ICON),
+                action: None,
+            }),
             ..Default::default()
         };
     }
@@ -68,11 +75,11 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
         increment_button: increment_button(builder, battle),
         decrement_button: decrement_button(builder, battle),
         dev_button: Some(ButtonView {
-            label: "\u{f0ad} Dev".to_string(),
+            label: builder.string(string_id::DEV_MENU_BUTTON),
             action: Some(BattleDisplayAction::OpenPanel(PanelAddress::Developer).into()),
         }),
         undo_button: Some(ButtonView {
-            label: "\u{f0e2}".to_string(),
+            label: builder.string(string_id::UNDO_ICON),
             action: Some(GameAction::Undo(builder.act_for_player())),
         }),
         browser: card_browser_view(builder),
@@ -92,7 +99,7 @@ fn render_prompt_message(
 
     let message = match get_prompt_message_from_source(battle, prompt) {
         Some(msg) => msg,
-        None => get_generic_prompt_message(&prompt.prompt_type),
+        None => get_generic_prompt_message(builder, &prompt.prompt_type),
     };
 
     Some(
@@ -152,15 +159,19 @@ fn find_ability_configuration(
         })
 }
 
-fn get_generic_prompt_message(prompt_type: &PromptType) -> String {
+fn get_generic_prompt_message(builder: &ResponseBuilder, prompt_type: &PromptType) -> String {
     match prompt_type {
-        PromptType::ChooseCharacter { .. } => "Choose a character".to_string(),
-        PromptType::ChooseStackCard { .. } => "Select a card".to_string(),
-        PromptType::ChooseVoidCard { .. } => "Select from your void".to_string(),
-        PromptType::Choose { .. } => "Select an option".to_string(),
-        PromptType::ChooseEnergyValue { .. } => "Choose energy amount".to_string(),
-        PromptType::SelectDeckCardOrder { .. } => "Select card position".to_string(),
-        PromptType::ModalEffect(_) => "Choose a mode".to_string(),
+        PromptType::ChooseCharacter { .. } => builder.string(string_id::PROMPT_CHOOSE_CHARACTER),
+        PromptType::ChooseStackCard { .. } => builder.string(string_id::PROMPT_SELECT_STACK_CARD),
+        PromptType::ChooseVoidCard { .. } => builder.string(string_id::PROMPT_SELECT_FROM_VOID),
+        PromptType::Choose { .. } => builder.string(string_id::PROMPT_SELECT_OPTION),
+        PromptType::ChooseEnergyValue { .. } => {
+            builder.string(string_id::PROMPT_CHOOSE_ENERGY_AMOUNT)
+        }
+        PromptType::SelectDeckCardOrder { .. } => {
+            builder.string(string_id::PROMPT_SELECT_CARD_ORDER)
+        }
+        PromptType::ModalEffect(_) => builder.string(string_id::PROMPT_PICK_MODE),
     }
 }
 
@@ -190,7 +201,10 @@ fn primary_action_button(
             .contains(BattleAction::SelectEnergyAdditionalCost(current), ForPlayer::Human)
         {
             return Some(ButtonView {
-                label: format!("Spend {current}\u{f7e4}"),
+                label: builder.string_with_args(
+                    string_id::PAY_ENERGY_ADDTIONAL_COST_BUTTON,
+                    fluent_args!("energy" => current),
+                ),
                 action: Some(BattleAction::SelectEnergyAdditionalCost(current).into()),
             });
         }
@@ -198,27 +212,27 @@ fn primary_action_button(
 
     if legal_actions.contains(BattleAction::SubmitVoidCardTargets, ForPlayer::Human) {
         Some(ButtonView {
-            label: "Submit".to_string(),
+            label: builder.string(string_id::PRIMARY_BUTTON_SUBMIT_VOID_CARD_TARGETS),
             action: Some(BattleAction::SubmitVoidCardTargets.into()),
         })
     } else if legal_actions.contains(BattleAction::SubmitDeckCardOrder, ForPlayer::Human) {
         Some(ButtonView {
-            label: "Submit".to_string(),
+            label: builder.string(string_id::PRIMARY_BUTTON_SUBMIT_DECK_CARD_ORDER),
             action: Some(BattleAction::SubmitDeckCardOrder.into()),
         })
     } else if legal_actions.contains(BattleAction::PassPriority, ForPlayer::Human) {
         Some(ButtonView {
-            label: "Resolve".to_string(),
+            label: builder.string(string_id::PRIMARY_BUTTON_RESOLVE_STACK),
             action: Some(BattleAction::PassPriority.into()),
         })
     } else if legal_actions.contains(BattleAction::EndTurn, ForPlayer::Human) {
         Some(ButtonView {
-            label: "End Turn".to_string(),
+            label: builder.string(string_id::PRIMARY_BUTTON_END_TURN),
             action: Some(BattleAction::EndTurn.into()),
         })
     } else if legal_actions.contains(BattleAction::StartNextTurn, ForPlayer::Human) {
         Some(ButtonView {
-            label: "Next Turn".to_string(),
+            label: builder.string(string_id::PRIMARY_BUTTON_START_NEXT_TURN),
             action: Some(BattleAction::StartNextTurn.into()),
         })
     } else {
@@ -252,7 +266,7 @@ fn increment_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<B
         let current =
             display_state::get_selected_energy_additional_cost(builder).unwrap_or(*minimum);
         return Some(ButtonView {
-            label: "+1\u{f7e4}".to_string(),
+            label: builder.string(string_id::INCREMENT_ENERGY_PROMPT_BUTTON),
             action: if current + Energy(1) <= *maximum {
                 Some(
                     BattleDisplayAction::SetSelectedEnergyAdditionalCost(current + Energy(1))
@@ -275,7 +289,7 @@ fn decrement_button(builder: &ResponseBuilder, battle: &BattleState) -> Option<B
         let current =
             display_state::get_selected_energy_additional_cost(builder).unwrap_or(*minimum);
         return Some(ButtonView {
-            label: "-1\u{f7e4}".to_string(),
+            label: builder.string(string_id::DECREMENT_ENERGY_PROMPT_BUTTON),
             action: if current > Energy(0) && current - Energy(1) >= *minimum {
                 Some(
                     BattleDisplayAction::SetSelectedEnergyAdditionalCost(current - Energy(1))
@@ -310,9 +324,9 @@ fn render_hide_stack_button(
     }
 
     let label = if display_state::is_stack_hidden(builder) {
-        icon::EYE.to_string()
+        builder.string(string_id::SHOW_STACK_BUTTON)
     } else {
-        icon::EYE_SLASH.to_string()
+        builder.string(string_id::HIDE_STACK_BUTTON)
     };
 
     Some(

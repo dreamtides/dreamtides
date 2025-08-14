@@ -20,6 +20,8 @@ use display_data::card_view::{
     RevealedCardView,
 };
 use display_data::object_position::{ObjectPosition, Position};
+use fluent::fluent_args;
+use tabula_ids::string_id;
 use ui_components::icon;
 
 use crate::core::adapter;
@@ -44,7 +46,7 @@ pub fn trigger_card_view(
             })
             .image(card_rendering::card_image(battle, character_card_id))
             .name(card_rendering::card_name(battle, character_card_id))
-            .rules_text(card_rendering::rules_text(battle, character_card_id))
+            .rules_text(card_rendering::rules_text(builder, battle, character_card_id))
             .create_position(ObjectPosition {
                 position: Position::HiddenWithinCard(adapter::client_card_id(character_card_id)),
                 sorting_key: 0,
@@ -166,7 +168,10 @@ fn activated_ability_card_view(
     });
 
     let character_name = card_rendering::card_name(battle, character_card_id);
-    let ability_name = format!("{character_name} Ability");
+    let ability_name = builder.string_with_args(
+        string_id::CHARACTER_ABILITY_CARD_NAME,
+        fluent_args!("character-name" => character_name),
+    );
 
     let legal_actions = legal_actions::compute(battle, builder.act_for_player());
     let is_legal_action = legal_actions.contains(action, ForPlayer::Human);
@@ -190,7 +195,7 @@ fn activated_ability_card_view(
             .name(ability_name)
             .maybe_cost(cost.map(|cost| cost.to_string()))
             .maybe_card_type(Some("Activated Ability".to_string()))
-            .rules_text(card_rendering::rules_text(battle, character_card_id))
+            .rules_text(card_rendering::rules_text(builder, battle, character_card_id))
             .create_position(ObjectPosition {
                 position: Position::HiddenWithinCard(adapter::client_card_id(character_card_id)),
                 sorting_key: 0,
@@ -203,6 +208,7 @@ fn activated_ability_card_view(
                 can_play: if is_legal_action { activate_action } else { None },
                 play_effect_preview: if is_legal_action {
                     Some(outcome_simulation::action_effect_preview(
+                        builder,
                         battle,
                         builder.act_for_player(),
                         action,
@@ -290,7 +296,7 @@ fn void_card_token_view(
             .maybe_spark(
                 card_properties::base_spark_for_id(battle, card_id).map(|spark| spark.to_string()),
             )
-            .rules_text(card_rendering::rules_text(battle, card_id))
+            .rules_text(card_rendering::rules_text(builder, battle, card_id))
             .create_position(ObjectPosition {
                 position: Position::InVoid(DisplayPlayer::User),
                 sorting_key: 32768,
@@ -303,6 +309,7 @@ fn void_card_token_view(
                 can_play: play_action.map(GameAction::BattleAction),
                 play_effect_preview: play_action.map(|action| {
                     outcome_simulation::action_effect_preview(
+                        builder,
                         battle,
                         builder.act_for_player(),
                         action,

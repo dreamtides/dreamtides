@@ -16,6 +16,7 @@ use core_data::types::PlayerName;
 use display_data::battle_view::{BattlePreviewView, PlayerPreviewView};
 use display_data::card_view::CardPreviewView;
 use masonry::flex_node::FlexNode;
+use tabula_ids::string_id;
 use tracing::error;
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::layer::SubscriberExt;
@@ -78,6 +79,7 @@ pub fn is_victory_imminent_for_player(battle: &BattleState, player: PlayerName) 
 /// Returns a preview of the battle state based on simulating the effect of
 /// playing the given card.
 pub fn action_effect_preview(
+    builder: &ResponseBuilder,
     battle: &BattleState,
     player: PlayerName,
     action: BattleAction,
@@ -129,13 +131,17 @@ pub fn action_effect_preview(
         },
     };
 
-    let preview_message = get_preview_message(&simulation, player);
+    let preview_message = get_preview_message(builder, &simulation, player);
     let cards = get_preview_cards(battle, &simulation, player);
 
     BattlePreviewView { user: user_preview, enemy: enemy_preview, cards, preview_message }
 }
 
-fn get_preview_message(simulation: &BattleState, player: PlayerName) -> Option<FlexNode> {
+fn get_preview_message(
+    builder: &ResponseBuilder,
+    simulation: &BattleState,
+    player: PlayerName,
+) -> Option<FlexNode> {
     let hand_size_exceeded =
         simulation.turn_history.current_action_history.player(player).hand_size_limit_exceeded;
     let character_limit_exceeded = !simulation
@@ -146,9 +152,9 @@ fn get_preview_message(simulation: &BattleState, player: PlayerName) -> Option<F
         .is_empty();
 
     match (hand_size_exceeded, character_limit_exceeded) {
-        (true, true) => combined_limit_messages().flex_node(),
-        (true, false) => hand_size_limit_exceeded_message().flex_node(),
-        (false, true) => character_limit_message().flex_node(),
+        (true, true) => combined_limit_messages(builder).flex_node(),
+        (true, false) => hand_size_limit_exceeded_message(builder).flex_node(),
+        (false, true) => character_limit_message(builder).flex_node(),
         (false, false) => None,
     }
 }
@@ -226,7 +232,7 @@ pub fn current_prompt_battle_preview(
                 let selected_energy =
                     display_state::get_selected_energy_additional_cost(builder).unwrap_or(*minimum);
                 let action = BattleAction::SelectEnergyAdditionalCost(selected_energy);
-                Some(action_effect_preview(battle, player, action))
+                Some(action_effect_preview(builder, battle, player, action))
             }
             _ => None,
         }
@@ -235,25 +241,25 @@ pub fn current_prompt_battle_preview(
     }
 }
 
-fn hand_size_limit_exceeded_message() -> impl Component {
+fn hand_size_limit_exceeded_message(builder: &ResponseBuilder) -> impl Component {
     InterfaceMessage::builder()
-        .text(format!("Note: Cards drawn in excess of 10 become {} instead.", icon::ENERGY))
+        .text(builder.string(string_id::HAND_SIZE_LIMIT_EXCEEDED_WARNING_MESSAGE))
         .anchor_position(AnchorPosition::Top)
         .temporary(false)
         .build()
 }
 
-fn character_limit_message() -> impl Component {
+fn character_limit_message(builder: &ResponseBuilder) -> impl Component {
     InterfaceMessage::builder()
-        .text("Character limit exceeded: A character will be abandoned, with its spark permanently added to your total.")
+        .text(builder.string(string_id::CHARACTER_LIMIT_EXCEEDED_WARNING_MESSAGE))
         .anchor_position(AnchorPosition::Top)
         .temporary(false)
         .build()
 }
 
-fn combined_limit_messages() -> impl Component {
+fn combined_limit_messages(builder: &ResponseBuilder) -> impl Component {
     InterfaceMessage::builder()
-        .text(format!("Character limit exceeded: A character will be abandoned. Cards drawn in excess of 10 become {} instead.", icon::ENERGY))
+        .text(builder.string(string_id::COMBINED_LIMIT_WARNING_MESSAGE))
         .anchor_position(AnchorPosition::Top)
         .temporary(false)
         .build()

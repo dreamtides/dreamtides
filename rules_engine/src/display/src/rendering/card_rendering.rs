@@ -22,8 +22,10 @@ use core_data::types::CardFacing;
 use display_data::card_view::{
     CardActions, CardPrefab, CardView, DisplayImage, InfoZoomData, InfoZoomIcon, RevealedCardView,
 };
+use fluent::fluent_args;
 use masonry::flex_enums::FlexDirection;
 use masonry::flex_style::FlexStyle;
+use tabula_ids::string_id;
 use ui_components::box_component::BoxComponent;
 use ui_components::component::Component;
 use ui_components::icon;
@@ -103,14 +105,14 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
         cost: if card_properties::base_energy_cost_for_id(battle, card_id).is_some() {
             Some(card_properties::converted_energy_cost(battle, card_id).to_string())
         } else {
-            Some(format!("<size=50%>{}</size>", icon::NON_NUMERIC))
+            Some(format!("<size=50%>{}</size>", builder.string(string_id::ASTERISK_ICON)))
         },
         produced: None,
         spark: card_properties::spark(battle, controller, CharacterId(card_id))
             .or_else(|| card_properties::base_spark_for_id(battle, card_id))
             .map(|spark| spark.to_string()),
         card_type: card_type(battle, card_id),
-        rules_text: rules_text(battle, card_id),
+        rules_text: rules_text(builder, battle, card_id),
         outline_color: match selection_color {
             Some(color) => Some(color),
             None if can_play => Some(display_color::GREEN),
@@ -124,6 +126,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
             on_click: selection_action,
             play_effect_preview: play_action.map(|play_action| {
                 outcome_simulation::action_effect_preview(
+                    builder,
                     battle,
                     builder.act_for_player(),
                     play_action,
@@ -297,7 +300,7 @@ fn card_type(battle: &BattleState, card_id: CardId) -> String {
     if card_properties::is_fast(battle, card_id) { format!("\u{f0e7} {result}") } else { result }
 }
 
-pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
+pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -> String {
     let mut base_text = match card::get(battle, card_id).name {
         CardName::TestVanillaCharacter => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
         CardName::TestDissolve => "<color=#AA00FF><b>Dissolve</b></color> an enemy character.".to_string(),
@@ -396,15 +399,28 @@ pub fn rules_text(battle: &BattleState, card_id: CardId) -> String {
         && let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))
         && let StackCardAdditionalCostsPaid::Energy(energy) = &stack_item.additional_costs_paid
     {
-        return format!("{} <b><color=\"blue\">({}\u{f7e4} paid)</color></b>", base_text, energy.0);
+        return format!(
+            "{} <b><color=\"blue\">{}</color></b>",
+            base_text,
+            builder.string_with_args(
+                string_id::CARD_RULES_TEXT_ENERGY_PAID,
+                fluent_args!("energy" => energy.0)
+            )
+        );
     }
 
     if is_on_stack_from_void(battle, card_id) {
-        return format!("{base_text} <b><color=\"blue\">(Reclaimed)</color></b>");
+        return format!(
+            "{base_text} <b><color=\"blue\">{}</color></b>",
+            builder.string(string_id::CARD_RULES_TEXT_RECLAIMED)
+        );
     }
 
     if apply_card_fx::is_anchored(battle, card_id) {
-        return format!("{base_text} <b><color=\"blue\">(Anchored)</color></b>");
+        return format!(
+            "{base_text} <b><color=\"blue\">{}</color></b>",
+            builder.string(string_id::CARD_RULES_TEXT_ANCHORED)
+        );
     }
 
     base_text

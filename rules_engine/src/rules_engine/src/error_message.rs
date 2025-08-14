@@ -10,6 +10,7 @@ use display_data::command::{Command, CommandSequence, UpdateBattleCommand};
 use game_creation::new_battle;
 use masonry::flex_enums::{TextAlign, WhiteSpace};
 use state_provider::state_provider::DefaultStateProvider;
+use tabula_ids::string_id;
 use ui_components::component::Component;
 use ui_components::panel_component::PanelComponent;
 use ui_components::text_component::TextComponent;
@@ -53,7 +54,7 @@ fn display_error_message_with_battle(battle: &BattleState, message: String) -> C
         false,
     );
     let mut view = battle_rendering::battle_view(&builder, battle);
-    view.interface.screen_overlay = render_message(message).flex_node();
+    view.interface.screen_overlay = render_message(&builder, message).flex_node();
     builder.push(Command::UpdateBattle(Box::new(UpdateBattleCommand {
         battle: view,
         update_sound: None,
@@ -61,9 +62,9 @@ fn display_error_message_with_battle(battle: &BattleState, message: String) -> C
     builder.commands()
 }
 
-fn render_message(text: String) -> impl Component {
+fn render_message(builder: &ResponseBuilder, text: String) -> impl Component {
     PanelComponent::builder()
-        .title("Error Message")
+        .title(builder.string(string_id::ERROR_MESSAGE_PANEL_TITLE))
         .content(
             TextComponent::builder()
                 .text(text)

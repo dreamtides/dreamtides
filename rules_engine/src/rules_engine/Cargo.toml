@@ -14,9 +14,9 @@ bench = false
 action_data = { path = "../action_data" }
 ai_agents = { path = "../ai_agents" }
 ai_data = { path = "../ai_data" }
-battle_state = { path = "../battle_state" }
 battle_mutations = { path = "../battle_mutations" }
 battle_queries = { path = "../battle_queries" }
+battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 database = { path = "../database" }
 display = { path = "../display" }
@@ -26,6 +26,7 @@ logging = { path = "../logging" }
 masonry = { path = "../masonry" }
 state_provider = { path = "../state_provider" }
 tabula = { path = "../tabula" }
+tabula_ids = { path = "../tabula_ids" }
 ui_components = { path = "../ui_components" }
 
 backtrace = { workspace = true }

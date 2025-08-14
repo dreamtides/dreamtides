@@ -5,9 +5,11 @@ use crate::core::response_builder::ResponseBuilder;
 
 pub fn choice_label(builder: &ResponseBuilder, label: PromptChoiceLabel) -> String {
     match label {
-        PromptChoiceLabel::String(string_id) => builder.string(string_id, FluentArgs::new()),
+        PromptChoiceLabel::String(string_id) => {
+            builder.string_with_args(string_id, FluentArgs::new())
+        }
         PromptChoiceLabel::StringWithEnergy(string_id, energy) => {
-            builder.string(string_id, fluent_args!("energy" => energy))
+            builder.string_with_args(string_id, fluent_args!("energy" => energy))
         }
     }
 }

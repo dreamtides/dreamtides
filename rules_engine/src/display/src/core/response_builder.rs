@@ -93,23 +93,23 @@ impl ResponseBuilder {
         self.pending_commands.push(command);
     }
 
-    /// Formats a string for display in the currently selected language with the
-    /// given arguments.
-    pub fn string(&self, string_id: StringId, args: FluentArgs) -> String {
-        self.provider.tabula().strings.format_pattern(
-            LanguageId::EnglishUnitedStates,
-            string_id,
-            &args,
-        )
-    }
-
     /// Formats a string for display in the currently language without any
     /// arguments.
-    pub fn string_id(&self, string_id: StringId) -> String {
+    pub fn string(&self, string_id: StringId) -> String {
         self.provider.tabula().strings.format_pattern(
             LanguageId::EnglishUnitedStates,
             string_id,
             &FluentArgs::new(),
+        )
+    }
+
+    /// Formats a string for display in the currently selected language with the
+    /// given arguments.
+    pub fn string_with_args(&self, string_id: StringId, args: FluentArgs) -> String {
+        self.provider.tabula().strings.format_pattern(
+            LanguageId::EnglishUnitedStates,
+            string_id,
+            &args,
         )
     }
 

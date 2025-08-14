@@ -80,8 +80,8 @@
     },
     {
       "id": "3f16a9f0-c905-4040-b4e3-58eafa3144f2",
-      "name": "prompt-select-card",
-      "description": "Prompt message to pick a card",
+      "name": "prompt-select-stack-card",
+      "description": "Prompt message to pick a card on the stack",
       "en_us": "Select a card"
     },
     {
@@ -220,7 +220,7 @@
       "id": "740ba650-6ee0-4fa2-9f6a-7c163454a191",
       "name": "character-ability-card-name",
       "description": "Card name for a card representing an ability of a character",
-      "en_us": "{$character_name} Ability"
+      "en_us": "{$character-name} Ability"
     },
     {
       "id": "f144ac6d-bd7a-460c-9990-06812c084191",

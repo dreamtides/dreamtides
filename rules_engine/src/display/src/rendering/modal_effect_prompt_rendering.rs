@@ -10,6 +10,8 @@ use core_data::display_color;
 use core_data::numerics::Energy;
 use display_data::card_view::{CardActions, CardView};
 use display_data::object_position::{ObjectPosition, Position};
+use fluent::fluent_args;
+use tabula_ids::string_id;
 
 use crate::core::adapter;
 use crate::core::response_builder::ResponseBuilder;
@@ -32,7 +34,8 @@ pub fn cards(builder: &ResponseBuilder, battle: &BattleState) -> Vec<CardView> {
         return vec![];
     }
 
-    let descriptions = modal_effect_descriptions(&card_rendering::rules_text(battle, card_id));
+    let descriptions =
+        modal_effect_descriptions(&card_rendering::rules_text(builder, battle, card_id));
     modal
         .choices
         .iter()
@@ -64,7 +67,10 @@ fn modal_effect_card_view(
     let view = TokenCardView::builder()
         .id(adapter::modal_effect_choice_client_id(card_id, index))
         .image(card_rendering::card_image(battle, card_id))
-        .name(format!("Choice {}", index.value() + 1))
+        .name(builder.string_with_args(
+            string_id::MODAL_EFFECT_CHOICE_CARD_NAME,
+            fluent_args!("number" => index.value() + 1),
+        ))
         .position(ObjectPosition { position: Position::Browser, sorting_key: index.value() as u32 })
         .create_position(ObjectPosition {
             position: Position::HiddenWithinCard(adapter::client_card_id(card_id)),

@@ -41,8 +41,9 @@ pub const KINDLE: StringId = StringId(uuid!("bf189fe0-75e2-4a87-9dca-67dd5f75576
 pub const PROMPT_CHOOSE_CHARACTER: StringId =
     StringId(uuid!("66edfc8f-483b-4ad0-b37b-c66aa7c4347b"));
 
-/// Prompt message to pick a card
-pub const PROMPT_SELECT_CARD: StringId = StringId(uuid!("3f16a9f0-c905-4040-b4e3-58eafa3144f2"));
+/// Prompt message to pick a card on the stack
+pub const PROMPT_SELECT_STACK_CARD: StringId =
+    StringId(uuid!("3f16a9f0-c905-4040-b4e3-58eafa3144f2"));
 
 /// Prompt message to pick a card from your void
 pub const PROMPT_SELECT_FROM_VOID: StringId =

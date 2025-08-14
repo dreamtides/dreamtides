@@ -2373,6 +2373,7 @@ dependencies = [
  "serde_json",
  "state_provider",
  "tabula",
+ "tabula_ids",
  "tokio",
  "tracing",
  "tracing-subscriber",
