@@ -1,4 +1,4 @@
-use battle_queries::battle_card_queries::{card, card_abilities};
+use battle_queries::battle_card_queries::{card, card_abilities, card_properties};
 use battle_queries::{battle_trace, panic_with};
 use battle_state::battle::all_cards::CreatedCard;
 use battle_state::battle::animation_data::AnimationStep;
@@ -80,7 +80,14 @@ pub fn add_deck_copy(battle: &mut BattleState, player: PlayerName) {
     for (name, &count) in &deck.cards {
         let can_play_restriction = card_abilities::query_by_name(*name).can_play_restriction;
         for _ in 0..count {
-            cards.push(CreatedCard { name: *name, can_play_restriction });
+            cards.push(CreatedCard {
+                name: *name,
+                can_play_restriction,
+                base_energy_cost: card_properties::base_energy_cost(*name),
+                base_spark: card_properties::base_spark(*name),
+                card_type: card_properties::card_type_by_name(*name),
+                is_fast: card_properties::is_fast_by_name(*name),
+            });
         }
     }
     battle.cards.create_cards_in_deck(player, cards);
@@ -95,6 +102,10 @@ pub fn add_cards(battle: &mut BattleState, player: PlayerName, cards: Vec<CardNa
             .map(|name| CreatedCard {
                 name,
                 can_play_restriction: card_abilities::query_by_name(name).can_play_restriction,
+                base_energy_cost: card_properties::base_energy_cost(name),
+                base_spark: card_properties::base_spark(name),
+                card_type: card_properties::card_type_by_name(name),
+                is_fast: card_properties::is_fast_by_name(name),
             })
             .collect(),
     );

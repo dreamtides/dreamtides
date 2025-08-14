@@ -1,7 +1,8 @@
 use std::collections::BTreeMap;
 
+use core_data::card_types::CardType;
 use core_data::identifiers::CardName;
-use core_data::numerics::Spark;
+use core_data::numerics::{Energy, Spark};
 use core_data::types::PlayerName;
 
 use crate::battle::card_id::{
@@ -27,6 +28,10 @@ pub type CharacterMap = BTreeMap<CharacterId, CharacterState>;
 pub struct CreatedCard {
     pub name: CardName,
     pub can_play_restriction: Option<CanPlayRestriction>,
+    pub base_energy_cost: Option<Energy>,
+    pub base_spark: Option<Spark>,
+    pub card_type: CardType,
+    pub is_fast: bool,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -203,6 +208,10 @@ impl AllCards {
                 name: name.name,
                 owner,
                 object_id,
+                base_energy_cost: name.base_energy_cost,
+                base_spark: name.base_spark,
+                card_type: name.card_type,
+                is_fast: name.is_fast,
                 revealed_to_player_override: PlayerMap::default(),
                 can_play_restriction: name.can_play_restriction,
             });

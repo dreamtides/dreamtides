@@ -57,7 +57,7 @@ pub fn converted_energy_cost(battle: &BattleState, card_id: impl CardIdType) -> 
 
 /// Returns the base energy cost of a card as in [base_energy_cost].
 pub fn base_energy_cost_for_id(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
-    base_energy_cost(card::get(battle, card_id).name)
+    card::get(battle, card_id).base_energy_cost
 }
 
 /// Returns the base energy cost of a card specified in the card definition, or
@@ -107,7 +107,7 @@ pub fn spark(battle: &BattleState, controller: PlayerName, id: CharacterId) -> O
 }
 
 pub fn base_spark_for_id(battle: &BattleState, card_id: impl CardIdType) -> Option<Spark> {
-    base_spark(card::get(battle, card_id).name)
+    card::get(battle, card_id).base_spark
 }
 
 pub fn base_spark(name: CardName) -> Option<Spark> {
@@ -127,7 +127,11 @@ pub fn base_spark(name: CardName) -> Option<Spark> {
 }
 
 pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
-    match card::get(battle, card_id).name {
+    card::get(battle, card_id).card_type
+}
+
+pub fn card_type_by_name(name: CardName) -> CardType {
+    match name {
         CardName::TestVanillaCharacter => CardType::Character(CharacterType::Musician),
         CardName::TestDissolve => CardType::Event,
         CardName::TestNamedDissolve => CardType::Event,
@@ -174,7 +178,11 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
 }
 
 pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
-    match card::get(battle, card_id).name {
+    card::get(battle, card_id).is_fast
+}
+
+pub fn is_fast_by_name(name: CardName) -> bool {
+    match name {
         CardName::TestVanillaCharacter => false,
         CardName::TestDissolve => true,
         CardName::TestNamedDissolve => true,

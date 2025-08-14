@@ -1,4 +1,6 @@
+use core_data::card_types::CardType;
 use core_data::identifiers::CardName;
+use core_data::numerics::{Energy, Spark};
 use core_data::types::PlayerName;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -57,6 +59,18 @@ pub struct BattleCardState {
 
     /// The object ID of this card.
     pub object_id: ObjectId,
+
+    /// Base energy cost for this card.
+    pub base_energy_cost: Option<Energy>,
+
+    /// Base spark for this card, if it is a character.
+    pub base_spark: Option<Spark>,
+
+    /// Card type for this card.
+    pub card_type: CardType,
+
+    /// Fast flag for this card.
+    pub is_fast: bool,
 
     /// If true, the card is revealed to the indicated player while in its
     /// current zone. This is not required for the card to be revealed in public
