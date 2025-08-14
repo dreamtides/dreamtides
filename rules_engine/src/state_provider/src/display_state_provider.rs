@@ -1,7 +1,10 @@
+use std::sync::Arc;
+
 use action_data::panel_address::PanelAddress;
 use core_data::identifiers::UserId;
 use core_data::numerics::Energy;
 use display_data::object_position::Position;
+use tabula::tabula::Tabula;
 
 #[derive(Debug, Clone, Default)]
 pub struct DisplayState {
@@ -15,4 +18,6 @@ pub trait DisplayStateProvider: Send + Sync {
     fn get_display_state(&self, user_id: UserId) -> DisplayState;
 
     fn set_display_state(&self, user_id: UserId, state: DisplayState);
+
+    fn tabula(&self) -> Arc<Tabula>;
 }

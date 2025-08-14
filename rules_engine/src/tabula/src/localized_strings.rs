@@ -1,6 +1,5 @@
-use std::cell::RefCell;
 use std::collections::BTreeMap;
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 
 use fluent::FluentBundle;
 use fluent_bundle::{FluentArgs, FluentError, FluentResource};
@@ -20,10 +19,10 @@ pub enum LanguageId {
 }
 
 /// A collection of localized strings.
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct LocalizedStrings {
     pub table: Table<StringId, LocalizedStringSet>,
-    pub bundle_cache: RefCell<BTreeMap<LanguageId, Arc<FluentResource>>>,
+    pub bundle_cache: RwLock<BTreeMap<LanguageId, Arc<FluentResource>>>,
 }
 
 /// A set of localizations for a given string.
@@ -58,7 +57,15 @@ impl<'de> Deserialize<'de> for LocalizedStrings {
         D: serde::Deserializer<'de>,
     {
         let table = Table::<StringId, LocalizedStringSet>::deserialize(deserializer)?;
-        Ok(LocalizedStrings { table, bundle_cache: RefCell::new(BTreeMap::new()) })
+        Ok(LocalizedStrings { table, bundle_cache: RwLock::new(BTreeMap::new()) })
+    }
+}
+
+impl Clone for LocalizedStrings {
+    fn clone(&self) -> Self {
+        let table = self.table.clone();
+        let cache = self.bundle_cache.read().unwrap().clone();
+        LocalizedStrings { table, bundle_cache: RwLock::new(cache) }
     }
 }
 
@@ -76,7 +83,7 @@ impl LocalizedStrings {
     /// - ERR7: Fluent Parser Error: {parser_error}
     /// - ERR8: Fluent Resolver Error: {resolver_error}
     pub fn format_pattern(&self, language: LanguageId, id: StringId, args: &FluentArgs) -> String {
-        if !self.bundle_cache.borrow().contains_key(&language) {
+        if !self.bundle_cache.read().unwrap().contains_key(&language) {
             let mut ftl = String::new();
             for row in &self.table.0 {
                 ftl.push_str(&format!(
@@ -89,9 +96,9 @@ impl LocalizedStrings {
                 Ok(r) => Arc::new(r),
                 Err(_) => return "ERR1: Invalid Resource".to_string(),
             };
-            self.bundle_cache.borrow_mut().insert(language, res);
+            self.bundle_cache.write().unwrap().insert(language, res);
         }
-        let res = match self.bundle_cache.borrow().get(&language) {
+        let res = match self.bundle_cache.read().unwrap().get(&language) {
             Some(r) => r.clone(),
             None => return "ERR2: Missing Resource".to_string(),
         };

@@ -9,6 +9,7 @@ use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{
     PromptChoice, PromptChoiceLabel, PromptConfiguration, PromptData, PromptType,
 };
+use tabula_ids::string_id;
 
 use crate::card_mutations::counterspell;
 use crate::effects::apply_effect::EffectWasApplied;
@@ -35,7 +36,7 @@ pub fn execute(
                         targets: prompt_targets.clone(),
                     },
                     PromptChoice {
-                        label: PromptChoiceLabel::Decline,
+                        label: PromptChoiceLabel::String(string_id::DECLINE_PROMPT_BUTTON),
                         effect: Effect::Effect(StandardEffect::Counterspell {
                             target: Predicate::It,
                         }),

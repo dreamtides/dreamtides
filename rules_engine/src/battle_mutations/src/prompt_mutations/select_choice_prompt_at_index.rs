@@ -15,16 +15,20 @@ pub fn select(battle: &mut BattleState, player: PlayerName, choice_index: usize)
         panic_with!("Expected an active prompt", battle);
     };
 
-    let (source, choice_effect, choice_targets, label) = {
-        let PromptType::Choose { choices } = &prompt.prompt_type else {
-            panic_with!("Expected a Prompt::Choose prompt", battle);
-        };
+    let PromptType::Choose { choices } = &prompt.prompt_type else {
+        panic_with!("Expected a Prompt::Choose prompt", battle);
+    };
+
+    let (source, choice_effect, choice_targets) = {
         let Some(choice) = choices.get(choice_index) else {
             panic_with!("Invalid choice index", battle, choice_index);
         };
-        (prompt.source, &choice.effect, &choice.targets, choice.label)
+        (prompt.source, &choice.effect, &choice.targets)
     };
 
-    battle.push_animation(source, || BattleAnimation::MakeChoice { player, choice: label });
+    battle.push_animation(source, || BattleAnimation::MakeChoice {
+        player,
+        choice: choices[choice_index].label,
+    });
     apply_effect::execute(battle, source, choice_effect, choice_targets.as_ref(), None);
 }

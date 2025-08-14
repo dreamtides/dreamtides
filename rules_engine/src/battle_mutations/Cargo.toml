@@ -16,6 +16,8 @@ ability_data = { path = "../ability_data" }
 battle_queries = { path = "../battle_queries" }
 battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
+tabula = { path = "../tabula" }
+tabula_ids = { path = "../tabula_ids" }
 
 bit-set = { workspace = true }
 either = { workspace = true }

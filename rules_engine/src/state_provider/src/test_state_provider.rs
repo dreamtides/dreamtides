@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::fs::File;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, RwLock};
 use std::time::Instant;
 
 use battle_state::battle::battle_state::RequestContext;
@@ -27,7 +27,7 @@ struct TestStateProviderInner {
     processing_users: Mutex<HashMap<UserId, bool>>,
     pending_updates: Mutex<HashMap<UserId, Vec<PollResult>>>,
     display_states: Mutex<HashMap<UserId, DisplayState>>,
-    tabula: Mutex<Option<Tabula>>,
+    tabula: RwLock<Option<Arc<Tabula>>>,
 }
 
 impl TestStateProvider {
@@ -41,7 +41,7 @@ impl TestStateProvider {
                 processing_users: Mutex::new(HashMap::new()),
                 pending_updates: Mutex::new(HashMap::new()),
                 display_states: Mutex::new(HashMap::new()),
-                tabula: Mutex::new(None),
+                tabula: RwLock::new(None),
             }),
         }
     }
@@ -72,8 +72,8 @@ impl StateProvider for TestStateProvider {
             })
             .ok_or(DatabaseError("Failed to load tabula.json".to_string()))?;
 
-        if let Ok(mut guard) = self.inner.tabula.lock() {
-            *guard = Some(tabula);
+        if let Ok(mut guard) = self.inner.tabula.write() {
+            *guard = Some(Arc::new(tabula));
         }
 
         let mut databases = self
@@ -202,14 +202,6 @@ impl StateProvider for TestStateProvider {
         }
         None
     }
-
-    fn get_tabula(&self) -> Tabula {
-        if let Ok(guard) = self.inner.tabula.lock() {
-            guard.clone().unwrap_or_else(|| panic!("Tabula not initialized"))
-        } else {
-            panic!("Failed to acquire lock")
-        }
-    }
 }
 
 impl DisplayStateProvider for TestStateProvider {
@@ -224,6 +216,14 @@ impl DisplayStateProvider for TestStateProvider {
     fn set_display_state(&self, user_id: UserId, state: DisplayState) {
         if let Ok(mut states) = self.inner.display_states.lock() {
             states.insert(user_id, state);
+        }
+    }
+
+    fn tabula(&self) -> Arc<Tabula> {
+        if let Ok(guard) = self.inner.tabula.read() {
+            guard.clone().unwrap_or_else(|| panic!("Tabula not initialized"))
+        } else {
+            panic!("Failed to acquire lock")
         }
     }
 }

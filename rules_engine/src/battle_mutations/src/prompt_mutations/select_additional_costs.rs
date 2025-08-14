@@ -1,8 +1,9 @@
+use ability_data::cost::Cost;
+use battle_queries::battle_player_queries::costs;
 use battle_queries::{battle_trace, panic_with};
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_cards::stack_card_state::StackCardAdditionalCostsPaid;
-use battle_state::prompt_types::prompt_data::PromptChoiceLabel;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 
@@ -22,7 +23,7 @@ pub fn energy_cost(battle: &mut BattleState, player: PlayerName, cost: Energy) {
     battle_trace!("Paying additional cost", battle, player, cost);
     battle.push_animation(source, || BattleAnimation::MakeChoice {
         player,
-        choice: PromptChoiceLabel::PayEnergy(cost),
+        choice: costs::pay_cost_label(&Cost::Energy(cost)),
     });
     energy::spend(battle, player, source, cost);
 }

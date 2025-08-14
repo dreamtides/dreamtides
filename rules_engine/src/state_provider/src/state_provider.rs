@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::panic::{RefUnwindSafe, UnwindSafe};
 use std::path::PathBuf;
-use std::sync::{LazyLock, Mutex};
+use std::sync::{Arc, LazyLock, Mutex, RwLock};
 use std::time::Instant;
 
 use battle_state::battle::battle_state::RequestContext;
@@ -62,8 +62,6 @@ pub trait StateProvider:
     fn should_panic_on_error(&self) -> bool {
         false
     }
-
-    fn get_tabula(&self) -> Tabula;
 }
 
 static REQUEST_CONTEXTS: LazyLock<Mutex<HashMap<UserId, RequestContext>>> =
@@ -84,7 +82,7 @@ static PENDING_UPDATES: LazyLock<Mutex<HashMap<UserId, Vec<PollResult>>>> =
 static DISPLAY_STATES: LazyLock<Mutex<HashMap<UserId, DisplayState>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
-static TABULA_DATA: LazyLock<Mutex<Option<Tabula>>> = LazyLock::new(|| Mutex::new(None));
+static TABULA_DATA: LazyLock<RwLock<Option<Arc<Tabula>>>> = LazyLock::new(|| RwLock::new(None));
 
 #[derive(Clone)]
 pub struct DefaultStateProvider;
@@ -103,8 +101,8 @@ impl StateProvider for DefaultStateProvider {
             .ok()
             .and_then(|file| serde_json::from_reader::<_, Tabula>(file).ok())
             .ok_or(DatabaseError("Failed to load tabula.json".to_string()))?;
-        let mut guard = TABULA_DATA.lock().unwrap();
-        *guard = Some(tabula);
+        let mut guard = TABULA_DATA.write().unwrap();
+        *guard = Some(Arc::new(tabula));
         Ok(db)
     }
 
@@ -188,11 +186,6 @@ impl StateProvider for DefaultStateProvider {
         }
         None
     }
-
-    fn get_tabula(&self) -> Tabula {
-        let guard = TABULA_DATA.lock().unwrap();
-        guard.clone().unwrap_or_else(|| panic!("Tabula not initialized"))
-    }
 }
 
 impl DisplayStateProvider for DefaultStateProvider {
@@ -204,5 +197,10 @@ impl DisplayStateProvider for DefaultStateProvider {
     fn set_display_state(&self, user_id: UserId, state: DisplayState) {
         let mut states = DISPLAY_STATES.lock().unwrap();
         states.insert(user_id, state);
+    }
+
+    fn tabula(&self) -> Arc<Tabula> {
+        let guard = TABULA_DATA.read().unwrap();
+        guard.clone().unwrap_or_else(|| panic!("Tabula not initialized"))
     }
 }
