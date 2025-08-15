@@ -77,12 +77,16 @@ fn ability_table() -> &'static AbilityTable {
 fn slot_for_index(index: usize) -> AbilitySlot {
     let table = ability_table();
     {
-        let mut guard = table.write();
-        if guard.len() <= index {
-            guard.resize_with(index + 1, || Arc::new(OnceLock::new()));
+        let guard = table.read();
+        if guard.len() > index {
+            return guard[index].clone();
         }
-        guard[index].clone()
     }
+    let mut guard = table.write();
+    if guard.len() <= index {
+        guard.resize_with(index + 1, || Arc::new(OnceLock::new()));
+    }
+    guard[index].clone()
 }
 
 pub fn query_by_name(name: CardName) -> Arc<AbilityList> {
