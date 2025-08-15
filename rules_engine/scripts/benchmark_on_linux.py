@@ -6,6 +6,7 @@ import subprocess
 import sys
 import shlex
 import time
+from datetime import datetime
 
 
 IMAGE_NAME = "dreamtides-bench:ubuntu24"
@@ -44,17 +45,74 @@ def project_root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
+LOG_PATH = None
+OUTPUT_MODE = "none"
+
+
+def init_logging():
+    global LOG_PATH
+    if LOG_PATH is None:
+        LOG_PATH = os.path.join(project_root(), f"benchmark_on_linux.log")
+        with open(LOG_PATH, "w") as f:
+            f.write(f"Benchmark session started at {datetime.now().isoformat()}\n")
+        print(f"Logging command output to {LOG_PATH}")
+
+
 def run(cmd, check=True, capture=False):
-    print(f"Running: {' '.join(cmd if isinstance(cmd, list) else shlex.split(cmd))}")
-    proc = subprocess.run(cmd if isinstance(cmd, list) else shlex.split(cmd),
-                          stdout=subprocess.PIPE if capture else None,
-                          stderr=subprocess.STDOUT,
-                          text=True)
-    if capture:
+    init_logging()
+    cmd_list = cmd if isinstance(cmd, list) else shlex.split(cmd)
+    printable = " ".join(cmd_list)
+    with open(LOG_PATH, "a") as logf:
+        logf.write(f"\n$ {printable}\n")
+        if capture:
+            proc = subprocess.run(cmd_list, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            if proc.stdout:
+                logf.write(proc.stdout)
+                if not proc.stdout.endswith("\n"):
+                    logf.write("\n")
+                if OUTPUT_MODE == "full":
+                    print(proc.stdout, end="")
+                elif OUTPUT_MODE == "dots":
+                    print(".", end="", flush=True)
+                if OUTPUT_MODE != "full":
+                    start = "Running benches/iai_benchmarks.rs"
+                    end = "Iai-Callgrind result"
+                    printing = False
+                    for line in proc.stdout.splitlines():
+                        if start in line:
+                            printing = True
+                        if printing:
+                            print(line)
+                        if printing and end in line:
+                            printing = False
+            if check and proc.returncode != 0:
+                raise RuntimeError(f"Command failed ({proc.returncode}): {printable}")
+            return proc
+        proc = subprocess.Popen(cmd_list, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+        try:
+            printing = False
+            start = "Running benches/iai_benchmarks.rs"
+            end = "Iai-Callgrind result"
+            for line in proc.stdout:
+                logf.write(line)
+                if OUTPUT_MODE == "full":
+                    print(line, end="")
+                elif OUTPUT_MODE == "dots":
+                    print(".", end="", flush=True)
+                if OUTPUT_MODE != "full":
+                    if start in line:
+                        printing = True
+                    if printing:
+                        print(line, end="" if line.endswith("\n") else "\n")
+                    if printing and end in line:
+                        printing = False
+        finally:
+            proc.wait()
+            if OUTPUT_MODE == "dots":
+                print("", flush=True)
+        if check and proc.returncode != 0:
+            raise RuntimeError(f"Command failed ({proc.returncode}): {printable}")
         return proc
-    if check and proc.returncode != 0:
-        raise RuntimeError(f"Command failed ({proc.returncode}): {cmd}")
-    return proc
 
 
 def require_docker():
@@ -165,7 +223,10 @@ def main():
     parser.add_argument("benchmark", help="Benchmark name filter passed to cargo bench")
     parser.add_argument("--no-build", action="store_true", help="Skip build step and only run benchmarks")
     parser.add_argument("--verbose", action="store_true", help="Verbose sync output")
+    parser.add_argument("--output", choices=["none", "dots", "full"], default="none", help="Console printing of subprocess output: none (default), dots, or full")
     args = parser.parse_args()
+    global OUTPUT_MODE
+    OUTPUT_MODE = args.output
 
     require_docker()
     ensure_volumes()

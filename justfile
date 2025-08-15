@@ -229,6 +229,9 @@ bench-c11:
 bench-full:
     cargo criterion --manifest-path rules_engine/Cargo.toml -p battle_benchmarks -- ai_full/ai_full
 
+iai:
+    ./rules_engine/scripts/benchmark_on_linux.py 'iai_benchmarks'
+
 symlinks:
      ./rules_engine/scripts/symlinks.py -d ~/Documents/dttmp rules_engine/target client/Library
 
