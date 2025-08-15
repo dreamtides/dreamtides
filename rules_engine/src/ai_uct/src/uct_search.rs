@@ -332,6 +332,7 @@ pub fn evaluate_for_benchmarking(
     battle: &mut BattleState,
     maximizing_player: PlayerName,
 ) -> OrderedFloat<f64> {
+    fastrand::seed(31415926535897);
     evaluate(battle, maximizing_player)
 }
 

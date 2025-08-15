@@ -91,6 +91,7 @@ def ensure_container():
 
     run([
         "docker", "run", "-d",
+        "--privileged",
         "--name", CONTAINER_NAME,
         "-e", "CARGO_TARGET_DIR=/cache/target",
         "-v", f"{VOLUME_CODE}:/workspace",
@@ -139,6 +140,15 @@ def exec_in_container(cmd, check=True):
     return run(["docker", "exec", "-u", "runner", CONTAINER_NAME, "bash", "-lc", cmd], check=check)
 
 
+def exec_in_container_root(cmd, check=True):
+    return run(["docker", "exec", "-u", "root", CONTAINER_NAME, "bash", "-lc", cmd], check=check)
+
+
+def ensure_debug_tools():
+    exec_in_container_root("if ! command -v valgrind >/dev/null 2>&1; then apt-get update && apt-get install -y valgrind && rm -rf /var/lib/apt/lists/*; fi")
+    exec_in_container("if ! command -v iai-callgrind-runner >/dev/null 2>&1; then cargo install --locked --version 0.16.1 iai-callgrind-runner; fi")
+
+
 def linux_build():
     path = WORKDIR if not CODE_SUBDIR else f"{WORKDIR}/{CODE_SUBDIR}"
     # Note: If this fails with SIGKILL, try increasing the Docker Desktop VM memory.
@@ -161,6 +171,7 @@ def main():
     ensure_volumes()
     build_image()
     ensure_container()
+    ensure_debug_tools()
     rsync_code(verbose=args.verbose)
 
     try:

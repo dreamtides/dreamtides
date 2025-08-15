@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     git \
     rsync \
+    valgrind \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal --default-toolchain stable \
@@ -26,6 +27,8 @@ RUN useradd -ms /bin/bash runner \
 
 USER runner
 WORKDIR /workspace
+
+RUN cargo install --locked --version 0.16.1 iai-callgrind-runner
 
 CMD ["bash", "-lc", "sleep infinity"]
 

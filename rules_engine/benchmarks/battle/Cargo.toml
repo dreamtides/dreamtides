@@ -2,24 +2,32 @@
 name = "battle_benchmarks"
 version = "0.0.0"
 edition = "2024"
+
 [lints]
 workspace = true
 
+# [[bench]]
+# name = "battle_benchmarks"
+# harness = false
+# test = false
+# doctest = false
 
 [[bench]]
-name = "battle_benchmarks"
-harness = false
+name = "iai_benchmarks"
 test = false
 doctest = false
+harness = false
 
 [dependencies]
 ai_agents = { path = "../../src/ai_agents" }
 ai_data = { path = "../../src/ai_data" }
 ai_uct = { path = "../../src/ai_uct" }
 benchmark_battles = { path = "../benchmark_battles" }
+battle_state = { path = "../../src/battle_state" }
 core_data = { path = "../../src/core_data" }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 
 [dev-dependencies]
 criterion = { workspace = true }
+iai-callgrind = { workspace = true }

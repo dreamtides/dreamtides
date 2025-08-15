@@ -18,6 +18,7 @@ battle_queries = { path = "../battle_queries", version = "0.0.0" }
 core_data = { path = "../core_data", version = "0.0.0" }
 
 ego-tree = { workspace = true }
+fastrand = { workspace = true }
 ordered-float = { workspace = true }
 petgraph = { workspace = true }
 rand = { workspace = true }
