@@ -94,7 +94,6 @@ fn generate_core_11_battle_with_logging(enable_logging: bool) -> BattleState {
                 }
             }
 
-            // Assert that these exact 6 actions are always returned
             let expected_actions = [
                 BattleAction::EndTurn,
                 BattleAction::PlayCardFromHand(HandCardId(CardId(18))),

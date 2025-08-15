@@ -1,0 +1,24 @@
+[package]
+name = "benchmark_battles"
+version = "0.0.0"
+edition = "2024"
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "core_11_battle"
+path = "src/core_11_battle.rs"
+
+[dependencies]
+ai_data = { path = "../../src/ai_data" }
+battle_mutations = { path = "../../src/battle_mutations" }
+battle_queries = { path = "../../src/battle_queries" }
+battle_state = { path = "../../src/battle_state" }
+core_data = { path = "../../src/core_data" }
+game_creation = { path = "../../src/game_creation" }
+
+rand = { workspace = true }
+rand_xoshiro = { workspace = true }
+uuid = { workspace = true }
+

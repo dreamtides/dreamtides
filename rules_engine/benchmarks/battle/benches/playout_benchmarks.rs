@@ -3,7 +3,7 @@ use std::time::Duration;
 use ai_agents::agent_search;
 use ai_data::game_ai::GameAI;
 use ai_uct::uct_search;
-use battle_benchmarks::{core_11_battle, starting_5_battle};
+use benchmark_battles::{core_11_battle, starting_5_battle};
 use core_data::types::PlayerName;
 use criterion::{BatchSize, Criterion, criterion_group};
 use tracing::{Level, subscriber};

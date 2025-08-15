@@ -12,25 +12,14 @@ harness = false
 test = false
 doctest = false
 
-[[bin]]
-name = "core_11_battle"
-path = "src/core_11_battle.rs"
-
 [dependencies]
 ai_agents = { path = "../../src/ai_agents" }
 ai_data = { path = "../../src/ai_data" }
 ai_uct = { path = "../../src/ai_uct" }
-battle_mutations = { path = "../../src/battle_mutations" }
-battle_queries = { path = "../../src/battle_queries" }
-battle_state = { path = "../../src/battle_state" }
+benchmark_battles = { path = "../benchmark_battles" }
 core_data = { path = "../../src/core_data" }
-game_creation = { path = "../../src/game_creation" }
-
-rand = { workspace = true }
-rand_xoshiro = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
-uuid = { workspace = true }
 
 [dev-dependencies]
 criterion = { workspace = true }

@@ -38,7 +38,6 @@ struct BenchmarkCardSpec {
 
 pub fn benchmark_battle() -> BattleState {
     let card_specs = vec![
-        // Player One
         BenchmarkCardSpec {
             id: 0,
             name: CardName::TestVanillaCharacter,
@@ -147,7 +146,6 @@ pub fn benchmark_battle() -> BattleState {
             owner: PlayerName::One,
             zone: Zone::Hand,
         },
-        // Player Two
         BenchmarkCardSpec {
             id: 18,
             name: CardName::TestVanillaCharacter,

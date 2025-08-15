@@ -319,17 +319,11 @@ dependencies = [
  "ai_agents",
  "ai_data",
  "ai_uct",
- "battle_mutations",
- "battle_queries",
- "battle_state",
+ "benchmark_battles",
  "core_data",
  "criterion",
- "game_creation",
- "rand 0.9.0",
- "rand_xoshiro",
  "tracing",
  "tracing-subscriber",
- "uuid",
 ]
 
 [[package]]
@@ -420,6 +414,21 @@ dependencies = [
  "test_utils",
  "tokio",
  "ui_components",
+ "uuid",
+]
+
+[[package]]
+name = "benchmark_battles"
+version = "0.0.0"
+dependencies = [
+ "ai_data",
+ "battle_mutations",
+ "battle_queries",
+ "battle_state",
+ "core_data",
+ "game_creation",
+ "rand 0.9.0",
+ "rand_xoshiro",
  "uuid",
 ]
 
