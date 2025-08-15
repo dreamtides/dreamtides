@@ -14,6 +14,7 @@ VOLUME_CODE = "dreamtides_code"
 VOLUME_TARGET = "dreamtides_target"
 VOLUME_CARGO = "dreamtides_cargo"
 WORKDIR = "/workspace"
+CODE_SUBDIR = ""
 
 
 class Colors:
@@ -44,6 +45,7 @@ def project_root():
 
 
 def run(cmd, check=True, capture=False):
+    print(f"Running: {' '.join(cmd if isinstance(cmd, list) else shlex.split(cmd))}")
     proc = subprocess.run(cmd if isinstance(cmd, list) else shlex.split(cmd),
                           stdout=subprocess.PIPE if capture else None,
                           stderr=subprocess.STDOUT,
@@ -84,26 +86,22 @@ def ensure_volumes():
 
 def ensure_container():
     result = run(["docker", "ps", "-a", "--filter", f"name=^{CONTAINER_NAME}$", "--format", "{{.Status}}"], check=False, capture=True)
-    exists = bool(result.stdout)
-    if exists and result.stdout.startswith("Up"):
-        return
-    if exists:
+    if result.stdout:
         run(["docker", "rm", "-f", CONTAINER_NAME], check=False)
 
     run([
         "docker", "run", "-d",
         "--name", CONTAINER_NAME,
+        "-e", "CARGO_TARGET_DIR=/cache/target",
         "-v", f"{VOLUME_CODE}:/workspace",
-        "-v", f"{VOLUME_TARGET}:{WORKDIR}/target",
+        "-v", f"{VOLUME_TARGET}:/cache/target",
         "-v", f"{VOLUME_CARGO}:/usr/local/cargo",
         IMAGE_NAME
     ])
 
-    # Small wait to ensure container is ready
     time.sleep(1)
-    # Ensure mounted volumes are writable by 'runner'
     run(["docker", "exec", "-u", "root", CONTAINER_NAME, "bash", "-lc",
-         f"chown -R runner:runner /workspace /usr/local/cargo {WORKDIR}/target || true"], check=False)
+         "mkdir -p /cache/target && chown -R runner:runner /workspace /cache /usr/local/cargo || true"], check=False)
 
 
 def rsync_code(verbose=False):
@@ -142,11 +140,13 @@ def exec_in_container(cmd, check=True):
 
 
 def linux_build():
-    exec_in_container(f"cd {WORKDIR} && cargo build")
+    path = WORKDIR if not CODE_SUBDIR else f"{WORKDIR}/{CODE_SUBDIR}"
+    exec_in_container(f"cd {path} && cargo build")
 
 
 def linux_bench(bench_filter):
-    exec_in_container(f"cd {WORKDIR} && cargo bench -- {shlex.quote(bench_filter)}")
+    path = WORKDIR if not CODE_SUBDIR else f"{WORKDIR}/{CODE_SUBDIR}"
+    exec_in_container(f"cd {path} && cargo bench -- {shlex.quote(bench_filter)}")
 
 
 def main():
