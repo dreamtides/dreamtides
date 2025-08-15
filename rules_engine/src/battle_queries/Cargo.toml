@@ -25,6 +25,7 @@ chrono = { workspace = true }
 enumset = { workspace = true }
 fastrand = { workspace = true }
 fluent = { workspace = true }
+parking_lot = { workspace = true }
 rand = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

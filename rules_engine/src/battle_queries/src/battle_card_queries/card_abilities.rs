@@ -20,11 +20,16 @@ use battle_state::triggers::trigger::TriggerName;
 use core_data::identifiers::{AbilityNumber, CardName};
 use core_data::numerics::{Energy, Spark};
 use enumset::EnumSet;
+use parking_lot::RwLock;
 
 use crate::battle_card_queries::{build_named_abilities, card};
 use crate::card_ability_queries::{effect_queries, target_predicates};
 
-static ABILITY_TABLE: OnceLock<Vec<OnceLock<Arc<AbilityList>>>> = OnceLock::new();
+type AbilitySlot = Arc<OnceLock<Arc<AbilityList>>>;
+type AbilitySlots = Vec<AbilitySlot>;
+type AbilityTable = RwLock<AbilitySlots>;
+
+static ABILITY_TABLE: OnceLock<AbilityTable> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> Arc<AbilityList> {
     query_by_name(card::get(battle, card_id).name)
@@ -65,19 +70,24 @@ fn card_name_index(name: CardName) -> usize {
     }
 }
 
-fn ability_table() -> &'static Vec<OnceLock<Arc<AbilityList>>> {
-    ABILITY_TABLE.get_or_init(|| {
-        let mut v = Vec::with_capacity(30);
-        for _ in 0..30 {
-            v.push(OnceLock::new());
+fn ability_table() -> &'static AbilityTable {
+    ABILITY_TABLE.get_or_init(|| RwLock::new(Vec::new()))
+}
+
+fn slot_for_index(index: usize) -> AbilitySlot {
+    let table = ability_table();
+    {
+        let mut guard = table.write();
+        if guard.len() <= index {
+            guard.resize_with(index + 1, || Arc::new(OnceLock::new()));
         }
-        v
-    })
+        guard[index].clone()
+    }
 }
 
 pub fn query_by_name(name: CardName) -> Arc<AbilityList> {
     let index = card_name_index(name);
-    let slot = &ability_table()[index];
+    let slot = slot_for_index(index);
     slot.get_or_init(|| Arc::new(build_for(name))).clone()
 }
 
