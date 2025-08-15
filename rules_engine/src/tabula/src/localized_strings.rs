@@ -103,6 +103,7 @@ impl LocalizedStrings {
             None => return "ERR2: Missing Resource".to_string(),
         };
         let mut bundle = FluentBundle::default();
+        bundle.set_use_isolating(false);
         if bundle.add_resource(res.as_ref()).is_err() {
             return "ERR3: Add Resource Failed".to_string();
         }
