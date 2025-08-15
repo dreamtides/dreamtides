@@ -121,7 +121,7 @@ fn get_prompt_message_from_source(battle: &BattleState, prompt: &PromptData) -> 
     };
 
     let abilities = card_abilities::query(battle, card_id);
-    let config = find_ability_configuration(abilities, ability_number)?;
+    let config = find_ability_configuration(&abilities, ability_number)?;
 
     match &prompt.prompt_type {
         PromptType::ChooseCharacter { .. }

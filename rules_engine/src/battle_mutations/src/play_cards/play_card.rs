@@ -5,7 +5,6 @@ use battle_queries::legal_action_queries::can_play_cards;
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{AbilityId, CardIdType, HandCardId, StackCardId, VoidCardId};
-use battle_state::battle_cards::ability_list::AbilityReference;
 use battle_state::battle_cards::zone::Zone;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger::Trigger;
@@ -108,9 +107,11 @@ fn apply_if_you_do_effect(
     via_ability: AbilityId,
 ) {
     let source = EffectSource::IfYouDo { controller: player, ability_id: via_ability };
-    let ability = card_abilities::ability(battle, via_ability);
-    if let AbilityReference::Static(static_ability) = ability
-        && let StandardStaticAbility::PlayFromVoid(play) = static_ability.standard_static_ability()
+    let abilities = card_abilities::query(battle, via_ability.card_id);
+    if let Some(ability_data) =
+        abilities.static_abilities.iter().find(|a| a.ability_number == via_ability.ability_number)
+        && let StandardStaticAbility::PlayFromVoid(play) =
+            ability_data.ability.standard_static_ability()
         && let Some(effect) = &play.if_you_do
     {
         apply_effect_with_prompt_for_targets::execute(

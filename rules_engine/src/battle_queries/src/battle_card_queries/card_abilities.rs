@@ -1,4 +1,4 @@
-use std::sync::OnceLock;
+use std::sync::{Arc, OnceLock};
 
 use ability_data::ability::{Ability, EventAbility};
 use ability_data::activated_ability::{ActivatedAbility, ActivatedAbilityOptions};
@@ -12,9 +12,9 @@ use ability_data::static_ability::{PlayFromVoid, StandardStaticAbility};
 use ability_data::trigger_event::{PlayerTurn, TriggerEvent};
 use ability_data::triggered_ability::TriggeredAbility;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{AbilityId, CardIdType};
+use battle_state::battle::card_id::CardIdType;
 use battle_state::battle_cards::ability_list::{
-    AbilityConfiguration, AbilityData, AbilityList, AbilityReference, CanPlayRestriction,
+    AbilityConfiguration, AbilityData, AbilityList, CanPlayRestriction,
 };
 use battle_state::triggers::trigger::TriggerName;
 use core_data::identifiers::{AbilityNumber, CardName};
@@ -23,555 +23,62 @@ use enumset::EnumSet;
 
 use crate::battle_card_queries::{build_named_abilities, card};
 use crate::card_ability_queries::{effect_queries, target_predicates};
-use crate::panic_with;
 
-static CHARACTER_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
-static TEST_DISSOLVE_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
-static TEST_NAMED_DISSOLVE_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
-static TEST_COUNTERSPELL_UNLESS_PAY: OnceLock<AbilityList> = OnceLock::new();
-static COUNTERSPELL_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
-static ENERGY_PROMPT_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
-static TEST_DRAW_ONE_ABILITIES: OnceLock<AbilityList> = OnceLock::new();
-static TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER: OnceLock<AbilityList> =
-    OnceLock::new();
-static TEST_TRIGGER_GAIN_SPARK_PLAY_OPPONENT_TURN: OnceLock<AbilityList> = OnceLock::new();
-static TEST_TRIGGER_GAIN_TWO_SPARK_PLAY_OPPONENT_TURN: OnceLock<AbilityList> = OnceLock::new();
-static TEST_ACTIVATED_ABILITY_CHARACTER: OnceLock<AbilityList> = OnceLock::new();
-static TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: OnceLock<AbilityList> = OnceLock::new();
-static TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: OnceLock<AbilityList> = OnceLock::new();
-static TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: OnceLock<AbilityList> =
-    OnceLock::new();
-static TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER: OnceLock<AbilityList> = OnceLock::new();
-static TEST_DUAL_ACTIVATED_ABILITY_CHARACTER: OnceLock<AbilityList> = OnceLock::new();
-static TEST_FORESEE_1: OnceLock<AbilityList> = OnceLock::new();
-static TEST_FORESEE_2: OnceLock<AbilityList> = OnceLock::new();
-static TEST_FORESEE_1_DRAW_A_CARD: OnceLock<AbilityList> = OnceLock::new();
-static TEST_DRAW_ONE_RECLAIM: OnceLock<AbilityList> = OnceLock::new();
-static TEST_RETURN_VOID_CARD_TO_HAND: OnceLock<AbilityList> = OnceLock::new();
-static TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND: OnceLock<AbilityList> = OnceLock::new();
-static TEST_MODAL_DRAW_ONE_OR_DRAW_TWO: OnceLock<AbilityList> = OnceLock::new();
-static TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY: OnceLock<AbilityList> = OnceLock::new();
-static TEST_RETURN_TO_HAND: OnceLock<AbilityList> = OnceLock::new();
-static TEST_PREVENT_DISSOLVE_THIS_TURN: OnceLock<AbilityList> = OnceLock::new();
-static TEST_COUNTERSPELL_CHARACTER: OnceLock<AbilityList> = OnceLock::new();
-static TEST_FORESEE_1_RECLAIM: OnceLock<AbilityList> = OnceLock::new();
-static TEST_FORESEE_1_DRAW_RECLAIM: OnceLock<AbilityList> = OnceLock::new();
-static TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO: OnceLock<AbilityList> = OnceLock::new();
+static ABILITY_TABLE: OnceLock<Vec<OnceLock<Arc<AbilityList>>>> = OnceLock::new();
 
-pub fn query(battle: &BattleState, card_id: impl CardIdType) -> &'static AbilityList {
+pub fn query(battle: &BattleState, card_id: impl CardIdType) -> Arc<AbilityList> {
     query_by_name(card::get(battle, card_id).name)
 }
 
-pub fn query_by_name(name: CardName) -> &'static AbilityList {
+fn card_name_index(name: CardName) -> usize {
     match name {
-        CardName::TestVanillaCharacter => CHARACTER_ABILITIES
-            .get_or_init(|| build_ability_list(CardName::TestVanillaCharacter, vec![])),
-        CardName::TestDissolve => TEST_DISSOLVE_ABILITIES.get_or_init(|| {
-            build_ability_list(CardName::TestDissolve, vec![(
-                AbilityNumber(0),
-                Ability::Event(EventAbility {
-                    additional_cost: None,
-                    effect: Effect::Effect(StandardEffect::DissolveCharacter {
-                        target: Predicate::Enemy(CardPredicate::Character),
-                    }),
-                }),
-                AbilityConfiguration {
-                    targeting_prompt: Some("Select an enemy character.".to_string()),
-                    ..Default::default()
-                },
-            )])
-        }),
-        CardName::TestNamedDissolve => TEST_NAMED_DISSOLVE_ABILITIES.get_or_init(|| {
-            build_ability_list(CardName::TestNamedDissolve, vec![(
-                AbilityNumber(0),
-                Ability::Event(EventAbility {
-                    additional_cost: None,
-                    effect: Effect::Effect(StandardEffect::DissolveCharacter {
-                        target: Predicate::Enemy(CardPredicate::Character),
-                    }),
-                }),
-                AbilityConfiguration {
-                    targeting_prompt: Some("Select an enemy character.".to_string()),
-                    ..Default::default()
-                },
-            )])
-        }),
-        CardName::TestCounterspellUnlessPays => TEST_COUNTERSPELL_UNLESS_PAY.get_or_init(|| {
-            build_ability_list(CardName::TestCounterspellUnlessPays, vec![(
-                AbilityNumber(0),
-                Ability::Event(EventAbility {
-                    additional_cost: None,
-                    effect: Effect::Effect(StandardEffect::CounterspellUnlessPaysCost {
-                        target: Predicate::Enemy(CardPredicate::Event),
-                        cost: Cost::Energy(Energy(2)),
-                    }),
-                }),
-                AbilityConfiguration {
-                    targeting_prompt: Some("Select an enemy event.".to_string()),
-                    choice_prompt: Some("Pay 2\u{f7e4} to resolve this card?".to_string()),
-                    ..Default::default()
-                },
-            )])
-        }),
-        CardName::TestCounterspell => COUNTERSPELL_ABILITIES.get_or_init(|| {
-            build_ability_list(CardName::TestCounterspell, vec![(
-                AbilityNumber(0),
-                Ability::Event(EventAbility {
-                    additional_cost: None,
-                    effect: Effect::Effect(StandardEffect::Counterspell {
-                        target: Predicate::Enemy(CardPredicate::CardOnStack),
-                    }),
-                }),
-                AbilityConfiguration {
-                    targeting_prompt: Some("Select an enemy card.".to_string()),
-                    ..Default::default()
-                },
-            )])
-        }),
-        CardName::TestVariableEnergyDraw => ENERGY_PROMPT_ABILITIES.get_or_init(|| {
-            build_ability_list(CardName::TestVariableEnergyDraw, vec![(
-                AbilityNumber(0),
-                Ability::Event(EventAbility {
-                    additional_cost: Some(Cost::SpendOneOrMoreEnergy),
-                    effect: Effect::Effect(StandardEffect::DrawCardsForEach {
-                        count: 1,
-                        for_each: QuantityExpression::ForEachEnergySpentOnThisCard,
-                    }),
-                }),
-                AbilityConfiguration {
-                    additional_cost_prompt: Some("Pay one or more \u{f7e4}.".to_string()),
-                    ..Default::default()
-                },
-            )])
-        }),
-        CardName::TestDrawOne => TEST_DRAW_ONE_ABILITIES.get_or_init(|| {
-            build_ability_list(CardName::TestDrawOne, vec![(
-                AbilityNumber(0),
-                Ability::Event(EventAbility {
-                    additional_cost: None,
-                    effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
-                }),
-                AbilityConfiguration { ..Default::default() },
-            )])
-        }),
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => {
-            TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER.get_or_init(|| {
-                build_ability_list(
-                    CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
-                    vec![(
-                        AbilityNumber(0),
-                        Ability::Triggered(TriggeredAbility {
-                            trigger: TriggerEvent::Materialize(Predicate::Another(
-                                CardPredicate::Character,
-                            )),
-                            effect: Effect::Effect(StandardEffect::GainsSpark {
-                                target: Predicate::This,
-                                gains: Spark(1),
-                            }),
-                            options: None,
-                        }),
-                        AbilityConfiguration::default(),
-                    )],
-                )
-            })
-        }
-        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
-            TEST_TRIGGER_GAIN_SPARK_PLAY_OPPONENT_TURN.get_or_init(|| {
-                build_ability_list(CardName::TestTriggerGainSparkOnPlayCardEnemyTurn, vec![(
-                    AbilityNumber(0),
-                    Ability::Triggered(TriggeredAbility {
-                        trigger: TriggerEvent::PlayDuringTurn(
-                            Predicate::Your(CardPredicate::Card),
-                            PlayerTurn::EnemyTurn,
-                        ),
-                        effect: Effect::Effect(StandardEffect::GainsSpark {
-                            target: Predicate::This,
-                            gains: Spark(1),
-                        }),
-                        options: None,
-                    }),
-                    AbilityConfiguration::default(),
-                )])
-            })
-        }
-        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => {
-            TEST_TRIGGER_GAIN_TWO_SPARK_PLAY_OPPONENT_TURN.get_or_init(|| {
-                build_ability_list(CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn, vec![(
-                    AbilityNumber(0),
-                    Ability::Triggered(TriggeredAbility {
-                        trigger: TriggerEvent::PlayDuringTurn(
-                            Predicate::Your(CardPredicate::Card),
-                            PlayerTurn::EnemyTurn,
-                        ),
-                        effect: Effect::Effect(StandardEffect::GainsSpark {
-                            target: Predicate::This,
-                            gains: Spark(2),
-                        }),
-                        options: None,
-                    }),
-                    AbilityConfiguration::default(),
-                )])
-            })
-        }
-        CardName::TestActivatedAbilityDrawCard => {
-            TEST_ACTIVATED_ABILITY_CHARACTER.get_or_init(|| {
-                build_ability_list(CardName::TestActivatedAbilityDrawCard, vec![(
-                    AbilityNumber(0),
-                    Ability::Activated(ActivatedAbility {
-                        costs: vec![Cost::Energy(Energy(1))],
-                        effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
-                        options: None,
-                    }),
-                    AbilityConfiguration::default(),
-                )])
-            })
-        }
-        CardName::TestMultiActivatedAbilityDrawCardCharacter => {
-            TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER.get_or_init(|| {
-                build_ability_list(CardName::TestMultiActivatedAbilityDrawCardCharacter, vec![(
-                    AbilityNumber(0),
-                    Ability::Activated(ActivatedAbility {
-                        costs: vec![Cost::Energy(Energy(1))],
-                        effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
-                        options: Some(ActivatedAbilityOptions { is_multi: true, is_fast: false }),
-                    }),
-                    AbilityConfiguration::default(),
-                )])
-            })
-        }
-        CardName::TestFastActivatedAbilityDrawCardCharacter => {
-            TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER.get_or_init(|| {
-                build_ability_list(CardName::TestFastActivatedAbilityDrawCardCharacter, vec![(
-                    AbilityNumber(0),
-                    Ability::Activated(ActivatedAbility {
-                        costs: vec![Cost::Energy(Energy(1))],
-                        effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
-                        options: Some(ActivatedAbilityOptions { is_multi: false, is_fast: true }),
-                    }),
-                    AbilityConfiguration::default(),
-                )])
-            })
-        }
-        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => {
-            TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER.get_or_init(|| {
-                build_ability_list(CardName::TestFastMultiActivatedAbilityDrawCardCharacter, vec![
-                    (
-                        AbilityNumber(0),
-                        Ability::Activated(ActivatedAbility {
-                            costs: vec![Cost::Energy(Energy(3))],
-                            effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
-                            options: Some(ActivatedAbilityOptions {
-                                is_multi: true,
-                                is_fast: true,
-                            }),
-                        }),
-                        AbilityConfiguration::default(),
-                    ),
-                ])
-            })
-        }
-        CardName::TestActivatedAbilityDissolveCharacter => {
-            TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER.get_or_init(|| {
-                build_ability_list(CardName::TestActivatedAbilityDissolveCharacter, vec![(
-                    AbilityNumber(0),
-                    Ability::Activated(ActivatedAbility {
-                        costs: vec![Cost::Energy(Energy(2))],
-                        effect: Effect::Effect(StandardEffect::DissolveCharacter {
-                            target: Predicate::Enemy(CardPredicate::Character),
-                        }),
-                        options: None,
-                    }),
-                    AbilityConfiguration {
-                        targeting_prompt: Some("Select an enemy character.".to_string()),
-                        ..Default::default()
-                    },
-                )])
-            })
-        }
-        CardName::TestDualActivatedAbilityCharacter => TEST_DUAL_ACTIVATED_ABILITY_CHARACTER
-            .get_or_init(|| {
-                build_ability_list(CardName::TestDualActivatedAbilityCharacter, vec![
-                    (
-                        AbilityNumber(0),
-                        Ability::Activated(ActivatedAbility {
-                            costs: vec![Cost::Energy(Energy(1))],
-                            effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
-                            options: None,
-                        }),
-                        AbilityConfiguration::default(),
-                    ),
-                    (
-                        AbilityNumber(1),
-                        Ability::Activated(ActivatedAbility {
-                            costs: vec![Cost::Energy(Energy(2))],
-                            effect: Effect::Effect(StandardEffect::DrawCards { count: 2 }),
-                            options: None,
-                        }),
-                        AbilityConfiguration::default(),
-                    ),
-                ])
-            }),
-        CardName::TestForeseeOne => TEST_FORESEE_1.get_or_init(|| {
-            build_ability_list(CardName::TestForeseeOne, vec![(
-                AbilityNumber(0),
-                Ability::Event(EventAbility {
-                    additional_cost: None,
-                    effect: Effect::Effect(StandardEffect::Foresee { count: 1 }),
-                }),
-                AbilityConfiguration::default(),
-            )])
-        }),
-        CardName::TestForeseeTwo => TEST_FORESEE_2.get_or_init(|| {
-            build_ability_list(CardName::TestForeseeTwo, vec![(
-                AbilityNumber(0),
-                Ability::Event(EventAbility {
-                    additional_cost: None,
-                    effect: Effect::Effect(StandardEffect::Foresee { count: 2 }),
-                }),
-                AbilityConfiguration::default(),
-            )])
-        }),
-        CardName::TestForeseeOneDrawACard => TEST_FORESEE_1_DRAW_A_CARD.get_or_init(|| {
-            build_ability_list(CardName::TestForeseeOneDrawACard, vec![(
-                AbilityNumber(0),
-                Ability::Event(EventAbility {
-                    additional_cost: None,
-                    effect: Effect::List(vec![
-                        EffectWithOptions::new(StandardEffect::Foresee { count: 1 }),
-                        EffectWithOptions::new(StandardEffect::DrawCards { count: 1 }),
-                    ]),
-                }),
-                AbilityConfiguration::default(),
-            )])
-        }),
-        CardName::TestDrawOneReclaim => TEST_DRAW_ONE_RECLAIM.get_or_init(|| {
-            build_ability_list(CardName::TestDrawOneReclaim, vec![
-                (
-                    AbilityNumber(0),
-                    Ability::Event(EventAbility {
-                        additional_cost: None,
-                        effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
-                    }),
-                    AbilityConfiguration::default(),
-                ),
-                (
-                    AbilityNumber(1),
-                    Ability::Named(NamedAbility::Reclaim(Some(Energy(1)))),
-                    AbilityConfiguration::default(),
-                ),
-            ])
-        }),
-        CardName::TestReturnVoidCardToHand => TEST_RETURN_VOID_CARD_TO_HAND.get_or_init(|| {
-            build_ability_list(CardName::TestReturnVoidCardToHand, vec![(
-                AbilityNumber(0),
-                Ability::Event(EventAbility {
-                    additional_cost: None,
-                    effect: Effect::Effect(StandardEffect::ReturnFromYourVoidToHand {
-                        target: Predicate::YourVoid(CardPredicate::Card),
-                    }),
-                }),
-                AbilityConfiguration {
-                    targeting_prompt: Some("Select a card from your void.".to_string()),
-                    ..Default::default()
-                },
-            )])
-        }),
-        CardName::TestReturnOneOrTwoVoidEventCardsToHand => {
-            TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND.get_or_init(|| {
-                build_ability_list(CardName::TestReturnOneOrTwoVoidEventCardsToHand, vec![(
-                    AbilityNumber(0),
-                    Ability::Event(EventAbility {
-                        additional_cost: None,
-                        effect: Effect::Effect(StandardEffect::ReturnUpToCountFromYourVoidToHand {
-                            target: Predicate::YourVoid(CardPredicate::Event),
-                            count: 2,
-                        }),
-                    }),
-                    AbilityConfiguration {
-                        targeting_prompt: Some(
-                            "Select one or two events from your void.".to_string(),
-                        ),
-                        ..Default::default()
-                    },
-                )])
-            })
-        }
-        CardName::TestModalDrawOneOrDrawTwo => TEST_MODAL_DRAW_ONE_OR_DRAW_TWO.get_or_init(|| {
-            build_ability_list(CardName::TestModalDrawOneOrDrawTwo, vec![(
-                AbilityNumber(0),
-                Ability::Event(EventAbility {
-                    additional_cost: None,
-                    effect: Effect::Modal(vec![
-                        ModalEffectChoice {
-                            energy_cost: Energy(1),
-                            effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
-                        },
-                        ModalEffectChoice {
-                            energy_cost: Energy(3),
-                            effect: Effect::Effect(StandardEffect::DrawCards { count: 2 }),
-                        },
-                    ]),
-                }),
-                AbilityConfiguration { ..Default::default() },
-            )])
-        }),
-        CardName::TestModalDrawOneOrDissolveEnemy => TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY
-            .get_or_init(|| {
-                build_ability_list(CardName::TestModalDrawOneOrDissolveEnemy, vec![(
-                    AbilityNumber(0),
-                    Ability::Event(EventAbility {
-                        additional_cost: None,
-                        effect: Effect::Modal(vec![
-                            ModalEffectChoice {
-                                energy_cost: Energy(1),
-                                effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
-                            },
-                            ModalEffectChoice {
-                                energy_cost: Energy(2),
-                                effect: Effect::Effect(StandardEffect::DissolveCharacter {
-                                    target: Predicate::Enemy(CardPredicate::Character),
-                                }),
-                            },
-                        ]),
-                    }),
-                    AbilityConfiguration { ..Default::default() },
-                )])
-            }),
-        CardName::TestReturnToHand => TEST_RETURN_TO_HAND.get_or_init(|| {
-            build_ability_list(CardName::TestReturnToHand, vec![(
-                AbilityNumber(0),
-                Ability::Event(EventAbility {
-                    additional_cost: None,
-                    effect: Effect::Effect(StandardEffect::ReturnToHand {
-                        target: Predicate::Enemy(CardPredicate::Character),
-                    }),
-                }),
-                AbilityConfiguration {
-                    targeting_prompt: Some("Select an enemy character.".to_string()),
-                    ..Default::default()
-                },
-            )])
-        }),
-        CardName::TestPreventDissolveThisTurn => {
-            TEST_PREVENT_DISSOLVE_THIS_TURN.get_or_init(|| {
-                build_ability_list(CardName::TestPreventDissolveThisTurn, vec![(
-                    AbilityNumber(0),
-                    Ability::Event(EventAbility {
-                        additional_cost: None,
-                        effect: Effect::Effect(StandardEffect::PreventDissolveThisTurn {
-                            target: Predicate::Your(CardPredicate::Character),
-                        }),
-                    }),
-                    AbilityConfiguration::default(),
-                )])
-            })
-        }
-        CardName::TestCounterspellCharacter => TEST_COUNTERSPELL_CHARACTER.get_or_init(|| {
-            build_ability_list(CardName::TestCounterspellCharacter, vec![(
-                AbilityNumber(0),
-                Ability::Event(EventAbility {
-                    additional_cost: None,
-                    effect: Effect::Effect(StandardEffect::Counterspell {
-                        target: Predicate::Enemy(CardPredicate::Character),
-                    }),
-                }),
-                AbilityConfiguration::default(),
-            )])
-        }),
-        CardName::TestForeseeOneReclaim => TEST_FORESEE_1_RECLAIM.get_or_init(|| {
-            build_ability_list(CardName::TestForeseeOneReclaim, vec![
-                (
-                    AbilityNumber(0),
-                    Ability::Event(EventAbility {
-                        additional_cost: None,
-                        effect: Effect::Effect(StandardEffect::Foresee { count: 1 }),
-                    }),
-                    AbilityConfiguration::default(),
-                ),
-                (
-                    AbilityNumber(1),
-                    Ability::Named(NamedAbility::Reclaim(Some(Energy(3)))),
-                    AbilityConfiguration::default(),
-                ),
-            ])
-        }),
-        CardName::TestForeseeOneDrawReclaim => TEST_FORESEE_1_DRAW_RECLAIM.get_or_init(|| {
-            build_ability_list(CardName::TestForeseeOneDrawReclaim, vec![
-                (
-                    AbilityNumber(0),
-                    Ability::Event(EventAbility {
-                        additional_cost: None,
-                        effect: Effect::List(vec![
-                            EffectWithOptions::new(StandardEffect::Foresee { count: 1 }),
-                            EffectWithOptions::new(StandardEffect::DrawCards { count: 1 }),
-                        ]),
-                    }),
-                    AbilityConfiguration::default(),
-                ),
-                (
-                    AbilityNumber(1),
-                    Ability::Named(NamedAbility::Reclaim(Some(Energy(4)))),
-                    AbilityConfiguration::default(),
-                ),
-            ])
-        }),
-        CardName::TestModalReturnToHandOrDrawTwo => TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO
-            .get_or_init(|| {
-                build_ability_list(CardName::TestModalReturnToHandOrDrawTwo, vec![(
-                    AbilityNumber(0),
-                    Ability::Event(EventAbility {
-                        additional_cost: None,
-                        effect: Effect::Modal(vec![
-                            ModalEffectChoice {
-                                energy_cost: Energy(2),
-                                effect: Effect::Effect(StandardEffect::ReturnToHand {
-                                    target: Predicate::Enemy(CardPredicate::Character),
-                                }),
-                            },
-                            ModalEffectChoice {
-                                energy_cost: Energy(3),
-                                effect: Effect::Effect(StandardEffect::DrawCards { count: 2 }),
-                            },
-                        ]),
-                    }),
-                    AbilityConfiguration::default(),
-                )])
-            }),
+        CardName::TestVanillaCharacter => 0,
+        CardName::TestDissolve => 1,
+        CardName::TestNamedDissolve => 2,
+        CardName::TestCounterspellUnlessPays => 3,
+        CardName::TestCounterspell => 4,
+        CardName::TestCounterspellCharacter => 5,
+        CardName::TestVariableEnergyDraw => 6,
+        CardName::TestDrawOne => 7,
+        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => 8,
+        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => 9,
+        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => 10,
+        CardName::TestActivatedAbilityDrawCard => 11,
+        CardName::TestMultiActivatedAbilityDrawCardCharacter => 12,
+        CardName::TestFastActivatedAbilityDrawCardCharacter => 13,
+        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => 14,
+        CardName::TestActivatedAbilityDissolveCharacter => 15,
+        CardName::TestDualActivatedAbilityCharacter => 16,
+        CardName::TestForeseeOne => 17,
+        CardName::TestForeseeTwo => 18,
+        CardName::TestForeseeOneDrawACard => 19,
+        CardName::TestDrawOneReclaim => 20,
+        CardName::TestForeseeOneReclaim => 21,
+        CardName::TestForeseeOneDrawReclaim => 22,
+        CardName::TestReturnVoidCardToHand => 23,
+        CardName::TestReturnOneOrTwoVoidEventCardsToHand => 24,
+        CardName::TestModalDrawOneOrDrawTwo => 25,
+        CardName::TestModalDrawOneOrDissolveEnemy => 26,
+        CardName::TestModalReturnToHandOrDrawTwo => 27,
+        CardName::TestReturnToHand => 28,
+        CardName::TestPreventDissolveThisTurn => 29,
     }
 }
 
-/// Returns a reference to an ability based on its ID.
-///
-/// Panics if the ability is not found.
-pub fn ability(battle: &BattleState, ability_id: AbilityId) -> AbilityReference<'static> {
-    let ability_list = query(battle, ability_id.card_id);
-    ability_list
-        .event_abilities
-        .iter()
-        .find(|a| a.ability_number == ability_id.ability_number)
-        .map(|a| AbilityReference::Event(&a.ability))
-        .or_else(|| {
-            ability_list
-                .static_abilities
-                .iter()
-                .find(|a| a.ability_number == ability_id.ability_number)
-                .map(|a| AbilityReference::Static(&a.ability))
-        })
-        .or_else(|| {
-            ability_list
-                .activated_abilities
-                .iter()
-                .find(|a| a.ability_number == ability_id.ability_number)
-                .map(|a| AbilityReference::Activated(&a.ability))
-        })
-        .or_else(|| {
-            ability_list
-                .triggered_abilities
-                .iter()
-                .find(|a| a.ability_number == ability_id.ability_number)
-                .map(|a| AbilityReference::Triggered(&a.ability))
-        })
-        .unwrap_or_else(|| panic_with!("Ability not found", battle, ability_id))
+fn ability_table() -> &'static Vec<OnceLock<Arc<AbilityList>>> {
+    ABILITY_TABLE.get_or_init(|| {
+        let mut v = Vec::with_capacity(30);
+        for _ in 0..30 {
+            v.push(OnceLock::new());
+        }
+        v
+    })
+}
+
+pub fn query_by_name(name: CardName) -> Arc<AbilityList> {
+    let index = card_name_index(name);
+    let slot = &ability_table()[index];
+    slot.get_or_init(|| Arc::new(build_for(name))).clone()
 }
 
 fn build_ability_list(
@@ -866,4 +373,436 @@ fn has_play_from_void_ability(list: &AbilityList) -> bool {
     }
 
     false
+}
+
+fn build_for(name: CardName) -> AbilityList {
+    match name {
+        CardName::TestVanillaCharacter => {
+            build_ability_list(CardName::TestVanillaCharacter, vec![])
+        }
+        CardName::TestDissolve => build_ability_list(CardName::TestDissolve, vec![(
+            AbilityNumber(0),
+            Ability::Event(EventAbility {
+                additional_cost: None,
+                effect: Effect::Effect(StandardEffect::DissolveCharacter {
+                    target: Predicate::Enemy(CardPredicate::Character),
+                }),
+            }),
+            AbilityConfiguration {
+                targeting_prompt: Some("Select an enemy character.".to_string()),
+                ..Default::default()
+            },
+        )]),
+        CardName::TestNamedDissolve => build_ability_list(CardName::TestNamedDissolve, vec![(
+            AbilityNumber(0),
+            Ability::Event(EventAbility {
+                additional_cost: None,
+                effect: Effect::Effect(StandardEffect::DissolveCharacter {
+                    target: Predicate::Enemy(CardPredicate::Character),
+                }),
+            }),
+            AbilityConfiguration {
+                targeting_prompt: Some("Select an enemy character.".to_string()),
+                ..Default::default()
+            },
+        )]),
+        CardName::TestCounterspellUnlessPays => {
+            build_ability_list(CardName::TestCounterspellUnlessPays, vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::CounterspellUnlessPaysCost {
+                        target: Predicate::Enemy(CardPredicate::Event),
+                        cost: Cost::Energy(Energy(2)),
+                    }),
+                }),
+                AbilityConfiguration {
+                    targeting_prompt: Some("Select an enemy event.".to_string()),
+                    choice_prompt: Some("Pay 2\u{f7e4} to resolve this card?".to_string()),
+                    ..Default::default()
+                },
+            )])
+        }
+        CardName::TestCounterspell => build_ability_list(CardName::TestCounterspell, vec![(
+            AbilityNumber(0),
+            Ability::Event(EventAbility {
+                additional_cost: None,
+                effect: Effect::Effect(StandardEffect::Counterspell {
+                    target: Predicate::Enemy(CardPredicate::CardOnStack),
+                }),
+            }),
+            AbilityConfiguration {
+                targeting_prompt: Some("Select an enemy card.".to_string()),
+                ..Default::default()
+            },
+        )]),
+        CardName::TestVariableEnergyDraw => {
+            build_ability_list(CardName::TestVariableEnergyDraw, vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: Some(Cost::SpendOneOrMoreEnergy),
+                    effect: Effect::Effect(StandardEffect::DrawCardsForEach {
+                        count: 1,
+                        for_each: QuantityExpression::ForEachEnergySpentOnThisCard,
+                    }),
+                }),
+                AbilityConfiguration {
+                    additional_cost_prompt: Some("Pay one or more \u{f7e4}.".to_string()),
+                    ..Default::default()
+                },
+            )])
+        }
+        CardName::TestDrawOne => build_ability_list(CardName::TestDrawOne, vec![(
+            AbilityNumber(0),
+            Ability::Event(EventAbility {
+                additional_cost: None,
+                effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
+            }),
+            AbilityConfiguration { ..Default::default() },
+        )]),
+        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => {
+            build_ability_list(CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter, vec![
+                (
+                    AbilityNumber(0),
+                    Ability::Triggered(TriggeredAbility {
+                        trigger: TriggerEvent::Materialize(Predicate::Another(
+                            CardPredicate::Character,
+                        )),
+                        effect: Effect::Effect(StandardEffect::GainsSpark {
+                            target: Predicate::This,
+                            gains: Spark(1),
+                        }),
+                        options: None,
+                    }),
+                    AbilityConfiguration::default(),
+                ),
+            ])
+        }
+        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
+            build_ability_list(CardName::TestTriggerGainSparkOnPlayCardEnemyTurn, vec![(
+                AbilityNumber(0),
+                Ability::Triggered(TriggeredAbility {
+                    trigger: TriggerEvent::PlayDuringTurn(
+                        Predicate::Your(CardPredicate::Card),
+                        PlayerTurn::EnemyTurn,
+                    ),
+                    effect: Effect::Effect(StandardEffect::GainsSpark {
+                        target: Predicate::This,
+                        gains: Spark(1),
+                    }),
+                    options: None,
+                }),
+                AbilityConfiguration::default(),
+            )])
+        }
+        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => {
+            build_ability_list(CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn, vec![(
+                AbilityNumber(0),
+                Ability::Triggered(TriggeredAbility {
+                    trigger: TriggerEvent::PlayDuringTurn(
+                        Predicate::Your(CardPredicate::Card),
+                        PlayerTurn::EnemyTurn,
+                    ),
+                    effect: Effect::Effect(StandardEffect::GainsSpark {
+                        target: Predicate::This,
+                        gains: Spark(2),
+                    }),
+                    options: None,
+                }),
+                AbilityConfiguration::default(),
+            )])
+        }
+        CardName::TestActivatedAbilityDrawCard => {
+            build_ability_list(CardName::TestActivatedAbilityDrawCard, vec![(
+                AbilityNumber(0),
+                Ability::Activated(ActivatedAbility {
+                    costs: vec![Cost::Energy(Energy(1))],
+                    effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
+                    options: None,
+                }),
+                AbilityConfiguration::default(),
+            )])
+        }
+        CardName::TestMultiActivatedAbilityDrawCardCharacter => {
+            build_ability_list(CardName::TestMultiActivatedAbilityDrawCardCharacter, vec![(
+                AbilityNumber(0),
+                Ability::Activated(ActivatedAbility {
+                    costs: vec![Cost::Energy(Energy(1))],
+                    effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
+                    options: Some(ActivatedAbilityOptions { is_multi: true, is_fast: false }),
+                }),
+                AbilityConfiguration::default(),
+            )])
+        }
+        CardName::TestFastActivatedAbilityDrawCardCharacter => {
+            build_ability_list(CardName::TestFastActivatedAbilityDrawCardCharacter, vec![(
+                AbilityNumber(0),
+                Ability::Activated(ActivatedAbility {
+                    costs: vec![Cost::Energy(Energy(1))],
+                    effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
+                    options: Some(ActivatedAbilityOptions { is_multi: false, is_fast: true }),
+                }),
+                AbilityConfiguration::default(),
+            )])
+        }
+        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => {
+            build_ability_list(CardName::TestFastMultiActivatedAbilityDrawCardCharacter, vec![(
+                AbilityNumber(0),
+                Ability::Activated(ActivatedAbility {
+                    costs: vec![Cost::Energy(Energy(3))],
+                    effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
+                    options: Some(ActivatedAbilityOptions { is_multi: true, is_fast: true }),
+                }),
+                AbilityConfiguration::default(),
+            )])
+        }
+        CardName::TestActivatedAbilityDissolveCharacter => {
+            build_ability_list(CardName::TestActivatedAbilityDissolveCharacter, vec![(
+                AbilityNumber(0),
+                Ability::Activated(ActivatedAbility {
+                    costs: vec![Cost::Energy(Energy(2))],
+                    effect: Effect::Effect(StandardEffect::DissolveCharacter {
+                        target: Predicate::Enemy(CardPredicate::Character),
+                    }),
+                    options: None,
+                }),
+                AbilityConfiguration {
+                    targeting_prompt: Some("Select an enemy character.".to_string()),
+                    ..Default::default()
+                },
+            )])
+        }
+        CardName::TestDualActivatedAbilityCharacter => {
+            build_ability_list(CardName::TestDualActivatedAbilityCharacter, vec![
+                (
+                    AbilityNumber(0),
+                    Ability::Activated(ActivatedAbility {
+                        costs: vec![Cost::Energy(Energy(1))],
+                        effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
+                        options: None,
+                    }),
+                    AbilityConfiguration::default(),
+                ),
+                (
+                    AbilityNumber(1),
+                    Ability::Activated(ActivatedAbility {
+                        costs: vec![Cost::Energy(Energy(2))],
+                        effect: Effect::Effect(StandardEffect::DrawCards { count: 2 }),
+                        options: None,
+                    }),
+                    AbilityConfiguration::default(),
+                ),
+            ])
+        }
+        CardName::TestForeseeOne => build_ability_list(CardName::TestForeseeOne, vec![(
+            AbilityNumber(0),
+            Ability::Event(EventAbility {
+                additional_cost: None,
+                effect: Effect::Effect(StandardEffect::Foresee { count: 1 }),
+            }),
+            AbilityConfiguration::default(),
+        )]),
+        CardName::TestForeseeTwo => build_ability_list(CardName::TestForeseeTwo, vec![(
+            AbilityNumber(0),
+            Ability::Event(EventAbility {
+                additional_cost: None,
+                effect: Effect::Effect(StandardEffect::Foresee { count: 2 }),
+            }),
+            AbilityConfiguration::default(),
+        )]),
+        CardName::TestForeseeOneDrawACard => {
+            build_ability_list(CardName::TestForeseeOneDrawACard, vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::List(vec![
+                        EffectWithOptions::new(StandardEffect::Foresee { count: 1 }),
+                        EffectWithOptions::new(StandardEffect::DrawCards { count: 1 }),
+                    ]),
+                }),
+                AbilityConfiguration::default(),
+            )])
+        }
+        CardName::TestDrawOneReclaim => build_ability_list(CardName::TestDrawOneReclaim, vec![
+            (
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
+                }),
+                AbilityConfiguration::default(),
+            ),
+            (
+                AbilityNumber(1),
+                Ability::Named(NamedAbility::Reclaim(Some(Energy(1)))),
+                AbilityConfiguration::default(),
+            ),
+        ]),
+        CardName::TestReturnVoidCardToHand => {
+            build_ability_list(CardName::TestReturnVoidCardToHand, vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::ReturnFromYourVoidToHand {
+                        target: Predicate::YourVoid(CardPredicate::Card),
+                    }),
+                }),
+                AbilityConfiguration {
+                    targeting_prompt: Some("Select a card from your void.".to_string()),
+                    ..Default::default()
+                },
+            )])
+        }
+        CardName::TestReturnOneOrTwoVoidEventCardsToHand => {
+            build_ability_list(CardName::TestReturnOneOrTwoVoidEventCardsToHand, vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::ReturnUpToCountFromYourVoidToHand {
+                        target: Predicate::YourVoid(CardPredicate::Event),
+                        count: 2,
+                    }),
+                }),
+                AbilityConfiguration {
+                    targeting_prompt: Some("Select one or two events from your void.".to_string()),
+                    ..Default::default()
+                },
+            )])
+        }
+        CardName::TestModalDrawOneOrDrawTwo => {
+            build_ability_list(CardName::TestModalDrawOneOrDrawTwo, vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Modal(vec![
+                        ModalEffectChoice {
+                            energy_cost: Energy(1),
+                            effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
+                        },
+                        ModalEffectChoice {
+                            energy_cost: Energy(3),
+                            effect: Effect::Effect(StandardEffect::DrawCards { count: 2 }),
+                        },
+                    ]),
+                }),
+                AbilityConfiguration { ..Default::default() },
+            )])
+        }
+        CardName::TestModalDrawOneOrDissolveEnemy => {
+            build_ability_list(CardName::TestModalDrawOneOrDissolveEnemy, vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Modal(vec![
+                        ModalEffectChoice {
+                            energy_cost: Energy(1),
+                            effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
+                        },
+                        ModalEffectChoice {
+                            energy_cost: Energy(2),
+                            effect: Effect::Effect(StandardEffect::DissolveCharacter {
+                                target: Predicate::Enemy(CardPredicate::Character),
+                            }),
+                        },
+                    ]),
+                }),
+                AbilityConfiguration { ..Default::default() },
+            )])
+        }
+        CardName::TestReturnToHand => build_ability_list(CardName::TestReturnToHand, vec![(
+            AbilityNumber(0),
+            Ability::Event(EventAbility {
+                additional_cost: None,
+                effect: Effect::Effect(StandardEffect::ReturnToHand {
+                    target: Predicate::Enemy(CardPredicate::Character),
+                }),
+            }),
+            AbilityConfiguration {
+                targeting_prompt: Some("Select an enemy character.".to_string()),
+                ..Default::default()
+            },
+        )]),
+        CardName::TestPreventDissolveThisTurn => {
+            build_ability_list(CardName::TestPreventDissolveThisTurn, vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::PreventDissolveThisTurn {
+                        target: Predicate::Your(CardPredicate::Character),
+                    }),
+                }),
+                AbilityConfiguration::default(),
+            )])
+        }
+        CardName::TestCounterspellCharacter => {
+            build_ability_list(CardName::TestCounterspellCharacter, vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::Counterspell {
+                        target: Predicate::Enemy(CardPredicate::Character),
+                    }),
+                }),
+                AbilityConfiguration::default(),
+            )])
+        }
+        CardName::TestForeseeOneReclaim => {
+            build_ability_list(CardName::TestForeseeOneReclaim, vec![
+                (
+                    AbilityNumber(0),
+                    Ability::Event(EventAbility {
+                        additional_cost: None,
+                        effect: Effect::Effect(StandardEffect::Foresee { count: 1 }),
+                    }),
+                    AbilityConfiguration::default(),
+                ),
+                (
+                    AbilityNumber(1),
+                    Ability::Named(NamedAbility::Reclaim(Some(Energy(3)))),
+                    AbilityConfiguration::default(),
+                ),
+            ])
+        }
+        CardName::TestForeseeOneDrawReclaim => {
+            build_ability_list(CardName::TestForeseeOneDrawReclaim, vec![
+                (
+                    AbilityNumber(0),
+                    Ability::Event(EventAbility {
+                        additional_cost: None,
+                        effect: Effect::List(vec![
+                            EffectWithOptions::new(StandardEffect::Foresee { count: 1 }),
+                            EffectWithOptions::new(StandardEffect::DrawCards { count: 1 }),
+                        ]),
+                    }),
+                    AbilityConfiguration::default(),
+                ),
+                (
+                    AbilityNumber(1),
+                    Ability::Named(NamedAbility::Reclaim(Some(Energy(4)))),
+                    AbilityConfiguration::default(),
+                ),
+            ])
+        }
+        CardName::TestModalReturnToHandOrDrawTwo => {
+            build_ability_list(CardName::TestModalReturnToHandOrDrawTwo, vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Modal(vec![
+                        ModalEffectChoice {
+                            energy_cost: Energy(2),
+                            effect: Effect::Effect(StandardEffect::ReturnToHand {
+                                target: Predicate::Enemy(CardPredicate::Character),
+                            }),
+                        },
+                        ModalEffectChoice {
+                            energy_cost: Energy(3),
+                            effect: Effect::Effect(StandardEffect::DrawCards { count: 2 }),
+                        },
+                    ]),
+                }),
+                AbilityConfiguration::default(),
+            )])
+        }
+    }
 }

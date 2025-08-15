@@ -3,7 +3,7 @@ use std::hash::Hash;
 use ability_data::static_ability::StandardStaticAbility;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{AbilityId, CardId, CardIdType, HandCardId, VoidCardId};
-use battle_state::battle_cards::ability_list::{AbilityReference, CanPlayRestriction};
+use battle_state::battle_cards::ability_list::CanPlayRestriction;
 use core_data::card_types::CardType;
 use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
@@ -115,18 +115,20 @@ pub fn play_from_void_energy_cost(
     card_id: VoidCardId,
     ability_id: AbilityId,
 ) -> Energy {
-    let ability = card_abilities::ability(battle, ability_id);
-    let cost = if let AbilityReference::Static(static_ability) = ability {
-        can_play_from_void_with_static_ability(
-            battle,
-            card_id,
-            ability_id.ability_number,
-            static_ability.standard_static_ability(),
-        )
-        .map(|cost| cost.cost)
-    } else {
-        None
-    };
+    let abilities = card_abilities::query(battle, ability_id.card_id);
+    let cost = abilities
+        .static_abilities
+        .iter()
+        .find(|a| a.ability_number == ability_id.ability_number)
+        .and_then(|ability_data| {
+            can_play_from_void_with_static_ability(
+                battle,
+                card_id,
+                ability_id.ability_number,
+                ability_data.ability.standard_static_ability(),
+            )
+            .map(|c| c.cost)
+        });
 
     if let Some(cost) = cost {
         cost
