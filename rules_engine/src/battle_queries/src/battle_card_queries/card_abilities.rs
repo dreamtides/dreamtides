@@ -17,7 +17,7 @@ use battle_state::battle_cards::ability_list::{
     AbilityConfiguration, AbilityData, AbilityList, CanPlayRestriction,
 };
 use battle_state::triggers::trigger::TriggerName;
-use core_data::identifiers::{AbilityNumber, CardName};
+use core_data::identifiers::{AbilityNumber, CardIdentity, CardName};
 use core_data::numerics::{Energy, Spark};
 use enumset::EnumSet;
 use parking_lot::RwLock;
@@ -32,42 +32,7 @@ type AbilityTable = RwLock<AbilitySlots>;
 static ABILITY_TABLE: OnceLock<AbilityTable> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> Arc<AbilityList> {
-    query_by_name(card::get(battle, card_id).name)
-}
-
-fn card_name_index(name: CardName) -> usize {
-    match name {
-        CardName::TestVanillaCharacter => 0,
-        CardName::TestDissolve => 1,
-        CardName::TestNamedDissolve => 2,
-        CardName::TestCounterspellUnlessPays => 3,
-        CardName::TestCounterspell => 4,
-        CardName::TestCounterspellCharacter => 5,
-        CardName::TestVariableEnergyDraw => 6,
-        CardName::TestDrawOne => 7,
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => 8,
-        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => 9,
-        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => 10,
-        CardName::TestActivatedAbilityDrawCard => 11,
-        CardName::TestMultiActivatedAbilityDrawCardCharacter => 12,
-        CardName::TestFastActivatedAbilityDrawCardCharacter => 13,
-        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => 14,
-        CardName::TestActivatedAbilityDissolveCharacter => 15,
-        CardName::TestDualActivatedAbilityCharacter => 16,
-        CardName::TestForeseeOne => 17,
-        CardName::TestForeseeTwo => 18,
-        CardName::TestForeseeOneDrawACard => 19,
-        CardName::TestDrawOneReclaim => 20,
-        CardName::TestForeseeOneReclaim => 21,
-        CardName::TestForeseeOneDrawReclaim => 22,
-        CardName::TestReturnVoidCardToHand => 23,
-        CardName::TestReturnOneOrTwoVoidEventCardsToHand => 24,
-        CardName::TestModalDrawOneOrDrawTwo => 25,
-        CardName::TestModalDrawOneOrDissolveEnemy => 26,
-        CardName::TestModalReturnToHandOrDrawTwo => 27,
-        CardName::TestReturnToHand => 28,
-        CardName::TestPreventDissolveThisTurn => 29,
-    }
+    query_by_identity(card::get(battle, card_id).identity)
 }
 
 fn ability_table() -> &'static AbilityTable {
@@ -89,14 +54,13 @@ fn slot_for_index(index: usize) -> AbilitySlot {
     guard[index].clone()
 }
 
-pub fn query_by_name(name: CardName) -> Arc<AbilityList> {
-    let index = card_name_index(name);
-    let slot = slot_for_index(index);
-    slot.get_or_init(|| Arc::new(build_for(name))).clone()
+pub fn query_by_identity(identity: CardIdentity) -> Arc<AbilityList> {
+    let slot = slot_for_index(identity.0);
+    slot.get_or_init(|| Arc::new(build_for(identity.tmp_to_card_name()))).clone()
 }
 
 fn build_ability_list(
-    card_name: CardName,
+    card_identity: CardIdentity,
     abilities: Vec<(AbilityNumber, Ability, AbilityConfiguration)>,
 ) -> AbilityList {
     let mut ability_list = AbilityList::default();
@@ -133,7 +97,7 @@ fn build_ability_list(
             }
             Ability::Named(named_ability) => {
                 build_named_abilities::build(
-                    card_name,
+                    card_identity,
                     &mut ability_list,
                     named_ability,
                     ability_number,
@@ -392,36 +356,40 @@ fn has_play_from_void_ability(list: &AbilityList) -> bool {
 fn build_for(name: CardName) -> AbilityList {
     match name {
         CardName::TestVanillaCharacter => {
-            build_ability_list(CardName::TestVanillaCharacter, vec![])
+            build_ability_list(CardName::TestVanillaCharacter.tmp_to_card_identity(), vec![])
         }
-        CardName::TestDissolve => build_ability_list(CardName::TestDissolve, vec![(
-            AbilityNumber(0),
-            Ability::Event(EventAbility {
-                additional_cost: None,
-                effect: Effect::Effect(StandardEffect::DissolveCharacter {
-                    target: Predicate::Enemy(CardPredicate::Character),
+        CardName::TestDissolve => {
+            build_ability_list(CardName::TestDissolve.tmp_to_card_identity(), vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::DissolveCharacter {
+                        target: Predicate::Enemy(CardPredicate::Character),
+                    }),
                 }),
-            }),
-            AbilityConfiguration {
-                targeting_prompt: Some("Select an enemy character.".to_string()),
-                ..Default::default()
-            },
-        )]),
-        CardName::TestNamedDissolve => build_ability_list(CardName::TestNamedDissolve, vec![(
-            AbilityNumber(0),
-            Ability::Event(EventAbility {
-                additional_cost: None,
-                effect: Effect::Effect(StandardEffect::DissolveCharacter {
-                    target: Predicate::Enemy(CardPredicate::Character),
+                AbilityConfiguration {
+                    targeting_prompt: Some("Select an enemy character.".to_string()),
+                    ..Default::default()
+                },
+            )])
+        }
+        CardName::TestNamedDissolve => {
+            build_ability_list(CardName::TestNamedDissolve.tmp_to_card_identity(), vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::DissolveCharacter {
+                        target: Predicate::Enemy(CardPredicate::Character),
+                    }),
                 }),
-            }),
-            AbilityConfiguration {
-                targeting_prompt: Some("Select an enemy character.".to_string()),
-                ..Default::default()
-            },
-        )]),
+                AbilityConfiguration {
+                    targeting_prompt: Some("Select an enemy character.".to_string()),
+                    ..Default::default()
+                },
+            )])
+        }
         CardName::TestCounterspellUnlessPays => {
-            build_ability_list(CardName::TestCounterspellUnlessPays, vec![(
+            build_ability_list(CardName::TestCounterspellUnlessPays.tmp_to_card_identity(), vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
@@ -437,21 +405,23 @@ fn build_for(name: CardName) -> AbilityList {
                 },
             )])
         }
-        CardName::TestCounterspell => build_ability_list(CardName::TestCounterspell, vec![(
-            AbilityNumber(0),
-            Ability::Event(EventAbility {
-                additional_cost: None,
-                effect: Effect::Effect(StandardEffect::Counterspell {
-                    target: Predicate::Enemy(CardPredicate::CardOnStack),
+        CardName::TestCounterspell => {
+            build_ability_list(CardName::TestCounterspell.tmp_to_card_identity(), vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::Counterspell {
+                        target: Predicate::Enemy(CardPredicate::CardOnStack),
+                    }),
                 }),
-            }),
-            AbilityConfiguration {
-                targeting_prompt: Some("Select an enemy card.".to_string()),
-                ..Default::default()
-            },
-        )]),
+                AbilityConfiguration {
+                    targeting_prompt: Some("Select an enemy card.".to_string()),
+                    ..Default::default()
+                },
+            )])
+        }
         CardName::TestVariableEnergyDraw => {
-            build_ability_list(CardName::TestVariableEnergyDraw, vec![(
+            build_ability_list(CardName::TestVariableEnergyDraw.tmp_to_card_identity(), vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: Some(Cost::SpendOneOrMoreEnergy),
@@ -466,34 +436,36 @@ fn build_for(name: CardName) -> AbilityList {
                 },
             )])
         }
-        CardName::TestDrawOne => build_ability_list(CardName::TestDrawOne, vec![(
-            AbilityNumber(0),
-            Ability::Event(EventAbility {
-                additional_cost: None,
-                effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
-            }),
-            AbilityConfiguration { ..Default::default() },
-        )]),
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => {
-            build_ability_list(CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter, vec![
-                (
-                    AbilityNumber(0),
-                    Ability::Triggered(TriggeredAbility {
-                        trigger: TriggerEvent::Materialize(Predicate::Another(
-                            CardPredicate::Character,
-                        )),
-                        effect: Effect::Effect(StandardEffect::GainsSpark {
-                            target: Predicate::This,
-                            gains: Spark(1),
-                        }),
-                        options: None,
-                    }),
-                    AbilityConfiguration::default(),
-                ),
-            ])
+        CardName::TestDrawOne => {
+            build_ability_list(CardName::TestDrawOne.tmp_to_card_identity(), vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
+                }),
+                AbilityConfiguration { ..Default::default() },
+            )])
         }
-        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
-            build_ability_list(CardName::TestTriggerGainSparkOnPlayCardEnemyTurn, vec![(
+        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => build_ability_list(
+            CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter.tmp_to_card_identity(),
+            vec![(
+                AbilityNumber(0),
+                Ability::Triggered(TriggeredAbility {
+                    trigger: TriggerEvent::Materialize(Predicate::Another(
+                        CardPredicate::Character,
+                    )),
+                    effect: Effect::Effect(StandardEffect::GainsSpark {
+                        target: Predicate::This,
+                        gains: Spark(1),
+                    }),
+                    options: None,
+                }),
+                AbilityConfiguration::default(),
+            )],
+        ),
+        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => build_ability_list(
+            CardName::TestTriggerGainSparkOnPlayCardEnemyTurn.tmp_to_card_identity(),
+            vec![(
                 AbilityNumber(0),
                 Ability::Triggered(TriggeredAbility {
                     trigger: TriggerEvent::PlayDuringTurn(
@@ -507,10 +479,11 @@ fn build_for(name: CardName) -> AbilityList {
                     options: None,
                 }),
                 AbilityConfiguration::default(),
-            )])
-        }
-        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => {
-            build_ability_list(CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn, vec![(
+            )],
+        ),
+        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => build_ability_list(
+            CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn.tmp_to_card_identity(),
+            vec![(
                 AbilityNumber(0),
                 Ability::Triggered(TriggeredAbility {
                     trigger: TriggerEvent::PlayDuringTurn(
@@ -524,21 +497,24 @@ fn build_for(name: CardName) -> AbilityList {
                     options: None,
                 }),
                 AbilityConfiguration::default(),
-            )])
-        }
+            )],
+        ),
         CardName::TestActivatedAbilityDrawCard => {
-            build_ability_list(CardName::TestActivatedAbilityDrawCard, vec![(
-                AbilityNumber(0),
-                Ability::Activated(ActivatedAbility {
-                    costs: vec![Cost::Energy(Energy(1))],
-                    effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
-                    options: None,
-                }),
-                AbilityConfiguration::default(),
-            )])
+            build_ability_list(CardName::TestActivatedAbilityDrawCard.tmp_to_card_identity(), vec![
+                (
+                    AbilityNumber(0),
+                    Ability::Activated(ActivatedAbility {
+                        costs: vec![Cost::Energy(Energy(1))],
+                        effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
+                        options: None,
+                    }),
+                    AbilityConfiguration::default(),
+                ),
+            ])
         }
-        CardName::TestMultiActivatedAbilityDrawCardCharacter => {
-            build_ability_list(CardName::TestMultiActivatedAbilityDrawCardCharacter, vec![(
+        CardName::TestMultiActivatedAbilityDrawCardCharacter => build_ability_list(
+            CardName::TestMultiActivatedAbilityDrawCardCharacter.tmp_to_card_identity(),
+            vec![(
                 AbilityNumber(0),
                 Ability::Activated(ActivatedAbility {
                     costs: vec![Cost::Energy(Energy(1))],
@@ -546,10 +522,11 @@ fn build_for(name: CardName) -> AbilityList {
                     options: Some(ActivatedAbilityOptions { is_multi: true, is_fast: false }),
                 }),
                 AbilityConfiguration::default(),
-            )])
-        }
-        CardName::TestFastActivatedAbilityDrawCardCharacter => {
-            build_ability_list(CardName::TestFastActivatedAbilityDrawCardCharacter, vec![(
+            )],
+        ),
+        CardName::TestFastActivatedAbilityDrawCardCharacter => build_ability_list(
+            CardName::TestFastActivatedAbilityDrawCardCharacter.tmp_to_card_identity(),
+            vec![(
                 AbilityNumber(0),
                 Ability::Activated(ActivatedAbility {
                     costs: vec![Cost::Energy(Energy(1))],
@@ -557,10 +534,11 @@ fn build_for(name: CardName) -> AbilityList {
                     options: Some(ActivatedAbilityOptions { is_multi: false, is_fast: true }),
                 }),
                 AbilityConfiguration::default(),
-            )])
-        }
-        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => {
-            build_ability_list(CardName::TestFastMultiActivatedAbilityDrawCardCharacter, vec![(
+            )],
+        ),
+        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => build_ability_list(
+            CardName::TestFastMultiActivatedAbilityDrawCardCharacter.tmp_to_card_identity(),
+            vec![(
                 AbilityNumber(0),
                 Ability::Activated(ActivatedAbility {
                     costs: vec![Cost::Energy(Energy(3))],
@@ -568,10 +546,11 @@ fn build_for(name: CardName) -> AbilityList {
                     options: Some(ActivatedAbilityOptions { is_multi: true, is_fast: true }),
                 }),
                 AbilityConfiguration::default(),
-            )])
-        }
-        CardName::TestActivatedAbilityDissolveCharacter => {
-            build_ability_list(CardName::TestActivatedAbilityDissolveCharacter, vec![(
+            )],
+        ),
+        CardName::TestActivatedAbilityDissolveCharacter => build_ability_list(
+            CardName::TestActivatedAbilityDissolveCharacter.tmp_to_card_identity(),
+            vec![(
                 AbilityNumber(0),
                 Ability::Activated(ActivatedAbility {
                     costs: vec![Cost::Energy(Energy(2))],
@@ -584,10 +563,11 @@ fn build_for(name: CardName) -> AbilityList {
                     targeting_prompt: Some("Select an enemy character.".to_string()),
                     ..Default::default()
                 },
-            )])
-        }
-        CardName::TestDualActivatedAbilityCharacter => {
-            build_ability_list(CardName::TestDualActivatedAbilityCharacter, vec![
+            )],
+        ),
+        CardName::TestDualActivatedAbilityCharacter => build_ability_list(
+            CardName::TestDualActivatedAbilityCharacter.tmp_to_card_identity(),
+            vec![
                 (
                     AbilityNumber(0),
                     Ability::Activated(ActivatedAbility {
@@ -606,26 +586,30 @@ fn build_for(name: CardName) -> AbilityList {
                     }),
                     AbilityConfiguration::default(),
                 ),
-            ])
+            ],
+        ),
+        CardName::TestForeseeOne => {
+            build_ability_list(CardName::TestForeseeOne.tmp_to_card_identity(), vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::Foresee { count: 1 }),
+                }),
+                AbilityConfiguration::default(),
+            )])
         }
-        CardName::TestForeseeOne => build_ability_list(CardName::TestForeseeOne, vec![(
-            AbilityNumber(0),
-            Ability::Event(EventAbility {
-                additional_cost: None,
-                effect: Effect::Effect(StandardEffect::Foresee { count: 1 }),
-            }),
-            AbilityConfiguration::default(),
-        )]),
-        CardName::TestForeseeTwo => build_ability_list(CardName::TestForeseeTwo, vec![(
-            AbilityNumber(0),
-            Ability::Event(EventAbility {
-                additional_cost: None,
-                effect: Effect::Effect(StandardEffect::Foresee { count: 2 }),
-            }),
-            AbilityConfiguration::default(),
-        )]),
+        CardName::TestForeseeTwo => {
+            build_ability_list(CardName::TestForeseeTwo.tmp_to_card_identity(), vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::Foresee { count: 2 }),
+                }),
+                AbilityConfiguration::default(),
+            )])
+        }
         CardName::TestForeseeOneDrawACard => {
-            build_ability_list(CardName::TestForeseeOneDrawACard, vec![(
+            build_ability_list(CardName::TestForeseeOneDrawACard.tmp_to_card_identity(), vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
@@ -637,23 +621,25 @@ fn build_for(name: CardName) -> AbilityList {
                 AbilityConfiguration::default(),
             )])
         }
-        CardName::TestDrawOneReclaim => build_ability_list(CardName::TestDrawOneReclaim, vec![
-            (
-                AbilityNumber(0),
-                Ability::Event(EventAbility {
-                    additional_cost: None,
-                    effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
-                }),
-                AbilityConfiguration::default(),
-            ),
-            (
-                AbilityNumber(1),
-                Ability::Named(NamedAbility::Reclaim(Some(Energy(1)))),
-                AbilityConfiguration::default(),
-            ),
-        ]),
+        CardName::TestDrawOneReclaim => {
+            build_ability_list(CardName::TestDrawOneReclaim.tmp_to_card_identity(), vec![
+                (
+                    AbilityNumber(0),
+                    Ability::Event(EventAbility {
+                        additional_cost: None,
+                        effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
+                    }),
+                    AbilityConfiguration::default(),
+                ),
+                (
+                    AbilityNumber(1),
+                    Ability::Named(NamedAbility::Reclaim(Some(Energy(1)))),
+                    AbilityConfiguration::default(),
+                ),
+            ])
+        }
         CardName::TestReturnVoidCardToHand => {
-            build_ability_list(CardName::TestReturnVoidCardToHand, vec![(
+            build_ability_list(CardName::TestReturnVoidCardToHand.tmp_to_card_identity(), vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
@@ -667,8 +653,9 @@ fn build_for(name: CardName) -> AbilityList {
                 },
             )])
         }
-        CardName::TestReturnOneOrTwoVoidEventCardsToHand => {
-            build_ability_list(CardName::TestReturnOneOrTwoVoidEventCardsToHand, vec![(
+        CardName::TestReturnOneOrTwoVoidEventCardsToHand => build_ability_list(
+            CardName::TestReturnOneOrTwoVoidEventCardsToHand.tmp_to_card_identity(),
+            vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
@@ -681,10 +668,10 @@ fn build_for(name: CardName) -> AbilityList {
                     targeting_prompt: Some("Select one or two events from your void.".to_string()),
                     ..Default::default()
                 },
-            )])
-        }
+            )],
+        ),
         CardName::TestModalDrawOneOrDrawTwo => {
-            build_ability_list(CardName::TestModalDrawOneOrDrawTwo, vec![(
+            build_ability_list(CardName::TestModalDrawOneOrDrawTwo.tmp_to_card_identity(), vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
@@ -702,8 +689,9 @@ fn build_for(name: CardName) -> AbilityList {
                 AbilityConfiguration { ..Default::default() },
             )])
         }
-        CardName::TestModalDrawOneOrDissolveEnemy => {
-            build_ability_list(CardName::TestModalDrawOneOrDissolveEnemy, vec![(
+        CardName::TestModalDrawOneOrDissolveEnemy => build_ability_list(
+            CardName::TestModalDrawOneOrDissolveEnemy.tmp_to_card_identity(),
+            vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
@@ -721,35 +709,39 @@ fn build_for(name: CardName) -> AbilityList {
                     ]),
                 }),
                 AbilityConfiguration { ..Default::default() },
-            )])
-        }
-        CardName::TestReturnToHand => build_ability_list(CardName::TestReturnToHand, vec![(
-            AbilityNumber(0),
-            Ability::Event(EventAbility {
-                additional_cost: None,
-                effect: Effect::Effect(StandardEffect::ReturnToHand {
-                    target: Predicate::Enemy(CardPredicate::Character),
-                }),
-            }),
-            AbilityConfiguration {
-                targeting_prompt: Some("Select an enemy character.".to_string()),
-                ..Default::default()
-            },
-        )]),
-        CardName::TestPreventDissolveThisTurn => {
-            build_ability_list(CardName::TestPreventDissolveThisTurn, vec![(
+            )],
+        ),
+        CardName::TestReturnToHand => {
+            build_ability_list(CardName::TestReturnToHand.tmp_to_card_identity(), vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
-                    effect: Effect::Effect(StandardEffect::PreventDissolveThisTurn {
-                        target: Predicate::Your(CardPredicate::Character),
+                    effect: Effect::Effect(StandardEffect::ReturnToHand {
+                        target: Predicate::Enemy(CardPredicate::Character),
                     }),
                 }),
-                AbilityConfiguration::default(),
+                AbilityConfiguration {
+                    targeting_prompt: Some("Select an enemy character.".to_string()),
+                    ..Default::default()
+                },
             )])
         }
+        CardName::TestPreventDissolveThisTurn => {
+            build_ability_list(CardName::TestPreventDissolveThisTurn.tmp_to_card_identity(), vec![
+                (
+                    AbilityNumber(0),
+                    Ability::Event(EventAbility {
+                        additional_cost: None,
+                        effect: Effect::Effect(StandardEffect::PreventDissolveThisTurn {
+                            target: Predicate::Your(CardPredicate::Character),
+                        }),
+                    }),
+                    AbilityConfiguration::default(),
+                ),
+            ])
+        }
         CardName::TestCounterspellCharacter => {
-            build_ability_list(CardName::TestCounterspellCharacter, vec![(
+            build_ability_list(CardName::TestCounterspellCharacter.tmp_to_card_identity(), vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
@@ -761,7 +753,7 @@ fn build_for(name: CardName) -> AbilityList {
             )])
         }
         CardName::TestForeseeOneReclaim => {
-            build_ability_list(CardName::TestForeseeOneReclaim, vec![
+            build_ability_list(CardName::TestForeseeOneReclaim.tmp_to_card_identity(), vec![
                 (
                     AbilityNumber(0),
                     Ability::Event(EventAbility {
@@ -778,7 +770,7 @@ fn build_for(name: CardName) -> AbilityList {
             ])
         }
         CardName::TestForeseeOneDrawReclaim => {
-            build_ability_list(CardName::TestForeseeOneDrawReclaim, vec![
+            build_ability_list(CardName::TestForeseeOneDrawReclaim.tmp_to_card_identity(), vec![
                 (
                     AbilityNumber(0),
                     Ability::Event(EventAbility {
@@ -797,8 +789,9 @@ fn build_for(name: CardName) -> AbilityList {
                 ),
             ])
         }
-        CardName::TestModalReturnToHandOrDrawTwo => {
-            build_ability_list(CardName::TestModalReturnToHandOrDrawTwo, vec![(
+        CardName::TestModalReturnToHandOrDrawTwo => build_ability_list(
+            CardName::TestModalReturnToHandOrDrawTwo.tmp_to_card_identity(),
+            vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
                     additional_cost: None,
@@ -816,7 +809,7 @@ fn build_for(name: CardName) -> AbilityList {
                     ]),
                 }),
                 AbilityConfiguration::default(),
-            )])
-        }
+            )],
+        ),
     }
 }

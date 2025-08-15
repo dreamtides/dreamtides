@@ -8,7 +8,7 @@ use battle_state::battle::card_id::{CardIdType, DeckCardId, HandCardId};
 use battle_state::battle_cards::card_set::CardSet;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger::Trigger;
-use core_data::identifiers::CardName;
+use core_data::identifiers::CardIdentity;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use rand::seq::IteratorRandom;
@@ -77,35 +77,37 @@ pub fn add_deck_copy(battle: &mut BattleState, player: PlayerName) {
     let quest = &battle.players.player(player).quest;
     let deck = &quest.deck;
     let mut cards = Vec::new();
-    for (name, &count) in &deck.cards {
-        let can_play_restriction = card_abilities::query_by_name(*name).can_play_restriction;
+    for (identity, &count) in &deck.cards {
+        let can_play_restriction =
+            card_abilities::query_by_identity(*identity).can_play_restriction;
         for _ in 0..count {
             cards.push(CreatedCard {
-                name: *name,
+                identity: *identity,
                 can_play_restriction,
-                base_energy_cost: card_properties::base_energy_cost(*name),
-                base_spark: card_properties::base_spark(*name),
-                card_type: card_properties::card_type_by_name(*name),
-                is_fast: card_properties::is_fast_by_name(*name),
+                base_energy_cost: card_properties::base_energy_cost(*identity),
+                base_spark: card_properties::base_spark(*identity),
+                card_type: card_properties::card_type_by_name(*identity),
+                is_fast: card_properties::is_fast_by_name(*identity),
             });
         }
     }
     battle.cards.create_cards_in_deck(player, cards);
 }
 
-/// Adds a list of cards by name to a player's deck
-pub fn add_cards(battle: &mut BattleState, player: PlayerName, cards: Vec<CardName>) {
+/// Adds a list of cards to a player's deck
+pub fn add_cards(battle: &mut BattleState, player: PlayerName, cards: Vec<CardIdentity>) {
     battle.cards.create_cards_in_deck(
         player,
         cards
             .into_iter()
-            .map(|name| CreatedCard {
-                name,
-                can_play_restriction: card_abilities::query_by_name(name).can_play_restriction,
-                base_energy_cost: card_properties::base_energy_cost(name),
-                base_spark: card_properties::base_spark(name),
-                card_type: card_properties::card_type_by_name(name),
-                is_fast: card_properties::is_fast_by_name(name),
+            .map(|identity| CreatedCard {
+                identity,
+                can_play_restriction: card_abilities::query_by_identity(identity)
+                    .can_play_restriction,
+                base_energy_cost: card_properties::base_energy_cost(identity),
+                base_spark: card_properties::base_spark(identity),
+                card_type: card_properties::card_type_by_name(identity),
+                is_fast: card_properties::is_fast_by_name(identity),
             })
             .collect(),
     );

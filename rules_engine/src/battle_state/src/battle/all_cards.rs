@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use core_data::card_types::CardType;
-use core_data::identifiers::CardName;
+use core_data::identifiers::CardIdentity;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::PlayerName;
 
@@ -26,7 +26,7 @@ pub type CharacterMap = BTreeMap<CharacterId, CharacterState>;
 
 /// A card to create in a player's deck.
 pub struct CreatedCard {
-    pub name: CardName,
+    pub identity: CardIdentity,
     pub can_play_restriction: Option<CanPlayRestriction>,
     pub base_energy_cost: Option<Energy>,
     pub base_spark: Option<Spark>,
@@ -205,7 +205,7 @@ impl AllCards {
             let id = self.cards.len();
             let object_id = self.new_object_id();
             self.cards.push(BattleCardState {
-                name: name.name,
+                identity: name.identity,
                 owner,
                 object_id,
                 base_energy_cost: name.base_energy_cost,

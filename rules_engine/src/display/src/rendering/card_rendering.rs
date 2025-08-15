@@ -190,7 +190,7 @@ fn can_select_order_action(legal_actions: &LegalActions, card_id: CardId) -> Opt
 }
 
 pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
-    match card::get(battle, card_id).name {
+    match card::get(battle, card_id).identity.tmp_to_card_name() {
         CardName::TestVanillaCharacter => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
@@ -285,7 +285,7 @@ pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
 }
 
 pub fn card_name(battle: &BattleState, card_id: CardId) -> String {
-    card_properties::display_name(card::get(battle, card_id).name)
+    card_properties::display_name(card::get(battle, card_id).identity)
 }
 
 fn card_type(battle: &BattleState, card_id: CardId) -> String {
@@ -301,7 +301,7 @@ fn card_type(battle: &BattleState, card_id: CardId) -> String {
 }
 
 pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -> String {
-    let mut base_text = match card::get(battle, card_id).name {
+    let mut base_text = match card::get(battle, card_id).identity.tmp_to_card_name() {
         CardName::TestVanillaCharacter => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
         CardName::TestDissolve => "<color=#AA00FF><b>Dissolve</b></color> an enemy character.".to_string(),
         CardName::TestNamedDissolve => "<color=#AA00FF><b>Dissolve</b></color> an enemy character.".to_string(),
@@ -395,7 +395,7 @@ pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: Card
             modal_effect_prompt_rendering::modal_effect_descriptions(&base_text)[index].clone();
     }
 
-    if card::get(battle, card_id).name == CardName::TestVariableEnergyDraw
+    if card::get(battle, card_id).identity.tmp_to_card_name() == CardName::TestVariableEnergyDraw
         && let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))
         && let StackCardAdditionalCostsPaid::Energy(energy) = &stack_item.additional_costs_paid
     {
@@ -460,7 +460,7 @@ fn is_on_stack_from_void(battle: &BattleState, card_id: CardId) -> bool {
 }
 
 fn supplemental_card_info(battle: &BattleState, card_id: CardId) -> Vec<String> {
-    match card::get(battle, card_id).name {
+    match card::get(battle, card_id).identity.tmp_to_card_name() {
         CardName::TestDissolve => vec!["<b>Dissolve:</b> Send a character to the void".to_string()],
         CardName::TestNamedDissolve => {
             vec!["<b>Dissolve:</b> Send a character to the void".to_string()]

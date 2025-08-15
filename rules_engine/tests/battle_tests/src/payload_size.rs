@@ -7,7 +7,7 @@ use battle_state::battle_player::battle_player_state::{
     CreateBattlePlayer, PlayerType, TestDeckName,
 };
 use battle_state::core::effect_source::EffectSource;
-use core_data::identifiers::{BattleId, CardName, UserId};
+use core_data::identifiers::{BattleId, CardIdentity, CardName, UserId};
 use core_data::types::PlayerName;
 use display::rendering::renderer;
 use display_data::request_data::{ConnectResponse, Metadata};
@@ -86,7 +86,7 @@ fn move_all_from_deck_to_void(battle: &mut BattleState, player_name: PlayerName)
     }
 }
 
-fn get_core_11_card_mix() -> Vec<CardName> {
+fn get_core_11_card_mix() -> Vec<CardIdentity> {
     let base_deck_map = create_500_card_core_11_deck();
     let mut cards = Vec::new();
 
@@ -106,44 +106,48 @@ fn create_500_card_core_11_deck() -> Deck {
     let scale_factor = 500_usize / 32_usize;
     let remainder = 500_usize % 32_usize;
 
-    deck_cards
-        .insert(CardName::TestNamedDissolve, 4 * scale_factor + if remainder > 0 { 1 } else { 0 });
-    deck_cards
-        .insert(CardName::TestCounterspell, 3 * scale_factor + if remainder > 4 { 1 } else { 0 });
     deck_cards.insert(
-        CardName::TestCounterspellUnlessPays,
+        CardName::TestNamedDissolve.tmp_to_card_identity(),
+        4 * scale_factor + if remainder > 0 { 1 } else { 0 },
+    );
+    deck_cards.insert(
+        CardName::TestCounterspell.tmp_to_card_identity(),
+        3 * scale_factor + if remainder > 4 { 1 } else { 0 },
+    );
+    deck_cards.insert(
+        CardName::TestCounterspellUnlessPays.tmp_to_card_identity(),
         2 * scale_factor + if remainder > 7 { 1 } else { 0 },
     );
     deck_cards.insert(
-        CardName::TestVariableEnergyDraw,
+        CardName::TestVariableEnergyDraw.tmp_to_card_identity(),
         3 * scale_factor + if remainder > 9 { 1 } else { 0 },
     );
     deck_cards.insert(
-        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn,
+        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn.tmp_to_card_identity(),
         4 * scale_factor + if remainder > 12 { 1 } else { 0 },
     );
     deck_cards.insert(
-        CardName::TestFastMultiActivatedAbilityDrawCardCharacter,
+        CardName::TestFastMultiActivatedAbilityDrawCardCharacter.tmp_to_card_identity(),
         5 * scale_factor + if remainder > 16 { 1 } else { 0 },
     );
     deck_cards.insert(
-        CardName::TestReturnOneOrTwoVoidEventCardsToHand,
+        CardName::TestReturnOneOrTwoVoidEventCardsToHand.tmp_to_card_identity(),
         2 * scale_factor + if remainder > 21 { 1 } else { 0 },
     );
     deck_cards.insert(
-        CardName::TestModalReturnToHandOrDrawTwo,
+        CardName::TestModalReturnToHandOrDrawTwo.tmp_to_card_identity(),
         2 * scale_factor + if remainder > 23 { 1 } else { 0 },
     );
     deck_cards.insert(
-        CardName::TestPreventDissolveThisTurn,
+        CardName::TestPreventDissolveThisTurn.tmp_to_card_identity(),
         2 * scale_factor + if remainder > 25 { 1 } else { 0 },
     );
     deck_cards.insert(
-        CardName::TestForeseeOneDrawReclaim,
+        CardName::TestForeseeOneDrawReclaim.tmp_to_card_identity(),
         3 * scale_factor + if remainder > 27 { 1 } else { 0 },
     );
     deck_cards.insert(
-        CardName::TestCounterspellCharacter,
+        CardName::TestCounterspellCharacter.tmp_to_card_identity(),
         2 * scale_factor + if remainder > 30 { 1 } else { 0 },
     );
 

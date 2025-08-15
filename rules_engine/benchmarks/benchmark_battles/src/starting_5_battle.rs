@@ -305,7 +305,7 @@ pub fn benchmark_battle() -> BattleState {
         card_specs
             .iter()
             .filter(|spec| spec.owner == PlayerName::One)
-            .map(|spec| spec.name)
+            .map(|spec| spec.name.tmp_to_card_identity())
             .collect(),
     );
     battle_deck::add_cards(
@@ -314,7 +314,7 @@ pub fn benchmark_battle() -> BattleState {
         card_specs
             .iter()
             .filter(|spec| spec.owner == PlayerName::Two)
-            .map(|spec| spec.name)
+            .map(|spec| spec.name.tmp_to_card_identity())
             .collect(),
     );
 
@@ -326,8 +326,8 @@ pub fn benchmark_battle() -> BattleState {
 
         if spec.zone == Zone::Battlefield {
             let character_id = CharacterId(card_id);
-            let card_name = card::get(&battle, character_id).name;
-            if card_name == CardName::TestVanillaCharacter {
+            let card_name = card::get(&battle, character_id).identity;
+            if card_name == CardName::TestVanillaCharacter.tmp_to_card_identity() {
                 if let Some(char_state) =
                     battle.cards.battlefield_state_mut(spec.owner).get_mut(&character_id)
                 {

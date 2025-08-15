@@ -104,7 +104,7 @@ impl Component for PlayOpponentCardCell {
                 )
                 .child(
                     TextComponent::builder()
-                        .text(card_properties::display_name(self.card))
+                        .text(card_properties::display_name(self.card.tmp_to_card_identity()))
                         .typography(Typography::Body2)
                         .build(),
                 )

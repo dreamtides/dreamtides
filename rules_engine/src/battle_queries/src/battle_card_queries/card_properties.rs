@@ -1,15 +1,15 @@
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardIdType, CharacterId};
 use core_data::card_types::{CardType, CharacterType};
-use core_data::identifiers::CardName;
+use core_data::identifiers::{CardIdentity, CardName};
 use core_data::numerics::{Energy, Spark};
 use core_data::types::PlayerName;
 
 use crate::battle_card_queries::card;
 
 /// Returns the display name for a card
-pub fn display_name(card_name: CardName) -> String {
-    match card_name {
+pub fn display_name(identity: CardIdentity) -> String {
+    match identity.tmp_to_card_name() {
         CardName::TestVanillaCharacter => "Character".to_string(),
         CardName::TestDissolve => "Dissolve".to_string(),
         CardName::TestNamedDissolve => "Immolate".to_string(),
@@ -62,8 +62,8 @@ pub fn base_energy_cost_for_id(battle: &BattleState, card_id: impl CardIdType) -
 
 /// Returns the base energy cost of a card specified in the card definition, or
 /// None if it has no energy cost (e.g. modal cards).
-pub fn base_energy_cost(name: CardName) -> Option<Energy> {
-    match name {
+pub fn base_energy_cost(identity: CardIdentity) -> Option<Energy> {
+    match identity.tmp_to_card_name() {
         CardName::TestVanillaCharacter => Some(Energy(2)),
         CardName::TestDissolve => Some(Energy(2)),
         CardName::TestNamedDissolve => Some(Energy(2)),
@@ -110,8 +110,8 @@ pub fn base_spark_for_id(battle: &BattleState, card_id: impl CardIdType) -> Opti
     card::get(battle, card_id).base_spark
 }
 
-pub fn base_spark(name: CardName) -> Option<Spark> {
-    match name {
+pub fn base_spark(identity: CardIdentity) -> Option<Spark> {
+    match identity.tmp_to_card_name() {
         CardName::TestVanillaCharacter => Some(Spark(5)),
         CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => Some(Spark(5)),
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => Some(Spark(1)),
@@ -130,8 +130,8 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
     card::get(battle, card_id).card_type
 }
 
-pub fn card_type_by_name(name: CardName) -> CardType {
-    match name {
+pub fn card_type_by_name(identity: CardIdentity) -> CardType {
+    match identity.tmp_to_card_name() {
         CardName::TestVanillaCharacter => CardType::Character(CharacterType::Musician),
         CardName::TestDissolve => CardType::Event,
         CardName::TestNamedDissolve => CardType::Event,
@@ -181,8 +181,8 @@ pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
     card::get(battle, card_id).is_fast
 }
 
-pub fn is_fast_by_name(name: CardName) -> bool {
-    match name {
+pub fn is_fast_by_name(identity: CardIdentity) -> bool {
+    match identity.tmp_to_card_name() {
         CardName::TestVanillaCharacter => false,
         CardName::TestDissolve => true,
         CardName::TestNamedDissolve => true,

@@ -1,5 +1,5 @@
 use core_data::card_types::CardType;
-use core_data::identifiers::CardName;
+use core_data::identifiers::CardIdentity;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::PlayerName;
 use schemars::JsonSchema;
@@ -51,8 +51,10 @@ pub struct CardObjectId<T> {
 /// Core state data for a card within a battle.
 #[derive(Clone, Debug)]
 pub struct BattleCardState {
-    /// The name of this card.
-    pub name: CardName,
+    /// The identity of this card.
+    ///
+    /// Uniquely identifies this card's rules text.
+    pub identity: CardIdentity,
 
     /// The player who owns this card.
     pub owner: PlayerName,

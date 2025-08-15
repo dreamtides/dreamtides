@@ -27,7 +27,7 @@ fn print_battlefield_state(battle: &BattleState) {
             let card_data = card::get(battle, *character_id);
             println!(
                 "  - {:?} (ID: {}, Spark: {})",
-                card_data.name, character_id.0.0, character_state.spark.0
+                card_data.identity, character_id.0.0, character_state.spark.0
             );
         }
 

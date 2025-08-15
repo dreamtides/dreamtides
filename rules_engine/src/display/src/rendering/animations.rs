@@ -47,7 +47,7 @@ pub fn render(
                             builder,
                             &CardViewContext::Battle(
                                 final_state,
-                                card::get(final_state, card_id).name,
+                                card::get(final_state, card_id).identity.tmp_to_card_name(),
                                 card_id.card_id(),
                             ),
                         )

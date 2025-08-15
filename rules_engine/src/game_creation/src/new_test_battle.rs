@@ -111,27 +111,34 @@ fn create_test_deck(name: TestDeckName) -> Deck {
     let mut deck_cards = BTreeMap::new();
     match name {
         TestDeckName::Vanilla => {
-            deck_cards.insert(CardName::TestVanillaCharacter, 30);
+            deck_cards.insert(CardName::TestVanillaCharacter.tmp_to_card_identity(), 30);
         }
         TestDeckName::StartingFive => {
-            deck_cards.insert(CardName::TestVanillaCharacter, 6);
-            deck_cards.insert(CardName::TestDissolve, 3);
-            deck_cards.insert(CardName::TestCounterspell, 3);
-            deck_cards.insert(CardName::TestCounterspellUnlessPays, 3);
-            deck_cards.insert(CardName::TestVariableEnergyDraw, 3);
+            deck_cards.insert(CardName::TestVanillaCharacter.tmp_to_card_identity(), 6);
+            deck_cards.insert(CardName::TestDissolve.tmp_to_card_identity(), 3);
+            deck_cards.insert(CardName::TestCounterspell.tmp_to_card_identity(), 3);
+            deck_cards.insert(CardName::TestCounterspellUnlessPays.tmp_to_card_identity(), 3);
+            deck_cards.insert(CardName::TestVariableEnergyDraw.tmp_to_card_identity(), 3);
         }
         TestDeckName::CoreEleven => {
-            deck_cards.insert(CardName::TestNamedDissolve, 4);
-            deck_cards.insert(CardName::TestCounterspell, 3);
-            deck_cards.insert(CardName::TestCounterspellUnlessPays, 2);
-            deck_cards.insert(CardName::TestVariableEnergyDraw, 3);
-            deck_cards.insert(CardName::TestTriggerGainSparkOnPlayCardEnemyTurn, 4);
-            deck_cards.insert(CardName::TestFastMultiActivatedAbilityDrawCardCharacter, 5);
-            deck_cards.insert(CardName::TestReturnOneOrTwoVoidEventCardsToHand, 2);
-            deck_cards.insert(CardName::TestModalReturnToHandOrDrawTwo, 2);
-            deck_cards.insert(CardName::TestPreventDissolveThisTurn, 2);
-            deck_cards.insert(CardName::TestForeseeOneDrawReclaim, 3);
-            deck_cards.insert(CardName::TestCounterspellCharacter, 2);
+            deck_cards.insert(CardName::TestNamedDissolve.tmp_to_card_identity(), 4);
+            deck_cards.insert(CardName::TestCounterspell.tmp_to_card_identity(), 3);
+            deck_cards.insert(CardName::TestCounterspellUnlessPays.tmp_to_card_identity(), 2);
+            deck_cards.insert(CardName::TestVariableEnergyDraw.tmp_to_card_identity(), 3);
+            deck_cards.insert(
+                CardName::TestTriggerGainSparkOnPlayCardEnemyTurn.tmp_to_card_identity(),
+                4,
+            );
+            deck_cards.insert(
+                CardName::TestFastMultiActivatedAbilityDrawCardCharacter.tmp_to_card_identity(),
+                5,
+            );
+            deck_cards
+                .insert(CardName::TestReturnOneOrTwoVoidEventCardsToHand.tmp_to_card_identity(), 2);
+            deck_cards.insert(CardName::TestModalReturnToHandOrDrawTwo.tmp_to_card_identity(), 2);
+            deck_cards.insert(CardName::TestPreventDissolveThisTurn.tmp_to_card_identity(), 2);
+            deck_cards.insert(CardName::TestForeseeOneDrawReclaim.tmp_to_card_identity(), 3);
+            deck_cards.insert(CardName::TestCounterspellCharacter.tmp_to_card_identity(), 2);
         }
     }
     Deck { cards: deck_cards }

@@ -30,7 +30,7 @@ pub fn apply_effect(
     let source_id = effect_source.card_id()?;
     let controller = card_properties::controller(battle, source_id);
     let effect_name = animation.discriminant().to_string();
-    match card::get(battle, source_id).name {
+    match card::get(battle, source_id).identity.tmp_to_card_name() {
         CardName::TestDissolve if effect_name == "ApplyTargetedEffect" => {
             animations::push_snapshot(builder, battle);
             for target_id in find_target_ids(animation) {
