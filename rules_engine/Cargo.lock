@@ -320,6 +320,7 @@ dependencies = [
  "ai_agents",
  "ai_data",
  "ai_uct",
+ "battle_mutations",
  "battle_state",
  "benchmark_battles",
  "core_data",

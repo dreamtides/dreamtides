@@ -10,6 +10,7 @@ use battle_queries::panic_with;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use core_data::types::PlayerName;
+use rand::Rng;
 use rand::seq::IndexedRandom;
 use tracing::debug;
 
@@ -46,7 +47,11 @@ pub fn select_action_unchecked(
     player: PlayerName,
     game_ai: &GameAI,
 ) -> BattleAction {
-    let battle = &player_state::randomize_battle_player(initial_battle, player.opponent());
+    let battle = &player_state::randomize_battle_player(
+        initial_battle,
+        player.opponent(),
+        rand::rng().random(),
+    );
     match game_ai {
         GameAI::AlwaysPanic => panic!("Always panic agent called for an action"),
         GameAI::FirstAvailableAction => first_available_action(battle, player),

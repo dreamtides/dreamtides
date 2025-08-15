@@ -14,6 +14,8 @@ use ordered_float::OrderedFloat;
 use petgraph::Direction;
 use petgraph::prelude::NodeIndex;
 use petgraph::visit::EdgeRef;
+use rand::{Rng, SeedableRng};
+use rand_xoshiro::Xoshiro256PlusPlus;
 use rayon::prelude::*;
 use tracing::debug;
 use tracing_subscriber::EnvFilter;
@@ -66,35 +68,7 @@ pub fn search(
         .par_iter()
         .with_min_len(if config.single_threaded { usize::MAX } else { 1 })
         .map(|&action| {
-            let subscriber = tracing_subscriber::registry().with(EnvFilter::new("warn"));
-            tracing::subscriber::with_default(subscriber, || {
-                let mut graph = SearchGraph::default();
-                let root = graph.add_node(SearchNode {
-                    player,
-                    total_reward: OrderedFloat(0.0),
-                    visit_count: 0,
-                    tried: Vec::new(),
-                });
-
-                for _ in 0..iterations_per_action {
-                    // Use a different random state every time. Doing this less
-                    // frequently does improve performance, but also pretty
-                    // consistently reduces play skill.
-                    let mut battle =
-                        player_state::randomize_battle_player(initial_battle, player.opponent());
-                    battle.request_context.logging_options.enable_action_legality_check = false;
-
-                    apply_battle_action::execute(&mut battle, player, action);
-
-                    let node = next_evaluation_target(&mut battle, &mut graph, root);
-                    let reward = evaluate(&mut battle, player);
-                    back_propagate_rewards(&mut graph, player, node, reward);
-                }
-
-                let total_reward = graph[root].total_reward;
-                let visit_count = graph[root].visit_count;
-                ActionSearchResult { action, graph, root, total_reward, visit_count }
-            })
+            search_action_candidate(initial_battle, player, iterations_per_action, action, None)
         })
         .collect();
 
@@ -127,6 +101,64 @@ pub fn search(
     // complexity/performance costs seem to not be worth it.
 
     action
+}
+
+/// Public version of `search_action_candidate` for use in benchmark tests.
+pub fn search_first_action_candidate_for_benchmarking(
+    initial_battle: &BattleState,
+    player: PlayerName,
+) -> BattleAction {
+    fastrand::seed(31415926535897);
+    let legal = legal_actions::compute(initial_battle, player);
+    let all_actions = legal.all();
+    let action = all_actions.first().expect("No legal actions available");
+    let result = search_action_candidate(initial_battle, player, 10, *action, Some(31415926535897));
+    result.action
+}
+
+fn search_action_candidate(
+    initial_battle: &BattleState,
+    player: PlayerName,
+    iterations_per_action: u32,
+    action: BattleAction,
+    randomize_player_seed: Option<u64>,
+) -> ActionSearchResult {
+    let subscriber = tracing_subscriber::registry().with(EnvFilter::new("warn"));
+    tracing::subscriber::with_default(subscriber, || {
+        let mut graph = SearchGraph::default();
+        let root = graph.add_node(SearchNode {
+            player,
+            total_reward: OrderedFloat(0.0),
+            visit_count: 0,
+            tried: Vec::new(),
+        });
+
+        let mut randomize_player_rng = Xoshiro256PlusPlus::seed_from_u64(
+            randomize_player_seed.unwrap_or_else(|| rand::rng().random()),
+        );
+
+        for _ in 0..iterations_per_action {
+            // Use a different random state every time. Doing this less
+            // frequently does improve performance, but also pretty
+            // consistently reduces play skill.
+            let mut battle = player_state::randomize_battle_player(
+                initial_battle,
+                player.opponent(),
+                randomize_player_rng.random(),
+            );
+            battle.request_context.logging_options.enable_action_legality_check = false;
+
+            apply_battle_action::execute(&mut battle, player, action);
+
+            let node = next_evaluation_target(&mut battle, &mut graph, root);
+            let reward = evaluate(&mut battle, player);
+            back_propagate_rewards(&mut graph, player, node, reward);
+        }
+
+        let total_reward = graph[root].total_reward;
+        let visit_count = graph[root].visit_count;
+        ActionSearchResult { action, graph, root, total_reward, visit_count }
+    })
 }
 
 struct ActionSearchResult {

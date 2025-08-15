@@ -23,6 +23,7 @@ ai_agents = { path = "../../src/ai_agents" }
 ai_data = { path = "../../src/ai_data" }
 ai_uct = { path = "../../src/ai_uct" }
 benchmark_battles = { path = "../benchmark_battles" }
+battle_mutations = { path = "../..//src/battle_mutations" }
 battle_state = { path = "../../src/battle_state" }
 core_data = { path = "../../src/core_data" }
 tracing = { workspace = true }
