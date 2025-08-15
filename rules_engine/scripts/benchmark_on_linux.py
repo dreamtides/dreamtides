@@ -141,6 +141,7 @@ def exec_in_container(cmd, check=True):
 
 def linux_build():
     path = WORKDIR if not CODE_SUBDIR else f"{WORKDIR}/{CODE_SUBDIR}"
+    # Note: If this fails with SIGKILL, try increasing the Docker Desktop VM memory.
     exec_in_container(f"cd {path} && cargo build")
 
 
