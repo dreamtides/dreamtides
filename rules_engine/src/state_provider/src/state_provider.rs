@@ -7,7 +7,8 @@ use std::time::Instant;
 
 use battle_state::battle::battle_state::RequestContext;
 use core_data::identifiers::UserId;
-use database::database::{Database, DatabaseError};
+use core_data::initialization_error::{ErrorCode, InitializationError};
+use database::database::Database;
 use database::sqlite_database::{self, SqliteDatabase};
 use display_data::command::CommandSequence;
 use display_data::request_data::{PollResponseType, RequestId};
@@ -34,9 +35,9 @@ pub trait StateProvider:
         &self,
         persistent_data_path: &str,
         streaming_assets_path: &str,
-    ) -> Result<Self::DatabaseImpl, DatabaseError>;
+    ) -> Result<Self::DatabaseImpl, Vec<InitializationError>>;
 
-    fn get_database(&self) -> Result<Self::DatabaseImpl, DatabaseError>;
+    fn get_database(&self) -> Result<Self::DatabaseImpl, Vec<InitializationError>>;
 
     fn store_request_context(&self, user_id: UserId, context: RequestContext);
 
@@ -95,21 +96,31 @@ impl StateProvider for DefaultStateProvider {
         &self,
         persistent_data_path: &str,
         streaming_assets_path: &str,
-    ) -> Result<Self::DatabaseImpl, DatabaseError> {
+    ) -> Result<Self::DatabaseImpl, Vec<InitializationError>> {
         let db = sqlite_database::initialize(PathBuf::from(persistent_data_path))?;
         let tabula_path = format!("{streaming_assets_path}/tabula.json");
         let ctx = TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates };
-        let tabula = File::open(&tabula_path)
-            .ok()
-            .and_then(|file| serde_json::from_reader::<_, TabulaRaw>(file).ok())
-            .and_then(|raw| tabula::build(&ctx, &raw).ok())
-            .ok_or(DatabaseError("Failed to load tabula.json".to_string()))?;
+        let file = File::open(&tabula_path).map_err(|e| {
+            vec![InitializationError::with_details(
+                ErrorCode::IOError,
+                "Failed to open tabula.json",
+                e.to_string(),
+            )]
+        })?;
+        let raw: TabulaRaw = serde_json::from_reader(file).map_err(|e| {
+            vec![InitializationError::with_details(
+                ErrorCode::JsonError,
+                "Failed to parse tabula.json",
+                e.to_string(),
+            )]
+        })?;
+        let tabula = tabula::build(&ctx, &raw)?;
         let mut guard = TABULA_DATA.write().unwrap();
         *guard = Some(Arc::new(tabula));
         Ok(db)
     }
 
-    fn get_database(&self) -> Result<Self::DatabaseImpl, DatabaseError> {
+    fn get_database(&self) -> Result<Self::DatabaseImpl, Vec<InitializationError>> {
         sqlite_database::get()
     }
 

@@ -5,7 +5,7 @@ use std::time::Instant;
 
 use battle_state::battle::battle_state::RequestContext;
 use core_data::identifiers::UserId;
-use database::database::DatabaseError;
+use core_data::initialization_error::{ErrorCode, InitializationError};
 use serde_json;
 use tabula_data::localized_strings::LanguageId;
 use tabula_data::tabula::{self, Tabula, TabulaBuildContext, TabulaRaw};
@@ -61,34 +61,50 @@ impl StateProvider for TestStateProvider {
         &self,
         persistent_data_path: &str,
         streaming_assets_path: &str,
-    ) -> Result<Self::DatabaseImpl, DatabaseError> {
+    ) -> Result<Self::DatabaseImpl, Vec<InitializationError>> {
         let tabula_path = format!("{streaming_assets_path}/tabula.json");
         let ctx = TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates };
-        let tabula = File::open(&tabula_path)
-            .ok()
-            .and_then(|file| {
-                serde_json::from_reader::<_, TabulaRaw>(file)
-                    .ok()
-                    .and_then(|raw| tabula::build(&ctx, &raw).ok())
-            })
-            .or_else(|| {
-                std::fs::File::open("tabula.json").ok().and_then(|file| {
-                    serde_json::from_reader::<_, TabulaRaw>(file)
-                        .ok()
-                        .and_then(|raw| tabula::build(&ctx, &raw).ok())
-                })
-            })
-            .ok_or(DatabaseError("Failed to load tabula.json".to_string()))?;
+        let tabula = match File::open(&tabula_path) {
+            Ok(file) => {
+                let raw: TabulaRaw = serde_json::from_reader(file).map_err(|e| {
+                    vec![InitializationError::with_details(
+                        ErrorCode::JsonError,
+                        "Failed to parse tabula.json",
+                        e.to_string(),
+                    )]
+                })?;
+                tabula::build(&ctx, &raw)?
+            }
+            Err(_) => {
+                let file = File::open("tabula.json").map_err(|e| {
+                    vec![InitializationError::with_details(
+                        ErrorCode::IOError,
+                        "Failed to open tabula.json",
+                        e.to_string(),
+                    )]
+                })?;
+                let raw: TabulaRaw = serde_json::from_reader(file).map_err(|e| {
+                    vec![InitializationError::with_details(
+                        ErrorCode::JsonError,
+                        "Failed to parse tabula.json",
+                        e.to_string(),
+                    )]
+                })?;
+                tabula::build(&ctx, &raw)?
+            }
+        };
 
         if let Ok(mut guard) = self.inner.tabula.write() {
             *guard = Some(Arc::new(tabula));
         }
 
-        let mut databases = self
-            .inner
-            .databases
-            .lock()
-            .map_err(|e| DatabaseError(format!("Failed to acquire lock: {e}")))?;
+        let mut databases = self.inner.databases.lock().map_err(|e| {
+            vec![InitializationError::with_details(
+                ErrorCode::MutexLockError,
+                "Failed to acquire lock".to_string(),
+                e.to_string(),
+            )]
+        })?;
 
         if let Some(existing_db) = databases.get(persistent_data_path) {
             Ok(existing_db.clone())
@@ -99,17 +115,20 @@ impl StateProvider for TestStateProvider {
         }
     }
 
-    fn get_database(&self) -> Result<Self::DatabaseImpl, DatabaseError> {
-        let databases = self
-            .inner
-            .databases
-            .lock()
-            .map_err(|e| DatabaseError(format!("Failed to acquire lock: {e}")))?;
-        databases
-            .values()
-            .next()
-            .cloned()
-            .ok_or_else(|| DatabaseError("No database initialized".to_string()))
+    fn get_database(&self) -> Result<Self::DatabaseImpl, Vec<InitializationError>> {
+        let databases = self.inner.databases.lock().map_err(|e| {
+            vec![InitializationError::with_details(
+                ErrorCode::MutexLockError,
+                "Failed to acquire lock".to_string(),
+                e.to_string(),
+            )]
+        })?;
+        databases.values().next().cloned().ok_or_else(|| {
+            vec![InitializationError::with_name(
+                ErrorCode::NotInitializedError,
+                "No database initialized".to_string(),
+            )]
+        })
     }
 
     fn store_request_context(&self, user_id: UserId, context: RequestContext) {

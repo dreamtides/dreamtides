@@ -16,6 +16,7 @@ use battle_state::battle_player::battle_player_state::{
     CreateBattlePlayer, PlayerType, TestDeckName,
 };
 use core_data::identifiers::{BattleId, QuestId, UserId};
+use core_data::initialization_error::InitializationError;
 use core_data::types::PlayerName;
 use database::database::Database;
 use database::save_file::SaveFile;
@@ -222,7 +223,12 @@ fn connect_internal(
 
     let database = match provider.initialize(persistent_data_path, streaming_assets_path) {
         Ok(db) => db,
-        Err(error) => return error_message::display_error_message(None, error.to_string()),
+        Err(errors) => {
+            return error_message::display_error_message(
+                None,
+                format_initialization_errors(&errors),
+            );
+        }
     };
 
     // Check if this is a multiplayer connection request
@@ -308,7 +314,9 @@ fn connect_for_multiplayer(
             None,
             format!("No save file found for opponent ID: {vs_opponent:?}"),
         ),
-        Err(error) => error_message::display_error_message(None, error.to_string()),
+        Err(errors) => {
+            error_message::display_error_message(None, format_initialization_errors(&errors))
+        }
     }
 }
 
@@ -352,10 +360,10 @@ fn load_battle_from_database(
             let save_file = serialize_save_file::battle(user_id, quest_id, &new_battle);
             match database.write_save(save_file) {
                 Ok(_) => Ok(LoadBattleResult::NewBattle(new_battle)),
-                Err(error) => Err(error.to_string()),
+                Err(errors) => Err(format_initialization_errors(&errors)),
             }
         }
-        Err(error) => Err(error.to_string()),
+        Err(errors) => Err(format_initialization_errors(&errors)),
     }
 }
 
@@ -408,7 +416,7 @@ fn save_battle_to_database(
     battle: &BattleState,
 ) -> Result<(), String> {
     let save_file = serialize_save_file::battle(user_id, quest_id, battle);
-    database.write_save(save_file).map_err(|e| e.to_string())
+    database.write_save(save_file).map_err(|errors| format_initialization_errors(&errors))
 }
 
 fn perform_action_internal(
@@ -445,27 +453,42 @@ fn perform_action_internal(
 
     let provider = provider.clone();
     let result = catch_panic_conditionally(&provider, || {
-        let Ok(database) = provider.get_database() else {
-            show_error_message(
-                provider.clone(),
-                user_id,
-                None,
-                format!("No database found for user_id: {user_id:?}"),
-            );
-            return;
+        let database = match provider.get_database() {
+            Ok(db) => db,
+            Err(errors) => {
+                show_error_message(
+                    provider.clone(),
+                    user_id,
+                    None,
+                    format_initialization_errors(&errors),
+                );
+                return;
+            }
         };
 
         // Use specific save file if requested, otherwise use the user's save
         // file
         let save_file_id = request.save_file_id.unwrap_or(user_id);
-        let Ok(Some(save)) = database.fetch_save(save_file_id) else {
-            let error_msg = if request.save_file_id.is_some() {
-                format!("No save file found for request.save_file_id: {save_file_id:?}")
-            } else {
-                format!("No save file found for user_id: {user_id:?}")
-            };
-            show_error_message(provider.clone(), user_id, None, error_msg);
-            return;
+        let save = match database.fetch_save(save_file_id) {
+            Ok(Some(save)) => save,
+            Ok(None) => {
+                let error_msg = if request.save_file_id.is_some() {
+                    format!("No save file found for request.save_file_id: {save_file_id:?}")
+                } else {
+                    format!("No save file found for user_id: {user_id:?}")
+                };
+                show_error_message(provider.clone(), user_id, None, error_msg);
+                return;
+            }
+            Err(errors) => {
+                show_error_message(
+                    provider.clone(),
+                    user_id,
+                    None,
+                    format_initialization_errors(&errors),
+                );
+                return;
+            }
         };
 
         let request_context = provider
@@ -485,14 +508,14 @@ fn perform_action_internal(
         battle.animations = Some(AnimationData::default());
         handle_request_action(provider.clone(), request, user_id, save, &mut battle, request_id);
 
-        if let Err(error) =
+        if let Err(errors) =
             database.write_save(serialize_save_file::battle(save_file_id, quest_id, &battle))
         {
             show_error_message(
                 provider.clone(),
                 user_id,
                 Some(&battle),
-                format!("Failed to save battle: {error}"),
+                format!("Failed to save battle: {}", format_initialization_errors(&errors)),
             );
         }
     });
@@ -502,6 +525,13 @@ fn perform_action_internal(
     }
 
     true
+}
+
+fn format_initialization_errors(errors: &[InitializationError]) -> String {
+    if errors.is_empty() {
+        return "Unknown initialization error".to_string();
+    }
+    errors.iter().map(|e| e.format()).collect::<Vec<_>>().join("\n")
 }
 
 fn send_updates_to_user_and_opponent(

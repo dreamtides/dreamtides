@@ -2,7 +2,8 @@ use std::collections::HashMap;
 use std::sync::{Arc, RwLock};
 
 use core_data::identifiers::UserId;
-use database::database::{Database, DatabaseError};
+use core_data::initialization_error::{ErrorCode, InitializationError};
+use database::database::Database;
 use database::save_file::SaveFile;
 
 #[derive(Clone)]
@@ -23,20 +24,26 @@ impl Default for TestDatabase {
 }
 
 impl Database for TestDatabase {
-    fn fetch_save(&self, user_id: UserId) -> Result<Option<SaveFile>, DatabaseError> {
-        let storage = self
-            .storage
-            .read()
-            .map_err(|e| DatabaseError(format!("Failed to acquire read lock: {e}")))?;
+    fn fetch_save(&self, user_id: UserId) -> Result<Option<SaveFile>, Vec<InitializationError>> {
+        let storage = self.storage.read().map_err(|e| {
+            vec![InitializationError::with_details(
+                ErrorCode::MutexLockError,
+                "Failed to acquire read lock".to_string(),
+                e.to_string(),
+            )]
+        })?;
 
         Ok(storage.get(&user_id).cloned())
     }
 
-    fn write_save(&self, save: SaveFile) -> Result<(), DatabaseError> {
-        let mut storage = self
-            .storage
-            .write()
-            .map_err(|e| DatabaseError(format!("Failed to acquire write lock: {e}")))?;
+    fn write_save(&self, save: SaveFile) -> Result<(), Vec<InitializationError>> {
+        let mut storage = self.storage.write().map_err(|e| {
+            vec![InitializationError::with_details(
+                ErrorCode::MutexLockError,
+                "Failed to acquire write lock".to_string(),
+                e.to_string(),
+            )]
+        })?;
         storage.insert(save.id(), save);
         Ok(())
     }

@@ -5,6 +5,13 @@ pub enum ErrorCode {
     FluentAddResourceError,
     FluentMissingMessage,
     FluentMissingValue,
+    DatabaseError,
+    IOError,
+    JsonError,
+    TabulaBuildError,
+    MutexLockError,
+    NotInitializedError,
+    AlreadyInitializedWithDifferentPath,
 }
 
 impl ErrorCode {
@@ -17,6 +24,13 @@ impl ErrorCode {
             ErrorCode::FluentAddResourceError => "FAR",
             ErrorCode::FluentMissingMessage => "FMM",
             ErrorCode::FluentMissingValue => "FMV",
+            ErrorCode::DatabaseError => "DBE",
+            ErrorCode::IOError => "IOE",
+            ErrorCode::JsonError => "JSE",
+            ErrorCode::TabulaBuildError => "TBE",
+            ErrorCode::MutexLockError => "MLE",
+            ErrorCode::NotInitializedError => "NIE",
+            ErrorCode::AlreadyInitializedWithDifferentPath => "AID",
         }
     }
 }
@@ -32,10 +46,10 @@ pub struct InitializationError {
 }
 
 impl InitializationError {
-    pub fn with_name(code: ErrorCode, name: String) -> Self {
+    pub fn with_name(code: ErrorCode, name: impl Into<String>) -> Self {
         Self {
             code,
-            name,
+            name: name.into(),
             details: None,
             tabula_sheet: None,
             tabula_row: None,
@@ -43,11 +57,15 @@ impl InitializationError {
         }
     }
 
-    pub fn with_details(code: ErrorCode, name: String, details: String) -> Self {
+    pub fn with_details(
+        code: ErrorCode,
+        name: impl Into<String>,
+        details: impl Into<String>,
+    ) -> Self {
         Self {
             code,
-            name,
-            details: Some(details),
+            name: name.into(),
+            details: Some(details.into()),
             tabula_sheet: None,
             tabula_row: None,
             tabula_column: None,
