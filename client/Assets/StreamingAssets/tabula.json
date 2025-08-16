@@ -245,17 +245,143 @@
       "name": "error-message-panel-title",
       "description": "Title for a panel displaying an error message",
       "en_us": "Error"
+    },
+    {
+      "id": "b7b16e85-8cbf-4433-8ee1-805858a10493",
+      "name": "card-type-character",
+      "description": "Card type for character cards",
+      "en_us": "Character"
+    },
+    {
+      "id": "11b07242-b514-42cb-aed9-a64992ac2e2b",
+      "name": "card-type-event",
+      "description": "Card type for event cards",
+      "en_us": "Event"
+    },
+    {
+      "id": "bee9a795-eb5a-46a1-aac5-692c7a070c64",
+      "name": "card-subtype-ancient",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Ancient"
+    },
+    {
+      "id": "602ea4ae-0f44-4704-9cf4-c1ef70248642",
+      "name": "card-subtype-child",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Child"
+    },
+    {
+      "id": "94f37651-7ffa-4bb1-97b9-40b5640db8ab",
+      "name": "card-subtype-detective",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Detective"
+    },
+    {
+      "id": "45d5bee1-12b7-4150-983c-4c4ce721d091",
+      "name": "card-subtype-explorer",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Explorer"
+    },
+    {
+      "id": "411b42ec-fa60-44a0-8282-35b9f1e6dcd8",
+      "name": "card-subtype-hacker",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Hacker"
+    },
+    {
+      "id": "0c84be77-7bac-4820-a5c2-7b648522db47",
+      "name": "card-subtype--mage",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Mage"
+    },
+    {
+      "id": "7947e5c2-bf87-4840-90be-4bbff0639b5f",
+      "name": "card-subtype-monster",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Monster"
+    },
+    {
+      "id": "bcc76e70-cb45-4667-8e89-7b2dacb81ebc",
+      "name": "card-subtype-musician",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Musician"
+    },
+    {
+      "id": "f786771e-b0fa-483a-b773-72fc9e9b56a5",
+      "name": "card-subtype-outsider",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Outsider"
+    },
+    {
+      "id": "f8032816-7252-4c33-8ce4-ffd3ba279a2a",
+      "name": "card-subtype-renegade",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Renegade"
+    },
+    {
+      "id": "60921d72-fde8-4958-b425-9bdc0964b0a3",
+      "name": "card-subtype-spirit-animal",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "SpiritAnimal"
+    },
+    {
+      "id": "1a6221e0-a5bd-4a48-8629-51a2796ad166",
+      "name": "card-subtype-super",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Super"
+    },
+    {
+      "id": "649edeb4-6c1d-48f4-bb39-8e01caba3d2a",
+      "name": "card-subtype-survivor",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Survivor"
+    },
+    {
+      "id": "82f771ba-f7d6-4718-9e26-a9ff3dcac12f",
+      "name": "card-subtype-synth",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Synth"
+    },
+    {
+      "id": "40e3fefd-b41e-4dfc-a467-0c59766116c8",
+      "name": "card-subtype-tinkerer",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Tinkerer"
+    },
+    {
+      "id": "f29c168c-6f67-4682-b948-dddd535fc467",
+      "name": "card-subtype-trooper",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Trooper"
+    },
+    {
+      "id": "42abc8f3-b741-4d49-97b1-d96a29563f18",
+      "name": "card-subtype-visionary",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Visionary"
+    },
+    {
+      "id": "727a0d85-e67d-49c6-920c-95619b488402",
+      "name": "card-subtype-visitor",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Visitor"
+    },
+    {
+      "id": "68338f97-ffd9-4082-8c5a-41091323e8cb",
+      "name": "card-subtype-warrior",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Warrior"
     }
   ],
   "test_cards": [
     {
       "id": "d4854b6e-5274-4f6a-8a60-a1ea1c15e9a6",
       "name_en_us": "Test Dissolve",
-      "cost": "2",
+      "energy_cost": "2",
       "rules_text_en_us": "Dissolve an enemy character.",
       "card_type": "Event",
       "subtype_en_us": null,
-      "fast": true,
+      "is_fast": true,
       "spark": null,
       "rarity": "Common",
       "image_number": "1907487244"

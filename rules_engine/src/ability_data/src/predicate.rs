@@ -1,4 +1,4 @@
-use core_data::card_types::CharacterType;
+use core_data::card_types::CardSubtype;
 use core_data::numerics::{Energy, Spark};
 use serde::{Deserialize, Serialize};
 
@@ -55,8 +55,8 @@ pub enum CardPredicate {
     Character,
     Event,
     CardOnStack,
-    CharacterType(CharacterType),
-    NotCharacterType(CharacterType),
+    CharacterType(CardSubtype),
+    NotCharacterType(CardSubtype),
     CharacterWithSpark(Spark, Operator<Spark>),
     CardWithCost {
         target: Box<CardPredicate>,

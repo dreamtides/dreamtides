@@ -149,3 +149,69 @@ pub const COMBINED_LIMIT_WARNING_MESSAGE: StringId =
 /// Title for a panel displaying an error message
 pub const ERROR_MESSAGE_PANEL_TITLE: StringId =
     StringId(uuid!("a36c2696-4c39-49d5-9c63-3e5b7149cefb"));
+
+/// Card type for character cards
+pub const CARD_TYPE_CHARACTER: StringId = StringId(uuid!("b7b16e85-8cbf-4433-8ee1-805858a10493"));
+
+/// Card type for event cards
+pub const CARD_TYPE_EVENT: StringId = StringId(uuid!("11b07242-b514-42cb-aed9-a64992ac2e2b"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_ANCIENT: StringId = StringId(uuid!("bee9a795-eb5a-46a1-aac5-692c7a070c64"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_CHILD: StringId = StringId(uuid!("602ea4ae-0f44-4704-9cf4-c1ef70248642"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_DETECTIVE: StringId =
+    StringId(uuid!("94f37651-7ffa-4bb1-97b9-40b5640db8ab"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_EXPLORER: StringId = StringId(uuid!("45d5bee1-12b7-4150-983c-4c4ce721d091"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_HACKER: StringId = StringId(uuid!("411b42ec-fa60-44a0-8282-35b9f1e6dcd8"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_MAGE: StringId = StringId(uuid!("0c84be77-7bac-4820-a5c2-7b648522db47"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_MONSTER: StringId = StringId(uuid!("7947e5c2-bf87-4840-90be-4bbff0639b5f"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_MUSICIAN: StringId = StringId(uuid!("bcc76e70-cb45-4667-8e89-7b2dacb81ebc"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_OUTSIDER: StringId = StringId(uuid!("f786771e-b0fa-483a-b773-72fc9e9b56a5"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_RENEGADE: StringId = StringId(uuid!("f8032816-7252-4c33-8ce4-ffd3ba279a2a"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_SPIRIT_ANIMAL: StringId =
+    StringId(uuid!("60921d72-fde8-4958-b425-9bdc0964b0a3"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_SUPER: StringId = StringId(uuid!("1a6221e0-a5bd-4a48-8629-51a2796ad166"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_SURVIVOR: StringId = StringId(uuid!("649edeb4-6c1d-48f4-bb39-8e01caba3d2a"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_SYNTH: StringId = StringId(uuid!("82f771ba-f7d6-4718-9e26-a9ff3dcac12f"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_TINKERER: StringId = StringId(uuid!("40e3fefd-b41e-4dfc-a467-0c59766116c8"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_TROOPER: StringId = StringId(uuid!("f29c168c-6f67-4682-b948-dddd535fc467"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_VISIONARY: StringId =
+    StringId(uuid!("42abc8f3-b741-4d49-97b1-d96a29563f18"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_VISITOR: StringId = StringId(uuid!("727a0d85-e67d-49c6-920c-95619b488402"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_WARRIOR: StringId = StringId(uuid!("68338f97-ffd9-4082-8c5a-41091323e8cb"));

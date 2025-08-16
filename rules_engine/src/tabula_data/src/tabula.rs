@@ -2,7 +2,7 @@ use core_data::identifiers::BaseCardId;
 use core_data::initialization_error::InitializationError;
 use serde::{Deserialize, Serialize};
 
-use crate::card_definition::CardDefinitionRaw;
+use crate::base_card_definition::BaseCardDefinitionRaw;
 use crate::localized_strings;
 use crate::localized_strings::{LanguageId, LocalizedStringSetRaw, LocalizedStrings, StringId};
 use crate::tabula_table::Table;
@@ -21,7 +21,7 @@ use crate::tabula_table::Table;
 #[derive(Debug, Clone)]
 pub struct Tabula {
     pub strings: LocalizedStrings,
-    pub test_cards: Table<BaseCardId, CardDefinitionRaw>,
+    pub test_cards: Table<BaseCardId, BaseCardDefinitionRaw>,
 }
 
 /// Context for building a [Tabula] struct from a [TabulaRaw] struct.
@@ -37,7 +37,7 @@ pub struct TabulaBuildContext {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TabulaRaw {
     pub strings: Table<StringId, LocalizedStringSetRaw>,
-    pub test_cards: Table<BaseCardId, CardDefinitionRaw>,
+    pub test_cards: Table<BaseCardId, BaseCardDefinitionRaw>,
 }
 
 pub fn build(

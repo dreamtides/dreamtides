@@ -5,7 +5,7 @@ use strum::Display;
 
 #[derive(Debug, Hash, Serialize, Deserialize, JsonSchema, Copy, Clone, Eq, PartialEq)]
 pub enum CardType {
-    Character(CharacterType),
+    Character(CardSubtype),
     Event,
     Dreamsign,
     Enemy,
@@ -15,7 +15,7 @@ pub enum CardType {
 #[derive(
     Debug, Hash, Ord, PartialOrd, Serialize, Deserialize, JsonSchema, EnumSetType, Display,
 )]
-pub enum CharacterType {
+pub enum CardSubtype {
     Ancient,
     Child,
     Detective,

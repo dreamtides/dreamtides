@@ -63,7 +63,7 @@ pub struct BaseCardDefinition {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CardDefinitionRaw {
+pub struct BaseCardDefinitionRaw {
     pub id: BaseCardId,
 
     /// Name of this card (U.S. English).

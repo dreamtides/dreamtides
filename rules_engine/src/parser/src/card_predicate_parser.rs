@@ -1,7 +1,7 @@
 use ability_data::predicate::{CardPredicate, Operator};
 use chumsky::Parser;
 use chumsky::prelude::choice;
-use core_data::card_types::CharacterType;
+use core_data::card_types::CardSubtype;
 use core_data::numerics::{Energy, Spark};
 
 use crate::parser_utils::{ErrorType, a_or_an, numeric, phrase};
@@ -121,13 +121,13 @@ fn character_with_multi_activated_ability<'a>()
         .to(CardPredicate::CharacterWithMultiActivatedAbility)
 }
 
-fn character_type<'a>() -> impl Parser<'a, &'a str, CharacterType, ErrorType<'a>> {
+fn character_type<'a>() -> impl Parser<'a, &'a str, CardSubtype, ErrorType<'a>> {
     phrase("{cardtype: ")
         .ignore_then(choice((
-            choice((phrase("warriors"), phrase("warrior"))).to(CharacterType::Warrior),
-            choice((phrase("survivors"), phrase("survivor"))).to(CharacterType::Survivor),
+            choice((phrase("warriors"), phrase("warrior"))).to(CardSubtype::Warrior),
+            choice((phrase("survivors"), phrase("survivor"))).to(CardSubtype::Survivor),
             choice((phrase("spirit animals"), phrase("spirit animal")))
-                .to(CharacterType::SpiritAnimal),
+                .to(CardSubtype::SpiritAnimal),
         )))
         .then_ignore(phrase("}"))
 }

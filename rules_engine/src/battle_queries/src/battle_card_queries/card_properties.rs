@@ -1,6 +1,6 @@
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardIdType, CharacterId};
-use core_data::card_types::{CardType, CharacterType};
+use core_data::card_types::{CardSubtype, CardType};
 use core_data::identifiers::{CardIdentity, CardName};
 use core_data::numerics::{Energy, Spark};
 use core_data::types::PlayerName;
@@ -132,7 +132,7 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
 
 pub fn card_type_by_name(identity: CardIdentity) -> CardType {
     match identity.tmp_to_card_name() {
-        CardName::TestVanillaCharacter => CardType::Character(CharacterType::Musician),
+        CardName::TestVanillaCharacter => CardType::Character(CardSubtype::Musician),
         CardName::TestDissolve => CardType::Event,
         CardName::TestNamedDissolve => CardType::Event,
         CardName::TestCounterspellUnlessPays => CardType::Event,
@@ -140,26 +140,26 @@ pub fn card_type_by_name(identity: CardIdentity) -> CardType {
         CardName::TestVariableEnergyDraw => CardType::Event,
         CardName::TestDrawOne => CardType::Event,
         CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => {
-            CardType::Character(CharacterType::Musician)
+            CardType::Character(CardSubtype::Musician)
         }
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
-            CardType::Character(CharacterType::Visitor)
+            CardType::Character(CardSubtype::Visitor)
         }
         CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => {
-            CardType::Character(CharacterType::Visitor)
+            CardType::Character(CardSubtype::Visitor)
         }
-        CardName::TestActivatedAbilityDrawCard => CardType::Character(CharacterType::Warrior),
+        CardName::TestActivatedAbilityDrawCard => CardType::Character(CardSubtype::Warrior),
         CardName::TestMultiActivatedAbilityDrawCardCharacter => {
-            CardType::Character(CharacterType::Warrior)
+            CardType::Character(CardSubtype::Warrior)
         }
         CardName::TestFastActivatedAbilityDrawCardCharacter => {
-            CardType::Character(CharacterType::Warrior)
+            CardType::Character(CardSubtype::Warrior)
         }
         CardName::TestFastMultiActivatedAbilityDrawCardCharacter => {
-            CardType::Character(CharacterType::Warrior)
+            CardType::Character(CardSubtype::Warrior)
         }
-        CardName::TestActivatedAbilityDissolveCharacter => CardType::Character(CharacterType::Mage),
-        CardName::TestDualActivatedAbilityCharacter => CardType::Character(CharacterType::Ancient),
+        CardName::TestActivatedAbilityDissolveCharacter => CardType::Character(CardSubtype::Mage),
+        CardName::TestDualActivatedAbilityCharacter => CardType::Character(CardSubtype::Ancient),
         CardName::TestForeseeOne => CardType::Event,
         CardName::TestForeseeTwo => CardType::Event,
         CardName::TestForeseeOneDrawACard => CardType::Event,
