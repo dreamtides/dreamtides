@@ -87,6 +87,10 @@ where
 }
 
 impl<I, T> Table<I, T> {
+    pub fn as_slice(&self) -> &[T] {
+        &self.0
+    }
+
     /// Returns the item with the given ID. Panics if the item is not found.
     pub fn get(&self, id: T::Id) -> &T
     where

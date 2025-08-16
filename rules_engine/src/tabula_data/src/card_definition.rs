@@ -16,7 +16,7 @@ pub enum Rarity {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct CardDefinition {
+pub struct CardDefinitionRaw {
     /// Identifies this card definition.
     pub id: BaseCardId,
 

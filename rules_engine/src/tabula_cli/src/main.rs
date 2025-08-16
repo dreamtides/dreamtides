@@ -57,13 +57,13 @@ async fn main() -> Result<()> {
     let spreadsheet = GoogleSheet::new(args.spreadsheet_id, hub);
     let tables = spreadsheet.read_all_tables().await?;
     let tabula_raw = tabula_sync::sync(tables)?;
-    let tabula = tabula::build(
+    let _tabula = tabula::build(
         &TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates },
         &tabula_raw,
     );
 
     if let Some(path) = args.string_ids.as_deref() {
-        tabula_codegen::generate_string_ids(&tabula, path)?;
+        tabula_codegen::generate_string_ids(&tabula_raw, path)?;
     }
 
     if let Some(path) = args.write_json.as_deref() {

@@ -25,14 +25,6 @@ pub struct LocalizedStrings {
     resource: Arc<FluentResource>,
     id_to_key: HashMap<StringId, String>,
     build_error: Option<String>,
-    rows: Vec<LocalizedStringMeta>,
-}
-
-#[derive(Debug, Clone)]
-pub struct LocalizedStringMeta {
-    pub id: StringId,
-    pub name: String,
-    pub description: String,
 }
 
 /// Serialized representation of LocalizedStringSet.
@@ -81,15 +73,6 @@ pub fn build(
             resource: Arc::new(res),
             id_to_key: table.0.iter().map(|row| (row.id, row.name.clone())).collect(),
             build_error: None,
-            rows: table
-                .0
-                .iter()
-                .map(|r| LocalizedStringMeta {
-                    id: r.id,
-                    name: r.name.clone(),
-                    description: r.description.clone(),
-                })
-                .collect(),
         },
         Err((res, errs)) => LocalizedStrings {
             resource: Arc::new(res),
@@ -100,15 +83,6 @@ pub fn build(
                     .collect::<Vec<_>>()
                     .join(" | "),
             ),
-            rows: table
-                .0
-                .iter()
-                .map(|r| LocalizedStringMeta {
-                    id: r.id,
-                    name: r.name.clone(),
-                    description: r.description.clone(),
-                })
-                .collect(),
         },
     }
 }
@@ -150,10 +124,6 @@ impl LocalizedStrings {
         let mut errors = vec![];
         let out = bundle.format_pattern(pattern, Some(args), &mut errors).into_owned();
         if errors.is_empty() { out } else { format_error_details(&errors) }
-    }
-
-    pub fn rows(&self) -> &[LocalizedStringMeta] {
-        &self.rows
     }
 }
 

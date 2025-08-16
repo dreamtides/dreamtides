@@ -2,16 +2,16 @@ use std::fs;
 
 use anyhow::Result;
 use convert_case::Case;
-use tabula_data::tabula::Tabula;
+use tabula_data::tabula::TabulaRaw;
 
 use crate::case_utils;
 
-pub fn generate_string_ids(tabula: &Tabula, output_path: &str) -> Result<()> {
+pub fn generate_string_ids(tabula_raw: &TabulaRaw, output_path: &str) -> Result<()> {
     let mut out = String::new();
     out.push_str("use tabula_data::localized_strings::StringId;\n");
     out.push_str("use uuid::uuid;\n\n");
 
-    for row in tabula.strings.rows() {
+    for row in tabula_raw.strings.as_slice() {
         out.push_str(&format!("/// {}\n", row.description.replace('\n', " ").trim()));
         let const_declaration = format!(
             "pub const {}: StringId = StringId(uuid!(\"{}\"));",
