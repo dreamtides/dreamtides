@@ -143,7 +143,7 @@ fn on_stack(
         CardPredicate::Character => {
             let mut characters = CardSet::default();
             for id in collection.iter() {
-                if matches!(card_properties::card_type(battle, id), CardType::Character(_)) {
+                if card_properties::card_type(battle, id) == CardType::Character {
                     characters.insert(id);
                 }
             }

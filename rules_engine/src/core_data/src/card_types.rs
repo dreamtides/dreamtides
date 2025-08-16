@@ -5,10 +5,10 @@ use strum::Display;
 
 #[derive(Debug, Hash, Serialize, Deserialize, JsonSchema, Copy, Clone, Eq, PartialEq)]
 pub enum CardType {
-    Character(CardSubtype),
+    Character,
     Event,
     Dreamsign,
-    Enemy,
+    Dreamcaller,
     Dreamwell,
 }
 

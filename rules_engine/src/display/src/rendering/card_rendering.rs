@@ -14,7 +14,7 @@ use battle_state::battle_cards::stack_card_state::{
     EffectTargets, StackCardAdditionalCostsPaid, StandardEffectTarget,
 };
 use battle_state::prompt_types::prompt_data::PromptType;
-use core_data::card_types::CardType;
+use core_data::card_types::{CardSubtype, CardType};
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::SpriteAddress;
 use core_data::identifiers::CardName;
@@ -76,10 +76,10 @@ pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardVi
         create_sound: None,
         destroy_position: None,
         prefab: match card_properties::card_type(battle, context.card_id()) {
-            CardType::Character(_) => CardPrefab::Character,
+            CardType::Character => CardPrefab::Character,
             CardType::Event => CardPrefab::Event,
             CardType::Dreamsign => CardPrefab::Dreamsign,
-            CardType::Enemy => CardPrefab::Enemy,
+            CardType::Dreamcaller => CardPrefab::Identity,
             CardType::Dreamwell => CardPrefab::Dreamwell,
         },
     }
@@ -290,10 +290,13 @@ pub fn card_name(battle: &BattleState, card_id: CardId) -> String {
 
 fn card_type(battle: &BattleState, card_id: CardId) -> String {
     let result = match card_properties::card_type(battle, card_id) {
-        CardType::Character(t) => t.to_string(),
+        CardType::Character => match card_properties::card_subtype(battle, card_id) {
+            Some(CardSubtype::Musician) => "Musician".to_string(),
+            _ => "Character".to_string(),
+        },
         CardType::Event => "Event".to_string(),
         CardType::Dreamsign => "Dreamsign".to_string(),
-        CardType::Enemy => "Enemy".to_string(),
+        CardType::Dreamcaller => "Dreamcaller".to_string(),
         CardType::Dreamwell => "Dreamwell".to_string(),
     };
 

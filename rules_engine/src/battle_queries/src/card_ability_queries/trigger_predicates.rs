@@ -73,22 +73,16 @@ fn matches_card_predicate(
     match predicate {
         CardPredicate::Card => true,
         CardPredicate::Character => {
-            matches!(card_properties::card_type(battle, trigger_card_id), CardType::Character(_))
+            card_properties::card_type(battle, trigger_card_id) == CardType::Character
         }
         CardPredicate::Event => {
             card_properties::card_type(battle, trigger_card_id) == CardType::Event
         }
         CardPredicate::CharacterType(character_type) => {
-            match card_properties::card_type(battle, trigger_card_id) {
-                CardType::Character(card_character_type) => card_character_type == *character_type,
-                _ => false,
-            }
+            card_properties::card_subtype(battle, trigger_card_id) == Some(*character_type)
         }
         CardPredicate::NotCharacterType(character_type) => {
-            match card_properties::card_type(battle, trigger_card_id) {
-                CardType::Character(card_character_type) => card_character_type != *character_type,
-                _ => false,
-            }
+            card_properties::card_subtype(battle, trigger_card_id) != Some(*character_type)
         }
         _ => todo!("Implement card predicate: {:?}", predicate),
     }

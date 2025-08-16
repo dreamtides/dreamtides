@@ -252,7 +252,7 @@ fn meets_restriction(
             .cards
             .stack_set(controller.opponent())
             .iter()
-            .any(|id| matches!(card_properties::card_type(battle, id), CardType::Character(_))),
+            .any(|id| card_properties::card_type(battle, id) == CardType::Character),
         CanPlayRestriction::AdditionalEnergyAvailable(required_energy) => {
             battle.players.player(controller).current_energy - energy_cost >= required_energy
         }

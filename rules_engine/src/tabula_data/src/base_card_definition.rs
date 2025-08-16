@@ -1,21 +1,9 @@
+use core_data::card_properties::Rarity;
+use core_data::card_types::{CardSubtype, CardType};
 use core_data::display_types::SpriteAddress;
 use core_data::identifiers::BaseCardId;
 use core_data::numerics::{Energy, Spark};
 use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum CardType {
-    Event,
-    Character,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum Rarity {
-    Common,
-    Uncommon,
-    Rare,
-    Special,
-}
 
 /// Base card definition from the Tabula database.
 ///
@@ -43,6 +31,9 @@ pub struct BaseCardDefinition {
     /// Type of this card.
     pub card_type: CardType,
 
+    /// Subtype of this card, if any.
+    pub card_subtype: Option<CardSubtype>,
+
     /// Whether this card is fast.
     ///
     /// Fast cards can be played "in response" to the opponent playing a card,
@@ -55,8 +46,8 @@ pub struct BaseCardDefinition {
     /// have no spark value specified here.
     pub spark: Option<Spark>,
 
-    /// Rarity of this card.
-    pub rarity: Rarity,
+    /// Rarity of this card, if any.
+    pub rarity: Option<Rarity>,
 
     /// Image to display for this card.
     pub image: SpriteAddress,
