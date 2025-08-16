@@ -4,7 +4,7 @@ use action_data::panel_address::PanelAddress;
 use core_data::identifiers::UserId;
 use core_data::numerics::Energy;
 use display_data::object_position::Position;
-use tabula::tabula::Tabula;
+use tabula_data::tabula::Tabula;
 
 #[derive(Debug, Clone, Default)]
 pub struct DisplayState {

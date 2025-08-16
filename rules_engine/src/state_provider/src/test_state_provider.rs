@@ -7,7 +7,8 @@ use battle_state::battle::battle_state::RequestContext;
 use core_data::identifiers::UserId;
 use database::database::DatabaseError;
 use serde_json;
-use tabula::tabula::Tabula;
+use tabula_data::localized_strings::LanguageId;
+use tabula_data::tabula::{self, Tabula, TabulaBuildContext, TabulaRaw};
 use uuid::Uuid;
 
 use crate::display_state_provider::{DisplayState, DisplayStateProvider};
@@ -62,13 +63,20 @@ impl StateProvider for TestStateProvider {
         streaming_assets_path: &str,
     ) -> Result<Self::DatabaseImpl, DatabaseError> {
         let tabula_path = format!("{streaming_assets_path}/tabula.json");
+        let ctx = TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates };
         let tabula = File::open(&tabula_path)
             .ok()
-            .and_then(|file| serde_json::from_reader::<_, Tabula>(file).ok())
-            .or_else(|| {
-                std::fs::File::open("tabula.json")
+            .and_then(|file| {
+                serde_json::from_reader::<_, TabulaRaw>(file)
                     .ok()
-                    .and_then(|file| serde_json::from_reader::<_, Tabula>(file).ok())
+                    .map(|raw| tabula::build(&ctx, &raw))
+            })
+            .or_else(|| {
+                std::fs::File::open("tabula.json").ok().and_then(|file| {
+                    serde_json::from_reader::<_, TabulaRaw>(file)
+                        .ok()
+                        .map(|raw| tabula::build(&ctx, &raw))
+                })
             })
             .ok_or(DatabaseError("Failed to load tabula.json".to_string()))?;
 
@@ -182,10 +190,6 @@ impl StateProvider for TestStateProvider {
         }
     }
 
-    fn should_panic_on_error(&self) -> bool {
-        true
-    }
-
     fn append_poll_result(&self, user_id: UserId, result: PollResult) {
         if let Ok(mut updates) = self.inner.pending_updates.lock() {
             updates.entry(user_id).or_default().push(result);
@@ -220,10 +224,10 @@ impl DisplayStateProvider for TestStateProvider {
     }
 
     fn tabula(&self) -> Arc<Tabula> {
-        if let Ok(guard) = self.inner.tabula.read() {
-            guard.clone().unwrap_or_else(|| panic!("Tabula not initialized"))
+        if let Ok(tabula) = self.inner.tabula.read() {
+            tabula.clone().unwrap_or_else(|| panic!("Tabula not initialized"))
         } else {
-            panic!("Failed to acquire lock")
+            panic!("Tabula not initialized")
         }
     }
 }

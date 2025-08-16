@@ -12,6 +12,6 @@ doctest = false
 bench = false
 
 [dependencies]
-tabula = { path = "../tabula" }
+tabula_data = { path = "../tabula_data" }
 
 uuid = { workspace = true }

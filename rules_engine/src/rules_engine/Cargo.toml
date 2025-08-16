@@ -25,7 +25,7 @@ game_creation = { path = "../game_creation" }
 logging = { path = "../logging" }
 masonry = { path = "../masonry" }
 state_provider = { path = "../state_provider" }
-tabula = { path = "../tabula" }
+tabula_data = { path = "../tabula_data" }
 tabula_ids = { path = "../tabula_ids" }
 ui_components = { path = "../ui_components" }
 

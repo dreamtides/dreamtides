@@ -1,11 +1,12 @@
-use std::collections::BTreeMap;
-use std::sync::{Arc, RwLock};
+use std::collections::HashMap;
+use std::sync::Arc;
 
 use fluent::FluentBundle;
 use fluent_bundle::{FluentArgs, FluentError, FluentResource};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use crate::tabula::TabulaBuildContext;
 use crate::tabula_table::{HasId, Table};
 
 /// A string identifier.
@@ -19,22 +20,39 @@ pub enum LanguageId {
 }
 
 /// A collection of localized strings.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LocalizedStrings {
-    pub table: Table<StringId, LocalizedStringSet>,
-    pub bundle_cache: RwLock<BTreeMap<LanguageId, Arc<FluentResource>>>,
+    resource: Arc<FluentResource>,
+    id_to_key: HashMap<StringId, String>,
+    build_error: Option<String>,
+    rows: Vec<LocalizedStringMeta>,
 }
 
-/// A set of localizations for a given string.
+#[derive(Debug, Clone)]
+pub struct LocalizedStringMeta {
+    pub id: StringId,
+    pub name: String,
+    pub description: String,
+}
+
+/// Serialized representation of LocalizedStringSet.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct LocalizedStringSet {
+pub struct LocalizedStringSetRaw {
     pub id: StringId,
     pub name: String,
     pub description: String,
     pub en_us: String,
 }
 
-impl HasId<StringId> for LocalizedStringSet {
+impl LocalizedStringSetRaw {
+    pub fn string(&self, language: LanguageId) -> String {
+        match language {
+            LanguageId::EnglishUnitedStates => self.en_us.clone(),
+        }
+    }
+}
+
+impl HasId<StringId> for LocalizedStringSetRaw {
     type Id = StringId;
 
     fn id(&self) -> StringId {
@@ -42,35 +60,61 @@ impl HasId<StringId> for LocalizedStringSet {
     }
 }
 
-impl Serialize for LocalizedStrings {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        self.table.serialize(serializer)
-    }
-}
-
-impl<'de> Deserialize<'de> for LocalizedStrings {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let table = Table::<StringId, LocalizedStringSet>::deserialize(deserializer)?;
-        Ok(LocalizedStrings { table, bundle_cache: RwLock::new(BTreeMap::new()) })
-    }
-}
-
-impl Clone for LocalizedStrings {
-    fn clone(&self) -> Self {
-        let table = self.table.clone();
-        let cache = self.bundle_cache.read().unwrap().clone();
-        LocalizedStrings { table, bundle_cache: RwLock::new(cache) }
+pub fn build(
+    context: &TabulaBuildContext,
+    table: &Table<StringId, LocalizedStringSetRaw>,
+) -> LocalizedStrings {
+    let ftl = table
+        .0
+        .iter()
+        .map(|row| {
+            format!(
+                "{} = {}\n",
+                row.name,
+                normalize_literal(row.string(context.current_language).as_str())
+            )
+        })
+        .collect::<Vec<_>>()
+        .join("");
+    match FluentResource::try_new(ftl) {
+        Ok(res) => LocalizedStrings {
+            resource: Arc::new(res),
+            id_to_key: table.0.iter().map(|row| (row.id, row.name.clone())).collect(),
+            build_error: None,
+            rows: table
+                .0
+                .iter()
+                .map(|r| LocalizedStringMeta {
+                    id: r.id,
+                    name: r.name.clone(),
+                    description: r.description.clone(),
+                })
+                .collect(),
+        },
+        Err((res, errs)) => LocalizedStrings {
+            resource: Arc::new(res),
+            id_to_key: table.0.iter().map(|row| (row.id, row.name.clone())).collect(),
+            build_error: Some(
+                errs.iter()
+                    .map(|e| format!("ERR7: Fluent Parser Error: {e}"))
+                    .collect::<Vec<_>>()
+                    .join(" | "),
+            ),
+            rows: table
+                .0
+                .iter()
+                .map(|r| LocalizedStringMeta {
+                    id: r.id,
+                    name: r.name.clone(),
+                    description: r.description.clone(),
+                })
+                .collect(),
+        },
     }
 }
 
 impl LocalizedStrings {
-    /// Formats the localized string for the given language using Fluent. In the
+    /// Formats the localized string using Fluent. In the
     /// event of an error, a descriptive error code is returned instead.
     ///
     /// Error codes:
@@ -82,36 +126,20 @@ impl LocalizedStrings {
     /// - ERR6: Fluent Formatting Error: Overriding {kind} id={id}
     /// - ERR7: Fluent Parser Error: {parser_error}
     /// - ERR8: Fluent Resolver Error: {resolver_error}
-    pub fn format_pattern(&self, language: LanguageId, id: StringId, args: &FluentArgs) -> String {
-        if !self.bundle_cache.read().unwrap().contains_key(&language) {
-            let mut ftl = String::new();
-            for row in &self.table.0 {
-                ftl.push_str(&format!(
-                    "{} = {}\n",
-                    row.name,
-                    normalize_literal(row.en_us.as_str())
-                ));
-            }
-            let res = match FluentResource::try_new(ftl) {
-                Ok(r) => Arc::new(r),
-                Err(_) => return "ERR1: Invalid Resource".to_string(),
-            };
-            self.bundle_cache.write().unwrap().insert(language, res);
+    pub fn format_pattern(&self, id: StringId, args: &FluentArgs) -> String {
+        if let Some(e) = &self.build_error {
+            return e.clone();
         }
-        let res = match self.bundle_cache.read().unwrap().get(&language) {
-            Some(r) => r.clone(),
-            None => return "ERR2: Missing Resource".to_string(),
-        };
         let mut bundle = FluentBundle::default();
         bundle.set_use_isolating(false);
-        if bundle.add_resource(res.as_ref()).is_err() {
+        if bundle.add_resource(self.resource.as_ref()).is_err() {
             return "ERR3: Add Resource Failed".to_string();
         }
-        let key = match self.table.get_optional(id) {
-            Some(row) => row.name.clone(),
+        let key = match self.id_to_key.get(&id) {
+            Some(k) => k,
             None => return "ERR4: Missing Message".to_string(),
         };
-        let msg = match bundle.get_message(&key) {
+        let msg = match bundle.get_message(key.as_str()) {
             Some(m) => m,
             None => return "ERR4: Missing Message".to_string(),
         };
@@ -122,6 +150,10 @@ impl LocalizedStrings {
         let mut errors = vec![];
         let out = bundle.format_pattern(pattern, Some(args), &mut errors).into_owned();
         if errors.is_empty() { out } else { format_error_details(&errors) }
+    }
+
+    pub fn rows(&self) -> &[LocalizedStringMeta] {
+        &self.rows
     }
 }
 

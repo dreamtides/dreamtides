@@ -8,6 +8,10 @@ use serde_json::{Deserializer as JsonDeserializer, Error as JsonError, Value};
 use serde_path_to_error as serde_path;
 use serde_path_to_error::Error as PathError;
 
+pub fn from_vec<I, T>(items: Vec<T>) -> Table<I, T> {
+    Table(items, PhantomData)
+}
+
 /// A trait for types that have an ID.
 pub trait HasId<I> {
     type Id: PartialEq + Copy + fmt::Debug;

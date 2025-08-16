@@ -12,7 +12,8 @@ use database::sqlite_database::{self, SqliteDatabase};
 use display_data::command::CommandSequence;
 use display_data::request_data::{PollResponseType, RequestId};
 use serde_json;
-use tabula::tabula::Tabula;
+use tabula_data::localized_strings::LanguageId;
+use tabula_data::tabula::{self, Tabula, TabulaBuildContext, TabulaRaw};
 use uuid::Uuid;
 
 use crate::display_state_provider::{DisplayState, DisplayStateProvider};
@@ -97,9 +98,11 @@ impl StateProvider for DefaultStateProvider {
     ) -> Result<Self::DatabaseImpl, DatabaseError> {
         let db = sqlite_database::initialize(PathBuf::from(persistent_data_path))?;
         let tabula_path = format!("{streaming_assets_path}/tabula.json");
+        let ctx = TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates };
         let tabula = File::open(&tabula_path)
             .ok()
-            .and_then(|file| serde_json::from_reader::<_, Tabula>(file).ok())
+            .and_then(|file| serde_json::from_reader::<_, TabulaRaw>(file).ok())
+            .map(|raw| tabula::build(&ctx, &raw))
             .ok_or(DatabaseError("Failed to load tabula.json".to_string()))?;
         let mut guard = TABULA_DATA.write().unwrap();
         *guard = Some(Arc::new(tabula));

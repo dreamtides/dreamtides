@@ -5,13 +5,14 @@ use convert_case::Case;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use serde_json::{Map, Value};
-use tabula::tabula::Tabula;
+use tabula_data::tabula::TabulaRaw;
 
 use crate::case_utils;
 use crate::spreadsheet::{SheetRow, SheetTable, SheetValue, Spreadsheet};
 
-/// Builds the canonical [Tabula] data structure from a list of [SheetTable]s.
-pub fn sync(sheets: Vec<SheetTable>) -> Result<Tabula> {
+/// Builds the canonical [TabulaRaw] data structure from a list of
+/// [SheetTable]s.
+pub fn sync(sheets: Vec<SheetTable>) -> Result<TabulaRaw> {
     let mut outer = Map::new();
     for table in sheets {
         let mut rows: Vec<Value> = Vec::with_capacity(table.rows.len());
@@ -24,8 +25,8 @@ pub fn sync(sheets: Vec<SheetTable>) -> Result<Tabula> {
         }
         outer.insert(case_utils::cleaned_to_case(&table.name, Case::Snake), Value::Array(rows));
     }
-    let tabula: Tabula = serde_json::from_value(Value::Object(outer))?;
-    Ok(tabula)
+    let raw: TabulaRaw = serde_json::from_value(Value::Object(outer))?;
+    Ok(raw)
 }
 
 /// Writes a list of structs to a spreadsheet as a table.

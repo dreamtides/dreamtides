@@ -4,7 +4,7 @@ use core_data::types::PlayerName;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use strum_macros::EnumDiscriminants;
-use tabula::localized_strings::StringId;
+use tabula_data::localized_strings::StringId;
 
 use crate::battle::battle_state::PendingEffectIndex;
 use crate::battle::card_id::{CharacterId, DeckCardId, StackCardId, VoidCardId};

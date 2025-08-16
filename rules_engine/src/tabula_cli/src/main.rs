@@ -10,6 +10,8 @@ use hyper_util::rt::TokioExecutor;
 use tabula_cli::google_sheet::GoogleSheet;
 use tabula_cli::spreadsheet::Spreadsheet;
 use tabula_cli::{tabula_codegen, tabula_sync};
+use tabula_data::localized_strings::LanguageId;
+use tabula_data::tabula::{self, TabulaBuildContext};
 use yup_oauth2::hyper_rustls::HttpsConnectorBuilder;
 
 #[derive(Parser, Debug)]
@@ -54,7 +56,11 @@ async fn main() -> Result<()> {
     let hub = Sheets::new(client, auth);
     let spreadsheet = GoogleSheet::new(args.spreadsheet_id, hub);
     let tables = spreadsheet.read_all_tables().await?;
-    let tabula = tabula_sync::sync(tables)?;
+    let tabula_raw = tabula_sync::sync(tables)?;
+    let tabula = tabula::build(
+        &TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates },
+        &tabula_raw,
+    );
 
     if let Some(path) = args.string_ids.as_deref() {
         tabula_codegen::generate_string_ids(&tabula, path)?;
@@ -64,7 +70,7 @@ async fn main() -> Result<()> {
         serde_json::to_writer_pretty(
             File::create(path)
                 .with_context(|| format!("failed to create JSON output file at {path}"))?,
-            &tabula,
+            &tabula_raw,
         )
         .context("failed to serialize Tabula to JSON")?;
     }

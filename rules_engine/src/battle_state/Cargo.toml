@@ -16,7 +16,7 @@ ability_data = { path = "../ability_data" }
 ai_data = { path = "../ai_data" }
 core_data = { path = "../core_data" }
 quest_state = { path = "../quest_state" }
-tabula = { path = "../tabula" }
+tabula_data = { path = "../tabula_data" }
 tabula_ids = { path = "../tabula_ids" }
 
 bit-set = { workspace = true }

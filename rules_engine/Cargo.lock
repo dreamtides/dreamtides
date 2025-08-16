@@ -342,7 +342,7 @@ dependencies = [
  "either",
  "rand 0.9.0",
  "rand_xoshiro",
- "tabula",
+ "tabula_data",
  "tabula_ids",
  "tracing",
 ]
@@ -366,7 +366,7 @@ dependencies = [
  "serde_json",
  "strum",
  "strum_macros",
- "tabula",
+ "tabula_data",
  "tabula_ids",
  "tracing",
 ]
@@ -389,7 +389,7 @@ dependencies = [
  "serde",
  "strum",
  "strum_macros",
- "tabula",
+ "tabula_data",
  "tabula_ids",
  "uuid",
 ]
@@ -885,7 +885,7 @@ dependencies = [
  "serde",
  "state_provider",
  "strum",
- "tabula",
+ "tabula_data",
  "tabula_ids",
  "tracing",
  "tracing-subscriber",
@@ -2454,7 +2454,7 @@ dependencies = [
  "rand 0.9.0",
  "serde_json",
  "state_provider",
- "tabula",
+ "tabula_data",
  "tabula_ids",
  "tokio",
  "tracing",
@@ -2891,7 +2891,7 @@ dependencies = [
  "display_data",
  "serde",
  "serde_json",
- "tabula",
+ "tabula_data",
  "uuid",
 ]
 
@@ -2958,23 +2958,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tabula"
-version = "0.0.0"
-dependencies = [
- "ability_data",
- "core_data",
- "fluent",
- "fluent-bundle",
- "schemars 1.0.2",
- "serde",
- "serde_json",
- "serde_path_to_error",
- "strum",
- "tracing",
- "uuid",
-]
-
-[[package]]
 name = "tabula_cli"
 version = "0.0.0"
 dependencies = [
@@ -2987,7 +2970,7 @@ dependencies = [
  "hyper-util",
  "serde",
  "serde_json",
- "tabula",
+ "tabula_data",
  "tokio",
  "tracing",
  "uuid",
@@ -3007,10 +2990,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "tabula_data"
+version = "0.0.0"
+dependencies = [
+ "ability_data",
+ "core_data",
+ "fluent",
+ "fluent-bundle",
+ "schemars 1.0.2",
+ "serde",
+ "serde_json",
+ "serde_path_to_error",
+ "strum",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
 name = "tabula_ids"
 version = "0.0.0"
 dependencies = [
- "tabula",
+ "tabula_data",
  "uuid",
 ]
 

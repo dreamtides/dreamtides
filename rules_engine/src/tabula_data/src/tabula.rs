@@ -2,7 +2,8 @@ use core_data::identifiers::BaseCardId;
 use serde::{Deserialize, Serialize};
 
 use crate::card_definition::CardDefinition;
-use crate::localized_strings::LocalizedStrings;
+use crate::localized_strings;
+use crate::localized_strings::{LanguageId, LocalizedStringSetRaw, LocalizedStrings, StringId};
 use crate::tabula_table::Table;
 
 /// Tabula is a read-only database of game data and rules information.
@@ -16,8 +17,31 @@ use crate::tabula_table::Table;
 /// `tabula_cli` tool is used to generate the tabula.json file from Google
 /// Sheets. Some data in tabula is also used to drive code generation for use in
 /// the rules engine, which is also handled by the `tabula_cli` tool.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct Tabula {
     pub strings: LocalizedStrings,
     pub test_cards: Table<BaseCardId, CardDefinition>,
+}
+
+/// Context for building a [Tabula] struct from a [TabulaRaw] struct.
+#[derive(Debug, Clone)]
+pub struct TabulaBuildContext {
+    pub current_language: LanguageId,
+}
+
+/// Serialized representation of Tabula.
+///
+/// Used to enable a simpler serialized representation which is transformed into
+/// a more ergonomic [Tabula] struct before use.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TabulaRaw {
+    pub strings: Table<StringId, LocalizedStringSetRaw>,
+    pub test_cards: Table<BaseCardId, CardDefinition>,
+}
+
+pub fn build(context: &TabulaBuildContext, raw: &TabulaRaw) -> Tabula {
+    Tabula {
+        strings: localized_strings::build(context, &raw.strings),
+        test_cards: raw.test_cards.clone(),
+    }
 }
