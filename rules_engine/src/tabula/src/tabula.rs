@@ -1,6 +1,9 @@
+use core_data::identifiers::BaseCardId;
 use serde::{Deserialize, Serialize};
 
+use crate::card_definition::CardDefinition;
 use crate::localized_strings::LocalizedStrings;
+use crate::tabula_table::Table;
 
 /// Tabula is a read-only database of game data and rules information.
 ///
@@ -16,4 +19,5 @@ use crate::localized_strings::LocalizedStrings;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Tabula {
     pub strings: LocalizedStrings,
+    pub test_cards: Table<BaseCardId, CardDefinition>,
 }

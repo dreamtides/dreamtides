@@ -4,7 +4,9 @@ use std::marker::PhantomData;
 use serde::de::{DeserializeOwned, Deserializer, SeqAccess, Visitor};
 use serde::ser::{SerializeSeq, Serializer};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use serde_json::{Deserializer as JsonDeserializer, Error as JsonError, Value};
+use serde_path_to_error as serde_path;
+use serde_path_to_error::Error as PathError;
 
 /// A trait for types that have an ID.
 pub trait HasId<I> {
@@ -39,7 +41,6 @@ impl<'de, I, T> Deserialize<'de> for Table<I, T>
 where
     T: DeserializeOwned,
 {
-    #[expect(clippy::print_stderr)]
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -63,13 +64,15 @@ where
                 A: SeqAccess<'de>,
             {
                 let mut items: Vec<T> = Vec::new();
+                let mut index: usize = 0;
                 while let Some(v) = seq.next_element::<Value>()? {
-                    match T::deserialize(v.clone()) {
+                    let s = v.to_string();
+                    let mut de = JsonDeserializer::from_str(&s);
+                    match serde_path::deserialize(&mut de) {
                         Ok(item) => items.push(item),
-                        Err(_) => {
-                            eprintln!("failed to deserialize table row, skipping: {v:?}");
-                        }
+                        Err(err) => log_tabula_row_error(index, &v, &s, &err),
                     }
+                    index += 1;
                 }
                 Ok(Table(items, PhantomData))
             }
@@ -98,4 +101,88 @@ impl<I, T> Table<I, T> {
     {
         self.0.iter().find(|item| item.id() == id)
     }
+}
+
+#[expect(clippy::print_stderr)]
+fn log_tabula_row_error(index: usize, v: &Value, s: &str, err: &PathError<JsonError>) {
+    let header = "\x1b[31;1mTabula deserialization error\x1b[0m";
+    let path_line = format!("  \x1b[1mPath\x1b[0m: {}", err.path());
+    let error_line = format!("  \x1b[1mError\x1b[0m: {}", err.inner());
+    let context_line =
+        format!("  \x1b[1mContext\x1b[0m: {}", error_context_snippet(s, err.inner()));
+    let row_line = match serde_json::to_string_pretty(v) {
+        Ok(pretty) => format!("  \x1b[1mRow JSON\x1b[0m:\n    {}", indent_multiline(&pretty, 4)),
+        Err(_) => format!("  \x1b[1mRow\x1b[0m: {v:?}"),
+    };
+    match v {
+        Value::Object(map) => match map.get("id") {
+            Some(id) => eprintln!(
+                "\n{header}\n  \x1b[1mRow\x1b[0m: {index}\n  \x1b[1mId\x1b[0m: {id}\n{path_line}\n{error_line}\n{context_line}\n{row_line}\n"
+            ),
+            None => eprintln!(
+                "\n{header}\n  \x1b[1mRow\x1b[0m: {index}\n{path_line}\n{error_line}\n{context_line}\n{row_line}\n"
+            ),
+        },
+        _ => eprintln!(
+            "\n{header}\n  \x1b[1mRow\x1b[0m: {index}\n{path_line}\n{error_line}\n{context_line}\n{row_line}\n"
+        ),
+    }
+}
+
+fn error_context_snippet(s: &str, json_error: &JsonError) -> String {
+    let msg = json_error.to_string();
+    match parse_error_column(&msg) {
+        Some(col) if col > 0 => {
+            let idx = col.saturating_sub(1);
+            let start = idx.saturating_sub(30);
+            let end = (idx + 30).min(s.len());
+            let sb = prev_char_boundary(s, start);
+            let eb = next_char_boundary(s, end);
+            let ib = prev_char_boundary(s, idx);
+            let ch = s.get(ib..eb).and_then(|t| t.chars().next()).unwrap_or('?');
+            let ch_len = ch.len_utf8();
+            let pre = s.get(sb..ib).unwrap_or("");
+            let post = s.get((ib + ch_len).min(s.len())..eb).unwrap_or("");
+            format!(
+                "context around column {col}: \x1b[2m...{pre}\x1b[0m\x1b[31;1m[{ch}]\x1b[0m\x1b[2m{post}...\x1b[0m"
+            )
+        }
+        _ => String::from("context: <unavailable>"),
+    }
+}
+
+fn indent_multiline(s: &str, spaces: usize) -> String {
+    let pad = " ".repeat(spaces);
+    s.lines().map(|line| format!("{pad}{line}")).collect::<Vec<_>>().join("\n")
+}
+
+fn parse_error_column(msg: &str) -> Option<usize> {
+    match msg.rfind("column ") {
+        Some(i) => {
+            let j = i + 7;
+            let digits: String = msg[j..].chars().take_while(|c| c.is_ascii_digit()).collect();
+            digits.parse().ok()
+        }
+        None => None,
+    }
+}
+
+fn prev_char_boundary(s: &str, mut idx: usize) -> usize {
+    if idx > s.len() {
+        idx = s.len();
+    }
+    while idx > 0 && !s.is_char_boundary(idx) {
+        idx -= 1;
+    }
+    idx
+}
+
+fn next_char_boundary(s: &str, mut idx: usize) -> usize {
+    if idx > s.len() {
+        idx = s.len();
+    }
+    while idx < s.len() && !s.is_char_boundary(idx) {
+        idx += 1;
+    }
+    idx
 }

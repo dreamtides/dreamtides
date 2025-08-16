@@ -246,5 +246,19 @@
       "description": "Title for a panel displaying an error message",
       "en_us": "Error"
     }
+  ],
+  "test_cards": [
+    {
+      "id": "d4854b6e-5274-4f6a-8a60-a1ea1c15e9a6",
+      "name_en_us": "Test Dissolve",
+      "cost": "2",
+      "rules_text_en_us": "Dissolve an enemy character.",
+      "card_type": "Event",
+      "subtype_en_us": null,
+      "fast": true,
+      "spark": null,
+      "rarity": "Common",
+      "image_number": "1907487244"
+    }
   ]
 }

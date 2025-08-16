@@ -36,7 +36,7 @@ pub struct QuestId(pub Uuid);
 /// Two cards with the same identity are considered to be "the same card", in
 /// the same sense that two copies of Lightning Bolt are "the same card" in
 /// Magic. Those two cards would have the same CardIdentity, but different
-/// CardIds.
+/// `CardId`s.
 #[derive(
     Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
 )]
@@ -79,6 +79,17 @@ impl CardIdentity {
         }
     }
 }
+
+/// Identifies the base rules for a card.
+///
+/// The 'base card' describes the abilities of a card before any modifications
+/// are applied to it, i.e. a card that appears in the Tabula database. A base
+/// card with zero or more modifications forms a [CardIdentity], and an instance
+/// of that card within a battle has a `CardId`.
+#[derive(
+    Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
+pub struct BaseCardId(pub Uuid);
 
 #[derive(
     Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,

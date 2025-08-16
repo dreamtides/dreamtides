@@ -2968,6 +2968,7 @@ dependencies = [
  "schemars 1.0.2",
  "serde",
  "serde_json",
+ "serde_path_to_error",
  "strum",
  "tracing",
  "uuid",

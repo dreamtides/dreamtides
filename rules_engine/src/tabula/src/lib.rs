@@ -1,3 +1,4 @@
+pub mod card_definition;
 pub mod dynamic_columns;
 pub mod localized_strings;
 pub mod tabula;
