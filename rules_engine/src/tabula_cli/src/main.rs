@@ -60,7 +60,10 @@ async fn main() -> Result<()> {
     let _tabula = tabula::build(
         &TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates },
         &tabula_raw,
-    );
+    )
+    .map_err(|errs| {
+        anyhow::anyhow!(errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n"))
+    })?;
 
     if let Some(path) = args.string_ids.as_deref() {
         tabula_codegen::generate_string_ids(&tabula_raw, path)?;

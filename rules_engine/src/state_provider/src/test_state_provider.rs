@@ -69,13 +69,13 @@ impl StateProvider for TestStateProvider {
             .and_then(|file| {
                 serde_json::from_reader::<_, TabulaRaw>(file)
                     .ok()
-                    .map(|raw| tabula::build(&ctx, &raw))
+                    .and_then(|raw| tabula::build(&ctx, &raw).ok())
             })
             .or_else(|| {
                 std::fs::File::open("tabula.json").ok().and_then(|file| {
                     serde_json::from_reader::<_, TabulaRaw>(file)
                         .ok()
-                        .map(|raw| tabula::build(&ctx, &raw))
+                        .and_then(|raw| tabula::build(&ctx, &raw).ok())
                 })
             })
             .ok_or(DatabaseError("Failed to load tabula.json".to_string()))?;

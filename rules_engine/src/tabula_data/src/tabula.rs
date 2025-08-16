@@ -1,4 +1,5 @@
 use core_data::identifiers::BaseCardId;
+use core_data::initialization_error::InitializationError;
 use serde::{Deserialize, Serialize};
 
 use crate::card_definition::CardDefinitionRaw;
@@ -39,9 +40,10 @@ pub struct TabulaRaw {
     pub test_cards: Table<BaseCardId, CardDefinitionRaw>,
 }
 
-pub fn build(context: &TabulaBuildContext, raw: &TabulaRaw) -> Tabula {
-    Tabula {
-        strings: localized_strings::build(context, &raw.strings),
-        test_cards: raw.test_cards.clone(),
-    }
+pub fn build(
+    context: &TabulaBuildContext,
+    raw: &TabulaRaw,
+) -> Result<Tabula, Vec<InitializationError>> {
+    let strings = localized_strings::build(context, &raw.strings)?;
+    Ok(Tabula { strings, test_cards: raw.test_cards.clone() })
 }

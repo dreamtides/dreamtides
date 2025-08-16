@@ -24,7 +24,7 @@ pub struct CardDefinitionRaw {
     pub name_en_us: String,
 
     /// Energy cost of this card, if any.
-    pub cost: Option<String>,
+    pub energy_cost: Option<String>,
 
     /// Rules text of this card (U.S. English).
     pub rules_text_en_us: String,

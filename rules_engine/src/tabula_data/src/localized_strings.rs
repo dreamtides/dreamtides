@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use core_data::initialization_error::{ErrorCode, InitializationError};
 use fluent::FluentBundle;
 use fluent_bundle::{FluentArgs, FluentError, FluentResource};
 use serde::{Deserialize, Serialize};
@@ -24,7 +25,6 @@ pub enum LanguageId {
 pub struct LocalizedStrings {
     resource: Arc<FluentResource>,
     id_to_key: HashMap<StringId, String>,
-    build_error: Option<String>,
 }
 
 /// Serialized representation of LocalizedStringSet.
@@ -55,9 +55,27 @@ impl HasId<StringId> for LocalizedStringSetRaw {
 pub fn build(
     context: &TabulaBuildContext,
     table: &Table<StringId, LocalizedStringSetRaw>,
-) -> LocalizedStrings {
+) -> Result<LocalizedStrings, Vec<InitializationError>> {
+    let mut errors: Vec<InitializationError> = Vec::new();
+
+    let mut seen: HashMap<&str, usize> = HashMap::new();
+    for (row_index, row) in table.as_slice().iter().enumerate() {
+        let c = seen.get(row.name.as_str()).copied().unwrap_or(0) + 1;
+        if c > 1 {
+            let mut e = InitializationError::with_name(
+                ErrorCode::FluentFormattingError,
+                format!("Duplicate message id {}", row.name),
+            );
+            e.tabula_sheet = Some(String::from("strings"));
+            e.tabula_column = Some(String::from("name"));
+            e.tabula_row = Some(row_index);
+            errors.push(e);
+        }
+        seen.insert(row.name.as_str(), c);
+    }
+
     let ftl = table
-        .0
+        .as_slice()
         .iter()
         .map(|row| {
             format!(
@@ -68,23 +86,73 @@ pub fn build(
         })
         .collect::<Vec<_>>()
         .join("");
-    match FluentResource::try_new(ftl) {
-        Ok(res) => LocalizedStrings {
-            resource: Arc::new(res),
-            id_to_key: table.0.iter().map(|row| (row.id, row.name.clone())).collect(),
-            build_error: None,
-        },
-        Err((res, errs)) => LocalizedStrings {
-            resource: Arc::new(res),
-            id_to_key: table.0.iter().map(|row| (row.id, row.name.clone())).collect(),
-            build_error: Some(
-                errs.iter()
-                    .map(|e| format!("ERR7: Fluent Parser Error: {e}"))
-                    .collect::<Vec<_>>()
-                    .join(" | "),
-            ),
-        },
+    let (resource, parser_errs_opt) = match FluentResource::try_new(ftl) {
+        Ok(res) => (res, None),
+        Err((res, errs)) => (res, Some(errs)),
+    };
+
+    if let Some(parser_errs) = parser_errs_opt {
+        for e in parser_errs {
+            let mut ierr = InitializationError::with_details(
+                ErrorCode::FluentParserError,
+                String::from("Fluent Parser Error"),
+                e.to_string(),
+            );
+            ierr.tabula_sheet = Some(String::from("strings"));
+            errors.push(ierr);
+        }
     }
+
+    let mut bundle = FluentBundle::default();
+    bundle.set_use_isolating(false);
+    if let Err(bundle_errs) = bundle.add_resource(&resource) {
+        for e in bundle_errs {
+            let mut ierr = InitializationError::with_details(
+                ErrorCode::FluentAddResourceError,
+                String::from("Fluent Add Resource Error"),
+                match e {
+                    FluentError::Overriding { kind, id } => format!("overriding {kind} id={id}"),
+                    FluentError::ParserError(pe) => pe.to_string(),
+                    FluentError::ResolverError(re) => re.to_string(),
+                },
+            );
+            ierr.tabula_sheet = Some(String::from("strings"));
+            errors.push(ierr);
+        }
+    }
+
+    for (row_index, row) in table.as_slice().iter().enumerate() {
+        match bundle.get_message(row.name.as_str()) {
+            Some(m) => {
+                if m.value().is_none() {
+                    let mut ierr = InitializationError::with_name(
+                        ErrorCode::FluentMissingValue,
+                        row.name.clone(),
+                    );
+                    ierr.tabula_sheet = Some(String::from("strings"));
+                    ierr.tabula_column = Some(String::from("en_us"));
+                    ierr.tabula_row = Some(row_index);
+                    errors.push(ierr);
+                }
+            }
+            None => {
+                let mut ierr = InitializationError::with_name(
+                    ErrorCode::FluentMissingMessage,
+                    row.name.clone(),
+                );
+                ierr.tabula_sheet = Some(String::from("strings"));
+                ierr.tabula_column = Some(String::from("name"));
+                ierr.tabula_row = Some(row_index);
+                errors.push(ierr);
+            }
+        }
+    }
+
+    let ls = LocalizedStrings {
+        resource: Arc::new(resource),
+        id_to_key: table.0.iter().map(|row| (row.id, row.name.clone())).collect(),
+    };
+    if errors.is_empty() { Ok(ls) } else { Err(errors) }
 }
 
 impl LocalizedStrings {
@@ -101,9 +169,6 @@ impl LocalizedStrings {
     /// - ERR7: Fluent Parser Error: {parser_error}
     /// - ERR8: Fluent Resolver Error: {resolver_error}
     pub fn format_pattern(&self, id: StringId, args: &FluentArgs) -> String {
-        if let Some(e) = &self.build_error {
-            return e.clone();
-        }
         let mut bundle = FluentBundle::default();
         bundle.set_use_isolating(false);
         if bundle.add_resource(self.resource.as_ref()).is_err() {
