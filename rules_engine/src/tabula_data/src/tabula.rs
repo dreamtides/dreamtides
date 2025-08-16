@@ -1,8 +1,10 @@
+use std::collections::BTreeMap;
+
 use core_data::identifiers::BaseCardId;
 use core_data::initialization_error::InitializationError;
 use serde::{Deserialize, Serialize};
 
-use crate::base_card_definition::BaseCardDefinitionRaw;
+use crate::base_card_definition::{self, BaseCardDefinition, BaseCardDefinitionRaw};
 use crate::localized_strings;
 use crate::localized_strings::{LanguageId, LocalizedStringSetRaw, LocalizedStrings, StringId};
 use crate::tabula_table::Table;
@@ -21,7 +23,7 @@ use crate::tabula_table::Table;
 #[derive(Debug, Clone)]
 pub struct Tabula {
     pub strings: LocalizedStrings,
-    pub test_cards: Table<BaseCardId, BaseCardDefinitionRaw>,
+    pub test_cards: BTreeMap<BaseCardId, BaseCardDefinition>,
 }
 
 /// Context for building a [Tabula] struct from a [TabulaRaw] struct.
@@ -45,5 +47,6 @@ pub fn build(
     raw: &TabulaRaw,
 ) -> Result<Tabula, Vec<InitializationError>> {
     let strings = localized_strings::build(context, &raw.strings)?;
-    Ok(Tabula { strings, test_cards: raw.test_cards.clone() })
+    let test_cards = base_card_definition::build("test_cards", context, &raw.test_cards)?;
+    Ok(Tabula { strings, test_cards })
 }

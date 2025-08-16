@@ -1,7 +1,7 @@
 use enumset::EnumSetType;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use strum::Display;
+use strum::{Display, EnumString};
 
 #[derive(Debug, Hash, Serialize, Deserialize, JsonSchema, Copy, Clone, Eq, PartialEq)]
 pub enum CardType {
@@ -13,7 +13,16 @@ pub enum CardType {
 }
 
 #[derive(
-    Debug, Hash, Ord, PartialOrd, Serialize, Deserialize, JsonSchema, EnumSetType, Display,
+    Debug,
+    Hash,
+    Ord,
+    PartialOrd,
+    Serialize,
+    Deserialize,
+    JsonSchema,
+    EnumSetType,
+    EnumString,
+    Display,
 )]
 pub enum CardSubtype {
     Ancient,

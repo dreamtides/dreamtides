@@ -1,9 +1,16 @@
+use std::collections::BTreeMap;
+
 use core_data::card_properties::Rarity;
 use core_data::card_types::{CardSubtype, CardType};
 use core_data::display_types::SpriteAddress;
 use core_data::identifiers::BaseCardId;
+use core_data::initialization_error::{ErrorCode, InitializationError};
 use core_data::numerics::{Energy, Spark};
 use serde::{Deserialize, Serialize};
+
+use crate::localized_strings::LanguageId;
+use crate::tabula::TabulaBuildContext;
+use crate::tabula_table::Table;
 
 /// Base card definition from the Tabula database.
 ///
@@ -11,6 +18,7 @@ use serde::{Deserialize, Serialize};
 /// associated with a [BaseCardId]. Base cards can have various modifications
 /// and upgrades applied to them, which are represented by the `CardIdentity`
 /// and `CardDescriptor` types.
+#[derive(Debug, Clone)]
 pub struct BaseCardDefinition {
     /// Identifies this card definition.
     pub id: BaseCardId,
@@ -69,8 +77,8 @@ pub struct BaseCardDefinitionRaw {
     /// Type of this card.
     pub card_type: CardType,
 
-    /// Subtype of this card (U.S. English).
-    pub subtype_en_us: Option<String>,
+    /// Subtype of this card
+    pub subtype: Option<String>,
 
     /// Whether this card is fast.
     pub is_fast: bool,
@@ -79,8 +87,102 @@ pub struct BaseCardDefinitionRaw {
     pub spark: Option<String>,
 
     /// Rarity of this card.
-    pub rarity: Rarity,
+    pub rarity: Option<Rarity>,
 
     /// Identifies this card's image in the game's assets.
     pub image_number: String,
+}
+
+pub fn build(
+    sheet_name: &str,
+    context: &TabulaBuildContext,
+    table: &Table<BaseCardId, BaseCardDefinitionRaw>,
+) -> Result<BTreeMap<BaseCardId, BaseCardDefinition>, Vec<InitializationError>> {
+    let mut errors: Vec<InitializationError> = Vec::new();
+    let mut out: BTreeMap<BaseCardId, BaseCardDefinition> = BTreeMap::new();
+    for (row_index, row) in table.as_slice().iter().enumerate() {
+        let energy_cost: Option<Energy> = match &row.energy_cost {
+            Some(s) => match s.parse::<u32>() {
+                Ok(v) => Some(Energy(v)),
+                Err(_) => {
+                    let mut ierr = InitializationError::with_details(
+                        ErrorCode::InvalidUnsignedInteger,
+                        String::from("Invalid energy_cost"),
+                        row.energy_cost.clone().unwrap_or_default(),
+                    );
+                    ierr.tabula_sheet = Some(sheet_name.to_string());
+                    ierr.tabula_column = Some(String::from("energy_cost"));
+                    ierr.tabula_row = Some(row_index);
+                    errors.push(ierr);
+                    None
+                }
+            },
+            None => None,
+        };
+
+        let card_subtype: Option<CardSubtype> = match &row.subtype {
+            Some(s) => match CardSubtype::try_from(s.as_str()) {
+                Ok(v) => Some(v),
+                Err(_) => {
+                    let mut ierr = InitializationError::with_details(
+                        ErrorCode::InvalidCardSubtype,
+                        String::from("Invalid card subtype"),
+                        s.clone(),
+                    );
+                    ierr.tabula_sheet = Some(sheet_name.to_string());
+                    ierr.tabula_column = Some(String::from("subtype"));
+                    ierr.tabula_row = Some(row_index);
+                    errors.push(ierr);
+                    None
+                }
+            },
+            None => None,
+        };
+
+        let spark: Option<Spark> = match &row.spark {
+            Some(s) => match s.parse::<u32>() {
+                Ok(v) => Some(Spark(v)),
+                Err(_) => {
+                    let mut ierr = InitializationError::with_details(
+                        ErrorCode::InvalidUnsignedInteger,
+                        String::from("Invalid spark"),
+                        row.spark.clone().unwrap_or_default(),
+                    );
+                    ierr.tabula_sheet = Some(sheet_name.to_string());
+                    ierr.tabula_column = Some(String::from("spark"));
+                    ierr.tabula_row = Some(row_index);
+                    errors.push(ierr);
+                    None
+                }
+            },
+            None => None,
+        };
+
+        let displayed_name = match context.current_language {
+            LanguageId::EnglishUnitedStates => row.name_en_us.clone(),
+        };
+        let displayed_rules_text = match context.current_language {
+            LanguageId::EnglishUnitedStates => row.rules_text_en_us.clone(),
+        };
+
+        let image = SpriteAddress::new(format!(
+            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_{}.png",
+            row.image_number
+        ));
+
+        out.insert(row.id, BaseCardDefinition {
+            id: row.id,
+            displayed_name,
+            energy_cost,
+            displayed_rules_text,
+            card_type: row.card_type,
+            card_subtype,
+            is_fast: row.is_fast,
+            spark,
+            rarity: row.rarity.clone(),
+            image,
+        });
+    }
+
+    if errors.is_empty() { Ok(out) } else { Err(errors) }
 }

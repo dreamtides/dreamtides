@@ -12,6 +12,8 @@ pub enum ErrorCode {
     MutexLockError,
     NotInitializedError,
     AlreadyInitializedWithDifferentPath,
+    InvalidUnsignedInteger,
+    InvalidCardSubtype,
 }
 
 impl ErrorCode {
@@ -31,6 +33,8 @@ impl ErrorCode {
             ErrorCode::MutexLockError => "MLE",
             ErrorCode::NotInitializedError => "NIE",
             ErrorCode::AlreadyInitializedWithDifferentPath => "AID",
+            ErrorCode::InvalidUnsignedInteger => "IUI",
+            ErrorCode::InvalidCardSubtype => "ICS",
         }
     }
 }
