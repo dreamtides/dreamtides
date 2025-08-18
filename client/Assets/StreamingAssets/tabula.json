@@ -382,7 +382,6 @@
       "abilities": [
         {
           "Event": {
-            "additional_cost": null,
             "effect": {
               "Effect": {
                 "DissolveCharacter": {

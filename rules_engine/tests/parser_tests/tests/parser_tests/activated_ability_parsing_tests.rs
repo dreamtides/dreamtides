@@ -21,7 +21,6 @@ fn test_banish_from_void_dissolve_enemy_character() {
             cost: Energy(2),
           )),
         )),
-        options: None,
       )),
     ]
     "###
@@ -115,7 +114,6 @@ fn test_abandon_character_with_spark() {
         effect: Effect(DrawCards(
           count: 1,
         )),
-        options: None,
       )),
     ]
     "###
@@ -159,7 +157,6 @@ fn test_discard_hand_gain_energy() {
         effect: Effect(GainEnergy(
           gains: Energy(1),
         )),
-        options: None,
       )),
     ]
     "###
@@ -182,7 +179,6 @@ fn test_multiple_costs_abandon_this() {
         effect: Effect(DrawCards(
           count: 3,
         )),
-        options: None,
       )),
     ]
     "###
@@ -206,7 +202,6 @@ fn test_activated_discover_and_then_materialize() {
             cost_operator: HigherBy(Energy(1)),
           ),
         )),
-        options: None,
       )),
     ]
     "###);
@@ -229,19 +224,14 @@ fn test_discard_card_draw_gain_point() {
               count: 1,
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
           EffectWithOptions(
             effect: GainPoints(
               gains: Points(1),
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
         ]),
-        options: None,
       )),
     ]
     "###
@@ -262,7 +252,6 @@ fn test_discard_warriors_gain_energy() {
         effect: Effect(GainEnergy(
           gains: Energy(1),
         )),
-        options: None,
       )),
     ]
     "###
@@ -284,19 +273,14 @@ fn test_activated_banish_materialize() {
               target: Another(Character),
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
           EffectWithOptions(
             effect: MaterializeCharacter(
               target: It,
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
         ]),
-        options: None,
       )),
     ]
     "###

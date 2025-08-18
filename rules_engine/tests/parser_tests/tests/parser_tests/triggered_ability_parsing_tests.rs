@@ -16,7 +16,6 @@ fn test_materialize_warrior_gain_spark() {
           target: This,
           gains: Spark(1),
         )),
-        options: None,
       )),
     ]
     "###
@@ -35,7 +34,6 @@ fn test_keyword_trigger_draw() {
         effect: Effect(DrawCards(
           count: 1,
         )),
-        options: None,
       )),
     ]
     "###);
@@ -54,7 +52,6 @@ fn test_multiple_keyword_trigger() {
         effect: Effect(DrawCards(
           count: 1,
         )),
-        options: None,
       )),
     ]
     "###);
@@ -74,7 +71,6 @@ fn test_three_keyword_trigger() {
         effect: Effect(DrawCards(
           count: 1,
         )),
-        options: None,
       )),
     ]
     "###);
@@ -125,13 +121,11 @@ fn test_multiple_keyword_trigger_conditional() {
             gains: Energy(1),
           ),
           optional: false,
-          trigger_cost: None,
           condition: Some(PredicateCount(
             count: 2,
             predicate: Another(CharacterType(Warrior)),
           )),
         )),
-        options: None,
       )),
     ]
     "###
@@ -169,7 +163,6 @@ fn test_draw_matching_card() {
         effect: Effect(DrawMatchingCard(
           predicate: CharacterType(Warrior),
         )),
-        options: None,
       )),
     ]
     "###);
@@ -186,7 +179,6 @@ fn test_gain_spark_on_materialize() {
           target: This,
           gains: Spark(1),
         )),
-        options: None,
       )),
     ]
     "###);
@@ -204,7 +196,6 @@ fn test_discard_gains_reclaim() {
           target: That,
           cost: None,
         )),
-        options: None,
       )),
     ]
     "###);
@@ -223,16 +214,12 @@ fn test_once_per_turn_multiple_effects() {
               gains: Energy(1),
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
           EffectWithOptions(
             effect: Kindle(
               amount: Spark(2),
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
         ]),
         options: Some(TriggeredAbilityOptions(
@@ -258,7 +245,6 @@ fn test_materialize_nth_this_turn() {
         effect: Effect(ReturnFromYourVoidToPlay(
           target: This,
         )),
-        options: None,
       )),
     ]
     "###
@@ -275,7 +261,6 @@ fn test_end_of_turn() {
         effect: Effect(GainEnergy(
           gains: Energy(2),
         )),
-        options: None,
       )),
     ]
     "###);
@@ -291,7 +276,6 @@ fn test_play_from_hand() {
         effect: Effect(Copy(
           target: It,
         )),
-        options: None,
       )),
     ]
     "###);
@@ -304,7 +288,6 @@ fn test_gain_energy_replacement() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(CreateTriggerUntilEndOfTurn(
           trigger: TriggeredAbility(
             trigger: GainEnergy,
@@ -328,7 +311,6 @@ fn test_draw_all_cards_win_game() {
       Triggered(TriggeredAbility(
         trigger: DrawAllCardsInCopyOfDeck,
         effect: Effect(YouWinTheGame),
-        options: None,
       )),
     ]
     "###);
@@ -346,7 +328,6 @@ fn test_banished_character_gains_spark() {
           target: This,
           gains: Spark(1),
         )),
-        options: None,
       )),
     ]
     "###);
@@ -362,7 +343,6 @@ fn test_dissolved_character_gains_spark() {
         effect: Effect(DrawCards(
           count: 1,
         )),
-        options: None,
       )),
     ]
     "###);
@@ -374,7 +354,6 @@ fn test_banish_until_next_main() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(CreateTriggerUntilEndOfTurn(
           trigger: TriggeredAbility(
             trigger: Banished(Your(Character)),
@@ -403,7 +382,6 @@ fn test_abandon_character_gains_spark() {
           target: This,
           gains: Spark(1),
         )),
-        options: None,
       )),
     ]
     "###);

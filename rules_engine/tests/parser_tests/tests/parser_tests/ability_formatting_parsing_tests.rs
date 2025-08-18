@@ -9,13 +9,11 @@ fn test_multiple_abilities_with_br() {
         @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(DrawCards(
           count: 1,
         )),
       )),
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(GainEnergy(
           gains: Energy(2),
         )),
@@ -31,7 +29,6 @@ fn test_flavor_text() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(DrawCards(
           count: 1,
         )),
@@ -50,13 +47,11 @@ fn test_multiple_abilities_with_flavor() {
         @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(DrawCards(
           count: 1,
         )),
       )),
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(PayCost(
           cost: DiscardCards(Card, 1),
         )),
@@ -72,7 +67,6 @@ fn test_reminder_text() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(DrawCards(
           count: 1,
         )),
@@ -91,13 +85,11 @@ fn test_multiple_abilities_with_reminder() {
         @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(DrawCards(
           count: 1,
         )),
       )),
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(PayCost(
           cost: DiscardCards(Card, 1),
         )),
@@ -117,13 +109,11 @@ fn test_reminder_and_flavor() {
         @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(DrawCards(
           count: 1,
         )),
       )),
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(PayCost(
           cost: DiscardCards(Card, 1),
         )),

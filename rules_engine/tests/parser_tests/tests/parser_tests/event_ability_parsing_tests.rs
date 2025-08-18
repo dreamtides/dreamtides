@@ -11,7 +11,6 @@ fn test_gains_spark_until_main_phase_for_each_warrior() {
     @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(GainsSparkUntilYourNextMainForEach(
           target: Your(Character),
           gains: Spark(1),
@@ -33,7 +32,6 @@ fn test_dissolve_character_with_cost_compared_to_warriors() {
         @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(DissolveCharacter(
           target: Enemy(CharacterWithCostComparedToControlled(
             target: Character,
@@ -55,7 +53,6 @@ fn test_disable_activated_abilities_while_in_play() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(DisableActivatedAbilitiesWhileInPlay(
           target: Enemy(Character),
         )),
@@ -72,7 +69,6 @@ fn test_abandon_and_gain_energy_for_spark() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: List([
           EffectWithOptions(
             effect: AbandonAndGainEnergyForSpark(
@@ -80,16 +76,12 @@ fn test_abandon_and_gain_energy_for_spark() {
               energy_per_spark: Energy(1),
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
           EffectWithOptions(
             effect: DrawCards(
               count: 1,
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
         ]),
       )),

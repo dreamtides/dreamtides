@@ -19,5 +19,6 @@ pub struct TriggeredAbilityOptions {
 pub struct TriggeredAbility {
     pub trigger: TriggerEvent,
     pub effect: Effect,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<TriggeredAbilityOptions>,
 }

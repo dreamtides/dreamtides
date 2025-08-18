@@ -19,19 +19,14 @@ fn test_multiple_effects() {
               gains: Spark(1),
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
           EffectWithOptions(
             effect: BanishCardsFromEnemyVoid(
               count: 1,
             ),
             optional: true,
-            trigger_cost: None,
-            condition: None,
           ),
         ]),
-        options: None,
       )),
     ]
     "###);
@@ -43,23 +38,18 @@ fn test_then_separator() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: List([
           EffectWithOptions(
             effect: DrawCards(
               count: 1,
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
           EffectWithOptions(
             effect: PayCost(
               cost: DiscardCards(Card, 1),
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
         ]),
       )),
@@ -75,14 +65,11 @@ fn test_optional_draw() {
         @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: WithOptions(EffectWithOptions(
           effect: DrawCards(
             count: 1,
           ),
           optional: true,
-          trigger_cost: None,
-          condition: None,
         )),
       )),
     ]
@@ -98,13 +85,11 @@ fn test_conditional_gain_energy() {
         @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: WithOptions(EffectWithOptions(
           effect: GainEnergy(
             gains: Energy(1),
           ),
           optional: false,
-          trigger_cost: None,
           condition: Some(PredicateCount(
             count: 2,
             predicate: Another(CharacterType(Warrior)),
@@ -124,13 +109,11 @@ fn test_conditional_optional_gain_energy() {
         @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: WithOptions(EffectWithOptions(
           effect: GainEnergy(
             gains: Energy(1),
           ),
           optional: true,
-          trigger_cost: None,
           condition: Some(PredicateCount(
             count: 2,
             predicate: Another(CharacterType(Warrior)),
@@ -148,7 +131,6 @@ fn test_until_end_of_turn() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(CreateTriggerUntilEndOfTurn(
           trigger: TriggeredAbility(
             trigger: Play(Your(Character)),
@@ -174,14 +156,12 @@ fn test_optional_cost() {
         @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: WithOptions(EffectWithOptions(
           effect: ReturnFromYourVoidToHand(
             target: This,
           ),
           optional: true,
           trigger_cost: Some(Energy(Energy(1))),
-          condition: None,
         )),
       )),
     ]
@@ -204,9 +184,7 @@ fn test_optional_cost_banish_enemy() {
           ),
           optional: true,
           trigger_cost: Some(BanishCardsFromEnemyVoid(1)),
-          condition: None,
         )),
-        options: None,
       )),
     ]
     "###

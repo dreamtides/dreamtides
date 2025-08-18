@@ -7,7 +7,6 @@ fn test_gain_energy_for_each() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(GainEnergyForEach(
           gains: Energy(1),
           for_each: Another(Character),
@@ -23,7 +22,6 @@ fn test_discover_materialized_ability() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(Discover(
           predicate: CharacterWithMaterializedAbility,
         )),
@@ -38,7 +36,6 @@ fn test_materialize_random_characters() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(MaterializeRandomFromDeck(
           count: 2,
           predicate: CardWithCost(
@@ -58,14 +55,11 @@ fn test_return_from_void_to_play() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: WithOptions(EffectWithOptions(
           effect: ReturnFromYourVoidToPlay(
             target: Your(CharacterType(Warrior)),
           ),
           optional: true,
-          trigger_cost: None,
-          condition: None,
         )),
       )),
     ]
@@ -78,7 +72,6 @@ fn test_negate_enemy_dream() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(Counterspell(
           target: Enemy(CardOnStack),
         )),
@@ -95,7 +88,6 @@ fn test_spend_all_energy_draw_discard() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(SpendAllEnergyDrawAndDiscard),
       )),
     ]
@@ -108,23 +100,18 @@ fn test_negate_and_put_on_top() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: List([
           EffectWithOptions(
             effect: Counterspell(
               target: Enemy(CardOnStack),
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
           EffectWithOptions(
             effect: PutOnTopOfEnemyDeck(
               target: That,
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
         ]),
       )),
@@ -140,7 +127,6 @@ fn test_discard_card_from_enemy_hand() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(DiscardCardFromEnemyHand(
           predicate: CardWithCost(
             target: Card,
@@ -161,7 +147,6 @@ fn test_each_matching_gains_spark_for_each() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(EachMatchingGainsSparkForEach(
           each: CharacterType(SpiritAnimal),
           gains: Spark(1),
@@ -180,7 +165,6 @@ fn test_return_all_but_one_draw_for_each() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(ReturnCharactersToHandDrawCardForEach(
           count: AllButOne,
         )),
@@ -205,19 +189,14 @@ fn test_banish_then_materialize() {
               target: Another(Character),
             ),
             optional: true,
-            trigger_cost: None,
-            condition: None,
           ),
           EffectWithOptions(
             effect: MaterializeCharacter(
               target: It,
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
         ]),
-        options: None,
       )),
     ]
     "###);
@@ -229,7 +208,6 @@ fn test_banish_any_number_then_materialize() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: List([
           EffectWithOptions(
             effect: BanishCollection(
@@ -237,16 +215,12 @@ fn test_banish_any_number_then_materialize() {
               count: AnyNumberOf,
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
           EffectWithOptions(
             effect: MaterializeCharacter(
               target: Them,
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
         ]),
       )),
@@ -260,7 +234,6 @@ fn test_banish_up_to_two() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: List([
           EffectWithOptions(
             effect: BanishCollection(
@@ -268,16 +241,12 @@ fn test_banish_up_to_two() {
               count: UpTo(2),
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
           EffectWithOptions(
             effect: MaterializeCharacter(
               target: Them,
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
         ]),
       )),
@@ -303,19 +272,14 @@ fn test_banish_up_to_two_activated() {
               count: UpTo(2),
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
           EffectWithOptions(
             effect: MaterializeCharacter(
               target: Them,
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
         ]),
-        options: None,
       )),
     ]
     "###);
@@ -336,7 +300,6 @@ fn test_dissolve_enemy_character_with_spark_compared_to_abandoned() {
             spark_operator: OrLess,
           )),
         )),
-        options: None,
       )),
     ]
     "###);
@@ -361,8 +324,6 @@ fn test_multi_activated_dissolve_with_abandoned_spark() {
             )),
           ),
           optional: true,
-          trigger_cost: None,
-          condition: None,
         )),
         options: Some(ActivatedAbilityOptions(
           is_fast: false,
@@ -380,7 +341,6 @@ fn test_abandon_any_number_draw_for_each() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: List([
           EffectWithOptions(
             effect: PayCost(
@@ -390,8 +350,6 @@ fn test_abandon_any_number_draw_for_each() {
               ),
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
           EffectWithOptions(
             effect: DrawCardsForEach(
@@ -399,8 +357,6 @@ fn test_abandon_any_number_draw_for_each() {
               for_each: AbandonedThisWay(Character),
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
         ]),
       )),
@@ -414,7 +370,6 @@ fn test_discover_card_with_cost() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(Discover(
           predicate: CardWithCost(
             target: Card,
@@ -437,7 +392,6 @@ fn test_materialize_character_when_discarded() {
         effect: Effect(MaterializeCharacter(
           target: It,
         )),
-        options: None,
       )),
     ]
     "###);
@@ -455,7 +409,6 @@ fn test_foresee() {
         effect: Effect(Foresee(
           count: 2,
         )),
-        options: None,
       )),
     ]
     "###);
@@ -469,23 +422,18 @@ fn test_lose_points() {
         @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: List([
           EffectWithOptions(
             effect: DissolveCharacter(
               target: Enemy(Character),
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
           EffectWithOptions(
             effect: LosePoints(
               loses: Points(4),
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
         ]),
       )),
@@ -500,7 +448,6 @@ fn test_dissolve_characters_count() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(DissolveCharactersCount(
           target: Any(Character),
           count: All,
@@ -516,7 +463,6 @@ fn test_enemy_points() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(EnemyGainsPoints(
           count: 2,
         )),
@@ -528,7 +474,6 @@ fn test_enemy_points() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(EnemyLosesPoints(
           count: 1,
         )),
@@ -543,7 +488,6 @@ fn test_banish_character() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(BanishCharacter(
           target: Enemy(CardWithCost(
             target: Character,
@@ -565,21 +509,16 @@ fn test_enemy_gains_points_equal_to_its_spark() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: List([
           EffectWithOptions(
             effect: BanishCharacter(
               target: Enemy(NotCharacterType(Warrior)),
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
           EffectWithOptions(
             effect: EnemyGainsPointsEqualToItsSpark,
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
         ]),
       )),
@@ -605,10 +544,7 @@ fn test_materialize_character_from_void() {
             ),
           ),
           optional: true,
-          trigger_cost: None,
-          condition: None,
         )),
-        options: None,
       )),
     ]
     "###);
@@ -620,23 +556,18 @@ fn test_abandon_a_character_or_discard_a_card() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: List([
           EffectWithOptions(
             effect: PayCost(
               cost: AbandonACharacterOrDiscardACard,
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
           EffectWithOptions(
             effect: DissolveCharacter(
               target: Enemy(Character),
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
         ]),
       )),
@@ -650,7 +581,6 @@ fn test_gain_control() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(GainControl(
           target: Enemy(CardWithCost(
             target: Character,
@@ -669,7 +599,6 @@ fn test_return_to_hand() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(ReturnToHand(
           target: Your(CardWithCost(
             target: Character,
@@ -696,7 +625,6 @@ fn test_event_gains_reclaim() {
           target: YourVoid(Event),
           cost: None,
         )),
-        options: None,
       )),
     ]
     "###);
@@ -708,7 +636,6 @@ fn return_a_character_to_hand() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(ReturnToHand(
           target: Any(Character),
         )),
@@ -723,7 +650,6 @@ fn test_gain_points_for_each() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(GainPointsForEach(
           gain: Points(1),
           for_count: PlayedThisTurn(CardOnStack),
@@ -739,7 +665,6 @@ fn test_draw_cards_for_each() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(DrawCardsForEach(
           count: 1,
           for_each: PlayedThisTurn(CardOnStack),
@@ -755,7 +680,6 @@ fn test_copy() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(Copy(
           target: Any(Character),
         )),
@@ -774,7 +698,6 @@ fn test_copy_it() {
         effect: Effect(Copy(
           target: It,
         )),
-        options: None,
       )),
     ]
     "###);
@@ -786,7 +709,6 @@ fn test_copy_next_played() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(CopyNextPlayed(
           matching: Your(Event),
           times: Some(2),
@@ -799,7 +721,6 @@ fn test_copy_next_played() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(CopyNextPlayed(
           matching: Your(Character),
           times: None,
@@ -815,7 +736,6 @@ fn test_cards_in_void_gain_reclaim_this_turn() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(CardsInVoidGainReclaimThisTurn(
           count: All,
           predicate: Card,
@@ -831,7 +751,6 @@ fn test_gains_reclaim_until_end_of_turn() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(GainsReclaimUntilEndOfTurn(
           target: YourVoid(Event),
           cost: Some(Energy(0)),
@@ -848,7 +767,6 @@ fn test_gains_spark_for_quantity() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(GainsSparkForQuantity(
           target: Your(Character),
           gains: Spark(1),
@@ -865,7 +783,6 @@ fn test_take_extra_turn() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(TakeExtraTurn),
       )),
     ]
@@ -878,7 +795,6 @@ fn test_double_your_energy() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(DoubleYourEnergy),
       )),
     ]
@@ -892,7 +808,6 @@ fn test_gain_twice_that_much_energy_instead() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(CreateTriggerUntilEndOfTurn(
           trigger: TriggeredAbility(
             trigger: GainEnergy,
@@ -921,7 +836,6 @@ fn test_copy_next_played_this_turn() {
           matching: Your(Event),
           times: Some(3),
         )),
-        options: None,
       )),
     ]
     "###);
@@ -934,7 +848,6 @@ fn test_shuffle_hand_and_deck_and_draw() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(ShuffleHandAndDeckAndDraw(
           count: 4,
         )),
@@ -951,7 +864,6 @@ fn test_dissolve_characters_quantity() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(DissolveCharactersQuantity(
           target: Enemy(Character),
           quantity: Matching(YourVoid(Card)),
@@ -967,7 +879,6 @@ fn test_put_cards_from_deck_into_void() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(PutCardsFromYourDeckIntoVoid(
           count: 3,
         )),
@@ -982,7 +893,6 @@ fn test_trigger_judgment_ability() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(TriggerJudgmentAbility(
           matching: Your(Character),
           collection: All,
@@ -1000,7 +910,6 @@ fn test_each_matching_gains_spark_until_next_main() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(EachMatchingGainsSparkUntilNextMain(
           each: CharacterType(SpiritAnimal),
           gains: Spark(2),
@@ -1020,7 +929,6 @@ fn test_banish_enemy_void() {
           Materialized,
         ]),
         effect: Effect(BanishEnemyVoid),
-        options: None,
       )),
     ]
     "###);
@@ -1041,7 +949,6 @@ fn test_spark_becomes() {
           matching: CharacterType(SpiritAnimal),
           spark: Spark(5),
         )),
-        options: None,
       )),
     ]
     "###);
@@ -1055,7 +962,6 @@ fn test_discard_card_from_enemy_hand_then_they_draw() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(DiscardCardFromEnemyHandThenTheyDraw(
           predicate: Card,
         )),
@@ -1078,7 +984,6 @@ fn test_banish_character_until_leaves_play() {
           target: Enemy(Character),
           until_leaves: This,
         )),
-        options: None,
       )),
     ]
     "###);
@@ -1091,7 +996,6 @@ fn test_materialize_character_at_end_of_turn() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: List([
           EffectWithOptions(
             effect: BanishCollection(
@@ -1099,16 +1003,12 @@ fn test_materialize_character_at_end_of_turn() {
               count: AnyNumberOf,
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
           EffectWithOptions(
             effect: MaterializeCharacterAtEndOfTurn(
               target: Them,
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
         ]),
       )),
@@ -1124,7 +1024,6 @@ fn test_spend_all_energy_dissolve_enemy() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(SpendAllEnergyDissolveEnemy),
       )),
     ]
@@ -1147,10 +1046,7 @@ fn test_banish_until_next_main() {
             target: AnyOther(Character),
           ),
           optional: true,
-          trigger_cost: None,
-          condition: None,
         )),
-        options: None,
       )),
     ]
     "###);
@@ -1189,7 +1085,6 @@ fn test_each_player_discard_cards() {
         effect: Effect(EachPlayerDiscardCards(
           count: 1,
         )),
-        options: None,
       )),
     ]
     "###);
@@ -1201,7 +1096,6 @@ fn test_put_cards_from_void_on_top_of_deck() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(PutCardsFromVoidOnTopOfDeck(
           count: 1,
           matching: Character,
@@ -1225,8 +1119,6 @@ fn test_put_cards_from_void_on_top_of_deck() {
             matching: Character,
           ),
           optional: true,
-          trigger_cost: None,
-          condition: None,
         )),
         options: Some(ActivatedAbilityOptions(
           is_fast: true,
@@ -1253,7 +1145,6 @@ fn test_materialize_silent_copy() {
           count: 1,
           quantity: PlayedThisTurn(CardOnStack),
         )),
-        options: None,
       )),
     ]
     "###);
@@ -1270,7 +1161,6 @@ fn test_materialize_silent_copy() {
           count: 2,
           quantity: Matching(This),
         )),
-        options: None,
       )),
     ]
     "###);
@@ -1286,7 +1176,6 @@ fn test_materialize_silent_copy() {
           count: 1,
           quantity: Matching(This),
         )),
-        options: None,
       )),
     ]
     "###);
@@ -1298,7 +1187,6 @@ fn test_draw_for_abandoned_this_turn() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(DrawCardsForEach(
           count: 1,
           for_each: AbandonedThisTurn(Character),
@@ -1315,23 +1203,18 @@ fn test_discover_multi_activated_ability() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: List([
           EffectWithOptions(
             effect: PayCost(
               cost: AbandonCharacters(Your(Character), 1),
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
           EffectWithOptions(
             effect: Discover(
               predicate: CharacterWithMultiActivatedAbility,
             ),
             optional: false,
-            trigger_cost: None,
-            condition: None,
           ),
         ]),
       )),
@@ -1352,7 +1235,6 @@ fn test_each_player_abandons_characters() {
           matching: Character,
           count: 1,
         )),
-        options: None,
       )),
     ]
     "###);
@@ -1361,7 +1243,6 @@ fn test_each_player_abandons_characters() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(EachPlayerAbandonsCharacters(
           matching: CardWithCost(
             target: Character,
@@ -1378,7 +1259,6 @@ fn test_each_player_abandons_characters() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(EachPlayerAbandonsCharacters(
           matching: CharacterType(Warrior),
           count: 1,
@@ -1394,7 +1274,6 @@ fn test_negate_unless_pays_cost() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
-        additional_cost: None,
         effect: Effect(CounterspellUnlessPaysCost(
           target: Enemy(Event),
           cost: Energy(Energy(2)),

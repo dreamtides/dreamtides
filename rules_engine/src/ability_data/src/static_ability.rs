@@ -30,6 +30,7 @@ pub struct StaticAbilityWithOptions {
     pub ability: StandardStaticAbility,
 
     /// Indicates an ability which occurs only if some condition is met,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub condition: Option<Condition>,
 }
 
@@ -62,19 +63,24 @@ pub struct PlayFromVoid {
     ///
     /// If not provided, the card may be played from the void for its normal
     /// listed energy cost.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub energy_cost: Option<Energy>,
 
     /// An additional cost to play this card from the void.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub additional_cost: Option<Cost>,
 
     /// An effect to apply if the card is played from the void using this
     /// static ability.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub if_you_do: Option<Effect>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AlternateCost {
     pub energy_cost: Energy,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub additional_cost: Option<Cost>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub if_you_do: Option<Effect>,
 }

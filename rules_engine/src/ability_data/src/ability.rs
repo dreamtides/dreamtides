@@ -44,6 +44,7 @@ pub struct EventAbility {
     /// "{cost}: {effect}" on event cards.
     ///
     /// The energy cost to play an Event card is *not* represented here.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub additional_cost: Option<Cost>,
 
     /// Effect of this ability when it resolves.

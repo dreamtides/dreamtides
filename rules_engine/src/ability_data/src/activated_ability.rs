@@ -15,6 +15,7 @@ pub struct ActivatedAbility {
     pub effect: Effect,
 
     /// Configuration for this activated ability
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<ActivatedAbilityOptions>,
 }
 

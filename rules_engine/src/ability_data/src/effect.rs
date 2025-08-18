@@ -51,10 +51,12 @@ pub struct EffectWithOptions {
     /// This is used for costs that apply on resolution of the effect. It is
     /// *not* used for additional costs to play event cards, which are paid
     /// before placing the card on the stack.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub trigger_cost: Option<Cost>,
 
     /// Indicates an effect which occurs only if some condition is met,
     /// usually phrased as "If {condition}, {effect}"
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub condition: Option<Condition>,
 }
 
