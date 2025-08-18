@@ -67,13 +67,13 @@ fn test_return_from_void_to_play() {
 }
 
 #[test]
-fn test_negate_enemy_dream() {
-    let result = parse("Negate an enemy dream.");
+fn test_prevent_enemy_card() {
+    let result = parse("{Prevent} a played enemy card.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
         effect: Effect(Counterspell(
-          target: Enemy(CardOnStack),
+          target: Enemy(Card),
         )),
       )),
     ]
@@ -95,15 +95,15 @@ fn test_spend_all_energy_draw_discard() {
 }
 
 #[test]
-fn test_negate_and_put_on_top() {
-    let result = parse("Negate an enemy dream. Put that card on top of the enemy's deck.");
+fn test_prevent_and_put_on_top() {
+    let result = parse("{Prevent} a played enemy card. Put that card on top of the enemy's deck.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
         effect: List([
           EffectWithOptions(
             effect: Counterspell(
-              target: Enemy(CardOnStack),
+              target: Enemy(Card),
             ),
             optional: false,
           ),
@@ -1269,8 +1269,8 @@ fn test_each_player_abandons_characters() {
 }
 
 #[test]
-fn test_negate_unless_pays_cost() {
-    let result = parse("Negate an enemy event unless they pay $2.");
+fn test_prevent_unless_pays_cost() {
+    let result = parse("{Prevent} a played enemy event unless they pay $2.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(

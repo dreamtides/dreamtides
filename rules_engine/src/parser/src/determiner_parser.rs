@@ -34,6 +34,7 @@ pub fn target_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>>
             .then_ignore(phrase("in the enemy's void"))
             .map(Predicate::EnemyVoid),
         phrase("an enemy").ignore_then(card_predicate_parser::parser()).map(Predicate::Enemy),
+        phrase("a played enemy").ignore_then(card_predicate_parser::parser()).map(Predicate::Enemy),
         phrase("another").ignore_then(card_predicate_parser::parser()).map(Predicate::AnyOther),
         a_or_an().ignore_then(card_predicate_parser::parser()).map(Predicate::Any),
     ))
