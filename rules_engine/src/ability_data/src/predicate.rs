@@ -54,7 +54,6 @@ pub enum CardPredicate {
     Card,
     Character,
     Event,
-    CardOnStack,
     CharacterType(CardSubtype),
     NotCharacterType(CardSubtype),
     CharacterWithSpark(Spark, Operator<Spark>),

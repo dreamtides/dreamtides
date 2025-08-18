@@ -646,13 +646,13 @@ fn return_a_character_to_hand() {
 
 #[test]
 fn test_gain_points_for_each() {
-    let result = parse("Gain 1 $point for each dream you have played this turn.");
+    let result = parse("Gain 1 $point for each card you have played this turn.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
         effect: Effect(GainPointsForEach(
           gain: Points(1),
-          for_count: PlayedThisTurn(CardOnStack),
+          for_count: PlayedThisTurn(Card),
         )),
       )),
     ]
@@ -661,13 +661,13 @@ fn test_gain_points_for_each() {
 
 #[test]
 fn test_draw_cards_for_each() {
-    let result = parse("Draw a card for each dream you have played this turn.");
+    let result = parse("Draw a card for each card you have played this turn.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
         effect: Effect(DrawCardsForEach(
           count: 1,
-          for_each: PlayedThisTurn(CardOnStack),
+          for_each: PlayedThisTurn(Card),
         )),
       )),
     ]
@@ -763,14 +763,14 @@ fn test_gains_reclaim_until_end_of_turn() {
 #[test]
 fn test_gains_spark_for_quantity() {
     let result =
-        parse("A character you control gains +1 spark for each dream you have played this turn.");
+        parse("A character you control gains +1 spark for each card you have played this turn.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
         effect: Effect(GainsSparkForQuantity(
           target: Your(Character),
           gains: Spark(1),
-          for_quantity: PlayedThisTurn(CardOnStack),
+          for_quantity: PlayedThisTurn(Card),
         )),
       )),
     ]
@@ -1132,7 +1132,7 @@ fn test_put_cards_from_void_on_top_of_deck() {
 #[test]
 fn test_materialize_silent_copy() {
     let result = parse(
-        "$materialized: Materialize a {kw: silent} copy of this character for each dream you have played this turn.",
+        "$materialized: Materialize a {kw: silent} copy of this character for each card you have played this turn.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -1143,7 +1143,7 @@ fn test_materialize_silent_copy() {
         effect: Effect(MaterializeSilentCopy(
           target: This,
           count: 1,
-          quantity: PlayedThisTurn(CardOnStack),
+          quantity: PlayedThisTurn(Card),
         )),
       )),
     ]

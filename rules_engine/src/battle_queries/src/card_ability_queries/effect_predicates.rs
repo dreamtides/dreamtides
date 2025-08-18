@@ -130,7 +130,7 @@ fn on_stack(
     predicate: &CardPredicate,
 ) -> CardSet<StackCardId> {
     match predicate {
-        CardPredicate::Card | CardPredicate::CardOnStack => collection,
+        CardPredicate::Card => collection,
         CardPredicate::Event => {
             let mut events = CardSet::default();
             for id in collection.iter() {

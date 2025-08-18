@@ -175,9 +175,7 @@ fn compute_event_target_restriction(list: &AbilityList) -> Option<CanPlayRestric
             }
         }
         PredicateType::Stack => match effect_predicate.predicate {
-            Predicate::Enemy(CardPredicate::CardOnStack) => {
-                Some(CanPlayRestriction::EnemyCardOnStack)
-            }
+            Predicate::Enemy(CardPredicate::Card) => Some(CanPlayRestriction::EnemyCardOnStack),
             Predicate::Enemy(CardPredicate::Event) => {
                 Some(CanPlayRestriction::EnemyEventCardOnStack)
             }
@@ -411,7 +409,7 @@ fn build_for(name: CardName) -> AbilityList {
                 Ability::Event(EventAbility {
                     additional_cost: None,
                     effect: Effect::Effect(StandardEffect::Counterspell {
-                        target: Predicate::Enemy(CardPredicate::CardOnStack),
+                        target: Predicate::Enemy(CardPredicate::Card),
                     }),
                 }),
                 AbilityConfiguration {
