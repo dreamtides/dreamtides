@@ -4,7 +4,7 @@ use parser::ability_parser;
 
 pub fn parse(text: &str) -> Vec<Ability> {
     let input = text.to_lowercase();
-    let (result, errs) = ability_parser::parse(&input).into_output_errors();
+    let (result, errs) = ability_parser::parse_string(&input).into_output_errors();
 
     if !errs.is_empty() {
         for e in errs {

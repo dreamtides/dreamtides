@@ -1958,7 +1958,7 @@ name = "parser"
 version = "0.0.0"
 dependencies = [
  "ability_data",
- "battle_state",
+ "ariadne",
  "chumsky",
  "core_data",
 ]
@@ -2964,10 +2964,12 @@ dependencies = [
  "anyhow",
  "clap",
  "convert_case 0.8.0",
+ "core_data",
  "fluent",
  "fluent-bundle",
  "google-sheets4",
  "hyper-util",
+ "parser",
  "serde",
  "serde_json",
  "tabula_data",

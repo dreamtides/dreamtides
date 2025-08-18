@@ -16,7 +16,7 @@ struct Args {
 
 fn parse_expression(input: &str, line_num: Option<usize>) -> Option<String> {
     let input = input.to_lowercase();
-    let (result, errs) = ability_parser::parse(&input).into_output_errors();
+    let (result, errs) = ability_parser::parse_string(&input).into_output_errors();
     if let Some(output) = result.as_ref() {
         ron::ser::to_string_pretty(output, ron::ser::PrettyConfig::default().struct_names(true))
             .ok()

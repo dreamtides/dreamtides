@@ -91,6 +91,10 @@ impl<I, T> Table<I, T> {
         &self.0
     }
 
+    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> {
+        self.0.iter_mut()
+    }
+
     /// Returns the item with the given ID. Panics if the item is not found.
     pub fn get(&self, id: T::Id) -> &T
     where

@@ -1,5 +1,7 @@
 use ability_data::ability::Ability;
+use ariadne::{Color, Label, Report, ReportKind, Source};
 use chumsky::prelude::*;
+use core_data::initialization_error::{ErrorCode, InitializationError};
 
 use crate::parser_utils::{ErrorType, phrase};
 use crate::{
@@ -7,10 +9,44 @@ use crate::{
 };
 
 /// Takes a string containing card rules text and parses it into a
+/// `Vec<[Ability]>` data structure.
+///
+/// Returns a list of [InitializationError]s if the parsing fails.
+pub fn parse(input: &str) -> Result<Vec<Ability>, Vec<InitializationError>> {
+    let input = input.to_lowercase();
+    let (result, errs) = parse_string(&input).into_output_errors();
+    if let Some(output) = result {
+        Ok(output)
+    } else {
+        let mut errors = Vec::new();
+        for e in errs {
+            Report::build(ReportKind::Error, (), e.span().start)
+                .with_message(e.to_string())
+                .with_label(
+                    Label::new(e.span().into_range())
+                        .with_message(e.reason().to_string())
+                        .with_color(Color::Red),
+                )
+                .finish()
+                .eprint(Source::from(&input))
+                .expect("Failed to print error");
+
+            errors.push(InitializationError::with_details(
+                ErrorCode::AbilityParsingError,
+                "Failed to parse ability",
+                e.reason().to_string(),
+            ));
+        }
+
+        Err(errors)
+    }
+}
+
+/// Takes a string containing card rules text and parses it into a
 /// Vec<[Ability]> data structure.
 ///
 /// The provided text must be all lowercase.
-pub fn parse(text: &str) -> ParseResult<Vec<Ability>, Rich<'_, char>> {
+pub fn parse_string(text: &str) -> ParseResult<Vec<Ability>, Rich<'_, char>> {
     parser().parse(text)
 }
 

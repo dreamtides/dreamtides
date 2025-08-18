@@ -36,7 +36,7 @@ pub fn parse_abilities(c: &mut Criterion) {
                 || ability_expressions.clone(),
                 |expressions| {
                     for expr in expressions {
-                        ability_parser::parse(&expr);
+                        ability_parser::parse_string(&expr);
                     }
                 },
                 BatchSize::SmallInput,

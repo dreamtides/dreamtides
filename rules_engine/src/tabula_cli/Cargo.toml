@@ -18,6 +18,8 @@ doctest = false
 bench = false
 
 [dependencies]
+core_data = { path = "../core_data" }
+parser = { path = "../parser" }
 tabula_data = { path = "../tabula_data" }
 
 anyhow = { workspace = true }

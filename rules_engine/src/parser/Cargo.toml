@@ -12,8 +12,8 @@ doctest = false
 bench = false
 
 [dependencies]
-battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 ability_data = { path = "../ability_data" }
 
+ariadne = { workspace = true }
 chumsky = { workspace = true }

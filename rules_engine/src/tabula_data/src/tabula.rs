@@ -27,7 +27,6 @@ pub struct Tabula {
 }
 
 /// Context for building a [Tabula] struct from a [TabulaRaw] struct.
-#[derive(Debug, Clone)]
 pub struct TabulaBuildContext {
     pub current_language: LanguageId,
 }

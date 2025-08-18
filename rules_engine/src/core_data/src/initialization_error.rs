@@ -14,6 +14,8 @@ pub enum ErrorCode {
     AlreadyInitializedWithDifferentPath,
     InvalidUnsignedInteger,
     InvalidCardSubtype,
+    AbilitiesNotPresent,
+    AbilityParsingError,
 }
 
 impl ErrorCode {
@@ -35,11 +37,14 @@ impl ErrorCode {
             ErrorCode::AlreadyInitializedWithDifferentPath => "AID",
             ErrorCode::InvalidUnsignedInteger => "IUI",
             ErrorCode::InvalidCardSubtype => "ICS",
+            ErrorCode::AbilitiesNotPresent => "ANP",
+            ErrorCode::AbilityParsingError => "APE",
         }
     }
 }
 
 /// Message describing why an error happened during initialization.
+#[derive(Debug, Clone)]
 pub struct InitializationError {
     pub code: ErrorCode,
     pub name: String,

@@ -3,15 +3,20 @@ use std::io::BufReader;
 
 use anyhow::{Context, Result};
 use clap::Parser;
+use core_data::identifiers::BaseCardId;
+use core_data::initialization_error::InitializationError;
 use google_sheets4::Sheets;
 use google_sheets4::yup_oauth2::{ServiceAccountAuthenticator, ServiceAccountKey};
 use hyper_util::client::legacy::Client;
 use hyper_util::rt::TokioExecutor;
+use parser::ability_parser;
 use tabula_cli::google_sheet::GoogleSheet;
 use tabula_cli::spreadsheet::Spreadsheet;
 use tabula_cli::{tabula_codegen, tabula_sync};
+use tabula_data::base_card_definition::BaseCardDefinitionRaw;
 use tabula_data::localized_strings::LanguageId;
 use tabula_data::tabula::{self, TabulaBuildContext};
+use tabula_data::tabula_table::Table;
 use yup_oauth2::hyper_rustls::HttpsConnectorBuilder;
 
 #[derive(Parser, Debug)]
@@ -56,7 +61,11 @@ async fn main() -> Result<()> {
     let hub = Sheets::new(client, auth);
     let spreadsheet = GoogleSheet::new(args.spreadsheet_id, hub);
     let tables = spreadsheet.read_all_tables().await?;
-    let tabula_raw = tabula_sync::sync(tables)?;
+    let mut tabula_raw = tabula_sync::sync(tables)?;
+    parse_abilities(&mut tabula_raw.test_cards).map_err(|errs| {
+        anyhow::anyhow!(errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n"))
+    })?;
+
     let _tabula = tabula::build(
         &TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates },
         &tabula_raw,
@@ -78,5 +87,14 @@ async fn main() -> Result<()> {
         .context("failed to serialize Tabula to JSON")?;
     }
 
+    Ok(())
+}
+
+fn parse_abilities(
+    table: &mut Table<BaseCardId, BaseCardDefinitionRaw>,
+) -> Result<(), Vec<InitializationError>> {
+    for row in table.iter_mut() {
+        row.abilities = Some(ability_parser::parse(row.rules_text_en_us.as_str())?);
+    }
     Ok(())
 }

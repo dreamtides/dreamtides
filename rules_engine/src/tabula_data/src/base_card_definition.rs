@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 
+use ability_data::ability::Ability;
 use core_data::card_properties::Rarity;
 use core_data::card_types::{CardSubtype, CardType};
 use core_data::display_types::SpriteAddress;
@@ -31,6 +32,9 @@ pub struct BaseCardDefinition {
     /// A card with a variable cost (e.g. modal cards) will have no energy cost
     /// specified here.
     pub energy_cost: Option<Energy>,
+
+    /// Abilities of this card.
+    pub abilities: Vec<Ability>,
 
     /// Rules text of this card in the currently-active language, formatted for
     /// display.
@@ -73,6 +77,12 @@ pub struct BaseCardDefinitionRaw {
 
     /// Rules text of this card (U.S. English).
     pub rules_text_en_us: String,
+
+    /// Abilities of this card in serialized form.
+    ///
+    /// If not present here, the Tabula CLI will populate this field by parsing
+    /// the English rules text.
+    pub abilities: Option<Vec<Ability>>,
 
     /// Type of this card.
     pub card_type: CardType,
@@ -170,10 +180,23 @@ pub fn build(
             row.image_number
         ));
 
+        let Some(abilities) = &row.abilities else {
+            let mut ierr = InitializationError::with_details(
+                ErrorCode::AbilitiesNotPresent,
+                "Abilities not present on card definition",
+                "Please run tabula_cli to populate this field",
+            );
+            ierr.tabula_sheet = Some(sheet_name.to_string());
+            ierr.tabula_row = Some(row_index);
+            errors.push(ierr);
+            continue;
+        };
+
         out.insert(row.id, BaseCardDefinition {
             id: row.id,
             displayed_name,
             energy_cost,
+            abilities: abilities.clone(),
             displayed_rules_text,
             card_type: row.card_type,
             card_subtype,

@@ -379,8 +379,24 @@
       "name_en_us": "Test Dissolve",
       "energy_cost": "2",
       "rules_text_en_us": "Dissolve an enemy character.",
+      "abilities": [
+        {
+          "Event": {
+            "additional_cost": null,
+            "effect": {
+              "Effect": {
+                "DissolveCharacter": {
+                  "target": {
+                    "Enemy": "Character"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
       "card_type": "Event",
-      "subtype_en_us": null,
+      "subtype": null,
       "is_fast": true,
       "spark": null,
       "rarity": "Common",
