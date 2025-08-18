@@ -4,7 +4,7 @@ use parser_tests::parser_test_utils::parse;
 #[test]
 fn test_banish_from_void_dissolve_enemy_character() {
     let result = parse(
-        "$activated Banish 3 cards from your void: Dissolve an enemy character with cost $2 or less.",
+        "$activated Banish 3 cards from your void: {Dissolve} an enemy character with cost $2 or less.",
     );
     assert_ron_snapshot!(
         result,

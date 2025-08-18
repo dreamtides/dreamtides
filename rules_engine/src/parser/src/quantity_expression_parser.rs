@@ -20,7 +20,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, QuantityExpression, ErrorType<'a
             .then_ignore(phrase("you abandoned this turn"))
             .map(QuantityExpression::AbandonedThisTurn),
         card_predicate_parser::parser()
-            .then_ignore(phrase("which dissolved this turn"))
+            .then_ignore(phrase("which {dissolved} this turn"))
             .map(QuantityExpression::DissolvedThisTurn),
         card_predicate_parser::parser()
             .then_ignore(phrase("abandoned"))

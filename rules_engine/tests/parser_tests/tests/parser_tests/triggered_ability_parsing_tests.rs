@@ -335,7 +335,7 @@ fn test_banished_character_gains_spark() {
 
 #[test]
 fn test_dissolved_character_gains_spark() {
-    let result = parse("Whenever a character you control is dissolved, drawa card.");
+    let result = parse("Whenever a character you control is {dissolved}, draw a card.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(

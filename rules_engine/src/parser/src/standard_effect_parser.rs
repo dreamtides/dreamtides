@@ -161,7 +161,7 @@ fn gain_spark_until_next_main_for_each<'a>()
 }
 
 fn dissolve_character<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    phrase("dissolve")
+    phrase("{dissolve}")
         .ignore_then(determiner_parser::target_parser())
         .map(|predicate| StandardEffect::DissolveCharacter { target: predicate })
 }
@@ -328,7 +328,7 @@ fn spend_all_energy_draw_and_discard<'a>() -> impl Parser<'a, &'a str, StandardE
 
 fn spend_all_energy_dissolve_enemy<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
 {
-    phrase("spend all your remaining energy. dissolve an enemy character with spark less than or equal to the energy spent this way")
+    phrase("spend all your remaining energy. {dissolve} an enemy character with spark less than or equal to the energy spent this way")
         .to(StandardEffect::SpendAllEnergyDissolveEnemy)
 }
 
@@ -425,7 +425,7 @@ fn lose_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> 
 }
 
 fn dissolve_characters_count<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    phrase("dissolve")
+    phrase("{dissolve}")
         .ignore_then(collection_expression_parser::parser())
         .then(determiner_parser::counted_parser())
         .map(|(count, target)| StandardEffect::DissolveCharactersCount { target, count })
@@ -546,7 +546,7 @@ fn shuffle_hand_and_deck_and_draw<'a>() -> impl Parser<'a, &'a str, StandardEffe
 }
 
 fn dissolve_characters_quantity<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    phrase("dissolve")
+    phrase("{dissolve}")
         .ignore_then(determiner_parser::target_parser())
         .then_ignore(phrase("with cost less than or equal to the number of"))
         .then(quantity_expression_parser::parser())

@@ -136,7 +136,7 @@ fn test_character_cost_reduction() {
 #[test]
 fn test_cost_reduction_for_each_dissolved() {
     let result =
-        parse("This event costs $1 less to play for each character which dissolved this turn.");
+        parse("This event costs $1 less to play for each character which {dissolved} this turn.");
     assert_ron_snapshot!(
         result,
         @r###"
@@ -237,7 +237,7 @@ fn test_play_for_alternate_cost_with_if_you_do() {
 #[test]
 fn test_play_if_character_dissolved() {
     let result = parse(
-        "If a character you controlled dissolved this turn, you may play this character from your void for $1.",
+        "If a character you controlled {dissolved} this turn, you may play this character from your void for $1.",
     );
     assert_ron_snapshot!(result, @r###"
     [

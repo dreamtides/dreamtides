@@ -288,7 +288,7 @@ fn test_banish_up_to_two_activated() {
 #[test]
 fn test_dissolve_enemy_character_with_spark_compared_to_abandoned() {
     let result = parse(
-        "$activated: Dissolve an enemy character with spark X or less, where X is the number of characters you have abandoned this turn.",
+        "$activated: {Dissolve} an enemy character with spark X or less, where X is the number of characters you have abandoned this turn.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -308,7 +308,7 @@ fn test_dissolve_enemy_character_with_spark_compared_to_abandoned() {
 #[test]
 fn test_multi_activated_dissolve_with_abandoned_spark() {
     let result = parse(
-        "$multiActivated Abandon another character: You may dissolve an enemy character with spark less than or equal to the abandoned character's spark.",
+        "$multiActivated Abandon another character: You may {dissolve} an enemy character with spark less than or equal to the abandoned character's spark.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -416,7 +416,7 @@ fn test_foresee() {
 
 #[test]
 fn test_lose_points() {
-    let result = parse("Dissolve an enemy character. You lose 4 $points.");
+    let result = parse("{Dissolve} an enemy character. You lose 4 $points.");
     assert_ron_snapshot!(
         result,
         @r###"
@@ -444,7 +444,7 @@ fn test_lose_points() {
 
 #[test]
 fn test_dissolve_characters_count() {
-    let result = parse("Dissolve all characters.");
+    let result = parse("{Dissolve} all characters.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
@@ -552,7 +552,7 @@ fn test_materialize_character_from_void() {
 
 #[test]
 fn test_abandon_a_character_or_discard_a_card() {
-    let result = parse("Abandon a character or discard a card. Dissolve an enemy character.");
+    let result = parse("Abandon a character or discard a card. {Dissolve} an enemy character.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
@@ -859,7 +859,7 @@ fn test_shuffle_hand_and_deck_and_draw() {
 #[test]
 fn test_dissolve_characters_quantity() {
     let result = parse(
-        "Dissolve an enemy character with cost less than or equal to the number of cards in your void.",
+        "{Dissolve} an enemy character with cost less than or equal to the number of cards in your void.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -1019,7 +1019,7 @@ fn test_materialize_character_at_end_of_turn() {
 #[test]
 fn test_spend_all_energy_dissolve_enemy() {
     let result = parse(
-        "Spend all your remaining energy. Dissolve an enemy character with spark less than or equal to the energy spent this way.",
+        "Spend all your remaining energy. {Dissolve} an enemy character with spark less than or equal to the energy spent this way.",
     );
     assert_ron_snapshot!(result, @r###"
     [

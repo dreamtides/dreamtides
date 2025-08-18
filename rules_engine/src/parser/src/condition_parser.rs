@@ -26,7 +26,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Condition, ErrorType<'a>> {
             .map(|count| Condition::CardsInVoidCount { count }),
         phrase("a")
             .ignore_then(card_predicate_parser::parser())
-            .then_ignore(phrase("you controlled dissolved this turn"))
+            .then_ignore(phrase("you controlled {dissolved} this turn"))
             .map(|predicate| Condition::DissolvedThisTurn {
                 predicate: Predicate::Your(predicate),
             }),

@@ -89,7 +89,7 @@ fn banished<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
 
 fn dissolved<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
     determiner_parser::target_parser()
-        .then_ignore(phrase("is dissolved"))
+        .then_ignore(phrase("is {dissolved}"))
         .map(TriggerEvent::Dissolved)
 }
 
