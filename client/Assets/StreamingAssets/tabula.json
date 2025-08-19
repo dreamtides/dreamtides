@@ -400,6 +400,33 @@
       "spark": null,
       "rarity": "Common",
       "image_number": "1907487244"
+    },
+    {
+      "id": "aad836b0-3ece-477c-b923-b099360f0115",
+      "name_en_us": "Test Counterspell",
+      "energy_cost": "2",
+      "rules_text_en_us": "{Prevent} a played enemy card.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "Counterspell": {
+                  "target": {
+                    "Enemy": "Card"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "subtype": null,
+      "is_fast": true,
+      "spark": null,
+      "rarity": "Common",
+      "image_number": "1282908322"
     }
   ]
 }
