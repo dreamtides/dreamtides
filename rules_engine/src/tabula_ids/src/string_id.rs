@@ -37,6 +37,9 @@ pub const COST: StringId = StringId(uuid!("cc5c5509-69c5-4c1f-8faa-b9948029dcb8"
 /// Formatting for a number of cards
 pub const CARDS: StringId = StringId(uuid!("87fcba1e-5935-4de4-8048-81a343f072a5"));
 
+/// Formatting for gaining an amount of spark
+pub const GAINED_SPARK: StringId = StringId(uuid!("c49b155f-57a2-479a-bc45-254b2144d04b"));
+
 /// Foresee keyword ability
 pub const FORESEE: StringId = StringId(uuid!("2e44ee4c-3218-45bf-a29e-0508f853c873"));
 

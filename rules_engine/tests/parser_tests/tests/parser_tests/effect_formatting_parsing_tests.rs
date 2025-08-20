@@ -4,7 +4,7 @@ use parser_tests::parser_test_utils::parse;
 #[test]
 fn test_multiple_effects() {
     let result = parse(
-        "$activated $1: This character gains +1 spark. You may banish a card from the enemy's void.",
+        "$activated $1: This character gains {-gained-spark(n:1)}. You may banish a card from the enemy's void.",
     );
     assert_ron_snapshot!(result, @r###"
     [

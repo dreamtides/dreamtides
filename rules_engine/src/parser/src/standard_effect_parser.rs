@@ -139,7 +139,7 @@ fn draw_cards<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
 
 fn gain_spark<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     determiner_parser::target_parser()
-        .then(numeric("gains +", Spark, "spark"))
+        .then(numeric("gains {-gained-spark(n:", Spark, ")}"))
         .map(|(predicate, spark)| StandardEffect::GainsSpark { target: predicate, gains: spark })
 }
 
@@ -150,7 +150,7 @@ fn gain_energy<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> 
 fn gain_spark_until_next_main_for_each<'a>()
 -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     determiner_parser::target_parser()
-        .then(numeric("gains +", Spark, "spark until your next main phase for each"))
+        .then(numeric("gains {-gained-spark(n:", Spark, ")} until your next main phase for each"))
         .then(card_predicate_parser::parser())
         .then_ignore(phrase("you control"))
         .map(|((target, spark), counted)| StandardEffect::GainsSparkUntilYourNextMainForEach {
@@ -343,8 +343,11 @@ fn each_matching_gains_spark_until_next_main<'a>()
 -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("each")
         .ignore_then(card_predicate_parser::parser())
-        .then_ignore(phrase("you control gains +"))
-        .then(numeric("", Spark, "spark until your next main phase"))
+        .then(numeric(
+            "you control gains {-gained-spark(n:",
+            Spark,
+            ")} until your next main phase",
+        ))
         .map(|(each, gains)| StandardEffect::EachMatchingGainsSparkUntilNextMain { each, gains })
 }
 
@@ -352,7 +355,7 @@ fn each_matching_gains_spark_for_each<'a>()
 -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("each")
         .ignore_then(card_predicate_parser::parser())
-        .then_ignore(phrase("you control gains +x spark, where x is the number of"))
+        .then_ignore(phrase("you control gains {-gained-spark(n:x)}, where x is the number of"))
         .then(card_predicate_parser::parser())
         .then_ignore(phrase("you control"))
         .map(|(matching, for_each)| StandardEffect::EachMatchingGainsSparkForEach {
@@ -516,7 +519,7 @@ fn cards_in_void_gain_reclaim_this_turn<'a>()
 
 fn gains_spark_for_quantity<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     determiner_parser::target_parser()
-        .then(numeric("gains +", Spark, "spark for each"))
+        .then(numeric("gains {-gained-spark(n:", Spark, ")} for each"))
         .then(quantity_expression_parser::parser())
         .map(|((target, gains), for_quantity)| StandardEffect::GainsSparkForQuantity {
             target,

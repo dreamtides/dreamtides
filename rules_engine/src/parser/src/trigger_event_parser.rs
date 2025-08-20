@@ -1,5 +1,5 @@
 use ability_data::predicate::Predicate;
-use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
+use ability_data::trigger_event::{PlayerTurn, TriggerEvent, TriggerKeyword};
 use chumsky::prelude::choice;
 use chumsky::{IterParser, Parser};
 
@@ -11,6 +11,7 @@ pub fn event_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a
         materialize_nth_this_turn(),
         materialize(),
         play_from_hand(),
+        play_during_enemy_turn(),
         play(),
         discard(),
         end_of_turn(),
@@ -60,6 +61,13 @@ fn play_from_hand<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>>
 
 fn play<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
     phrase("you play").ignore_then(determiner_parser::your_action()).map(TriggerEvent::Play)
+}
+
+fn play_during_enemy_turn<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
+    phrase("you play")
+        .ignore_then(determiner_parser::your_action())
+        .then_ignore(phrase("during the enemy's turn"))
+        .map(|predicate| TriggerEvent::PlayDuringTurn(predicate, PlayerTurn::EnemyTurn))
 }
 
 fn discard<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {

@@ -4,7 +4,7 @@ use parser_tests::parser_test_utils::parse;
 #[test]
 fn test_gains_spark_until_main_phase_for_each_warrior() {
     let result = parse(
-        "A character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control.",
+        "A character you control gains {-gained-spark(n:1)} until your next main phase for each {cardtype: warrior} you control.",
     );
     assert_ron_snapshot!(
     result,

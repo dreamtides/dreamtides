@@ -54,7 +54,7 @@ fn test_fast_activated_grant_aegis() {
 #[test]
 fn test_activated_spark_equal_to_warriors() {
     let result = parse(
-        "$fastActivated $2: Another character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control.",
+        "$fastActivated $2: Another character you control gains {-gained-spark(n:1)} until your next main phase for each {cardtype: warrior} you control.",
     );
     assert_ron_snapshot!(result, @r###"
     [

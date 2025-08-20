@@ -142,7 +142,7 @@ fn test_discard_card_from_enemy_hand() {
 #[test]
 fn test_each_matching_gains_spark_for_each() {
     let result = parse(
-        "Each {cardtype: spirit animal} you control gains +X spark, where X is the number of {cardtype: spirit animals} you control.",
+        "Each {cardtype: spirit animal} you control gains {-gained-spark(n:X)}, where X is the number of {cardtype: spirit animals} you control.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -762,8 +762,9 @@ fn test_gains_reclaim_until_end_of_turn() {
 
 #[test]
 fn test_gains_spark_for_quantity() {
-    let result =
-        parse("A character you control gains +1 spark for each card you have played this turn.");
+    let result = parse(
+        "A character you control gains {-gained-spark(n:1)} for each card you have played this turn.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
@@ -905,7 +906,7 @@ fn test_trigger_judgment_ability() {
 #[test]
 fn test_each_matching_gains_spark_until_next_main() {
     let result = parse(
-        "Each {cardtype: spirit animal} you control gains +2 spark until your next main phase.",
+        "Each {cardtype: spirit animal} you control gains {-gained-spark(n:2)} until your next main phase.",
     );
     assert_ron_snapshot!(result, @r###"
     [

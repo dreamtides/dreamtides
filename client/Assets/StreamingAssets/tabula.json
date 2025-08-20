@@ -73,6 +73,12 @@
       "en_us": "{$n ->\n  [one] a card\n  *[other] $n cards\n}"
     },
     {
+      "id": "c49b155f-57a2-479a-bc45-254b2144d04b",
+      "name": "-gained-spark",
+      "description": "Formatting for gaining an amount of spark",
+      "en_us": "+{$n} spark"
+    },
+    {
       "id": "2e44ee4c-3218-45bf-a29e-0508f853c873",
       "name": "foresee",
       "description": "Foresee keyword ability",
@@ -544,6 +550,40 @@
       "spark": null,
       "rarity": "Common",
       "image_number": "489056605"
+    },
+    {
+      "id": "86ee5ad7-b60b-4596-af8c-7a495022ac61",
+      "name_en_us": "Test Trigger Gain on Fast",
+      "energy_cost": "2",
+      "rules_text_en_us": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}.",
+      "abilities": [
+        {
+          "Triggered": {
+            "trigger": {
+              "PlayDuringTurn": [
+                {
+                  "Your": "Card"
+                },
+                "EnemyTurn"
+              ]
+            },
+            "effect": {
+              "Effect": {
+                "GainsSpark": {
+                  "target": "This",
+                  "gains": 1
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Character",
+      "subtype": null,
+      "is_fast": true,
+      "spark": null,
+      "rarity": "Common",
+      "image_number": "403770319"
     }
   ]
 }

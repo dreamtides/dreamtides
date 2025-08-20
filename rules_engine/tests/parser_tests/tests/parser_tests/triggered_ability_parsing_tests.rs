@@ -4,7 +4,7 @@ use parser_tests::parser_test_utils::parse;
 #[test]
 fn test_materialize_warrior_gain_spark() {
     let result = parse(
-        "Whenever you materialize another {cardtype: warrior}, this character gains +1 spark.",
+        "Whenever you materialize another {cardtype: warrior}, this character gains {-gained-spark(n:1)}.",
     );
     assert_ron_snapshot!(
         result,
@@ -170,7 +170,8 @@ fn test_draw_matching_card() {
 
 #[test]
 fn test_gain_spark_on_materialize() {
-    let result = parse("Whenever you materialize a character, this character gains +1 spark.");
+    let result =
+        parse("Whenever you materialize a character, this character gains {-gained-spark(n:1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -318,8 +319,9 @@ fn test_draw_all_cards_win_game() {
 
 #[test]
 fn test_banished_character_gains_spark() {
-    let result =
-        parse("Whenever a character you control is banished, this character gains +1 spark.");
+    let result = parse(
+        "Whenever a character you control is banished, this character gains {-gained-spark(n:1)}.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -373,11 +375,30 @@ fn test_banish_until_next_main() {
 
 #[test]
 fn test_abandon_character_gains_spark() {
-    let result = parse("Whenever you abandon a character, this character gains +1 spark.");
+    let result =
+        parse("Whenever you abandon a character, this character gains {-gained-spark(n:1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
         trigger: Abandon(Your(Character)),
+        effect: Effect(GainsSpark(
+          target: This,
+          gains: Spark(1),
+        )),
+      )),
+    ]
+    "###);
+}
+
+#[test]
+fn test_trigger_on_play_enemy_turn() {
+    let result = parse(
+        "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}.",
+    );
+    assert_ron_snapshot!(result, @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: PlayDuringTurn(Your(Card), EnemyTurn),
         effect: Effect(GainsSpark(
           target: This,
           gains: Spark(1),
