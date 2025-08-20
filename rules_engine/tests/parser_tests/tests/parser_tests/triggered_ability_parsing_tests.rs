@@ -24,7 +24,7 @@ fn test_materialize_warrior_gain_spark() {
 
 #[test]
 fn test_keyword_trigger_draw() {
-    let result = parse("$materialized: Draw a card.");
+    let result = parse("$materialized: Draw {-cards(n: 1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -41,7 +41,7 @@ fn test_keyword_trigger_draw() {
 
 #[test]
 fn test_multiple_keyword_trigger() {
-    let result = parse("$materialized, $dissolved: Draw a card.");
+    let result = parse("$materialized, $dissolved: Draw {-cards(n: 1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -59,7 +59,7 @@ fn test_multiple_keyword_trigger() {
 
 #[test]
 fn test_three_keyword_trigger() {
-    let result = parse("$materialized, $judgment, $dissolved: Draw a card.");
+    let result = parse("$materialized, $judgment, $dissolved: Draw {-cards(n: 1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -78,8 +78,9 @@ fn test_three_keyword_trigger() {
 
 #[test]
 fn test_once_per_turn() {
-    let result =
-        parse("Once per turn, when you materialize a character with cost $2 or less, draw a card.");
+    let result = parse(
+        "Once per turn, when you materialize a character with cost $2 or less, draw {-cards(n: 1)}.",
+    );
     assert_ron_snapshot!(
         result,
         @r###"
@@ -337,7 +338,7 @@ fn test_banished_character_gains_spark() {
 
 #[test]
 fn test_dissolved_character_gains_spark() {
-    let result = parse("Whenever a character you control is {dissolved}, draw a card.");
+    let result = parse("Whenever a character you control is {dissolved}, draw {-cards(n: 1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -352,7 +353,7 @@ fn test_dissolved_character_gains_spark() {
 
 #[test]
 fn test_banish_until_next_main() {
-    let result = parse("Until end of turn, whenever you banish a character, draw a card.");
+    let result = parse("Until end of turn, whenever you banish a character, draw {-cards(n: 1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(

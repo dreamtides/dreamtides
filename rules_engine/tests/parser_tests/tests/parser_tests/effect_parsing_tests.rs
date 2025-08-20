@@ -336,8 +336,9 @@ fn test_multi_activated_dissolve_with_abandoned_spark() {
 
 #[test]
 fn test_abandon_any_number_draw_for_each() {
-    let result =
-        parse("Abandon any number of characters. Draw a card for each character abandoned.");
+    let result = parse(
+        "Abandon any number of characters. Draw {-cards(n: 1)} for each character abandoned.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
@@ -661,7 +662,7 @@ fn test_gain_points_for_each() {
 
 #[test]
 fn test_draw_cards_for_each() {
-    let result = parse("Draw a card for each card you have played this turn.");
+    let result = parse("Draw {-cards(n: 1)} for each card you have played this turn.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
@@ -1187,7 +1188,7 @@ fn test_materialize_silent_copy() {
 
 #[test]
 fn test_draw_for_abandoned_this_turn() {
-    let result = parse("Draw a card for each character you abandoned this turn.");
+    let result = parse("Draw {-cards(n: 1)} for each character you abandoned this turn.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(

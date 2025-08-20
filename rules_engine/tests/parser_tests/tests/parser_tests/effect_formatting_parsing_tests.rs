@@ -34,7 +34,7 @@ fn test_multiple_effects() {
 
 #[test]
 fn test_then_separator() {
-    let result = parse("Draw a card, then discard a card.");
+    let result = parse("Draw {-cards(n: 1)}, then discard a card.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
@@ -59,7 +59,7 @@ fn test_then_separator() {
 
 #[test]
 fn test_optional_draw() {
-    let result = parse("You may draw a card.");
+    let result = parse("You may draw {-cards(n: 1)}.");
     assert_ron_snapshot!(
         result,
         @r###"
@@ -127,7 +127,7 @@ fn test_conditional_optional_gain_energy() {
 
 #[test]
 fn test_until_end_of_turn() {
-    let result = parse("Until end of turn, whenever you play a character, draw a card.");
+    let result = parse("Until end of turn, whenever you play a character, draw {-cards(n: 1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(

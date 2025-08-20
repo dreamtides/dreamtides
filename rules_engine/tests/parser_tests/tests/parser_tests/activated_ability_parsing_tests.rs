@@ -78,7 +78,7 @@ fn test_activated_spark_equal_to_warriors() {
 
 #[test]
 fn test_multi_activated_draw() {
-    let result = parse("$multiActivated {-energy-cost(e: 2)}: Draw a card.");
+    let result = parse("$multiActivated {-energy-cost(e: 2)}: Draw {-cards(n: 1)}.");
     assert_ron_snapshot!(
         result,
         @r###"
@@ -102,7 +102,8 @@ fn test_multi_activated_draw() {
 
 #[test]
 fn test_abandon_character_with_spark() {
-    let result = parse("$activated Abandon another character with spark 2 or less: Draw a card.");
+    let result =
+        parse("$activated Abandon another character with spark 2 or less: Draw {-cards(n: 1)}.");
     assert_ron_snapshot!(
         result,
         @r###"
@@ -123,7 +124,7 @@ fn test_abandon_character_with_spark() {
 #[test]
 fn test_activated_ability_multiple_costs() {
     let result = parse(
-        "$multiActivated {-energy-cost(e: 2)}, Abandon another character with spark 1 or less: Draw 2 cards.",
+        "$multiActivated {-energy-cost(e: 2)}, Abandon another character with spark 1 or less: Draw {-cards(n: 2)}.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -167,7 +168,7 @@ fn test_discard_hand_gain_energy() {
 #[test]
 fn test_multiple_costs_abandon_this() {
     let result = parse(
-        "$activated {-energy-cost(e: 2)}, Abandon this character, discard your hand: Draw 3 cards.",
+        "$activated {-energy-cost(e: 2)}, Abandon this character, discard your hand: Draw {-cards(n: 3)}.",
     );
     assert_ron_snapshot!(
         result,
@@ -212,7 +213,7 @@ fn test_activated_discover_and_then_materialize() {
 
 #[test]
 fn test_discard_card_draw_gain_point() {
-    let result = parse("$activated Discard a card: Draw a card. Gain 1 $point.");
+    let result = parse("$activated Discard a card: Draw {-cards(n: 1)}. Gain 1 $point.");
     assert_ron_snapshot!(
         result,
         @r###"
