@@ -513,6 +513,18 @@
   ],
   "test_cards": [
     {
+      "id": "253ee0ca-f973-4d9f-ad37-abe548bc674f",
+      "name_en_us": "Test Vanilla Character",
+      "energy_cost": "2",
+      "rules_text_en_us": " ",
+      "abilities": [],
+      "card_type": "Character",
+      "is_fast": false,
+      "spark": "5",
+      "rarity": "Special",
+      "image_number": "1794244540"
+    },
+    {
       "id": "d4854b6e-5274-4f6a-8a60-a1ea1c15e9a6",
       "name_en_us": "Test Dissolve",
       "energy_cost": "2",
@@ -644,6 +656,7 @@
       ],
       "card_type": "Character",
       "is_fast": true,
+      "spark": "1",
       "rarity": "Special",
       "image_number": "403770319"
     },
@@ -676,6 +689,7 @@
       ],
       "card_type": "Character",
       "is_fast": false,
+      "spark": "2",
       "rarity": "Special",
       "image_number": "1794244540"
     },

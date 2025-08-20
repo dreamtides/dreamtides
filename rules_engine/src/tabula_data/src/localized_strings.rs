@@ -227,6 +227,10 @@ impl LocalizedStrings {
         context: StringContext,
         mut args: FluentArgs,
     ) -> String {
+        if s.trim().is_empty() {
+            return s;
+        }
+
         args.set("context", context.key());
         let mut bundle = FluentBundle::default();
         bundle.set_use_isolating(false);

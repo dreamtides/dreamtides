@@ -14,6 +14,9 @@ use crate::{
 ///
 /// Returns a list of [InitializationError]s if the parsing fails.
 pub fn parse(input: &str) -> Result<Vec<Ability>, Vec<InitializationError>> {
+    if input.trim().is_empty() {
+        return Ok(Vec::new());
+    }
     let input = input.to_lowercase();
     let (result, errs) = parse_string(&input).into_output_errors();
     if let Some(output) = result {
@@ -72,7 +75,7 @@ fn parser<'a>() -> impl Parser<'a, &'a str, Vec<Ability>, ErrorType<'a>> {
 
     let multiple_abilities = ability_block.repeated().at_least(1).collect();
 
-    choice((multiple_abilities, single_ability.map(|a| vec![a])))
+    choice((multiple_abilities, single_ability.map(|a| vec![a]), empty().padded().to(Vec::new())))
         .then_ignore(flavor_text.or_not())
         .then_ignore(end())
 }

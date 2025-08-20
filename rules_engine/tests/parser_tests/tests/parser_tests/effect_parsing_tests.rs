@@ -1424,3 +1424,9 @@ fn test_modal_draw_one_or_dissolve_enemy() {
     ]
     "###);
 }
+
+#[test]
+fn test_parse_all_whitespace_returns_empty_vector() {
+    let result = parse("   \n\t  ");
+    assert_ron_snapshot!(result, @r###"[]"###);
+}
