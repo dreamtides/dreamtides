@@ -2,7 +2,7 @@ set positional-arguments
 
 code-review: check-format build workspace-lints clippy test check-docs unity-tests
 
-review: check-format build workspace-lints clippy test check-docs
+review: check-format build workspace-lints clippy test
 
 check:
     cargo check --manifest-path rules_engine/Cargo.toml --workspace --all-targets --all-features

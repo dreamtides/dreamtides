@@ -1,0 +1,15 @@
+{"run_id":"1755721836-419933000","line":131,"new":{"module_name":"lib__parser_tests__ability_formatting_parsing_tests","snapshot_name":"ability_blocks_example","metadata":{"source":"tests/parser_tests/tests/parser_tests/ability_formatting_parsing_tests.rs","assertion_line":131,"expression":"result"},"snapshot":"[\n  Event(EventAbility(\n    effect: List([\n      EffectWithOptions(\n        effect: Foresee(\n          count: 1,\n        ),\n        optional: false,\n      ),\n      EffectWithOptions(\n        effect: DrawCards(\n          count: 1,\n        ),\n        optional: false,\n      ),\n    ]),\n  )),\n  Named(Reclaim(Some(Energy(3)))),\n]"},"old":{"module_name":"lib__parser_tests__ability_formatting_parsing_tests","metadata":{},"snapshot":"[\n  Event(EventAbility(\n    effect: List([\n      Effect(Foresee(\n        count: 1,\n      )),\n      Effect(DrawCards(\n        count: 1,\n      )),\n    ]),\n  )),\n  Named(Reclaim(\n    Some(Energy(3)),\n  )),\n]"}}
+{"run_id":"1755721899-610864000","line":83,"new":null,"old":null}
+{"run_id":"1755721899-610864000","line":131,"new":null,"old":null}
+{"run_id":"1755721899-610864000","line":45,"new":null,"old":null}
+{"run_id":"1755721899-610864000","line":67,"new":null,"old":null}
+{"run_id":"1755721899-610864000","line":29,"new":null,"old":null}
+{"run_id":"1755721899-610864000","line":7,"new":null,"old":null}
+{"run_id":"1755721899-610864000","line":107,"new":null,"old":null}
+{"run_id":"1755721962-417205000","line":83,"new":null,"old":null}
+{"run_id":"1755721962-417205000","line":107,"new":null,"old":null}
+{"run_id":"1755721962-417205000","line":67,"new":null,"old":null}
+{"run_id":"1755721962-417205000","line":131,"new":null,"old":null}
+{"run_id":"1755721962-417205000","line":45,"new":null,"old":null}
+{"run_id":"1755721962-417205000","line":29,"new":null,"old":null}
+{"run_id":"1755721962-417205000","line":7,"new":null,"old":null}

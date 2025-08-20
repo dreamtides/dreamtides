@@ -62,12 +62,17 @@ fn parser<'a>() -> impl Parser<'a, &'a str, Vec<Ability>, ErrorType<'a>> {
         effect_parser::event().map(Ability::Event),
         static_ability_parser::parser().then_ignore(phrase(".")).map(Ability::Static),
     ))
-    .then_ignore(reminder_text.or_not());
+    .then_ignore(reminder_text.or_not())
+    .boxed();
 
-    single_ability
-        .separated_by(phrase("$br"))
-        .at_least(1)
-        .collect()
+    let ability_block = phrase("{ability}")
+        .padded()
+        .ignore_then(single_ability.clone())
+        .then_ignore(phrase("{end-ability}").padded());
+
+    let multiple_abilities = ability_block.repeated().at_least(1).collect();
+
+    choice((multiple_abilities, single_ability.map(|a| vec![a])))
         .then_ignore(flavor_text.or_not())
         .then_ignore(end())
 }
