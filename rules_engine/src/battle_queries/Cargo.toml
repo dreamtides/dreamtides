@@ -17,6 +17,7 @@ ability_data = { path = "../ability_data" }
 battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 display_data = { path = "../display_data" }
+quest_state = { path = "../quest_state" }
 tabula_data = { path = "../tabula_data" }
 tabula_ids = { path = "../tabula_ids" }
 

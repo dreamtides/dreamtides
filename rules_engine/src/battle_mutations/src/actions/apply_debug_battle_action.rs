@@ -8,6 +8,7 @@ use battle_state::battle::card_id::{CardId, DeckCardId, HandCardId};
 use battle_state::core::effect_source::EffectSource;
 use core_data::identifiers::CardName;
 use core_data::types::PlayerName;
+use quest_state::quest::card_descriptor;
 
 use crate::actions::apply_battle_action;
 use crate::card_mutations::{battle_deck, move_card};
@@ -36,13 +37,17 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
         }
         DebugBattleAction::AddCardToBattlefield { player: player_name, card: card_name } => {
             let card_count = battle.cards.all_cards().count();
-            battle_deck::add_cards(battle, player_name, vec![card_name.tmp_to_card_identity()]);
+            battle_deck::add_cards(battle, player_name, vec![card_descriptor::get_base_identity(
+                card_name,
+            )]);
             let new_card_id = DeckCardId(CardId(card_count));
             move_card::from_deck_to_battlefield(battle, source, player_name, new_card_id);
         }
         DebugBattleAction::AddCardToVoid { player: player_name, card: card_name } => {
             let card_count = battle.cards.all_cards().count();
-            battle_deck::add_cards(battle, player_name, vec![card_name.tmp_to_card_identity()]);
+            battle_deck::add_cards(battle, player_name, vec![card_descriptor::get_base_identity(
+                card_name,
+            )]);
             let new_card_id = DeckCardId(CardId(card_count));
             move_card::from_deck_to_void(battle, source, player_name, new_card_id);
         }
@@ -90,7 +95,7 @@ fn add_to_hand(
     card_name: CardName,
 ) -> HandCardId {
     let card_count = battle.cards.all_cards().count();
-    battle_deck::add_cards(battle, player, vec![card_name.tmp_to_card_identity()]);
+    battle_deck::add_cards(battle, player, vec![card_descriptor::get_base_identity(card_name)]);
     let new_card_id = DeckCardId(CardId(card_count));
     move_card::from_deck_to_hand(battle, source, player, new_card_id)
 }

@@ -12,6 +12,7 @@ use core_data::types::PlayerName;
 use display::rendering::renderer;
 use display_data::request_data::{ConnectResponse, Metadata};
 use game_creation::new_test_battle;
+use quest_state::quest::card_descriptor;
 use quest_state::quest::deck::Deck;
 use state_provider::state_provider::StateProvider;
 use state_provider::test_state_provider::TestStateProvider;
@@ -107,47 +108,49 @@ fn create_500_card_core_11_deck() -> Deck {
     let remainder = 500_usize % 32_usize;
 
     deck_cards.insert(
-        CardName::TestNamedDissolve.tmp_to_card_identity(),
+        card_descriptor::get_base_identity(CardName::TestNamedDissolve),
         4 * scale_factor + if remainder > 0 { 1 } else { 0 },
     );
     deck_cards.insert(
-        CardName::TestCounterspell.tmp_to_card_identity(),
+        card_descriptor::get_base_identity(CardName::TestCounterspell),
         3 * scale_factor + if remainder > 4 { 1 } else { 0 },
     );
     deck_cards.insert(
-        CardName::TestCounterspellUnlessPays.tmp_to_card_identity(),
+        card_descriptor::get_base_identity(CardName::TestCounterspellUnlessPays),
         2 * scale_factor + if remainder > 7 { 1 } else { 0 },
     );
     deck_cards.insert(
-        CardName::TestVariableEnergyDraw.tmp_to_card_identity(),
+        card_descriptor::get_base_identity(CardName::TestVariableEnergyDraw),
         3 * scale_factor + if remainder > 9 { 1 } else { 0 },
     );
     deck_cards.insert(
-        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn.tmp_to_card_identity(),
+        card_descriptor::get_base_identity(CardName::TestTriggerGainSparkOnPlayCardEnemyTurn),
         4 * scale_factor + if remainder > 12 { 1 } else { 0 },
     );
     deck_cards.insert(
-        CardName::TestFastMultiActivatedAbilityDrawCardCharacter.tmp_to_card_identity(),
+        card_descriptor::get_base_identity(
+            CardName::TestFastMultiActivatedAbilityDrawCardCharacter,
+        ),
         5 * scale_factor + if remainder > 16 { 1 } else { 0 },
     );
     deck_cards.insert(
-        CardName::TestReturnOneOrTwoVoidEventCardsToHand.tmp_to_card_identity(),
+        card_descriptor::get_base_identity(CardName::TestReturnOneOrTwoVoidEventCardsToHand),
         2 * scale_factor + if remainder > 21 { 1 } else { 0 },
     );
     deck_cards.insert(
-        CardName::TestModalReturnToHandOrDrawTwo.tmp_to_card_identity(),
+        card_descriptor::get_base_identity(CardName::TestModalReturnToHandOrDrawTwo),
         2 * scale_factor + if remainder > 23 { 1 } else { 0 },
     );
     deck_cards.insert(
-        CardName::TestPreventDissolveThisTurn.tmp_to_card_identity(),
+        card_descriptor::get_base_identity(CardName::TestPreventDissolveThisTurn),
         2 * scale_factor + if remainder > 25 { 1 } else { 0 },
     );
     deck_cards.insert(
-        CardName::TestForeseeOneDrawReclaim.tmp_to_card_identity(),
+        card_descriptor::get_base_identity(CardName::TestForeseeOneDrawReclaim),
         3 * scale_factor + if remainder > 27 { 1 } else { 0 },
     );
     deck_cards.insert(
-        CardName::TestCounterspellCharacter.tmp_to_card_identity(),
+        card_descriptor::get_base_identity(CardName::TestCounterspellCharacter),
         2 * scale_factor + if remainder > 30 { 1 } else { 0 },
     );
 

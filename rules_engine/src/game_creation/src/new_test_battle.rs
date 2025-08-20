@@ -20,6 +20,7 @@ use battle_state::triggers::trigger_state::TriggerState;
 use core_data::identifiers::{BattleId, CardName, QuestId, UserId};
 use core_data::numerics::{Energy, Essence, Points, Spark, TurnId};
 use core_data::types::PlayerName;
+use quest_state::quest::card_descriptor;
 use quest_state::quest::deck::Deck;
 use quest_state::quest::quest_state::QuestState;
 use rand::SeedableRng;
@@ -111,34 +112,60 @@ fn create_test_deck(name: TestDeckName) -> Deck {
     let mut deck_cards = BTreeMap::new();
     match name {
         TestDeckName::Vanilla => {
-            deck_cards.insert(CardName::TestVanillaCharacter.tmp_to_card_identity(), 30);
+            deck_cards
+                .insert(card_descriptor::get_base_identity(CardName::TestVanillaCharacter), 30);
         }
         TestDeckName::StartingFive => {
-            deck_cards.insert(CardName::TestVanillaCharacter.tmp_to_card_identity(), 6);
-            deck_cards.insert(CardName::TestDissolve.tmp_to_card_identity(), 3);
-            deck_cards.insert(CardName::TestCounterspell.tmp_to_card_identity(), 3);
-            deck_cards.insert(CardName::TestCounterspellUnlessPays.tmp_to_card_identity(), 3);
-            deck_cards.insert(CardName::TestVariableEnergyDraw.tmp_to_card_identity(), 3);
+            deck_cards
+                .insert(card_descriptor::get_base_identity(CardName::TestVanillaCharacter), 6);
+            deck_cards.insert(card_descriptor::get_base_identity(CardName::TestDissolve), 3);
+            deck_cards.insert(card_descriptor::get_base_identity(CardName::TestCounterspell), 3);
+            deck_cards.insert(
+                card_descriptor::get_base_identity(CardName::TestCounterspellUnlessPays),
+                3,
+            );
+            deck_cards
+                .insert(card_descriptor::get_base_identity(CardName::TestVariableEnergyDraw), 3);
         }
         TestDeckName::CoreEleven => {
-            deck_cards.insert(CardName::TestNamedDissolve.tmp_to_card_identity(), 4);
-            deck_cards.insert(CardName::TestCounterspell.tmp_to_card_identity(), 3);
-            deck_cards.insert(CardName::TestCounterspellUnlessPays.tmp_to_card_identity(), 2);
-            deck_cards.insert(CardName::TestVariableEnergyDraw.tmp_to_card_identity(), 3);
+            deck_cards.insert(card_descriptor::get_base_identity(CardName::TestNamedDissolve), 4);
+            deck_cards.insert(card_descriptor::get_base_identity(CardName::TestCounterspell), 3);
             deck_cards.insert(
-                CardName::TestTriggerGainSparkOnPlayCardEnemyTurn.tmp_to_card_identity(),
+                card_descriptor::get_base_identity(CardName::TestCounterspellUnlessPays),
+                2,
+            );
+            deck_cards
+                .insert(card_descriptor::get_base_identity(CardName::TestVariableEnergyDraw), 3);
+            deck_cards.insert(
+                card_descriptor::get_base_identity(
+                    CardName::TestTriggerGainSparkOnPlayCardEnemyTurn,
+                ),
                 4,
             );
             deck_cards.insert(
-                CardName::TestFastMultiActivatedAbilityDrawCardCharacter.tmp_to_card_identity(),
+                card_descriptor::get_base_identity(
+                    CardName::TestFastMultiActivatedAbilityDrawCardCharacter,
+                ),
                 5,
             );
+            deck_cards.insert(
+                card_descriptor::get_base_identity(
+                    CardName::TestReturnOneOrTwoVoidEventCardsToHand,
+                ),
+                2,
+            );
+            deck_cards.insert(
+                card_descriptor::get_base_identity(CardName::TestModalReturnToHandOrDrawTwo),
+                2,
+            );
+            deck_cards.insert(
+                card_descriptor::get_base_identity(CardName::TestPreventDissolveThisTurn),
+                2,
+            );
             deck_cards
-                .insert(CardName::TestReturnOneOrTwoVoidEventCardsToHand.tmp_to_card_identity(), 2);
-            deck_cards.insert(CardName::TestModalReturnToHandOrDrawTwo.tmp_to_card_identity(), 2);
-            deck_cards.insert(CardName::TestPreventDissolveThisTurn.tmp_to_card_identity(), 2);
-            deck_cards.insert(CardName::TestForeseeOneDrawReclaim.tmp_to_card_identity(), 3);
-            deck_cards.insert(CardName::TestCounterspellCharacter.tmp_to_card_identity(), 2);
+                .insert(card_descriptor::get_base_identity(CardName::TestForeseeOneDrawReclaim), 3);
+            deck_cards
+                .insert(card_descriptor::get_base_identity(CardName::TestCounterspellCharacter), 2);
         }
     }
     Deck { cards: deck_cards }

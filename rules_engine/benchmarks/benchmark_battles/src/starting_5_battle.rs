@@ -25,6 +25,7 @@ use core_data::identifiers::{BattleId, CardName};
 use core_data::numerics::{Energy, Points, Spark, TurnId};
 use core_data::types::PlayerName;
 use game_creation::new_test_battle;
+use quest_state::quest::card_descriptor;
 use rand::SeedableRng;
 use rand_xoshiro::Xoshiro256PlusPlus;
 use uuid::Uuid;
@@ -305,7 +306,7 @@ pub fn benchmark_battle() -> BattleState {
         card_specs
             .iter()
             .filter(|spec| spec.owner == PlayerName::One)
-            .map(|spec| spec.name.tmp_to_card_identity())
+            .map(|spec| card_descriptor::get_base_identity(spec.name))
             .collect(),
     );
     battle_deck::add_cards(
@@ -314,7 +315,7 @@ pub fn benchmark_battle() -> BattleState {
         card_specs
             .iter()
             .filter(|spec| spec.owner == PlayerName::Two)
-            .map(|spec| spec.name.tmp_to_card_identity())
+            .map(|spec| card_descriptor::get_base_identity(spec.name))
             .collect(),
     );
 
@@ -327,7 +328,7 @@ pub fn benchmark_battle() -> BattleState {
         if spec.zone == Zone::Battlefield {
             let character_id = CharacterId(card_id);
             let card_name = card::get(&battle, character_id).identity;
-            if card_name == CardName::TestVanillaCharacter.tmp_to_card_identity() {
+            if card_name == card_descriptor::get_base_identity(CardName::TestVanillaCharacter) {
                 if let Some(char_state) =
                     battle.cards.battlefield_state_mut(spec.owner).get_mut(&character_id)
                 {

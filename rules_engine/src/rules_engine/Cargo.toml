@@ -24,6 +24,7 @@ display_data = { path = "../display_data" }
 game_creation = { path = "../game_creation" }
 logging = { path = "../logging" }
 masonry = { path = "../masonry" }
+quest_state = { path = "../quest_state" }
 state_provider = { path = "../state_provider" }
 tabula_data = { path = "../tabula_data" }
 tabula_ids = { path = "../tabula_ids" }

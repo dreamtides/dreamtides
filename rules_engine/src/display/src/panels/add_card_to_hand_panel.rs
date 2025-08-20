@@ -7,6 +7,7 @@ use core_data::identifiers::CardName;
 use core_data::types::PlayerName;
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify};
 use masonry::flex_style::FlexStyle;
+use quest_state::quest::card_descriptor;
 use ui_components::box_component::BoxComponent;
 use ui_components::button_component::ButtonComponent;
 use ui_components::component::Component;
@@ -242,7 +243,9 @@ impl Component for AddCardCell {
                 )
                 .child(
                     TextComponent::builder()
-                        .text(card_properties::display_name(self.card.tmp_to_card_identity()))
+                        .text(card_properties::display_name(card_descriptor::get_base_identity(
+                            self.card,
+                        )))
                         .typography(Typography::Body2)
                         .build(),
                 )

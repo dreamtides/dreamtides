@@ -4,12 +4,13 @@ use core_data::card_types::{CardSubtype, CardType};
 use core_data::identifiers::{CardIdentity, CardName};
 use core_data::numerics::{Energy, Spark};
 use core_data::types::PlayerName;
+use quest_state::quest::card_descriptor;
 
 use crate::battle_card_queries::card;
 
 /// Returns the display name for a card
 pub fn display_name(identity: CardIdentity) -> String {
-    match identity.tmp_to_card_name() {
+    match card_descriptor::get_base_card_id(identity) {
         CardName::TestVanillaCharacter => "Character".to_string(),
         CardName::TestDissolve => "Dissolve".to_string(),
         CardName::TestNamedDissolve => "Immolate".to_string(),
@@ -63,7 +64,7 @@ pub fn base_energy_cost_for_id(battle: &BattleState, card_id: impl CardIdType) -
 /// Returns the base energy cost of a card specified in the card definition, or
 /// None if it has no energy cost (e.g. modal cards).
 pub fn base_energy_cost(identity: CardIdentity) -> Option<Energy> {
-    match identity.tmp_to_card_name() {
+    match card_descriptor::get_base_card_id(identity) {
         CardName::TestVanillaCharacter => Some(Energy(2)),
         CardName::TestDissolve => Some(Energy(2)),
         CardName::TestNamedDissolve => Some(Energy(2)),
@@ -111,7 +112,7 @@ pub fn base_spark_for_id(battle: &BattleState, card_id: impl CardIdType) -> Opti
 }
 
 pub fn base_spark(identity: CardIdentity) -> Option<Spark> {
-    match identity.tmp_to_card_name() {
+    match card_descriptor::get_base_card_id(identity) {
         CardName::TestVanillaCharacter => Some(Spark(5)),
         CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => Some(Spark(5)),
         CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => Some(Spark(1)),
@@ -135,7 +136,7 @@ pub fn card_subtype(_battle: &BattleState, _card_id: impl CardIdType) -> Option<
 }
 
 pub fn card_type_by_name(identity: CardIdentity) -> CardType {
-    match identity.tmp_to_card_name() {
+    match card_descriptor::get_base_card_id(identity) {
         CardName::TestVanillaCharacter => CardType::Character,
         CardName::TestDissolve => CardType::Event,
         CardName::TestNamedDissolve => CardType::Event,
@@ -174,7 +175,7 @@ pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
 }
 
 pub fn is_fast_by_name(identity: CardIdentity) -> bool {
-    match identity.tmp_to_card_name() {
+    match card_descriptor::get_base_card_id(identity) {
         CardName::TestVanillaCharacter => false,
         CardName::TestDissolve => true,
         CardName::TestNamedDissolve => true,

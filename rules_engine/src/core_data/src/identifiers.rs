@@ -43,44 +43,6 @@ pub struct QuestId(pub Uuid);
 )]
 pub struct CardIdentity(pub usize);
 
-impl CardIdentity {
-    pub fn tmp_to_card_name(self) -> CardName {
-        match self.0 {
-            0 => CardName::TestVanillaCharacter,
-            1 => CardName::TestDissolve,
-            2 => CardName::TestNamedDissolve,
-            3 => CardName::TestCounterspellUnlessPays,
-            4 => CardName::TestCounterspell,
-            5 => CardName::TestCounterspellCharacter,
-            6 => CardName::TestVariableEnergyDraw,
-            7 => CardName::TestDrawOne,
-            8 => CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
-            9 => CardName::TestTriggerGainSparkOnPlayCardEnemyTurn,
-            10 => CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn,
-            11 => CardName::TestActivatedAbilityDrawCard,
-            12 => CardName::TestMultiActivatedAbilityDrawCardCharacter,
-            13 => CardName::TestFastActivatedAbilityDrawCardCharacter,
-            14 => CardName::TestFastMultiActivatedAbilityDrawCardCharacter,
-            15 => CardName::TestActivatedAbilityDissolveCharacter,
-            16 => CardName::TestDualActivatedAbilityCharacter,
-            17 => CardName::TestForeseeOne,
-            18 => CardName::TestForeseeTwo,
-            19 => CardName::TestForeseeOneDrawACard,
-            20 => CardName::TestDrawOneReclaim,
-            21 => CardName::TestForeseeOneReclaim,
-            22 => CardName::TestForeseeOneDrawReclaim,
-            23 => CardName::TestReturnVoidCardToHand,
-            24 => CardName::TestReturnOneOrTwoVoidEventCardsToHand,
-            25 => CardName::TestModalDrawOneOrDrawTwo,
-            26 => CardName::TestModalDrawOneOrDissolveEnemy,
-            27 => CardName::TestModalReturnToHandOrDrawTwo,
-            28 => CardName::TestReturnToHand,
-            29 => CardName::TestPreventDissolveThisTurn,
-            _ => panic!("Invalid card identity: {}", self.0),
-        }
-    }
-}
-
 /// Identifies the base rules for a card.
 ///
 /// The 'base card' describes the abilities of a card before any modifications
@@ -126,12 +88,6 @@ pub enum CardName {
     TestModalReturnToHandOrDrawTwo,
     TestReturnToHand,
     TestPreventDissolveThisTurn,
-}
-
-impl CardName {
-    pub fn tmp_to_card_identity(self) -> CardIdentity {
-        CardIdentity(self as usize)
-    }
 }
 
 /// Number of an ability within a card.

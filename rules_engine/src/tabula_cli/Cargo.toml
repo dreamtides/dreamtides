@@ -20,6 +20,7 @@ bench = false
 [dependencies]
 core_data = { path = "../core_data" }
 parser = { path = "../parser" }
+quest_state = { path = "../quest_state" }
 tabula_data = { path = "../tabula_data" }
 
 anyhow = { workspace = true }

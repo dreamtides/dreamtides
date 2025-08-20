@@ -17,6 +17,7 @@ battle_queries = { path = "../../src/battle_queries" }
 battle_state = { path = "../../src/battle_state" }
 core_data = { path = "../../src/core_data" }
 game_creation = { path = "../../src/game_creation" }
+quest_state = { path = "../../src/quest_state" }
 
 rand = { workspace = true }
 rand_xoshiro = { workspace = true }
