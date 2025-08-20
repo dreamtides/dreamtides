@@ -15,7 +15,7 @@ use tabula_cli::google_sheet::GoogleSheet;
 use tabula_cli::spreadsheet::Spreadsheet;
 use tabula_cli::{tabula_codegen, tabula_sync};
 use tabula_data::base_card_definition::BaseCardDefinitionRaw;
-use tabula_data::localized_strings::LanguageId;
+use tabula_data::localized_strings::{LanguageId, StringContext};
 use tabula_data::tabula::{self, TabulaBuildContext};
 use tabula_data::tabula_table::Table;
 use uuid::uuid;
@@ -85,7 +85,14 @@ async fn main() -> Result<()> {
         .get(&BaseCardId(uuid!("e06a8cfe-483f-42c0-aac8-9c12b21b3f99")))
         .expect("test card not found")
         .displayed_rules_text;
-    println!("{:?}", tabula.strings.format_display_string(text.clone(), &FluentArgs::new()));
+    println!(
+        "{:?}",
+        tabula.strings.format_display_string(
+            text.clone(),
+            StringContext::CardText,
+            FluentArgs::new()
+        )
+    );
 
     if let Some(path) = args.string_ids.as_deref() {
         tabula_codegen::generate_string_ids(&tabula_raw, path)?;

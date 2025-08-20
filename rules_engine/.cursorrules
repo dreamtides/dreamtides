@@ -8,13 +8,16 @@ all times.
 - Avoid creating new variables via "let" statements, just write code inline.
 - DO NOT add inline comments to code
 - DO NOT delete existing inline comments
-- DO NOT fully-qualify names in generated code ever
-- Always use imports to modules, never fully-qualify names and never use direct function names:
-  - WRONG: crate::zone_mutations::move_card::to_destination_zone()
-  - WRONG: to_destination_zone()
-  - WRONG: battle_state::battle_cards::zone::Zone::Battlefield
-  - CORRECT: Zone::Battlefield
-  - CORRECT: move_card::to_destination_zone()
+- DO NOT fully-qualify names in code ever
+- Function calls and enum values have exactly one qualifier, struct names have
+  zero qualifiers:
+  - WRONG FUNCTION CALL: crate::zone_mutations::move_card::to_destination_zone()
+  - WRONG FUNCTION CALL: to_destination_zone()
+  - WRONG ENUM VALUE: battle_state::battle_cards::zone::Zone::Battlefield
+  - WRONG STRUCT NAME: battle_state::BattleState
+  - CORRECT ENUM VALUE: Zone::Battlefield
+  - CORRECT FUNCTION CALL: move_card::to_destination_zone()
+  - CORRECT STRUCT NAME: BattleState
 - Public functions and types go at the TOP of the file, then private ones.
 - Don't add "pub use" for anything.
 

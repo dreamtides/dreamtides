@@ -28,9 +28,6 @@ pub const EYE_SLASH_ICON: StringId = StringId(uuid!("2ca2c1dd-20f7-410b-9f5d-ce3
 /// "Star of life" icon used to represent non-numeric costs
 pub const ASTERISK_ICON: StringId = StringId(uuid!("fd603588-7ab8-48c8-93b0-2bf6afc59325"));
 
-/// Blue colored energy icon
-pub const E_COLOR: StringId = StringId(uuid!("62a93bf3-2794-4069-a68f-bd39308b9c49"));
-
 /// Formatting for ability keywords in card rules text
 pub const KEYWORD: StringId = StringId(uuid!("e5e10712-21d7-41f4-a550-16918f39f8f7"));
 

@@ -14,6 +14,24 @@ use crate::tabula_table::{HasId, Table};
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, Eq, PartialEq, Hash)]
 pub struct StringId(pub Uuid);
 
+/// Describes the context in which a string is used.
+///
+/// Used to e.g. correctly determine colors colored elements.
+#[derive(Debug, Clone, Copy, Ord, PartialOrd, Eq, PartialEq)]
+pub enum StringContext {
+    Interface,
+    CardText,
+}
+
+impl StringContext {
+    pub fn key(&self) -> &'static str {
+        match self {
+            StringContext::Interface => "interface",
+            StringContext::CardText => "card-text",
+        }
+    }
+}
+
 /// A language identifier.
 #[derive(Debug, Clone, Copy, Ord, PartialOrd, Eq, PartialEq)]
 pub enum LanguageId {
@@ -174,7 +192,13 @@ impl LocalizedStrings {
     /// - ERR6: Fluent Formatting Error: Overriding {kind} id={id}
     /// - ERR7: Fluent Parser Error: {parser_error}
     /// - ERR8: Fluent Resolver Error: {resolver_error}
-    pub fn format_pattern(&self, id: StringId, args: &FluentArgs) -> String {
+    pub fn format_pattern(
+        &self,
+        id: StringId,
+        context: StringContext,
+        mut args: FluentArgs,
+    ) -> String {
+        args.set("context", context.key());
         let mut bundle = FluentBundle::default();
         bundle.set_use_isolating(false);
         if bundle.add_resource(self.resource.as_ref()).is_err() {
@@ -193,17 +217,23 @@ impl LocalizedStrings {
             None => return "ERR5: Missing Value".to_string(),
         };
         let mut errors = vec![];
-        let out = bundle.format_pattern(pattern, Some(args), &mut errors).into_owned();
+        let out = bundle.format_pattern(pattern, Some(&args), &mut errors).into_owned();
         if errors.is_empty() { out } else { format_error_details(&errors) }
     }
 
-    pub fn format_display_string(&self, s: String, args: &FluentArgs) -> String {
+    pub fn format_display_string(
+        &self,
+        s: String,
+        context: StringContext,
+        mut args: FluentArgs,
+    ) -> String {
+        args.set("context", context.key());
         let mut bundle = FluentBundle::default();
         bundle.set_use_isolating(false);
         if bundle.add_resource(self.resource.as_ref()).is_err() {
             return "ERR3: Add Resource Failed".to_string();
         }
-        let ftl = format!("tmp-for-display = {s}");
+        let ftl = format!("tmp-for-display = {}", normalize_literal(&s));
         let (temp_res, parser_errs_opt) = match FluentResource::try_new(ftl) {
             Ok(res) => (res, None),
             Err((res, errs)) => (res, Some(errs)),
@@ -225,22 +255,51 @@ impl LocalizedStrings {
             None => return "ERR5: Missing Value".to_string(),
         };
         let mut errors = vec![];
-        let out = bundle.format_pattern(pattern, Some(args), &mut errors).into_owned();
+        let out = bundle.format_pattern(pattern, Some(&args), &mut errors).into_owned();
         if errors.is_empty() { out } else { format_error_details(&errors) }
     }
 }
 
+/// Normalizes a string to a format that can be used in Fluent.
+///
+/// This involves replacing our custom Unicode escape sequences "\u(ABCD)" with
+/// the actual characters.
 fn normalize_literal(s: &str) -> String {
-    let trimmed = s.trim();
-    if trimmed.starts_with("\\u[") && trimmed.ends_with("]") && trimmed.len() > 4 {
-        let hex = &trimmed[3..trimmed.len() - 1];
-        match u32::from_str_radix(hex, 16).ok().and_then(std::char::from_u32) {
-            Some(ch) => ch.to_string(),
-            None => s.to_string(),
+    let mut out = String::with_capacity(s.len());
+    let mut i = 0;
+    loop {
+        match s[i..].find("\\u(") {
+            Some(rel) => {
+                let start = i + rel;
+                out.push_str(&s[i..start]);
+                let rest = &s[start + 3..];
+                match rest.find(')') {
+                    Some(end_rel) => {
+                        let hex = &rest[..end_rel];
+                        match u32::from_str_radix(hex, 16).ok().and_then(std::char::from_u32) {
+                            Some(ch) => {
+                                out.push(ch);
+                                i = start + 3 + end_rel + 1;
+                            }
+                            None => {
+                                out.push_str("\\u(");
+                                i = start + 3;
+                            }
+                        }
+                    }
+                    None => {
+                        out.push_str(&s[start..]);
+                        break;
+                    }
+                }
+            }
+            None => {
+                out.push_str(&s[i..]);
+                break;
+            }
         }
-    } else {
-        s.to_string()
     }
+    out
 }
 
 fn format_error_details(errors: &[FluentError]) -> String {
