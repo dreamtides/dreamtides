@@ -578,7 +578,7 @@
       "id": "76b6d00c-5a28-4ee3-9655-e4fea1d8a4d8",
       "name_en_us": "Test Counterspell Unless Pays",
       "energy_cost": "1",
-      "rules_text_en_us": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e: 2)}.",
+      "rules_text_en_us": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}.",
       "abilities": [
         {
           "Event": {
@@ -606,7 +606,7 @@
       "id": "e06a8cfe-483f-42c0-aac8-9c12b21b3f99",
       "name_en_us": "Test Variable Energy Draw",
       "energy_cost": "2",
-      "rules_text_en_us": "Pay one or more {e}: Draw {-cards(n: 1)} for each {e} spent.",
+      "rules_text_en_us": "Pay one or more {e}: Draw {-cards(n:1)} for each {e} spent.",
       "abilities": [
         {
           "Event": {
@@ -664,7 +664,7 @@
       "id": "d8a8541f-5b00-4d91-9518-aa8ae70ea450",
       "name_en_us": "Test Fast Mutiactivated Draw",
       "energy_cost": "2",
-      "rules_text_en_us": "{fma} {-energy-cost(e: 3)}: Draw {-cards(n: 1)}.",
+      "rules_text_en_us": "{fma} {-energy-cost(e:3)}: Draw {-cards(n:1)}.",
       "abilities": [
         {
           "Activated": {
@@ -790,7 +790,7 @@
       "id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
       "name_en_us": "Test Foresee Draw Reclaim ",
       "energy_cost": "1",
-      "rules_text_en_us": "{ability}{-Foresee(n:1)}. Draw {-cards(n:1)}.{end-ability}\n{ability}{-Reclaim-Cost(e: 3)}{end-ability}",
+      "rules_text_en_us": "{ability}{-Foresee(n:1)}. Draw {-cards(n:1)}.{end-ability}\n{ability}{-Reclaim-Cost(e:3)}{end-ability}",
       "abilities": [
         {
           "Event": {
@@ -851,6 +851,555 @@
       "is_fast": true,
       "rarity": "Special",
       "image_number": "1239919309"
+    },
+    {
+      "id": "3c1dbdc7-702e-4748-af3c-4fd837bcb404",
+      "name_en_us": "Test Named Dissolve",
+      "energy_cost": "2",
+      "rules_text_en_us": "{Dissolve} an enemy character.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "DissolveCharacter": {
+                  "target": {
+                    "Enemy": "Character"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "rarity": "Special",
+      "image_number": "1907487244"
+    },
+    {
+      "id": "68f90d08-9b51-424e-90d1-d15ddd1ece93",
+      "name_en_us": "Test Draw One",
+      "energy_cost": "0",
+      "rules_text_en_us": "Draw {-cards(n:1)}.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "DrawCards": {
+                  "count": 1
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "rarity": "Special",
+      "image_number": "489056605"
+    },
+    {
+      "id": "91c9ed93-5faf-4178-aec9-d631bbcf5d6a",
+      "name_en_us": "Test Trigger Gain Spark When Materialize Another Character",
+      "energy_cost": "0",
+      "rules_text_en_us": "Whenever you materialize another character, this character gains {-gained-spark(n:1)}.",
+      "abilities": [
+        {
+          "Triggered": {
+            "trigger": {
+              "Materialize": {
+                "Another": "Character"
+              }
+            },
+            "effect": {
+              "Effect": {
+                "GainsSpark": {
+                  "target": "This",
+                  "gains": 1
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Character",
+      "is_fast": false,
+      "spark": "5",
+      "rarity": "Special",
+      "image_number": "403770319"
+    },
+    {
+      "id": "82759c0b-5161-4f6f-91b3-d42c2b4e0f9f",
+      "name_en_us": "Test Trigger Gain Two Spark On Play Card Enemy Turn",
+      "energy_cost": "2",
+      "rules_text_en_us": "Whenever you materialize another character, this character gains {-gained-spark(n:2)}.",
+      "abilities": [
+        {
+          "Triggered": {
+            "trigger": {
+              "Materialize": {
+                "Another": "Character"
+              }
+            },
+            "effect": {
+              "Effect": {
+                "GainsSpark": {
+                  "target": "This",
+                  "gains": 2
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Character",
+      "is_fast": true,
+      "spark": "5",
+      "rarity": "Special",
+      "image_number": "403770319"
+    },
+    {
+      "id": "8dfeb2c1-2d72-411c-a8cc-7f84ca532c63",
+      "name_en_us": "Test Activated Ability Draw Card",
+      "energy_cost": "2",
+      "rules_text_en_us": "{a} {-energy-cost(e:1)}: Draw {-cards(n:1)}.",
+      "abilities": [
+        {
+          "Activated": {
+            "costs": [
+              {
+                "Energy": 1
+              }
+            ],
+            "effect": {
+              "Effect": {
+                "DrawCards": {
+                  "count": 1
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Character",
+      "is_fast": false,
+      "spark": "3",
+      "rarity": "Special",
+      "image_number": "1794244540"
+    },
+    {
+      "id": "56f944bb-333b-4e2c-9c8c-2068f41998c2",
+      "name_en_us": "Test Multiactivated Ability Draw Card Character",
+      "energy_cost": "0",
+      "rules_text_en_us": "{ma} {-energy-cost(e:1)}: Draw {-cards(n:1)}.",
+      "abilities": [
+        {
+          "Activated": {
+            "costs": [
+              {
+                "Energy": 1
+              }
+            ],
+            "effect": {
+              "Effect": {
+                "DrawCards": {
+                  "count": 1
+                }
+              }
+            },
+            "options": {
+              "is_fast": false,
+              "is_multi": true
+            }
+          }
+        }
+      ],
+      "card_type": "Character",
+      "is_fast": false,
+      "spark": "3",
+      "rarity": "Special",
+      "image_number": "1794244540"
+    },
+    {
+      "id": "44aa4a1a-e8c6-4969-94bc-5fdbe010395e",
+      "name_en_us": "Test Fast Activated Ability Draw Card Character",
+      "energy_cost": "0",
+      "rules_text_en_us": "{fa} {-energy-cost(e:1)}: Draw {-cards(n:1)}.",
+      "abilities": [
+        {
+          "Activated": {
+            "costs": [
+              {
+                "Energy": 1
+              }
+            ],
+            "effect": {
+              "Effect": {
+                "DrawCards": {
+                  "count": 1
+                }
+              }
+            },
+            "options": {
+              "is_fast": true,
+              "is_multi": false
+            }
+          }
+        }
+      ],
+      "card_type": "Character",
+      "is_fast": false,
+      "spark": "3",
+      "rarity": "Special",
+      "image_number": "1794244540"
+    },
+    {
+      "id": "785e0341-fdd8-4e05-acb4-cbceed70ea6c",
+      "name_en_us": "Test Activated Ability Dissolve Character",
+      "energy_cost": "3",
+      "rules_text_en_us": "{a} {-energy-cost(e:2)}: {Dissolve} an enemy character.",
+      "abilities": [
+        {
+          "Activated": {
+            "costs": [
+              {
+                "Energy": 2
+              }
+            ],
+            "effect": {
+              "Effect": {
+                "DissolveCharacter": {
+                  "target": {
+                    "Enemy": "Character"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Character",
+      "is_fast": false,
+      "spark": "4",
+      "rarity": "Special",
+      "image_number": "1794244540"
+    },
+    {
+      "id": "3af84464-874a-4fd2-89cb-1986dee59ae1",
+      "name_en_us": "Test Dual Activated Ability Character",
+      "energy_cost": "4",
+      "rules_text_en_us": "{ability}{a} {-energy-cost(e:1)}: Draw {-cards(n:1)}.{end-ability}\n{ability}{a} {-energy-cost(e:2)}: Draw {-cards(n:2)}.{end-ability}",
+      "abilities": [
+        {
+          "Activated": {
+            "costs": [
+              {
+                "Energy": 1
+              }
+            ],
+            "effect": {
+              "Effect": {
+                "DrawCards": {
+                  "count": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "Activated": {
+            "costs": [
+              {
+                "Energy": 2
+              }
+            ],
+            "effect": {
+              "Effect": {
+                "DrawCards": {
+                  "count": 2
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Character",
+      "is_fast": false,
+      "spark": "3",
+      "rarity": "Special",
+      "image_number": "1794244540"
+    },
+    {
+      "id": "8217b59b-6573-484b-9f3b-203e86e1d841",
+      "name_en_us": "Test Foresee One",
+      "energy_cost": "1",
+      "rules_text_en_us": "{-Foresee(n:1)}.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "Foresee": {
+                  "count": 1
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "rarity": "Special",
+      "image_number": "489056605"
+    },
+    {
+      "id": "89e34264-a69c-48a4-867e-add7b811394b",
+      "name_en_us": "Test Foresee Two",
+      "energy_cost": "1",
+      "rules_text_en_us": "{-Foresee(n:2)}.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "Foresee": {
+                  "count": 2
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "rarity": "Special",
+      "image_number": "489056605"
+    },
+    {
+      "id": "820faab3-37c1-46fa-a314-5f023ec739a1",
+      "name_en_us": "Test Foresee One Draw A Card",
+      "energy_cost": "1",
+      "rules_text_en_us": "{-Foresee(n:1)}. Draw {-cards(n:1)}.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "List": [
+                {
+                  "effect": {
+                    "Foresee": {
+                      "count": 1
+                    }
+                  },
+                  "optional": false
+                },
+                {
+                  "effect": {
+                    "DrawCards": {
+                      "count": 1
+                    }
+                  },
+                  "optional": false
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "rarity": "Special",
+      "image_number": "1328168243"
+    },
+    {
+      "id": "0cba1386-d1b6-4f57-8ccc-d92f8be01d7c",
+      "name_en_us": "Test Draw One Reclaim",
+      "energy_cost": "2",
+      "rules_text_en_us": "{ability}Draw {-cards(n:1)}.{end-ability}\n{ability}{-Reclaim-Cost(e:1)}{end-ability}",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "DrawCards": {
+                  "count": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "Named": {
+            "Reclaim": 1
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "rarity": "Special",
+      "image_number": "1328168243"
+    },
+    {
+      "id": "86ffc58b-96db-4106-a892-8ae2a70719e6",
+      "name_en_us": "Test Foresee One Reclaim",
+      "energy_cost": "1",
+      "rules_text_en_us": "{ability}{-Foresee(n:1)}.{end-ability}\n{ability}{-Reclaim-Cost(e:3)}{end-ability}",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "Foresee": {
+                  "count": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "Named": {
+            "Reclaim": 3
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "rarity": "Special",
+      "image_number": "1328168243"
+    },
+    {
+      "id": "46e20fe4-36ca-438d-91a6-fac880ee9495",
+      "name_en_us": "Test Return Void Card To Hand",
+      "energy_cost": "1",
+      "rules_text_en_us": "Return a card from your void to your hand.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "ReturnFromYourVoidToHand": {
+                  "target": {
+                    "YourVoid": "Card"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "rarity": "Special",
+      "image_number": "1328168243"
+    },
+    {
+      "id": "029889e9-25bc-438f-a492-8813febd65d8",
+      "name_en_us": "Test Modal Draw One Or Draw Two",
+      "energy_cost": "*",
+      "rules_text_en_us": "{choose-one}\n{mode}{-energy-cost(e:1)}: Draw {-cards(n:1)}.{end-mode}\n{mode}{-energy-cost(e:3)}: Draw {-cards(n:2)}.{end-mode}",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Modal": [
+                {
+                  "energy_cost": 1,
+                  "effect": {
+                    "Effect": {
+                      "DrawCards": {
+                        "count": 1
+                      }
+                    }
+                  }
+                },
+                {
+                  "energy_cost": 3,
+                  "effect": {
+                    "Effect": {
+                      "DrawCards": {
+                        "count": 2
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": false,
+      "rarity": "Special",
+      "image_number": "1200949264"
+    },
+    {
+      "id": "9847b3fc-1e7f-44e5-90af-1240ae12aaee",
+      "name_en_us": "Test Modal Draw One Or Dissolve Enemy",
+      "energy_cost": "*",
+      "rules_text_en_us": "{choose-one}\n{mode}{-energy-cost(e:1)}: Draw {-cards(n:1)}.{end-mode}\n{mode}{-energy-cost(e:2)}: {Dissolve} an enemy character.{end-mode}",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Modal": [
+                {
+                  "energy_cost": 1,
+                  "effect": {
+                    "Effect": {
+                      "DrawCards": {
+                        "count": 1
+                      }
+                    }
+                  }
+                },
+                {
+                  "energy_cost": 2,
+                  "effect": {
+                    "Effect": {
+                      "DissolveCharacter": {
+                        "target": {
+                          "Enemy": "Character"
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "rarity": "Special",
+      "image_number": "1200949264"
+    },
+    {
+      "id": "cf2f292b-f02c-4130-aff7-3f48fd147633",
+      "name_en_us": "Test Return To Hand",
+      "energy_cost": "1",
+      "rules_text_en_us": "Return an enemy character to hand.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "ReturnToHand": {
+                  "target": {
+                    "Enemy": "Character"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "rarity": "Special",
+      "image_number": "1200949264"
     }
   ]
 }
