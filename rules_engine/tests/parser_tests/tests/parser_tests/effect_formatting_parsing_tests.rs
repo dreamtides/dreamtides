@@ -4,7 +4,7 @@ use parser_tests::parser_test_utils::parse;
 #[test]
 fn test_multiple_effects() {
     let result = parse(
-        "$activated $1: This character gains {-gained-spark(n:1)}. You may banish a card from the enemy's void.",
+        "$activated {-energy-cost(e: 1)}: This character gains {-gained-spark(n:1)}. You may banish a card from the enemy's void.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -150,7 +150,9 @@ fn test_until_end_of_turn() {
 
 #[test]
 fn test_optional_cost() {
-    let result = parse("You may pay $1 to return this character from your void to your hand.");
+    let result = parse(
+        "You may pay {-energy-cost(e: 1)} to return this character from your void to your hand.",
+    );
     assert_ron_snapshot!(
         result,
         @r###"

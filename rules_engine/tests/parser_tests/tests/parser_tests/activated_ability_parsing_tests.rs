@@ -54,7 +54,7 @@ fn test_fast_activated_grant_aegis() {
 #[test]
 fn test_activated_spark_equal_to_warriors() {
     let result = parse(
-        "$fastActivated $2: Another character you control gains {-gained-spark(n:1)} until your next main phase for each {cardtype: warrior} you control.",
+        "$fastActivated {-energy-cost(e: 2)}: Another character you control gains {-gained-spark(n:1)} until your next main phase for each {cardtype: warrior} you control.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -78,7 +78,7 @@ fn test_activated_spark_equal_to_warriors() {
 
 #[test]
 fn test_multi_activated_draw() {
-    let result = parse("$multiActivated $2: Draw a card.");
+    let result = parse("$multiActivated {-energy-cost(e: 2)}: Draw a card.");
     assert_ron_snapshot!(
         result,
         @r###"
@@ -122,8 +122,9 @@ fn test_abandon_character_with_spark() {
 
 #[test]
 fn test_activated_ability_multiple_costs() {
-    let result =
-        parse("$multiActivated $2, Abandon another character with spark 1 or less: Draw 2 cards.");
+    let result = parse(
+        "$multiActivated {-energy-cost(e: 2)}, Abandon another character with spark 1 or less: Draw 2 cards.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       Activated(ActivatedAbility(
@@ -165,7 +166,9 @@ fn test_discard_hand_gain_energy() {
 
 #[test]
 fn test_multiple_costs_abandon_this() {
-    let result = parse("$activated $2, Abandon this character, discard your hand: Draw 3 cards.");
+    let result = parse(
+        "$activated {-energy-cost(e: 2)}, Abandon this character, discard your hand: Draw 3 cards.",
+    );
     assert_ron_snapshot!(
         result,
         @r###"

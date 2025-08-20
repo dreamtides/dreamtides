@@ -8,7 +8,7 @@ use crate::parser_utils::{ErrorType, count, number, numeric, phrase};
 use crate::{card_predicate_parser, collection_expression_parser, determiner_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
-    choice((numeric("$", Energy, "").map(Cost::Energy), standard_cost()))
+    choice((numeric("{-energy-cost(e:", Energy, ")}").map(Cost::Energy), standard_cost()))
 }
 
 /// Costs written as a standard verb phrase, for example "pay $1" or "discard a
@@ -16,7 +16,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
 pub fn standard_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
     choice((
         phrase("pay one or more {e}").to(Cost::SpendOneOrMoreEnergy),
-        numeric("pay $", Energy, "").map(Cost::Energy),
+        numeric("pay {-energy-cost(e:", Energy, ")}").map(Cost::Energy),
         phrase("banish a card from your void").to(Cost::BanishCardsFromYourVoid(1)),
         numeric("banish", count, "cards from your void").map(Cost::BanishCardsFromYourVoid),
         phrase("banish a card from the enemy's void").to(Cost::BanishCardsFromEnemyVoid(1)),

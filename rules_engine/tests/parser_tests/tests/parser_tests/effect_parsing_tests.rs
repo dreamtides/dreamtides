@@ -257,7 +257,7 @@ fn test_banish_up_to_two() {
 #[test]
 fn test_banish_up_to_two_activated() {
     let result = parse(
-        "$activated $3: Banish up to two other characters you control, then materialize them.",
+        "$activated {-energy-cost(e: 3)}: Banish up to two other characters you control, then materialize them.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -937,8 +937,9 @@ fn test_banish_enemy_void() {
 
 #[test]
 fn test_spark_becomes() {
-    let result =
-        parse("$activated $3: The spark of each {cardtype: spirit animal} you control becomes 5.");
+    let result = parse(
+        "$activated {-energy-cost(e: 3)}: The spark of each {cardtype: spirit animal} you control becomes 5.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       Activated(ActivatedAbility(
@@ -1055,7 +1056,9 @@ fn test_banish_until_next_main() {
 
 #[test]
 fn test_materialize_copy_character() {
-    let result = parse("$multiActivated $4: Materialize a copy of another character you control.");
+    let result = parse(
+        "$multiActivated {-energy-cost(e: 4)}: Materialize a copy of another character you control.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       Activated(ActivatedAbility(
