@@ -25,6 +25,18 @@
       "en_us": "\\u(f101)"
     },
     {
+      "id": "e0eb0864-3150-4ac5-a903-258ada0f906a",
+      "name": "fa",
+      "description": "Fast + Activated icon",
+      "en_us": "{f}<space=\\\"-0.25px\\\">{a}"
+    },
+    {
+      "id": "1921caf1-b581-4feb-b956-b27a553cbc43",
+      "name": "fma",
+      "description": "Fast + Multi-Activated icon",
+      "en_us": "{f}<space=\\\"-0.25px\\\">{ma}"
+    },
+    {
       "id": "eeb2bbe9-1952-43fa-9ae6-12512d005829",
       "name": "bug-icon",
       "description": "Dev menu icon",
@@ -62,9 +74,9 @@
     },
     {
       "id": "cc5c5509-69c5-4c1f-8faa-b9948029dcb8",
-      "name": "-cost",
+      "name": "-energy-cost",
       "description": "Formatting for an amount of energy paid as a cost",
-      "en_us": "<color=#00838F><b>{$energy}{e}</b></color>"
+      "en_us": "<color=#00838F><b>{$e}{e}</b></color>"
     },
     {
       "id": "87fcba1e-5935-4de4-8048-81a343f072a5",
@@ -498,7 +510,7 @@
       "id": "76b6d00c-5a28-4ee3-9655-e4fea1d8a4d8",
       "name_en_us": "Test Counterspell Unless Pays",
       "energy_cost": "1",
-      "rules_text_en_us": "{Prevent} a played enemy event unless the enemy pays {-cost(energy: 2)}.",
+      "rules_text_en_us": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e: 2)}.",
       "abilities": [
         {
           "Event": {
@@ -584,6 +596,40 @@
       "spark": null,
       "rarity": "Common",
       "image_number": "403770319"
+    },
+    {
+      "id": "d8a8541f-5b00-4d91-9518-aa8ae70ea450",
+      "name_en_us": "Test Fast Mutiactivated Draw",
+      "energy_cost": "2",
+      "rules_text_en_us": "{fma} {-energy-cost(e: 3)}: Draw {-cards(n: 1)}.",
+      "abilities": [
+        {
+          "Activated": {
+            "costs": [
+              {
+                "Energy": 3
+              }
+            ],
+            "effect": {
+              "Effect": {
+                "DrawCards": {
+                  "count": 1
+                }
+              }
+            },
+            "options": {
+              "is_fast": true,
+              "is_multi": true
+            }
+          }
+        }
+      ],
+      "card_type": "Character",
+      "subtype": null,
+      "is_fast": false,
+      "spark": null,
+      "rarity": "Common",
+      "image_number": "1794244540"
     }
   ]
 }

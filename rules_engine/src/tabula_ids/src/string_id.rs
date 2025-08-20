@@ -13,6 +13,12 @@ pub const A: StringId = StringId(uuid!("adc9a41d-fd82-49b5-a099-a9f10a73afad"));
 /// Multi-activated icon
 pub const MA: StringId = StringId(uuid!("121fc3af-6abd-4a90-9197-43c6e18eeca2"));
 
+/// Fast + Activated icon
+pub const FA: StringId = StringId(uuid!("e0eb0864-3150-4ac5-a903-258ada0f906a"));
+
+/// Fast + Multi-Activated icon
+pub const FMA: StringId = StringId(uuid!("1921caf1-b581-4feb-b956-b27a553cbc43"));
+
 /// Dev menu icon
 pub const BUG_ICON: StringId = StringId(uuid!("eeb2bbe9-1952-43fa-9ae6-12512d005829"));
 
@@ -32,7 +38,7 @@ pub const ASTERISK_ICON: StringId = StringId(uuid!("fd603588-7ab8-48c8-93b0-2bf6
 pub const KEYWORD: StringId = StringId(uuid!("e5e10712-21d7-41f4-a550-16918f39f8f7"));
 
 /// Formatting for an amount of energy paid as a cost
-pub const COST: StringId = StringId(uuid!("cc5c5509-69c5-4c1f-8faa-b9948029dcb8"));
+pub const ENERGY_COST: StringId = StringId(uuid!("cc5c5509-69c5-4c1f-8faa-b9948029dcb8"));
 
 /// Formatting for a number of cards
 pub const CARDS: StringId = StringId(uuid!("87fcba1e-5935-4de4-8048-81a343f072a5"));
