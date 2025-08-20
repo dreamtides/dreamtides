@@ -1270,7 +1270,7 @@ fn test_each_player_abandons_characters() {
 
 #[test]
 fn test_prevent_unless_pays_cost() {
-    let result = parse("{Prevent} a played enemy event unless they pay $2.");
+    let result = parse("{Prevent} a played enemy event unless the enemy pays {-cost(energy: 2)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(

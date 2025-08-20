@@ -61,6 +61,12 @@
       "en_us": "<color=#AA00FF><b>{$kw}</b></color>"
     },
     {
+      "id": "cc5c5509-69c5-4c1f-8faa-b9948029dcb8",
+      "name": "-cost",
+      "description": "Formatting for an amount of energy paid as a cost",
+      "en_us": "<color=#00838F><b>{$energy}{e}</b></color>"
+    },
+    {
       "id": "2e44ee4c-3218-45bf-a29e-0508f853c873",
       "name": "foresee",
       "description": "Foresee keyword ability",
@@ -475,6 +481,36 @@
       "spark": null,
       "rarity": "Common",
       "image_number": "1282908322"
+    },
+    {
+      "id": "76b6d00c-5a28-4ee3-9655-e4fea1d8a4d8",
+      "name_en_us": "Test Counterspell Unless Pays",
+      "energy_cost": "1",
+      "rules_text_en_us": "{Prevent} a played enemy event unless the enemy pays {-cost(energy: 2)}.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "CounterspellUnlessPaysCost": {
+                  "target": {
+                    "Enemy": "Event"
+                  },
+                  "cost": {
+                    "Energy": 2
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "subtype": null,
+      "is_fast": true,
+      "spark": null,
+      "rarity": "Common",
+      "image_number": "2123360837"
     }
   ]
 }

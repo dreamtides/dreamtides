@@ -285,8 +285,8 @@ fn kindle<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
 fn prevent_unless_pays_cost<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("{prevent}")
         .ignore_then(determiner_parser::target_parser())
-        .then_ignore(phrase("unless they"))
-        .then(cost_parser::their_cost())
+        .then_ignore(phrase("unless the enemy"))
+        .then(cost_parser::third_person_singular_present_tense_cost())
         .map(|(target, cost)| StandardEffect::CounterspellUnlessPaysCost { target, cost })
 }
 

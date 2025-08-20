@@ -129,7 +129,7 @@ fn play_from_void<'a>() -> impl Parser<'a, &'a str, StandardStaticAbility, Error
         .ignore_then(this())
         .ignore_then(phrase("from your void"))
         .ignore_then(numeric("for $", Energy, "").or_not())
-        .then(phrase("by").ignore_then(cost_parser::inflected_additional_cost()).or_not())
+        .then(phrase("by").ignore_then(cost_parser::present_participle_additional_cost()).or_not())
         .then(phrase(". if you do,").ignore_then(standard_effect_parser::parser()).or_not())
         .map(|((energy_cost, additional_cost), if_you_do)| {
             StandardStaticAbility::PlayFromVoid(PlayFromVoid {
@@ -144,7 +144,7 @@ fn play_for_alternate_cost<'a>() -> impl Parser<'a, &'a str, StandardStaticAbili
     phrase("you may play")
         .ignore_then(this())
         .ignore_then(numeric("for $", Energy, ""))
-        .then(phrase("by").ignore_then(cost_parser::inflected_additional_cost()).or_not())
+        .then(phrase("by").ignore_then(cost_parser::present_participle_additional_cost()).or_not())
         .then(phrase(". if you do,").ignore_then(standard_effect_parser::parser()).or_not())
         .map(|((energy_cost, additional_cost), if_you_do)| {
             StandardStaticAbility::PlayForAlternateCost(AlternateCost {

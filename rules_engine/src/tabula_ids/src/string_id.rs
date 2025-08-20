@@ -31,6 +31,9 @@ pub const ASTERISK_ICON: StringId = StringId(uuid!("fd603588-7ab8-48c8-93b0-2bf6
 /// Formatting for ability keywords in card rules text
 pub const KEYWORD: StringId = StringId(uuid!("e5e10712-21d7-41f4-a550-16918f39f8f7"));
 
+/// Formatting for an amount of energy paid as a cost
+pub const COST: StringId = StringId(uuid!("cc5c5509-69c5-4c1f-8faa-b9948029dcb8"));
+
 /// Foresee keyword ability
 pub const FORESEE: StringId = StringId(uuid!("2e44ee4c-3218-45bf-a29e-0508f853c873"));
 

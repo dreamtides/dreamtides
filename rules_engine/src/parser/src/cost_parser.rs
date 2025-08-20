@@ -11,6 +11,8 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
     choice((numeric("$", Energy, "").map(Cost::Energy), standard_cost()))
 }
 
+/// Costs written as a standard verb phrase, for example "pay $1" or "discard a
+/// card".
 pub fn standard_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
     choice((
         numeric("pay $", Energy, "").map(Cost::Energy),
@@ -39,7 +41,7 @@ pub fn standard_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
 
 /// Alternate phrasing for costs, which are written in static abilities, for
 /// example "You may play this event for $0 by abandoning a character".
-pub fn inflected_additional_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
+pub fn present_participle_additional_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
     choice((
         phrase("banishing another card from your void").to(Cost::BanishCardsFromYourVoid(1)),
         phrase("banishing all other cards from your void").to(Cost::BanishAllCardsFromYourVoid),
@@ -63,23 +65,26 @@ pub fn inflected_additional_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorTy
     ))
 }
 
-pub fn their_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
+/// Costs written as a third-person singular present-tense verb phrase, for
+/// example "pays $1" or "discards a card".
+pub fn third_person_singular_present_tense_cost<'a>()
+-> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
     choice((
-        numeric("pay $", Energy, "").map(Cost::Energy),
-        phrase("banish a card from their void").to(Cost::BanishCardsFromYourVoid(1)),
-        numeric("banish", count, "cards from their void").map(Cost::BanishCardsFromYourVoid),
-        phrase("abandon a character or discard a card").to(Cost::AbandonACharacterOrDiscardACard),
-        phrase("abandon a dreamscape").to(Cost::AbandonDreamscapes(1)),
-        numeric("abandon", count, "dreamscapes").map(Cost::AbandonDreamscapes),
-        phrase("abandon")
+        numeric("pays {-cost(energy:", Energy, ")}").map(Cost::Energy),
+        phrase("banishes a card from their void").to(Cost::BanishCardsFromYourVoid(1)),
+        numeric("banishes", count, "cards from their void").map(Cost::BanishCardsFromYourVoid),
+        phrase("abandons a character or discards a card").to(Cost::AbandonACharacterOrDiscardACard),
+        phrase("abandons a dreamscape").to(Cost::AbandonDreamscapes(1)),
+        numeric("abandons", count, "dreamscapes").map(Cost::AbandonDreamscapes),
+        phrase("abandons")
             .ignore_then(determiner_parser::your_action())
             .map(|p| Cost::AbandonCharacters(p, 1)),
         abandon_characters_count(),
-        phrase("discard their hand").to(Cost::DiscardHand),
-        phrase("discard a")
+        phrase("discards their hand").to(Cost::DiscardHand),
+        phrase("discards a")
             .ignore_then(card_predicate_parser::parser())
             .map(|predicate| Cost::DiscardCards(predicate, 1)),
-        phrase("discard")
+        phrase("discards")
             .ignore_then(number(count))
             .then(card_predicate_parser::parser())
             .map(|(count, predicate)| Cost::DiscardCards(predicate, count)),
