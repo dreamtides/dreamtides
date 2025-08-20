@@ -4,7 +4,7 @@ use chumsky::Parser;
 use chumsky::prelude::*;
 
 use crate::parser_utils::{ErrorType, phrase};
-use crate::{condition_parser, cost_parser, standard_effect_parser};
+use crate::{condition_parser, cost_parser, modal_effect_parser, standard_effect_parser};
 
 pub fn event<'a>() -> impl Parser<'a, &'a str, EventAbility, ErrorType<'a>> {
     cost_parser::parser()
@@ -15,11 +15,20 @@ pub fn event<'a>() -> impl Parser<'a, &'a str, EventAbility, ErrorType<'a>> {
 }
 
 pub fn effect<'a>() -> impl Parser<'a, &'a str, Effect, ErrorType<'a>> {
-    single_effect().repeated().at_least(1).collect::<Vec<_>>().map(|effects| {
-        match effects.as_slice() {
-            [effect] => effect.clone().to_effect(),
-            effects => Effect::List(effects.to_vec()),
-        }
+    recursive(|effect| {
+        let seq = single_effect()
+            .repeated()
+            .at_least(1)
+            .collect::<Vec<_>>()
+            .map(|effects| match effects.as_slice() {
+                [effect] => effect.clone().to_effect(),
+                effects => Effect::List(effects.to_vec()),
+            })
+            .boxed();
+
+        let modal = modal_effect_parser::parser_with(effect.clone()).boxed();
+
+        choice((modal, seq)).boxed()
     })
 }
 

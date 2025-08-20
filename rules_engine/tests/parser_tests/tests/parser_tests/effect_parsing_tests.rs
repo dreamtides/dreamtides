@@ -1331,3 +1331,57 @@ fn test_return_one_or_two_events_from_your_void_to_your_hand() {
     ]
     "###);
 }
+
+#[test]
+fn test_modal_draw_one_or_draw_two() {
+    let result = parse(
+        "{choose-one}\n{mode-start}{-energy-cost(e: 1)}: Draw {-cards(n: 1)}.{mode-end}\n{mode-start}{-energy-cost(e: 3)}: Draw {-cards(n: 2)}.{mode-end}",
+    );
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(EventAbility(
+        effect: Modal([
+          ModalEffectChoice(
+            energy_cost: Energy(1),
+            effect: Effect(DrawCards(
+              count: 1,
+            )),
+          ),
+          ModalEffectChoice(
+            energy_cost: Energy(3),
+            effect: Effect(DrawCards(
+              count: 2,
+            )),
+          ),
+        ]),
+      )),
+    ]
+    "###);
+}
+
+#[test]
+fn test_modal_draw_one_or_dissolve_enemy() {
+    let result = parse(
+        "{choose-one}\n{mode-start}{-energy-cost(e: 1)}: Draw {-cards(n: 1)}.{mode-end}\n{mode-start}{-energy-cost(e: 2)}: {dissolve} an enemy character.{mode-end}",
+    );
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(EventAbility(
+        effect: Modal([
+          ModalEffectChoice(
+            energy_cost: Energy(1),
+            effect: Effect(DrawCards(
+              count: 1,
+            )),
+          ),
+          ModalEffectChoice(
+            energy_cost: Energy(2),
+            effect: Effect(DissolveCharacter(
+              target: Enemy(Character),
+            )),
+          ),
+        ]),
+      )),
+    ]
+    "###);
+}

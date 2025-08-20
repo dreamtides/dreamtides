@@ -82,13 +82,31 @@
       "id": "87fcba1e-5935-4de4-8048-81a343f072a5",
       "name": "-cards",
       "description": "Formatting for a number of cards",
-      "en_us": "{$n ->\n  [one] a card\n  *[other] $n cards\n}"
+      "en_us": "{$n ->\n  [one] a card\n  *[other] {$n} cards\n}"
     },
     {
       "id": "c49b155f-57a2-479a-bc45-254b2144d04b",
       "name": "-gained-spark",
       "description": "Formatting for gaining an amount of spark",
       "en_us": "+{$n} spark"
+    },
+    {
+      "id": "3057478f-1445-4b7d-8241-a90d97da7adf",
+      "name": "choose-one",
+      "description": "Formatting to select a single mode of a modal card",
+      "en_us": "Choose one:\\u(000A)"
+    },
+    {
+      "id": "3cc400d3-0594-4663-9187-e8c46613a21f",
+      "name": "mode-start",
+      "description": "Formatting that appears before a modal ability",
+      "en_us": " • <indent=1em><color=#00838F>"
+    },
+    {
+      "id": "4a6ed656-0057-44c7-977d-8c0cedf1f725",
+      "name": "mode-end",
+      "description": "Formatting that appears after a modal ability",
+      "en_us": "</indent>\\u(000A)"
     },
     {
       "id": "2e44ee4c-3218-45bf-a29e-0508f853c873",
@@ -476,7 +494,7 @@
       "subtype": null,
       "is_fast": true,
       "spark": null,
-      "rarity": "Common",
+      "rarity": "Special",
       "image_number": "1907487244"
     },
     {
@@ -503,7 +521,7 @@
       "subtype": null,
       "is_fast": true,
       "spark": null,
-      "rarity": "Common",
+      "rarity": "Special",
       "image_number": "1282908322"
     },
     {
@@ -533,7 +551,7 @@
       "subtype": null,
       "is_fast": true,
       "spark": null,
-      "rarity": "Common",
+      "rarity": "Special",
       "image_number": "2123360837"
     },
     {
@@ -560,7 +578,7 @@
       "subtype": null,
       "is_fast": true,
       "spark": null,
-      "rarity": "Common",
+      "rarity": "Special",
       "image_number": "489056605"
     },
     {
@@ -594,7 +612,7 @@
       "subtype": null,
       "is_fast": true,
       "spark": null,
-      "rarity": "Common",
+      "rarity": "Special",
       "image_number": "403770319"
     },
     {
@@ -628,7 +646,7 @@
       "subtype": null,
       "is_fast": false,
       "spark": null,
-      "rarity": "Common",
+      "rarity": "Special",
       "image_number": "1794244540"
     },
     {
@@ -656,8 +674,52 @@
       "subtype": null,
       "is_fast": false,
       "spark": null,
-      "rarity": "Common",
+      "rarity": "Special",
       "image_number": "644603677"
+    },
+    {
+      "id": "e8f937da-cca7-447d-a559-530d7c339325",
+      "name_en_us": "Test Modal Return To Hand Or Draw Two",
+      "energy_cost": "*",
+      "rules_text_en_us": "{choose-one}\n{mode-start}{-energy-cost(e:2)}: Return an enemy character to hand.{mode-end}\n{mode-start}{-energy-cost(e:3)}: Draw {-cards(n:2)}.{mode-end}",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Modal": [
+                {
+                  "energy_cost": 2,
+                  "effect": {
+                    "Effect": {
+                      "ReturnToHand": {
+                        "target": {
+                          "Enemy": "Character"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "energy_cost": 3,
+                  "effect": {
+                    "Effect": {
+                      "DrawCards": {
+                        "count": 2
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "subtype": null,
+      "is_fast": true,
+      "spark": null,
+      "rarity": "Special",
+      "image_number": "1200949264"
     }
   ]
 }

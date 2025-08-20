@@ -82,7 +82,7 @@ async fn main() -> Result<()> {
 
     let text = &tabula
         .test_cards
-        .get(&BaseCardId(uuid!("559e62a0-7ead-4136-8bd4-6cc58db4bef7")))
+        .get(&BaseCardId(uuid!("e8f937da-cca7-447d-a559-530d7c339325")))
         .expect("test card not found")
         .displayed_rules_text;
     println!(

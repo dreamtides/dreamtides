@@ -46,6 +46,15 @@ pub const CARDS: StringId = StringId(uuid!("87fcba1e-5935-4de4-8048-81a343f072a5
 /// Formatting for gaining an amount of spark
 pub const GAINED_SPARK: StringId = StringId(uuid!("c49b155f-57a2-479a-bc45-254b2144d04b"));
 
+/// Formatting to select a single mode of a modal card
+pub const CHOOSE_ONE: StringId = StringId(uuid!("3057478f-1445-4b7d-8241-a90d97da7adf"));
+
+/// Formatting that appears before a modal ability
+pub const MODE_START: StringId = StringId(uuid!("3cc400d3-0594-4663-9187-e8c46613a21f"));
+
+/// Formatting that appears after a modal ability
+pub const MODE_END: StringId = StringId(uuid!("4a6ed656-0057-44c7-977d-8c0cedf1f725"));
+
 /// Foresee keyword ability
 pub const FORESEE: StringId = StringId(uuid!("2e44ee4c-3218-45bf-a29e-0508f853c873"));
 

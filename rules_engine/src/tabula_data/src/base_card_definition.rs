@@ -115,16 +115,20 @@ pub fn build(
             Some(s) => match s.parse::<u32>() {
                 Ok(v) => Some(Energy(v)),
                 Err(_) => {
-                    let mut ierr = InitializationError::with_details(
-                        ErrorCode::InvalidUnsignedInteger,
-                        String::from("Invalid energy_cost"),
-                        row.energy_cost.clone().unwrap_or_default(),
-                    );
-                    ierr.tabula_sheet = Some(sheet_name.to_string());
-                    ierr.tabula_column = Some(String::from("energy_cost"));
-                    ierr.tabula_row = Some(row_index);
-                    errors.push(ierr);
-                    None
+                    if s == "*" {
+                        None
+                    } else {
+                        let mut ierr = InitializationError::with_details(
+                            ErrorCode::InvalidUnsignedInteger,
+                            String::from("Invalid energy_cost"),
+                            row.energy_cost.clone().unwrap_or_default(),
+                        );
+                        ierr.tabula_sheet = Some(sheet_name.to_string());
+                        ierr.tabula_column = Some(String::from("energy_cost"));
+                        ierr.tabula_row = Some(row_index);
+                        errors.push(ierr);
+                        None
+                    }
                 }
             },
             None => None,

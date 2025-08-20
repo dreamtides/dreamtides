@@ -138,7 +138,7 @@ tabula *args='':
       --key-file ./service_account_key.json \
       --spreadsheet-id "1AqSIZ_kwo3H3vfNsG-ubPV5GobkPVV_XEQEKZpRWqrA" \
       --string-ids rules_engine/src/tabula_ids/src/string_id.rs \
-      --write-json client/Assets/StreamingAssets/tabula.jsongo, but first things first
+      --write-json client/Assets/StreamingAssets/tabula.json
   cd rules_engine && cargo +nightly fmt
 
 insta:
