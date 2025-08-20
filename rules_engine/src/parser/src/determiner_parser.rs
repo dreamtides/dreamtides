@@ -22,6 +22,10 @@ pub fn target_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>>
             .then_ignore(phrase("you control"))
             .map(Predicate::Another),
         a_or_an()
+            .ignore_then(phrase("allied"))
+            .ignore_then(card_predicate_parser::parser())
+            .map(Predicate::Your),
+        a_or_an()
             .ignore_then(card_predicate_parser::parser())
             .then_ignore(phrase("you control"))
             .map(Predicate::Your),
@@ -55,6 +59,7 @@ pub fn counted_parser<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>
             .then_ignore(phrase("you control"))
             .map(Predicate::Another),
         phrase("enemy").ignore_then(card_predicate_parser::parser()).map(Predicate::Enemy),
+        phrase("allied").ignore_then(card_predicate_parser::parser()).map(Predicate::Your),
         card_predicate_parser::parser().then_ignore(phrase("you control")).map(Predicate::Your),
         card_predicate_parser::parser()
             .then_ignore(phrase("in your void"))
@@ -83,6 +88,7 @@ pub fn your_action<'a>() -> impl Parser<'a, &'a str, Predicate, ErrorType<'a>> {
         phrase("this character").to(Predicate::This),
         phrase("this event").to(Predicate::This),
         phrase("another").ignore_then(card_predicate_parser::parser()).map(Predicate::Another),
+        phrase("an allied").ignore_then(card_predicate_parser::parser()).map(Predicate::Your),
         phrase("an").ignore_then(card_predicate_parser::parser()).map(Predicate::Your),
         phrase("a").ignore_then(card_predicate_parser::parser()).map(Predicate::Your),
     ))

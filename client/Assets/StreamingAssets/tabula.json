@@ -169,6 +169,18 @@
       "en_us": "{-keyword(kw: \"Prevent\")}"
     },
     {
+      "id": "901b84a1-c886-447b-bd0d-005e240a23de",
+      "name": "anchored",
+      "description": "Anchored keyword ability",
+      "en_us": "{-keyword(kw: \"anchored\")}"
+    },
+    {
+      "id": "1bb69fb4-344a-48f2-a7a2-95a30ac4a2f2",
+      "name": "Anchored",
+      "description": "Anchored keyword ability, capitalized",
+      "en_us": "{-keyword(kw: \"Anchored\")}"
+    },
+    {
       "id": "66edfc8f-483b-4ad0-b37b-c66aa7c4347b",
       "name": "prompt-choose-character",
       "description": "Prompt message to target a character",
@@ -720,6 +732,33 @@
       "spark": null,
       "rarity": "Special",
       "image_number": "1200949264"
+    },
+    {
+      "id": "0b783ac8-6aea-438e-a2d5-87bf68548eda",
+      "name_en_us": "Test Prevent Dissolve This Turn",
+      "energy_cost": "1",
+      "rules_text_en_us": "Give an allied character {anchored} until end of turn.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "PreventDissolveThisTurn": {
+                  "target": {
+                    "Your": "Character"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "subtype": null,
+      "is_fast": true,
+      "spark": null,
+      "rarity": "Special",
+      "image_number": "1621160806"
     }
   ]
 }

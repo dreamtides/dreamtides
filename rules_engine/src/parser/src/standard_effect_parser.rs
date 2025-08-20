@@ -83,6 +83,7 @@ fn spark_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>
 fn gain_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     choice((
         dissolve_character(),
+        anchored_until_end_of_turn(),
         gains_aegis_this_turn(),
         gain_energy_for_each(),
         gain_energy(),
@@ -142,6 +143,13 @@ fn gain_spark<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     determiner_parser::target_parser()
         .then(numeric("gains {-gained-spark(n:", Spark, ")}"))
         .map(|(predicate, spark)| StandardEffect::GainsSpark { target: predicate, gains: spark })
+}
+
+fn anchored_until_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("give")
+        .ignore_then(determiner_parser::target_parser())
+        .then_ignore(phrase("{anchored} until end of turn"))
+        .map(|target| StandardEffect::PreventDissolveThisTurn { target })
 }
 
 fn gain_energy<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {

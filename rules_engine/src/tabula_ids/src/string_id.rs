@@ -70,6 +70,9 @@ pub const DISSOLVE: StringId = StringId(uuid!("5771085d-3c89-423f-be05-c728035e7
 /// Prevent keyword ability
 pub const PREVENT: StringId = StringId(uuid!("1a9e01e9-e7aa-4692-9b1b-5dd9e0b4a7f9"));
 
+/// Anchored keyword ability
+pub const ANCHORED: StringId = StringId(uuid!("901b84a1-c886-447b-bd0d-005e240a23de"));
+
 /// Prompt message to target a character
 pub const PROMPT_CHOOSE_CHARACTER: StringId =
     StringId(uuid!("66edfc8f-483b-4ad0-b37b-c66aa7c4347b"));

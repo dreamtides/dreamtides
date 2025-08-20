@@ -17,6 +17,20 @@ fn test_gain_energy_for_each() {
 }
 
 #[test]
+fn test_give_allied_character_anchored() {
+    let result = parse("Give an allied character {anchored} until end of turn.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(EventAbility(
+        effect: Effect(PreventDissolveThisTurn(
+          target: Your(Character),
+        )),
+      )),
+    ]
+    "###);
+}
+
+#[test]
 fn test_discover_materialized_ability() {
     let result = parse("{kw: discover} a character with a $materialized ability.");
     assert_ron_snapshot!(result, @r###"
