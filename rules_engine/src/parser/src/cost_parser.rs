@@ -71,7 +71,7 @@ pub fn present_participle_additional_cost<'a>() -> impl Parser<'a, &'a str, Cost
 pub fn third_person_singular_present_tense_cost<'a>()
 -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
     choice((
-        numeric("pays {-cost(energy:", Energy, ")}").map(Cost::Energy),
+        numeric("pays {-energy-cost(e:", Energy, ")}").map(Cost::Energy),
         phrase("banishes a card from their void").to(Cost::BanishCardsFromYourVoid(1)),
         numeric("banishes", count, "cards from their void").map(Cost::BanishCardsFromYourVoid),
         phrase("abandons a character or discards a card").to(Cost::AbandonACharacterOrDiscardACard),
