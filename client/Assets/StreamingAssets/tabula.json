@@ -630,6 +630,34 @@
       "spark": null,
       "rarity": "Common",
       "image_number": "1794244540"
+    },
+    {
+      "id": "559e62a0-7ead-4136-8bd4-6cc58db4bef7",
+      "name_en_us": "Test Return One Or Two Void Events",
+      "energy_cost": "4",
+      "rules_text_en_us": "Return one or two events from your void to your hand.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "ReturnUpToCountFromYourVoidToHand": {
+                  "target": {
+                    "YourVoid": "Event"
+                  },
+                  "count": 2
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "subtype": null,
+      "is_fast": false,
+      "spark": null,
+      "rarity": "Common",
+      "image_number": "644603677"
     }
   ]
 }

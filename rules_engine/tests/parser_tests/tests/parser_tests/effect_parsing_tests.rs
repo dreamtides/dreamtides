@@ -1302,3 +1302,32 @@ fn test_energy_spent_on_this_card() {
     ]
     "###);
 }
+
+#[test]
+fn test_return_card_from_your_void_to_your_hand() {
+    let result = parse("Return a card from your void to your hand.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(EventAbility(
+        effect: Effect(ReturnFromYourVoidToHand(
+          target: YourVoid(Card),
+        )),
+      )),
+    ]
+    "###);
+}
+
+#[test]
+fn test_return_one_or_two_events_from_your_void_to_your_hand() {
+    let result = parse("Return one or two events from your void to your hand.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(EventAbility(
+        effect: Effect(ReturnUpToCountFromYourVoidToHand(
+          target: YourVoid(Event),
+          count: 2,
+        )),
+      )),
+    ]
+    "###);
+}

@@ -112,6 +112,7 @@ fn game_state_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
         discover_and_then_materialize(),
         discover(),
         materialize_random_characters(),
+        return_one_or_two_from_void_to_hand(),
         return_from_void_to_hand(),
         return_from_void_to_play(),
         gains_reclaim_until_end_of_turn(),
@@ -259,6 +260,10 @@ fn return_from_void_to_hand<'a>() -> impl Parser<'a, &'a str, StandardEffect, Er
     phrase("return")
         .ignore_then(determiner_parser::your_action())
         .then_ignore(phrase("from your void to your hand"))
+        .map(|target| match target {
+            Predicate::Your(matching) => Predicate::YourVoid(matching),
+            other => other,
+        })
         .map(|target| StandardEffect::ReturnFromYourVoidToHand { target })
 }
 
@@ -267,6 +272,18 @@ fn return_from_void_to_play<'a>() -> impl Parser<'a, &'a str, StandardEffect, Er
         .ignore_then(determiner_parser::your_action())
         .then_ignore(phrase("from your void to play"))
         .map(|target| StandardEffect::ReturnFromYourVoidToPlay { target })
+}
+
+fn return_one_or_two_from_void_to_hand<'a>()
+-> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("return")
+        .ignore_then(phrase("one or two").to(2))
+        .ignore_then(card_predicate_parser::parser())
+        .then_ignore(phrase("from your void to your hand"))
+        .map(|matching| StandardEffect::ReturnUpToCountFromYourVoidToHand {
+            target: Predicate::YourVoid(matching),
+            count: 2,
+        })
 }
 
 fn gains_reclaim_until_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
