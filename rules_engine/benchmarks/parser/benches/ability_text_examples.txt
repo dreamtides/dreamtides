@@ -1,10 +1,10 @@
 Draw a card.
 {kw: Discover} a card with cost $2. {reminder: (pick one of 4 cards with different types to put into your hand.)}
 $judgment: Return this character from your void to your hand. {flavor: Born from rust and resilience.}
-$activated: Draw 2 cards. Discard 3 cards. {flavor: Promises under a stormy sky.}
+{a}: Draw 2 cards. Discard 3 cards. {flavor: Promises under a stormy sky.}
 Draw 2 cards. Discard 2 cards. $br {kw: Reclaim}. {reminder: (you may play this dream from your void, then banish it.)}
 When you discard this character, materialize it. {flavor: Beyond lies the unknown.}
-$activated Discard a card: Draw a card. Gain 1 $point. {flavor: In whispers, secrets unfold.}
+{a} Discard a card: Draw a card. Gain 1 $point. {flavor: In whispers, secrets unfold.}
 Whenever you discard a card, it gains {kw: reclaim} until end of turn. {reminder: (you may play it from your void and banish it when it leaves play.)}
 $materialized: {kw: Foresee} 2. {reminder: (Look at the top 2 cards of your deck. Put any of them into your void, then put the rest back in any order.)}
 You may play this character from your void for $0 by abandoning 2 characters. {flavor: The blade's whisper stirred darkness.}
@@ -13,8 +13,8 @@ $judgment: Gain $1. {flavor: Where light shines in shadow, life stirs and power 
 Gain $3. {flavor: Stand before the fathomless.}
 Dissolve an enemy character. You lose 4 $points.
 If you have discarded a card this turn, this character costs $1.
-$activated Banish 3 cards from your void: Dissolve an enemy character with cost $2 or less.
-$activated: Draw a card. Discard a card. {flavor: She sifts through the wreckage of memory, searching for fragments to rebuild the future.}
+{a} Banish 3 cards from your void: Dissolve an enemy character with cost $2 or less.
+{a}: Draw a card. Discard a card. {flavor: She sifts through the wreckage of memory, searching for fragments to rebuild the future.}
 Dissolve all characters. {flavor: He watched as worlds fell.}
 Whenever you discard a card, {kw: kindle} 1. {reminder: (add +1 to the spark of your rightmost character.)}
 $judgment: Draw a card. The enemy gains 2 $points. {flavor: "Take my gift; the cost is yours alone."}
@@ -22,15 +22,15 @@ Once per turn, you may play a character with cost $2 or less from your void. {fl
 $materialized: Discard 2 cards. Draw 2 cards. {flavor: In the endless maze of lights, clarity is fleeting.}
 You may return a character from your void to your hand. Draw a card. {flavor: Even in the shadow of despair, they found their way back to the light.}
 Dissolve an enemy character. {flavor: Darkness released from within.}
-$activated Discard a card: Dissolve an enemy character with spark 1 or less. {flavor: A shadow in the storm.}
+{a} Discard a card: Dissolve an enemy character with spark 1 or less. {flavor: A shadow in the storm.}
 Once per turn, when you discard a card, gain $1 and then {kw: kindle} 2. {reminder: (add +2 to the spark of your most recently played character.)}
 If you have 8 or more cards in your void, you may play this character from your void for $0 by banishing all other cards from your void.
 $materialized: Draw a card. Discard a card. $br {kw: Reclaim}. {reminder: (you may play this card from your void and banish it when it leaves play.)}
 This character's spark is equal to the number of cards in your void. {flavor: Born of despair and fed by memory, it grows as the past crumbles.}
-$activated Abandon a {cardtype: warrior}: {kw: Discover} a {cardtype: warrior} with cost $1 higher than the abandoned character and materialize it.
+{a} Abandon a {cardtype: warrior}: {kw: Discover} a {cardtype: warrior} with cost $1 higher than the abandoned character and materialize it.
 $materialized, $dissolved: Draw a card. {flavor: Peace forged under falling leaves.}
-$fastActivated: Another character you control gains {kw: aegis} this turn. {reminder: (it cannot be affected by the enemy)} {flavor: She stands where others would fall.}
-$fastActivated $2: Another character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control. {flavor: Cleave the shadows apart.}
+{fa}: Another character you control gains {kw: aegis} this turn. {reminder: (it cannot be affected by the enemy)} {flavor: She stands where others would fall.}
+{fa} $2: Another character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control. {flavor: Cleave the shadows apart.}
 A character you control gains +1 spark until your next main phase for each {cardtype: warrior} you control.
 Whenever you materialize another {cardtype: warrior}, this character gains +1 spark. {flavor: The sound of hooves and steel is his battle cry—and his soldiers' anthem.}
 Once per turn, when you materialize a character with cost $2 or less, draw a card. {flavor: Claim the night.}
@@ -40,19 +40,19 @@ Dissolve an enemy character with spark 1 or less. {flavor: The weak are swept aw
 Dissolve an enemy character with cost less than or equal to the number of {cardtype: warriors} you control.
 {kw: Discover} a {cardtype: warrior}. {reminder: (pick one of 4 random warriors with different costs to put into your hand).}
 You may play this character from your void for $2 by banishing another card from your void. {flavor:  Death is but a detour for vengeance.}
-$multiActivated $2, Abandon another character with spark 1 or less: Draw 2 cards. {flavor: Knowledge comes at a cost, and he always collects.}
+{ma} $2, Abandon another character with spark 1 or less: Draw 2 cards. {flavor: Knowledge comes at a cost, and he always collects.}
 $materialized, $judgment: If you control 2 other {cardtype: warriors}, gain $1. {flavor: He speaks not of glory, but of bonds that cannot be broken.}
 $materialized, $judgment:  Gain $2. {flavor: Each step forward brings light.}
 Once per turn, when you materialize a character, gain $1. {flavor: Every step she takes invites another to follow.}
 $materialized: Draw a {cardtype: warrior} from your deck. {flavor: The stones whispered, and she listened.}
-$activated $2, Abandon this character, discard your hand: Draw 3 cards.
+{a} $2, Abandon this character, discard your hand: Draw 3 cards.
 Disable the "$materialized" abilities of enemy characters. {flavor: Life's song fades beneath his march.}
 Other {cardtype: warriors} you control have +1 spark. {flavor: Under his shadow, warriors find their fire.}
-$activated $1: This character gains +1 spark. You may banish a card from the enemy's void.  {flavor: What is cast away only fuels her fire.}
+{a} $1: This character gains +1 spark. You may banish a card from the enemy's void.  {flavor: What is cast away only fuels her fire.}
 The enemy's events cost $1 more. {flavor: In shadow, energy awakens.}
 $materialized: Disable the activated abilities of an enemy character while this character is in play.
 $materialized: Draw a card. {flavor: The spirit's shadow speaks truths only the bold dare to hear.}
-$multiActivated Abandon another character: This character gains +1 spark. {flavor: The flames whispered promises of power, and he discarded honor to listen.}
+{ma} Abandon another character: This character gains +1 spark. {flavor: The flames whispered promises of power, and he discarded honor to listen.}
 This character's spark is equal to the number of {cardtype: warriors} you control. {flavor: His strength burns hottest when the many stand as one.}
 Once per turn, when you materialize a {cardtype: warrior}, draw a card. {flavor: Each story adds a link to the unbreakable chain of fate.}
 Whenever you play a {cardtype: warrior}, you may materialize a character with cost $3 or less from your void.
@@ -126,7 +126,7 @@ When you draw all of the cards in a copy of your deck, you win the game. {flavor
 Return all but one character you control to hand. Draw a card for each character returned.
 Whenever you materialize a character, this character gains +1 spark.
 Whenever you play a {cardtype: spirit animal}, draw a card. {flavor: A light in the dusk, a guide for the lost.}
-$activated $4: Each {cardtype: spirit animal} you control gains +2 spark until your next main phase. {flavor: Its presence ignites the pack's fury.}
+{a} $4: Each {cardtype: spirit animal} you control gains +2 spark until your next main phase. {flavor: Its presence ignites the pack's fury.}
 Whenever you materialize another {cardtype: spirit animal}, that character gains +1 spark. {flavor: Its cry awakens strength in all who hear.}
 $materialized, $judgment: {kw: Kindle} 1. {flavor: Bound by light, shadow, and an unbroken oath.}
 $materialized: Return a character from your void to your hand. {flavor: Through the forest's glow, it finds what others cannot.}
@@ -136,16 +136,16 @@ $judgment: Gain $2. {flavor: The air hums with its boundless power}
 You may look at the top card of your deck. $br You may play characters from the top of your deck.
 $materialized: Banish the enemy's void. {flavor: Where it prowls, the past finds no refuge.}
 $materialized: Draw a card for each {cardtype: spirit animal} you control.
-$activated $3: The spark of each {cardtype: spirit animal} you control becomes 5.
+{a} $3: The spark of each {cardtype: spirit animal} you control becomes 5.
 $materialized: You may banish another character you control, then materialize it. {flavor: Step into the unknown.}
-$immediate $activated: Banish another character with spark 1 or less you control, then materialize it.
+$immediate {a}: Banish another character with spark 1 or less you control, then materialize it.
 $materialized: A card with cost $3 or less in your void gains {kw: reclaim} $0 until end of turn.
 $materialized: Banish any number of other characters you control, then materialize them. {flavor: He rides the seams of reality.}
 $materialized: Look at the enemy's hand. You may choose a card from it. The enemy discards that card and then draws a card.
 $materialized: Draw 2 cards. {flavor: The lantern held more than light—it carried whispers of worlds lost, waiting to be remembered.}
 $materialized: Banish an enemy character until this character leaves play. {flavor: He doesn't kill—he rewrites the story.}
 Banish a character you control, then materialize it at end of turn. $br {kw: Reclaim} $1.
-$immediate $fastActivated Abandon this character: Negate an enemy event.
+$immediate {fa} Abandon this character: Negate an enemy event.
 {kw: Discover} a character with a $materialized ability. {reminder: (pick one of 4 random matching cards with different costs to put into your hand)}
 $judgment: You may banish another character you control, then materialize it. {flavor: The gate opens, the story begins anew.}
 Whenever a character you control is banished, this character gains +1 spark. {flavor: Every return casts ripples.}
@@ -154,18 +154,18 @@ Materialize two random characters with cost $3 or less from your deck. {flavor: 
 Negate an enemy character. {flavor: What rises against the peak is buried beneath it}
 Dissolve an enemy character with spark 3 or more. {flavor: The flames hunger for greatness, and devour it whole.}
 Dissolve an enemy character with cost $3 or more. $br {kw: Reclaim} $2.
-$activated $3: Banish up to two other characters you control, then materialize them. {flavor: Nothing is lost—only transformed.}
+{a} $3: Banish up to two other characters you control, then materialize them. {flavor: Nothing is lost—only transformed.}
 $materialized: You may banish another character until the start of your next main phase. {flavor: The veil opens, and time is rewritten.}
 Banish up to two characters you control, then materialize them.
 $materialized: Gain $3. {flavor: He stepped into the cascade, his body trembling as the colors wove power into his very soul.}
-$multiActivated $4: Materialize a copy of another character you control. {flavor: The circle shimmered, and where one stood, another emerged—an echo of power made flesh.}
+{ma} $4: Materialize a copy of another character you control. {flavor: The circle shimmered, and where one stood, another emerged—an echo of power made flesh.}
 If you control a {cardtype: survivor}, this character costs $1. $br You may play this character from your void.
-$activated $1, Discard a card: {kw: Kindle} 2. {flavor: When the world collapses, some rise to hold its weight.}
+{a} $1, Discard a card: {kw: Kindle} 2. {flavor: When the world collapses, some rise to hold its weight.}
 $materialized, $judgment: If you control 2 other {cardtype: survivors}, draw a card. {flavor: In the wreckage of the old world, he finds whispers of a brighter one.}
 $dissolved: {kw: Kindle} 2. $br Whenever another {cardtype: survivor} you control is dissolved, {kw: kindle} 2.
-$multiActivated Abandon another character: Gain $1. {flavor: They followed him, believing in the hope of rebirth. They did not know that rebirth required their lives.}
+{ma} Abandon another character: Gain $1. {flavor: They followed him, believing in the hope of rebirth. They did not know that rebirth required their lives.}
 $dissolved: Draw a card. $br Whenever another {cardtype: survivor} you control is dissolved, draw a card.
-$immediate $multiActivated Abandon another character: Put the top 2 cards of your deck into your void.
+$immediate {ma} Abandon another character: Put the top 2 cards of your deck into your void.
 Whenever another character you control is dissolved, draw a card. {flavor: Through the haze of destruction, he gathers fragments of hope.}
 $materialized: Each player discards a card. {flavor: In the ruins, strength is measured in what you're willing to lose.}
 If a character you controlled dissolved this turn, you may play this character from your void for $1.
@@ -175,8 +175,8 @@ $dissolved: A {cardtype: survivor} with cost $3 or less in your void gains {kw: 
 $judgment: You may pay $1 to return this character from your void to your hand. {flavor: Lost once, but never forgotten}
 You may only play this character from your void.
 If this character is in your void, {cardtype: survivors} you control have +1 spark. {flavor: His spark ignites in the hearts of those who remember him.}
-$multiActivated Abandon another character: {kw: Kindle} 1. {flavor: In the wasteland, power is built on sacrifice, and survival demands it.}
-$activated: You may banish a card from the enemy's void to gain $1. {flavor: What others leave behind, he turns into survival.}
+{ma} Abandon another character: {kw: Kindle} 1. {flavor: In the wasteland, power is built on sacrifice, and survival demands it.}
+{a}: You may banish a card from the enemy's void to gain $1. {flavor: What others leave behind, he turns into survival.}
 Dissolve an enemy character with cost $2 or less. $br You may play this event from your void for $0 by abandoning a character.
 $materialized, $dissolved: Put the top 4 cards of your deck into your void. {flavor: In the poisoned haze, he searches for remnants of a forgotten world.}
 Once per turn, when you materialize a {cardtype: survivor}, you may return this character from your void to play.
@@ -184,12 +184,12 @@ Once per turn, when you materialize a {cardtype: survivor}, you may return this 
 Whenever you play a {cardtype: survivor}, put the top 2 cards of your deck into your void.
 Whenever you abandon a character, this character gains +1 spark.
 Whenever you abandon a character, gain 1 $points.
-$activated Abandon another character:  Gain 1 $points. {flavor: The path ahead is clear when the past burns behind you.}
+{a} Abandon another character:  Gain 1 $points. {flavor: The path ahead is clear when the past burns behind you.}
 Whenever you abandon a character, {kw: kindle} 2. {flavor: Every offering feeds the flames}
-$immediate $fastMultiActivated Abandon another character: You may put a character from your void on top of your deck.
-$multiActivated Abandon another character: You may dissolve an enemy character with spark less than or equal to the abandoned character's spark.
+$immediate {fma} Abandon another character: You may put a character from your void on top of your deck.
+{ma} Abandon another character: You may dissolve an enemy character with spark less than or equal to the abandoned character's spark.
 Whenever a character you control is dissolved, gain $1. {flavor: From destruction, she draws power—each loss ignites her purpose.}
-$activated Abandon a character: You may return a {cardtype: warrior} from your void to play.
+{a} Abandon a character: You may return a {cardtype: warrior} from your void to play.
 Whenever you materialize a character, gain $1.
 $materialized: Materialize a {kw: silent} copy of this character for each dream you have played this turn.
 $materialized: Materialize two {kw: silent} copies of this character. {flavor: Bound by unity, their precision is as unyielding as their resolve.}

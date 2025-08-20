@@ -257,7 +257,7 @@ fn test_banish_up_to_two() {
 #[test]
 fn test_banish_up_to_two_activated() {
     let result = parse(
-        "$activated {-energy-cost(e: 3)}: Banish up to two other characters you control, then materialize them.",
+        "{a} {-energy-cost(e: 3)}: Banish up to two other characters you control, then materialize them.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -288,7 +288,7 @@ fn test_banish_up_to_two_activated() {
 #[test]
 fn test_dissolve_enemy_character_with_spark_compared_to_abandoned() {
     let result = parse(
-        "$activated: {Dissolve} an enemy character with spark X or less, where X is the number of characters you have abandoned this turn.",
+        "{a}: {Dissolve} an enemy character with spark X or less, where X is the number of characters you have abandoned this turn.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -308,7 +308,7 @@ fn test_dissolve_enemy_character_with_spark_compared_to_abandoned() {
 #[test]
 fn test_multi_activated_dissolve_with_abandoned_spark() {
     let result = parse(
-        "$multiActivated Abandon another character: You may {dissolve} an enemy character with spark less than or equal to the abandoned character's spark.",
+        "{ma} Abandon another character: You may {dissolve} an enemy character with spark less than or equal to the abandoned character's spark.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -939,7 +939,7 @@ fn test_banish_enemy_void() {
 #[test]
 fn test_spark_becomes() {
     let result = parse(
-        "$activated {-energy-cost(e: 3)}: The spark of each {cardtype: spirit animal} you control becomes 5.",
+        "{a} {-energy-cost(e: 3)}: The spark of each {cardtype: spirit animal} you control becomes 5.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -1057,9 +1057,8 @@ fn test_banish_until_next_main() {
 
 #[test]
 fn test_materialize_copy_character() {
-    let result = parse(
-        "$multiActivated {-energy-cost(e: 4)}: Materialize a copy of another character you control.",
-    );
+    let result =
+        parse("{ma} {-energy-cost(e: 4)}: Materialize a copy of another character you control.");
     assert_ron_snapshot!(result, @r###"
     [
       Activated(ActivatedAbility(
@@ -1110,7 +1109,7 @@ fn test_put_cards_from_void_on_top_of_deck() {
     "###);
 
     let result = parse(
-        "$fastMultiActivated Abandon another character: You may put a character from your void on top of your deck.",
+        "{fma} Abandon another character: You may put a character from your void on top of your deck.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -1203,8 +1202,7 @@ fn test_draw_for_abandoned_this_turn() {
 
 #[test]
 fn test_discover_multi_activated_ability() {
-    let result =
-        parse("Abandon a character. {kw: Discover} a character with a $multiActivated ability.");
+    let result = parse("Abandon a character. {kw: Discover} a character with a {ma} ability.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(

@@ -116,7 +116,7 @@ fn character_with_materialized_ability<'a>()
 fn character_with_multi_activated_ability<'a>()
 -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     character()
-        .ignore_then(phrase("with a $multiactivated ability"))
+        .ignore_then(phrase("with a {ma} ability"))
         .to(CardPredicate::CharacterWithMultiActivatedAbility)
 }
 
