@@ -1285,7 +1285,7 @@ fn test_prevent_unless_pays_cost() {
 
 #[test]
 fn test_energy_spent_on_this_card() {
-    let result = parse("Spend any amount of energy: draw a card for each energy spent.");
+    let result = parse("Pay one or more {e}: Draw {-cards(n: 1)} for each {e} spent.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(

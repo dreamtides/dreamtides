@@ -55,6 +55,12 @@
       "en_us": "\\u[f621]"
     },
     {
+      "id": "62a93bf3-2794-4069-a68f-bd39308b9c49",
+      "name": "e-color",
+      "description": "Blue colored energy icon",
+      "en_us": "<color=#00838F>{e}</color>"
+    },
+    {
       "id": "e5e10712-21d7-41f4-a550-16918f39f8f7",
       "name": "-keyword",
       "description": "Formatting for ability keywords in card rules text",
@@ -65,6 +71,12 @@
       "name": "-cost",
       "description": "Formatting for an amount of energy paid as a cost",
       "en_us": "<color=#00838F><b>{$energy}{e}</b></color>"
+    },
+    {
+      "id": "87fcba1e-5935-4de4-8048-81a343f072a5",
+      "name": "-cards",
+      "description": "Formatting for a number of cards",
+      "en_us": "{$n ->\n  [one] a card\n  *[other] $n cards\n}"
     },
     {
       "id": "2e44ee4c-3218-45bf-a29e-0508f853c873",
@@ -511,6 +523,33 @@
       "spark": null,
       "rarity": "Common",
       "image_number": "2123360837"
+    },
+    {
+      "id": "e06a8cfe-483f-42c0-aac8-9c12b21b3f99",
+      "name_en_us": "Test Variable Energy Draw",
+      "energy_cost": "2",
+      "rules_text_en_us": "Pay one or more {e}: Draw {-cards(n: 1)} for each {e} spent.",
+      "abilities": [
+        {
+          "Event": {
+            "additional_cost": "SpendOneOrMoreEnergy",
+            "effect": {
+              "Effect": {
+                "DrawCardsForEach": {
+                  "count": 1,
+                  "for_each": "ForEachEnergySpentOnThisCard"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "subtype": null,
+      "is_fast": true,
+      "spark": null,
+      "rarity": "Common",
+      "image_number": "489056605"
     }
   ]
 }

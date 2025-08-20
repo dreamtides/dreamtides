@@ -15,6 +15,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
 /// card".
 pub fn standard_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
     choice((
+        phrase("pay one or more {e}").to(Cost::SpendOneOrMoreEnergy),
         numeric("pay $", Energy, "").map(Cost::Energy),
         phrase("banish a card from your void").to(Cost::BanishCardsFromYourVoid(1)),
         numeric("banish", count, "cards from your void").map(Cost::BanishCardsFromYourVoid),
