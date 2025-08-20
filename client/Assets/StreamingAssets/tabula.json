@@ -116,13 +116,13 @@
     },
     {
       "id": "3cc400d3-0594-4663-9187-e8c46613a21f",
-      "name": "mode-start",
+      "name": "mode",
       "description": "Formatting that appears before a modal ability",
       "en_us": " • <indent=1em><color=#00838F>"
     },
     {
       "id": "4a6ed656-0057-44c7-977d-8c0cedf1f725",
-      "name": "mode-end",
+      "name": "end-mode",
       "description": "Formatting that appears after a modal ability",
       "en_us": "</indent>\\u(000A)"
     },
@@ -164,15 +164,15 @@
     },
     {
       "id": "bf189fe0-75e2-4a87-9dca-67dd5f755766",
-      "name": "kindle",
-      "description": "Kindle keyword ability",
-      "en_us": "{keyword}kindle{end-keyword}"
+      "name": "-kindle",
+      "description": "Kindle keyword ability with quantity",
+      "en_us": "{keyword}kindle{end-keyword} {$s}"
     },
     {
       "id": "d1c8ff05-9dd8-4ed6-9436-746a9caf5a63",
-      "name": "Kindle",
-      "description": "Kindle keyword ability, capitalized",
-      "en_us": "{keyword}Kindle{end-keyword}"
+      "name": "-Kindle",
+      "description": "Kindle keyword ability with quantity, capitalized",
+      "en_us": "{keyword}Kindle{end-keyword} {$s}"
     },
     {
       "id": "5771085d-3c89-423f-be05-c728035e7cd0",
@@ -533,9 +533,7 @@
         }
       ],
       "card_type": "Event",
-      "subtype": null,
       "is_fast": true,
-      "spark": null,
       "rarity": "Special",
       "image_number": "1907487244"
     },
@@ -560,9 +558,7 @@
         }
       ],
       "card_type": "Event",
-      "subtype": null,
       "is_fast": true,
-      "spark": null,
       "rarity": "Special",
       "image_number": "1282908322"
     },
@@ -590,9 +586,7 @@
         }
       ],
       "card_type": "Event",
-      "subtype": null,
       "is_fast": true,
-      "spark": null,
       "rarity": "Special",
       "image_number": "2123360837"
     },
@@ -617,9 +611,7 @@
         }
       ],
       "card_type": "Event",
-      "subtype": null,
       "is_fast": true,
-      "spark": null,
       "rarity": "Special",
       "image_number": "489056605"
     },
@@ -651,9 +643,7 @@
         }
       ],
       "card_type": "Character",
-      "subtype": null,
       "is_fast": true,
-      "spark": null,
       "rarity": "Special",
       "image_number": "403770319"
     },
@@ -685,9 +675,7 @@
         }
       ],
       "card_type": "Character",
-      "subtype": null,
       "is_fast": false,
-      "spark": null,
       "rarity": "Special",
       "image_number": "1794244540"
     },
@@ -713,9 +701,7 @@
         }
       ],
       "card_type": "Event",
-      "subtype": null,
       "is_fast": false,
-      "spark": null,
       "rarity": "Special",
       "image_number": "644603677"
     },
@@ -723,7 +709,7 @@
       "id": "e8f937da-cca7-447d-a559-530d7c339325",
       "name_en_us": "Test Modal Return To Hand Or Draw Two",
       "energy_cost": "*",
-      "rules_text_en_us": "{choose-one}\n{mode-start}{-energy-cost(e:2)}: Return an enemy character to hand.{mode-end}\n{mode-start}{-energy-cost(e:3)}: Draw {-cards(n:2)}.{mode-end}",
+      "rules_text_en_us": "{choose-one}\n{mode}{-energy-cost(e:2)}: Return an enemy character to hand.{end-mode}\n{mode}{-energy-cost(e:3)}: Draw {-cards(n:2)}.{end-mode}",
       "abilities": [
         {
           "Event": {
@@ -757,9 +743,7 @@
         }
       ],
       "card_type": "Event",
-      "subtype": null,
       "is_fast": true,
-      "spark": null,
       "rarity": "Special",
       "image_number": "1200949264"
     },
@@ -784,9 +768,7 @@
         }
       ],
       "card_type": "Event",
-      "subtype": null,
       "is_fast": true,
-      "spark": null,
       "rarity": "Special",
       "image_number": "1621160806"
     },
@@ -827,11 +809,34 @@
         }
       ],
       "card_type": "Event",
-      "subtype": null,
       "is_fast": true,
-      "spark": null,
       "rarity": "Special",
       "image_number": "1328168243"
+    },
+    {
+      "id": "86ed0d3f-320b-49d0-b022-cd94aa07edbd",
+      "name_en_us": "Test Counterspell Character",
+      "energy_cost": "2",
+      "rules_text_en_us": "{Prevent} a played enemy character.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "Counterspell": {
+                  "target": {
+                    "Enemy": "Character"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "rarity": "Special",
+      "image_number": "1239919309"
     }
   ]
 }

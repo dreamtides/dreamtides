@@ -73,6 +73,7 @@ pub struct BaseCardDefinitionRaw {
     pub name_en_us: String,
 
     /// Energy cost of this card, if any.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub energy_cost: Option<String>,
 
     /// Rules text of this card (U.S. English).
@@ -88,15 +89,18 @@ pub struct BaseCardDefinitionRaw {
     pub card_type: CardType,
 
     /// Subtype of this card
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub subtype: Option<String>,
 
     /// Whether this card is fast.
     pub is_fast: bool,
 
     /// Spark value of this card, if any.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub spark: Option<String>,
 
     /// Rarity of this card.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub rarity: Option<Rarity>,
 
     /// Identifies this card's image in the game's assets.

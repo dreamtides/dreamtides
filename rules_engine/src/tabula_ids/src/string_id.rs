@@ -59,10 +59,10 @@ pub const ABILITY: StringId = StringId(uuid!("a8108996-e881-4b2e-80dd-3bfe5bf8dc
 pub const END_ABILITY: StringId = StringId(uuid!("12487a98-0f31-4f71-bd51-9a85bfcd281c"));
 
 /// Formatting that appears before a modal ability
-pub const MODE_START: StringId = StringId(uuid!("3cc400d3-0594-4663-9187-e8c46613a21f"));
+pub const MODE: StringId = StringId(uuid!("3cc400d3-0594-4663-9187-e8c46613a21f"));
 
 /// Formatting that appears after a modal ability
-pub const MODE_END: StringId = StringId(uuid!("4a6ed656-0057-44c7-977d-8c0cedf1f725"));
+pub const END_MODE: StringId = StringId(uuid!("4a6ed656-0057-44c7-977d-8c0cedf1f725"));
 
 /// Foresee keyword ability with quantity
 pub const FORESEE: StringId = StringId(uuid!("2e44ee4c-3218-45bf-a29e-0508f853c873"));
@@ -73,7 +73,7 @@ pub const RECLAIM: StringId = StringId(uuid!("f19214ee-632b-4f0b-b3e4-d63e67b7ac
 /// Reclaim keyword ability with energy cost
 pub const RECLAIM_COST: StringId = StringId(uuid!("fb895ce7-1f66-426d-8c29-b19fdeee7828"));
 
-/// Kindle keyword ability
+/// Kindle keyword ability with quantity
 pub const KINDLE: StringId = StringId(uuid!("bf189fe0-75e2-4a87-9dca-67dd5f755766"));
 
 /// Dissolve keyword ability
