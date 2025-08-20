@@ -55,22 +55,70 @@
       "en_us": "\\u[f621]"
     },
     {
+      "id": "e5e10712-21d7-41f4-a550-16918f39f8f7",
+      "name": "-keyword",
+      "description": "Formatting for ability keywords in card rules text",
+      "en_us": "<color=#AA00FF><b>{$kw}</b></color>"
+    },
+    {
       "id": "2e44ee4c-3218-45bf-a29e-0508f853c873",
       "name": "foresee",
       "description": "Foresee keyword ability",
-      "en_us": "Foresee"
+      "en_us": "{-keyword(kw: \"foresee\")}"
+    },
+    {
+      "id": "b68a7c1c-5b2b-4885-863b-4ebf81279330",
+      "name": "Foresee",
+      "description": "Foresee keyword ability, capitalized",
+      "en_us": "{-keyword(kw: \"Foresee\")}"
     },
     {
       "id": "fb895ce7-1f66-426d-8c29-b19fdeee7828",
       "name": "reclaim",
       "description": "Reclaim keyword ability",
-      "en_us": "Reclaim"
+      "en_us": "{-keyword(kw: \"reclaim\")}"
+    },
+    {
+      "id": "5674a8dd-b4eb-4630-85c2-79d6b95cdaae",
+      "name": "Reclaim",
+      "description": "Reclaim keyword ability, capitalized",
+      "en_us": "{-keyword(kw: \"Reclaim\")}"
     },
     {
       "id": "bf189fe0-75e2-4a87-9dca-67dd5f755766",
       "name": "kindle",
       "description": "Kindle keyword ability",
-      "en_us": "Kindle"
+      "en_us": "{-keyword(kw: \"kindle\")}"
+    },
+    {
+      "id": "d1c8ff05-9dd8-4ed6-9436-746a9caf5a63",
+      "name": "Kindle",
+      "description": "Kindle keyword ability, capitalized",
+      "en_us": "{-keyword(kw: \"Kindle\")}"
+    },
+    {
+      "id": "5771085d-3c89-423f-be05-c728035e7cd0",
+      "name": "dissolve",
+      "description": "Dissolve keyword ability",
+      "en_us": "{-keyword(kw: \"dissolve\")}"
+    },
+    {
+      "id": "8b9ef6b9-a6e1-4abe-be4d-cf7fa3ce41b8",
+      "name": "Dissolve",
+      "description": "Dissolve keyword ability, capitalized",
+      "en_us": "{-keyword(kw: \"Dissolve\")}"
+    },
+    {
+      "id": "1a9e01e9-e7aa-4692-9b1b-5dd9e0b4a7f9",
+      "name": "prevent",
+      "description": "Prevent keyword ability",
+      "en_us": "{-keyword(kw: \"prevent\")}"
+    },
+    {
+      "id": "fb38409b-cbaf-41a5-96fc-af622ce6f333",
+      "name": "Prevent",
+      "description": "Prevent keyword ability, capitalized",
+      "en_us": "{-keyword(kw: \"Prevent\")}"
     },
     {
       "id": "66edfc8f-483b-4ad0-b37b-c66aa7c4347b",

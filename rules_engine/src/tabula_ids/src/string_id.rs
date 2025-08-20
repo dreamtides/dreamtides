@@ -28,6 +28,9 @@ pub const EYE_SLASH_ICON: StringId = StringId(uuid!("2ca2c1dd-20f7-410b-9f5d-ce3
 /// "Star of life" icon used to represent non-numeric costs
 pub const ASTERISK_ICON: StringId = StringId(uuid!("fd603588-7ab8-48c8-93b0-2bf6afc59325"));
 
+/// Formatting for ability keywords in card rules text
+pub const KEYWORD: StringId = StringId(uuid!("e5e10712-21d7-41f4-a550-16918f39f8f7"));
+
 /// Foresee keyword ability
 pub const FORESEE: StringId = StringId(uuid!("2e44ee4c-3218-45bf-a29e-0508f853c873"));
 
@@ -36,6 +39,12 @@ pub const RECLAIM: StringId = StringId(uuid!("fb895ce7-1f66-426d-8c29-b19fdeee78
 
 /// Kindle keyword ability
 pub const KINDLE: StringId = StringId(uuid!("bf189fe0-75e2-4a87-9dca-67dd5f755766"));
+
+/// Dissolve keyword ability
+pub const DISSOLVE: StringId = StringId(uuid!("5771085d-3c89-423f-be05-c728035e7cd0"));
+
+/// Prevent keyword ability
+pub const PREVENT: StringId = StringId(uuid!("1a9e01e9-e7aa-4692-9b1b-5dd9e0b4a7f9"));
 
 /// Prompt message to target a character
 pub const PROMPT_CHOOSE_CHARACTER: StringId =

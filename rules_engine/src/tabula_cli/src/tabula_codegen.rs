@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::fs;
 
 use anyhow::Result;
@@ -11,18 +12,20 @@ pub fn generate_string_ids(tabula_raw: &TabulaRaw, output_path: &str) -> Result<
     out.push_str("use tabula_data::localized_strings::StringId;\n");
     out.push_str("use uuid::uuid;\n\n");
 
+    let mut seen_names: HashSet<String> = HashSet::new();
     for row in tabula_raw.strings.as_slice() {
+        let const_name = case_utils::cleaned_to_case(&row.name, Case::UpperSnake);
+        if seen_names.contains(&const_name) {
+            continue;
+        }
+        seen_names.insert(const_name.clone());
         out.push_str(&format!("/// {}\n", row.description.replace('\n', " ").trim()));
-        let const_declaration = format!(
-            "pub const {}: StringId = StringId(uuid!(\"{}\"));",
-            case_utils::cleaned_to_case(&row.name, Case::UpperSnake),
-            row.id.0
-        );
+        let const_declaration =
+            format!("pub const {}: StringId = StringId(uuid!(\"{}\"));", const_name, row.id.0);
         if const_declaration.len() > 100 {
             out.push_str(&format!(
                 "pub const {}: StringId =\n    StringId(uuid!(\"{}\"));\n\n",
-                case_utils::cleaned_to_case(&row.name, Case::UpperSnake),
-                row.id.0
+                const_name, row.id.0
             ));
         } else {
             out.push_str(&format!("{const_declaration}\n\n"));

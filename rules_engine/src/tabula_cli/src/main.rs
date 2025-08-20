@@ -5,6 +5,7 @@ use anyhow::{Context, Result};
 use clap::Parser;
 use core_data::identifiers::BaseCardId;
 use core_data::initialization_error::InitializationError;
+use fluent::FluentArgs;
 use google_sheets4::Sheets;
 use google_sheets4::yup_oauth2::{ServiceAccountAuthenticator, ServiceAccountKey};
 use hyper_util::client::legacy::Client;
@@ -17,6 +18,7 @@ use tabula_data::base_card_definition::BaseCardDefinitionRaw;
 use tabula_data::localized_strings::LanguageId;
 use tabula_data::tabula::{self, TabulaBuildContext};
 use tabula_data::tabula_table::Table;
+use uuid::uuid;
 use yup_oauth2::hyper_rustls::HttpsConnectorBuilder;
 
 #[derive(Parser, Debug)]
@@ -60,19 +62,30 @@ async fn main() -> Result<()> {
 
     let hub = Sheets::new(client, auth);
     let spreadsheet = GoogleSheet::new(args.spreadsheet_id, hub);
+
+    println!("Sending Google Sheets request");
     let tables = spreadsheet.read_all_tables().await?;
+    println!("Got Google Sheets response");
+
     let mut tabula_raw = tabula_sync::sync(tables)?;
     parse_abilities(&mut tabula_raw.test_cards).map_err(|errs| {
         anyhow::anyhow!(errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n"))
     })?;
 
-    let _tabula = tabula::build(
+    let tabula = tabula::build(
         &TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates },
         &tabula_raw,
     )
     .map_err(|errs| {
         anyhow::anyhow!(errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n"))
     })?;
+
+    let text = &tabula
+        .test_cards
+        .get(&BaseCardId(uuid!("aad836b0-3ece-477c-b923-b099360f0115")))
+        .expect("test card not found")
+        .displayed_rules_text;
+    println!("{:?}", tabula.strings.format_display_string(text.clone(), &FluentArgs::new()));
 
     if let Some(path) = args.string_ids.as_deref() {
         tabula_codegen::generate_string_ids(&tabula_raw, path)?;

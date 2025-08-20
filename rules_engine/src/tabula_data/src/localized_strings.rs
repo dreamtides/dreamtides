@@ -122,6 +122,11 @@ pub fn build(
     }
 
     for (row_index, row) in table.as_slice().iter().enumerate() {
+        if row.name.starts_with("-") {
+            // Fluent terms cannot be directly retrieved
+            continue;
+        }
+
         match bundle.get_message(row.name.as_str()) {
             Some(m) => {
                 if m.value().is_none() {
@@ -136,9 +141,10 @@ pub fn build(
                 }
             }
             None => {
-                let mut ierr = InitializationError::with_name(
+                let mut ierr = InitializationError::with_details(
                     ErrorCode::FluentMissingMessage,
                     row.name.clone(),
+                    "Message not found in Fluent during validation",
                 );
                 ierr.tabula_sheet = Some(String::from("strings"));
                 ierr.tabula_column = Some(String::from("name"));
@@ -181,6 +187,38 @@ impl LocalizedStrings {
         let msg = match bundle.get_message(key.as_str()) {
             Some(m) => m,
             None => return "ERR4: Missing Message".to_string(),
+        };
+        let pattern = match msg.value() {
+            Some(p) => p,
+            None => return "ERR5: Missing Value".to_string(),
+        };
+        let mut errors = vec![];
+        let out = bundle.format_pattern(pattern, Some(args), &mut errors).into_owned();
+        if errors.is_empty() { out } else { format_error_details(&errors) }
+    }
+
+    pub fn format_display_string(&self, s: String, args: &FluentArgs) -> String {
+        let mut bundle = FluentBundle::default();
+        bundle.set_use_isolating(false);
+        if bundle.add_resource(self.resource.as_ref()).is_err() {
+            return "ERR3: Add Resource Failed".to_string();
+        }
+        let ftl = format!("tmp-for-display = {s}");
+        let (temp_res, parser_errs_opt) = match FluentResource::try_new(ftl) {
+            Ok(res) => (res, None),
+            Err((res, errs)) => (res, Some(errs)),
+        };
+        if let Some(parser_errs) = parser_errs_opt {
+            return format_error_details(
+                &parser_errs.into_iter().map(FluentError::ParserError).collect::<Vec<_>>(),
+            );
+        }
+        if bundle.add_resource(&temp_res).is_err() {
+            return "ERR3: Add Resource Failed".to_string();
+        }
+        let msg = match bundle.get_message("tmp-for-display") {
+            Some(m) => m,
+            None => return "ERR4: Missing Message 'tmp-for-display'".to_string(),
         };
         let pattern = match msg.value() {
             Some(p) => p,
