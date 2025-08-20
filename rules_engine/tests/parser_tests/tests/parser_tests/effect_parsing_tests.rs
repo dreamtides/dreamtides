@@ -414,7 +414,7 @@ fn test_materialize_character_when_discarded() {
 
 #[test]
 fn test_foresee() {
-    let result = parse("$materialized: {kw: Foresee} 2.");
+    let result = parse("$materialized: {foresee(n: 2)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -424,6 +424,31 @@ fn test_foresee() {
         effect: Effect(Foresee(
           count: 2,
         )),
+      )),
+    ]
+    "###);
+}
+
+#[test]
+fn test_foresee_then_draw_card() {
+    let result = parse("{Foresee(n: 1)}. Draw {-cards(n: 1)}.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(EventAbility(
+        effect: List([
+          EffectWithOptions(
+            effect: Foresee(
+              count: 1,
+            ),
+            optional: false,
+          ),
+          EffectWithOptions(
+            effect: DrawCards(
+              count: 1,
+            ),
+            optional: false,
+          ),
+        ]),
       )),
     ]
     "###);

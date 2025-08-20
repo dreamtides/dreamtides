@@ -8,6 +8,7 @@ mod cost_parser;
 mod determiner_parser;
 mod effect_parser;
 mod modal_effect_parser;
+mod named_ability_parser;
 mod parser_utils;
 mod quantity_expression_parser;
 mod standard_effect_parser;

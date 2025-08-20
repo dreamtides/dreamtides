@@ -5,7 +5,8 @@ use core_data::initialization_error::{ErrorCode, InitializationError};
 
 use crate::parser_utils::{ErrorType, phrase};
 use crate::{
-    activated_ability_parser, effect_parser, static_ability_parser, triggered_ability_parser,
+    activated_ability_parser, effect_parser, named_ability_parser, static_ability_parser,
+    triggered_ability_parser,
 };
 
 /// Takes a string containing card rules text and parses it into a
@@ -57,6 +58,7 @@ fn parser<'a>() -> impl Parser<'a, &'a str, Vec<Ability>, ErrorType<'a>> {
     let single_ability = choice((
         triggered_ability_parser::parser().map(Ability::Triggered),
         activated_ability_parser::parser().map(Ability::Activated),
+        named_ability_parser::parser().map(Ability::Named),
         effect_parser::event().map(Ability::Event),
         static_ability_parser::parser().then_ignore(phrase(".")).map(Ability::Static),
     ))
