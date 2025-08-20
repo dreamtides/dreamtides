@@ -12,6 +12,7 @@ doctest = false
 bench = false
 
 [dependencies]
+core_data = { path = "../core_data" }
 tabula_data = { path = "../tabula_data" }
 
 uuid = { workspace = true }

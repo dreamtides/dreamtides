@@ -3012,6 +3012,7 @@ dependencies = [
 name = "tabula_ids"
 version = "0.0.0"
 dependencies = [
+ "core_data",
  "tabula_data",
  "uuid",
 ]

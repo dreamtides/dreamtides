@@ -31,7 +31,8 @@ pub struct BattleId(pub Uuid);
 )]
 pub struct QuestId(pub Uuid);
 
-/// Identifies a card with given rules text.
+/// Identifies a card with given rules text, i.e. a base card and a set of
+/// card modifications.
 ///
 /// Two cards with the same identity are considered to be "the same card", in
 /// the same sense that two copies of Lightning Bolt are "the same card" in

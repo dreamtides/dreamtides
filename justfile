@@ -138,6 +138,7 @@ tabula *args='':
       --key-file ./service_account_key.json \
       --spreadsheet-id "1AqSIZ_kwo3H3vfNsG-ubPV5GobkPVV_XEQEKZpRWqrA" \
       --string-ids rules_engine/src/tabula_ids/src/string_id.rs \
+      --test-card-ids rules_engine/src/tabula_ids/src/test_card.rs \
       --write-json client/Assets/StreamingAssets/tabula.json
   cd rules_engine && cargo +nightly fmt
 

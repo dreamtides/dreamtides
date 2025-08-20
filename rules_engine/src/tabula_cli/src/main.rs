@@ -28,8 +28,10 @@ pub struct Args {
     key_file: String,
     #[arg(long, value_name = "SPREADSHEET_ID", help = "Google Sheets spreadsheet ID")]
     spreadsheet_id: String,
-    #[arg(long, value_name = "PATH", help = "Generate string_id.rs at the given path and exit")]
+    #[arg(long, value_name = "PATH", help = "Generate string_id.rs at the given path")]
     string_ids: Option<String>,
+    #[arg(long, value_name = "PATH", help = "Generate test_card_id.rs at the given path")]
+    test_card_ids: Option<String>,
     #[arg(
         long,
         value_name = "PATH",
@@ -96,6 +98,10 @@ async fn main() -> Result<()> {
 
     if let Some(path) = args.string_ids.as_deref() {
         tabula_codegen::generate_string_ids(&tabula_raw, path)?;
+    }
+
+    if let Some(path) = args.test_card_ids.as_deref() {
+        tabula_codegen::generate_test_card_ids(&tabula_raw, path)?;
     }
 
     if let Some(path) = args.write_json.as_deref() {
