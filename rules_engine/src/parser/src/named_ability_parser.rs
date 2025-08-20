@@ -11,7 +11,7 @@ pub fn parser<'a>() -> impl Parser<'a, &'a str, NamedAbility, ErrorType<'a>> {
 
 fn reclaim<'a>() -> impl Parser<'a, &'a str, NamedAbility, ErrorType<'a>> {
     choice((
-        phrase("{reclaim}").to(NamedAbility::Reclaim(None)),
-        numeric("{reclaim(e:", Energy, ")}").map(|e| NamedAbility::Reclaim(Some(e))),
+        phrase("{-reclaim}").to(NamedAbility::Reclaim(None)),
+        numeric("{-reclaim-cost(e:", Energy, ")}").map(|e| NamedAbility::Reclaim(Some(e))),
     ))
 }

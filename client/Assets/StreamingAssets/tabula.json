@@ -67,10 +67,16 @@
       "en_us": "\\u(f621)"
     },
     {
-      "id": "e5e10712-21d7-41f4-a550-16918f39f8f7",
-      "name": "-keyword",
-      "description": "Formatting for ability keywords in card rules text",
-      "en_us": "<color=#AA00FF><b>{$kw}</b></color>"
+      "id": "cb899350-def7-4466-a1e2-2a59e105d9fb",
+      "name": "keyword",
+      "description": "Formatting that appears before keywords",
+      "en_us": "<color=#AA00FF><b>"
+    },
+    {
+      "id": "bf435908-6161-4a6e-9407-81e0ccde2c4e",
+      "name": "end-keyword",
+      "description": "Formatting that appears after keywords",
+      "en_us": "</b></color>"
     },
     {
       "id": "cc5c5509-69c5-4c1f-8faa-b9948029dcb8",
@@ -97,6 +103,18 @@
       "en_us": "Choose one:\\u(000A)"
     },
     {
+      "id": "a8108996-e881-4b2e-80dd-3bfe5bf8dcd4",
+      "name": "ability",
+      "description": "Formatting that appears before an ability of a card with mutiple abilities",
+      "en_us": "<line-height=120%>"
+    },
+    {
+      "id": "12487a98-0f31-4f71-bd51-9a85bfcd281c",
+      "name": "end-ability",
+      "description": "Formatting that appears after an ability of a card with multiple abilities",
+      "en_us": "</line-height>"
+    },
+    {
       "id": "3cc400d3-0594-4663-9187-e8c46613a21f",
       "name": "mode-start",
       "description": "Formatting that appears before a modal ability",
@@ -110,75 +128,87 @@
     },
     {
       "id": "2e44ee4c-3218-45bf-a29e-0508f853c873",
-      "name": "foresee",
-      "description": "Foresee keyword ability",
-      "en_us": "{-keyword(kw: \"foresee\")}"
+      "name": "-foresee",
+      "description": "Foresee keyword ability with quantity",
+      "en_us": "{keyword}foresee{end-keyword} {$n}"
     },
     {
       "id": "b68a7c1c-5b2b-4885-863b-4ebf81279330",
-      "name": "Foresee",
-      "description": "Foresee keyword ability, capitalized",
-      "en_us": "{-keyword(kw: \"Foresee\")}"
+      "name": "-Foresee",
+      "description": "Foresee keyword ability with quantity, capitalized",
+      "en_us": "{keyword}Foresee{end-keyword} {$n}"
+    },
+    {
+      "id": "f19214ee-632b-4f0b-b3e4-d63e67b7ac03",
+      "name": "reclaim",
+      "description": "Reclaim keyword ability without energy cost",
+      "en_us": "{keyword}reclaim{end-keyword}"
+    },
+    {
+      "id": "6640dfed-a5d6-4b68-88db-3b62a4400132",
+      "name": "Reclaim",
+      "description": "Reclaim keyword ability without energy cost, capitalized",
+      "en_us": "{keyword}Reclaim{end-keyword}"
     },
     {
       "id": "fb895ce7-1f66-426d-8c29-b19fdeee7828",
-      "name": "reclaim",
-      "description": "Reclaim keyword ability",
-      "en_us": "{-keyword(kw: \"reclaim\")}"
+      "name": "-reclaim-cost",
+      "description": "Reclaim keyword ability with energy cost",
+      "en_us": "{keyword}reclaim{end-keyword} <color=#00838F><b>{$e}{e}</b></color>"
     },
     {
       "id": "5674a8dd-b4eb-4630-85c2-79d6b95cdaae",
-      "name": "Reclaim",
-      "description": "Reclaim keyword ability, capitalized",
-      "en_us": "{-keyword(kw: \"Reclaim\")}"
+      "name": "-Reclaim-Cost",
+      "description": "Reclaim keyword ability with energy cost, capitalized",
+      "en_us": "{keyword}Reclaim{end-keyword} <color=#00838F><b>{$e}{e}</b></color>"
     },
     {
       "id": "bf189fe0-75e2-4a87-9dca-67dd5f755766",
       "name": "kindle",
       "description": "Kindle keyword ability",
-      "en_us": "{-keyword(kw: \"kindle\")}"
+      "en_us": "{keyword}kindle{end-keyword}"
     },
     {
       "id": "d1c8ff05-9dd8-4ed6-9436-746a9caf5a63",
       "name": "Kindle",
       "description": "Kindle keyword ability, capitalized",
-      "en_us": "{-keyword(kw: \"Kindle\")}"
+      "en_us": "{keyword}Kindle{end-keyword}"
     },
     {
       "id": "5771085d-3c89-423f-be05-c728035e7cd0",
       "name": "dissolve",
       "description": "Dissolve keyword ability",
-      "en_us": "{-keyword(kw: \"dissolve\")}"
+      "en_us": "{keyword}dissolve{end-keyword}"
     },
     {
       "id": "8b9ef6b9-a6e1-4abe-be4d-cf7fa3ce41b8",
       "name": "Dissolve",
       "description": "Dissolve keyword ability, capitalized",
-      "en_us": "{-keyword(kw: \"Dissolve\")}"
+      "en_us": "{keyword}Dissolve{end-keyword}"
     },
     {
       "id": "1a9e01e9-e7aa-4692-9b1b-5dd9e0b4a7f9",
       "name": "prevent",
       "description": "Prevent keyword ability",
-      "en_us": "{-keyword(kw: \"prevent\")}"
+      "en_us": "{keyword}prevent{end-keyword}"
     },
     {
       "id": "fb38409b-cbaf-41a5-96fc-af622ce6f333",
       "name": "Prevent",
       "description": "Prevent keyword ability, capitalized",
-      "en_us": "{-keyword(kw: \"Prevent\")}"
+      "en_us": "{keyword}Prevent{end-keyword}"
     },
     {
       "id": "901b84a1-c886-447b-bd0d-005e240a23de",
       "name": "anchored",
       "description": "Anchored keyword ability",
-      "en_us": "{-keyword(kw: \"anchored\")}"
+      "en_us": "{keyword}anchored{end-keyword}"
     },
     {
       "id": "1bb69fb4-344a-48f2-a7a2-95a30ac4a2f2",
       "name": "Anchored",
       "description": "Anchored keyword ability, capitalized",
-      "en_us": "{-keyword(kw: \"Anchored\")}"
+      "en_us": "{keyword}Anchored{end-keyword}"
     },
     {
       "id": "66edfc8f-483b-4ad0-b37b-c66aa7c4347b",
@@ -759,6 +789,49 @@
       "spark": null,
       "rarity": "Special",
       "image_number": "1621160806"
+    },
+    {
+      "id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
+      "name_en_us": "Test Foresee Draw Reclaim ",
+      "energy_cost": "1",
+      "rules_text_en_us": "{ability}{-Foresee(n:1)}. Draw {-cards(n:1)}.{end-ability}\n{ability}{-Reclaim-Cost(e: 3)}{end-ability}",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "List": [
+                {
+                  "effect": {
+                    "Foresee": {
+                      "count": 1
+                    }
+                  },
+                  "optional": false
+                },
+                {
+                  "effect": {
+                    "DrawCards": {
+                      "count": 1
+                    }
+                  },
+                  "optional": false
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Named": {
+            "Reclaim": 3
+          }
+        }
+      ],
+      "card_type": "Event",
+      "subtype": null,
+      "is_fast": true,
+      "spark": null,
+      "rarity": "Special",
+      "image_number": "1328168243"
     }
   ]
 }

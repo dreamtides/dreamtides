@@ -126,7 +126,7 @@ fn test_reminder_and_flavor() {
 #[test]
 fn test_ability_blocks_example() {
     let result = parse(
-        "{ability}{Foresee(n: 1)}. Draw {-cards(n: 1)}.{end-ability}{ability}{Reclaim(e: 3)}{end-ability}",
+        "{ability}{-Foresee(n: 1)}. Draw {-cards(n: 1)}.{end-ability}{ability}{-Reclaim-Cost(e: 3)}{end-ability}",
     );
     assert_ron_snapshot!(
         result,

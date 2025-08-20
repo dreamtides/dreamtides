@@ -34,8 +34,11 @@ pub const EYE_SLASH_ICON: StringId = StringId(uuid!("2ca2c1dd-20f7-410b-9f5d-ce3
 /// "Star of life" icon used to represent non-numeric costs
 pub const ASTERISK_ICON: StringId = StringId(uuid!("fd603588-7ab8-48c8-93b0-2bf6afc59325"));
 
-/// Formatting for ability keywords in card rules text
-pub const KEYWORD: StringId = StringId(uuid!("e5e10712-21d7-41f4-a550-16918f39f8f7"));
+/// Formatting that appears before keywords
+pub const KEYWORD: StringId = StringId(uuid!("cb899350-def7-4466-a1e2-2a59e105d9fb"));
+
+/// Formatting that appears after keywords
+pub const END_KEYWORD: StringId = StringId(uuid!("bf435908-6161-4a6e-9407-81e0ccde2c4e"));
 
 /// Formatting for an amount of energy paid as a cost
 pub const ENERGY_COST: StringId = StringId(uuid!("cc5c5509-69c5-4c1f-8faa-b9948029dcb8"));
@@ -49,17 +52,26 @@ pub const GAINED_SPARK: StringId = StringId(uuid!("c49b155f-57a2-479a-bc45-254b2
 /// Formatting to select a single mode of a modal card
 pub const CHOOSE_ONE: StringId = StringId(uuid!("3057478f-1445-4b7d-8241-a90d97da7adf"));
 
+/// Formatting that appears before an ability of a card with mutiple abilities
+pub const ABILITY: StringId = StringId(uuid!("a8108996-e881-4b2e-80dd-3bfe5bf8dcd4"));
+
+/// Formatting that appears after an ability of a card with multiple abilities
+pub const END_ABILITY: StringId = StringId(uuid!("12487a98-0f31-4f71-bd51-9a85bfcd281c"));
+
 /// Formatting that appears before a modal ability
 pub const MODE_START: StringId = StringId(uuid!("3cc400d3-0594-4663-9187-e8c46613a21f"));
 
 /// Formatting that appears after a modal ability
 pub const MODE_END: StringId = StringId(uuid!("4a6ed656-0057-44c7-977d-8c0cedf1f725"));
 
-/// Foresee keyword ability
+/// Foresee keyword ability with quantity
 pub const FORESEE: StringId = StringId(uuid!("2e44ee4c-3218-45bf-a29e-0508f853c873"));
 
-/// Reclaim keyword ability
-pub const RECLAIM: StringId = StringId(uuid!("fb895ce7-1f66-426d-8c29-b19fdeee7828"));
+/// Reclaim keyword ability without energy cost
+pub const RECLAIM: StringId = StringId(uuid!("f19214ee-632b-4f0b-b3e4-d63e67b7ac03"));
+
+/// Reclaim keyword ability with energy cost
+pub const RECLAIM_COST: StringId = StringId(uuid!("fb895ce7-1f66-426d-8c29-b19fdeee7828"));
 
 /// Kindle keyword ability
 pub const KINDLE: StringId = StringId(uuid!("bf189fe0-75e2-4a87-9dca-67dd5f755766"));

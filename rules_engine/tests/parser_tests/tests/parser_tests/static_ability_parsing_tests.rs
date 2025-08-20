@@ -449,7 +449,7 @@ fn test_cards_in_void_have_reclaim() {
 
 #[test]
 fn test_reclaim_named_ability() {
-    let result = parse("{Reclaim}");
+    let result = parse("{-Reclaim}");
     assert_ron_snapshot!(result, @r###"
     [
       Named(Reclaim(None)),
@@ -459,7 +459,7 @@ fn test_reclaim_named_ability() {
 
 #[test]
 fn test_reclaim_named_ability_with_cost() {
-    let result = parse("{Reclaim(e: 3)}");
+    let result = parse("{-Reclaim-Cost(e: 3)}");
     assert_ron_snapshot!(result, @r###"
     [
       Named(Reclaim(Some(Energy(3)))),

@@ -443,7 +443,7 @@ fn gain_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> 
 }
 
 fn foresee<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    numeric("{foresee(n:", count, ")}").map(|count| StandardEffect::Foresee { count })
+    numeric("{-foresee(n:", count, ")}").map(|count| StandardEffect::Foresee { count })
 }
 
 fn lose_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {

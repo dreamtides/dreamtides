@@ -414,7 +414,7 @@ fn test_materialize_character_when_discarded() {
 
 #[test]
 fn test_foresee() {
-    let result = parse("$materialized: {foresee(n: 2)}.");
+    let result = parse("$materialized: {-foresee(n: 2)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -431,7 +431,7 @@ fn test_foresee() {
 
 #[test]
 fn test_foresee_then_draw_card() {
-    let result = parse("{Foresee(n: 1)}. Draw {-cards(n: 1)}.");
+    let result = parse("{-Foresee(n: 1)}. Draw {-cards(n: 1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
@@ -1374,7 +1374,7 @@ fn test_return_one_or_two_events_from_your_void_to_your_hand() {
 #[test]
 fn test_modal_draw_one_or_draw_two() {
     let result = parse(
-        "{choose-one}\n{mode-start}{-energy-cost(e: 1)}: Draw {-cards(n: 1)}.{mode-end}\n{mode-start}{-energy-cost(e: 3)}: Draw {-cards(n: 2)}.{mode-end}",
+        "{choose-one}\n{mode}{-energy-cost(e: 1)}: Draw {-cards(n: 1)}.{end-mode}\n{mode}{-energy-cost(e: 3)}: Draw {-cards(n: 2)}.{end-mode}",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -1401,7 +1401,7 @@ fn test_modal_draw_one_or_draw_two() {
 #[test]
 fn test_modal_draw_one_or_dissolve_enemy() {
     let result = parse(
-        "{choose-one}\n{mode-start}{-energy-cost(e: 1)}: Draw {-cards(n: 1)}.{mode-end}\n{mode-start}{-energy-cost(e: 2)}: {dissolve} an enemy character.{mode-end}",
+        "{choose-one}\n{mode}{-energy-cost(e: 1)}: Draw {-cards(n: 1)}.{end-mode}\n{mode}{-energy-cost(e: 2)}: {dissolve} an enemy character.{end-mode}",
     );
     assert_ron_snapshot!(result, @r###"
     [
