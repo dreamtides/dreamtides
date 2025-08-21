@@ -17,12 +17,12 @@ use state_provider::state_provider::{PollResult, StateProvider};
 use tracing::instrument;
 use uuid::Uuid;
 
-pub fn poll(provider: impl StateProvider + 'static, user_id: UserId) -> Option<PollResult> {
+pub fn poll<P: StateProvider>(provider: &P, user_id: UserId) -> Option<PollResult> {
     provider.take_next_poll_result(user_id)
 }
 
-pub fn append_update(
-    provider: impl StateProvider + 'static,
+pub fn append_update<P: StateProvider>(
+    provider: &P,
     user_id: UserId,
     update: CommandSequence,
     context: &RequestContext,
@@ -38,8 +38,8 @@ pub fn append_update(
 }
 
 #[instrument(name = "handle_battle_action", level = "debug", skip(provider, battle, context))]
-pub fn execute(
-    provider: impl StateProvider + 'static,
+pub fn execute<P: StateProvider + 'static>(
+    provider: &P,
     battle: &mut BattleState,
     initiated_by: UserId,
     player: PlayerName,
@@ -57,7 +57,7 @@ pub fn execute(
         let Some(next_player) = legal_actions::next_to_act(battle) else {
             battle_trace!("Rendering updates for game over", battle);
             render_updates(
-                provider.clone(),
+                provider,
                 battle,
                 initiated_by,
                 context,
@@ -78,7 +78,7 @@ pub fn execute(
         if let PlayerType::Agent(agent) = battle.players.player(next_player).player_type.clone() {
             battle_trace!("Rendering updates for AI player turn", battle);
             render_updates(
-                provider.clone(),
+                provider,
                 battle,
                 initiated_by,
                 context,
@@ -93,7 +93,7 @@ pub fn execute(
         } else {
             battle_trace!("Rendering updates for human player turn", battle);
             render_updates(
-                provider.clone(),
+                provider,
                 battle,
                 initiated_by,
                 context,
@@ -135,8 +135,8 @@ pub fn should_auto_execute_action(legal_actions: &LegalActions) -> Option<Battle
     }
 }
 
-fn render_updates(
-    provider: impl StateProvider + 'static,
+fn render_updates<P: StateProvider + 'static>(
+    provider: &P,
     battle: &BattleState,
     user_id: UserId,
     context: &RequestContext,
@@ -144,13 +144,13 @@ fn render_updates(
     response_type: PollResponseType,
 ) {
     let player_name = renderer::player_name_for_user(battle, user_id);
-    let player_updates = renderer::render_updates(battle, user_id, provider.clone());
-    append_update(provider.clone(), user_id, player_updates, context, request_id, response_type);
+    let player_updates = renderer::render_updates(battle, user_id, (*provider).clone());
+    append_update(provider, user_id, player_updates, context, request_id, response_type);
 
     if let PlayerType::User(opponent_id) =
         &battle.players.player(player_name.opponent()).player_type
     {
-        let opponent_updates = renderer::render_updates(battle, *opponent_id, provider.clone());
+        let opponent_updates = renderer::render_updates(battle, *opponent_id, (*provider).clone());
         append_update(provider, *opponent_id, opponent_updates, context, request_id, response_type);
     }
 }
