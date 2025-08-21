@@ -107,7 +107,7 @@ namespace Dreamtides.TestUtils
       return this;
     }
 
-    public TestBattle AddCardToHand(DisplayPlayer player, CardName cardName = CardName.TestVanillaCharacter)
+    public TestBattle AddCardToHand(DisplayPlayer player, Guid card = default(Guid))
     {
       var name = GetPlayerName(player);
       _actions.Add(new DebugBattleAction
@@ -116,7 +116,7 @@ namespace Dreamtides.TestUtils
         {
           AddCardToHand = new AddCardToHand
           {
-            Card = cardName,
+            Card = card == default(Guid) ? TestCards.TestVanillaCharacter : card,
             Player = name,
           }
         }
@@ -127,16 +127,16 @@ namespace Dreamtides.TestUtils
     public TestBattle AddCardsToBattlefield(
       DisplayPlayer player,
       int count,
-      CardName cardName = CardName.TestVanillaCharacter)
+      Guid card = default(Guid))
     {
       for (var i = 0; i < count; i++)
       {
-        AddCardToBattlefield(player, cardName);
+        AddCardToBattlefield(player, card);
       }
       return this;
     }
 
-    public TestBattle AddCardToBattlefield(DisplayPlayer player, CardName cardName = CardName.TestVanillaCharacter)
+    public TestBattle AddCardToBattlefield(DisplayPlayer player, Guid card = default(Guid))
     {
       var name = GetPlayerName(player);
       _actions.Add(new DebugBattleAction
@@ -145,7 +145,7 @@ namespace Dreamtides.TestUtils
         {
           AddCardToBattlefield = new AddCardToBattlefield
           {
-            Card = cardName,
+            Card = card == default(Guid) ? TestCards.TestVanillaCharacter : card,
             Player = name,
           }
         }
@@ -171,7 +171,7 @@ namespace Dreamtides.TestUtils
         {
           AddCardToVoid = new AddCardToVoid
           {
-            Card = CardName.TestVanillaCharacter,
+            Card = TestCards.TestVanillaCharacter,
             Player = name,
           }
         }

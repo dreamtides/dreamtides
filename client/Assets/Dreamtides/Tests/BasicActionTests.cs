@@ -40,7 +40,7 @@ namespace Dreamtides.Tests
       );
 
       yield return PerformAddCardAction(TestBattle.New()
-        .AddCardToHand(DisplayPlayer.User, CardName.TestVanillaCharacter)
+        .AddCardToHand(DisplayPlayer.User, TestCards.TestVanillaCharacter)
         .Build()
       );
 
@@ -74,7 +74,7 @@ namespace Dreamtides.Tests
       );
 
       yield return PerformAddCardAction(TestBattle.New()
-        .AddCardToHand(DisplayPlayer.User, CardName.TestDissolve)
+        .AddCardToHand(DisplayPlayer.User, TestCards.TestDissolve)
         .Build()
       );
 
@@ -131,27 +131,27 @@ namespace Dreamtides.Tests
       );
 
       yield return PerformAddCardAction(TestBattle.New()
-         .AddCardToHand(DisplayPlayer.User, CardName.TestVanillaCharacter)
+         .AddCardToHand(DisplayPlayer.User, TestCards.TestVanillaCharacter)
          .Build()
        );
       var characterCard = Registry.LayoutService.GetCard(CurrentCardId);
       yield return PerformAddCardAction(TestBattle.New()
-        .AddCardToHand(DisplayPlayer.User, CardName.TestCounterspell)
+        .AddCardToHand(DisplayPlayer.User, TestCards.TestCounterspell)
         .Build()
       );
       var userPrevent1 = Registry.LayoutService.GetCard(CurrentCardId);
       yield return PerformAddCardAction(TestBattle.New()
-        .AddCardToHand(DisplayPlayer.User, CardName.TestCounterspell)
+        .AddCardToHand(DisplayPlayer.User, TestCards.TestCounterspell)
         .Build()
       );
       var userPrevent2 = Registry.LayoutService.GetCard(CurrentCardId);
       yield return PerformAddCardAction(TestBattle.New()
-        .AddCardToHand(DisplayPlayer.Enemy, CardName.TestDrawOne)
+        .AddCardToHand(DisplayPlayer.Enemy, TestCards.TestDrawOne)
         .Build()
       );
       var enemyCard1 = CurrentCardId;
       yield return PerformAddCardAction(TestBattle.New()
-        .AddCardToHand(DisplayPlayer.Enemy, CardName.TestDrawOne)
+        .AddCardToHand(DisplayPlayer.Enemy, TestCards.TestDrawOne)
         .Build()
       );
       var enemyCard2 = CurrentCardId;
@@ -222,12 +222,12 @@ namespace Dreamtides.Tests
         .RemovePlayerHands()
         .SetEnergy(DisplayPlayer.User, 99)
         .SetEnergy(DisplayPlayer.Enemy, 99)
-        .AddCardToHand(DisplayPlayer.Enemy, CardName.TestDrawOne)
+        .AddCardToHand(DisplayPlayer.Enemy, TestCards.TestDrawOne)
         .AddCardsToBattlefield(DisplayPlayer.Enemy, 8)
         .Build()
       );
       yield return PerformAddCardAction(TestBattle.New()
-        .AddCardToHand(DisplayPlayer.User, CardName.TestDissolve)
+        .AddCardToHand(DisplayPlayer.User, TestCards.TestDissolve)
         .Build()
       );
       var userDissolve = Registry.LayoutService.GetCard(CurrentCardId);

@@ -27,7 +27,7 @@ namespace Dreamtides.Tests
         .Build()
       );
       yield return PerformAddCardAction(TestBattle.New()
-        .AddCardToHand(DisplayPlayer.User, CardName.TestActivatedAbilityDrawCard)
+        .AddCardToHand(DisplayPlayer.User, TestCards.TestActivatedAbilityDrawCard)
         .Build()
       );
       var activatedAbilityCharacter = Registry.LayoutService.GetCard(CurrentCardId);

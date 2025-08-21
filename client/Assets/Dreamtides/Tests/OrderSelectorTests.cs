@@ -28,7 +28,7 @@ namespace Dreamtides.Tests
       );
 
       yield return PerformAddCardAction(TestBattle.New()
-        .AddCardToHand(DisplayPlayer.User, CardName.TestForeseeTwo)
+        .AddCardToHand(DisplayPlayer.User, TestCards.TestForeseeTwo)
         .Build()
       );
       var foreseeTwo = Registry.LayoutService.GetCard(CurrentCardId);

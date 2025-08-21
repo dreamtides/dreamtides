@@ -23,7 +23,7 @@ namespace Dreamtides.Tests
       yield return Connect();
       yield return PerformAction(TestBattle.New()
         .RemovePlayerHands()
-        .AddCardsToBattlefield(DisplayPlayer.Enemy, 2, CardName.TestVanillaCharacter)
+        .AddCardsToBattlefield(DisplayPlayer.Enemy, 2, TestCards.TestVanillaCharacter)
         .Build()
       );
 
