@@ -7,7 +7,6 @@ use battle_state::battle_cards::zone::Zone;
 use battle_state::core::effect_source::EffectSource;
 use core_data::display_color;
 use core_data::display_types::{AudioClipAddress, EffectAddress, Milliseconds, ProjectileAddress};
-use core_data::identifiers::CardName;
 use display_data::card_view::{CardEffects, ClientCardId};
 use display_data::command::{
     Command, DisplayEffectCommand, DissolveCardCommand, FireProjectileCommand, GameObjectId,
@@ -16,6 +15,7 @@ use display_data::command::{
 use masonry::flex_style::FlexVector3;
 use quest_state::quest::card_descriptor;
 use strum::IntoDiscriminant;
+use tabula_ids::test_card;
 
 use crate::core::adapter;
 use crate::core::response_builder::ResponseBuilder;
@@ -32,7 +32,7 @@ pub fn apply_effect(
     let controller = card_properties::controller(battle, source_id);
     let effect_name = animation.discriminant().to_string();
     match card_descriptor::get_base_card_id(card::get(battle, source_id).identity) {
-        CardName::TestDissolve if effect_name == "ApplyTargetedEffect" => {
+        test_card::TEST_DISSOLVE if effect_name == "ApplyTargetedEffect" => {
             animations::push_snapshot(builder, battle);
             for target_id in find_target_ids(animation) {
                 builder.push(Command::FireProjectile(
@@ -70,7 +70,7 @@ pub fn apply_effect(
             }
         }
 
-        CardName::TestNamedDissolve if effect_name == "ApplyTargetedEffect" => {
+        test_card::TEST_NAMED_DISSOLVE if effect_name == "ApplyTargetedEffect" => {
             animations::push_snapshot(builder, battle);
             for target_id in find_target_ids(animation) {
                 builder.push(Command::FireProjectile(
@@ -108,7 +108,7 @@ pub fn apply_effect(
             }
         }
 
-        CardName::TestCounterspell if effect_name == "ApplyTargetedEffect" => {
+        test_card::TEST_COUNTERSPELL if effect_name == "ApplyTargetedEffect" => {
             animations::push_snapshot(builder, battle);
             for target_id in find_target_ids(animation) {
                 builder.push(Command::FireProjectile(
@@ -123,7 +123,7 @@ pub fn apply_effect(
             }
         }
 
-        CardName::TestCounterspellCharacter if effect_name == "ApplyTargetedEffect" => {
+        test_card::TEST_COUNTERSPELL_CHARACTER if effect_name == "ApplyTargetedEffect" => {
             animations::push_snapshot(builder, battle);
             for target_id in find_target_ids(animation) {
                 builder.push(Command::FireProjectile(
@@ -138,7 +138,7 @@ pub fn apply_effect(
             }
         }
 
-        CardName::TestCounterspellUnlessPays if effect_name == "ApplyTargetedEffect" => {
+        test_card::TEST_COUNTERSPELL_UNLESS_PAYS if effect_name == "ApplyTargetedEffect" => {
             animations::push_snapshot(builder, battle);
             for target_id in find_target_ids(animation) {
                 builder.push(Command::FireProjectile(
@@ -156,7 +156,7 @@ pub fn apply_effect(
             }
         }
 
-        CardName::TestVariableEnergyDraw if effect_name == "DrawCards" => {
+        test_card::TEST_VARIABLE_ENERGY_DRAW if effect_name == "DrawCards" => {
             animations::push_snapshot(builder, battle);
             builder.push(Command::DisplayEffect(DisplayEffectCommand {
                 target: GameObjectId::Deck(builder.to_display_player(controller)),
@@ -170,7 +170,7 @@ pub fn apply_effect(
             }));
         }
 
-        CardName::TestFastMultiActivatedAbilityDrawCardCharacter
+        test_card::TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER
             if effect_name == "ActivatedAbility" =>
         {
             animations::push_snapshot(builder, battle);
@@ -185,7 +185,7 @@ pub fn apply_effect(
             }));
         }
 
-        CardName::TestReturnOneOrTwoVoidEventCardsToHand
+        test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND
             if effect_name == "SelectedTargetsForCard" =>
         {
             animations::push_snapshot(builder, battle);
@@ -196,7 +196,9 @@ pub fn apply_effect(
             }));
         }
 
-        CardName::TestModalReturnToHandOrDrawTwo if effect_name == "ApplyTargetedEffect" => {
+        test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO
+            if effect_name == "ApplyTargetedEffect" =>
+        {
             animations::push_snapshot(builder, battle);
             for target_id in find_target_ids(animation) {
                 builder.push(Command::FireProjectile(
@@ -214,7 +216,7 @@ pub fn apply_effect(
             }
         }
 
-        CardName::TestModalReturnToHandOrDrawTwo if effect_name == "DrawCards" => {
+        test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO if effect_name == "DrawCards" => {
             animations::push_snapshot(builder, battle);
             builder.push(Command::DisplayEffect(DisplayEffectCommand {
                 target: GameObjectId::Deck(builder.to_display_player(controller)),

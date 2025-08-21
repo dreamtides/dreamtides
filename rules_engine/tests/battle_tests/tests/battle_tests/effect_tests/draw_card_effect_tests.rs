@@ -1,8 +1,8 @@
 use battle_tests::assert_display_string_contains;
-use core_data::identifiers::CardName;
 use core_data::numerics::Energy;
 use display_data::battle_view::{BattlePreviewState, DisplayPlayer};
 use display_data::command::Command;
+use tabula_ids::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_prelude::*;
@@ -12,7 +12,7 @@ use ui_components::icon;
 fn draw_card_for_each_energy_spent() {
     let mut s = TestBattle::builder().connect();
     let starting_energy = s.user_client.me.energy();
-    let id = s.create_and_play(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
+    let id = s.create_and_play(DisplayPlayer::User, test_card::TEST_VARIABLE_ENERGY_DRAW);
     let cost = s.user_client.cards.get_cost(&id);
     s.click_increment_button(DisplayPlayer::User);
     s.click_increment_button(DisplayPlayer::User);
@@ -34,7 +34,7 @@ fn draw_card_for_each_energy_spent() {
 #[test]
 fn draw_card_animation_command() {
     let mut s = TestBattle::builder().connect();
-    s.create_and_play(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_VARIABLE_ENERGY_DRAW);
     s.click_increment_button(DisplayPlayer::User);
     s.click_primary_button(DisplayPlayer::User, "Spend");
 
@@ -64,7 +64,7 @@ fn draw_card_animation_command() {
 #[test]
 fn draw_multiple_cards_animation() {
     let mut s = TestBattle::builder().connect();
-    s.create_and_play(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_VARIABLE_ENERGY_DRAW);
     s.click_increment_button(DisplayPlayer::User);
     s.click_increment_button(DisplayPlayer::User);
     s.click_increment_button(DisplayPlayer::User);
@@ -101,7 +101,7 @@ fn draw_multiple_cards_animation() {
 fn battle_preview_shows_energy_changes_for_incremental_spending() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(10).build()).connect();
     let starting_energy = s.user_client.me.energy();
-    let id = s.create_and_play(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
+    let id = s.create_and_play(DisplayPlayer::User, test_card::TEST_VARIABLE_ENERGY_DRAW);
     let card_cost = s.user_client.cards.get_cost(&id);
 
     assert!(
@@ -174,9 +174,10 @@ fn battle_preview_shows_energy_changes_for_incremental_spending() {
 #[test]
 fn energy_prompt_rules_text_shows_energy_spent_on_stack() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_hand(DisplayPlayer::Enemy, CardName::TestCounterspell);
+    s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_COUNTERSPELL);
 
-    let energy_prompt_id = s.create_and_play(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
+    let energy_prompt_id =
+        s.create_and_play(DisplayPlayer::User, test_card::TEST_VARIABLE_ENERGY_DRAW);
     s.click_increment_button(DisplayPlayer::User);
     s.click_increment_button(DisplayPlayer::User);
     s.click_primary_button(DisplayPlayer::User, "Spend");

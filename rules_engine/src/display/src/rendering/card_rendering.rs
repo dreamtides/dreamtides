@@ -17,7 +17,6 @@ use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::card_types::{CardSubtype, CardType};
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::SpriteAddress;
-use core_data::identifiers::CardName;
 use core_data::types::CardFacing;
 use display_data::card_view::{
     CardActions, CardPrefab, CardView, DisplayImage, InfoZoomData, InfoZoomIcon, RevealedCardView,
@@ -26,7 +25,7 @@ use fluent::fluent_args;
 use masonry::flex_enums::FlexDirection;
 use masonry::flex_style::FlexStyle;
 use quest_state::quest::card_descriptor;
-use tabula_ids::string_id;
+use tabula_ids::{string_id, test_card};
 use ui_components::box_component::BoxComponent;
 use ui_components::component::Component;
 use ui_components::icon;
@@ -192,96 +191,99 @@ fn can_select_order_action(legal_actions: &LegalActions, card_id: CardId) -> Opt
 
 pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
     match card_descriptor::get_base_card_id(card::get(battle, card_id).identity) {
-        CardName::TestVanillaCharacter => SpriteAddress::new(
+        test_card::TEST_VANILLA_CHARACTER => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
-        CardName::TestDissolve => SpriteAddress::new(
+        test_card::TEST_DISSOLVE => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png",
         ),
-        CardName::TestNamedDissolve => SpriteAddress::new(
+        test_card::TEST_NAMED_DISSOLVE => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png",
         ),
-        CardName::TestCounterspellUnlessPays => SpriteAddress::new(
+        test_card::TEST_COUNTERSPELL_UNLESS_PAYS => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_2123360837.png",
         ),
-        CardName::TestCounterspell => SpriteAddress::new(
+        test_card::TEST_COUNTERSPELL => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1282908322.png",
         ),
-        CardName::TestVariableEnergyDraw => SpriteAddress::new(
+        test_card::TEST_VARIABLE_ENERGY_DRAW => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
-        CardName::TestDrawOne => SpriteAddress::new(
+        test_card::TEST_DRAW_ONE => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
-        ),
-        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => SpriteAddress::new(
+        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER => {
+            SpriteAddress::new(
+                "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
+            )
+        }
+        test_card::TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png",
         ),
-        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => SpriteAddress::new(
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
-        CardName::TestActivatedAbilityDrawCard => SpriteAddress::new(
+        test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
-        CardName::TestMultiActivatedAbilityDrawCardCharacter => SpriteAddress::new(
+        test_card::TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
-        CardName::TestFastActivatedAbilityDrawCardCharacter => SpriteAddress::new(
+        test_card::TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
-        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => SpriteAddress::new(
+        test_card::TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
-        CardName::TestActivatedAbilityDissolveCharacter => SpriteAddress::new(
+        test_card::TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
-        CardName::TestDualActivatedAbilityCharacter => SpriteAddress::new(
+        test_card::TEST_DUAL_ACTIVATED_ABILITY_CHARACTER => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
         ),
-        CardName::TestForeseeOne => SpriteAddress::new(
+        test_card::TEST_FORESEE_ONE => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
-        CardName::TestForeseeTwo => SpriteAddress::new(
+        test_card::TEST_FORESEE_TWO => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
-        CardName::TestForeseeOneDrawACard => SpriteAddress::new(
+        test_card::TEST_FORESEE_ONE_DRAW_A_CARD => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
-        CardName::TestDrawOneReclaim => SpriteAddress::new(
+        test_card::TEST_DRAW_ONE_RECLAIM => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
-        CardName::TestReturnVoidCardToHand => SpriteAddress::new(
+        test_card::TEST_RETURN_VOID_CARD_TO_HAND => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
-        CardName::TestReturnOneOrTwoVoidEventCardsToHand => SpriteAddress::new(
+        test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png",
         ),
-        CardName::TestModalDrawOneOrDrawTwo => SpriteAddress::new(
+        test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
-        CardName::TestModalDrawOneOrDissolveEnemy => SpriteAddress::new(
+        test_card::TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
-        CardName::TestReturnToHand => SpriteAddress::new(
+        test_card::TEST_RETURN_TO_HAND => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
         ),
-        CardName::TestPreventDissolveThisTurn => SpriteAddress::new(
+        test_card::TEST_PREVENT_DISSOLVE_THIS_TURN => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png",
         ),
-        CardName::TestCounterspellCharacter => SpriteAddress::new(
+        test_card::TEST_COUNTERSPELL_CHARACTER => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png",
         ),
-        CardName::TestForeseeOneReclaim => SpriteAddress::new(
+        test_card::TEST_FORESEE_ONE_RECLAIM => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png",
         ),
-        CardName::TestForeseeOneDrawReclaim => SpriteAddress::new(
+        test_card::TEST_FORESEE_ONE_DRAW_RECLAIM => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png",
         ),
-        CardName::TestModalReturnToHandOrDrawTwo => SpriteAddress::new(
+        test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO => SpriteAddress::new(
             "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png",
         ),
+        _ => panic!("Unknown card: {card_id:?}"),
     }
 }
 
@@ -306,90 +308,91 @@ fn card_type(battle: &BattleState, card_id: CardId) -> String {
 
 pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -> String {
     let mut base_text = match card_descriptor::get_base_card_id(card::get(battle, card_id).identity) {
-        CardName::TestVanillaCharacter => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
-        CardName::TestDissolve => "<color=#AA00FF><b>Dissolve</b></color> an enemy character.".to_string(),
-        CardName::TestNamedDissolve => "<color=#AA00FF><b>Dissolve</b></color> an enemy character.".to_string(),
-        CardName::TestCounterspellUnlessPays => {
+        test_card::TEST_VANILLA_CHARACTER => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
+        test_card::TEST_DISSOLVE => "<color=#AA00FF><b>Dissolve</b></color> an enemy character.".to_string(),
+        test_card::TEST_NAMED_DISSOLVE => "<color=#AA00FF><b>Dissolve</b></color> an enemy character.".to_string(),
+        test_card::TEST_COUNTERSPELL_UNLESS_PAYS => {
             "<color=#AA00FF><b>Prevent</b></color> a played enemy event unless the enemy pays <color=#00838F><b>2\u{f7e4}</b></color>.".to_string()
         }
-        CardName::TestCounterspell => "<color=#AA00FF><b>Prevent</b></color> a played enemy card.".to_string(),
-        CardName::TestVariableEnergyDraw => {
+        test_card::TEST_COUNTERSPELL => "<color=#AA00FF><b>Prevent</b></color> a played enemy card.".to_string(),
+        test_card::TEST_VARIABLE_ENERGY_DRAW => {
             "Pay one or more <color=#00838F>\u{f7e4}</color>: Draw a card for each <color=#00838F>\u{f7e4}</color> spent.".to_string()
         }
-        CardName::TestDrawOne => "Draw a card.".to_string(),
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => {
+        test_card::TEST_DRAW_ONE => "Draw a card.".to_string(),
+        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER => {
             "Whenever you materialize another character, this character gains +1 spark.".to_string()
         }
-        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => {
+        test_card::TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN => {
             "Whenever you play a card during the enemy's turn, this character gains +1 spark.".to_string()
         }
-        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => {
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN => {
             "Whenever you play a card during the enemy's turn, this character gains +2 spark.".to_string()
         }
-        CardName::TestActivatedAbilityDrawCard => {
+        test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD => {
             "1\u{f7e4} -> Draw a card.".to_string()
         }
-        CardName::TestMultiActivatedAbilityDrawCardCharacter => {
+        test_card::TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => {
             "[multi] 1\u{f7e4} -> Draw a card.".to_string()
         }
-        CardName::TestFastActivatedAbilityDrawCardCharacter => {
+        test_card::TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => {
             "[fast] 1\u{f7e4} -> Draw a card.".to_string()
         }
-        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => {
+        test_card::TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => {
             format!(
                 "{}<space=\"-0.25px\">{} <color=#00838F><b>3\u{f7e4}</b></color><b><size=120%>:</size></b> Draw a card.",
                 icon::FAST,
                 icon::MULTI_ACTIVATED
             )
         }
-        CardName::TestActivatedAbilityDissolveCharacter => {
+        test_card::TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER => {
             "2\u{f7e4} -> <b>Dissolve</b> an enemy character.".to_string()
         }
-        CardName::TestDualActivatedAbilityCharacter => {
+        test_card::TEST_DUAL_ACTIVATED_ABILITY_CHARACTER => {
             "1\u{f7e4} -> Draw a card.\n2\u{f7e4} -> Draw 2 cards.".to_string()
         }
-        CardName::TestForeseeOne => {
+        test_card::TEST_FORESEE_ONE => {
             "<b>Foresee</b> 1.".to_string()
         }
-        CardName::TestForeseeTwo => {
+        test_card::TEST_FORESEE_TWO => {
             "<b>Foresee</b> 2.".to_string()
         }
-        CardName::TestForeseeOneDrawACard => {
+        test_card::TEST_FORESEE_ONE_DRAW_A_CARD => {
             "<b>Foresee</b> 1. Draw a card.".to_string()
         }
-        CardName::TestDrawOneReclaim => {
+        test_card::TEST_DRAW_ONE_RECLAIM => {
             "Draw a card. Reclaim 1\u{f7e4}.".to_string()
         }
-        CardName::TestReturnVoidCardToHand => {
+        test_card::TEST_RETURN_VOID_CARD_TO_HAND => {
             "Return a card from your void to your hand.".to_string()
         }
-        CardName::TestReturnOneOrTwoVoidEventCardsToHand => {
+        test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND => {
             "Return one or two events from your void to your hand.".to_string()
         }
-        CardName::TestModalDrawOneOrDrawTwo => {
+        test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO => {
             "Choose one:\n • <indent=1em>1\u{f7e4} : Draw 1 card.</indent>\n • <indent=1em>3\u{f7e4}: Draw 2 cards.</indent>".to_string()
         }
-        CardName::TestModalDrawOneOrDissolveEnemy => {
+        test_card::TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY => {
             "Choose one:\n • <indent=1em>1\u{f7e4}: Draw 1 card.</indent>\n • <indent=1em>2\u{f7e4}: <b>Dissolve</b> an enemy character.</indent>".to_string()
         }
-        CardName::TestReturnToHand => {
+        test_card::TEST_RETURN_TO_HAND => {
             "<b>Return</b> an enemy character to its owner's hand.".to_string()
         }
-        CardName::TestPreventDissolveThisTurn => {
+        test_card::TEST_PREVENT_DISSOLVE_THIS_TURN => {
             "Give an allied character <color=#AA00FF><b>anchored</b></color> until end of turn.".to_string()
         }
-        CardName::TestCounterspellCharacter => {
+        test_card::TEST_COUNTERSPELL_CHARACTER => {
             "<color=#AA00FF><b>Prevent</b></color> a played enemy character.".to_string()
         }
-        CardName::TestForeseeOneReclaim => {
+        test_card::TEST_FORESEE_ONE_RECLAIM => {
             "<line-height=120%><color=#AA00FF><b>Foresee</b></color> 1.\n</line-height><color=#AA00FF><b>Reclaim</b></color> <color=#00838F><b>3\u{f7e4}</b></color>".to_string()
         }
-        CardName::TestForeseeOneDrawReclaim => {
+        test_card::TEST_FORESEE_ONE_DRAW_RECLAIM => {
             "<line-height=120%><color=#AA00FF><b>Foresee</b></color> 1. Draw a card.\n</line-height><color=#AA00FF><b>Reclaim</b></color> <color=#00838F><b>4\u{f7e4}</b></color>".to_string()
         }
-        CardName::TestModalReturnToHandOrDrawTwo => {
+        test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO => {
             "Choose one:\n • <indent=1em><color=#00838F><b>2\u{f7e4}</b></color>: Return an enemy character to hand.</indent>\n • <indent=1em><color=#00838F><b>3\u{f7e4}</b></color>: Draw 2 cards.</indent>".to_string()
         }
+        _ => panic!("Unknown card: {card_id:?}"),
     };
 
     if let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))
@@ -400,7 +403,7 @@ pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: Card
     }
 
     if card_descriptor::get_base_card_id(card::get(battle, card_id).identity)
-        == CardName::TestVariableEnergyDraw
+        == test_card::TEST_VARIABLE_ENERGY_DRAW
         && let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))
         && let StackCardAdditionalCostsPaid::Energy(energy) = &stack_item.additional_costs_paid
     {
@@ -466,29 +469,31 @@ fn is_on_stack_from_void(battle: &BattleState, card_id: CardId) -> bool {
 
 fn supplemental_card_info(battle: &BattleState, card_id: CardId) -> Vec<String> {
     match card_descriptor::get_base_card_id(card::get(battle, card_id).identity) {
-        CardName::TestDissolve => vec!["<b>Dissolve:</b> Send a character to the void".to_string()],
-        CardName::TestNamedDissolve => {
+        test_card::TEST_DISSOLVE => {
             vec!["<b>Dissolve:</b> Send a character to the void".to_string()]
         }
-        CardName::TestCounterspellUnlessPays => vec![
+        test_card::TEST_NAMED_DISSOLVE => {
+            vec!["<b>Dissolve:</b> Send a character to the void".to_string()]
+        }
+        test_card::TEST_COUNTERSPELL_UNLESS_PAYS => vec![
             "<b>Prevent:</b> Send a card to the void in response to it being played".to_string(),
         ],
-        CardName::TestCounterspell => vec![
+        test_card::TEST_COUNTERSPELL => vec![
             "<b>Prevent:</b> Send a card to the void in response to it being played".to_string(),
         ],
-        CardName::TestForeseeOne => vec![
+        test_card::TEST_FORESEE_ONE => vec![
             "<b>Foresee 1:</b> Look at the top card of your deck. You may put it into your void."
                 .to_string(),
         ],
-        CardName::TestPreventDissolveThisTurn => {
+        test_card::TEST_PREVENT_DISSOLVE_THIS_TURN => {
             vec!["<b>Anchored:</b> Cannot be dissolved.".to_string()]
         }
-        CardName::TestForeseeOneDrawReclaim => vec![
+        test_card::TEST_FORESEE_ONE_DRAW_RECLAIM => vec![
             "<b>Foresee 1:</b> Look at the top card of your deck. You may put it into your void."
                 .to_string(),
             "<b>Reclaim:</b> You may play this card from your void, then banish it.".to_string(),
         ],
-        CardName::TestCounterspellCharacter => vec![
+        test_card::TEST_COUNTERSPELL_CHARACTER => vec![
             "<b>Prevent:</b> Send a character to the void in response to it being played"
                 .to_string(),
         ],

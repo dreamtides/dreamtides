@@ -417,6 +417,7 @@ dependencies = [
  "serde",
  "serde_json",
  "state_provider",
+ "tabula_ids",
  "test_utils",
  "tokio",
  "ui_components",
@@ -436,6 +437,7 @@ dependencies = [
  "quest_state",
  "rand 0.9.0",
  "rand_xoshiro",
+ "tabula_ids",
  "uuid",
 ]
 
@@ -1198,6 +1200,7 @@ dependencies = [
  "rand 0.9.0",
  "rand_xoshiro",
  "serde",
+ "tabula_ids",
  "user_state",
  "uuid",
 ]
@@ -2188,6 +2191,7 @@ dependencies = [
  "core_data",
  "schemars 1.0.2",
  "serde",
+ "tabula_ids",
  "user_state",
 ]
 

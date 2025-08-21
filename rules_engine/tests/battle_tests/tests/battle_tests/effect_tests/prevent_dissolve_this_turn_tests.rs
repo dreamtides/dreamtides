@@ -1,18 +1,18 @@
-use core_data::identifiers::CardName;
 use display_data::battle_view::DisplayPlayer;
+use tabula_ids::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::session::test_session_prelude::*;
 
 #[test]
 fn prevent_dissolve_in_response() {
     let mut s = TestBattle::builder().connect();
-    let character_id = s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let character_id = s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
     let prevent_dissolve_id =
-        s.add_to_hand(DisplayPlayer::User, CardName::TestPreventDissolveThisTurn);
+        s.add_to_hand(DisplayPlayer::User, test_card::TEST_PREVENT_DISSOLVE_THIS_TURN);
 
-    s.create_and_play(DisplayPlayer::Enemy, CardName::TestDissolve);
+    s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_DISSOLVE);
 
     assert!(
         s.user_client.cards.get_revealed(&prevent_dissolve_id).actions.can_play.is_some(),
@@ -35,12 +35,12 @@ fn prevent_dissolve_in_response() {
 #[test]
 fn prevent_dissolve_makes_character_invalid_target() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
-    let dissolve_id = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDissolve);
+    let dissolve_id = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DISSOLVE);
     let prevent_dissolve_id =
-        s.add_to_hand(DisplayPlayer::User, CardName::TestPreventDissolveThisTurn);
+        s.add_to_hand(DisplayPlayer::User, test_card::TEST_PREVENT_DISSOLVE_THIS_TURN);
 
     assert!(
         s.enemy_client.cards.get_revealed(&dissolve_id).actions.can_play.is_some(),
@@ -48,7 +48,7 @@ fn prevent_dissolve_makes_character_invalid_target() {
     );
 
     // Enemy adds 'draw one' to stack
-    s.create_and_play(DisplayPlayer::Enemy, CardName::TestDrawOne);
+    s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_DRAW_ONE);
     // User responds with prevent dissolve on stack
     s.play_card_from_hand(DisplayPlayer::User, &prevent_dissolve_id);
     // Pass priority, prevent dissolve resolves on stack
@@ -63,20 +63,22 @@ fn prevent_dissolve_makes_character_invalid_target() {
 #[test]
 fn prevent_dissolve_with_multiple_characters() {
     let mut s = TestBattle::builder().connect();
-    let character1_id = s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
-    let character2_id = s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let character1_id =
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    let character2_id =
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
-    let dissolve_id = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDissolve);
+    let dissolve_id = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DISSOLVE);
     let prevent_dissolve_id =
-        s.add_to_hand(DisplayPlayer::User, CardName::TestPreventDissolveThisTurn);
+        s.add_to_hand(DisplayPlayer::User, test_card::TEST_PREVENT_DISSOLVE_THIS_TURN);
 
     assert!(
         s.enemy_client.cards.get_revealed(&dissolve_id).actions.can_play.is_some(),
         "enemy can currently play dissolve"
     );
 
-    s.create_and_play(DisplayPlayer::Enemy, CardName::TestDrawOne);
+    s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_DRAW_ONE);
 
     assert!(
         s.user_client.cards.get_revealed(&prevent_dissolve_id).actions.can_play.is_some(),
@@ -105,14 +107,16 @@ fn prevent_dissolve_with_multiple_characters() {
 #[test]
 fn multiple_dissolve_effects_with_prevent_dissolve() {
     let mut s = TestBattle::builder().connect();
-    let character1_id = s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
-    let character2_id = s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let character1_id =
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    let character2_id =
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
-    let dissolve1_id = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDissolve);
-    let dissolve2_id = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDissolve);
+    let dissolve1_id = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DISSOLVE);
+    let dissolve2_id = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DISSOLVE);
     let prevent_dissolve_id =
-        s.add_to_hand(DisplayPlayer::User, CardName::TestPreventDissolveThisTurn);
+        s.add_to_hand(DisplayPlayer::User, test_card::TEST_PREVENT_DISSOLVE_THIS_TURN);
 
     s.play_card_from_hand(DisplayPlayer::Enemy, &dissolve1_id);
     s.click_card(DisplayPlayer::Enemy, &character1_id);
@@ -139,15 +143,15 @@ fn multiple_dissolve_effects_with_prevent_dissolve() {
 #[test]
 fn prevent_dissolve_in_end_step() {
     let mut s = TestBattle::builder().connect();
-    let dissolve_id = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDissolve);
-    let character_id = s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let dissolve_id = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DISSOLVE);
+    let character_id = s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     let other_character_1 =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     let other_character_2 =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestPreventDissolveThisTurn);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_PREVENT_DISSOLVE_THIS_TURN);
     s.click_card(DisplayPlayer::User, &character_id);
     s.click_primary_button(DisplayPlayer::Enemy, "Resolve");
 
@@ -171,12 +175,12 @@ fn prevent_dissolve_in_end_step() {
 #[test]
 fn prevent_dissolve_expires_next_turn() {
     let mut s = TestBattle::builder().connect();
-    let character_id = s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
-    s.create_and_play(DisplayPlayer::User, CardName::TestPreventDissolveThisTurn);
+    let character_id = s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_PREVENT_DISSOLVE_THIS_TURN);
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    s.create_and_play(DisplayPlayer::Enemy, CardName::TestDissolve);
+    s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_DISSOLVE);
     assert_eq!(s.user_client.cards.user_battlefield().len(), 0, "character should be dissolved");
     assert!(s.user_client.cards.user_void().contains(&character_id), "character should be in void");
 }

@@ -21,18 +21,19 @@ use battle_state::battle_player::battle_player_state::{
 };
 use battle_state::battle_player::player_map::PlayerMap;
 use battle_state::triggers::trigger_state::TriggerState;
-use core_data::identifiers::{BattleId, CardName};
+use core_data::identifiers::{BaseCardId, BattleId};
 use core_data::numerics::{Energy, Points, Spark, TurnId};
 use core_data::types::PlayerName;
 use game_creation::new_test_battle;
 use quest_state::quest::card_descriptor;
 use rand::SeedableRng;
 use rand_xoshiro::Xoshiro256PlusPlus;
+use tabula_ids::test_card;
 use uuid::Uuid;
 
 struct BenchmarkCardSpec {
     id: usize,
-    name: CardName,
+    name: BaseCardId,
     owner: PlayerName,
     zone: Zone,
 }
@@ -41,217 +42,217 @@ pub fn benchmark_battle() -> BattleState {
     let card_specs = vec![
         BenchmarkCardSpec {
             id: 0,
-            name: CardName::TestVanillaCharacter,
+            name: test_card::TEST_VANILLA_CHARACTER,
             owner: PlayerName::One,
             zone: Zone::Battlefield,
         },
         BenchmarkCardSpec {
             id: 1,
-            name: CardName::TestVanillaCharacter,
+            name: test_card::TEST_VANILLA_CHARACTER,
             owner: PlayerName::One,
             zone: Zone::Deck,
         },
         BenchmarkCardSpec {
             id: 2,
-            name: CardName::TestVanillaCharacter,
+            name: test_card::TEST_VANILLA_CHARACTER,
             owner: PlayerName::One,
             zone: Zone::Hand,
         },
         BenchmarkCardSpec {
             id: 3,
-            name: CardName::TestVanillaCharacter,
+            name: test_card::TEST_VANILLA_CHARACTER,
             owner: PlayerName::One,
             zone: Zone::Deck,
         },
         BenchmarkCardSpec {
             id: 4,
-            name: CardName::TestVanillaCharacter,
+            name: test_card::TEST_VANILLA_CHARACTER,
             owner: PlayerName::One,
             zone: Zone::Battlefield,
         },
         BenchmarkCardSpec {
             id: 5,
-            name: CardName::TestVanillaCharacter,
+            name: test_card::TEST_VANILLA_CHARACTER,
             owner: PlayerName::One,
             zone: Zone::Deck,
         },
         BenchmarkCardSpec {
             id: 6,
-            name: CardName::TestDissolve,
+            name: test_card::TEST_DISSOLVE,
             owner: PlayerName::One,
             zone: Zone::Hand,
         },
         BenchmarkCardSpec {
             id: 7,
-            name: CardName::TestDissolve,
+            name: test_card::TEST_DISSOLVE,
             owner: PlayerName::One,
             zone: Zone::Hand,
         },
         BenchmarkCardSpec {
             id: 8,
-            name: CardName::TestDissolve,
+            name: test_card::TEST_DISSOLVE,
             owner: PlayerName::One,
             zone: Zone::Deck,
         },
         BenchmarkCardSpec {
             id: 9,
-            name: CardName::TestCounterspell,
+            name: test_card::TEST_COUNTERSPELL,
             owner: PlayerName::One,
             zone: Zone::Hand,
         },
         BenchmarkCardSpec {
             id: 10,
-            name: CardName::TestCounterspell,
+            name: test_card::TEST_COUNTERSPELL,
             owner: PlayerName::One,
             zone: Zone::Deck,
         },
         BenchmarkCardSpec {
             id: 11,
-            name: CardName::TestCounterspell,
+            name: test_card::TEST_COUNTERSPELL,
             owner: PlayerName::One,
             zone: Zone::Hand,
         },
         BenchmarkCardSpec {
             id: 12,
-            name: CardName::TestCounterspellUnlessPays,
+            name: test_card::TEST_COUNTERSPELL_UNLESS_PAYS,
             owner: PlayerName::One,
             zone: Zone::Deck,
         },
         BenchmarkCardSpec {
             id: 13,
-            name: CardName::TestCounterspellUnlessPays,
+            name: test_card::TEST_COUNTERSPELL_UNLESS_PAYS,
             owner: PlayerName::One,
             zone: Zone::Deck,
         },
         BenchmarkCardSpec {
             id: 14,
-            name: CardName::TestCounterspellUnlessPays,
+            name: test_card::TEST_COUNTERSPELL_UNLESS_PAYS,
             owner: PlayerName::One,
             zone: Zone::Hand,
         },
         BenchmarkCardSpec {
             id: 15,
-            name: CardName::TestVariableEnergyDraw,
+            name: test_card::TEST_VARIABLE_ENERGY_DRAW,
             owner: PlayerName::One,
             zone: Zone::Deck,
         },
         BenchmarkCardSpec {
             id: 16,
-            name: CardName::TestVariableEnergyDraw,
+            name: test_card::TEST_VARIABLE_ENERGY_DRAW,
             owner: PlayerName::One,
             zone: Zone::Deck,
         },
         BenchmarkCardSpec {
             id: 17,
-            name: CardName::TestVariableEnergyDraw,
+            name: test_card::TEST_VARIABLE_ENERGY_DRAW,
             owner: PlayerName::One,
             zone: Zone::Hand,
         },
         BenchmarkCardSpec {
             id: 18,
-            name: CardName::TestVanillaCharacter,
+            name: test_card::TEST_VANILLA_CHARACTER,
             owner: PlayerName::Two,
             zone: Zone::Deck,
         },
         BenchmarkCardSpec {
             id: 19,
-            name: CardName::TestVanillaCharacter,
+            name: test_card::TEST_VANILLA_CHARACTER,
             owner: PlayerName::Two,
             zone: Zone::Battlefield,
         },
         BenchmarkCardSpec {
             id: 20,
-            name: CardName::TestVanillaCharacter,
+            name: test_card::TEST_VANILLA_CHARACTER,
             owner: PlayerName::Two,
             zone: Zone::Deck,
         },
         BenchmarkCardSpec {
             id: 21,
-            name: CardName::TestVanillaCharacter,
+            name: test_card::TEST_VANILLA_CHARACTER,
             owner: PlayerName::Two,
             zone: Zone::Deck,
         },
         BenchmarkCardSpec {
             id: 22,
-            name: CardName::TestVanillaCharacter,
+            name: test_card::TEST_VANILLA_CHARACTER,
             owner: PlayerName::Two,
             zone: Zone::Deck,
         },
         BenchmarkCardSpec {
             id: 23,
-            name: CardName::TestVanillaCharacter,
+            name: test_card::TEST_VANILLA_CHARACTER,
             owner: PlayerName::Two,
             zone: Zone::Deck,
         },
         BenchmarkCardSpec {
             id: 24,
-            name: CardName::TestDissolve,
+            name: test_card::TEST_DISSOLVE,
             owner: PlayerName::Two,
             zone: Zone::Hand,
         },
         BenchmarkCardSpec {
             id: 25,
-            name: CardName::TestDissolve,
+            name: test_card::TEST_DISSOLVE,
             owner: PlayerName::Two,
             zone: Zone::Hand,
         },
         BenchmarkCardSpec {
             id: 26,
-            name: CardName::TestDissolve,
+            name: test_card::TEST_DISSOLVE,
             owner: PlayerName::Two,
             zone: Zone::Deck,
         },
         BenchmarkCardSpec {
             id: 27,
-            name: CardName::TestCounterspell,
+            name: test_card::TEST_COUNTERSPELL,
             owner: PlayerName::Two,
             zone: Zone::Deck,
         },
         BenchmarkCardSpec {
             id: 28,
-            name: CardName::TestCounterspell,
+            name: test_card::TEST_COUNTERSPELL,
             owner: PlayerName::Two,
             zone: Zone::Hand,
         },
         BenchmarkCardSpec {
             id: 29,
-            name: CardName::TestCounterspell,
+            name: test_card::TEST_COUNTERSPELL,
             owner: PlayerName::Two,
             zone: Zone::Hand,
         },
         BenchmarkCardSpec {
             id: 30,
-            name: CardName::TestCounterspellUnlessPays,
+            name: test_card::TEST_COUNTERSPELL_UNLESS_PAYS,
             owner: PlayerName::Two,
             zone: Zone::Hand,
         },
         BenchmarkCardSpec {
             id: 31,
-            name: CardName::TestCounterspellUnlessPays,
+            name: test_card::TEST_COUNTERSPELL_UNLESS_PAYS,
             owner: PlayerName::Two,
             zone: Zone::Hand,
         },
         BenchmarkCardSpec {
             id: 32,
-            name: CardName::TestCounterspellUnlessPays,
+            name: test_card::TEST_COUNTERSPELL_UNLESS_PAYS,
             owner: PlayerName::Two,
             zone: Zone::Deck,
         },
         BenchmarkCardSpec {
             id: 33,
-            name: CardName::TestVariableEnergyDraw,
+            name: test_card::TEST_VARIABLE_ENERGY_DRAW,
             owner: PlayerName::Two,
             zone: Zone::Hand,
         },
         BenchmarkCardSpec {
             id: 34,
-            name: CardName::TestVariableEnergyDraw,
+            name: test_card::TEST_VARIABLE_ENERGY_DRAW,
             owner: PlayerName::Two,
             zone: Zone::Hand,
         },
         BenchmarkCardSpec {
             id: 35,
-            name: CardName::TestVariableEnergyDraw,
+            name: test_card::TEST_VARIABLE_ENERGY_DRAW,
             owner: PlayerName::Two,
             zone: Zone::Deck,
         },
@@ -328,7 +329,7 @@ pub fn benchmark_battle() -> BattleState {
         if spec.zone == Zone::Battlefield {
             let character_id = CharacterId(card_id);
             let card_name = card::get(&battle, character_id).identity;
-            if card_name == card_descriptor::get_base_identity(CardName::TestVanillaCharacter) {
+            if card_name == card_descriptor::get_base_identity(test_card::TEST_VANILLA_CHARACTER) {
                 if let Some(char_state) =
                     battle.cards.battlefield_state_mut(spec.owner).get_mut(&character_id)
                 {

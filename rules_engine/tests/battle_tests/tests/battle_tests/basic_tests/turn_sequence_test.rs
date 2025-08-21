@@ -1,8 +1,8 @@
 use battle_state::actions::battle_actions::BattleAction;
-use core_data::identifiers::CardName;
 use core_data::numerics::{Points, Spark};
 use display_data::battle_view::{DisplayPlayer, DisplayedTurnIndicator};
 use display_data::command::Command;
+use tabula_ids::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_prelude::*;
@@ -11,11 +11,11 @@ use test_utils::session::test_session_prelude::*;
 fn play_fast_card_during_enemy_end_step() {
     let mut s = TestBattle::builder().connect();
 
-    let dissolve_id = s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
+    let dissolve_id = s.add_to_hand(DisplayPlayer::User, test_card::TEST_DISSOLVE);
     // Add another fast card to hand to prevent the next user turn from
     // automatically starting.
-    s.add_to_hand(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
-    s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_VARIABLE_ENERGY_DRAW);
+    s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "enemy has one character");
     assert!(s.user_client.me.can_act(), "user can act on their turn");
@@ -82,7 +82,7 @@ fn play_fast_card_during_enemy_end_step() {
 fn judgment_command_fired_when_user_score_changes() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
-    let _character_id = s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let _character_id = s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     assert_eq!(s.user_client.me.total_spark(), Spark(5), "user has spark from character");
     assert_eq!(s.user_client.me.score(), Points(0), "user starts with no points");
@@ -173,7 +173,7 @@ fn judgment_command_shows_total_score_not_points_gained() {
     let mut s =
         TestBattle::builder().user(TestPlayer::builder().energy(99).points(10).build()).connect();
 
-    let _character_id = s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let _character_id = s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     assert_eq!(s.user_client.me.total_spark(), Spark(5), "user has spark from character");
     assert_eq!(s.user_client.me.score(), Points(10), "user starts with 10 points");
@@ -218,8 +218,8 @@ fn judgment_command_shows_total_score_not_points_gained() {
 #[test]
 fn turn_indicator_displays_correct_phase() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
-    s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
+    s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DRAW_ONE);
 
     assert_eq!(
         s.user_client.me.view.as_ref().unwrap().turn_indicator,

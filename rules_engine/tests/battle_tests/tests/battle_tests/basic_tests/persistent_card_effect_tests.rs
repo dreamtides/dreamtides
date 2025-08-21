@@ -1,14 +1,14 @@
-use core_data::identifiers::CardName;
 use display_data::battle_view::DisplayPlayer;
+use tabula_ids::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::session::test_session_prelude::*;
 
 #[test]
 fn prevent_dissolve_shows_looping_effect_on_battlefield() {
     let mut s = TestBattle::builder().connect();
-    let character_id = s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let character_id = s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestPreventDissolveThisTurn);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_PREVENT_DISSOLVE_THIS_TURN);
 
     let character_data = s.user_client.cards.get(&character_id);
     assert!(
@@ -20,11 +20,12 @@ fn prevent_dissolve_shows_looping_effect_on_battlefield() {
 #[test]
 fn prevent_dissolve_removes_looping_effect_when_returned_to_hand() {
     let mut s = TestBattle::builder().connect();
-    let character_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let character_id =
+        s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    s.create_and_play(DisplayPlayer::Enemy, CardName::TestPreventDissolveThisTurn);
+    s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_PREVENT_DISSOLVE_THIS_TURN);
 
     let character_data = s.enemy_client.cards.get(&character_id);
     assert!(
@@ -34,7 +35,7 @@ fn prevent_dissolve_removes_looping_effect_when_returned_to_hand() {
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::Enemy);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestReturnToHand);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_RETURN_TO_HAND);
 
     let character_data = s.user_client.cards.get(&character_id);
     assert!(
@@ -50,9 +51,9 @@ fn prevent_dissolve_removes_looping_effect_when_returned_to_hand() {
 #[test]
 fn prevent_dissolve_looping_effect_expires_next_turn() {
     let mut s = TestBattle::builder().connect();
-    let character_id = s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let character_id = s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestPreventDissolveThisTurn);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_PREVENT_DISSOLVE_THIS_TURN);
 
     let character_data = s.user_client.cards.get(&character_id);
     assert!(

@@ -1,6 +1,6 @@
-use core_data::identifiers::CardName;
 use core_data::numerics::Spark;
 use display_data::battle_view::DisplayPlayer;
+use tabula_ids::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_prelude::*;
@@ -8,13 +8,13 @@ use test_utils::session::test_session_prelude::*;
 #[test]
 fn return_enemy_character_to_hand() {
     let mut s = TestBattle::builder().connect();
-    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "enemy character on battlefield");
     assert_eq!(s.user_client.cards.enemy_hand().len(), 0, "enemy hand empty");
     assert_eq!(s.user_client.cards.user_void().len(), 0, "user void empty");
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestReturnToHand);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_RETURN_TO_HAND);
 
     assert_eq!(
         s.user_client.cards.enemy_battlefield().len(),
@@ -32,8 +32,8 @@ fn return_enemy_character_to_hand() {
 #[test]
 fn return_to_hand_with_multiple_targets() {
     let mut s = TestBattle::builder().connect();
-    let target1_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
-    let target2_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let target1_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
+    let target2_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     assert_eq!(
         s.user_client.cards.enemy_battlefield().len(),
@@ -41,7 +41,7 @@ fn return_to_hand_with_multiple_targets() {
         "two enemy characters on battlefield"
     );
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestReturnToHand);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_RETURN_TO_HAND);
     s.click_card(DisplayPlayer::User, &target1_id);
 
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "one enemy character remains");
@@ -56,12 +56,12 @@ fn return_to_hand_with_multiple_targets() {
 #[test]
 fn return_to_hand_auto_targets_single_enemy() {
     let mut s = TestBattle::builder().connect();
-    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "enemy character on battlefield");
     assert_eq!(s.user_client.cards.enemy_hand().len(), 0, "enemy hand empty");
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestReturnToHand);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_RETURN_TO_HAND);
 
     assert_eq!(
         s.user_client.cards.enemy_battlefield().len(),
@@ -79,8 +79,8 @@ fn return_to_hand_auto_targets_single_enemy() {
 fn return_to_hand_only_targets_enemy_characters() {
     let mut s = TestBattle::builder().connect();
     let user_character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
-    let return_card_id = s.add_to_hand(DisplayPlayer::User, CardName::TestReturnToHand);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    let return_card_id = s.add_to_hand(DisplayPlayer::User, test_card::TEST_RETURN_TO_HAND);
 
     let return_card = s.user_client.cards.get_revealed(&return_card_id);
     assert!(
@@ -105,7 +105,7 @@ fn return_to_hand_resets_spark_from_triggered_abilities() {
     // Place a trigger character on user battlefield
     let trigger_character_id = s.create_and_play(
         DisplayPlayer::User,
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
+        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER,
     );
 
     // Verify base spark
@@ -113,7 +113,7 @@ fn return_to_hand_resets_spark_from_triggered_abilities() {
     assert_eq!(initial_spark, Some(Spark(5)), "trigger character has base spark of 5");
 
     // Materialize another character to trigger the spark gain
-    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     // Verify spark increased from trigger
     let increased_spark = s.user_client.cards.get_revealed(&trigger_character_id).numeric_spark();
@@ -124,7 +124,7 @@ fn return_to_hand_resets_spark_from_triggered_abilities() {
 
     // Enemy returns the character to hand - need to target manually since there are
     // 2 characters
-    s.create_and_play(DisplayPlayer::Enemy, CardName::TestReturnToHand);
+    s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_RETURN_TO_HAND);
     s.click_card(DisplayPlayer::Enemy, &trigger_character_id);
 
     // Verify character was returned to user hand
@@ -142,7 +142,7 @@ fn return_to_hand_resets_spark_from_triggered_abilities() {
     // fresh instance
     let reset_character_id = s.create_and_play(
         DisplayPlayer::User,
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
+        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER,
     );
 
     // Verify spark has reset to base value for newly materialized character
@@ -157,9 +157,9 @@ fn return_to_hand_resets_spark_from_triggered_abilities() {
 #[test]
 fn return_to_hand_revealed_to_opponent() {
     let mut s = TestBattle::builder().connect();
-    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestReturnToHand);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_RETURN_TO_HAND);
 
     // Verify the card is in the enemy's hand
     assert!(s.user_client.cards.enemy_hand().contains(&target_id), "Card should be in enemy hand");

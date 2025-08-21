@@ -3,7 +3,6 @@ use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
 use core_data::identifiers::UserId;
 use display_data::request_data::{ConnectRequest, Metadata, PerformActionRequest};
-use logging;
 use rules_engine::engine;
 use state_provider::state_provider::StateProvider;
 use state_provider::test_state_provider::TestStateProvider;

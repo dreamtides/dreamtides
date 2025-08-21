@@ -6,11 +6,11 @@ use battle_state::actions::battle_actions::BattleAction;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
 use battle_state::battle_player::battle_player_state::TestDeckName;
 use bon::Builder;
-use core_data::identifiers::CardName;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify, FlexWrap};
 use masonry::flex_style::FlexStyle;
+use tabula_ids::test_card;
 use ui_components::box_component::BoxComponent;
 use ui_components::button_component::ButtonComponent;
 use ui_components::component::Component;
@@ -83,7 +83,7 @@ impl Component for DeveloperPanel {
                                 .action(BattleAction::Debug(
                                     DebugBattleAction::AddCardToBattlefield {
                                         player: self.user_player.opponent(),
-                                        card: CardName::TestVanillaCharacter,
+                                        card: test_card::TEST_VANILLA_CHARACTER,
                                     },
                                 ))
                                 .build(),

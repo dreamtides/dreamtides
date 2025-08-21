@@ -1,4 +1,4 @@
-use core_data::identifiers::CardName;
+use core_data::identifiers::BaseCardId;
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::PlayerName;
 use schemars::JsonSchema;
@@ -19,18 +19,18 @@ pub enum DebugBattleAction {
     /// Set the spark bonus of the player
     SetSparkBonus { player: PlayerName, spark: Spark },
     /// Add a specific card to hand
-    AddCardToHand { player: PlayerName, card: CardName },
+    AddCardToHand { player: PlayerName, card: BaseCardId },
     /// Add a specific card to battlefield
-    AddCardToBattlefield { player: PlayerName, card: CardName },
+    AddCardToBattlefield { player: PlayerName, card: BaseCardId },
     /// Add a specific card to void
-    AddCardToVoid { player: PlayerName, card: CardName },
+    AddCardToVoid { player: PlayerName, card: BaseCardId },
     /// Move all cards from hand to deck
     MoveHandToDeck { player: PlayerName },
     /// Set the number of cards remaining in a player's deck. All other cards
     /// are moved to the void.
     SetCardsRemainingInDeck { player: PlayerName, cards: usize },
     /// Play a card for the opponent, with prompt choices
-    OpponentPlayCard { card: CardName },
+    OpponentPlayCard { card: BaseCardId },
     /// Cause the opponent to take a 'continue' legal action
     OpponentContinue,
 }

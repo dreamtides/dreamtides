@@ -6,7 +6,7 @@ use battle_state::actions::debug_battle_action::DebugBattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, DeckCardId, HandCardId};
 use battle_state::core::effect_source::EffectSource;
-use core_data::identifiers::CardName;
+use core_data::identifiers::BaseCardId;
 use core_data::types::PlayerName;
 use quest_state::quest::card_descriptor;
 
@@ -92,7 +92,7 @@ fn add_to_hand(
     battle: &mut BattleState,
     player: PlayerName,
     source: EffectSource,
-    card_name: CardName,
+    card_name: BaseCardId,
 ) -> HandCardId {
     let card_count = battle.cards.all_cards().count();
     battle_deck::add_cards(battle, player, vec![card_descriptor::get_base_identity(card_name)]);

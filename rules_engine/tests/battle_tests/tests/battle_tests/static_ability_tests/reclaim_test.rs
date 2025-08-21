@@ -1,7 +1,7 @@
-use core_data::identifiers::CardName;
 use core_data::numerics::Energy;
 use display_data::battle_view::DisplayPlayer;
 use display_data::card_view::CardPrefab;
+use tabula_ids::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_prelude::*;
@@ -14,7 +14,7 @@ fn reclaim_basic_play_twice_then_banish() {
     assert_eq!(s.user_client.cards.user_void().len(), 0, "void empty initially");
     assert_eq!(s.user_client.cards.user_banished().len(), 0, "banished empty initially");
 
-    let card_id = s.create_and_play(DisplayPlayer::User, CardName::TestDrawOneReclaim);
+    let card_id = s.create_and_play(DisplayPlayer::User, test_card::TEST_DRAW_ONE_RECLAIM);
 
     assert_eq!(
         s.user_client.cards.user_hand().len(),
@@ -52,8 +52,8 @@ fn reclaim_basic_play_twice_then_banish() {
 fn reclaim_multiple_cards_in_void() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
-    let card1_id = s.create_and_play(DisplayPlayer::User, CardName::TestDrawOneReclaim);
-    let card2_id = s.create_and_play(DisplayPlayer::User, CardName::TestDrawOneReclaim);
+    let card1_id = s.create_and_play(DisplayPlayer::User, test_card::TEST_DRAW_ONE_RECLAIM);
+    let card2_id = s.create_and_play(DisplayPlayer::User, test_card::TEST_DRAW_ONE_RECLAIM);
 
     assert_eq!(s.user_client.cards.user_void().len(), 2, "two reclaim cards in void");
     assert_eq!(s.user_client.cards.user_hand().len(), 4, "2 drawn cards + 2 reclaim tokens");
@@ -82,7 +82,7 @@ fn reclaim_multiple_cards_in_void() {
 fn reclaim_token_card_properties() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
-    let _card_id = s.create_and_play(DisplayPlayer::User, CardName::TestDrawOneReclaim);
+    let _card_id = s.create_and_play(DisplayPlayer::User, test_card::TEST_DRAW_ONE_RECLAIM);
 
     let user_hand = s.user_client.cards.user_hand();
     let reclaim_token_cards: Vec<_> =
@@ -107,11 +107,12 @@ fn reclaim_during_enemy_turn() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let card_id = s.create_and_play(DisplayPlayer::User, CardName::TestDrawOneReclaim);
+    let card_id = s.create_and_play(DisplayPlayer::User, test_card::TEST_DRAW_ONE_RECLAIM);
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    let _enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let _enemy_character =
+        s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     assert!(s.user_client.me.can_act(), "user can act during enemy turn with fast card");
 
@@ -138,7 +139,7 @@ fn reclaim_during_enemy_turn() {
 fn reclaim_card_banished_when_leaves_play() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
-    let card_id = s.create_and_play(DisplayPlayer::User, CardName::TestDrawOneReclaim);
+    let card_id = s.create_and_play(DisplayPlayer::User, test_card::TEST_DRAW_ONE_RECLAIM);
 
     assert_eq!(s.user_client.cards.user_void().len(), 1, "card in void after first play");
     assert_eq!(s.user_client.cards.user_banished().len(), 0, "not banished after first play");
@@ -159,8 +160,8 @@ fn reclaim_card_banished_when_leaves_play() {
 fn reclaim_vs_normal_play_from_hand_cost() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
-    let hand_card_id = s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOneReclaim);
-    let void_card_id = s.add_to_void(DisplayPlayer::User, CardName::TestDrawOneReclaim);
+    let hand_card_id = s.add_to_hand(DisplayPlayer::User, test_card::TEST_DRAW_ONE_RECLAIM);
+    let void_card_id = s.add_to_void(DisplayPlayer::User, test_card::TEST_DRAW_ONE_RECLAIM);
 
     let hand_card = s.user_client.cards.get_revealed(&hand_card_id);
     assert_eq!(hand_card.numeric_cost(), Some(Energy(2)), "normal play cost is 2");
@@ -185,8 +186,8 @@ fn reclaim_vs_normal_play_from_hand_cost() {
 fn reclaim_mixed_with_other_void_cards() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
-    let reclaim_card_id = s.create_and_play(DisplayPlayer::User, CardName::TestDrawOneReclaim);
-    let normal_card_id = s.add_to_void(DisplayPlayer::User, CardName::TestDrawOne);
+    let reclaim_card_id = s.create_and_play(DisplayPlayer::User, test_card::TEST_DRAW_ONE_RECLAIM);
+    let normal_card_id = s.add_to_void(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
 
     assert_eq!(s.user_client.cards.user_void().len(), 2, "two cards in void");
 
@@ -215,7 +216,7 @@ fn reclaim_mixed_with_other_void_cards() {
 fn reclaim_token_always_in_hand_even_when_unplayable() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(2).build()).connect();
 
-    let card_id = s.create_and_play(DisplayPlayer::User, CardName::TestDrawOneReclaim);
+    let card_id = s.create_and_play(DisplayPlayer::User, test_card::TEST_DRAW_ONE_RECLAIM);
     assert_eq!(s.user_client.me.energy(), Energy(0), "2 energy spent on initial play");
 
     let user_hand = s.user_client.cards.user_hand();
@@ -243,8 +244,8 @@ fn reclaim_token_always_in_hand_even_when_unplayable() {
 #[test]
 fn reclaim_card_shows_reclaimed_in_rules_text_when_on_stack() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
-    let card_id = s.create_and_play(DisplayPlayer::User, CardName::TestDrawOneReclaim);
-    s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+    let card_id = s.create_and_play(DisplayPlayer::User, test_card::TEST_DRAW_ONE_RECLAIM);
+    s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DRAW_ONE);
     s.play_card_from_void(DisplayPlayer::User, &card_id);
 
     let stack_cards: Vec<&_> = s.user_client.cards.stack_cards().iter().map(|c| &c.view).collect();

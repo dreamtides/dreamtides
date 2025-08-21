@@ -1,6 +1,6 @@
-use core_data::identifiers::CardName;
 use core_data::numerics::{Energy, Spark};
 use display_data::battle_view::DisplayPlayer;
+use tabula_ids::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
 use test_utils::client::test_interface_view;
@@ -10,7 +10,7 @@ use test_utils::session::test_session_prelude::*;
 fn character_card_shows_energy_decrease_in_preview() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(10).build()).connect();
     let initial_energy = s.user_client.me.energy();
-    let id = s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let id = s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     let card_cost = s.user_client.cards.get_cost(&id);
     let preview = s.user_client.cards.get_play_effect_preview(&id);
     let preview_energy = preview.user.energy.expect("preview should show user energy");
@@ -26,10 +26,10 @@ fn hand_size_limit_exceeded_shows_interface_message() {
     let mut s = TestBattle::builder().connect();
 
     for _ in 0..9 {
-        s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
+        s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     }
 
-    let draw_id = s.add_to_hand(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
+    let draw_id = s.add_to_hand(DisplayPlayer::User, test_card::TEST_VARIABLE_ENERGY_DRAW);
     s.play_card_from_hand(DisplayPlayer::User, &draw_id);
     s.click_increment_button(DisplayPlayer::User);
     s.click_increment_button(DisplayPlayer::User);
@@ -47,10 +47,10 @@ fn character_limit_exceeded_shows_interface_message() {
     let mut s = TestBattle::builder().connect();
 
     for _ in 0..8 {
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     }
 
-    let char_id = s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let char_id = s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     let preview = s.user_client.cards.get_play_effect_preview(&char_id);
     let message = preview.preview_message.as_ref().expect("preview should show message");
     assert!(
@@ -63,14 +63,14 @@ fn both_limits_exceeded_shows_combined_interface_message() {
     let mut s = TestBattle::builder().connect();
 
     for _ in 0..8 {
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     }
 
     for _ in 0..9 {
-        s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
+        s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     }
 
-    let draw_id = s.add_to_hand(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
+    let draw_id = s.add_to_hand(DisplayPlayer::User, test_card::TEST_VARIABLE_ENERGY_DRAW);
     s.play_card_from_hand(DisplayPlayer::User, &draw_id);
     s.click_increment_button(DisplayPlayer::User);
     s.click_increment_button(DisplayPlayer::User);
@@ -87,9 +87,9 @@ fn both_limits_exceeded_shows_combined_interface_message() {
 #[test]
 fn card_preview_shows_cost_changes_from_effects() {
     let mut s = TestBattle::builder().connect();
-    let char_id = s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let char_id = s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     let original_cost = s.user_client.cards.get_cost(&char_id);
-    let event_id = s.add_to_hand(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
+    let event_id = s.add_to_hand(DisplayPlayer::User, test_card::TEST_VARIABLE_ENERGY_DRAW);
 
     s.play_card_from_hand(DisplayPlayer::User, &event_id);
     s.click_increment_button(DisplayPlayer::User);
@@ -108,7 +108,7 @@ fn card_preview_shows_cost_changes_from_effects() {
 fn event_card_energy_prompt_shows_preview_with_incremental_changes() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(10).build()).connect();
     let initial_energy = s.user_client.me.energy();
-    let id = s.create_and_play(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
+    let id = s.create_and_play(DisplayPlayer::User, test_card::TEST_VARIABLE_ENERGY_DRAW);
     let card_cost = s.user_client.cards.get_cost(&id);
 
     let preview = s.user_client.active_battle_preview();
@@ -134,7 +134,7 @@ fn event_card_energy_prompt_shows_preview_with_incremental_changes() {
 fn character_play_effect_preview_shows_spark_increase() {
     let mut s = TestBattle::builder().connect();
     let initial_spark = s.user_client.me.total_spark();
-    let char_id = s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let char_id = s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     let preview = s.user_client.cards.get_play_effect_preview(&char_id);
     let preview_spark = preview.user.total_spark.expect("preview should show user total spark");

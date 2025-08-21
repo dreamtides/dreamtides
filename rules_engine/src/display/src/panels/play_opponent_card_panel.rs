@@ -3,11 +3,12 @@ use battle_queries::battle_card_queries::card_properties;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
 use battle_state::battle::battle_state::BattleState;
 use bon::Builder;
-use core_data::identifiers::CardName;
+use core_data::identifiers::BaseCardId;
 use core_data::types::PlayerName;
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify};
 use masonry::flex_style::FlexStyle;
 use quest_state::quest::card_descriptor;
+use tabula_ids::test_card;
 use ui_components::box_component::BoxComponent;
 use ui_components::button_component::ButtonComponent;
 use ui_components::component::Component;
@@ -44,37 +45,37 @@ impl Component for PlayOpponentCardPanel<'_> {
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
-                                        .card(CardName::TestVanillaCharacter)
+                                        .card(test_card::TEST_VANILLA_CHARACTER)
                                         .build(),
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
-                                        .card(CardName::TestDrawOne)
+                                        .card(test_card::TEST_DRAW_ONE)
                                         .build(),
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
-                                        .card(CardName::TestModalReturnToHandOrDrawTwo)
+                                        .card(test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO)
                                         .build(),
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
-                                        .card(CardName::TestDissolve)
+                                        .card(test_card::TEST_DISSOLVE)
                                         .build(),
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
-                                        .card(CardName::TestReturnOneOrTwoVoidEventCardsToHand)
+                                        .card(test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND)
                                         .build(),
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
-                                        .card(CardName::TestCounterspell)
+                                        .card(test_card::TEST_COUNTERSPELL)
                                         .build(),
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
-                                        .card(CardName::TestReturnToHand)
+                                        .card(test_card::TEST_RETURN_TO_HAND)
                                         .build(),
                                 )
                                 .build(),
@@ -88,7 +89,7 @@ impl Component for PlayOpponentCardPanel<'_> {
 
 #[derive(Clone, Builder)]
 pub struct PlayOpponentCardCell {
-    pub card: CardName,
+    pub card: BaseCardId,
 }
 
 impl Component for PlayOpponentCardCell {

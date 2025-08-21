@@ -71,7 +71,7 @@ pub const TEST_ACTIVATED_ABILITY_DRAW_CARD: BaseCardId =
     BaseCardId(uuid!("8dfeb2c1-2d72-411c-a8cc-7f84ca532c63"));
 
 /// {ma} {-energy-cost(e:1)}: Draw {-cards(n:1)}.
-pub const TEST_MULTIACTIVATED_ABILITY_DRAW_CARD_CHARACTER: BaseCardId =
+pub const TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: BaseCardId =
     BaseCardId(uuid!("56f944bb-333b-4e2c-9c8c-2068f41998c2"));
 
 /// {fa} {-energy-cost(e:1)}: Draw {-cards(n:1)}.

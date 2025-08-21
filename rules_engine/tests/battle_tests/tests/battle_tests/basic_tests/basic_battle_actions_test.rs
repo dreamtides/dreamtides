@@ -1,9 +1,9 @@
 use battle_state::actions::battle_actions::BattleAction;
-use core_data::identifiers::CardName;
 use core_data::numerics::{Energy, Points, Spark};
 use display_data::battle_view::DisplayPlayer;
 use display_data::card_view::CardPrefab;
 use display_data::command::GameMessageType;
+use tabula_ids::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_battle_extension::TestPlayCard;
@@ -76,7 +76,7 @@ fn play_character_increase_spark() {
     assert_eq!(s.user_client.me.energy(), Energy(99), "initial energy");
     assert_eq!(s.user_client.me.total_spark(), Spark(0), "initial spark");
     assert_eq!(s.user_client.cards.user_battlefield().len(), 0, "battlefield empty");
-    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     assert_eq!(s.user_client.me.energy(), Energy(97), "energy spent");
     assert_eq!(s.user_client.me.total_spark(), Spark(5), "spark increased");
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "character materialized");
@@ -86,7 +86,7 @@ fn play_character_increase_spark() {
 #[test]
 fn play_character_score_points() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
-    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     s.perform_user_action(BattleAction::EndTurn);
     assert_eq!(s.user_client.me.score(), Points(0), "score unchanged");
     s.perform_enemy_action(BattleAction::EndTurn);
@@ -98,7 +98,7 @@ fn play_character_score_points() {
 fn play_character_win_battle() {
     let mut s =
         TestBattle::builder().user(TestPlayer::builder().energy(99).points(20).build()).connect();
-    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     s.perform_user_action(BattleAction::EndTurn);
     s.perform_enemy_action(BattleAction::EndTurn);
     assert_eq!(s.user_client.me.score(), Points(25), "score increased");
@@ -127,8 +127,8 @@ fn energy_increment_at_turn_start() {
 #[test]
 fn create_and_play() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
-    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 }
 
 #[test]
@@ -136,8 +136,8 @@ fn play_card_dissolve_target() {
     let mut s = TestBattle::builder().connect();
     // Note that if a single target is present then no prompt for targeting is
     // shown.
-    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
-    s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
+    s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     assert_eq!(
         s.user_client.cards.enemy_battlefield().len(),
@@ -150,7 +150,7 @@ fn play_card_dissolve_target() {
 
     s.create_and_play(
         DisplayPlayer::User,
-        TestPlayCard::new(CardName::TestDissolve).target(&target_id),
+        TestPlayCard::new(test_card::TEST_DISSOLVE).target(&target_id),
     );
 
     assert_eq!(
@@ -168,8 +168,8 @@ fn play_card_dissolve_target() {
 fn cards_in_hand_properties() {
     let mut s = TestBattle::builder().connect();
 
-    let character_id = s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
-    let event_id = s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
+    let character_id = s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    let event_id = s.add_to_hand(DisplayPlayer::User, test_card::TEST_DISSOLVE);
 
     assert_eq!(s.user_client.cards.user_hand().len(), 2, "user has 2 cards in hand");
 
@@ -200,9 +200,9 @@ fn cards_in_hand_properties() {
 fn card_order_preserved_when_adding_new_cards() {
     let mut s = TestBattle::builder().connect();
 
-    let first_hand_card = s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
-    let second_hand_card = s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
-    let third_hand_card = s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let first_hand_card = s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    let second_hand_card = s.add_to_hand(DisplayPlayer::User, test_card::TEST_DISSOLVE);
+    let third_hand_card = s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     let initial_hand_order: Vec<_> =
         s.user_client.cards.user_hand().iter().map(|c| c.id.clone()).collect();
@@ -212,9 +212,9 @@ fn card_order_preserved_when_adding_new_cards() {
     assert_eq!(initial_hand_order[2], third_hand_card, "third card in correct position");
 
     let first_battlefield_char =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     let second_battlefield_char =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     let initial_battlefield_order: Vec<_> =
         s.user_client.cards.user_battlefield().iter().map(|c| c.id.clone()).collect();
@@ -228,7 +228,7 @@ fn card_order_preserved_when_adding_new_cards() {
         "second character in correct position"
     );
 
-    let new_hand_card = s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
+    let new_hand_card = s.add_to_hand(DisplayPlayer::User, test_card::TEST_DISSOLVE);
 
     let final_hand_order: Vec<_> =
         s.user_client.cards.user_hand().iter().map(|c| c.id.clone()).collect();
@@ -239,7 +239,7 @@ fn card_order_preserved_when_adding_new_cards() {
     assert_eq!(final_hand_order[3], new_hand_card, "new card added at end");
 
     let new_battlefield_char =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     let final_battlefield_order: Vec<_> =
         s.user_client.cards.user_battlefield().iter().map(|c| c.id.clone()).collect();

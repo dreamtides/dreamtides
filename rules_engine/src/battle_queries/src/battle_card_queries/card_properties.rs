@@ -1,50 +1,58 @@
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardIdType, CharacterId};
 use core_data::card_types::{CardSubtype, CardType};
-use core_data::identifiers::{CardIdentity, CardName};
+use core_data::identifiers::CardIdentity;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::PlayerName;
 use quest_state::quest::card_descriptor;
+use tabula_ids::test_card;
 
 use crate::battle_card_queries::card;
 
 /// Returns the display name for a card
 pub fn display_name(identity: CardIdentity) -> String {
     match card_descriptor::get_base_card_id(identity) {
-        CardName::TestVanillaCharacter => "Character".to_string(),
-        CardName::TestDissolve => "Dissolve".to_string(),
-        CardName::TestNamedDissolve => "Immolate".to_string(),
-        CardName::TestCounterspellUnlessPays => "Ripple of Defiance".to_string(),
-        CardName::TestCounterspell => "Abolish".to_string(),
-        CardName::TestVariableEnergyDraw => "Dreamscatter".to_string(),
-        CardName::TestDrawOne => "Draw One".to_string(),
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => {
+        test_card::TEST_VANILLA_CHARACTER => "Character".to_string(),
+        test_card::TEST_DISSOLVE => "Dissolve".to_string(),
+        test_card::TEST_NAMED_DISSOLVE => "Immolate".to_string(),
+        test_card::TEST_COUNTERSPELL_UNLESS_PAYS => "Ripple of Defiance".to_string(),
+        test_card::TEST_COUNTERSPELL => "Abolish".to_string(),
+        test_card::TEST_VARIABLE_ENERGY_DRAW => "Dreamscatter".to_string(),
+        test_card::TEST_DRAW_ONE => "Draw One".to_string(),
+        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER => {
             "Materialize Gain Spark".to_string()
         }
-        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => "Sundown Surfer".to_string(),
-        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => "Play Enemy Gain Spark".to_string(),
-        CardName::TestActivatedAbilityDrawCard => "Activated".to_string(),
-        CardName::TestMultiActivatedAbilityDrawCardCharacter => "Multi Activated".to_string(),
-        CardName::TestFastActivatedAbilityDrawCardCharacter => "Fast Activated".to_string(),
-        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => {
+        test_card::TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN => "Sundown Surfer".to_string(),
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN => {
+            "Play Enemy Gain Spark".to_string()
+        }
+        test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD => "Activated".to_string(),
+        test_card::TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => {
+            "Multi Activated".to_string()
+        }
+        test_card::TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => "Fast Activated".to_string(),
+        test_card::TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => {
             "Minstrel of Falling Light".to_string()
         }
-        CardName::TestActivatedAbilityDissolveCharacter => "Dissolve Character".to_string(),
-        CardName::TestDualActivatedAbilityCharacter => "Dual Abilities".to_string(),
-        CardName::TestForeseeOne => "Foresee 1".to_string(),
-        CardName::TestForeseeTwo => "Foresee 2".to_string(),
-        CardName::TestForeseeOneDrawACard => "Foresee 1 Draw 1".to_string(),
-        CardName::TestDrawOneReclaim => "Draw 1 Reclaim".to_string(),
-        CardName::TestReturnVoidCardToHand => "Return Void Card".to_string(),
-        CardName::TestReturnOneOrTwoVoidEventCardsToHand => "Archive of the Forgotten".to_string(),
-        CardName::TestModalDrawOneOrDrawTwo => "Modal Draw".to_string(),
-        CardName::TestModalDrawOneOrDissolveEnemy => "Modal Draw & Dissolve".to_string(),
-        CardName::TestReturnToHand => "Return to Hand".to_string(),
-        CardName::TestPreventDissolveThisTurn => "Together Against the Tide".to_string(),
-        CardName::TestForeseeOneReclaim => "Foresee 1 Reclaim".to_string(),
-        CardName::TestForeseeOneDrawReclaim => "Guiding Light".to_string(),
-        CardName::TestModalReturnToHandOrDrawTwo => "Break the Sequence".to_string(),
-        CardName::TestCounterspellCharacter => "Cragfall".to_string(),
+        test_card::TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER => "Dissolve Character".to_string(),
+        test_card::TEST_DUAL_ACTIVATED_ABILITY_CHARACTER => "Dual Abilities".to_string(),
+        test_card::TEST_FORESEE_ONE => "Foresee 1".to_string(),
+        test_card::TEST_FORESEE_TWO => "Foresee 2".to_string(),
+        test_card::TEST_FORESEE_ONE_DRAW_A_CARD => "Foresee 1 Draw 1".to_string(),
+        test_card::TEST_DRAW_ONE_RECLAIM => "Draw 1 Reclaim".to_string(),
+        test_card::TEST_RETURN_VOID_CARD_TO_HAND => "Return Void Card".to_string(),
+        test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND => {
+            "Archive of the Forgotten".to_string()
+        }
+        test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO => "Modal Draw".to_string(),
+        test_card::TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY => "Modal Draw & Dissolve".to_string(),
+        test_card::TEST_RETURN_TO_HAND => "Return to Hand".to_string(),
+        test_card::TEST_PREVENT_DISSOLVE_THIS_TURN => "Together Against the Tide".to_string(),
+        test_card::TEST_FORESEE_ONE_RECLAIM => "Foresee 1 Reclaim".to_string(),
+        test_card::TEST_FORESEE_ONE_DRAW_RECLAIM => "Guiding Light".to_string(),
+        test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO => "Break the Sequence".to_string(),
+        test_card::TEST_COUNTERSPELL_CHARACTER => "Cragfall".to_string(),
+        _ => panic!("Unknown card: {identity:?}"),
     }
 }
 
@@ -65,36 +73,37 @@ pub fn base_energy_cost_for_id(battle: &BattleState, card_id: impl CardIdType) -
 /// None if it has no energy cost (e.g. modal cards).
 pub fn base_energy_cost(identity: CardIdentity) -> Option<Energy> {
     match card_descriptor::get_base_card_id(identity) {
-        CardName::TestVanillaCharacter => Some(Energy(2)),
-        CardName::TestDissolve => Some(Energy(2)),
-        CardName::TestNamedDissolve => Some(Energy(2)),
-        CardName::TestCounterspellUnlessPays => Some(Energy(1)),
-        CardName::TestCounterspell => Some(Energy(2)),
-        CardName::TestCounterspellCharacter => Some(Energy(2)),
-        CardName::TestVariableEnergyDraw => Some(Energy(2)),
-        CardName::TestDrawOne => Some(Energy(0)),
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => Some(Energy(0)),
-        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => Some(Energy(2)),
-        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => Some(Energy(2)),
-        CardName::TestActivatedAbilityDrawCard => Some(Energy(2)),
-        CardName::TestMultiActivatedAbilityDrawCardCharacter => Some(Energy(0)),
-        CardName::TestFastActivatedAbilityDrawCardCharacter => Some(Energy(0)),
-        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => Some(Energy(2)),
-        CardName::TestActivatedAbilityDissolveCharacter => Some(Energy(3)),
-        CardName::TestDualActivatedAbilityCharacter => Some(Energy(4)),
-        CardName::TestForeseeOne => Some(Energy(1)),
-        CardName::TestForeseeTwo => Some(Energy(1)),
-        CardName::TestForeseeOneDrawACard => Some(Energy(1)),
-        CardName::TestDrawOneReclaim => Some(Energy(2)),
-        CardName::TestForeseeOneReclaim => Some(Energy(1)),
-        CardName::TestForeseeOneDrawReclaim => Some(Energy(1)),
-        CardName::TestReturnVoidCardToHand => Some(Energy(1)),
-        CardName::TestReturnOneOrTwoVoidEventCardsToHand => Some(Energy(4)),
-        CardName::TestModalDrawOneOrDrawTwo => None,
-        CardName::TestModalDrawOneOrDissolveEnemy => None,
-        CardName::TestModalReturnToHandOrDrawTwo => None,
-        CardName::TestReturnToHand => Some(Energy(1)),
-        CardName::TestPreventDissolveThisTurn => Some(Energy(1)),
+        test_card::TEST_VANILLA_CHARACTER => Some(Energy(2)),
+        test_card::TEST_DISSOLVE => Some(Energy(2)),
+        test_card::TEST_NAMED_DISSOLVE => Some(Energy(2)),
+        test_card::TEST_COUNTERSPELL_UNLESS_PAYS => Some(Energy(1)),
+        test_card::TEST_COUNTERSPELL => Some(Energy(2)),
+        test_card::TEST_COUNTERSPELL_CHARACTER => Some(Energy(2)),
+        test_card::TEST_VARIABLE_ENERGY_DRAW => Some(Energy(2)),
+        test_card::TEST_DRAW_ONE => Some(Energy(0)),
+        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER => Some(Energy(0)),
+        test_card::TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN => Some(Energy(2)),
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN => Some(Energy(2)),
+        test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD => Some(Energy(2)),
+        test_card::TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => Some(Energy(0)),
+        test_card::TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => Some(Energy(0)),
+        test_card::TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => Some(Energy(2)),
+        test_card::TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER => Some(Energy(3)),
+        test_card::TEST_DUAL_ACTIVATED_ABILITY_CHARACTER => Some(Energy(4)),
+        test_card::TEST_FORESEE_ONE => Some(Energy(1)),
+        test_card::TEST_FORESEE_TWO => Some(Energy(1)),
+        test_card::TEST_FORESEE_ONE_DRAW_A_CARD => Some(Energy(1)),
+        test_card::TEST_DRAW_ONE_RECLAIM => Some(Energy(2)),
+        test_card::TEST_FORESEE_ONE_RECLAIM => Some(Energy(1)),
+        test_card::TEST_FORESEE_ONE_DRAW_RECLAIM => Some(Energy(1)),
+        test_card::TEST_RETURN_VOID_CARD_TO_HAND => Some(Energy(1)),
+        test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND => Some(Energy(4)),
+        test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO => None,
+        test_card::TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY => None,
+        test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO => None,
+        test_card::TEST_RETURN_TO_HAND => Some(Energy(1)),
+        test_card::TEST_PREVENT_DISSOLVE_THIS_TURN => Some(Energy(1)),
+        _ => panic!("Unknown card: {identity:?}"),
     }
 }
 
@@ -113,16 +122,16 @@ pub fn base_spark_for_id(battle: &BattleState, card_id: impl CardIdType) -> Opti
 
 pub fn base_spark(identity: CardIdentity) -> Option<Spark> {
     match card_descriptor::get_base_card_id(identity) {
-        CardName::TestVanillaCharacter => Some(Spark(5)),
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => Some(Spark(5)),
-        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => Some(Spark(1)),
-        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => Some(Spark(5)),
-        CardName::TestActivatedAbilityDrawCard => Some(Spark(3)),
-        CardName::TestMultiActivatedAbilityDrawCardCharacter => Some(Spark(3)),
-        CardName::TestFastActivatedAbilityDrawCardCharacter => Some(Spark(3)),
-        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => Some(Spark(2)),
-        CardName::TestActivatedAbilityDissolveCharacter => Some(Spark(4)),
-        CardName::TestDualActivatedAbilityCharacter => Some(Spark(3)),
+        test_card::TEST_VANILLA_CHARACTER => Some(Spark(5)),
+        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER => Some(Spark(5)),
+        test_card::TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN => Some(Spark(1)),
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN => Some(Spark(5)),
+        test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD => Some(Spark(3)),
+        test_card::TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => Some(Spark(3)),
+        test_card::TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => Some(Spark(3)),
+        test_card::TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => Some(Spark(2)),
+        test_card::TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER => Some(Spark(4)),
+        test_card::TEST_DUAL_ACTIVATED_ABILITY_CHARACTER => Some(Spark(3)),
         _ => None,
     }
 }
@@ -137,36 +146,39 @@ pub fn card_subtype(_battle: &BattleState, _card_id: impl CardIdType) -> Option<
 
 pub fn card_type_by_name(identity: CardIdentity) -> CardType {
     match card_descriptor::get_base_card_id(identity) {
-        CardName::TestVanillaCharacter => CardType::Character,
-        CardName::TestDissolve => CardType::Event,
-        CardName::TestNamedDissolve => CardType::Event,
-        CardName::TestCounterspellUnlessPays => CardType::Event,
-        CardName::TestCounterspell => CardType::Event,
-        CardName::TestVariableEnergyDraw => CardType::Event,
-        CardName::TestDrawOne => CardType::Event,
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => CardType::Character,
-        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => CardType::Character,
-        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => CardType::Character,
-        CardName::TestActivatedAbilityDrawCard => CardType::Character,
-        CardName::TestMultiActivatedAbilityDrawCardCharacter => CardType::Character,
-        CardName::TestFastActivatedAbilityDrawCardCharacter => CardType::Character,
-        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => CardType::Character,
-        CardName::TestActivatedAbilityDissolveCharacter => CardType::Character,
-        CardName::TestDualActivatedAbilityCharacter => CardType::Character,
-        CardName::TestForeseeOne => CardType::Event,
-        CardName::TestForeseeTwo => CardType::Event,
-        CardName::TestForeseeOneDrawACard => CardType::Event,
-        CardName::TestDrawOneReclaim => CardType::Event,
-        CardName::TestReturnVoidCardToHand => CardType::Event,
-        CardName::TestReturnOneOrTwoVoidEventCardsToHand => CardType::Event,
-        CardName::TestModalDrawOneOrDrawTwo => CardType::Event,
-        CardName::TestModalDrawOneOrDissolveEnemy => CardType::Event,
-        CardName::TestReturnToHand => CardType::Event,
-        CardName::TestPreventDissolveThisTurn => CardType::Event,
-        CardName::TestCounterspellCharacter => CardType::Event,
-        CardName::TestForeseeOneReclaim => CardType::Event,
-        CardName::TestForeseeOneDrawReclaim => CardType::Event,
-        CardName::TestModalReturnToHandOrDrawTwo => CardType::Event,
+        test_card::TEST_VANILLA_CHARACTER => CardType::Character,
+        test_card::TEST_DISSOLVE => CardType::Event,
+        test_card::TEST_NAMED_DISSOLVE => CardType::Event,
+        test_card::TEST_COUNTERSPELL_UNLESS_PAYS => CardType::Event,
+        test_card::TEST_COUNTERSPELL => CardType::Event,
+        test_card::TEST_VARIABLE_ENERGY_DRAW => CardType::Event,
+        test_card::TEST_DRAW_ONE => CardType::Event,
+        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER => {
+            CardType::Character
+        }
+        test_card::TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN => CardType::Character,
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN => CardType::Character,
+        test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD => CardType::Character,
+        test_card::TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => CardType::Character,
+        test_card::TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => CardType::Character,
+        test_card::TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => CardType::Character,
+        test_card::TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER => CardType::Character,
+        test_card::TEST_DUAL_ACTIVATED_ABILITY_CHARACTER => CardType::Character,
+        test_card::TEST_FORESEE_ONE => CardType::Event,
+        test_card::TEST_FORESEE_TWO => CardType::Event,
+        test_card::TEST_FORESEE_ONE_DRAW_A_CARD => CardType::Event,
+        test_card::TEST_DRAW_ONE_RECLAIM => CardType::Event,
+        test_card::TEST_RETURN_VOID_CARD_TO_HAND => CardType::Event,
+        test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND => CardType::Event,
+        test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO => CardType::Event,
+        test_card::TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY => CardType::Event,
+        test_card::TEST_RETURN_TO_HAND => CardType::Event,
+        test_card::TEST_PREVENT_DISSOLVE_THIS_TURN => CardType::Event,
+        test_card::TEST_COUNTERSPELL_CHARACTER => CardType::Event,
+        test_card::TEST_FORESEE_ONE_RECLAIM => CardType::Event,
+        test_card::TEST_FORESEE_ONE_DRAW_RECLAIM => CardType::Event,
+        test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO => CardType::Event,
+        _ => panic!("Unknown card: {identity:?}"),
     }
 }
 
@@ -176,35 +188,36 @@ pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
 
 pub fn is_fast_by_name(identity: CardIdentity) -> bool {
     match card_descriptor::get_base_card_id(identity) {
-        CardName::TestVanillaCharacter => false,
-        CardName::TestDissolve => true,
-        CardName::TestNamedDissolve => true,
-        CardName::TestCounterspellUnlessPays => true,
-        CardName::TestCounterspell => true,
-        CardName::TestVariableEnergyDraw => true,
-        CardName::TestDrawOne => true,
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => false,
-        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => true,
-        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => true,
-        CardName::TestActivatedAbilityDrawCard => false,
-        CardName::TestMultiActivatedAbilityDrawCardCharacter => false,
-        CardName::TestFastActivatedAbilityDrawCardCharacter => false,
-        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => false,
-        CardName::TestActivatedAbilityDissolveCharacter => false,
-        CardName::TestDualActivatedAbilityCharacter => false,
-        CardName::TestForeseeOne => true,
-        CardName::TestForeseeTwo => true,
-        CardName::TestForeseeOneDrawACard => true,
-        CardName::TestDrawOneReclaim => true,
-        CardName::TestReturnVoidCardToHand => true,
-        CardName::TestReturnOneOrTwoVoidEventCardsToHand => false,
-        CardName::TestModalDrawOneOrDrawTwo => false,
-        CardName::TestModalDrawOneOrDissolveEnemy => true,
-        CardName::TestReturnToHand => true,
-        CardName::TestPreventDissolveThisTurn => true,
-        CardName::TestCounterspellCharacter => true,
-        CardName::TestForeseeOneReclaim => true,
-        CardName::TestForeseeOneDrawReclaim => true,
-        CardName::TestModalReturnToHandOrDrawTwo => true,
+        test_card::TEST_VANILLA_CHARACTER => false,
+        test_card::TEST_DISSOLVE => true,
+        test_card::TEST_NAMED_DISSOLVE => true,
+        test_card::TEST_COUNTERSPELL_UNLESS_PAYS => true,
+        test_card::TEST_COUNTERSPELL => true,
+        test_card::TEST_VARIABLE_ENERGY_DRAW => true,
+        test_card::TEST_DRAW_ONE => true,
+        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER => false,
+        test_card::TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN => true,
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN => true,
+        test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD => false,
+        test_card::TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => false,
+        test_card::TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => false,
+        test_card::TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => false,
+        test_card::TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER => false,
+        test_card::TEST_DUAL_ACTIVATED_ABILITY_CHARACTER => false,
+        test_card::TEST_FORESEE_ONE => true,
+        test_card::TEST_FORESEE_TWO => true,
+        test_card::TEST_FORESEE_ONE_DRAW_A_CARD => true,
+        test_card::TEST_DRAW_ONE_RECLAIM => true,
+        test_card::TEST_RETURN_VOID_CARD_TO_HAND => true,
+        test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND => false,
+        test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO => false,
+        test_card::TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY => true,
+        test_card::TEST_RETURN_TO_HAND => true,
+        test_card::TEST_PREVENT_DISSOLVE_THIS_TURN => true,
+        test_card::TEST_COUNTERSPELL_CHARACTER => true,
+        test_card::TEST_FORESEE_ONE_RECLAIM => true,
+        test_card::TEST_FORESEE_ONE_DRAW_RECLAIM => true,
+        test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO => true,
+        _ => panic!("Unknown card: {identity:?}"),
     }
 }

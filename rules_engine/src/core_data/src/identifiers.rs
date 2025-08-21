@@ -54,42 +54,6 @@ pub struct CardIdentity(pub usize);
 )]
 pub struct BaseCardId(pub Uuid);
 
-#[derive(
-    Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
-)]
-pub enum CardName {
-    TestVanillaCharacter,
-    TestDissolve,
-    TestNamedDissolve,
-    TestCounterspellUnlessPays,
-    TestCounterspell,
-    TestCounterspellCharacter,
-    TestVariableEnergyDraw,
-    TestDrawOne,
-    TestTriggerGainSparkWhenMaterializeAnotherCharacter,
-    TestTriggerGainSparkOnPlayCardEnemyTurn,
-    TestTriggerGainTwoSparkOnPlayCardEnemyTurn,
-    TestActivatedAbilityDrawCard,
-    TestMultiActivatedAbilityDrawCardCharacter,
-    TestFastActivatedAbilityDrawCardCharacter,
-    TestFastMultiActivatedAbilityDrawCardCharacter,
-    TestActivatedAbilityDissolveCharacter,
-    TestDualActivatedAbilityCharacter,
-    TestForeseeOne,
-    TestForeseeTwo,
-    TestForeseeOneDrawACard,
-    TestDrawOneReclaim,
-    TestForeseeOneReclaim,
-    TestForeseeOneDrawReclaim,
-    TestReturnVoidCardToHand,
-    TestReturnOneOrTwoVoidEventCardsToHand,
-    TestModalDrawOneOrDrawTwo,
-    TestModalDrawOneOrDissolveEnemy,
-    TestModalReturnToHandOrDrawTwo,
-    TestReturnToHand,
-    TestPreventDissolveThisTurn,
-}
-
 /// Number of an ability within a card.
 #[derive(
     Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,

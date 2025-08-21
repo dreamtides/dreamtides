@@ -17,11 +17,12 @@ use battle_state::battle_cards::ability_list::{
     AbilityConfiguration, AbilityData, AbilityList, CanPlayRestriction,
 };
 use battle_state::triggers::trigger::TriggerName;
-use core_data::identifiers::{AbilityNumber, CardIdentity, CardName};
+use core_data::identifiers::{AbilityNumber, BaseCardId, CardIdentity};
 use core_data::numerics::{Energy, Spark};
 use enumset::EnumSet;
 use parking_lot::RwLock;
 use quest_state::quest::card_descriptor;
+use tabula_ids::test_card;
 
 use crate::battle_card_queries::{build_named_abilities, card};
 use crate::card_ability_queries::{effect_queries, target_predicates};
@@ -352,29 +353,31 @@ fn has_play_from_void_ability(list: &AbilityList) -> bool {
     false
 }
 
-fn build_for(name: CardName) -> AbilityList {
+fn build_for(name: BaseCardId) -> AbilityList {
     match name {
-        CardName::TestVanillaCharacter => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestVanillaCharacter),
+        test_card::TEST_VANILLA_CHARACTER => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_VANILLA_CHARACTER),
             vec![],
         ),
-        CardName::TestDissolve => {
-            build_ability_list(card_descriptor::get_base_identity(CardName::TestDissolve), vec![(
-                AbilityNumber(0),
-                Ability::Event(EventAbility {
-                    additional_cost: None,
-                    effect: Effect::Effect(StandardEffect::DissolveCharacter {
-                        target: Predicate::Enemy(CardPredicate::Character),
+        test_card::TEST_DISSOLVE => {
+            build_ability_list(card_descriptor::get_base_identity(test_card::TEST_DISSOLVE), vec![
+                (
+                    AbilityNumber(0),
+                    Ability::Event(EventAbility {
+                        additional_cost: None,
+                        effect: Effect::Effect(StandardEffect::DissolveCharacter {
+                            target: Predicate::Enemy(CardPredicate::Character),
+                        }),
                     }),
-                }),
-                AbilityConfiguration {
-                    targeting_prompt: Some("Select an enemy character.".to_string()),
-                    ..Default::default()
-                },
-            )])
+                    AbilityConfiguration {
+                        targeting_prompt: Some("Select an enemy character.".to_string()),
+                        ..Default::default()
+                    },
+                ),
+            ])
         }
-        CardName::TestNamedDissolve => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestNamedDissolve),
+        test_card::TEST_NAMED_DISSOLVE => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_NAMED_DISSOLVE),
             vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
@@ -389,8 +392,8 @@ fn build_for(name: CardName) -> AbilityList {
                 },
             )],
         ),
-        CardName::TestCounterspellUnlessPays => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestCounterspellUnlessPays),
+        test_card::TEST_COUNTERSPELL_UNLESS_PAYS => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_COUNTERSPELL_UNLESS_PAYS),
             vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
@@ -407,8 +410,8 @@ fn build_for(name: CardName) -> AbilityList {
                 },
             )],
         ),
-        CardName::TestCounterspell => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestCounterspell),
+        test_card::TEST_COUNTERSPELL => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_COUNTERSPELL),
             vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
@@ -423,8 +426,8 @@ fn build_for(name: CardName) -> AbilityList {
                 },
             )],
         ),
-        CardName::TestVariableEnergyDraw => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestVariableEnergyDraw),
+        test_card::TEST_VARIABLE_ENERGY_DRAW => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_VARIABLE_ENERGY_DRAW),
             vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
@@ -440,37 +443,43 @@ fn build_for(name: CardName) -> AbilityList {
                 },
             )],
         ),
-        CardName::TestDrawOne => {
-            build_ability_list(card_descriptor::get_base_identity(CardName::TestDrawOne), vec![(
-                AbilityNumber(0),
-                Ability::Event(EventAbility {
-                    additional_cost: None,
-                    effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
-                }),
-                AbilityConfiguration { ..Default::default() },
-            )])
-        }
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter => build_ability_list(
-            card_descriptor::get_base_identity(
-                CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
-            ),
-            vec![(
-                AbilityNumber(0),
-                Ability::Triggered(TriggeredAbility {
-                    trigger: TriggerEvent::Materialize(Predicate::Another(
-                        CardPredicate::Character,
-                    )),
-                    effect: Effect::Effect(StandardEffect::GainsSpark {
-                        target: Predicate::This,
-                        gains: Spark(1),
+        test_card::TEST_DRAW_ONE => {
+            build_ability_list(card_descriptor::get_base_identity(test_card::TEST_DRAW_ONE), vec![
+                (
+                    AbilityNumber(0),
+                    Ability::Event(EventAbility {
+                        additional_cost: None,
+                        effect: Effect::Effect(StandardEffect::DrawCards { count: 1 }),
                     }),
-                    options: None,
-                }),
-                AbilityConfiguration::default(),
-            )],
-        ),
-        CardName::TestTriggerGainSparkOnPlayCardEnemyTurn => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestTriggerGainSparkOnPlayCardEnemyTurn),
+                    AbilityConfiguration { ..Default::default() },
+                ),
+            ])
+        }
+        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER => {
+            build_ability_list(
+                card_descriptor::get_base_identity(
+                    test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER,
+                ),
+                vec![(
+                    AbilityNumber(0),
+                    Ability::Triggered(TriggeredAbility {
+                        trigger: TriggerEvent::Materialize(Predicate::Another(
+                            CardPredicate::Character,
+                        )),
+                        effect: Effect::Effect(StandardEffect::GainsSpark {
+                            target: Predicate::This,
+                            gains: Spark(1),
+                        }),
+                        options: None,
+                    }),
+                    AbilityConfiguration::default(),
+                )],
+            )
+        }
+        test_card::TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN => build_ability_list(
+            card_descriptor::get_base_identity(
+                test_card::TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN,
+            ),
             vec![(
                 AbilityNumber(0),
                 Ability::Triggered(TriggeredAbility {
@@ -487,9 +496,9 @@ fn build_for(name: CardName) -> AbilityList {
                 AbilityConfiguration::default(),
             )],
         ),
-        CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn => build_ability_list(
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN => build_ability_list(
             card_descriptor::get_base_identity(
-                CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn,
+                test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN,
             ),
             vec![(
                 AbilityNumber(0),
@@ -507,8 +516,8 @@ fn build_for(name: CardName) -> AbilityList {
                 AbilityConfiguration::default(),
             )],
         ),
-        CardName::TestActivatedAbilityDrawCard => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestActivatedAbilityDrawCard),
+        test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD),
             vec![(
                 AbilityNumber(0),
                 Ability::Activated(ActivatedAbility {
@@ -519,9 +528,9 @@ fn build_for(name: CardName) -> AbilityList {
                 AbilityConfiguration::default(),
             )],
         ),
-        CardName::TestMultiActivatedAbilityDrawCardCharacter => build_ability_list(
+        test_card::TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => build_ability_list(
             card_descriptor::get_base_identity(
-                CardName::TestMultiActivatedAbilityDrawCardCharacter,
+                test_card::TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER,
             ),
             vec![(
                 AbilityNumber(0),
@@ -533,8 +542,10 @@ fn build_for(name: CardName) -> AbilityList {
                 AbilityConfiguration::default(),
             )],
         ),
-        CardName::TestFastActivatedAbilityDrawCardCharacter => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestFastActivatedAbilityDrawCardCharacter),
+        test_card::TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => build_ability_list(
+            card_descriptor::get_base_identity(
+                test_card::TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER,
+            ),
             vec![(
                 AbilityNumber(0),
                 Ability::Activated(ActivatedAbility {
@@ -545,9 +556,9 @@ fn build_for(name: CardName) -> AbilityList {
                 AbilityConfiguration::default(),
             )],
         ),
-        CardName::TestFastMultiActivatedAbilityDrawCardCharacter => build_ability_list(
+        test_card::TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => build_ability_list(
             card_descriptor::get_base_identity(
-                CardName::TestFastMultiActivatedAbilityDrawCardCharacter,
+                test_card::TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER,
             ),
             vec![(
                 AbilityNumber(0),
@@ -559,8 +570,10 @@ fn build_for(name: CardName) -> AbilityList {
                 AbilityConfiguration::default(),
             )],
         ),
-        CardName::TestActivatedAbilityDissolveCharacter => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestActivatedAbilityDissolveCharacter),
+        test_card::TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER => build_ability_list(
+            card_descriptor::get_base_identity(
+                test_card::TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER,
+            ),
             vec![(
                 AbilityNumber(0),
                 Ability::Activated(ActivatedAbility {
@@ -576,8 +589,8 @@ fn build_for(name: CardName) -> AbilityList {
                 },
             )],
         ),
-        CardName::TestDualActivatedAbilityCharacter => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestDualActivatedAbilityCharacter),
+        test_card::TEST_DUAL_ACTIVATED_ABILITY_CHARACTER => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_DUAL_ACTIVATED_ABILITY_CHARACTER),
             vec![
                 (
                     AbilityNumber(0),
@@ -599,32 +612,30 @@ fn build_for(name: CardName) -> AbilityList {
                 ),
             ],
         ),
-        CardName::TestForeseeOne => {
-            build_ability_list(card_descriptor::get_base_identity(CardName::TestForeseeOne), vec![
-                (
-                    AbilityNumber(0),
-                    Ability::Event(EventAbility {
-                        additional_cost: None,
-                        effect: Effect::Effect(StandardEffect::Foresee { count: 1 }),
-                    }),
-                    AbilityConfiguration::default(),
-                ),
-            ])
-        }
-        CardName::TestForeseeTwo => {
-            build_ability_list(card_descriptor::get_base_identity(CardName::TestForeseeTwo), vec![
-                (
-                    AbilityNumber(0),
-                    Ability::Event(EventAbility {
-                        additional_cost: None,
-                        effect: Effect::Effect(StandardEffect::Foresee { count: 2 }),
-                    }),
-                    AbilityConfiguration::default(),
-                ),
-            ])
-        }
-        CardName::TestForeseeOneDrawACard => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestForeseeOneDrawACard),
+        test_card::TEST_FORESEE_ONE => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_FORESEE_ONE),
+            vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::Foresee { count: 1 }),
+                }),
+                AbilityConfiguration::default(),
+            )],
+        ),
+        test_card::TEST_FORESEE_TWO => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_FORESEE_TWO),
+            vec![(
+                AbilityNumber(0),
+                Ability::Event(EventAbility {
+                    additional_cost: None,
+                    effect: Effect::Effect(StandardEffect::Foresee { count: 2 }),
+                }),
+                AbilityConfiguration::default(),
+            )],
+        ),
+        test_card::TEST_FORESEE_ONE_DRAW_A_CARD => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_FORESEE_ONE_DRAW_A_CARD),
             vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
@@ -637,8 +648,8 @@ fn build_for(name: CardName) -> AbilityList {
                 AbilityConfiguration::default(),
             )],
         ),
-        CardName::TestDrawOneReclaim => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestDrawOneReclaim),
+        test_card::TEST_DRAW_ONE_RECLAIM => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_DRAW_ONE_RECLAIM),
             vec![
                 (
                     AbilityNumber(0),
@@ -655,8 +666,8 @@ fn build_for(name: CardName) -> AbilityList {
                 ),
             ],
         ),
-        CardName::TestReturnVoidCardToHand => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestReturnVoidCardToHand),
+        test_card::TEST_RETURN_VOID_CARD_TO_HAND => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_RETURN_VOID_CARD_TO_HAND),
             vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
@@ -671,8 +682,10 @@ fn build_for(name: CardName) -> AbilityList {
                 },
             )],
         ),
-        CardName::TestReturnOneOrTwoVoidEventCardsToHand => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestReturnOneOrTwoVoidEventCardsToHand),
+        test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND => build_ability_list(
+            card_descriptor::get_base_identity(
+                test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND,
+            ),
             vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
@@ -688,8 +701,8 @@ fn build_for(name: CardName) -> AbilityList {
                 },
             )],
         ),
-        CardName::TestModalDrawOneOrDrawTwo => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestModalDrawOneOrDrawTwo),
+        test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO),
             vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
@@ -708,8 +721,8 @@ fn build_for(name: CardName) -> AbilityList {
                 AbilityConfiguration { ..Default::default() },
             )],
         ),
-        CardName::TestModalDrawOneOrDissolveEnemy => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestModalDrawOneOrDissolveEnemy),
+        test_card::TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY),
             vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
@@ -730,8 +743,8 @@ fn build_for(name: CardName) -> AbilityList {
                 AbilityConfiguration { ..Default::default() },
             )],
         ),
-        CardName::TestReturnToHand => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestReturnToHand),
+        test_card::TEST_RETURN_TO_HAND => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_RETURN_TO_HAND),
             vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
@@ -746,8 +759,8 @@ fn build_for(name: CardName) -> AbilityList {
                 },
             )],
         ),
-        CardName::TestPreventDissolveThisTurn => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestPreventDissolveThisTurn),
+        test_card::TEST_PREVENT_DISSOLVE_THIS_TURN => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_PREVENT_DISSOLVE_THIS_TURN),
             vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
@@ -759,8 +772,8 @@ fn build_for(name: CardName) -> AbilityList {
                 AbilityConfiguration::default(),
             )],
         ),
-        CardName::TestCounterspellCharacter => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestCounterspellCharacter),
+        test_card::TEST_COUNTERSPELL_CHARACTER => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_COUNTERSPELL_CHARACTER),
             vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
@@ -772,8 +785,8 @@ fn build_for(name: CardName) -> AbilityList {
                 AbilityConfiguration::default(),
             )],
         ),
-        CardName::TestForeseeOneReclaim => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestForeseeOneReclaim),
+        test_card::TEST_FORESEE_ONE_RECLAIM => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_FORESEE_ONE_RECLAIM),
             vec![
                 (
                     AbilityNumber(0),
@@ -790,8 +803,8 @@ fn build_for(name: CardName) -> AbilityList {
                 ),
             ],
         ),
-        CardName::TestForeseeOneDrawReclaim => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestForeseeOneDrawReclaim),
+        test_card::TEST_FORESEE_ONE_DRAW_RECLAIM => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_FORESEE_ONE_DRAW_RECLAIM),
             vec![
                 (
                     AbilityNumber(0),
@@ -811,8 +824,8 @@ fn build_for(name: CardName) -> AbilityList {
                 ),
             ],
         ),
-        CardName::TestModalReturnToHandOrDrawTwo => build_ability_list(
-            card_descriptor::get_base_identity(CardName::TestModalReturnToHandOrDrawTwo),
+        test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO => build_ability_list(
+            card_descriptor::get_base_identity(test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO),
             vec![(
                 AbilityNumber(0),
                 Ability::Event(EventAbility {
@@ -833,5 +846,6 @@ fn build_for(name: CardName) -> AbilityList {
                 AbilityConfiguration::default(),
             )],
         ),
+        _ => panic!("Unknown card: {name:?}"),
     }
 }

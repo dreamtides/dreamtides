@@ -1,6 +1,6 @@
-use core_data::identifiers::CardName;
 use core_data::numerics::Energy;
 use display_data::battle_view::DisplayPlayer;
+use tabula_ids::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_prelude::*;
@@ -10,7 +10,7 @@ use crate::battle_tests::basic_tests::test_helpers;
 #[test]
 fn modal_effect_displays_browser_cards_with_correct_costs() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
-    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDrawTwo);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO);
 
     let browser_cards = s.user_client.cards.browser_cards();
     assert_eq!(browser_cards.len(), 2, "two browser cards displayed for modal choice");
@@ -38,7 +38,7 @@ fn modal_effect_displays_browser_cards_with_correct_costs() {
 #[test]
 fn select_draw_one_effect_costs_one_energy() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(5).build()).connect();
-    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDrawTwo);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO);
 
     assert_eq!(s.user_client.me.energy(), Energy(5), "no energy spent to play modal card");
     assert_eq!(s.user_client.cards.user_hand().len(), 0, "hand empty before choice");
@@ -58,7 +58,7 @@ fn select_draw_one_effect_costs_one_energy() {
 #[test]
 fn select_draw_two_effect_costs_three_energy() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(7).build()).connect();
-    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDrawTwo);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO);
 
     assert_eq!(s.user_client.me.energy(), Energy(7), "no energy spent to play modal card");
     assert_eq!(s.user_client.cards.user_hand().len(), 0, "hand empty before choice");
@@ -78,7 +78,7 @@ fn select_draw_two_effect_costs_three_energy() {
 #[test]
 fn modal_effect_choice_browser_cards_have_click_actions() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
-    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDrawTwo);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO);
 
     let browser_cards = s.user_client.cards.browser_cards();
     assert_eq!(browser_cards.len(), 2, "two browser cards displayed");
@@ -97,7 +97,7 @@ fn modal_effect_choice_browser_cards_have_click_actions() {
 #[test]
 fn insufficient_energy_prevents_selection() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(2).build()).connect();
-    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDrawTwo);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO);
 
     assert_eq!(s.user_client.me.energy(), Energy(2), "no energy spent to play modal card");
 
@@ -116,7 +116,8 @@ fn insufficient_energy_prevents_selection() {
 #[test]
 fn modal_choices_unplayable_with_no_energy() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(0).build()).connect();
-    let modal_card_id = s.add_to_hand(DisplayPlayer::User, CardName::TestModalDrawOneOrDrawTwo);
+    let modal_card_id =
+        s.add_to_hand(DisplayPlayer::User, test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO);
 
     let modal_card = s.user_client.cards.get(&modal_card_id);
     assert!(
@@ -128,7 +129,7 @@ fn modal_choices_unplayable_with_no_energy() {
 #[test]
 fn modal_draw_or_dissolve_auto_targets_single_enemy() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
-    let enemy_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let enemy_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     assert_eq!(
         s.user_client.cards.enemy_battlefield().len(),
@@ -138,7 +139,7 @@ fn modal_draw_or_dissolve_auto_targets_single_enemy() {
     assert_eq!(s.user_client.cards.enemy_void().len(), 0, "enemy void empty");
     assert_eq!(s.user_client.cards.user_hand().len(), 0, "user hand empty");
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDissolveEnemy);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY);
 
     let browser_cards = s.user_client.cards.browser_cards();
     assert_eq!(browser_cards.len(), 2, "two browser cards displayed for modal choice");
@@ -157,8 +158,8 @@ fn modal_draw_or_dissolve_auto_targets_single_enemy() {
 #[test]
 fn modal_draw_or_dissolve_manual_targeting_multiple_enemies() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
-    let enemy1_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
-    let enemy2_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let enemy1_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
+    let enemy2_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     assert_eq!(
         s.user_client.cards.enemy_battlefield().len(),
@@ -167,7 +168,7 @@ fn modal_draw_or_dissolve_manual_targeting_multiple_enemies() {
     );
     assert_eq!(s.user_client.cards.enemy_void().len(), 0, "enemy void empty");
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDissolveEnemy);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY);
 
     let browser_cards = s.user_client.cards.browser_cards();
     assert_eq!(browser_cards.len(), 2, "two browser cards displayed for modal choice");
@@ -188,12 +189,12 @@ fn modal_draw_or_dissolve_manual_targeting_multiple_enemies() {
 #[test]
 fn modal_draw_or_dissolve_draw_option_no_targeting() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
-    let enemy_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let enemy_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     assert_eq!(s.user_client.cards.user_hand().len(), 0, "user hand empty");
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "enemy still on battlefield");
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDissolveEnemy);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY);
 
     let browser_cards = s.user_client.cards.browser_cards();
     assert_eq!(browser_cards.len(), 2, "two browser cards displayed for modal choice");
@@ -216,10 +217,10 @@ fn modal_draw_or_dissolve_draw_option_no_targeting() {
 #[test]
 fn modal_draw_or_dissolve_costs_and_targeting() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
-    s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
-    s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
+    s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDissolveEnemy);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY);
 
     let browser_cards = s.user_client.cards.browser_cards();
     assert_eq!(browser_cards.len(), 2, "two browser cards displayed for modal choice");
@@ -253,7 +254,7 @@ fn modal_draw_or_dissolve_costs_and_targeting() {
 fn modal_dissolve_choice_unavailable_without_targets() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDissolveEnemy);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY);
 
     let browser_cards = s.user_client.cards.browser_cards();
     assert_eq!(browser_cards.len(), 2, "two browser cards displayed for modal choice");
@@ -271,9 +272,9 @@ fn modal_dissolve_choice_unavailable_without_targets() {
 #[test]
 fn modal_dissolve_choice_available_with_targets() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
-    s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDissolveEnemy);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY);
 
     let browser_cards = s.user_client.cards.browser_cards();
     assert_eq!(browser_cards.len(), 2, "two browser cards displayed for modal choice");
@@ -292,7 +293,7 @@ fn modal_dissolve_choice_available_with_targets() {
 fn modal_choice_energy_and_target_validation() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(1).build()).connect();
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDissolveEnemy);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY);
 
     let browser_cards = s.user_client.cards.browser_cards();
     assert_eq!(browser_cards.len(), 2, "two browser cards displayed for modal choice");
@@ -315,7 +316,7 @@ fn modal_effect_choices_only_visible_to_prompted_player() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
     // User plays a modal card that creates a prompt
-    s.create_and_play(DisplayPlayer::User, CardName::TestModalDrawOneOrDrawTwo);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO);
 
     // Verify the user can see the modal choices
     let user_browser_cards = s.user_client.cards.browser_cards();

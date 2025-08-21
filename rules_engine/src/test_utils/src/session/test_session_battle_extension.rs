@@ -6,7 +6,7 @@ use battle_state::actions::battle_actions::{
 };
 use battle_state::actions::debug_battle_action::DebugBattleAction;
 use battle_state::battle::card_id::DeckCardId;
-use core_data::identifiers::CardName;
+use core_data::identifiers::BaseCardId;
 use display_data::battle_view::{ButtonView, DisplayPlayer};
 use display_data::card_view::{CardPrefab, ClientCardId};
 use display_data::command::Command;
@@ -14,12 +14,12 @@ use display_data::command::Command;
 use crate::session::test_session::TestSession;
 
 pub struct TestPlayCard {
-    pub name: CardName,
+    pub name: BaseCardId,
     pub target: Option<ClientCardId>,
 }
 
 impl TestPlayCard {
-    pub fn new(name: CardName) -> Self {
+    pub fn new(name: BaseCardId) -> Self {
         Self { name, target: None }
     }
 
@@ -29,8 +29,8 @@ impl TestPlayCard {
     }
 }
 
-impl From<CardName> for TestPlayCard {
-    fn from(name: CardName) -> Self {
+impl From<BaseCardId> for TestPlayCard {
+    fn from(name: BaseCardId) -> Self {
         Self { name, target: None }
     }
 }
@@ -66,14 +66,14 @@ pub trait TestSessionBattleExtension {
     fn click_card(&mut self, player: DisplayPlayer, target_id: &ClientCardId);
 
     /// Adds a card to a player's hand via debug actions, returning its card id.
-    fn add_to_hand(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId;
+    fn add_to_hand(&mut self, player: DisplayPlayer, card: BaseCardId) -> ClientCardId;
 
     /// Adds a card to a player's battlefield via debug actions, returning its
     /// card id. This does not play the card or spend energy etc.
-    fn add_to_battlefield(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId;
+    fn add_to_battlefield(&mut self, player: DisplayPlayer, card: BaseCardId) -> ClientCardId;
 
     /// Adds a card to a player's void via debug actions, returning its card id.
-    fn add_to_void(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId;
+    fn add_to_void(&mut self, player: DisplayPlayer, card: BaseCardId) -> ClientCardId;
 
     /// Plays a card from a player's void using its reclaim ability.
     ///
@@ -209,7 +209,7 @@ impl TestSessionBattleExtension for TestSession {
         self.perform_player_action(player, target_action);
     }
 
-    fn add_to_hand(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId {
+    fn add_to_hand(&mut self, player: DisplayPlayer, card: BaseCardId) -> ClientCardId {
         let existing_hand_ids: HashSet<String> =
             self.client(player).cards.user_hand().iter().map(|c| c.id.clone()).collect();
 
@@ -230,7 +230,7 @@ impl TestSessionBattleExtension for TestSession {
             .expect("Failed to find newly added card in hand")
     }
 
-    fn add_to_battlefield(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId {
+    fn add_to_battlefield(&mut self, player: DisplayPlayer, card: BaseCardId) -> ClientCardId {
         let existing_battlefield_ids: HashSet<String> =
             self.client(player).cards.user_battlefield().iter().map(|c| c.id.clone()).collect();
 
@@ -251,7 +251,7 @@ impl TestSessionBattleExtension for TestSession {
             .expect("Failed to find newly added card on battlefield")
     }
 
-    fn add_to_void(&mut self, player: DisplayPlayer, card: CardName) -> ClientCardId {
+    fn add_to_void(&mut self, player: DisplayPlayer, card: BaseCardId) -> ClientCardId {
         let existing_void_ids: HashSet<String> =
             self.client(player).cards.user_void().iter().map(|c| c.id.clone()).collect();
 

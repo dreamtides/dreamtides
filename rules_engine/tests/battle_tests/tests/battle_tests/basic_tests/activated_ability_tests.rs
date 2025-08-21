@@ -1,10 +1,10 @@
 use battle_state::actions::battle_actions::BattleAction;
-use core_data::identifiers::CardName;
 use core_data::numerics::{Energy, Spark};
 use display_data::battle_view::DisplayPlayer;
 use display_data::card_view::{CardPrefab, CardView};
 use display_data::command::Command;
 use display_data::object_position::Position;
+use tabula_ids::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_prelude::*;
@@ -14,7 +14,7 @@ fn activate_ability_basic_draw_card() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCard);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD);
 
     assert_eq!(s.user_client.cards.user_hand().len(), 1, "activated ability token in hand");
     assert_eq!(s.user_client.me.energy(), Energy(99), "initial energy");
@@ -43,7 +43,7 @@ fn activate_ability_multi_use_same_turn() {
 
     let character_id = s.add_to_battlefield(
         DisplayPlayer::User,
-        CardName::TestMultiActivatedAbilityDrawCardCharacter,
+        test_card::TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER,
     );
 
     assert_eq!(s.user_client.cards.user_hand().len(), 1, "activated ability token in hand");
@@ -65,7 +65,7 @@ fn activate_ability_single_use_per_turn_cycle() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCard);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD);
 
     s.activate_ability(DisplayPlayer::User, &character_id, 0);
     assert_eq!(s.user_client.cards.user_hand().len(), 1, "token used, replaced by drawn card");
@@ -83,7 +83,7 @@ fn activate_ability_insufficient_energy() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(0).build()).connect();
 
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCard);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD);
 
     let token_card_id = format!("A{character_id}/0");
     let token_card = s.user_client.cards.card_map.get(&token_card_id);
@@ -110,14 +110,15 @@ fn activate_ability_fast_during_enemy_turn() {
 
     let character_id = s.add_to_battlefield(
         DisplayPlayer::User,
-        CardName::TestFastActivatedAbilityDrawCardCharacter,
+        test_card::TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER,
     );
 
     assert_eq!(s.user_client.cards.user_hand().len(), 1, "activated ability token in hand");
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let enemy_character =
+        s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     assert!(
         s.user_client.cards.stack_cards().contains(&enemy_character),
@@ -140,12 +141,13 @@ fn activate_ability_fast_multi_during_enemy_turn() {
 
     let character_id = s.add_to_battlefield(
         DisplayPlayer::User,
-        CardName::TestFastMultiActivatedAbilityDrawCardCharacter,
+        test_card::TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER,
     );
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    let _enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let _enemy_character =
+        s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     s.activate_ability(DisplayPlayer::User, &character_id, 0);
     assert_eq!(s.user_client.cards.user_hand().len(), 2, "drew first card, token regenerated");
@@ -164,11 +166,12 @@ fn activate_ability_non_fast_not_available_during_enemy_turn() {
         .connect();
 
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCard);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD);
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    let _enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let _enemy_character =
+        s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     let token_card_id = format!("A{character_id}/0");
     let token_card = s.user_client.cards.card_map.get(&token_card_id);
@@ -191,7 +194,7 @@ fn activate_ability_token_card_properties() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCard);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD);
 
     let token_card_id = format!("A{character_id}/0");
     let token_card = s.user_client.cards.card_map.get(&token_card_id);
@@ -211,7 +214,7 @@ fn activate_ability_spark_unchanged() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCard);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD);
 
     let initial_spark = s.user_client.cards.get_revealed(&character_id).numeric_spark();
     assert_eq!(initial_spark, Some(Spark(3)), "character has initial spark");
@@ -231,7 +234,7 @@ fn activate_ability_enemy_perspective_token_card_on_stack() {
 
     // Add a character with activated ability to enemy's battlefield
     let enemy_character_id =
-        s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestActivatedAbilityDrawCard);
+        s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD);
 
     assert_eq!(s.user_client.cards.stack_cards().len(), 0, "no cards on stack initially");
 
@@ -296,11 +299,11 @@ fn activate_ability_goes_on_stack_requires_priority_passing() {
 
     // Add character with activated ability to user's battlefield
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCard);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD);
 
     // Give enemy a fast card so they have multiple legal actions when user
     // activates ability
-    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DRAW_ONE);
 
     assert_eq!(s.user_client.cards.user_hand().len(), 1, "activated ability token in hand");
     assert_eq!(s.user_client.cards.stack_cards().len(), 0, "no cards on stack initially");
@@ -353,17 +356,17 @@ fn activate_ability_can_be_responded_to_with_fast_cards() {
 
     // Add character with activated ability to user's battlefield
     let user_character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCard);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD);
 
     // Add fast activated ability character to enemy's battlefield
     let enemy_character_id = s.add_to_battlefield(
         DisplayPlayer::Enemy,
-        CardName::TestFastActivatedAbilityDrawCardCharacter,
+        test_card::TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER,
     );
 
     // Give both players additional cards so they have multiple legal actions
-    let _user_fast_card = s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
-    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+    let _user_fast_card = s.add_to_hand(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
+    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DRAW_ONE);
 
     // User activates their ability
     s.activate_ability(DisplayPlayer::User, &user_character_id, 0);
@@ -402,18 +405,18 @@ fn activate_ability_fast_can_respond_during_enemy_turn() {
     // Add fast activated ability character to user's battlefield
     let user_character_id = s.add_to_battlefield(
         DisplayPlayer::User,
-        CardName::TestFastActivatedAbilityDrawCardCharacter,
+        test_card::TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER,
     );
 
     // End user turn
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
     // Give both players an additional fast card for multiple legal actions
-    let _user_fast_card = s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
-    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+    let _user_fast_card = s.add_to_hand(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
+    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DRAW_ONE);
 
     // Enemy plays a card
-    let enemy_card = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let enemy_card = s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     // Verify enemy card is on stack and user can act (has priority to respond)
     assert!(s.user_client.cards.stack_cards().contains(&enemy_card), "enemy card on stack");
@@ -442,12 +445,14 @@ fn activate_ability_with_targeting_dissolve_enemy_character() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let dissolve_character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDissolveCharacter);
-    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let dissolve_character_id = s.add_to_battlefield(
+        DisplayPlayer::User,
+        test_card::TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER,
+    );
+    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     // Give enemy an additional card so they have multiple legal actions
-    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DRAW_ONE);
 
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "enemy character on battlefield");
     assert_eq!(s.user_client.cards.enemy_void().len(), 0, "enemy void empty");
@@ -479,13 +484,15 @@ fn activate_ability_with_targeting_multiple_targets() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let dissolve_character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDissolveCharacter);
-    let target1_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
-    let target2_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let dissolve_character_id = s.add_to_battlefield(
+        DisplayPlayer::User,
+        test_card::TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER,
+    );
+    let target1_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
+    let target2_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     // Give enemy an additional card so they have multiple legal actions
-    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DRAW_ONE);
 
     assert_eq!(
         s.user_client.cards.enemy_battlefield().len(),
@@ -512,12 +519,14 @@ fn activate_ability_with_targeting_works_on_stack() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let dissolve_character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDissolveCharacter);
-    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let dissolve_character_id = s.add_to_battlefield(
+        DisplayPlayer::User,
+        test_card::TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER,
+    );
+    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     // Give enemy an additional card so they have multiple legal actions
-    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DRAW_ONE);
 
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "enemy character on battlefield");
     assert_eq!(s.user_client.cards.stack_cards().len(), 0, "stack empty initially");
@@ -542,7 +551,7 @@ fn dual_activated_abilities_each_usable_once_per_turn() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestDualActivatedAbilityCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_DUAL_ACTIVATED_ABILITY_CHARACTER);
 
     assert_eq!(s.user_client.cards.user_hand().len(), 2, "two activated ability tokens in hand");
     assert_eq!(s.user_client.me.energy(), Energy(99), "initial energy");
@@ -591,7 +600,7 @@ fn dual_activated_abilities_regenerate_next_turn() {
         .connect();
 
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestDualActivatedAbilityCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_DUAL_ACTIVATED_ABILITY_CHARACTER);
 
     s.activate_ability(DisplayPlayer::User, &character_id, 0);
     s.activate_ability(DisplayPlayer::User, &character_id, 1);
@@ -634,7 +643,7 @@ fn dual_activated_abilities_independent_usage() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestDualActivatedAbilityCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_DUAL_ACTIVATED_ABILITY_CHARACTER);
 
     s.activate_ability(DisplayPlayer::User, &character_id, 1);
     assert_eq!(s.user_client.me.energy(), Energy(97), "energy spent on second ability only");
@@ -665,7 +674,7 @@ fn dual_activated_abilities_different_effects() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestDualActivatedAbilityCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_DUAL_ACTIVATED_ABILITY_CHARACTER);
 
     let initial_hand_size = s.user_client.cards.user_hand().len();
 
@@ -692,7 +701,7 @@ fn dual_activated_abilities_different_costs() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(4).build()).connect();
 
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestDualActivatedAbilityCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_DUAL_ACTIVATED_ABILITY_CHARACTER);
 
     s.activate_ability(DisplayPlayer::User, &character_id, 0);
     assert_eq!(s.user_client.me.energy(), Energy(3), "spent 1 energy on first ability");
@@ -715,9 +724,9 @@ fn activate_ability_token_not_available_when_already_on_stack() {
         .connect();
 
     let character_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestActivatedAbilityDrawCard);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD);
 
-    s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+    s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DRAW_ONE);
 
     assert_eq!(s.user_client.cards.user_hand().len(), 1, "activated ability token in hand");
 
@@ -750,11 +759,12 @@ fn activate_ability_token_not_available_when_already_on_stack() {
 fn token_cards_in_hand_have_higher_sorting_keys_than_regular_cards() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
-    let regular_card_id = s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
-    let second_regular_card_id = s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let regular_card_id = s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    let second_regular_card_id =
+        s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     let character_with_ability_id =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestDualActivatedAbilityCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_DUAL_ACTIVATED_ABILITY_CHARACTER);
 
     let regular_card_1 = s.user_client.cards.card_map.get(&regular_card_id).unwrap();
     let regular_card_2 = s.user_client.cards.card_map.get(&second_regular_card_id).unwrap();

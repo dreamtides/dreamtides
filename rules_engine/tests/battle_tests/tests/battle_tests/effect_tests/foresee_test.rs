@@ -2,21 +2,21 @@ use battle_state::actions::battle_actions::{
     CardOrderSelectionTarget, CardOrderSelectionTargetDiscriminants,
 };
 use battle_state::actions::debug_battle_action::DebugBattleAction;
-use core_data::identifiers::CardName;
 use core_data::types::PlayerName;
 use display_data::battle_view::DisplayPlayer;
 use display_data::object_position::Position;
+use tabula_ids::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::session::test_session_prelude::*;
 
 #[test]
 fn foresee_one_keep_card_on_deck() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
-    s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
-    s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_DISSOLVE);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestForeseeOne);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_FORESEE_ONE);
 
     assert!(
         s.user_client.interface().card_order_selector.is_some(),
@@ -43,7 +43,7 @@ fn foresee_one_keep_card_on_deck() {
         "Card order selector should be hidden after submission"
     );
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestDrawOne);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
 
     assert!(
         s.user_client.cards.user_hand().contains(&card_id),
@@ -54,10 +54,10 @@ fn foresee_one_keep_card_on_deck() {
 #[test]
 fn foresee_one_put_card_in_void() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
-    s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestForeseeOne);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_FORESEE_ONE);
 
     let cards_in_browser: Vec<_> = s
         .user_client
@@ -79,7 +79,7 @@ fn foresee_one_put_card_in_void() {
         "The card we placed in void should now be in the void"
     );
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestDrawOne);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
 
     assert!(
         !s.user_client.cards.user_hand().contains(&card_id),
@@ -90,11 +90,11 @@ fn foresee_one_put_card_in_void() {
 #[test]
 fn foresee_two_keep_both_cards_same_order() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
-    s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
-    s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_DISSOLVE);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestForeseeTwo);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_FORESEE_TWO);
 
     let cards_in_browser: Vec<_> = s
         .user_client
@@ -113,7 +113,7 @@ fn foresee_two_keep_both_cards_same_order() {
     s.select_card_order(DisplayPlayer::User, &second_card_id, CardOrderSelectionTarget::Deck(1));
     s.click_primary_button(DisplayPlayer::User, "Submit");
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestDrawOne);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
 
     assert!(
         !s.user_client.cards.user_hand().contains(&first_card_id),
@@ -129,11 +129,11 @@ fn foresee_two_keep_both_cards_same_order() {
 #[test]
 fn foresee_two_reverse_card_order() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
-    s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
-    s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_DISSOLVE);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestForeseeTwo);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_FORESEE_TWO);
 
     let cards_in_browser: Vec<_> = s
         .user_client
@@ -152,7 +152,7 @@ fn foresee_two_reverse_card_order() {
     s.select_card_order(DisplayPlayer::User, &first_card_id, CardOrderSelectionTarget::Deck(1));
     s.click_primary_button(DisplayPlayer::User, "Submit");
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestDrawOne);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
 
     assert!(
         !s.user_client.cards.user_hand().contains(&second_card_id),
@@ -168,10 +168,10 @@ fn foresee_two_reverse_card_order() {
 #[test]
 fn foresee_two_put_both_cards_in_void() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
-    s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestForeseeTwo);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_FORESEE_TWO);
 
     let cards_in_browser: Vec<_> = s
         .user_client
@@ -200,7 +200,7 @@ fn foresee_two_put_both_cards_in_void() {
         "The second card we placed in void should be in the void"
     );
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestDrawOne);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
 
     assert!(
         !s.user_client.cards.user_hand().contains(&first_card_id),
@@ -216,11 +216,11 @@ fn foresee_two_put_both_cards_in_void() {
 #[test]
 fn foresee_two_mixed_one_deck_one_void() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
-    s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
-    s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_DISSOLVE);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestForeseeTwo);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_FORESEE_TWO);
 
     let cards_in_browser: Vec<_> = s
         .user_client
@@ -244,7 +244,7 @@ fn foresee_two_mixed_one_deck_one_void() {
         "The second card we placed in void should be in the void"
     );
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestDrawOne);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
 
     assert!(
         s.user_client.cards.user_hand().contains(&first_card_id),
@@ -260,9 +260,9 @@ fn foresee_two_mixed_one_deck_one_void() {
 #[test]
 fn foresee_cards_appear_in_browser_position() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestForeseeTwo);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_FORESEE_TWO);
 
     let cards_in_deck_selector: Vec<_> = s
         .user_client
@@ -350,9 +350,9 @@ fn foresee_cards_appear_in_browser_position() {
 #[test]
 fn foresee_cards_have_can_select_order_action() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestForeseeOne);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_FORESEE_ONE);
 
     let cards_in_browser: Vec<_> = s
         .user_client
@@ -384,7 +384,7 @@ fn foresee_with_empty_deck() {
 
     assert_eq!(s.user_client.cards.user_deck().len(), 0, "User deck should be empty");
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestForeseeOne);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_FORESEE_ONE);
 
     assert!(
         s.user_client.interface().card_order_selector.is_some(),
@@ -432,7 +432,7 @@ fn foresee_two_with_only_one_card_in_deck() {
 
     assert_eq!(s.user_client.cards.user_deck().len(), 1, "User deck should have 1 card");
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestForeseeTwo);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_FORESEE_TWO);
 
     let cards_in_browser: Vec<_> = s
         .user_client
@@ -455,7 +455,7 @@ fn foresee_two_with_only_one_card_in_deck() {
     s.select_card_order(DisplayPlayer::User, &second_card_id, CardOrderSelectionTarget::Deck(1));
     s.click_primary_button(DisplayPlayer::User, "Submit");
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestDrawOne);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
 
     assert!(
         !s.user_client.cards.user_hand().contains(&first_card_id),
@@ -471,10 +471,10 @@ fn foresee_two_with_only_one_card_in_deck() {
 #[test]
 fn foresee_one_draw_a_card_keep_card_on_deck() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
-    s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_DISSOLVE);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestForeseeOneDrawACard);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_FORESEE_ONE_DRAW_A_CARD);
 
     assert!(
         s.user_client.interface().card_order_selector.is_some(),
@@ -510,12 +510,12 @@ fn foresee_one_draw_a_card_keep_card_on_deck() {
 #[test]
 fn foresee_one_draw_a_card_put_card_in_void() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_hand(DisplayPlayer::User, CardName::TestVanillaCharacter);
-    s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_DISSOLVE);
 
     let initial_hand_count = s.user_client.cards.user_hand().len();
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestForeseeOneDrawACard);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_FORESEE_ONE_DRAW_A_CARD);
 
     let cards_in_browser: Vec<_> = s
         .user_client
@@ -562,7 +562,7 @@ fn foresee_one_draw_a_card_with_empty_deck() {
 
     let initial_hand_count = s.user_client.cards.user_hand().len();
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestForeseeOneDrawACard);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_FORESEE_ONE_DRAW_A_CARD);
 
     assert!(
         s.user_client.interface().card_order_selector.is_some(),

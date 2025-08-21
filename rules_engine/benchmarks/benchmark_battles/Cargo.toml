@@ -18,6 +18,7 @@ battle_state = { path = "../../src/battle_state" }
 core_data = { path = "../../src/core_data" }
 game_creation = { path = "../../src/game_creation" }
 quest_state = { path = "../../src/quest_state" }
+tabula_ids = { path = "../../src/tabula_ids" }
 
 rand = { workspace = true }
 rand_xoshiro = { workspace = true }

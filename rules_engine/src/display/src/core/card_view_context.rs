@@ -1,11 +1,11 @@
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardId;
-use core_data::identifiers::CardName;
+use core_data::identifiers::BaseCardId;
 
 /// Provides the context in which a card view is being displayed, i.e. either
 /// during an active battle or in a deck or draft context.
 pub enum CardViewContext<'a> {
-    Battle(&'a BattleState, CardName, CardId),
+    Battle(&'a BattleState, BaseCardId, CardId),
 }
 
 impl<'a> CardViewContext<'a> {
@@ -15,7 +15,7 @@ impl<'a> CardViewContext<'a> {
         }
     }
 
-    pub fn card_name(&self) -> CardName {
+    pub fn card_name(&self) -> BaseCardId {
         match self {
             CardViewContext::Battle(_, card_name, _) => *card_name,
         }

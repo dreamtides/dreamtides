@@ -1,6 +1,6 @@
-use core_data::identifiers::CardName;
 use display_data::battle_view::DisplayPlayer;
 use display_data::command::Command;
+use tabula_ids::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::session::test_session_prelude::*;
 
@@ -9,7 +9,7 @@ fn enemy_message_displayed_when_spending_energy_on_energy_prompt() {
     let mut s = TestBattle::builder().connect();
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    s.create_and_play(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
+    s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VARIABLE_ENERGY_DRAW);
     s.click_increment_button(DisplayPlayer::Enemy);
     s.click_increment_button(DisplayPlayer::Enemy);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
@@ -39,11 +39,12 @@ fn enemy_message_displayed_when_spending_energy_on_energy_prompt() {
 #[test]
 fn enemy_message_displayed_when_declining_to_pay_for_counterspell_unless_pays() {
     let mut s = TestBattle::builder().connect();
-    let counterspell_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
-    s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let counterspell_id =
+        s.add_to_hand(DisplayPlayer::User, test_card::TEST_COUNTERSPELL_UNLESS_PAYS);
+    s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    s.create_and_play(DisplayPlayer::Enemy, CardName::TestDissolve);
+    s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_DISSOLVE);
     s.play_card_from_hand(DisplayPlayer::User, &counterspell_id);
     s.click_secondary_button(DisplayPlayer::Enemy, "Decline");
 
@@ -71,11 +72,12 @@ fn enemy_message_displayed_when_declining_to_pay_for_counterspell_unless_pays() 
 #[test]
 fn enemy_message_displayed_when_paying_for_counterspell_unless_pays() {
     let mut s = TestBattle::builder().connect();
-    let counterspell_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspellUnlessPays);
-    s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let counterspell_id =
+        s.add_to_hand(DisplayPlayer::User, test_card::TEST_COUNTERSPELL_UNLESS_PAYS);
+    s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    s.create_and_play(DisplayPlayer::Enemy, CardName::TestDissolve);
+    s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_DISSOLVE);
     s.play_card_from_hand(DisplayPlayer::User, &counterspell_id);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
 
@@ -106,7 +108,7 @@ fn enemy_message_displayed_when_spending_minimum_energy_on_energy_prompt() {
     let mut s = TestBattle::builder().connect();
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    s.create_and_play(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
+    s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VARIABLE_ENERGY_DRAW);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
 
     let commands = s.last_user_commands.as_ref().expect("No commands found");

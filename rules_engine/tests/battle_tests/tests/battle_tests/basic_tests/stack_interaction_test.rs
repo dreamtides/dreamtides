@@ -1,9 +1,9 @@
 use battle_state::actions::battle_actions::BattleAction;
 use core_data::display_color;
-use core_data::identifiers::CardName;
 use display_data::battle_view::DisplayPlayer;
 use display_data::card_view::ClientCardId;
 use display_data::command::{ArrowStyle, GameObjectId};
+use tabula_ids::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::session::test_session::TestSession;
 use test_utils::session::test_session_prelude::*;
@@ -11,10 +11,10 @@ use test_utils::session::test_session_prelude::*;
 #[test]
 fn negate_card_on_stack() {
     let mut s = TestBattle::builder().connect();
-    let negate_id = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
+    let negate_id = s.add_to_hand(DisplayPlayer::User, test_card::TEST_COUNTERSPELL);
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
     let enemy_character_id =
-        s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+        s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     assert!(
         s.user_client.cards.stack_cards().contains(&enemy_character_id),
@@ -41,14 +41,15 @@ fn stack_back_and_forth_with_targeting() {
     let mut s = TestBattle::builder().connect();
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    let user_counterspell1 = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
-    let user_counterspell2 = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
-    let _user_counterspell3 = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
-    let enemy_counterspell1 = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestCounterspell);
-    let enemy_counterspell2 = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestCounterspell);
-    let _enemy_counterspell3 = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestCounterspell);
+    let user_counterspell1 = s.add_to_hand(DisplayPlayer::User, test_card::TEST_COUNTERSPELL);
+    let user_counterspell2 = s.add_to_hand(DisplayPlayer::User, test_card::TEST_COUNTERSPELL);
+    let _user_counterspell3 = s.add_to_hand(DisplayPlayer::User, test_card::TEST_COUNTERSPELL);
+    let enemy_counterspell1 = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_COUNTERSPELL);
+    let enemy_counterspell2 = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_COUNTERSPELL);
+    let _enemy_counterspell3 = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_COUNTERSPELL);
 
-    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let enemy_character =
+        s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     assert!(
         s.user_client.cards.stack_cards().contains(&enemy_character),
@@ -145,13 +146,14 @@ fn resolve_negate_with_removed_target() {
     let mut s = TestBattle::builder().connect();
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    let user_counterspell1 = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
-    let user_counterspell2 = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
-    let _user_extra = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
-    let enemy_variable = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
-    let _enemy_extra = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestCounterspell);
+    let user_counterspell1 = s.add_to_hand(DisplayPlayer::User, test_card::TEST_COUNTERSPELL);
+    let user_counterspell2 = s.add_to_hand(DisplayPlayer::User, test_card::TEST_COUNTERSPELL);
+    let _user_extra = s.add_to_hand(DisplayPlayer::User, test_card::TEST_COUNTERSPELL);
+    let enemy_variable = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_VARIABLE_ENERGY_DRAW);
+    let _enemy_extra = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_COUNTERSPELL);
 
-    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let enemy_character =
+        s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
     assert_eq!(s.user_client.cards.stack_cards().len(), 1, "one card on stack");
 
     s.play_card_from_hand(DisplayPlayer::User, &user_counterspell1);
@@ -208,13 +210,13 @@ fn resolve_negate_with_removed_target() {
 #[test]
 fn resolve_dissolve_with_removed_target() {
     let mut s = TestBattle::builder().connect();
-    let dissolve1 = s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
-    let dissolve2 = s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
-    let _extra = s.add_to_hand(DisplayPlayer::User, CardName::TestVariableEnergyDraw);
-    let draw = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
-    let _extra2 = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestVariableEnergyDraw);
+    let dissolve1 = s.add_to_hand(DisplayPlayer::User, test_card::TEST_DISSOLVE);
+    let dissolve2 = s.add_to_hand(DisplayPlayer::User, test_card::TEST_DISSOLVE);
+    let _extra = s.add_to_hand(DisplayPlayer::User, test_card::TEST_VARIABLE_ENERGY_DRAW);
+    let draw = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_VARIABLE_ENERGY_DRAW);
+    let _extra2 = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_VARIABLE_ENERGY_DRAW);
 
-    let character = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let character = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
     s.play_card_from_hand(DisplayPlayer::User, &dissolve1);
     s.play_card_from_hand(DisplayPlayer::Enemy, &draw);
     s.click_primary_button(DisplayPlayer::Enemy, "Spend");
@@ -332,12 +334,13 @@ fn assert_no_info_zoom_targeting(
 #[test]
 fn prevent_dissolve_this_turn_shows_green_arrows() {
     let mut s = TestBattle::builder().connect();
-    let user_character = s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let user_character =
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     let prevent_dissolve_card =
-        s.add_to_hand(DisplayPlayer::User, CardName::TestPreventDissolveThisTurn);
+        s.add_to_hand(DisplayPlayer::User, test_card::TEST_PREVENT_DISSOLVE_THIS_TURN);
 
     // Give opponent a fast card so they can respond, keeping the card on stack
-    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DRAW_ONE);
 
     s.play_card_from_hand(DisplayPlayer::User, &prevent_dissolve_card);
     // Target is automatically selected since there's only one valid target
@@ -365,19 +368,21 @@ fn prevent_dissolve_this_turn_shows_green_arrows() {
 #[test]
 fn targeting_outline_colors_green_for_own_red_for_enemy() {
     let mut s = TestBattle::builder().connect();
-    let user_character1 = s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
-    let user_character2 = s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let user_character1 =
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    let user_character2 =
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     let enemy_character1 =
-        s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+        s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
     let enemy_character2 =
-        s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+        s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     // Give opponent a fast card so they can respond, keeping the card on stack
-    s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+    s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DRAW_ONE);
 
     // Play a TestDissolve card which targets characters - this will require user to
     // choose a target
-    let dissolve_card = s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
+    let dissolve_card = s.add_to_hand(DisplayPlayer::User, test_card::TEST_DISSOLVE);
     s.play_card_from_hand(DisplayPlayer::User, &dissolve_card);
 
     // Check that enemy characters have red outline (hostile targeting)
@@ -409,7 +414,7 @@ fn targeting_outline_colors_green_for_own_red_for_enemy() {
 
     // Now test with TestPreventDissolveThisTurn which targets own characters
     let prevent_dissolve_card =
-        s.add_to_hand(DisplayPlayer::User, CardName::TestPreventDissolveThisTurn);
+        s.add_to_hand(DisplayPlayer::User, test_card::TEST_PREVENT_DISSOLVE_THIS_TURN);
 
     s.play_card_from_hand(DisplayPlayer::User, &prevent_dissolve_card);
 
@@ -441,19 +446,19 @@ fn arrow_colors_based_on_stack_item_controller_vs_target_controller() {
 
     // Create multiple characters for both players to force manual targeting
     let _user_character1 =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     let _user_character2 =
-        s.add_to_battlefield(DisplayPlayer::User, CardName::TestVanillaCharacter);
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
     let enemy_character1 =
-        s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+        s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
     let _enemy_character2 =
-        s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+        s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     // Give opponent a fast card so they can respond, keeping cards on stack
-    s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+    s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DRAW_ONE);
 
     // User plays dissolve targeting enemy character (should be red arrow)
-    let user_dissolve = s.add_to_hand(DisplayPlayer::User, CardName::TestDissolve);
+    let user_dissolve = s.add_to_hand(DisplayPlayer::User, test_card::TEST_DISSOLVE);
     s.play_card_from_hand(DisplayPlayer::User, &user_dissolve);
 
     // Select a target to create the arrow

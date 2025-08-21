@@ -1,9 +1,9 @@
-use core_data::identifiers::CardName;
 use core_data::numerics::Spark;
 use display_data::battle_view::DisplayPlayer;
 use display_data::card_view::{CardPrefab, CardView};
 use display_data::command::{Command, GameObjectId};
 use display_data::object_position::Position;
+use tabula_ids::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_prelude::*;
@@ -16,7 +16,7 @@ fn triggered_ability_gain_spark_when_materialize_another_character() {
 
     let trigger_character_id = s.create_and_play(
         DisplayPlayer::User,
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
+        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER,
     );
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
@@ -24,7 +24,7 @@ fn triggered_ability_gain_spark_when_materialize_another_character() {
     let initial_spark = s.user_client.cards.get_revealed(&trigger_character_id).numeric_spark();
     assert_eq!(initial_spark, Some(Spark(5)), "trigger character has base spark");
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 2, "two characters on battlefield");
 
@@ -40,7 +40,7 @@ fn triggered_ability_gain_spark_multiple_materializations() {
 
     let trigger_character_id = s.create_and_play(
         DisplayPlayer::User,
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
+        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER,
     );
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
@@ -48,7 +48,7 @@ fn triggered_ability_gain_spark_multiple_materializations() {
     let initial_spark = s.user_client.cards.get_revealed(&trigger_character_id).numeric_spark();
     assert_eq!(initial_spark, Some(Spark(5)), "trigger character has base spark");
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     let first_trigger_spark =
         s.user_client.cards.get_revealed(&trigger_character_id).numeric_spark();
@@ -58,7 +58,7 @@ fn triggered_ability_gain_spark_multiple_materializations() {
         "trigger character gained +1 spark after first materialization"
     );
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 3, "three characters on battlefield");
 
@@ -78,7 +78,7 @@ fn triggered_ability_does_not_trigger_on_self_materialization() {
 
     let trigger_character_id = s.create_and_play(
         DisplayPlayer::User,
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
+        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER,
     );
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
@@ -102,7 +102,7 @@ fn triggered_ability_does_not_trigger_on_enemy_materialization() {
 
     let trigger_character_id = s.create_and_play(
         DisplayPlayer::User,
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
+        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER,
     );
 
     assert_eq!(
@@ -115,7 +115,7 @@ fn triggered_ability_does_not_trigger_on_enemy_materialization() {
     assert_eq!(initial_spark, Some(Spark(5)), "trigger character has base spark");
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
-    s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     assert_eq!(
         s.user_client.cards.enemy_battlefield().len(),
@@ -139,7 +139,7 @@ fn triggered_ability_multiple_trigger_characters() {
 
     let first_trigger_character_id = s.create_and_play(
         DisplayPlayer::User,
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
+        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER,
     );
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
@@ -150,7 +150,7 @@ fn triggered_ability_multiple_trigger_characters() {
 
     let second_trigger_character_id = s.create_and_play(
         DisplayPlayer::User,
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
+        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER,
     );
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 2, "two characters on battlefield");
@@ -166,7 +166,7 @@ fn triggered_ability_multiple_trigger_characters() {
     );
     assert_eq!(second_initial_spark, Some(Spark(5)), "second trigger character has base spark");
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 3, "three characters on battlefield");
 
@@ -194,7 +194,7 @@ fn triggered_ability_token_cards_appear_and_disappear_on_stack() {
 
     let trigger_character_id = s.create_and_play(
         DisplayPlayer::User,
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
+        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER,
     );
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
@@ -203,7 +203,7 @@ fn triggered_ability_token_cards_appear_and_disappear_on_stack() {
     let initial_spark = s.user_client.cards.get_revealed(&trigger_character_id).numeric_spark();
     assert_eq!(initial_spark, Some(Spark(5)), "trigger character has base spark");
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     let token_cards: Vec<&CardView> = s
         .find_all_commands(DisplayPlayer::User, |command| {
@@ -262,7 +262,7 @@ fn triggered_ability_display_effect_command_applied_to_spark_gaining_character()
 
     let trigger_character_id = s.create_and_play(
         DisplayPlayer::User,
-        CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter,
+        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER,
     );
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
@@ -270,7 +270,7 @@ fn triggered_ability_display_effect_command_applied_to_spark_gaining_character()
     let initial_spark = s.user_client.cards.get_revealed(&trigger_character_id).numeric_spark();
     assert_eq!(initial_spark, Some(Spark(5)), "trigger character has base spark");
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     let display_effect_command = s.find_command(DisplayPlayer::User, |command| {
         if let Command::DisplayEffect(display_effect) = command {
@@ -305,8 +305,10 @@ fn triggered_ability_gain_spark_on_play_card_enemy_turn() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let trigger_character_id = s
-        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
+    let trigger_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN,
+    );
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
 
@@ -315,8 +317,9 @@ fn triggered_ability_gain_spark_on_play_card_enemy_turn() {
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    let user_counterspell = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
-    let enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let user_counterspell = s.add_to_hand(DisplayPlayer::User, test_card::TEST_COUNTERSPELL);
+    let enemy_character =
+        s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     assert!(
         s.user_client.cards.stack_cards().contains(&enemy_character),
@@ -339,8 +342,10 @@ fn triggered_ability_gain_spark_multiple_cards_enemy_turn() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let trigger_character_id = s
-        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
+    let trigger_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN,
+    );
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
 
@@ -349,9 +354,9 @@ fn triggered_ability_gain_spark_multiple_cards_enemy_turn() {
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    let user_draw1 = s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
-    let user_draw2 = s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
-    s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let user_draw1 = s.add_to_hand(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
+    let user_draw2 = s.add_to_hand(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
+    s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     s.play_card_from_hand(DisplayPlayer::User, &user_draw1);
 
@@ -379,15 +384,17 @@ fn triggered_ability_gain_spark_multiple_cards_enemy_turn() {
 fn triggered_ability_does_not_trigger_during_user_turn() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 
-    let trigger_character_id = s
-        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
+    let trigger_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN,
+    );
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
 
     let initial_spark = s.user_client.cards.get_revealed(&trigger_character_id).numeric_spark();
     assert_eq!(initial_spark, Some(Spark(5)), "trigger character has base spark");
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 2, "two characters on battlefield");
 
@@ -408,8 +415,10 @@ fn triggered_ability_does_not_trigger_when_enemy_plays_cards() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let trigger_character_id = s
-        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
+    let trigger_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN,
+    );
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
 
@@ -418,7 +427,7 @@ fn triggered_ability_does_not_trigger_when_enemy_plays_cards() {
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     assert_eq!(
         s.user_client.cards.enemy_battlefield().len(),
@@ -443,11 +452,15 @@ fn triggered_ability_multiple_trigger_characters_enemy_turn() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let first_trigger_character_id = s
-        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
+    let first_trigger_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN,
+    );
 
-    let second_trigger_character_id = s
-        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
+    let second_trigger_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN,
+    );
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 2, "two characters on battlefield");
 
@@ -460,8 +473,9 @@ fn triggered_ability_multiple_trigger_characters_enemy_turn() {
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    let user_counterspell = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
-    let _enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let user_counterspell = s.add_to_hand(DisplayPlayer::User, test_card::TEST_COUNTERSPELL);
+    let _enemy_character =
+        s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     s.play_card_from_hand(DisplayPlayer::User, &user_counterspell);
 
@@ -482,8 +496,10 @@ fn triggered_ability_triggers_on_different_card_types_enemy_turn() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let trigger_character_id = s
-        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
+    let trigger_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN,
+    );
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
 
@@ -492,10 +508,13 @@ fn triggered_ability_triggers_on_different_card_types_enemy_turn() {
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    let user_fast_character =
-        s.add_to_hand(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
-    let user_draw = s.add_to_hand(DisplayPlayer::User, CardName::TestDrawOne);
-    let _enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let user_fast_character = s.add_to_hand(
+        DisplayPlayer::User,
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN,
+    );
+    let user_draw = s.add_to_hand(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
+    let _enemy_character =
+        s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     s.play_card_from_hand(DisplayPlayer::User, &user_fast_character);
 
@@ -526,8 +545,10 @@ fn triggered_ability_triggers_on_fast_character_enemy_turn() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let trigger_character_id = s
-        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
+    let trigger_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN,
+    );
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
 
@@ -536,9 +557,12 @@ fn triggered_ability_triggers_on_fast_character_enemy_turn() {
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    let user_fast_character =
-        s.add_to_hand(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
-    let _enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let user_fast_character = s.add_to_hand(
+        DisplayPlayer::User,
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN,
+    );
+    let _enemy_character =
+        s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     s.play_card_from_hand(DisplayPlayer::User, &user_fast_character);
 
@@ -561,8 +585,10 @@ fn triggered_ability_enemy_turn_token_cards_and_display_effect() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let trigger_character_id = s
-        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
+    let trigger_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN,
+    );
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
     assert_eq!(s.user_client.cards.stack_cards().len(), 0, "no cards on stack initially");
@@ -572,8 +598,9 @@ fn triggered_ability_enemy_turn_token_cards_and_display_effect() {
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    let user_counterspell = s.add_to_hand(DisplayPlayer::User, CardName::TestCounterspell);
-    let _enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let user_counterspell = s.add_to_hand(DisplayPlayer::User, test_card::TEST_COUNTERSPELL);
+    let _enemy_character =
+        s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     s.play_card_from_hand(DisplayPlayer::User, &user_counterspell);
 
@@ -652,22 +679,25 @@ fn triggered_ability_triggers_on_reclaim_during_enemy_turn() {
         .enemy(TestPlayer::builder().energy(99).build())
         .connect();
 
-    let trigger_character_id = s
-        .create_and_play(DisplayPlayer::User, CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn);
+    let trigger_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN,
+    );
 
     assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
 
     let initial_spark = s.user_client.cards.get_revealed(&trigger_character_id).numeric_spark();
     assert_eq!(initial_spark, Some(Spark(5)), "trigger character has base spark");
 
-    let reclaim_card_id = s.create_and_play(DisplayPlayer::User, CardName::TestDrawOneReclaim);
+    let reclaim_card_id = s.create_and_play(DisplayPlayer::User, test_card::TEST_DRAW_ONE_RECLAIM);
 
     assert_eq!(s.user_client.cards.user_void().len(), 1, "reclaim card in void");
     assert_eq!(s.user_client.cards.user_hand().len(), 2, "drew card plus reclaim token");
 
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
-    let _enemy_character = s.create_and_play(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let _enemy_character =
+        s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     assert!(s.user_client.me.can_act(), "user can act during enemy turn with fast reclaim");
 

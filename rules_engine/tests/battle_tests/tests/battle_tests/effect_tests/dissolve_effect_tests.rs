@@ -1,19 +1,19 @@
-use core_data::identifiers::CardName;
 use display_data::battle_view::DisplayPlayer;
 use display_data::command::{Command, GameObjectId};
+use tabula_ids::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::session::test_session_prelude::*;
 
 #[test]
 fn dissolve_enemy_character() {
     let mut s = TestBattle::builder().connect();
-    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "enemy character on battlefield");
     assert_eq!(s.user_client.cards.enemy_void().len(), 0, "enemy void empty");
     assert_eq!(s.user_client.cards.user_void().len(), 0, "user void empty");
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestDissolve);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_DISSOLVE);
 
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 0, "enemy character dissolved");
     assert_eq!(s.user_client.cards.enemy_void().len(), 1, "enemy character in void");
@@ -27,9 +27,9 @@ fn dissolve_enemy_character() {
 #[test]
 fn dissolve_fire_projectile_command() {
     let mut s = TestBattle::builder().connect();
-    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
-    let test_dissolve_id = s.create_and_play(DisplayPlayer::User, CardName::TestDissolve);
+    let test_dissolve_id = s.create_and_play(DisplayPlayer::User, test_card::TEST_DISSOLVE);
 
     let fire_projectile_commands =
         s.find_all_commands(DisplayPlayer::User, |command| match command {
@@ -68,8 +68,8 @@ fn dissolve_fire_projectile_command() {
 #[test]
 fn dissolve_with_multiple_targets() {
     let mut s = TestBattle::builder().connect();
-    let target1_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
-    let target2_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let target1_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
+    let target2_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
     assert_eq!(
         s.user_client.cards.enemy_battlefield().len(),
@@ -77,7 +77,7 @@ fn dissolve_with_multiple_targets() {
         "two enemy characters on battlefield"
     );
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestDissolve);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_DISSOLVE);
     s.click_card(DisplayPlayer::User, &target1_id);
 
     assert_eq!(s.user_client.cards.enemy_battlefield().len(), 1, "one enemy character remains");
@@ -89,9 +89,9 @@ fn dissolve_with_multiple_targets() {
 #[test]
 fn dissolve_card_command() {
     let mut s = TestBattle::builder().connect();
-    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, CardName::TestVanillaCharacter);
+    let target_id = s.add_to_battlefield(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestDissolve);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_DISSOLVE);
 
     let dissolve_commands = s.find_all_commands(DisplayPlayer::User, |command| match command {
         Command::DissolveCard(cmd) => Some(cmd),

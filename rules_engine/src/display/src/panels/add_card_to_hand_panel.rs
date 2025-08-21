@@ -3,11 +3,12 @@ use battle_state::actions::battle_actions::BattleAction;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
 use battle_state::battle::battle_state::BattleState;
 use bon::Builder;
-use core_data::identifiers::CardName;
+use core_data::identifiers::BaseCardId;
 use core_data::types::PlayerName;
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify};
 use masonry::flex_style::FlexStyle;
 use quest_state::quest::card_descriptor;
+use tabula_ids::test_card;
 use ui_components::box_component::BoxComponent;
 use ui_components::button_component::ButtonComponent;
 use ui_components::component::Component;
@@ -66,151 +67,151 @@ impl Component for AddCardToHandPanel<'_> {
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestVanillaCharacter)
+                                        .card(test_card::TEST_VANILLA_CHARACTER)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestForeseeOne)
+                                        .card(test_card::TEST_FORESEE_ONE)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestForeseeTwo)
+                                        .card(test_card::TEST_FORESEE_TWO)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestForeseeOneDrawACard)
+                                        .card(test_card::TEST_FORESEE_ONE_DRAW_A_CARD)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestForeseeOneReclaim)
+                                        .card(test_card::TEST_FORESEE_ONE_RECLAIM)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestDrawOneReclaim)
+                                        .card(test_card::TEST_DRAW_ONE_RECLAIM)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestModalDrawOneOrDrawTwo)
+                                        .card(test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestModalDrawOneOrDissolveEnemy)
+                                        .card(test_card::TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestModalReturnToHandOrDrawTwo)
+                                        .card(test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestPreventDissolveThisTurn)
+                                        .card(test_card::TEST_PREVENT_DISSOLVE_THIS_TURN)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestTriggerGainSparkWhenMaterializeAnotherCharacter)
+                                        .card(test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestTriggerGainSparkOnPlayCardEnemyTurn)
+                                        .card(test_card::TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestReturnVoidCardToHand)
+                                        .card(test_card::TEST_RETURN_VOID_CARD_TO_HAND)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestReturnOneOrTwoVoidEventCardsToHand)
+                                        .card(test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestForeseeOneDrawReclaim)
+                                        .card(test_card::TEST_FORESEE_ONE_DRAW_RECLAIM)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestActivatedAbilityDrawCard)
+                                        .card(test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestMultiActivatedAbilityDrawCardCharacter)
+                                        .card(test_card::TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestFastActivatedAbilityDrawCardCharacter)
+                                        .card(test_card::TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestFastMultiActivatedAbilityDrawCardCharacter)
+                                        .card(test_card::TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestTriggerGainTwoSparkOnPlayCardEnemyTurn)
+                                        .card(test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestDissolve)
+                                        .card(test_card::TEST_DISSOLVE)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestCounterspellUnlessPays)
+                                        .card(test_card::TEST_COUNTERSPELL_UNLESS_PAYS)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestCounterspell)
+                                        .card(test_card::TEST_COUNTERSPELL)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestVariableEnergyDraw)
+                                        .card(test_card::TEST_VARIABLE_ENERGY_DRAW)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
                                 .child(
                                     AddCardCell::builder()
-                                        .card(CardName::TestDrawOne)
+                                        .card(test_card::TEST_DRAW_ONE)
                                         .user_player(self.user_player)
                                         .build(),
                                 )
@@ -225,7 +226,7 @@ impl Component for AddCardToHandPanel<'_> {
 
 #[derive(Clone, Builder)]
 pub struct AddCardCell {
-    pub card: CardName,
+    pub card: BaseCardId,
     pub user_player: PlayerName,
 }
 

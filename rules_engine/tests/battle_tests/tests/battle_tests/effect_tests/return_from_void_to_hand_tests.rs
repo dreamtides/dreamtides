@@ -1,7 +1,7 @@
-use core_data::identifiers::CardName;
 use display_data::battle_view::DisplayPlayer;
 use display_data::command::ArrowStyle;
 use display_data::object_position::Position;
+use tabula_ids::test_card;
 use test_utils::battle::test_battle::TestBattle;
 use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_prelude::*;
@@ -9,9 +9,9 @@ use test_utils::session::test_session_prelude::*;
 #[test]
 fn return_void_card_to_hand_basic() {
     let mut s = TestBattle::builder().connect();
-    let void_card = s.add_to_void(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let void_card = s.add_to_void(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_RETURN_VOID_CARD_TO_HAND);
 
     let cards_in_browser = s.user_client.cards.browser_cards();
 
@@ -38,9 +38,9 @@ fn return_void_card_to_hand_basic() {
 #[test]
 fn return_void_card_to_hand_click_to_select() {
     let mut s = TestBattle::builder().connect();
-    let void_card = s.add_to_void(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let void_card = s.add_to_void(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_RETURN_VOID_CARD_TO_HAND);
 
     let void_card_view = s.user_client.cards.get(&void_card);
     assert!(
@@ -58,9 +58,9 @@ fn return_void_card_to_hand_click_to_select() {
 #[test]
 fn return_void_card_to_hand_click_twice_to_unselect() {
     let mut s = TestBattle::builder().connect();
-    let void_card = s.add_to_void(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let void_card = s.add_to_void(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_RETURN_VOID_CARD_TO_HAND);
 
     s.click_card(DisplayPlayer::User, &void_card);
     assert!(
@@ -78,10 +78,10 @@ fn return_void_card_to_hand_click_twice_to_unselect() {
 #[test]
 fn return_void_card_to_hand_select_different_card() {
     let mut s = TestBattle::builder().connect();
-    let void_card_1 = s.add_to_void(DisplayPlayer::User, CardName::TestVanillaCharacter);
-    let void_card_2 = s.add_to_void(DisplayPlayer::User, CardName::TestDissolve);
+    let void_card_1 = s.add_to_void(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    let void_card_2 = s.add_to_void(DisplayPlayer::User, test_card::TEST_DISSOLVE);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_RETURN_VOID_CARD_TO_HAND);
 
     s.click_card(DisplayPlayer::User, &void_card_1);
     s.click_card(DisplayPlayer::User, &void_card_2);
@@ -105,9 +105,9 @@ fn return_void_card_to_hand_select_different_card() {
 #[test]
 fn return_void_card_to_hand_no_submit_without_selection() {
     let mut s = TestBattle::builder().connect();
-    s.add_to_void(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    s.add_to_void(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_RETURN_VOID_CARD_TO_HAND);
 
     assert!(
         s.user_client.interface().primary_action_button.is_none(),
@@ -118,11 +118,11 @@ fn return_void_card_to_hand_no_submit_without_selection() {
 #[test]
 fn return_void_card_to_hand_with_multiple_void_cards() {
     let mut s = TestBattle::builder().connect();
-    let void_card_1 = s.add_to_void(DisplayPlayer::User, CardName::TestVanillaCharacter);
-    let void_card_2 = s.add_to_void(DisplayPlayer::User, CardName::TestDissolve);
-    let void_card_3 = s.add_to_void(DisplayPlayer::User, CardName::TestDrawOne);
+    let void_card_1 = s.add_to_void(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    let void_card_2 = s.add_to_void(DisplayPlayer::User, test_card::TEST_DISSOLVE);
+    let void_card_3 = s.add_to_void(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_RETURN_VOID_CARD_TO_HAND);
 
     let cards_in_browser = s.user_client.cards.browser_cards();
 
@@ -152,7 +152,7 @@ fn return_void_card_to_hand_with_multiple_void_cards() {
 fn return_void_card_to_hand_with_empty_void() {
     let mut s = TestBattle::builder().connect();
 
-    let hand_card = s.add_to_hand(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
+    let hand_card = s.add_to_hand(DisplayPlayer::User, test_card::TEST_RETURN_VOID_CARD_TO_HAND);
 
     assert!(
         s.user_client.cards.get(&hand_card).view.revealed.as_ref().unwrap().outline_color.is_none(),
@@ -176,9 +176,9 @@ fn return_void_card_to_hand_with_empty_void() {
 #[test]
 fn return_void_card_to_hand_browser_shows_correct_position() {
     let mut s = TestBattle::builder().connect();
-    let void_card = s.add_to_void(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let void_card = s.add_to_void(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_RETURN_VOID_CARD_TO_HAND);
 
     let card_in_browser = s.user_client.cards.get(&void_card);
     assert!(
@@ -190,9 +190,9 @@ fn return_void_card_to_hand_browser_shows_correct_position() {
 #[test]
 fn return_void_card_to_hand_browser_closes_after_submit() {
     let mut s = TestBattle::builder().connect();
-    let void_card = s.add_to_void(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let void_card = s.add_to_void(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_RETURN_VOID_CARD_TO_HAND);
 
     s.click_card(DisplayPlayer::User, &void_card);
     s.click_primary_button(DisplayPlayer::User, "Submit");
@@ -205,14 +205,14 @@ fn return_void_card_to_hand_browser_closes_after_submit() {
 #[test]
 fn void_card_shows_above_void_position_when_targeted() {
     let mut s = TestBattle::builder().enemy(TestPlayer::builder().energy(99).build()).connect();
-    let void_card = s.add_to_void(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let void_card = s.add_to_void(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     // Give the enemy a fast card so they can respond and keep the effect on the
     // stack
-    s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+    s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DRAW_ONE);
 
     // Play the return void card effect, which puts it on the stack
-    let return_card = s.add_to_hand(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
+    let return_card = s.add_to_hand(DisplayPlayer::User, test_card::TEST_RETURN_VOID_CARD_TO_HAND);
     s.play_card_from_hand(DisplayPlayer::User, &return_card);
 
     // During target selection, void cards appear in browser
@@ -258,14 +258,14 @@ fn void_card_shows_above_void_position_when_targeted() {
 #[test]
 fn void_card_targeting_creates_green_arrows() {
     let mut s = TestBattle::builder().enemy(TestPlayer::builder().energy(99).build()).connect();
-    let void_card = s.add_to_void(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let void_card = s.add_to_void(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
     // Give the enemy a fast card so they can respond and keep the effect on the
     // stack
-    s.add_to_hand(DisplayPlayer::Enemy, CardName::TestDrawOne);
+    s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DRAW_ONE);
 
     // Play the return void card effect, which puts it on the stack
-    let return_card = s.add_to_hand(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
+    let return_card = s.add_to_hand(DisplayPlayer::User, test_card::TEST_RETURN_VOID_CARD_TO_HAND);
     s.play_card_from_hand(DisplayPlayer::User, &return_card);
 
     // Select the void card as a target and submit
@@ -289,9 +289,9 @@ fn void_card_targeting_creates_green_arrows() {
 #[test]
 fn return_void_card_to_hand_revealed_to_opponent() {
     let mut s = TestBattle::builder().connect();
-    let void_card = s.add_to_void(DisplayPlayer::User, CardName::TestVanillaCharacter);
+    let void_card = s.add_to_void(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_RETURN_VOID_CARD_TO_HAND);
 
     s.click_card(DisplayPlayer::User, &void_card);
     s.click_primary_button(DisplayPlayer::User, "Submit");
@@ -310,10 +310,10 @@ fn return_void_card_to_hand_revealed_to_opponent() {
 #[test]
 fn return_void_card_browser_only_shows_user_cards() {
     let mut s = TestBattle::builder().connect();
-    let user_void_card = s.add_to_void(DisplayPlayer::User, CardName::TestVanillaCharacter);
-    let enemy_void_card = s.add_to_void(DisplayPlayer::Enemy, CardName::TestDissolve);
+    let user_void_card = s.add_to_void(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    let enemy_void_card = s.add_to_void(DisplayPlayer::Enemy, test_card::TEST_DISSOLVE);
 
-    s.create_and_play(DisplayPlayer::User, CardName::TestReturnVoidCardToHand);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_RETURN_VOID_CARD_TO_HAND);
 
     let cards_in_browser = s.user_client.cards.browser_cards();
 

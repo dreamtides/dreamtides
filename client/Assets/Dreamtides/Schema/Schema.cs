@@ -971,7 +971,7 @@ namespace Dreamtides.Schema
     public partial class AddCardToBattlefield
     {
         [JsonProperty("card", Required = Required.Always)]
-        public CardName Card { get; set; }
+        public Guid Card { get; set; }
 
         [JsonProperty("player", Required = Required.Always)]
         public PlayerName Player { get; set; }
@@ -980,7 +980,7 @@ namespace Dreamtides.Schema
     public partial class AddCardToHand
     {
         [JsonProperty("card", Required = Required.Always)]
-        public CardName Card { get; set; }
+        public Guid Card { get; set; }
 
         [JsonProperty("player", Required = Required.Always)]
         public PlayerName Player { get; set; }
@@ -989,7 +989,7 @@ namespace Dreamtides.Schema
     public partial class AddCardToVoid
     {
         [JsonProperty("card", Required = Required.Always)]
-        public CardName Card { get; set; }
+        public Guid Card { get; set; }
 
         [JsonProperty("player", Required = Required.Always)]
         public PlayerName Player { get; set; }
@@ -1010,7 +1010,7 @@ namespace Dreamtides.Schema
     public partial class OpponentPlayCard
     {
         [JsonProperty("card", Required = Required.Always)]
-        public CardName Card { get; set; }
+        public Guid Card { get; set; }
     }
 
     public partial class SetCardsRemainingInDeck
@@ -2354,8 +2354,6 @@ namespace Dreamtides.Schema
     /// </summary>
     public enum DebugBattleActionEnum { OpponentContinue };
 
-    public enum CardName { TestActivatedAbilityDissolveCharacter, TestActivatedAbilityDrawCard, TestCounterspell, TestCounterspellCharacter, TestCounterspellUnlessPays, TestDissolve, TestDrawOne, TestDrawOneReclaim, TestDualActivatedAbilityCharacter, TestFastActivatedAbilityDrawCardCharacter, TestFastMultiActivatedAbilityDrawCardCharacter, TestForeseeOne, TestForeseeOneDrawACard, TestForeseeOneDrawReclaim, TestForeseeOneReclaim, TestForeseeTwo, TestModalDrawOneOrDissolveEnemy, TestModalDrawOneOrDrawTwo, TestModalReturnToHandOrDrawTwo, TestMultiActivatedAbilityDrawCardCharacter, TestNamedDissolve, TestPreventDissolveThisTurn, TestReturnOneOrTwoVoidEventCardsToHand, TestReturnToHand, TestReturnVoidCardToHand, TestTriggerGainSparkOnPlayCardEnemyTurn, TestTriggerGainSparkWhenMaterializeAnotherCharacter, TestTriggerGainTwoSparkOnPlayCardEnemyTurn, TestVanillaCharacter, TestVariableEnergyDraw };
-
     /// <summary>
     /// Identifies a player in an ongoing battle.
     /// </summary>
@@ -2601,7 +2599,6 @@ namespace Dreamtides.Schema
                 ActionUnionConverter.Singleton,
                 BattleActionConverter.Singleton,
                 DebugBattleActionConverter.Singleton,
-                CardNameConverter.Singleton,
                 PlayerNameConverter.Singleton,
                 DebugBattleActionEnumConverter.Singleton,
                 PlayCardFromVoidConverter.Singleton,
@@ -3534,187 +3531,6 @@ namespace Dreamtides.Schema
         }
 
         public static readonly DebugBattleActionConverter Singleton = new DebugBattleActionConverter();
-    }
-
-    internal class CardNameConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(CardName) || t == typeof(CardName?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "TestActivatedAbilityDissolveCharacter":
-                    return CardName.TestActivatedAbilityDissolveCharacter;
-                case "TestActivatedAbilityDrawCard":
-                    return CardName.TestActivatedAbilityDrawCard;
-                case "TestCounterspell":
-                    return CardName.TestCounterspell;
-                case "TestCounterspellCharacter":
-                    return CardName.TestCounterspellCharacter;
-                case "TestCounterspellUnlessPays":
-                    return CardName.TestCounterspellUnlessPays;
-                case "TestDissolve":
-                    return CardName.TestDissolve;
-                case "TestDrawOne":
-                    return CardName.TestDrawOne;
-                case "TestDrawOneReclaim":
-                    return CardName.TestDrawOneReclaim;
-                case "TestDualActivatedAbilityCharacter":
-                    return CardName.TestDualActivatedAbilityCharacter;
-                case "TestFastActivatedAbilityDrawCardCharacter":
-                    return CardName.TestFastActivatedAbilityDrawCardCharacter;
-                case "TestFastMultiActivatedAbilityDrawCardCharacter":
-                    return CardName.TestFastMultiActivatedAbilityDrawCardCharacter;
-                case "TestForeseeOne":
-                    return CardName.TestForeseeOne;
-                case "TestForeseeOneDrawACard":
-                    return CardName.TestForeseeOneDrawACard;
-                case "TestForeseeOneDrawReclaim":
-                    return CardName.TestForeseeOneDrawReclaim;
-                case "TestForeseeOneReclaim":
-                    return CardName.TestForeseeOneReclaim;
-                case "TestForeseeTwo":
-                    return CardName.TestForeseeTwo;
-                case "TestModalDrawOneOrDissolveEnemy":
-                    return CardName.TestModalDrawOneOrDissolveEnemy;
-                case "TestModalDrawOneOrDrawTwo":
-                    return CardName.TestModalDrawOneOrDrawTwo;
-                case "TestModalReturnToHandOrDrawTwo":
-                    return CardName.TestModalReturnToHandOrDrawTwo;
-                case "TestMultiActivatedAbilityDrawCardCharacter":
-                    return CardName.TestMultiActivatedAbilityDrawCardCharacter;
-                case "TestNamedDissolve":
-                    return CardName.TestNamedDissolve;
-                case "TestPreventDissolveThisTurn":
-                    return CardName.TestPreventDissolveThisTurn;
-                case "TestReturnOneOrTwoVoidEventCardsToHand":
-                    return CardName.TestReturnOneOrTwoVoidEventCardsToHand;
-                case "TestReturnToHand":
-                    return CardName.TestReturnToHand;
-                case "TestReturnVoidCardToHand":
-                    return CardName.TestReturnVoidCardToHand;
-                case "TestTriggerGainSparkOnPlayCardEnemyTurn":
-                    return CardName.TestTriggerGainSparkOnPlayCardEnemyTurn;
-                case "TestTriggerGainSparkWhenMaterializeAnotherCharacter":
-                    return CardName.TestTriggerGainSparkWhenMaterializeAnotherCharacter;
-                case "TestTriggerGainTwoSparkOnPlayCardEnemyTurn":
-                    return CardName.TestTriggerGainTwoSparkOnPlayCardEnemyTurn;
-                case "TestVanillaCharacter":
-                    return CardName.TestVanillaCharacter;
-                case "TestVariableEnergyDraw":
-                    return CardName.TestVariableEnergyDraw;
-            }
-            throw new Exception("Cannot unmarshal type CardName");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (CardName)untypedValue;
-            switch (value)
-            {
-                case CardName.TestActivatedAbilityDissolveCharacter:
-                    serializer.Serialize(writer, "TestActivatedAbilityDissolveCharacter");
-                    return;
-                case CardName.TestActivatedAbilityDrawCard:
-                    serializer.Serialize(writer, "TestActivatedAbilityDrawCard");
-                    return;
-                case CardName.TestCounterspell:
-                    serializer.Serialize(writer, "TestCounterspell");
-                    return;
-                case CardName.TestCounterspellCharacter:
-                    serializer.Serialize(writer, "TestCounterspellCharacter");
-                    return;
-                case CardName.TestCounterspellUnlessPays:
-                    serializer.Serialize(writer, "TestCounterspellUnlessPays");
-                    return;
-                case CardName.TestDissolve:
-                    serializer.Serialize(writer, "TestDissolve");
-                    return;
-                case CardName.TestDrawOne:
-                    serializer.Serialize(writer, "TestDrawOne");
-                    return;
-                case CardName.TestDrawOneReclaim:
-                    serializer.Serialize(writer, "TestDrawOneReclaim");
-                    return;
-                case CardName.TestDualActivatedAbilityCharacter:
-                    serializer.Serialize(writer, "TestDualActivatedAbilityCharacter");
-                    return;
-                case CardName.TestFastActivatedAbilityDrawCardCharacter:
-                    serializer.Serialize(writer, "TestFastActivatedAbilityDrawCardCharacter");
-                    return;
-                case CardName.TestFastMultiActivatedAbilityDrawCardCharacter:
-                    serializer.Serialize(writer, "TestFastMultiActivatedAbilityDrawCardCharacter");
-                    return;
-                case CardName.TestForeseeOne:
-                    serializer.Serialize(writer, "TestForeseeOne");
-                    return;
-                case CardName.TestForeseeOneDrawACard:
-                    serializer.Serialize(writer, "TestForeseeOneDrawACard");
-                    return;
-                case CardName.TestForeseeOneDrawReclaim:
-                    serializer.Serialize(writer, "TestForeseeOneDrawReclaim");
-                    return;
-                case CardName.TestForeseeOneReclaim:
-                    serializer.Serialize(writer, "TestForeseeOneReclaim");
-                    return;
-                case CardName.TestForeseeTwo:
-                    serializer.Serialize(writer, "TestForeseeTwo");
-                    return;
-                case CardName.TestModalDrawOneOrDissolveEnemy:
-                    serializer.Serialize(writer, "TestModalDrawOneOrDissolveEnemy");
-                    return;
-                case CardName.TestModalDrawOneOrDrawTwo:
-                    serializer.Serialize(writer, "TestModalDrawOneOrDrawTwo");
-                    return;
-                case CardName.TestModalReturnToHandOrDrawTwo:
-                    serializer.Serialize(writer, "TestModalReturnToHandOrDrawTwo");
-                    return;
-                case CardName.TestMultiActivatedAbilityDrawCardCharacter:
-                    serializer.Serialize(writer, "TestMultiActivatedAbilityDrawCardCharacter");
-                    return;
-                case CardName.TestNamedDissolve:
-                    serializer.Serialize(writer, "TestNamedDissolve");
-                    return;
-                case CardName.TestPreventDissolveThisTurn:
-                    serializer.Serialize(writer, "TestPreventDissolveThisTurn");
-                    return;
-                case CardName.TestReturnOneOrTwoVoidEventCardsToHand:
-                    serializer.Serialize(writer, "TestReturnOneOrTwoVoidEventCardsToHand");
-                    return;
-                case CardName.TestReturnToHand:
-                    serializer.Serialize(writer, "TestReturnToHand");
-                    return;
-                case CardName.TestReturnVoidCardToHand:
-                    serializer.Serialize(writer, "TestReturnVoidCardToHand");
-                    return;
-                case CardName.TestTriggerGainSparkOnPlayCardEnemyTurn:
-                    serializer.Serialize(writer, "TestTriggerGainSparkOnPlayCardEnemyTurn");
-                    return;
-                case CardName.TestTriggerGainSparkWhenMaterializeAnotherCharacter:
-                    serializer.Serialize(writer, "TestTriggerGainSparkWhenMaterializeAnotherCharacter");
-                    return;
-                case CardName.TestTriggerGainTwoSparkOnPlayCardEnemyTurn:
-                    serializer.Serialize(writer, "TestTriggerGainTwoSparkOnPlayCardEnemyTurn");
-                    return;
-                case CardName.TestVanillaCharacter:
-                    serializer.Serialize(writer, "TestVanillaCharacter");
-                    return;
-                case CardName.TestVariableEnergyDraw:
-                    serializer.Serialize(writer, "TestVariableEnergyDraw");
-                    return;
-            }
-            throw new Exception("Cannot marshal type CardName");
-        }
-
-        public static readonly CardNameConverter Singleton = new CardNameConverter();
     }
 
     internal class PlayerNameConverter : JsonConverter
