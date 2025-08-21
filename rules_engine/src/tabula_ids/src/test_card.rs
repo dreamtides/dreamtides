@@ -20,15 +20,15 @@ pub const TEST_VARIABLE_ENERGY_DRAW: BaseCardId =
 
 /// Whenever you play a card during the enemy's turn, this character gains
 /// {-gained-spark(n:1)}.
-pub const TEST_TRIGGER_GAIN_ON_FAST: BaseCardId =
+pub const TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN: BaseCardId =
     BaseCardId(uuid!("86ee5ad7-b60b-4596-af8c-7a495022ac61"));
 
 /// {fma} {-energy-cost(e:3)}: Draw {-cards(n:1)}.
-pub const TEST_FAST_MUTIACTIVATED_DRAW: BaseCardId =
+pub const TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: BaseCardId =
     BaseCardId(uuid!("d8a8541f-5b00-4d91-9518-aa8ae70ea450"));
 
 /// Return one or two events from your void to your hand.
-pub const TEST_RETURN_ONE_OR_TWO_VOID_EVENTS: BaseCardId =
+pub const TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND: BaseCardId =
     BaseCardId(uuid!("559e62a0-7ead-4136-8bd4-6cc58db4bef7"));
 
 /// {choose-one} {mode}{-energy-cost(e:2)}: Return an enemy character to
@@ -42,7 +42,7 @@ pub const TEST_PREVENT_DISSOLVE_THIS_TURN: BaseCardId =
 
 /// {ability}{-Foresee(n:1)}. Draw {-cards(n:1)}.{end-ability}
 /// {ability}{-Reclaim-Cost(e:3)}{end-ability}
-pub const TEST_FORESEE_DRAW_RECLAIM: BaseCardId =
+pub const TEST_FORESEE_ONE_DRAW_RECLAIM: BaseCardId =
     BaseCardId(uuid!("de21db6c-54b4-4bff-b1d6-5a4711ef5ed8"));
 
 /// {Prevent} a played enemy character.

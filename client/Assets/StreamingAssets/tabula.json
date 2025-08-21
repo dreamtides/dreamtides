@@ -629,7 +629,7 @@
     },
     {
       "id": "86ee5ad7-b60b-4596-af8c-7a495022ac61",
-      "name_en_us": "Test Trigger Gain on Fast",
+      "name_en_us": "Test Trigger Gain Spark On Play Card Enemy Turn",
       "energy_cost": "2",
       "rules_text_en_us": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}.",
       "abilities": [
@@ -662,7 +662,7 @@
     },
     {
       "id": "d8a8541f-5b00-4d91-9518-aa8ae70ea450",
-      "name_en_us": "Test Fast Mutiactivated Draw",
+      "name_en_us": "Test Fast Multi Activated Ability Draw Card Character",
       "energy_cost": "2",
       "rules_text_en_us": "{fma} {-energy-cost(e:3)}: Draw {-cards(n:1)}.",
       "abilities": [
@@ -695,7 +695,7 @@
     },
     {
       "id": "559e62a0-7ead-4136-8bd4-6cc58db4bef7",
-      "name_en_us": "Test Return One Or Two Void Events",
+      "name_en_us": "Test Return One Or Two Void Event Cards To Hand",
       "energy_cost": "4",
       "rules_text_en_us": "Return one or two events from your void to your hand.",
       "abilities": [
@@ -788,7 +788,7 @@
     },
     {
       "id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
-      "name_en_us": "Test Foresee Draw Reclaim ",
+      "name_en_us": "Test Foresee One Draw Reclaim",
       "energy_cost": "1",
       "rules_text_en_us": "{ability}{-Foresee(n:1)}. Draw {-cards(n:1)}.{end-ability}\n{ability}{-Reclaim-Cost(e:3)}{end-ability}",
       "abilities": [
