@@ -1,13 +1,14 @@
 use std::collections::BTreeMap;
 
-use core_data::identifiers::BaseCardId;
+use core_data::identifiers::{BaseCardId, CardIdentity};
 use core_data::initialization_error::InitializationError;
 use serde::{Deserialize, Serialize};
 
-use crate::base_card_definition::{self, BaseCardDefinition, BaseCardDefinitionRaw};
-use crate::localized_strings;
+use crate::base_card_definition_raw::BaseCardDefinitionRaw;
+use crate::card_definition::CardDefinition;
 use crate::localized_strings::{LanguageId, LocalizedStringSetRaw, LocalizedStrings, StringId};
 use crate::tabula_table::Table;
+use crate::{base_card_definition_raw, localized_strings};
 
 /// Tabula is a read-only database of game data and rules information.
 ///
@@ -23,7 +24,7 @@ use crate::tabula_table::Table;
 #[derive(Debug, Clone)]
 pub struct Tabula {
     pub strings: LocalizedStrings,
-    pub test_cards: BTreeMap<BaseCardId, BaseCardDefinition>,
+    pub test_cards: BTreeMap<CardIdentity, CardDefinition>,
 }
 
 /// Context for building a [Tabula] struct from a [TabulaRaw] struct.
@@ -46,6 +47,6 @@ pub fn build(
     raw: &TabulaRaw,
 ) -> Result<Tabula, Vec<InitializationError>> {
     let strings = localized_strings::build(context, &raw.strings)?;
-    let test_cards = base_card_definition::build("test_cards", context, &raw.test_cards)?;
+    let test_cards = base_card_definition_raw::build("test_cards", context, &raw.test_cards)?;
     Ok(Tabula { strings, test_cards })
 }

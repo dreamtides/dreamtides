@@ -2196,6 +2196,7 @@ dependencies = [
  "core_data",
  "schemars 1.0.2",
  "serde",
+ "tabula_data",
  "tabula_ids",
  "user_state",
 ]

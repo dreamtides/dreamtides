@@ -1,4 +1,4 @@
-pub mod card_properties;
+pub mod card_property_data;
 pub mod card_types;
 pub mod display_color;
 pub mod display_types;

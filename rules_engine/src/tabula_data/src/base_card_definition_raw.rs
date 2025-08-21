@@ -1,69 +1,18 @@
 use std::collections::BTreeMap;
 
 use ability_data::ability::Ability;
-use core_data::card_properties::Rarity;
+use core_data::card_property_data::Rarity;
 use core_data::card_types::{CardSubtype, CardType};
 use core_data::display_types::SpriteAddress;
-use core_data::identifiers::BaseCardId;
+use core_data::identifiers::{BaseCardId, CardIdentity};
 use core_data::initialization_error::{ErrorCode, InitializationError};
 use core_data::numerics::{Energy, Spark};
 use serde::{Deserialize, Serialize};
 
+use crate::card_definition::CardDefinition;
 use crate::localized_strings::LanguageId;
 use crate::tabula::TabulaBuildContext;
 use crate::tabula_table::Table;
-
-/// Base card definition from the Tabula database.
-///
-/// This is the definition of a card that is used to create a card instance,
-/// associated with a [BaseCardId]. Base cards can have various modifications
-/// and upgrades applied to them, which are represented by the `CardIdentity`
-/// and `CardDescriptor` types.
-#[derive(Debug, Clone)]
-pub struct BaseCardDefinition {
-    /// Identifies this card definition.
-    pub id: BaseCardId,
-
-    /// Name of this card in the currently-active language.
-    pub displayed_name: String,
-
-    /// Base energy cost of this card, if any.
-    ///
-    /// A card with a variable cost (e.g. modal cards) will have no energy cost
-    /// specified here.
-    pub energy_cost: Option<Energy>,
-
-    /// Abilities of this card.
-    pub abilities: Vec<Ability>,
-
-    /// Rules text of this card in the currently-active language, formatted for
-    /// display.
-    pub displayed_rules_text: String,
-
-    /// Type of this card.
-    pub card_type: CardType,
-
-    /// Subtype of this card, if any.
-    pub card_subtype: Option<CardSubtype>,
-
-    /// Whether this card is fast.
-    ///
-    /// Fast cards can be played "in response" to the opponent playing a card,
-    /// or at the end of the opponent's turn.
-    pub is_fast: bool,
-
-    /// Base spark value of this card, if any.
-    ///
-    /// A character card with a spark defined by a static ability value will
-    /// have no spark value specified here.
-    pub spark: Option<Spark>,
-
-    /// Rarity of this card, if any.
-    pub rarity: Option<Rarity>,
-
-    /// Image to display for this card.
-    pub image: SpriteAddress,
-}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BaseCardDefinitionRaw {
@@ -111,9 +60,9 @@ pub fn build(
     sheet_name: &str,
     context: &TabulaBuildContext,
     table: &Table<BaseCardId, BaseCardDefinitionRaw>,
-) -> Result<BTreeMap<BaseCardId, BaseCardDefinition>, Vec<InitializationError>> {
+) -> Result<BTreeMap<CardIdentity, CardDefinition>, Vec<InitializationError>> {
     let mut errors: Vec<InitializationError> = Vec::new();
-    let mut out: BTreeMap<BaseCardId, BaseCardDefinition> = BTreeMap::new();
+    let mut out: BTreeMap<CardIdentity, CardDefinition> = BTreeMap::new();
     for (row_index, row) in table.as_slice().iter().enumerate() {
         let energy_cost: Option<Energy> = match &row.energy_cost {
             Some(s) => match s.parse::<u32>() {
@@ -200,8 +149,10 @@ pub fn build(
             continue;
         };
 
-        out.insert(row.id, BaseCardDefinition {
-            id: row.id,
+        let identity = CardIdentity(row_index);
+        out.insert(identity, CardDefinition {
+            identity,
+            base_card_id: row.id,
             displayed_name,
             energy_cost,
             abilities: abilities.clone(),
