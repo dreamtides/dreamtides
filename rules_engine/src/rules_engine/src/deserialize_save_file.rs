@@ -14,6 +14,7 @@ use core_data::types::PlayerName;
 use database::save_file::SaveFile;
 use game_creation::new_battle;
 use serde_json;
+use state_provider::state_provider::StateProvider;
 use tracing::{error, instrument, subscriber};
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::layer::SubscriberExt;
@@ -31,9 +32,20 @@ struct DeserializationAction {
 
 /// Returns a deserialized [BattleState] for the battle in this save
 /// file, if one is present.
-#[instrument(name = "deserialize_save_file", level = "debug", skip(file, request_context))]
-pub fn battle(file: &SaveFile, request_context: RequestContext) -> Option<(BattleState, QuestId)> {
-    get_battle_impl(file, None, request_context)
+#[instrument(
+    name = "deserialize_save_file",
+    level = "debug",
+    skip(provider, file, request_context)
+)]
+pub fn battle<P>(
+    provider: &P,
+    file: &SaveFile,
+    request_context: RequestContext,
+) -> Option<(BattleState, QuestId)>
+where
+    P: StateProvider + 'static,
+{
+    get_battle_impl(provider, file, None, request_context)
 }
 
 /// Returns a deserialized [BattleState] for an 'undo' operation on the battle
@@ -41,19 +53,27 @@ pub fn battle(file: &SaveFile, request_context: RequestContext) -> Option<(Battl
 ///
 /// We advance the battle state to one which is immediately before the named
 /// player's last battle action.
-pub fn undo(
+pub fn undo<P>(
+    provider: &P,
     file: &SaveFile,
     player: PlayerName,
     request_context: RequestContext,
-) -> Option<(BattleState, QuestId)> {
-    get_battle_impl(file, Some(player), request_context)
+) -> Option<(BattleState, QuestId)>
+where
+    P: StateProvider + 'static,
+{
+    get_battle_impl(provider, file, Some(player), request_context)
 }
 
-fn get_battle_impl(
+fn get_battle_impl<P>(
+    provider: &P,
     file: &SaveFile,
     undo: Option<PlayerName>,
     request_context: RequestContext,
-) -> Option<(BattleState, QuestId)> {
+) -> Option<(BattleState, QuestId)>
+where
+    P: StateProvider + 'static,
+{
     match file {
         SaveFile::V1(v1) => {
             let filter = EnvFilter::new("warn");
@@ -65,6 +85,7 @@ fn get_battle_impl(
                 let file = v1.quest.as_ref()?.battle.as_ref()?;
                 let mut battle = new_battle::create_and_start(
                     file.id,
+                    provider.tabula(),
                     file.seed,
                     file.player_types.one.clone(),
                     file.player_types.two.clone(),

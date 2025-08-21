@@ -17,7 +17,9 @@ battle_queries = { path = "../../src/battle_queries" }
 battle_state = { path = "../../src/battle_state" }
 core_data = { path = "../../src/core_data" }
 game_creation = { path = "../../src/game_creation" }
+logging = { path = "../../src/logging" }
 quest_state = { path = "../../src/quest_state" }
+state_provider = { path = "../../src/state_provider" }
 tabula_ids = { path = "../../src/tabula_ids" }
 
 rand = { workspace = true }

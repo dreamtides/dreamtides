@@ -1,5 +1,6 @@
 use std::collections::VecDeque;
 use std::path::PathBuf;
+use std::sync::Arc;
 
 use ability_data::effect::{Effect, ModelEffectChoiceIndex};
 use core_data::identifiers::BattleId;
@@ -7,6 +8,7 @@ use core_data::types::PlayerName;
 use rand_xoshiro::Xoshiro256PlusPlus;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use tabula_data::tabula::Tabula;
 
 use crate::actions::battle_actions::BattleAction;
 use crate::battle::all_cards::AllCards;
@@ -38,6 +40,10 @@ pub struct BattleState {
 
     /// Configuration for the rules of this battle
     pub rules_config: BattleRulesConfig,
+
+    /// Game rules database for this battle, containing definitions of cards
+    /// etc.
+    pub tabula: Arc<Tabula>,
 
     /// Player data for all players in this battle
     pub players: PlayerMap<BattlePlayerState>,
@@ -156,6 +162,7 @@ impl BattleState {
             id: self.id,
             cards: self.cards.clone(),
             rules_config: self.rules_config.clone(),
+            tabula: self.tabula.clone(),
             players: self.players.clone(),
             status: self.status.clone(),
             stack_priority: self.stack_priority,
@@ -192,6 +199,7 @@ impl BattleState {
                 id: self.id,
                 cards: self.cards.clone(),
                 rules_config: self.rules_config.clone(),
+                tabula: self.tabula.clone(),
                 players: self.players.clone(),
                 status: self.status.clone(),
                 stack_priority: self.stack_priority,

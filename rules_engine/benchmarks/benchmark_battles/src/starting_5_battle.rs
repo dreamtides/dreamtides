@@ -28,6 +28,9 @@ use game_creation::new_test_battle;
 use quest_state::quest::card_descriptor;
 use rand::SeedableRng;
 use rand_xoshiro::Xoshiro256PlusPlus;
+use state_provider::display_state_provider::DisplayStateProvider;
+use state_provider::state_provider::StateProvider;
+use state_provider::test_state_provider::TestStateProvider;
 use tabula_ids::test_card;
 use uuid::Uuid;
 
@@ -259,10 +262,15 @@ pub fn benchmark_battle() -> BattleState {
     ];
 
     let seed = 12345678912345;
+    let provider = TestStateProvider::new();
+    let streaming_assets_path = logging::get_developer_mode_streaming_assets_path();
+    let _ = provider.initialize("/tmp/test", &streaming_assets_path);
+
     let mut battle = BattleState {
         id: BattleId(Uuid::new_v4()),
         cards: AllCards::default(),
         rules_config: BattleRulesConfig { points_to_win: Points(25) },
+        tabula: provider.tabula(),
         players: PlayerMap {
             one: BattlePlayerState {
                 player_type: PlayerType::Agent(GameAI::AlwaysPanic),

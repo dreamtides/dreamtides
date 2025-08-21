@@ -25,6 +25,7 @@ use quest_state::quest::deck::Deck;
 use quest_state::quest::quest_state::QuestState;
 use rand::SeedableRng;
 use rand_xoshiro::Xoshiro256PlusPlus;
+use tabula_data::tabula::Tabula;
 use tabula_ids::test_card;
 use user_state::user::user_state::UserState;
 use uuid::Uuid;
@@ -32,6 +33,7 @@ use uuid::Uuid;
 /// Creates a new test battle between two Agents and starts it.
 pub fn create_and_start(
     id: BattleId,
+    tabula: Arc<Tabula>,
     seed: u64,
     player_one: CreateBattlePlayer,
     player_two: CreateBattlePlayer,
@@ -41,6 +43,7 @@ pub fn create_and_start(
         id,
         cards: AllCards::default(),
         rules_config: BattleRulesConfig { points_to_win: Points(12) },
+        tabula,
         players: PlayerMap {
             one: BattlePlayerState {
                 player_type: player_one.player_type,

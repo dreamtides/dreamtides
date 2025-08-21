@@ -12,19 +12,22 @@ use tracing_subscriber::EnvFilter;
 use tracing_subscriber::layer::SubscriberExt;
 use uuid::Uuid;
 
-pub fn execute(
-    provider: impl StateProvider + 'static,
+pub fn execute<P>(
+    provider: &P,
     battle: &mut BattleState,
     user_id: UserId,
     user_player: PlayerName,
     action: DebugAction,
-) {
+) where
+    P: StateProvider + 'static,
+{
     match action {
         DebugAction::ApplyTestScenarioAction => {}
         DebugAction::RestartBattle => {
             let seed = rand::rng().next_u64();
             *battle = new_battle::create_and_start(
                 battle.id,
+                provider.tabula(),
                 seed,
                 battle.players.one.as_create_battle_player(),
                 battle.players.two.as_create_battle_player(),
@@ -35,6 +38,7 @@ pub fn execute(
             let seed = rand::rng().next_u64();
             *battle = new_battle::create_and_start(
                 battle.id,
+                provider.tabula(),
                 seed,
                 CreateBattlePlayer {
                     player_type: battle.players.one.player_type.clone(),

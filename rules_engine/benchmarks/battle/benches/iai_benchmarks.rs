@@ -7,7 +7,9 @@ use battle_mutations::player_mutations::player_state;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use core_data::types::PlayerName;
-use iai_callgrind::{library_benchmark, library_benchmark_group, main};
+#[cfg(target_os = "linux")]
+use iai_callgrind::main;
+use iai_callgrind::{library_benchmark, library_benchmark_group};
 
 #[library_benchmark]
 #[bench::eval(benchmark_battles::core_11_battle::generate_core_11_battle())]
@@ -42,4 +44,8 @@ library_benchmark_group!(
     benchmarks = bench_core11_evaluate, bench_core11_search_action_candidate
 );
 
+#[cfg(target_os = "linux")]
 main!(library_benchmark_groups = bench_group);
+
+#[cfg(not(target_os = "linux"))]
+fn main() {}

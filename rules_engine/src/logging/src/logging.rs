@@ -78,6 +78,17 @@ pub fn get_developer_mode_project_directory() -> Result<PathBuf, String> {
     Ok(project_root.to_path_buf())
 }
 
+/// Returns the path to the developer mode streaming assets directory.
+pub fn get_developer_mode_streaming_assets_path() -> String {
+    get_developer_mode_project_directory()
+        .expect("Failed to get project directory")
+        .join("client/Assets/StreamingAssets")
+        .canonicalize()
+        .expect("Failed to canonicalize path")
+        .to_string_lossy()
+        .to_string()
+}
+
 fn tag_parser(event: &Event) -> Option<Tag> {
     let target = event.metadata().target();
     let level = *event.metadata().level();

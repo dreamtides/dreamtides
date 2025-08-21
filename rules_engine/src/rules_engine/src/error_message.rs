@@ -9,7 +9,7 @@ use display::rendering::battle_rendering;
 use display_data::command::{Command, CommandSequence, UpdateBattleCommand};
 use game_creation::new_battle;
 use masonry::flex_enums::{TextAlign, WhiteSpace};
-use state_provider::state_provider::DefaultStateProvider;
+use state_provider::state_provider::{DefaultStateProvider, StateProvider};
 use tabula_ids::string_id;
 use ui_components::component::Component;
 use ui_components::panel_component::PanelComponent;
@@ -19,10 +19,14 @@ use uuid::Uuid;
 
 /// Attempts to display an error message to the player describing a rules engine
 /// error.
-pub fn display_error_message(
+pub fn display_error_message<P>(
     battle: Option<&BattleState>,
+    provider: &P,
     message: impl Into<String>,
-) -> CommandSequence {
+) -> CommandSequence
+where
+    P: StateProvider + 'static,
+{
     let message = message.into();
     match battle {
         Some(existing_battle) => display_error_message_with_battle(existing_battle, message),
@@ -30,6 +34,7 @@ pub fn display_error_message(
             let id = BattleId(Uuid::new_v4());
             let dummy_battle = new_battle::create_and_start(
                 id,
+                provider.tabula(),
                 0,
                 CreateBattlePlayer {
                     player_type: PlayerType::User(UserId::default()),

@@ -6,11 +6,11 @@ edition = "2024"
 [lints]
 workspace = true
 
-# [[bench]]
-# name = "battle_benchmarks"
-# harness = false
-# test = false
-# doctest = false
+[[bench]]
+name = "battle_benchmarks"
+harness = false
+test = false
+doctest = false
 
 [[bench]]
 name = "iai_benchmarks"

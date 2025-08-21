@@ -14,6 +14,9 @@ use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
 use game_creation::new_test_battle;
 use serde_json::from_str;
+use state_provider::display_state_provider::DisplayStateProvider;
+use state_provider::state_provider::StateProvider;
+use state_provider::test_state_provider::TestStateProvider;
 use tracing::{debug, subscriber};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::{EnvFilter, Layer};
@@ -141,8 +144,12 @@ fn run_match(
     }
 
     let battle_id = BattleId(Uuid::new_v4());
+    let provider = TestStateProvider::new();
+    let streaming_assets_path = logging::get_developer_mode_streaming_assets_path();
+    let _ = provider.initialize("/tmp/test", &streaming_assets_path);
     let mut battle = new_test_battle::create_and_start(
         battle_id,
+        provider.tabula(),
         seed,
         CreateBattlePlayer { player_type: battle_ai_one, deck_name: TestDeckName::StartingFive },
         CreateBattlePlayer { player_type: battle_ai_two, deck_name: TestDeckName::StartingFive },

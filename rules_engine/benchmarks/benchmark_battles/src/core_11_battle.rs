@@ -12,6 +12,9 @@ use battle_state::battle_player::battle_player_state::{
 use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
 use game_creation::new_test_battle;
+use state_provider::display_state_provider::DisplayStateProvider;
+use state_provider::state_provider::StateProvider;
+use state_provider::test_state_provider::TestStateProvider;
 use uuid::Uuid;
 
 fn print_battlefield_state(battle: &BattleState) {
@@ -44,8 +47,12 @@ pub fn generate_core_11_battle() -> BattleState {
 
 fn generate_core_11_battle_with_logging(enable_logging: bool) -> BattleState {
     let seed = 12345678912345;
+    let provider = TestStateProvider::new();
+    let streaming_assets_path = logging::get_developer_mode_streaming_assets_path();
+    let _ = provider.initialize("/tmp/test", &streaming_assets_path);
     let mut battle = new_test_battle::create_and_start(
         BattleId(Uuid::new_v4()),
+        provider.tabula(),
         seed,
         CreateBattlePlayer {
             player_type: PlayerType::Agent(GameAI::AlwaysPanic),

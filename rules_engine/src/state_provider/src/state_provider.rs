@@ -214,7 +214,7 @@ impl DisplayStateProvider for DefaultStateProvider {
     }
 
     fn tabula(&self) -> Arc<Tabula> {
-        let guard = TABULA_DATA.read().unwrap();
-        guard.clone().unwrap_or_else(|| panic!("Tabula not initialized"))
+        let guard = TABULA_DATA.read().expect("Failed to lock tabula data");
+        guard.clone().expect("Tabula not initialized")
     }
 }

@@ -20,6 +20,8 @@ battle_mutations = { path = "../battle_mutations" }
 battle_queries = { path = "../battle_queries" }
 core_data = { path = "../core_data" }
 game_creation = { path = "../game_creation" }
+logging = { path = "../logging" }
+state_provider = { path = "../state_provider" }
 
 clap = { workspace = true }
 rand = { workspace = true }

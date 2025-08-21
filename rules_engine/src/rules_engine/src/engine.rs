@@ -85,7 +85,7 @@ pub fn connect_with_provider(
     });
     let commands = match result {
         Ok(commands) => commands,
-        Err(error) => error_message::display_error_message(None, error),
+        Err(error) => error_message::display_error_message(None, &provider, error),
     };
 
     let response_version = Uuid::new_v4();
@@ -226,6 +226,7 @@ fn connect_internal(
         Err(errors) => {
             return error_message::display_error_message(
                 None,
+                &provider,
                 format_initialization_errors(&errors),
             );
         }
@@ -246,6 +247,7 @@ fn connect_internal(
 
     match load_battle_from_database(
         &database,
+        provider.clone(),
         user_id,
         request_context,
         request.debug_configuration.as_ref(),
@@ -267,7 +269,7 @@ fn connect_internal(
         Ok(LoadBattleResult::NewBattle(battle)) => {
             renderer::connect(&battle, user_id, provider.clone(), false)
         }
-        Err(error) => error_message::display_error_message(None, error),
+        Err(error) => error_message::display_error_message(None, &provider, error),
     }
 }
 
@@ -287,7 +289,7 @@ fn connect_for_multiplayer(
     // Load opponent's save file
     match database.fetch_save(vs_opponent) {
         Ok(Some(save_file)) => {
-            match deserialize_save_file::battle(&save_file, request_context) {
+            match deserialize_save_file::battle(&provider, &save_file, request_context) {
                 Some((battle, quest_id)) => {
                     // Check if the connecting user is already in the battle
                     if is_user_in_battle(&battle, user_id) {
@@ -306,17 +308,21 @@ fn connect_for_multiplayer(
                 }
                 None => error_message::display_error_message(
                     None,
+                    &provider,
                     "No battle found in opponent's save file".to_string(),
                 ),
             }
         }
         Ok(None) => error_message::display_error_message(
             None,
+            &provider,
             format!("No save file found for opponent ID: {vs_opponent:?}"),
         ),
-        Err(errors) => {
-            error_message::display_error_message(None, format_initialization_errors(&errors))
-        }
+        Err(errors) => error_message::display_error_message(
+            None,
+            &provider,
+            format_initialization_errors(&errors),
+        ),
     }
 }
 
@@ -327,15 +333,18 @@ enum LoadBattleResult {
 
 fn load_battle_from_database(
     database: &impl Database,
+    provider: impl StateProvider + 'static,
     user_id: UserId,
     request_context: RequestContext,
     debug_configuration: Option<&DebugConfiguration>,
 ) -> Result<LoadBattleResult, String> {
     match database.fetch_save(user_id) {
-        Ok(Some(save_file)) => match deserialize_save_file::battle(&save_file, request_context) {
-            Some((battle, quest_id)) => Ok(LoadBattleResult::ExistingBattle(battle, quest_id)),
-            None => Err("No battle in save file".to_string()),
-        },
+        Ok(Some(save_file)) => {
+            match deserialize_save_file::battle(&provider, &save_file, request_context) {
+                Some((battle, quest_id)) => Ok(LoadBattleResult::ExistingBattle(battle, quest_id)),
+                None => Err("No battle in save file".to_string()),
+            }
+        }
         Ok(None) => {
             // No save file exists, create a new battle
             info!(?user_id, "No save file found, creating new battle");
@@ -349,6 +358,7 @@ fn load_battle_from_database(
             let deck_name = configuration.deck_override.unwrap_or(TestDeckName::CoreEleven);
             let new_battle = new_battle::create_and_start(
                 battle_id,
+                provider.tabula(),
                 seed,
                 CreateBattlePlayer { player_type: PlayerType::User(user_id), deck_name },
                 CreateBattlePlayer { player_type: enemy, deck_name },
@@ -405,7 +415,7 @@ fn handle_user_not_in_battle(
     let save_user_id = vs_opponent.unwrap_or(user_id);
     match save_battle_to_database(database, save_user_id, quest_id, &battle) {
         Ok(_) => renderer::connect(&battle, user_id, provider, false),
-        Err(error) => error_message::display_error_message(None, error),
+        Err(error) => error_message::display_error_message(None, &provider, error),
     }
 }
 
@@ -494,7 +504,8 @@ fn perform_action_internal(
         let request_context = provider
             .get_request_context(user_id)
             .unwrap_or(RequestContext { logging_options: Default::default() });
-        let Some((mut battle, quest_id)) = deserialize_save_file::battle(&save, request_context)
+        let Some((mut battle, quest_id)) =
+            deserialize_save_file::battle(&provider, &save, request_context)
         else {
             show_error_message(
                 provider.clone(),
@@ -580,7 +591,7 @@ fn handle_request_action(
         GameAction::NoOp => {}
         GameAction::DebugAction(action) => {
             let player = renderer::player_name_for_user(&*battle, user_id);
-            debug_actions::execute(provider.clone(), battle, user_id, player, action.clone());
+            debug_actions::execute(&provider, battle, user_id, player, action.clone());
 
             send_updates_to_user_and_opponent(
                 provider.clone(),
@@ -624,7 +635,7 @@ fn handle_request_action(
         }
         GameAction::Undo(player) => {
             let Some((undone_battle, _)) =
-                deserialize_save_file::undo(&save, *player, request_context.clone())
+                deserialize_save_file::undo(&provider, &save, *player, request_context.clone())
             else {
                 show_error_message(
                     provider.clone(),
@@ -675,7 +686,7 @@ fn show_error_message(
     handle_battle_action::append_update(
         provider.clone(),
         user_id,
-        error_message::display_error_message(battle, error_message),
+        error_message::display_error_message(battle, &provider, error_message),
         &request_context,
         None,
         PollResponseType::Final,
