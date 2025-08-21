@@ -193,6 +193,13 @@ def rsync_code(verbose=False):
         "bash", "-lc", " ".join(shlex.quote(x) for x in rsync_cmd)
     ])
 
+    tabula_host_path = os.path.normpath(os.path.join(project_root(), "..", "client", "Assets", "StreamingAssets", "tabula.json"))
+    if os.path.exists(tabula_host_path):
+        exec_in_container_root("mkdir -p /client/Assets/StreamingAssets")
+        run(["docker", "cp", tabula_host_path, f"{CONTAINER_NAME}:/client/Assets/StreamingAssets/tabula.json"], check=True)
+    else:
+        warn(f"tabula.json not found at {tabula_host_path}; skipping copy")
+
 
 def exec_in_container(cmd, check=True):
     return run(["docker", "exec", "-u", "runner", CONTAINER_NAME, "bash", "-lc", cmd], check=check)
