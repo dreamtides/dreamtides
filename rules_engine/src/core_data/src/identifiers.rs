@@ -36,7 +36,7 @@ pub struct QuestId(pub Uuid);
 ///
 /// Two cards with the same identity are considered to be "the same card", in
 /// the same sense that two copies of Lightning Bolt are "the same card" in
-/// Magic. Those two cards would have the same CardIdentity, but different
+/// Magic. Those two cards would have the same `CardIdentity`, but different
 /// `CardId`s.
 #[derive(
     Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
