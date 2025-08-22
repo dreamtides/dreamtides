@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use ai_data::game_ai::GameAI;
 use battle_mutations::card_mutations::battle_deck;
-use battle_queries::battle_card_queries::card;
+use battle_queries::battle_card_queries::{card, card_abilities};
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::ability_cache::AbilityCache;
@@ -267,12 +267,21 @@ pub fn benchmark_battle() -> BattleState {
     let streaming_assets_path = logging::get_developer_mode_streaming_assets_path();
     let _ = provider.initialize("/tmp/test", &streaming_assets_path);
 
+    let mut pairs = Vec::new();
+    for spec in &card_specs {
+        pairs.push((
+            card_descriptor::get_base_identity(spec.name),
+            card_abilities::query_by_identity(card_descriptor::get_base_identity(spec.name)),
+        ));
+    }
+    let ability_cache = Arc::new(AbilityCache::from_pairs(pairs));
+
     let mut battle = BattleState {
         id: BattleId(Uuid::new_v4()),
         cards: AllCards::default(),
         rules_config: BattleRulesConfig { points_to_win: Points(25) },
         tabula: provider.tabula(),
-        ability_cache: Arc::new(AbilityCache::default()),
+        ability_cache,
         players: PlayerMap {
             one: BattlePlayerState {
                 player_type: PlayerType::Agent(GameAI::AlwaysPanic),

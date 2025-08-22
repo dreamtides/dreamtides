@@ -1,35 +1,32 @@
 use std::fmt;
 use std::sync::Arc;
 
-use parking_lot::RwLock;
+use core_data::identifiers::CardIdentity;
 
-use crate::battle::card_id::CardIdType;
 use crate::battle_cards::ability_list::AbilityList;
 
+#[derive(Default)]
 pub struct AbilityCache {
-    /// Cache of abilities for cards in this battle.
-    ///
-    /// Indices in this vector correspond to the `CardId` of each card in
-    /// the battle.
-    cache: RwLock<Vec<Arc<AbilityList>>>,
+    cache_by_identity: Vec<Arc<AbilityList>>,
 }
 
 impl AbilityCache {
-    pub fn get(&self, id: impl CardIdType) -> Arc<AbilityList> {
-        self.cache.read()[id.card_id().0].clone()
+    pub fn try_get_by_identity(&self, identity: CardIdentity) -> Option<Arc<AbilityList>> {
+        self.cache_by_identity.get(identity.0).cloned()
     }
 
-    pub fn append<I: IntoIterator<Item = Arc<AbilityList>>>(&self, lists: I) {
-        let mut guard = self.cache.write();
-        guard.extend(lists);
+    pub fn from_pairs(pairs: Vec<(CardIdentity, Arc<AbilityList>)>) -> Self {
+        let max = pairs.iter().map(|(id, _)| id.0).max().unwrap_or(0);
+        let mut cache_by_identity = Vec::with_capacity(max + 1);
+        cache_by_identity.resize_with(max + 1, || Arc::new(AbilityList::default()));
+        for (identity, list) in pairs {
+            cache_by_identity[identity.0] = list;
+        }
+        Self { cache_by_identity }
     }
 }
 
-impl Default for AbilityCache {
-    fn default() -> Self {
-        Self { cache: RwLock::new(Vec::new()) }
-    }
-}
+// Default derived above
 
 impl fmt::Debug for AbilityCache {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

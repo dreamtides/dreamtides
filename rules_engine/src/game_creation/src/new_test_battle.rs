@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 use battle_mutations::card_mutations::battle_deck;
 use battle_mutations::phase_mutations::turn;
+use battle_queries::battle_card_queries::card_abilities;
 use battle_state::battle::ability_cache::AbilityCache;
 use battle_state::battle::all_cards::AllCards;
 use battle_state::battle::battle_rules_config::BattleRulesConfig;
@@ -40,12 +41,24 @@ pub fn create_and_start(
     player_two: CreateBattlePlayer,
     request_context: RequestContext,
 ) -> BattleState {
+    let quest_one = Arc::new(create_quest_state(player_one.deck_name));
+    let quest_two = Arc::new(create_quest_state(player_two.deck_name));
+
+    let mut pairs = Vec::new();
+    for identity in quest_one.deck.cards.keys() {
+        pairs.push((*identity, card_abilities::query_by_identity(*identity)));
+    }
+    for identity in quest_two.deck.cards.keys() {
+        pairs.push((*identity, card_abilities::query_by_identity(*identity)));
+    }
+    let ability_cache = Arc::new(AbilityCache::from_pairs(pairs));
+
     let mut battle = BattleState {
         id,
         cards: AllCards::default(),
         rules_config: BattleRulesConfig { points_to_win: Points(12) },
         tabula,
-        ability_cache: Arc::new(AbilityCache::default()),
+        ability_cache,
         players: PlayerMap {
             one: BattlePlayerState {
                 player_type: player_one.player_type,
@@ -54,7 +67,7 @@ pub fn create_and_start(
                 current_energy: Energy(0),
                 produced_energy: Energy(0),
                 deck_name: player_one.deck_name,
-                quest: Arc::new(create_quest_state(player_one.deck_name)),
+                quest: quest_one,
             },
             two: BattlePlayerState {
                 player_type: player_two.player_type,
@@ -63,7 +76,7 @@ pub fn create_and_start(
                 current_energy: Energy(0),
                 produced_energy: Energy(0),
                 deck_name: player_two.deck_name,
-                quest: Arc::new(create_quest_state(player_two.deck_name)),
+                quest: quest_two,
             },
         },
         status: BattleStatus::Setup,

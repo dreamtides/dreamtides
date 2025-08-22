@@ -30,4 +30,3 @@ serde = { workspace = true }
 strum = { workspace = true }
 strum_macros = { workspace = true }
 uuid = { workspace = true }
-parking_lot = { workspace = true }

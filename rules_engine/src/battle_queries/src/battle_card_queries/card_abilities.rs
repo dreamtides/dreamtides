@@ -24,7 +24,7 @@ use parking_lot::RwLock;
 use quest_state::quest::card_descriptor;
 use tabula_ids::test_card;
 
-use crate::battle_card_queries::build_named_abilities;
+use crate::battle_card_queries::{build_named_abilities, card};
 use crate::card_ability_queries::{effect_queries, target_predicates};
 
 type AbilitySlot = Arc<OnceLock<Arc<AbilityList>>>;
@@ -34,7 +34,10 @@ type AbilityTable = RwLock<AbilitySlots>;
 static ABILITY_TABLE: OnceLock<AbilityTable> = OnceLock::new();
 
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> Arc<AbilityList> {
-    battle.ability_cache.get(card_id)
+    battle
+        .ability_cache
+        .try_get_by_identity(card::get(battle, card_id).identity)
+        .unwrap_or_else(|| query_by_identity(card::get(battle, card_id).identity))
 }
 
 fn ability_table() -> &'static AbilityTable {
