@@ -1,11 +1,10 @@
-use std::fmt;
 use std::sync::Arc;
 
 use core_data::identifiers::CardIdentity;
 
 use crate::battle_cards::ability_list::AbilityList;
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct AbilityCache {
     cache_by_identity: Vec<Arc<AbilityList>>,
 }
@@ -23,13 +22,5 @@ impl AbilityCache {
             cache_by_identity[identity.0] = list;
         }
         Self { cache_by_identity }
-    }
-}
-
-// Default derived above
-
-impl fmt::Debug for AbilityCache {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("AbilityCache").finish()
     }
 }

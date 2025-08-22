@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use core_data::identifiers::{BaseCardId, CardIdentity};
+use core_data::identifiers::BaseCardId;
 use core_data::initialization_error::InitializationError;
 use serde::{Deserialize, Serialize};
 
@@ -24,7 +24,7 @@ use crate::{base_card_definition_raw, localized_strings};
 #[derive(Debug, Clone)]
 pub struct Tabula {
     pub strings: LocalizedStrings,
-    pub test_cards: BTreeMap<CardIdentity, CardDefinition>,
+    pub test_cards: BTreeMap<BaseCardId, CardDefinition>,
 }
 
 /// Context for building a [Tabula] struct from a [TabulaRaw] struct.

@@ -4,7 +4,7 @@ use ability_data::ability::Ability;
 use core_data::card_property_data::Rarity;
 use core_data::card_types::{CardSubtype, CardType};
 use core_data::display_types::SpriteAddress;
-use core_data::identifiers::{BaseCardId, CardIdentity};
+use core_data::identifiers::BaseCardId;
 use core_data::initialization_error::{ErrorCode, InitializationError};
 use core_data::numerics::{Energy, Spark};
 use serde::{Deserialize, Serialize};
@@ -60,9 +60,9 @@ pub fn build(
     sheet_name: &str,
     context: &TabulaBuildContext,
     table: &Table<BaseCardId, BaseCardDefinitionRaw>,
-) -> Result<BTreeMap<CardIdentity, CardDefinition>, Vec<InitializationError>> {
+) -> Result<BTreeMap<BaseCardId, CardDefinition>, Vec<InitializationError>> {
     let mut errors: Vec<InitializationError> = Vec::new();
-    let mut out: BTreeMap<CardIdentity, CardDefinition> = BTreeMap::new();
+    let mut out: BTreeMap<BaseCardId, CardDefinition> = BTreeMap::new();
     for (row_index, row) in table.as_slice().iter().enumerate() {
         let energy_cost: Option<Energy> = match &row.energy_cost {
             Some(s) => match s.parse::<u32>() {
@@ -149,9 +149,7 @@ pub fn build(
             continue;
         };
 
-        let identity = CardIdentity(row_index);
-        out.insert(identity, CardDefinition {
-            identity,
+        out.insert(row.id, CardDefinition {
             base_card_id: row.id,
             displayed_name,
             energy_cost,
