@@ -6,6 +6,7 @@ use battle_mutations::card_mutations::battle_deck;
 use battle_queries::battle_card_queries::card;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
+use battle_state::battle::ability_cache::AbilityCache;
 use battle_state::battle::all_cards::AllCards;
 use battle_state::battle::battle_rules_config::BattleRulesConfig;
 use battle_state::battle::battle_state::{BattleState, LoggingOptions, RequestContext};
@@ -271,6 +272,7 @@ pub fn benchmark_battle() -> BattleState {
         cards: AllCards::default(),
         rules_config: BattleRulesConfig { points_to_win: Points(25) },
         tabula: provider.tabula(),
+        ability_cache: Arc::new(AbilityCache::default()),
         players: PlayerMap {
             one: BattlePlayerState {
                 player_type: PlayerType::Agent(GameAI::AlwaysPanic),

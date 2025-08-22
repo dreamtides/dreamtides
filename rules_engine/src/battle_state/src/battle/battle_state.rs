@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 use tabula_data::tabula::Tabula;
 
 use crate::actions::battle_actions::BattleAction;
+use crate::battle::ability_cache::AbilityCache;
 use crate::battle::all_cards::AllCards;
 use crate::battle::animation_data::{AnimationData, AnimationStep};
 use crate::battle::battle_animation::BattleAnimation;
@@ -79,6 +80,9 @@ pub struct BattleState {
 
     /// State of abilities in this battle.
     pub ability_state: AbilityState,
+
+    /// Cache of abilities for cards in this battle.
+    pub ability_cache: Arc<AbilityCache>,
 
     /// Effects that are waiting to be applied.
     pub pending_effects: VecDeque<PendingEffect>,
@@ -174,6 +178,7 @@ impl BattleState {
             triggers: self.triggers.clone(),
             activated_abilities: self.activated_abilities.clone(),
             ability_state: self.ability_state.clone(),
+            ability_cache: self.ability_cache.clone(),
             pending_effects: self.pending_effects.clone(),
             animations: None,
             tracing: None,
@@ -211,6 +216,7 @@ impl BattleState {
                 triggers: self.triggers.clone(),
                 activated_abilities: self.activated_abilities.clone(),
                 ability_state: self.ability_state.clone(),
+                ability_cache: self.ability_cache.clone(),
                 pending_effects: self.pending_effects.clone(),
                 animations: None,
                 tracing: None,

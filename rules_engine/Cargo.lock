@@ -384,6 +384,7 @@ dependencies = [
  "core_data",
  "enum-iterator",
  "enumset",
+ "parking_lot",
  "quest_state",
  "rand 0.9.0",
  "rand_xoshiro",

@@ -1,3 +1,4 @@
+pub mod ability_cache;
 pub mod all_cards;
 pub mod animation_data;
 pub mod battle_animation;

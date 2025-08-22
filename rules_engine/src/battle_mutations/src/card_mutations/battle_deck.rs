@@ -77,6 +77,7 @@ pub fn add_deck_copy(battle: &mut BattleState, player: PlayerName) {
     let quest = &battle.players.player(player).quest;
     let deck = &quest.deck;
     let mut cards = Vec::new();
+    let mut ability_lists = Vec::new();
     for (identity, &count) in &deck.cards {
         let can_play_restriction =
             card_abilities::query_by_identity(*identity).can_play_restriction;
@@ -89,13 +90,19 @@ pub fn add_deck_copy(battle: &mut BattleState, player: PlayerName) {
                 card_type: card_properties::card_type_by_name(*identity),
                 is_fast: card_properties::is_fast_by_name(*identity),
             });
+            ability_lists.push(card_abilities::query_by_identity(*identity));
         }
     }
     battle.cards.create_cards_in_deck(player, cards);
+    battle.ability_cache.append(ability_lists);
 }
 
 /// Adds a list of cards to a player's deck
 pub fn add_cards(battle: &mut BattleState, player: PlayerName, cards: Vec<CardIdentity>) {
+    let ability_lists = cards
+        .iter()
+        .map(|identity| card_abilities::query_by_identity(*identity))
+        .collect::<Vec<_>>();
     battle.cards.create_cards_in_deck(
         player,
         cards
@@ -111,6 +118,7 @@ pub fn add_cards(battle: &mut BattleState, player: PlayerName, cards: Vec<CardId
             })
             .collect(),
     );
+    battle.ability_cache.append(ability_lists);
 }
 
 /// Ensures that at least `count` cards are known at the top of a player's deck.

@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 use battle_mutations::card_mutations::battle_deck;
 use battle_mutations::phase_mutations::turn;
+use battle_state::battle::ability_cache::AbilityCache;
 use battle_state::battle::all_cards::AllCards;
 use battle_state::battle::battle_rules_config::BattleRulesConfig;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
@@ -44,6 +45,7 @@ pub fn create_and_start(
         cards: AllCards::default(),
         rules_config: BattleRulesConfig { points_to_win: Points(12) },
         tabula,
+        ability_cache: Arc::new(AbilityCache::default()),
         players: PlayerMap {
             one: BattlePlayerState {
                 player_type: player_one.player_type,
