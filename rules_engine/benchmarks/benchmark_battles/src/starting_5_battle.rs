@@ -269,10 +269,10 @@ pub fn benchmark_battle() -> BattleState {
 
     let mut pairs = Vec::new();
     for spec in &card_specs {
-        pairs.push((
-            card_descriptor::get_base_identity(spec.name),
-            card_abilities::query_by_identity(card_descriptor::get_base_identity(spec.name)),
-        ));
+        let identity = card_descriptor::get_base_identity(spec.name);
+        let list = card_abilities::query_by_identity(identity);
+        let def = provider.tabula().test_cards.get(&spec.name).unwrap().clone();
+        pairs.push((identity, list, Arc::new(def)));
     }
     let ability_cache = Arc::new(AbilityCache::from_pairs(pairs));
 
@@ -290,7 +290,11 @@ pub fn benchmark_battle() -> BattleState {
                 produced_energy: Energy(6),
                 spark_bonus: Spark(0),
                 deck_name: TestDeckName::StartingFive,
-                quest: Arc::new(new_test_battle::create_quest_state(TestDeckName::StartingFive)),
+                deck: Vec::new(),
+                quest: Arc::new(new_test_battle::create_quest_state(
+                    &provider.tabula(),
+                    TestDeckName::StartingFive,
+                )),
             },
             two: BattlePlayerState {
                 player_type: PlayerType::Agent(GameAI::AlwaysPanic),
@@ -299,7 +303,11 @@ pub fn benchmark_battle() -> BattleState {
                 produced_energy: Energy(5),
                 spark_bonus: Spark(0),
                 deck_name: TestDeckName::StartingFive,
-                quest: Arc::new(new_test_battle::create_quest_state(TestDeckName::StartingFive)),
+                deck: Vec::new(),
+                quest: Arc::new(new_test_battle::create_quest_state(
+                    &provider.tabula(),
+                    TestDeckName::StartingFive,
+                )),
             },
         },
         status: BattleStatus::Playing,
@@ -326,7 +334,7 @@ pub fn benchmark_battle() -> BattleState {
         card_specs
             .iter()
             .filter(|spec| spec.owner == PlayerName::One)
-            .map(|spec| card_descriptor::get_base_identity(spec.name))
+            .map(|spec| provider.tabula().test_cards.get(&spec.name).unwrap().clone())
             .collect(),
     );
     battle_deck::add_cards(
@@ -335,7 +343,7 @@ pub fn benchmark_battle() -> BattleState {
         card_specs
             .iter()
             .filter(|spec| spec.owner == PlayerName::Two)
-            .map(|spec| card_descriptor::get_base_identity(spec.name))
+            .map(|spec| provider.tabula().test_cards.get(&spec.name).unwrap().clone())
             .collect(),
     );
 

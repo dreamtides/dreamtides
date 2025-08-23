@@ -13,7 +13,7 @@ use display::rendering::renderer;
 use display_data::request_data::{ConnectResponse, Metadata};
 use game_creation::new_test_battle;
 use quest_state::quest::card_descriptor;
-use quest_state::quest::deck::Deck;
+//
 use state_provider::display_state_provider::DisplayStateProvider;
 use state_provider::state_provider::StateProvider;
 use state_provider::test_state_provider::TestStateProvider;
@@ -71,10 +71,24 @@ fn create_500_card_battle_json() -> ConnectResponse {
 
 fn add_500_cards(battle: &mut BattleState) {
     let core_11_cards = get_core_11_card_mix();
+    let definitions_one = core_11_cards
+        .iter()
+        .map(|id| {
+            let base = card_descriptor::get_base_card_id(*id);
+            battle.tabula.test_cards.get(&base).expect("Card definition not found").clone()
+        })
+        .collect();
 
-    battle_deck::add_cards(battle, PlayerName::One, core_11_cards.clone());
+    battle_deck::add_cards(battle, PlayerName::One, definitions_one);
     move_all_from_deck_to_void(battle, PlayerName::One);
-    battle_deck::add_cards(battle, PlayerName::Two, core_11_cards);
+    let definitions_two = get_core_11_card_mix()
+        .iter()
+        .map(|id| {
+            let base = card_descriptor::get_base_card_id(*id);
+            battle.tabula.test_cards.get(&base).expect("Card definition not found").clone()
+        })
+        .collect();
+    battle_deck::add_cards(battle, PlayerName::Two, definitions_two);
     move_all_from_deck_to_void(battle, PlayerName::Two);
 }
 
@@ -94,7 +108,7 @@ fn get_core_11_card_mix() -> Vec<CardIdentity> {
     let base_deck_map = create_500_card_core_11_deck();
     let mut cards = Vec::new();
 
-    for (card_name, count) in base_deck_map.cards {
+    for (card_name, count) in base_deck_map {
         for _ in 0..count {
             cards.push(card_name);
         }
@@ -103,7 +117,7 @@ fn get_core_11_card_mix() -> Vec<CardIdentity> {
     cards
 }
 
-fn create_500_card_core_11_deck() -> Deck {
+fn create_500_card_core_11_deck() -> BTreeMap<CardIdentity, usize> {
     let mut deck_cards = BTreeMap::new();
 
     #[expect(clippy::integer_division)]
@@ -161,5 +175,5 @@ fn create_500_card_core_11_deck() -> Deck {
         2 * scale_factor + if remainder > 30 { 1 } else { 0 },
     );
 
-    Deck { cards: deck_cards }
+    deck_cards
 }

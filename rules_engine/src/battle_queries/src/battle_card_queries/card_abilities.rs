@@ -22,6 +22,7 @@ use core_data::numerics::{Energy, Spark};
 use enumset::EnumSet;
 use parking_lot::RwLock;
 use quest_state::quest::card_descriptor;
+use tabula_data::card_definition::CardDefinition;
 use tabula_ids::test_card;
 
 use crate::battle_card_queries::{build_named_abilities, card};
@@ -62,6 +63,20 @@ fn slot_for_index(index: usize) -> AbilitySlot {
 pub fn query_by_identity(identity: CardIdentity) -> Arc<AbilityList> {
     let slot = slot_for_index(identity.0);
     slot.get_or_init(|| Arc::new(build_for(card_descriptor::get_base_card_id(identity)))).clone()
+}
+
+/// Builds an ability list from a card definition for a specific identity.
+pub fn build_from_definition(
+    card_identity: CardIdentity,
+    definition: &CardDefinition,
+) -> AbilityList {
+    let abilities = definition
+        .abilities
+        .iter()
+        .enumerate()
+        .map(|(i, ability)| (AbilityNumber(i), ability.clone(), AbilityConfiguration::default()))
+        .collect();
+    build_ability_list(card_identity, abilities)
 }
 
 fn build_ability_list(

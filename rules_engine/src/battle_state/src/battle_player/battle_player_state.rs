@@ -1,11 +1,12 @@
 use std::sync::Arc;
 
 use ai_data::game_ai::GameAI;
-use core_data::identifiers::UserId;
+use core_data::identifiers::{CardIdentity, UserId};
 use core_data::numerics::{Energy, Points, Spark};
 use quest_state::quest::quest_state::QuestState;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use tabula_data::card_definition::CardDefinition;
 
 /// Represents the state of a player within a battle.
 ///
@@ -32,8 +33,20 @@ pub struct BattlePlayerState {
     /// The deck name for this player.
     pub deck_name: TestDeckName,
 
+    /// The player's deck.
+    ///
+    /// Cards in this deck are assumed to have already been populated in the
+    /// ability cache when the battle is created.
+    pub deck: Vec<BattleDeckCard>,
+
     /// The player's quest state.
     pub quest: Arc<QuestState>,
+}
+
+#[derive(Clone, Debug)]
+pub struct BattleDeckCard {
+    pub identity: CardIdentity,
+    pub definition: Arc<CardDefinition>,
 }
 
 impl BattlePlayerState {

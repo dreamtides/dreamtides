@@ -15,7 +15,6 @@ use display_data::battle_view::{
     BattlePreviewState, BattleView, DisplayedTurnIndicator, PlayerView,
 };
 use display_data::command::{ArrowStyle, Command, DisplayArrow, GameMessageType};
-use quest_state::quest::card_descriptor;
 
 use crate::core::adapter;
 use crate::core::card_view_context::CardViewContext;
@@ -50,7 +49,11 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
                 builder,
                 &CardViewContext::Battle(
                     battle,
-                    card_descriptor::get_base_card_id(card::get(battle, id).identity),
+                    battle
+                        .ability_cache
+                        .try_get_definition(card::get(battle, id).identity)
+                        .expect("definition missing for identity")
+                        .base_card_id,
                     id,
                 ),
             )

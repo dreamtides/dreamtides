@@ -225,6 +225,10 @@ impl StateProvider for TestStateProvider {
         }
         None
     }
+
+    fn should_panic_on_error(&self) -> bool {
+        true
+    }
 }
 
 impl DisplayStateProvider for TestStateProvider {

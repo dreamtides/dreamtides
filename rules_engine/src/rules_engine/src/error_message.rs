@@ -19,6 +19,7 @@ use uuid::Uuid;
 
 /// Attempts to display an error message to the player describing a rules engine
 /// error.
+#[expect(clippy::print_stderr)]
 pub fn display_error_message<P>(
     battle: Option<&BattleState>,
     provider: &P,
@@ -28,6 +29,7 @@ where
     P: StateProvider + 'static,
 {
     let message = message.into();
+    eprintln!("ERROR: {message}");
     match battle {
         Some(existing_battle) => display_error_message_with_battle(existing_battle, message),
         None => {

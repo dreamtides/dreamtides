@@ -1,5 +1,8 @@
-use battle_queries::battle_card_queries::{card, card_abilities, card_properties};
+use std::sync::Arc;
+
+use battle_queries::battle_card_queries::{card, card_abilities};
 use battle_queries::{battle_trace, panic_with};
+use battle_state::battle::ability_cache::AbilityCache;
 use battle_state::battle::all_cards::CreatedCard;
 use battle_state::battle::animation_data::AnimationStep;
 use battle_state::battle::battle_animation::BattleAnimation;
@@ -13,6 +16,7 @@ use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use rand::seq::IteratorRandom;
 use rand_xoshiro::Xoshiro256PlusPlus;
+use tabula_data::card_definition::CardDefinition;
 
 use crate::card_mutations::move_card;
 use crate::player_mutations::energy;
@@ -74,43 +78,62 @@ pub fn draw_cards(battle: &mut BattleState, source: EffectSource, player: Player
 
 /// Adds a copy of a player's quest deck to their battle deck.
 pub fn add_deck_copy(battle: &mut BattleState, player: PlayerName) {
-    let quest = &battle.players.player(player).quest;
-    let deck = &quest.deck;
     let mut cards = Vec::new();
-    for (identity, &count) in &deck.cards {
-        let can_play_restriction =
-            card_abilities::query_by_identity(*identity).can_play_restriction;
-        for _ in 0..count {
-            cards.push(CreatedCard {
-                identity: *identity,
-                can_play_restriction,
-                base_energy_cost: card_properties::base_energy_cost(*identity),
-                base_spark: card_properties::base_spark(*identity),
-                card_type: card_properties::card_type_by_name(*identity),
-                is_fast: card_properties::is_fast_by_name(*identity),
-            });
-        }
+    for card in &battle.players.player(player).deck {
+        let can_play_restriction = battle
+            .ability_cache
+            .try_get_by_identity(card.identity)
+            .map(|list| list.can_play_restriction)
+            .unwrap_or(None);
+        cards.push(CreatedCard {
+            identity: card.identity,
+            can_play_restriction,
+            base_energy_cost: card.definition.energy_cost,
+            base_spark: card.definition.spark,
+            card_type: card.definition.card_type,
+            is_fast: card.definition.is_fast,
+        });
     }
     battle.cards.create_cards_in_deck(player, cards);
 }
 
 /// Adds a list of cards to a player's deck
-pub fn add_cards(battle: &mut BattleState, player: PlayerName, cards: Vec<CardIdentity>) {
-    battle.cards.create_cards_in_deck(
-        player,
-        cards
-            .into_iter()
-            .map(|identity| CreatedCard {
-                identity,
-                can_play_restriction: card_abilities::query_by_identity(identity)
-                    .can_play_restriction,
-                base_energy_cost: card_properties::base_energy_cost(identity),
-                base_spark: card_properties::base_spark(identity),
-                card_type: card_properties::card_type_by_name(identity),
-                is_fast: card_properties::is_fast_by_name(identity),
-            })
-            .collect(),
-    );
+pub fn add_cards(battle: &mut BattleState, player: PlayerName, cards: Vec<CardDefinition>) {
+    let mut pairs = Vec::new();
+    let mut i = 0usize;
+    loop {
+        let id = CardIdentity(i);
+        if let Some(list) = battle.ability_cache.try_get_by_identity(id) {
+            let def = battle
+                .ability_cache
+                .try_get_definition(id)
+                .expect("missing definition for identity");
+            pairs.push((id, list, def));
+            i += 1;
+        } else {
+            break;
+        }
+    }
+
+    let mut created = Vec::new();
+    for definition in cards {
+        let identity = CardIdentity(i);
+        i += 1;
+        let ability_list = card_abilities::build_from_definition(identity, &definition);
+        let can_play_restriction = ability_list.can_play_restriction;
+        pairs.push((identity, Arc::new(ability_list), Arc::new(definition.clone())));
+        created.push(CreatedCard {
+            identity,
+            can_play_restriction,
+            base_energy_cost: definition.energy_cost,
+            base_spark: definition.spark,
+            card_type: definition.card_type,
+            is_fast: definition.is_fast,
+        });
+    }
+
+    battle.ability_cache = Arc::new(AbilityCache::from_pairs(pairs));
+    battle.cards.create_cards_in_deck(player, created);
 }
 
 /// Ensures that at least `count` cards are known at the top of a player's deck.
