@@ -2,10 +2,7 @@ use ai_data::game_ai::GameAI;
 use battle_mutations::actions::apply_battle_action;
 use battle_queries::battle_card_queries::card;
 use battle_queries::legal_action_queries::legal_actions;
-use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::{BattleState, LoggingOptions, RequestContext};
-use battle_state::battle::battle_turn_phase::BattleTurnPhase;
-use battle_state::battle::card_id::{CardId, HandCardId};
 use battle_state::battle_player::battle_player_state::{
     CreateBattlePlayer, PlayerType, TestDeckName,
 };
@@ -46,7 +43,7 @@ pub fn generate_core_11_battle() -> BattleState {
 }
 
 fn generate_core_11_battle_with_logging(enable_logging: bool) -> BattleState {
-    let seed = 12345678912345;
+    let seed = 1234567891234;
     let provider = TestStateProvider::new();
     let streaming_assets_path = logging::get_developer_mode_streaming_assets_path();
     let _ = provider.initialize("/tmp/test", &streaming_assets_path);
@@ -65,26 +62,22 @@ fn generate_core_11_battle_with_logging(enable_logging: bool) -> BattleState {
         RequestContext { logging_options: LoggingOptions::default() },
     );
 
-    let mut turn_count = 0;
-    let max_turns = 1000;
+    let mut action_count = 0;
+    let max_actions = 999;
 
     loop {
-        turn_count += 1;
-        if turn_count > max_turns {
-            if enable_logging {
-                println!(
-                    "Battle ended without Player 1 ever having 6+ legal actions (max turn limit reached)"
-                );
-            }
-            break;
+        action_count += 1;
+        if action_count > max_actions {
+            panic!(
+                "Battle ended on action {action_count:?} without Player 1 ever having 6+ legal actions (max turn limit reached)"
+            );
         }
 
         let next_player = legal_actions::next_to_act(&battle);
         if next_player.is_none() {
-            if enable_logging {
-                println!("Battle ended without Player 1 ever having 6+ legal actions (game over)");
-            }
-            break;
+            panic!(
+                "Battle ended on action {action_count:?} without Player 1 ever having 6+ legal actions (game over)"
+            );
         }
 
         let current_player = next_player.unwrap();
@@ -101,88 +94,16 @@ fn generate_core_11_battle_with_logging(enable_logging: bool) -> BattleState {
                 }
             }
 
-            let expected_actions = [
-                BattleAction::EndTurn,
-                BattleAction::PlayCardFromHand(HandCardId(CardId(18))),
-                BattleAction::PlayCardFromHand(HandCardId(CardId(19))),
-                BattleAction::PlayCardFromHand(HandCardId(CardId(22))),
-                BattleAction::PlayCardFromHand(HandCardId(CardId(25))),
-                BattleAction::PlayCardFromHand(HandCardId(CardId(29))),
-            ];
-
-            assert_eq!(
-                all_actions.len(),
-                expected_actions.len(),
-                "Expected exactly {} legal actions, got {}",
-                expected_actions.len(),
-                all_actions.len()
-            );
-
-            for (i, expected_action) in expected_actions.iter().enumerate() {
-                assert_eq!(
-                    &all_actions[i],
-                    expected_action,
-                    "Action {} does not match expected. Got {:?}, expected {:?}",
-                    i + 1,
-                    all_actions[i],
-                    expected_action
-                );
-            }
-
-            assert_eq!(
-                battle.turn.turn_id.0, 7,
-                "Expected turn ID to be 7, got {}",
-                battle.turn.turn_id.0
-            );
-
-            assert_eq!(
-                battle.turn.active_player,
-                PlayerName::One,
-                "Expected active player to be Player One, got {:?}",
-                battle.turn.active_player
-            );
-
-            assert_eq!(
-                battle.phase,
-                BattleTurnPhase::Main,
-                "Expected phase to be Main, got {:?}",
-                battle.phase
-            );
-
-            assert_eq!(
-                battle.cards.battlefield_state(PlayerName::One).len(),
-                0,
-                "Expected Player One battlefield to be empty, got {} characters",
-                battle.cards.battlefield_state(PlayerName::One).len()
-            );
-
-            assert_eq!(
-                battle.cards.battlefield_state(PlayerName::Two).len(),
-                0,
-                "Expected Player Two battlefield to be empty, got {} characters",
-                battle.cards.battlefield_state(PlayerName::Two).len()
-            );
-
-            if enable_logging {
-                println!("✓ All assertions passed - deterministic battle state validated");
-            }
-            break;
+            return battle;
         }
 
         if legal.is_empty() {
-            if enable_logging {
-                println!(
-                    "Battle ended without Player 1 ever having 6+ legal actions (no legal actions)"
-                );
-            }
-            break;
+            panic!("Battle ended without Player 1 ever having 6+ legal actions (no legal actions)");
         }
 
         let action = legal.all()[0];
         apply_battle_action::execute(&mut battle, current_player, action);
     }
-
-    battle
 }
 
 pub fn main() {

@@ -44,6 +44,7 @@ pub fn write_battle_event(
     }
 }
 
+#[expect(clippy::print_stderr)]
 pub fn write_panic_snapshot(
     battle: &BattleState,
     message: String,
@@ -63,7 +64,9 @@ pub fn write_panic_snapshot(
         timestamp,
     };
 
-    write_event_to_log_file(&event, &battle.request_context);
+    if !write_event_to_log_file(&event, &battle.request_context) {
+        eprintln!("Failed to write panic snapshot to log file");
+    }
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -102,8 +105,12 @@ pub fn write_deserialization_panic(
     };
 
     match serde_json::to_string_pretty(&event) {
-        Ok(json) => write_json_to_log_file(&json, &battle.request_context),
-        Err(e) => error!("Failed to serialize DeserializationPanicEvent: {}", e),
+        Ok(json) => {
+            write_json_to_log_file(&json, &battle.request_context);
+        }
+        Err(e) => {
+            error!("Failed to serialize DeserializationPanicEvent: {}", e);
+        }
     }
 }
 
@@ -141,8 +148,12 @@ pub fn write_animations(battle: &BattleState, animations: &AnimationData) {
         timestamp,
     };
     match serde_json::to_string_pretty(&event) {
-        Ok(json) => write_json_to_log_file(&json, &battle.request_context),
-        Err(e) => error!("Failed to serialize CommandSequence: {}", e),
+        Ok(json) => {
+            write_json_to_log_file(&json, &battle.request_context);
+        }
+        Err(e) => {
+            error!("Failed to serialize CommandSequence: {}", e);
+        }
     }
 }
 
@@ -164,8 +175,12 @@ pub fn write_commands(sequence: &CommandSequence, request_context: &RequestConte
         timestamp,
     };
     match serde_json::to_string_pretty(&event) {
-        Ok(json) => write_json_to_log_file(&json, request_context),
-        Err(e) => error!("Failed to serialize CommandSequence: {}", e),
+        Ok(json) => {
+            write_json_to_log_file(&json, request_context);
+        }
+        Err(e) => {
+            error!("Failed to serialize CommandSequence: {}", e);
+        }
     }
 }
 
@@ -187,27 +202,37 @@ pub fn clear_log_file(request_context: &RequestContext) {
     }
 }
 
-fn write_event_to_log_file(event: &BattleTraceEvent, request_context: &RequestContext) {
+/// Writes an event to the log file. Returns true if the event was written.
+fn write_event_to_log_file(event: &BattleTraceEvent, request_context: &RequestContext) -> bool {
     match serde_json::to_string_pretty(event) {
         Ok(json) => write_json_to_log_file(&json, request_context),
-        Err(e) => error!("Failed to serialize event: {}", e),
+        Err(e) => {
+            error!("Failed to serialize event: {}", e);
+            false
+        }
     }
 }
 
-fn write_json_to_log_file(json_str: &str, request_context: &RequestContext) {
+/// Writes a JSON string to the log file. Returns true if the JSON was written.
+fn write_json_to_log_file(json_str: &str, request_context: &RequestContext) -> bool {
     let Some(log_path) = get_log_file_path(request_context) else {
-        return;
+        return false;
     };
 
     if !log_path.exists() {
         match File::create(&log_path) {
             Ok(mut file) => match file.write_all(format!("[\n{json_str}\n]").as_bytes()) {
                 Ok(_) => debug!(?log_path, "Created dreamtides.json"),
-                Err(e) => error!(?log_path, "Failed to write to dreamtides.json: {}", e),
+                Err(e) => {
+                    error!(?log_path, "Failed to write to dreamtides.json: {}", e);
+                    return false;
+                }
             },
-            Err(e) => error!(?log_path, "Failed to create dreamtides.json: {}", e),
+            Err(e) => {
+                error!(?log_path, "Failed to create dreamtides.json: {}", e);
+                return false;
+            }
         }
-        return;
     }
 
     match OpenOptions::new().read(true).write(true).open(&log_path) {
@@ -215,33 +240,33 @@ fn write_json_to_log_file(json_str: &str, request_context: &RequestContext) {
             Ok(metadata) => {
                 if metadata.len() > 0 {
                     if file.seek(SeekFrom::End(-1)).is_err() {
-                        reset_file(&mut file, json_str);
-                        return;
+                        return reset_file(&mut file, json_str);
                     }
 
                     let mut last_char = [0u8; 1];
                     if file.read_exact(&mut last_char).is_err() {
-                        reset_file(&mut file, json_str);
-                        return;
+                        return reset_file(&mut file, json_str);
                     }
 
                     if last_char[0] == b']' {
                         if file.seek(SeekFrom::End(-1)).is_err() {
-                            reset_file(&mut file, json_str);
-                            return;
+                            return reset_file(&mut file, json_str);
                         }
 
                         if let Err(e) = file.write_all(format!(",\n{json_str}\n]").as_bytes()) {
                             error!(?log_path, "Failed to append to dreamtides.json: {}", e);
                         }
-                        return;
+                        return false;
                     }
                 }
-                reset_file(&mut file, json_str);
+                return reset_file(&mut file, json_str);
             }
-            Err(_) => reset_file(&mut file, json_str),
+            Err(_) => return reset_file(&mut file, json_str),
         },
-        Err(e) => error!(?log_path, "Failed to open dreamtides.json for appending: {}", e),
+        Err(e) => {
+            error!(?log_path, "Failed to open dreamtides.json for appending: {}", e);
+            return false;
+        }
     }
 }
 
@@ -250,13 +275,18 @@ fn get_log_file_path(request_context: &RequestContext) -> Option<PathBuf> {
     Some(log_directory.join("dreamtides.json"))
 }
 
-fn reset_file(file: &mut File, json_str: &str) {
+/// Resets the file to the beginning and writes the JSON string to it. Returns
+/// true if the file was written successfully.
+fn reset_file(file: &mut File, json_str: &str) -> bool {
     if file.seek(SeekFrom::Start(0)).is_err() || file.set_len(0).is_err() {
         error!("Failed to reset file");
-        return;
+        return false;
     }
 
     if let Err(e) = file.write_all(format!("[\n{json_str}\n]").as_bytes()) {
         error!("Failed to write to dreamtides.json: {}", e);
+        return false;
     }
+
+    true
 }
