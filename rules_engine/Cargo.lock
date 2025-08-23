@@ -403,6 +403,7 @@ dependencies = [
  "action_data",
  "ai_data",
  "battle_mutations",
+ "battle_queries",
  "battle_state",
  "clap",
  "core_data",

@@ -1,7 +1,12 @@
+use std::sync::Arc;
+
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType};
 use battle_state::battle_cards::battle_card_state::BattleCardState;
+use core_data::identifiers::BaseCardId;
+use tabula_data::card_definition::CardDefinition;
 
+use crate::battle_card_queries::card;
 use crate::panic_with;
 
 /// Returns the state of a card.
@@ -30,6 +35,21 @@ pub fn get_mut(battle: &mut BattleState, card_id: impl CardIdType) -> &mut Battl
     } else {
         panic_invalid_id(battle, card_id);
     }
+}
+
+/// Returns the definition of a card.
+pub fn get_definition(battle: &BattleState, card_id: impl CardIdType) -> Arc<CardDefinition> {
+    let identity = card::get(battle, card_id).identity;
+    battle
+        .ability_cache
+        .try_get_definition(identity)
+        .expect("definition missing for identity")
+        .clone()
+}
+
+/// Returns the base card ID for a given card ID.
+pub fn get_base_card_id(battle: &BattleState, card_id: impl CardIdType) -> BaseCardId {
+    get_definition(battle, card_id).base_card_id
 }
 
 #[cold]

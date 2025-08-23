@@ -22,11 +22,10 @@ use battle_state::battle_player::battle_player_state::{
 };
 use battle_state::battle_player::player_map::PlayerMap;
 use battle_state::triggers::trigger_state::TriggerState;
-use core_data::identifiers::{BaseCardId, BattleId};
+use core_data::identifiers::{BaseCardId, BattleId, CardIdentity};
 use core_data::numerics::{Energy, Points, Spark, TurnId};
 use core_data::types::PlayerName;
 use game_creation::new_test_battle;
-use quest_state::quest::card_descriptor;
 use rand::SeedableRng;
 use rand_xoshiro::Xoshiro256PlusPlus;
 use state_provider::display_state_provider::DisplayStateProvider;
@@ -268,11 +267,12 @@ pub fn benchmark_battle() -> BattleState {
     let _ = provider.initialize("/tmp/test", &streaming_assets_path);
 
     let mut pairs = Vec::new();
+    let mut next_identity = 0usize;
     for spec in &card_specs {
-        let identity = card_descriptor::get_base_identity(spec.name);
-        let list = card_abilities::query_by_identity(identity);
         let def = provider.tabula().test_cards.get(&spec.name).unwrap().clone();
-        pairs.push((identity, list, Arc::new(def)));
+        let list = card_abilities::build_from_definition(&def);
+        pairs.push((CardIdentity(next_identity), Arc::new(list), Arc::new(def)));
+        next_identity += 1;
     }
     let ability_cache = Arc::new(AbilityCache::from_pairs(pairs));
 
@@ -331,20 +331,20 @@ pub fn benchmark_battle() -> BattleState {
     battle_deck::add_cards(
         &mut battle,
         PlayerName::One,
-        card_specs
+        &card_specs
             .iter()
             .filter(|spec| spec.owner == PlayerName::One)
             .map(|spec| provider.tabula().test_cards.get(&spec.name).unwrap().clone())
-            .collect(),
+            .collect::<Vec<_>>(),
     );
     battle_deck::add_cards(
         &mut battle,
         PlayerName::Two,
-        card_specs
+        &card_specs
             .iter()
             .filter(|spec| spec.owner == PlayerName::Two)
             .map(|spec| provider.tabula().test_cards.get(&spec.name).unwrap().clone())
-            .collect(),
+            .collect::<Vec<_>>(),
     );
 
     for spec in &card_specs {
@@ -355,8 +355,8 @@ pub fn benchmark_battle() -> BattleState {
 
         if spec.zone == Zone::Battlefield {
             let character_id = CharacterId(card_id);
-            let card_name = card::get(&battle, character_id).identity;
-            if card_name == card_descriptor::get_base_identity(test_card::TEST_VANILLA_CHARACTER) {
+            let card_name = card::get_base_card_id(&battle, character_id);
+            if card_name == test_card::TEST_VANILLA_CHARACTER {
                 if let Some(char_state) =
                     battle.cards.battlefield_state_mut(spec.owner).get_mut(&character_id)
                 {

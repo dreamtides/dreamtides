@@ -4,13 +4,12 @@ use ability_data::predicate::Predicate;
 use ability_data::standard_effect::StandardEffect;
 use ability_data::static_ability::{PlayFromVoid, StandardStaticAbility, StaticAbility};
 use battle_state::battle_cards::ability_list::{AbilityConfiguration, AbilityData, AbilityList};
-use core_data::identifiers::{AbilityNumber, CardIdentity};
-
-use crate::battle_card_queries::card_properties;
+use core_data::identifiers::AbilityNumber;
+use tabula_data::card_definition::CardDefinition;
 
 /// Expands a named ability into its constituent abilities.
 pub fn build(
-    identity: CardIdentity,
+    definition: &CardDefinition,
     ability_list: &mut AbilityList,
     named: NamedAbility,
     ability_number: AbilityNumber,
@@ -21,8 +20,7 @@ pub fn build(
                 ability_number,
                 ability: StaticAbility::StaticAbility(StandardStaticAbility::PlayFromVoid(
                     PlayFromVoid {
-                        energy_cost: energy_cost
-                            .or_else(|| card_properties::base_energy_cost(identity)),
+                        energy_cost: energy_cost.or_else(|| definition.energy_cost),
                         additional_cost: None,
                         if_you_do: Some(Effect::Effect(StandardEffect::BanishWhenLeavesPlay {
                             target: Predicate::This,

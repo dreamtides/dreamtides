@@ -13,7 +13,6 @@ use display_data::command::{
     SetCardTrailCommand,
 };
 use masonry::flex_style::FlexVector3;
-use quest_state::quest::card_descriptor;
 use strum::IntoDiscriminant;
 use tabula_ids::test_card;
 
@@ -31,7 +30,7 @@ pub fn apply_effect(
     let source_id = effect_source.card_id()?;
     let controller = card_properties::controller(battle, source_id);
     let effect_name = animation.discriminant().to_string();
-    match card_descriptor::get_base_card_id(card::get(battle, source_id).identity) {
+    match card::get_base_card_id(battle, source_id) {
         test_card::TEST_DISSOLVE if effect_name == "ApplyTargetedEffect" => {
             animations::push_snapshot(builder, battle);
             for target_id in find_target_ids(animation) {

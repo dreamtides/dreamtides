@@ -51,14 +51,14 @@ pub fn create_and_start(
     for definition in &quest_one.deck.cards {
         let identity = CardIdentity(next_identity);
         next_identity += 1;
-        let ability_list = card_abilities::build_from_definition(identity, definition);
+        let ability_list = card_abilities::build_from_definition(definition);
         pairs.push((identity, Arc::new(ability_list), Arc::new(definition.clone())));
         deck_one.push(BattleDeckCard { identity, definition: Arc::new(definition.clone()) });
     }
     for definition in &quest_two.deck.cards {
         let identity = CardIdentity(next_identity);
         next_identity += 1;
-        let ability_list = card_abilities::build_from_definition(identity, definition);
+        let ability_list = card_abilities::build_from_definition(definition);
         pairs.push((identity, Arc::new(ability_list), Arc::new(definition.clone())));
         deck_two.push(BattleDeckCard { identity, definition: Arc::new(definition.clone()) });
     }

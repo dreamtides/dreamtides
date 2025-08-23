@@ -98,7 +98,7 @@ pub fn add_deck_copy(battle: &mut BattleState, player: PlayerName) {
 }
 
 /// Adds a list of cards to a player's deck
-pub fn add_cards(battle: &mut BattleState, player: PlayerName, cards: Vec<CardDefinition>) {
+pub fn add_cards(battle: &mut BattleState, player: PlayerName, cards: &[CardDefinition]) {
     let mut pairs = Vec::new();
     let mut i = 0usize;
     loop {
@@ -119,7 +119,7 @@ pub fn add_cards(battle: &mut BattleState, player: PlayerName, cards: Vec<CardDe
     for definition in cards {
         let identity = CardIdentity(i);
         i += 1;
-        let ability_list = card_abilities::build_from_definition(identity, &definition);
+        let ability_list = card_abilities::build_from_definition(definition);
         let can_play_restriction = ability_list.can_play_restriction;
         pairs.push((identity, Arc::new(ability_list), Arc::new(definition.clone())));
         created.push(CreatedCard {

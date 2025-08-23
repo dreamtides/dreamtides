@@ -1,5 +1,4 @@
 use action_data::debug_action_data::DebugAction;
-use battle_queries::battle_card_queries::card_properties;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
 use battle_state::battle::battle_state::BattleState;
 use bon::Builder;
@@ -7,7 +6,6 @@ use core_data::identifiers::BaseCardId;
 use core_data::types::PlayerName;
 use masonry::flex_enums::{FlexAlign, FlexDirection, FlexJustify};
 use masonry::flex_style::FlexStyle;
-use quest_state::quest::card_descriptor;
 use tabula_ids::test_card;
 use ui_components::box_component::BoxComponent;
 use ui_components::button_component::ButtonComponent;
@@ -45,36 +43,43 @@ impl Component for PlayOpponentCardPanel<'_> {
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
+                                        .battle(&self.battle)
                                         .card(test_card::TEST_VANILLA_CHARACTER)
                                         .build(),
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
+                                        .battle(&self.battle)
                                         .card(test_card::TEST_DRAW_ONE)
                                         .build(),
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
+                                        .battle(&self.battle)
                                         .card(test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO)
                                         .build(),
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
+                                        .battle(&self.battle)
                                         .card(test_card::TEST_DISSOLVE)
                                         .build(),
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
+                                        .battle(&self.battle)
                                         .card(test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND)
                                         .build(),
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
+                                        .battle(&self.battle)
                                         .card(test_card::TEST_COUNTERSPELL)
                                         .build(),
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
+                                        .battle(&self.battle)
                                         .card(test_card::TEST_RETURN_TO_HAND)
                                         .build(),
                                 )
@@ -88,12 +93,21 @@ impl Component for PlayOpponentCardPanel<'_> {
 }
 
 #[derive(Clone, Builder)]
-pub struct PlayOpponentCardCell {
+pub struct PlayOpponentCardCell<'a> {
+    pub battle: &'a BattleState,
     pub card: BaseCardId,
 }
 
-impl Component for PlayOpponentCardCell {
+impl Component for PlayOpponentCardCell<'_> {
     fn render(self) -> Option<impl Component> {
+        let name = self
+            .battle
+            .tabula
+            .test_cards
+            .get(&self.card)
+            .expect("definition missing for identity")
+            .displayed_name
+            .clone();
         Some(
             BoxComponent::builder()
                 .name(format!("{:?} Card Cell", self.card))
@@ -104,14 +118,7 @@ impl Component for PlayOpponentCardCell {
                         .margin(6)
                         .build(),
                 )
-                .child(
-                    TextComponent::builder()
-                        .text(card_properties::display_name(card_descriptor::get_base_identity(
-                            self.card,
-                        )))
-                        .typography(Typography::Body2)
-                        .build(),
-                )
+                .child(TextComponent::builder().text(name).typography(Typography::Body2).build())
                 .child(
                     ButtonComponent::builder()
                         .label("Play")

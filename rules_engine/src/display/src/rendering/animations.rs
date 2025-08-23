@@ -11,7 +11,6 @@ use display_data::command::{
     PlayAudioClipCommand,
 };
 use masonry::flex_style::FlexVector3;
-use quest_state::quest::card_descriptor;
 
 use crate::core::adapter;
 use crate::core::card_view_context::CardViewContext;
@@ -48,9 +47,7 @@ pub fn render(
                             builder,
                             &CardViewContext::Battle(
                                 final_state,
-                                card_descriptor::get_base_card_id(
-                                    card::get(final_state, card_id).identity,
-                                ),
+                                card::get_base_card_id(snapshot, card_id),
                                 card_id.card_id(),
                             ),
                         )

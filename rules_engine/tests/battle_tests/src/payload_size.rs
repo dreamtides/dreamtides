@@ -2,6 +2,7 @@ use std::collections::BTreeMap;
 
 use ai_data::game_ai::GameAI;
 use battle_mutations::card_mutations::{battle_deck, move_card};
+use battle_queries::battle_card_queries::card;
 use battle_state::battle::battle_state::{BattleState, LoggingOptions, RequestContext};
 use battle_state::battle_player::battle_player_state::{
     CreateBattlePlayer, PlayerType, TestDeckName,
@@ -12,8 +13,6 @@ use core_data::types::PlayerName;
 use display::rendering::renderer;
 use display_data::request_data::{ConnectResponse, Metadata};
 use game_creation::new_test_battle;
-use quest_state::quest::card_descriptor;
-//
 use state_provider::display_state_provider::DisplayStateProvider;
 use state_provider::state_provider::StateProvider;
 use state_provider::test_state_provider::TestStateProvider;
@@ -74,7 +73,7 @@ fn add_500_cards(battle: &mut BattleState) {
     let definitions_one = core_11_cards
         .iter()
         .map(|id| {
-            let base = card_descriptor::get_base_card_id(*id);
+            let base = card::get_base_card_id(battle, *id);
             battle.tabula.test_cards.get(&base).expect("Card definition not found").clone()
         })
         .collect();

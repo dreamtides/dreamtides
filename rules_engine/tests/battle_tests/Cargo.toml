@@ -15,6 +15,7 @@ bench = false
 action_data = { path = "../../src/action_data" }
 ai_data = { path = "../../src/ai_data" }
 battle_mutations = { path = "../../src/battle_mutations" }
+battle_queries = { path = "../../src/battle_queries" }
 battle_state = { path = "../../src/battle_state" }
 core_data = { path = "../../src/core_data" }
 display = { path = "../../src/display"}
@@ -40,6 +41,6 @@ uuid = { workspace = true }
 name = "test_determinism"
 path = "src/bin/test_determinism.rs"
 
-[[bin]]
-name = "test_payload_size"
-path = "src/bin/test_payload_size.rs"
+# [[bin]]
+# name = "test_payload_size"
+# path = "src/bin/test_payload_size.rs"

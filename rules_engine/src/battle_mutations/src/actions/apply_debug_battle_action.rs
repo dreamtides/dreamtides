@@ -43,7 +43,7 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
                 .get(&card_name)
                 .expect("Card definition not found")
                 .clone();
-            battle_deck::add_cards(battle, player_name, vec![definition]);
+            battle_deck::add_cards(battle, player_name, &[definition]);
             let new_card_id = DeckCardId(CardId(card_count));
             move_card::from_deck_to_battlefield(battle, source, player_name, new_card_id);
         }
@@ -55,7 +55,7 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
                 .get(&card_name)
                 .expect("Card definition not found")
                 .clone();
-            battle_deck::add_cards(battle, player_name, vec![definition]);
+            battle_deck::add_cards(battle, player_name, &[definition]);
             let new_card_id = DeckCardId(CardId(card_count));
             move_card::from_deck_to_void(battle, source, player_name, new_card_id);
         }
@@ -105,7 +105,7 @@ fn add_to_hand(
     let card_count = battle.cards.all_cards().count();
     let definition =
         battle.tabula.test_cards.get(&card_name).expect("Card definition not found").clone();
-    battle_deck::add_cards(battle, player, vec![definition]);
+    battle_deck::add_cards(battle, player, &[definition]);
     let new_card_id = DeckCardId(CardId(card_count));
     move_card::from_deck_to_hand(battle, source, player, new_card_id)
 }
