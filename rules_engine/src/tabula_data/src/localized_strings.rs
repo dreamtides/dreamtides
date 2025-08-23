@@ -223,12 +223,12 @@ impl LocalizedStrings {
 
     pub fn format_display_string(
         &self,
-        s: String,
+        s: &str,
         context: StringContext,
         mut args: FluentArgs,
     ) -> String {
         if s.trim().is_empty() {
-            return s;
+            return s.to_string();
         }
 
         args.set("context", context.key());
@@ -237,7 +237,7 @@ impl LocalizedStrings {
         if bundle.add_resource(self.resource.as_ref()).is_err() {
             return "ERR3: Add Resource Failed".to_string();
         }
-        let ftl = format!("tmp-for-display = {}", normalize_literal(&s));
+        let ftl = format!("tmp-for-display = {}", normalize_literal(s));
         let (temp_res, parser_errs_opt) = match FluentResource::try_new(ftl) {
             Ok(res) => (res, None),
             Err((res, errs)) => (res, Some(errs)),

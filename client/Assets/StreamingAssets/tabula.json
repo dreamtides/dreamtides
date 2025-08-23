@@ -529,6 +529,7 @@
       "name_en_us": "Test Dissolve",
       "energy_cost": "2",
       "rules_text_en_us": "{Dissolve} an enemy character.",
+      "prompts_en_us": "Choose an enemy character to {dissolve}.",
       "abilities": [
         {
           "Event": {
@@ -554,6 +555,7 @@
       "name_en_us": "Test Counterspell",
       "energy_cost": "2",
       "rules_text_en_us": "{Prevent} a played enemy card.",
+      "prompts_en_us": "Choose an enemy card to {prevent}.",
       "abilities": [
         {
           "Event": {
@@ -579,6 +581,7 @@
       "name_en_us": "Test Counterspell Unless Pays",
       "energy_cost": "1",
       "rules_text_en_us": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}.",
+      "prompts_en_us": "Choose an enemy event to {prevent}.",
       "abilities": [
         {
           "Event": {
@@ -607,6 +610,7 @@
       "name_en_us": "Test Variable Energy Draw",
       "energy_cost": "2",
       "rules_text_en_us": "Pay one or more {e}: Draw {-cards(n:1)} for each {e} spent.",
+      "prompts_en_us": "Pay one or more {e}.",
       "abilities": [
         {
           "Event": {
@@ -698,6 +702,7 @@
       "name_en_us": "Test Return One Or Two Void Event Cards To Hand",
       "energy_cost": "4",
       "rules_text_en_us": "Return one or two events from your void to your hand.",
+      "prompts_en_us": "Choose one or two events in your void to return.",
       "abilities": [
         {
           "Event": {
@@ -724,6 +729,7 @@
       "name_en_us": "Test Modal Return To Hand Or Draw Two",
       "energy_cost": "*",
       "rules_text_en_us": "{choose-one}\n{mode}{-energy-cost(e:2)}: Return an enemy character to hand.{end-mode}\n{mode}{-energy-cost(e:3)}: Draw {-cards(n:2)}.{end-mode}",
+      "prompts_en_us": "Choose an enemy character to return to hand.",
       "abilities": [
         {
           "Event": {
@@ -766,6 +772,7 @@
       "name_en_us": "Test Prevent Dissolve This Turn",
       "energy_cost": "1",
       "rules_text_en_us": "Give an allied character {anchored} until end of turn.",
+      "prompts_en_us": "Choose an allied character to gain {anchored}.",
       "abilities": [
         {
           "Event": {
@@ -832,6 +839,7 @@
       "name_en_us": "Test Counterspell Character",
       "energy_cost": "2",
       "rules_text_en_us": "{Prevent} a played enemy character.",
+      "prompts_en_us": "Choose an enemy character to {prevent}.",
       "abilities": [
         {
           "Event": {
@@ -857,6 +865,7 @@
       "name_en_us": "Test Named Dissolve",
       "energy_cost": "2",
       "rules_text_en_us": "{Dissolve} an enemy character.",
+      "prompts_en_us": "Choose an enemy character to {dissolve}.",
       "abilities": [
         {
           "Event": {
@@ -1063,6 +1072,7 @@
       "name_en_us": "Test Activated Ability Dissolve Character",
       "energy_cost": "3",
       "rules_text_en_us": "{a} {-energy-cost(e:2)}: {Dissolve} an enemy character.",
+      "prompts_en_us": "Choose an enemy character to {dissolve}.",
       "abilities": [
         {
           "Activated": {
@@ -1277,6 +1287,7 @@
       "name_en_us": "Test Return Void Card To Hand",
       "energy_cost": "1",
       "rules_text_en_us": "Return a card from your void to your hand.",
+      "prompts_en_us": "Choose a card in your void.",
       "abilities": [
         {
           "Event": {
@@ -1342,6 +1353,7 @@
       "name_en_us": "Test Modal Draw One Or Dissolve Enemy",
       "energy_cost": "*",
       "rules_text_en_us": "{choose-one}\n{mode}{-energy-cost(e:1)}: Draw {-cards(n:1)}.{end-mode}\n{mode}{-energy-cost(e:2)}: {Dissolve} an enemy character.{end-mode}",
+      "prompts_en_us": "Choose an enemy character to {dissolve}.",
       "abilities": [
         {
           "Event": {
@@ -1384,6 +1396,7 @@
       "name_en_us": "Test Return To Hand",
       "energy_cost": "1",
       "rules_text_en_us": "Return an enemy character to hand.",
+      "prompts_en_us": "Choose an enemy character to return to hand.",
       "abilities": [
         {
           "Event": {

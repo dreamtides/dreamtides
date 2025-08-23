@@ -54,7 +54,7 @@ namespace Dreamtides.Tests
       Assert.That(triggerCharacter._battlefieldSparkText.text, Is.EqualTo("6"));
 
       var createdDisplayables = Registry.TestHelperService.CreatedDisplayables();
-      Assert.That(createdDisplayables, Has.Some.Contains("Materialize Gain Spark"));
+      Assert.That(createdDisplayables, Has.Some.Contains("Gain Spark When Materialize Another"));
 
       yield return EndTest();
     }

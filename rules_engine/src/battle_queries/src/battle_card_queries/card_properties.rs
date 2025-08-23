@@ -14,7 +14,6 @@ pub fn converted_energy_cost(battle: &BattleState, card_id: impl CardIdType) -> 
     base_energy_cost_for_id(battle, card_id).unwrap_or_default()
 }
 
-/// Returns the base energy cost of a card as in [base_energy_cost].
 pub fn base_energy_cost_for_id(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
     card::get(battle, card_id).base_energy_cost
 }

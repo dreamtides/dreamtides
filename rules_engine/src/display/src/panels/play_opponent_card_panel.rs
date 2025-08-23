@@ -43,43 +43,43 @@ impl Component for PlayOpponentCardPanel<'_> {
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
-                                        .battle(&self.battle)
+                                        .battle(self.battle)
                                         .card(test_card::TEST_VANILLA_CHARACTER)
                                         .build(),
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
-                                        .battle(&self.battle)
+                                        .battle(self.battle)
                                         .card(test_card::TEST_DRAW_ONE)
                                         .build(),
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
-                                        .battle(&self.battle)
+                                        .battle(self.battle)
                                         .card(test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO)
                                         .build(),
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
-                                        .battle(&self.battle)
+                                        .battle(self.battle)
                                         .card(test_card::TEST_DISSOLVE)
                                         .build(),
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
-                                        .battle(&self.battle)
+                                        .battle(self.battle)
                                         .card(test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND)
                                         .build(),
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
-                                        .battle(&self.battle)
+                                        .battle(self.battle)
                                         .card(test_card::TEST_COUNTERSPELL)
                                         .build(),
                                 )
                                 .child(
                                     PlayOpponentCardCell::builder()
-                                        .battle(&self.battle)
+                                        .battle(self.battle)
                                         .card(test_card::TEST_RETURN_TO_HAND)
                                         .build(),
                                 )

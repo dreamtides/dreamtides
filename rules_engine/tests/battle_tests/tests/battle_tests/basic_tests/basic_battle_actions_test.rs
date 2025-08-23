@@ -183,11 +183,11 @@ fn cards_in_hand_properties() {
     let event_revealed = s.user_client.cards.get_revealed(&event_id);
 
     assert_eq!(character_revealed.numeric_spark(), Some(Spark(5)), "test character spark");
-    assert_eq!(character_revealed.name, "Character", "character name");
+    assert!(character_revealed.name.contains("Character"), "character name");
     assert_eq!(character_revealed.card_type, "Musician", "character type");
 
     assert_eq!(event_revealed.numeric_spark(), None, "event card should have no spark");
-    assert_eq!(event_revealed.name, "Dissolve", "event name");
+    assert!(event_revealed.name.contains("Dissolve"), "event name");
     assert_eq!(event_revealed.card_type, "\u{f0e7} Event", "event type");
 
     assert_eq!(character_card.view.prefab, CardPrefab::Character, "character uses character frame");

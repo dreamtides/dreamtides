@@ -267,12 +267,10 @@ pub fn benchmark_battle() -> BattleState {
     let _ = provider.initialize("/tmp/test", &streaming_assets_path);
 
     let mut pairs = Vec::new();
-    let mut next_identity = 0usize;
-    for spec in &card_specs {
+    for (next_identity, spec) in card_specs.iter().enumerate() {
         let def = provider.tabula().test_cards.get(&spec.name).unwrap().clone();
         let list = card_abilities::build_from_definition(&def);
         pairs.push((CardIdentity(next_identity), Arc::new(list), Arc::new(def)));
-        next_identity += 1;
     }
     let ability_cache = Arc::new(AbilityCache::from_pairs(pairs));
 

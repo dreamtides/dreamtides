@@ -9,9 +9,7 @@ use ability_data::static_ability::{PlayFromVoid, StandardStaticAbility};
 use ability_data::trigger_event::TriggerEvent;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CardIdType;
-use battle_state::battle_cards::ability_list::{
-    AbilityConfiguration, AbilityData, AbilityList, CanPlayRestriction,
-};
+use battle_state::battle_cards::ability_list::{AbilityData, AbilityList, CanPlayRestriction};
 use battle_state::triggers::trigger::TriggerName;
 use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
@@ -24,7 +22,7 @@ use crate::card_ability_queries::{effect_queries, target_predicates};
 pub fn query(battle: &BattleState, card_id: impl CardIdType) -> Arc<AbilityList> {
     battle.ability_cache.try_get_by_identity(card::get(battle, card_id).identity).unwrap_or_else(
         || {
-            panic!("definition missing for card {:?}", card_id);
+            panic!("definition missing for card {card_id:?}");
         },
     )
 }
@@ -35,46 +33,38 @@ pub fn build_from_definition(definition: &CardDefinition) -> AbilityList {
         .abilities
         .iter()
         .enumerate()
-        .map(|(i, ability)| (AbilityNumber(i), ability.clone(), AbilityConfiguration::default()))
+        .map(|(i, ability)| (AbilityNumber(i), ability.clone()))
         .collect();
     build_ability_list(definition, abilities)
 }
 
 fn build_ability_list(
     definition: &CardDefinition,
-    abilities: Vec<(AbilityNumber, Ability, AbilityConfiguration)>,
+    abilities: Vec<(AbilityNumber, Ability)>,
 ) -> AbilityList {
     let mut ability_list = AbilityList::default();
 
-    for (ability_number, ability, configuration) in abilities {
+    for (ability_number, ability) in abilities {
         match ability {
             Ability::Event(event_ability) => {
-                ability_list.event_abilities.push(AbilityData {
-                    ability_number,
-                    ability: event_ability.clone(),
-                    configuration,
-                });
+                ability_list
+                    .event_abilities
+                    .push(AbilityData { ability_number, ability: event_ability.clone() });
             }
             Ability::Static(static_ability) => {
-                ability_list.static_abilities.push(AbilityData {
-                    ability_number,
-                    ability: static_ability.clone(),
-                    configuration,
-                });
+                ability_list
+                    .static_abilities
+                    .push(AbilityData { ability_number, ability: static_ability.clone() });
             }
             Ability::Activated(activated_ability) => {
-                ability_list.activated_abilities.push(AbilityData {
-                    ability_number,
-                    ability: activated_ability.clone(),
-                    configuration,
-                });
+                ability_list
+                    .activated_abilities
+                    .push(AbilityData { ability_number, ability: activated_ability.clone() });
             }
             Ability::Triggered(triggered_ability) => {
-                ability_list.triggered_abilities.push(AbilityData {
-                    ability_number,
-                    ability: triggered_ability.clone(),
-                    configuration,
-                });
+                ability_list
+                    .triggered_abilities
+                    .push(AbilityData { ability_number, ability: triggered_ability.clone() });
             }
             Ability::Named(named_ability) => {
                 build_named_abilities::build(

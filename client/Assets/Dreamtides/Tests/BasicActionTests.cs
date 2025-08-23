@@ -95,7 +95,7 @@ namespace Dreamtides.Tests
       yield return WaitForCount(Registry.Layout.TargetingEnemyStack, 1);
 
       AssertCountIs(Registry.Layout.UserHand, 0);
-      AssertTextIsInInterface("Select an enemy character", "Target prompt message not found");
+      AssertTextIsInInterface("Choose an enemy character", "Target prompt message not found");
       foreach (var enemy in Registry.Layout.EnemyBattlefield.Objects)
       {
         var enemyCard = ComponentUtils.Get<Card>(enemy);

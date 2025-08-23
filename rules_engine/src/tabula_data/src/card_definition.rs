@@ -8,9 +8,7 @@ use core_data::numerics::{Energy, Spark};
 /// Describes the rules for a card.
 ///
 /// A card definition includes a "base card" (the rules from the tabula database
-/// for a card) as well as zero or more card modifications. Card definitions are
-/// assigned a unique [CardIdentity] when created. Modifying a card creates a
-/// new definition with a new [CardIdentity].
+/// for a card) as well as zero or more card modifications.
 ///
 /// Card definitions are stored in two different places: base card definitions
 /// exist directly in the tabula database, while modified card definitions exist
@@ -35,6 +33,10 @@ pub struct CardDefinition {
     /// Rules text of this card in the currently-active language, formatted for
     /// display.
     pub displayed_rules_text: String,
+
+    /// Prompts to display for this card in the currently-active language,
+    /// formatted for display.
+    pub displayed_prompts: Vec<String>,
 
     /// Type of this card.
     pub card_type: CardType,

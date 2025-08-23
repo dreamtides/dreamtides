@@ -1,24 +1,22 @@
 use action_data::battle_display_action::BattleDisplayAction;
 use action_data::game_action_data::GameAction;
 use action_data::panel_address::PanelAddress;
-use battle_queries::battle_card_queries::card_abilities;
+use battle_queries::battle_card_queries::card;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalActions};
 use battle_queries::panic_with;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle_cards::ability_list::{AbilityConfiguration, AbilityList};
-use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::{PromptData, PromptType};
-use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
 use display_data::battle_view::{
     ButtonView, CardBrowserView, CardOrderSelectorView, InterfaceView,
 };
-use fluent::fluent_args;
+use fluent::{FluentArgs, fluent_args};
 use masonry::dimension::{FlexInsets, SafeAreaInsets};
 use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition};
 use masonry::flex_style::FlexStyle;
+use tabula_data::localized_strings::StringContext;
 use tabula_ids::string_id;
 use ui_components::box_component::{BoxComponent, BoxComponentBuilder, Named};
 use ui_components::button_component::ButtonComponent;
@@ -113,50 +111,14 @@ fn render_prompt_message(
 
 fn get_prompt_message_from_source(battle: &BattleState, prompt: &PromptData) -> Option<String> {
     let card_id = prompt.source.card_id()?;
-    let ability_number = match prompt.source {
-        EffectSource::Event { ability_number, .. }
-        | EffectSource::Triggered { ability_number, .. } => ability_number,
-        EffectSource::Activated { activated_ability_id, .. } => activated_ability_id.ability_number,
-        _ => return None,
-    };
-
-    let abilities = card_abilities::query(battle, card_id);
-    let config = find_ability_configuration(&abilities, ability_number)?;
-
-    match &prompt.prompt_type {
-        PromptType::ChooseCharacter { .. }
-        | PromptType::ChooseStackCard { .. }
-        | PromptType::ChooseVoidCard { .. } => config.targeting_prompt.clone(),
-        PromptType::Choose { .. } => config.choice_prompt.clone(),
-        PromptType::ChooseEnergyValue { .. } => config.additional_cost_prompt.clone(),
-        PromptType::SelectDeckCardOrder { .. } => None,
-        PromptType::ModalEffect(_) => None,
-    }
-}
-
-fn find_ability_configuration(
-    abilities: &AbilityList,
-    ability_number: AbilityNumber,
-) -> Option<&AbilityConfiguration> {
-    abilities
-        .event_abilities
-        .iter()
-        .find(|ability_data| ability_data.ability_number == ability_number)
-        .map(|ability_data| &ability_data.configuration)
-        .or_else(|| {
-            abilities
-                .activated_abilities
-                .iter()
-                .find(|ability_data| ability_data.ability_number == ability_number)
-                .map(|ability_data| &ability_data.configuration)
-        })
-        .or_else(|| {
-            abilities
-                .triggered_abilities
-                .iter()
-                .find(|ability_data| ability_data.ability_number == ability_number)
-                .map(|ability_data| &ability_data.configuration)
-        })
+    // TODO: Handle multiple prompts per card.
+    let definition = card::get_definition(battle, card_id);
+    let prompt = definition.displayed_prompts.first()?.as_str();
+    Some(battle.tabula.strings.format_display_string(
+        prompt,
+        StringContext::Interface,
+        FluentArgs::default(),
+    ))
 }
 
 fn get_generic_prompt_message(builder: &ResponseBuilder, prompt_type: &PromptType) -> String {

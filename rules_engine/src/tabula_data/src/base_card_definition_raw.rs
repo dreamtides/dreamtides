@@ -28,6 +28,10 @@ pub struct BaseCardDefinitionRaw {
     /// Rules text of this card (U.S. English).
     pub rules_text_en_us: String,
 
+    /// Prompts for this card (U.S. English).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub prompts_en_us: Option<String>,
+
     /// Abilities of this card in serialized form.
     ///
     /// If not present here, the Tabula CLI will populate this field by parsing
@@ -155,6 +159,11 @@ pub fn build(
             energy_cost,
             abilities: abilities.clone(),
             displayed_rules_text,
+            displayed_prompts: row
+                .prompts_en_us
+                .as_ref()
+                .map(|s| vec![s.clone()])
+                .unwrap_or_default(),
             card_type: row.card_type,
             card_subtype,
             is_fast: row.is_fast,

@@ -11,7 +11,7 @@ fn dissolve_targeting_prompt_with_multiple_targets() {
     s.create_and_play(DisplayPlayer::User, test_card::TEST_DISSOLVE);
 
     assert!(
-        s.user_client.interface.screen_overlay_contains("Select an enemy character"),
+        s.user_client.interface.screen_overlay_contains("Choose an enemy character"),
         "Test dissolve should show targeting prompt when multiple enemy characters are present"
     );
 }
