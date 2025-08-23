@@ -61,7 +61,7 @@ pub const TEST_DRAW_ONE: BaseCardId = BaseCardId(uuid!("68f90d08-9b51-424e-90d1-
 pub const TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER: BaseCardId =
     BaseCardId(uuid!("91c9ed93-5faf-4178-aec9-d631bbcf5d6a"));
 
-/// Whenever you materialize another character, this character gains
+/// Whenever you play a card during the enemy's turn, this character gains
 /// {-gained-spark(n:2)}.
 pub const TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN: BaseCardId =
     BaseCardId(uuid!("82759c0b-5161-4f6f-91b3-d42c2b4e0f9f"));

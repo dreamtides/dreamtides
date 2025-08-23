@@ -7,11 +7,24 @@ review: check-format build workspace-lints clippy test
 check:
     cargo check --manifest-path rules_engine/Cargo.toml --workspace --all-targets --all-features
 
+check-timed:
+    cargo check --manifest-path rules_engine/Cargo.toml --timings --workspace --all-targets --all-features
+
+# Analyze this with crox
+# https://github.com/rust-lang/measureme/blob/master/crox/README.md
+# crox {crate name}-{pid}.mm_profdata
+# Chrome > Dev Tools > Performance > Load Profile
+check-profiled:
+    RUSTFLAGS="-Z self-profile" cargo +nightly check --manifest-path rules_engine/Cargo.toml -j1 --timings --workspace --all-targets --all-features
+
 check-warnings:
     RUSTFLAGS="--deny warnings" cargo check --manifest-path rules_engine/Cargo.toml --workspace --all-targets --all-features
 
 build:
     cargo build --manifest-path rules_engine/Cargo.toml --all-targets --all-features
+
+build-timed:
+    cargo build --manifest-path rules_engine/Cargo.toml --timings --all-targets --all-features
 
 dev:
     cargo run --manifest-path rules_engine/Cargo.toml --bin "dev_server"

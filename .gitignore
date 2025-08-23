@@ -1,4 +1,4 @@
-.DS_Store
+in fall sections, things.DS_Store
 target
 profile.json
 dreamtides.log
@@ -10,3 +10,6 @@ CLAUDE.md
 release_builds
 client_secret.json
 service_account_key.json
+*.mm_profdata
+chrome_profiler.json
+.DS_Store

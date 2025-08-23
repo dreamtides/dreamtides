@@ -934,14 +934,17 @@
       "id": "82759c0b-5161-4f6f-91b3-d42c2b4e0f9f",
       "name_en_us": "Test Trigger Gain Two Spark On Play Card Enemy Turn",
       "energy_cost": "2",
-      "rules_text_en_us": "Whenever you materialize another character, this character gains {-gained-spark(n:2)}.",
+      "rules_text_en_us": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:2)}.",
       "abilities": [
         {
           "Triggered": {
             "trigger": {
-              "Materialize": {
-                "Another": "Character"
-              }
+              "PlayDuringTurn": [
+                {
+                  "Your": "Card"
+                },
+                "EnemyTurn"
+              ]
             },
             "effect": {
               "Effect": {
@@ -991,7 +994,7 @@
     },
     {
       "id": "56f944bb-333b-4e2c-9c8c-2068f41998c2",
-      "name_en_us": "Test Multiactivated Ability Draw Card Character",
+      "name_en_us": "Test Multi Activated Ability Draw Card Character",
       "energy_cost": "0",
       "rules_text_en_us": "{ma} {-energy-cost(e:1)}: Draw {-cards(n:1)}.",
       "abilities": [

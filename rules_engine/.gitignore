@@ -9,3 +9,4 @@ search_graph.png
 tarpaulin-report.html
 .claude
 *.log
+*.mm_profdata

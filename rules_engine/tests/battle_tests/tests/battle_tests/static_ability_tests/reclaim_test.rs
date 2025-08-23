@@ -33,8 +33,9 @@ fn reclaim_basic_play_twice_then_banish() {
     assert_eq!(reclaim_token_cards.len(), 1, "one reclaim token in hand");
     let token_card = &reclaim_token_cards[0];
     assert!(
-        token_card.view.revealed.as_ref().unwrap().name.contains("Draw 1 Reclaim"),
-        "token shows card name"
+        token_card.view.revealed.as_ref().unwrap().name.contains("Draw One Reclaim"),
+        "token card name was {:?}, expected 'Draw One Reclaim'",
+        token_card.view.revealed.as_ref().unwrap().name
     );
     let token_cost = token_card.view.revealed.as_ref().unwrap().numeric_cost();
     assert_eq!(token_cost, Some(Energy(1)), "token shows reclaim cost");
@@ -92,7 +93,7 @@ fn reclaim_token_card_properties() {
     let token_card = &reclaim_token_cards[0];
     let revealed = token_card.view.revealed.as_ref().unwrap();
 
-    assert!(revealed.name.contains("Draw 1 Reclaim"), "token shows original card name");
+    assert!(revealed.name.contains("Draw One Reclaim"), "token shows original card name");
     assert_eq!(revealed.numeric_cost(), Some(Energy(1)), "token shows reclaim cost");
     assert!(revealed.rules_text.contains("Draw a card"), "token shows original rules text");
     assert!(revealed.is_fast, "reclaim card is fast");
@@ -199,7 +200,7 @@ fn reclaim_mixed_with_other_void_cards() {
 
     let token_card = &reclaim_token_cards[0];
     let revealed = token_card.view.revealed.as_ref().unwrap();
-    assert!(revealed.name.contains("Draw 1 Reclaim"), "token is for the reclaim card");
+    assert!(revealed.name.contains("Draw One Reclaim"), "token is for the reclaim card");
 
     s.play_card_from_void(DisplayPlayer::User, &reclaim_card_id);
 
@@ -230,7 +231,7 @@ fn reclaim_token_always_in_hand_even_when_unplayable() {
     );
     let token_card = &reclaim_token_cards[0];
     let revealed = token_card.view.revealed.as_ref().unwrap();
-    assert!(revealed.name.contains("Draw 1 Reclaim"), "token shows original card name");
+    assert!(revealed.name.contains("Draw One Reclaim"), "token shows original card name");
     assert_eq!(revealed.numeric_cost(), Some(Energy(1)), "token shows reclaim cost");
     assert!(
         revealed.actions.can_play.is_none(),
