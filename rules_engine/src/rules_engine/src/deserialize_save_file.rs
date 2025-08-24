@@ -15,9 +15,7 @@ use database::save_file::SaveFile;
 use game_creation::new_battle;
 use serde_json;
 use state_provider::state_provider::StateProvider;
-use tracing::{error, instrument, subscriber};
-use tracing_subscriber::EnvFilter;
-use tracing_subscriber::layer::SubscriberExt;
+use tracing::{error, instrument};
 
 use crate::handle_battle_action::should_auto_execute_action;
 
@@ -32,20 +30,28 @@ struct DeserializationAction {
 
 /// Returns a deserialized [BattleState] for the battle in this save
 /// file, if one is present.
-#[instrument(
-    name = "deserialize_save_file",
-    level = "debug",
-    skip(provider, file, request_context)
-)]
+#[instrument(name = "deserialize_save_file", level = "debug", skip(provider, file))]
 pub fn battle<P>(
     provider: &P,
     file: &SaveFile,
-    request_context: RequestContext,
+    _request_context: RequestContext,
 ) -> Option<(BattleState, QuestId)>
 where
     P: StateProvider + 'static,
 {
-    get_battle_impl(provider, file, None, request_context)
+    match file {
+        SaveFile::V2(v2) => {
+            let quest = v2.quest.as_ref()?;
+            let quest_id = quest.id;
+
+            let mut battle = quest.battle.clone()?;
+            battle.tabula = provider.tabula();
+            battle.tracing = Some(BattleTracing::default());
+            battle.animations = Some(AnimationData::default());
+            battle_trace!("Loaded battle from save", &mut battle);
+            Some((battle, quest_id))
+        }
+    }
 }
 
 /// Returns a deserialized [BattleState] for an 'undo' operation on the battle
@@ -62,95 +68,73 @@ pub fn undo<P>(
 where
     P: StateProvider + 'static,
 {
-    get_battle_impl(provider, file, Some(player), request_context)
-}
-
-fn get_battle_impl<P>(
-    provider: &P,
-    file: &SaveFile,
-    undo: Option<PlayerName>,
-    request_context: RequestContext,
-) -> Option<(BattleState, QuestId)>
-where
-    P: StateProvider + 'static,
-{
     match file {
-        SaveFile::V1(v1) => {
-            let filter = EnvFilter::new("warn");
-            let forest_subscriber =
-                tracing_subscriber::registry().with(logging::create_forest_layer(filter));
+        SaveFile::V2(v2) => {
+            let quest = v2.quest.as_ref()?;
+            let quest_id = quest.id;
+            let file = quest.replay.as_ref()?;
 
-            let mut result = subscriber::with_default(forest_subscriber, || {
-                let quest_id = v1.quest.as_ref()?.id;
-                let file = v1.quest.as_ref()?.battle.as_ref()?;
-                let mut battle = new_battle::create_and_start(
-                    file.id,
-                    provider.tabula(),
-                    file.seed,
-                    file.player_types.one.clone(),
-                    file.player_types.two.clone(),
-                    request_context,
-                );
-                battle.animations = None;
-                battle.tracing = None;
+            let mut battle = new_battle::create_and_start(
+                file.id,
+                provider.tabula(),
+                file.seed,
+                file.player_types.one.clone(),
+                file.player_types.two.clone(),
+                request_context,
+            );
+            battle.animations = None;
+            battle.tracing = None;
 
-                let mut last_non_auto_battle = None;
-                let mut actions = Vec::new();
-                for (action_index, history_action) in file.actions.iter().enumerate() {
-                    let is_undo_player = undo == Some(history_action.player);
-                    let legal = legal_actions::compute(&battle, history_action.player);
-                    let auto = should_auto_execute_action(&legal);
-                    if is_undo_player
-                        && auto != Some(history_action.action)
-                        && !should_skip_action_for_undo(history_action.action)
-                    {
-                        last_non_auto_battle = Some((battle.clone(), quest_id));
-                    }
-
-                    actions.push(DeserializationAction {
-                        player: history_action.player,
-                        action: history_action.action,
-                        action_index,
-                        turn_id: battle.turn.turn_id.0,
-                        phase: battle.phase,
-                    });
-
-                    let battle_clone = battle.clone();
-                    let result = panic::catch_unwind(AssertUnwindSafe(|| {
-                        apply_battle_action::execute(
-                            &mut battle,
-                            history_action.player,
-                            history_action.action,
-                        );
-                    }));
-
-                    if let Err(panic_info) = result {
-                        error!("Panic during deserialization at action {}", action_index);
-
-                        write_deserialization_panic_trace(
-                            &battle_clone,
-                            &actions,
-                            action_index,
-                            &format!("{panic_info:?}"),
-                        );
-                        panic::resume_unwind(panic_info);
-                    }
+            let mut last_non_auto_battle = None;
+            let mut actions = Vec::new();
+            for (action_index, history_action) in file.actions.iter().enumerate() {
+                let is_undo_player = player == history_action.player;
+                let legal = legal_actions::compute(&battle, history_action.player);
+                let auto = should_auto_execute_action(&legal);
+                if is_undo_player
+                    && auto != Some(history_action.action)
+                    && !should_skip_action_for_undo(history_action.action)
+                {
+                    last_non_auto_battle = Some((battle.clone(), quest_id));
                 }
 
-                if undo.is_some() { last_non_auto_battle } else { Some((battle, quest_id)) }
-            });
+                actions.push(DeserializationAction {
+                    player: history_action.player,
+                    action: history_action.action,
+                    action_index,
+                    turn_id: battle.turn.turn_id.0,
+                    phase: battle.phase,
+                });
 
-            if let Some((battle, _)) = &mut result {
-                battle.tracing = Some(BattleTracing::default());
-                battle.animations = Some(AnimationData::default());
-                if undo.is_some() {
-                    battle_trace!("Completed undo operation", battle);
-                } else {
-                    battle_trace!("Completed battle replay", battle);
+                let battle_clone = battle.clone();
+                let result = panic::catch_unwind(AssertUnwindSafe(|| {
+                    apply_battle_action::execute(
+                        &mut battle,
+                        history_action.player,
+                        history_action.action,
+                    );
+                }));
+
+                if let Err(panic_info) = result {
+                    error!("Panic during deserialization at action {}", action_index);
+
+                    write_deserialization_panic_trace(
+                        &battle_clone,
+                        &actions,
+                        action_index,
+                        &format!("{panic_info:?}"),
+                    );
+                    panic::resume_unwind(panic_info);
                 }
             }
 
-            result
+            if let Some((battle, _)) = &mut last_non_auto_battle {
+                battle.tracing = Some(BattleTracing::default());
+                battle.animations = Some(AnimationData::default());
+                battle_trace!("Completed undo operation", battle);
+            }
+
+            last_non_auto_battle
         }
     }
 }
