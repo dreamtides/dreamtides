@@ -1,10 +1,12 @@
+use serde::{Deserialize, Serialize};
+
 use crate::battle::card_id::{CardId, CharacterId, VoidCardId};
 use crate::battle_cards::battle_card_state::CardObjectId;
 use crate::battle_cards::card_set::CardSet;
 use crate::battle_player::player_map::PlayerMap;
 
 /// Stores state for abilities of a player in this battle.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct AbilityState {
     /// All cards currently in this player's void which have an ability which
     /// *may* let them be played from the void.
@@ -22,7 +24,7 @@ pub struct AbilityState {
 ///
 /// This struct is automatically dropped by the rules engine when a new turn
 /// begins.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct UntilEndOfTurn {
     /// Characters which should be prevented from being dissolved this turn.
     pub prevent_dissolved: Vec<CardObjectId<CharacterId>>,

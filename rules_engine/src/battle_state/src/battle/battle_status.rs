@@ -1,6 +1,7 @@
 use core_data::types::PlayerName;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub enum BattleStatus {
     /// Initial step of battle setup.
     Setup,

@@ -39,9 +39,9 @@ pub enum LanguageId {
 }
 
 /// A collection of localized strings.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct LocalizedStrings {
-    resource: Arc<FluentResource>,
+    resource: Option<Arc<FluentResource>>,
     id_to_key: HashMap<StringId, String>,
 }
 
@@ -173,13 +173,17 @@ pub fn build(
     }
 
     let ls = LocalizedStrings {
-        resource: Arc::new(resource),
+        resource: Some(Arc::new(resource)),
         id_to_key: table.0.iter().map(|row| (row.id, row.name.clone())).collect(),
     };
     if errors.is_empty() { Ok(ls) } else { Err(errors) }
 }
 
 impl LocalizedStrings {
+    fn resource(&self) -> Arc<FluentResource> {
+        self.resource.clone().expect("Resource is not set")
+    }
+
     /// Formats the localized string using Fluent. In the
     /// event of an error, a descriptive error code is returned instead.
     ///
@@ -201,7 +205,7 @@ impl LocalizedStrings {
         args.set("context", context.key());
         let mut bundle = FluentBundle::default();
         bundle.set_use_isolating(false);
-        if bundle.add_resource(self.resource.as_ref()).is_err() {
+        if bundle.add_resource(self.resource()).is_err() {
             return "ERR3: Add Resource Failed".to_string();
         }
         let key = match self.id_to_key.get(&id) {
@@ -234,7 +238,7 @@ impl LocalizedStrings {
         args.set("context", context.key());
         let mut bundle = FluentBundle::default();
         bundle.set_use_isolating(false);
-        if bundle.add_resource(self.resource.as_ref()).is_err() {
+        if bundle.add_resource(self.resource()).is_err() {
             return "ERR3: Add Resource Failed".to_string();
         }
         let ftl = format!("tmp-for-display = {}", normalize_literal(s));
@@ -247,7 +251,7 @@ impl LocalizedStrings {
                 &parser_errs.into_iter().map(FluentError::ParserError).collect::<Vec<_>>(),
             );
         }
-        if bundle.add_resource(&temp_res).is_err() {
+        if bundle.add_resource(Arc::new(temp_res)).is_err() {
             return "ERR3: Add Resource Failed".to_string();
         }
         let msg = match bundle.get_message("tmp-for-display") {

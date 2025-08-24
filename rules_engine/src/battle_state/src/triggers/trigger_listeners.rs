@@ -1,9 +1,11 @@
+use serde::{Deserialize, Serialize};
+
 use crate::battle::card_id::CardId;
 use crate::battle_cards::card_set::CardSet;
 use crate::triggers::trigger::TriggerName;
 
 /// Tracks cards which are currently listening for a trigger.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct TriggerListeners {
     pub abandoned: CardSet<CardId>,
     pub banished: CardSet<CardId>,

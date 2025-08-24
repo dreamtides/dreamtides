@@ -5,6 +5,7 @@ use ability_data::triggered_ability::TriggeredAbility;
 use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
 use enumset::EnumSet;
+use serde::{Deserialize, Serialize};
 
 use crate::triggers::trigger::TriggerName;
 
@@ -12,7 +13,7 @@ use crate::triggers::trigger::TriggerName;
 ///
 /// This is a wrapper around `Ability` which stores some precomputed state
 /// information to improve search performance.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct AbilityList {
     pub event_abilities: Vec<AbilityData<EventAbility>>,
     pub static_abilities: Vec<AbilityData<StaticAbility>>,
@@ -40,7 +41,7 @@ pub struct AbilityList {
 pub struct AbilityEffectFlags {}
 
 /// Wrapper around an ability which stores additional metadata.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AbilityData<T> {
     pub ability_number: AbilityNumber,
     pub ability: T,
@@ -53,7 +54,7 @@ pub struct AbilityData<T> {
 /// that we do not need to examine the the card's abilities to determine
 /// whether it can be played -- it is sufficient to look at this restriction
 /// in addition to standard things like whether its energy cost can be paid.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum CanPlayRestriction {
     Unrestricted,
     EnemyCharacterOnBattlefield,

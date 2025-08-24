@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use crate::actions::battle_actions::BattleAction;
 
 /// Tracks history of actions and events during a battle
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct BattleHistory {
     pub actions: Vec<BattleHistoryAction>,
 }

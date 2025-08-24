@@ -4,6 +4,7 @@ use core_data::card_types::CardType;
 use core_data::identifiers::CardIdentity;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::PlayerName;
+use serde::{Deserialize, Serialize};
 
 use crate::battle::card_id::{
     ActivatedAbilityId, BanishedCardId, CardId, CardIdType, CharacterId, DeckCardId, HandCardId,
@@ -34,7 +35,7 @@ pub struct CreatedCard {
     pub is_fast: bool,
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct AllCards {
     cards: Vec<BattleCardState>,
     battlefield: PlayerMap<CardSet<CharacterId>>,

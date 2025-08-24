@@ -2,10 +2,11 @@ use std::marker::PhantomData;
 use std::{fmt, iter};
 
 use bit_set::BitSet;
+use serde::{Deserialize, Serialize};
 
 use crate::battle::card_id::{CardId, CardIdType};
 
-#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct CardSet<T> {
     // - BitSet<usize> does around 2% better in our benchmarks than BitSet<u32>
     // - FixedBitSet generally seems to perform the same or worse.

@@ -31,7 +31,7 @@ use crate::core::effect_source::EffectSource;
 use crate::prompt_types::prompt_data::PromptData;
 use crate::triggers::trigger_state::TriggerState;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct BattleState {
     /// Unique identifier for this battle
     pub id: BattleId,
@@ -44,6 +44,7 @@ pub struct BattleState {
 
     /// Game rules database for this battle, containing definitions of cards
     /// etc.
+    #[serde(skip)]
     pub tabula: Arc<Tabula>,
 
     /// Player data for all players in this battle
@@ -89,9 +90,11 @@ pub struct BattleState {
 
     /// Animation tracker for this battle. If this is None it means we are not
     /// currently rendering for display.
+    #[serde(skip)]
     pub animations: Option<AnimationData>,
 
     /// Debug tracing data for this battle
+    #[serde(skip)]
     pub tracing: Option<BattleTracing>,
 
     /// History of actions and events during this battle.
@@ -113,7 +116,7 @@ pub struct BattleState {
 pub struct PendingEffectIndex(pub usize);
 
 /// Information about effects that are waiting to be applied.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct PendingEffect {
     /// Source of the effect.
     pub source: EffectSource,

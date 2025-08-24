@@ -8,7 +8,7 @@ ariadne = "0.2"
 axum = { version = "0.8", features = ["macros"] }
 axum-macros = "0.5"
 backtrace = "0.3"
-bit-set = "0.8"
+bit-set = { version = "0.8", features = ["serde"] }
 bit-vec = "0.8"
 bon = "3"
 chrono = "0.4"
@@ -32,12 +32,12 @@ parking_lot = "0.12"
 petgraph = "0.8"
 proptest = "1"
 rand = "0.9"
-rand_xoshiro = "0.7"
+rand_xoshiro = { version = "0.7", features = ["serde"] }
 rayon = "1"
 ron = "0.8"
 rusqlite = { version = "0.35", features = ["serde_json", "bundled", "uuid"] }
 schemars = { version = "1", features = ["uuid1"] }
-serde = { version = "1", features = ["derive"] }
+serde = { version = "1", features = ["derive", "rc"] }
 serde_json = "1"
 strum = { version = "0.27", features = ["derive"] }
 strum_macros = "0.27"

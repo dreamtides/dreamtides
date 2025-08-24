@@ -1,5 +1,7 @@
 use std::collections::VecDeque;
 
+use serde::{Deserialize, Serialize};
+
 use crate::battle::card_id::CardId;
 use crate::core::effect_source::EffectSource;
 use crate::triggers::trigger::Trigger;
@@ -16,14 +18,14 @@ use crate::triggers::trigger_listeners::TriggerListeners;
 ///
 /// Order of listeners being invoked within a single event is arbitrary
 /// (currently in CardID order).
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct TriggerState {
     pub listeners: TriggerListeners,
     pub events: VecDeque<TriggerForListener>,
 }
 
 /// A record of a trigger event for a specific listener.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TriggerForListener {
     pub source: EffectSource,
     pub listener: CardId,

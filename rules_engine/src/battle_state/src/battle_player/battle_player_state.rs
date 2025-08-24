@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 /// Terminology note: we always refer to a participant in a battle as a
 /// "player". We use the term "user" to refer to the human playing the game. For
 /// information about the user's overall save file state, refer to `UserData`.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct BattlePlayerState {
     /// Contains the player's UserId or AI game agent info.
     pub player_type: PlayerType,

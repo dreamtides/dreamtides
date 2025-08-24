@@ -4,6 +4,7 @@ use core_data::card_types::{CardSubtype, CardType};
 use core_data::display_types::SpriteAddress;
 use core_data::identifiers::BaseCardId;
 use core_data::numerics::{Energy, Spark};
+use serde::{Deserialize, Serialize};
 
 /// Describes the rules for a card.
 ///
@@ -13,7 +14,7 @@ use core_data::numerics::{Energy, Spark};
 /// Card definitions are stored in two different places: base card definitions
 /// exist directly in the tabula database, while modified card definitions exist
 /// in the quest state.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CardDefinition {
     /// The base card that this card definition is based on.
     pub base_card_id: BaseCardId,

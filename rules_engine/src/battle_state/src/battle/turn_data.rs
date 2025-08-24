@@ -1,8 +1,9 @@
 use core_data::numerics::TurnId;
 use core_data::types::PlayerName;
+use serde::{Deserialize, Serialize};
 
 /// Identifies a turn within the game.
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Serialize, Deserialize)]
 pub struct TurnData {
     /// Player whose turn it is or was.
     pub active_player: PlayerName,

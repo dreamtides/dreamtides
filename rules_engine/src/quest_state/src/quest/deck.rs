@@ -1,9 +1,10 @@
 use core_data::identifiers::BaseCardId;
+use serde::{Deserialize, Serialize};
 use tabula_data::card_definition::CardDefinition;
 use tabula_data::tabula::Tabula;
 
 /// Represents a player's deck during a quest or battle.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Deck {
     pub cards: Vec<CardDefinition>,
 }

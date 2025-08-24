@@ -1,5 +1,6 @@
 use core_data::identifiers::QuestId;
 use core_data::numerics::Essence;
+use serde::{Deserialize, Serialize};
 use user_state::user::user_state::UserState;
 
 use crate::quest::deck::Deck;
@@ -10,7 +11,7 @@ use crate::quest::deck::Deck;
 /// Note that both human and AI players have their own quests and QuestStates,
 /// although some of these details are hidden from the user. AI enemies build
 /// their decks by participating in simulated quests.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct QuestState {
     /// Unique identifier for this quest.
     pub id: QuestId,

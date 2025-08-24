@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use core_data::identifiers::CardIdentity;
+use serde::{Deserialize, Serialize};
 use tabula_data::card_definition::CardDefinition;
 
 use crate::battle::all_cards::CreatedCard;
@@ -8,7 +9,7 @@ use crate::battle_cards::ability_list::AbilityList;
 
 /// Stores the [CardDefinition] and [AbilityList]s for cards in this battle
 /// keyed by their [CardIdentity].
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct AbilityCache {
     cache_by_identity: Vec<Arc<AbilityList>>,
     definitions_by_identity: Vec<Arc<CardDefinition>>,

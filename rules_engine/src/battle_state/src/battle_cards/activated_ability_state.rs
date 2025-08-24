@@ -1,10 +1,12 @@
 use std::collections::BTreeSet;
 
+use serde::{Deserialize, Serialize};
+
 use crate::battle::card_id::{ActivatedAbilityId, CharacterId};
 use crate::battle_cards::card_set::CardSet;
 
 /// Stores state for activated abilities of a player in this battle.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ActivatedAbilityState {
     /// Characters in play which have activated abilities.
     ///

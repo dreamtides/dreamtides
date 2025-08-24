@@ -45,7 +45,7 @@ impl StackItemId {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct StackItemState {
     pub id: StackItemId,
     pub controller: PlayerName,
@@ -86,7 +86,7 @@ impl StackItemState {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum EffectTargets {
     /// A target for a standard effect.
     Standard(StandardEffectTarget),
@@ -129,7 +129,7 @@ impl EffectTargets {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum StandardEffectTarget {
     Character(CardObjectId<CharacterId>),
     StackCard(CardObjectId<StackCardId>),
@@ -148,7 +148,7 @@ impl StandardEffectTarget {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum StackCardAdditionalCostsPaid {
     None,
     Energy(Energy),

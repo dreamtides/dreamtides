@@ -1,11 +1,12 @@
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use enumset::EnumSetType;
+use serde::{Deserialize, Serialize};
 
 use crate::battle::card_id::{CharacterId, StackCardId, VoidCardId};
 
 /// Represents an event which can occur during a battle.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Trigger {
     Abandonded(VoidCardId),
     Banished(VoidCardId),

@@ -49,7 +49,7 @@ pub struct CardObjectId<T> {
 }
 
 /// Core state data for a card within a battle.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct BattleCardState {
     /// The identity of this card.
     ///

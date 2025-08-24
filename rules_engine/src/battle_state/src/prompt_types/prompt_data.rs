@@ -22,7 +22,7 @@ pub enum OnSelected {
 }
 
 /// Data for a prompt to be displayed to a player.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PromptData {
     /// Source which caused this prompt to be displayed
     pub source: EffectSource,
@@ -37,7 +37,7 @@ pub struct PromptData {
     pub configuration: PromptConfiguration,
 }
 
-#[derive(Debug, Clone, EnumDiscriminants)]
+#[derive(Debug, Clone, EnumDiscriminants, Serialize, Deserialize)]
 #[strum_discriminants()]
 pub enum PromptType {
     ChooseCharacter { on_selected: OnSelected, valid: CardSet<CharacterId> },
@@ -49,7 +49,7 @@ pub enum PromptType {
     SelectDeckCardOrder { prompt: SelectDeckCardOrderPrompt },
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChooseVoidCardPrompt {
     pub on_selected: OnSelected,
     pub valid: CardSet<VoidCardId>,
@@ -57,14 +57,14 @@ pub struct ChooseVoidCardPrompt {
     pub maximum_selection: u32,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ModalEffectPrompt {
     pub on_selected: OnSelected,
     pub choices: Vec<ModalEffectChoice>,
 }
 
 /// State for a prompt to select a deck card order.
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct SelectDeckCardOrderPrompt {
     /// Initial list of cards we are considering for ordering.
     pub initial: Vec<DeckCardId>,
@@ -80,13 +80,13 @@ pub struct SelectDeckCardOrderPrompt {
     pub void: CardSet<DeckCardId>,
 }
 
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]
 pub struct PromptConfiguration {
     /// Can the player select no option to resolve this prompt?
     pub optional: bool,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PromptChoice {
     /// Label to display for this choice.
     pub label: PromptChoiceLabel,
@@ -99,7 +99,7 @@ pub struct PromptChoice {
     pub targets: Option<EffectTargets>,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum PromptChoiceLabel {
     String(StringId),
     StringWithEnergy(StringId, Energy),
