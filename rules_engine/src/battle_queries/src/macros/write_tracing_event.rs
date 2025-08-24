@@ -259,13 +259,13 @@ fn write_json_to_log_file(json_str: &str, request_context: &RequestContext) -> b
                         return false;
                     }
                 }
-                return reset_file(&mut file, json_str);
+                reset_file(&mut file, json_str)
             }
-            Err(_) => return reset_file(&mut file, json_str),
+            Err(_) => reset_file(&mut file, json_str),
         },
         Err(e) => {
             error!(?log_path, "Failed to open dreamtides.json for appending: {}", e);
-            return false;
+            false
         }
     }
 }

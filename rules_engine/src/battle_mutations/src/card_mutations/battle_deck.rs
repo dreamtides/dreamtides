@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use battle_queries::battle_card_queries::{card, card_abilities};
 use battle_queries::{battle_trace, panic_with};
-use battle_state::battle::ability_cache::AbilityCache;
+use battle_state::battle::ability_cache::{AbilityCache, AbilityCacheCard};
 use battle_state::battle::all_cards::CreatedCard;
 use battle_state::battle::animation_data::AnimationStep;
 use battle_state::battle::battle_animation::BattleAnimation;
@@ -11,7 +11,6 @@ use battle_state::battle::card_id::{CardIdType, DeckCardId, HandCardId};
 use battle_state::battle_cards::card_set::CardSet;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger::Trigger;
-use core_data::identifiers::CardIdentity;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use rand::seq::IteratorRandom;
@@ -99,41 +98,16 @@ pub fn add_deck_copy(battle: &mut BattleState, player: PlayerName) {
 
 /// Adds a list of cards to a player's deck
 pub fn add_cards(battle: &mut BattleState, player: PlayerName, cards: &[CardDefinition]) {
-    let mut pairs = Vec::new();
-    let mut i = 0usize;
-    loop {
-        let id = CardIdentity(i);
-        if let Some(list) = battle.ability_cache.try_get_by_identity(id) {
-            let def = battle
-                .ability_cache
-                .try_get_definition(id)
-                .expect("missing definition for identity");
-            pairs.push((id, list, def));
-            i += 1;
-        } else {
-            break;
-        }
-    }
-
-    let mut created = Vec::new();
+    let mut new_cards = Vec::new();
     for definition in cards {
-        let identity = CardIdentity(i);
-        i += 1;
-        let ability_list = card_abilities::build_from_definition(definition);
-        let can_play_restriction = ability_list.can_play_restriction;
-        pairs.push((identity, Arc::new(ability_list), Arc::new(definition.clone())));
-        created.push(CreatedCard {
-            identity,
-            can_play_restriction,
-            base_energy_cost: definition.energy_cost,
-            base_spark: definition.spark,
-            card_type: definition.card_type,
-            is_fast: definition.is_fast,
-        });
+        let def_arc = Arc::new(definition.clone());
+        let list = Arc::new(card_abilities::build_from_definition(&def_arc));
+        new_cards.push(AbilityCacheCard { ability_list: list, definition: def_arc });
     }
 
-    battle.ability_cache = Arc::new(AbilityCache::from_pairs(pairs));
-    battle.cards.create_cards_in_deck(player, created);
+    let response = AbilityCache::append(&battle.ability_cache, new_cards);
+    battle.ability_cache = Arc::new(response.cache);
+    battle.cards.create_cards_in_deck(player, response.created);
 }
 
 /// Ensures that at least `count` cards are known at the top of a player's deck.

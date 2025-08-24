@@ -4,7 +4,7 @@ use std::sync::Arc;
 use battle_mutations::card_mutations::battle_deck;
 use battle_mutations::phase_mutations::turn;
 use battle_queries::battle_card_queries::card_abilities;
-use battle_state::battle::ability_cache::AbilityCache;
+use battle_state::battle::ability_cache::{AbilityCache, AbilityCacheCard};
 use battle_state::battle::all_cards::AllCards;
 use battle_state::battle::battle_rules_config::BattleRulesConfig;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
@@ -19,7 +19,7 @@ use battle_state::battle_player::battle_player_state::{
 use battle_state::battle_player::player_map::PlayerMap;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger_state::TriggerState;
-use core_data::identifiers::{BattleId, CardIdentity, QuestId, UserId};
+use core_data::identifiers::{BattleId, QuestId, UserId};
 use core_data::numerics::{Energy, Essence, Points, Spark, TurnId};
 use core_data::types::PlayerName;
 use quest_state::quest::deck::Deck;
@@ -43,27 +43,45 @@ pub fn create_and_start(
     let quest_one = Arc::new(create_quest_state(&tabula, player_one.deck_name));
     let quest_two = Arc::new(create_quest_state(&tabula, player_two.deck_name));
 
-    let mut pairs = Vec::new();
-    let mut deck_one = Vec::new();
-    let mut deck_two = Vec::new();
-    let mut next_identity = 0usize;
-
+    let mut cache_cards = Vec::new();
     for definition in &quest_one.deck.cards {
-        let identity = CardIdentity(next_identity);
-        next_identity += 1;
         let ability_list = card_abilities::build_from_definition(definition);
-        pairs.push((identity, Arc::new(ability_list), Arc::new(definition.clone())));
-        deck_one.push(BattleDeckCard { identity, definition: Arc::new(definition.clone()) });
+        cache_cards.push(AbilityCacheCard {
+            ability_list: Arc::new(ability_list),
+            definition: Arc::new(definition.clone()),
+        });
     }
     for definition in &quest_two.deck.cards {
-        let identity = CardIdentity(next_identity);
-        next_identity += 1;
         let ability_list = card_abilities::build_from_definition(definition);
-        pairs.push((identity, Arc::new(ability_list), Arc::new(definition.clone())));
-        deck_two.push(BattleDeckCard { identity, definition: Arc::new(definition.clone()) });
+        cache_cards.push(AbilityCacheCard {
+            ability_list: Arc::new(ability_list),
+            definition: Arc::new(definition.clone()),
+        });
     }
 
-    let ability_cache = Arc::new(AbilityCache::from_pairs(pairs));
+    let ability_cache_response = AbilityCache::build(cache_cards);
+    let ability_cache = Arc::new(ability_cache_response.cache);
+
+    let created = ability_cache_response.created;
+    let deck_one_len = quest_one.deck.cards.len();
+    let deck_one = created
+        .iter()
+        .take(deck_one_len)
+        .enumerate()
+        .map(|(i, c)| BattleDeckCard {
+            identity: c.identity,
+            definition: Arc::new(quest_one.deck.cards[i].clone()),
+        })
+        .collect::<Vec<_>>();
+    let deck_two = created
+        .iter()
+        .skip(deck_one_len)
+        .enumerate()
+        .map(|(i, c)| BattleDeckCard {
+            identity: c.identity,
+            definition: Arc::new(quest_two.deck.cards[i].clone()),
+        })
+        .collect::<Vec<_>>();
 
     let mut battle = BattleState {
         id,

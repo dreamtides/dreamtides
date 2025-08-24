@@ -6,7 +6,7 @@ use battle_mutations::card_mutations::battle_deck;
 use battle_queries::battle_card_queries::{card, card_abilities};
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
-use battle_state::battle::ability_cache::AbilityCache;
+use battle_state::battle::ability_cache::{AbilityCache, AbilityCacheCard};
 use battle_state::battle::all_cards::AllCards;
 use battle_state::battle::battle_rules_config::BattleRulesConfig;
 use battle_state::battle::battle_state::{BattleState, LoggingOptions, RequestContext};
@@ -22,7 +22,7 @@ use battle_state::battle_player::battle_player_state::{
 };
 use battle_state::battle_player::player_map::PlayerMap;
 use battle_state::triggers::trigger_state::TriggerState;
-use core_data::identifiers::{BaseCardId, BattleId, CardIdentity};
+use core_data::identifiers::{BaseCardId, BattleId};
 use core_data::numerics::{Energy, Points, Spark, TurnId};
 use core_data::types::PlayerName;
 use game_creation::new_test_battle;
@@ -266,13 +266,14 @@ pub fn benchmark_battle() -> BattleState {
     let streaming_assets_path = logging::get_developer_mode_streaming_assets_path();
     let _ = provider.initialize("/tmp/test", &streaming_assets_path);
 
-    let mut pairs = Vec::new();
-    for (next_identity, spec) in card_specs.iter().enumerate() {
+    let mut cache_cards = Vec::new();
+    for spec in card_specs.iter() {
         let def = provider.tabula().test_cards.get(&spec.name).unwrap().clone();
         let list = card_abilities::build_from_definition(&def);
-        pairs.push((CardIdentity(next_identity), Arc::new(list), Arc::new(def)));
+        cache_cards
+            .push(AbilityCacheCard { ability_list: Arc::new(list), definition: Arc::new(def) });
     }
-    let ability_cache = Arc::new(AbilityCache::from_pairs(pairs));
+    let ability_cache = Arc::new(AbilityCache::build(cache_cards).cache);
 
     let mut battle = BattleState {
         id: BattleId(Uuid::new_v4()),
