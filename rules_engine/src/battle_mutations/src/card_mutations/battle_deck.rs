@@ -79,18 +79,16 @@ pub fn draw_cards(battle: &mut BattleState, source: EffectSource, player: Player
 pub fn add_deck_copy(battle: &mut BattleState, player: PlayerName) {
     let mut cards = Vec::new();
     for card in &battle.players.player(player).deck {
-        let can_play_restriction = battle
-            .ability_cache
-            .try_get_by_identity(card.identity)
-            .map(|list| list.can_play_restriction)
-            .unwrap_or(None);
+        let ability_list = battle.ability_cache.try_get_by_identity(*card).unwrap();
+        let definition = battle.ability_cache.try_get_definition(*card).unwrap();
+        let can_play_restriction = ability_list.can_play_restriction;
         cards.push(CreatedCard {
-            identity: card.identity,
+            identity: *card,
             can_play_restriction,
-            base_energy_cost: card.definition.energy_cost,
-            base_spark: card.definition.spark,
-            card_type: card.definition.card_type,
-            is_fast: card.definition.is_fast,
+            base_energy_cost: definition.energy_cost,
+            base_spark: definition.spark,
+            card_type: definition.card_type,
+            is_fast: definition.is_fast,
         });
     }
     battle.cards.create_cards_in_deck(player, cards);

@@ -14,7 +14,7 @@ use battle_state::battle::turn_data::TurnData;
 use battle_state::battle::turn_history::TurnHistory;
 use battle_state::battle_cards::ability_state::AbilityState;
 use battle_state::battle_player::battle_player_state::{
-    BattleDeckCard, BattlePlayerState, CreateBattlePlayer, TestDeckName,
+    BattlePlayerState, CreateBattlePlayer, TestDeckName,
 };
 use battle_state::battle_player::player_map::PlayerMap;
 use battle_state::core::effect_source::EffectSource;
@@ -64,24 +64,8 @@ pub fn create_and_start(
 
     let created = ability_cache_response.created;
     let deck_one_len = quest_one.deck.cards.len();
-    let deck_one = created
-        .iter()
-        .take(deck_one_len)
-        .enumerate()
-        .map(|(i, c)| BattleDeckCard {
-            identity: c.identity,
-            definition: Arc::new(quest_one.deck.cards[i].clone()),
-        })
-        .collect::<Vec<_>>();
-    let deck_two = created
-        .iter()
-        .skip(deck_one_len)
-        .enumerate()
-        .map(|(i, c)| BattleDeckCard {
-            identity: c.identity,
-            definition: Arc::new(quest_two.deck.cards[i].clone()),
-        })
-        .collect::<Vec<_>>();
+    let deck_one = created.iter().take(deck_one_len).map(|c| c.identity).collect::<Vec<_>>();
+    let deck_two = created.iter().skip(deck_one_len).map(|c| c.identity).collect::<Vec<_>>();
 
     let mut battle = BattleState {
         id,

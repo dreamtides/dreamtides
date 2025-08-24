@@ -6,7 +6,6 @@ use core_data::numerics::{Energy, Points, Spark};
 use quest_state::quest::quest_state::QuestState;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use tabula_data::card_definition::CardDefinition;
 
 /// Represents the state of a player within a battle.
 ///
@@ -37,16 +36,10 @@ pub struct BattlePlayerState {
     ///
     /// Cards in this deck are assumed to have already been populated in the
     /// ability cache when the battle is created.
-    pub deck: Vec<BattleDeckCard>,
+    pub deck: Vec<CardIdentity>,
 
     /// The player's quest state.
     pub quest: Arc<QuestState>,
-}
-
-#[derive(Clone, Debug)]
-pub struct BattleDeckCard {
-    pub identity: CardIdentity,
-    pub definition: Arc<CardDefinition>,
 }
 
 impl BattlePlayerState {
