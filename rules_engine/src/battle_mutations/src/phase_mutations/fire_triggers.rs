@@ -1,5 +1,5 @@
 use ability_data::triggered_ability::TriggeredAbility;
-use battle_queries::battle_card_queries::{card_abilities, card_properties};
+use battle_queries::battle_card_queries::{card, card_properties};
 use battle_queries::card_ability_queries::trigger_queries;
 use battle_state::battle::battle_animation::{BattleAnimation, TriggerAnimation};
 use battle_state::battle::battle_state::BattleState;
@@ -48,7 +48,7 @@ pub fn execute_if_no_active_prompt(battle: &mut BattleState) {
             continue;
         };
 
-        for ability_data in &card_abilities::query(battle, character_id).triggered_abilities {
+        for ability_data in &card::ability_list(battle, character_id).triggered_abilities {
             if trigger_queries::matches(
                 battle,
                 trigger_for_listener.trigger,
@@ -89,7 +89,7 @@ fn set_displayed_active_triggers(battle: &mut BattleState, previous: &mut Vec<Tr
         else {
             continue;
         };
-        for ability_data in &card_abilities::query(battle, character_id).triggered_abilities {
+        for ability_data in &card::ability_list(battle, character_id).triggered_abilities {
             if trigger_queries::matches(
                 battle,
                 trigger_for_listener.trigger,

@@ -1,5 +1,5 @@
 use ability_data::effect::ModelEffectChoiceIndex;
-use battle_queries::battle_card_queries::card_abilities;
+use battle_queries::battle_card_queries::card;
 use battle_queries::battle_trace;
 use battle_queries::card_ability_queries::effect_prompts;
 use battle_state::battle::battle_state::BattleState;
@@ -16,7 +16,7 @@ pub fn add(
     card_id: StackCardId,
     modal_choice: Option<ModelEffectChoiceIndex>,
 ) {
-    for data in &card_abilities::query(battle, card_id).event_abilities {
+    for data in &card::ability_list(battle, card_id).event_abilities {
         let source = EffectSource::Event {
             controller: player,
             stack_card_id: card_id,
@@ -47,7 +47,7 @@ pub fn add_for_activated_ability(
     activated_ability_id: ActivatedAbilityId,
     modal_choice: Option<ModelEffectChoiceIndex>,
 ) {
-    let abilities = card_abilities::query(battle, activated_ability_id.character_id);
+    let abilities = card::ability_list(battle, activated_ability_id.character_id);
     if let Some(ability_data) = abilities
         .activated_abilities
         .iter()

@@ -50,9 +50,8 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
                 &CardViewContext::Battle(
                     battle,
                     battle
-                        .ability_cache
-                        .try_get_definition(card::get(battle, id).identity)
-                        .expect("definition missing for identity")
+                        .card_definitions
+                        .get_definition(card::get(battle, id).identity)
                         .base_card_id,
                     id,
                 ),

@@ -9,7 +9,7 @@ use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 
-use crate::battle_card_queries::{card, card_abilities, card_properties};
+use crate::battle_card_queries::{card, card_properties};
 use crate::card_ability_queries::effect_queries;
 use crate::legal_action_queries::{
     has_legal_additional_costs, has_legal_targets, legal_modal_effect_choices,
@@ -115,7 +115,7 @@ pub fn play_from_void_energy_cost(
     card_id: VoidCardId,
     ability_id: AbilityId,
 ) -> Energy {
-    let abilities = card_abilities::query(battle, ability_id.card_id);
+    let abilities = card::ability_list(battle, ability_id.card_id);
     let cost = abilities
         .static_abilities
         .iter()
@@ -154,7 +154,7 @@ pub fn can_play_from_void_energy_cost(
     battle: &BattleState,
     card_id: VoidCardId,
 ) -> Option<FromVoidWithCost> {
-    card_abilities::query(battle, card_id)
+    card::ability_list(battle, card_id)
         .static_abilities
         .iter()
         .filter_map(|ability_data| {

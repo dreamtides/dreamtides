@@ -6,8 +6,10 @@ use battle_mutations::card_mutations::battle_deck;
 use battle_queries::battle_card_queries::{card, card_abilities};
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::actions::battle_actions::BattleAction;
-use battle_state::battle::ability_cache::{AbilityCache, AbilityCacheCard};
 use battle_state::battle::all_cards::AllCards;
+use battle_state::battle::battle_card_definitions::{
+    BattleCardDefinitions, BattleCardDefinitionsCard,
+};
 use battle_state::battle::battle_rules_config::BattleRulesConfig;
 use battle_state::battle::battle_state::{BattleState, LoggingOptions, RequestContext};
 use battle_state::battle::battle_status::BattleStatus;
@@ -270,17 +272,19 @@ pub fn benchmark_battle() -> BattleState {
     for spec in card_specs.iter() {
         let def = provider.tabula().test_cards.get(&spec.name).unwrap().clone();
         let list = card_abilities::build_from_definition(&def);
-        cache_cards
-            .push(AbilityCacheCard { ability_list: Arc::new(list), definition: Arc::new(def) });
+        cache_cards.push(BattleCardDefinitionsCard {
+            ability_list: Arc::new(list),
+            definition: Arc::new(def),
+        });
     }
-    let ability_cache = Arc::new(AbilityCache::build(cache_cards).cache);
+    let ability_cache = Arc::new(BattleCardDefinitions::build(cache_cards).cache);
 
     let mut battle = BattleState {
         id: BattleId(Uuid::new_v4()),
         cards: AllCards::default(),
         rules_config: BattleRulesConfig { points_to_win: Points(25) },
         tabula: provider.tabula(),
-        ability_cache,
+        card_definitions: ability_cache,
         players: PlayerMap {
             one: BattlePlayerState {
                 player_type: PlayerType::Agent(GameAI::AlwaysPanic),

@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use ability_data::ability::Ability;
 use ability_data::cost::Cost;
 use ability_data::effect::Effect;
@@ -7,8 +5,6 @@ use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
 use ability_data::static_ability::{PlayFromVoid, StandardStaticAbility};
 use ability_data::trigger_event::TriggerEvent;
-use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::CardIdType;
 use battle_state::battle_cards::ability_list::{AbilityData, AbilityList, CanPlayRestriction};
 use battle_state::triggers::trigger::TriggerName;
 use core_data::identifiers::AbilityNumber;
@@ -16,16 +12,8 @@ use core_data::numerics::Energy;
 use enumset::EnumSet;
 use tabula_data::card_definition::CardDefinition;
 
-use crate::battle_card_queries::{build_named_abilities, card};
+use crate::battle_card_queries::build_named_abilities;
 use crate::card_ability_queries::{effect_queries, target_predicates};
-
-pub fn query(battle: &BattleState, card_id: impl CardIdType) -> Arc<AbilityList> {
-    battle.ability_cache.try_get_by_identity(card::get(battle, card_id).identity).unwrap_or_else(
-        || {
-            panic!("definition missing for card {card_id:?}");
-        },
-    )
-}
 
 /// Builds an ability list from a card definition for a specific identity.
 pub fn build_from_definition(definition: &CardDefinition) -> AbilityList {

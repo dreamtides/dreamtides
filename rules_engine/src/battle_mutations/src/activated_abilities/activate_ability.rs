@@ -1,5 +1,5 @@
 use ability_data::effect::ModelEffectChoiceIndex;
-use battle_queries::battle_card_queries::card_abilities;
+use battle_queries::battle_card_queries::card;
 use battle_queries::{battle_trace, panic_with};
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
@@ -20,7 +20,7 @@ pub fn execute(
     battle_trace!("Activating ability", battle, player, activated_ability_id);
     let source = EffectSource::Activated { controller: player, activated_ability_id };
 
-    let abilities = card_abilities::query(battle, activated_ability_id.character_id);
+    let abilities = card::ability_list(battle, activated_ability_id.character_id);
     let Some(ability_data) = abilities
         .activated_abilities
         .iter()

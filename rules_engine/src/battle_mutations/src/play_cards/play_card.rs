@@ -1,6 +1,6 @@
 use ability_data::effect::ModelEffectChoiceIndex;
 use ability_data::static_ability::StandardStaticAbility;
-use battle_queries::battle_card_queries::{card_abilities, card_properties};
+use battle_queries::battle_card_queries::{card, card_properties};
 use battle_queries::legal_action_queries::can_play_cards;
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
@@ -107,7 +107,7 @@ fn apply_if_you_do_effect(
     via_ability: AbilityId,
 ) {
     let source = EffectSource::IfYouDo { controller: player, ability_id: via_ability };
-    let abilities = card_abilities::query(battle, via_ability.card_id);
+    let abilities = card::ability_list(battle, via_ability.card_id);
     if let Some(ability_data) =
         abilities.static_abilities.iter().find(|a| a.ability_number == via_ability.ability_number)
         && let StandardStaticAbility::PlayFromVoid(play) =

@@ -1,4 +1,4 @@
-use battle_queries::battle_card_queries::{card, card_abilities, card_properties};
+use battle_queries::battle_card_queries::{card, card_properties};
 use battle_queries::panic_with;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{
@@ -230,7 +230,7 @@ fn on_enter_battlefield(
     controller: PlayerName,
     card_id: CardId,
 ) {
-    let ability_list = card_abilities::query(battle, card_id);
+    let ability_list = card::ability_list(battle, card_id);
     let triggers = ability_list.battlefield_triggers;
     for trigger in triggers {
         battle.triggers.listeners.add_listener(trigger, card_id);
@@ -255,7 +255,7 @@ fn on_leave_battlefield(
     card_id: CardId,
     new: &mut Zone,
 ) {
-    let ability_list = card_abilities::query(battle, card_id);
+    let ability_list = card::ability_list(battle, card_id);
     let triggers = ability_list.battlefield_triggers;
     for trigger in triggers {
         battle.triggers.listeners.remove_listener(trigger, card_id);
@@ -274,7 +274,7 @@ fn on_leave_battlefield(
 }
 
 fn on_enter_void(battle: &mut BattleState, controller: PlayerName, card_id: CardId) {
-    let ability_list = card_abilities::query(battle, card_id);
+    let ability_list = card::ability_list(battle, card_id);
     if ability_list.has_play_from_void_ability {
         battle
             .ability_state
@@ -285,7 +285,7 @@ fn on_enter_void(battle: &mut BattleState, controller: PlayerName, card_id: Card
 }
 
 fn on_leave_void(battle: &mut BattleState, controller: PlayerName, card_id: CardId) {
-    let ability_list = card_abilities::query(battle, card_id);
+    let ability_list = card::ability_list(battle, card_id);
     if ability_list.has_play_from_void_ability {
         battle
             .ability_state
@@ -296,7 +296,7 @@ fn on_leave_void(battle: &mut BattleState, controller: PlayerName, card_id: Card
 }
 
 fn on_enter_stack(battle: &mut BattleState, card_id: CardId) {
-    let ability_list = card_abilities::query(battle, card_id);
+    let ability_list = card::ability_list(battle, card_id);
     let triggers = ability_list.stack_triggers;
     for trigger in triggers {
         battle.triggers.listeners.add_listener(trigger, card_id);
@@ -304,7 +304,7 @@ fn on_enter_stack(battle: &mut BattleState, card_id: CardId) {
 }
 
 fn on_leave_stack(battle: &mut BattleState, card_id: CardId, new: &mut Zone) {
-    let ability_list = card_abilities::query(battle, card_id);
+    let ability_list = card::ability_list(battle, card_id);
     let triggers = ability_list.stack_triggers;
     for trigger in triggers {
         battle.triggers.listeners.remove_listener(trigger, card_id);

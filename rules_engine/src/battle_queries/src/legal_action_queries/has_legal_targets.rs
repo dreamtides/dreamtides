@@ -5,13 +5,13 @@ use battle_state::battle::card_id::{CardId, StackCardId};
 use battle_state::core::effect_source::EffectSource;
 use core_data::types::PlayerName;
 
-use crate::battle_card_queries::card_abilities;
+use crate::battle_card_queries::card;
 use crate::card_ability_queries::{effect_predicates, effect_queries, target_predicates};
 
 /// Returns true if the given card has legal targets for its event abilities, or
 /// if this card does not require targets.
 pub fn for_event(battle: &BattleState, controller: PlayerName, card_id: CardId) -> bool {
-    for data in &card_abilities::query(battle, card_id).event_abilities {
+    for data in &card::ability_list(battle, card_id).event_abilities {
         let source = EffectSource::Event {
             controller,
             stack_card_id: StackCardId(card_id),

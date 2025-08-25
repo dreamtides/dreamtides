@@ -4,8 +4,10 @@ use std::sync::Arc;
 use battle_mutations::card_mutations::battle_deck;
 use battle_mutations::phase_mutations::turn;
 use battle_queries::battle_card_queries::card_abilities;
-use battle_state::battle::ability_cache::{AbilityCache, AbilityCacheCard};
 use battle_state::battle::all_cards::AllCards;
+use battle_state::battle::battle_card_definitions::{
+    BattleCardDefinitions, BattleCardDefinitionsCard,
+};
 use battle_state::battle::battle_rules_config::BattleRulesConfig;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle::battle_status::BattleStatus;
@@ -46,20 +48,20 @@ pub fn create_and_start(
     let mut cache_cards = Vec::new();
     for definition in &quest_one.deck.cards {
         let ability_list = card_abilities::build_from_definition(definition);
-        cache_cards.push(AbilityCacheCard {
+        cache_cards.push(BattleCardDefinitionsCard {
             ability_list: Arc::new(ability_list),
             definition: Arc::new(definition.clone()),
         });
     }
     for definition in &quest_two.deck.cards {
         let ability_list = card_abilities::build_from_definition(definition);
-        cache_cards.push(AbilityCacheCard {
+        cache_cards.push(BattleCardDefinitionsCard {
             ability_list: Arc::new(ability_list),
             definition: Arc::new(definition.clone()),
         });
     }
 
-    let ability_cache_response = AbilityCache::build(cache_cards);
+    let ability_cache_response = BattleCardDefinitions::build(cache_cards);
     let ability_cache = Arc::new(ability_cache_response.cache);
 
     let created = ability_cache_response.created;
@@ -72,7 +74,7 @@ pub fn create_and_start(
         cards: AllCards::default(),
         rules_config: BattleRulesConfig { points_to_win: Points(12) },
         tabula,
-        ability_cache,
+        card_definitions: ability_cache,
         players: PlayerMap {
             one: BattlePlayerState {
                 player_type: player_one.player_type,

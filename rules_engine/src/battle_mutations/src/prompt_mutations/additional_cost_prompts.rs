@@ -1,5 +1,5 @@
 use ability_data::cost::Cost;
-use battle_queries::battle_card_queries::card_abilities;
+use battle_queries::battle_card_queries::card;
 use battle_queries::battle_trace;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::StackCardId;
@@ -11,7 +11,7 @@ use core_data::types::PlayerName;
 /// Adds a prompt for the controller of the `card_id` card to pay additional
 /// costs for this card, if any.
 pub fn add(battle: &mut BattleState, controller: PlayerName, card_id: StackCardId) {
-    for data in &card_abilities::query(battle, card_id).event_abilities {
+    for data in &card::ability_list(battle, card_id).event_abilities {
         if let Some(additional_cost) = &data.ability.additional_cost {
             let source = EffectSource::Event {
                 controller,

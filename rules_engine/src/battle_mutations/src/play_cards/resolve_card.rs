@@ -1,4 +1,4 @@
-use battle_queries::battle_card_queries::{card_abilities, card_properties};
+use battle_queries::battle_card_queries::{card, card_properties};
 use battle_queries::{assert_that, battle_trace, panic_with};
 use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
@@ -81,7 +81,7 @@ fn apply_event_effects(battle: &mut BattleState, item: &StackItemState, card_id:
         battle,
         item.controller,
         card_id,
-        &card_abilities::query(battle, card_id).event_abilities,
+        &card::ability_list(battle, card_id).event_abilities,
         item.targets.as_ref(),
         item.modal_choice,
     );
@@ -93,7 +93,7 @@ fn resolve_activated_ability(
     ability_id: ActivatedAbilityId,
 ) {
     battle_trace!("Resolving activated ability", battle, ability_id);
-    let abilities = card_abilities::query(battle, ability_id.character_id);
+    let abilities = card::ability_list(battle, ability_id.character_id);
     let Some(ability_data) = abilities
         .activated_abilities
         .iter()

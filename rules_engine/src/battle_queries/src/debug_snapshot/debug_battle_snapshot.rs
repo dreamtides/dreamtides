@@ -14,7 +14,7 @@ use battle_state::prompt_types::prompt_data::{PromptData, PromptType};
 use core_data::types::PlayerName;
 use strum::IntoDiscriminant;
 
-use crate::battle_card_queries::{card, card_abilities, card_properties};
+use crate::battle_card_queries::{card, card_properties};
 
 /// Builds a human-readable representation of the state of the battle suitable
 /// for use in logging & debugging.
@@ -139,7 +139,7 @@ fn debug_card_state(
     current_zone: Zone,
     card_id: CardId,
 ) -> DebugCardState {
-    let ability_list = card_abilities::query(battle, card_id);
+    let ability_list = card::ability_list(battle, card_id);
     DebugCardState {
         id: format!("{card_id:?}"),
         object_id: format!("{:?}", card::get(battle, card_id).object_id),

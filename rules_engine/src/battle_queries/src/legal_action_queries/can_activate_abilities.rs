@@ -2,7 +2,7 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::ActivatedAbilityId;
 use core_data::types::PlayerName;
 
-use crate::battle_card_queries::card_abilities;
+use crate::battle_card_queries::card;
 use crate::battle_player_queries::costs;
 use crate::legal_action_queries::can_play_cards::FastOnly;
 
@@ -20,7 +20,7 @@ pub fn for_player(
     let mut activatable_abilities = Vec::new();
 
     for character_id in battle.activated_abilities.player(player).characters.iter() {
-        let abilities = card_abilities::query(battle, character_id);
+        let abilities = card::ability_list(battle, character_id);
 
         for ability_data in &abilities.activated_abilities {
             let options = ability_data.ability.options.as_ref();

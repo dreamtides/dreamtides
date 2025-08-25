@@ -1,6 +1,6 @@
 use ability_data::cost::Cost;
 use action_data::game_action_data::GameAction;
-use battle_queries::battle_card_queries::{card, card_abilities, card_properties};
+use battle_queries::battle_card_queries::{card, card_properties};
 use battle_queries::legal_action_queries::legal_actions_data::ForPlayer;
 use battle_queries::legal_action_queries::{can_play_cards, legal_actions};
 use battle_state::actions::battle_actions::BattleAction;
@@ -69,7 +69,7 @@ pub fn all_user_character_activated_abilities(
     character_id: CharacterId,
     token_offset: &mut usize,
 ) -> Vec<CardView> {
-    let abilities = card_abilities::query(battle, character_id);
+    let abilities = card::ability_list(battle, character_id);
     let player = builder.act_for_player();
     let base_sorting_key = battle.cards.next_object_id_for_display().0 + *token_offset;
 
@@ -152,7 +152,7 @@ fn activated_ability_card_view(
     hand_sorting_key: Option<u32>,
 ) -> CardView {
     let character_card_id = ability.character_id.card_id();
-    let abilities = card_abilities::query(battle, character_card_id);
+    let abilities = card::ability_list(battle, character_card_id);
 
     let ability_data = abilities
         .activated_abilities

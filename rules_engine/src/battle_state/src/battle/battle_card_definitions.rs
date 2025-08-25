@@ -7,10 +7,10 @@ use tabula_data::card_definition::CardDefinition;
 use crate::battle::all_cards::CreatedCard;
 use crate::battle_cards::ability_list::AbilityList;
 
-/// Stores the [CardDefinition] and [AbilityList]s for cards in this battle
+/// Stores the [CardDefinition]s and [AbilityList]s for cards in this battle
 /// keyed by their [CardIdentity].
 #[derive(Default, Debug, Serialize, Deserialize)]
-pub struct AbilityCache {
+pub struct BattleCardDefinitions {
     #[serde(default)]
     cache_by_identity: Vec<Arc<AbilityList>>,
     #[serde(default)]
@@ -18,44 +18,48 @@ pub struct AbilityCache {
 }
 
 /// Describes a card definition to add to the cache.
-pub struct AbilityCacheCard {
+pub struct BattleCardDefinitionsCard {
     pub ability_list: Arc<AbilityList>,
     pub definition: Arc<CardDefinition>,
 }
 
-/// Returns the result of a [AbilityCache::build] operation.
-pub struct AbilityCacheResponse {
-    pub cache: AbilityCache,
+/// Returns the result of a [BattleCardDefinitions::build] operation.
+pub struct BattleCardDefinitionsResponse {
+    pub cache: BattleCardDefinitions,
     pub created: Vec<CreatedCard>,
 }
 
-impl AbilityCache {
-    pub fn try_get_by_identity(&self, identity: CardIdentity) -> Option<Arc<AbilityList>> {
-        self.cache_by_identity.get(identity.0).cloned()
+impl BattleCardDefinitions {
+    pub fn get_ability_list(&self, identity: CardIdentity) -> Arc<AbilityList> {
+        self.cache_by_identity[identity.0].clone()
     }
 
-    pub fn try_get_definition(&self, identity: CardIdentity) -> Option<Arc<CardDefinition>> {
-        self.definitions_by_identity.get(identity.0).cloned()
+    pub fn get_definition(&self, identity: CardIdentity) -> Arc<CardDefinition> {
+        self.definitions_by_identity[identity.0].clone()
     }
 
-    /// Builds a new [AbilityCache] from a list of [AbilityCacheCard]s.
-    pub fn build(cards: Vec<AbilityCacheCard>) -> AbilityCacheResponse {
+    /// Builds a new [BattleCardDefinitions] from a list of
+    /// [BattleCardDefinitionsCard]s.
+    pub fn build(cards: Vec<BattleCardDefinitionsCard>) -> BattleCardDefinitionsResponse {
         let initial_lists: Vec<Arc<AbilityList>> = Vec::new();
         let initial_defs: Vec<Arc<CardDefinition>> = Vec::new();
         Self::build_with_initial(&initial_lists, &initial_defs, cards)
     }
 
-    /// Builds a new [AbilityCache] by appending a list of [AbilityCacheCard]s
-    /// to this [AbilityCache].
-    pub fn append(self: &AbilityCache, cards: Vec<AbilityCacheCard>) -> AbilityCacheResponse {
+    /// Builds a new [BattleCardDefinitions] by appending a list of
+    /// [BattleCardDefinitionsCard]s to this [BattleCardDefinitions].
+    pub fn append(
+        self: &BattleCardDefinitions,
+        cards: Vec<BattleCardDefinitionsCard>,
+    ) -> BattleCardDefinitionsResponse {
         Self::build_with_initial(&self.cache_by_identity, &self.definitions_by_identity, cards)
     }
 
     fn build_with_initial(
         initial_lists: &[Arc<AbilityList>],
         initial_defs: &[Arc<CardDefinition>],
-        cards: Vec<AbilityCacheCard>,
-    ) -> AbilityCacheResponse {
+        cards: Vec<BattleCardDefinitionsCard>,
+    ) -> BattleCardDefinitionsResponse {
         let start = initial_lists.len();
         let mut cache_by_identity = Vec::with_capacity(start + cards.len());
         let mut definitions_by_identity = Vec::with_capacity(start + cards.len());
@@ -77,8 +81,8 @@ impl AbilityCache {
             });
         }
 
-        AbilityCacheResponse {
-            cache: AbilityCache { cache_by_identity, definitions_by_identity },
+        BattleCardDefinitionsResponse {
+            cache: BattleCardDefinitions { cache_by_identity, definitions_by_identity },
             created,
         }
     }

@@ -2,10 +2,12 @@ use std::sync::Arc;
 
 use battle_queries::battle_card_queries::{card, card_abilities};
 use battle_queries::{battle_trace, panic_with};
-use battle_state::battle::ability_cache::{AbilityCache, AbilityCacheCard};
 use battle_state::battle::all_cards::CreatedCard;
 use battle_state::battle::animation_data::AnimationStep;
 use battle_state::battle::battle_animation::BattleAnimation;
+use battle_state::battle::battle_card_definitions::{
+    BattleCardDefinitions, BattleCardDefinitionsCard,
+};
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardIdType, DeckCardId, HandCardId};
 use battle_state::battle_cards::card_set::CardSet;
@@ -79,8 +81,8 @@ pub fn draw_cards(battle: &mut BattleState, source: EffectSource, player: Player
 pub fn add_deck_copy(battle: &mut BattleState, player: PlayerName) {
     let mut cards = Vec::new();
     for card in &battle.players.player(player).deck {
-        let ability_list = battle.ability_cache.try_get_by_identity(*card).unwrap();
-        let definition = battle.ability_cache.try_get_definition(*card).unwrap();
+        let ability_list = battle.card_definitions.get_ability_list(*card);
+        let definition = battle.card_definitions.get_definition(*card);
         let can_play_restriction = ability_list.can_play_restriction;
         cards.push(CreatedCard {
             identity: *card,
@@ -100,11 +102,11 @@ pub fn add_cards(battle: &mut BattleState, player: PlayerName, cards: &[CardDefi
     for definition in cards {
         let def_arc = Arc::new(definition.clone());
         let list = Arc::new(card_abilities::build_from_definition(&def_arc));
-        new_cards.push(AbilityCacheCard { ability_list: list, definition: def_arc });
+        new_cards.push(BattleCardDefinitionsCard { ability_list: list, definition: def_arc });
     }
 
-    let response = AbilityCache::append(&battle.ability_cache, new_cards);
-    battle.ability_cache = Arc::new(response.cache);
+    let response = BattleCardDefinitions::append(&battle.card_definitions, new_cards);
+    battle.card_definitions = Arc::new(response.cache);
     battle.cards.create_cards_in_deck(player, response.created);
 }
 

@@ -4,13 +4,13 @@ use battle_state::battle::card_id::{CardId, StackCardId};
 use battle_state::core::effect_source::EffectSource;
 use core_data::types::PlayerName;
 
-use crate::battle_card_queries::card_abilities;
+use crate::battle_card_queries::card;
 use crate::legal_action_queries::has_legal_targets;
 
 /// Returns true if the given card has any legal modal effect choices for its
 /// event abilities.
 pub fn event_has_legal_choices(battle: &BattleState, player: PlayerName, card_id: CardId) -> bool {
-    for data in &card_abilities::query(battle, card_id).event_abilities {
+    for data in &card::ability_list(battle, card_id).event_abilities {
         let source = EffectSource::Event {
             controller: player,
             stack_card_id: StackCardId(card_id),

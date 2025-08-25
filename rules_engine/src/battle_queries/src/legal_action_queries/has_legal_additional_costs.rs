@@ -5,13 +5,13 @@ use battle_state::core::effect_source::EffectSource;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 
-use crate::battle_card_queries::card_abilities;
+use crate::battle_card_queries::card;
 
 /// Returns true if the given card has legal additional cost choices for its
 /// event abilities after paying the energy cost value `paid`, or if this
 /// card does not require additional cost choices.
 pub fn for_event(battle: &BattleState, player: PlayerName, card_id: CardId, paid: Energy) -> bool {
-    for data in &card_abilities::query(battle, card_id).event_abilities {
+    for data in &card::ability_list(battle, card_id).event_abilities {
         if let Some(additional_cost) = data.ability.additional_cost.as_ref() {
             let source = EffectSource::Event {
                 controller: player,
