@@ -2,13 +2,12 @@ use std::collections::BTreeMap;
 
 use ai_data::game_ai::GameAI;
 use battle_mutations::card_mutations::{battle_deck, move_card};
-use battle_queries::battle_card_queries::card;
 use battle_state::battle::battle_state::{BattleState, LoggingOptions, RequestContext};
 use battle_state::battle_player::battle_player_state::{
     CreateBattlePlayer, PlayerType, TestDeckName,
 };
 use battle_state::core::effect_source::EffectSource;
-use core_data::identifiers::{BattleId, CardIdentity, UserId};
+use core_data::identifiers::{BaseCardId, BattleId, UserId};
 use core_data::types::PlayerName;
 use display::rendering::renderer;
 use display_data::request_data::{ConnectResponse, Metadata};
@@ -72,22 +71,16 @@ fn add_500_cards(battle: &mut BattleState) {
     let core_11_cards = get_core_11_card_mix();
     let definitions_one = core_11_cards
         .iter()
-        .map(|id| {
-            let base = card::get_base_card_id(battle, *id);
-            battle.tabula.test_cards.get(&base).expect("Card definition not found").clone()
-        })
-        .collect();
+        .map(|base| battle.tabula.test_cards.get(base).expect("Card definition not found").clone())
+        .collect::<Vec<_>>();
 
-    battle_deck::add_cards(battle, PlayerName::One, definitions_one);
+    battle_deck::add_cards(battle, PlayerName::One, &definitions_one);
     move_all_from_deck_to_void(battle, PlayerName::One);
     let definitions_two = get_core_11_card_mix()
         .iter()
-        .map(|id| {
-            let base = card_descriptor::get_base_card_id(*id);
-            battle.tabula.test_cards.get(&base).expect("Card definition not found").clone()
-        })
-        .collect();
-    battle_deck::add_cards(battle, PlayerName::Two, definitions_two);
+        .map(|base| battle.tabula.test_cards.get(base).expect("Card definition not found").clone())
+        .collect::<Vec<_>>();
+    battle_deck::add_cards(battle, PlayerName::Two, &definitions_two);
     move_all_from_deck_to_void(battle, PlayerName::Two);
 }
 
@@ -103,7 +96,7 @@ fn move_all_from_deck_to_void(battle: &mut BattleState, player_name: PlayerName)
     }
 }
 
-fn get_core_11_card_mix() -> Vec<CardIdentity> {
+fn get_core_11_card_mix() -> Vec<BaseCardId> {
     let base_deck_map = create_500_card_core_11_deck();
     let mut cards = Vec::new();
 
@@ -116,7 +109,7 @@ fn get_core_11_card_mix() -> Vec<CardIdentity> {
     cards
 }
 
-fn create_500_card_core_11_deck() -> BTreeMap<CardIdentity, usize> {
+fn create_500_card_core_11_deck() -> BTreeMap<BaseCardId, usize> {
     let mut deck_cards = BTreeMap::new();
 
     #[expect(clippy::integer_division)]
@@ -124,53 +117,45 @@ fn create_500_card_core_11_deck() -> BTreeMap<CardIdentity, usize> {
     let remainder = 500_usize % 32_usize;
 
     deck_cards.insert(
-        card_descriptor::get_base_identity(test_card::TEST_NAMED_DISSOLVE),
+        test_card::TEST_NAMED_DISSOLVE,
         4 * scale_factor + if remainder > 0 { 1 } else { 0 },
     );
+    deck_cards
+        .insert(test_card::TEST_COUNTERSPELL, 3 * scale_factor + if remainder > 4 { 1 } else { 0 });
     deck_cards.insert(
-        card_descriptor::get_base_identity(test_card::TEST_COUNTERSPELL),
-        3 * scale_factor + if remainder > 4 { 1 } else { 0 },
-    );
-    deck_cards.insert(
-        card_descriptor::get_base_identity(test_card::TEST_COUNTERSPELL_UNLESS_PAYS),
+        test_card::TEST_COUNTERSPELL_UNLESS_PAYS,
         2 * scale_factor + if remainder > 7 { 1 } else { 0 },
     );
     deck_cards.insert(
-        card_descriptor::get_base_identity(test_card::TEST_VARIABLE_ENERGY_DRAW),
+        test_card::TEST_VARIABLE_ENERGY_DRAW,
         3 * scale_factor + if remainder > 9 { 1 } else { 0 },
     );
     deck_cards.insert(
-        card_descriptor::get_base_identity(
-            test_card::TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN,
-        ),
+        test_card::TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN,
         4 * scale_factor + if remainder > 12 { 1 } else { 0 },
     );
     deck_cards.insert(
-        card_descriptor::get_base_identity(
-            test_card::TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER,
-        ),
+        test_card::TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER,
         5 * scale_factor + if remainder > 16 { 1 } else { 0 },
     );
     deck_cards.insert(
-        card_descriptor::get_base_identity(
-            test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND,
-        ),
+        test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND,
         2 * scale_factor + if remainder > 21 { 1 } else { 0 },
     );
     deck_cards.insert(
-        card_descriptor::get_base_identity(test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO),
+        test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO,
         2 * scale_factor + if remainder > 23 { 1 } else { 0 },
     );
     deck_cards.insert(
-        card_descriptor::get_base_identity(test_card::TEST_PREVENT_DISSOLVE_THIS_TURN),
+        test_card::TEST_PREVENT_DISSOLVE_THIS_TURN,
         2 * scale_factor + if remainder > 25 { 1 } else { 0 },
     );
     deck_cards.insert(
-        card_descriptor::get_base_identity(test_card::TEST_FORESEE_ONE_DRAW_RECLAIM),
+        test_card::TEST_FORESEE_ONE_DRAW_RECLAIM,
         3 * scale_factor + if remainder > 27 { 1 } else { 0 },
     );
     deck_cards.insert(
-        card_descriptor::get_base_identity(test_card::TEST_COUNTERSPELL_CHARACTER),
+        test_card::TEST_COUNTERSPELL_CHARACTER,
         2 * scale_factor + if remainder > 30 { 1 } else { 0 },
     );
 
