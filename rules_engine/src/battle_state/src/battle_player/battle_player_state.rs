@@ -18,15 +18,19 @@ pub struct BattlePlayerState {
     pub player_type: PlayerType,
 
     /// Current score
+    #[serde(default)]
     pub points: Points,
 
     /// Current energy
+    #[serde(default)]
     pub current_energy: Energy,
 
     /// Energy produced each turn
+    #[serde(default)]
     pub produced_energy: Energy,
 
     /// Additional spark for this player
+    #[serde(default)]
     pub spark_bonus: Spark,
 
     /// The deck name for this player.
@@ -36,6 +40,7 @@ pub struct BattlePlayerState {
     ///
     /// Cards in this deck are assumed to have already been populated in the
     /// ability cache when the battle is created.
+    #[serde(default)]
     pub deck: Vec<CardIdentity>,
 
     /// The player's quest state.

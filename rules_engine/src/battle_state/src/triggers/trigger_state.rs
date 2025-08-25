@@ -20,7 +20,9 @@ use crate::triggers::trigger_listeners::TriggerListeners;
 /// (currently in CardID order).
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct TriggerState {
+    #[serde(default)]
     pub listeners: TriggerListeners,
+    #[serde(default)]
     pub events: VecDeque<TriggerForListener>,
 }
 

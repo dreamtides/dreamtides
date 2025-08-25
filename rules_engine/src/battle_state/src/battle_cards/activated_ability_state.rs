@@ -13,10 +13,12 @@ pub struct ActivatedAbilityState {
     /// This is all characters with activated abilities, not only on the ones
     /// which can currently be activated, e.g. ability to pay the cost is not
     /// considered here.
+    #[serde(default)]
     pub characters: CardSet<CharacterId>,
 
     /// Activated abilities which have been activated this turn cycle.
     ///
     /// Used for tracking once-per-turn abilities.
+    #[serde(default)]
     pub activated_this_turn_cycle: BTreeSet<ActivatedAbilityId>,
 }

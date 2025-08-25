@@ -34,6 +34,7 @@ pub struct PromptData {
     pub prompt_type: PromptType,
 
     /// Configuration options for the prompt.
+    #[serde(default)]
     pub configuration: PromptConfiguration,
 }
 

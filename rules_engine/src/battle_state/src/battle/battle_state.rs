@@ -37,6 +37,7 @@ pub struct BattleState {
     pub id: BattleId,
 
     /// All cards in this battle
+    #[serde(default)]
     pub cards: AllCards,
 
     /// Configuration for the rules of this battle
@@ -54,9 +55,11 @@ pub struct BattleState {
     pub status: BattleStatus,
 
     /// Player who is currently next to act when a stack is active.
+    #[serde(default)]
     pub stack_priority: Option<PlayerName>,
 
     /// Current turn
+    #[serde(default)]
     pub turn: TurnData,
 
     /// Current phase within the turn
@@ -71,21 +74,27 @@ pub struct BattleState {
     /// Queue of prompts to display to players in order to make choices.
     ///
     /// The first element in the queue (index 0) is the currently-active prompt.
+    #[serde(default)]
     pub prompts: VecDeque<PromptData>,
 
     /// State of the trigger system.
+    #[serde(default)]
     pub triggers: TriggerState,
 
     /// State of activated abilities for players in this battle.
+    #[serde(default)]
     pub activated_abilities: PlayerMap<ActivatedAbilityState>,
 
     /// State of abilities in this battle.
+    #[serde(default)]
     pub ability_state: AbilityState,
 
     /// Cache of abilities for cards in this battle.
+    #[serde(default)]
     pub ability_cache: Arc<AbilityCache>,
 
     /// Effects that are waiting to be applied.
+    #[serde(default)]
     pub pending_effects: VecDeque<PendingEffect>,
 
     /// Animation tracker for this battle. If this is None it means we are not
@@ -100,12 +109,15 @@ pub struct BattleState {
     /// History of actions and events during this battle.
     ///
     /// Can be None if history tracking is disabled, e.g. during AI simulation.
+    #[serde(default)]
     pub action_history: Option<BattleHistory>,
 
     /// History of actions and events during the current turn.
+    #[serde(default)]
     pub turn_history: TurnHistory,
 
     /// Information about why & how we are currently running the rules engine.
+    #[serde(default)]
     pub request_context: RequestContext,
 }
 
@@ -132,7 +144,7 @@ pub struct PendingEffect {
 }
 
 /// Information about why & how we are currently running the rules engine.
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Default)]
 pub struct RequestContext {
     pub logging_options: LoggingOptions,
 }

@@ -10,13 +10,16 @@ use crate::battle_player::player_map::PlayerMap;
 pub struct AbilityState {
     /// All cards currently in this player's void which have an ability which
     /// *may* let them be played from the void.
+    #[serde(default)]
     pub has_play_from_void_ability: PlayerMap<CardSet<VoidCardId>>,
 
     /// Cards which should be banished when they are moved to any zone other
     /// than the stack or battlefield.
+    #[serde(default)]
     pub banish_when_leaves_play: CardSet<CardId>,
 
     /// State for abilities which persist until the end of the current turn.
+    #[serde(default)]
     pub until_end_of_turn: UntilEndOfTurn,
 }
 

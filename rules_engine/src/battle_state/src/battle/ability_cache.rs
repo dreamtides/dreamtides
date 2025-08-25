@@ -11,7 +11,9 @@ use crate::battle_cards::ability_list::AbilityList;
 /// keyed by their [CardIdentity].
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct AbilityCache {
+    #[serde(default)]
     cache_by_identity: Vec<Arc<AbilityList>>,
+    #[serde(default)]
     definitions_by_identity: Vec<Arc<CardDefinition>>,
 }
 
