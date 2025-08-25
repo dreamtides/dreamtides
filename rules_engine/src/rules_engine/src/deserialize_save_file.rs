@@ -40,8 +40,8 @@ where
     P: StateProvider + 'static,
 {
     match file {
-        SaveFile::V2(v2) => {
-            let quest = v2.quest.as_ref()?;
+        SaveFile::V1(v1) => {
+            let quest = v1.quest.as_ref()?;
             let quest_id = quest.id;
 
             let mut battle = quest.battle.clone()?;
@@ -69,17 +69,17 @@ where
     P: StateProvider + 'static,
 {
     match file {
-        SaveFile::V2(v2) => {
-            let quest = v2.quest.as_ref()?;
+        SaveFile::V1(v1) => {
+            let quest = v1.quest.as_ref()?;
             let quest_id = quest.id;
-            let file = quest.replay.as_ref()?;
+            let saved_battle = quest.battle.as_ref()?;
 
             let mut battle = new_battle::create_and_start(
-                file.id,
+                saved_battle.id,
                 provider.tabula(),
-                file.seed,
-                file.player_types.one.clone(),
-                file.player_types.two.clone(),
+                saved_battle.seed,
+                saved_battle.players.one.as_create_battle_player(),
+                saved_battle.players.two.as_create_battle_player(),
                 request_context,
             );
             battle.animations = None;
@@ -87,7 +87,8 @@ where
 
             let mut last_non_auto_battle = None;
             let mut actions = Vec::new();
-            for (action_index, history_action) in file.actions.iter().enumerate() {
+            let history = saved_battle.action_history.as_ref()?;
+            for (action_index, history_action) in history.actions.iter().enumerate() {
                 let is_undo_player = player == history_action.player;
                 let legal = legal_actions::compute(&battle, history_action.player);
                 let auto = should_auto_execute_action(&legal);
