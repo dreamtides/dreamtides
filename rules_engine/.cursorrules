@@ -5,7 +5,7 @@ all times.
 # CODE STYLE:
 
 
-- Avoid creating new variables via "let" statements, just write code inline.
+- Prefer writing code inline (when possible) to creating new variables via "let" statements
 - DO NOT add inline comments to code
 - DO NOT delete existing inline comments
 - DO NOT fully-qualify names in code ever
@@ -20,6 +20,7 @@ all times.
   - CORRECT STRUCT NAME: BattleState
 - Public functions and types go at the TOP of the file, then private ones.
 - Don't add "pub use" for anything.
+- Keep Cargo.toml dependencies alphabetized
 
 
 # VALIDATING CHANGES

@@ -22,7 +22,8 @@ quest_state = { path = "../../src/quest_state" }
 state_provider = { path = "../../src/state_provider" }
 tabula_ids = { path = "../../src/tabula_ids" }
 
+clap = { workspace = true }
 rand = { workspace = true }
 rand_xoshiro = { workspace = true }
+serde_json = { workspace = true }
 uuid = { workspace = true }
-
