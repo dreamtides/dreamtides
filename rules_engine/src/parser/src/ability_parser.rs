@@ -56,9 +56,6 @@ pub fn parse_string(text: &str) -> ParseResult<Vec<Ability>, Rich<'_, char>> {
 }
 
 fn parser<'a>() -> impl Parser<'a, &'a str, Vec<Ability>, ErrorType<'a>> {
-    let flavor_text = just("{flavor:").then(none_of("}").repeated()).then(just("}")).padded();
-    let reminder_text = just("{reminder:").then(none_of("}").repeated()).then(just("}")).padded();
-
     let single_ability = choice((
         triggered_ability_parser::parser().map(Ability::Triggered),
         activated_ability_parser::parser().map(Ability::Activated),
@@ -66,7 +63,6 @@ fn parser<'a>() -> impl Parser<'a, &'a str, Vec<Ability>, ErrorType<'a>> {
         effect_parser::event().map(Ability::Event),
         static_ability_parser::parser().then_ignore(phrase(".")).map(Ability::Static),
     ))
-    .then_ignore(reminder_text.or_not())
     .boxed();
 
     let ability_block = phrase("{ability}")
@@ -77,6 +73,5 @@ fn parser<'a>() -> impl Parser<'a, &'a str, Vec<Ability>, ErrorType<'a>> {
     let multiple_abilities = ability_block.repeated().at_least(1).collect();
 
     choice((multiple_abilities, single_ability.map(|a| vec![a]), empty().padded().to(Vec::new())))
-        .then_ignore(flavor_text.or_not())
         .then_ignore(end())
 }

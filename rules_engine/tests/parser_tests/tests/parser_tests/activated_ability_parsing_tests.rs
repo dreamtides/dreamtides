@@ -29,9 +29,7 @@ fn test_banish_from_void_dissolve_enemy_character() {
 
 #[test]
 fn test_fast_activated_grant_aegis() {
-    let result = parse(
-        "{fa}: Another character you control gains {kw: aegis} this turn. {reminder: (it cannot be affected by the enemy)} {flavor: She stands where others would fall.}",
-    );
+    let result = parse("{fa}: Another character you control gains {kw: aegis} this turn.");
     assert_ron_snapshot!(
         result,
         @r###"
