@@ -3,7 +3,7 @@ use parser_tests::parser_test_utils::parse;
 
 #[test]
 fn test_multiple_abilities_with_br() {
-    let result = parse("{ability}Draw {-cards(n: 1)}.{end-ability}{ability}Gain $2.{end-ability}");
+    let result = parse("Draw {-cards(n: 1)}.\nGain $2.");
     assert_ron_snapshot!(
         result,
         @r###"
@@ -25,9 +25,7 @@ fn test_multiple_abilities_with_br() {
 
 #[test]
 fn test_ability_blocks_example() {
-    let result = parse(
-        "{ability}{-Foresee(n: 1)}. Draw {-cards(n: 1)}.{end-ability}{ability}{-Reclaim-Cost(e: 3)}{end-ability}",
-    );
+    let result = parse("{-Foresee(n: 1)}. Draw {-cards(n: 1)}.\n{-Reclaim-Cost(e: 3)}");
     assert_ron_snapshot!(
         result,
         @r###"

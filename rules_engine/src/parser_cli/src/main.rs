@@ -1,6 +1,5 @@
 use std::fs;
 
-use ariadne::{Color, Label, Report, ReportKind, Source};
 use clap::Parser;
 use parser::ability_parser;
 
@@ -14,32 +13,22 @@ struct Args {
     file: Option<String>,
 }
 
+#[expect(clippy::print_stderr)]
 fn parse_expression(input: &str, line_num: Option<usize>) -> Option<String> {
     let input = input.to_lowercase();
-    let (result, errs) = ability_parser::parse_string(&input).into_output_errors();
-    if let Some(output) = result.as_ref() {
-        ron::ser::to_string_pretty(output, ron::ser::PrettyConfig::default().struct_names(true))
-            .ok()
-    } else {
-        for e in errs {
-            let mut report =
-                Report::build(ReportKind::Error, (), e.span().start).with_message(e.to_string());
-
-            if let Some(line) = line_num {
-                report = report.with_note(format!("Error in line {line}"));
+    let results = ability_parser::parse(&input);
+    match results {
+        Ok(output) => ron::ser::to_string_pretty(
+            &output,
+            ron::ser::PrettyConfig::default().struct_names(true),
+        )
+        .ok(),
+        Err(errs) => {
+            for e in errs {
+                eprintln!("{:?} at line {}", e, line_num.unwrap_or(0));
             }
-
-            report
-                .with_label(
-                    Label::new(e.span().into_range())
-                        .with_message(e.reason().to_string())
-                        .with_color(Color::Red),
-                )
-                .finish()
-                .eprint(Source::from(&input))
-                .unwrap();
+            None
         }
-        None
     }
 }
 
