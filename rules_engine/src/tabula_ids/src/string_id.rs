@@ -204,6 +204,15 @@ pub const CARD_TYPE_CHARACTER: StringId = StringId(uuid!("b7b16e85-8cbf-4433-8ee
 /// Card type for event cards
 pub const CARD_TYPE_EVENT: StringId = StringId(uuid!("11b07242-b514-42cb-aed9-a64992ac2e2b"));
 
+/// Card type for dreamsign cards
+pub const CARD_TYPE_DREAMSIGN: StringId = StringId(uuid!("3876f34a-f8c3-49f3-bec5-5ae740e2978f"));
+
+/// Card type for dreamcaller cards
+pub const CARD_TYPE_DREAMCALLER: StringId = StringId(uuid!("a71f9d3b-ffc9-4edd-9be1-e998bdc5310a"));
+
+/// Card type for dreamwell cards
+pub const CARD_TYPE_DREAMWELL: StringId = StringId(uuid!("a2bcbaa7-2167-47fc-9db7-5267a91b17c4"));
+
 /// Card subtype, displayed on character cards
 pub const CARD_SUBTYPE_ANCIENT: StringId = StringId(uuid!("bee9a795-eb5a-46a1-aac5-692c7a070c64"));
 
@@ -213,6 +222,9 @@ pub const CARD_SUBTYPE_CHILD: StringId = StringId(uuid!("602ea4ae-0f44-4704-9cf4
 /// Card subtype, displayed on character cards
 pub const CARD_SUBTYPE_DETECTIVE: StringId =
     StringId(uuid!("94f37651-7ffa-4bb1-97b9-40b5640db8ab"));
+
+/// Card subtype, displayed on character cards
+pub const CARD_SUBTYPE_ENIGMA: StringId = StringId(uuid!("9aa89193-4555-4906-9830-8c4584d4e882"));
 
 /// Card subtype, displayed on character cards
 pub const CARD_SUBTYPE_EXPLORER: StringId = StringId(uuid!("45d5bee1-12b7-4150-983c-4c4ce721d091"));

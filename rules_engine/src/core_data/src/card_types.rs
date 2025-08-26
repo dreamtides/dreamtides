@@ -44,4 +44,7 @@ pub enum CardSubtype {
     Visionary,
     Visitor,
     Warrior,
+
+    #[serde(other)]
+    Enigma,
 }

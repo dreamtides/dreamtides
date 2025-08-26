@@ -397,6 +397,24 @@
       "en_us": "Event"
     },
     {
+      "id": "3876f34a-f8c3-49f3-bec5-5ae740e2978f",
+      "name": "card-type-dreamsign",
+      "description": "Card type for dreamsign cards",
+      "en_us": "Dreamsign"
+    },
+    {
+      "id": "a71f9d3b-ffc9-4edd-9be1-e998bdc5310a",
+      "name": "card-type-dreamcaller",
+      "description": "Card type for dreamcaller cards",
+      "en_us": "Dreamcaller"
+    },
+    {
+      "id": "a2bcbaa7-2167-47fc-9db7-5267a91b17c4",
+      "name": "card-type-dreamwell",
+      "description": "Card type for dreamwell cards",
+      "en_us": "Dreamwell"
+    },
+    {
       "id": "bee9a795-eb5a-46a1-aac5-692c7a070c64",
       "name": "card-subtype-ancient",
       "description": "Card subtype, displayed on character cards",
@@ -413,6 +431,12 @@
       "name": "card-subtype-detective",
       "description": "Card subtype, displayed on character cards",
       "en_us": "Detective"
+    },
+    {
+      "id": "9aa89193-4555-4906-9830-8c4584d4e882",
+      "name": "card-subtype-enigma",
+      "description": "Card subtype, displayed on character cards",
+      "en_us": "Enigma"
     },
     {
       "id": "45d5bee1-12b7-4150-983c-4c4ce721d091",
@@ -519,6 +543,7 @@
       "rules_text_en_us": " ",
       "abilities": [],
       "card_type": "Character",
+      "subtype": "Musician",
       "is_fast": false,
       "spark": "5",
       "rarity": "Special",

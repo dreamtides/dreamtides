@@ -110,7 +110,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
         spark: card_properties::spark(battle, controller, CharacterId(card_id))
             .or_else(|| card_properties::base_spark_for_id(battle, card_id))
             .map(|spark| spark.to_string()),
-        card_type: card_type(battle, card_id),
+        card_type: card_type(builder, battle, card_id),
         rules_text: rules_text(builder, battle, card_id),
         outline_color: match selection_color {
             Some(color) => Some(color),
@@ -189,119 +189,49 @@ fn can_select_order_action(legal_actions: &LegalActions, card_id: CardId) -> Opt
 }
 
 pub fn card_image(battle: &BattleState, card_id: CardId) -> SpriteAddress {
-    match card::get_base_card_id(battle, card_id) {
-        test_card::TEST_VANILLA_CHARACTER => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
-        ),
-        test_card::TEST_DISSOLVE => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png",
-        ),
-        test_card::TEST_NAMED_DISSOLVE => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png",
-        ),
-        test_card::TEST_COUNTERSPELL_UNLESS_PAYS => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_2123360837.png",
-        ),
-        test_card::TEST_COUNTERSPELL => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1282908322.png",
-        ),
-        test_card::TEST_VARIABLE_ENERGY_DRAW => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
-        ),
-        test_card::TEST_DRAW_ONE => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
-        ),
-        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER => {
-            SpriteAddress::new(
-                "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
-            )
-        }
-        test_card::TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png",
-        ),
-        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
-        ),
-        test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
-        ),
-        test_card::TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
-        ),
-        test_card::TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
-        ),
-        test_card::TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
-        ),
-        test_card::TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
-        ),
-        test_card::TEST_DUAL_ACTIVATED_ABILITY_CHARACTER => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png",
-        ),
-        test_card::TEST_FORESEE_ONE => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
-        ),
-        test_card::TEST_FORESEE_TWO => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
-        ),
-        test_card::TEST_FORESEE_ONE_DRAW_A_CARD => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
-        ),
-        test_card::TEST_DRAW_ONE_RECLAIM => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
-        ),
-        test_card::TEST_RETURN_VOID_CARD_TO_HAND => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
-        ),
-        test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png",
-        ),
-        test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
-        ),
-        test_card::TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
-        ),
-        test_card::TEST_RETURN_TO_HAND => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png",
-        ),
-        test_card::TEST_PREVENT_DISSOLVE_THIS_TURN => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png",
-        ),
-        test_card::TEST_COUNTERSPELL_CHARACTER => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png",
-        ),
-        test_card::TEST_FORESEE_ONE_RECLAIM => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png",
-        ),
-        test_card::TEST_FORESEE_ONE_DRAW_RECLAIM => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png",
-        ),
-        test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO => SpriteAddress::new(
-            "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png",
-        ),
-        _ => panic!("Unknown card: {card_id:?}"),
-    }
+    card::get_definition(battle, card_id).image.clone()
 }
 
 pub fn card_name(battle: &BattleState, card_id: CardId) -> String {
     card::get_definition(battle, card_id).displayed_name.clone()
 }
 
-fn card_type(battle: &BattleState, card_id: CardId) -> String {
-    let result = match card_properties::card_type(battle, card_id) {
-        CardType::Character => match card_properties::card_subtype(battle, card_id) {
-            Some(CardSubtype::Musician) => "Musician".to_string(),
-            _ => "Character".to_string(),
-        },
-        CardType::Event => "Event".to_string(),
-        CardType::Dreamsign => "Dreamsign".to_string(),
-        CardType::Dreamcaller => "Dreamcaller".to_string(),
-        CardType::Dreamwell => "Dreamwell".to_string(),
+fn card_type(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -> String {
+    let definition = card::get_definition(battle, card_id);
+    let type_string = if let Some(subtype) = definition.card_subtype {
+        match subtype {
+            CardSubtype::Ancient => string_id::CARD_SUBTYPE_ANCIENT,
+            CardSubtype::Child => string_id::CARD_SUBTYPE_CHILD,
+            CardSubtype::Detective => string_id::CARD_SUBTYPE_DETECTIVE,
+            CardSubtype::Explorer => string_id::CARD_SUBTYPE_EXPLORER,
+            CardSubtype::Hacker => string_id::CARD_SUBTYPE_HACKER,
+            CardSubtype::Mage => string_id::CARD_SUBTYPE_MAGE,
+            CardSubtype::Monster => string_id::CARD_SUBTYPE_MONSTER,
+            CardSubtype::Musician => string_id::CARD_SUBTYPE_MUSICIAN,
+            CardSubtype::Outsider => string_id::CARD_SUBTYPE_OUTSIDER,
+            CardSubtype::Renegade => string_id::CARD_SUBTYPE_RENEGADE,
+            CardSubtype::SpiritAnimal => string_id::CARD_SUBTYPE_SPIRIT_ANIMAL,
+            CardSubtype::Super => string_id::CARD_SUBTYPE_SUPER,
+            CardSubtype::Survivor => string_id::CARD_SUBTYPE_SURVIVOR,
+            CardSubtype::Synth => string_id::CARD_SUBTYPE_SYNTH,
+            CardSubtype::Tinkerer => string_id::CARD_SUBTYPE_TINKERER,
+            CardSubtype::Trooper => string_id::CARD_SUBTYPE_TROOPER,
+            CardSubtype::Visionary => string_id::CARD_SUBTYPE_VISIONARY,
+            CardSubtype::Visitor => string_id::CARD_SUBTYPE_VISITOR,
+            CardSubtype::Warrior => string_id::CARD_SUBTYPE_WARRIOR,
+            CardSubtype::Enigma => string_id::CARD_SUBTYPE_ENIGMA,
+        }
+    } else {
+        match definition.card_type {
+            CardType::Character => string_id::CARD_TYPE_CHARACTER,
+            CardType::Event => string_id::CARD_TYPE_EVENT,
+            CardType::Dreamsign => string_id::CARD_TYPE_DREAMSIGN,
+            CardType::Dreamcaller => string_id::CARD_TYPE_DREAMCALLER,
+            CardType::Dreamwell => string_id::CARD_TYPE_DREAMWELL,
+        }
     };
 
+    let result = builder.string(type_string);
     if card_properties::is_fast(battle, card_id) { format!("\u{f0e7} {result}") } else { result }
 }
 
