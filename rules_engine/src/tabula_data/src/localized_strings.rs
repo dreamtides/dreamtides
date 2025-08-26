@@ -252,7 +252,7 @@ impl LocalizedStrings {
         if bundle.add_resource(self.resource()).is_err() {
             return "ERR3: Add Resource Failed".to_string();
         }
-        let ftl = format!("tmp-for-display = {}", normalize_literal(s));
+        let ftl = format!("tmp-for-display = {}", s);
         let (temp_res, parser_errs_opt) = match FluentResource::try_new(ftl) {
             Ok(res) => (res, None),
             Err((res, errs)) => (res, Some(errs)),
@@ -279,47 +279,7 @@ impl LocalizedStrings {
     }
 }
 
-/// Normalizes a string to a format that can be used in Fluent.
-///
-/// This involves replacing our custom Unicode escape sequences "\u(ABCD)" with
-/// the actual characters.
-fn normalize_literal(s: &str) -> String {
-    let mut out = String::with_capacity(s.len());
-    let mut i = 0;
-    loop {
-        match s[i..].find("\\u(") {
-            Some(rel) => {
-                let start = i + rel;
-                out.push_str(&s[i..start]);
-                let rest = &s[start + 3..];
-                match rest.find(')') {
-                    Some(end_rel) => {
-                        let hex = &rest[..end_rel];
-                        match u32::from_str_radix(hex, 16).ok().and_then(std::char::from_u32) {
-                            Some(ch) => {
-                                out.push(ch);
-                                i = start + 3 + end_rel + 1;
-                            }
-                            None => {
-                                out.push_str("\\u(");
-                                i = start + 3;
-                            }
-                        }
-                    }
-                    None => {
-                        out.push_str(&s[start..]);
-                        break;
-                    }
-                }
-            }
-            None => {
-                out.push_str(&s[i..]);
-                break;
-            }
-        }
-    }
-    out
-}
+// normalize_literal removed (no longer required)
 
 fn format_error_details(errors: &[FluentError]) -> String {
     let mut parts: Vec<String> = Vec::new();
@@ -344,7 +304,7 @@ fn validate_row_and_build_ftl_line(
     row: &LocalizedStringSetRaw,
     language: LanguageId,
 ) -> Result<String, Vec<InitializationError>> {
-    let tmp = format!("tmp = {}", normalize_literal(row.string(language).as_str()));
+    let tmp = format!("tmp = {}", row.string(language));
     match FluentResource::try_new(tmp.clone()) {
         Ok(_) => {}
         Err((_res, errs)) => {
@@ -364,5 +324,5 @@ fn validate_row_and_build_ftl_line(
         }
     }
 
-    Ok(format!("{} = {}\n", row.name, normalize_literal(row.string(language).as_str())))
+    Ok(format!("{} = {}\n", row.name, row.string(language)))
 }
