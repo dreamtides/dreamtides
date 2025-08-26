@@ -40,7 +40,7 @@ pub const TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO: BaseCardId =
 pub const TEST_PREVENT_DISSOLVE_THIS_TURN: BaseCardId =
     BaseCardId(uuid!("0b783ac8-6aea-438e-a2d5-87bf68548eda"));
 
-/// {ability}{-Foresee(n:1)}. Draw {-cards(n:1)}.{end-ability}
+/// {ability}{-Foresee(n:1)}. Draw {-cards(n:1)}.{end-ability} {br}
 /// {ability}{-Reclaim-Cost(e:3)}{end-ability}
 pub const TEST_FORESEE_ONE_DRAW_RECLAIM: BaseCardId =
     BaseCardId(uuid!("de21db6c-54b4-4bff-b1d6-5a4711ef5ed8"));

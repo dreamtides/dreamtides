@@ -8,7 +8,7 @@ use crate::parser_utils::{ErrorType, count, number, numeric, phrase};
 use crate::{card_predicate_parser, collection_expression_parser, determiner_parser};
 
 pub fn parser<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
-    choice((numeric("{-energy-cost(e:", Energy, ")}").map(Cost::Energy), standard_cost()))
+    choice((numeric("{-energy-cost(e:", Energy, ")}").map(Cost::Energy), standard_cost())).boxed()
 }
 
 /// Costs written as a standard verb phrase, for example "pay $1" or "discard a

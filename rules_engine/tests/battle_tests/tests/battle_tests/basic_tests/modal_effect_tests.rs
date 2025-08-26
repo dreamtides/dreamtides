@@ -24,7 +24,7 @@ fn modal_effect_displays_browser_cards_with_correct_costs() {
     let rules_text_1 = &card_1.revealed().rules_text;
     let rules_text_2 = &card_2.revealed().rules_text;
     assert!(
-        rules_text_1.contains("Draw 1") || rules_text_1.contains("draw 1"),
+        rules_text_1.contains("Draw a") || rules_text_1.contains("draw a"),
         "first choice rules text mentions drawing 1 card: {rules_text_1}"
     );
     assert!(

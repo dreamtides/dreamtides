@@ -24,6 +24,7 @@ use display_data::card_view::{
 use fluent::fluent_args;
 use masonry::flex_enums::FlexDirection;
 use masonry::flex_style::FlexStyle;
+use tabula_data::localized_strings::StringContext;
 use tabula_ids::{string_id, test_card};
 use ui_components::box_component::BoxComponent;
 use ui_components::component::Component;
@@ -236,99 +237,18 @@ fn card_type(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -
 }
 
 pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -> String {
-    let mut base_text = match card::get_base_card_id(battle, card_id) {
-        test_card::TEST_VANILLA_CHARACTER => "<i>As the stars wept fire across the sky, he strummed the chords that once taught the heavens to sing.</i>".to_string(),
-        test_card::TEST_DISSOLVE => "<color=#AA00FF><b>Dissolve</b></color> an enemy character.".to_string(),
-        test_card::TEST_NAMED_DISSOLVE => "<color=#AA00FF><b>Dissolve</b></color> an enemy character.".to_string(),
-        test_card::TEST_COUNTERSPELL_UNLESS_PAYS => {
-            "<color=#AA00FF><b>Prevent</b></color> a played enemy event unless the enemy pays <color=#00838F><b>2\u{f7e4}</b></color>.".to_string()
-        }
-        test_card::TEST_COUNTERSPELL => "<color=#AA00FF><b>Prevent</b></color> a played enemy card.".to_string(),
-        test_card::TEST_VARIABLE_ENERGY_DRAW => {
-            "Pay one or more <color=#00838F>\u{f7e4}</color>: Draw a card for each <color=#00838F>\u{f7e4}</color> spent.".to_string()
-        }
-        test_card::TEST_DRAW_ONE => "Draw a card.".to_string(),
-        test_card::TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER => {
-            "Whenever you materialize another character, this character gains +1 spark.".to_string()
-        }
-        test_card::TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN => {
-            "Whenever you play a card during the enemy's turn, this character gains +1 spark.".to_string()
-        }
-        test_card::TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN => {
-            "Whenever you play a card during the enemy's turn, this character gains +2 spark.".to_string()
-        }
-        test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD => {
-            "1\u{f7e4} -> Draw a card.".to_string()
-        }
-        test_card::TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => {
-            "[multi] 1\u{f7e4} -> Draw a card.".to_string()
-        }
-        test_card::TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => {
-            "[fast] 1\u{f7e4} -> Draw a card.".to_string()
-        }
-        test_card::TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER => {
-            format!(
-                "{}<space=\"-0.25px\">{} <color=#00838F><b>3\u{f7e4}</b></color><b><size=120%>:</size></b> Draw a card.",
-                icon::FAST,
-                icon::MULTI_ACTIVATED
-            )
-        }
-        test_card::TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER => {
-            "2\u{f7e4} -> <b>Dissolve</b> an enemy character.".to_string()
-        }
-        test_card::TEST_DUAL_ACTIVATED_ABILITY_CHARACTER => {
-            "1\u{f7e4} -> Draw a card.\n2\u{f7e4} -> Draw 2 cards.".to_string()
-        }
-        test_card::TEST_FORESEE_ONE => {
-            "<b>Foresee</b> 1.".to_string()
-        }
-        test_card::TEST_FORESEE_TWO => {
-            "<b>Foresee</b> 2.".to_string()
-        }
-        test_card::TEST_FORESEE_ONE_DRAW_A_CARD => {
-            "<b>Foresee</b> 1. Draw a card.".to_string()
-        }
-        test_card::TEST_DRAW_ONE_RECLAIM => {
-            "Draw a card. Reclaim 1\u{f7e4}.".to_string()
-        }
-        test_card::TEST_RETURN_VOID_CARD_TO_HAND => {
-            "Return a card from your void to your hand.".to_string()
-        }
-        test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND => {
-            "Return one or two events from your void to your hand.".to_string()
-        }
-        test_card::TEST_MODAL_DRAW_ONE_OR_DRAW_TWO => {
-            "Choose one:\n • <indent=1em>1\u{f7e4} : Draw 1 card.</indent>\n • <indent=1em>3\u{f7e4}: Draw 2 cards.</indent>".to_string()
-        }
-        test_card::TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY => {
-            "Choose one:\n • <indent=1em>1\u{f7e4}: Draw 1 card.</indent>\n • <indent=1em>2\u{f7e4}: <b>Dissolve</b> an enemy character.</indent>".to_string()
-        }
-        test_card::TEST_RETURN_TO_HAND => {
-            "<b>Return</b> an enemy character to its owner's hand.".to_string()
-        }
-        test_card::TEST_PREVENT_DISSOLVE_THIS_TURN => {
-            "Give an allied character <color=#AA00FF><b>anchored</b></color> until end of turn.".to_string()
-        }
-        test_card::TEST_COUNTERSPELL_CHARACTER => {
-            "<color=#AA00FF><b>Prevent</b></color> a played enemy character.".to_string()
-        }
-        test_card::TEST_FORESEE_ONE_RECLAIM => {
-            "<line-height=120%><color=#AA00FF><b>Foresee</b></color> 1.\n</line-height><color=#AA00FF><b>Reclaim</b></color> <color=#00838F><b>3\u{f7e4}</b></color>".to_string()
-        }
-        test_card::TEST_FORESEE_ONE_DRAW_RECLAIM => {
-            "<line-height=120%><color=#AA00FF><b>Foresee</b></color> 1. Draw a card.\n</line-height><color=#AA00FF><b>Reclaim</b></color> <color=#00838F><b>4\u{f7e4}</b></color>".to_string()
-        }
-        test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO => {
-            "Choose one:\n • <indent=1em><color=#00838F><b>2\u{f7e4}</b></color>: Return an enemy character to hand.</indent>\n • <indent=1em><color=#00838F><b>3\u{f7e4}</b></color>: Draw 2 cards.</indent>".to_string()
-        }
-        _ => panic!("Unknown card: {card_id:?}"),
-    };
+    let definition = card::get_definition(battle, card_id);
+    let mut formatted = builder.tabula().strings.format_display_string(
+        &definition.displayed_rules_text,
+        StringContext::Interface,
+        fluent_args![],
+    );
 
     if let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))
         && let Some(ModelEffectChoiceIndex(index)) = stack_item.modal_choice
     {
-        base_text =
-            modal_effect_prompt_rendering::modal_effect_descriptions(&base_text)[index].clone();
+        formatted =
+            modal_effect_prompt_rendering::modal_effect_descriptions(&formatted)[index].clone();
     }
 
     if card::get_base_card_id(battle, card_id) == test_card::TEST_VARIABLE_ENERGY_DRAW
@@ -337,7 +257,7 @@ pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: Card
     {
         return format!(
             "{} <b><color=\"blue\">{}</color></b>",
-            base_text,
+            formatted,
             builder.string_with_args(
                 string_id::CARD_RULES_TEXT_ENERGY_PAID,
                 fluent_args!("energy" => energy.0)
@@ -347,19 +267,19 @@ pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: Card
 
     if is_on_stack_from_void(battle, card_id) {
         return format!(
-            "{base_text} <b><color=\"blue\">{}</color></b>",
+            "{formatted} <b><color=\"blue\">{}</color></b>",
             builder.string(string_id::CARD_RULES_TEXT_RECLAIMED)
         );
     }
 
     if apply_card_fx::is_anchored(battle, card_id) {
         return format!(
-            "{base_text} <b><color=\"blue\">{}</color></b>",
+            "{formatted} <b><color=\"blue\">{}</color></b>",
             builder.string(string_id::CARD_RULES_TEXT_ANCHORED)
         );
     }
 
-    base_text
+    formatted
 }
 
 /// Returns true if the the `card_id` is on the stack and was played from the

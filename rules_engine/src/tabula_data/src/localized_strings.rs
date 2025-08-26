@@ -92,18 +92,18 @@ pub fn build(
         seen.insert(row.name.as_str(), c);
     }
 
-    let ftl = table
-        .as_slice()
-        .iter()
-        .map(|row| {
-            format!(
-                "{} = {}\n",
-                row.name,
-                normalize_literal(row.string(context.current_language).as_str())
-            )
-        })
-        .collect::<Vec<_>>()
-        .join("");
+    let mut ftl_lines: Vec<String> = Vec::new();
+    let mut valid_indices: Vec<usize> = Vec::new();
+    for (row_index, row) in table.as_slice().iter().enumerate() {
+        match validate_row_and_build_ftl_line(row_index, row, context.current_language) {
+            Ok(line) => {
+                ftl_lines.push(line);
+                valid_indices.push(row_index);
+            }
+            Err(mut row_errs) => errors.append(&mut row_errs),
+        }
+    }
+    let ftl = ftl_lines.join("");
     let (resource, parser_errs_opt) = match FluentResource::try_new(ftl) {
         Ok(res) => (res, None),
         Err((res, errs)) => (res, Some(errs)),
@@ -140,6 +140,9 @@ pub fn build(
     }
 
     for (row_index, row) in table.as_slice().iter().enumerate() {
+        if !valid_indices.contains(&row_index) {
+            continue;
+        }
         if row.name.starts_with("-") {
             // Fluent terms cannot be directly retrieved
             continue;
@@ -174,7 +177,13 @@ pub fn build(
 
     let ls = LocalizedStrings {
         resource: Some(Arc::new(resource)),
-        id_to_key: table.0.iter().map(|row| (row.id, row.name.clone())).collect(),
+        id_to_key: table
+            .0
+            .iter()
+            .enumerate()
+            .filter(|(i, _)| valid_indices.contains(i))
+            .map(|(_, row)| (row.id, row.name.clone()))
+            .collect(),
     };
     if errors.is_empty() { Ok(ls) } else { Err(errors) }
 }
@@ -225,6 +234,8 @@ impl LocalizedStrings {
         if errors.is_empty() { out } else { format_error_details(&errors) }
     }
 
+    /// Formats a string for display in the currently selected language with the
+    /// given arguments, resolving all known Fluent placeables.
     pub fn format_display_string(
         &self,
         s: &str,
@@ -326,4 +337,32 @@ fn format_error_details(errors: &[FluentError]) -> String {
         }
     }
     if parts.is_empty() { "ERR6: Fluent Formatting Error".to_string() } else { parts.join(" | ") }
+}
+
+fn validate_row_and_build_ftl_line(
+    row_index: usize,
+    row: &LocalizedStringSetRaw,
+    language: LanguageId,
+) -> Result<String, Vec<InitializationError>> {
+    let tmp = format!("tmp = {}", normalize_literal(row.string(language).as_str()));
+    match FluentResource::try_new(tmp.clone()) {
+        Ok(_) => {}
+        Err((_res, errs)) => {
+            let mut out: Vec<InitializationError> = Vec::new();
+            for e in errs {
+                let mut ierr = InitializationError::with_details(
+                    ErrorCode::FluentParserError,
+                    String::from("Fluent Parser Error"),
+                    format!("{e} in parsing {tmp:?}"),
+                );
+                ierr.tabula_sheet = Some(String::from("strings"));
+                ierr.tabula_column = Some(String::from("en_us"));
+                ierr.tabula_row = Some(row_index);
+                out.push(ierr);
+            }
+            return Err(out);
+        }
+    }
+
+    Ok(format!("{} = {}\n", row.name, normalize_literal(row.string(language).as_str())))
 }

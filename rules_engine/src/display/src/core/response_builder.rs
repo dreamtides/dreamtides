@@ -9,6 +9,7 @@ use display_data::command::{Command, CommandSequence, ParallelCommandGroup, Upda
 use fluent::FluentArgs;
 use state_provider::display_state_provider::{DisplayState, DisplayStateProvider};
 use tabula_data::localized_strings::{StringContext, StringId};
+use tabula_data::tabula::Tabula;
 
 /// Primary builder used to render game state.
 pub struct ResponseBuilder {
@@ -91,6 +92,11 @@ impl ResponseBuilder {
     /// that is received via [Self::push_battle_view].
     pub fn run_with_next_battle_view(&mut self, command: Command) {
         self.pending_commands.push(command);
+    }
+
+    /// Returns the [Tabula] instance
+    pub fn tabula(&self) -> Arc<Tabula> {
+        self.provider.tabula().clone()
     }
 
     /// Formats a string for display in the currently language without any

@@ -58,6 +58,9 @@ pub const ABILITY: StringId = StringId(uuid!("a8108996-e881-4b2e-80dd-3bfe5bf8dc
 /// Formatting that appears after an ability of a card with multiple abilities
 pub const END_ABILITY: StringId = StringId(uuid!("12487a98-0f31-4f71-bd51-9a85bfcd281c"));
 
+/// Inserts a linebreak in card rules text
+pub const BR: StringId = StringId(uuid!("e189f8a2-0901-41b9-9023-78dd196f60d5"));
+
 /// Formatting that appears before a modal ability
 pub const MODE: StringId = StringId(uuid!("3cc400d3-0594-4663-9187-e8c46613a21f"));
 

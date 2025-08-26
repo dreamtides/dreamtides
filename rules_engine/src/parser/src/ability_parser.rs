@@ -18,6 +18,7 @@ pub fn parse(input: &str) -> Result<Vec<Ability>, Vec<InitializationError>> {
         return Ok(Vec::new());
     }
     let input = input.to_lowercase();
+
     let (result, errs) = parse_string(&input).into_output_errors();
     if let Some(output) = result {
         Ok(output)
