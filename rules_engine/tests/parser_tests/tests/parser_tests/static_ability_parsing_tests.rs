@@ -361,7 +361,7 @@ fn test_play_for_alternate_cost_with_condition() {
 #[test]
 fn test_look_at_top_card_and_play() {
     let result = parse(
-        "You may look at the top card of your deck.\nYou may play characters from the top of your deck.",
+        "You may look at the top card of your deck.\n\nYou may play characters from the top of your deck.",
     );
     assert_ron_snapshot!(result, @r###"
     [

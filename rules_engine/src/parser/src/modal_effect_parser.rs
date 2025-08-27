@@ -18,10 +18,9 @@ fn mode<'a, P>(effect: P) -> impl Parser<'a, &'a str, ModalEffectChoice, ErrorTy
 where
     P: Parser<'a, &'a str, Effect, ErrorType<'a>> + Clone,
 {
-    phrase("{mode}")
+    phrase("{bullet}")
         .ignore_then(numeric("{-energy-cost(e:", Energy, ")}"))
         .then_ignore(just(":"))
         .then(effect)
-        .then_ignore(phrase("{end-mode}"))
         .map(|(energy_cost, effect)| ModalEffectChoice { energy_cost, effect })
 }

@@ -1373,7 +1373,7 @@ fn test_return_one_or_two_events_from_your_void_to_your_hand() {
 #[test]
 fn test_modal_draw_one_or_draw_two() {
     let result = parse(
-        "{choose-one}{mode}{-energy-cost(e: 1)}: Draw {-cards(n: 1)}.{end-mode}{mode}{-energy-cost(e: 3)}: Draw {-cards(n: 2)}.{end-mode}",
+        "{choose-one}\n{bullet} {-energy-cost(e: 1)}: Draw {-cards(n: 1)}.\n{bullet} {-energy-cost(e: 3)}: Draw {-cards(n: 2)}.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -1400,7 +1400,7 @@ fn test_modal_draw_one_or_draw_two() {
 #[test]
 fn test_modal_draw_one_or_dissolve_enemy() {
     let result = parse(
-        "{choose-one}{mode}{-energy-cost(e: 1)}: Draw {-cards(n: 1)}.{end-mode}{mode}{-energy-cost(e: 2)}: {dissolve} an enemy character.{end-mode}",
+        "{choose-one}\n{bullet} {-energy-cost(e: 1)}: Draw {-cards(n: 1)}.\n{bullet} {-energy-cost(e: 2)}: {dissolve} an enemy character.",
     );
     assert_ron_snapshot!(result, @r###"
     [

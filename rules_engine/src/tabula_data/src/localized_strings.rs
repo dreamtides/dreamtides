@@ -252,7 +252,7 @@ impl LocalizedStrings {
         if bundle.add_resource(self.resource()).is_err() {
             return "ERR3: Add Resource Failed".to_string();
         }
-        let ftl = format!("tmp-for-display = {}", s);
+        let ftl = format!("tmp-for-display = {s}");
         let (temp_res, parser_errs_opt) = match FluentResource::try_new(ftl) {
             Ok(res) => (res, None),
             Err((res, errs)) => (res, Some(errs)),

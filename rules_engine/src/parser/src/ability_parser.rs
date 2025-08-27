@@ -56,11 +56,12 @@ pub fn parse(input: &str) -> Result<Vec<Ability>, Vec<InitializationError>> {
 /// The provided text must be all lowercase.
 pub fn parse_string(text: &str) -> Vec<ParseResult<Ability, Rich<'_, char>>> {
     let mut results = Vec::new();
-    for line in text.lines() {
-        if line.trim().is_empty() {
+    for block in text.split("\n\n") {
+        let block = block.trim();
+        if block.is_empty() {
             continue;
         }
-        results.push(single_ability_parser().parse(line));
+        results.push(single_ability_parser().parse(block));
     }
     results
 }
