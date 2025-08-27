@@ -1,5 +1,5 @@
 {
-  "id": "1616e2b0-c7bb-4291-a4b9-9036a10da72b",
+  "id": "f66962c7-5e86-4c72-a78b-75fad66d27dd",
   "cards": {
     "cards": [
       {
@@ -1226,8 +1226,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       },
       "two": {
         "set": {
@@ -1235,8 +1234,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       }
     },
     "battlefield_state": {
@@ -1250,8 +1248,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       },
       "two": {
         "set": {
@@ -1259,8 +1256,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       }
     },
     "hands": {
@@ -1272,8 +1268,7 @@
             ],
             "nbits": 39
           }
-        },
-        "_marker": null
+        }
       },
       "two": {
         "set": {
@@ -1284,8 +1279,7 @@
             ],
             "nbits": 78
           }
-        },
-        "_marker": null
+        }
       }
     },
     "shuffled_into_decks": {
@@ -1297,8 +1291,7 @@
             ],
             "nbits": 43
           }
-        },
-        "_marker": null
+        }
       },
       "two": {
         "set": {
@@ -1309,8 +1302,7 @@
             ],
             "nbits": 86
           }
-        },
-        "_marker": null
+        }
       }
     },
     "tops_of_decks": {
@@ -1325,8 +1317,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       },
       "two": {
         "set": {
@@ -1334,8 +1325,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       }
     },
     "banished": {
@@ -1345,8 +1335,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       },
       "two": {
         "set": {
@@ -1354,8 +1343,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       }
     },
     "next_object_id": 98,
@@ -1420,7 +1408,7 @@
         42
       ],
       "quest": {
-        "id": "b83ca469-2a54-4fdf-a795-6758255094af",
+        "id": "8be025ee-48f4-44a6-90e3-a028ed21d2c2",
         "user": {
           "id": "00000000-0000-0000-0000-000000000000"
         },
@@ -1448,8 +1436,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{dissolve} an enemy character."
+                      "Effect": "{Dissolve} an enemy character."
                     }
                   }
                 }
@@ -1489,8 +1478,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{dissolve} an enemy character."
+                      "Effect": "{Dissolve} an enemy character."
                     }
                   }
                 }
@@ -1530,8 +1520,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{dissolve} an enemy character."
+                      "Effect": "{Dissolve} an enemy character."
                     }
                   }
                 }
@@ -1571,8 +1562,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{dissolve} an enemy character."
+                      "Effect": "{Dissolve} an enemy character."
                     }
                   }
                 }
@@ -1612,8 +1604,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{prevent} a played enemy card."
+                      "Effect": "{Prevent} a played enemy card."
                     }
                   }
                 }
@@ -1653,8 +1646,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{prevent} a played enemy card."
+                      "Effect": "{Prevent} a played enemy card."
                     }
                   }
                 }
@@ -1694,8 +1688,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{prevent} a played enemy card."
+                      "Effect": "{Prevent} a played enemy card."
                     }
                   }
                 }
@@ -1738,8 +1733,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
+                      "Effect": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
                     }
                   }
                 }
@@ -1782,8 +1778,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
+                      "Effect": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
                     }
                   }
                 }
@@ -1823,8 +1820,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "draw {-cards(n:1)} for each {e} spent."
+                      "Effect": "Draw {-cards(n:1)} for each {e} spent."
                     }
                   }
                 }
@@ -1864,8 +1862,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "draw {-cards(n:1)} for each {e} spent."
+                      "Effect": "Draw {-cards(n:1)} for each {e} spent."
                     }
                   }
                 }
@@ -1905,8 +1904,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "draw {-cards(n:1)} for each {e} spent."
+                      "Effect": "Draw {-cards(n:1)} for each {e} spent."
                     }
                   }
                 }
@@ -1953,7 +1953,7 @@
               "displayed_abilities": [
                 {
                   "Triggered": {
-                    "text": "whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+                    "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
                   }
                 }
               ],
@@ -1997,7 +1997,7 @@
               "displayed_abilities": [
                 {
                   "Triggered": {
-                    "text": "whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+                    "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
                   }
                 }
               ],
@@ -2041,7 +2041,7 @@
               "displayed_abilities": [
                 {
                   "Triggered": {
-                    "text": "whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+                    "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
                   }
                 }
               ],
@@ -2085,7 +2085,7 @@
               "displayed_abilities": [
                 {
                   "Triggered": {
-                    "text": "whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+                    "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
                   }
                 }
               ],
@@ -2131,7 +2131,7 @@
                   "Activated": {
                     "cost": "{-energy-cost(e:3)}",
                     "effect": {
-                      "Effect": "draw {-cards(n:1)}."
+                      "Effect": "Draw {-cards(n:1)}."
                     }
                   }
                 }
@@ -2178,7 +2178,7 @@
                   "Activated": {
                     "cost": "{-energy-cost(e:3)}",
                     "effect": {
-                      "Effect": "draw {-cards(n:1)}."
+                      "Effect": "Draw {-cards(n:1)}."
                     }
                   }
                 }
@@ -2225,7 +2225,7 @@
                   "Activated": {
                     "cost": "{-energy-cost(e:3)}",
                     "effect": {
-                      "Effect": "draw {-cards(n:1)}."
+                      "Effect": "Draw {-cards(n:1)}."
                     }
                   }
                 }
@@ -2272,7 +2272,7 @@
                   "Activated": {
                     "cost": "{-energy-cost(e:3)}",
                     "effect": {
-                      "Effect": "draw {-cards(n:1)}."
+                      "Effect": "Draw {-cards(n:1)}."
                     }
                   }
                 }
@@ -2319,7 +2319,7 @@
                   "Activated": {
                     "cost": "{-energy-cost(e:3)}",
                     "effect": {
-                      "Effect": "draw {-cards(n:1)}."
+                      "Effect": "Draw {-cards(n:1)}."
                     }
                   }
                 }
@@ -2358,8 +2358,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "return one or two events from your void to your hand."
+                      "Effect": "Return one or two events from your void to your hand."
                     }
                   }
                 }
@@ -2400,8 +2401,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "return one or two events from your void to your hand."
+                      "Effect": "Return one or two events from your void to your hand."
                     }
                   }
                 }
@@ -2458,15 +2460,16 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
                       "Modal": [
                         {
                           "cost": "{-energy-cost(e:2)}",
-                          "effect": "return an enemy character to hand."
+                          "effect": "Return an enemy character to hand."
                         },
                         {
                           "cost": "{-energy-cost(e:3)}",
-                          "effect": "draw {-cards(n:2)}."
+                          "effect": "Draw {-cards(n:2)}."
                         }
                       ]
                     }
@@ -2525,15 +2528,16 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
                       "Modal": [
                         {
                           "cost": "{-energy-cost(e:2)}",
-                          "effect": "return an enemy character to hand."
+                          "effect": "Return an enemy character to hand."
                         },
                         {
                           "cost": "{-energy-cost(e:3)}",
-                          "effect": "draw {-cards(n:2)}."
+                          "effect": "Draw {-cards(n:2)}."
                         }
                       ]
                     }
@@ -2575,8 +2579,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "give an allied character {anchored} until end of turn."
+                      "Effect": "Give an allied character {anchored} until end of turn."
                     }
                   }
                 }
@@ -2616,8 +2621,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "give an allied character {anchored} until end of turn."
+                      "Effect": "Give an allied character {anchored} until end of turn."
                     }
                   }
                 }
@@ -2673,14 +2679,15 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+                      "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
                     }
                   }
                 },
                 {
                   "Named": {
-                    "name": "{-reclaim-cost(e:3)}"
+                    "name": "{-Reclaim-Cost(e:3)}"
                   }
                 }
               ],
@@ -2733,14 +2740,15 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+                      "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
                     }
                   }
                 },
                 {
                   "Named": {
-                    "name": "{-reclaim-cost(e:3)}"
+                    "name": "{-Reclaim-Cost(e:3)}"
                   }
                 }
               ],
@@ -2793,14 +2801,15 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+                      "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
                     }
                   }
                 },
                 {
                   "Named": {
-                    "name": "{-reclaim-cost(e:3)}"
+                    "name": "{-Reclaim-Cost(e:3)}"
                   }
                 }
               ],
@@ -2837,8 +2846,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{prevent} a played enemy character."
+                      "Effect": "{Prevent} a played enemy character."
                     }
                   }
                 }
@@ -2878,8 +2888,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{prevent} a played enemy character."
+                      "Effect": "{Prevent} a played enemy character."
                     }
                   }
                 }
@@ -2920,8 +2931,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "return one or two events from your void to your hand."
+                      "Effect": "Return one or two events from your void to your hand."
                     }
                   }
                 }
@@ -2962,8 +2974,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "return one or two events from your void to your hand."
+                      "Effect": "Return one or two events from your void to your hand."
                     }
                   }
                 }
@@ -3020,15 +3033,16 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
                       "Modal": [
                         {
                           "cost": "{-energy-cost(e:2)}",
-                          "effect": "return an enemy character to hand."
+                          "effect": "Return an enemy character to hand."
                         },
                         {
                           "cost": "{-energy-cost(e:3)}",
-                          "effect": "draw {-cards(n:2)}."
+                          "effect": "Draw {-cards(n:2)}."
                         }
                       ]
                     }
@@ -3087,15 +3101,16 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
                       "Modal": [
                         {
                           "cost": "{-energy-cost(e:2)}",
-                          "effect": "return an enemy character to hand."
+                          "effect": "Return an enemy character to hand."
                         },
                         {
                           "cost": "{-energy-cost(e:3)}",
-                          "effect": "draw {-cards(n:2)}."
+                          "effect": "Draw {-cards(n:2)}."
                         }
                       ]
                     }
@@ -3137,8 +3152,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "give an allied character {anchored} until end of turn."
+                      "Effect": "Give an allied character {anchored} until end of turn."
                     }
                   }
                 }
@@ -3178,8 +3194,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "give an allied character {anchored} until end of turn."
+                      "Effect": "Give an allied character {anchored} until end of turn."
                     }
                   }
                 }
@@ -3235,14 +3252,15 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+                      "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
                     }
                   }
                 },
                 {
                   "Named": {
-                    "name": "{-reclaim-cost(e:3)}"
+                    "name": "{-Reclaim-Cost(e:3)}"
                   }
                 }
               ],
@@ -3295,14 +3313,15 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+                      "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
                     }
                   }
                 },
                 {
                   "Named": {
-                    "name": "{-reclaim-cost(e:3)}"
+                    "name": "{-Reclaim-Cost(e:3)}"
                   }
                 }
               ],
@@ -3355,14 +3374,15 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+                      "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
                     }
                   }
                 },
                 {
                   "Named": {
-                    "name": "{-reclaim-cost(e:3)}"
+                    "name": "{-Reclaim-Cost(e:3)}"
                   }
                 }
               ],
@@ -3399,8 +3419,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{prevent} a played enemy character."
+                      "Effect": "{Prevent} a played enemy character."
                     }
                   }
                 }
@@ -3440,8 +3461,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{prevent} a played enemy character."
+                      "Effect": "{Prevent} a played enemy character."
                     }
                   }
                 }
@@ -3519,7 +3541,7 @@
         85
       ],
       "quest": {
-        "id": "ed3795e6-8d51-400d-a0ca-eedd1f7ca2cf",
+        "id": "bbceedde-c20a-4167-8586-146cebe1d1a1",
         "user": {
           "id": "00000000-0000-0000-0000-000000000000"
         },
@@ -3547,8 +3569,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{dissolve} an enemy character."
+                      "Effect": "{Dissolve} an enemy character."
                     }
                   }
                 }
@@ -3588,8 +3611,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{dissolve} an enemy character."
+                      "Effect": "{Dissolve} an enemy character."
                     }
                   }
                 }
@@ -3629,8 +3653,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{dissolve} an enemy character."
+                      "Effect": "{Dissolve} an enemy character."
                     }
                   }
                 }
@@ -3670,8 +3695,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{dissolve} an enemy character."
+                      "Effect": "{Dissolve} an enemy character."
                     }
                   }
                 }
@@ -3711,8 +3737,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{prevent} a played enemy card."
+                      "Effect": "{Prevent} a played enemy card."
                     }
                   }
                 }
@@ -3752,8 +3779,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{prevent} a played enemy card."
+                      "Effect": "{Prevent} a played enemy card."
                     }
                   }
                 }
@@ -3793,8 +3821,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{prevent} a played enemy card."
+                      "Effect": "{Prevent} a played enemy card."
                     }
                   }
                 }
@@ -3837,8 +3866,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
+                      "Effect": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
                     }
                   }
                 }
@@ -3881,8 +3911,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
+                      "Effect": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
                     }
                   }
                 }
@@ -3922,8 +3953,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "draw {-cards(n:1)} for each {e} spent."
+                      "Effect": "Draw {-cards(n:1)} for each {e} spent."
                     }
                   }
                 }
@@ -3963,8 +3995,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "draw {-cards(n:1)} for each {e} spent."
+                      "Effect": "Draw {-cards(n:1)} for each {e} spent."
                     }
                   }
                 }
@@ -4004,8 +4037,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "draw {-cards(n:1)} for each {e} spent."
+                      "Effect": "Draw {-cards(n:1)} for each {e} spent."
                     }
                   }
                 }
@@ -4052,7 +4086,7 @@
               "displayed_abilities": [
                 {
                   "Triggered": {
-                    "text": "whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+                    "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
                   }
                 }
               ],
@@ -4096,7 +4130,7 @@
               "displayed_abilities": [
                 {
                   "Triggered": {
-                    "text": "whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+                    "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
                   }
                 }
               ],
@@ -4140,7 +4174,7 @@
               "displayed_abilities": [
                 {
                   "Triggered": {
-                    "text": "whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+                    "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
                   }
                 }
               ],
@@ -4184,7 +4218,7 @@
               "displayed_abilities": [
                 {
                   "Triggered": {
-                    "text": "whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+                    "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
                   }
                 }
               ],
@@ -4230,7 +4264,7 @@
                   "Activated": {
                     "cost": "{-energy-cost(e:3)}",
                     "effect": {
-                      "Effect": "draw {-cards(n:1)}."
+                      "Effect": "Draw {-cards(n:1)}."
                     }
                   }
                 }
@@ -4277,7 +4311,7 @@
                   "Activated": {
                     "cost": "{-energy-cost(e:3)}",
                     "effect": {
-                      "Effect": "draw {-cards(n:1)}."
+                      "Effect": "Draw {-cards(n:1)}."
                     }
                   }
                 }
@@ -4324,7 +4358,7 @@
                   "Activated": {
                     "cost": "{-energy-cost(e:3)}",
                     "effect": {
-                      "Effect": "draw {-cards(n:1)}."
+                      "Effect": "Draw {-cards(n:1)}."
                     }
                   }
                 }
@@ -4371,7 +4405,7 @@
                   "Activated": {
                     "cost": "{-energy-cost(e:3)}",
                     "effect": {
-                      "Effect": "draw {-cards(n:1)}."
+                      "Effect": "Draw {-cards(n:1)}."
                     }
                   }
                 }
@@ -4418,7 +4452,7 @@
                   "Activated": {
                     "cost": "{-energy-cost(e:3)}",
                     "effect": {
-                      "Effect": "draw {-cards(n:1)}."
+                      "Effect": "Draw {-cards(n:1)}."
                     }
                   }
                 }
@@ -4457,8 +4491,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "return one or two events from your void to your hand."
+                      "Effect": "Return one or two events from your void to your hand."
                     }
                   }
                 }
@@ -4499,8 +4534,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "return one or two events from your void to your hand."
+                      "Effect": "Return one or two events from your void to your hand."
                     }
                   }
                 }
@@ -4557,15 +4593,16 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
                       "Modal": [
                         {
                           "cost": "{-energy-cost(e:2)}",
-                          "effect": "return an enemy character to hand."
+                          "effect": "Return an enemy character to hand."
                         },
                         {
                           "cost": "{-energy-cost(e:3)}",
-                          "effect": "draw {-cards(n:2)}."
+                          "effect": "Draw {-cards(n:2)}."
                         }
                       ]
                     }
@@ -4624,15 +4661,16 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
                       "Modal": [
                         {
                           "cost": "{-energy-cost(e:2)}",
-                          "effect": "return an enemy character to hand."
+                          "effect": "Return an enemy character to hand."
                         },
                         {
                           "cost": "{-energy-cost(e:3)}",
-                          "effect": "draw {-cards(n:2)}."
+                          "effect": "Draw {-cards(n:2)}."
                         }
                       ]
                     }
@@ -4674,8 +4712,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "give an allied character {anchored} until end of turn."
+                      "Effect": "Give an allied character {anchored} until end of turn."
                     }
                   }
                 }
@@ -4715,8 +4754,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "give an allied character {anchored} until end of turn."
+                      "Effect": "Give an allied character {anchored} until end of turn."
                     }
                   }
                 }
@@ -4772,14 +4812,15 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+                      "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
                     }
                   }
                 },
                 {
                   "Named": {
-                    "name": "{-reclaim-cost(e:3)}"
+                    "name": "{-Reclaim-Cost(e:3)}"
                   }
                 }
               ],
@@ -4832,14 +4873,15 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+                      "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
                     }
                   }
                 },
                 {
                   "Named": {
-                    "name": "{-reclaim-cost(e:3)}"
+                    "name": "{-Reclaim-Cost(e:3)}"
                   }
                 }
               ],
@@ -4892,14 +4934,15 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+                      "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
                     }
                   }
                 },
                 {
                   "Named": {
-                    "name": "{-reclaim-cost(e:3)}"
+                    "name": "{-Reclaim-Cost(e:3)}"
                   }
                 }
               ],
@@ -4936,8 +4979,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{prevent} a played enemy character."
+                      "Effect": "{Prevent} a played enemy character."
                     }
                   }
                 }
@@ -4977,8 +5021,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{prevent} a played enemy character."
+                      "Effect": "{Prevent} a played enemy character."
                     }
                   }
                 }
@@ -5019,8 +5064,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "return one or two events from your void to your hand."
+                      "Effect": "Return one or two events from your void to your hand."
                     }
                   }
                 }
@@ -5061,8 +5107,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "return one or two events from your void to your hand."
+                      "Effect": "Return one or two events from your void to your hand."
                     }
                   }
                 }
@@ -5119,15 +5166,16 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
                       "Modal": [
                         {
                           "cost": "{-energy-cost(e:2)}",
-                          "effect": "return an enemy character to hand."
+                          "effect": "Return an enemy character to hand."
                         },
                         {
                           "cost": "{-energy-cost(e:3)}",
-                          "effect": "draw {-cards(n:2)}."
+                          "effect": "Draw {-cards(n:2)}."
                         }
                       ]
                     }
@@ -5186,15 +5234,16 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
                       "Modal": [
                         {
                           "cost": "{-energy-cost(e:2)}",
-                          "effect": "return an enemy character to hand."
+                          "effect": "Return an enemy character to hand."
                         },
                         {
                           "cost": "{-energy-cost(e:3)}",
-                          "effect": "draw {-cards(n:2)}."
+                          "effect": "Draw {-cards(n:2)}."
                         }
                       ]
                     }
@@ -5236,8 +5285,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "give an allied character {anchored} until end of turn."
+                      "Effect": "Give an allied character {anchored} until end of turn."
                     }
                   }
                 }
@@ -5277,8 +5327,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "give an allied character {anchored} until end of turn."
+                      "Effect": "Give an allied character {anchored} until end of turn."
                     }
                   }
                 }
@@ -5334,14 +5385,15 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+                      "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
                     }
                   }
                 },
                 {
                   "Named": {
-                    "name": "{-reclaim-cost(e:3)}"
+                    "name": "{-Reclaim-Cost(e:3)}"
                   }
                 }
               ],
@@ -5394,14 +5446,15 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+                      "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
                     }
                   }
                 },
                 {
                   "Named": {
-                    "name": "{-reclaim-cost(e:3)}"
+                    "name": "{-Reclaim-Cost(e:3)}"
                   }
                 }
               ],
@@ -5454,14 +5507,15 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+                      "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
                     }
                   }
                 },
                 {
                   "Named": {
-                    "name": "{-reclaim-cost(e:3)}"
+                    "name": "{-Reclaim-Cost(e:3)}"
                   }
                 }
               ],
@@ -5498,8 +5552,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{prevent} a played enemy character."
+                      "Effect": "{Prevent} a played enemy character."
                     }
                   }
                 }
@@ -5539,8 +5594,9 @@
               "displayed_abilities": [
                 {
                   "Event": {
+                    "additional_cost": null,
                     "effect": {
-                      "Effect": "{prevent} a played enemy character."
+                      "Effect": "{Prevent} a played enemy character."
                     }
                   }
                 }
@@ -5589,8 +5645,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       },
       "banished": {
         "set": {
@@ -5598,8 +5653,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       },
       "discarded": {
         "set": {
@@ -5607,8 +5661,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       },
       "dissolved": {
         "set": {
@@ -5616,8 +5669,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       },
       "drew_all_cards_in_copy_of_deck": {
         "set": {
@@ -5625,8 +5677,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       },
       "end_of_turn": {
         "set": {
@@ -5634,8 +5685,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       },
       "gained_energy": {
         "set": {
@@ -5643,8 +5693,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       },
       "judgment": {
         "set": {
@@ -5652,8 +5701,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       },
       "materialized": {
         "set": {
@@ -5661,8 +5709,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       },
       "played_card": {
         "set": {
@@ -5670,8 +5717,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       },
       "played_card_from_hand": {
         "set": {
@@ -5679,8 +5725,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       },
       "played_card_from_void": {
         "set": {
@@ -5688,8 +5733,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       }
     },
     "events": []
@@ -5702,8 +5746,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       },
       "activated_this_turn_cycle": []
     },
@@ -5714,8 +5757,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       },
       "activated_this_turn_cycle": []
     }
@@ -5728,8 +5770,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       },
       "two": {
         "set": {
@@ -5737,8 +5778,7 @@
             "storage": [],
             "nbits": 0
           }
-        },
-        "_marker": null
+        }
       }
     },
     "banish_when_leaves_play": {
@@ -5747,8 +5787,7 @@
           "storage": [],
           "nbits": 0
         }
-      },
-      "_marker": null
+      }
     },
     "until_end_of_turn": {
       "prevent_dissolved": []
@@ -8658,8 +8697,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{dissolve} an enemy character."
+                "Effect": "{Dissolve} an enemy character."
               }
             }
           }
@@ -8699,8 +8739,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{dissolve} an enemy character."
+                "Effect": "{Dissolve} an enemy character."
               }
             }
           }
@@ -8740,8 +8781,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{dissolve} an enemy character."
+                "Effect": "{Dissolve} an enemy character."
               }
             }
           }
@@ -8781,8 +8823,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{dissolve} an enemy character."
+                "Effect": "{Dissolve} an enemy character."
               }
             }
           }
@@ -8822,8 +8865,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{prevent} a played enemy card."
+                "Effect": "{Prevent} a played enemy card."
               }
             }
           }
@@ -8863,8 +8907,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{prevent} a played enemy card."
+                "Effect": "{Prevent} a played enemy card."
               }
             }
           }
@@ -8904,2041 +8949,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{prevent} a played enemy card."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{Prevent} a played enemy card.",
-        "displayed_prompts": [
-          "Choose an enemy card to {prevent}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1282908322.png"
-        }
-      },
-      {
-        "base_card_id": "76b6d00c-5a28-4ee3-9655-e4fea1d8a4d8",
-        "displayed_name": "Test Counterspell Unless Pays",
-        "energy_cost": 1,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "CounterspellUnlessPaysCost": {
-                    "target": {
-                      "Enemy": "Event"
-                    },
-                    "cost": {
-                      "Energy": 2
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}.",
-        "displayed_prompts": [
-          "Choose an enemy event to {prevent}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_2123360837.png"
-        }
-      },
-      {
-        "base_card_id": "76b6d00c-5a28-4ee3-9655-e4fea1d8a4d8",
-        "displayed_name": "Test Counterspell Unless Pays",
-        "energy_cost": 1,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "CounterspellUnlessPaysCost": {
-                    "target": {
-                      "Enemy": "Event"
-                    },
-                    "cost": {
-                      "Energy": 2
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}.",
-        "displayed_prompts": [
-          "Choose an enemy event to {prevent}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_2123360837.png"
-        }
-      },
-      {
-        "base_card_id": "e06a8cfe-483f-42c0-aac8-9c12b21b3f99",
-        "displayed_name": "Test Variable Energy Draw",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Event": {
-              "additional_cost": "SpendOneOrMoreEnergy",
-              "effect": {
-                "Effect": {
-                  "DrawCardsForEach": {
-                    "count": 1,
-                    "for_each": "ForEachEnergySpentOnThisCard"
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "draw {-cards(n:1)} for each {e} spent."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "Pay one or more {e}: Draw {-cards(n:1)} for each {e} spent.",
-        "displayed_prompts": [
-          "Pay one or more {e}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png"
-        }
-      },
-      {
-        "base_card_id": "e06a8cfe-483f-42c0-aac8-9c12b21b3f99",
-        "displayed_name": "Test Variable Energy Draw",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Event": {
-              "additional_cost": "SpendOneOrMoreEnergy",
-              "effect": {
-                "Effect": {
-                  "DrawCardsForEach": {
-                    "count": 1,
-                    "for_each": "ForEachEnergySpentOnThisCard"
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "draw {-cards(n:1)} for each {e} spent."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "Pay one or more {e}: Draw {-cards(n:1)} for each {e} spent.",
-        "displayed_prompts": [
-          "Pay one or more {e}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png"
-        }
-      },
-      {
-        "base_card_id": "e06a8cfe-483f-42c0-aac8-9c12b21b3f99",
-        "displayed_name": "Test Variable Energy Draw",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Event": {
-              "additional_cost": "SpendOneOrMoreEnergy",
-              "effect": {
-                "Effect": {
-                  "DrawCardsForEach": {
-                    "count": 1,
-                    "for_each": "ForEachEnergySpentOnThisCard"
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "draw {-cards(n:1)} for each {e} spent."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "Pay one or more {e}: Draw {-cards(n:1)} for each {e} spent.",
-        "displayed_prompts": [
-          "Pay one or more {e}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png"
-        }
-      },
-      {
-        "base_card_id": "86ee5ad7-b60b-4596-af8c-7a495022ac61",
-        "displayed_name": "Test Trigger Gain Spark On Play Card Enemy Turn",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Triggered": {
-              "trigger": {
-                "PlayDuringTurn": [
-                  {
-                    "Your": "Card"
-                  },
-                  "EnemyTurn"
-                ]
-              },
-              "effect": {
-                "Effect": {
-                  "GainsSpark": {
-                    "target": "This",
-                    "gains": 1
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Triggered": {
-              "text": "whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
-            }
-          }
-        ],
-        "displayed_rules_text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}.",
-        "displayed_prompts": [],
-        "card_type": "Character",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": 1,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png"
-        }
-      },
-      {
-        "base_card_id": "86ee5ad7-b60b-4596-af8c-7a495022ac61",
-        "displayed_name": "Test Trigger Gain Spark On Play Card Enemy Turn",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Triggered": {
-              "trigger": {
-                "PlayDuringTurn": [
-                  {
-                    "Your": "Card"
-                  },
-                  "EnemyTurn"
-                ]
-              },
-              "effect": {
-                "Effect": {
-                  "GainsSpark": {
-                    "target": "This",
-                    "gains": 1
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Triggered": {
-              "text": "whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
-            }
-          }
-        ],
-        "displayed_rules_text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}.",
-        "displayed_prompts": [],
-        "card_type": "Character",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": 1,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png"
-        }
-      },
-      {
-        "base_card_id": "86ee5ad7-b60b-4596-af8c-7a495022ac61",
-        "displayed_name": "Test Trigger Gain Spark On Play Card Enemy Turn",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Triggered": {
-              "trigger": {
-                "PlayDuringTurn": [
-                  {
-                    "Your": "Card"
-                  },
-                  "EnemyTurn"
-                ]
-              },
-              "effect": {
-                "Effect": {
-                  "GainsSpark": {
-                    "target": "This",
-                    "gains": 1
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Triggered": {
-              "text": "whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
-            }
-          }
-        ],
-        "displayed_rules_text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}.",
-        "displayed_prompts": [],
-        "card_type": "Character",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": 1,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png"
-        }
-      },
-      {
-        "base_card_id": "86ee5ad7-b60b-4596-af8c-7a495022ac61",
-        "displayed_name": "Test Trigger Gain Spark On Play Card Enemy Turn",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Triggered": {
-              "trigger": {
-                "PlayDuringTurn": [
-                  {
-                    "Your": "Card"
-                  },
-                  "EnemyTurn"
-                ]
-              },
-              "effect": {
-                "Effect": {
-                  "GainsSpark": {
-                    "target": "This",
-                    "gains": 1
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Triggered": {
-              "text": "whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
-            }
-          }
-        ],
-        "displayed_rules_text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}.",
-        "displayed_prompts": [],
-        "card_type": "Character",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": 1,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png"
-        }
-      },
-      {
-        "base_card_id": "d8a8541f-5b00-4d91-9518-aa8ae70ea450",
-        "displayed_name": "Test Fast Multi Activated Ability Draw Card Character",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Activated": {
-              "costs": [
-                {
-                  "Energy": 3
-                }
-              ],
-              "effect": {
-                "Effect": {
-                  "DrawCards": {
-                    "count": 1
-                  }
-                }
-              },
-              "options": {
-                "is_fast": true,
-                "is_multi": true
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Activated": {
-              "cost": "{-energy-cost(e:3)}",
-              "effect": {
-                "Effect": "draw {-cards(n:1)}."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{fma} {-energy-cost(e:3)}: Draw {-cards(n:1)}.",
-        "displayed_prompts": [],
-        "card_type": "Character",
-        "card_subtype": null,
-        "is_fast": false,
-        "spark": 2,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
-        }
-      },
-      {
-        "base_card_id": "d8a8541f-5b00-4d91-9518-aa8ae70ea450",
-        "displayed_name": "Test Fast Multi Activated Ability Draw Card Character",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Activated": {
-              "costs": [
-                {
-                  "Energy": 3
-                }
-              ],
-              "effect": {
-                "Effect": {
-                  "DrawCards": {
-                    "count": 1
-                  }
-                }
-              },
-              "options": {
-                "is_fast": true,
-                "is_multi": true
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Activated": {
-              "cost": "{-energy-cost(e:3)}",
-              "effect": {
-                "Effect": "draw {-cards(n:1)}."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{fma} {-energy-cost(e:3)}: Draw {-cards(n:1)}.",
-        "displayed_prompts": [],
-        "card_type": "Character",
-        "card_subtype": null,
-        "is_fast": false,
-        "spark": 2,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
-        }
-      },
-      {
-        "base_card_id": "d8a8541f-5b00-4d91-9518-aa8ae70ea450",
-        "displayed_name": "Test Fast Multi Activated Ability Draw Card Character",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Activated": {
-              "costs": [
-                {
-                  "Energy": 3
-                }
-              ],
-              "effect": {
-                "Effect": {
-                  "DrawCards": {
-                    "count": 1
-                  }
-                }
-              },
-              "options": {
-                "is_fast": true,
-                "is_multi": true
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Activated": {
-              "cost": "{-energy-cost(e:3)}",
-              "effect": {
-                "Effect": "draw {-cards(n:1)}."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{fma} {-energy-cost(e:3)}: Draw {-cards(n:1)}.",
-        "displayed_prompts": [],
-        "card_type": "Character",
-        "card_subtype": null,
-        "is_fast": false,
-        "spark": 2,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
-        }
-      },
-      {
-        "base_card_id": "d8a8541f-5b00-4d91-9518-aa8ae70ea450",
-        "displayed_name": "Test Fast Multi Activated Ability Draw Card Character",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Activated": {
-              "costs": [
-                {
-                  "Energy": 3
-                }
-              ],
-              "effect": {
-                "Effect": {
-                  "DrawCards": {
-                    "count": 1
-                  }
-                }
-              },
-              "options": {
-                "is_fast": true,
-                "is_multi": true
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Activated": {
-              "cost": "{-energy-cost(e:3)}",
-              "effect": {
-                "Effect": "draw {-cards(n:1)}."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{fma} {-energy-cost(e:3)}: Draw {-cards(n:1)}.",
-        "displayed_prompts": [],
-        "card_type": "Character",
-        "card_subtype": null,
-        "is_fast": false,
-        "spark": 2,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
-        }
-      },
-      {
-        "base_card_id": "d8a8541f-5b00-4d91-9518-aa8ae70ea450",
-        "displayed_name": "Test Fast Multi Activated Ability Draw Card Character",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Activated": {
-              "costs": [
-                {
-                  "Energy": 3
-                }
-              ],
-              "effect": {
-                "Effect": {
-                  "DrawCards": {
-                    "count": 1
-                  }
-                }
-              },
-              "options": {
-                "is_fast": true,
-                "is_multi": true
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Activated": {
-              "cost": "{-energy-cost(e:3)}",
-              "effect": {
-                "Effect": "draw {-cards(n:1)}."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{fma} {-energy-cost(e:3)}: Draw {-cards(n:1)}.",
-        "displayed_prompts": [],
-        "card_type": "Character",
-        "card_subtype": null,
-        "is_fast": false,
-        "spark": 2,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
-        }
-      },
-      {
-        "base_card_id": "559e62a0-7ead-4136-8bd4-6cc58db4bef7",
-        "displayed_name": "Test Return One Or Two Void Event Cards To Hand",
-        "energy_cost": 4,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "ReturnUpToCountFromYourVoidToHand": {
-                    "target": {
-                      "YourVoid": "Event"
-                    },
-                    "count": 2
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "return one or two events from your void to your hand."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "Return one or two events from your void to your hand.",
-        "displayed_prompts": [
-          "Choose one or two events in your void to return."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": false,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
-        }
-      },
-      {
-        "base_card_id": "559e62a0-7ead-4136-8bd4-6cc58db4bef7",
-        "displayed_name": "Test Return One Or Two Void Event Cards To Hand",
-        "energy_cost": 4,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "ReturnUpToCountFromYourVoidToHand": {
-                    "target": {
-                      "YourVoid": "Event"
-                    },
-                    "count": 2
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "return one or two events from your void to your hand."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "Return one or two events from your void to your hand.",
-        "displayed_prompts": [
-          "Choose one or two events in your void to return."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": false,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
-        }
-      },
-      {
-        "base_card_id": "e8f937da-cca7-447d-a559-530d7c339325",
-        "displayed_name": "Test Modal Return To Hand Or Draw Two",
-        "energy_cost": null,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Modal": [
-                  {
-                    "energy_cost": 2,
-                    "effect": {
-                      "Effect": {
-                        "ReturnToHand": {
-                          "target": {
-                            "Enemy": "Character"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  {
-                    "energy_cost": 3,
-                    "effect": {
-                      "Effect": {
-                        "DrawCards": {
-                          "count": 2
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Modal": [
-                  {
-                    "cost": "{-energy-cost(e:2)}",
-                    "effect": "return an enemy character to hand."
-                  },
-                  {
-                    "cost": "{-energy-cost(e:3)}",
-                    "effect": "draw {-cards(n:2)}."
-                  }
-                ]
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{choose-one}\n{bullet} {-energy-cost(e:2)}: Return an enemy character to hand.\n{bullet} {-energy-cost(e:3)}: Draw {-cards(n:2)}.",
-        "displayed_prompts": [
-          "Choose an enemy character to return to hand."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
-        }
-      },
-      {
-        "base_card_id": "e8f937da-cca7-447d-a559-530d7c339325",
-        "displayed_name": "Test Modal Return To Hand Or Draw Two",
-        "energy_cost": null,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Modal": [
-                  {
-                    "energy_cost": 2,
-                    "effect": {
-                      "Effect": {
-                        "ReturnToHand": {
-                          "target": {
-                            "Enemy": "Character"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  {
-                    "energy_cost": 3,
-                    "effect": {
-                      "Effect": {
-                        "DrawCards": {
-                          "count": 2
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Modal": [
-                  {
-                    "cost": "{-energy-cost(e:2)}",
-                    "effect": "return an enemy character to hand."
-                  },
-                  {
-                    "cost": "{-energy-cost(e:3)}",
-                    "effect": "draw {-cards(n:2)}."
-                  }
-                ]
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{choose-one}\n{bullet} {-energy-cost(e:2)}: Return an enemy character to hand.\n{bullet} {-energy-cost(e:3)}: Draw {-cards(n:2)}.",
-        "displayed_prompts": [
-          "Choose an enemy character to return to hand."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
-        }
-      },
-      {
-        "base_card_id": "0b783ac8-6aea-438e-a2d5-87bf68548eda",
-        "displayed_name": "Test Prevent Dissolve This Turn",
-        "energy_cost": 1,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "PreventDissolveThisTurn": {
-                    "target": {
-                      "Your": "Character"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "give an allied character {anchored} until end of turn."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "Give an allied character {anchored} until end of turn.",
-        "displayed_prompts": [
-          "Choose an allied character to gain {anchored}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
-        }
-      },
-      {
-        "base_card_id": "0b783ac8-6aea-438e-a2d5-87bf68548eda",
-        "displayed_name": "Test Prevent Dissolve This Turn",
-        "energy_cost": 1,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "PreventDissolveThisTurn": {
-                    "target": {
-                      "Your": "Character"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "give an allied character {anchored} until end of turn."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "Give an allied character {anchored} until end of turn.",
-        "displayed_prompts": [
-          "Choose an allied character to gain {anchored}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
-        }
-      },
-      {
-        "base_card_id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
-        "displayed_name": "Test Foresee One Draw Reclaim",
-        "energy_cost": 1,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "List": [
-                  {
-                    "effect": {
-                      "Foresee": {
-                        "count": 1
-                      }
-                    },
-                    "optional": false
-                  },
-                  {
-                    "effect": {
-                      "DrawCards": {
-                        "count": 1
-                      }
-                    },
-                    "optional": false
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "Named": {
-              "Reclaim": 3
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
-              }
-            }
-          },
-          {
-            "Named": {
-              "name": "{-reclaim-cost(e:3)}"
-            }
-          }
-        ],
-        "displayed_rules_text": "{-Foresee(n:1)}. Draw {-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
-        "displayed_prompts": [],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
-        }
-      },
-      {
-        "base_card_id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
-        "displayed_name": "Test Foresee One Draw Reclaim",
-        "energy_cost": 1,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "List": [
-                  {
-                    "effect": {
-                      "Foresee": {
-                        "count": 1
-                      }
-                    },
-                    "optional": false
-                  },
-                  {
-                    "effect": {
-                      "DrawCards": {
-                        "count": 1
-                      }
-                    },
-                    "optional": false
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "Named": {
-              "Reclaim": 3
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
-              }
-            }
-          },
-          {
-            "Named": {
-              "name": "{-reclaim-cost(e:3)}"
-            }
-          }
-        ],
-        "displayed_rules_text": "{-Foresee(n:1)}. Draw {-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
-        "displayed_prompts": [],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
-        }
-      },
-      {
-        "base_card_id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
-        "displayed_name": "Test Foresee One Draw Reclaim",
-        "energy_cost": 1,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "List": [
-                  {
-                    "effect": {
-                      "Foresee": {
-                        "count": 1
-                      }
-                    },
-                    "optional": false
-                  },
-                  {
-                    "effect": {
-                      "DrawCards": {
-                        "count": 1
-                      }
-                    },
-                    "optional": false
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "Named": {
-              "Reclaim": 3
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
-              }
-            }
-          },
-          {
-            "Named": {
-              "name": "{-reclaim-cost(e:3)}"
-            }
-          }
-        ],
-        "displayed_rules_text": "{-Foresee(n:1)}. Draw {-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
-        "displayed_prompts": [],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
-        }
-      },
-      {
-        "base_card_id": "86ed0d3f-320b-49d0-b022-cd94aa07edbd",
-        "displayed_name": "Test Counterspell Character",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "Counterspell": {
-                    "target": {
-                      "Enemy": "Character"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{prevent} a played enemy character."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{Prevent} a played enemy character.",
-        "displayed_prompts": [
-          "Choose an enemy character to {prevent}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
-        }
-      },
-      {
-        "base_card_id": "86ed0d3f-320b-49d0-b022-cd94aa07edbd",
-        "displayed_name": "Test Counterspell Character",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "Counterspell": {
-                    "target": {
-                      "Enemy": "Character"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{prevent} a played enemy character."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{Prevent} a played enemy character.",
-        "displayed_prompts": [
-          "Choose an enemy character to {prevent}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
-        }
-      },
-      {
-        "base_card_id": "559e62a0-7ead-4136-8bd4-6cc58db4bef7",
-        "displayed_name": "Test Return One Or Two Void Event Cards To Hand",
-        "energy_cost": 4,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "ReturnUpToCountFromYourVoidToHand": {
-                    "target": {
-                      "YourVoid": "Event"
-                    },
-                    "count": 2
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "return one or two events from your void to your hand."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "Return one or two events from your void to your hand.",
-        "displayed_prompts": [
-          "Choose one or two events in your void to return."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": false,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
-        }
-      },
-      {
-        "base_card_id": "559e62a0-7ead-4136-8bd4-6cc58db4bef7",
-        "displayed_name": "Test Return One Or Two Void Event Cards To Hand",
-        "energy_cost": 4,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "ReturnUpToCountFromYourVoidToHand": {
-                    "target": {
-                      "YourVoid": "Event"
-                    },
-                    "count": 2
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "return one or two events from your void to your hand."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "Return one or two events from your void to your hand.",
-        "displayed_prompts": [
-          "Choose one or two events in your void to return."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": false,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
-        }
-      },
-      {
-        "base_card_id": "e8f937da-cca7-447d-a559-530d7c339325",
-        "displayed_name": "Test Modal Return To Hand Or Draw Two",
-        "energy_cost": null,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Modal": [
-                  {
-                    "energy_cost": 2,
-                    "effect": {
-                      "Effect": {
-                        "ReturnToHand": {
-                          "target": {
-                            "Enemy": "Character"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  {
-                    "energy_cost": 3,
-                    "effect": {
-                      "Effect": {
-                        "DrawCards": {
-                          "count": 2
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Modal": [
-                  {
-                    "cost": "{-energy-cost(e:2)}",
-                    "effect": "return an enemy character to hand."
-                  },
-                  {
-                    "cost": "{-energy-cost(e:3)}",
-                    "effect": "draw {-cards(n:2)}."
-                  }
-                ]
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{choose-one}\n{bullet} {-energy-cost(e:2)}: Return an enemy character to hand.\n{bullet} {-energy-cost(e:3)}: Draw {-cards(n:2)}.",
-        "displayed_prompts": [
-          "Choose an enemy character to return to hand."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
-        }
-      },
-      {
-        "base_card_id": "e8f937da-cca7-447d-a559-530d7c339325",
-        "displayed_name": "Test Modal Return To Hand Or Draw Two",
-        "energy_cost": null,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Modal": [
-                  {
-                    "energy_cost": 2,
-                    "effect": {
-                      "Effect": {
-                        "ReturnToHand": {
-                          "target": {
-                            "Enemy": "Character"
-                          }
-                        }
-                      }
-                    }
-                  },
-                  {
-                    "energy_cost": 3,
-                    "effect": {
-                      "Effect": {
-                        "DrawCards": {
-                          "count": 2
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Modal": [
-                  {
-                    "cost": "{-energy-cost(e:2)}",
-                    "effect": "return an enemy character to hand."
-                  },
-                  {
-                    "cost": "{-energy-cost(e:3)}",
-                    "effect": "draw {-cards(n:2)}."
-                  }
-                ]
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{choose-one}\n{bullet} {-energy-cost(e:2)}: Return an enemy character to hand.\n{bullet} {-energy-cost(e:3)}: Draw {-cards(n:2)}.",
-        "displayed_prompts": [
-          "Choose an enemy character to return to hand."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
-        }
-      },
-      {
-        "base_card_id": "0b783ac8-6aea-438e-a2d5-87bf68548eda",
-        "displayed_name": "Test Prevent Dissolve This Turn",
-        "energy_cost": 1,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "PreventDissolveThisTurn": {
-                    "target": {
-                      "Your": "Character"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "give an allied character {anchored} until end of turn."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "Give an allied character {anchored} until end of turn.",
-        "displayed_prompts": [
-          "Choose an allied character to gain {anchored}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
-        }
-      },
-      {
-        "base_card_id": "0b783ac8-6aea-438e-a2d5-87bf68548eda",
-        "displayed_name": "Test Prevent Dissolve This Turn",
-        "energy_cost": 1,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "PreventDissolveThisTurn": {
-                    "target": {
-                      "Your": "Character"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "give an allied character {anchored} until end of turn."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "Give an allied character {anchored} until end of turn.",
-        "displayed_prompts": [
-          "Choose an allied character to gain {anchored}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
-        }
-      },
-      {
-        "base_card_id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
-        "displayed_name": "Test Foresee One Draw Reclaim",
-        "energy_cost": 1,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "List": [
-                  {
-                    "effect": {
-                      "Foresee": {
-                        "count": 1
-                      }
-                    },
-                    "optional": false
-                  },
-                  {
-                    "effect": {
-                      "DrawCards": {
-                        "count": 1
-                      }
-                    },
-                    "optional": false
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "Named": {
-              "Reclaim": 3
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
-              }
-            }
-          },
-          {
-            "Named": {
-              "name": "{-reclaim-cost(e:3)}"
-            }
-          }
-        ],
-        "displayed_rules_text": "{-Foresee(n:1)}. Draw {-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
-        "displayed_prompts": [],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
-        }
-      },
-      {
-        "base_card_id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
-        "displayed_name": "Test Foresee One Draw Reclaim",
-        "energy_cost": 1,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "List": [
-                  {
-                    "effect": {
-                      "Foresee": {
-                        "count": 1
-                      }
-                    },
-                    "optional": false
-                  },
-                  {
-                    "effect": {
-                      "DrawCards": {
-                        "count": 1
-                      }
-                    },
-                    "optional": false
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "Named": {
-              "Reclaim": 3
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
-              }
-            }
-          },
-          {
-            "Named": {
-              "name": "{-reclaim-cost(e:3)}"
-            }
-          }
-        ],
-        "displayed_rules_text": "{-Foresee(n:1)}. Draw {-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
-        "displayed_prompts": [],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
-        }
-      },
-      {
-        "base_card_id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
-        "displayed_name": "Test Foresee One Draw Reclaim",
-        "energy_cost": 1,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "List": [
-                  {
-                    "effect": {
-                      "Foresee": {
-                        "count": 1
-                      }
-                    },
-                    "optional": false
-                  },
-                  {
-                    "effect": {
-                      "DrawCards": {
-                        "count": 1
-                      }
-                    },
-                    "optional": false
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "Named": {
-              "Reclaim": 3
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
-              }
-            }
-          },
-          {
-            "Named": {
-              "name": "{-reclaim-cost(e:3)}"
-            }
-          }
-        ],
-        "displayed_rules_text": "{-Foresee(n:1)}. Draw {-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
-        "displayed_prompts": [],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
-        }
-      },
-      {
-        "base_card_id": "86ed0d3f-320b-49d0-b022-cd94aa07edbd",
-        "displayed_name": "Test Counterspell Character",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "Counterspell": {
-                    "target": {
-                      "Enemy": "Character"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{prevent} a played enemy character."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{Prevent} a played enemy character.",
-        "displayed_prompts": [
-          "Choose an enemy character to {prevent}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
-        }
-      },
-      {
-        "base_card_id": "86ed0d3f-320b-49d0-b022-cd94aa07edbd",
-        "displayed_name": "Test Counterspell Character",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "Counterspell": {
-                    "target": {
-                      "Enemy": "Character"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{prevent} a played enemy character."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{Prevent} a played enemy character.",
-        "displayed_prompts": [
-          "Choose an enemy character to {prevent}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
-        }
-      },
-      {
-        "base_card_id": "3c1dbdc7-702e-4748-af3c-4fd837bcb404",
-        "displayed_name": "Test Named Dissolve",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "DissolveCharacter": {
-                    "target": {
-                      "Enemy": "Character"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{dissolve} an enemy character."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{Dissolve} an enemy character.",
-        "displayed_prompts": [
-          "Choose an enemy character to {dissolve}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png"
-        }
-      },
-      {
-        "base_card_id": "3c1dbdc7-702e-4748-af3c-4fd837bcb404",
-        "displayed_name": "Test Named Dissolve",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "DissolveCharacter": {
-                    "target": {
-                      "Enemy": "Character"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{dissolve} an enemy character."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{Dissolve} an enemy character.",
-        "displayed_prompts": [
-          "Choose an enemy character to {dissolve}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png"
-        }
-      },
-      {
-        "base_card_id": "3c1dbdc7-702e-4748-af3c-4fd837bcb404",
-        "displayed_name": "Test Named Dissolve",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "DissolveCharacter": {
-                    "target": {
-                      "Enemy": "Character"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{dissolve} an enemy character."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{Dissolve} an enemy character.",
-        "displayed_prompts": [
-          "Choose an enemy character to {dissolve}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png"
-        }
-      },
-      {
-        "base_card_id": "3c1dbdc7-702e-4748-af3c-4fd837bcb404",
-        "displayed_name": "Test Named Dissolve",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "DissolveCharacter": {
-                    "target": {
-                      "Enemy": "Character"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{dissolve} an enemy character."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{Dissolve} an enemy character.",
-        "displayed_prompts": [
-          "Choose an enemy character to {dissolve}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png"
-        }
-      },
-      {
-        "base_card_id": "aad836b0-3ece-477c-b923-b099360f0115",
-        "displayed_name": "Test Counterspell",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "Counterspell": {
-                    "target": {
-                      "Enemy": "Card"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{prevent} a played enemy card."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{Prevent} a played enemy card.",
-        "displayed_prompts": [
-          "Choose an enemy card to {prevent}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1282908322.png"
-        }
-      },
-      {
-        "base_card_id": "aad836b0-3ece-477c-b923-b099360f0115",
-        "displayed_name": "Test Counterspell",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "Counterspell": {
-                    "target": {
-                      "Enemy": "Card"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{prevent} a played enemy card."
-              }
-            }
-          }
-        ],
-        "displayed_rules_text": "{Prevent} a played enemy card.",
-        "displayed_prompts": [
-          "Choose an enemy card to {prevent}."
-        ],
-        "card_type": "Event",
-        "card_subtype": null,
-        "is_fast": true,
-        "spark": null,
-        "rarity": "Special",
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1282908322.png"
-        }
-      },
-      {
-        "base_card_id": "aad836b0-3ece-477c-b923-b099360f0115",
-        "displayed_name": "Test Counterspell",
-        "energy_cost": 2,
-        "abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": {
-                  "Counterspell": {
-                    "target": {
-                      "Enemy": "Card"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "displayed_abilities": [
-          {
-            "Event": {
-              "effect": {
-                "Effect": "{prevent} a played enemy card."
+                "Effect": "{Prevent} a played enemy card."
               }
             }
           }
@@ -10981,8 +8994,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
+                "Effect": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
               }
             }
           }
@@ -11025,8 +9039,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
+                "Effect": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
               }
             }
           }
@@ -11066,8 +9081,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "draw {-cards(n:1)} for each {e} spent."
+                "Effect": "Draw {-cards(n:1)} for each {e} spent."
               }
             }
           }
@@ -11107,8 +9123,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "draw {-cards(n:1)} for each {e} spent."
+                "Effect": "Draw {-cards(n:1)} for each {e} spent."
               }
             }
           }
@@ -11148,8 +9165,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "draw {-cards(n:1)} for each {e} spent."
+                "Effect": "Draw {-cards(n:1)} for each {e} spent."
               }
             }
           }
@@ -11196,7 +9214,7 @@
         "displayed_abilities": [
           {
             "Triggered": {
-              "text": "whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+              "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
             }
           }
         ],
@@ -11240,7 +9258,7 @@
         "displayed_abilities": [
           {
             "Triggered": {
-              "text": "whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+              "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
             }
           }
         ],
@@ -11284,7 +9302,7 @@
         "displayed_abilities": [
           {
             "Triggered": {
-              "text": "whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+              "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
             }
           }
         ],
@@ -11328,7 +9346,7 @@
         "displayed_abilities": [
           {
             "Triggered": {
-              "text": "whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+              "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
             }
           }
         ],
@@ -11374,7 +9392,7 @@
             "Activated": {
               "cost": "{-energy-cost(e:3)}",
               "effect": {
-                "Effect": "draw {-cards(n:1)}."
+                "Effect": "Draw {-cards(n:1)}."
               }
             }
           }
@@ -11421,7 +9439,7 @@
             "Activated": {
               "cost": "{-energy-cost(e:3)}",
               "effect": {
-                "Effect": "draw {-cards(n:1)}."
+                "Effect": "Draw {-cards(n:1)}."
               }
             }
           }
@@ -11468,7 +9486,7 @@
             "Activated": {
               "cost": "{-energy-cost(e:3)}",
               "effect": {
-                "Effect": "draw {-cards(n:1)}."
+                "Effect": "Draw {-cards(n:1)}."
               }
             }
           }
@@ -11515,7 +9533,7 @@
             "Activated": {
               "cost": "{-energy-cost(e:3)}",
               "effect": {
-                "Effect": "draw {-cards(n:1)}."
+                "Effect": "Draw {-cards(n:1)}."
               }
             }
           }
@@ -11562,7 +9580,7 @@
             "Activated": {
               "cost": "{-energy-cost(e:3)}",
               "effect": {
-                "Effect": "draw {-cards(n:1)}."
+                "Effect": "Draw {-cards(n:1)}."
               }
             }
           }
@@ -11601,8 +9619,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "return one or two events from your void to your hand."
+                "Effect": "Return one or two events from your void to your hand."
               }
             }
           }
@@ -11643,8 +9662,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "return one or two events from your void to your hand."
+                "Effect": "Return one or two events from your void to your hand."
               }
             }
           }
@@ -11701,15 +9721,16 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
                 "Modal": [
                   {
                     "cost": "{-energy-cost(e:2)}",
-                    "effect": "return an enemy character to hand."
+                    "effect": "Return an enemy character to hand."
                   },
                   {
                     "cost": "{-energy-cost(e:3)}",
-                    "effect": "draw {-cards(n:2)}."
+                    "effect": "Draw {-cards(n:2)}."
                   }
                 ]
               }
@@ -11768,15 +9789,16 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
                 "Modal": [
                   {
                     "cost": "{-energy-cost(e:2)}",
-                    "effect": "return an enemy character to hand."
+                    "effect": "Return an enemy character to hand."
                   },
                   {
                     "cost": "{-energy-cost(e:3)}",
-                    "effect": "draw {-cards(n:2)}."
+                    "effect": "Draw {-cards(n:2)}."
                   }
                 ]
               }
@@ -11818,8 +9840,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "give an allied character {anchored} until end of turn."
+                "Effect": "Give an allied character {anchored} until end of turn."
               }
             }
           }
@@ -11859,8 +9882,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "give an allied character {anchored} until end of turn."
+                "Effect": "Give an allied character {anchored} until end of turn."
               }
             }
           }
@@ -11916,14 +9940,15 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+                "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
               }
             }
           },
           {
             "Named": {
-              "name": "{-reclaim-cost(e:3)}"
+              "name": "{-Reclaim-Cost(e:3)}"
             }
           }
         ],
@@ -11976,14 +10001,15 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+                "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
               }
             }
           },
           {
             "Named": {
-              "name": "{-reclaim-cost(e:3)}"
+              "name": "{-Reclaim-Cost(e:3)}"
             }
           }
         ],
@@ -12036,14 +10062,15 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+                "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
               }
             }
           },
           {
             "Named": {
-              "name": "{-reclaim-cost(e:3)}"
+              "name": "{-Reclaim-Cost(e:3)}"
             }
           }
         ],
@@ -12080,8 +10107,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{prevent} a played enemy character."
+                "Effect": "{Prevent} a played enemy character."
               }
             }
           }
@@ -12121,8 +10149,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{prevent} a played enemy character."
+                "Effect": "{Prevent} a played enemy character."
               }
             }
           }
@@ -12163,8 +10192,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "return one or two events from your void to your hand."
+                "Effect": "Return one or two events from your void to your hand."
               }
             }
           }
@@ -12205,8 +10235,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "return one or two events from your void to your hand."
+                "Effect": "Return one or two events from your void to your hand."
               }
             }
           }
@@ -12263,15 +10294,16 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
                 "Modal": [
                   {
                     "cost": "{-energy-cost(e:2)}",
-                    "effect": "return an enemy character to hand."
+                    "effect": "Return an enemy character to hand."
                   },
                   {
                     "cost": "{-energy-cost(e:3)}",
-                    "effect": "draw {-cards(n:2)}."
+                    "effect": "Draw {-cards(n:2)}."
                   }
                 ]
               }
@@ -12330,15 +10362,16 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
                 "Modal": [
                   {
                     "cost": "{-energy-cost(e:2)}",
-                    "effect": "return an enemy character to hand."
+                    "effect": "Return an enemy character to hand."
                   },
                   {
                     "cost": "{-energy-cost(e:3)}",
-                    "effect": "draw {-cards(n:2)}."
+                    "effect": "Draw {-cards(n:2)}."
                   }
                 ]
               }
@@ -12380,8 +10413,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "give an allied character {anchored} until end of turn."
+                "Effect": "Give an allied character {anchored} until end of turn."
               }
             }
           }
@@ -12421,8 +10455,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "give an allied character {anchored} until end of turn."
+                "Effect": "Give an allied character {anchored} until end of turn."
               }
             }
           }
@@ -12478,14 +10513,15 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+                "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
               }
             }
           },
           {
             "Named": {
-              "name": "{-reclaim-cost(e:3)}"
+              "name": "{-Reclaim-Cost(e:3)}"
             }
           }
         ],
@@ -12538,14 +10574,15 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+                "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
               }
             }
           },
           {
             "Named": {
-              "name": "{-reclaim-cost(e:3)}"
+              "name": "{-Reclaim-Cost(e:3)}"
             }
           }
         ],
@@ -12598,14 +10635,15 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+                "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
               }
             }
           },
           {
             "Named": {
-              "name": "{-reclaim-cost(e:3)}"
+              "name": "{-Reclaim-Cost(e:3)}"
             }
           }
         ],
@@ -12642,8 +10680,9 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{prevent} a played enemy character."
+                "Effect": "{Prevent} a played enemy character."
               }
             }
           }
@@ -12683,8 +10722,2076 @@
         "displayed_abilities": [
           {
             "Event": {
+              "additional_cost": null,
               "effect": {
-                "Effect": "{prevent} a played enemy character."
+                "Effect": "{Prevent} a played enemy character."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{Prevent} a played enemy character.",
+        "displayed_prompts": [
+          "Choose an enemy character to {prevent}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
+        }
+      },
+      {
+        "base_card_id": "3c1dbdc7-702e-4748-af3c-4fd837bcb404",
+        "displayed_name": "Test Named Dissolve",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "DissolveCharacter": {
+                    "target": {
+                      "Enemy": "Character"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{Dissolve} an enemy character."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{Dissolve} an enemy character.",
+        "displayed_prompts": [
+          "Choose an enemy character to {dissolve}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png"
+        }
+      },
+      {
+        "base_card_id": "3c1dbdc7-702e-4748-af3c-4fd837bcb404",
+        "displayed_name": "Test Named Dissolve",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "DissolveCharacter": {
+                    "target": {
+                      "Enemy": "Character"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{Dissolve} an enemy character."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{Dissolve} an enemy character.",
+        "displayed_prompts": [
+          "Choose an enemy character to {dissolve}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png"
+        }
+      },
+      {
+        "base_card_id": "3c1dbdc7-702e-4748-af3c-4fd837bcb404",
+        "displayed_name": "Test Named Dissolve",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "DissolveCharacter": {
+                    "target": {
+                      "Enemy": "Character"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{Dissolve} an enemy character."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{Dissolve} an enemy character.",
+        "displayed_prompts": [
+          "Choose an enemy character to {dissolve}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png"
+        }
+      },
+      {
+        "base_card_id": "3c1dbdc7-702e-4748-af3c-4fd837bcb404",
+        "displayed_name": "Test Named Dissolve",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "DissolveCharacter": {
+                    "target": {
+                      "Enemy": "Character"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{Dissolve} an enemy character."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{Dissolve} an enemy character.",
+        "displayed_prompts": [
+          "Choose an enemy character to {dissolve}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png"
+        }
+      },
+      {
+        "base_card_id": "aad836b0-3ece-477c-b923-b099360f0115",
+        "displayed_name": "Test Counterspell",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "Counterspell": {
+                    "target": {
+                      "Enemy": "Card"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{Prevent} a played enemy card."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{Prevent} a played enemy card.",
+        "displayed_prompts": [
+          "Choose an enemy card to {prevent}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1282908322.png"
+        }
+      },
+      {
+        "base_card_id": "aad836b0-3ece-477c-b923-b099360f0115",
+        "displayed_name": "Test Counterspell",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "Counterspell": {
+                    "target": {
+                      "Enemy": "Card"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{Prevent} a played enemy card."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{Prevent} a played enemy card.",
+        "displayed_prompts": [
+          "Choose an enemy card to {prevent}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1282908322.png"
+        }
+      },
+      {
+        "base_card_id": "aad836b0-3ece-477c-b923-b099360f0115",
+        "displayed_name": "Test Counterspell",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "Counterspell": {
+                    "target": {
+                      "Enemy": "Card"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{Prevent} a played enemy card."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{Prevent} a played enemy card.",
+        "displayed_prompts": [
+          "Choose an enemy card to {prevent}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1282908322.png"
+        }
+      },
+      {
+        "base_card_id": "76b6d00c-5a28-4ee3-9655-e4fea1d8a4d8",
+        "displayed_name": "Test Counterspell Unless Pays",
+        "energy_cost": 1,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "CounterspellUnlessPaysCost": {
+                    "target": {
+                      "Enemy": "Event"
+                    },
+                    "cost": {
+                      "Energy": 2
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}.",
+        "displayed_prompts": [
+          "Choose an enemy event to {prevent}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_2123360837.png"
+        }
+      },
+      {
+        "base_card_id": "76b6d00c-5a28-4ee3-9655-e4fea1d8a4d8",
+        "displayed_name": "Test Counterspell Unless Pays",
+        "energy_cost": 1,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "CounterspellUnlessPaysCost": {
+                    "target": {
+                      "Enemy": "Event"
+                    },
+                    "cost": {
+                      "Energy": 2
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}.",
+        "displayed_prompts": [
+          "Choose an enemy event to {prevent}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_2123360837.png"
+        }
+      },
+      {
+        "base_card_id": "e06a8cfe-483f-42c0-aac8-9c12b21b3f99",
+        "displayed_name": "Test Variable Energy Draw",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Event": {
+              "additional_cost": "SpendOneOrMoreEnergy",
+              "effect": {
+                "Effect": {
+                  "DrawCardsForEach": {
+                    "count": 1,
+                    "for_each": "ForEachEnergySpentOnThisCard"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Draw {-cards(n:1)} for each {e} spent."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "Pay one or more {e}: Draw {-cards(n:1)} for each {e} spent.",
+        "displayed_prompts": [
+          "Pay one or more {e}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png"
+        }
+      },
+      {
+        "base_card_id": "e06a8cfe-483f-42c0-aac8-9c12b21b3f99",
+        "displayed_name": "Test Variable Energy Draw",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Event": {
+              "additional_cost": "SpendOneOrMoreEnergy",
+              "effect": {
+                "Effect": {
+                  "DrawCardsForEach": {
+                    "count": 1,
+                    "for_each": "ForEachEnergySpentOnThisCard"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Draw {-cards(n:1)} for each {e} spent."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "Pay one or more {e}: Draw {-cards(n:1)} for each {e} spent.",
+        "displayed_prompts": [
+          "Pay one or more {e}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png"
+        }
+      },
+      {
+        "base_card_id": "e06a8cfe-483f-42c0-aac8-9c12b21b3f99",
+        "displayed_name": "Test Variable Energy Draw",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Event": {
+              "additional_cost": "SpendOneOrMoreEnergy",
+              "effect": {
+                "Effect": {
+                  "DrawCardsForEach": {
+                    "count": 1,
+                    "for_each": "ForEachEnergySpentOnThisCard"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Draw {-cards(n:1)} for each {e} spent."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "Pay one or more {e}: Draw {-cards(n:1)} for each {e} spent.",
+        "displayed_prompts": [
+          "Pay one or more {e}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png"
+        }
+      },
+      {
+        "base_card_id": "86ee5ad7-b60b-4596-af8c-7a495022ac61",
+        "displayed_name": "Test Trigger Gain Spark On Play Card Enemy Turn",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Triggered": {
+              "trigger": {
+                "PlayDuringTurn": [
+                  {
+                    "Your": "Card"
+                  },
+                  "EnemyTurn"
+                ]
+              },
+              "effect": {
+                "Effect": {
+                  "GainsSpark": {
+                    "target": "This",
+                    "gains": 1
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Triggered": {
+              "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+            }
+          }
+        ],
+        "displayed_rules_text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}.",
+        "displayed_prompts": [],
+        "card_type": "Character",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": 1,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png"
+        }
+      },
+      {
+        "base_card_id": "86ee5ad7-b60b-4596-af8c-7a495022ac61",
+        "displayed_name": "Test Trigger Gain Spark On Play Card Enemy Turn",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Triggered": {
+              "trigger": {
+                "PlayDuringTurn": [
+                  {
+                    "Your": "Card"
+                  },
+                  "EnemyTurn"
+                ]
+              },
+              "effect": {
+                "Effect": {
+                  "GainsSpark": {
+                    "target": "This",
+                    "gains": 1
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Triggered": {
+              "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+            }
+          }
+        ],
+        "displayed_rules_text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}.",
+        "displayed_prompts": [],
+        "card_type": "Character",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": 1,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png"
+        }
+      },
+      {
+        "base_card_id": "86ee5ad7-b60b-4596-af8c-7a495022ac61",
+        "displayed_name": "Test Trigger Gain Spark On Play Card Enemy Turn",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Triggered": {
+              "trigger": {
+                "PlayDuringTurn": [
+                  {
+                    "Your": "Card"
+                  },
+                  "EnemyTurn"
+                ]
+              },
+              "effect": {
+                "Effect": {
+                  "GainsSpark": {
+                    "target": "This",
+                    "gains": 1
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Triggered": {
+              "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+            }
+          }
+        ],
+        "displayed_rules_text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}.",
+        "displayed_prompts": [],
+        "card_type": "Character",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": 1,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png"
+        }
+      },
+      {
+        "base_card_id": "86ee5ad7-b60b-4596-af8c-7a495022ac61",
+        "displayed_name": "Test Trigger Gain Spark On Play Card Enemy Turn",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Triggered": {
+              "trigger": {
+                "PlayDuringTurn": [
+                  {
+                    "Your": "Card"
+                  },
+                  "EnemyTurn"
+                ]
+              },
+              "effect": {
+                "Effect": {
+                  "GainsSpark": {
+                    "target": "This",
+                    "gains": 1
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Triggered": {
+              "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+            }
+          }
+        ],
+        "displayed_rules_text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}.",
+        "displayed_prompts": [],
+        "card_type": "Character",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": 1,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png"
+        }
+      },
+      {
+        "base_card_id": "d8a8541f-5b00-4d91-9518-aa8ae70ea450",
+        "displayed_name": "Test Fast Multi Activated Ability Draw Card Character",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Activated": {
+              "costs": [
+                {
+                  "Energy": 3
+                }
+              ],
+              "effect": {
+                "Effect": {
+                  "DrawCards": {
+                    "count": 1
+                  }
+                }
+              },
+              "options": {
+                "is_fast": true,
+                "is_multi": true
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Activated": {
+              "cost": "{-energy-cost(e:3)}",
+              "effect": {
+                "Effect": "Draw {-cards(n:1)}."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{fma} {-energy-cost(e:3)}: Draw {-cards(n:1)}.",
+        "displayed_prompts": [],
+        "card_type": "Character",
+        "card_subtype": null,
+        "is_fast": false,
+        "spark": 2,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
+        }
+      },
+      {
+        "base_card_id": "d8a8541f-5b00-4d91-9518-aa8ae70ea450",
+        "displayed_name": "Test Fast Multi Activated Ability Draw Card Character",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Activated": {
+              "costs": [
+                {
+                  "Energy": 3
+                }
+              ],
+              "effect": {
+                "Effect": {
+                  "DrawCards": {
+                    "count": 1
+                  }
+                }
+              },
+              "options": {
+                "is_fast": true,
+                "is_multi": true
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Activated": {
+              "cost": "{-energy-cost(e:3)}",
+              "effect": {
+                "Effect": "Draw {-cards(n:1)}."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{fma} {-energy-cost(e:3)}: Draw {-cards(n:1)}.",
+        "displayed_prompts": [],
+        "card_type": "Character",
+        "card_subtype": null,
+        "is_fast": false,
+        "spark": 2,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
+        }
+      },
+      {
+        "base_card_id": "d8a8541f-5b00-4d91-9518-aa8ae70ea450",
+        "displayed_name": "Test Fast Multi Activated Ability Draw Card Character",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Activated": {
+              "costs": [
+                {
+                  "Energy": 3
+                }
+              ],
+              "effect": {
+                "Effect": {
+                  "DrawCards": {
+                    "count": 1
+                  }
+                }
+              },
+              "options": {
+                "is_fast": true,
+                "is_multi": true
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Activated": {
+              "cost": "{-energy-cost(e:3)}",
+              "effect": {
+                "Effect": "Draw {-cards(n:1)}."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{fma} {-energy-cost(e:3)}: Draw {-cards(n:1)}.",
+        "displayed_prompts": [],
+        "card_type": "Character",
+        "card_subtype": null,
+        "is_fast": false,
+        "spark": 2,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
+        }
+      },
+      {
+        "base_card_id": "d8a8541f-5b00-4d91-9518-aa8ae70ea450",
+        "displayed_name": "Test Fast Multi Activated Ability Draw Card Character",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Activated": {
+              "costs": [
+                {
+                  "Energy": 3
+                }
+              ],
+              "effect": {
+                "Effect": {
+                  "DrawCards": {
+                    "count": 1
+                  }
+                }
+              },
+              "options": {
+                "is_fast": true,
+                "is_multi": true
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Activated": {
+              "cost": "{-energy-cost(e:3)}",
+              "effect": {
+                "Effect": "Draw {-cards(n:1)}."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{fma} {-energy-cost(e:3)}: Draw {-cards(n:1)}.",
+        "displayed_prompts": [],
+        "card_type": "Character",
+        "card_subtype": null,
+        "is_fast": false,
+        "spark": 2,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
+        }
+      },
+      {
+        "base_card_id": "d8a8541f-5b00-4d91-9518-aa8ae70ea450",
+        "displayed_name": "Test Fast Multi Activated Ability Draw Card Character",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Activated": {
+              "costs": [
+                {
+                  "Energy": 3
+                }
+              ],
+              "effect": {
+                "Effect": {
+                  "DrawCards": {
+                    "count": 1
+                  }
+                }
+              },
+              "options": {
+                "is_fast": true,
+                "is_multi": true
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Activated": {
+              "cost": "{-energy-cost(e:3)}",
+              "effect": {
+                "Effect": "Draw {-cards(n:1)}."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{fma} {-energy-cost(e:3)}: Draw {-cards(n:1)}.",
+        "displayed_prompts": [],
+        "card_type": "Character",
+        "card_subtype": null,
+        "is_fast": false,
+        "spark": 2,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
+        }
+      },
+      {
+        "base_card_id": "559e62a0-7ead-4136-8bd4-6cc58db4bef7",
+        "displayed_name": "Test Return One Or Two Void Event Cards To Hand",
+        "energy_cost": 4,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "ReturnUpToCountFromYourVoidToHand": {
+                    "target": {
+                      "YourVoid": "Event"
+                    },
+                    "count": 2
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Return one or two events from your void to your hand."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "Return one or two events from your void to your hand.",
+        "displayed_prompts": [
+          "Choose one or two events in your void to return."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": false,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
+        }
+      },
+      {
+        "base_card_id": "559e62a0-7ead-4136-8bd4-6cc58db4bef7",
+        "displayed_name": "Test Return One Or Two Void Event Cards To Hand",
+        "energy_cost": 4,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "ReturnUpToCountFromYourVoidToHand": {
+                    "target": {
+                      "YourVoid": "Event"
+                    },
+                    "count": 2
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Return one or two events from your void to your hand."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "Return one or two events from your void to your hand.",
+        "displayed_prompts": [
+          "Choose one or two events in your void to return."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": false,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
+        }
+      },
+      {
+        "base_card_id": "e8f937da-cca7-447d-a559-530d7c339325",
+        "displayed_name": "Test Modal Return To Hand Or Draw Two",
+        "energy_cost": null,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Modal": [
+                  {
+                    "energy_cost": 2,
+                    "effect": {
+                      "Effect": {
+                        "ReturnToHand": {
+                          "target": {
+                            "Enemy": "Character"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "energy_cost": 3,
+                    "effect": {
+                      "Effect": {
+                        "DrawCards": {
+                          "count": 2
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Modal": [
+                  {
+                    "cost": "{-energy-cost(e:2)}",
+                    "effect": "Return an enemy character to hand."
+                  },
+                  {
+                    "cost": "{-energy-cost(e:3)}",
+                    "effect": "Draw {-cards(n:2)}."
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{choose-one}\n{bullet} {-energy-cost(e:2)}: Return an enemy character to hand.\n{bullet} {-energy-cost(e:3)}: Draw {-cards(n:2)}.",
+        "displayed_prompts": [
+          "Choose an enemy character to return to hand."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
+        }
+      },
+      {
+        "base_card_id": "e8f937da-cca7-447d-a559-530d7c339325",
+        "displayed_name": "Test Modal Return To Hand Or Draw Two",
+        "energy_cost": null,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Modal": [
+                  {
+                    "energy_cost": 2,
+                    "effect": {
+                      "Effect": {
+                        "ReturnToHand": {
+                          "target": {
+                            "Enemy": "Character"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "energy_cost": 3,
+                    "effect": {
+                      "Effect": {
+                        "DrawCards": {
+                          "count": 2
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Modal": [
+                  {
+                    "cost": "{-energy-cost(e:2)}",
+                    "effect": "Return an enemy character to hand."
+                  },
+                  {
+                    "cost": "{-energy-cost(e:3)}",
+                    "effect": "Draw {-cards(n:2)}."
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{choose-one}\n{bullet} {-energy-cost(e:2)}: Return an enemy character to hand.\n{bullet} {-energy-cost(e:3)}: Draw {-cards(n:2)}.",
+        "displayed_prompts": [
+          "Choose an enemy character to return to hand."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
+        }
+      },
+      {
+        "base_card_id": "0b783ac8-6aea-438e-a2d5-87bf68548eda",
+        "displayed_name": "Test Prevent Dissolve This Turn",
+        "energy_cost": 1,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "PreventDissolveThisTurn": {
+                    "target": {
+                      "Your": "Character"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Give an allied character {anchored} until end of turn."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "Give an allied character {anchored} until end of turn.",
+        "displayed_prompts": [
+          "Choose an allied character to gain {anchored}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
+        }
+      },
+      {
+        "base_card_id": "0b783ac8-6aea-438e-a2d5-87bf68548eda",
+        "displayed_name": "Test Prevent Dissolve This Turn",
+        "energy_cost": 1,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "PreventDissolveThisTurn": {
+                    "target": {
+                      "Your": "Character"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Give an allied character {anchored} until end of turn."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "Give an allied character {anchored} until end of turn.",
+        "displayed_prompts": [
+          "Choose an allied character to gain {anchored}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
+        }
+      },
+      {
+        "base_card_id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
+        "displayed_name": "Test Foresee One Draw Reclaim",
+        "energy_cost": 1,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "List": [
+                  {
+                    "effect": {
+                      "Foresee": {
+                        "count": 1
+                      }
+                    },
+                    "optional": false
+                  },
+                  {
+                    "effect": {
+                      "DrawCards": {
+                        "count": 1
+                      }
+                    },
+                    "optional": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Named": {
+              "Reclaim": 3
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
+              }
+            }
+          },
+          {
+            "Named": {
+              "name": "{-Reclaim-Cost(e:3)}"
+            }
+          }
+        ],
+        "displayed_rules_text": "{-Foresee(n:1)}. Draw {-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
+        "displayed_prompts": [],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
+        }
+      },
+      {
+        "base_card_id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
+        "displayed_name": "Test Foresee One Draw Reclaim",
+        "energy_cost": 1,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "List": [
+                  {
+                    "effect": {
+                      "Foresee": {
+                        "count": 1
+                      }
+                    },
+                    "optional": false
+                  },
+                  {
+                    "effect": {
+                      "DrawCards": {
+                        "count": 1
+                      }
+                    },
+                    "optional": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Named": {
+              "Reclaim": 3
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
+              }
+            }
+          },
+          {
+            "Named": {
+              "name": "{-Reclaim-Cost(e:3)}"
+            }
+          }
+        ],
+        "displayed_rules_text": "{-Foresee(n:1)}. Draw {-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
+        "displayed_prompts": [],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
+        }
+      },
+      {
+        "base_card_id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
+        "displayed_name": "Test Foresee One Draw Reclaim",
+        "energy_cost": 1,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "List": [
+                  {
+                    "effect": {
+                      "Foresee": {
+                        "count": 1
+                      }
+                    },
+                    "optional": false
+                  },
+                  {
+                    "effect": {
+                      "DrawCards": {
+                        "count": 1
+                      }
+                    },
+                    "optional": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Named": {
+              "Reclaim": 3
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
+              }
+            }
+          },
+          {
+            "Named": {
+              "name": "{-Reclaim-Cost(e:3)}"
+            }
+          }
+        ],
+        "displayed_rules_text": "{-Foresee(n:1)}. Draw {-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
+        "displayed_prompts": [],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
+        }
+      },
+      {
+        "base_card_id": "86ed0d3f-320b-49d0-b022-cd94aa07edbd",
+        "displayed_name": "Test Counterspell Character",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "Counterspell": {
+                    "target": {
+                      "Enemy": "Character"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{Prevent} a played enemy character."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{Prevent} a played enemy character.",
+        "displayed_prompts": [
+          "Choose an enemy character to {prevent}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
+        }
+      },
+      {
+        "base_card_id": "86ed0d3f-320b-49d0-b022-cd94aa07edbd",
+        "displayed_name": "Test Counterspell Character",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "Counterspell": {
+                    "target": {
+                      "Enemy": "Character"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{Prevent} a played enemy character."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{Prevent} a played enemy character.",
+        "displayed_prompts": [
+          "Choose an enemy character to {prevent}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
+        }
+      },
+      {
+        "base_card_id": "559e62a0-7ead-4136-8bd4-6cc58db4bef7",
+        "displayed_name": "Test Return One Or Two Void Event Cards To Hand",
+        "energy_cost": 4,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "ReturnUpToCountFromYourVoidToHand": {
+                    "target": {
+                      "YourVoid": "Event"
+                    },
+                    "count": 2
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Return one or two events from your void to your hand."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "Return one or two events from your void to your hand.",
+        "displayed_prompts": [
+          "Choose one or two events in your void to return."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": false,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
+        }
+      },
+      {
+        "base_card_id": "559e62a0-7ead-4136-8bd4-6cc58db4bef7",
+        "displayed_name": "Test Return One Or Two Void Event Cards To Hand",
+        "energy_cost": 4,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "ReturnUpToCountFromYourVoidToHand": {
+                    "target": {
+                      "YourVoid": "Event"
+                    },
+                    "count": 2
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Return one or two events from your void to your hand."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "Return one or two events from your void to your hand.",
+        "displayed_prompts": [
+          "Choose one or two events in your void to return."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": false,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
+        }
+      },
+      {
+        "base_card_id": "e8f937da-cca7-447d-a559-530d7c339325",
+        "displayed_name": "Test Modal Return To Hand Or Draw Two",
+        "energy_cost": null,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Modal": [
+                  {
+                    "energy_cost": 2,
+                    "effect": {
+                      "Effect": {
+                        "ReturnToHand": {
+                          "target": {
+                            "Enemy": "Character"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "energy_cost": 3,
+                    "effect": {
+                      "Effect": {
+                        "DrawCards": {
+                          "count": 2
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Modal": [
+                  {
+                    "cost": "{-energy-cost(e:2)}",
+                    "effect": "Return an enemy character to hand."
+                  },
+                  {
+                    "cost": "{-energy-cost(e:3)}",
+                    "effect": "Draw {-cards(n:2)}."
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{choose-one}\n{bullet} {-energy-cost(e:2)}: Return an enemy character to hand.\n{bullet} {-energy-cost(e:3)}: Draw {-cards(n:2)}.",
+        "displayed_prompts": [
+          "Choose an enemy character to return to hand."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
+        }
+      },
+      {
+        "base_card_id": "e8f937da-cca7-447d-a559-530d7c339325",
+        "displayed_name": "Test Modal Return To Hand Or Draw Two",
+        "energy_cost": null,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Modal": [
+                  {
+                    "energy_cost": 2,
+                    "effect": {
+                      "Effect": {
+                        "ReturnToHand": {
+                          "target": {
+                            "Enemy": "Character"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "energy_cost": 3,
+                    "effect": {
+                      "Effect": {
+                        "DrawCards": {
+                          "count": 2
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Modal": [
+                  {
+                    "cost": "{-energy-cost(e:2)}",
+                    "effect": "Return an enemy character to hand."
+                  },
+                  {
+                    "cost": "{-energy-cost(e:3)}",
+                    "effect": "Draw {-cards(n:2)}."
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{choose-one}\n{bullet} {-energy-cost(e:2)}: Return an enemy character to hand.\n{bullet} {-energy-cost(e:3)}: Draw {-cards(n:2)}.",
+        "displayed_prompts": [
+          "Choose an enemy character to return to hand."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
+        }
+      },
+      {
+        "base_card_id": "0b783ac8-6aea-438e-a2d5-87bf68548eda",
+        "displayed_name": "Test Prevent Dissolve This Turn",
+        "energy_cost": 1,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "PreventDissolveThisTurn": {
+                    "target": {
+                      "Your": "Character"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Give an allied character {anchored} until end of turn."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "Give an allied character {anchored} until end of turn.",
+        "displayed_prompts": [
+          "Choose an allied character to gain {anchored}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
+        }
+      },
+      {
+        "base_card_id": "0b783ac8-6aea-438e-a2d5-87bf68548eda",
+        "displayed_name": "Test Prevent Dissolve This Turn",
+        "energy_cost": 1,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "PreventDissolveThisTurn": {
+                    "target": {
+                      "Your": "Character"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Give an allied character {anchored} until end of turn."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "Give an allied character {anchored} until end of turn.",
+        "displayed_prompts": [
+          "Choose an allied character to gain {anchored}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
+        }
+      },
+      {
+        "base_card_id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
+        "displayed_name": "Test Foresee One Draw Reclaim",
+        "energy_cost": 1,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "List": [
+                  {
+                    "effect": {
+                      "Foresee": {
+                        "count": 1
+                      }
+                    },
+                    "optional": false
+                  },
+                  {
+                    "effect": {
+                      "DrawCards": {
+                        "count": 1
+                      }
+                    },
+                    "optional": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Named": {
+              "Reclaim": 3
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
+              }
+            }
+          },
+          {
+            "Named": {
+              "name": "{-Reclaim-Cost(e:3)}"
+            }
+          }
+        ],
+        "displayed_rules_text": "{-Foresee(n:1)}. Draw {-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
+        "displayed_prompts": [],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
+        }
+      },
+      {
+        "base_card_id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
+        "displayed_name": "Test Foresee One Draw Reclaim",
+        "energy_cost": 1,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "List": [
+                  {
+                    "effect": {
+                      "Foresee": {
+                        "count": 1
+                      }
+                    },
+                    "optional": false
+                  },
+                  {
+                    "effect": {
+                      "DrawCards": {
+                        "count": 1
+                      }
+                    },
+                    "optional": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Named": {
+              "Reclaim": 3
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
+              }
+            }
+          },
+          {
+            "Named": {
+              "name": "{-Reclaim-Cost(e:3)}"
+            }
+          }
+        ],
+        "displayed_rules_text": "{-Foresee(n:1)}. Draw {-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
+        "displayed_prompts": [],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
+        }
+      },
+      {
+        "base_card_id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
+        "displayed_name": "Test Foresee One Draw Reclaim",
+        "energy_cost": 1,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "List": [
+                  {
+                    "effect": {
+                      "Foresee": {
+                        "count": 1
+                      }
+                    },
+                    "optional": false
+                  },
+                  {
+                    "effect": {
+                      "DrawCards": {
+                        "count": 1
+                      }
+                    },
+                    "optional": false
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "Named": {
+              "Reclaim": 3
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
+              }
+            }
+          },
+          {
+            "Named": {
+              "name": "{-Reclaim-Cost(e:3)}"
+            }
+          }
+        ],
+        "displayed_rules_text": "{-Foresee(n:1)}. Draw {-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
+        "displayed_prompts": [],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
+        }
+      },
+      {
+        "base_card_id": "86ed0d3f-320b-49d0-b022-cd94aa07edbd",
+        "displayed_name": "Test Counterspell Character",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "Counterspell": {
+                    "target": {
+                      "Enemy": "Character"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{Prevent} a played enemy character."
+              }
+            }
+          }
+        ],
+        "displayed_rules_text": "{Prevent} a played enemy character.",
+        "displayed_prompts": [
+          "Choose an enemy character to {prevent}."
+        ],
+        "card_type": "Event",
+        "card_subtype": null,
+        "is_fast": true,
+        "spark": null,
+        "rarity": "Special",
+        "image": {
+          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
+        }
+      },
+      {
+        "base_card_id": "86ed0d3f-320b-49d0-b022-cd94aa07edbd",
+        "displayed_name": "Test Counterspell Character",
+        "energy_cost": 2,
+        "abilities": [
+          {
+            "Event": {
+              "effect": {
+                "Effect": {
+                  "Counterspell": {
+                    "target": {
+                      "Enemy": "Character"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "displayed_abilities": [
+          {
+            "Event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{Prevent} a played enemy character."
               }
             }
           }
@@ -12716,8 +12823,7 @@
               "storage": [],
               "nbits": 0
             }
-          },
-          "_marker": null
+          }
         }
       },
       "two": {
@@ -12728,8 +12834,7 @@
               "storage": [],
               "nbits": 0
             }
-          },
-          "_marker": null
+          }
         }
       }
     }

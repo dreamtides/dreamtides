@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use ability_data::ability::{DisplayedAbility, DisplayedAbilityEffect};
 use ability_data::effect::ModelEffectChoiceIndex;
 use action_data::game_action_data::GameAction;
 use battle_queries::battle_card_queries::{card, card_properties, valid_target_queries};
@@ -239,7 +240,7 @@ fn card_type(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -
 pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -> String {
     let definition = card::get_definition(battle, card_id);
     let mut formatted = builder.tabula().strings.format_display_string(
-        &definition.displayed_rules_text,
+        &get_displayed_text(&definition.displayed_abilities),
         StringContext::CardText,
         fluent_args![],
     );
@@ -482,4 +483,71 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
     }
 
     icons.into_values().collect()
+}
+
+fn get_displayed_text(abilities: &[DisplayedAbility]) -> String {
+    let colon = "<size=130%>:</size>";
+    abilities
+        .iter()
+        .map(|ability| match ability {
+            DisplayedAbility::Event(event) => {
+                let effect = match &event.effect {
+                    DisplayedAbilityEffect::Effect(text) => text.clone(),
+                    DisplayedAbilityEffect::Modal(choices) => {
+                        let lines = choices
+                            .iter()
+                            .map(|c| {
+                                if c.cost.is_empty() {
+                                    format!("{bullet} {}", c.effect, bullet = "{bullet}")
+                                } else {
+                                    format!(
+                                        "{bullet} {}{colon} {}",
+                                        c.cost,
+                                        c.effect,
+                                        bullet = "{bullet}"
+                                    )
+                                }
+                            })
+                            .collect::<Vec<_>>()
+                            .join("\n");
+                        format!("{choose}\n{}", lines, choose = "{choose-one}")
+                    }
+                };
+                if let Some(additional_cost) = &event.additional_cost {
+                    format!("{additional_cost}{colon} {effect}")
+                } else {
+                    effect
+                }
+            }
+            DisplayedAbility::Static { text } => text.clone(),
+            DisplayedAbility::Activated { cost, effect } => {
+                let effect_text = match effect {
+                    DisplayedAbilityEffect::Effect(text) => text.clone(),
+                    DisplayedAbilityEffect::Modal(choices) => {
+                        let lines = choices
+                            .iter()
+                            .map(|c| {
+                                if c.cost.is_empty() {
+                                    format!("{bullet} {}", c.effect, bullet = "{bullet}")
+                                } else {
+                                    format!(
+                                        "{bullet} {}{colon} {}",
+                                        c.cost,
+                                        c.effect,
+                                        bullet = "{bullet}"
+                                    )
+                                }
+                            })
+                            .collect::<Vec<_>>()
+                            .join("\n");
+                        format!("{choose}\n{}", lines, choose = "{choose-one}")
+                    }
+                };
+                format!("{cost}{colon} {effect_text}")
+            }
+            DisplayedAbility::Triggered { text } => text.clone(),
+            DisplayedAbility::Named { name } => name.clone(),
+        })
+        .collect::<Vec<_>>()
+        .join("\n\n")
 }

@@ -7,7 +7,21 @@ fn test_event_simple_effect() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
+        additional_cost: None,
         effect: Effect("draw {-cards(n: 1)}."),
+      )),
+    ]
+    "###);
+}
+
+#[test]
+fn test_additional_cost_effect() {
+    let result = parse_displayed("Pay one or more {e}: Draw {-cards(n:1)} for each {e} spent.");
+    assert_ron_snapshot!(result, @r###"
+    [
+      Event(EventAbility(
+        additional_cost: Some("pay one or more {e}"),
+        effect: Effect("draw {-cards(n:1)} for each {e} spent."),
       )),
     ]
     "###);
@@ -21,6 +35,7 @@ fn test_event_modal_choices() {
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
+        additional_cost: None,
         effect: Modal([
           DisplayedModalEffectChoice(
             cost: "{-energy-cost(e: 1)}",
@@ -42,7 +57,7 @@ fn test_activated_with_costs() {
     assert_ron_snapshot!(result, @r###"
     [
       Activated(
-        cost: "{-energy-cost(e: 3)}",
+        cost: "{a} {-energy-cost(e: 3)}",
         effect: Effect("draw {-cards(n: 1)}."),
       ),
     ]

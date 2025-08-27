@@ -33,12 +33,22 @@ pub fn parse_with(
             Ability::Triggered(_) => {
                 out.push(DisplayedAbility::Triggered { text: (*block).to_string() });
             }
-            Ability::Event(_) => match to_effect(extract_effect_tail(block)) {
-                Ok(effect) => out.push(DisplayedAbility::Event(DisplayedEventAbility { effect })),
-                Err(e) => errs.push(e),
-            },
+            Ability::Event(_) => {
+                let cost = extract_cost_before_colon(block).unwrap_or_default();
+                match to_effect(extract_effect_tail(block)) {
+                    Ok(effect) => out.push(DisplayedAbility::Event(DisplayedEventAbility {
+                        additional_cost: if cost.is_empty() || is_modal(block) {
+                            None
+                        } else {
+                            Some(cost)
+                        },
+                        effect,
+                    })),
+                    Err(e) => errs.push(e),
+                }
+            }
             Ability::Activated(_) => {
-                let cost = extract_activated_cost(block).unwrap_or_default();
+                let cost = extract_cost_before_colon(block).unwrap_or_default();
                 match to_effect(extract_effect_tail(block)) {
                     Ok(effect) => out.push(DisplayedAbility::Activated { cost, effect }),
                     Err(e) => errs.push(e),
@@ -71,15 +81,9 @@ fn find_top_level_colon(text: &str) -> Option<usize> {
     None
 }
 
-fn extract_activated_cost(block: &str) -> Option<String> {
+fn extract_cost_before_colon(block: &str) -> Option<String> {
     let colon = find_top_level_colon(block)?;
     let head = block[..colon].trim();
-    let head = head
-        .strip_prefix("{fa} ")
-        .or_else(|| head.strip_prefix("{fma} "))
-        .or_else(|| head.strip_prefix("{ma} "))
-        .or_else(|| head.strip_prefix("{a} "))
-        .unwrap_or(head);
     Some(head.trim().to_string())
 }
 

@@ -586,6 +586,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Effect": "{Dissolve} an enemy character."
             }
@@ -621,6 +622,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Effect": "{Prevent} a played enemy card."
             }
@@ -659,6 +661,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Effect": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
             }
@@ -694,6 +697,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": "Pay one or more {e}",
             "effect": {
               "Effect": "Draw {-cards(n:1)} for each {e} spent."
             }
@@ -775,7 +779,7 @@
       "displayed_abilities": [
         {
           "Activated": {
-            "cost": "{-energy-cost(e:3)}",
+            "cost": "{fma} {-energy-cost(e:3)}",
             "effect": {
               "Effect": "Draw {-cards(n:1)}."
             }
@@ -813,6 +817,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Effect": "Return one or two events from your void to your hand."
             }
@@ -865,6 +870,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Modal": [
                 {
@@ -909,6 +915,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Effect": "Give an allied character {anchored} until end of turn."
             }
@@ -959,6 +966,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
             }
@@ -999,6 +1007,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Effect": "{Prevent} a played enemy character."
             }
@@ -1034,6 +1043,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Effect": "{Dissolve} an enemy character."
             }
@@ -1066,6 +1076,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Effect": "Draw {-cards(n:1)}."
             }
@@ -1180,7 +1191,7 @@
       "displayed_abilities": [
         {
           "Activated": {
-            "cost": "{-energy-cost(e:1)}",
+            "cost": "{a} {-energy-cost(e:1)}",
             "effect": {
               "Effect": "Draw {-cards(n:1)}."
             }
@@ -1223,7 +1234,7 @@
       "displayed_abilities": [
         {
           "Activated": {
-            "cost": "{-energy-cost(e:1)}",
+            "cost": "{ma} {-energy-cost(e:1)}",
             "effect": {
               "Effect": "Draw {-cards(n:1)}."
             }
@@ -1266,7 +1277,7 @@
       "displayed_abilities": [
         {
           "Activated": {
-            "cost": "{-energy-cost(e:1)}",
+            "cost": "{fa} {-energy-cost(e:1)}",
             "effect": {
               "Effect": "Draw {-cards(n:1)}."
             }
@@ -1308,7 +1319,7 @@
       "displayed_abilities": [
         {
           "Activated": {
-            "cost": "{-energy-cost(e:2)}",
+            "cost": "{a} {-energy-cost(e:2)}",
             "effect": {
               "Effect": "{Dissolve} an enemy character."
             }
@@ -1363,7 +1374,7 @@
       "displayed_abilities": [
         {
           "Activated": {
-            "cost": "{-energy-cost(e:1)}",
+            "cost": "{a} {-energy-cost(e:1)}",
             "effect": {
               "Effect": "Draw {-cards(n:1)}."
             }
@@ -1371,7 +1382,7 @@
         },
         {
           "Activated": {
-            "cost": "{-energy-cost(e:2)}",
+            "cost": "{a} {-energy-cost(e:2)}",
             "effect": {
               "Effect": "Draw {-cards(n:2)}."
             }
@@ -1405,6 +1416,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Effect": "{-Foresee(n:1)}."
             }
@@ -1437,6 +1449,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Effect": "{-Foresee(n:2)}."
             }
@@ -1482,6 +1495,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
             }
@@ -1519,6 +1533,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Effect": "Draw {-cards(n:1)}."
             }
@@ -1561,6 +1576,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Effect": "{-Foresee(n:1)}."
             }
@@ -1601,6 +1617,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Effect": "Return a card from your void to your hand."
             }
@@ -1650,6 +1667,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Modal": [
                 {
@@ -1711,6 +1729,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Modal": [
                 {
@@ -1755,6 +1774,7 @@
       "displayed_abilities": [
         {
           "Event": {
+            "additional_cost": null,
             "effect": {
               "Effect": "Return an enemy character to hand."
             }

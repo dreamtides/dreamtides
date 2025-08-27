@@ -51,13 +51,13 @@ pub enum DisplayedAbility {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum DisplayedAbilityEffect {
     Effect(String),
-    EffectList(Vec<String>),
     Modal(Vec<DisplayedModalEffectChoice>),
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename = "EventAbility")]
 pub struct DisplayedEventAbility {
+    pub additional_cost: Option<String>,
     pub effect: DisplayedAbilityEffect,
 }
 
