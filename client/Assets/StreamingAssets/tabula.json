@@ -515,6 +515,48 @@
       "name": "card-subtype-warrior",
       "description": "Card subtype, displayed on character cards",
       "en_us": "Warrior"
+    },
+    {
+      "id": "a4e6687d-4c0e-4de9-b3aa-1e49e09b4668",
+      "name": "help-text-dissolve",
+      "description": "Info zoom help text, displayed on a tooltip to describe card abilities",
+      "en_us": "{Dissolve}: Send a character to the void"
+    },
+    {
+      "id": "c58bd162-3392-444f-868e-488c023e9e91",
+      "name": "help-text-prevent",
+      "description": "Info zoom help text, displayed on a tooltip to describe card abilities",
+      "en_us": "{Prevent}: Send a card to the void in response to it being played"
+    },
+    {
+      "id": "893f14c2-d7d6-4adf-a97a-66847febe6ed",
+      "name": "help-text-foresee-1",
+      "description": "Info zoom help text, displayed on a tooltip to describe card abilities",
+      "en_us": "{keyword}Foresee{end-keyword} 1: Look at the top card of your deck. You may put it into your void."
+    },
+    {
+      "id": "283a1526-f6e7-4885-a000-1b0cd54a75ed",
+      "name": "help-text-foresee-n",
+      "description": "Info zoom help text, displayed on a tooltip to describe card abilities",
+      "en_us": "{keyword}Foresee{end-keyword} {$n}: Look at the top {$n} cards of your deck. You may put them into your void or put them back in any order."
+    },
+    {
+      "id": "85f5f06f-417d-4bb7-bf99-51eef3d4a5ac",
+      "name": "help-text-anchored",
+      "description": "Info zoom help text, displayed on a tooltip to describe card abilities",
+      "en_us": "{Anchored}: Cannot be dissolved."
+    },
+    {
+      "id": "3e724a9f-4eed-4044-85ee-12187f1aef65",
+      "name": "help-text-reclaim-without-cost",
+      "description": "Info zoom help text, displayed on a tooltip to describe card abilities",
+      "en_us": "{Reclaim}: You may play a card from your void, then banish it when it leaves play."
+    },
+    {
+      "id": "7b13a745-c94b-437c-bc2d-73c64b479147",
+      "name": "help-text-reclaim-with-cost",
+      "description": "Info zoom help text, displayed on a tooltip to describe card abilities",
+      "en_us": "{keyword}Reclaim{end-keyword} {$e}{e}: You may play this card from your void for {$e}{e}, then banish it."
     }
   ],
   "test_cards": [

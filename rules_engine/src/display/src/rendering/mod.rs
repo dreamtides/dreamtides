@@ -1,3 +1,4 @@
+pub mod ability_help_text;
 pub mod animations;
 pub mod apply_card_fx;
 pub mod battle_rendering;

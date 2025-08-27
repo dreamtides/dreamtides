@@ -266,3 +266,26 @@ pub const CARD_SUBTYPE_VISITOR: StringId = StringId(uuid!("727a0d85-e67d-49c6-92
 
 /// Card subtype, displayed on character cards
 pub const CARD_SUBTYPE_WARRIOR: StringId = StringId(uuid!("68338f97-ffd9-4082-8c5a-41091323e8cb"));
+
+/// Info zoom help text, displayed on a tooltip to describe card abilities
+pub const HELP_TEXT_DISSOLVE: StringId = StringId(uuid!("a4e6687d-4c0e-4de9-b3aa-1e49e09b4668"));
+
+/// Info zoom help text, displayed on a tooltip to describe card abilities
+pub const HELP_TEXT_PREVENT: StringId = StringId(uuid!("c58bd162-3392-444f-868e-488c023e9e91"));
+
+/// Info zoom help text, displayed on a tooltip to describe card abilities
+pub const HELP_TEXT_FORESEE_1: StringId = StringId(uuid!("893f14c2-d7d6-4adf-a97a-66847febe6ed"));
+
+/// Info zoom help text, displayed on a tooltip to describe card abilities
+pub const HELP_TEXT_FORESEE_N: StringId = StringId(uuid!("283a1526-f6e7-4885-a000-1b0cd54a75ed"));
+
+/// Info zoom help text, displayed on a tooltip to describe card abilities
+pub const HELP_TEXT_ANCHORED: StringId = StringId(uuid!("85f5f06f-417d-4bb7-bf99-51eef3d4a5ac"));
+
+/// Info zoom help text, displayed on a tooltip to describe card abilities
+pub const HELP_TEXT_RECLAIM_WITHOUT_COST: StringId =
+    StringId(uuid!("3e724a9f-4eed-4044-85ee-12187f1aef65"));
+
+/// Info zoom help text, displayed on a tooltip to describe card abilities
+pub const HELP_TEXT_RECLAIM_WITH_COST: StringId =
+    StringId(uuid!("7b13a745-c94b-437c-bc2d-73c64b479147"));

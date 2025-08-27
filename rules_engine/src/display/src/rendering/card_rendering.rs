@@ -40,22 +40,8 @@ use crate::display_actions::outcome_simulation;
 use crate::rendering::positions::ControllerAndZone;
 use crate::rendering::supplemental_card_info::SupplementalCardInfo;
 use crate::rendering::{
-    apply_card_fx, card_display_state, modal_effect_prompt_rendering, positions,
+    ability_help_text, apply_card_fx, card_display_state, modal_effect_prompt_rendering, positions,
 };
-
-/// Returns the appropriate targeting color based on card ownership
-fn targeting_color(
-    battle: &BattleState,
-    current_player: core_data::types::PlayerName,
-    target_card_id: CardId,
-) -> DisplayColor {
-    let target_controller = card_properties::controller(battle, target_card_id);
-    if target_controller == current_player {
-        display_color::GREEN_500
-    } else {
-        display_color::RED_500
-    }
-}
 
 pub fn card_view(builder: &ResponseBuilder, context: &CardViewContext) -> CardView {
     let battle = context.battle();
@@ -121,7 +107,7 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
             None if can_play => Some(display_color::GREEN),
             _ => None,
         },
-        info_zoom_data: build_info_zoom_data(battle, card_id),
+        info_zoom_data: build_info_zoom_data(builder, battle, card_id),
         is_fast: false,
         actions: CardActions {
             can_play: play_action.map(GameAction::BattleAction),
@@ -337,43 +323,13 @@ fn is_on_stack_from_void(battle: &BattleState, card_id: CardId) -> bool {
         .unwrap_or(false)
 }
 
-fn supplemental_card_info(battle: &BattleState, card_id: CardId) -> Vec<String> {
-    match card::get_base_card_id(battle, card_id) {
-        test_card::TEST_DISSOLVE => {
-            vec!["<b>Dissolve:</b> Send a character to the void".to_string()]
-        }
-        test_card::TEST_NAMED_DISSOLVE => {
-            vec!["<b>Dissolve:</b> Send a character to the void".to_string()]
-        }
-        test_card::TEST_COUNTERSPELL_UNLESS_PAYS => vec![
-            "<b>Prevent:</b> Send a card to the void in response to it being played".to_string(),
-        ],
-        test_card::TEST_COUNTERSPELL => vec![
-            "<b>Prevent:</b> Send a card to the void in response to it being played".to_string(),
-        ],
-        test_card::TEST_FORESEE_ONE => vec![
-            "<b>Foresee 1:</b> Look at the top card of your deck. You may put it into your void."
-                .to_string(),
-        ],
-        test_card::TEST_PREVENT_DISSOLVE_THIS_TURN => {
-            vec!["<b>Anchored:</b> Cannot be dissolved.".to_string()]
-        }
-        test_card::TEST_FORESEE_ONE_DRAW_RECLAIM => vec![
-            "<b>Foresee 1:</b> Look at the top card of your deck. You may put it into your void."
-                .to_string(),
-            "<b>Reclaim:</b> You may play this card from your void, then banish it.".to_string(),
-        ],
-        test_card::TEST_COUNTERSPELL_CHARACTER => vec![
-            "<b>Prevent:</b> Send a character to the void in response to it being played"
-                .to_string(),
-        ],
-        _ => vec![],
-    }
-}
-
-pub fn build_info_zoom_data(battle: &BattleState, card_id: CardId) -> Option<InfoZoomData> {
+pub fn build_info_zoom_data(
+    builder: &ResponseBuilder,
+    battle: &BattleState,
+    card_id: CardId,
+) -> Option<InfoZoomData> {
     let targeting_icons = get_targeting_icons(battle, card_id);
-    let supplemental_texts = supplemental_card_info(battle, card_id);
+    let supplemental_texts = ability_help_text::help_texts(builder, battle, card_id);
 
     let supplemental_info = if supplemental_texts.is_empty() {
         None
@@ -555,5 +511,19 @@ fn displayed_effect_text(effect: &DisplayedAbilityEffect) -> String {
                 .join("\n");
             format!("{choose}\n{}", lines, choose = "{choose-one}")
         }
+    }
+}
+
+/// Returns the appropriate targeting color based on card ownership
+fn targeting_color(
+    battle: &BattleState,
+    current_player: core_data::types::PlayerName,
+    target_card_id: CardId,
+) -> DisplayColor {
+    let target_controller = card_properties::controller(battle, target_card_id);
+    if target_controller == current_player {
+        display_color::GREEN_500
+    } else {
+        display_color::RED_500
     }
 }

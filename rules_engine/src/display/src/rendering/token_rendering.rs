@@ -61,7 +61,7 @@ pub fn trigger_card_view(
                 sorting_key: 0,
             })
             .create_sound(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/UI, Pads, Enchantments and Misc/RPG3_Enchantment_Subtle01v2.wav"))
-            .maybe_info_zoom_data(build_token_info_zoom_data(battle, character_card_id))
+            .maybe_info_zoom_data(build_token_info_zoom_data(builder, battle, character_card_id))
             .build(),
     )
 }
@@ -236,7 +236,7 @@ fn activated_ability_card_view(
             .is_fast(
                 ability_data.ability.options.as_ref().map(|opts| opts.is_fast).unwrap_or(false),
             )
-            .maybe_info_zoom_data(build_token_info_zoom_data(battle, character_card_id))
+            .maybe_info_zoom_data(build_token_info_zoom_data(builder, battle, character_card_id))
             .build(),
     )
 }
@@ -329,7 +329,7 @@ fn void_card_token_view(
             })
             .maybe_outline_color(play_action.map(|_| display_color::PURPLE_300))
             .is_fast(card_properties::is_fast(battle, card_id))
-            .maybe_info_zoom_data(build_token_info_zoom_data(battle, card_id))
+            .maybe_info_zoom_data(build_token_info_zoom_data(builder, battle, card_id))
             .build(),
     )
 }
@@ -386,8 +386,9 @@ pub fn token_card_view(view: TokenCardView) -> CardView {
 }
 
 fn build_token_info_zoom_data(
+    builder: &ResponseBuilder,
     battle: &BattleState,
     parent_card_id: CardId,
 ) -> Option<InfoZoomData> {
-    card_rendering::build_info_zoom_data(battle, parent_card_id)
+    card_rendering::build_info_zoom_data(builder, battle, parent_card_id)
 }

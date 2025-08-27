@@ -94,7 +94,8 @@ impl InitializationError {
                 parts.push(format!("Sheet: {sheet}"));
             }
             if let Some(row) = self.tabula_row {
-                parts.push(format!("Row: {row}"));
+                // Add 1 for 0-indexed, 1 for header row
+                parts.push(format!("Row: {}", row + 2));
             }
             if let Some(col) = &self.tabula_column {
                 parts.push(format!("Column: {col}"));
