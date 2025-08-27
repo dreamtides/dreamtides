@@ -52,23 +52,8 @@ pub const GAINED_SPARK: StringId = StringId(uuid!("c49b155f-57a2-479a-bc45-254b2
 /// Formatting to select a single mode of a modal card
 pub const CHOOSE_ONE: StringId = StringId(uuid!("3057478f-1445-4b7d-8241-a90d97da7adf"));
 
-/// Formatting that appears before an ability of a card with mutiple abilities
-pub const ABILITY: StringId = StringId(uuid!("a8108996-e881-4b2e-80dd-3bfe5bf8dcd4"));
-
-/// Formatting that appears after an ability of a card with multiple abilities
-pub const END_ABILITY: StringId = StringId(uuid!("12487a98-0f31-4f71-bd51-9a85bfcd281c"));
-
-/// Inserts a linebreak in card rules text
-pub const BR: StringId = StringId(uuid!("e189f8a2-0901-41b9-9023-78dd196f60d5"));
-
 /// Inserts a bullet character
 pub const BULLET: StringId = StringId(uuid!("abfc5cdc-e118-4e43-87a1-3493cc80df75"));
-
-/// Formatting that appears before a modal ability
-pub const MODE: StringId = StringId(uuid!("3cc400d3-0594-4663-9187-e8c46613a21f"));
-
-/// Formatting that appears after a modal ability
-pub const END_MODE: StringId = StringId(uuid!("4a6ed656-0057-44c7-977d-8c0cedf1f725"));
 
 /// Foresee keyword ability with quantity
 pub const FORESEE: StringId = StringId(uuid!("2e44ee4c-3218-45bf-a29e-0508f853c873"));

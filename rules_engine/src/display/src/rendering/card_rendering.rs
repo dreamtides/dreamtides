@@ -486,7 +486,14 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
 }
 
 fn get_displayed_text(abilities: &[DisplayedAbility]) -> String {
-    let colon = "<size=130%>:</size>";
+    // Tags must use Fluent "quoted string" syntax to avoid breaking parsing.
+    let colon = "{\"<size=130%>:</size>\"}";
+    let indent = "{\"<indent=0.75em>\"}";
+    let end_indent = "{\"</indent>\"}";
+    let bullet = "{bullet}";
+    let line_height_25 = "{\"<line-height=25%>\"}";
+    let end_line_height = "{\"</line-height>\"}";
+
     abilities
         .iter()
         .map(|ability| match ability {
@@ -498,13 +505,11 @@ fn get_displayed_text(abilities: &[DisplayedAbility]) -> String {
                             .iter()
                             .map(|c| {
                                 if c.cost.is_empty() {
-                                    format!("{bullet} {}", c.effect, bullet = "{bullet}")
+                                    format!("{bullet} {indent}{}{end_indent}", c.effect)
                                 } else {
                                     format!(
-                                        "{bullet} {}{colon} {}",
-                                        c.cost,
-                                        c.effect,
-                                        bullet = "{bullet}"
+                                        "{bullet} {indent}{}{colon} {}{end_indent}",
+                                        c.cost, c.effect
                                     )
                                 }
                             })
@@ -528,13 +533,11 @@ fn get_displayed_text(abilities: &[DisplayedAbility]) -> String {
                             .iter()
                             .map(|c| {
                                 if c.cost.is_empty() {
-                                    format!("{bullet} {}", c.effect, bullet = "{bullet}")
+                                    format!("{bullet} {indent}{}{end_indent}", c.effect,)
                                 } else {
                                     format!(
-                                        "{bullet} {}{colon} {}",
-                                        c.cost,
-                                        c.effect,
-                                        bullet = "{bullet}"
+                                        "{bullet} {indent}{}{colon} {}{end_indent}",
+                                        c.cost, c.effect
                                     )
                                 }
                             })
@@ -549,5 +552,7 @@ fn get_displayed_text(abilities: &[DisplayedAbility]) -> String {
             DisplayedAbility::Named { name } => name.clone(),
         })
         .collect::<Vec<_>>()
-        .join("\n\n")
+        // We must use fluent quoted string syntax + unicode newline character
+        // to avoid breaking fluent parsing.
+        .join(&format!("\n{line_height_25}\n{end_line_height}"))
 }
