@@ -99,21 +99,23 @@ pub fn add_deck_copy(battle: &mut BattleState, player: PlayerName) {
 /// Adds a list of cards to a player's deck
 pub fn debug_add_cards(battle: &mut BattleState, player: PlayerName, cards: &[CardDefinition]) {
     let mut new_cards = Vec::new();
+    let mut new_quest = (*battle.players.player(player).quest).clone();
+    let mut new_deck = battle.players.player(player).quest.deck.clone();
+
     for definition in cards {
         let def_arc = Arc::new(definition.clone());
         let list = Arc::new(card_abilities::build_from_definition(&def_arc));
-        let mut new_deck = battle.players.player(player).quest.deck.clone();
-        let quest_id = new_deck.push_card_and_get_id(definition.clone());
+        let quest_card_id = new_deck.push_card_and_get_id(definition.clone());
         new_cards.push(BattleCardDefinitionsCard {
             ability_list: list,
             definition: def_arc,
-            quest_deck_card_id: quest_id,
+            quest_deck_card_id: quest_card_id,
+            owner: player,
         });
-        let mut new_quest = (*battle.players.player(player).quest).clone();
-        new_quest.deck = new_deck;
-        battle.players.player_mut(player).quest = Arc::new(new_quest);
     }
 
+    new_quest.deck = new_deck;
+    battle.players.player_mut(player).quest = Arc::new(new_quest);
     let response = BattleCardDefinitions::append(&battle.card_definitions, new_cards);
     battle.card_definitions = Arc::new(response.cache);
 

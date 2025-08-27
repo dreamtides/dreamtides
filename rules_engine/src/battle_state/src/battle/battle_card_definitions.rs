@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 use std::sync::Arc;
 
+use core_data::types::PlayerName;
 use quest_state::quest::deck::QuestDeckCardId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -19,16 +20,22 @@ use crate::battle_cards::ability_list::AbilityList;
 )]
 pub struct BattleCardIdentity(usize);
 
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
+pub struct QuestDeckIdentity {
+    pub id: QuestDeckCardId,
+    pub owner: PlayerName,
+}
+
 /// Stores the [CardDefinition]s and [AbilityList]s for cards in this battle
 /// keyed by their [BattleCardIdentity].
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct BattleCardDefinitions {
-    #[serde(default)]
+    #[serde(skip)]
     cache_by_identity: Vec<Arc<AbilityList>>,
-    #[serde(default)]
+    #[serde(skip)]
     definitions_by_identity: Vec<Arc<CardDefinition>>,
     #[serde(default)]
-    quest_deck_card_ids: BTreeMap<QuestDeckCardId, BattleCardIdentity>,
+    quest_deck_card_ids: BTreeMap<BattleCardIdentity, QuestDeckIdentity>,
 }
 
 /// Describes a card definition to add to the cache.
@@ -36,6 +43,7 @@ pub struct BattleCardDefinitionsCard {
     pub ability_list: Arc<AbilityList>,
     pub definition: Arc<CardDefinition>,
     pub quest_deck_card_id: QuestDeckCardId,
+    pub owner: PlayerName,
 }
 
 /// Returns the result of a [BattleCardDefinitions::build] operation.
@@ -58,7 +66,7 @@ impl BattleCardDefinitions {
     pub fn build(cards: Vec<BattleCardDefinitionsCard>) -> BattleCardDefinitionsResponse {
         let initial_lists: Vec<Arc<AbilityList>> = Vec::new();
         let initial_defs: Vec<Arc<CardDefinition>> = Vec::new();
-        let initial_map: BTreeMap<QuestDeckCardId, BattleCardIdentity> = BTreeMap::new();
+        let initial_map: BTreeMap<BattleCardIdentity, QuestDeckIdentity> = BTreeMap::new();
         Self::build_with_initial(&initial_lists, &initial_defs, &initial_map, cards)
     }
 
@@ -76,10 +84,49 @@ impl BattleCardDefinitions {
         )
     }
 
+    /// Builds a new [BattleCardDefinitions] by repopulating the cached values
+    /// using the provided builder functions.
+    ///
+    /// Card identities will be reconstructed based on the internal quest deck
+    /// card ids.
+    pub fn rebuild(
+        definitions: &BattleCardDefinitions,
+        definition_fn: impl Fn(QuestDeckCardId, PlayerName) -> Arc<CardDefinition>,
+        ability_list_fn: impl Fn(&CardDefinition) -> AbilityList,
+    ) -> BattleCardDefinitions {
+        let mut cache_by_identity = vec![None; definitions.quest_deck_card_ids.len()];
+        let mut definitions_by_identity = vec![None; definitions.quest_deck_card_ids.len()];
+        for (identity, quest_deck_identity) in definitions.quest_deck_card_ids.iter() {
+            let definition = definition_fn(quest_deck_identity.id, quest_deck_identity.owner);
+            let ability_list = ability_list_fn(&definition);
+            cache_by_identity[identity.0] = Some(Arc::new(ability_list));
+            definitions_by_identity[identity.0] = Some(definition);
+        }
+
+        let ability_list = cache_by_identity.into_iter().flatten().collect::<Vec<_>>();
+        assert_eq!(
+            ability_list.len(),
+            definitions.cache_by_identity.len(),
+            "Ability list length mismatch"
+        );
+        let definition_list = definitions_by_identity.into_iter().flatten().collect::<Vec<_>>();
+        assert_eq!(
+            definition_list.len(),
+            definitions.definitions_by_identity.len(),
+            "Definition list length mismatch"
+        );
+
+        BattleCardDefinitions {
+            cache_by_identity: ability_list,
+            definitions_by_identity: definition_list,
+            quest_deck_card_ids: definitions.quest_deck_card_ids.clone(),
+        }
+    }
+
     fn build_with_initial(
         initial_lists: &[Arc<AbilityList>],
         initial_defs: &[Arc<CardDefinition>],
-        initial_map: &BTreeMap<QuestDeckCardId, BattleCardIdentity>,
+        initial_map: &BTreeMap<BattleCardIdentity, QuestDeckIdentity>,
         cards: Vec<BattleCardDefinitionsCard>,
     ) -> BattleCardDefinitionsResponse {
         let start = initial_lists.len();
@@ -94,7 +141,10 @@ impl BattleCardDefinitions {
             let identity = BattleCardIdentity(start + i);
             cache_by_identity.push(card.ability_list.clone());
             definitions_by_identity.push(card.definition.clone());
-            quest_deck_card_ids.insert(card.quest_deck_card_id, identity);
+            quest_deck_card_ids.insert(identity, QuestDeckIdentity {
+                id: card.quest_deck_card_id,
+                owner: card.owner,
+            });
             created.push(CreatedCard {
                 identity,
                 can_play_restriction: card.ability_list.can_play_restriction,

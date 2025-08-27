@@ -279,6 +279,7 @@ pub fn benchmark_battle() -> BattleState {
             ability_list: Arc::new(list),
             definition: Arc::new(def),
             quest_deck_card_id: quest_id,
+            owner: spec.owner,
         });
     }
     let ability_cache = Arc::new(BattleCardDefinitions::build(cache_cards).cache);

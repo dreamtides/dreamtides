@@ -1,11 +1,14 @@
 use std::panic::{self, AssertUnwindSafe};
+use std::sync::Arc;
 
 use battle_mutations::actions::apply_battle_action;
+use battle_queries::battle_card_queries::card_abilities;
 use battle_queries::battle_trace;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::macros::write_tracing_event;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::animation_data::AnimationData;
+use battle_state::battle::battle_card_definitions::BattleCardDefinitions;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::battle_trace::battle_tracing::BattleTracing;
@@ -48,6 +51,15 @@ where
             battle.tabula = provider.tabula();
             battle.tracing = Some(BattleTracing::default());
             battle.animations = Some(AnimationData::default());
+            battle.card_definitions = Arc::new(BattleCardDefinitions::rebuild(
+                &battle.card_definitions,
+                |quest_deck_card_id, owner| {
+                    let definition =
+                        battle.players.player(owner).quest.deck.get_card(quest_deck_card_id);
+                    Arc::new(definition.clone())
+                },
+                card_abilities::build_from_definition,
+            ));
             battle_trace!("Loaded battle from save", &mut battle);
             Some((battle, quest_id))
         }

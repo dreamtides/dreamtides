@@ -52,6 +52,7 @@ pub fn create_and_start(
             ability_list: Arc::new(ability_list),
             definition: Arc::new(definition.clone()),
             quest_deck_card_id: quest_id,
+            owner: PlayerName::One,
         });
     }
     for (quest_id, definition) in quest_two.deck.cards() {
@@ -60,6 +61,7 @@ pub fn create_and_start(
             ability_list: Arc::new(ability_list),
             definition: Arc::new(definition.clone()),
             quest_deck_card_id: quest_id,
+            owner: PlayerName::Two,
         });
     }
 
