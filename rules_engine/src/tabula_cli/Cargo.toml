@@ -18,6 +18,7 @@ doctest = false
 bench = false
 
 [dependencies]
+ability_data = { path = "../ability_data" }
 core_data = { path = "../core_data" }
 parser = { path = "../parser" }
 quest_state = { path = "../quest_state" }

@@ -4,8 +4,9 @@ use core_data::identifiers::{BaseCardId, DreamwellCardId};
 use core_data::initialization_error::InitializationError;
 use serde::{Deserialize, Serialize};
 
-use crate::card_definitions::base_card_definition_raw::{self, BaseCardDefinitionRaw};
+use crate::card_definitions::base_card_definition_raw::BaseCardDefinitionRaw;
 use crate::card_definitions::card_definition::CardDefinition;
+use crate::card_definitions::card_definition_builder;
 use crate::card_definitions::dreamwell_card_definition::{
     DreamwellCardDefinition, DreamwellCardDefinitionRaw,
 };
@@ -55,6 +56,12 @@ pub fn build(
     raw: &TabulaRaw,
 ) -> Result<Tabula, Vec<InitializationError>> {
     let strings = localized_strings::build(context, &raw.strings)?;
-    let test_cards = base_card_definition_raw::build("test_cards", context, &raw.test_cards)?;
-    Ok(Tabula { strings, test_cards, dreamwell_cards: Default::default() })
+    let test_cards =
+        card_definition_builder::build_base_cards("test_cards", context, &raw.test_cards)?;
+    let dreamwell_cards = card_definition_builder::build_dreamwell_cards(
+        "dreamwell_cards",
+        context,
+        &raw.dreamwell_cards,
+    )?;
+    Ok(Tabula { strings, test_cards, dreamwell_cards })
 }

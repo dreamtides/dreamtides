@@ -2932,6 +2932,7 @@ dependencies = [
 name = "tabula_cli"
 version = "0.0.0"
 dependencies = [
+ "ability_data",
  "anyhow",
  "clap",
  "convert_case 0.8.0",
