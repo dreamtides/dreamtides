@@ -6,7 +6,8 @@ use strum::EnumDiscriminants;
 
 use crate::actions::debug_battle_action::DebugBattleAction;
 use crate::battle::card_id::{
-    AbilityId, ActivatedAbilityId, CharacterId, DeckCardId, HandCardId, StackCardId, VoidCardId,
+    AbilityId, ActivatedAbilityId, BattleDeckCardId, CharacterId, HandCardId, StackCardId,
+    VoidCardId,
 };
 
 /// An action that can be performed in a battle
@@ -56,7 +57,7 @@ pub enum BattleAction {
     Debug, Copy, Clone, Serialize, Eq, PartialEq, Hash, PartialOrd, Ord, Deserialize, JsonSchema,
 )]
 pub struct DeckCardSelectedOrder {
-    pub card_id: DeckCardId,
+    pub card_id: BattleDeckCardId,
     pub target: CardOrderSelectionTarget,
 }
 

@@ -28,6 +28,7 @@ use core_data::identifiers::{BaseCardId, BattleId};
 use core_data::numerics::{Energy, Points, Spark, TurnId};
 use core_data::types::PlayerName;
 use game_creation::new_test_battle;
+use quest_state::quest::deck::Deck;
 use rand::SeedableRng;
 use rand_xoshiro::Xoshiro256PlusPlus;
 use state_provider::display_state_provider::DisplayStateProvider;
@@ -269,12 +270,15 @@ pub fn benchmark_battle() -> BattleState {
     let _ = provider.initialize("/tmp/test", &streaming_assets_path);
 
     let mut cache_cards = Vec::new();
+    let mut temp_deck = Deck::default();
     for spec in card_specs.iter() {
         let def = provider.tabula().test_cards.get(&spec.name).unwrap().clone();
+        let quest_id = temp_deck.push_card_and_get_id(def.clone());
         let list = card_abilities::build_from_definition(&def);
         cache_cards.push(BattleCardDefinitionsCard {
             ability_list: Arc::new(list),
             definition: Arc::new(def),
+            quest_deck_card_id: quest_id,
         });
     }
     let ability_cache = Arc::new(BattleCardDefinitions::build(cache_cards).cache);
@@ -331,7 +335,7 @@ pub fn benchmark_battle() -> BattleState {
         request_context: RequestContext { logging_options: LoggingOptions::default() },
     };
 
-    battle_deck::add_cards(
+    battle_deck::debug_add_cards(
         &mut battle,
         PlayerName::One,
         &card_specs
@@ -340,7 +344,7 @@ pub fn benchmark_battle() -> BattleState {
             .map(|spec| provider.tabula().test_cards.get(&spec.name).unwrap().clone())
             .collect::<Vec<_>>(),
     );
-    battle_deck::add_cards(
+    battle_deck::debug_add_cards(
         &mut battle,
         PlayerName::Two,
         &card_specs

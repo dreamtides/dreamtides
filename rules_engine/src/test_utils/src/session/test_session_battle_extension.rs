@@ -5,7 +5,7 @@ use battle_state::actions::battle_actions::{
     BattleAction, CardOrderSelectionTarget, DeckCardSelectedOrder,
 };
 use battle_state::actions::debug_battle_action::DebugBattleAction;
-use battle_state::battle::card_id::DeckCardId;
+use battle_state::battle::card_id::BattleDeckCardId;
 use core_data::identifiers::BaseCardId;
 use display_data::battle_view::{ButtonView, DisplayPlayer};
 use display_data::card_view::{CardPrefab, ClientCardId};
@@ -364,7 +364,7 @@ impl TestSessionBattleExtension for TestSession {
             .can_select_order
             .expect("Card cannot be selected for ordering");
 
-        let deck_card_id = DeckCardId(can_select_order);
+        let deck_card_id = BattleDeckCardId(can_select_order);
         let order = DeckCardSelectedOrder { card_id: deck_card_id, target };
 
         self.perform_player_action(player, BattleAction::SelectOrderForDeckCard(order));

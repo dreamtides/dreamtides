@@ -7,7 +7,7 @@ use strum_macros::EnumDiscriminants;
 use tabula_data::localized_strings::StringId;
 
 use crate::battle::battle_state::PendingEffectIndex;
-use crate::battle::card_id::{CharacterId, DeckCardId, StackCardId, VoidCardId};
+use crate::battle::card_id::{BattleDeckCardId, CharacterId, StackCardId, VoidCardId};
 use crate::battle_cards::card_set::CardSet;
 use crate::battle_cards::stack_card_state::{EffectTargets, StackItemId};
 use crate::core::effect_source::EffectSource;
@@ -68,17 +68,17 @@ pub struct ModalEffectPrompt {
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct SelectDeckCardOrderPrompt {
     /// Initial list of cards we are considering for ordering.
-    pub initial: Vec<DeckCardId>,
+    pub initial: Vec<BattleDeckCardId>,
 
     /// Cards which have had a `SelectOrderForDeckCard` action performed on
     /// them. Used by the AI to prevent loops.
-    pub moved: CardSet<DeckCardId>,
+    pub moved: CardSet<BattleDeckCardId>,
 
     /// Cards currently in the deck position, in the selected order.
-    pub deck: Vec<DeckCardId>,
+    pub deck: Vec<BattleDeckCardId>,
 
     /// Cards currently in the void position, unordered.
-    pub void: CardSet<DeckCardId>,
+    pub void: CardSet<BattleDeckCardId>,
 }
 
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize)]

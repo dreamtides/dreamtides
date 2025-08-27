@@ -46,18 +46,20 @@ pub fn create_and_start(
     let quest_two = Arc::new(create_quest_state(&tabula, player_two.deck_name));
 
     let mut cache_cards = Vec::new();
-    for definition in &quest_one.deck.cards {
+    for (quest_id, definition) in quest_one.deck.cards() {
         let ability_list = card_abilities::build_from_definition(definition);
         cache_cards.push(BattleCardDefinitionsCard {
             ability_list: Arc::new(ability_list),
             definition: Arc::new(definition.clone()),
+            quest_deck_card_id: quest_id,
         });
     }
-    for definition in &quest_two.deck.cards {
+    for (quest_id, definition) in quest_two.deck.cards() {
         let ability_list = card_abilities::build_from_definition(definition);
         cache_cards.push(BattleCardDefinitionsCard {
             ability_list: Arc::new(ability_list),
             definition: Arc::new(definition.clone()),
+            quest_deck_card_id: quest_id,
         });
     }
 

@@ -120,9 +120,9 @@ impl fmt::Debug for VoidCardId {
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema)]
-pub struct DeckCardId(pub CardId);
+pub struct BattleDeckCardId(pub CardId);
 
-impl CardIdType for DeckCardId {
+impl CardIdType for BattleDeckCardId {
     fn card_id(self) -> CardId {
         self.0
     }
@@ -132,13 +132,13 @@ impl CardIdType for DeckCardId {
     }
 }
 
-impl fmt::Display for DeckCardId {
+impl fmt::Display for BattleDeckCardId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "D{:?}", self.0)
     }
 }
 
-impl fmt::Debug for DeckCardId {
+impl fmt::Debug for BattleDeckCardId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Display::fmt(self, f)
     }

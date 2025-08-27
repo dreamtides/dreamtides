@@ -7,8 +7,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::battle::battle_card_definitions::BattleCardIdentity;
 use crate::battle::card_id::{
-    ActivatedAbilityId, BanishedCardId, CardId, CardIdType, CharacterId, DeckCardId, HandCardId,
-    StackCardId, VoidCardId,
+    ActivatedAbilityId, BanishedCardId, BattleDeckCardId, CardId, CardIdType, CharacterId,
+    HandCardId, StackCardId, VoidCardId,
 };
 use crate::battle_cards::ability_list::CanPlayRestriction;
 use crate::battle_cards::battle_card_state::{BattleCardState, ObjectId};
@@ -42,8 +42,8 @@ pub struct AllCards {
     battlefield_state: PlayerMap<CharacterMap>,
     void: PlayerMap<CardSet<VoidCardId>>,
     hands: PlayerMap<CardSet<HandCardId>>,
-    shuffled_into_decks: PlayerMap<CardSet<DeckCardId>>,
-    tops_of_decks: PlayerMap<Vec<DeckCardId>>,
+    shuffled_into_decks: PlayerMap<CardSet<BattleDeckCardId>>,
+    tops_of_decks: PlayerMap<Vec<BattleDeckCardId>>,
     stack: StackItems,
     stack_card_set: PlayerMap<CardSet<StackCardId>>,
     banished: PlayerMap<CardSet<BanishedCardId>>,
@@ -88,26 +88,29 @@ impl AllCards {
     }
 
     /// Returns the set of cards shuffled into a player's deck.
-    pub fn shuffled_into_deck(&self, player: PlayerName) -> &CardSet<DeckCardId> {
+    pub fn shuffled_into_deck(&self, player: PlayerName) -> &CardSet<BattleDeckCardId> {
         self.shuffled_into_decks.player(player)
     }
 
     /// Returns the top of deck cards for a given player.
     ///
     /// The last element of the vector is the topmost card of the deck.
-    pub fn top_of_deck(&self, player: PlayerName) -> &Vec<DeckCardId> {
+    pub fn top_of_deck(&self, player: PlayerName) -> &Vec<BattleDeckCardId> {
         self.tops_of_decks.player(player)
     }
 
     /// Mutable equivalent to [Self::top_of_deck].
     ///
     /// The last element of the vector is the topmost card of the deck.
-    pub fn top_of_deck_mut(&mut self, player: PlayerName) -> &mut Vec<DeckCardId> {
+    pub fn top_of_deck_mut(&mut self, player: PlayerName) -> &mut Vec<BattleDeckCardId> {
         self.tops_of_decks.player_mut(player)
     }
 
     /// Returns all cards in a player's deck.
-    pub fn all_deck_cards(&self, player: PlayerName) -> impl Iterator<Item = DeckCardId> + '_ {
+    pub fn all_deck_cards(
+        &self,
+        player: PlayerName,
+    ) -> impl Iterator<Item = BattleDeckCardId> + '_ {
         self.shuffled_into_decks
             .player(player)
             .iter()
@@ -185,7 +188,11 @@ impl AllCards {
     /// player.
     ///
     /// Returns true if the card was found and moved.
-    pub fn move_card_to_top_of_deck(&mut self, player: PlayerName, card_id: DeckCardId) -> bool {
+    pub fn move_card_to_top_of_deck(
+        &mut self,
+        player: PlayerName,
+        card_id: BattleDeckCardId,
+    ) -> bool {
         if self.shuffled_into_decks.player(player).contains(card_id) {
             self.shuffled_into_decks.player_mut(player).remove(card_id);
             self.tops_of_decks.player_mut(player).push(card_id);
@@ -216,7 +223,7 @@ impl AllCards {
                 revealed_to_player_override: PlayerMap::default(),
                 can_play_restriction: name.can_play_restriction,
             });
-            self.shuffled_into_decks.player_mut(owner).insert(DeckCardId(CardId(id)));
+            self.shuffled_into_decks.player_mut(owner).insert(BattleDeckCardId(CardId(id)));
         }
     }
 
@@ -253,11 +260,13 @@ impl AllCards {
             }
             Zone::Battlefield => self.battlefield.player(controller).contains(CharacterId(card_id)),
             Zone::Deck => {
-                self.shuffled_into_decks.player(controller).contains(DeckCardId(CardId(card_id.0)))
+                self.shuffled_into_decks
+                    .player(controller)
+                    .contains(BattleDeckCardId(CardId(card_id.0)))
                     || self
                         .tops_of_decks
                         .player(controller)
-                        .contains(&DeckCardId(CardId(card_id.0)))
+                        .contains(&BattleDeckCardId(CardId(card_id.0)))
             }
             Zone::Hand => self.hands.player(controller).contains(HandCardId(CardId(card_id.0))),
             Zone::Stack => {
@@ -380,7 +389,7 @@ impl AllCards {
                     .insert(CharacterId(card_id), CharacterState::default());
             }
             Zone::Deck => {
-                self.shuffled_into_decks.player_mut(controller).insert(DeckCardId(card_id));
+                self.shuffled_into_decks.player_mut(controller).insert(BattleDeckCardId(card_id));
             }
             Zone::Hand => {
                 self.hands.player_mut(controller).insert(HandCardId(card_id));
@@ -411,9 +420,9 @@ impl AllCards {
                 self.battlefield_state.player_mut(controller).remove(&CharacterId(card_id));
             }
             Zone::Deck => {
-                self.shuffled_into_decks.player_mut(controller).remove(DeckCardId(card_id));
+                self.shuffled_into_decks.player_mut(controller).remove(BattleDeckCardId(card_id));
                 let tops = self.tops_of_decks.player_mut(controller);
-                if let Some(pos) = tops.iter().position(|&id| id == DeckCardId(card_id)) {
+                if let Some(pos) = tops.iter().position(|&id| id == BattleDeckCardId(card_id)) {
                     tops.remove(pos);
                 }
             }

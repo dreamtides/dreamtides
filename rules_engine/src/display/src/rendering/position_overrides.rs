@@ -1,6 +1,6 @@
 use battle_state::actions::battle_actions::CardOrderSelectionTargetDiscriminants;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CardId, DeckCardId, VoidCardId};
+use battle_state::battle::card_id::{BattleDeckCardId, CardId, VoidCardId};
 use battle_state::battle_cards::stack_card_state::{EffectTargets, StandardEffectTarget};
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::types::PlayerName;
@@ -93,7 +93,7 @@ fn for_top_of_deck(
     base_object_position: ObjectPosition,
 ) -> ObjectPosition {
     if matches!(base_object_position.position, Position::InDeck(_)) {
-        let deck_card_id = DeckCardId(card_id);
+        let deck_card_id = BattleDeckCardId(card_id);
         for player in [PlayerName::One, PlayerName::Two] {
             let top_of_deck_list = battle.cards.top_of_deck(player);
             if let Some(position) = top_of_deck_list.iter().position(|&id| id == deck_card_id) {
@@ -119,7 +119,7 @@ fn for_card_order_browser(
     if let Some(prompt) = battle.prompts.front()
         && let PromptType::SelectDeckCardOrder { prompt: deck_prompt } = &prompt.prompt_type
     {
-        let deck_card_id = DeckCardId(card_id);
+        let deck_card_id = BattleDeckCardId(card_id);
         if deck_prompt.initial.contains(&deck_card_id) {
             if deck_prompt.void.contains(deck_card_id) {
                 return ObjectPosition {

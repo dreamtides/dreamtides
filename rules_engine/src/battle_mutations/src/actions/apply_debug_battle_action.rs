@@ -4,7 +4,7 @@ use battle_queries::legal_action_queries::legal_actions_data::{LegalActions, Pri
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CardId, DeckCardId, HandCardId};
+use battle_state::battle::card_id::{BattleDeckCardId, CardId, HandCardId};
 use battle_state::core::effect_source::EffectSource;
 use core_data::identifiers::BaseCardId;
 use core_data::types::PlayerName;
@@ -43,8 +43,8 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
                 .get(&card_name)
                 .expect("Card definition not found")
                 .clone();
-            battle_deck::add_cards(battle, player_name, &[definition]);
-            let new_card_id = DeckCardId(CardId(card_count));
+            battle_deck::debug_add_cards(battle, player_name, &[definition]);
+            let new_card_id = BattleDeckCardId(CardId(card_count));
             move_card::from_deck_to_battlefield(battle, source, player_name, new_card_id);
         }
         DebugBattleAction::AddCardToVoid { player: player_name, card: card_name } => {
@@ -55,8 +55,8 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
                 .get(&card_name)
                 .expect("Card definition not found")
                 .clone();
-            battle_deck::add_cards(battle, player_name, &[definition]);
-            let new_card_id = DeckCardId(CardId(card_count));
+            battle_deck::debug_add_cards(battle, player_name, &[definition]);
+            let new_card_id = BattleDeckCardId(CardId(card_count));
             move_card::from_deck_to_void(battle, source, player_name, new_card_id);
         }
         DebugBattleAction::MoveHandToDeck { player: player_name } => {
@@ -66,7 +66,8 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
             }
         }
         DebugBattleAction::SetCardsRemainingInDeck { player: player_name, cards: target_count } => {
-            let deck_cards: Vec<DeckCardId> = battle.cards.all_deck_cards(player_name).collect();
+            let deck_cards: Vec<BattleDeckCardId> =
+                battle.cards.all_deck_cards(player_name).collect();
             let current_count = deck_cards.len();
             if current_count > target_count {
                 let cards_to_move = current_count - target_count;
@@ -105,8 +106,8 @@ fn add_to_hand(
     let card_count = battle.cards.all_cards().count();
     let definition =
         battle.tabula.test_cards.get(&card_name).expect("Card definition not found").clone();
-    battle_deck::add_cards(battle, player, &[definition]);
-    let new_card_id = DeckCardId(CardId(card_count));
+    battle_deck::debug_add_cards(battle, player, &[definition]);
+    let new_card_id = BattleDeckCardId(CardId(card_count));
     move_card::from_deck_to_hand(battle, source, player, new_card_id)
 }
 

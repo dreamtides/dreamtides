@@ -9,7 +9,7 @@ use battle_state::battle::battle_card_definitions::{
     BattleCardDefinitions, BattleCardDefinitionsCard,
 };
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle::card_id::{CardIdType, DeckCardId, HandCardId};
+use battle_state::battle::card_id::{BattleDeckCardId, CardIdType, HandCardId};
 use battle_state::battle_cards::card_set::CardSet;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger::Trigger;
@@ -97,16 +97,26 @@ pub fn add_deck_copy(battle: &mut BattleState, player: PlayerName) {
 }
 
 /// Adds a list of cards to a player's deck
-pub fn add_cards(battle: &mut BattleState, player: PlayerName, cards: &[CardDefinition]) {
+pub fn debug_add_cards(battle: &mut BattleState, player: PlayerName, cards: &[CardDefinition]) {
     let mut new_cards = Vec::new();
     for definition in cards {
         let def_arc = Arc::new(definition.clone());
         let list = Arc::new(card_abilities::build_from_definition(&def_arc));
-        new_cards.push(BattleCardDefinitionsCard { ability_list: list, definition: def_arc });
+        let mut new_deck = battle.players.player(player).quest.deck.clone();
+        let quest_id = new_deck.push_card_and_get_id(definition.clone());
+        new_cards.push(BattleCardDefinitionsCard {
+            ability_list: list,
+            definition: def_arc,
+            quest_deck_card_id: quest_id,
+        });
+        let mut new_quest = (*battle.players.player(player).quest).clone();
+        new_quest.deck = new_deck;
+        battle.players.player_mut(player).quest = Arc::new(new_quest);
     }
 
     let response = BattleCardDefinitions::append(&battle.card_definitions, new_cards);
     battle.card_definitions = Arc::new(response.cache);
+
     battle.cards.create_cards_in_deck(player, response.created);
 }
 
@@ -123,7 +133,7 @@ pub fn realize_top_of_deck(
     battle: &mut BattleState,
     player: PlayerName,
     count: u32,
-) -> Vec<DeckCardId> {
+) -> Vec<BattleDeckCardId> {
     let current_top_count = battle.cards.top_of_deck(player).len() as u32;
     let needed_cards = count.saturating_sub(current_top_count);
 
@@ -194,6 +204,9 @@ fn draw_card_internal(
 }
 
 /// Returns a random element from the given set.
-fn random_element(set: &CardSet<DeckCardId>, rng: &mut Xoshiro256PlusPlus) -> Option<DeckCardId> {
+fn random_element(
+    set: &CardSet<BattleDeckCardId>,
+    rng: &mut Xoshiro256PlusPlus,
+) -> Option<BattleDeckCardId> {
     set.iter().choose(rng)
 }

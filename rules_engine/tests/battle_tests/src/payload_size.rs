@@ -74,13 +74,13 @@ fn add_500_cards(battle: &mut BattleState) {
         .map(|base| battle.tabula.test_cards.get(base).expect("Card definition not found").clone())
         .collect::<Vec<_>>();
 
-    battle_deck::add_cards(battle, PlayerName::One, &definitions_one);
+    battle_deck::debug_add_cards(battle, PlayerName::One, &definitions_one);
     move_all_from_deck_to_void(battle, PlayerName::One);
     let definitions_two = get_core_11_card_mix()
         .iter()
         .map(|base| battle.tabula.test_cards.get(base).expect("Card definition not found").clone())
         .collect::<Vec<_>>();
-    battle_deck::add_cards(battle, PlayerName::Two, &definitions_two);
+    battle_deck::debug_add_cards(battle, PlayerName::Two, &definitions_two);
     move_all_from_deck_to_void(battle, PlayerName::Two);
 }
 

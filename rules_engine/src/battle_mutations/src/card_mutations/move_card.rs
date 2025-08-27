@@ -2,7 +2,7 @@ use battle_queries::battle_card_queries::{card, card_properties};
 use battle_queries::panic_with;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{
-    CardId, CardIdType, CharacterId, DeckCardId, HandCardId, StackCardId, VoidCardId,
+    BattleDeckCardId, CardId, CardIdType, CharacterId, HandCardId, StackCardId, VoidCardId,
 };
 use battle_state::battle_cards::character_state::CharacterState;
 use battle_state::battle_cards::zone::Zone;
@@ -96,7 +96,7 @@ pub fn from_deck_to_hand(
     battle: &mut BattleState,
     source: EffectSource,
     controller: PlayerName,
-    card_id: DeckCardId,
+    card_id: BattleDeckCardId,
 ) -> HandCardId {
     to_destination_zone(battle, source, controller, card_id.card_id(), Zone::Deck, Zone::Hand);
     HandCardId(card_id.card_id())
@@ -110,9 +110,9 @@ pub fn from_hand_to_deck(
     source: EffectSource,
     controller: PlayerName,
     card_id: HandCardId,
-) -> DeckCardId {
+) -> BattleDeckCardId {
     to_destination_zone(battle, source, controller, card_id.card_id(), Zone::Hand, Zone::Deck);
-    DeckCardId(card_id.card_id())
+    BattleDeckCardId(card_id.card_id())
 }
 
 /// Moves a card from the 'controller' player's deck to their battlefield.
@@ -122,7 +122,7 @@ pub fn from_deck_to_battlefield(
     battle: &mut BattleState,
     source: EffectSource,
     controller: PlayerName,
-    card_id: DeckCardId,
+    card_id: BattleDeckCardId,
 ) -> CharacterId {
     to_destination_zone(
         battle,
@@ -142,7 +142,7 @@ pub fn from_deck_to_void(
     battle: &mut BattleState,
     source: EffectSource,
     controller: PlayerName,
-    card_id: DeckCardId,
+    card_id: BattleDeckCardId,
 ) -> VoidCardId {
     to_destination_zone(battle, source, controller, card_id.card_id(), Zone::Deck, Zone::Void);
     VoidCardId(card_id.card_id())

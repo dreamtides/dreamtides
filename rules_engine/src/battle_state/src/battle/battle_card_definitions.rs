@@ -1,5 +1,7 @@
+use std::collections::BTreeMap;
 use std::sync::Arc;
 
+use quest_state::quest::deck::QuestDeckCardId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use tabula_data::card_definition::CardDefinition;
@@ -18,19 +20,22 @@ use crate::battle_cards::ability_list::AbilityList;
 pub struct BattleCardIdentity(usize);
 
 /// Stores the [CardDefinition]s and [AbilityList]s for cards in this battle
-/// keyed by their [CardIdentity].
+/// keyed by their [BattleCardIdentity].
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct BattleCardDefinitions {
     #[serde(default)]
     cache_by_identity: Vec<Arc<AbilityList>>,
     #[serde(default)]
     definitions_by_identity: Vec<Arc<CardDefinition>>,
+    #[serde(default)]
+    quest_deck_card_ids: BTreeMap<QuestDeckCardId, BattleCardIdentity>,
 }
 
 /// Describes a card definition to add to the cache.
 pub struct BattleCardDefinitionsCard {
     pub ability_list: Arc<AbilityList>,
     pub definition: Arc<CardDefinition>,
+    pub quest_deck_card_id: QuestDeckCardId,
 }
 
 /// Returns the result of a [BattleCardDefinitions::build] operation.
@@ -53,7 +58,8 @@ impl BattleCardDefinitions {
     pub fn build(cards: Vec<BattleCardDefinitionsCard>) -> BattleCardDefinitionsResponse {
         let initial_lists: Vec<Arc<AbilityList>> = Vec::new();
         let initial_defs: Vec<Arc<CardDefinition>> = Vec::new();
-        Self::build_with_initial(&initial_lists, &initial_defs, cards)
+        let initial_map: BTreeMap<QuestDeckCardId, BattleCardIdentity> = BTreeMap::new();
+        Self::build_with_initial(&initial_lists, &initial_defs, &initial_map, cards)
     }
 
     /// Builds a new [BattleCardDefinitions] by appending a list of
@@ -62,17 +68,24 @@ impl BattleCardDefinitions {
         self: &BattleCardDefinitions,
         cards: Vec<BattleCardDefinitionsCard>,
     ) -> BattleCardDefinitionsResponse {
-        Self::build_with_initial(&self.cache_by_identity, &self.definitions_by_identity, cards)
+        Self::build_with_initial(
+            &self.cache_by_identity,
+            &self.definitions_by_identity,
+            &self.quest_deck_card_ids,
+            cards,
+        )
     }
 
     fn build_with_initial(
         initial_lists: &[Arc<AbilityList>],
         initial_defs: &[Arc<CardDefinition>],
+        initial_map: &BTreeMap<QuestDeckCardId, BattleCardIdentity>,
         cards: Vec<BattleCardDefinitionsCard>,
     ) -> BattleCardDefinitionsResponse {
         let start = initial_lists.len();
         let mut cache_by_identity = Vec::with_capacity(start + cards.len());
         let mut definitions_by_identity = Vec::with_capacity(start + cards.len());
+        let mut quest_deck_card_ids = initial_map.clone();
         cache_by_identity.extend(initial_lists.iter().cloned());
         definitions_by_identity.extend(initial_defs.iter().cloned());
 
@@ -81,6 +94,7 @@ impl BattleCardDefinitions {
             let identity = BattleCardIdentity(start + i);
             cache_by_identity.push(card.ability_list.clone());
             definitions_by_identity.push(card.definition.clone());
+            quest_deck_card_ids.insert(card.quest_deck_card_id, identity);
             created.push(CreatedCard {
                 identity,
                 can_play_restriction: card.ability_list.can_play_restriction,
@@ -92,7 +106,11 @@ impl BattleCardDefinitions {
         }
 
         BattleCardDefinitionsResponse {
-            cache: BattleCardDefinitions { cache_by_identity, definitions_by_identity },
+            cache: BattleCardDefinitions {
+                cache_by_identity,
+                definitions_by_identity,
+                quest_deck_card_ids,
+            },
             created,
         }
     }
