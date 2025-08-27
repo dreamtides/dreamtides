@@ -41,7 +41,7 @@ pub fn parse(input: &str) -> Result<Vec<Ability>, Vec<InitializationError>> {
                 errors.push(InitializationError::with_details(
                     ErrorCode::AbilityParsingError,
                     "Failed to parse ability",
-                    e.reason().to_string(),
+                    format!("{} for input {}", e.reason(), input),
                 ));
             }
         }

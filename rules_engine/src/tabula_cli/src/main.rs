@@ -103,8 +103,28 @@ async fn main() -> Result<()> {
 fn parse_abilities(
     table: &mut Table<BaseCardId, BaseCardDefinitionRaw>,
 ) -> Result<(), Vec<InitializationError>> {
-    for row in table.iter_mut() {
-        row.abilities = Some(ability_parser::parse(row.rules_text_en_us.as_str())?);
+    let mut errors: Vec<InitializationError> = Vec::new();
+    for (row_index, row) in table.iter_mut().enumerate() {
+        match ability_parser::parse(row.rules_text_en_us.as_str()) {
+            Ok(parsed) => row.abilities = Some(parsed),
+            Err(mut errs) => {
+                for e in errs.iter_mut() {
+                    if e.tabula_sheet.is_none() {
+                        e.tabula_sheet = Some(String::from("test_cards"));
+                    }
+                    if e.tabula_row.is_none() {
+                        e.tabula_row = Some(row_index);
+                    }
+                    if e.tabula_column.is_none() {
+                        e.tabula_column = Some(String::from("rules_text_en_us"));
+                    }
+                    if e.tabula_id.is_none() {
+                        e.tabula_id = Some(format!("{}", row.id.0));
+                    }
+                }
+                errors.extend(errs);
+            }
+        }
     }
-    Ok(())
+    if errors.is_empty() { Ok(()) } else { Err(errors) }
 }

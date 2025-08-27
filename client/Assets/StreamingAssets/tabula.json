@@ -121,6 +121,12 @@
       "en_us": "<line-height=120%>{\"\\u000A\"}</line-height>"
     },
     {
+      "id": "abfc5cdc-e118-4e43-87a1-3493cc80df75",
+      "name": "bullet",
+      "description": "Inserts a bullet character",
+      "en_us": "•"
+    },
+    {
       "id": "3cc400d3-0594-4663-9187-e8c46613a21f",
       "name": "mode",
       "description": "Formatting that appears before a modal ability",
@@ -759,7 +765,7 @@
       "id": "e8f937da-cca7-447d-a559-530d7c339325",
       "name_en_us": "Test Modal Return To Hand Or Draw Two",
       "energy_cost": "*",
-      "rules_text_en_us": "{choose-one}\n{mode}{-energy-cost(e:2)}: Return an enemy character to hand.{end-mode}\n{mode}{-energy-cost(e:3)}: Draw {-cards(n:2)}.{end-mode}",
+      "rules_text_en_us": "{choose-one}\n{bullet} {-energy-cost(e:2)}: Return an enemy character to hand.\n{bullet} {-energy-cost(e:3)}: Draw {-cards(n:2)}.",
       "prompts_en_us": "Choose an enemy character to return to hand.",
       "abilities": [
         {
@@ -828,7 +834,7 @@
       "id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
       "name_en_us": "Test Foresee One Draw Reclaim",
       "energy_cost": "1",
-      "rules_text_en_us": "{ability}{-Foresee(n:1)}. Draw {-cards(n:1)}.{end-ability} {br}\n{ability}{-Reclaim-Cost(e:3)}{end-ability}",
+      "rules_text_en_us": "{-Foresee(n:1)}. Draw {-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
       "abilities": [
         {
           "Event": {
@@ -1134,7 +1140,7 @@
       "id": "3af84464-874a-4fd2-89cb-1986dee59ae1",
       "name_en_us": "Test Dual Activated Ability Character",
       "energy_cost": "4",
-      "rules_text_en_us": "{ability}{a} {-energy-cost(e:1)}: Draw {-cards(n:1)}.{end-ability}\n{ability}{a} {-energy-cost(e:2)}: Draw {-cards(n:2)}.{end-ability}",
+      "rules_text_en_us": "{a} {-energy-cost(e:1)}: Draw {-cards(n:1)}.\n\n{a} {-energy-cost(e:2)}: Draw {-cards(n:2)}.",
       "abilities": [
         {
           "Activated": {
@@ -1261,7 +1267,7 @@
       "id": "0cba1386-d1b6-4f57-8ccc-d92f8be01d7c",
       "name_en_us": "Test Draw One Reclaim",
       "energy_cost": "2",
-      "rules_text_en_us": "{ability}Draw {-cards(n:1)}.{end-ability}\n{ability}{-Reclaim-Cost(e:1)}{end-ability}",
+      "rules_text_en_us": "Draw {-cards(n:1)}.\n\n{-Reclaim-Cost(e:1)}",
       "abilities": [
         {
           "Event": {
@@ -1289,7 +1295,7 @@
       "id": "86ffc58b-96db-4106-a892-8ae2a70719e6",
       "name_en_us": "Test Foresee One Reclaim",
       "energy_cost": "1",
-      "rules_text_en_us": "{ability}{-Foresee(n:1)}.{end-ability}\n{ability}{-Reclaim-Cost(e:3)}{end-ability}",
+      "rules_text_en_us": "{-Foresee(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
       "abilities": [
         {
           "Event": {
@@ -1343,7 +1349,7 @@
       "id": "029889e9-25bc-438f-a492-8813febd65d8",
       "name_en_us": "Test Modal Draw One Or Draw Two",
       "energy_cost": "*",
-      "rules_text_en_us": "{choose-one}\n{mode}{-energy-cost(e:1)}: Draw {-cards(n:1)}.{end-mode}\n{mode}{-energy-cost(e:3)}: Draw {-cards(n:2)}.{end-mode}",
+      "rules_text_en_us": "{choose-one}\n{bullet} {-energy-cost(e:1)}: Draw {-cards(n:1)}.\n{bullet} {-energy-cost(e:3)}: Draw {-cards(n:2)}.",
       "abilities": [
         {
           "Event": {
@@ -1383,7 +1389,7 @@
       "id": "9847b3fc-1e7f-44e5-90af-1240ae12aaee",
       "name_en_us": "Test Modal Draw One Or Dissolve Enemy",
       "energy_cost": "*",
-      "rules_text_en_us": "{choose-one}\n{mode}{-energy-cost(e:1)}: Draw {-cards(n:1)}.{end-mode}\n{mode}{-energy-cost(e:2)}: {Dissolve} an enemy character.{end-mode}",
+      "rules_text_en_us": "{choose-one}\n{bullet} {-energy-cost(e:1)}: Draw {-cards(n:1)}.\n{bullet} {-energy-cost(e:2)}: {Dissolve} an enemy character.",
       "prompts_en_us": "Choose an enemy character to {dissolve}.",
       "abilities": [
         {

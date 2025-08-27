@@ -31,8 +31,8 @@ pub const TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: BaseCardId =
 pub const TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND: BaseCardId =
     BaseCardId(uuid!("559e62a0-7ead-4136-8bd4-6cc58db4bef7"));
 
-/// {choose-one} {mode}{-energy-cost(e:2)}: Return an enemy character to
-/// hand.{end-mode} {mode}{-energy-cost(e:3)}: Draw {-cards(n:2)}.{end-mode}
+/// {choose-one} {bullet} {-energy-cost(e:2)}: Return an enemy character to
+/// hand. {bullet} {-energy-cost(e:3)}: Draw {-cards(n:2)}.
 pub const TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO: BaseCardId =
     BaseCardId(uuid!("e8f937da-cca7-447d-a559-530d7c339325"));
 
@@ -40,8 +40,7 @@ pub const TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO: BaseCardId =
 pub const TEST_PREVENT_DISSOLVE_THIS_TURN: BaseCardId =
     BaseCardId(uuid!("0b783ac8-6aea-438e-a2d5-87bf68548eda"));
 
-/// {ability}{-Foresee(n:1)}. Draw {-cards(n:1)}.{end-ability} {br}
-/// {ability}{-Reclaim-Cost(e:3)}{end-ability}
+/// {-Foresee(n:1)}. Draw {-cards(n:1)}.  {-Reclaim-Cost(e:3)}
 pub const TEST_FORESEE_ONE_DRAW_RECLAIM: BaseCardId =
     BaseCardId(uuid!("de21db6c-54b4-4bff-b1d6-5a4711ef5ed8"));
 
@@ -82,8 +81,8 @@ pub const TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: BaseCardId =
 pub const TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER: BaseCardId =
     BaseCardId(uuid!("785e0341-fdd8-4e05-acb4-cbceed70ea6c"));
 
-/// {ability}{a} {-energy-cost(e:1)}: Draw {-cards(n:1)}.{end-ability}
-/// {ability}{a} {-energy-cost(e:2)}: Draw {-cards(n:2)}.{end-ability}
+/// {a} {-energy-cost(e:1)}: Draw {-cards(n:1)}.  {a} {-energy-cost(e:2)}: Draw
+/// {-cards(n:2)}.
 pub const TEST_DUAL_ACTIVATED_ABILITY_CHARACTER: BaseCardId =
     BaseCardId(uuid!("3af84464-874a-4fd2-89cb-1986dee59ae1"));
 
@@ -97,13 +96,11 @@ pub const TEST_FORESEE_TWO: BaseCardId = BaseCardId(uuid!("89e34264-a69c-48a4-86
 pub const TEST_FORESEE_ONE_DRAW_A_CARD: BaseCardId =
     BaseCardId(uuid!("820faab3-37c1-46fa-a314-5f023ec739a1"));
 
-/// {ability}Draw {-cards(n:1)}.{end-ability}
-/// {ability}{-Reclaim-Cost(e:1)}{end-ability}
+/// Draw {-cards(n:1)}.  {-Reclaim-Cost(e:1)}
 pub const TEST_DRAW_ONE_RECLAIM: BaseCardId =
     BaseCardId(uuid!("0cba1386-d1b6-4f57-8ccc-d92f8be01d7c"));
 
-/// {ability}{-Foresee(n:1)}.{end-ability}
-/// {ability}{-Reclaim-Cost(e:3)}{end-ability}
+/// {-Foresee(n:1)}.  {-Reclaim-Cost(e:3)}
 pub const TEST_FORESEE_ONE_RECLAIM: BaseCardId =
     BaseCardId(uuid!("86ffc58b-96db-4106-a892-8ae2a70719e6"));
 
@@ -111,13 +108,13 @@ pub const TEST_FORESEE_ONE_RECLAIM: BaseCardId =
 pub const TEST_RETURN_VOID_CARD_TO_HAND: BaseCardId =
     BaseCardId(uuid!("46e20fe4-36ca-438d-91a6-fac880ee9495"));
 
-/// {choose-one} {mode}{-energy-cost(e:1)}: Draw {-cards(n:1)}.{end-mode}
-/// {mode}{-energy-cost(e:3)}: Draw {-cards(n:2)}.{end-mode}
+/// {choose-one} {bullet} {-energy-cost(e:1)}: Draw {-cards(n:1)}. {bullet}
+/// {-energy-cost(e:3)}: Draw {-cards(n:2)}.
 pub const TEST_MODAL_DRAW_ONE_OR_DRAW_TWO: BaseCardId =
     BaseCardId(uuid!("029889e9-25bc-438f-a492-8813febd65d8"));
 
-/// {choose-one} {mode}{-energy-cost(e:1)}: Draw {-cards(n:1)}.{end-mode}
-/// {mode}{-energy-cost(e:2)}: {Dissolve} an enemy character.{end-mode}
+/// {choose-one} {bullet} {-energy-cost(e:1)}: Draw {-cards(n:1)}. {bullet}
+/// {-energy-cost(e:2)}: {Dissolve} an enemy character.
 pub const TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY: BaseCardId =
     BaseCardId(uuid!("9847b3fc-1e7f-44e5-90af-1240ae12aaee"));
 

@@ -52,6 +52,7 @@ pub struct InitializationError {
     pub tabula_sheet: Option<String>,
     pub tabula_row: Option<usize>,
     pub tabula_column: Option<String>,
+    pub tabula_id: Option<String>,
 }
 
 impl InitializationError {
@@ -63,6 +64,7 @@ impl InitializationError {
             tabula_sheet: None,
             tabula_row: None,
             tabula_column: None,
+            tabula_id: None,
         }
     }
 
@@ -78,6 +80,7 @@ impl InitializationError {
             tabula_sheet: None,
             tabula_row: None,
             tabula_column: None,
+            tabula_id: None,
         }
     }
 
@@ -95,6 +98,9 @@ impl InitializationError {
             }
             if let Some(col) = &self.tabula_column {
                 parts.push(format!("Column: {col}"));
+            }
+            if let Some(id) = &self.tabula_id {
+                parts.push(format!("ID: {id}"));
             }
             if !parts.is_empty() {
                 lines.push(parts.join(" "));

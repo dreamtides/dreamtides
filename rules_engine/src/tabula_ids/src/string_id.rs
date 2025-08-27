@@ -61,6 +61,9 @@ pub const END_ABILITY: StringId = StringId(uuid!("12487a98-0f31-4f71-bd51-9a85bf
 /// Inserts a linebreak in card rules text
 pub const BR: StringId = StringId(uuid!("e189f8a2-0901-41b9-9023-78dd196f60d5"));
 
+/// Inserts a bullet character
+pub const BULLET: StringId = StringId(uuid!("abfc5cdc-e118-4e43-87a1-3493cc80df75"));
+
 /// Formatting that appears before a modal ability
 pub const MODE: StringId = StringId(uuid!("3cc400d3-0594-4663-9187-e8c46613a21f"));
 
