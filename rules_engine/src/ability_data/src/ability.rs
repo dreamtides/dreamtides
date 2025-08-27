@@ -41,7 +41,7 @@ pub enum Ability {
 /// parts.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum DisplayedAbility {
-    Event(DisplayedEventAbility),
+    Event { event: DisplayedEventAbility },
     Static { text: String },
     Activated { cost: String, effect: DisplayedAbilityEffect },
     Triggered { text: String },

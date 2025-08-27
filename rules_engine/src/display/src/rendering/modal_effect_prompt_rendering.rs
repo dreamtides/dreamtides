@@ -112,7 +112,7 @@ fn all_modal_effect_descriptions(
     let mut result = vec![];
     for ability in abilities {
         match ability {
-            DisplayedAbility::Event(event) => {
+            DisplayedAbility::Event { event } => {
                 result.extend(effect_modal_effect_descriptions(&event.effect));
             }
             DisplayedAbility::Activated { effect, .. } => {

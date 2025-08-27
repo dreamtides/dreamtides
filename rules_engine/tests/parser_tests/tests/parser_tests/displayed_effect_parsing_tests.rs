@@ -6,10 +6,12 @@ fn test_event_simple_effect() {
     let result = parse_displayed("Draw {-cards(n: 1)}.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(EventAbility(
-        additional_cost: None,
-        effect: Effect("draw {-cards(n: 1)}."),
-      )),
+      Event(
+        event: EventAbility(
+          additional_cost: None,
+          effect: Effect("draw {-cards(n: 1)}."),
+        ),
+      ),
     ]
     "###);
 }
@@ -19,10 +21,12 @@ fn test_additional_cost_effect() {
     let result = parse_displayed("Pay one or more {e}: Draw {-cards(n:1)} for each {e} spent.");
     assert_ron_snapshot!(result, @r###"
     [
-      Event(EventAbility(
-        additional_cost: Some("pay one or more {e}"),
-        effect: Effect("draw {-cards(n:1)} for each {e} spent."),
-      )),
+      Event(
+        event: EventAbility(
+          additional_cost: Some("pay one or more {e}"),
+          effect: Effect("draw {-cards(n:1)} for each {e} spent."),
+        ),
+      ),
     ]
     "###);
 }
@@ -34,19 +38,21 @@ fn test_event_modal_choices() {
     );
     assert_ron_snapshot!(result, @r###"
     [
-      Event(EventAbility(
-        additional_cost: None,
-        effect: Modal([
-          DisplayedModalEffectChoice(
-            cost: "{-energy-cost(e: 1)}",
-            effect: "draw {-cards(n: 1)}.",
-          ),
-          DisplayedModalEffectChoice(
-            cost: "{-energy-cost(e: 3)}",
-            effect: "draw {-cards(n: 2)}.",
-          ),
-        ]),
-      )),
+      Event(
+        event: EventAbility(
+          additional_cost: None,
+          effect: Modal([
+            DisplayedModalEffectChoice(
+              cost: "{-energy-cost(e: 1)}",
+              effect: "draw {-cards(n: 1)}.",
+            ),
+            DisplayedModalEffectChoice(
+              cost: "{-energy-cost(e: 3)}",
+              effect: "draw {-cards(n: 2)}.",
+            ),
+          ]),
+        ),
+      ),
     ]
     "###);
 }

@@ -18,6 +18,7 @@ use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::card_types::{CardSubtype, CardType};
 use core_data::display_color::{self, DisplayColor};
 use core_data::display_types::SpriteAddress;
+use core_data::identifiers::AbilityNumber;
 use core_data::types::CardFacing;
 use display_data::card_view::{
     CardActions, CardPrefab, CardView, DisplayImage, InfoZoomData, InfoZoomIcon, RevealedCardView,
@@ -25,6 +26,7 @@ use display_data::card_view::{
 use fluent::fluent_args;
 use masonry::flex_enums::FlexDirection;
 use masonry::flex_style::FlexStyle;
+use tabula_data::card_definition::CardDefinition;
 use tabula_data::localized_strings::StringContext;
 use tabula_ids::{string_id, test_card};
 use ui_components::box_component::BoxComponent;
@@ -235,6 +237,23 @@ fn card_type(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -
 
     let result = builder.string(type_string);
     if card_properties::is_fast(battle, card_id) { format!("\u{f0e7} {result}") } else { result }
+}
+
+/// Returns the rules text for the given ability, without including any costs.
+pub fn ability_token_text(
+    builder: &ResponseBuilder,
+    definition: &CardDefinition,
+    ability_number: AbilityNumber,
+) -> String {
+    let ability = &definition.displayed_abilities[ability_number.0];
+    let text = match ability {
+        DisplayedAbility::Event { event } => displayed_effect_text(&event.effect),
+        DisplayedAbility::Static { text } => text.clone(),
+        DisplayedAbility::Activated { effect, .. } => displayed_effect_text(effect),
+        DisplayedAbility::Triggered { text } => text.clone(),
+        DisplayedAbility::Named { name } => name.clone(),
+    };
+    builder.tabula().strings.format_display_string(&text, StringContext::CardText, fluent_args![])
 }
 
 pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: CardId) -> String {
@@ -488,36 +507,14 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
 fn get_displayed_text(abilities: &[DisplayedAbility]) -> String {
     // Tags must use Fluent "quoted string" syntax to avoid breaking parsing.
     let colon = "{\"<size=130%>:</size>\"}";
-    let indent = "{\"<indent=0.75em>\"}";
-    let end_indent = "{\"</indent>\"}";
-    let bullet = "{bullet}";
     let line_height_25 = "{\"<line-height=25%>\"}";
     let end_line_height = "{\"</line-height>\"}";
 
     abilities
         .iter()
         .map(|ability| match ability {
-            DisplayedAbility::Event(event) => {
-                let effect = match &event.effect {
-                    DisplayedAbilityEffect::Effect(text) => text.clone(),
-                    DisplayedAbilityEffect::Modal(choices) => {
-                        let lines = choices
-                            .iter()
-                            .map(|c| {
-                                if c.cost.is_empty() {
-                                    format!("{bullet} {indent}{}{end_indent}", c.effect)
-                                } else {
-                                    format!(
-                                        "{bullet} {indent}{}{colon} {}{end_indent}",
-                                        c.cost, c.effect
-                                    )
-                                }
-                            })
-                            .collect::<Vec<_>>()
-                            .join("\n");
-                        format!("{choose}\n{}", lines, choose = "{choose-one}")
-                    }
-                };
+            DisplayedAbility::Event { event } => {
+                let effect = displayed_effect_text(&event.effect);
                 if let Some(additional_cost) = &event.additional_cost {
                     format!("{additional_cost}{colon} {effect}")
                 } else {
@@ -526,33 +523,37 @@ fn get_displayed_text(abilities: &[DisplayedAbility]) -> String {
             }
             DisplayedAbility::Static { text } => text.clone(),
             DisplayedAbility::Activated { cost, effect } => {
-                let effect_text = match effect {
-                    DisplayedAbilityEffect::Effect(text) => text.clone(),
-                    DisplayedAbilityEffect::Modal(choices) => {
-                        let lines = choices
-                            .iter()
-                            .map(|c| {
-                                if c.cost.is_empty() {
-                                    format!("{bullet} {indent}{}{end_indent}", c.effect,)
-                                } else {
-                                    format!(
-                                        "{bullet} {indent}{}{colon} {}{end_indent}",
-                                        c.cost, c.effect
-                                    )
-                                }
-                            })
-                            .collect::<Vec<_>>()
-                            .join("\n");
-                        format!("{choose}\n{}", lines, choose = "{choose-one}")
-                    }
-                };
+                let effect_text = displayed_effect_text(effect);
                 format!("{cost}{colon} {effect_text}")
             }
             DisplayedAbility::Triggered { text } => text.clone(),
             DisplayedAbility::Named { name } => name.clone(),
         })
         .collect::<Vec<_>>()
-        // We must use fluent quoted string syntax + unicode newline character
-        // to avoid breaking fluent parsing.
         .join(&format!("\n{line_height_25}\n{end_line_height}"))
+}
+
+fn displayed_effect_text(effect: &DisplayedAbilityEffect) -> String {
+    let colon = "{\"<size=130%>:</size>\"}";
+    let indent = "{\"<indent=0.75em>\"}";
+    let end_indent = "{\"</indent>\"}";
+    let bullet = "{bullet}";
+
+    match effect {
+        DisplayedAbilityEffect::Effect(text) => text.clone(),
+        DisplayedAbilityEffect::Modal(choices) => {
+            let lines = choices
+                .iter()
+                .map(|c| {
+                    if c.cost.is_empty() {
+                        format!("{bullet} {indent}{}{end_indent}", c.effect,)
+                    } else {
+                        format!("{bullet} {indent}{}{colon} {}{end_indent}", c.cost, c.effect)
+                    }
+                })
+                .collect::<Vec<_>>()
+                .join("\n");
+            format!("{choose}\n{}", lines, choose = "{choose-one}")
+        }
+    }
 }

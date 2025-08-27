@@ -36,14 +36,16 @@ pub fn parse_with(
             Ability::Event(_) => {
                 let cost = extract_cost_before_colon(block).unwrap_or_default();
                 match to_effect(extract_effect_tail(block)) {
-                    Ok(effect) => out.push(DisplayedAbility::Event(DisplayedEventAbility {
-                        additional_cost: if cost.is_empty() || is_modal(block) {
-                            None
-                        } else {
-                            Some(cost)
+                    Ok(effect) => out.push(DisplayedAbility::Event {
+                        event: DisplayedEventAbility {
+                            additional_cost: if cost.is_empty() || is_modal(block) {
+                                None
+                            } else {
+                                Some(cost)
+                            },
+                            effect,
                         },
-                        effect,
-                    })),
+                    }),
                     Err(e) => errs.push(e),
                 }
             }

@@ -37,6 +37,7 @@ pub fn trigger_card_view(
 ) -> CardView {
     let current_stack = positions::current_stack_type(builder, battle);
     let character_card_id = trigger.character_id.card_id();
+    let definition = card::get_definition(battle, character_card_id);
     token_card_view(
         TokenCardView::builder()
             .id(format!("T{:?}/{:?}", character_card_id.0, trigger.ability_number))
@@ -46,7 +47,11 @@ pub fn trigger_card_view(
             })
             .image(card_rendering::card_image(battle, character_card_id))
             .name(card_rendering::card_name(battle, character_card_id))
-            .rules_text(card_rendering::rules_text(builder, battle, character_card_id))
+            .rules_text(card_rendering::ability_token_text(
+                builder,
+                &definition,
+                trigger.ability_number
+            ))
             .create_position(ObjectPosition {
                 position: Position::HiddenWithinCard(adapter::client_card_id(character_card_id)),
                 sorting_key: 0,
@@ -153,6 +158,7 @@ fn activated_ability_card_view(
 ) -> CardView {
     let character_card_id = ability.character_id.card_id();
     let abilities = card::ability_list(battle, character_card_id);
+    let definition = card::get_definition(battle, character_card_id);
 
     let ability_data = abilities
         .activated_abilities
@@ -195,7 +201,11 @@ fn activated_ability_card_view(
             .name(ability_name)
             .maybe_cost(cost.map(|cost| cost.to_string()))
             .maybe_card_type(Some("Activated Ability".to_string()))
-            .rules_text(card_rendering::rules_text(builder, battle, character_card_id))
+            .rules_text(card_rendering::ability_token_text(
+                builder,
+                &definition,
+                ability.ability_number,
+            ))
             .create_position(ObjectPosition {
                 position: Position::HiddenWithinCard(adapter::client_card_id(character_card_id)),
                 sorting_key: 0,
