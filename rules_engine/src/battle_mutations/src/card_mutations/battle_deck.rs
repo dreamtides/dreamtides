@@ -17,7 +17,7 @@ use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use rand::seq::IteratorRandom;
 use rand_xoshiro::Xoshiro256PlusPlus;
-use tabula_data::card_definition::CardDefinition;
+use tabula_data::card_definitions::card_definition::CardDefinition;
 
 use crate::card_mutations::move_card;
 use crate::player_mutations::energy;

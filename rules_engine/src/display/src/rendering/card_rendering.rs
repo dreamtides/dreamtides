@@ -26,7 +26,7 @@ use display_data::card_view::{
 use fluent::fluent_args;
 use masonry::flex_enums::FlexDirection;
 use masonry::flex_style::FlexStyle;
-use tabula_data::card_definition::CardDefinition;
+use tabula_data::card_definitions::card_definition::CardDefinition;
 use tabula_data::localized_strings::StringContext;
 use tabula_ids::{string_id, test_card};
 use ui_components::box_component::BoxComponent;

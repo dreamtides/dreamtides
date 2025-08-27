@@ -9,7 +9,7 @@ use core_data::initialization_error::{ErrorCode, InitializationError};
 use core_data::numerics::{Energy, Spark};
 use serde::{Deserialize, Serialize};
 
-use crate::card_definition::CardDefinition;
+use crate::card_definitions::card_definition::CardDefinition;
 use crate::localized_strings::LanguageId;
 use crate::tabula::TabulaBuildContext;
 use crate::tabula_table::Table;

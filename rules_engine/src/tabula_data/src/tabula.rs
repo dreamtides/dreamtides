@@ -4,11 +4,11 @@ use core_data::identifiers::BaseCardId;
 use core_data::initialization_error::InitializationError;
 use serde::{Deserialize, Serialize};
 
-use crate::base_card_definition_raw::BaseCardDefinitionRaw;
-use crate::card_definition::CardDefinition;
+use crate::card_definitions::base_card_definition_raw::{self, BaseCardDefinitionRaw};
+use crate::card_definitions::card_definition::CardDefinition;
+use crate::localized_strings;
 use crate::localized_strings::{LanguageId, LocalizedStringSetRaw, LocalizedStrings, StringId};
 use crate::tabula_table::Table;
-use crate::{base_card_definition_raw, localized_strings};
 
 /// Tabula is a read-only database of game data and rules information.
 ///

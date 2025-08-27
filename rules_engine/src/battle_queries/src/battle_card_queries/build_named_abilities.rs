@@ -5,7 +5,7 @@ use ability_data::standard_effect::StandardEffect;
 use ability_data::static_ability::{PlayFromVoid, StandardStaticAbility, StaticAbility};
 use battle_state::battle_cards::ability_list::{AbilityData, AbilityList};
 use core_data::identifiers::AbilityNumber;
-use tabula_data::card_definition::CardDefinition;
+use tabula_data::card_definitions::card_definition::CardDefinition;
 
 /// Expands a named ability into its constituent abilities.
 pub fn build(

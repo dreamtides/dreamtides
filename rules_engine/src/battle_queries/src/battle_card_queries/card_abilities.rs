@@ -10,7 +10,7 @@ use battle_state::triggers::trigger::TriggerName;
 use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
 use enumset::EnumSet;
-use tabula_data::card_definition::CardDefinition;
+use tabula_data::card_definitions::card_definition::CardDefinition;
 
 use crate::battle_card_queries::build_named_abilities;
 use crate::card_ability_queries::{effect_queries, target_predicates};

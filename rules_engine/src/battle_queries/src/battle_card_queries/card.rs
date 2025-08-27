@@ -5,7 +5,7 @@ use battle_state::battle::card_id::{CardId, CardIdType};
 use battle_state::battle_cards::ability_list::AbilityList;
 use battle_state::battle_cards::battle_card_state::BattleCardState;
 use core_data::identifiers::BaseCardId;
-use tabula_data::card_definition::CardDefinition;
+use tabula_data::card_definitions::card_definition::CardDefinition;
 
 use crate::battle_card_queries::card;
 use crate::panic_with;

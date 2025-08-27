@@ -13,7 +13,7 @@ use parser::displayed_ability_parser;
 use tabula_cli::google_sheet::GoogleSheet;
 use tabula_cli::spreadsheet::Spreadsheet;
 use tabula_cli::{tabula_codegen, tabula_sync};
-use tabula_data::base_card_definition_raw::BaseCardDefinitionRaw;
+use tabula_data::card_definitions::base_card_definition_raw::BaseCardDefinitionRaw;
 use tabula_data::localized_strings::LanguageId;
 use tabula_data::tabula::{self, TabulaBuildContext};
 use tabula_data::tabula_table::Table;
