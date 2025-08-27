@@ -25,6 +25,12 @@ pub trait HasId<I> {
 #[derive(Clone, Debug)]
 pub struct Table<I, T>(pub Vec<T>, PhantomData<I>);
 
+impl<I, T> Default for Table<I, T> {
+    fn default() -> Self {
+        Self(Vec::new(), PhantomData)
+    }
+}
+
 impl<I, T> Serialize for Table<I, T>
 where
     T: Serialize,

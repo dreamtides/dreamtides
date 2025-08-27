@@ -40,6 +40,12 @@ pub struct QuestId(pub Uuid);
 )]
 pub struct BaseCardId(pub Uuid);
 
+/// Identifies a dreamwell card.
+#[derive(
+    Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
+pub struct DreamwellCardId(pub Uuid);
+
 /// Number of an ability within a card.
 #[derive(
     Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,

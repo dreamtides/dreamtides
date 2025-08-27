@@ -1,11 +1,14 @@
 use std::collections::BTreeMap;
 
-use core_data::identifiers::BaseCardId;
+use core_data::identifiers::{BaseCardId, DreamwellCardId};
 use core_data::initialization_error::InitializationError;
 use serde::{Deserialize, Serialize};
 
 use crate::card_definitions::base_card_definition_raw::{self, BaseCardDefinitionRaw};
 use crate::card_definitions::card_definition::CardDefinition;
+use crate::card_definitions::dreamwell_card_definition::{
+    DreamwellCardDefinition, DreamwellCardDefinitionRaw,
+};
 use crate::localized_strings;
 use crate::localized_strings::{LanguageId, LocalizedStringSetRaw, LocalizedStrings, StringId};
 use crate::tabula_table::Table;
@@ -25,6 +28,7 @@ use crate::tabula_table::Table;
 pub struct Tabula {
     pub strings: LocalizedStrings,
     pub test_cards: BTreeMap<BaseCardId, CardDefinition>,
+    pub dreamwell_cards: BTreeMap<DreamwellCardId, DreamwellCardDefinition>,
 }
 
 /// Context for building a [Tabula] struct from a [TabulaRaw] struct.
@@ -38,8 +42,12 @@ pub struct TabulaBuildContext {
 /// a more ergonomic [Tabula] struct before use.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TabulaRaw {
+    #[serde(default)]
     pub strings: Table<StringId, LocalizedStringSetRaw>,
+    #[serde(default)]
     pub test_cards: Table<BaseCardId, BaseCardDefinitionRaw>,
+    #[serde(default)]
+    pub dreamwell_cards: Table<DreamwellCardId, DreamwellCardDefinitionRaw>,
 }
 
 pub fn build(
@@ -48,5 +56,5 @@ pub fn build(
 ) -> Result<Tabula, Vec<InitializationError>> {
     let strings = localized_strings::build(context, &raw.strings)?;
     let test_cards = base_card_definition_raw::build("test_cards", context, &raw.test_cards)?;
-    Ok(Tabula { strings, test_cards })
+    Ok(Tabula { strings, test_cards, dreamwell_cards: Default::default() })
 }
