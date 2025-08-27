@@ -12,6 +12,8 @@ pub struct CardSet<T> {
     // - FixedBitSet generally seems to perform the same or worse.
     // - BTreeSet is around 8% slower than BitSet
     set: BitSet<usize>,
+
+    #[serde(skip)]
     _marker: PhantomData<T>,
 }
 

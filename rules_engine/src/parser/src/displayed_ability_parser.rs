@@ -8,8 +8,7 @@ pub fn parse_with(
     abilities: &[Ability],
     input: &str,
 ) -> Result<Vec<DisplayedAbility>, Vec<InitializationError>> {
-    let input = input.to_lowercase();
-    let blocks = split_blocks(&input);
+    let blocks = split_blocks(input);
     if abilities.len() != blocks.len() {
         return Err(vec![InitializationError::with_details(
             ErrorCode::AbilityParsingError,

@@ -91,7 +91,6 @@ pub struct BattleState {
 
     /// Cache of abilities for cards in this battle.
     #[serde(default)]
-    #[serde(alias = "ability_cache")]
     pub card_definitions: Arc<BattleCardDefinitions>,
 
     /// Effects that are waiting to be applied.

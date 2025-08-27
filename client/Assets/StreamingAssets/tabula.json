@@ -587,7 +587,7 @@
         {
           "Event": {
             "effect": {
-              "Effect": "{dissolve} an enemy character."
+              "Effect": "{Dissolve} an enemy character."
             }
           }
         }
@@ -622,7 +622,7 @@
         {
           "Event": {
             "effect": {
-              "Effect": "{prevent} a played enemy card."
+              "Effect": "{Prevent} a played enemy card."
             }
           }
         }
@@ -660,7 +660,7 @@
         {
           "Event": {
             "effect": {
-              "Effect": "{prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
+              "Effect": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
             }
           }
         }
@@ -695,7 +695,7 @@
         {
           "Event": {
             "effect": {
-              "Effect": "draw {-cards(n:1)} for each {e} spent."
+              "Effect": "Draw {-cards(n:1)} for each {e} spent."
             }
           }
         }
@@ -735,7 +735,7 @@
       "displayed_abilities": [
         {
           "Triggered": {
-            "text": "whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+            "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
           }
         }
       ],
@@ -777,7 +777,7 @@
           "Activated": {
             "cost": "{-energy-cost(e:3)}",
             "effect": {
-              "Effect": "draw {-cards(n:1)}."
+              "Effect": "Draw {-cards(n:1)}."
             }
           }
         }
@@ -814,7 +814,7 @@
         {
           "Event": {
             "effect": {
-              "Effect": "return one or two events from your void to your hand."
+              "Effect": "Return one or two events from your void to your hand."
             }
           }
         }
@@ -869,11 +869,11 @@
               "Modal": [
                 {
                   "cost": "{-energy-cost(e:2)}",
-                  "effect": "return an enemy character to hand."
+                  "effect": "Return an enemy character to hand."
                 },
                 {
                   "cost": "{-energy-cost(e:3)}",
-                  "effect": "draw {-cards(n:2)}."
+                  "effect": "Draw {-cards(n:2)}."
                 }
               ]
             }
@@ -910,7 +910,7 @@
         {
           "Event": {
             "effect": {
-              "Effect": "give an allied character {anchored} until end of turn."
+              "Effect": "Give an allied character {anchored} until end of turn."
             }
           }
         }
@@ -960,13 +960,13 @@
         {
           "Event": {
             "effect": {
-              "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+              "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
             }
           }
         },
         {
           "Named": {
-            "name": "{-reclaim-cost(e:3)}"
+            "name": "{-Reclaim-Cost(e:3)}"
           }
         }
       ],
@@ -1000,7 +1000,7 @@
         {
           "Event": {
             "effect": {
-              "Effect": "{prevent} a played enemy character."
+              "Effect": "{Prevent} a played enemy character."
             }
           }
         }
@@ -1035,7 +1035,7 @@
         {
           "Event": {
             "effect": {
-              "Effect": "{dissolve} an enemy character."
+              "Effect": "{Dissolve} an enemy character."
             }
           }
         }
@@ -1067,7 +1067,7 @@
         {
           "Event": {
             "effect": {
-              "Effect": "draw {-cards(n:1)}."
+              "Effect": "Draw {-cards(n:1)}."
             }
           }
         }
@@ -1104,7 +1104,7 @@
       "displayed_abilities": [
         {
           "Triggered": {
-            "text": "whenever you materialize another character, this character gains {-gained-spark(n:1)}."
+            "text": "Whenever you materialize another character, this character gains {-gained-spark(n:1)}."
           }
         }
       ],
@@ -1144,7 +1144,7 @@
       "displayed_abilities": [
         {
           "Triggered": {
-            "text": "whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:2)}."
+            "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:2)}."
           }
         }
       ],
@@ -1182,7 +1182,7 @@
           "Activated": {
             "cost": "{-energy-cost(e:1)}",
             "effect": {
-              "Effect": "draw {-cards(n:1)}."
+              "Effect": "Draw {-cards(n:1)}."
             }
           }
         }
@@ -1225,7 +1225,7 @@
           "Activated": {
             "cost": "{-energy-cost(e:1)}",
             "effect": {
-              "Effect": "draw {-cards(n:1)}."
+              "Effect": "Draw {-cards(n:1)}."
             }
           }
         }
@@ -1268,7 +1268,7 @@
           "Activated": {
             "cost": "{-energy-cost(e:1)}",
             "effect": {
-              "Effect": "draw {-cards(n:1)}."
+              "Effect": "Draw {-cards(n:1)}."
             }
           }
         }
@@ -1310,7 +1310,7 @@
           "Activated": {
             "cost": "{-energy-cost(e:2)}",
             "effect": {
-              "Effect": "{dissolve} an enemy character."
+              "Effect": "{Dissolve} an enemy character."
             }
           }
         }
@@ -1365,7 +1365,7 @@
           "Activated": {
             "cost": "{-energy-cost(e:1)}",
             "effect": {
-              "Effect": "draw {-cards(n:1)}."
+              "Effect": "Draw {-cards(n:1)}."
             }
           }
         },
@@ -1373,7 +1373,7 @@
           "Activated": {
             "cost": "{-energy-cost(e:2)}",
             "effect": {
-              "Effect": "draw {-cards(n:2)}."
+              "Effect": "Draw {-cards(n:2)}."
             }
           }
         }
@@ -1406,7 +1406,7 @@
         {
           "Event": {
             "effect": {
-              "Effect": "{-foresee(n:1)}."
+              "Effect": "{-Foresee(n:1)}."
             }
           }
         }
@@ -1438,7 +1438,7 @@
         {
           "Event": {
             "effect": {
-              "Effect": "{-foresee(n:2)}."
+              "Effect": "{-Foresee(n:2)}."
             }
           }
         }
@@ -1483,7 +1483,7 @@
         {
           "Event": {
             "effect": {
-              "Effect": "{-foresee(n:1)}. draw {-cards(n:1)}."
+              "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
             }
           }
         }
@@ -1520,13 +1520,13 @@
         {
           "Event": {
             "effect": {
-              "Effect": "draw {-cards(n:1)}."
+              "Effect": "Draw {-cards(n:1)}."
             }
           }
         },
         {
           "Named": {
-            "name": "{-reclaim-cost(e:1)}"
+            "name": "{-Reclaim-Cost(e:1)}"
           }
         }
       ],
@@ -1562,13 +1562,13 @@
         {
           "Event": {
             "effect": {
-              "Effect": "{-foresee(n:1)}."
+              "Effect": "{-Foresee(n:1)}."
             }
           }
         },
         {
           "Named": {
-            "name": "{-reclaim-cost(e:3)}"
+            "name": "{-Reclaim-Cost(e:3)}"
           }
         }
       ],
@@ -1602,7 +1602,7 @@
         {
           "Event": {
             "effect": {
-              "Effect": "return a card from your void to your hand."
+              "Effect": "Return a card from your void to your hand."
             }
           }
         }
@@ -1654,11 +1654,11 @@
               "Modal": [
                 {
                   "cost": "{-energy-cost(e:1)}",
-                  "effect": "draw {-cards(n:1)}."
+                  "effect": "Draw {-cards(n:1)}."
                 },
                 {
                   "cost": "{-energy-cost(e:3)}",
-                  "effect": "draw {-cards(n:2)}."
+                  "effect": "Draw {-cards(n:2)}."
                 }
               ]
             }
@@ -1715,11 +1715,11 @@
               "Modal": [
                 {
                   "cost": "{-energy-cost(e:1)}",
-                  "effect": "draw {-cards(n:1)}."
+                  "effect": "Draw {-cards(n:1)}."
                 },
                 {
                   "cost": "{-energy-cost(e:2)}",
-                  "effect": "{dissolve} an enemy character."
+                  "effect": "{Dissolve} an enemy character."
                 }
               ]
             }
@@ -1756,7 +1756,7 @@
         {
           "Event": {
             "effect": {
-              "Effect": "return an enemy character to hand."
+              "Effect": "Return an enemy character to hand."
             }
           }
         }

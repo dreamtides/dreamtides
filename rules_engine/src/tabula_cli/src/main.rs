@@ -9,6 +9,7 @@ use google_sheets4::Sheets;
 use google_sheets4::yup_oauth2::{ServiceAccountAuthenticator, ServiceAccountKey};
 use hyper_util::client::legacy::Client;
 use hyper_util::rt::TokioExecutor;
+use parser::displayed_ability_parser;
 use tabula_cli::google_sheet::GoogleSheet;
 use tabula_cli::spreadsheet::Spreadsheet;
 use tabula_cli::{tabula_codegen, tabula_sync};
@@ -138,7 +139,7 @@ fn parse_displayed_abilities(
 ) -> Result<(), Vec<InitializationError>> {
     let mut errors: Vec<InitializationError> = Vec::new();
     for (row_index, row) in table.iter_mut().enumerate() {
-        match parser::displayed_ability_parser::parse_with(
+        match displayed_ability_parser::parse_with(
             row.abilities.as_ref().expect("abilities not present"),
             row.rules_text_en_us.as_str(),
         ) {
