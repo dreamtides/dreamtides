@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use ability_data::ability::Ability;
+use ability_data::ability::{Ability, DisplayedAbility};
 use core_data::card_property_data::Rarity;
 use core_data::card_types::{CardSubtype, CardType};
 use core_data::display_types::SpriteAddress;
@@ -37,6 +37,12 @@ pub struct BaseCardDefinitionRaw {
     /// If not present here, the Tabula CLI will populate this field by parsing
     /// the English rules text.
     pub abilities: Option<Vec<Ability>>,
+
+    /// Abilities of this card in serialized form, formatted for display.
+    ///
+    /// If not present here, the Tabula CLI will populate this field by parsing
+    /// the English rules text.
+    pub displayed_abilities: Option<Vec<DisplayedAbility>>,
 
     /// Type of this card.
     pub card_type: CardType,
@@ -153,11 +159,24 @@ pub fn build(
             continue;
         };
 
+        let Some(displayed_abilities) = &row.displayed_abilities else {
+            let mut ierr = InitializationError::with_details(
+                ErrorCode::AbilitiesNotPresent,
+                "Abilities not present on card definition",
+                "Please run tabula_cli to populate this field",
+            );
+            ierr.tabula_sheet = Some(sheet_name.to_string());
+            ierr.tabula_row = Some(row_index);
+            errors.push(ierr);
+            continue;
+        };
+
         out.insert(row.id, CardDefinition {
             base_card_id: row.id,
             displayed_name,
             energy_cost,
             abilities: abilities.clone(),
+            displayed_abilities: displayed_abilities.clone(),
             displayed_rules_text,
             displayed_prompts: row
                 .prompts_en_us

@@ -1,5 +1,7 @@
+use ability_data::ability::{DisplayedAbility, DisplayedAbilityEffect, DisplayedModalEffectChoice};
 use ability_data::effect::ModelEffectChoiceIndex;
 use action_data::game_action_data::GameAction;
+use battle_queries::battle_card_queries::card;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::legal_action_queries::legal_actions_data::ForPlayer;
 use battle_state::actions::battle_actions::BattleAction;
@@ -11,6 +13,7 @@ use core_data::numerics::Energy;
 use display_data::card_view::{CardActions, CardView};
 use display_data::object_position::{ObjectPosition, Position};
 use fluent::fluent_args;
+use tabula_data::localized_strings::StringContext;
 use tabula_ids::string_id;
 
 use crate::core::adapter;
@@ -34,8 +37,8 @@ pub fn cards(builder: &ResponseBuilder, battle: &BattleState) -> Vec<CardView> {
         return vec![];
     }
 
-    let descriptions =
-        modal_effect_descriptions(&card_rendering::rules_text(builder, battle, card_id));
+    let definition = card::get_definition(battle, card_id);
+    let descriptions = modal_effect_descriptions(&definition.displayed_abilities);
     modal
         .choices
         .iter()
@@ -64,6 +67,11 @@ fn modal_effect_card_view(
     let legal_actions = legal_actions::compute(battle, builder.act_for_player());
     let select_action = BattleAction::SelectModalEffectChoice(index);
     let can_select = legal_actions.contains(select_action, ForPlayer::Human);
+    let formatted = builder.tabula().strings.format_display_string(
+        description,
+        StringContext::CardText,
+        fluent_args![],
+    );
     let view = TokenCardView::builder()
         .id(adapter::modal_effect_choice_client_id(card_id, index))
         .image(card_rendering::card_image(battle, card_id))
@@ -81,7 +89,7 @@ fn modal_effect_card_view(
             sorting_key: index.value() as u32,
         })
         .cost(cost.to_string())
-        .rules_text(description.to_string())
+        .rules_text(formatted)
         .outline_color(if can_select { display_color::GREEN } else { display_color::WHITE })
         .actions(CardActions {
             on_click: can_select.then_some(GameAction::BattleAction(select_action)),
@@ -94,53 +102,30 @@ fn modal_effect_card_view(
 
 /// [String]s for the descriptions of the choices in an active modal effect
 /// prompt, if any.
-pub fn modal_effect_descriptions(rules_text: &str) -> Vec<String> {
-    let mut descriptions = Vec::new();
-    let mut current_pos = 0;
-
-    while let Some(start_tag) = rules_text[current_pos..].find("<indent") {
-        let indent_start = current_pos + start_tag;
-        if let Some(close_bracket) = rules_text[indent_start..].find(">") {
-            let content_start = indent_start + close_bracket + 1;
-            if let Some(end_tag) = rules_text[content_start..].find("</indent>") {
-                let content_end = content_start + end_tag;
-                let raw_description = &rules_text[content_start..content_end];
-                let clean_description = clean_modal_description(raw_description);
-                descriptions.push(clean_description);
-                current_pos = content_end + 8;
-            } else {
-                break;
-            }
-        } else {
-            break;
-        }
-    }
-
-    descriptions
+pub fn modal_effect_descriptions(abilities: &[DisplayedAbility]) -> Vec<String> {
+    all_modal_effect_descriptions(abilities).iter().map(|choice| choice.effect.clone()).collect()
 }
 
-fn clean_modal_description(raw_description: &str) -> String {
-    let mut result = raw_description.to_string();
-
-    // Remove HTML color and bold tags with cost information
-    // Pattern: <color=#XXXXXX><b>COST</b></color>:
-    while let Some(color_start) = result.find("<color=") {
-        if let Some(color_end) = result[color_start..].find("</color>:") {
-            let full_pattern_end = color_start + color_end + 9; // "</color>:" is 9 chars
-            result.replace_range(color_start..full_pattern_end, "");
-        } else {
-            break;
+fn all_modal_effect_descriptions(
+    abilities: &[DisplayedAbility],
+) -> Vec<DisplayedModalEffectChoice> {
+    let mut result = vec![];
+    for ability in abilities {
+        match ability {
+            DisplayedAbility::Event(event) => {
+                result.extend(effect_modal_effect_descriptions(&event.effect));
+            }
+            DisplayedAbility::Activated { effect, .. } => {
+                result.extend(effect_modal_effect_descriptions(effect));
+            }
+            _ => {}
         }
     }
+    result
+}
 
-    // Clean up any remaining HTML tags
-    while let Some(tag_start) = result.find('<') {
-        if let Some(tag_end) = result[tag_start..].find('>') {
-            result.replace_range(tag_start..tag_start + tag_end + 1, "");
-        } else {
-            break;
-        }
-    }
-
-    result.trim().to_string()
+fn effect_modal_effect_descriptions(
+    effect: &DisplayedAbilityEffect,
+) -> Vec<DisplayedModalEffectChoice> {
+    if let DisplayedAbilityEffect::Modal(choices) = effect { choices.clone() } else { vec![] }
 }

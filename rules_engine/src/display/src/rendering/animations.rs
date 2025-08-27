@@ -142,8 +142,9 @@ pub fn render(
         BattleAnimation::SelectModalEffectChoice { player, item_id, choice_index } => {
             if *player != builder.display_for_player() {
                 push_snapshot(builder, snapshot);
+                let definition = card::get_definition(snapshot, item_id.underlying_card_id());
                 let descriptions = modal_effect_prompt_rendering::modal_effect_descriptions(
-                    &card_rendering::rules_text(builder, snapshot, item_id.underlying_card_id()),
+                    &definition.displayed_abilities,
                 );
                 builder.push(Command::DisplayEnemyMessage(DisplayEnemyMessageCommand {
                     message: descriptions[choice_index.value()].clone(),

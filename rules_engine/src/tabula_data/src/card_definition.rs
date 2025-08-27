@@ -1,4 +1,4 @@
-use ability_data::ability::Ability;
+use ability_data::ability::{Ability, DisplayedAbility};
 use core_data::card_property_data::Rarity;
 use core_data::card_types::{CardSubtype, CardType};
 use core_data::display_types::SpriteAddress;
@@ -30,6 +30,9 @@ pub struct CardDefinition {
 
     /// Abilities of this card.
     pub abilities: Vec<Ability>,
+
+    /// Abilities of this card, formatted for display.
+    pub displayed_abilities: Vec<DisplayedAbility>,
 
     /// Rules text of this card in the currently-active language, formatted for
     /// display.

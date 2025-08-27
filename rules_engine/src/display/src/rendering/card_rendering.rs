@@ -240,15 +240,17 @@ pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: Card
     let definition = card::get_definition(battle, card_id);
     let mut formatted = builder.tabula().strings.format_display_string(
         &definition.displayed_rules_text,
-        StringContext::Interface,
+        StringContext::CardText,
         fluent_args![],
     );
 
     if let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))
         && let Some(ModelEffectChoiceIndex(index)) = stack_item.modal_choice
     {
-        formatted =
-            modal_effect_prompt_rendering::modal_effect_descriptions(&formatted)[index].clone();
+        formatted = modal_effect_prompt_rendering::modal_effect_descriptions(
+            &definition.displayed_abilities,
+        )[index]
+            .clone();
     }
 
     if card::get_base_card_id(battle, card_id) == test_card::TEST_VARIABLE_ENERGY_DRAW

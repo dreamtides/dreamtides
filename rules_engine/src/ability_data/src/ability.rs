@@ -37,6 +37,36 @@ pub enum Ability {
     Named(NamedAbility),
 }
 
+/// Represents the rules text for an ability, parsed into its constituent
+/// parts.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum DisplayedAbility {
+    Event(DisplayedEventAbility),
+    Static { text: String },
+    Activated { cost: String, effect: DisplayedAbilityEffect },
+    Triggered { text: String },
+    Named { name: String },
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum DisplayedAbilityEffect {
+    Effect(String),
+    EffectList(Vec<String>),
+    Modal(Vec<DisplayedModalEffectChoice>),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename = "EventAbility")]
+pub struct DisplayedEventAbility {
+    pub effect: DisplayedAbilityEffect,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct DisplayedModalEffectChoice {
+    pub cost: String,
+    pub effect: String,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EventAbility {
     /// If a [Cost] is specified this cost must be paid immediately upon playing

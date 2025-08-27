@@ -1400,7 +1400,7 @@ fn test_modal_draw_one_or_draw_two() {
 #[test]
 fn test_modal_draw_one_or_dissolve_enemy() {
     let result = parse(
-        "{choose-one}\n{bullet} {-energy-cost(e: 1)}: Draw {-cards(n: 1)}.\n{bullet} {-energy-cost(e: 2)}: {dissolve} an enemy character.",
+        "{choose-one}\n{bullet} {-energy-cost(e:1)}: Draw {-cards(n:1)}.\n{bullet} {-energy-cost(e:2)}: {Dissolve} an enemy character.",
     );
     assert_ron_snapshot!(result, @r###"
     [

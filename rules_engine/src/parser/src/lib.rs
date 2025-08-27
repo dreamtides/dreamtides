@@ -6,6 +6,7 @@ mod collection_expression_parser;
 mod condition_parser;
 mod cost_parser;
 mod determiner_parser;
+pub mod displayed_ability_parser;
 mod effect_parser;
 mod modal_effect_parser;
 mod named_ability_parser;

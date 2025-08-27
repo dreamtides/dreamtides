@@ -9,7 +9,6 @@ use google_sheets4::Sheets;
 use google_sheets4::yup_oauth2::{ServiceAccountAuthenticator, ServiceAccountKey};
 use hyper_util::client::legacy::Client;
 use hyper_util::rt::TokioExecutor;
-use parser::ability_parser;
 use tabula_cli::google_sheet::GoogleSheet;
 use tabula_cli::spreadsheet::Spreadsheet;
 use tabula_cli::{tabula_codegen, tabula_sync};
@@ -71,6 +70,9 @@ async fn main() -> Result<()> {
     parse_abilities(&mut tabula_raw.test_cards).map_err(|errs| {
         anyhow::anyhow!(errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n"))
     })?;
+    parse_displayed_abilities(&mut tabula_raw.test_cards).map_err(|errs| {
+        anyhow::anyhow!(errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n"))
+    })?;
 
     let _ = tabula::build(
         &TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates },
@@ -105,8 +107,44 @@ fn parse_abilities(
 ) -> Result<(), Vec<InitializationError>> {
     let mut errors: Vec<InitializationError> = Vec::new();
     for (row_index, row) in table.iter_mut().enumerate() {
-        match ability_parser::parse(row.rules_text_en_us.as_str()) {
-            Ok(parsed) => row.abilities = Some(parsed),
+        match parser::ability_parser::parse(row.rules_text_en_us.as_str()) {
+            Ok(parsed) => {
+                row.abilities = Some(parsed.clone());
+            }
+            Err(mut errs) => {
+                for e in errs.iter_mut() {
+                    if e.tabula_sheet.is_none() {
+                        e.tabula_sheet = Some(String::from("test_cards"));
+                    }
+                    if e.tabula_row.is_none() {
+                        e.tabula_row = Some(row_index);
+                    }
+                    if e.tabula_column.is_none() {
+                        e.tabula_column = Some(String::from("rules_text_en_us"));
+                    }
+                    if e.tabula_id.is_none() {
+                        e.tabula_id = Some(format!("{}", row.id.0));
+                    }
+                }
+                errors.extend(errs);
+            }
+        }
+    }
+    if errors.is_empty() { Ok(()) } else { Err(errors) }
+}
+
+fn parse_displayed_abilities(
+    table: &mut Table<BaseCardId, BaseCardDefinitionRaw>,
+) -> Result<(), Vec<InitializationError>> {
+    let mut errors: Vec<InitializationError> = Vec::new();
+    for (row_index, row) in table.iter_mut().enumerate() {
+        match parser::displayed_ability_parser::parse_with(
+            row.abilities.as_ref().expect("abilities not present"),
+            row.rules_text_en_us.as_str(),
+        ) {
+            Ok(parsed) => {
+                row.displayed_abilities = Some(parsed.clone());
+            }
             Err(mut errs) => {
                 for e in errs.iter_mut() {
                     if e.tabula_sheet.is_none() {
