@@ -42,45 +42,28 @@ impl Component for PlayOpponentCardPanel<'_> {
                                         .build(),
                                 )
                                 .child(
-                                    PlayOpponentCardCell::builder()
-                                        .battle(self.battle)
-                                        .card(test_card::TEST_VANILLA_CHARACTER)
-                                        .build(),
-                                )
-                                .child(
-                                    PlayOpponentCardCell::builder()
-                                        .battle(self.battle)
-                                        .card(test_card::TEST_DRAW_ONE)
-                                        .build(),
-                                )
-                                .child(
-                                    PlayOpponentCardCell::builder()
-                                        .battle(self.battle)
-                                        .card(test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO)
-                                        .build(),
-                                )
-                                .child(
-                                    PlayOpponentCardCell::builder()
-                                        .battle(self.battle)
-                                        .card(test_card::TEST_DISSOLVE)
-                                        .build(),
-                                )
-                                .child(
-                                    PlayOpponentCardCell::builder()
-                                        .battle(self.battle)
-                                        .card(test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND)
-                                        .build(),
-                                )
-                                .child(
-                                    PlayOpponentCardCell::builder()
-                                        .battle(self.battle)
-                                        .card(test_card::TEST_COUNTERSPELL)
-                                        .build(),
-                                )
-                                .child(
-                                    PlayOpponentCardCell::builder()
-                                        .battle(self.battle)
-                                        .card(test_card::TEST_RETURN_TO_HAND)
+                                    BoxComponent::builder()
+                                        .name("All Test Cards")
+                                        .style(
+                                            FlexStyle::builder()
+                                                .align_items(FlexAlign::Stretch)
+                                                .flex_direction(FlexDirection::Column)
+                                                .flex_grow(1)
+                                                .justify_content(FlexJustify::FlexStart)
+                                                .build(),
+                                        )
+                                        .children(
+                                            test_card::ALL_TEST_CARD_IDS
+                                                .iter()
+                                                .filter_map(|id| {
+                                                    PlayOpponentCardCell::builder()
+                                                        .battle(self.battle)
+                                                        .card(*id)
+                                                        .build()
+                                                        .flex_node()
+                                                })
+                                                .collect(),
+                                        )
                                         .build(),
                                 )
                                 .build(),
