@@ -30,11 +30,21 @@ pub struct QuestDeckIdentity {
 /// keyed by their [BattleCardIdentity].
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct BattleCardDefinitions {
+    /// "Map" of [BattleCardIdentity] to [AbilityList] for the cards in this
+    /// battle.
     #[serde(skip)]
     cache_by_identity: Vec<Arc<AbilityList>>,
+
+    /// "Map" of [BattleCardIdentity] to [CardDefinition] for the cards in this
+    /// battle.
     #[serde(skip)]
     definitions_by_identity: Vec<Arc<CardDefinition>>,
-    #[serde(default)]
+
+    /// Map of [BattleCardIdentity] to [QuestDeckIdentity] for the cards in this
+    /// battle.
+    ///
+    /// This is used to reconstruct the [BattleCardIdentity]s for cards that
+    /// are added to the battle after the [BattleCardDefinitions] is created.
     quest_deck_card_ids: BTreeMap<BattleCardIdentity, QuestDeckIdentity>,
 }
 
@@ -94,6 +104,8 @@ impl BattleCardDefinitions {
         definition_fn: impl Fn(QuestDeckCardId, PlayerName) -> Arc<CardDefinition>,
         ability_list_fn: impl Fn(&CardDefinition) -> AbilityList,
     ) -> BattleCardDefinitions {
+        assert!(!definitions.quest_deck_card_ids.is_empty(), "No quest deck card ids provided");
+
         let mut cache_by_identity = vec![None; definitions.quest_deck_card_ids.len()];
         let mut definitions_by_identity = vec![None; definitions.quest_deck_card_ids.len()];
         for (identity, quest_deck_identity) in definitions.quest_deck_card_ids.iter() {
@@ -103,16 +115,15 @@ impl BattleCardDefinitions {
             definitions_by_identity[identity.0] = Some(definition);
         }
 
+        let expected_ability_list_len = cache_by_identity.len();
+        let expected_definition_len = definitions_by_identity.len();
         let ability_list = cache_by_identity.into_iter().flatten().collect::<Vec<_>>();
-        assert_eq!(
-            ability_list.len(),
-            definitions.cache_by_identity.len(),
-            "Ability list length mismatch"
-        );
         let definition_list = definitions_by_identity.into_iter().flatten().collect::<Vec<_>>();
+
+        assert_eq!(ability_list.len(), expected_ability_list_len, "Ability list length mismatch");
         assert_eq!(
             definition_list.len(),
-            definitions.definitions_by_identity.len(),
+            expected_definition_len,
             "Definition list length mismatch"
         );
 
