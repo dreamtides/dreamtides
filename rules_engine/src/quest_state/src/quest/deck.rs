@@ -24,7 +24,7 @@ impl Deck {
         &self.cards[id.0]
     }
 
-    /// Inserts `count copies of the card with the given [BaseCardId] into the
+    /// Inserts `count` copies of the card with the given [BaseCardId] into the
     /// deck.
     pub fn insert_copies(&mut self, tabula: &Tabula, id: BaseCardId, count: usize) {
         let card = tabula

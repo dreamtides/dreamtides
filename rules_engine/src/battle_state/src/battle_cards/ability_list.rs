@@ -13,7 +13,7 @@ use crate::triggers::trigger::TriggerName;
 ///
 /// This is a wrapper around `Ability` which stores some precomputed state
 /// information to improve search performance.
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default)]
 pub struct AbilityList {
     pub event_abilities: Vec<AbilityData<EventAbility>>,
     pub static_abilities: Vec<AbilityData<StaticAbility>>,
@@ -41,7 +41,7 @@ pub struct AbilityList {
 pub struct AbilityEffectFlags {}
 
 /// Wrapper around an ability which stores additional metadata.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct AbilityData<T> {
     pub ability_number: AbilityNumber,
     pub ability: T,

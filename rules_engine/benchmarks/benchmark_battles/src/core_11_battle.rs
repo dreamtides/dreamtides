@@ -1,11 +1,12 @@
 use std::fs::File;
 use std::path::Path;
-use std::sync::OnceLock;
+use std::sync::{Arc, OnceLock};
 
 use ai_data::game_ai::GameAI;
 use battle_mutations::actions::apply_battle_action;
-use battle_queries::battle_card_queries::card;
+use battle_queries::battle_card_queries::{card, card_abilities};
 use battle_queries::legal_action_queries::legal_actions;
+use battle_state::battle::battle_card_definitions::BattleCardDefinitions;
 use battle_state::battle::battle_state::{BattleState, LoggingOptions, RequestContext};
 use battle_state::battle_player::battle_player_state::{
     CreateBattlePlayer, PlayerType, TestDeckName,
@@ -64,6 +65,15 @@ pub fn generate_core_11_battle() -> BattleState {
             battle.request_context.logging_options.enable_action_legality_check = false;
             battle.request_context.logging_options.log_ai_search_diagram = false;
             battle.request_context.logging_options.log_directory = None;
+            battle.card_definitions = Arc::new(BattleCardDefinitions::rebuild(
+                &battle.card_definitions,
+                |quest_deck_card_id, owner| {
+                    let definition =
+                        battle.players.player(owner).quest.deck.get_card(quest_deck_card_id);
+                    Arc::new(definition.clone())
+                },
+                card_abilities::build_from_definition,
+            ));
             battle
         })
         .clone()
