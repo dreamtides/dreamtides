@@ -8,8 +8,8 @@ use std::time::Instant;
 use battle_state::battle::battle_state::RequestContext;
 use core_data::identifiers::UserId;
 use core_data::initialization_error::{ErrorCode, InitializationError};
-use database::database::Database;
-use database::sqlite_database::{self, SqliteDatabase};
+use database::save_file::SaveFile;
+use database::save_file_io;
 use display_data::command::CommandSequence;
 use display_data::request_data::{PollResponseType, RequestId};
 use serde_json;
@@ -29,15 +29,16 @@ pub struct PollResult {
 pub trait StateProvider:
     Clone + RefUnwindSafe + UnwindSafe + Send + Sync + DisplayStateProvider
 {
-    type DatabaseImpl: Database;
-
     fn initialize(
         &self,
         persistent_data_path: &str,
         streaming_assets_path: &str,
-    ) -> Result<Self::DatabaseImpl, Vec<InitializationError>>;
+    ) -> Result<(), Vec<InitializationError>>;
 
-    fn get_database(&self) -> Result<Self::DatabaseImpl, Vec<InitializationError>>;
+    fn read_save_file(&self, user_id: UserId)
+    -> Result<Option<SaveFile>, Vec<InitializationError>>;
+
+    fn write_save_file(&self, save: SaveFile) -> Result<(), Vec<InitializationError>>;
 
     fn store_request_context(&self, user_id: UserId, context: RequestContext);
 
@@ -86,18 +87,19 @@ static DISPLAY_STATES: LazyLock<Mutex<HashMap<UserId, DisplayState>>> =
 
 static TABULA_DATA: LazyLock<RwLock<Option<Arc<Tabula>>>> = LazyLock::new(|| RwLock::new(None));
 
+static PERSISTENT_DATA_DIR: LazyLock<Mutex<Option<PathBuf>>> = LazyLock::new(|| Mutex::new(None));
+
 #[derive(Clone)]
 pub struct DefaultStateProvider;
 
 impl StateProvider for DefaultStateProvider {
-    type DatabaseImpl = SqliteDatabase;
-
     fn initialize(
         &self,
         persistent_data_path: &str,
         streaming_assets_path: &str,
-    ) -> Result<Self::DatabaseImpl, Vec<InitializationError>> {
-        let db = sqlite_database::initialize(PathBuf::from(persistent_data_path))?;
+    ) -> Result<(), Vec<InitializationError>> {
+        let mut dir_guard = PERSISTENT_DATA_DIR.lock().unwrap();
+        *dir_guard = Some(PathBuf::from(persistent_data_path));
         let tabula_path = format!("{streaming_assets_path}/tabula.json");
         let ctx = TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates };
         let file = File::open(&tabula_path).map_err(|e| {
@@ -117,11 +119,36 @@ impl StateProvider for DefaultStateProvider {
         let tabula = tabula::build(&ctx, &raw)?;
         let mut guard = TABULA_DATA.write().unwrap();
         *guard = Some(Arc::new(tabula));
-        Ok(db)
+        Ok(())
     }
 
-    fn get_database(&self) -> Result<Self::DatabaseImpl, Vec<InitializationError>> {
-        sqlite_database::get()
+    fn read_save_file(
+        &self,
+        user_id: UserId,
+    ) -> Result<Option<SaveFile>, Vec<InitializationError>> {
+        let dir = {
+            let guard = PERSISTENT_DATA_DIR.lock().unwrap();
+            guard.clone().ok_or_else(|| {
+                vec![InitializationError::with_name(
+                    ErrorCode::NotInitializedError,
+                    "Data directory not initialized. Call initialize() first.".to_string(),
+                )]
+            })?
+        };
+        save_file_io::read_save_from_dir(&dir, user_id)
+    }
+
+    fn write_save_file(&self, save: SaveFile) -> Result<(), Vec<InitializationError>> {
+        let dir = {
+            let guard = PERSISTENT_DATA_DIR.lock().unwrap();
+            guard.clone().ok_or_else(|| {
+                vec![InitializationError::with_name(
+                    ErrorCode::NotInitializedError,
+                    "Data directory not initialized. Call initialize() first.".to_string(),
+                )]
+            })?
+        };
+        save_file_io::write_save_to_dir(&dir, &save)
     }
 
     fn store_request_context(&self, user_id: UserId, context: RequestContext) {

@@ -6,6 +6,7 @@ use std::time::Instant;
 use battle_state::battle::battle_state::RequestContext;
 use core_data::identifiers::UserId;
 use core_data::initialization_error::{ErrorCode, InitializationError};
+use database::save_file::SaveFile;
 use serde_json;
 use tabula_data::localized_strings::LanguageId;
 use tabula_data::tabula::{self, Tabula, TabulaBuildContext, TabulaRaw};
@@ -13,7 +14,6 @@ use uuid::Uuid;
 
 use crate::display_state_provider::{DisplayState, DisplayStateProvider};
 use crate::state_provider::{PollResult, StateProvider};
-use crate::test_database::TestDatabase;
 
 #[derive(Clone)]
 pub struct TestStateProvider {
@@ -21,7 +21,7 @@ pub struct TestStateProvider {
 }
 
 struct TestStateProviderInner {
-    databases: Mutex<HashMap<String, TestDatabase>>,
+    save_files: Mutex<HashMap<String, HashMap<UserId, SaveFile>>>,
     request_contexts: Mutex<HashMap<UserId, RequestContext>>,
     request_timestamps: Mutex<HashMap<Option<Uuid>, Instant>>,
     last_response_versions: Mutex<HashMap<UserId, Uuid>>,
@@ -35,7 +35,7 @@ impl TestStateProvider {
     pub fn new() -> Self {
         Self {
             inner: Arc::new(TestStateProviderInner {
-                databases: Mutex::new(HashMap::new()),
+                save_files: Mutex::new(HashMap::new()),
                 request_contexts: Mutex::new(HashMap::new()),
                 request_timestamps: Mutex::new(HashMap::new()),
                 last_response_versions: Mutex::new(HashMap::new()),
@@ -55,13 +55,11 @@ impl Default for TestStateProvider {
 }
 
 impl StateProvider for TestStateProvider {
-    type DatabaseImpl = TestDatabase;
-
     fn initialize(
         &self,
         persistent_data_path: &str,
         streaming_assets_path: &str,
-    ) -> Result<Self::DatabaseImpl, Vec<InitializationError>> {
+    ) -> Result<(), Vec<InitializationError>> {
         let tabula_path = format!("{streaming_assets_path}/tabula.json");
         let ctx = TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates };
         let tabula = match File::open(&tabula_path) {
@@ -97,38 +95,53 @@ impl StateProvider for TestStateProvider {
         if let Ok(mut guard) = self.inner.tabula.write() {
             *guard = Some(Arc::new(tabula));
         }
-
-        let mut databases = self.inner.databases.lock().map_err(|e| {
+        let mut databases = self.inner.save_files.lock().map_err(|e| {
             vec![InitializationError::with_details(
                 ErrorCode::MutexLockError,
                 "Failed to acquire lock".to_string(),
                 e.to_string(),
             )]
         })?;
-
-        if let Some(existing_db) = databases.get(persistent_data_path) {
-            Ok(existing_db.clone())
-        } else {
-            let db = TestDatabase::new();
-            databases.insert(persistent_data_path.to_string(), db.clone());
-            Ok(databases.get(persistent_data_path).unwrap().clone())
-        }
+        databases.entry(persistent_data_path.to_string()).or_default();
+        Ok(())
     }
 
-    fn get_database(&self) -> Result<Self::DatabaseImpl, Vec<InitializationError>> {
-        let databases = self.inner.databases.lock().map_err(|e| {
+    fn read_save_file(
+        &self,
+        user_id: UserId,
+    ) -> Result<Option<SaveFile>, Vec<InitializationError>> {
+        let save_files = self.inner.save_files.lock().map_err(|e| {
             vec![InitializationError::with_details(
                 ErrorCode::MutexLockError,
                 "Failed to acquire lock".to_string(),
                 e.to_string(),
             )]
         })?;
-        databases.values().next().cloned().ok_or_else(|| {
+        let db = save_files.values().next().ok_or_else(|| {
+            vec![InitializationError::with_name(
+                ErrorCode::NotInitializedError,
+                "No save file initialized".to_string(),
+            )]
+        })?;
+        Ok(db.get(&user_id).cloned())
+    }
+
+    fn write_save_file(&self, save: SaveFile) -> Result<(), Vec<InitializationError>> {
+        let mut save_files = self.inner.save_files.lock().map_err(|e| {
+            vec![InitializationError::with_details(
+                ErrorCode::MutexLockError,
+                "Failed to acquire lock".to_string(),
+                e.to_string(),
+            )]
+        })?;
+        let db = save_files.values_mut().next().ok_or_else(|| {
             vec![InitializationError::with_name(
                 ErrorCode::NotInitializedError,
                 "No database initialized".to_string(),
             )]
-        })
+        })?;
+        db.insert(save.id(), save);
+        Ok(())
     }
 
     fn store_request_context(&self, user_id: UserId, context: RequestContext) {

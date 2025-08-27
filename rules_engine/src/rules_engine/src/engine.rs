@@ -18,7 +18,6 @@ use battle_state::battle_player::battle_player_state::{
 use core_data::identifiers::{BattleId, QuestId, UserId};
 use core_data::initialization_error::InitializationError;
 use core_data::types::PlayerName;
-use database::database::Database;
 use database::save_file::SaveFile;
 use display::display_actions::apply_battle_display_action;
 use display::rendering::renderer;
@@ -38,6 +37,7 @@ use uuid::Uuid;
 
 use crate::{
     debug_actions, deserialize_save_file, error_message, handle_battle_action, serialize_save_file,
+    undo,
 };
 
 thread_local! {
@@ -220,26 +220,22 @@ fn connect_internal<P: StateProvider + 'static>(
         display_properties::store_display_properties(user_id, display_props.clone());
     }
 
-    let database = match provider.initialize(persistent_data_path, streaming_assets_path) {
-        Ok(db) => db,
-        Err(errors) => {
-            return error_message::display_error_message(
-                None,
-                provider,
-                format_initialization_errors(&errors),
-            );
-        }
-    };
+    if let Err(errors) = provider.initialize(persistent_data_path, streaming_assets_path) {
+        return error_message::display_error_message(
+            None,
+            provider,
+            format_initialization_errors(&errors),
+        );
+    }
 
     // Check if this is a multiplayer connection request
     if let Some(vs_opponent) = request.vs_opponent {
-        return connect_for_multiplayer(provider, &database, user_id, vs_opponent, request_context);
+        return connect_for_multiplayer(provider, user_id, vs_opponent, request_context);
     } else {
         info!(?user_id, "Loading battle from database");
     }
 
-    match load_battle_from_database(
-        &database,
+    match load_battle_from_provider(
         provider,
         user_id,
         request_context,
@@ -249,7 +245,7 @@ fn connect_internal<P: StateProvider + 'static>(
             if is_user_in_battle(&battle, user_id) {
                 renderer::connect(&battle, user_id, (*provider).clone(), false)
             } else {
-                handle_user_not_in_battle(provider, user_id, battle, quest_id, &database, None)
+                handle_user_not_in_battle(provider, user_id, battle, quest_id, None)
             }
         }
         Ok(LoadBattleResult::NewBattle(battle)) => {
@@ -265,15 +261,13 @@ fn connect_internal<P: StateProvider + 'static>(
 /// opponent's save file and joins the battle if possible.
 fn connect_for_multiplayer<P: StateProvider + 'static>(
     provider: &P,
-    database: &impl Database,
     user_id: UserId,
     vs_opponent: UserId,
     request_context: RequestContext,
 ) -> CommandSequence {
     info!(?user_id, ?vs_opponent, "Loading multiplayer battle from opponent's database");
 
-    // Load opponent's save file
-    match database.fetch_save(vs_opponent) {
+    match provider.read_save_file(vs_opponent) {
         Ok(Some(save_file)) => {
             match deserialize_save_file::battle(provider, &save_file, request_context) {
                 Some((battle, quest_id)) => {
@@ -288,7 +282,6 @@ fn connect_for_multiplayer<P: StateProvider + 'static>(
                         user_id,
                         battle,
                         quest_id,
-                        database,
                         Some(vs_opponent),
                     )
                 }
@@ -317,14 +310,13 @@ enum LoadBattleResult {
     NewBattle(BattleState),
 }
 
-fn load_battle_from_database<P: StateProvider + 'static>(
-    database: &impl Database,
+fn load_battle_from_provider<P: StateProvider + 'static>(
     provider: &P,
     user_id: UserId,
     request_context: RequestContext,
     debug_configuration: Option<&DebugConfiguration>,
 ) -> Result<LoadBattleResult, String> {
-    match database.fetch_save(user_id) {
+    match provider.read_save_file(user_id) {
         Ok(Some(save_file)) => {
             match deserialize_save_file::battle(provider, &save_file, request_context) {
                 Some((battle, quest_id)) => Ok(LoadBattleResult::ExistingBattle(battle, quest_id)),
@@ -354,7 +346,7 @@ fn load_battle_from_database<P: StateProvider + 'static>(
             // Save new battle to database
             let quest_id = QuestId(Uuid::new_v4());
             let save_file = serialize_save_file::battle(user_id, quest_id, &new_battle);
-            match database.write_save(save_file) {
+            match provider.write_save_file(save_file) {
                 Ok(_) => Ok(LoadBattleResult::NewBattle(new_battle)),
                 Err(errors) => Err(format_initialization_errors(&errors)),
             }
@@ -375,7 +367,6 @@ fn handle_user_not_in_battle<P: StateProvider + 'static>(
     user_id: UserId,
     mut battle: BattleState,
     quest_id: QuestId,
-    database: &impl Database,
     vs_opponent: Option<UserId>,
 ) -> CommandSequence {
     battle_trace!("User is not a player in this battle, attempting to join", &mut battle, user_id);
@@ -399,20 +390,20 @@ fn handle_user_not_in_battle<P: StateProvider + 'static>(
     }
 
     let save_user_id = vs_opponent.unwrap_or(user_id);
-    match save_battle_to_database(database, save_user_id, quest_id, &battle) {
+    match save_battle_to_provider(provider, save_user_id, quest_id, &battle) {
         Ok(_) => renderer::connect(&battle, user_id, (*provider).clone(), false),
         Err(error) => error_message::display_error_message(None, provider, error),
     }
 }
 
-fn save_battle_to_database(
-    database: &impl Database,
+fn save_battle_to_provider(
+    provider: &impl StateProvider,
     user_id: UserId,
     quest_id: QuestId,
     battle: &BattleState,
 ) -> Result<(), String> {
     let save_file = serialize_save_file::battle(user_id, quest_id, battle);
-    database.write_save(save_file).map_err(|errors| format_initialization_errors(&errors))
+    provider.write_save_file(save_file).map_err(|errors| format_initialization_errors(&errors))
 }
 
 fn perform_action_internal<P: StateProvider + 'static>(
@@ -448,18 +439,8 @@ fn perform_action_internal<P: StateProvider + 'static>(
     let _enter = span.enter();
 
     let result = catch_panic_conditionally(provider, || {
-        let database = match provider.get_database() {
-            Ok(db) => db,
-            Err(errors) => {
-                show_error_message(provider, user_id, None, format_initialization_errors(&errors));
-                return;
-            }
-        };
-
-        // Use specific save file if requested, otherwise use the user's save
-        // file
         let save_file_id = request.save_file_id.unwrap_or(user_id);
-        let save = match database.fetch_save(save_file_id) {
+        let save = match provider.read_save_file(save_file_id) {
             Ok(Some(save)) => save,
             Ok(None) => {
                 let error_msg = if request.save_file_id.is_some() {
@@ -495,7 +476,7 @@ fn perform_action_internal<P: StateProvider + 'static>(
         handle_request_action(provider, request, user_id, save, &mut battle, request_id);
 
         if let Err(errors) =
-            database.write_save(serialize_save_file::battle(save_file_id, quest_id, &battle))
+            provider.write_save_file(serialize_save_file::battle(save_file_id, quest_id, &battle))
         {
             show_error_message(
                 provider,
@@ -610,7 +591,7 @@ fn handle_request_action<P: StateProvider + 'static>(
         }
         GameAction::Undo(player) => {
             let Some((undone_battle, _)) =
-                deserialize_save_file::undo(provider, &save, *player, request_context.clone())
+                undo::undo(provider, &save, *player, request_context.clone())
             else {
                 show_error_message(
                     provider,
