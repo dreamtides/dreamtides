@@ -1,10 +1,10 @@
 use core_data::card_types::CardType;
-use core_data::identifiers::CardIdentity;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::PlayerName;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use crate::battle::battle_card_definitions::BattleCardIdentity;
 use crate::battle_cards::ability_list::CanPlayRestriction;
 use crate::battle_player::player_map::PlayerMap;
 
@@ -54,7 +54,7 @@ pub struct BattleCardState {
     /// The identity of this card.
     ///
     /// Uniquely identifies this card's rules text.
-    pub identity: CardIdentity,
+    pub identity: BattleCardIdentity,
 
     /// The player who owns this card.
     pub owner: PlayerName,

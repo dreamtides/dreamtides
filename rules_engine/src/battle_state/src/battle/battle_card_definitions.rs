@@ -1,11 +1,21 @@
 use std::sync::Arc;
 
-use core_data::identifiers::CardIdentity;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use tabula_data::card_definition::CardDefinition;
 
 use crate::battle::all_cards::CreatedCard;
 use crate::battle_cards::ability_list::AbilityList;
+
+/// Identifies a card with given rules text during a battle.
+///
+/// This is used as a key to look up the cached definition of a card's rules to
+/// improve performance. Two cards with the same identity are guaranteed to be
+/// identical in play.
+#[derive(
+    Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
+pub struct BattleCardIdentity(usize);
 
 /// Stores the [CardDefinition]s and [AbilityList]s for cards in this battle
 /// keyed by their [CardIdentity].
@@ -30,11 +40,11 @@ pub struct BattleCardDefinitionsResponse {
 }
 
 impl BattleCardDefinitions {
-    pub fn get_ability_list(&self, identity: CardIdentity) -> Arc<AbilityList> {
+    pub fn get_ability_list(&self, identity: BattleCardIdentity) -> Arc<AbilityList> {
         self.cache_by_identity[identity.0].clone()
     }
 
-    pub fn get_definition(&self, identity: CardIdentity) -> Arc<CardDefinition> {
+    pub fn get_definition(&self, identity: BattleCardIdentity) -> Arc<CardDefinition> {
         self.definitions_by_identity[identity.0].clone()
     }
 
@@ -68,7 +78,7 @@ impl BattleCardDefinitions {
 
         let mut created = Vec::with_capacity(cards.len());
         for (i, card) in cards.into_iter().enumerate() {
-            let identity = CardIdentity(start + i);
+            let identity = BattleCardIdentity(start + i);
             cache_by_identity.push(card.ability_list.clone());
             definitions_by_identity.push(card.definition.clone());
             created.push(CreatedCard {

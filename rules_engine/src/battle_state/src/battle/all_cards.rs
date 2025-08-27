@@ -1,11 +1,11 @@
 use std::collections::BTreeMap;
 
 use core_data::card_types::CardType;
-use core_data::identifiers::CardIdentity;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::PlayerName;
 use serde::{Deserialize, Serialize};
 
+use crate::battle::battle_card_definitions::BattleCardIdentity;
 use crate::battle::card_id::{
     ActivatedAbilityId, BanishedCardId, CardId, CardIdType, CharacterId, DeckCardId, HandCardId,
     StackCardId, VoidCardId,
@@ -27,7 +27,7 @@ pub type CharacterMap = BTreeMap<CharacterId, CharacterState>;
 
 /// A card to create in a player's deck.
 pub struct CreatedCard {
-    pub identity: CardIdentity,
+    pub identity: BattleCardIdentity,
     pub can_play_restriction: Option<CanPlayRestriction>,
     pub base_energy_cost: Option<Energy>,
     pub base_spark: Option<Spark>,

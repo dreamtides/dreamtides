@@ -31,16 +31,6 @@ pub struct BattleId(pub Uuid);
 )]
 pub struct QuestId(pub Uuid);
 
-/// Identifies a card with given rules text during a battle.
-///
-/// This is used as a key to look up the cached definition of a card's rules to
-/// improve performance. Two cards with the same identity are guaranteed to be
-/// identical in play.
-#[derive(
-    Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
-)]
-pub struct CardIdentity(pub usize);
-
 /// Identifies the base rules for a card.
 ///
 /// The 'base card' describes the abilities of a card before any modifications
