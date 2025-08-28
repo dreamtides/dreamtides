@@ -585,7 +585,9 @@ fn dissolve_characters_quantity<'a>() -> impl Parser<'a, &'a str, StandardEffect
 }
 
 fn put_cards_from_deck_into_void<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    numeric("put the top", count, "cards of your deck into your void")
+    phrase("put the top")
+        .ignore_then(numeric("{-count(n:", count, ")}"))
+        .then_ignore(phrase("cards of your deck into your void"))
         .map(|count| StandardEffect::PutCardsFromYourDeckIntoVoid { count })
 }
 

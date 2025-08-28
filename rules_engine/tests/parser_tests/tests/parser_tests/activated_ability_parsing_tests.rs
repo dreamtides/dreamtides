@@ -292,8 +292,9 @@ fn test_activated_banish_materialize() {
 
 #[test]
 fn test_immediate_multi_activated() {
-    let result =
-        parse("{ma} Abandon another character: Put the top 2 cards of your deck into your void.");
+    let result = parse(
+        "{ma} Abandon another character: Put the top {-count(n: 2)} cards of your deck into your void.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       Activated(ActivatedAbility(
