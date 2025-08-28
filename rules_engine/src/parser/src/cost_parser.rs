@@ -1,5 +1,5 @@
 use ability_data::cost::Cost;
-use ability_data::predicate::Predicate;
+use ability_data::predicate::{CardPredicate, Predicate};
 use chumsky::Parser;
 use chumsky::prelude::*;
 use core_data::numerics::Energy;
@@ -29,6 +29,9 @@ pub fn standard_cost<'a>() -> impl Parser<'a, &'a str, Cost, ErrorType<'a>> {
             .map(|p| Cost::AbandonCharacters(p, 1)),
         abandon_characters_count(),
         phrase("discard your hand").to(Cost::DiscardHand),
+        phrase("discard")
+            .ignore_then(numeric("{-discarded-cards(n:", count, ")}"))
+            .map(|n| Cost::DiscardCards(CardPredicate::Card, n)),
         phrase("discard a")
             .ignore_then(card_predicate_parser::parser())
             .map(|predicate| Cost::DiscardCards(predicate, 1)),
@@ -56,6 +59,9 @@ pub fn present_participle_additional_cost<'a>() -> impl Parser<'a, &'a str, Cost
             .ignore_then(determiner_parser::your_action())
             .then_ignore(phrase("from your hand"))
             .map(Cost::BanishFromHand),
+        phrase("discarding")
+            .ignore_then(numeric("{-discarded-cards(n:", count, ")}"))
+            .map(|n| Cost::DiscardCards(CardPredicate::Card, n)),
         phrase("discarding a")
             .ignore_then(card_predicate_parser::parser())
             .map(|predicate| Cost::DiscardCards(predicate, 1)),
@@ -82,6 +88,9 @@ pub fn third_person_singular_present_tense_cost<'a>()
             .map(|p| Cost::AbandonCharacters(p, 1)),
         abandon_characters_count(),
         phrase("discards their hand").to(Cost::DiscardHand),
+        phrase("discards")
+            .ignore_then(numeric("{-discarded-cards(n:", count, ")}"))
+            .map(|n| Cost::DiscardCards(CardPredicate::Card, n)),
         phrase("discards a")
             .ignore_then(card_predicate_parser::parser())
             .map(|predicate| Cost::DiscardCards(predicate, 1)),

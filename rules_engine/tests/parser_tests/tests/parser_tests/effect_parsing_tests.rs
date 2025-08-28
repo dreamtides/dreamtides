@@ -351,7 +351,7 @@ fn test_multi_activated_dissolve_with_abandoned_spark() {
 #[test]
 fn test_abandon_any_number_draw_for_each() {
     let result = parse(
-        "Abandon any number of characters. Draw {-cards(n: 1)} for each character abandoned.",
+        "Abandon any number of characters. Draw {-drawn-cards(n: 1)} for each character abandoned.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -431,7 +431,7 @@ fn test_foresee() {
 
 #[test]
 fn test_foresee_then_draw_card() {
-    let result = parse("{-Foresee(n: 1)}. Draw {-cards(n: 1)}.");
+    let result = parse("{-Foresee(n: 1)}. Draw {-drawn-cards(n: 1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
@@ -700,7 +700,7 @@ fn test_gain_points_for_each() {
 
 #[test]
 fn test_draw_cards_for_each() {
-    let result = parse("Draw {-cards(n: 1)} for each card you have played this turn.");
+    let result = parse("Draw {-drawn-cards(n: 1)} for each card you have played this turn.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
@@ -1225,7 +1225,7 @@ fn test_materialize_silent_copy() {
 
 #[test]
 fn test_draw_for_abandoned_this_turn() {
-    let result = parse("Draw {-cards(n: 1)} for each character you abandoned this turn.");
+    let result = parse("Draw {-drawn-cards(n: 1)} for each character you abandoned this turn.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
@@ -1327,7 +1327,7 @@ fn test_prevent_unless_pays_cost() {
 
 #[test]
 fn test_energy_spent_on_this_card() {
-    let result = parse("Pay one or more {e}: Draw {-cards(n: 1)} for each {e} spent.");
+    let result = parse("Pay one or more {e}: Draw {-drawn-cards(n: 1)} for each {e} spent.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
@@ -1373,7 +1373,7 @@ fn test_return_one_or_two_events_from_your_void_to_your_hand() {
 #[test]
 fn test_modal_draw_one_or_draw_two() {
     let result = parse(
-        "{choose-one}\n{bullet} {-energy-cost(e: 1)}: Draw {-cards(n: 1)}.\n{bullet} {-energy-cost(e: 3)}: Draw {-cards(n: 2)}.",
+        "{choose-one}\n{bullet} {-energy-cost(e: 1)}: Draw {-drawn-cards(n: 1)}.\n{bullet} {-energy-cost(e: 3)}: Draw {-drawn-cards(n: 2)}.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -1400,7 +1400,7 @@ fn test_modal_draw_one_or_draw_two() {
 #[test]
 fn test_modal_draw_one_or_dissolve_enemy() {
     let result = parse(
-        "{choose-one}\n{bullet} {-energy-cost(e:1)}: Draw {-cards(n:1)}.\n{bullet} {-energy-cost(e:2)}: {Dissolve} an enemy character.",
+        "{choose-one}\n{bullet} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.\n{bullet} {-energy-cost(e:2)}: {Dissolve} an enemy character.",
     );
     assert_ron_snapshot!(result, @r###"
     [

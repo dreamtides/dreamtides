@@ -3,13 +3,13 @@ use parser_tests::displayed_parser_test_utils::parse_displayed;
 
 #[test]
 fn test_event_simple_effect() {
-    let result = parse_displayed("Draw {-cards(n: 1)}.");
+    let result = parse_displayed("Draw {-drawn-cards(n: 1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(
         event: EventAbility(
           additional_cost: None,
-          effect: Effect("draw {-cards(n: 1)}."),
+          effect: Effect("draw {-drawn-cards(n: 1)}."),
         ),
       ),
     ]
@@ -18,13 +18,14 @@ fn test_event_simple_effect() {
 
 #[test]
 fn test_additional_cost_effect() {
-    let result = parse_displayed("Pay one or more {e}: Draw {-cards(n:1)} for each {e} spent.");
+    let result =
+        parse_displayed("Pay one or more {e}: Draw {-drawn-cards(n:1)} for each {e} spent.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(
         event: EventAbility(
           additional_cost: Some("pay one or more {e}"),
-          effect: Effect("draw {-cards(n:1)} for each {e} spent."),
+          effect: Effect("draw {-drawn-cards(n:1)} for each {e} spent."),
         ),
       ),
     ]
@@ -34,7 +35,7 @@ fn test_additional_cost_effect() {
 #[test]
 fn test_event_modal_choices() {
     let result = parse_displayed(
-        "{choose-one}\n{bullet} {-energy-cost(e: 1)}: Draw {-cards(n: 1)}.\n{bullet} {-energy-cost(e: 3)}: Draw {-cards(n: 2)}.",
+        "{choose-one}\n{bullet} {-energy-cost(e: 1)}: Draw {-drawn-cards(n: 1)}.\n{bullet} {-energy-cost(e: 3)}: Draw {-drawn-cards(n: 2)}.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -44,11 +45,11 @@ fn test_event_modal_choices() {
           effect: Modal([
             DisplayedModalEffectChoice(
               cost: "{-energy-cost(e: 1)}",
-              effect: "draw {-cards(n: 1)}.",
+              effect: "draw {-drawn-cards(n: 1)}.",
             ),
             DisplayedModalEffectChoice(
               cost: "{-energy-cost(e: 3)}",
-              effect: "draw {-cards(n: 2)}.",
+              effect: "draw {-drawn-cards(n: 2)}.",
             ),
           ]),
         ),
@@ -59,12 +60,12 @@ fn test_event_modal_choices() {
 
 #[test]
 fn test_activated_with_costs() {
-    let result = parse_displayed("{a} {-energy-cost(e: 3)}: Draw {-cards(n: 1)}.");
+    let result = parse_displayed("{a} {-energy-cost(e: 3)}: Draw {-drawn-cards(n: 1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Activated(
         cost: "{a} {-energy-cost(e: 3)}",
-        effect: Effect("draw {-cards(n: 1)}."),
+        effect: Effect("draw {-drawn-cards(n: 1)}."),
       ),
     ]
     "###);
@@ -72,11 +73,11 @@ fn test_activated_with_costs() {
 
 #[test]
 fn test_triggered_keyword_then_effect() {
-    let result = parse_displayed("$materialized: Draw {-cards(n: 1)}.");
+    let result = parse_displayed("$materialized: Draw {-drawn-cards(n: 1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(
-        text: "$materialized: draw {-cards(n: 1)}.",
+        text: "$materialized: draw {-drawn-cards(n: 1)}.",
       ),
     ]
     "###);
@@ -84,11 +85,11 @@ fn test_triggered_keyword_then_effect() {
 
 #[test]
 fn test_triggered_standard_then_effect() {
-    let result = parse_displayed("When you play an event, Draw {-cards(n: 1)}.");
+    let result = parse_displayed("When you play an event, Draw {-drawn-cards(n: 1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(
-        text: "when you play an event, draw {-cards(n: 1)}.",
+        text: "when you play an event, draw {-drawn-cards(n: 1)}.",
       ),
     ]
     "###);

@@ -135,7 +135,7 @@ fn game_state_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
 
 fn draw_cards<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("draw")
-        .ignore_then(numeric("{-cards(n:", count, ")}"))
+        .ignore_then(numeric("{-drawn-cards(n:", count, ")}"))
         .map(|count| StandardEffect::DrawCards { count })
 }
 
@@ -511,7 +511,7 @@ fn gain_points_for_each<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorT
 
 fn draw_cards_for_each<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("draw")
-        .ignore_then(numeric("{-cards(n:", count, ")}"))
+        .ignore_then(numeric("{-drawn-cards(n:", count, ")}"))
         .then_ignore(phrase("for each"))
         .then(quantity_expression_parser::parser())
         .map(|(count, for_count)| StandardEffect::DrawCardsForEach { count, for_each: for_count })

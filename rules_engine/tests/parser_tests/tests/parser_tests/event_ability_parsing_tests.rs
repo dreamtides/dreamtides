@@ -64,7 +64,7 @@ fn test_disable_activated_abilities_while_in_play() {
 #[test]
 fn test_abandon_and_gain_energy_for_spark() {
     let result = parse(
-        "Abandon a character and gain $1 for each point of spark that character had. Draw {-cards(n: 1)}.",
+        "Abandon a character and gain $1 for each point of spark that character had. Draw {-drawn-cards(n: 1)}.",
     );
     assert_ron_snapshot!(result, @r###"
     [
