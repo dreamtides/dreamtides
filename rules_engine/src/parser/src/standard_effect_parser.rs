@@ -153,7 +153,9 @@ fn anchored_until_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, 
 }
 
 fn gain_energy<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    numeric("gain $", Energy, "").map(|energy| StandardEffect::GainEnergy { gains: energy })
+    phrase("gain")
+        .ignore_then(numeric("{-gained-energy(e:", Energy, ")}"))
+        .map(|energy| StandardEffect::GainEnergy { gains: energy })
 }
 
 fn gain_spark_until_next_main_for_each<'a>()
@@ -215,9 +217,13 @@ fn abandon_and_gain_energy_for_spark<'a>() -> impl Parser<'a, &'a str, StandardE
 }
 
 fn gain_energy_for_each<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    numeric("gain $", Energy, "").then(determiner_parser::for_each_parser()).map(
-        |(gained, counted)| StandardEffect::GainEnergyForEach { gains: gained, for_each: counted },
-    )
+    phrase("gain")
+        .ignore_then(numeric("{-gained-energy(e:", Energy, ")}"))
+        .then(determiner_parser::for_each_parser())
+        .map(|(gained, counted)| StandardEffect::GainEnergyForEach {
+            gains: gained,
+            for_each: counted,
+        })
 }
 
 fn create_trigger_until_end_of_turn<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
@@ -437,8 +443,8 @@ fn materialize_character_at_end_of_turn<'a>()
 }
 
 fn gain_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
-    numeric("gain", Points, "$point")
-        .then_ignore(just("s").or_not())
+    phrase("gain")
+        .ignore_then(numeric("{-gained-points(n:", Points, ")}"))
         .map(|points| StandardEffect::GainPoints { gains: points })
 }
 
@@ -461,8 +467,7 @@ fn dissolve_characters_count<'a>() -> impl Parser<'a, &'a str, StandardEffect, E
 
 fn enemy_gains_points<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("the enemy gains")
-        .ignore_then(numeric("", count, "$point"))
-        .then_ignore(just("s").or_not())
+        .ignore_then(numeric("{-gained-points(n:", count, ")}"))
         .map(|count| StandardEffect::EnemyGainsPoints { count })
 }
 
@@ -498,8 +503,7 @@ fn return_to_hand<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a
 
 fn gain_points_for_each<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
     phrase("gain")
-        .ignore_then(numeric("", Points, "$point"))
-        .then_ignore(just("s").or_not())
+        .ignore_then(numeric("{-gained-points(n:", Points, ")}"))
         .then_ignore(phrase("for each"))
         .then(quantity_expression_parser::parser())
         .map(|(gain, for_count)| StandardEffect::GainPointsForEach { gain, for_count })

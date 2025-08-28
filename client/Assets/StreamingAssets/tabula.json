@@ -37,6 +37,12 @@
       "en_us": "{f}<space=\\\"-0.25px\\\">{ma}"
     },
     {
+      "id": "81fb9fe5-eff0-46ce-a10a-7aa4a45b0992",
+      "name": "p",
+      "description": "Points icon",
+      "en_us": "{\"\\uf091\"}"
+    },
+    {
       "id": "eeb2bbe9-1952-43fa-9ae6-12512d005829",
       "name": "bug-icon",
       "description": "Dev menu icon",
@@ -85,9 +91,39 @@
       "en_us": "<color=#00838F><b>{$e}{e}</b></color>"
     },
     {
+      "id": "50ef5a4a-86f6-4640-88f9-a249cc4cd5cf",
+      "name": "-gained-energy",
+      "description": "Formatting for an amount of energy gained as an effect",
+      "en_us": "<color=#00838F><b>{$e}{e}</b></color>"
+    },
+    {
       "id": "87fcba1e-5935-4de4-8048-81a343f072a5",
       "name": "-cards",
       "description": "Formatting for a number of cards",
+      "en_us": "{$n ->\n  [one] a card\n  *[other] {$n} cards\n}"
+    },
+    {
+      "id": "44535fb6-0190-4197-8bce-3acf063d4318",
+      "name": "-drawn-cards",
+      "description": "Formatting for a number of cards drawn",
+      "en_us": "{$n ->\n  [one] a card\n  *[other] {$n} cards\n}"
+    },
+    {
+      "id": "af11d700-b210-433e-a716-63125b4a1c10",
+      "name": "-Drawn-Cards",
+      "description": "Formatting for a number of cards drawn, capitalized",
+      "en_us": "{$n ->\n  [one] Draw a card\n  *[other] Draw {$n} cards\n}"
+    },
+    {
+      "id": "0d6c79d7-af53-4477-977c-a248fb4fa0ba",
+      "name": "-discarded-cards",
+      "description": "Formatting for a number of cards discarded",
+      "en_us": "{$n ->\n  [one] a card\n  *[other] {$n} cards\n}"
+    },
+    {
+      "id": "a0766c41-a450-4ec1-ba61-ebb6d32c263c",
+      "name": "-Discarded-Cards",
+      "description": "Formatting for a number of cards discarded, capitalized",
       "en_us": "{$n ->\n  [one] a card\n  *[other] {$n} cards\n}"
     },
     {
@@ -95,6 +131,12 @@
       "name": "-gained-spark",
       "description": "Formatting for gaining an amount of spark",
       "en_us": "+{$n} spark"
+    },
+    {
+      "id": "707467ad-9e99-4953-8e4d-cf5f47e31768",
+      "name": "-count",
+      "description": "Formatting for an arbitrary numerical value",
+      "en_us": "{$n}"
     },
     {
       "id": "3057478f-1445-4b7d-8241-a90d97da7adf",
@@ -155,6 +197,12 @@
       "name": "-Kindle",
       "description": "Kindle keyword ability with quantity, capitalized",
       "en_us": "{keyword}Kindle{end-keyword} {$s}"
+    },
+    {
+      "id": "70374512-2121-4569-a028-e871209fad38",
+      "name": "-gained-points",
+      "description": "Formatting for gaining an amount of points",
+      "en_us": "{$n}{p}"
     },
     {
       "id": "5771085d-3c89-423f-be05-c728035e7cd0",
@@ -1838,5 +1886,6 @@
       "rarity": "Special",
       "image_number": "1200949264"
     }
-  ]
+  ],
+  "dreamwell_cards": []
 }

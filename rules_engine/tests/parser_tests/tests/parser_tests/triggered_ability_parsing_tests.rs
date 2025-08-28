@@ -106,8 +106,9 @@ fn test_once_per_turn() {
 
 #[test]
 fn test_multiple_keyword_trigger_conditional() {
-    let result =
-        parse("$materialized, $judgment: If you control 2 other {cardtype: warriors}, gain $1.");
+    let result = parse(
+        "$materialized, $judgment: If you control 2 other {cardtype: warriors}, gain {-gained-energy(e: 1)}.",
+    );
     assert_ron_snapshot!(
         result,
         @r###"
@@ -135,7 +136,8 @@ fn test_multiple_keyword_trigger_conditional() {
 
 #[test]
 fn test_once_per_turn_materialize() {
-    let result = parse("Once per turn, when you materialize a character, gain $1.");
+    let result =
+        parse("Once per turn, when you materialize a character, gain {-gained-energy(e: 1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -205,7 +207,9 @@ fn test_discard_gains_reclaim() {
 
 #[test]
 fn test_once_per_turn_multiple_effects() {
-    let result = parse("Once per turn, when you discard a card, gain $1 and then {kw: kindle} 2.");
+    let result = parse(
+        "Once per turn, when you discard a card, gain {-gained-energy(e: 1)} and then {kw: kindle} 2.",
+    );
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -255,7 +259,7 @@ fn test_materialize_nth_this_turn() {
 
 #[test]
 fn test_end_of_turn() {
-    let result = parse("At the end of your turn, gain $2.");
+    let result = parse("At the end of your turn, gain {-gained-energy(e: 2)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(

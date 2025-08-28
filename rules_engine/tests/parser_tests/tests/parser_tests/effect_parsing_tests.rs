@@ -3,7 +3,7 @@ use parser_tests::parser_test_utils::parse;
 
 #[test]
 fn test_gain_energy_for_each() {
-    let result = parse("Gain $1 for each other character you control.");
+    let result = parse("Gain {-gained-energy(e: 1)} for each other character you control.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
@@ -499,7 +499,7 @@ fn test_dissolve_characters_count() {
 
 #[test]
 fn test_enemy_points() {
-    let result = parse("The enemy gains 2 $points.");
+    let result = parse("The enemy gains {-gained-points(n: 2)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
@@ -685,7 +685,7 @@ fn return_a_character_to_hand() {
 
 #[test]
 fn test_gain_points_for_each() {
-    let result = parse("Gain 1 $point for each card you have played this turn.");
+    let result = parse("Gain {-gained-points(n: 1)} for each card you have played this turn.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(

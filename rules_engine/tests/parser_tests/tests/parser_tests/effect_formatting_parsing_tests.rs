@@ -79,7 +79,7 @@ fn test_optional_draw() {
 
 #[test]
 fn test_conditional_gain_energy() {
-    let result = parse("If you control 2 other {cardtype: warriors}, gain $1.");
+    let result = parse("If you control 2 other {cardtype: warriors}, gain {-gained-energy(e: 1)}.");
     assert_ron_snapshot!(
         result,
         @r###"
@@ -103,7 +103,8 @@ fn test_conditional_gain_energy() {
 
 #[test]
 fn test_conditional_optional_gain_energy() {
-    let result = parse("If you control 2 other {cardtype: warriors}, you may gain $1.");
+    let result =
+        parse("If you control 2 other {cardtype: warriors}, you may gain {-gained-energy(e: 1)}.");
     assert_ron_snapshot!(
         result,
         @r###"
@@ -173,7 +174,8 @@ fn test_optional_cost() {
 
 #[test]
 fn test_optional_cost_banish_enemy() {
-    let result = parse("{a}: You may banish a card from the enemy's void to gain $1.");
+    let result =
+        parse("{a}: You may banish a card from the enemy's void to gain {-gained-energy(e: 1)}.");
     assert_ron_snapshot!(
         result,
         @r###"

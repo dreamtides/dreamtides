@@ -3,7 +3,7 @@ use parser_tests::parser_test_utils::parse;
 
 #[test]
 fn test_multiple_abilities_with_br() {
-    let result = parse("Draw {-cards(n: 1)}.\n\nGain $2.");
+    let result = parse("Draw {-cards(n: 1)}.\n\nGain {-gained-energy(e: 2)}.");
     assert_ron_snapshot!(
         result,
         @r###"

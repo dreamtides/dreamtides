@@ -144,7 +144,7 @@ fn test_activated_ability_multiple_costs() {
 
 #[test]
 fn test_discard_hand_gain_energy() {
-    let result = parse("{a} Discard your hand: Gain $1.");
+    let result = parse("{a} Discard your hand: Gain {-gained-energy(e: 1)}.");
     assert_ron_snapshot!(
         result,
         @r###"
@@ -210,7 +210,7 @@ fn test_activated_discover_and_then_materialize() {
 
 #[test]
 fn test_discard_card_draw_gain_point() {
-    let result = parse("{a} Discard a card: Draw {-cards(n: 1)}. Gain 1 $point.");
+    let result = parse("{a} Discard a card: Draw {-cards(n: 1)}. Gain {-gained-points(n: 1)}.");
     assert_ron_snapshot!(
         result,
         @r###"
@@ -241,7 +241,7 @@ fn test_discard_card_draw_gain_point() {
 
 #[test]
 fn test_discard_warriors_gain_energy() {
-    let result = parse("{a} Discard 2 {cardtype: warriors}: Gain $1.");
+    let result = parse("{a} Discard 2 {cardtype: warriors}: Gain {-gained-energy(e: 1)}.");
     assert_ron_snapshot!(
         result,
         @r###"

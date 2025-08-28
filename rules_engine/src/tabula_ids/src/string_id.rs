@@ -19,6 +19,9 @@ pub const FA: StringId = StringId(uuid!("e0eb0864-3150-4ac5-a903-258ada0f906a"))
 /// Fast + Multi-Activated icon
 pub const FMA: StringId = StringId(uuid!("1921caf1-b581-4feb-b956-b27a553cbc43"));
 
+/// Points icon
+pub const P: StringId = StringId(uuid!("81fb9fe5-eff0-46ce-a10a-7aa4a45b0992"));
+
 /// Dev menu icon
 pub const BUG_ICON: StringId = StringId(uuid!("eeb2bbe9-1952-43fa-9ae6-12512d005829"));
 
@@ -43,11 +46,23 @@ pub const END_KEYWORD: StringId = StringId(uuid!("bf435908-6161-4a6e-9407-81e0cc
 /// Formatting for an amount of energy paid as a cost
 pub const ENERGY_COST: StringId = StringId(uuid!("cc5c5509-69c5-4c1f-8faa-b9948029dcb8"));
 
+/// Formatting for an amount of energy gained as an effect
+pub const GAINED_ENERGY: StringId = StringId(uuid!("50ef5a4a-86f6-4640-88f9-a249cc4cd5cf"));
+
 /// Formatting for a number of cards
 pub const CARDS: StringId = StringId(uuid!("87fcba1e-5935-4de4-8048-81a343f072a5"));
 
+/// Formatting for a number of cards drawn
+pub const DRAWN_CARDS: StringId = StringId(uuid!("44535fb6-0190-4197-8bce-3acf063d4318"));
+
+/// Formatting for a number of cards discarded
+pub const DISCARDED_CARDS: StringId = StringId(uuid!("0d6c79d7-af53-4477-977c-a248fb4fa0ba"));
+
 /// Formatting for gaining an amount of spark
 pub const GAINED_SPARK: StringId = StringId(uuid!("c49b155f-57a2-479a-bc45-254b2144d04b"));
+
+/// Formatting for an arbitrary numerical value
+pub const COUNT: StringId = StringId(uuid!("707467ad-9e99-4953-8e4d-cf5f47e31768"));
 
 /// Formatting to select a single mode of a modal card
 pub const CHOOSE_ONE: StringId = StringId(uuid!("3057478f-1445-4b7d-8241-a90d97da7adf"));
@@ -66,6 +81,9 @@ pub const RECLAIM_COST: StringId = StringId(uuid!("fb895ce7-1f66-426d-8c29-b19fd
 
 /// Kindle keyword ability with quantity
 pub const KINDLE: StringId = StringId(uuid!("bf189fe0-75e2-4a87-9dca-67dd5f755766"));
+
+/// Formatting for gaining an amount of points
+pub const GAINED_POINTS: StringId = StringId(uuid!("70374512-2121-4569-a028-e871209fad38"));
 
 /// Dissolve keyword ability
 pub const DISSOLVE: StringId = StringId(uuid!("5771085d-3c89-423f-be05-c728035e7cd0"));
