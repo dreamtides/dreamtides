@@ -97,33 +97,15 @@
       "en_us": "<color=#00838F><b>{$e}{e}</b></color>"
     },
     {
-      "id": "87fcba1e-5935-4de4-8048-81a343f072a5",
-      "name": "-cards",
-      "description": "Formatting for a number of cards",
-      "en_us": "{$n ->\n  [one] a card\n  *[other] {$n} cards\n}"
-    },
-    {
       "id": "44535fb6-0190-4197-8bce-3acf063d4318",
       "name": "-drawn-cards",
       "description": "Formatting for a number of cards drawn",
       "en_us": "{$n ->\n  [one] a card\n  *[other] {$n} cards\n}"
     },
     {
-      "id": "af11d700-b210-433e-a716-63125b4a1c10",
-      "name": "-Drawn-Cards",
-      "description": "Formatting for a number of cards drawn, capitalized",
-      "en_us": "{$n ->\n  [one] Draw a card\n  *[other] Draw {$n} cards\n}"
-    },
-    {
       "id": "0d6c79d7-af53-4477-977c-a248fb4fa0ba",
       "name": "-discarded-cards",
       "description": "Formatting for a number of cards discarded",
-      "en_us": "{$n ->\n  [one] a card\n  *[other] {$n} cards\n}"
-    },
-    {
-      "id": "a0766c41-a450-4ec1-ba61-ebb6d32c263c",
-      "name": "-Discarded-Cards",
-      "description": "Formatting for a number of cards discarded, capitalized",
       "en_us": "{$n ->\n  [one] a card\n  *[other] {$n} cards\n}"
     },
     {
@@ -743,7 +725,7 @@
       "id": "e06a8cfe-483f-42c0-aac8-9c12b21b3f99",
       "name_en_us": "Test Variable Energy Draw",
       "energy_cost": "2",
-      "rules_text_en_us": "Pay one or more {e}: Draw {-cards(n:1)} for each {e} spent.",
+      "rules_text_en_us": "Pay one or more {e}: Draw {-drawn-cards(n:1)} for each {e} spent.",
       "prompts_en_us": "Pay one or more {e}.",
       "abilities": [
         {
@@ -766,7 +748,7 @@
             "event": {
               "additional_cost": "Pay one or more {e}",
               "effect": {
-                "Effect": "Draw {-cards(n:1)} for each {e} spent."
+                "Effect": "Draw {-drawn-cards(n:1)} for each {e} spent."
               }
             }
           }
@@ -821,7 +803,7 @@
       "id": "d8a8541f-5b00-4d91-9518-aa8ae70ea450",
       "name_en_us": "Test Fast Multi Activated Ability Draw Card Character",
       "energy_cost": "2",
-      "rules_text_en_us": "{fma} {-energy-cost(e:3)}: Draw {-cards(n:1)}.",
+      "rules_text_en_us": "{fma} {-energy-cost(e:3)}: Draw {-drawn-cards(n:1)}.",
       "abilities": [
         {
           "Activated": {
@@ -849,7 +831,7 @@
           "Activated": {
             "cost": "{fma} {-energy-cost(e:3)}",
             "effect": {
-              "Effect": "Draw {-cards(n:1)}."
+              "Effect": "Draw {-drawn-cards(n:1)}."
             }
           }
         }
@@ -903,7 +885,7 @@
       "id": "e8f937da-cca7-447d-a559-530d7c339325",
       "name_en_us": "Test Modal Return To Hand Or Draw Two",
       "energy_cost": "*",
-      "rules_text_en_us": "{choose-one}\n{bullet} {-energy-cost(e:2)}: Return an enemy character to hand.\n{bullet} {-energy-cost(e:3)}: Draw {-cards(n:2)}.",
+      "rules_text_en_us": "{choose-one}\n{bullet} {-energy-cost(e:2)}: Return an enemy character to hand.\n{bullet} {-energy-cost(e:3)}: Draw {-drawn-cards(n:2)}.",
       "prompts_en_us": "Choose an enemy character to return to hand.",
       "abilities": [
         {
@@ -950,7 +932,7 @@
                   },
                   {
                     "cost": "{-energy-cost(e:3)}",
-                    "effect": "Draw {-cards(n:2)}."
+                    "effect": "Draw {-drawn-cards(n:2)}."
                   }
                 ]
               }
@@ -1005,7 +987,7 @@
       "id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
       "name_en_us": "Test Foresee One Draw Reclaim",
       "energy_cost": "1",
-      "rules_text_en_us": "{-Foresee(n:1)}. Draw {-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
+      "rules_text_en_us": "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
       "abilities": [
         {
           "Event": {
@@ -1043,7 +1025,7 @@
             "event": {
               "additional_cost": null,
               "effect": {
-                "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
+                "Effect": "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}."
               }
             }
           }
@@ -1139,7 +1121,7 @@
       "id": "68f90d08-9b51-424e-90d1-d15ddd1ece93",
       "name_en_us": "Test Draw One",
       "energy_cost": "0",
-      "rules_text_en_us": "Draw {-cards(n:1)}.",
+      "rules_text_en_us": "Draw {-drawn-cards(n:1)}.",
       "abilities": [
         {
           "Event": {
@@ -1159,7 +1141,7 @@
             "event": {
               "additional_cost": null,
               "effect": {
-                "Effect": "Draw {-cards(n:1)}."
+                "Effect": "Draw {-drawn-cards(n:1)}."
               }
             }
           }
@@ -1251,7 +1233,7 @@
       "id": "8dfeb2c1-2d72-411c-a8cc-7f84ca532c63",
       "name_en_us": "Test Activated Ability Draw Card",
       "energy_cost": "2",
-      "rules_text_en_us": "{a} {-energy-cost(e:1)}: Draw {-cards(n:1)}.",
+      "rules_text_en_us": "{a} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.",
       "abilities": [
         {
           "Activated": {
@@ -1275,7 +1257,7 @@
           "Activated": {
             "cost": "{a} {-energy-cost(e:1)}",
             "effect": {
-              "Effect": "Draw {-cards(n:1)}."
+              "Effect": "Draw {-drawn-cards(n:1)}."
             }
           }
         }
@@ -1290,7 +1272,7 @@
       "id": "56f944bb-333b-4e2c-9c8c-2068f41998c2",
       "name_en_us": "Test Multi Activated Ability Draw Card Character",
       "energy_cost": "0",
-      "rules_text_en_us": "{ma} {-energy-cost(e:1)}: Draw {-cards(n:1)}.",
+      "rules_text_en_us": "{ma} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.",
       "abilities": [
         {
           "Activated": {
@@ -1318,7 +1300,7 @@
           "Activated": {
             "cost": "{ma} {-energy-cost(e:1)}",
             "effect": {
-              "Effect": "Draw {-cards(n:1)}."
+              "Effect": "Draw {-drawn-cards(n:1)}."
             }
           }
         }
@@ -1333,7 +1315,7 @@
       "id": "44aa4a1a-e8c6-4969-94bc-5fdbe010395e",
       "name_en_us": "Test Fast Activated Ability Draw Card Character",
       "energy_cost": "0",
-      "rules_text_en_us": "{fa} {-energy-cost(e:1)}: Draw {-cards(n:1)}.",
+      "rules_text_en_us": "{fa} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.",
       "abilities": [
         {
           "Activated": {
@@ -1361,7 +1343,7 @@
           "Activated": {
             "cost": "{fa} {-energy-cost(e:1)}",
             "effect": {
-              "Effect": "Draw {-cards(n:1)}."
+              "Effect": "Draw {-drawn-cards(n:1)}."
             }
           }
         }
@@ -1418,7 +1400,7 @@
       "id": "3af84464-874a-4fd2-89cb-1986dee59ae1",
       "name_en_us": "Test Dual Activated Ability Character",
       "energy_cost": "4",
-      "rules_text_en_us": "{a} {-energy-cost(e:1)}: Draw {-cards(n:1)}.\n\n{a} {-energy-cost(e:2)}: Draw {-cards(n:2)}.",
+      "rules_text_en_us": "{a} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.\n\n{a} {-energy-cost(e:2)}: Draw {-drawn-cards(n:2)}.",
       "abilities": [
         {
           "Activated": {
@@ -1458,7 +1440,7 @@
           "Activated": {
             "cost": "{a} {-energy-cost(e:1)}",
             "effect": {
-              "Effect": "Draw {-cards(n:1)}."
+              "Effect": "Draw {-drawn-cards(n:1)}."
             }
           }
         },
@@ -1466,7 +1448,7 @@
           "Activated": {
             "cost": "{a} {-energy-cost(e:2)}",
             "effect": {
-              "Effect": "Draw {-cards(n:2)}."
+              "Effect": "Draw {-drawn-cards(n:2)}."
             }
           }
         }
@@ -1551,7 +1533,7 @@
       "id": "820faab3-37c1-46fa-a314-5f023ec739a1",
       "name_en_us": "Test Foresee One Draw A Card",
       "energy_cost": "1",
-      "rules_text_en_us": "{-Foresee(n:1)}. Draw {-cards(n:1)}.",
+      "rules_text_en_us": "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}.",
       "abilities": [
         {
           "Event": {
@@ -1584,7 +1566,7 @@
             "event": {
               "additional_cost": null,
               "effect": {
-                "Effect": "{-Foresee(n:1)}. Draw {-cards(n:1)}."
+                "Effect": "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}."
               }
             }
           }
@@ -1599,7 +1581,7 @@
       "id": "0cba1386-d1b6-4f57-8ccc-d92f8be01d7c",
       "name_en_us": "Test Draw One Reclaim",
       "energy_cost": "2",
-      "rules_text_en_us": "Draw {-cards(n:1)}.\n\n{-Reclaim-Cost(e:1)}",
+      "rules_text_en_us": "Draw {-drawn-cards(n:1)}.\n\n{-Reclaim-Cost(e:1)}",
       "abilities": [
         {
           "Event": {
@@ -1624,7 +1606,7 @@
             "event": {
               "additional_cost": null,
               "effect": {
-                "Effect": "Draw {-cards(n:1)}."
+                "Effect": "Draw {-drawn-cards(n:1)}."
               }
             }
           }
@@ -1727,7 +1709,7 @@
       "id": "029889e9-25bc-438f-a492-8813febd65d8",
       "name_en_us": "Test Modal Draw One Or Draw Two",
       "energy_cost": "*",
-      "rules_text_en_us": "{choose-one}\n{bullet} {-energy-cost(e:1)}: Draw {-cards(n:1)}.\n{bullet} {-energy-cost(e:3)}: Draw {-cards(n:2)}.",
+      "rules_text_en_us": "{choose-one}\n{bullet} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.\n{bullet} {-energy-cost(e:3)}: Draw {-drawn-cards(n:2)}.",
       "abilities": [
         {
           "Event": {
@@ -1767,11 +1749,11 @@
                 "Modal": [
                   {
                     "cost": "{-energy-cost(e:1)}",
-                    "effect": "Draw {-cards(n:1)}."
+                    "effect": "Draw {-drawn-cards(n:1)}."
                   },
                   {
                     "cost": "{-energy-cost(e:3)}",
-                    "effect": "Draw {-cards(n:2)}."
+                    "effect": "Draw {-drawn-cards(n:2)}."
                   }
                 ]
               }
@@ -1788,7 +1770,7 @@
       "id": "9847b3fc-1e7f-44e5-90af-1240ae12aaee",
       "name_en_us": "Test Modal Draw One Or Dissolve Enemy",
       "energy_cost": "*",
-      "rules_text_en_us": "{choose-one}\n{bullet} {-energy-cost(e:1)}: Draw {-cards(n:1)}.\n{bullet} {-energy-cost(e:2)}: {Dissolve} an enemy character.",
+      "rules_text_en_us": "{choose-one}\n{bullet} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.\n{bullet} {-energy-cost(e:2)}: {Dissolve} an enemy character.",
       "prompts_en_us": "Choose an enemy character to {dissolve}.",
       "abilities": [
         {
@@ -1831,7 +1813,7 @@
                 "Modal": [
                   {
                     "cost": "{-energy-cost(e:1)}",
-                    "effect": "Draw {-cards(n:1)}."
+                    "effect": "Draw {-drawn-cards(n:1)}."
                   },
                   {
                     "cost": "{-energy-cost(e:2)}",
@@ -1887,5 +1869,426 @@
       "image_number": "1200949264"
     }
   ],
-  "dreamwell_cards": []
+  "dreamwell_cards": [
+    {
+      "id": "bc143c3c-f149-4506-813f-1aa8dd54e370",
+      "name_en_us": "Dawning Horizon",
+      "energy_produced": "2",
+      "rules_text_en_us": " ",
+      "phase": "0",
+      "is_test_card": false,
+      "abilities": [],
+      "displayed_abilities": [],
+      "image_number": "1963305268"
+    },
+    {
+      "id": "1dda2551-c972-4db2-81c0-9dc95ac8b27c",
+      "name_en_us": "Sunrise Cavern",
+      "energy_produced": "2",
+      "rules_text_en_us": " ",
+      "phase": "0",
+      "is_test_card": false,
+      "abilities": [],
+      "displayed_abilities": [],
+      "image_number": "565499323"
+    },
+    {
+      "id": "dcd99f3d-8c47-47fa-9b9a-4c1455a9d2eb",
+      "name_en_us": "Skypath",
+      "energy_produced": "1",
+      "rules_text_en_us": "{-Foresee(n:1)}.",
+      "phase": "1",
+      "is_test_card": false,
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "Foresee": {
+                  "count": 1
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{-Foresee(n:1)}."
+              }
+            }
+          }
+        }
+      ],
+      "image_number": "1897537165"
+    },
+    {
+      "id": "276c1e23-53d8-4aeb-a4dd-243189a44561",
+      "name_en_us": "Autumn Glade",
+      "energy_produced": "1",
+      "rules_text_en_us": "Gain {-gained-points(n: 2)}.",
+      "phase": null,
+      "is_test_card": false,
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "GainPoints": {
+                  "gains": 2
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Gain {-gained-points(n: 2)}."
+              }
+            }
+          }
+        }
+      ],
+      "image_number": "1789989917"
+    },
+    {
+      "id": "63d5d9f5-208f-4e35-9681-d51a5ba6ce57",
+      "name_en_us": "Twilight Radiance",
+      "energy_produced": "1",
+      "rules_text_en_us": "Gain {-gained-energy(e: 1)}.",
+      "phase": null,
+      "is_test_card": false,
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "GainEnergy": {
+                  "gains": 1
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Gain {-gained-energy(e: 1)}."
+              }
+            }
+          }
+        }
+      ],
+      "image_number": "1786390154"
+    },
+    {
+      "id": "8e5b3423-b8e1-4e1c-9e3e-5281190c4713",
+      "name_en_us": "Astral Interface",
+      "energy_produced": "1",
+      "rules_text_en_us": "Draw {-drawn-cards(n: 1)}. Discard {-discarded-cards(n: 1)}.",
+      "phase": null,
+      "is_test_card": false,
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "List": [
+                {
+                  "effect": {
+                    "DrawCards": {
+                      "count": 1
+                    }
+                  },
+                  "optional": false
+                },
+                {
+                  "effect": {
+                    "PayCost": {
+                      "cost": {
+                        "DiscardCards": [
+                          "Card",
+                          1
+                        ]
+                      }
+                    }
+                  },
+                  "optional": false
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Draw {-drawn-cards(n: 1)}. Discard {-discarded-cards(n: 1)}."
+              }
+            }
+          }
+        }
+      ],
+      "image_number": "1011222385"
+    },
+    {
+      "id": "e2c10a87-e92f-4170-9bbf-c288abcf9f9b",
+      "name_en_us": "Shadow Passage",
+      "energy_produced": "1",
+      "rules_text_en_us": "Put the top {-count(n: 3)} cards of your deck into your void.",
+      "phase": null,
+      "is_test_card": false,
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "PutCardsFromYourDeckIntoVoid": {
+                  "count": 3
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Put the top {-count(n: 3)} cards of your deck into your void."
+              }
+            }
+          }
+        }
+      ],
+      "image_number": "1068256757"
+    },
+    {
+      "id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
+      "name_en_us": "Dreamwell Vanilla 1",
+      "energy_produced": "2",
+      "rules_text_en_us": " ",
+      "phase": "0",
+      "is_test_card": true,
+      "abilities": [],
+      "displayed_abilities": [],
+      "image_number": "1963305268"
+    },
+    {
+      "id": "308fd4c0-ca98-4bfa-a9be-c29b36a145fd",
+      "name_en_us": "Dreamwell Vanilla 2",
+      "energy_produced": "2",
+      "rules_text_en_us": " ",
+      "phase": "0",
+      "is_test_card": true,
+      "abilities": [],
+      "displayed_abilities": [],
+      "image_number": "565499323"
+    },
+    {
+      "id": "40c77ea8-a021-4bc6-8970-0853c03f3fe0",
+      "name_en_us": "Dreamwell Foresee",
+      "energy_produced": "1",
+      "rules_text_en_us": "{-Foresee(n:1)}.",
+      "phase": "1",
+      "is_test_card": true,
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "Foresee": {
+                  "count": 1
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{-Foresee(n:1)}."
+              }
+            }
+          }
+        }
+      ],
+      "image_number": "1897537165"
+    },
+    {
+      "id": "d386663c-9e9f-4b8e-b410-f3467e39801b",
+      "name_en_us": "Dreamwell Gain Points",
+      "energy_produced": "1",
+      "rules_text_en_us": "Gain {-gained-points(n: 2)}.",
+      "phase": null,
+      "is_test_card": true,
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "GainPoints": {
+                  "gains": 2
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Gain {-gained-points(n: 2)}."
+              }
+            }
+          }
+        }
+      ],
+      "image_number": "1789989917"
+    },
+    {
+      "id": "107c3b3f-6131-4ff8-afcb-f0ce4188848f",
+      "name_en_us": "Dreamwell Gain Energy",
+      "energy_produced": "1",
+      "rules_text_en_us": "Gain {-gained-energy(e: 1)}.",
+      "phase": null,
+      "is_test_card": true,
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "GainEnergy": {
+                  "gains": 1
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Gain {-gained-energy(e: 1)}."
+              }
+            }
+          }
+        }
+      ],
+      "image_number": "1786390154"
+    },
+    {
+      "id": "40e4381f-12f7-46b9-ae50-67b3195781b1",
+      "name_en_us": "Dreamwell Draw Discard",
+      "energy_produced": "1",
+      "rules_text_en_us": "Draw {-drawn-cards(n: 1)}. Discard {-discarded-cards(n: 1)}.",
+      "phase": null,
+      "is_test_card": true,
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "List": [
+                {
+                  "effect": {
+                    "DrawCards": {
+                      "count": 1
+                    }
+                  },
+                  "optional": false
+                },
+                {
+                  "effect": {
+                    "PayCost": {
+                      "cost": {
+                        "DiscardCards": [
+                          "Card",
+                          1
+                        ]
+                      }
+                    }
+                  },
+                  "optional": false
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Draw {-drawn-cards(n: 1)}. Discard {-discarded-cards(n: 1)}."
+              }
+            }
+          }
+        }
+      ],
+      "image_number": "1011222385"
+    },
+    {
+      "id": "a2cdf115-8e1a-455e-a118-123f6f36c7ba",
+      "name_en_us": "Dreamwell Mill 3",
+      "energy_produced": "1",
+      "rules_text_en_us": "Put the top {-count(n: 3)} cards of your deck into your void.",
+      "phase": null,
+      "is_test_card": true,
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "PutCardsFromYourDeckIntoVoid": {
+                  "count": 3
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Put the top {-count(n: 3)} cards of your deck into your void."
+              }
+            }
+          }
+        }
+      ],
+      "image_number": "1068256757"
+    }
+  ]
 }

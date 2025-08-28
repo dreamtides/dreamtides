@@ -242,6 +242,7 @@ pub fn build_dreamwell_cards(
             displayed_rules_text,
             displayed_prompts,
             phase,
+            is_test_card: row.is_test_card,
             image,
         });
     }

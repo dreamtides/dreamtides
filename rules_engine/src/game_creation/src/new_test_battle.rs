@@ -15,6 +15,7 @@ use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::battle::turn_data::TurnData;
 use battle_state::battle::turn_history::TurnHistory;
 use battle_state::battle_cards::ability_state::AbilityState;
+use battle_state::battle_cards::dreamwell::Dreamwell;
 use battle_state::battle_player::battle_player_state::{
     BattlePlayerState, CreateBattlePlayer, TestDeckName,
 };
@@ -109,6 +110,7 @@ pub fn create_and_start(
         rng: Xoshiro256PlusPlus::seed_from_u64(seed),
         animations: None,
         prompts: VecDeque::new(),
+        dreamwell: Dreamwell::default(),
         triggers: TriggerState::default(),
         activated_abilities: PlayerMap::default(),
         ability_state: AbilityState::default(),

@@ -40,6 +40,9 @@ pub struct DreamwellCardDefinition {
     /// the randomized order.
     pub phase: DreamwellCardPhase,
 
+    /// Whether this card is a test card.
+    pub is_test_card: bool,
+
     /// Image to display for this card.
     pub image: SpriteAddress,
 }
@@ -65,6 +68,9 @@ pub struct DreamwellCardDefinitionRaw {
     /// Phase of this card, used to determine the order in which it appears in
     /// the shuffled dreamwell deck.
     pub phase: Option<String>,
+
+    /// Whether this card is a test card.
+    pub is_test_card: bool,
 
     /// Abilities of this card in serialized form.
     ///

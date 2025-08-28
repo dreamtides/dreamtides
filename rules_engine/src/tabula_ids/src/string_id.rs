@@ -49,9 +49,6 @@ pub const ENERGY_COST: StringId = StringId(uuid!("cc5c5509-69c5-4c1f-8faa-b99480
 /// Formatting for an amount of energy gained as an effect
 pub const GAINED_ENERGY: StringId = StringId(uuid!("50ef5a4a-86f6-4640-88f9-a249cc4cd5cf"));
 
-/// Formatting for a number of cards
-pub const CARDS: StringId = StringId(uuid!("87fcba1e-5935-4de4-8048-81a343f072a5"));
-
 /// Formatting for a number of cards drawn
 pub const DRAWN_CARDS: StringId = StringId(uuid!("44535fb6-0190-4197-8bce-3acf063d4318"));
 

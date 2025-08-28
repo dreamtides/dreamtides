@@ -23,6 +23,7 @@ use crate::battle::turn_data::TurnData;
 use crate::battle::turn_history::TurnHistory;
 use crate::battle_cards::ability_state::AbilityState;
 use crate::battle_cards::activated_ability_state::ActivatedAbilityState;
+use crate::battle_cards::dreamwell::Dreamwell;
 use crate::battle_cards::stack_card_state::EffectTargets;
 use crate::battle_player::battle_player_state::BattlePlayerState;
 use crate::battle_player::player_map::PlayerMap;
@@ -76,6 +77,10 @@ pub struct BattleState {
     /// The first element in the queue (index 0) is the currently-active prompt.
     #[serde(default)]
     pub prompts: VecDeque<PromptData>,
+
+    /// State of the dreamwell.
+    #[serde(default)]
+    pub dreamwell: Dreamwell,
 
     /// State of the trigger system.
     #[serde(default)]
@@ -190,6 +195,7 @@ impl BattleState {
             seed: self.seed,
             rng: self.rng.clone(),
             prompts: self.prompts.clone(),
+            dreamwell: self.dreamwell.clone(),
             triggers: self.triggers.clone(),
             activated_abilities: self.activated_abilities.clone(),
             ability_state: self.ability_state.clone(),
@@ -228,6 +234,7 @@ impl BattleState {
                 seed: self.seed,
                 rng: self.rng.clone(),
                 prompts: self.prompts.clone(),
+                dreamwell: self.dreamwell.clone(),
                 triggers: self.triggers.clone(),
                 activated_abilities: self.activated_abilities.clone(),
                 ability_state: self.ability_state.clone(),
