@@ -2081,9 +2081,20 @@
       "image_number": "1068256757"
     },
     {
+      "id": "146ae27e-a8ac-4f3c-aef2-cf2211e4bcfe",
+      "name_en_us": "Dreamwell Produce 0",
+      "energy_produced": "0",
+      "rules_text_en_us": " ",
+      "phase": "0",
+      "is_test_card": true,
+      "abilities": [],
+      "displayed_abilities": [],
+      "image_number": "1963305268"
+    },
+    {
       "id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
-      "name_en_us": "Dreamwell Vanilla 1",
-      "energy_produced": "2",
+      "name_en_us": "Dreamwell Produce 1",
+      "energy_produced": "1",
       "rules_text_en_us": " ",
       "phase": "0",
       "is_test_card": true,
@@ -2093,14 +2104,14 @@
     },
     {
       "id": "308fd4c0-ca98-4bfa-a9be-c29b36a145fd",
-      "name_en_us": "Dreamwell Vanilla 2",
+      "name_en_us": "Dreamwell Produce 2",
       "energy_produced": "2",
       "rules_text_en_us": " ",
       "phase": "0",
       "is_test_card": true,
       "abilities": [],
       "displayed_abilities": [],
-      "image_number": "565499323"
+      "image_number": "1963305268"
     },
     {
       "id": "40c77ea8-a021-4bc6-8970-0853c03f3fe0",
@@ -2289,6 +2300,50 @@
         }
       ],
       "image_number": "1068256757"
+    }
+  ],
+  "card_lists": [
+    {
+      "list_name": "Test Dreamwell No Abilities",
+      "list_type": "DreamwellCardId",
+      "card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
+      "copies": 10.0
+    },
+    {
+      "list_name": "Test Dreamwell Basic 5",
+      "list_type": "DreamwellCardId",
+      "card_id": "308fd4c0-ca98-4bfa-a9be-c29b36a145fd",
+      "copies": 2.0
+    },
+    {
+      "list_name": "Test Dreamwell Basic 5",
+      "list_type": "DreamwellCardId",
+      "card_id": "40c77ea8-a021-4bc6-8970-0853c03f3fe0",
+      "copies": 1.0
+    },
+    {
+      "list_name": "Test Dreamwell Basic 5",
+      "list_type": "DreamwellCardId",
+      "card_id": "d386663c-9e9f-4b8e-b410-f3467e39801b",
+      "copies": 1.0
+    },
+    {
+      "list_name": "Test Dreamwell Basic 5",
+      "list_type": "DreamwellCardId",
+      "card_id": "107c3b3f-6131-4ff8-afcb-f0ce4188848f",
+      "copies": 1.0
+    },
+    {
+      "list_name": "Test Dreamwell Basic 5",
+      "list_type": "DreamwellCardId",
+      "card_id": "40e4381f-12f7-46b9-ae50-67b3195781b1",
+      "copies": 1.0
+    },
+    {
+      "list_name": "Test Dreamwell Basic 5",
+      "list_type": "DreamwellCardId",
+      "card_id": "a2cdf115-8e1a-455e-a118-123f6f36c7ba",
+      "copies": 1.0
     }
   ]
 }

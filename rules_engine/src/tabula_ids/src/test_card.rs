@@ -122,10 +122,13 @@ pub const TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY: BaseCardId =
 pub const TEST_RETURN_TO_HAND: BaseCardId =
     BaseCardId(uuid!("cf2f292b-f02c-4130-aff7-3f48fd147633"));
 
-pub const DREAMWELL_VANILLA_1: DreamwellCardId =
+pub const DREAMWELL_PRODUCE_0: DreamwellCardId =
+    DreamwellCardId(uuid!("146ae27e-a8ac-4f3c-aef2-cf2211e4bcfe"));
+
+pub const DREAMWELL_PRODUCE_1: DreamwellCardId =
     DreamwellCardId(uuid!("ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2"));
 
-pub const DREAMWELL_VANILLA_2: DreamwellCardId =
+pub const DREAMWELL_PRODUCE_2: DreamwellCardId =
     DreamwellCardId(uuid!("308fd4c0-ca98-4bfa-a9be-c29b36a145fd"));
 
 /// {-Foresee(n:1)}.
@@ -182,8 +185,9 @@ pub const ALL_TEST_CARD_IDS: &[BaseCardId] = &[
 ];
 
 pub const ALL_TEST_DREAMWELL_CARD_IDS: &[DreamwellCardId] = &[
-    DREAMWELL_VANILLA_1,
-    DREAMWELL_VANILLA_2,
+    DREAMWELL_PRODUCE_0,
+    DREAMWELL_PRODUCE_1,
+    DREAMWELL_PRODUCE_2,
     DREAMWELL_FORESEE,
     DREAMWELL_GAIN_POINTS,
     DREAMWELL_GAIN_ENERGY,

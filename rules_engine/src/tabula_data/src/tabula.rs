@@ -10,6 +10,7 @@ use crate::card_definitions::card_definition_builder;
 use crate::card_definitions::dreamwell_card_definition::{
     DreamwellCardDefinition, DreamwellCardDefinitionRaw,
 };
+use crate::card_lists::card_list_row::CardListRow;
 use crate::localized_strings;
 use crate::localized_strings::{LanguageId, LocalizedStringSetRaw, LocalizedStrings, StringId};
 use crate::tabula_table::Table;
@@ -30,6 +31,7 @@ pub struct Tabula {
     pub strings: LocalizedStrings,
     pub test_cards: BTreeMap<BaseCardId, CardDefinition>,
     pub dreamwell_cards: BTreeMap<DreamwellCardId, DreamwellCardDefinition>,
+    pub card_lists: Vec<CardListRow>,
 }
 
 /// Context for building a [Tabula] struct from a [TabulaRaw] struct.
@@ -49,6 +51,8 @@ pub struct TabulaRaw {
     pub test_cards: Table<BaseCardId, BaseCardDefinitionRaw>,
     #[serde(default)]
     pub dreamwell_cards: Table<DreamwellCardId, DreamwellCardDefinitionRaw>,
+    #[serde(default)]
+    pub card_lists: Vec<CardListRow>,
 }
 
 pub fn build(
@@ -63,5 +67,6 @@ pub fn build(
         context,
         &raw.dreamwell_cards,
     )?;
-    Ok(Tabula { strings, test_cards, dreamwell_cards })
+
+    Ok(Tabula { strings, test_cards, dreamwell_cards, card_lists: raw.card_lists.clone() })
 }

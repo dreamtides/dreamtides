@@ -29,6 +29,8 @@ pub struct Args {
     string_ids: Option<String>,
     #[arg(long, value_name = "PATH", help = "Generate test_card_id.rs at the given path")]
     test_card_ids: Option<String>,
+    #[arg(long, value_name = "PATH", help = "Generate card_lists.rs at the given path")]
+    card_lists: Option<String>,
     #[arg(
         long,
         value_name = "PATH",
@@ -104,6 +106,10 @@ async fn main() -> Result<()> {
             &tabula_raw,
         )
         .context("failed to serialize Tabula to JSON")?;
+    }
+
+    if let Some(path) = args.card_lists.as_deref() {
+        tabula_codegen::generate_card_lists(&tabula_raw, path)?;
     }
 
     Ok(())
