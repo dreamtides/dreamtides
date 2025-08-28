@@ -15,7 +15,7 @@ pub enum SaveFile {
 impl SaveFile {
     pub fn id(&self) -> UserId {
         match self {
-            SaveFile::V1(v2) => v2.id,
+            SaveFile::V1(v1) => v1.id,
         }
     }
 }

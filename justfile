@@ -23,6 +23,9 @@ check-warnings:
 build:
     cargo build --manifest-path rules_engine/Cargo.toml --all-targets --all-features
 
+build-release:
+    cargo build --manifest-path rules_engine/Cargo.toml --release --all-targets --all-features
+
 build-timed:
     cargo build --manifest-path rules_engine/Cargo.toml --timings --all-targets --all-features
 

@@ -21,7 +21,7 @@ pub struct TestStateProvider {
 }
 
 struct TestStateProviderInner {
-    save_files: Mutex<HashMap<String, HashMap<UserId, SaveFile>>>,
+    save_files: Mutex<HashMap<UserId, SaveFile>>,
     request_contexts: Mutex<HashMap<UserId, RequestContext>>,
     request_timestamps: Mutex<HashMap<Option<Uuid>, Instant>>,
     last_response_versions: Mutex<HashMap<UserId, Uuid>>,
@@ -57,7 +57,7 @@ impl Default for TestStateProvider {
 impl StateProvider for TestStateProvider {
     fn initialize(
         &self,
-        persistent_data_path: &str,
+        _persistent_data_path: &str,
         streaming_assets_path: &str,
     ) -> Result<(), Vec<InitializationError>> {
         let tabula_path = format!("{streaming_assets_path}/tabula.json");
@@ -95,14 +95,6 @@ impl StateProvider for TestStateProvider {
         if let Ok(mut guard) = self.inner.tabula.write() {
             *guard = Some(Arc::new(tabula));
         }
-        let mut databases = self.inner.save_files.lock().map_err(|e| {
-            vec![InitializationError::with_details(
-                ErrorCode::MutexLockError,
-                "Failed to acquire lock".to_string(),
-                e.to_string(),
-            )]
-        })?;
-        databases.entry(persistent_data_path.to_string()).or_default();
         Ok(())
     }
 
@@ -110,37 +102,33 @@ impl StateProvider for TestStateProvider {
         &self,
         user_id: UserId,
     ) -> Result<Option<SaveFile>, Vec<InitializationError>> {
-        let save_files = self.inner.save_files.lock().map_err(|e| {
-            vec![InitializationError::with_details(
-                ErrorCode::MutexLockError,
-                "Failed to acquire lock".to_string(),
-                e.to_string(),
-            )]
-        })?;
-        let db = save_files.values().next().ok_or_else(|| {
-            vec![InitializationError::with_name(
-                ErrorCode::NotInitializedError,
-                "No save file initialized".to_string(),
-            )]
-        })?;
-        Ok(db.get(&user_id).cloned())
+        Ok(self
+            .inner
+            .save_files
+            .lock()
+            .map_err(|e| {
+                vec![InitializationError::with_details(
+                    ErrorCode::MutexLockError,
+                    "Failed to acquire lock".to_string(),
+                    e.to_string(),
+                )]
+            })?
+            .get(&user_id)
+            .cloned())
     }
 
     fn write_save_file(&self, save: SaveFile) -> Result<(), Vec<InitializationError>> {
-        let mut save_files = self.inner.save_files.lock().map_err(|e| {
-            vec![InitializationError::with_details(
-                ErrorCode::MutexLockError,
-                "Failed to acquire lock".to_string(),
-                e.to_string(),
-            )]
-        })?;
-        let db = save_files.values_mut().next().ok_or_else(|| {
-            vec![InitializationError::with_name(
-                ErrorCode::NotInitializedError,
-                "No database initialized".to_string(),
-            )]
-        })?;
-        db.insert(save.id(), save);
+        self.inner
+            .save_files
+            .lock()
+            .map_err(|e| {
+                vec![InitializationError::with_details(
+                    ErrorCode::MutexLockError,
+                    "Failed to acquire lock".to_string(),
+                    e.to_string(),
+                )]
+            })?
+            .insert(save.id(), save);
         Ok(())
     }
 
