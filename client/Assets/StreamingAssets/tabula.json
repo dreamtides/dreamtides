@@ -1931,7 +1931,7 @@
       "name_en_us": "Autumn Glade",
       "energy_produced": "1",
       "rules_text_en_us": "Gain {-gained-points(n: 2)}.",
-      "phase": null,
+      "phase": "1",
       "is_test_card": false,
       "abilities": [
         {
@@ -1965,7 +1965,7 @@
       "name_en_us": "Twilight Radiance",
       "energy_produced": "1",
       "rules_text_en_us": "Gain {-gained-energy(e: 1)}.",
-      "phase": null,
+      "phase": "1",
       "is_test_card": false,
       "abilities": [
         {
@@ -1999,7 +1999,7 @@
       "name_en_us": "Astral Interface",
       "energy_produced": "1",
       "rules_text_en_us": "Draw {-drawn-cards(n: 1)}. Discard {-discarded-cards(n: 1)}.",
-      "phase": null,
+      "phase": "1",
       "is_test_card": false,
       "abilities": [
         {
@@ -2051,7 +2051,7 @@
       "name_en_us": "Shadow Passage",
       "energy_produced": "1",
       "rules_text_en_us": "Put the top {-count(n: 3)} cards of your deck into your void.",
-      "phase": null,
+      "phase": "1",
       "is_test_card": false,
       "abilities": [
         {
@@ -2085,7 +2085,7 @@
       "name_en_us": "Dreamwell Produce 0",
       "energy_produced": "0",
       "rules_text_en_us": " ",
-      "phase": "0",
+      "phase": "1",
       "is_test_card": true,
       "abilities": [],
       "displayed_abilities": [],
@@ -2096,7 +2096,7 @@
       "name_en_us": "Dreamwell Produce 1",
       "energy_produced": "1",
       "rules_text_en_us": " ",
-      "phase": "0",
+      "phase": "1",
       "is_test_card": true,
       "abilities": [],
       "displayed_abilities": [],
@@ -2104,7 +2104,7 @@
     },
     {
       "id": "308fd4c0-ca98-4bfa-a9be-c29b36a145fd",
-      "name_en_us": "Dreamwell Produce 2",
+      "name_en_us": "Dreamwell Produce 2 Starter",
       "energy_produced": "2",
       "rules_text_en_us": " ",
       "phase": "0",
@@ -2152,7 +2152,7 @@
       "name_en_us": "Dreamwell Gain Points",
       "energy_produced": "1",
       "rules_text_en_us": "Gain {-gained-points(n: 2)}.",
-      "phase": null,
+      "phase": "1",
       "is_test_card": true,
       "abilities": [
         {
@@ -2186,7 +2186,7 @@
       "name_en_us": "Dreamwell Gain Energy",
       "energy_produced": "1",
       "rules_text_en_us": "Gain {-gained-energy(e: 1)}.",
-      "phase": null,
+      "phase": "1",
       "is_test_card": true,
       "abilities": [
         {
@@ -2220,7 +2220,7 @@
       "name_en_us": "Dreamwell Draw Discard",
       "energy_produced": "1",
       "rules_text_en_us": "Draw {-drawn-cards(n: 1)}. Discard {-discarded-cards(n: 1)}.",
-      "phase": null,
+      "phase": "1",
       "is_test_card": true,
       "abilities": [
         {
@@ -2272,7 +2272,7 @@
       "name_en_us": "Dreamwell Mill 3",
       "energy_produced": "1",
       "rules_text_en_us": "Put the top {-count(n: 3)} cards of your deck into your void.",
-      "phase": null,
+      "phase": "1",
       "is_test_card": true,
       "abilities": [
         {
@@ -2303,6 +2303,12 @@
     }
   ],
   "card_lists": [
+    {
+      "list_name": "Test Dreamwell No Abilities",
+      "list_type": "DreamwellCardId",
+      "card_id": "308fd4c0-ca98-4bfa-a9be-c29b36a145fd",
+      "copies": 2.0
+    },
     {
       "list_name": "Test Dreamwell No Abilities",
       "list_type": "DreamwellCardId",

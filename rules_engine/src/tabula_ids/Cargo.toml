@@ -15,4 +15,6 @@ bench = false
 core_data = { path = "../core_data" }
 tabula_data = { path = "../tabula_data" }
 
+schemars = { workspace = true }
+serde = { workspace = true }
 uuid = { workspace = true }

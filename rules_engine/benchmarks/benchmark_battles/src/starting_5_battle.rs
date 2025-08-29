@@ -35,6 +35,7 @@ use rand_xoshiro::Xoshiro256PlusPlus;
 use state_provider::display_state_provider::DisplayStateProvider;
 use state_provider::state_provider::StateProvider;
 use state_provider::test_state_provider::TestStateProvider;
+use tabula_ids::card_lists::DreamwellCardIdList;
 use tabula_ids::test_card;
 use uuid::Uuid;
 
@@ -326,7 +327,10 @@ pub fn benchmark_battle() -> BattleState {
         seed,
         rng: Xoshiro256PlusPlus::seed_from_u64(seed),
         prompts: VecDeque::new(),
-        dreamwell: Dreamwell::default(),
+        dreamwell: Dreamwell::from_card_list(
+            &provider.tabula(),
+            DreamwellCardIdList::TestDreamwellNoAbilities,
+        ),
         triggers: TriggerState::default(),
         activated_abilities: PlayerMap::default(),
         ability_state: AbilityState::default(),

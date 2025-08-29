@@ -15,6 +15,7 @@ fn counterspell_unless_pays_cost() {
     s.end_turn_remove_opponent_hand(DisplayPlayer::User);
 
     let initial_enemy_energy = s.user_client.opponent.energy();
+    assert_eq!(initial_enemy_energy, Energy(101), "enemy energy should be 101");
 
     let event_id = s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_DISSOLVE);
     let event_cost = s.user_client.cards.get_cost(&event_id);

@@ -10,7 +10,7 @@ use core_data::numerics::TurnId;
 use core_data::types::PlayerName;
 
 use crate::card_mutations::battle_deck;
-use crate::phase_mutations::{dreamwell, fire_triggers, judgment};
+use crate::phase_mutations::{dreamwell_phase, fire_triggers, judgment_phase};
 
 /// End the current player's turn.
 ///
@@ -41,8 +41,8 @@ pub fn start_turn(battle: &mut BattleState, player: PlayerName) {
     }
 
     battle.push_animation(source, || BattleAnimation::StartTurn { player });
-    judgment::run(battle, battle.turn.active_player, source);
-    dreamwell::activate(battle, battle.turn.active_player, source);
+    judgment_phase::run(battle, battle.turn.active_player, source);
+    dreamwell_phase::activate(battle, battle.turn.active_player, source);
     battle.phase = BattleTurnPhase::Draw;
 
     if battle.turn.turn_id != TurnId(1) {

@@ -341,7 +341,9 @@ fn load_battle_from_provider<P: StateProvider + 'static>(
                 seed,
                 Dreamwell::from_card_list(
                     &provider.tabula(),
-                    DreamwellCardIdList::TestDreamwellNoAbilities,
+                    configuration
+                        .dreamwell_override
+                        .unwrap_or(DreamwellCardIdList::TestDreamwellNoAbilities),
                 ),
                 CreateBattlePlayer { player_type: PlayerType::User(user_id), deck_name },
                 CreateBattlePlayer { player_type: enemy, deck_name },

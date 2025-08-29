@@ -919,6 +919,7 @@ dependencies = [
  "schemars 1.0.2",
  "serde",
  "strum",
+ "tabula_ids",
  "ui_components",
  "uuid",
 ]
@@ -2988,6 +2989,8 @@ name = "tabula_ids"
 version = "0.0.0"
 dependencies = [
  "core_data",
+ "schemars 1.0.2",
+ "serde",
  "tabula_data",
  "uuid",
 ]
@@ -3027,6 +3030,7 @@ dependencies = [
  "schemars 1.0.2",
  "serde",
  "state_provider",
+ "tabula_ids",
  "tokio",
  "tracing",
  "tracing-subscriber",

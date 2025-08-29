@@ -1,6 +1,9 @@
 use core_data::identifiers::DreamwellCardId;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 use uuid::uuid;
 
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub enum DreamwellCardIdList {
     TestDreamwellNoAbilities,
     TestDreamwellBasic5,
@@ -24,6 +27,8 @@ pub const TEST_DREAMWELL_BASIC_5: &[DreamwellCardId] = &[
 ];
 
 pub const TEST_DREAMWELL_NO_ABILITIES: &[DreamwellCardId] = &[
+    DreamwellCardId(uuid!("308fd4c0-ca98-4bfa-a9be-c29b36a145fd")),
+    DreamwellCardId(uuid!("308fd4c0-ca98-4bfa-a9be-c29b36a145fd")),
     DreamwellCardId(uuid!("ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2")),
     DreamwellCardId(uuid!("ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2")),
     DreamwellCardId(uuid!("ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2")),

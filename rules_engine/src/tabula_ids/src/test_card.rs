@@ -128,7 +128,7 @@ pub const DREAMWELL_PRODUCE_0: DreamwellCardId =
 pub const DREAMWELL_PRODUCE_1: DreamwellCardId =
     DreamwellCardId(uuid!("ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2"));
 
-pub const DREAMWELL_PRODUCE_2: DreamwellCardId =
+pub const DREAMWELL_PRODUCE_2_STARTER: DreamwellCardId =
     DreamwellCardId(uuid!("308fd4c0-ca98-4bfa-a9be-c29b36a145fd"));
 
 /// {-Foresee(n:1)}.
@@ -187,7 +187,7 @@ pub const ALL_TEST_CARD_IDS: &[BaseCardId] = &[
 pub const ALL_TEST_DREAMWELL_CARD_IDS: &[DreamwellCardId] = &[
     DREAMWELL_PRODUCE_0,
     DREAMWELL_PRODUCE_1,
-    DREAMWELL_PRODUCE_2,
+    DREAMWELL_PRODUCE_2_STARTER,
     DREAMWELL_FORESEE,
     DREAMWELL_GAIN_POINTS,
     DREAMWELL_GAIN_ENERGY,

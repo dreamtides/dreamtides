@@ -10,6 +10,7 @@ use display_data::request_data::{
 };
 use rules_engine::engine;
 use state_provider::test_state_provider::TestStateProvider;
+use tabula_ids::card_lists::DreamwellCardIdList;
 use uuid::Uuid;
 
 use crate::client::test_client::TestClient;
@@ -91,6 +92,7 @@ impl TestSession {
                     enemy: opponent.clone(),
                     seed: self.seed.or(Some(314159265358979323)),
                     deck_override: Some(TestDeckName::Vanilla),
+                    dreamwell_override: Some(DreamwellCardIdList::TestDreamwellNoAbilities),
                 }),
             },
             self.request_context(),
