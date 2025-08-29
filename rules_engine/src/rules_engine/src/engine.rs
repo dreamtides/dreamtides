@@ -19,7 +19,6 @@ use battle_state::battle_player::battle_player_state::{
 use core_data::identifiers::{BattleId, QuestId, UserId};
 use core_data::initialization_error::InitializationError;
 use core_data::types::PlayerName;
-use database::save_file::SaveFile;
 use display::display_actions::apply_battle_display_action;
 use display::rendering::renderer;
 use display_data::command::CommandSequence;
@@ -479,7 +478,7 @@ fn perform_action_internal<P: StateProvider + 'static>(
         };
 
         battle.animations = Some(AnimationData::default());
-        handle_request_action(provider, request, user_id, save, &mut battle, request_id);
+        handle_request_action(provider, request, user_id, &mut battle, request_id);
 
         if let Err(errors) =
             provider.write_save_file(serialize_save_file::battle(save_file_id, quest_id, &battle))
@@ -540,7 +539,6 @@ fn handle_request_action<P: StateProvider + 'static>(
     provider: &P,
     request: &PerformActionRequest,
     user_id: UserId,
-    save: SaveFile,
     battle: &mut BattleState,
     request_id: Option<Uuid>,
 ) {
@@ -596,8 +594,8 @@ fn handle_request_action<P: StateProvider + 'static>(
             );
         }
         GameAction::Undo(player) => {
-            let Some((undone_battle, _)) =
-                undo::undo(provider, &save, *player, request_context.clone())
+            let Some(undone_battle) =
+                undo::undo(provider, &*battle, *player, request_context.clone())
             else {
                 show_error_message(
                     provider,
