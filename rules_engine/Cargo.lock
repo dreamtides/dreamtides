@@ -2466,6 +2466,8 @@ dependencies = [
  "serde",
  "serde_json",
  "state_provider",
+ "tabula_data",
+ "tabula_ids",
  "tracing",
  "tracing-subscriber",
  "uuid",

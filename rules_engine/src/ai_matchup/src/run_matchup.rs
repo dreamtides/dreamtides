@@ -6,6 +6,7 @@ use battle_mutations::actions::apply_battle_action;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
 use battle_state::battle::battle_status::BattleStatus;
+use battle_state::battle_cards::dreamwell::Dreamwell;
 use battle_state::battle_player::battle_player_state::{
     CreateBattlePlayer, PlayerType, TestDeckName,
 };
@@ -17,6 +18,7 @@ use serde_json::from_str;
 use state_provider::display_state_provider::DisplayStateProvider;
 use state_provider::state_provider::StateProvider;
 use state_provider::test_state_provider::TestStateProvider;
+use tabula_ids::card_lists::DreamwellCardIdList;
 use tracing::{debug, subscriber};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::{EnvFilter, Layer};
@@ -151,6 +153,10 @@ fn run_match(
         battle_id,
         provider.tabula(),
         seed,
+        Dreamwell::from_card_list(
+            &provider.tabula(),
+            DreamwellCardIdList::TestDreamwellNoAbilities,
+        ),
         CreateBattlePlayer { player_type: battle_ai_one, deck_name: TestDeckName::StartingFive },
         CreateBattlePlayer { player_type: battle_ai_two, deck_name: TestDeckName::StartingFive },
         RequestContext { logging_options: LoggingOptions::default() },

@@ -46,6 +46,7 @@ where
                 saved_battle.id,
                 provider.tabula(),
                 saved_battle.seed,
+                saved_battle.dreamwell.clone(),
                 saved_battle.players.one.as_create_battle_player(),
                 saved_battle.players.two.as_create_battle_player(),
                 request_context,

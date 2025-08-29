@@ -39,6 +39,7 @@ pub fn create_and_start(
     id: BattleId,
     tabula: Arc<Tabula>,
     seed: u64,
+    _dreamwell: Dreamwell,
     player_one: CreateBattlePlayer,
     player_two: CreateBattlePlayer,
     request_context: RequestContext,

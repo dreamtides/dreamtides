@@ -12,6 +12,7 @@ use battle_queries::battle_trace;
 use battle_queries::macros::write_tracing_event;
 use battle_state::battle::animation_data::AnimationData;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
+use battle_state::battle_cards::dreamwell::Dreamwell;
 use battle_state::battle_player::battle_player_state::{
     CreateBattlePlayer, PlayerType, TestDeckName,
 };
@@ -30,6 +31,7 @@ use game_creation::new_battle;
 use rand::RngCore;
 use state_provider::state_provider::{DefaultStateProvider, PollResult, StateProvider};
 use state_provider::test_state_provider::TestStateProvider;
+use tabula_ids::card_lists::DreamwellCardIdList;
 use tokio::task;
 use tracing::{Level, debug, error, info, warn};
 use ui_components::display_properties;
@@ -338,6 +340,10 @@ fn load_battle_from_provider<P: StateProvider + 'static>(
                 battle_id,
                 provider.tabula(),
                 seed,
+                Dreamwell::from_card_list(
+                    &provider.tabula(),
+                    DreamwellCardIdList::TestDreamwellNoAbilities,
+                ),
                 CreateBattlePlayer { player_type: PlayerType::User(user_id), deck_name },
                 CreateBattlePlayer { player_type: enemy, deck_name },
                 request_context,

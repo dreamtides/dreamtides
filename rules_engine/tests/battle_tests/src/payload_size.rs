@@ -3,6 +3,7 @@ use std::collections::BTreeMap;
 use ai_data::game_ai::GameAI;
 use battle_mutations::card_mutations::{battle_deck, move_card};
 use battle_state::battle::battle_state::{BattleState, LoggingOptions, RequestContext};
+use battle_state::battle_cards::dreamwell::Dreamwell;
 use battle_state::battle_player::battle_player_state::{
     CreateBattlePlayer, PlayerType, TestDeckName,
 };
@@ -15,6 +16,7 @@ use game_creation::new_test_battle;
 use state_provider::display_state_provider::DisplayStateProvider;
 use state_provider::state_provider::StateProvider;
 use state_provider::test_state_provider::TestStateProvider;
+use tabula_ids::card_lists::DreamwellCardIdList;
 use tabula_ids::test_card;
 use uuid::Uuid;
 use {logging, serde_json};
@@ -40,6 +42,10 @@ fn create_500_card_battle_json() -> ConnectResponse {
         battle_id,
         provider.tabula(),
         seed,
+        Dreamwell::from_card_list(
+            &provider.tabula(),
+            DreamwellCardIdList::TestDreamwellNoAbilities,
+        ),
         CreateBattlePlayer {
             player_type: PlayerType::User(user_id),
             deck_name: TestDeckName::CoreEleven,

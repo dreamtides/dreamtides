@@ -1,4 +1,5 @@
 use battle_state::battle::battle_state::{BattleState, RequestContext};
+use battle_state::battle_cards::dreamwell::Dreamwell;
 use battle_state::battle_player::battle_player_state::{
     CreateBattlePlayer, PlayerType, TestDeckName,
 };
@@ -10,6 +11,7 @@ use display_data::command::{Command, CommandSequence, UpdateBattleCommand};
 use game_creation::new_battle;
 use masonry::flex_enums::{TextAlign, WhiteSpace};
 use state_provider::state_provider::{DefaultStateProvider, StateProvider};
+use tabula_ids::card_lists::DreamwellCardIdList;
 use tabula_ids::string_id;
 use ui_components::component::Component;
 use ui_components::panel_component::PanelComponent;
@@ -38,6 +40,10 @@ where
                 id,
                 provider.tabula(),
                 0,
+                Dreamwell::from_card_list(
+                    &provider.tabula(),
+                    DreamwellCardIdList::TestDreamwellNoAbilities,
+                ),
                 CreateBattlePlayer {
                     player_type: PlayerType::User(UserId::default()),
                     deck_name: TestDeckName::StartingFive,

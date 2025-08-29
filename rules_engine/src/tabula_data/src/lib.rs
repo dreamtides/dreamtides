@@ -1,5 +1,5 @@
 pub mod card_definitions;
-pub mod card_lists;
+pub mod card_list_data;
 pub mod localized_strings;
 pub mod tabula;
 pub mod tabula_primitives;

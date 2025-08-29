@@ -29,6 +29,7 @@ pub fn execute<P>(
                 battle.id,
                 provider.tabula(),
                 seed,
+                battle.dreamwell.clone(),
                 battle.players.one.as_create_battle_player(),
                 battle.players.two.as_create_battle_player(),
                 battle.request_context.clone(),
@@ -40,6 +41,7 @@ pub fn execute<P>(
                 battle.id,
                 provider.tabula(),
                 seed,
+                battle.dreamwell.clone(),
                 CreateBattlePlayer {
                     player_type: battle.players.one.player_type.clone(),
                     deck_name: one,

@@ -10,7 +10,7 @@ use crate::card_definitions::card_definition_builder;
 use crate::card_definitions::dreamwell_card_definition::{
     DreamwellCardDefinition, DreamwellCardDefinitionRaw,
 };
-use crate::card_lists::card_list_row::CardListRow;
+use crate::card_list_data::card_list_row::CardListRow;
 use crate::localized_strings;
 use crate::localized_strings::{LanguageId, LocalizedStringSetRaw, LocalizedStrings, StringId};
 use crate::tabula_table::Table;

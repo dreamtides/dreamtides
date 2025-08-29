@@ -22,6 +22,8 @@ core_data = { path = "../core_data" }
 game_creation = { path = "../game_creation" }
 logging = { path = "../logging" }
 state_provider = { path = "../state_provider" }
+tabula_data = { path = "../tabula_data" }
+tabula_ids = { path = "../tabula_ids" }
 
 clap = { workspace = true }
 rand = { workspace = true }

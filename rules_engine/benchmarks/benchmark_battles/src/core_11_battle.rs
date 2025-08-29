@@ -8,6 +8,7 @@ use battle_queries::battle_card_queries::{card, card_abilities};
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::battle::battle_card_definitions::BattleCardDefinitions;
 use battle_state::battle::battle_state::{BattleState, LoggingOptions, RequestContext};
+use battle_state::battle_cards::dreamwell::Dreamwell;
 use battle_state::battle_player::battle_player_state::{
     CreateBattlePlayer, PlayerType, TestDeckName,
 };
@@ -18,6 +19,7 @@ use game_creation::new_test_battle;
 use state_provider::display_state_provider::DisplayStateProvider;
 use state_provider::state_provider::StateProvider;
 use state_provider::test_state_provider::TestStateProvider;
+use tabula_ids::card_lists::DreamwellCardIdList;
 use uuid::Uuid;
 
 static BATTLE_ONCE: OnceLock<BattleState> = OnceLock::new();
@@ -88,6 +90,10 @@ fn generate_core_11_battle_with_logging(enable_logging: bool) -> BattleState {
         BattleId(Uuid::new_v4()),
         provider.tabula(),
         seed,
+        Dreamwell::from_card_list(
+            &provider.tabula(),
+            DreamwellCardIdList::TestDreamwellNoAbilities,
+        ),
         CreateBattlePlayer {
             player_type: PlayerType::Agent(GameAI::AlwaysPanic),
             deck_name: TestDeckName::CoreEleven,
