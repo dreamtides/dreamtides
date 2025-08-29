@@ -141,6 +141,12 @@ namespace Dreamtides.Schema
         public TestDeckName? DeckOverride { get; set; }
 
         /// <summary>
+        /// If specified, the battle will be created with the given dreamwell.
+        /// </summary>
+        [JsonProperty("dreamwell_override")]
+        public DreamwellCardIdList? DreamwellOverride { get; set; }
+
+        /// <summary>
         /// If specified, the enemy will be this player type.
         /// </summary>
         [JsonProperty("enemy")]
@@ -2269,6 +2275,8 @@ namespace Dreamtides.Schema
 
     public enum TestDeckName { CoreEleven, StartingFive, Vanilla };
 
+    public enum DreamwellCardIdList { TestDreamwellBasic5, TestDreamwellNoAbilities };
+
     public enum GameAiEnum { AlwaysPanic, FirstAvailableAction, RandomAction, WaitFiveSeconds };
 
     /// <summary>
@@ -2586,6 +2594,7 @@ namespace Dreamtides.Schema
                 LogTypeConverter.Singleton,
                 LogSpanNameConverter.Singleton,
                 TestDeckNameConverter.Singleton,
+                DreamwellCardIdListConverter.Singleton,
                 GameAiConverter.Singleton,
                 GameAiEnumConverter.Singleton,
                 DisplayPlayerConverter.Singleton,
@@ -2805,6 +2814,47 @@ namespace Dreamtides.Schema
         }
 
         public static readonly TestDeckNameConverter Singleton = new TestDeckNameConverter();
+    }
+
+    internal class DreamwellCardIdListConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(DreamwellCardIdList) || t == typeof(DreamwellCardIdList?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "TestDreamwellBasic5":
+                    return DreamwellCardIdList.TestDreamwellBasic5;
+                case "TestDreamwellNoAbilities":
+                    return DreamwellCardIdList.TestDreamwellNoAbilities;
+            }
+            throw new Exception("Cannot unmarshal type DreamwellCardIdList");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (DreamwellCardIdList)untypedValue;
+            switch (value)
+            {
+                case DreamwellCardIdList.TestDreamwellBasic5:
+                    serializer.Serialize(writer, "TestDreamwellBasic5");
+                    return;
+                case DreamwellCardIdList.TestDreamwellNoAbilities:
+                    serializer.Serialize(writer, "TestDreamwellNoAbilities");
+                    return;
+            }
+            throw new Exception("Cannot marshal type DreamwellCardIdList");
+        }
+
+        public static readonly DreamwellCardIdListConverter Singleton = new DreamwellCardIdListConverter();
     }
 
     internal class GameAiConverter : JsonConverter
