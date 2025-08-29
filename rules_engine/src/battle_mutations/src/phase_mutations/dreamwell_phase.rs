@@ -10,7 +10,7 @@ use crate::player_mutations::energy;
 pub fn activate(battle: &mut BattleState, player: PlayerName, source: EffectSource) {
     battle.phase = BattleTurnPhase::Dreamwell;
     let card = dreamwell_deck::draw(battle);
-    let new_produced_energy = battle.players.player(player).produced_energy + card.energy_produced;
+    let new_produced_energy = battle.players.player(player).produced_energy + card.produced_energy;
     energy::set_produced(battle, player, source, new_produced_energy);
     energy::set(battle, player, source, new_produced_energy);
 }

@@ -1,5 +1,5 @@
 {
-  "id": "c8484e6d-e277-4fc5-8d67-57ca4c412eaf",
+  "id": "07ac55e7-0ab7-4cc5-b337-dbef9d95e864",
   "cards": {
     "cards": [
       {
@@ -1408,7 +1408,7 @@
         42
       ],
       "quest": {
-        "id": "6da7983b-6914-4a1c-b439-81a3ba08ff57",
+        "id": "8f5a8b1a-7c19-48ce-9d3e-2a6cc7188369",
         "user": {
           "id": "00000000-0000-0000-0000-000000000000"
         },
@@ -3609,7 +3609,7 @@
         85
       ],
       "quest": {
-        "id": "5055365e-07a6-46c9-8634-f0581de6f950",
+        "id": "22f3b832-9dbc-44fb-a796-4282cc972d5c",
         "user": {
           "id": "00000000-0000-0000-0000-000000000000"
         },
@@ -5776,171 +5776,195 @@
   "dreamwell": {
     "cards": [
       {
-        "base_card_id": "308fd4c0-ca98-4bfa-a9be-c29b36a145fd",
-        "displayed_name": "Dreamwell Produce 2 Starter",
-        "energy_produced": 2,
-        "abilities": [],
-        "displayed_abilities": [],
-        "displayed_rules_text": " ",
-        "displayed_prompts": [],
-        "phase": 0,
-        "is_test_card": true,
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+        "definition": {
+          "base_card_id": "308fd4c0-ca98-4bfa-a9be-c29b36a145fd",
+          "displayed_name": "Dreamwell Produce 2 Starter",
+          "energy_produced": 2,
+          "abilities": [],
+          "displayed_abilities": [],
+          "displayed_rules_text": " ",
+          "displayed_prompts": [],
+          "phase": 0,
+          "is_test_card": true,
+          "image": {
+            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+          }
         }
       },
       {
-        "base_card_id": "308fd4c0-ca98-4bfa-a9be-c29b36a145fd",
-        "displayed_name": "Dreamwell Produce 2 Starter",
-        "energy_produced": 2,
-        "abilities": [],
-        "displayed_abilities": [],
-        "displayed_rules_text": " ",
-        "displayed_prompts": [],
-        "phase": 0,
-        "is_test_card": true,
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+        "definition": {
+          "base_card_id": "308fd4c0-ca98-4bfa-a9be-c29b36a145fd",
+          "displayed_name": "Dreamwell Produce 2 Starter",
+          "energy_produced": 2,
+          "abilities": [],
+          "displayed_abilities": [],
+          "displayed_rules_text": " ",
+          "displayed_prompts": [],
+          "phase": 0,
+          "is_test_card": true,
+          "image": {
+            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+          }
         }
       },
       {
-        "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
-        "displayed_name": "Dreamwell Produce 1",
-        "energy_produced": 1,
-        "abilities": [],
-        "displayed_abilities": [],
-        "displayed_rules_text": " ",
-        "displayed_prompts": [],
-        "phase": 1,
-        "is_test_card": true,
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+        "definition": {
+          "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
+          "displayed_name": "Dreamwell Produce 1",
+          "energy_produced": 1,
+          "abilities": [],
+          "displayed_abilities": [],
+          "displayed_rules_text": " ",
+          "displayed_prompts": [],
+          "phase": 1,
+          "is_test_card": true,
+          "image": {
+            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+          }
         }
       },
       {
-        "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
-        "displayed_name": "Dreamwell Produce 1",
-        "energy_produced": 1,
-        "abilities": [],
-        "displayed_abilities": [],
-        "displayed_rules_text": " ",
-        "displayed_prompts": [],
-        "phase": 1,
-        "is_test_card": true,
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+        "definition": {
+          "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
+          "displayed_name": "Dreamwell Produce 1",
+          "energy_produced": 1,
+          "abilities": [],
+          "displayed_abilities": [],
+          "displayed_rules_text": " ",
+          "displayed_prompts": [],
+          "phase": 1,
+          "is_test_card": true,
+          "image": {
+            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+          }
         }
       },
       {
-        "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
-        "displayed_name": "Dreamwell Produce 1",
-        "energy_produced": 1,
-        "abilities": [],
-        "displayed_abilities": [],
-        "displayed_rules_text": " ",
-        "displayed_prompts": [],
-        "phase": 1,
-        "is_test_card": true,
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+        "definition": {
+          "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
+          "displayed_name": "Dreamwell Produce 1",
+          "energy_produced": 1,
+          "abilities": [],
+          "displayed_abilities": [],
+          "displayed_rules_text": " ",
+          "displayed_prompts": [],
+          "phase": 1,
+          "is_test_card": true,
+          "image": {
+            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+          }
         }
       },
       {
-        "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
-        "displayed_name": "Dreamwell Produce 1",
-        "energy_produced": 1,
-        "abilities": [],
-        "displayed_abilities": [],
-        "displayed_rules_text": " ",
-        "displayed_prompts": [],
-        "phase": 1,
-        "is_test_card": true,
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+        "definition": {
+          "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
+          "displayed_name": "Dreamwell Produce 1",
+          "energy_produced": 1,
+          "abilities": [],
+          "displayed_abilities": [],
+          "displayed_rules_text": " ",
+          "displayed_prompts": [],
+          "phase": 1,
+          "is_test_card": true,
+          "image": {
+            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+          }
         }
       },
       {
-        "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
-        "displayed_name": "Dreamwell Produce 1",
-        "energy_produced": 1,
-        "abilities": [],
-        "displayed_abilities": [],
-        "displayed_rules_text": " ",
-        "displayed_prompts": [],
-        "phase": 1,
-        "is_test_card": true,
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+        "definition": {
+          "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
+          "displayed_name": "Dreamwell Produce 1",
+          "energy_produced": 1,
+          "abilities": [],
+          "displayed_abilities": [],
+          "displayed_rules_text": " ",
+          "displayed_prompts": [],
+          "phase": 1,
+          "is_test_card": true,
+          "image": {
+            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+          }
         }
       },
       {
-        "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
-        "displayed_name": "Dreamwell Produce 1",
-        "energy_produced": 1,
-        "abilities": [],
-        "displayed_abilities": [],
-        "displayed_rules_text": " ",
-        "displayed_prompts": [],
-        "phase": 1,
-        "is_test_card": true,
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+        "definition": {
+          "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
+          "displayed_name": "Dreamwell Produce 1",
+          "energy_produced": 1,
+          "abilities": [],
+          "displayed_abilities": [],
+          "displayed_rules_text": " ",
+          "displayed_prompts": [],
+          "phase": 1,
+          "is_test_card": true,
+          "image": {
+            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+          }
         }
       },
       {
-        "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
-        "displayed_name": "Dreamwell Produce 1",
-        "energy_produced": 1,
-        "abilities": [],
-        "displayed_abilities": [],
-        "displayed_rules_text": " ",
-        "displayed_prompts": [],
-        "phase": 1,
-        "is_test_card": true,
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+        "definition": {
+          "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
+          "displayed_name": "Dreamwell Produce 1",
+          "energy_produced": 1,
+          "abilities": [],
+          "displayed_abilities": [],
+          "displayed_rules_text": " ",
+          "displayed_prompts": [],
+          "phase": 1,
+          "is_test_card": true,
+          "image": {
+            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+          }
         }
       },
       {
-        "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
-        "displayed_name": "Dreamwell Produce 1",
-        "energy_produced": 1,
-        "abilities": [],
-        "displayed_abilities": [],
-        "displayed_rules_text": " ",
-        "displayed_prompts": [],
-        "phase": 1,
-        "is_test_card": true,
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+        "definition": {
+          "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
+          "displayed_name": "Dreamwell Produce 1",
+          "energy_produced": 1,
+          "abilities": [],
+          "displayed_abilities": [],
+          "displayed_rules_text": " ",
+          "displayed_prompts": [],
+          "phase": 1,
+          "is_test_card": true,
+          "image": {
+            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+          }
         }
       },
       {
-        "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
-        "displayed_name": "Dreamwell Produce 1",
-        "energy_produced": 1,
-        "abilities": [],
-        "displayed_abilities": [],
-        "displayed_rules_text": " ",
-        "displayed_prompts": [],
-        "phase": 1,
-        "is_test_card": true,
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+        "definition": {
+          "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
+          "displayed_name": "Dreamwell Produce 1",
+          "energy_produced": 1,
+          "abilities": [],
+          "displayed_abilities": [],
+          "displayed_rules_text": " ",
+          "displayed_prompts": [],
+          "phase": 1,
+          "is_test_card": true,
+          "image": {
+            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+          }
         }
       },
       {
-        "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
-        "displayed_name": "Dreamwell Produce 1",
-        "energy_produced": 1,
-        "abilities": [],
-        "displayed_abilities": [],
-        "displayed_rules_text": " ",
-        "displayed_prompts": [],
-        "phase": 1,
-        "is_test_card": true,
-        "image": {
-          "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+        "definition": {
+          "base_card_id": "ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2",
+          "displayed_name": "Dreamwell Produce 1",
+          "energy_produced": 1,
+          "abilities": [],
+          "displayed_abilities": [],
+          "displayed_rules_text": " ",
+          "displayed_prompts": [],
+          "phase": 1,
+          "is_test_card": true,
+          "image": {
+            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1963305268.png"
+          }
         }
       }
     ],

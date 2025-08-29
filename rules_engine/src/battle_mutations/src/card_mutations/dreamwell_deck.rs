@@ -2,18 +2,18 @@ use std::sync::Arc;
 
 use battle_queries::panic_with;
 use battle_state::battle::battle_state::BattleState;
+use battle_state::battle_cards::dreamwell::DreamwellCard;
 use rand::seq::SliceRandom;
-use tabula_data::card_definitions::dreamwell_card_definition::DreamwellCardDefinition;
 
 /// Draws the next card from the dreamwell.
 ///
 /// Panics if the dreamwell is empty.
-pub fn draw(battle: &mut BattleState) -> Arc<DreamwellCardDefinition> {
+pub fn draw(battle: &mut BattleState) -> Arc<DreamwellCard> {
     if battle.dreamwell.next_index == 0 {
         // Randomly shuffle the dreamwell cards.
         let mut new_cards = battle.dreamwell.cards.as_ref().clone();
         new_cards.shuffle(&mut battle.rng);
-        new_cards.sort_by_key(|c| c.phase);
+        new_cards.sort_by_key(|c| c.definition.phase);
         battle.dreamwell.cards = Arc::new(new_cards);
     }
 
@@ -28,7 +28,7 @@ pub fn draw(battle: &mut BattleState) -> Arc<DreamwellCardDefinition> {
         // Special case: when we reach the end of the dreamwell, remove all
         // 'phase 0' cards, since these are the "starter" cards.
         let mut new_cards = battle.dreamwell.cards.as_ref().clone();
-        new_cards.retain(|c| c.phase != 0);
+        new_cards.retain(|c| c.definition.phase != 0);
 
         if !new_cards.is_empty() {
             battle.dreamwell.cards = Arc::new(new_cards);
