@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::fs::File;
 use std::io::BufReader;
 
@@ -11,7 +12,7 @@ use tabula_cli::google_sheet::GoogleSheet;
 use tabula_cli::spreadsheet::Spreadsheet;
 use tabula_cli::{ability_parsing, tabula_codegen, tabula_sync};
 use tabula_data::localized_strings::LanguageId;
-use tabula_data::tabula::{self, TabulaBuildContext};
+use tabula_data::tabula::{self, TabulaBuildContext, TabulaRaw};
 use yup_oauth2::hyper_rustls::HttpsConnectorBuilder;
 
 #[derive(Parser, Debug)]
@@ -35,8 +36,19 @@ pub struct Args {
     write_json: Option<String>,
 }
 
+#[expect(clippy::print_stderr)]
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() {
+    if let Err(err) = run().await {
+        eprintln!("Error: {err}");
+        for cause in err.chain().skip(1) {
+            eprintln!("Caused by: {cause}");
+        }
+        std::process::exit(1);
+    }
+}
+
+async fn run() -> Result<()> {
     let args = Args::parse();
 
     let file = File::open(&args.key_file)
@@ -74,6 +86,23 @@ async fn main() -> Result<()> {
     .map_err(|errs| {
         anyhow::anyhow!(errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n"))
     })?;
+
+    if let Some(path) = args.write_json.as_deref() {
+        if let Ok(local_file) = File::open(path) {
+            let local_raw: TabulaRaw = serde_json::from_reader(BufReader::new(local_file))
+                .with_context(|| format!("failed to parse local JSON at {path}"))?;
+            let local_ids: HashSet<_> = local_raw.test_cards.0.iter().map(|r| r.id).collect();
+            let remote_ids: HashSet<_> = tabula_raw.test_cards.0.iter().map(|r| r.id).collect();
+            let missing: Vec<_> =
+                local_ids.difference(&remote_ids).map(|id| id.0.to_string()).collect();
+            if !missing.is_empty() {
+                anyhow::bail!(
+                    "local test card IDs missing from Google Sheets: {}. Aborting to avoid overwriting local-only cards.",
+                    missing.join(", ")
+                );
+            }
+        }
+    }
 
     if let Some(path) = args.string_ids.as_deref() {
         tabula_codegen::generate_string_ids(&tabula_raw, path)?;
