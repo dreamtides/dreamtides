@@ -44,6 +44,9 @@ watch-release:
 test:
     cargo test --manifest-path rules_engine/Cargo.toml
 
+battle-test *args='':
+    cargo test --manifest-path rules_engine/Cargo.toml -p battle_tests "$@"
+
 doc:
     cargo doc --manifest-path rules_engine/Cargo.toml
 

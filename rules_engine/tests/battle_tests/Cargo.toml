@@ -40,7 +40,13 @@ uuid = { workspace = true }
 [[bin]]
 name = "test_determinism"
 path = "src/bin/test_determinism.rs"
+test = false
+doctest = false
+bench = false
 
-# [[bin]]
-# name = "test_payload_size"
-# path = "src/bin/test_payload_size.rs"
+[[bin]]
+name = "test_payload_size"
+path = "src/bin/test_payload_size.rs"
+test = false
+doctest = false
+bench = false
