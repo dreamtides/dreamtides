@@ -60,6 +60,7 @@ fn card_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>>
         copy_next_played(),
         shuffle_hand_and_deck_and_draw(),
         put_cards_from_deck_into_void(),
+        discard_cards(),
         each_player_discard_cards(),
         each_player_abandons_characters(),
     ))
@@ -131,6 +132,12 @@ fn game_state_effects<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorTyp
         win_game(),
     ))
     .boxed()
+}
+
+fn discard_cards<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {
+    phrase("discard")
+        .ignore_then(numeric("{-discarded-cards(n:", count, ")}"))
+        .map(|count| StandardEffect::DiscardCards { count })
 }
 
 fn draw_cards<'a>() -> impl Parser<'a, &'a str, StandardEffect, ErrorType<'a>> {

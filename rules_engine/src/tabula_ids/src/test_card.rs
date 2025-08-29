@@ -131,6 +131,12 @@ pub const TEST_GAIN_ENERGY: BaseCardId = BaseCardId(uuid!("db191470-7a5b-4133-b7
 /// Put the top {-count(n: 3)} cards of your deck into your void.
 pub const TEST_DECK_TO_VOID: BaseCardId = BaseCardId(uuid!("a7340f26-b759-458c-b8cb-b6fcc36fe412"));
 
+/// Discard {-discarded-cards(n: 1)}.
+pub const TEST_DISCARD: BaseCardId = BaseCardId(uuid!("6e76f193-dcf0-4faf-b1f7-50af2e0dc8a2"));
+
+/// Discard {-discarded-cards(n: 2)}.
+pub const TEST_DISCARD_TWO: BaseCardId = BaseCardId(uuid!("ef6d55f9-49ba-4637-af50-91068cb3a2b2"));
+
 pub const DREAMWELL_PRODUCE_0: DreamwellCardId =
     DreamwellCardId(uuid!("146ae27e-a8ac-4f3c-aef2-cf2211e4bcfe"));
 
@@ -194,6 +200,8 @@ pub const ALL_TEST_CARD_IDS: &[BaseCardId] = &[
     TEST_GAIN_POINTS,
     TEST_GAIN_ENERGY,
     TEST_DECK_TO_VOID,
+    TEST_DISCARD,
+    TEST_DISCARD_TWO,
 ];
 
 pub const ALL_TEST_DREAMWELL_CARD_IDS: &[DreamwellCardId] = &[

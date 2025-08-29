@@ -1982,6 +1982,77 @@
       ],
       "card_type": "Event",
       "is_fast": false,
+      "rarity": "Special",
+      "image_number": "1200949264"
+    },
+    {
+      "id": "6e76f193-dcf0-4faf-b1f7-50af2e0dc8a2",
+      "name_en_us": "Test Discard",
+      "energy_cost": "1",
+      "rules_text_en_us": "Discard {-discarded-cards(n: 1)}.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "DiscardCards": {
+                  "count": 1
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Discard {-discarded-cards(n: 1)}."
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": false,
+      "rarity": "Special",
+      "image_number": "1200949264"
+    },
+    {
+      "id": "ef6d55f9-49ba-4637-af50-91068cb3a2b2",
+      "name_en_us": "Test Discard Two",
+      "energy_cost": "2",
+      "rules_text_en_us": "Discard {-discarded-cards(n: 2)}.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "DiscardCards": {
+                  "count": 2
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Discard {-discarded-cards(n: 2)}."
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": false,
+      "rarity": "Special",
       "image_number": "1200949264"
     }
   ],
@@ -2132,13 +2203,8 @@
                 },
                 {
                   "effect": {
-                    "PayCost": {
-                      "cost": {
-                        "DiscardCards": [
-                          "Card",
-                          1
-                        ]
-                      }
+                    "DiscardCards": {
+                      "count": 1
                     }
                   },
                   "optional": false
@@ -2353,13 +2419,8 @@
                 },
                 {
                   "effect": {
-                    "PayCost": {
-                      "cost": {
-                        "DiscardCards": [
-                          "Card",
-                          1
-                        ]
-                      }
+                    "DiscardCards": {
+                      "count": 1
                     }
                   },
                   "optional": false

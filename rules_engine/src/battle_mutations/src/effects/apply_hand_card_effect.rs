@@ -3,6 +3,7 @@ use battle_state::battle::card_id::HandCardId;
 use battle_state::battle_cards::card_set::CardSet;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::prompt_types::prompt_data::HandCardEffect;
+use battle_state::triggers::trigger::Trigger;
 
 use crate::card_mutations::move_card;
 
@@ -25,7 +26,9 @@ fn apply_to_card(
 ) {
     match effect {
         HandCardEffect::Discard => {
-            move_card::from_hand_to_void(battle, source, source.controller(), *hand_card_id);
+            let void_card_id =
+                move_card::from_hand_to_void(battle, source, source.controller(), *hand_card_id);
+            battle.triggers.push(source, Trigger::Discarded(void_card_id));
         }
     }
 }

@@ -20,7 +20,7 @@ use core_data::types::PlayerName;
 use crate::card_mutations::{battle_deck, counterspell, move_card, spark};
 use crate::character_mutations::dissolve;
 use crate::effects::apply_effect::EffectWasApplied;
-use crate::effects::{counterspell_unless_pays_cost, pay_cost, targeting};
+use crate::effects::{counterspell_unless_pays_cost, discard_cards, pay_cost, targeting};
 use crate::player_mutations::{energy, points};
 
 /// Applies a [StandardEffect] to the given [BattleState].
@@ -39,6 +39,9 @@ pub fn apply(
         StandardEffect::Counterspell { .. } => counterspell(battle, source, targets),
         StandardEffect::CounterspellUnlessPaysCost { cost, .. } => {
             counterspell_unless_pays_cost::execute(battle, source, targets, cost)
+        }
+        StandardEffect::DiscardCards { count } => {
+            discard_cards::execute(battle, source, source.controller(), *count)
         }
         StandardEffect::DrawCards { count } => {
             draw_cards(battle, source, source.controller(), *count)

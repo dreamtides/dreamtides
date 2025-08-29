@@ -46,8 +46,8 @@ fn test_then_separator() {
             optional: false,
           ),
           EffectWithOptions(
-            effect: PayCost(
-              cost: DiscardCards(Card, 1),
+            effect: DiscardCards(
+              count: 1,
             ),
             optional: false,
           ),

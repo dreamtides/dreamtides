@@ -36,7 +36,7 @@ pub enum LegalActions {
     SelectHandCardPrompt {
         valid: CardSet<HandCardId>,
         current: CardSet<HandCardId>,
-        maximum_selection: usize,
+        target_count: usize,
     },
     SelectPromptChoicePrompt {
         choice_count: usize,
@@ -186,22 +186,19 @@ impl LegalActions {
                 }
             }
             BattleAction::SelectHandCardTarget(hand_card_id) => {
-                if let LegalActions::SelectHandCardPrompt { valid, current, maximum_selection } =
-                    self
-                {
+                if let LegalActions::SelectHandCardPrompt { valid, current, target_count } = self {
                     match for_player {
                         ForPlayer::Agent => {
                             !current.contains(hand_card_id)
                                 && valid.contains(hand_card_id)
-                                && current.len() < *maximum_selection
+                                && current.len() < *target_count
                         }
 
-                        ForPlayer::Human if *maximum_selection == 1 => valid.contains(hand_card_id),
+                        ForPlayer::Human if *target_count == 1 => valid.contains(hand_card_id),
 
                         ForPlayer::Human => {
                             valid.contains(hand_card_id)
-                                && (current.len() < *maximum_selection
-                                    || current.contains(hand_card_id))
+                                && (current.len() < *target_count || current.contains(hand_card_id))
                         }
                     }
                 } else {
@@ -209,9 +206,8 @@ impl LegalActions {
                 }
             }
             BattleAction::SubmitHandCardTargets => {
-                if let LegalActions::SelectHandCardPrompt { current, maximum_selection, .. } = self
-                {
-                    !current.is_empty() && current.len() <= *maximum_selection
+                if let LegalActions::SelectHandCardPrompt { current, target_count, .. } = self {
+                    current.len() == *target_count
                 } else {
                     false
                 }
@@ -300,8 +296,8 @@ impl LegalActions {
                     valid.len() - current.len()
                 }
             }
-            LegalActions::SelectHandCardPrompt { valid, current, maximum_selection } => {
-                if current.len() == *maximum_selection || current.len() == valid.len() {
+            LegalActions::SelectHandCardPrompt { valid, current, target_count } => {
+                if current.len() == *target_count || current.len() == valid.len() {
                     1 // SubmitHandCardTargets, only for AI when at max selection
                 } else {
                     valid.len() - current.len()
@@ -415,8 +411,8 @@ impl LegalActions {
                 }
             }
 
-            LegalActions::SelectHandCardPrompt { valid, current, maximum_selection } => {
-                if current.len() == *maximum_selection || current.len() == valid.len() {
+            LegalActions::SelectHandCardPrompt { valid, current, target_count } => {
+                if current.len() == *target_count || current.len() == valid.len() {
                     if actions.contains(&BattleAction::SubmitHandCardTargets) {
                         None
                     } else {
@@ -537,8 +533,8 @@ impl LegalActions {
                 }
             }
 
-            LegalActions::SelectHandCardPrompt { valid, current, maximum_selection } => {
-                if current.len() == *maximum_selection || current.len() == valid.len() {
+            LegalActions::SelectHandCardPrompt { valid, current, target_count } => {
+                if current.len() == *target_count || current.len() == valid.len() {
                     vec![BattleAction::SubmitHandCardTargets]
                 } else {
                     valid
