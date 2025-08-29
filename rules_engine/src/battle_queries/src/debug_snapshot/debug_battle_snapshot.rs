@@ -224,6 +224,14 @@ fn format_prompt_choices(prompt: &PromptType) -> Vec<String> {
                 format!("maximum_selection: {:?}", prompt.maximum_selection),
             ]
         }
+        PromptType::ChooseHandCards(prompt) => {
+            vec![
+                format!("valid: {:?}", prompt.valid),
+                format!("selected: {:?}", prompt.selected),
+                format!("maximum_selection: {:?}", prompt.maximum_selection),
+                format!("effect: {:?}", prompt.effect),
+            ]
+        }
         PromptType::Choose { choices } => {
             choices.iter().map(|choice| format!("{choice:?}")).collect()
         }

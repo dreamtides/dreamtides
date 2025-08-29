@@ -301,6 +301,12 @@
       "en_us": "Submit"
     },
     {
+      "id": "be3fe1f9-17ed-4324-b1d9-f1d5e6ccf2c3",
+      "name": "primary-button-submit-hand-card-targets",
+      "description": "Button to confirm selection of target cards in the hand",
+      "en_us": "Submit"
+    },
+    {
       "id": "f03ee2d3-e278-40bc-a449-25571d36fa56",
       "name": "primary-button-submit-deck-card-order",
       "description": "Button to confirm selection of ordering of cards in deck",

@@ -7,7 +7,7 @@ use strum_macros::EnumDiscriminants;
 use tabula_data::localized_strings::StringId;
 
 use crate::battle::battle_state::PendingEffectIndex;
-use crate::battle::card_id::{BattleDeckCardId, CharacterId, StackCardId, VoidCardId};
+use crate::battle::card_id::{BattleDeckCardId, CharacterId, HandCardId, StackCardId, VoidCardId};
 use crate::battle_cards::card_set::CardSet;
 use crate::battle_cards::stack_card_state::{EffectTargets, StackItemId};
 use crate::core::effect_source::EffectSource;
@@ -44,6 +44,7 @@ pub enum PromptType {
     ChooseCharacter { on_selected: OnSelected, valid: CardSet<CharacterId> },
     ChooseStackCard { on_selected: OnSelected, valid: CardSet<StackCardId> },
     ChooseVoidCard(ChooseVoidCardPrompt),
+    ChooseHandCards(ChooseHandCardsPrompt),
     Choose { choices: Vec<PromptChoice> },
     ChooseEnergyValue { minimum: Energy, maximum: Energy },
     ModalEffect(ModalEffectPrompt),
@@ -56,6 +57,20 @@ pub struct ChooseVoidCardPrompt {
     pub valid: CardSet<VoidCardId>,
     pub selected: CardSet<VoidCardId>,
     pub maximum_selection: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChooseHandCardsPrompt {
+    pub effect: HandCardEffect,
+    pub valid: CardSet<HandCardId>,
+    pub selected: CardSet<HandCardId>,
+    pub maximum_selection: u32,
+}
+
+/// Effect to apply to the set of selected cards in a [ChooseHandCardsPrompt].
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum HandCardEffect {
+    Discard,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

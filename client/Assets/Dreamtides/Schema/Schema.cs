@@ -858,6 +858,8 @@ namespace Dreamtides.Schema
     ///
     /// Select a card in a void as a target
     ///
+    /// Select a card in hand as a target
+    ///
     /// Select a choice at a given index position in response to a prompt.
     ///
     /// Pick an amount of energy to pay as an additional cost to play a card.
@@ -888,6 +890,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("SelectVoidCardTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectVoidCardTarget { get; set; }
+
+        [JsonProperty("SelectHandCardTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SelectHandCardTarget { get; set; }
 
         [JsonProperty("SelectPromptChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectPromptChoice { get; set; }
@@ -2350,12 +2355,14 @@ namespace Dreamtides.Schema
     ///
     /// Submit the selected void card targets
     ///
+    /// Submit the selected hand card targets
+    ///
     /// Submit the selected deck card order configuration in the current
     /// ordering prompt.
     ///
     /// Confirm the selected cards to mulligan
     /// </summary>
-    public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitDeckCardOrder, SubmitMulligan, SubmitVoidCardTargets };
+    public enum BattleActionEnum { EndTurn, PassPriority, StartNextTurn, SubmitDeckCardOrder, SubmitHandCardTargets, SubmitMulligan, SubmitVoidCardTargets };
 
     /// <summary>
     /// Cause the opponent to take a 'continue' legal action
@@ -3487,6 +3494,8 @@ namespace Dreamtides.Schema
                             return new BattleAction { Enum = BattleActionEnum.StartNextTurn };
                         case "SubmitDeckCardOrder":
                             return new BattleAction { Enum = BattleActionEnum.SubmitDeckCardOrder };
+                        case "SubmitHandCardTargets":
+                            return new BattleAction { Enum = BattleActionEnum.SubmitHandCardTargets };
                         case "SubmitMulligan":
                             return new BattleAction { Enum = BattleActionEnum.SubmitMulligan };
                         case "SubmitVoidCardTargets":
@@ -3518,6 +3527,9 @@ namespace Dreamtides.Schema
                         return;
                     case BattleActionEnum.SubmitDeckCardOrder:
                         serializer.Serialize(writer, "SubmitDeckCardOrder");
+                        return;
+                    case BattleActionEnum.SubmitHandCardTargets:
+                        serializer.Serialize(writer, "SubmitHandCardTargets");
                         return;
                     case BattleActionEnum.SubmitMulligan:
                         serializer.Serialize(writer, "SubmitMulligan");
@@ -3792,6 +3804,8 @@ namespace Dreamtides.Schema
                     return BattleActionEnum.StartNextTurn;
                 case "SubmitDeckCardOrder":
                     return BattleActionEnum.SubmitDeckCardOrder;
+                case "SubmitHandCardTargets":
+                    return BattleActionEnum.SubmitHandCardTargets;
                 case "SubmitMulligan":
                     return BattleActionEnum.SubmitMulligan;
                 case "SubmitVoidCardTargets":
@@ -3821,6 +3835,9 @@ namespace Dreamtides.Schema
                     return;
                 case BattleActionEnum.SubmitDeckCardOrder:
                     serializer.Serialize(writer, "SubmitDeckCardOrder");
+                    return;
+                case BattleActionEnum.SubmitHandCardTargets:
+                    serializer.Serialize(writer, "SubmitHandCardTargets");
                     return;
                 case BattleActionEnum.SubmitMulligan:
                     serializer.Serialize(writer, "SubmitMulligan");

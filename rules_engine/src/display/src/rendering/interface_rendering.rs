@@ -126,6 +126,7 @@ fn get_generic_prompt_message(builder: &ResponseBuilder, prompt_type: &PromptTyp
         PromptType::ChooseCharacter { .. } => builder.string(string_id::PROMPT_CHOOSE_CHARACTER),
         PromptType::ChooseStackCard { .. } => builder.string(string_id::PROMPT_SELECT_STACK_CARD),
         PromptType::ChooseVoidCard { .. } => builder.string(string_id::PROMPT_SELECT_FROM_VOID),
+        PromptType::ChooseHandCards { .. } => builder.string(string_id::PROMPT_SELECT_FROM_HAND),
         PromptType::Choose { .. } => builder.string(string_id::PROMPT_SELECT_OPTION),
         PromptType::ChooseEnergyValue { .. } => {
             builder.string(string_id::PROMPT_CHOOSE_ENERGY_AMOUNT)
@@ -176,6 +177,11 @@ fn primary_action_button(
         Some(ButtonView {
             label: builder.string(string_id::PRIMARY_BUTTON_SUBMIT_VOID_CARD_TARGETS),
             action: Some(BattleAction::SubmitVoidCardTargets.into()),
+        })
+    } else if legal_actions.contains(BattleAction::SubmitHandCardTargets, ForPlayer::Human) {
+        Some(ButtonView {
+            label: builder.string(string_id::PRIMARY_BUTTON_SUBMIT_HAND_CARD_TARGETS),
+            action: Some(BattleAction::SubmitHandCardTargets.into()),
         })
     } else if legal_actions.contains(BattleAction::SubmitDeckCardOrder, ForPlayer::Human) {
         Some(ButtonView {

@@ -171,6 +171,22 @@ fn outline_and_selection_action(
         }
     }
 
+    if let Some(prompt) = battle.prompts.front()
+        && let PromptType::ChooseHandCards(choose_hand_prompt) = &prompt.prompt_type
+    {
+        let hand_card_id = HandCardId(card_id);
+        let select = BattleAction::SelectHandCardTarget(hand_card_id);
+        let selection_action = legal_actions
+            .contains(select, ForPlayer::Human)
+            .then_some(GameAction::BattleAction(select));
+
+        if choose_hand_prompt.selected.contains(hand_card_id) {
+            return (Some(display_color::YELLOW_500), selection_action);
+        } else if choose_hand_prompt.valid.contains(hand_card_id) {
+            return (Some(display_color::WHITE), selection_action);
+        }
+    }
+
     (None, None)
 }
 

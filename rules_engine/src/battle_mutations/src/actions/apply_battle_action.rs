@@ -10,7 +10,9 @@ use crate::actions::{apply_card_order_action, apply_debug_battle_action};
 use crate::activated_abilities::activate_ability;
 use crate::effects::apply_effect;
 use crate::phase_mutations::{fire_triggers, turn};
-use crate::play_cards::{play_card, resolve_card, select_modal_effect_choice, select_target};
+use crate::play_cards::{
+    choose_hand_cards, play_card, resolve_card, select_modal_effect_choice, select_target,
+};
 use crate::prompt_mutations::{select_additional_costs, select_choice_prompt_at_index};
 
 #[instrument(name = "apply_battle_action", level = "debug", skip(battle))]
@@ -72,6 +74,12 @@ pub fn execute_without_tracking_history(
         }
         BattleAction::SubmitVoidCardTargets => {
             select_target::submit_void_card_targets(battle, player);
+        }
+        BattleAction::SelectHandCardTarget(hand_card_id) => {
+            choose_hand_cards::hand_card(battle, player, hand_card_id);
+        }
+        BattleAction::SubmitHandCardTargets => {
+            choose_hand_cards::submit_hand_card_targets(battle, player);
         }
         BattleAction::SelectPromptChoice(choice_index) => {
             select_choice_prompt_at_index::select(battle, player, choice_index);

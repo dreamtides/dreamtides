@@ -139,6 +139,10 @@ pub const PAY_ENERGY_ADDTIONAL_COST_BUTTON: StringId =
 pub const PRIMARY_BUTTON_SUBMIT_VOID_CARD_TARGETS: StringId =
     StringId(uuid!("a637975a-fb02-40b1-8dbe-95f278867ef8"));
 
+/// Button to confirm selection of target cards in the hand
+pub const PRIMARY_BUTTON_SUBMIT_HAND_CARD_TARGETS: StringId =
+    StringId(uuid!("be3fe1f9-17ed-4324-b1d9-f1d5e6ccf2c3"));
+
 /// Button to confirm selection of ordering of cards in deck
 pub const PRIMARY_BUTTON_SUBMIT_DECK_CARD_ORDER: StringId =
     StringId(uuid!("f03ee2d3-e278-40bc-a449-25571d36fa56"));

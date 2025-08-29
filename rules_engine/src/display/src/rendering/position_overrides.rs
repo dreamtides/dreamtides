@@ -27,6 +27,7 @@ pub fn object_position(
     });
     let object_position = for_card_order_browser(battle, card_id, object_position);
     let object_position = for_void_card_browser(builder, battle, object_position);
+    let object_position = for_hand_card_browser(builder, battle, object_position);
     let object_position = for_void_card_targeting(battle, card_id, object_position);
     let position = for_browser(builder, object_position.position);
     ObjectPosition { position, sorting_key: object_position.sorting_key }
@@ -162,6 +163,25 @@ fn for_void_card_browser(
         && let PromptType::ChooseVoidCard(_) = &prompt.prompt_type
         && let Position::InVoid(void_player) = base_object_position.position
         && void_player == builder.to_display_player(prompt.player)
+    {
+        return ObjectPosition {
+            position: Position::Browser,
+            sorting_key: base_object_position.sorting_key,
+        };
+    }
+    base_object_position
+}
+
+fn for_hand_card_browser(
+    builder: &ResponseBuilder,
+    battle: &BattleState,
+    base_object_position: ObjectPosition,
+) -> ObjectPosition {
+    if let Some(prompt) = battle.prompts.front()
+        && prompt.player == builder.act_for_player()
+        && let PromptType::ChooseHandCards(_) = &prompt.prompt_type
+        && let Position::InHand(hand_player) = base_object_position.position
+        && hand_player == builder.to_display_player(prompt.player)
     {
         return ObjectPosition {
             position: Position::Browser,

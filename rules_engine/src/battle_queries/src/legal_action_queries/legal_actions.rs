@@ -35,6 +35,11 @@ pub fn compute(battle: &BattleState, player: PlayerName) -> LegalActions {
                 current: prompt.selected.clone(),
                 maximum_selection: prompt.maximum_selection as usize,
             },
+            PromptType::ChooseHandCards(prompt) => LegalActions::SelectHandCardPrompt {
+                valid: prompt.valid.clone(),
+                current: prompt.selected.clone(),
+                maximum_selection: prompt.maximum_selection as usize,
+            },
             PromptType::Choose { choices } => {
                 LegalActions::SelectPromptChoicePrompt { choice_count: choices.len() }
             }

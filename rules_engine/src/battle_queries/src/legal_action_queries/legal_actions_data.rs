@@ -33,6 +33,11 @@ pub enum LegalActions {
         current: CardSet<VoidCardId>,
         maximum_selection: usize,
     },
+    SelectHandCardPrompt {
+        valid: CardSet<HandCardId>,
+        current: CardSet<HandCardId>,
+        maximum_selection: usize,
+    },
     SelectPromptChoicePrompt {
         choice_count: usize,
     },
@@ -75,6 +80,7 @@ impl LegalActions {
             LegalActions::SelectCharacterPrompt { .. }
                 | LegalActions::SelectStackCardPrompt { .. }
                 | LegalActions::SelectVoidCardPrompt { .. }
+                | LegalActions::SelectHandCardPrompt { .. }
                 | LegalActions::SelectPromptChoicePrompt { .. }
                 | LegalActions::SelectEnergyValuePrompt { .. }
                 | LegalActions::SelectDeckCardOrder { .. }
@@ -179,6 +185,37 @@ impl LegalActions {
                     false
                 }
             }
+            BattleAction::SelectHandCardTarget(hand_card_id) => {
+                if let LegalActions::SelectHandCardPrompt { valid, current, maximum_selection } =
+                    self
+                {
+                    match for_player {
+                        ForPlayer::Agent => {
+                            !current.contains(hand_card_id)
+                                && valid.contains(hand_card_id)
+                                && current.len() < *maximum_selection
+                        }
+
+                        ForPlayer::Human if *maximum_selection == 1 => valid.contains(hand_card_id),
+
+                        ForPlayer::Human => {
+                            valid.contains(hand_card_id)
+                                && (current.len() < *maximum_selection
+                                    || current.contains(hand_card_id))
+                        }
+                    }
+                } else {
+                    false
+                }
+            }
+            BattleAction::SubmitHandCardTargets => {
+                if let LegalActions::SelectHandCardPrompt { current, maximum_selection, .. } = self
+                {
+                    !current.is_empty() && current.len() <= *maximum_selection
+                } else {
+                    false
+                }
+            }
             BattleAction::SelectPromptChoice(index) => {
                 if let LegalActions::SelectPromptChoicePrompt { choice_count } = self {
                     index < *choice_count
@@ -231,6 +268,7 @@ impl LegalActions {
             LegalActions::SelectCharacterPrompt { valid } => valid.is_empty(),
             LegalActions::SelectStackCardPrompt { valid } => valid.is_empty(),
             LegalActions::SelectVoidCardPrompt { .. } => false,
+            LegalActions::SelectHandCardPrompt { .. } => false,
             LegalActions::SelectPromptChoicePrompt { choice_count } => *choice_count == 0,
             LegalActions::SelectEnergyValuePrompt { minimum, maximum } => maximum < minimum,
             LegalActions::SelectDeckCardOrder { .. } => false,
@@ -258,6 +296,13 @@ impl LegalActions {
             LegalActions::SelectVoidCardPrompt { valid, current, maximum_selection } => {
                 if current.len() == *maximum_selection || current.len() == valid.len() {
                     1 // SubmitVoidCardTargets, only for AI when at max selection
+                } else {
+                    valid.len() - current.len()
+                }
+            }
+            LegalActions::SelectHandCardPrompt { valid, current, maximum_selection } => {
+                if current.len() == *maximum_selection || current.len() == valid.len() {
+                    1 // SubmitHandCardTargets, only for AI when at max selection
                 } else {
                     valid.len() - current.len()
                 }
@@ -370,6 +415,24 @@ impl LegalActions {
                 }
             }
 
+            LegalActions::SelectHandCardPrompt { valid, current, maximum_selection } => {
+                if current.len() == *maximum_selection || current.len() == valid.len() {
+                    if actions.contains(&BattleAction::SubmitHandCardTargets) {
+                        None
+                    } else {
+                        Some(BattleAction::SubmitHandCardTargets)
+                    }
+                } else {
+                    valid
+                        .iter()
+                        .find(|id| {
+                            !actions.contains(&BattleAction::SelectHandCardTarget(*id))
+                                && !current.contains(*id)
+                        })
+                        .map(BattleAction::SelectHandCardTarget)
+                }
+            }
+
             LegalActions::SelectPromptChoicePrompt { choice_count } => (0..*choice_count)
                 .find(|&i| !actions.contains(&BattleAction::SelectPromptChoice(i)))
                 .map(BattleAction::SelectPromptChoice),
@@ -470,6 +533,18 @@ impl LegalActions {
                         .iter()
                         .filter(|&id| !current.contains(id))
                         .map(BattleAction::SelectVoidCardTarget)
+                        .collect::<Vec<_>>()
+                }
+            }
+
+            LegalActions::SelectHandCardPrompt { valid, current, maximum_selection } => {
+                if current.len() == *maximum_selection || current.len() == valid.len() {
+                    vec![BattleAction::SubmitHandCardTargets]
+                } else {
+                    valid
+                        .iter()
+                        .filter(|&id| !current.contains(id))
+                        .map(BattleAction::SelectHandCardTarget)
                         .collect::<Vec<_>>()
                 }
             }
@@ -581,6 +656,16 @@ impl LegalActions {
             }
 
             LegalActions::SelectVoidCardPrompt { .. } => {
+                let all_actions = self.all();
+                if all_actions.is_empty() {
+                    None
+                } else {
+                    let index = fastrand::usize(..all_actions.len());
+                    Some(all_actions[index])
+                }
+            }
+
+            LegalActions::SelectHandCardPrompt { .. } => {
                 let all_actions = self.all();
                 if all_actions.is_empty() {
                     None

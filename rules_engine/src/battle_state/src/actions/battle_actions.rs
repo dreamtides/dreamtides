@@ -38,6 +38,10 @@ pub enum BattleAction {
     SelectVoidCardTarget(VoidCardId),
     /// Submit the selected void card targets
     SubmitVoidCardTargets,
+    /// Select a card in hand as a target
+    SelectHandCardTarget(HandCardId),
+    /// Submit the selected hand card targets
+    SubmitHandCardTargets,
     /// Select a choice at a given index position in response to a prompt.
     SelectPromptChoice(usize),
     /// Pick an amount of energy to pay as an additional cost to play a card.
@@ -111,6 +115,10 @@ impl BattleAction {
                 format!("SVC{:?}", void_card_id.0.0)
             }
             BattleAction::SubmitVoidCardTargets => "SVC".to_string(),
+            BattleAction::SelectHandCardTarget(hand_card_id) => {
+                format!("SHC{:?}", hand_card_id.0.0)
+            }
+            BattleAction::SubmitHandCardTargets => "SHC".to_string(),
             BattleAction::SelectPromptChoice(index) => format!("SPC{index:?}"),
             BattleAction::SelectEnergyAdditionalCost(energy) => format!("SEAC{}", energy.0),
             BattleAction::SelectOrderForDeckCard(order) => {
