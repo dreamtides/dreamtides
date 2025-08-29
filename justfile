@@ -159,6 +159,10 @@ tabula *args='':
       --write-json client/Assets/StreamingAssets/tabula.json
   cd rules_engine && cargo +nightly fmt
 
+tabula-add-card *args='':
+  cargo run --manifest-path rules_engine/Cargo.toml --bin "tabula_add_card" -- \
+      --tabula-path client/Assets/StreamingAssets/tabula.json "$@"
+
 insta:
   cd rules_engine && cargo insta review
 

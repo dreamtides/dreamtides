@@ -17,6 +17,13 @@ test = false
 doctest = false
 bench = false
 
+[[bin]]
+name = "tabula_add_card"
+path = "src/add_card.rs"
+test = false
+doctest = false
+bench = false
+
 [dependencies]
 ability_data = { path = "../ability_data" }
 core_data = { path = "../core_data" }
