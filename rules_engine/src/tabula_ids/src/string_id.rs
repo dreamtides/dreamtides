@@ -103,6 +103,10 @@ pub const PROMPT_SELECT_STACK_CARD: StringId =
 pub const PROMPT_SELECT_FROM_VOID: StringId =
     StringId(uuid!("95c481aa-46e6-4e03-ab9f-ae162207cd39"));
 
+/// Prompt message to pick a card from your hand
+pub const PROMPT_SELECT_FROM_HAND: StringId =
+    StringId(uuid!("68ddc76a-67ee-4d95-a0a1-ff688752b5f8"));
+
 /// Prompt message to pick a choice among several options
 pub const PROMPT_SELECT_OPTION: StringId = StringId(uuid!("02b21277-492f-4a76-9d9e-b71ea88e72ad"));
 

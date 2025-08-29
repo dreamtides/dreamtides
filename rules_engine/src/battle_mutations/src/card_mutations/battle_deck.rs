@@ -128,7 +128,8 @@ pub fn debug_add_cards(battle: &mut BattleState, player: PlayerName, cards: &[Ca
 /// revealed to their owner while in the deck.
 ///
 /// Any new cards that are required are picked randomly from the deck and
-/// inserted below any existing known cards at the top of the deck.
+/// inserted below any existing known cards at the top of the deck. A new deck
+/// is created if there are no cards left in the deck.
 ///
 /// Returns exactly `count` cards from the top of the deck.
 pub fn realize_top_of_deck(

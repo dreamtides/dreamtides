@@ -64,6 +64,9 @@ pub fn apply(
         StandardEffect::PreventDissolveThisTurn { .. } => {
             prevent_dissolve_this_turn(battle, targets)
         }
+        StandardEffect::PutCardsFromYourDeckIntoVoid { count } => {
+            put_cards_from_your_deck_into_void(battle, source, *count)
+        }
         _ => todo!("Implement {:?}", effect),
     }
 }
@@ -210,6 +213,26 @@ fn prevent_dissolve_this_turn(
         .until_end_of_turn
         .prevent_dissolved
         .push(CardObjectId { card_id: id, object_id });
+    Some(EffectWasApplied)
+}
+
+fn put_cards_from_your_deck_into_void(
+    battle: &mut BattleState,
+    source: EffectSource,
+    count: u32,
+) -> Option<EffectWasApplied> {
+    if count == 0 {
+        return None;
+    }
+
+    let player = source.controller();
+    let cards = battle_deck::realize_top_of_deck(battle, player, count);
+    battle_trace!("Putting cards from deck into void", battle, player, cards);
+
+    for card_id in cards {
+        move_card::from_deck_to_void(battle, source, player, card_id);
+    }
+
     Some(EffectWasApplied)
 }
 

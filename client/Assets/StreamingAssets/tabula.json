@@ -241,6 +241,12 @@
       "en_us": "Select from your void"
     },
     {
+      "id": "68ddc76a-67ee-4d95-a0a1-ff688752b5f8",
+      "name": "prompt-select-from-hand",
+      "description": "Prompt message to pick a card from your hand",
+      "en_us": "Select from your hand"
+    },
+    {
       "id": "02b21277-492f-4a76-9d9e-b71ea88e72ad",
       "name": "prompt-select-option",
       "description": "Prompt message to pick a choice among several options",
@@ -1936,6 +1942,40 @@
       "card_type": "Event",
       "is_fast": false,
       "rarity": "Special",
+      "image_number": "1200949264"
+    },
+    {
+      "id": "a7340f26-b759-458c-b8cb-b6fcc36fe412",
+      "name_en_us": "Test Deck To Void",
+      "energy_cost": "2",
+      "rules_text_en_us": "Put the top {-count(n: 3)} cards of your deck into your void.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "PutCardsFromYourDeckIntoVoid": {
+                  "count": 3
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Put the top {-count(n: 3)} cards of your deck into your void."
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": false,
       "image_number": "1200949264"
     }
   ],
