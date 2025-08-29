@@ -122,6 +122,9 @@ pub const TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY: BaseCardId =
 pub const TEST_RETURN_TO_HAND: BaseCardId =
     BaseCardId(uuid!("cf2f292b-f02c-4130-aff7-3f48fd147633"));
 
+/// Gain {-gained-points(n: 2)}.
+pub const TEST_GAIN_POINTS: BaseCardId = BaseCardId(uuid!("995b52a1-b368-4c83-ae05-8ab3800ca618"));
+
 pub const DREAMWELL_PRODUCE_0: DreamwellCardId =
     DreamwellCardId(uuid!("146ae27e-a8ac-4f3c-aef2-cf2211e4bcfe"));
 
@@ -182,6 +185,7 @@ pub const ALL_TEST_CARD_IDS: &[BaseCardId] = &[
     TEST_MODAL_DRAW_ONE_OR_DRAW_TWO,
     TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY,
     TEST_RETURN_TO_HAND,
+    TEST_GAIN_POINTS,
 ];
 
 pub const ALL_TEST_DREAMWELL_CARD_IDS: &[DreamwellCardId] = &[

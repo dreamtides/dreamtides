@@ -1867,6 +1867,40 @@
       "is_fast": true,
       "rarity": "Special",
       "image_number": "1200949264"
+    },
+    {
+      "id": "995b52a1-b368-4c83-ae05-8ab3800ca618",
+      "name_en_us": "Test Gain Points",
+      "energy_cost": "0",
+      "rules_text_en_us": "Gain {-gained-points(n: 2)}.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "GainPoints": {
+                  "gains": 2
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Gain {-gained-points(n: 2)}."
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": false,
+      "image_number": "0"
     }
   ],
   "dreamwell_cards": [

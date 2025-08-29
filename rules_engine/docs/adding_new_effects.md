@@ -15,6 +15,9 @@ unit tests for this functionality. Please think carefully and make a plan for
 how to achieve this. Review all of the instructions in this document thoroughly
 before starting.
 
+Please create a TODO list before starting with one entry per step or sub-step in
+this document.
+
 ## Step 1: Verify your effect is present in StandardEffect
 
 A large number of effects defined in `StandardEffect` but not yet implemented. If
@@ -140,6 +143,9 @@ pub const TEST_DISSOLVE: BaseCardId = BaseCardId(uuid!("d4854b6e-5274-4f6a-8a60-
 ```
 
  The test card ID can now be used in tests.
+
+ You should *always* create a new test card for each effect. Do not use existing
+ card definitions. Do not use Dreamwell cards in your test.
 
  ## Step 5: Define a new test for your effect
 
