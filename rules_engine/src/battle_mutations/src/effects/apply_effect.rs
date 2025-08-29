@@ -4,11 +4,10 @@ use battle_queries::battle_card_queries::valid_target_queries;
 use battle_queries::panic_with;
 use battle_state::battle::battle_state::{BattleState, PendingEffect};
 use battle_state::battle::battle_status::BattleStatus;
-use battle_state::battle::card_id::StackCardId;
 use battle_state::battle_cards::ability_list::AbilityData;
 use battle_state::battle_cards::stack_card_state::EffectTargets;
 use battle_state::core::effect_source::EffectSource;
-use core_data::types::PlayerName;
+use core_data::identifiers::AbilityNumber;
 
 use crate::effects::apply_standard_effect;
 
@@ -19,8 +18,7 @@ pub struct EffectWasApplied;
 /// Applies all effects for the given [EventAbility] list to the [BattleState].
 pub fn execute_event_abilities(
     battle: &mut BattleState,
-    controller: PlayerName,
-    stack_card_id: StackCardId,
+    effect_source_fn: impl Fn(AbilityNumber) -> EffectSource,
     abilities: &[AbilityData<EventAbility>],
     requested_targets: Option<&EffectTargets>,
     modal_choice: Option<ModelEffectChoiceIndex>,
@@ -28,20 +26,12 @@ pub fn execute_event_abilities(
     match abilities {
         [] => {}
         [ability] => {
-            let source = EffectSource::Event {
-                controller,
-                stack_card_id,
-                ability_number: ability.ability_number,
-            };
+            let source = effect_source_fn(ability.ability_number);
             execute(battle, source, &ability.ability.effect, requested_targets, modal_choice);
         }
         _ => {
             battle.pending_effects.extend(abilities.iter().map(|ability_data| {
-                let source = EffectSource::Event {
-                    controller,
-                    stack_card_id,
-                    ability_number: ability_data.ability_number,
-                };
+                let source = effect_source_fn(ability_data.ability_number);
                 PendingEffect {
                     source,
                     effect: ability_data.ability.effect.clone(),

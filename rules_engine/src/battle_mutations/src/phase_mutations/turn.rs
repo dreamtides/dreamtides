@@ -26,6 +26,10 @@ pub fn start_turn(battle: &mut BattleState, player: PlayerName) {
 
     battle.triggers.push(source, Trigger::EndOfTurn(player.opponent()));
     fire_triggers::execute_if_no_active_prompt(battle);
+    if !battle.prompts.is_empty() {
+        todo!("Handle prompts from end of turn");
+    }
+
     battle.ability_state.until_end_of_turn = UntilEndOfTurn::default();
 
     battle_trace!("Starting turn for", battle, player);
@@ -41,13 +45,25 @@ pub fn start_turn(battle: &mut BattleState, player: PlayerName) {
     }
 
     battle.push_animation(source, || BattleAnimation::StartTurn { player });
+
     judgment_phase::run(battle, battle.turn.active_player, source);
+    if !battle.prompts.is_empty() {
+        todo!("Handle prompts from judgment phase");
+    }
+
     dreamwell_phase::activate(battle, battle.turn.active_player, source);
+    if !battle.prompts.is_empty() {
+        todo!("Handle prompts from dreamwell phase");
+    }
+
     battle.phase = BattleTurnPhase::Draw;
 
     if battle.turn.turn_id != TurnId(1) {
         battle_deck::draw_card(battle, source, player);
     }
 
+    if !battle.prompts.is_empty() {
+        todo!("Handle prompts from draw phase");
+    }
     battle.phase = BattleTurnPhase::Main;
 }

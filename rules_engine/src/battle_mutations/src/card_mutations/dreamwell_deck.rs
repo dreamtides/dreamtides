@@ -10,11 +10,7 @@ use rand::seq::SliceRandom;
 /// Panics if the dreamwell is empty.
 pub fn draw(battle: &mut BattleState) -> Arc<DreamwellCard> {
     if battle.dreamwell.next_index == 0 {
-        // Randomly shuffle the dreamwell cards.
-        let mut new_cards = battle.dreamwell.cards.as_ref().clone();
-        new_cards.shuffle(&mut battle.rng);
-        new_cards.sort_by_key(|c| c.definition.phase);
-        battle.dreamwell.cards = Arc::new(new_cards);
+        randomize(battle);
     }
 
     let card = if let Some(card) = battle.dreamwell.cards.get(battle.dreamwell.next_index) {
@@ -37,6 +33,13 @@ pub fn draw(battle: &mut BattleState) -> Arc<DreamwellCard> {
     }
 
     card
+}
+
+pub fn randomize(battle: &mut BattleState) {
+    let mut new_cards = battle.dreamwell.cards.as_ref().clone();
+    new_cards.shuffle(&mut battle.rng);
+    new_cards.sort_by_key(|c| c.definition.phase);
+    battle.dreamwell.cards = Arc::new(new_cards);
 }
 
 #[cold]

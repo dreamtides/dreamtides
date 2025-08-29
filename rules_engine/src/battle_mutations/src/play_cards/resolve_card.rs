@@ -79,8 +79,11 @@ fn resolve_stack_card(battle: &mut BattleState, item: &StackItemState, card_id: 
 fn apply_event_effects(battle: &mut BattleState, item: &StackItemState, card_id: StackCardId) {
     apply_effect::execute_event_abilities(
         battle,
-        item.controller,
-        card_id,
+        |ability_number| EffectSource::Event {
+            controller: item.controller,
+            stack_card_id: card_id,
+            ability_number,
+        },
         &card::ability_list(battle, card_id).event_abilities,
         item.targets.as_ref(),
         item.modal_choice,
