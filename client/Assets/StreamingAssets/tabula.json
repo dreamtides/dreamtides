@@ -1902,6 +1902,41 @@
       "is_fast": false,
       "rarity": "Special",
       "image_number": "1200949264"
+    },
+    {
+      "id": "db191470-7a5b-4133-b731-8a81767d46e1",
+      "name_en_us": "Test Gain Energy",
+      "energy_cost": "2",
+      "rules_text_en_us": "Gain {-gained-energy(e: 1)}.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "GainEnergy": {
+                  "gains": 1
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Gain {-gained-energy(e: 1)}."
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": false,
+      "rarity": "Special",
+      "image_number": "1200949264"
     }
   ],
   "dreamwell_cards": [

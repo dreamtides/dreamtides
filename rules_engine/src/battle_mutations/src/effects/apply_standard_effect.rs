@@ -21,7 +21,7 @@ use crate::card_mutations::{battle_deck, counterspell, move_card, spark};
 use crate::character_mutations::dissolve;
 use crate::effects::apply_effect::EffectWasApplied;
 use crate::effects::{counterspell_unless_pays_cost, pay_cost, targeting};
-use crate::player_mutations::points;
+use crate::player_mutations::{energy, points};
 
 /// Applies a [StandardEffect] to the given [BattleState].
 ///
@@ -48,6 +48,7 @@ pub fn apply(
         }
         StandardEffect::DissolveCharacter { .. } => dissolve(battle, source, targets),
         StandardEffect::Foresee { count } => foresee(battle, source, targets, *count),
+        StandardEffect::GainEnergy { gains } => gain_energy(battle, source, *gains),
         StandardEffect::GainPoints { gains } => gain_points(battle, source, *gains),
         StandardEffect::GainsSpark { gains, .. } => gains_spark(battle, source, targets, *gains),
         StandardEffect::OpponentPaysCost { cost } => opponent_pays_cost(battle, source, cost),
@@ -154,6 +155,17 @@ fn foresee(
     } else {
         None
     }
+}
+
+fn gain_energy(
+    battle: &mut BattleState,
+    source: EffectSource,
+    gains: core_data::numerics::Energy,
+) -> Option<EffectWasApplied> {
+    let player = source.controller();
+    battle_trace!("Gaining energy", battle, player, gains);
+    energy::gain(battle, player, source, gains);
+    Some(EffectWasApplied)
 }
 
 fn gain_points(
