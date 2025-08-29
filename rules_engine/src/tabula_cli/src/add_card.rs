@@ -7,8 +7,10 @@ use core_data::card_property_data::Rarity;
 use core_data::card_types::CardType;
 use core_data::identifiers::BaseCardId;
 use parser::{ability_parser, displayed_ability_parser};
+use tabula_cli::{ability_parsing, tabula_codegen};
 use tabula_data::card_definitions::base_card_definition_raw::BaseCardDefinitionRaw;
-use tabula_data::tabula::TabulaRaw;
+use tabula_data::localized_strings::LanguageId;
+use tabula_data::tabula::{self, TabulaBuildContext, TabulaRaw};
 use tabula_data::tabula_table::from_vec;
 use uuid::Uuid;
 
@@ -50,6 +52,18 @@ struct Args {
 
     #[arg(long, value_name = "STRING", default_value = "0")]
     image_number: String,
+
+    #[arg(long, help = "Run code generation after adding the card")]
+    codegen: bool,
+
+    #[arg(long, value_name = "PATH", help = "Generate string_id.rs at the given path")]
+    string_ids: Option<String>,
+
+    #[arg(long, value_name = "PATH", help = "Generate test_card_id.rs at the given path")]
+    test_card_ids: Option<String>,
+
+    #[arg(long, value_name = "PATH", help = "Generate card_lists.rs at the given path")]
+    card_lists: Option<String>,
 }
 
 fn main() -> Result<()> {
@@ -100,6 +114,46 @@ fn main() -> Result<()> {
     let pretty = serde_json::to_string_pretty(&raw).context("failed to serialize tabula json")?;
     fs::write(&path, pretty)
         .with_context(|| format!("failed to write tabula json at {}", path.display()))?;
+
+    if args.codegen {
+        run_codegen(
+            &mut raw,
+            args.string_ids.as_deref(),
+            args.test_card_ids.as_deref(),
+            args.card_lists.as_deref(),
+        )?;
+    }
+
+    Ok(())
+}
+
+fn run_codegen(
+    raw: &mut TabulaRaw,
+    string_ids: Option<&str>,
+    test_card_ids: Option<&str>,
+    card_lists: Option<&str>,
+) -> Result<()> {
+    ability_parsing::parse_all_abilities_for_raw_tabula(raw)?;
+
+    let _ = tabula::build(
+        &TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates },
+        raw,
+    )
+    .map_err(|errs| {
+        anyhow::anyhow!(errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n"))
+    })?;
+
+    if let Some(path) = string_ids {
+        tabula_codegen::generate_string_ids(raw, path)?;
+    }
+
+    if let Some(path) = test_card_ids {
+        tabula_codegen::generate_test_card_ids(raw, path)?;
+    }
+
+    if let Some(path) = card_lists {
+        tabula_codegen::generate_card_lists(raw, path)?;
+    }
 
     Ok(())
 }

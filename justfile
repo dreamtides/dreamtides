@@ -164,7 +164,11 @@ tabula *args='':
 
 tabula-add-card *args='':
   cargo run --manifest-path rules_engine/Cargo.toml --bin "tabula_add_card" -- \
-      --tabula-path client/Assets/StreamingAssets/tabula.json "$@"
+      --tabula-path client/Assets/StreamingAssets/tabula.json \
+      --string-ids rules_engine/src/tabula_ids/src/string_id.rs \
+      --test-card-ids rules_engine/src/tabula_ids/src/test_card.rs \
+      --card-lists rules_engine/src/tabula_ids/src/card_lists.rs \
+      --codegen "$@"
 
 insta:
   cd rules_engine && cargo insta review

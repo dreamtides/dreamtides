@@ -3,19 +3,15 @@ use std::io::BufReader;
 
 use anyhow::{Context, Result};
 use clap::Parser;
-use core_data::initialization_error::InitializationError;
 use google_sheets4::Sheets;
 use google_sheets4::yup_oauth2::{ServiceAccountAuthenticator, ServiceAccountKey};
 use hyper_util::client::legacy::Client;
 use hyper_util::rt::TokioExecutor;
-use parser::displayed_ability_parser;
 use tabula_cli::google_sheet::GoogleSheet;
 use tabula_cli::spreadsheet::Spreadsheet;
-use tabula_cli::{tabula_codegen, tabula_sync};
-use tabula_data::card_definitions::base_card_definition_type::BaseCardDefinitionType;
+use tabula_cli::{ability_parsing, tabula_codegen, tabula_sync};
 use tabula_data::localized_strings::LanguageId;
 use tabula_data::tabula::{self, TabulaBuildContext};
-use tabula_data::tabula_table::Table;
 use yup_oauth2::hyper_rustls::HttpsConnectorBuilder;
 
 #[derive(Parser, Debug)]
@@ -69,19 +65,7 @@ async fn main() -> Result<()> {
     println!("Got Google Sheets response");
 
     let mut tabula_raw = tabula_sync::sync(tables)?;
-    parse_table_abilities("test_cards", &mut tabula_raw.test_cards).map_err(|errs| {
-        anyhow::anyhow!(errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n"))
-    })?;
-    parse_table_displayed_abilities("test_cards", &mut tabula_raw.test_cards).map_err(|errs| {
-        anyhow::anyhow!(errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n"))
-    })?;
-
-    parse_table_abilities("dreamwell_cards", &mut tabula_raw.dreamwell_cards).map_err(|errs| {
-        anyhow::anyhow!(errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n"))
-    })?;
-    parse_table_displayed_abilities("dreamwell_cards", &mut tabula_raw.dreamwell_cards).map_err(
-        |errs| anyhow::anyhow!(errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n")),
-    )?;
+    ability_parsing::parse_all_abilities_for_raw_tabula(&mut tabula_raw)?;
 
     let _ = tabula::build(
         &TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates },
@@ -113,77 +97,4 @@ async fn main() -> Result<()> {
     }
 
     Ok(())
-}
-
-fn parse_table_abilities<I, T>(
-    sheet_name: &str,
-    table: &mut Table<I, T>,
-) -> Result<(), Vec<InitializationError>>
-where
-    T: BaseCardDefinitionType,
-{
-    let mut errors: Vec<InitializationError> = Vec::new();
-    for (row_index, row) in table.iter_mut().enumerate() {
-        match parser::ability_parser::parse(row.rules_text_en_us()) {
-            Ok(parsed) => {
-                *row.abilities_mut() = Some(parsed.clone());
-            }
-            Err(mut errs) => {
-                for e in errs.iter_mut() {
-                    if e.tabula_sheet.is_none() {
-                        e.tabula_sheet = Some(String::from(sheet_name));
-                    }
-                    if e.tabula_row.is_none() {
-                        e.tabula_row = Some(row_index);
-                    }
-                    if e.tabula_column.is_none() {
-                        e.tabula_column = Some(String::from("rules_text_en_us"));
-                    }
-                    if e.tabula_id.is_none() {
-                        e.tabula_id = Some(row.id_string());
-                    }
-                }
-                errors.extend(errs);
-            }
-        }
-    }
-    if errors.is_empty() { Ok(()) } else { Err(errors) }
-}
-
-fn parse_table_displayed_abilities<I, T>(
-    sheet_name: &str,
-    table: &mut Table<I, T>,
-) -> Result<(), Vec<InitializationError>>
-where
-    T: BaseCardDefinitionType,
-{
-    let mut errors: Vec<InitializationError> = Vec::new();
-    for (row_index, row) in table.iter_mut().enumerate() {
-        match displayed_ability_parser::parse_with(
-            row.abilities_ref().expect("abilities not present"),
-            row.rules_text_en_us(),
-        ) {
-            Ok(parsed) => {
-                *row.displayed_abilities_mut() = Some(parsed.clone());
-            }
-            Err(mut errs) => {
-                for e in errs.iter_mut() {
-                    if e.tabula_sheet.is_none() {
-                        e.tabula_sheet = Some(String::from(sheet_name));
-                    }
-                    if e.tabula_row.is_none() {
-                        e.tabula_row = Some(row_index);
-                    }
-                    if e.tabula_column.is_none() {
-                        e.tabula_column = Some(String::from("rules_text_en_us"));
-                    }
-                    if e.tabula_id.is_none() {
-                        e.tabula_id = Some(row.id_string());
-                    }
-                }
-                errors.extend(errs);
-            }
-        }
-    }
-    if errors.is_empty() { Ok(()) } else { Err(errors) }
 }

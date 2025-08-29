@@ -116,20 +116,14 @@ test card with your desired rules text, then use it to implement a unit test.
 Test cards can be added using the `just` command runner as follows:
 
 ```
- just tabula-add-card --name "Name" --text "{Dissolve} an enemy character." --cost 2 --card-type "Event"
+ just tabula-add-card --name "Test Dissolve" --text "{Dissolve} an enemy character." --cost 2 --card-type "Event"
 ```
 
  This will add a new card to the card database in
  `client/Assets/StreamingAssets/tabula.json` named "Name" with the rules text
  "{Dissolve} an enemy character.", suitable for testing the "dissolve" effect.
-
- Don't directly open `tabula.json` since it's thousands of lines.
-
- After adding the test card, you must regenerate the tabula database by invoking
-
- ```
- just tabula
- ```
+ Don't directly open `tabula.json` since it's thousands of lines. By convention,
+ test card names are short and start with the word "test".
 
  This will cause new code to be generated containing your test card's ID. Test
  card ID constants are defined at:
@@ -138,7 +132,14 @@ Test cards can be added using the `just` command runner as follows:
  rules_engine/src/tabula_ids/src/test_card.rsk
  ```
 
- The test card ID can now be used.
+ for example:
+
+ ```
+/// {Dissolve} an enemy character.
+pub const TEST_DISSOLVE: BaseCardId = BaseCardId(uuid!("d4854b6e-5274-4f6a-8a60-a1ea1c15e9a6"));
+```
+
+ The test card ID can now be used in tests.
 
  ## Step 5: Define a new test for your effect
 

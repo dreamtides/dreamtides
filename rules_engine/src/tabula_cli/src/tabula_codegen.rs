@@ -115,6 +115,8 @@ pub fn generate_test_card_ids(tabula_raw: &TabulaRaw, output_path: &str) -> Resu
 
 pub fn generate_card_lists(tabula_raw: &TabulaRaw, output_path: &str) -> Result<()> {
     let mut out = String::new();
+    out.push_str("use schemars::JsonSchema;\n");
+    out.push_str("use serde::{Deserialize, Serialize};\n");
     out.push_str("use uuid::uuid;\n\n");
 
     let mut list_types: BTreeSet<String> = BTreeSet::new();
@@ -160,6 +162,7 @@ pub fn generate_card_lists(tabula_raw: &TabulaRaw, output_path: &str) -> Result<
 
     for (type_key, names) in type_to_names.iter() {
         let enum_name = format!("{type_key}List");
+        out.push_str("#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]\n");
         out.push_str(&format!("pub enum {enum_name} {{\n"));
         for name in names.iter() {
             let variant_name = case_utils::cleaned_to_case(name, Case::UpperCamel);
