@@ -10,6 +10,11 @@ The `Effect` struct is a wrapper that adds various configuration values
 as well as supporting effect lists, while the `StandardEffect` struct is the
 comprehensive enumeration of possible effects.
 
+Please implement implement the described new effect and then add comprehensive
+unit tests for this functionality. Please think carefully and make a plan for
+how to achieve this. Review all of the instructions in this document thoroughly
+before starting.
+
 ## Step 1: Verify your effect is present in StandardEffect
 
 A large number of effects defined in `StandardEffect` but not yet implemented. If
@@ -34,7 +39,9 @@ Effect parsing has unit tests which live primarily in:
 
 `rules_engine/tests/parser_tests/tests/parser_tests/effect_parsing_tests.rs`
 
-# Step 3: Add logic to implement your effect
+## Step 3: Add logic to implement your effect
+
+### Step 3A: Implementing the effect
 
 Effects are primarily applied by:
 
@@ -55,7 +62,54 @@ file in alphabetical order.
 - Move Card: `rules_engine/src/battle_mutations/src/card_mutations/move_card.rs`
 - Card State: `rules_engine/src/battle_state/src/battle/all_cards.rs`
 
-# Step 4: Create a test card
+### Step 3B: Handling triggers
+
+Some effects should cause a "trigger" to fire. You can check the list of
+triggers here:
+
+- `rules_engine/src/battle_state/src/triggers/trigger.rs`
+
+If your effect doesn't seem to match any of these, don't worry about it. Do not
+add new triggers ever.
+
+If your effect *does* match a trigger, you simply need to fire it as follows:
+
+```
+battle.triggers.push(source, Trigger::GainedEnergy(player, amount));
+```
+
+### Step 3C: Handling animations
+
+Some effects cause animations to be displayed. You can find a list of animations
+here:
+
+- `rules_engine/src/battle_state/src/battle/battle_animation.rs`
+
+Most effects don't need to add animations. If your effect does match something
+in this list, you can fire an animation like this:
+
+```
+battle.push_animation(source, || BattleAnimation::ApplyTargetedEffect {
+    effect_name: TargetedEffectName::Dissolve,
+    targets: vec![id.card_id()],
+});
+```
+
+Do *not* add new animations to the list.
+
+### Step 3D: Handling tracing
+
+Most effects should include tracing for their exeuction. This is a simple log
+message describing what happened, along with relevant numeric parameters. You
+can add a trace entry for an effect as follows:
+
+```
+use battle_queries::battle_trace;
+...
+battle_trace!("Dissolving character", battle, id);
+```
+
+## Step 4: Create a test card
 
 In order to test an effect implementation, we use "test cards". Define a new
 test card with your desired rules text, then use it to implement a unit test.
@@ -86,7 +140,7 @@ Test cards can be added using the `just` command runner as follows:
 
  The test card ID can now be used.
 
- # Step 5: Define a new test for your effect
+ ## Step 5: Define a new test for your effect
 
 Tests for effects live in the `tests/battle_tests/effect_tests/` directory. Look
 at some example tests for reference:
@@ -116,7 +170,7 @@ session extension here:
 - `rules_engine/src/test_utils/src/client/test_client.rs`
 - `rules_engine/src/test_utils/src/session/test_session_battle_extension.rs`
 
-# Step 6: Run your test
+## Step 6: Run your test
 
 You can run a newly created test using `just` as follows, from any project
 directory:
@@ -132,7 +186,7 @@ just battle-test battle_tests::effect_tests::dissolve_effect_tests::dissolve_ene
 just battle-test battle_tests::effect_tests::dissolve_effect_tests
 ```
 
-# Step 7: Validate changes
+## Step 7: Validate changes
 
 After you test passes, you should run `just fmt` to apply rustfmt formatting
 rules to the project codebase. You should then run Clippy and the full project unit test
