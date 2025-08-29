@@ -13,3 +13,4 @@ service_account_key.json
 *.mm_profdata
 chrome_profiler.json
 .DS_Store
+missing_cards.html

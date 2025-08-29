@@ -9,6 +9,7 @@ use google_sheets4::yup_oauth2::{ServiceAccountAuthenticator, ServiceAccountKey}
 use hyper_util::client::legacy::Client;
 use hyper_util::rt::TokioExecutor;
 use tabula_cli::google_sheet::GoogleSheet;
+use tabula_cli::missing_cards_table::write_missing_cards_html;
 use tabula_cli::spreadsheet::Spreadsheet;
 use tabula_cli::{ability_parsing, tabula_codegen, tabula_sync};
 use tabula_data::localized_strings::LanguageId;
@@ -93,12 +94,27 @@ async fn run() -> Result<()> {
                 .with_context(|| format!("failed to parse local JSON at {path}"))?;
             let local_ids: HashSet<_> = local_raw.test_cards.0.iter().map(|r| r.id).collect();
             let remote_ids: HashSet<_> = tabula_raw.test_cards.0.iter().map(|r| r.id).collect();
-            let missing: Vec<_> =
-                local_ids.difference(&remote_ids).map(|id| id.0.to_string()).collect();
-            if !missing.is_empty() {
+            let missing_ids: Vec<_> = local_ids.difference(&remote_ids).cloned().collect();
+            if !missing_ids.is_empty() {
+                let context =
+                    TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates };
+                let tabula = tabula::build(&context, &local_raw).map_err(|errs| {
+                    anyhow::anyhow!(
+                        errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n")
+                    )
+                })?;
+                let mut rows = Vec::new();
+                for id in missing_ids.iter() {
+                    if let Some(def) = tabula.test_cards.get(id) {
+                        rows.push((*id, def.clone()));
+                    }
+                }
+                let out_path = std::path::Path::new("missing_cards.html");
+                write_missing_cards_html(out_path, &rows)
+                    .context("failed to write missing_cards.html in project root")?;
                 anyhow::bail!(
-                    "local test card IDs missing from Google Sheets: {}. Aborting to avoid overwriting local-only cards.",
-                    missing.join(", ")
+                    "local test card IDs missing from Google Sheets: {}. Wrote missing_cards.html with rows to paste into Sheets.",
+                    missing_ids.iter().map(|id| id.0.to_string()).collect::<Vec<_>>().join(", ")
                 );
             }
         }
