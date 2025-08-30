@@ -46,7 +46,7 @@ namespace Dreamtides.Services
       {
         var cardId = cardView.ClientId();
         toDelete.Remove(cardId);
-        var layout = LayoutForPosition(cardView.Position);
+        var layout = LayoutForObjectPosition(cardView.Position);
         Card card;
         if (Cards.ContainsKey(cardId))
         {
@@ -67,7 +67,7 @@ namespace Dreamtides.Services
 
           if (cardView.CreatePosition != null)
           {
-            LayoutForPosition(cardView.CreatePosition).ApplyTargetTransform(card);
+            LayoutForObjectPosition(cardView.CreatePosition).ApplyTargetTransform(card);
           }
           else
           {
@@ -160,7 +160,7 @@ namespace Dreamtides.Services
     /// </summary>
     public void AddToParent(Card card)
     {
-      var layout = LayoutForPosition(card.CardView.Position);
+      var layout = LayoutForObjectPosition(card.CardView.Position);
       layout.Add(card);
     }
 
@@ -170,7 +170,7 @@ namespace Dreamtides.Services
     /// </summary>
     public void MoveObject(Displayable displayable, ObjectPosition position, Sequence? sequence = null)
     {
-      var layout = LayoutForPosition(position);
+      var layout = LayoutForObjectPosition(position);
       layout.Add(displayable);
       ApplyAllLayouts(sequence);
     }
@@ -256,7 +256,7 @@ namespace Dreamtides.Services
 
           if (card.CardView.DestroyPosition != null)
           {
-            var layout = LayoutForPosition(card.CardView.DestroyPosition);
+            var layout = LayoutForObjectPosition(card.CardView.DestroyPosition);
             layout.ApplyTargetTransform(card, sequence);
           }
         }
@@ -280,9 +280,11 @@ namespace Dreamtides.Services
       }
     }
 
-    ObjectLayout LayoutForPosition(ObjectPosition objectPosition)
+    ObjectLayout LayoutForObjectPosition(ObjectPosition objectPosition) =>
+        LayoutForPosition(objectPosition.Position);
+
+    public ObjectLayout LayoutForPosition(Position position)
     {
-      var position = objectPosition.Position;
       if (position.Enum == PositionEnum.Drawn)
       {
         return Registry.Layout.DrawnCardsPosition;

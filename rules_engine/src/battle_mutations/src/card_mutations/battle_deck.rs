@@ -122,10 +122,17 @@ pub fn debug_add_cards(battle: &mut BattleState, player: PlayerName, cards: &[Ca
     battle.cards.create_cards_in_deck(player, response.created);
 }
 
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
+pub enum SetRevealedToPlayer {
+    Yes,
+    No,
+}
+
 /// Ensures that at least `count` cards are known at the top of a player's deck.
 ///
-/// Adds a `revealed_to_player_override` to the cards to indicate that they are
-/// revealed to their owner while in the deck.
+/// If [SetRevealedToPlayer] is `Yes`, adds a `revealed_to_player_override` to
+/// the cards to indicate that they are revealed to their owner while in the
+/// deck.
 ///
 /// Any new cards that are required are picked randomly from the deck and
 /// inserted below any existing known cards at the top of the deck. A new deck
@@ -136,6 +143,7 @@ pub fn realize_top_of_deck(
     battle: &mut BattleState,
     player: PlayerName,
     count: u32,
+    set_revealed_to_player: SetRevealedToPlayer,
 ) -> Vec<BattleDeckCardId> {
     let current_top_count = battle.cards.top_of_deck(player).len() as u32;
     let needed_cards = count.saturating_sub(current_top_count);
@@ -160,8 +168,10 @@ pub fn realize_top_of_deck(
 
     let result =
         battle.cards.top_of_deck(player).iter().take(count as usize).copied().collect::<Vec<_>>();
-    for card_id in &result {
-        *card::get_mut(battle, *card_id).revealed_to_player_override.player_mut(player) = true;
+    if set_revealed_to_player == SetRevealedToPlayer::Yes {
+        for card_id in &result {
+            *card::get_mut(battle, *card_id).revealed_to_player_override.player_mut(player) = true;
+        }
     }
     result
 }

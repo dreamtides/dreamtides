@@ -535,6 +535,12 @@ namespace Dreamtides.Schema
         public List<CardView> Cards { get; set; }
 
         /// <summary>
+        /// Destination position to move the cards to after drawing them.
+        /// </summary>
+        [JsonProperty("destination", Required = Required.Always)]
+        public Position Destination { get; set; }
+
+        /// <summary>
         /// Time to display each card before moving it to hand.
         ///
         /// Should be less than stagger_interval for best results.
@@ -2463,6 +2469,8 @@ namespace Dreamtides.Schema
     /// Position category
     ///
     /// Possible types of display positions
+    ///
+    /// Destination position to move the cards to after drawing them.
     /// </summary>
     public partial struct Position
     {

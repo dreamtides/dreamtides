@@ -12,7 +12,7 @@ use strum::EnumDiscriminants;
 
 use crate::battle_view::{BattleView, DisplayPlayer};
 use crate::card_view::{CardView, ClientCardId};
-use crate::object_position::ObjectPosition;
+use crate::object_position::{ObjectPosition, Position};
 
 /// A list of [ParallelCommandGroup]s to execute sequentially.
 #[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
@@ -199,6 +199,9 @@ pub struct DrawUserCardsCommand {
     ///
     /// Should be less than stagger_interval for best results.
     pub pause_duration: Milliseconds,
+
+    /// Destination position to move the cards to after drawing them.
+    pub destination: Position,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

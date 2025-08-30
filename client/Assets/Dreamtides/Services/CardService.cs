@@ -68,11 +68,12 @@ namespace Dreamtides.Services
         card.transform.DORotateQuaternion(Registry.Layout.DrawnCardsPosition.transform.rotation, moveDuration));
       yield return new WaitForSeconds(moveDuration + command.PauseDuration.ToSeconds());
 
-      Registry.Layout.UserHand.Add(card);
+      var layout = Registry.LayoutService.LayoutForPosition(command.Destination);
+      layout.Add(card);
       if (!isLastCard)
       {
         // Running this on the last card will conflict with LayoutService.ApplyLayout.
-        Registry.Layout.UserHand.ApplyLayout(TweenUtils.Sequence("DrawUserCardMoveToHand"));
+        layout.ApplyLayout(TweenUtils.Sequence("DrawUserCardMoveToHand"));
       }
     }
 

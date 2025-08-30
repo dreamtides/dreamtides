@@ -4,7 +4,9 @@ use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::PlayerName;
 use strum::{Display, EnumDiscriminants};
 
-use crate::battle::card_id::{ActivatedAbilityId, CardId, CharacterId, HandCardId};
+use crate::battle::card_id::{
+    ActivatedAbilityId, BattleDeckCardId, CardId, CharacterId, HandCardId,
+};
 use crate::battle_cards::stack_card_state::{EffectTargets, StackItemId};
 use crate::battle_cards::zone::Zone;
 use crate::prompt_types::prompt_data::PromptChoiceLabel;
@@ -62,6 +64,10 @@ pub enum BattleAnimation {
     },
     PreventedEffect {
         card_id: CardId,
+    },
+    PutCardsFromDeckIntoVoid {
+        player: PlayerName,
+        cards: Vec<BattleDeckCardId>,
     },
     ResolveCharacter {
         character_id: CharacterId,

@@ -17,6 +17,7 @@ use battle_state::prompt_types::prompt_data::{
 use core_data::numerics::Spark;
 use core_data::types::PlayerName;
 
+use crate::card_mutations::battle_deck::SetRevealedToPlayer;
 use crate::card_mutations::{battle_deck, counterspell, move_card, spark};
 use crate::character_mutations::dissolve;
 use crate::effects::apply_effect::EffectWasApplied;
@@ -140,7 +141,7 @@ fn foresee(
     count: u32,
 ) -> Option<EffectWasApplied> {
     let player = source.controller();
-    let cards = battle_deck::realize_top_of_deck(battle, player, count);
+    let cards = battle_deck::realize_top_of_deck(battle, player, count, SetRevealedToPlayer::Yes);
 
     if !cards.is_empty() {
         let prompt = SelectDeckCardOrderPrompt {
@@ -229,7 +230,12 @@ fn put_cards_from_your_deck_into_void(
     }
 
     let player = source.controller();
-    let cards = battle_deck::realize_top_of_deck(battle, player, count);
+    let cards = battle_deck::realize_top_of_deck(battle, player, count, SetRevealedToPlayer::No);
+
+    battle.push_animation(source, || BattleAnimation::PutCardsFromDeckIntoVoid {
+        player,
+        cards: cards.clone(),
+    });
     battle_trace!("Putting cards from deck into void", battle, player, cards);
 
     for card_id in cards {

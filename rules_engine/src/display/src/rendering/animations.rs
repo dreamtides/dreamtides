@@ -5,11 +5,13 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardIdType, StackCardId};
 use battle_state::core::effect_source::EffectSource;
 use core_data::display_types::{AudioClipAddress, Milliseconds};
+use display_data::battle_view::DisplayPlayer;
 use display_data::command::{
     Command, DisplayDreamwellActivationCommand, DisplayEffectCommand, DisplayEnemyMessageCommand,
     DisplayJudgmentCommand, DrawUserCardsCommand, GameMessageType, GameObjectId,
     PlayAudioClipCommand,
 };
+use display_data::object_position::Position;
 use masonry::flex_style::FlexVector3;
 
 use crate::core::adapter;
@@ -58,6 +60,7 @@ pub fn render(
                     cards: card_views,
                     stagger_interval: Milliseconds::new(500),
                     pause_duration: Milliseconds::new(300),
+                    destination: Position::InHand(DisplayPlayer::User),
                 }));
             }
         }
@@ -128,6 +131,32 @@ pub fn render(
                 // so it can be seen.
                 push_snapshot(builder, snapshot);
                 builder.push(Command::Wait(Milliseconds::new(1000)));
+            }
+        }
+
+        BattleAnimation::PutCardsFromDeckIntoVoid { player, cards } => {
+            if !cards.is_empty() {
+                push_snapshot(builder, snapshot);
+                let card_views = cards
+                    .iter()
+                    .map(|&card_id| {
+                        card_rendering::card_view(
+                            builder,
+                            &CardViewContext::Battle(
+                                final_state,
+                                card::get_base_card_id(snapshot, card_id),
+                                card_id.card_id(),
+                            ),
+                        )
+                    })
+                    .collect();
+
+                builder.push(Command::DrawUserCards(DrawUserCardsCommand {
+                    cards: card_views,
+                    stagger_interval: Milliseconds::new(500),
+                    pause_duration: Milliseconds::new(300),
+                    destination: Position::InVoid(builder.to_display_player(*player)),
+                }));
             }
         }
 
