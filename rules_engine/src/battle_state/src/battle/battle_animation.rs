@@ -9,6 +9,7 @@ use crate::battle::card_id::{
 };
 use crate::battle_cards::stack_card_state::{EffectTargets, StackItemId};
 use crate::battle_cards::zone::Zone;
+use crate::core::effect_source::EffectSource;
 use crate::prompt_types::prompt_data::PromptChoiceLabel;
 
 #[derive(Clone, Debug, Copy, PartialEq, Eq, Hash)]
@@ -71,6 +72,10 @@ pub enum BattleAnimation {
     },
     ResolveCharacter {
         character_id: CharacterId,
+    },
+    ScorePoints {
+        player: PlayerName,
+        source: EffectSource,
     },
     SelectModalEffectChoice {
         player: PlayerName,

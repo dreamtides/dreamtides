@@ -4,12 +4,12 @@ use battle_state::battle::battle_animation::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardIdType, StackCardId};
 use battle_state::core::effect_source::EffectSource;
-use core_data::display_types::{AudioClipAddress, Milliseconds};
+use core_data::display_types::{AudioClipAddress, Milliseconds, ProjectileAddress};
 use display_data::battle_view::DisplayPlayer;
 use display_data::command::{
     Command, DisplayDreamwellActivationCommand, DisplayEffectCommand, DisplayEnemyMessageCommand,
-    DisplayJudgmentCommand, DrawUserCardsCommand, GameMessageType, GameObjectId,
-    PlayAudioClipCommand,
+    DisplayJudgmentCommand, DrawUserCardsCommand, FireProjectileCommand, GameMessageType,
+    GameObjectId, PlayAudioClipCommand,
 };
 use display_data::object_position::Position;
 use masonry::flex_style::FlexVector3;
@@ -166,6 +166,22 @@ pub fn render(
                 sound: AudioClipAddress::new("Assets/ThirdParty/Cafofo/Magic Spells Sound Effects V2.0/General Spell/Positive Effect 10.wav"),
                 pause_duration: Milliseconds::new(0),
             }));
+        }
+
+        BattleAnimation::ScorePoints { player, source } => {
+            push_snapshot(builder, snapshot);
+            if let Some(card_id) = source.card_id() {
+                builder.push(Command::FireProjectile(
+                    FireProjectileCommand::builder()
+                        .source_id(adapter::card_game_object_id(card_id))
+                        .target_id(GameObjectId::Avatar(builder.to_display_player(*player)))
+                        .projectile(ProjectileAddress::new("Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 4 yellow arrow.prefab"))
+                        .travel_duration(Milliseconds::new(300))
+                        .fire_sound(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Generic_SubtleWhoosh03.wav"))
+                        .impact_sound(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicCannon_Impact01.wav"))
+                        .build()
+                ));
+            }
         }
 
         BattleAnimation::SelectModalEffectChoice { player, item_id, choice_index } => {
