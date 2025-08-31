@@ -1,10 +1,12 @@
 use asset_paths::hovl;
 use battle_queries::battle_card_queries::card;
-use battle_state::battle::battle_animation::BattleAnimation;
+use battle_state::battle::battle_animation_data::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardIdType, StackCardId};
+use battle_state::battle_cards::zone::Zone;
 use battle_state::core::effect_source::EffectSource;
 use core_data::display_types::{AudioClipAddress, Milliseconds, ProjectileAddress};
+use core_data::types::PlayerName;
 use display_data::battle_view::DisplayPlayer;
 use display_data::command::{
     Command, DisplayDreamwellActivationCommand, DisplayEffectCommand, DisplayEnemyMessageCommand,
@@ -78,6 +80,24 @@ pub fn render(
                 new_energy: Some(*new_energy),
                 new_produced_energy: Some(*new_produced_energy),
             }));
+        }
+
+        BattleAnimation::GainEnergy { player, source } => {
+            push_snapshot(builder, snapshot);
+            if let Some(card_id) = source.card_id()
+                && is_on_stack_or_battlefield(snapshot, *player, card_id)
+            {
+                builder.push(Command::FireProjectile(
+                    FireProjectileCommand::builder()
+                        .source_id(adapter::card_game_object_id(card_id))
+                        .target_id(GameObjectId::Avatar(builder.to_display_player(*player)))
+                        .projectile(ProjectileAddress::new("Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 6 blue fire.prefab"))
+                        .travel_duration(Milliseconds::new(300))
+                        .fire_sound(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_Generic_SubtleWhoosh04.wav"))
+                        .impact_sound(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic Magic and Impacts/RPG3_MagicCute2_Heal02.wav"))
+                        .build()
+                ));
+            }
         }
 
         BattleAnimation::GainSpark { character_id, .. } => {
@@ -170,7 +190,9 @@ pub fn render(
 
         BattleAnimation::ScorePoints { player, source } => {
             push_snapshot(builder, snapshot);
-            if let Some(card_id) = source.card_id() {
+            if let Some(card_id) = source.card_id()
+                && is_on_stack_or_battlefield(snapshot, *player, card_id)
+            {
                 builder.push(Command::FireProjectile(
                     FireProjectileCommand::builder()
                         .source_id(adapter::card_game_object_id(card_id))
@@ -227,4 +249,13 @@ pub fn render(
 /// Appends a command to update the battle view to the current state.
 pub fn push_snapshot(builder: &mut ResponseBuilder, snapshot: &BattleState) {
     builder.push_battle_view(battle_rendering::battle_view(builder, snapshot));
+}
+
+fn is_on_stack_or_battlefield(
+    battle: &BattleState,
+    owner: PlayerName,
+    card_id: impl CardIdType,
+) -> bool {
+    battle.cards.contains_card(owner, card_id.card_id(), Zone::Stack)
+        || battle.cards.contains_card(owner, card_id.card_id(), Zone::Battlefield)
 }

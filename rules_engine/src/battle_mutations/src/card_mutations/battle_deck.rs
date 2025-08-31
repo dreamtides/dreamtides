@@ -4,7 +4,7 @@ use battle_queries::battle_card_queries::{card, card_abilities};
 use battle_queries::{battle_trace, panic_with};
 use battle_state::battle::all_cards::CreatedCard;
 use battle_state::battle::animation_data::AnimationStep;
-use battle_state::battle::battle_animation::BattleAnimation;
+use battle_state::battle::battle_animation_data::BattleAnimation;
 use battle_state::battle::battle_card_definitions::{
     BattleCardDefinitions, BattleCardDefinitionsCard,
 };

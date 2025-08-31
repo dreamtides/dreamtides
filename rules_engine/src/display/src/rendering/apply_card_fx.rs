@@ -1,6 +1,6 @@
 use asset_paths::{dissolve_material, hovl, wow_sound};
 use battle_queries::battle_card_queries::{card, card_properties};
-use battle_state::battle::battle_animation::BattleAnimation;
+use battle_state::battle::battle_animation_data::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType};
 use battle_state::battle_cards::zone::Zone;

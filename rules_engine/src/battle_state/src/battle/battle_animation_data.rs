@@ -41,6 +41,10 @@ pub enum BattleAnimation {
         new_energy: Energy,
         new_produced_energy: Energy,
     },
+    GainEnergy {
+        player: PlayerName,
+        source: EffectSource,
+    },
     GainSpark {
         character_id: CharacterId,
         spark: Spark,

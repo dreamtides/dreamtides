@@ -1,4 +1,5 @@
 use battle_queries::assert_that;
+use battle_state::battle::battle_animation_data::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger::Trigger;
@@ -36,6 +37,7 @@ pub fn set_produced(
 
 /// Adds `amount` to `player`'s current energy.
 pub fn gain(battle: &mut BattleState, player: PlayerName, source: EffectSource, amount: Energy) {
+    battle.push_animation(source, || BattleAnimation::GainEnergy { player, source });
     let player_state = battle.players.player_mut(player);
     player_state.current_energy += amount;
     battle.triggers.push(source, Trigger::GainedEnergy(player, amount));

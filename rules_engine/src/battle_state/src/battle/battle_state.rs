@@ -13,7 +13,7 @@ use tabula_data::tabula::Tabula;
 use crate::actions::battle_actions::BattleAction;
 use crate::battle::all_cards::AllCards;
 use crate::battle::animation_data::{AnimationData, AnimationStep};
-use crate::battle::battle_animation::BattleAnimation;
+use crate::battle::battle_animation_data::BattleAnimation;
 use crate::battle::battle_card_definitions::BattleCardDefinitions;
 use crate::battle::battle_history::BattleHistory;
 use crate::battle::battle_rules_config::BattleRulesConfig;

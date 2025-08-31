@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use battle_state::battle::battle_animation::TriggerAnimation;
+use battle_state::battle::battle_animation_data::TriggerAnimation;
 use battle_state::battle::card_id::ActivatedAbilityId;
 use core_data::identifiers::UserId;
 use core_data::types::PlayerName;

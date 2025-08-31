@@ -1,5 +1,5 @@
 use battle_queries::battle_player_queries::player_properties;
-use battle_state::battle::battle_animation::BattleAnimation;
+use battle_state::battle::battle_animation_data::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::core::effect_source::EffectSource;

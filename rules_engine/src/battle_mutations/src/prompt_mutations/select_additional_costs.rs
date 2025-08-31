@@ -1,7 +1,7 @@
 use ability_data::cost::Cost;
 use battle_queries::battle_player_queries::costs;
 use battle_queries::{battle_trace, panic_with};
-use battle_state::battle::battle_animation::BattleAnimation;
+use battle_state::battle::battle_animation_data::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_cards::stack_card_state::StackCardAdditionalCostsPaid;
 use core_data::numerics::Energy;

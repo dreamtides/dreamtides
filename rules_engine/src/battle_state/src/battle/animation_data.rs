@@ -1,4 +1,4 @@
-use crate::battle::battle_animation::BattleAnimation;
+use crate::battle::battle_animation_data::BattleAnimation;
 use crate::battle::battle_state::BattleState;
 use crate::core::effect_source::EffectSource;
 

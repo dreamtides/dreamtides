@@ -1,7 +1,7 @@
 use ability_data::triggered_ability::TriggeredAbility;
 use battle_queries::battle_card_queries::{card, card_properties};
 use battle_queries::card_ability_queries::trigger_queries;
-use battle_state::battle::battle_animation::{BattleAnimation, TriggerAnimation};
+use battle_state::battle::battle_animation_data::{BattleAnimation, TriggerAnimation};
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::card_id::CharacterId;

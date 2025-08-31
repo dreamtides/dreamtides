@@ -1,6 +1,6 @@
 use battle_queries::battle_card_queries::card_properties;
 use battle_queries::panic_with;
-use battle_state::battle::battle_animation::BattleAnimation;
+use battle_state::battle::battle_animation_data::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::CharacterId;
 use battle_state::core::effect_source::EffectSource;

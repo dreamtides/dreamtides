@@ -4,7 +4,7 @@ use battle_queries::battle_card_queries::{card, card_properties};
 use battle_queries::legal_action_queries::legal_actions_data::ForPlayer;
 use battle_queries::legal_action_queries::{can_play_cards, legal_actions};
 use battle_state::actions::battle_actions::BattleAction;
-use battle_state::battle::battle_animation::TriggerAnimation;
+use battle_state::battle::battle_animation_data::TriggerAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{
     ActivatedAbilityId, CardId, CardIdType, CharacterId, VoidCardId,
