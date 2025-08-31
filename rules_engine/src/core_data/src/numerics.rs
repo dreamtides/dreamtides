@@ -148,6 +148,8 @@ impl<'a> From<Essence> for FluentValue<'a> {
 }
 
 /// Identifies a turn within a game.
+///
+/// Turn 0 is the starting player's first turn.
 #[derive(
     Debug,
     Display,

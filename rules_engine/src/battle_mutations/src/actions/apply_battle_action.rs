@@ -61,7 +61,7 @@ pub fn execute_without_tracking_history(
             turn::to_ending_phase(battle);
         }
         BattleAction::StartNextTurn => {
-            turn::start_turn(battle, battle.turn.active_player.opponent());
+            turn::start_next_turn(battle);
         }
         BattleAction::SelectCharacterTarget(character_id) => {
             select_target::character(battle, player, character_id);
@@ -102,6 +102,6 @@ pub fn execute_without_tracking_history(
     }
 
     apply_effect::execute_pending_effects_if_no_active_prompt(battle);
-
     fire_triggers::execute_if_no_active_prompt(battle);
+    turn::run_turn_state_machine_if_no_active_prompts(battle);
 }

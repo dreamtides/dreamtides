@@ -138,7 +138,10 @@ pub fn create_and_start(
         PlayerName::Two,
         5,
     );
-    turn::start_turn(&mut battle, PlayerName::One);
+
+    battle.phase = BattleTurnPhase::Starting;
+    turn::run_turn_state_machine_if_no_active_prompts(&mut battle);
+
     battle
 }
 

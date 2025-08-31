@@ -17,3 +17,9 @@ pub enum BattleStatus {
     /// If the winner is None, the battle has ended in a draw.
     GameOver { winner: Option<PlayerName> },
 }
+
+impl BattleStatus {
+    pub fn is_game_over(&self) -> bool {
+        matches!(self, BattleStatus::GameOver { .. })
+    }
+}

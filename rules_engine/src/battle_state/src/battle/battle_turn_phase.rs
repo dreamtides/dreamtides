@@ -11,4 +11,6 @@ pub enum BattleTurnPhase {
     Draw,
     Main,
     Ending,
+    EndingPhaseFinished,
+    FiringEndOfTurnTriggers,
 }
