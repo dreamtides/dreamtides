@@ -4,6 +4,7 @@ pub mod apply_card_fx;
 pub mod battle_rendering;
 pub mod card_display_state;
 pub mod card_rendering;
+pub mod dreamwell_card_rendering;
 pub mod identity_card_rendering;
 pub mod interface_message;
 pub mod interface_rendering;

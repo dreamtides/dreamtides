@@ -2,21 +2,22 @@ use std::sync::Arc;
 
 use battle_queries::panic_with;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle_cards::dreamwell_data::DreamwellCard;
+use battle_state::battle_cards::dreamwell_data::{BattleDreamwellCardId, DreamwellCard};
 use rand::seq::SliceRandom;
 
 /// Draws the next card from the dreamwell.
 ///
 /// Panics if the dreamwell is empty.
-pub fn draw(battle: &mut BattleState) -> Arc<DreamwellCard> {
+pub fn draw(battle: &mut BattleState) -> (Arc<DreamwellCard>, BattleDreamwellCardId) {
     if battle.dreamwell.next_index == 0 {
         randomize(battle);
     }
 
-    let card = if let Some(card) = battle.dreamwell.cards.get(battle.dreamwell.next_index) {
-        card.clone()
+    let index = battle.dreamwell.next_index;
+    let (card, card_id) = if let (Some(card), card_id) = battle.dreamwell.get(index) {
+        (card.clone(), card_id)
     } else {
-        panic_invalid_index(battle, battle.dreamwell.next_index);
+        panic_invalid_index(battle, index);
     };
 
     battle.dreamwell.next_index += 1;
@@ -32,7 +33,7 @@ pub fn draw(battle: &mut BattleState) -> Arc<DreamwellCard> {
         battle.dreamwell.next_index = 0;
     }
 
-    card
+    (card, card_id)
 }
 
 pub fn randomize(battle: &mut BattleState) {

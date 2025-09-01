@@ -96,6 +96,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 40ff546e59bd542c58259da9c6580b71
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicCannon_Impact01.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 42596b33fedcf4378968d264c18fa1cf
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       25 orange explosion.prefab
@@ -245,6 +250,12 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 96214742bce4a4f2caa21e086cb04942
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic
+      Magic and Impacts/RPG3_MagicCute2_Heal02.wav
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 97d7e590715d24b7ab420ad274465588
     m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic
       Magic and Impacts/RPG3_Generic_SubtleWhoosh04.wav
@@ -330,6 +341,12 @@ MonoBehaviour:
   - m_GUID: b166252c36cbe434d96d7add83bd5bcf
     m_Address: Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile
       9 water.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b4d2a6feb3c9b4f91b2a82dd31854dd1
+    m_Address: Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Generic
+      Magic and Impacts/RPG3_Generic_SubtleWhoosh03.wav
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

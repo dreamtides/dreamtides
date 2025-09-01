@@ -17,8 +17,7 @@ fn put_three_cards_from_deck_into_void() {
 
     assert_eq!(
         final_void_size, expected_void_size,
-        "Event card and 3 deck cards should be in void. Initial: {}, Final: {}, Expected: {}",
-        initial_void_size, final_void_size, expected_void_size
+        "Event card and 3 deck cards should be in void. Initial: {initial_void_size}, Final: {final_void_size}, Expected: {expected_void_size}"
     );
 }
 

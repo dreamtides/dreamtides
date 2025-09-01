@@ -21,8 +21,8 @@ use crate::core::card_view_context::CardViewContext;
 use crate::core::response_builder::ResponseBuilder;
 use crate::display_actions::{display_state, outcome_simulation};
 use crate::rendering::{
-    card_rendering, identity_card_rendering, interface_rendering, modal_effect_prompt_rendering,
-    token_rendering,
+    card_rendering, dreamwell_card_rendering, identity_card_rendering, interface_rendering,
+    modal_effect_prompt_rendering, token_rendering,
 };
 
 pub fn run(builder: &mut ResponseBuilder, battle: &BattleState) {
@@ -96,6 +96,8 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
     ));
 
     cards.extend(modal_effect_prompt_rendering::cards(builder, battle));
+
+    cards.extend(dreamwell_card_rendering::all_cards(builder, battle));
 
     cards.push(identity_card_rendering::identity_card_view(
         builder,

@@ -67,18 +67,13 @@ pub fn render(
             }
         }
 
-        BattleAnimation::DreamwellActivation {
-            player,
-            dreamwell_card_id,
-            new_energy,
-            new_produced_energy,
-        } => {
+        BattleAnimation::DreamwellActivation { player, dreamwell_card_id } => {
             push_snapshot(builder, snapshot);
             builder.push(Command::DisplayDreamwellActivation(DisplayDreamwellActivationCommand {
                 player: builder.to_display_player(*player),
-                card_id: adapter::client_card_id(*dreamwell_card_id),
-                new_energy: Some(*new_energy),
-                new_produced_energy: Some(*new_produced_energy),
+                card_id: adapter::battle_dreamwell_card_id(*dreamwell_card_id),
+                new_energy: None,
+                new_produced_energy: None,
             }));
         }
 

@@ -476,7 +476,7 @@ fn get_targeting_icons(battle: &BattleState, card_id: CardId) -> Vec<InfoZoomIco
     icons.into_values().collect()
 }
 
-fn get_displayed_text(abilities: &[DisplayedAbility]) -> String {
+pub fn get_displayed_text(abilities: &[DisplayedAbility]) -> String {
     // Tags must use Fluent "quoted string" syntax to avoid breaking parsing.
     let colon = "{\"<size=130%>:</size>\"}";
     let line_height_25 = "{\"<line-height=25%>\"}";

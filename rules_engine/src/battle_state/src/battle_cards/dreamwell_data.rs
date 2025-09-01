@@ -11,6 +11,16 @@ use tabula_ids::card_lists::{self, DreamwellCardIdList};
 
 use crate::battle_cards::ability_list::AbilityData;
 
+/// Identifies a dreamwell card within a battle.
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, Serialize, Deserialize)]
+pub struct BattleDreamwellCardId(usize);
+
+impl From<BattleDreamwellCardId> for usize {
+    fn from(value: BattleDreamwellCardId) -> Self {
+        value.0
+    }
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct DreamwellCard {
     pub definition: DreamwellCardDefinition,
@@ -62,6 +72,17 @@ impl Dreamwell {
             )));
         }
         Self { cards: Arc::new(cards), next_index: 0 }
+    }
+
+    /// Returns the card at the given index and its [BattleDreamwellCardId].
+    pub fn get(&self, index: usize) -> (Option<Arc<DreamwellCard>>, BattleDreamwellCardId) {
+        (self.cards.get(index).cloned(), BattleDreamwellCardId(index))
+    }
+
+    /// Returns an iterator over all cards in the dreamwell, paired with their
+    /// [BattleDreamwellCardId].
+    pub fn all_cards(&self) -> impl Iterator<Item = (BattleDreamwellCardId, Arc<DreamwellCard>)> {
+        self.cards.iter().enumerate().map(|(i, c)| (BattleDreamwellCardId(i), c.clone()))
     }
 }
 

@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::battle::card_id::{
     AbilityId, ActivatedAbilityId, CardId, CardIdType, CharacterId, StackCardId,
 };
+use crate::battle_cards::dreamwell_data::BattleDreamwellCardId;
 
 /// Describes the source of some mutation or query.
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash, Serialize, Deserialize)]
@@ -18,7 +19,7 @@ pub enum EffectSource {
     Player { controller: PlayerName },
 
     /// Effect caused by a dreamwell activation.
-    Dreamwell { controller: PlayerName },
+    Dreamwell { controller: PlayerName, dreamwell_card_id: BattleDreamwellCardId },
 
     /// Effect caused by an ability of a card on the stack
     Event { controller: PlayerName, stack_card_id: StackCardId, ability_number: AbilityNumber },
@@ -39,7 +40,7 @@ impl EffectSource {
         match self {
             EffectSource::Game { controller } => *controller,
             EffectSource::Player { controller } => *controller,
-            EffectSource::Dreamwell { controller } => *controller,
+            EffectSource::Dreamwell { controller, .. } => *controller,
             EffectSource::Event { controller, .. } => *controller,
             EffectSource::Activated { controller, .. } => *controller,
             EffectSource::Triggered { controller, .. } => *controller,

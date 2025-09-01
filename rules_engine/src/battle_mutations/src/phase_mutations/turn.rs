@@ -64,9 +64,7 @@ pub fn run_turn_state_machine_if_no_active_prompts(battle: &mut BattleState) {
             }
             BattleTurnPhase::Judgment => {
                 battle.phase = BattleTurnPhase::Dreamwell;
-                dreamwell_phase::activate(battle, battle.turn.active_player, EffectSource::Game {
-                    controller: battle.turn.active_player,
-                });
+                dreamwell_phase::activate(battle, battle.turn.active_player);
                 apply_effect::execute_pending_effects_if_no_active_prompt(battle);
                 fire_triggers::execute_if_no_active_prompt(battle);
             }

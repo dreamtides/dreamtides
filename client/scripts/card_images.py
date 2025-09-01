@@ -6,11 +6,20 @@ Usage:
 Input images should be 1000px tall.
 
 Example Usage:
-    ./client/scripts/resize.py \
-        --input client/Assets/ThirdParty/GameAssets/SourceImages
-    ./client/scripts/card_images.py \ 
-        --input client/Assets/ThirdParty/GameAssets/SourceImages \
-        --output client/Assets/ThirdParty/GameAssets/CardImages \
+    ./client/scripts/resize.py \\
+        --input client/Assets/ThirdParty/GameAssets/SourceImages/Standard
+    ./client/scripts/card_images.py \\ 
+        --input client/Assets/ThirdParty/GameAssets/SourceImages/Standard \\
+        --output client/Assets/ThirdParty/GameAssets/CardImages/Standard \\
+        -r 45
+
+Example Usage:
+    ./client/scripts/resize.py \\
+        --input client/Assets/ThirdParty/GameAssets/SourceImages/Dreamwell
+    ./client/scripts/card_images.py \\ 
+        --input client/Assets/ThirdParty/GameAssets/SourceImages/Dreamwell \\
+        --output client/Assets/ThirdParty/GameAssets/CardImages/Dreamwell \\
+        --landscape \\ 
         -r 45
 """
  
@@ -45,7 +54,7 @@ def create_rounded_rectangle_mask(width, height, output_path, corner_radius=45, 
         output_path
     ], check=True)
 
-def process_image(image_file, output_file, corner_radius=45, verbose=False):
+def process_image(image_file, output_file, corner_radius=45, verbose=False, landscape=False):
     """Process a single image file, adding rounded corners and resizing."""
     log(f"Processing: {image_file}", verbose)
     
@@ -56,8 +65,10 @@ def process_image(image_file, output_file, corner_radius=45, verbose=False):
     if orig_height != 1000:
         raise ValueError(f"Error: Image {image_file} height is {orig_height}px. All images must be exactly 1000px tall.")
     
-    # Calculate target width (height / 1.15)
-    target_width = int(orig_height / 1.15)
+    if landscape:
+        target_width = int(orig_height * 1.6)
+    else:
+        target_width = int(orig_height / 1.15)
     
     # Create a temporary directory for our intermediate files
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -99,6 +110,7 @@ def main():
     parser.add_argument('--output', '-o', required=True, help='Output directory for processed PNG files')
     parser.add_argument('--corner-radius', '-r', type=int, default=45, help='Corner radius for rounded rectangle (default: 45)')
     parser.add_argument('--verbose', '-v', action='store_true', help='Enable verbose logging')
+    parser.add_argument('--landscape', '-l', action='store_true', help='Crop to 16:10 aspect ratio')
     
     # Parse arguments
     args = parser.parse_args()
@@ -107,6 +119,7 @@ def main():
     output_dir = args.output
     corner_radius = args.corner_radius
     verbose = args.verbose
+    landscape = args.landscape
 
     # Count of processed files
     processed_count = 0
@@ -138,7 +151,7 @@ def main():
                 
                 try:
                     # Process the image
-                    process_image(image_file, output_file, corner_radius, verbose)
+                    process_image(image_file, output_file, corner_radius, verbose, landscape)
                     processed_count += 1
                 except ValueError as e:
                     print(e)

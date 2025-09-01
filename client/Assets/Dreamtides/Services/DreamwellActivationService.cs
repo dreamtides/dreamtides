@@ -76,60 +76,61 @@ namespace Dreamtides.Services
       yield return flipSequence.WaitForCompletion();
 
       yield return new WaitForSeconds(_displayPauseDurationSeconds * _durationMultiplier);
+      /*
+            // Fire energy update projectile if energy change is specified
+            if (command.NewProducedEnergy.HasValue && command.NewEnergy.HasValue)
+            {
+              var projectile = Registry.AssetPoolService.Create(
+                _updateEnergyProjectilePrefab,
+                card.transform.position
+              );
 
-      // Fire energy update projectile if energy change is specified
-      if (command.NewProducedEnergy.HasValue && command.NewEnergy.HasValue)
-      {
-        var projectile = Registry.AssetPoolService.Create(
-          _updateEnergyProjectilePrefab,
-          card.transform.position
-        );
+              if (_fireSound != null)
+              {
+                Registry.SoundService.Play(_fireSound);
+              }
 
-        if (_fireSound != null)
-        {
-          Registry.SoundService.Play(_fireSound);
-        }
+              // Create a throw animation sequence
+              var startPosition = card.transform.position;
+              var statusDisplay = command.Player switch
+              {
+                DisplayPlayer.Enemy => Registry.Layout.EnemyStatusDisplay,
+                DisplayPlayer.User => Registry.Layout.UserStatusDisplay,
+                _ => throw Errors.UnknownEnumValue(command.Player)
+              };
+              var targetPosition = statusDisplay.transform.position;
+              var throwSequence = TweenUtils.Sequence("DreamwellThrow")
+                .Insert(0, card.transform.DOMove(Vector3.Lerp(startPosition, targetPosition, 0.1f), 0.1f))
+                .Insert(0.1f, card.transform.DOMove(startPosition, 0.1f));
 
-        // Create a throw animation sequence
-        var startPosition = card.transform.position;
-        var statusDisplay = command.Player switch
-        {
-          DisplayPlayer.Enemy => Registry.Layout.EnemyStatusDisplay,
-          DisplayPlayer.User => Registry.Layout.UserStatusDisplay,
-          _ => throw Errors.UnknownEnumValue(command.Player)
-        };
-        var targetPosition = statusDisplay.transform.position;
-        var throwSequence = TweenUtils.Sequence("DreamwellThrow")
-          .Insert(0, card.transform.DOMove(Vector3.Lerp(startPosition, targetPosition, 0.1f), 0.1f))
-          .Insert(0.1f, card.transform.DOMove(startPosition, 0.1f));
+              StartCoroutine(projectile.Fire(
+                Registry,
+                statusDisplay.transform,
+                new Milliseconds { MillisecondsValue = 500 },
+                onHit: () =>
+                {
+                  Registry.SoundService.Play(_energyUpdateSound);
+                  statusDisplay.SetEnergy(command.NewEnergy.Value, command.NewProducedEnergy.Value, true);
+                },
+                mute: true
+              ));
 
-        StartCoroutine(projectile.Fire(
-          Registry,
-          statusDisplay.transform,
-          new Milliseconds { MillisecondsValue = 500 },
-          onHit: () =>
-          {
-            Registry.SoundService.Play(_energyUpdateSound);
-            statusDisplay.SetEnergy(command.NewEnergy.Value, command.NewProducedEnergy.Value, true);
-          },
-          mute: true
-        ));
+              // Wait for the throw animation to complete
+              yield return throwSequence.WaitForCompletion();
+            }
 
-        // Wait for the throw animation to complete
-        yield return throwSequence.WaitForCompletion();
-      }
+            yield return new WaitForSeconds(0.3f * _durationMultiplier);
+            var finalMoveSequence = TweenUtils.Sequence("DreamwellActivationFinalMove");
+            finalMoveSequence.Insert(
+                0,
+                card.transform.DOMove(Registry.Layout.DreamwellActivation.transform.position, moveDuration)
+                  .SetEase(Ease.OutCubic));
+            finalMoveSequence.Insert(
+              0,
+              card.transform.DORotate(Registry.Layout.DreamwellActivation.transform.rotation.eulerAngles, moveDuration));
 
-      yield return new WaitForSeconds(0.3f * _durationMultiplier);
-      var finalMoveSequence = TweenUtils.Sequence("DreamwellActivationFinalMove");
-      finalMoveSequence.Insert(
-          0,
-          card.transform.DOMove(Registry.Layout.DreamwellActivation.transform.position, moveDuration)
-            .SetEase(Ease.OutCubic));
-      finalMoveSequence.Insert(
-        0,
-        card.transform.DORotate(Registry.Layout.DreamwellActivation.transform.rotation.eulerAngles, moveDuration));
-
-      yield return finalMoveSequence.WaitForCompletion();
+            yield return finalMoveSequence.WaitForCompletion();
+            */
     }
   }
 }

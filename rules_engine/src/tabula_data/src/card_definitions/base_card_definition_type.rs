@@ -1,5 +1,7 @@
 use ability_data::ability::{Ability, DisplayedAbility};
 
+use crate::card_definitions::base_card_definition_raw::BaseCardDefinitionRaw;
+
 pub trait BaseCardDefinitionType {
     fn id_string(&self) -> String;
     fn rules_text_en_us(&self) -> &str;
@@ -10,9 +12,10 @@ pub trait BaseCardDefinitionType {
     fn displayed_abilities_ref(&self) -> Option<&Vec<DisplayedAbility>>;
     fn displayed_abilities_mut(&mut self) -> &mut Option<Vec<DisplayedAbility>>;
     fn image_number(&self) -> &str;
+    fn image_directory(&self) -> &'static str;
 }
 
-impl BaseCardDefinitionType for super::base_card_definition_raw::BaseCardDefinitionRaw {
+impl BaseCardDefinitionType for BaseCardDefinitionRaw {
     fn id_string(&self) -> String {
         format!("{}", self.id.0)
     }
@@ -47,6 +50,10 @@ impl BaseCardDefinitionType for super::base_card_definition_raw::BaseCardDefinit
 
     fn image_number(&self) -> &str {
         self.image_number.as_str()
+    }
+
+    fn image_directory(&self) -> &'static str {
+        "Standard"
     }
 }
 
@@ -85,5 +92,9 @@ impl BaseCardDefinitionType for super::dreamwell_card_definition::DreamwellCardD
 
     fn image_number(&self) -> &str {
         self.image_number.as_str()
+    }
+
+    fn image_directory(&self) -> &'static str {
+        "Dreamwell"
     }
 }

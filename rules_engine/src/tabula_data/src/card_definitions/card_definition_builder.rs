@@ -41,7 +41,8 @@ fn common_fields<T: BaseCardDefinitionType>(
     };
     let displayed_prompts = row.prompts_en_us().map(|s| vec![s.to_string()]).unwrap_or_default();
     let image = SpriteAddress::new(format!(
-        "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_{}.png",
+        "Assets/ThirdParty/GameAssets/CardImages/{}/shutterstock_{}.png",
+        row.image_directory(),
         row.image_number()
     ));
 

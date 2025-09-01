@@ -1,12 +1,13 @@
 use ability_data::effect::ModelEffectChoiceIndex;
 use core_data::identifiers::AbilityNumber;
-use core_data::numerics::{Energy, Points, Spark};
+use core_data::numerics::{Points, Spark};
 use core_data::types::PlayerName;
 use strum::{Display, EnumDiscriminants};
 
 use crate::battle::card_id::{
     ActivatedAbilityId, BattleDeckCardId, CardId, CharacterId, HandCardId,
 };
+use crate::battle_cards::dreamwell_data::BattleDreamwellCardId;
 use crate::battle_cards::stack_card_state::{EffectTargets, StackItemId};
 use crate::battle_cards::zone::Zone;
 use crate::core::effect_source::EffectSource;
@@ -37,9 +38,7 @@ pub enum BattleAnimation {
     },
     DreamwellActivation {
         player: PlayerName,
-        dreamwell_card_id: CardId,
-        new_energy: Energy,
-        new_produced_energy: Energy,
+        dreamwell_card_id: BattleDreamwellCardId,
     },
     GainEnergy {
         player: PlayerName,

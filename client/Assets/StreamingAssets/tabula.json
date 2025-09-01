@@ -2230,7 +2230,7 @@
     },
     {
       "id": "e2c10a87-e92f-4170-9bbf-c288abcf9f9b",
-      "name_en_us": "Shadow Passage",
+      "name_en_us": "Auroral Passage",
       "energy_produced": "1",
       "rules_text_en_us": "Put the top {-count(n: 3)} cards of your deck into your void.",
       "phase": "1",
@@ -2260,7 +2260,7 @@
           }
         }
       ],
-      "image_number": "1068256757"
+      "image_number": "2421338077"
     },
     {
       "id": "146ae27e-a8ac-4f3c-aef2-cf2211e4bcfe",
@@ -2476,7 +2476,7 @@
           }
         }
       ],
-      "image_number": "1068256757"
+      "image_number": "2421338077"
     }
   ],
   "card_lists": [

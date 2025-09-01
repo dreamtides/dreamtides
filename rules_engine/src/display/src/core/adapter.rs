@@ -1,5 +1,6 @@
 use ability_data::effect::ModelEffectChoiceIndex;
 use battle_state::battle::card_id::{CardId, CardIdType, VoidCardId};
+use battle_state::battle_cards::dreamwell_data::BattleDreamwellCardId;
 use battle_state::battle_cards::stack_card_state::StackItemId;
 use display_data::card_view::ClientCardId;
 use display_data::command::GameObjectId;
@@ -20,6 +21,11 @@ pub fn stack_item_client_card_id(item: impl Into<StackItemId>) -> ClientCardId {
 
 pub fn card_game_object_id(id: impl CardIdType) -> GameObjectId {
     GameObjectId::CardId(client_card_id(id.card_id()))
+}
+
+pub fn battle_dreamwell_card_id(card_id: BattleDreamwellCardId) -> ClientCardId {
+    let index: usize = card_id.into();
+    format!("D{index}")
 }
 
 pub fn card_game_object_client_id(id: &ClientCardId) -> GameObjectId {
