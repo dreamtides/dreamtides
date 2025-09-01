@@ -56,9 +56,20 @@ pub struct Dreamwell {
     /// Index of the next card to be drawn from the dreamwell.
     #[serde(default)]
     pub next_index: usize,
+
+    /// Whether the first complete iteration through all cards has finished.
+    ///
+    /// Subsequent iterations through the dreamwell will skip phase 0 cards.
+    #[serde(default)]
+    pub first_iteration_complete: bool,
 }
 
 impl Dreamwell {
+    /// Clones the dreamwell and resets the next index to 0.
+    pub fn clone_and_reset(&self) -> Self {
+        Self { cards: self.cards.clone(), next_index: 0, first_iteration_complete: false }
+    }
+
     /// Creates a new dreamwell from a [DreamwellCardIdList].
     pub fn from_card_list(tabula: &Tabula, list: DreamwellCardIdList) -> Self {
         let mut cards = Vec::new();
@@ -71,7 +82,7 @@ impl Dreamwell {
                     .clone(),
             )));
         }
-        Self { cards: Arc::new(cards), next_index: 0 }
+        Self { cards: Arc::new(cards), next_index: 0, first_iteration_complete: false }
     }
 
     /// Returns the card at the given index and its [BattleDreamwellCardId].

@@ -13,23 +13,30 @@ pub fn draw(battle: &mut BattleState) -> (Arc<DreamwellCard>, BattleDreamwellCar
         randomize(battle);
     }
 
-    let index = battle.dreamwell.next_index;
+    let mut index = battle.dreamwell.next_index;
+
+    // Skip phase 0 cards if this is not the first iteration through the
+    // dreamwell.
+    if battle.dreamwell.first_iteration_complete {
+        while index < battle.dreamwell.cards.len() {
+            if let (Some(card), _) = battle.dreamwell.get(index) {
+                if card.definition.phase != 0 {
+                    break;
+                }
+            }
+            index += 1;
+        }
+    }
+
     let (card, card_id) = if let (Some(card), card_id) = battle.dreamwell.get(index) {
         (card.clone(), card_id)
     } else {
         panic_invalid_index(battle, index);
     };
 
-    battle.dreamwell.next_index += 1;
-    if battle.dreamwell.next_index == battle.dreamwell.cards.len() {
-        // Special case: when we reach the end of the dreamwell, remove all
-        // 'phase 0' cards, since these are the "starter" cards.
-        let mut new_cards = battle.dreamwell.cards.as_ref().clone();
-        new_cards.retain(|c| c.definition.phase != 0);
-
-        if !new_cards.is_empty() {
-            battle.dreamwell.cards = Arc::new(new_cards);
-        }
+    battle.dreamwell.next_index = index + 1;
+    if battle.dreamwell.next_index >= battle.dreamwell.cards.len() {
+        battle.dreamwell.first_iteration_complete = true;
         battle.dreamwell.next_index = 0;
     }
 
