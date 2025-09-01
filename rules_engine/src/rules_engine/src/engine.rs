@@ -12,7 +12,7 @@ use battle_queries::battle_trace;
 use battle_queries::macros::write_tracing_event;
 use battle_state::battle::animation_data::AnimationData;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
-use battle_state::battle_cards::dreamwell::Dreamwell;
+use battle_state::battle_cards::dreamwell_data::Dreamwell;
 use battle_state::battle_player::battle_player_state::{
     CreateBattlePlayer, PlayerType, TestDeckName,
 };
@@ -343,7 +343,7 @@ fn load_battle_from_provider<P: StateProvider + 'static>(
                     &provider.tabula(),
                     configuration
                         .dreamwell_override
-                        .unwrap_or(DreamwellCardIdList::TestDreamwellNoAbilities),
+                        .unwrap_or(DreamwellCardIdList::TestDreamwellBasic5),
                 ),
                 CreateBattlePlayer { player_type: PlayerType::User(user_id), deck_name },
                 CreateBattlePlayer { player_type: enemy, deck_name },

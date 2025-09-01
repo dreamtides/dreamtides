@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use ai_data::game_ai::GameAI;
 use battle_mutations::card_mutations::{battle_deck, move_card};
 use battle_state::battle::battle_state::{BattleState, LoggingOptions, RequestContext};
-use battle_state::battle_cards::dreamwell::Dreamwell;
+use battle_state::battle_cards::dreamwell_data::Dreamwell;
 use battle_state::battle_player::battle_player_state::{
     CreateBattlePlayer, PlayerType, TestDeckName,
 };

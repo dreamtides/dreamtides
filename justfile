@@ -298,3 +298,6 @@ code-review-rsync: rsync-for-review
 
 unity-test-rsync: rsync-for-review
     cd ~/dreamtides_tests && just unity-tests
+
+regenerate-test-battles:
+    cargo run --bin core_11_battle --manifest-path rules_engine/Cargo.toml -- --output rules_engine/benchmarks/benchmark_battles/src/core_11_battle.json

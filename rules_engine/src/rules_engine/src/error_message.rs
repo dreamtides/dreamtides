@@ -1,5 +1,5 @@
 use battle_state::battle::battle_state::{BattleState, RequestContext};
-use battle_state::battle_cards::dreamwell::Dreamwell;
+use battle_state::battle_cards::dreamwell_data::Dreamwell;
 use battle_state::battle_player::battle_player_state::{
     CreateBattlePlayer, PlayerType, TestDeckName,
 };

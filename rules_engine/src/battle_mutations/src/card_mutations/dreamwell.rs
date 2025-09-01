@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use battle_queries::panic_with;
 use battle_state::battle::battle_state::BattleState;
-use battle_state::battle_cards::dreamwell::DreamwellCard;
+use battle_state::battle_cards::dreamwell_data::DreamwellCard;
 use rand::seq::SliceRandom;
 
 /// Draws the next card from the dreamwell.

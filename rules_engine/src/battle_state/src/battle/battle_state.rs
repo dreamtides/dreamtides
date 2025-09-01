@@ -23,7 +23,7 @@ use crate::battle::turn_data::TurnData;
 use crate::battle::turn_history::TurnHistory;
 use crate::battle_cards::ability_state::AbilityState;
 use crate::battle_cards::activated_ability_state::ActivatedAbilityState;
-use crate::battle_cards::dreamwell::Dreamwell;
+use crate::battle_cards::dreamwell_data::Dreamwell;
 use crate::battle_cards::stack_card_state::EffectTargets;
 use crate::battle_player::battle_player_state::BattlePlayerState;
 use crate::battle_player::player_map::PlayerMap;

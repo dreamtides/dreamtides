@@ -18,7 +18,7 @@ use battle_state::battle::card_id::{CardId, CharacterId, HandCardId};
 use battle_state::battle::turn_data::TurnData;
 use battle_state::battle::turn_history::TurnHistory;
 use battle_state::battle_cards::ability_state::AbilityState;
-use battle_state::battle_cards::dreamwell::Dreamwell;
+use battle_state::battle_cards::dreamwell_data::Dreamwell;
 use battle_state::battle_cards::zone::Zone;
 use battle_state::battle_player::battle_player_state::{
     BattlePlayerState, PlayerType, TestDeckName,

@@ -8,7 +8,7 @@ use battle_queries::battle_card_queries::{card, card_abilities};
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::battle::battle_card_definitions::BattleCardDefinitions;
 use battle_state::battle::battle_state::{BattleState, LoggingOptions, RequestContext};
-use battle_state::battle_cards::dreamwell::Dreamwell;
+use battle_state::battle_cards::dreamwell_data::Dreamwell;
 use battle_state::battle_player::battle_player_state::{
     CreateBattlePlayer, PlayerType, TestDeckName,
 };
@@ -90,10 +90,7 @@ fn generate_core_11_battle_with_logging(enable_logging: bool) -> BattleState {
         BattleId(Uuid::new_v4()),
         provider.tabula(),
         seed,
-        Dreamwell::from_card_list(
-            &provider.tabula(),
-            DreamwellCardIdList::TestDreamwellNoAbilities,
-        ),
+        Dreamwell::from_card_list(&provider.tabula(), DreamwellCardIdList::TestDreamwellBasic5),
         CreateBattlePlayer {
             player_type: PlayerType::Agent(GameAI::AlwaysPanic),
             deck_name: TestDeckName::CoreEleven,

@@ -6,7 +6,7 @@ use battle_mutations::actions::apply_battle_action;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_state::battle::battle_state::{LoggingOptions, RequestContext};
 use battle_state::battle::battle_status::BattleStatus;
-use battle_state::battle_cards::dreamwell::Dreamwell;
+use battle_state::battle_cards::dreamwell_data::Dreamwell;
 use battle_state::battle_player::battle_player_state::{
     CreateBattlePlayer, PlayerType, TestDeckName,
 };
