@@ -250,28 +250,26 @@ fn format_prompt_choices(prompt: &PromptType) -> Vec<String> {
 }
 
 fn debug_dreamwell(state: &BattleState) -> DebugDreamwellState {
-    let active = state
-        .ability_state
-        .until_end_of_turn
-        .active_dreamwell_card
-        .map(usize::from)
-        .unwrap_or(usize::MAX);
+    let active = state.ability_state.until_end_of_turn.active_dreamwell_card.map(usize::from);
     let cards = state
         .dreamwell
         .all_cards()
-        .map(|(id, card)| DebugDreamwellCardState {
-            index: format!("{}", usize::from(id)),
-            name: card.definition.displayed_name.to_string(),
-            phase: format!("{:?}", card.definition.phase),
-            produced_energy: format!("{:?}", card.produced_energy),
-            abilities: card.effects.iter().map(|a| format!("{:?}", a.ability)).collect(),
-            is_active: format!("{}", usize::from(id) == active),
+        .map(|(id, card)| {
+            let idx = usize::from(id);
+            DebugDreamwellCardState {
+                index: format!("{idx}"),
+                name: card.definition.displayed_name.to_string(),
+                phase: format!("{:?}", card.definition.phase),
+                produced_energy: format!("{:?}", card.produced_energy),
+                abilities: card.effects.iter().map(|a| format!("{:?}", a.ability)).collect(),
+                is_active: format!("{}", active.map(|a| a == idx).unwrap_or(false)),
+            }
         })
         .collect();
     DebugDreamwellState {
         next_index: format!("{:?}", state.dreamwell.next_index),
         first_iteration_complete: format!("{:?}", state.dreamwell.first_iteration_complete),
-        active_card: if active == usize::MAX { String::new() } else { format!("{active}") },
+        active_card: active.map(|a| format!("{a}")).unwrap_or_default(),
         cards,
     }
 }
