@@ -1,4 +1,4 @@
-use core_data::identifiers::{BaseCardId, DreamwellCardId};
+use core_data::identifiers::{BaseCardId, DreamwellCardDefinitionId};
 use uuid::uuid;
 
 pub const TEST_VANILLA_CHARACTER: BaseCardId =
@@ -137,34 +137,34 @@ pub const TEST_DISCARD: BaseCardId = BaseCardId(uuid!("6e76f193-dcf0-4faf-b1f7-5
 /// Discard {-discarded-cards(n: 2)}.
 pub const TEST_DISCARD_TWO: BaseCardId = BaseCardId(uuid!("ef6d55f9-49ba-4637-af50-91068cb3a2b2"));
 
-pub const DREAMWELL_PRODUCE_0: DreamwellCardId =
-    DreamwellCardId(uuid!("146ae27e-a8ac-4f3c-aef2-cf2211e4bcfe"));
+pub const DREAMWELL_PRODUCE_0: DreamwellCardDefinitionId =
+    DreamwellCardDefinitionId(uuid!("146ae27e-a8ac-4f3c-aef2-cf2211e4bcfe"));
 
-pub const DREAMWELL_PRODUCE_1: DreamwellCardId =
-    DreamwellCardId(uuid!("ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2"));
+pub const DREAMWELL_PRODUCE_1: DreamwellCardDefinitionId =
+    DreamwellCardDefinitionId(uuid!("ee7b0367-f7c3-46c3-94db-b29cfd8dc2d2"));
 
-pub const DREAMWELL_PRODUCE_2_STARTER: DreamwellCardId =
-    DreamwellCardId(uuid!("308fd4c0-ca98-4bfa-a9be-c29b36a145fd"));
+pub const DREAMWELL_PRODUCE_2_STARTER: DreamwellCardDefinitionId =
+    DreamwellCardDefinitionId(uuid!("308fd4c0-ca98-4bfa-a9be-c29b36a145fd"));
 
 /// {-Foresee(n:1)}.
-pub const DREAMWELL_FORESEE: DreamwellCardId =
-    DreamwellCardId(uuid!("40c77ea8-a021-4bc6-8970-0853c03f3fe0"));
+pub const DREAMWELL_FORESEE: DreamwellCardDefinitionId =
+    DreamwellCardDefinitionId(uuid!("40c77ea8-a021-4bc6-8970-0853c03f3fe0"));
 
 /// Gain {-gained-points(n: 2)}.
-pub const DREAMWELL_GAIN_POINTS: DreamwellCardId =
-    DreamwellCardId(uuid!("d386663c-9e9f-4b8e-b410-f3467e39801b"));
+pub const DREAMWELL_GAIN_POINTS: DreamwellCardDefinitionId =
+    DreamwellCardDefinitionId(uuid!("d386663c-9e9f-4b8e-b410-f3467e39801b"));
 
 /// Gain {-gained-energy(e: 1)}.
-pub const DREAMWELL_GAIN_ENERGY: DreamwellCardId =
-    DreamwellCardId(uuid!("107c3b3f-6131-4ff8-afcb-f0ce4188848f"));
+pub const DREAMWELL_GAIN_ENERGY: DreamwellCardDefinitionId =
+    DreamwellCardDefinitionId(uuid!("107c3b3f-6131-4ff8-afcb-f0ce4188848f"));
 
 /// Draw {-drawn-cards(n: 1)}. Discard {-discarded-cards(n: 1)}.
-pub const DREAMWELL_DRAW_DISCARD: DreamwellCardId =
-    DreamwellCardId(uuid!("40e4381f-12f7-46b9-ae50-67b3195781b1"));
+pub const DREAMWELL_DRAW_DISCARD: DreamwellCardDefinitionId =
+    DreamwellCardDefinitionId(uuid!("40e4381f-12f7-46b9-ae50-67b3195781b1"));
 
 /// Put the top {-count(n: 3)} cards of your deck into your void.
-pub const DREAMWELL_MILL_3: DreamwellCardId =
-    DreamwellCardId(uuid!("a2cdf115-8e1a-455e-a118-123f6f36c7ba"));
+pub const DREAMWELL_MILL_3: DreamwellCardDefinitionId =
+    DreamwellCardDefinitionId(uuid!("a2cdf115-8e1a-455e-a118-123f6f36c7ba"));
 
 pub const ALL_TEST_CARD_IDS: &[BaseCardId] = &[
     TEST_VANILLA_CHARACTER,
@@ -204,7 +204,7 @@ pub const ALL_TEST_CARD_IDS: &[BaseCardId] = &[
     TEST_DISCARD_TWO,
 ];
 
-pub const ALL_TEST_DREAMWELL_CARD_IDS: &[DreamwellCardId] = &[
+pub const ALL_TEST_DREAMWELL_CARD_IDS: &[DreamwellCardDefinitionId] = &[
     DREAMWELL_PRODUCE_0,
     DREAMWELL_PRODUCE_1,
     DREAMWELL_PRODUCE_2_STARTER,

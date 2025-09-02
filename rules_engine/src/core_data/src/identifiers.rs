@@ -44,7 +44,7 @@ pub struct BaseCardId(pub Uuid);
 #[derive(
     Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
 )]
-pub struct DreamwellCardId(pub Uuid);
+pub struct DreamwellCardDefinitionId(pub Uuid);
 
 /// Number of an ability within a card.
 #[derive(

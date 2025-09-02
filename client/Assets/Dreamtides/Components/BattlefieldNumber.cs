@@ -24,12 +24,13 @@ namespace Dreamtides
 
     public void SetText(string text, bool animate)
     {
+      var matchesOriginal = _originalText == text;
       SetOriginalText(text);
 
       if (_text.text != text && !_activePreview)
       {
         SetTextInternal(text);
-        if (animate && text != _originalText)
+        if (animate && !matchesOriginal)
         {
           // Toggle to restart animation if needed
           _onChange.gameObject.SetActive(false);

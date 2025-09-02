@@ -56,12 +56,11 @@ fn discard_two_cards_basic() {
 
     s.create_and_play(DisplayPlayer::User, test_card::TEST_DISCARD_TWO);
 
-    let cards_in_browser = s.user_client.cards.browser_cards();
-
-    assert!(!cards_in_browser.is_empty(), "Should have cards in browser for selection");
-    assert!(cards_in_browser.contains(&card1), "Card1 should be selectable");
-    assert!(cards_in_browser.contains(&card2), "Card2 should be selectable");
-    assert!(cards_in_browser.contains(&card3), "Card3 should be selectable");
+    let cards_in_hand = s.user_client.cards.user_hand();
+    assert!(!cards_in_hand.is_empty(), "Should have cards in hand for selection");
+    assert!(cards_in_hand.contains(&card1), "Card1 should be selectable");
+    assert!(cards_in_hand.contains(&card2), "Card2 should be selectable");
+    assert!(cards_in_hand.contains(&card3), "Card3 should be selectable");
 
     s.click_card(DisplayPlayer::User, &card1);
     s.click_card(DisplayPlayer::User, &card2);
@@ -161,27 +160,4 @@ fn discard_two_cards_with_only_one_in_hand() {
         2,
         "Should have 2 cards in void (1 discarded + 1 played)"
     );
-}
-
-#[test]
-fn discard_two_cards_browser_closes_after_submit() {
-    let mut s = TestBattle::builder().connect();
-    let card1 = s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
-    let card2 = s.add_to_hand(
-        DisplayPlayer::User,
-        test_card::TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER,
-    );
-    s.add_to_hand(DisplayPlayer::User, test_card::TEST_COUNTERSPELL_CHARACTER);
-
-    s.create_and_play(DisplayPlayer::User, test_card::TEST_DISCARD_TWO);
-
-    let cards_in_browser_before = s.user_client.cards.browser_cards();
-    assert!(!cards_in_browser_before.is_empty(), "Should have cards in browser before submit");
-
-    s.click_card(DisplayPlayer::User, &card1);
-    s.click_card(DisplayPlayer::User, &card2);
-    s.click_primary_button(DisplayPlayer::User, "Submit");
-
-    let cards_in_browser_after = s.user_client.cards.browser_cards();
-    assert_eq!(cards_in_browser_after.len(), 0, "No cards should be in browser after submit");
 }

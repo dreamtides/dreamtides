@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use ability_data::ability::{Ability, DisplayedAbility};
 use core_data::card_types::CardSubtype;
 use core_data::display_types::SpriteAddress;
-use core_data::identifiers::{BaseCardId, DreamwellCardId};
+use core_data::identifiers::{BaseCardId, DreamwellCardDefinitionId};
 use core_data::initialization_error::{ErrorCode, InitializationError};
 use core_data::numerics::{Energy, Spark};
 
@@ -183,10 +183,11 @@ pub fn build_base_cards(
 pub fn build_dreamwell_cards(
     sheet_name: &str,
     context: &TabulaBuildContext,
-    table: &Table<DreamwellCardId, DreamwellCardDefinitionRaw>,
-) -> Result<BTreeMap<DreamwellCardId, DreamwellCardDefinition>, Vec<InitializationError>> {
+    table: &Table<DreamwellCardDefinitionId, DreamwellCardDefinitionRaw>,
+) -> Result<BTreeMap<DreamwellCardDefinitionId, DreamwellCardDefinition>, Vec<InitializationError>>
+{
     let mut errors: Vec<InitializationError> = Vec::new();
-    let mut out: BTreeMap<DreamwellCardId, DreamwellCardDefinition> = BTreeMap::new();
+    let mut out: BTreeMap<DreamwellCardDefinitionId, DreamwellCardDefinition> = BTreeMap::new();
     for (row_index, row) in table.as_slice().iter().enumerate() {
         let Some(CommonCardFields {
             displayed_name,

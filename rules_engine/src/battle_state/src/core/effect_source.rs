@@ -34,6 +34,14 @@ pub enum EffectSource {
     IfYouDo { controller: PlayerName, ability_id: AbilityId },
 }
 
+/// Represents the card which caused an effect.
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+pub enum CardSource {
+    CardId(CardId),
+    DreamwellCard(BattleDreamwellCardId),
+    None,
+}
+
 impl EffectSource {
     /// Returns the controller of this effect.
     pub fn controller(&self) -> PlayerName {
@@ -45,6 +53,16 @@ impl EffectSource {
             EffectSource::Activated { controller, .. } => *controller,
             EffectSource::Triggered { controller, .. } => *controller,
             EffectSource::IfYouDo { controller, .. } => *controller,
+        }
+    }
+
+    pub fn card_source(&self) -> CardSource {
+        if let Some(card_id) = self.card_id() {
+            CardSource::CardId(card_id)
+        } else if let EffectSource::Dreamwell { dreamwell_card_id, .. } = self {
+            CardSource::DreamwellCard(*dreamwell_card_id)
+        } else {
+            CardSource::None
         }
     }
 

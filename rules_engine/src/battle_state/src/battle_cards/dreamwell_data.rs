@@ -90,6 +90,11 @@ impl Dreamwell {
         (self.cards.get(index).cloned(), BattleDreamwellCardId(index))
     }
 
+    /// Returns the [DreamwellCardDefinition] for the given card ID.
+    pub fn definition(&self, id: BattleDreamwellCardId) -> &DreamwellCardDefinition {
+        &self.cards[id.0].definition
+    }
+
     /// Returns an iterator over all cards in the dreamwell, paired with their
     /// [BattleDreamwellCardId].
     pub fn all_cards(&self) -> impl Iterator<Item = (BattleDreamwellCardId, Arc<DreamwellCard>)> {

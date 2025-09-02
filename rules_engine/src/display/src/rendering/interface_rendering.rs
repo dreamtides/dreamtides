@@ -7,6 +7,7 @@ use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalA
 use battle_queries::panic_with;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
+use battle_state::core::effect_source::CardSource;
 use battle_state::prompt_types::prompt_data::{PromptData, PromptType};
 use core_data::numerics::Energy;
 use display_data::battle_view::{
@@ -110,12 +111,23 @@ fn render_prompt_message(
 }
 
 fn get_prompt_message_from_source(battle: &BattleState, prompt: &PromptData) -> Option<String> {
-    let card_id = prompt.source.card_id()?;
-    // TODO: Handle multiple prompts per card.
-    let definition = card::get_definition(battle, card_id);
-    let prompt = definition.displayed_prompts.first()?.as_str();
+    let prompt = match prompt.source.card_source() {
+        CardSource::CardId(card_id) => {
+            // TODO: Handle multiple prompts per card.
+            let definition = card::get_definition(battle, card_id);
+            definition.displayed_prompts.first()?.clone()
+        }
+        CardSource::DreamwellCard(dreamwell_card_id) => {
+            let definition = battle.dreamwell.definition(dreamwell_card_id);
+            definition.displayed_prompts.first()?.clone()
+        }
+        CardSource::None => {
+            return None;
+        }
+    };
+
     Some(battle.tabula.strings.format_display_string(
-        prompt,
+        &prompt,
         StringContext::Interface,
         FluentArgs::default(),
     ))
