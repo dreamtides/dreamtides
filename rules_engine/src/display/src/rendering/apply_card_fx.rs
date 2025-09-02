@@ -4,7 +4,7 @@ use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{CardId, CardIdType};
 use battle_state::battle_cards::zone::Zone;
 use battle_state::core::effect_source::EffectSource;
-use core_data::display_types::EffectAddress;
+use core_data::display_types::{EffectAddress, Milliseconds};
 use core_data::types::PlayerName;
 use display_data::card_view::{CardEffects, ClientCardId};
 use display_data::command::{
@@ -305,8 +305,8 @@ fn display_effect(
     let duration = match &row.effect_duration_milliseconds {
         Some(d) => *d.as_ref(),
         None => {
-            warn!(?row.card_id, "Missing effect_duration_milliseconds for DisplayEffect effect");
-            return;
+            warn!(?row.card_id, "Missing effect_duration_milliseconds for DisplayEffect effect; defaulting to 500ms");
+            Milliseconds::new(500)
         }
     };
     let scale = match row.effect_scale {

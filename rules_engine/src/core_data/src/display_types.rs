@@ -214,24 +214,12 @@ impl Milliseconds {
 
 impl StringWrapper for Milliseconds {
     fn to_string_value(&self) -> String {
-        let ms = self.milliseconds_value;
-        let mut s = format!("{:.3}", ms as f32 / 1000.0);
-        while s.contains('.') && s.ends_with('0') {
-            s.pop();
-        }
-        if s.ends_with('.') {
-            s.pop();
-        }
-        s
+        self.milliseconds_value.to_string()
     }
 
     fn from_string_value(s: &str) -> Result<Self, String> {
         let trimmed = s.trim();
-        let seconds = trimmed.parse::<f32>().map_err(|e| e.to_string())?;
-        if seconds < 0.0 {
-            return Err("negative seconds".to_string());
-        }
-        let ms = (seconds * 1000.0).round() as u32;
+        let ms = trimmed.parse::<u32>().map_err(|e| e.to_string())?;
         Ok(Milliseconds { milliseconds_value: ms })
     }
 }

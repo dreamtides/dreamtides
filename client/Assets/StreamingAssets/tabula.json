@@ -2563,7 +2563,7 @@
       "effect_trigger": "ApplyTargetedEffect",
       "projectile_source": "ThisCard",
       "projectile_target": "ForEachTarget",
-      "projectile_address": "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 10 blue laser.prefab",
+      "projectile_address": "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 6 blue fire.prefab",
       "projectile_fire_sound": "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Cast01.wav",
       "projectile_impact_sound": "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Impact03.wav"
     },

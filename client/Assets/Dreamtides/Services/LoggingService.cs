@@ -20,6 +20,8 @@ namespace Dreamtides.Services
         private readonly List<LogEntry> _bufferedLogs = new();
         private float? _lastBufferedLogTime;
         private const float SPAN_TIMEOUT_SECONDS = 10f;
+    // Reentrancy guard so our own Debug.Log calls don't get re-captured and re-logged infinitely
+    private bool _emittingToUnityConsole;
 
         protected override void OnInitialize(TestConfiguration? testConfiguration)
         {
@@ -340,6 +342,33 @@ namespace Dreamtides.Services
                 _bufferedLogs.Add(entry);
                 _lastBufferedLogTime = Time.time;
             }
+
+            // Immediately emit to Unity console (guard against recursive capture)
+            if (!_emittingToUnityConsole)
+            {
+                try
+                {
+                    _emittingToUnityConsole = true;
+                    switch (logType)
+                    {
+                        case Schema.LogType.Error:
+                            Debug.LogError(formattedMessage);
+                            break;
+                        case Schema.LogType.Warning:
+                            Debug.LogWarning(formattedMessage);
+                            break;
+                        case Schema.LogType.Info:
+                        case Schema.LogType.Debug:
+                        default:
+                            Debug.Log(formattedMessage);
+                            break;
+                    }
+                }
+                finally
+                {
+                    _emittingToUnityConsole = false;
+                }
+            }
         }
 
         private static string FormatMessageWithArguments(string message, Dictionary<string, string> arguments, string? source = null)
@@ -357,6 +386,8 @@ namespace Dreamtides.Services
 
         private void OnUnityLogMessageReceived(string condition, string _stackTrace, UnityEngine.LogType type)
         {
+            // If we're currently emitting to the console ourselves, skip to avoid duplication
+            if (_emittingToUnityConsole) return;
             var logType = ConvertUnityLogType(type);
             var arguments = new Dictionary<string, string>();
             AddLogEntry(logType, condition, arguments);

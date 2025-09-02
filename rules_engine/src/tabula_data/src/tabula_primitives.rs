@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize, Serializer};
 
 /// A wrapper around a value that can be constructed from or serialized to a
 /// string.
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct TabulaValue<T>(pub T);
 
 impl<T> Deref for TabulaValue<T> {
