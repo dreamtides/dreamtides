@@ -34,6 +34,7 @@ pub fn execute<P>(
                 battle.players.two.as_create_battle_player(),
                 battle.request_context.clone(),
             );
+            provider.clear_undo_stack(battle.id);
         }
         DebugAction::RestartBattleWithDecks { one, two } => {
             let seed = rand::rng().next_u64();
@@ -52,6 +53,7 @@ pub fn execute<P>(
                 },
                 battle.request_context.clone(),
             );
+            provider.clear_undo_stack(battle.id);
         }
         DebugAction::SetOpponentAgent(ai) => {
             battle.players.player_mut(user_player.opponent()).player_type = PlayerType::Agent(ai);

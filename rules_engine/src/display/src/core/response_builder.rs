@@ -94,6 +94,11 @@ impl ResponseBuilder {
         self.pending_commands.push(command);
     }
 
+    /// Returns the [DisplayStateProvider] instance
+    pub fn provider(&self) -> Arc<dyn DisplayStateProvider> {
+        self.provider.clone()
+    }
+
     /// Returns the [Tabula] instance
     pub fn tabula(&self) -> Arc<Tabula> {
         self.provider.tabula().clone()

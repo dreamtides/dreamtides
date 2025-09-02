@@ -3,9 +3,10 @@ use std::fs::File;
 use std::sync::{Arc, Mutex, RwLock};
 use std::time::Instant;
 
-use battle_state::battle::battle_state::RequestContext;
-use core_data::identifiers::UserId;
+use battle_state::battle::battle_state::{BattleState, RequestContext};
+use core_data::identifiers::{BattleId, UserId};
 use core_data::initialization_error::{ErrorCode, InitializationError};
+use core_data::types::PlayerName;
 use database::save_file::SaveFile;
 use serde_json;
 use tabula_data::localized_strings::LanguageId;
@@ -29,6 +30,7 @@ struct TestStateProviderInner {
     pending_updates: Mutex<HashMap<UserId, Vec<PollResult>>>,
     display_states: Mutex<HashMap<UserId, DisplayState>>,
     tabula: RwLock<Option<Arc<Tabula>>>,
+    undo_stacks: Mutex<HashMap<BattleId, Vec<(PlayerName, BattleState)>>>,
 }
 
 impl TestStateProvider {
@@ -42,6 +44,7 @@ impl TestStateProvider {
                 processing_users: Mutex::new(HashMap::new()),
                 pending_updates: Mutex::new(HashMap::new()),
                 display_states: Mutex::new(HashMap::new()),
+                undo_stacks: Mutex::new(HashMap::new()),
                 tabula: RwLock::new(None),
             }),
         }
@@ -227,6 +230,32 @@ impl StateProvider for TestStateProvider {
         None
     }
 
+    fn push_undo_entry(&self, battle_id: BattleId, player: PlayerName, state: BattleState) {
+        if let Ok(mut stacks) = self.inner.undo_stacks.lock() {
+            stacks.entry(battle_id).or_default().push((player, state));
+        }
+    }
+
+    fn pop_undo_entry(&self, battle_id: BattleId, player: PlayerName) -> Option<BattleState> {
+        if let Ok(mut stacks) = self.inner.undo_stacks.lock() {
+            if let Some(stack) = stacks.get_mut(&battle_id) {
+                for i in (0..stack.len()).rev() {
+                    if stack[i].0 == player {
+                        let entry = stack.remove(i);
+                        return Some(entry.1);
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    fn clear_undo_stack(&self, battle_id: BattleId) {
+        if let Ok(mut stacks) = self.inner.undo_stacks.lock() {
+            stacks.remove(&battle_id);
+        }
+    }
+
     fn should_panic_on_error(&self) -> bool {
         true
     }
@@ -253,5 +282,13 @@ impl DisplayStateProvider for TestStateProvider {
         } else {
             panic!("Tabula not initialized")
         }
+    }
+
+    fn can_undo(&self, battle_id: BattleId, player: PlayerName) -> bool {
+        let stacks = self.inner.undo_stacks.lock().unwrap();
+        stacks
+            .get(&battle_id)
+            .map(|stack| stack.iter().any(|(entry_player, _)| *entry_player == player))
+            .unwrap_or(false)
     }
 }

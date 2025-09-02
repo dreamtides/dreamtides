@@ -5,9 +5,10 @@ use std::path::PathBuf;
 use std::sync::{Arc, LazyLock, Mutex, RwLock};
 use std::time::Instant;
 
-use battle_state::battle::battle_state::RequestContext;
-use core_data::identifiers::UserId;
+use battle_state::battle::battle_state::{BattleState, RequestContext};
+use core_data::identifiers::{BattleId, UserId};
 use core_data::initialization_error::{ErrorCode, InitializationError};
+use core_data::types::PlayerName;
 use database::save_file::SaveFile;
 use database::save_file_io;
 use display_data::command::CommandSequence;
@@ -56,6 +57,12 @@ pub trait StateProvider:
 
     fn finish_processing(&self, user_id: UserId);
 
+    fn push_undo_entry(&self, battle_id: BattleId, player: PlayerName, state: BattleState);
+
+    fn pop_undo_entry(&self, battle_id: BattleId, player: PlayerName) -> Option<BattleState>;
+
+    fn clear_undo_stack(&self, battle_id: BattleId);
+
     fn is_processing(&self, user_id: UserId) -> bool;
 
     fn append_poll_result(&self, user_id: UserId, result: PollResult);
@@ -74,6 +81,15 @@ static REQUEST_TIMESTAMPS: LazyLock<Mutex<HashMap<Option<Uuid>, Instant>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 static LAST_RESPONSE_VERSIONS: LazyLock<Mutex<HashMap<UserId, Uuid>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+#[derive(Clone)]
+struct UndoEntry {
+    player: PlayerName,
+    state: BattleState,
+}
+
+static UNDO_STACKS: LazyLock<Mutex<HashMap<BattleId, Vec<UndoEntry>>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 static PROCESSING_USERS: LazyLock<Mutex<HashMap<UserId, bool>>> =
@@ -218,6 +234,34 @@ impl StateProvider for DefaultStateProvider {
         updates.entry(user_id).or_default().push(result);
     }
 
+    fn push_undo_entry(&self, battle_id: BattleId, player: PlayerName, state: BattleState) {
+        let mut stacks = UNDO_STACKS.lock().unwrap();
+        stacks.entry(battle_id).or_default().push(UndoEntry { player, state });
+    }
+
+    fn pop_undo_entry(&self, battle_id: BattleId, player: PlayerName) -> Option<BattleState> {
+        let mut stacks = UNDO_STACKS.lock().unwrap();
+        let stack = stacks.get_mut(&battle_id)?;
+        if stack.is_empty() {
+            return None;
+        }
+        let mut index = None;
+        for i in (0..stack.len()).rev() {
+            if stack[i].player == player {
+                index = Some(i);
+                break;
+            }
+        }
+        let idx = index?;
+        let drained: Vec<UndoEntry> = stack.drain(idx..).collect();
+        drained.into_iter().next().map(|e| e.state)
+    }
+
+    fn clear_undo_stack(&self, battle_id: BattleId) {
+        let mut stacks = UNDO_STACKS.lock().unwrap();
+        stacks.remove(&battle_id);
+    }
+
     fn take_next_poll_result(&self, user_id: UserId) -> Option<PollResult> {
         let mut updates = PENDING_UPDATES.lock().unwrap();
         if let Some(user_updates) = updates.get_mut(&user_id) {
@@ -243,5 +287,13 @@ impl DisplayStateProvider for DefaultStateProvider {
     fn tabula(&self) -> Arc<Tabula> {
         let guard = TABULA_DATA.read().expect("Failed to lock tabula data");
         guard.clone().expect("Tabula not initialized")
+    }
+
+    fn can_undo(&self, battle_id: BattleId, player: PlayerName) -> bool {
+        let stacks = UNDO_STACKS.lock().unwrap();
+        stacks
+            .get(&battle_id)
+            .map(|stack| stack.iter().any(|entry| entry.player == player))
+            .unwrap_or(false)
     }
 }

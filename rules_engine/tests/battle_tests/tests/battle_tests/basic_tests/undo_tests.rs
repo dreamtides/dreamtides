@@ -148,3 +148,36 @@ fn undo_restores_points_and_spark() {
     assert_eq!(s.user_client.me.total_spark(), Spark(5), "spark from character still present");
     test_helpers::assert_clients_identical(&s);
 }
+
+#[test]
+fn undo_multiple_steps() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(20).build()).connect();
+    let c1 = s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    let c2 = s.add_to_hand(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+    s.play_card_from_hand(DisplayPlayer::User, &c1);
+    s.play_card_from_hand(DisplayPlayer::User, &c2);
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 2, "two characters");
+    s.perform_user_action(GameAction::Undo(PlayerName::One));
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one after undo");
+    s.perform_user_action(GameAction::Undo(PlayerName::One));
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 0, "zero after second undo");
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn undo_skips_micro_selection_actions() {
+    let mut s = TestBattle::builder().connect();
+    let card = s.create_and_play(DisplayPlayer::User, test_card::TEST_VARIABLE_ENERGY_DRAW);
+    s.click_increment_button(DisplayPlayer::User);
+    assert!(s.user_client.cards.stack_cards().contains(&card), "on stack");
+    s.perform_user_action(GameAction::Undo(PlayerName::One));
+    assert!(!s.user_client.cards.stack_cards().contains(&card), "no longer on stack");
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn undo_empty_stack_does_not_crash() {
+    let mut s = TestBattle::builder().connect();
+    s.perform_user_action(GameAction::Undo(PlayerName::One));
+    test_helpers::assert_clients_identical(&s);
+}

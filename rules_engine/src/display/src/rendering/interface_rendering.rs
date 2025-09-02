@@ -78,7 +78,7 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
         }),
         undo_button: Some(ButtonView {
             label: builder.string(string_id::UNDO_ICON),
-            action: Some(GameAction::Undo(builder.act_for_player())),
+            action: can_undo(builder, battle).then_some(GameAction::Undo(builder.act_for_player())),
         }),
         browser: card_browser_view(builder),
         card_order_selector: card_order_selector_view(battle),
@@ -316,6 +316,17 @@ fn render_hide_stack_button(
             )
             .build(),
     )
+}
+
+fn can_undo(builder: &ResponseBuilder, battle: &BattleState) -> bool {
+    if builder.is_for_animation() {
+        return false;
+    }
+
+    let legal_actions = legal_actions::compute(battle, builder.act_for_player());
+    // Only show enabled button when some other legal action exists
+    builder.provider().can_undo(battle.id, builder.display_for_player())
+        && !legal_actions.is_empty()
 }
 
 fn card_browser_view(builder: &ResponseBuilder) -> Option<CardBrowserView> {

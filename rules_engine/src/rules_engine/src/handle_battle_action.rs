@@ -50,6 +50,13 @@ pub fn execute<P: StateProvider + 'static>(
     let mut current_player = player;
     let mut current_action = action;
 
+    if should_push_undo_entry(current_action) {
+        let mut snapshot = battle.clone();
+        snapshot.animations = None;
+        snapshot.tracing = None;
+        provider.push_undo_entry(snapshot.id, current_player, snapshot);
+    }
+
     loop {
         battle_trace!("Executing battle action", battle, current_action, request_id);
         apply_battle_action::execute(battle, current_player, current_action);
@@ -133,6 +140,16 @@ pub fn should_auto_execute_action(legal_actions: &LegalActions) -> Option<Battle
     } else {
         None
     }
+}
+
+fn should_push_undo_entry(action: BattleAction) -> bool {
+    !matches!(
+        action,
+        BattleAction::SelectOrderForDeckCard(..)
+            | BattleAction::SelectVoidCardTarget(..)
+            | BattleAction::SelectHandCardTarget(..)
+            | BattleAction::SelectModalEffectChoice(..)
+    )
 }
 
 fn render_updates<P: StateProvider + 'static>(

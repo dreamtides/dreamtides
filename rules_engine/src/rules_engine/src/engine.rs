@@ -38,7 +38,6 @@ use uuid::Uuid;
 
 use crate::{
     debug_actions, deserialize_save_file, error_message, handle_battle_action, serialize_save_file,
-    undo,
 };
 
 thread_local! {
@@ -320,7 +319,10 @@ fn load_battle_from_provider<P: StateProvider + 'static>(
     match provider.read_save_file(user_id) {
         Ok(Some(save_file)) => {
             match deserialize_save_file::battle(provider, &save_file, request_context) {
-                Some((battle, quest_id)) => Ok(LoadBattleResult::ExistingBattle(battle, quest_id)),
+                Some((battle, quest_id)) => {
+                    // provider.clear_undo_stack(battle.id);
+                    Ok(LoadBattleResult::ExistingBattle(battle, quest_id))
+                }
                 None => Err("No battle in save file".to_string()),
             }
         }
@@ -350,6 +352,7 @@ fn load_battle_from_provider<P: StateProvider + 'static>(
                 request_context,
             );
 
+            provider.clear_undo_stack(new_battle.id);
             // Save new battle to database
             let quest_id = QuestId(Uuid::new_v4());
             let save_file = serialize_save_file::battle(user_id, quest_id, &new_battle);
@@ -596,28 +599,27 @@ fn handle_request_action<P: StateProvider + 'static>(
             );
         }
         GameAction::Undo(player) => {
-            let Some(undone_battle) =
-                undo::undo(provider, &*battle, *player, request_context.clone())
-            else {
+            if let Some(mut previous) = provider.pop_undo_entry(battle.id, *player) {
+                previous.animations = Some(AnimationData::default());
+                previous.tracing = Some(battle.tracing.clone().unwrap_or_default());
+                *battle = previous;
+                let player_name = renderer::player_name_for_user(&*battle, user_id);
+                send_updates_to_user_and_opponent(
+                    provider,
+                    battle,
+                    user_id,
+                    player_name,
+                    &request_context,
+                    request_id,
+                );
+            } else {
                 show_error_message(
                     provider,
                     user_id,
                     None,
                     "Failed to undo: Battle state not found.".to_string(),
                 );
-                return;
-            };
-
-            *battle = undone_battle;
-            let player_name = renderer::player_name_for_user(&*battle, user_id);
-            send_updates_to_user_and_opponent(
-                provider,
-                battle,
-                user_id,
-                player_name,
-                &request_context,
-                request_id,
-            );
+            }
         }
     };
 }

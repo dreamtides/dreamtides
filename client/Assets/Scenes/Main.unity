@@ -1174,6 +1174,8 @@ MonoBehaviour:
   _canvasGroup: {fileID: 63280837}
   _showing: 0
   _text: {fileID: 69273721}
+  _enabledTextColor: {r: 1, g: 1, b: 1, a: 1}
+  _disabledTextColor: {r: 0.55, g: 0.55, b: 0.55, a: 1}
 --- !u!225 &63280837
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -3131,6 +3133,8 @@ MonoBehaviour:
   _canvasGroup: {fileID: 2054405745}
   _showing: 0
   _text: {fileID: 1229255466}
+  _enabledTextColor: {r: 1, g: 1, b: 1, a: 1}
+  _disabledTextColor: {r: 0.65, g: 0.65, b: 0.65, a: 1}
 --- !u!1 &267398374
 GameObject:
   m_ObjectHideFlags: 0
@@ -7752,6 +7756,8 @@ MonoBehaviour:
   _canvasGroup: {fileID: 0}
   _showing: 0
   _text: {fileID: 0}
+  _enabledTextColor: {r: 1, g: 1, b: 1, a: 1}
+  _disabledTextColor: {r: 0.65, g: 0.65, b: 0.65, a: 1}
 --- !u!1 &699114456
 GameObject:
   m_ObjectHideFlags: 0
@@ -8858,6 +8864,8 @@ MonoBehaviour:
   _canvasGroup: {fileID: 794038740}
   _showing: 0
   _text: {fileID: 109627238}
+  _enabledTextColor: {r: 1, g: 1, b: 1, a: 1}
+  _disabledTextColor: {r: 0.65, g: 0.65, b: 0.65, a: 1}
 --- !u!225 &794038740
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -9890,6 +9898,8 @@ MonoBehaviour:
   _canvasGroup: {fileID: 0}
   _showing: 0
   _text: {fileID: 0}
+  _enabledTextColor: {r: 1, g: 1, b: 1, a: 1}
+  _disabledTextColor: {r: 0.65, g: 0.65, b: 0.65, a: 1}
 --- !u!1 &910376771
 GameObject:
   m_ObjectHideFlags: 0

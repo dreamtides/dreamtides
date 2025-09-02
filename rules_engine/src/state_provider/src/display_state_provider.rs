@@ -1,8 +1,9 @@
 use std::sync::Arc;
 
 use action_data::panel_address::PanelAddress;
-use core_data::identifiers::UserId;
+use core_data::identifiers::{BattleId, UserId};
 use core_data::numerics::Energy;
+use core_data::types::PlayerName;
 use display_data::object_position::Position;
 use tabula_data::tabula::Tabula;
 
@@ -20,4 +21,6 @@ pub trait DisplayStateProvider: Send + Sync {
     fn set_display_state(&self, user_id: UserId, state: DisplayState);
 
     fn tabula(&self) -> Arc<Tabula>;
+
+    fn can_undo(&self, battle_id: BattleId, player: PlayerName) -> bool;
 }
