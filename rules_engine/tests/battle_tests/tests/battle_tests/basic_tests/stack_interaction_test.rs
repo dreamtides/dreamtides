@@ -410,7 +410,7 @@ fn targeting_outline_colors_green_for_own_red_for_enemy() {
     s.click_card(DisplayPlayer::User, &enemy_character1);
 
     // Pass priority and let the dissolve resolve
-    s.perform_enemy_action(battle_state::actions::battle_actions::BattleAction::PassPriority);
+    s.perform_enemy_action(BattleAction::PassPriority);
 
     // Now test with TestPreventDissolveThisTurn which targets own characters
     let prevent_dissolve_card =

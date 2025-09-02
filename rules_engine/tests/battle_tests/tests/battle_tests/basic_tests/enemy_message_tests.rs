@@ -16,12 +16,15 @@ fn enemy_message_displayed_when_spending_energy_on_energy_prompt() {
 
     let commands = s.last_user_commands.as_ref().expect("No commands found");
 
-    let enemy_message_cmd = commands.groups.iter().flat_map(|group| &group.commands).find_map(
-        |command| match command {
+    let enemy_message_cmd = commands
+        .groups
+        .iter()
+        .flat_map(|group| &group.commands)
+        .find(|command| matches!(command, Command::DisplayEnemyMessage(_)))
+        .and_then(|command| match command {
             Command::DisplayEnemyMessage(cmd) => Some(cmd),
             _ => None,
-        },
-    );
+        });
 
     assert!(
         enemy_message_cmd.is_some(),
@@ -50,12 +53,15 @@ fn enemy_message_displayed_when_declining_to_pay_for_counterspell_unless_pays() 
 
     let commands = s.last_user_commands.as_ref().expect("No commands found");
 
-    let enemy_message_cmd = commands.groups.iter().flat_map(|group| &group.commands).find_map(
-        |command| match command {
+    let enemy_message_cmd = commands
+        .groups
+        .iter()
+        .flat_map(|group| &group.commands)
+        .find(|command| matches!(command, Command::DisplayEnemyMessage(_)))
+        .and_then(|command| match command {
             Command::DisplayEnemyMessage(cmd) => Some(cmd),
             _ => None,
-        },
-    );
+        });
 
     assert!(
         enemy_message_cmd.is_some(),
@@ -83,12 +89,15 @@ fn enemy_message_displayed_when_paying_for_counterspell_unless_pays() {
 
     let commands = s.last_user_commands.as_ref().expect("No commands found");
 
-    let enemy_message_cmd = commands.groups.iter().flat_map(|group| &group.commands).find_map(
-        |command| match command {
+    let enemy_message_cmd = commands
+        .groups
+        .iter()
+        .flat_map(|group| &group.commands)
+        .find(|command| matches!(command, Command::DisplayEnemyMessage(_)))
+        .and_then(|command| match command {
             Command::DisplayEnemyMessage(cmd) => Some(cmd),
             _ => None,
-        },
-    );
+        });
 
     assert!(
         enemy_message_cmd.is_some(),
@@ -113,12 +122,15 @@ fn enemy_message_displayed_when_spending_minimum_energy_on_energy_prompt() {
 
     let commands = s.last_user_commands.as_ref().expect("No commands found");
 
-    let enemy_message_cmd = commands.groups.iter().flat_map(|group| &group.commands).find_map(
-        |command| match command {
+    let enemy_message_cmd = commands
+        .groups
+        .iter()
+        .flat_map(|group| &group.commands)
+        .find(|command| matches!(command, Command::DisplayEnemyMessage(_)))
+        .and_then(|command| match command {
             Command::DisplayEnemyMessage(cmd) => Some(cmd),
             _ => None,
-        },
-    );
+        });
 
     assert!(
         enemy_message_cmd.is_some(),

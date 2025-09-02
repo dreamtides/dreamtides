@@ -1,3 +1,4 @@
+use core_data::display_color::DisplayColor;
 use core_data::display_types::{
     AudioClipAddress, EffectAddress, MaterialAddress, Milliseconds, ProjectileAddress,
 };
@@ -34,7 +35,7 @@ pub struct CardEffectRow {
     pub dissolve_material: Option<TabulaValue<MaterialAddress>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub dissolve_color: Option<String>,
+    pub dissolve_color: Option<TabulaValue<DisplayColor>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub dissolve_sound: Option<TabulaValue<AudioClipAddress>>,
@@ -64,7 +65,7 @@ pub struct CardEffectRow {
     pub trail_duration_milliseconds: Option<TabulaValue<Milliseconds>>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum CardEffectRowType {
     FireProjectile,
     DissolveTargets,
@@ -73,7 +74,7 @@ pub enum CardEffectRowType {
     SetCardTrail,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum CardEffectRowTrigger {
     ApplyTargetedEffect,
     DrawCards,
@@ -81,7 +82,7 @@ pub enum CardEffectRowTrigger {
     SelectedTargetsForCard,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub enum CardEffectRowObjectPredicate {
     ThisCard,
     ForEachTarget,

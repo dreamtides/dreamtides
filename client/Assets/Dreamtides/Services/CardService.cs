@@ -29,6 +29,7 @@ namespace Dreamtides.Services
 
     public IEnumerator HandleDrawUserCards(DrawUserCardsCommand command)
     {
+      Debug.Log("DrawUserCards");
       for (var i = 0; i < command.Cards.Count; ++i)
       {
         if (i < command.Cards.Count - 1)

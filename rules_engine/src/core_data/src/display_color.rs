@@ -1,6 +1,8 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+use crate::display_types::StringWrapper;
+
 /// Represents a color with the given RGBA values represented as floats in the
 /// 0-1 range.
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema, PartialEq)]
@@ -14,6 +16,38 @@ pub struct DisplayColor {
 impl DisplayColor {
     pub fn new(red: f32, green: f32, blue: f32, alpha: f32) -> Self {
         Self { red, green, blue, alpha }
+    }
+}
+
+impl StringWrapper for DisplayColor {
+    fn to_string_value(&self) -> String {
+        let r = (self.red.clamp(0.0, 1.0) * 255.0).round() as u8;
+        let g = (self.green.clamp(0.0, 1.0) * 255.0).round() as u8;
+        let b = (self.blue.clamp(0.0, 1.0) * 255.0).round() as u8;
+        let a = (self.alpha.clamp(0.0, 1.0) * 255.0).round() as u8;
+        if a == 255 {
+            format!("#{r:02X}{g:02X}{b:02X}")
+        } else {
+            format!("#{r:02X}{g:02X}{b:02X}{a:02X}")
+        }
+    }
+
+    fn from_string_value(s: &str) -> Result<Self, String> {
+        let trimmed = s.trim();
+        let no_hash = if let Some(rest) = trimmed.strip_prefix('#') { rest } else { trimmed };
+        let len = no_hash.len();
+        if len != 6 && len != 8 {
+            return Err("expected 6 or 8 hex characters".to_string());
+        }
+        if !no_hash.chars().all(|c| c.is_ascii_hexdigit()) {
+            return Err("invalid hex characters".to_string());
+        }
+        let parse_byte = |hex: &str| u8::from_str_radix(hex, 16).map_err(|e| e.to_string());
+        let r = parse_byte(&no_hash[0..2])? as f32 / 255.0;
+        let g = parse_byte(&no_hash[2..4])? as f32 / 255.0;
+        let b = parse_byte(&no_hash[4..6])? as f32 / 255.0;
+        let a = if len == 8 { parse_byte(&no_hash[6..8])? as f32 / 255.0 } else { 1.0 };
+        Ok(DisplayColor { red: r, green: g, blue: b, alpha: a })
     }
 }
 
