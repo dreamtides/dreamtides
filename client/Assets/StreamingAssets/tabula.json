@@ -2530,5 +2530,118 @@
       "card_id": "a2cdf115-8e1a-455e-a118-123f6f36c7ba",
       "copies": 1.0
     }
+  ],
+  "card_effects": [
+    {
+      "card_id": "d4854b6e-5274-4f6a-8a60-a1ea1c15e9a6",
+      "effect_type": "FireProjectile",
+      "effect_trigger": "ApplyTargetedEffect",
+      "projectile_source": "ThisCard",
+      "projectile_target": "ForEachTarget",
+      "projectile_address": "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 3 black fire.prefab",
+      "projectile_fire_sound": "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicArrow_Projectile01.wav",
+      "projectile_impact_sound": "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagic_Impact01.wav"
+    },
+    {
+      "card_id": "d4854b6e-5274-4f6a-8a60-a1ea1c15e9a6",
+      "effect_type": "DissolveTargets",
+      "effect_trigger": "ApplyTargetedEffect",
+      "dissolve_material": "Assets/Content/Dissolves/Dissolve15.mat",
+      "dissolve_color": "#FFC107"
+    },
+    {
+      "card_id": "d4854b6e-5274-4f6a-8a60-a1ea1c15e9a6",
+      "effect_type": "ReverseDissolveTargets",
+      "effect_trigger": "ApplyTargetedEffect",
+      "dissolve_material": "Assets/Content/Dissolves/Dissolve15.mat",
+      "dissolve_color": "#FFC107",
+      "dissolve_sound": "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagicBall_LightImpact03.wav"
+    },
+    {
+      "card_id": "aad836b0-3ece-477c-b923-b099360f0115",
+      "effect_type": "FireProjectile",
+      "effect_trigger": "ApplyTargetedEffect",
+      "projectile_source": "ThisCard",
+      "projectile_target": "ForEachTarget",
+      "projectile_address": "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 10 blue laser.prefab",
+      "projectile_fire_sound": "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Cast01.wav",
+      "projectile_impact_sound": "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Impact03.wav"
+    },
+    {
+      "card_id": "86ed0d3f-320b-49d0-b022-cd94aa07edbd",
+      "effect_type": "FireProjectile",
+      "effect_trigger": "ApplyTargetedEffect",
+      "projectile_source": "ThisCard",
+      "projectile_target": "ForEachTarget",
+      "projectile_address": "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 10 blue laser.prefab",
+      "projectile_fire_sound": "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Cast01.wav",
+      "projectile_impact_sound": "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Impact03.wav"
+    },
+    {
+      "card_id": "76b6d00c-5a28-4ee3-9655-e4fea1d8a4d8",
+      "effect_type": "FireProjectile",
+      "effect_trigger": "ApplyTargetedEffect",
+      "projectile_source": "ThisCard",
+      "projectile_target": "ForEachTarget",
+      "projectile_address": "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 10 blue laser.prefab",
+      "projectile_fire_sound": "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Cast01.wav",
+      "projectile_impact_sound": "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Water Magic/RPG3_WaterMagic_Impact03.wav"
+    },
+    {
+      "card_id": "e06a8cfe-483f-42c0-aac8-9c12b21b3f99",
+      "effect_type": "DisplayEffect",
+      "effect_trigger": "DrawCards",
+      "effect_target": "ControllerDeck",
+      "effect_address": "Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Magic circle 1.prefab",
+      "effect_duration_milliseconds": "500",
+      "effect_scale": 5.0,
+      "effect_sound": "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Light Magic/RPG3_LightMagicEpic_HealingWing_P1.wav"
+    },
+    {
+      "card_id": "d8a8541f-5b00-4d91-9518-aa8ae70ea450",
+      "effect_type": "DisplayEffect",
+      "effect_trigger": "ActivatedAbility",
+      "effect_target": "ThisCard",
+      "effect_address": "Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Magic circle 2.prefab",
+      "effect_duration_milliseconds": "500",
+      "effect_scale": 5.0,
+      "effect_sound": "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Light Magic/RPG3_LightMagic_Cast03.wav"
+    },
+    {
+      "card_id": "559e62a0-7ead-4136-8bd4-6cc58db4bef7",
+      "effect_type": "SetCardTrail",
+      "effect_trigger": "SelectedTargetsForCard",
+      "card_trail_targets": "ForEachTarget",
+      "card_trail_address": "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 7 pink.prefab",
+      "trail_duration_milliseconds": "500"
+    },
+    {
+      "card_id": "e8f937da-cca7-447d-a559-530d7c339325",
+      "effect_type": "FireProjectile",
+      "effect_trigger": "ApplyTargetedEffect",
+      "projectile_source": "ThisCard",
+      "projectile_target": "ForEachTarget",
+      "projectile_address": "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 5 red.prefab",
+      "projectile_fire_sound": "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Plasma Magic/RPG3_PlasmaMagic_Cast01.wav",
+      "projectile_impact_sound": "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Plasma Magic/RPG3_PlasmaMagic_MediumImpact01.wav"
+    },
+    {
+      "card_id": "e8f937da-cca7-447d-a559-530d7c339325",
+      "effect_type": "DisplayEffect",
+      "effect_trigger": "DrawCards",
+      "effect_target": "ControllerDeck",
+      "effect_address": "Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Magic circle 9.prefab",
+      "effect_duration_milliseconds": "500",
+      "effect_scale": 2.5,
+      "effect_sound": "Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Fire Magic/RPG3_FireMagic_Cast04.wav"
+    },
+    {
+      "card_id": "e8f937da-cca7-447d-a559-530d7c339325",
+      "effect_type": "SetCardTrail",
+      "effect_trigger": "DrawCards",
+      "card_trail_targets": "ForEachTarget",
+      "card_trail_address": "Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 5 red.prefab",
+      "trail_duration_milliseconds": "1500"
+    }
   ]
 }

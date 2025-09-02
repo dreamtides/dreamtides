@@ -10,6 +10,7 @@ use crate::card_definitions::card_definition_builder;
 use crate::card_definitions::dreamwell_card_definition::{
     DreamwellCardDefinition, DreamwellCardDefinitionRaw,
 };
+use crate::card_effect_definitions::card_effect_row::CardEffectRow;
 use crate::card_list_data::card_list_row::CardListRow;
 use crate::localized_strings;
 use crate::localized_strings::{LanguageId, LocalizedStringSetRaw, LocalizedStrings, StringId};
@@ -32,6 +33,7 @@ pub struct Tabula {
     pub test_cards: BTreeMap<BaseCardId, CardDefinition>,
     pub dreamwell_cards: BTreeMap<DreamwellCardId, DreamwellCardDefinition>,
     pub card_lists: Vec<CardListRow>,
+    pub card_effects: Vec<CardEffectRow>,
 }
 
 /// Context for building a [Tabula] struct from a [TabulaRaw] struct.
@@ -53,6 +55,8 @@ pub struct TabulaRaw {
     pub dreamwell_cards: Table<DreamwellCardId, DreamwellCardDefinitionRaw>,
     #[serde(default)]
     pub card_lists: Vec<CardListRow>,
+    #[serde(default)]
+    pub card_effects: Vec<CardEffectRow>,
 }
 
 pub fn build(
@@ -68,5 +72,11 @@ pub fn build(
         &raw.dreamwell_cards,
     )?;
 
-    Ok(Tabula { strings, test_cards, dreamwell_cards, card_lists: raw.card_lists.clone() })
+    Ok(Tabula {
+        strings,
+        test_cards,
+        dreamwell_cards,
+        card_lists: raw.card_lists.clone(),
+        card_effects: raw.card_effects.clone(),
+    })
 }
