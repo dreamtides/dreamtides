@@ -17,6 +17,8 @@ action_data = { path = "../action_data" }
 battle_state = { path = "../battle_state" }
 core_data = { path = "../core_data" }
 game_creation = { path = "../game_creation" }
+
+atomic-write-file = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
