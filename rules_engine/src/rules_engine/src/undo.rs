@@ -30,7 +30,7 @@ where
         current_battle.id,
         provider.tabula(),
         current_battle.seed,
-        current_battle.dreamwell.clone(),
+        current_battle.dreamwell.clone_and_reset(),
         current_battle.players.one.as_create_battle_player(),
         current_battle.players.two.as_create_battle_player(),
         request_context,
