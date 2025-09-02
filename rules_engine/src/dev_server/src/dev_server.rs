@@ -61,7 +61,7 @@ fn check_response_size<T: Serialize + Clone>(response: &T, log_size: bool) -> Js
             let _ = File::create("/tmp/too_large.json")
                 .and_then(|mut f| f.write_all(json_string.as_bytes()));
             eprintln!(
-                "ERROR: Response size ({} bytes) exceeds 1MB limit, wrote JSON to /tmp/too_large.json",
+                ">>>    ERROR: Response size ({} bytes) exceeds 1MB limit, wrote JSON to /tmp/too_large.json",
                 json_string.len()
             );
         } else if log_size {

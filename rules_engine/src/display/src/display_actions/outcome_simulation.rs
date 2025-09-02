@@ -8,7 +8,6 @@ use battle_queries::legal_action_queries::legal_actions_data::ForPlayer;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
-use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::battle::card_id::{CardId, CardIdType, CharacterId};
 use battle_state::prompt_types::prompt_data::PromptType;
 use core_data::display_color;
@@ -17,7 +16,6 @@ use display_data::battle_view::{BattlePreviewView, PlayerPreviewView};
 use display_data::card_view::CardPreviewView;
 use masonry::flex_node::FlexNode;
 use tabula_ids::string_id;
-use tracing::error;
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::layer::SubscriberExt;
 use ui_components::component::Component;
@@ -37,43 +35,16 @@ pub fn is_victory_imminent_for_player(battle: &BattleState, player: PlayerName) 
     if battle.turn.active_player == player {
         return false;
     }
-
     if matches!(battle.status, BattleStatus::GameOver { .. }) {
         return false;
     }
-
-    let mut simulation = battle.logical_clone();
-
-    // Clear state which might prevent the 'end turn' action from being legal.
-    simulation.prompts.clear();
-    simulation.stack_priority = None;
-    simulation.phase = BattleTurnPhase::Main;
-
-    let opponent = player.opponent();
-    let legal_actions = legal_actions::compute(&simulation, opponent);
-    if !legal_actions.contains(BattleAction::EndTurn, ForPlayer::Human) {
-        error!(?opponent, "Opponent cannot end their turn");
+    let player_state = battle.players.player(player);
+    let remaining = battle.rules_config.points_to_win.0.saturating_sub(player_state.points.0);
+    if remaining == 0 {
         return false;
     }
-
-    let subscriber = tracing_subscriber::registry().with(EnvFilter::new("warn"));
-    tracing::subscriber::with_default(subscriber, || {
-        apply_battle_action::execute(&mut simulation, opponent, BattleAction::EndTurn);
-    });
-
-    simulation.prompts.clear();
-    simulation.stack_priority = None;
-    let legal_actions = legal_actions::compute(&simulation, player);
-    if !legal_actions.contains(BattleAction::StartNextTurn, ForPlayer::Human) {
-        error!(?player, "Player cannot start their turn");
-        return false;
-    }
-    let subscriber = tracing_subscriber::registry().with(EnvFilter::new("warn"));
-    tracing::subscriber::with_default(subscriber, || {
-        apply_battle_action::execute(&mut simulation, player, BattleAction::StartNextTurn);
-    });
-
-    matches!(simulation.status, BattleStatus::GameOver { winner: Some(winner) } if winner == player)
+    let current_spark = player_properties::spark_total(battle, player).0;
+    current_spark >= remaining
 }
 
 /// Returns a preview of the battle state based on simulating the effect of
