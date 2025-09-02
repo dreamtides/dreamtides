@@ -3,6 +3,8 @@ use core_data::display_types::{
 };
 use core_data::identifiers::BaseCardId;
 
+use crate::tabula_primitives::TabulaValue;
+
 /// Represents a custom effect applied by a card.
 pub struct CardEffectRow {
     pub card_id: BaseCardId,
@@ -10,19 +12,20 @@ pub struct CardEffectRow {
     pub effect_trigger: CardEffectRowTrigger,
     pub projectile_source: Option<CardEffectRowObjectPredicate>,
     pub projectile_target: Option<CardEffectRowObjectPredicate>,
-    pub projectile_address: Option<ProjectileAddress>,
-    pub projectile_fire_sound: Option<AudioClipAddress>,
-    pub projectile_impact_sound: Option<AudioClipAddress>,
-    pub dissolve_material: Option<MaterialAddress>,
+    pub projectile_address: Option<TabulaValue<ProjectileAddress>>,
+    pub projectile_fire_sound: Option<TabulaValue<AudioClipAddress>>,
+    pub projectile_impact_sound: Option<TabulaValue<AudioClipAddress>>,
+    pub dissolve_material: Option<TabulaValue<MaterialAddress>>,
     pub dissolve_color: Option<String>,
-    pub dissolve_sound: Option<AudioClipAddress>,
+    pub dissolve_sound: Option<TabulaValue<AudioClipAddress>>,
     pub effect_target: Option<CardEffectRowObjectPredicate>,
-    pub effect_address: Option<EffectAddress>,
-    pub effect_duration_milliseconds: Option<Milliseconds>,
+    pub effect_address: Option<TabulaValue<EffectAddress>>,
+    pub effect_duration_milliseconds: Option<TabulaValue<Milliseconds>>,
     pub effect_scale: Option<f64>,
-    pub effect_sound: Option<AudioClipAddress>,
+    pub effect_sound: Option<TabulaValue<AudioClipAddress>>,
     pub card_trail_targets: Option<CardEffectRowObjectPredicate>,
-    pub card_trail_address: Option<ProjectileAddress>,
+    pub card_trail_address: Option<TabulaValue<ProjectileAddress>>,
+    pub trail_duration_milliseconds: Option<TabulaValue<Milliseconds>>,
 }
 
 pub enum CardEffectRowType {
