@@ -2,6 +2,7 @@ use std::panic::{self, AssertUnwindSafe};
 
 use battle_mutations::actions::apply_battle_action;
 use battle_queries::battle_trace;
+use battle_queries::debug_snapshot::debug_battle_snapshot;
 use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::macros::write_tracing_event;
 use battle_state::actions::battle_actions::BattleAction;
@@ -61,6 +62,7 @@ where
         });
 
         let tracing_battle_clone = battle.clone();
+        let _snapshot = debug_battle_snapshot::capture(&battle);
         let result = panic::catch_unwind(AssertUnwindSafe(|| {
             apply_battle_action::execute(&mut battle, history_action.player, history_action.action);
         }));
@@ -102,6 +104,7 @@ fn should_skip_action_for_undo(action: BattleAction) -> bool {
         action,
         BattleAction::SelectOrderForDeckCard(..)
             | BattleAction::SelectVoidCardTarget(..)
+            | BattleAction::SelectHandCardTarget(..)
             | BattleAction::SelectModalEffectChoice(..)
     )
 }
