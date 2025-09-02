@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::battle::card_id::{CardId, CharacterId, VoidCardId};
 use crate::battle_cards::battle_card_state::CardObjectId;
 use crate::battle_cards::card_set::CardSet;
+use crate::battle_cards::dreamwell_data::BattleDreamwellCardId;
 use crate::battle_player::player_map::PlayerMap;
 
 /// Stores state for abilities of a player in this battle.
@@ -29,6 +30,11 @@ pub struct AbilityState {
 /// begins.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct UntilEndOfTurn {
+    /// The dreamwell card for the current turn, if any.
+    ///
+    /// Selected during the 'dreamwell' phase of the turn.
+    pub active_dreamwell_card: Option<BattleDreamwellCardId>,
+
     /// Characters which should be prevented from being dissolved this turn.
     pub prevent_dissolved: Vec<CardObjectId<CharacterId>>,
 }

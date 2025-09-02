@@ -79,12 +79,10 @@ pub fn render(
 
         BattleAnimation::GainEnergy { player, source } => {
             push_snapshot(builder, snapshot);
-            if let Some(card_id) = source.card_id()
-                && is_on_stack_or_battlefield(snapshot, *player, card_id)
-            {
+            if let Some(game_object_id) = effect_source_game_object_id(snapshot, *player, source) {
                 builder.push(Command::FireProjectile(
                     FireProjectileCommand::builder()
-                        .source_id(adapter::card_game_object_id(card_id))
+                        .source_id(game_object_id)
                         .target_id(GameObjectId::Avatar(builder.to_display_player(*player)))
                         .projectile(ProjectileAddress::new("Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 6 blue fire.prefab"))
                         .travel_duration(Milliseconds::new(300))
@@ -185,12 +183,10 @@ pub fn render(
 
         BattleAnimation::ScorePoints { player, source } => {
             push_snapshot(builder, snapshot);
-            if let Some(card_id) = source.card_id()
-                && is_on_stack_or_battlefield(snapshot, *player, card_id)
-            {
+            if let Some(game_object_id) = effect_source_game_object_id(snapshot, *player, source) {
                 builder.push(Command::FireProjectile(
                     FireProjectileCommand::builder()
-                        .source_id(adapter::card_game_object_id(card_id))
+                        .source_id(game_object_id)
                         .target_id(GameObjectId::Avatar(builder.to_display_player(*player)))
                         .projectile(ProjectileAddress::new("Assets/ThirdParty/Hovl Studio/AAA Projectiles Vol 1/Prefabs/Dreamtides/Projectile 4 yellow arrow.prefab"))
                         .travel_duration(Milliseconds::new(300))
@@ -246,11 +242,20 @@ pub fn push_snapshot(builder: &mut ResponseBuilder, snapshot: &BattleState) {
     builder.push_battle_view(battle_rendering::battle_view(builder, snapshot));
 }
 
-fn is_on_stack_or_battlefield(
+/// Returns the game object ID to display as the source of an effect.
+fn effect_source_game_object_id(
     battle: &BattleState,
     owner: PlayerName,
-    card_id: impl CardIdType,
-) -> bool {
-    battle.cards.contains_card(owner, card_id.card_id(), Zone::Stack)
-        || battle.cards.contains_card(owner, card_id.card_id(), Zone::Battlefield)
+    source: &EffectSource,
+) -> Option<GameObjectId> {
+    if let Some(card_id) = source.card_id()
+        && (battle.cards.contains_card(owner, card_id.card_id(), Zone::Stack)
+            || battle.cards.contains_card(owner, card_id.card_id(), Zone::Battlefield))
+    {
+        Some(adapter::card_game_object_id(card_id))
+    } else if let EffectSource::Dreamwell { dreamwell_card_id, .. } = source {
+        Some(GameObjectId::CardId(adapter::battle_dreamwell_card_id(*dreamwell_card_id)))
+    } else {
+        None
+    }
 }

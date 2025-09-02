@@ -1,4 +1,5 @@
 use battle_state::battle::battle_state::BattleState;
+use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::battle_cards::dreamwell_data::{BattleDreamwellCardId, DreamwellCard};
 use core_data::types::CardFacing;
 use display_data::card_view::{
@@ -24,7 +25,7 @@ pub fn all_cards(builder: &ResponseBuilder, battle: &BattleState) -> Vec<CardVie
 
 fn dreamwell_card_view(
     builder: &ResponseBuilder,
-    _battle: &BattleState,
+    battle: &BattleState,
     card_id: BattleDreamwellCardId,
     card: &DreamwellCard,
 ) -> CardView {
@@ -34,7 +35,13 @@ fn dreamwell_card_view(
     CardView {
         id: client_id,
         position: ObjectPosition {
-            position: Position::InDreamwell(player),
+            position: if battle.phase == BattleTurnPhase::Dreamwell
+                && battle.ability_state.until_end_of_turn.active_dreamwell_card == Some(card_id)
+            {
+                Position::DreamwellActivation
+            } else {
+                Position::InDreamwell(player)
+            },
             sorting_key: Into::<usize>::into(card_id) as u32,
         },
         revealed: Some(RevealedCardView {

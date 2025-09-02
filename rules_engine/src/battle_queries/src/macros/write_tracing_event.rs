@@ -70,7 +70,7 @@ pub fn write_panic_snapshot(
 }
 
 #[derive(Debug, Clone, Serialize)]
-pub struct DeserializationPanicEvent {
+pub struct UndoPanicEvent {
     pub m: String,
     pub snapshot: DebugBattleState,
     pub panic_action_index: usize,
@@ -81,7 +81,7 @@ pub struct DeserializationPanicEvent {
     pub timestamp: String,
 }
 
-pub fn write_deserialization_panic(
+pub fn write_undo_panic(
     battle: &BattleState,
     panic_action_index: usize,
     total_actions: usize,
@@ -91,10 +91,8 @@ pub fn write_deserialization_panic(
 ) {
     let snapshot = debug_battle_snapshot::capture(battle);
     let timestamp = format_current_time();
-    let event = DeserializationPanicEvent {
-        m: format!(
-            "PANIC: Deserialization panic at action {panic_action_index} of {total_actions}"
-        ),
+    let event = UndoPanicEvent {
+        m: format!("PANIC: Undo panic at action index {panic_action_index} of {total_actions}"),
         snapshot,
         panic_action_index,
         total_actions,
@@ -109,7 +107,7 @@ pub fn write_deserialization_panic(
             write_json_to_log_file(&json, &battle.request_context);
         }
         Err(e) => {
-            error!("Failed to serialize DeserializationPanicEvent: {}", e);
+            error!("Failed to serialize UndoPanicEvent: {}", e);
         }
     }
 }

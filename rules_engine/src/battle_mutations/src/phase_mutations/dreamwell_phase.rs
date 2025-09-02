@@ -17,6 +17,7 @@ pub fn activate(battle: &mut BattleState, player: PlayerName) {
         player,
         dreamwell_card_id,
     });
+    battle.ability_state.until_end_of_turn.active_dreamwell_card = Some(dreamwell_card_id);
 
     let new_produced_energy = battle.players.player(player).produced_energy + card.produced_energy;
     energy::set_produced(battle, player, source, new_produced_energy);

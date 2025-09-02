@@ -74,9 +74,9 @@ where
         }));
 
         if let Err(panic_info) = result {
-            error!("Panic during deserialization at action {}", action_index);
+            error!("Panic during undo at action {}", action_index);
 
-            write_deserialization_panic_trace(
+            write_undo_panic_trace(
                 &battle_clone,
                 &actions,
                 action_index,
@@ -104,7 +104,7 @@ fn should_skip_action_for_undo(action: BattleAction) -> bool {
     )
 }
 
-fn write_deserialization_panic_trace(
+fn write_undo_panic_trace(
     battle: &BattleState,
     actions: &[ReplayAction],
     panic_action_index: usize,
@@ -134,7 +134,7 @@ fn write_deserialization_panic_trace(
             .insert("panic_phase".to_string(), serde_json::json!(format!("{:?}", action.phase)));
     }
 
-    write_tracing_event::write_deserialization_panic(
+    write_tracing_event::write_undo_panic(
         battle,
         panic_action_index,
         actions.len(),
