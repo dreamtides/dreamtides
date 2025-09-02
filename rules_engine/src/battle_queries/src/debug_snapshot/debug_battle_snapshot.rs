@@ -9,6 +9,7 @@ use battle_state::debug::debug_battle_state::DebugBattleState;
 use battle_state::debug::debug_card_state::{
     DebugCardProperties, DebugCardState, DebugStackItemState,
 };
+use battle_state::debug::debug_dreamwell::{DebugDreamwellCardState, DebugDreamwellState};
 use battle_state::debug::debug_prompt_data::DebugPromptData;
 use battle_state::prompt_types::prompt_data::{PromptData, PromptType};
 use core_data::types::PlayerName;
@@ -28,6 +29,7 @@ pub fn capture(state: &BattleState) -> DebugBattleState {
         stack_priority: format!("{:?}", state.stack_priority),
         turn: format!("{:?}", state.turn),
         phase: format!("{:?}", state.phase),
+        dreamwell: debug_dreamwell(state),
         prompt: debug_prompt_data(state.prompts.front()),
     }
 }
@@ -244,5 +246,32 @@ fn format_prompt_choices(prompt: &PromptType) -> Vec<String> {
         PromptType::SelectDeckCardOrder { prompt } => {
             vec![format!("initial: {:?}", prompt.initial), format!("moved: {:?}", prompt.moved)]
         }
+    }
+}
+
+fn debug_dreamwell(state: &BattleState) -> DebugDreamwellState {
+    let active = state
+        .ability_state
+        .until_end_of_turn
+        .active_dreamwell_card
+        .map(usize::from)
+        .unwrap_or(usize::MAX);
+    let cards = state
+        .dreamwell
+        .all_cards()
+        .map(|(id, card)| DebugDreamwellCardState {
+            index: format!("{}", usize::from(id)),
+            name: card.definition.displayed_name.to_string(),
+            phase: format!("{:?}", card.definition.phase),
+            produced_energy: format!("{:?}", card.produced_energy),
+            abilities: card.effects.iter().map(|a| format!("{:?}", a.ability)).collect(),
+            is_active: format!("{}", usize::from(id) == active),
+        })
+        .collect();
+    DebugDreamwellState {
+        next_index: format!("{:?}", state.dreamwell.next_index),
+        first_iteration_complete: format!("{:?}", state.dreamwell.first_iteration_complete),
+        active_card: if active == usize::MAX { String::new() } else { format!("{active}") },
+        cards,
     }
 }
