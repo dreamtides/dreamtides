@@ -94,6 +94,17 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
                 action,
             );
         }
+        DebugBattleAction::SetNextDreamwellCard { base_card_id } => {
+            let position = battle
+                .dreamwell
+                .cards
+                .iter()
+                .position(|c| c.definition.base_card_id == base_card_id);
+            let Some(position) = position else {
+                panic!("Card with definition ID {base_card_id:?} not found in dreamwell");
+            };
+            battle.dreamwell.next_index = position;
+        }
     }
 }
 

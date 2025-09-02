@@ -1,4 +1,4 @@
-use core_data::identifiers::BaseCardId;
+use core_data::identifiers::{BaseCardId, DreamwellCardDefinitionId};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::PlayerName;
 use schemars::JsonSchema;
@@ -33,4 +33,8 @@ pub enum DebugBattleAction {
     OpponentPlayCard { card: BaseCardId },
     /// Cause the opponent to take a 'continue' legal action
     OpponentContinue,
+    /// Sets the `next_index` for the dreamwell to draw the card with the
+    /// indicated definition ID. Panics if this card is not present in the
+    /// dreamwell.
+    SetNextDreamwellCard { base_card_id: DreamwellCardDefinitionId },
 }

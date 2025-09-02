@@ -27,6 +27,7 @@ pub struct TestSession {
     pub seed: Option<u64>,
     pub last_user_commands: Option<CommandSequence>,
     pub last_enemy_commands: Option<CommandSequence>,
+    pub dreamwell_list: Option<DreamwellCardIdList>,
 }
 
 impl Default for TestSession {
@@ -49,6 +50,7 @@ impl TestSession {
             seed: None,
             last_user_commands: None,
             last_enemy_commands: None,
+            dreamwell_list: None,
         }
     }
 
@@ -62,6 +64,12 @@ impl TestSession {
     /// Set the seed for deterministic random number generation
     pub fn with_seed(mut self, seed: u64) -> Self {
         self.seed = Some(seed);
+        self
+    }
+
+    /// Sets the dreamwell card list for the session
+    pub fn with_dreamwell(mut self, id: DreamwellCardIdList) -> Self {
+        self.dreamwell_list = Some(id);
         self
     }
 
@@ -92,7 +100,12 @@ impl TestSession {
                     enemy: opponent.clone(),
                     seed: self.seed.or(Some(314159265358979323)),
                     deck_override: Some(TestDeckName::Vanilla),
-                    dreamwell_override: Some(DreamwellCardIdList::TestDreamwellNoAbilities),
+                    dreamwell_override: Some(
+                        self.dreamwell_list
+                            .as_ref()
+                            .unwrap_or(&DreamwellCardIdList::TestDreamwellNoAbilities)
+                            .clone(),
+                    ),
                 }),
             },
             self.request_context(),

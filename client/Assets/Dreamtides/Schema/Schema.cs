@@ -948,6 +948,10 @@ namespace Dreamtides.Schema
     /// are moved to the void.
     ///
     /// Play a card for the opponent, with prompt choices
+    ///
+    /// Sets the `next_index` for the dreamwell to draw the card with the
+    /// indicated definition ID. Panics if this card is not present in the
+    /// dreamwell.
     /// </summary>
     public partial class DebugBattleActionClass
     {
@@ -983,6 +987,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("OpponentPlayCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public OpponentPlayCard OpponentPlayCard { get; set; }
+
+        [JsonProperty("SetNextDreamwellCard", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public SetNextDreamwellCard SetNextDreamwellCard { get; set; }
     }
 
     public partial class AddCardToBattlefield
@@ -1046,6 +1053,12 @@ namespace Dreamtides.Schema
 
         [JsonProperty("player", Required = Required.Always)]
         public PlayerName Player { get; set; }
+    }
+
+    public partial class SetNextDreamwellCard
+    {
+        [JsonProperty("base_card_id", Required = Required.Always)]
+        public Guid BaseCardId { get; set; }
     }
 
     public partial class SetPoints
