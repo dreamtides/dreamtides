@@ -1,4 +1,4 @@
-use core_data::identifiers::{BaseCardId, DreamwellCardDefinitionId};
+use core_data::identifiers::{BaseCardId, DreamwellCardId};
 use core_data::numerics::{Energy, Points, Spark};
 use core_data::types::PlayerName;
 use schemars::JsonSchema;
@@ -36,5 +36,5 @@ pub enum DebugBattleAction {
     /// Sets the `next_index` for the dreamwell to draw the card with the
     /// indicated definition ID. Panics if this card is not present in the
     /// dreamwell.
-    SetNextDreamwellCard { base_card_id: DreamwellCardDefinitionId },
+    SetNextDreamwellCard { base_card_id: DreamwellCardId },
 }

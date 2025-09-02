@@ -1,6 +1,6 @@
 use ability_data::ability::{Ability, DisplayedAbility};
 use core_data::display_types::SpriteAddress;
-use core_data::identifiers::DreamwellCardDefinitionId;
+use core_data::identifiers::DreamwellCardId;
 use core_data::numerics::Energy;
 use serde::{Deserialize, Serialize};
 
@@ -13,7 +13,7 @@ pub type DreamwellCardPhase = usize;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DreamwellCardDefinition {
     /// The base card that this card definition is based on.
-    pub base_card_id: DreamwellCardDefinitionId,
+    pub base_card_id: DreamwellCardId,
 
     /// Name of this card in the currently-active language.
     pub displayed_name: String,
@@ -50,7 +50,7 @@ pub struct DreamwellCardDefinition {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DreamwellCardDefinitionRaw {
     /// Identifies this card.
-    pub id: DreamwellCardDefinitionId,
+    pub id: DreamwellCardId,
 
     /// Name of this card (U.S. English).
     pub name_en_us: String,

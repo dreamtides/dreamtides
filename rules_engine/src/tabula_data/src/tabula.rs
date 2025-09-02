@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use core_data::identifiers::{BaseCardId, DreamwellCardDefinitionId};
+use core_data::identifiers::{BaseCardId, DreamwellCardId};
 use core_data::initialization_error::InitializationError;
 use serde::{Deserialize, Serialize};
 
@@ -30,7 +30,7 @@ use crate::tabula_table::Table;
 pub struct Tabula {
     pub strings: LocalizedStrings,
     pub test_cards: BTreeMap<BaseCardId, CardDefinition>,
-    pub dreamwell_cards: BTreeMap<DreamwellCardDefinitionId, DreamwellCardDefinition>,
+    pub dreamwell_cards: BTreeMap<DreamwellCardId, DreamwellCardDefinition>,
     pub card_lists: Vec<CardListRow>,
 }
 
@@ -50,7 +50,7 @@ pub struct TabulaRaw {
     #[serde(default)]
     pub test_cards: Table<BaseCardId, BaseCardDefinitionRaw>,
     #[serde(default)]
-    pub dreamwell_cards: Table<DreamwellCardDefinitionId, DreamwellCardDefinitionRaw>,
+    pub dreamwell_cards: Table<DreamwellCardId, DreamwellCardDefinitionRaw>,
     #[serde(default)]
     pub card_lists: Vec<CardListRow>,
 }
