@@ -6,7 +6,7 @@ use battle_state::actions::battle_actions::{
 };
 use battle_state::actions::debug_battle_action::DebugBattleAction;
 use battle_state::battle::card_id::BattleDeckCardId;
-use core_data::identifiers::BaseCardId;
+use core_data::identifiers::{BaseCardId, DreamwellCardDefinitionId};
 use display_data::battle_view::{ButtonView, DisplayPlayer};
 use display_data::card_view::{CardPrefab, ClientCardId};
 use display_data::command::Command;
@@ -158,6 +158,9 @@ pub trait TestSessionBattleExtension {
         player: DisplayPlayer,
         command_extractor: impl Fn(&Command) -> Option<&T>,
     ) -> Vec<&T>;
+
+    /// Sets the next card that will be drawn from the dreamwell.
+    fn set_next_dreamwell_card(&mut self, player: DisplayPlayer, id: DreamwellCardDefinitionId);
 }
 
 impl TestSessionBattleExtension for TestSession {
@@ -414,6 +417,12 @@ impl TestSessionBattleExtension for TestSession {
             .flat_map(|group| &group.commands)
             .filter_map(command_extractor)
             .collect()
+    }
+
+    fn set_next_dreamwell_card(&mut self, player: DisplayPlayer, id: DreamwellCardDefinitionId) {
+        self.perform_player_action(player, DebugBattleAction::SetNextDreamwellCard {
+            base_card_id: id,
+        });
     }
 }
 

@@ -4,6 +4,7 @@ use battle_state::actions::debug_battle_action::DebugBattleAction;
 use battle_state::battle_player::battle_player_state::PlayerType;
 use core_data::identifiers::BattleId;
 use core_data::types::PlayerName;
+use tabula_ids::card_lists::DreamwellCardIdList;
 use uuid::Uuid;
 
 use crate::battle::test_player::TestPlayer;
@@ -64,6 +65,12 @@ impl TestBattle {
     /// Sets the seed for deterministic random number generation.
     pub fn seed(mut self, seed: u64) -> Self {
         self.session.seed = Some(seed);
+        self
+    }
+
+    /// Sets the dreamwell card list for the session.
+    pub fn with_dreamwell(mut self, id: DreamwellCardIdList) -> Self {
+        self.session = self.session.with_dreamwell(id);
         self
     }
 

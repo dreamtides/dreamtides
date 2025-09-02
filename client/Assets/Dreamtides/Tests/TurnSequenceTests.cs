@@ -31,7 +31,7 @@ namespace Dreamtides.Tests
       Assert.That(Registry.Layout.EnemyStatusDisplay.TotalSpark._text.text.Contains("10"),
           Is.True,
           "Enemy spark should be 10");
-      yield return TestClickInputProvider.ClickOn(Registry, Registry.Layout.PrimaryActionButton, timeoutSeconds: 30.0f);
+      yield return TestClickInputProvider.ClickOn(Registry, Registry.Layout.PrimaryActionButton);
       Assert.That(Registry.TestHelperService.DidObjectMove(Registry.Layout.UserStatusDisplay.TotalSpark),
           Is.True,
           "User spark should have moved");

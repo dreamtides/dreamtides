@@ -14,12 +14,12 @@ namespace Dreamtides.TestUtils
     readonly float _clickStartTime;
     readonly float _clickEndTime;
 
-    public static IEnumerator ClickOn(Registry registry, Displayable target, float timeoutSeconds = 5.0f)
+    public static IEnumerator ClickOn(Registry registry, Displayable target)
     {
       var screenPosition = registry.Layout.MainCamera.WorldToScreenPoint(target.transform.position);
       registry.InputService.InputProvider = new TestClickInputProvider(target, screenPosition);
       yield return new WaitForSeconds(0.2f);
-      yield return registry.TestHelperService.WaitForIdle(timeoutSeconds);
+      yield return registry.TestHelperService.WaitForIdle(IntegrationTest.TimeoutSeconds);
     }
 
     public TestClickInputProvider(Displayable target, Vector2 screenPosition)
