@@ -1,4 +1,4 @@
-use asset_paths::poneti_ui;
+use asset_paths::ui_assets;
 use bon::Builder;
 use masonry::dimension::{FlexInsets, SafeAreaInsets};
 use masonry::flex_enums::{FlexAlign, FlexJustify, FlexPosition};
@@ -25,7 +25,7 @@ impl<T: Component> Component for PanelComponent<T> {
                 .style(
                     FlexStyle::builder()
                         .align_items(FlexAlign::Stretch)
-                        .background_image(poneti_ui::window_background())
+                        .background_image(ui_assets::window_background())
                         // These slice offsets rely on large "pixels per unit"
                         // values in Unity, e.g. 2048 pixels per unit in this
                         // case. I don't really know why.

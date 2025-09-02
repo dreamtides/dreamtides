@@ -1,5 +1,5 @@
 use action_data::game_action_data::GameAction;
-use asset_paths::poneti_ui;
+use asset_paths::ui_assets;
 use bon::Builder;
 use core_data::display_color;
 use masonry::flex_enums::{FlexAlign, FlexJustify};
@@ -30,9 +30,9 @@ impl Component for ButtonComponent {
                     FlexStyle::builder()
                         .align_items(FlexAlign::Center)
                         .background_image(if self.is_primary {
-                            poneti_ui::primary_button_background()
+                            ui_assets::primary_button_background()
                         } else {
-                            poneti_ui::secondary_button_background()
+                            ui_assets::secondary_button_background()
                         })
                         .flex_grow(self.flex_grow.unwrap_or_default())
                         .flex_shrink(0)

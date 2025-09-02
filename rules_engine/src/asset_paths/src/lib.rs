@@ -1,4 +1,2 @@
-pub mod dissolve_material;
-pub mod hovl;
-pub mod poneti_ui;
-pub mod wow_sound;
+pub mod effect_assets;
+pub mod ui_assets;

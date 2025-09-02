@@ -1,4 +1,4 @@
-use asset_paths::hovl;
+use asset_paths::effect_assets;
 use battle_queries::battle_card_queries::card;
 use battle_state::battle::battle_animation_data::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
@@ -97,7 +97,7 @@ pub fn render(
             push_snapshot(builder, snapshot);
             builder.push(Command::DisplayEffect(DisplayEffectCommand {
                 target: GameObjectId::CardId(adapter::client_card_id(character_id.card_id())),
-                effect: hovl::gain_spark(),
+                effect: effect_assets::gain_spark(),
                 duration: Milliseconds::new(500),
                 scale: FlexVector3::new(5.0, 5.0, 5.0),
                 sound: Some(AudioClipAddress::new("Assets/ThirdParty/WowSound/RPG Magic Sound Effects Pack 3/Light Magic/RPG3_LightMagic_Buff01.wav")),
