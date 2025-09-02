@@ -60,7 +60,7 @@ where
             phase: battle.phase,
         });
 
-        let battle_clone = battle.clone();
+        let tracing_battle_clone = battle.clone();
         let result = panic::catch_unwind(AssertUnwindSafe(|| {
             apply_battle_action::execute(&mut battle, history_action.player, history_action.action);
         }));
@@ -69,7 +69,7 @@ where
             error!("Panic during undo at action {}", action_index);
 
             write_undo_panic_trace(
-                &battle_clone,
+                &tracing_battle_clone,
                 &actions,
                 &history.actions,
                 action_index,

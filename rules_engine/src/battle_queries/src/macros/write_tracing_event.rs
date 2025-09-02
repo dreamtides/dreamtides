@@ -67,6 +67,8 @@ pub fn write_panic_snapshot(
     if !write_event_to_log_file(&event, &battle.request_context) {
         eprintln!("Failed to write panic snapshot to log file");
     }
+
+    panic!("PANIC: {message}");
 }
 
 #[derive(Debug, Clone, Serialize)]
