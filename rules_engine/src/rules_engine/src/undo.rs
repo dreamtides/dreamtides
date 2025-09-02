@@ -6,6 +6,7 @@ use battle_queries::legal_action_queries::legal_actions;
 use battle_queries::macros::write_tracing_event;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::animation_data::AnimationData;
+use battle_state::battle::battle_history::BattleHistoryAction;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use battle_state::battle_trace::battle_tracing::BattleTracing;
@@ -15,15 +16,6 @@ use state_provider::state_provider::StateProvider;
 use tracing::error;
 
 use crate::handle_battle_action::should_auto_execute_action;
-
-#[derive(Debug, Clone)]
-struct ReplayAction {
-    player: PlayerName,
-    action: BattleAction,
-    action_index: usize,
-    turn_id: u32,
-    phase: BattleTurnPhase,
-}
 
 pub fn undo<P>(
     provider: &P,
@@ -79,6 +71,7 @@ where
             write_undo_panic_trace(
                 &battle_clone,
                 &actions,
+                &history.actions,
                 action_index,
                 &format!("{panic_info:?}"),
             );
@@ -95,6 +88,15 @@ where
     last_non_auto_battle
 }
 
+#[derive(Debug, Clone)]
+struct ReplayAction {
+    player: PlayerName,
+    action: BattleAction,
+    action_index: usize,
+    turn_id: u32,
+    phase: BattleTurnPhase,
+}
+
 fn should_skip_action_for_undo(action: BattleAction) -> bool {
     matches!(
         action,
@@ -107,19 +109,29 @@ fn should_skip_action_for_undo(action: BattleAction) -> bool {
 fn write_undo_panic_trace(
     battle: &BattleState,
     actions: &[ReplayAction],
+    full_history_actions: &[BattleHistoryAction],
     panic_action_index: usize,
     panic_info: &str,
 ) {
-    let action_history: Vec<serde_json::Value> = actions
+    let action_history: Vec<serde_json::Value> = full_history_actions
         .iter()
-        .map(|a| {
-            serde_json::json!({
-                "index": a.action_index,
-                "player": format!("{:?}", a.player),
-                "action": format!("{:?}", a.action),
-                "turnId": a.turn_id,
-                "phase": format!("{:?}", a.phase)
-            })
+        .enumerate()
+        .map(|(index, h)| {
+            if let Some(r) = actions.iter().find(|a| a.action_index == index) {
+                serde_json::json!({
+                    "index": r.action_index,
+                    "player": format!("{:?}", r.player),
+                    "action": format!("{:?}", r.action),
+                    "turnId": r.turn_id,
+                    "phase": format!("{:?}", r.phase)
+                })
+            } else {
+                serde_json::json!({
+                    "index": index,
+                    "player": format!("{:?}", h.player),
+                    "action": format!("{:?}", h.action)
+                })
+            }
         })
         .collect();
 
@@ -137,7 +149,7 @@ fn write_undo_panic_trace(
     write_tracing_event::write_undo_panic(
         battle,
         panic_action_index,
-        actions.len(),
+        full_history_actions.len(),
         panic_info.to_string(),
         action_history,
         panic_details,
