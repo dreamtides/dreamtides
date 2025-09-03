@@ -111,6 +111,11 @@ fn render_prompt_message(
 }
 
 fn get_prompt_message_from_source(battle: &BattleState, prompt: &PromptData) -> Option<String> {
+    if matches!(prompt.prompt_type, PromptType::ModalEffect(..)) {
+        // Do not apply message to modal choices.
+        return None;
+    }
+
     let prompt = match prompt.source.card_source() {
         CardSource::CardId(card_id) => {
             // TODO: Handle multiple prompts per card.
