@@ -30,7 +30,8 @@ use quest_state::quest::quest_state::QuestState;
 use rand::SeedableRng;
 use rand_xoshiro::Xoshiro256PlusPlus;
 use tabula_data::tabula::Tabula;
-use tabula_ids::test_card;
+use tabula_ids::card_lists::BaseCardIdList;
+use tabula_ids::{card_lists, test_card};
 use user_state::user::user_state::UserState;
 use uuid::Uuid;
 
@@ -168,7 +169,7 @@ fn create_test_deck(tabula: &Tabula, name: TestDeckName) -> Deck {
             deck.insert_copies(tabula, test_card::TEST_COUNTERSPELL_UNLESS_PAYS, 3);
             deck.insert_copies(tabula, test_card::TEST_VARIABLE_ENERGY_DRAW, 3);
         }
-        TestDeckName::CoreEleven => {
+        TestDeckName::Benchmark1 => {
             deck.insert_copies(tabula, test_card::TEST_NAMED_DISSOLVE, 4);
             deck.insert_copies(tabula, test_card::TEST_COUNTERSPELL, 3);
             deck.insert_copies(tabula, test_card::TEST_COUNTERSPELL_UNLESS_PAYS, 2);
@@ -202,7 +203,16 @@ fn create_test_deck(tabula: &Tabula, name: TestDeckName) -> Deck {
             deck.insert_copies(tabula, test_card::TEST_FORESEE_ONE_DRAW_RECLAIM, 3);
             deck.insert_copies(tabula, test_card::TEST_COUNTERSPELL_CHARACTER, 2);
         }
+        TestDeckName::Core11 => {
+            populate_deck_from_base_card_id_list(tabula, &mut deck, BaseCardIdList::Core11);
+        }
     }
 
     deck
+}
+
+fn populate_deck_from_base_card_id_list(tabula: &Tabula, deck: &mut Deck, list: BaseCardIdList) {
+    for id in card_lists::base_card_id_list(list) {
+        deck.insert_copies(tabula, *id, 1);
+    }
 }

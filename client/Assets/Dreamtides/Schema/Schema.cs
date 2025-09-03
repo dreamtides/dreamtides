@@ -2297,9 +2297,9 @@ namespace Dreamtides.Schema
 
     public enum LogType { Debug, Error, Info, Warning };
 
-    public enum TestDeckName { CoreEleven, StartingFive, Vanilla };
+    public enum TestDeckName { Benchmark1, Core11, StartingFive, Vanilla };
 
-    public enum DreamwellCardIdList { TestDreamwellBasic5, TestDreamwellNoAbilities };
+    public enum DreamwellCardIdList { DreamwellBasic5, TestDreamwellBasic5, TestDreamwellNoAbilities };
 
     public enum GameAiEnum { AlwaysPanic, FirstAvailableAction, RandomAction, WaitFiveSeconds };
 
@@ -2808,8 +2808,10 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "CoreEleven":
-                    return TestDeckName.CoreEleven;
+                case "Benchmark1":
+                    return TestDeckName.Benchmark1;
+                case "Core11":
+                    return TestDeckName.Core11;
                 case "StartingFive":
                     return TestDeckName.StartingFive;
                 case "Vanilla":
@@ -2828,8 +2830,11 @@ namespace Dreamtides.Schema
             var value = (TestDeckName)untypedValue;
             switch (value)
             {
-                case TestDeckName.CoreEleven:
-                    serializer.Serialize(writer, "CoreEleven");
+                case TestDeckName.Benchmark1:
+                    serializer.Serialize(writer, "Benchmark1");
+                    return;
+                case TestDeckName.Core11:
+                    serializer.Serialize(writer, "Core11");
                     return;
                 case TestDeckName.StartingFive:
                     serializer.Serialize(writer, "StartingFive");
@@ -2854,6 +2859,8 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
+                case "DreamwellBasic5":
+                    return DreamwellCardIdList.DreamwellBasic5;
                 case "TestDreamwellBasic5":
                     return DreamwellCardIdList.TestDreamwellBasic5;
                 case "TestDreamwellNoAbilities":
@@ -2872,6 +2879,9 @@ namespace Dreamtides.Schema
             var value = (DreamwellCardIdList)untypedValue;
             switch (value)
             {
+                case DreamwellCardIdList.DreamwellBasic5:
+                    serializer.Serialize(writer, "DreamwellBasic5");
+                    return;
                 case DreamwellCardIdList.TestDreamwellBasic5:
                     serializer.Serialize(writer, "TestDreamwellBasic5");
                     return;

@@ -336,7 +336,7 @@ fn load_battle_from_provider<P: StateProvider + 'static>(
             let enemy =
                 configuration.enemy.as_ref().cloned().unwrap_or(DEFAULT_AI_OPPONENT.clone());
 
-            let deck_name = configuration.deck_override.unwrap_or(TestDeckName::CoreEleven);
+            let deck_name = configuration.deck_override.unwrap_or(TestDeckName::Core11);
             let new_battle = new_battle::create_and_start(
                 battle_id,
                 provider.tabula(),
@@ -345,7 +345,7 @@ fn load_battle_from_provider<P: StateProvider + 'static>(
                     &provider.tabula(),
                     configuration
                         .dreamwell_override
-                        .unwrap_or(DreamwellCardIdList::TestDreamwellBasic5),
+                        .unwrap_or(DreamwellCardIdList::DreamwellBasic5),
                 ),
                 CreateBattlePlayer { player_type: PlayerType::User(user_id), deck_name },
                 CreateBattlePlayer { player_type: enemy, deck_name },

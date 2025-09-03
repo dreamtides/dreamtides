@@ -48,11 +48,11 @@ fn create_500_card_battle_json() -> ConnectResponse {
         ),
         CreateBattlePlayer {
             player_type: PlayerType::User(user_id),
-            deck_name: TestDeckName::CoreEleven,
+            deck_name: TestDeckName::Benchmark1,
         },
         CreateBattlePlayer {
             player_type: PlayerType::Agent(GameAI::AlwaysPanic),
-            deck_name: TestDeckName::CoreEleven,
+            deck_name: TestDeckName::Benchmark1,
         },
         RequestContext { logging_options: LoggingOptions::default() },
     );

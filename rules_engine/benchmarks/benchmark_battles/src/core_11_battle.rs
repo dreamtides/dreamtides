@@ -93,11 +93,11 @@ fn generate_core_11_battle_with_logging(enable_logging: bool) -> BattleState {
         Dreamwell::from_card_list(&provider.tabula(), DreamwellCardIdList::TestDreamwellBasic5),
         CreateBattlePlayer {
             player_type: PlayerType::Agent(GameAI::AlwaysPanic),
-            deck_name: TestDeckName::CoreEleven,
+            deck_name: TestDeckName::Benchmark1,
         },
         CreateBattlePlayer {
             player_type: PlayerType::Agent(GameAI::AlwaysPanic),
-            deck_name: TestDeckName::CoreEleven,
+            deck_name: TestDeckName::Benchmark1,
         },
         RequestContext { logging_options: LoggingOptions::default() },
     );

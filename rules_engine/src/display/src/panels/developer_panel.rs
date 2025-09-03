@@ -107,8 +107,8 @@ impl Component for DeveloperPanel {
                             DebugButton::builder()
                                 .label("Core 11")
                                 .action(DebugAction::RestartBattleWithDecks {
-                                    one: TestDeckName::CoreEleven,
-                                    two: TestDeckName::CoreEleven,
+                                    one: TestDeckName::Benchmark1,
+                                    two: TestDeckName::Benchmark1,
                                 })
                                 .build(),
                         )
