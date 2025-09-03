@@ -60,7 +60,8 @@ namespace Dreamtides.Buttons
 
     private void Update()
     {
-      if (_pendingView != null && _showOnIdleDuration.HasValue && _lastSetViewTime.HasValue)
+      if (_pendingView != null && _showOnIdleDuration.HasValue &&
+      _lastSetViewTime.HasValue)
       {
         float elapsedTime = Time.time - _lastSetViewTime.Value;
         if (elapsedTime >= _showOnIdleDuration.Value)
@@ -91,7 +92,7 @@ namespace Dreamtides.Buttons
 
     public void SetView(ButtonView? view, Milliseconds? showOnIdleDuration = null)
     {
-      SaveCurrentValues();
+      MaybeInitialize();
       _lastSetViewTime = Time.time;
       MarkInteraction();
 
@@ -210,7 +211,7 @@ namespace Dreamtides.Buttons
     {
       MarkInteraction();
       if (_action == null) return;
-      SaveCurrentValues();
+      MaybeInitialize();
 
       var currentTime = Time.time;
       if (currentTime - _lastClickTime < (_debounceDelayMilliseconds / 1000f))
@@ -251,7 +252,7 @@ namespace Dreamtides.Buttons
       }
     }
 
-    private void SaveCurrentValues()
+    private void MaybeInitialize()
     {
       if (_initialized)
       {

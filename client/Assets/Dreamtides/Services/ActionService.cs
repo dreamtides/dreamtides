@@ -208,6 +208,12 @@ namespace Dreamtides.Services
       else
       {
         var response = Plugin.Connect(request);
+
+        // Wait one frame so this doesn't happen on the first frame after
+        // starting, gives time for initialization to run and avoids weird
+        // display bugs with e.g Action buttons.
+        yield return new WaitForEndOfFrame();
+
         yield return ApplyCommands(response.Commands, animate: false, onComplete: () =>
         {
           if (startLoggingSpan)

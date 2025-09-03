@@ -20,8 +20,7 @@ namespace Dreamtides.Services
         private readonly List<LogEntry> _bufferedLogs = new();
         private float? _lastBufferedLogTime;
         private const float SPAN_TIMEOUT_SECONDS = 10f;
-    // Reentrancy guard so our own Debug.Log calls don't get re-captured and re-logged infinitely
-    private bool _emittingToUnityConsole;
+        private bool _emittingToUnityConsole;
 
         protected override void OnInitialize(TestConfiguration? testConfiguration)
         {
@@ -318,7 +317,12 @@ namespace Dreamtides.Services
             _lastBufferedLogTime = null;
         }
 
-        private void AddLogEntry(Schema.LogType logType, string message, Dictionary<string, string> arguments, string? source = null)
+        private void AddLogEntry(
+            Schema.LogType logType,
+            string message,
+            Dictionary<string, string> arguments,
+            string? source = null,
+            bool logToUnity = true)
         {
             var formattedMessage = FormatMessageWithArguments(message, arguments, source);
 
@@ -344,7 +348,7 @@ namespace Dreamtides.Services
             }
 
             // Immediately emit to Unity console (guard against recursive capture)
-            if (!_emittingToUnityConsole)
+            if (!_emittingToUnityConsole && logToUnity)
             {
                 try
                 {
@@ -390,7 +394,7 @@ namespace Dreamtides.Services
             if (_emittingToUnityConsole) return;
             var logType = ConvertUnityLogType(type);
             var arguments = new Dictionary<string, string>();
-            AddLogEntry(logType, condition, arguments);
+            AddLogEntry(logType, condition, arguments, logToUnity: false);
         }
 
         private static Schema.LogType ConvertUnityLogType(UnityEngine.LogType unityLogType)

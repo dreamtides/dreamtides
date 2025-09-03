@@ -17,10 +17,8 @@ namespace Dreamtides.Components
     [SerializeField] ObjectLayout? _toUpdate;
     [SerializeField] float _xOffset;
 
-    public IEnumerator Start()
+    public void Start()
     {
-      // Wait for GameCamera field of view changes to stabilize.
-      yield return new WaitForEndOfFrame();
       var screenPoint = TransformUtils.RectTransformToScreenSpace(_rectTransform).center;
       var anchor = _registry.Layout.MainCamera.ScreenToWorldPoint(
           new Vector3(screenPoint.x, screenPoint.y, _distanceFromCamera));
