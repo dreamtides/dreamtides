@@ -17,8 +17,16 @@ namespace Dreamtides.Components
     [SerializeField] ObjectLayout? _toUpdate;
     [SerializeField] float _xOffset;
 
-    public void Start()
+    public IEnumerator Start()
     {
+      if (Registry.TestConfiguration != null)
+      {
+        // Hack: Screen resolution is not correct on first frame in tests. See
+        // note in Registry.cs.
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
+      }
+
       var screenPoint = TransformUtils.RectTransformToScreenSpace(_rectTransform).center;
       var anchor = _registry.Layout.MainCamera.ScreenToWorldPoint(
           new Vector3(screenPoint.x, screenPoint.y, _distanceFromCamera));
