@@ -393,7 +393,7 @@ namespace Dreamtides.Components
       if (_registry.IsMobileDevice &&
         GameContext == GameContext.Hand &&
         CardView.Position.Position.PositionClass?.InHand == DisplayPlayer.User &&
-        CardView.Revealed?.Actions?.OnClick == null &&
+        CardView.Revealed?.Actions?.OnClick?.ToGameAction() == null &&
         !_registry.CapabilitiesService.AnyBrowserOpen())
       {
         // Jump to large size when in user hand on mobile
