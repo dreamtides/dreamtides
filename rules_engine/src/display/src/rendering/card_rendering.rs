@@ -28,7 +28,7 @@ use masonry::flex_enums::FlexDirection;
 use masonry::flex_style::FlexStyle;
 use tabula_data::card_definitions::card_definition::CardDefinition;
 use tabula_data::localized_strings::StringContext;
-use tabula_ids::{string_id, test_card};
+use tabula_ids::string_id;
 use ui_components::box_component::BoxComponent;
 use ui_components::component::Component;
 use ui_components::icon;
@@ -276,8 +276,7 @@ pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: Card
             .clone();
     }
 
-    if card::get_base_card_id(battle, card_id) == test_card::TEST_VARIABLE_ENERGY_DRAW
-        && let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))
+    if let Some(stack_item) = battle.cards.stack_item(StackCardId(card_id))
         && let StackCardAdditionalCostsPaid::Energy(energy) = &stack_item.additional_costs_paid
     {
         return format!(
