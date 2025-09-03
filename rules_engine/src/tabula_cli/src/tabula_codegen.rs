@@ -44,6 +44,9 @@ pub fn generate_test_card_ids(tabula_raw: &TabulaRaw, output_path: &str) -> Resu
     let mut seen_names: HashSet<String> = HashSet::new();
     let mut base_const_names: Vec<String> = Vec::new();
     for row in tabula_raw.cards.as_slice() {
+        if !row.is_test_card {
+            continue;
+        }
         let const_name = case_utils::cleaned_to_case(&row.name_en_us, Case::UpperSnake);
         if seen_names.contains(&const_name) {
             continue;

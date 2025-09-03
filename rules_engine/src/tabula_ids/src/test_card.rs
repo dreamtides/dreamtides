@@ -1,46 +1,6 @@
 use core_data::identifiers::{BaseCardId, DreamwellCardId};
 use uuid::uuid;
 
-/// {Dissolve} an enemy character.
-pub const IMMOLATE: BaseCardId = BaseCardId(uuid!("d8fe4b2a-088c-4a92-aeb7-d6d4d22fda1a"));
-
-/// {Prevent} a played enemy card.
-pub const ABOLISH: BaseCardId = BaseCardId(uuid!("d07ac4fa-cc3b-4bb8-8018-de7dc1760f35"));
-
-/// {Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}.
-pub const RIPPLE_OF_DEFIANCE: BaseCardId =
-    BaseCardId(uuid!("d4207a7b-fc36-45e4-a1ee-f01b34485221"));
-
-/// Pay one or more {e}: Draw {-drawn-cards(n:1)} for each {e} spent.
-pub const DREAMSCATTER: BaseCardId = BaseCardId(uuid!("15a39336-2c71-44d6-b462-d9fd23a4d925"));
-
-/// Whenever you play a card during the enemy's turn, this character gains
-/// {-gained-spark(n:1)}.
-pub const SUNDOWN_SURFER: BaseCardId = BaseCardId(uuid!("3380cf41-2bca-468c-95e0-57abafd29430"));
-
-/// {fma} {-energy-cost(e:3)}: Draw {-drawn-cards(n:1)}.
-pub const MINSTREL_OF_FALLING_LIGHT: BaseCardId =
-    BaseCardId(uuid!("86c79455-f9ba-46e4-80a6-e018f330942b"));
-
-/// Return one or two events from your void to your hand.
-pub const ARCHIVE_OF_THE_FORGOTTEN: BaseCardId =
-    BaseCardId(uuid!("07f737af-dbaf-471a-8edc-e1d987c23903"));
-
-/// {choose-one} {bullet} {-energy-cost(e:2)}: Return an enemy character to
-/// hand. {bullet} {-energy-cost(e:3)}: Draw {-drawn-cards(n:2)}.
-pub const BREAK_THE_SEQUENCE: BaseCardId =
-    BaseCardId(uuid!("33c0db9c-666d-4b4c-a596-b74106025be8"));
-
-/// Give an allied character {anchored} until end of turn.
-pub const TOGETHER_AGAINST_THE_TIDE: BaseCardId =
-    BaseCardId(uuid!("9866955c-31af-4aad-8319-a52d2fd85d0f"));
-
-/// {-Foresee(n:1)}. Draw {-drawn-cards(n:1)}.  {-Reclaim-Cost(e:3)}
-pub const GUIDING_LIGHT: BaseCardId = BaseCardId(uuid!("5e70988b-ce14-45a0-8334-7cf4539ee2d8"));
-
-/// {Prevent} a played enemy character.
-pub const CRAGFALL: BaseCardId = BaseCardId(uuid!("1d41a21a-1beb-4e56-8d7f-be29c4a9d43d"));
-
 pub const TEST_VANILLA_CHARACTER: BaseCardId =
     BaseCardId(uuid!("253ee0ca-f973-4d9f-ad37-abe548bc674f"));
 
@@ -207,17 +167,6 @@ pub const DREAMWELL_MILL_3: DreamwellCardId =
     DreamwellCardId(uuid!("a2cdf115-8e1a-455e-a118-123f6f36c7ba"));
 
 pub const ALL_TEST_CARD_IDS: &[BaseCardId] = &[
-    IMMOLATE,
-    ABOLISH,
-    RIPPLE_OF_DEFIANCE,
-    DREAMSCATTER,
-    SUNDOWN_SURFER,
-    MINSTREL_OF_FALLING_LIGHT,
-    ARCHIVE_OF_THE_FORGOTTEN,
-    BREAK_THE_SEQUENCE,
-    TOGETHER_AGAINST_THE_TIDE,
-    GUIDING_LIGHT,
-    CRAGFALL,
     TEST_VANILLA_CHARACTER,
     TEST_DISSOLVE,
     TEST_COUNTERSPELL,
