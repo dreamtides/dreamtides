@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::fs::File;
-use std::sync::{Arc, Mutex, RwLock};
+use std::sync::{Arc, Mutex, OnceLock, RwLock};
 use std::time::Instant;
 
 use battle_state::battle::battle_state::{BattleState, RequestContext};
@@ -63,40 +63,41 @@ impl StateProvider for TestStateProvider {
         _persistent_data_path: &str,
         streaming_assets_path: &str,
     ) -> Result<(), Vec<InitializationError>> {
+        // Cache tabula value between tests to improve test performance
+        // substantially.
+        static GLOBAL_TABULA: OnceLock<Arc<Tabula>> = OnceLock::new();
+        if let Some(global) = GLOBAL_TABULA.get() {
+            if let Ok(mut guard) = self.inner.tabula.write() {
+                *guard = Some(global.clone());
+            }
+            return Ok(());
+        }
         let tabula_path = format!("{streaming_assets_path}/tabula.json");
         let ctx = TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates };
-        let tabula = match File::open(&tabula_path) {
-            Ok(file) => {
-                let raw: TabulaRaw = serde_json::from_reader(file).map_err(|e| {
-                    vec![InitializationError::with_details(
-                        ErrorCode::JsonError,
-                        "Failed to parse tabula.json",
-                        e.to_string(),
-                    )]
-                })?;
-                tabula::build(&ctx, &raw)?
-            }
-            Err(_) => {
-                let file = File::open("tabula.json").map_err(|e| {
-                    vec![InitializationError::with_details(
-                        ErrorCode::IOError,
-                        "Failed to open tabula.json",
-                        e.to_string(),
-                    )]
-                })?;
-                let raw: TabulaRaw = serde_json::from_reader(file).map_err(|e| {
-                    vec![InitializationError::with_details(
-                        ErrorCode::JsonError,
-                        "Failed to parse tabula.json",
-                        e.to_string(),
-                    )]
-                })?;
-                tabula::build(&ctx, &raw)?
-            }
+        let build_from_file = |path: &str| -> Result<Tabula, Vec<InitializationError>> {
+            let file = File::open(path).map_err(|e| {
+                vec![InitializationError::with_details(
+                    ErrorCode::IOError,
+                    "Failed to open tabula.json",
+                    e.to_string(),
+                )]
+            })?;
+            let raw: TabulaRaw = serde_json::from_reader(file).map_err(|e| {
+                vec![InitializationError::with_details(
+                    ErrorCode::JsonError,
+                    "Failed to parse tabula.json",
+                    e.to_string(),
+                )]
+            })?;
+            tabula::build(&ctx, &raw)
         };
-
+        let built = match build_from_file(&tabula_path) {
+            Ok(t) => t,
+            Err(_) => build_from_file("tabula.json")?,
+        };
+        let arc = GLOBAL_TABULA.get_or_init(|| Arc::new(built));
         if let Ok(mut guard) = self.inner.tabula.write() {
-            *guard = Some(Arc::new(tabula));
+            *guard = Some(arc.clone());
         }
         Ok(())
     }
