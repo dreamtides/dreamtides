@@ -43,8 +43,10 @@ pub fn is_victory_imminent_for_player(battle: &BattleState, player: PlayerName) 
     if remaining == 0 {
         return false;
     }
-    let current_spark = player_properties::spark_total(battle, player).0;
-    current_spark >= remaining
+    let difference = player_properties::spark_total(battle, player)
+        .0
+        .saturating_sub(player_properties::spark_total(battle, player.opponent()).0);
+    difference >= remaining
 }
 
 /// Returns a preview of the battle state based on simulating the effect of
