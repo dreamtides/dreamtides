@@ -28,7 +28,7 @@ impl Deck {
     /// deck.
     pub fn insert_copies(&mut self, tabula: &Tabula, id: BaseCardId, count: usize) {
         let card = tabula
-            .test_cards
+            .cards
             .get(&id)
             .unwrap_or_else(|| panic!("Card definition not found for card id: {id:?}"));
         for _ in 0..count {

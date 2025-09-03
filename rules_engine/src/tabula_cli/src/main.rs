@@ -92,8 +92,8 @@ async fn run() -> Result<()> {
         if let Ok(local_file) = File::open(path) {
             let local_raw: TabulaRaw = serde_json::from_reader(BufReader::new(local_file))
                 .with_context(|| format!("failed to parse local JSON at {path}"))?;
-            let local_ids: HashSet<_> = local_raw.test_cards.0.iter().map(|r| r.id).collect();
-            let remote_ids: HashSet<_> = tabula_raw.test_cards.0.iter().map(|r| r.id).collect();
+            let local_ids: HashSet<_> = local_raw.cards.0.iter().map(|r| r.id).collect();
+            let remote_ids: HashSet<_> = tabula_raw.cards.0.iter().map(|r| r.id).collect();
             let missing_ids: Vec<_> = local_ids.difference(&remote_ids).cloned().collect();
             if !missing_ids.is_empty() {
                 let context =
@@ -105,7 +105,7 @@ async fn run() -> Result<()> {
                 })?;
                 let mut rows = Vec::new();
                 for id in missing_ids.iter() {
-                    if let Some(def) = tabula.test_cards.get(id) {
+                    if let Some(def) = tabula.cards.get(id) {
                         rows.push((*id, def.clone()));
                     }
                 }

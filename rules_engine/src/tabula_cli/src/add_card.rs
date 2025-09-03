@@ -103,13 +103,14 @@ fn main() -> Result<()> {
         subtype: args.subtype,
         is_fast: args.is_fast,
         spark: args.spark,
+        is_test_card: true,
         rarity,
         image_number: args.image_number,
     };
 
-    let mut items = raw.test_cards.0;
+    let mut items = raw.cards.0;
     items.push(row);
-    raw.test_cards = from_vec(items);
+    raw.cards = from_vec(items);
 
     let pretty = serde_json::to_string_pretty(&raw).context("failed to serialize tabula json")?;
     fs::write(&path, pretty)

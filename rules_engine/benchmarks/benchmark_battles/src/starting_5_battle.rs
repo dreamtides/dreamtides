@@ -274,7 +274,7 @@ pub fn benchmark_battle() -> BattleState {
     let mut cache_cards = Vec::new();
     let mut temp_deck = Deck::default();
     for spec in card_specs.iter() {
-        let def = provider.tabula().test_cards.get(&spec.name).unwrap().clone();
+        let def = provider.tabula().cards.get(&spec.name).unwrap().clone();
         let quest_id = temp_deck.push_card_and_get_id(def.clone());
         let list = card_abilities::build_from_definition(&def);
         cache_cards.push(BattleCardDefinitionsCard {
@@ -348,7 +348,7 @@ pub fn benchmark_battle() -> BattleState {
         &card_specs
             .iter()
             .filter(|spec| spec.owner == PlayerName::One)
-            .map(|spec| provider.tabula().test_cards.get(&spec.name).unwrap().clone())
+            .map(|spec| provider.tabula().cards.get(&spec.name).unwrap().clone())
             .collect::<Vec<_>>(),
     );
     battle_deck::debug_add_cards(
@@ -357,7 +357,7 @@ pub fn benchmark_battle() -> BattleState {
         &card_specs
             .iter()
             .filter(|spec| spec.owner == PlayerName::Two)
-            .map(|spec| provider.tabula().test_cards.get(&spec.name).unwrap().clone())
+            .map(|spec| provider.tabula().cards.get(&spec.name).unwrap().clone())
             .collect::<Vec<_>>(),
     );
 

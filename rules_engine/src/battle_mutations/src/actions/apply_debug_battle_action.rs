@@ -37,24 +37,16 @@ pub fn execute(battle: &mut BattleState, player: PlayerName, action: DebugBattle
         }
         DebugBattleAction::AddCardToBattlefield { player: player_name, card: card_name } => {
             let card_count = battle.cards.all_cards().count();
-            let definition = battle
-                .tabula
-                .test_cards
-                .get(&card_name)
-                .expect("Card definition not found")
-                .clone();
+            let definition =
+                battle.tabula.cards.get(&card_name).expect("Card definition not found").clone();
             battle_deck::debug_add_cards(battle, player_name, &[definition]);
             let new_card_id = BattleDeckCardId(CardId(card_count));
             move_card::from_deck_to_battlefield(battle, source, player_name, new_card_id);
         }
         DebugBattleAction::AddCardToVoid { player: player_name, card: card_name } => {
             let card_count = battle.cards.all_cards().count();
-            let definition = battle
-                .tabula
-                .test_cards
-                .get(&card_name)
-                .expect("Card definition not found")
-                .clone();
+            let definition =
+                battle.tabula.cards.get(&card_name).expect("Card definition not found").clone();
             battle_deck::debug_add_cards(battle, player_name, &[definition]);
             let new_card_id = BattleDeckCardId(CardId(card_count));
             move_card::from_deck_to_void(battle, source, player_name, new_card_id);
@@ -116,7 +108,7 @@ fn add_to_hand(
 ) -> HandCardId {
     let card_count = battle.cards.all_cards().count();
     let definition =
-        battle.tabula.test_cards.get(&card_name).expect("Card definition not found").clone();
+        battle.tabula.cards.get(&card_name).expect("Card definition not found").clone();
     battle_deck::debug_add_cards(battle, player, &[definition]);
     let new_card_id = BattleDeckCardId(CardId(card_count));
     move_card::from_deck_to_hand(battle, source, player, new_card_id)

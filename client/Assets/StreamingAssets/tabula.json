@@ -601,7 +601,493 @@
       "en_us": "{keyword}Reclaim{end-keyword} {$e}{e}: You may play this card from your void for {$e}{e}, then banish it."
     }
   ],
-  "test_cards": [
+  "cards": [
+    {
+      "id": "d8fe4b2a-088c-4a92-aeb7-d6d4d22fda1a",
+      "name_en_us": "Immolate",
+      "energy_cost": "2",
+      "rules_text_en_us": "{Dissolve} an enemy character.",
+      "prompts_en_us": "Choose an enemy character to {dissolve}.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "DissolveCharacter": {
+                  "target": {
+                    "Enemy": "Character"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{Dissolve} an enemy character."
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "is_test_card": false,
+      "rarity": "Special",
+      "image_number": "1907487244"
+    },
+    {
+      "id": "d07ac4fa-cc3b-4bb8-8018-de7dc1760f35",
+      "name_en_us": "Abolish",
+      "energy_cost": "2",
+      "rules_text_en_us": "{Prevent} a played enemy card.",
+      "prompts_en_us": "Choose an enemy card to {prevent}.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "Counterspell": {
+                  "target": {
+                    "Enemy": "Card"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{Prevent} a played enemy card."
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "is_test_card": false,
+      "rarity": "Special",
+      "image_number": "1282908322"
+    },
+    {
+      "id": "d4207a7b-fc36-45e4-a1ee-f01b34485221",
+      "name_en_us": "Ripple of Defiance",
+      "energy_cost": "1",
+      "rules_text_en_us": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}.",
+      "prompts_en_us": "Choose an enemy event to {prevent}.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "CounterspellUnlessPaysCost": {
+                  "target": {
+                    "Enemy": "Event"
+                  },
+                  "cost": {
+                    "Energy": 2
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{Prevent} a played enemy event unless the enemy pays {-energy-cost(e:2)}."
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "is_test_card": false,
+      "rarity": "Special",
+      "image_number": "2123360837"
+    },
+    {
+      "id": "15a39336-2c71-44d6-b462-d9fd23a4d925",
+      "name_en_us": "Dreamscatter",
+      "energy_cost": "2",
+      "rules_text_en_us": "Pay one or more {e}: Draw {-drawn-cards(n:1)} for each {e} spent.",
+      "prompts_en_us": "Pay one or more {e}.",
+      "abilities": [
+        {
+          "Event": {
+            "additional_cost": "SpendOneOrMoreEnergy",
+            "effect": {
+              "Effect": {
+                "DrawCardsForEach": {
+                  "count": 1,
+                  "for_each": "ForEachEnergySpentOnThisCard"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": "Pay one or more {e}",
+              "effect": {
+                "Effect": "Draw {-drawn-cards(n:1)} for each {e} spent."
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "is_test_card": false,
+      "rarity": "Special",
+      "image_number": "489056605"
+    },
+    {
+      "id": "3380cf41-2bca-468c-95e0-57abafd29430",
+      "name_en_us": "Sundown Surfer",
+      "energy_cost": "2",
+      "rules_text_en_us": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}.",
+      "abilities": [
+        {
+          "Triggered": {
+            "trigger": {
+              "PlayDuringTurn": [
+                {
+                  "Your": "Card"
+                },
+                "EnemyTurn"
+              ]
+            },
+            "effect": {
+              "Effect": {
+                "GainsSpark": {
+                  "target": "This",
+                  "gains": 1
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Triggered": {
+            "text": "Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}."
+          }
+        }
+      ],
+      "card_type": "Character",
+      "is_fast": true,
+      "spark": "1",
+      "is_test_card": false,
+      "rarity": "Special",
+      "image_number": "403770319"
+    },
+    {
+      "id": "86c79455-f9ba-46e4-80a6-e018f330942b",
+      "name_en_us": "Minstrel of Falling Light",
+      "energy_cost": "2",
+      "rules_text_en_us": "{fma} {-energy-cost(e:3)}: Draw {-drawn-cards(n:1)}.",
+      "abilities": [
+        {
+          "Activated": {
+            "costs": [
+              {
+                "Energy": 3
+              }
+            ],
+            "effect": {
+              "Effect": {
+                "DrawCards": {
+                  "count": 1
+                }
+              }
+            },
+            "options": {
+              "is_fast": true,
+              "is_multi": true
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Activated": {
+            "cost": "{fma} {-energy-cost(e:3)}",
+            "effect": {
+              "Effect": "Draw {-drawn-cards(n:1)}."
+            }
+          }
+        }
+      ],
+      "card_type": "Character",
+      "is_fast": false,
+      "spark": "2",
+      "is_test_card": false,
+      "rarity": "Special",
+      "image_number": "1794244540"
+    },
+    {
+      "id": "07f737af-dbaf-471a-8edc-e1d987c23903",
+      "name_en_us": "Archive of the Forgotten",
+      "energy_cost": "4",
+      "rules_text_en_us": "Return one or two events from your void to your hand.",
+      "prompts_en_us": "Choose one or two events in your void to return.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "ReturnUpToCountFromYourVoidToHand": {
+                  "target": {
+                    "YourVoid": "Event"
+                  },
+                  "count": 2
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Return one or two events from your void to your hand."
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": false,
+      "is_test_card": false,
+      "rarity": "Special",
+      "image_number": "644603677"
+    },
+    {
+      "id": "33c0db9c-666d-4b4c-a596-b74106025be8",
+      "name_en_us": "Break the Sequence",
+      "energy_cost": "*",
+      "rules_text_en_us": "{choose-one}\n{bullet} {-energy-cost(e:2)}: Return an enemy character to hand.\n{bullet} {-energy-cost(e:3)}: Draw {-drawn-cards(n:2)}.",
+      "prompts_en_us": "Choose an enemy character to return to hand.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Modal": [
+                {
+                  "energy_cost": 2,
+                  "effect": {
+                    "Effect": {
+                      "ReturnToHand": {
+                        "target": {
+                          "Enemy": "Character"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "energy_cost": 3,
+                  "effect": {
+                    "Effect": {
+                      "DrawCards": {
+                        "count": 2
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Modal": [
+                  {
+                    "cost": "{-energy-cost(e:2)}",
+                    "effect": "Return an enemy character to hand."
+                  },
+                  {
+                    "cost": "{-energy-cost(e:3)}",
+                    "effect": "Draw {-drawn-cards(n:2)}."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "is_test_card": false,
+      "rarity": "Special",
+      "image_number": "1200949264"
+    },
+    {
+      "id": "9866955c-31af-4aad-8319-a52d2fd85d0f",
+      "name_en_us": "Together Against the Tide",
+      "energy_cost": "1",
+      "rules_text_en_us": "Give an allied character {anchored} until end of turn.",
+      "prompts_en_us": "Choose an allied character to gain {anchored}.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "PreventDissolveThisTurn": {
+                  "target": {
+                    "Your": "Character"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "Give an allied character {anchored} until end of turn."
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "is_test_card": false,
+      "rarity": "Special",
+      "image_number": "1621160806"
+    },
+    {
+      "id": "5e70988b-ce14-45a0-8334-7cf4539ee2d8",
+      "name_en_us": "Guiding Light",
+      "energy_cost": "1",
+      "rules_text_en_us": "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "List": [
+                {
+                  "effect": {
+                    "Foresee": {
+                      "count": 1
+                    }
+                  },
+                  "optional": false
+                },
+                {
+                  "effect": {
+                    "DrawCards": {
+                      "count": 1
+                    }
+                  },
+                  "optional": false
+                }
+              ]
+            }
+          }
+        },
+        {
+          "Named": {
+            "Reclaim": 3
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}."
+              }
+            }
+          }
+        },
+        {
+          "Named": {
+            "name": "{-Reclaim-Cost(e:3)}"
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "is_test_card": false,
+      "rarity": "Special",
+      "image_number": "1328168243"
+    },
+    {
+      "id": "1d41a21a-1beb-4e56-8d7f-be29c4a9d43d",
+      "name_en_us": "Cragfall",
+      "energy_cost": "2",
+      "rules_text_en_us": "{Prevent} a played enemy character.",
+      "prompts_en_us": "Choose an enemy character to {prevent}.",
+      "abilities": [
+        {
+          "Event": {
+            "effect": {
+              "Effect": {
+                "Counterspell": {
+                  "target": {
+                    "Enemy": "Character"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Event": {
+            "event": {
+              "additional_cost": null,
+              "effect": {
+                "Effect": "{Prevent} a played enemy character."
+              }
+            }
+          }
+        }
+      ],
+      "card_type": "Event",
+      "is_fast": true,
+      "is_test_card": false,
+      "rarity": "Special",
+      "image_number": "1239919309"
+    },
     {
       "id": "253ee0ca-f973-4d9f-ad37-abe548bc674f",
       "name_en_us": "Test Vanilla Character",
@@ -613,6 +1099,7 @@
       "subtype": "Musician",
       "is_fast": false,
       "spark": "5",
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1794244540"
     },
@@ -651,6 +1138,7 @@
       ],
       "card_type": "Event",
       "is_fast": true,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1907487244"
     },
@@ -689,6 +1177,7 @@
       ],
       "card_type": "Event",
       "is_fast": true,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1282908322"
     },
@@ -730,6 +1219,7 @@
       ],
       "card_type": "Event",
       "is_fast": true,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "2123360837"
     },
@@ -768,6 +1258,7 @@
       ],
       "card_type": "Event",
       "is_fast": true,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "489056605"
     },
@@ -808,6 +1299,7 @@
       "card_type": "Character",
       "is_fast": true,
       "spark": "1",
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "403770319"
     },
@@ -851,6 +1343,7 @@
       "card_type": "Character",
       "is_fast": false,
       "spark": "2",
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1794244540"
     },
@@ -890,6 +1383,7 @@
       ],
       "card_type": "Event",
       "is_fast": false,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "644603677"
     },
@@ -954,6 +1448,7 @@
       ],
       "card_type": "Event",
       "is_fast": true,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1200949264"
     },
@@ -992,6 +1487,7 @@
       ],
       "card_type": "Event",
       "is_fast": true,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1621160806"
     },
@@ -1050,6 +1546,7 @@
       ],
       "card_type": "Event",
       "is_fast": true,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1328168243"
     },
@@ -1088,6 +1585,7 @@
       ],
       "card_type": "Event",
       "is_fast": true,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1239919309"
     },
@@ -1126,6 +1624,7 @@
       ],
       "card_type": "Event",
       "is_fast": true,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1907487244"
     },
@@ -1161,6 +1660,7 @@
       ],
       "card_type": "Event",
       "is_fast": true,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "489056605"
     },
@@ -1198,6 +1698,7 @@
       "card_type": "Character",
       "is_fast": false,
       "spark": "5",
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "403770319"
     },
@@ -1238,6 +1739,7 @@
       "card_type": "Character",
       "is_fast": true,
       "spark": "5",
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "403770319"
     },
@@ -1277,6 +1779,7 @@
       "card_type": "Character",
       "is_fast": false,
       "spark": "3",
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1794244540"
     },
@@ -1320,6 +1823,7 @@
       "card_type": "Character",
       "is_fast": false,
       "spark": "3",
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1794244540"
     },
@@ -1363,6 +1867,7 @@
       "card_type": "Character",
       "is_fast": false,
       "spark": "3",
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1794244540"
     },
@@ -1405,6 +1910,7 @@
       "card_type": "Character",
       "is_fast": false,
       "spark": "4",
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1794244540"
     },
@@ -1468,6 +1974,7 @@
       "card_type": "Character",
       "is_fast": false,
       "spark": "3",
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1794244540"
     },
@@ -1503,6 +2010,7 @@
       ],
       "card_type": "Event",
       "is_fast": true,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "489056605"
     },
@@ -1538,6 +2046,7 @@
       ],
       "card_type": "Event",
       "is_fast": true,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "489056605"
     },
@@ -1586,6 +2095,7 @@
       ],
       "card_type": "Event",
       "is_fast": true,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1328168243"
     },
@@ -1631,6 +2141,7 @@
       ],
       "card_type": "Event",
       "is_fast": true,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1328168243"
     },
@@ -1676,6 +2187,7 @@
       ],
       "card_type": "Event",
       "is_fast": true,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1328168243"
     },
@@ -1714,6 +2226,7 @@
       ],
       "card_type": "Event",
       "is_fast": true,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1328168243"
     },
@@ -1775,6 +2288,7 @@
       ],
       "card_type": "Event",
       "is_fast": false,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1200949264"
     },
@@ -1839,6 +2353,7 @@
       ],
       "card_type": "Event",
       "is_fast": true,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1200949264"
     },
@@ -1877,6 +2392,7 @@
       ],
       "card_type": "Event",
       "is_fast": true,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1200949264"
     },
@@ -1912,6 +2428,7 @@
       ],
       "card_type": "Event",
       "is_fast": false,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1200949264"
     },
@@ -1947,6 +2464,7 @@
       ],
       "card_type": "Event",
       "is_fast": false,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1200949264"
     },
@@ -1982,6 +2500,7 @@
       ],
       "card_type": "Event",
       "is_fast": false,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1200949264"
     },
@@ -2017,6 +2536,7 @@
       ],
       "card_type": "Event",
       "is_fast": false,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1200949264"
     },
@@ -2052,6 +2572,7 @@
       ],
       "card_type": "Event",
       "is_fast": false,
+      "is_test_card": true,
       "rarity": "Special",
       "image_number": "1200949264"
     }

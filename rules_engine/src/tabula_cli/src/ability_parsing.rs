@@ -78,10 +78,10 @@ where
 }
 
 pub fn parse_all_abilities_for_raw_tabula(raw: &mut tabula_data::tabula::TabulaRaw) -> Result<()> {
-    parse_table_abilities("test_cards", &mut raw.test_cards).map_err(|errs| {
+    parse_table_abilities("test_cards", &mut raw.cards).map_err(|errs| {
         anyhow::anyhow!(errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n"))
     })?;
-    parse_table_displayed_abilities("test_cards", &mut raw.test_cards).map_err(|errs| {
+    parse_table_displayed_abilities("test_cards", &mut raw.cards).map_err(|errs| {
         anyhow::anyhow!(errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n"))
     })?;
 

@@ -172,6 +172,7 @@ pub fn build_base_cards(
             card_subtype,
             is_fast: row.is_fast,
             spark,
+            is_test_card: row.is_test_card,
             rarity: row.rarity.clone(),
             image,
         });

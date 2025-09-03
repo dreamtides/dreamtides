@@ -30,7 +30,7 @@ use crate::tabula_table::Table;
 #[derive(Debug, Clone, Default)]
 pub struct Tabula {
     pub strings: LocalizedStrings,
-    pub test_cards: BTreeMap<BaseCardId, CardDefinition>,
+    pub cards: BTreeMap<BaseCardId, CardDefinition>,
     pub dreamwell_cards: BTreeMap<DreamwellCardId, DreamwellCardDefinition>,
     pub card_lists: Vec<CardListRow>,
     pub card_effects: Vec<CardEffectRow>,
@@ -50,7 +50,7 @@ pub struct TabulaRaw {
     #[serde(default)]
     pub strings: Table<StringId, LocalizedStringSetRaw>,
     #[serde(default)]
-    pub test_cards: Table<BaseCardId, BaseCardDefinitionRaw>,
+    pub cards: Table<BaseCardId, BaseCardDefinitionRaw>,
     #[serde(default)]
     pub dreamwell_cards: Table<DreamwellCardId, DreamwellCardDefinitionRaw>,
     #[serde(default)]
@@ -64,8 +64,7 @@ pub fn build(
     raw: &TabulaRaw,
 ) -> Result<Tabula, Vec<InitializationError>> {
     let strings = localized_strings::build(context, &raw.strings)?;
-    let test_cards =
-        card_definition_builder::build_base_cards("test_cards", context, &raw.test_cards)?;
+    let cards = card_definition_builder::build_base_cards("cards", context, &raw.cards)?;
     let dreamwell_cards = card_definition_builder::build_dreamwell_cards(
         "dreamwell_cards",
         context,
@@ -74,7 +73,7 @@ pub fn build(
 
     Ok(Tabula {
         strings,
-        test_cards,
+        cards,
         dreamwell_cards,
         card_lists: raw.card_lists.clone(),
         card_effects: raw.card_effects.clone(),

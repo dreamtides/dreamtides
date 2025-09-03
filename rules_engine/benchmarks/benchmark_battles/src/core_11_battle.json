@@ -1,5 +1,5 @@
 {
-  "id": "8c1fc6b7-71cd-47f9-a756-b1eba74c380e",
+  "id": "90e4752a-98f5-4697-b468-e4cc5d87c9e1",
   "cards": {
     "cards": [
       {
@@ -1411,7 +1411,7 @@
         42
       ],
       "quest": {
-        "id": "87c1f3c0-38bf-4c9a-9277-9d12a3ef9059",
+        "id": "2370ceeb-4539-45e3-a863-73d290227d2e",
         "user": {
           "id": "00000000-0000-0000-0000-000000000000"
         },
@@ -1456,6 +1456,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png"
@@ -1500,6 +1501,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png"
@@ -1544,6 +1546,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png"
@@ -1588,6 +1591,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png"
@@ -1632,6 +1636,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1282908322.png"
@@ -1676,6 +1681,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1282908322.png"
@@ -1720,6 +1726,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1282908322.png"
@@ -1767,6 +1774,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_2123360837.png"
@@ -1814,6 +1822,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_2123360837.png"
@@ -1858,6 +1867,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png"
@@ -1902,6 +1912,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png"
@@ -1946,6 +1957,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png"
@@ -1990,6 +2002,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": 1,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png"
@@ -2034,6 +2047,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": 1,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png"
@@ -2078,6 +2092,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": 1,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png"
@@ -2122,6 +2137,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": 1,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png"
@@ -2169,6 +2185,7 @@
               "card_subtype": null,
               "is_fast": false,
               "spark": 2,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
@@ -2216,6 +2233,7 @@
               "card_subtype": null,
               "is_fast": false,
               "spark": 2,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
@@ -2263,6 +2281,7 @@
               "card_subtype": null,
               "is_fast": false,
               "spark": 2,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
@@ -2310,6 +2329,7 @@
               "card_subtype": null,
               "is_fast": false,
               "spark": 2,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
@@ -2357,6 +2377,7 @@
               "card_subtype": null,
               "is_fast": false,
               "spark": 2,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
@@ -2402,6 +2423,7 @@
               "card_subtype": null,
               "is_fast": false,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
@@ -2447,6 +2469,7 @@
               "card_subtype": null,
               "is_fast": false,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
@@ -2517,6 +2540,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
@@ -2587,6 +2611,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
@@ -2631,6 +2656,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
@@ -2675,6 +2701,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
@@ -2738,6 +2765,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
@@ -2801,6 +2829,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
@@ -2864,6 +2893,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
@@ -2908,6 +2938,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
@@ -2952,6 +2983,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
@@ -2997,6 +3029,7 @@
               "card_subtype": null,
               "is_fast": false,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
@@ -3042,6 +3075,7 @@
               "card_subtype": null,
               "is_fast": false,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
@@ -3112,6 +3146,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
@@ -3182,6 +3217,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
@@ -3226,6 +3262,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
@@ -3270,6 +3307,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
@@ -3333,6 +3371,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
@@ -3396,6 +3435,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
@@ -3459,6 +3499,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
@@ -3503,6 +3544,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
@@ -3547,6 +3589,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
@@ -3612,7 +3655,7 @@
         85
       ],
       "quest": {
-        "id": "9e66309e-be86-4faf-a23d-97caad92adfa",
+        "id": "f06fa6c5-61ef-4ba6-b7e0-030eb8add8e0",
         "user": {
           "id": "00000000-0000-0000-0000-000000000000"
         },
@@ -3657,6 +3700,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png"
@@ -3701,6 +3745,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png"
@@ -3745,6 +3790,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png"
@@ -3789,6 +3835,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1907487244.png"
@@ -3833,6 +3880,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1282908322.png"
@@ -3877,6 +3925,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1282908322.png"
@@ -3921,6 +3970,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1282908322.png"
@@ -3968,6 +4018,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_2123360837.png"
@@ -4015,6 +4066,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_2123360837.png"
@@ -4059,6 +4111,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png"
@@ -4103,6 +4156,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png"
@@ -4147,6 +4201,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_489056605.png"
@@ -4191,6 +4246,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": 1,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png"
@@ -4235,6 +4291,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": 1,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png"
@@ -4279,6 +4336,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": 1,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png"
@@ -4323,6 +4381,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": 1,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_403770319.png"
@@ -4370,6 +4429,7 @@
               "card_subtype": null,
               "is_fast": false,
               "spark": 2,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
@@ -4417,6 +4477,7 @@
               "card_subtype": null,
               "is_fast": false,
               "spark": 2,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
@@ -4464,6 +4525,7 @@
               "card_subtype": null,
               "is_fast": false,
               "spark": 2,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
@@ -4511,6 +4573,7 @@
               "card_subtype": null,
               "is_fast": false,
               "spark": 2,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
@@ -4558,6 +4621,7 @@
               "card_subtype": null,
               "is_fast": false,
               "spark": 2,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
@@ -4603,6 +4667,7 @@
               "card_subtype": null,
               "is_fast": false,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
@@ -4648,6 +4713,7 @@
               "card_subtype": null,
               "is_fast": false,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
@@ -4718,6 +4784,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
@@ -4788,6 +4855,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
@@ -4832,6 +4900,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
@@ -4876,6 +4945,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
@@ -4939,6 +5009,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
@@ -5002,6 +5073,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
@@ -5065,6 +5137,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
@@ -5109,6 +5182,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
@@ -5153,6 +5227,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
@@ -5198,6 +5273,7 @@
               "card_subtype": null,
               "is_fast": false,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
@@ -5243,6 +5319,7 @@
               "card_subtype": null,
               "is_fast": false,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
@@ -5313,6 +5390,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
@@ -5383,6 +5461,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
@@ -5427,6 +5506,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
@@ -5471,6 +5551,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
@@ -5534,6 +5615,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
@@ -5597,6 +5679,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
@@ -5660,6 +5743,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
@@ -5704,6 +5788,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
@@ -5748,6 +5833,7 @@
               "card_subtype": null,
               "is_fast": true,
               "spark": null,
+              "is_test_card": true,
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"

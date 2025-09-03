@@ -60,6 +60,9 @@ pub struct CardDefinition {
     /// have no spark value specified here.
     pub spark: Option<Spark>,
 
+    /// Whether this card is a test card.
+    pub is_test_card: bool,
+
     /// Rarity of this card, if any.
     pub rarity: Option<Rarity>,
 

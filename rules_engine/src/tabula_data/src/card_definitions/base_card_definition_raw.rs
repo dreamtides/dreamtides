@@ -48,6 +48,10 @@ pub struct BaseCardDefinitionRaw {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub spark: Option<String>,
 
+    /// Whether this card is a test card.
+    #[serde(default)]
+    pub is_test_card: bool,
+
     /// Rarity of this card.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rarity: Option<Rarity>,

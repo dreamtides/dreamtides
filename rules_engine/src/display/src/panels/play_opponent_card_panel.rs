@@ -86,7 +86,7 @@ impl Component for PlayOpponentCardCell<'_> {
         let name = self
             .battle
             .tabula
-            .test_cards
+            .cards
             .get(&self.card)
             .expect("definition missing for identity")
             .displayed_name
