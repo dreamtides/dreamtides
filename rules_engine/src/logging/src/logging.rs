@@ -2,7 +2,7 @@ use std::env;
 use std::fs::File;
 use std::io::{self, Write};
 use std::path::PathBuf;
-use std::sync::{Arc, Mutex, Once};
+use std::sync::{Arc, Mutex, Once, OnceLock};
 
 use battle_state::battle::battle_state::RequestContext;
 use tracing::{Event, Level};
@@ -16,6 +16,8 @@ use tracing_subscriber::{EnvFilter, Layer};
 pub const LOG_FILTER_EMOJIS: &[&str] = &["🚨", "🚧", "🌐", "🤖", "🟢"];
 
 static INIT: Once = Once::new();
+static LOG_FILE_PATH: OnceLock<PathBuf> = OnceLock::new();
+static TRACE_JSON_PATH: OnceLock<PathBuf> = OnceLock::new();
 
 /// Initializes global logging behavior for the 'tracing' crate if it hasn't
 /// already been initialized.
@@ -26,7 +28,7 @@ pub fn maybe_initialize(request_context: &RequestContext) {
 }
 
 /// Initializes global logging behavior for the 'tracing' crate.
-pub fn initialize(request_context: &RequestContext) {
+fn initialize(request_context: &RequestContext) {
     let env_filter =
         env::var("RUST_LOG").map(EnvFilter::new).unwrap_or_else(|_| EnvFilter::new("debug"));
 
@@ -34,6 +36,11 @@ pub fn initialize(request_context: &RequestContext) {
         Some(log_directory) => {
             // Set up dual output to stdout and file
             let log_path = log_directory.join("dreamtides.log");
+            println!("Logging to: {}", log_path.display());
+            LOG_FILE_PATH.set(log_path.clone()).expect("Failed to set log file path");
+            TRACE_JSON_PATH
+                .set(log_directory.join("dreamtides.json"))
+                .expect("Failed to set log JSON path");
             let log_file = File::create(log_path).expect("Error creating tracing log file");
 
             let dual_writer = DualMakeWriter::new(log_file);
@@ -51,6 +58,14 @@ pub fn initialize(request_context: &RequestContext) {
             tracing_subscriber::registry().with(forest_layer).with(ErrorLayer::default()).init();
         }
     }
+}
+
+pub fn trace_json_path() -> Option<&'static PathBuf> {
+    TRACE_JSON_PATH.get()
+}
+
+pub fn log_file_path() -> Option<&'static PathBuf> {
+    LOG_FILE_PATH.get()
 }
 
 /// Returns a ForestLayer configured with the given EnvFilter

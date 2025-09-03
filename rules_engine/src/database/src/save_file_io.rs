@@ -7,6 +7,7 @@ use atomic_write_file::AtomicWriteFile;
 use core_data::identifiers::UserId;
 use core_data::initialization_error::{ErrorCode, InitializationError};
 use serde_json;
+use tracing::debug;
 
 use crate::save_file::SaveFile;
 
@@ -37,6 +38,7 @@ pub fn write_save_to_dir(dir: &Path, save: &SaveFile) -> Result<(), Vec<Initiali
         )]
     })?;
     let file_path = save_path(dir, save.id());
+    debug!(?file_path, "Writing save file");
     let buf = serialize_save(save).map_err(|e| vec![*e])?;
     validate_serialized_json(&buf).map_err(|e| vec![*e])?;
     atomic_write(&file_path, &buf).map_err(|e| vec![*e])?;

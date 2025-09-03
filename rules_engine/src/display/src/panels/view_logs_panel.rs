@@ -21,7 +21,7 @@ use ui_components::typography::Typography;
 
 #[derive(Clone, Builder)]
 pub struct ViewLogsPanel {
-    pub log_directory: Option<PathBuf>,
+    pub log_file_path: Option<PathBuf>,
     pub filter: Option<String>,
 }
 
@@ -78,16 +78,15 @@ impl Component for ViewLogsPanel {
 
 impl ViewLogsPanel {
     fn read_log_content(&self) -> String {
-        let log_path = match &self.log_directory {
-            Some(dir) => dir.join("dreamtides.log"),
-            None => return "No log directory available.".to_string(),
+        let Some(log_file) = self.log_file_path.as_ref() else {
+            return "Log file path not initialized".to_string();
         };
 
-        if !log_path.exists() {
+        if !log_file.exists() {
             return "Log file does not exist.".to_string();
         }
 
-        match self.read_last_lines(&log_path, 1000) {
+        match self.read_last_lines(log_file, 1000) {
             Ok(content) => {
                 if content.is_empty() {
                     "Log file is empty.".to_string()

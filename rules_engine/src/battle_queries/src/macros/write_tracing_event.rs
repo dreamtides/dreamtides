@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 use std::fmt::Write as FmtWrite;
 use std::fs::{self, File, OpenOptions};
 use std::io::{Read, Seek, SeekFrom, Write};
-use std::path::PathBuf;
+// PathBuf no longer needed after refactor
 use std::time::SystemTime;
 
 use battle_state::battle::animation_data::AnimationData;
@@ -190,13 +190,13 @@ fn format_current_time() -> String {
     datetime.format("%Y-%m-%d %H:%M:%S%.3f %z").to_string()
 }
 
-pub fn clear_log_file(request_context: &RequestContext) {
-    let Some(log_path) = get_log_file_path(request_context) else {
+pub fn clear_log_file() {
+    let Some(log_path) = logging::trace_json_path() else {
         return;
     };
 
     if log_path.exists() {
-        if let Err(e) = fs::remove_file(&log_path) {
+        if let Err(e) = fs::remove_file(log_path) {
             error!(?log_path, "Failed to remove dreamtides.json: {}", e);
         }
     }
@@ -214,13 +214,13 @@ fn write_event_to_log_file(event: &BattleTraceEvent, request_context: &RequestCo
 }
 
 /// Writes a JSON string to the log file. Returns true if the JSON was written.
-fn write_json_to_log_file(json_str: &str, request_context: &RequestContext) -> bool {
-    let Some(log_path) = get_log_file_path(request_context) else {
+fn write_json_to_log_file(json_str: &str, _request_context: &RequestContext) -> bool {
+    let Some(log_path) = logging::trace_json_path() else {
         return false;
     };
 
     if !log_path.exists() {
-        match File::create(&log_path) {
+        match File::create(log_path) {
             Ok(mut file) => match file.write_all(format!("[\n{json_str}\n]").as_bytes()) {
                 Ok(_) => debug!(?log_path, "Created dreamtides.json"),
                 Err(e) => {
@@ -235,7 +235,7 @@ fn write_json_to_log_file(json_str: &str, request_context: &RequestContext) -> b
         }
     }
 
-    match OpenOptions::new().read(true).write(true).open(&log_path) {
+    match OpenOptions::new().read(true).write(true).open(log_path) {
         Ok(mut file) => match file.metadata() {
             Ok(metadata) => {
                 if metadata.len() > 0 {
@@ -268,11 +268,6 @@ fn write_json_to_log_file(json_str: &str, request_context: &RequestContext) -> b
             false
         }
     }
-}
-
-fn get_log_file_path(request_context: &RequestContext) -> Option<PathBuf> {
-    let log_directory = request_context.logging_options.log_directory.as_ref()?;
-    Some(log_directory.join("dreamtides.json"))
 }
 
 /// Resets the file to the beginning and writes the JSON string to it. Returns

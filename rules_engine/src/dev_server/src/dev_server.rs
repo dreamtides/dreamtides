@@ -145,7 +145,7 @@ async fn main() {
             panic!("Failed to get log directory: {e}");
         }
     };
-    logging::initialize(&RequestContext {
+    logging::maybe_initialize(&RequestContext {
         logging_options: LoggingOptions {
             log_directory: Some(log_directory),
             log_ai_search_diagram: true,

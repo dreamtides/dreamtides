@@ -35,7 +35,7 @@ pub fn render_panel(
             .build()
             .wrap(),
         PanelAddress::ViewLogs(filter) => ViewLogsPanel::builder()
-            .maybe_log_directory(battle.request_context.logging_options.log_directory.clone())
+            .maybe_log_file_path(logging::log_file_path().cloned())
             .maybe_filter(filter)
             .build()
             .wrap(),

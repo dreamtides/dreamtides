@@ -214,12 +214,13 @@ fn connect_internal<P: StateProvider + 'static>(
     let user_id = request.metadata.user_id;
     let persistent_data_path = &request.persistent_data_path;
     let streaming_assets_path = &request.streaming_assets_path;
-    write_tracing_event::clear_log_file(&request_context);
+    write_tracing_event::clear_log_file();
 
     if let Some(ref display_props) = request.display_properties {
         display_properties::store_display_properties(user_id, display_props.clone());
     }
 
+    debug!(">>> Initializing provider with persistent data path: {:?}", persistent_data_path);
     if let Err(errors) = provider.initialize(persistent_data_path, streaming_assets_path) {
         return error_message::display_error_message(
             None,
