@@ -38,7 +38,7 @@ pub fn cards(builder: &ResponseBuilder, battle: &BattleState) -> Vec<CardView> {
     }
 
     let definition = card::get_definition(battle, card_id);
-    let descriptions = modal_effect_descriptions(&definition.displayed_abilities);
+    let descriptions = modal_effect_descriptions(builder, &definition.displayed_abilities);
     modal
         .choices
         .iter()
@@ -67,11 +67,7 @@ fn modal_effect_card_view(
     let legal_actions = legal_actions::compute(battle, builder.act_for_player());
     let select_action = BattleAction::SelectModalEffectChoice(index);
     let can_select = legal_actions.contains(select_action, ForPlayer::Human);
-    let formatted = builder.tabula().strings.format_display_string(
-        description,
-        StringContext::CardText,
-        fluent_args![],
-    );
+    let formatted = description.to_string();
     let view = TokenCardView::builder()
         .id(adapter::modal_effect_choice_client_id(card_id, index))
         .image(card_rendering::card_image(battle, card_id))
@@ -102,8 +98,20 @@ fn modal_effect_card_view(
 
 /// [String]s for the descriptions of the choices in an active modal effect
 /// prompt, if any.
-pub fn modal_effect_descriptions(abilities: &[DisplayedAbility]) -> Vec<String> {
-    all_modal_effect_descriptions(abilities).iter().map(|choice| choice.effect.clone()).collect()
+pub fn modal_effect_descriptions(
+    builder: &ResponseBuilder,
+    abilities: &[DisplayedAbility],
+) -> Vec<String> {
+    all_modal_effect_descriptions(abilities)
+        .iter()
+        .map(|choice| {
+            builder.tabula().strings.format_display_string(
+                &choice.effect,
+                StringContext::CardText,
+                fluent_args![],
+            )
+        })
+        .collect()
 }
 
 fn all_modal_effect_descriptions(

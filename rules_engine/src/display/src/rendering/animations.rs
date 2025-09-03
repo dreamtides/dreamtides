@@ -202,6 +202,7 @@ pub fn render(
                 push_snapshot(builder, snapshot);
                 let definition = card::get_definition(snapshot, item_id.underlying_card_id());
                 let descriptions = modal_effect_prompt_rendering::modal_effect_descriptions(
+                    builder,
                     &definition.displayed_abilities,
                 );
                 builder.push(Command::DisplayEnemyMessage(DisplayEnemyMessageCommand {

@@ -270,6 +270,7 @@ pub fn rules_text(builder: &ResponseBuilder, battle: &BattleState, card_id: Card
         && let Some(ModelEffectChoiceIndex(index)) = stack_item.modal_choice
     {
         formatted = modal_effect_prompt_rendering::modal_effect_descriptions(
+            builder,
             &definition.displayed_abilities,
         )[index]
             .clone();
