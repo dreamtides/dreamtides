@@ -58,7 +58,7 @@ namespace Dreamtides.Layout
 
     public void SetScore(long score, bool animate = true)
     {
-      _score.SetText($"{score} <voffset=0.1em><size=80%>\uf0a3</size></voffset>", animate);
+      _score.SetText($"{score} <voffset=0.1em><size=80%>\uf5a2</size></voffset>", animate);
     }
 
     public void SetTotalSpark(long totalSpark, bool animate = true)
@@ -77,7 +77,7 @@ namespace Dreamtides.Layout
 
       if (preview.Score != null)
       {
-        string scoreText = $"{preview.Score} <voffset=0.1em><size=80%>\uf0a3</size></voffset>";
+        string scoreText = $"{preview.Score} <voffset=0.1em><size=80%>\uf5a2</size></voffset>";
         Score.SetPreviewText(scoreText, previewTextColor);
       }
 

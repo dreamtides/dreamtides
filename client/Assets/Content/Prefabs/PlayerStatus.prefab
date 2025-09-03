@@ -102,7 +102,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 2 <voffset=0.1em><size=80%>\uf0a3</size></voffset>
+  m_text: 2 <voffset=0.1em><size=80%>\uf5a2</size></voffset>
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2be120b2218e34571b466d19bded3ddf, type: 2}
   m_sharedMaterial: {fileID: 2023162549472097733, guid: 2be120b2218e34571b466d19bded3ddf, type: 2}
@@ -248,7 +248,8 @@ MonoBehaviour:
   _energy: {fileID: 2558500935868125653}
   _score: {fileID: 6102077444113359776}
   _totalSpark: {fileID: 0}
-  _turnIndicator: {fileID: 0}
+  _leftTurnIndicator: {fileID: 0}
+  _rightTurnIndicator: {fileID: 0}
   _imminentVictorySparkBackgroundMaterial: {fileID: 2100000, guid: bb3208b07971a417f90e7df1a8eca741, type: 2}
   _imminentVictoryIndicator: {fileID: 0}
   _characterImage: {fileID: 3517697758460983304}
