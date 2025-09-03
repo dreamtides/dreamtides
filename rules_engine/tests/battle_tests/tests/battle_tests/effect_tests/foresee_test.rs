@@ -1,3 +1,4 @@
+use action_data::battle_display_action::BattleDisplayAction;
 use battle_state::actions::battle_actions::{
     CardOrderSelectionTarget, CardOrderSelectionTargetDiscriminants,
 };
@@ -602,5 +603,26 @@ fn foresee_one_draw_a_card_with_empty_deck() {
         s.user_client.cards.user_hand().len(),
         initial_hand_count + 1,
         "Should have drawn exactly 1 card, increasing hand size by 1"
+    );
+}
+
+#[test]
+fn foresee_hide_and_show_card_order_selector() {
+    let mut s = TestBattle::builder().connect();
+    s.add_to_hand(DisplayPlayer::User, test_card::TEST_DRAW_ONE);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_FORESEE_TWO);
+    assert!(
+        s.user_client.interface().card_order_selector.is_some(),
+        "Card order selector should be visible after foresee"
+    );
+    s.perform_user_action(BattleDisplayAction::ToggleStackVisibility);
+    assert!(
+        s.user_client.interface().card_order_selector.is_none(),
+        "Card order selector should be hidden after toggle"
+    );
+    s.perform_user_action(BattleDisplayAction::ToggleStackVisibility);
+    assert!(
+        s.user_client.interface().card_order_selector.is_some(),
+        "Card order selector should reappear after second toggle"
     );
 }

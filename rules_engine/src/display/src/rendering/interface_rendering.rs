@@ -56,7 +56,7 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
 
     let overlay_builder = overlay_builder()
         .child(render_prompt_message(builder, battle))
-        .child(render_hide_stack_button(builder, battle))
+        .child(render_hide_overlay_button(builder, battle))
         .child(
             current_panel_address
                 .map(|address| panel_rendering::render_panel(address, builder, battle)),
@@ -82,7 +82,7 @@ pub fn interface_view(builder: &ResponseBuilder, battle: &BattleState) -> Interf
             action: can_undo(builder, battle).then_some(GameAction::Undo(builder.act_for_player())),
         }),
         browser: card_browser_view(builder),
-        card_order_selector: card_order_selector_view(battle),
+        card_order_selector: card_order_selector_view(builder, battle),
         bottom_right_button: None,
     }
 }
@@ -295,15 +295,26 @@ fn overlay_builder() -> BoxComponentBuilder<Named> {
     )
 }
 
-fn render_hide_stack_button(
+fn render_hide_overlay_button(
     builder: &ResponseBuilder,
     battle: &BattleState,
 ) -> Option<impl Component> {
-    if builder.is_for_animation() || !battle.cards.has_stack() {
+    if builder.is_for_animation() {
         return None;
     }
 
-    let label = if display_state::is_stack_hidden(builder) {
+    let has_stack = battle.cards.has_stack();
+    let has_card_order_selector_prompt = battle
+        .prompts
+        .front()
+        .map(|p| matches!(p.prompt_type, PromptType::SelectDeckCardOrder { .. }))
+        .unwrap_or(false);
+    let has_browser = display_state::get_card_browser_source(builder).is_some();
+    if !(has_stack || has_card_order_selector_prompt || has_browser) {
+        return None;
+    }
+
+    let label = if display_state::is_overlay_hidden(builder) {
         builder.string(string_id::SHOW_STACK_BUTTON)
     } else {
         builder.string(string_id::HIDE_STACK_BUTTON)
@@ -342,7 +353,9 @@ fn can_undo(builder: &ResponseBuilder, battle: &BattleState) -> bool {
 }
 
 fn card_browser_view(builder: &ResponseBuilder) -> Option<CardBrowserView> {
-    if display_state::get_card_browser_source(builder).is_some() {
+    if display_state::get_card_browser_source(builder).is_some()
+        && !display_state::is_overlay_hidden(builder)
+    {
         Some(CardBrowserView {
             close_button: Some(GameAction::BattleDisplayAction(
                 BattleDisplayAction::CloseCardBrowser,
@@ -353,7 +366,13 @@ fn card_browser_view(builder: &ResponseBuilder) -> Option<CardBrowserView> {
     }
 }
 
-fn card_order_selector_view(battle: &BattleState) -> Option<CardOrderSelectorView> {
+fn card_order_selector_view(
+    builder: &ResponseBuilder,
+    battle: &BattleState,
+) -> Option<CardOrderSelectorView> {
+    if display_state::is_overlay_hidden(builder) {
+        return None;
+    }
     if let Some(prompt) = battle.prompts.front()
         && let PromptType::SelectDeckCardOrder { .. } = &prompt.prompt_type
     {

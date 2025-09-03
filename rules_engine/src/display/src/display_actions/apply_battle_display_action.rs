@@ -54,7 +54,7 @@ pub fn on_action_performed(
     if action != &GameAction::BattleDisplayAction(BattleDisplayAction::ToggleStackVisibility) {
         // Stop hiding stack on any other action received.
         let mut state = provider.get_display_state(user_id);
-        state.stack_hidden = false;
+        state.overlay_hidden = false;
         provider.set_display_state(user_id, state);
     }
 }
@@ -104,6 +104,6 @@ pub fn current_browser_source(builder: &ResponseBuilder) -> Option<Position> {
 
 /// Toggles the visibility of the stack.
 fn toggle_stack_visibility(builder: &ResponseBuilder) {
-    let current = display_state::is_stack_hidden(builder);
-    display_state::set_stack_hidden(builder, !current);
+    let current = display_state::is_overlay_hidden(builder);
+    display_state::set_overlay_hidden(builder, !current);
 }

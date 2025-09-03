@@ -47,14 +47,15 @@ pub fn get_current_panel_address(builder: &ResponseBuilder) -> Option<PanelAddre
     builder.get_display_state().current_panel_address
 }
 
-/// Updates whether the stack is hidden.
-pub fn set_stack_hidden(builder: &ResponseBuilder, hidden: bool) {
+/// Updates whether the prominent overlay (stack, browsers, selectors) is
+/// hidden.
+pub fn set_overlay_hidden(builder: &ResponseBuilder, hidden: bool) {
     builder.update_display_state(|state| {
-        state.stack_hidden = hidden;
+        state.overlay_hidden = hidden;
     });
 }
 
-/// Gets whether the stack is currently hidden.
-pub fn is_stack_hidden(builder: &ResponseBuilder) -> bool {
-    builder.get_display_state().stack_hidden
+/// Gets whether the prominent overlay is currently hidden.
+pub fn is_overlay_hidden(builder: &ResponseBuilder) -> bool {
+    builder.get_display_state().overlay_hidden
 }

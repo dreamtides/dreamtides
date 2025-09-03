@@ -12,7 +12,7 @@ pub struct DisplayState {
     pub card_browser_source: Option<Position>,
     pub selected_energy_additional_cost: Option<Energy>,
     pub current_panel_address: Option<PanelAddress>,
-    pub stack_hidden: bool,
+    pub overlay_hidden: bool,
 }
 
 pub trait DisplayStateProvider: Send + Sync {

@@ -25,7 +25,7 @@ pub fn object_position(
         position,
         sorting_key: base_object_position.sorting_key,
     });
-    let object_position = for_card_order_browser(battle, card_id, object_position);
+    let object_position = for_card_order_browser(builder, battle, card_id, object_position);
     let object_position = for_void_card_browser(builder, battle, object_position);
     // let object_position = for_hand_card_browser(builder, battle,
     // object_position);
@@ -55,6 +55,9 @@ fn for_prompt_source(
 /// Returns the position for a card in the browser, if it is the current
 /// browser.
 pub fn for_browser(builder: &ResponseBuilder, position: Position) -> Position {
+    if display_state::is_overlay_hidden(builder) {
+        return position;
+    }
     if let Some(browser_source) = apply_battle_display_action::current_browser_source(builder)
         && position == browser_source
     {
@@ -81,7 +84,7 @@ fn for_stack_during_prompt(battle: &BattleState, position: Position) -> Position
 
 /// Returns the position for a card if the stack is hidden.
 fn for_hidden_stack(builder: &ResponseBuilder, position: Position) -> Position {
-    if display_state::is_stack_hidden(builder) && matches!(position, Position::OnStack(_)) {
+    if display_state::is_overlay_hidden(builder) && matches!(position, Position::OnStack(_)) {
         Position::OnScreenStorage
     } else {
         position
@@ -114,10 +117,14 @@ fn for_top_of_deck(
 /// Returns the position for a card in the card order browser, if it is being
 /// ordered.
 fn for_card_order_browser(
+    builder: &ResponseBuilder,
     battle: &BattleState,
     card_id: CardId,
     base_object_position: ObjectPosition,
 ) -> ObjectPosition {
+    if display_state::is_overlay_hidden(builder) {
+        return base_object_position;
+    }
     if let Some(prompt) = battle.prompts.front()
         && let PromptType::SelectDeckCardOrder { prompt: deck_prompt } = &prompt.prompt_type
     {
@@ -159,6 +166,9 @@ fn for_void_card_browser(
     battle: &BattleState,
     base_object_position: ObjectPosition,
 ) -> ObjectPosition {
+    if display_state::is_overlay_hidden(builder) {
+        return base_object_position;
+    }
     if let Some(prompt) = battle.prompts.front()
         && prompt.player == builder.act_for_player()
         && let PromptType::ChooseVoidCard(_) = &prompt.prompt_type
