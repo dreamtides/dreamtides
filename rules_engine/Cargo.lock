@@ -416,7 +416,6 @@ version = "0.0.0"
 dependencies = [
  "ability_data",
  "ai_data",
- "bit-set",
  "bit-vec",
  "core_data",
  "enum-iterator",

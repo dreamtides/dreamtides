@@ -193,15 +193,6 @@ fn create_test_deck(tabula: &Tabula, name: TestDeckName) -> Deck {
             deck.insert_copies(tabula, test_card::TEST_PREVENT_DISSOLVE_THIS_TURN, 2);
             deck.insert_copies(tabula, test_card::TEST_FORESEE_ONE_DRAW_RECLAIM, 3);
             deck.insert_copies(tabula, test_card::TEST_COUNTERSPELL_CHARACTER, 2);
-            deck.insert_copies(
-                tabula,
-                test_card::TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND,
-                2,
-            );
-            deck.insert_copies(tabula, test_card::TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO, 2);
-            deck.insert_copies(tabula, test_card::TEST_PREVENT_DISSOLVE_THIS_TURN, 2);
-            deck.insert_copies(tabula, test_card::TEST_FORESEE_ONE_DRAW_RECLAIM, 3);
-            deck.insert_copies(tabula, test_card::TEST_COUNTERSPELL_CHARACTER, 2);
         }
         TestDeckName::Core11 => {
             populate_deck_from_base_card_id_list(tabula, &mut deck, BaseCardIdList::Core11);

@@ -92,6 +92,25 @@ impl AllCards {
         self.shuffled_into_decks.player(player)
     }
 
+    /// Mutable equivalent to [Self::shuffled_into_deck].
+    pub fn shuffled_into_deck_mut(&mut self, player: PlayerName) -> &mut CardSet<BattleDeckCardId> {
+        self.shuffled_into_decks.player_mut(player)
+    }
+
+    /// Fast operation to move all cards from a player's void to their deck.
+    /// This efficiently combines the void cards with the existing deck cards.
+    pub fn shuffle_void_into_deck(&mut self, player: PlayerName) {
+        let void_cards = std::mem::take(self.void.player_mut(player));
+
+        // Zero-cost reinterpretation: VoidCardId and BattleDeckCardId are both newtypes
+        // around CardId This avoids any iteration and directly reuses the
+        // underlying BitSet
+        let deck_cards = void_cards.reinterpret_as::<BattleDeckCardId>();
+
+        // Use the fast union operation to combine with existing deck
+        self.shuffled_into_decks.player_mut(player).union_with(&deck_cards);
+    }
+
     /// Returns the top of deck cards for a given player.
     ///
     /// The last element of the vector is the topmost card of the deck.

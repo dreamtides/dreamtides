@@ -25,7 +25,7 @@ use crate::player_mutations::energy;
 const HAND_SIZE_LIMIT: usize = 10;
 
 /// Draw a card from `player`'s deck and put it into their hand. If their deck
-/// is empty, it will be replaced with a new shuffled copy of the deck.
+/// is empty, all cards from the void will be shuffled back into the deck.
 ///
 /// Returns the new [HandCardId] for the card if a card was drawn, or None if no
 /// card was drawn (e.g. if the player's hand size limit was exceeded or the
@@ -43,11 +43,20 @@ pub fn draw_cards(battle: &mut BattleState, source: EffectSource, player: Player
     let should_animate = battle.animations.is_some();
     let pre_draw_snapshot = if should_animate {
         let mut snapshot = battle.logical_clone();
+        let total_available =
+            snapshot.cards.all_deck_cards(player).count() + snapshot.cards.void(player).len();
+        if total_available < count as usize {
+            panic_with!(
+                "Cannot draw enough cards from deck and void combined",
+                battle,
+                count,
+                total_available,
+                player
+            );
+        }
+        // Ensure void cards are shuffled into deck for animation purposes
         while snapshot.cards.all_deck_cards(player).count() < count as usize {
-            // Make sure the cards to be drawn are present in the deck. This
-            // won't necessarily happen in exactly the same order, but we just
-            // need them to visually be somewhere in the deck.
-            add_deck_copy(&mut snapshot, player);
+            snapshot.cards.shuffle_void_into_deck(player);
         }
         Some(snapshot)
     } else {
@@ -154,14 +163,27 @@ pub fn realize_top_of_deck(
         {
             battle.cards.move_card_to_top_of_deck(player, card_id);
         } else {
-            battle_trace!("Adding new deck for realize_top_of_deck", battle, player);
-            add_deck_copy(battle, player);
-            if let Some(card_id) =
-                random_element(battle.cards.shuffled_into_deck(player), &mut battle.rng)
-            {
-                battle.cards.move_card_to_top_of_deck(player, card_id);
+            // Deck is empty, try to shuffle void back into deck
+            if !battle.cards.void(player).is_empty() {
+                battle_trace!("Shuffling void into deck for realize_top_of_deck", battle, player);
+                battle.cards.shuffle_void_into_deck(player);
+                if let Some(card_id) =
+                    random_element(battle.cards.shuffled_into_deck(player), &mut battle.rng)
+                {
+                    battle.cards.move_card_to_top_of_deck(player, card_id);
+                } else {
+                    panic_with!(
+                        "Failed to find card after shuffling void into deck",
+                        battle,
+                        player
+                    );
+                }
             } else {
-                panic_with!("Failed to find card after adding new deck", battle, player);
+                panic_with!(
+                    "Cannot realize top of deck: both deck and void are empty",
+                    battle,
+                    player
+                );
             }
         }
     }
@@ -199,10 +221,16 @@ fn draw_card_internal(
     {
         random_card
     } else {
-        battle_trace!("Adding new deck copy", battle, player);
-        add_deck_copy(battle, player);
-        battle.triggers.push(source, Trigger::DrewAllCardsInCopyOfDeck(player));
-        return draw_card_internal(battle, source, player, with_animation);
+        // Deck is empty, try to shuffle void back into deck
+        if !battle.cards.void(player).is_empty() {
+            battle_trace!("Shuffling void into deck", battle, player);
+            battle.cards.shuffle_void_into_deck(player);
+            battle.triggers.push(source, Trigger::DrewAllCardsInCopyOfDeck(player));
+            return draw_card_internal(battle, source, player, with_animation);
+        } else {
+            // Both deck and void are empty, cannot draw
+            panic_with!("Cannot draw card: both deck and void are empty", battle, player);
+        }
     };
 
     if with_animation {

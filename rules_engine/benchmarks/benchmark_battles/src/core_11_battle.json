@@ -1,11 +1,11 @@
 {
-  "id": "5816bf53-ac74-405b-ab3c-bb6f27bf410d",
+  "id": "1778775a-b4a3-4ca6-8fe6-77644520748e",
   "cards": {
     "cards": [
       {
         "identity": 0,
         "owner": "One",
-        "object_id": 0,
+        "object_id": 64,
         "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
@@ -19,7 +19,7 @@
       {
         "identity": 1,
         "owner": "One",
-        "object_id": 88,
+        "object_id": 1,
         "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
@@ -33,7 +33,7 @@
       {
         "identity": 2,
         "owner": "One",
-        "object_id": 2,
+        "object_id": 67,
         "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
@@ -103,7 +103,7 @@
       {
         "identity": 7,
         "owner": "One",
-        "object_id": 97,
+        "object_id": 75,
         "base_energy_cost": 1,
         "base_spark": null,
         "card_type": "Event",
@@ -131,7 +131,7 @@
       {
         "identity": 9,
         "owner": "One",
-        "object_id": 9,
+        "object_id": 82,
         "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
@@ -147,7 +147,7 @@
       {
         "identity": 10,
         "owner": "One",
-        "object_id": 10,
+        "object_id": 81,
         "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
@@ -179,7 +179,7 @@
       {
         "identity": 12,
         "owner": "One",
-        "object_id": 12,
+        "object_id": 65,
         "base_energy_cost": 2,
         "base_spark": 1,
         "card_type": "Character",
@@ -193,7 +193,7 @@
       {
         "identity": 13,
         "owner": "One",
-        "object_id": 89,
+        "object_id": 13,
         "base_energy_cost": 2,
         "base_spark": 1,
         "card_type": "Character",
@@ -235,7 +235,7 @@
       {
         "identity": 16,
         "owner": "One",
-        "object_id": 90,
+        "object_id": 16,
         "base_energy_cost": 2,
         "base_spark": 2,
         "card_type": "Character",
@@ -291,7 +291,7 @@
       {
         "identity": 20,
         "owner": "One",
-        "object_id": 20,
+        "object_id": 80,
         "base_energy_cost": 2,
         "base_spark": 2,
         "card_type": "Character",
@@ -347,7 +347,7 @@
       {
         "identity": 24,
         "owner": "One",
-        "object_id": 87,
+        "object_id": 24,
         "base_energy_cost": null,
         "base_spark": null,
         "card_type": "Event",
@@ -389,7 +389,7 @@
       {
         "identity": 27,
         "owner": "One",
-        "object_id": 27,
+        "object_id": 79,
         "base_energy_cost": 1,
         "base_spark": null,
         "card_type": "Event",
@@ -403,7 +403,7 @@
       {
         "identity": 28,
         "owner": "One",
-        "object_id": 28,
+        "object_id": 68,
         "base_energy_cost": 1,
         "base_spark": null,
         "card_type": "Event",
@@ -417,7 +417,7 @@
       {
         "identity": 29,
         "owner": "One",
-        "object_id": 29,
+        "object_id": 66,
         "base_energy_cost": 1,
         "base_spark": null,
         "card_type": "Event",
@@ -458,37 +458,37 @@
       },
       {
         "identity": 32,
-        "owner": "One",
+        "owner": "Two",
         "object_id": 32,
-        "base_energy_cost": 4,
+        "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
-        "is_fast": false,
+        "is_fast": true,
         "revealed_to_player_override": {
           "one": false,
           "two": false
         },
-        "can_play_restriction": null
+        "can_play_restriction": "DissolveEnemyCharacter"
       },
       {
         "identity": 33,
-        "owner": "One",
+        "owner": "Two",
         "object_id": 33,
-        "base_energy_cost": 4,
+        "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
-        "is_fast": false,
+        "is_fast": true,
         "revealed_to_player_override": {
           "one": false,
           "two": false
         },
-        "can_play_restriction": null
+        "can_play_restriction": "DissolveEnemyCharacter"
       },
       {
         "identity": 34,
-        "owner": "One",
-        "object_id": 102,
-        "base_energy_cost": null,
+        "owner": "Two",
+        "object_id": 34,
+        "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
         "is_fast": true,
@@ -496,13 +496,13 @@
           "one": false,
           "two": false
         },
-        "can_play_restriction": null
+        "can_play_restriction": "DissolveEnemyCharacter"
       },
       {
         "identity": 35,
-        "owner": "One",
+        "owner": "Two",
         "object_id": 35,
-        "base_energy_cost": null,
+        "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
         "is_fast": true,
@@ -510,13 +510,13 @@
           "one": false,
           "two": false
         },
-        "can_play_restriction": null
+        "can_play_restriction": "DissolveEnemyCharacter"
       },
       {
         "identity": 36,
-        "owner": "One",
+        "owner": "Two",
         "object_id": 36,
-        "base_energy_cost": 1,
+        "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
         "is_fast": true,
@@ -524,13 +524,13 @@
           "one": false,
           "two": false
         },
-        "can_play_restriction": null
+        "can_play_restriction": "EnemyCardOnStack"
       },
       {
         "identity": 37,
-        "owner": "One",
+        "owner": "Two",
         "object_id": 37,
-        "base_energy_cost": 1,
+        "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
         "is_fast": true,
@@ -538,13 +538,13 @@
           "one": false,
           "two": false
         },
-        "can_play_restriction": null
+        "can_play_restriction": "EnemyCardOnStack"
       },
       {
         "identity": 38,
-        "owner": "One",
-        "object_id": 86,
-        "base_energy_cost": 1,
+        "owner": "Two",
+        "object_id": 77,
+        "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
         "is_fast": true,
@@ -552,11 +552,11 @@
           "one": false,
           "two": false
         },
-        "can_play_restriction": "Unrestricted"
+        "can_play_restriction": "EnemyCardOnStack"
       },
       {
         "identity": 39,
-        "owner": "One",
+        "owner": "Two",
         "object_id": 39,
         "base_energy_cost": 1,
         "base_spark": null,
@@ -566,11 +566,11 @@
           "one": false,
           "two": false
         },
-        "can_play_restriction": "Unrestricted"
+        "can_play_restriction": "EnemyEventCardOnStack"
       },
       {
         "identity": 40,
-        "owner": "One",
+        "owner": "Two",
         "object_id": 40,
         "base_energy_cost": 1,
         "base_spark": null,
@@ -580,11 +580,11 @@
           "one": false,
           "two": false
         },
-        "can_play_restriction": "Unrestricted"
+        "can_play_restriction": "EnemyEventCardOnStack"
       },
       {
         "identity": 41,
-        "owner": "One",
+        "owner": "Two",
         "object_id": 41,
         "base_energy_cost": 2,
         "base_spark": null,
@@ -594,11 +594,13 @@
           "one": false,
           "two": false
         },
-        "can_play_restriction": "EnemyCharacterCardOnStack"
+        "can_play_restriction": {
+          "AdditionalEnergyAvailable": 1
+        }
       },
       {
         "identity": 42,
-        "owner": "One",
+        "owner": "Two",
         "object_id": 42,
         "base_energy_cost": 2,
         "base_spark": null,
@@ -608,7 +610,9 @@
           "one": false,
           "two": false
         },
-        "can_play_restriction": "EnemyCharacterCardOnStack"
+        "can_play_restriction": {
+          "AdditionalEnergyAvailable": 1
+        }
       },
       {
         "identity": 43,
@@ -622,232 +626,228 @@
           "one": false,
           "two": false
         },
-        "can_play_restriction": "DissolveEnemyCharacter"
+        "can_play_restriction": {
+          "AdditionalEnergyAvailable": 1
+        }
       },
       {
         "identity": 44,
         "owner": "Two",
-        "object_id": 44,
+        "object_id": 72,
         "base_energy_cost": 2,
-        "base_spark": null,
-        "card_type": "Event",
+        "base_spark": 1,
+        "card_type": "Character",
         "is_fast": true,
         "revealed_to_player_override": {
           "one": false,
           "two": false
         },
-        "can_play_restriction": "DissolveEnemyCharacter"
+        "can_play_restriction": "Unrestricted"
       },
       {
         "identity": 45,
         "owner": "Two",
         "object_id": 45,
         "base_energy_cost": 2,
-        "base_spark": null,
-        "card_type": "Event",
+        "base_spark": 1,
+        "card_type": "Character",
         "is_fast": true,
         "revealed_to_player_override": {
           "one": false,
           "two": false
         },
-        "can_play_restriction": "DissolveEnemyCharacter"
+        "can_play_restriction": "Unrestricted"
       },
       {
         "identity": 46,
         "owner": "Two",
-        "object_id": 46,
+        "object_id": 70,
         "base_energy_cost": 2,
-        "base_spark": null,
-        "card_type": "Event",
+        "base_spark": 1,
+        "card_type": "Character",
         "is_fast": true,
         "revealed_to_player_override": {
           "one": false,
           "two": false
         },
-        "can_play_restriction": "DissolveEnemyCharacter"
+        "can_play_restriction": "Unrestricted"
       },
       {
         "identity": 47,
         "owner": "Two",
         "object_id": 47,
         "base_energy_cost": 2,
-        "base_spark": null,
-        "card_type": "Event",
+        "base_spark": 1,
+        "card_type": "Character",
         "is_fast": true,
         "revealed_to_player_override": {
           "one": false,
           "two": false
         },
-        "can_play_restriction": "EnemyCardOnStack"
+        "can_play_restriction": "Unrestricted"
       },
       {
         "identity": 48,
         "owner": "Two",
-        "object_id": 93,
+        "object_id": 76,
         "base_energy_cost": 2,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
+        "base_spark": 2,
+        "card_type": "Character",
+        "is_fast": false,
         "revealed_to_player_override": {
           "one": false,
           "two": false
         },
-        "can_play_restriction": "EnemyCardOnStack"
+        "can_play_restriction": "Unrestricted"
       },
       {
         "identity": 49,
         "owner": "Two",
         "object_id": 49,
         "base_energy_cost": 2,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
+        "base_spark": 2,
+        "card_type": "Character",
+        "is_fast": false,
         "revealed_to_player_override": {
           "one": false,
           "two": false
         },
-        "can_play_restriction": "EnemyCardOnStack"
+        "can_play_restriction": "Unrestricted"
       },
       {
         "identity": 50,
         "owner": "Two",
         "object_id": 50,
-        "base_energy_cost": 1,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
+        "base_energy_cost": 2,
+        "base_spark": 2,
+        "card_type": "Character",
+        "is_fast": false,
         "revealed_to_player_override": {
           "one": false,
           "two": false
         },
-        "can_play_restriction": "EnemyEventCardOnStack"
+        "can_play_restriction": "Unrestricted"
       },
       {
         "identity": 51,
         "owner": "Two",
-        "object_id": 99,
-        "base_energy_cost": 1,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
+        "object_id": 74,
+        "base_energy_cost": 2,
+        "base_spark": 2,
+        "card_type": "Character",
+        "is_fast": false,
         "revealed_to_player_override": {
           "one": false,
           "two": false
         },
-        "can_play_restriction": "EnemyEventCardOnStack"
+        "can_play_restriction": "Unrestricted"
       },
       {
         "identity": 52,
         "owner": "Two",
-        "object_id": 92,
+        "object_id": 52,
         "base_energy_cost": 2,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
+        "base_spark": 2,
+        "card_type": "Character",
+        "is_fast": false,
         "revealed_to_player_override": {
           "one": false,
           "two": false
         },
-        "can_play_restriction": {
-          "AdditionalEnergyAvailable": 1
-        }
+        "can_play_restriction": "Unrestricted"
       },
       {
         "identity": 53,
         "owner": "Two",
         "object_id": 53,
-        "base_energy_cost": 2,
+        "base_energy_cost": 4,
         "base_spark": null,
         "card_type": "Event",
-        "is_fast": true,
+        "is_fast": false,
         "revealed_to_player_override": {
           "one": false,
           "two": false
         },
-        "can_play_restriction": {
-          "AdditionalEnergyAvailable": 1
-        }
+        "can_play_restriction": null
       },
       {
         "identity": 54,
         "owner": "Two",
-        "object_id": 54,
-        "base_energy_cost": 2,
+        "object_id": 78,
+        "base_energy_cost": 4,
         "base_spark": null,
         "card_type": "Event",
-        "is_fast": true,
+        "is_fast": false,
         "revealed_to_player_override": {
           "one": false,
           "two": false
         },
-        "can_play_restriction": {
-          "AdditionalEnergyAvailable": 1
-        }
+        "can_play_restriction": null
       },
       {
         "identity": 55,
         "owner": "Two",
         "object_id": 55,
-        "base_energy_cost": 2,
-        "base_spark": 1,
-        "card_type": "Character",
+        "base_energy_cost": null,
+        "base_spark": null,
+        "card_type": "Event",
         "is_fast": true,
         "revealed_to_player_override": {
           "one": false,
           "two": false
         },
-        "can_play_restriction": "Unrestricted"
+        "can_play_restriction": null
       },
       {
         "identity": 56,
         "owner": "Two",
-        "object_id": 100,
-        "base_energy_cost": 2,
-        "base_spark": 1,
-        "card_type": "Character",
+        "object_id": 56,
+        "base_energy_cost": null,
+        "base_spark": null,
+        "card_type": "Event",
         "is_fast": true,
         "revealed_to_player_override": {
           "one": false,
           "two": false
         },
-        "can_play_restriction": "Unrestricted"
+        "can_play_restriction": null
       },
       {
         "identity": 57,
         "owner": "Two",
         "object_id": 57,
-        "base_energy_cost": 2,
-        "base_spark": 1,
-        "card_type": "Character",
+        "base_energy_cost": 1,
+        "base_spark": null,
+        "card_type": "Event",
         "is_fast": true,
         "revealed_to_player_override": {
           "one": false,
           "two": false
         },
-        "can_play_restriction": "Unrestricted"
+        "can_play_restriction": null
       },
       {
         "identity": 58,
         "owner": "Two",
         "object_id": 58,
-        "base_energy_cost": 2,
-        "base_spark": 1,
-        "card_type": "Character",
+        "base_energy_cost": 1,
+        "base_spark": null,
+        "card_type": "Event",
         "is_fast": true,
         "revealed_to_player_override": {
           "one": false,
           "two": false
         },
-        "can_play_restriction": "Unrestricted"
+        "can_play_restriction": null
       },
       {
         "identity": 59,
         "owner": "Two",
         "object_id": 59,
-        "base_energy_cost": 2,
-        "base_spark": 2,
-        "card_type": "Character",
-        "is_fast": false,
+        "base_energy_cost": 1,
+        "base_spark": null,
+        "card_type": "Event",
+        "is_fast": true,
         "revealed_to_player_override": {
           "one": false,
           "two": false
@@ -857,119 +857,7 @@
       {
         "identity": 60,
         "owner": "Two",
-        "object_id": 60,
-        "base_energy_cost": 2,
-        "base_spark": 2,
-        "card_type": "Character",
-        "is_fast": false,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": "Unrestricted"
-      },
-      {
-        "identity": 61,
-        "owner": "Two",
-        "object_id": 61,
-        "base_energy_cost": 2,
-        "base_spark": 2,
-        "card_type": "Character",
-        "is_fast": false,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": "Unrestricted"
-      },
-      {
-        "identity": 62,
-        "owner": "Two",
-        "object_id": 91,
-        "base_energy_cost": 2,
-        "base_spark": 2,
-        "card_type": "Character",
-        "is_fast": false,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": "Unrestricted"
-      },
-      {
-        "identity": 63,
-        "owner": "Two",
-        "object_id": 63,
-        "base_energy_cost": 2,
-        "base_spark": 2,
-        "card_type": "Character",
-        "is_fast": false,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": "Unrestricted"
-      },
-      {
-        "identity": 64,
-        "owner": "Two",
-        "object_id": 64,
-        "base_energy_cost": 4,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": false,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": null
-      },
-      {
-        "identity": 65,
-        "owner": "Two",
-        "object_id": 65,
-        "base_energy_cost": 4,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": false,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": null
-      },
-      {
-        "identity": 66,
-        "owner": "Two",
-        "object_id": 66,
-        "base_energy_cost": null,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": null
-      },
-      {
-        "identity": 67,
-        "owner": "Two",
-        "object_id": 67,
-        "base_energy_cost": null,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": null
-      },
-      {
-        "identity": 68,
-        "owner": "Two",
-        "object_id": 96,
+        "object_id": 73,
         "base_energy_cost": 1,
         "base_spark": null,
         "card_type": "Event",
@@ -978,10 +866,10 @@
           "one": false,
           "two": false
         },
-        "can_play_restriction": null
+        "can_play_restriction": "Unrestricted"
       },
       {
-        "identity": 69,
+        "identity": 61,
         "owner": "Two",
         "object_id": 69,
         "base_energy_cost": 1,
@@ -992,54 +880,12 @@
           "one": false,
           "two": false
         },
-        "can_play_restriction": null
-      },
-      {
-        "identity": 70,
-        "owner": "Two",
-        "object_id": 70,
-        "base_energy_cost": 1,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
         "can_play_restriction": "Unrestricted"
       },
       {
-        "identity": 71,
+        "identity": 62,
         "owner": "Two",
-        "object_id": 71,
-        "base_energy_cost": 1,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": "Unrestricted"
-      },
-      {
-        "identity": 72,
-        "owner": "Two",
-        "object_id": 72,
-        "base_energy_cost": 1,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": "Unrestricted"
-      },
-      {
-        "identity": 73,
-        "owner": "Two",
-        "object_id": 101,
+        "object_id": 62,
         "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
@@ -1051,163 +897,9 @@
         "can_play_restriction": "EnemyCharacterCardOnStack"
       },
       {
-        "identity": 74,
+        "identity": 63,
         "owner": "Two",
-        "object_id": 98,
-        "base_energy_cost": 2,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": "EnemyCharacterCardOnStack"
-      },
-      {
-        "identity": 75,
-        "owner": "Two",
-        "object_id": 75,
-        "base_energy_cost": 4,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": false,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": null
-      },
-      {
-        "identity": 76,
-        "owner": "Two",
-        "object_id": 94,
-        "base_energy_cost": 4,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": false,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": null
-      },
-      {
-        "identity": 77,
-        "owner": "Two",
-        "object_id": 95,
-        "base_energy_cost": null,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": null
-      },
-      {
-        "identity": 78,
-        "owner": "Two",
-        "object_id": 78,
-        "base_energy_cost": null,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": null
-      },
-      {
-        "identity": 79,
-        "owner": "Two",
-        "object_id": 79,
-        "base_energy_cost": 1,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": null
-      },
-      {
-        "identity": 80,
-        "owner": "Two",
-        "object_id": 80,
-        "base_energy_cost": 1,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": null
-      },
-      {
-        "identity": 81,
-        "owner": "Two",
-        "object_id": 81,
-        "base_energy_cost": 1,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": "Unrestricted"
-      },
-      {
-        "identity": 82,
-        "owner": "Two",
-        "object_id": 82,
-        "base_energy_cost": 1,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": "Unrestricted"
-      },
-      {
-        "identity": 83,
-        "owner": "Two",
-        "object_id": 83,
-        "base_energy_cost": 1,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": "Unrestricted"
-      },
-      {
-        "identity": 84,
-        "owner": "Two",
-        "object_id": 84,
-        "base_energy_cost": 2,
-        "base_spark": null,
-        "card_type": "Event",
-        "is_fast": true,
-        "revealed_to_player_override": {
-          "one": false,
-          "two": false
-        },
-        "can_play_restriction": "EnemyCharacterCardOnStack"
-      },
-      {
-        "identity": 85,
-        "owner": "Two",
-        "object_id": 85,
+        "object_id": 63,
         "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
@@ -1221,20 +913,10 @@
     ],
     "battlefield": {
       "one": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       },
       "two": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       }
     },
     "battlefield_state": {
@@ -1243,69 +925,26 @@
     },
     "void": {
       "one": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 135267328
       },
       "two": {
-        "set": {
-          "bit_vec": {
-            "storage": [
-              74309393851613184,
-              1024
-            ],
-            "nbits": 75
-          }
-        }
+        "bits": 274877906944
       }
     },
     "hands": {
       "one": {
-        "set": {
-          "bit_vec": {
-            "storage": [
-              292074627202
-            ],
-            "nbits": 39
-          }
-        }
+        "bits": 805311109
       },
       "two": {
-        "set": {
-          "bit_vec": {
-            "storage": [
-              4616471093031469056,
-              12816
-            ],
-            "nbits": 78
-          }
-        }
+        "bits": 3479400148050640896
       }
     },
     "shuffled_into_decks": {
       "one": {
-        "set": {
-          "bit_vec": {
-            "storage": [
-              8504018395005
-            ],
-            "nbits": 43
-          }
-        }
+        "bits": 3354388858
       },
       "two": {
-        "set": {
-          "bit_vec": {
-            "storage": [
-              13755954790733447168,
-              4180463
-            ],
-            "nbits": 86
-          }
-        }
+        "bits": 14967343646486036480
       }
     },
     "tops_of_decks": {
@@ -1315,41 +954,21 @@
     "stack": [],
     "stack_card_set": {
       "one": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       },
       "two": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       }
     },
     "banished": {
       "one": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       },
       "two": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       }
     },
-    "next_object_id": 103,
+    "next_object_id": 83,
     "activated_ability_object_ids": {}
   },
   "rules_config": {
@@ -1361,7 +980,7 @@
         "Agent": "AlwaysPanic"
       },
       "points": 2,
-      "current_energy": 5,
+      "current_energy": 4,
       "produced_energy": 4,
       "spark_bonus": 0,
       "deck_name": "Benchmark1",
@@ -1397,21 +1016,10 @@
         28,
         29,
         30,
-        31,
-        32,
-        33,
-        34,
-        35,
-        36,
-        37,
-        38,
-        39,
-        40,
-        41,
-        42
+        31
       ],
       "quest": {
-        "id": "f6147d6d-c70d-4e75-81e5-68ede2b7d11d",
+        "id": "2e6fb909-6a16-474b-975d-482bfa037041",
         "user": {
           "id": "00000000-0000-0000-0000-000000000000"
         },
@@ -2381,612 +1989,6 @@
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
-              }
-            },
-            {
-              "base_card_id": "559e62a0-7ead-4136-8bd4-6cc58db4bef7",
-              "displayed_name": "Test Return One Or Two Void Event Cards To Hand",
-              "energy_cost": 4,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "Effect": {
-                        "ReturnUpToCountFromYourVoidToHand": {
-                          "target": {
-                            "YourVoid": "Event"
-                          },
-                          "count": 2
-                        }
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Effect": "Return one or two events from your void to your hand."
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_rules_text": "Return one or two events from your void to your hand.",
-              "displayed_prompts": [
-                "Choose one or two events in your void to return."
-              ],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": false,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
-              }
-            },
-            {
-              "base_card_id": "559e62a0-7ead-4136-8bd4-6cc58db4bef7",
-              "displayed_name": "Test Return One Or Two Void Event Cards To Hand",
-              "energy_cost": 4,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "Effect": {
-                        "ReturnUpToCountFromYourVoidToHand": {
-                          "target": {
-                            "YourVoid": "Event"
-                          },
-                          "count": 2
-                        }
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Effect": "Return one or two events from your void to your hand."
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_rules_text": "Return one or two events from your void to your hand.",
-              "displayed_prompts": [
-                "Choose one or two events in your void to return."
-              ],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": false,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
-              }
-            },
-            {
-              "base_card_id": "e8f937da-cca7-447d-a559-530d7c339325",
-              "displayed_name": "Test Modal Return To Hand Or Draw Two",
-              "energy_cost": null,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "Modal": [
-                        {
-                          "energy_cost": 2,
-                          "effect": {
-                            "Effect": {
-                              "ReturnToHand": {
-                                "target": {
-                                  "Enemy": "Character"
-                                }
-                              }
-                            }
-                          }
-                        },
-                        {
-                          "energy_cost": 3,
-                          "effect": {
-                            "Effect": {
-                              "DrawCards": {
-                                "count": 2
-                              }
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Modal": [
-                          {
-                            "cost": "{-energy-cost(e:2)}",
-                            "effect": "Return an enemy character to hand."
-                          },
-                          {
-                            "cost": "{-energy-cost(e:3)}",
-                            "effect": "Draw {-drawn-cards(n:2)}."
-                          }
-                        ]
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_rules_text": "{choose-one}\n{bullet} {-energy-cost(e:2)}: Return an enemy character to hand.\n{bullet} {-energy-cost(e:3)}: Draw {-drawn-cards(n:2)}.",
-              "displayed_prompts": [
-                "Choose an enemy character to return to hand."
-              ],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": true,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
-              }
-            },
-            {
-              "base_card_id": "e8f937da-cca7-447d-a559-530d7c339325",
-              "displayed_name": "Test Modal Return To Hand Or Draw Two",
-              "energy_cost": null,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "Modal": [
-                        {
-                          "energy_cost": 2,
-                          "effect": {
-                            "Effect": {
-                              "ReturnToHand": {
-                                "target": {
-                                  "Enemy": "Character"
-                                }
-                              }
-                            }
-                          }
-                        },
-                        {
-                          "energy_cost": 3,
-                          "effect": {
-                            "Effect": {
-                              "DrawCards": {
-                                "count": 2
-                              }
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Modal": [
-                          {
-                            "cost": "{-energy-cost(e:2)}",
-                            "effect": "Return an enemy character to hand."
-                          },
-                          {
-                            "cost": "{-energy-cost(e:3)}",
-                            "effect": "Draw {-drawn-cards(n:2)}."
-                          }
-                        ]
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_rules_text": "{choose-one}\n{bullet} {-energy-cost(e:2)}: Return an enemy character to hand.\n{bullet} {-energy-cost(e:3)}: Draw {-drawn-cards(n:2)}.",
-              "displayed_prompts": [
-                "Choose an enemy character to return to hand."
-              ],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": true,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
-              }
-            },
-            {
-              "base_card_id": "0b783ac8-6aea-438e-a2d5-87bf68548eda",
-              "displayed_name": "Test Prevent Dissolve This Turn",
-              "energy_cost": 1,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "Effect": {
-                        "PreventDissolveThisTurn": {
-                          "target": {
-                            "Your": "Character"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Effect": "Give an allied character {anchored} until end of turn."
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_rules_text": "Give an allied character {anchored} until end of turn.",
-              "displayed_prompts": [
-                "Choose an allied character to gain {anchored}."
-              ],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": true,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
-              }
-            },
-            {
-              "base_card_id": "0b783ac8-6aea-438e-a2d5-87bf68548eda",
-              "displayed_name": "Test Prevent Dissolve This Turn",
-              "energy_cost": 1,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "Effect": {
-                        "PreventDissolveThisTurn": {
-                          "target": {
-                            "Your": "Character"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Effect": "Give an allied character {anchored} until end of turn."
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_rules_text": "Give an allied character {anchored} until end of turn.",
-              "displayed_prompts": [
-                "Choose an allied character to gain {anchored}."
-              ],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": true,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
-              }
-            },
-            {
-              "base_card_id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
-              "displayed_name": "Test Foresee One Draw Reclaim",
-              "energy_cost": 1,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "List": [
-                        {
-                          "effect": {
-                            "Foresee": {
-                              "count": 1
-                            }
-                          },
-                          "optional": false
-                        },
-                        {
-                          "effect": {
-                            "DrawCards": {
-                              "count": 1
-                            }
-                          },
-                          "optional": false
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "Named": {
-                    "Reclaim": 3
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Effect": "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}."
-                      }
-                    }
-                  }
-                },
-                {
-                  "Named": {
-                    "name": "{-Reclaim-Cost(e:3)}"
-                  }
-                }
-              ],
-              "displayed_rules_text": "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
-              "displayed_prompts": [],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": true,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
-              }
-            },
-            {
-              "base_card_id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
-              "displayed_name": "Test Foresee One Draw Reclaim",
-              "energy_cost": 1,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "List": [
-                        {
-                          "effect": {
-                            "Foresee": {
-                              "count": 1
-                            }
-                          },
-                          "optional": false
-                        },
-                        {
-                          "effect": {
-                            "DrawCards": {
-                              "count": 1
-                            }
-                          },
-                          "optional": false
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "Named": {
-                    "Reclaim": 3
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Effect": "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}."
-                      }
-                    }
-                  }
-                },
-                {
-                  "Named": {
-                    "name": "{-Reclaim-Cost(e:3)}"
-                  }
-                }
-              ],
-              "displayed_rules_text": "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
-              "displayed_prompts": [],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": true,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
-              }
-            },
-            {
-              "base_card_id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
-              "displayed_name": "Test Foresee One Draw Reclaim",
-              "energy_cost": 1,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "List": [
-                        {
-                          "effect": {
-                            "Foresee": {
-                              "count": 1
-                            }
-                          },
-                          "optional": false
-                        },
-                        {
-                          "effect": {
-                            "DrawCards": {
-                              "count": 1
-                            }
-                          },
-                          "optional": false
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "Named": {
-                    "Reclaim": 3
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Effect": "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}."
-                      }
-                    }
-                  }
-                },
-                {
-                  "Named": {
-                    "name": "{-Reclaim-Cost(e:3)}"
-                  }
-                }
-              ],
-              "displayed_rules_text": "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
-              "displayed_prompts": [],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": true,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
-              }
-            },
-            {
-              "base_card_id": "86ed0d3f-320b-49d0-b022-cd94aa07edbd",
-              "displayed_name": "Test Counterspell Character",
-              "energy_cost": 2,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "Effect": {
-                        "Counterspell": {
-                          "target": {
-                            "Enemy": "Character"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Effect": "{Prevent} a played enemy character."
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_rules_text": "{Prevent} a played enemy character.",
-              "displayed_prompts": [
-                "Choose an enemy character to {prevent}."
-              ],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": true,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
-              }
-            },
-            {
-              "base_card_id": "86ed0d3f-320b-49d0-b022-cd94aa07edbd",
-              "displayed_name": "Test Counterspell Character",
-              "energy_cost": 2,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "Effect": {
-                        "Counterspell": {
-                          "target": {
-                            "Enemy": "Character"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Effect": "{Prevent} a played enemy character."
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_rules_text": "{Prevent} a played enemy character.",
-              "displayed_prompts": [
-                "Choose an enemy character to {prevent}."
-              ],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": true,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
               }
             },
             {
@@ -3610,6 +2612,17 @@
       "spark_bonus": 0,
       "deck_name": "Benchmark1",
       "deck": [
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
         43,
         44,
         45,
@@ -3630,32 +2643,10 @@
         60,
         61,
         62,
-        63,
-        64,
-        65,
-        66,
-        67,
-        68,
-        69,
-        70,
-        71,
-        72,
-        73,
-        74,
-        75,
-        76,
-        77,
-        78,
-        79,
-        80,
-        81,
-        82,
-        83,
-        84,
-        85
+        63
       ],
       "quest": {
-        "id": "202d6cd1-2799-4e88-87bf-c389a92abe1e",
+        "id": "cb150d86-7a67-4edf-8e1b-9a785ecb3ca6",
         "user": {
           "id": "00000000-0000-0000-0000-000000000000"
         },
@@ -4625,612 +3616,6 @@
               "rarity": "Special",
               "image": {
                 "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1794244540.png"
-              }
-            },
-            {
-              "base_card_id": "559e62a0-7ead-4136-8bd4-6cc58db4bef7",
-              "displayed_name": "Test Return One Or Two Void Event Cards To Hand",
-              "energy_cost": 4,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "Effect": {
-                        "ReturnUpToCountFromYourVoidToHand": {
-                          "target": {
-                            "YourVoid": "Event"
-                          },
-                          "count": 2
-                        }
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Effect": "Return one or two events from your void to your hand."
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_rules_text": "Return one or two events from your void to your hand.",
-              "displayed_prompts": [
-                "Choose one or two events in your void to return."
-              ],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": false,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
-              }
-            },
-            {
-              "base_card_id": "559e62a0-7ead-4136-8bd4-6cc58db4bef7",
-              "displayed_name": "Test Return One Or Two Void Event Cards To Hand",
-              "energy_cost": 4,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "Effect": {
-                        "ReturnUpToCountFromYourVoidToHand": {
-                          "target": {
-                            "YourVoid": "Event"
-                          },
-                          "count": 2
-                        }
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Effect": "Return one or two events from your void to your hand."
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_rules_text": "Return one or two events from your void to your hand.",
-              "displayed_prompts": [
-                "Choose one or two events in your void to return."
-              ],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": false,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_644603677.png"
-              }
-            },
-            {
-              "base_card_id": "e8f937da-cca7-447d-a559-530d7c339325",
-              "displayed_name": "Test Modal Return To Hand Or Draw Two",
-              "energy_cost": null,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "Modal": [
-                        {
-                          "energy_cost": 2,
-                          "effect": {
-                            "Effect": {
-                              "ReturnToHand": {
-                                "target": {
-                                  "Enemy": "Character"
-                                }
-                              }
-                            }
-                          }
-                        },
-                        {
-                          "energy_cost": 3,
-                          "effect": {
-                            "Effect": {
-                              "DrawCards": {
-                                "count": 2
-                              }
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Modal": [
-                          {
-                            "cost": "{-energy-cost(e:2)}",
-                            "effect": "Return an enemy character to hand."
-                          },
-                          {
-                            "cost": "{-energy-cost(e:3)}",
-                            "effect": "Draw {-drawn-cards(n:2)}."
-                          }
-                        ]
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_rules_text": "{choose-one}\n{bullet} {-energy-cost(e:2)}: Return an enemy character to hand.\n{bullet} {-energy-cost(e:3)}: Draw {-drawn-cards(n:2)}.",
-              "displayed_prompts": [
-                "Choose an enemy character to return to hand."
-              ],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": true,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
-              }
-            },
-            {
-              "base_card_id": "e8f937da-cca7-447d-a559-530d7c339325",
-              "displayed_name": "Test Modal Return To Hand Or Draw Two",
-              "energy_cost": null,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "Modal": [
-                        {
-                          "energy_cost": 2,
-                          "effect": {
-                            "Effect": {
-                              "ReturnToHand": {
-                                "target": {
-                                  "Enemy": "Character"
-                                }
-                              }
-                            }
-                          }
-                        },
-                        {
-                          "energy_cost": 3,
-                          "effect": {
-                            "Effect": {
-                              "DrawCards": {
-                                "count": 2
-                              }
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Modal": [
-                          {
-                            "cost": "{-energy-cost(e:2)}",
-                            "effect": "Return an enemy character to hand."
-                          },
-                          {
-                            "cost": "{-energy-cost(e:3)}",
-                            "effect": "Draw {-drawn-cards(n:2)}."
-                          }
-                        ]
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_rules_text": "{choose-one}\n{bullet} {-energy-cost(e:2)}: Return an enemy character to hand.\n{bullet} {-energy-cost(e:3)}: Draw {-drawn-cards(n:2)}.",
-              "displayed_prompts": [
-                "Choose an enemy character to return to hand."
-              ],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": true,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1200949264.png"
-              }
-            },
-            {
-              "base_card_id": "0b783ac8-6aea-438e-a2d5-87bf68548eda",
-              "displayed_name": "Test Prevent Dissolve This Turn",
-              "energy_cost": 1,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "Effect": {
-                        "PreventDissolveThisTurn": {
-                          "target": {
-                            "Your": "Character"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Effect": "Give an allied character {anchored} until end of turn."
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_rules_text": "Give an allied character {anchored} until end of turn.",
-              "displayed_prompts": [
-                "Choose an allied character to gain {anchored}."
-              ],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": true,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
-              }
-            },
-            {
-              "base_card_id": "0b783ac8-6aea-438e-a2d5-87bf68548eda",
-              "displayed_name": "Test Prevent Dissolve This Turn",
-              "energy_cost": 1,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "Effect": {
-                        "PreventDissolveThisTurn": {
-                          "target": {
-                            "Your": "Character"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Effect": "Give an allied character {anchored} until end of turn."
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_rules_text": "Give an allied character {anchored} until end of turn.",
-              "displayed_prompts": [
-                "Choose an allied character to gain {anchored}."
-              ],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": true,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1621160806.png"
-              }
-            },
-            {
-              "base_card_id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
-              "displayed_name": "Test Foresee One Draw Reclaim",
-              "energy_cost": 1,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "List": [
-                        {
-                          "effect": {
-                            "Foresee": {
-                              "count": 1
-                            }
-                          },
-                          "optional": false
-                        },
-                        {
-                          "effect": {
-                            "DrawCards": {
-                              "count": 1
-                            }
-                          },
-                          "optional": false
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "Named": {
-                    "Reclaim": 3
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Effect": "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}."
-                      }
-                    }
-                  }
-                },
-                {
-                  "Named": {
-                    "name": "{-Reclaim-Cost(e:3)}"
-                  }
-                }
-              ],
-              "displayed_rules_text": "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
-              "displayed_prompts": [],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": true,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
-              }
-            },
-            {
-              "base_card_id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
-              "displayed_name": "Test Foresee One Draw Reclaim",
-              "energy_cost": 1,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "List": [
-                        {
-                          "effect": {
-                            "Foresee": {
-                              "count": 1
-                            }
-                          },
-                          "optional": false
-                        },
-                        {
-                          "effect": {
-                            "DrawCards": {
-                              "count": 1
-                            }
-                          },
-                          "optional": false
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "Named": {
-                    "Reclaim": 3
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Effect": "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}."
-                      }
-                    }
-                  }
-                },
-                {
-                  "Named": {
-                    "name": "{-Reclaim-Cost(e:3)}"
-                  }
-                }
-              ],
-              "displayed_rules_text": "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
-              "displayed_prompts": [],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": true,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
-              }
-            },
-            {
-              "base_card_id": "de21db6c-54b4-4bff-b1d6-5a4711ef5ed8",
-              "displayed_name": "Test Foresee One Draw Reclaim",
-              "energy_cost": 1,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "List": [
-                        {
-                          "effect": {
-                            "Foresee": {
-                              "count": 1
-                            }
-                          },
-                          "optional": false
-                        },
-                        {
-                          "effect": {
-                            "DrawCards": {
-                              "count": 1
-                            }
-                          },
-                          "optional": false
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "Named": {
-                    "Reclaim": 3
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Effect": "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}."
-                      }
-                    }
-                  }
-                },
-                {
-                  "Named": {
-                    "name": "{-Reclaim-Cost(e:3)}"
-                  }
-                }
-              ],
-              "displayed_rules_text": "{-Foresee(n:1)}. Draw {-drawn-cards(n:1)}.\n\n{-Reclaim-Cost(e:3)}",
-              "displayed_prompts": [],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": true,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1328168243.png"
-              }
-            },
-            {
-              "base_card_id": "86ed0d3f-320b-49d0-b022-cd94aa07edbd",
-              "displayed_name": "Test Counterspell Character",
-              "energy_cost": 2,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "Effect": {
-                        "Counterspell": {
-                          "target": {
-                            "Enemy": "Character"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Effect": "{Prevent} a played enemy character."
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_rules_text": "{Prevent} a played enemy character.",
-              "displayed_prompts": [
-                "Choose an enemy character to {prevent}."
-              ],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": true,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
-              }
-            },
-            {
-              "base_card_id": "86ed0d3f-320b-49d0-b022-cd94aa07edbd",
-              "displayed_name": "Test Counterspell Character",
-              "energy_cost": 2,
-              "abilities": [
-                {
-                  "Event": {
-                    "effect": {
-                      "Effect": {
-                        "Counterspell": {
-                          "target": {
-                            "Enemy": "Character"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_abilities": [
-                {
-                  "Event": {
-                    "event": {
-                      "additional_cost": null,
-                      "effect": {
-                        "Effect": "{Prevent} a played enemy character."
-                      }
-                    }
-                  }
-                }
-              ],
-              "displayed_rules_text": "{Prevent} a played enemy character.",
-              "displayed_prompts": [
-                "Choose an enemy character to {prevent}."
-              ],
-              "card_type": "Event",
-              "card_subtype": null,
-              "is_fast": true,
-              "spark": null,
-              "is_test_card": true,
-              "rarity": "Special",
-              "image": {
-                "sprite": "Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_1239919309.png"
               }
             },
             {
@@ -5855,10 +4240,10 @@
   "seed": 1234567891234,
   "rng": {
     "s": [
-      8972986889947824389,
-      16864806886584222445,
-      7180489657156645951,
-      7342383304707827884
+      6275314622831295681,
+      11370292044317372482,
+      6953914393759911328,
+      7934590272824457409
     ]
   },
   "prompts": [],
@@ -5937,84 +4322,6 @@
       },
       {
         "definition": {
-          "base_card_id": "a2cdf115-8e1a-455e-a118-123f6f36c7ba",
-          "displayed_name": "Dreamwell Mill 3",
-          "energy_produced": 1,
-          "abilities": [
-            {
-              "Event": {
-                "effect": {
-                  "Effect": {
-                    "PutCardsFromYourDeckIntoVoid": {
-                      "count": 3
-                    }
-                  }
-                }
-              }
-            }
-          ],
-          "displayed_abilities": [
-            {
-              "Event": {
-                "event": {
-                  "additional_cost": null,
-                  "effect": {
-                    "Effect": "Put the top {-count(n: 3)} cards of your deck into your void."
-                  }
-                }
-              }
-            }
-          ],
-          "displayed_rules_text": "Put the top {-count(n: 3)} cards of your deck into your void.",
-          "displayed_prompts": [],
-          "phase": 1,
-          "is_test_card": true,
-          "image": {
-            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Dreamwell/shutterstock_2421338077.png"
-          }
-        }
-      },
-      {
-        "definition": {
-          "base_card_id": "107c3b3f-6131-4ff8-afcb-f0ce4188848f",
-          "displayed_name": "Dreamwell Gain Energy",
-          "energy_produced": 1,
-          "abilities": [
-            {
-              "Event": {
-                "effect": {
-                  "Effect": {
-                    "GainEnergy": {
-                      "gains": 1
-                    }
-                  }
-                }
-              }
-            }
-          ],
-          "displayed_abilities": [
-            {
-              "Event": {
-                "event": {
-                  "additional_cost": null,
-                  "effect": {
-                    "Effect": "Gain {-gained-energy(e: 1)}."
-                  }
-                }
-              }
-            }
-          ],
-          "displayed_rules_text": "Gain {-gained-energy(e: 1)}.",
-          "displayed_prompts": [],
-          "phase": 1,
-          "is_test_card": true,
-          "image": {
-            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Dreamwell/shutterstock_1786390154.png"
-          }
-        }
-      },
-      {
-        "definition": {
           "base_card_id": "40e4381f-12f7-46b9-ae50-67b3195781b1",
           "displayed_name": "Dreamwell Draw Discard",
           "energy_produced": 1,
@@ -6069,6 +4376,45 @@
       },
       {
         "definition": {
+          "base_card_id": "a2cdf115-8e1a-455e-a118-123f6f36c7ba",
+          "displayed_name": "Dreamwell Mill 3",
+          "energy_produced": 1,
+          "abilities": [
+            {
+              "Event": {
+                "effect": {
+                  "Effect": {
+                    "PutCardsFromYourDeckIntoVoid": {
+                      "count": 3
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "displayed_abilities": [
+            {
+              "Event": {
+                "event": {
+                  "additional_cost": null,
+                  "effect": {
+                    "Effect": "Put the top {-count(n: 3)} cards of your deck into your void."
+                  }
+                }
+              }
+            }
+          ],
+          "displayed_rules_text": "Put the top {-count(n: 3)} cards of your deck into your void.",
+          "displayed_prompts": [],
+          "phase": 1,
+          "is_test_card": true,
+          "image": {
+            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Dreamwell/shutterstock_2421338077.png"
+          }
+        }
+      },
+      {
+        "definition": {
           "base_card_id": "40c77ea8-a021-4bc6-8970-0853c03f3fe0",
           "displayed_name": "Dreamwell Foresee",
           "energy_produced": 1,
@@ -6105,6 +4451,45 @@
             "sprite": "Assets/ThirdParty/GameAssets/CardImages/Dreamwell/shutterstock_1897537165.png"
           }
         }
+      },
+      {
+        "definition": {
+          "base_card_id": "107c3b3f-6131-4ff8-afcb-f0ce4188848f",
+          "displayed_name": "Dreamwell Gain Energy",
+          "energy_produced": 1,
+          "abilities": [
+            {
+              "Event": {
+                "effect": {
+                  "Effect": {
+                    "GainEnergy": {
+                      "gains": 1
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "displayed_abilities": [
+            {
+              "Event": {
+                "event": {
+                  "additional_cost": null,
+                  "effect": {
+                    "Effect": "Gain {-gained-energy(e: 1)}."
+                  }
+                }
+              }
+            }
+          ],
+          "displayed_rules_text": "Gain {-gained-energy(e: 1)}.",
+          "displayed_prompts": [],
+          "phase": 1,
+          "is_test_card": true,
+          "image": {
+            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Dreamwell/shutterstock_1786390154.png"
+          }
+        }
       }
     ],
     "next_index": 5,
@@ -6113,100 +4498,40 @@
   "triggers": {
     "listeners": {
       "abandoned": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       },
       "banished": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       },
       "discarded": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       },
       "dissolved": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       },
       "drew_all_cards_in_copy_of_deck": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       },
       "end_of_turn": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       },
       "gained_energy": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       },
       "judgment": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       },
       "materialized": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       },
       "played_card": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       },
       "played_card_from_hand": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       },
       "played_card_from_void": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       }
     },
     "events": []
@@ -6214,23 +4539,13 @@
   "activated_abilities": {
     "one": {
       "characters": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       },
       "activated_this_turn_cycle": []
     },
     "two": {
       "characters": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       },
       "activated_this_turn_cycle": []
     }
@@ -6238,29 +4553,14 @@
   "ability_state": {
     "has_play_from_void_ability": {
       "one": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 134217728
       },
       "two": {
-        "set": {
-          "bit_vec": {
-            "storage": [],
-            "nbits": 0
-          }
-        }
+        "bits": 0
       }
     },
     "banish_when_leaves_play": {
-      "set": {
-        "bit_vec": {
-          "storage": [],
-          "nbits": 0
-        }
-      }
+      "bits": 0
     },
     "until_end_of_turn": {
       "active_dreamwell_card": 4,
@@ -6398,219 +4698,131 @@
         "owner": "One"
       },
       "32": {
-        "id": 32,
-        "owner": "One"
-      },
-      "33": {
-        "id": 33,
-        "owner": "One"
-      },
-      "34": {
-        "id": 34,
-        "owner": "One"
-      },
-      "35": {
-        "id": 35,
-        "owner": "One"
-      },
-      "36": {
-        "id": 36,
-        "owner": "One"
-      },
-      "37": {
-        "id": 37,
-        "owner": "One"
-      },
-      "38": {
-        "id": 38,
-        "owner": "One"
-      },
-      "39": {
-        "id": 39,
-        "owner": "One"
-      },
-      "40": {
-        "id": 40,
-        "owner": "One"
-      },
-      "41": {
-        "id": 41,
-        "owner": "One"
-      },
-      "42": {
-        "id": 42,
-        "owner": "One"
-      },
-      "43": {
         "id": 0,
         "owner": "Two"
       },
-      "44": {
+      "33": {
         "id": 1,
         "owner": "Two"
       },
-      "45": {
+      "34": {
         "id": 2,
         "owner": "Two"
       },
-      "46": {
+      "35": {
         "id": 3,
         "owner": "Two"
       },
-      "47": {
+      "36": {
         "id": 4,
         "owner": "Two"
       },
-      "48": {
+      "37": {
         "id": 5,
         "owner": "Two"
       },
-      "49": {
+      "38": {
         "id": 6,
         "owner": "Two"
       },
-      "50": {
+      "39": {
         "id": 7,
         "owner": "Two"
       },
-      "51": {
+      "40": {
         "id": 8,
         "owner": "Two"
       },
-      "52": {
+      "41": {
         "id": 9,
         "owner": "Two"
       },
-      "53": {
+      "42": {
         "id": 10,
         "owner": "Two"
       },
-      "54": {
+      "43": {
         "id": 11,
         "owner": "Two"
       },
-      "55": {
+      "44": {
         "id": 12,
         "owner": "Two"
       },
-      "56": {
+      "45": {
         "id": 13,
         "owner": "Two"
       },
-      "57": {
+      "46": {
         "id": 14,
         "owner": "Two"
       },
-      "58": {
+      "47": {
         "id": 15,
         "owner": "Two"
       },
-      "59": {
+      "48": {
         "id": 16,
         "owner": "Two"
       },
-      "60": {
+      "49": {
         "id": 17,
         "owner": "Two"
       },
-      "61": {
+      "50": {
         "id": 18,
         "owner": "Two"
       },
-      "62": {
+      "51": {
         "id": 19,
         "owner": "Two"
       },
-      "63": {
+      "52": {
         "id": 20,
         "owner": "Two"
       },
-      "64": {
+      "53": {
         "id": 21,
         "owner": "Two"
       },
-      "65": {
+      "54": {
         "id": 22,
         "owner": "Two"
       },
-      "66": {
+      "55": {
         "id": 23,
         "owner": "Two"
       },
-      "67": {
+      "56": {
         "id": 24,
         "owner": "Two"
       },
-      "68": {
+      "57": {
         "id": 25,
         "owner": "Two"
       },
-      "69": {
+      "58": {
         "id": 26,
         "owner": "Two"
       },
-      "70": {
+      "59": {
         "id": 27,
         "owner": "Two"
       },
-      "71": {
+      "60": {
         "id": 28,
         "owner": "Two"
       },
-      "72": {
+      "61": {
         "id": 29,
         "owner": "Two"
       },
-      "73": {
+      "62": {
         "id": 30,
         "owner": "Two"
       },
-      "74": {
+      "63": {
         "id": 31,
-        "owner": "Two"
-      },
-      "75": {
-        "id": 32,
-        "owner": "Two"
-      },
-      "76": {
-        "id": 33,
-        "owner": "Two"
-      },
-      "77": {
-        "id": 34,
-        "owner": "Two"
-      },
-      "78": {
-        "id": 35,
-        "owner": "Two"
-      },
-      "79": {
-        "id": 36,
-        "owner": "Two"
-      },
-      "80": {
-        "id": 37,
-        "owner": "Two"
-      },
-      "81": {
-        "id": 38,
-        "owner": "Two"
-      },
-      "82": {
-        "id": 39,
-        "owner": "Two"
-      },
-      "83": {
-        "id": 40,
-        "owner": "Two"
-      },
-      "84": {
-        "id": 41,
-        "owner": "Two"
-      },
-      "85": {
-        "id": 42,
         "owner": "Two"
       }
     }
@@ -6622,23 +4834,13 @@
       "one": {
         "hand_size_limit_exceeded": false,
         "character_limit_characters_abandoned": {
-          "set": {
-            "bit_vec": {
-              "storage": [],
-              "nbits": 0
-            }
-          }
+          "bits": 0
         }
       },
       "two": {
         "hand_size_limit_exceeded": false,
         "character_limit_characters_abandoned": {
-          "set": {
-            "bit_vec": {
-              "storage": [],
-              "nbits": 0
-            }
-          }
+          "bits": 0
         }
       }
     }
