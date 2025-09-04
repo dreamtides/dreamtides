@@ -166,7 +166,7 @@ fn activated_ability_card_view(
         .find(|data| data.ability_number == ability.ability_number)
         .expect("Ability not found");
 
-    let action = BattleAction::ActivateAbility(ability);
+    let action = BattleAction::ActivateAbilityForCharacter(ability.character_id);
     let activate_action = Some(GameAction::BattleAction(action));
     let cost = ability_data.ability.costs.iter().find_map(|cost| match cost {
         Cost::Energy(energy) => Some(*energy),

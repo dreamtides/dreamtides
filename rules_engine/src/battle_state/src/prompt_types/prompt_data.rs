@@ -1,4 +1,5 @@
 use ability_data::effect::{Effect, ModalEffectChoice};
+use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
 use schemars::JsonSchema;
@@ -48,6 +49,7 @@ pub enum PromptType {
     Choose { choices: Vec<PromptChoice> },
     ChooseEnergyValue { minimum: Energy, maximum: Energy },
     ModalEffect(ModalEffectPrompt),
+    ChooseActivatedAbility { character_id: CharacterId, abilities: Vec<ActivatedAbilityOption> },
     SelectDeckCardOrder { prompt: SelectDeckCardOrderPrompt },
 }
 
@@ -119,4 +121,14 @@ pub struct PromptChoice {
 pub enum PromptChoiceLabel {
     String(StringId),
     StringWithEnergy(StringId, Energy),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ActivatedAbilityOption {
+    /// The ability number for this activated ability
+    pub ability_number: AbilityNumber,
+    /// Display name for this ability
+    pub name: String,
+    /// Energy cost for this ability
+    pub energy_cost: Option<Energy>,
 }

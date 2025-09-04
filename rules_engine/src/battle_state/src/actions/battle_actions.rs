@@ -5,9 +5,7 @@ use serde::{Deserialize, Serialize};
 use strum::EnumDiscriminants;
 
 use crate::actions::debug_battle_action::DebugBattleAction;
-use crate::battle::card_id::{
-    ActivatedAbilityId, BattleDeckCardId, CharacterId, HandCardId, StackCardId, VoidCardId,
-};
+use crate::battle::card_id::{BattleDeckCardId, CharacterId, HandCardId, StackCardId, VoidCardId};
 
 /// An action that can be performed in a battle
 #[derive(
@@ -20,8 +18,9 @@ pub enum BattleAction {
     PlayCardFromHand(HandCardId),
     /// Play a card in the user's void using the lowest-cost ability.
     PlayCardFromVoid(VoidCardId),
-    /// Activate a character's ability.
-    ActivateAbility(ActivatedAbilityId),
+    /// Activate a character's ability by character ID, prompting for ability
+    /// selection if multiple exist.
+    ActivateAbilityForCharacter(CharacterId),
     /// Pass on taking actions in response to a card being played by the
     /// opponent, thus causing the stack to be resolved.
     PassPriority,
@@ -54,6 +53,8 @@ pub enum BattleAction {
     SubmitMulligan,
     /// Select a modal effect choice for an effect or item on the stack
     SelectModalEffectChoice(ModelEffectChoiceIndex),
+    /// Select which activated ability to activate from a character
+    SelectActivatedAbilityChoice(usize),
 }
 
 #[derive(
@@ -95,11 +96,8 @@ impl BattleAction {
             BattleAction::PlayCardFromVoid(void_card_id) => {
                 format!("PCFV{:?}", void_card_id.0.0)
             }
-            BattleAction::ActivateAbility(activated_ability_id) => {
-                format!(
-                    "AA{:?}_{:?}",
-                    activated_ability_id.character_id.0.0, activated_ability_id.ability_number.0
-                )
+            BattleAction::ActivateAbilityForCharacter(character_id) => {
+                format!("AAFC{:?}", character_id.0.0)
             }
             BattleAction::PassPriority => "PP".to_string(),
             BattleAction::EndTurn => "ET".to_string(),
@@ -131,6 +129,9 @@ impl BattleAction {
             BattleAction::SubmitMulligan => "SM".to_string(),
             BattleAction::SelectModalEffectChoice(modal_choice_index) => {
                 format!("SMEC{:?}", modal_choice_index.0)
+            }
+            BattleAction::SelectActivatedAbilityChoice(choice_index) => {
+                format!("SAAC{choice_index:?}")
             }
         }
     }

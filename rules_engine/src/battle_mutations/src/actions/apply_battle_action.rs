@@ -51,8 +51,8 @@ pub fn execute_without_tracking_history(
         BattleAction::PlayCardFromVoid(card_id) => {
             play_card::from_void(battle, player, card_id);
         }
-        BattleAction::ActivateAbility(activated_ability_id) => {
-            activate_ability::execute(battle, player, activated_ability_id);
+        BattleAction::ActivateAbilityForCharacter(character_id) => {
+            activate_ability::execute(battle, player, character_id, None);
         }
         BattleAction::PassPriority => {
             resolve_card::pass_priority(battle, player);
@@ -98,6 +98,9 @@ pub fn execute_without_tracking_history(
         }
         BattleAction::SelectModalEffectChoice(modal_choice_index) => {
             select_modal_effect_choice::execute(battle, player, modal_choice_index);
+        }
+        BattleAction::SelectActivatedAbilityChoice(choice_index) => {
+            activate_ability::execute_selected_ability(battle, player, choice_index);
         }
     }
 

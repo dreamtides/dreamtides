@@ -2,9 +2,7 @@ use ability_data::effect::ModelEffectChoiceIndex;
 use battle_state::actions::battle_actions::{
     BattleAction, CardOrderSelectionTarget, DeckCardSelectedOrder,
 };
-use battle_state::battle::card_id::{
-    ActivatedAbilityId, CharacterId, HandCardId, StackCardId, VoidCardId,
-};
+use battle_state::battle::card_id::{CharacterId, HandCardId, StackCardId, VoidCardId};
 use battle_state::battle_cards::card_set::CardSet;
 use battle_state::prompt_types::prompt_data::SelectDeckCardOrderPrompt;
 use bit_set::BitSet;
@@ -49,6 +47,9 @@ pub enum LegalActions {
     ModalEffectPrompt {
         valid_choices: BitSet<usize>,
     },
+    SelectActivatedAbilityPrompt {
+        choice_count: usize,
+    },
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -56,7 +57,7 @@ pub struct StandardLegalActions {
     pub primary: PrimaryLegalAction,
     pub play_card_from_hand: CardSet<HandCardId>,
     pub play_card_from_void: CardSet<VoidCardId>,
-    pub activate_abilities: Vec<ActivatedAbilityId>,
+    pub activate_abilities_for_character: CardSet<CharacterId>,
 }
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
@@ -83,6 +84,7 @@ impl LegalActions {
                 | LegalActions::SelectEnergyValuePrompt { .. }
                 | LegalActions::SelectDeckCardOrder { .. }
                 | LegalActions::ModalEffectPrompt { .. }
+                | LegalActions::SelectActivatedAbilityPrompt { .. }
         )
     }
 
@@ -103,9 +105,9 @@ impl LegalActions {
                     false
                 }
             }
-            BattleAction::ActivateAbility(activated_ability_id) => {
+            BattleAction::ActivateAbilityForCharacter(character_id) => {
                 if let LegalActions::Standard { actions } = self {
-                    actions.activate_abilities.contains(&activated_ability_id)
+                    actions.activate_abilities_for_character.contains(character_id)
                 } else {
                     false
                 }
@@ -246,6 +248,13 @@ impl LegalActions {
                     false
                 }
             }
+            BattleAction::SelectActivatedAbilityChoice(choice_index) => {
+                if let LegalActions::SelectActivatedAbilityPrompt { choice_count } = self {
+                    choice_index < *choice_count
+                } else {
+                    false
+                }
+            }
         }
     }
 
@@ -264,6 +273,7 @@ impl LegalActions {
             LegalActions::SelectEnergyValuePrompt { minimum, maximum } => maximum < minimum,
             LegalActions::SelectDeckCardOrder { .. } => false,
             LegalActions::ModalEffectPrompt { valid_choices } => valid_choices.is_empty(),
+            LegalActions::SelectActivatedAbilityPrompt { choice_count } => *choice_count == 0,
         }
     }
 
@@ -278,8 +288,8 @@ impl LegalActions {
                 let primary_count = 1;
                 let play_cards_count = actions.play_card_from_hand.len();
                 let play_void_cards_count = actions.play_card_from_void.len();
-                let ability_count = actions.activate_abilities.len();
-                primary_count + play_cards_count + play_void_cards_count + ability_count
+                let character_ability_count = actions.activate_abilities_for_character.len();
+                primary_count + play_cards_count + play_void_cards_count + character_ability_count
             }
 
             LegalActions::SelectCharacterPrompt { valid } => valid.len(),
@@ -318,6 +328,7 @@ impl LegalActions {
                 }
             }
             LegalActions::ModalEffectPrompt { valid_choices } => valid_choices.len(),
+            LegalActions::SelectActivatedAbilityPrompt { choice_count } => *choice_count,
         }
     }
 
@@ -359,13 +370,17 @@ impl LegalActions {
                         {
                             Some(BattleAction::PlayCardFromVoid(card_id))
                         } else {
+                            // All abilities are now handled through
+                            // activate_abilities_for_character
                             standard_actions
-                                .activate_abilities
+                                .activate_abilities_for_character
                                 .iter()
-                                .find(|&&ability| {
-                                    !actions.contains(&BattleAction::ActivateAbility(ability))
+                                .find(|&character_id| {
+                                    !actions.contains(&BattleAction::ActivateAbilityForCharacter(
+                                        character_id,
+                                    ))
                                 })
-                                .map(|&ability| BattleAction::ActivateAbility(ability))
+                                .map(BattleAction::ActivateAbilityForCharacter)
                         }
                     }
                 }
@@ -463,6 +478,10 @@ impl LegalActions {
                         .contains(&BattleAction::SelectModalEffectChoice(ModelEffectChoiceIndex(i)))
                 })
                 .map(|i| BattleAction::SelectModalEffectChoice(ModelEffectChoiceIndex(i))),
+
+            LegalActions::SelectActivatedAbilityPrompt { choice_count } => (0..*choice_count)
+                .find(|&i| !actions.contains(&BattleAction::SelectActivatedAbilityChoice(i)))
+                .map(BattleAction::SelectActivatedAbilityChoice),
         }
     }
 
@@ -490,8 +509,9 @@ impl LegalActions {
                     result.push(BattleAction::PlayCardFromVoid(card_id));
                 }
 
-                for ability in actions.activate_abilities.iter() {
-                    result.push(BattleAction::ActivateAbility(*ability));
+                // All abilities are now handled through activate_abilities_for_character
+                for character_id in actions.activate_abilities_for_character.iter() {
+                    result.push(BattleAction::ActivateAbilityForCharacter(character_id));
                 }
 
                 result
@@ -565,6 +585,10 @@ impl LegalActions {
                 .iter()
                 .map(|i| BattleAction::SelectModalEffectChoice(ModelEffectChoiceIndex(i)))
                 .collect::<Vec<_>>(),
+
+            LegalActions::SelectActivatedAbilityPrompt { choice_count } => (0..*choice_count)
+                .map(BattleAction::SelectActivatedAbilityChoice)
+                .collect::<Vec<_>>(),
         }
     }
 
@@ -609,9 +633,9 @@ impl LegalActions {
                         } else {
                             let ability_index = void_index - actions.play_card_from_void.len();
                             actions
-                                .activate_abilities
-                                .get(ability_index)
-                                .map(|&ability| BattleAction::ActivateAbility(ability))
+                                .activate_abilities_for_character
+                                .get_at_index(ability_index)
+                                .map(BattleAction::ActivateAbilityForCharacter)
                         }
                     }
                 }
@@ -690,6 +714,16 @@ impl LegalActions {
                 } else {
                     let index = fastrand::usize(..all_actions.len());
                     Some(all_actions[index])
+                }
+            }
+
+            LegalActions::SelectActivatedAbilityPrompt { choice_count } => {
+                if *choice_count == 0 {
+                    None
+                } else {
+                    Some(BattleAction::SelectActivatedAbilityChoice(fastrand::usize(
+                        ..*choice_count,
+                    )))
                 }
             }
         }

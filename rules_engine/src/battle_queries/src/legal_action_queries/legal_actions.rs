@@ -57,6 +57,9 @@ pub fn compute(battle: &BattleState, player: PlayerName) -> LegalActions {
                 }
                 LegalActions::ModalEffectPrompt { valid_choices }
             }
+            PromptType::ChooseActivatedAbility { abilities, .. } => {
+                LegalActions::SelectActivatedAbilityPrompt { choice_count: abilities.len() }
+            }
             PromptType::SelectDeckCardOrder { prompt } => {
                 LegalActions::SelectDeckCardOrder { current: prompt.clone() }
             }
@@ -139,8 +142,13 @@ fn standard_legal_actions(
         } else {
             can_play_cards::from_void(battle, player, fast_only)
         },
-        activate_abilities: if battle.activated_abilities.player(player).characters.is_empty() {
-            vec![]
+        activate_abilities_for_character: if battle
+            .activated_abilities
+            .player(player)
+            .characters
+            .is_empty()
+        {
+            CardSet::new()
         } else {
             can_activate_abilities::for_player(battle, player, fast_only)
         },

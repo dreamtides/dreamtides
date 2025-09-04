@@ -152,6 +152,9 @@ fn get_generic_prompt_message(builder: &ResponseBuilder, prompt_type: &PromptTyp
             builder.string(string_id::PROMPT_SELECT_CARD_ORDER)
         }
         PromptType::ModalEffect(_) => builder.string(string_id::PROMPT_PICK_MODE),
+        PromptType::ChooseActivatedAbility { .. } => {
+            builder.string(string_id::PROMPT_SELECT_OPTION)
+        }
     }
 }
 

@@ -856,7 +856,8 @@ namespace Dreamtides.Schema
     ///
     /// Play a card in the user's void using the lowest-cost ability.
     ///
-    /// Activate a character's ability.
+    /// Activate a character's ability by character ID, prompting for ability
+    /// selection if multiple exist.
     ///
     /// Select a character as a target
     ///
@@ -873,6 +874,8 @@ namespace Dreamtides.Schema
     /// Sets the position of a card in a card order selector.
     ///
     /// Select a modal effect choice for an effect or item on the stack
+    ///
+    /// Select which activated ability to activate from a character
     /// </summary>
     public partial class BattleActionClass
     {
@@ -885,8 +888,8 @@ namespace Dreamtides.Schema
         [JsonProperty("PlayCardFromVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? PlayCardFromVoid { get; set; }
 
-        [JsonProperty("ActivateAbility", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public ActivatedAbilityId ActivateAbility { get; set; }
+        [JsonProperty("ActivateAbilityForCharacter", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? ActivateAbilityForCharacter { get; set; }
 
         [JsonProperty("SelectCharacterTarget", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectCharacterTarget { get; set; }
@@ -911,18 +914,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("SelectModalEffectChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public long? SelectModalEffectChoice { get; set; }
-    }
 
-    /// <summary>
-    /// Identifies an activated ability of a character.
-    /// </summary>
-    public partial class ActivatedAbilityId
-    {
-        [JsonProperty("ability_number", Required = Required.Always)]
-        public long AbilityNumber { get; set; }
-
-        [JsonProperty("character_id", Required = Required.Always)]
-        public long CharacterId { get; set; }
+        [JsonProperty("SelectActivatedAbilityChoice", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public long? SelectActivatedAbilityChoice { get; set; }
     }
 
     /// <summary>

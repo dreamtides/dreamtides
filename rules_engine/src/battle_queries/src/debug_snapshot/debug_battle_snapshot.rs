@@ -246,6 +246,9 @@ fn format_prompt_choices(prompt: &PromptType) -> Vec<String> {
         PromptType::SelectDeckCardOrder { prompt } => {
             vec![format!("initial: {:?}", prompt.initial), format!("moved: {:?}", prompt.moved)]
         }
+        PromptType::ChooseActivatedAbility { character_id, abilities } => {
+            vec![format!("character_id: {:?}", character_id), format!("abilities: {:?}", abilities)]
+        }
     }
 }
 
