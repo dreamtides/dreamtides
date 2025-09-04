@@ -1,6 +1,7 @@
 use battle_queries::battle_card_queries::{card, card_properties, valid_target_queries};
 use battle_queries::battle_player_queries::player_properties;
-use battle_queries::legal_action_queries::legal_actions;
+use battle_queries::legal_action_queries::can_play_cards::FastOnly;
+use battle_queries::legal_action_queries::{can_activate_abilities, legal_actions};
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
@@ -77,16 +78,26 @@ pub fn battle_view(builder: &ResponseBuilder, battle: &BattleState) -> BattleVie
     let mut token_offset = 100;
 
     cards.extend(
-        battle.activated_abilities.player(builder.display_for_player()).characters.iter().flat_map(
-            |character_id| {
+        battle
+            .cards
+            .battlefield(builder.act_for_player())
+            .iter()
+            .filter(|card_id| {
+                can_activate_abilities::activated_ability_energy_cost(
+                    battle,
+                    *card_id,
+                    FastOnly::No,
+                )
+                .is_some()
+            })
+            .flat_map(|character_id| {
                 token_rendering::all_user_character_activated_abilities(
                     builder,
                     battle,
                     character_id,
                     &mut token_offset,
                 )
-            },
-        ),
+            }),
     );
 
     cards.extend(token_rendering::all_user_void_card_tokens_with_offset(

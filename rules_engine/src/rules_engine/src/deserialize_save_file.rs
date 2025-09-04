@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use battle_queries::battle_card_queries::card_abilities;
 use battle_queries::battle_trace;
+use battle_queries::legal_action_queries::legal_actions_cache;
 use battle_state::battle::animation_data::AnimationData;
 use battle_state::battle::battle_card_definitions::BattleCardDefinitions;
 use battle_state::battle::battle_state::BattleState;
@@ -36,6 +37,7 @@ where
                 },
                 card_abilities::build_from_definition,
             ));
+            legal_actions_cache::populate(&mut battle);
             battle_trace!("Loaded battle from save", &mut battle);
             Some((battle, quest_id))
         }

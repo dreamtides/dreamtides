@@ -255,12 +255,12 @@ pub fn all_user_void_card_tokens_with_offset(
     battle: &BattleState,
     token_offset: &mut usize,
 ) -> Vec<CardView> {
-    let void_ability_cards =
-        battle.ability_state.has_play_from_void_ability.player(builder.act_for_player());
+    let void_ability_cards = battle.cards.void(builder.act_for_player()).iter().filter(|card_id| {
+        can_play_cards::can_play_from_void_energy_cost(battle, *card_id).is_some()
+    });
     let base_sorting_key = battle.cards.next_object_id_for_display().0 + *token_offset;
 
     let result: Vec<CardView> = void_ability_cards
-        .iter()
         .enumerate()
         .map(|(index, card_id)| {
             let hand_sorting_key = (base_sorting_key + index) as u32;

@@ -186,6 +186,13 @@ impl<T: CardIdType> CardSet<T> {
         self.bits |= other.bits;
     }
 
+    /// Fast intersection operation: keeps only elements that are present in
+    /// both sets.
+    #[inline(always)]
+    pub fn intersect_with(&mut self, other: &Self) {
+        self.bits &= other.bits;
+    }
+
     /// Returns the card ID at the given index (0-based), treating the set as
     /// an ordered collection from lowest to highest bit position.
     ///

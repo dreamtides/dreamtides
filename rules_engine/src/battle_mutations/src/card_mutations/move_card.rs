@@ -236,7 +236,6 @@ fn to_destination_zone(
     match old {
         Zone::Stack => on_leave_stack(battle, card_id, &mut new),
         Zone::Battlefield => on_leave_battlefield(battle, controller, card_id, &mut new),
-        Zone::Void => on_leave_void(battle, controller, card_id),
         _ => {}
     }
 
@@ -245,7 +244,6 @@ fn to_destination_zone(
     match new {
         Zone::Stack => on_enter_stack(battle, card_id),
         Zone::Battlefield => on_enter_battlefield(battle, source, controller, card_id),
-        Zone::Void => on_enter_void(battle, controller, card_id),
         _ => {}
     }
 }
@@ -268,10 +266,6 @@ fn on_enter_battlefield(
     };
     battle.cards.battlefield_state_mut(controller).insert(id, CharacterState { spark });
 
-    if ability_list.has_battlefield_activated_abilities {
-        battle.activated_abilities.player_mut(controller).characters.insert(id);
-    }
-
     battle.triggers.push(source, Trigger::Materialized(id));
 }
 
@@ -287,37 +281,11 @@ fn on_leave_battlefield(
         battle.triggers.listeners.remove_listener(trigger, card_id);
     }
 
-    if ability_list.has_battlefield_activated_abilities {
-        battle.activated_abilities.player_mut(controller).characters.remove(CharacterId(card_id));
-    }
-
     battle.cards.battlefield_state_mut(controller).remove(&CharacterId(card_id));
 
     if battle.ability_state.banish_when_leaves_play.contains(card_id) {
         battle.ability_state.banish_when_leaves_play.remove(card_id);
         *new = Zone::Banished;
-    }
-}
-
-fn on_enter_void(battle: &mut BattleState, controller: PlayerName, card_id: CardId) {
-    let ability_list = card::ability_list(battle, card_id);
-    if ability_list.has_play_from_void_ability {
-        battle
-            .ability_state
-            .has_play_from_void_ability
-            .player_mut(controller)
-            .insert(VoidCardId(card_id));
-    }
-}
-
-fn on_leave_void(battle: &mut BattleState, controller: PlayerName, card_id: CardId) {
-    let ability_list = card::ability_list(battle, card_id);
-    if ability_list.has_play_from_void_ability {
-        battle
-            .ability_state
-            .has_play_from_void_ability
-            .player_mut(controller)
-            .remove(VoidCardId(card_id));
     }
 }
 

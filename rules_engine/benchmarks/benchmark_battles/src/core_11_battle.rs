@@ -5,7 +5,7 @@ use std::sync::{Arc, OnceLock};
 use ai_data::game_ai::GameAI;
 use battle_mutations::actions::apply_battle_action;
 use battle_queries::battle_card_queries::{card, card_abilities};
-use battle_queries::legal_action_queries::legal_actions;
+use battle_queries::legal_action_queries::{legal_actions, legal_actions_cache};
 use battle_state::battle::battle_card_definitions::BattleCardDefinitions;
 use battle_state::battle::battle_state::{BattleState, LoggingOptions, RequestContext};
 use battle_state::battle_cards::dreamwell_data::Dreamwell;
@@ -76,6 +76,7 @@ pub fn generate_core_11_battle() -> BattleState {
                 },
                 card_abilities::build_from_definition,
             ));
+            legal_actions_cache::populate(&mut battle);
             battle
         })
         .clone()

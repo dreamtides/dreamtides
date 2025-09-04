@@ -26,6 +26,7 @@ use crate::battle_cards::activated_ability_state::ActivatedAbilityState;
 use crate::battle_cards::dreamwell_data::Dreamwell;
 use crate::battle_cards::stack_card_state::EffectTargets;
 use crate::battle_player::battle_player_state::BattlePlayerState;
+use crate::battle_player::legal_actions_cache_data::LegalActionsCacheData;
 use crate::battle_player::player_map::PlayerMap;
 use crate::battle_trace::battle_tracing::BattleTracing;
 use crate::core::effect_source::EffectSource;
@@ -124,6 +125,11 @@ pub struct BattleState {
     /// Information about why & how we are currently running the rules engine.
     #[serde(default)]
     pub request_context: RequestContext,
+
+    /// Cached data about what actions a player can legally take in a given game
+    /// state.
+    #[serde(skip)]
+    pub legal_actions_cache: Arc<PlayerMap<LegalActionsCacheData>>,
 }
 
 /// A unique identifier for a pending effect.
@@ -206,6 +212,7 @@ impl BattleState {
             action_history: None,
             turn_history: self.turn_history.clone(),
             request_context: self.request_context.clone(),
+            legal_actions_cache: self.legal_actions_cache.clone(),
         }
     }
 
@@ -245,6 +252,7 @@ impl BattleState {
                 action_history: None,
                 turn_history: self.turn_history.clone(),
                 request_context: self.request_context.clone(),
+                legal_actions_cache: self.legal_actions_cache.clone(),
             };
             animations.steps.push(AnimationStep { source, snapshot, animation: update() });
         }

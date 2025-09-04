@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use battle_queries::battle_card_queries::{card, card_abilities};
+use battle_queries::legal_action_queries::legal_actions_cache;
 use battle_queries::{battle_trace, panic_with};
 use battle_state::battle::all_cards::CreatedCard;
 use battle_state::battle::animation_data::AnimationStep;
@@ -129,6 +130,8 @@ pub fn debug_add_cards(battle: &mut BattleState, player: PlayerName, cards: &[Ca
     battle.card_definitions = Arc::new(response.cache);
 
     battle.cards.create_cards_in_deck(player, response.created);
+
+    legal_actions_cache::populate(battle);
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
@@ -245,7 +248,6 @@ fn draw_card_internal(
 }
 
 fn shuffle_void_into_deck(battle: &mut BattleState, player: PlayerName) {
-    battle.ability_state.has_play_from_void_ability.player_mut(player).clear();
     battle.cards.shuffle_void_into_deck(player);
 }
 

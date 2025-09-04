@@ -1,7 +1,6 @@
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
-use battle_state::battle_cards::card_set::CardSet;
 use battle_state::prompt_types::prompt_data::PromptType;
 use bit_set::BitSet;
 use core_data::types::PlayerName;
@@ -132,25 +131,9 @@ fn standard_legal_actions(
     StandardLegalActions {
         primary,
         play_card_from_hand: can_play_cards::from_hand(battle, player, fast_only),
-        play_card_from_void: if battle
-            .ability_state
-            .has_play_from_void_ability
-            .player(player)
-            .is_empty()
-        {
-            CardSet::new()
-        } else {
-            can_play_cards::from_void(battle, player, fast_only)
-        },
-        activate_abilities_for_character: if battle
-            .activated_abilities
-            .player(player)
-            .characters
-            .is_empty()
-        {
-            CardSet::new()
-        } else {
-            can_activate_abilities::for_player(battle, player, fast_only)
-        },
+        play_card_from_void: can_play_cards::from_void(battle, player, fast_only),
+        activate_abilities_for_character: can_activate_abilities::for_player(
+            battle, player, fast_only,
+        ),
     }
 }

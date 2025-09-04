@@ -13,7 +13,7 @@ use core_data::types::PlayerName;
 use crate::battle_card_queries::{card, card_properties};
 use crate::card_ability_queries::effect_queries;
 use crate::legal_action_queries::{
-    has_legal_additional_costs, has_legal_targets, legal_modal_effect_choices,
+    has_legal_additional_costs, has_legal_targets, legal_actions_cache, legal_modal_effect_choices,
 };
 use crate::panic_with;
 
@@ -35,25 +35,14 @@ pub fn from_hand(
     player: PlayerName,
     fast_only: FastOnly,
 ) -> CardSet<HandCardId> {
-    // Tested using a bitset here, but Vec is consistently faster (4% overall
-    // benchmark improvement) possibly due to better random element selection.
+    let mut candidates = legal_actions_cache::play_card_candidates(battle, player, fast_only);
+    candidates.intersect_with(battle.cards.hand(player));
+
     let mut legal_cards = CardSet::new();
-
-    for card_id in battle.cards.hand(player) {
-        // Quick check for energy cost first, since this is the most common
-        // reason for a card not being playable.
+    for card_id in &candidates {
         let energy_cost = card_properties::converted_energy_cost(battle, card_id);
-        if energy_cost > battle.players.player(player).current_energy {
-            continue;
-        }
-
-        if fast_only == FastOnly::Yes && !card_properties::is_fast(battle, card_id) {
-            continue;
-        }
-
         add_if_meets_restriction(battle, player, card_id, energy_cost, &mut legal_cards);
     }
-
     legal_cards
 }
 
@@ -81,20 +70,14 @@ pub fn from_void(
     player: PlayerName,
     fast_only: FastOnly,
 ) -> CardSet<VoidCardId> {
+    let mut candidates = legal_actions_cache::play_from_void_candidates(battle, player, fast_only);
+    candidates.intersect_with(battle.cards.void(player));
     let mut legal_cards = CardSet::new();
 
-    for card_id in battle.ability_state.has_play_from_void_ability.player(player).iter() {
+    for card_id in &candidates {
         let Some(from_void_with_cost) = can_play_from_void_energy_cost(battle, card_id) else {
             continue;
         };
-
-        if fast_only == FastOnly::Yes && !card_properties::is_fast(battle, card_id) {
-            continue;
-        }
-
-        if from_void_with_cost.cost > battle.players.player(player).current_energy {
-            continue;
-        }
 
         add_if_meets_restriction(
             battle,

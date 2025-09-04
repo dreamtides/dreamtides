@@ -4,6 +4,7 @@ use std::sync::Arc;
 use battle_mutations::card_mutations::battle_deck;
 use battle_mutations::phase_mutations::turn;
 use battle_queries::battle_card_queries::card_abilities;
+use battle_queries::legal_action_queries::legal_actions_cache;
 use battle_state::battle::all_cards::AllCards;
 use battle_state::battle::battle_card_definitions::{
     BattleCardDefinitions, BattleCardDefinitionsCard,
@@ -121,10 +122,13 @@ pub fn create_and_start(
         action_history: None,
         turn_history: TurnHistory::default(),
         request_context,
+        legal_actions_cache: Arc::new(PlayerMap::default()),
     };
 
     battle_deck::add_deck_copy(&mut battle, PlayerName::One);
     battle_deck::add_deck_copy(&mut battle, PlayerName::Two);
+
+    legal_actions_cache::populate(&mut battle);
 
     battle.status = BattleStatus::Playing;
     battle_deck::draw_cards(
