@@ -33,7 +33,7 @@ pub struct BattleCardDefinitions {
     /// "Map" of [BattleCardIdentity] to [AbilityList] for the cards in this
     /// battle.
     #[serde(skip)]
-    cache_by_identity: Vec<Arc<AbilityList>>,
+    lists_by_identity: Vec<Arc<AbilityList>>,
 
     /// "Map" of [BattleCardIdentity] to [CardDefinition] for the cards in this
     /// battle.
@@ -64,7 +64,7 @@ pub struct BattleCardDefinitionsResponse {
 
 impl BattleCardDefinitions {
     pub fn get_ability_list(&self, identity: BattleCardIdentity) -> Arc<AbilityList> {
-        self.cache_by_identity[identity.0].clone()
+        self.lists_by_identity[identity.0].clone()
     }
 
     pub fn get_definition(&self, identity: BattleCardIdentity) -> Arc<CardDefinition> {
@@ -87,7 +87,7 @@ impl BattleCardDefinitions {
         cards: Vec<BattleCardDefinitionsCard>,
     ) -> BattleCardDefinitionsResponse {
         Self::build_with_initial(
-            &self.cache_by_identity,
+            &self.lists_by_identity,
             &self.definitions_by_identity,
             &self.quest_deck_card_ids,
             cards,
@@ -128,7 +128,7 @@ impl BattleCardDefinitions {
         );
 
         BattleCardDefinitions {
-            cache_by_identity: ability_list,
+            lists_by_identity: ability_list,
             definitions_by_identity: definition_list,
             quest_deck_card_ids: definitions.quest_deck_card_ids.clone(),
         }
@@ -168,7 +168,7 @@ impl BattleCardDefinitions {
 
         BattleCardDefinitionsResponse {
             cache: BattleCardDefinitions {
-                cache_by_identity,
+                lists_by_identity: cache_by_identity,
                 definitions_by_identity,
                 quest_deck_card_ids,
             },
