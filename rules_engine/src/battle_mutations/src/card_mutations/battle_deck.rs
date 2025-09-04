@@ -15,7 +15,7 @@ use battle_state::core::effect_source::EffectSource;
 use battle_state::triggers::trigger::Trigger;
 use core_data::numerics::Energy;
 use core_data::types::PlayerName;
-use rand::seq::IteratorRandom;
+use rand::Rng;
 use rand_xoshiro::Xoshiro256PlusPlus;
 use tabula_data::card_definitions::card_definition::CardDefinition;
 
@@ -249,5 +249,11 @@ fn random_element(
     set: &CardSet<BattleDeckCardId>,
     rng: &mut Xoshiro256PlusPlus,
 ) -> Option<BattleDeckCardId> {
-    set.iter().choose(rng)
+    if set.is_empty() {
+        return None;
+    }
+
+    let len = set.len();
+    let random_index = rng.random_range(0..len);
+    set.get_at_index(random_index)
 }

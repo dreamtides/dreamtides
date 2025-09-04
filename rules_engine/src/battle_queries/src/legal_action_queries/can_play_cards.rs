@@ -4,6 +4,7 @@ use ability_data::static_ability::StandardStaticAbility;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{AbilityId, CardId, CardIdType, HandCardId, VoidCardId};
 use battle_state::battle_cards::ability_list::CanPlayRestriction;
+use battle_state::battle_cards::card_set::CardSet;
 use core_data::card_types::CardType;
 use core_data::identifiers::AbilityNumber;
 use core_data::numerics::Energy;
@@ -29,10 +30,14 @@ pub enum FastOnly {
 ///
 /// This does *not* check whether it is legal to play cards in the larger
 /// current battle state, e.g. whether it is the player's turn.
-pub fn from_hand(battle: &BattleState, player: PlayerName, fast_only: FastOnly) -> Vec<HandCardId> {
+pub fn from_hand(
+    battle: &BattleState,
+    player: PlayerName,
+    fast_only: FastOnly,
+) -> CardSet<HandCardId> {
     // Tested using a bitset here, but Vec is consistently faster (4% overall
     // benchmark improvement) possibly due to better random element selection.
-    let mut legal_cards = Vec::new();
+    let mut legal_cards = CardSet::new();
 
     for card_id in battle.cards.hand(player) {
         // Quick check for energy cost first, since this is the most common
@@ -94,7 +99,7 @@ pub fn from_void(
         let can_play_from_void =
             CanPlayFromVoid { card_id, via_ability_id: from_void_with_cost.via_ability_id };
 
-        add_if_meets_restriction(
+        add_if_meets_restriction_void(
             battle,
             player,
             can_play_from_void,
@@ -196,7 +201,34 @@ fn can_play_from_void_with_static_ability(
 }
 
 /// Adds a card to the list of legal cards if it meets the restriction.
-fn add_if_meets_restriction<TId: Into<CardId> + Copy>(
+fn add_if_meets_restriction(
+    battle: &BattleState,
+    player: PlayerName,
+    card_id: HandCardId,
+    cost: Energy,
+    legal_cards: &mut CardSet<HandCardId>,
+) {
+    let meets = match card::get(battle, card_id).can_play_restriction {
+        Some(restriction) => meets_restriction(battle, player, restriction, cost),
+        None => {
+            // No fast version of the 'can play' restriction, check all card
+            // abilities.
+            has_legal_targets::for_event(battle, player, card_id.card_id())
+                && has_legal_additional_costs::for_event(battle, player, card_id.card_id(), cost)
+                && legal_modal_effect_choices::event_has_legal_choices(
+                    battle,
+                    player,
+                    card_id.card_id(),
+                )
+        }
+    };
+
+    if meets {
+        legal_cards.insert(card_id);
+    }
+}
+
+fn add_if_meets_restriction_void<TId: Into<CardId> + Copy>(
     battle: &BattleState,
     player: PlayerName,
     to_add: TId,

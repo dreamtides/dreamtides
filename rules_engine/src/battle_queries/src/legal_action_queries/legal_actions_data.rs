@@ -56,7 +56,7 @@ pub enum LegalActions {
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct StandardLegalActions {
     pub primary: PrimaryLegalAction,
-    pub play_card_from_hand: Vec<HandCardId>,
+    pub play_card_from_hand: CardSet<HandCardId>,
     pub play_card_from_void: Vec<CanPlayFromVoid>,
     pub activate_abilities: Vec<ActivatedAbilityId>,
 }
@@ -93,7 +93,7 @@ impl LegalActions {
             BattleAction::Debug(..) => true,
             BattleAction::PlayCardFromHand(hand_card_id) => {
                 if let LegalActions::Standard { actions } = self {
-                    actions.play_card_from_hand.contains(&hand_card_id)
+                    actions.play_card_from_hand.contains(hand_card_id)
                 } else {
                     false
                 }
@@ -352,11 +352,11 @@ impl LegalActions {
                     }
                     _ => {
                         if let Some(card_id) =
-                            standard_actions.play_card_from_hand.iter().find(|&&card_id| {
+                            standard_actions.play_card_from_hand.iter().find(|&card_id| {
                                 !actions.contains(&BattleAction::PlayCardFromHand(card_id))
                             })
                         {
-                            Some(BattleAction::PlayCardFromHand(*card_id))
+                            Some(BattleAction::PlayCardFromHand(card_id))
                         } else if let Some(card_id) =
                             standard_actions.play_card_from_void.iter().find(|&&can_play| {
                                 !actions.contains(&BattleAction::PlayCardFromVoid(
@@ -494,7 +494,7 @@ impl LegalActions {
                 }
 
                 for card_id in actions.play_card_from_hand.iter() {
-                    result.push(BattleAction::PlayCardFromHand(*card_id));
+                    result.push(BattleAction::PlayCardFromHand(card_id));
                 }
 
                 for play_from_void in actions.play_card_from_void.iter() {
@@ -611,8 +611,8 @@ impl LegalActions {
                     if remaining_index < actions.play_card_from_hand.len() {
                         actions
                             .play_card_from_hand
-                            .get(remaining_index)
-                            .map(|card_id| BattleAction::PlayCardFromHand(*card_id))
+                            .get_at_index(remaining_index)
+                            .map(|card_id| BattleAction::PlayCardFromHand(card_id))
                     } else {
                         let void_index = remaining_index - actions.play_card_from_hand.len();
                         if void_index < actions.play_card_from_void.len() {
