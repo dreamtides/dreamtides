@@ -1,3 +1,5 @@
+pub mod android_logging;
+
 use std::env;
 use std::fs::File;
 use std::io::{self, Write};

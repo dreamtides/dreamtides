@@ -1,5 +1,6 @@
 #![allow(clippy::missing_safety_doc)] // You only live once, that's the motto - Drake
 
+use std::backtrace::Backtrace;
 use std::panic::{self, UnwindSafe};
 use std::path::PathBuf;
 use std::sync::LazyLock;
@@ -12,6 +13,7 @@ use display_data::request_data::{
     ConnectRequest, PerformActionRequest, PerformActionResponse, PollRequest, PollResponse,
     PollResponseType,
 };
+use logging::android_logging;
 use rules_engine::{client_logging, engine};
 use tokio::runtime::Runtime;
 
@@ -45,6 +47,9 @@ unsafe fn connect_impl(
     response: *mut u8,
     response_length: i32,
 ) -> Result<i32> {
+    println!("Connecting to plugin...");
+    android_logging::write_to_logcat("Connecting to plugin...");
+
     let request_data = unsafe { std::slice::from_raw_parts(request, request_length as usize) };
     let deserialized_request = serde_json::from_slice::<ConnectRequest>(request_data)?;
     let context = RequestContext {
@@ -54,6 +59,7 @@ unsafe fn connect_impl(
             enable_action_legality_check: true,
         },
     };
+
     logging::maybe_initialize(&context);
 
     let scene = engine::connect(&deserialized_request, context);
@@ -193,12 +199,37 @@ unsafe fn log_impl(request: *const u8, request_length: i32) -> Result<i32> {
 
 #[expect(clippy::print_stderr)]
 unsafe fn error_boundary(function: impl FnOnce() -> Result<i32> + UnwindSafe) -> i32 {
-    panic::catch_unwind(|| match function() {
+    let result = panic::catch_unwind(|| match function() {
         Ok(i) => i,
         Err(e) => {
-            eprintln!("PANIC: {e:?}");
+            let mut chain = String::new();
+            chain.push_str(&format!("{e}"));
+            let mut source_opt = e.source();
+            while let Some(src) = source_opt {
+                chain.push_str(&format!(" | caused by: {src}"));
+                source_opt = src.source();
+            }
+            android_logging::write_to_logcat(format!("ERROR: {chain}"));
+            eprintln!("ERROR: {chain}");
             -1
         }
-    })
-    .unwrap_or(-1)
+    });
+
+    match result {
+        Ok(value) => value,
+        Err(panic_payload) => {
+            let panic_msg = if let Some(s) = panic_payload.downcast_ref::<&str>() {
+                *s
+            } else if let Some(s) = panic_payload.downcast_ref::<String>() {
+                s.as_str()
+            } else {
+                "Unknown panic payload"
+            };
+            let bt = Backtrace::capture();
+            let log_msg = format!("PANIC: {panic_msg}\nBacktrace:\n{bt}");
+            android_logging::write_to_logcat(log_msg.clone());
+            eprintln!("{log_msg}");
+            -1
+        }
+    }
 }

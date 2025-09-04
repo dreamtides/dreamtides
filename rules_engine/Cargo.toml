@@ -3,6 +3,7 @@ members = ["benchmarks/*", "src/*", "tests/*"]
 resolver = "2"
 
 [workspace.dependencies]
+android_log-sys = "0.3"
 anyhow = "1"
 ariadne = "0.2"
 atomic-write-file = "0.2"
