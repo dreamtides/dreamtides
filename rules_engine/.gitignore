@@ -10,3 +10,4 @@ tarpaulin-report.html
 .claude
 *.log
 *.mm_profdata
+*.profraw

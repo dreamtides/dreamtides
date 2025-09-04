@@ -1,3 +1,25 @@
+/// Benchmark group for AI playout performance.
+///
+/// Building just this benchmark target (without running it) using Cargo:
+///
+/// ```bash
+/// # Build only this bench target
+/// cargo build --manifest-path benchmarks/battle/Cargo.toml -p battle_benchmarks --bench playout_benchmarks
+///
+/// # (Alternative) build all benchmarks in the package
+/// cargo build --manifest-path benchmarks/battle/Cargo.toml -p battle_benchmarks --benches
+///
+/// # Run only this benchmark via Criterion harness
+/// cargo bench --manifest-path benchmarks/battle/Cargo.toml -p battle_benchmarks --bench playout_benchmarks -- ai_core_11/ai_core_11
+///
+/// # With LLVM source-based coverage instrumentation (example)
+/// RUSTFLAGS="-Cinstrument-coverage -Ccodegen-units=1 -Clink-dead-code -Coverflow-checks=off" \\
+///    cargo +nightly build --release --manifest-path benchmarks/battle/Cargo.toml -p battle_benchmarks --bench playout_benchmarks
+/// ```
+///
+/// The actual bench function defined here is `ai_core_11` and is grouped under
+/// the Criterion group name `ai_core_11` inside the bench target
+/// `playout_benchmarks`.
 use std::time::Duration;
 
 use ai_agents::agent_search;

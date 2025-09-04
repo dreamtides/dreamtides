@@ -303,3 +303,6 @@ regenerate-test-battles:
 
 logcat:
     adb logcat -s dreamtides -s Unity -s CRASH
+
+most-called-functions:
+    ./rules_engine/scripts/most_called_functions.py --auto-build --benchmark ai_core_11/ai_core_11 -p battle_benchmarks --manifest-path benchmarks/battle/Cargo.toml --limit 25 --demangle  --collapse-generics
