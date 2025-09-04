@@ -1,4 +1,5 @@
 use std::collections::BTreeMap;
+use std::ops::{Index, IndexMut};
 
 use core_data::card_types::CardType;
 use core_data::numerics::{Energy, Spark};
@@ -52,26 +53,6 @@ pub struct AllCards {
 }
 
 impl AllCards {
-    /// Returns the state of a card without bounds checking.
-    ///
-    /// # Safety
-    /// Always use `card::get` in battle_queries instead of this function,
-    /// because it performs bounds checking via [Self::is_valid_card_id].
-    #[inline(always)]
-    pub unsafe fn get_card_unchecked(&self, id: CardId) -> &BattleCardState {
-        unsafe { self.cards.get_unchecked(id.0) }
-    }
-
-    /// Mutable equivalent to [Self::get_card_unchecked]
-    ///
-    /// # Safety
-    /// Always use `card::get_mut` in battle_mutations instead of this function,
-    /// because it performs bounds checking via [Self::is_valid_card_id].
-    #[inline(always)]
-    pub unsafe fn get_card_unchecked_mut(&mut self, id: CardId) -> &mut BattleCardState {
-        unsafe { self.cards.get_unchecked_mut(id.0) }
-    }
-
     /// Returns the spark value of a character.
     ///
     /// Returns None if this character is not present on the battlefield.
@@ -465,5 +446,19 @@ impl AllCards {
                 self.void.player_mut(controller).remove(VoidCardId(card_id));
             }
         }
+    }
+}
+
+impl<T: CardIdType> Index<T> for AllCards {
+    type Output = BattleCardState;
+
+    fn index(&self, index: T) -> &Self::Output {
+        &self.cards[index.card_id().0]
+    }
+}
+
+impl<T: CardIdType> IndexMut<T> for AllCards {
+    fn index_mut(&mut self, index: T) -> &mut Self::Output {
+        &mut self.cards[index.card_id().0]
     }
 }
