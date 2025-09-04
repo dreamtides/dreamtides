@@ -229,14 +229,7 @@ samply-matchup *args='':
 
 # Example: just samply-battle-benchmark ai_core_11
 samply-battle-benchmark *args='':
-    #!/bin/zsh
-    rm ./rules_engine/target/release/deps/battle_benchmarks-*
-    cargo criterion --manifest-path rules_engine/Cargo.toml --no-run
-    ALL_BENCHMARKS=`echo ./rules_engine/target/release/deps/battle_benchmarks-*`
-    echo "Found benchmark binaries" $ALL_BENCHMARKS
-    BENCHMARK=`echo ./rules_engine/target/release/deps/battle_benchmarks-*([1])`
-    echo "Running" $BENCHMARK
-    samply record $BENCHMARK --bench --profile-time 10 "$@"
+    ./rules_engine/scripts/profile_benchmark_binary.py --manifest-path benchmarks/battle/Cargo.toml --samply --package battle_benchmarks --benchmark $@
 
 @nim *args='':
     cargo run --manifest-path rules_engine/Cargo.toml --bin run_nim -- $@
