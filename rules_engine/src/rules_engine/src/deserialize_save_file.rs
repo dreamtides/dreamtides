@@ -4,7 +4,7 @@ use battle_queries::battle_card_queries::card_abilities;
 use battle_queries::battle_trace;
 use battle_state::battle::animation_data::AnimationData;
 use battle_state::battle::battle_card_definitions::BattleCardDefinitions;
-use battle_state::battle::battle_state::{BattleState, RequestContext};
+use battle_state::battle::battle_state::BattleState;
 use battle_state::battle_trace::battle_tracing::BattleTracing;
 use core_data::identifiers::QuestId;
 use database::save_file::SaveFile;
@@ -13,12 +13,8 @@ use tracing::instrument;
 
 /// Returns a deserialized [BattleState] for the battle in this save
 /// file, if one is present.
-#[instrument(name = "deserialize_save_file", level = "debug", skip(provider, file))]
-pub fn battle<P>(
-    provider: &P,
-    file: &SaveFile,
-    _request_context: RequestContext,
-) -> Option<(BattleState, QuestId)>
+#[instrument(skip_all, level = "debug")]
+pub fn battle<P>(provider: &P, file: &SaveFile) -> Option<(BattleState, QuestId)>
 where
     P: StateProvider + 'static,
 {

@@ -17,6 +17,7 @@ use display_data::request_data::{PollResponseType, RequestId};
 use serde_json;
 use tabula_data::localized_strings::LanguageId;
 use tabula_data::tabula::{self, Tabula, TabulaBuildContext, TabulaRaw};
+use tracing::instrument;
 use uuid::Uuid;
 use zip::ZipArchive;
 
@@ -214,6 +215,7 @@ impl StateProvider for DefaultStateProvider {
         Ok(())
     }
 
+    #[instrument(skip_all, level = "debug")]
     fn read_save_file(
         &self,
         user_id: UserId,
@@ -230,6 +232,7 @@ impl StateProvider for DefaultStateProvider {
         save_file_io::read_save_from_dir(&dir, user_id)
     }
 
+    #[instrument(skip_all, level = "debug")]
     fn write_save_file(&self, save: SaveFile) -> Result<(), Vec<InitializationError>> {
         let dir = {
             let guard = PERSISTENT_DATA_DIR.lock().unwrap();

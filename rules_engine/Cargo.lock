@@ -3137,6 +3137,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tabula_data",
+ "tracing",
  "uuid",
  "zip",
 ]

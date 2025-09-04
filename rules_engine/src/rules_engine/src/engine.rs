@@ -32,7 +32,7 @@ use state_provider::state_provider::{DefaultStateProvider, PollResult, StateProv
 use state_provider::test_state_provider::TestStateProvider;
 use tabula_ids::card_lists::DreamwellCardIdList;
 use tokio::task;
-use tracing::{Level, debug, error, info, warn};
+use tracing::{Level, debug, error, info, instrument, warn};
 use ui_components::display_properties;
 use uuid::Uuid;
 
@@ -231,7 +231,7 @@ fn connect_internal<P: StateProvider + 'static>(
 
     // Check if this is a multiplayer connection request
     if let Some(vs_opponent) = request.vs_opponent {
-        return connect_for_multiplayer(provider, user_id, vs_opponent, request_context);
+        return connect_for_multiplayer(provider, user_id, vs_opponent);
     } else {
         info!(?user_id, "Loading battle from database");
     }
@@ -264,13 +264,12 @@ fn connect_for_multiplayer<P: StateProvider + 'static>(
     provider: &P,
     user_id: UserId,
     vs_opponent: UserId,
-    request_context: RequestContext,
 ) -> CommandSequence {
     info!(?user_id, ?vs_opponent, "Loading multiplayer battle from opponent's database");
 
     match provider.read_save_file(vs_opponent) {
         Ok(Some(save_file)) => {
-            match deserialize_save_file::battle(provider, &save_file, request_context) {
+            match deserialize_save_file::battle(provider, &save_file) {
                 Some((battle, quest_id)) => {
                     // Check if the connecting user is already in the battle
                     if is_user_in_battle(&battle, user_id) {
@@ -311,6 +310,7 @@ enum LoadBattleResult {
     NewBattle(BattleState),
 }
 
+#[instrument(skip_all, level = "debug")]
 fn load_battle_from_provider<P: StateProvider + 'static>(
     provider: &P,
     user_id: UserId,
@@ -318,15 +318,10 @@ fn load_battle_from_provider<P: StateProvider + 'static>(
     debug_configuration: Option<&DebugConfiguration>,
 ) -> Result<LoadBattleResult, String> {
     match provider.read_save_file(user_id) {
-        Ok(Some(save_file)) => {
-            match deserialize_save_file::battle(provider, &save_file, request_context) {
-                Some((battle, quest_id)) => {
-                    // provider.clear_undo_stack(battle.id);
-                    Ok(LoadBattleResult::ExistingBattle(battle, quest_id))
-                }
-                None => Err("No battle in save file".to_string()),
-            }
-        }
+        Ok(Some(save_file)) => match deserialize_save_file::battle(provider, &save_file) {
+            Some((battle, quest_id)) => Ok(LoadBattleResult::ExistingBattle(battle, quest_id)),
+            None => Err("No battle in save file".to_string()),
+        },
         Ok(None) => {
             // No save file exists, create a new battle
             info!(?user_id, "No save file found, creating new battle");
@@ -417,6 +412,7 @@ fn save_battle_to_provider(
     provider.write_save_file(save_file).map_err(|errors| format_initialization_errors(&errors))
 }
 
+#[instrument(skip_all, level = "debug")]
 fn perform_action_internal<P: StateProvider + 'static>(
     provider: &P,
     request: &PerformActionRequest,
@@ -468,12 +464,7 @@ fn perform_action_internal<P: StateProvider + 'static>(
             }
         };
 
-        let request_context = provider
-            .get_request_context(user_id)
-            .unwrap_or(RequestContext { logging_options: Default::default() });
-        let Some((mut battle, quest_id)) =
-            deserialize_save_file::battle(provider, &save, request_context)
-        else {
+        let Some((mut battle, quest_id)) = deserialize_save_file::battle(provider, &save) else {
             show_error_message(
                 provider,
                 user_id,
@@ -541,6 +532,7 @@ fn send_updates_to_user_and_opponent<P: StateProvider + 'static>(
     }
 }
 
+#[instrument(skip_all, level = "debug")]
 fn handle_request_action<P: StateProvider + 'static>(
     provider: &P,
     request: &PerformActionRequest,

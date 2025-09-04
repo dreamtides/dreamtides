@@ -12,9 +12,10 @@ use battle_state::battle::battle_state::BattleState;
 use core_data::types::PlayerName;
 use rand::Rng;
 use rand::seq::IndexedRandom;
-use tracing::debug;
+use tracing::{debug, instrument};
 
 /// Selects an action for the given player using the given AI agent.
+#[instrument(skip_all, level = "debug")]
 pub fn select_action(battle: &BattleState, player: PlayerName, game_ai: &GameAI) -> BattleAction {
     assert_eq!(legal_actions::next_to_act(battle), Some(player));
 

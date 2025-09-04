@@ -37,7 +37,7 @@ pub fn append_update<P: StateProvider>(
     });
 }
 
-#[instrument(name = "handle_battle_action", level = "debug", skip(provider, battle, context))]
+#[instrument(skip_all, level = "debug")]
 pub fn execute<P: StateProvider + 'static>(
     provider: &P,
     battle: &mut BattleState,
