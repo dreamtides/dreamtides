@@ -19,6 +19,7 @@ tabula_data = { path = "../tabula_data" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 uuid = { workspace = true }
+zip = { workspace = true }
 
 [lints]
 workspace = true

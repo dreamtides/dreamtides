@@ -303,5 +303,4 @@ regenerate-test-battles:
     cargo run --bin core_11_battle --manifest-path rules_engine/Cargo.toml -- --output rules_engine/benchmarks/benchmark_battles/src/core_11_battle.json
 
 logcat:
-    adb logcat -c
     adb logcat -s dreamtides -s Unity -s CRASH

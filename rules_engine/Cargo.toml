@@ -51,6 +51,7 @@ tracing-forest = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 uuid = { version = "1", features = ["serde", "v4"] }
 yup-oauth2 = "12"
+zip = "4"
 
 [workspace.lints.clippy]
 #redundant_test_prefix = "deny"
