@@ -345,7 +345,6 @@ fn evaluate(battle: &mut BattleState, maximizing_player: PlayerName) -> OrderedF
         let Some(action) = legal_actions::compute(battle, player).random_action() else {
             panic_with!("No legal actions available", battle, player);
         };
-        battle.request_context.logging_options.enable_action_legality_check = false;
         apply_battle_action::execute(battle, player, action);
 
         // I've tried aborting early here and using heuristics to evaluate the

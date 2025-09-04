@@ -35,18 +35,21 @@ fn put_cards_from_deck_into_void_with_small_deck() {
 
     s.create_and_play(DisplayPlayer::User, test_card::TEST_DECK_TO_VOID);
 
-    // Should still put 3 deck cards + 1 event card into void after adding new deck
-    // copy
+    let final_void_size = s.user_client.cards.user_void().len();
+
+    // Under new rules: void cards shuffle into deck when deck runs out, then 3
+    // cards + 1 event card go to void The net effect is we get 4 cards in void
+    // (3 from deck + 1 event card)
     assert_eq!(
-        s.user_client.cards.user_void().len(),
-        initial_void_size + 4,
-        "Should put 3 deck cards + 1 event card into void even with small initial deck"
+        final_void_size, 4,
+        "Should have 4 cards in void (3 deck cards plus 1 event card). Initial void: {}, Final void: {}",
+        initial_void_size, final_void_size
     );
 
-    // Deck should be refilled
+    // Deck should have cards remaining after shuffle
     assert!(
         !s.user_client.cards.user_deck().is_empty(),
-        "Deck should be refilled when not enough cards available"
+        "Deck should have cards remaining after shuffle and move"
     );
 }
 
@@ -60,20 +63,22 @@ fn put_cards_from_deck_into_void_with_empty_deck() {
         cards: 0,
     });
 
-    let initial_void_size = s.user_client.cards.user_void().len();
-
     s.create_and_play(DisplayPlayer::User, test_card::TEST_DECK_TO_VOID);
 
-    // Should create new deck copy and put 3 deck cards + 1 event card into void
+    // Under new rules: when deck is empty, void shuffles into deck first
+    // Starting: deck=0, void=32 (from SetCardsRemainingInDeck)
+    // Deck empty, so void shuffles into deck: deck=32, void=0
+    // Move 3 cards from deck to void: deck=29, void=3
+    // Event card goes to void: deck=29, void=4
+    // Net result: void should have 4 cards
     assert_eq!(
         s.user_client.cards.user_void().len(),
-        initial_void_size + 4,
-        "Should put 3 deck cards + 1 event card into void even when starting with empty deck"
+        4,
+        "Should have 4 cards in void (3 deck cards plus 1 event card after void shuffled into deck)"
     );
 
-    assert!(!s.user_client.cards.user_deck().is_empty(), "Deck should be refilled when empty");
+    assert!(!s.user_client.cards.user_deck().is_empty(), "Deck should have cards after shuffle");
 }
-
 #[test]
 fn cards_moved_to_void_are_visible() {
     let mut s = TestBattle::builder().connect();

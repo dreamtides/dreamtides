@@ -56,7 +56,7 @@ pub fn draw_cards(battle: &mut BattleState, source: EffectSource, player: Player
         }
         // Ensure void cards are shuffled into deck for animation purposes
         while snapshot.cards.all_deck_cards(player).count() < count as usize {
-            snapshot.cards.shuffle_void_into_deck(player);
+            shuffle_void_into_deck(&mut snapshot, player);
         }
         Some(snapshot)
     } else {
@@ -166,7 +166,7 @@ pub fn realize_top_of_deck(
             // Deck is empty, try to shuffle void back into deck
             if !battle.cards.void(player).is_empty() {
                 battle_trace!("Shuffling void into deck for realize_top_of_deck", battle, player);
-                battle.cards.shuffle_void_into_deck(player);
+                shuffle_void_into_deck(battle, player);
                 if let Some(card_id) =
                     random_element(battle.cards.shuffled_into_deck(player), &mut battle.rng)
                 {
@@ -224,7 +224,7 @@ fn draw_card_internal(
         // Deck is empty, try to shuffle void back into deck
         if !battle.cards.void(player).is_empty() {
             battle_trace!("Shuffling void into deck", battle, player);
-            battle.cards.shuffle_void_into_deck(player);
+            shuffle_void_into_deck(battle, player);
             battle.triggers.push(source, Trigger::DrewAllCardsInCopyOfDeck(player));
             return draw_card_internal(battle, source, player, with_animation);
         } else {
@@ -242,6 +242,11 @@ fn draw_card_internal(
     }
 
     Some(move_card::from_deck_to_hand(battle, source, player, id))
+}
+
+fn shuffle_void_into_deck(battle: &mut BattleState, player: PlayerName) {
+    battle.ability_state.has_play_from_void_ability.player_mut(player).clear();
+    battle.cards.shuffle_void_into_deck(player);
 }
 
 /// Returns a random element from the given set.

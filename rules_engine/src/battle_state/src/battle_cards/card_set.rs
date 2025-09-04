@@ -245,7 +245,7 @@ impl<T: CardIdType> CardSet<T> {
                 return Some(T::from_card_id(CardId(pos)));
             }
 
-            // Clear the lowest set bit using bit manipulation trick
+            // Clear the lowest set bit
             remaining_bits &= remaining_bits - 1;
             current_index += 1;
         }

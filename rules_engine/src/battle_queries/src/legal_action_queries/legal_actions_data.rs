@@ -612,7 +612,7 @@ impl LegalActions {
                         actions
                             .play_card_from_hand
                             .get_at_index(remaining_index)
-                            .map(|card_id| BattleAction::PlayCardFromHand(card_id))
+                            .map(BattleAction::PlayCardFromHand)
                     } else {
                         let void_index = remaining_index - actions.play_card_from_hand.len();
                         if void_index < actions.play_card_from_void.len() {

@@ -97,13 +97,19 @@ impl AllCards {
         self.shuffled_into_decks.player_mut(player)
     }
 
-    /// Fast operation to move all cards from a player's void to their deck.
-    ///
-    /// This efficiently combines the void cards with the existing deck cards.
+    /// Move all cards from a player's void to their deck.
     pub fn shuffle_void_into_deck(&mut self, player: PlayerName) {
         let void_cards = std::mem::take(self.void.player_mut(player));
-        let deck_cards = void_cards.reinterpret_as::<BattleDeckCardId>();
-        self.shuffled_into_decks.player_mut(player).union_with(&deck_cards);
+        let new_cards = void_cards.reinterpret_as::<BattleDeckCardId>();
+
+        for card_id in new_cards.iter() {
+            let new_object_id = self.new_object_id();
+            let state = &mut self.cards[card_id.card_id().0];
+            state.object_id = new_object_id;
+            state.revealed_to_player_override = PlayerMap::default();
+        }
+
+        self.shuffled_into_decks.player_mut(player).union_with(&new_cards);
     }
 
     /// Returns the top of deck cards for a given player.

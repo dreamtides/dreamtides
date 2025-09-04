@@ -229,9 +229,9 @@ fn to_destination_zone(
     mut new: Zone,
 ) {
     let card_id = id.card_id();
-    // if !battle.cards.contains_card(controller, card_id, old) {
-    //     panic_card_not_found(battle, controller, card_id, old, new);
-    // }
+    if !battle.cards.contains_card(controller, card_id, old) {
+        panic_card_not_found(battle, controller, card_id, old, new);
+    }
 
     match old {
         Zone::Stack => on_leave_stack(battle, card_id, &mut new),
