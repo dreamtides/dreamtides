@@ -91,14 +91,14 @@ fn revealed_card_view(builder: &ResponseBuilder, context: &CardViewContext) -> R
     RevealedCardView {
         image: DisplayImage::Sprite(card_image(battle, card_id)),
         name: card_name(battle, card_id),
-        cost: if card_properties::base_energy_cost_for_id(battle, card_id).is_some() {
+        cost: if card_properties::base_energy_cost(battle, card_id).is_some() {
             Some(card_properties::converted_energy_cost(battle, card_id).to_string())
         } else {
             Some(format!("<size=50%>{}</size>", builder.string(string_id::ASTERISK_ICON)))
         },
         produced: None,
         spark: card_properties::spark(battle, controller, CharacterId(card_id))
-            .or_else(|| card_properties::base_spark_for_id(battle, card_id))
+            .or_else(|| card_properties::base_spark(battle, card_id))
             .map(|spark| spark.to_string()),
         card_type: card_type(builder, battle, card_id),
         rules_text: rules_text(builder, battle, card_id),

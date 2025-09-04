@@ -10,11 +10,13 @@ use crate::battle_card_queries::card;
 ///
 /// Cards may not have an energy cost due to their card type (e.g. dreamwell
 /// cards) or may not have a cost due to their ability (e.g. modal cards).
+#[inline(always)]
 pub fn converted_energy_cost(battle: &BattleState, card_id: impl CardIdType) -> Energy {
-    base_energy_cost_for_id(battle, card_id).unwrap_or_default()
+    base_energy_cost(battle, card_id).unwrap_or_default()
 }
 
-pub fn base_energy_cost_for_id(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
+#[inline(always)]
+pub fn base_energy_cost(battle: &BattleState, card_id: impl CardIdType) -> Option<Energy> {
     card::get(battle, card_id).base_energy_cost
 }
 
@@ -27,7 +29,7 @@ pub fn spark(battle: &BattleState, controller: PlayerName, id: CharacterId) -> O
     battle.cards.spark(controller, id)
 }
 
-pub fn base_spark_for_id(battle: &BattleState, card_id: impl CardIdType) -> Option<Spark> {
+pub fn base_spark(battle: &BattleState, card_id: impl CardIdType) -> Option<Spark> {
     card::get(battle, card_id).base_spark
 }
 

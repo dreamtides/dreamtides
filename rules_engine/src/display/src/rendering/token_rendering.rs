@@ -304,7 +304,7 @@ fn void_card_token_view(
                     .unwrap_or_else(|| format!("<size=50%>{}</size>", icon::NON_NUMERIC)),
             )
             .maybe_spark(
-                card_properties::base_spark_for_id(battle, card_id).map(|spark| spark.to_string()),
+                card_properties::base_spark(battle, card_id).map(|spark| spark.to_string()),
             )
             .rules_text(card_rendering::rules_text(builder, battle, card_id))
             .create_position(ObjectPosition {

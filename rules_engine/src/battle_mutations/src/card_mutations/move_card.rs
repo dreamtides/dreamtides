@@ -263,7 +263,7 @@ fn on_enter_battlefield(
     }
 
     let id = CharacterId(card_id);
-    let Some(spark) = card_properties::base_spark_for_id(battle, id) else {
+    let Some(spark) = card_properties::base_spark(battle, id) else {
         panic_no_base_spark(battle, id);
     };
     battle.cards.battlefield_state_mut(controller).insert(id, CharacterState { spark });
