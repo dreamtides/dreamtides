@@ -322,7 +322,7 @@ fn is_on_stack_from_void(battle: &BattleState, card_id: CardId) -> bool {
                 .iter()
                 .rev()
                 .find_map(|history_action| match &history_action.action {
-                    BattleAction::PlayCardFromVoid(void_card_id, _)
+                    BattleAction::PlayCardFromVoid(void_card_id)
                         if void_card_id.card_id() == card_id =>
                     {
                         Some(true)

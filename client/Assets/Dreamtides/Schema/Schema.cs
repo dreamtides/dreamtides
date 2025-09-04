@@ -854,7 +854,7 @@ namespace Dreamtides.Schema
     ///
     /// Play a card in the user's hand using the standard play action.
     ///
-    /// Play a card in the user's void using the given ability.
+    /// Play a card in the user's void using the lowest-cost ability.
     ///
     /// Activate a character's ability.
     ///
@@ -883,7 +883,7 @@ namespace Dreamtides.Schema
         public long? PlayCardFromHand { get; set; }
 
         [JsonProperty("PlayCardFromVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public List<PlayCardFromVoid> PlayCardFromVoid { get; set; }
+        public long? PlayCardFromVoid { get; set; }
 
         [JsonProperty("ActivateAbility", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public ActivatedAbilityId ActivateAbility { get; set; }
@@ -1086,18 +1086,6 @@ namespace Dreamtides.Schema
 
         [JsonProperty("spark", Required = Required.Always)]
         public long Spark { get; set; }
-    }
-
-    /// <summary>
-    /// Identifies an ability of a card.
-    /// </summary>
-    public partial class AbilityId
-    {
-        [JsonProperty("ability_number", Required = Required.Always)]
-        public long AbilityNumber { get; set; }
-
-        [JsonProperty("card_id", Required = Required.Always)]
-        public long CardId { get; set; }
     }
 
     public partial class DeckCardSelectedOrder
@@ -2503,15 +2491,6 @@ namespace Dreamtides.Schema
         public static implicit operator DebugBattleAction(DebugBattleActionEnum Enum) => new DebugBattleAction { Enum = Enum };
     }
 
-    public partial struct PlayCardFromVoid
-    {
-        public AbilityId AbilityId;
-        public long? Integer;
-
-        public static implicit operator PlayCardFromVoid(AbilityId AbilityId) => new PlayCardFromVoid { AbilityId = AbilityId };
-        public static implicit operator PlayCardFromVoid(long Integer) => new PlayCardFromVoid { Integer = Integer };
-    }
-
     public partial struct CardOrderSelectionTarget
     {
         public CardOrderSelectionTargetClass CardOrderSelectionTargetClass;
@@ -2638,7 +2617,6 @@ namespace Dreamtides.Schema
                 DebugBattleActionConverter.Singleton,
                 PlayerNameConverter.Singleton,
                 DebugBattleActionEnumConverter.Singleton,
-                PlayCardFromVoidConverter.Singleton,
                 CardOrderSelectionTargetConverter.Singleton,
                 CardOrderSelectionTargetEnumConverter.Singleton,
                 BattleActionEnumConverter.Singleton,
@@ -3699,43 +3677,6 @@ namespace Dreamtides.Schema
         }
 
         public static readonly DebugBattleActionEnumConverter Singleton = new DebugBattleActionEnumConverter();
-    }
-
-    internal class PlayCardFromVoidConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(PlayCardFromVoid) || t == typeof(PlayCardFromVoid?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            switch (reader.TokenType)
-            {
-                case JsonToken.Integer:
-                    var integerValue = serializer.Deserialize<long>(reader);
-                    return new PlayCardFromVoid { Integer = integerValue };
-                case JsonToken.StartObject:
-                    var objectValue = serializer.Deserialize<AbilityId>(reader);
-                    return new PlayCardFromVoid { AbilityId = objectValue };
-            }
-            throw new Exception("Cannot unmarshal type PlayCardFromVoid");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            var value = (PlayCardFromVoid)untypedValue;
-            if (value.Integer != null)
-            {
-                serializer.Serialize(writer, value.Integer.Value);
-                return;
-            }
-            if (value.AbilityId != null)
-            {
-                serializer.Serialize(writer, value.AbilityId);
-                return;
-            }
-            throw new Exception("Cannot marshal type PlayCardFromVoid");
-        }
-
-        public static readonly PlayCardFromVoidConverter Singleton = new PlayCardFromVoidConverter();
     }
 
     internal class CardOrderSelectionTargetConverter : JsonConverter

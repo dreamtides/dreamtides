@@ -281,9 +281,8 @@ fn void_card_token_view(
     let card_id = void_card_id.card_id();
     let from_void_with_cost = can_play_cards::can_play_from_void_energy_cost(battle, void_card_id);
     let legal_actions = legal_actions::compute(battle, builder.act_for_player());
-    let play_action = if let Some(from_void_with_cost) = from_void_with_cost {
-        let action =
-            BattleAction::PlayCardFromVoid(void_card_id, from_void_with_cost.via_ability_id);
+    let play_action = if from_void_with_cost.is_some() {
+        let action = BattleAction::PlayCardFromVoid(void_card_id);
         if legal_actions.contains(action, ForPlayer::Human) { Some(action) } else { None }
     } else {
         None

@@ -1,6 +1,7 @@
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
 use battle_state::battle::battle_turn_phase::BattleTurnPhase;
+use battle_state::battle_cards::card_set::CardSet;
 use battle_state::prompt_types::prompt_data::PromptType;
 use bit_set::BitSet;
 use core_data::types::PlayerName;
@@ -134,7 +135,7 @@ fn standard_legal_actions(
             .player(player)
             .is_empty()
         {
-            vec![]
+            CardSet::new()
         } else {
             can_play_cards::from_void(battle, player, fast_only)
         },

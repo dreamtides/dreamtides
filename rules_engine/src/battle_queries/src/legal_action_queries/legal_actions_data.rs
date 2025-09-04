@@ -11,8 +11,6 @@ use bit_set::BitSet;
 use core_data::numerics::Energy;
 use fastrand;
 
-use crate::legal_action_queries::can_play_cards::CanPlayFromVoid;
-
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum LegalActions {
     NoActionsGameOver,
@@ -57,7 +55,7 @@ pub enum LegalActions {
 pub struct StandardLegalActions {
     pub primary: PrimaryLegalAction,
     pub play_card_from_hand: CardSet<HandCardId>,
-    pub play_card_from_void: Vec<CanPlayFromVoid>,
+    pub play_card_from_void: CardSet<VoidCardId>,
     pub activate_abilities: Vec<ActivatedAbilityId>,
 }
 
@@ -98,12 +96,9 @@ impl LegalActions {
                     false
                 }
             }
-            BattleAction::PlayCardFromVoid(void_card_id, ability_id) => {
+            BattleAction::PlayCardFromVoid(void_card_id) => {
                 if let LegalActions::Standard { actions } = self {
-                    actions.play_card_from_void.contains(&CanPlayFromVoid {
-                        card_id: void_card_id,
-                        via_ability_id: ability_id,
-                    })
+                    actions.play_card_from_void.contains(void_card_id)
                 } else {
                     false
                 }
@@ -358,17 +353,11 @@ impl LegalActions {
                         {
                             Some(BattleAction::PlayCardFromHand(card_id))
                         } else if let Some(card_id) =
-                            standard_actions.play_card_from_void.iter().find(|&&can_play| {
-                                !actions.contains(&BattleAction::PlayCardFromVoid(
-                                    can_play.card_id,
-                                    can_play.via_ability_id,
-                                ))
+                            standard_actions.play_card_from_void.iter().find(|&card_id| {
+                                !actions.contains(&BattleAction::PlayCardFromVoid(card_id))
                             })
                         {
-                            Some(BattleAction::PlayCardFromVoid(
-                                card_id.card_id,
-                                card_id.via_ability_id,
-                            ))
+                            Some(BattleAction::PlayCardFromVoid(card_id))
                         } else {
                             standard_actions
                                 .activate_abilities
@@ -497,11 +486,8 @@ impl LegalActions {
                     result.push(BattleAction::PlayCardFromHand(card_id));
                 }
 
-                for play_from_void in actions.play_card_from_void.iter() {
-                    result.push(BattleAction::PlayCardFromVoid(
-                        play_from_void.card_id,
-                        play_from_void.via_ability_id,
-                    ));
+                for card_id in actions.play_card_from_void.iter() {
+                    result.push(BattleAction::PlayCardFromVoid(card_id));
                 }
 
                 for ability in actions.activate_abilities.iter() {
@@ -616,12 +602,10 @@ impl LegalActions {
                     } else {
                         let void_index = remaining_index - actions.play_card_from_hand.len();
                         if void_index < actions.play_card_from_void.len() {
-                            actions.play_card_from_void.get(void_index).map(|can_play| {
-                                BattleAction::PlayCardFromVoid(
-                                    can_play.card_id,
-                                    can_play.via_ability_id,
-                                )
-                            })
+                            actions
+                                .play_card_from_void
+                                .get_at_index(void_index)
+                                .map(BattleAction::PlayCardFromVoid)
                         } else {
                             let ability_index = void_index - actions.play_card_from_void.len();
                             actions

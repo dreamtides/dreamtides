@@ -2,6 +2,7 @@ use ability_data::effect::ModelEffectChoiceIndex;
 use ability_data::static_ability::StandardStaticAbility;
 use battle_queries::battle_card_queries::{card, card_properties};
 use battle_queries::legal_action_queries::can_play_cards;
+use battle_queries::panic_with;
 use battle_state::battle::battle_animation_data::BattleAnimation;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{AbilityId, CardIdType, HandCardId, StackCardId, VoidCardId};
@@ -45,12 +46,13 @@ pub fn from_hand(battle: &mut BattleState, player: PlayerName, card_id: HandCard
 
 /// Plays a card from the void to the stack as `player` by paying its costs. If
 /// the card requires targets or choices, a prompt will be displayed.
-pub fn from_void(
-    battle: &mut BattleState,
-    player: PlayerName,
-    card_id: VoidCardId,
-    via_ability: AbilityId,
-) {
+pub fn from_void(battle: &mut BattleState, player: PlayerName, card_id: VoidCardId) {
+    let from_void_with_cost = match can_play_cards::can_play_from_void_energy_cost(battle, card_id)
+    {
+        Some(cost) => cost,
+        None => panic_with!("Card cannot be played from void", battle, card_id),
+    };
+    let via_ability = from_void_with_cost.via_ability_id;
     let source = EffectSource::Player { controller: player };
     battle.push_animation(source, || BattleAnimation::PlayCard {
         player,
@@ -58,12 +60,7 @@ pub fn from_void(
         from_zone: Zone::Void,
     });
 
-    energy::spend(
-        battle,
-        player,
-        source,
-        can_play_cards::play_from_void_energy_cost(battle, card_id, via_ability),
-    );
+    energy::spend(battle, player, source, from_void_with_cost.cost);
 
     let stack_card_id = move_card::from_void_to_stack(battle, source, player, card_id);
 

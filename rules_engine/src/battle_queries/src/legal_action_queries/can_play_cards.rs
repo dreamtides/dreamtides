@@ -80,8 +80,8 @@ pub fn from_void(
     battle: &BattleState,
     player: PlayerName,
     fast_only: FastOnly,
-) -> Vec<CanPlayFromVoid> {
-    let mut legal_cards = Vec::new();
+) -> CardSet<VoidCardId> {
+    let mut legal_cards = CardSet::new();
 
     for card_id in battle.ability_state.has_play_from_void_ability.player(player).iter() {
         let Some(from_void_with_cost) = can_play_from_void_energy_cost(battle, card_id) else {
@@ -96,13 +96,10 @@ pub fn from_void(
             continue;
         }
 
-        let can_play_from_void =
-            CanPlayFromVoid { card_id, via_ability_id: from_void_with_cost.via_ability_id };
-
-        add_if_meets_restriction_void(
+        add_if_meets_restriction(
             battle,
             player,
-            can_play_from_void,
+            card_id,
             from_void_with_cost.cost,
             &mut legal_cards,
         );
@@ -200,60 +197,40 @@ fn can_play_from_void_with_static_ability(
     }
 }
 
-/// Adds a card to the list of legal cards if it meets the restriction.
-fn add_if_meets_restriction(
+/// Adds a card to the collection of legal cards if it meets the restriction.
+fn add_if_meets_restriction<TId>(
     battle: &BattleState,
     player: PlayerName,
-    card_id: HandCardId,
+    card_id: TId,
     cost: Energy,
-    legal_cards: &mut CardSet<HandCardId>,
-) {
-    let meets = match card::get(battle, card_id).can_play_restriction {
+    legal_cards: &mut CardSet<TId>,
+) where
+    TId: Into<CardId> + Copy + CardIdType,
+{
+    let card_id_generic: CardId = card_id.into();
+
+    let meets = match card::get(battle, card_id_generic).can_play_restriction {
         Some(restriction) => meets_restriction(battle, player, restriction, cost),
         None => {
             // No fast version of the 'can play' restriction, check all card
             // abilities.
-            has_legal_targets::for_event(battle, player, card_id.card_id())
-                && has_legal_additional_costs::for_event(battle, player, card_id.card_id(), cost)
+            has_legal_targets::for_event(battle, player, card_id_generic.card_id())
+                && has_legal_additional_costs::for_event(
+                    battle,
+                    player,
+                    card_id_generic.card_id(),
+                    cost,
+                )
                 && legal_modal_effect_choices::event_has_legal_choices(
                     battle,
                     player,
-                    card_id.card_id(),
+                    card_id_generic.card_id(),
                 )
         }
     };
 
     if meets {
         legal_cards.insert(card_id);
-    }
-}
-
-fn add_if_meets_restriction_void<TId: Into<CardId> + Copy>(
-    battle: &BattleState,
-    player: PlayerName,
-    to_add: TId,
-    cost: Energy,
-    legal_cards: &mut Vec<TId>,
-) {
-    let card_id = to_add.into();
-
-    let meets = match card::get(battle, card_id).can_play_restriction {
-        Some(restriction) => meets_restriction(battle, player, restriction, cost),
-        None => {
-            // No fast version of the 'can play' restriction, check all card
-            // abilities.
-            has_legal_targets::for_event(battle, player, card_id.card_id())
-                && has_legal_additional_costs::for_event(battle, player, card_id.card_id(), cost)
-                && legal_modal_effect_choices::event_has_legal_choices(
-                    battle,
-                    player,
-                    card_id.card_id(),
-                )
-        }
-    };
-
-    if meets {
-        legal_cards.push(to_add);
     }
 }
 
