@@ -5,6 +5,7 @@ use core_data::display_types::{
     StudioAnimation,
 };
 use core_data::numerics::{Energy, Points};
+use masonry::flex_node::FlexNode;
 use masonry::flex_style::FlexVector3;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -76,6 +77,7 @@ pub enum Command {
     PlayStudioAnimation(PlayStudioAnimationCommand),
     SetCardTrail(SetCardTrailCommand),
     ShuffleVoidIntoDeck(ShuffleVoidIntoDeckCommand),
+    UpdateScreenOverlay(Box<UpdateScreenOverlayCommand>),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -284,6 +286,12 @@ pub struct SetCardTrailCommand {
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ShuffleVoidIntoDeckCommand {
     pub player: DisplayPlayer,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct UpdateScreenOverlayCommand {
+    /// New screen overlay to set. If None clears the current overlay.
+    pub screen_overlay: Option<FlexNode>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Eq, PartialEq)]

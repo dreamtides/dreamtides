@@ -277,7 +277,7 @@ impl<T: CardIdType> CardSet<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::battle::card_id::CharacterId;
+    use crate::battle::card_id::{CharacterId, HandCardId};
 
     // Helper function to create a test CardId
     fn test_card_id(id: usize) -> CharacterId {
@@ -488,11 +488,11 @@ mod tests {
         char_set.insert(test_card_id(42));
 
         // Reinterpret as a different card type (they share the same underlying CardId)
-        let hand_set: CardSet<crate::battle::card_id::HandCardId> = char_set.reinterpret_as();
+        let hand_set: CardSet<HandCardId> = char_set.reinterpret_as();
 
         // Should maintain the same bits and functionality
         assert_eq!(hand_set.len(), 1);
-        assert!(hand_set.contains(crate::battle::card_id::HandCardId(CardId(42))));
+        assert!(hand_set.contains(HandCardId(CardId(42))));
     }
 
     #[test]

@@ -84,7 +84,7 @@ pub fn connect_with_provider(
     });
     let commands = match result {
         Ok(commands) => commands,
-        Err(error) => error_message::display_error_message(None, &provider, error),
+        Err(error) => error_message::display_error_message(error),
     };
 
     let response_version = Uuid::new_v4();
@@ -144,6 +144,22 @@ pub fn perform_action(request: PerformActionRequest) {
     let request_id = request.metadata.request_id;
     let user_id = request.metadata.user_id;
 
+    if let Some(initialization_error) = DefaultStateProvider.stored_initialization_error() {
+        let provider = DefaultStateProvider;
+        provider.store_request_timestamp(request_id, Instant::now());
+        task::spawn_blocking(move || {
+            handle_battle_action::append_update(
+                &provider,
+                user_id,
+                error_message::display_error_message(initialization_error),
+                &RequestContext { logging_options: Default::default() },
+                None,
+                PollResponseType::Final,
+            );
+        });
+        return;
+    }
+
     if let Some(integration_test_id) = request.metadata.integration_test_id {
         debug!(?integration_test_id, "Performing action for integration test");
         let provider = get_test_state_provider(integration_test_id);
@@ -174,6 +190,12 @@ pub fn perform_action_blocking(
     request: PerformActionRequest,
     enemy_id: Option<UserId>,
 ) -> PerformActionBlockingResult {
+    if let Some(_err) = provider.stored_initialization_error() {
+        return PerformActionBlockingResult {
+            user_poll_results: vec![],
+            enemy_poll_results: vec![],
+        };
+    }
     let user_id = request.metadata.user_id;
 
     let processing_started = perform_action_internal(&provider, &request);
@@ -222,11 +244,7 @@ fn connect_internal<P: StateProvider + 'static>(
 
     debug!(">>> Initializing provider with persistent data path: {:?}", persistent_data_path);
     if let Err(errors) = provider.initialize(persistent_data_path, streaming_assets_path) {
-        return error_message::display_error_message(
-            None,
-            provider,
-            format_initialization_errors(&errors),
-        );
+        return error_message::display_error_message(format_initialization_errors(&errors));
     }
 
     // Check if this is a multiplayer connection request
@@ -252,7 +270,7 @@ fn connect_internal<P: StateProvider + 'static>(
         Ok(LoadBattleResult::NewBattle(battle)) => {
             renderer::connect(&battle, user_id, (*provider).clone(), false)
         }
-        Err(error) => error_message::display_error_message(None, provider, error),
+        Err(error) => error_message::display_error_message(error),
     }
 }
 
@@ -286,22 +304,14 @@ fn connect_for_multiplayer<P: StateProvider + 'static>(
                     )
                 }
                 None => error_message::display_error_message(
-                    None,
-                    provider,
                     "No battle found in opponent's save file".to_string(),
                 ),
             }
         }
-        Ok(None) => error_message::display_error_message(
-            None,
-            provider,
-            format!("No save file found for opponent ID: {vs_opponent:?}"),
-        ),
-        Err(errors) => error_message::display_error_message(
-            None,
-            provider,
-            format_initialization_errors(&errors),
-        ),
+        Ok(None) => error_message::display_error_message(format!(
+            "No save file found for opponent ID: {vs_opponent:?}"
+        )),
+        Err(errors) => error_message::display_error_message(format_initialization_errors(&errors)),
     }
 }
 
@@ -398,7 +408,7 @@ fn handle_user_not_in_battle<P: StateProvider + 'static>(
     let save_user_id = vs_opponent.unwrap_or(user_id);
     match save_battle_to_provider(provider, save_user_id, quest_id, &battle) {
         Ok(_) => renderer::connect(&battle, user_id, (*provider).clone(), false),
-        Err(error) => error_message::display_error_message(None, provider, error),
+        Err(error) => error_message::display_error_message(error),
     }
 }
 
@@ -455,11 +465,11 @@ fn perform_action_internal<P: StateProvider + 'static>(
                 } else {
                     format!("No save file found for user_id: {user_id:?}")
                 };
-                show_error_message(provider, user_id, None, error_msg);
+                show_error_message(provider, user_id, error_msg);
                 return;
             }
             Err(errors) => {
-                show_error_message(provider, user_id, None, format_initialization_errors(&errors));
+                show_error_message(provider, user_id, format_initialization_errors(&errors));
                 return;
             }
         };
@@ -468,7 +478,6 @@ fn perform_action_internal<P: StateProvider + 'static>(
             show_error_message(
                 provider,
                 user_id,
-                None,
                 format!("No battle found for save_file_id: {save_file_id:?}"),
             );
             return;
@@ -483,14 +492,13 @@ fn perform_action_internal<P: StateProvider + 'static>(
             show_error_message(
                 provider,
                 user_id,
-                Some(&battle),
                 format!("Failed to save battle: {}", format_initialization_errors(&errors)),
             );
         }
     });
 
     if let Err(error) = result {
-        show_error_message(provider, user_id, None, error);
+        show_error_message(provider, user_id, error);
     }
 
     true
@@ -609,7 +617,6 @@ fn handle_request_action<P: StateProvider + 'static>(
                 show_error_message(
                     provider,
                     user_id,
-                    None,
                     "Failed to undo: Battle state not found.".to_string(),
                 );
             }
@@ -628,7 +635,6 @@ fn get_test_state_provider(integration_test_id: Uuid) -> TestStateProvider {
 fn show_error_message<P: StateProvider + 'static>(
     provider: &P,
     user_id: UserId,
-    battle: Option<&BattleState>,
     error_message: String,
 ) {
     error!("Error in engine: {error_message}");
@@ -643,7 +649,7 @@ fn show_error_message<P: StateProvider + 'static>(
     handle_battle_action::append_update(
         provider,
         user_id,
-        error_message::display_error_message(battle, provider, error_message),
+        error_message::display_error_message(error_message),
         &request_context,
         None,
         PollResponseType::Final,

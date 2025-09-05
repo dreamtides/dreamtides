@@ -102,6 +102,11 @@ impl TestClient {
                     Command::PlayStudioAnimation(_) => {}
                     Command::SetCardTrail(_) => {}
                     Command::ShuffleVoidIntoDeck(_) => {}
+                    Command::UpdateScreenOverlay(overlay) => {
+                        if let Some(interface) = self.interface.view.as_mut() {
+                            interface.screen_overlay = overlay.screen_overlay;
+                        }
+                    }
                 }
             }
         }

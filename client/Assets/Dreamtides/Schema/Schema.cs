@@ -294,6 +294,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("ShuffleVoidIntoDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public ShuffleVoidIntoDeckCommand ShuffleVoidIntoDeck { get; set; }
+
+        [JsonProperty("UpdateScreenOverlay", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public UpdateScreenOverlayCommand UpdateScreenOverlay { get; set; }
     }
 
     public partial class DisplayDreamwellActivationCommand
@@ -2214,6 +2217,15 @@ namespace Dreamtides.Schema
     {
         [JsonProperty("Active", Required = Required.Always)]
         public BattlePreviewView Active { get; set; }
+    }
+
+    public partial class UpdateScreenOverlayCommand
+    {
+        /// <summary>
+        /// New screen overlay to set. If None clears the current overlay.
+        /// </summary>
+        [JsonProperty("screen_overlay")]
+        public FlexNode ScreenOverlay { get; set; }
     }
 
     public partial class PerformActionRequest

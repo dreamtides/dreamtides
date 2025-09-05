@@ -601,6 +601,12 @@ namespace Dreamtides.Services
           coroutines.Add(StartCoroutine(
               Registry.CardService.HandleShuffleVoidIntoDeck(command.ShuffleVoidIntoDeck)));
         }
+
+        if (command.UpdateScreenOverlay != null)
+        {
+          Registry.LoggingService.Log("ActionService", "Applying command: UpdateScreenOverlay");
+          Registry.DocumentService.RenderScreenOverlay(command.UpdateScreenOverlay.ScreenOverlay);
+        }
       }
 
       foreach (var coroutine in coroutines)

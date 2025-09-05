@@ -80,6 +80,12 @@ pub trait StateProvider:
     fn should_panic_on_error(&self) -> bool {
         false
     }
+
+    fn stored_initialization_error(&self) -> Option<String> {
+        None
+    }
+
+    fn set_initialization_error(&self, _error: String) {}
 }
 
 static REQUEST_CONTEXTS: LazyLock<Mutex<HashMap<UserId, RequestContext>>> =
@@ -90,6 +96,8 @@ static REQUEST_TIMESTAMPS: LazyLock<Mutex<HashMap<Option<Uuid>, Instant>>> =
 
 static LAST_RESPONSE_VERSIONS: LazyLock<Mutex<HashMap<UserId, Uuid>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
+
+static INITIALIZATION_ERROR: LazyLock<Mutex<Option<String>>> = LazyLock::new(|| Mutex::new(None));
 
 #[derive(Clone)]
 struct UndoEntry {
@@ -222,10 +230,22 @@ impl StateProvider for DefaultStateProvider {
         *dir_guard = Some(PathBuf::from(persistent_data_path));
         let tabula_path = format!("{streaming_assets_path}/tabula.json");
         let ctx = TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates };
-        let raw: TabulaRaw = load_tabula_raw(&tabula_path)?;
+        let raw: TabulaRaw = match load_tabula_raw(&tabula_path) {
+            Ok(r) => r,
+            Err(e) => {
+                let formatted = e.iter().map(|e| e.format()).collect::<Vec<_>>().join("\n");
+                if let Ok(mut guard) = INITIALIZATION_ERROR.lock() {
+                    *guard = Some(formatted.clone());
+                }
+                return Err(e);
+            }
+        };
         let tabula = tabula::build(&ctx, &raw)?;
         let mut guard = TABULA_DATA.write().unwrap();
         *guard = Some(Arc::new(tabula));
+        if let Ok(mut guard) = INITIALIZATION_ERROR.lock() {
+            *guard = None;
+        }
         Ok(())
     }
 
@@ -376,6 +396,16 @@ impl StateProvider for DefaultStateProvider {
             searches.remove(&battle_id)
         } else {
             None
+        }
+    }
+
+    fn stored_initialization_error(&self) -> Option<String> {
+        INITIALIZATION_ERROR.lock().ok().and_then(|g| g.clone())
+    }
+
+    fn set_initialization_error(&self, error: String) {
+        if let Ok(mut guard) = INITIALIZATION_ERROR.lock() {
+            *guard = Some(error);
         }
     }
 }
