@@ -120,16 +120,17 @@ pub fn execute(
                 PollResponseType::Final,
             );
             battle.animations = Some(AnimationData::default());
+            let agent_player = next_player.opponent();
 
             if let PlayerType::Agent(agent) =
-                &battle.players.player(current_player).player_type.clone()
+                &battle.players.player(agent_player).player_type.clone()
             {
                 let legal = legal_actions::compute(battle, next_player);
                 if let LegalActions::Standard { actions } = legal {
                     start_speculative_response_search(
                         provider,
                         battle,
-                        current_player,
+                        agent_player,
                         agent,
                         next_player,
                         actions.primary,
@@ -203,6 +204,11 @@ fn start_speculative_response_search(
         break;
     }
     if legal_actions::next_to_act(&simulation) != Some(ai_player) {
+        battle_trace!(
+            "[🔮] Skipping speculation, ai_player is not next to act",
+            battle,
+            opponent_action
+        );
         return;
     }
     let result = Arc::new((Mutex::new(None), Condvar::new()));
