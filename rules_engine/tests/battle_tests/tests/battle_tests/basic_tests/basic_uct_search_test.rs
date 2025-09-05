@@ -3,8 +3,8 @@ use battle_state::actions::battle_actions::BattleAction;
 use display_data::command::GameMessageType;
 use test_utils::battle::test_battle::TestBattle;
 
-#[test]
-fn test_monte_carlo_agent_basic_game() {
+#[tokio::test]
+async fn test_monte_carlo_agent_basic_game() {
     let mut s = TestBattle::builder().enemy_agent(GameAI::MonteCarlo(1)).connect();
     s.perform_user_action(BattleAction::EndTurn);
     assert_eq!(
