@@ -248,6 +248,9 @@ fn draw_card_internal(
 }
 
 fn shuffle_void_into_deck(battle: &mut BattleState, player: PlayerName) {
+    battle.push_animation(EffectSource::Game { controller: player }, || {
+        BattleAnimation::ShuffleVoidIntoDeck { player }
+    });
     battle.cards.shuffle_void_into_deck(player);
 }
 

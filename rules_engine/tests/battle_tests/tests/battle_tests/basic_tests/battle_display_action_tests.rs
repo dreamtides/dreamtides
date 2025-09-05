@@ -3,9 +3,11 @@ use battle_state::actions::battle_actions::BattleAction;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
 use core_data::types::PlayerName;
 use display_data::battle_view::DisplayPlayer;
+use display_data::card_view::CardPrefab;
 use display_data::object_position::Position;
 use tabula_ids::test_card;
 use test_utils::battle::test_battle::TestBattle;
+use test_utils::battle::test_player::TestPlayer;
 use test_utils::session::test_session_prelude::*;
 
 #[test]
@@ -41,7 +43,6 @@ fn browse_user_void_moves_cards_to_browser() {
 #[test]
 fn browse_enemy_void_moves_cards_to_browser() {
     let mut s = TestBattle::builder().connect();
-
     s.perform_user_action(DebugBattleAction::AddCardToVoid {
         player: PlayerName::Two,
         card: test_card::TEST_VANILLA_CHARACTER,
@@ -453,4 +454,58 @@ fn toggle_stack_visibility_hides_and_shows_activated_ability_token() {
 
     s.perform_enemy_action(BattleAction::PassPriority);
     assert_eq!(s.user_client.cards.stack_cards().len(), 0, "stack empty after resolution");
+}
+
+#[test]
+fn hide_overlay_does_not_hide_hand_ability_tokens() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    let character_id = s.add_to_battlefield(
+        DisplayPlayer::User,
+        test_card::TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER,
+    );
+
+    let initial_token_ids: Vec<String> = s
+        .user_client
+        .cards
+        .user_hand()
+        .iter()
+        .filter(|c| {
+            c.view.prefab == CardPrefab::Token && c.id.starts_with(&format!("A{character_id}"))
+        })
+        .map(|c| c.id.clone())
+        .collect();
+    assert!(!initial_token_ids.is_empty(), "expected fast activated ability token in hand");
+
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+    let _enemy_card_on_stack =
+        s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
+
+    assert!(
+        !s.user_client.cards.stack_cards().is_empty(),
+        "enemy card should be on stack so toggle is available"
+    );
+
+    s.perform_user_action(BattleDisplayAction::ToggleStackVisibility);
+
+    let hand_after_toggle_ids: Vec<String> = s
+        .user_client
+        .cards
+        .user_hand()
+        .iter()
+        .filter(|c| c.view.prefab == CardPrefab::Token)
+        .map(|c| c.id.clone())
+        .collect();
+    assert_eq!(
+        initial_token_ids, hand_after_toggle_ids,
+        "fast activated ability hand token should remain in hand when overlay hidden"
+    );
+
+    let storage_list = s.user_client.cards.cards_at_position(&Position::OnScreenStorage);
+    let storage_tokens: Vec<_> =
+        storage_list.iter().filter(|c| c.view.prefab == CardPrefab::Token).collect();
+    assert!(storage_tokens.is_empty(), "no hand ability tokens should move to on screen storage");
 }

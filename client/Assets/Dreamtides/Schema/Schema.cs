@@ -291,6 +291,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("SetCardTrail", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public SetCardTrailCommand SetCardTrail { get; set; }
+
+        [JsonProperty("ShuffleVoidIntoDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public ShuffleVoidIntoDeckCommand ShuffleVoidIntoDeck { get; set; }
     }
 
     public partial class DisplayDreamwellActivationCommand
@@ -1940,6 +1943,12 @@ namespace Dreamtides.Schema
 
         [JsonProperty("trail", Required = Required.Always)]
         public ProjectileAddress Trail { get; set; }
+    }
+
+    public partial class ShuffleVoidIntoDeckCommand
+    {
+        [JsonProperty("player", Required = Required.Always)]
+        public DisplayPlayer Player { get; set; }
     }
 
     public partial class UpdateBattleCommand

@@ -305,11 +305,7 @@ fn void_card_token_view(
         None
     };
 
-    let position = if display_state::is_overlay_hidden(builder) {
-        Position::OnScreenStorage
-    } else {
-        Position::InHand(DisplayPlayer::User)
-    };
+    let position = Position::InHand(DisplayPlayer::User);
     token_card_view(
         TokenCardView::builder()
             .id(adapter::void_card_token_client_id(void_card_id))

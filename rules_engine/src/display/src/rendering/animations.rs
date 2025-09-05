@@ -11,7 +11,7 @@ use display_data::battle_view::DisplayPlayer;
 use display_data::command::{
     Command, DisplayDreamwellActivationCommand, DisplayEffectCommand, DisplayEnemyMessageCommand,
     DisplayJudgmentCommand, DrawUserCardsCommand, FireProjectileCommand, GameMessageType,
-    GameObjectId, PlayAudioClipCommand,
+    GameObjectId, PlayAudioClipCommand, ShuffleVoidIntoDeckCommand,
 };
 use display_data::object_position::Position;
 use masonry::flex_style::FlexVector3;
@@ -223,6 +223,13 @@ pub fn render(
             if !triggers.is_empty() {
                 builder.push(Command::Wait(Milliseconds::new(300)));
             }
+        }
+
+        BattleAnimation::ShuffleVoidIntoDeck { player } => {
+            push_snapshot(builder, snapshot);
+            builder.push(Command::ShuffleVoidIntoDeck(ShuffleVoidIntoDeckCommand {
+                player: builder.to_display_player(*player),
+            }));
         }
 
         BattleAnimation::StartTurn { player } => {

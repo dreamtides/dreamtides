@@ -75,6 +75,7 @@ pub enum Command {
     DisplayEnemyMessage(DisplayEnemyMessageCommand),
     PlayStudioAnimation(PlayStudioAnimationCommand),
     SetCardTrail(SetCardTrailCommand),
+    ShuffleVoidIntoDeck(ShuffleVoidIntoDeckCommand),
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -278,6 +279,11 @@ pub struct SetCardTrailCommand {
     pub card_ids: Vec<ClientCardId>,
     pub trail: ProjectileAddress,
     pub duration: Milliseconds,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ShuffleVoidIntoDeckCommand {
+    pub player: DisplayPlayer,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, Eq, PartialEq)]

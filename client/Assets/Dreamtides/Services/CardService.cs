@@ -2,6 +2,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using Dreamtides.Components;
 using Dreamtides.Layout;
@@ -14,6 +15,7 @@ namespace Dreamtides.Services
 {
   public class CardService : Service
   {
+    [SerializeField] AudioClip? _shuffleVoidIntoDeckSound;
     Card? _currentInfoZoom;
     bool _hidCloseButton;
     bool _infoZoomDisabled;
@@ -29,7 +31,6 @@ namespace Dreamtides.Services
 
     public IEnumerator HandleDrawUserCards(DrawUserCardsCommand command)
     {
-      Debug.Log("DrawUserCards");
       for (var i = 0; i < command.Cards.Count; ++i)
       {
         if (i < command.Cards.Count - 1)
@@ -42,6 +43,152 @@ namespace Dreamtides.Services
           yield return DrawUserCard(command, i, isLastCard: true);
         }
       }
+    }
+
+    public IEnumerator HandleShuffleVoidIntoDeck(ShuffleVoidIntoDeckCommand command)
+    {
+      var (source, destination) = command.Player switch
+      {
+        DisplayPlayer.User => (Registry.Layout.UserVoid, Registry.Layout.UserDeck),
+        DisplayPlayer.Enemy => (Registry.Layout.EnemyVoid, Registry.Layout.EnemyDeck),
+        _ => (null, null)
+      };
+
+      if (source == null || destination == null)
+      {
+        yield break;
+      }
+
+      var sourceCards = source.Objects.OfType<Card>().ToList();
+      if (sourceCards.Count == 0)
+      {
+        yield break;
+      }
+
+      const float totalDuration = 3f;
+      const float earlyPhaseDuration = 1f; // First second: move only up to 10 cards
+      float shuffleRotationDuration = 0.4f; // Wiggle at end (can be trimmed if overcrowded)
+      float movePhaseDuration = Mathf.Max(0f, totalDuration - shuffleRotationDuration);
+
+      int earlyBatchCount = Mathf.Min(10, sourceCards.Count);
+      int laterBatchCount = sourceCards.Count - earlyBatchCount;
+
+      // If there are too many cards, ensure later cards still have some minimum time slice.
+      const float minLegDuration = 0.03f; // per leg minimal duration target
+      const float earlyPauseFraction = 0.35f; // portion of early slice used for pause (tapered)
+
+      // Compute base per-card durations for phases.
+      float earlyPerCardTotal = earlyBatchCount > 0 ? earlyPhaseDuration / earlyBatchCount : 0f;
+      float laterPhaseDuration = movePhaseDuration - earlyPhaseDuration;
+      if (laterPhaseDuration < 0f) laterPhaseDuration = 0f;
+      float laterPerCardTotal = laterBatchCount > 0 ? laterPhaseDuration / laterBatchCount : 0f;
+
+      // Adjust if later cards get too little time; borrow from shuffle wiggle if necessary.
+      if (laterBatchCount > 0 && laterPerCardTotal / 2f < minLegDuration)
+      {
+        // Required later duration to hit minLegDuration with no pause.
+        float requiredLaterDuration = laterBatchCount * (minLegDuration * 2f);
+        float deficit = requiredLaterDuration - laterPhaseDuration;
+        if (deficit > 0f)
+        {
+          // First try trimming shuffle time.
+            float availableFromShuffle = Mathf.Max(0f, shuffleRotationDuration - 0.15f); // keep at least 0.15s
+          float take = Mathf.Min(deficit, availableFromShuffle);
+          shuffleRotationDuration -= take;
+          laterPhaseDuration += take;
+          laterPerCardTotal = laterPhaseDuration / laterBatchCount;
+        }
+      }
+
+      for (int i = 0; i < sourceCards.Count; ++i)
+      {
+        var card = sourceCards[i];
+        source.RemoveIfPresent(card);
+
+        bool isEarly = i < earlyBatchCount;
+        float perCardTotal = isEarly ? earlyPerCardTotal : laterPerCardTotal;
+
+        // Early cards get a pause that tapers off over the first 10. Later cards have no pause.
+        float pauseTaper = 0f;
+        if (isEarly && earlyBatchCount > 1)
+        {
+          pauseTaper = 1f - (i / (float)(earlyBatchCount - 1)); // 1 for first early, 0 for last early
+        }
+        else if (isEarly && earlyBatchCount == 1)
+        {
+          pauseTaper = 1f;
+        }
+        float pauseDuration = isEarly ? perCardTotal * earlyPauseFraction * pauseTaper : 0f;
+        float legsAvailable = perCardTotal - pauseDuration;
+        if (legsAvailable < minLegDuration * 2f)
+        {
+          pauseDuration = Mathf.Max(0f, perCardTotal - (minLegDuration * 2f));
+          legsAvailable = perCardTotal - pauseDuration;
+        }
+        float legDuration = legsAvailable / 2f;
+        legDuration = Mathf.Max(minLegDuration, legDuration);
+
+        Registry.SoundService.PlayDrawCardSound();
+
+        // 1) Move to drawn position.
+        yield return MoveCardToPosition(card,
+          Registry.Layout.DrawnCardsPosition.transform.position,
+          Registry.Layout.DrawnCardsPosition.transform.rotation,
+          legDuration);
+
+        card.GameContext = GameContext.DrawnCards;
+
+        if (pauseDuration > 0.001f)
+        {
+          yield return new WaitForSeconds(pauseDuration);
+        }
+
+        // 2) Move into deck root.
+        yield return MoveCardToPosition(card,
+          destination.transform.position,
+          destination.transform.rotation,
+          legDuration);
+
+        destination.Add(card);
+        card.transform.position = destination.transform.position;
+        card.transform.rotation = destination.transform.rotation;
+      }
+
+      destination.ApplyLayout();
+
+      // 3) Shuffle rotation effect (wiggle cards around Y axis within remaining
+      //    time budget)
+      yield return ShuffleDeckRotation(destination, shuffleRotationDuration);
+    }
+
+    IEnumerator MoveCardToPosition(Card card, Vector3 position, Quaternion rotation, float duration)
+    {
+      var seq = DOTween.Sequence();
+      seq.Insert(0, card.transform.DOMove(position, duration).SetEase(Ease.OutCubic));
+      seq.Insert(0, card.transform.DORotateQuaternion(rotation, duration).SetEase(Ease.OutCubic));
+      yield return seq.WaitForCompletion();
+    }
+
+    IEnumerator ShuffleDeckRotation(ObjectLayout deckLayout, float totalDuration)
+    {
+      var cards = deckLayout.Objects.OfType<Card>().ToList();
+      if (cards.Count == 0 || totalDuration <= 0f)
+      {
+        yield break;
+      }
+
+      // Single quick wiggle: rotate to a small random Y angle then back.
+      float half = totalDuration / 2f;
+      var seq = DOTween.Sequence();
+      foreach (var card in cards)
+      {
+        var startEuler = card.transform.localEulerAngles;
+        float angle = Random.Range(-15f, 15f);
+        var midEuler = startEuler + new Vector3(0f, angle, 0f);
+        seq.Insert(0, card.transform.DOLocalRotate(midEuler, half * 0.9f).SetEase(Ease.OutCubic));
+        seq.Insert(half, card.transform.DOLocalRotate(startEuler, half * 0.9f).SetEase(Ease.InCubic));
+      }
+      yield return seq.WaitForCompletion();
     }
 
     IEnumerator DrawUserCard(DrawUserCardsCommand command, int index, bool isLastCard)

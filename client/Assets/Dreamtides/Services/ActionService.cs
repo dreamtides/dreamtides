@@ -593,6 +593,13 @@ namespace Dreamtides.Services
           Registry.LoggingService.Log("ActionService", "Applying command: SetCardTrail");
           Registry.EffectService.HandleSetCardTrailCommand(command.SetCardTrail);
         }
+
+        if (command.ShuffleVoidIntoDeck != null)
+        {
+          Registry.LoggingService.Log("ActionService", "Applying command: ShuffleVoidIntoDeck");
+          coroutines.Add(StartCoroutine(
+              Registry.CardService.HandleShuffleVoidIntoDeck(command.ShuffleVoidIntoDeck)));
+        }
       }
 
       foreach (var coroutine in coroutines)

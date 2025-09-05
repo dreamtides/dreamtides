@@ -93,6 +93,9 @@ pub enum BattleAnimation {
     SetActiveTriggers {
         triggers: Vec<TriggerAnimation>,
     },
+    ShuffleVoidIntoDeck {
+        player: PlayerName,
+    },
     StartTurn {
         player: PlayerName,
     },

@@ -101,6 +101,7 @@ impl TestClient {
                     Command::DisplayEnemyMessage(_) => {}
                     Command::PlayStudioAnimation(_) => {}
                     Command::SetCardTrail(_) => {}
+                    Command::ShuffleVoidIntoDeck(_) => {}
                 }
             }
         }
