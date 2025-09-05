@@ -100,11 +100,20 @@ impl ViewLogsPanel {
 
     fn apply_filter(&self, content: String) -> String {
         match &self.filter {
-            Some(filter_str) => content
-                .lines()
-                .filter(|line| line.contains(filter_str))
-                .collect::<Vec<_>>()
-                .join("\n"),
+            Some(filter_str) => {
+                let filter = filter_str.as_str();
+                let lines = content.lines().filter(|line| !line.contains("OpenPanel(ViewLogs("));
+                if filter == "🔮" {
+                    lines
+                        .filter(|line| {
+                            line.contains("🔮") || line.contains("👿") || line.contains("🌟")
+                        })
+                        .collect::<Vec<_>>()
+                        .join("\n")
+                } else {
+                    lines.filter(|line| line.contains(filter)).collect::<Vec<_>>().join("\n")
+                }
+            }
             None => content,
         }
     }
@@ -145,6 +154,10 @@ impl Component for LogFilterButtons {
                     .build(),
             )
             .child(FilterButton::builder().emoji("All".to_string()).build());
+
+        buttons = buttons.child(
+            FilterButton::builder().emoji("🔮".to_string()).emoji_filter("🔮".to_string()).build(),
+        );
 
         for &emoji in LOG_FILTER_EMOJIS {
             buttons = buttons.child(

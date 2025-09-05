@@ -102,7 +102,7 @@ pub fn execute(
             battle_trace!("Selecting action for AI player", battle);
 
             if let Some(action) = get_speculative_response_action(provider, battle, action) {
-                battle_trace!("Speculative action hit", battle, action);
+                battle_trace!("[🌟] Speculative action hit", battle, action);
                 current_action = action;
             } else {
                 current_action = agent_search::select_action(battle, next_player, &agent);
@@ -185,7 +185,6 @@ fn start_speculative_response_search(
     human_player: PlayerName,
     opponent_action: PrimaryLegalAction,
 ) {
-    battle_trace!("Starting speculative response search", battle, opponent_action);
     let assumed_action = match opponent_action {
         PrimaryLegalAction::PassPriority => BattleAction::PassPriority,
         PrimaryLegalAction::EndTurn => BattleAction::EndTurn,
@@ -209,6 +208,8 @@ fn start_speculative_response_search(
     let result = Arc::new((Mutex::new(None), Condvar::new()));
     let result_clone = result.clone();
     let agent_clone = *agent;
+    battle_trace!("[🔮] Starting speculative action search", battle, opponent_action);
+
     task::spawn_blocking(move || {
         let action = agent_search::select_action(&simulation, ai_player, &agent_clone);
         if let Ok(mut guard) = result_clone.0.lock() {
@@ -237,7 +238,7 @@ fn get_speculative_response_action(
     let search = provider.take_speculative_search(battle.id)?;
     if search.assumed_action != action {
         let expected = search.assumed_action;
-        debug!(?action, ?expected, "Speculative action miss");
+        debug!(?action, ?expected, "[👿] Speculative Action miss");
         return None;
     }
     let (lock, cvar) = &*search.result;
