@@ -21,5 +21,6 @@ game_creation = { path = "../game_creation" }
 atomic-write-file = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+serde_path_to_error = { workspace = true }
 tracing = { workspace = true }
 uuid = { workspace = true }

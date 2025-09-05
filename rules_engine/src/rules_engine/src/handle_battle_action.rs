@@ -1,8 +1,13 @@
+use std::sync::{Arc, Condvar, Mutex};
+
 use ai_agents::agent_search;
+use ai_data::game_ai::GameAI;
 use battle_mutations::actions::apply_battle_action;
 use battle_queries::battle_trace;
 use battle_queries::legal_action_queries::legal_actions;
-use battle_queries::legal_action_queries::legal_actions_data::{ForPlayer, LegalActions};
+use battle_queries::legal_action_queries::legal_actions_data::{
+    ForPlayer, LegalActions, PrimaryLegalAction,
+};
 use battle_queries::macros::write_tracing_event;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::animation_data::AnimationData;
@@ -13,16 +18,17 @@ use core_data::types::PlayerName;
 use display::rendering::renderer;
 use display_data::command::CommandSequence;
 use display_data::request_data::PollResponseType;
-use state_provider::state_provider::{PollResult, StateProvider};
-use tracing::instrument;
+use state_provider::state_provider::{PollResult, SpeculativeSearchState, StateProvider};
+use tokio::task;
+use tracing::{debug, instrument};
 use uuid::Uuid;
 
-pub fn poll<P: StateProvider>(provider: &P, user_id: UserId) -> Option<PollResult> {
+pub fn poll(provider: &impl StateProvider, user_id: UserId) -> Option<PollResult> {
     provider.take_next_poll_result(user_id)
 }
 
-pub fn append_update<P: StateProvider>(
-    provider: &P,
+pub fn append_update(
+    provider: &impl StateProvider,
     user_id: UserId,
     update: CommandSequence,
     context: &RequestContext,
@@ -38,8 +44,8 @@ pub fn append_update<P: StateProvider>(
 }
 
 #[instrument(skip_all, level = "debug")]
-pub fn execute<P: StateProvider + 'static>(
-    provider: &P,
+pub fn execute(
+    provider: &(impl StateProvider + 'static),
     battle: &mut BattleState,
     initiated_by: UserId,
     player: PlayerName,
@@ -93,9 +99,15 @@ pub fn execute<P: StateProvider + 'static>(
                 PollResponseType::Incremental,
             );
             battle.animations = Some(AnimationData::default());
-
             battle_trace!("Selecting action for AI player", battle);
-            current_action = agent_search::select_action(battle, next_player, &agent);
+
+            if let Some(action) = get_speculative_response_action(provider, battle, action) {
+                battle_trace!("Speculative action hit", battle, action);
+                current_action = action;
+            } else {
+                current_action = agent_search::select_action(battle, next_player, &agent);
+            }
+
             current_player = next_player;
         } else {
             battle_trace!("Rendering updates for human player turn", battle);
@@ -108,6 +120,22 @@ pub fn execute<P: StateProvider + 'static>(
                 PollResponseType::Final,
             );
             battle.animations = Some(AnimationData::default());
+
+            if let PlayerType::Agent(agent) =
+                &battle.players.player(current_player).player_type.clone()
+            {
+                let legal = legal_actions::compute(battle, next_player);
+                if let LegalActions::Standard { actions } = legal {
+                    start_speculative_response_search(
+                        provider,
+                        battle,
+                        current_player,
+                        agent,
+                        next_player,
+                        actions.primary,
+                    );
+                }
+            }
             return;
         }
     }
@@ -142,6 +170,84 @@ pub fn should_auto_execute_action(legal_actions: &LegalActions) -> Option<Battle
     }
 }
 
+/// Begins a speculative search for an agent action.
+///
+/// In order to optimistically improve performance, we assume that the human
+/// player will respond to a battle state with their [PrimaryLegalAction]
+/// (resolve, end turn, etc). While we are waiting for a user response, we start
+/// computing a speculative response to this action in order to respond more
+/// quickly if it is selected.
+fn start_speculative_response_search(
+    provider: &(impl StateProvider + 'static),
+    battle: &mut BattleState,
+    ai_player: PlayerName,
+    agent: &GameAI,
+    human_player: PlayerName,
+    opponent_action: PrimaryLegalAction,
+) {
+    battle_trace!("Starting speculative response search", battle, opponent_action);
+    let assumed_action = match opponent_action {
+        PrimaryLegalAction::PassPriority => BattleAction::PassPriority,
+        PrimaryLegalAction::EndTurn => BattleAction::EndTurn,
+        PrimaryLegalAction::StartNextTurn => BattleAction::StartNextTurn,
+    };
+    let mut simulation = battle.logical_clone();
+    apply_battle_action::execute(&mut simulation, human_player, assumed_action);
+    loop {
+        let Some(next_player) = legal_actions::next_to_act(&simulation) else { break };
+        if let Some(auto) =
+            should_auto_execute_action(&legal_actions::compute(&simulation, next_player))
+        {
+            apply_battle_action::execute(&mut simulation, next_player, auto);
+            continue;
+        }
+        break;
+    }
+    if legal_actions::next_to_act(&simulation) != Some(ai_player) {
+        return;
+    }
+    let result = Arc::new((Mutex::new(None), Condvar::new()));
+    let result_clone = result.clone();
+    let agent_clone = *agent;
+    task::spawn_blocking(move || {
+        let action = agent_search::select_action(&simulation, ai_player, &agent_clone);
+        if let Ok(mut guard) = result_clone.0.lock() {
+            *guard = Some(action);
+            result_clone.1.notify_all();
+        }
+    });
+    provider.set_speculative_search(battle.id, SpeculativeSearchState { assumed_action, result });
+}
+
+/// Returns the computed speculative response action.
+///
+/// If the provided `action` matches the action we assumed the user would take
+/// when we started our speculative response search, this returns a computed
+/// agent response to that action. If the user took a different action, this
+/// returns None.
+///
+/// If the AI evaluation has not yet completed, but the `action` here matches
+/// the assumed action, this blocks until the evaluation is complete and returns
+/// its value.
+fn get_speculative_response_action(
+    provider: &(impl StateProvider + 'static),
+    battle: &BattleState,
+    action: BattleAction,
+) -> Option<BattleAction> {
+    let search = provider.take_speculative_search(battle.id)?;
+    if search.assumed_action != action {
+        let expected = search.assumed_action;
+        debug!(?action, ?expected, "Speculative action miss");
+        return None;
+    }
+    let (lock, cvar) = &*search.result;
+    let mut guard = lock.lock().unwrap();
+    while guard.is_none() {
+        guard = cvar.wait(guard).unwrap();
+    }
+    *guard
+}
+
 fn should_push_undo_entry(action: BattleAction) -> bool {
     !matches!(
         action,
@@ -152,8 +258,8 @@ fn should_push_undo_entry(action: BattleAction) -> bool {
     )
 }
 
-fn render_updates<P: StateProvider + 'static>(
-    provider: &P,
+fn render_updates(
+    provider: &(impl StateProvider + 'static),
     battle: &BattleState,
     user_id: UserId,
     context: &RequestContext,

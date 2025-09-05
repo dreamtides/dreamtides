@@ -5,6 +5,7 @@ use core_data::card_types::CardType;
 use core_data::numerics::{Energy, Spark};
 use core_data::types::PlayerName;
 use serde::{Deserialize, Serialize};
+use serde_with::serde_as;
 
 use crate::battle::battle_card_definitions::BattleCardIdentity;
 use crate::battle::card_id::{
@@ -36,6 +37,7 @@ pub struct CreatedCard {
     pub is_fast: bool,
 }
 
+#[serde_as]
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct AllCards {
     cards: Vec<BattleCardState>,
@@ -49,6 +51,8 @@ pub struct AllCards {
     stack_card_set: PlayerMap<CardSet<StackCardId>>,
     banished: PlayerMap<CardSet<BanishedCardId>>,
     next_object_id: ObjectId,
+
+    #[serde_as(as = "Vec<(_, _)>")]
     activated_ability_object_ids: BTreeMap<ActivatedAbilityId, ObjectId>,
 }
 

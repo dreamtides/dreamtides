@@ -3,9 +3,10 @@ use std::fs::File;
 use std::io::{Cursor, Read};
 use std::panic::{RefUnwindSafe, UnwindSafe};
 use std::path::PathBuf;
-use std::sync::{Arc, LazyLock, Mutex, RwLock};
+use std::sync::{Arc, Condvar, LazyLock, Mutex, RwLock};
 use std::time::Instant;
 
+use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::{BattleState, RequestContext};
 use core_data::identifiers::{BattleId, UserId};
 use core_data::initialization_error::{ErrorCode, InitializationError};
@@ -72,6 +73,10 @@ pub trait StateProvider:
 
     fn take_next_poll_result(&self, user_id: UserId) -> Option<PollResult>;
 
+    fn set_speculative_search(&self, battle_id: BattleId, search: SpeculativeSearchState);
+
+    fn take_speculative_search(&self, battle_id: BattleId) -> Option<SpeculativeSearchState>;
+
     fn should_panic_on_error(&self) -> bool {
         false
     }
@@ -102,6 +107,15 @@ static PENDING_UPDATES: LazyLock<Mutex<HashMap<UserId, Vec<PollResult>>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 static DISPLAY_STATES: LazyLock<Mutex<HashMap<UserId, DisplayState>>> =
+    LazyLock::new(|| Mutex::new(HashMap::new()));
+
+#[derive(Clone)]
+pub struct SpeculativeSearchState {
+    pub assumed_action: BattleAction,
+    pub result: Arc<(Mutex<Option<BattleAction>>, Condvar)>,
+}
+
+static SPECULATIVE_SEARCHES: LazyLock<Mutex<HashMap<BattleId, SpeculativeSearchState>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 static TABULA_DATA: LazyLock<RwLock<Option<Arc<Tabula>>>> = LazyLock::new(|| RwLock::new(None));
@@ -349,6 +363,20 @@ impl StateProvider for DefaultStateProvider {
             }
         }
         None
+    }
+
+    fn set_speculative_search(&self, battle_id: BattleId, search: SpeculativeSearchState) {
+        if let Ok(mut searches) = SPECULATIVE_SEARCHES.lock() {
+            searches.insert(battle_id, search);
+        }
+    }
+
+    fn take_speculative_search(&self, battle_id: BattleId) -> Option<SpeculativeSearchState> {
+        if let Ok(mut searches) = SPECULATIVE_SEARCHES.lock() {
+            searches.remove(&battle_id)
+        } else {
+            None
+        }
     }
 }
 

@@ -1,4 +1,3 @@
-use std::any::type_name;
 use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
@@ -6,8 +5,8 @@ use std::path::{Path, PathBuf};
 use atomic_write_file::AtomicWriteFile;
 use core_data::identifiers::UserId;
 use core_data::initialization_error::{ErrorCode, InitializationError};
-use serde_json;
 use tracing::debug;
+use {serde_json, serde_path_to_error};
 
 use crate::save_file::SaveFile;
 
@@ -176,20 +175,17 @@ fn atomic_write(final_path: &Path, data: &[u8]) -> Result<(), Box<Initialization
 
 fn serialize_save(save: &SaveFile) -> Result<Vec<u8>, Box<InitializationError>> {
     let mut buf = Vec::new();
-    match serde_json::to_writer_pretty(&mut buf, save) {
-        Ok(()) => Ok(buf),
+    let mut json = serde_json::Serializer::pretty(&mut buf);
+    match serde_path_to_error::serialize(save, &mut json) {
+        Ok(_) => Ok(buf),
         Err(e) => {
+            let path = e.path().to_string();
+            let underlying = e.inner();
             let dbg = format!("{save:?}");
-            let max = 6000usize;
-            let prefix_len = dbg.len().min(max);
-            let prefix = &dbg[..prefix_len];
             let key_hint = extract_non_string_map_key_hint(&dbg);
             let details = format!(
-                "serde_json error: {e}; type={} debug_prefix_len={} key_hint={} debug_prefix=<<<{}>>>",
-                type_name::<SaveFile>(),
-                prefix_len,
-                key_hint.unwrap_or("<none>").replace('\n', "\\n"),
-                prefix.replace('\n', "\\n"),
+                "serde_json serialization error at path={path}: {underlying}; key_hint={}",
+                key_hint.unwrap_or("none").replace('\n', "\\n"),
             );
             Err(Box::new(InitializationError::with_details(
                 ErrorCode::JsonError,
