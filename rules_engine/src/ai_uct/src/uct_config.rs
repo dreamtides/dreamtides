@@ -3,15 +3,22 @@ pub struct UctConfig {
     /// How many iterations of the monte carlo algorithm to run for each
     /// possible action under consideration.
     ///
-    /// This value may be reduced if it would exceed max_total_iterations.
+    /// This value may be reduced when the number of available actions
+    /// exceeds the configured multiplier budget (see
+    /// max_total_actions_multiplier).
     pub max_iterations_per_action: u32,
-
-    /// Maximum total number of iterations to run across all actions.
+    /// Multiplier determining the total iteration budget across all actions.
     ///
-    /// If the number of available actions multiplied by
-    /// max_iterations_per_action exceeds this value, the iterations per
-    /// action will be reduced to stay within this cap.
-    pub max_total_iterations: u32,
+    /// Effective total iteration budget ~= max_iterations_per_action *
+    /// max_total_actions_multiplier. If the number of legal actions exceeds
+    /// this multiplier, iterations are divided proportionally so the total
+    /// stays near the budget. If there are fewer actions, each gets the full
+    /// max_iterations_per_action.
+    pub max_total_actions_multiplier: u32,
+
+    /// If set, overrides any dynamic iteration multipliers (prompt, phase,
+    /// turn, energy-based) and applies this fixed multiplier instead.
+    pub iteration_multiplier_override: Option<f64>,
 
     /// Force all search logic onto one thread.
     ///

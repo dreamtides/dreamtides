@@ -44,6 +44,7 @@ pub fn ai_core_11(c: &mut Criterion) {
                         &battle,
                         PlayerName::One,
                         &GameAI::MonteCarloSingleThreaded(1),
+                        Some(1.0),
                     ))
                 },
                 BatchSize::SmallInput,

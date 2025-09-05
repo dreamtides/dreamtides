@@ -9,6 +9,7 @@ use battle_queries::panic_with;
 use battle_state::actions::battle_actions::BattleAction;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::battle_status::BattleStatus;
+use battle_state::battle::battle_turn_phase::BattleTurnPhase;
 use core_data::types::PlayerName;
 use ordered_float::OrderedFloat;
 use petgraph::Direction;
@@ -61,7 +62,7 @@ pub fn search(
     config: &UctConfig,
 ) -> BattleAction {
     let legal = legal_actions::compute(initial_battle, player);
-    let iterations_per_action = iterations_per_action(&legal, config);
+    let iterations_per_action = iterations_per_action(&legal, config, initial_battle, player);
 
     let action_results: Vec<_> = legal
         .all()
@@ -404,17 +405,37 @@ fn child_score(
 /// The calculation prioritizes distributing iterations evenly across available
 /// actions while respecting configured limits. Prompt actions receive fewer
 /// iterations as they require faster response times.
-fn iterations_per_action(legal: &LegalActions, config: &UctConfig) -> u32 {
+fn iterations_per_action(
+    legal: &LegalActions,
+    config: &UctConfig,
+    battle: &BattleState,
+    agent: PlayerName,
+) -> u32 {
     let base_iterations = match legal.len() {
         0 => config.max_iterations_per_action,
         action_count => {
-            let distributed_iterations =
-                (config.max_total_iterations as f64 / action_count as f64) as u32;
+            let total_budget =
+                config.max_iterations_per_action * config.max_total_actions_multiplier;
+            let distributed_iterations = (total_budget as f64 / action_count as f64) as u32;
             cmp::min(distributed_iterations, config.max_iterations_per_action)
         }
     };
 
-    // Search fewer actions for prompts to improve perceived response time,
-    // since these usually happen immediately after another AI search.
-    if legal.is_prompt() { (base_iterations as f64 / 2.0) as u32 } else { base_iterations }
+    // Apply phase/turn-based multipliers:
+    //  * Prompt actions: 0.5x (fast response)
+    //  * First action of agent's main phase when energy >= produced_energy: 1.5x
+    //  * Other actions in agent's main phase (its turn): 1.0x
+    //  * Actions in other phases or opponent's turn: 0.75x
+    let is_main =
+        battle.turn.active_player == agent && matches!(battle.phase, BattleTurnPhase::Main);
+    let player_state = battle.players.player(battle.turn.active_player);
+
+    let multiplier = match is_main {
+        _ if legal.is_prompt() => 0.5,
+        true if player_state.current_energy >= player_state.produced_energy => 1.5,
+        true => 1.0,
+        _ => 0.75,
+    };
+    let applied_multiplier = config.iteration_multiplier_override.unwrap_or(multiplier);
+    ((base_iterations as f64) * applied_multiplier) as u32
 }

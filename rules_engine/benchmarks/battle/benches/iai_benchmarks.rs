@@ -36,6 +36,7 @@ fn bench_core11_select(battle: BattleState) -> BattleAction {
         &battle,
         PlayerName::One,
         &GameAI::MonteCarloSingleThreaded(1),
+        Some(1.0),
     ))
 }
 

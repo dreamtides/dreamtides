@@ -1,11 +1,11 @@
 {
-  "id": "1778775a-b4a3-4ca6-8fe6-77644520748e",
+  "id": "40542859-8f7a-44ec-a73f-c8da4353e769",
   "cards": {
     "cards": [
       {
         "identity": 0,
         "owner": "One",
-        "object_id": 64,
+        "object_id": 0,
         "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
@@ -33,7 +33,7 @@
       {
         "identity": 2,
         "owner": "One",
-        "object_id": 67,
+        "object_id": 66,
         "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
@@ -103,7 +103,7 @@
       {
         "identity": 7,
         "owner": "One",
-        "object_id": 75,
+        "object_id": 7,
         "base_energy_cost": 1,
         "base_spark": null,
         "card_type": "Event",
@@ -131,7 +131,7 @@
       {
         "identity": 9,
         "owner": "One",
-        "object_id": 82,
+        "object_id": 9,
         "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
@@ -147,7 +147,7 @@
       {
         "identity": 10,
         "owner": "One",
-        "object_id": 81,
+        "object_id": 10,
         "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
@@ -179,7 +179,7 @@
       {
         "identity": 12,
         "owner": "One",
-        "object_id": 65,
+        "object_id": 12,
         "base_energy_cost": 2,
         "base_spark": 1,
         "card_type": "Character",
@@ -207,7 +207,7 @@
       {
         "identity": 14,
         "owner": "One",
-        "object_id": 14,
+        "object_id": 68,
         "base_energy_cost": 2,
         "base_spark": 1,
         "card_type": "Character",
@@ -249,7 +249,7 @@
       {
         "identity": 17,
         "owner": "One",
-        "object_id": 17,
+        "object_id": 75,
         "base_energy_cost": 2,
         "base_spark": 2,
         "card_type": "Character",
@@ -291,7 +291,7 @@
       {
         "identity": 20,
         "owner": "One",
-        "object_id": 80,
+        "object_id": 20,
         "base_energy_cost": 2,
         "base_spark": 2,
         "card_type": "Character",
@@ -347,7 +347,7 @@
       {
         "identity": 24,
         "owner": "One",
-        "object_id": 24,
+        "object_id": 67,
         "base_energy_cost": null,
         "base_spark": null,
         "card_type": "Event",
@@ -389,7 +389,7 @@
       {
         "identity": 27,
         "owner": "One",
-        "object_id": 79,
+        "object_id": 64,
         "base_energy_cost": 1,
         "base_spark": null,
         "card_type": "Event",
@@ -403,7 +403,7 @@
       {
         "identity": 28,
         "owner": "One",
-        "object_id": 68,
+        "object_id": 80,
         "base_energy_cost": 1,
         "base_spark": null,
         "card_type": "Event",
@@ -417,7 +417,7 @@
       {
         "identity": 29,
         "owner": "One",
-        "object_id": 66,
+        "object_id": 29,
         "base_energy_cost": 1,
         "base_spark": null,
         "card_type": "Event",
@@ -431,7 +431,7 @@
       {
         "identity": 30,
         "owner": "One",
-        "object_id": 30,
+        "object_id": 65,
         "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
@@ -487,7 +487,7 @@
       {
         "identity": 34,
         "owner": "Two",
-        "object_id": 34,
+        "object_id": 73,
         "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
@@ -543,7 +543,7 @@
       {
         "identity": 38,
         "owner": "Two",
-        "object_id": 77,
+        "object_id": 38,
         "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
@@ -585,7 +585,7 @@
       {
         "identity": 41,
         "owner": "Two",
-        "object_id": 41,
+        "object_id": 74,
         "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
@@ -601,7 +601,7 @@
       {
         "identity": 42,
         "owner": "Two",
-        "object_id": 42,
+        "object_id": 70,
         "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
@@ -633,7 +633,7 @@
       {
         "identity": 44,
         "owner": "Two",
-        "object_id": 72,
+        "object_id": 44,
         "base_energy_cost": 2,
         "base_spark": 1,
         "card_type": "Character",
@@ -647,7 +647,7 @@
       {
         "identity": 45,
         "owner": "Two",
-        "object_id": 45,
+        "object_id": 72,
         "base_energy_cost": 2,
         "base_spark": 1,
         "card_type": "Character",
@@ -661,7 +661,7 @@
       {
         "identity": 46,
         "owner": "Two",
-        "object_id": 70,
+        "object_id": 46,
         "base_energy_cost": 2,
         "base_spark": 1,
         "card_type": "Character",
@@ -689,7 +689,7 @@
       {
         "identity": 48,
         "owner": "Two",
-        "object_id": 76,
+        "object_id": 48,
         "base_energy_cost": 2,
         "base_spark": 2,
         "card_type": "Character",
@@ -703,7 +703,7 @@
       {
         "identity": 49,
         "owner": "Two",
-        "object_id": 49,
+        "object_id": 78,
         "base_energy_cost": 2,
         "base_spark": 2,
         "card_type": "Character",
@@ -717,7 +717,7 @@
       {
         "identity": 50,
         "owner": "Two",
-        "object_id": 50,
+        "object_id": 69,
         "base_energy_cost": 2,
         "base_spark": 2,
         "card_type": "Character",
@@ -731,7 +731,7 @@
       {
         "identity": 51,
         "owner": "Two",
-        "object_id": 74,
+        "object_id": 51,
         "base_energy_cost": 2,
         "base_spark": 2,
         "card_type": "Character",
@@ -773,7 +773,7 @@
       {
         "identity": 54,
         "owner": "Two",
-        "object_id": 78,
+        "object_id": 54,
         "base_energy_cost": 4,
         "base_spark": null,
         "card_type": "Event",
@@ -801,7 +801,7 @@
       {
         "identity": 56,
         "owner": "Two",
-        "object_id": 56,
+        "object_id": 79,
         "base_energy_cost": null,
         "base_spark": null,
         "card_type": "Event",
@@ -829,7 +829,7 @@
       {
         "identity": 58,
         "owner": "Two",
-        "object_id": 58,
+        "object_id": 71,
         "base_energy_cost": 1,
         "base_spark": null,
         "card_type": "Event",
@@ -857,7 +857,7 @@
       {
         "identity": 60,
         "owner": "Two",
-        "object_id": 73,
+        "object_id": 76,
         "base_energy_cost": 1,
         "base_spark": null,
         "card_type": "Event",
@@ -871,7 +871,7 @@
       {
         "identity": 61,
         "owner": "Two",
-        "object_id": 69,
+        "object_id": 61,
         "base_energy_cost": 1,
         "base_spark": null,
         "card_type": "Event",
@@ -885,7 +885,7 @@
       {
         "identity": 62,
         "owner": "Two",
-        "object_id": 62,
+        "object_id": 77,
         "base_energy_cost": 2,
         "base_spark": null,
         "card_type": "Event",
@@ -925,26 +925,26 @@
     },
     "void": {
       "one": {
-        "bits": 135267328
+        "bits": 0
       },
       "two": {
-        "bits": 274877906944
+        "bits": 5765170472987656192
       }
     },
     "hands": {
       "one": {
-        "bits": 805311109
+        "bits": 1493319684
       },
       "two": {
-        "bits": 3479400148050640896
+        "bits": 361455668718206976
       }
     },
     "shuffled_into_decks": {
       "one": {
-        "bits": 3354388858
+        "bits": 2801647611
       },
       "two": {
-        "bits": 14967343646486036480
+        "bits": 12320117927708721152
       }
     },
     "tops_of_decks": {
@@ -968,8 +968,8 @@
         "bits": 0
       }
     },
-    "next_object_id": 83,
-    "activated_ability_object_ids": {}
+    "next_object_id": 81,
+    "activated_ability_object_ids": []
   },
   "rules_config": {
     "points_to_win": 12
@@ -1019,7 +1019,7 @@
         31
       ],
       "quest": {
-        "id": "2e6fb909-6a16-474b-975d-482bfa037041",
+        "id": "1a4e934c-15ef-4995-8b01-66644f6f7ff6",
         "user": {
           "id": "00000000-0000-0000-0000-000000000000"
         },
@@ -2646,7 +2646,7 @@
         63
       ],
       "quest": {
-        "id": "cb150d86-7a67-4edf-8e1b-9a785ecb3ca6",
+        "id": "f8b36932-2773-4b2a-b8e6-e36d34595087",
         "user": {
           "id": "00000000-0000-0000-0000-000000000000"
         },
@@ -4240,10 +4240,10 @@
   "seed": 1234567891234,
   "rng": {
     "s": [
-      6275314622831295681,
-      11370292044317372482,
-      6953914393759911328,
-      7934590272824457409
+      14914330095189350999,
+      3179512528000039353,
+      7275890535606386611,
+      13834582437082048176
     ]
   },
   "prompts": [],
@@ -4283,6 +4283,84 @@
       },
       {
         "definition": {
+          "base_card_id": "40c77ea8-a021-4bc6-8970-0853c03f3fe0",
+          "displayed_name": "Dreamwell Foresee",
+          "energy_produced": 1,
+          "abilities": [
+            {
+              "Event": {
+                "effect": {
+                  "Effect": {
+                    "Foresee": {
+                      "count": 1
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "displayed_abilities": [
+            {
+              "Event": {
+                "event": {
+                  "additional_cost": null,
+                  "effect": {
+                    "Effect": "{-Foresee(n:1)}."
+                  }
+                }
+              }
+            }
+          ],
+          "displayed_rules_text": "{-Foresee(n:1)}.",
+          "displayed_prompts": [],
+          "phase": 1,
+          "is_test_card": true,
+          "image": {
+            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Dreamwell/shutterstock_1897537165.png"
+          }
+        }
+      },
+      {
+        "definition": {
+          "base_card_id": "a2cdf115-8e1a-455e-a118-123f6f36c7ba",
+          "displayed_name": "Dreamwell Mill 3",
+          "energy_produced": 1,
+          "abilities": [
+            {
+              "Event": {
+                "effect": {
+                  "Effect": {
+                    "PutCardsFromYourDeckIntoVoid": {
+                      "count": 3
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "displayed_abilities": [
+            {
+              "Event": {
+                "event": {
+                  "additional_cost": null,
+                  "effect": {
+                    "Effect": "Put the top {-count(n: 3)} cards of your deck into your void."
+                  }
+                }
+              }
+            }
+          ],
+          "displayed_rules_text": "Put the top {-count(n: 3)} cards of your deck into your void.",
+          "displayed_prompts": [],
+          "phase": 1,
+          "is_test_card": true,
+          "image": {
+            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Dreamwell/shutterstock_2421338077.png"
+          }
+        }
+      },
+      {
+        "definition": {
           "base_card_id": "d386663c-9e9f-4b8e-b410-f3467e39801b",
           "displayed_name": "Dreamwell Gain Points",
           "energy_produced": 1,
@@ -4317,6 +4395,45 @@
           "is_test_card": true,
           "image": {
             "sprite": "Assets/ThirdParty/GameAssets/CardImages/Dreamwell/shutterstock_1789989917.png"
+          }
+        }
+      },
+      {
+        "definition": {
+          "base_card_id": "107c3b3f-6131-4ff8-afcb-f0ce4188848f",
+          "displayed_name": "Dreamwell Gain Energy",
+          "energy_produced": 1,
+          "abilities": [
+            {
+              "Event": {
+                "effect": {
+                  "Effect": {
+                    "GainEnergy": {
+                      "gains": 1
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "displayed_abilities": [
+            {
+              "Event": {
+                "event": {
+                  "additional_cost": null,
+                  "effect": {
+                    "Effect": "Gain {-gained-energy(e: 1)}."
+                  }
+                }
+              }
+            }
+          ],
+          "displayed_rules_text": "Gain {-gained-energy(e: 1)}.",
+          "displayed_prompts": [],
+          "phase": 1,
+          "is_test_card": true,
+          "image": {
+            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Dreamwell/shutterstock_1786390154.png"
           }
         }
       },
@@ -4373,123 +4490,6 @@
             "sprite": "Assets/ThirdParty/GameAssets/CardImages/Dreamwell/shutterstock_1011222385.png"
           }
         }
-      },
-      {
-        "definition": {
-          "base_card_id": "a2cdf115-8e1a-455e-a118-123f6f36c7ba",
-          "displayed_name": "Dreamwell Mill 3",
-          "energy_produced": 1,
-          "abilities": [
-            {
-              "Event": {
-                "effect": {
-                  "Effect": {
-                    "PutCardsFromYourDeckIntoVoid": {
-                      "count": 3
-                    }
-                  }
-                }
-              }
-            }
-          ],
-          "displayed_abilities": [
-            {
-              "Event": {
-                "event": {
-                  "additional_cost": null,
-                  "effect": {
-                    "Effect": "Put the top {-count(n: 3)} cards of your deck into your void."
-                  }
-                }
-              }
-            }
-          ],
-          "displayed_rules_text": "Put the top {-count(n: 3)} cards of your deck into your void.",
-          "displayed_prompts": [],
-          "phase": 1,
-          "is_test_card": true,
-          "image": {
-            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Dreamwell/shutterstock_2421338077.png"
-          }
-        }
-      },
-      {
-        "definition": {
-          "base_card_id": "40c77ea8-a021-4bc6-8970-0853c03f3fe0",
-          "displayed_name": "Dreamwell Foresee",
-          "energy_produced": 1,
-          "abilities": [
-            {
-              "Event": {
-                "effect": {
-                  "Effect": {
-                    "Foresee": {
-                      "count": 1
-                    }
-                  }
-                }
-              }
-            }
-          ],
-          "displayed_abilities": [
-            {
-              "Event": {
-                "event": {
-                  "additional_cost": null,
-                  "effect": {
-                    "Effect": "{-Foresee(n:1)}."
-                  }
-                }
-              }
-            }
-          ],
-          "displayed_rules_text": "{-Foresee(n:1)}.",
-          "displayed_prompts": [],
-          "phase": 1,
-          "is_test_card": true,
-          "image": {
-            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Dreamwell/shutterstock_1897537165.png"
-          }
-        }
-      },
-      {
-        "definition": {
-          "base_card_id": "107c3b3f-6131-4ff8-afcb-f0ce4188848f",
-          "displayed_name": "Dreamwell Gain Energy",
-          "energy_produced": 1,
-          "abilities": [
-            {
-              "Event": {
-                "effect": {
-                  "Effect": {
-                    "GainEnergy": {
-                      "gains": 1
-                    }
-                  }
-                }
-              }
-            }
-          ],
-          "displayed_abilities": [
-            {
-              "Event": {
-                "event": {
-                  "additional_cost": null,
-                  "effect": {
-                    "Effect": "Gain {-gained-energy(e: 1)}."
-                  }
-                }
-              }
-            }
-          ],
-          "displayed_rules_text": "Gain {-gained-energy(e: 1)}.",
-          "displayed_prompts": [],
-          "phase": 1,
-          "is_test_card": true,
-          "image": {
-            "sprite": "Assets/ThirdParty/GameAssets/CardImages/Dreamwell/shutterstock_1786390154.png"
-          }
-        }
       }
     ],
     "next_index": 5,
@@ -4538,27 +4538,13 @@
   },
   "activated_abilities": {
     "one": {
-      "characters": {
-        "bits": 0
-      },
       "activated_this_turn_cycle": []
     },
     "two": {
-      "characters": {
-        "bits": 0
-      },
       "activated_this_turn_cycle": []
     }
   },
   "ability_state": {
-    "has_play_from_void_ability": {
-      "one": {
-        "bits": 134217728
-      },
-      "two": {
-        "bits": 0
-      }
-    },
     "banish_when_leaves_play": {
       "bits": 0
     },

@@ -14,6 +14,21 @@ use rand::Rng;
 use rand::seq::IndexedRandom;
 use tracing::{debug, instrument};
 
+/// Selects an action using a custom UctConfig (exposed for benchmarks to allow
+/// forcing iteration multipliers like setting iteration_multiplier_override).
+pub fn select_action_with_uct_config(
+    initial_battle: &BattleState,
+    player: PlayerName,
+    config: &UctConfig,
+) -> BattleAction {
+    let battle = &player_state::randomize_battle_player(
+        initial_battle,
+        player.opponent(),
+        rand::rng().random(),
+    );
+    uct_search::search(battle, player, config)
+}
+
 /// Selects an action for the given player using the given AI agent.
 #[instrument(skip_all, level = "debug")]
 pub fn select_action(battle: &BattleState, player: PlayerName, game_ai: &GameAI) -> BattleAction {
@@ -30,7 +45,7 @@ pub fn select_action(battle: &BattleState, player: PlayerName, game_ai: &GameAI)
     }
 
     let start_time = Instant::now();
-    let action = select_action_unchecked(battle, player, game_ai);
+    let action = select_action_unchecked(battle, player, game_ai, None);
     debug!(
         "Agent selected action {:?} in {:.3} seconds",
         action,
@@ -47,6 +62,7 @@ pub fn select_action_unchecked(
     initial_battle: &BattleState,
     player: PlayerName,
     game_ai: &GameAI,
+    iteration_multiplier_override: Option<f64>,
 ) -> BattleAction {
     let battle = &player_state::randomize_battle_player(
         initial_battle,
@@ -60,7 +76,8 @@ pub fn select_action_unchecked(
         GameAI::MonteCarlo(thousands_of_iterations) => {
             let config = UctConfig {
                 max_iterations_per_action: *thousands_of_iterations * 1000,
-                max_total_iterations: *thousands_of_iterations * 1000 * 6,
+                max_total_actions_multiplier: 6,
+                iteration_multiplier_override,
                 single_threaded: false,
             };
             uct_search::search(battle, player, &config)
@@ -68,7 +85,8 @@ pub fn select_action_unchecked(
         GameAI::MonteCarloSingleThreaded(thousands_of_iterations) => {
             let config = UctConfig {
                 max_iterations_per_action: *thousands_of_iterations * 1000,
-                max_total_iterations: *thousands_of_iterations * 1000 * 6,
+                max_total_actions_multiplier: 6,
+                iteration_multiplier_override,
                 single_threaded: true,
             };
             uct_search::search(battle, player, &config)
