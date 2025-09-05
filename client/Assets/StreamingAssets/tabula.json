@@ -3097,67 +3097,67 @@
       "list_name": "Core 11",
       "list_type": "BaseCardId",
       "card_id": "d8fe4b2a-088c-4a92-aeb7-d6d4d22fda1a",
-      "copies": 4.0
+      "copies": 8.0
     },
     {
       "list_name": "Core 11",
       "list_type": "BaseCardId",
       "card_id": "d07ac4fa-cc3b-4bb8-8018-de7dc1760f35",
-      "copies": 3.0
+      "copies": 6.0
     },
     {
       "list_name": "Core 11",
       "list_type": "BaseCardId",
       "card_id": "d4207a7b-fc36-45e4-a1ee-f01b34485221",
-      "copies": 2.0
-    },
-    {
-      "list_name": "Core 11",
-      "list_type": "BaseCardId",
-      "card_id": "15a39336-2c71-44d6-b462-d9fd23a4d925",
-      "copies": 3.0
-    },
-    {
-      "list_name": "Core 11",
-      "list_type": "BaseCardId",
-      "card_id": "3380cf41-2bca-468c-95e0-57abafd29430",
       "copies": 4.0
     },
     {
       "list_name": "Core 11",
       "list_type": "BaseCardId",
+      "card_id": "15a39336-2c71-44d6-b462-d9fd23a4d925",
+      "copies": 6.0
+    },
+    {
+      "list_name": "Core 11",
+      "list_type": "BaseCardId",
+      "card_id": "3380cf41-2bca-468c-95e0-57abafd29430",
+      "copies": 8.0
+    },
+    {
+      "list_name": "Core 11",
+      "list_type": "BaseCardId",
       "card_id": "86c79455-f9ba-46e4-80a6-e018f330942b",
-      "copies": 5.0
+      "copies": 10.0
     },
     {
       "list_name": "Core 11",
       "list_type": "BaseCardId",
       "card_id": "07f737af-dbaf-471a-8edc-e1d987c23903",
-      "copies": 2.0
+      "copies": 4.0
     },
     {
       "list_name": "Core 11",
       "list_type": "BaseCardId",
       "card_id": "33c0db9c-666d-4b4c-a596-b74106025be8",
-      "copies": 2.0
+      "copies": 4.0
     },
     {
       "list_name": "Core 11",
       "list_type": "BaseCardId",
       "card_id": "9866955c-31af-4aad-8319-a52d2fd85d0f",
-      "copies": 2.0
-    },
-    {
-      "list_name": "Core 11",
-      "list_type": "BaseCardId",
-      "card_id": "5e70988b-ce14-45a0-8334-7cf4539ee2d8",
       "copies": 3.0
     },
     {
       "list_name": "Core 11",
       "list_type": "BaseCardId",
+      "card_id": "5e70988b-ce14-45a0-8334-7cf4539ee2d8",
+      "copies": 6.0
+    },
+    {
+      "list_name": "Core 11",
+      "list_type": "BaseCardId",
       "card_id": "1d41a21a-1beb-4e56-8d7f-be29c4a9d43d",
-      "copies": 2.0
+      "copies": 4.0
     }
   ],
   "card_effects": [

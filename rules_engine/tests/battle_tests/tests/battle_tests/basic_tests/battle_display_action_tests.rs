@@ -1,4 +1,5 @@
 use action_data::battle_display_action::{BattleDisplayAction, CardBrowserType};
+use battle_state::actions::battle_actions::BattleAction;
 use battle_state::actions::debug_battle_action::DebugBattleAction;
 use core_data::types::PlayerName;
 use display_data::battle_view::DisplayPlayer;
@@ -412,4 +413,44 @@ fn other_game_actions_unhide_stack() {
         0,
         "on screen storage should be empty after performing other action"
     );
+}
+
+#[test]
+fn toggle_stack_visibility_hides_and_shows_activated_ability_token() {
+    let mut s = TestBattle::builder().connect();
+
+    let character_id =
+        s.add_to_battlefield(DisplayPlayer::User, test_card::TEST_ACTIVATED_ABILITY_DRAW_CARD);
+    let _enemy_fast_card = s.add_to_hand(DisplayPlayer::Enemy, test_card::TEST_DRAW_ONE);
+
+    s.activate_ability(DisplayPlayer::User, &character_id, 0);
+
+    assert_eq!(s.user_client.cards.stack_cards().len(), 1, "activated ability should be on stack");
+    assert_eq!(
+        s.user_client.cards.cards_at_position(&Position::OnScreenStorage).len(),
+        0,
+        "on screen storage empty before hiding"
+    );
+
+    s.perform_user_action(BattleDisplayAction::ToggleStackVisibility);
+
+    assert_eq!(s.user_client.cards.stack_cards().len(), 0, "stack hidden should appear empty");
+    let storage_cards = s.user_client.cards.cards_at_position(&Position::OnScreenStorage);
+    assert_eq!(storage_cards.len(), 1, "ability token moved to on screen storage");
+    let stored = storage_cards.get(0).unwrap();
+    assert!(
+        stored.view.revealed.as_ref().unwrap().name.contains("Ability"),
+        "stored card is ability token"
+    );
+
+    s.perform_user_action(BattleDisplayAction::ToggleStackVisibility);
+
+    assert_eq!(
+        s.user_client.cards.stack_cards().len(),
+        1,
+        "ability token back on stack after showing"
+    );
+
+    s.perform_enemy_action(BattleAction::PassPriority);
+    assert_eq!(s.user_client.cards.stack_cards().len(), 0, "stack empty after resolution");
 }

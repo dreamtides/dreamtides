@@ -26,7 +26,7 @@ use ui_components::icon;
 
 use crate::core::adapter;
 use crate::core::response_builder::ResponseBuilder;
-use crate::display_actions::outcome_simulation;
+use crate::display_actions::{display_state, outcome_simulation};
 use crate::rendering::{card_rendering, positions};
 
 pub fn trigger_card_view(
@@ -36,13 +36,18 @@ pub fn trigger_card_view(
     trigger: &TriggerAnimation,
 ) -> CardView {
     let current_stack = positions::current_stack_type(builder, battle);
+    let stack_position = if display_state::is_overlay_hidden(builder) {
+        Position::OnScreenStorage
+    } else {
+        Position::OnStack(current_stack)
+    };
     let character_card_id = trigger.character_id.card_id();
     let definition = card::get_definition(battle, character_card_id);
     token_card_view(
         TokenCardView::builder()
             .id(format!("T{:?}/{:?}", character_card_id.0, trigger.ability_number))
             .position(ObjectPosition {
-                position: Position::OnStack(current_stack),
+                position: stack_position,
                 sorting_key: (battle.cards.next_object_id_for_display().0 + index + 5) as u32,
             })
             .image(card_rendering::card_image(battle, character_card_id))
@@ -141,8 +146,13 @@ pub fn activated_ability_card_view_on_stack(
     ability: ActivatedAbilityId,
 ) -> CardView {
     let current_stack = positions::current_stack_type(builder, battle);
+    let base_position = Position::OnStack(current_stack);
     let stack_position = ObjectPosition {
-        position: Position::OnStack(current_stack),
+        position: if display_state::is_overlay_hidden(builder) {
+            Position::OnScreenStorage
+        } else {
+            base_position
+        },
         sorting_key: battle.cards.activated_ability_object_id(ability).unwrap_or_default().0 as u32,
     };
 
@@ -191,6 +201,13 @@ fn activated_ability_card_view(
             position: Position::InHand(DisplayPlayer::User),
             sorting_key: card::get(battle, character_card_id).object_id.0 as u32,
         }
+    };
+    let position = if matches!(position.position, Position::OnStack(_))
+        && display_state::is_overlay_hidden(builder)
+    {
+        ObjectPosition { position: Position::OnScreenStorage, sorting_key: position.sorting_key }
+    } else {
+        position
     };
 
     token_card_view(
@@ -288,13 +305,15 @@ fn void_card_token_view(
         None
     };
 
+    let position = if display_state::is_overlay_hidden(builder) {
+        Position::OnScreenStorage
+    } else {
+        Position::InHand(DisplayPlayer::User)
+    };
     token_card_view(
         TokenCardView::builder()
             .id(adapter::void_card_token_client_id(void_card_id))
-            .position(ObjectPosition {
-                position: Position::InHand(DisplayPlayer::User),
-                sorting_key: hand_sorting_key,
-            })
+            .position(ObjectPosition { position, sorting_key: hand_sorting_key })
             .image(card_rendering::card_image(battle, card_id))
             .name(card_rendering::card_name(battle, card_id))
             .cost(

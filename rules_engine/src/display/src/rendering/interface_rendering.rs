@@ -330,7 +330,7 @@ fn render_hide_overlay_button(
 
     Some(
         BoxComponent::builder()
-            .name("Hide Stack Button Container")
+            .name("Hide Overlay Button Container")
             .style(
                 FlexStyle::builder()
                     .position(FlexPosition::Absolute)
