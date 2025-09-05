@@ -165,7 +165,7 @@ tabula *args='':
       --string-ids rules_engine/src/tabula_ids/src/string_id.rs \
       --test-card-ids rules_engine/src/tabula_ids/src/test_card.rs \
       --card-lists rules_engine/src/tabula_ids/src/card_lists.rs \
-      --write-json client/Assets/StreamingAssets/tabula.json
+      --write-json client/Assets/StreamingAssets/tabula.json "$@"
   cd rules_engine && cargo +nightly fmt
 
 tabula-add-card *args='':

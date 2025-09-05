@@ -3214,6 +3214,7 @@ dependencies = [
  "clap",
  "convert_case 0.8.0",
  "core_data",
+ "database",
  "fluent",
  "fluent-bundle",
  "google-sheets4",

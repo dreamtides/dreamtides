@@ -1,9 +1,13 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
+use std::env;
 use std::fs::File;
 use std::io::BufReader;
+use std::sync::Arc;
 
 use anyhow::{Context, Result};
 use clap::Parser;
+use core_data::identifiers::BaseCardId;
+use database::save_file::SaveFile;
 use google_sheets4::Sheets;
 use google_sheets4::yup_oauth2::{ServiceAccountAuthenticator, ServiceAccountKey};
 use hyper_util::client::legacy::Client;
@@ -12,6 +16,7 @@ use tabula_cli::google_sheet::GoogleSheet;
 use tabula_cli::missing_cards_table::write_missing_cards_html;
 use tabula_cli::spreadsheet::Spreadsheet;
 use tabula_cli::{ability_parsing, tabula_codegen, tabula_sync};
+use tabula_data::card_definitions::card_definition::CardDefinition; // for type reference
 use tabula_data::localized_strings::LanguageId;
 use tabula_data::tabula::{self, TabulaBuildContext, TabulaRaw};
 use yup_oauth2::hyper_rustls::HttpsConnectorBuilder;
@@ -29,6 +34,12 @@ pub struct Args {
     test_card_ids: Option<String>,
     #[arg(long, value_name = "PATH", help = "Generate card_lists.rs at the given path")]
     card_lists: Option<String>,
+    #[arg(
+        long,
+        value_name = "PATH",
+        help = "Path to a SaveFile JSON to update in-place with new CardDefinitions"
+    )]
+    update_save_file: Option<String>,
     #[arg(
         long,
         value_name = "PATH",
@@ -50,7 +61,15 @@ async fn main() {
 }
 
 async fn run() -> Result<()> {
-    let args = Args::parse();
+    let args = Args::parse_from(env::args_os().enumerate().filter_map(|(i, s)| {
+        if i == 0 {
+            Some(s)
+        } else if s.to_string_lossy().is_empty() {
+            None
+        } else {
+            Some(s)
+        }
+    }));
 
     let file = File::open(&args.key_file)
         .with_context(|| format!("failed to open key file at {path}", path = args.key_file))?;
@@ -141,5 +160,61 @@ async fn run() -> Result<()> {
         tabula_codegen::generate_card_lists(&tabula_raw, path)?;
     }
 
+    if let Some(path) = args.update_save_file.as_deref() {
+        update_save_file(path, &tabula_raw)?;
+    }
+
+    Ok(())
+}
+
+fn update_save_file(path: &str, tabula_raw: &TabulaRaw) -> Result<()> {
+    println!("Updating save file card definitions at {path}");
+    let save_path = std::path::Path::new(path);
+    let file = File::open(save_path)
+        .with_context(|| format!("failed to open save file JSON at {path}"))?;
+    let mut save_file: SaveFile = serde_json::from_reader(BufReader::new(file))
+        .with_context(|| format!("failed to parse save file JSON at {path}"))?;
+    let mut latest_defs: HashMap<BaseCardId, &CardDefinition> = HashMap::new();
+    let built_tabula = tabula::build(
+        &TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates },
+        tabula_raw,
+    )
+    .map_err(|errs| {
+        anyhow::anyhow!(errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n"))
+    })?;
+    for (id, def) in built_tabula.cards.iter() {
+        latest_defs.insert(*id, def);
+    }
+    fn update_deck_cards(
+        cards: &mut [CardDefinition],
+        latest: &HashMap<BaseCardId, &CardDefinition>,
+    ) -> usize {
+        let mut updated = 0;
+        for c in cards.iter_mut() {
+            if let Some(new_def) = latest.get(&c.base_card_id) {
+                *c = (*new_def).clone();
+                updated += 1;
+            }
+        }
+        updated
+    }
+    let mut total_updated = 0usize;
+    match &mut save_file {
+        SaveFile::V1(v1) => {
+            if let Some(quest) = &mut v1.quest {
+                if let Some(battle) = &mut quest.battle {
+                    let one_cards = &mut Arc::make_mut(&mut battle.players.one.quest).deck.cards;
+                    total_updated += update_deck_cards(one_cards, &latest_defs);
+                    let two_cards = &mut Arc::make_mut(&mut battle.players.two.quest).deck.cards;
+                    total_updated += update_deck_cards(two_cards, &latest_defs);
+                }
+            }
+        }
+    }
+    println!("Updated {total_updated} card definitions in save file");
+    let out = File::create(save_path)
+        .with_context(|| format!("failed to open save file for writing at {path}"))?;
+    serde_json::to_writer_pretty(out, &save_file)
+        .context("failed to write updated save file JSON")?;
     Ok(())
 }
