@@ -1,15 +1,14 @@
 use std::fmt;
 use std::marker::PhantomData;
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::battle::card_id::{CardId, CardIdType};
 
-#[derive(Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct CardSet<T> {
     bits: u128,
 
-    #[serde(skip)]
     _marker: PhantomData<T>,
 }
 
@@ -100,6 +99,30 @@ impl<T: CardIdType> Extend<T> for CardSet<T> {
             debug_assert!(pos < 128, "CardSet only supports card IDs 0-127, got {pos}");
             self.bits |= 1u128 << pos;
         }
+    }
+}
+
+impl<T: CardIdType> Serialize for CardSet<T> {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        let mut vec = Vec::with_capacity(self.len());
+        for id in self.iter() {
+            vec.push(id.card_id().0 as u64);
+        }
+        vec.serialize(serializer)
+    }
+}
+
+impl<'de, T: CardIdType> Deserialize<'de> for CardSet<T> {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let raw: Vec<u64> = Vec::<u64>::deserialize(deserializer)?;
+        let mut set = CardSet::new();
+        for v in raw {
+            if v >= 128 {
+                return Err(serde::de::Error::custom("CardSet only supports card IDs 0-127"));
+            }
+            set.bits |= 1u128 << v;
+        }
+        Ok(set)
     }
 }
 
@@ -493,6 +516,21 @@ mod tests {
         // Should maintain the same bits and functionality
         assert_eq!(hand_set.len(), 1);
         assert!(hand_set.contains(HandCardId(CardId(42))));
+    }
+
+    #[test]
+    fn test_json_serialization_vector_form() {
+        let mut set = CardSet::new();
+        set.insert(test_card_id(5));
+        set.insert(test_card_id(1));
+        set.insert(test_card_id(9));
+        let json = serde_json::to_string(&set).unwrap();
+        assert_eq!(json, "[1,5,9]");
+        let de: CardSet<CharacterId> = serde_json::from_str(&json).unwrap();
+        assert_eq!(de.len(), 3);
+        assert!(de.contains(test_card_id(1)));
+        assert!(de.contains(test_card_id(5)));
+        assert!(de.contains(test_card_id(9)));
     }
 
     #[test]

@@ -425,6 +425,7 @@ dependencies = [
  "rand_xoshiro",
  "schemars 1.0.2",
  "serde",
+ "serde_json",
  "serde_with",
  "strum",
  "strum_macros",

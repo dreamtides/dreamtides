@@ -1,5 +1,5 @@
 {
-  "id": "40542859-8f7a-44ec-a73f-c8da4353e769",
+  "id": "c5622276-080d-4852-be95-9f7333b710aa",
   "cards": {
     "cards": [
       {
@@ -912,40 +912,93 @@
       }
     ],
     "battlefield": {
-      "one": {
-        "bits": 0
-      },
-      "two": {
-        "bits": 0
-      }
+      "one": [],
+      "two": []
     },
     "battlefield_state": {
       "one": {},
       "two": {}
     },
     "void": {
-      "one": {
-        "bits": 0
-      },
-      "two": {
-        "bits": 5765170472987656192
-      }
+      "one": [],
+      "two": [
+        49,
+        60,
+        62
+      ]
     },
     "hands": {
-      "one": {
-        "bits": 1493319684
-      },
-      "two": {
-        "bits": 361455668718206976
-      }
+      "one": [
+        2,
+        14,
+        17,
+        24,
+        27,
+        28,
+        30
+      ],
+      "two": [
+        34,
+        41,
+        42,
+        45,
+        50,
+        56,
+        58
+      ]
     },
     "shuffled_into_decks": {
-      "one": {
-        "bits": 2801647611
-      },
-      "two": {
-        "bits": 12320117927708721152
-      }
+      "one": [
+        0,
+        1,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        15,
+        16,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        25,
+        26,
+        29,
+        31
+      ],
+      "two": [
+        32,
+        33,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        43,
+        44,
+        46,
+        47,
+        48,
+        51,
+        52,
+        53,
+        54,
+        55,
+        57,
+        59,
+        61,
+        63
+      ]
     },
     "tops_of_decks": {
       "one": [],
@@ -953,20 +1006,12 @@
     },
     "stack": [],
     "stack_card_set": {
-      "one": {
-        "bits": 0
-      },
-      "two": {
-        "bits": 0
-      }
+      "one": [],
+      "two": []
     },
     "banished": {
-      "one": {
-        "bits": 0
-      },
-      "two": {
-        "bits": 0
-      }
+      "one": [],
+      "two": []
     },
     "next_object_id": 81,
     "activated_ability_object_ids": []
@@ -1019,7 +1064,7 @@
         31
       ],
       "quest": {
-        "id": "1a4e934c-15ef-4995-8b01-66644f6f7ff6",
+        "id": "225e1efe-d0ad-473a-968e-9f8bec7dfb31",
         "user": {
           "id": "00000000-0000-0000-0000-000000000000"
         },
@@ -2646,7 +2691,7 @@
         63
       ],
       "quest": {
-        "id": "f8b36932-2773-4b2a-b8e6-e36d34595087",
+        "id": "c671ba7c-925a-42dd-9ff2-1a63b55cb6c2",
         "user": {
           "id": "00000000-0000-0000-0000-000000000000"
         },
@@ -4497,42 +4542,18 @@
   },
   "triggers": {
     "listeners": {
-      "abandoned": {
-        "bits": 0
-      },
-      "banished": {
-        "bits": 0
-      },
-      "discarded": {
-        "bits": 0
-      },
-      "dissolved": {
-        "bits": 0
-      },
-      "drew_all_cards_in_copy_of_deck": {
-        "bits": 0
-      },
-      "end_of_turn": {
-        "bits": 0
-      },
-      "gained_energy": {
-        "bits": 0
-      },
-      "judgment": {
-        "bits": 0
-      },
-      "materialized": {
-        "bits": 0
-      },
-      "played_card": {
-        "bits": 0
-      },
-      "played_card_from_hand": {
-        "bits": 0
-      },
-      "played_card_from_void": {
-        "bits": 0
-      }
+      "abandoned": [],
+      "banished": [],
+      "discarded": [],
+      "dissolved": [],
+      "drew_all_cards_in_copy_of_deck": [],
+      "end_of_turn": [],
+      "gained_energy": [],
+      "judgment": [],
+      "materialized": [],
+      "played_card": [],
+      "played_card_from_hand": [],
+      "played_card_from_void": []
     },
     "events": []
   },
@@ -4545,9 +4566,7 @@
     }
   },
   "ability_state": {
-    "banish_when_leaves_play": {
-      "bits": 0
-    },
+    "banish_when_leaves_play": [],
     "until_end_of_turn": {
       "active_dreamwell_card": 4,
       "prevent_dissolved": []
@@ -4819,15 +4838,11 @@
     "current_action_history": {
       "one": {
         "hand_size_limit_exceeded": false,
-        "character_limit_characters_abandoned": {
-          "bits": 0
-        }
+        "character_limit_characters_abandoned": []
       },
       "two": {
         "hand_size_limit_exceeded": false,
-        "character_limit_characters_abandoned": {
-          "bits": 0
-        }
+        "character_limit_characters_abandoned": []
       }
     }
   },
