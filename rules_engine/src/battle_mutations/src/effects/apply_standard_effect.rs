@@ -11,6 +11,7 @@ use battle_state::battle_cards::battle_card_state::CardObjectId;
 use battle_state::battle_cards::card_set::CardSet;
 use battle_state::battle_cards::stack_card_state::EffectTargets;
 use battle_state::core::effect_source::EffectSource;
+use battle_state::core::should_animate::ShouldAnimate;
 use battle_state::prompt_types::prompt_data::{
     PromptConfiguration, PromptData, PromptType, SelectDeckCardOrderPrompt,
 };
@@ -182,7 +183,7 @@ fn gain_points(
 ) -> Option<EffectWasApplied> {
     let player = source.controller();
     battle_trace!("Gaining points", battle, player, gains);
-    points::gain(battle, player, source, gains);
+    points::gain(battle, player, source, gains, ShouldAnimate::Yes);
     Some(EffectWasApplied)
 }
 
