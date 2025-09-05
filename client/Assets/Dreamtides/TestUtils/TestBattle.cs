@@ -107,7 +107,7 @@ namespace Dreamtides.TestUtils
       return this;
     }
 
-    public TestBattle AddCardToHand(DisplayPlayer player, Guid card = default(Guid))
+    public TestBattle AddCardToHand(DisplayPlayer player, Guid card = default)
     {
       var name = GetPlayerName(player);
       _actions.Add(new DebugBattleAction

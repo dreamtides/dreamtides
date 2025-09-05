@@ -275,6 +275,7 @@ namespace Dreamtides.Services
             User = _enemyId,
           },
           Seed = 1234567890,
+          DeckOverride = TestDeckName.Benchmark1,
         }
       };
     }
