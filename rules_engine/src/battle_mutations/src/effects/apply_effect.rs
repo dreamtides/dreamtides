@@ -78,7 +78,7 @@ pub fn execute(
                 requested_targets: requested_targets.cloned(),
                 modal_choice,
             });
-            execute_pending_effects_if_no_active_prompt(battle);
+            execute_pending_effects_if_no_active_prompt_internal(battle);
         }
         Effect::Modal(choices) => {
             if let Some(modal_choice) = modal_choice {
@@ -92,7 +92,17 @@ pub fn execute(
 
 /// Executes pending effects until there are no more in the queue or a prompt is
 /// created.
+#[inline]
 pub fn execute_pending_effects_if_no_active_prompt(battle: &mut BattleState) {
+    if !battle.pending_effects.is_empty() && battle.prompts.is_empty() {
+        execute_pending_effects_if_no_active_prompt_internal(battle);
+    }
+}
+
+/// Executes pending effects until there are no more in the queue or a prompt is
+/// created.
+#[cold]
+fn execute_pending_effects_if_no_active_prompt_internal(battle: &mut BattleState) {
     loop {
         if !battle.prompts.is_empty() {
             return;

@@ -18,7 +18,15 @@ use crate::effects::apply_effect_with_prompt_for_targets;
 /// Triggers are removed from the trigger list after firing. Runs until all
 /// triggers are resolved, including new triggers that may be added during
 /// execution.
+#[inline]
 pub fn execute_if_no_active_prompt(battle: &mut BattleState) {
+    if !battle.triggers.events.is_empty() && battle.prompts.is_empty() {
+        execute_if_no_active_prompt_internal(battle);
+    }
+}
+
+#[cold]
+fn execute_if_no_active_prompt_internal(battle: &mut BattleState) {
     let should_animate = battle.animations.is_some();
     let mut trigger_animations = Vec::new();
 
@@ -40,11 +48,11 @@ pub fn execute_if_no_active_prompt(battle: &mut BattleState) {
         };
 
         let controller = card_properties::controller(battle, trigger_for_listener.listener);
+
+        // Check whether this character is currently on the battlefield.
         let Some(character_id) =
             battle.cards.to_character_id(controller, trigger_for_listener.listener)
         else {
-            // Skip triggers for cards that are not currently on the
-            // battlefield.
             continue;
         };
 

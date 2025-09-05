@@ -38,7 +38,7 @@ pub fn card_type(battle: &BattleState, card_id: impl CardIdType) -> CardType {
 }
 
 pub fn card_subtype(_battle: &BattleState, _card_id: impl CardIdType) -> Option<CardSubtype> {
-    Some(CardSubtype::Musician)
+    todo!("Implement card_subtype");
 }
 
 pub fn is_fast(battle: &BattleState, card_id: impl CardIdType) -> bool {
