@@ -38,6 +38,8 @@ namespace Dreamtides.Services
       _registry = registry;
       _clickAction = InputSystem.actions.FindAction("Click");
       _tapPositionAction = InputSystem.actions.FindAction("TapPosition");
+      _clickAction.Enable();
+      _tapPositionAction.Enable();
     }
 
     // Note: In the Unity 6 editor, there is a bug where this will sometimes start
