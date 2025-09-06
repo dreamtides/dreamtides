@@ -93,6 +93,12 @@ pub fn connect_with_provider(
     ConnectResponse { metadata, commands, response_version }
 }
 
+/// Returns true if there are any pending poll updates for any user.
+pub fn any_user_has_updates() -> bool {
+    let provider = DefaultStateProvider;
+    provider.has_pending_updates()
+}
+
 /// Polls for the result of a game action.
 pub fn poll(user_id: UserId, metadata: Metadata) -> Option<PollResponse> {
     if let Some(integration_test_id) = metadata.integration_test_id {

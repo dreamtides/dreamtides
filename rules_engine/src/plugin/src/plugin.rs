@@ -127,6 +127,13 @@ unsafe fn perform_impl(
     Ok(json_bytes.len() as i32)
 }
 
+/// Checks whether any updates are available to retreive from the poll()
+/// function.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn dreamtides_has_updates() -> bool {
+    engine::any_user_has_updates()
+}
+
 /// Polls for pending updates for a user.
 ///
 /// `request` should be a buffer including the json serialization of a

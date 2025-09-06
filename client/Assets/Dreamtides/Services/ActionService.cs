@@ -111,12 +111,15 @@ namespace Dreamtides.Services
         }
         else
         {
-          var request = new PollRequest
+          if (Plugin.HasPendingUpdates() || _integrationTestId != null)
           {
-            Metadata = Errors.CheckNotNull(_metadata)
-          };
-          var response = Plugin.Poll(request);
-          StartCoroutine(HandlePollResponse(response));
+            var request = new PollRequest
+            {
+              Metadata = Errors.CheckNotNull(_metadata)
+            };
+            var response = Plugin.Poll(request);
+            StartCoroutine(HandlePollResponse(response));
+          }
         }
       }
     }

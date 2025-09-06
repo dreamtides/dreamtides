@@ -36,6 +36,11 @@ static class Plugin
         return Errors.CheckNotNull(deserialized, "Error deserializing action response");
     }
 
+    public static bool HasPendingUpdates()
+    {
+        return dreamtides_has_updates();
+    }
+
     public static PollResponse Poll(PollRequest request)
     {
         var serialized = JsonConvert.SerializeObject(request, Converter.Settings);
@@ -77,6 +82,13 @@ static class Plugin
       int requestLength,
       [Out] byte[] response,
       int responseLength);
+
+#if !UNITY_EDITOR && (UNITY_IOS || UNITY_WEBGL)
+    [DllImport("__Internal")]
+#else
+    [DllImport("plugin")]
+#endif
+    public static extern bool dreamtides_has_updates();
 
 #if !UNITY_EDITOR && (UNITY_IOS || UNITY_WEBGL)
     [DllImport("__Internal")]

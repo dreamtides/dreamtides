@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io::{Cursor, Read};
 use std::panic::{RefUnwindSafe, UnwindSafe};
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Condvar, LazyLock, Mutex, RwLock};
 use std::time::Instant;
 
@@ -114,6 +115,12 @@ static PROCESSING_USERS: LazyLock<Mutex<HashMap<UserId, bool>>> =
 static PENDING_UPDATES: LazyLock<Mutex<HashMap<UserId, Vec<PollResult>>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
+// Fast path counter for total pending poll results across all users. This lets
+// callers check for any pending updates with a single atomic read instead of
+// locking the PENDING_UPDATES map. Maintained in append_poll_result /
+// take_next_poll_result.
+static TOTAL_PENDING_UPDATES: LazyLock<AtomicUsize> = LazyLock::new(|| AtomicUsize::new(0));
+
 static DISPLAY_STATES: LazyLock<Mutex<HashMap<UserId, DisplayState>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
@@ -132,6 +139,14 @@ static PERSISTENT_DATA_DIR: LazyLock<Mutex<Option<PathBuf>>> = LazyLock::new(|| 
 
 #[derive(Clone)]
 pub struct DefaultStateProvider;
+
+impl DefaultStateProvider {
+    // Fast check used by the rules engine to determine if any poll results are
+    // pending.
+    pub fn has_pending_updates(&self) -> bool {
+        TOTAL_PENDING_UPDATES.load(Ordering::Acquire) > 0
+    }
+}
 
 /// Loads tabula.json from an APK jar style URL on Android.
 ///
@@ -345,6 +360,7 @@ impl StateProvider for DefaultStateProvider {
     fn append_poll_result(&self, user_id: UserId, result: PollResult) {
         let mut updates = PENDING_UPDATES.lock().unwrap();
         updates.entry(user_id).or_default().push(result);
+        TOTAL_PENDING_UPDATES.fetch_add(1, Ordering::Release);
     }
 
     fn push_undo_entry(&self, battle_id: BattleId, player: PlayerName, state: BattleState) {
@@ -379,7 +395,9 @@ impl StateProvider for DefaultStateProvider {
         let mut updates = PENDING_UPDATES.lock().unwrap();
         if let Some(user_updates) = updates.get_mut(&user_id) {
             if !user_updates.is_empty() {
-                return Some(user_updates.remove(0));
+                let result = user_updates.remove(0);
+                TOTAL_PENDING_UPDATES.fetch_sub(1, Ordering::AcqRel);
+                return Some(result);
             }
         }
         None
