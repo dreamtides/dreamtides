@@ -1,1 +1,1 @@
-rules_engine/.cursorrules
+../rules_engine/.cursorrules
