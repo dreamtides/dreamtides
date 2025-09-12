@@ -1,10 +1,18 @@
-Please begin your response with "Sure!".
-
 Please follow all of the "code style" and "validating changes" rules below at
 all times.
 
 
-# CODE STYLE:
+# SETUP
+
+
+- This project uses Rust and Cargo, which can be installed via `rustup`
+    - `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
+- This project uses the `just` command runner
+    - `cargo install just`
+- A `just` command can be run from any directory of the project and will have the same result
+
+
+# CODE STYLE
 
 
 - Prefer writing code inline (when possible) to creating new variables via "let" statements
@@ -22,7 +30,8 @@ all times.
   - CORRECT STRUCT NAME: BattleState
 - Public functions and types go at the TOP of the file, then private ones.
 - Don't add "pub use" for anything.
-- Keep Cargo.toml dependencies alphabetized
+- Keep Cargo.toml dependencies alphabetized in two lists, internal then external dependencies.
+- Use modern Rust features such as if-let statements and "{inline:?}" variable formatting
 
 
 # VALIDATING CHANGES
@@ -30,12 +39,12 @@ all times.
 
 - After completing work, please always run "just fmt" to apply rustfmt
   formatting rules
-- After completing work, please ALWAYS run "just review" to validate changes
-- After completing work, if you change any structs in display_data, please
-  run the "just schema" command.
-- After completing work, review the code structure in .cursorrules for
-  correctness and suggest any needed additions or changes.
+- Run `just check` to type check code
+- Run `just clippy` to check for lint warnings
+- After writing a test, use `just battle-test <TEST NAME>` to run it
+- After completing work, please ALWAYS run `just review` to validate changes
 - Do not print a summary of changes after completing work.
+- Prefer the `just` commands over `cargo` commands since they have project-specific rules
 
 
 # PROJECT CONTEXT
@@ -55,6 +64,8 @@ Dissolved characters and played events go the discard pile, which is called the
 
 
 The code is structured as a series of Rust crates using the cargo "workspace" feature.
+
+Rules engine source code lives in the rules_engine/ directory.
 
 
 ## Data Crates
