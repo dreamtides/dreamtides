@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Dreamtides.Buttons;
+using HighlightPlus;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -15,6 +16,13 @@ public class CameraMover : MonoBehaviour
     [SerializeField] Transform _shopTrackingTarget;
     [SerializeField] CinemachineCamera _eventCamera;
     [SerializeField] Transform _eventTrackingTarget;
+    [SerializeField] CinemachineCamera _essenceCamera;
+    [SerializeField] Transform _essenceTrackingTarget;
+    [SerializeField] CinemachineCamera _draft2Camera;
+    [SerializeField] Transform _draft2TrackingTarget;
+    [SerializeField] CinemachineCamera _battleCamera;
+    [SerializeField] Transform _battleTrackingTarget;
+    [SerializeField] List<HighlightEffect> _highlightEffects;
     [SerializeField] List<SiteButton> _siteButtons;
 
     Coroutine _siteButtonsActivationCoroutine;
@@ -36,7 +44,7 @@ public class CameraMover : MonoBehaviour
 
     public void FocusSpaceCameraNear()
     {
-        ResetPrioritiesAndTrack(null, true);
+        ResetPrioritiesAndTrack(null, false);
         _spaceCameraNear.Priority = 10;
     }
 
@@ -64,6 +72,24 @@ public class CameraMover : MonoBehaviour
         _eventCamera.Priority = 10;
     }
 
+    public void FocusEssenceCamera()
+    {
+        ResetPrioritiesAndTrack(_essenceTrackingTarget, false);
+        _essenceCamera.Priority = 10;
+    }
+
+    public void FocusDraft2Camera()
+    {
+        ResetPrioritiesAndTrack(_draft2TrackingTarget, false);
+        _draft2Camera.Priority = 10;
+    }
+
+    public void FocusBattleCamera()
+    {
+        ResetPrioritiesAndTrack(_battleTrackingTarget, false);
+        _battleCamera.Priority = 10;
+    }
+
     void ResetPrioritiesAndTrack(Transform track, bool showSiteButtons)
     {
         // Cancel any pending site-button activation and hide them immediately
@@ -79,6 +105,9 @@ public class CameraMover : MonoBehaviour
         _draftCamera.Priority = 0;
         _shopCamera.Priority = 0;
         _eventCamera.Priority = 0;
+        _essenceCamera.Priority = 0;
+        _draft2Camera.Priority = 0;
+        _battleCamera.Priority = 0;
 
         SetSiteButtonsActive(false);
 
@@ -90,6 +119,9 @@ public class CameraMover : MonoBehaviour
             _draftCamera.Target.TrackingTarget = track;
             _shopCamera.Target.TrackingTarget = track;
             _eventCamera.Target.TrackingTarget = track;
+            _essenceCamera.Target.TrackingTarget = track;
+            _draft2Camera.Target.TrackingTarget = track;
+            _battleCamera.Target.TrackingTarget = track;
         }
 
         // Defer showing site buttons (if requested) until after the blend/transition completes
@@ -105,7 +137,17 @@ public class CameraMover : MonoBehaviour
         foreach (var button in _siteButtons)
         {
             if (button != null)
+            {
                 button.gameObject.SetActive(active);
+            }
+        }
+
+        foreach (var effect in _highlightEffects)
+        {
+            if (effect != null)
+            {
+                effect.highlighted = active;
+            }
         }
     }
 
