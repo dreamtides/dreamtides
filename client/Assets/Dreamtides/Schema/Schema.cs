@@ -689,6 +689,9 @@ namespace Dreamtides.Schema
     ///
     /// Object is above the void, used to display void cards which are currently
     /// being targeted.
+    ///
+    /// Object is in a deck of cards displayed at a given dreamscape site, e.g.
+    /// before being drafted.
     /// </summary>
     public partial class PositionClass
     {
@@ -724,6 +727,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("AboveVoid", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayPlayer? AboveVoid { get; set; }
+
+        [JsonProperty("SiteDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public Guid? SiteDeck { get; set; }
     }
 
     /// <summary>
@@ -2261,6 +2267,30 @@ namespace Dreamtides.Schema
         /// </summary>
         [JsonProperty("interface", Required = Required.Always)]
         public InterfaceView Interface { get; set; }
+
+        /// <summary>
+        /// Sites which can be visited within the currently-active dreamscape.
+        /// </summary>
+        [JsonProperty("sites", Required = Required.Always)]
+        public List<SiteView> Sites { get; set; }
+    }
+
+    /// <summary>
+    /// Represents the visual state of a site within a dreamscape
+    /// </summary>
+    public partial class SiteView
+    {
+        /// <summary>
+        /// Icon representing this site
+        /// </summary>
+        [JsonProperty("icon", Required = Required.Always)]
+        public string Icon { get; set; }
+
+        /// <summary>
+        /// Unique identifier for this site
+        /// </summary>
+        [JsonProperty("id", Required = Required.Always)]
+        public Guid Id { get; set; }
     }
 
     public partial class UpdateScreenOverlayCommand

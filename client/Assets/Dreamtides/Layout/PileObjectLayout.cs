@@ -7,11 +7,12 @@ namespace Dreamtides.Layout
   public class PileObjectLayout : StandardObjectLayout
   {
     [SerializeField] float _singleElementY = 0.5f;
+    [SerializeField] float _yMultiplier = 1.0f;
 
     public override Vector3 CalculateObjectPosition(int index, int count) =>
       new(
         transform.position.x,
-        transform.position.y + Mathf.Lerp(0f, 1f, YPosition(index, count)),
+        transform.position.y + (_yMultiplier * Mathf.Lerp(0f, 1f, YPosition(index, count))),
         transform.position.z);
 
     public override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;

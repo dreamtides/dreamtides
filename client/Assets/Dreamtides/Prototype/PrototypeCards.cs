@@ -8,7 +8,7 @@ namespace Dreamtides.Prototype
 {
   public static class PrototypeCards
   {
-    public static List<CardView> CreateCards(int count, ObjectPosition position)
+    public static List<CardView> CreateCards(int count, ObjectPosition position, bool revealed = true)
     {
       if (count <= 0) return new List<CardView>();
       if (position == null) throw new ArgumentNullException(nameof(position));
@@ -20,7 +20,7 @@ namespace Dreamtides.Prototype
       {
         var template = _cardTemplates[rng.Next(_cardTemplates.Length)];
         var objectPosition = ClonePositionWithSorting(position, i);
-        list.Add(BuildCardView(template, objectPosition, i));
+        list.Add(BuildCardView(template, objectPosition, i, revealed));
       }
 
       return list;
@@ -154,14 +154,14 @@ namespace Dreamtides.Prototype
       )
     };
 
-    static CardView BuildCardView(CardTemplate t, ObjectPosition objectPosition, int sortIndex) => new()
+    static CardView BuildCardView(CardTemplate t, ObjectPosition objectPosition, int sortIndex, bool revealed) => new()
     {
-      Backless = true, // Start revealed without flip animation
-      CardFacing = CardFacing.FaceUp,
-      Id = Guid.NewGuid().ToString(),
+      Backless = revealed, // Only backless if revealed so we don't animate a flip
+      CardFacing = revealed ? CardFacing.FaceUp : CardFacing.FaceDown,
+      Id = (sortIndex + 1).ToString(),
       Position = objectPosition,
       Prefab = t.Prefab,
-      Revealed = BuildRevealed(t),
+      Revealed = revealed ? BuildRevealed(t) : null,
       RevealedToOpponents = true,
       // Optional fields left null to intentionally avoid outlines / effects / actions
     };

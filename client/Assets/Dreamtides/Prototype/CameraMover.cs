@@ -1,11 +1,17 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using Dreamtides.Buttons;
+using Dreamtides.Prototype;
+using Dreamtides.Schema;
+using Dreamtides.Services;
 using HighlightPlus;
 using Unity.Cinemachine;
 using UnityEngine;
 
 public class CameraMover : MonoBehaviour
 {
+    [SerializeField] Registry _registry = null!;
     [SerializeField] CinemachineBrain _brain;
     [SerializeField] CinemachineCamera _spaceCameraFar;
     [SerializeField] CinemachineCamera _spaceCameraNear;
@@ -58,6 +64,18 @@ public class CameraMover : MonoBehaviour
     {
         ResetPrioritiesAndTrack(_draftTrackingTarget, false);
         _draftCamera.Priority = 10;
+
+        StartCoroutine(CreateCards(20, new ObjectPosition
+        {
+            Position = new Position
+            {
+                PositionClass = new PositionClass
+                {
+                    SiteDeck = Guid.NewGuid()
+                }
+            },
+            SortingKey = 1,
+        }, false));
     }
 
     public void FocusShopCamera()
@@ -164,5 +182,19 @@ public class CameraMover : MonoBehaviour
 
         SetSiteButtonsActive(true);
         _siteButtonsActivationCoroutine = null;
+    }
+
+    IEnumerator CreateCards(int count, ObjectPosition position, bool revealed)
+    {
+        var cards = PrototypeCards.CreateCards(count, position, revealed);
+        var command = new UpdateQuestCommand
+        {
+            Quest = new QuestView
+            {
+                Cards = cards,
+            },
+        };
+
+        return _registry.CardService.HandleUpdateQuestCommand(command);
     }
 }

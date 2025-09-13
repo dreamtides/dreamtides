@@ -51,3 +51,9 @@ pub struct DreamwellCardId(pub Uuid);
     Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
 )]
 pub struct AbilityNumber(pub usize);
+
+/// Identifies a location with an effect within a dreamscape.
+#[derive(
+    Copy, Clone, Debug, Eq, PartialEq, Hash, PartialOrd, Ord, Serialize, Deserialize, JsonSchema,
+)]
+pub struct SiteId(pub Uuid);

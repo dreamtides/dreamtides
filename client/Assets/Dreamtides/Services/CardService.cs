@@ -67,6 +67,7 @@ namespace Dreamtides.Services
         toDelete.Remove(cardId);
         var layout = LayoutForObjectPosition(cardView.Position);
         Card card;
+
         if (Cards.ContainsKey(cardId))
         {
           card = Cards[cardId];
@@ -441,6 +442,11 @@ namespace Dreamtides.Services
           DisplayPlayer.Enemy => Registry.Layout.AboveEnemyVoid,
           _ => throw Errors.UnknownEnumValue(aboveVoid),
         };
+      }
+
+      if (position.PositionClass.SiteDeck is { } siteDeck)
+      {
+        return Registry.DreamscapeService.SiteDeckLayout(siteDeck);
       }
 
       var json = JsonConvert.SerializeObject(position.PositionClass);

@@ -1,4 +1,5 @@
 use battle_state::actions::battle_actions::CardOrderSelectionTargetDiscriminants;
+use core_data::identifiers::SiteId;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -97,6 +98,10 @@ pub enum Position {
     /// Object is above the void, used to display void cards which are currently
     /// being targeted.
     AboveVoid(DisplayPlayer),
+
+    /// Object is in a deck of cards displayed at a given dreamscape site, e.g.
+    /// before being drafted.
+    SiteDeck(SiteId),
 }
 
 #[derive(

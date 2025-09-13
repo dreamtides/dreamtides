@@ -93,6 +93,9 @@ namespace Dreamtides.Services
     [SerializeField] IdleReconnectService? _idleReconnectService;
     public IdleReconnectService IdleReconnectService => Check(_idleReconnectService);
 
+    [SerializeField] DreamscapeService _dreamscapeService = null!;
+    public DreamscapeService DreamscapeService => Check(_dreamscapeService);
+
     void Awake()
     {
       var testConfiguration = TestConfiguration;
