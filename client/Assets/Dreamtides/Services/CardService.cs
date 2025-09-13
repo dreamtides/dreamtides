@@ -37,15 +37,31 @@ namespace Dreamtides.Services
       Sequence? sequence = null
     )
     {
-      var view = command.Battle;
+      return ApplyUpdate(command.Battle.Cards, command.UpdateSound, sequence);
+    }
+
+    public IEnumerator HandleUpdateQuestCommand(
+      UpdateQuestCommand command,
+      Sequence? sequence = null
+    )
+    {
+      return ApplyUpdate(command.Quest.Cards, command.UpdateSound, sequence);
+    }
+
+    IEnumerator ApplyUpdate(
+      List<CardView> cardViews,
+      AudioClipAddress updateSound,
+      Sequence? sequence = null
+    )
+    {
       var toDelete = Cards.Keys.ToHashSet();
 
-      if (command.UpdateSound != null)
+      if (updateSound != null)
       {
-        Registry.SoundService.Play(command.UpdateSound);
+        Registry.SoundService.Play(updateSound);
       }
 
-      foreach (var cardView in view.Cards)
+      foreach (var cardView in cardViews)
       {
         var cardId = cardView.ClientId();
         toDelete.Remove(cardId);

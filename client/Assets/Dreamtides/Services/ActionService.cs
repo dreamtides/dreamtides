@@ -491,28 +491,40 @@ namespace Dreamtides.Services
         if (command.UpdateBattle != null)
         {
           Registry.LoggingService.Log("ActionService", "Applying command: UpdateBattle");
-          Registry.Layout.UserStatusDisplay.UpdatePlayerView(command.UpdateBattle.Battle.User, animate);
-          Registry.Layout.EnemyStatusDisplay.UpdatePlayerView(command.UpdateBattle.Battle.Enemy, animate);
-          Registry.DocumentService.RenderScreenOverlay(command.UpdateBattle.Battle.Interface?.ScreenOverlay);
-          Registry.Layout.CardOrderSelector.View = command.UpdateBattle.Battle.Interface?.CardOrderSelector;
+          Registry.Layout.UserStatusDisplay.UpdatePlayerView(
+              command.UpdateBattle.Battle.User, animate);
+          Registry.Layout.EnemyStatusDisplay.UpdatePlayerView(
+              command.UpdateBattle.Battle.Enemy, animate);
+          Registry.DocumentService.RenderScreenOverlay(
+              command.UpdateBattle.Battle.Interface?.ScreenOverlay);
+          Registry.Layout.CardOrderSelector.View =
+            command.UpdateBattle.Battle.Interface?.CardOrderSelector;
           Registry.Layout.PrimaryActionButton.SetView(
               command.UpdateBattle.Battle.Interface?.PrimaryActionButton,
               null);
-          Registry.Layout.SecondaryActionButton.SetView(command.UpdateBattle.Battle.Interface?.SecondaryActionButton);
-          Registry.Layout.IncrementActionButton.SetView(command.UpdateBattle.Battle.Interface?.IncrementButton);
-          Registry.Layout.DecrementActionButton.SetView(command.UpdateBattle.Battle.Interface?.DecrementButton);
-          Registry.Layout.UndoButton.SetView(command.UpdateBattle.Battle.Interface?.UndoButton);
-          Registry.Layout.DevButton.SetView(command.UpdateBattle.Battle.Interface?.DevButton);
+          Registry.Layout.SecondaryActionButton.SetView(
+              command.UpdateBattle.Battle.Interface?.SecondaryActionButton);
+          Registry.Layout.IncrementActionButton.SetView(
+              command.UpdateBattle.Battle.Interface?.IncrementButton);
+          Registry.Layout.DecrementActionButton.SetView(
+              command.UpdateBattle.Battle.Interface?.DecrementButton);
+          Registry.Layout.UndoButton.SetView(
+              command.UpdateBattle.Battle.Interface?.UndoButton);
+          Registry.Layout.DevButton.SetView(
+              command.UpdateBattle.Battle.Interface?.DevButton);
           Registry.Layout.CloseBrowserButton.CloseAction =
               command.UpdateBattle.Battle.Interface?.Browser?.CloseButton?.ToGameAction();
-          Registry.BottomRightButton.SetView(command.UpdateBattle.Battle.Interface?.BottomRightButton);
+          Registry.BottomRightButton.SetView(
+              command.UpdateBattle.Battle.Interface?.BottomRightButton);
           coroutines.Add(StartCoroutine(Registry.CardService.HandleUpdateBattleCommand(
               command.UpdateBattle,
               animate ? TweenUtils.Sequence("UpdateLayout") : null)));
-          Registry.DocumentService.HasOpenPanels = command.UpdateBattle.Battle.Interface?.HasOpenPanels ?? false;
+          Registry.DocumentService.HasOpenPanels =
+              command.UpdateBattle.Battle.Interface?.HasOpenPanels ?? false;
 
           // Must happen after UpdateLayout since cards may be created which are referenced
-          Registry.ArrowService.HandleDisplayArrows(command.UpdateBattle.Battle.Arrows ?? new List<DisplayArrow>());
+          Registry.ArrowService.HandleDisplayArrows(
+              command.UpdateBattle.Battle.Arrows ?? new List<DisplayArrow>());
 
           if (command.UpdateBattle.Battle.Preview.BattlePreviewStateClass?.Active is { } preview)
           {
@@ -522,6 +534,22 @@ namespace Dreamtides.Services
           {
             Registry.CardEffectPreviewService.ClearBattlePreview();
           }
+        }
+
+        if (command.UpdateQuest != null)
+        {
+          Registry.LoggingService.Log("ActionService", "Applying command: UpdateQuest");
+          Registry.DocumentService.RenderScreenOverlay(
+              command.UpdateQuest.Quest.Interface?.ScreenOverlay);
+          Registry.Layout.CardOrderSelector.View =
+              command.UpdateQuest.Quest.Interface?.CardOrderSelector;
+          Registry.Layout.UndoButton.SetView(command.UpdateQuest.Quest.Interface?.UndoButton);
+          Registry.Layout.DevButton.SetView(command.UpdateQuest.Quest.Interface?.DevButton);
+          Registry.Layout.CloseBrowserButton.CloseAction =
+              command.UpdateQuest.Quest.Interface?.Browser?.CloseButton?.ToGameAction();
+          coroutines.Add(StartCoroutine(Registry.CardService.HandleUpdateQuestCommand(
+              command.UpdateQuest,
+              animate ? TweenUtils.Sequence("UpdateQuest") : null)));
         }
 
         if (command.Wait != null)
@@ -639,6 +667,7 @@ namespace Dreamtides.Services
         foreach (var command in group.Commands)
         {
           if (command.UpdateBattle != null) commandNames.Add("UpdateBattle");
+          if (command.UpdateQuest != null) commandNames.Add("UpdateQuest");
           if (command.Wait != null) commandNames.Add("Wait");
           if (command.FireProjectile != null) commandNames.Add("FireProjectile");
           if (command.DissolveCard != null) commandNames.Add("DissolveCard");
@@ -649,6 +678,10 @@ namespace Dreamtides.Services
           if (command.DisplayDreamwellActivation != null) commandNames.Add("DisplayDreamwellActivation");
           if (command.DisplayEnemyMessage != null) commandNames.Add("DisplayEnemyMessage");
           if (command.PlayAudioClip != null) commandNames.Add("PlayAudioClip");
+          if (command.PlayStudioAnimation != null) commandNames.Add("PlayStudioAnimation");
+          if (command.SetCardTrail != null) commandNames.Add("SetCardTrail");
+          if (command.ShuffleVoidIntoDeck != null) commandNames.Add("ShuffleVoidIntoDeck");
+          if (command.UpdateScreenOverlay != null) commandNames.Add("UpdateScreenOverlay");
         }
       }
 
