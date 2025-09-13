@@ -3,4 +3,5 @@ pub mod card_view;
 pub mod client_log_request;
 pub mod command;
 pub mod object_position;
+pub mod quest_view;
 pub mod request_data;

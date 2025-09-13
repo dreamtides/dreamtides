@@ -14,6 +14,7 @@ use strum::EnumDiscriminants;
 use crate::battle_view::{BattleView, DisplayPlayer};
 use crate::card_view::{CardView, ClientCardId};
 use crate::object_position::{ObjectPosition, Position};
+use crate::quest_view::QuestView;
 
 /// A list of [ParallelCommandGroup]s to execute sequentially.
 #[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
@@ -64,6 +65,7 @@ pub struct ParallelCommandGroup {
 #[strum_discriminants()]
 pub enum Command {
     UpdateBattle(Box<UpdateBattleCommand>),
+    UpdateQuest(Box<UpdateQuestCommand>),
     Wait(Milliseconds),
     FireProjectile(FireProjectileCommand),
     DissolveCard(DissolveCardCommand),
@@ -86,6 +88,15 @@ pub struct UpdateBattleCommand {
     pub battle: BattleView,
 
     /// Sound to play when the battle is updated.
+    pub update_sound: Option<AudioClipAddress>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct UpdateQuestCommand {
+    /// The quest to update.
+    pub quest: QuestView,
+
+    /// Sound to play when the quest is updated.
     pub update_sound: Option<AudioClipAddress>,
 }
 

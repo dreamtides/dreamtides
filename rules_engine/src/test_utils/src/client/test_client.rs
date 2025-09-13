@@ -7,6 +7,7 @@ use display_data::battle_view::{
 use display_data::card_view::CardView;
 use display_data::command::{
     Command, CommandSequence, DisplayArrow, GameMessageType, UpdateBattleCommand,
+    UpdateQuestCommand,
 };
 
 use crate::client::test_client_cards::{TestClientCard, TestClientCards};
@@ -47,6 +48,7 @@ impl TestClient {
             for command in group.commands {
                 match command {
                     Command::UpdateBattle(update) => self.handle_update_battle(*update),
+                    Command::UpdateQuest(update) => self.handle_update_quest(*update),
                     Command::Wait(_) => {}
                     Command::FireProjectile(_) => {}
                     Command::DissolveCard(_) => {}
@@ -132,6 +134,21 @@ impl TestClient {
         self.arrows = battle.arrows;
 
         self.preview = Some(battle.preview);
+
+        if let Some(sound) = update.update_sound {
+            self.last_audio_clip = Some(sound);
+        }
+    }
+
+    fn handle_update_quest(&mut self, update: UpdateQuestCommand) {
+        self.cards.card_map.clear();
+        for card in update.quest.cards {
+            self.cards
+                .card_map
+                .insert(card.id.clone(), TestClientCard { id: card.id.clone(), view: card });
+        }
+
+        self.interface = TestInterfaceView::new(Some(update.quest.interface));
 
         if let Some(sound) = update.update_sound {
             self.last_audio_clip = Some(sound);

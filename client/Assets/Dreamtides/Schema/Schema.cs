@@ -256,6 +256,9 @@ namespace Dreamtides.Schema
         [JsonProperty("UpdateBattle", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public UpdateBattleCommand UpdateBattle { get; set; }
 
+        [JsonProperty("UpdateQuest", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public UpdateQuestCommand UpdateQuest { get; set; }
+
         [JsonProperty("Wait", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public Milliseconds Wait { get; set; }
 
@@ -2217,6 +2220,47 @@ namespace Dreamtides.Schema
     {
         [JsonProperty("Active", Required = Required.Always)]
         public BattlePreviewView Active { get; set; }
+    }
+
+    public partial class UpdateQuestCommand
+    {
+        /// <summary>
+        /// The quest to update.
+        /// </summary>
+        [JsonProperty("quest", Required = Required.Always)]
+        public QuestView Quest { get; set; }
+
+        /// <summary>
+        /// Sound to play when the quest is updated.
+        /// </summary>
+        [JsonProperty("update_sound")]
+        public AudioClipAddress UpdateSound { get; set; }
+    }
+
+    /// <summary>
+    /// The quest to update.
+    ///
+    /// Represents the visual state of a dream quest
+    /// </summary>
+    public partial class QuestView
+    {
+        /// <summary>
+        /// Cards which are currently being displayed
+        /// </summary>
+        [JsonProperty("cards", Required = Required.Always)]
+        public List<CardView> Cards { get; set; }
+
+        /// <summary>
+        /// Unique identifier for this quest
+        /// </summary>
+        [JsonProperty("id", Required = Required.Always)]
+        public Guid Id { get; set; }
+
+        /// <summary>
+        /// UI to display to the player.
+        /// </summary>
+        [JsonProperty("interface", Required = Required.Always)]
+        public InterfaceView Interface { get; set; }
     }
 
     public partial class UpdateScreenOverlayCommand
