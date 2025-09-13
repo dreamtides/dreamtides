@@ -14,6 +14,8 @@ namespace Dreamtides.Services
 {
   public class ActionService : Service
   {
+    [SerializeField] bool _disableConnectOnStart;
+
     private struct CommandBatch
     {
       public CommandSequence? Commands;
@@ -75,6 +77,7 @@ namespace Dreamtides.Services
       _lastActionTime = Time.time;
       _integrationTestId = testConfiguration?.IntegrationTestId;
       _enemyId = Guid.NewGuid();
+
       StartCoroutine(InitializeAsync());
     }
 
@@ -86,7 +89,11 @@ namespace Dreamtides.Services
         UserId = IsEnemyTestClient ? Errors.CheckNotNull(_enemyId) : _userGuid,
         IntegrationTestId = _integrationTestId,
       };
-      yield return PerformConnect(isReconnect: false, startLoggingSpan: true);
+
+      if (!_disableConnectOnStart)
+      {
+          yield return PerformConnect(isReconnect: false, startLoggingSpan: true);
+      }
     }
 
     protected override void OnUpdate()

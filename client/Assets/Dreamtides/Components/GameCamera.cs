@@ -11,7 +11,7 @@ namespace Dreamtides.Components
     [SerializeField] float _zoomInThreshold = 0.18f;
     [SerializeField] Camera _camera = null!;
 
-    void Awake()
+    public void AdjustFieldOfView()
     {
       for (int i = 0; i < 25; i++)
       {
@@ -49,6 +49,5 @@ namespace Dreamtides.Components
         }
       }
     }
-
   }
 }

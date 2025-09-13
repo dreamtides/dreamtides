@@ -2,6 +2,7 @@
 
 using System.Collections;
 using Dreamtides.Buttons;
+using Dreamtides.Components;
 using Dreamtides.Layout;
 using Dreamtides.Utils;
 using UnityEngine;
@@ -98,25 +99,29 @@ namespace Dreamtides.Services
 
       if (testConfiguration != null)
       {
-        // Screen resolution is not correct on Awake() frame in tests because of
-        // the hacks we are using to set it, so we delay the Awake() call.
+        // Note: Test screen resolution is not correct on Awake() frame
         Debug.Log($"Starting integration test {testConfiguration.IntegrationTestId}");
-        StartCoroutine(DelayedAwake(testConfiguration));
       }
       else
       {
         Debug.Log($"Starting Dreamtides");
-        RunAwake(testConfiguration);
       }
+
+      StartCoroutine(DelayedAwake(testConfiguration));
     }
 
-    IEnumerator DelayedAwake(TestConfiguration testConfiguration)
+    IEnumerator DelayedAwake(TestConfiguration? testConfiguration)
     {
       yield return new WaitForEndOfFrame();
-      RunAwake(testConfiguration);
+      yield return new WaitForEndOfFrame();
+      yield return new WaitForEndOfFrame();
+      yield return new WaitForEndOfFrame();
+      yield return new WaitForEndOfFrame();
+
+      RunAwake(GameMode.Quest, testConfiguration);
     }
 
-    void RunAwake(TestConfiguration? testConfiguration)
+    void RunAwake(GameMode mode, TestConfiguration? testConfiguration)
     {
       var width = UnityEngine.Device.Screen.width;
       var height = UnityEngine.Device.Screen.height;
@@ -133,6 +138,7 @@ namespace Dreamtides.Services
       }
 
       Application.targetFrameRate = 60;
+      ToggleGameObjectForMode(mode);
 
       foreach (var service in GetComponentsInChildren<Service>())
       {
@@ -142,5 +148,28 @@ namespace Dreamtides.Services
 
     T Check<T>(T? value) where T : Object =>
         Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
+
+    void ToggleGameObjectForMode(GameMode mode)
+    {
+      var battleMode = mode == GameMode.Battle;
+      var battleCamera = ComponentUtils.Get<GameCamera>(Layout.MainCamera);
+      if (battleMode)
+      {
+        battleCamera.AdjustFieldOfView();
+      }
+
+      Layout.UserStatusDisplay.TotalSpark.gameObject.SetActive(battleMode);
+      Layout.UserStatusDisplay.gameObject.SetActive(battleMode);
+      Layout.EnemyStatusDisplay.TotalSpark.gameObject.SetActive(battleMode);
+      Layout.EnemyStatusDisplay.gameObject.SetActive(battleMode);
+      Layout.PrimaryActionButton.gameObject.SetActive(battleMode);
+      Layout.SecondaryActionButton.gameObject.SetActive(battleMode);
+      Layout.IncrementActionButton.gameObject.SetActive(battleMode);
+      Layout.DecrementActionButton.gameObject.SetActive(battleMode);
+      foreach (var button in Layout.GetComponentsInChildren<CardBrowserButton>())
+      {
+        button.gameObject.SetActive(false);
+      }
+    }
   }
 }
