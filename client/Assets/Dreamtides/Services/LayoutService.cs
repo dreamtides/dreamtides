@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace Dreamtides.Services
 {
-  public class LayoutService : Service
+  public class CardService : Service
   {
     [SerializeField] Card _cardPrefab = null!;
     [SerializeField] Card _eventCardPrefab = null!;
@@ -32,7 +32,10 @@ namespace Dreamtides.Services
 
     public IEnumerable<string> GetCardIds() => Cards.Keys;
 
-    public IEnumerator UpdateLayout(UpdateBattleCommand command, Sequence? sequence = null)
+    public IEnumerator HandleUpdateBattleCommand(
+      UpdateBattleCommand command,
+      Sequence? sequence = null
+    )
     {
       var view = command.Battle;
       var toDelete = Cards.Keys.ToHashSet();

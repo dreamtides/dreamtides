@@ -30,7 +30,7 @@ namespace Dreamtides.Tests
         .AddCardToHand(DisplayPlayer.User, TestCards.TestActivatedAbilityDrawCard)
         .Build()
       );
-      var activatedAbilityCharacter = Registry.LayoutService.GetCard(CurrentCardId);
+      var activatedAbilityCharacter = Registry.CardService.GetCard(CurrentCardId);
       yield return TestDragInputProvider.DragTo(
         Registry,
         activatedAbilityCharacter,

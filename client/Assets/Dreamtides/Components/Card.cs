@@ -388,7 +388,7 @@ namespace Dreamtides.Components
       _draggedToClearThreshold = false;
       _draggedToPlayThreshold = false;
       _distanceDragged = 0;
-      _registry.CardService.IsPointerDownOnCard = true;
+      _registry.CardAnimationService.IsPointerDownOnCard = true;
 
       if (_registry.IsMobileDevice &&
         GameContext == GameContext.Hand &&
@@ -399,7 +399,7 @@ namespace Dreamtides.Components
         // Jump to large size when in user hand on mobile
         transform.position = MobileHandCardJumpPosition();
         transform.rotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0);
-        _registry.CardService.DisplayInfoZoom(this, forCardInHand: true);
+        _registry.CardAnimationService.DisplayInfoZoom(this, forCardInHand: true);
       }
       else if (
         !_registry.IsMobileDevice &&
@@ -413,14 +413,14 @@ namespace Dreamtides.Components
           transform.position = jumpPosition.Value;
           transform.rotation = Quaternion.Euler(Constants.CameraXAngle, 0, 0);
         }
-        _registry.CardService.DisplayInfoZoom(this, forCardInHand: true);
+        _registry.CardAnimationService.DisplayInfoZoom(this, forCardInHand: true);
       }
       else if (
           _registry.CapabilitiesService.CanInfoZoom(GameContext, CardView.Position.Position) &&
           CardView.Revealed != null &&
           !_draggedToClearThreshold)
       {
-        _registry.CardService.DisplayInfoZoom(this, forCardInHand: false);
+        _registry.CardAnimationService.DisplayInfoZoom(this, forCardInHand: false);
       }
 
       if (CanPlay() || CanSelectOrder())
@@ -480,7 +480,7 @@ namespace Dreamtides.Components
 
       if (_distanceDragged > 0.25f)
       {
-        _registry.CardService.ClearInfoZoom();
+        _registry.CardAnimationService.ClearInfoZoom();
         _draggedToClearThreshold = true;
       }
 
@@ -496,8 +496,8 @@ namespace Dreamtides.Components
     public override void MouseUp(bool isSameObject)
     {
       _registry.SoundService.PlayCardSound();
-      _registry.CardService.ClearInfoZoom();
-      _registry.CardService.IsPointerDownOnCard = false;
+      _registry.CardAnimationService.ClearInfoZoom();
+      _registry.CardAnimationService.IsPointerDownOnCard = false;
 
       if (CardView.Revealed?.Actions?.OnClick is { } onClick && isSameObject && (Time.time - _lastMouseDownTime < 1f))
       {
@@ -530,8 +530,8 @@ namespace Dreamtides.Components
       else if (ShouldReturnToPreviousParentOnRelease())
       {
         _registry.CardEffectPreviewService.ClearBattlePreview();
-        _registry.LayoutService.AddToParent(this);
-        _registry.LayoutService.RunAnimations(() =>
+        _registry.CardService.AddToParent(this);
+        _registry.CardService.RunAnimations(() =>
         {
           _isDraggingFromHand = false;
         });
@@ -567,7 +567,7 @@ namespace Dreamtides.Components
     {
       if (Time.time - _hoverStartTime > 0.15f && _hoveringForInfoZoom && !_longHoverFired)
       {
-        _registry.CardService.DisplayInfoZoom(this, forCardInHand: false);
+        _registry.CardAnimationService.DisplayInfoZoom(this, forCardInHand: false);
         _longHoverFired = true;
       }
     }
@@ -576,7 +576,7 @@ namespace Dreamtides.Components
     {
       if (_hoveringForInfoZoom)
       {
-        _registry.CardService.ClearInfoZoom();
+        _registry.CardAnimationService.ClearInfoZoom();
         _hoveringForInfoZoom = false;
         _longHoverFired = false;
       }

@@ -24,8 +24,8 @@ namespace Dreamtides.Services
     public GameLayout Layout =>
         IsLandscape ? Check(_landscapeLayout) : Check(_portraitLayout);
 
-    [SerializeField] LayoutService? _layoutService;
-    public LayoutService LayoutService => Check(_layoutService);
+    [SerializeField] CardService? _cardService;
+    public CardService CardService => Check(_cardService);
 
     [SerializeField] ActionService? _actionService;
     public ActionService ActionService => Check(_actionService);
@@ -42,8 +42,8 @@ namespace Dreamtides.Services
     [SerializeField] SoundService? _soundService;
     public SoundService SoundService => Check(_soundService);
 
-    [SerializeField] CardService? _cardService;
-    public CardService CardService => Check(_cardService);
+    [SerializeField] CardAnimationService? _cardAnimationService;
+    public CardAnimationService CardAnimationService => Check(_cardAnimationService);
 
     [SerializeField] SettingsService? _settingsService;
     public SettingsService SettingsService => Check(_settingsService);

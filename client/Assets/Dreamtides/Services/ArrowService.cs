@@ -24,8 +24,8 @@ namespace Dreamtides.Services
       foreach (var arrow in arrows)
       {
         var arrowInstance = ComponentUtils.Instantiate(ArrowForType(arrow.Color));
-        var source = Registry.LayoutService.GetGameObject(arrow.Source);
-        var target = Registry.LayoutService.GetGameObject(arrow.Target);
+        var source = Registry.CardService.GetGameObject(arrow.Source);
+        var target = Registry.CardService.GetGameObject(arrow.Target);
         if (source.SortingGroup)
         {
           arrowInstance.SortingGroup.sortingLayerID = source.SortingGroup.sortingLayerID;

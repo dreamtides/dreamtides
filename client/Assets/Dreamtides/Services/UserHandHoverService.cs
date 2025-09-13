@@ -257,7 +257,7 @@ namespace Dreamtides.Services
         {
           state.AnimationProgress = 1f;
           state.CurrentTween = null;
-          Registry.CardService.DisplayInfoZoom(state.Card, forCardInHand: true);
+          Registry.CardAnimationService.DisplayInfoZoom(state.Card, forCardInHand: true);
         });
     }
 
@@ -277,7 +277,7 @@ namespace Dreamtides.Services
       var originalRotation = Registry.Layout.UserHand.CalculateObjectRotation(state.Card);
       if (originalPosition == null || originalRotation == null)
       {
-        Registry.CardService.ClearInfoZoom();
+        Registry.CardAnimationService.ClearInfoZoom();
         if (state.Card.GameContext == GameContext.Hovering)
         {
           state.Card.GameContext = GameContext.Hand;
@@ -286,7 +286,7 @@ namespace Dreamtides.Services
         return;
       }
 
-      Registry.CardService.ClearInfoZoom();
+      Registry.CardAnimationService.ClearInfoZoom();
       if (state.Card.GameContext == GameContext.Hovering)
       {
         state.Card.GameContext = GameContext.Hand;

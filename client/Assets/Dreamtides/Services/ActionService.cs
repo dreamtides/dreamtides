@@ -92,7 +92,7 @@ namespace Dreamtides.Services
 
       if (!_disableConnectOnStart)
       {
-          yield return PerformConnect(isReconnect: false, startLoggingSpan: true);
+        yield return PerformConnect(isReconnect: false, startLoggingSpan: true);
       }
     }
 
@@ -506,7 +506,7 @@ namespace Dreamtides.Services
           Registry.Layout.CloseBrowserButton.CloseAction =
               command.UpdateBattle.Battle.Interface?.Browser?.CloseButton?.ToGameAction();
           Registry.BottomRightButton.SetView(command.UpdateBattle.Battle.Interface?.BottomRightButton);
-          coroutines.Add(StartCoroutine(Registry.LayoutService.UpdateLayout(
+          coroutines.Add(StartCoroutine(Registry.CardService.HandleUpdateBattleCommand(
               command.UpdateBattle,
               animate ? TweenUtils.Sequence("UpdateLayout") : null)));
           Registry.DocumentService.HasOpenPanels = command.UpdateBattle.Battle.Interface?.HasOpenPanels ?? false;
@@ -562,7 +562,7 @@ namespace Dreamtides.Services
         {
           Registry.LoggingService.Log("ActionService", "Applying command: DrawUserCards",
             ("cardCount", command.DrawUserCards.Cards.Count.ToString()));
-          coroutines.Add(StartCoroutine(Registry.CardService.HandleDrawUserCards(command.DrawUserCards)));
+          coroutines.Add(StartCoroutine(Registry.CardAnimationService.HandleDrawUserCards(command.DrawUserCards)));
         }
 
         if (command.DisplayJudgment != null)
@@ -609,7 +609,7 @@ namespace Dreamtides.Services
         {
           Registry.LoggingService.Log("ActionService", "Applying command: ShuffleVoidIntoDeck");
           coroutines.Add(StartCoroutine(
-              Registry.CardService.HandleShuffleVoidIntoDeck(command.ShuffleVoidIntoDeck)));
+              Registry.CardAnimationService.HandleShuffleVoidIntoDeck(command.ShuffleVoidIntoDeck)));
         }
 
         if (command.UpdateScreenOverlay != null)

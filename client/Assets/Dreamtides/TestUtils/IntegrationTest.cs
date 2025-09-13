@@ -104,9 +104,9 @@ namespace Dreamtides.TestUtils
     /// </remarks>
     protected IEnumerator PerformAddCardAction(GameAction action)
     {
-      var existingCardIds = Registry.LayoutService.GetCardIds().ToHashSet();
+      var existingCardIds = Registry.CardService.GetCardIds().ToHashSet();
       yield return PerformAction(action);
-      var newCardIds = Registry.LayoutService.GetCardIds().Except(existingCardIds).ToList();
+      var newCardIds = Registry.CardService.GetCardIds().Except(existingCardIds).ToList();
 
       if (newCardIds.Count == 0)
       {

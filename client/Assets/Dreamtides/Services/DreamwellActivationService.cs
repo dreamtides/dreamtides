@@ -18,7 +18,7 @@ namespace Dreamtides.Services
     public IEnumerator HandleDreamwellActivationCommand(DisplayDreamwellActivationCommand command)
     {
       // Get the card from the layout service
-      var card = Registry.LayoutService.GetCard(command.CardId);
+      var card = Registry.CardService.GetCard(command.CardId);
 
       // Turn the card face down without animation first
       card.TurnFaceDown();

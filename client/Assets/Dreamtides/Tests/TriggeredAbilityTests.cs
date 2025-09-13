@@ -29,12 +29,12 @@ namespace Dreamtides.Tests
         .AddCardToHand(DisplayPlayer.User, TestCards.TestVanillaCharacter)
         .Build()
       );
-      var vanillaCharacter = Registry.LayoutService.GetCard(CurrentCardId);
+      var vanillaCharacter = Registry.CardService.GetCard(CurrentCardId);
       yield return PerformAddCardAction(TestBattle.New()
         .AddCardToHand(DisplayPlayer.User, TestCards.TestTriggerGainSparkWhenMaterializeAnotherCharacter)
         .Build()
       );
-      var triggerCharacter = Registry.LayoutService.GetCard(CurrentCardId);
+      var triggerCharacter = Registry.CardService.GetCard(CurrentCardId);
 
       yield return TestDragInputProvider.DragTo(
         Registry,

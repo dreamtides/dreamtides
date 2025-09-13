@@ -31,7 +31,7 @@ namespace Dreamtides.Layout
       if (Objects.Count > 0)
       {
         _scrollbar.gameObject.SetActive(Objects.Count > WindowSize() &&
-            !_registry.CardService.IsPointerDownOnCard);
+            !_registry.CardAnimationService.IsPointerDownOnCard);
         _scrollbar.size = (float)WindowSize() / Objects.Count;
 
         _scrollAmount = _scrollbar.value;

@@ -31,7 +31,7 @@ namespace Dreamtides.Tests
         .AddCardToHand(DisplayPlayer.User, TestCards.TestForeseeTwo)
         .Build()
       );
-      var foreseeTwo = Registry.LayoutService.GetCard(CurrentCardId);
+      var foreseeTwo = Registry.CardService.GetCard(CurrentCardId);
       yield return TestDragInputProvider.DragTo(
         Registry,
         foreseeTwo,

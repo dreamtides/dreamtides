@@ -36,7 +36,7 @@ namespace Dreamtides.Services
 
       foreach (var cardPreview in _current.Cards)
       {
-        var card = Registry.LayoutService.GetCard(cardPreview.CardId);
+        var card = Registry.CardService.GetCard(cardPreview.CardId);
         card.ApplyPreview(cardPreview, _previewTextColor);
       }
 
@@ -58,7 +58,7 @@ namespace Dreamtides.Services
 
       foreach (var cardPreview in _current.Cards)
       {
-        var card = Registry.LayoutService.GetCard(cardPreview.CardId);
+        var card = Registry.CardService.GetCard(cardPreview.CardId);
         card.ClearPreview();
       }
 

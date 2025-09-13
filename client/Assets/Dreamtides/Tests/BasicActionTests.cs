@@ -44,7 +44,7 @@ namespace Dreamtides.Tests
         .Build()
       );
 
-      var card = Registry.LayoutService.GetCard(CurrentCardId);
+      var card = Registry.CardService.GetCard(CurrentCardId);
       AssertCountIs(Registry.Layout.UserBattlefield, 7);
       AssertCountIs(Registry.Layout.UserHand, 5);
 
@@ -78,7 +78,7 @@ namespace Dreamtides.Tests
         .Build()
       );
 
-      var card = Registry.LayoutService.GetCard(CurrentCardId);
+      var card = Registry.CardService.GetCard(CurrentCardId);
       AssertCountIs(Registry.Layout.UserHand, 1);
       AssertCountIs(Registry.Layout.UserVoid, 0);
       foreach (var enemy in Registry.Layout.EnemyBattlefield.Objects)
@@ -134,17 +134,17 @@ namespace Dreamtides.Tests
          .AddCardToHand(DisplayPlayer.User, TestCards.TestVanillaCharacter)
          .Build()
        );
-      var characterCard = Registry.LayoutService.GetCard(CurrentCardId);
+      var characterCard = Registry.CardService.GetCard(CurrentCardId);
       yield return PerformAddCardAction(TestBattle.New()
         .AddCardToHand(DisplayPlayer.User, TestCards.TestCounterspell)
         .Build()
       );
-      var userPrevent1 = Registry.LayoutService.GetCard(CurrentCardId);
+      var userPrevent1 = Registry.CardService.GetCard(CurrentCardId);
       yield return PerformAddCardAction(TestBattle.New()
         .AddCardToHand(DisplayPlayer.User, TestCards.TestCounterspell)
         .Build()
       );
-      var userPrevent2 = Registry.LayoutService.GetCard(CurrentCardId);
+      var userPrevent2 = Registry.CardService.GetCard(CurrentCardId);
       yield return PerformAddCardAction(TestBattle.New()
         .AddCardToHand(DisplayPlayer.Enemy, TestCards.TestDrawOne)
         .Build()
@@ -202,9 +202,9 @@ namespace Dreamtides.Tests
       }
 
       AssertPrimaryActionButtonIsVisible();
-      AssertArrowBetween(userPrevent1, Registry.LayoutService.GetCard(enemyCard1), "userPrevent1 should target enemyCard1");
+      AssertArrowBetween(userPrevent1, Registry.CardService.GetCard(enemyCard1), "userPrevent1 should target enemyCard1");
 
-      yield return TestClickInputProvider.ClickOn(Registry, Registry.LayoutService.GetCard(enemyCard2));
+      yield return TestClickInputProvider.ClickOn(Registry, Registry.CardService.GetCard(enemyCard2));
       yield return WaitForCount(Registry.Layout.DefaultStack, 0);
 
       AssertCountIs(Registry.Layout.UserVoid, 2);
@@ -230,7 +230,7 @@ namespace Dreamtides.Tests
         .AddCardToHand(DisplayPlayer.User, TestCards.TestDissolve)
         .Build()
       );
-      var userDissolve = Registry.LayoutService.GetCard(CurrentCardId);
+      var userDissolve = Registry.CardService.GetCard(CurrentCardId);
 
       yield return TestDragInputProvider.DragTo(
         Registry,

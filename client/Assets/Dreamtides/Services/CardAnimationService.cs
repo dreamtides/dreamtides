@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace Dreamtides.Services
 {
-  public class CardService : Service
+  public class CardAnimationService : Service
   {
     [SerializeField] AudioClip? _shuffleVoidIntoDeckSound;
     Card? _currentInfoZoom;
@@ -92,7 +92,7 @@ namespace Dreamtides.Services
         if (deficit > 0f)
         {
           // First try trimming shuffle time.
-            float availableFromShuffle = Mathf.Max(0f, shuffleRotationDuration - 0.15f); // keep at least 0.15s
+          float availableFromShuffle = Mathf.Max(0f, shuffleRotationDuration - 0.15f); // keep at least 0.15s
           float take = Mathf.Min(deficit, availableFromShuffle);
           shuffleRotationDuration -= take;
           laterPhaseDuration += take;
@@ -194,7 +194,7 @@ namespace Dreamtides.Services
     IEnumerator DrawUserCard(DrawUserCardsCommand command, int index, bool isLastCard)
     {
       var cardView = command.Cards[index];
-      var card = Registry.LayoutService.GetCard(cardView.Id);
+      var card = Registry.CardService.GetCard(cardView.Id);
       if (card.Parent)
       {
         card.Parent.RemoveIfPresent(card);
@@ -216,7 +216,7 @@ namespace Dreamtides.Services
         card.transform.DORotateQuaternion(Registry.Layout.DrawnCardsPosition.transform.rotation, moveDuration));
       yield return new WaitForSeconds(moveDuration + command.PauseDuration.ToSeconds());
 
-      var layout = Registry.LayoutService.LayoutForPosition(command.Destination);
+      var layout = Registry.CardService.LayoutForPosition(command.Destination);
       layout.Add(card);
       if (!isLastCard)
       {
@@ -269,7 +269,7 @@ namespace Dreamtides.Services
       {
         foreach (var icon in icons)
         {
-          var targetCard = Registry.LayoutService.GetCard(icon.CardId);
+          var targetCard = Registry.CardService.GetCard(icon.CardId);
           targetCard.SetInfoZoomIcon(icon);
           _cardsWithInfoZoomIcons.Add(targetCard);
         }

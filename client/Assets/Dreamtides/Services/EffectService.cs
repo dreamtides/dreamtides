@@ -17,7 +17,7 @@ namespace Dreamtides.Services
     /// </summary>
     public IEnumerator HandleDisplayEffectCommand(DisplayEffectCommand command)
     {
-      var target = Registry.LayoutService.GetGameObject(command.Target);
+      var target = Registry.CardService.GetGameObject(command.Target);
       var effectPosition = target.DisplayEffectPosition;
       var effect = Registry.AssetService.GetEffectPrefab(command.Effect);
       // TODO: Figure out correct rotation for effects.
@@ -47,8 +47,8 @@ namespace Dreamtides.Services
     /// </summary>
     public IEnumerator HandleFireProjectileCommand(FireProjectileCommand command)
     {
-      var source = Registry.LayoutService.GetGameObject(command.SourceId);
-      var target = Registry.LayoutService.GetGameObject(command.TargetId);
+      var source = Registry.CardService.GetGameObject(command.SourceId);
+      var target = Registry.CardService.GetGameObject(command.TargetId);
       var originalPosition = source.transform.position;
       var originalRotation = source.transform.rotation.eulerAngles;
       var projectileSourcePosition = source.ProjectileSourcePosition ?
@@ -102,7 +102,7 @@ namespace Dreamtides.Services
       if (command.JumpToPosition != null)
       {
         var sequence = TweenUtils.Sequence("JumpToPosition");
-        Registry.LayoutService.MoveObject(target, command.JumpToPosition, sequence);
+        Registry.CardService.MoveObject(target, command.JumpToPosition, sequence);
         yield return sequence.WaitForCompletion();
       }
 
@@ -114,7 +114,7 @@ namespace Dreamtides.Services
 
     public IEnumerator HandleDissolveCommand(DissolveCardCommand command)
     {
-      var target = Registry.LayoutService.GetCard(command.Target);
+      var target = Registry.CardService.GetCard(command.Target);
       yield return target.StartDissolve(command);
     }
 
@@ -122,7 +122,7 @@ namespace Dreamtides.Services
     {
       foreach (var cardId in command.CardIds)
       {
-        var card = Registry.LayoutService.GetCardIfExists(cardId);
+        var card = Registry.CardService.GetCardIfExists(cardId);
         if (card)
         {
           card.SetCardTrail(command.Trail, command.Duration.ToSeconds());
