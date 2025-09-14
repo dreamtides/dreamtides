@@ -72,7 +72,7 @@ pub enum Command {
     DisplayGameMessage(GameMessageType),
     DisplayEffect(DisplayEffectCommand),
     PlayAudioClip(PlayAudioClipCommand),
-    DrawUserCards(DrawUserCardsCommand),
+    MoveCardsWithCustomAnimation(MoveCardsWithCustomAnimationCommand),
     DisplayJudgment(DisplayJudgmentCommand),
     DisplayDreamwellActivation(DisplayDreamwellActivationCommand),
     DisplayEnemyMessage(DisplayEnemyMessageCommand),
@@ -202,20 +202,29 @@ pub struct PlayAudioClipCommand {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-pub struct DrawUserCardsCommand {
-    /// Cards to draw. Must already be present in user deck.
+pub struct MoveCardsWithCustomAnimationCommand {
+    pub animation: MoveCardsCustomAnimation,
+
+    /// Cards to move. Must already be present in the game.
     pub cards: Vec<CardView>,
 
-    /// Time to wait between drawing subsequent cards.
+    /// Time to wait between moving subsequent cards.
     pub stagger_interval: Milliseconds,
 
-    /// Time to display each card before moving it to hand.
+    /// Time used by some animations to display each card before moving it to
+    /// final destination.
     ///
     /// Should be less than stagger_interval for best results.
     pub pause_duration: Milliseconds,
 
-    /// Destination position to move the cards to after drawing them.
+    /// Destination position to move the cards to
     pub destination: Position,
+}
+
+/// Animation to perform when moving cards
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
+pub enum MoveCardsCustomAnimation {
+    ShowAtDrawnCardsPosition,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

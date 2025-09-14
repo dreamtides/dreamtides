@@ -10,8 +10,9 @@ use core_data::types::PlayerName;
 use display_data::battle_view::DisplayPlayer;
 use display_data::command::{
     Command, DisplayDreamwellActivationCommand, DisplayEffectCommand, DisplayEnemyMessageCommand,
-    DisplayJudgmentCommand, DrawUserCardsCommand, FireProjectileCommand, GameMessageType,
-    GameObjectId, PlayAudioClipCommand, ShuffleVoidIntoDeckCommand,
+    DisplayJudgmentCommand, FireProjectileCommand, GameMessageType, GameObjectId,
+    MoveCardsCustomAnimation, MoveCardsWithCustomAnimationCommand, PlayAudioClipCommand,
+    ShuffleVoidIntoDeckCommand,
 };
 use display_data::object_position::Position;
 use masonry::flex_style::FlexVector3;
@@ -58,12 +59,15 @@ pub fn render(
                     })
                     .collect();
 
-                builder.push(Command::DrawUserCards(DrawUserCardsCommand {
-                    cards: card_views,
-                    stagger_interval: Milliseconds::new(500),
-                    pause_duration: Milliseconds::new(300),
-                    destination: Position::InHand(DisplayPlayer::User),
-                }));
+                builder.push(Command::MoveCardsWithCustomAnimation(
+                    MoveCardsWithCustomAnimationCommand {
+                        animation: MoveCardsCustomAnimation::ShowAtDrawnCardsPosition,
+                        cards: card_views,
+                        stagger_interval: Milliseconds::new(500),
+                        pause_duration: Milliseconds::new(300),
+                        destination: Position::InHand(DisplayPlayer::User),
+                    },
+                ));
             }
         }
 
@@ -164,12 +168,15 @@ pub fn render(
                     })
                     .collect();
 
-                builder.push(Command::DrawUserCards(DrawUserCardsCommand {
-                    cards: card_views,
-                    stagger_interval: Milliseconds::new(500),
-                    pause_duration: Milliseconds::new(300),
-                    destination: Position::InVoid(builder.to_display_player(*player)),
-                }));
+                builder.push(Command::MoveCardsWithCustomAnimation(
+                    MoveCardsWithCustomAnimationCommand {
+                        animation: MoveCardsCustomAnimation::ShowAtDrawnCardsPosition,
+                        cards: card_views,
+                        stagger_interval: Milliseconds::new(500),
+                        pause_duration: Milliseconds::new(300),
+                        destination: Position::InVoid(builder.to_display_player(*player)),
+                    },
+                ));
             }
         }
 

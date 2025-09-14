@@ -586,11 +586,11 @@ namespace Dreamtides.Services
           coroutines.Add(StartCoroutine(Registry.EffectService.HandleDisplayEffectCommand(command.DisplayEffect)));
         }
 
-        if (command.DrawUserCards != null)
+        if (command.MoveCardsWithCustomAnimation != null)
         {
-          Registry.LoggingService.Log("ActionService", "Applying command: DrawUserCards",
-            ("cardCount", command.DrawUserCards.Cards.Count.ToString()));
-          coroutines.Add(StartCoroutine(Registry.CardAnimationService.HandleDrawUserCards(command.DrawUserCards)));
+          Registry.LoggingService.Log("ActionService", "Applying command: MoveCardsWithCustomAnimation",
+            ("cardCount", command.MoveCardsWithCustomAnimation.Cards.Count.ToString()));
+          coroutines.Add(StartCoroutine(Registry.CardAnimationService.HandleMoveCardsWithCustomAnimation(command.MoveCardsWithCustomAnimation)));
         }
 
         if (command.DisplayJudgment != null)
@@ -673,7 +673,7 @@ namespace Dreamtides.Services
           if (command.DissolveCard != null) commandNames.Add("DissolveCard");
           if (command.DisplayGameMessage != null) commandNames.Add("DisplayGameMessage");
           if (command.DisplayEffect != null) commandNames.Add("DisplayEffect");
-          if (command.DrawUserCards != null) commandNames.Add("DrawUserCards");
+          if (command.MoveCardsWithCustomAnimation != null) commandNames.Add("MoveCardsWithCustomAnimation");
           if (command.DisplayJudgment != null) commandNames.Add("DisplayJudgment");
           if (command.DisplayDreamwellActivation != null) commandNames.Add("DisplayDreamwellActivation");
           if (command.DisplayEnemyMessage != null) commandNames.Add("DisplayEnemyMessage");

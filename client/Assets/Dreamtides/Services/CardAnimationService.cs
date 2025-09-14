@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +30,18 @@ namespace Dreamtides.Services
       _infoZoomDisabled = testConfiguration != null;
     }
 
-    public IEnumerator HandleDrawUserCards(DrawUserCardsCommand command)
+    public IEnumerator HandleMoveCardsWithCustomAnimation(MoveCardsWithCustomAnimationCommand command)
+    {
+      switch (command.Animation)
+      {
+        case MoveCardsCustomAnimation.ShowAtDrawnCardsPosition:
+          return HandleDrawUserCards(command);
+        default:
+          throw new IndexOutOfRangeException($"Unhandled animation type: {command.Animation}");
+      }
+    }
+
+    IEnumerator HandleDrawUserCards(MoveCardsWithCustomAnimationCommand command)
     {
       for (var i = 0; i < command.Cards.Count; ++i)
       {
@@ -183,7 +195,7 @@ namespace Dreamtides.Services
       foreach (var card in cards)
       {
         var startEuler = card.transform.localEulerAngles;
-        float angle = Random.Range(-15f, 15f);
+        float angle = UnityEngine.Random.Range(-15f, 15f);
         var midEuler = startEuler + new Vector3(0f, angle, 0f);
         seq.Insert(0, card.transform.DOLocalRotate(midEuler, half * 0.9f).SetEase(Ease.OutCubic));
         seq.Insert(half, card.transform.DOLocalRotate(startEuler, half * 0.9f).SetEase(Ease.InCubic));
@@ -191,7 +203,7 @@ namespace Dreamtides.Services
       yield return seq.WaitForCompletion();
     }
 
-    IEnumerator DrawUserCard(DrawUserCardsCommand command, int index, bool isLastCard)
+    IEnumerator DrawUserCard(MoveCardsWithCustomAnimationCommand command, int index, bool isLastCard)
     {
       var cardView = command.Cards[index];
       var card = Registry.CardService.GetCard(cardView.Id);

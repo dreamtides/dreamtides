@@ -59,7 +59,7 @@ impl TestClient {
                     Command::PlayAudioClip(audio) => {
                         self.last_audio_clip = Some(audio.sound);
                     }
-                    Command::DrawUserCards(draw) => {
+                    Command::MoveCardsWithCustomAnimation(draw) => {
                         self.last_drawn_cards = draw.cards.clone();
                     }
                     Command::DisplayJudgment(judgment) => {

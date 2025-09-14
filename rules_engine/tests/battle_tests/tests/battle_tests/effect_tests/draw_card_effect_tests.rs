@@ -42,7 +42,7 @@ fn draw_card_animation_command() {
 
     let draw_cards_cmd = commands.groups.iter().flat_map(|group| &group.commands).find_map(
         |command| match command {
-            Command::DrawUserCards(cmd) => Some(cmd),
+            Command::MoveCardsWithCustomAnimation(cmd) => Some(cmd),
             _ => None,
         },
     );
@@ -74,7 +74,7 @@ fn draw_multiple_cards_animation() {
 
     let draw_cards_cmd = commands.groups.iter().flat_map(|group| &group.commands).find_map(
         |command| match command {
-            Command::DrawUserCards(cmd) => Some(cmd),
+            Command::MoveCardsWithCustomAnimation(cmd) => Some(cmd),
             _ => None,
         },
     );

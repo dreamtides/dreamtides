@@ -277,8 +277,8 @@ namespace Dreamtides.Schema
         [JsonProperty("PlayAudioClip", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public PlayAudioClipCommand PlayAudioClip { get; set; }
 
-        [JsonProperty("DrawUserCards", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
-        public DrawUserCardsCommand DrawUserCards { get; set; }
+        [JsonProperty("MoveCardsWithCustomAnimation", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public MoveCardsWithCustomAnimationCommand MoveCardsWithCustomAnimation { get; set; }
 
         [JsonProperty("DisplayJudgment", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public DisplayJudgmentCommand DisplayJudgment { get; set; }
@@ -376,11 +376,12 @@ namespace Dreamtides.Schema
     ///
     /// How long to pause before continuing with animations.
     ///
-    /// Time to display each card before moving it to hand.
+    /// Time used by some animations to display each card before moving it to
+    /// final destination.
     ///
     /// Should be less than stagger_interval for best results.
     ///
-    /// Time to wait between drawing subsequent cards.
+    /// Time to wait between moving subsequent cards.
     /// </summary>
     public partial class Milliseconds
     {
@@ -535,107 +536,40 @@ namespace Dreamtides.Schema
         public string Material { get; set; }
     }
 
-    public partial class DrawUserCardsCommand
+    public partial class FireProjectileCommand
     {
-        /// <summary>
-        /// Cards to draw. Must already be present in user deck.
-        /// </summary>
-        [JsonProperty("cards", Required = Required.Always)]
-        public List<CardView> Cards { get; set; }
+        [JsonProperty("additional_hit")]
+        public EffectAddress AdditionalHit { get; set; }
 
-        /// <summary>
-        /// Destination position to move the cards to after drawing them.
-        /// </summary>
-        [JsonProperty("destination", Required = Required.Always)]
-        public Position Destination { get; set; }
+        [JsonProperty("additional_hit_delay")]
+        public Milliseconds AdditionalHitDelay { get; set; }
 
-        /// <summary>
-        /// Time to display each card before moving it to hand.
-        ///
-        /// Should be less than stagger_interval for best results.
-        /// </summary>
-        [JsonProperty("pause_duration", Required = Required.Always)]
-        public Milliseconds PauseDuration { get; set; }
+        [JsonProperty("fire_sound")]
+        public AudioClipAddress FireSound { get; set; }
 
-        /// <summary>
-        /// Time to wait between drawing subsequent cards.
-        /// </summary>
-        [JsonProperty("stagger_interval", Required = Required.Always)]
-        public Milliseconds StaggerInterval { get; set; }
-    }
+        [JsonProperty("hide_on_hit", Required = Required.Always)]
+        public bool HideOnHit { get; set; }
 
-    /// <summary>
-    /// Represents the visual state of a card or ability in a game
-    /// </summary>
-    public partial class CardView
-    {
-        /// <summary>
-        /// True if this card is initially revealed and thus should not play the
-        /// 'flip' animation from its back side.
-        /// </summary>
-        [JsonProperty("backless", Required = Required.Always)]
-        public bool Backless { get; set; }
+        [JsonProperty("impact_sound")]
+        public AudioClipAddress ImpactSound { get; set; }
 
-        /// <summary>
-        /// Face up/face down state for this card
-        /// </summary>
-        [JsonProperty("card_facing", Required = Required.Always)]
-        public CardFacing CardFacing { get; set; }
+        [JsonProperty("jump_to_position")]
+        public ObjectPosition JumpToPosition { get; set; }
 
-        /// <summary>
-        /// Optionally, a position at which to create this card.
-        ///
-        /// If this card does not already exist, it will be created at this position
-        /// before being animated to [Self::position].
-        /// </summary>
-        [JsonProperty("create_position")]
-        public ObjectPosition CreatePosition { get; set; }
+        [JsonProperty("projectile", Required = Required.Always)]
+        public ProjectileAddress Projectile { get; set; }
 
-        /// <summary>
-        /// Optionally, a sound to play when this card is created.
-        /// </summary>
-        [JsonProperty("create_sound")]
-        public AudioClipAddress CreateSound { get; set; }
+        [JsonProperty("source_id", Required = Required.Always)]
+        public GameObjectId SourceId { get; set; }
 
-        /// <summary>
-        /// Optionally, a position at which to destroy this card.
-        ///
-        /// If provided, the card will be animated to this position before being
-        /// destroyed.
-        /// </summary>
-        [JsonProperty("destroy_position")]
-        public ObjectPosition DestroyPosition { get; set; }
+        [JsonProperty("target_id", Required = Required.Always)]
+        public GameObjectId TargetId { get; set; }
 
-        /// <summary>
-        /// Identifier for this card
-        /// </summary>
-        [JsonProperty("id", Required = Required.Always)]
-        public string Id { get; set; }
+        [JsonProperty("travel_duration")]
+        public Milliseconds TravelDuration { get; set; }
 
-        /// <summary>
-        /// Position of this card in the UI
-        /// </summary>
-        [JsonProperty("position", Required = Required.Always)]
-        public ObjectPosition Position { get; set; }
-
-        /// <summary>
-        /// Represents the general category of card being displayed.
-        /// </summary>
-        [JsonProperty("prefab", Required = Required.Always)]
-        public CardPrefab Prefab { get; set; }
-
-        /// <summary>
-        /// If this card is revealed to the viewer, contains information on the
-        /// revealed face of the card.
-        /// </summary>
-        [JsonProperty("revealed")]
-        public RevealedCardView Revealed { get; set; }
-
-        /// <summary>
-        /// True if this card is in a hidden zone but known to one or more opponents
-        /// </summary>
-        [JsonProperty("revealed_to_opponents", Required = Required.Always)]
-        public bool RevealedToOpponents { get; set; }
+        [JsonProperty("wait_duration")]
+        public Milliseconds WaitDuration { get; set; }
     }
 
     /// <summary>
@@ -730,6 +664,119 @@ namespace Dreamtides.Schema
 
         [JsonProperty("SiteDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public Guid? SiteDeck { get; set; }
+    }
+
+    public partial class ProjectileAddress
+    {
+        [JsonProperty("projectile", Required = Required.Always)]
+        public string Projectile { get; set; }
+    }
+
+    public partial class MoveCardsWithCustomAnimationCommand
+    {
+        [JsonProperty("animation", Required = Required.Always)]
+        public MoveCardsCustomAnimation Animation { get; set; }
+
+        /// <summary>
+        /// Cards to move. Must already be present in the game.
+        /// </summary>
+        [JsonProperty("cards", Required = Required.Always)]
+        public List<CardView> Cards { get; set; }
+
+        /// <summary>
+        /// Destination position to move the cards to
+        /// </summary>
+        [JsonProperty("destination", Required = Required.Always)]
+        public Position Destination { get; set; }
+
+        /// <summary>
+        /// Time used by some animations to display each card before moving it to
+        /// final destination.
+        ///
+        /// Should be less than stagger_interval for best results.
+        /// </summary>
+        [JsonProperty("pause_duration", Required = Required.Always)]
+        public Milliseconds PauseDuration { get; set; }
+
+        /// <summary>
+        /// Time to wait between moving subsequent cards.
+        /// </summary>
+        [JsonProperty("stagger_interval", Required = Required.Always)]
+        public Milliseconds StaggerInterval { get; set; }
+    }
+
+    /// <summary>
+    /// Represents the visual state of a card or ability in a game
+    /// </summary>
+    public partial class CardView
+    {
+        /// <summary>
+        /// True if this card is initially revealed and thus should not play the
+        /// 'flip' animation from its back side.
+        /// </summary>
+        [JsonProperty("backless", Required = Required.Always)]
+        public bool Backless { get; set; }
+
+        /// <summary>
+        /// Face up/face down state for this card
+        /// </summary>
+        [JsonProperty("card_facing", Required = Required.Always)]
+        public CardFacing CardFacing { get; set; }
+
+        /// <summary>
+        /// Optionally, a position at which to create this card.
+        ///
+        /// If this card does not already exist, it will be created at this position
+        /// before being animated to [Self::position].
+        /// </summary>
+        [JsonProperty("create_position")]
+        public ObjectPosition CreatePosition { get; set; }
+
+        /// <summary>
+        /// Optionally, a sound to play when this card is created.
+        /// </summary>
+        [JsonProperty("create_sound")]
+        public AudioClipAddress CreateSound { get; set; }
+
+        /// <summary>
+        /// Optionally, a position at which to destroy this card.
+        ///
+        /// If provided, the card will be animated to this position before being
+        /// destroyed.
+        /// </summary>
+        [JsonProperty("destroy_position")]
+        public ObjectPosition DestroyPosition { get; set; }
+
+        /// <summary>
+        /// Identifier for this card
+        /// </summary>
+        [JsonProperty("id", Required = Required.Always)]
+        public string Id { get; set; }
+
+        /// <summary>
+        /// Position of this card in the UI
+        /// </summary>
+        [JsonProperty("position", Required = Required.Always)]
+        public ObjectPosition Position { get; set; }
+
+        /// <summary>
+        /// Represents the general category of card being displayed.
+        /// </summary>
+        [JsonProperty("prefab", Required = Required.Always)]
+        public CardPrefab Prefab { get; set; }
+
+        /// <summary>
+        /// If this card is revealed to the viewer, contains information on the
+        /// revealed face of the card.
+        /// </summary>
+        [JsonProperty("revealed")]
+        public RevealedCardView Revealed { get; set; }
+
+        /// <summary>
+        /// True if this card is in a hidden zone but known to one or more opponents
+        /// </summary>
+        [JsonProperty("revealed_to_opponents", Required = Required.Always)]
+        public bool RevealedToOpponents { get; set; }
     }
 
     /// <summary>
@@ -1867,48 +1914,6 @@ namespace Dreamtides.Schema
         public string Icon { get; set; }
     }
 
-    public partial class FireProjectileCommand
-    {
-        [JsonProperty("additional_hit")]
-        public EffectAddress AdditionalHit { get; set; }
-
-        [JsonProperty("additional_hit_delay")]
-        public Milliseconds AdditionalHitDelay { get; set; }
-
-        [JsonProperty("fire_sound")]
-        public AudioClipAddress FireSound { get; set; }
-
-        [JsonProperty("hide_on_hit", Required = Required.Always)]
-        public bool HideOnHit { get; set; }
-
-        [JsonProperty("impact_sound")]
-        public AudioClipAddress ImpactSound { get; set; }
-
-        [JsonProperty("jump_to_position")]
-        public ObjectPosition JumpToPosition { get; set; }
-
-        [JsonProperty("projectile", Required = Required.Always)]
-        public ProjectileAddress Projectile { get; set; }
-
-        [JsonProperty("source_id", Required = Required.Always)]
-        public GameObjectId SourceId { get; set; }
-
-        [JsonProperty("target_id", Required = Required.Always)]
-        public GameObjectId TargetId { get; set; }
-
-        [JsonProperty("travel_duration")]
-        public Milliseconds TravelDuration { get; set; }
-
-        [JsonProperty("wait_duration")]
-        public Milliseconds WaitDuration { get; set; }
-    }
-
-    public partial class ProjectileAddress
-    {
-        [JsonProperty("projectile", Required = Required.Always)]
-        public string Projectile { get; set; }
-    }
-
     public partial class PlayAudioClipCommand
     {
         /// <summary>
@@ -2395,13 +2400,6 @@ namespace Dreamtides.Schema
     public enum GameMessageType { Defeat, EnemyTurn, Victory, YourTurn };
 
     /// <summary>
-    /// Face up/face down state for this card
-    ///
-    /// Whether a card is face-down or face-up
-    /// </summary>
-    public enum CardFacing { FaceDown, FaceUp };
-
-    /// <summary>
     /// Object position used in interface elements like the deck viewer which
     /// don't rely on game positioning.
     ///
@@ -2435,6 +2433,18 @@ namespace Dreamtides.Schema
     public enum CardOrderSelectionTargetDiscriminants { Deck, Void };
 
     public enum StackType { Default, TargetingBothBattlefields, TargetingEnemyBattlefield, TargetingUserBattlefield };
+
+    /// <summary>
+    /// Animation to perform when moving cards
+    /// </summary>
+    public enum MoveCardsCustomAnimation { ShowAtDrawnCardsPosition };
+
+    /// <summary>
+    /// Face up/face down state for this card
+    ///
+    /// Whether a card is face-down or face-up
+    /// </summary>
+    public enum CardFacing { FaceDown, FaceUp };
 
     /// <summary>
     /// Represents the general category of card being displayed.
@@ -2562,7 +2572,7 @@ namespace Dreamtides.Schema
     ///
     /// Possible types of display positions
     ///
-    /// Destination position to move the cards to after drawing them.
+    /// Destination position to move the cards to
     /// </summary>
     public partial struct Position
     {
@@ -2697,11 +2707,12 @@ namespace Dreamtides.Schema
                 GameAiEnumConverter.Singleton,
                 DisplayPlayerConverter.Singleton,
                 GameMessageTypeConverter.Singleton,
-                CardFacingConverter.Singleton,
                 PositionConverter.Singleton,
                 CardOrderSelectionTargetDiscriminantsConverter.Singleton,
                 StackTypeConverter.Singleton,
                 PositionEnumConverter.Singleton,
+                MoveCardsCustomAnimationConverter.Singleton,
+                CardFacingConverter.Singleton,
                 CardPrefabConverter.Singleton,
                 ActionUnionConverter.Singleton,
                 BattleActionConverter.Singleton,
@@ -3169,47 +3180,6 @@ namespace Dreamtides.Schema
         public static readonly GameMessageTypeConverter Singleton = new GameMessageTypeConverter();
     }
 
-    internal class CardFacingConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(CardFacing) || t == typeof(CardFacing?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "FaceDown":
-                    return CardFacing.FaceDown;
-                case "FaceUp":
-                    return CardFacing.FaceUp;
-            }
-            throw new Exception("Cannot unmarshal type CardFacing");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (CardFacing)untypedValue;
-            switch (value)
-            {
-                case CardFacing.FaceDown:
-                    serializer.Serialize(writer, "FaceDown");
-                    return;
-                case CardFacing.FaceUp:
-                    serializer.Serialize(writer, "FaceUp");
-                    return;
-            }
-            throw new Exception("Cannot marshal type CardFacing");
-        }
-
-        public static readonly CardFacingConverter Singleton = new CardFacingConverter();
-    }
-
     internal class PositionConverter : JsonConverter
     {
         public override bool CanConvert(Type t) => t == typeof(Position) || t == typeof(Position?);
@@ -3463,6 +3433,81 @@ namespace Dreamtides.Schema
         }
 
         public static readonly PositionEnumConverter Singleton = new PositionEnumConverter();
+    }
+
+    internal class MoveCardsCustomAnimationConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(MoveCardsCustomAnimation) || t == typeof(MoveCardsCustomAnimation?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            if (value == "ShowAtDrawnCardsPosition")
+            {
+                return MoveCardsCustomAnimation.ShowAtDrawnCardsPosition;
+            }
+            throw new Exception("Cannot unmarshal type MoveCardsCustomAnimation");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (MoveCardsCustomAnimation)untypedValue;
+            if (value == MoveCardsCustomAnimation.ShowAtDrawnCardsPosition)
+            {
+                serializer.Serialize(writer, "ShowAtDrawnCardsPosition");
+                return;
+            }
+            throw new Exception("Cannot marshal type MoveCardsCustomAnimation");
+        }
+
+        public static readonly MoveCardsCustomAnimationConverter Singleton = new MoveCardsCustomAnimationConverter();
+    }
+
+    internal class CardFacingConverter : JsonConverter
+    {
+        public override bool CanConvert(Type t) => t == typeof(CardFacing) || t == typeof(CardFacing?);
+
+        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null) return null;
+            var value = serializer.Deserialize<string>(reader);
+            switch (value)
+            {
+                case "FaceDown":
+                    return CardFacing.FaceDown;
+                case "FaceUp":
+                    return CardFacing.FaceUp;
+            }
+            throw new Exception("Cannot unmarshal type CardFacing");
+        }
+
+        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
+        {
+            if (untypedValue == null)
+            {
+                serializer.Serialize(writer, null);
+                return;
+            }
+            var value = (CardFacing)untypedValue;
+            switch (value)
+            {
+                case CardFacing.FaceDown:
+                    serializer.Serialize(writer, "FaceDown");
+                    return;
+                case CardFacing.FaceUp:
+                    serializer.Serialize(writer, "FaceUp");
+                    return;
+            }
+            throw new Exception("Cannot marshal type CardFacing");
+        }
+
+        public static readonly CardFacingConverter Singleton = new CardFacingConverter();
     }
 
     internal class CardPrefabConverter : JsonConverter
