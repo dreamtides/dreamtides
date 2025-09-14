@@ -259,7 +259,7 @@ namespace Dreamtides.Services
       Registry.Layout.AboveUserVoid.ApplyLayout(sequence);
       Registry.Layout.AboveEnemyVoid.ApplyLayout(sequence);
 
-      Registry.DreamscapeService.ApplySiteLayouts(sequence);
+      Registry.DreamscapeService.ApplyLayouts(sequence);
     }
 
     List<Card> PrepareToDelete(Sequence? sequence, HashSet<string> toDelete)
@@ -330,6 +330,11 @@ namespace Dreamtides.Services
       if (position.Enum == PositionEnum.OnScreenStorage)
       {
         return Registry.Layout.OnScreenStorage;
+      }
+
+      if (position.Enum == PositionEnum.DraftPickDisplay)
+      {
+        return Registry.DreamscapeLayout.DraftPickLayout;
       }
 
       if (position.PositionClass == null)

@@ -2424,8 +2424,10 @@ namespace Dreamtides.Schema
     /// Object is in the on-screen storage area, used to hold objects at a small
     /// size when they're not being focused on, e.g. when the user hides a
     /// card browser to get a better view of the battlefield.
+    ///
+    /// Object is being displayed as a potential draft pick choice
     /// </summary>
-    public enum PositionEnum { Browser, Default, Drawn, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnScreenStorage };
+    public enum PositionEnum { Browser, Default, DraftPickDisplay, Drawn, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnScreenStorage };
 
     /// <summary>
     /// Auto-generated discriminant enum variants
@@ -3225,6 +3227,8 @@ namespace Dreamtides.Schema
                             return new Position { Enum = PositionEnum.Browser };
                         case "Default":
                             return new Position { Enum = PositionEnum.Default };
+                        case "DraftPickDisplay":
+                            return new Position { Enum = PositionEnum.DraftPickDisplay };
                         case "Drawn":
                             return new Position { Enum = PositionEnum.Drawn };
                         case "DreamwellActivation":
@@ -3258,6 +3262,9 @@ namespace Dreamtides.Schema
                         return;
                     case PositionEnum.Default:
                         serializer.Serialize(writer, "Default");
+                        return;
+                    case PositionEnum.DraftPickDisplay:
+                        serializer.Serialize(writer, "DraftPickDisplay");
                         return;
                     case PositionEnum.Drawn:
                         serializer.Serialize(writer, "Drawn");
@@ -3396,6 +3403,8 @@ namespace Dreamtides.Schema
                     return PositionEnum.Browser;
                 case "Default":
                     return PositionEnum.Default;
+                case "DraftPickDisplay":
+                    return PositionEnum.DraftPickDisplay;
                 case "Drawn":
                     return PositionEnum.Drawn;
                 case "DreamwellActivation":
@@ -3427,6 +3436,9 @@ namespace Dreamtides.Schema
                     return;
                 case PositionEnum.Default:
                     serializer.Serialize(writer, "Default");
+                    return;
+                case PositionEnum.DraftPickDisplay:
+                    serializer.Serialize(writer, "DraftPickDisplay");
                     return;
                 case PositionEnum.Drawn:
                     serializer.Serialize(writer, "Drawn");

@@ -8,28 +8,67 @@ namespace Dreamtides.Prototype
 {
   public static class PrototypeCards
   {
-    public static List<CardView> CreateCards(int count, ObjectPosition position, bool revealed = true)
+    /// <summary>
+    /// Create new cards up to at least <paramref name="count"/> total, or update the first <paramref name="count"/> existing cards' positions.
+    /// Subsequent calls with a smaller count DO NOT shrink the underlying cached collection; they only adjust the positions
+    /// (and optionally facing/revealed state) of the first N cards. This allows a call sequence like (20) then (4) to still
+    /// return 20 cards, with only the first 4 repositioned as requested.
+    /// Card generation is fully deterministic: requesting (count = 20) will always yield the same 20 card identities & templates
+    /// regardless of any prior calls with different counts or parameters.
+    /// </summary>
+    public static List<CardView> CreateOrUpdateCards(int count, ObjectPosition position, bool revealed = true)
     {
-      if (count <= 0) return new List<CardView>();
       if (position == null) throw new ArgumentNullException(nameof(position));
-
-      var list = new List<CardView>(capacity: count);
-      var rng = _rng;
-
-      for (var i = 0; i < count; i++)
+      if (count <= 0)
       {
-        var template = _cardTemplates[rng.Next(_cardTemplates.Length)];
-        var objectPosition = ClonePositionWithSorting(position, i);
-        list.Add(BuildCardView(template, objectPosition, i, revealed));
+        // Preserve previous behavior of returning empty when asked for <= 0.
+        return new List<CardView>();
       }
 
-      return list;
+      // Grow cache if needed (never shrink) so that subsequent smaller requests still return the full prior set.
+      var targetCount = Math.Max(count, _cachedCards.Count);
+
+      // Generate any missing cards deterministically by index (seed derived from global seed + card index) so order/content
+      // is independent of the sequence of external calls.
+      for (int i = _cachedCards.Count; i < targetCount; i++)
+      {
+        var template = GetTemplateForIndex(i);
+        var objectPosition = ClonePositionWithSorting(position, i);
+        _cachedCards.Add(BuildCardView(template, objectPosition, i, revealed));
+      }
+
+      // Update (only) the first 'count' cards' positions (and facing/revealed state) to reflect the new base position request.
+      // Remaining cards keep prior positions exactly as required by the spec example (20 -> 4 returns 20 with only first 4 moved).
+      for (int i = 0; i < Math.Min(count, _cachedCards.Count); i++)
+      {
+        var existing = _cachedCards[i];
+        existing.Position = ClonePositionWithSorting(position, i); // Update sorting key relative to new request
+        if (existing.CardFacing != (revealed ? CardFacing.FaceUp : CardFacing.FaceDown))
+        {
+          existing.CardFacing = revealed ? CardFacing.FaceUp : CardFacing.FaceDown;
+        }
+        if (revealed && existing.Revealed == null)
+        {
+          // If previously hidden but now revealed, build a revealed view deterministically from its template index.
+          existing.Revealed = BuildRevealed(GetTemplateForIndex(i));
+        }
+        else if (!revealed)
+        {
+          existing.Revealed = null; // Conceal if request indicates hidden.
+        }
+      }
+
+      // Return a defensive copy so callers cannot mutate the cached list.
+      return new List<CardView>(_cachedCards);
     }
 
     #region Helpers
 
-    // Single shared RNG so repeated calls feel varied but deterministic within a run if desired.
-    static readonly Random _rng = new Random();
+    // Persistent cache of created cards (never shrinks).
+    static readonly List<CardView> _cachedCards = new List<CardView>();
+
+    // Fixed base seed for deterministic per-index pseudo-random selection.
+    const int _baseSeed = 0x5EEDBEEF; // Arbitrary constant
 
     // Minimal template info needed to fabricate a revealed card view.
     class CardTemplate
@@ -154,16 +193,28 @@ namespace Dreamtides.Prototype
       )
     };
 
+    // Deterministically pick a template for a given card index independent of call order.
+    static CardTemplate GetTemplateForIndex(int index)
+    {
+      // Derive a per-card seed; use unchecked to allow overflow wrapping.
+      unchecked
+      {
+        int seed = _baseSeed + index * 31; // 31 is a small prime multiplier
+        var rng = new Random(seed);
+        int templateIndex = rng.Next(_cardTemplates.Length);
+        return _cardTemplates[templateIndex];
+      }
+    }
+
     static CardView BuildCardView(CardTemplate t, ObjectPosition objectPosition, int sortIndex, bool revealed) => new()
     {
-      Backless = revealed, // Only backless if revealed so we don't animate a flip
+      Backless = false,
       CardFacing = revealed ? CardFacing.FaceUp : CardFacing.FaceDown,
       Id = (sortIndex + 1).ToString(),
       Position = objectPosition,
       Prefab = t.Prefab,
       Revealed = revealed ? BuildRevealed(t) : null,
-      RevealedToOpponents = true,
-      // Optional fields left null to intentionally avoid outlines / effects / actions
+      RevealedToOpponents = false,
     };
 
     static RevealedCardView BuildRevealed(CardTemplate t) => new()

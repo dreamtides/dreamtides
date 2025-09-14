@@ -11,9 +11,11 @@ namespace Dreamtides.Services
   {
     [SerializeField] ObjectLayout _tmpSiteDeckLayout = null!;
 
-    public void ApplySiteLayouts(Sequence? sequence)
+    public void ApplyLayouts(Sequence? sequence)
     {
+      Registry.DreamscapeLayout.DraftPickLayout.ApplyLayout(sequence);
       _tmpSiteDeckLayout.ApplyLayout(sequence);
+
     }
 
     public ObjectLayout SiteDeckLayout(Guid siteId)

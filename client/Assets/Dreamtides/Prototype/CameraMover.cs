@@ -5,6 +5,7 @@ using Dreamtides.Buttons;
 using Dreamtides.Prototype;
 using Dreamtides.Schema;
 using Dreamtides.Services;
+using Dreamtides.Utils;
 using HighlightPlus;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -62,9 +63,6 @@ public class CameraMover : MonoBehaviour
 
     public void FocusDraftCamera()
     {
-        ResetPrioritiesAndTrack(_draftTrackingTarget, false);
-        _draftCamera.Priority = 10;
-
         StartCoroutine(CreateCards(20, new ObjectPosition
         {
             Position = new Position
@@ -76,6 +74,19 @@ public class CameraMover : MonoBehaviour
             },
             SortingKey = 1,
         }, false));
+
+        ResetPrioritiesAndTrack(_draftTrackingTarget, false, () =>
+        {
+            StartCoroutine(CreateCards(4, new ObjectPosition
+            {
+                Position = new Position
+                {
+                    Enum = PositionEnum.DraftPickDisplay
+                },
+                SortingKey = 1,
+            }, false));
+        });
+        _draftCamera.Priority = 10;
     }
 
     public void FocusShopCamera()
@@ -108,7 +119,7 @@ public class CameraMover : MonoBehaviour
         _battleCamera.Priority = 10;
     }
 
-    void ResetPrioritiesAndTrack(Transform track, bool showSiteButtons)
+    void ResetPrioritiesAndTrack(Transform track, bool showSiteButtons, Action onCameraMoveFinished = null)
     {
         // Cancel any pending site-button activation and hide them immediately
         if (_siteButtonsActivationCoroutine != null)
@@ -142,10 +153,17 @@ public class CameraMover : MonoBehaviour
             _battleCamera.Target.TrackingTarget = track;
         }
 
-        // Defer showing site buttons (if requested) until after the blend/transition completes
-        if (showSiteButtons)
+        // Defer site button display and/or completion callback until after the blend/transition completes
+        if (showSiteButtons || onCameraMoveFinished != null)
         {
-            _siteButtonsActivationCoroutine = StartCoroutine(WaitForTransitionThenShowSiteButtons());
+            _siteButtonsActivationCoroutine = StartCoroutine(WaitForTransitionThen(() =>
+            {
+                if (showSiteButtons)
+                {
+                    SetSiteButtonsActive(true);
+                }
+                onCameraMoveFinished?.Invoke();
+            }));
         }
     }
 
@@ -169,8 +187,9 @@ public class CameraMover : MonoBehaviour
         }
     }
 
-    System.Collections.IEnumerator WaitForTransitionThenShowSiteButtons()
+    IEnumerator WaitForTransitionThen(Action afterBlend)
     {
+        // Wait a frame so Cinemachine can start the blend
         yield return null;
         if (_brain != null)
         {
@@ -179,14 +198,13 @@ public class CameraMover : MonoBehaviour
                 yield return null;
             }
         }
-
-        SetSiteButtonsActive(true);
+        afterBlend?.Invoke();
         _siteButtonsActivationCoroutine = null;
     }
 
     IEnumerator CreateCards(int count, ObjectPosition position, bool revealed)
     {
-        var cards = PrototypeCards.CreateCards(count, position, revealed);
+        var cards = PrototypeCards.CreateOrUpdateCards(count, position, revealed);
         var command = new UpdateQuestCommand
         {
             Quest = new QuestView
@@ -195,6 +213,7 @@ public class CameraMover : MonoBehaviour
             },
         };
 
-        return _registry.CardService.HandleUpdateQuestCommand(command);
+        var sequence = TweenUtils.Sequence("UpdateQuest");
+        return _registry.CardService.HandleUpdateQuestCommand(command, sequence);
     }
 }

@@ -102,6 +102,9 @@ pub enum Position {
     /// Object is in a deck of cards displayed at a given dreamscape site, e.g.
     /// before being drafted.
     SiteDeck(SiteId),
+
+    /// Object is being displayed as a potential draft pick choice
+    DraftPickDisplay,
 }
 
 #[derive(

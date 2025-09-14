@@ -24,6 +24,9 @@ namespace Dreamtides.Services
     public GameLayout Layout =>
         IsLandscape ? Check(_landscapeLayout) : Check(_portraitLayout);
 
+    [SerializeField] DreamscapeLayout? _dreamscapeLayout;
+    public DreamscapeLayout DreamscapeLayout => Check(_dreamscapeLayout);
+
     [SerializeField] CardService? _cardService;
     public CardService CardService => Check(_cardService);
 
