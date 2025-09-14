@@ -258,6 +258,8 @@ namespace Dreamtides.Services
       Registry.Layout.OnScreenStorage.ApplyLayout(sequence);
       Registry.Layout.AboveUserVoid.ApplyLayout(sequence);
       Registry.Layout.AboveEnemyVoid.ApplyLayout(sequence);
+
+      Registry.DreamscapeService.ApplySiteLayouts(sequence);
     }
 
     List<Card> PrepareToDelete(Sequence? sequence, HashSet<string> toDelete)
