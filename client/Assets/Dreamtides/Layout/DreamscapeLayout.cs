@@ -7,8 +7,8 @@ namespace Dreamtides.Layout
 
   public class DreamscapeLayout : MonoBehaviour
   {
-    [SerializeField] ObjectLayout _draftPickLayout = null!;
-    public ObjectLayout DraftPickLayout => Check(_draftPickLayout);
+    [SerializeField] DraftPickObjectLayout _draftPickLayout = null!;
+    public DraftPickObjectLayout DraftPickLayout => Check(_draftPickLayout);
 
     T Check<T>(T? value) where T : Object =>
         Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");

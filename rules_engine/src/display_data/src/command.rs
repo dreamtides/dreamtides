@@ -225,6 +225,7 @@ pub struct MoveCardsWithCustomAnimationCommand {
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, JsonSchema)]
 pub enum MoveCardsCustomAnimation {
     ShowAtDrawnCardsPosition,
+    ShowInDraftPickLayout,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]

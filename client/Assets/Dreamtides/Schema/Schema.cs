@@ -2437,7 +2437,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Animation to perform when moving cards
     /// </summary>
-    public enum MoveCardsCustomAnimation { ShowAtDrawnCardsPosition };
+    public enum MoveCardsCustomAnimation { ShowAtDrawnCardsPosition, ShowInDraftPickLayout };
 
     /// <summary>
     /// Face up/face down state for this card
@@ -3443,9 +3443,12 @@ namespace Dreamtides.Schema
         {
             if (reader.TokenType == JsonToken.Null) return null;
             var value = serializer.Deserialize<string>(reader);
-            if (value == "ShowAtDrawnCardsPosition")
+            switch (value)
             {
-                return MoveCardsCustomAnimation.ShowAtDrawnCardsPosition;
+                case "ShowAtDrawnCardsPosition":
+                    return MoveCardsCustomAnimation.ShowAtDrawnCardsPosition;
+                case "ShowInDraftPickLayout":
+                    return MoveCardsCustomAnimation.ShowInDraftPickLayout;
             }
             throw new Exception("Cannot unmarshal type MoveCardsCustomAnimation");
         }
@@ -3458,10 +3461,14 @@ namespace Dreamtides.Schema
                 return;
             }
             var value = (MoveCardsCustomAnimation)untypedValue;
-            if (value == MoveCardsCustomAnimation.ShowAtDrawnCardsPosition)
+            switch (value)
             {
-                serializer.Serialize(writer, "ShowAtDrawnCardsPosition");
-                return;
+                case MoveCardsCustomAnimation.ShowAtDrawnCardsPosition:
+                    serializer.Serialize(writer, "ShowAtDrawnCardsPosition");
+                    return;
+                case MoveCardsCustomAnimation.ShowInDraftPickLayout:
+                    serializer.Serialize(writer, "ShowInDraftPickLayout");
+                    return;
             }
             throw new Exception("Cannot marshal type MoveCardsCustomAnimation");
         }

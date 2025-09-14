@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Dreamtides.Buttons;
 using Dreamtides.Prototype;
 using Dreamtides.Schema;
@@ -13,6 +14,7 @@ using UnityEngine;
 public class CameraMover : MonoBehaviour
 {
     [SerializeField] Registry _registry = null!;
+    [SerializeField] string _outlineColorHex = "#EF6C00";
     [SerializeField] CinemachineBrain _brain;
     [SerializeField] CinemachineCamera _spaceCameraFar;
     [SerializeField] CinemachineCamera _spaceCameraNear;
@@ -63,7 +65,7 @@ public class CameraMover : MonoBehaviour
 
     public void FocusDraftCamera()
     {
-        StartCoroutine(CreateCards(20, new ObjectPosition
+        StartCoroutine(CreateOrUpdateCards(20, new ObjectPosition
         {
             Position = new Position
             {
@@ -77,14 +79,7 @@ public class CameraMover : MonoBehaviour
 
         ResetPrioritiesAndTrack(_draftTrackingTarget, false, () =>
         {
-            StartCoroutine(CreateCards(4, new ObjectPosition
-            {
-                Position = new Position
-                {
-                    Enum = PositionEnum.DraftPickDisplay
-                },
-                SortingKey = 1,
-            }, false));
+            StartCoroutine(RunDraftPickSequence());
         });
         _draftCamera.Priority = 10;
     }
@@ -202,9 +197,9 @@ public class CameraMover : MonoBehaviour
         _siteButtonsActivationCoroutine = null;
     }
 
-    IEnumerator CreateCards(int count, ObjectPosition position, bool revealed)
+    IEnumerator CreateOrUpdateCards(int count, ObjectPosition position, bool revealed, string outlineColorHex = null)
     {
-        var cards = PrototypeCards.CreateOrUpdateCards(count, position, revealed);
+        var cards = PrototypeCards.CreateOrUpdateCards(count, position, revealed, outlineColorHex);
         var command = new UpdateQuestCommand
         {
             Quest = new QuestView
@@ -215,5 +210,37 @@ public class CameraMover : MonoBehaviour
 
         var sequence = TweenUtils.Sequence("UpdateQuest");
         return _registry.CardService.HandleUpdateQuestCommand(command, sequence);
+    }
+
+    IEnumerator RunDraftPickSequence()
+    {
+        var allCards = PrototypeCards.CreateOrUpdateCards(4, new ObjectPosition
+        {
+            Position = new Position
+            {
+                Enum = PositionEnum.DraftPickDisplay
+            },
+            SortingKey = 1,
+        }, revealed: true, outlineColorHex: _outlineColorHex);
+
+        var customAnimation = new MoveCardsWithCustomAnimationCommand
+        {
+            Animation = MoveCardsCustomAnimation.ShowInDraftPickLayout,
+            Cards = allCards.Take(4).ToList(),
+            Destination = new Position { Enum = PositionEnum.DraftPickDisplay },
+            PauseDuration = new Milliseconds { MillisecondsValue = 0 },
+            StaggerInterval = new Milliseconds { MillisecondsValue = 300 },
+        };
+
+        yield return StartCoroutine(_registry.CardAnimationService.HandleMoveCardsWithCustomAnimation(customAnimation));
+
+        yield return StartCoroutine(CreateOrUpdateCards(4, new ObjectPosition
+        {
+            Position = new Position
+            {
+                Enum = PositionEnum.DraftPickDisplay
+            },
+            SortingKey = 1,
+        }, revealed: true, outlineColorHex: _outlineColorHex));
     }
 }

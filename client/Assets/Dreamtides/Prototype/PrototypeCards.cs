@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using Dreamtides.Schema;
 using System;
+using Dreamtides.Masonry;
 
 namespace Dreamtides.Prototype
 {
@@ -16,7 +17,7 @@ namespace Dreamtides.Prototype
     /// Card generation is fully deterministic: requesting (count = 20) will always yield the same 20 card identities & templates
     /// regardless of any prior calls with different counts or parameters.
     /// </summary>
-    public static List<CardView> CreateOrUpdateCards(int count, ObjectPosition position, bool revealed = true)
+    public static List<CardView> CreateOrUpdateCards(int count, ObjectPosition position, bool revealed = true, string? outlineColorHex = null)
     {
       if (position == null) throw new ArgumentNullException(nameof(position));
       if (count <= 0)
@@ -34,7 +35,7 @@ namespace Dreamtides.Prototype
       {
         var template = GetTemplateForIndex(i);
         var objectPosition = ClonePositionWithSorting(position, i);
-        _cachedCards.Add(BuildCardView(template, objectPosition, i, revealed));
+        _cachedCards.Add(BuildCardView(template, objectPosition, i, revealed, outlineColorHex));
       }
 
       // Update (only) the first 'count' cards' positions (and facing/revealed state) to reflect the new base position request.
@@ -47,12 +48,20 @@ namespace Dreamtides.Prototype
         {
           existing.CardFacing = revealed ? CardFacing.FaceUp : CardFacing.FaceDown;
         }
-        if (revealed && existing.Revealed == null)
+        if (revealed)
         {
-          // If previously hidden but now revealed, build a revealed view deterministically from its template index.
-          existing.Revealed = BuildRevealed(GetTemplateForIndex(i));
+          if (existing.Revealed == null)
+          {
+            // If previously hidden but now revealed, build a revealed view deterministically from its template index.
+            existing.Revealed = BuildRevealed(GetTemplateForIndex(i), outlineColorHex);
+          }
+          else if (outlineColorHex != null)
+          {
+            // Update outline color if provided.
+            existing.Revealed.OutlineColor = Mason.MakeColor(outlineColorHex);
+          }
         }
-        else if (!revealed)
+        else // !revealed
         {
           existing.Revealed = null; // Conceal if request indicates hidden.
         }
@@ -206,18 +215,18 @@ namespace Dreamtides.Prototype
       }
     }
 
-    static CardView BuildCardView(CardTemplate t, ObjectPosition objectPosition, int sortIndex, bool revealed) => new()
+    static CardView BuildCardView(CardTemplate t, ObjectPosition objectPosition, int sortIndex, bool revealed, string? outlineColorHex) => new()
     {
       Backless = false,
       CardFacing = revealed ? CardFacing.FaceUp : CardFacing.FaceDown,
       Id = (sortIndex + 1).ToString(),
       Position = objectPosition,
       Prefab = t.Prefab,
-      Revealed = revealed ? BuildRevealed(t) : null,
+      Revealed = revealed ? BuildRevealed(t, outlineColorHex) : null,
       RevealedToOpponents = false,
     };
 
-    static RevealedCardView BuildRevealed(CardTemplate t) => new()
+    static RevealedCardView BuildRevealed(CardTemplate t, string? outlineColorHex) => new()
     {
       Actions = new CardActions(), // All null => no actions, clicks, sounds
       CardType = t.CardType,
@@ -230,7 +239,7 @@ namespace Dreamtides.Prototype
       InfoZoomData = null,
       IsFast = t.IsFast,
       Name = t.Name,
-      OutlineColor = null, // Explicit for clarity (no outline override)
+      OutlineColor = outlineColorHex != null ? Mason.MakeColor(outlineColorHex) : null,
       Produced = t.Produced,
       RulesText = t.Rules,
       Spark = t.Spark

@@ -36,6 +36,8 @@ namespace Dreamtides.Services
       {
         case MoveCardsCustomAnimation.ShowAtDrawnCardsPosition:
           return HandleDrawUserCards(command);
+        case MoveCardsCustomAnimation.ShowInDraftPickLayout:
+          return HandleShowInDraftPickLayout(command);
         default:
           throw new IndexOutOfRangeException($"Unhandled animation type: {command.Animation}");
       }
@@ -55,6 +57,55 @@ namespace Dreamtides.Services
           yield return DrawUserCard(command, i, isLastCard: true);
         }
       }
+    }
+
+    IEnumerator HandleShowInDraftPickLayout(MoveCardsWithCustomAnimationCommand command)
+    {
+      var draftLayout = Registry.DreamscapeLayout.DraftPickLayout;
+      var cardViews = command.Cards;
+      var cards = cardViews.Select(cv => Registry.CardService.GetCard(cv.Id)).ToList();
+      var stagger = command.StaggerInterval.ToSeconds();
+
+      var existingCount = draftLayout.Objects.Count;
+      var finalCount = existingCount + cards.Count;
+      for (int i = 0; i < cards.Count; ++i)
+      {
+        var card = cards[i];
+        var cardView = cardViews[i];
+        int targetIndex = existingCount + i;
+        if (i < cards.Count - 1)
+        {
+          StartCoroutine(MoveCardToDraftPick(draftLayout, card, cardView, targetIndex, finalCount));
+          if (stagger > 0)
+          {
+            yield return new WaitForSeconds(stagger);
+          }
+        }
+        else
+        {
+          yield return MoveCardToDraftPick(draftLayout, card, cardView, targetIndex, finalCount);
+        }
+      }
+    }
+
+    IEnumerator MoveCardToDraftPick(DraftPickObjectLayout draftLayout, Card card, CardView cardView, int targetIndex, int finalCount)
+    {
+      if (card.Parent)
+      {
+        card.Parent.RemoveIfPresent(card);
+      }
+      var targetPosition = draftLayout.CalculateObjectPosition(targetIndex, finalCount);
+      var rotationEuler = draftLayout.CalculateObjectRotation(targetIndex, finalCount) ?? draftLayout.transform.rotation.eulerAngles;
+      var targetRotation = Quaternion.Euler(rotationEuler);
+      var targetScale = draftLayout.CalculateObjectScale(targetIndex, finalCount) ?? draftLayout.transform.localScale.x;
+      Registry.SoundService.PlayDrawCardSound();
+      var seq = TweenUtils.Sequence("DraftPickMove");
+      card.SortingKey = (int)cardView.Position.SortingKey;
+      card.Render(Registry, cardView, seq);
+      seq.Insert(0, card.transform.DOMove(targetPosition, TweenUtils.MoveAnimationDurationSeconds));
+      seq.Insert(0, card.transform.DORotateQuaternion(targetRotation, TweenUtils.MoveAnimationDurationSeconds));
+      seq.Insert(0, card.transform.DOScale(Vector3.one * targetScale, TweenUtils.MoveAnimationDurationSeconds));
+      yield return seq.WaitForCompletion();
     }
 
     public IEnumerator HandleShuffleVoidIntoDeck(ShuffleVoidIntoDeckCommand command)
