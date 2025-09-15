@@ -2,7 +2,7 @@
 
 This document describes the steps to implement new trigger functionality for
 the Dreamtides battle system. Triggers are events that occur during a battle
-which can activate triggered abilities on character cards. The trigger system
+which can activate triggered effects on character cards. The trigger system
 is defined in:
 
 - `rules_engine/src/battle_state/src/triggers/trigger.rs`
@@ -91,13 +91,6 @@ battle.triggers.push(source, Trigger::PlayedCard(stack_card_id));
 battle.triggers.push(source, Trigger::PlayedCardFromHand(stack_card_id));
 ```
 
-### Example: Playing a Card from Void
-```rust
-// After moving a card from void to stack
-battle.triggers.push(source, Trigger::PlayedCard(stack_card_id));
-battle.triggers.push(source, Trigger::PlayedCardFromVoid(stack_card_id));
-```
-
 ### Example: Materializing a Character
 ```rust
 // When a character enters the battlefield
@@ -130,7 +123,7 @@ If your trigger is missing, you will need to add it to both the `Trigger` enum
 and the `TriggerName` enum, along with updating the `name()` method to handle
 the new variant.
 
-## Step 2: Verify your trigger event is recognized by the ability parser
+## Step 1: Verify your trigger event is recognized by the ability parser
 
 Triggered abilities on cards are parsed from rules text using the ability
 parser. Trigger events are parsed by:
@@ -142,9 +135,40 @@ Most trigger events are already supported by the parser. If your trigger event
 is *not* supported, you will need to implement parsing support for it in the
 `trigger_event_parser.rs` file.
 
-Trigger parsing has unit tests which live in:
+## Step 2: Add a test for trigger parsing if needed
+
+Before writing battle tests, verify that your trigger event is correctly parsed.
+
+Trigger parsing is demonstrated by the tests in:
 
 `rules_engine/tests/parser_tests/tests/parser_tests/triggered_ability_parsing_tests.rs`
+
+A simple parser test looks like:
+
+```rust
+#[test]
+fn test_your_trigger_parsing() {
+    let result = parse(
+        "Whenever an enemy character is {dissolved}, draw {-drawn-cards(n: 1)}.",
+    );
+    assert_ron_snapshot!(
+        result,
+        @r###"
+    [
+      Triggered(TriggeredAbility(
+        trigger: Dissolved(Enemy(CharacterType(Any))),
+        effect: Effect(DrawCards(
+          count: 1,
+        )),
+      )),
+    ]
+    "###
+    );
+}
+```
+
+This test verifies that the rules text is correctly parsed into the expected
+`TriggeredAbility` structure.
 
 ## Step 3: Add logic to fire your trigger
 
@@ -252,41 +276,7 @@ session extension here:
 - `rules_engine/src/test_utils/src/client/test_client.rs`
 - `rules_engine/src/test_utils/src/session/test_session_battle_extension.rs`
 
-## Step 6: Verify trigger is recognized by the parser
-
-Before writing battle tests, verify that your trigger event is correctly parsed
-by adding a parser test to:
-
-`rules_engine/tests/parser_tests/tests/parser_tests/triggered_ability_parsing_tests.rs`
-
-A simple parser test looks like:
-
-```rust
-#[test]
-fn test_your_trigger_parsing() {
-    let result = parse(
-        "Whenever an enemy character is {dissolved}, draw {-drawn-cards(n: 1)}.",
-    );
-    assert_ron_snapshot!(
-        result,
-        @r###"
-    [
-      Triggered(TriggeredAbility(
-        trigger: Dissolved(Enemy(CharacterType(Any))),
-        effect: Effect(DrawCards(
-          count: 1,
-        )),
-      )),
-    ]
-    "###
-    );
-}
-```
-
-This test verifies that the rules text is correctly parsed into the expected
-`TriggeredAbility` structure.
-
-## Step 7: Run your tests
+## Step 6: Run your tests
 
 You can run a newly created test using `just` as follows, from any project
 directory:
@@ -308,7 +298,7 @@ For parser tests:
 just parser-test parser_tests::triggered_ability_parsing_tests::test_your_trigger_parsing
 ```
 
-## Step 8: Validate changes
+## Step 7: Validate changes
 
 After your tests pass, you should run `just fmt` to apply rustfmt formatting
 rules to the project codebase. You should then run Clippy and the full project
