@@ -1,14 +1,19 @@
+use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
 use battle_queries::battle_card_queries::{card, card_properties};
 use battle_queries::panic_with;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{
     BattleDeckCardId, CardId, CardIdType, CharacterId, HandCardId, StackCardId, VoidCardId,
 };
+use battle_state::battle_cards::ability_list::AbilityList;
 use battle_state::battle_cards::character_state::CharacterState;
 use battle_state::battle_cards::zone::Zone;
 use battle_state::core::effect_source::EffectSource;
-use battle_state::triggers::trigger::Trigger;
+use battle_state::triggers::trigger::{Trigger, TriggerName};
 use core_data::types::PlayerName;
+use enumset::EnumSet;
+
+use crate::effects::apply_effect_with_prompt_for_targets;
 
 /// Moves a card from the 'controller' player's hand to the stack.
 ///
@@ -255,17 +260,26 @@ fn on_enter_battlefield(
     card_id: CardId,
 ) {
     let ability_list = card::ability_list(battle, card_id);
-    let triggers = ability_list.battlefield_triggers;
-    for trigger in triggers {
+    let id = CharacterId(card_id);
+
+    // Performance optimization: Handle {materialized} keyword triggers immediately
+    // instead of going through the normal trigger listener system
+    execute_materialized_keyword_triggers(battle, &ability_list, source, controller, id);
+
+    // Register as listener for other battlefield triggers (excluding
+    // already-handled materialized keywords)
+    let filtered_triggers = filter_out_materialized_keywords(&ability_list);
+    for trigger in filtered_triggers {
         battle.triggers.listeners.add_listener(trigger, card_id);
     }
 
-    let id = CharacterId(card_id);
     let Some(spark) = card_properties::base_spark(battle, id) else {
         panic_no_base_spark(battle, id);
     };
     battle.cards.battlefield_state_mut(controller).insert(id, CharacterState { spark });
 
+    // Still fire the normal Materialized trigger for non-keyword triggered
+    // abilities
     battle.triggers.push(source, Trigger::Materialized(id));
 }
 
@@ -308,6 +322,61 @@ fn on_leave_stack(battle: &mut BattleState, card_id: CardId, new: &mut Zone) {
         battle.ability_state.banish_when_leaves_play.remove(card_id);
         *new = Zone::Banished;
     }
+}
+
+/// Performance optimization: Execute {materialized} keyword triggers
+/// immediately instead of going through the trigger listener system.
+fn execute_materialized_keyword_triggers(
+    battle: &mut BattleState,
+    ability_list: &AbilityList,
+    _source: EffectSource,
+    controller: PlayerName,
+    character_id: CharacterId,
+) {
+    for ability_data in &ability_list.triggered_abilities {
+        if let TriggerEvent::Keywords(keywords) = &ability_data.ability.trigger
+            && keywords.iter().any(|k| matches!(k, TriggerKeyword::Materialized))
+        {
+            // Execute the triggered ability immediately
+            let effect_source = EffectSource::Triggered {
+                controller,
+                character_id,
+                ability_number: ability_data.ability_number,
+            };
+
+            apply_effect_with_prompt_for_targets::execute(
+                battle,
+                effect_source,
+                &ability_data.ability.effect,
+                Some(character_id.card_id()), // The triggering card is the character itself
+                None,
+            );
+        }
+    }
+}
+
+/// Filter out battlefield triggers that are {materialized} keyword triggers,
+/// since we handle those immediately for performance reasons.
+fn filter_out_materialized_keywords(ability_list: &AbilityList) -> EnumSet<TriggerName> {
+    let mut filtered_triggers = EnumSet::new();
+
+    // Add all battlefield triggers
+    for trigger in ability_list.battlefield_triggers {
+        filtered_triggers.insert(trigger);
+    }
+
+    // Remove TriggerName::Materialized if this card has {materialized} keyword
+    // triggers
+    for ability_data in &ability_list.triggered_abilities {
+        if let TriggerEvent::Keywords(keywords) = &ability_data.ability.trigger
+            && keywords.iter().any(|k| matches!(k, TriggerKeyword::Materialized))
+        {
+            filtered_triggers.remove(TriggerName::Materialized);
+            break; // No need to check further once we find one
+        }
+    }
+
+    filtered_triggers
 }
 
 #[cold]

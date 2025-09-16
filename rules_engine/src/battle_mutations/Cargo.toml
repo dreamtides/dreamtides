@@ -22,6 +22,7 @@ tabula_ids = { path = "../tabula_ids" }
 
 bit-set = { workspace = true }
 either = { workspace = true }
+enumset = { workspace = true }
 rand = { workspace = true }
 rand_xoshiro = { workspace = true }
 tracing = { workspace = true }
