@@ -47,6 +47,9 @@ test:
 battle-test *args='':
     cargo test --manifest-path rules_engine/Cargo.toml -p battle_tests "$@"
 
+parser-test *args='':
+    cargo test --manifest-path rules_engine/Cargo.toml -p parser_tests "$@"
+
 doc:
     cargo doc --manifest-path rules_engine/Cargo.toml
 
