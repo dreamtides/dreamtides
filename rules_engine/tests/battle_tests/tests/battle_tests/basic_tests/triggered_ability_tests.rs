@@ -718,3 +718,111 @@ fn triggered_ability_triggers_on_reclaim_during_enemy_turn() {
 
     test_helpers::assert_clients_identical(&s);
 }
+
+#[test]
+fn materialized_keyword_trigger_draws_card() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    // Create character with {Materialized} trigger
+    let _materialized_character_id =
+        s.create_and_play(DisplayPlayer::User, test_card::TEST_MATERIALIZED_DRAW);
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
+    assert_eq!(s.user_client.cards.user_hand().len(), 1, "drew card from materialized trigger");
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn materialized_keyword_trigger_multiple_characters() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    // Play first character with {Materialized} trigger
+    let _first_materialized_id =
+        s.create_and_play(DisplayPlayer::User, test_card::TEST_MATERIALIZED_DRAW);
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
+    assert_eq!(
+        s.user_client.cards.user_hand().len(),
+        1,
+        "drew card from first materialized trigger"
+    );
+
+    // Play second character with {Materialized} trigger
+    let _second_materialized_id =
+        s.create_and_play(DisplayPlayer::User, test_card::TEST_MATERIALIZED_DRAW);
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 2, "two characters on battlefield");
+    assert_eq!(
+        s.user_client.cards.user_hand().len(),
+        2,
+        "drew card from second materialized trigger"
+    );
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn materialized_keyword_trigger_only_triggers_for_self() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    // Play character with {Materialized} trigger
+    let _materialized_character_id =
+        s.create_and_play(DisplayPlayer::User, test_card::TEST_MATERIALIZED_DRAW);
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
+    assert_eq!(s.user_client.cards.user_hand().len(), 1, "drew card from materialized trigger");
+
+    // Play another character without materialized trigger
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 2, "two characters on battlefield");
+    assert_eq!(
+        s.user_client.cards.user_hand().len(),
+        1,
+        "no additional card drawn from vanilla character"
+    );
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn materialized_keyword_trigger_does_not_trigger_for_enemy() {
+    let mut s = TestBattle::builder()
+        .user(TestPlayer::builder().energy(99).build())
+        .enemy(TestPlayer::builder().energy(99).build())
+        .connect();
+
+    // Play user character with {Materialized} trigger
+    let _materialized_character_id =
+        s.create_and_play(DisplayPlayer::User, test_card::TEST_MATERIALIZED_DRAW);
+
+    assert_eq!(
+        s.user_client.cards.user_battlefield().len(),
+        1,
+        "one user character on battlefield"
+    );
+    assert_eq!(
+        s.user_client.cards.user_hand().len(),
+        1,
+        "drew card from user materialized trigger"
+    );
+
+    s.end_turn_remove_opponent_hand(DisplayPlayer::User);
+
+    // Enemy plays character - should not trigger user's materialized ability
+    s.create_and_play(DisplayPlayer::Enemy, test_card::TEST_VANILLA_CHARACTER);
+
+    assert_eq!(
+        s.user_client.cards.enemy_battlefield().len(),
+        1,
+        "one enemy character on battlefield"
+    );
+    assert_eq!(
+        s.user_client.cards.user_hand().len(),
+        1,
+        "no additional card drawn from enemy materialization"
+    );
+
+    test_helpers::assert_clients_identical(&s);
+}

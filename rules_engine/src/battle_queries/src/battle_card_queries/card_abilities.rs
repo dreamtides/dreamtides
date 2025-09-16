@@ -4,7 +4,7 @@ use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
 use ability_data::static_ability::{PlayFromVoid, StandardStaticAbility};
-use ability_data::trigger_event::TriggerEvent;
+use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
 use battle_state::battle_cards::ability_list::{AbilityData, AbilityList, CanPlayRestriction};
 use battle_state::triggers::trigger::TriggerName;
 use core_data::identifiers::AbilityNumber;
@@ -265,7 +265,22 @@ fn battlefield_triggers(list: &AbilityList) -> EnumSet<TriggerName> {
     let mut triggers = EnumSet::new();
 
     for ability in list.triggered_abilities.iter() {
-        triggers.insert(watch_for_battlefield_trigger(&ability.ability.trigger));
+        match &ability.ability.trigger {
+            TriggerEvent::Keywords(keywords) => {
+                // For Keywords trigger events, we need to watch for all the triggers
+                // mentioned in the keywords list
+                for keyword in keywords {
+                    match keyword {
+                        TriggerKeyword::Materialized => triggers.insert(TriggerName::Materialized),
+                        TriggerKeyword::Judgment => triggers.insert(TriggerName::Judgment),
+                        TriggerKeyword::Dissolved => triggers.insert(TriggerName::Dissolved),
+                    };
+                }
+            }
+            _ => {
+                triggers.insert(watch_for_battlefield_trigger(&ability.ability.trigger));
+            }
+        }
     }
 
     triggers

@@ -2575,6 +2575,42 @@
       "is_test_card": true,
       "rarity": "Special",
       "image_number": "1200949264"
+    },
+    {
+      "id": "82b032b9-23d3-448d-87b1-3fc2744c28c3",
+      "name_en_us": "Test Materialized Draw",
+      "energy_cost": "2",
+      "rules_text_en_us": "{Materialized}: Draw {-drawn-cards(n:1)}.",
+      "abilities": [
+        {
+          "Triggered": {
+            "trigger": {
+              "Keywords": [
+                "Materialized"
+              ]
+            },
+            "effect": {
+              "Effect": {
+                "DrawCards": {
+                  "count": 1
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Triggered": {
+            "text": "{Materialized}: Draw {-drawn-cards(n:1)}."
+          }
+        }
+      ],
+      "card_type": "Character",
+      "is_fast": false,
+      "spark": "3",
+      "is_test_card": true,
+      "image_number": "0"
     }
   ],
   "dreamwell_cards": [
