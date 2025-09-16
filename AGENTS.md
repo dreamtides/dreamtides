@@ -9,7 +9,11 @@ all times.
     - `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
 - This project uses the `just` command runner
     - `cargo install just`
-- A `just` command can be run from any directory of the project and will have the same result
+  - A `just` command can be run from any directory of the project and will have the same result
+- This project uses `cargo-workspace-lints`
+    - `cargo install cargo-workspace-lints`
+- If you want to be able to run benchmarks, you will need valgrind:
+    - `sudo apt-get install valgrind`
 
 
 # CODE STYLE
@@ -58,6 +62,16 @@ value called 'spark' that lets them generate victory 'points'. Playing a charact
 is called 'materializing' it and destroying it is called 'dissolving' it.
 Dissolved characters and played events go the discard pile, which is called the
 'void'. Playing one game or match of Dreamtides is known as a 'battle'.
+
+
+# ADDITIONAL DOCUMENTATION
+
+More task-specification documentation is available:
+
+- Development environment setup: rules_engine/docs/environment_setup.md
+- Adding new battle effects: rules_engine/docs/adding_new_effects.md
+- Adding new trigger conditions: rules_engine/docs/adding_new_triggers.md
+- Running benchmarks: rules_engine/docs/benchmarks.md
 
 
 # DETAILED CODE STRUCTURE
