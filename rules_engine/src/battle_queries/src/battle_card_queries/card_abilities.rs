@@ -4,7 +4,7 @@ use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
 use ability_data::static_ability::{PlayFromVoid, StandardStaticAbility};
-use ability_data::trigger_event::TriggerEvent;
+use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
 use battle_state::battle_cards::ability_list::{AbilityData, AbilityList, CanPlayRestriction};
 use battle_state::triggers::trigger::TriggerName;
 use core_data::identifiers::AbilityNumber;
@@ -274,6 +274,17 @@ fn battlefield_triggers(list: &AbilityList) -> EnumSet<TriggerName> {
 fn watch_for_battlefield_trigger(event: &TriggerEvent) -> TriggerName {
     match event {
         TriggerEvent::Materialize(..) => TriggerName::Materialized,
+        TriggerEvent::Keywords(keywords) => {
+            if keywords.contains(&TriggerKeyword::Materialized) {
+                TriggerName::Materialized
+            } else if keywords.contains(&TriggerKeyword::Judgment) {
+                TriggerName::Judgment
+            } else if keywords.contains(&TriggerKeyword::Dissolved) {
+                TriggerName::Dissolved
+            } else {
+                todo!("Implement watch_for_trigger() for Keywords({:?})", keywords)
+            }
+        }
         TriggerEvent::Play(..) => TriggerName::PlayedCard,
         TriggerEvent::PlayDuringTurn(..) => TriggerName::PlayedCard,
         TriggerEvent::PlayFromHand(..) => TriggerName::PlayedCardFromHand,

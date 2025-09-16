@@ -718,3 +718,76 @@ fn triggered_ability_triggers_on_reclaim_during_enemy_turn() {
 
     test_helpers::assert_clients_identical(&s);
 }
+
+#[test]
+fn materialized_keyword_trigger_draws_card() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    let initial_hand_size = s.user_client.cards.user_hand().len();
+
+    let _materialized_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        test_card::TEST_MATERIALIZED_DRAW,
+    );
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
+    
+    let final_hand_size = s.user_client.cards.user_hand().len();
+    assert_eq!(final_hand_size, initial_hand_size + 1, "should have drawn 1 card from {{Materialized}} trigger");
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn materialized_keyword_trigger_multiple_characters() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    let initial_hand_size = s.user_client.cards.user_hand().len();
+
+    let _first_materialized_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        test_card::TEST_MATERIALIZED_DRAW,
+    );
+
+    let first_hand_size = s.user_client.cards.user_hand().len();
+    assert_eq!(first_hand_size, initial_hand_size + 1, "should have drawn 1 card from first {{Materialized}} trigger");
+
+    let _second_materialized_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        test_card::TEST_MATERIALIZED_DRAW,
+    );
+
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 2, "two characters on battlefield");
+    
+    let final_hand_size = s.user_client.cards.user_hand().len();
+    assert_eq!(final_hand_size, initial_hand_size + 2, "should have drawn 1 card from second {{Materialized}} trigger");
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn materialized_keyword_trigger_does_not_trigger_on_other_character_materializations() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    let materialized_character_id = s.create_and_play(
+        DisplayPlayer::User,
+        test_card::TEST_MATERIALIZED_DRAW,
+    );
+
+    let initial_hand_size = s.user_client.cards.user_hand().len();
+    assert_eq!(initial_hand_size, 1, "should have drawn 1 card from {{Materialized}} trigger");
+
+    // Check that the first character is on the battlefield
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 1, "one character on battlefield");
+    assert!(s.user_client.cards.user_battlefield().contains(&materialized_character_id), "materialized character is on battlefield");
+
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+
+    // Check that both characters are on the battlefield
+    assert_eq!(s.user_client.cards.user_battlefield().len(), 2, "two characters on battlefield");
+
+    let final_hand_size = s.user_client.cards.user_hand().len();
+    assert_eq!(final_hand_size, 0, "should not have drawn from other character materialization");
+
+    test_helpers::assert_clients_identical(&s);
+}

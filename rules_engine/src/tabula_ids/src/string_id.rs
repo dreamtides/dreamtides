@@ -173,13 +173,11 @@ pub const HIDE_STACK_BUTTON: StringId = StringId(uuid!("bec6ea4b-55b9-4eb9-8173-
 /// Button to show the stack after hiding it
 pub const SHOW_STACK_BUTTON: StringId = StringId(uuid!("e2cbff72-868a-4be2-a13a-37815ce0a5f2"));
 
-/// Addition to card rules text showing how much energy was spent on a card with
-/// a variable energy cost
+/// Addition to card rules text showing how much energy was spent on a card with a variable energy cost
 pub const CARD_RULES_TEXT_ENERGY_PAID: StringId =
     StringId(uuid!("1231c8b5-de17-4cf3-b45d-f42d62143916"));
 
-/// Addition to card rules text showing that a card was played with the
-/// "reclaim" ability
+/// Addition to card rules text showing that a card was played with the "reclaim" ability
 pub const CARD_RULES_TEXT_RECLAIMED: StringId =
     StringId(uuid!("dd5982c1-cfba-4608-a0ce-abf4257fcd5a"));
 
@@ -203,8 +201,7 @@ pub const HAND_SIZE_LIMIT_EXCEEDED_WARNING_MESSAGE: StringId =
 pub const CHARACTER_LIMIT_EXCEEDED_WARNING_MESSAGE: StringId =
     StringId(uuid!("9cffdaea-7a9f-4ca0-80af-6c414cb5c4f0"));
 
-/// Message describing the effects of exceeding both the character limit and the
-/// hand size limit
+/// Message describing the effects of exceeding both the character limit and the hand size limit
 pub const COMBINED_LIMIT_WARNING_MESSAGE: StringId =
     StringId(uuid!("59bc7390-ee3f-426c-8874-48d56d62d7ea"));
 

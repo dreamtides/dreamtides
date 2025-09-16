@@ -18,8 +18,7 @@ pub const TEST_COUNTERSPELL_UNLESS_PAYS: BaseCardId =
 pub const TEST_VARIABLE_ENERGY_DRAW: BaseCardId =
     BaseCardId(uuid!("e06a8cfe-483f-42c0-aac8-9c12b21b3f99"));
 
-/// Whenever you play a card during the enemy's turn, this character gains
-/// {-gained-spark(n:1)}.
+/// Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:1)}.
 pub const TEST_TRIGGER_GAIN_SPARK_ON_PLAY_CARD_ENEMY_TURN: BaseCardId =
     BaseCardId(uuid!("86ee5ad7-b60b-4596-af8c-7a495022ac61"));
 
@@ -31,8 +30,7 @@ pub const TEST_FAST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: BaseCardId =
 pub const TEST_RETURN_ONE_OR_TWO_VOID_EVENT_CARDS_TO_HAND: BaseCardId =
     BaseCardId(uuid!("559e62a0-7ead-4136-8bd4-6cc58db4bef7"));
 
-/// {choose-one} {bullet} {-energy-cost(e:2)}: Return an enemy character to
-/// hand. {bullet} {-energy-cost(e:3)}: Draw {-drawn-cards(n:2)}.
+/// {choose-one} {bullet} {-energy-cost(e:2)}: Return an enemy character to hand. {bullet} {-energy-cost(e:3)}: Draw {-drawn-cards(n:2)}.
 pub const TEST_MODAL_RETURN_TO_HAND_OR_DRAW_TWO: BaseCardId =
     BaseCardId(uuid!("e8f937da-cca7-447d-a559-530d7c339325"));
 
@@ -55,13 +53,11 @@ pub const TEST_NAMED_DISSOLVE: BaseCardId =
 /// Draw {-drawn-cards(n:1)}.
 pub const TEST_DRAW_ONE: BaseCardId = BaseCardId(uuid!("68f90d08-9b51-424e-90d1-d15ddd1ece93"));
 
-/// Whenever you materialize another character, this character gains
-/// {-gained-spark(n:1)}.
+/// Whenever you materialize another character, this character gains {-gained-spark(n:1)}.
 pub const TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER: BaseCardId =
     BaseCardId(uuid!("91c9ed93-5faf-4178-aec9-d631bbcf5d6a"));
 
-/// Whenever you play a card during the enemy's turn, this character gains
-/// {-gained-spark(n:2)}.
+/// Whenever you play a card during the enemy's turn, this character gains {-gained-spark(n:2)}.
 pub const TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN: BaseCardId =
     BaseCardId(uuid!("82759c0b-5161-4f6f-91b3-d42c2b4e0f9f"));
 
@@ -81,8 +77,7 @@ pub const TEST_FAST_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER: BaseCardId =
 pub const TEST_ACTIVATED_ABILITY_DISSOLVE_CHARACTER: BaseCardId =
     BaseCardId(uuid!("785e0341-fdd8-4e05-acb4-cbceed70ea6c"));
 
-/// {a} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.  {a} {-energy-cost(e:2)}:
-/// Draw {-drawn-cards(n:2)}.
+/// {a} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.  {a} {-energy-cost(e:2)}: Draw {-drawn-cards(n:2)}.
 pub const TEST_DUAL_ACTIVATED_ABILITY_CHARACTER: BaseCardId =
     BaseCardId(uuid!("3af84464-874a-4fd2-89cb-1986dee59ae1"));
 
@@ -108,13 +103,11 @@ pub const TEST_FORESEE_ONE_RECLAIM: BaseCardId =
 pub const TEST_RETURN_VOID_CARD_TO_HAND: BaseCardId =
     BaseCardId(uuid!("46e20fe4-36ca-438d-91a6-fac880ee9495"));
 
-/// {choose-one} {bullet} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.
-/// {bullet} {-energy-cost(e:3)}: Draw {-drawn-cards(n:2)}.
+/// {choose-one} {bullet} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}. {bullet} {-energy-cost(e:3)}: Draw {-drawn-cards(n:2)}.
 pub const TEST_MODAL_DRAW_ONE_OR_DRAW_TWO: BaseCardId =
     BaseCardId(uuid!("029889e9-25bc-438f-a492-8813febd65d8"));
 
-/// {choose-one} {bullet} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}.
-/// {bullet} {-energy-cost(e:2)}: {Dissolve} an enemy character.
+/// {choose-one} {bullet} {-energy-cost(e:1)}: Draw {-drawn-cards(n:1)}. {bullet} {-energy-cost(e:2)}: {Dissolve} an enemy character.
 pub const TEST_MODAL_DRAW_ONE_OR_DISSOLVE_ENEMY: BaseCardId =
     BaseCardId(uuid!("9847b3fc-1e7f-44e5-90af-1240ae12aaee"));
 
@@ -136,6 +129,10 @@ pub const TEST_DISCARD: BaseCardId = BaseCardId(uuid!("6e76f193-dcf0-4faf-b1f7-5
 
 /// Discard {-discarded-cards(n: 2)}.
 pub const TEST_DISCARD_TWO: BaseCardId = BaseCardId(uuid!("ef6d55f9-49ba-4637-af50-91068cb3a2b2"));
+
+/// {Materialized}: Draw {-drawn-cards(n: 1)}.
+pub const TEST_MATERIALIZED_DRAW: BaseCardId =
+    BaseCardId(uuid!("55564ead-325e-403d-a500-ee05e5e9e506"));
 
 pub const DREAMWELL_PRODUCE_0: DreamwellCardId =
     DreamwellCardId(uuid!("146ae27e-a8ac-4f3c-aef2-cf2211e4bcfe"));
@@ -202,6 +199,7 @@ pub const ALL_TEST_CARD_IDS: &[BaseCardId] = &[
     TEST_DECK_TO_VOID,
     TEST_DISCARD,
     TEST_DISCARD_TWO,
+    TEST_MATERIALIZED_DRAW,
 ];
 
 pub const ALL_TEST_DREAMWELL_CARD_IDS: &[DreamwellCardId] = &[

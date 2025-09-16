@@ -1,7 +1,8 @@
-use core_data::identifiers::{BaseCardId, DreamwellCardId};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use uuid::uuid;
+
+use core_data::identifiers::{BaseCardId, DreamwellCardId};
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub enum BaseCardIdList {
