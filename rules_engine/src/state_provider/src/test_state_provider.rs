@@ -223,12 +223,11 @@ impl StateProvider for TestStateProvider {
     }
 
     fn take_next_poll_result(&self, user_id: UserId) -> Option<PollResult> {
-        if let Ok(mut updates) = self.inner.pending_updates.lock() {
-            if let Some(user_updates) = updates.get_mut(&user_id) {
-                if !user_updates.is_empty() {
-                    return Some(user_updates.remove(0));
-                }
-            }
+        if let Ok(mut updates) = self.inner.pending_updates.lock()
+            && let Some(user_updates) = updates.get_mut(&user_id)
+            && !user_updates.is_empty()
+        {
+            return Some(user_updates.remove(0));
         }
         None
     }
@@ -254,13 +253,13 @@ impl StateProvider for TestStateProvider {
     }
 
     fn pop_undo_entry(&self, battle_id: BattleId, player: PlayerName) -> Option<BattleState> {
-        if let Ok(mut stacks) = self.inner.undo_stacks.lock() {
-            if let Some(stack) = stacks.get_mut(&battle_id) {
-                for i in (0..stack.len()).rev() {
-                    if stack[i].0 == player {
-                        let entry = stack.remove(i);
-                        return Some(entry.1);
-                    }
+        if let Ok(mut stacks) = self.inner.undo_stacks.lock()
+            && let Some(stack) = stacks.get_mut(&battle_id)
+        {
+            for i in (0..stack.len()).rev() {
+                if stack[i].0 == player {
+                    let entry = stack.remove(i);
+                    return Some(entry.1);
                 }
             }
         }

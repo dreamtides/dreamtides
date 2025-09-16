@@ -100,22 +100,19 @@ pub fn current_stack_type(builder: &ResponseBuilder, battle: &BattleState) -> St
         }
     }
 
-    if let Some(prompt) = battle.prompts.front() {
-        if let PromptType::ChooseCharacter { ref valid, .. } = prompt.prompt_type {
-            for character_id in valid.iter() {
-                if battle.cards.contains_card(
-                    display_player,
-                    character_id.card_id(),
-                    Zone::Battlefield,
-                ) {
-                    targeting_user_battlefield = true;
-                } else if battle.cards.contains_card(
-                    display_player.opponent(),
-                    character_id.card_id(),
-                    Zone::Battlefield,
-                ) {
-                    targeting_enemy_battlefield = true;
-                }
+    if let Some(prompt) = battle.prompts.front()
+        && let PromptType::ChooseCharacter { ref valid, .. } = prompt.prompt_type
+    {
+        for character_id in valid.iter() {
+            if battle.cards.contains_card(display_player, character_id.card_id(), Zone::Battlefield)
+            {
+                targeting_user_battlefield = true;
+            } else if battle.cards.contains_card(
+                display_player.opponent(),
+                character_id.card_id(),
+                Zone::Battlefield,
+            ) {
+                targeting_enemy_battlefield = true;
             }
         }
     }

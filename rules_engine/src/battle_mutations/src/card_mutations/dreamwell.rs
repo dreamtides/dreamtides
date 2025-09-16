@@ -19,10 +19,10 @@ pub fn draw(battle: &mut BattleState) -> (Arc<DreamwellCard>, BattleDreamwellCar
     // dreamwell.
     if battle.dreamwell.first_iteration_complete {
         while index < battle.dreamwell.cards.len() {
-            if let (Some(card), _) = battle.dreamwell.get(index) {
-                if card.definition.phase != 0 {
-                    break;
-                }
+            if let (Some(card), _) = battle.dreamwell.get(index)
+                && card.definition.phase != 0
+            {
+                break;
             }
             index += 1;
         }

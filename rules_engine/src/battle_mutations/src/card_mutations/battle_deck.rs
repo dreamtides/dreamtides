@@ -66,10 +66,10 @@ pub fn draw_cards(battle: &mut BattleState, source: EffectSource, player: Player
 
     let mut drawn_cards = Vec::new();
     for _ in 0..count {
-        if let Some(card_id) = draw_card_internal(battle, source, player, false) {
-            if should_animate {
-                drawn_cards.push(card_id);
-            }
+        if let Some(card_id) = draw_card_internal(battle, source, player, false)
+            && should_animate
+        {
+            drawn_cards.push(card_id);
         }
     }
 

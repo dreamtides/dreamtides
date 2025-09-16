@@ -24,7 +24,7 @@ fn test_materialize_warrior_gain_spark() {
 
 #[test]
 fn test_keyword_trigger_draw() {
-    let result = parse("$materialized: Draw {-drawn-cards(n: 1)}.");
+    let result = parse("{Materialized}: Draw {-drawn-cards(n: 1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -41,7 +41,7 @@ fn test_keyword_trigger_draw() {
 
 #[test]
 fn test_multiple_keyword_trigger() {
-    let result = parse("$materialized, $dissolved: Draw {-drawn-cards(n: 1)}.");
+    let result = parse("{Materialized}, $dissolved: Draw {-drawn-cards(n: 1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -59,7 +59,7 @@ fn test_multiple_keyword_trigger() {
 
 #[test]
 fn test_three_keyword_trigger() {
-    let result = parse("$materialized, $judgment, $dissolved: Draw {-drawn-cards(n: 1)}.");
+    let result = parse("{Materialized}, $judgment, $dissolved: Draw {-drawn-cards(n: 1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -107,7 +107,7 @@ fn test_once_per_turn() {
 #[test]
 fn test_multiple_keyword_trigger_conditional() {
     let result = parse(
-        "$materialized, $judgment: If you control 2 other {cardtype: warriors}, gain {-gained-energy(e: 1)}.",
+        "{Materialized}, $judgment: If you control 2 other {cardtype: warriors}, gain {-gained-energy(e: 1)}.",
     );
     assert_ron_snapshot!(
         result,
@@ -156,7 +156,7 @@ fn test_once_per_turn_materialize() {
 
 #[test]
 fn test_draw_matching_card() {
-    let result = parse("$materialized: Draw a {cardtype: warrior} from your deck.");
+    let result = parse("{Materialized}: Draw a {cardtype: warrior} from your deck.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(

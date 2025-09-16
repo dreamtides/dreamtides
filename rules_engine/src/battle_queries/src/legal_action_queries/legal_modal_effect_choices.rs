@@ -16,10 +16,10 @@ pub fn event_has_legal_choices(battle: &BattleState, player: PlayerName, card_id
             stack_card_id: StackCardId(card_id),
             ability_number: data.ability_number,
         };
-        if let Effect::Modal(modal) = &data.ability.effect {
-            if !modal.iter().any(|choice| is_legal_choice(battle, source, player, choice)) {
-                return false;
-            }
+        if let Effect::Modal(modal) = &data.ability.effect
+            && !modal.iter().any(|choice| is_legal_choice(battle, source, player, choice))
+        {
+            return false;
         }
     }
 

@@ -195,10 +195,10 @@ pub fn clear_log_file() {
         return;
     };
 
-    if log_path.exists() {
-        if let Err(e) = fs::remove_file(log_path) {
-            error!(?log_path, "Failed to remove dreamtides.json: {}", e);
-        }
+    if log_path.exists()
+        && let Err(e) = fs::remove_file(log_path)
+    {
+        error!(?log_path, "Failed to remove dreamtides.json: {}", e);
     }
 }
 

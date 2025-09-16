@@ -75,16 +75,16 @@ pub fn player_name_for_user(battle: &BattleState, user_id: UserId) -> PlayerName
 /// Returns the name of the player for a given user ID, or None if this user is
 /// not a participant in this battle.
 pub fn player_name_for_user_optional(battle: &BattleState, user_id: UserId) -> Option<PlayerName> {
-    if let PlayerType::User(id) = &battle.players.one.player_type {
-        if *id == user_id {
-            return Some(PlayerName::One);
-        }
+    if let PlayerType::User(id) = &battle.players.one.player_type
+        && *id == user_id
+    {
+        return Some(PlayerName::One);
     }
 
-    if let PlayerType::User(id) = &battle.players.two.player_type {
-        if *id == user_id {
-            return Some(PlayerName::Two);
-        }
+    if let PlayerType::User(id) = &battle.players.two.player_type
+        && *id == user_id
+    {
+        return Some(PlayerName::Two);
     }
 
     None

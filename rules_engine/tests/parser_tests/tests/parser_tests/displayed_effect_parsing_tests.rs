@@ -73,11 +73,11 @@ fn test_activated_with_costs() {
 
 #[test]
 fn test_triggered_keyword_then_effect() {
-    let result = parse_displayed("$materialized: Draw {-drawn-cards(n: 1)}.");
+    let result = parse_displayed("{Materialized}: Draw {-drawn-cards(n: 1)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(
-        text: "$materialized: draw {-drawn-cards(n: 1)}.",
+        text: "{materialized}: draw {-drawn-cards(n: 1)}.",
       ),
     ]
     "###);

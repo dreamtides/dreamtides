@@ -393,12 +393,12 @@ impl StateProvider for DefaultStateProvider {
 
     fn take_next_poll_result(&self, user_id: UserId) -> Option<PollResult> {
         let mut updates = PENDING_UPDATES.lock().unwrap();
-        if let Some(user_updates) = updates.get_mut(&user_id) {
-            if !user_updates.is_empty() {
-                let result = user_updates.remove(0);
-                TOTAL_PENDING_UPDATES.fetch_sub(1, Ordering::AcqRel);
-                return Some(result);
-            }
+        if let Some(user_updates) = updates.get_mut(&user_id)
+            && !user_updates.is_empty()
+        {
+            let result = user_updates.remove(0);
+            TOTAL_PENDING_UPDATES.fetch_sub(1, Ordering::AcqRel);
+            return Some(result);
         }
         None
     }
