@@ -1,14 +1,20 @@
+use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
+use ability_data::triggered_ability::TriggeredAbility;
 use battle_queries::battle_card_queries::{card, card_properties};
+use battle_queries::card_ability_queries::trigger_queries;
 use battle_queries::panic_with;
 use battle_state::battle::battle_state::BattleState;
 use battle_state::battle::card_id::{
     BattleDeckCardId, CardId, CardIdType, CharacterId, HandCardId, StackCardId, VoidCardId,
 };
+use battle_state::battle_cards::ability_list::{AbilityData, AbilityList};
 use battle_state::battle_cards::character_state::CharacterState;
 use battle_state::battle_cards::zone::Zone;
 use battle_state::core::effect_source::EffectSource;
-use battle_state::triggers::trigger::Trigger;
+use battle_state::triggers::trigger::{Trigger, TriggerName};
 use core_data::types::PlayerName;
+
+use crate::effects::apply_effect_with_prompt_for_targets;
 
 /// Moves a card from the 'controller' player's hand to the stack.
 ///
@@ -266,6 +272,8 @@ fn on_enter_battlefield(
     };
     battle.cards.battlefield_state_mut(controller).insert(id, CharacterState { spark });
 
+    fire_materialized_keyword_abilities(battle, controller, card_id, ability_list.as_ref());
+
     battle.triggers.push(source, Trigger::Materialized(id));
 }
 
@@ -287,6 +295,70 @@ fn on_leave_battlefield(
         battle.ability_state.banish_when_leaves_play.remove(card_id);
         *new = Zone::Banished;
     }
+}
+
+fn fire_materialized_keyword_abilities(
+    battle: &mut BattleState,
+    controller: PlayerName,
+    card_id: CardId,
+    ability_list: &AbilityList,
+) {
+    let mut fired_any = false;
+    let character_id = CharacterId(card_id);
+    for ability_data in ability_list.triggered_abilities.iter() {
+        if should_fire_materialized_keyword(&ability_data.ability.trigger) {
+            fired_any = true;
+            fire_materialized_keyword_ability(battle, controller, character_id, ability_data);
+        }
+    }
+
+    if fired_any && !requires_materialized_listener(ability_list) {
+        battle.triggers.listeners.remove_listener(TriggerName::Materialized, card_id);
+    }
+}
+
+fn should_fire_materialized_keyword(event: &TriggerEvent) -> bool {
+    match event {
+        TriggerEvent::Keywords(keywords) => {
+            keywords.iter().any(|keyword| matches!(keyword, TriggerKeyword::Materialized))
+        }
+        _ => false,
+    }
+}
+
+fn requires_materialized_listener(ability_list: &AbilityList) -> bool {
+    for ability_data in ability_list.triggered_abilities.iter() {
+        if matches!(
+            ability_data.ability.trigger,
+            TriggerEvent::Materialize(..) | TriggerEvent::MaterializeNthThisTurn(..)
+        ) {
+            return true;
+        }
+    }
+
+    false
+}
+
+fn fire_materialized_keyword_ability(
+    battle: &mut BattleState,
+    controller: PlayerName,
+    character_id: CharacterId,
+    ability_data: &AbilityData<TriggeredAbility>,
+) {
+    let trigger = Trigger::Materialized(character_id);
+    let source = EffectSource::Triggered {
+        controller,
+        character_id,
+        ability_number: ability_data.ability_number,
+    };
+    let that_card = trigger_queries::triggering_card_id(trigger);
+    apply_effect_with_prompt_for_targets::execute(
+        battle,
+        source,
+        &ability_data.ability.effect,
+        that_card,
+        None,
+    );
 }
 
 fn on_enter_stack(battle: &mut BattleState, card_id: CardId) {

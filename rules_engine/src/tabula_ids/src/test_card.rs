@@ -137,6 +137,10 @@ pub const TEST_DISCARD: BaseCardId = BaseCardId(uuid!("6e76f193-dcf0-4faf-b1f7-5
 /// Discard {-discarded-cards(n: 2)}.
 pub const TEST_DISCARD_TWO: BaseCardId = BaseCardId(uuid!("ef6d55f9-49ba-4637-af50-91068cb3a2b2"));
 
+/// {Materialized}: Draw {-drawn-cards(n: 1)}.
+pub const TEST_MATERIALIZED_DRAW: BaseCardId =
+    BaseCardId(uuid!("be80f94b-b9ee-4b5b-8436-4bced2d29059"));
+
 pub const DREAMWELL_PRODUCE_0: DreamwellCardId =
     DreamwellCardId(uuid!("146ae27e-a8ac-4f3c-aef2-cf2211e4bcfe"));
 
@@ -202,6 +206,7 @@ pub const ALL_TEST_CARD_IDS: &[BaseCardId] = &[
     TEST_DECK_TO_VOID,
     TEST_DISCARD,
     TEST_DISCARD_TWO,
+    TEST_MATERIALIZED_DRAW,
 ];
 
 pub const ALL_TEST_DREAMWELL_CARD_IDS: &[DreamwellCardId] = &[

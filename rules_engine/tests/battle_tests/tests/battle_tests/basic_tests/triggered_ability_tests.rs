@@ -189,6 +189,61 @@ fn triggered_ability_multiple_trigger_characters() {
 }
 
 #[test]
+fn materialized_keyword_draws_card_on_entry() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    assert_eq!(s.user_client.cards.user_hand().len(), 0, "hand empty initially");
+
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MATERIALIZED_DRAW);
+
+    assert_eq!(s.user_client.cards.user_hand().len(), 1, "materialized trigger should draw a card");
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn materialized_keyword_does_not_trigger_on_other_cards() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MATERIALIZED_DRAW);
+
+    assert_eq!(s.user_client.cards.user_hand().len(), 1, "materialized trigger should draw a card");
+
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+
+    assert_eq!(
+        s.user_client.cards.user_hand().len(),
+        1,
+        "other characters materializing should not draw a card"
+    );
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn materialized_keyword_multiple_copies_draw() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MATERIALIZED_DRAW);
+
+    assert_eq!(
+        s.user_client.cards.user_hand().len(),
+        1,
+        "first copy should draw a card when it materializes"
+    );
+
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MATERIALIZED_DRAW);
+
+    assert_eq!(
+        s.user_client.cards.user_hand().len(),
+        2,
+        "each copy should draw a card when it materializes"
+    );
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
 fn triggered_ability_token_cards_appear_and_disappear_on_stack() {
     let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
 

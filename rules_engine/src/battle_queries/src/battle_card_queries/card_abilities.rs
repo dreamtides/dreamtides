@@ -4,7 +4,7 @@ use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
 use ability_data::static_ability::{PlayFromVoid, StandardStaticAbility};
-use ability_data::trigger_event::TriggerEvent;
+use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
 use battle_state::battle_cards::ability_list::{AbilityData, AbilityList, CanPlayRestriction};
 use battle_state::triggers::trigger::TriggerName;
 use core_data::identifiers::AbilityNumber;
@@ -265,19 +265,53 @@ fn battlefield_triggers(list: &AbilityList) -> EnumSet<TriggerName> {
     let mut triggers = EnumSet::new();
 
     for ability in list.triggered_abilities.iter() {
-        triggers.insert(watch_for_battlefield_trigger(&ability.ability.trigger));
+        let ability_triggers = watch_for_battlefield_triggers(&ability.ability.trigger);
+        for trigger in ability_triggers {
+            triggers.insert(trigger);
+        }
     }
 
     triggers
 }
 
-fn watch_for_battlefield_trigger(event: &TriggerEvent) -> TriggerName {
+fn watch_for_battlefield_triggers(event: &TriggerEvent) -> EnumSet<TriggerName> {
+    let mut triggers = EnumSet::new();
+
     match event {
-        TriggerEvent::Materialize(..) => TriggerName::Materialized,
-        TriggerEvent::Play(..) => TriggerName::PlayedCard,
-        TriggerEvent::PlayDuringTurn(..) => TriggerName::PlayedCard,
-        TriggerEvent::PlayFromHand(..) => TriggerName::PlayedCardFromHand,
+        TriggerEvent::Materialize(..) => {
+            triggers.insert(TriggerName::Materialized);
+        }
+        TriggerEvent::Keywords(keywords) => {
+            for keyword in keywords.iter() {
+                add_keyword_trigger(&mut triggers, keyword);
+            }
+        }
+        TriggerEvent::Play(..) => {
+            triggers.insert(TriggerName::PlayedCard);
+        }
+        TriggerEvent::PlayDuringTurn(..) => {
+            triggers.insert(TriggerName::PlayedCard);
+        }
+        TriggerEvent::PlayFromHand(..) => {
+            triggers.insert(TriggerName::PlayedCardFromHand);
+        }
         _ => todo!("Implement watch_for_trigger() for {:?}", event),
+    }
+
+    triggers
+}
+
+fn add_keyword_trigger(triggers: &mut EnumSet<TriggerName>, keyword: &TriggerKeyword) {
+    match keyword {
+        TriggerKeyword::Materialized => {
+            triggers.insert(TriggerName::Materialized);
+        }
+        TriggerKeyword::Judgment => {
+            triggers.insert(TriggerName::Judgment);
+        }
+        TriggerKeyword::Dissolved => {
+            triggers.insert(TriggerName::Dissolved);
+        }
     }
 }
 
