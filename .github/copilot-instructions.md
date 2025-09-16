@@ -1,1 +1,1 @@
-../rules_engine/.cursorrules
+../AGENTS.md
