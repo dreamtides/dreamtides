@@ -264,6 +264,9 @@ bench-full:
 iai:
     ./rules_engine/scripts/benchmark_on_linux.py 'iai_benchmarks'
 
+bench-iai:
+    cargo bench --manifest-path rules_engine/Cargo.toml iai_benchmarks
+
 symlinks:
      ./rules_engine/scripts/symlinks.py -d ~/Documents/dttmp rules_engine/target client/Library
 
