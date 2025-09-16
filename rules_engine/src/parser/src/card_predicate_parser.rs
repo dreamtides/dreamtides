@@ -109,7 +109,7 @@ fn character_with_cost_compared_to_abandoned<'a>()
 fn character_with_materialized_ability<'a>()
 -> impl Parser<'a, &'a str, CardPredicate, ErrorType<'a>> {
     character()
-        .ignore_then(phrase("with a $materialized ability"))
+        .ignore_then(phrase("with a {materialized} ability"))
         .to(CardPredicate::CharacterWithMaterializedAbility)
 }
 

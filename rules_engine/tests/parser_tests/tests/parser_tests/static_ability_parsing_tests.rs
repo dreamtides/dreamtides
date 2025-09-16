@@ -64,7 +64,7 @@ fn test_play_event_from_void() {
 
 #[test]
 fn test_disable_enemy_materialized_abilities() {
-    let result = parse("Disable the \"$materialized\" abilities of the enemy's characters.");
+    let result = parse("Disable the \"{materialized}\" abilities of the enemy's characters.");
     assert_ron_snapshot!(
         result,
         @r###"
@@ -77,7 +77,7 @@ fn test_disable_enemy_materialized_abilities() {
 
 #[test]
 fn test_disable_enemy_materialized_abilities_alternate() {
-    let result = parse("Disable the \"$materialized\" abilities of enemy characters.");
+    let result = parse("Disable the \"{materialized}\" abilities of enemy characters.");
     assert_ron_snapshot!(
         result,
         @r###"

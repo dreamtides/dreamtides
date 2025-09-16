@@ -212,13 +212,13 @@ fn for_void_card_targeting(
 
         // Check if this void card is targeted by any item on the stack
         for stack_item in battle.cards.all_items_on_stack() {
-            if let Some(targets) = &stack_item.targets {
-                if is_void_card_targeted(targets, void_card_id) {
-                    return ObjectPosition {
-                        position: Position::AboveVoid(player),
-                        sorting_key: base_object_position.sorting_key,
-                    };
-                }
+            if let Some(targets) = &stack_item.targets
+                && is_void_card_targeted(targets, void_card_id)
+            {
+                return ObjectPosition {
+                    position: Position::AboveVoid(player),
+                    sorting_key: base_object_position.sorting_key,
+                };
             }
         }
     }

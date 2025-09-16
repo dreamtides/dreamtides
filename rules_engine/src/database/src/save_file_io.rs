@@ -136,14 +136,15 @@ fn read_and_parse_save(file_path: &Path) -> Result<Option<SaveFile>, Vec<Initial
 
 fn validate_serialized_json(data: &[u8]) -> Result<(), Box<InitializationError>> {
     let last = data.iter().rposition(|b| !b.is_ascii_whitespace()).map(|i| data[i]);
-    if let Some(b) = last {
-        if b != b'}' && b != b']' {
-            return Err(Box::new(InitializationError::with_details(
-                ErrorCode::JsonError,
-                "Serialized JSON appears incomplete",
-                format!("last_non_ws_byte=0x{b:02x}"),
-            )));
-        }
+    if let Some(b) = last
+        && b != b'}'
+        && b != b']'
+    {
+        return Err(Box::new(InitializationError::with_details(
+            ErrorCode::JsonError,
+            "Serialized JSON appears incomplete",
+            format!("last_non_ws_byte=0x{b:02x}"),
+        )));
     }
     Ok(())
 }

@@ -107,35 +107,32 @@ async fn run() -> Result<()> {
         anyhow::anyhow!(errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n"))
     })?;
 
-    if let Some(path) = args.write_json.as_deref() {
-        if let Ok(local_file) = File::open(path) {
-            let local_raw: TabulaRaw = serde_json::from_reader(BufReader::new(local_file))
-                .with_context(|| format!("failed to parse local JSON at {path}"))?;
-            let local_ids: HashSet<_> = local_raw.cards.0.iter().map(|r| r.id).collect();
-            let remote_ids: HashSet<_> = tabula_raw.cards.0.iter().map(|r| r.id).collect();
-            let missing_ids: Vec<_> = local_ids.difference(&remote_ids).cloned().collect();
-            if !missing_ids.is_empty() {
-                let context =
-                    TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates };
-                let tabula = tabula::build(&context, &local_raw).map_err(|errs| {
-                    anyhow::anyhow!(
-                        errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n")
-                    )
-                })?;
-                let mut rows = Vec::new();
-                for id in missing_ids.iter() {
-                    if let Some(def) = tabula.cards.get(id) {
-                        rows.push((*id, def.clone()));
-                    }
+    if let Some(path) = args.write_json.as_deref()
+        && let Ok(local_file) = File::open(path)
+    {
+        let local_raw: TabulaRaw = serde_json::from_reader(BufReader::new(local_file))
+            .with_context(|| format!("failed to parse local JSON at {path}"))?;
+        let local_ids: HashSet<_> = local_raw.cards.0.iter().map(|r| r.id).collect();
+        let remote_ids: HashSet<_> = tabula_raw.cards.0.iter().map(|r| r.id).collect();
+        let missing_ids: Vec<_> = local_ids.difference(&remote_ids).cloned().collect();
+        if !missing_ids.is_empty() {
+            let context = TabulaBuildContext { current_language: LanguageId::EnglishUnitedStates };
+            let tabula = tabula::build(&context, &local_raw).map_err(|errs| {
+                anyhow::anyhow!(errs.into_iter().map(|e| e.format()).collect::<Vec<_>>().join("\n"))
+            })?;
+            let mut rows = Vec::new();
+            for id in missing_ids.iter() {
+                if let Some(def) = tabula.cards.get(id) {
+                    rows.push((*id, def.clone()));
                 }
-                let out_path = std::path::Path::new("missing_cards.html");
-                write_missing_cards_html(out_path, &rows)
-                    .context("failed to write missing_cards.html in project root")?;
-                anyhow::bail!(
-                    "local test card IDs missing from Google Sheets: {}. Wrote missing_cards.html with rows to paste into Sheets.",
-                    missing_ids.iter().map(|id| id.0.to_string()).collect::<Vec<_>>().join(", ")
-                );
             }
+            let out_path = std::path::Path::new("missing_cards.html");
+            write_missing_cards_html(out_path, &rows)
+                .context("failed to write missing_cards.html in project root")?;
+            anyhow::bail!(
+                "local test card IDs missing from Google Sheets: {}. Wrote missing_cards.html with rows to paste into Sheets.",
+                missing_ids.iter().map(|id| id.0.to_string()).collect::<Vec<_>>().join(", ")
+            );
         }
     }
 
@@ -201,13 +198,13 @@ fn update_save_file(path: &str, tabula_raw: &TabulaRaw) -> Result<()> {
     let mut total_updated = 0usize;
     match &mut save_file {
         SaveFile::V1(v1) => {
-            if let Some(quest) = &mut v1.quest {
-                if let Some(battle) = &mut quest.battle {
-                    let one_cards = &mut Arc::make_mut(&mut battle.players.one.quest).deck.cards;
-                    total_updated += update_deck_cards(one_cards, &latest_defs);
-                    let two_cards = &mut Arc::make_mut(&mut battle.players.two.quest).deck.cards;
-                    total_updated += update_deck_cards(two_cards, &latest_defs);
-                }
+            if let Some(quest) = &mut v1.quest
+                && let Some(battle) = &mut quest.battle
+            {
+                let one_cards = &mut Arc::make_mut(&mut battle.players.one.quest).deck.cards;
+                total_updated += update_deck_cards(one_cards, &latest_defs);
+                let two_cards = &mut Arc::make_mut(&mut battle.players.two.quest).deck.cards;
+                total_updated += update_deck_cards(two_cards, &latest_defs);
             }
         }
     }

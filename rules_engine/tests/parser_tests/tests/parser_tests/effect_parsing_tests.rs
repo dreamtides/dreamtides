@@ -32,7 +32,7 @@ fn test_give_allied_character_anchored() {
 
 #[test]
 fn test_discover_materialized_ability() {
-    let result = parse("{kw: discover} a character with a $materialized ability.");
+    let result = parse("{kw: discover} a character with a {materialized} ability.");
     assert_ron_snapshot!(result, @r###"
     [
       Event(EventAbility(
@@ -190,7 +190,7 @@ fn test_return_all_but_one_draw_for_each() {
 #[test]
 fn test_banish_then_materialize() {
     let result =
-        parse("$materialized: You may banish another character you control, then materialize it.");
+        parse("{Materialized}: You may banish another character you control, then materialize it.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -414,7 +414,7 @@ fn test_materialize_character_when_discarded() {
 
 #[test]
 fn test_foresee() {
-    let result = parse("$materialized: {-foresee(n: 2)}.");
+    let result = parse("{Materialized}: {-foresee(n: 2)}.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -653,7 +653,7 @@ fn test_return_to_hand() {
 #[test]
 fn test_event_gains_reclaim() {
     let result =
-        parse("$materialized: An event in your void gains {kw: reclaim} until end of turn.");
+        parse("{Materialized}: An event in your void gains {kw: reclaim} until end of turn.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -865,7 +865,7 @@ fn test_gain_twice_that_much_energy_instead() {
 
 #[test]
 fn test_copy_next_played_this_turn() {
-    let result = parse("$materialized: Copy the next event you play this turn three times.");
+    let result = parse("{Materialized}: Copy the next event you play this turn three times.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -961,7 +961,7 @@ fn test_each_matching_gains_spark_until_next_main() {
 
 #[test]
 fn test_banish_enemy_void() {
-    let result = parse("$materialized: Banish the enemy's void.");
+    let result = parse("{Materialized}: Banish the enemy's void.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -1014,7 +1014,7 @@ fn test_discard_card_from_enemy_hand_then_they_draw() {
 #[test]
 fn test_banish_character_until_leaves_play() {
     let result =
-        parse("$materialized: Banish an enemy character until this character leaves play.");
+        parse("{Materialized}: Banish an enemy character until this character leaves play.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -1074,7 +1074,7 @@ fn test_spend_all_energy_dissolve_enemy() {
 #[test]
 fn test_banish_until_next_main() {
     let result = parse(
-        "$materialized: You may banish another character until the start of your next main phase.",
+        "{Materialized}: You may banish another character until the start of your next main phase.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -1117,7 +1117,7 @@ fn test_materialize_copy_character() {
 
 #[test]
 fn test_each_player_discard_cards() {
-    let result = parse("$materialized: Each player discards a card.");
+    let result = parse("{Materialized}: Each player discards a card.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
@@ -1174,7 +1174,7 @@ fn test_put_cards_from_void_on_top_of_deck() {
 #[test]
 fn test_materialize_silent_copy() {
     let result = parse(
-        "$materialized: Materialize a {kw: silent} copy of this character for each card you have played this turn.",
+        "{Materialized}: Materialize a {kw: silent} copy of this character for each card you have played this turn.",
     );
     assert_ron_snapshot!(result, @r###"
     [
@@ -1191,7 +1191,7 @@ fn test_materialize_silent_copy() {
     ]
     "###);
 
-    let result = parse("$materialized: Materialize two {kw: silent} copies of this character.");
+    let result = parse("{Materialized}: Materialize two {kw: silent} copies of this character.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(

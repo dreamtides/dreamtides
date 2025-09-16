@@ -133,10 +133,10 @@ pub fn extract_text_from_node(node: &FlexNode) -> String {
 
 /// Recursively collect text from a FlexNode hierarchy
 fn collect_text_recursive(node: &FlexNode, texts: &mut Vec<String>) {
-    if let Some(NodeType::Text(text_node)) = &node.node_type {
-        if !text_node.label.is_empty() {
-            texts.push(text_node.label.clone());
-        }
+    if let Some(NodeType::Text(text_node)) = &node.node_type
+        && !text_node.label.is_empty()
+    {
+        texts.push(text_node.label.clone());
     }
 
     for child in &node.children {

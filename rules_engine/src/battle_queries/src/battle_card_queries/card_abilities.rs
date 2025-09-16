@@ -160,7 +160,7 @@ pub struct EventEffectPredicate<'a> {
     pub predicate_type: PredicateType,
 }
 
-fn event_effect_predicates(list: &AbilityList) -> Vec<EventEffectPredicate> {
+fn event_effect_predicates(list: &AbilityList) -> Vec<EventEffectPredicate<'_>> {
     list.event_abilities
         .iter()
         .flat_map(|data| match &data.ability.effect {

@@ -213,40 +213,40 @@ impl TestClient {
 
         // Collect actions from interface buttons
         if let Some(interface) = &self.interface.view {
-            if let Some(button) = &interface.primary_action_button {
-                if let Some(action) = &button.action {
-                    actions.push(action.clone());
-                }
+            if let Some(button) = &interface.primary_action_button
+                && let Some(action) = &button.action
+            {
+                actions.push(action.clone());
             }
-            if let Some(button) = &interface.secondary_action_button {
-                if let Some(action) = &button.action {
-                    actions.push(action.clone());
-                }
+            if let Some(button) = &interface.secondary_action_button
+                && let Some(action) = &button.action
+            {
+                actions.push(action.clone());
             }
-            if let Some(button) = &interface.increment_button {
-                if let Some(action) = &button.action {
-                    actions.push(action.clone());
-                }
+            if let Some(button) = &interface.increment_button
+                && let Some(action) = &button.action
+            {
+                actions.push(action.clone());
             }
-            if let Some(button) = &interface.decrement_button {
-                if let Some(action) = &button.action {
-                    actions.push(action.clone());
-                }
+            if let Some(button) = &interface.decrement_button
+                && let Some(action) = &button.action
+            {
+                actions.push(action.clone());
             }
-            if let Some(button) = &interface.dev_button {
-                if let Some(action) = &button.action {
-                    actions.push(action.clone());
-                }
+            if let Some(button) = &interface.dev_button
+                && let Some(action) = &button.action
+            {
+                actions.push(action.clone());
             }
-            if let Some(button) = &interface.undo_button {
-                if let Some(action) = &button.action {
-                    actions.push(action.clone());
-                }
+            if let Some(button) = &interface.undo_button
+                && let Some(action) = &button.action
+            {
+                actions.push(action.clone());
             }
-            if let Some(button) = &interface.bottom_right_button {
-                if let Some(action) = &button.action {
-                    actions.push(action.clone());
-                }
+            if let Some(button) = &interface.bottom_right_button
+                && let Some(action) = &button.action
+            {
+                actions.push(action.clone());
             }
         }
 
