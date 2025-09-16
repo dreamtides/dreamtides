@@ -1,6 +1,6 @@
 # Environment Setup
 
-This document records the exact steps I followed to make the Dreamtides rules engine
+This document records the exact steps followed to make the Dreamtides rules engine
 repository buildable and ready for day-to-day development.
 
 ## 1. Verify the Rust toolchain
@@ -16,7 +16,7 @@ repository buildable and ready for day-to-day development.
    ```bash
    rustup component add clippy rustfmt
    ```
-3. The `just fmt` recipe runs `cargo +nightly fmt`, so I installed the nightly
+3. The `just fmt` recipe runs `cargo +nightly fmt`, so also installed the nightly
    rustfmt component before trying to format again. The download and install took
    roughly 30 seconds on my machine:
    ```bash
@@ -46,8 +46,8 @@ cargo install cargo-workspace-lints
 
 ## 4. Run formatting and validation commands
 
-With the tooling in place, I ran the standard validation commands in the order
-requested by the repository instructions. Timings below reflect the waits I saw
+With the tooling in place, ran the standard validation commands in the order
+requested by the repository instructions. Timings below reflect the waits seen
 on a fresh build; once the workspace cache is warm the commands finish much
 faster.
 
@@ -57,12 +57,11 @@ faster.
    ```bash
    just fmt
    ```
-2. **Check:** A full workspace check from a cold cache took roughly 3 minutes and
-   20 seconds.
+2. **Check:** A full workspace check from a cold cache took roughly 4 minutes
    ```bash
    just check
    ```
-3. **Clippy:** The lint pass finished in a little under a minute (~55 seconds).
+3. **Clippy:** The lint pass finished in a little under a minute
    ```bash
    just clippy
    ```
