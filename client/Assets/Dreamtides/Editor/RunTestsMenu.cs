@@ -4,7 +4,6 @@ using UnityEditor;
 using UnityEditor.TestTools.TestRunner.Api;
 using UnityEngine;
 
-
 namespace Dreamtides.Editors
 {
   public static class RunTestsMenu
@@ -14,10 +13,7 @@ namespace Dreamtides.Editors
     {
       var testRunnerApi = ScriptableObject.CreateInstance<TestRunnerApi>();
       testRunnerApi.RegisterCallbacks(new TestCallbacks());
-      testRunnerApi.Execute(new ExecutionSettings(new Filter()
-      {
-        testMode = TestMode.PlayMode
-      }));
+      testRunnerApi.Execute(new ExecutionSettings(new Filter() { testMode = TestMode.PlayMode }));
     }
 
     private class TestCallbacks : ICallbacks
@@ -32,9 +28,7 @@ namespace Dreamtides.Editors
         Debug.Log($"Done running tests. Overall result {result.TestStatus}");
       }
 
-      public void TestStarted(ITestAdaptor test)
-      {
-      }
+      public void TestStarted(ITestAdaptor test) { }
 
       public void TestFinished(ITestResultAdaptor result)
       {

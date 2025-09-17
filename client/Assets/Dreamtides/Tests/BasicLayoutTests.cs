@@ -1,13 +1,13 @@
 #nullable enable
 
 using System.Collections;
-using NUnit.Framework;
-using UnityEngine.TestTools;
-using Dreamtides.Services;
-using Dreamtides.Utils;
 using Dreamtides.Components;
+using Dreamtides.Services;
 using Dreamtides.TestUtils;
 using Dreamtides.UnityInternal;
+using Dreamtides.Utils;
+using NUnit.Framework;
+using UnityEngine.TestTools;
 
 namespace Dreamtides.Tests
 {
@@ -37,14 +37,28 @@ namespace Dreamtides.Tests
     }
 
     [UnityTest]
-    public IEnumerator TestBasicLayout([ValueSource("AllResolutions")] GameViewResolution resolution)
+    public IEnumerator TestBasicLayout(
+      [ValueSource("AllResolutions")] GameViewResolution resolution
+    )
     {
       yield return Connect(resolution: resolution);
       yield return PerformAction(TestBattle.New().FullLayout().Build());
-      AssertBoxColliderIsOnScreen(GetBoxCollider(Registry.Layout.UserDeck), "User deck is not on screen");
-      AssertBoxColliderIsOnScreen(GetBoxCollider(Registry.Layout.EnemyDeck), "Enemy deck is not on screen");
-      AssertBoxColliderIsOnScreen(GetBoxCollider(Registry.Layout.UserVoid), "User void is not on screen");
-      AssertBoxColliderIsOnScreen(GetBoxCollider(Registry.Layout.EnemyVoid), "Enemy void is not on screen");
+      AssertBoxColliderIsOnScreen(
+        GetBoxCollider(Registry.Layout.UserDeck),
+        "User deck is not on screen"
+      );
+      AssertBoxColliderIsOnScreen(
+        GetBoxCollider(Registry.Layout.EnemyDeck),
+        "Enemy deck is not on screen"
+      );
+      AssertBoxColliderIsOnScreen(
+        GetBoxCollider(Registry.Layout.UserVoid),
+        "User void is not on screen"
+      );
+      AssertBoxColliderIsOnScreen(
+        GetBoxCollider(Registry.Layout.EnemyVoid),
+        "Enemy void is not on screen"
+      );
 
       foreach (var displayable in Registry.Layout.UserHand.Objects)
       {

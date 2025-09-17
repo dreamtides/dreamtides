@@ -9,8 +9,11 @@ namespace Dreamtides.Components
   [DisallowMultipleComponent]
   public sealed class TimedEffect : MonoBehaviour
   {
-    [SerializeField] float _duration;
-    [SerializeField] bool _looping;
+    [SerializeField]
+    float _duration;
+
+    [SerializeField]
+    bool _looping;
     public Action? OnDisable { get; set; }
 
     void OnEnable()

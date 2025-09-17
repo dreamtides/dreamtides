@@ -8,13 +8,26 @@ namespace Dreamtides.Layout
 {
   public class ScrollableUserHandLayout : StandardObjectLayout
   {
-    [SerializeField] Registry _registry = null!;
-    [SerializeField] float _offset;
-    [SerializeField] Scrollbar _scrollbar = null!;
-    [SerializeField] float _cardWidth;
-    [SerializeField] Transform _leftEdge = null!;
-    [SerializeField] Transform _rightEdge = null!;
-    [SerializeField] bool _hideWhenOutsideWindow;
+    [SerializeField]
+    Registry _registry = null!;
+
+    [SerializeField]
+    float _offset;
+
+    [SerializeField]
+    Scrollbar _scrollbar = null!;
+
+    [SerializeField]
+    float _cardWidth;
+
+    [SerializeField]
+    Transform _leftEdge = null!;
+
+    [SerializeField]
+    Transform _rightEdge = null!;
+
+    [SerializeField]
+    bool _hideWhenOutsideWindow;
 
     private float _scrollAmount = 0f;
     private float _previousScrollAmount = 0f;
@@ -30,8 +43,9 @@ namespace Dreamtides.Layout
     {
       if (Objects.Count > 0)
       {
-        _scrollbar.gameObject.SetActive(Objects.Count > WindowSize() &&
-            !_registry.CardAnimationService.IsPointerDownOnCard);
+        _scrollbar.gameObject.SetActive(
+          Objects.Count > WindowSize() && !_registry.CardAnimationService.IsPointerDownOnCard
+        );
         _scrollbar.size = (float)WindowSize() / Objects.Count;
 
         _scrollAmount = _scrollbar.value;
@@ -54,10 +68,12 @@ namespace Dreamtides.Layout
       return new Vector3(
         transform.position.x + ScrolledOffset(index, count, _scrollAmount),
         transform.position.y,
-        transform.position.z);
+        transform.position.z
+      );
     }
 
-    public override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
+    public override Vector3? CalculateObjectRotation(int index, int count) =>
+      transform.rotation.eulerAngles;
 
     public override float? CalculateObjectScale(int index, int count) => transform.localScale.x;
 

@@ -4,7 +4,5 @@ using UnityEngine;
 
 namespace Dreamtides.Buttons
 {
-  public class SiteButton : MonoBehaviour
-  {
-  }
+  public class SiteButton : MonoBehaviour { }
 }

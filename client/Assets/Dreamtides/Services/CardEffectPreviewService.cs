@@ -32,7 +32,8 @@ namespace Dreamtides.Services
 
     private void ApplyPreview()
     {
-      if (_current == null) return;
+      if (_current == null)
+        return;
 
       foreach (var cardPreview in _current.Cards)
       {

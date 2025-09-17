@@ -39,7 +39,12 @@ namespace Dreamtides.Utils
 
     public static Sequence FadeInSprite(SpriteRenderer spriteRenderer)
     {
-      spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 0);
+      spriteRenderer.color = new Color(
+        spriteRenderer.color.r,
+        spriteRenderer.color.g,
+        spriteRenderer.color.b,
+        0
+      );
       var result = Sequence($"FadeIn{spriteRenderer.gameObject.name}");
       result.Insert(0, spriteRenderer.DOFade(1, MoveAnimationDurationSeconds));
       return result;
@@ -47,7 +52,12 @@ namespace Dreamtides.Utils
 
     public static Sequence FadeOutSprite(SpriteRenderer spriteRenderer)
     {
-      spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, 1);
+      spriteRenderer.color = new Color(
+        spriteRenderer.color.r,
+        spriteRenderer.color.g,
+        spriteRenderer.color.b,
+        1
+      );
       var result = Sequence($"FadeOut{spriteRenderer.gameObject.name}");
       result.Insert(0, spriteRenderer.DOFade(0, MoveAnimationDurationSeconds));
       return result;

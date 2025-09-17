@@ -54,28 +54,29 @@ namespace Dreamtides.Services
       var tapScreenPosition = PointerPosition();
       var ray = _registry.Layout.MainCamera.ScreenPointToRay(tapScreenPosition);
       var hits = Physics.RaycastAll(
-          ray,
-          maxDistance: 256,
-          LayerMask.GetMask("Default"),
-          QueryTriggerInteraction.Ignore);
+        ray,
+        maxDistance: 256,
+        LayerMask.GetMask("Default"),
+        QueryTriggerInteraction.Ignore
+      );
 
       var candidates = new List<Displayable>();
       for (var i = 0; i < hits.Length; ++i)
       {
         var hit = hits[i];
         var displayable = hit.collider.GetComponent<Displayable>();
-        if (displayable && displayable.CanHandleMouseEvents() &&
-            (allowedContexts == null || allowedContexts.Contains(displayable.GameContext)))
+        if (
+          displayable
+          && displayable.CanHandleMouseEvents()
+          && (allowedContexts == null || allowedContexts.Contains(displayable.GameContext))
+        )
         {
           candidates.Add(displayable);
         }
       }
 
       Array.Clear(_raycastHitsTempBuffer, 0, _raycastHitsTempBuffer.Length);
-      return candidates
-        .OrderBy(c => c.GameContext)
-        .ThenBy(c => c.SortingKey)
-        .LastOrDefault();
+      return candidates.OrderBy(c => c.GameContext).ThenBy(c => c.SortingKey).LastOrDefault();
     }
 
     public Vector2 PointerPosition() => _tapPositionAction.ReadValue<Vector2>();
@@ -109,7 +110,8 @@ namespace Dreamtides.Services
     {
       var tapScreenPosition = InputProvider.PointerPosition();
       return Registry.Layout.MainCamera.ScreenToWorldPoint(
-          new Vector3(tapScreenPosition.x, tapScreenPosition.y, screenZ));
+        new Vector3(tapScreenPosition.x, tapScreenPosition.y, screenZ)
+      );
     }
 
     protected override void OnUpdate()
@@ -169,7 +171,10 @@ namespace Dreamtides.Services
 
     Displayable? FireClick()
     {
-      if (Registry.DocumentService.MouseOverDocumentElement() || Registry.DocumentService.HasOpenPanels)
+      if (
+        Registry.DocumentService.MouseOverDocumentElement()
+        || Registry.DocumentService.HasOpenPanels
+      )
       {
         return null;
       }

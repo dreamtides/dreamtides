@@ -51,8 +51,6 @@ namespace Dreamtides.Masonry
       UnregisterCallback<MouseDownEvent>(OnMouseDown);
     }
 
-    void OnMouseDown(MouseDownEvent evt)
-    {
-    }
+    void OnMouseDown(MouseDownEvent evt) { }
   }
 }

@@ -25,7 +25,7 @@ namespace Dreamtides.Masonry
         TouchScrollBehavior.Unrestricted => ScrollView.TouchScrollBehavior.Unrestricted,
         TouchScrollBehavior.Elastic => ScrollView.TouchScrollBehavior.Elastic,
         TouchScrollBehavior.Clamped => ScrollView.TouchScrollBehavior.Clamped,
-        _ => throw new ArgumentOutOfRangeException()
+        _ => throw new ArgumentOutOfRangeException(),
       };
       view.verticalPageSize = (float)(data.VerticalPageSize ?? -1);
       view.verticalScrollerVisibility = AdaptVisibility(data.VerticalScrollBarVisibility);
@@ -51,7 +51,7 @@ namespace Dreamtides.Masonry
         ScrollBarVisibility.Auto => ScrollerVisibility.Auto,
         ScrollBarVisibility.AlwaysVisible => ScrollerVisibility.AlwaysVisible,
         ScrollBarVisibility.Hidden => ScrollerVisibility.Hidden,
-        _ => throw new ArgumentOutOfRangeException(nameof(visibility), visibility, null)
+        _ => throw new ArgumentOutOfRangeException(nameof(visibility), visibility, null),
       };
   }
 

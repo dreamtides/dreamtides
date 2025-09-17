@@ -13,93 +13,122 @@ namespace Dreamtides.Services
   {
     public static TestConfiguration? TestConfiguration { get; set; }
 
-    [SerializeField] GameLayout? _portraitLayout;
-    [SerializeField] GameLayout? _landscapeLayout;
+    [SerializeField]
+    GameLayout? _portraitLayout;
+
+    [SerializeField]
+    GameLayout? _landscapeLayout;
     bool _isLandscape = false;
 
     public bool IsLandscape => _isLandscape;
 
     public bool IsMobileDevice => UnityEngine.Device.Application.isMobilePlatform;
 
-    public GameLayout Layout =>
-        IsLandscape ? Check(_landscapeLayout) : Check(_portraitLayout);
+    public GameLayout Layout => IsLandscape ? Check(_landscapeLayout) : Check(_portraitLayout);
 
-    [SerializeField] DreamscapeLayout? _dreamscapeLayout;
+    [SerializeField]
+    DreamscapeLayout? _dreamscapeLayout;
     public DreamscapeLayout DreamscapeLayout => Check(_dreamscapeLayout);
 
-    [SerializeField] CardService? _cardService;
+    [SerializeField]
+    CardService? _cardService;
     public CardService CardService => Check(_cardService);
 
-    [SerializeField] ActionService? _actionService;
+    [SerializeField]
+    ActionService? _actionService;
     public ActionService ActionService => Check(_actionService);
 
-    [SerializeField] InputService? _inputService;
+    [SerializeField]
+    InputService? _inputService;
     public InputService InputService => Check(_inputService);
 
-    [SerializeField] DocumentService? _documentService;
+    [SerializeField]
+    DocumentService? _documentService;
     public DocumentService DocumentService => Check(_documentService);
 
-    [SerializeField] CapabilitiesService? _capabilitiesService;
+    [SerializeField]
+    CapabilitiesService? _capabilitiesService;
     public CapabilitiesService CapabilitiesService => Check(_capabilitiesService);
 
-    [SerializeField] SoundService? _soundService;
+    [SerializeField]
+    SoundService? _soundService;
     public SoundService SoundService => Check(_soundService);
 
-    [SerializeField] CardAnimationService? _cardAnimationService;
+    [SerializeField]
+    CardAnimationService? _cardAnimationService;
     public CardAnimationService CardAnimationService => Check(_cardAnimationService);
 
-    [SerializeField] SettingsService? _settingsService;
+    [SerializeField]
+    SettingsService? _settingsService;
     public SettingsService SettingsService => Check(_settingsService);
 
-    [SerializeField] AssetService? _assetService;
+    [SerializeField]
+    AssetService? _assetService;
     public AssetService AssetService => Check(_assetService);
 
-    [SerializeField] AssetPoolService? _assetPoolService;
+    [SerializeField]
+    AssetPoolService? _assetPoolService;
     public AssetPoolService AssetPoolService => Check(_assetPoolService);
 
-    [SerializeField] EffectService? _effectService;
+    [SerializeField]
+    EffectService? _effectService;
     public EffectService EffectService => Check(_effectService);
 
-    [SerializeField] MusicService? _musicService;
+    [SerializeField]
+    MusicService? _musicService;
     public MusicService MusicService => Check(_musicService);
 
-    [SerializeField] EnvironmentService? _environmentService;
+    [SerializeField]
+    EnvironmentService? _environmentService;
     public EnvironmentService EnvironmentService => Check(_environmentService);
 
-    [SerializeField] JudgmentService? _judgmentService;
+    [SerializeField]
+    JudgmentService? _judgmentService;
     public JudgmentService JudgmentService => Check(_judgmentService);
 
-    [SerializeField] DreamwellActivationService? _dreamwellActivationService;
-    public DreamwellActivationService DreamwellActivationService => Check(_dreamwellActivationService);
+    [SerializeField]
+    DreamwellActivationService? _dreamwellActivationService;
+    public DreamwellActivationService DreamwellActivationService =>
+      Check(_dreamwellActivationService);
 
-    [SerializeField] ArrowService? _arrowService;
+    [SerializeField]
+    ArrowService? _arrowService;
     public ArrowService ArrowService => Check(_arrowService);
 
-    [SerializeField] CardEffectPreviewService? _cardEffectPreviewService;
+    [SerializeField]
+    CardEffectPreviewService? _cardEffectPreviewService;
     public CardEffectPreviewService CardEffectPreviewService => Check(_cardEffectPreviewService);
 
-    [SerializeField] TestHelperService? _testHelperService;
+    [SerializeField]
+    TestHelperService? _testHelperService;
     public TestHelperService TestHelperService => Check(_testHelperService);
 
-    [SerializeField] LoggingService? _loggingService;
+    [SerializeField]
+    LoggingService? _loggingService;
     public LoggingService LoggingService => Check(_loggingService);
 
-    [SerializeField] StudioService? _studioService;
+    [SerializeField]
+    StudioService? _studioService;
     public StudioService StudioService => Check(_studioService);
 
-    [SerializeField] ControlledButton? _bottomRightButton;
+    [SerializeField]
+    ControlledButton? _bottomRightButton;
     public ControlledButton BottomRightButton => Check(_bottomRightButton);
 
-    [SerializeField] UserHandHoverService? _userHandHoverService;
+    [SerializeField]
+    UserHandHoverService? _userHandHoverService;
     public UserHandHoverService UserHandHoverService => Check(_userHandHoverService);
 
-    [SerializeField] IdleReconnectService? _idleReconnectService;
+    [SerializeField]
+    IdleReconnectService? _idleReconnectService;
     public IdleReconnectService IdleReconnectService => Check(_idleReconnectService);
 
-    [SerializeField] DreamscapeService _dreamscapeService = null!;
+    [SerializeField]
+    DreamscapeService _dreamscapeService = null!;
     public DreamscapeService DreamscapeService => Check(_dreamscapeService);
 
-    [SerializeField] PrototypeQuest? _prototypeQuest;
+    [SerializeField]
+    PrototypeQuest? _prototypeQuest;
     public PrototypeQuest PrototypeQuest => Check(_prototypeQuest);
 
     void Awake()
@@ -155,8 +184,8 @@ namespace Dreamtides.Services
       }
     }
 
-    T Check<T>(T? value) where T : Object =>
-        Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
+    T Check<T>(T? value)
+      where T : Object => Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
 
     void ToggleGameObjectForMode(GameMode mode)
     {

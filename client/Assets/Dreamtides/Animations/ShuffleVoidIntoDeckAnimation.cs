@@ -19,8 +19,11 @@ namespace Dreamtides.Animations
       var (source, destination) = command.Player switch
       {
         DisplayPlayer.User => (service.Registry.Layout.UserVoid, service.Registry.Layout.UserDeck),
-        DisplayPlayer.Enemy => (service.Registry.Layout.EnemyVoid, service.Registry.Layout.EnemyDeck),
-        _ => (null, null)
+        DisplayPlayer.Enemy => (
+          service.Registry.Layout.EnemyVoid,
+          service.Registry.Layout.EnemyDeck
+        ),
+        _ => (null, null),
       };
 
       if (source == null || destination == null)
@@ -49,7 +52,8 @@ namespace Dreamtides.Animations
       // Compute base per-card durations for phases.
       float earlyPerCardTotal = earlyBatchCount > 0 ? earlyPhaseDuration / earlyBatchCount : 0f;
       float laterPhaseDuration = movePhaseDuration - earlyPhaseDuration;
-      if (laterPhaseDuration < 0f) laterPhaseDuration = 0f;
+      if (laterPhaseDuration < 0f)
+        laterPhaseDuration = 0f;
       float laterPerCardTotal = laterBatchCount > 0 ? laterPhaseDuration / laterBatchCount : 0f;
 
       // Adjust if later cards get too little time; borrow from shuffle wiggle if necessary.
@@ -100,10 +104,12 @@ namespace Dreamtides.Animations
         service.Registry.SoundService.PlayDrawCardSound();
 
         // 1) Move to drawn position.
-        yield return CardAnimationUtils.MoveCardToPosition(card,
+        yield return CardAnimationUtils.MoveCardToPosition(
+          card,
           service.Registry.Layout.DrawnCardsPosition.transform.position,
           service.Registry.Layout.DrawnCardsPosition.transform.rotation,
-          legDuration);
+          legDuration
+        );
 
         card.GameContext = GameContext.DrawnCards;
 
@@ -113,10 +119,12 @@ namespace Dreamtides.Animations
         }
 
         // 2) Move into deck root.
-        yield return CardAnimationUtils.MoveCardToPosition(card,
+        yield return CardAnimationUtils.MoveCardToPosition(
+          card,
           destination.transform.position,
           destination.transform.rotation,
-          legDuration);
+          legDuration
+        );
 
         destination.Add(card);
         card.transform.position = destination.transform.position;

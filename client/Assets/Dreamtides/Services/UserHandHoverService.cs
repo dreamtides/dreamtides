@@ -26,11 +26,20 @@ namespace Dreamtides.Services
       public float LastAnimationEndTime { get; set; }
     }
 
-    [SerializeField] float _hoverDistance = 2f;
-    [SerializeField] float _animateUpDuration = 0.1f;
-    [SerializeField] float _animateDownDuration = 0.3f;
-    [SerializeField] float _recoveryCheckInterval = 0.1f;
-    [SerializeField] float _debounceTime = 0.3f;
+    [SerializeField]
+    float _hoverDistance = 2f;
+
+    [SerializeField]
+    float _animateUpDuration = 0.1f;
+
+    [SerializeField]
+    float _animateDownDuration = 0.3f;
+
+    [SerializeField]
+    float _recoveryCheckInterval = 0.1f;
+
+    [SerializeField]
+    float _debounceTime = 0.3f;
     bool _isActive;
     bool _isTest;
     Card? _currentHoveredCard;
@@ -45,11 +54,11 @@ namespace Dreamtides.Services
     protected override void OnUpdate()
     {
       if (
-          _isTest ||
-          Registry.IsMobileDevice ||
-          Registry.DocumentService.MouseOverDocumentElement() ||
-          Registry.DocumentService.HasOpenPanels
-        )
+        _isTest
+        || Registry.IsMobileDevice
+        || Registry.DocumentService.MouseOverDocumentElement()
+        || Registry.DocumentService.HasOpenPanels
+      )
       {
         return;
       }
@@ -104,8 +113,13 @@ namespace Dreamtides.Services
             continue;
           }
 
-          var screenTargetPosition = Registry.Layout.MainCamera.WorldToScreenPoint(targetPosition.Value);
-          var distance = Vector2.Distance(pointerPosition, new Vector2(screenTargetPosition.x, screenTargetPosition.y));
+          var screenTargetPosition = Registry.Layout.MainCamera.WorldToScreenPoint(
+            targetPosition.Value
+          );
+          var distance = Vector2.Distance(
+            pointerPosition,
+            new Vector2(screenTargetPosition.x, screenTargetPosition.y)
+          );
 
           if (distance < closestDistance)
           {
@@ -158,7 +172,10 @@ namespace Dreamtides.Services
 
     void TransitionToNewCard(Card? newCard)
     {
-      if (_currentHoveredCard != null && _animationStates.TryGetValue(_currentHoveredCard.Id, out var previousState))
+      if (
+        _currentHoveredCard != null
+        && _animationStates.TryGetValue(_currentHoveredCard.Id, out var previousState)
+      )
       {
         previousState.IsAnimatingToJump = false;
         AnimateCardToOriginal(previousState);
@@ -203,7 +220,7 @@ namespace Dreamtides.Services
         CurrentTween = null,
         IsAnimatingToJump = false,
         AnimationProgress = 0f,
-        LastAnimationEndTime = 0f
+        LastAnimationEndTime = 0f,
       };
     }
 
@@ -216,10 +233,8 @@ namespace Dreamtides.Services
       }
 
       var horizontalPosition = Mathf.Clamp01((targetPosition.Value.x - 8f) / 14f);
-      return targetPosition.Value + Vector3.Lerp(
-        new Vector3(2f, 5.0f, 2f),
-        new Vector3(-2f, 5.0f, 2f),
-        horizontalPosition);
+      return targetPosition.Value
+        + Vector3.Lerp(new Vector3(2f, 5.0f, 2f), new Vector3(-2f, 5.0f, 2f), horizontalPosition);
     }
 
     void AnimateCardToJump(CardAnimationState state)
@@ -243,14 +258,23 @@ namespace Dreamtides.Services
 
       state.Card.GameContext = GameContext.Hovering;
       state.Card.ExcludeFromLayout = true;
-      state.CurrentTween = DOTween.Sequence()
-        .Append(state.Card.transform.DOMove(state.JumpPosition, _animateUpDuration).SetEase(Ease.OutCubic))
-        .Join(state.Card.transform.DORotateQuaternion(state.JumpRotation, _animateUpDuration).SetEase(Ease.OutCubic))
+      state.CurrentTween = DOTween
+        .Sequence()
+        .Append(
+          state.Card.transform.DOMove(state.JumpPosition, _animateUpDuration).SetEase(Ease.OutCubic)
+        )
+        .Join(
+          state
+            .Card.transform.DORotateQuaternion(state.JumpRotation, _animateUpDuration)
+            .SetEase(Ease.OutCubic)
+        )
         .OnUpdate(() =>
         {
           if (state.IsAnimatingToJump)
           {
-            state.AnimationProgress = Mathf.Clamp01(state.AnimationProgress + Time.deltaTime / _animateUpDuration);
+            state.AnimationProgress = Mathf.Clamp01(
+              state.AnimationProgress + Time.deltaTime / _animateUpDuration
+            );
           }
         })
         .OnComplete(() =>
@@ -292,16 +316,28 @@ namespace Dreamtides.Services
         state.Card.GameContext = GameContext.Hand;
       }
       state.Card.ExcludeFromLayout = false;
-      state.CurrentTween = DOTween.Sequence()
-        .Append(state.Card.transform.DOMove(originalPosition.Value, _animateDownDuration).SetEase(Ease.OutCubic))
-        .Join(state.Card.transform.DORotateQuaternion(Quaternion.Euler(originalRotation.Value), _animateDownDuration)
-          .SetEase(Ease.OutCubic)
+      state.CurrentTween = DOTween
+        .Sequence()
+        .Append(
+          state
+            .Card.transform.DOMove(originalPosition.Value, _animateDownDuration)
+            .SetEase(Ease.OutCubic)
+        )
+        .Join(
+          state
+            .Card.transform.DORotateQuaternion(
+              Quaternion.Euler(originalRotation.Value),
+              _animateDownDuration
+            )
+            .SetEase(Ease.OutCubic)
         )
         .OnUpdate(() =>
         {
           if (!state.IsAnimatingToJump)
           {
-            state.AnimationProgress = Mathf.Clamp01(state.AnimationProgress - Time.deltaTime / _animateDownDuration);
+            state.AnimationProgress = Mathf.Clamp01(
+              state.AnimationProgress - Time.deltaTime / _animateDownDuration
+            );
           }
         })
         .OnComplete(() =>
@@ -349,9 +385,9 @@ namespace Dreamtides.Services
         if (state.CurrentTween == null || !state.CurrentTween.IsActive())
         {
           var currentPos = state.Card.transform.position;
-          var targetPos = state.IsAnimatingToJump ?
-            state.JumpPosition :
-            userHand.CalculateObjectPosition(state.Card);
+          var targetPos = state.IsAnimatingToJump
+            ? state.JumpPosition
+            : userHand.CalculateObjectPosition(state.Card);
 
           if (targetPos == null)
           {

@@ -9,8 +9,11 @@ namespace Dreamtides.Components
 {
   public class CardBrowserButton : Displayable
   {
-    [SerializeField] Registry _registry = null!;
-    [SerializeField] CardBrowserType _type;
+    [SerializeField]
+    Registry _registry = null!;
+
+    [SerializeField]
+    CardBrowserType _type;
 
     public override bool CanHandleMouseEvents() => true;
 
@@ -26,14 +29,8 @@ namespace Dreamtides.Components
       {
         GameActionClass = new()
         {
-          BattleDisplayAction = new()
-          {
-            BattleDisplayActionClass = new()
-            {
-              BrowseCards = _type
-            }
-          }
-        }
+          BattleDisplayAction = new() { BattleDisplayActionClass = new() { BrowseCards = _type } },
+        },
       };
       _registry.ActionService.PerformAction(action);
     }

@@ -2,9 +2,9 @@
 
 using System;
 using System.Collections;
+using Dreamtides.Animations;
 using Dreamtides.Components;
 using Dreamtides.Schema;
-using Dreamtides.Animations;
 
 namespace Dreamtides.Services
 {
@@ -23,7 +23,9 @@ namespace Dreamtides.Services
       _infoZoom.Initialize(infoZoomDisabled: testConfiguration != null);
     }
 
-    public IEnumerator HandleMoveCardsWithCustomAnimation(MoveCardsWithCustomAnimationCommand command)
+    public IEnumerator HandleMoveCardsWithCustomAnimation(
+      MoveCardsWithCustomAnimationCommand command
+    )
     {
       switch (command.Animation)
       {

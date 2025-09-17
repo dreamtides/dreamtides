@@ -10,12 +10,23 @@ namespace Dreamtides.Components
 {
   public class AnchorToCanvasPosition : MonoBehaviour
   {
-    [SerializeField] Registry _registry = null!;
-    [SerializeField] RectTransform _rectTransform = null!;
-    [SerializeField] float _distanceFromCamera = 10.0f;
-    [SerializeField] bool _xCoordinateOnly;
-    [SerializeField] ObjectLayout? _toUpdate;
-    [SerializeField] float _xOffset;
+    [SerializeField]
+    Registry _registry = null!;
+
+    [SerializeField]
+    RectTransform _rectTransform = null!;
+
+    [SerializeField]
+    float _distanceFromCamera = 10.0f;
+
+    [SerializeField]
+    bool _xCoordinateOnly;
+
+    [SerializeField]
+    ObjectLayout? _toUpdate;
+
+    [SerializeField]
+    float _xOffset;
 
     public IEnumerator Start()
     {
@@ -29,11 +40,16 @@ namespace Dreamtides.Components
 
       var screenPoint = TransformUtils.RectTransformToScreenSpace(_rectTransform).center;
       var anchor = _registry.Layout.MainCamera.ScreenToWorldPoint(
-          new Vector3(screenPoint.x, screenPoint.y, _distanceFromCamera));
+        new Vector3(screenPoint.x, screenPoint.y, _distanceFromCamera)
+      );
 
       if (_xCoordinateOnly)
       {
-        transform.position = new Vector3(anchor.x + _xOffset, transform.position.y, transform.position.z);
+        transform.position = new Vector3(
+          anchor.x + _xOffset,
+          transform.position.y,
+          transform.position.z
+        );
       }
       else
       {

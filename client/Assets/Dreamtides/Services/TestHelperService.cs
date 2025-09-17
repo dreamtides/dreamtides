@@ -2,8 +2,8 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using Dreamtides.Layout;
 using Dreamtides.Components;
+using Dreamtides.Layout;
 using UnityEngine;
 
 namespace Dreamtides.Services
@@ -76,7 +76,8 @@ namespace Dreamtides.Services
       var totalTimer = 0.0f;
       movementHistory.Clear();
 
-      void TrackObjects<T>() where T : MonoBehaviour
+      void TrackObjects<T>()
+        where T : MonoBehaviour
       {
         var objects = FindObjectsByType<T>(FindObjectsSortMode.None);
         foreach (var obj in objects)
@@ -89,7 +90,8 @@ namespace Dreamtides.Services
         }
       }
 
-      bool CheckMovement<T>() where T : MonoBehaviour
+      bool CheckMovement<T>()
+        where T : MonoBehaviour
       {
         var objects = FindObjectsByType<T>(FindObjectsSortMode.None);
         foreach (var obj in objects)
@@ -148,7 +150,9 @@ namespace Dreamtides.Services
       {
         if (totalTimer >= timeoutSeconds)
         {
-          throw new System.TimeoutException($"WaitForIdle exceeded timeout of {timeoutSeconds} seconds");
+          throw new System.TimeoutException(
+            $"WaitForIdle exceeded timeout of {timeoutSeconds} seconds"
+          );
         }
 
         var hasMovement = false;

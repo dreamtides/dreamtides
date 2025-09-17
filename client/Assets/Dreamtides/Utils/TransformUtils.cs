@@ -13,6 +13,5 @@ namespace Dreamtides.Utils
       var y = transform.position.y - ((1.0f - transform.pivot.y) * size.y);
       return new Rect(x, y, size.x, size.y);
     }
-
   }
 }

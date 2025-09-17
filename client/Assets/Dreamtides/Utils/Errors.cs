@@ -7,20 +7,24 @@ namespace Dreamtides.Utils
 {
   public static class Errors
   {
-    public static T CheckNotNull<T>(T? value, string message = "") where T : class
+    public static T CheckNotNull<T>(T? value, string message = "")
+      where T : class
     {
       switch (value)
       {
         case null:
         case Object c when !c:
           // UnityEngine.Object has weird null behavior
-          throw new NullReferenceException($"Expected a non-null object of type {typeof(T).FullName}. {message}");
+          throw new NullReferenceException(
+            $"Expected a non-null object of type {typeof(T).FullName}. {message}"
+          );
         default:
           return value;
       }
     }
 
-    public static T CheckNotNull<T>(T? value) where T : struct
+    public static T CheckNotNull<T>(T? value)
+      where T : struct
     {
       if (!value.HasValue)
       {
@@ -30,11 +34,14 @@ namespace Dreamtides.Utils
       return value.Value;
     }
 
-    public static T CheckNotDefault<T>(T value) where T : Enum
+    public static T CheckNotDefault<T>(T value)
+      where T : Enum
     {
       if (Equals(value, default(T)))
       {
-        throw new ArgumentException($"Expected enum value of type {typeof(T).FullName} to have a non-default value.");
+        throw new ArgumentException(
+          $"Expected enum value of type {typeof(T).FullName} to have a non-default value."
+        );
       }
 
       return value;
@@ -52,8 +59,8 @@ namespace Dreamtides.Utils
       return value;
     }
 
-    public static Exception UnknownEnumValue<T>(T value) where T : Enum =>
-      new ArgumentException($"Unknown '{typeof(T).Name}' value: '{value}'");
+    public static Exception UnknownEnumValue<T>(T value)
+      where T : Enum => new ArgumentException($"Unknown '{typeof(T).Name}' value: '{value}'");
 
     public static void CheckArgument(bool expression, string message)
     {

@@ -1,18 +1,18 @@
-using System.Collections;
-using NUnit.Framework;
-using Dreamtides.Services;
-using Dreamtides.Utils;
-using Dreamtides.UnityInternal;
-using UnityEngine;
-using System.Linq;
 using System;
-using UnityEngine.SceneManagement;
-using Dreamtides.Layout;
-using UnityEngine.UIElements;
-using Dreamtides.Schema;
-using System.Runtime.CompilerServices;
-using UnityEngine.Rendering;
+using System.Collections;
 using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using Dreamtides.Layout;
+using Dreamtides.Schema;
+using Dreamtides.Services;
+using Dreamtides.UnityInternal;
+using Dreamtides.Utils;
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 #nullable enable
 
@@ -30,7 +30,8 @@ namespace Dreamtides.TestUtils
 
     protected IEnumerator Connect(
       [CallerMemberName] string? testName = null,
-      GameViewResolution resolution = GameViewResolution.Resolution16x9)
+      GameViewResolution resolution = GameViewResolution.Resolution16x9
+    )
     {
       Registry.TestConfiguration = new TestConfiguration(Guid.NewGuid());
       GameViewUtils.SetGameViewResolution(resolution);
@@ -39,16 +40,23 @@ namespace Dreamtides.TestUtils
       yield return new WaitForSeconds(0.1f);
       var registry = ComponentUtils.Get<Registry>(GameObject.Find("Registry"));
       Assert.IsNotNull(registry);
-      Assert.AreEqual(GameViewUtils.GetResolution(resolution), new Vector2(Screen.width, Screen.height),
-          $"Resolution {resolution} not set");
-      yield return new WaitUntil(() => registry.ActionService.Connected,
+      Assert.AreEqual(
+        GameViewUtils.GetResolution(resolution),
+        new Vector2(Screen.width, Screen.height),
+        $"Resolution {resolution} not set"
+      );
+      yield return new WaitUntil(
+        () => registry.ActionService.Connected,
         TimeSpan.FromSeconds(TimeoutSeconds),
         () =>
         {
           var screenshotPath = CaptureScreenshot($"Connect_Timeout_{DateTime.Now:yyyyMMdd_HHmmss}");
           Debug.Log($"Screenshot captured at: {screenshotPath}");
-          throw new TimeoutException($"Timeout waiting for registry.ActionService.Connected: {screenshotPath}");
-        });
+          throw new TimeoutException(
+            $"Timeout waiting for registry.ActionService.Connected: {screenshotPath}"
+          );
+        }
+      );
       yield return registry.TestHelperService.WaitForIdle(TimeoutSeconds);
       _registry = registry;
       Debug.Log($"{testName} started successfully");
@@ -61,14 +69,20 @@ namespace Dreamtides.TestUtils
     {
       var requestId = Guid.NewGuid();
       Registry.ActionService.PerformAction(action, requestId);
-      yield return new WaitUntil(() => Registry.ActionService.LastResponseReceived == requestId,
+      yield return new WaitUntil(
+        () => Registry.ActionService.LastResponseReceived == requestId,
         TimeSpan.FromSeconds(TimeoutSeconds),
         () =>
         {
-          var screenshotPath = CaptureScreenshot($"PerformAction_Timeout_{DateTime.Now:yyyyMMdd_HHmmss}");
+          var screenshotPath = CaptureScreenshot(
+            $"PerformAction_Timeout_{DateTime.Now:yyyyMMdd_HHmmss}"
+          );
           Debug.Log($"Screenshot captured at: {screenshotPath}");
-          throw new TimeoutException($"Timeout waiting for ActionService.LastResponseReceived == requestId: {screenshotPath}");
-        });
+          throw new TimeoutException(
+            $"Timeout waiting for ActionService.LastResponseReceived == requestId: {screenshotPath}"
+          );
+        }
+      );
       yield return Registry.TestHelperService.WaitForIdle(TimeoutSeconds);
     }
 
@@ -77,19 +91,18 @@ namespace Dreamtides.TestUtils
     /// </summary>
     protected IEnumerator PerformOpponentAction(BattleAction action)
     {
-      return PerformAction(new GameAction
-      {
-        GameActionClass = new GameActionClass
+      return PerformAction(
+        new GameAction
         {
-          DebugAction = new DebugAction
+          GameActionClass = new GameActionClass
           {
-            DebugActionClass = new DebugActionClass
+            DebugAction = new DebugAction
             {
-              PerformOpponentAction = action,
+              DebugActionClass = new DebugActionClass { PerformOpponentAction = action },
             },
           },
-        },
-      });
+        }
+      );
     }
 
     /// <summary>
@@ -115,8 +128,10 @@ namespace Dreamtides.TestUtils
 
       if (newCardIds.Count > 1)
       {
-        throw new InvalidOperationException("Multiple new cards were added after performing the action :" +
-            $"{string.Join(", ", newCardIds)}");
+        throw new InvalidOperationException(
+          "Multiple new cards were added after performing the action :"
+            + $"{string.Join(", ", newCardIds)}"
+        );
       }
 
       _cardId = newCardIds[0];
@@ -143,14 +158,20 @@ namespace Dreamtides.TestUtils
     /// </summary>
     protected IEnumerator WaitForCount(ObjectLayout layout, int count)
     {
-      yield return new WaitUntil(() => layout.Objects.Count == count,
+      yield return new WaitUntil(
+        () => layout.Objects.Count == count,
         TimeSpan.FromSeconds(TimeoutSeconds),
         () =>
         {
-          var screenshotPath = CaptureScreenshot($"WaitForCount_Timeout_{DateTime.Now:yyyyMMdd_HHmmss}");
+          var screenshotPath = CaptureScreenshot(
+            $"WaitForCount_Timeout_{DateTime.Now:yyyyMMdd_HHmmss}"
+          );
           Debug.Log($"Screenshot captured at: {screenshotPath}");
-          throw new TimeoutException($"Timeout waiting for layout.Objects.Count == {count}: {screenshotPath}");
-        });
+          throw new TimeoutException(
+            $"Timeout waiting for layout.Objects.Count == {count}: {screenshotPath}"
+          );
+        }
+      );
       yield return Registry.TestHelperService.WaitForIdle(TimeoutSeconds);
     }
 
@@ -159,14 +180,20 @@ namespace Dreamtides.TestUtils
     /// </summary>
     protected IEnumerator WaitForSceneLoad()
     {
-      yield return new WaitUntil(() => SceneManager.GetActiveScene().buildIndex == 0,
+      yield return new WaitUntil(
+        () => SceneManager.GetActiveScene().buildIndex == 0,
         TimeSpan.FromSeconds(TimeoutSeconds),
         () =>
         {
-          var screenshotPath = CaptureScreenshot($"WaitForSceneLoad_Timeout_{DateTime.Now:yyyyMMdd_HHmmss}");
+          var screenshotPath = CaptureScreenshot(
+            $"WaitForSceneLoad_Timeout_{DateTime.Now:yyyyMMdd_HHmmss}"
+          );
           Debug.Log($"Screenshot captured at: {screenshotPath}");
-          throw new TimeoutException($"Timeout waiting for scene to load (buildIndex == 0): {screenshotPath}");
-        });
+          throw new TimeoutException(
+            $"Timeout waiting for scene to load (buildIndex == 0): {screenshotPath}"
+          );
+        }
+      );
     }
 
     protected void AssertEmpty(ObjectLayout objectLayout)
@@ -187,18 +214,28 @@ namespace Dreamtides.TestUtils
     protected void AssertActive(Component component, string? message = null)
     {
       Assert.That(component.gameObject.activeSelf, Is.True, $"{message}. Component is not active");
-      Assert.That(component.gameObject.activeInHierarchy, Is.True, $"{message}. Component is not active in hierarchy");
+      Assert.That(
+        component.gameObject.activeInHierarchy,
+        Is.True,
+        $"{message}. Component is not active in hierarchy"
+      );
       if (component is MonoBehaviour monoBehaviour)
       {
         Assert.That(monoBehaviour.enabled, Is.True, $"{message}. Component is not enabled");
       }
     }
 
-    protected void AssertLayoutContains(ObjectLayout objectLayout, Displayable displayable, string? message = null)
+    protected void AssertLayoutContains(
+      ObjectLayout objectLayout,
+      Displayable displayable,
+      string? message = null
+    )
     {
-      Assert.That(objectLayout.Objects.Any(obj => obj.GetComponent<Displayable>() == displayable),
-          Is.True,
-          $"{message}. {displayable.name} not found in layout {objectLayout.name}");
+      Assert.That(
+        objectLayout.Objects.Any(obj => obj.GetComponent<Displayable>() == displayable),
+        Is.True,
+        $"{message}. {displayable.name} not found in layout {objectLayout.name}"
+      );
     }
 
     protected void AssertBoxColliderIsOnScreen(BoxCollider collider, string? message = null)
@@ -219,7 +256,8 @@ namespace Dreamtides.TestUtils
       {
         var viewportPos = Registry.Layout.MainCamera.WorldToViewportPoint(corner);
 
-        var errorMessage = message ?? $"BoxCollider corner at {corner} is outside viewport: {viewportPos}";
+        var errorMessage =
+          message ?? $"BoxCollider corner at {corner} is outside viewport: {viewportPos}";
 
         Assert.That(viewportPos.z > 0, errorMessage);
         Assert.That(viewportPos.x >= 0 && viewportPos.x <= 1, errorMessage);
@@ -230,7 +268,11 @@ namespace Dreamtides.TestUtils
     /// <summary>
     /// Asserts that all four corners of a 'renderer' are visible on the screen
     /// </summary>
-    protected void AssertIsOnscreen(Renderer sprite, string message, params GameObject[] ignoredObjects)
+    protected void AssertIsOnscreen(
+      Renderer sprite,
+      string message,
+      params GameObject[] ignoredObjects
+    )
     {
       var bounds = sprite.bounds;
       var corners = new Vector3[4]
@@ -238,7 +280,7 @@ namespace Dreamtides.TestUtils
         new Vector3(bounds.min.x, bounds.min.y, bounds.center.z),
         new Vector3(bounds.max.x, bounds.min.y, bounds.center.z),
         new Vector3(bounds.max.x, bounds.max.y, bounds.center.z),
-        new Vector3(bounds.min.x, bounds.max.y, bounds.center.z)
+        new Vector3(bounds.min.x, bounds.max.y, bounds.center.z),
       };
 
       var isOnscreen = true;
@@ -248,9 +290,15 @@ namespace Dreamtides.TestUtils
       {
         var viewportPos = Registry.Layout.MainCamera.WorldToViewportPoint(corner);
 
-        if (!(viewportPos.x >= -0.01f && viewportPos.x <= 1.01f &&
-              viewportPos.y >= -0.01f && viewportPos.y <= 1.01f &&
-              viewportPos.z >= -0.01f))
+        if (
+          !(
+            viewportPos.x >= -0.01f
+            && viewportPos.x <= 1.01f
+            && viewportPos.y >= -0.01f
+            && viewportPos.y <= 1.01f
+            && viewportPos.z >= -0.01f
+          )
+        )
         {
           isOnscreen = false;
           failureReason = $"Corner at world position {corner} is outside viewport: {viewportPos}";
@@ -260,7 +308,9 @@ namespace Dreamtides.TestUtils
 
       if (!isOnscreen)
       {
-        var screenshotPath = CaptureScreenshot($"AssertIsOnscreen_Failure_{DateTime.Now:yyyyMMdd_HHmmss}");
+        var screenshotPath = CaptureScreenshot(
+          $"AssertIsOnscreen_Failure_{DateTime.Now:yyyyMMdd_HHmmss}"
+        );
         Debug.Log($"Screenshot captured at: {screenshotPath}");
         Assert.Fail($"{message}: {screenshotPath}\n{failureReason}");
       }
@@ -283,19 +333,27 @@ namespace Dreamtides.TestUtils
 
     protected void AssertPrimaryActionButtonIsVisible()
     {
-      AssertIsOnscreen(Registry.Layout.PrimaryActionButton._background,
+      AssertIsOnscreen(
+        Registry.Layout.PrimaryActionButton._background,
         "Primary action button should be visible",
-        Registry.Layout.PrimaryActionButton._text.gameObject);
-      AssertIsTopmost(Registry.Layout.PrimaryActionButton._background,
+        Registry.Layout.PrimaryActionButton._text.gameObject
+      );
+      AssertIsTopmost(
+        Registry.Layout.PrimaryActionButton._background,
         "Primary action button should be topmost",
-        Registry.Layout.PrimaryActionButton._text.gameObject);
+        Registry.Layout.PrimaryActionButton._text.gameObject
+      );
     }
 
     /// <summary>
     /// Asserts that a ray fired through the center of the renderer hits no other
     /// higher objects.
     /// </summary>
-    protected void AssertIsTopmost(Renderer sprite, string message, params GameObject[] ignoredObjects)
+    protected void AssertIsTopmost(
+      Renderer sprite,
+      string message,
+      params GameObject[] ignoredObjects
+    )
     {
       var spriteBounds = sprite.bounds;
       var spriteCenter = spriteBounds.center;
@@ -308,8 +366,12 @@ namespace Dreamtides.TestUtils
       var hits = Physics.RaycastAll(ray);
 
       var sortingGroupParent = sprite.GetComponentInParent<SortingGroup>();
-      var spriteSortingLayer = sortingGroupParent ? sortingGroupParent.sortingLayerID : sprite.sortingLayerID;
-      var spriteSortingOrder = sortingGroupParent ? sortingGroupParent.sortingOrder : sprite.sortingOrder;
+      var spriteSortingLayer = sortingGroupParent
+        ? sortingGroupParent.sortingLayerID
+        : sprite.sortingLayerID;
+      var spriteSortingOrder = sortingGroupParent
+        ? sortingGroupParent.sortingOrder
+        : sprite.sortingOrder;
       var spriteSortingLayerValue = SortingLayer.GetLayerValueFromID(spriteSortingLayer);
 
       foreach (var hit in hits)
@@ -324,31 +386,54 @@ namespace Dreamtides.TestUtils
 
         if (sortingGroup != null)
         {
-          if (sprite.transform.IsChildOf(sortingGroup.transform) || sortingGroup == sortingGroupParent)
+          if (
+            sprite.transform.IsChildOf(sortingGroup.transform)
+            || sortingGroup == sortingGroupParent
+          )
           {
             continue;
           }
 
-          if (ignoredObjects.Any(ignored => sortingGroup.transform.IsChildOf(ignored.transform) || sortingGroup.gameObject == ignored))
+          if (
+            ignoredObjects.Any(ignored =>
+              sortingGroup.transform.IsChildOf(ignored.transform)
+              || sortingGroup.gameObject == ignored
+            )
+          )
           {
             continue;
           }
 
-          var groupSortingLayerValue = SortingLayer.GetLayerValueFromID(sortingGroup.sortingLayerID);
+          var groupSortingLayerValue = SortingLayer.GetLayerValueFromID(
+            sortingGroup.sortingLayerID
+          );
 
           if (groupSortingLayerValue > spriteSortingLayerValue)
           {
-            var parent = sortingGroup.transform.parent != null ? $" of {sortingGroup.transform.parent.name}" : "";
-            Assert.Fail($"{message}: SortingGroup '{sortingGroup.name}'{parent} has a higher sorting layer " +
-                        $"(layer: {SortingLayer.IDToName(sortingGroup.sortingLayerID)}, value: {groupSortingLayerValue}) " +
-                        $"than sprite '{sprite.name}'{ofParent} (layer: {SortingLayer.IDToName(spriteSortingLayer)}, value: {spriteSortingLayerValue})");
+            var parent =
+              sortingGroup.transform.parent != null
+                ? $" of {sortingGroup.transform.parent.name}"
+                : "";
+            Assert.Fail(
+              $"{message}: SortingGroup '{sortingGroup.name}'{parent} has a higher sorting layer "
+                + $"(layer: {SortingLayer.IDToName(sortingGroup.sortingLayerID)}, value: {groupSortingLayerValue}) "
+                + $"than sprite '{sprite.name}'{ofParent} (layer: {SortingLayer.IDToName(spriteSortingLayer)}, value: {spriteSortingLayerValue})"
+            );
           }
 
-          if (groupSortingLayerValue == spriteSortingLayerValue && sortingGroup.sortingOrder > spriteSortingOrder)
+          if (
+            groupSortingLayerValue == spriteSortingLayerValue
+            && sortingGroup.sortingOrder > spriteSortingOrder
+          )
           {
-            var parent = sortingGroup.transform.parent != null ? $" of {sortingGroup.transform.parent.name}" : "";
-            Assert.Fail($"{message}: SortingGroup '{sortingGroup.name}'{parent} has the same sorting layer " +
-                        $"but higher sorting order ({sortingGroup.sortingOrder}) than sprite '{sprite.name}{ofParent}' ({spriteSortingOrder})");
+            var parent =
+              sortingGroup.transform.parent != null
+                ? $" of {sortingGroup.transform.parent.name}"
+                : "";
+            Assert.Fail(
+              $"{message}: SortingGroup '{sortingGroup.name}'{parent} has the same sorting layer "
+                + $"but higher sorting order ({sortingGroup.sortingOrder}) than sprite '{sprite.name}{ofParent}' ({spriteSortingOrder})"
+            );
           }
         }
         else
@@ -357,28 +442,44 @@ namespace Dreamtides.TestUtils
 
           foreach (var renderer in renderers)
           {
-            if (renderer == sprite) continue;
+            if (renderer == sprite)
+              continue;
 
-            if (ignoredObjects.Any(ignored => renderer.transform.IsChildOf(ignored.transform) || renderer.gameObject == ignored))
+            if (
+              ignoredObjects.Any(ignored =>
+                renderer.transform.IsChildOf(ignored.transform) || renderer.gameObject == ignored
+              )
+            )
             {
               continue;
             }
 
-            var rendererSortingLayerValue = SortingLayer.GetLayerValueFromID(renderer.sortingLayerID);
+            var rendererSortingLayerValue = SortingLayer.GetLayerValueFromID(
+              renderer.sortingLayerID
+            );
 
             if (rendererSortingLayerValue > spriteSortingLayerValue)
             {
-              var parent = renderer.transform.parent != null ? $" of {renderer.transform.parent.name}" : "";
-              Assert.Fail($"{message}: Renderer '{renderer.name}'{parent} has a higher sorting layer " +
-                          $"(layer: {SortingLayer.IDToName(renderer.sortingLayerID)}, value: {rendererSortingLayerValue}) " +
-                          $"than sprite '{sprite.name}{ofParent}' (layer: {SortingLayer.IDToName(spriteSortingLayer)}, value: {spriteSortingLayerValue})");
+              var parent =
+                renderer.transform.parent != null ? $" of {renderer.transform.parent.name}" : "";
+              Assert.Fail(
+                $"{message}: Renderer '{renderer.name}'{parent} has a higher sorting layer "
+                  + $"(layer: {SortingLayer.IDToName(renderer.sortingLayerID)}, value: {rendererSortingLayerValue}) "
+                  + $"than sprite '{sprite.name}{ofParent}' (layer: {SortingLayer.IDToName(spriteSortingLayer)}, value: {spriteSortingLayerValue})"
+              );
             }
 
-            if (rendererSortingLayerValue == spriteSortingLayerValue && renderer.sortingOrder > spriteSortingOrder)
+            if (
+              rendererSortingLayerValue == spriteSortingLayerValue
+              && renderer.sortingOrder > spriteSortingOrder
+            )
             {
-              var parent = renderer.transform.parent != null ? $" of {renderer.transform.parent.name}" : "";
-              Assert.Fail($"{message}: Renderer '{renderer.name}'{parent} has the same sorting layer " +
-                          $"but higher sorting order ({renderer.sortingOrder}) than sprite '{sprite.name}{ofParent}' ({spriteSortingOrder})");
+              var parent =
+                renderer.transform.parent != null ? $" of {renderer.transform.parent.name}" : "";
+              Assert.Fail(
+                $"{message}: Renderer '{renderer.name}'{parent} has the same sorting layer "
+                  + $"but higher sorting order ({renderer.sortingOrder}) than sprite '{sprite.name}{ofParent}' ({spriteSortingOrder})"
+              );
             }
           }
         }
@@ -396,13 +497,19 @@ namespace Dreamtides.TestUtils
     protected void AssertPrimaryButtonContainsText(string text)
     {
       var primaryButton = Registry.Layout.PrimaryActionButton;
-      Assert.That(primaryButton._text.text, Is.EqualTo(text), $"Primary button text is not '{text}'");
+      Assert.That(
+        primaryButton._text.text,
+        Is.EqualTo(text),
+        $"Primary button text is not '{text}'"
+      );
     }
 
     protected BoxCollider GetBoxCollider(Component component)
     {
-      return Errors.CheckNotNull(component.GetComponentInChildren<BoxCollider>(),
-          $"No BoxCollider found on {component.gameObject}");
+      return Errors.CheckNotNull(
+        component.GetComponentInChildren<BoxCollider>(),
+        $"No BoxCollider found on {component.gameObject}"
+      );
     }
   }
 }

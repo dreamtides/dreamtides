@@ -18,17 +18,27 @@ namespace Dreamtides.Layout
   /// </summary>
   public sealed class RenderAsChildObjectLayout : ObjectLayout
   {
-    [SerializeField] List<Displayable> _objects = new();
-    [SerializeField] bool _debugUpdateContinuously = false;
+    [SerializeField]
+    List<Displayable> _objects = new();
+
+    [SerializeField]
+    bool _debugUpdateContinuously = false;
 
     // Pile-like tuning (applied as LOCAL offsets relative to this transform)
-    [SerializeField] float _singleElementY = 0.5f;
-    [SerializeField] float _yMultiplier = 1.0f;
+    [SerializeField]
+    float _singleElementY = 0.5f;
+
+    [SerializeField]
+    float _yMultiplier = 1.0f;
 
     /// <summary>
     /// If true, the layout will update continuously.
     /// </summary>
-    public bool DebugUpdateContinuously { get => _debugUpdateContinuously; set => _debugUpdateContinuously = value; }
+    public bool DebugUpdateContinuously
+    {
+      get => _debugUpdateContinuously;
+      set => _debugUpdateContinuously = value;
+    }
 
     /// <summary>The objects in this ObjectLayout</summary>
     public override IReadOnlyList<Displayable> Objects => _objects.AsReadOnly();
@@ -118,10 +128,8 @@ namespace Dreamtides.Layout
     /// Calculates the LOCAL position of the object at the given index in the layout.
     /// Defaults to a pile-like depth (Z-axis) distribution relative to this transform.
     /// </summary>
-    Vector3 CalculateObjectPosition(int index, int count) => new(
-      0f,
-      0f,
-      _yMultiplier * Mathf.Lerp(0f, 1f, YPosition(index, count)));
+    Vector3 CalculateObjectPosition(int index, int count) =>
+      new(0f, 0f, _yMultiplier * Mathf.Lerp(0f, 1f, YPosition(index, count)));
 
     /// <summary>
     /// Calculates the LOCAL rotation of the object at the given index in the layout.
@@ -148,7 +156,8 @@ namespace Dreamtides.Layout
       int index,
       int count,
       Sequence? sequence = null,
-      bool applyToChildren = true)
+      bool applyToChildren = true
+    )
     {
       if (displayable.ExcludeFromLayout)
       {
@@ -212,7 +221,10 @@ namespace Dreamtides.Layout
 
       if (sequence != null)
       {
-        sequence.Insert(atPosition: 0, displayable.transform.DOScale(Vector3.one * localScale, duration));
+        sequence.Insert(
+          atPosition: 0,
+          displayable.transform.DOScale(Vector3.one * localScale, duration)
+        );
       }
       else
       {
@@ -220,14 +232,25 @@ namespace Dreamtides.Layout
       }
     }
 
-    bool IsEquivalent(Displayable displayable, Vector3 localPosition, Vector3? localRotation, float localScale)
+    bool IsEquivalent(
+      Displayable displayable,
+      Vector3 localPosition,
+      Vector3? localRotation,
+      float localScale
+    )
     {
       if (Vector3.Distance(displayable.transform.localPosition, localPosition) > 0.01f)
       {
         return false;
       }
 
-      if (localRotation != null && Vector3.Distance(EulerAngleDistance(displayable.transform.localEulerAngles, localRotation.Value), Vector3.zero) > 0.01f)
+      if (
+        localRotation != null
+        && Vector3.Distance(
+          EulerAngleDistance(displayable.transform.localEulerAngles, localRotation.Value),
+          Vector3.zero
+        ) > 0.01f
+      )
       {
         return false;
       }
@@ -245,22 +268,21 @@ namespace Dreamtides.Layout
       _objects.Sort((a, b) => a.SortingKey.CompareTo(b.SortingKey));
     }
 
-    Vector3 EulerAngleDistance(Vector3 a, Vector3 b) => new(
-      Mathf.DeltaAngle(a.x, b.x),
-      Mathf.DeltaAngle(a.y, b.y),
-      Mathf.DeltaAngle(a.z, b.z));
+    Vector3 EulerAngleDistance(Vector3 a, Vector3 b) =>
+      new(Mathf.DeltaAngle(a.x, b.x), Mathf.DeltaAngle(a.y, b.y), Mathf.DeltaAngle(a.z, b.z));
 
-    float YPosition(int index, int count) => count switch
-    {
-      _ when index >= count => 0.65f,
-      0 => _singleElementY,
-      1 => _singleElementY,
-      2 => new[] { 0.4f, 0.6f }[index],
-      3 => new[] { 0.4f, 0.5f, 0.6f }[index],
-      4 => new[] { 0.40f, 0.45f, 0.50f, 0.55f }[index],
-      5 => new[] { 0.40f, 0.45f, 0.50f, 0.55f, 0.6f }[index],
-      6 => new[] { 0.40f, 0.45f, 0.50f, 0.55f, 0.6f, 0.65f }[index],
-      _ => index / ((float)count - 1)
-    };
+    float YPosition(int index, int count) =>
+      count switch
+      {
+        _ when index >= count => 0.65f,
+        0 => _singleElementY,
+        1 => _singleElementY,
+        2 => new[] { 0.4f, 0.6f }[index],
+        3 => new[] { 0.4f, 0.5f, 0.6f }[index],
+        4 => new[] { 0.40f, 0.45f, 0.50f, 0.55f }[index],
+        5 => new[] { 0.40f, 0.45f, 0.50f, 0.55f, 0.6f }[index],
+        6 => new[] { 0.40f, 0.45f, 0.50f, 0.55f, 0.6f, 0.65f }[index],
+        _ => index / ((float)count - 1),
+      };
   }
 }

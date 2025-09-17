@@ -98,20 +98,19 @@ namespace Dreamtides.UnityInternal
       Assembly assembly = Assembly.Load(assemblyName);
       Type gameViewSize = assembly.GetType("UnityEditor.GameViewSize");
       Type gameViewSizeType = assembly.GetType("UnityEditor.GameViewSizeType");
-      ConstructorInfo ctor = gameViewSize.GetConstructor(new Type[]
-          {
-                 gameViewSizeType,
-                 typeof(int),
-                 typeof(int),
-                 typeof(string)
-          });
+      ConstructorInfo ctor = gameViewSize.GetConstructor(
+        new Type[] { gameViewSizeType, typeof(int), typeof(int), typeof(string) }
+      );
       var resolutionVector = GetResolution(resolution);
-      var newSize = ctor.Invoke(new object[] {
-        GameViewSizeType.FixedResolution,
-        (int)resolutionVector.x,
-        (int)resolutionVector.y,
-        resolution.ToString()
-      });
+      var newSize = ctor.Invoke(
+        new object[]
+        {
+          GameViewSizeType.FixedResolution,
+          (int)resolutionVector.x,
+          (int)resolutionVector.y,
+          resolution.ToString(),
+        }
+      );
       addCustomSize.Invoke(group, new object[] { newSize });
     }
 

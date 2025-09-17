@@ -14,15 +14,32 @@ namespace Dreamtides.Components
   [DisallowMultipleComponent]
   public sealed class Projectile : MonoBehaviour
   {
-    [SerializeField] float _scale = 3f;
-    [SerializeField] public TimedEffect? _flash;
-    [SerializeField] public TimedEffect? _hit;
-    [SerializeField] public bool _useFirePointRotation;
-    [SerializeField] public Vector3 _rotationOffset = new Vector3(0, 0, 0);
-    [SerializeField] public ParticleSystem? _hitParticleSystem;
-    [SerializeField] public Light? _light;
-    [SerializeField] public List<GameObject> _detached = new();
-    [SerializeField] public ParticleSystem? _projectileParticleSystem;
+    [SerializeField]
+    float _scale = 3f;
+
+    [SerializeField]
+    public TimedEffect? _flash;
+
+    [SerializeField]
+    public TimedEffect? _hit;
+
+    [SerializeField]
+    public bool _useFirePointRotation;
+
+    [SerializeField]
+    public Vector3 _rotationOffset = new Vector3(0, 0, 0);
+
+    [SerializeField]
+    public ParticleSystem? _hitParticleSystem;
+
+    [SerializeField]
+    public Light? _light;
+
+    [SerializeField]
+    public List<GameObject> _detached = new();
+
+    [SerializeField]
+    public ParticleSystem? _projectileParticleSystem;
 
     public IEnumerator Fire(
       Registry registry,
@@ -33,7 +50,8 @@ namespace Dreamtides.Components
       AudioClipAddress? fireSound = null,
       AudioClipAddress? impactSound = null,
       Action? onHit = null,
-      bool mute = false)
+      bool mute = false
+    )
     {
       if (_flash)
       {
@@ -69,8 +87,11 @@ namespace Dreamtides.Components
         registry.SoundService.PlayFireProjectileSound();
       }
 
-      yield return TweenUtils.Sequence($"{name} Projectile")
-        .Append(transform.DOMove(target.position, duration?.ToSeconds() ?? 0.3f).SetEase(Ease.Linear))
+      yield return TweenUtils
+        .Sequence($"{name} Projectile")
+        .Append(
+          transform.DOMove(target.position, duration?.ToSeconds() ?? 0.3f).SetEase(Ease.Linear)
+        )
         .WaitForCompletion();
 
       if (_hit)
@@ -101,8 +122,10 @@ namespace Dreamtides.Components
         {
           _hit.gameObject.SetActive(false);
         }
-        var additionalHitEffect =
-          registry.AssetPoolService.Create(registry.AssetService.GetEffectPrefab(additionalHit), transform.position);
+        var additionalHitEffect = registry.AssetPoolService.Create(
+          registry.AssetService.GetEffectPrefab(additionalHit),
+          transform.position
+        );
         additionalHitEffect.transform.rotation = rotation;
       }
 

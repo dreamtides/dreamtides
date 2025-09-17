@@ -8,7 +8,8 @@ namespace Dreamtides.Services
 {
   public class EnvironmentService : Service
   {
-    [SerializeField] List<GameEnvironment> _environments = null!;
+    [SerializeField]
+    List<GameEnvironment> _environments = null!;
 
     protected override void OnInitialize(TestConfiguration? testConfiguration)
     {

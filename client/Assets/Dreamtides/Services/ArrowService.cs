@@ -8,13 +8,19 @@ using Dreamtides.Utils;
 using UnityEngine;
 
 [assembly: InternalsVisibleTo("Dreamtides.Tests")]
+
 namespace Dreamtides.Services
 {
   public class ArrowService : Service
   {
-    [SerializeField] Arrow _redArrowPrefab = null!;
-    [SerializeField] Arrow _greenArrowPrefab = null!;
-    [SerializeField] Arrow _blueArrowPrefab = null!;
+    [SerializeField]
+    Arrow _redArrowPrefab = null!;
+
+    [SerializeField]
+    Arrow _greenArrowPrefab = null!;
+
+    [SerializeField]
+    Arrow _blueArrowPrefab = null!;
     internal readonly List<Arrow> _arrows = new();
 
     public void HandleDisplayArrows(List<DisplayArrow> arrows)
@@ -53,12 +59,13 @@ namespace Dreamtides.Services
       _arrows.Clear();
     }
 
-    Arrow ArrowForType(ArrowStyle style) => style switch
-    {
-      ArrowStyle.Red => _redArrowPrefab,
-      ArrowStyle.Green => _greenArrowPrefab,
-      ArrowStyle.Blue => _blueArrowPrefab,
-      _ => throw Errors.UnknownEnumValue(style)
-    };
+    Arrow ArrowForType(ArrowStyle style) =>
+      style switch
+      {
+        ArrowStyle.Red => _redArrowPrefab,
+        ArrowStyle.Green => _greenArrowPrefab,
+        ArrowStyle.Blue => _blueArrowPrefab,
+        _ => throw Errors.UnknownEnumValue(style),
+      };
   }
 }

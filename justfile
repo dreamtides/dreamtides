@@ -187,6 +187,9 @@ insta:
 fmt:
     cd rules_engine && cargo +nightly fmt
 
+fmt-csharp:
+    cd client && dotnet csharpier format .
+
 check-format:
     cd rules_engine && cargo +nightly fmt -- --check
 

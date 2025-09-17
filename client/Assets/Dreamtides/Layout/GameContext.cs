@@ -43,44 +43,46 @@ namespace Dreamtides.Layout
 
   public static class SortingLayerExtensions
   {
-    public static int SortingLayerId(this GameContext context) => context switch
-    {
-      GameContext.Unspecified => SortingLayer.NameToID("Default"),
-      GameContext.Hidden => SortingLayer.NameToID("Hidden"),
-      GameContext.BattlefieldBackground => SortingLayer.NameToID("BattlefieldBackground"),
-      GameContext.Battlefield => SortingLayer.NameToID("Battlefield"),
-      GameContext.PlayerStatus => SortingLayer.NameToID("PlayerStatus"),
-      GameContext.Deck => SortingLayer.NameToID("Deck"),
-      GameContext.DiscardPile => SortingLayer.NameToID("DiscardPile"),
-      GameContext.PrimaryActionButton => SortingLayer.NameToID("PrimaryActionButton"),
-      GameContext.GameModifiers => SortingLayer.NameToID("GameModifiers"),
-      GameContext.OnScreenStorage => SortingLayer.NameToID("OnScreenStorage"),
-      GameContext.Interface => SortingLayer.NameToID("Interface"),
-      GameContext.CardActivation => SortingLayer.NameToID("CardActivation"),
-      GameContext.Stack => SortingLayer.NameToID("Stack"),
-      GameContext.DrawnCards => SortingLayer.NameToID("DrawnCards"),
-      GameContext.RevealedCards => SortingLayer.NameToID("RevealedCards"),
-      GameContext.Hand => SortingLayer.NameToID("Hand"),
-      GameContext.BrowserBackground => SortingLayer.NameToID("BrowserBackground"),
-      GameContext.Browser => SortingLayer.NameToID("Browser"),
-      GameContext.Effects => SortingLayer.NameToID("Effects"),
-      GameContext.UserMessage => SortingLayer.NameToID("UserMessage"),
-      GameContext.InfoZoom => SortingLayer.NameToID("InfoZoom"),
-      GameContext.Hovering => SortingLayer.NameToID("Hovering"),
-      GameContext.Dragging => SortingLayer.NameToID("Dragging"),
-      GameContext.BrowserOverlay => SortingLayer.NameToID("BrowserOverlay"),
-      GameContext.InterfaceOverlay => SortingLayer.NameToID("InterfaceOverlay"),
-      GameContext.SplashScreen => SortingLayer.NameToID("SplashScreen"),
-      _ => throw Errors.UnknownEnumValue(context),
-    };
+    public static int SortingLayerId(this GameContext context) =>
+      context switch
+      {
+        GameContext.Unspecified => SortingLayer.NameToID("Default"),
+        GameContext.Hidden => SortingLayer.NameToID("Hidden"),
+        GameContext.BattlefieldBackground => SortingLayer.NameToID("BattlefieldBackground"),
+        GameContext.Battlefield => SortingLayer.NameToID("Battlefield"),
+        GameContext.PlayerStatus => SortingLayer.NameToID("PlayerStatus"),
+        GameContext.Deck => SortingLayer.NameToID("Deck"),
+        GameContext.DiscardPile => SortingLayer.NameToID("DiscardPile"),
+        GameContext.PrimaryActionButton => SortingLayer.NameToID("PrimaryActionButton"),
+        GameContext.GameModifiers => SortingLayer.NameToID("GameModifiers"),
+        GameContext.OnScreenStorage => SortingLayer.NameToID("OnScreenStorage"),
+        GameContext.Interface => SortingLayer.NameToID("Interface"),
+        GameContext.CardActivation => SortingLayer.NameToID("CardActivation"),
+        GameContext.Stack => SortingLayer.NameToID("Stack"),
+        GameContext.DrawnCards => SortingLayer.NameToID("DrawnCards"),
+        GameContext.RevealedCards => SortingLayer.NameToID("RevealedCards"),
+        GameContext.Hand => SortingLayer.NameToID("Hand"),
+        GameContext.BrowserBackground => SortingLayer.NameToID("BrowserBackground"),
+        GameContext.Browser => SortingLayer.NameToID("Browser"),
+        GameContext.Effects => SortingLayer.NameToID("Effects"),
+        GameContext.UserMessage => SortingLayer.NameToID("UserMessage"),
+        GameContext.InfoZoom => SortingLayer.NameToID("InfoZoom"),
+        GameContext.Hovering => SortingLayer.NameToID("Hovering"),
+        GameContext.Dragging => SortingLayer.NameToID("Dragging"),
+        GameContext.BrowserOverlay => SortingLayer.NameToID("BrowserOverlay"),
+        GameContext.InterfaceOverlay => SortingLayer.NameToID("InterfaceOverlay"),
+        GameContext.SplashScreen => SortingLayer.NameToID("SplashScreen"),
+        _ => throw Errors.UnknownEnumValue(context),
+      };
 
-    public static bool IsBattlefieldContext(this GameContext context) => context switch
-    {
-      GameContext.BattlefieldBackground => true,
-      GameContext.Battlefield => true,
-      GameContext.DiscardPile => true,
-      GameContext.GameModifiers => true,
-      _ => false
-    };
+    public static bool IsBattlefieldContext(this GameContext context) =>
+      context switch
+      {
+        GameContext.BattlefieldBackground => true,
+        GameContext.Battlefield => true,
+        GameContext.DiscardPile => true,
+        GameContext.GameModifiers => true,
+        _ => false,
+      };
   }
 }

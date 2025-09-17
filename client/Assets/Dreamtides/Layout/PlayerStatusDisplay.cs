@@ -8,17 +8,38 @@ namespace Dreamtides.Layout
 {
   public class PlayerStatusDisplay : StandardObjectLayout
   {
-    [SerializeField] BattlefieldNumber _energy = null!;
-    [SerializeField] BattlefieldNumber _score = null!;
-    [SerializeField] BattlefieldNumber _totalSpark = null!;
-    [SerializeField] GameObject _leftTurnIndicator = null!;
-    [SerializeField] GameObject _rightTurnIndicator = null!;
-    [SerializeField] Material _imminentVictorySparkBackgroundMaterial = null!;
-    [SerializeField] GameObject _imminentVictoryIndicator = null!;
-    [SerializeField] MeshRenderer _characterImage = null!;
-    [SerializeField] GameObject _testCharacterPrefab = null!;
-    [SerializeField] Registry _registry = null!;
-    [SerializeField] StudioType _studioType;
+    [SerializeField]
+    BattlefieldNumber _energy = null!;
+
+    [SerializeField]
+    BattlefieldNumber _score = null!;
+
+    [SerializeField]
+    BattlefieldNumber _totalSpark = null!;
+
+    [SerializeField]
+    GameObject _leftTurnIndicator = null!;
+
+    [SerializeField]
+    GameObject _rightTurnIndicator = null!;
+
+    [SerializeField]
+    Material _imminentVictorySparkBackgroundMaterial = null!;
+
+    [SerializeField]
+    GameObject _imminentVictoryIndicator = null!;
+
+    [SerializeField]
+    MeshRenderer _characterImage = null!;
+
+    [SerializeField]
+    GameObject _testCharacterPrefab = null!;
+
+    [SerializeField]
+    Registry _registry = null!;
+
+    [SerializeField]
+    StudioType _studioType;
 
     long _producedEnergy;
     Renderer _sparkBackgroundRenderer = null!;
@@ -42,9 +63,9 @@ namespace Dreamtides.Layout
       SetScore(playerView.Score, animate);
       _leftTurnIndicator.SetActive(playerView.TurnIndicator == DisplayedTurnIndicator.Left);
       _rightTurnIndicator.SetActive(playerView.TurnIndicator == DisplayedTurnIndicator.Right);
-      _sparkBackgroundRenderer.material = playerView.IsVictoryImminent ?
-          _imminentVictorySparkBackgroundMaterial :
-          _sparkBackgroundMaterial;
+      _sparkBackgroundRenderer.material = playerView.IsVictoryImminent
+        ? _imminentVictorySparkBackgroundMaterial
+        : _sparkBackgroundMaterial;
       _imminentVictoryIndicator.SetActive(playerView.IsVictoryImminent);
     }
 
@@ -52,8 +73,9 @@ namespace Dreamtides.Layout
     {
       _producedEnergy = producedEnergy;
       _energy.SetText(
-          $"{currentEnergy}/{producedEnergy} <color=#00838F><voffset=0.1em>\uf7e4</voffset></color>",
-          animate);
+        $"{currentEnergy}/{producedEnergy} <color=#00838F><voffset=0.1em>\uf7e4</voffset></color>",
+        animate
+      );
     }
 
     public void SetScore(long score, bool animate = true)
@@ -70,8 +92,9 @@ namespace Dreamtides.Layout
     {
       if (preview.Energy != null)
       {
-        string energyText = $"{preview.Energy}/{preview.ProducedEnergy ?? _producedEnergy} " +
-          "<color=#00838F><voffset=0.1em>\uf7e4</voffset></color>";
+        string energyText =
+          $"{preview.Energy}/{preview.ProducedEnergy ?? _producedEnergy} "
+          + "<color=#00838F><voffset=0.1em>\uf7e4</voffset></color>";
         Energy.SetPreviewText(energyText, previewTextColor);
       }
 

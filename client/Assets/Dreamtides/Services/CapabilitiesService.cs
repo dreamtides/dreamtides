@@ -13,7 +13,8 @@ namespace Dreamtides.Services
     /// Returns true if a card browser is currently open, e.g. to select a card
     /// or view the contents of the void.
     /// </summary>
-    public bool AnyBrowserOpen() => Registry.Layout.Browser.IsOpen || Registry.Layout.CardOrderSelector.IsOpen;
+    public bool AnyBrowserOpen() =>
+      Registry.Layout.Browser.IsOpen || Registry.Layout.CardOrderSelector.IsOpen;
 
     /// <summary>
     /// Can the user currently info zoom a card that exists in the provided
@@ -21,7 +22,10 @@ namespace Dreamtides.Services
     /// </summary>
     public bool CanInfoZoom(GameContext gameContext, Position position)
     {
-      if (Registry.DocumentService.MouseOverDocumentElement() || Registry.DocumentService.HasOpenPanels)
+      if (
+        Registry.DocumentService.MouseOverDocumentElement()
+        || Registry.DocumentService.HasOpenPanels
+      )
       {
         return false;
       }
@@ -29,7 +33,8 @@ namespace Dreamtides.Services
       switch (gameContext)
       {
         case GameContext.Browser:
-          return Registry.Layout.Browser.Objects.Count > 1 || Registry.Layout.CardOrderSelector.Objects.Count > 1;
+          return Registry.Layout.Browser.Objects.Count > 1
+            || Registry.Layout.CardOrderSelector.Objects.Count > 1;
         case GameContext.BrowserOverlay:
         case GameContext.Dragging:
           return true;

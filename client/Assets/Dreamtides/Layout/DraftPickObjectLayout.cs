@@ -7,11 +7,20 @@ namespace Dreamtides.Layout
 {
   public sealed class DraftPickObjectLayout : StandardObjectLayout
   {
-    [SerializeField] Registry _registry = null!;
-    [SerializeField] float _horizontalSpacing;
-    [SerializeField] float _verticalSpacing;
-    [SerializeField] float _cardWidth;
-    [SerializeField] float _cardHeight;
+    [SerializeField]
+    Registry _registry = null!;
+
+    [SerializeField]
+    float _horizontalSpacing;
+
+    [SerializeField]
+    float _verticalSpacing;
+
+    [SerializeField]
+    float _cardWidth;
+
+    [SerializeField]
+    float _cardHeight;
 
     public override Vector3 CalculateObjectPosition(int index, int count)
     {
@@ -36,14 +45,15 @@ namespace Dreamtides.Layout
 
         var localX = ComputeHorizontalOffset(indexInRow, rowCount, _horizontalSpacing);
 
-        float localY = count <= 1 ? 0f : (isTopRow ? _verticalSpacing / 2f : -_verticalSpacing / 2f);
+        float localY =
+          count <= 1 ? 0f : (isTopRow ? _verticalSpacing / 2f : -_verticalSpacing / 2f);
 
         return transform.position + transform.right * localX + transform.up * localY;
       }
     }
 
     public override Vector3? CalculateObjectRotation(int index, int count) =>
-        transform.rotation.eulerAngles;
+      transform.rotation.eulerAngles;
 
     public override float? CalculateObjectScale(int index, int count) => transform.localScale.x;
 

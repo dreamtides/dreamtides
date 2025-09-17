@@ -10,8 +10,8 @@ namespace Dreamtides.Services
   {
     readonly Dictionary<int, List<GameObject>> _pools = new();
 
-    public T Create<T>(T prefab, Vector3 position, Transform? parent = null) where T : Component =>
-      ComponentUtils.Get<T>(Create(prefab.gameObject, position, parent));
+    public T Create<T>(T prefab, Vector3 position, Transform? parent = null)
+      where T : Component => ComponentUtils.Get<T>(Create(prefab.gameObject, position, parent));
 
     public GameObject Create(GameObject prefab, Vector3 position, Transform? parent = null)
     {

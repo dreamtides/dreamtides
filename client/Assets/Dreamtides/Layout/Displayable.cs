@@ -8,10 +8,17 @@ namespace Dreamtides.Layout
 {
   public abstract class Displayable : MonoBehaviour
   {
-    [SerializeField] Transform? _projectileSourcePosition;
-    [SerializeField] Transform? _displayEffectPosition;
-    [SerializeField] SortingGroup? _sortingGroup;
-    [SerializeField] GameContext _internalGameContext;
+    [SerializeField]
+    Transform? _projectileSourcePosition;
+
+    [SerializeField]
+    Transform? _displayEffectPosition;
+
+    [SerializeField]
+    SortingGroup? _sortingGroup;
+
+    [SerializeField]
+    GameContext _internalGameContext;
     ObjectLayout? _parent;
 
     /// <summary>
@@ -73,9 +80,7 @@ namespace Dreamtides.Layout
     /// <summary>
     /// Invoked when the displayable is created.
     /// </summary>
-    protected virtual void OnStart()
-    {
-    }
+    protected virtual void OnStart() { }
 
     /// <summary>
     /// Should return true if this game object can currently handle a MouseDown or MouseHoverStart event.
@@ -86,16 +91,12 @@ namespace Dreamtides.Layout
     /// Invoked on mouse down. Will only be invoked if <see cref="CanHandleMouseEvents"/>
     /// returns true and this is the topmost object hit by the on click raycast.
     /// </summary>
-    public virtual void MouseDown()
-    {
-    }
+    public virtual void MouseDown() { }
 
     /// <summary>
     /// Sent every frame while the mouse button is held down to objects which received <see cref="MouseDown"/>.
     /// </summary>
-    public virtual void MouseDrag()
-    {
-    }
+    public virtual void MouseDrag() { }
 
     /// <summary>
     /// Sent on *any* mouse up event, anywhere on screen, to objects which
@@ -103,30 +104,20 @@ namespace Dreamtides.Layout
     /// the pointer was released over the same Displayable which received
     /// MouseDown.
     /// </summary>
-    public virtual void MouseUp(bool isSameObject)
-    {
-    }
+    public virtual void MouseUp(bool isSameObject) { }
 
     /// <summary>
     /// Invoked on mouse hover start. Will only be invoked if <see cref="CanHandleMouseEvents"/>
     /// returns true and this is the topmost object hit by the on click raycast.
     /// </summary>
-    public virtual void MouseHoverStart()
-    {
-    }
+    public virtual void MouseHoverStart() { }
 
-    public virtual void MouseHover()
-    {
-    }
+    public virtual void MouseHover() { }
 
-    public virtual void MouseHoverEnd()
-    {
-    }
+    public virtual void MouseHoverEnd() { }
 
     /// <summary>Called when the parent container is repositioned.</summary>
-    public virtual void OnParentRepositioned()
-    {
-    }
+    public virtual void OnParentRepositioned() { }
 
     public GameContext GameContext
     {

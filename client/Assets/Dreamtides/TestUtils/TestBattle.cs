@@ -1,6 +1,6 @@
-using Dreamtides.Schema;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using Dreamtides.Schema;
 
 namespace Dreamtides.TestUtils
 {
@@ -21,12 +21,9 @@ namespace Dreamtides.TestUtils
         {
           DebugAction = new DebugAction
           {
-            DebugActionClass = new DebugActionClass
-            {
-              ApplyActionList = _actions
-            }
-          }
-        }
+            DebugActionClass = new DebugActionClass { ApplyActionList = _actions },
+          },
+        },
       };
     }
 
@@ -55,46 +52,54 @@ namespace Dreamtides.TestUtils
 
     public TestBattle RemovePlayerHands()
     {
-      _actions.Add(new DebugBattleAction
-      {
-        DebugBattleActionClass = new DebugBattleActionClass
+      _actions.Add(
+        new DebugBattleAction
         {
-          MoveHandToDeck = new MoveHandToDeck { Player = PlayerName.One }
+          DebugBattleActionClass = new DebugBattleActionClass
+          {
+            MoveHandToDeck = new MoveHandToDeck { Player = PlayerName.One },
+          },
         }
-      });
-      _actions.Add(new DebugBattleAction
-      {
-        DebugBattleActionClass = new DebugBattleActionClass
+      );
+      _actions.Add(
+        new DebugBattleAction
         {
-          MoveHandToDeck = new MoveHandToDeck { Player = PlayerName.Two }
+          DebugBattleActionClass = new DebugBattleActionClass
+          {
+            MoveHandToDeck = new MoveHandToDeck { Player = PlayerName.Two },
+          },
         }
-      });
+      );
       return this;
     }
 
     public TestBattle SetEnergy(DisplayPlayer player, int energy)
     {
       var name = GetPlayerName(player);
-      _actions.Add(new DebugBattleAction
-      {
-        DebugBattleActionClass = new DebugBattleActionClass
+      _actions.Add(
+        new DebugBattleAction
         {
-          SetEnergy = new SetEnergy { Player = name, Energy = energy }
+          DebugBattleActionClass = new DebugBattleActionClass
+          {
+            SetEnergy = new SetEnergy { Player = name, Energy = energy },
+          },
         }
-      });
+      );
       return this;
     }
 
     public TestBattle SetPoints(DisplayPlayer player, int points)
     {
       var name = GetPlayerName(player);
-      _actions.Add(new DebugBattleAction
-      {
-        DebugBattleActionClass = new DebugBattleActionClass
+      _actions.Add(
+        new DebugBattleAction
         {
-          SetPoints = new SetPoints { Player = name, Points = points }
+          DebugBattleActionClass = new DebugBattleActionClass
+          {
+            SetPoints = new SetPoints { Player = name, Points = points },
+          },
         }
-      });
+      );
       return this;
     }
 
@@ -110,24 +115,27 @@ namespace Dreamtides.TestUtils
     public TestBattle AddCardToHand(DisplayPlayer player, Guid card = default)
     {
       var name = GetPlayerName(player);
-      _actions.Add(new DebugBattleAction
-      {
-        DebugBattleActionClass = new DebugBattleActionClass
+      _actions.Add(
+        new DebugBattleAction
         {
-          AddCardToHand = new AddCardToHand
+          DebugBattleActionClass = new DebugBattleActionClass
           {
-            Card = card == default(Guid) ? TestCards.TestVanillaCharacter : card,
-            Player = name,
-          }
+            AddCardToHand = new AddCardToHand
+            {
+              Card = card == default(Guid) ? TestCards.TestVanillaCharacter : card,
+              Player = name,
+            },
+          },
         }
-      });
+      );
       return this;
     }
 
     public TestBattle AddCardsToBattlefield(
       DisplayPlayer player,
       int count,
-      Guid card = default(Guid))
+      Guid card = default(Guid)
+    )
     {
       for (var i = 0; i < count; i++)
       {
@@ -139,17 +147,19 @@ namespace Dreamtides.TestUtils
     public TestBattle AddCardToBattlefield(DisplayPlayer player, Guid card = default(Guid))
     {
       var name = GetPlayerName(player);
-      _actions.Add(new DebugBattleAction
-      {
-        DebugBattleActionClass = new DebugBattleActionClass
+      _actions.Add(
+        new DebugBattleAction
         {
-          AddCardToBattlefield = new AddCardToBattlefield
+          DebugBattleActionClass = new DebugBattleActionClass
           {
-            Card = card == default(Guid) ? TestCards.TestVanillaCharacter : card,
-            Player = name,
-          }
+            AddCardToBattlefield = new AddCardToBattlefield
+            {
+              Card = card == default(Guid) ? TestCards.TestVanillaCharacter : card,
+              Player = name,
+            },
+          },
         }
-      });
+      );
       return this;
     }
 
@@ -165,17 +175,19 @@ namespace Dreamtides.TestUtils
     public TestBattle AddCardToVoid(DisplayPlayer player)
     {
       var name = GetPlayerName(player);
-      _actions.Add(new DebugBattleAction
-      {
-        DebugBattleActionClass = new DebugBattleActionClass
+      _actions.Add(
+        new DebugBattleAction
         {
-          AddCardToVoid = new AddCardToVoid
+          DebugBattleActionClass = new DebugBattleActionClass
           {
-            Card = TestCards.TestVanillaCharacter,
-            Player = name,
-          }
+            AddCardToVoid = new AddCardToVoid
+            {
+              Card = TestCards.TestVanillaCharacter,
+              Player = name,
+            },
+          },
         }
-      });
+      );
       return this;
     }
 
@@ -185,7 +197,7 @@ namespace Dreamtides.TestUtils
       {
         DisplayPlayer.User => PlayerName.One,
         DisplayPlayer.Enemy => PlayerName.Two,
-        _ => throw new IndexOutOfRangeException("Invalid player")
+        _ => throw new IndexOutOfRangeException("Invalid player"),
       };
     }
   }

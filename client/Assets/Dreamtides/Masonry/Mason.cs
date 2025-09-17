@@ -11,25 +11,20 @@ namespace Dreamtides.Masonry
 {
   public static class Mason
   {
-    public static Dimension Px(float value) => new()
-    {
-      Unit = DimensionUnit.Pixels,
-      Value = value
-    };
+    public static Dimension Px(float value) => new() { Unit = DimensionUnit.Pixels, Value = value };
 
-    public static Dimension Percent(float value) => new()
-    {
-      Unit = DimensionUnit.Percentage,
-      Value = value
-    };
+    public static Dimension Percent(float value) =>
+      new() { Unit = DimensionUnit.Percentage, Value = value };
 
     public static DimensionGroup PositionDip(float left, float top) => GroupPx(top, 0, 0, left);
 
     public static DimensionGroup AllPx(float all) => GroupPx(all, all, all, all);
 
-    public static DimensionGroup LeftRightPx(float leftRight) => GroupPx(0, leftRight, 0, leftRight);
+    public static DimensionGroup LeftRightPx(float leftRight) =>
+      GroupPx(0, leftRight, 0, leftRight);
 
-    public static DimensionGroup TopBottomPx(float topBottom) => GroupPx(topBottom, 0, topBottom, 0);
+    public static DimensionGroup TopBottomPx(float topBottom) =>
+      GroupPx(topBottom, 0, topBottom, 0);
 
     public static DimensionGroup TopDip(float top) => GroupPx(top, 0, 0, 0);
 
@@ -39,13 +34,14 @@ namespace Dreamtides.Masonry
 
     public static DimensionGroup LeftDip(float left) => GroupPx(0, 0, 0, left);
 
-    public static DimensionGroup GroupPx(float top, float right, float bottom, float left) => new()
-    {
-      Top = Px(top),
-      Right = Px(right),
-      Bottom = Px(bottom),
-      Left = Px(left)
-    };
+    public static DimensionGroup GroupPx(float top, float right, float bottom, float left) =>
+      new()
+      {
+        Top = Px(top),
+        Right = Px(right),
+        Bottom = Px(bottom),
+        Left = Px(left),
+      };
 
     public static DisplayColor MakeColor(string hexString)
     {
@@ -59,47 +55,45 @@ namespace Dreamtides.Masonry
       }
     }
 
-    public static DisplayColor MakeColor(Color color, float? setAlpha = null) => new()
-    {
-      Red = color.r,
-      Green = color.g,
-      Blue = color.b,
-      Alpha = setAlpha ?? color.a
-    };
+    public static DisplayColor MakeColor(Color color, float? setAlpha = null) =>
+      new()
+      {
+        Red = color.r,
+        Green = color.g,
+        Blue = color.b,
+        Alpha = setAlpha ?? color.a,
+      };
 
-    public static BorderColor AllBordersColor(Color color) => new()
-    {
-      Top = MakeColor(color),
-      Right = MakeColor(color),
-      Bottom = MakeColor(color),
-      Left = MakeColor(color)
-    };
+    public static BorderColor AllBordersColor(Color color) =>
+      new()
+      {
+        Top = MakeColor(color),
+        Right = MakeColor(color),
+        Bottom = MakeColor(color),
+        Left = MakeColor(color),
+      };
 
-    public static BorderWidth AllBordersWidth(float width) => new()
-    {
-      Top = width,
-      Right = width,
-      Bottom = width,
-      Left = width
-    };
+    public static BorderWidth AllBordersWidth(float width) =>
+      new()
+      {
+        Top = width,
+        Right = width,
+        Bottom = width,
+        Left = width,
+      };
 
-    public static BorderRadius AllBordersRadiusDip(float radius) => new()
-    {
-      TopLeft = Px(radius),
-      TopRight = Px(radius),
-      BottomRight = Px(radius),
-      BottomLeft = Px(radius)
-    };
+    public static BorderRadius AllBordersRadiusDip(float radius) =>
+      new()
+      {
+        TopLeft = Px(radius),
+        TopRight = Px(radius),
+        BottomRight = Px(radius),
+        BottomLeft = Px(radius),
+      };
 
-    public static SpriteAddress Sprite(string address) => new()
-    {
-      Sprite = address
-    };
+    public static SpriteAddress Sprite(string address) => new() { Sprite = address };
 
-    public static FontAddress Font(string address) => new()
-    {
-      Font = address
-    };
+    public static FontAddress Font(string address) => new() { Font = address };
 
     public static FlexNode Row(string name, FlexStyle? style, IEnumerable<FlexNode?> children) =>
       Row(name, style, children.ToArray());
@@ -111,7 +105,8 @@ namespace Dreamtides.Masonry
       string name,
       FlexStyle? style = null,
       EventHandlers? handlers = null,
-      params FlexNode?[] children)
+      params FlexNode?[] children
+    )
     {
       style ??= new FlexStyle();
       style.FlexDirection = FlexDirection.Row;
@@ -121,14 +116,18 @@ namespace Dreamtides.Masonry
     public static FlexNode Column(string name, FlexStyle? style, IEnumerable<FlexNode?> children) =>
       Column(name, style, children.ToArray());
 
-    public static FlexNode Column(string name, FlexStyle? style = null, params FlexNode?[] children) =>
-      Column(name, style, handlers: null, children);
+    public static FlexNode Column(
+      string name,
+      FlexStyle? style = null,
+      params FlexNode?[] children
+    ) => Column(name, style, handlers: null, children);
 
     public static FlexNode Column(
       string name,
       FlexStyle? style = null,
       EventHandlers? handlers = null,
-      params FlexNode?[] children)
+      params FlexNode?[] children
+    )
     {
       style ??= new FlexStyle();
       style.FlexDirection = FlexDirection.Column;
@@ -145,76 +144,73 @@ namespace Dreamtides.Masonry
       return input;
     }
 
-    public static FlexNode Text(string label, FlexStyle style) => new()
-    {
-      NodeType = new NodeType
+    public static FlexNode Text(string label, FlexStyle style) =>
+      new()
       {
-        Text = new TextNode
-        {
-          Label = label,
-        }
-      },
-      Style = style,
-    };
+        NodeType = new NodeType { Text = new TextNode { Label = label } },
+        Style = style,
+      };
 
     public static FlexScale Scale(float amount) => Scale(amount, amount);
 
-    public static FlexScale Scale(float x, float y) => new()
-    {
-      Amount = new FlexVector3
+    public static FlexScale Scale(float x, float y) =>
+      new()
       {
-        X = x,
-        Y = y,
-        Z = 0
-      }
-    };
+        Amount = new FlexVector3
+        {
+          X = x,
+          Y = y,
+          Z = 0,
+        },
+      };
 
-    public static FlexRotate Rotate(float degrees) => new()
-    {
-      Degrees = degrees
-    };
+    public static FlexRotate Rotate(float degrees) => new() { Degrees = degrees };
 
-    public static FlexTranslate TranslateDip(float x, float y, float z = 0) => new()
-    {
-      X = Px(x),
-      Y = Px(y),
-      Z = z
-    };
+    public static FlexTranslate TranslateDip(float x, float y, float z = 0) =>
+      new()
+      {
+        X = Px(x),
+        Y = Px(y),
+        Z = z,
+      };
 
-    public static FlexTranslate TranslatePercent(float x, float y, float z = 0) => new()
-    {
-      X = Percent(x),
-      Y = Percent(y),
-      Z = z
-    };
+    public static FlexTranslate TranslatePercent(float x, float y, float z = 0) =>
+      new()
+      {
+        X = Percent(x),
+        Y = Percent(y),
+        Z = z,
+      };
 
-
-    public static Milliseconds DurationMs(uint ms) => new()
-    {
-      MillisecondsValue = ms
-    };
+    public static Milliseconds DurationMs(uint ms) => new() { MillisecondsValue = ms };
 
     public static ImageSlice ImageSlice(uint slice) => ImageSlice(slice, slice);
 
     public static ImageSlice ImageSlice(uint topBottom, uint rightLeft) =>
       ImageSlice(topBottom, rightLeft, topBottom, rightLeft);
 
-    public static ImageSlice ImageSlice(uint top, uint right, uint bottom, uint left) => new()
-    {
-      Top = top,
-      Right = right,
-      Bottom = bottom,
-      Left = left
-    };
+    public static ImageSlice ImageSlice(uint top, uint right, uint bottom, uint left) =>
+      new()
+      {
+        Top = top,
+        Right = right,
+        Bottom = bottom,
+        Left = left,
+      };
 
-    static FlexNode MakeFlexbox(string name, FlexStyle style, EventHandlers? handlers, params FlexNode?[] children)
+    static FlexNode MakeFlexbox(
+      string name,
+      FlexStyle style,
+      EventHandlers? handlers,
+      params FlexNode?[] children
+    )
     {
       var result = new FlexNode
       {
         Style = style,
         EventHandlers = handlers,
         Name = name,
-        Children = new()
+        Children = new(),
       };
       result.Children.AddRange(children.Where(child => child != null));
       return result;
@@ -272,7 +268,8 @@ namespace Dreamtides.Masonry
       result.AlignSelf = newStyle.AlignSelf ?? original.AlignSelf;
       result.BackgroundColor = newStyle.BackgroundColor ?? original.BackgroundColor;
       result.BackgroundImage = newStyle.BackgroundImage ?? original.BackgroundImage;
-      result.BackgroundImageTintColor = newStyle.BackgroundImageTintColor ?? original.BackgroundImageTintColor;
+      result.BackgroundImageTintColor =
+        newStyle.BackgroundImageTintColor ?? original.BackgroundImageTintColor;
       result.BorderColor = newStyle.BorderColor ?? original.BorderColor;
       result.BorderRadius = newStyle.BorderRadius ?? original.BorderRadius;
       result.BorderWidth = newStyle.BorderWidth ?? original.BorderWidth;
@@ -313,7 +310,8 @@ namespace Dreamtides.Masonry
       result.TransformOrigin = newStyle.TransformOrigin ?? original.TransformOrigin;
       result.TransitionDelays = newStyle.TransitionDelays ?? original.TransitionDelays;
       result.TransitionDurations = newStyle.TransitionDurations ?? original.TransitionDurations;
-      result.TransitionEasingModes = newStyle.TransitionEasingModes ?? original.TransitionEasingModes;
+      result.TransitionEasingModes =
+        newStyle.TransitionEasingModes ?? original.TransitionEasingModes;
       result.TransitionProperties = newStyle.TransitionProperties ?? original.TransitionProperties;
       result.Translate = newStyle.Translate ?? original.Translate;
       result.Visibility = newStyle.Visibility ?? original.Visibility;

@@ -16,13 +16,26 @@ namespace Dreamtides.Services
 {
   public class CardService : Service
   {
-    [SerializeField] Card _cardPrefab = null!;
-    [SerializeField] Card _eventCardPrefab = null!;
-    [SerializeField] Card _tokenPrefab = null!;
-    [SerializeField] Card _dreamwellPrefab = null!;
-    [SerializeField] Card _identityCardPrefab = null!;
-    [SerializeField] Card _enemyPrefab = null!;
-    [SerializeField] Card _dreamsignPrefab = null!;
+    [SerializeField]
+    Card _cardPrefab = null!;
+
+    [SerializeField]
+    Card _eventCardPrefab = null!;
+
+    [SerializeField]
+    Card _tokenPrefab = null!;
+
+    [SerializeField]
+    Card _dreamwellPrefab = null!;
+
+    [SerializeField]
+    Card _identityCardPrefab = null!;
+
+    [SerializeField]
+    Card _enemyPrefab = null!;
+
+    [SerializeField]
+    Card _dreamsignPrefab = null!;
 
     Dictionary<string, Card> Cards { get; } = new();
 
@@ -82,7 +95,7 @@ namespace Dreamtides.Services
             CardPrefab.Dreamsign => ComponentUtils.Instantiate(_dreamsignPrefab),
             CardPrefab.Event => ComponentUtils.Instantiate(_eventCardPrefab),
             CardPrefab.Identity => ComponentUtils.Instantiate(_identityCardPrefab),
-            _ => ComponentUtils.Instantiate(_cardPrefab)
+            _ => ComponentUtils.Instantiate(_cardPrefab),
           };
 
           if (cardView.CreatePosition != null)
@@ -140,7 +153,7 @@ namespace Dreamtides.Services
         {
           DisplayPlayer.User => Registry.Layout.UserDeck,
           DisplayPlayer.Enemy => Registry.Layout.EnemyDeck,
-          _ => throw Errors.UnknownEnumValue(deck)
+          _ => throw Errors.UnknownEnumValue(deck),
         };
       }
 
@@ -150,7 +163,7 @@ namespace Dreamtides.Services
         {
           DisplayPlayer.User => Registry.Layout.UserVoid,
           DisplayPlayer.Enemy => Registry.Layout.EnemyVoid,
-          _ => throw Errors.UnknownEnumValue(voidPile)
+          _ => throw Errors.UnknownEnumValue(voidPile),
         };
       }
 
@@ -160,7 +173,7 @@ namespace Dreamtides.Services
         {
           DisplayPlayer.User => Registry.Layout.UserStatusDisplay,
           DisplayPlayer.Enemy => Registry.Layout.EnemyStatusDisplay,
-          _ => throw Errors.UnknownEnumValue(avatar)
+          _ => throw Errors.UnknownEnumValue(avatar),
         };
       }
 
@@ -188,7 +201,11 @@ namespace Dreamtides.Services
     /// Moves an object to a new target ObjectLayout, optionally animating the
     /// transition if a sequence is provided.
     /// </summary>
-    public void MoveObject(Displayable displayable, ObjectPosition position, Sequence? sequence = null)
+    public void MoveObject(
+      Displayable displayable,
+      ObjectPosition position,
+      Sequence? sequence = null
+    )
     {
       var layout = LayoutForObjectPosition(position);
       layout.Add(displayable);
@@ -223,8 +240,10 @@ namespace Dreamtides.Services
         Registry.Layout.Browser.Hide(Registry, sequence);
       }
 
-      if (Registry.Layout.CardOrderSelector.Objects.Count > 0 ||
-          Registry.Layout.CardOrderSelectorVoid.Objects.Count > 0)
+      if (
+        Registry.Layout.CardOrderSelector.Objects.Count > 0
+        || Registry.Layout.CardOrderSelectorVoid.Objects.Count > 0
+      )
       {
         Registry.Layout.CardOrderSelector.Show(Registry, sequence);
       }
@@ -303,7 +322,7 @@ namespace Dreamtides.Services
     }
 
     ObjectLayout LayoutForObjectPosition(ObjectPosition objectPosition) =>
-        LayoutForPosition(objectPosition.Position);
+      LayoutForPosition(objectPosition.Position);
 
     public ObjectLayout LayoutForPosition(Position position)
     {

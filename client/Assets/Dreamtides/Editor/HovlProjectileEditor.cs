@@ -60,16 +60,27 @@ namespace Dreamtides.Editors
         }
 
         CleanUpChildren(projectile.transform);
-        DestroyImmediate(projectile.gameObject.GetComponent<Rigidbody>(), allowDestroyingAssets: true);
-        DestroyImmediate(projectile.gameObject.GetComponent<SphereCollider>(), allowDestroyingAssets: true);
-        DestroyImmediate(projectile.gameObject.GetComponent<HS_Poolable>(), allowDestroyingAssets: true);
+        DestroyImmediate(
+          projectile.gameObject.GetComponent<Rigidbody>(),
+          allowDestroyingAssets: true
+        );
+        DestroyImmediate(
+          projectile.gameObject.GetComponent<SphereCollider>(),
+          allowDestroyingAssets: true
+        );
+        DestroyImmediate(
+          projectile.gameObject.GetComponent<HS_Poolable>(),
+          allowDestroyingAssets: true
+        );
         DestroyImmediate(projectile, allowDestroyingAssets: true);
       }
     }
 
     private void UpdateParticleSystems(GameObject gameObject)
     {
-      var particleSystems = gameObject.GetComponentsInChildren<ParticleSystem>(includeInactive: true);
+      var particleSystems = gameObject.GetComponentsInChildren<ParticleSystem>(
+        includeInactive: true
+      );
       foreach (var ps in particleSystems)
       {
         var main = ps.main;

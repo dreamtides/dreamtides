@@ -5,21 +5,35 @@ using DG.Tweening;
 using Dreamtides.Components;
 using Dreamtides.Schema;
 using Dreamtides.Utils;
-
 using UnityEngine;
 
 namespace Dreamtides.Services
 {
   public class JudgmentService : Service
   {
-    [SerializeField] float _durationMultiplier = 1f;
-    [SerializeField] float _shakeStrength = 0.5f;
-    [SerializeField] int _shakeVibrato = 10;
-    [SerializeField] AudioClip _startSound = null!;
-    [SerializeField] AudioClip _windUpSound = null!;
-    [SerializeField] AudioClip _pointsSound = null!;
-    [SerializeField] TimedEffect _hitEffectPrefab = null!;
-    [SerializeField] Projectile _scorePointsProjectilePrefab = null!;
+    [SerializeField]
+    float _durationMultiplier = 1f;
+
+    [SerializeField]
+    float _shakeStrength = 0.5f;
+
+    [SerializeField]
+    int _shakeVibrato = 10;
+
+    [SerializeField]
+    AudioClip _startSound = null!;
+
+    [SerializeField]
+    AudioClip _windUpSound = null!;
+
+    [SerializeField]
+    AudioClip _pointsSound = null!;
+
+    [SerializeField]
+    TimedEffect _hitEffectPrefab = null!;
+
+    [SerializeField]
+    Projectile _scorePointsProjectilePrefab = null!;
 
     public IEnumerator HandleDisplayJudgmentCommand(DisplayJudgmentCommand displayJudgment)
     {
@@ -31,13 +45,13 @@ namespace Dreamtides.Services
         // pretty annoying.
         yield break;
       }
-      var actorStatusDisplay = actorIsUser ?
-          Registry.Layout.UserStatusDisplay :
-          Registry.Layout.EnemyStatusDisplay;
+      var actorStatusDisplay = actorIsUser
+        ? Registry.Layout.UserStatusDisplay
+        : Registry.Layout.EnemyStatusDisplay;
       var actorSparkTotal = actorStatusDisplay.TotalSpark.transform;
-      var opponentSparkTotal = actorIsUser ?
-          Registry.Layout.EnemyStatusDisplay.TotalSpark.transform :
-          Registry.Layout.UserStatusDisplay.TotalSpark.transform;
+      var opponentSparkTotal = actorIsUser
+        ? Registry.Layout.EnemyStatusDisplay.TotalSpark.transform
+        : Registry.Layout.UserStatusDisplay.TotalSpark.transform;
       Vector3 actorOriginalPos = actorSparkTotal.position;
       Vector3 opponentOriginalPos = opponentSparkTotal.position;
 
@@ -72,23 +86,34 @@ namespace Dreamtides.Services
       sequence.AppendCallback(() =>
       {
         var hit = Registry.AssetPoolService.Create(_hitEffectPrefab, actorSparkTotal.position);
-        var rotation = Quaternion.LookRotation(transform.position - Registry.Layout.MainCamera.transform.position);
+        var rotation = Quaternion.LookRotation(
+          transform.position - Registry.Layout.MainCamera.transform.position
+        );
         hit.transform.rotation = rotation;
         hit.transform.localScale = 5f * Vector3.one;
         Registry.SoundService.Play(_pointsSound);
-        var projectile = Registry.AssetPoolService.Create(_scorePointsProjectilePrefab, actorSparkTotal.position);
-        StartCoroutine(projectile.Fire(Registry, actorStatusDisplay.transform, new Milliseconds
-        {
-          MillisecondsValue = 500,
-        }, onHit: () =>
-        {
-          actorStatusDisplay.SetScore(displayJudgment.NewScore!.Value, true);
-        }));
+        var projectile = Registry.AssetPoolService.Create(
+          _scorePointsProjectilePrefab,
+          actorSparkTotal.position
+        );
+        StartCoroutine(
+          projectile.Fire(
+            Registry,
+            actorStatusDisplay.transform,
+            new Milliseconds { MillisecondsValue = 500 },
+            onHit: () =>
+            {
+              actorStatusDisplay.SetScore(displayJudgment.NewScore!.Value, true);
+            }
+          )
+        );
       });
 
       // Add shake effect after collision
       var shakeActor = opponentSparkTotal;
-      sequence.Append(shakeActor.DOShakePosition(_durationMultiplier * 0.1f, _shakeStrength, _shakeVibrato));
+      sequence.Append(
+        shakeActor.DOShakePosition(_durationMultiplier * 0.1f, _shakeStrength, _shakeVibrato)
+      );
 
       // Animate both objects returning to their original positions
       sequence.Append(actorSparkTotal.DOMove(actorOriginalPos, _durationMultiplier * 0.1f));

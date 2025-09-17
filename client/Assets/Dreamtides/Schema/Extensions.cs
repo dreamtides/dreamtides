@@ -6,6 +6,7 @@ namespace Dreamtides.Schema
   {
     public string ClientId() => Id.ToString();
   }
+
   public partial class Milliseconds
   {
     public float ToSeconds() => MillisecondsValue / 1000f;
@@ -29,7 +30,7 @@ namespace Dreamtides.Schema
           BattleAction = ActionClass?.BattleAction,
           BattleDisplayAction = ActionClass?.BattleDisplayAction,
           Undo = ActionClass?.Undo,
-        }
+        },
       };
     }
   }

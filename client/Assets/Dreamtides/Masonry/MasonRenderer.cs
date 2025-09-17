@@ -104,21 +104,29 @@ namespace Dreamtides.Masonry
           hoverStyle = Mason.MergeStyles(hoverStyle, node.OnAttachStyle);
           hoverStyle = Mason.MergeStyles(hoverStyle, node.HoverStyle);
 
-          callbacks.SetCallback(Callbacks.Event.MouseEnter, () =>
-          {
-            if (node.EventHandlers?.OnMouseEnter != null)
+          callbacks.SetCallback(
+            Callbacks.Event.MouseEnter,
+            () =>
             {
-              registry.ActionService.PerformAction(node.EventHandlers.OnMouseEnter?.ToGameAction());
-            }
+              if (node.EventHandlers?.OnMouseEnter != null)
+              {
+                registry.ActionService.PerformAction(
+                  node.EventHandlers.OnMouseEnter?.ToGameAction()
+                );
+              }
 
-            ApplyStyle(registry, element, hoverStyle);
-          });
+              ApplyStyle(registry, element, hoverStyle);
+            }
+          );
         }
         else
         {
-          SetCallback(registry, callbacks,
+          SetCallback(
+            registry,
+            callbacks,
             node.EventHandlers?.OnMouseEnter?.ToGameAction(),
-            Callbacks.Event.MouseEnter);
+            Callbacks.Event.MouseEnter
+          );
         }
 
         if (node.PressedStyle != null)
@@ -128,45 +136,57 @@ namespace Dreamtides.Masonry
           pressedStyle = Mason.MergeStyles(pressedStyle, node.OnAttachStyle);
           pressedStyle = Mason.MergeStyles(pressedStyle, node.PressedStyle);
 
-          callbacks.SetCallback(Callbacks.Event.MouseDown, () =>
-          {
-            ApplyStyle(registry, element, pressedStyle);
-
-            if (node.EventHandlers?.OnMouseDown is { } onMouseDown)
+          callbacks.SetCallback(
+            Callbacks.Event.MouseDown,
+            () =>
             {
-              registry.ActionService.PerformAction(onMouseDown.ToGameAction());
+              ApplyStyle(registry, element, pressedStyle);
+
+              if (node.EventHandlers?.OnMouseDown is { } onMouseDown)
+              {
+                registry.ActionService.PerformAction(onMouseDown.ToGameAction());
+              }
             }
-          });
-          callbacks.SetCallback(Callbacks.Event.MouseUp, () =>
-          {
-            var style = new FlexStyle();
-            style = Mason.MergeStyles(style, nodeStyle);
-            style = Mason.MergeStyles(style, node.OnAttachStyle);
-
-            if (node.HoverStyle != null)
+          );
+          callbacks.SetCallback(
+            Callbacks.Event.MouseUp,
+            () =>
             {
-              style = new FlexStyle();
+              var style = new FlexStyle();
               style = Mason.MergeStyles(style, nodeStyle);
               style = Mason.MergeStyles(style, node.OnAttachStyle);
-              style = Mason.MergeStyles(style, node.HoverStyle);
-            }
 
-            ApplyStyle(registry, element, style);
+              if (node.HoverStyle != null)
+              {
+                style = new FlexStyle();
+                style = Mason.MergeStyles(style, nodeStyle);
+                style = Mason.MergeStyles(style, node.OnAttachStyle);
+                style = Mason.MergeStyles(style, node.HoverStyle);
+              }
 
-            if (node.EventHandlers?.OnMouseUp is { } onMouseUp)
-            {
-              registry.ActionService.PerformAction(onMouseUp.ToGameAction());
+              ApplyStyle(registry, element, style);
+
+              if (node.EventHandlers?.OnMouseUp is { } onMouseUp)
+              {
+                registry.ActionService.PerformAction(onMouseUp.ToGameAction());
+              }
             }
-          });
+          );
         }
         else
         {
-          SetCallback(registry, callbacks,
+          SetCallback(
+            registry,
+            callbacks,
             node.EventHandlers?.OnMouseDown?.ToGameAction(),
-            Callbacks.Event.MouseDown);
-          SetCallback(registry, callbacks,
+            Callbacks.Event.MouseDown
+          );
+          SetCallback(
+            registry,
+            callbacks,
             node.EventHandlers?.OnMouseUp?.ToGameAction(),
-            Callbacks.Event.MouseUp);
+            Callbacks.Event.MouseUp
+          );
         }
 
         if (node.OnAttachStyle != null)
@@ -181,21 +201,30 @@ namespace Dreamtides.Masonry
           }
           else
           {
-            callbacks.SetCallback(Callbacks.Event.AttachToPanel, () =>
-            {
-              TweenUtils.ExecuteAfter(0.01f, () =>
+            callbacks.SetCallback(
+              Callbacks.Event.AttachToPanel,
+              () =>
               {
-                ApplyStyle(registry, element, attachStyle);
-              });
-            });
+                TweenUtils.ExecuteAfter(
+                  0.01f,
+                  () =>
+                  {
+                    ApplyStyle(registry, element, attachStyle);
+                  }
+                );
+              }
+            );
           }
 
           if (node.OnAttachStyleDuration != null)
           {
-            TweenUtils.ExecuteAfter(node.OnAttachStyleDuration.MillisecondsValue / 1000f, () =>
-            {
-              ApplyStyle(registry, element, nodeStyle);
-            });
+            TweenUtils.ExecuteAfter(
+              node.OnAttachStyleDuration.MillisecondsValue / 1000f,
+              () =>
+              {
+                ApplyStyle(registry, element, nodeStyle);
+              }
+            );
           }
         }
         else
@@ -203,12 +232,24 @@ namespace Dreamtides.Masonry
           callbacks.SetCallback(Callbacks.Event.AttachToPanel, null);
         }
 
-        SetCallback(registry, callbacks,
-          node.EventHandlers?.OnClick?.ToGameAction(), Callbacks.Event.Click);
-        SetCallback(registry, callbacks,
-          node.EventHandlers?.OnLongPress?.ToGameAction(), Callbacks.Event.LongPress);
-        SetCallback(registry, callbacks,
-          node.EventHandlers?.OnFieldChanged?.ToGameAction(), Callbacks.Event.FieldChanged);
+        SetCallback(
+          registry,
+          callbacks,
+          node.EventHandlers?.OnClick?.ToGameAction(),
+          Callbacks.Event.Click
+        );
+        SetCallback(
+          registry,
+          callbacks,
+          node.EventHandlers?.OnLongPress?.ToGameAction(),
+          Callbacks.Event.LongPress
+        );
+        SetCallback(
+          registry,
+          callbacks,
+          node.EventHandlers?.OnFieldChanged?.ToGameAction(),
+          Callbacks.Event.FieldChanged
+        );
 
         if (node.PressedStyle != null || node.HoverStyle != null || node.EventHandlers != null)
         {
@@ -222,43 +263,62 @@ namespace Dreamtides.Masonry
 
         if (node.HoverStyle != null || node.PressedStyle != null)
         {
-          callbacks.SetCallback(Callbacks.Event.MouseLeave, () =>
-          {
-            if (node.EventHandlers?.OnMouseLeave != null)
+          callbacks.SetCallback(
+            Callbacks.Event.MouseLeave,
+            () =>
             {
-              registry.ActionService.PerformAction(node.EventHandlers.OnMouseLeave?.ToGameAction());
-            }
+              if (node.EventHandlers?.OnMouseLeave != null)
+              {
+                registry.ActionService.PerformAction(
+                  node.EventHandlers.OnMouseLeave?.ToGameAction()
+                );
+              }
 
-            var originalStyle = new FlexStyle();
-            originalStyle = Mason.MergeStyles(originalStyle, node.Style);
-            originalStyle = Mason.MergeStyles(originalStyle, node.OnAttachStyle);
-            ApplyStyle(registry, element, originalStyle);
-          });
+              var originalStyle = new FlexStyle();
+              originalStyle = Mason.MergeStyles(originalStyle, node.Style);
+              originalStyle = Mason.MergeStyles(originalStyle, node.OnAttachStyle);
+              ApplyStyle(registry, element, originalStyle);
+            }
+          );
         }
         else
         {
-          SetCallback(registry, callbacks,
+          SetCallback(
+            registry,
+            callbacks,
             node.EventHandlers?.OnMouseLeave?.ToGameAction(),
-            Callbacks.Event.MouseLeave);
+            Callbacks.Event.MouseLeave
+          );
         }
       }
       else
       {
         if (node.PressedStyle != null || node.HoverStyle != null || node.EventHandlers != null)
         {
-          registry.LoggingService.LogError("MasonRenderer", $"Custom element {element} cannot have interaction");
+          registry.LoggingService.LogError(
+            "MasonRenderer",
+            $"Custom element {element} cannot have interaction"
+          );
         }
       }
     }
 
-    static void SetCallback(Registry registry, INodeCallbacks element, GameAction? action, Callbacks.Event eventType)
+    static void SetCallback(
+      Registry registry,
+      INodeCallbacks element,
+      GameAction? action,
+      Callbacks.Event eventType
+    )
     {
       if (action != null)
       {
-        element.SetCallback(eventType, () =>
-        {
-          registry.ActionService.PerformAction(action);
-        });
+        element.SetCallback(
+          eventType,
+          () =>
+          {
+            registry.ActionService.PerformAction(action);
+          }
+        );
       }
       else
       {
@@ -271,13 +331,14 @@ namespace Dreamtides.Masonry
       label.text = text.Label;
     }
 
-    public static Color ToUnityColor(DisplayColor color) => new(
-      (float)color.Red, (float)color.Green, (float)color.Blue, (float)color.Alpha);
+    public static Color ToUnityColor(DisplayColor color) =>
+      new((float)color.Red, (float)color.Green, (float)color.Blue, (float)color.Alpha);
 
     static StyleColor AdaptColor(DisplayColor? color) =>
       color == null ? new StyleColor(StyleKeyword.Null) : ToUnityColor(color);
 
-    static StyleFloat AdaptFloat(double? input) => (float?)input ?? new StyleFloat(StyleKeyword.Null);
+    static StyleFloat AdaptFloat(double? input) =>
+      (float?)input ?? new StyleFloat(StyleKeyword.Null);
 
     static StyleInt AdaptInt(long? input) => (int?)input ?? new StyleInt(StyleKeyword.Null);
 
@@ -290,38 +351,51 @@ namespace Dreamtides.Masonry
     static StyleLength AdaptDimension(Registry registry, Dimension? dimension) =>
       dimension is { } d ? AdaptDimensionNonNull(registry, d) : new StyleLength(StyleKeyword.Null);
 
-    static Length AdaptDimensionNonNull(Registry registry, Dimension dimension) => dimension.Unit switch
-    {
-      DimensionUnit.Pixels => new Length((float)dimension.Value),
-      DimensionUnit.Percentage => Length.Percent((float)dimension.Value),
-      DimensionUnit.ViewportWidth => new Length(
-        registry.DocumentService.ScreenPxToElementPx(
-          (float)dimension.Value / 100 * Screen.safeArea.width)),
-      DimensionUnit.ViewportHeight => new Length(
-        registry.DocumentService.ScreenPxToElementPx(
-          (float)dimension.Value / 100 * Screen.safeArea.height)),
-      DimensionUnit.SafeAreaTopInset => new Length((float)(registry.DocumentService.GetSafeArea().Top.Value +
-          dimension.Value)),
-      DimensionUnit.SafeAreaRightInset => new Length((float)(registry.DocumentService.GetSafeArea().Right.Value +
-          dimension.Value)),
-      DimensionUnit.SafeAreaBottomInset => new Length((float)(registry.DocumentService.GetSafeArea().Bottom.Value +
-          dimension.Value)),
-      DimensionUnit.SafeAreaLeftInset => new Length((float)(registry.DocumentService.GetSafeArea().Left.Value +
-          dimension.Value)),
-      _ => throw Errors.UnknownEnumValue(dimension.Unit)
-    };
+    static Length AdaptDimensionNonNull(Registry registry, Dimension dimension) =>
+      dimension.Unit switch
+      {
+        DimensionUnit.Pixels => new Length((float)dimension.Value),
+        DimensionUnit.Percentage => Length.Percent((float)dimension.Value),
+        DimensionUnit.ViewportWidth => new Length(
+          registry.DocumentService.ScreenPxToElementPx(
+            (float)dimension.Value / 100 * Screen.safeArea.width
+          )
+        ),
+        DimensionUnit.ViewportHeight => new Length(
+          registry.DocumentService.ScreenPxToElementPx(
+            (float)dimension.Value / 100 * Screen.safeArea.height
+          )
+        ),
+        DimensionUnit.SafeAreaTopInset => new Length(
+          (float)(registry.DocumentService.GetSafeArea().Top.Value + dimension.Value)
+        ),
+        DimensionUnit.SafeAreaRightInset => new Length(
+          (float)(registry.DocumentService.GetSafeArea().Right.Value + dimension.Value)
+        ),
+        DimensionUnit.SafeAreaBottomInset => new Length(
+          (float)(registry.DocumentService.GetSafeArea().Bottom.Value + dimension.Value)
+        ),
+        DimensionUnit.SafeAreaLeftInset => new Length(
+          (float)(registry.DocumentService.GetSafeArea().Left.Value + dimension.Value)
+        ),
+        _ => throw Errors.UnknownEnumValue(dimension.Unit),
+      };
 
-    static StyleEnum<Align> AdaptAlign(FlexAlign? input) => input switch
-    {
-      FlexAlign.Auto => Align.Auto,
-      FlexAlign.FlexStart => Align.FlexStart,
-      FlexAlign.Center => Align.Center,
-      FlexAlign.FlexEnd => Align.FlexEnd,
-      FlexAlign.Stretch => Align.Stretch,
-      _ => new StyleEnum<Align>(StyleKeyword.Null)
-    };
+    static StyleEnum<Align> AdaptAlign(FlexAlign? input) =>
+      input switch
+      {
+        FlexAlign.Auto => Align.Auto,
+        FlexAlign.FlexStart => Align.FlexStart,
+        FlexAlign.Center => Align.Center,
+        FlexAlign.FlexEnd => Align.FlexEnd,
+        FlexAlign.Stretch => Align.Stretch,
+        _ => new StyleEnum<Align>(StyleKeyword.Null),
+      };
 
-    static StyleList<TResult> AdaptList<TSource, TResult>(IList<TSource>? field, Func<TSource, TResult> selector) =>
+    static StyleList<TResult> AdaptList<TSource, TResult>(
+      IList<TSource>? field,
+      Func<TSource, TResult> selector
+    ) =>
       field == null || field.Count == 0
         ? new StyleList<TResult>(StyleKeyword.Null)
         : new StyleList<TResult>(field.Select(selector).ToList());
@@ -353,7 +427,7 @@ namespace Dreamtides.Masonry
       {
         FlexDisplayStyle.Flex => DisplayStyle.Flex,
         FlexDisplayStyle.None => DisplayStyle.None,
-        _ => new StyleEnum<DisplayStyle>(StyleKeyword.Null)
+        _ => new StyleEnum<DisplayStyle>(StyleKeyword.Null),
       };
       e.style.flexBasis = AdaptDimension(registry, input?.FlexBasis);
       e.style.flexDirection = input?.FlexDirection switch
@@ -362,7 +436,7 @@ namespace Dreamtides.Masonry
         Schema.FlexDirection.ColumnReverse => UnityEngine.UIElements.FlexDirection.ColumnReverse,
         Schema.FlexDirection.Row => UnityEngine.UIElements.FlexDirection.Row,
         Schema.FlexDirection.RowReverse => UnityEngine.UIElements.FlexDirection.RowReverse,
-        _ => new StyleEnum<UnityEngine.UIElements.FlexDirection>(StyleKeyword.Null)
+        _ => new StyleEnum<UnityEngine.UIElements.FlexDirection>(StyleKeyword.Null),
       };
       e.style.flexGrow = AdaptFloat(input?.FlexGrow);
       e.style.flexShrink = AdaptFloat(input?.FlexShrink);
@@ -371,7 +445,7 @@ namespace Dreamtides.Masonry
         FlexWrap.NoWrap => Wrap.NoWrap,
         FlexWrap.Wrap => Wrap.Wrap,
         FlexWrap.WrapReverse => Wrap.WrapReverse,
-        _ => new StyleEnum<Wrap>(StyleKeyword.Null)
+        _ => new StyleEnum<Wrap>(StyleKeyword.Null),
       };
       e.style.fontSize = AdaptDimension(registry, input?.FontSize);
       e.style.height = AdaptDimension(registry, input?.Height);
@@ -382,7 +456,7 @@ namespace Dreamtides.Masonry
         FlexJustify.FlexEnd => Justify.FlexEnd,
         FlexJustify.SpaceBetween => Justify.SpaceBetween,
         FlexJustify.SpaceAround => Justify.SpaceAround,
-        _ => new StyleEnum<Justify>(StyleKeyword.Null)
+        _ => new StyleEnum<Justify>(StyleKeyword.Null),
       };
       e.style.letterSpacing = AdaptDimension(registry, input?.LetterSpacing);
       e.style.marginTop = AdaptDimension(registry, input?.Margin?.Top);
@@ -398,7 +472,7 @@ namespace Dreamtides.Masonry
       {
         FlexVisibility.Visible => Overflow.Visible,
         FlexVisibility.Hidden => Overflow.Hidden,
-        _ => new StyleEnum<Overflow>(StyleKeyword.Null)
+        _ => new StyleEnum<Overflow>(StyleKeyword.Null),
       };
       e.style.paddingTop = AdaptDimension(registry, input?.Padding?.Top);
       e.style.paddingRight = AdaptDimension(registry, input?.Padding?.Right);
@@ -408,64 +482,88 @@ namespace Dreamtides.Masonry
       {
         FlexPosition.Relative => UnityEngine.UIElements.Position.Relative,
         FlexPosition.Absolute => UnityEngine.UIElements.Position.Absolute,
-        _ => new StyleEnum<UnityEngine.UIElements.Position>(StyleKeyword.Null)
+        _ => new StyleEnum<UnityEngine.UIElements.Position>(StyleKeyword.Null),
       };
       e.style.rotate = input?.Rotate is { } r
         ? new Rotate(Angle.Degrees((float)r.Degrees))
         : new StyleRotate(StyleKeyword.Null);
-      e.style.scale = input?.Scale is { } s ? new Scale(AdaptVector3(s.Amount)) : new StyleScale(StyleKeyword.Null);
+      e.style.scale = input?.Scale is { } s
+        ? new Scale(AdaptVector3(s.Amount))
+        : new StyleScale(StyleKeyword.Null);
       e.style.textOverflow = input?.TextOverflow switch
       {
         Schema.TextOverflow.Clip => UnityEngine.UIElements.TextOverflow.Clip,
         Schema.TextOverflow.Ellipsis => UnityEngine.UIElements.TextOverflow.Ellipsis,
-        _ => new StyleEnum<UnityEngine.UIElements.TextOverflow>(StyleKeyword.Null)
+        _ => new StyleEnum<UnityEngine.UIElements.TextOverflow>(StyleKeyword.Null),
       };
       e.style.textShadow = input?.TextShadow is { } ts
         ? new UnityEngine.UIElements.TextShadow
         {
           offset = AdaptVector2(ts.Offset),
           blurRadius = (float)ts.BlurRadius,
-          color = ts.Color == null ? Color.black : ToUnityColor(ts.Color)
+          color = ts.Color == null ? Color.black : ToUnityColor(ts.Color),
         }
         : new StyleTextShadow(StyleKeyword.Null);
       e.style.transformOrigin = input?.TransformOrigin is { } to
-        ? new TransformOrigin(AdaptDimensionNonNull(registry, to.X), AdaptDimensionNonNull(registry, to.Y), (float)to.Z)
+        ? new TransformOrigin(
+          AdaptDimensionNonNull(registry, to.X),
+          AdaptDimensionNonNull(registry, to.Y),
+          (float)to.Z
+        )
         : new StyleTransformOrigin(StyleKeyword.Null);
-      e.style.transitionDelay =
-        AdaptList(input?.TransitionDelays, t => new TimeValue(t.MillisecondsValue, TimeUnit.Millisecond));
-      e.style.transitionDuration = AdaptList(input?.TransitionDurations,
-        t => new TimeValue(t.MillisecondsValue, TimeUnit.Millisecond));
-      e.style.transitionProperty = AdaptList(input?.TransitionProperties, p => new StylePropertyName(p));
-      e.style.transitionTimingFunction = AdaptList(input?.TransitionEasingModes, mode => new EasingFunction(mode switch
-      {
-        Schema.EasingMode.Ease => UnityEngine.UIElements.EasingMode.Ease,
-        Schema.EasingMode.EaseIn => UnityEngine.UIElements.EasingMode.EaseIn,
-        Schema.EasingMode.EaseOut => UnityEngine.UIElements.EasingMode.EaseOut,
-        Schema.EasingMode.EaseInOut => UnityEngine.UIElements.EasingMode.EaseInOut,
-        Schema.EasingMode.Linear => UnityEngine.UIElements.EasingMode.Linear,
-        Schema.EasingMode.EaseInSine => UnityEngine.UIElements.EasingMode.EaseInSine,
-        Schema.EasingMode.EaseOutSine => UnityEngine.UIElements.EasingMode.EaseOutSine,
-        Schema.EasingMode.EaseInOutSine => UnityEngine.UIElements.EasingMode.EaseInOutSine,
-        Schema.EasingMode.EaseInCubic => UnityEngine.UIElements.EasingMode.EaseInCubic,
-        Schema.EasingMode.EaseOutCubic => UnityEngine.UIElements.EasingMode.EaseOutCubic,
-        Schema.EasingMode.EaseInOutCubic => UnityEngine.UIElements.EasingMode.EaseInOutCubic,
-        Schema.EasingMode.EaseInCirc => UnityEngine.UIElements.EasingMode.EaseInCirc,
-        Schema.EasingMode.EaseOutCirc => UnityEngine.UIElements.EasingMode.EaseOutCirc,
-        Schema.EasingMode.EaseInOutCirc => UnityEngine.UIElements.EasingMode.EaseInOutCirc,
-        Schema.EasingMode.EaseInElastic => UnityEngine.UIElements.EasingMode.EaseInElastic,
-        Schema.EasingMode.EaseOutElastic => UnityEngine.UIElements.EasingMode.EaseOutElastic,
-        Schema.EasingMode.EaseInOutElastic => UnityEngine.UIElements.EasingMode.EaseInOutElastic,
-        Schema.EasingMode.EaseInBack => UnityEngine.UIElements.EasingMode.EaseInBack,
-        Schema.EasingMode.EaseOutBack => UnityEngine.UIElements.EasingMode.EaseOutBack,
-        Schema.EasingMode.EaseInOutBack => UnityEngine.UIElements.EasingMode.EaseInOutBack,
-        Schema.EasingMode.EaseInBounce => UnityEngine.UIElements.EasingMode.EaseInBounce,
-        Schema.EasingMode.EaseOutBounce => UnityEngine.UIElements.EasingMode.EaseOutBounce,
-        Schema.EasingMode.EaseInOutBounce => UnityEngine.UIElements.EasingMode.EaseInOutBounce,
-        _ => UnityEngine.UIElements.EasingMode.Ease
-      }));
+      e.style.transitionDelay = AdaptList(
+        input?.TransitionDelays,
+        t => new TimeValue(t.MillisecondsValue, TimeUnit.Millisecond)
+      );
+      e.style.transitionDuration = AdaptList(
+        input?.TransitionDurations,
+        t => new TimeValue(t.MillisecondsValue, TimeUnit.Millisecond)
+      );
+      e.style.transitionProperty = AdaptList(
+        input?.TransitionProperties,
+        p => new StylePropertyName(p)
+      );
+      e.style.transitionTimingFunction = AdaptList(
+        input?.TransitionEasingModes,
+        mode => new EasingFunction(
+          mode switch
+          {
+            Schema.EasingMode.Ease => UnityEngine.UIElements.EasingMode.Ease,
+            Schema.EasingMode.EaseIn => UnityEngine.UIElements.EasingMode.EaseIn,
+            Schema.EasingMode.EaseOut => UnityEngine.UIElements.EasingMode.EaseOut,
+            Schema.EasingMode.EaseInOut => UnityEngine.UIElements.EasingMode.EaseInOut,
+            Schema.EasingMode.Linear => UnityEngine.UIElements.EasingMode.Linear,
+            Schema.EasingMode.EaseInSine => UnityEngine.UIElements.EasingMode.EaseInSine,
+            Schema.EasingMode.EaseOutSine => UnityEngine.UIElements.EasingMode.EaseOutSine,
+            Schema.EasingMode.EaseInOutSine => UnityEngine.UIElements.EasingMode.EaseInOutSine,
+            Schema.EasingMode.EaseInCubic => UnityEngine.UIElements.EasingMode.EaseInCubic,
+            Schema.EasingMode.EaseOutCubic => UnityEngine.UIElements.EasingMode.EaseOutCubic,
+            Schema.EasingMode.EaseInOutCubic => UnityEngine.UIElements.EasingMode.EaseInOutCubic,
+            Schema.EasingMode.EaseInCirc => UnityEngine.UIElements.EasingMode.EaseInCirc,
+            Schema.EasingMode.EaseOutCirc => UnityEngine.UIElements.EasingMode.EaseOutCirc,
+            Schema.EasingMode.EaseInOutCirc => UnityEngine.UIElements.EasingMode.EaseInOutCirc,
+            Schema.EasingMode.EaseInElastic => UnityEngine.UIElements.EasingMode.EaseInElastic,
+            Schema.EasingMode.EaseOutElastic => UnityEngine.UIElements.EasingMode.EaseOutElastic,
+            Schema.EasingMode.EaseInOutElastic => UnityEngine
+              .UIElements
+              .EasingMode
+              .EaseInOutElastic,
+            Schema.EasingMode.EaseInBack => UnityEngine.UIElements.EasingMode.EaseInBack,
+            Schema.EasingMode.EaseOutBack => UnityEngine.UIElements.EasingMode.EaseOutBack,
+            Schema.EasingMode.EaseInOutBack => UnityEngine.UIElements.EasingMode.EaseInOutBack,
+            Schema.EasingMode.EaseInBounce => UnityEngine.UIElements.EasingMode.EaseInBounce,
+            Schema.EasingMode.EaseOutBounce => UnityEngine.UIElements.EasingMode.EaseOutBounce,
+            Schema.EasingMode.EaseInOutBounce => UnityEngine.UIElements.EasingMode.EaseInOutBounce,
+            _ => UnityEngine.UIElements.EasingMode.Ease,
+          }
+        )
+      );
       e.style.translate = input?.Translate is { } translate
-        ? new Translate(AdaptDimensionNonNull(registry, translate.X), AdaptDimensionNonNull(registry, translate.Y),
-          (float)translate.Z)
+        ? new Translate(
+          AdaptDimensionNonNull(registry, translate.X),
+          AdaptDimensionNonNull(registry, translate.Y),
+          (float)translate.Z
+        )
         : new StyleTranslate(StyleKeyword.Null);
       e.style.unityBackgroundImageTintColor = AdaptColor(input?.BackgroundImageTintColor);
       e.style.unityFontDefinition = input?.Font is { } font
@@ -477,13 +575,13 @@ namespace Dreamtides.Masonry
         Schema.FontStyle.Bold => UnityEngine.FontStyle.Bold,
         Schema.FontStyle.Italic => UnityEngine.FontStyle.Italic,
         Schema.FontStyle.BoldAndItalic => UnityEngine.FontStyle.BoldAndItalic,
-        _ => new StyleEnum<UnityEngine.FontStyle>(StyleKeyword.Null)
+        _ => new StyleEnum<UnityEngine.FontStyle>(StyleKeyword.Null),
       };
       e.style.unityOverflowClipBox = input?.OverflowClipBox switch
       {
         Schema.OverflowClipBox.PaddingBox => UnityEngine.UIElements.OverflowClipBox.PaddingBox,
         Schema.OverflowClipBox.ContentBox => UnityEngine.UIElements.OverflowClipBox.ContentBox,
-        _ => new StyleEnum<UnityEngine.UIElements.OverflowClipBox>(StyleKeyword.Null)
+        _ => new StyleEnum<UnityEngine.UIElements.OverflowClipBox>(StyleKeyword.Null),
       };
       e.style.unityParagraphSpacing = AdaptDimension(registry, input?.ParagraphSpacing);
       e.style.unitySliceTop = AdaptInt(input?.ImageSlice?.Top);
@@ -501,7 +599,7 @@ namespace Dreamtides.Masonry
         TextAlign.LowerLeft => TextAnchor.LowerLeft,
         TextAlign.LowerCenter => TextAnchor.LowerCenter,
         TextAlign.LowerRight => TextAnchor.LowerRight,
-        _ => new StyleEnum<TextAnchor>(StyleKeyword.Null)
+        _ => new StyleEnum<TextAnchor>(StyleKeyword.Null),
       };
       e.style.unityTextOutlineColor = AdaptColor(input?.TextOutlineColor);
       e.style.unityTextOutlineWidth = AdaptFloat(input?.TextOutlineWidth);
@@ -510,19 +608,19 @@ namespace Dreamtides.Masonry
         Schema.TextOverflowPosition.End => UnityEngine.UIElements.TextOverflowPosition.End,
         Schema.TextOverflowPosition.Start => UnityEngine.UIElements.TextOverflowPosition.Start,
         Schema.TextOverflowPosition.Middle => UnityEngine.UIElements.TextOverflowPosition.Middle,
-        _ => new StyleEnum<UnityEngine.UIElements.TextOverflowPosition>(StyleKeyword.Null)
+        _ => new StyleEnum<UnityEngine.UIElements.TextOverflowPosition>(StyleKeyword.Null),
       };
       e.style.visibility = input?.Visibility switch
       {
         FlexVisibility.Visible => Visibility.Visible,
         FlexVisibility.Hidden => Visibility.Hidden,
-        _ => new StyleEnum<Visibility>(StyleKeyword.Null)
+        _ => new StyleEnum<Visibility>(StyleKeyword.Null),
       };
       e.style.whiteSpace = input?.WhiteSpace switch
       {
         Schema.WhiteSpace.Normal => UnityEngine.UIElements.WhiteSpace.Normal,
         Schema.WhiteSpace.NoWrap => UnityEngine.UIElements.WhiteSpace.NoWrap,
-        _ => new StyleEnum<UnityEngine.UIElements.WhiteSpace>(StyleKeyword.Null)
+        _ => new StyleEnum<UnityEngine.UIElements.WhiteSpace>(StyleKeyword.Null),
       };
       e.style.width = AdaptDimension(registry, input?.Width);
       e.style.wordSpacing = AdaptDimension(registry, input?.WordSpacing);
@@ -542,7 +640,7 @@ namespace Dreamtides.Masonry
         null => PickingMode.Position,
         FlexPickingMode.Position => PickingMode.Position,
         FlexPickingMode.Ignore => PickingMode.Ignore,
-        _ => throw new ArgumentOutOfRangeException()
+        _ => throw new ArgumentOutOfRangeException(),
       };
     }
   }

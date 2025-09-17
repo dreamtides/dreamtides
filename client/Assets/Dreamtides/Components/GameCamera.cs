@@ -6,10 +6,17 @@ namespace Dreamtides.Components
 {
   public class GameCamera : MonoBehaviour
   {
-    [SerializeField] Transform _topLeft = null!;
-    [SerializeField] Transform _bottomLeft = null!;
-    [SerializeField] float _zoomInThreshold = 0.18f;
-    [SerializeField] Camera _camera = null!;
+    [SerializeField]
+    Transform _topLeft = null!;
+
+    [SerializeField]
+    Transform _bottomLeft = null!;
+
+    [SerializeField]
+    float _zoomInThreshold = 0.18f;
+
+    [SerializeField]
+    Camera _camera = null!;
 
     public void AdjustFieldOfView()
     {

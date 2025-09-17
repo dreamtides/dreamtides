@@ -11,8 +11,11 @@ namespace Dreamtides.Components
 {
   public class DissolveEffect : MonoBehaviour
   {
-    [SerializeField] Renderer _target = null!;
-    [SerializeField] Material _originalMaterial = null!;
+    [SerializeField]
+    Renderer _target = null!;
+
+    [SerializeField]
+    Material _originalMaterial = null!;
     bool _running = false;
     float _clipValue = 0;
     bool _reverse = false;
@@ -36,23 +39,27 @@ namespace Dreamtides.Components
 
       var material = Instantiate(registry.AssetService.GetMaterial(command.Material));
       material.mainTexture = _target.material.mainTexture;
-      AdvancedDissolveKeywords.SetKeyword(
-          material,
-          AdvancedDissolveKeywords.State.Enabled, true);
+      AdvancedDissolveKeywords.SetKeyword(material, AdvancedDissolveKeywords.State.Enabled, true);
       AdvancedDissolveProperties.Cutout.Standard.UpdateLocalProperty(
-          material,
-          AdvancedDissolveProperties.Cutout.Standard.Property.Clip, _reverse ? 1f : 0f);
+        material,
+        AdvancedDissolveProperties.Cutout.Standard.Property.Clip,
+        _reverse ? 1f : 0f
+      );
       AdvancedDissolveProperties.Edge.Base.UpdateLocalProperty(
-          material,
-          AdvancedDissolveProperties.Edge.Base.Property.Color, MasonRenderer.ToUnityColor(command.Color));
+        material,
+        AdvancedDissolveProperties.Edge.Base.Property.Color,
+        MasonRenderer.ToUnityColor(command.Color)
+      );
       AdvancedDissolveProperties.Edge.Base.UpdateLocalProperty(
-          material,
-          AdvancedDissolveProperties.Edge.Base.Property.ColorIntensity,
-          Random.Range(5f, 8f));
+        material,
+        AdvancedDissolveProperties.Edge.Base.Property.ColorIntensity,
+        Random.Range(5f, 8f)
+      );
       AdvancedDissolveProperties.Edge.Base.UpdateLocalProperty(
-          material,
-          AdvancedDissolveProperties.Edge.Base.Property.Shape,
-          AdvancedDissolveProperties.Edge.Base.Shape.Smoother);
+        material,
+        AdvancedDissolveProperties.Edge.Base.Property.Shape,
+        AdvancedDissolveProperties.Edge.Base.Shape.Smoother
+      );
       _target.material = material;
       _running = true;
       yield return new WaitUntil(() => !_running);
@@ -70,7 +77,8 @@ namespace Dreamtides.Components
       AdvancedDissolveProperties.Cutout.Standard.UpdateLocalProperty(
         _target.material,
         AdvancedDissolveProperties.Cutout.Standard.Property.Clip,
-        _clipValue);
+        _clipValue
+      );
 
       if (!_soundPlayed && _sound != null && _registry != null)
       {

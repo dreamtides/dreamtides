@@ -14,21 +14,34 @@ namespace Dreamtides.Components
   [Serializable]
   public class MessageContent
   {
-    [SerializeField] GameObject _effect = null!;
+    [SerializeField]
+    GameObject _effect = null!;
     public GameObject Effect => _effect;
 
-    [SerializeField] TextMeshPro _text = null!;
+    [SerializeField]
+    TextMeshPro _text = null!;
     public TextMeshPro Text => _text;
   }
 
   public class GameMessage : MonoBehaviour
   {
-    [SerializeField] Registry _registry = null!;
-    [SerializeField] Transform _top = null!;
-    [SerializeField] MessageContent _yourTurn = null!;
-    [SerializeField] MessageContent _enemyTurn = null!;
-    [SerializeField] MessageContent _victory = null!;
-    [SerializeField] MessageContent _defeat = null!;
+    [SerializeField]
+    Registry _registry = null!;
+
+    [SerializeField]
+    Transform _top = null!;
+
+    [SerializeField]
+    MessageContent _yourTurn = null!;
+
+    [SerializeField]
+    MessageContent _enemyTurn = null!;
+
+    [SerializeField]
+    MessageContent _victory = null!;
+
+    [SerializeField]
+    MessageContent _defeat = null!;
 
     public IEnumerator Show(GameMessageType messageType)
     {
@@ -49,7 +62,7 @@ namespace Dreamtides.Components
         GameMessageType.EnemyTurn => ShowContent(_enemyTurn, 1.75f, moveToTop: false),
         GameMessageType.Victory => ShowContent(_victory, 2f, moveToTop: true),
         GameMessageType.Defeat => ShowContent(_defeat, 2f, moveToTop: true),
-        _ => throw Errors.UnknownEnumValue(messageType)
+        _ => throw Errors.UnknownEnumValue(messageType),
       };
     }
 
@@ -68,7 +81,8 @@ namespace Dreamtides.Components
         _registry.Layout.BattlefieldOverlay.gameObject.SetActive(true);
         _registry.Layout.BattlefieldOverlay.color = new Color(0, 0, 0, 0);
         _registry.Layout.BattlefieldOverlay.DOFade(1.0f, 0.3f);
-        var sequence = TweenUtils.Sequence("MoveToTop")
+        var sequence = TweenUtils
+          .Sequence("MoveToTop")
           .Insert(0, content.Text.transform.DOMove(_top.position, 0.3f));
         sequence.Insert(0, content.Effect.transform.DOMove(_top.position, 0.3f));
         yield return sequence.WaitForCompletion();

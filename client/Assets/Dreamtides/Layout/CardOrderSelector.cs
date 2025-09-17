@@ -6,25 +6,42 @@ using Dreamtides.Utils;
 using UnityEngine;
 
 [assembly: InternalsVisibleTo("Dreamtides.Tests")]
+
 namespace Dreamtides.Layout
 {
   public class CardOrderSelector : AbstractCardBrowser
   {
-    [SerializeField] internal float _initialSpacing = 0.5f;
-    [SerializeField] internal float _initialOffset;
-    [SerializeField] internal GameObject _deckImage = null!;
-    [SerializeField] internal GameObject _voidImage = null!;
-    [SerializeField] internal ObjectLayout _cardOrderSelectorVoid = null!;
+    [SerializeField]
+    internal float _initialSpacing = 0.5f;
+
+    [SerializeField]
+    internal float _initialOffset;
+
+    [SerializeField]
+    internal GameObject _deckImage = null!;
+
+    [SerializeField]
+    internal GameObject _voidImage = null!;
+
+    [SerializeField]
+    internal ObjectLayout _cardOrderSelectorVoid = null!;
 
     public CardOrderSelectorView? View { get; set; }
 
     public override Vector3 CalculateObjectPosition(int index, int count)
     {
-      var offset = CenteredObjectLayout.CalculateOffset(TotalWidth(), _initialSpacing, _cardWidth, index, count);
+      var offset = CenteredObjectLayout.CalculateOffset(
+        TotalWidth(),
+        _initialSpacing,
+        _cardWidth,
+        index,
+        count
+      );
       return _leftEdge.position + new Vector3(offset + _initialOffset, 0, 0);
     }
 
-    public override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
+    public override Vector3? CalculateObjectRotation(int index, int count) =>
+      transform.rotation.eulerAngles;
 
     /// <summary>
     /// Returns the index position within the selector which most closely maps
@@ -50,10 +67,7 @@ namespace Dreamtides.Layout
           CardId = cardId,
           Target = new CardOrderSelectionTarget
           {
-            CardOrderSelectionTargetClass = new CardOrderSelectionTargetClass
-            {
-              Deck = 0,
-            }
+            CardOrderSelectionTargetClass = new CardOrderSelectionTargetClass { Deck = 0 },
           },
         };
       }
@@ -65,10 +79,7 @@ namespace Dreamtides.Layout
           CardId = cardId,
           Target = new CardOrderSelectionTarget
           {
-            CardOrderSelectionTargetClass = new CardOrderSelectionTargetClass
-            {
-              Deck = 0,
-            }
+            CardOrderSelectionTargetClass = new CardOrderSelectionTargetClass { Deck = 0 },
           },
         };
       }
@@ -83,7 +94,7 @@ namespace Dreamtides.Layout
             CardOrderSelectionTargetClass = new CardOrderSelectionTargetClass
             {
               Deck = Objects.Count,
-            }
+            },
           },
         };
       }
@@ -102,8 +113,11 @@ namespace Dreamtides.Layout
             {
               CardOrderSelectionTargetClass = new CardOrderSelectionTargetClass
               {
-                Deck = (targetPosition - currentPosition < nextPosition - targetPosition) ? i + 1 : i + 2,
-              }
+                Deck =
+                  (targetPosition - currentPosition < nextPosition - targetPosition)
+                    ? i + 1
+                    : i + 2,
+              },
             },
           };
         }
@@ -114,10 +128,7 @@ namespace Dreamtides.Layout
         CardId = cardId,
         Target = new CardOrderSelectionTarget
         {
-          CardOrderSelectionTargetClass = new CardOrderSelectionTargetClass
-          {
-            Deck = 0,
-          }
+          CardOrderSelectionTargetClass = new CardOrderSelectionTargetClass { Deck = 0 },
         },
       };
     }

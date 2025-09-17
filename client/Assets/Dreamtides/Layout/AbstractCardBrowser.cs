@@ -9,11 +9,20 @@ namespace Dreamtides.Layout
 {
   public abstract class AbstractCardBrowser : StandardObjectLayout
   {
-    [SerializeField] protected float _cardWidth = 2.5f;
-    [SerializeField] protected Transform _leftEdge = null!;
-    [SerializeField] protected Transform _rightEdge = null!;
-    [SerializeField] protected bool _isOpen = false;
-    [SerializeField] Registry _registry = null!;
+    [SerializeField]
+    protected float _cardWidth = 2.5f;
+
+    [SerializeField]
+    protected Transform _leftEdge = null!;
+
+    [SerializeField]
+    protected Transform _rightEdge = null!;
+
+    [SerializeField]
+    protected bool _isOpen = false;
+
+    [SerializeField]
+    Registry _registry = null!;
 
     protected Registry Registry => Errors.CheckNotNull(_registry);
 

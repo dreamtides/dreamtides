@@ -1,37 +1,66 @@
 #nullable enable
 
+using System.Runtime.CompilerServices;
+using DG.Tweening;
 using Dreamtides.Layout;
+using Dreamtides.Schema;
 using Dreamtides.Services;
 using Dreamtides.Utils;
-using DG.Tweening;
 using TMPro;
 using UnityEngine;
-using Dreamtides.Schema;
-using System.Runtime.CompilerServices;
 using UnityEngine.Serialization;
 
 [assembly: InternalsVisibleTo("Dreamtides.TestUtils")]
+
 namespace Dreamtides.Buttons
 {
   public sealed class ActionButton : Displayable
   {
-    [SerializeField] internal Registry _registry = null!;
-    [SerializeField] internal SpriteRenderer _background = null!;
-    [SerializeField] internal TextMeshPro _text = null!;
-    [FormerlySerializedAs("_onPressedMaterial")]
-    [SerializeField] internal Material _noOutlineMaterial = null!;
-    [SerializeField] internal float _animationDuration = 0.1f;
-    [SerializeField] internal float _moveDistance = 1f;
-    [SerializeField] internal AudioClip _onClickSound = null!;
-    [SerializeField] internal float _fadeDuration = 0.1f;
-    [SerializeField] internal Collider _collider = null!;
-    [SerializeField] internal int _debounceDelayMilliseconds = 500;
+    [SerializeField]
+    internal Registry _registry = null!;
 
-    [SerializeField] Vector3 _originalPosition;
-    [SerializeField] Color _originalColor;
-    [SerializeField] Material _originalMaterial = null!;
-    [SerializeField] Vector3 _originalBackgroundLocalScale;
-    [SerializeField] Vector3 _originalTextLocalScale;
+    [SerializeField]
+    internal SpriteRenderer _background = null!;
+
+    [SerializeField]
+    internal TextMeshPro _text = null!;
+
+    [FormerlySerializedAs("_onPressedMaterial")]
+    [SerializeField]
+    internal Material _noOutlineMaterial = null!;
+
+    [SerializeField]
+    internal float _animationDuration = 0.1f;
+
+    [SerializeField]
+    internal float _moveDistance = 1f;
+
+    [SerializeField]
+    internal AudioClip _onClickSound = null!;
+
+    [SerializeField]
+    internal float _fadeDuration = 0.1f;
+
+    [SerializeField]
+    internal Collider _collider = null!;
+
+    [SerializeField]
+    internal int _debounceDelayMilliseconds = 500;
+
+    [SerializeField]
+    Vector3 _originalPosition;
+
+    [SerializeField]
+    Color _originalColor;
+
+    [SerializeField]
+    Material _originalMaterial = null!;
+
+    [SerializeField]
+    Vector3 _originalBackgroundLocalScale;
+
+    [SerializeField]
+    Vector3 _originalTextLocalScale;
     Sequence? _currentAnimation;
     Sequence? _hideSequence;
     GameAction? _action;
@@ -60,8 +89,7 @@ namespace Dreamtides.Buttons
 
     private void Update()
     {
-      if (_pendingView != null && _showOnIdleDuration.HasValue &&
-      _lastSetViewTime.HasValue)
+      if (_pendingView != null && _showOnIdleDuration.HasValue && _lastSetViewTime.HasValue)
       {
         float elapsedTime = Time.time - _lastSetViewTime.Value;
         if (elapsedTime >= _showOnIdleDuration.Value)
@@ -74,7 +102,12 @@ namespace Dreamtides.Buttons
       if (now - _lastIdlePollTime >= 1f)
       {
         _lastIdlePollTime = now;
-        if (!_hasRestoredAfterIdle && now - _lastInteractionTime >= 1f && _initialized && !_isAnimating)
+        if (
+          !_hasRestoredAfterIdle
+          && now - _lastInteractionTime >= 1f
+          && _initialized
+          && !_isAnimating
+        )
         {
           RestoreDefaults();
           _hasRestoredAfterIdle = true;
@@ -195,7 +228,9 @@ namespace Dreamtides.Buttons
           _text.gameObject.SetActive(true);
           _collider.enabled = true;
           Sequence showSequence = TweenUtils.Sequence("ButtonShowAnimation");
-          showSequence.Join(_background.transform.DOScale(_originalBackgroundLocalScale, _fadeDuration));
+          showSequence.Join(
+            _background.transform.DOScale(_originalBackgroundLocalScale, _fadeDuration)
+          );
           showSequence.Join(_text.transform.DOScale(_originalTextLocalScale, _fadeDuration));
           showSequence.OnComplete(() => _isAnimating = false);
         }
@@ -210,13 +245,16 @@ namespace Dreamtides.Buttons
     public override void MouseDown()
     {
       MarkInteraction();
-      if (_action == null) return;
+      if (_action == null)
+        return;
       MaybeInitialize();
 
       var currentTime = Time.time;
       if (currentTime - _lastClickTime < (_debounceDelayMilliseconds / 1000f))
       {
-        _registry.LoggingService.LogWarning($"Ignoring click <{_debounceDelayMilliseconds}ms after previous");
+        _registry.LoggingService.LogWarning(
+          $"Ignoring click <{_debounceDelayMilliseconds}ms after previous"
+        );
         _ignoreClick = true;
         return;
       }
@@ -225,17 +263,23 @@ namespace Dreamtides.Buttons
       _lastClickTime = currentTime;
 
       _currentAnimation?.Kill();
-      Vector3 directionFromCamera = (transform.position - _registry.Layout.MainCamera.transform.position).normalized;
+      Vector3 directionFromCamera = (
+        transform.position - _registry.Layout.MainCamera.transform.position
+      ).normalized;
       Vector3 targetPosition = transform.position + directionFromCamera * _moveDistance;
       _currentAnimation = TweenUtils.Sequence("ButtonPressAnimation");
       _currentAnimation.Insert(0, transform.DOMove(targetPosition, _animationDuration));
-      _currentAnimation.Insert(0, _background.DOColor(new Color(0.8f, 0.8f, 0.8f), _animationDuration));
+      _currentAnimation.Insert(
+        0,
+        _background.DOColor(new Color(0.8f, 0.8f, 0.8f), _animationDuration)
+      );
     }
 
     public override void MouseUp(bool isSameObject)
     {
       MarkInteraction();
-      if (_action == null) return;
+      if (_action == null)
+        return;
       if (_ignoreClick)
       {
         _ignoreClick = false;

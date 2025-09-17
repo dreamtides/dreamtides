@@ -10,10 +10,17 @@ namespace Dreamtides.Services
 {
   public class DreamwellActivationService : Service
   {
-    [SerializeField] float _displayPauseDurationSeconds;
-    [SerializeField] float _durationMultiplier = 1f;
-    [SerializeField] AudioClip _startSound = null!;
-    [SerializeField] AudioClip _revealSound = null!;
+    [SerializeField]
+    float _displayPauseDurationSeconds;
+
+    [SerializeField]
+    float _durationMultiplier = 1f;
+
+    [SerializeField]
+    AudioClip _startSound = null!;
+
+    [SerializeField]
+    AudioClip _revealSound = null!;
 
     public IEnumerator HandleDreamwellActivationCommand(DisplayDreamwellActivationCommand command)
     {
@@ -40,10 +47,12 @@ namespace Dreamtides.Services
       moveSequence.Insert(
         0,
         card.transform.DOMove(Registry.Layout.DreamwellDisplay.position, moveDuration)
-          .SetEase(Ease.OutCubic));
+          .SetEase(Ease.OutCubic)
+      );
       moveSequence.Insert(
         0,
-        card.transform.DORotate(Registry.Layout.DreamwellDisplay.rotation.eulerAngles, moveDuration));
+        card.transform.DORotate(Registry.Layout.DreamwellDisplay.rotation.eulerAngles, moveDuration)
+      );
 
       var flipDuration = TweenUtils.FlipAnimationDurationSeconds / 2f * _durationMultiplier;
 
@@ -60,12 +69,20 @@ namespace Dreamtides.Services
       // Now start the flip sequence
       flipSequence
         .Insert(0, card.transform.DOLocalRotate(flippedAngles, flipDuration))
-        .InsertCallback(flipDuration, () =>
-        {
-          card.TurnFaceUp();
-        })
-        .Insert(flipDuration, card.transform.DOLocalRotate(
-            Registry.Layout.DreamwellDisplay.rotation.eulerAngles, flipDuration));
+        .InsertCallback(
+          flipDuration,
+          () =>
+          {
+            card.TurnFaceUp();
+          }
+        )
+        .Insert(
+          flipDuration,
+          card.transform.DOLocalRotate(
+            Registry.Layout.DreamwellDisplay.rotation.eulerAngles,
+            flipDuration
+          )
+        );
 
       // Wait for both sequences to complete
       yield return moveSequence.WaitForCompletion();

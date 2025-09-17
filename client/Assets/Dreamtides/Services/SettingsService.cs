@@ -4,8 +4,6 @@ namespace Dreamtides.Services
 {
   public class SettingsService : Service
   {
-    public void SyncPreferences()
-    {
-    }
+    public void SyncPreferences() { }
   }
 }

@@ -11,11 +11,20 @@ namespace Dreamtides.Layout
 {
   public class UserHandLayout : ObjectLayout
   {
-    [SerializeField] StandardObjectLayout _layout1 = null!;
-    [SerializeField] StandardObjectLayout? _layout2;
-    [SerializeField] ScrollableUserHandLayout _scrollableHand = null!;
-    [SerializeField] int _useSecondLayoutAfter;
-    [SerializeField] int _useBrowserAfter;
+    [SerializeField]
+    StandardObjectLayout _layout1 = null!;
+
+    [SerializeField]
+    StandardObjectLayout? _layout2;
+
+    [SerializeField]
+    ScrollableUserHandLayout _scrollableHand = null!;
+
+    [SerializeField]
+    int _useSecondLayoutAfter;
+
+    [SerializeField]
+    int _useBrowserAfter;
 
     public override IReadOnlyList<Displayable> Objects
     {
@@ -77,17 +86,23 @@ namespace Dreamtides.Layout
       if (_layout1.Objects.Contains(card))
       {
         return _layout1.CalculateObjectPosition(
-          _layout1.Objects.ToList().IndexOf(card), _layout1.Objects.Count);
+          _layout1.Objects.ToList().IndexOf(card),
+          _layout1.Objects.Count
+        );
       }
       else if (_layout2 && _layout2.Objects.Contains(card))
       {
         return _layout2.CalculateObjectPosition(
-          _layout2.Objects.ToList().IndexOf(card), _layout2.Objects.Count);
+          _layout2.Objects.ToList().IndexOf(card),
+          _layout2.Objects.Count
+        );
       }
       else if (_scrollableHand.Objects.Contains(card))
       {
         return _scrollableHand.CalculateObjectPosition(
-          _scrollableHand.Objects.ToList().IndexOf(card), _scrollableHand.Objects.Count);
+          _scrollableHand.Objects.ToList().IndexOf(card),
+          _scrollableHand.Objects.Count
+        );
       }
 
       return null;
@@ -98,17 +113,23 @@ namespace Dreamtides.Layout
       if (_layout1.Objects.Contains(card))
       {
         return _layout1.CalculateObjectRotation(
-          _layout1.Objects.ToList().IndexOf(card), _layout1.Objects.Count);
+          _layout1.Objects.ToList().IndexOf(card),
+          _layout1.Objects.Count
+        );
       }
       else if (_layout2 && _layout2.Objects.Contains(card))
       {
         return _layout2.CalculateObjectRotation(
-          _layout2.Objects.ToList().IndexOf(card), _layout2.Objects.Count);
+          _layout2.Objects.ToList().IndexOf(card),
+          _layout2.Objects.Count
+        );
       }
       else if (_scrollableHand.Objects.Contains(card))
       {
         return _scrollableHand.CalculateObjectRotation(
-          _scrollableHand.Objects.ToList().IndexOf(card), _scrollableHand.Objects.Count);
+          _scrollableHand.Objects.ToList().IndexOf(card),
+          _scrollableHand.Objects.Count
+        );
       }
 
       return null;
@@ -153,7 +174,6 @@ namespace Dreamtides.Layout
 
       RebalanceLayouts();
     }
-
 
     void RebalanceLayouts()
     {

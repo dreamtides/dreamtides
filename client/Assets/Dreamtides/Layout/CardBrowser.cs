@@ -7,16 +7,28 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [assembly: InternalsVisibleTo("Dreamtides.Tests")]
+
 namespace Dreamtides.Layout
 {
   public class CardBrowser : AbstractCardBrowser
   {
-    [SerializeField] internal float _scrollAmount;
-    [SerializeField] internal Scrollbar _scrollbar = null!;
-    [SerializeField] internal CloseBrowserButton _closeButton = null!;
-    [SerializeField] internal float _maxStackOffsetRight = 1f;
-    [SerializeField] internal Transform _largeCardPosition = null!;
-    [SerializeField] internal Transform _twoCardsPosition = null!;
+    [SerializeField]
+    internal float _scrollAmount;
+
+    [SerializeField]
+    internal Scrollbar _scrollbar = null!;
+
+    [SerializeField]
+    internal CloseBrowserButton _closeButton = null!;
+
+    [SerializeField]
+    internal float _maxStackOffsetRight = 1f;
+
+    [SerializeField]
+    internal Transform _largeCardPosition = null!;
+
+    [SerializeField]
+    internal Transform _twoCardsPosition = null!;
 
     public override void Show(Registry registry, Sequence? sequence)
     {
@@ -83,10 +95,12 @@ namespace Dreamtides.Layout
       return new Vector3(
         SmoothedOffset(index, count, Mathf.Clamp01(_scrollAmount)),
         transform.position.y,
-        _leftEdge.position.z);
+        _leftEdge.position.z
+      );
     }
 
-    public override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
+    public override Vector3? CalculateObjectRotation(int index, int count) =>
+      transform.rotation.eulerAngles;
 
     protected override void OnUpdate()
     {

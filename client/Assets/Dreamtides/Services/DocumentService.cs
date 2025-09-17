@@ -13,7 +13,8 @@ namespace Dreamtides.Services
 {
   public class DocumentService : Service
   {
-    [SerializeField] UIDocument _document = null!;
+    [SerializeField]
+    UIDocument _document = null!;
     IMasonElement _infoZoom = null!;
     IMasonElement _screenOverlay = null!;
     IMasonElement _effectPreviewOverlay = null!;
@@ -61,10 +62,11 @@ namespace Dreamtides.Services
     {
       if (Registry.Layout.Browser.Objects.Count > 0)
       {
-        return new HashSet<GameContext> {
+        return new HashSet<GameContext>
+        {
           GameContext.Browser,
           GameContext.Hand,
-          GameContext.PrimaryActionButton
+          GameContext.PrimaryActionButton,
         };
       }
 
@@ -128,9 +130,9 @@ namespace Dreamtides.Services
       var safeLeftTop = RuntimePanelUtils.ScreenToPanel(
         panel,
         new Vector2(
-            UnityEngine.Device.Screen.safeArea.xMin,
-            UnityEngine.Device.Screen.height - UnityEngine.Device.Screen.safeArea.yMax
-          )
+          UnityEngine.Device.Screen.safeArea.xMin,
+          UnityEngine.Device.Screen.height - UnityEngine.Device.Screen.safeArea.yMax
+        )
       );
       var safeRightBottom = RuntimePanelUtils.ScreenToPanel(
         panel,
@@ -141,26 +143,30 @@ namespace Dreamtides.Services
       );
 
       return Mason.GroupPx(
-          top: safeLeftTop.y,
-          right: safeRightBottom.x,
-          bottom: safeRightBottom.y,
-          left: safeLeftTop.x);
+        top: safeLeftTop.y,
+        right: safeRightBottom.x,
+        bottom: safeRightBottom.y,
+        left: safeLeftTop.x
+      );
     }
 
     void AddChild(string elementName, out IMasonElement element)
     {
-      var node = Mason.Row(elementName, new FlexStyle
-      {
-        Position = FlexPosition.Absolute,
-        Inset = new FlexInsets()
+      var node = Mason.Row(
+        elementName,
+        new FlexStyle
         {
-          Bottom = Mason.Px(0),
-          Left = Mason.Px(0),
-          Right = Mason.Px(0),
-          Top = Mason.Px(0)
-        },
-        PickingMode = FlexPickingMode.Ignore
-      });
+          Position = FlexPosition.Absolute,
+          Inset = new FlexInsets()
+          {
+            Bottom = Mason.Px(0),
+            Left = Mason.Px(0),
+            Right = Mason.Px(0),
+            Top = Mason.Px(0),
+          },
+          PickingMode = FlexPickingMode.Ignore,
+        }
+      );
       var container = MasonRenderer.Render(Registry, node);
       var result = new NodeVisualElement();
       container.Self.Add(result);

@@ -1,11 +1,11 @@
 #nullable enable
 
 using System.Collections;
-using NUnit.Framework;
-using UnityEngine.TestTools;
+using Dreamtides.Schema;
 using Dreamtides.Services;
 using Dreamtides.TestUtils;
-using Dreamtides.Schema;
+using NUnit.Framework;
+using UnityEngine.TestTools;
 
 namespace Dreamtides.Tests
 {
@@ -21,25 +21,27 @@ namespace Dreamtides.Tests
     public IEnumerator TestTriggeredAbility()
     {
       yield return Connect();
-      yield return PerformAction(TestBattle.New()
-        .RemovePlayerHands()
-        .Build()
-      );
-      yield return PerformAddCardAction(TestBattle.New()
-        .AddCardToHand(DisplayPlayer.User, TestCards.TestVanillaCharacter)
-        .Build()
+      yield return PerformAction(TestBattle.New().RemovePlayerHands().Build());
+      yield return PerformAddCardAction(
+        TestBattle.New().AddCardToHand(DisplayPlayer.User, TestCards.TestVanillaCharacter).Build()
       );
       var vanillaCharacter = Registry.CardService.GetCard(CurrentCardId);
-      yield return PerformAddCardAction(TestBattle.New()
-        .AddCardToHand(DisplayPlayer.User, TestCards.TestTriggerGainSparkWhenMaterializeAnotherCharacter)
-        .Build()
+      yield return PerformAddCardAction(
+        TestBattle
+          .New()
+          .AddCardToHand(
+            DisplayPlayer.User,
+            TestCards.TestTriggerGainSparkWhenMaterializeAnotherCharacter
+          )
+          .Build()
       );
       var triggerCharacter = Registry.CardService.GetCard(CurrentCardId);
 
       yield return TestDragInputProvider.DragTo(
         Registry,
         triggerCharacter,
-        Registry.Layout.DefaultStack);
+        Registry.Layout.DefaultStack
+      );
       yield return WaitForCount(Registry.Layout.UserBattlefield, 1);
 
       Assert.That(triggerCharacter._battlefieldSparkText.text, Is.EqualTo("5"));
@@ -48,7 +50,8 @@ namespace Dreamtides.Tests
       yield return TestDragInputProvider.DragTo(
         Registry,
         vanillaCharacter,
-        Registry.Layout.DefaultStack);
+        Registry.Layout.DefaultStack
+      );
       yield return WaitForCount(Registry.Layout.UserBattlefield, 2);
 
       Assert.That(triggerCharacter._battlefieldSparkText.text, Is.EqualTo("6"));

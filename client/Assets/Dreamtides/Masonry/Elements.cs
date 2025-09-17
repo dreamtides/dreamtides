@@ -25,7 +25,8 @@ namespace Dreamtides.Masonry
 
     VisualElement Self { get; }
 
-    IMasonElement Clone(Registry registry) => MasonRenderer.Render(registry, Errors.CheckNotNull(Node, "Node is null"));
+    IMasonElement Clone(Registry registry) =>
+      MasonRenderer.Render(registry, Errors.CheckNotNull(Node, "Node is null"));
   }
 
   public interface INodeCallbacks : IMasonElement
@@ -53,7 +54,7 @@ namespace Dreamtides.Masonry
       LongPress,
       Change,
       FieldChanged,
-      AttachToPanel
+      AttachToPanel,
     }
 
     readonly HashSet<Event> _registered = new();
@@ -122,14 +123,17 @@ namespace Dreamtides.Masonry
     {
       _mouseDown = true;
       _actions.GetValueOrDefault(Event.MouseDown)?.Invoke();
-      TweenUtils.ExecuteAfter(0.5f, () =>
-      {
-        if (_mouseDown)
+      TweenUtils.ExecuteAfter(
+        0.5f,
+        () =>
         {
-          _firedLongPress = true;
-          _actions.GetValueOrDefault(Event.LongPress)?.Invoke();
+          if (_mouseDown)
+          {
+            _firedLongPress = true;
+            _actions.GetValueOrDefault(Event.LongPress)?.Invoke();
+          }
         }
-      });
+      );
     }
 
     void OnMouseUp(MouseUpEvent evt)

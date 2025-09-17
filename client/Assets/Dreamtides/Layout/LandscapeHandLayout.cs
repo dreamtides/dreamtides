@@ -8,15 +8,32 @@ namespace Dreamtides.Layout
 {
   public class LandscapeHandLayout : StandardObjectLayout
   {
-    [SerializeField] int _zRotationAddition;
-    [SerializeField] int _zRotationMultiplier;
-    [SerializeField] Transform _controlPoint1 = null!;
-    [SerializeField] Transform _controlPoint2 = null!;
-    [SerializeField] Transform _controlPoint3 = null!;
-    [SerializeField] Transform _controlPoint4 = null!;
-    [SerializeField] float _gizmoRadius = 1.0f;
-    [SerializeField] float _objectScale;
-    [SerializeField] float _yRotation;
+    [SerializeField]
+    int _zRotationAddition;
+
+    [SerializeField]
+    int _zRotationMultiplier;
+
+    [SerializeField]
+    Transform _controlPoint1 = null!;
+
+    [SerializeField]
+    Transform _controlPoint2 = null!;
+
+    [SerializeField]
+    Transform _controlPoint3 = null!;
+
+    [SerializeField]
+    Transform _controlPoint4 = null!;
+
+    [SerializeField]
+    float _gizmoRadius = 1.0f;
+
+    [SerializeField]
+    float _objectScale;
+
+    [SerializeField]
+    float _yRotation;
 
     public override Vector3 CalculateObjectPosition(int index, int count)
     {
@@ -29,12 +46,14 @@ namespace Dreamtides.Layout
     {
       var curvePosition = CalculateCurvePosition(index, count);
       return new Vector3(
-          x: Constants.CameraXAngle,
-          y: _yRotation,
-          z: _zRotationAddition + _zRotationMultiplier * CalculateZRotation(curvePosition));
+        x: Constants.CameraXAngle,
+        y: _yRotation,
+        z: _zRotationAddition + _zRotationMultiplier * CalculateZRotation(curvePosition)
+      );
     }
 
-    public override float? CalculateObjectScale(int index, int count) => _objectScale == 0.0 ? null : _objectScale;
+    public override float? CalculateObjectScale(int index, int count) =>
+      _objectScale == 0.0 ? null : _objectScale;
 
     float CalculateCurvePosition(int cardIndex, int cardCount)
     {
@@ -76,10 +95,10 @@ namespace Dreamtides.Layout
     float CalculateZRotation(float t) => -10.0f * t + 5.0f;
 
     Vector3 CalculateBezierPosition(float t) =>
-      Mathf.Pow(1 - t, 3) * ControlPointPosition(1) +
-      3 * Mathf.Pow(1 - t, 2) * t * ControlPointPosition(2) +
-      3 * (1 - t) * Mathf.Pow(t, 2) * ControlPointPosition(3) +
-      Mathf.Pow(t, 3) * ControlPointPosition(4);
+      Mathf.Pow(1 - t, 3) * ControlPointPosition(1)
+      + 3 * Mathf.Pow(1 - t, 2) * t * ControlPointPosition(2)
+      + 3 * (1 - t) * Mathf.Pow(t, 2) * ControlPointPosition(3)
+      + Mathf.Pow(t, 3) * ControlPointPosition(4);
 
     Vector3 ControlPointPosition(int index) =>
       index switch

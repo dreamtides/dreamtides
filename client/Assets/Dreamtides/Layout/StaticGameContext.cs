@@ -9,7 +9,8 @@ namespace Dreamtides.Layout
   /// </summary>
   public class StaticGameContext : MonoBehaviour
   {
-    [SerializeField] GameContext _startingContext;
+    [SerializeField]
+    GameContext _startingContext;
 
     void Start()
     {

@@ -11,12 +11,23 @@ namespace Dreamtides.Buttons
 {
   public class ControlledButton : MonoBehaviour
   {
-    [SerializeField] Registry _registry = null!;
-    [SerializeField] CanvasGroup _canvasGroup = null!;
-    [SerializeField] bool _showing;
-    [SerializeField] TextMeshProUGUI _text = null!;
-    [SerializeField] Color _enabledTextColor = Color.white;
-    [SerializeField] Color _disabledTextColor = new(0.55f, 0.55f, 0.55f, 1f);
+    [SerializeField]
+    Registry _registry = null!;
+
+    [SerializeField]
+    CanvasGroup _canvasGroup = null!;
+
+    [SerializeField]
+    bool _showing;
+
+    [SerializeField]
+    TextMeshProUGUI _text = null!;
+
+    [SerializeField]
+    Color _enabledTextColor = Color.white;
+
+    [SerializeField]
+    Color _disabledTextColor = new(0.55f, 0.55f, 0.55f, 1f);
 
     ButtonView? _view;
     float _lastClickTime = -1f;
@@ -51,7 +62,9 @@ namespace Dreamtides.Buttons
       if (view == null && _showing)
       {
         _showing = false;
-        TweenUtils.FadeOutCanvasGroup(_canvasGroup).OnComplete(() => _canvasGroup.gameObject.SetActive(false));
+        TweenUtils
+          .FadeOutCanvasGroup(_canvasGroup)
+          .OnComplete(() => _canvasGroup.gameObject.SetActive(false));
       }
 
       if (view != null)

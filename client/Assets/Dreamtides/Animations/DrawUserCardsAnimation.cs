@@ -11,7 +11,10 @@ namespace Dreamtides.Animations
 {
   public class DrawUserCardsAnimation
   {
-    public IEnumerator Handle(MoveCardsWithCustomAnimationCommand command, CardAnimationService service)
+    public IEnumerator Handle(
+      MoveCardsWithCustomAnimationCommand command,
+      CardAnimationService service
+    )
     {
       for (var i = 0; i < command.Cards.Count; ++i)
       {
@@ -27,7 +30,12 @@ namespace Dreamtides.Animations
       }
     }
 
-    IEnumerator DrawUserCard(MoveCardsWithCustomAnimationCommand command, int index, bool isLastCard, CardAnimationService service)
+    IEnumerator DrawUserCard(
+      MoveCardsWithCustomAnimationCommand command,
+      int index,
+      bool isLastCard,
+      CardAnimationService service
+    )
     {
       var cardView = command.Cards[index];
       var card = service.Registry.CardService.GetCard(cardView.Id);
@@ -45,11 +53,18 @@ namespace Dreamtides.Animations
       sequence.Insert(
         0,
         card.transform.DOMove(
-          service.Registry.Layout.DrawnCardsPosition.transform.position, moveDuration)
-            .SetEase(Ease.OutCubic));
+            service.Registry.Layout.DrawnCardsPosition.transform.position,
+            moveDuration
+          )
+          .SetEase(Ease.OutCubic)
+      );
       sequence.Insert(
         0,
-        card.transform.DORotateQuaternion(service.Registry.Layout.DrawnCardsPosition.transform.rotation, moveDuration));
+        card.transform.DORotateQuaternion(
+          service.Registry.Layout.DrawnCardsPosition.transform.rotation,
+          moveDuration
+        )
+      );
       yield return new UnityEngine.WaitForSeconds(moveDuration + command.PauseDuration.ToSeconds());
 
       var layout = service.Registry.CardService.LayoutForPosition(command.Destination);

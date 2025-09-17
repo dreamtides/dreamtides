@@ -12,8 +12,11 @@ namespace Dreamtides.Services
 {
   public class StudioService : Service
   {
-    [SerializeField] Studio _studioPrefab = null!;
-    [SerializeField] Transform _studioPosition = null!;
+    [SerializeField]
+    Studio _studioPrefab = null!;
+
+    [SerializeField]
+    Transform _studioPosition = null!;
 
     private Dictionary<StudioType, CaptureSession> _activeSessions = new();
 
@@ -32,7 +35,12 @@ namespace Dreamtides.Services
     /// Captures a live image of a subject prefab and displays it on a
     /// RenderTexture on the provided MeshRenderer.
     /// </summary>
-    public void CaptureSubject(StudioType type, GameObject prefab, Renderer output, bool far = false)
+    public void CaptureSubject(
+      StudioType type,
+      GameObject prefab,
+      Renderer output,
+      bool far = false
+    )
     {
       var studio = ComponentUtils.Instantiate(_studioPrefab);
       var studioPosition = FindStudioPosition();
@@ -54,7 +62,7 @@ namespace Dreamtides.Services
         Studio = studio,
         Subject = instance,
         RenderTexture = renderTexture,
-        StudioType = type
+        StudioType = type,
       };
 
       _activeSessions[type] = session;
@@ -82,7 +90,10 @@ namespace Dreamtides.Services
       return null;
     }
 
-    private IEnumerator PlayAnimationSequence(CaptureSession session, PlayStudioAnimationCommand command)
+    private IEnumerator PlayAnimationSequence(
+      CaptureSession session,
+      PlayStudioAnimationCommand command
+    )
     {
       var animator = session.Subject.GetComponent<Animator>();
 
@@ -149,8 +160,8 @@ namespace Dreamtides.Services
         return basePosition;
       }
 
-      var occupiedXPositions = _activeSessions.Values
-        .Where(s => s.Studio != null)
+      var occupiedXPositions = _activeSessions
+        .Values.Where(s => s.Studio != null)
         .Select(s => s.Studio.transform.position.x)
         .ToList();
 

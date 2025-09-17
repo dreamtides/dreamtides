@@ -51,8 +51,9 @@ namespace Dreamtides.Services
       var target = Registry.CardService.GetGameObject(command.TargetId);
       var originalPosition = source.transform.position;
       var originalRotation = source.transform.rotation.eulerAngles;
-      var projectileSourcePosition = source.ProjectileSourcePosition ?
-          source.ProjectileSourcePosition : source.transform;
+      var projectileSourcePosition = source.ProjectileSourcePosition
+        ? source.ProjectileSourcePosition
+        : source.transform;
 
       if (source.GameContext.IsBattlefieldContext())
       {
@@ -66,11 +67,20 @@ namespace Dreamtides.Services
       }
 
       var projectile = Registry.AssetPoolService.Create(
-        Registry.AssetService.GetProjectilePrefab(command.Projectile), projectileSourcePosition.position);
+        Registry.AssetService.GetProjectilePrefab(command.Projectile),
+        projectileSourcePosition.position
+      );
 
       var startPosition = source.transform.position;
-      var throwSequence = TweenUtils.Sequence("ProjectileThrow")
-        .Insert(0, source.transform.DOMove(Vector3.Lerp(startPosition, target.transform.position, 0.1f), 0.1f))
+      var throwSequence = TweenUtils
+        .Sequence("ProjectileThrow")
+        .Insert(
+          0,
+          source.transform.DOMove(
+            Vector3.Lerp(startPosition, target.transform.position, 0.1f),
+            0.1f
+          )
+        )
         .Insert(0.1f, source.transform.DOMove(startPosition, 0.1f));
 
       if (source.GameContext.IsBattlefieldContext())
@@ -87,7 +97,8 @@ namespace Dreamtides.Services
         command.AdditionalHit,
         command.AdditionalHitDelay,
         command.FireSound,
-        command.ImpactSound);
+        command.ImpactSound
+      );
 
       if (command.HideOnHit)
       {

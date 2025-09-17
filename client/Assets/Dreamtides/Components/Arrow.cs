@@ -9,14 +9,29 @@ namespace Dreamtides.Components
 {
   public sealed class Arrow : MonoBehaviour
   {
-    [SerializeField] float _pieceSize = 0.5f;
-    [SerializeField] float _pieceFadeDistance = 0.35f;
-    [SerializeField] GameObject _headPrefab = null!;
-    [SerializeField] GameObject _piecePrefab = null!;
-    [SerializeField] Transform _source = null!;
-    [SerializeField] Transform _target = null!;
-    [SerializeField] float _radiusMultiplier = 1f;
-    [SerializeField] SortingGroup _sortingGroup = null!;
+    [SerializeField]
+    float _pieceSize = 0.5f;
+
+    [SerializeField]
+    float _pieceFadeDistance = 0.35f;
+
+    [SerializeField]
+    GameObject _headPrefab = null!;
+
+    [SerializeField]
+    GameObject _piecePrefab = null!;
+
+    [SerializeField]
+    Transform _source = null!;
+
+    [SerializeField]
+    Transform _target = null!;
+
+    [SerializeField]
+    float _radiusMultiplier = 1f;
+
+    [SerializeField]
+    SortingGroup _sortingGroup = null!;
     Transform? _arrow;
 
     readonly List<Transform> _segments = new();
@@ -97,7 +112,9 @@ namespace Dreamtides.Components
       var firstSegmentPos =
         Quaternion.Euler(Mathf.Repeat(offset, segmentAngle), 0f, 0f) * (left - center) + center;
 
-      var fadeStartDistance = (Quaternion.Euler(segmentAngle / 2f, 0f, 0f) * (left - center) + center).z;
+      var fadeStartDistance = (
+        Quaternion.Euler(segmentAngle / 2f, 0f, 0f) * (left - center) + center
+      ).z;
 
       for (var i = 0; i < segmentsCount; i++)
       {
@@ -113,8 +130,11 @@ namespace Dreamtides.Components
 
         var currentColor = meshRenderer.material.color;
         var distance1 = right.z - _pieceFadeDistance - pos.z;
-        currentColor.a = Mathf.Clamp01(Mathf.Clamp01((pos.z - left.z) / fadeStartDistance) +
-          Mathf.Clamp01(distance1 / fadeStartDistance) - 1f);
+        currentColor.a = Mathf.Clamp01(
+          Mathf.Clamp01((pos.z - left.z) / fadeStartDistance)
+            + Mathf.Clamp01(distance1 / fadeStartDistance)
+            - 1f
+        );
         meshRenderer.material.color = currentColor;
       }
 

@@ -13,13 +13,20 @@ namespace Dreamtides.Layout
   /// </summary>
   public abstract class StandardObjectLayout : ObjectLayout
   {
-    [SerializeField] List<Displayable> _objects = new();
-    [SerializeField] bool _debugUpdateContinuously = false;
+    [SerializeField]
+    List<Displayable> _objects = new();
+
+    [SerializeField]
+    bool _debugUpdateContinuously = false;
 
     /// <summary>
     /// If true, the layout will update continuously.
     /// </summary>
-    public bool DebugUpdateContinuously { get => _debugUpdateContinuously; set => _debugUpdateContinuously = value; }
+    public bool DebugUpdateContinuously
+    {
+      get => _debugUpdateContinuously;
+      set => _debugUpdateContinuously = value;
+    }
 
     /// <summary>The objects in this ObjectLayout</summary>
     public override IReadOnlyList<Displayable> Objects => _objects.AsReadOnly();
@@ -140,7 +147,8 @@ namespace Dreamtides.Layout
       int index,
       int count,
       Sequence? sequence = null,
-      bool applyToChildren = true)
+      bool applyToChildren = true
+    )
     {
       if (displayable.ExcludeFromLayout)
       {
@@ -189,8 +197,7 @@ namespace Dreamtides.Layout
       {
         if (sequence != null)
         {
-          sequence.Insert(atPosition: 0,
-            displayable.transform.DOLocalRotate(vector, duration));
+          sequence.Insert(atPosition: 0, displayable.transform.DOLocalRotate(vector, duration));
         }
         else
         {
@@ -200,7 +207,10 @@ namespace Dreamtides.Layout
 
       if (sequence != null)
       {
-        sequence.Insert(atPosition: 0, displayable.transform.DOScale(Vector3.one * scale, duration));
+        sequence.Insert(
+          atPosition: 0,
+          displayable.transform.DOScale(Vector3.one * scale, duration)
+        );
       }
       else
       {
@@ -215,7 +225,13 @@ namespace Dreamtides.Layout
         return false;
       }
 
-      if (rotation != null && Vector3.Distance(EulerAngleDistance(displayable.transform.localEulerAngles, rotation.Value), Vector3.zero) > 0.01f)
+      if (
+        rotation != null
+        && Vector3.Distance(
+          EulerAngleDistance(displayable.transform.localEulerAngles, rotation.Value),
+          Vector3.zero
+        ) > 0.01f
+      )
       {
         return false;
       }
@@ -233,9 +249,7 @@ namespace Dreamtides.Layout
       _objects.Sort((a, b) => a.SortingKey.CompareTo(b.SortingKey));
     }
 
-    Vector3 EulerAngleDistance(Vector3 a, Vector3 b) => new(
-      Mathf.DeltaAngle(a.x, b.x),
-      Mathf.DeltaAngle(a.y, b.y),
-      Mathf.DeltaAngle(a.z, b.z));
+    Vector3 EulerAngleDistance(Vector3 a, Vector3 b) =>
+      new(Mathf.DeltaAngle(a.x, b.x), Mathf.DeltaAngle(a.y, b.y), Mathf.DeltaAngle(a.z, b.z));
   }
 }

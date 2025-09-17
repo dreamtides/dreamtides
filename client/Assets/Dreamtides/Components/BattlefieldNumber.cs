@@ -7,15 +7,25 @@ using TMPro;
 using UnityEngine;
 
 [assembly: InternalsVisibleTo("Dreamtides.Tests")]
+
 namespace Dreamtides
 {
   public class BattlefieldNumber : MonoBehaviour
   {
-    [SerializeField] internal TextMeshPro _text = null!;
-    [SerializeField] internal TimedEffect _onChange = null!;
-    [SerializeField] internal string? _originalText;
-    [SerializeField] internal Color _originalColor = Color.white;
-    [SerializeField] internal bool _activePreview;
+    [SerializeField]
+    internal TextMeshPro _text = null!;
+
+    [SerializeField]
+    internal TimedEffect _onChange = null!;
+
+    [SerializeField]
+    internal string? _originalText;
+
+    [SerializeField]
+    internal Color _originalColor = Color.white;
+
+    [SerializeField]
+    internal bool _activePreview;
 
     void Start()
     {

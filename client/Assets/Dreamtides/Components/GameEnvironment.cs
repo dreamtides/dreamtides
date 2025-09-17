@@ -7,8 +7,11 @@ namespace Dreamtides.Components
 {
   public class GameEnvironment : MonoBehaviour
   {
-    [SerializeField] Transform _portrait = null!;
-    [SerializeField] Transform _landscape = null!;
+    [SerializeField]
+    Transform _portrait = null!;
+
+    [SerializeField]
+    Transform _landscape = null!;
 
     public void Activate(Registry registry)
     {

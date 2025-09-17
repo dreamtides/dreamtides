@@ -20,7 +20,11 @@ namespace Dreamtides.TestUtils
     {
       var startPosition = registry.Layout.MainCamera.WorldToScreenPoint(source.transform.position);
       var endPosition = registry.Layout.MainCamera.WorldToScreenPoint(target.transform.position);
-      registry.InputService.InputProvider = new TestDragInputProvider(source, startPosition, endPosition);
+      registry.InputService.InputProvider = new TestDragInputProvider(
+        source,
+        startPosition,
+        endPosition
+      );
       yield return new WaitForSeconds(0.1f + _dragDuration);
       yield return registry.TestHelperService.WaitForIdle(IntegrationTest.TimeoutSeconds);
     }

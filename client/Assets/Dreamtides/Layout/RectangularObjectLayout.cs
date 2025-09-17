@@ -6,21 +6,33 @@ namespace Dreamtides.Layout
 {
   public sealed class RectangularObjectLayout : StandardObjectLayout
   {
-    [SerializeField] float _width;
-    [SerializeField] float _height;
-    [SerializeField] float _itemHorizontalSpacing;
-    [SerializeField] float _itemVerticalSpacing;
-    [SerializeField] float _itemWidth;
-    [SerializeField] float _itemHeight;
-    [SerializeField] int _rowCount;
+    [SerializeField]
+    float _width;
+
+    [SerializeField]
+    float _height;
+
+    [SerializeField]
+    float _itemHorizontalSpacing;
+
+    [SerializeField]
+    float _itemVerticalSpacing;
+
+    [SerializeField]
+    float _itemWidth;
+
+    [SerializeField]
+    float _itemHeight;
+
+    [SerializeField]
+    int _rowCount;
 
     public override Vector3 CalculateObjectPosition(int index, int count) =>
-      transform.position + new Vector3(
-        CalculateXOffset(index, count),
-        0.5f,
-        CalculateZOffset(index, count));
+      transform.position
+      + new Vector3(CalculateXOffset(index, count), 0.5f, CalculateZOffset(index, count));
 
-    public override Vector3? CalculateObjectRotation(int index, int count) => transform.rotation.eulerAngles;
+    public override Vector3? CalculateObjectRotation(int index, int count) =>
+      transform.rotation.eulerAngles;
 
     float CalculateXOffset(int index, int count)
     {
@@ -29,7 +41,8 @@ namespace Dreamtides.Layout
         _itemHorizontalSpacing,
         _itemWidth,
         index % _rowCount,
-        count > _rowCount ? _rowCount : count);
+        count > _rowCount ? _rowCount : count
+      );
     }
 
     float CalculateZOffset(int index, int count)
@@ -47,11 +60,23 @@ namespace Dreamtides.Layout
     void OnDrawGizmosSelected()
     {
       Gizmos.color = Color.blue;
-      Gizmos.DrawSphere(transform.position + new Vector3(_width / 2f, 0, _height / 2f), radius: 0.5f);
-      Gizmos.DrawSphere(transform.position + new Vector3(_width / 2f, 0, _height / -2f), radius: 0.5f);
+      Gizmos.DrawSphere(
+        transform.position + new Vector3(_width / 2f, 0, _height / 2f),
+        radius: 0.5f
+      );
+      Gizmos.DrawSphere(
+        transform.position + new Vector3(_width / 2f, 0, _height / -2f),
+        radius: 0.5f
+      );
       Gizmos.DrawSphere(transform.position, radius: 0.5f);
-      Gizmos.DrawSphere(transform.position + new Vector3(_width / -2f, 0, _height / 2f), radius: 0.5f);
-      Gizmos.DrawSphere(transform.position + new Vector3(_width / -2f, 0, _height / -2f), radius: 0.5f);
+      Gizmos.DrawSphere(
+        transform.position + new Vector3(_width / -2f, 0, _height / 2f),
+        radius: 0.5f
+      );
+      Gizmos.DrawSphere(
+        transform.position + new Vector3(_width / -2f, 0, _height / -2f),
+        radius: 0.5f
+      );
     }
   }
 }

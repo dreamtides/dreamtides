@@ -3,8 +3,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using Dreamtides.Components;
-using Dreamtides.Masonry;
 using Dreamtides.Layout;
+using Dreamtides.Masonry;
 using Dreamtides.Schema;
 using Dreamtides.Services;
 using UnityEngine;
@@ -54,7 +54,9 @@ namespace Dreamtides.Animations
           _currentInfoZoom.SortingGroup.sortingLayerID = GameContext.InfoZoom.SortingLayerId();
         }
 
-        var anchor = shouldShowOnLeft ? service.Registry.Layout.InfoZoomLeft : service.Registry.Layout.InfoZoomRight;
+        var anchor = shouldShowOnLeft
+          ? service.Registry.Layout.InfoZoomLeft
+          : service.Registry.Layout.InfoZoomRight;
         _currentInfoZoom.transform.SetParent(anchor);
         _currentInfoZoom.transform.localPosition = Vector3.zero;
         _currentInfoZoom.transform.localScale = Vector3.one;
@@ -73,31 +75,54 @@ namespace Dreamtides.Animations
 
       if (card.CardView.Revealed?.InfoZoomData?.SupplementalCardInfo is { } info)
       {
-        var infoAnchor = shouldShowOnLeft ?
-            service.Registry.Layout.SupplementalCardInfoLeft : service.Registry.Layout.SupplementalCardInfoRight;
-        var screenPosition = service.Registry.Layout.MainCamera.WorldToScreenPoint(infoAnchor.position);
-        var width = Mathf.Min(275f, service.Registry.DocumentService.ScreenPxToElementPx(Screen.width / 2.2f));
+        var infoAnchor = shouldShowOnLeft
+          ? service.Registry.Layout.SupplementalCardInfoLeft
+          : service.Registry.Layout.SupplementalCardInfoRight;
+        var screenPosition = service.Registry.Layout.MainCamera.WorldToScreenPoint(
+          infoAnchor.position
+        );
+        var width = Mathf.Min(
+          275f,
+          service.Registry.DocumentService.ScreenPxToElementPx(Screen.width / 2.2f)
+        );
 
-        var node = Mason.Row("InfoZoom",
+        var node = Mason.Row(
+          "InfoZoom",
           new FlexStyle
           {
             Position = FlexPosition.Absolute,
             Width = Mason.Px(width),
             JustifyContent = shouldShowOnLeft ? FlexJustify.FlexStart : FlexJustify.FlexEnd,
             AlignItems = FlexAlign.FlexStart,
-            Inset = shouldShowOnLeft ? new FlexInsets()
-            {
-              Left = forCardInHand ?
-                  Mason.Px(8) :
-                  Mason.Px(service.Registry.DocumentService.ScreenPxToElementPx(screenPosition.x)),
-              Top = Mason.Px(service.Registry.DocumentService.ScreenPxToElementPx(Screen.height - screenPosition.y)),
-            } : new FlexInsets()
-            {
-              Right = forCardInHand ?
-                  Mason.Px(8) :
-                  Mason.Px(service.Registry.DocumentService.ScreenPxToElementPx(Screen.width - screenPosition.x)),
-              Top = Mason.Px(service.Registry.DocumentService.ScreenPxToElementPx(Screen.height - screenPosition.y)),
-            },
+            Inset = shouldShowOnLeft
+              ? new FlexInsets()
+              {
+                Left = forCardInHand
+                  ? Mason.Px(8)
+                  : Mason.Px(
+                    service.Registry.DocumentService.ScreenPxToElementPx(screenPosition.x)
+                  ),
+                Top = Mason.Px(
+                  service.Registry.DocumentService.ScreenPxToElementPx(
+                    Screen.height - screenPosition.y
+                  )
+                ),
+              }
+              : new FlexInsets()
+              {
+                Right = forCardInHand
+                  ? Mason.Px(8)
+                  : Mason.Px(
+                    service.Registry.DocumentService.ScreenPxToElementPx(
+                      Screen.width - screenPosition.x
+                    )
+                  ),
+                Top = Mason.Px(
+                  service.Registry.DocumentService.ScreenPxToElementPx(
+                    Screen.height - screenPosition.y
+                  )
+                ),
+              },
           },
           info
         );

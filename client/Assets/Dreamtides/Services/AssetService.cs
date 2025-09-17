@@ -14,34 +14,39 @@ namespace Dreamtides.Services
 
     public Font GetFont(FontAddress address) => GetAsset<Font>(address.Font);
 
-    public AudioClip GetAudioClip(AudioClipAddress address) => GetAsset<AudioClip>(address.AudioClip);
+    public AudioClip GetAudioClip(AudioClipAddress address) =>
+      GetAsset<AudioClip>(address.AudioClip);
 
     public Material GetMaterial(MaterialAddress address) => GetAsset<Material>(address.Material);
 
     public TimedEffect GetEffectPrefab(EffectAddress address) =>
-        GetAssetComponent<TimedEffect>(address.Effect);
+      GetAssetComponent<TimedEffect>(address.Effect);
 
     public Projectile GetProjectilePrefab(ProjectileAddress address) =>
-        GetAssetComponent<Projectile>(address.Projectile);
+      GetAssetComponent<Projectile>(address.Projectile);
 
     public GameObject GetPrefab(PrefabAddress address) => GetAsset<GameObject>(address.Prefab);
 
     protected override void OnInitialize(TestConfiguration? testConfiguration)
     {
-      GetEffectPrefab(new EffectAddress
-      {
-        Effect = "Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Magic circle 1.prefab"
-      });
+      GetEffectPrefab(
+        new EffectAddress
+        {
+          Effect = "Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Magic circle 1.prefab",
+        }
+      );
     }
 
-    T GetAsset<T>(string address) where T : class
+    T GetAsset<T>(string address)
+      where T : class
     {
       var op = Addressables.LoadAssetAsync<T>(address);
       var result = op.WaitForCompletion();
       return Errors.CheckNotNull(result);
     }
 
-    T GetAssetComponent<T>(string address) where T : Component
+    T GetAssetComponent<T>(string address)
+      where T : Component
     {
       return ComponentUtils.Get<T>(GetAsset<GameObject>(address));
     }

@@ -26,13 +26,16 @@ namespace Dreamtides.Services
         return;
       }
 
-      var thinking = !Registry.ActionService.IsProcessingCommands && Registry.ActionService.LastResponseIncremental;
+      var thinking =
+        !Registry.ActionService.IsProcessingCommands
+        && Registry.ActionService.LastResponseIncremental;
       Registry.Layout.ThinkingIndicator.SetActive(thinking);
 
       var currentTime = Time.time;
-      var hasActivity = Registry.ActionService.IsProcessingCommands ||
-                       Registry.InputService.IsPointerPressed() ||
-                       Registry.ActionService.LastActionTime > _lastActivityTime;
+      var hasActivity =
+        Registry.ActionService.IsProcessingCommands
+        || Registry.InputService.IsPointerPressed()
+        || Registry.ActionService.LastActionTime > _lastActivityTime;
 
       if (hasActivity)
       {
@@ -43,7 +46,10 @@ namespace Dreamtides.Services
       var timeSinceLastActivity = currentTime - _lastActivityTime;
       var timeSinceLastReconnect = currentTime - _lastReconnectTime;
 
-      if (timeSinceLastActivity >= IdleTimeoutSeconds && timeSinceLastReconnect >= IdleTimeoutSeconds)
+      if (
+        timeSinceLastActivity >= IdleTimeoutSeconds
+        && timeSinceLastReconnect >= IdleTimeoutSeconds
+      )
       {
         _lastReconnectTime = currentTime;
         Registry.ActionService.TriggerReconnect();

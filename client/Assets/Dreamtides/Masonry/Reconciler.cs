@@ -24,7 +24,8 @@ namespace Dreamtides.Masonry
     public static IMasonElement? Update(
       Registry registry,
       FlexNode node,
-      IMasonElement? previousElement = null)
+      IMasonElement? previousElement = null
+    )
     {
       var nodeType = Mason.GetNodeTypeTag(node);
       if (previousElement != null && (Mason.GetNodeTypeTag(previousElement.Node) == nodeType))
@@ -42,7 +43,8 @@ namespace Dreamtides.Masonry
     static IMasonElement? UpdateWhenMatching(
       Registry registry,
       FlexNode node,
-      IMasonElement previousElement)
+      IMasonElement previousElement
+    )
     {
       UpdateChildren(registry, node, previousElement.Self, previousElement.Self);
       MasonRenderer.ApplyToElement(registry, previousElement, node);
@@ -59,10 +61,12 @@ namespace Dreamtides.Masonry
 
     static bool HasInternalChildren(VisualElement? element) => element is TextField or Slider;
 
-    static void UpdateChildren(Registry registry,
+    static void UpdateChildren(
+      Registry registry,
       FlexNode node,
       VisualElement addTo,
-      VisualElement? previousElement = null)
+      VisualElement? previousElement = null
+    )
     {
       if (HasInternalChildren(previousElement))
       {
@@ -79,10 +83,7 @@ namespace Dreamtides.Masonry
           if (previousElement != null && count < previousElement.childCount)
           {
             // Element exists in previous tree.
-            var result = Update(
-              registry,
-              child,
-              previousElement[count] as IMasonElement);
+            var result = Update(registry, child, previousElement[count] as IMasonElement);
             if (result != null)
             {
               previousElement.RemoveAt(count);
@@ -104,7 +105,6 @@ namespace Dreamtides.Masonry
         {
           previousElement.RemoveAt(count);
         }
-
       }
     }
   }

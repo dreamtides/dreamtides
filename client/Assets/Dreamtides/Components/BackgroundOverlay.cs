@@ -5,7 +5,8 @@ using UnityEngine;
 
 public class BrowserBackground : MonoBehaviour
 {
-  [SerializeField] SpriteRenderer _overlay = null!;
+  [SerializeField]
+  SpriteRenderer _overlay = null!;
   bool _isVisible = false;
 
   public bool IsVisible => _isVisible;
@@ -40,7 +41,9 @@ public class BrowserBackground : MonoBehaviour
 
     if (sequence != null)
     {
-      sequence.Insert(0, _overlay.DOBlendableColor(Color.clear, 0.3f)).AppendCallback(() => _isVisible = false);
+      sequence
+        .Insert(0, _overlay.DOBlendableColor(Color.clear, 0.3f))
+        .AppendCallback(() => _isVisible = false);
     }
     else
     {

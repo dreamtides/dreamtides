@@ -22,7 +22,7 @@ namespace Dreamtides.Masonry
       {
         Schema.SliderDirection.Horizontal => UnityEngine.UIElements.SliderDirection.Horizontal,
         Schema.SliderDirection.Vertical => UnityEngine.UIElements.SliderDirection.Vertical,
-        _ => UnityEngine.UIElements.SliderDirection.Horizontal
+        _ => UnityEngine.UIElements.SliderDirection.Horizontal,
       };
 
       view.highValue = (float)(data.HighValue ?? 0);
@@ -38,23 +38,37 @@ namespace Dreamtides.Masonry
       }
       else
       {
-        ((INodeCallbacks)view).SetCallback(Callbacks.Event.Change,
+        ((INodeCallbacks)view).SetCallback(
+          Callbacks.Event.Change,
           () =>
           {
             PlayerPrefs.SetFloat(data.PreferenceKey, view.value);
             registry.SettingsService.SyncPreferences();
-          });
+          }
+        );
       }
 
       MasonRenderer.ApplyStyle(registry, view.labelElement, data.LabelStyle);
-      MasonRenderer.ApplyStyle(registry,
-        view.Query(className: BaseSlider<float>.dragContainerUssClassName), data.DragContainerStyle);
-      MasonRenderer.ApplyStyle(registry,
-        view.Query(className: BaseSlider<float>.trackerUssClassName), data.TrackerStyle);
-      MasonRenderer.ApplyStyle(registry,
-        view.Query(className: BaseSlider<float>.draggerUssClassName), data.DraggerStyle);
-      MasonRenderer.ApplyStyle(registry,
-        view.Query(className: BaseSlider<float>.draggerBorderUssClassName), data.DraggerBorderStyle);
+      MasonRenderer.ApplyStyle(
+        registry,
+        view.Query(className: BaseSlider<float>.dragContainerUssClassName),
+        data.DragContainerStyle
+      );
+      MasonRenderer.ApplyStyle(
+        registry,
+        view.Query(className: BaseSlider<float>.trackerUssClassName),
+        data.TrackerStyle
+      );
+      MasonRenderer.ApplyStyle(
+        registry,
+        view.Query(className: BaseSlider<float>.draggerUssClassName),
+        data.DraggerStyle
+      );
+      MasonRenderer.ApplyStyle(
+        registry,
+        view.Query(className: BaseSlider<float>.draggerBorderUssClassName),
+        data.DraggerBorderStyle
+      );
     }
   }
 
