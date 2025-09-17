@@ -312,3 +312,19 @@ logcat:
 
 most-called-functions:
     ./rules_engine/scripts/most_called_functions.py --auto-build --benchmark ai_core_11/ai_core_11 -p battle_benchmarks --manifest-path benchmarks/battle/Cargo.toml --limit 25 --demangle  --collapse-generics
+
+prune-remote-branches:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # List remote branches, exclude the HEAD ref and origin/master, strip the origin/ prefix
+    branches=$(git branch -r | sed 's/^ *//' | grep '^origin/' | grep -v -- '->' | grep -v '^origin/master$' | sed 's#^origin/##')
+    if [ -z "$branches" ]; then
+        echo "No remote branches to delete (only master present)."
+        exit 0
+    fi
+    echo "Deleting remote branches on origin:"
+    echo "$branches" | sed 's/^/  /'
+    for b in $branches; do
+    echo "Deleting remote branch: $b"
+        git push -d origin "$b" || true
+    done
