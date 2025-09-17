@@ -1185,6 +1185,9 @@ namespace Dreamtides.Schema
 
     public partial class DebugActionClass
     {
+        [JsonProperty("ApplyTestScenarioAction", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public string ApplyTestScenarioAction { get; set; }
+
         [JsonProperty("RestartBattleWithDecks", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public RestartBattleWithDecks RestartBattleWithDecks { get; set; }
 
@@ -2439,7 +2442,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Animation to perform when moving cards
     /// </summary>
-    public enum MoveCardsCustomAnimation { ShowAtDrawnCardsPosition, ShowInDraftPickLayout };
+    public enum MoveCardsCustomAnimation { MoveToQuestDeckOrDestroy, ShowAtDrawnCardsPosition, ShowInDraftPickLayout };
 
     /// <summary>
     /// Face up/face down state for this card
@@ -2497,7 +2500,7 @@ namespace Dreamtides.Schema
 
     public enum PanelAddressEnum { AddCardToHand, Developer, PlayOpponentCard, SetOpponentAgent };
 
-    public enum DebugActionEnum { ApplyTestScenarioAction, RestartBattle, SetOpponentAsHuman };
+    public enum DebugActionEnum { RestartBattle, SetOpponentAsHuman };
 
     public enum FlexAlign { Auto, Center, FlexEnd, FlexStart, Stretch };
 
@@ -3457,6 +3460,8 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
+                case "MoveToQuestDeckOrDestroy":
+                    return MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy;
                 case "ShowAtDrawnCardsPosition":
                     return MoveCardsCustomAnimation.ShowAtDrawnCardsPosition;
                 case "ShowInDraftPickLayout":
@@ -3475,6 +3480,9 @@ namespace Dreamtides.Schema
             var value = (MoveCardsCustomAnimation)untypedValue;
             switch (value)
             {
+                case MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy:
+                    serializer.Serialize(writer, "MoveToQuestDeckOrDestroy");
+                    return;
                 case MoveCardsCustomAnimation.ShowAtDrawnCardsPosition:
                     serializer.Serialize(writer, "ShowAtDrawnCardsPosition");
                     return;
@@ -4279,8 +4287,6 @@ namespace Dreamtides.Schema
                     var stringValue = serializer.Deserialize<string>(reader);
                     switch (stringValue)
                     {
-                        case "ApplyTestScenarioAction":
-                            return new DebugAction { Enum = DebugActionEnum.ApplyTestScenarioAction };
                         case "RestartBattle":
                             return new DebugAction { Enum = DebugActionEnum.RestartBattle };
                         case "SetOpponentAsHuman":
@@ -4301,9 +4307,6 @@ namespace Dreamtides.Schema
             {
                 switch (value.Enum)
                 {
-                    case DebugActionEnum.ApplyTestScenarioAction:
-                        serializer.Serialize(writer, "ApplyTestScenarioAction");
-                        return;
                     case DebugActionEnum.RestartBattle:
                         serializer.Serialize(writer, "RestartBattle");
                         return;
@@ -4333,8 +4336,6 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
-                case "ApplyTestScenarioAction":
-                    return DebugActionEnum.ApplyTestScenarioAction;
                 case "RestartBattle":
                     return DebugActionEnum.RestartBattle;
                 case "SetOpponentAsHuman":
@@ -4353,9 +4354,6 @@ namespace Dreamtides.Schema
             var value = (DebugActionEnum)untypedValue;
             switch (value)
             {
-                case DebugActionEnum.ApplyTestScenarioAction:
-                    serializer.Serialize(writer, "ApplyTestScenarioAction");
-                    return;
                 case DebugActionEnum.RestartBattle:
                     serializer.Serialize(writer, "RestartBattle");
                     return;

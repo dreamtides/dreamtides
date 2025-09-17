@@ -14,6 +14,7 @@ namespace Dreamtides.Services
     ShowAsDraftPickAnimation _showAsDraftPick = new();
     ShuffleVoidIntoDeckAnimation _shuffleVoidIntoDeck = new();
     InfoZoomAnimation _infoZoom = new();
+    MoveToQuestDeckOrDestroyAnimation _moveToQuestDeckOrDestroy = new();
 
     public bool IsPointerDownOnCard { get; set; } = false;
 
@@ -30,6 +31,8 @@ namespace Dreamtides.Services
           return _drawUserCards.Handle(command, this);
         case MoveCardsCustomAnimation.ShowInDraftPickLayout:
           return _showAsDraftPick.Handle(command, this);
+        case MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy:
+          return _moveToQuestDeckOrDestroy.Handle(command, this);
         default:
           throw new IndexOutOfRangeException($"Unhandled animation type: {command.Animation}");
       }

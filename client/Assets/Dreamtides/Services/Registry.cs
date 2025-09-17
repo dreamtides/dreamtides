@@ -99,6 +99,9 @@ namespace Dreamtides.Services
     [SerializeField] DreamscapeService _dreamscapeService = null!;
     public DreamscapeService DreamscapeService => Check(_dreamscapeService);
 
+    [SerializeField] PrototypeQuest? _prototypeQuest;
+    public PrototypeQuest PrototypeQuest => Check(_prototypeQuest);
+
     void Awake()
     {
       var testConfiguration = TestConfiguration;

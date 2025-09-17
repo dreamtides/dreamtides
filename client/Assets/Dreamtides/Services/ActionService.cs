@@ -138,6 +138,12 @@ namespace Dreamtides.Services
         return;
       }
 
+      if (action.Value.GameActionClass?.DebugAction?.DebugActionClass?.ApplyTestScenarioAction is { } a)
+      {
+        Registry.PrototypeQuest.OnDebugScenarioAction(a);
+        return;
+      }
+
       _lastActionTime = Time.time;
       var requestId = requestIdentifier ?? Guid.NewGuid();
       Registry.LoggingService.StartSpan(LogSpanName.PerformAction);

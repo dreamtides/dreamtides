@@ -22,7 +22,7 @@ pub fn execute<P>(
     P: StateProvider + 'static,
 {
     match action {
-        DebugAction::ApplyTestScenarioAction => {}
+        DebugAction::ApplyTestScenarioAction(_) => {}
         DebugAction::RestartBattle => {
             let seed = rand::rng().next_u64();
             *battle = new_battle::create_and_start(

@@ -10,7 +10,7 @@ use crate::game_action_data::GameAction;
 /// Private actions for developer use
 #[derive(Debug, Clone, Serialize, Eq, PartialEq, Hash, Deserialize, JsonSchema)]
 pub enum DebugAction {
-    ApplyTestScenarioAction,
+    ApplyTestScenarioAction(String),
     RestartBattle,
     RestartBattleWithDecks { one: TestDeckName, two: TestDeckName },
     SetOpponentAgent(GameAI),

@@ -45,22 +45,7 @@ namespace Dreamtides.Utils
 
         private static string GetDebugActionName(DebugAction debugAction)
         {
-            if (debugAction.Enum.HasValue)
-            {
-                return debugAction.Enum.Value switch
-                {
-                    DebugActionEnum.ApplyTestScenarioAction => "ApplyTestScenarioAction",
-                    DebugActionEnum.RestartBattle => "RestartBattle",
-                    _ => debugAction.Enum.Value.ToString()
-                };
-            }
-
-            if (debugAction.DebugActionClass != null)
-            {
-                return "SetOpponentAgent";
-            }
-
-            return "UnknownDebugAction";
+            return "DebugAction";
         }
 
         private static string GetBattleActionName(BattleAction battleAction)
