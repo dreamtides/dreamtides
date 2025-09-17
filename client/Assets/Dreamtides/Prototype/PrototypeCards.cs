@@ -71,7 +71,7 @@ namespace Dreamtides.Prototype
         if (request.Revealed && request.OnClickDebugScenario != null && card.Revealed != null)
         {
           EnsureActions(card.Revealed);
-          var cardId = BuildId(request.GroupKey, i);
+          var cardId = card.Id; // use actual id to avoid mismatches if ordering changes
           card.Revealed.Actions.OnClick = BuildDebugOnClick(cardId, request.OnClickDebugScenario);
         }
         cache.Add(card);
@@ -107,7 +107,7 @@ namespace Dreamtides.Prototype
           if (request.OnClickDebugScenario != null)
           {
             EnsureActions(existing.Revealed);
-            var cardId = BuildId(request.GroupKey, i);
+            var cardId = existing.Id; // do not recompute by index; cache may be rotated
             existing.Revealed.Actions.OnClick = BuildDebugOnClick(
               cardId,
               request.OnClickDebugScenario
@@ -379,6 +379,58 @@ namespace Dreamtides.Prototype
         total += kvp.Value.Count;
       }
       return total;
+    }
+
+    public void AdvanceGroupWindow(string groupKey, int by)
+    {
+      if (!_groupCaches.TryGetValue(groupKey, out var cache))
+      {
+        return;
+      }
+      if (cache.Count == 0)
+      {
+        return;
+      }
+      by %= cache.Count;
+      if (by < 0)
+        by += cache.Count;
+      if (by == 0)
+      {
+        return;
+      }
+
+      var rotated = new List<CardView>(cache.Count);
+      for (int i = 0; i < cache.Count; i++)
+      {
+        int src = (i + by) % cache.Count;
+        rotated.Add(cache[src]);
+      }
+      _groupCaches[groupKey] = rotated;
+    }
+
+    public void UpdateGroupCards(string groupKey, IEnumerable<CardView> updates)
+    {
+      if (!_groupCaches.TryGetValue(groupKey, out var cache))
+      {
+        return;
+      }
+
+      foreach (var updated in updates)
+      {
+        for (int i = 0; i < cache.Count; i++)
+        {
+          if (cache[i].Id == updated.Id)
+          {
+            var current = cache[i];
+            current.Position = updated.Position;
+            current.CardFacing = updated.CardFacing;
+            current.Revealed = updated.Revealed;
+            current.RevealedToOpponents = updated.RevealedToOpponents;
+            cache[i] = current;
+            break;
+          }
+        }
+      }
     }
 
     #endregion

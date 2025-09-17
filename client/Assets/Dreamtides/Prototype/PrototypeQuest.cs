@@ -186,6 +186,31 @@ public class PrototypeQuest : Service
 
     var update = new UpdateQuestCommand { Quest = new QuestView { Cards = updateCards } };
     yield return Registry.CardService.HandleUpdateQuestCommand(update);
+
+    // Keep the prototype's draft cache in sync so old picks don't snap back into the draft layout
+    _prototypeCards.UpdateGroupCards("draft", updateCards);
+
+    _prototypeCards.AdvanceGroupWindow("draft", 4);
+
+    var remaining = 0;
+    foreach (var cv in updateCards)
+    {
+      if (cv.Position.Position.PositionClass?.SiteDeck != null)
+      {
+        remaining++;
+      }
+    }
+
+    if (remaining >= 4)
+    {
+      yield return StartCoroutine(RunDraftPickSequence());
+    }
+    else
+    {
+      // Draft deck exhausted; return focus to map and clear pick state
+      _currentDraftPickIds.Clear();
+      FocusMapCamera();
+    }
   }
 
   public void FocusSpaceCameraFar()
