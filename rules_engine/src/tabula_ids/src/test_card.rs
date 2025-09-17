@@ -60,6 +60,10 @@ pub const TEST_DRAW_ONE: BaseCardId = BaseCardId(uuid!("68f90d08-9b51-424e-90d1-
 pub const TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER: BaseCardId =
     BaseCardId(uuid!("91c9ed93-5faf-4178-aec9-d631bbcf5d6a"));
 
+/// {Materialized}: Draw {-drawn-cards(n:1)}.
+pub const TEST_MATERIALIZED_DRAW_CARD: BaseCardId =
+    BaseCardId(uuid!("f62670ae-73ad-4645-8de4-4cd8fb58b920"));
+
 /// Whenever you play a card during the enemy's turn, this character gains
 /// {-gained-spark(n:2)}.
 pub const TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN: BaseCardId =
@@ -182,6 +186,7 @@ pub const ALL_TEST_CARD_IDS: &[BaseCardId] = &[
     TEST_NAMED_DISSOLVE,
     TEST_DRAW_ONE,
     TEST_TRIGGER_GAIN_SPARK_WHEN_MATERIALIZE_ANOTHER_CHARACTER,
+    TEST_MATERIALIZED_DRAW_CARD,
     TEST_TRIGGER_GAIN_TWO_SPARK_ON_PLAY_CARD_ENEMY_TURN,
     TEST_ACTIVATED_ABILITY_DRAW_CARD,
     TEST_MULTI_ACTIVATED_ABILITY_DRAW_CARD_CHARACTER,

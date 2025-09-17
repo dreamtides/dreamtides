@@ -1703,6 +1703,43 @@
       "image_number": "403770319"
     },
     {
+      "id": "f62670ae-73ad-4645-8de4-4cd8fb58b920",
+      "name_en_us": "Test Materialized Draw Card",
+      "energy_cost": "0",
+      "rules_text_en_us": "{Materialized}: Draw {-drawn-cards(n:1)}.",
+      "abilities": [
+        {
+          "Triggered": {
+            "trigger": {
+              "Keywords": [
+                "Materialized"
+              ]
+            },
+            "effect": {
+              "Effect": {
+                "DrawCards": {
+                  "count": 1
+                }
+              }
+            }
+          }
+        }
+      ],
+      "displayed_abilities": [
+        {
+          "Triggered": {
+            "text": "{Materialized}: Draw {-drawn-cards(n:1)}."
+          }
+        }
+      ],
+      "card_type": "Character",
+      "is_fast": false,
+      "spark": "1",
+      "is_test_card": true,
+      "rarity": "Special",
+      "image_number": "188264905"
+    },
+    {
       "id": "82759c0b-5161-4f6f-91b3-d42c2b4e0f9f",
       "name_en_us": "Test Trigger Gain Two Spark On Play Card Enemy Turn",
       "energy_cost": "2",

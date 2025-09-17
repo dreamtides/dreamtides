@@ -299,6 +299,62 @@ fn triggered_ability_display_effect_command_applied_to_spark_gaining_character()
 }
 
 #[test]
+fn materialized_trigger_draws_card_on_entry() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    let initial_hand_len = s.user_client.cards.user_hand().len();
+
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MATERIALIZED_DRAW_CARD);
+
+    let final_hand_len = s.user_client.cards.user_hand().len();
+    assert_eq!(
+        final_hand_len,
+        initial_hand_len + 1,
+        "materialized ability should draw a card when this character enters play",
+    );
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn materialized_trigger_draws_for_each_copy() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    let initial_hand_len = s.user_client.cards.user_hand().len();
+
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MATERIALIZED_DRAW_CARD);
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MATERIALIZED_DRAW_CARD);
+
+    let final_hand_len = s.user_client.cards.user_hand().len();
+    assert_eq!(
+        final_hand_len,
+        initial_hand_len + 2,
+        "materialized ability should draw a card for each copy entering play",
+    );
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
+fn materialized_trigger_does_not_fire_for_other_characters() {
+    let mut s = TestBattle::builder().user(TestPlayer::builder().energy(99).build()).connect();
+
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_MATERIALIZED_DRAW_CARD);
+
+    let hand_after_trigger = s.user_client.cards.user_hand().len();
+
+    s.create_and_play(DisplayPlayer::User, test_card::TEST_VANILLA_CHARACTER);
+
+    let final_hand_len = s.user_client.cards.user_hand().len();
+    assert_eq!(
+        final_hand_len, hand_after_trigger,
+        "materialized ability should not trigger when another character enters play",
+    );
+
+    test_helpers::assert_clients_identical(&s);
+}
+
+#[test]
 fn triggered_ability_gain_spark_on_play_card_enemy_turn() {
     let mut s = TestBattle::builder()
         .user(TestPlayer::builder().energy(99).build())
