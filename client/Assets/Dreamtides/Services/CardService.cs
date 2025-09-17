@@ -361,6 +361,11 @@ namespace Dreamtides.Services
         return Registry.DreamscapeLayout.DraftPickLayout;
       }
 
+      if (position.Enum == PositionEnum.Offscreen)
+      {
+        return Registry.Layout.Offscreen;
+      }
+
       if (position.PositionClass == null)
       {
         throw new InvalidOperationException($"Unknown layout position enum: ${position.Enum}");

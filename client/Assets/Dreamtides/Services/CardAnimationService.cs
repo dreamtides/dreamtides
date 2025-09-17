@@ -5,11 +5,20 @@ using System.Collections;
 using Dreamtides.Animations;
 using Dreamtides.Components;
 using Dreamtides.Schema;
+using UnityEngine;
 
 namespace Dreamtides.Services
 {
   public class CardAnimationService : Service
   {
+    [SerializeField]
+    AudioClip _flipCardSound = null!;
+    public AudioClip FlipCardSound => _flipCardSound;
+
+    [SerializeField]
+    AudioClip _moveToQuestDeckSound = null!;
+    public AudioClip MoveToQuestDeckSound => _moveToQuestDeckSound;
+
     DrawUserCardsAnimation _drawUserCards = new();
     ShowAsDraftPickAnimation _showAsDraftPick = new();
     ShuffleVoidIntoDeckAnimation _shuffleVoidIntoDeck = new();

@@ -119,7 +119,12 @@ public class PrototypeQuest : Service
     if (!_currentDraftPickIds.Contains(clickedId))
       return;
 
-    var cards = new List<CardView>(4);
+    StartCoroutine(ResolveDraftPick(clickedId));
+  }
+
+  IEnumerator ResolveDraftPick(string clickedId)
+  {
+    var cardsForAnimation = new List<CardView>(4);
     foreach (var id in _currentDraftPickIds)
     {
       var card = Registry.CardService.GetCard(id);
@@ -127,26 +132,60 @@ public class PrototypeQuest : Service
       if (id == clickedId)
       {
         var sorting = Registry.DreamscapeLayout.QuestDeck.Objects.Count;
-        cards.Add(
+        cardsForAnimation.Add(
           CloneCardViewWithPosition(source, new Position { Enum = PositionEnum.QuestDeck }, sorting)
         );
       }
       else
       {
-        cards.Add(source);
+        cardsForAnimation.Add(source);
       }
     }
 
     var command = new MoveCardsWithCustomAnimationCommand
     {
       Animation = MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy,
-      Cards = cards,
+      Cards = cardsForAnimation,
       Destination = new Position { Enum = PositionEnum.QuestDeck },
-      PauseDuration = new Milliseconds { MillisecondsValue = 3000 },
+      PauseDuration = new Milliseconds { MillisecondsValue = 300 },
       StaggerInterval = new Milliseconds { MillisecondsValue = 100 },
     };
 
-    StartCoroutine(Registry.CardAnimationService.HandleMoveCardsWithCustomAnimation(command));
+    yield return StartCoroutine(
+      Registry.CardAnimationService.HandleMoveCardsWithCustomAnimation(command)
+    );
+
+    var allIds = Registry.CardService.GetCardIds().ToList();
+    var updateCards = new List<CardView>(allIds.Count);
+    foreach (var id in allIds)
+    {
+      var card = Registry.CardService.GetCard(id);
+      var source = card.CardView;
+      if (id == clickedId)
+      {
+        var sorting = Registry.DreamscapeLayout.QuestDeck.Objects.Count;
+        updateCards.Add(
+          CloneCardViewWithPositionHidden(
+            source,
+            new Position { Enum = PositionEnum.QuestDeck },
+            sorting
+          )
+        );
+      }
+      else if (_currentDraftPickIds.Contains(id))
+      {
+        updateCards.Add(
+          CloneCardViewWithPosition(source, new Position { Enum = PositionEnum.Offscreen }, 0)
+        );
+      }
+      else
+      {
+        updateCards.Add(source);
+      }
+    }
+
+    var update = new UpdateQuestCommand { Quest = new QuestView { Cards = updateCards } };
+    yield return Registry.CardService.HandleUpdateQuestCommand(update);
   }
 
   public void FocusSpaceCameraFar()
@@ -392,5 +431,24 @@ public class PrototypeQuest : Service
       Prefab = source.Prefab,
       Revealed = source.Revealed,
       RevealedToOpponents = source.RevealedToOpponents,
+    };
+
+  static CardView CloneCardViewWithPositionHidden(
+    CardView source,
+    Position position,
+    int sortingKey
+  ) =>
+    new CardView
+    {
+      Backless = source.Backless,
+      CardFacing = CardFacing.FaceDown,
+      CreatePosition = source.CreatePosition,
+      CreateSound = source.CreateSound,
+      DestroyPosition = source.DestroyPosition,
+      Id = source.Id,
+      Position = new ObjectPosition { Position = position, SortingKey = sortingKey },
+      Prefab = source.Prefab,
+      Revealed = null,
+      RevealedToOpponents = false,
     };
 }

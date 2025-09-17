@@ -60,6 +60,8 @@ namespace Dreamtides.Animations
       System.Action onDone
     )
     {
+      service.Registry.SoundService.Play(service.FlipCardSound);
+
       for (int i = 0; i < toDestroy.Count; ++i)
       {
         var cardView = toDestroy[i];
@@ -116,6 +118,8 @@ namespace Dreamtides.Animations
         );
 
         yield return moveSeq.WaitForCompletion();
+
+        service.Registry.SoundService.Play(service.MoveToQuestDeckSound);
 
         var flipSeq = TweenUtils.Sequence("QuestDeckFlip");
         card.TurnFaceDown(flipSeq);
