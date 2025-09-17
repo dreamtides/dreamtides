@@ -4,7 +4,7 @@ use ability_data::effect::Effect;
 use ability_data::predicate::{CardPredicate, Predicate};
 use ability_data::standard_effect::StandardEffect;
 use ability_data::static_ability::{PlayFromVoid, StandardStaticAbility};
-use ability_data::trigger_event::TriggerEvent;
+use ability_data::trigger_event::{TriggerEvent, TriggerKeyword};
 use battle_state::battle_cards::ability_list::{AbilityData, AbilityList, CanPlayRestriction};
 use battle_state::triggers::trigger::TriggerName;
 use core_data::identifiers::AbilityNumber;
@@ -277,6 +277,20 @@ fn watch_for_battlefield_trigger(event: &TriggerEvent) -> TriggerName {
         TriggerEvent::Play(..) => TriggerName::PlayedCard,
         TriggerEvent::PlayDuringTurn(..) => TriggerName::PlayedCard,
         TriggerEvent::PlayFromHand(..) => TriggerName::PlayedCardFromHand,
+        TriggerEvent::Keywords(keywords) => {
+            // For keyword triggers, we need to return the appropriate trigger name
+            // Handle the first keyword found
+            if let Some(keyword) = keywords.iter().next() {
+                match keyword {
+                    TriggerKeyword::Materialized => TriggerName::Materialized,
+                    TriggerKeyword::Dissolved => TriggerName::Dissolved,
+                    TriggerKeyword::Judgment => TriggerName::Judgment,
+                }
+            } else {
+                // If no keywords were provided (shouldn't happen)
+                panic!("Empty keywords list in trigger event: {:?}", keywords);
+            }
+        }
         _ => todo!("Implement watch_for_trigger() for {:?}", event),
     }
 }

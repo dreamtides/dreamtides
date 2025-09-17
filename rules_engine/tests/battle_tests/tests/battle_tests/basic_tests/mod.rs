@@ -6,6 +6,7 @@ mod battle_limits_test;
 pub mod dreamwell_tests;
 mod duplicate_action_prevention_test;
 mod enemy_message_tests;
+mod materialized_trigger_tests;
 mod modal_effect_tests;
 mod outcome_simulation_tests;
 mod persistent_card_effect_tests;
