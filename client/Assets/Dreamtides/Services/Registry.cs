@@ -158,9 +158,9 @@ namespace Dreamtides.Services
     void ToggleGameObjectForMode(GameMode mode)
     {
       var battleMode = mode == GameMode.Battle;
-      var battleCamera = ComponentUtils.Get<GameCamera>(Layout.MainCamera);
       if (battleMode)
       {
+        var battleCamera = ComponentUtils.Get<GameCamera>(Layout.MainCamera);
         battleCamera.AdjustFieldOfView();
       }
 

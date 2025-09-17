@@ -7,17 +7,19 @@ using Dreamtides.Masonry;
 
 namespace Dreamtides.Prototype
 {
-  public static class PrototypeCards
+  public class PrototypeCards
   {
     /// <summary>
-    /// Create new cards up to at least <paramref name="count"/> total, or update the first <paramref name="count"/> existing cards' positions.
-    /// Subsequent calls with a smaller count DO NOT shrink the underlying cached collection; they only adjust the positions
-    /// (and optionally facing/revealed state) of the first N cards. This allows a call sequence like (20) then (4) to still
-    /// return 20 cards, with only the first 4 repositioned as requested.
-    /// Card generation is fully deterministic: requesting (count = 20) will always yield the same 20 card identities & templates
-    /// regardless of any prior calls with different counts or parameters.
+    /// Per-group deterministic card creation and updates.
+    /// - Maintains an independent cache for each <paramref name="groupKey"/> (e.g., "quest", "draft").
+    /// - For the specified group, grows (never shrinks) up to at least <paramref name="count"/>, and updates the first N cards' positions
+    ///   (and optionally facing/revealed state).
+    /// - Returns the union of ALL groups' cached cards with the requested group's cards first, so callers can safely pass the result
+    ///   to a full-state updater without deleting cards from other groups, while still being able to take the first N cards for
+    ///   animations in the active group.
+    /// Card identities are group-namespaced (e.g., "draft-1"), ensuring no ID collisions across groups.
     /// </summary>
-    public static List<CardView> CreateOrUpdateCards(int count, ObjectPosition position, bool revealed = true, string? outlineColorHex = null)
+    public List<CardView> CreateOrUpdateCards(int count, ObjectPosition position, bool revealed = true, string? outlineColorHex = null, string groupKey = "default")
     {
       if (position == null) throw new ArgumentNullException(nameof(position));
       if (count <= 0)
@@ -26,23 +28,30 @@ namespace Dreamtides.Prototype
         return new List<CardView>();
       }
 
-      // Grow cache if needed (never shrink) so that subsequent smaller requests still return the full prior set.
-      var targetCount = Math.Max(count, _cachedCards.Count);
+      // Ensure the group's cache exists.
+      if (!_groupCaches.TryGetValue(groupKey, out var cache))
+      {
+        cache = new List<CardView>();
+        _groupCaches[groupKey] = cache;
+      }
+
+      // Grow this group's cache if needed (never shrink).
+      var targetCount = Math.Max(count, cache.Count);
 
       // Generate any missing cards deterministically by index (seed derived from global seed + card index) so order/content
       // is independent of the sequence of external calls.
-      for (int i = _cachedCards.Count; i < targetCount; i++)
+      for (int i = cache.Count; i < targetCount; i++)
       {
-        var template = GetTemplateForIndex(i);
+        var template = GetTemplateForIndex(groupKey, i);
         var objectPosition = ClonePositionWithSorting(position, i);
-        _cachedCards.Add(BuildCardView(template, objectPosition, i, revealed, outlineColorHex));
+        cache.Add(BuildCardView(groupKey, template, objectPosition, i, revealed, outlineColorHex));
       }
 
       // Update (only) the first 'count' cards' positions (and facing/revealed state) to reflect the new base position request.
       // Remaining cards keep prior positions exactly as required by the spec example (20 -> 4 returns 20 with only first 4 moved).
-      for (int i = 0; i < Math.Min(count, _cachedCards.Count); i++)
+      for (int i = 0; i < Math.Min(count, cache.Count); i++)
       {
-        var existing = _cachedCards[i];
+        var existing = cache[i];
         existing.Position = ClonePositionWithSorting(position, i); // Update sorting key relative to new request
         if (existing.CardFacing != (revealed ? CardFacing.FaceUp : CardFacing.FaceDown))
         {
@@ -53,7 +62,7 @@ namespace Dreamtides.Prototype
           if (existing.Revealed == null)
           {
             // If previously hidden but now revealed, build a revealed view deterministically from its template index.
-            existing.Revealed = BuildRevealed(GetTemplateForIndex(i), outlineColorHex);
+            existing.Revealed = BuildRevealed(GetTemplateForIndex(groupKey, i), outlineColorHex);
           }
           else if (outlineColorHex != null)
           {
@@ -67,17 +76,26 @@ namespace Dreamtides.Prototype
         }
       }
 
-      // Return a defensive copy so callers cannot mutate the cached list.
-      return new List<CardView>(_cachedCards);
+      // Build a union list of all groups with requested group's cards first so callers keep other groups alive on update.
+      var result = new List<CardView>(cache.Count + TotalOtherCardsCount(groupKey));
+      result.AddRange(cache);
+      foreach (var kvp in _groupCaches)
+      {
+        if (kvp.Key == groupKey) continue;
+        result.AddRange(kvp.Value);
+      }
+
+      // Return a defensive copy so callers cannot mutate the caches.
+      return result;
     }
 
     #region Helpers
 
-    // Persistent cache of created cards (never shrinks).
-    static readonly List<CardView> _cachedCards = new List<CardView>();
+    // Persistent per-group caches of created cards (never shrink per group).
+    readonly Dictionary<string, List<CardView>> _groupCaches = new Dictionary<string, List<CardView>>();
 
-    // Fixed base seed for deterministic per-index pseudo-random selection.
-    const int _baseSeed = 0x5EEDBEEF; // Arbitrary constant
+    // Fixed base seed for deterministic per-index pseudo-random selection (instance-level, not static).
+    readonly int _baseSeed = 0x5EEDBEEF; // Arbitrary constant
 
     // Minimal template info needed to fabricate a revealed card view.
     class CardTemplate
@@ -106,8 +124,8 @@ namespace Dreamtides.Prototype
       }
     }
 
-    static readonly CardTemplate[] _cardTemplates = new CardTemplate[]
-    {
+    readonly CardTemplate[] _cardTemplates = new CardTemplate[]
+      {
       new CardTemplate(
         name: "Immolate",
         cost: "2",
@@ -200,33 +218,33 @@ namespace Dreamtides.Prototype
         isFast: true,
         imageNumber: 1239919309
       )
-    };
+      };
 
-    // Deterministically pick a template for a given card index independent of call order.
-    static CardTemplate GetTemplateForIndex(int index)
+    // Deterministically pick a template for a given group+index independent of call order.
+    CardTemplate GetTemplateForIndex(string groupKey, int index)
     {
       // Derive a per-card seed; use unchecked to allow overflow wrapping.
       unchecked
       {
-        int seed = _baseSeed + index * 31; // 31 is a small prime multiplier
+        int seed = _baseSeed ^ StableHash(groupKey) + index * 31; // group-scoped deterministic seed
         var rng = new Random(seed);
         int templateIndex = rng.Next(_cardTemplates.Length);
         return _cardTemplates[templateIndex];
       }
     }
 
-    static CardView BuildCardView(CardTemplate t, ObjectPosition objectPosition, int sortIndex, bool revealed, string? outlineColorHex) => new()
+    CardView BuildCardView(string groupKey, CardTemplate t, ObjectPosition objectPosition, int sortIndex, bool revealed, string? outlineColorHex) => new()
     {
       Backless = false,
       CardFacing = revealed ? CardFacing.FaceUp : CardFacing.FaceDown,
-      Id = (sortIndex + 1).ToString(),
+      Id = BuildId(groupKey, sortIndex),
       Position = objectPosition,
       Prefab = t.Prefab,
       Revealed = revealed ? BuildRevealed(t, outlineColorHex) : null,
       RevealedToOpponents = false,
     };
 
-    static RevealedCardView BuildRevealed(CardTemplate t, string? outlineColorHex) => new()
+    RevealedCardView BuildRevealed(CardTemplate t, string? outlineColorHex) => new()
     {
       Actions = new CardActions(), // All null => no actions, clicks, sounds
       CardType = t.CardType,
@@ -245,14 +263,40 @@ namespace Dreamtides.Prototype
       Spark = t.Spark
     };
 
-    static ObjectPosition ClonePositionWithSorting(ObjectPosition basePosition, int sortingKey) => new()
+    ObjectPosition ClonePositionWithSorting(ObjectPosition basePosition, int sortingKey) => new()
     {
       Position = basePosition.Position,
       SortingKey = sortingKey
     };
 
-    static string BuildSpritePath(long imageNumber) =>
+    string BuildSpritePath(long imageNumber) =>
       $"Assets/ThirdParty/GameAssets/CardImages/Standard/shutterstock_{imageNumber}.png";
+
+    string BuildId(string groupKey, int index) => $"{groupKey}-{index + 1}";
+
+    int StableHash(string s)
+    {
+      unchecked
+      {
+        int h = 23;
+        for (int i = 0; i < s.Length; i++)
+        {
+          h = h * 31 + s[i];
+        }
+        return h;
+      }
+    }
+
+    int TotalOtherCardsCount(string currentGroup)
+    {
+      int total = 0;
+      foreach (var kvp in _groupCaches)
+      {
+        if (kvp.Key == currentGroup) continue;
+        total += kvp.Value.Count;
+      }
+      return total;
+    }
 
     #endregion
   }

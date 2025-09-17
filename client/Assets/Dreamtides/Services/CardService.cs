@@ -332,6 +332,11 @@ namespace Dreamtides.Services
         return Registry.Layout.OnScreenStorage;
       }
 
+      if (position.Enum == PositionEnum.QuestDeck)
+      {
+        return Registry.DreamscapeLayout.QuestDeck;
+      }
+
       if (position.Enum == PositionEnum.DraftPickDisplay)
       {
         return Registry.DreamscapeLayout.DraftPickLayout;

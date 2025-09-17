@@ -2423,9 +2423,11 @@ namespace Dreamtides.Schema
     /// size when they're not being focused on, e.g. when the user hides a
     /// card browser to get a better view of the battlefield.
     ///
+    /// User deck displayed in the quest view
+    ///
     /// Object is being displayed as a potential draft pick choice
     /// </summary>
-    public enum PositionEnum { Browser, Default, DraftPickDisplay, Drawn, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnScreenStorage };
+    public enum PositionEnum { Browser, Default, DraftPickDisplay, Drawn, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnScreenStorage, QuestDeck };
 
     /// <summary>
     /// Auto-generated discriminant enum variants
@@ -3211,6 +3213,8 @@ namespace Dreamtides.Schema
                             return new Position { Enum = PositionEnum.Offscreen };
                         case "OnScreenStorage":
                             return new Position { Enum = PositionEnum.OnScreenStorage };
+                        case "QuestDeck":
+                            return new Position { Enum = PositionEnum.QuestDeck };
                     }
                     break;
                 case JsonToken.StartObject:
@@ -3253,6 +3257,9 @@ namespace Dreamtides.Schema
                         return;
                     case PositionEnum.OnScreenStorage:
                         serializer.Serialize(writer, "OnScreenStorage");
+                        return;
+                    case PositionEnum.QuestDeck:
+                        serializer.Serialize(writer, "QuestDeck");
                         return;
                 }
             }
@@ -3387,6 +3394,8 @@ namespace Dreamtides.Schema
                     return PositionEnum.Offscreen;
                 case "OnScreenStorage":
                     return PositionEnum.OnScreenStorage;
+                case "QuestDeck":
+                    return PositionEnum.QuestDeck;
             }
             throw new Exception("Cannot unmarshal type PositionEnum");
         }
@@ -3427,6 +3436,9 @@ namespace Dreamtides.Schema
                     return;
                 case PositionEnum.OnScreenStorage:
                     serializer.Serialize(writer, "OnScreenStorage");
+                    return;
+                case PositionEnum.QuestDeck:
+                    serializer.Serialize(writer, "QuestDeck");
                     return;
             }
             throw new Exception("Cannot marshal type PositionEnum");

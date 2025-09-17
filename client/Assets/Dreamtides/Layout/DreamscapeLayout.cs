@@ -7,6 +7,9 @@ namespace Dreamtides.Layout
 
   public class DreamscapeLayout : MonoBehaviour
   {
+    [SerializeField] ObjectLayout _questDeck = null!;
+    public ObjectLayout QuestDeck => Check(_questDeck);
+
     [SerializeField] DraftPickObjectLayout _draftPickLayout = null!;
     public DraftPickObjectLayout DraftPickLayout => Check(_draftPickLayout);
 
