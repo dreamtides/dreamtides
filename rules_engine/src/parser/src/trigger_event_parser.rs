@@ -27,8 +27,8 @@ pub fn event_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a
 pub fn keyword_parser<'a>() -> impl Parser<'a, &'a str, TriggerEvent, ErrorType<'a>> {
     let single_keyword = choice((
         phrase("{materialized}").to(TriggerKeyword::Materialized),
-        phrase("$judgment").to(TriggerKeyword::Judgment),
-        phrase("$dissolved").to(TriggerKeyword::Dissolved),
+        phrase("{judgment}").to(TriggerKeyword::Judgment),
+        phrase("{dissolved}").to(TriggerKeyword::Dissolved),
     ));
 
     single_keyword

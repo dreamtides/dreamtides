@@ -1265,7 +1265,7 @@ fn test_discover_multi_activated_ability() {
 
 #[test]
 fn test_each_player_abandons_characters() {
-    let result = parse("$judgment: Each player abandons a character.");
+    let result = parse("{Judgment}: Each player abandons a character.");
     assert_ron_snapshot!(result, @r###"
     [
       Triggered(TriggeredAbility(
