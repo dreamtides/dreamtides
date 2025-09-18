@@ -52,6 +52,8 @@ SpriteRenderer:
   m_RayTracingAccelStructBuildFlagsOverride: 0
   m_RayTracingAccelStructBuildFlags: 1
   m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -73,6 +75,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
@@ -149,19 +152,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1544506479045370388, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.15
+      value: 0.22220002
       objectReference: {fileID: 0}
     - target: {fileID: 1544506479045370388, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.15
+      value: 0.22220002
       objectReference: {fileID: 0}
     - target: {fileID: 1544506479045370388, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.15
+      value: 0.22220002
       objectReference: {fileID: 0}
     - target: {fileID: 1544506479045370388, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.04
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1544506479045370388, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: m_ConstrainProportionsScale
@@ -186,7 +189,7 @@ PrefabInstance:
     - target: {fileID: 5442503120378194473, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: d0e53658ff14944e1aeb6fa48288fb17, type: 3}
+      objectReference: {fileID: 21300000, guid: b7aaa136b5804aa46b34a0e8a3071265, type: 3}
     - target: {fileID: 5680000531262599633, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: m_Size.y
       value: 3.5
@@ -217,11 +220,11 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: 672866c9d71074b199cad72cea8c05e5, type: 3}
     - target: {fileID: 8401684551806214642, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: m_text
-      value: Dragon Egg
+      value: Belladonna
       objectReference: {fileID: 0}
     - target: {fileID: 8401684551806214642, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: m_fontSize
-      value: 2.5
+      value: 1.6
       objectReference: {fileID: 0}
     - target: {fileID: 8401684551806214642, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: m_margin.x
