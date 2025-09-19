@@ -23,6 +23,14 @@ namespace Dreamtides.Layout
     Transform _aboveQuestDeck = null!;
     public Transform AboveQuestDeck => Check(_aboveQuestDeck);
 
+    [SerializeField]
+    StandardObjectLayout _shopLayout = null!;
+    public StandardObjectLayout ShopLayout => Check(_shopLayout);
+
+    [SerializeField]
+    BrowserBackground _dreamscapeBackgroundOverlay = null!;
+    public BrowserBackground DreamscapeBackgroundOverlay => Check(_dreamscapeBackgroundOverlay);
+
     T Check<T>(T? value)
       where T : Object => Errors.CheckNotNull(value, $"{typeof(T).Name} not initialized");
   }

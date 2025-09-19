@@ -626,6 +626,9 @@ namespace Dreamtides.Schema
     ///
     /// Object is in a deck of cards displayed at a given dreamscape site, e.g.
     /// before being drafted.
+    ///
+    /// Object is being displayed in the possession of a merchant at a given
+    /// dreamscape site (prior to animation to the shop display).
     /// </summary>
     public partial class PositionClass
     {
@@ -664,6 +667,9 @@ namespace Dreamtides.Schema
 
         [JsonProperty("SiteDeck", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
         public Guid? SiteDeck { get; set; }
+
+        [JsonProperty("MerchantWares", Required = Required.DisallowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public Guid? MerchantWares { get; set; }
     }
 
     public partial class ProjectileAddress
@@ -2429,8 +2435,10 @@ namespace Dreamtides.Schema
     /// User deck displayed in the quest view
     ///
     /// Object is being displayed as a potential draft pick choice
+    ///
+    /// Object is being displayed in the shop interface
     /// </summary>
-    public enum PositionEnum { Browser, Default, DraftPickDisplay, Drawn, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnScreenStorage, QuestDeck };
+    public enum PositionEnum { Browser, Default, DraftPickDisplay, Drawn, DreamwellActivation, GameModifier, HandStorage, Offscreen, OnScreenStorage, QuestDeck, ShopDisplay };
 
     /// <summary>
     /// Auto-generated discriminant enum variants
@@ -2442,7 +2450,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Animation to perform when moving cards
     /// </summary>
-    public enum MoveCardsCustomAnimation { MoveToQuestDeckOrDestroy, ShowAtDrawnCardsPosition, ShowInDraftPickLayout };
+    public enum MoveCardsCustomAnimation { MoveToQuestDeckOrDestroy, ShowAtDrawnCardsPosition, ShowInDraftPickLayout, ShowInShopLayout };
 
     /// <summary>
     /// Face up/face down state for this card
@@ -3218,6 +3226,8 @@ namespace Dreamtides.Schema
                             return new Position { Enum = PositionEnum.OnScreenStorage };
                         case "QuestDeck":
                             return new Position { Enum = PositionEnum.QuestDeck };
+                        case "ShopDisplay":
+                            return new Position { Enum = PositionEnum.ShopDisplay };
                     }
                     break;
                 case JsonToken.StartObject:
@@ -3263,6 +3273,9 @@ namespace Dreamtides.Schema
                         return;
                     case PositionEnum.QuestDeck:
                         serializer.Serialize(writer, "QuestDeck");
+                        return;
+                    case PositionEnum.ShopDisplay:
+                        serializer.Serialize(writer, "ShopDisplay");
                         return;
                 }
             }
@@ -3399,6 +3412,8 @@ namespace Dreamtides.Schema
                     return PositionEnum.OnScreenStorage;
                 case "QuestDeck":
                     return PositionEnum.QuestDeck;
+                case "ShopDisplay":
+                    return PositionEnum.ShopDisplay;
             }
             throw new Exception("Cannot unmarshal type PositionEnum");
         }
@@ -3443,6 +3458,9 @@ namespace Dreamtides.Schema
                 case PositionEnum.QuestDeck:
                     serializer.Serialize(writer, "QuestDeck");
                     return;
+                case PositionEnum.ShopDisplay:
+                    serializer.Serialize(writer, "ShopDisplay");
+                    return;
             }
             throw new Exception("Cannot marshal type PositionEnum");
         }
@@ -3466,6 +3484,8 @@ namespace Dreamtides.Schema
                     return MoveCardsCustomAnimation.ShowAtDrawnCardsPosition;
                 case "ShowInDraftPickLayout":
                     return MoveCardsCustomAnimation.ShowInDraftPickLayout;
+                case "ShowInShopLayout":
+                    return MoveCardsCustomAnimation.ShowInShopLayout;
             }
             throw new Exception("Cannot unmarshal type MoveCardsCustomAnimation");
         }
@@ -3488,6 +3508,9 @@ namespace Dreamtides.Schema
                     return;
                 case MoveCardsCustomAnimation.ShowInDraftPickLayout:
                     serializer.Serialize(writer, "ShowInDraftPickLayout");
+                    return;
+                case MoveCardsCustomAnimation.ShowInShopLayout:
+                    serializer.Serialize(writer, "ShowInShopLayout");
                     return;
             }
             throw new Exception("Cannot marshal type MoveCardsCustomAnimation");

@@ -18,6 +18,8 @@ namespace Dreamtides.Components
 {
   public class Card : Displayable
   {
+    public GameObject ActionButton = null!;
+
     [SerializeField]
     internal Transform _cardFront = null!;
 

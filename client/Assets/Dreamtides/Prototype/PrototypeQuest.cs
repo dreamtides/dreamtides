@@ -75,6 +75,7 @@ public class PrototypeQuest : Service
   Coroutine? _siteButtonsActivationCoroutine;
   PrototypeCards _prototypeCards = new PrototypeCards();
   List<string> _currentDraftPickIds = new List<string>(4);
+  List<string> _currentShopDisplayIds = new List<string>(8);
 
   void Awake()
   {
@@ -265,7 +266,34 @@ public class PrototypeQuest : Service
 
   public void FocusShopCamera()
   {
-    ResetPrioritiesAndTrack(_shopTrackingTarget, false);
+    StartCoroutine(
+      CreateOrUpdateCards(
+        new CreateOrUpdateCardsRequest
+        {
+          Count = 6,
+          Position = new ObjectPosition
+          {
+            Position = new Position
+            {
+              PositionClass = new PositionClass { MerchantWares = Guid.NewGuid() },
+            },
+            SortingKey = 1,
+          },
+          Revealed = true,
+          GroupKey = "shop",
+        }
+      )
+    );
+
+    ResetPrioritiesAndTrack(
+      _shopTrackingTarget,
+      false,
+      () =>
+      {
+        StartCoroutine(RunShopDisplaySequence());
+      }
+    );
+
     _shopCamera.Priority = 10;
   }
 
@@ -438,6 +466,57 @@ public class PrototypeQuest : Service
           OutlineColorHex = _outlineColorHex,
           GroupKey = "draft",
           OnClickDebugScenario = "draft-pick",
+        }
+      )
+    );
+  }
+
+  IEnumerator RunShopDisplaySequence()
+  {
+    var allCards = _prototypeCards.CreateOrUpdateCards(
+      new CreateOrUpdateCardsRequest
+      {
+        Count = 6,
+        Position = new ObjectPosition
+        {
+          Position = new Position { Enum = PositionEnum.ShopDisplay },
+          SortingKey = 1,
+        },
+        Revealed = true,
+        GroupKey = "shop",
+        OnClickDebugScenario = "shop-display",
+      }
+    );
+    _currentShopDisplayIds = allCards.Take(6).Select(cv => cv.Id).ToList();
+
+    yield return new WaitForSeconds(0.3f);
+
+    var customAnimation = new MoveCardsWithCustomAnimationCommand
+    {
+      Animation = MoveCardsCustomAnimation.ShowInShopLayout,
+      Cards = allCards.Take(6).ToList(),
+      Destination = new Position { Enum = PositionEnum.ShopDisplay },
+      PauseDuration = new Milliseconds { MillisecondsValue = 0 },
+      StaggerInterval = new Milliseconds { MillisecondsValue = 50 },
+    };
+
+    yield return StartCoroutine(
+      Registry.CardAnimationService.HandleMoveCardsWithCustomAnimation(customAnimation)
+    );
+
+    yield return StartCoroutine(
+      CreateOrUpdateCards(
+        new CreateOrUpdateCardsRequest
+        {
+          Count = 6,
+          Position = new ObjectPosition
+          {
+            Position = new Position { Enum = PositionEnum.ShopDisplay },
+            SortingKey = 1,
+          },
+          Revealed = true,
+          GroupKey = "shop",
+          OnClickDebugScenario = "shop-display",
         }
       )
     );

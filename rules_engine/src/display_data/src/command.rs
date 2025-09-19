@@ -226,6 +226,7 @@ pub struct MoveCardsWithCustomAnimationCommand {
 pub enum MoveCardsCustomAnimation {
     ShowAtDrawnCardsPosition,
     ShowInDraftPickLayout,
+    ShowInShopLayout,
     MoveToQuestDeckOrDestroy,
 }
 

@@ -21,6 +21,7 @@ namespace Dreamtides.Services
 
     DrawUserCardsAnimation _drawUserCards = new();
     ShowAsDraftPickAnimation _showAsDraftPick = new();
+    ShowInShopLayoutAnimation _showInShopLayout = new();
     ShuffleVoidIntoDeckAnimation _shuffleVoidIntoDeck = new();
     InfoZoomAnimation _infoZoom = new();
     MoveToQuestDeckOrDestroyAnimation _moveToQuestDeckOrDestroy = new();
@@ -42,6 +43,8 @@ namespace Dreamtides.Services
           return _drawUserCards.Handle(command, this);
         case MoveCardsCustomAnimation.ShowInDraftPickLayout:
           return _showAsDraftPick.Handle(command, this);
+        case MoveCardsCustomAnimation.ShowInShopLayout:
+          return _showInShopLayout.Handle(command, this);
         case MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy:
           return _moveToQuestDeckOrDestroy.Handle(command, this);
         default:

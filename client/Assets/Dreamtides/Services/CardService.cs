@@ -361,6 +361,11 @@ namespace Dreamtides.Services
         return Registry.DreamscapeLayout.DraftPickLayout;
       }
 
+      if (position.Enum == PositionEnum.ShopDisplay)
+      {
+        return Registry.DreamscapeLayout.ShopLayout;
+      }
+
       if (position.Enum == PositionEnum.Offscreen)
       {
         return Registry.Layout.Offscreen;
@@ -483,6 +488,11 @@ namespace Dreamtides.Services
       if (position.PositionClass.SiteDeck is { } siteDeck)
       {
         return Registry.DreamscapeService.SiteDeckLayout(siteDeck);
+      }
+
+      if (position.PositionClass.MerchantWares is { } merchantWares)
+      {
+        return Registry.DreamscapeService.MerchantPositionLayout(merchantWares);
       }
 
       var json = JsonConvert.SerializeObject(position.PositionClass);
