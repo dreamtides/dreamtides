@@ -1,8 +1,12 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using DG.Tweening;
+using Dreamtides.Components;
 using Dreamtides.Layout;
+using Dreamtides.Schema;
+using Dreamtides.Utils;
 using UnityEngine;
 
 namespace Dreamtides.Services
@@ -15,6 +19,9 @@ namespace Dreamtides.Services
     [SerializeField]
     ObjectLayout _tmpMerchantPositionLayout = null!;
 
+    [SerializeField]
+    CanvasGroup _closeButton = null!;
+
     public void ApplyLayouts(Sequence? sequence)
     {
       Registry.DreamscapeLayout.DraftPickLayout.ApplyLayout(sequence);
@@ -22,6 +29,21 @@ namespace Dreamtides.Services
 
       _tmpSiteDeckLayout.ApplyLayout(sequence);
       _tmpMerchantPositionLayout.ApplyLayout(sequence);
+    }
+
+    public void ShowShopWithCards(List<Card> cards)
+    {
+      _closeButton.gameObject.SetActive(true);
+      TweenUtils.FadeInCanvasGroup(_closeButton);
+
+      foreach (var card in cards)
+      {
+        card.CardActionButton.gameObject.SetActive(true);
+        card.SpriteCardContentProtection.gameObject.SetActive(true);
+
+        TweenUtils.FadeInSprite(card.CardActionButton);
+        TweenUtils.FadeInSprite(card.SpriteCardContentProtection);
+      }
     }
 
     public ObjectLayout SiteDeckLayout(Guid siteId)

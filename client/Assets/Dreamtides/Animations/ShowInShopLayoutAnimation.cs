@@ -51,10 +51,7 @@ namespace Dreamtides.Animations
         }
       }
 
-      foreach (var card in cards)
-      {
-        card.ActionButton.SetActive(true);
-      }
+      service.Registry.DreamscapeService.ShowShopWithCards(cards);
     }
 
     IEnumerator MoveCardToShop(
@@ -70,6 +67,7 @@ namespace Dreamtides.Animations
       {
         card.Parent.RemoveIfPresent(card);
       }
+      // Compute target transform from the layout
       var targetPosition = shopLayout.CalculateObjectPosition(targetIndex, finalCount);
       var rotationEuler =
         shopLayout.CalculateObjectRotation(targetIndex, finalCount)
@@ -78,19 +76,25 @@ namespace Dreamtides.Animations
       var targetScale =
         shopLayout.CalculateObjectScale(targetIndex, finalCount)
         ?? shopLayout.transform.localScale.x;
+
+      // Immediately jump to final position/rotation at tiny scale
+      card.transform.position = targetPosition;
+      card.transform.rotation = targetRotation;
+      card.transform.localScale = Vector3.one * 0.01f;
+
       service.Registry.SoundService.PlayDrawCardSound();
-      var seq = TweenUtils.Sequence("ShopMove");
+
+      // Create a sequence to coordinate flip/render effects and the scale-up only
+      var seq = TweenUtils.Sequence("ShopScale");
       card.SortingKey = (int)cardView.Position.SortingKey;
       card.Render(service.Registry, cardView, seq);
-      seq.Insert(0, card.transform.DOMove(targetPosition, TweenUtils.MoveAnimationDurationSeconds));
-      seq.Insert(
-        0,
-        card.transform.DORotateQuaternion(targetRotation, TweenUtils.MoveAnimationDurationSeconds)
-      );
+
+      // Animate only the scale from 0.01 to the layout's target scale
       seq.Insert(
         0,
         card.transform.DOScale(Vector3.one * targetScale, TweenUtils.MoveAnimationDurationSeconds)
       );
+
       yield return seq.WaitForCompletion();
     }
   }

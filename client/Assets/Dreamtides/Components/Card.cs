@@ -18,8 +18,6 @@ namespace Dreamtides.Components
 {
   public class Card : Displayable
   {
-    public GameObject ActionButton = null!;
-
     [SerializeField]
     internal Transform _cardFront = null!;
 
@@ -107,6 +105,12 @@ namespace Dreamtides.Components
     [SerializeField]
     internal GameObject? _cardTrail;
 
+    [SerializeField]
+    internal SpriteRenderer _cardActionButton = null!;
+
+    [SerializeField]
+    internal SpriteRenderer _spriteCardContentProtection = null!;
+
     bool _isRevealed = false;
     internal Registry _registry = null!;
     CardView _cardView = null!;
@@ -134,6 +138,11 @@ namespace Dreamtides.Components
     public string Id => CardView.ClientId();
 
     public ObjectLayout ContainedObjects => Errors.CheckNotNull(_containedObjects);
+
+    public SpriteRenderer CardActionButton => Errors.CheckNotNull(_cardActionButton);
+
+    public SpriteRenderer SpriteCardContentProtection =>
+      Errors.CheckNotNull(_spriteCardContentProtection);
 
     public void Render(Registry registry, CardView view, Sequence? sequence = null)
     {
