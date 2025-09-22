@@ -45,6 +45,8 @@ namespace Dreamtides.Services
           return _showAsDraftPick.Handle(command, this);
         case MoveCardsCustomAnimation.ShowInShopLayout:
           return _showInShopLayout.Handle(command, this);
+        case MoveCardsCustomAnimation.HideShopLayout:
+          return _showInShopLayout.HandleHide(command, this);
         case MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy:
           return _moveToQuestDeckOrDestroy.Handle(command, this);
         default:

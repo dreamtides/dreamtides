@@ -109,7 +109,7 @@ namespace Dreamtides.Components
     internal SpriteRenderer _cardActionButton = null!;
 
     [SerializeField]
-    internal SpriteRenderer _spriteCardContentProtection = null!;
+    internal SpriteRenderer? _spriteCardContentProtection;
 
     bool _isRevealed = false;
     internal Registry _registry = null!;
@@ -141,8 +141,7 @@ namespace Dreamtides.Components
 
     public SpriteRenderer CardActionButton => Errors.CheckNotNull(_cardActionButton);
 
-    public SpriteRenderer SpriteCardContentProtection =>
-      Errors.CheckNotNull(_spriteCardContentProtection);
+    public SpriteRenderer? SpriteCardContentProtection => _spriteCardContentProtection;
 
     public void Render(Registry registry, CardView view, Sequence? sequence = null)
     {
@@ -384,8 +383,14 @@ namespace Dreamtides.Components
       ToggleActiveElements();
       _name.text = revealed.Name;
       _rulesText.text = revealed.RulesText;
-      _costBackground.gameObject.SetActive(revealed.Cost != null);
-      _costText.text = revealed.Cost?.ToString();
+      if (_costBackground)
+      {
+        _costBackground.gameObject.SetActive(revealed.Cost != null);
+      }
+      if (_costText)
+      {
+        _costText.text = revealed.Cost?.ToString();
+      }
       _producedEnergyText.text = revealed.Produced?.ToString();
       _sparkText.text = revealed.Spark?.ToString();
       _battlefieldSparkText.text = revealed.Spark?.ToString();

@@ -2450,7 +2450,7 @@ namespace Dreamtides.Schema
     /// <summary>
     /// Animation to perform when moving cards
     /// </summary>
-    public enum MoveCardsCustomAnimation { MoveToQuestDeckOrDestroy, ShowAtDrawnCardsPosition, ShowInDraftPickLayout, ShowInShopLayout };
+    public enum MoveCardsCustomAnimation { HideShopLayout, MoveToQuestDeckOrDestroy, ShowAtDrawnCardsPosition, ShowInDraftPickLayout, ShowInShopLayout };
 
     /// <summary>
     /// Face up/face down state for this card
@@ -3478,6 +3478,8 @@ namespace Dreamtides.Schema
             var value = serializer.Deserialize<string>(reader);
             switch (value)
             {
+                case "HideShopLayout":
+                    return MoveCardsCustomAnimation.HideShopLayout;
                 case "MoveToQuestDeckOrDestroy":
                     return MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy;
                 case "ShowAtDrawnCardsPosition":
@@ -3500,6 +3502,9 @@ namespace Dreamtides.Schema
             var value = (MoveCardsCustomAnimation)untypedValue;
             switch (value)
             {
+                case MoveCardsCustomAnimation.HideShopLayout:
+                    serializer.Serialize(writer, "HideShopLayout");
+                    return;
                 case MoveCardsCustomAnimation.MoveToQuestDeckOrDestroy:
                     serializer.Serialize(writer, "MoveToQuestDeckOrDestroy");
                     return;

@@ -227,6 +227,7 @@ pub enum MoveCardsCustomAnimation {
     ShowAtDrawnCardsPosition,
     ShowInDraftPickLayout,
     ShowInShopLayout,
+    HideShopLayout,
     MoveToQuestDeckOrDestroy,
 }
 

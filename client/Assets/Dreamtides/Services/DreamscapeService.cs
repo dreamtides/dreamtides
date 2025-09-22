@@ -22,6 +22,8 @@ namespace Dreamtides.Services
     [SerializeField]
     CanvasGroup _closeButton = null!;
 
+    public CanvasGroup CloseButton => Errors.CheckNotNull(_closeButton);
+
     public void ApplyLayouts(Sequence? sequence)
     {
       Registry.DreamscapeLayout.DraftPickLayout.ApplyLayout(sequence);
@@ -39,11 +41,24 @@ namespace Dreamtides.Services
       foreach (var card in cards)
       {
         card.CardActionButton.gameObject.SetActive(true);
-        card.SpriteCardContentProtection.gameObject.SetActive(true);
-
         TweenUtils.FadeInSprite(card.CardActionButton);
-        TweenUtils.FadeInSprite(card.SpriteCardContentProtection);
+
+        if (card.SpriteCardContentProtection)
+        {
+          card.SpriteCardContentProtection.gameObject.SetActive(true);
+          TweenUtils.FadeInSprite(card.SpriteCardContentProtection);
+        }
       }
+    }
+
+    public void HideShop()
+    {
+      TweenUtils
+        .FadeOutCanvasGroup(_closeButton)
+        .OnComplete(() =>
+        {
+          _closeButton.gameObject.SetActive(false);
+        });
     }
 
     public ObjectLayout SiteDeckLayout(Guid siteId)

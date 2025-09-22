@@ -108,17 +108,37 @@ public class PrototypeQuest : Service
   public void OnDebugScenarioAction(string name)
   {
     if (string.IsNullOrEmpty(name))
+    {
       return;
+    }
+
+    if (name == "closeShop")
+    {
+      _currentShopDisplayIds.Clear();
+      FocusMapCamera();
+      Registry.DreamscapeService.HideShop();
+      StartCoroutine(HideShopSequence());
+      return;
+    }
+
     var parts = name.Split('/');
     if (parts.Length != 2)
+    {
       return;
+    }
     if (parts[0] != "draft-pick")
+    {
       return;
+    }
     var clickedId = parts[1];
     if (_currentDraftPickIds == null || _currentDraftPickIds.Count != 4)
+    {
       return;
+    }
     if (!_currentDraftPickIds.Contains(clickedId))
+    {
       return;
+    }
 
     StartCoroutine(ResolveDraftPick(clickedId));
   }
@@ -266,6 +286,8 @@ public class PrototypeQuest : Service
 
   public void FocusShopCamera()
   {
+    // Reset the shop cache so we create fresh cards and can apply Dreamsign overrides deterministically
+    _prototypeCards.ResetGroup("shop");
     StartCoroutine(
       CreateOrUpdateCards(
         new CreateOrUpdateCardsRequest
@@ -281,6 +303,8 @@ public class PrototypeQuest : Service
           },
           Revealed = true,
           GroupKey = "shop",
+          // Make cards #5 and #6 (zero-based indices 4 and 5) Dreamsigns
+          DreamsignPrefabIndices = new[] { 4, 5 },
         }
       )
     );
@@ -485,6 +509,7 @@ public class PrototypeQuest : Service
         Revealed = true,
         GroupKey = "shop",
         OnClickDebugScenario = "shop-display",
+        DreamsignPrefabIndices = new[] { 4, 5 },
       }
     );
     _currentShopDisplayIds = allCards.Take(6).Select(cv => cv.Id).ToList();
@@ -519,6 +544,56 @@ public class PrototypeQuest : Service
           OnClickDebugScenario = "shop-display",
         }
       )
+    );
+
+    var button = Registry.DreamscapeService.CloseButton.GetComponent<CloseBrowserButton>();
+    button.CloseAction = new GameAction
+    {
+      GameActionClass = new GameActionClass
+      {
+        DebugAction = new DebugAction
+        {
+          DebugActionClass = new DebugActionClass { ApplyTestScenarioAction = $"closeShop" },
+        },
+      },
+    };
+  }
+
+  IEnumerator HideShopSequence()
+  {
+    // Gather current shop cards. Prefer the tracked IDs; if empty, fall back to layout contents.
+    var cardsForAnimation = new List<CardView>(_currentShopDisplayIds.Count);
+    if (_currentShopDisplayIds.Count > 0)
+    {
+      foreach (var id in _currentShopDisplayIds)
+      {
+        var card = Registry.CardService.GetCard(id);
+        cardsForAnimation.Add(card.CardView);
+      }
+    }
+    else
+    {
+      var shopObjects = Registry.DreamscapeLayout.ShopLayout.Objects;
+      foreach (var displayable in shopObjects)
+      {
+        if (displayable is Dreamtides.Components.Card card)
+        {
+          cardsForAnimation.Add(card.CardView);
+        }
+      }
+    }
+
+    var command = new MoveCardsWithCustomAnimationCommand
+    {
+      Animation = MoveCardsCustomAnimation.HideShopLayout,
+      Cards = cardsForAnimation,
+      Destination = new Position { Enum = PositionEnum.ShopDisplay },
+      PauseDuration = new Milliseconds { MillisecondsValue = 0 },
+      StaggerInterval = new Milliseconds { MillisecondsValue = 50 },
+    };
+
+    yield return StartCoroutine(
+      Registry.CardAnimationService.HandleMoveCardsWithCustomAnimation(command)
     );
   }
 

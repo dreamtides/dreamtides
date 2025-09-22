@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Dreamtides.Masonry;
 using Dreamtides.Schema;
+using UnityEngine;
 
 namespace Dreamtides.Prototype
 {
@@ -14,6 +15,12 @@ namespace Dreamtides.Prototype
     public bool Revealed { get; set; } = true;
     public string? OutlineColorHex { get; set; }
     public string GroupKey { get; set; } = "default";
+
+    // Optional: number of cards (starting from index 0) to force using the Dreamsign prefab
+    public int DreamsignPrefabCount { get; set; } = 0;
+
+    // Optional: specific zero-based indices to use Dreamsign prefab (takes precedence over DreamsignPrefabCount)
+    public int[]? DreamsignPrefabIndices { get; set; }
 
     // When provided, attach a card on-click action that triggers a debug test scenario
     // with this string. Action path: action.Value.GameActionClass?.DebugAction?.DebugActionClass?.ApplyTestScenarioAction
@@ -60,13 +67,20 @@ namespace Dreamtides.Prototype
       {
         var template = GetTemplateForIndex(request.GroupKey, i);
         var objectPosition = ClonePositionWithSorting(request.Position, i);
+        // Allow overriding the prefab for the first N cards, e.g., shop dreamsigns
+        CardPrefab? prefabOverride = null;
+        if (IsDreamsignIndex(request, i))
+        {
+          prefabOverride = CardPrefab.Dreamsign;
+        }
         var card = BuildCardView(
           request.GroupKey,
           template,
           objectPosition,
           i,
           request.Revealed,
-          request.OutlineColorHex
+          request.OutlineColorHex,
+          prefabOverride
         );
         if (request.Revealed && request.OnClickDebugScenario != null && card.Revealed != null)
         {
@@ -82,20 +96,22 @@ namespace Dreamtides.Prototype
       for (int i = 0; i < Math.Min(request.Count, cache.Count); i++)
       {
         var existing = cache[i];
+        var templateForUpdate = GetTemplateForIndex(request.GroupKey, i);
         existing.Position = ClonePositionWithSorting(request.Position, i); // Update sorting key relative to new request
         if (existing.CardFacing != (request.Revealed ? CardFacing.FaceUp : CardFacing.FaceDown))
         {
           existing.CardFacing = request.Revealed ? CardFacing.FaceUp : CardFacing.FaceDown;
         }
+        // Keep prefab consistent with requested dreamsign count (first N use Dreamsign, others use template prefab)
+        existing.Prefab = IsDreamsignIndex(request, i)
+          ? CardPrefab.Dreamsign
+          : templateForUpdate.Prefab;
         if (request.Revealed)
         {
           if (existing.Revealed == null)
           {
             // If previously hidden but now revealed, build a revealed view deterministically from its template index.
-            existing.Revealed = BuildRevealed(
-              GetTemplateForIndex(request.GroupKey, i),
-              request.OutlineColorHex
-            );
+            existing.Revealed = BuildRevealed(templateForUpdate, request.OutlineColorHex);
           }
           else if (request.OutlineColorHex != null)
           {
@@ -283,7 +299,7 @@ namespace Dreamtides.Prototype
       unchecked
       {
         int seed = _baseSeed ^ StableHash(groupKey) + index * 31; // group-scoped deterministic seed
-        var rng = new Random(seed);
+        var rng = new System.Random(seed);
         int templateIndex = rng.Next(_cardTemplates.Length);
         return _cardTemplates[templateIndex];
       }
@@ -295,7 +311,8 @@ namespace Dreamtides.Prototype
       ObjectPosition objectPosition,
       int sortIndex,
       bool revealed,
-      string? outlineColorHex
+      string? outlineColorHex,
+      CardPrefab? overridePrefab = null
     ) =>
       new()
       {
@@ -303,7 +320,7 @@ namespace Dreamtides.Prototype
         CardFacing = revealed ? CardFacing.FaceUp : CardFacing.FaceDown,
         Id = BuildId(groupKey, sortIndex),
         Position = objectPosition,
-        Prefab = t.Prefab,
+        Prefab = overridePrefab ?? t.Prefab,
         Revealed = revealed ? BuildRevealed(t, outlineColorHex) : null,
         RevealedToOpponents = false,
       };
@@ -379,6 +396,32 @@ namespace Dreamtides.Prototype
         total += kvp.Value.Count;
       }
       return total;
+    }
+
+    bool IsDreamsignIndex(CreateOrUpdateCardsRequest request, int index)
+    {
+      var indices = request.DreamsignPrefabIndices;
+      if (indices != null && indices.Length > 0)
+      {
+        for (int i = 0; i < indices.Length; i++)
+        {
+          if (indices[i] == index)
+          {
+            return true;
+          }
+        }
+        return false;
+      }
+      return index < request.DreamsignPrefabCount;
+    }
+
+    // Clear a group's cache so that subsequent requests will recreate cards from templates.
+    public void ResetGroup(string groupKey)
+    {
+      if (_groupCaches.ContainsKey(groupKey))
+      {
+        _groupCaches.Remove(groupKey);
+      }
     }
 
     public void AdvanceGroupWindow(string groupKey, int by)

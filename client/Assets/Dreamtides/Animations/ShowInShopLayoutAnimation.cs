@@ -23,11 +23,8 @@ namespace Dreamtides.Animations
       var cardViews = command.Cards;
       var cards = cardViews.Select(cv => service.Registry.CardService.GetCard(cv.Id)).ToList();
       var stagger = command.StaggerInterval.ToSeconds();
-      service.Registry.DreamscapeLayout.DreamscapeBackgroundOverlay.Show(
-        0.7f,
-        TweenUtils.Sequence("ShowShopBackground")
-      );
 
+      service.Registry.DreamscapeService.ShowShopWithCards(cards);
       var existingCount = shopLayout.Objects.Count;
       var finalCount = existingCount + cards.Count;
       for (int i = 0; i < cards.Count; ++i)
@@ -50,8 +47,44 @@ namespace Dreamtides.Animations
           yield return MoveCardToShop(shopLayout, card, cardView, targetIndex, finalCount, service);
         }
       }
+    }
 
-      service.Registry.DreamscapeService.ShowShopWithCards(cards);
+    public IEnumerator HandleHide(
+      MoveCardsWithCustomAnimationCommand command,
+      CardAnimationService service
+    )
+    {
+      var shopLayout = service.Registry.DreamscapeLayout.ShopLayout;
+      var cardViews = command.Cards;
+      var cards = cardViews.Select(cv => service.Registry.CardService.GetCard(cv.Id)).ToList();
+      var stagger = command.StaggerInterval.ToSeconds();
+
+      for (int i = 0; i < cards.Count; ++i)
+      {
+        var card = cards[i];
+        if (i < cards.Count - 1)
+        {
+          service.StartCoroutine(ScaleCardDownInPlace(card));
+          if (stagger > 0)
+          {
+            yield return new WaitForSeconds(stagger);
+          }
+        }
+        else
+        {
+          yield return ScaleCardDownInPlace(card);
+        }
+      }
+    }
+
+    IEnumerator ScaleCardDownInPlace(Card card)
+    {
+      var seq = TweenUtils.Sequence("ShopScaleDown");
+      seq.Insert(
+        0,
+        card.transform.DOScale(Vector3.one * 0.01f, TweenUtils.MoveAnimationDurationSeconds)
+      );
+      yield return seq.WaitForCompletion();
     }
 
     IEnumerator MoveCardToShop(
