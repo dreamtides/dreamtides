@@ -200,6 +200,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 81f0bad4f7d5bad4ca94860844466f04
+    m_Address: Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/goldfeather.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 828951a51d69a418d9de14a1a4ea193b
     m_Address: Assets/ThirdParty/Hovl Studio/Magic circles/Dreamtides/Magic circle
       1.prefab

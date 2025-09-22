@@ -8,6 +8,29 @@ using UnityEngine;
 
 namespace Dreamtides.Prototype
 {
+  [Serializable]
+  // Per-card customization for creation/update requests.
+  public class CardOverride
+  {
+    // Zero-based index within the requested group window
+    public int Index { get; set; }
+
+    // Optional prefab override
+    public CardPrefab? Prefab { get; set; }
+
+    // Optional revealed data overrides
+    public string? Name { get; set; }
+    public string? Cost { get; set; }
+    public string? Rules { get; set; }
+    public string? CardType { get; set; }
+    public bool? IsFast { get; set; }
+    public long? ImageNumber { get; set; }
+    public string? SpritePath { get; set; }
+    public string? Spark { get; set; }
+    public string? Produced { get; set; }
+    public string? OutlineColorHex { get; set; }
+  }
+
   public class CreateOrUpdateCardsRequest
   {
     public int Count { get; set; }
@@ -21,6 +44,9 @@ namespace Dreamtides.Prototype
 
     // Optional: specific zero-based indices to use Dreamsign prefab (takes precedence over DreamsignPrefabCount)
     public int[]? DreamsignPrefabIndices { get; set; }
+
+    // Optional: arbitrary per-index overrides applied after templating (takes precedence over template fields)
+    public List<CardOverride>? Overrides { get; set; }
 
     // When provided, attach a card on-click action that triggers a debug test scenario
     // with this string. Action path: action.Value.GameActionClass?.DebugAction?.DebugActionClass?.ApplyTestScenarioAction
@@ -67,12 +93,9 @@ namespace Dreamtides.Prototype
       {
         var template = GetTemplateForIndex(request.GroupKey, i);
         var objectPosition = ClonePositionWithSorting(request.Position, i);
-        // Allow overriding the prefab for the first N cards, e.g., shop dreamsigns
-        CardPrefab? prefabOverride = null;
-        if (IsDreamsignIndex(request, i))
-        {
-          prefabOverride = CardPrefab.Dreamsign;
-        }
+        // Unified override path (including dreamsign indices)
+        var cardOv = GetEffectiveOverride(request, i);
+        CardPrefab? prefabOverride = cardOv?.Prefab;
         var card = BuildCardView(
           request.GroupKey,
           template,
@@ -82,6 +105,11 @@ namespace Dreamtides.Prototype
           request.OutlineColorHex,
           prefabOverride
         );
+        // Apply revealed data overrides after creation (if revealed)
+        if (request.Revealed && card.Revealed != null && cardOv != null)
+        {
+          ApplyRevealedOverrides(card.Revealed, cardOv);
+        }
         if (request.Revealed && request.OnClickDebugScenario != null && card.Revealed != null)
         {
           EnsureActions(card.Revealed);
@@ -97,15 +125,14 @@ namespace Dreamtides.Prototype
       {
         var existing = cache[i];
         var templateForUpdate = GetTemplateForIndex(request.GroupKey, i);
+        var cardOv = GetEffectiveOverride(request, i);
         existing.Position = ClonePositionWithSorting(request.Position, i); // Update sorting key relative to new request
         if (existing.CardFacing != (request.Revealed ? CardFacing.FaceUp : CardFacing.FaceDown))
         {
           existing.CardFacing = request.Revealed ? CardFacing.FaceUp : CardFacing.FaceDown;
         }
-        // Keep prefab consistent with requested dreamsign count (first N use Dreamsign, others use template prefab)
-        existing.Prefab = IsDreamsignIndex(request, i)
-          ? CardPrefab.Dreamsign
-          : templateForUpdate.Prefab;
+        // Keep prefab consistent via effective overrides (which include Dreamsign indices)
+        existing.Prefab = cardOv?.Prefab ?? templateForUpdate.Prefab;
         if (request.Revealed)
         {
           if (existing.Revealed == null)
@@ -119,9 +146,19 @@ namespace Dreamtides.Prototype
             existing.Revealed.OutlineColor = Mason.MakeColor(request.OutlineColorHex);
           }
 
+          // Apply any per-card revealed overrides (take precedence over request outline)
+          if (cardOv != null && existing.Revealed != null)
+          {
+            ApplyRevealedOverrides(existing.Revealed, cardOv);
+          }
+
           // Wire up on-click debug scenario for updated cards when requested
           if (request.OnClickDebugScenario != null)
           {
+            if (existing.Revealed == null)
+            {
+              existing.Revealed = BuildRevealed(templateForUpdate, request.OutlineColorHex);
+            }
             EnsureActions(existing.Revealed);
             var cardId = existing.Id; // do not recompute by index; cache may be rotated
             existing.Revealed.Actions.OnClick = BuildDebugOnClick(
@@ -413,6 +450,90 @@ namespace Dreamtides.Prototype
         return false;
       }
       return index < request.DreamsignPrefabCount;
+    }
+
+    CardOverride? GetOverrideForIndex(CreateOrUpdateCardsRequest request, int index)
+    {
+      var overrides = request.Overrides;
+      if (overrides == null || overrides.Count == 0)
+        return null;
+      for (int i = 0; i < overrides.Count; i++)
+      {
+        if (overrides[i].Index == index)
+          return overrides[i];
+      }
+      return null;
+    }
+
+    // Merge Dreamsign index handling into the overrides path without mutating the caller's overrides.
+    CardOverride? GetEffectiveOverride(CreateOrUpdateCardsRequest request, int index)
+    {
+      var ov = GetOverrideForIndex(request, index);
+      var isDream = IsDreamsignIndex(request, index);
+      if (!isDream)
+      {
+        return ov;
+      }
+
+      if (ov == null)
+      {
+        return new CardOverride { Index = index, Prefab = CardPrefab.Dreamsign };
+      }
+
+      if (ov.Prefab == null)
+      {
+        // Return a shallow copy with Prefab set to Dreamsign so we don't mutate the original
+        return new CardOverride
+        {
+          Index = ov.Index,
+          Prefab = CardPrefab.Dreamsign,
+          Name = ov.Name,
+          Cost = ov.Cost,
+          Rules = ov.Rules,
+          CardType = ov.CardType,
+          IsFast = ov.IsFast,
+          ImageNumber = ov.ImageNumber,
+          SpritePath = ov.SpritePath,
+          Spark = ov.Spark,
+          Produced = ov.Produced,
+          OutlineColorHex = ov.OutlineColorHex,
+        };
+      }
+
+      return ov;
+    }
+
+    void ApplyRevealedOverrides(RevealedCardView revealed, CardOverride ov)
+    {
+      if (ov.Name != null)
+        revealed.Name = ov.Name;
+      if (ov.Cost != null)
+        revealed.Cost = ov.Cost;
+      if (ov.Rules != null)
+        revealed.RulesText = ov.Rules;
+      if (ov.CardType != null)
+        revealed.CardType = ov.CardType;
+      if (ov.IsFast.HasValue)
+        revealed.IsFast = ov.IsFast.Value;
+      if (ov.Spark != null)
+        revealed.Spark = ov.Spark;
+      if (ov.Produced != null)
+        revealed.Produced = ov.Produced;
+      if (!string.IsNullOrEmpty(ov.OutlineColorHex))
+      {
+        revealed.OutlineColor = Mason.MakeColor(ov.OutlineColorHex);
+      }
+      if (!string.IsNullOrEmpty(ov.SpritePath))
+      {
+        revealed.Image = new DisplayImage { Sprite = new SpriteAddress { Sprite = ov.SpritePath } };
+      }
+      else if (ov.ImageNumber.HasValue)
+      {
+        revealed.Image = new DisplayImage
+        {
+          Sprite = new SpriteAddress { Sprite = BuildSpritePath(ov.ImageNumber.Value) },
+        };
+      }
     }
 
     // Clear a group's cache so that subsequent requests will recreate cards from templates.

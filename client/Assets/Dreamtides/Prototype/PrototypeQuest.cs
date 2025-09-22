@@ -77,6 +77,20 @@ public class PrototypeQuest : Service
   List<string> _currentDraftPickIds = new List<string>(4);
   List<string> _currentShopDisplayIds = new List<string>(8);
 
+  // Optional per-card overrides when spawning shop cards
+  List<CardOverride>? _shopOverrides;
+
+  // Public API to configure arbitrary shop card overrides (index-based)
+  public void ConfigureShopOverrides(params CardOverride[] overrides)
+  {
+    _shopOverrides = overrides?.ToList();
+  }
+
+  public void ClearShopOverrides()
+  {
+    _shopOverrides = null;
+  }
+
   void Awake()
   {
     Application.targetFrameRate = 60;
@@ -288,6 +302,30 @@ public class PrototypeQuest : Service
   {
     // Reset the shop cache so we create fresh cards and can apply Dreamsign overrides deterministically
     _prototypeCards.ResetGroup("shop");
+
+    if (_shopOverrides == null)
+    {
+      _shopOverrides = new List<CardOverride>();
+    }
+    // Remove any prior override for index 4 then add our image override
+    _shopOverrides.RemoveAll(o => o.Index == 4);
+    _shopOverrides.Add(
+      new CardOverride
+      {
+        Index = 4,
+        SpritePath = "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/hourglass.png",
+        Prefab = CardPrefab.Dreamsign,
+      }
+    );
+    _shopOverrides.Add(
+      new CardOverride
+      {
+        Index = 5,
+        SpritePath = "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/goldfeather.png",
+        Prefab = CardPrefab.Dreamsign,
+      }
+    );
+
     StartCoroutine(
       CreateOrUpdateCards(
         new CreateOrUpdateCardsRequest
@@ -303,8 +341,7 @@ public class PrototypeQuest : Service
           },
           Revealed = true,
           GroupKey = "shop",
-          // Make cards #5 and #6 (zero-based indices 4 and 5) Dreamsigns
-          DreamsignPrefabIndices = new[] { 4, 5 },
+          Overrides = _shopOverrides,
         }
       )
     );
@@ -497,6 +534,15 @@ public class PrototypeQuest : Service
 
   IEnumerator RunShopDisplaySequence()
   {
+    // Ensure the custom image override for card #5 persists during display
+    const string hourglassPath =
+      "Assets/ThirdParty/AngelinaAvgustova/WitchCraftIcons/PNG/hourglass.png";
+    if (_shopOverrides == null)
+    {
+      _shopOverrides = new List<CardOverride>();
+    }
+    _shopOverrides.RemoveAll(o => o.Index == 4);
+    _shopOverrides.Add(new CardOverride { Index = 4, SpritePath = hourglassPath });
     var allCards = _prototypeCards.CreateOrUpdateCards(
       new CreateOrUpdateCardsRequest
       {
@@ -509,7 +555,7 @@ public class PrototypeQuest : Service
         Revealed = true,
         GroupKey = "shop",
         OnClickDebugScenario = "shop-display",
-        DreamsignPrefabIndices = new[] { 4, 5 },
+        Overrides = _shopOverrides,
       }
     );
     _currentShopDisplayIds = allCards.Take(6).Select(cv => cv.Id).ToList();

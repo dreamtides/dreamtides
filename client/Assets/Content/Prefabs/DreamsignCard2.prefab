@@ -255,7 +255,15 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 8215946370556705966, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
+      propertyPath: _sparkText
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8215946370556705966, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
       propertyPath: _costBackground
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8215946370556705966, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}
+      propertyPath: _sparkBackground
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 8215946370556705966, guid: dd6008076c4484dbda8c385e712d05aa, type: 3}

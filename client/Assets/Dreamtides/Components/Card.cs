@@ -58,19 +58,19 @@ namespace Dreamtides.Components
     internal SpriteRenderer _battlefieldOutline = null!;
 
     [SerializeField]
-    internal SpriteRenderer _costBackground = null!;
+    internal SpriteRenderer? _costBackground;
 
     [SerializeField]
-    internal TextMeshPro _costText = null!;
+    internal TextMeshPro? _costText;
 
     [SerializeField]
     internal TextMeshPro _producedEnergyText = null!;
 
     [SerializeField]
-    internal Renderer _sparkBackground = null!;
+    internal Renderer? _sparkBackground;
 
     [SerializeField]
-    internal TextMeshPro _sparkText = null!;
+    internal TextMeshPro? _sparkText;
 
     [SerializeField]
     internal Renderer _battlefieldSparkBackground = null!;
@@ -219,13 +219,13 @@ namespace Dreamtides.Components
 
     public void ApplyPreview(CardPreviewView preview, Color textColor)
     {
-      if (preview.Cost != null)
+      if (preview.Cost != null && _costText)
       {
         _costText.text = preview.Cost;
         _costText.color = textColor;
       }
 
-      if (preview.Spark != null)
+      if (preview.Spark != null && _sparkText)
       {
         _sparkText.text = preview.Spark;
         _battlefieldSparkText.text = preview.Spark;
@@ -243,11 +243,19 @@ namespace Dreamtides.Components
 
     public void ClearPreview()
     {
-      _costText.text = CardView.Revealed?.Cost;
-      _sparkText.text = CardView.Revealed?.Spark;
+      if (_costText)
+      {
+        _costText.text = CardView.Revealed?.Cost;
+        _costText.color = Color.white;
+      }
+
+      if (_sparkText)
+      {
+        _sparkText.text = CardView.Revealed?.Spark;
+        _sparkText.color = Color.white;
+      }
+
       _battlefieldSparkText.text = CardView.Revealed?.Spark;
-      _costText.color = Color.white;
-      _sparkText.color = Color.white;
       _battlefieldSparkText.color = Color.white;
       _battlefieldIconContainer.SetActive(false);
     }
@@ -392,7 +400,12 @@ namespace Dreamtides.Components
         _costText.text = revealed.Cost?.ToString();
       }
       _producedEnergyText.text = revealed.Produced?.ToString();
-      _sparkText.text = revealed.Spark?.ToString();
+
+      if (_sparkText)
+      {
+        _sparkText.text = revealed.Spark?.ToString();
+      }
+
       _battlefieldSparkText.text = revealed.Spark?.ToString();
       _typeText.text = revealed.CardType;
 
@@ -732,7 +745,11 @@ namespace Dreamtides.Components
         _cardBack.gameObject.SetActive(false);
         _cardFront.gameObject.SetActive(true);
         _battlefieldCardFront.gameObject.SetActive(false);
-        _sparkBackground.gameObject.SetActive(CardView.Revealed?.Spark != null);
+
+        if (_sparkBackground)
+        {
+          _sparkBackground.gameObject.SetActive(CardView.Revealed?.Spark != null);
+        }
         _cardCollider.center = new Vector3(0, -0.5f, 0);
         _cardCollider.size = new Vector3(2.5f, 4f, 0.1f);
         _cardFrame.gameObject.SetActive(true);
